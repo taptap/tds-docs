@@ -10,24 +10,34 @@ module.exports = {
   projectName: 'docusaurus', // Usually your repo name.
   themeConfig: {
     navbar: {
-      title: 'My Site',
+      title: 'TapTap Doc',
       logo: {
-        alt: 'My Site Logo',
-        src: 'img/logo.svg',
+        alt: 'Tap Logo',
+        src: 'img/favicon.ico',
       },
       items: [
         {
-          to: 'docs/',
-          activeBasePath: 'docs',
-          label: 'Docs',
+          to: '/docs/tap-unity',
+          //activeBasePath: 'docs',
+          label: 'TapSDK',
           position: 'left',
         },
-        {to: 'blog', label: 'Blog', position: 'left'},
-        {
-          href: 'https://github.com/facebook/docusaurus',
-          label: 'GitHub',
-          position: 'right',
-        },
+        // {
+        //   to: '/docs/xd-download',
+        //   //activeBasePath: 'docs',
+        //   label: 'XDSDK',
+        //   position: 'left',
+        // },
+        // {
+        //   to: 'blog',
+        //   label: 'Blog',
+        //   position: 'left'
+        // },
+        // {
+        //   href: 'https://github.com/facebook/docusaurus',
+        //   label: 'Github',
+        //   position: 'right',
+        // },
       ],
     },
     footer: {
