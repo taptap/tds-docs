@@ -2,6 +2,7 @@
 id: tap-unity
 title: Unity工程
 sidebar_label: Unity
+slug: /
 ---
 
 ## 导包
@@ -15,7 +16,7 @@ sidebar_label: Unity
 **至此，已经将XDSDk导入自己的工程**
 ![import down](http://qnblog.ijemy.com/xd_importdown.png)
 
-## 简单实现TapTap登陆功能
+## 登陆功能
 ### 实现步骤
 
 - 平台判断，可自行用unity平台工具判断，也可以导入[Common](#)

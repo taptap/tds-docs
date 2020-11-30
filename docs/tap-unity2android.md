@@ -4,11 +4,11 @@ title: unity打包Android apk
 sidebar_label: Unity2Android
 ---
 
-## 1. 按需要修改AndroidManifest
+## 按需要修改AndroidManifest  
 
-可以根据需要,参照如下示例修改Plugins/Android/AndroidManifest.xml。
+可以根据需要,参照如下示例修改Plugins/Android/AndroidManifest.xml。  
 
-```
+```  
 <?xml version="1.0" encoding="utf-8"?>
 <manifest
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -116,14 +116,12 @@ sidebar_label: Unity2Android
 		android:name="com.squareup.picasso.PicassoProvider"/>
     </application>
 </manifest>
-```
+```   
 
+## 防沉迷设置
+Android 防沉迷依赖于 XDSDK.OnResume 和 XDSDK.OnStop 接口，所以游戏应确保这两个接口接入正常，在 unity 中接入示例：  
 
-## 2. 防沉迷设置
-
-Android 防沉迷依赖于 XDSDK.OnResume 和 XDSDK.OnStop 接口，所以游戏应确保这两个接口接入正常，在 unity 中接入示例：
-
-```
+```  
 void OnApplicationPause(bool pauseStatus)
     {
         if (pauseStatus)
@@ -134,23 +132,19 @@ void OnApplicationPause(bool pauseStatus)
         {
 			xdsdk.XDSDK.OnResume();
         }
-    }
-```
-如果游戏将项目导出为 Android 原生工程，也可以在主 Activity 中的`onResume`和`onStop`中调用原生对应接口 `XDSDK.onResume`和`XDSDK.onStop`。两种接入方式选择一个即可。
+    }  
+```  
+如果游戏将项目导出为 Android 原生工程，也可以在主 Activity 中的`onResume`和`onStop`中调用原生对应接口 `XDSDK.onResume`和`XDSDK.onStop`。两种接入方式选择一个即可。  
 
-## 3. 生成APK
+## 生成APK  
 
-<p>在Unity中生成APK，或将工程导出至Android Studio进行打包。</p>
+在Unity中生成APK，或将工程导出至Android Studio进行打包。
 
-<p style="color:red">当前版本QQ SDK （open_sdk_r6008_lite.jar）包含assets，当构建工具设置成internal时，这些文件不会被打包进apk中，会导致未安装QQ时不能扫码登录。为避免此类问题，建议将构建构建工具换成gradle或提取jar包含的assets文件，放置于android/assets</p>
+当前版本QQ SDK （open_sdk_r6008_lite.jar）包含assets，当构建工具设置成internal时，这些文件不会被打包进apk中，会导致未安装QQ时不能扫码登录。为避免此类问题，建议将构建构建工具换成gradle或提取jar包含的assets文件，放置于android/assets
 
-![](http://qnblog.ijemy.com/xd_android_releaseapk.png)
-
-
+![](http://qnblog.ijemy.com/xd_android_releaseapk.png)  
 
 ## FAQ
-
-
 
 - 游戏打包后无法在AndroidP的机型上使用
 
