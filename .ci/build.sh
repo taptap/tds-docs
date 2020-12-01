@@ -1,5 +1,14 @@
-echo "info: build information"
-yq --version
+YQ_VERSION=3.4.1
+OS=$(uname -s | tr '[A-Z]' '[a-z]')
+ARCH=amd64
+
+echo "info: download prerequisites"
+yqbin=$(mktemp)
+curl --retry 10 -L -o $yqbin https://tap-bintray.oss-cn-shanghai.aliyuncs.com/ops/utils/yq/${YQ_VERSION}/yq_${OS}_${ARCH}
+chmod +x $yqbin
+
+echo "info: show version information"
+$yqbin --version
 npm --version
 
 npm install
@@ -22,7 +31,7 @@ if [ -d "${KUBEFILES_DIR}" ];then
 else
   git clone git@git.gametaptap.com:ops/kubefiles.git
 fi
-yq w -i "${KUBEFILES_PROJECT_DIR}/values.yaml" image.tag "${IMAGE_TAG}"
+$yqbin w -i "${KUBEFILES_PROJECT_DIR}/values.yaml" --style=double image.tag "${IMAGE_TAG}"
 cd ${KUBEFILES_PROJECT_DIR}
 git config user.email cirobot@git.gametaptap.com
 git config user.name "CI Robot tds"
