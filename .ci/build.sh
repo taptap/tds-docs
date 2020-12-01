@@ -1,5 +1,4 @@
-npx @docusaurus/init@latest
-
+npm install
 rm -f ./build
 SOURCE_VERSION_SHORT="$(git rev-parse --short HEAD)"
 echo $SOURCE_VERSION_SHORT
