@@ -148,7 +148,7 @@ void OnApplicationPause(bool pauseStatus)
 
 - 游戏打包后无法在AndroidP的机型上使用
 
-1. 将[org.apache.http.legacy.jar](../org.apache.http.legacy.jar)打包到游戏内
+1. 将[org.apache.http.legacy.jar](#)打包到游戏内
 2. AndroidManifest的Application标签下添加如下内容
 
 ```

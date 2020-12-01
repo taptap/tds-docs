@@ -41,3 +41,4 @@ tap-sdk-doc
 - docusaurus.config.js/#themeConfig.items可以配置多个headerLinks，但是要与sidebars.js对应，否则无法初始化菜单栏  
 - 即便是代码块包裹的dom节点，也会无法编译，导致整个md无法加载。可以尝试用markdown转义符'\'试试  
 - 一定要本地运行一下，检查更改过的代码文件是否能正常打开再pr  
+- 若端口冲突，可手动修改package.json#start脚本；可以添加外部访问ip段，或者指定全部docusaurus start --port 3000 --host 0.0.0.0 

@@ -17,17 +17,21 @@ module.exports = {
       },
       items: [
         {
-          to: '/',
+          type:'doc',
+          //to: '/',
+          docId:'tap-unity',
           //activeBasePath: 'docs',
           label: 'TapSDK',
           position: 'left',
         },
-        // {
-        //   to: '/docs/xd-download',
-        //   //activeBasePath: 'docs',
-        //   label: 'XDSDK',
-        //   position: 'left',
-        // },
+        {
+          //to: '/',
+          type: 'doc',
+          //activeBasePath: 'docs',
+          docId:'tap-api',
+          label: 'API',
+          position: 'left',
+        },
         // {
         //   to: 'blog',
         //   label: 'Blog',

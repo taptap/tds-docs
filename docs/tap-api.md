@@ -1,25 +1,24 @@
 ---
 id: tap-api
-title: tap-api
-sidebar_label: tap-api
+title: Tap-API
+sidebar_label: Tap-API
 ---
 
 ## InitSDK
 初始化SDK
-
-### 示例代码  
+**示例代码**  
 
 ```
 XDSDK.InitSDK("xxxx", 1, "", "", false);
 ```
 
-### API接口  
+**API接口**  
 
 ```
 public static void InitSDK(string appid, int aOrientation, string channel, string version, bool enableTapDB)
 ```
 
-### API参数说明  
+**API参数说明**  
 
 参数 | 必选 | 备注
 :--- | :--- | :---
@@ -32,12 +31,12 @@ enableTapDB | Y | 是否开启TapDB
 ## SetCallback XDCallback
 设置XDSDK的所有回调监听  
 
-### 示例代码  
+**示例代码**  
 ```
     XDSDK.SetCallback (new XDSDKHandler ());
 ```
 
-### API接口  
+**API接口**  
 ```
     public class XDSDKHandler : XDCallback {
 
@@ -147,22 +146,22 @@ enableTapDB | Y | 是否开启TapDB
 
 ## Login
 
-### 示例代码   
+**示例代码**   
 ```
 XDSDK.Login();
 ```
 
-### API接口  
+**API接口**  
 
 ```
 public static void Login()
 ```
 
 
-### API说明  
+**API说明**  
 
 调用该接口会触发下列回调
-<p style="color:red">获取、查看用户信息以及支付接口请在获取到登录成功回调之后调用。</p>
+获取、查看用户信息以及支付接口请在获取到登录成功回调之后调用。
 
 类别 | 回调方法
 --- | ---

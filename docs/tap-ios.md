@@ -1,5 +1,5 @@
 ---
 id: tap-ios
 title: TapSDK iOS快速开始
-sidebar_label: iOS
+sidebar_label: iOS快速开始
 ---
