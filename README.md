@@ -2,8 +2,8 @@
 
 **需要nodejs环境，自己建站需要走下面步骤；直接运行本项目请跳过【建站】这步**  
 1. npx @docusaurus/init@latest init [projectName] classic  
-2. 得到目录  
-my-website  
+2. 初始化后的目录  
+tap-sdk-doc
 ├── blog  
 │   ├── 2019-05-28-hola.md  
 │   ├── 2019-05-29-hello-world.md  
@@ -28,7 +28,7 @@ my-website
 └── yarn.lock  
 3. npm start，开始项目，默认会打开本地3000端口  
 
-## 文档发布
+## 文档发布  
 1. git clone 本项目   
 2. npm install，安装所有需要的包  
 3. 修改/提交md文件到docs    
