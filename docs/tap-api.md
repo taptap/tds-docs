@@ -9,7 +9,7 @@ sidebar_label: Tap-API
 **示例代码**  
 
 ```
-XDSDK.InitSDK("xxxxxxxxx", 1, "", "", false);
+XDSDK.InitSDK("xxxx", 1, "", "", false);
 ```
 
 **API接口**  
