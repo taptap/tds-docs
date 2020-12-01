@@ -9,6 +9,15 @@ module.exports = {
   organizationName: 'facebook', // Usually your GitHub org/user name.
   projectName: 'docusaurus', // Usually your repo name.
   themeConfig: {
+    algolia: {
+      apiKey: '9158d2e78cea72731892281efc0509c4',
+      indexName: 'tap-sdk-doc',
+      appId: 'TVQNXY05EF',
+      contextualSearch: true,
+
+      searchParameters: {},
+
+    },
     navbar: {
       title: 'TapTap Doc',
       logo: {
