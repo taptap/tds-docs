@@ -18,7 +18,7 @@ if [ -d "${KUBEFILES_DIR}" ];then
 else
   git clone git@git.gametaptap.com:ops/kubefiles.git
 fi
-yq w -i "${KUBEFILES_PROJECT_DIR}/values.yaml" image.tag "'${IMAGE_TAG}'"
+yq w -i "${KUBEFILES_PROJECT_DIR}/values.yaml" --style=double image.tag "${IMAGE_TAG}"
 cd ${KUBEFILES_PROJECT_DIR}
 git config user.email cirobot@git.gametaptap.com
 git config user.name "CI Robot tds"
