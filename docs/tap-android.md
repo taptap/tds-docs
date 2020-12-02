@@ -5,7 +5,7 @@ sidebar_label: Android快速开始
 ---
 `本文主要介绍Android如何将TapSDK快速接入并实现登录功能。TapSDK同时还包含用户数据收集和动态发布功能，详情可以参考`[数据收集](./tap-fun-db)、[动态](./tap-fun-moment)`文档介绍`
 ## API实现步骤
-建议在Activity的onCreate调用:    
+**建议在Activity的onCreate按下面顺序调用，可以参考**[simpleCode](#6-simple-code)**里面onCreate操作**
 1. 初始化[initSDK()](#3-初始化)
 2. 注册回调[registerLoginCallback()](#4-注册回调)
 3. 登录[login()](#5-登录)
@@ -15,7 +15,7 @@ sidebar_label: Android快速开始
 - 最低支持Android level 14+。如果需要开启[OAID功能](#)，最低支持Android level 21+  
 
 ## 2. 工程导入
-1. 将[下载](#)的SDK包，导入到'/project/app/libs/'下  
+1. 将[下载](#)的SDK包，导入到'/project/app/libs/'目录下  
 2. 添加gradle配置如下  
 ```  
 repositories{  
@@ -76,7 +76,7 @@ LoginManager.getInstance().registerCallback(callbackManager, new TapTapLoginCall
 
 ## 5. 登录
 TapTap登录，当没有安装TapTap app时，会打开内置webview进行TapTap验证登录  
-**API** [logInWithReadPermissions()](./tap-api.md#loginwitheadpermissions)
+**API**  [logInWithReadPermissions()](./tap-api.md#loginwithreadpermissions)
 
 **示例代码**  
 可以用下面代码直接登录：

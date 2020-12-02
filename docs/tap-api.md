@@ -144,7 +144,7 @@ loginType | 否 | 第三方登录枚举类型，具体见下面说明
 | PhoneNumber      |    手机号登录   |
 | Custom      |   用户自定义登录类型  （默认名字为Custom,如需修改可以调用LoginType.Custom.changeType） |
 
-### openId获取方式
+### Tap登录后openId获取方式
 ```
 Profile.fetchProfileForCurrentAccessToken(new Api.ApiCallback<Profile>() {
             @Override
