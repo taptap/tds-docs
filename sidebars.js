@@ -14,6 +14,7 @@ module.exports = {
     {
       常见问题:['tap-unity-faq','tap-ios-faq','tap-android-faq'],
     },
+    'tap-changelog',
     'tap-known',
   ],
   api: ['tap-api']

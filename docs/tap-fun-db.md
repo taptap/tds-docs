@@ -3,14 +3,21 @@ id: tap-fun-db
 title: TapDB数据收集
 sidebar_label: 数据收集
 ---
-
+`本文用Android API介绍数据收集相关功能和使用方式，iOS和unity可参考同名方法和参数即可`
 ## 1. 介绍
 TapSDK提供一套可供游戏开发者收集用户数据的API。系统会收集用户数据并进行分析，最终形成数据报表，帮助游戏开发者分析用户行为并优化游戏。  
 参考：https://www.tapdb.com/  
 
 ## 2. 功能开启
+放在[TdsInitializer.init](./tap-api.md#init)初始化SDK之后调用即可  
 **API**  
-TapSDK.enableTapDB
+```
+TdsInitializer.enableTapDB(String gameVersion, String gameChannel);
+```
+**示例代码**
+```
+TdsInitializer.enableTapDB("v1.0.0","channel");
+```
 
 **enableTapDB 参数说明：**   
 
@@ -19,25 +26,24 @@ TapSDK.enableTapDB
 channel | 否 | 长度大于0并小于等于256。分包渠道。1.2.名词解释中有介绍
 gameVersion | 否 | 长度大于0并小于等于256。游戏版本。为空时，自动获取游戏安装包的版本（AndroidManifest.xml中的versionName）
 
-## 3. 获取初始化参数
-调用init初始化后，可以调用一下接口获取初始化参数。
 
-```
-public synchronized static Map<String, String> getStartInfo()
-```
+## 3. 记录一个用户
+当enableTapDB后，可以调用此API  
 
-## 4. 记录一个用户
-
-记录一个用户。当用户登陆时调用。
-
+**API**
 ```
 public static void setUser(String userId)
 ```
-**或使用以下方式**
 
 ```
-public static void setUser(String userId,String openId, LoginType loginType)
+public static void setUser(String userId, String openId, LoginType loginType)
 ```
+
+**示例代码**
+```
+TapDB.setUser("xxxxuser1","openId",LoginType.TapTap);
+```
+**setUser参数说明**
 
 字段 | 可为空 | 说明
 | ------ | ------ | ------ |
@@ -45,7 +51,7 @@ userId | 否 | 长度大于0并小于等于256。只能包含数字、大小写�
 openId | 否 | 通过第三方登录获取到的openId
 loginType | 否 | 第三方登录枚举类型，具体见下面说明
 
-loginType 类型说明
+**loginType类型说明**
 
 | 参数      |    说明   |
 | :-------- | :-------- |
@@ -61,49 +67,84 @@ loginType 类型说明
 | PhoneNumber      |    手机号登录   |
 | Custom      |   用户自定义登录类型  （默认名字为Custom,如需修改可以调用LoginType.Custom.changeType） |
 
-## 5. 用户名称
+### TapTap登录时openId获取方式
+```
+Profile.fetchProfileForCurrentAccessToken(new Api.ApiCallback<Profile>() {
+            @Override
+            public void onSuccess(Profile data) {
+                Log.e(Tag, "checkLogin-onSuccess");
+                String openId = Profile.getCurrentProfile().getOpenid();
+            }
 
-设置用户名。
+            @Override
+            public void onError(Throwable error) {
+                Log.e(Tag, "checkLogin-onError");
+                login();
+            }
+        });
+```
 
+## 4. 用户名称
+设置用户名称
+**API**  
 ```
 public static void setName(String name)
+```
+**示例代码**
+```
+TapDB.setName("taptap");
 ```
 
 字段 | 可为空 | 说明
 | ------ | ------ | ------ |
 name | 否 | 长度大于0并小于等于256。用户名
 
-## 6. 用户等级
-
-设置用户等级。用户登录或升级时调用。
-
+## 5. 用户等级
+设置用户等级。用户登录或升级时调用  
+**API**  
 ```
 public static void setLevel(int level)
+```
+**示例代码**
+```
+TapDB.setLevel(5);
 ```
 
 字段 | 可为空 | 说明
 | ------ | ------ | ------ |
 level | 否 | 大于等于0。用户等级
 
-## 7. 用户所在服务器
+## 6. 用户所在服务器
 
-设置用户所在服务器。用户登陆或切换服务器时调用。
+设置用户所在服务器。用户登陆或切换服务器时调用
 
+**API**  
 ```
 public static void setServer(String server)
 ```
+**示例代码**
+```
+TapDB.setServer("https://test.taptap.com/callback");
+```
+
 
 字段 | 可为空 | 说明
 | ------ | ------ | ------ |
 server | 否 | 长度大于0并小于等于256。用户所在服务器
 
-## 8. 充值
+## 7. 充值
 
 充值成功时调用。SDK推送和4.1中描述的服务端推送方法只能选择其中一种。建议优先选择服务端推送方式，以保证数据的准确性。
 
+**API**  
 ```
 public static void onCharge(String orderId, String product, long amount, String currencyType, String payment)
 ```
+**示例代码**
+```
+TapDB.onCharge("0xueiEns","大宝剑","100","CNY","wechat");
+```
+**参数说明**
 
 字段 | 可为空 | 说明
 | ------ | ------ | ------ |
@@ -115,12 +156,22 @@ payment | 是 | 长度大于0并小于等于256。充值渠道
 
 常见货币类型的格式参考<a target="_blank" href="https://www.tapdb.com/docs/zh_CN/features/exchangeRate.html">汇率表</a>
 
-## 9. 自定义事件
+## 8. 自定义事件
 
 推送自定义事件。需要在控制台预先进行配置。
 
+**API**  
 ```
 public static void onEvent(String eventCode, JSONObject properties)
+```
+**示例代码**
+```
+try {
+    JSONObject object = new JSONObject("{\"param1\":\"param1\",\"param2\":\"param2\"}");
+    TapDB.setLevel(4);TapDB.onEvent("1000",object);
+} catch (JSONException e) {
+    e.printStackTrace();
+}
 ```
 
 字段 | 可为空 | 说明
@@ -128,22 +179,45 @@ public static void onEvent(String eventCode, JSONObject properties)
 eventCode | 否 | 在控制台中配置得到的事件编码
 properties | 是 | 事件属性。需要和控制台的配置匹配。值需要是长度大于0并小于等于256的字符串或绝对值小于1E11的浮点数
 
-## 10. 跟踪游戏的启停
+## 9. 跟踪游戏的启停
 
 跟踪用户游戏次数和游戏时长。需要给游戏中每个Activity的onResume和onStop中添加对应的调用。如果多个Activity继承同一个父类，只需要在父类中添加调用即可。比如onResume方法，直接在Activity的onResume方法的最后添加TapDB.onResume(this)即可。
-
+**API**  
 ```
 public static void onResume(Activity activity)
 public static void onStop(Activity activity)
+```
+**示例代码**
+```
+public class GameActivity extends Activity {
+    private GameView gameView;
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_game);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        TapDB.onResume(GameActivity.this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        TapDB.onStop(GameActivity.this);
+    }
+}
 ```
 
 字段 | 可为空 | 说明
 | ------ | ------ | ------ |
 activity | 否 | 当前Activity对象。一般传递"this"
 
-## 11. 服务端推送接口
+## 10. 服务端推送接口
 
-### 11.1 充值推送接口
+### 10.1 充值推送接口
 
 由于SDK推送可能会不太准确，这里提供服务端充值推送方法。需要忽略掉SDK中的相关充值推送接口。
 
@@ -176,7 +250,7 @@ activity | 否 | 当前Activity对象。一般传递"this"
 
 常见货币类型的格式参考<a target="_blank" href="https://www.tapdb.com/docs/zh_CN/features/exchangeRate.html">汇率表</a>
 
-### 11.2 在线数据推送接口
+### 10.2 在线数据推送接口
 
 由于SDK无法推送准确的在线数据，这里提供服务端在线数据推送接口。游戏服务端可以每隔5分钟自行统计在线人数，通过接口推送到TapDB。TapDB进行数据汇总展现。
 
@@ -221,10 +295,9 @@ timestamp | long | 当前统计数据的时间戳(秒)。TapDB会按照自然5�
 
 成功判断：返回的HTTP Code为200时认为发送成功，否则认为失败
 
-## 12. 收集OAID
-**TapDB在2.1.2版本开始新增了OAID获取功能**，需要将下载到的SDK目录中OAID文件夹下的 oaid_sdk_1.0.23.aar 放⼊入项⽬ libs目录下，并且将SDK目录中OAID文件夹下的 supplierconfig.json 放⼊入assets 文件夹内，具体路路径 app/src/main/
+## 11. 收集OAID
+**TapSDK支持OAID获取功能**，需要将下载到的SDK目录中OAID文件夹下的 oaid_sdk_1.0.23.aar 放⼊入项⽬ libs目录下，并且将SDK目录中OAID文件夹下的 supplierconfig.json 放⼊入assets 文件夹内，具体路路径 app/src/main/
 assets , 配置文件内容无需修改。然后在混淆文件里添加如下配置，若无混淆配置可以不添加。
-
 ```
 -keep class XI.CA.XI.**{*;}
 -keep class XI.K0.XI.**{*;}
@@ -238,7 +311,5 @@ assets , 配置文件内容无需修改。然后在混淆文件里添加如下�
 -keep class com.huawei.hms.ads.identifier.**{*;}
 -keep class com.samsung.android.deviceidservice.**{*;}
 -keep class org.json.**{*;}
--keep public class com.netease.nis.sdkwrapper.Utils {public
-<methods>;}
-
+-keep public class com.netease.nis.sdkwrapper.Utils {public <methods>;}
 ```
