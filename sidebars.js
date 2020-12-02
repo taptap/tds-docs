@@ -1,10 +1,20 @@
 module.exports = {
   tapsdk: [
+    'tap-download',
     {
-      Unity快速开始: ['tap-unity', 'tap-unity2android', 'tap-unity2ios'],
+      快速开始: [
+        {Unity快速开始:['tap-unity','tap-unity2ios','tap-unity2android']},
+        'tap-ios',
+        'tap-android',
+      ],
     },
-    'tap-android',
-    'tap-ios',
+    {
+      功能介绍:['tap-fun-login','tap-fun-db','tap-fun-moment'],
+    },
+    {
+      常见问题:['tap-unity-faq','tap-ios-faq','tap-android-faq'],
+    },
+    'tap-known',
   ],
   api: ['tap-api']
 };

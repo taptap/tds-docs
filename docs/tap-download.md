@@ -1,7 +1,7 @@
 ---
 id: tap-download
-title: TapTapSDK下载
-sidebar_label: 下载
+title: 下载
+sidebar_label: 资源中心
 ---
 
 ## SDK下载  
