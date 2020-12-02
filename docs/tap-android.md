@@ -4,7 +4,6 @@ title: TapSDK Android快速开始1
 sidebar_label: Android快速开始
 ---
 
-<<<<<<< HEAD
 ## 1. 环境配置
 Android API Level: 8+  
 gradle: 3.2
@@ -38,6 +37,3 @@ LoginManager.getInstance().logInWithReadPermissions(MainActivity.this, TapTapSdk
 ## 7. simple code
 从[这里](#)可以下载到快速开始Demo
 ## 8. API功能参考
-=======
-hello , I'm tap-android quickstart; test111;
->>>>>>> tds/master
