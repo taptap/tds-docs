@@ -28,7 +28,6 @@ groupId="tap-platform"
 
   ```java
   TdsInitializer.enableTapDB(String gameVersion, String gameChannel);
-  TdsInitializer.enableMoment(String clientId);
   ```  
   </TabItem>
 
