@@ -3,7 +3,11 @@ id: tap-fun-db
 title: TapDB数据收集
 sidebar_label: 数据收集
 ---
-`本文用Android API介绍数据收集相关功能和使用方式，iOS和unity可参考同名方法和参数即可`
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+`本文介绍数据收集相关功能和使用方式`
 ## 1. 介绍
 TapSDK提供一套可供游戏开发者收集用户数据的API。系统会收集用户数据并进行分析，最终形成数据报表，帮助游戏开发者分析用户行为并优化游戏。  
 参考：https://www.tapdb.com/  
@@ -11,13 +15,56 @@ TapSDK提供一套可供游戏开发者收集用户数据的API。系统会收�
 ## 2. 功能开启
 放在[TdsInitializer.init](./tap-api.md#init)初始化SDK之后调用即可  
 **API**  
-```
-TdsInitializer.enableTapDB(String gameVersion, String gameChannel);
-```
+
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+  <TabItem value="android">
+
+  ```java
+  TdsInitializer.enableTapDB(String gameVersion, String gameChannel);
+  TdsInitializer.enableMoment(String clientId);
+  ```  
+  </TabItem>
+
+  <TabItem value="ios">
+
+  </TabItem>
+
+  <TabItem value="unity">
+
+  </TabItem>
+</Tabs>
+
 **示例代码**
+
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+  <TabItem value="android">
+
+```java
+  TdsInitializer.enableTapDB("v1.0.0","channel");
 ```
-TdsInitializer.enableTapDB("v1.0.0","channel");
-```
+  </TabItem>
+
+  <TabItem value="ios">
+
+  </TabItem>
+  <TabItem value="unity">
+
+  </TabItem>
+</Tabs>
 
 **enableTapDB 参数说明：**   
 
@@ -31,18 +78,57 @@ gameVersion | 否 | 长度大于0并小于等于256。游戏版本。为空时�
 当enableTapDB后，可以调用此API  
 
 **API**
-```
-public static void setUser(String userId)
-```
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+  <TabItem value="android">
 
+```java
+  public static void setUser(String userId)
+  public static void setUser(String userId, String openId, LoginType loginType)
 ```
-public static void setUser(String userId, String openId, LoginType loginType)
-```
+  </TabItem>
+
+  <TabItem value="ios">
+
+  </TabItem>
+  <TabItem value="unity">
+
+  </TabItem>
+</Tabs>
+
+
+
 
 **示例代码**
-```
-TapDB.setUser("xxxxuser1","openId",LoginType.TapTap);
-```
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+  <TabItem value="android">
+
+  ```java
+  TapDB.setUser("xxxxuser1","openId",LoginType.TapTap);
+  ```
+  </TabItem>
+
+  <TabItem value="ios">
+
+  </TabItem>
+  <TabItem value="unity">
+
+  </TabItem>
+</Tabs>
+
 **setUser参数说明**
 
 字段 | 可为空 | 说明
@@ -68,32 +154,93 @@ loginType | 否 | 第三方登录枚举类型，具体见下面说明
 | Custom      |   用户自定义登录类型  （默认名字为Custom,如需修改可以调用LoginType.Custom.changeType） |
 
 ### TapTap登录时openId获取方式
-```
-Profile.fetchProfileForCurrentAccessToken(new Api.ApiCallback<Profile>() {
-            @Override
-            public void onSuccess(Profile data) {
-                Log.e(Tag, "checkLogin-onSuccess");
-                String openId = Profile.getCurrentProfile().getOpenid();
-            }
 
-            @Override
-            public void onError(Throwable error) {
-                Log.e(Tag, "checkLogin-onError");
-                login();
-            }
-        });
-```
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+  <TabItem value="android">
+
+  ```java
+  Profile.fetchProfileForCurrentAccessToken(new Api.ApiCallback<Profile>() {
+              @Override
+              public void onSuccess(Profile data) {
+                  Log.e(Tag, "checkLogin-onSuccess");
+                  String openId = Profile.getCurrentProfile().getOpenid();
+              }
+
+              @Override
+              public void onError(Throwable error) {
+                  Log.e(Tag, "checkLogin-onError");
+                  login();
+              }
+          });
+  ```
+  </TabItem>
+
+  <TabItem value="ios">
+
+  </TabItem>
+  <TabItem value="unity">
+
+  </TabItem>
+</Tabs>
+
 
 ## 4. 用户名称
 设置用户名称
 **API**  
-```
-public static void setName(String name)
-```
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+  <TabItem value="android">
+
+  ```java
+  public static void setName(String name)
+  ```
+  </TabItem>
+
+  <TabItem value="ios">
+
+  </TabItem>
+  <TabItem value="unity">
+
+  </TabItem>
+</Tabs>
+
 **示例代码**
-```
-TapDB.setName("taptap");
-```
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+  <TabItem value="android">
+
+  ```java
+  TapDB.setName("taptap");
+  ```
+  </TabItem>
+
+  <TabItem value="ios">
+
+  </TabItem>
+  <TabItem value="unity">
+
+  </TabItem>
+</Tabs>
+
 
 字段 | 可为空 | 说明
 | ------ | ------ | ------ |
@@ -102,13 +249,53 @@ name | 否 | 长度大于0并小于等于256。用户名
 ## 5. 用户等级
 设置用户等级。用户登录或升级时调用  
 **API**  
-```
-public static void setLevel(int level)
-```
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+  <TabItem value="android">
+
+  ```java
+  public static void setLevel(int level)
+  ```
+  </TabItem>
+
+  <TabItem value="ios">
+
+  </TabItem>
+  <TabItem value="unity">
+
+  </TabItem>
+</Tabs>
+
 **示例代码**
-```
-TapDB.setLevel(5);
-```
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+  <TabItem value="android">
+
+  ```java
+  TapDB.setLevel(5);
+  ```
+  </TabItem>
+
+  <TabItem value="ios">
+
+  </TabItem>
+  <TabItem value="unity">
+
+  </TabItem>
+</Tabs>
+
 
 字段 | 可为空 | 说明
 | ------ | ------ | ------ |
@@ -118,14 +305,53 @@ level | 否 | 大于等于0。用户等级
 
 设置用户所在服务器。用户登陆或切换服务器时调用
 
-**API**  
-```
-public static void setServer(String server)
-```
+**API**   
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+  <TabItem value="android">
+
+  ```java
+  public static void setServer(String server)
+  ```
+  </TabItem>
+
+  <TabItem value="ios">
+
+  </TabItem>
+  <TabItem value="unity">
+
+  </TabItem>
+</Tabs>
+
 **示例代码**
-```
-TapDB.setServer("https://test.taptap.com/callback");
-```
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+  <TabItem value="android">
+
+  ```java
+  TapDB.setServer("https://test.taptap.com/callback");
+  ```
+  </TabItem>
+
+  <TabItem value="ios">
+
+  </TabItem>
+  <TabItem value="unity">
+
+  </TabItem>
+</Tabs>
 
 
 字段 | 可为空 | 说明
@@ -137,13 +363,53 @@ server | 否 | 长度大于0并小于等于256。用户所在服务器
 充值成功时调用。SDK推送和4.1中描述的服务端推送方法只能选择其中一种。建议优先选择服务端推送方式，以保证数据的准确性。
 
 **API**  
-```
-public static void onCharge(String orderId, String product, long amount, String currencyType, String payment)
-```
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+  <TabItem value="android">
+
+  ```java
+  public static void onCharge(String orderId, String product, long amount, String currencyType, String payment)
+  ```
+  </TabItem>
+
+  <TabItem value="ios">
+
+  </TabItem>
+  <TabItem value="unity">
+
+  </TabItem>
+</Tabs>
+
 **示例代码**
-```
-TapDB.onCharge("0xueiEns","大宝剑","100","CNY","wechat");
-```
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+  <TabItem value="android">
+
+  ```java
+  TapDB.onCharge("0xueiEns","大宝剑","100","CNY","wechat");
+  ```
+  </TabItem>
+
+  <TabItem value="ios">
+
+  </TabItem>
+  <TabItem value="unity">
+
+  </TabItem>
+</Tabs>
+
 **参数说明**
 
 字段 | 可为空 | 说明
@@ -161,18 +427,58 @@ payment | 是 | 长度大于0并小于等于256。充值渠道
 推送自定义事件。需要在控制台预先进行配置。
 
 **API**  
-```
-public static void onEvent(String eventCode, JSONObject properties)
-```
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+  <TabItem value="android">
+
+  ```java
+  public static void onEvent(String eventCode, JSONObject properties)
+  ```
+  </TabItem>
+
+  <TabItem value="ios">
+
+  </TabItem>
+  <TabItem value="unity">
+
+  </TabItem>
+</Tabs>
+
 **示例代码**
-```
-try {
-    JSONObject object = new JSONObject("{\"param1\":\"param1\",\"param2\":\"param2\"}");
-    TapDB.setLevel(4);TapDB.onEvent("1000",object);
-} catch (JSONException e) {
-    e.printStackTrace();
-}
-```
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+  <TabItem value="android">
+
+  ```java
+  try {
+      JSONObject object = new JSONObject("{\"param1\":\"param1\",\"param2\":\"param2\"}");
+      TapDB.setLevel(4);TapDB.onEvent("1000",object);
+  } catch (JSONException e) {
+      e.printStackTrace();
+  }
+  ```
+  </TabItem>
+
+  <TabItem value="ios">
+
+  </TabItem>
+  <TabItem value="unity">
+
+  </TabItem>
+</Tabs>
+
 
 字段 | 可为空 | 说明
 | ------ | ------ | ------ |
@@ -183,33 +489,72 @@ properties | 是 | 事件属性。需要和控制台的配置匹配。值需要�
 
 跟踪用户游戏次数和游戏时长。需要给游戏中每个Activity的onResume和onStop中添加对应的调用。如果多个Activity继承同一个父类，只需要在父类中添加调用即可。比如onResume方法，直接在Activity的onResume方法的最后添加TapDB.onResume(this)即可。
 **API**  
-```
-public static void onResume(Activity activity)
-public static void onStop(Activity activity)
-```
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+  <TabItem value="android">
+
+  ```java
+  public static void onResume(Activity activity)
+  public static void onStop(Activity activity)
+  ```
+  </TabItem>
+
+  <TabItem value="ios">
+
+  </TabItem>
+  <TabItem value="unity">
+
+  </TabItem>
+</Tabs>
+
 **示例代码**
-```
-public class GameActivity extends Activity {
-    private GameView gameView;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_game);
-    }
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+  <TabItem value="android">
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        TapDB.onResume(GameActivity.this);
-    }
+  ```java
+  public class GameActivity extends Activity {
+      private GameView gameView;
+      @Override
+      protected void onCreate(Bundle savedInstanceState) {
+          super.onCreate(savedInstanceState);
+          setContentView(R.layout.activity_game);
+      }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        TapDB.onStop(GameActivity.this);
-    }
-}
-```
+      @Override
+      protected void onResume() {
+          super.onResume();
+          TapDB.onResume(GameActivity.this);
+      }
+
+      @Override
+      protected void onPause() {
+          super.onPause();
+          TapDB.onStop(GameActivity.this);
+      }
+  }
+  ```
+  </TabItem>
+  <TabItem value="ios">
+
+  </TabItem>
+  <TabItem value="unity">
+
+  </TabItem>
+</Tabs>
+
 
 字段 | 可为空 | 说明
 | ------ | ------ | ------ |
@@ -296,20 +641,43 @@ timestamp | long | 当前统计数据的时间戳(秒)。TapDB会按照自然5�
 成功判断：返回的HTTP Code为200时认为发送成功，否则认为失败
 
 ## 11. 收集OAID
-**TapSDK支持OAID获取功能**，需要将下载到的SDK目录中OAID文件夹下的 oaid_sdk_1.0.23.aar 放⼊入项⽬ libs目录下，并且将SDK目录中OAID文件夹下的 supplierconfig.json 放⼊入assets 文件夹内，具体路路径 app/src/main/
-assets , 配置文件内容无需修改。然后在混淆文件里添加如下配置，若无混淆配置可以不添加。
-```
--keep class XI.CA.XI.**{*;}
--keep class XI.K0.XI.**{*;}
--keep class XI.XI.K0.**{*;}
--keep class XI.vs.K0.**{*;}
--keep class XI.xo.XI.XI.**{*;}
--keep class com.asus.msa.SupplementaryDID.**{*;}
--keep class com.asus.msa.sdid.**{*;}
--keep class com.bun.lib.**{*;}
--keep class com.bun.miitmdid.**{*;}
--keep class com.huawei.hms.ads.identifier.**{*;}
--keep class com.samsung.android.deviceidservice.**{*;}
--keep class org.json.**{*;}
--keep public class com.netease.nis.sdkwrapper.Utils {public <methods>;}
-```
+
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+  <TabItem value="android">
+  TapSDK支持OAID获取功能，需要将下载到的SDK目录中OAID文件夹下的 oaid_sdk_1.0.23.aar 放⼊入项⽬ libs目录下，并且将SDK目录中OAID文件夹下的 supplierconfig.json 放⼊入assets 文件夹内，具体路路径 app/src/main/
+  assets , 配置文件内容无需修改。然后在混淆文件里添加如下配置，若无混淆配置可以不添加。
+
+  ```java
+
+  -keep class XI.CA.XI.**{*;}
+  -keep class XI.K0.XI.**{*;}
+  -keep class XI.XI.K0.**{*;}
+  -keep class XI.vs.K0.**{*;}
+  -keep class XI.xo.XI.XI.**{*;}
+  -keep class com.asus.msa.SupplementaryDID.**{*;}
+  -keep class com.asus.msa.sdid.**{*;}
+  -keep class com.bun.lib.**{*;}
+  -keep class com.bun.miitmdid.**{*;}
+  -keep class com.huawei.hms.ads.identifier.**{*;}
+  -keep class com.samsung.android.deviceidservice.**{*;}
+  -keep class org.json.**{*;}
+  -keep public class com.netease.nis.sdkwrapper.Utils {public <methods>;}
+
+  ```
+
+  </TabItem>
+
+  <TabItem value="ios">
+
+  </TabItem>
+  <TabItem value="unity">
+
+  </TabItem>
+</Tabs>

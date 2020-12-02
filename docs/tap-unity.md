@@ -2,7 +2,6 @@
 id: tap-unity
 title: Unity工程
 sidebar_label: Unity
-slug: /
 ---
 ## 1. 环境配置
 Unity Version: 8+  

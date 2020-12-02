@@ -28,7 +28,7 @@ module.exports = {
         {
           type:'doc',
           //to: '/',
-          docId:'tap-unity',
+          docId:'tap-android',
           //activeBasePath: 'docs',
           label: 'TapSDK',
           position: 'left',

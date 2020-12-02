@@ -3,7 +3,7 @@ id: tap-changelog
 title: TapSDK更新日志
 sidebar_label: 更新日志
 ---
-## v1.1.0
+## v1.1.1
 **新增**
 - 新增日志打点功能
 - 新增微信登录
