@@ -3,8 +3,8 @@ id: tap-api
 title: Tap-API
 sidebar_label: Tap-API
 ---
-## TdsSDK
-### Init
+## TdsInitializer
+### init
 初始化SDK
 
 **API**  
