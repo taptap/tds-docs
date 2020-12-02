@@ -26,7 +26,7 @@ gameVersion | 否 | 长度大于0并小于等于256。游戏版本。为空时�
 public synchronized static Map<String, String> getStartInfo()
 ```
 
-## 3.3.记录一个用户
+## 4. 记录一个用户
 
 记录一个用户。当用户登陆时调用。
 
@@ -61,7 +61,7 @@ loginType 类型说明
 | PhoneNumber      |    手机号登录   |
 | Custom      |   用户自定义登录类型  （默认名字为Custom,如需修改可以调用LoginType.Custom.changeType） |
 
-## 3.4.用户名称
+## 5. 用户名称
 
 设置用户名。
 
@@ -73,7 +73,7 @@ public static void setName(String name)
 | ------ | ------ | ------ |
 name | 否 | 长度大于0并小于等于256。用户名
 
-## 3.5.用户等级
+## 6. 用户等级
 
 设置用户等级。用户登录或升级时调用。
 
@@ -85,7 +85,7 @@ public static void setLevel(int level)
 | ------ | ------ | ------ |
 level | 否 | 大于等于0。用户等级
 
-## 3.6.用户所在服务器
+## 7. 用户所在服务器
 
 设置用户所在服务器。用户登陆或切换服务器时调用。
 
@@ -97,7 +97,7 @@ public static void setServer(String server)
 | ------ | ------ | ------ |
 server | 否 | 长度大于0并小于等于256。用户所在服务器
 
-## 3.7.充值
+## 8. 充值
 
 充值成功时调用。SDK推送和4.1中描述的服务端推送方法只能选择其中一种。建议优先选择服务端推送方式，以保证数据的准确性。
 
@@ -115,7 +115,7 @@ payment | 是 | 长度大于0并小于等于256。充值渠道
 
 常见货币类型的格式参考<a target="_blank" href="https://www.tapdb.com/docs/zh_CN/features/exchangeRate.html">汇率表</a>
 
-## 3.8.自定义事件
+## 9. 自定义事件
 
 推送自定义事件。需要在控制台预先进行配置。
 
@@ -128,7 +128,7 @@ public static void onEvent(String eventCode, JSONObject properties)
 eventCode | 否 | 在控制台中配置得到的事件编码
 properties | 是 | 事件属性。需要和控制台的配置匹配。值需要是长度大于0并小于等于256的字符串或绝对值小于1E11的浮点数
 
-## 3.9.跟踪游戏的启停
+## 10. 跟踪游戏的启停
 
 跟踪用户游戏次数和游戏时长。需要给游戏中每个Activity的onResume和onStop中添加对应的调用。如果多个Activity继承同一个父类，只需要在父类中添加调用即可。比如onResume方法，直接在Activity的onResume方法的最后添加TapDB.onResume(this)即可。
 
@@ -141,9 +141,9 @@ public static void onStop(Activity activity)
 | ------ | ------ | ------ |
 activity | 否 | 当前Activity对象。一般传递"this"
 
-# 4.服务端推送接口
+## 11. 服务端推送接口
 
-## 4.1.充值推送接口
+### 11.1 充值推送接口
 
 由于SDK推送可能会不太准确，这里提供服务端充值推送方法。需要忽略掉SDK中的相关充值推送接口。
 
@@ -176,7 +176,7 @@ activity | 否 | 当前Activity对象。一般传递"this"
 
 常见货币类型的格式参考<a target="_blank" href="https://www.tapdb.com/docs/zh_CN/features/exchangeRate.html">汇率表</a>
 
-## 4.2.在线数据推送接口
+### 11.2 在线数据推送接口
 
 由于SDK无法推送准确的在线数据，这里提供服务端在线数据推送接口。游戏服务端可以每隔5分钟自行统计在线人数，通过接口推送到TapDB。TapDB进行数据汇总展现。
 
@@ -221,7 +221,7 @@ timestamp | long | 当前统计数据的时间戳(秒)。TapDB会按照自然5�
 
 成功判断：返回的HTTP Code为200时认为发送成功，否则认为失败
 
-# 5.收集OAID
+## 12. 收集OAID
 **TapDB在2.1.2版本开始新增了OAID获取功能**，需要将下载到的SDK目录中OAID文件夹下的 oaid_sdk_1.0.23.aar 放⼊入项⽬ libs目录下，并且将SDK目录中OAID文件夹下的 supplierconfig.json 放⼊入assets 文件夹内，具体路路径 app/src/main/
 assets , 配置文件内容无需修改。然后在混淆文件里添加如下配置，若无混淆配置可以不添加。
 
