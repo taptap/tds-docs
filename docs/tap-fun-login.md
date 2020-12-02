@@ -10,7 +10,7 @@ sidebar_label: 登录
 ## 登录设置
 您可以通过LoginSdkConfig配置您的需要的登录页面是圆角还是直角，及是否需要开启国际化等
 
-**API:** TapSDK.enableTapLogin(LoginSdkConfig)  
+**API:** [TapTapSdk.changeTapLoginConfig](./tap-api.md#changetaploginconfig)(LoginSdkConfig)  
 **`LoginSdkConfig为可配置项，非必须`**
 
 **示例代码**
@@ -24,7 +24,8 @@ TapTapSdk.changeTapLoginConfig(loginSdkConfig);
 ```
 
 ## 登录
-**API:** logInWithReadPermissions(Activity activity, String... var2)
+执行登录操作，跳转TapTap APP登录，当没有TapTap APP时，会默认打开内置webview登录  
+**API:** [logInWithReadPermissions](./tap-api.md#loginwithreadpermissions)(Activity activity, String... var2)
 
 **示例代码**
 ```
@@ -32,7 +33,8 @@ LoginManager.getInstance().logInWithReadPermissions(MainActivity.this, TapTapSdk
 ```
 
 ## 登出
-**API:** logout()  
+退出登录，清除用户登录缓存记录  
+**API:** [logout](./tap-api.md#logout)()  
 
 **示例代码**
 ```

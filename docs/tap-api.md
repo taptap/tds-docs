@@ -50,6 +50,24 @@ gameVersion | 否 | 长度大于0并小于等于256。游戏版本。为空时�
 
 ### enableMoment
 
+## TapTapSdk
+### changeTapLoginConfig
+LoginSdkConfig为可配置项，非必须  
+**API:**
+```
+changeTapLoginConfig(TapTapSdk.LoginSdkConfig var0)
+```
+
+**示例代码**
+```
+TapTapSdk.LoginSdkConfig loginSdkConfig = new TapTapSdk.LoginSdkConfig();
+//false：登录页面是直角，true：登录页面是圆角
+loginSdkConfig.roundCorner = false;
+//RegionType.IO标识为国际版，RegionType.CN为国内版
+loginSdkConfig.regionType = RegionType.IO;
+TapTapSdk.changeTapLoginConfig(loginSdkConfig);
+```
+
 ## LoginManager
 ### registerCallback
 设置TapSDK的登录回调监听  
@@ -102,6 +120,17 @@ LoginManager.getInstance().logInWithReadPermissions(MainActivity.this, TapTapSdk
 登录成功 | void OnLoginSucceed(LoginResponse loginResponse)
 登录失败 | void onError(Throwable throwable)
 登录取消 | void onCancel()  
+
+### logout
+**API**
+```
+logout()
+````
+
+**示例代码**
+```
+LoginManager.getInstance().logout;
+```
 
 ## TapDB
 ### setUser
