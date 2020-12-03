@@ -4,11 +4,18 @@ title: TapSDK Android快速开始
 sidebar_label: Android快速开始
 slug: /
 ---
-`本文主要介绍Android如何将TapSDK快速接入并实现登录功能。TapSDK同时还包含用户数据收集和动态发布功能，详情可以参考`[数据收集](./tap-fun-db)、[动态](./tap-fun-moment)`文档介绍`
+
+
+本文主要介绍Android如何将TapSDK快速接入并实现登录功能。TapSDK同时还包含用户数据收集和动态发布功能，详情可以参考[数据收集](./tap-fun-db)、[动态](./tap-fun-moment)文档介绍
+
+
+:::note
+如需通过示例项目了解如何在 Android 应用中集成 TapSDK，请参阅 GitHub 中的 [TapSDKSample](#)。
+:::
 
 ## API实现核心步骤
 
-- 初始化[init()](#6-初始化)
+- 初始化[init()](#6-初始化) 
 - 注册回调[registerCallback()](#7-注册回调)
 - 登录[logInWithReadPermissions()](#8-登录)
 
@@ -118,7 +125,3 @@ Profile.fetchProfileForCurrentAccessToken(new Api.ApiCallback<Profile>() {
 });
 }
 ```
-
-
-## 6. simple code
-从[这里](#)可以下载到快速开始Demo  
