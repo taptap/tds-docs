@@ -7,6 +7,10 @@ sidebar_label: 数据收集
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
+:::caution
+**目前 需要联系[运营团队](#)获取 TapDB 的使用权限。**
+:::
+
 `本文介绍数据收集相关功能和使用方式`
 ## 1. 介绍
 TapSDK提供一套可供游戏开发者收集用户数据的API。系统会收集用户数据并进行分析，最终形成数据报表，帮助游戏开发者分析用户行为并优化游戏。  
