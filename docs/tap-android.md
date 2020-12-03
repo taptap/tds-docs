@@ -21,11 +21,11 @@ slug: /
 [点击下载](#) TapTap 应用
 
 ## 3. 环境配置
-- 最低支持Android level 14+。如需开启[OAID功能](#)，最低支持Android level 21+  
+- 最低支持Android level 15+。
 
 ## 4. 工程导入
-1. 将[下载](#)的SDK包，导入到 '/project/app/libs/' 目录下  
-2. 打开您工程的 '/project/app/build.gradle' 文件，添加gradle配置如下  
+1. 将[下载](#)的SDK包，导入到 **your_app** > **app** > **libs**  目录下  
+2. 打开您工程的 **you_app** > **app** > **build.gradle** 文件，添加gradle配置如下  
 ```java  
 repositories{  
     flatDir {  
