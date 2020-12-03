@@ -13,11 +13,6 @@ slug: /
 如需通过示例项目了解如何在 Android 应用中集成 TapSDK，请参阅 GitHub 中的 [TapSDKSample](#)。
 :::
 
-## API实现核心步骤
-
-- 初始化[init()](#6-初始化) 
-- 注册回调[registerCallback()](#7-注册回调)
-- 登录[logInWithReadPermissions()](#8-登录)
 
 ## 1. 登录TapTap开发者中心
 请登录 [TapTap开发者中心](#) 来创建应用或注册为开发者。

@@ -100,7 +100,7 @@ module.exports = {
       //     ],
       //   },
       // ],
-      copyright: `Copyright © ${new Date().getFullYear()} TapTap, Inc. Built with Docusaurus.`,
+      copyright: `Copyright © ${new Date().getFullYear()} TapTap, Inc.`,
     },
   },
   presets: [
