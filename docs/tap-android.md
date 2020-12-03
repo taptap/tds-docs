@@ -35,15 +35,8 @@ dependencies {
     implementation (name:'TapSDK_1.0', ext:'aar')  
 }  
 ```  
-## 5. 编辑资源清单
-1. 打开您的 /app/res/values/strings.xml 文件  
-2. 添加如下所示的代码：
 
-```java
- <string name="tap_client_id">[your client id]</string>
-```
-**注意: ** tap_client_id是您从[TapTap开发者中心](#)控制台获取到的Client Id
-## 6. 初始化
+## 5. 初始化
 TapSDK初始化  
 **API**    [TdsInitializer.init()](./tap-api.md#init)  
 
@@ -56,13 +49,27 @@ TdsConfig tdsConfig = new TdsConfig.Builder()
 TdsInitializer.init(tdsConfig);  
 ```
 
-## 7. 注册回调
+## 6. 监听Activity回调
+通过TapTap登录后跳转回来会发起这个回调  
+```java
+CallBackManager callbackManager = CallBackManager.Factory.create();
+@Override
+protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+   super.onActivityResult(requestCode, resultCode, data);
+   if (callbackManager != null) {
+       callbackManager.onActivityResult(requestCode, resultCode, data);
+       Log.e(Tag, "Login-onActivityResult");
+       //TODO
+   }
+}
+```
+
+## 7. 注册登录回调
 监听登录的结果  
 **API**  [registerCallback()](./tap-api.md#registercallback)
 
 **示例代码**
 ```java
-CallBackManager callbackManager = CallBackManager.Factory.create();
 LoginManager.getInstance().registerCallback(callbackManager, new TapTapLoginCallback<LoginResponse>() {
     @Override
     public void onSuccess(LoginResponse loginResponse) {
