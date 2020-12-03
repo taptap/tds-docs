@@ -19,16 +19,16 @@ module.exports = {
 
     },
     navbar: {
-      title: 'TapTap Doc',
+      title: 'TapSDK Doc',
       logo: {
         alt: 'Tap Logo',
         src: 'img/favicon.ico',
       },
       items: [
         {
-          type:'doc',
+          type: 'doc',
           //to: '/',
-          docId:'tap-android',
+          docId: 'tap-android',
           //activeBasePath: 'docs',
           label: 'TapSDK',
           position: 'left',
@@ -37,7 +37,7 @@ module.exports = {
           //to: '/',
           type: 'doc',
           //activeBasePath: 'docs',
-          docId:'tap-api',
+          docId: 'tap-api',
           label: 'API',
           position: 'left',
         },
