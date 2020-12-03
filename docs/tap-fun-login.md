@@ -49,7 +49,7 @@ groupId="tap-platform"
 
 ## 登录
 执行登录操作，跳转TapTap APP登录，当没有TapTap APP时，会默认打开内置webview登录  
-**API:** [logInWithReadPermissions](./tap-api.md#loginwithreadpermissions)(Activity activity, String... var2)
+**API:** [startTapLogin](./tap-api.md#startTapLogin)(Activity activity, String... var2)
 
 **示例代码**
 
@@ -64,7 +64,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-  LoginManager.getInstance().logInWithReadPermissions(MainActivity.this, TapTapSdk.SCOPE_PUIBLIC_PROFILE);
+  TapLoginHelper.getInstance().startTapLogin(MainActivity.this, TapTapSdk.SCOPE_PUIBLIC_PROFILE);
   ```
   </TabItem>
 
@@ -94,7 +94,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-  LoginManager.getInstance().logout();
+  TapLoginHelper.logout();
   ```
   </TabItem>
 

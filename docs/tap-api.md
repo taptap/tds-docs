@@ -200,8 +200,9 @@ TapTapSdk.changeTapLoginConfig(loginSdkConfig);
 
 
 
-## LoginManager
-### registerCallback
+## TapLoginHelper
+
+### setLoginResultCallback
 设置TapSDK的登录回调监听  
 
 **API**  
@@ -216,7 +217,7 @@ groupId="tap-platform"
 <TabItem value="android">
 
 ```java
-registerCallback(CallBackManager var1, final TapTapLoginCallback<LoginResponse> var2);
+setLoginResultCallback(TapLoginHelper.ITapLoginResultCallback var1)
 ````
 </TabItem>
 
@@ -243,24 +244,22 @@ groupId="tap-platform"
 <TabItem value="android">
 
 ```java
-callbackManager = CallBackManager.Factory.create();
-LoginManager.getInstance().registerCallback(callbackManager, new TapTapLoginCallback<LoginResponse>() {
+TapLoginHelper.getInstance().setLoginResultCallback(new TapLoginHelper.ITapLoginResultCallback() {
     @Override
-    public void onSuccess(LoginResponse loginResponse) {
-        Log.e(Tag, "Login-onSuccess");
+    public void onLoginSuccess(AccessToken accessToken) {
         startGame();
     }
 
     @Override
-    public void onCancel() {
-        Log.e(Tag, "Login-onCancel");
+    public void onLoginCancel() {
+
     }
 
     @Override
-    public void onError(Throwable throwable) {
-        Log.e(Tag, "Login-onError: " + throwable.getMessage());
+    public void onLoginError(Throwable throwable) {
+        login();
     }
-});    
+});  
 ```
 </TabItem>
 
@@ -276,7 +275,7 @@ LoginManager.getInstance().registerCallback(callbackManager, new TapTapLoginCall
 
 
 
-### logInWithReadPermissions
+### startTapLogin
 **API**
 <Tabs
 groupId="tap-platform"
@@ -289,7 +288,7 @@ groupId="tap-platform"
 <TabItem value="android">
 
 ```java
-logInWithReadPermissions(Activity activity, String... var2)
+startTapLogin(Activity activity, String... var2)
 ````
 </TabItem>
 
@@ -316,7 +315,7 @@ groupId="tap-platform"
 <TabItem value="android">
 
 ```java
-LoginManager.getInstance().logInWithReadPermissions(MainActivity.this, TapTapSdk.SCOPE_PUIBLIC_PROFILE);
+ TapLoginHelper.getInstance().startTapLogin(MainActivity.this,TapTapSdk.SCOPE_PUIBLIC_PROFILE);
 ```
 </TabItem>
 
@@ -333,7 +332,7 @@ LoginManager.getInstance().logInWithReadPermissions(MainActivity.this, TapTapSdk
 
 **API说明**  
 
-调用该接口会触发下列回调
+调用该接口会触发[setloginresultcallback](#setloginresultcallback)回调
 
 类别 | 回调方法
 --- | ---
@@ -381,7 +380,184 @@ groupId="tap-platform"
 <TabItem value="android">
 
 ```java
-LoginManager.getInstance().logout;
+TapLoginHelper.logout();
+```
+</TabItem>
+
+<TabItem value="ios">
+
+</TabItem>
+
+<TabItem value="unity">
+
+</TabItem>
+</Tabs>
+
+### getCurrentAccessToken
+return com.taptap.sdk.AccessToken;  
+
+**API**
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+<TabItem value="android">
+
+```java
+getCurrentAccessToken()
+````
+</TabItem>
+
+<TabItem value="ios">
+
+</TabItem>
+
+<TabItem value="unity">
+
+</TabItem>
+</Tabs>
+
+
+
+**示例代码**
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+<TabItem value="android">
+
+```java
+AccessToken accessToken =  TapLoginHelper.getCurrentAccessToken();
+```
+</TabItem>
+
+<TabItem value="ios">
+
+</TabItem>
+
+<TabItem value="unity">
+
+</TabItem>
+</Tabs>
+
+### getCurrentProfile
+return com.taptap.sdk.Profile;
+
+**API**
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+<TabItem value="android">
+
+```java
+getCurrentProfile()
+````
+</TabItem>
+
+<TabItem value="ios">
+
+</TabItem>
+
+<TabItem value="unity">
+
+</TabItem>
+</Tabs>
+
+
+
+**示例代码**
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+<TabItem value="android">
+
+```java
+Profile profile = TapLoginHelper.getCurrentProfile();
+```
+</TabItem>
+
+<TabItem value="ios">
+
+</TabItem>
+
+<TabItem value="unity">
+
+</TabItem>
+</Tabs>
+
+### fetchProfileForCurrentAccessToken
+
+**API**
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+<TabItem value="android">
+
+```java
+fetchProfileForCurrentAccessToken(Api.ApiCallback<Profile>)
+````
+</TabItem>
+
+<TabItem value="ios">
+
+</TabItem>
+
+<TabItem value="unity">
+
+</TabItem>
+</Tabs>
+
+
+
+**示例代码**
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+<TabItem value="android">
+
+```java
+TapLoginHelper.getInstance().fetchProfileForCurrentAccessToken(new Api.ApiCallback<Profile>() {
+            @Override
+            public void onSuccess(Profile profile) {
+                Log.e(Tag, "checkLogin-onSuccess");
+                //TapDB会用到
+                String openId = Profile.getCurrentProfile().getOpenid();
+                startGame();
+            }
+
+            @Override
+            public void onError(Throwable throwable) {
+                login();
+            }
+        });
 ```
 </TabItem>
 

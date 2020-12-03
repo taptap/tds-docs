@@ -24,14 +24,14 @@ slug: /
 - 最低支持Android level 15+。
 
 ## 4. 工程导入
-### 方法一、自动加载
+<!-- ### 方法一、自动加载
 打开并修改 '/project/app/build.gradle' 文件
 ```java
 dependencies {
    implementation 'com.tds.tapsdk:TapSDK:1.0.0'
 }
-```  
-### 方法二、手动添加
+```   -->
+<!-- ### 方法二、手动添加 -->
 1. 将[下载](#)的SDK包，导入到 '/project/app/libs/' 目录下  
 2. 打开您工程的 '/project/app/build.gradle' 文件，添加gradle配置如下  
 ```java  
@@ -61,57 +61,55 @@ TdsInitializer.init(tdsConfig);
 
 ## 6. 注册登录回调
 监听登录的结果  
-**API**  [registerCallback()](./tap-api.md#registercallback)
+**API**  [setLoginResultCallback()](./tap-api.md#setloginresultcallback)
 
 **示例代码**
 ```java
-CallBackManager callbackManager = CallBackManager.Factory.create();
-LoginManager.getInstance().registerCallback(callbackManager, new TapTapLoginCallback<LoginResponse>() {
+TapLoginHelper.getInstance().setLoginResultCallback(new TapLoginHelper.ITapLoginResultCallback() {
     @Override
-    public void onSuccess(LoginResponse loginResponse) {
-        Log.e(Tag, "Login-onSuccess");
+    public void onLoginSuccess(AccessToken accessToken) {
         startGame();
     }
 
     @Override
-    public void onCancel() {
-        Log.e(Tag, "Login-onCancel");
+    public void onLoginCancel() {
+
     }
 
     @Override
-    public void onError(Throwable throwable) {
-        Log.e(Tag, "Login-onError: " + throwable.getMessage());
+    public void onLoginError(Throwable throwable) {
+        login();
     }
 });
 ```
 
 ## 7. 登录
 TapTap登录，当没有安装TapTap app时，会打开内置webview进行TapTap验证登录  
-**API**  [logInWithReadPermissions()](./tap-api.md#loginwithreadpermissions)
+**API**  [startTapLogin()](./tap-api.md#starttaplogin)
 
 **示例代码**  
 可以用下面代码直接登录：  
 
 ```java
-LoginManager.getInstance().logInWithReadPermissions(MainActivity.this, TapTapSdk.SCOPE_PUIBLIC_PROFILE);
+TapLoginHelper.getInstance().startTapLogin(MainActivity.this,TapTapSdk.SCOPE_PUIBLIC_PROFILE);
 ```
 
 ## 8. 检查登录状态
 
 可以先校验该用户是否登录过，对未登录的用户调用login()  
 
-方法一、通过 TapLoginHelper.getCurrentAccessToken() 和 TapLoginHelper.getCurrentProfile() 方法分别获取登录状态和用户信息  
+方法一、通过 TapLoginHelper.[getCurrentAccessToken](./tap-api.md#getcurrentaccesstoken)() 和 TapLoginHelper.[getCurrentProfile](./tap-api.md#getcurrentprofile)() 方法分别获取登录状态和用户信息  
 
 ```java  
 //未登录用户会返回null
 if (TapLoginHelper.getInstance().getCurrentAccessToken() == null) {
-   LoginManager.getInstance().logInWithReadPermissions(MainActivity.this, TapTapSdk.SCOPE_PUIBLIC_PROFILE);
+    TapLoginHelper.getInstance().startTapLogin(MainActivity.this,TapTapSdk.SCOPE_PUIBLIC_PROFILE);
 } else {
    startGame();
 }
 ```
 
-方法二、通过 TapLoginHelper.fetchProfileForCurrentAccessToken() 获取实时更新的用户信息    
+方法二、通过 TapLoginHelper.[fetchProfileForCurrentAccessToken](./tap-api#fetchprofileforcurrentaccesstoken)() 获取实时更新的用户信息    
 
 ```java  
 //未登录用户会回调onError，已经登录用户实时回调onSuccess
@@ -125,7 +123,10 @@ TapLoginHelper.fetchProfileForCurrentAccessToken(new Api.ApiCallback<Profile>() 
     @Override
     public void onError(Throwable error) {
         Log.e(Tag, "checkLogin-onError");
-        LoginManager.getInstance().logInWithReadPermissions(MainActivity.this, TapTapSdk.SCOPE_PUIBLIC_PROFILE);
+        TapLoginHelper.getInstance().startTapLogin(MainActivity.this, TapTapSdk.SCOPE_PUIBLIC_PROFILE);
     }
 });
 ```
+
+## 9. 登出
+调用`TapLoginHelper.logout()` 实现登出功能。

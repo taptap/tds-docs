@@ -14,7 +14,7 @@ sidebar_label: iOS快速开始
 - 最低支持到iOS 9.0  
 
 ## 4. 工程导入
-### 方式一、自动导入(推荐pod集成)  
+<!-- ### 方式一、自动导入(推荐pod集成)  
 
 1. 安装 CocoaPods
 在终端窗口中输入如下命令（需要提前在 Mac 中安装 Ruby 环境）：
@@ -42,9 +42,9 @@ pod install
 &nbsp;更新   
 ```objectivec
 pod update
-```
+``` -->
 
-### 方式二、手动导入
+<!-- ### 方式二、手动导入 -->
 直接拖拽[下载](#)的SDK到项目目录即可  
 
 ![](https://qnblog.ijemy.com/xd_ios_importsdk.png)
