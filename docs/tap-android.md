@@ -10,15 +10,15 @@ slug: /
 
 
 :::note
-如需通过示例项目了解如何在 Android 应用中集成 TapSDK，请参阅 GitHub 中的 [TapSDKSample](#)。
+如需通过示例项目了解如何在 Android 应用中集成 TapSDK，请参阅 GitHub 中的 [TapSDKSample](https://github.com/TapTap/TapSDKDemoAndroid)。
 :::
 
 
 ## 1. 登录TapTap开发者中心
-请登录 [TapTap开发者中心](#) 来创建应用或注册为开发者。
+请登录 [TapTap开发者中心](https://www.taptap.com/developer-center) 来创建应用或注册为开发者。
 
 ## 2. 下载 TapTap 应用
-[点击下载](#) TapTap 应用
+点击下载 [TapTap 应用](#)
 
 ## 3. 环境配置
 - 最低支持Android level 15+。
