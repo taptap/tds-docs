@@ -20,10 +20,10 @@ slug: /
 ## 2. 下载 TapTap 应用
 点击下载 [TapTap 应用](#)
 
-## 3. 环境配置
+## 3. 环境要求
 - 最低支持Android level 15+。
 
-## 4. 工程导入
+## 4. 工程配置
 <!-- ### 方法一、自动加载
 打开并修改 '/project/app/build.gradle' 文件
 ```java
@@ -45,6 +45,10 @@ dependencies {
     implementation (name:'TapSDK_1.0.0', ext:'aar')  
 }  
 ```  
+3. 打开AndroidManifest.xml添加网络权限  
+```java
+<uses-permission android:name="android.permission.INTERNET"></uses-permission>
+```
 
 ## 5. 初始化
 TapSDK初始化  
@@ -68,17 +72,17 @@ TdsInitializer.init(tdsConfig);
 TapLoginHelper.getInstance().setLoginResultCallback(new TapLoginHelper.ITapLoginResultCallback() {
     @Override
     public void onLoginSuccess(AccessToken accessToken) {
-        startGame();
+        Log.e(Tag, "onLoginSuccess");
     }
 
     @Override
     public void onLoginCancel() {
-
+        Log.e(Tag, "onLoginCancel");
     }
 
     @Override
     public void onLoginError(Throwable throwable) {
-        login();
+        Log.e(Tag, "onLoginError");
     }
 });
 ```
@@ -103,9 +107,9 @@ TapLoginHelper.getInstance().startTapLogin(MainActivity.this,TapTapSdk.SCOPE_PUI
 ```java  
 //未登录用户会返回null
 if (TapLoginHelper.getInstance().getCurrentAccessToken() == null) {
-    TapLoginHelper.getInstance().startTapLogin(MainActivity.this,TapTapSdk.SCOPE_PUIBLIC_PROFILE);
+    //TODO 用户未登录
 } else {
-   startGame();
+   //TODO 用户已经登录过
 }
 ```
 
@@ -116,14 +120,14 @@ if (TapLoginHelper.getInstance().getCurrentAccessToken() == null) {
 TapLoginHelper.fetchProfileForCurrentAccessToken(new Api.ApiCallback<Profile>() {
     @Override
     public void onSuccess(Profile data) {
+        //TODO 用户已经登录过，可以获取Profile信息
         Log.e(Tag, "checkLogin-onSuccess");
-        startGame();
     }
 
     @Override
     public void onError(Throwable error) {
+        //TODO 用户未登录
         Log.e(Tag, "checkLogin-onError");
-        TapLoginHelper.getInstance().startTapLogin(MainActivity.this, TapTapSdk.SCOPE_PUIBLIC_PROFILE);
     }
 });
 ```

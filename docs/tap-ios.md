@@ -4,13 +4,19 @@ title: TapSDK iOS快速开始
 sidebar_label: iOS快速开始
 ---
 
+本文主要介绍iOS如何将TapSDK快速接入并实现登录功能。TapSDK同时还包含用户数据收集和动态发布功能，详情可以参考[数据收集](./tap-fun-db)、[动态](./tap-fun-moment)文档介绍
+
+:::note
+如需通过示例项目了解如何在 Android 应用中集成 TapSDK，请参阅 GitHub 中的 [TapSDKSample](https://github.com/xindong/TapSDKDemoAndroid)。
+:::
+
 ## 1. 登录TapTap开发者中心
 请登录 [TapTap开发者中心](#) 来创建应用或注册为开发者。
 
 ## 2. 下载 TapTap 应用
 [点击下载](#) TapTap 应用
 
-## 3. 环境配置
+## 3. 环境要求
 - 最低支持到iOS 9.0  
 
 ## 4. 工程导入
@@ -51,7 +57,7 @@ pod update
 
 
 ## 5. 添加系统依赖库
-请仔细核对下面依赖库是否都添加成功  
+请仔细核对下面依赖库是否都添加成功   
 ```objectivec
 'TapSDK.framework'
 'WebKit.framework',
@@ -64,17 +70,76 @@ pod update
 'Security.framework',
 ```  
 
-## 6. 初始化
-TapSDK.init();
-## 4. 功能开启
-TapSDK.enableLogin();  
-TapSDK.enableMoment();  
-TapSDK.enableDB();  
-## 5. 注册回调
-TapSDK.registerTapSDKCallback();
-## 6. 开始使用
-LoginManager.getInstance().logInWithReadPermissions(MainActivity.this, TapTapSdk.SCOPE_PUIBLIC_PROFILE);
+## 6. 跳转TapTap登录配置
+`未添加做此配置或者用户无TapTap应用时，默认会打开webview登录`  
+1. 打开info.plist，添加如下配置
 
-## 7. simple code
-从[这里](#)可以下载到快速开始Demo
-## 8. API功能参考
+```objectivec
+<key>CFBundleURLTypes</key>
+<array>
+    <dict>
+        <key>CFBundleTypeRole</key>
+        <string>Editor</string>
+        <key>CFBundleURLName</key>
+        <string>taptap</string>
+        <key>CFBundleURLSchemes</key>
+        <array>
+            <string>ttCqBgq73t1JdHFE3Rk3</string>
+        </array>
+    </dict>
+</array>
+
+<key>LSApplicationQueriesSchemes</key>
+<array>
+   <string>tapiosdk</string>
+   <string>tapsdk</string>
+</array>
+```
+
+2. 添加AppDelegate。TapSDK需要将AppDelegate关联到TTSDKApplicationDelegate对象，要实现这一操作，请添加如下代码到 AppDelegate.m 文件中。
+
+```objectivec
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
+   return [[TTSDKApplicationDelegate sharedInstance] handleTapTapOpenURL:url];
+}
+
+- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
+   return [[TTSDKApplicationDelegate sharedInstance] handleTapTapOpenURL:url];
+}
+```
+
+## 7. 初始化
+TapSDK初始化  
+
+**示例代码**
+```objectivec
+TDSConfig *config = [[TDSConfig alloc] init];
+config.clientId = @"you client id";
+[TDSInitializer initWithConfig:config];
+```
+
+## 8. 登录
+TapTap登录，当没有安装TapTap app时，会打开内置webview进行TapTap验证登录  
+
+**示例代码**  
+```objectivec
+[[[TapLoginHelper alloc] init] startTapLogin:@[@"public_profile"] handler:^(TTSDKLoginResult *result, NSError *error) {
+   if (error) {
+       // 授权失败或用户拒绝授权
+       NSLog([error localizedDescription]);
+   } else {
+       if (result.isCancelled) {
+           //授权流程被取消
+           NSLog(@"isCancelled");
+       } else {
+           // 授权成功
+           NSLog(@"success");
+       }
+   }
+}];
+```
+## 9. 登出
+**示例代码**  
+```objectivec
+[[[TapLoginHelper alloc] init] logout];
+```
