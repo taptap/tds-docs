@@ -116,7 +116,7 @@ b. 如果没有SceneDelegate.m，只有AppDelegate.m，请添加如下代码到 
    return [[TTSDKApplicationDelegate sharedInstance] handleTapTapOpenURL:url];
 }
 ```
-并在AppDelegate.h中添加UIWindow，然后删除info.plist里面的
+并在AppDelegate.h中添加UIWindow，然后删除info.plist里面的Application Scene Manifest
 ```objectivec
 @property (strong, nonatomic) UIWindow *window;
 ```
