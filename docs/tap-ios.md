@@ -7,7 +7,7 @@ sidebar_label: iOS快速开始
 本文主要介绍iOS如何将TapSDK快速接入并实现登录功能。TapSDK同时还包含用户数据收集和动态发布功能，详情可以参考[数据收集](./tap-fun-db)、[动态](./tap-fun-moment)文档介绍
 
 :::note
-如需通过示例项目了解如何在 Android 应用中集成 TapSDK，请参阅 GitHub 中的 [TapSDKSample](https://github.com/xindong/TapSDKDemoAndroid)。
+如需通过示例项目了解如何在 iOS 应用中集成 TapSDK，请参阅 GitHub 中的 [TapSDKSample](#)。
 :::
 
 ## 1. 登录TapTap开发者中心
@@ -73,7 +73,7 @@ pod update
 ## 6. 跳转TapTap登录配置
 `未添加做此配置或者用户无TapTap应用时，默认会打开webview登录`  
 1. 打开info.plist，添加如下配置
-
+![](https://qnblog.ijemy.com/xd_ios_info.png)
 ```objectivec
 <key>CFBundleURLTypes</key>
 <array>
@@ -96,8 +96,17 @@ pod update
 </array>
 ```
 
-2. 添加AppDelegate。TapSDK需要将AppDelegate关联到TTSDKApplicationDelegate对象，要实现这一操作，请添加如下代码到 AppDelegate.m 文件中。
+2. 根据项目中是否有SceneDelegate.m文件分两种情况  
 
+a. 如果有SceneDelegate.m，请添加如下代码到 SceneDelegate.m 文件中即可。
+```objectivec
+#import <TapSDK/TTSDKApplicationDelegate.h>
+- (void)scene:(UIScene *)scene openURLContexts:(NSSet<UIOpenURLContext *> *)URLContexts{
+    [[TTSDKApplicationDelegate sharedInstance] handleTapTapOpenURL:URLContexts.allObjects.firstObject.URL];
+}
+```
+
+b. 如果没有SceneDelegate.m，只有AppDelegate.m，请添加如下代码到 AppDelegate.m 文件中。
 ```objectivec
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
    return [[TTSDKApplicationDelegate sharedInstance] handleTapTapOpenURL:url];
@@ -107,6 +116,12 @@ pod update
    return [[TTSDKApplicationDelegate sharedInstance] handleTapTapOpenURL:url];
 }
 ```
+并在AppDelegate.h中添加UIWindow，然后删除info.plist里面的
+```objectivec
+@property (strong, nonatomic) UIWindow *window;
+```
+![](https://qnblog.ijemy.com/xd_ios_appmanifest.png)
+
 
 ## 7. 初始化
 TapSDK初始化  
