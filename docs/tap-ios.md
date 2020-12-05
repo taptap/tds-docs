@@ -71,7 +71,7 @@ pod update
 ```  
 
 ## 6. 跳转TapTap登录配置
-`未添加做此配置或者用户无TapTap应用时，默认会打开webview登录`  
+`未做此配置或者用户无TapTap应用时，默认会打开webview登录`  
 1. 打开info.plist，添加如下配置
 ![](https://qnblog.ijemy.com/xd_ios_info.png)
 ```objectivec
