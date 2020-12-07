@@ -12,7 +12,7 @@ module.exports = {
       功能介绍:['tap-fun-login','tap-fun-db','tap-fun-moment'],
     },
     {
-      常见问题:['tap-android-faq','tap-ios-faq','tap-unity-faq'],
+      常见问题:['tap-android-faq','tap-ios-faq','tap-unity-faq','tap-noun'],
     },
     'tap-changelog',
     'tap-known',

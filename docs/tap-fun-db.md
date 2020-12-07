@@ -73,12 +73,12 @@ groupId="tap-platform"
 
 字段 | 必须 | 说明  
 ------ | ------ | ------
-channel | 否 | 长度大于0并小于等于256。分包渠道。1.2.名词解释中有介绍
-gameVersion | 否 | 长度大于0并小于等于256。游戏版本。为空时，自动获取游戏安装包的版本（AndroidManifest.xml中的versionName）
+channel | 否 | [分包渠道](./tap-noun#分包渠道)。长度大于0并小于等于256。
+gameVersion | 否 | 游戏版本。长度大于0并小于等于256。为空时，自动获取游戏安装包的版本（AndroidManifest.xml中的versionName）
 
 
 ## 3. 记录一个用户
-当enableTapDB后，可以调用此API  
+当enableTapDB后，可以调用此API来记录一个用户  
 
 **API**
 <Tabs
@@ -196,6 +196,7 @@ groupId="tap-platform"
 
 ## 4. 用户名称
 设置用户名称
+
 **API**  
 <Tabs
 groupId="tap-platform"
@@ -251,6 +252,7 @@ name | 否 | 长度大于0并小于等于256。用户名
 
 ## 5. 用户等级
 设置用户等级。用户登录或升级时调用  
+
 **API**  
 <Tabs
 groupId="tap-platform"
@@ -359,11 +361,11 @@ groupId="tap-platform"
 
 字段 | 可为空 | 说明
 | ------ | ------ | ------ |
-server | 否 | 长度大于0并小于等于256。用户所在服务器
+server | 否 | 用户所在服务器。长度大于0并小于等于256。
 
 ## 7. 充值
 
-充值成功时调用。SDK推送和4.1中描述的服务端推送方法只能选择其中一种。建议优先选择服务端推送方式，以保证数据的准确性。
+充值成功时调用。SDK推送和[服务端充值推送](#101-充值推送接口)只能选择其中一种。建议优先选择服务端推送方式，以保证数据的准确性。
 
 **API**  
 <Tabs
@@ -417,11 +419,11 @@ groupId="tap-platform"
 
 字段 | 可为空 | 说明
 | ------ | ------ | ------ |
-orderId | 是 | 长度大于0并小于等于256。订单ID。传递订单ID可进行排重，防止计算多次
-product | 是 | 长度大于0并小于等于256。商品名称
-amount | 否 | 大于0并小于等于100000000000。充值金额。单位分，即无论什么币种，都需要乘以100
+orderId | 是 | 订单ID。长度大于0并小于等于256。传递订单ID可进行排重，防止计算多次
+product | 是 | 商品名称。长度大于0并小于等于256。
+amount | 否 | 充值金额。大于0并小于等于100000000000。单位分，即无论什么币种，都需要乘以100
 currencyType | 是 | 货币类型。国际通行三字母表示法，为空时默认CNY。参考：人民币 CNY，美元 USD；欧元 EUR
-payment | 是 | 长度大于0并小于等于256。充值渠道
+payment | 是 | 充值渠道。长度大于0并小于等于256。
 
 常见货币类型的格式参考<a target="_blank" href="https://www.tapdb.com/docs/zh_CN/features/exchangeRate.html">汇率表</a>
 
@@ -491,6 +493,7 @@ properties | 是 | 事件属性。需要和控制台的配置匹配。值需要�
 ## 9. 跟踪游戏的启停
 
 跟踪用户游戏次数和游戏时长。需要给游戏中每个Activity的onResume和onStop中添加对应的调用。如果多个Activity继承同一个父类，只需要在父类中添加调用即可。比如onResume方法，直接在Activity的onResume方法的最后添加TapDB.onResume(this)即可。
+
 **API**  
 <Tabs
 groupId="tap-platform"

@@ -19,6 +19,7 @@ TapSDK提供可供用户发布动态到TapTapApp和游戏内部展示动态的�
 
 ## 2. 功能开启
 API放在[TdsInitializer.init](./tap-api.md#init)初始化SDK之后调用即可  
+
 **API**  
 
 <Tabs
@@ -420,6 +421,7 @@ TapTapMomentSdk.getNoticeData();
 ## 8. 进入好友动态主页
 
 当游戏需要进入指定用户的动态页面时，调用该接口
+
 **API**  
 <Tabs
 groupId="tap-platform"
