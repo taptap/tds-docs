@@ -58,7 +58,7 @@ TapSDK初始化
 ```java
 TdsConfig tdsConfig = new TdsConfig.Builder()
                 .appContext(MainActivity.this)
-                .clientId(getResources().getString(R.string.tap_client_id))//开发者中心获取到的client Id
+                .clientId("your client id")//开发者中心获取到的client Id
                 .build();
 TdsInitializer.init(tdsConfig);  
 ```
