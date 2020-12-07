@@ -10,9 +10,12 @@ import TabItem from '@theme/TabItem';
 
 
 `本文介绍动态相关功能和使用方式`
+:::caution
+**目前 需要联系[运营团队](#)获取 TapMoment 的使用权限。**
+:::
+
 ## 1. 介绍
 TapSDK提供可供用户发布动态到TapTapApp和游戏内部展示动态的控件和功能。  
-
 
 ## 2. 功能开启
 API放在[TdsInitializer.init](./tap-api.md#init)初始化SDK之后调用即可  
@@ -29,7 +32,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-  TdsInitializer.enableMoment(Activity);
+TdsInitializer.enableMoment(Activity);
   ```  
   </TabItem>
 
@@ -111,12 +114,12 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-  TapTapMomentSdk.setCallback(new TapTapMomentSdk.TapMomentCallback() {
-          @Override
-          public void onCallback(int code, String msg) {
+TapTapMomentSdk.setCallback(new TapTapMomentSdk.TapMomentCallback() {
+  @Override
+  public void onCallback(int code, String msg) {
 
-          }
-      });
+  }
+});
   ```
   </TabItem>
 
@@ -146,8 +149,6 @@ CALLBACK_CODE_ClOSE_CANCEL | 50000 | 弹出关闭动态弹窗时，用户取消
 CALLBACK_CODE_ClOSE_CONFIRM | 50100 | 弹出关闭动态弹窗时，用户确认
 
 
-
-
 ## 4. 设置登录信息
 游戏在使用 TapTap 登录完成后，需要调用该接口设置登录信息
 
@@ -163,7 +164,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-  TapTapMomentSdk.setLoginToken(AccessToken);
+TapTapMomentSdk.setLoginToken(AccessToken);
   ```
   </TabItem>
 
@@ -187,8 +188,8 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-  AccessToken currentAccessToken = AccessToken.getCurrentAccessToken();
-  TapTapMomentSdk.setLoginToken(currentAccessToken);
+AccessToken currentAccessToken = AccessToken.getCurrentAccessToken();
+TapTapMomentSdk.setLoginToken(currentAccessToken);
   ```
   </TabItem>
 
@@ -201,12 +202,9 @@ groupId="tap-platform"
 </Tabs>
 
 
-字段 | 可为空 | 说明
-| ------ | ------ | ------ |
-name | 否 | 长度大于0并小于等于256。用户名
-
 ## 5. 打开动态页面
-在游戏中，显示游戏动态页面
+在游戏中，显示游戏动态页面  
+
 **API**  
 <Tabs
 groupId="tap-platform"
@@ -306,7 +304,7 @@ TapTapMomentSdk.Config config = new TapTapMomentSdk.Config();
 config.orientation = TapTapMomentSdk.ORIENTATION_DEFAULT;  
 String content = "普通动态描述";
 String[] imagePaths = new String[] { "content://***.jpg","/sdcard/**.jpg" };
-TapTapMomentSdk.publishMoment(config, imagePaths, "测试");
+TapTapMomentSdk.publishMoment(config, imagePaths, content);
   ```
   </TabItem>
 
@@ -335,7 +333,7 @@ groupId="tap-platform"
 
   ```java
   TapTapMomentSdk.publishVideoMoment(TapTapMomentSdk.Config config, String[] videoPaths,
-  String[] imgPaths, String title, String desc);
+  String[] imgPaths, String title, String content);
   ```
   </TabItem>
 
@@ -363,10 +361,10 @@ TapTapMomentSdk.Config config = new TapTapMomentSdk.Config();
 String[] imagePaths = new String[]{ "content://***.jpg","/sdcard/**.jpg" };
 String[] videoPaths = new String[] { "content://***.mp4", "content://***.mp4" };
 String title = "title";
-String desc = "desc";
-TapTapMomentSdk.publishVideoMoment(config, videoPaths, imagePaths, title, desc);
+String content = "content";
+TapTapMomentSdk.publishVideoMoment(config, videoPaths, imagePaths, title, content);
 //如果不需要上传封面图片，可调用如下接口
-//TapTapMomentSdk.publishVideoMoment(config, videoPaths, title, desc);
+//TapTapMomentSdk.publishVideoMoment(config, videoPaths, title, content);
 
   ```
   </TabItem>
@@ -387,7 +385,7 @@ config | 否 | 发布动态图片或者视频的横竖屏配置
 videoPaths | 否 | 视频文件路径，数组形式呈现
 imgPaths | 是 | 视频封面图，可以不配置
 title | 否 | 动态标题
-desc | 是 | 动态描述
+content | 是 | 动态描述
 
 
 
@@ -434,7 +432,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-  TapTapMomentSdk.openUserMoment(TapTapMomentSdk.Config config,String tapOpenId);
+TapTapMomentSdk.openUserMoment(TapTapMomentSdk.Config config, String openId);
   ```
   </TabItem>
 
@@ -460,7 +458,7 @@ groupId="tap-platform"
   ```java
 TapTapMomentSdk.Config config = new TapTapMomentSdk.Config();
 config.orientation = TapTapMomentSdk.ORIENTATION_DEFAULT;  
-TapTapMomentSdk.openUserMoment(config,tapOpenId);
+TapTapMomentSdk.openUserMoment(config, openId);
   ```
   </TabItem>
   <TabItem value="ios">
@@ -471,6 +469,7 @@ TapTapMomentSdk.openUserMoment(config,tapOpenId);
   </TabItem>
 </Tabs>
 
+**参数说明**
 
 字段 | 可为空 | 说明
 | ------ | ------ | ------ |
@@ -521,7 +520,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-TapTapMomentSdk.closeMoment(title,content)
+TapTapMomentSdk.closeMoment(title, content)
   ```
 
   </TabItem>

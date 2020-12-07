@@ -8,6 +8,7 @@ import TabItem from '@theme/TabItem';
 
 
 ## TdsInitializer
+TapSDK核心组建，负责SDK初始化和功能开启
 ### init
 初始化SDK
 
@@ -23,7 +24,7 @@ groupId="tap-platform"
 <TabItem value="android">
 
 ```java
-init(TdsConfig config)
+init(TdsConfig config);
 ```  
 </TabItem>
 
@@ -69,10 +70,10 @@ TdsInitializer.init(tdsConfig);
 
 **TdsConfig参数说明**  
 
-参数 | 必选 | 备注
+参数 | 可选 | 备注
 :--- | :--- | :---
-clientId | Y | 开发者中心获取的client Id
-appContext | Context | 当前Activity
+clientId | 否 | 开发者中心获取的client Id
+appContext | 否 | 当前Activity
 
 ### enableTapDB
 **API**  
@@ -87,7 +88,7 @@ groupId="tap-platform"
 <TabItem value="android">
 
 ```java
-enableTapDB(TdsConfig config)
+enableTapDB(TdsConfig config);
 ```
 </TabItem>
 
@@ -131,16 +132,17 @@ TdsInitializer.enableTapDB("v1.0.0","channel");
 
 **enableTapDB 参数说明：**   
 
-字段 | 必须 | 说明  
+字段 | 可选 | 说明  
 ------ | ------ | ------
-channel | 否 | 长度大于0并小于等于256。分包渠道。1.2.名词解释中有介绍
-gameVersion | 否 | 长度大于0并小于等于256。游戏版本。为空时，自动获取游戏安装包的版本（AndroidManifest.xml中的versionName）
+channel | 是 | 长度大于0并小于等于256。分包渠道。1.2.名词解释中有介绍
+gameVersion | 是 | 长度大于0并小于等于256。游戏版本。为空时，自动获取游戏安装包的版本（AndroidManifest.xml中的versionName）
 
 ### enableMoment
 
 ## TapTapSdk
 ### changeTapLoginConfig
-LoginSdkConfig为可配置项，非必须  
+登录配置功能。LoginSdkConfig为可配置项，非必须  
+
 **API:**
 <Tabs
 groupId="tap-platform"
@@ -153,7 +155,7 @@ groupId="tap-platform"
 <TabItem value="android">
 
 ```java
-changeTapLoginConfig(TapTapSdk.LoginSdkConfig var0)
+changeTapLoginConfig(TapTapSdk.LoginSdkConfig var0);
 ```
 </TabItem>
 
@@ -201,7 +203,7 @@ TapTapSdk.changeTapLoginConfig(loginSdkConfig);
 
 
 ## TapLoginHelper
-
+登录功能相关API控制
 ### setLoginResultCallback
 设置TapSDK的登录回调监听  
 
@@ -217,7 +219,7 @@ groupId="tap-platform"
 <TabItem value="android">
 
 ```java
-setLoginResultCallback(TapLoginHelper.ITapLoginResultCallback var1)
+public void setLoginResultCallback(TapLoginHelper.ITapLoginResultCallback var1);
 ````
 </TabItem>
 
@@ -288,7 +290,7 @@ groupId="tap-platform"
 <TabItem value="android">
 
 ```java
-startTapLogin(Activity activity, String... var2)
+public void startTapLogin(Activity activity, String... var2);
 ````
 </TabItem>
 
@@ -353,7 +355,7 @@ groupId="tap-platform"
 <TabItem value="android">
 
 ```java
-logout()
+public static void logout();
 ````
 </TabItem>
 
@@ -408,7 +410,7 @@ groupId="tap-platform"
 <TabItem value="android">
 
 ```java
-getCurrentAccessToken()
+public static AccessToken getCurrentAccessToken();
 ````
 </TabItem>
 
@@ -463,7 +465,7 @@ groupId="tap-platform"
 <TabItem value="android">
 
 ```java
-getCurrentProfile()
+public static Profile getCurrentProfile();
 ````
 </TabItem>
 
@@ -517,7 +519,7 @@ groupId="tap-platform"
 <TabItem value="android">
 
 ```java
-fetchProfileForCurrentAccessToken(Api.ApiCallback<Profile>)
+public static void fetchProfileForCurrentAccessToken(Api.ApiCallback<Profile>);
 ````
 </TabItem>
 
@@ -588,8 +590,8 @@ groupId="tap-platform"
 <TabItem value="android">
 
 ```java
-public static void setUser(String userId)
-public static void setUser(String userId, String openId, LoginType loginType)
+public static void setUser(String userId);
+public static void setUser(String userId, String openId, LoginType loginType);
 ```
 </TabItem>
 
@@ -707,7 +709,7 @@ groupId="tap-platform"
 <TabItem value="android">
 
 ```java
-public static void setName(String name)
+public static void setName(String name);
 ```
 </TabItem>
 
@@ -765,7 +767,7 @@ groupId="tap-platform"
 <TabItem value="android">
 
 ```java
-public static void setLevel(int level)
+public static void setLevel(int level);
 ```
 </TabItem>
 
@@ -826,7 +828,7 @@ groupId="tap-platform"
 <TabItem value="android">
 
 ```java
-public static void setServer(String server)
+public static void setServer(String server);
 ```
 </TabItem>
 
@@ -888,7 +890,7 @@ groupId="tap-platform"
 <TabItem value="android">
 
 ```java
-public static void onCharge(String orderId, String product, long amount, String currencyType, String payment)
+public static void onCharge(String orderId, String product, long amount, String currencyType, String payment);
 ```  
 </TabItem>
 
@@ -956,7 +958,7 @@ groupId="tap-platform"
 <TabItem value="android">
 
 ```java
-public static void onEvent(String eventCode, JSONObject properties)
+public static void onEvent(String eventCode, JSONObject properties);
 ```
 </TabItem>
 
@@ -1022,8 +1024,8 @@ groupId="tap-platform"
 <TabItem value="android">
 
 ```java
-public static void onResume(Activity activity)
-public static void onStop(Activity activity)
+public static void onResume(Activity activity);
+public static void onStop(Activity activity);
 ```
 </TabItem>
 
@@ -1086,3 +1088,442 @@ public class GameActivity extends Activity {
 字段 | 可为空 | 说明
 | ------ | ------ | ------ |
 activity | 否 | 当前Activity对象。一般传递"this"
+
+## TapTapMoment
+### setCallback
+
+设置动态发布回调  
+
+**API**  
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+<TabItem value="android">
+
+```java
+public static void setCallback(TapTapMomentSdk.TapMomentCallback tapMomentCallback);
+```
+</TabItem>
+
+<TabItem value="ios">
+
+</TabItem>
+
+<TabItem value="unity">
+
+</TabItem>
+</Tabs>
+
+
+**示例代码**
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+<TabItem value="android">
+
+```java
+TapTapMomentSdk.setCallback(new TapTapMomentSdk.TapMomentCallback() {
+  @Override
+  public void onCallback(int code, String msg) {
+
+  }
+});
+```
+</TabItem>
+
+<TabItem value="ios">
+
+</TabItem>
+
+<TabItem value="unity">
+
+</TabItem>
+</Tabs>
+
+### setLoginToken
+设置登录信息
+
+**API**  
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+<TabItem value="android">
+
+```java
+public static void setLoginToken(AccessToken accessToken);
+```
+</TabItem>
+
+<TabItem value="ios">
+
+</TabItem>
+
+<TabItem value="unity">
+
+</TabItem>
+</Tabs>
+
+
+**示例代码**
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+<TabItem value="android">
+
+```java
+AccessToken currentAccessToken = AccessToken.getCurrentAccessToken();
+TapTapMomentSdk.setLoginToken(currentAccessToken);
+```
+</TabItem>
+
+<TabItem value="ios">
+
+</TabItem>
+
+<TabItem value="unity">
+
+</TabItem>
+</Tabs>
+
+
+### openTapMoment
+打开动态页面
+
+**API**  
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+<TabItem value="android">
+
+```java
+public static void openTapMoment(TapTapMomentSdk.Config config);
+```
+</TabItem>
+
+<TabItem value="ios">
+
+</TabItem>
+
+<TabItem value="unity">
+
+</TabItem>
+</Tabs>
+
+
+**示例代码**
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+<TabItem value="android">
+
+```java
+TapTapMomentSdk.Config config = new TapTapMomentSdk.Config();
+// config用来设置页面显示配置，包括显示方向等
+TapTapMomentSdk.openTapMoment(config);
+```
+</TabItem>
+
+<TabItem value="ios">
+
+</TabItem>
+
+<TabItem value="unity">
+
+</TabItem>
+</Tabs>
+
+### publishMoment
+发布动态
+
+**API**  
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+<TabItem value="android">
+
+```java
+//发布普通动态，包括图片和描述
+public static void publishMoment(TapTapMomentSdk.Config config, String imgPaths, String content);
+//发布视频动态，包括视频和图片（图片可选）
+public static void publishVideoMoment(TapTapMomentSdk.Config config, String[] videoPaths,String[] imgPaths, String title, String content);
+```
+</TabItem>
+
+<TabItem value="ios">
+
+</TabItem>
+
+<TabItem value="unity">
+
+</TabItem>
+</Tabs>
+
+**示例代码**
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+<TabItem value="android">
+
+```java
+//普通动态
+TapTapMomentSdk.Config config = new TapTapMomentSdk.Config();
+config.orientation = TapTapMomentSdk.ORIENTATION_DEFAULT;  
+String content = "普通动态描述";
+String[] imagePaths = new String[] { "content://***.jpg","/sdcard/**.jpg" };
+TapTapMomentSdk.publishMoment(config, imagePaths, content);
+
+//视频动态
+TapTapMomentSdk.Config config = new TapTapMomentSdk.Config();
+String[] imagePaths = new String[]{ "content://***.jpg","/sdcard/**.jpg" };
+String[] videoPaths = new String[] { "content://***.mp4", "content://***.mp4" };
+String title = "title";
+String content = "content";
+TapTapMomentSdk.publishVideoMoment(config, videoPaths, imagePaths, title, content);
+//如果不需要上传封面图片，可调用如下接口
+//TapTapMomentSdk.publishVideoMoment(config, videoPaths, title, content);
+```
+</TabItem>
+
+<TabItem value="ios">
+
+</TabItem>
+
+<TabItem value="unity">
+
+</TabItem>
+</Tabs>
+
+**参数说明**
+
+字段 | 可为空 | 说明
+| ------ | ------ | ------ |
+config | 否 | 发布动态图片或者视频的横竖屏配置
+videoPaths | 否 | 视频文件路径，数组形式呈现
+imgPaths | 是 | 视频封面图，可以不配置
+title | 否 | 动态标题
+content | 是 | 动态描述
+
+### getNoticeData
+获取用户新通知数量   
+
+**API**  
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+<TabItem value="android">
+
+```java
+public static void getNoticeData();
+```
+</TabItem>
+
+<TabItem value="ios">
+
+</TabItem>
+
+<TabItem value="unity">
+
+</TabItem>
+</Tabs>
+
+
+**示例代码**
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+<TabItem value="android">
+
+```java
+TapTapMomentSdk.getNoticeData();
+```
+</TabItem>
+
+<TabItem value="ios">
+
+</TabItem>
+
+<TabItem value="unity">
+
+</TabItem>
+</Tabs>
+
+### openUserMoment
+进入指定用户的动态页面
+
+**API**  
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+<TabItem value="android">
+
+```java
+public static void openUserMoment(TapTapMomentSdk.Config config, String openId)
+```
+</TabItem>
+
+<TabItem value="ios">
+
+</TabItem>
+
+<TabItem value="unity">
+
+</TabItem>
+</Tabs>
+
+**示例代码**
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+<TabItem value="android">
+
+```java
+TapTapMomentSdk.Config config = new TapTapMomentSdk.Config();
+config.orientation = TapTapMomentSdk.ORIENTATION_DEFAULT;  
+TapTapMomentSdk.openUserMoment(config, openId);
+```
+</TabItem>
+
+<TabItem value="ios">
+
+</TabItem>
+
+<TabItem value="unity">
+
+</TabItem>
+</Tabs>
+
+**参数说明**
+
+字段 | 可为空 | 说明
+| ------ | ------ | ------ |
+openId | 否 | [openId获取方式](./tap-api.md/#tap登录后openid获取方式)
+
+
+### closeMoment
+关闭动态页面
+
+**API**  
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+<TabItem value="android">
+
+```java
+//直接关闭
+public static void closeMoment();
+
+//确认关闭
+public static void closeMoment(String title, String content);
+```
+</TabItem>
+
+<TabItem value="ios">
+
+</TabItem>
+
+<TabItem value="unity">
+
+</TabItem>
+</Tabs>
+
+
+**示例代码**
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+<TabItem value="android">
+
+```java
+//直接关闭
+TapTapMomentSdk.closeMoment();
+
+//确认关闭
+TapTapMomentSdk.closeMoment(title, content);
+```
+</TabItem>
+
+<TabItem value="ios">
+
+</TabItem>
+
+<TabItem value="unity">
+
+</TabItem>
+</Tabs>
+
+**参数说明**
+
+字段 | 可为空 | 说明
+| ------ | ------ | ------ |
+title | 否 | 动态标题
+content | 否 | 动态描述
