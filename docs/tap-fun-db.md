@@ -37,6 +37,9 @@ groupId="tap-platform"
 
   <TabItem value="ios">
 
+```objectivec
+(void)enableTapDBWithChannel:(nullable NSString *)channel gameVersion:(nullable NSString *)gameVersion;
+```
   </TabItem>
 
   <TabItem value="unity">
@@ -63,6 +66,9 @@ groupId="tap-platform"
 
   <TabItem value="ios">
 
+```objectivec
+[TDSInitializer enableTapDBWithChannel:@"taptap" gameVersion:@"v1.0.0"];
+```
   </TabItem>
   <TabItem value="unity">
 
@@ -99,6 +105,10 @@ groupId="tap-platform"
 
   <TabItem value="ios">
 
+  ```objectivec  
++ (void)setUser:(NSString *)userId;
++ (void)setUser:(NSString *)userId openId:(NSString *)openId loginType:(TapDBLoginType)loginType;
+  ```
   </TabItem>
   <TabItem value="unity">
 
@@ -126,6 +136,9 @@ groupId="tap-platform"
 
   <TabItem value="ios">
 
+  ```objectivec
+ [TapDB setUser:@"userId" openId:@"openId" loginType:TapDBLoginTypeTapTap];
+  ```
   </TabItem>
   <TabItem value="unity">
 
@@ -215,6 +228,9 @@ groupId="tap-platform"
 
   <TabItem value="ios">
 
+  ```objectivec
++ (void)setName:(NSString *)name;
+  ```
   </TabItem>
   <TabItem value="unity">
 
@@ -239,6 +255,9 @@ groupId="tap-platform"
 
   <TabItem value="ios">
 
+  ```objectivec
+ [TapDB setName:@"Tap zhang"];
+  ```
   </TabItem>
   <TabItem value="unity">
 
@@ -271,6 +290,9 @@ groupId="tap-platform"
 
   <TabItem value="ios">
 
+  ```objectivec
++ (void)setLevel:(NSInteger)level;
+  ```
   </TabItem>
   <TabItem value="unity">
 
@@ -295,6 +317,9 @@ groupId="tap-platform"
 
   <TabItem value="ios">
 
+  ```objectivec
+[TapDB setLevel:10];
+  ```
   </TabItem>
   <TabItem value="unity">
 
@@ -328,6 +353,9 @@ groupId="tap-platform"
 
   <TabItem value="ios">
 
+  ```objectivec
++ (void)setServer:(NSString *)server;
+  ```
   </TabItem>
   <TabItem value="unity">
 
@@ -352,6 +380,9 @@ groupId="tap-platform"
 
   <TabItem value="ios">
 
+  ```objectivec
+[TapDB setServer:@"https://test.taptap.com/callback"];
+  ```
   </TabItem>
   <TabItem value="unity">
 
@@ -385,6 +416,9 @@ groupId="tap-platform"
 
   <TabItem value="ios">
 
+  ```objectivec
++ (void)onChargeSuccess:(NSString *)orderId product:(NSString *)product amount:(NSInteger)amount currencyType:(NSString *)currencyType payment:(NSString *)payment;
+  ```
   </TabItem>
   <TabItem value="unity">
 
@@ -403,12 +437,15 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-  TapDB.onCharge("0xueiEns","大宝剑","100","CNY","wechat");
+  TapDB.onCharge("0xueiEns","轩辕剑","100","CNY","wechat");
   ```
   </TabItem>
 
   <TabItem value="ios">
 
+  ```objectivec
+[TapDB onChargeSuccess:@"0xueiEns" product:@"轩辕剑" amount:10 currencyType:@"CNY" payment:@"wechat"];
+  ```
   </TabItem>
   <TabItem value="unity">
 
@@ -449,6 +486,9 @@ groupId="tap-platform"
 
   <TabItem value="ios">
 
+  ```objectivec
++ (void)onEvent:(NSString *)eventCode properties:(NSDictionary *)properties;
+  ```
   </TabItem>
   <TabItem value="unity">
 
@@ -478,6 +518,10 @@ groupId="tap-platform"
 
   <TabItem value="ios">
 
+  ```objectivec
+NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:@"name",@"Tap zhang",@"age",@"18",nil];
+[TapDB onEvent:@"userInfo" properties:dict];
+  ```
   </TabItem>
   <TabItem value="unity">
 
@@ -490,7 +534,7 @@ groupId="tap-platform"
 eventCode | 否 | 在控制台中配置得到的事件编码
 properties | 是 | 事件属性。需要和控制台的配置匹配。值需要是长度大于0并小于等于256的字符串或绝对值小于1E11的浮点数
 
-## 9. 跟踪游戏的启停
+<!-- ## 9. 跟踪游戏的启停
 
 跟踪用户游戏次数和游戏时长。需要给游戏中每个Activity的onResume和onStop中添加对应的调用。如果多个Activity继承同一个父类，只需要在父类中添加调用即可。比如onResume方法，直接在Activity的onResume方法的最后添加TapDB.onResume(this)即可。
 
@@ -564,11 +608,11 @@ groupId="tap-platform"
 
 字段 | 可为空 | 说明
 | ------ | ------ | ------ |
-activity | 否 | 当前Activity对象。一般传递"this"
+activity | 否 | 当前Activity对象。一般传递"this" -->
 
-## 10. 服务端推送接口
+## 9. 服务端推送接口
 
-### 10.1 充值推送接口
+### 9.1 充值推送接口
 
 由于SDK推送可能会不太准确，这里提供服务端充值推送方法。需要忽略掉SDK中的相关充值推送接口。
 
@@ -601,7 +645,7 @@ activity | 否 | 当前Activity对象。一般传递"this"
 
 常见货币类型的格式参考<a target="_blank" href="https://www.tapdb.com/docs/zh_CN/features/exchangeRate.html">汇率表</a>
 
-### 10.2 在线数据推送接口
+### 9.2 在线数据推送接口
 
 由于SDK无法推送准确的在线数据，这里提供服务端在线数据推送接口。游戏服务端可以每隔5分钟自行统计在线人数，通过接口推送到TapDB。TapDB进行数据汇总展现。
 
@@ -646,8 +690,8 @@ timestamp | long | 当前统计数据的时间戳(秒)。TapDB会按照自然5�
 
 成功判断：返回的HTTP Code为200时认为发送成功，否则认为失败
 
-## 11. 收集OAID
-
+## 10. 收集OAID
+TapSDK支持OAID获取功能，需要[下载](https://github.com/xindong/TapSDKAndroid/releases)oaid_sdk_1.0.23.aar放⼊入项⽬ libs目录下
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -657,26 +701,7 @@ groupId="tap-platform"
     {label: 'unity', value: 'unity'},
   ]}>
   <TabItem value="android">
-  TapSDK支持OAID获取功能，需要将下载到的SDK目录中OAID文件夹下的 oaid_sdk_1.0.23.aar 放⼊入项⽬ libs目录下，并且将SDK目录中OAID文件夹下的 supplierconfig.json 放⼊入assets 文件夹内，具体路路径 app/src/main/
-  assets , 配置文件内容无需修改。然后在混淆文件里添加如下配置，若无混淆配置可以不添加。
 
-  ```java
-
-  -keep class XI.CA.XI.**{*;}
-  -keep class XI.K0.XI.**{*;}
-  -keep class XI.XI.K0.**{*;}
-  -keep class XI.vs.K0.**{*;}
-  -keep class XI.xo.XI.XI.**{*;}
-  -keep class com.asus.msa.SupplementaryDID.**{*;}
-  -keep class com.asus.msa.sdid.**{*;}
-  -keep class com.bun.lib.**{*;}
-  -keep class com.bun.miitmdid.**{*;}
-  -keep class com.huawei.hms.ads.identifier.**{*;}
-  -keep class com.samsung.android.deviceidservice.**{*;}
-  -keep class org.json.**{*;}
-  -keep public class com.netease.nis.sdkwrapper.Utils {public <methods>;}
-
-  ```
 
   </TabItem>
 

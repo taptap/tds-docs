@@ -39,6 +39,9 @@ TdsInitializer.enableMoment(Activity);
 
   <TabItem value="ios">
 
+  ```objectivec
++ (void)enableMoment;
+  ```
   </TabItem>
 
   <TabItem value="unity">
@@ -65,6 +68,9 @@ groupId="tap-platform"
 
   <TabItem value="ios">
 
+  ```objectivec
+[TDSInitializer enableMoment];
+  ```
   </TabItem>
   <TabItem value="unity">
 
@@ -93,6 +99,9 @@ TapTapMomentSdk.setCallback(TapTapMomentSdk.TapMomentCallback var0);
 
   <TabItem value="ios">
 
+  ```objectivec
+- (void)didChangeResultCode:(NSInteger)code msg:(NSString *)msg;
+  ```
   </TabItem>
   <TabItem value="unity">
 
@@ -126,6 +135,9 @@ TapTapMomentSdk.setCallback(new TapTapMomentSdk.TapMomentCallback() {
 
   <TabItem value="ios">
 
+  ```objectivec
+
+  ```
   </TabItem>
   <TabItem value="unity">
 
@@ -171,6 +183,9 @@ TapTapMomentSdk.setLoginToken(AccessToken);
 
   <TabItem value="ios">
 
+  ```objectivec
+
+  ```
   </TabItem>
   <TabItem value="unity">
 
@@ -196,6 +211,9 @@ TapTapMomentSdk.setLoginToken(currentAccessToken);
 
   <TabItem value="ios">
 
+  ```objectivec
+
+  ```
   </TabItem>
   <TabItem value="unity">
 
@@ -224,6 +242,9 @@ TapTapMomentSdk.openTapMoment(TapTapMomentSdk.Config);
 
   <TabItem value="ios">
 
+  ```objectivec
+  + (void)openTapMomentWithConfig:(TDSMomentConfig *) config;
+  ```
   </TabItem>
   <TabItem value="unity">
 
@@ -250,6 +271,11 @@ groupId="tap-platform"
 
   <TabItem value="ios">
 
+  ```objectivec
+  TDSMomentConfig *mconfig = [TDSMomentSdk init];
+  mconfig.orientation = TDSMomentOrientationDefault;
+  [TDSMomentSdk openTapMomentWithConfig:mconfig];
+  ```
   </TabItem>
   <TabItem value="unity">
 
@@ -283,6 +309,9 @@ groupId="tap-platform"
 
   <TabItem value="ios">
 
+  ```objectivec
+
+  ```
   </TabItem>
   <TabItem value="unity">
 
@@ -311,6 +340,9 @@ TapTapMomentSdk.publishMoment(config, imagePaths, content);
 
   <TabItem value="ios">
 
+  ```objectivec
+
+  ```
   </TabItem>
   <TabItem value="unity">
 
@@ -340,6 +372,9 @@ groupId="tap-platform"
 
   <TabItem value="ios">
 
+  ```objectivec
+
+  ```
   </TabItem>
   <TabItem value="unity">
 
@@ -372,6 +407,9 @@ TapTapMomentSdk.publishVideoMoment(config, videoPaths, imagePaths, title, conten
 
   <TabItem value="ios">
 
+  ```objectivec
+
+  ```
   </TabItem>
   <TabItem value="unity">
 
@@ -411,6 +449,9 @@ TapTapMomentSdk.getNoticeData();
 
   <TabItem value="ios">
 
+  ```objectivec
+
+  ```
   </TabItem>
   <TabItem value="unity">
 
@@ -440,6 +481,9 @@ TapTapMomentSdk.openUserMoment(TapTapMomentSdk.Config config, String openId);
 
   <TabItem value="ios">
 
+  ```objectivec
+
+  ```
   </TabItem>
   <TabItem value="unity">
 
@@ -465,6 +509,9 @@ TapTapMomentSdk.openUserMoment(config, openId);
   </TabItem>
   <TabItem value="ios">
 
+  ```objectivec
+
+  ```
   </TabItem>
   <TabItem value="unity">
 
@@ -502,6 +549,9 @@ TapTapMomentSdk.closeMoment();
 
   <TabItem value="ios">
 
+  ```objectivec
+
+  ```
   </TabItem>
   <TabItem value="unity">
 
@@ -529,6 +579,9 @@ TapTapMomentSdk.closeMoment(title, content)
 
   <TabItem value="ios">
 
+  ```objectivec
+
+  ```
   </TabItem>
   <TabItem value="unity">
 

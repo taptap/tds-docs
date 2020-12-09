@@ -16,8 +16,9 @@ sidebar_label: iOS快速开始
 ## 2. 下载 TapTap 应用
 [点击下载](#) TapTap 应用
 
-## 3. 环境要求
+## 3. 环境配置
 - 最低支持到iOS 9.0  
+- 请在Xcode 选择工程，到Build Setting-->Other Linker Flags添加-ObjC
 
 ## 4. 工程导入
 <!-- ### 方式一、自动导入(推荐pod集成)  
@@ -59,6 +60,7 @@ pod update
 ## 5. 添加系统依赖库
 请仔细核对下面依赖库是否都添加成功   
 ```objectivec
+'libc++.tbd',
 'TapSDK.framework'
 'WebKit.framework',
 'SystemConfiguration.framework',
@@ -122,37 +124,53 @@ b. 如果没有SceneDelegate.m，只有AppDelegate.m，请添加如下代码到 
 ```
 ![](https://qnblog.ijemy.com/xd_ios_appmanifest.png)
 
-
 ## 7. 初始化
 TapSDK初始化  
 
 **示例代码**
 ```objectivec
-TDSConfig *config = [[TDSConfig alloc] init];
-config.clientId = @"you client id";
-[TDSInitializer initWithConfig:config];
-```
+NSString *clientID = @"CqBgq73t1JdHFE3Rk3";
+TDSConfig *tconfig = [[TDSConfig alloc]init];
+tconfig.clientId =clientID;
+[TDSInitializer initWithConfig:tconfig];
 
+/**修改登录配置。
+ 此段代码可以不调用，默认配置 (RegionTypeCN和圆角登录框)
+ */
+TTSDKConfig *config = [[TTSDKConfig alloc] init];
+config.regionType = RegionTypeCN;// 海外为 RegionTypeIO（默认值为RegionTypeCN）
+config.roundCorner = NO;// NO 则网页登录是边框为直角（默认值为YES）
+[TapLoginHelper changeConfig:config];
+
+```
+## 注册登录回调
+注册登录回调，登录结果会通过回调告知前端
+
+**示例代码**  
+```objectivec
+[TapLoginHelper registerLoginCallback:^(TTSDKLoginResult *result, NSError *error) {
+        if (error) {
+            // 授权失败
+            NSLog([error localizedDescription]);
+        } else {
+            if (result.isCancelled) {
+                // 授权流程被取消
+                NSLog(@"isCancelled");              
+            } else {
+                // 授权成功
+                NSLog(@"success");
+            }
+        }
+    }];
+```
 ## 8. 登录
 TapTap登录，当没有安装TapTap app时，会打开内置webview进行TapTap验证登录  
 
 **示例代码**  
 ```objectivec
-[[[TapLoginHelper alloc] init] startTapLogin:@[@"public_profile"] handler:^(TTSDKLoginResult *result, NSError *error) {
-   if (error) {
-       // 授权失败或用户拒绝授权
-       NSLog([error localizedDescription]);
-   } else {
-       if (result.isCancelled) {
-           //授权流程被取消
-           NSLog(@"isCancelled");
-       } else {
-           // 授权成功
-           NSLog(@"success");
-       }
-   }
-}];
+[TapLoginHelper startTapLogin:@[@"public_profile"]];
 ```
+
 ## 9. 登出
 **示例代码**  
 ```objectivec

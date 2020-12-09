@@ -41,6 +41,12 @@ groupId="tap-platform"
 
   <TabItem value="ios">
 
+  ```objectivec
+  TTSDKConfig *config = [[TTSDKConfig alloc] init];
+  config.regionType = RegionTypeCN;// 海外为 RegionTypeIO（默认值为RegionTypeCN）
+  config.roundCorner = YES;// NO 则网页登录是边框为直角（默认值为YES）
+  [TapLoginHelper changeConfig:config];
+ ````
   </TabItem>
   <TabItem value="unity">
 
@@ -64,12 +70,15 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-  TapLoginHelper.getInstance().startTapLogin(MainActivity.this, TapTapSdk.SCOPE_PUIBLIC_PROFILE);
+TapLoginHelper.getInstance().startTapLogin(MainActivity.this, TapTapSdk.SCOPE_PUIBLIC_PROFILE);
   ```
   </TabItem>
 
   <TabItem value="ios">
 
+```objectivec  
+[TapLoginHelper startTapLogin:@[@"public_profile"]];
+````
   </TabItem>
   <TabItem value="unity">
 
@@ -94,12 +103,15 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-  TapLoginHelper.logout();
+TapLoginHelper.logout();
   ```
   </TabItem>
 
   <TabItem value="ios">
 
+```objectivec
+[TapLoginHelper logout];
+```
   </TabItem>
   <TabItem value="unity">
 
