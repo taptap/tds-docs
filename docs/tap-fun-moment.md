@@ -230,6 +230,10 @@ TapTapMomentSdk.setLoginToken(currentAccessToken);
 ## 5. 打开动态页面
 在游戏中，显示游戏动态页面  
 
+:::caution
+**截止到此步骤，2、3、4步为必要步骤**
+:::
+
 **API**  
 <Tabs
 groupId="tap-platform"
@@ -278,9 +282,9 @@ groupId="tap-platform"
   <TabItem value="ios">
 
   ```objectivec
-  TDSMomentConfig *mconfig = [TDSMomentSdk init];
-  mconfig.orientation = TDSMomentOrientationDefault;
-  [TDSMomentSdk openTapMomentWithConfig:mconfig];
+TDSMomentConfig *mconfig = [[TDSMomentConfig alloc]init];
+mconfig.orientation = TDSMomentOrientationDefault;
+[TDSMomentSdk openTapMomentWithConfig:mconfig];
   ```
   </TabItem>
   <TabItem value="unity">
@@ -290,9 +294,6 @@ groupId="tap-platform"
 
 
 ## 6. 发布动态
-:::caution
-**截止到此步骤，2、3、4步为必要步骤**
-:::
 
 ### 普通动态
 普通动态包括图片和对应的内容描述

@@ -10,3 +10,5 @@ sidebar_label: iOS
 ## [UIWindow tds_topWindow]: unrecognized selector sent to class 0xxxxxxxx
 到Build Setting-->Other Linker Flags添加-ObjC
 ![](https://qnblog.ijemy.com/xd_ios_003.png)
+
+## reason: '*** +[TDSMomentSdk<0x1029441d0> init]: cannot init a class object.'

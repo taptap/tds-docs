@@ -346,7 +346,7 @@ NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:@"name",@"Tap zh
 | properties | 是   | 事件属性。需要和控制台的配置匹配。值需要是长度大于0并小于等于256的字符串或绝对值小于1E11的浮点数 |
 
 
-## TapTapMoment
+## TDSMomentSdk
 
 ### didChangeResultCode
 
