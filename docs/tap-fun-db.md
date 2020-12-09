@@ -200,6 +200,10 @@ groupId="tap-platform"
 
   <TabItem value="ios">
 
+```objectivec
+TTSDKProfile *currentProfile = [TapLoginHelper currentProfile];
+NSString *openId = [currentProfile openid];
+```
   </TabItem>
   <TabItem value="unity">
 

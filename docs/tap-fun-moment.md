@@ -136,7 +136,13 @@ TapTapMomentSdk.setCallback(new TapTapMomentSdk.TapMomentCallback() {
   <TabItem value="ios">
 
   ```objectivec
+  @interface ViewController () <TDSMomentDelegate>
 
+  @end
+
+  - (void)didChangeResultCode:(NSInteger)code msg:(NSString *)msg {
+      NSLog (@"msg:%@, code:%i" ,msg, code);
+  }
   ```
   </TabItem>
   <TabItem value="unity">
@@ -184,7 +190,7 @@ TapTapMomentSdk.setLoginToken(AccessToken);
   <TabItem value="ios">
 
   ```objectivec
-
++ (void)setAccessToken:(TDSMomentAccessToken *)token;
   ```
   </TabItem>
   <TabItem value="unity">
@@ -212,7 +218,7 @@ TapTapMomentSdk.setLoginToken(currentAccessToken);
   <TabItem value="ios">
 
   ```objectivec
-
+[TDSMomentSdk setAccessToken:[TDSMomentAccessToken build:[[TapLoginHelper currentAccessToken]toJsonString]]];
   ```
   </TabItem>
   <TabItem value="unity">
@@ -310,7 +316,8 @@ groupId="tap-platform"
   <TabItem value="ios">
 
   ```objectivec
-
+  + (void)openPostMomentPageWithContent:(TDSPostMomentData * _Nonnull)content
+                                 config:(TDSMomentConfig * _Nonnull)config;
   ```
   </TabItem>
   <TabItem value="unity">
@@ -333,7 +340,7 @@ groupId="tap-platform"
 TapTapMomentSdk.Config config = new TapTapMomentSdk.Config();
 config.orientation = TapTapMomentSdk.ORIENTATION_DEFAULT;  
 String content = "普通动态描述";
-String[] imagePaths = new String[] { "content://***.jpg","/sdcard/**.jpg" };
+String[] images = new String[] { "content://***.jpg","/sdcard/**.jpg" };
 TapTapMomentSdk.publishMoment(config, imagePaths, content);
   ```
   </TabItem>
@@ -341,7 +348,14 @@ TapTapMomentSdk.publishMoment(config, imagePaths, content);
   <TabItem value="ios">
 
   ```objectivec
+  TDSImageMomentData *imageMoment = [[TDSImageMomentData alloc] init];
+  imageMoment.images = @[@"file://..."];
+  imageMoment.content = @"我是发图片动态的内容";
 
+  TDSMomentConfig *config = [[TDSMomentConfig alloc] init];
+  config.orientation = TDSMomentOrientationDefault;
+
+  [TDSMomentSdk openPostMomentPageWithContent:imageMoment config:config];
   ```
   </TabItem>
   <TabItem value="unity">
@@ -366,14 +380,15 @@ groupId="tap-platform"
 
   ```java
   TapTapMomentSdk.publishVideoMoment(TapTapMomentSdk.Config config, String[] videoPaths,
-  String[] imgPaths, String title, String content);
+  String[] imagePaths, String title, String content);
   ```
   </TabItem>
 
   <TabItem value="ios">
 
   ```objectivec
-
+  + (void)openPostMomentPageWithContent:(TDSPostMomentData * _Nonnull)content
+                                 config:(TDSMomentConfig * _Nonnull)config;
   ```
   </TabItem>
   <TabItem value="unity">
@@ -394,8 +409,8 @@ groupId="tap-platform"
 
   ```java
 TapTapMomentSdk.Config config = new TapTapMomentSdk.Config();
-String[] imagePaths = new String[]{ "content://***.jpg","/sdcard/**.jpg" };
-String[] videoPaths = new String[] { "content://***.mp4", "content://***.mp4" };
+String[] images = new String[]{ "content://***.jpg","/sdcard/**.jpg" };
+String[] videos = new String[] { "content://***.mp4", "content://***.mp4" };
 String title = "title";
 String content = "content";
 TapTapMomentSdk.publishVideoMoment(config, videoPaths, imagePaths, title, content);
@@ -408,7 +423,16 @@ TapTapMomentSdk.publishVideoMoment(config, videoPaths, imagePaths, title, conten
   <TabItem value="ios">
 
   ```objectivec
+  TDSVideoMomentData *videoMoment = [[TDSVideoMomentData alloc] init];
+  videoMoment.images = @[@"file://..."];
+  videoMoment.videos = @[@"file://..."];
+  videoMoment.title = @"我是发送视频动态的标题";
+  videoMoment.content = @"我是发送视频动态的内容";
 
+  TDSMomentConfig *config = [[TDSMomentConfig alloc] init];
+  config.orientation = TDSMomentOrientationDefault;
+
+  [TDSMomentSdk openPostMomentPageWithContent:videoMoment config:config];
   ```
   </TabItem>
   <TabItem value="unity">
@@ -421,8 +445,8 @@ TapTapMomentSdk.publishVideoMoment(config, videoPaths, imagePaths, title, conten
 字段 | 可为空 | 说明
 | ------ | ------ | ------ |
 config | 否 | 发布动态图片或者视频的横竖屏配置
-videoPaths | 否 | 视频文件路径，数组形式呈现
-imgPaths | 是 | 视频封面图，可以不配置
+videos | 否 | 视频文件路径，数组形式呈现
+images | 是 | 视频封面图，可以不配置
 title | 否 | 动态标题
 content | 是 | 动态描述
 
@@ -445,19 +469,21 @@ groupId="tap-platform"
   ```java
 TapTapMomentSdk.getNoticeData();
   ```
+  返回结果会通过回调 `CALLBACK_CODE_GET_NOTICE_SUCCESS`(20000)或`CALLBACK_CODE_GET_NOTICE_FAIL`(20100)通知游戏
   </TabItem>
 
   <TabItem value="ios">
 
   ```objectivec
-
++ (void)fetchNewMessage;
   ```
+  结果在 `Delegate` 下的 `didChangeResultCode:msg:`, code == TM_RESULT_CODE_NEW_MSG_SUCCEED时，`msg` 即为消息数量
   </TabItem>
   <TabItem value="unity">
 
   </TabItem>
 </Tabs>
-返回结果会通过回调 `CALLBACK_CODE_GET_NOTICE_SUCCESS`(20000)或`CALLBACK_CODE_GET_NOTICE_FAIL`(20100)通知游戏
+
 
 ## 8. 进入好友动态主页
 
@@ -482,7 +508,7 @@ TapTapMomentSdk.openUserMoment(TapTapMomentSdk.Config config, String openId);
   <TabItem value="ios">
 
   ```objectivec
-
++ (void)openUserCenterWithConfig:(TDSMomentConfig *)config userId:(NSString *)userId;
   ```
   </TabItem>
   <TabItem value="unity">
@@ -510,7 +536,9 @@ TapTapMomentSdk.openUserMoment(config, openId);
   <TabItem value="ios">
 
   ```objectivec
-
+  TDSMomentConfig *config = [[TDSMomentConfig alloc] init];
+  config.orientation = TDSMomentOrientationDefault;
+  [TDSMomentSdk openUserCenterWithConfig:config userId:@"userId"];
   ```
   </TabItem>
   <TabItem value="unity">
@@ -550,7 +578,7 @@ TapTapMomentSdk.closeMoment();
   <TabItem value="ios">
 
   ```objectivec
-
+[TDSMomentSdk closeMoment];
   ```
   </TabItem>
   <TabItem value="unity">
@@ -574,24 +602,31 @@ groupId="tap-platform"
   ```java
 TapTapMomentSdk.closeMoment(title, content)
   ```
+  **参数说明**
 
+字段 | 可为空 | 说明
+| ------ | ------ | ------ |
+title | 否 | 动态标题
+content | 否 | 动态描述
+
+参数为二次弹窗的标题和内容，默认为"提示"和"匹配成功，进入游戏",用户选择接口会通过回调 `CALLBACK_CODE_ClOSE_CANCEL`(50000) 和`CALLBACK_CODE_ClOSE_CONFIRM`(50100)通知游戏  
   </TabItem>
 
   <TabItem value="ios">
 
   ```objectivec
-
+[TDSMomentSdk closeMomentWithTitle:@"title" content:@"content" showConfirm:true];
   ```
+  **参数说明**
+
+字段 | 可为空 | 说明
+| ------ | ------ | ------ |
+title | 否 | 动态标题
+content | 否 | 动态描述
+showConfirm | 否 | 是否显示确认弹窗
+
   </TabItem>
   <TabItem value="unity">
 
   </TabItem>
 </Tabs>
-	参数为二次弹窗的标题和内容，默认为"提示"和"匹配成功，进入游戏",用户选择接口会通过回调 `CALLBACK_CODE_ClOSE_CANCEL`(50000) 和`CALLBACK_CODE_ClOSE_CONFIRM`(50100)通知游戏  
-
-**参数说明**
-
-  字段 | 可为空 | 说明
-  | ------ | ------ | ------ |
-  title | 否 | 动态标题
-  content | 否 | 动态描述

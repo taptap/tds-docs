@@ -30,6 +30,9 @@ init(TdsConfig config);
 
 <TabItem value="ios">
 
+```objectivec
++ (void)initWithConfig:(TDSConfig *)config;
+```
 </TabItem>
 
 <TabItem value="unity">
@@ -57,16 +60,6 @@ TdsConfig tdsConfig = new TdsConfig.Builder()
                 .build();
 TdsInitializer.init(tdsConfig);
 ```  
-</TabItem>
-
-<TabItem value="ios">
-
-</TabItem>
-
-<TabItem value="unity">
-
-</TabItem>
-</Tabs>
 
 **TdsConfig参数说明**  
 
@@ -74,6 +67,31 @@ TdsInitializer.init(tdsConfig);
 :--- | :--- | :---
 clientId | 否 | 开发者中心获取的client Id
 appContext | 否 | 当前Activity
+
+</TabItem>
+
+<TabItem value="ios">
+
+```objectivec
+NSString *clientID = @"clientId";
+TDSConfig *config = [[TDSConfig alloc]init];
+config.clientId =clientID;
+[TDSInitializer initWithConfig:config];
+```
+
+**TDSConfig参数说明**  
+
+参数 | 可选 | 备注
+:--- | :--- | :---
+clientId | 否 | 开发者中心获取的client Id
+</TabItem>
+
+<TabItem value="unity">
+
+</TabItem>
+</Tabs>
+
+
 
 ### enableTapDB
 **API**  
@@ -94,6 +112,9 @@ enableTapDB(TdsConfig config);
 
 <TabItem value="ios">
 
+```objectivec
++ (void)enableTapDBWithChannel:(nullable NSString *)channel gameVersion:(nullable NSString *)gameVersion;
+```
 </TabItem>
 
 <TabItem value="unity">
@@ -121,6 +142,9 @@ TdsInitializer.enableTapDB("v1.0.0","channel");
 
 <TabItem value="ios">
 
+```objectivec
+[TDSInitializer enableTapDBWithChannel:@"channel" gameVersion:@"v1.0.0"];
+```
 </TabItem>
 
 <TabItem value="unity">
@@ -138,6 +162,65 @@ channel | 是 | 长度大于0并小于等于256。分包渠道。1.2.名词解�
 gameVersion | 是 | 长度大于0并小于等于256。游戏版本。为空时，自动获取游戏安装包的版本（AndroidManifest.xml中的versionName）
 
 ### enableMoment
+开启动态
+
+**API**  
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+<TabItem value="android">
+
+```java
+public static void enableMoment(Activity activity);
+```
+</TabItem>
+
+<TabItem value="ios">
+
+```objectivec
++ (void)enableMoment;
+```
+</TabItem>
+
+<TabItem value="unity">
+
+</TabItem>
+</Tabs>
+
+
+**示例代码**
+
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+<TabItem value="android">
+
+```java
+TdsInitializer.enableMoment(MainActivity.this);
+```
+</TabItem>
+
+<TabItem value="ios">
+
+```objectivec
+[TDSInitializer enableMoment];
+```
+</TabItem>
+
+<TabItem value="unity">
+
+</TabItem>
+</Tabs>
 
 ## TapTapSdk
 ### changeTapLoginConfig
@@ -161,6 +244,9 @@ changeTapLoginConfig(TapTapSdk.LoginSdkConfig var0);
 
 <TabItem value="ios">
 
+```objectivec
++ (void)enableMoment;
+```
 </TabItem>
 
 <TabItem value="unity">
@@ -193,6 +279,9 @@ TapTapSdk.changeTapLoginConfig(loginSdkConfig);
 
 <TabItem value="ios">
 
+```objectivec
+[TDSMomentSdk closeMoment];
+```
 </TabItem>
 
 <TabItem value="unity">
@@ -225,6 +314,9 @@ public void setLoginResultCallback(TapLoginHelper.ITapLoginResultCallback var1);
 
 <TabItem value="ios">
 
+```objectivec
++ (void)registerLoginCallback:(TTSDKLoginManagerRequestHandler)callback;
+```
 </TabItem>
 
 <TabItem value="unity">
@@ -267,6 +359,22 @@ TapLoginHelper.getInstance().setLoginResultCallback(new TapLoginHelper.ITapLogin
 
 <TabItem value="ios">
 
+```objectivec
+[TapLoginHelper registerLoginCallback:^(TTSDKLoginResult *result, NSError *error) {
+        if (error) {
+            // 授权失败
+            NSLog([error localizedDescription]);
+        } else {
+            if (result.isCancelled) {
+                // 授权流程被取消
+                NSLog(@"isCancelled");              
+            } else {
+                // 授权成功
+                NSLog(@"success");
+            }
+        }
+    }];
+```
 </TabItem>
 
 <TabItem value="unity">
@@ -278,6 +386,8 @@ TapLoginHelper.getInstance().setLoginResultCallback(new TapLoginHelper.ITapLogin
 
 
 ### startTapLogin
+登录
+
 **API**
 <Tabs
 groupId="tap-platform"
@@ -295,6 +405,10 @@ public void startTapLogin(Activity activity, String... var2);
 </TabItem>
 
 <TabItem value="ios">
+
+```objectivec
++ (void)startTapLogin:(NSArray *)permissions;
+```
 
 </TabItem>
 
@@ -323,6 +437,10 @@ groupId="tap-platform"
 
 <TabItem value="ios">
 
+```objectivec
+[TapLoginHelper startTapLogin:@[@"public_profile"]];
+```
+
 </TabItem>
 
 <TabItem value="unity">
@@ -343,6 +461,8 @@ groupId="tap-platform"
 登录取消 | void onCancel()  
 
 ### logout
+登出
+
 **API**
 <Tabs
 groupId="tap-platform"
@@ -360,6 +480,10 @@ public static void logout();
 </TabItem>
 
 <TabItem value="ios">
+
+```objectivec
++ (void)logout;
+```
 
 </TabItem>
 
@@ -388,6 +512,10 @@ TapLoginHelper.logout();
 
 <TabItem value="ios">
 
+```objectivec
+[[[TapLoginHelper alloc] init] logout];
+```
+
 </TabItem>
 
 <TabItem value="unity">
@@ -396,7 +524,7 @@ TapLoginHelper.logout();
 </Tabs>
 
 ### getCurrentAccessToken
-return com.taptap.sdk.AccessToken;  
+获取用户登录信息
 
 **API**
 <Tabs
@@ -415,6 +543,10 @@ public static AccessToken getCurrentAccessToken();
 </TabItem>
 
 <TabItem value="ios">
+
+```objectivec
++ (TTSDKAccessToken *)currentAccessToken;
+```
 
 </TabItem>
 
@@ -442,6 +574,10 @@ AccessToken accessToken =  TapLoginHelper.getCurrentAccessToken();
 </TabItem>
 
 <TabItem value="ios">
+
+```objectivec
+TTSDKAccessToken *currentAccessToken = [TapLoginHelper currentAccessToken];
+```
 
 </TabItem>
 
@@ -471,6 +607,10 @@ public static Profile getCurrentProfile();
 
 <TabItem value="ios">
 
+```objectivec
++ (TTSDKProfile *)currentProfile;
+```
+
 </TabItem>
 
 <TabItem value="unity">
@@ -498,6 +638,10 @@ Profile profile = TapLoginHelper.getCurrentProfile();
 
 <TabItem value="ios">
 
+```objectivec
+TTSDKProfile *currentProfile = [TapLoginHelper currentProfile];
+```
+
 </TabItem>
 
 <TabItem value="unity">
@@ -524,6 +668,10 @@ public static void fetchProfileForCurrentAccessToken(Api.ApiCallback<Profile>);
 </TabItem>
 
 <TabItem value="ios">
+
+```objectivec
++ (void)fetchProfileForCurrentAccessToken:(void (^)(TTSDKProfile *profile, NSError *error))callback;
+```
 
 </TabItem>
 
@@ -565,6 +713,13 @@ TapLoginHelper.getInstance().fetchProfileForCurrentAccessToken(new Api.ApiCallba
 
 <TabItem value="ios">
 
+```objectivec
+[TapLoginHelper fetchProfileForCurrentAccessToken:^(TTSDKProfile * _Nonnull profile, NSError * _Nonnull error) {
+        //TapDB会用到openID
+        NSString *openId = [profile openid];
+    }];
+```
+
 </TabItem>
 
 <TabItem value="unity">
@@ -597,6 +752,11 @@ public static void setUser(String userId, String openId, LoginType loginType);
 
 <TabItem value="ios">
 
+```objectivec
++ (void)setUser:(NSString *)userId;
++ (void)setUser:(NSString *)userId openId:(NSString *)openId loginType:(TapDBLoginType)loginType;
+```
+
 </TabItem>
 
 <TabItem value="unity">
@@ -623,6 +783,10 @@ TapDB.setUser("xxxxuser1","openId",LoginType.TapTap);
 </TabItem>
 
 <TabItem value="ios">
+
+```objectivec
+[TapDB setUser:@"userId" openId:@"openId" loginType:TapDBLoginTypeTapTap];
+```
 
 </TabItem>
 
@@ -686,6 +850,11 @@ Profile.fetchProfileForCurrentAccessToken(new Api.ApiCallback<Profile>() {
 
 <TabItem value="ios">
 
+```objectivec
+TTSDKProfile *currentProfile = [TapLoginHelper currentProfile];
+NSString *openId = [currentProfile openid];
+```
+
 </TabItem>
 
 <TabItem value="unity">
@@ -715,6 +884,10 @@ public static void setName(String name);
 
 <TabItem value="ios">
 
+```objectivec
++ (void)setName:(NSString *)name;
+```
+
 </TabItem>
 
 <TabItem value="unity">
@@ -740,6 +913,10 @@ TapDB.setName("taptap");
 </TabItem>
 
 <TabItem value="ios">
+
+```objectivec
+ [TapDB setName:@"Tap zhang"];
+```
 
 </TabItem>
 
@@ -773,6 +950,10 @@ public static void setLevel(int level);
 
 <TabItem value="ios">
 
+```objectivec
++ (void)setLevel:(NSInteger)level;
+```
+
 </TabItem>
 
 <TabItem value="unity">
@@ -798,6 +979,10 @@ TapDB.setLevel(5);
 </TabItem>
 
 <TabItem value="ios">
+
+```objectivec
+[TapDB setLevel:10];
+```
 
 </TabItem>
 
@@ -834,6 +1019,10 @@ public static void setServer(String server);
 
 <TabItem value="ios">
 
+```objectivec
++ (void)setServer:(NSString *)server;
+```
+
 </TabItem>
 
 <TabItem value="unity">
@@ -859,6 +1048,10 @@ TapDB.setServer("https://test.taptap.com/callback");
 </TabItem>
 
 <TabItem value="ios">
+
+```objectivec
+[TapDB setServer:@"https://test.taptap.com/callback"];
+```
 
 </TabItem>
 
@@ -896,6 +1089,10 @@ public static void onCharge(String orderId, String product, long amount, String 
 
 <TabItem value="ios">
 
+```objectivec
++ (void)onChargeSuccess:(NSString *)orderId product:(NSString *)product amount:(NSInteger)amount currencyType:(NSString *)currencyType payment:(NSString *)payment;
+```
+
 </TabItem>
 
 <TabItem value="unity">
@@ -922,6 +1119,10 @@ TapDB.onCharge("0xueiEns","大宝剑","100","CNY","wechat");
 
 <TabItem value="ios">
 
+```objectivec
+[TapDB onChargeSuccess:@"0xueiEns" product:@"轩辕剑" amount:10 currencyType:@"CNY" payment:@"wechat"];
+```
+
 </TabItem>
 
 <TabItem value="unity">
@@ -934,11 +1135,11 @@ TapDB.onCharge("0xueiEns","大宝剑","100","CNY","wechat");
 
 字段 | 可为空 | 说明
 | ------ | ------ | ------ |
-orderId | 是 | 长度大于0并小于等于256。订单ID。传递订单ID可进行排重，防止计算多次
-product | 是 | 长度大于0并小于等于256。商品名称
-amount | 否 | 大于0并小于等于100000000000。充值金额。单位分，即无论什么币种，都需要乘以100
+orderId | 是 | 订单ID。长度大于0并小于等于256。传递订单ID可进行排重，防止计算多次
+product | 是 | 商品名称。长度大于0并小于等于256。
+amount | 否 | 充值金额。大于0并小于等于100000000000。单位分，即无论什么币种，都需要乘以100
 currencyType | 是 | 货币类型。国际通行三字母表示法，为空时默认CNY。参考：人民币 CNY，美元 USD；欧元 EUR
-payment | 是 | 长度大于0并小于等于256。充值渠道
+payment | 是 | 充值渠道。长度大于0并小于等于256。
 
 常见货币类型的格式参考<a target="_blank" href="https://www.tapdb.com/docs/zh_CN/features/exchangeRate.html">汇率表</a>
 
@@ -963,6 +1164,10 @@ public static void onEvent(String eventCode, JSONObject properties);
 </TabItem>
 
 <TabItem value="ios">
+
+```objectivec
++ (void)onEvent:(NSString *)eventCode properties:(NSDictionary *)properties;
+```
 
 </TabItem>
 
@@ -995,6 +1200,11 @@ try {
 
 <TabItem value="ios">
 
+```objectivec
+NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:@"name",@"Tap zhang",@"age",@"18",nil];
+[TapDB onEvent:@"userInfo" properties:dict];
+```
+
 </TabItem>
 
 <TabItem value="unity">
@@ -1009,7 +1219,7 @@ try {
 eventCode | 否 | 在控制台中配置得到的事件编码
 properties | 是 | 事件属性。需要和控制台的配置匹配。值需要是长度大于0并小于等于256的字符串或绝对值小于1E11的浮点数
 
-### onResume&onStop
+<!-- ### onResume&onStop
 
 跟踪用户游戏次数和游戏时长。需要给游戏中每个Activity的onResume和onStop中添加对应的调用。如果多个Activity继承同一个父类，只需要在父类中添加调用即可。比如onResume方法，直接在Activity的onResume方法的最后添加TapDB.onResume(this)即可。  
 **API**  
@@ -1030,6 +1240,10 @@ public static void onStop(Activity activity);
 </TabItem>
 
 <TabItem value="ios">
+
+```objectivec
+
+```
 
 </TabItem>
 
@@ -1076,6 +1290,10 @@ public class GameActivity extends Activity {
 
 <TabItem value="ios">
 
+```objectivec
+
+```
+
 </TabItem>
 
 <TabItem value="unity">
@@ -1087,7 +1305,7 @@ public class GameActivity extends Activity {
 
 字段 | 可为空 | 说明
 | ------ | ------ | ------ |
-activity | 否 | 当前Activity对象。一般传递"this"
+activity | 否 | 当前Activity对象。一般传递"this" -->
 
 ## TapTapMoment
 ### setCallback
@@ -1111,6 +1329,10 @@ public static void setCallback(TapTapMomentSdk.TapMomentCallback tapMomentCallba
 </TabItem>
 
 <TabItem value="ios">
+
+```objectivec
+- (void)didChangeResultCode:(NSInteger)code msg:(NSString *)msg;
+```
 
 </TabItem>
 
@@ -1143,6 +1365,16 @@ TapTapMomentSdk.setCallback(new TapTapMomentSdk.TapMomentCallback() {
 
 <TabItem value="ios">
 
+```objectivec
+@interface ViewController () <TDSMomentDelegate>
+
+@end
+
+- (void)didChangeResultCode:(NSInteger)code msg:(NSString *)msg {
+    NSLog (@"msg:%@, code:%i" ,msg, code);
+}
+```
+
 </TabItem>
 
 <TabItem value="unity">
@@ -1171,6 +1403,10 @@ public static void setLoginToken(AccessToken accessToken);
 
 <TabItem value="ios">
 
+```objectivec
++ (void)setAccessToken:(TDSMomentAccessToken *)token;
+```
+
 </TabItem>
 
 <TabItem value="unity">
@@ -1197,6 +1433,10 @@ TapTapMomentSdk.setLoginToken(currentAccessToken);
 </TabItem>
 
 <TabItem value="ios">
+
+```objectivec
+[TDSMomentSdk setAccessToken:[TDSMomentAccessToken build:[[TapLoginHelper currentAccessToken]toJsonString]]];
+```
 
 </TabItem>
 
@@ -1227,6 +1467,10 @@ public static void openTapMoment(TapTapMomentSdk.Config config);
 
 <TabItem value="ios">
 
+```objectivec
+  + (void)openTapMomentWithConfig:(TDSMomentConfig *) config;
+```
+
 </TabItem>
 
 <TabItem value="unity">
@@ -1254,6 +1498,12 @@ TapTapMomentSdk.openTapMoment(config);
 </TabItem>
 
 <TabItem value="ios">
+
+```objectivec
+TDSMomentConfig *mconfig = [TDSMomentSdk init];
+mconfig.orientation = TDSMomentOrientationDefault;
+[TDSMomentSdk openTapMomentWithConfig:mconfig];
+```
 
 </TabItem>
 
@@ -1285,6 +1535,11 @@ public static void publishVideoMoment(TapTapMomentSdk.Config config, String[] vi
 </TabItem>
 
 <TabItem value="ios">
+
+```objectivec
++ (void)openPostMomentPageWithContent:(TDSPostMomentData * _Nonnull)content
+                               config:(TDSMomentConfig * _Nonnull)config;
+```
 
 </TabItem>
 
@@ -1326,6 +1581,26 @@ TapTapMomentSdk.publishVideoMoment(config, videoPaths, imagePaths, title, conten
 
 <TabItem value="ios">
 
+```objectivec
+//发布图片动态
+TDSImageMomentData *imageMoment = [[TDSImageMomentData alloc] init];
+imageMoment.images = @[@"file://..."];
+imageMoment.content = @"我是发图片动态的内容";
+TDSMomentConfig *config = [[TDSMomentConfig alloc] init];
+config.orientation = TDSMomentOrientationDefault;
+[TDSMomentSdk openPostMomentPageWithContent:imageMoment config:config];
+
+//发布视频动态
+TDSVideoMomentData *videoMoment = [[TDSVideoMomentData alloc] init];
+videoMoment.images = @[@"file://..."];
+videoMoment.videos = @[@"file://..."];
+videoMoment.title = @"我是发送视频动态的标题";
+videoMoment.content = @"我是发送视频动态的内容";
+TDSMomentConfig *config = [[TDSMomentConfig alloc] init];
+config.orientation = TDSMomentOrientationDefault;
+[TDSMomentSdk openPostMomentPageWithContent:videoMoment config:config];
+```
+
 </TabItem>
 
 <TabItem value="unity">
@@ -1364,6 +1639,10 @@ public static void getNoticeData();
 
 <TabItem value="ios">
 
+```objectivec
++ (void)fetchNewMessage;
+```
+  结果在 `Delegate` 下的 `didChangeResultCode:msg:`, code == TM_RESULT_CODE_NEW_MSG_SUCCEED时，`msg` 即为消息数量
 </TabItem>
 
 <TabItem value="unity">
@@ -1389,6 +1668,10 @@ TapTapMomentSdk.getNoticeData();
 </TabItem>
 
 <TabItem value="ios">
+
+```objectivec
+[TDSMomentSdk fetchNewMessage];
+```
 
 </TabItem>
 
@@ -1418,6 +1701,10 @@ public static void openUserMoment(TapTapMomentSdk.Config config, String openId)
 
 <TabItem value="ios">
 
+```objectivec
++ (void)openUserCenterWithConfig:(TDSMomentConfig *)config userId:(NSString *)userId;
+```
+
 </TabItem>
 
 <TabItem value="unity">
@@ -1444,6 +1731,12 @@ TapTapMomentSdk.openUserMoment(config, openId);
 </TabItem>
 
 <TabItem value="ios">
+
+```objectivec
+TDSMomentConfig *config = [[TDSMomentConfig alloc] init];
+config.orientation = TDSMomentOrientationDefault;
+[TDSMomentSdk openUserCenterWithConfig:config userId:@"userId"];
+```
 
 </TabItem>
 
@@ -1484,6 +1777,14 @@ public static void closeMoment(String title, String content);
 
 <TabItem value="ios">
 
+```objectivec
+//直接关闭
++ (void)closeMoment;
+
+//确认关闭
++ (void)closeMomentWithTitle:(NSString *)title content:(NSString *)content showConfirm:(BOOL)showConfirm;
+```
+
 </TabItem>
 
 <TabItem value="unity">
@@ -1510,16 +1811,6 @@ TapTapMomentSdk.closeMoment();
 //确认关闭
 TapTapMomentSdk.closeMoment(title, content);
 ```
-</TabItem>
-
-<TabItem value="ios">
-
-</TabItem>
-
-<TabItem value="unity">
-
-</TabItem>
-</Tabs>
 
 **参数说明**
 
@@ -1527,3 +1818,27 @@ TapTapMomentSdk.closeMoment(title, content);
 | ------ | ------ | ------ |
 title | 否 | 动态标题
 content | 否 | 动态描述
+</TabItem>
+
+<TabItem value="ios">
+
+```objectivec
+//直接关闭
+[TDSMomentSdk closeMoment];
+
+//确认关闭
+[TDSMomentSdk closeMomentWithTitle:@"title" content:@"content" showConfirm:true];
+```
+**参数说明**
+
+字段 | 可为空 | 说明
+| ------ | ------ | ------ |
+title | 否 | 动态标题
+content | 否 | 动态描述
+showConfirm | 否 | 是否显示确认弹窗
+</TabItem>
+
+<TabItem value="unity">
+
+</TabItem>
+</Tabs>
