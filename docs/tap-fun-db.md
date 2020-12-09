@@ -17,9 +17,9 @@ TapSDK提供一套可供游戏开发者收集用户数据的API。系统会收�
 参考：https://www.tapdb.com/  
 
 ## 2. 功能开启
-放在[TdsInitializer.init](./tap-api.md#init)初始化SDK之后调用即可  
-**API**  
+放在初始化SDK之后调用即可
 
+**API**  
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -695,7 +695,7 @@ timestamp | long | 当前统计数据的时间戳(秒)。TapDB会按照自然5�
 成功判断：返回的HTTP Code为200时认为发送成功，否则认为失败
 
 ## 10. 收集OAID
-TapSDK支持OAID获取功能，需要[下载](https://github.com/xindong/TapSDKAndroid/releases)oaid_sdk_1.0.23.aar放⼊入项⽬ libs目录下
+TapSDK支持OAID获取功能
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -706,7 +706,7 @@ groupId="tap-platform"
   ]}>
   <TabItem value="android">
 
-
+需要[下载](https://github.com/xindong/TapSDKAndroid/releases)oaid_sdk_1.0.23.aar放⼊入项⽬ libs目录下
   </TabItem>
 
   <TabItem value="ios">

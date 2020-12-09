@@ -17,5 +17,5 @@ module.exports = {
     'tap-changelog',
     'tap-known',
   ],
-  api: ['tap-api']
+  api: ['tap-api-android','tap-api-ios','tap-api-unity']
 };

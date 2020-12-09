@@ -37,7 +37,7 @@ module.exports = {
           //to: '/',
           type: 'doc',
           //activeBasePath: 'docs',
-          docId: 'tap-api',
+          docId: 'tap-api-android',
           label: 'API',
           position: 'left',
         },

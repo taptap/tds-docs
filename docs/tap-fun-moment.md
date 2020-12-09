@@ -18,7 +18,7 @@ import TabItem from '@theme/TabItem';
 TapSDK提供可供用户发布动态到TapTapApp和游戏内部展示动态的控件和功能。  
 
 ## 2. 功能开启
-API放在[TdsInitializer.init](./tap-api.md#init)初始化SDK之后调用即可  
+API放在[TdsInitializer.init](./tap-api-android.md#init)初始化SDK之后调用即可  
 
 **API**  
 
@@ -550,7 +550,7 @@ TapTapMomentSdk.openUserMoment(config, openId);
 
 字段 | 可为空 | 说明
 | ------ | ------ | ------ |
-openId | 否 | [openId获取方式](./tap-api.md/#tap登录后openid获取方式)
+openId | 否 | [openId获取方式](./tap-api-android.md/#tap登录后openid获取方式)
 
 ## 9. 关闭动态
 
