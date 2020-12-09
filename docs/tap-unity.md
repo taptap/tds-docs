@@ -84,24 +84,26 @@ TapSDK.TDSCore.Init("clientId");
 
 ```c#
 TapSDK.TDSLogin.RegisterLoginCallback(new MyLoginCallback());
-public class MyLoginCallback : LoginCallback{
-    void LoginSuccess(TDSAccessToken accessToken){
-        Debug.Log("Login success");
-    }
+public class MyLoginCallback : TapSDK.LoginCallback{
+   public void LoginSuccess(TapSDK.TDSAccessToken accessToken){
+           Debug.Log("Login success");
+           SceneManager.LoadScene("StartScene");
+   }
 
-    void LoginCancel(){
+   public void LoginCancel(){
+       Debug.Log("LoginCancel");
+   }
 
-    }
-
-    void LoginError(string error){
-        Debug.Log(error);
-    }
+   public void LoginError(string error){
+       Debug.Log(error);
+   }
 }
 ```
 ## 7. 登录
 
 ```c#
-TapSDK.TDSLogin.StartLogin(new string["public_profile"]);
+string[] permissions = {"public_profile"};
+TapSDK.TDSLogin.StartLogin(permissions);
 ```
 ## 8. 登出
 
