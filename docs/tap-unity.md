@@ -87,7 +87,6 @@ TapSDK.TDSLogin.RegisterLoginCallback(new MyLoginCallback());
 public class MyLoginCallback : TapSDK.LoginCallback{
    public void LoginSuccess(TapSDK.TDSAccessToken accessToken){
            Debug.Log("Login success");
-           SceneManager.LoadScene("StartScene");
    }
 
    public void LoginCancel(){
@@ -102,8 +101,7 @@ public class MyLoginCallback : TapSDK.LoginCallback{
 ## 7. 登录
 
 ```c#
-string[] permissions = {"public_profile"};
-TapSDK.TDSLogin.StartLogin(permissions);
+TapSDK.TDSLogin.StartLogin(new string[]{"public_profile"});
 ```
 ## 8. 登出
 
