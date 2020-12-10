@@ -50,6 +50,17 @@ groupId="tap-platform"
   </TabItem>
   <TabItem value="unity">
 
+```c#
+  /**
+  clientId: 控制台获取的clientID
+  isCN: 国内外，默认为true
+  isRoundCorner: 登录框是否圆角，默认为true
+  **/
+  //public static void Init(string clientId, bool isCN, bool isRoundCorner)
+
+  TapSDK.TDSCore.Init("FwFdCIr6u71WQDQwQN",true,true);
+```
+
   </TabItem>
 </Tabs>
 
@@ -82,6 +93,9 @@ TapLoginHelper.getInstance().startTapLogin(MainActivity.this, TapTapSdk.SCOPE_PU
   </TabItem>
   <TabItem value="unity">
 
+```c#
+TapSDK.TDSLogin.StartLogin(new string[]{"public_profile"});
+```
   </TabItem>
 </Tabs>
 
@@ -115,5 +129,8 @@ TapLoginHelper.logout();
   </TabItem>
   <TabItem value="unity">
 
+```c#
+TapSDK.TDSLogin.Logout();
+```
   </TabItem>
 </Tabs>

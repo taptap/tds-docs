@@ -44,6 +44,10 @@ groupId="tap-platform"
 
   <TabItem value="unity">
 
+```c#
+public static void Init(string clientId, string channel, string gameVersion)
+```
+
   </TabItem>
 </Tabs>
 
@@ -71,6 +75,10 @@ groupId="tap-platform"
 ```
   </TabItem>
   <TabItem value="unity">
+
+```c#
+TapSDK.TDSTapDB.Init("clientID","channel","gameVersion");
+```
 
   </TabItem>
 </Tabs>
@@ -112,6 +120,12 @@ groupId="tap-platform"
   </TabItem>
   <TabItem value="unity">
 
+```c#
+public static void SetUser(string userId)
+
+public static void SetUser(string userId, string openId, string loginType)
+```
+
   </TabItem>
 </Tabs>
 
@@ -141,6 +155,11 @@ groupId="tap-platform"
   ```
   </TabItem>
   <TabItem value="unity">
+
+```c#
+TapSDK.TDSTapDB.SetUser("userId");
+TapSDK.TDSTapDB.SetUser("userId","openId","loginType");
+```
 
   </TabItem>
 </Tabs>
@@ -205,9 +224,13 @@ TTSDKProfile *currentProfile = [TapLoginHelper currentProfile];
 NSString *openId = [currentProfile openid];
 ```
   </TabItem>
-  <TabItem value="unity">
 
-  </TabItem>
+  ```c#
+  TTSDKProfile *currentProfile = [TapLoginHelper currentProfile];
+  NSString *openId = [currentProfile openid];
+  ```
+    </TabItem>
+
 </Tabs>
 
 
@@ -238,6 +261,10 @@ groupId="tap-platform"
   </TabItem>
   <TabItem value="unity">
 
+```c#
+public static void SetName(string name);
+```
+
   </TabItem>
 </Tabs>
 
@@ -264,6 +291,10 @@ groupId="tap-platform"
   ```
   </TabItem>
   <TabItem value="unity">
+
+```c#
+TapSDK.TDSTapDB.SetName("name");
+```
 
   </TabItem>
 </Tabs>
@@ -300,6 +331,10 @@ groupId="tap-platform"
   </TabItem>
   <TabItem value="unity">
 
+```c#
+public static void SetLevel(int level);
+```
+
   </TabItem>
 </Tabs>
 
@@ -326,6 +361,10 @@ groupId="tap-platform"
   ```
   </TabItem>
   <TabItem value="unity">
+
+```c#
+TapSDK.TDSTapDB.SetLevel(5);
+```
 
   </TabItem>
 </Tabs>
@@ -363,6 +402,10 @@ groupId="tap-platform"
   </TabItem>
   <TabItem value="unity">
 
+```c#
+public static void SetServer(string server);
+```
+
   </TabItem>
 </Tabs>
 
@@ -389,6 +432,10 @@ groupId="tap-platform"
   ```
   </TabItem>
   <TabItem value="unity">
+
+```c#
+TapSDK.TDSTapDB.SetServer("https://test.taptap.com/callback");
+```
 
   </TabItem>
 </Tabs>
@@ -426,6 +473,10 @@ groupId="tap-platform"
   </TabItem>
   <TabItem value="unity">
 
+```c#
+public static void OnCharge(string orderId, string productId, string amount, string currencyType, string payment)
+```
+
   </TabItem>
 </Tabs>
 
@@ -452,6 +503,10 @@ groupId="tap-platform"
   ```
   </TabItem>
   <TabItem value="unity">
+
+```c#
+TapSDK.TDSTapDB.OnCharge("0xueiEns","大宝剑","100","CNY","wechat");
+```
 
   </TabItem>
 </Tabs>
@@ -496,6 +551,10 @@ groupId="tap-platform"
   </TabItem>
   <TabItem value="unity">
 
+```c#
+public static void OnEvent(string eventCode, string properties)
+```
+
   </TabItem>
 </Tabs>
 
@@ -528,6 +587,10 @@ NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:@"name",@"Tap zh
   ```
   </TabItem>
   <TabItem value="unity">
+
+```c#
+TapSDK.TDSTapDB.OnEvent("1000","{\"param1\":\"param1\",\"param2\":\"param2\"}");
+```
 
   </TabItem>
 </Tabs>
@@ -563,6 +626,10 @@ groupId="tap-platform"
 
   </TabItem>
   <TabItem value="unity">
+
+```c#
+
+```
 
   </TabItem>
 </Tabs>
@@ -605,6 +672,10 @@ groupId="tap-platform"
 
   </TabItem>
   <TabItem value="unity">
+
+```c#
+
+```
 
   </TabItem>
 </Tabs>
@@ -709,9 +780,12 @@ groupId="tap-platform"
 需要[下载](https://github.com/xindong/TapSDKAndroid/releases)oaid_sdk_1.0.23.aar放⼊入项⽬ libs目录下
   </TabItem>
 
+
   <TabItem value="ios">
 
+
   </TabItem>
+
   <TabItem value="unity">
 
   </TabItem>

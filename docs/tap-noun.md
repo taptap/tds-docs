@@ -1,7 +1,7 @@
 ---
 id: tap-noun
 title: TapSDK 名词解释
-sidebar_label: 名次解释
+sidebar_label: 名词解释
 ---
 
 

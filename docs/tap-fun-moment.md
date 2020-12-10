@@ -46,6 +46,10 @@ TdsInitializer.enableMoment(Activity);
 
   <TabItem value="unity">
 
+```c#
+public static void InitSDK(string clientId);
+```
+
   </TabItem>
 </Tabs>
 
@@ -73,6 +77,10 @@ groupId="tap-platform"
   ```
   </TabItem>
   <TabItem value="unity">
+
+```c#
+TapSDK.TDSMoment.InitSDK("clientId");
+```
 
   </TabItem>
 </Tabs>
@@ -104,6 +112,10 @@ TapTapMomentSdk.setCallback(TapTapMomentSdk.TapMomentCallback var0);
   ```
   </TabItem>
   <TabItem value="unity">
+
+```c#
+public static void SetCallback(Action<int, string> callback);
+```
 
   </TabItem>
 </Tabs>
@@ -146,6 +158,12 @@ TapTapMomentSdk.setCallback(new TapTapMomentSdk.TapMomentCallback() {
   ```
   </TabItem>
   <TabItem value="unity">
+
+```c#
+TapSDK.TDSMoment.SetCallback((code,msg)=>{
+    Debug.Log(code+"---"+msg);
+});
+```
 
   </TabItem>
 
@@ -195,6 +213,10 @@ TapTapMomentSdk.setLoginToken(AccessToken);
   </TabItem>
   <TabItem value="unity">
 
+```c#
+public static void SetLoginToken(string accessToken);
+```
+
   </TabItem>
 </Tabs>
 
@@ -222,6 +244,12 @@ TapTapMomentSdk.setLoginToken(currentAccessToken);
   ```
   </TabItem>
   <TabItem value="unity">
+
+```c#
+TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
+    TapSDK.TDSMoment.SetLoginToken(token.toJSON());
+});
+```
 
   </TabItem>
 </Tabs>
@@ -258,6 +286,10 @@ TapTapMomentSdk.openTapMoment(TapTapMomentSdk.Config);
   </TabItem>
   <TabItem value="unity">
 
+```c#
+public static void OpenMoment(Orientation config);
+```
+
   </TabItem>
 </Tabs>
 
@@ -288,6 +320,10 @@ mconfig.orientation = TDSMomentOrientationDefault;
   ```
   </TabItem>
   <TabItem value="unity">
+
+```c#
+TapSDK.TDSMoment.OpenMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE);
+```
 
   </TabItem>
 </Tabs>
@@ -322,6 +358,10 @@ groupId="tap-platform"
   ```
   </TabItem>
   <TabItem value="unity">
+
+```c#
+public static void PublishMoment(Orientation config, string[] imagePaths, string content);
+```
 
   </TabItem>
 </Tabs>
@@ -361,6 +401,12 @@ TapTapMomentSdk.publishMoment(config, imagePaths, content);
   </TabItem>
   <TabItem value="unity">
 
+```c#
+string content = "我是描述";
+string[] images = {"imgpath01","imgpath02","imgpath03"};
+TapSDK.TDSMoment.PublishMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE, images, content);
+```
+
   </TabItem>
 </Tabs>
 
@@ -393,6 +439,14 @@ groupId="tap-platform"
   ```
   </TabItem>
   <TabItem value="unity">
+
+```c#
+//带封面
+public static void PublishVideoMoment(Orientation config, string[] videoPaths, string[] imagePaths, string title, string desc)
+
+//不带封面
+public static void PublishVideoMoment(Orientation config, string[] videoPaths, string title, string desc)
+```
 
   </TabItem>
 </Tabs>
@@ -438,6 +492,22 @@ TapTapMomentSdk.publishVideoMoment(config, videoPaths, imagePaths, title, conten
   </TabItem>
   <TabItem value="unity">
 
+```c#
+//带封面
+string[] images = {"imgpath01","imgpath02","imgpath03"};
+string[] videos = {"videop01","videop02","videop03"};
+string title = "我是动态";
+string desc = "我是描述";
+TapSDK.TDSMoment.PublishVideoMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE, videos,images,title,desc);
+
+//不带封面
+string[] images = {"imgpath01","imgpath02","imgpath03"};
+string[] videos = {"videop01","videop02","videop03"};
+string title = "我是动态";
+string desc = "我是描述";
+TapSDK.TDSMoment.PublishVideoMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE, videos,title,desc);
+```
+
   </TabItem>
 </Tabs>
 
@@ -482,6 +552,11 @@ TapTapMomentSdk.getNoticeData();
   </TabItem>
   <TabItem value="unity">
 
+```c#
+public static void GetNoticeData();
+```
+结果在`TapSDK.TDSMoment.SetCallback`进行回调
+
   </TabItem>
 </Tabs>
 
@@ -514,6 +589,10 @@ TapTapMomentSdk.openUserMoment(TapTapMomentSdk.Config config, String openId);
   </TabItem>
   <TabItem value="unity">
 
+```c#
+
+```
+
   </TabItem>
 </Tabs>
 
@@ -543,6 +622,10 @@ TapTapMomentSdk.openUserMoment(config, openId);
   ```
   </TabItem>
   <TabItem value="unity">
+
+```c#
+
+```
 
   </TabItem>
 </Tabs>
@@ -583,6 +666,10 @@ TapTapMomentSdk.closeMoment();
   ```
   </TabItem>
   <TabItem value="unity">
+
+```c#
+TapSDK.TDSMoment.CloseMoment();
+```
 
   </TabItem>
 </Tabs>
@@ -628,6 +715,17 @@ showConfirm | 否 | 是否显示确认弹窗
 
   </TabItem>
   <TabItem value="unity">
+
+```c#
+TapSDK.TDSMoment.CloseMoment(title, desc);
+```
+
+**参数说明**
+
+字段 | 可为空 | 说明
+| ------ | ------ | ------ |
+title | 否 | 动态标题
+desc | 否 | 动态描述
 
   </TabItem>
 </Tabs>
