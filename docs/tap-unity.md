@@ -3,6 +3,7 @@ id: tap-unity
 title: Unity快速开始
 sidebar_label: Unity
 ---
+本文主要介绍Unity如何将TapSDK快速接入并实现登录功能。TapSDK同时还包含用户数据收集和动态发布功能，详情可以参考[数据收集](./tap-fun-db)、[动态](./tap-fun-moment)文档介绍
 
 :::note
 如需通过示例项目了解如何在 Unity 引擎中集成 TapSDK，请参阅 GitHub 中的 [TapSDKSample](#)。
@@ -108,3 +109,17 @@ TapSDK.TDSLogin.StartLogin(new string[]{"public_profile"});
 ```c#
 TapSDK.TDSLogin.Logout();
 ```
+
+## 9. 导出到Android
+unity打包apk步骤  
+
+`需要配置package name和签名文件`  
+
+![](http://qnblog.ijemy.com/xd_unity_android_build.png)
+## 10. 导出到Xcode
+`需要配置icon和bundleId`
+
+1. Unity导出Xcode工程步骤
+
+![](http://qnblog.ijemy.com/xd_ios_build.png)
+2. 保存的文件点击'Unity-iPhone.xcodeproj'打开xcode工程

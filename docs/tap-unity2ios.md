@@ -7,7 +7,7 @@ sidebar_label: Unity2iOS
 ## 1. 工程导出并打开
 
 1.用Unity导出Xcode工程并打开
-![](http://qnblog.ijemy.com/xd_unity_ios_release.png)
+![](http://qnblog.ijemy.com/xd_ios_build.png)
 2.保存的文件点击'Unity-iPhone.xcodeproj'打开xcode工程
 
 ## 2. 导入SDK文件

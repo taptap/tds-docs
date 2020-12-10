@@ -1,7 +1,7 @@
 ---
 id: tap-ios
 title: TapSDK iOS快速开始
-sidebar_label: iOS快速开始
+sidebar_label: iOS
 ---
 
 本文主要介绍iOS如何将TapSDK快速接入并实现登录功能。TapSDK同时还包含用户数据收集和动态发布功能，详情可以参考[数据收集](./tap-fun-db)、[动态](./tap-fun-moment)文档介绍

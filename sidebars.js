@@ -5,7 +5,8 @@ module.exports = {
       快速开始: [
         'tap-android',
         'tap-ios',
-        {Unity快速开始:['tap-unity','tap-unity2ios','tap-unity2android']},
+        //{Unity快速开始:['tap-unity','tap-unity2ios','tap-unity2android']},
+        'tap-unity'
       ],
     },
     {
