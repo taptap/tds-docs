@@ -19,7 +19,7 @@ ARTIFACT_IMAGE="taptap-img-registry-vpc.cn-beijing.cr.aliyuncs.com/tds/tapsdkdoc
 # yarn build
 node_modules/.bin/docusaurus build
 
-if [$? -eq 0]; then 
+if [ $? -eq 0 ]; then 
   docker build -t $ARTIFACT_IMAGE . 
   docker push $ARTIFACT_IMAGE        
   docker rmi ${ARTIFACT_IMAGE}   
