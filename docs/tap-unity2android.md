@@ -4,6 +4,8 @@ title: unity打包Android apk
 sidebar_label: Unity2Android
 ---
 
+此处为原XDSDK步骤，未在前端配置路由
+
 ## 按需要修改AndroidManifest  
 
 可以根据需要,参照如下示例修改Plugins/Android/AndroidManifest.xml。  

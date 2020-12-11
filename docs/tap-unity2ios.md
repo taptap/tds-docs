@@ -3,6 +3,7 @@ id: tap-unity2ios
 title: unity打包Xcode项目
 sidebar_label: Unity2iOS
 ---
+此处为原XDSDK步骤，未在前端配置路由
 
 ## 1. 工程导出并打开
 
