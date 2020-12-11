@@ -31,7 +31,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-  TdsInitializer.enableTapDB(String gameVersion, String gameChannel);
+  public static void enableTapDB(Activity activity, String gameVersion, String gameChannel)
   ```  
   </TabItem>
 
@@ -64,7 +64,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
 ```java
-  TdsInitializer.enableTapDB("v1.0.0","channel");
+  TdsInitializer.enableTapDB(MainActivity.this, "1.0", "taptap");
 ```
   </TabItem>
 

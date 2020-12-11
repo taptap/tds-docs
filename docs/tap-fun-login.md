@@ -14,7 +14,7 @@ import TabItem from '@theme/TabItem';
 ## 登录设置
 您可以通过LoginSdkConfig配置您的需要的登录页面是圆角还是直角，及是否需要开启国际化等
 
-**API:** [TapTapSdk.changeTapLoginConfig](./tap-api-android.md#changetaploginconfig)(LoginSdkConfig)  
+**API:** [TapLoginHelper.changeTapLoginConfig](./api/android-loginhelper.md#changetaploginconfig)(LoginSdkConfig)  
 **`LoginSdkConfig为可配置项，非必须`**
 
 **示例代码**
@@ -66,7 +66,7 @@ groupId="tap-platform"
 
 ## 登录
 执行登录操作，跳转TapTap APP登录，当没有TapTap APP时，会默认打开内置webview登录  
-**API:** [startTapLogin](./tap-api-android.md#startTapLogin)(Activity activity, String... var2)
+**API:** [startTapLogin](./api/android-loginhelper.md#startTapLogin)(Activity activity, String... var2)
 
 **示例代码**
 
@@ -102,7 +102,7 @@ TapSDK.TDSLogin.StartLogin(new string[]{"public_profile"});
 
 ## 登出
 退出登录，清除用户登录缓存记录  
-**API:** [logout](./tap-api-android.md#logout)()  
+**API:** [logout](./api/android-loginhelper.md#logout)()  
 
 **示例代码**
 

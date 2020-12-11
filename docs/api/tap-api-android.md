@@ -603,7 +603,7 @@ TapTapMomentSdk.openUserMoment(config, openId);
 
 | 字段     | 可为空 | 说明                                                   |
 | ------ | --- | ---------------------------------------------------- |
-| openId | 否   | [openId获取方式](./tap-api-android.md/#tap登录后openid获取方式) |
+| openId | 否   | [openId获取方式](./api/android-tapdb.md/#tap登录后openid获取方式) |
 
 ### closeMoment
 

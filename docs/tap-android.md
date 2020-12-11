@@ -52,7 +52,7 @@ dependencies {
 
 ## 5. 初始化
 TapSDK初始化  
-**API**    [TdsInitializer.init()](./tap-api-android.md#init)  
+**API**    [TdsInitializer.init()](./api/android-initializer.md#init)  
 
 **示例代码**  
 ```java
@@ -65,7 +65,7 @@ TdsInitializer.init(tdsConfig);
 
 ## 6. 注册登录回调
 监听登录的结果  
-**API**  [setLoginResultCallback()](./tap-api-android.md#setloginresultcallback)
+**API**  [setLoginResultCallback()](./api/android-loginhelper.md#setloginresultcallback)
 
 **示例代码**
 ```java
@@ -89,7 +89,7 @@ TapLoginHelper.getInstance().addLoginResultCallback(new TapLoginHelper.TapLoginR
 
 ## 7. 登录
 TapTap登录，当没有安装TapTap app时，会打开内置webview进行TapTap验证登录  
-**API**  [startTapLogin()](./tap-api-android.md#starttaplogin)
+**API**  [startTapLogin()](./api/android-loginhelper.md#starttaplogin)
 
 **示例代码**  
 可以用下面代码直接登录：  
@@ -102,7 +102,7 @@ TapLoginHelper.getInstance().startTapLogin(MainActivity.this,TapTapSdk.SCOPE_PUI
 
 可以先校验该用户是否登录过，对未登录的用户调用login()  
 
-方法一、通过 TapLoginHelper.[getCurrentAccessToken](./tap-api-android.md#getcurrentaccesstoken)() 和 TapLoginHelper.[getCurrentProfile](./tap-api-android.md#getcurrentprofile)() 方法分别获取登录状态和用户信息  
+方法一、通过 TapLoginHelper.[getCurrentAccessToken](./api/android-loginhelper.md#getcurrentaccesstoken)() 和 TapLoginHelper.[getCurrentProfile](././api/android-loginhelper.md#getcurrentprofile)() 方法分别获取登录状态和用户信息  
 
 ```java  
 //未登录用户会返回null
@@ -113,7 +113,7 @@ if (TapLoginHelper.getInstance().getCurrentAccessToken() == null) {
 }
 ```
 
-方法二、通过 TapLoginHelper.[fetchProfileForCurrentAccessToken](./tap-api-android#fetchprofileforcurrentaccesstoken)() 获取实时更新的用户信息    
+方法二、通过 TapLoginHelper.[fetchProfileForCurrentAccessToken](./api/android-loginhelper.md#fetchprofileforcurrentaccesstoken)() 获取实时更新的用户信息    
 
 ```java  
 //未登录用户会回调onError，已经登录用户实时回调onSuccess

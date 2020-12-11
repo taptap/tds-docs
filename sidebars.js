@@ -18,5 +18,16 @@ module.exports = {
     'tap-changelog',
     'tap-known',
   ],
-  api: ['tap-api-android','tap-api-ios','tap-api-unity']
+  api: [
+    {
+      Android:['api/android-initializer','api/android-loginhelper','api/android-tapdb','api/android-tapmoment'],
+    },
+    {
+      iOS:['api/ios-initializer','api/ios-loginhelper','api/ios-tapdb','api/ios-tapmoment'],
+    },
+    {
+      Unity:['api/unity-login','api/unity-tapdb','api/unity-tapmoment'],
+    },
+
+  ]
 };
