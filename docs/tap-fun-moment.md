@@ -331,6 +331,20 @@ TapSDK.TDSMoment.OpenMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE);
 
 ## 6. 发布动态
 
+**发布动态的功能，需要在Moment回调强制调用下面代码**
+
+```java
+TapTapMomentSdk.setCallback(new TapTapMomentSdk.TapMomentCallback() {
+    @Override
+    public void onCallback(int code, String msg) {
+      if (code == TapTapMomentSdk.CALLBACK_CODE_LOGIN_SUCCESS) {
+            TapTapMomentSdk.setHandleLoginResult(true);
+        }
+    }
+});
+```
+
+
 ### 普通动态
 普通动态包括图片和对应的内容描述
 

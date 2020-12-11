@@ -69,7 +69,7 @@ TdsInitializer.init(tdsConfig);
 
 **示例代码**
 ```java
-TapLoginHelper.getInstance().setLoginResultCallback(new TapLoginHelper.ITapLoginResultCallback() {
+TapLoginHelper.getInstance().addLoginResultCallback(new TapLoginHelper.TapLoginResultCallback()  {
     @Override
     public void onLoginSuccess(AccessToken accessToken) {
         Log.e(Tag, "onLoginSuccess");
