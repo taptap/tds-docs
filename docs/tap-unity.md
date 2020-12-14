@@ -15,7 +15,7 @@ sidebar_label: Unity
 - Android 目标为API19或更高版本
 
 ## 2. 工程导入
-在YourProjectPath/Packages/manifest.json中添加以下代码，[点击](https://github.com/xindong/TAPSDK_UPM/releases)参考最新版本
+在YourProjectPath/Packages/manifest.json中添加以下代码，[点击](https://github.com/xindong/TAPSDK_UPM/releases)参考最新版本SDK
 
 ```json
 "dependencies":{

@@ -143,7 +143,7 @@ config.roundCorner = NO;// NO 则网页登录是边框为直角（默认值为YE
 [TapLoginHelper changeConfig:config];
 
 ```
-## 注册登录回调
+## 8. 注册登录回调
 注册登录回调，登录结果会通过回调告知前端
 
 **示例代码**  
@@ -163,7 +163,7 @@ config.roundCorner = NO;// NO 则网页登录是边框为直角（默认值为YE
         }
     }];
 ```
-## 8. 登录
+## 9. 登录
 TapTap登录，当没有安装TapTap app时，会打开内置webview进行TapTap验证登录  
 
 **示例代码**  
@@ -171,7 +171,7 @@ TapTap登录，当没有安装TapTap app时，会打开内置webview进行TapTap
 [TapLoginHelper startTapLogin:@[@"public_profile"]];
 ```
 
-## 9. 登出
+## 10. 登出
 **示例代码**  
 ```objectivec
 [[[TapLoginHelper alloc] init] logout];
