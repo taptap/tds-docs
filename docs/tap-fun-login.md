@@ -34,7 +34,7 @@ groupId="tap-platform"
   //false：登录页面是直角，true：登录页面是圆角
   loginSdkConfig.roundCorner = false;
   //RegionType.IO标识为国际版，RegionType.CN为国内版
-  loginSdkConfig.regionType = RegionType.IO;
+  loginSdkConfig.regionType = RegionType.CN;
   TapTapSdk.changeTapLoginConfig(loginSdkConfig);
   ```
   </TabItem>

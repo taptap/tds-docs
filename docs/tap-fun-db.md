@@ -87,8 +87,8 @@ TapSDK.TDSTapDB.Init("clientID","channel","gameVersion");
 
 字段 | 必须 | 说明  
 ------ | ------ | ------
-channel | 否 | [分包渠道](./tap-noun#分包渠道)。长度大于0并小于等于256。
-gameVersion | 否 | 游戏版本。长度大于0并小于等于256。为空时，自动获取游戏安装包的版本（AndroidManifest.xml中的versionName）
+channel | 否 | [分包渠道](./tap-noun#分包渠道)。长度大于0并小于等于256的字符串。
+gameVersion | 否 | 游戏版本。长度大于0并小于等于256的字符串。为空时，自动获取游戏安装包的版本（AndroidManifest.xml中的versionName）
 
 
 ## 3. 记录一个用户
@@ -169,7 +169,7 @@ TapSDK.TDSTapDB.SetUser("userId","openId","loginType");
 字段 | 可为空 | 说明
 | ------ | ------ | ------ |
 userId | 否 | 长度大于0并小于等于256。只能包含数字、大小写字母、下划线(_)、横线(-)，用户ID。不同用户需要保证ID的唯一性
-openId | 否 | 通过第三方登录获取到的openId
+openId | 否 | 通过第三方登录获取到的[openId](#taptap登录时openid获取方式)
 loginType | 否 | 第三方登录枚举类型，具体见下面说明
 
 **loginType类型说明**
@@ -224,12 +224,14 @@ TTSDKProfile *currentProfile = [TapLoginHelper currentProfile];
 NSString *openId = [currentProfile openid];
 ```
   </TabItem>
+  <TabItem value="unity">
 
-  ```c#
-  TTSDKProfile *currentProfile = [TapLoginHelper currentProfile];
-  NSString *openId = [currentProfile openid];
-  ```
-    </TabItem>
+```c#
+TapSDK.TDSLogin.GetCurrentProfile((profile) => {
+    string openid = profile.openid;
+});
+```
+  </TabItem>
 
 </Tabs>
 

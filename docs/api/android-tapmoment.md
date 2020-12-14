@@ -175,3 +175,19 @@ TapTapMomentSdk.closeMoment(title, content);
 | ------- | --- | ---- |
 | title   | 否   | 动态标题 |
 | content | 否   | 动态描述 |
+
+## 回调
+| 字段          | code | 说明       |
+| ----------- | --- | -------- |
+| CALLBACK_CODE_PUBLISH_SUCCESS       | 10000   | 动态发布成功     |
+| CALLBACK_CODE_PUBLISH_FAIL     | 10100   | 动态发布失败     |
+| CALLBACK_CODE_PUBLISH_CANCEL       | 10200   | 关闭动态发布页面     |
+| CALLBACK_CODE_GET_NOTICE_SUCCESS | 20000   | 获取新消息成功 |
+| CALLBACK_CODE_GET_NOTICE_FAIL | 20100   | 获取新消息失败 |
+| CALLBACK_CODE_MOMENT_APPEAR | 30000   | 自己/好友动态页面打开 |
+| CALLBACK_CODE_MOMENT_DISAPPEAR | 30100   | 自己/好友动态页面关闭 |
+| CALLBACK_CODE_ClOSE_CANCEL | 50000   | 取消关闭所有动态界面（弹框点击取消按钮） |
+| CALLBACK_CODE_ClOSE_CONFIRM | 50100   | 确认关闭所有动态界面（弹框点击确认按钮） |
+| CALLBACK_CODE_LOGIN_SUCCESS | 60000   | 动态也没内嵌登录成功 |
+| CALLBACK_CODE_ON_STOP | 500   | 动态回调停止(内部回调，请忽略) |
+| CALLBACK_CODE_ON_RESUME | 6000   | 动态回调开始(内部回调，请忽略) |
