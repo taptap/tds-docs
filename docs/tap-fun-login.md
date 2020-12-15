@@ -35,7 +35,7 @@ groupId="tap-platform"
   loginSdkConfig.roundCorner = false;
   //RegionType.IO标识为国际版，RegionType.CN为国内版
   loginSdkConfig.regionType = RegionType.CN;
-  TapTapSdk.changeTapLoginConfig(loginSdkConfig);
+  TapLoginHelper.changeTapLoginConfig(loginSdkConfig);
   ```
   </TabItem>
 
@@ -81,7 +81,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-TapLoginHelper.getInstance().startTapLogin(MainActivity.this, TapTapSdk.SCOPE_PUIBLIC_PROFILE);
+TapLoginHelper.startTapLogin(MainActivity.this, TapTapSdk.SCOPE_PUIBLIC_PROFILE);
   ```
   </TabItem>
 

@@ -39,13 +39,13 @@ TdsInitializer.init(tdsConfig);
 **API**  
 
 ```java
-enableTapDB(TdsConfig config);
+enableTapDB(Activity activity, String gameVersion, String gameChannel);
 ```
 
 **示例代码**
 
 ```java
-TdsInitializer.enableTapDB("v1.0.0","channel");
+TdsInitializer.enableTapDB(MainActivity.this, "1.0", "default");
 ```
 
 **enableTapDB 参数说明：**   

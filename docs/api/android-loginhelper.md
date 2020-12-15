@@ -27,35 +27,35 @@ loginSdkConfig.regionType = RegionType.CN;
 TapLoginHelper.changeTapLoginConfig(loginSdkConfig);
 ```
 
-### setLoginResultCallback
+### registerLoginCallback
 
 设置TapSDK的登录回调监听  
 
 **API**  
 
 ```java
-public void setLoginResultCallback(TapLoginHelper.ITapLoginResultCallback var1);
+public static void registerLoginCallback(TapLoginHelper.TapLoginResultCallback loginResultCallback);
 ```
 
 **示例代码**
 
 ```java
-TapLoginHelper.getInstance().setLoginResultCallback(new TapLoginHelper.ITapLoginResultCallback() {
-    @Override
-    public void onLoginSuccess(AccessToken accessToken) {
-        startGame();
-    }
+TapLoginHelper.registerLoginCallback(new TapLoginResultCallback() {
+     @Override
+     public void onLoginSuccess(AccessToken accessToken) {
+         Log.e("MainActivity", "onLoginSuccess" + "" + accessToken);
+     }
 
-    @Override
-    public void onLoginCancel() {
+     @Override
+     public void onLoginCancel() {
+         Log.e("MainActivity", "onLoginCancel" + "");
+     }
 
-    }
-
-    @Override
-    public void onLoginError(Throwable throwable) {
-        login();
-    }
-});  
+     @Override
+     public void onLoginError(com.taptap.sdk.AccountGlobalError accountGlobalError) {
+         Log.e("MainActivity", "onLoginError" + " " + accountGlobalError.toJsonString());
+     }
+ });
 ```
 
 ### startTapLogin
