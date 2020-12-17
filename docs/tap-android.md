@@ -58,7 +58,7 @@ TapSDK初始化
 ```java
 TdsConfig tdsConfig = new TdsConfig.Builder()
                 .appContext(MainActivity.this)
-                .clientId("your client id")//开发者中心获取到的client Id
+                .clientId(your cient id)//开发者中心获取到的client Id
                 .build();
 TdsInitializer.init(tdsConfig);  
 ```
@@ -133,4 +133,7 @@ TapLoginHelper.fetchProfileForCurrentAccessToken(new Api.ApiCallback<Profile>() 
 ```
 
 ## 9. 登出
+:::caution
+当用户退出登录的时候请务必调用此方法执行退出功能， 避免用户信息错乱。
+:::
 调用`TapLoginHelper.logout()` 实现登出功能。

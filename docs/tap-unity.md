@@ -106,6 +106,10 @@ TapSDK.TDSLogin.StartLogin(new string[]{"public_profile"});
 ```
 ## 8. 登出
 
+:::caution
+当用户退出登录的时候请务必调用此方法执行退出功能， 避免用户信息错乱。
+:::
+
 ```c#
 TapSDK.TDSLogin.Logout();
 ```
