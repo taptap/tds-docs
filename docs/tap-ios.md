@@ -129,7 +129,7 @@ TapSDK初始化
 
 **示例代码**
 ```objectivec
-NSString *clientID = @"CqBgq73t1JdHFE3Rk3";
+NSString *clientID = your client id;
 TDSConfig *tconfig = [[TDSConfig alloc]init];
 tconfig.clientId =clientID;
 [TDSInitializer initWithConfig:tconfig];
@@ -183,6 +183,9 @@ TapTap登录，当没有安装TapTap app时，会打开内置webview进行TapTap
 ```
 
 ## 10. 登出
+:::caution
+当用户退出登录的时候请务必调用此方法执行退出功能， 避免用户信息错乱。
+:::
 **示例代码**  
 ```objectivec
 [[[TapLoginHelper alloc] init] logout];
