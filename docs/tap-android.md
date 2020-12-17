@@ -65,26 +65,26 @@ TdsInitializer.init(tdsConfig);
 
 ## 6. 注册登录回调
 监听登录的结果  
-**API**  [setLoginResultCallback()](./api/android-loginhelper.md#setloginresultcallback)
+**API**  [registerLoginCallback()](./api/android-loginhelper.md#registerlogincallback)
 
 **示例代码**
 ```java
-TapLoginHelper.getInstance().addLoginResultCallback(new TapLoginHelper.TapLoginResultCallback()  {
-    @Override
-    public void onLoginSuccess(AccessToken accessToken) {
-        Log.e(Tag, "onLoginSuccess");
-    }
+TapLoginHelper.registerLoginCallback(new TapLoginResultCallback() {
+     @Override
+     public void onLoginSuccess(AccessToken accessToken) {
+         Log.e("MainActivity", "onLoginSuccess" + "" + accessToken);
+     }
 
-    @Override
-    public void onLoginCancel() {
-        Log.e(Tag, "onLoginCancel");
-    }
+     @Override
+     public void onLoginCancel() {
+         Log.e("MainActivity", "onLoginCancel" + "");
+     }
 
-    @Override
-    public void onLoginError(Throwable throwable) {
-        Log.e(Tag, "onLoginError");
-    }
-});
+     @Override
+     public void onLoginError(com.taptap.sdk.AccountGlobalError accountGlobalError) {
+         Log.e("MainActivity", "onLoginError" + " " + accountGlobalError.toJsonString());
+     }
+ });
 ```
 
 ## 7. 登录
@@ -95,7 +95,7 @@ TapTap登录，当没有安装TapTap app时，会打开内置webview进行TapTap
 可以用下面代码直接登录：  
 
 ```java
-TapLoginHelper.getInstance().startTapLogin(MainActivity.this,TapTapSdk.SCOPE_PUIBLIC_PROFILE);
+TapLoginHelper.startTapLogin(MainActivity.this,TapTapSdk.SCOPE_PUIBLIC_PROFILE);
 ```
 
 ## 8. 检查登录状态
@@ -106,7 +106,7 @@ TapLoginHelper.getInstance().startTapLogin(MainActivity.this,TapTapSdk.SCOPE_PUI
 
 ```java  
 //未登录用户会返回null
-if (TapLoginHelper.getInstance().getCurrentAccessToken() == null) {
+if (TapLoginHelper.getCurrentAccessToken() == null) {
     //TODO 用户未登录
 } else {
    //TODO 用户已经登录过

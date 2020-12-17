@@ -148,20 +148,31 @@ config.roundCorner = NO;// NO 则网页登录是边框为直角（默认值为YE
 
 **示例代码**  
 ```objectivec
-[TapLoginHelper registerLoginCallback:^(TTSDKLoginResult *result, NSError *error) {
-        if (error) {
-            // 授权失败
-            NSLog([error localizedDescription]);
-        } else {
-            if (result.isCancelled) {
-                // 授权流程被取消
-                NSLog(@"isCancelled");              
-            } else {
-                // 授权成功
-                NSLog(@"success");
-            }
-        }
-    }];
+//注册登录回调
+[TapLoginHelper registerLoginResultDelegate:self];
+
+//实现代理
+@interface ViewController () <TDSMomentDelegate,TapLoginResultDelegate>
+
+@end
+
+//实现回调方法
+// 登录成功回调
+// @param token token对象
+- (void)onLoginSuccess:(TTSDKAccessToken *)token{
+    NSLog (@"onLoginSuccess");
+}
+
+// 登录取消
+- (void)onLoginCancel{
+    NSLog (@"onLoginCancel");
+}
+
+// 登录失败
+// @param error 失败原因
+- (void)onLoginError:(AccountGlobalError *)error{
+    NSLog (@"onLoginError error");
+}
 ```
 ## 9. 登录
 TapTap登录，当没有安装TapTap app时，会打开内置webview进行TapTap验证登录  

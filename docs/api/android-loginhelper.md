@@ -71,12 +71,12 @@ public void startTapLogin(Activity activity, String... var2);
 **示例代码**
 
 ```java
- TapLoginHelper.getInstance().startTapLogin(MainActivity.this,TapTapSdk.SCOPE_PUIBLIC_PROFILE);
+ TapLoginHelper.startTapLogin(MainActivity.this,TapTapSdk.SCOPE_PUIBLIC_PROFILE);
 ```
 
 **API说明**  
 
-调用该接口会触发[setloginresultcallback](#setloginresultcallback)回调
+调用该接口会触发[registerLoginCallback](#registerlogincallback)回调
 
 | 类别   | 回调方法                                             |
 | ---- | ------------------------------------------------ |
@@ -143,7 +143,7 @@ public static void fetchProfileForCurrentAccessToken(Api.ApiCallback<Profile>);
 **示例代码**
 
 ```java
-TapLoginHelper.getInstance().fetchProfileForCurrentAccessToken(new Api.ApiCallback<Profile>() {
+TapLoginHelper.fetchProfileForCurrentAccessToken(new Api.ApiCallback<Profile>() {
             @Override
             public void onSuccess(Profile profile) {
                 Log.e(Tag, "checkLogin-onSuccess");
