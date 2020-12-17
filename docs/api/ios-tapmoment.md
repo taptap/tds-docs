@@ -28,7 +28,7 @@ slug: /ios-tapmoment
 }
 ```
 
-### setAccessToken
+<!-- ### setAccessToken
 
 设置登录信息
 
@@ -42,7 +42,7 @@ slug: /ios-tapmoment
 
 ```objectivec
 [TDSMomentSdk setAccessToken:[TDSMomentAccessToken build:[[TapLoginHelper currentAccessToken]toJsonString]]];
-```
+``` -->
 
 ### openTapMomentWithConfig
 

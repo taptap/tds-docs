@@ -185,7 +185,7 @@ CALLBACK_CODE_INIT_FAIL | 40100 | 动态初始化失败
 CALLBACK_CODE_ClOSE_CANCEL | 50000 | 弹出关闭动态弹窗时，用户取消
 CALLBACK_CODE_ClOSE_CONFIRM | 50100 | 弹出关闭动态弹窗时，用户确认
 
-
+<!--
 ## 4. 设置登录信息
 游戏在使用 TapTap 登录完成后，需要调用该接口设置登录信息
 
@@ -252,7 +252,7 @@ TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
 ```
 
   </TabItem>
-</Tabs>
+</Tabs> -->
 
 
 ## 5. 打开动态页面
