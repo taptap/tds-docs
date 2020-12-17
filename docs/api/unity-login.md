@@ -7,7 +7,7 @@ slug: /unity-login
 ### Init
 初始化SDK
 
-**API**
+#### API
 
 ```c#
 public static void Init(string clientId)
@@ -16,7 +16,7 @@ public static void Init(string clientId, bool isCN, bool isRoundCorner)
 ```
 
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSLogin.Init("clientId");
@@ -33,13 +33,13 @@ TapSDK.TDSLogin.Init("clientId", true,true);
 ### StartLogin
 开始登录
 
-**API**
+#### API
 
 ```c#
 public static void StartLogin(string[] permissions)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSLogin.StartLogin(new string[]{"public_profile"});
@@ -49,13 +49,13 @@ TapSDK.TDSLogin.StartLogin(new string[]{"public_profile"});
 ### RegisterLoginCallback
 设置登录回调
 
-**API**
+#### API
 
 ```c#
 public static void RegisterLoginCallback(LoginCallback callback)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSLogin.RegisterLoginCallback(new MyLoginCallback());
@@ -78,13 +78,13 @@ public class MyLoginCallback : TapSDK.LoginCallback{
 ### GetCurrentAccessToken
 获取accessToken
 
-**API**
+#### API
 
 ```c#
 public static void GetCurrentAccessToken(Action<TDSAccessToken> callback)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
@@ -95,13 +95,13 @@ TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
 ### GetCurrentProfile
 获取登录信息
 
-**API**
+#### API
 
 ```c#
 public static void GetCurrentProfile(Action<TDSLoginProfile> callback)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSLogin.GetCurrentProfile((profile)=>{
@@ -112,13 +112,13 @@ TapSDK.TDSLogin.GetCurrentProfile((profile)=>{
 ### Logout
 登出
 
-**API**
+#### API
 
 ```c#
 public static void Logout()
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSLogin.Logout();
@@ -126,13 +126,13 @@ TapSDK.TDSLogin.Logout();
 
 ### FetchProfileForCurrentAccessToken
 获取accessToken
-**API**
+#### API
 
 ```c#
 public static void FetchProfileForCurrentAccessToken(Action<TDSLoginProfile> callback, Action<string> errorCallback)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSLogin.FetchProfileForCurrentAccessToken((profile)=>{          
@@ -145,13 +145,13 @@ TapSDK.TDSLogin.FetchProfileForCurrentAccessToken((profile)=>{
 ### ChangeConfig
 修改登录配置
 
-**API**
+#### API
 
 ```c#
 public static void ChangeConfig(bool isCN, bool isRoundCorner)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSLogin.ChangeConfig(true,true);

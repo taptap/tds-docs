@@ -9,13 +9,13 @@ slug: /unity-tapmoment
 ### InitSDK
 初始化动态SDK
 
-**API**
+#### API
 
 ```c#
 public static void InitSDK(string clientId);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSMoment.InitSDK("clientId");
@@ -24,13 +24,13 @@ TapSDK.TDSMoment.InitSDK("clientId");
 ### SetCallback
 设置动态回调
 
-**API**
+#### API
 
 ```c#
 public static void SetCallback(Action<int, string> callback);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSMoment.SetCallback((code,msg)=>{
@@ -41,13 +41,13 @@ TapSDK.TDSMoment.SetCallback((code,msg)=>{
 <!-- ### SetLoginToken
 设置登录信息
 
-**API**
+#### API
 
 ```c#
 public static void SetLoginToken(string accessToken);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
@@ -58,13 +58,13 @@ TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
 ### OpenMoment
 打开动态页面
 
-**API**
+#### API
 
 ```c#
 public static void OpenMoment(Orientation config);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSMoment.OpenMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE);
@@ -77,13 +77,13 @@ TapSDK.TDSMoment.OpenMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE);
 ### PublishMoment
 发布普通动态
 
-**API**
+#### API
 
 ```c#
 public static void PublishMoment(Orientation config, string[] imagePaths, string content);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 string content = "我是描述";
@@ -94,7 +94,7 @@ TapSDK.TDSMoment.PublishMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE, images,
 ### PublishVideoMoment
 发布视频动态
 
-**API**
+#### API
 
 ```c#
 //带封面
@@ -104,7 +104,7 @@ public static void PublishVideoMoment(Orientation config, string[] videoPaths, s
 public static void PublishVideoMoment(Orientation config, string[] videoPaths, string title, string desc)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 //带封面
@@ -125,13 +125,13 @@ TapSDK.TDSMoment.PublishVideoMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE, vi
 ### GetNoticeData
 获取用户新增通知
 
-**API**
+#### API
 
 ```c#
 public static void GetNoticeData();
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSMoment.GetNoticeData();
@@ -140,7 +140,7 @@ TapSDK.TDSMoment.GetNoticeData();
 ### CloseMoment
 关闭动态
 
-**API**
+#### API
 
 ```c#
 //直接关闭
@@ -150,7 +150,7 @@ public static void CloseMoment()
 public static void CloseMoment(string title, string desc)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 //直接关闭
@@ -170,13 +170,13 @@ TapSDK.TDSMoment.CloseMoment(title, desc);
 ### SetGameScreenAutoRotate
 设置游戏页面旋转角度
 
-**API**
+#### API
 
 ```c#
 public static void SetGameScreenAutoRotate(Boolean auto)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSMoment.SetGameScreenAutoRotate(true);

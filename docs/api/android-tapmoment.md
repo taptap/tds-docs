@@ -9,13 +9,13 @@ slug: /android-tapmoment
 
 设置动态发布回调  
 
-**API**  
+#### API  
 
 ```java
 public static void setCallback(TapTapMomentSdk.TapMomentCallback tapMomentCallback);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TapTapMomentSdk.setCallback(new TapTapMomentSdk.TapMomentCallback() {
@@ -30,13 +30,13 @@ TapTapMomentSdk.setCallback(new TapTapMomentSdk.TapMomentCallback() {
 
 设置登录信息
 
-**API**  
+#### API  
 
 ```java
 public static void setLoginToken(AccessToken accessToken);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 AccessToken currentAccessToken = AccessToken.getCurrentAccessToken();
@@ -47,13 +47,13 @@ TapTapMomentSdk.setLoginToken(currentAccessToken);
 
 打开动态页面
 
-**API**  
+#### API  
 
 ```java
 public static void openTapMoment(TapTapMomentSdk.Config config);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TapTapMomentSdk.Config config = new TapTapMomentSdk.Config();
@@ -65,7 +65,7 @@ TapTapMomentSdk.openTapMoment(config);
 
 发布动态
 
-**API**  
+#### API  
 
 ```java
 //发布普通动态，包括图片和描述
@@ -74,7 +74,7 @@ public static void publishMoment(TapTapMomentSdk.Config config, String imgPaths,
 public static void publishVideoMoment(TapTapMomentSdk.Config config, String[] videoPaths,String[] imgPaths, String title, String content);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 //普通动态
@@ -109,13 +109,13 @@ TapTapMomentSdk.publishVideoMoment(config, videoPaths, imagePaths, title, conten
 
 获取用户新通知数量   
 
-**API**  
+#### API  
 
 ```java
 public static void getNoticeData();
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TapTapMomentSdk.getNoticeData();
@@ -125,13 +125,13 @@ TapTapMomentSdk.getNoticeData();
 
 进入指定用户的动态页面
 
-**API**  
+#### API  
 
 ```java
 public static void openUserMoment(TapTapMomentSdk.Config config, String openId)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TapTapMomentSdk.Config config = new TapTapMomentSdk.Config();
@@ -149,7 +149,7 @@ TapTapMomentSdk.openUserMoment(config, openId);
 
 关闭动态页面
 
-**API**  
+#### API  
 
 ```java
 //直接关闭
@@ -159,7 +159,7 @@ public static void closeMoment();
 public static void closeMoment(String title, String content);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 //直接关闭

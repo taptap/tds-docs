@@ -7,13 +7,13 @@ slug: /unity-tapdb
 ### Init
 初始化TapDB
 
-**API**
+#### API
 
 ```c#
 public static void Init(string clientId, string channel, string gameVersion)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSTapDB.Init("clientID","channel","gameVersion");
@@ -22,7 +22,7 @@ TapSDK.TDSTapDB.Init("clientID","channel","gameVersion");
 ### SetUser
 设置用户
 
-**API**
+#### API
 
 ```c#
 public static void SetUser(string userId)
@@ -30,7 +30,7 @@ public static void SetUser(string userId)
 public static void SetUser(string userId, string openId, string loginType)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSTapDB.SetUser("userId");
@@ -64,13 +64,13 @@ TapSDK.TDSTapDB.SetUser("userId","openId","loginType");
 ### SetName
 设置姓名
 
-**API**
+#### API
 
 ```c#
 public static void SetName(string name);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSTapDB.SetName("name");
@@ -79,13 +79,13 @@ TapSDK.TDSTapDB.SetName("name");
 ### SetLevel
 设置玩家等级
 
-**API**
+#### API
 
 ```c#
 public static void SetLevel(int level);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSTapDB.SetLevel(5);
@@ -94,13 +94,13 @@ TapSDK.TDSTapDB.SetLevel(5);
 ### SetServer
 设置服务器
 
-**API**
+#### API
 
 ```c#
 public static void SetServer(string server);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSTapDB.SetServer("https://test.taptap.com/callback");
@@ -109,13 +109,13 @@ TapSDK.TDSTapDB.SetServer("https://test.taptap.com/callback");
 ### OnCharge
 充值成功
 
-**API**
+#### API
 
 ```c#
 public static void OnCharge(string orderId, string productId, string amount, string currencyType, string payment)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSTapDB.OnCharge("0xueiEns","大宝剑","100","CNY","wechat");
@@ -136,13 +136,13 @@ TapSDK.TDSTapDB.OnCharge("0xueiEns","大宝剑","100","CNY","wechat");
 ### OnEvent
 自定义回调事件
 
-**API**
+#### API
 
 ```c#
 public static void OnEvent(string eventCode, string properties)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSTapDB.OnEvent("1000","{\"param1\":\"param1\",\"param2\":\"param2\"}");

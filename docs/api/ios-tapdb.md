@@ -9,14 +9,14 @@ slug: /ios-tapdb
 
 当enableTapDB后，可以调用此API  
 
-**API**
+#### API
 
 ```objectivec
 + (void)setUser:(NSString *)userId;
 + (void)setUser:(NSString *)userId openId:(NSString *)openId loginType:(TapDBLoginType)loginType;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 [TapDB setUser:@"userId" openId:@"openId" loginType:TapDBLoginTypeTapTap];
@@ -56,13 +56,13 @@ NSString *openId = [currentProfile openid];
 ### setName
 
 设置用户名称
-**API**  
+#### API  
 
 ```objectivec
 + (void)setName:(NSString *)name;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
  [TapDB setName:@"Tap zhang"];
@@ -75,13 +75,13 @@ NSString *openId = [currentProfile openid];
 ### setLevel
 
 设置用户等级。用户登录或升级时调用  
-**API**  
+#### API  
 
 ```objectivec
 + (void)setLevel:(NSInteger)level;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 [TapDB setLevel:10];
@@ -95,13 +95,13 @@ NSString *openId = [currentProfile openid];
 
 设置用户所在服务器。用户登陆或切换服务器时调用
 
-**API**  
+#### API  
 
 ```objectivec
 + (void)setServer:(NSString *)server;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 [TapDB setServer:@"https://test.taptap.com/callback"];
@@ -115,13 +115,13 @@ NSString *openId = [currentProfile openid];
 
 充值成功时调用。SDK推送和4.1中描述的服务端推送方法只能选择其中一种。建议优先选择服务端推送方式，以保证数据的准确性。
 
-**API**  
+#### API  
 
 ```objectivec
 + (void)onChargeSuccess:(NSString *)orderId product:(NSString *)product amount:(NSInteger)amount currencyType:(NSString *)currencyType payment:(NSString *)payment;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 [TapDB onChargeSuccess:@"0xueiEns" product:@"轩辕剑" amount:10 currencyType:@"CNY" payment:@"wechat"];
@@ -143,13 +143,13 @@ NSString *openId = [currentProfile openid];
 
 推送自定义事件。需要在控制台预先进行配置。
 
-**API**  
+#### API  
 
 ```objectivec
 + (void)onEvent:(NSString *)eventCode properties:(NSDictionary *)properties;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:@"name",@"Tap zhang",@"age",@"18",nil];

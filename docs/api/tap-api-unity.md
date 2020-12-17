@@ -8,7 +8,7 @@ sidebar_label: Unity-API
 ### Init
 初始化SDK
 
-**API**
+#### API
 
 ```c#
 public static void Init(string clientId)
@@ -17,7 +17,7 @@ public static void Init(string clientId, bool isCN, bool isRoundCorner)
 ```
 
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSLogin.Init("clientId");
@@ -34,13 +34,13 @@ TapSDK.TDSLogin.Init("clientId", true,true);
 ### StartLogin
 开始登录
 
-**API**
+#### API
 
 ```c#
 public static void StartLogin(string[] permissions)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSLogin.StartLogin(new string[]{"public_profile"});
@@ -50,13 +50,13 @@ TapSDK.TDSLogin.StartLogin(new string[]{"public_profile"});
 ### RegisterLoginCallback
 设置登录回调
 
-**API**
+#### API
 
 ```c#
 public static void RegisterLoginCallback(LoginCallback callback)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSLogin.RegisterLoginCallback(new MyLoginCallback());
@@ -79,13 +79,13 @@ public class MyLoginCallback : TapSDK.LoginCallback{
 ### GetCurrentAccessToken
 获取accessToken
 
-**API**
+#### API
 
 ```c#
 public static void GetCurrentAccessToken(Action<TDSAccessToken> callback)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
@@ -96,13 +96,13 @@ TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
 ### GetCurrentProfile
 获取登录信息
 
-**API**
+#### API
 
 ```c#
 public static void GetCurrentProfile(Action<TDSLoginProfile> callback)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSLogin.GetCurrentProfile((profile)=>{
@@ -113,13 +113,13 @@ TapSDK.TDSLogin.GetCurrentProfile((profile)=>{
 ### Logout
 登出
 
-**API**
+#### API
 
 ```c#
 public static void Logout()
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSLogin.Logout();
@@ -127,13 +127,13 @@ TapSDK.TDSLogin.Logout();
 
 ### FetchProfileForCurrentAccessToken
 获取accessToken
-**API**
+#### API
 
 ```c#
 public static void FetchProfileForCurrentAccessToken(Action<TDSLoginProfile> callback, Action<string> errorCallback)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSLogin.FetchProfileForCurrentAccessToken((profile)=>{          
@@ -146,13 +146,13 @@ TapSDK.TDSLogin.FetchProfileForCurrentAccessToken((profile)=>{
 ### ChangeConfig
 修改登录配置
 
-**API**
+#### API
 
 ```c#
 public static void ChangeConfig(bool isCN, bool isRoundCorner)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSLogin.ChangeConfig(true,true);
@@ -163,13 +163,13 @@ TapSDK.TDSLogin.ChangeConfig(true,true);
 ### Init
 初始化TapDB
 
-**API**
+#### API
 
 ```c#
 public static void Init(string clientId, string channel, string gameVersion)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSTapDB.Init("clientID","channel","gameVersion");
@@ -178,7 +178,7 @@ TapSDK.TDSTapDB.Init("clientID","channel","gameVersion");
 ### SetUser
 设置用户
 
-**API**
+#### API
 
 ```c#
 public static void SetUser(string userId)
@@ -186,7 +186,7 @@ public static void SetUser(string userId)
 public static void SetUser(string userId, string openId, string loginType)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSTapDB.SetUser("userId");
@@ -220,13 +220,13 @@ TapSDK.TDSTapDB.SetUser("userId","openId","loginType");
 ### SetName
 设置姓名
 
-**API**
+#### API
 
 ```c#
 public static void SetName(string name);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSTapDB.SetName("name");
@@ -235,13 +235,13 @@ TapSDK.TDSTapDB.SetName("name");
 ### SetLevel
 设置玩家等级
 
-**API**
+#### API
 
 ```c#
 public static void SetLevel(int level);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSTapDB.SetLevel(5);
@@ -250,13 +250,13 @@ TapSDK.TDSTapDB.SetLevel(5);
 ### SetServer
 设置服务器
 
-**API**
+#### API
 
 ```c#
 public static void SetServer(string server);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSTapDB.SetServer("https://test.taptap.com/callback");
@@ -265,13 +265,13 @@ TapSDK.TDSTapDB.SetServer("https://test.taptap.com/callback");
 ### OnCharge
 充值成功
 
-**API**
+#### API
 
 ```c#
 public static void OnCharge(string orderId, string productId, string amount, string currencyType, string payment)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSTapDB.OnCharge("0xueiEns","大宝剑","100","CNY","wechat");
@@ -292,13 +292,13 @@ TapSDK.TDSTapDB.OnCharge("0xueiEns","大宝剑","100","CNY","wechat");
 ### OnEvent
 自定义回调事件
 
-**API**
+#### API
 
 ```c#
 public static void OnEvent(string eventCode, string properties)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSTapDB.OnEvent("1000","{\"param1\":\"param1\",\"param2\":\"param2\"}");
@@ -316,13 +316,13 @@ TapSDK.TDSTapDB.OnEvent("1000","{\"param1\":\"param1\",\"param2\":\"param2\"}");
 ### InitSDK
 初始化动态SDK
 
-**API**
+#### API
 
 ```c#
 public static void InitSDK(string clientId);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSMoment.InitSDK("clientId");
@@ -331,13 +331,13 @@ TapSDK.TDSMoment.InitSDK("clientId");
 ### SetCallback
 设置动态回调
 
-**API**
+#### API
 
 ```c#
 public static void SetCallback(Action<int, string> callback);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSMoment.SetCallback((code,msg)=>{
@@ -348,13 +348,13 @@ TapSDK.TDSMoment.SetCallback((code,msg)=>{
 ### SetLoginToken
 设置登录信息
 
-**API**
+#### API
 
 ```c#
 public static void SetLoginToken(string accessToken);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
@@ -365,13 +365,13 @@ TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
 ### OpenMoment
 打开动态页面
 
-**API**
+#### API
 
 ```c#
 public static void OpenMoment(Orientation config);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSMoment.OpenMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE);
@@ -384,13 +384,13 @@ TapSDK.TDSMoment.OpenMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE);
 ### PublishMoment
 发布普通动态
 
-**API**
+#### API
 
 ```c#
 public static void PublishMoment(Orientation config, string[] imagePaths, string content);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 string content = "我是描述";
@@ -401,7 +401,7 @@ TapSDK.TDSMoment.PublishMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE, images,
 ### PublishVideoMoment
 发布视频动态
 
-**API**
+#### API
 
 ```c#
 //带封面
@@ -411,7 +411,7 @@ public static void PublishVideoMoment(Orientation config, string[] videoPaths, s
 public static void PublishVideoMoment(Orientation config, string[] videoPaths, string title, string desc)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 //带封面
@@ -432,13 +432,13 @@ TapSDK.TDSMoment.PublishVideoMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE, vi
 ### GetNoticeData
 获取用户新增通知
 
-**API**
+#### API
 
 ```c#
 public static void GetNoticeData();
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSMoment.GetNoticeData();
@@ -447,7 +447,7 @@ TapSDK.TDSMoment.GetNoticeData();
 ### CloseMoment
 关闭动态
 
-**API**
+#### API
 
 ```c#
 //直接关闭
@@ -457,7 +457,7 @@ public static void CloseMoment()
 public static void CloseMoment(string title, string desc)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 //直接关闭
@@ -477,13 +477,13 @@ TapSDK.TDSMoment.CloseMoment(title, desc);
 ### SetGameScreenAutoRotate
 设置游戏页面旋转角度
 
-**API**
+#### API
 
 ```c#
 public static void SetGameScreenAutoRotate(Boolean auto)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```c#
 TapSDK.TDSMoment.SetGameScreenAutoRotate(true);

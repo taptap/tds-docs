@@ -73,7 +73,9 @@ pod update
 ```  
 
 ## 6. 跳转TapTap登录配置
+
 `未做此配置或者用户无TapTap应用时，默认会打开webview登录`  
+
 1. 打开info.plist，添加如下配置
 ![](https://qnblog.ijemy.com/xd_ios_info.png)
 ```objectivec
@@ -127,7 +129,7 @@ b. 如果没有SceneDelegate.m，只有AppDelegate.m，请添加如下代码到 
 ## 7. 初始化
 TapSDK初始化  
 
-**示例代码**
+#### 示例代码
 ```objectivec
 NSString *clientID = your client id;
 TDSConfig *tconfig = [[TDSConfig alloc]init];
@@ -143,10 +145,14 @@ config.roundCorner = NO;// NO 则网页登录是边框为直角（默认值为YE
 [TapLoginHelper changeConfig:config];
 
 ```
+
+#### API
+[initWithConfig](./api/ios-initializer.md#initwithconfig)
+
 ## 8. 注册登录回调
 注册登录回调，登录结果会通过回调告知前端
 
-**示例代码**  
+#### 示例代码
 ```objectivec
 //注册登录回调
 [TapLoginHelper registerLoginResultDelegate:self];
@@ -174,19 +180,28 @@ config.roundCorner = NO;// NO 则网页登录是边框为直角（默认值为YE
     NSLog (@"onLoginError error");
 }
 ```
+#### API
+[registerLoginCallback](./api/ios-loginhelper.md#registerlogincallback)
+
 ## 9. 登录
 TapTap登录，当没有安装TapTap app时，会打开内置webview进行TapTap验证登录  
 
-**示例代码**  
+#### 示例代码
 ```objectivec
 [TapLoginHelper startTapLogin:@[@"public_profile"]];
 ```
+
+#### API
+[registerLoginCallback](./api/ios-loginhelper.md#starttaplogin)
 
 ## 10. 登出
 :::caution
 当用户退出登录的时候请务必调用此方法执行退出功能， 避免用户信息错乱。
 :::
-**示例代码**  
+#### 示例代码
 ```objectivec
 [[[TapLoginHelper alloc] init] logout];
 ```
+
+#### API
+[registerLoginCallback](./api/ios-loginhelper.md#logout)

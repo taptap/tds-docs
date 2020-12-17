@@ -11,13 +11,13 @@ TapSDK核心组建，负责SDK初始化和功能开启
 
 初始化SDK
 
-**API**  
+#### API  
 
 ```objectivec
 + (void)initWithConfig:(TDSConfig *)config;
 ```
 
-**示例代码**  
+#### 示例代码
 
 ```objectivec
 NSString *clientID = @"clientId";
@@ -34,13 +34,13 @@ config.clientId =clientID;
 
 ### enableTapDBWithChannel
 
-**API**  
+#### API  
 
 ```objectivec
 + (void)enableTapDBWithChannel:(nullable NSString *)channel gameVersion:(nullable NSString *)gameVersion;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 [TDSInitializer enableTapDBWithChannel:@"channel" gameVersion:@"v1.0.0"];
@@ -57,13 +57,13 @@ config.clientId =clientID;
 
 开启动态
 
-**API**  
+#### API  
 
 ```objectivec
 + (void)enableMoment;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 [TDSInitializer enableMoment];
@@ -78,13 +78,13 @@ config.clientId =clientID;
 
 设置TapSDK的登录回调监听  
 
-**API**  
+#### API  
 
 ```objectivec
 + (void)registerLoginCallback:(TTSDKLoginManagerRequestHandler)callback;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 [TapLoginHelper registerLoginCallback:^(TTSDKLoginResult *result, NSError *error) {
@@ -107,13 +107,13 @@ config.clientId =clientID;
 
 登录
 
-**API**
+#### API
 
 ```objectivec
 + (void)startTapLogin:(NSArray *)permissions;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 [TapLoginHelper startTapLogin:@[@"public_profile"]];
@@ -128,13 +128,13 @@ config.clientId =clientID;
 
 登出
 
-**API**
+#### API
 
 ```objectivec
 + (void)logout;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 [[[TapLoginHelper alloc] init] logout];
@@ -144,13 +144,13 @@ config.clientId =clientID;
 
 获取用户登录信息
 
-**API**
+#### API
 
 ```objectivec
 + (TTSDKAccessToken *)currentAccessToken;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 TTSDKAccessToken *currentAccessToken = [TapLoginHelper currentAccessToken];
@@ -158,13 +158,13 @@ TTSDKAccessToken *currentAccessToken = [TapLoginHelper currentAccessToken];
 
 ### currentProfile
 
-**API**
+#### API
 
 ```objectivec
 + (TTSDKProfile *)currentProfile;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 TTSDKProfile *currentProfile = [TapLoginHelper currentProfile];
@@ -172,13 +172,13 @@ TTSDKProfile *currentProfile = [TapLoginHelper currentProfile];
 
 ### fetchProfileForCurrentAccessToken
 
-**API**
+#### API
 
 ```objectivec
 + (void)fetchProfileForCurrentAccessToken:(void (^)(TTSDKProfile *profile, NSError *error))callback;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 [TapLoginHelper fetchProfileForCurrentAccessToken:^(TTSDKProfile * _Nonnull profile, NSError * _Nonnull error) {
@@ -193,14 +193,14 @@ TTSDKProfile *currentProfile = [TapLoginHelper currentProfile];
 
 当enableTapDB后，可以调用此API  
 
-**API**
+#### API
 
 ```objectivec
 + (void)setUser:(NSString *)userId;
 + (void)setUser:(NSString *)userId openId:(NSString *)openId loginType:(TapDBLoginType)loginType;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 [TapDB setUser:@"userId" openId:@"openId" loginType:TapDBLoginTypeTapTap];
@@ -240,13 +240,13 @@ NSString *openId = [currentProfile openid];
 ### setName
 
 设置用户名称
-**API**  
+#### API  
 
 ```objectivec
 + (void)setName:(NSString *)name;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
  [TapDB setName:@"Tap zhang"];
@@ -259,13 +259,13 @@ NSString *openId = [currentProfile openid];
 ### setLevel
 
 设置用户等级。用户登录或升级时调用  
-**API**  
+#### API  
 
 ```objectivec
 + (void)setLevel:(NSInteger)level;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 [TapDB setLevel:10];
@@ -279,13 +279,13 @@ NSString *openId = [currentProfile openid];
 
 设置用户所在服务器。用户登陆或切换服务器时调用
 
-**API**  
+#### API  
 
 ```objectivec
 + (void)setServer:(NSString *)server;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 [TapDB setServer:@"https://test.taptap.com/callback"];
@@ -299,13 +299,13 @@ NSString *openId = [currentProfile openid];
 
 充值成功时调用。SDK推送和4.1中描述的服务端推送方法只能选择其中一种。建议优先选择服务端推送方式，以保证数据的准确性。
 
-**API**  
+#### API  
 
 ```objectivec
 + (void)onChargeSuccess:(NSString *)orderId product:(NSString *)product amount:(NSInteger)amount currencyType:(NSString *)currencyType payment:(NSString *)payment;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 [TapDB onChargeSuccess:@"0xueiEns" product:@"轩辕剑" amount:10 currencyType:@"CNY" payment:@"wechat"];
@@ -327,13 +327,13 @@ NSString *openId = [currentProfile openid];
 
 推送自定义事件。需要在控制台预先进行配置。
 
-**API**  
+#### API  
 
 ```objectivec
 + (void)onEvent:(NSString *)eventCode properties:(NSDictionary *)properties;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:@"name",@"Tap zhang",@"age",@"18",nil];
@@ -352,13 +352,13 @@ NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:@"name",@"Tap zh
 
 设置动态发布回调  
 
-**API**  
+#### API  
 
 ```objectivec
 - (void)didChangeResultCode:(NSInteger)code msg:(NSString *)msg;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 @interface ViewController () <TDSMomentDelegate>
@@ -374,13 +374,13 @@ NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:@"name",@"Tap zh
 
 设置登录信息
 
-**API**  
+#### API  
 
 ```objectivec
 + (void)setAccessToken:(TDSMomentAccessToken *)token;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 [TDSMomentSdk setAccessToken:[TDSMomentAccessToken build:[[TapLoginHelper currentAccessToken]toJsonString]]];
@@ -390,13 +390,13 @@ NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:@"name",@"Tap zh
 
 打开动态页面
 
-**API**  
+#### API  
 
 ```objectivec
   + (void)openTapMomentWithConfig:(TDSMomentConfig *) config;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 TDSMomentConfig *mconfig = [TDSMomentSdk init];
@@ -408,14 +408,14 @@ mconfig.orientation = TDSMomentOrientationDefault;
 
 发布动态
 
-**API**  
+#### API  
 
 ```objectivec
 + (void)openPostMomentPageWithContent:(TDSPostMomentData * _Nonnull)content
                                config:(TDSMomentConfig * _Nonnull)config;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 //发布图片动态
@@ -451,7 +451,7 @@ config.orientation = TDSMomentOrientationDefault;
 
 获取用户新通知数量   
 
-**API**  
+#### API  
 
 ```objectivec
 + (void)fetchNewMessage;
@@ -459,7 +459,7 @@ config.orientation = TDSMomentOrientationDefault;
 
   结果在 `Delegate` 下的 `didChangeResultCode:msg:`, code == TM_RESULT_CODE_NEW_MSG_SUCCEED时，`msg` 即为消息数量
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 [TDSMomentSdk fetchNewMessage];
@@ -469,13 +469,13 @@ config.orientation = TDSMomentOrientationDefault;
 
 进入指定用户的动态页面
 
-**API**  
+#### API  
 
 ```objectivec
 + (void)openUserCenterWithConfig:(TDSMomentConfig *)config userId:(NSString *)userId;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 TDSMomentConfig *config = [[TDSMomentConfig alloc] init];
@@ -493,7 +493,7 @@ config.orientation = TDSMomentOrientationDefault;
 
 关闭动态页面
 
-**API**  
+#### API  
 
 ```objectivec
 //直接关闭
@@ -503,7 +503,7 @@ config.orientation = TDSMomentOrientationDefault;
 + (void)closeMomentWithTitle:(NSString *)title content:(NSString *)content showConfirm:(BOOL)showConfirm;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 //直接关闭

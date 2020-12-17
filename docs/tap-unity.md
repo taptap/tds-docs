@@ -77,12 +77,17 @@ sidebar_label: Unity
 ```
 
 ## 5. 初始化
-
+TapSDK的初始化操作
+#### 示例代码
 ```c#
 TapSDK.TDSCore.Init("clientId");
 ```
-## 6. 注册回调
+#### API
+[Init](./api/unity-login.md/#init)
 
+## 6. 注册回调
+注册登录回调，成功与否的信息在回调中处理
+#### 示例代码
 ```c#
 TapSDK.TDSLogin.RegisterLoginCallback(new MyLoginCallback());
 public class MyLoginCallback : TapSDK.LoginCallback{
@@ -99,20 +104,32 @@ public class MyLoginCallback : TapSDK.LoginCallback{
    }
 }
 ```
-## 7. 登录
 
+#### API
+[RegisterLoginCallback](./api/unity-login.md/#registerlogincallback)
+
+## 7. 登录
+TapSDK提供的登录功能，开始登录
+#### 示例代码
 ```c#
 TapSDK.TDSLogin.StartLogin(new string[]{"public_profile"});
 ```
+
+#### API
+[StartLogin](./api/unity-login.md/#startlogin)
+
 ## 8. 登出
 
 :::caution
 当用户退出登录的时候请务必调用此方法执行退出功能， 避免用户信息错乱。
 :::
 
+#### 示例代码
 ```c#
 TapSDK.TDSLogin.Logout();
 ```
+#### API
+[Logout](./api/unity-login.md/#logout)
 
 ## 9. 导出到Android
 unity打包apk步骤  

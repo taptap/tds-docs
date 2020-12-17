@@ -20,7 +20,7 @@ TapSDK提供可供用户发布动态到TapTapApp和游戏内部展示动态的�
 ## 2. 功能开启
 API放在init初始化SDK之后调用即可  
 
-**API**  
+#### API  
 
 <Tabs
 groupId="tap-platform"
@@ -53,7 +53,7 @@ public static void InitSDK(string clientId);
   </TabItem>
 </Tabs>
 
-**示例代码**
+#### 示例代码
 
 <Tabs
 groupId="tap-platform"
@@ -89,7 +89,7 @@ TapSDK.TDSMoment.InitSDK("clientId");
 ## 3. 添加回调
 调用 enableMoment 后，需要设置动态回调
 
-**API**
+#### API
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -123,7 +123,7 @@ public static void SetCallback(Action<int, string> callback);
 
 
 
-**示例代码**
+#### 示例代码
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -189,7 +189,7 @@ CALLBACK_CODE_ClOSE_CONFIRM | 50100 | 弹出关闭动态弹窗时，用户确认
 ## 4. 设置登录信息
 游戏在使用 TapTap 登录完成后，需要调用该接口设置登录信息
 
-**API**  
+#### API  
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -220,7 +220,7 @@ public static void SetLoginToken(string accessToken);
   </TabItem>
 </Tabs>
 
-**示例代码**
+#### 示例代码
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -262,7 +262,7 @@ TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
 **截止到此步骤，2、3、4步为必要步骤**
 :::
 
-**API**  
+#### API  
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -293,7 +293,7 @@ public static void OpenMoment(Orientation config);
   </TabItem>
 </Tabs>
 
-**示例代码**
+#### 示例代码
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -348,7 +348,7 @@ TapTapMomentSdk.setCallback(new TapTapMomentSdk.TapMomentCallback() {
 ### 普通动态
 普通动态包括图片和对应的内容描述
 
-**API**   
+#### API   
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -380,7 +380,7 @@ public static void PublishMoment(Orientation config, string[] imagePaths, string
   </TabItem>
 </Tabs>
 
-**示例代码**
+#### 示例代码
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -428,7 +428,7 @@ TapSDK.TDSMoment.PublishMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE, images,
 
 视频动态包括视频和图片（可选）
 
-**API**  
+#### API  
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -465,7 +465,7 @@ public static void PublishVideoMoment(Orientation config, string[] videoPaths, s
   </TabItem>
 </Tabs>
 
-**示例代码**
+#### 示例代码
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -540,7 +540,7 @@ content | 是 | 动态描述
 ## 7. 获取用户新通知数量
 当游戏需要获取当前用户的新的通知信息数量时，调用该接口
 
-**API**  
+#### API  
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -579,7 +579,7 @@ public static void GetNoticeData();
 
 当游戏需要进入指定用户的动态页面时，调用该接口
 
-**API**  
+#### API  
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -610,7 +610,7 @@ TapTapMomentSdk.openUserMoment(TapTapMomentSdk.Config config, String openId);
   </TabItem>
 </Tabs>
 
-**示例代码**
+#### 示例代码
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"

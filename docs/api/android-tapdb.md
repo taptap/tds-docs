@@ -8,14 +8,14 @@ slug: /android-tapdb
 
 当enableTapDB后，可以调用此API  
 
-**API**
+#### API
 
 ```java
 public static void setUser(String userId);
 public static void setUser(String userId, String openId, LoginType loginType);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TapDB.setUser("xxxxuser1","openId",LoginType.TapTap);
@@ -66,13 +66,13 @@ Profile.fetchProfileForCurrentAccessToken(new Api.ApiCallback<Profile>() {
 ### setName
 
 设置用户名称
-**API**  
+#### API  
 
 ```java
 public static void setName(String name);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TapDB.setName("taptap");
@@ -85,13 +85,13 @@ TapDB.setName("taptap");
 ### setLevel
 
 设置用户等级。用户登录或升级时调用  
-**API**  
+#### API  
 
 ```java
 public static void setLevel(int level);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TapDB.setLevel(5);
@@ -105,13 +105,13 @@ TapDB.setLevel(5);
 
 设置用户所在服务器。用户登陆或切换服务器时调用
 
-**API**  
+#### API  
 
 ```java
 public static void setServer(String server);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TapDB.setServer("https://test.taptap.com/callback");
@@ -125,13 +125,13 @@ TapDB.setServer("https://test.taptap.com/callback");
 
 充值成功时调用。SDK推送和4.1中描述的服务端推送方法只能选择其中一种。建议优先选择服务端推送方式，以保证数据的准确性。
 
-**API**  
+#### API  
 
 ```java
 public static void onCharge(String orderId, String product, long amount, String currencyType, String payment);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TapDB.onCharge("0xueiEns","大宝剑","100","CNY","wechat");
@@ -153,13 +153,13 @@ TapDB.onCharge("0xueiEns","大宝剑","100","CNY","wechat");
 
 推送自定义事件。需要在控制台预先进行配置。
 
-**API**  
+#### API  
 
 ```java
 public static void onEvent(String eventCode, JSONObject properties);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 try {
@@ -179,7 +179,7 @@ try {
 <!-- ### onResume&onStop
 
 跟踪用户游戏次数和游戏时长。需要给游戏中每个Activity的onResume和onStop中添加对应的调用。如果多个Activity继承同一个父类，只需要在父类中添加调用即可。比如onResume方法，直接在Activity的onResume方法的最后添加TapDB.onResume(this)即可。  
-**API**  
+#### API  
 
 
 ```java
@@ -195,7 +195,7 @@ public static void onStop(Activity activity);
 
 
 
-**示例代码**
+#### 示例代码
 
 
 ```java

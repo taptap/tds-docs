@@ -16,7 +16,7 @@ slug: /android-loginhelper
 changeTapLoginConfig(TapTapSdk.LoginSdkConfig var0);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TapTapSdk.LoginSdkConfig loginSdkConfig = new TapTapSdk.LoginSdkConfig();
@@ -31,13 +31,13 @@ TapLoginHelper.changeTapLoginConfig(loginSdkConfig);
 
 设置TapSDK的登录回调监听  
 
-**API**  
+#### API  
 
 ```java
 public static void registerLoginCallback(TapLoginHelper.TapLoginResultCallback loginResultCallback);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TapLoginHelper.registerLoginCallback(new TapLoginResultCallback() {
@@ -62,13 +62,13 @@ TapLoginHelper.registerLoginCallback(new TapLoginResultCallback() {
 
 登录
 
-**API**
+#### API
 
 ```java
 public void startTapLogin(Activity activity, String... var2);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
  TapLoginHelper.startTapLogin(MainActivity.this,TapTapSdk.SCOPE_PUIBLIC_PROFILE);
@@ -88,13 +88,13 @@ public void startTapLogin(Activity activity, String... var2);
 
 登出
 
-**API**
+#### API
 
 ```java
 public static void logout();
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TapLoginHelper.logout();
@@ -104,13 +104,13 @@ TapLoginHelper.logout();
 
 获取用户登录信息
 
-**API**
+#### API
 
 ```java
 public static AccessToken getCurrentAccessToken();
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 AccessToken accessToken =  TapLoginHelper.getCurrentAccessToken();
@@ -120,13 +120,13 @@ AccessToken accessToken =  TapLoginHelper.getCurrentAccessToken();
 
 return com.taptap.sdk.Profile;
 
-**API**
+#### API
 
 ```java
 public static Profile getCurrentProfile();
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 Profile profile = TapLoginHelper.getCurrentProfile();
@@ -134,13 +134,13 @@ Profile profile = TapLoginHelper.getCurrentProfile();
 
 ### fetchProfileForCurrentAccessToken
 
-**API**
+#### API
 
 ```java
 public static void fetchProfileForCurrentAccessToken(Api.ApiCallback<Profile>);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TapLoginHelper.fetchProfileForCurrentAccessToken(new Api.ApiCallback<Profile>() {

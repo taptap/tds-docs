@@ -96,15 +96,16 @@ TapLoginHelper.registerLoginCallback(new TapLoginResultCallback() {
 [registerLoginCallback()](./api/android-loginhelper.md#registerlogincallback)
 
 ## 7. 登录
-TapTap登录，当没有安装TapTap app时，会打开内置webview进行TapTap验证登录  
-**API**  [startTapLogin()](./api/android-loginhelper.md#starttaplogin)
+TapTap登录，当没有安装TapTap app时，会打开内置webview进行TapTap验证登录
 
-**示例代码**  
+#### 示例代码  
 可以用下面代码直接登录：  
 
 ```java
 TapLoginHelper.startTapLogin(MainActivity.this,TapTapSdk.SCOPE_PUIBLIC_PROFILE);
 ```
+#### API
+[startTapLogin()](./api/android-loginhelper.md#starttaplogin)  
 
 ## 8. 检查登录状态
 

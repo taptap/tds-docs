@@ -10,13 +10,13 @@ slug: /ios-loginhelper
 
 设置TapSDK的登录回调监听  
 
-**API**  
+#### API  
 
 ```objectivec
 + (void)registerLoginCallback:(TTSDKLoginManagerRequestHandler)callback;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 [TapLoginHelper registerLoginCallback:^(TTSDKLoginResult *result, NSError *error) {
@@ -39,13 +39,13 @@ slug: /ios-loginhelper
 
 登录
 
-**API**
+#### API
 
 ```objectivec
 + (void)startTapLogin:(NSArray *)permissions;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 [TapLoginHelper startTapLogin:@[@"public_profile"]];
@@ -60,13 +60,13 @@ slug: /ios-loginhelper
 
 登出
 
-**API**
+#### API
 
 ```objectivec
 + (void)logout;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 [[[TapLoginHelper alloc] init] logout];
@@ -76,13 +76,13 @@ slug: /ios-loginhelper
 
 获取用户登录信息
 
-**API**
+#### API
 
 ```objectivec
 + (TTSDKAccessToken *)currentAccessToken;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 TTSDKAccessToken *currentAccessToken = [TapLoginHelper currentAccessToken];
@@ -90,13 +90,13 @@ TTSDKAccessToken *currentAccessToken = [TapLoginHelper currentAccessToken];
 
 ### currentProfile
 
-**API**
+#### API
 
 ```objectivec
 + (TTSDKProfile *)currentProfile;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 TTSDKProfile *currentProfile = [TapLoginHelper currentProfile];
@@ -104,13 +104,13 @@ TTSDKProfile *currentProfile = [TapLoginHelper currentProfile];
 
 ### fetchProfileForCurrentAccessToken
 
-**API**
+#### API
 
 ```objectivec
 + (void)fetchProfileForCurrentAccessToken:(void (^)(TTSDKProfile *profile, NSError *error))callback;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 [TapLoginHelper fetchProfileForCurrentAccessToken:^(TTSDKProfile * _Nonnull profile, NSError * _Nonnull error) {

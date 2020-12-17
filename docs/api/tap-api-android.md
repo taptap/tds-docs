@@ -12,13 +12,13 @@ TapSDK核心组建，负责SDK初始化和功能开启
 
 初始化SDK
 
-**API**  
+#### API  
 
 ```java
 init(TdsConfig config);
 ```
 
-**示例代码**  
+#### 示例代码
 
 ```java
 TdsConfig tdsConfig = new TdsConfig.Builder()
@@ -37,13 +37,13 @@ TdsInitializer.init(tdsConfig);
 
 ### enableTapDB
 
-**API**  
+#### API  
 
 ```java
 enableTapDB(TdsConfig config);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TdsInitializer.enableTapDB("v1.0.0","channel");
@@ -60,13 +60,13 @@ TdsInitializer.enableTapDB("v1.0.0","channel");
 
 开启动态
 
-**API**  
+#### API  
 
 ```java
 public static void enableMoment(Activity activity);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TdsInitializer.enableMoment(MainActivity.this);
@@ -84,7 +84,7 @@ TdsInitializer.enableMoment(MainActivity.this);
 changeTapLoginConfig(TapTapSdk.LoginSdkConfig var0);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TapTapSdk.LoginSdkConfig loginSdkConfig = new TapTapSdk.LoginSdkConfig();
@@ -103,13 +103,13 @@ TapTapSdk.changeTapLoginConfig(loginSdkConfig);
 
 设置TapSDK的登录回调监听  
 
-**API**  
+#### API  
 
 ```java
 public void setLoginResultCallback(TapLoginHelper.ITapLoginResultCallback var1);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TapLoginHelper.getInstance().setLoginResultCallback(new TapLoginHelper.ITapLoginResultCallback() {
@@ -134,13 +134,13 @@ TapLoginHelper.getInstance().setLoginResultCallback(new TapLoginHelper.ITapLogin
 
 登录
 
-**API**
+#### API
 
 ```java
 public void startTapLogin(Activity activity, String... var2);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
  TapLoginHelper.getInstance().startTapLogin(MainActivity.this,TapTapSdk.SCOPE_PUIBLIC_PROFILE);
@@ -160,13 +160,13 @@ public void startTapLogin(Activity activity, String... var2);
 
 登出
 
-**API**
+#### API
 
 ```java
 public static void logout();
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TapLoginHelper.logout();
@@ -176,13 +176,13 @@ TapLoginHelper.logout();
 
 获取用户登录信息
 
-**API**
+#### API
 
 ```java
 public static AccessToken getCurrentAccessToken();
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 AccessToken accessToken =  TapLoginHelper.getCurrentAccessToken();
@@ -192,13 +192,13 @@ AccessToken accessToken =  TapLoginHelper.getCurrentAccessToken();
 
 return com.taptap.sdk.Profile;
 
-**API**
+#### API
 
 ```java
 public static Profile getCurrentProfile();
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 Profile profile = TapLoginHelper.getCurrentProfile();
@@ -206,13 +206,13 @@ Profile profile = TapLoginHelper.getCurrentProfile();
 
 ### fetchProfileForCurrentAccessToken
 
-**API**
+#### API
 
 ```java
 public static void fetchProfileForCurrentAccessToken(Api.ApiCallback<Profile>);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TapLoginHelper.getInstance().fetchProfileForCurrentAccessToken(new Api.ApiCallback<Profile>() {
@@ -237,14 +237,14 @@ TapLoginHelper.getInstance().fetchProfileForCurrentAccessToken(new Api.ApiCallba
 
 当enableTapDB后，可以调用此API  
 
-**API**
+#### API
 
 ```java
 public static void setUser(String userId);
 public static void setUser(String userId, String openId, LoginType loginType);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TapDB.setUser("xxxxuser1","openId",LoginType.TapTap);
@@ -295,13 +295,13 @@ Profile.fetchProfileForCurrentAccessToken(new Api.ApiCallback<Profile>() {
 ### setName
 
 设置用户名称
-**API**  
+#### API  
 
 ```java
 public static void setName(String name);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TapDB.setName("taptap");
@@ -314,13 +314,13 @@ TapDB.setName("taptap");
 ### setLevel
 
 设置用户等级。用户登录或升级时调用  
-**API**  
+#### API  
 
 ```java
 public static void setLevel(int level);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TapDB.setLevel(5);
@@ -334,13 +334,13 @@ TapDB.setLevel(5);
 
 设置用户所在服务器。用户登陆或切换服务器时调用
 
-**API**  
+#### API  
 
 ```java
 public static void setServer(String server);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TapDB.setServer("https://test.taptap.com/callback");
@@ -354,13 +354,13 @@ TapDB.setServer("https://test.taptap.com/callback");
 
 充值成功时调用。SDK推送和4.1中描述的服务端推送方法只能选择其中一种。建议优先选择服务端推送方式，以保证数据的准确性。
 
-**API**  
+#### API  
 
 ```java
 public static void onCharge(String orderId, String product, long amount, String currencyType, String payment);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TapDB.onCharge("0xueiEns","大宝剑","100","CNY","wechat");
@@ -382,13 +382,13 @@ TapDB.onCharge("0xueiEns","大宝剑","100","CNY","wechat");
 
 推送自定义事件。需要在控制台预先进行配置。
 
-**API**  
+#### API  
 
 ```java
 public static void onEvent(String eventCode, JSONObject properties);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 try {
@@ -408,7 +408,7 @@ try {
 <!-- ### onResume&onStop
 
 跟踪用户游戏次数和游戏时长。需要给游戏中每个Activity的onResume和onStop中添加对应的调用。如果多个Activity继承同一个父类，只需要在父类中添加调用即可。比如onResume方法，直接在Activity的onResume方法的最后添加TapDB.onResume(this)即可。  
-**API**  
+#### API  
 
 
 ```java
@@ -424,7 +424,7 @@ public static void onStop(Activity activity);
 
 
 
-**示例代码**
+#### 示例代码
 
 
 ```java
@@ -469,13 +469,13 @@ activity | 否 | 当前Activity对象。一般传递"this" -->
 
 设置动态发布回调  
 
-**API**  
+#### API  
 
 ```java
 public static void setCallback(TapTapMomentSdk.TapMomentCallback tapMomentCallback);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TapTapMomentSdk.setCallback(new TapTapMomentSdk.TapMomentCallback() {
@@ -490,13 +490,13 @@ TapTapMomentSdk.setCallback(new TapTapMomentSdk.TapMomentCallback() {
 
 设置登录信息
 
-**API**  
+#### API  
 
 ```java
 public static void setLoginToken(AccessToken accessToken);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 AccessToken currentAccessToken = AccessToken.getCurrentAccessToken();
@@ -507,13 +507,13 @@ TapTapMomentSdk.setLoginToken(currentAccessToken);
 
 打开动态页面
 
-**API**  
+#### API  
 
 ```java
 public static void openTapMoment(TapTapMomentSdk.Config config);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TapTapMomentSdk.Config config = new TapTapMomentSdk.Config();
@@ -525,7 +525,7 @@ TapTapMomentSdk.openTapMoment(config);
 
 发布动态
 
-**API**  
+#### API  
 
 ```java
 //发布普通动态，包括图片和描述
@@ -534,7 +534,7 @@ public static void publishMoment(TapTapMomentSdk.Config config, String imgPaths,
 public static void publishVideoMoment(TapTapMomentSdk.Config config, String[] videoPaths,String[] imgPaths, String title, String content);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 //普通动态
@@ -569,13 +569,13 @@ TapTapMomentSdk.publishVideoMoment(config, videoPaths, imagePaths, title, conten
 
 获取用户新通知数量   
 
-**API**  
+#### API  
 
 ```java
 public static void getNoticeData();
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TapTapMomentSdk.getNoticeData();
@@ -585,13 +585,13 @@ TapTapMomentSdk.getNoticeData();
 
 进入指定用户的动态页面
 
-**API**  
+#### API  
 
 ```java
 public static void openUserMoment(TapTapMomentSdk.Config config, String openId)
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TapTapMomentSdk.Config config = new TapTapMomentSdk.Config();
@@ -609,7 +609,7 @@ TapTapMomentSdk.openUserMoment(config, openId);
 
 关闭动态页面
 
-**API**  
+#### API  
 
 ```java
 //直接关闭
@@ -619,7 +619,7 @@ public static void closeMoment();
 public static void closeMoment(String title, String content);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 //直接关闭

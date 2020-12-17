@@ -10,13 +10,13 @@ slug: /ios-tapmoment
 
 设置动态发布回调  
 
-**API**  
+#### API  
 
 ```objectivec
 - (void)didChangeResultCode:(NSInteger)code msg:(NSString *)msg;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 @interface ViewController () <TDSMomentDelegate>
@@ -32,13 +32,13 @@ slug: /ios-tapmoment
 
 设置登录信息
 
-**API**  
+#### API  
 
 ```objectivec
 + (void)setAccessToken:(TDSMomentAccessToken *)token;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 [TDSMomentSdk setAccessToken:[TDSMomentAccessToken build:[[TapLoginHelper currentAccessToken]toJsonString]]];
@@ -48,13 +48,13 @@ slug: /ios-tapmoment
 
 打开动态页面
 
-**API**  
+#### API  
 
 ```objectivec
   + (void)openTapMomentWithConfig:(TDSMomentConfig *) config;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 TDSMomentConfig *mconfig = [TDSMomentSdk init];
@@ -66,14 +66,14 @@ mconfig.orientation = TDSMomentOrientationDefault;
 
 发布动态
 
-**API**  
+#### API  
 
 ```objectivec
 + (void)openPostMomentPageWithContent:(TDSPostMomentData * _Nonnull)content
                                config:(TDSMomentConfig * _Nonnull)config;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 //发布图片动态
@@ -109,7 +109,7 @@ config.orientation = TDSMomentOrientationDefault;
 
 获取用户新通知数量   
 
-**API**  
+#### API  
 
 ```objectivec
 + (void)fetchNewMessage;
@@ -117,7 +117,7 @@ config.orientation = TDSMomentOrientationDefault;
 
   结果在 `Delegate` 下的 `didChangeResultCode:msg:`, code == TM_RESULT_CODE_NEW_MSG_SUCCEED时，`msg` 即为消息数量
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 [TDSMomentSdk fetchNewMessage];
@@ -127,13 +127,13 @@ config.orientation = TDSMomentOrientationDefault;
 
 进入指定用户的动态页面
 
-**API**  
+#### API  
 
 ```objectivec
 + (void)openUserCenterWithConfig:(TDSMomentConfig *)config userId:(NSString *)userId;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 TDSMomentConfig *config = [[TDSMomentConfig alloc] init];
@@ -151,7 +151,7 @@ config.orientation = TDSMomentOrientationDefault;
 
 关闭动态页面
 
-**API**  
+#### API  
 
 ```objectivec
 //直接关闭
@@ -161,7 +161,7 @@ config.orientation = TDSMomentOrientationDefault;
 + (void)closeMomentWithTitle:(NSString *)title content:(NSString *)content showConfirm:(BOOL)showConfirm;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 //直接关闭

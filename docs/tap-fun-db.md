@@ -19,7 +19,7 @@ TapSDK提供一套可供游戏开发者收集用户数据的API。系统会收�
 ## 2. 功能开启
 放在初始化SDK之后调用即可
 
-**API**  
+#### API  
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -51,7 +51,7 @@ public static void Init(string clientId, string channel, string gameVersion)
   </TabItem>
 </Tabs>
 
-**示例代码**
+#### 示例代码
 
 <Tabs
 groupId="tap-platform"
@@ -94,7 +94,7 @@ gameVersion | 否 | 游戏版本。长度大于0并小于等于256的字符串�
 ## 3. 记录一个用户
 当enableTapDB后，可以调用此API来记录一个用户  
 
-**API**
+#### API
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -132,7 +132,7 @@ public static void SetUser(string userId, string openId, string loginType)
 
 
 
-**示例代码**
+#### 示例代码
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -239,7 +239,7 @@ TapSDK.TDSLogin.GetCurrentProfile((profile) => {
 ## 4. 用户名称
 设置用户名称
 
-**API**  
+#### API  
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -270,7 +270,7 @@ public static void SetName(string name);
   </TabItem>
 </Tabs>
 
-**示例代码**
+#### 示例代码
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -309,7 +309,7 @@ name | 否 | 长度大于0并小于等于256。用户名
 ## 5. 用户等级
 设置用户等级。用户登录或升级时调用  
 
-**API**  
+#### API  
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -340,7 +340,7 @@ public static void SetLevel(int level);
   </TabItem>
 </Tabs>
 
-**示例代码**
+#### 示例代码
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -380,7 +380,7 @@ level | 否 | 大于等于0。用户等级
 
 设置用户所在服务器。用户登陆或切换服务器时调用
 
-**API**   
+#### API   
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -411,7 +411,7 @@ public static void SetServer(string server);
   </TabItem>
 </Tabs>
 
-**示例代码**
+#### 示例代码
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -451,7 +451,7 @@ server | 否 | 用户所在服务器。长度大于0并小于等于256。
 
 充值成功时调用。SDK推送和[服务端充值推送](#101-充值推送接口)只能选择其中一种。建议优先选择服务端推送方式，以保证数据的准确性。
 
-**API**  
+#### API  
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -482,7 +482,7 @@ public static void OnCharge(string orderId, string productId, string amount, str
   </TabItem>
 </Tabs>
 
-**示例代码**
+#### 示例代码
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -529,7 +529,7 @@ payment | 是 | 充值渠道。长度大于0并小于等于256。
 
 推送自定义事件。需要在控制台预先进行配置。
 
-**API**  
+#### API  
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -560,7 +560,7 @@ public static void OnEvent(string eventCode, string properties)
   </TabItem>
 </Tabs>
 
-**示例代码**
+#### 示例代码
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -607,7 +607,7 @@ properties | 是 | 事件属性。需要和控制台的配置匹配。值需要�
 
 跟踪用户游戏次数和游戏时长。需要给游戏中每个Activity的onResume和onStop中添加对应的调用。如果多个Activity继承同一个父类，只需要在父类中添加调用即可。比如onResume方法，直接在Activity的onResume方法的最后添加TapDB.onResume(this)即可。
 
-**API**  
+#### API  
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"
@@ -636,7 +636,7 @@ groupId="tap-platform"
   </TabItem>
 </Tabs>
 
-**示例代码**
+#### 示例代码
 <Tabs
 groupId="tap-platform"
   defaultValue="Android"

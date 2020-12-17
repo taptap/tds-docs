@@ -9,13 +9,13 @@ slug: /ios-initializer
 
 初始化SDK
 
-**API**  
+#### API  
 
 ```objectivec
 + (void)initWithConfig:(TDSConfig *)config;
 ```
 
-**示例代码**  
+#### 示例代码
 
 ```objectivec
 NSString *clientID = @"clientId";
@@ -32,13 +32,13 @@ config.clientId =clientID;
 
 ### enableTapDBWithChannel
 
-**API**  
+#### API  
 
 ```objectivec
 + (void)enableTapDBWithChannel:(nullable NSString *)channel gameVersion:(nullable NSString *)gameVersion;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 [TDSInitializer enableTapDBWithChannel:@"channel" gameVersion:@"v1.0.0"];
@@ -55,13 +55,13 @@ config.clientId =clientID;
 
 开启动态
 
-**API**  
+#### API  
 
 ```objectivec
 + (void)enableMoment;
 ```
 
-**示例代码**
+#### 示例代码
 
 ```objectivec
 [TDSInitializer enableMoment];

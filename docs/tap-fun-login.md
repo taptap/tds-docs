@@ -13,11 +13,39 @@ import TabItem from '@theme/TabItem';
 
 ## 登录设置
 您可以通过LoginSdkConfig配置您的需要的登录页面是圆角还是直角，及是否需要开启国际化等
+#### API
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+  <TabItem value="android">
 
-**API:** [TapLoginHelper.changeTapLoginConfig](./api/android-loginhelper.md#changetaploginconfig)(LoginSdkConfig)  
-**`LoginSdkConfig为可配置项，非必须`**
+  ```java
+  changeTapLoginConfig(TapTapSdk.LoginSdkConfig var0);
+  ```  
+  </TabItem>
 
-**示例代码**
+  <TabItem value="ios">
+
+```objectivec
++ (void)initWithConfig:(TDSConfig *)config;
+```
+  </TabItem>
+
+  <TabItem value="unity">
+
+```c#
+public static void Init(string clientId, bool isCN, bool isRoundCorner)
+```
+
+  </TabItem>
+</Tabs>
+
+#### 示例代码
 
 <Tabs
 groupId="tap-platform"
@@ -66,9 +94,40 @@ groupId="tap-platform"
 
 ## 登录
 执行登录操作，跳转TapTap APP登录，当没有TapTap APP时，会默认打开内置webview登录  
-**API:** [startTapLogin](./api/android-loginhelper.md#startTapLogin)(Activity activity, String... var2)
 
-**示例代码**
+#### API
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+  <TabItem value="android">
+
+  ```java
+  public void startTapLogin(Activity activity, String... var2);
+  ```  
+  </TabItem>
+
+  <TabItem value="ios">
+
+```objectivec
++ (void)startTapLogin:(NSArray *)permissions;
+```
+  </TabItem>
+
+  <TabItem value="unity">
+
+```c#
+public static void StartLogin(string[] permissions)
+```
+
+  </TabItem>
+</Tabs>
+
+#### 示例代码
 
 <Tabs
 groupId="tap-platform"
@@ -102,9 +161,39 @@ TapSDK.TDSLogin.StartLogin(new string[]{"public_profile"});
 
 ## 登出
 退出登录，清除用户登录缓存记录  
-**API:** [logout](./api/android-loginhelper.md#logout)()  
+#### API
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+  <TabItem value="android">
 
-**示例代码**
+  ```java
+public static void logout();
+  ```  
+  </TabItem>
+
+  <TabItem value="ios">
+
+```objectivec
++ (void)logout;
+```
+  </TabItem>
+
+  <TabItem value="unity">
+
+```c#
+public static void Logout();
+```
+
+  </TabItem>
+</Tabs>
+
+#### 示例代码
 
 <Tabs
 groupId="tap-platform"

@@ -11,13 +11,13 @@ TapSDK核心组建，负责SDK初始化和功能开启
 
 初始化SDK
 
-**API**  
+#### API  
 
 ```java
 init(TdsConfig config);
 ```
 
-**示例代码**  
+#### 示例代码
 
 ```java
 TdsConfig tdsConfig = new TdsConfig.Builder()
@@ -36,13 +36,13 @@ TdsInitializer.init(tdsConfig);
 
 ### enableTapDB
 
-**API**  
+#### API  
 
 ```java
 enableTapDB(Activity activity, String gameVersion, String gameChannel);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TdsInitializer.enableTapDB(MainActivity.this, "1.0", "default");
@@ -59,13 +59,13 @@ TdsInitializer.enableTapDB(MainActivity.this, "1.0", "default");
 
 开启动态
 
-**API**  
+#### API  
 
 ```java
 public static void enableMoment(Activity activity);
 ```
 
-**示例代码**
+#### 示例代码
 
 ```java
 TdsInitializer.enableMoment(MainActivity.this);
