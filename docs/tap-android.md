@@ -32,8 +32,8 @@ dependencies {
 }
 ```   -->
 <!-- ### 方法二、手动添加 -->
-1. 将[下载](#)的SDK包，导入到 '/project/app/libs/' 目录下  
-2. 打开您工程的 '/project/app/build.gradle' 文件，添加gradle配置如下  
+1. 将[下载](#)的SDK包，导入到 **your project** > **app** > **libs** 目录下  
+2. 打开您工程的 **your project ** > **app** > **build.gradle** 文件，添加gradle配置如下  
 ```java  
 repositories{  
     flatDir {  
@@ -42,7 +42,9 @@ repositories{
 }  
 dependencies {  
 ...  
-    implementation (name:'TapSDK_1.0.0', ext:'aar')  
+    implementation (name:'TapSDK_x.x.x', ext:'aar')  // 必选: x.x.x 代表所下载的 SDK的版本号
+    implementation (name:'TDSCommon_x.x.x', ext:'aar') // 必选:x.x.x 代表所下载的 SDK的版本号
+    implementation (name:'oaid_sdk_x.x.x', ext:'aar')  // 可选: 使用 TapDB 数据分析功能必选， 以获得更精准的统计
 }  
 ```  
 3. 打开AndroidManifest.xml添加网络权限  
@@ -51,10 +53,10 @@ dependencies {
 ```
 
 ## 5. 初始化
-TapSDK初始化  
-**API**    [TdsInitializer.init()](./api/android-initializer.md#init)  
 
-**示例代码**  
+TapSDK初始化  
+
+#### 示例代码  
 ```java
 TdsConfig tdsConfig = new TdsConfig.Builder()
                 .appContext(MainActivity.this)
@@ -63,11 +65,14 @@ TdsConfig tdsConfig = new TdsConfig.Builder()
 TdsInitializer.init(tdsConfig);  
 ```
 
+#### API
+
+[TdsInitializer.init()](./api/android-initializer.md#init)  
+
 ## 6. 注册登录回调
 监听登录的结果  
-**API**  [registerLoginCallback()](./api/android-loginhelper.md#registerlogincallback)
 
-**示例代码**
+#### 示例代码
 ```java
 TapLoginHelper.registerLoginCallback(new TapLoginResultCallback() {
      @Override
@@ -86,6 +91,9 @@ TapLoginHelper.registerLoginCallback(new TapLoginResultCallback() {
      }
  });
 ```
+
+#### API  
+[registerLoginCallback()](./api/android-loginhelper.md#registerlogincallback)
 
 ## 7. 登录
 TapTap登录，当没有安装TapTap app时，会打开内置webview进行TapTap验证登录  
