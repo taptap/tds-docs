@@ -25,7 +25,7 @@ TapTapMomentSdk.setCallback(new TapTapMomentSdk.TapMomentCallback() {
   }
 });
 ```
-
+<!--
 ### setLoginToken
 
 设置登录信息
@@ -41,7 +41,7 @@ public static void setLoginToken(AccessToken accessToken);
 ```java
 AccessToken currentAccessToken = AccessToken.getCurrentAccessToken();
 TapTapMomentSdk.setLoginToken(currentAccessToken);
-```
+``` -->
 
 ### openTapMoment
 

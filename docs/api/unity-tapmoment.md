@@ -38,7 +38,7 @@ TapSDK.TDSMoment.SetCallback((code,msg)=>{
 });
 ```
 
-### SetLoginToken
+<!-- ### SetLoginToken
 设置登录信息
 
 **API**
@@ -53,7 +53,7 @@ public static void SetLoginToken(string accessToken);
 TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
     TapSDK.TDSMoment.SetLoginToken(token.toJSON());
 });
-```
+``` -->
 
 ### OpenMoment
 打开动态页面
