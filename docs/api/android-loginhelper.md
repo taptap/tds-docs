@@ -10,7 +10,7 @@ slug: /android-loginhelper
 
 登录配置功能。LoginSdkConfig为可配置项，非必须  
 
-**API:**
+#### API
 
 ```java
 changeTapLoginConfig(TapTapSdk.LoginSdkConfig var0);
@@ -74,7 +74,7 @@ public void startTapLogin(Activity activity, String... var2);
  TapLoginHelper.startTapLogin(MainActivity.this,TapTapSdk.SCOPE_PUIBLIC_PROFILE);
 ```
 
-**API说明**  
+#### API
 
 调用该接口会触发[registerLoginCallback](#registerlogincallback)回调
 

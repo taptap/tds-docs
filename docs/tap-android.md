@@ -21,7 +21,7 @@ slug: /
 点击下载 [TapTap 应用](#)
 
 ## 3. 环境要求
-- 最低支持Android level 15+。
+- 最低支持Android level 21+。
 
 ## 4. 工程配置
 <!-- ### 方法一、自动加载

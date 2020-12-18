@@ -88,7 +88,7 @@ pod update
         <string>taptap</string>
         <key>CFBundleURLSchemes</key>
         <array>
-            <string>ttCqBgq73t1JdHFE3Rk3</string>
+            <string>tt[clientID]</string>
         </array>
     </dict>
 </array>
@@ -142,7 +142,7 @@ tconfig.clientId =clientID;
 TTSDKConfig *config = [[TTSDKConfig alloc] init];
 config.regionType = RegionTypeCN;// 海外为 RegionTypeIO（默认值为RegionTypeCN）
 config.roundCorner = NO;// NO 则网页登录是边框为直角（默认值为YES）
-[TapLoginHelper changeConfig:config];
+[TapLoginHelper changeTapLoginConfig:config];
 
 ```
 
@@ -200,7 +200,7 @@ TapTap登录，当没有安装TapTap app时，会打开内置webview进行TapTap
 :::
 #### 示例代码
 ```objectivec
-[[[TapLoginHelper alloc] init] logout];
+[TapLoginHelper logout];
 ```
 
 #### API
