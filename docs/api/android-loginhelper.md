@@ -158,3 +158,10 @@ TapLoginHelper.fetchProfileForCurrentAccessToken(new Api.ApiCallback<Profile>() 
             }
         });
 ```
+
+## 错误码
+| 字段          | code | 说明       |
+| ----------- | --- | -------- |
+| AccountGlobalError.LOGIN_ERROR_ACCESS_DENIED       | access_denied   | token失效   |
+| AccountGlobalError.LOGIN_ERROR_FORBIDDEN     | forbidden   | token失效     |
+| AccountGlobalError.LOGIN_ERROR_PERMISSION_RESULT       | permission_result   | 登录失败，发生在首次登录过程中    |
