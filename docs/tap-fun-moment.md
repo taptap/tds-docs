@@ -87,7 +87,7 @@ TapSDK.TDSMoment.InitSDK("clientId");
 
 
 ## 3. 添加回调
-调用 enableMoment 后，需要设置动态回调
+调用 enableMoment 后，需要设置动态回调，用于获取动态的状态变化
 
 #### API
 <Tabs
@@ -540,7 +540,9 @@ groupId="tap-platform"
   ```java
 TapTapMomentSdk.getNoticeData();
   ```
-  返回结果会通过回调 `CALLBACK_CODE_GET_NOTICE_SUCCESS`(20000)或`CALLBACK_CODE_GET_NOTICE_FAIL`(20100)通知游戏
+  返回结果会通过动态回调通知游戏。  
+  `code == CALLBACK_CODE_GET_NOTICE_SUCCESS`(20000)表示获取成功，`msg` 即为消息数量。   
+  `CALLBACK_CODE_GET_NOTICE_FAIL`(20100)表示获取失败
   </TabItem>
 
   <TabItem value="ios">
@@ -548,7 +550,9 @@ TapTapMomentSdk.getNoticeData();
   ```objectivec
 + (void)fetchNewMessage;
   ```
-  结果在 `Delegate` 下的 `didChangeResultCode:msg:`, code == TM_RESULT_CODE_NEW_MSG_SUCCEED时，`msg` 即为消息数量
+  结果在 `Delegate` 下的 `didChangeResultCode:msg:`中返回。  
+  `code == CALLBACK_CODE_GET_NOTICE_SUCCESS`(20000)表示获取成功，`msg` 即为消息数量。   
+  `CALLBACK_CODE_GET_NOTICE_FAIL`(20100)表示获取失败
   </TabItem>
   <TabItem value="unity">
 
