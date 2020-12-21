@@ -106,18 +106,18 @@ a. 如果有SceneDelegate.m，请添加如下代码到 SceneDelegate.m 文件中
 ```objectivec
 #import <TapSDK/TTSDKApplicationDelegate.h>
 - (void)scene:(UIScene *)scene openURLContexts:(NSSet<UIOpenURLContext *> *)URLContexts{
-    [[TTSDKApplicationDelegate sharedInstance] handleTapTapOpenURL:URLContexts.allObjects.firstObject.URL];
+    [TapLoginHelper handleTapTapOpenURL:URLContexts.allObjects.firstObject.URL];
 }
 ```
 
 b. 如果没有SceneDelegate.m，只有AppDelegate.m，请添加如下代码到 AppDelegate.m 文件中。
 ```objectivec
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
-   return [[TTSDKApplicationDelegate sharedInstance] handleTapTapOpenURL:url];
+   return [TapLoginHelper handleTapTapOpenURL:url];
 }
 
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
-   return [[TTSDKApplicationDelegate sharedInstance] handleTapTapOpenURL:url];
+   return [TapLoginHelper handleTapTapOpenURL:url];
 }
 ```
 并在AppDelegate.h中添加UIWindow，然后删除info.plist里面的Application Scene Manifest
