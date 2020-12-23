@@ -75,7 +75,7 @@ TapSDK初始化
 #### 示例代码  
 ```java
 TdsConfig tdsConfig = new TdsConfig.Builder()
-                .appContext(MainActivity.this)
+                .appContext(Activity)
                 .clientId(your cient id)//开发者中心获取到的client Id
                 .build();
 TdsInitializer.init(tdsConfig);  
@@ -93,17 +93,17 @@ TdsInitializer.init(tdsConfig);
 TapLoginHelper.registerLoginCallback(new TapLoginResultCallback() {
      @Override
      public void onLoginSuccess(AccessToken accessToken) {
-         Log.e("MainActivity", "onLoginSuccess" + "" + accessToken);
+         Log.e(TAG, "onLoginSuccess" + "" + accessToken);
      }
 
      @Override
      public void onLoginCancel() {
-         Log.e("MainActivity", "onLoginCancel" + "");
+         Log.e(TAG, "onLoginCancel" + "");
      }
 
      @Override
      public void onLoginError(com.taptap.sdk.AccountGlobalError accountGlobalError) {
-         Log.e("MainActivity", "onLoginError" + " " + accountGlobalError.toJsonString());
+         Log.e(TAG, "onLoginError" + " " + accountGlobalError.toJsonString());
      }
  });
 ```
@@ -146,13 +146,13 @@ TapLoginHelper.fetchProfileForCurrentAccessToken(new Api.ApiCallback<Profile>() 
     @Override
     public void onSuccess(Profile data) {
         //TODO 用户已经登录过，可以获取Profile信息
-        Log.e(Tag, "checkLogin-onSuccess");
+        Log.e(TAG, "fetch profile success:" + data);
     }
 
     @Override
     public void onError(Throwable error) {
         //TODO 用户未登录
-        Log.e(Tag, "checkLogin-onError");
+        Log.e(TAG, "fetch profile error:" + data);
     }
 });
 ```
