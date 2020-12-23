@@ -75,6 +75,23 @@ public class MyLoginCallback : TapSDK.LoginCallback{
 }
 ```
 
+
+
+### UnRegisterLoginCallback
+设置登录回调
+
+#### API
+
+```c#
+public static void UnRegisterLoginCallback()
+```
+
+#### 示例代码
+
+```c#
+ TapSDK.TDSLogin.UnRegisterLoginCallback();
+```
+
 ### GetCurrentAccessToken
 获取accessToken
 

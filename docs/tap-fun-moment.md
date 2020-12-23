@@ -564,7 +564,7 @@ public static void GetNoticeData();
 </Tabs>
 
 
-## 7. 进入好友动态主页
+<!-- ## 7. 进入好友动态主页
 
 当游戏需要进入指定用户的动态页面时，调用该接口
 
@@ -631,9 +631,9 @@ TapTapMomentSdk.openUserMoment(config, openId);
 ```
 
   </TabItem>
-</Tabs>
+</Tabs> -->
 
-## 8. 关闭动态
+## 7. 关闭动态
 
 当游戏在特定场景下需要主动关闭动态时调用
 ### 直接关闭  

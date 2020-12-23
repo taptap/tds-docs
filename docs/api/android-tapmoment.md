@@ -131,14 +131,14 @@ public static void getNoticeData();
 TapTapMomentSdk.getNoticeData();
 ```
 
-### openUserMoment
+<!-- ### openUserMoment
 
-进入指定用户的动态页面
+进入指定用户的动态页面。
 
 #### API  
 
 ```java
-public static void openUserMoment(TapTapMomentSdk.Config config, String openId)
+public static void openUserMoment(TapTapMomentSdk.Config config, String userId)
 ```
 
 #### 示例代码
@@ -146,14 +146,14 @@ public static void openUserMoment(TapTapMomentSdk.Config config, String openId)
 ```java
 TapTapMomentSdk.Config config = new TapTapMomentSdk.Config();
 config.orientation = TapTapMomentSdk.ORIENTATION_DEFAULT;  
-TapTapMomentSdk.openUserMoment(config, openId);
+TapTapMomentSdk.openUserMoment(config, userId);
 ```
 
 **参数说明**
 
 | 字段     | 可为空 | 说明                                                   |
 | ------ | --- | ---------------------------------------------------- |
-| openId | 否   | [openId获取方式](./api/android-tapdb.md/#tap登录后openid获取方式) |
+| userId | 否   | xd的userId，非TapTap的userId | -->
 
 ### closeMoment
 

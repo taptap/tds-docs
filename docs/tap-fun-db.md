@@ -107,7 +107,7 @@ groupId="tap-platform"
 
 ```java
   public static void setUser(String userId)
-  public static void setUser(String userId, String openId, LoginType loginType)
+  public static void setUser(String userId,  LoginType loginType)
 ```
   </TabItem>
 
@@ -115,7 +115,7 @@ groupId="tap-platform"
 
   ```objectivec  
 + (void)setUser:(NSString *)userId;
-+ (void)setUser:(NSString *)userId openId:(NSString *)openId loginType:(TapDBLoginType)loginType;
++ (void)setUser:(NSString *)userId  loginType:(TapDBLoginType)loginType;
   ```
   </TabItem>
   <TabItem value="unity">
@@ -123,7 +123,7 @@ groupId="tap-platform"
 ```c#
 public static void SetUser(string userId)
 
-public static void SetUser(string userId, string openId, string loginType)
+public static void SetUser(string userId, string loginType)
 ```
 
   </TabItem>
@@ -144,21 +144,21 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-  TapDB.setUser("xxxxuser1","openId",LoginType.TapTap);
+  TapDB.setUser("xxxxuser1", LoginType.TapTap);
   ```
   </TabItem>
 
   <TabItem value="ios">
 
   ```objectivec
- [TapDB setUser:@"userId" openId:@"openId" loginType:TapDBLoginTypeTapTap];
+ [TapDB setUser:@"userId" loginType:TapDBLoginTypeTapTap];
   ```
   </TabItem>
   <TabItem value="unity">
 
 ```c#
 TapSDK.TDSTapDB.SetUser("userId");
-TapSDK.TDSTapDB.SetUser("userId","openId","loginType");
+TapSDK.TDSTapDB.SetUser("userId","loginType");
 ```
 
   </TabItem>
@@ -169,7 +169,6 @@ TapSDK.TDSTapDB.SetUser("userId","openId","loginType");
 字段 | 可为空 | 说明
 | ------ | ------ | ------ |
 userId | 否 | 长度大于0并小于等于256。只能包含数字、大小写字母、下划线(_)、横线(-)，用户ID。不同用户需要保证ID的唯一性
-openId | 否 | 通过第三方登录获取到的[openId](#taptap登录时openid获取方式)
 loginType | 否 | 第三方登录枚举类型，具体见下面说明
 
 **loginType类型说明**
@@ -187,7 +186,7 @@ loginType | 否 | 第三方登录枚举类型，具体见下面说明
 | Twitter      |    Twitter登录   |
 | PhoneNumber      |    手机号登录   |
 | Custom      |   用户自定义登录类型  （默认名字为Custom,如需修改可以调用LoginType.Custom.changeType） |
-
+<!--
 ### TapTap登录时openId获取方式
 
 <Tabs
@@ -233,7 +232,7 @@ TapSDK.TDSLogin.GetCurrentProfile((profile) => {
 ```
   </TabItem>
 
-</Tabs>
+</Tabs> -->
 
 
 ## 4. 用户名称
