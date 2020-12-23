@@ -86,7 +86,7 @@ TapSDK.TDSMoment.InitSDK("clientId");
 </Tabs>
 
 
-## 3. 添加回调
+## 3. 设置回调
 调用 enableMoment 后，需要设置动态回调，用于获取动态的状态变化
 
 #### API
@@ -155,6 +155,8 @@ TapTapMomentSdk.setCallback(new TapTapMomentSdk.TapMomentCallback() {
   - (void)didChangeResultCode:(NSInteger)code msg:(NSString *)msg {
       NSLog (@"msg:%@, code:%i" ,msg, code);
   }
+
+  [TDSMomentSdk setDelegate:self];
   ```
   </TabItem>
   <TabItem value="unity">
@@ -634,16 +636,10 @@ TapTapMomentSdk.openUserMoment(config, openId);
   </TabItem>
 </Tabs>
 
-**参数说明**
-
-字段 | 可为空 | 说明
-| ------ | ------ | ------ |
-openId | 否 | [openId获取方式](./api/android-tapdb.md/#tap登录后openid获取方式)
-
 ## 9. 关闭动态
 
 当游戏在特定场景下需要主动关闭动态时调用
-1. 直接关闭  
+### 直接关闭  
 
 该接口会直接关闭动态窗口，不会弹出二次确认弹窗，接口示例：
 
@@ -678,7 +674,7 @@ TapSDK.TDSMoment.CloseMoment();
   </TabItem>
 </Tabs>
 
-2. 弹出二次确认  
+### 弹出二次确认  
 
 该接口会弹出二次确认弹窗，由用户确定是否关闭，示例如下：
 <Tabs

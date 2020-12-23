@@ -5,34 +5,80 @@ slug: /ios-loginhelper
 ---
 ## method
 
+### changeTapLoginConfig
+修改登录配置
+#### API  
+```objectivec
++ (void)changeTapLoginConfig:(TTSDKConfig *_Nullable)config;
+```
+#### 示例代码
 
-### registerLoginCallback
+```objectivec
+/**修改登录配置。
+ 此段代码可以不调用，默认配置 (RegionTypeCN和圆角登录框)
+ */
+TTSDKConfig *tconfig = [[TTSDKConfig alloc] init];
+tconfig.regionType = RegionTypeCN;// 海外为 RegionTypeIO（默认值为RegionTypeCN）
+tconfig.roundCorner = YES;// NO 则网页登录是边框为直角（默认值为YES）
+[TapLoginHelper changeTapLoginConfig:tconfig];
+```
 
+### registerLoginResultDelegate
 设置TapSDK的登录回调监听  
 
 #### API  
 
 ```objectivec
-+ (void)registerLoginCallback:(TTSDKLoginManagerRequestHandler)callback;
++ (void)registerLoginResultDelegate:(id <TapLoginResultDelegate>)delegate;
 ```
 
 #### 示例代码
 
 ```objectivec
-[TapLoginHelper registerLoginCallback:^(TTSDKLoginResult *result, NSError *error) {
-        if (error) {
-            // 授权失败
-            NSLog([error localizedDescription]);
-        } else {
-            if (result.isCancelled) {
-                // 授权流程被取消
-                NSLog(@"isCancelled");              
-            } else {
-                // 授权成功
-                NSLog(@"success");
-            }
-        }
-    }];
+[TapLoginHelper registerLoginResultDelegate:self];
+
+ - (void)onLoginSuccess:(TTSDKAccessToken *)token {
+     NSLog(@"Login success %@", [token toJsonString]);
+ }
+
+ - (void)onLoginCancel {
+     NSLog(@"Login cancel");
+
+ }
+
+ - (void)onLoginError:(AccountGlobalError *)error{
+     NSLog(@"Login error %@", [error toJsonString]);
+ }
+```
+
+### unregisterLoginResultDelegate
+移除TapSDK的登录回调监听  
+
+#### API  
+
+```objectivec
++ (void)unregisterLoginResultDelegate;
+```
+
+#### 示例代码
+
+```objectivec
+[TapLoginHelper unregisterLoginResultDelegate];
+```
+
+### getLoginResultDelegate
+获取当前设置的登录回调
+
+#### API  
+
+```objectivec
++ (id <TapLoginResultDelegate>)getLoginResultDelegate;
+```
+
+#### 示例代码
+
+```objectivec
+[TapLoginHelper getLoginResultDelegate];
 ```
 
 ### startTapLogin
@@ -117,4 +163,32 @@ TTSDKProfile *currentProfile = [TapLoginHelper currentProfile];
         //TapDB会用到openID
         NSString *openId = [profile openid];
     }];
+```
+
+### isTapTapClientSupport
+当前是否有国内客户端支持
+#### API
+
+```objectivec
++ (BOOL)isTapTapClientSupport;
+```
+
+#### 示例代码
+
+```objectivec
+bool isCNSuport = [TapLoginHelper isTapTapClientSupport];
+```
+
+### isTapTapGlobalClientSupport
+当前是否有国外客户端支持
+#### API
+
+```objectivec
++ (BOOL)isTapTapGlobalClientSupport;
+```
+
+#### 示例代码
+
+```objectivec
+bool isIOSuport = [TapLoginHelper isTapTapGlobalClientSupport];
 ```

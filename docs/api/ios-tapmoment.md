@@ -5,10 +5,25 @@ slug: /ios-tapmoment
 ---
 ## method
 
+### setDelegate
+
+设置动态回调
+
+#### API  
+
+```objectivec
++ (void)setDelegate:(id <TDSMomentDelegate>)delegate;
+```
+
+#### 示例代码
+
+```objectivec
+[TDSMomentSdk setDelegate:self];
+```
 
 ### didChangeResultCode
 
-设置动态发布回调  
+动态回调结果  
 
 #### API  
 
@@ -57,9 +72,9 @@ slug: /ios-tapmoment
 #### 示例代码
 
 ```objectivec
-TDSMomentConfig *mconfig = [TDSMomentSdk init];
-mconfig.orientation = TDSMomentOrientationDefault;
-[TDSMomentSdk openTapMomentWithConfig:mconfig];
+TDSMomentConfig *momentConfig = [[TDSMomentConfig alloc] init];
+momentConfig.orientation = TDSMomentOrientationDefault;
+[TDSMomentSdk openTapMomentWithConfig:momentConfig];
 ```
 
 ### openPostMomentPageWithContent
@@ -148,28 +163,68 @@ config.orientation = TDSMomentOrientationDefault;
 | openId | 否   | [openId获取方式](./api/ios-tapdb.md/#tap登录后openid获取方式) |
 
 ### closeMoment
-
-关闭动态页面
+直接关闭动态页面
 
 #### API  
 
 ```objectivec
-//直接关闭
 + (void)closeMoment;
+```
 
-//确认关闭
+#### 示例代码
+
+```objectivec
+[TDSMomentSdk closeMoment];
+```
+
+### closeMomentWithTitle
+
+确认方式关闭动态页面
+
+#### API  
+
+```objectivec
 + (void)closeMomentWithTitle:(NSString *)title content:(NSString *)content showConfirm:(BOOL)showConfirm;
 ```
 
 #### 示例代码
 
 ```objectivec
-//直接关闭
-[TDSMomentSdk closeMoment];
-
-//确认关闭
 [TDSMomentSdk closeMomentWithTitle:@"title" content:@"content" showConfirm:true];
 ```
+
+### getSdkVersion
+
+获取SDK版本
+
+#### API  
+
+```objectivec
++ (NSString *)getSdkVersion;
+```
+
+#### 示例代码
+
+```objectivec
+
+```
+
+### getSdkVersionCode
+
+获取SDK版本code
+
+#### API  
+
+```objectivec
++ (NSString *)getSdkVersionCode;
+```
+
+#### 示例代码
+
+```objectivec
+
+```
+
 
 **参数说明**
 
@@ -191,4 +246,4 @@ config.orientation = TDSMomentOrientationDefault;
 | TM_RESULT_CODE_MOMENT_PAGE_CLOSED | 30100   | 自己/好友动态页面关闭 |
 | TM_RESULT_CODE_MOMENT_CLOSE_CANCELLED | 50000   | 取消关闭所有动态界面（弹框点击取消按钮） |
 | TM_RESULT_CODE_MOMENT_CLOSE_CONFIRMED | 50100   | 确认关闭所有动态界面（弹框点击确认按钮） |
-| TM_RESULT_CODE_MOMENT_LOGIN_SUCCEED | 60000   | 动态也没内嵌登录成功 |
+| TM_RESULT_CODE_MOMENT_LOGIN_SUCCEED | 60000   | 动态也没内嵌登录成功 |  

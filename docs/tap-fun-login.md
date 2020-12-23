@@ -12,7 +12,7 @@ import TabItem from '@theme/TabItem';
 跳转TapTap APP登录，当没有TapTap APP时，会默认打开内置webview登录
 
 ## 登录设置
-您可以通过LoginSdkConfig配置您的需要的登录页面是圆角还是直角，及是否需要开启国际化等
+您可以通过LoginSdkConfig配置您的需要的登录页面角、直角和是否需要开启国际化，请在登录前调用
 #### API
 <Tabs
 groupId="tap-platform"
@@ -32,7 +32,8 @@ groupId="tap-platform"
   <TabItem value="ios">
 
 ```objectivec
-+ (void)initWithConfig:(TDSConfig *)config;
+//TapLoginHelper
++ (void)changeTapLoginConfig:(TTSDKConfig *_Nullable)config;
 ```
   </TabItem>
 
@@ -73,7 +74,7 @@ groupId="tap-platform"
   TTSDKConfig *config = [[TTSDKConfig alloc] init];
   config.regionType = RegionTypeCN;// 海外为 RegionTypeIO（默认值为RegionTypeCN）
   config.roundCorner = YES;// NO 则网页登录是边框为直角（默认值为YES）
-  [TapLoginHelper changeConfig:config];
+  [TapLoginHelper changeTapLoginConfig:config];
  ````
   </TabItem>
   <TabItem value="unity">
