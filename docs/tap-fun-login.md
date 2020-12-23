@@ -12,7 +12,7 @@ import TabItem from '@theme/TabItem';
 跳转TapTap APP登录，当没有TapTap APP时，会默认打开内置webview登录
 
 ## 登录设置
-您可以通过LoginSdkConfig配置内置 WebView 的`直角`和是`国际化`，请在登录前调用
+您可以通过LoginSdkConfig配置内置 WebView 的`直角`和`国际化`，请在登录前调用
 #### API
 <Tabs
 groupId="tap-platform"
@@ -25,7 +25,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-  changeTapLoginConfig(TapTapSdk.LoginSdkConfig var0);
+  changeTapLoginConfig(TapTapSdk.LoginSdkConfig loginConfig);
   ```  
   </TabItem>
 
@@ -94,7 +94,7 @@ groupId="tap-platform"
 </Tabs>
 
 ## 登录
-执行登录操作，跳转TapTap APP登录，当没有TapTap APP时，会默认打开内置webview登录  
+执行登录操作，优先跳转TapTap APP登录，当没有TapTap APP时，会打开内置 Webview 登录  
 
 #### API
 <Tabs
@@ -108,7 +108,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-  public void startTapLogin(Activity activity, String... var2);
+  public void startTapLogin(Activity activity, String... permissions);
   ```  
   </TabItem>
 
