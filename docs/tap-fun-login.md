@@ -224,3 +224,166 @@ TapSDK.TDSLogin.Logout();
 ```
   </TabItem>
 </Tabs>
+
+## 检查登录状态
+可以先校验该用户是否登录过，对未登录的用户调用login()  
+
+#### API
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+  <TabItem value="android">
+
+  ```java
+public static AccessToken getCurrentAccessToken();
+  ```  
+  </TabItem>
+
+  <TabItem value="ios">
+
+```objectivec
++ (TTSDKAccessToken *)currentAccessToken;
+```
+  </TabItem>
+
+  <TabItem value="unity">
+
+```c#
+public static void GetCurrentAccessToken(Action<TDSAccessToken> callback)
+```
+
+  </TabItem>
+</Tabs>
+
+#### 示例代码
+
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+  <TabItem value="android">
+
+  ```java
+  //未登录用户会返回null
+  if (TapLoginHelper.getCurrentAccessToken() == null) {
+      //TODO 用户未登录
+  } else {
+     //TODO 用户已经登录过
+  }
+  ```
+  </TabItem>
+
+  <TabItem value="ios">
+
+```objectivec
+TTSDKAccessToken *currentAccessToken = [TapLoginHelper currentAccessToken];
+if(currentAccessToken.accessToken == nil){
+    //用户未登录
+}else{
+    //用户已登录
+}
+```
+  </TabItem>
+  <TabItem value="unity">
+
+```c#
+TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
+  if (accessToken != null)
+  {
+      //用户已经登录
+      Debug.Log(token.toJSON());
+  }
+  else {
+      //用户未登录
+  }
+});
+```
+  </TabItem>
+</Tabs>
+
+## 获取用户登录信息
+退出登录，清除用户登录缓存记录
+#### API
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+  <TabItem value="android">
+
+  ```java
+public static Profile getCurrentProfile();
+  ```  
+  </TabItem>
+
+  <TabItem value="ios">
+
+```objectivec
++ (TTSDKProfile *)currentProfile;
+```
+  </TabItem>
+
+  <TabItem value="unity">
+
+```c#
+public static void GetCurrentProfile(Action<TDSLoginProfile> callback)
+```
+
+  </TabItem>
+</Tabs>
+
+#### 示例代码
+
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+  <TabItem value="android">
+
+  ```java
+//需要先判空，否则会崩溃
+Profile profile = Profile.getCurrentProfile();
+if (profile != null) {
+    Log.e(TAG, profile.toString());
+}
+  ```
+  </TabItem>
+
+  <TabItem value="ios">
+
+```objectivec
+//需要先判空，否则会崩溃
+TTSDKProfile *currentProfile = [TapLoginHelper currentProfile];
+if(currentProfile != nil){
+   NSLog([currentProfile toJsonString]);
+}
+```
+  </TabItem>
+  <TabItem value="unity">
+
+```c#
+//需要先判空，否则会崩溃
+TapSDK.TDSLogin.GetCurrentProfile((profile) => {
+    if (profile != null) {
+        Debug.Log(profile.toJSON());
+    }
+});
+```
+  </TabItem>
+</Tabs>
