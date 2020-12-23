@@ -193,9 +193,17 @@ config.orientation = TDSMomentOrientationDefault;
 [TDSMomentSdk closeMomentWithTitle:@"title" content:@"content" showConfirm:true];
 ```
 
+**参数说明**
+
+| 字段          | 可为空 | 说明       |
+| ----------- | --- | -------- |
+| title       | 否   | 动态标题     |
+| content     | 否   | 动态描述     |
+| showConfirm | 否   | 是否显示确认弹窗 |
+
 ### getSdkVersion
 
-获取SDK版本
+获取动态功能版本。**注意**并非是TapSDK version。此API不建议调用
 
 #### API  
 
@@ -211,7 +219,7 @@ NSString *version =  [TDSMomentSdk getSdkVersion];
 
 ### getSdkVersionCode
 
-获取SDK版本code
+获取动态功能版本code，**注意**并非是TapSDK version。此API不建议调用
 
 #### API  
 
@@ -224,15 +232,6 @@ NSString *version =  [TDSMomentSdk getSdkVersion];
 ```objectivec
  NSString *versionCode =  [TDSMomentSdk getSdkVersionCode];
 ```
-
-
-**参数说明**
-
-| 字段          | 可为空 | 说明       |
-| ----------- | --- | -------- |
-| title       | 否   | 动态标题     |
-| content     | 否   | 动态描述     |
-| showConfirm | 否   | 是否显示确认弹窗 |
 
 ## 回调
 | 字段          | code | 说明       |

@@ -63,13 +63,31 @@ TapTapMomentSdk.openTapMoment(config);
 
 ### publishMoment
 
-发布动态
+发布普通动态，包括图片和描述
 
 #### API  
 
 ```java
-//发布普通动态，包括图片和描述
 public static void publishMoment(TapTapMomentSdk.Config config, String imgPaths, String content);
+```
+
+#### 示例代码
+
+```java
+TapTapMomentSdk.Config config = new TapTapMomentSdk.Config();
+config.orientation = TapTapMomentSdk.ORIENTATION_DEFAULT;  
+String content = "普通动态描述";
+String[] imagePaths = new String[] { "content://***.jpg","/sdcard/**.jpg" };
+TapTapMomentSdk.publishMoment(config, imagePaths, content);
+```
+
+### publishVideoMoment
+
+发布视频动态
+
+#### API  
+
+```java
 //发布视频动态，包括视频和图片（图片可选）
 public static void publishVideoMoment(TapTapMomentSdk.Config config, String[] videoPaths,String[] imgPaths, String title, String content);
 ```
@@ -77,14 +95,6 @@ public static void publishVideoMoment(TapTapMomentSdk.Config config, String[] vi
 #### 示例代码
 
 ```java
-//普通动态
-TapTapMomentSdk.Config config = new TapTapMomentSdk.Config();
-config.orientation = TapTapMomentSdk.ORIENTATION_DEFAULT;  
-String content = "普通动态描述";
-String[] imagePaths = new String[] { "content://***.jpg","/sdcard/**.jpg" };
-TapTapMomentSdk.publishMoment(config, imagePaths, content);
-
-//视频动态
 TapTapMomentSdk.Config config = new TapTapMomentSdk.Config();
 String[] imagePaths = new String[]{ "content://***.jpg","/sdcard/**.jpg" };
 String[] videoPaths = new String[] { "content://***.mp4", "content://***.mp4" };
@@ -175,6 +185,24 @@ TapTapMomentSdk.closeMoment(title, content);
 | ------- | --- | ---- |
 | title   | 否   | 动态标题 |
 | content | 否   | 动态描述 |
+
+
+### getSdkVersion
+
+获取动态功能的版本信息，**注意**并非是TapSDK version。此API不建议调用
+
+#### API  
+
+```java
+public static String getSdkVersion()
+```
+
+#### 示例代码
+
+```java
+String sdkVersion = TapTapMomentSdk.getSdkVersion();
+```
+
 
 ## 回调
 | 字段          | code | 说明       |

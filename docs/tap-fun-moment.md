@@ -8,11 +8,7 @@ sidebar_label: 动态
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-
-`本文介绍动态相关功能和使用方式`
-:::caution
-**目前 需要联系[运营团队](#)获取 TapMoment 的使用权限。**
-:::
+`本文主要介绍动态相关功能和使用方式`
 
 ## 1. 介绍
 TapSDK提供可供用户发布动态到TapTapApp和游戏内部展示动态的控件和功能。  
@@ -257,11 +253,11 @@ TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
 </Tabs> -->
 
 
-## 5. 打开动态页面
+## 4. 打开动态页面
 在游戏中，显示游戏动态页面  
 
 :::caution
-**截止到此步骤，2、3、4步为必要步骤**
+**截止到此步骤，2、3步为必要步骤**
 :::
 
 #### API  
@@ -309,6 +305,7 @@ groupId="tap-platform"
   ```java
   TapTapMomentSdk.Config config = new TapTapMomentSdk.Config();
   // config用来设置页面显示配置，包括显示方向等
+  //config.orientation = TapTapMomentSdk.ORIENTATION_LANDSCAPE;
   TapTapMomentSdk.openTapMoment(config);
   ```
   </TabItem>
@@ -331,7 +328,7 @@ TapSDK.TDSMoment.OpenMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE);
 </Tabs>
 
 
-## 6. 发布动态
+## 5. 发布动态
 
 ### 普通动态
 普通动态包括图片和对应的内容描述
@@ -525,7 +522,7 @@ content | 是 | 动态描述
 
 
 
-## 7. 获取用户新通知数量
+## 6. 获取用户新通知数量
 当游戏需要获取当前用户的新的通知信息数量时，调用该接口
 
 #### API  
@@ -567,7 +564,7 @@ public static void GetNoticeData();
 </Tabs>
 
 
-## 8. 进入好友动态主页
+## 7. 进入好友动态主页
 
 当游戏需要进入指定用户的动态页面时，调用该接口
 
@@ -636,7 +633,7 @@ TapTapMomentSdk.openUserMoment(config, openId);
   </TabItem>
 </Tabs>
 
-## 9. 关闭动态
+## 8. 关闭动态
 
 当游戏在特定场景下需要主动关闭动态时调用
 ### 直接关闭  
@@ -726,78 +723,6 @@ TapSDK.TDSMoment.CloseMoment(title, desc);
 | ------ | ------ | ------ |
 title | 否 | 动态标题
 desc | 否 | 动态描述
-
-  </TabItem>
-</Tabs>
-
-## 10. 获取SDK版本信息
-
-当游戏需要进入指定用户的动态页面时，调用该接口
-
-#### API  
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
-
-  ```java
-public static String getSdkVersion()
-  ```
-  </TabItem>
-
-  <TabItem value="ios">
-
-  ```objectivec
-//version
-+ (NSString *)getSdkVersion;
-
-//versionCode
-+ (NSString *)getSdkVersionCode;
-  ```
-  </TabItem>
-  <TabItem value="unity">
-
-```c#
-
-```
-
-  </TabItem>
-</Tabs>
-
-#### 示例代码
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
-
-  ```java
-
-  ```
-  </TabItem>
-  <TabItem value="ios">
-
-  ```objectivec
-//version
-NSString *version =  [TDSMomentSdk getSdkVersion];
-//versionCode
-NSString *versionCode =  [TDSMomentSdk getSdkVersionCode];
-  ```
-  </TabItem>
-  <TabItem value="unity">
-
-```c#
-
-```
 
   </TabItem>
 </Tabs>
