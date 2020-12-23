@@ -123,44 +123,8 @@ TapLoginHelper.startTapLogin(MainActivity.this,TapTapSdk.SCOPE_PUIBLIC_PROFILE);
 #### API
 [startTapLogin()](./api/android-loginhelper.md#starttaplogin)  
 
-
-<<<<<<< HEAD
 ## 8. 登出
-=======
 可以先校验该用户是否登录过，对未登录的用户调用login()  
-
-方法一、通过 TapLoginHelper.[getCurrentAccessToken](./api/android-loginhelper.md#getcurrentaccesstoken)() 和 TapLoginHelper.[getCurrentProfile](././api/android-loginhelper.md#getcurrentprofile)() 方法分别获取登录状态和用户信息  
-
-```java  
-//未登录用户会返回null
-if (TapLoginHelper.getCurrentAccessToken() == null) {
-    //TODO 用户未登录
-} else {
-   //TODO 用户已经登录过
-}
-```
-
-方法二、通过 TapLoginHelper.[fetchProfileForCurrentAccessToken](./api/android-loginhelper.md#fetchprofileforcurrentaccesstoken)() 获取实时更新的用户信息    
-
-```java  
-//未登录用户会回调onError，已经登录用户实时回调onSuccess
-TapLoginHelper.fetchProfileForCurrentAccessToken(new Api.ApiCallback<Profile>() {
-    @Override
-    public void onSuccess(Profile data) {
-        //TODO 用户已经登录过，可以获取Profile信息
-        Log.e(TAG, "fetch profile success:" + data);
-    }
-
-    @Override
-    public void onError(Throwable error) {
-        //TODO 用户未登录
-        Log.e(TAG, "fetch profile error:" + data);
-    }
-});
-```
-
-## 9. 登出
->>>>>>> 5b3cae4bf4dfa26de4e2b8400e1038bec2db9fc2
 :::caution
 当用户退出登录的时候请务必调用此方法执行退出功能， 避免用户信息错乱。
 :::
