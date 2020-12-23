@@ -12,7 +12,7 @@ import TabItem from '@theme/TabItem';
 跳转TapTap APP登录，当没有TapTap APP时，会默认打开内置webview登录
 
 ## 登录设置
-您可以通过LoginSdkConfig配置您的需要的登录页面角、直角和是否需要开启国际化，请在登录前调用
+您可以通过LoginSdkConfig配置您的需要的登录页面、直角和是否需要开启国际化，请在登录前调用
 #### API
 <Tabs
 groupId="tap-platform"
