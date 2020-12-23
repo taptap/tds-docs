@@ -206,7 +206,7 @@ config.orientation = TDSMomentOrientationDefault;
 #### 示例代码
 
 ```objectivec
-
+NSString *version =  [TDSMomentSdk getSdkVersion];
 ```
 
 ### getSdkVersionCode
@@ -222,7 +222,7 @@ config.orientation = TDSMomentOrientationDefault;
 #### 示例代码
 
 ```objectivec
-
+ NSString *versionCode =  [TDSMomentSdk getSdkVersionCode];
 ```
 
 

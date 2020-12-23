@@ -729,3 +729,75 @@ desc | 否 | 动态描述
 
   </TabItem>
 </Tabs>
+
+## 10. 获取SDK版本信息
+
+当游戏需要进入指定用户的动态页面时，调用该接口
+
+#### API  
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+  <TabItem value="android">
+
+  ```java
+public static String getSdkVersion()
+  ```
+  </TabItem>
+
+  <TabItem value="ios">
+
+  ```objectivec
+//version
++ (NSString *)getSdkVersion;
+
+//versionCode
++ (NSString *)getSdkVersionCode;
+  ```
+  </TabItem>
+  <TabItem value="unity">
+
+```c#
+
+```
+
+  </TabItem>
+</Tabs>
+
+#### 示例代码
+<Tabs
+groupId="tap-platform"
+  defaultValue="Android"
+  values={[
+    {label: 'Android', value: 'android'},
+    {label: 'iOS', value: 'ios'},
+    {label: 'unity', value: 'unity'},
+  ]}>
+  <TabItem value="android">
+
+  ```java
+
+  ```
+  </TabItem>
+  <TabItem value="ios">
+
+  ```objectivec
+//version
+NSString *version =  [TDSMomentSdk getSdkVersion];
+//versionCode
+NSString *versionCode =  [TDSMomentSdk getSdkVersionCode];
+  ```
+  </TabItem>
+  <TabItem value="unity">
+
+```c#
+
+```
+
+  </TabItem>
+</Tabs>
