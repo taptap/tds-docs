@@ -43,7 +43,7 @@ TdsInitializer.enableMoment(Activity);
   <TabItem value="unity">
 
 ```c#
-public static void InitSDK(string clientId);
+public static void EnableMoment();
 ```
 
   </TabItem>
@@ -75,7 +75,7 @@ groupId="tap-platform"
   <TabItem value="unity">
 
 ```c#
-TapSDK.TDSMoment.InitSDK("clientId");
+TapSDK.TDSCore.EnableMoment();
 ```
 
   </TabItem>

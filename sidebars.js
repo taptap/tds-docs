@@ -1,6 +1,6 @@
 module.exports = {
   tapsdk: [
-    'tap-issue',
+    //'tap-issue',
     'tap-download',
     {
       快速开始: [

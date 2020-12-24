@@ -45,7 +45,7 @@ groupId="tap-platform"
   <TabItem value="unity">
 
 ```c#
-public static void Init(string clientId, string channel, string gameVersion)
+public static void EnableTapDB(string gameVersion, string channel);
 ```
 
   </TabItem>
@@ -77,7 +77,7 @@ groupId="tap-platform"
   <TabItem value="unity">
 
 ```c#
-TapSDK.TDSTapDB.Init("clientID","channel","gameVersion");
+TapSDK.TDSCore.EnableTapDB(gameVersion,gameChannel);
 ```
 
   </TabItem>

@@ -3,7 +3,7 @@ id: tap-unity
 title: TapSDK Unity快速开始
 sidebar_label: Unity
 ---
-本文主要介绍Unity如何将TapSDK快速接入并实现登录功能。TapSDK同时还包含用户数据收集和动态发布功能，详情可以参考[数据收集](./tap-fun-db)、[动态](./tap-fun-moment)文档介绍  
+本文主要介绍Unity如何将TapSDK快速接入并实现登录功能。
 
 export const Highlight = ({children, color}) => (
   <span
@@ -19,11 +19,11 @@ export const Highlight = ({children, color}) => (
 
 <Highlight color="#f9422f">⚠️注意：</Highlight>  
 
-在接入前请确保您已经仔细阅读过[TapSDK注意事项](./tap-issue.md)，以方便您能更加顺利接入  
+<!-- 在接入前请确保您已经仔细阅读过[TapSDK注意事项](./tap-issue.md)，以方便您能更加顺利接入   -->
 
 
 :::note
-如需通过示例项目了解如何在 Unity 引擎中集成 TapSDK，请参阅 GitHub 中的 [TapSDKSample](#)。
+如需通过示例项目了解如何在 Unity 引擎中集成 TapSDK，请参阅 GitHub 中的 [TapSDKSample](https://github.com/xindong/TapSDK_Unity_Demo)。
 :::
 
 
@@ -31,7 +31,7 @@ export const Highlight = ({children, color}) => (
 请登录 [TapTap开发者中心](https://www.taptap.com/developer-center) 来创建应用或注册为开发者。
 
 ## 2. 下载 TapTap 应用
-点击下载 [TapTap 应用](#)
+点击下载 [TapTap 应用](https://www.taptap.com/mobile)
 
 ## 3. 环境要求
 - 安装Unity Unity 2018.3或更高版本
@@ -43,7 +43,7 @@ export const Highlight = ({children, color}) => (
 
 ```json
 "dependencies":{
-    //x.x.x为版本信息，请点击上方按钮获取最新版本 
+    //x.x.x为版本信息，请点击上方按钮获取最新版本
     "com.tds.sdk":"https://github.com/xindong/TAPSDK_UPM.git#x.x.x-alpha"
 }
 ```

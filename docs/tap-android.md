@@ -5,7 +5,7 @@ sidebar_label: Android
 slug: /
 ---
 
-本文主要介绍Android如何将TapSDK快速接入并实现登录功能。TapSDK同时还包含用户数据收集和动态发布功能，详情可以参考[数据收集](./tap-fun-db)、[动态](./tap-fun-moment)文档介绍  
+本文主要介绍Android如何将TapSDK快速接入并实现登录功能。
 
 export const Highlight = ({children, color}) => (
   <span
@@ -21,12 +21,12 @@ export const Highlight = ({children, color}) => (
 
 <Highlight color="#f9422f">⚠️注意：</Highlight>  
 
-在接入前请确保您已经仔细阅读过[TapSDK注意事项](./tap-issue.md)，以方便您能更加顺利接入
+<!-- 在接入前请确保您已经仔细阅读过[TapSDK注意事项](./tap-issue.md)，以方便您能更加顺利接入 -->
 
 
 
 :::note
-如需通过示例项目了解如何在 Android 应用中集成 TapSDK，请参阅 GitHub 中的 [TapSDKSample](https://github.com/xindong/TapSDKDemoAndroid)。
+如需通过示例项目了解如何在 Android 应用中集成 TapSDK，请参阅 GitHub 中的 [TapSDKSample](https://github.com/xindong/TapSDK_Android)。
 :::
 
 
@@ -34,7 +34,7 @@ export const Highlight = ({children, color}) => (
 请登录 [TapTap开发者中心](https://www.taptap.com/developer-center) 来创建应用或注册为开发者。
 
 ## 2. 下载 TapTap 应用
-点击下载 [TapTap 应用](#)
+点击下载 [TapTap 应用](https://www.taptap.com/mobile)
 
 ## 3. 环境要求
 - 最低支持Android level 21+。
