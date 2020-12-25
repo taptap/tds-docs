@@ -104,7 +104,7 @@ TapTapMomentSdk.setCallback(TapTapMomentSdk.TapMomentCallback var0);
   <TabItem value="ios">
 
   ```objectivec
-- (void)didChangeResultCode:(NSInteger)code msg:(NSString *)msg;
+- (void)onMomentCallbackWithCode:(NSInteger)code msg:(NSString *)msg;
   ```
   </TabItem>
   <TabItem value="unity">
@@ -148,7 +148,7 @@ TapTapMomentSdk.setCallback(new TapTapMomentSdk.TapMomentCallback() {
 
   @end
 
-  - (void)didChangeResultCode:(NSInteger)code msg:(NSString *)msg {
+  - (void)onMomentCallbackWithCode:(NSInteger)code msg:(NSString *)msg {
       NSLog (@"msg:%@, code:%i" ,msg, code);
   }
 
@@ -549,7 +549,7 @@ TapTapMomentSdk.getNoticeData();
   ```objectivec
 + (void)fetchNewMessage;
   ```
-  结果在 `Delegate` 下的 `didChangeResultCode:msg:`中返回。  
+  结果在 `Delegate` 下的 `onMomentCallbackWithCode:msg:`中返回。  
   `code == CALLBACK_CODE_GET_NOTICE_SUCCESS`(20000)表示获取成功，`msg` 即为消息数量。   
   `CALLBACK_CODE_GET_NOTICE_FAIL`(20100)表示获取失败
   </TabItem>

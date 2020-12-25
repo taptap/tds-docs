@@ -21,14 +21,14 @@ slug: /ios-tapmoment
 [TDSMomentSdk setDelegate:self];
 ```
 
-### didChangeResultCode
+### onMomentCallbackWithCode
 
 动态回调结果  
 
 #### API  
 
 ```objectivec
-- (void)didChangeResultCode:(NSInteger)code msg:(NSString *)msg;
+- (void)onMomentCallbackWithCode:(NSInteger)code msg:(NSString *)msg;
 ```
 
 #### 示例代码
@@ -38,7 +38,7 @@ slug: /ios-tapmoment
 
 @end
 
-- (void)didChangeResultCode:(NSInteger)code msg:(NSString *)msg {
+- (void)onMomentCallbackWithCode:(NSInteger)code msg:(NSString *)msg {
     NSLog (@"msg:%@, code:%i" ,msg, code);
 }
 ```
@@ -130,7 +130,7 @@ config.orientation = TDSMomentOrientationDefault;
 + (void)fetchNewMessage;
 ```
 
-  结果在 `Delegate` 下的 `didChangeResultCode:msg:`, code == TM_RESULT_CODE_NEW_MSG_SUCCEED时，`msg` 即为消息数量
+  结果在 `Delegate` 下的 `onMomentCallbackWithCode:msg:`, code == TM_RESULT_CODE_NEW_MSG_SUCCEED时，`msg` 即为消息数量
 
 #### 示例代码
 
