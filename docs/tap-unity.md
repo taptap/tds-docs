@@ -17,7 +17,7 @@ export const Highlight = ({children, color}) => (
   </span>
 );
 
-<Highlight color="#f9422f">⚠️注意：</Highlight>  
+<!-- <Highlight color="#f9422f">⚠️注意：</Highlight>   -->
 
 <!-- 在接入前请确保您已经仔细阅读过[TapSDK注意事项](./tap-issue.md)，以方便您能更加顺利接入   -->
 
@@ -44,7 +44,7 @@ export const Highlight = ({children, color}) => (
 ```json
 "dependencies":{
     //x.x.x为版本信息，请点击上方按钮获取最新版本
-    "com.tds.sdk":"https://github.com/xindong/TAPSDK_UPM.git#x.x.x-alpha"
+    "com.tds.sdk":"https://github.com/xindong/TAPSDK_UPM.git#x.x.x"
 }
 ```
 
@@ -117,7 +117,7 @@ TapSDK.TDSCore.Init("clientId");
 TapSDK.TDSLogin.RegisterLoginCallback(new MyLoginCallback());
 public class MyLoginCallback : TapSDK.LoginCallback{
    public void LoginSuccess(TapSDK.TDSAccessToken accessToken){
-           Debug.Log("Login success");
+       Debug.Log("Login success");
    }
 
    public void LoginCancel(){

@@ -19,7 +19,7 @@ export const Highlight = ({children, color}) => (
   </span>
 );
 
-<Highlight color="#f9422f">⚠️注意：</Highlight>  
+<!-- <Highlight color="#f9422f">⚠️注意：</Highlight>   -->
 
 <!-- 在接入前请确保您已经仔细阅读过[TapSDK注意事项](./tap-issue.md)，以方便您能更加顺利接入 -->
 

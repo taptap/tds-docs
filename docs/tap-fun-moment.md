@@ -496,15 +496,15 @@ TapTapMomentSdk.publishVideoMoment(config, videoPaths, imagePaths, title, conten
 string[] images = {"imgpath01","imgpath02","imgpath03"};
 string[] videos = {"videop01","videop02","videop03"};
 string title = "我是动态";
-string desc = "我是描述";
-TapSDK.TDSMoment.PublishVideoMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE, videos,images,title,desc);
+string content = "我是描述";
+TapSDK.TDSMoment.PublishVideoMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE, videos, images, title, content);
 
 //不带封面
 string[] images = {"imgpath01","imgpath02","imgpath03"};
 string[] videos = {"videop01","videop02","videop03"};
 string title = "我是动态";
-string desc = "我是描述";
-TapSDK.TDSMoment.PublishVideoMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE, videos,title,desc);
+string content = "我是描述";
+TapSDK.TDSMoment.PublishVideoMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE, videos, title, content);
 ```
 
   </TabItem>
@@ -633,9 +633,9 @@ TapTapMomentSdk.openUserMoment(config, openId);
   </TabItem>
 </Tabs> -->
 
-## 7. 关闭动态
+## 7. 关闭动态页面
 
-当游戏在特定场景下需要主动关闭动态时调用
+当游戏在特定场景下需要主动关闭动态窗口时调用
 ### 直接关闭  
 
 该接口会直接关闭动态窗口，不会弹出二次确认弹窗，接口示例：
