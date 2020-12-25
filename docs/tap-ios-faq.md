@@ -4,7 +4,7 @@ title: TapSDK iOS FAQ
 sidebar_label: iOS
 ---
 
-## 无法唤起registerLoginCallback回调
+## registerLoginCallback代理无法回调
 检查一下clientID设置，info.plist和初始化代码里面保持一致
 
 ## [UIWindow tds_topWindow]: unrecognized selector sent to class 0xxxxxxxx
