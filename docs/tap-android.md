@@ -118,7 +118,7 @@ TapTap登录，当没有安装TapTap app时，会打开内置webview进行TapTap
 可以用下面代码直接登录：  
 
 ```java
-TapLoginHelper.startTapLogin(MainActivity.this,TapTapSdk.SCOPE_PUIBLIC_PROFILE);
+TapLoginHelper.startTapLogin(MainActivity.this,TapLoginHelper.SCOPE_PUBLIC_PROFILE);
 ```
 #### API
 [startTapLogin()](./api/android-loginhelper.md#starttaplogin)  
