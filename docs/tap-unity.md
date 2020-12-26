@@ -78,8 +78,9 @@ export const Highlight = ({children, color}) => (
 </plist>
 ```
 
-## 6. SDK脚本引用
-1. 在调用SDK脚本目录下创建.amsdef文件
+## 6. 添加SDK引用
+1. 在调用TapSDK处的同级目录下创建.amsdef文件
+![](https://qnblog.ijemy.com/xd_amsdefpng.png)
 ![](https://qnblog.ijemy.com/xd_unity_amsdef.png)
 2. 添加如下配置
 
