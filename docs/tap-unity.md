@@ -79,9 +79,11 @@ export const Highlight = ({children, color}) => (
 ```
 
 ## 6. 添加SDK引用
-1. 在调用TapSDK处的同级目录下创建.amsdef文件
-![](https://qnblog.ijemy.com/xd_amsdefpng.png)
+1. 在Assets/scripts/根目录下面创建.amsdef文件如下图即可。
+<!-- 如果项目业务只在指定目录调用TapSDK，也可以只在调用TapSDK处的同级目录下创建
+![](https://qnblog.ijemy.com/xd_amsdefpng.png) -->
 ![](https://qnblog.ijemy.com/xd_unity_amsdef.png)
+
 2. 添加如下配置
 
 ```json
