@@ -88,11 +88,27 @@ pod update
 'Security.framework',
 ```  
 
-## 6. 跳转TapTap登录配置
+## 6. 跳转TapTap登录和打开多媒体
+### 配置多媒体权限
+`在使用到动态功能时，需要授权相册/相机/麦克风访问权限`  
+打开info.plist，添加如下配置
 
-`未做此配置或者用户无TapTap应用时，默认会打开webview登录`  
+```objectivec
+<!--使用到动态功能时需要配置，可替换授权文案-->
+<key>NSPhotoLibraryUsageDescription</key>
+<string>App需要您的同意,才能访问相册</string>
+<!-- 相机 -->
+<key>NSCameraUsageDescription</key>
+<string>App需要您的同意,才能访问相机</string>
+<!-- 麦克风 -->
+<key>NSMicrophoneUsageDescription</key>
+<string>App需要您的同意,才能访问麦克风</string>
+```
 
-1. 打开info.plist，添加如下配置
+### 配置跳转TapTap应用
+`用户无TapTap应用时，默认会打开webview登录`
+
+1. 打开info.plist，添加如下配置，然后请替换clientID为您在控制台获取的clientID
 ![](https://qnblog.ijemy.com/xd_ios_info.png)
 ```objectivec
 <key>CFBundleURLTypes</key>
