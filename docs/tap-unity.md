@@ -133,8 +133,8 @@ public class MyLoginCallback : TapSDK.LoginCallback{
        Debug.Log("LoginCancel");
    }
 
-   public void LoginError(string error){
-       Debug.Log(error);
+   public void LoginError(TapSDK.TDSAccountError error){
+       Debug.Log(error.ToString());
    }
 }
 ```
