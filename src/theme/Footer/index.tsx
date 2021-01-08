@@ -5,6 +5,7 @@ import {useThemeConfig} from '@docusaurus/theme-common';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import ThemedImage from '@theme/ThemedImage';
 import styles from './styles.module.css';
+import './override.scss';
 
 function FooterLink({to, href, label, prependBaseUrlToHref, ...props}: any) {
   const toUrl = useBaseUrl(to);

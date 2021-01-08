@@ -27,7 +27,51 @@ module.exports = {
       appId: 'TVQNXY05EF',
       contextualSearch: true,
     },
-    navbar: {},
+    navbar: {
+      title: 'TapSDK Doc',
+      items: [
+        {
+          label: '文档首页',
+          to: '/',
+          position: 'right',
+          activeBaseRegex: 'none',
+        },
+        {
+          label: '入门指南',
+          to: '/',
+          position: 'right',
+          activeBaseRegex: 'none',
+        },
+        {
+          label: '游戏商店',
+          to: '/',
+          position: 'right',
+          activeBaseRegex: 'none',
+        },
+        {
+          label: 'SDK功能',
+          docId: 'sdk/tap-android',
+          type: 'doc',
+          position: 'right',
+        },
+        {
+          label: '资源下载',
+          position: 'right',
+          items: [
+            {
+              label: '品牌素材',
+              to: '/',
+              activeBaseRegex: 'none',
+            },
+            {
+              label: 'SDK工具包',
+              to: '/',
+              activeBaseRegex: 'none',
+            },
+          ],
+        },
+      ],
+    },
     footer: {}
   },
   presets: [

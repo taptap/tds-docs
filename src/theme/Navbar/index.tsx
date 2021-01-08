@@ -11,12 +11,10 @@ import NavbarItem from '@theme/NavbarItem';
 import IconMenu from '@theme/IconMenu';
 import Logo from './Logo';
 import styles from './styles.module.css';
+import './override.scss'
 
-// retrocompatible with v1
 const DefaultNavItemPosition = 'right';
 
-// If split links by left/right
-// if position is unspecified, fallback to right (as v1)
 function splitNavItemsByPosition(items) {
   const leftItems = items.filter(
     (item) => (item.position ?? DefaultNavItemPosition) === 'left',
