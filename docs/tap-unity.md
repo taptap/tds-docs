@@ -169,8 +169,10 @@ TapSDK.TDSLogin.Logout();
 unity打包apk步骤  
 
 `需要配置package name和签名文件`  
-
 ![](http://qnblog.ijemy.com/xd_unity_android_build.png)
+**需要注意**  
+到Player Settings-->Other Settings-->Target APILevel确认是否 >= 29  
+当Target APILever < 29时，需要配置manifest，在application节点添加 `tools:remove="android:requestLegacyExternalStorage"`
 ## 12. 导出到Xcode
 `需要配置icon和bundleId`
 
