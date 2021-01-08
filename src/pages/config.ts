@@ -16,7 +16,7 @@ export const entryList: Array<Entry> = [
     links: [
       {
         label: '查看更多',
-        to: '/'
+        to: '/1'
       }
     ]
   },
@@ -26,7 +26,7 @@ export const entryList: Array<Entry> = [
     links: [
       {
         label: '查看更多',
-        to: '/'
+        to: '/2'
       }
     ]
   },
@@ -36,11 +36,11 @@ export const entryList: Array<Entry> = [
     links: [
       {
         label: '品牌素材库',
-        to: '/'
+        to: '/3'
       },
       {
         label: 'SDK工具包',
-        to: '/'
+        to: '/4'
       }
     ]
   },
@@ -50,7 +50,7 @@ export const entryList: Array<Entry> = [
     links: [
       {
         label: '查看更多',
-        to: '/'
+        to: '/5'
       }
     ]
   },

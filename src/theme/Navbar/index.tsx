@@ -9,7 +9,7 @@ import useLockBodyScroll from '@theme/hooks/useLockBodyScroll';
 import useWindowSize, { windowSizes } from '@theme/hooks/useWindowSize';
 import NavbarItem from '@theme/NavbarItem';
 import IconMenu from '@theme/IconMenu';
-import Logo from './Logo';
+import Logo from '@theme/Logo';
 import styles from './styles.module.css';
 import './override.scss'
 
@@ -84,17 +84,17 @@ function Navbar(): JSX.Element {
               tabIndex={0}
               onClick={showSidebar}
               onKeyDown={showSidebar}>
-              <IconMenu/>
+              <IconMenu />
             </div>
           )}
-          <Logo/>
+          <Logo />
           {leftItems.map((item, i) => (
-            <NavbarItem {...item} key={i}/>
+            <NavbarItem {...item} key={i} />
           ))}
         </div>
         <div className="navbar__items navbar__items--right">
           {rightItems.map((item, i) => (
-            <NavbarItem {...item} key={i}/>
+            <NavbarItem {...item} key={i} />
           ))}
           {!disableColorModeSwitch && (
             <Toggle
@@ -117,7 +117,7 @@ function Navbar(): JSX.Element {
       />
       <div className="navbar-sidebar">
         <div className="navbar-sidebar__brand">
-          <Logo onClick={hideSidebar}/>
+          <Logo onClick={hideSidebar} />
           {!disableColorModeSwitch && sidebarShown && (
             <Toggle
               aria-label="Dark mode toggle in sidebar"
@@ -130,7 +130,7 @@ function Navbar(): JSX.Element {
           <div className="menu">
             <ul className="menu__list">
               {items?.map((item, i) => (
-                <NavbarItem mobile {...item} onClick={hideSidebar} key={i}/>
+                <NavbarItem mobile {...item} onClick={hideSidebar} key={i} />
               ))}
             </ul>
           </div>
