@@ -1,7 +1,7 @@
 ---
 id: android-initializer
 title: TdsInitializer
-slug: /android-initializer
+slug: /api
 ---
 ## method
 

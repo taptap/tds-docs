@@ -1,7 +1,6 @@
 ---
 id: ios-initializer
 title: TDSInitializer
-slug: /ios-initializer
 ---
 ## method
 

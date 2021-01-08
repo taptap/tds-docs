@@ -1,7 +1,6 @@
 ---
 id: unity-tapmoment
 title: TDSMoment
-slug: /unity-tapmoment
 ---
 ## method
 

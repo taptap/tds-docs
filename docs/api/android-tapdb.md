@@ -1,7 +1,6 @@
 ---
 id: android-tapdb
 title: TapDB
-slug: /android-tapdb
 ---
 ## method
 ### setUser

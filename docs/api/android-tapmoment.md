@@ -1,7 +1,6 @@
 ---
 id: android-tapmoment
 title: TapTapMoment
-slug: /android-tapmoment
 ---
 ## method
 
