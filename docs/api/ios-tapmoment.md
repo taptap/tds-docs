@@ -1,7 +1,6 @@
 ---
 id: ios-tapmoment
 title: TDSMomentSdk
-slug: /ios-tapmoment
 ---
 ## method
 

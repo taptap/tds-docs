@@ -1,7 +1,6 @@
 ---
 id: ios-tapdb
 title: TapDB
-slug: /ios-tapdb
 ---
 ## method
 

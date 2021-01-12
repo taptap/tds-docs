@@ -1,7 +1,6 @@
 ---
 id: android-loginhelper
 title: TapLoginHelper
-slug: /android-loginhelper
 ---
 ## method
 

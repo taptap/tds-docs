@@ -1,7 +1,6 @@
 ---
 id: ios-loginhelper
 title: TapLoginHelper
-slug: /ios-loginhelper
 ---
 ## method
 

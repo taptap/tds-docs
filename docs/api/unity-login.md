@@ -1,7 +1,6 @@
 ---
 id: unity-login
 title: TDSLogin
-slug: /unity-login
 ---
 ## method
 ### Init

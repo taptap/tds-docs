@@ -1,33 +1,30 @@
 module.exports = {
   tapsdk: [
-    //'tap-issue',
-    'tap-download',
+    'sdk/tap-download',
     {
       快速开始: [
-        'tap-android',
-        'tap-ios',
-        //{Unity快速开始:['tap-unity','tap-unity2ios','tap-unity2android']},
-        'tap-unity'
+        'sdk/tap-android',
+        'sdk/tap-ios',
+        'sdk/tap-unity'
       ],
     },
     {
-      功能介绍:['tap-fun-login','tap-fun-db','tap-fun-moment'],
+      功能介绍: ['sdk/tap-fun-login', 'sdk/tap-fun-db', 'sdk/tap-fun-moment'],
     },
     {
-      常见问题:['tap-android-faq','tap-ios-faq','tap-unity-faq','tap-noun'],
+      常见问题: ['sdk/tap-android-faq', 'sdk/tap-ios-faq', 'sdk/tap-unity-faq', 'sdk/tap-noun'],
     },
-    'tap-changelog',
-    //'tap-known',
+    'sdk/tap-changelog',
   ],
   api: [
     {
-      Android:['api/android-initializer','api/android-loginhelper','api/android-tapdb','api/android-tapmoment'],
+      Android: ['api/android-initializer', 'api/android-loginhelper', 'api/android-tapdb', 'api/android-tapmoment'],
     },
     {
-      iOS:['api/ios-initializer','api/ios-loginhelper','api/ios-tapdb','api/ios-tapmoment'],
+      iOS: ['api/ios-initializer', 'api/ios-loginhelper', 'api/ios-tapdb', 'api/ios-tapmoment'],
     },
     {
-      Unity:['api/unity-login','api/unity-tapdb','api/unity-tapmoment'],
+      Unity: ['api/unity-login', 'api/unity-tapdb', 'api/unity-tapmoment'],
     },
 
   ]

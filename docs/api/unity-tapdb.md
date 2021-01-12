@@ -1,7 +1,6 @@
 ---
 id: unity-tapdb
 title: TDSTapDB
-slug: /unity-tapdb
 ---
 ## method
 ### Init
