@@ -1,9 +1,9 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+import clsx from "clsx";
 import Layout from "@theme/Layout";
 import styles from './styles.module.scss';
-import { entryList } from "./config";
-import clsx from "clsx";
-import { Link } from 'react-router-dom';
+import { entryList } from "./_config";
 
 const HomePage = () => {
   return <Layout>
@@ -27,7 +27,7 @@ const HomePage = () => {
               <div>
                 {item.links?.map((link, index, links) =>
                   <div key={link.to} className={clsx(styles.entryCellActionButton, {
-                    [styles.entryCellActionButtonLarge]: links.length > 1
+                    [styles.entryCellActionButtonLarge]: links.length > 1,
                   })}>
                     <Link to={link.to}> {link.label} </Link>
                   </div>)}

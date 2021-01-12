@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './styles.module.scss';
 import Logo from "@theme/Logo";
-import { externalLinkList, innerLinkList } from './config';
+import { externalLinkList, innerLinkList } from './_config';
 
 function Footer() {
   return (
