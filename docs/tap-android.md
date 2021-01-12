@@ -68,6 +68,11 @@ dependencies {
 <uses-permission android:name="android.permission.INTERNET"></uses-permission>
 ```
 
+4. 配置存储模型  
+当您的targetSdkVersion<29时，需要添加如下配置    
+manifest节点添加 `xmlns:tools="http://schemas.android.com/tools"`  
+application节点添加 `tools:remove="android:requestLegacyExternalStorage"`
+
 ## 5. 初始化
 
 TapSDK初始化  
