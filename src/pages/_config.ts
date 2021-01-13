@@ -1,6 +1,7 @@
 type ActionCellLink = {
   label: string;
   to: string;
+  href?: string;
 };
 
 type Entry = {
@@ -16,9 +17,9 @@ export const entryList: Array<Entry> = [
     links: [
       {
         label: '查看更多',
-        to: '/1'
-      }
-    ]
+        to: '/store',
+      },
+    ],
   },
   {
     title: 'SDK功能',
@@ -26,9 +27,9 @@ export const entryList: Array<Entry> = [
     links: [
       {
         label: '查看更多',
-        to: '/2'
-      }
-    ]
+        to: '/sdk',
+      },
+    ],
   },
   {
     title: '资源下载',
@@ -36,13 +37,13 @@ export const entryList: Array<Entry> = [
     links: [
       {
         label: '品牌素材库',
-        to: '/3'
+        href: 'https://www.taptap.com/about-us/brand-resources',
       },
       {
         label: 'SDK工具包',
-        to: '/4'
-      }
-    ]
+        to: '/sdk/tap-download',
+      },
+    ],
   },
   {
     title: '栏目收录申请',
@@ -50,8 +51,8 @@ export const entryList: Array<Entry> = [
     links: [
       {
         label: '查看更多',
-        to: '/5'
-      }
-    ]
+        to: '/ad-apply',
+      },
+    ],
   },
 ]
