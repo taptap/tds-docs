@@ -19,3 +19,9 @@ export const ImageLink=({href, children}) => (
 <img src={children} ></img>
 </a>
 );
+
+export const FaqLink=({href, children}) =>(
+<font size="3" color="#666666">
+{children}
+</font>
+);
