@@ -17,7 +17,7 @@ export const entryList: Array<Entry> = [
     links: [
       {
         label: '查看更多',
-        to: '/1',
+        to: '/store',
       },
     ],
   },
@@ -27,7 +27,7 @@ export const entryList: Array<Entry> = [
     links: [
       {
         label: '查看更多',
-        to: '/2',
+        to: '/sdk',
       },
     ],
   },
@@ -37,11 +37,11 @@ export const entryList: Array<Entry> = [
     links: [
       {
         label: '品牌素材库',
-        to: '/3',
+        href: 'https://www.taptap.com/about-us/brand-resources',
       },
       {
         label: 'SDK工具包',
-        to: '/4',
+        to: '/sdk/tap-download',
       },
     ],
   },
@@ -51,7 +51,7 @@ export const entryList: Array<Entry> = [
     links: [
       {
         label: '查看更多',
-        to: '/5',
+        to: '/ad-apply',
       },
     ],
   },

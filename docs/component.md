@@ -7,3 +7,8 @@ export const Highlight = ({children, color}) => (
     {children}
   </span>
 );
+
+export const Link=({href, children}) =>
+<a href={href} target="_blank">
+{children}
+</a>

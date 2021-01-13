@@ -38,9 +38,9 @@ module.exports = {
         },
         {
           label: '入门指南',
-          to: '/',
+          to: '/dev-create',
           position: 'right',
-          activeBaseRegex: 'none',
+            activeBaseRegex: 'none',
         },
         {
           label: '游戏商店',
@@ -60,12 +60,12 @@ module.exports = {
           items: [
             {
               label: '品牌素材',
-              to: '/',
+              href: 'https://www.taptap.com/about-us/brand-resources',
               activeBaseRegex: 'none',
             },
             {
               label: 'SDK工具包',
-              to: '/',
+              to: '/sdk/tap-download',
               activeBaseRegex: 'none',
             },
           ],
