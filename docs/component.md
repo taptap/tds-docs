@@ -8,7 +8,14 @@ export const Highlight = ({children, color}) => (
   </span>
 );
 
-export const Link=({href, children}) =>
+export const Link=({href, children}) =>(
 <a href={href} target="_blank">
 {children}
 </a>
+);
+
+export const ImageLink=({href, children}) => (
+<a href={href} rel='noreferrer nofollow noopener'>
+<img src={children} ></img>
+</a>
+);
