@@ -1,6 +1,7 @@
 type ActionCellLink = {
   label: string;
   to: string;
+  href?: string;
 };
 
 type Entry = {
