@@ -44,9 +44,9 @@ module.exports = {
         },
         {
           label: '游戏商店',
-          to: '/',
+          docId: 'store/store-about',
           position: 'right',
-          activeBaseRegex: 'none',
+          type: 'doc',
         },
         {
           label: 'SDK功能',
