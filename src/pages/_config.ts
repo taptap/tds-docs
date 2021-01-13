@@ -16,9 +16,9 @@ export const entryList: Array<Entry> = [
     links: [
       {
         label: '查看更多',
-        to: '/1'
-      }
-    ]
+        to: '/1',
+      },
+    ],
   },
   {
     title: 'SDK功能',
@@ -26,9 +26,9 @@ export const entryList: Array<Entry> = [
     links: [
       {
         label: '查看更多',
-        to: '/2'
-      }
-    ]
+        to: '/2',
+      },
+    ],
   },
   {
     title: '资源下载',
@@ -36,13 +36,13 @@ export const entryList: Array<Entry> = [
     links: [
       {
         label: '品牌素材库',
-        to: '/3'
+        to: '/3',
       },
       {
         label: 'SDK工具包',
-        to: '/4'
-      }
-    ]
+        to: '/4',
+      },
+    ],
   },
   {
     title: '栏目收录申请',
@@ -50,8 +50,8 @@ export const entryList: Array<Entry> = [
     links: [
       {
         label: '查看更多',
-        to: '/5'
-      }
-    ]
+        to: '/5',
+      },
+    ],
   },
 ]

@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { Fragment } from 'react';
 import { Link } from 'react-router-dom';
-import clsx from "clsx";
 import Layout from "@theme/Layout";
 import styles from './styles.module.scss';
 import { entryList } from "./_config";
@@ -24,13 +23,13 @@ const HomePage = () => {
                 <div className={styles.entryCellTitle}>{item.title}</div>
                 <div>{item.description}</div>
               </div>
-              <div>
+              <div className={styles.entryCellActionContainer}>
                 {item.links?.map((link, index, links) =>
-                  <div key={link.to} className={clsx(styles.entryCellActionButton, {
-                    [styles.entryCellActionButtonLarge]: links.length > 1,
-                  })}>
-                    <Link to={link.to}> {link.label} </Link>
-                  </div>)}
+                  <Fragment key={link.to}>
+                    <Link className={styles.entryCellActionButton} to={link.to}> {link.label} </Link>
+                    {index < links.length - 1 && <div className={styles.entryCellActionDivider} />}
+                  </Fragment>,
+                )}
               </div>
             </div>)}
         </div>
