@@ -25,11 +25,11 @@ const HomePage = () => {
               </div>
               <div className={styles.entryCellActionContainer}>
                 {item.links?.map((link, index, links) =>
-                  <Fragment key={link.to}>
+                  <Fragment key={link.label}>
                     {
                       link.href
                         ? <a href={link.href} rel='noreferrer nofollow noopener' target='_blank'>{link.label}</a>
-                        : <Link className={styles.entryCellActionButton} to={link.to}> {link.label} </Link>
+                        : <Link className={styles.entryCellActionButton} to={link.to || '/'}> {link.label} </Link>
                     }
                     {index < links.length - 1 && <div className={styles.entryCellActionDivider} />}
                   </Fragment>,

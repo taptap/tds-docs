@@ -7,13 +7,13 @@ type LogoProp = {
   onClick?: () => any;
 };
 
-const Logo = ({noLabel, onClick}: LogoProp) => {
+const Logo = ({ noLabel, onClick }: LogoProp) => {
   return <div className={styles.logoContainer} onClick={onClick}>
-    <a className={styles.logoImage} target="_blank" href={MAIN_DOMAIN_HOST}>
+    <a className={styles.logoImage} href={MAIN_DOMAIN_HOST}>
       <img src='/img/logo.svg' alt="TapTap" />
     </a>
     {!noLabel && <div className={styles.divider} />}
-    {!noLabel && <a className={styles.label} target="_blank" href={DC_DOMAIN_HOST}> Developer Center </a>}
+    {!noLabel && <a className={styles.label} href={DC_DOMAIN_HOST}> Developer Center </a>}
   </div>;
 };
 
