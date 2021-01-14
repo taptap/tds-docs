@@ -4,8 +4,6 @@ title: DLC 接入文档
 sidebar_label: DLC 接入文档
 ---
 
-# DLC 接入文档
-
 ## 一、准备工作
   1. 首先通过TapTap开发者中心—SDK控制台模块，申请SDK并通过审核
   2. SDK审核通过后，点击“配置”按钮可进行SDK配置，开发者需提交测试使用的TapTap账号ID，以便进行自测

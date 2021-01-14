@@ -4,8 +4,6 @@ title: 唤起 TapTap 相关功能使用说明
 sidebar_label: 唤起 TapTap
 ---
 
-# **唤起 TapTap 相关功能使用说明**
-
 ![小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)
 当游戏版本过低时，引导用户唤起 TapTap 更新。唤起 TapTap 相关功能介绍
 
