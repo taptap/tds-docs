@@ -15,7 +15,7 @@ const HomePage = () => {
         <div className={styles.topSubtitle}>
           这里为用户提供游戏开发者相关文档和常见问题，包含游戏商店设置、SDK功能说明及TapTap品牌资源下载。
         </div>
-        <Link className={styles.topEntryButton} to="/dev-create">入门指南 </Link>
+        <Link className={styles.topEntryButton} to="store/store-register">入门指南 </Link>
         <div className={styles.entryContainer}>
           {entryList.map(item =>
             <div key={item.title} className={styles.entryCell}>

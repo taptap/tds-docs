@@ -36,9 +36,10 @@ tap-sdk-doc
 5. npm start，浏览器默认打开3000端口，即可   
 
 ## 文档发布注意事项  
-- 不支持html文件脚本，直接复制markdown过来的文件可能无法初始化     
+- 不支持html文件脚本，直接复制markdown过来的文件可能无法初始化
+- markdown跳转需要将空格换成'-'，比如'[<FaqLink>2. 安卓端测试形式</FaqLink>](./store-test#二、 安卓端测试形式)'替换成'[<FaqLink>2. 安卓端测试形式</FaqLink>](./store-test#二、-安卓端测试形式)'      
 - 仔细检查sidebars.js结构，可能无法初始化左侧导航栏    
 - docusaurus.config.js/#themeConfig.items可以配置多个headerLinks，但是要与sidebars.js对应，否则无法初始化菜单栏  
 - 即便是代码块包裹的dom节点，也会无法编译，导致整个md无法加载。可以尝试用markdown转义符'\'试试  
 - 一定要本地运行一下，检查更改过的代码文件是否能正常打开再pr  
-- 若端口冲突，可手动修改package.json#start脚本；可以添加外部访问ip段，或者指定全部docusaurus start --port 3000 --host 0.0.0.0 
+- 若端口冲突，可手动修改package.json#start脚本；可以添加外部访问ip段，或者指定全部docusaurus start --port 3000 --host 0.0.0.0

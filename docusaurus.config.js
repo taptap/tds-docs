@@ -38,7 +38,7 @@ module.exports = {
         },
         {
           label: '入门指南',
-          to: '/dev-create',
+          to: 'store/store-register',
           position: 'right',
             activeBaseRegex: 'none',
         },

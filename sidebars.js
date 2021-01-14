@@ -34,6 +34,7 @@ module.exports = {
     'store/store-practice',
     'store/store-agree',
     'store/store-admin',
+    'store/store-register',
     'store/store-auth',
     'store/store-material',
     'store/store-creategame',
