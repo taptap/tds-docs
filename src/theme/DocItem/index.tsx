@@ -15,7 +15,7 @@ import DocPaginator from '@theme/DocPaginator';
 import DocVersionSuggestions from '@theme/DocVersionSuggestions';
 import TOC from '@theme/TOC';
 import IconEdit from '@theme/IconEdit';
-import styles from './styles.module.css';
+import styles from './styles.module.scss';
 import { useActivePlugin, useActiveVersion, useVersions } from '@theme/hooks/useDocs';
 import './override.scss'
 

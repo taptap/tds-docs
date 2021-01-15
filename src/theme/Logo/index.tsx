@@ -13,7 +13,7 @@ const Logo = ({ noLabel, onClick }: LogoProp) => {
       <img src='/img/logo.svg' alt="TapTap" />
     </a>
     {!noLabel && <div className={styles.divider} />}
-    {!noLabel && <a className={styles.label} href={DC_DOMAIN_HOST}> Developer Center </a>}
+    {!noLabel && <a className={styles.label} href={DC_DOMAIN_HOST}> 开发者中心 </a>}
   </div>;
 };
 
