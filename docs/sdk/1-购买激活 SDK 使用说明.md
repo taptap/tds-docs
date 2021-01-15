@@ -4,7 +4,7 @@ title: 购买激活 SDK 使用说明
 sidebar_label: 购买激活
 ---
 
-import {Highlight,Link,ImageLink} from '../component.md';
+import {Highlight,Link,ImageLink} from '../component';
 
 <Highlight color='#A0A0A0'>为了游戏售卖服务的 SDK ，避免 APK 流出导致盗版横行；当游戏准备在 TapTap 开放售卖时，请按照此文档操作。</Highlight>
 

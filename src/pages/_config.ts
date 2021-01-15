@@ -1,6 +1,6 @@
 type ActionCellLink = {
   label: string;
-  to: string;
+  to?: string;
   href?: string;
 };
 
