@@ -34,7 +34,7 @@ module.exports = {
           label: '文档首页',
           to: '/',
           position: 'right',
-          activeBaseRegex: '/(?!.+)',
+          activeBaseRegex: '^/(?!.+)',
         },
         {
           label: '游戏商店',
