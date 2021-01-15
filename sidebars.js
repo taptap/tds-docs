@@ -1,6 +1,5 @@
 module.exports = {
   tapsdk: [
-    'sdk/tap-download',
     {
       快速开始: [
         'sdk/tap-android',
@@ -9,7 +8,7 @@ module.exports = {
       ],
     },
     {
-      功能介绍: ['sdk/tap-fun-login', 'sdk/tap-fun-db', 'sdk/tap-fun-moment','sdk/tap-fun-paysdk','sdk/tap-fun-alive','sdk/tap-fun-dlc'],
+      功能介绍: ['sdk/tap-fun-login', 'sdk/tap-fun-db', 'sdk/tap-fun-moment', 'sdk/tap-fun-paysdk', 'sdk/tap-fun-alive', 'sdk/tap-fun-dlc'],
     },
     {
       API: [
@@ -28,6 +27,7 @@ module.exports = {
       常见问题: ['sdk/tap-android-faq', 'sdk/tap-ios-faq', 'sdk/tap-unity-faq', 'sdk/tap-noun'],
     },
     'sdk/tap-changelog',
+    'sdk/tap-download'
   ],
   store: [
     'store/store-about',
@@ -46,6 +46,5 @@ module.exports = {
     'store/store-complaint',
     'store/store-contact',
     'store/store-faq',
-
-  ]
+  ],
 };

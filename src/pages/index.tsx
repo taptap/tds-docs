@@ -28,8 +28,20 @@ const HomePage = () => {
                   <Fragment key={link.label}>
                     {
                       link.href
-                        ? <a href={link.href} rel='noreferrer nofollow noopener' target='_blank'>{link.label}</a>
-                        : <Link className={styles.entryCellActionButton} to={link.to || '/'}> {link.label} </Link>
+                        ? <a
+                          className={styles.entryCellActionButton}
+                          href={link.href}
+                          rel='noreferrer nofollow noopener'
+                          target='_blank'
+                        >
+                          {link.label}
+                        </a>
+                        : <Link
+                          className={styles.entryCellActionButton}
+                          to={link.to || '/'}
+                        >
+                          {link.label}
+                        </Link>
                     }
                     {index < links.length - 1 && <div className={styles.entryCellActionDivider} />}
                   </Fragment>,
