@@ -11,6 +11,7 @@ echo "info: show version information"
 $yqbin --version
 npm --version
 
+npm config set registry https://registry.npm.taobao.org
 npm install
 rm -rf ./build
 SOURCE_VERSION_SHORT="$(git rev-parse --short HEAD)"
