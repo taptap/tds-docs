@@ -2,7 +2,7 @@
  * doc: https://www.docusaurus.cn/docs/docusaurus.config.js
  * */
 module.exports = {
-  title: 'TapSDK',
+  title: 'TapTap 开发者文档中心',
   url: 'https://your-docusaurus-test-site.com', // todo should overwrite
   baseUrl: '/',
   onBrokenLinks: 'throw',
@@ -34,7 +34,7 @@ module.exports = {
           label: '文档首页',
           to: '/',
           position: 'right',
-          activeBaseRegex: '/(?!.+)',
+          activeBaseRegex: '^/(?!.+)',
         },
         {
           label: '游戏商店',
