@@ -1,3 +1,9 @@
+#!/bin/bash
+
+set -o errexit
+set -o nounset
+set -o pipefail
+
 YQ_VERSION=3.4.1
 OS=$(uname -s | tr '[A-Z]' '[a-z]')
 ARCH=amd64
@@ -18,9 +24,10 @@ SOURCE_VERSION_SHORT="$(git rev-parse --short HEAD)"
 echo $SOURCE_VERSION_SHORT
 ARTIFACT_IMAGE="taptap-img-registry-vpc.cn-beijing.cr.aliyuncs.com/tds/tapsdkdoc:${SOURCE_VERSION_SHORT}"
 # yarn build
-node_modules/.bin/docusaurus build
+ret=0
+node_modules/.bin/docusaurus build || ret=$?
 
-if [ $? -eq 0 ]; then 
+if [ req -eq 0 ]; then 
   docker build -t $ARTIFACT_IMAGE . 
   docker push $ARTIFACT_IMAGE        
   docker rmi ${ARTIFACT_IMAGE}   
