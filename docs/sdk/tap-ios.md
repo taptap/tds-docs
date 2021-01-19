@@ -6,21 +6,6 @@ sidebar_label: iOS
 
 本文主要介绍iOS如何将TapSDK快速接入并实现登录功能。
 
-export const Highlight = ({children, color}) => (
-  <span
-    style={{
-      backgroundColor: color,
-      borderRadius: '4px',
-      color: '#fff',
-      padding: '0.2rem',
-    }}>
-    {children}
-  </span>
-);
-
-<!-- <Highlight color="#f9422f">⚠️注意：</Highlight>   -->
-
-<!-- 在接入前请确保您已经仔细阅读过[TapSDK注意事项](./tap-issue.md)，以方便您能更加顺利接入   -->
 
 :::note
 如需通过示例项目了解如何在 iOS 应用中集成 TapSDK，请参阅 GitHub 中的 [TapSDKSample](https://github.com/xindong/TapSDK_iOS)。
@@ -68,9 +53,15 @@ pod update
 ``` -->
 
 <!-- ### 方式二、手动导入 -->
-直接拖拽[下载](#)的SDK到项目目录即可  
+直接拖拽[下载](https://github.com/xindong/TapSDK_iOS/releases)的SDK到项目目录即可    
+```
+//下载目录包含一下三个资源文件都需要导入
+release/TapSDK.framework
+release/TDSCommon.framework
+TDSMomentResource.bundle
+```
 
-![](https://qnblog.ijemy.com/xd_ios_importsdk.png)
+![](https://qnblog.ijemy.com/tap_ios_import2.png)
 
 
 ## 5. 添加系统依赖库
