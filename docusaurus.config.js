@@ -6,7 +6,7 @@ const baseUrl = '/v2-doc/';
 
 module.exports = {
   title: 'TapTap 开发者文档中心',
-  url: 'https://your-docusaurus-test-site.com', // todo should overwrite
+  url: 'https://developer.taptap.com', // todo should overwrite
   baseUrl: baseUrl,
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
