@@ -39,7 +39,7 @@ const HomePage = () => {
                         </a>
                         : <Link
                           className={styles.entryCellActionButton}
-                          to={link.to || '/'}
+                          to={useBaseUrl(link.to)}
                         >
                           {link.label}
                         </Link>
