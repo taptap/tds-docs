@@ -3,7 +3,7 @@
  * */
 module.exports = {
   title: 'TapTap 开发者文档中心',
-  url: 'https://your-docusaurus-test-site.com', // todo should overwrite
+  url: 'https://developer.taptap.com', // todo should overwrite
   baseUrl: '/v2-doc/',
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
