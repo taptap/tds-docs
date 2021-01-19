@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import { Link } from 'react-router-dom';
 import Layout from "@theme/Layout";
 import styles from './styles.module.scss';
@@ -9,7 +10,7 @@ const HomePage = () => {
     <div className={styles.container}>
       <div className={styles.containerContent}>
         <div className={styles.topTitle}>
-          <img src='/img/logo.svg' alt="TapTap" />
+          <img src={useBaseUrl('img/logo.svg')} alt="TapTap" />
           开发者文档中心
         </div>
         <div className={styles.topSubtitle}>
