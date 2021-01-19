@@ -1,10 +1,13 @@
 /**
  * doc: https://www.docusaurus.cn/docs/docusaurus.config.js
  * */
+
+const baseUrl = '/v2-doc/';
+
 module.exports = {
   title: 'TapTap 开发者文档中心',
   url: 'https://developer.taptap.com', // todo should overwrite
-  baseUrl: '/v2-doc/',
+  baseUrl: baseUrl,
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: '/img/favicon.ico',
@@ -34,7 +37,7 @@ module.exports = {
           label: '文档首页',
           to: '/',
           position: 'right',
-          activeBaseRegex: '^/(?!.+)',
+          activeBaseRegex: '^' + baseUrl + '(?!.+)',
         },
         {
           label: '游戏商店',
