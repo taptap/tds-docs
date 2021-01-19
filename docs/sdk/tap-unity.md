@@ -3,23 +3,9 @@ id: tap-unity
 title: TapSDK Unity快速开始
 sidebar_label: Unity
 ---
+import {Highlight} from '../component';
+
 本文主要介绍Unity如何将TapSDK快速接入并实现登录功能。
-
-export const Highlight = ({children, color}) => (
-  <span
-    style={{
-      backgroundColor: color,
-      borderRadius: '4px',
-      color: '#fff',
-      padding: '0.2rem',
-    }}>
-    {children}
-  </span>
-);
-
-<!-- <Highlight color="#f9422f">⚠️注意：</Highlight>   -->
-
-<!-- 在接入前请确保您已经仔细阅读过[TapSDK注意事项](./tap-issue.md)，以方便您能更加顺利接入   -->
 
 
 :::note
@@ -85,6 +71,8 @@ export const Highlight = ({children, color}) => (
 ```
 
 ## 6. 添加SDK引用
+**<Highlight color="#f00">默认无需配置，如果错误提示缺少TapSDK时请按下面步骤配置</Highlight>**
+
 1. 在Assets/scripts/根目录下面创建.amsdef文件如下图即可。
 <!-- 如果项目业务只在指定目录调用TapSDK，也可以只在调用TapSDK处的同级目录下创建
 ![](https://qnblog.ijemy.com/xd_amsdefpng.png) -->
@@ -170,7 +158,7 @@ unity打包apk步骤
 
 `需要配置package name和签名文件`  
 ![](http://qnblog.ijemy.com/xd_unity_android_build.png)
-**需要注意**  
+**<Highlight color='#f00'>需要注意:</Highlight>**  
 到Player Settings-->Other Settings-->Target APILevel确认是否 >= 29  
 当Target APILever < 29时，需要配置manifest，在application节点添加 `tools:remove="android:requestLegacyExternalStorage"`
 ## 12. 导出到Xcode
