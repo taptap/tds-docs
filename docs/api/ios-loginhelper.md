@@ -191,3 +191,10 @@ bool isCNSuport = [TapLoginHelper isTapTapClientSupport];
 ```objectivec
 bool isIOSuport = [TapLoginHelper isTapTapGlobalClientSupport];
 ```
+
+## 错误码
+| 字段          | error | 说明       |
+| ----------- | --- | -------- |
+| AccountGlobalError.LOGIN_ERROR_ACCESS_DENIED       | access_denied   | token失效   |
+| AccountGlobalError.LOGIN_ERROR_INVALID_GRANT     | invalid_grant   |  token失效    |
+| AccountGlobalError.LOGIN_ERROR_PERMISSION_RESULT       | permission_result   | 登录失败，发生在首次登录过程中    |

@@ -60,8 +60,7 @@ public static void RegisterLoginCallback(LoginCallback callback)
 TapSDK.TDSLogin.RegisterLoginCallback(new MyLoginCallback());
 public class MyLoginCallback : TapSDK.LoginCallback{
     public void LoginSuccess(TapSDK.TDSAccessToken accessToken){
-            Debug.Log("Login success");
-            SceneManager.LoadScene("StartScene");
+        Debug.Log("Login success");
     }
 
     public void LoginCancel(){
