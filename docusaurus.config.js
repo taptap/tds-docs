@@ -29,6 +29,9 @@ module.exports = {
       indexName: 'tap-sdk-doc',
       appId: 'TVQNXY05EF',
       contextualSearch: true,
+      searchParameters: {
+        facetFilters: []
+      }
     },
     navbar: {
       title: 'TapSDK Doc',
