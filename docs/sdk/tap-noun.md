@@ -4,6 +4,8 @@ title: TapSDK 名词解释
 sidebar_label: 名词解释
 ---
 
+## client_id
+是一个游戏实体包在 TapTap 开发者中心的唯一身份标识，TapTap 通过 client_id 来鉴别游戏包的身份  
 ## 玩家
 对应一个玩家账户，需要一个唯一的标识符。玩家是统计系统的数据统计基本单位
 ## 设备
