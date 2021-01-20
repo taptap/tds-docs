@@ -28,10 +28,6 @@ module.exports = {
       apiKey: '9158d2e78cea72731892281efc0509c4',
       indexName: 'tap-sdk-doc',
       appId: 'TVQNXY05EF',
-      contextualSearch: true,
-      searchParameters: {
-        facetFilters: []
-      }
     },
     navbar: {
       title: 'TapSDK Doc',
