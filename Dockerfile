@@ -1,2 +1,3 @@
-FROM taptap-img-registry-vpc.cn-beijing.cr.aliyuncs.com/public/nginx-static-site:v0.1.0
+FROM nginx:alpine
 COPY ./build /usr/share/nginx/html
+COPY ./.ci/default.conf /etc/nginx/conf.d/default.conf
