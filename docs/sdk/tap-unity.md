@@ -29,8 +29,7 @@ import {Highlight} from '../component';
 
 ```json
 "dependencies":{
-    //x.x.x为版本信息，请点击上方按钮获取最新版本
-    "com.tds.sdk":"https://github.com/xindong/TAPSDK_UPM.git#x.x.x"
+    "com.tds.sdk":"https://github.com/xindong/TAPSDK_UPM.git#1.0.0"
 }
 ```
 
