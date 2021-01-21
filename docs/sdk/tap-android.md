@@ -7,24 +7,6 @@ slug: /sdk
 
 本文主要介绍Android如何将TapSDK快速接入并实现登录功能。
 
-export const Highlight = ({children, color}) => (
-  <span
-    style={{
-      backgroundColor: color,
-      borderRadius: '4px',
-      color: '#fff',
-      padding: '0.2rem',
-    }}>
-    {children}
-  </span>
-);
-
-<!-- <Highlight color="#f9422f">⚠️注意：</Highlight>   -->
-
-<!-- 在接入前请确保您已经仔细阅读过[TapSDK注意事项](./tap-issue.md)，以方便您能更加顺利接入 -->
-
-
-
 :::note
 如需通过示例项目了解如何在 Android 应用中集成 TapSDK，请参阅 GitHub 中的 [TapSDKSample](https://github.com/xindong/TapSDK_Android)。
 :::
