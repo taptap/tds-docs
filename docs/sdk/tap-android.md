@@ -40,9 +40,9 @@ repositories{
 }  
 dependencies {  
 ...  
-    implementation (name:'TapSDK_x.x.x', ext:'aar')  // 必选: x.x.x 代表所下载的 SDK的版本号
-    implementation (name:'TDSCommon_x.x.x', ext:'aar') // 必选:x.x.x 代表所下载的 SDK的版本号
-    implementation (name:'oaid_sdk_x.x.x', ext:'aar')  // 可选: 使用 TapDB 数据分析功能必选， 以获得更精准的统计
+    implementation (name:'TapSDK_v1.0.0', ext:'aar')  // 必选: x.x.x 代表所下载的 SDK的版本号
+    implementation (name:'TDSCommon_1.1.4', ext:'aar') // 必选:x.x.x 代表所下载的 SDK的版本号
+    implementation (name:'oaid_sdk_1.0.23', ext:'aar')  // 可选: 使用 TapDB 数据分析功能必选， 以获得更精准的统计
 }  
 ```  
 3. 打开AndroidManifest.xml添加网络权限  
