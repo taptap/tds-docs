@@ -29,7 +29,7 @@ import {Highlight} from '../component';
 
 ```json
 "dependencies":{
-    "com.tds.sdk":"https://github.com/xindong/TAPSDK_UPM.git#1.0.0"
+    "com.tds.sdk":"https://github.com/xindong/TAPSDK_UPM.git#1.0.1"
 }
 ```
 

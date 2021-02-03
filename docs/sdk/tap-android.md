@@ -30,7 +30,7 @@ dependencies {
 }
 ```   -->
 <!-- ### 方法二、手动添加 -->
-1. 将[下载](#)的SDK包，导入到 **your project** > **app** > **libs** 目录下  
+1. 将[下载](https://github.com/xindong/TapSDK_Android/releases)的SDK包，导入到 **your project** > **app** > **libs** 目录下  
 2. 打开您工程的 **your project ** > **app** > **build.gradle** 文件，添加gradle配置如下  
 ```java  
 repositories{  
@@ -40,7 +40,7 @@ repositories{
 }  
 dependencies {  
 ...  
-    implementation (name:'TapSDK_v1.0.0', ext:'aar')  // 必选: x.x.x 代表所下载的 SDK的版本号
+    implementation (name:'TapSDK_v1.0.1', ext:'aar')  // 必选: x.x.x 代表所下载的 SDK的版本号
     implementation (name:'TDSCommon_1.1.4', ext:'aar') // 必选:x.x.x 代表所下载的 SDK的版本号
     implementation (name:'oaid_sdk_1.0.23', ext:'aar')  // 可选: 使用 TapDB 数据分析功能必选， 以获得更精准的统计
 }  
@@ -111,7 +111,7 @@ TapLoginHelper.startTapLogin(MainActivity.this,TapLoginHelper.SCOPE_PUBLIC_PROFI
 [startTapLogin()](../api/android-loginhelper.md#starttaplogin)  
 
 ## 8. 登出
-可以先校验该用户是否登录过，对未登录的用户调用login()  
+
 :::caution
 当用户退出登录的时候请务必调用此方法执行退出功能， 避免用户信息错乱。
 :::
