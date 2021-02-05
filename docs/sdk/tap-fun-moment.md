@@ -7,6 +7,7 @@ sidebar_label: 动态
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import {Highlight} from '../component';
 
 `本文主要介绍动态相关功能和使用方式`
 
@@ -254,7 +255,9 @@ TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
 
 
 ## 4. 打开动态页面
-在游戏中，显示游戏动态页面  
+在游戏中，显示游戏动态页面。<Highlight color='#f00'>注意：打开动态页面时，请先屏蔽游戏自身的声音，避免与动态内视频声音产生重合</Highlight>  
+
+
 
 :::caution
 **截止到此步骤，2、3步为必要步骤**

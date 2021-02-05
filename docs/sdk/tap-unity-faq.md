@@ -10,3 +10,9 @@ sidebar_label: Unity
 
 ## The type or namespace name 'TapSDK' could not be found
 不需要手动引入命名空间using TapSDK;直接使用就可以，详情参考[快速开始](./tap-unity#7-初始化)的用法
+
+## 打开动态页面出现视频声音跟游戏声音重合
+请在`openTapMoment`调用时，主动屏蔽游戏声音
+
+## 点击动态后小红点未消失
+动态打开时Tab默认选择的是“全部”，请点击“关注”后小红点会消失
