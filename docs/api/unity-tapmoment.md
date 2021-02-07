@@ -10,13 +10,13 @@ title: TDSMoment
 
 #### API
 
-```c#
+```cs
 public static void InitSDK(string clientId);
 ```
 
 #### 示例代码
 
-```c#
+```cs
 TapSDK.TDSMoment.InitSDK("clientId");
 ```
 
@@ -25,13 +25,13 @@ TapSDK.TDSMoment.InitSDK("clientId");
 
 #### API
 
-```c#
+```cs
 public static void SetCallback(Action<int, string> callback);
 ```
 
 #### 示例代码
 
-```c#
+```cs
 TapSDK.TDSMoment.SetCallback((code,msg)=>{
     Debug.Log(code+"---"+msg);
 });
@@ -42,13 +42,13 @@ TapSDK.TDSMoment.SetCallback((code,msg)=>{
 
 #### API
 
-```c#
+```cs
 public static void SetLoginToken(string accessToken);
 ```
 
 #### 示例代码
 
-```c#
+```cs
 TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
     TapSDK.TDSMoment.SetLoginToken(token.toJSON());
 });
@@ -59,13 +59,13 @@ TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
 
 #### API
 
-```c#
+```cs
 public static void OpenMoment(Orientation config);
 ```
 
 #### 示例代码
 
-```c#
+```cs
 TapSDK.TDSMoment.OpenMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE);
 ```
 
@@ -78,13 +78,13 @@ TapSDK.TDSMoment.OpenMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE);
 
 #### API
 
-```c#
+```cs
 public static void PublishMoment(Orientation config, string[] imagePaths, string content);
 ```
 
 #### 示例代码
 
-```c#
+```cs
 string content = "我是描述";
 string[] images = {"imgpath01","imgpath02","imgpath03"};
 TapSDK.TDSMoment.PublishMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE, images, content);
@@ -95,7 +95,7 @@ TapSDK.TDSMoment.PublishMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE, images,
 
 #### API
 
-```c#
+```cs
 //带封面
 public static void PublishVideoMoment(Orientation config, string[] videoPaths, string[] imagePaths, string title, string desc)
 
@@ -105,7 +105,7 @@ public static void PublishVideoMoment(Orientation config, string[] videoPaths, s
 
 #### 示例代码
 
-```c#
+```cs
 //带封面
 string[] images = {"imgpath01","imgpath02","imgpath03"};
 string[] videos = {"videop01","videop02","videop03"};
@@ -126,13 +126,13 @@ TapSDK.TDSMoment.PublishVideoMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE, vi
 
 #### API
 
-```c#
+```cs
 public static void GetNoticeData();
 ```
 
 #### 示例代码
 
-```c#
+```cs
 TapSDK.TDSMoment.GetNoticeData();
 ```
 
@@ -141,7 +141,7 @@ TapSDK.TDSMoment.GetNoticeData();
 
 #### API
 
-```c#
+```cs
 //直接关闭
 public static void CloseMoment()
 
@@ -151,7 +151,7 @@ public static void CloseMoment(string title, string desc)
 
 #### 示例代码
 
-```c#
+```cs
 //直接关闭
 TapSDK.TDSMoment.CloseMoment();
 
@@ -171,13 +171,13 @@ TapSDK.TDSMoment.CloseMoment(title, desc);
 
 #### API
 
-```c#
+```cs
 public static void SetGameScreenAutoRotate(Boolean auto)
 ```
 
 #### 示例代码
 
-```c#
+```cs
 TapSDK.TDSMoment.SetGameScreenAutoRotate(true);
 ```
 

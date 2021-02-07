@@ -14,6 +14,10 @@ module.exports = {
   organizationName: 'TapTap',
   projectName: 'TapSDK Document',
   themeConfig: {
+    prism: {
+      theme: require('prism-react-renderer/themes/dracula'),
+      additionalLanguages: ['csharp'],
+    },
     image: '/img/logo.svg',
     // todo SEO 数据
     metadatas: [{

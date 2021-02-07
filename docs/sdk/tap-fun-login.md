@@ -39,7 +39,7 @@ groupId="tap-platform"
 
   <TabItem value="unity">
 
-```c#
+```cs
 public static void Init(string clientId, bool isCN, bool isRoundCorner)
 ```
 
@@ -79,7 +79,7 @@ groupId="tap-platform"
   </TabItem>
   <TabItem value="unity">
 
-```c#
+```cs
   /**
   clientId: 控制台获取的clientID
   isCN: 国内外，默认为true
@@ -121,7 +121,7 @@ groupId="tap-platform"
 
   <TabItem value="unity">
 
-```c#
+```cs
 public static void StartLogin(string[] permissions)
 ```
 
@@ -153,7 +153,7 @@ TapLoginHelper.startTapLogin(MainActivity.this, TapTapSdk.SCOPE_PUIBLIC_PROFILE)
   </TabItem>
   <TabItem value="unity">
 
-```c#
+```cs
 TapSDK.TDSLogin.StartLogin(new string[]{"public_profile"});
 ```
   </TabItem>
@@ -187,7 +187,7 @@ public static void logout();
 
   <TabItem value="unity">
 
-```c#
+```cs
 public static void Logout();
 ```
 
@@ -219,7 +219,7 @@ TapLoginHelper.logout();
   </TabItem>
   <TabItem value="unity">
 
-```c#
+```cs
 TapSDK.TDSLogin.Logout();
 ```
   </TabItem>
@@ -253,7 +253,7 @@ public static AccessToken getCurrentAccessToken();
 
   <TabItem value="unity">
 
-```c#
+```cs
 public static void GetCurrentAccessToken(Action<TDSAccessToken> callback)
 ```
 
@@ -295,7 +295,7 @@ if(currentAccessToken.accessToken == nil){
   </TabItem>
   <TabItem value="unity">
 
-```c#
+```cs
 TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
   if (accessToken != null)
   {
@@ -337,7 +337,7 @@ public static Profile getCurrentProfile();
 
   <TabItem value="unity">
 
-```c#
+```cs
 public static void GetCurrentProfile(Action<TDSLoginProfile> callback)
 ```
 
@@ -377,7 +377,7 @@ if(currentProfile != nil){
   </TabItem>
   <TabItem value="unity">
 
-```c#
+```cs
 //需要先判空，否则会崩溃
 TapSDK.TDSLogin.GetCurrentProfile((profile) => {
     if (profile != null) {

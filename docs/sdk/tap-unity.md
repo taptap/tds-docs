@@ -100,7 +100,7 @@ import {Highlight} from '../component';
 ## 7. 初始化
 TapSDK的初始化操作
 #### 示例代码
-```c#
+```cs
 TapSDK.TDSCore.Init("clientId");
 ```
 #### API
@@ -109,7 +109,7 @@ TapSDK.TDSCore.Init("clientId");
 ## 8. 注册回调
 注册登录回调，成功与否的信息在回调中处理
 #### 示例代码
-```c#
+```cs
 TapSDK.TDSLogin.RegisterLoginCallback(new MyLoginCallback());
 public class MyLoginCallback : TapSDK.LoginCallback{
    public void LoginSuccess(TapSDK.TDSAccessToken accessToken){
@@ -132,7 +132,7 @@ public class MyLoginCallback : TapSDK.LoginCallback{
 ## 9. 登录
 TapSDK提供的登录功能，开始登录
 #### 示例代码
-```c#
+```cs
 TapSDK.TDSLogin.StartLogin(new string[]{"public_profile"});
 ```
 
@@ -146,7 +146,7 @@ TapSDK.TDSLogin.StartLogin(new string[]{"public_profile"});
 :::
 
 #### 示例代码
-```c#
+```cs
 TapSDK.TDSLogin.Logout();
 ```
 #### API

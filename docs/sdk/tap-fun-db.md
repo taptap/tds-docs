@@ -43,7 +43,7 @@ groupId="tap-platform"
 
   <TabItem value="unity">
 
-```c#
+```cs
 public static void EnableTapDB(string gameVersion, string channel);
 ```
 
@@ -75,7 +75,7 @@ groupId="tap-platform"
   </TabItem>
   <TabItem value="unity">
 
-```c#
+```cs
 TapSDK.TDSCore.EnableTapDB(gameVersion,gameChannel);
 ```
 
@@ -119,7 +119,7 @@ groupId="tap-platform"
   </TabItem>
   <TabItem value="unity">
 
-```c#
+```cs
 public static void SetUser(string userId)
 
 public static void SetUser(string userId, string loginType)
@@ -155,7 +155,7 @@ groupId="tap-platform"
   </TabItem>
   <TabItem value="unity">
 
-```c#
+```cs
 TapSDK.TDSTapDB.SetUser("userId");
 TapSDK.TDSTapDB.SetUser("userId","loginType");
 ```
@@ -224,7 +224,7 @@ NSString *openId = [currentProfile openid];
   </TabItem>
   <TabItem value="unity">
 
-```c#
+```cs
 TapSDK.TDSLogin.GetCurrentProfile((profile) => {
     string openid = profile.openid;
 });
@@ -261,7 +261,7 @@ groupId="tap-platform"
   </TabItem>
   <TabItem value="unity">
 
-```c#
+```cs
 public static void SetName(string name);
 ```
 
@@ -292,7 +292,7 @@ groupId="tap-platform"
   </TabItem>
   <TabItem value="unity">
 
-```c#
+```cs
 TapSDK.TDSTapDB.SetName("name");
 ```
 
@@ -331,7 +331,7 @@ groupId="tap-platform"
   </TabItem>
   <TabItem value="unity">
 
-```c#
+```cs
 public static void SetLevel(int level);
 ```
 
@@ -362,7 +362,7 @@ groupId="tap-platform"
   </TabItem>
   <TabItem value="unity">
 
-```c#
+```cs
 TapSDK.TDSTapDB.SetLevel(5);
 ```
 
@@ -402,7 +402,7 @@ groupId="tap-platform"
   </TabItem>
   <TabItem value="unity">
 
-```c#
+```cs
 public static void SetServer(string server);
 ```
 
@@ -433,7 +433,7 @@ groupId="tap-platform"
   </TabItem>
   <TabItem value="unity">
 
-```c#
+```cs
 TapSDK.TDSTapDB.SetServer("https://test.taptap.com/callback");
 ```
 
@@ -475,7 +475,7 @@ groupId="tap-platform"
   </TabItem>
   <TabItem value="unity">
 
-```c#
+```cs
 public static void OnCharge(string orderId, string productId, string amount, string currencyType, string payment)
 ```
 
@@ -506,7 +506,7 @@ groupId="tap-platform"
   </TabItem>
   <TabItem value="unity">
 
-```c#
+```cs
 TapSDK.TDSTapDB.OnCharge("0xueiEns","大宝剑","100","CNY","wechat");
 ```
 
@@ -588,7 +588,7 @@ groupId="tap-platform"
   </TabItem>
   <TabItem value="unity">
 
-```c#
+```cs
 public static void OnEvent(string eventCode, string properties)
 ```
 
@@ -625,7 +625,7 @@ NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:@"name",@"Tap zh
   </TabItem>
   <TabItem value="unity">
 
-```c#
+```cs
 TapSDK.TDSTapDB.OnEvent("1000","{\"param1\":\"param1\",\"param2\":\"param2\"}");
 ```
 

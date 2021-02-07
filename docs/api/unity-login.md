@@ -8,7 +8,8 @@ title: TDSLogin
 
 #### API
 
-```c#
+```cs
+
 public static void Init(string clientId)
 
 public static void Init(string clientId, bool isCN, bool isRoundCorner)
@@ -17,7 +18,7 @@ public static void Init(string clientId, bool isCN, bool isRoundCorner)
 
 #### 示例代码
 
-```c#
+```cs
 TapSDK.TDSLogin.Init("clientId");
 
 TapSDK.TDSLogin.Init("clientId", true,true);
@@ -34,13 +35,13 @@ TapSDK.TDSLogin.Init("clientId", true,true);
 
 #### API
 
-```c#
+```cs
 public static void StartLogin(string[] permissions)
 ```
 
 #### 示例代码
 
-```c#
+```cs
 TapSDK.TDSLogin.StartLogin(new string[]{"public_profile"});
 ```
 
@@ -50,13 +51,13 @@ TapSDK.TDSLogin.StartLogin(new string[]{"public_profile"});
 
 #### API
 
-```c#
+```cs
 public static void RegisterLoginCallback(LoginCallback callback)
 ```
 
 #### 示例代码
 
-```c#
+```cs
 TapSDK.TDSLogin.RegisterLoginCallback(new MyLoginCallback());
 public class MyLoginCallback : TapSDK.LoginCallback{
     public void LoginSuccess(TapSDK.TDSAccessToken accessToken){
@@ -80,13 +81,13 @@ public class MyLoginCallback : TapSDK.LoginCallback{
 
 #### API
 
-```c#
+```cs
 public static void UnRegisterLoginCallback()
 ```
 
 #### 示例代码
 
-```c#
+```cs
  TapSDK.TDSLogin.UnRegisterLoginCallback();
 ```
 
@@ -95,13 +96,13 @@ public static void UnRegisterLoginCallback()
 
 #### API
 
-```c#
+```cs
 public static void GetCurrentAccessToken(Action<TDSAccessToken> callback)
 ```
 
 #### 示例代码
 
-```c#
+```cs
 TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
     Debug.Log(token.toJSON());
 });
@@ -112,13 +113,13 @@ TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
 
 #### API
 
-```c#
+```cs
 public static void GetCurrentProfile(Action<TDSLoginProfile> callback)
 ```
 
 #### 示例代码
 
-```c#
+```cs
 TapSDK.TDSLogin.GetCurrentProfile((profile)=>{
     Debug.Log(profile.toJSON());
 });
@@ -129,13 +130,13 @@ TapSDK.TDSLogin.GetCurrentProfile((profile)=>{
 
 #### API
 
-```c#
+```cs
 public static void Logout()
 ```
 
 #### 示例代码
 
-```c#
+```cs
 TapSDK.TDSLogin.Logout();
 ```
 
@@ -143,13 +144,13 @@ TapSDK.TDSLogin.Logout();
 获取accessToken
 #### API
 
-```c#
+```cs
 public static void FetchProfileForCurrentAccessToken(Action<TDSLoginProfile> callback, Action<string> errorCallback)
 ```
 
 #### 示例代码
 
-```c#
+```cs
 TapSDK.TDSLogin.FetchProfileForCurrentAccessToken((profile)=>{          
     Debug.Log(profile.toJSON());
 }, (error)=>{
@@ -162,12 +163,12 @@ TapSDK.TDSLogin.FetchProfileForCurrentAccessToken((profile)=>{
 
 #### API
 
-```c#
+```cs
 public static void ChangeConfig(bool isCN, bool isRoundCorner)
 ```
 
 #### 示例代码
 
-```c#
+```cs
 TapSDK.TDSLogin.ChangeConfig(true,true);
 ```
