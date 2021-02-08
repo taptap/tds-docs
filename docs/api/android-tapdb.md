@@ -11,21 +11,20 @@ title: TapDB
 
 ```java
 public static void setUser(String userId);
-public static void setUser(String userId, String openId, LoginType loginType);
+public static void setUser(String userId, LoginType loginType);
 ```
 
 #### 示例代码
 
 ```java
-TapDB.setUser("xxxxuser1","openId",LoginType.TapTap);
+TapDB.setUser("xxxxuser1", LoginType.TapTap);
 ```
 
 **setUser参数说明**
 
 | 字段        | 可为空 | 说明                                                           |
 | --------- | --- | ------------------------------------------------------------ |
-| userId    | 否   | 长度大于0并小于等于256。只能包含数字、大小写字母、下划线(\_)、横线(-)，用户ID。不同用户需要保证ID的唯一性 |
-| openId    | 否   | 通过第三方登录获取到的openId                                            |
+| userId    | 否   | 长度大于0并小于等于256。只能包含数字、大小写字母、下划线(\_)、横线(-)，用户ID。不同用户需要保证ID的唯一性 |                                           |
 | loginType | 否   | 第三方登录枚举类型，具体见下面说明                                            |
 
 **loginType类型说明**
@@ -170,6 +169,7 @@ try {
 ```
 
 **参数说明**
+
 | 字段         | 可为空 | 说明                                                   |
 | ---------- | --- | ---------------------------------------------------- |
 | eventCode  | 否   | 在控制台中配置得到的事件编码                                       |
