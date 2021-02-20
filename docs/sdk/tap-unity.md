@@ -72,7 +72,7 @@ import {Highlight} from '../component';
 ## 6. 添加SDK引用
 **<Highlight color="#f00">默认无需配置，如果错误提示缺少TapSDK时请按下面步骤配置</Highlight>**
 
-1. 在Assets/scripts/根目录下面创建.amsdef文件如下图即可。
+1. 在<项目脚本语言根目录>下面创建.amsdef文件如下图即可。
 <!-- 如果项目业务只在指定目录调用TapSDK，也可以只在调用TapSDK处的同级目录下创建
 ![](https://qnblog.ijemy.com/xd_amsdefpng.png) -->
 ![](https://qnblog.ijemy.com/xd_unity_amsdef.png)

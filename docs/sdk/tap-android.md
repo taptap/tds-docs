@@ -4,13 +4,11 @@ title: TapSDK Android快速开始
 sidebar_label: Android
 slug: /sdk
 ---
-
 本文主要介绍Android如何将TapSDK快速接入并实现登录功能。
 
 :::note
 如需通过示例项目了解如何在 Android 应用中集成 TapSDK，请参阅 GitHub 中的 [TapSDKSample](https://github.com/xindong/TapSDK_Android)。
 :::
-
 
 ## 1. 登录TapTap开发者中心
 请登录 [TapTap开发者中心](https://www.taptap.com/developer-center) 来创建应用或注册为开发者。
