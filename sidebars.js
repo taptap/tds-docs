@@ -1,6 +1,9 @@
 module.exports = {
   tapsdk: [
     {
+      产品简述: ['pro/pro-in', 'pro/pro-fun'],
+    },
+    {
       快速开始: [
         'sdk/tap-android',
         'sdk/tap-ios',
@@ -21,6 +24,7 @@ module.exports = {
         {
           Unity: ['api/unity-login', 'api/unity-tapdb', 'api/unity-tapmoment'],
         },
+        'api/service',
       ]
     },
     {
