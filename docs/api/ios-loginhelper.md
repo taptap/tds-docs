@@ -114,7 +114,7 @@ tconfig.roundCorner = YES;// NO 则网页登录是边框为直角（默认值为
 #### 示例代码
 
 ```objectivec
-[[[TapLoginHelper alloc] init] logout];
+[TapLoginHelper logout];
 ```
 
 ### currentAccessToken
