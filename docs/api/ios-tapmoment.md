@@ -244,4 +244,4 @@ NSString *version =  [TDSMomentSdk getSdkVersion];
 | TM_RESULT_CODE_MOMENT_PAGE_CLOSED | 30100   | 动态页面关闭 |
 | TM_RESULT_CODE_MOMENT_CLOSE_CANCELLED | 50000   | 取消关闭所有动态界面（弹框点击取消按钮） |
 | TM_RESULT_CODE_MOMENT_CLOSE_CONFIRMED | 50100   | 确认关闭所有动态界面（弹框点击确认按钮） |
-| TM_RESULT_CODE_MOMENT_LOGIN_SUCCEED | 60000   | 动态也没内嵌登录成功 |  
+| TM_RESULT_CODE_MOMENT_LOGIN_SUCCEED | 60000   | 动态页面内登录成功 |  
