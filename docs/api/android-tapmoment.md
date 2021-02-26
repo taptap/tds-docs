@@ -215,6 +215,6 @@ String sdkVersion = TapTapMomentSdk.getSdkVersion();
 | CALLBACK_CODE_MOMENT_DISAPPEAR | 30100   | 自己/好友动态页面关闭 |
 | CALLBACK_CODE_ClOSE_CANCEL | 50000   | 取消关闭所有动态界面（弹框点击取消按钮） |
 | CALLBACK_CODE_ClOSE_CONFIRM | 50100   | 确认关闭所有动态界面（弹框点击确认按钮） |
-| CALLBACK_CODE_LOGIN_SUCCESS | 60000   | 动态也没内嵌登录成功 |
+| CALLBACK_CODE_LOGIN_SUCCESS | 60000   | 动态页面内登录成功 |
 | CALLBACK_CODE_ON_STOP | 500   | 动态回调停止(内部回调，请忽略) |
 | CALLBACK_CODE_ON_RESUME | 6000   | 动态回调开始(内部回调，请忽略) |

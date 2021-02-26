@@ -255,8 +255,10 @@ TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
 
 
 ## 4. 打开动态页面
-在游戏中，显示游戏动态页面。<Highlight color='#f00'>注意：打开动态页面时，请先屏蔽游戏自身的声音，避免与动态内视频声音产生重合</Highlight>  
+在游戏中，显示游戏动态页面。
+> <Highlight color='#f00'>打开动态页面时，请先屏蔽游戏自身的声音，避免与动态内视频声音产生重合 </Highlight>    
 
+> <Highlight color='#f00'>如需要动态能支持横竖屏随设备自动旋转，需要游戏app自身能支持横竖屏(Xcode配置Device Orientation)</Highlight>  
 
 
 :::caution

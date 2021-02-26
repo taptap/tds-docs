@@ -15,4 +15,4 @@ sidebar_label: Unity
 请在`openTapMoment`调用时，主动屏蔽游戏声音
 
 ## 点击动态后小红点未消失
-动态打开时Tab默认选择的是“全部”，请点击“关注”后小红点会消失
+OpenMoment后会刷新动态，小红点逻辑需要游戏手动根据GetNoticeData来改变
