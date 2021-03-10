@@ -11,9 +11,25 @@ OpenAPI 采用统一的 Mac Token 头部签算来传递用户身份。
 
 以下接口，凡标示类似 `GET` `MAC Token` 的，表示这是一个 `GET` 请求，头部要用 `MAC Token` 签算。
 
+## 流程
+1. 移动端用SDK的TapTap登录，可以通过`GetCurrentAccessToken`获取AccessToken，里面包含
+```java
+  public String kid;
+  public String access_token;
+  public String token_type;
+  public String mac_key;
+  public String mac_algorithm;
+  private String json = null;
+```
+
+2. 再把access_token和mac_key发到游戏业务服务器，服务端签算mac token。
+3. 请求https://openapi.taptap.com/account/profile/v1，header携带mac token
+
+> 注意：当前实际返回的kid和access_token值相等，建议使用access_token
+
 ## API
 
-### 当前账户详细信息
+### 获取当前账户详细信息
 
 `GET` `MAC Token` <https://openapi.taptap.com/account/profile/v1>
 
@@ -32,6 +48,12 @@ avatar          | string        | 用户头像图片
 gender         | string       | "female"、"male" 或者空字符串
 openid          | string        | 授权用户唯一标识(每个 client 不同)
 unionid         | string        | 授权用户唯一标识(每个 union 不同)
+
+#### 请求示例
+替换其中的`MAC id`和`client id`为自己签算的mac token和控制台的client id
+```
+curl -s -H 'Authorization:MAC id="1/hhykMJFMExXBLJrbW823QN3j-O2-MRLBm13XaHNscXgRvLEGQiE2mjXvFIWN_fapPk5dfAcq59kkRD1BUrsocJ1uVWpq5OzGBZ9rwae9-nZ50nzpDLRooFTNT8iTPHmRSH3v0nTk1m4b2-NhXqpGya8t96DQF9zkhf68IkbwIgmDy4GoGVrgVcjFh0xHwLG_4rlwtVR5BZ8-Twyx1PhPjDc8trycgN2i6e-2ivfP6zxrnQr5kW03yQ0QMMgS01Inx4DRcgXMSYPCeNqIxwA6j7WlyrNgU0X0qwnnWBugKOzbJPxA-rgKDu8zVmaly6Xl654V21z2GhWwIfLnil0R6A",ts="1615196300",nonce="abcdef",mac="RgNtmn57fFQB5Ztw7a2KuQyiWkg="' "https://openapi.taptap.com/account/profile/v1?client_id=<clien id>"
+```
 
 ### 主动撤销 Token
 
@@ -63,6 +85,40 @@ MAC Token 包含以下字段：
 
 使用 Mac Token 签算一个接口：
 
+#### 脚本
+可用此脚本验证直接替换参数，用来验证自己服务端签算的mac token是否正确  
+CLIENT_ID替换为控制台获取的`client id`，ACCESS_TOKEN和MAC_KEY为客户端登录成功后的`access_token`、`mac_key`
+```
+#!/usr/bin/env bash
+
+# 客户端 ID
+CLIENT_ID="请替换为控制台的client id"
+# SDK 获取的 access_token
+ACCESS_TOKEN="1/hhykMJFMExXBLJrbW823QN3j-O2-MRLBm13XaHNscXgRvLEGQiE2mjXvFIWN_fapPk5dfAcq59kkRD1BUrsocJ1uVWpq5OzGBZ9rwae9-nZ50nzpDLRooFTNT8iTPHmRSH3v0nTk1m4b2-NhXqpGya8t96DQF9zkhf68IkbwIgmDy4GoGVrgVcjFh0xHwLG_4rlwtVR5BZ8-Twyx1PhPjDc8trycgN2i6e-2ivfP6zxrnQr5kW03yQ0QMMgS01Inx4DRcgXMSYPCeNqIxwA6j7WlyrNgU0X0qwnnWBugKOzbJPxA-rgKDu8zVmaly6Xl654V21z2GhWwIfLnil0R6A"
+# SDK 获取的 mac_key
+MAC_KEY="URpUGfaVHjpQUSeJ2R7pxfVvmY4lEFtgakccSlUQ"
+
+# 随机数，正式上线请替换
+NONCE="abcdef"
+# 当前时间戳
+TS=$(date +%s)
+
+# 请求方法
+METHOD="GET"
+# 请求地址 (带 query string)
+REQUEST_URI="/account/profile/v1?client_id=${CLIENT_ID}"
+# 请求域名
+REQUEST_HOST="openapi.taptap.com"
+
+MAC=$(printf "%s\n%s\n%s\n%s\n%s\n443\n\n" "${TS}" "${NONCE}" "${METHOD}" "${REQUEST_URI}" "${REQUEST_HOST}" | openssl dgst -binary -sha1 -hmac ${MAC_KEY} | base64)
+
+AUTHORIZATION=$(printf 'MAC id="%s",ts="%s",nonce="%s",mac="%s"' "${ACCESS_TOKEN}" "${TS}" "${NONCE}" "${MAC}")
+
+curl -s -H"Authorization:${AUTHORIZATION}" "https://openapi.taptap.com/account/profile/v1?client_id=${CLIENT_ID}"
+```
+
+
+#### PHP代码示例
 ```php
 
 $url = 'http://api.domain.com/protected-resource?a=b';
@@ -104,6 +160,8 @@ function buildSignature($signatureBaseString, $signatureSecret) {
 }
 
 ```
+
+
 
 ### 通用接口错误信息
 
