@@ -47,7 +47,7 @@ import {Highlight} from '../component';
     android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
 ```
 ### iOS配置
-在Assets/Plugins/IOS/Resource目录下创建TDS-Info.plist文件，复制以下代码并且替换其中的`ClientId`和`授权文案`
+在Assets/Plugins/iOS/Resource目录下创建TDS-Info.plist文件，复制以下代码并且替换其中的`ClientId`和`授权文案`
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
