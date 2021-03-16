@@ -6,9 +6,10 @@ sidebar_label: 数据收集
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import {Highlight} from '../component';
 
 :::caution
-**目前 需要联系[运营团队](#)获取 TapDB 的使用权限。**
+**目前 需要联系运营团队获取 TapDB 的使用权限。**
 :::
 
 `本文介绍数据收集相关功能和使用方式`
@@ -684,28 +685,13 @@ timestamp | long | 当前统计数据的时间戳(秒)。TapDB会按照自然5�
 
 成功判断：返回的HTTP Code为200时认为发送成功，否则认为失败
 
-## 10. 收集OAID
-TapSDK支持OAID获取功能
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
+## 10. 收集设备指纹
+### OAID方式
+自行选择是否引入OAID，TapSDK支持OAID版本为1.0.5-1.0.23
+- 如果自己有集成其他SDK使用到OAID，TapSDK可以直接使用
+- 如果没有集成其他OAID版本，我们推荐下载 [oaid_sdk_1.0.23.aar](https://qnblog.ijemy.com/oaid_sdk_1.0.23.aar)
 
-需要[下载](https://github.com/xindong/TapSDKAndroid/releases)oaid_sdk_1.0.23.aar放⼊入项⽬ libs目录下
-  </TabItem>
+### 数美SDK收集
+  <Highlight color='#f00'> ⬇️ 数美定制版，仅支持当前下载渠道</Highlight>
 
-
-  <TabItem value="ios">
-
-
-  </TabItem>
-
-  <TabItem value="unity">
-
-  </TabItem>
-</Tabs>
+[下载SDK](https://qnblog.ijemy.com/xdwl-pri-release.aar)
