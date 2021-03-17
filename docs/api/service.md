@@ -23,7 +23,7 @@ OpenAPI 采用统一的 Mac Token 头部签算来传递用户身份。
 ```
 
 2. 再把access_token和mac_key发到游戏业务服务器，服务端签算mac token。
-3. 请求https://openapi.taptap.com/account/profile/v1，header携带mac token
+3. 请求https://openapi.taptap.com/account/profile/v1 ， header携带mac token
 
 > 注意：当前实际返回的kid和access_token值相等，建议使用access_token
 

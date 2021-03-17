@@ -1,6 +1,6 @@
 ---
 id: tap-fun-moment
-title: TDSMoment
+title: 动态社区
 sidebar_label: 动态
 ---
 
@@ -9,10 +9,10 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import {Highlight} from '../component';
 
-`本文主要介绍动态相关功能和使用方式`
+本文主要介绍动态相关的使用方式，详细产品介绍请参考[动态产品介绍](/pro/pro-fun#二、动态)
 
 ## 1. 介绍
-TapSDK提供可供用户发布动态到TapTapApp和游戏内部展示动态的控件和功能。  
+内嵌动态基于TapTap 内容社区的功能和游戏本身的账号系统的更多融合，成功接入内嵌动态SDK后玩家即可通过游戏直接访问TapTap内容和自带功能。同时内嵌动态SDK也为游戏打造个性化内容或服务提供了开放功能。
 
 ## 2. 功能开启
 API放在init初始化SDK之后调用即可  
@@ -335,7 +335,6 @@ TapSDK.TDSMoment.OpenMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE);
 
 ## 5. 发布动态
 
-### 普通动态
 普通动态包括图片和对应的内容描述
 
 #### API   
@@ -414,7 +413,7 @@ TapSDK.TDSMoment.PublishMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE, images,
   </TabItem>
 </Tabs>
 
-### 发布视频动态
+<!-- ### 发布视频动态
 
 视频动态包括视频和图片（可选）
 
@@ -523,7 +522,7 @@ config | 否 | 发布动态图片或者视频的横竖屏配置
 videos | 否 | 视频文件路径，数组形式呈现
 images | 是 | 视频封面图，可以不配置
 title | 否 | 动态标题
-content | 是 | 动态描述
+content | 是 | 动态描述 -->
 
 
 
@@ -545,7 +544,7 @@ groupId="tap-platform"
 TapTapMomentSdk.getNoticeData();
   ```
   返回结果会通过动态回调通知游戏。  
-  `code == CALLBACK_CODE_GET_NOTICE_SUCCESS`(20000)表示获取成功，`msg` 即为消息数量。   
+  `code == CALLBACK_CODE_GET_NOTICE_SUCCESS`(20000)表示获取成功，`msg` 为0表示无新消息，为1表示有新消息。   
   `CALLBACK_CODE_GET_NOTICE_FAIL`(20100)表示获取失败
   </TabItem>
 
@@ -555,7 +554,7 @@ TapTapMomentSdk.getNoticeData();
 + (void)fetchNewMessage;
   ```
   结果在 `Delegate` 下的 `onMomentCallbackWithCode:msg:`中返回。  
-  `code == CALLBACK_CODE_GET_NOTICE_SUCCESS`(20000)表示获取成功，`msg` 即为消息数量。   
+  `code == CALLBACK_CODE_GET_NOTICE_SUCCESS`(20000)表示获取成功，`msg` 为0表示无新消息，为1表示有新消息。   
   `CALLBACK_CODE_GET_NOTICE_FAIL`(20100)表示获取失败
   </TabItem>
   <TabItem value="unity">
@@ -731,3 +730,9 @@ desc | 否 | 动态描述
 
   </TabItem>
 </Tabs>
+
+## 8. 注意事项
+- 打开动态页面时，请先屏蔽游戏自身的声音，避免与动态内视频声音产生重合
+- 如需要动态能支持横竖屏随设备自动旋转，需要游戏app自身能支持横竖屏(Xcode配置Device Orientation)
+- 小红点建议请求频率1次/1分钟
+- 动态内的背景图是可配置的，具体配置位置[点击查看](https://qnblog.ijemy.com/xd_moment_bg.png)，且需要等待审核，请提前配置

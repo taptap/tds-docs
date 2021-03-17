@@ -11,18 +11,26 @@ module.exports = {
       ],
     },
     {
-      功能介绍: ['sdk/tap-fun-login', 'sdk/tap-fun-db', 'sdk/tap-fun-moment'],
+      功能介绍: ['sdk/tap-fun-login',
+      //'sdk/tap-fun-db',
+      'sdk/tap-fun-moment'],
     },
     {
       API: [
         {
-          Android: ['api/android-initializer', 'api/android-loginhelper', 'api/android-tapdb', 'api/android-tapmoment'],
+          Android: ['api/android-initializer', 'api/android-loginhelper',
+          //'api/android-tapdb',
+          'api/android-tapmoment'],
         },
         {
-          iOS: ['api/ios-initializer', 'api/ios-loginhelper', 'api/ios-tapdb', 'api/ios-tapmoment'],
+          iOS: ['api/ios-initializer', 'api/ios-loginhelper',
+          //'api/ios-tapdb',
+          'api/ios-tapmoment'],
         },
         {
-          Unity: ['api/unity-login', 'api/unity-tapdb', 'api/unity-tapmoment'],
+          Unity: ['api/unity-login',
+          //'api/unity-tapdb', 
+          'api/unity-tapmoment'],
         },
         'api/service',
       ]
