@@ -68,7 +68,7 @@ TdsInitializer.init(tdsConfig);
 
 #### API
 
-[TdsInitializer.init()](../api/android-initializer.md#init)  
+[TdsInitializer.init()](/api/android-initializer.md#init)  
 
 ## 6. 注册登录回调
 监听登录的结果  
@@ -94,7 +94,7 @@ TapLoginHelper.registerLoginCallback(new TapLoginResultCallback() {
 ```
 
 #### API  
-[registerLoginCallback()](../api/android-loginhelper.md#registerlogincallback)
+[registerLoginCallback()](/api/android-loginhelper.md#registerlogincallback)
 
 ## 7. 登录
 TapTap登录，当没有安装TapTap app时，会打开内置webview进行TapTap验证登录
@@ -106,7 +106,7 @@ TapTap登录，当没有安装TapTap app时，会打开内置webview进行TapTap
 TapLoginHelper.startTapLogin(MainActivity.this,TapLoginHelper.SCOPE_PUBLIC_PROFILE);
 ```
 #### API
-[startTapLogin()](../api/android-loginhelper.md#starttaplogin)  
+[startTapLogin()](/api/android-loginhelper.md#starttaplogin)  
 
 ## 8. 登出
 

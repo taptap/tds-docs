@@ -87,7 +87,7 @@ TapSDK.TDSCore.EnableTapDB(gameVersion,gameChannel);
 
 字段 | 必须 | 说明  
 ------ | ------ | ------
-channel | 否 | [分包渠道](./tap-noun#分包渠道)。长度大于0并小于等于256的字符串。
+channel | 否 | [分包渠道](/sdk/tap-noun#分包渠道)。长度大于0并小于等于256的字符串。
 gameVersion | 否 | 游戏版本。长度大于0并小于等于256的字符串。为空时，自动获取游戏安装包的版本（AndroidManifest.xml中的versionName）
 
 
