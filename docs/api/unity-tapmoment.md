@@ -74,7 +74,6 @@ TapSDK.TDSMoment.OpenMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE);
 | Orientation | 否   |ORIENTATION_LANDSCAPE:横屏，ORIENTATION_PORTRAIT:竖屏 |
 
 ### PublishMoment
-发布普通动态
 
 #### API
 
@@ -90,7 +89,7 @@ string[] images = {"imgpath01","imgpath02","imgpath03"};
 TapSDK.TDSMoment.PublishMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE, images, content);
 ```
 
-### PublishVideoMoment
+<!-- ### PublishVideoMoment
 发布视频动态
 
 #### API
@@ -119,7 +118,7 @@ string[] videos = {"videop01","videop02","videop03"};
 string title = "我是动态";
 string desc = "我是描述";
 TapSDK.TDSMoment.PublishVideoMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE, videos,title,desc);
-```
+``` -->
 
 ### GetNoticeData
 获取用户新增通知

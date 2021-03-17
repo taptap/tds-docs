@@ -80,7 +80,7 @@ String[] imagePaths = new String[] { "content://***.jpg","/sdcard/**.jpg" };
 TapTapMomentSdk.publishMoment(config, imagePaths, content);
 ```
 
-### publishVideoMoment
+<!-- ### publishVideoMoment
 
 发布视频动态
 
@@ -112,7 +112,7 @@ TapTapMomentSdk.publishVideoMoment(config, videoPaths, imagePaths, title, conten
 | videoPaths | 否   | 视频文件路径，数组形式呈现    |
 | imgPaths   | 是   | 视频封面图，可以不配置      |
 | title      | 否   | 动态标题             |
-| content    | 是   | 动态描述             |
+| content    | 是   | 动态描述             | -->
 
 ### getNoticeData
 

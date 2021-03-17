@@ -129,7 +129,7 @@ config.orientation = TDSMomentOrientationDefault;
 + (void)fetchNewMessage;
 ```
 
-  结果在 `Delegate` 下的 `onMomentCallbackWithCode:msg:`, code == TM_RESULT_CODE_NEW_MSG_SUCCEED时，`msg` 即为消息数量
+  结果在 `Delegate` 下的 `onMomentCallbackWithCode:msg:`, code == TM_RESULT_CODE_NEW_MSG_SUCCEED时，`msg` 0为无新消息，1为有新消息
 
 #### 示例代码
 

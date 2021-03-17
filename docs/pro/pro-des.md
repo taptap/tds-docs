@@ -3,7 +3,7 @@ id: pro-des
 title: 产品概述
 sidebar_label: 产品概述
 ---
-
+算了我编不下去了，此页暂时放弃
 <!-- https://cloud.tencent.com/document/product/647/46351 -->
 ## 概述
 TapTap 是一个游戏推荐平台，亦是一个高品质玩家社区。
