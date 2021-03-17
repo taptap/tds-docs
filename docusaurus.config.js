@@ -6,7 +6,7 @@ const baseUrl = '/v2-doc/';
 
 module.exports = {
   title: 'TapTap 开发者文档中心',
-  url: 'https://developer.taptap.com', // todo should overwrite
+  url: 'https://developer.taptap.com/v2-doc',
   baseUrl: baseUrl,
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -19,10 +19,9 @@ module.exports = {
       additionalLanguages: ['csharp'],
     },
     image: '/img/logo.svg',
-    // todo SEO 数据
     metadatas: [{
       name: 'keywords',
-      content: 'taptap tds'
+      content: 'taptap tds 开发者 文档中心'
     }],
     colorMode: {
       defaultMode: 'light',

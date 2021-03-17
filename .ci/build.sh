@@ -15,10 +15,8 @@ chmod +x $yqbin
 
 echo "info: show version information"
 $yqbin --version
-npm --version
-
-npm config set registry https://registry.npm.taobao.org
-npm install
+yarn --version
+yarn install
 rm -rf ./build
 SOURCE_VERSION_SHORT="$(git rev-parse --short HEAD)"
 echo $SOURCE_VERSION_SHORT
