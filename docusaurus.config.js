@@ -1,5 +1,5 @@
 /**
- * doc: https://www.docusaurus.cn/docs/docusaurus.config.js
+ * doc: https://v2.docusaurus.io/docs/docusaurus.config.js
  * */
 
 const baseUrl = '/v2-doc/';
@@ -65,9 +65,25 @@ module.exports = {
             },
           ],
         },
+        {
+          type: 'localeDropdown',
+          position: 'right',
+        },
       ],
     },
     footer: {}
+  },
+  i18n: {
+    defaultLocale: 'zh-Hans',
+    locales: ['zh-Hans', 'en'],
+    localeConfigs: {
+      en: {
+        label: 'English',
+      },
+      'zh-Hans': {
+        label: '简体中文',
+      },
+    },
   },
   presets: [
     [
