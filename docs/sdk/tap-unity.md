@@ -104,7 +104,7 @@ TapSDK的初始化操作
 TapSDK.TDSCore.Init("clientId");
 ```
 #### API
-[Init](/sdk/api/unity-login.md/#init)
+[Init](/api/unity-login.md/#init)
 
 ## 8. 注册回调
 注册登录回调，成功与否的信息在回调中处理
@@ -127,7 +127,7 @@ public class MyLoginCallback : TapSDK.LoginCallback{
 ```
 
 #### API
-[RegisterLoginCallback](/sdk/api/unity-login.md/#registerlogincallback)
+[RegisterLoginCallback](/api/unity-login.md/#registerlogincallback)
 
 ## 9. 登录
 TapSDK提供的登录功能，开始登录
@@ -137,7 +137,7 @@ TapSDK.TDSLogin.StartLogin(new string[]{"public_profile"});
 ```
 
 #### API
-[StartLogin](/sdk/api/unity-login.md/#startlogin)
+[StartLogin](/api/unity-login.md/#startlogin)
 
 ## 10. 登出
 
@@ -150,7 +150,7 @@ TapSDK.TDSLogin.StartLogin(new string[]{"public_profile"});
 TapSDK.TDSLogin.Logout();
 ```
 #### API
-[Logout](/sdk/api/unity-login.md/#logout)
+[Logout](/api/unity-login.md/#logout)
 
 ## 11. 导出到Android
 unity打包apk步骤  
