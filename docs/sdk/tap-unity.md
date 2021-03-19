@@ -9,7 +9,7 @@ import {Highlight} from '../component';
 
 
 :::note
-如需通过示例项目了解如何在 Unity 引擎中集成 TapSDK，请参阅 GitHub 中的 [TapSDKSample](https://github.com/xindong/TapSDK_Unity_Demo)。
+如需通过示例项目了解如何在 Unity 引擎中集成 TapSDK，请参阅 GitHub 中的 [TapSDK_Unity_Demo](https://github.com/xindong/TapSDK_Unity_Demo) 示例项目。
 :::
 
 
