@@ -16,7 +16,7 @@ module.exports = {
   themeConfig: {
     prism: {
       theme: require('prism-react-renderer/themes/dracula'),
-      additionalLanguages: ['csharp'],
+      additionalLanguages: ['csharp', 'java'],
     },
     image: '/img/logo.svg',
     metadatas: [{
