@@ -1,4 +1,5 @@
 import React, { Fragment } from 'react';
+import Translate from '@docusaurus/Translate';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import { Link } from 'react-router-dom';
 import Layout from "@theme/Layout";
@@ -11,7 +12,7 @@ const HomePage = () => {
       <div className={styles.containerContent}>
         <div className={styles.topTitle}>
           <img src={useBaseUrl('img/logo.svg')} alt="TapTap" />
-          开发者文档中心
+          <Translate id="tds-开发者文档中心" description="from HomePage">开发者文档中心</Translate>
         </div>
         <div className={styles.topSubtitle}>
           这里为用户提供游戏开发者相关文档和常见问题，包含游戏商店设置、SDK功能说明及TapTap品牌资源下载。
