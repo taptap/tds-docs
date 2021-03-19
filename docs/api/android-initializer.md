@@ -22,7 +22,7 @@ init(TdsConfig config);
 ```java
 TdsConfig tdsConfig = new TdsConfig.Builder()
                 .appContext(MainActivity.this)
-                .clientId(Config.CID)
+                .clientId("client id")
                 .build();
 TdsInitializer.init(tdsConfig);
 ```
@@ -34,7 +34,7 @@ TdsInitializer.init(tdsConfig);
 | clientId   | 否   | 开发者中心获取的client Id |
 | appContext | 否   | 当前Activity        |
 
-### enableTapDB
+<!-- ### enableTapDB
 
 #### API  
 
@@ -53,7 +53,7 @@ TdsInitializer.enableTapDB(MainActivity.this, "1.0", "default");
 | 字段          | 可选  | 说明                                                                    |
 | ----------- | --- | --------------------------------------------------------------------- |
 | channel     | 是   | 长度大于0并小于等于256。分包渠道。1.2.名词解释中有介绍                                       |
-| gameVersion | 是   | 长度大于0并小于等于256。游戏版本。为空时，自动获取游戏安装包的版本（AndroidManifest.xml中的versionName） |
+| gameVersion | 是   | 长度大于0并小于等于256。游戏版本。为空时，自动获取游戏安装包的版本（AndroidManifest.xml中的versionName） | -->
 
 ### enableMoment
 

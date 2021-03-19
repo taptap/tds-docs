@@ -1,8 +1,7 @@
 module.exports = {
   tapsdk: [
-    {
-      产品简述: ['pro/pro-in', 'pro/pro-fun'],
-    },
+    'pro/pro-fun',
+    'pro/pro-in',
     {
       快速开始: [
         'sdk/tap-android',
@@ -29,15 +28,16 @@ module.exports = {
         },
         {
           Unity: ['api/unity-login',
-          //'api/unity-tapdb', 
+          //'api/unity-tapdb',
           'api/unity-tapmoment'],
         },
         'api/service',
       ]
     },
     {
-      常见问题: ['sdk/tap-android-faq', 'sdk/tap-ios-faq', 'sdk/tap-unity-faq', 'sdk/tap-noun'],
+      常见问题: ['sdk/tap-android-faq', 'sdk/tap-ios-faq', 'sdk/tap-unity-faq'],
     },
+    'sdk/tap-noun',
     'sdk/tap-changelog',
     'sdk/tap-download'
   ],
