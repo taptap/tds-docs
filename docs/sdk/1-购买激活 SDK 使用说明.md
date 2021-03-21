@@ -90,45 +90,45 @@ https://img.tapimg.com/market/images/a6c4670a09d7e42dd68d910cfd29865e.png
 
 ② 游戏启动时执行如下代码：
 
-```
-    TapLicense.INSTANCE.checkLicense();
+```cs
+TapLicense.INSTANCE.checkLicense();
 ```
 
 ③ 需要授权成功的回调的话请使用如下代码（参考Demo.cs）
 
-```
-    TapLicense.INSTANCE.checkLicense(onLicenseSuccess);
+```cs
+TapLicense.INSTANCE.checkLicense(onLicenseSuccess);
 ```
 
 ④ 继承 UnityPlayerActivity 并拦截 UnityActivity 的 onActivityResult 方法  
 
-```
-      @Override
-      protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        TapTapLicense.onActivityResult(requestCode, resultCode, data);
-      }
+```java
+@Override
+protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+  super.onActivityResult(requestCode, resultCode, data);
+  TapTapLicense.onActivityResult(requestCode, resultCode, data);
+}
 ```
 
 ⑤ 如果没有额外自定义主 Activity 的需求，可直接拷贝下面代码至 AndroidManifest 内， 即可使用 SDK 中预留的 TapTapUnityActivity。
 
-```
-   <?xml version="1.0" encoding="utf-8"?>
-    <manifest
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        package="com.unity3d.player"
-        xmlns:tools="http://schemas.android.com/tools">
-        <application>
-            <activity android:name="com.taptap.pay.sdk.library.TapTapUnityActivity"
-                      android:theme="@style/UnityThemeSelector">
-                <intent-filter>
-                    <action android:name="android.intent.action.MAIN" />
-                    <category android:name="android.intent.category.LAUNCHER" />
-                </intent-filter>
-                <meta-data android:name="unityplayer.UnityActivity" android:value="true" />
-            </activity>
-        </application>
-    </manifest>
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.unity3d.player"
+    xmlns:tools="http://schemas.android.com/tools">
+    <application>
+        <activity android:name="com.taptap.pay.sdk.library.TapTapUnityActivity"
+                  android:theme="@style/UnityThemeSelector">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <meta-data android:name="unityplayer.UnityActivity" android:value="true" />
+        </activity>
+    </application>
+</manifest>
 ```
 
 ![小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)
@@ -144,29 +144,29 @@ https://img.tapimg.com/market/images/a6c4670a09d7e42dd68d910cfd29865e.png
 
 ② 游戏Activity创建的时候调用如下代码：
 
-```
-   @Override
-   protected void onCreate(Bundle savedInstanceState) {
-     super.onCreate(savedInstanceState);
+```java
+@Override
+protected void onCreate(Bundle savedInstanceState) {
+ super.onCreate(savedInstanceState);
 
-  //需要回调的话请在check()之前添加回调
-      TapTapLicense.setLicenseCallback(new LicenseCallback() {
-        @Override
-        public void onLicenseSuccess() {
-          // 授权成功
-        }
-      });
+//需要回调的话请在check()之前添加回调
+  TapTapLicense.setLicenseCallback(new LicenseCallback() {
+    @Override
+    public void onLicenseSuccess() {
+      // 授权成功
+    }
+  });
 
-     TapTapLicense.check(this);
-   }
+ TapTapLicense.check(this);
+}
 ```
 ③ 拦截 Activity 的 onActivityResult  
-```
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-      super.onActivityResult(requestCode, resultCode, data);
-      TapTapLicense.onActivityResult(requestCode, resultCode, data);
-    }
+```java
+@Override
+protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+  super.onActivityResult(requestCode, resultCode, data);
+  TapTapLicense.onActivityResult(requestCode, resultCode, data);
+}
 ```
 
 ![小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)
@@ -212,7 +212,7 @@ AntiAddiction.StandAlone.AntiAddiction.init(onAntiAddictionResult);
 
 在需要验证用户信息（登录）的时候调用 checkState 接口。
 
-```
+```cs
 AntiAddiction.StandAlone.AntiAddiction.checkState();
 ```
 
@@ -221,22 +221,22 @@ AntiAddiction.StandAlone.AntiAddiction.checkState();
 
 为了跟踪用户游戏时长，游戏需要在监听启动和停止的地方调用 SDK 的对应方法, 例如 Unity 的 OnApplicationPause 方法，代码示例如下：
 
-```
-	void OnApplicationPause(bool pauseStatus)
+```cs
+void OnApplicationPause(bool pauseStatus)
+{
+	if (pauseStatus)
 	{
-		if (pauseStatus)
-		{
-			AntiAddiction.StandAlone.AntiAddiction.onStop();
+		AntiAddiction.StandAlone.AntiAddiction.onStop();
 
-             /// 在游戏暂时进入后台时，也要主动调用 Onstop，避免玩家暂时退出游戏时，仍在统计时长  
+           /// 在游戏暂时进入后台时，也要主动调用 Onstop，避免玩家暂时退出游戏时，仍在统计时长  
 
-		}
-		else
-		{
-			AntiAddiction.StandAlone.AntiAddiction.onResume();
-
-		}
 	}
+	else
+	{
+		AntiAddiction.StandAlone.AntiAddiction.onResume();
+
+	}
+}
 
 ```
 
@@ -244,7 +244,7 @@ AntiAddiction.StandAlone.AntiAddiction.checkState();
 
 为限制用户过度消费，游戏每次付费前需调用该接口来获取当前用户消费状态，示例如下：
 
-```
+```cs
 AntiAddiction.StandAlone.AntiAddiction.checkPayLimit(5000);
 ```
 参数的金额单位为分，SDK 通过回调通知游戏是否可以继续付费。
@@ -253,7 +253,7 @@ AntiAddiction.StandAlone.AntiAddiction.checkPayLimit(5000);
 
 用户成功付费后，游戏需要调用本接口，更新用户的付费数据。代码示例如下：
 
-```
+```cs
 AntiAddiction.StandAlone.AntiAddiction.paySuccess(5000);
 ```
 参数的金额单位为分，结果会通过回调通知游戏。
@@ -262,7 +262,7 @@ AntiAddiction.StandAlone.AntiAddiction.paySuccess(5000);
 
 用户登录后。游戏可以获取当前用户的类型，示例如下：
 
-```
+```cs
 int type = AntiAddiction.StandAlone.AntiAddiction.getUserType();
 ```
 返回值为用户的年龄段信息，具体如下：
@@ -317,8 +317,8 @@ int type = AntiAddiction.StandAlone.AntiAddiction.getUserType();
 游戏通过打开调试开关,方便检测 SDK 接入的正确性。   
 示例：
 
-```
-  AntiAddictionKit.setDebug(true);
+```java
+AntiAddictionKit.setDebug(true);
 ```
 
 
@@ -326,12 +326,12 @@ int type = AntiAddiction.StandAlone.AntiAddiction.getUserType();
 
 游戏接入 SDK 时，首先要调用 SDK 的初始化接口，一般在主 Activity 的 onCreate 方法中，接口声明如下：
 
-```
+```java
  init(Activity activity,AntiAddictionCallback protectCallBack,boolean autoTip)
 ```
 第二个参数是游戏中防沉迷触发的回调，当用户因宵禁或时长用完时，SDK 会触发该回调。第三个参数是游戏是否展示防沉迷提示倒计时弹框，使用示例如下：
 
-```
+```java
 AntiAddictionKit.init(this, new AntiAddictionKit.AntiAddictionCallback() {
             @Override
             public void onAntiAddictionResult(int resultCode, String msg) {
@@ -363,7 +363,7 @@ AntiAddictionKit.init(this, new AntiAddictionKit.AntiAddictionCallback() {
 为对当前游戏的用户信息、客户端版本等信息进行校验，游戏需要调用 checkState 方法(可以看作是登录接口)。  
 示例如下：  
 
-```
+```java
 AntiAddictionKit.checkState();
 
 ```
@@ -373,25 +373,25 @@ AntiAddictionKit.checkState();
 
 为了跟踪用户游戏时长，游戏需要在项目的主 Activity 中的 onResume 和 onStop 方法 或 其他监听游戏启动和停止的地方调用 SDK 的对应方法，代码示例如下：
 
-```
-	@Override
-    protected void onResume() {
-        super.onResume();
-        AntiAddictionKit.onResume();
-    }
+```java
+@Override
+  protected void onResume() {
+      super.onResume();
+      AntiAddictionKit.onResume();
+  }
 
-    @Override
-    protected void onStop() {
-        super.onStop();
-        AntiAddictionKit.onStop();
-    }
+  @Override
+  protected void onStop() {
+      super.onStop();
+      AntiAddictionKit.onStop();
+  }
 
 ```
 
 ⑥ 付费检查
 为了限制用户过度消费，游戏需要在付费前调用该接口检查用户是否可以付费，代码示例如下：
 
-```
+```java
  AntiAddictionKit.checkPayLimit(50*100);
 ```
 参数的金额单位为分，结果会通过回调通知游戏。当游戏收到付费无限制回调时，可继续本次付费。
@@ -399,7 +399,7 @@ AntiAddictionKit.checkState();
 ⑦ 上传付费数据
 用户成功付费后，游戏需要调用本接口，更新用户的付费数据。代码示例如下：
 
-```
+```java
 AntiAddictionKit.paySuccess(50*100);
 ```
 参数的金额单位为分，结果会通过回调通知游戏。
@@ -407,7 +407,7 @@ AntiAddictionKit.paySuccess(50*100);
 ⑧  获取用户类型
 用户登录后，游戏可以获取当前用户的类型，示例如下：
 
-```
+```java
  int type = AntiAddictionKit.getUserType();
 ```
 返回值为用户的年龄段信息，具体如下：
@@ -476,7 +476,7 @@ AntiAddictionKit.paySuccess(50*100);
 
 ### **1. 完善应用信息**
 
-前往开发者中心，按照[物料要求](https://www.taptap.com/developer/help_docs/7?id=42#document_35)填写应用信息，并审核通过。
+前往开发者中心，按照[物料要求](/store/store-material)填写应用信息，并审核通过。
 
 ### **2. 设置售卖价格**
 
@@ -484,7 +484,7 @@ AntiAddictionKit.paySuccess(50*100);
 
 ### **3. 正式上线**
 
-所有流程都确保顺利后，游戏可[正式上线](https://www.taptap.com/developer/help_docs/7?id=47)。
+所有流程都确保顺利后，游戏可[正式上线](/store/store-release)。
 ![用来空行的小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)
 
 ---
