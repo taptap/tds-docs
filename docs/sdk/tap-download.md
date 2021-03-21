@@ -18,6 +18,9 @@ Unity Demo下载：[Unity_TapDemo](https://github.com/xindong/TapSDK_Unity_Demo)
 登录按钮素材 [icon.zip](https://qnblog.ijemy.com/xd_icon.zip)
 
 ## SDK附加
-SDK附加为可选择接入项
+#### SDK附加为可选择接入项
 - 数美定制版SDK [点击下载](https://qnblog.ijemy.com/xdwl-pri-release.aar)  
 - OAID推荐版 [oaid_sdk_1.0.23.aar](https://qnblog.ijemy.com/oaid_sdk_1.0.23.aar)
+
+#### 测试用例
+TapSDK测试用例[点击下载](https://qnblog.ijemy.com/TapSDK测试用例.xlsx)
