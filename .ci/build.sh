@@ -25,10 +25,10 @@ ARTIFACT_IMAGE="taptap-img-registry-vpc.cn-beijing.cr.aliyuncs.com/tds/tapsdkdoc
 ret=0
 node_modules/.bin/docusaurus build || ret=$?
 
-if [ $ret -eq 0 ]; then 
-  docker build -t $ARTIFACT_IMAGE . 
-  docker push $ARTIFACT_IMAGE        
-  docker rmi ${ARTIFACT_IMAGE}   
+if [ $ret -eq 0 ]; then
+  docker build -t $ARTIFACT_IMAGE .
+  docker push $ARTIFACT_IMAGE
+  docker rmi ${ARTIFACT_IMAGE}
 
 
   IMAGE_TAG=${SOURCE_VERSION_SHORT}
@@ -50,5 +50,5 @@ if [ $ret -eq 0 ]; then
 
 else
   echo "build failed"
+  exit 1
 fi
-

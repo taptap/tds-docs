@@ -1,7 +1,7 @@
 ---
 id: pro-fun
-title: 产品介绍
-sidebar_label: 产品介绍
+title: 产品指南
+sidebar_label: 产品指南
 ---
 import {Highlight} from '../component';
 

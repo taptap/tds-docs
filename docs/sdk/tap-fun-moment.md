@@ -384,7 +384,7 @@ groupId="tap-platform"
 TapTapMomentSdk.Config config = new TapTapMomentSdk.Config();
 config.orientation = TapTapMomentSdk.ORIENTATION_DEFAULT;  
 String content = "普通动态描述";
-String[] images = new String[] { "content://***.jpg","/sdcard/**.jpg" };
+String[] imagePaths = new String[] { "content://***.jpg","/sdcard/**.jpg" };
 TapTapMomentSdk.publishMoment(config, imagePaths, content);
   ```
   </TabItem>
