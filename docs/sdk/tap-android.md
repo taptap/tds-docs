@@ -7,7 +7,7 @@ slug: /sdk
 本文主要介绍Android如何将TapSDK快速接入并实现登录功能。
 
 :::note
-如需通过示例项目了解如何在 Android 应用中集成 TapSDK，请参阅 GitHub 中的 [TapSDKSample](https://github.com/xindong/TapSDK_Android)。
+如需通过示例项目了解如何在 Android 应用中集成 TapSDK，请参阅 GitHub 中的 [TapSDK_Android](https://github.com/xindong/TapSDK_Android) 示例项目。
 :::
 
 ## 1. 登录TapTap开发者中心
@@ -38,8 +38,8 @@ repositories{
 }  
 dependencies {  
 ...  
-    implementation (name:'TapSDK_v1.0.1', ext:'aar')  // 必选: x.x.x 代表所下载的 SDK的版本号
-    implementation (name:'TDSCommon_1.1.4', ext:'aar') // 必选:x.x.x 代表所下载的 SDK的版本号
+    implementation (name:'TapSDK_v1.0.1', ext:'aar')  // 必选: 请替换版本号为下载的 SDK的版本号
+    implementation (name:'TDSCommon_1.1.4', ext:'aar') // 必选: 请替换版本号为下载的 SDK的版本号
     implementation (name:'oaid_sdk_1.0.23', ext:'aar')  // 可选: 使用 TapDB 数据分析功能必选， 以获得更精准的统计
 }  
 ```  
@@ -61,7 +61,7 @@ TapSDK初始化
 ```java
 TdsConfig tdsConfig = new TdsConfig.Builder()
                 .appContext(Activity)
-                .clientId(your cient id)//开发者中心获取到的client Id
+                .clientId(yourClientId)//开发者中心获取到的client Id
                 .build();
 TdsInitializer.init(tdsConfig);  
 ```
