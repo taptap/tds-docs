@@ -9,7 +9,7 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import {Highlight} from '../component';
 
-本文主要介绍动态相关的使用方式，详细产品介绍请参考[动态产品介绍](/pro/pro-fun#二、动态)
+本文主要介绍动态相关的使用方式，详细产品介绍请参考[动态产品介绍](/pro/pro-moment)
 
 ## 1. 介绍
 内嵌动态基于TapTap 内容社区的功能和游戏本身的账号系统的更多融合，成功接入内嵌动态SDK后玩家即可通过游戏直接访问TapTap内容和自带功能。同时内嵌动态SDK也为游戏打造个性化内容或服务提供了开放功能。
