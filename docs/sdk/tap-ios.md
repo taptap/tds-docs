@@ -87,19 +87,19 @@ TDSMomentResource.bundle
 ```objectivec
 <!--使用到动态功能时需要配置，可替换授权文案-->
 <key>NSPhotoLibraryUsageDescription</key>
-<string>App需要您的同意,才能访问相册</string>
+<string>App需要你的同意,才能访问相册</string>
 <!-- 相机 -->
 <key>NSCameraUsageDescription</key>
-<string>App需要您的同意,才能访问相机</string>
+<string>App需要你的同意,才能访问相机</string>
 <!-- 麦克风 -->
 <key>NSMicrophoneUsageDescription</key>
-<string>App需要您的同意,才能访问麦克风</string>
+<string>App需要你的同意,才能访问麦克风</string>
 ```
 
 ### 配置跳转TapTap应用
 `用户无TapTap应用时，默认会打开webview登录`
 
-1. 打开info.plist，添加如下配置，然后请替换clientID为您在控制台获取的clientID
+1. 打开info.plist，添加如下配置，然后请替换clientID为你在控制台获取的clientID
 ![](https://qnblog.ijemy.com/xd_ios_info.png)
 ```objectivec
 <key>CFBundleURLTypes</key>

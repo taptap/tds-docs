@@ -7,7 +7,7 @@ sidebar_label: 登录
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-本文主要介绍登录的使用方式，详细介绍请参考[登录产品介绍](/pro/pro-fun#一、登录)
+本文主要介绍登录的使用方式，详细介绍请参考[登录产品介绍](/pro/pro-login)
 ## 介绍
 跳转TapTap APP登录，当没有TapTap APP时，会默认打开内置webview登录。
 
@@ -312,7 +312,7 @@ TapSDK.TDSLogin.Logout();
 
 
 ## 登录设置
-您可以通过LoginSdkConfig配置内置 WebView 的`直角`和`国际化`，请在登录前调用
+你可以通过LoginSdkConfig配置内置 WebView 的`直角`和`国际化`，请在登录前调用
 #### API
 <Tabs
 groupId="tap-platform"

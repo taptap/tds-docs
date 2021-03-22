@@ -29,7 +29,7 @@ dependencies {
 ```   -->
 <!-- ### 方法二、手动添加 -->
 1. 将[下载](https://github.com/xindong/TapSDK_Android/releases)的SDK包，导入到 **your project** > **app** > **libs** 目录下  
-2. 打开您工程的 **your project ** > **app** > **build.gradle** 文件，添加gradle配置如下  
+2. 打开你工程的 **your project ** > **app** > **build.gradle** 文件，添加gradle配置如下  
 ```java  
 repositories{  
     flatDir {  
@@ -49,7 +49,7 @@ dependencies {
 ```
 
 4. 配置存储模型  
-当您的targetSdkVersion<29时，需要添加如下配置    
+当你的targetSdkVersion<29时，需要添加如下配置    
 manifest节点添加 `xmlns:tools="http://schemas.android.com/tools"`  
 application节点添加 `tools:remove="android:requestLegacyExternalStorage"`
 
