@@ -1,6 +1,12 @@
 module.exports = {
   tapsdk: [
-    'pro/pro-fun',
+    {
+      产品指南:[
+        'pro/pro-login',
+        'pro/pro-moment'
+      ]
+    },
+
     'pro/pro-in',
     {
       快速开始: [

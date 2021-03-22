@@ -60,11 +60,11 @@ import {Highlight} from '../component';
         <string>ClientId</string>
     </dict>
     <key>NSPhotoLibraryUsageDescription</key>
-    <string>App需要您的同意,才能访问相册</string>
+    <string>App需要你的同意,才能访问相册</string>
     <key>NSCameraUsageDescription</key>
-    <string>App需要您的同意,才能访问相机</string>
+    <string>App需要你的同意,才能访问相机</string>
     <key>NSMicrophoneUsageDescription</key>
-    <string>App需要您的同意,才能访问麦克风</string>
+    <string>App需要你的同意,才能访问麦克风</string>
 </dict>
 </plist>
 ```
