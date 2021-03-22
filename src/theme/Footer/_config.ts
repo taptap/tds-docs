@@ -1,3 +1,5 @@
+import { translate } from '@docusaurus/Translate';
+
 export const innerLinkList = [
   {
     label: '广告',
@@ -27,7 +29,13 @@ export const innerLinkList = [
     label: '联系我们',
     link: 'https://www.taptap.com/developer-center/doc/7?id=50',
   },
-]
+].map((i, index) => ({
+  ...i,
+  label: translate({
+    message: `tds-footer-${i.label}`,
+    description: `from Footer Left Link ${index + 1}`,
+  }),
+}));
 
 export const externalLinkList = [
   {
@@ -57,4 +65,10 @@ export const externalLinkList = [
     link: 'https://www.12377.cn/',
     icon: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAACVElEQVQ4jZWUT2gTQRTGvzfbDaag9OTBg51IkMQeKoL0pixK61qU2D/iRagVkaAXz0oVxasBre1J0JOBVtODbaAUojcPHirYpqTtOv65eBAiIgbTneehKslkVuvAXt73vt9+b3i7hH+cgfGg01Z/ennPO1td/B1WuUYUKvMBwutRHooSBidXR6HxwOJ4Mp1NDhMRbzlh5l5l0AoDXk5nk8PzXYmxuZQ8vCXgwHhwyCF61JqMX29vb/PnuxJjDLpBDhVn98me1gEaYffXDxLreRA6jL6Kuy30Ru7458G42VCvhmCvf1kttiQ8dTfotsIYFVds9A3cPv4NjFHjRR0OaLaQkrIJmMmVpXB0sTUZKdfZ6Mtn0+p0EHxhzR4AZUB3xQWVfkMpkytLJ+aWAJYtMFH38tl0E6CYkpIElQAY/VDfNXvif2AA4K8o9SvpJ0OScSGe2RebtajVrMqm7Oh2tuwwg+PCFXUPoOYkRLudmFvK5MrmWCikpHTgzBKw05AUNB8hADgzWZZ17T4H2PhuSYU/6t7Mlc3RCykp4xH3x5o9f0UpAQD5bFqJWJsH0GdjCOnE3BIzUxSMgY+CqddfUQpo2MOpC/KtgD4KRrWJKejWTDrRGZHsA5HwesvB6p/2RnXq0t5FghgC+CsAEOur5ya8QlxgwQKrgnDi2NL6WtMlwXIGJ9YyFIb7Lz70c7rGL5jRbbToUFBP/5vglemN/H3NJZM7KKZLBD5gOEIGn/WX1GObz7qHDAiKhQstMADMGImCAUBbRJ3roCGbcHI5eB8FA4Cfa37wC2krAVQAAAAASUVORK5CYII=',
   },
-]
+].map((i, index) => ({
+  ...i,
+  label: translate({
+    message: `tds-footer-${i.label}`,
+    description: `from Footer Right Link ${index + 1}`,
+  }),
+}));
