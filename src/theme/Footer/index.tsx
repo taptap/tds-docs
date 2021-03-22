@@ -1,10 +1,12 @@
 import React from 'react';
+import Translate from '@docusaurus/Translate';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import styles from './styles.module.scss';
 import Logo from "@theme/Logo";
 import { externalLinkList, innerLinkList } from './_config';
-import Translate from '@docusaurus/Translate';
 
 function Footer() {
+  const { i18n: { currentLocale, defaultLocale } } = useDocusaurusContext();
   return (
     <footer className={styles.footerContainer}>
       <div className={styles.footerContent}>
@@ -40,7 +42,7 @@ function Footer() {
             ©2021 TapTap
           </div>
         </div>
-        <div className={styles.recordRow}>
+        {currentLocale === defaultLocale && <div className={styles.recordRow}>
           {externalLinkList.map(item => <a
             key={item.label + item.link}
             className={styles.externalItem}
@@ -51,7 +53,7 @@ function Footer() {
             {item.icon && <img src={item.icon} alt={item.label} />}
             {item.label}
           </a>)}
-        </div>
+        </div>}
       </div>
     </footer>
   );
