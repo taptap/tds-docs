@@ -312,7 +312,7 @@ TapSDK.TDSLogin.Logout();
 
 
 ## 登录设置
-您可以通过LoginSdkConfig配置内置 WebView 的`直角`和`国际化`，请在登录前调用
+你可以通过LoginSdkConfig配置内置 WebView 的`直角`和`国际化`，请在登录前调用
 #### API
 <Tabs
 groupId="tap-platform"
