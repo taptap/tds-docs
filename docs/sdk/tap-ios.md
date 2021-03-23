@@ -1,28 +1,28 @@
 ---
 id: tap-ios
-title: TapSDK iOS快速开始
+title: TapSDK iOS 快速开始
 sidebar_label: iOS
 ---
 
-本文主要介绍iOS如何将TapSDK快速接入并实现登录功能。
+本文主要介绍 iOS 如何将 TapSDK 快速接入并实现登录功能。
 
 
 :::note
 如需通过示例项目了解如何在 iOS 应用中集成 TapSDK，请参阅 GitHub 中的 [TapSDKSample](https://github.com/xindong/TapSDK_iOS)。
 :::
 
-## 1. 登录TapTap开发者中心
-请登录 [TapTap开发者中心](https://www.taptap.com/developer-center) 来创建应用或注册为开发者。
+## 1. 登录 TapTap 开发者中心
+请登录 [TapTap 开发者中心](https://www.taptap.com/developer-center) 来创建应用或注册为开发者。
 
 ## 2. 下载 TapTap 应用
 [点击下载](https://www.taptap.com/mobile) TapTap 应用
 
 ## 3. 环境配置
-- 最低支持到iOS 10.0  
-- 请在Xcode 选择工程，到Build Setting-->Other Linker Flags添加-ObjC
+- 最低支持到 iOS 10.0  
+- 请在 Xcode 选择工程，到 Build Setting-->Other Linker Flags 添加 - ObjC
 
 ## 4. 工程导入
-<!-- ### 方式一、自动导入(推荐pod集成)  
+<!-- ### 方式一、自动导入 (推荐 pod 集成)  
 
 1. 安装 CocoaPods
 在终端窗口中输入如下命令（需要提前在 Mac 中安装 Ruby 环境）：
@@ -40,22 +40,22 @@ target 'App' do
   pod 'TapSDK', :podspec => '../'
   end
 ```
-4. 安装SDk并更新  
+4. 安装 SDk 并更新  
 
 安装  
 ```objectivec
 pod install
 ```  
 
-&nbsp;更新   
+&nbsp; 更新   
 ```objectivec
 pod update
 ``` -->
 
 <!-- ### 方式二、手动导入 -->
-直接拖拽[下载](https://github.com/xindong/TapSDK_iOS/releases)的SDK到项目目录即可    
+直接拖拽 [下载](https://github.com/xindong/TapSDK_iOS/releases) 的 SDK 到项目目录即可    
 ```
-//下载目录包含一下三个资源文件都需要导入
+// 下载目录包含一下三个资源文件都需要导入
 release/TapSDK.framework
 release/TDSCommon.framework
 TDSMomentResource.bundle
@@ -79,27 +79,27 @@ TDSMomentResource.bundle
 'Security.framework',
 ```  
 
-## 6. 跳转TapTap登录和打开多媒体
+## 6. 跳转 TapTap 登录和打开多媒体
 ### 配置多媒体权限
-`在使用到动态功能时，需要授权相册/相机/麦克风访问权限`  
-打开info.plist，添加如下配置
+`在使用到动态功能时，需要授权相册 / 相机 / 麦克风访问权限`  
+打开 info.plist，添加如下配置
 
 ```objectivec
-<!--使用到动态功能时需要配置，可替换授权文案-->
+<!-- 使用到动态功能时需要配置，可替换授权文案 -->
 <key>NSPhotoLibraryUsageDescription</key>
-<string>App需要你的同意,才能访问相册</string>
+<string>App 需要你的同意，才能访问相册 </string>
 <!-- 相机 -->
 <key>NSCameraUsageDescription</key>
-<string>App需要你的同意,才能访问相机</string>
+<string>App 需要你的同意，才能访问相机 </string>
 <!-- 麦克风 -->
 <key>NSMicrophoneUsageDescription</key>
-<string>App需要你的同意,才能访问麦克风</string>
+<string>App 需要你的同意，才能访问麦克风 </string>
 ```
 
-### 配置跳转TapTap应用
-`用户无TapTap应用时，默认会打开webview登录`
+### 配置跳转 TapTap 应用
+`用户无 TapTap 应用时，默认会打开 webview 登录`
 
-1. 打开info.plist，添加如下配置，然后请替换clientID为你在控制台获取的clientID
+1. 打开 info.plist，添加如下配置，然后请替换 clientID 为你在控制台获取的 clientID
 ![](https://qnblog.ijemy.com/xd_ios_info.png)
 ```objectivec
 <key>CFBundleURLTypes</key>
@@ -123,9 +123,9 @@ TDSMomentResource.bundle
 </array>
 ```
 
-2. 根据项目中是否有SceneDelegate.m文件分两种情况  
+2. 根据项目中是否有 SceneDelegate.m 文件分两种情况  
 
-a. 如果有SceneDelegate.m，请添加如下代码到 SceneDelegate.m 文件中即可。
+a. 如果有 SceneDelegate.m，请添加如下代码到 SceneDelegate.m 文件中即可。
 ```objectivec
 #import <TapSDK/TTSDKApplicationDelegate.h>
 - (void)scene:(UIScene *)scene openURLContexts:(NSSet<UIOpenURLContext *> *)URLContexts{
@@ -133,7 +133,7 @@ a. 如果有SceneDelegate.m，请添加如下代码到 SceneDelegate.m 文件中
 }
 ```
 
-b. 如果没有SceneDelegate.m，只有AppDelegate.m，请添加如下代码到 AppDelegate.m 文件中。
+b. 如果没有 SceneDelegate.m，只有 AppDelegate.m，请添加如下代码到 AppDelegate.m 文件中。
 ```objectivec
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
    return [TapLoginHelper handleTapTapOpenURL:url];
@@ -143,14 +143,14 @@ b. 如果没有SceneDelegate.m，只有AppDelegate.m，请添加如下代码到 
    return [TapLoginHelper handleTapTapOpenURL:url];
 }
 ```
-并在AppDelegate.h中添加UIWindow，然后删除info.plist里面的Application Scene Manifest
+并在 AppDelegate.h 中添加 UIWindow，然后删除 info.plist 里面的 Application Scene Manifest
 ```objectivec
 @property (strong, nonatomic) UIWindow *window;
 ```
 ![](https://qnblog.ijemy.com/xd_ios_appmanifest.png)
 
 ## 7. 初始化
-TapSDK初始化  
+TapSDK 初始化  
 
 #### 示例代码
 ```objectivec
@@ -159,12 +159,12 @@ TDSConfig *tconfig = [[TDSConfig alloc]init];
 tconfig.clientId =clientID;
 [TDSInitializer initWithConfig:tconfig];
 
-/**修改登录配置。
- 此段代码可以不调用，默认配置 (RegionTypeCN和圆角登录框)
+/** 修改登录配置。
+ 此段代码可以不调用，默认配置 (RegionTypeCN 和圆角登录框)
  */
 TTSDKConfig *config = [[TTSDKConfig alloc] init];
-config.regionType = RegionTypeCN;// 海外为 RegionTypeIO（默认值为RegionTypeCN）
-config.roundCorner = NO;// NO 则网页登录是边框为直角（默认值为YES）
+config.regionType = RegionTypeCN;// 海外为 RegionTypeIO（默认值为 RegionTypeCN）
+config.roundCorner = NO;// NO 则网页登录是边框为直角（默认值为 YES）
 [TapLoginHelper changeTapLoginConfig:config];
 
 ```
@@ -177,17 +177,17 @@ config.roundCorner = NO;// NO 则网页登录是边框为直角（默认值为YE
 
 #### 示例代码
 ```objectivec
-//注册登录回调
+// 注册登录回调
 [TapLoginHelper registerLoginResultDelegate:self];
 
-//实现代理
+// 实现代理
 @interface ViewController () <TDSMomentDelegate,TapLoginResultDelegate>
 
 @end
 
-//实现回调方法
+// 实现回调方法
 // 登录成功回调
-// @param token token对象
+// @param token token 对象
 - (void)onLoginSuccess:(TTSDKAccessToken *)token{
     NSLog (@"onLoginSuccess");
 }
@@ -207,7 +207,7 @@ config.roundCorner = NO;// NO 则网页登录是边框为直角（默认值为YE
 [registerLoginCallback](/api/ios-loginhelper.md#registerlogincallback)
 
 ## 9. 登录
-TapTap登录，当没有安装TapTap app时，会打开内置webview进行TapTap验证登录  
+TapTap 登录，当没有安装 TapTap app 时，会打开内置 webview 进行 TapTap 验证登录  
 
 #### 示例代码
 ```objectivec

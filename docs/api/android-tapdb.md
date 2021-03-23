@@ -5,7 +5,7 @@ title: TapDB
 ## method
 ### setUser
 
-当enableTapDB后，可以调用此API  
+当 enableTapDB 后，可以调用此 API  
 
 #### API
 
@@ -20,30 +20,30 @@ public static void setUser(String userId, LoginType loginType);
 TapDB.setUser("xxxxuser1", LoginType.TapTap);
 ```
 
-**setUser参数说明**
+**setUser 参数说明**
 
 | 字段        | 可为空 | 说明                                                           |
 | --------- | --- | ------------------------------------------------------------ |
-| userId    | 否   | 长度大于0并小于等于256。只能包含数字、大小写字母、下划线(\_)、横线(-)，用户ID。不同用户需要保证ID的唯一性 |                                           |
+| userId    | 否   | 长度大于 0 并小于等于 256。只能包含数字、大小写字母、下划线 (\_)、横线 (-)，用户 ID。不同用户需要保证 ID 的唯一性 |                                           |
 | loginType | 否   | 第三方登录枚举类型，具体见下面说明                                            |
 
-**loginType类型说明**
+**loginType 类型说明**
 
 | 参数          | 说明                                                           |
 | :---------- | :----------------------------------------------------------- |
-| TapTap      | TapTap登录                                                     |
+| TapTap      | TapTap 登录                                                     |
 | WeiXin      | 微信登录                                                         |
-| QQ          | QQ登录                                                         |
+| QQ          | QQ 登录                                                         |
 | Tourist     | 游客登录                                                         |
-| Apple       | Apple登录                                                      |
+| Apple       | Apple 登录                                                      |
 | Alipay      | 支付宝登录                                                        |
-| Facebook    | facebook登录                                                   |
-| Google      | Google登录                                                     |
-| Twitter     | Twitter登录                                                    |
+| Facebook    | facebook 登录                                                   |
+| Google      | Google 登录                                                     |
+| Twitter     | Twitter 登录                                                    |
 | PhoneNumber | 手机号登录                                                        |
-| Custom      | 用户自定义登录类型  （默认名字为Custom,如需修改可以调用LoginType.Custom.changeType） |
+| Custom      | 用户自定义登录类型  （默认名字为 Custom, 如需修改可以调用 LoginType.Custom.changeType） |
 
-### Tap登录后openId获取方式
+### Tap 登录后 openId 获取方式
 
 ```java
 Profile.fetchProfileForCurrentAccessToken(new Api.ApiCallback<Profile>() {
@@ -78,7 +78,7 @@ TapDB.setName("taptap");
 
 | 字段   | 可为空 | 说明                |
 | ---- | --- | ----------------- |
-| name | 否   | 长度大于0并小于等于256。用户名 |
+| name | 否   | 长度大于 0 并小于等于 256。用户名 |
 
 ### setLevel
 
@@ -97,7 +97,7 @@ TapDB.setLevel(5);
 
 | 字段    | 可为空 | 说明         |
 | ----- | --- | ---------- |
-| level | 否   | 大于等于0。用户等级 |
+| level | 否   | 大于等于 0。用户等级 |
 
 ### setServer
 
@@ -117,11 +117,11 @@ TapDB.setServer("https://test.taptap.com/callback");
 
 | 字段     | 可为空 | 说明                    |
 | ------ | --- | --------------------- |
-| server | 否   | 长度大于0并小于等于256。用户所在服务器 |
+| server | 否   | 长度大于 0 并小于等于 256。用户所在服务器 |
 
 ### onCharge
 
-充值成功时调用。SDK推送和4.1中描述的服务端推送方法只能选择其中一种。建议优先选择服务端推送方式，以保证数据的准确性。
+充值成功时调用。SDK 推送和 4.1 中描述的服务端推送方法只能选择其中一种。建议优先选择服务端推送方式，以保证数据的准确性。
 
 #### API  
 
@@ -132,20 +132,20 @@ public static void onCharge(String orderId, String product, long amount, String 
 #### 示例代码
 
 ```java
-TapDB.onCharge("0xueiEns","大宝剑","100","CNY","wechat");
+TapDB.onCharge ("0xueiEns","大宝剑","100","CNY","wechat");
 ```
 
 **参数说明**  
 
 | 字段           | 可为空 | 说明                                                |
 | ------------ | --- | ------------------------------------------------- |
-| orderId      | 是   | 订单ID。长度大于0并小于等于256。传递订单ID可进行排重，防止计算多次             |
-| product      | 是   | 商品名称。长度大于0并小于等于256。                               |
-| amount       | 否   | 充值金额。大于0并小于等于100000000000。单位分，即无论什么币种，都需要乘以100    |
-| currencyType | 是   | 货币类型。国际通行三字母表示法，为空时默认CNY。参考：人民币 CNY，美元 USD；欧元 EUR|
-| payment      | 是   | 充值渠道。长度大于0并小于等于256。                               |
+| orderId      | 是   | 订单 ID。长度大于 0 并小于等于 256。传递订单 ID 可进行排重，防止计算多次             |
+| product      | 是   | 商品名称。长度大于 0 并小于等于 256。                               |
+| amount       | 否   | 充值金额。大于 0 并小于等于 100000000000。单位分，即无论什么币种，都需要乘以 100    |
+| currencyType | 是   | 货币类型。国际通行三字母表示法，为空时默认 CNY。参考：人民币 CNY，美元 USD；欧元 EUR|
+| payment      | 是   | 充值渠道。长度大于 0 并小于等于 256。                               |
 
-常见货币类型的格式参考<a target="_blank" href="https://www.tapdb.com/docs/zh_CN/features/exchangeRate.html">汇率表</a>
+常见货币类型的格式参考 <a target="_blank" href="https://www.tapdb.com/docs/zh_CN/features/exchangeRate.html"> 汇率表 </a>
 
 ### onEvent
 
@@ -173,11 +173,11 @@ try {
 | 字段         | 可为空 | 说明                                                   |
 | ---------- | --- | ---------------------------------------------------- |
 | eventCode  | 否   | 在控制台中配置得到的事件编码                                       |
-| properties | 是   | 事件属性。需要和控制台的配置匹配。值需要是长度大于0并小于等于256的字符串或绝对值小于1E11的浮点数 |
+| properties | 是   | 事件属性。需要和控制台的配置匹配。值需要是长度大于 0 并小于等于 256 的字符串或绝对值小于 1E11 的浮点数 |
 
 <!-- ### onResume&onStop
 
-跟踪用户游戏次数和游戏时长。需要给游戏中每个Activity的onResume和onStop中添加对应的调用。如果多个Activity继承同一个父类，只需要在父类中添加调用即可。比如onResume方法，直接在Activity的onResume方法的最后添加TapDB.onResume(this)即可。  
+跟踪用户游戏次数和游戏时长。需要给游戏中每个 Activity 的 onResume 和 onStop 中添加对应的调用。如果多个 Activity 继承同一个父类，只需要在父类中添加调用即可。比如 onResume 方法，直接在 Activity 的 onResume 方法的最后添加 TapDB.onResume (this) 即可。  
 #### API  
 
 

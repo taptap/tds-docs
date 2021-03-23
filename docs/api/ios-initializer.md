@@ -6,7 +6,7 @@ title: TDSInitializer
 
 ### initWithConfig
 
-初始化SDK
+初始化 SDK
 
 #### API  
 
@@ -23,11 +23,11 @@ config.clientId =clientID;
 [TDSInitializer initWithConfig:config];
 ```
 
-**TDSConfig参数说明**  
+**TDSConfig 参数说明**  
 
 | 参数       | 可选  | 备注                |
 | :------- | :-- | :---------------- |
-| clientId | 否   | 开发者中心获取的client Id |
+| clientId | 否   | 开发者中心获取的 client Id |
 
 ### enableTapDBWithChannel
 
@@ -47,8 +47,8 @@ config.clientId =clientID;
 
 | 字段          | 可选  | 说明                                                                    |
 | ----------- | --- | --------------------------------------------------------------------- |
-| channel     | 是   | 长度大于0并小于等于256。分包渠道。1.2.名词解释中有介绍                                       |
-| gameVersion | 是   | 长度大于0并小于等于256。游戏版本。为空时，自动获取游戏安装包的版本（AndroidManifest.xml中的versionName） |
+| channel     | 是   | 长度大于 0 并小于等于 256。分包渠道。1.2. 名词解释中有介绍                                       |
+| gameVersion | 是   | 长度大于 0 并小于等于 256。游戏版本。为空时，自动获取游戏安装包的版本（AndroidManifest.xml 中的 versionName） |
 
 ### enableMoment
 
