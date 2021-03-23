@@ -90,7 +90,7 @@ momentConfig.orientation = TDSMomentOrientationDefault;
 #### 示例代码
 
 ```objectivec
-//发布图片动态
+// 发布图片动态
 TDSImageMomentData *imageMoment = [[TDSImageMomentData alloc] init];
 imageMoment.images = @[@"file://..."];
 imageMoment.content = @"我是发图片动态的内容";
@@ -98,7 +98,7 @@ TDSMomentConfig *config = [[TDSMomentConfig alloc] init];
 config.orientation = TDSMomentOrientationDefault;
 [TDSMomentSdk openPostMomentPageWithContent:imageMoment config:config];
 
-//发布视频动态
+// 发布视频动态
 TDSVideoMomentData *videoMoment = [[TDSVideoMomentData alloc] init];
 videoMoment.images = @[@"file://..."];
 videoMoment.videos = @[@"file://..."];
@@ -129,7 +129,7 @@ config.orientation = TDSMomentOrientationDefault;
 + (void)fetchNewMessage;
 ```
 
-  结果在 `Delegate` 下的 `onMomentCallbackWithCode:msg:`, code == TM_RESULT_CODE_NEW_MSG_SUCCEED时，`msg` 0为无新消息，1为有新消息
+  结果在 `Delegate` 下的 `onMomentCallbackWithCode:msg:`, code == TM_RESULT_CODE_NEW_MSG_SUCCEED 时，`msg` 0 为无新消息，1 为有新消息
 
 #### 示例代码
 
@@ -155,11 +155,11 @@ config.orientation = TDSMomentOrientationDefault;
 [TDSMomentSdk openUserCenterWithConfig:config userId:@"userId"];
 ```
 
-**参数说明**
+** 参数说明 **
 
 | 字段     | 可为空 | 说明                                                   |
 | ------ | --- | ---------------------------------------------------- |
-| userId | 否   | xd的userId，非TapTap的userId | -->
+| userId | 否   | xd 的 userId，非 TapTap 的 userId | -->
 
 ### closeMoment
 直接关闭动态页面
@@ -202,7 +202,7 @@ config.orientation = TDSMomentOrientationDefault;
 
 ### getSdkVersion
 
-获取动态功能版本。**注意**并非是TapSDK version。此API不建议调用
+获取动态功能版本。**注意** 并非是 TapSDK version。此 API 不建议调用
 
 #### API  
 
@@ -218,7 +218,7 @@ NSString *version =  [TDSMomentSdk getSdkVersion];
 
 ### getSdkVersionCode
 
-获取动态功能版本code，**注意**并非是TapSDK version。此API不建议调用
+获取动态功能版本 code，**注意** 并非是 TapSDK version。此 API 不建议调用
 
 #### API  
 

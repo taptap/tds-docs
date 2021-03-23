@@ -7,12 +7,12 @@ sidebar_label: 登录
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-本文主要介绍登录的使用方式，详细介绍请参考[登录产品介绍](/pro/pro-fun#一、登录)
+本文主要介绍登录的使用方式，详细介绍请参考 [登录产品介绍](/pro/pro-login)
 ## 介绍
-跳转TapTap APP登录，当没有TapTap APP时，会默认打开内置webview登录。
+跳转 TapTap APP 登录，当没有 TapTap APP 时，会默认打开内置 webview 登录。
 
 ## 检查登录状态
-可以先校验该用户是否登录过，对未登录的用户调用login()  
+可以先校验该用户是否登录过，对未登录的用户调用 login ()  
 
 #### API
 <Tabs
@@ -59,7 +59,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-  //未登录用户会返回null
+  // 未登录用户会返回 null
   if (TapLoginHelper.getCurrentAccessToken() == null) {
       //TODO 用户未登录
   } else {
@@ -73,9 +73,9 @@ groupId="tap-platform"
 ```objectivec
 TTSDKAccessToken *currentAccessToken = [TapLoginHelper currentAccessToken];
 if(currentAccessToken.accessToken == nil){
-    //用户未登录
+    // 用户未登录
 }else{
-    //用户已登录
+    // 用户已登录
 }
 ```
   </TabItem>
@@ -85,11 +85,11 @@ if(currentAccessToken.accessToken == nil){
 TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
   if (accessToken != null)
   {
-      //用户已经登录
+      // 用户已经登录
       Debug.Log(token.toJSON());
   }
   else {
-      //用户未登录
+      // 用户未登录
   }
 });
 ```
@@ -144,7 +144,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-//需要先判空，否则会崩溃
+// 需要先判空，否则会崩溃
 Profile profile = Profile.getCurrentProfile();
 if (profile != null) {
     Log.e(TAG, profile.toString());
@@ -155,7 +155,7 @@ if (profile != null) {
   <TabItem value="ios">
 
 ```objectivec
-//需要先判空，否则会崩溃
+// 需要先判空，否则会崩溃
 TTSDKProfile *currentProfile = [TapLoginHelper currentProfile];
 if(currentProfile != nil){
    NSLog([currentProfile toJsonString]);
@@ -165,7 +165,7 @@ if(currentProfile != nil){
   <TabItem value="unity">
 
 ```cs
-//需要先判空，否则会崩溃
+// 需要先判空，否则会崩溃
 TapSDK.TDSLogin.GetCurrentProfile((profile) => {
     if (profile != null) {
         Debug.Log(profile.toJSON());
@@ -177,7 +177,7 @@ TapSDK.TDSLogin.GetCurrentProfile((profile) => {
 
 
 ## 登录
-执行登录操作，优先跳转TapTap APP登录，当没有TapTap APP时，会打开内置 Webview 登录  
+执行登录操作，优先跳转 TapTap APP 登录，当没有 TapTap APP 时，会打开内置 Webview 登录  
 
 #### API
 <Tabs
@@ -312,7 +312,7 @@ TapSDK.TDSLogin.Logout();
 
 
 ## 登录设置
-您可以通过LoginSdkConfig配置内置 WebView 的`直角`和`国际化`，请在登录前调用
+你可以通过 LoginSdkConfig 配置内置 WebView 的 `直角` 和 `国际化`，请在登录前调用
 #### API
 <Tabs
 groupId="tap-platform"
@@ -372,8 +372,8 @@ groupId="tap-platform"
 
   ```objectivec
   TTSDKConfig *config = [[TTSDKConfig alloc] init];
-  config.regionType = RegionTypeCN;// 海外为 RegionTypeIO（默认值为RegionTypeCN）
-  config.roundCorner = YES;// NO 则网页登录是边框为直角（默认值为YES）
+  config.regionType = RegionTypeCN;// 海外为 RegionTypeIO（默认值为 RegionTypeCN）
+  config.roundCorner = YES;// NO 则网页登录是边框为直角（默认值为 YES）
   [TapLoginHelper changeTapLoginConfig:config];
  ````
   </TabItem>
@@ -381,9 +381,9 @@ groupId="tap-platform"
 
 ```cs
   /**
-  clientId: 控制台获取的clientID
-  isCN: 国内外，默认为true
-  isRoundCorner: 登录框是否圆角，默认为true
+  clientId: 控制台获取的 clientID
+  isCN: 国内外，默认为 true
+  isRoundCorner: 登录框是否圆角，默认为 true
   **/
   //public static void Init(string clientId, bool isCN, bool isRoundCorner)
 
