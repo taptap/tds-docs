@@ -5,11 +5,11 @@ slug: /api
 ---
 ## method
 
-TapSDK核心组建，负责SDK初始化和功能开启
+TapSDK 核心组建，负责 SDK 初始化和功能开启
 
 ### init
 
-初始化SDK
+初始化 SDK
 
 #### API  
 
@@ -27,12 +27,12 @@ TdsConfig tdsConfig = new TdsConfig.Builder()
 TdsInitializer.init(tdsConfig);
 ```
 
-**TdsConfig参数说明**  
+**TdsConfig 参数说明**  
 
 | 参数         | 可选  | 备注                |
 | :--------- | :-- | :---------------- |
-| clientId   | 否   | 开发者中心获取的client Id |
-| appContext | 否   | 当前Activity        |
+| clientId   | 否   | 开发者中心获取的 client Id |
+| appContext | 否   | 当前 Activity        |
 
 <!-- ### enableTapDB
 
@@ -52,8 +52,8 @@ TdsInitializer.enableTapDB(MainActivity.this, "1.0", "default");
 
 | 字段          | 可选  | 说明                                                                    |
 | ----------- | --- | --------------------------------------------------------------------- |
-| channel     | 是   | 长度大于0并小于等于256。分包渠道。1.2.名词解释中有介绍                                       |
-| gameVersion | 是   | 长度大于0并小于等于256。游戏版本。为空时，自动获取游戏安装包的版本（AndroidManifest.xml中的versionName） | -->
+| channel     | 是   | 长度大于 0 并小于等于 256。分包渠道。1.2. 名词解释中有介绍                                       |
+| gameVersion | 是   | 长度大于 0 并小于等于 256。游戏版本。为空时，自动获取游戏安装包的版本（AndroidManifest.xml 中的 versionName） | -->
 
 ### enableMoment
 
