@@ -7,7 +7,7 @@ title: TapLoginHelper
 
 ### changeTapLoginConfig
 
-登录配置功能。LoginSdkConfig为可配置项，非必须  
+登录配置功能。LoginSdkConfig 为可配置项，非必须  
 
 #### API
 
@@ -21,14 +21,14 @@ changeTapLoginConfig(TapTapSdk.LoginSdkConfig var0);
 TapTapSdk.LoginSdkConfig loginSdkConfig = new TapTapSdk.LoginSdkConfig();
 //false：登录页面是直角，true：登录页面是圆角
 loginSdkConfig.roundCorner = false;
-//RegionType.IO标识为国际版，RegionType.CN为国内版
+//RegionType.IO 标识为国际版，RegionType.CN 为国内版
 loginSdkConfig.regionType = RegionType.CN;
 TapLoginHelper.changeTapLoginConfig(loginSdkConfig);
 ```
 
 ### registerLoginCallback
 
-设置TapSDK的登录回调监听  
+设置 TapSDK 的登录回调监听  
 
 #### API  
 
@@ -75,13 +75,13 @@ public void startTapLogin(Activity activity, String... var2);
 
 #### API
 
-调用该接口会触发[registerLoginCallback](#registerlogincallback)回调
+调用该接口会触发 [registerLoginCallback](#registerlogincallback) 回调
 
 | 类别   | 回调方法                                             |
 | ---- | ------------------------------------------------ |
-| 登录成功 | void OnLoginSucceed(LoginResponse loginResponse) |
-| 登录失败 | void onError(Throwable throwable)                |
-| 登录取消 | void onCancel()                                  |
+| 登录成功 | void OnLoginSucceed (LoginResponse loginResponse) |
+| 登录失败 | void onError (Throwable throwable)                |
+| 登录取消 | void onCancel ()                                  |
 
 ### logout
 
@@ -146,7 +146,7 @@ TapLoginHelper.fetchProfileForCurrentAccessToken(new Api.ApiCallback<Profile>() 
             @Override
             public void onSuccess(Profile profile) {
                 Log.e(Tag, "checkLogin-onSuccess");
-                //TapDB会用到
+                //TapDB 会用到
                 String openId = Profile.getCurrentProfile().getOpenid();
                 startGame();
             }
@@ -161,6 +161,6 @@ TapLoginHelper.fetchProfileForCurrentAccessToken(new Api.ApiCallback<Profile>() 
 ## 错误码
 | 字段          | error | 说明       |
 | ----------- | --- | -------- |
-| AccountGlobalError.LOGIN_ERROR_ACCESS_DENIED       | access_denied   | token失效   |
-| AccountGlobalError.LOGIN_ERROR_INVALID_GRANT     | invalid_grant   |  token失效    |
+| AccountGlobalError.LOGIN_ERROR_ACCESS_DENIED       | access_denied   | token 失效   |
+| AccountGlobalError.LOGIN_ERROR_INVALID_GRANT     | invalid_grant   |  token 失效    |
 | AccountGlobalError.LOGIN_ERROR_PERMISSION_RESULT       | permission_result   | 登录失败，发生在首次登录过程中    |

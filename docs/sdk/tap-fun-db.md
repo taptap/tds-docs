@@ -14,10 +14,10 @@ import {Highlight} from '../component';
 
 `本文介绍数据收集相关功能和使用方式`
 ## 1. 介绍
-TapSDK提供一套可供游戏开发者收集用户数据的API。系统会收集用户数据并进行分析，最终形成数据报表，帮助游戏开发者分析用户行为并优化游戏。  
+TapSDK 提供一套可供游戏开发者收集用户数据的API。系统会收集用户数据并进行分析，最终形成数据报表，帮助游戏开发者分析用户行为并优化游戏。  
 
 ## 2. 功能开启
-放在初始化SDK之后调用即可
+放在初始化 SDK 之后调用即可
 
 #### API  
 <Tabs
@@ -92,7 +92,7 @@ gameVersion | 否 | 游戏版本。长度大于0并小于等于256的字符串�
 
 
 ## 3. 记录一个用户
-当enableTapDB后，可以调用此API来记录一个用户  
+当 enableTapD B后，可以调用此 API 来记录一个用户  
 
 #### API
 <Tabs
@@ -164,28 +164,28 @@ TapSDK.TDSTapDB.SetUser("userId","loginType");
   </TabItem>
 </Tabs>
 
-**setUser参数说明**
+**setUser 参数说明**
 
 字段 | 可为空 | 说明
 | ------ | ------ | ------ |
 userId | 否 | 长度大于0并小于等于256。只能包含数字、大小写字母、下划线(_)、横线(-)，用户ID。不同用户需要保证ID的唯一性
 loginType | 否 | 第三方登录枚举类型，具体见下面说明
 
-**loginType类型说明**
+**loginType 类型说明**
 
 | 参数      |    说明   |
 | :-------- | :-------- |
-| TapTap      |    TapTap登录   |
+| TapTap      |    TapTap 登录   |
 | WeiXin      |    微信登录   |
-| QQ      |    QQ登录   |
+| QQ      |    QQ 登录   |
 | Tourist      |    游客登录   |
-| Apple      |    Apple登录   |
+| Apple      |    Apple 登录   |
 | Alipay      |    支付宝登录 |
-| Facebook      |    facebook登录   |
-| Google      |    Google登录   |
-| Twitter      |    Twitter登录   |
+| Facebook      |    facebook 登录   |
+| Google      |    Google 登录   |
+| Twitter      |    Twitter 登录   |
 | PhoneNumber      |    手机号登录   |
-| Custom      |   用户自定义登录类型  （默认名字为Custom,如需修改可以调用LoginType.Custom.changeType） |
+| Custom      |   用户自定义登录类型  （默认名字为 Custom, 如需修改可以调用 LoginType.Custom.changeType） |
 <!--
 ### TapTap登录时openId获取方式
 

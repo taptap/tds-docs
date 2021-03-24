@@ -9,13 +9,13 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import {Highlight} from '../component';
 
-本文主要介绍动态相关的使用方式，详细产品介绍请参考[动态产品介绍](/pro/pro-moment)
+本文主要介绍动态相关的使用方式，详细产品介绍请参考 [动态产品介绍](/pro/pro-moment)
 
 ## 1. 介绍
-内嵌动态基于TapTap 内容社区的功能和游戏本身的账号系统的更多融合，成功接入内嵌动态SDK后玩家即可通过游戏直接访问TapTap内容和自带功能。同时内嵌动态SDK也为游戏打造个性化内容或服务提供了开放功能。
+内嵌动态基于 TapTap 内容社区的功能和游戏本身的账号系统的更多融合，成功接入内嵌动态 SDK 后玩家即可通过游戏直接访问 TapTap 内容和自带功能。同时内嵌动态 SDK 也为游戏打造个性化内容或服务提供了开放功能。
 
 ## 2. 功能开启
-API放在init初始化SDK之后调用即可  
+API 放在 init 初始化 SDK 之后调用即可  
 
 #### API  
 
@@ -256,13 +256,13 @@ TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
 
 ## 4. 打开动态页面
 在游戏中，显示游戏动态页面。
-> <Highlight color='#f00'>打开动态页面时，请先屏蔽游戏自身的声音，避免与动态内视频声音产生重合 </Highlight>    
+> <Highlight color='#f00'> 打开动态页面时，请先屏蔽游戏自身的声音，避免与动态内视频声音产生重合 </Highlight>    
 
-> <Highlight color='#f00'>如需要动态能支持横竖屏随设备自动旋转，需要游戏app自身能支持横竖屏(Xcode配置Device Orientation)</Highlight>  
+> <Highlight color='#f00'> 如需要动态能支持横竖屏随设备自动旋转，需要游戏 app 自身能支持横竖屏 (Xcode 配置 Device Orientation)</Highlight>  
 
 
 :::caution
-**截止到此步骤，2、3步为必要步骤**
+**截止到此步骤，2、3 步为必要步骤**
 :::
 
 #### API  
@@ -309,7 +309,7 @@ groupId="tap-platform"
 
   ```java
   TapTapMomentSdk.Config config = new TapTapMomentSdk.Config();
-  // config用来设置页面显示配置，包括显示方向等
+  //config 用来设置页面显示配置，包括显示方向等
   //config.orientation = TapTapMomentSdk.ORIENTATION_LANDSCAPE;
   TapTapMomentSdk.openTapMoment(config);
   ```
@@ -444,10 +444,10 @@ groupId="tap-platform"
   <TabItem value="unity">
 
 ```cs
-//带封面
+// 带封面
 public static void PublishVideoMoment(Orientation config, string[] videoPaths, string[] imagePaths, string title, string desc)
 
-//不带封面
+// 不带封面
 public static void PublishVideoMoment(Orientation config, string[] videoPaths, string title, string desc)
 ```
 
@@ -472,7 +472,7 @@ String[] videos = new String[] { "content://***.mp4", "content://***.mp4" };
 String title = "title";
 String content = "content";
 TapTapMomentSdk.publishVideoMoment(config, videoPaths, imagePaths, title, content);
-//如果不需要上传封面图片，可调用如下接口
+// 如果不需要上传封面图片，可调用如下接口
 //TapTapMomentSdk.publishVideoMoment(config, videoPaths, title, content);
 
   ```
@@ -496,14 +496,14 @@ TapTapMomentSdk.publishVideoMoment(config, videoPaths, imagePaths, title, conten
   <TabItem value="unity">
 
 ```cs
-//带封面
+// 带封面
 string[] images = {"imgpath01","imgpath02","imgpath03"};
 string[] videos = {"videop01","videop02","videop03"};
 string title = "我是动态";
 string content = "我是描述";
 TapSDK.TDSMoment.PublishVideoMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE, videos, images, title, content);
 
-//不带封面
+// 不带封面
 string[] images = {"imgpath01","imgpath02","imgpath03"};
 string[] videos = {"videop01","videop02","videop03"};
 string title = "我是动态";
@@ -544,8 +544,8 @@ groupId="tap-platform"
 TapTapMomentSdk.getNoticeData();
   ```
   返回结果会通过动态回调通知游戏。  
-  `code == CALLBACK_CODE_GET_NOTICE_SUCCESS`(20000)表示获取成功，`msg` 为0表示无新消息，为1表示有新消息。   
-  `CALLBACK_CODE_GET_NOTICE_FAIL`(20100)表示获取失败
+  `code == CALLBACK_CODE_GET_NOTICE_SUCCESS`(20000) 表示获取成功，`msg` 为 0 表示无新消息，为 1 表示有新消息。   
+  `CALLBACK_CODE_GET_NOTICE_FAIL`(20100) 表示获取失败
   </TabItem>
 
   <TabItem value="ios">
@@ -553,16 +553,16 @@ TapTapMomentSdk.getNoticeData();
   ```objectivec
 + (void)fetchNewMessage;
   ```
-  结果在 `Delegate` 下的 `onMomentCallbackWithCode:msg:`中返回。  
-  `code == CALLBACK_CODE_GET_NOTICE_SUCCESS`(20000)表示获取成功，`msg` 为0表示无新消息，为1表示有新消息。   
-  `CALLBACK_CODE_GET_NOTICE_FAIL`(20100)表示获取失败
+  结果在 `Delegate` 下的 `onMomentCallbackWithCode:msg:` 中返回。  
+  `code == CALLBACK_CODE_GET_NOTICE_SUCCESS`(20000) 表示获取成功，`msg` 为 0 表示无新消息，为 1 表示有新消息。   
+  `CALLBACK_CODE_GET_NOTICE_FAIL`(20100) 表示获取失败
   </TabItem>
   <TabItem value="unity">
 
 ```cs
 public static void GetNoticeData();
 ```
-结果在`TapSDK.TDSMoment.SetCallback`进行回调
+结果在 `TapSDK.TDSMoment.SetCallback` 进行回调
 
   </TabItem>
 </Tabs>
@@ -698,7 +698,7 @@ TapTapMomentSdk.closeMoment(title, content)
 title | 否 | 动态标题
 content | 否 | 动态描述
 
-参数为二次弹窗的标题和内容，默认为"提示"和"匹配成功，进入游戏",用户选择接口会通过回调 `CALLBACK_CODE_ClOSE_CANCEL`(50000) 和`CALLBACK_CODE_ClOSE_CONFIRM`(50100)通知游戏  
+参数为二次弹窗的标题和内容，默认为 "提示" 和 "匹配成功，进入游戏", 用户选择接口会通过回调 `CALLBACK_CODE_ClOSE_CANCEL`(50000) 和 `CALLBACK_CODE_ClOSE_CONFIRM`(50100) 通知游戏  
   </TabItem>
 
   <TabItem value="ios">
@@ -733,6 +733,6 @@ desc | 否 | 动态描述
 
 ## 8. 注意事项
 - 打开动态页面时，请先屏蔽游戏自身的声音，避免与动态内视频声音产生重合
-- 如需要动态能支持横竖屏随设备自动旋转，需要游戏app自身能支持横竖屏(Xcode配置Device Orientation)
-- 小红点建议请求频率1次/1分钟
+- 如需要动态能支持横竖屏随设备自动旋转，需要游戏 app 自身能支持横竖屏 (Xcode 配置 Device Orientation)
+- 小红点建议请求频率 1 次 / 1 分钟
 - 动态内的背景图是可配置的，具体配置位置[点击查看](https://qnblog.ijemy.com/xd_moment_bg.png)，且需要等待审核，请提前配置

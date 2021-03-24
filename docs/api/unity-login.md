@@ -4,7 +4,7 @@ title: TDSLogin
 ---
 ## method
 ### Init
-初始化SDK
+初始化 SDK
 
 #### API
 
@@ -26,9 +26,9 @@ TapSDK.TDSLogin.Init("clientId", true,true);
 
 | 字段        | 可为空 | 说明                                                           |
 | --------- | --- | ------------------------------------------------------------ |
-| clientId    | 否   | 开发者中心获取到的clientId |
-| isCN    | 是   | true为国内，false为国外，默认true                                           |
-| isRoundCorner | 是   | 登录框：true为圆角，false为直角，默认为true                     |
+| clientId    | 否   | 开发者中心获取到的 clientId |
+| isCN    | 是   | true 为国内，false 为国外，默认 true                                           |
+| isRoundCorner | 是   | 登录框：true 为圆角，false 为直角，默认为 true                     |
 
 ### StartLogin
 开始登录
@@ -92,7 +92,7 @@ public static void UnRegisterLoginCallback()
 ```
 
 ### GetCurrentAccessToken
-获取accessToken
+获取 accessToken
 
 #### API
 
@@ -141,7 +141,7 @@ TapSDK.TDSLogin.Logout();
 ```
 
 ### FetchProfileForCurrentAccessToken
-获取accessToken
+获取 accessToken
 #### API
 
 ```cs

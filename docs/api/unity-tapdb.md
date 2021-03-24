@@ -4,7 +4,7 @@ title: TDSTapDB
 ---
 ## method
 ### Init
-初始化TapDB
+初始化 TapDB
 
 #### API
 
@@ -36,29 +36,29 @@ TapSDK.TDSTapDB.SetUser("userId");
 TapSDK.TDSTapDB.SetUser("userId","openId","loginType");
 ```
 
-**setUser参数说明**
+**setUser 参数说明 **
 
 | 字段        | 可为空 | 说明                                                           |
 | --------- | --- | ------------------------------------------------------------ |
-| userId    | 否   | 长度大于0并小于等于256。只能包含数字、大小写字母、下划线(\_)、横线(-)，用户ID。不同用户需要保证ID的唯一性 |
-| openId    | 否   | 通过第三方登录获取到的openId                                            |
+| userId    | 否   | 长度大于 0 并小于等于 256。只能包含数字、大小写字母、下划线 (\_)、横线 (-)，用户 ID。不同用户需要保证 ID 的唯一性 |
+| openId    | 否   | 通过第三方登录获取到的 openId                                            |
 | loginType | 否   | 第三方登录枚举类型，具体见下面说明                                            |
 
-**loginType类型说明**
+**loginType 类型说明 **
 
 | 参数          | 说明                                                           |
 | :---------- | :----------------------------------------------------------- |
-| TapTap      | TapTap登录                                                     |
+| TapTap      | TapTap 登录                                                     |
 | WeiXin      | 微信登录                                                         |
-| QQ          | QQ登录                                                         |
+| QQ          | QQ 登录                                                         |
 | Tourist     | 游客登录                                                         |
-| Apple       | Apple登录                                                      |
+| Apple       | Apple 登录                                                      |
 | Alipay      | 支付宝登录                                                        |
-| Facebook    | facebook登录                                                   |
-| Google      | Google登录                                                     |
-| Twitter     | Twitter登录                                                    |
+| Facebook    | facebook 登录                                                   |
+| Google      | Google 登录                                                     |
+| Twitter     | Twitter 登录                                                    |
 | PhoneNumber | 手机号登录                                                        |
-| Custom      | 用户自定义登录类型  （默认名字为Custom,如需修改可以调用LoginType.Custom.changeType） |
+| Custom      | 用户自定义登录类型  （默认名字为 Custom, 如需修改可以调用 LoginType.Custom.changeType） |
 
 ### SetName
 设置姓名
@@ -117,20 +117,20 @@ public static void OnCharge(string orderId, string productId, string amount, str
 #### 示例代码
 
 ```cs
-TapSDK.TDSTapDB.OnCharge("0xueiEns","大宝剑","100","CNY","wechat");
+TapSDK.TDSTapDB.OnCharge ("0xueiEns","大宝剑","100","CNY","wechat");
 ```
 
 **参数说明**
 
 | 字段           | 可为空 | 说明                                                |
 | ------------ | --- | ------------------------------------------------- |
-| orderId      | 是   | 订单ID。长度大于0并小于等于256。传递订单ID可进行排重，防止计算多次             |
-| product      | 是   | 商品名称。长度大于0并小于等于256。                               |
-| amount       | 否   | 充值金额。大于0并小于等于100000000000。单位分，即无论什么币种，都需要乘以100    |
-| currencyType | 是   | 货币类型。国际通行三字母表示法，为空时默认CNY。参考：人民币 CNY，美元 USD；欧元 EUR |
-| payment      | 是   | 充值渠道。长度大于0并小于等于256。                               |
+| orderId      | 是   | 订单 ID。长度大于 0 并小于等于 256。传递订单 ID 可进行排重，防止计算多次             |
+| product      | 是   | 商品名称。长度大于 0 并小于等于 256。                               |
+| amount       | 否   | 充值金额。大于 0 并小于等于 100000000000。单位分，即无论什么币种，都需要乘以 100    |
+| currencyType | 是   | 货币类型。国际通行三字母表示法，为空时默认 CNY。参考：人民币 CNY，美元 USD；欧元 EUR |
+| payment      | 是   | 充值渠道。长度大于 0 并小于等于 256。                               |
 
-常见货币类型的格式参考<a target="_blank" href="https://www.tapdb.com/docs/zh_CN/features/exchangeRate.html">汇率表</a>
+常见货币类型的格式参考 <a target="_blank" href="https://www.tapdb.com/docs/zh_CN/features/exchangeRate.html"> 汇率表 </a>
 
 ### OnEvent
 自定义回调事件
