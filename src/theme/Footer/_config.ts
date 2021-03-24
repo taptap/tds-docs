@@ -32,7 +32,8 @@ export const innerLinkList = [
 ].map((i, index) => ({
   ...i,
   label: translate({
-    message: `tds-footer-${i.label}`,
+    message: i.label,
+    id: `tds-footer-${i.label}`,
     description: `from Footer Left Link ${index + 1}`,
   }),
 }));
@@ -68,7 +69,8 @@ export const externalLinkList = [
 ].map((i, index) => ({
   ...i,
   label: translate({
-    message: `tds-footer-${i.label}`,
+    message: i.label,
+    id: `tds-footer-${i.label}`,
     description: `from Footer Right Link ${index + 1}`,
   }),
 }));

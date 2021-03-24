@@ -59,17 +59,20 @@ export const entryList: Array<Entry> = [
   },
 ].map((i, index) => ({
   title: translate({
-    message: `tds-home-${i.title}`,
+    message: i.title,
+    id: `tds-home-${i.title}`,
     description: `from HomePage Cell ${index + 1} Title`,
   }),
   description: translate({
-    message: `tds-home-${i.description}`,
+    message: i.description,
+    id: `tds-home-${i.description}`,
     description: `from HomePage Cell ${index + 1} Desc`,
   }),
   links: i.links.map((link) => ({
     ...link,
     label: translate({
-      message: `tds-home-link-${link.label}`,
+      message: link.label,
+      id: `tds-home-link-${link.label}`,
       description: `from HomePage Cell Link`,
     }),
   })) as Entry['links'],
