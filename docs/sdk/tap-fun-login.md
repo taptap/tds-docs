@@ -83,7 +83,7 @@ if(currentAccessToken.accessToken == nil){
 
 ```cs
 TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
-  if (accessToken != null)
+  if (token != null)
   {
       // 用户已经登录
       Debug.Log(token.toJSON());

@@ -19,7 +19,8 @@ module.exports = {
       功能介绍: ['sdk/tap-fun-login',
       //'sdk/tap-fun-db',
       'sdk/tap-fun-moment',
-      'sdk/tap-fun-paysdk'],
+      'sdk/tap-fun-paysdk',
+      'sdk/tap-fun-usertest'],
     },
     {
       API: [
