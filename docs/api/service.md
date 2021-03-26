@@ -125,14 +125,14 @@ const format = require('string-format');
 /**
 TapSDK登录后信息获取
 **/
-var kid = "1/abjpmb6pdM76y3vyV1IuZIE4xDsZXjqW4eU-rNAkmF5YcKD3zjOxZVwRv1GzAOq58Lm9VE9VYy9Gbg_GlRDR1bNdw-NhR79V_lllBa-9JNpEgz_tGmlu1_MFOEF1Wm80IqQ9ejsBcZg8l5RMCM2IwUA-nXEvIRpyYbybsYkvqc5kiKxI7WFd3cKpeZI5H6W_RNfN5cj2qOKRhZU39V9Yccxzgs7s_2nKQk_pDROqQPA5HGKulB191-aqIP7mqH2SRZWJ1hBvpqRfFmqELSS0krkI1n2Os8qpKp2N0VeubsHAY_dmZg1yjyJ9R0GRFWzNlc-eHiHGFzjO5joI_hzEHA";
-var mac_key = "hw1PT3g30vKMbej1oXHWsEjJW59RaQNgkkKSMBj5";
-var nonce = "adssd";
-var client_id = "BIEZXb7baKJI2ub3oc";
+var kid = "";//替换为客户端获取的kid或者access_token
+var mac_key = "";//替换为客户端获取的mac_key
+var nonce = "adssd";//自行生成5位字符串
+var client_id = "";
 
 
 var ts = Math.ceil(Date.now() / 1000);
-var ext = "";
+var ext = "";//附加信息可以不填
 var signArray = [ts, nonce, 'GET', '/account/profile/v1?client_id=' + client_id, 'openapi.taptap.com', 443, ext];
 
 var mac = hmacSha1(signArray.join("\n")+"\n", mac_key);
