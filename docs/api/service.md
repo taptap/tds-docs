@@ -117,47 +117,53 @@ AUTHORIZATION=$(printf 'MAC id="%s",ts="%s",nonce="%s",mac="%s"' "${ACCESS_TOKEN
 curl -s -H"Authorization:${AUTHORIZATION}" "https://openapi.taptap.com/account/profile/v1?client_id=${CLIENT_ID}"
 ```
 
+#### nodejs代码示例
 
-#### PHP代码示例
-```php
-
-$url = 'http://api.domain.com/protected-resource?a=b';
-
-$kid = '664cee85e5d85fc8645186c64ea11f198370d876'; // kid
-$mac_key = '744f213aad7ebe0a78fae2e8416d0d1c2323537f'; // mac_key
-$nonce = 'aSefW'; // 随机字串，建议至少5位，必须每次随机生成
-$ts = time(); // 当前时间戳，秒级
-
-$signatureBaseArray = [];
-$signatureBaseArray[] = $ts; // 当前时间戳，秒级
-$signatureBaseArray[] = $nonce; // 随机字符串
-$signatureBaseArray[] = 'GET'; // 请求方式, GET 或 POST
-$signatureBaseArray[] = '/protected-resource?a=b'; // uri
-$signatureBaseArray[] = 'api.domain.com'; // 主机名
-$signatureBaseArray[] = 80; // 端口 80 | 443
-$signatureBaseArray[] = ""; // ext
-
-$signatureBaseString = implode("\n", $signatureBaseArray) . "\n";
-
-$mac = buildSignature($signatureBaseString, $mac_key);
-
-$header = [
-    "Authorization" => sprintf('MAC id="%s",ts="%d",nonce="%s",mac="%s"', $kid, $ts, $nonce, $mac)
-];
-
-$response = Requests::get($url, $header);
-
+```javascript
+const urllib = require('urllib');
+const format = require('string-format');
 /**
- * 生成签名
- *
- * @param $signatureBaseString
- * @param $signatureSecret
- * @return string
- * @example buildSignature('abc', 'def') -> dYTuFEkwcs2NmuhQ4P8JBTgjD4w=
- */
-function buildSignature($signatureBaseString, $signatureSecret) {
-    return base64_encode ( hash_hmac ( 'sha1', $signatureBaseString, $signatureSecret, true ) );
+TapSDK登录后信息获取
+**/
+var kid = "1/abjpmb6pdM76y3vyV1IuZIE4xDsZXjqW4eU-rNAkmF5YcKD3zjOxZVwRv1GzAOq58Lm9VE9VYy9Gbg_GlRDR1bNdw-NhR79V_lllBa-9JNpEgz_tGmlu1_MFOEF1Wm80IqQ9ejsBcZg8l5RMCM2IwUA-nXEvIRpyYbybsYkvqc5kiKxI7WFd3cKpeZI5H6W_RNfN5cj2qOKRhZU39V9Yccxzgs7s_2nKQk_pDROqQPA5HGKulB191-aqIP7mqH2SRZWJ1hBvpqRfFmqELSS0krkI1n2Os8qpKp2N0VeubsHAY_dmZg1yjyJ9R0GRFWzNlc-eHiHGFzjO5joI_hzEHA";
+var mac_key = "hw1PT3g30vKMbej1oXHWsEjJW59RaQNgkkKSMBj5";
+var nonce = "adssd";
+var client_id = "BIEZXb7baKJI2ub3oc";
+
+
+var ts = Math.ceil(Date.now() / 1000);
+var ext = "";
+var signArray = [ts, nonce, 'GET', '/account/profile/v1?client_id=' + client_id, 'openapi.taptap.com', 443, ext];
+
+var mac = hmacSha1(signArray.join("\n")+"\n", mac_key);
+var auth = format('MAC id={id},ts={ts},nonce={nonce},mac={mac}', {
+  id: '\"'+kid+'\"',
+  ts: '\"'+ts+'\"',
+  nonce: '\"'+nonce+'\"',
+  mac: '\"'+mac+'\"'
+});
+
+var headers = {
+  Authorization: auth
 }
+
+var reqData = {
+  method: "GET",
+  headers: headers
+}
+
+urllib.request("https://openapi.taptap.com/account/profile/v1?client_id=" + client_id, reqData,
+  (err, data, response) => {
+    if(!err){
+      console.log("返回数据：" + data.toString());
+    }
+  });
+
+function hmacSha1(encodedFlags, secretKey) {
+    var hmac = crypto.createHmac('sha1', secretKey);
+    hmac.update(encodedFlags);
+    return hmac.digest('base64');
+};
 
 ```
 
