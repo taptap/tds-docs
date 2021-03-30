@@ -40,7 +40,7 @@ dependencies {
 ...  
     implementation (name:'TapBootStrap_2.0.0', ext:'aar')  // 必选: x.x.x 代表所下载的 SDK 的版本号
     implementation (name:'TapCommon_1.1.11', ext:'aar') // 必选:x.x.x 代表所下载的 SDK 的版本号
-    implementation (name:'TapMoment1.2.4', ext:'aar') // 必选:x.x.x 代表所下载的 SDK 的版本号
+    implementation (name:'TapMoment_1.2.4', ext:'aar') // 必选:x.x.x 代表所下载的 SDK 的版本号
 }  
 ```  
 3. 打开 AndroidManifest.xml 添加网络权限  
