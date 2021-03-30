@@ -9,7 +9,7 @@ import React from 'react';
 import DefaultNavbarItem from '@theme/NavbarItem/DefaultNavbarItem';
 import SearchNavbarItem from '@theme/NavbarItem/SearchNavbarItem';
 import type {Props} from '@theme/NavbarItem';
-import LocaleDropdownNavbarItem from './LocaleDropdownNavbarItem';
+import LocaleDropdownNavbarItem from '@theme/NavbarItem/LocaleDropdownNavbarItem';
 
 const NavbarItemComponents = {
   default: () => DefaultNavbarItem,
