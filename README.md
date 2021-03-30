@@ -44,3 +44,17 @@ tap-sdk-doc
 - 一定要本地运行一下，检查更改过的代码文件是否能正常打开再pr  
 - 若端口冲突，可手动修改package.json#start脚本；可以添加外部访问ip段，或者指定全部docusaurus start --port 3000 --host 0.0.0.0
 - master 分支为主分支，其他分支均为开发使用，无特殊含义。
+
+## 关于国际化
+> 参考 [docusaurus文档](https://v2.docusaurus.io/docs/i18n/tutorial)
+- 国际化文件存放于`i18n`文件夹下，对应的目录结构如下：
+```
+└── en
+   ├── code.json  默认的翻译（自定义页面等）
+   ├── docusaurus-plugin-content-docs
+   │  ├── current 翻译文档的文件夹（层级相当于/doc，需要一一对应）
+   │  └── current.json  文档目录Sidebar的翻译
+   └── docusaurus-theme-classic
+      └── navbar.json 顶栏Header的翻译
+```
+- 可通过weblate进行协作翻译：https://translate.gametaptap.com/projects/taptap-developer/

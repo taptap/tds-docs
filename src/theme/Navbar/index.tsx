@@ -1,20 +1,31 @@
-import React, { useCallback, useEffect, useState } from 'react';
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+import React, {useCallback, useState, useEffect} from 'react';
 import clsx from 'clsx';
 import SearchBar from '@theme/SearchBar';
 import Toggle from '@theme/Toggle';
 import useThemeContext from '@theme/hooks/useThemeContext';
-import { useThemeConfig } from '@docusaurus/theme-common';
+import {useThemeConfig} from '@docusaurus/theme-common';
 import useHideableNavbar from '@theme/hooks/useHideableNavbar';
 import useLockBodyScroll from '@theme/hooks/useLockBodyScroll';
-import useWindowSize, { windowSizes } from '@theme/hooks/useWindowSize';
+import useWindowSize, {windowSizes} from '@theme/hooks/useWindowSize';
 import NavbarItem from '@theme/NavbarItem';
-import IconMenu from '@theme/IconMenu';
 import Logo from '@theme/Logo';
+import IconMenu from '@theme/IconMenu';
+
 import styles from './styles.module.css';
 import './override.scss'
 
+// retrocompatible with v1
 const DefaultNavItemPosition = 'right';
 
+// If split links by left/right
+// if position is unspecified, fallback to right (as v1)
 function splitNavItemsByPosition(items) {
   const leftItems = items.filter(
     (item) => (item.position ?? DefaultNavItemPosition) === 'left',
@@ -33,10 +44,7 @@ function Navbar(): JSX.Element {
     navbar: {items, hideOnScroll, style},
     colorMode: {disableSwitch: disableColorModeSwitch},
   } = useThemeConfig();
-
   const [sidebarShown, setSidebarShown] = useState(false);
-  const [isSearchBarExpanded, setIsSearchBarExpanded] = useState(false);
-
   const {isDarkTheme, setLightTheme, setDarkTheme} = useThemeContext();
   const {navbarRef, isNavbarVisible} = useHideableNavbar(hideOnScroll);
 
@@ -62,6 +70,7 @@ function Navbar(): JSX.Element {
     }
   }, [windowSize]);
 
+  const hasSearchNavbarItem = items.some((item) => item.type === 'search');
   const {leftItems, rightItems} = splitNavItemsByPosition(items);
 
   return (
@@ -72,22 +81,26 @@ function Navbar(): JSX.Element {
         'navbar--primary': style === 'primary',
         'navbar-sidebar--show': sidebarShown,
         [styles.navbarHideable]: hideOnScroll,
-        [styles.navbarHidden]: !isNavbarVisible,
+        [styles.navbarHidden]: hideOnScroll && !isNavbarVisible,
       })}>
       <div className="navbar__inner">
         <div className="navbar__items">
           {items != null && items.length !== 0 && (
-            <div
+            <button
               aria-label="Navigation bar toggle"
               className="navbar__toggle"
-              role="button"
+              type="button"
               tabIndex={0}
               onClick={showSidebar}
               onKeyDown={showSidebar}>
               <IconMenu />
-            </div>
+            </button>
           )}
-          <Logo />
+          <Logo
+            className="navbar__brand"
+            imageClassName="navbar__logo"
+            titleClassName={clsx('navbar__title')}
+          />
           {leftItems.map((item, i) => (
             <NavbarItem {...item} key={i} />
           ))}
@@ -104,10 +117,7 @@ function Navbar(): JSX.Element {
               onChange={onToggleChange}
             />
           )}
-          <SearchBar
-            handleSearchBarToggle={setIsSearchBarExpanded}
-            isSearchBarExpanded={isSearchBarExpanded}
-          />
+          {!hasSearchNavbarItem && <SearchBar />}
         </div>
       </div>
       <div
@@ -117,7 +127,12 @@ function Navbar(): JSX.Element {
       />
       <div className="navbar-sidebar">
         <div className="navbar-sidebar__brand">
-          <Logo onClick={hideSidebar} />
+          <Logo
+            className="navbar__brand"
+            imageClassName="navbar__logo"
+            titleClassName="navbar__title"
+            onClick={hideSidebar}
+          />
           {!disableColorModeSwitch && sidebarShown && (
             <Toggle
               aria-label="Dark mode toggle in sidebar"
@@ -129,8 +144,13 @@ function Navbar(): JSX.Element {
         <div className="navbar-sidebar__items">
           <div className="menu">
             <ul className="menu__list">
-              {items?.map((item, i) => (
-                <NavbarItem mobile {...item} onClick={hideSidebar} key={i} />
+              {items.map((item, i) => (
+                <NavbarItem
+                  mobile
+                  {...(item as any)} // TODO fix typing
+                  onClick={hideSidebar}
+                  key={i}
+                />
               ))}
             </ul>
           </div>

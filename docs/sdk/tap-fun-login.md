@@ -26,14 +26,14 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-public static AccessToken getCurrentAccessToken();
+public static AccessToken getCurrentToken;
   ```  
   </TabItem>
 
   <TabItem value="ios">
 
 ```objectivec
-+ (TTSDKAccessToken *)currentAccessToken;
++ (AccessToken *)getCurrentToken;
 ```
   </TabItem>
 
@@ -60,7 +60,7 @@ groupId="tap-platform"
 
   ```java
   // 未登录用户会返回 null
-  if (TapLoginHelper.getCurrentAccessToken() == null) {
+  if (TTapBootStrap.getCurrentToken() == null) {
       //TODO 用户未登录
   } else {
      //TODO 用户已经登录过
@@ -71,12 +71,12 @@ groupId="tap-platform"
   <TabItem value="ios">
 
 ```objectivec
-TTSDKAccessToken *currentAccessToken = [TapLoginHelper currentAccessToken];
-if(currentAccessToken.accessToken == nil){
-    // 用户未登录
-}else{
-    // 用户已登录
-}
+AccessToken *accessToken = [TapBootstrap getCurrentToken];
+   if(accessToken == nil){
+       //未登录，请登录
+   }else{
+       //已经登录
+   }
 ```
   </TabItem>
   <TabItem value="unity">
@@ -97,7 +97,7 @@ TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
 </Tabs>
 
 
-## 获取用户登录信息
+## 获取用户信息
 退出登录，清除用户登录缓存记录
 #### API
 <Tabs
@@ -111,14 +111,15 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-public static Profile getCurrentProfile();
+public static void getUser(Callback<TapUser> user);
+public static void getUserDetails(Callback<TapUserDetails> userDetails);
   ```  
   </TabItem>
 
   <TabItem value="ios">
 
 ```objectivec
-+ (TTSDKProfile *)currentProfile;
++ (void)getUserDetails:(TapUserDetailsHandler)handler;
 ```
   </TabItem>
 
@@ -144,11 +145,29 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-// 需要先判空，否则会崩溃
-Profile profile = Profile.getCurrentProfile();
-if (profile != null) {
-    Log.e(TAG, profile.toString());
-}
+TapBootStrap.getUser(new Callback<TapUser>() {
+    @Override
+    public void onSuccess(TapUser tapUser) {
+                
+    }
+
+    @Override
+    public void onFail(TapError tapError) {
+
+    }
+});
+
+TapBootStrap.getUserDetails(new Callback<TapUserDetails>() {
+    @Override
+    public void onSuccess(TapUserDetails tapUserDetails) {
+                
+    }
+
+    @Override
+    public void onFail(TapError tapError) {
+
+    }
+});
   ```
   </TabItem>
 
@@ -156,10 +175,13 @@ if (profile != null) {
 
 ```objectivec
 // 需要先判空，否则会崩溃
-TTSDKProfile *currentProfile = [TapLoginHelper currentProfile];
-if(currentProfile != nil){
-   NSLog([currentProfile toJsonString]);
-}
+[TapBootstrap getUserDetails:^(TapUserDetails *_Nullable userDetail, NSError *_Nullable error) {
+    if (error) {
+        NSLog(@"获取用户信息失败 %@", error);
+    } else {
+        NSLog(@"获取用户信息成功 %@", userDetail.name);
+    }
+}];
 ```
   </TabItem>
   <TabItem value="unity">
@@ -191,14 +213,17 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-  public void startTapLogin(Activity activity, String... permissions);
+  /**
+ * @param type like {TapTap = 0, apple = 1, guest = 2}
+ */
+  public static void login(Activity activity, int type, String... permissions);
   ```  
   </TabItem>
 
   <TabItem value="ios">
 
 ```objectivec
-+ (void)startTapLogin:(NSArray *)permissions;
++ (void)login:(TapBootstrapLoginType)type permissions:(NSArray *_Nullable)permissions;
 ```
   </TabItem>
 
@@ -224,14 +249,17 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-TapLoginHelper.startTapLogin(MainActivity.this, TapTapSdk.SCOPE_PUIBLIC_PROFILE);
+// 登陆类型：0 表示TapTap登陆, 1 表示苹果登陆, 2 表示游客登陆 
+// 本例使用TapTap登陆
+TapBootStrap.login(MainActivity.this, 0);
   ```
   </TabItem>
 
   <TabItem value="ios">
 
 ```objectivec  
-[TapLoginHelper startTapLogin:@[@"public_profile"]];
+TapBootstrapLoginType loginType = TapBootstrapLoginTypeTapTap;
+[TapBootstrap login:(loginType) permissions:@[@"public_profile"]];
 ````
   </TabItem>
   <TabItem value="unity">
@@ -290,14 +318,14 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-TapLoginHelper.logout();
+TapBootStrap.logout();
   ```
   </TabItem>
 
   <TabItem value="ios">
 
 ```objectivec
-[TapLoginHelper logout];
+[TapBootstrap logout];
 ```
   </TabItem>
   <TabItem value="unity">
@@ -305,90 +333,5 @@ TapLoginHelper.logout();
 ```cs
 TapSDK.TDSLogin.Logout();
 ```
-  </TabItem>
-</Tabs>
-
-
-
-
-## 登录设置
-你可以通过 LoginSdkConfig 配置内置 WebView 的 `直角` 和 `国际化`，请在登录前调用
-#### API
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
-
-  ```java
-  changeTapLoginConfig(TapTapSdk.LoginSdkConfig loginConfig);
-  ```  
-  </TabItem>
-
-  <TabItem value="ios">
-
-```objectivec
-//TapLoginHelper
-+ (void)changeTapLoginConfig:(TTSDKConfig *_Nullable)config;
-```
-  </TabItem>
-
-  <TabItem value="unity">
-
-```cs
-public static void Init(string clientId, bool isCN, bool isRoundCorner)
-```
-
-  </TabItem>
-</Tabs>
-
-#### 示例代码
-
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
-
-  ```java
-  TapTapSdk.LoginSdkConfig loginSdkConfig = new TapTapSdk.LoginSdkConfig();
-  //false：登录页面是直角，true：登录页面是圆角
-  loginSdkConfig.roundCorner = false;
-  //RegionType.CN 标识为国内版，RegionType.IO 为国国际版
-  loginSdkConfig.regionType = RegionType.CN;
-  TapLoginHelper.changeTapLoginConfig(loginSdkConfig);
-  ```
-  </TabItem>
-
-  <TabItem value="ios">
-
-  ```objectivec
-  TTSDKConfig *config = [[TTSDKConfig alloc] init];
-  config.regionType = RegionTypeCN;// 海外为 RegionTypeIO（默认值为 RegionTypeCN）
-  config.roundCorner = YES;// NO 则网页登录是边框为直角（默认值为 YES）
-  [TapLoginHelper changeTapLoginConfig:config];
- ````
-  </TabItem>
-  <TabItem value="unity">
-
-```cs
-  /**
-  clientId: 控制台获取的 clientID
-  isCN: 国内外，默认为 true
-  isRoundCorner: 登录框是否圆角，默认为 true
-  **/
-  //public static void Init(string clientId, bool isCN, bool isRoundCorner)
-
-  TapSDK.TDSCore.Init("FwFdCIr6u71WQDQwQN",true,true);
-```
-
   </TabItem>
 </Tabs>

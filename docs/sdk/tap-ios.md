@@ -8,11 +8,11 @@ sidebar_label: iOS
 
 
 :::note
-如需通过示例项目了解如何在 iOS 应用中集成 TapSDK，请参阅 GitHub 中的 [TapSDK_iOS](https://github.com/xindong/TapSDK_iOS) 示例项目。
+如需通过示例项目了解如何在 iOS 应用中集成 TapSDK，请参阅 GitHub 中的 [TapSDK_iOS_Demo](https://github.com/xindong/TapSDK_iOS) 示例项目。
 :::
 
 ## 1. 登录 TapTap 开发者中心
-请登录 [TapTap 开发者中心](https://www.taptap.com/developer-center) 来创建应用或注册为开发者。
+请登录 [TapTap 开发者中心](https://developer.taptap.com/) 来创建应用或注册为开发者。
 
 ## 2. 下载 TapTap 应用
 [点击下载](https://www.taptap.com/mobile) TapTap 应用
@@ -53,30 +53,37 @@ pod update
 ``` -->
 
 <!-- ### 方式二、手动导入 -->
-直接拖拽 [下载](https://github.com/xindong/TapSDK_iOS/releases) 的 SDK 到项目目录即可    
-```
-// 下载目录包含一下三个资源文件都需要导入
-release/TapSDK.framework
-release/TDSCommon.framework
-TDSMomentResource.bundle
-```
+直接拖拽 [下载](https://github.com/xindong/TapSDK_iOS/releases) 的 SDK 到项目目录即可   
 
-![](https://qnblog.ijemy.com/tap_ios_import2.png)
-
+下载目录包含的以下资源文件视需要导入都需要导入  
+```objectivec
+//登录：TapBootstrap
+TapBootstrapResource.bundle
+TapBootstrapSDK.framework
+TapCommonResource.bundle
+TapCommonSDK.framework
+TapLoginSDK.framework
+//动态：TapMoment
+TapMomentResource.bundle
+TapMomentSDK.framework
+```
+<!-- ![](https://qnblog.ijemy.com/tap_ios_import2.png) -->
 
 ## 5. 添加系统依赖库
 请仔细核对下面依赖库是否都添加成功   
 ```objectivec
-'libc++.tbd',
-'TapSDK.framework'
-'WebKit.framework',
-'SystemConfiguration.framework',
-'AVFoundation.framework',
-'Photos.framework',
-'CoreTelephony.framework',
-'MobileCoreServices.framework',
-'AdSupport.framework',
-'Security.framework',
+// 登录：TapBootstrap
+WebKit.framework
+Security.framework
+SystemConfiguration.framework
+
+// 动态：TapMoment
+AVFoundation.framework
+CoreTelephony.framework
+MobileCoreServices.framework
+Photos.framework
+SystemConfiguration.framework
+WebKit.framework
 ```  
 
 ## 6. 跳转 TapTap 登录和打开多媒体
@@ -127,20 +134,20 @@ TDSMomentResource.bundle
 
 a. 如果有 SceneDelegate.m，请添加如下代码到 SceneDelegate.m 文件中即可。
 ```objectivec
-#import <TapSDK/TTSDKApplicationDelegate.h>
+#import <TapBootstrapSDK/TapBootstrapSDK.h>
 - (void)scene:(UIScene *)scene openURLContexts:(NSSet<UIOpenURLContext *> *)URLContexts{
-    [TapLoginHelper handleTapTapOpenURL:URLContexts.allObjects.firstObject.URL];
+    [TapBootstrap handleOpenURL:URLContexts.allObjects.firstObject.URL];
 }
 ```
 
 b. 如果没有 SceneDelegate.m，只有 AppDelegate.m，请添加如下代码到 AppDelegate.m 文件中。
 ```objectivec
 - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
-   return [TapLoginHelper handleTapTapOpenURL:url];
+   return [TapBootstrap handleOpenURL:url];
 }
 
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
-   return [TapLoginHelper handleTapTapOpenURL:url];
+   return [TapBootstrap handleOpenURL:url];
 }
 ```
 并在 AppDelegate.h 中添加 UIWindow，然后删除 info.plist 里面的 Application Scene Manifest
@@ -154,23 +161,14 @@ TapSDK 初始化
 
 #### 示例代码
 ```objectivec
-NSString *clientID = your client id;
-TDSConfig *tconfig = [[TDSConfig alloc]init];
-tconfig.clientId =clientID;
-[TDSInitializer initWithConfig:tconfig];
-
-/** 修改登录配置。
- 此段代码可以不调用，默认配置 (RegionTypeCN 和圆角登录框)
- */
-TTSDKConfig *config = [[TTSDKConfig alloc] init];
-config.regionType = RegionTypeCN;// 海外为 RegionTypeIO（默认值为 RegionTypeCN）
-config.roundCorner = NO;// NO 则网页登录是边框为直角（默认值为 YES）
-[TapLoginHelper changeTapLoginConfig:config];
-
+TapConfig *config = TapConfig.new;
+config.clientId = @"client id";
+config.region = TapSDKRegionTypeCN;
+[TapBootstrap initWithConfig:config];
 ```
 
 #### API
-[initWithConfig](/api/ios-initializer.md#initwithconfig)
+[initWithConfig](/api/ios-tapbootstrap#initwithconfig)
 
 ## 8. 注册登录回调
 注册登录回调，登录结果会通过回调告知前端
@@ -178,17 +176,12 @@ config.roundCorner = NO;// NO 则网页登录是边框为直角（默认值为 Y
 #### 示例代码
 ```objectivec
 // 注册登录回调
-[TapLoginHelper registerLoginResultDelegate:self];
-
-// 实现代理
-@interface ViewController () <TDSMomentDelegate,TapLoginResultDelegate>
-
-@end
+[TapBootstrap registerLoginResultDelegate:self];
 
 // 实现回调方法
 // 登录成功回调
 // @param token token 对象
-- (void)onLoginSuccess:(TTSDKAccessToken *)token{
+- (void)onLoginSuccess:(AccessToken *)token{
     NSLog (@"onLoginSuccess");
 }
 
@@ -199,23 +192,24 @@ config.roundCorner = NO;// NO 则网页登录是边框为直角（默认值为 Y
 
 // 登录失败
 // @param error 失败原因
-- (void)onLoginError:(AccountGlobalError *)error{
+- (void)onLoginError:(NSError *)error{
     NSLog (@"onLoginError error");
 }
 ```
 #### API
-[registerLoginCallback](/api/ios-loginhelper.md#registerlogincallback)
+[registerLoginResultDelegate](/api/ios-tapbootstrap#registerloginresultdelegate)
 
 ## 9. 登录
 TapTap 登录，当没有安装 TapTap app 时，会打开内置 webview 进行 TapTap 验证登录  
 
 #### 示例代码
 ```objectivec
-[TapLoginHelper startTapLogin:@[@"public_profile"]];
+TapBootstrapLoginType loginType = TapBootstrapLoginTypeTapTap;
+[TapBootstrap login:(loginType) permissions:@[@"public_profile"]];
 ```
 
 #### API
-[registerLoginCallback](/api/ios-loginhelper.md#starttaplogin)
+[login](/api/ios-tapbootstrap#login)
 
 ## 10. 登出
 :::caution
@@ -223,8 +217,8 @@ TapTap 登录，当没有安装 TapTap app 时，会打开内置 webview 进行 
 :::
 #### 示例代码
 ```objectivec
-[TapLoginHelper logout];
+[TapBootstrap logout];
 ```
 
 #### API
-[registerLoginCallback](/api/ios-loginhelper.md#logout)
+[registerLoginCallback](/api/ios-tapbootstrap#logout)
