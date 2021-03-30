@@ -1,6 +1,6 @@
 ---
 id: android-tapmoment
-title: TapTapMoment
+title: TapMoment
 ---
 ## method
 
@@ -11,13 +11,13 @@ title: TapTapMoment
 #### API  
 
 ```java
-public static void setCallback(TapTapMomentSdk.TapMomentCallback tapMomentCallback);
+public static void setCallback(TapMoment.TapMomentCallback tapMomentCallback);
 ```
 
 #### 示例代码
 
 ```java
-TapTapMomentSdk.setCallback(new TapTapMomentSdk.TapMomentCallback() {
+TapMoment.setCallback(new TapMoment.TapMomentCallback() {
   @Override
   public void onCallback(int code, String msg) {
 
@@ -42,7 +42,7 @@ AccessToken currentAccessToken = AccessToken.getCurrentAccessToken();
 TapTapMomentSdk.setLoginToken(currentAccessToken);
 ``` -->
 
-### openTapMoment
+<!-- ### openTapMoment
 
 打开动态页面
 
@@ -58,26 +58,53 @@ public static void openTapMoment(TapTapMomentSdk.Config config);
 TapTapMomentSdk.Config config = new TapTapMomentSdk.Config();
 //config 用来设置页面显示配置，包括显示方向等
 TapTapMomentSdk.openTapMoment(config);
+``` -->
+
+### open
+
+打开动态页面
+
+#### API  
+
+```java
+/**
+ * @param orientation 设置动态显示方向
+ * {TapMoment.ORIENTATION_PORTRAIT、TapMoment.ORIENTATION_PORTRAIT}
+ */
+public static void open(int orientation);
 ```
 
-### publishMoment
+#### 示例代码
+
+```java
+TapMoment.open(TapMoment.ORIENTATION_PORTRAIT);
+```
+
+
+### publish
 
 发布普通动态，包括图片和描述
 
 #### API  
 
 ```java
-public static void publishMoment(TapTapMomentSdk.Config config, String imgPaths, String content);
+public static void publish(int orientation, String[] imagePath, String content);
 ```
+** 参数说明 **
+
+| 字段         | 可为空 | 说明               |
+| ---------- | --- | ---------------- |
+| orientation | 否   | 发布动态时横竖屏配置 |
+| imgPaths   | 是   | 动态图片地址      |
+| content    | 是   | 动态描述             |
 
 #### 示例代码
 
 ```java
-TapTapMomentSdk.Config config = new TapTapMomentSdk.Config();
-config.orientation = TapTapMomentSdk.ORIENTATION_DEFAULT;  
-String content = "普通动态描述";
-String[] imagePaths = new String[] { "content://***.jpg","/sdcard/**.jpg" };
-TapTapMomentSdk.publishMoment(config, imagePaths, content);
+int orientation = TapMoment.ORIENTATION_PORTRAIT;
+String content = "发布动态内容描述";
+String[] imagePaths = new String[]{"content://***.jpg", "/sdcard/**.jpg"};
+TapMoment.publish(orientation, imagePaths, content);
 ```
 
 <!-- ### publishVideoMoment
@@ -114,20 +141,20 @@ TapTapMomentSdk.publishVideoMoment(config, videoPaths, imagePaths, title, conten
 | title      | 否   | 动态标题             |
 | content    | 是   | 动态描述             | -->
 
-### getNoticeData
+### fetchNotification
 
 获取用户新通知数量   
 
 #### API  
 
 ```java
-public static void getNoticeData();
+public static void fetchNotification();
 ```
 
 #### 示例代码
 
 ```java
-TapTapMomentSdk.getNoticeData();
+TapMoment.fetchNotification();
 ```
 
 <!-- ### openUserMoment
@@ -154,7 +181,7 @@ TapTapMomentSdk.openUserMoment(config, userId);
 | ------ | --- | ---------------------------------------------------- |
 | userId | 否   | xd 的 userId，非 TapTap 的 userId | -->
 
-### closeMoment
+### close
 
 关闭动态页面
 
@@ -162,20 +189,20 @@ TapTapMomentSdk.openUserMoment(config, userId);
 
 ```java
 // 直接关闭
-public static void closeMoment();
+public static void close();
 
 // 确认关闭
-public static void closeMoment(String title, String content);
+public static void closeWithConfirmWindow(String title, String content)
 ```
 
 #### 示例代码
 
 ```java
 // 直接关闭
-TapTapMomentSdk.closeMoment();
+TapMoment.close();
 
 // 确认关闭
-TapTapMomentSdk.closeMoment(title, content);
+TapMoment.closeWithConfirmWindow(title, content);
 ```
 
 ** 参数说明 **
@@ -199,7 +226,7 @@ public static String getSdkVersion()
 #### 示例代码
 
 ```java
-String sdkVersion = TapTapMomentSdk.getSdkVersion();
+String sdkVersion = TapMoment.getSdkVersion();
 ```
 
 
@@ -216,5 +243,4 @@ String sdkVersion = TapTapMomentSdk.getSdkVersion();
 | CALLBACK_CODE_ClOSE_CANCEL | 50000   | 取消关闭所有动态界面（弹框点击取消按钮） |
 | CALLBACK_CODE_ClOSE_CONFIRM | 50100   | 确认关闭所有动态界面（弹框点击确认按钮） |
 | CALLBACK_CODE_LOGIN_SUCCESS | 60000   | 动态页面内登录成功 |
-| CALLBACK_CODE_ON_STOP | 500   | 动态回调停止 (内部回调，请忽略) |
-| CALLBACK_CODE_ON_RESUME | 6000   | 动态回调开始(内部回调，请忽略) |
+
