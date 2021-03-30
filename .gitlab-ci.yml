@@ -1,10 +1,60 @@
+include:
+  - project: sre/gitlab-ci-templates
+    ref: v1.0.4
+    file:
+      - /shared/build-and-push-image.yml
+      - /shared/deploy-kubefiles.yml
+
 stages:
   - build
+  - image
+  - deploy-staging
+  - deploy-production
+
 build:
   stage: build
-  tags:
-    - builds
+  image: node:15.12
+  before_script:
+    - yarn --version
+    - yarn install
   script:
-    - sh .ci/build.sh
+    - node_modules/.bin/docusaurus build
+  artifacts:
+    paths:
+      - build
+    expire_in: 1 day
+  cache:
+    paths:
+      - node_modules
+
+build-and-push-image:
+  stage: image
+  extends:
+    - .build-and-push-image
+  variables:
+    DOCKER_REGISTRY_NAMESPACE: tds
+    DOCKER_REGISTRY_REPO: tapsdkdoc
+  dependencies:
+    - build
+
+deploy-staging:
+  stage: deploy-staging
+  extends:
+    - .deploy-kubefiles-staging
+  variables:
+    PROJECT_PATH: tds/tapsdkdoc
+  needs:
+    - build-and-push-image
+  only:
+    - master
+
+deploy-production:
+  stage: deploy-production
+  extends:
+    - .deploy-kubefiles-production
+  variables:
+    PROJECT_PATH: tds/tapsdkdoc
+  needs:
+    - deploy-staging
   only:
     - master
