@@ -32,3 +32,61 @@ TapBootStrap.init(MainActivity.this, tapConfig);
 | :--------- | :-- | :---------------- |
 | context   | 否   | 上下文 |
 | clientId | 否   | 开发者中心获取的 client Id |
+
+### isInitialized
+
+是否完成初始化
+
+#### API  
+
+```java
+public static void isInitialized(Callback<TapSdkInitResult> callback);
+```
+
+#### 示例代码
+
+```java
+TapBootStrap.isInitialized(new Callback<TapSdkInitResult>() {
+    @Override
+    public void onSuccess(TapSdkInitResult tapSdkInitResult) {
+        // 初始化成功
+    }
+
+    @Override
+    public void onFail(TapError tapError) {
+        // 初始化失败
+    }
+});
+```
+
+### registerLoginResultListener
+
+是否完成初始化
+
+#### API  
+
+```java
+public static void registerLoginResultListener(TapLoginResultListener loginResultListener);
+```
+
+#### 示例代码
+
+```java
+TapBootStrap.registerLoginResultListener(new TapLoginResultListener() {
+    @Override
+    public void loginSuccess(AccessToken accessToken) {
+        Log.d(TAG, "onLoginSuccess: " + accessToken.toJSON());
+    }
+
+    @Override
+    public void loginFail(TapError tapError) {
+        Log.d(TAG, "onLoginError: " + tapError.getMessage());
+    }
+
+    @Override
+    public void loginCancel() {
+        Log.d(TAG, "onLoginCancel");
+    }
+});
+```
+
