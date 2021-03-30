@@ -14,75 +14,6 @@ import {Highlight} from '../component';
 ## 1. 介绍
 内嵌动态基于 TapTap 内容社区的功能和游戏本身的账号系统的更多融合，成功接入内嵌动态 SDK 后玩家即可通过游戏直接访问 TapTap 内容和自带功能。同时内嵌动态 SDK 也为游戏打造个性化内容或服务提供了开放功能。
 
-## 2. 功能开启
-API 放在 init 初始化 SDK 之后调用即可  
-
-#### API  
-
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
-
-  ```java
-TdsInitializer.enableMoment(Activity);
-  ```  
-  </TabItem>
-
-  <TabItem value="ios">
-
-  ```objectivec
-+ (void)enableMoment;
-  ```
-  </TabItem>
-
-  <TabItem value="unity">
-
-```cs
-public static void EnableMoment();
-```
-
-  </TabItem>
-</Tabs>
-
-#### 示例代码
-
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
-
-```java
-  TdsInitializer.enableMoment(MainActivity.this);
-```
-  </TabItem>
-
-  <TabItem value="ios">
-
-  ```objectivec
-[TDSInitializer enableMoment];
-  ```
-  </TabItem>
-  <TabItem value="unity">
-
-```cs
-TapSDK.TDSCore.EnableMoment();
-```
-
-  </TabItem>
-</Tabs>
-
-
 ## 3. 设置回调
 调用 enableMoment 后，需要设置动态回调，用于获取动态的状态变化
 
@@ -105,7 +36,7 @@ TapTapMomentSdk.setCallback(TapTapMomentSdk.TapMomentCallback var0);
   <TabItem value="ios">
 
   ```objectivec
-- (void)onMomentCallbackWithCode:(NSInteger)code msg:(NSString *)msg;
++ (void)setDelegate:(id <TapMomentDelegate>)delegate;
   ```
   </TabItem>
   <TabItem value="unity">
@@ -145,15 +76,14 @@ TapTapMomentSdk.setCallback(new TapTapMomentSdk.TapMomentCallback() {
   <TabItem value="ios">
 
   ```objectivec
-  @interface ViewController () <TDSMomentDelegate>
+@interface ViewController ()<TapMomentDelegate>
+@end
 
-  @end
-
-  - (void)onMomentCallbackWithCode:(NSInteger)code msg:(NSString *)msg {
-      NSLog (@"msg:%@, code:%i" ,msg, code);
-  }
-
-  [TDSMomentSdk setDelegate:self];
+[TapMoment setDelegate:self];
+- (void)onMomentCallbackWithCode:(NSInteger)code msg:(NSString *)msg
+{
+    NSLog (@"msg:%@, code:%i" ,msg, code);
+}  
   ```
   </TabItem>
   <TabItem value="unity">
@@ -284,7 +214,7 @@ TapTapMomentSdk.openTapMoment(TapTapMomentSdk.Config);
   <TabItem value="ios">
 
   ```objectivec
-  + (void)openTapMomentWithConfig:(TDSMomentConfig *) config;
++ (void)open:(TapMomentConfig *)config;
   ```
   </TabItem>
   <TabItem value="unity">
@@ -318,9 +248,9 @@ groupId="tap-platform"
   <TabItem value="ios">
 
   ```objectivec
-TDSMomentConfig *mconfig = [[TDSMomentConfig alloc]init];
-mconfig.orientation = TDSMomentOrientationDefault;
-[TDSMomentSdk openTapMomentWithConfig:mconfig];
+  TapMomentConfig *mConfig = TapMomentConfig.new;
+  mConfig.orientation = TapMomentOrientationDefault;
+  [TapMoment open:mConfig];
   ```
   </TabItem>
   <TabItem value="unity">
@@ -356,8 +286,8 @@ groupId="tap-platform"
   <TabItem value="ios">
 
   ```objectivec
-  + (void)openPostMomentPageWithContent:(TDSPostMomentData * _Nonnull)content
-                                 config:(TDSMomentConfig * _Nonnull)config;
+  + (void)publish:(TapMomentConfig *_Nonnull)config
+        content:(TapMomentPostData *_Nonnull)content;
   ```
   </TabItem>
   <TabItem value="unity">
@@ -392,14 +322,14 @@ TapTapMomentSdk.publishMoment(config, imagePaths, content);
   <TabItem value="ios">
 
   ```objectivec
-  TDSImageMomentData *imageMoment = [[TDSImageMomentData alloc] init];
-  imageMoment.images = @[@"file://..."];
-  imageMoment.content = @"我是发图片动态的内容";
-
-  TDSMomentConfig *config = [[TDSMomentConfig alloc] init];
-  config.orientation = TDSMomentOrientationDefault;
-
-  [TDSMomentSdk openPostMomentPageWithContent:imageMoment config:config];
+  //发布动态配置横竖屏
+TapMomentConfig * tconfig = TapMomentConfig.new;
+tconfig.orientation = TapMomentOrientationDefault;
+//发布图片动态
+ TapMomentImageData *postData = TapMomentImageData.new;
+ postData.images = @[@"file://..."];
+ postData.content = @"我是图片描述";
+ [TapMoment publish:tconfig content:(postData)];
   ```
   </TabItem>
   <TabItem value="unity">
@@ -551,7 +481,7 @@ TapTapMomentSdk.getNoticeData();
   <TabItem value="ios">
 
   ```objectivec
-+ (void)fetchNewMessage;
++ (void)fetchNotification;
   ```
   结果在 `Delegate` 下的 `onMomentCallbackWithCode:msg:` 中返回。  
   `code == CALLBACK_CODE_GET_NOTICE_SUCCESS`(20000) 表示获取成功，`msg` 为 0 表示无新消息，为 1 表示有新消息。   
@@ -663,7 +593,7 @@ TapTapMomentSdk.closeMoment();
   <TabItem value="ios">
 
   ```objectivec
-[TDSMomentSdk closeMoment];
+ [TapMoment close];
   ```
   </TabItem>
   <TabItem value="unity">
@@ -704,7 +634,7 @@ content | 否 | 动态描述
   <TabItem value="ios">
 
   ```objectivec
-[TDSMomentSdk closeMomentWithTitle:@"title" content:@"content" showConfirm:true];
+[TapMoment closeWithTitle:@"title" content:@"content" showConfirm:YES];
   ```
   **参数说明**
 
