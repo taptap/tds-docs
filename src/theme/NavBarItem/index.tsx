@@ -6,10 +6,10 @@
  */
 
 import React from 'react';
-import DefaultNavbarItem from '@theme/NavBarItem/DefaultNavbarItem';
-import SearchNavbarItem from '@theme/NavBarItem/SearchNavbarItem';
+import DefaultNavbarItem from '@theme/NavbarItem/DefaultNavbarItem';
+import SearchNavbarItem from '@theme/NavbarItem/SearchNavbarItem';
 import type {Props} from '@theme/NavbarItem';
-import LocaleDropdownNavbarItem from './LocaleDropdownNavbarItem';
+import LocaleDropdownNavbarItem from '@theme/NavbarItem/LocaleDropdownNavbarItem';
 
 const NavbarItemComponents = {
   default: () => DefaultNavbarItem,
@@ -20,13 +20,13 @@ const NavbarItemComponents = {
   // See https://github.com/facebook/docusaurus/issues/3360
   docsVersion: () =>
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require('@theme/NavBarItem/DocsVersionNavbarItem').default,
+    require('@theme/NavbarItem/DocsVersionNavbarItem').default,
   docsVersionDropdown: () =>
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require('@theme/NavBarItem/DocsVersionDropdownNavbarItem').default,
+    require('@theme/NavbarItem/DocsVersionDropdownNavbarItem').default,
   doc: () =>
     // eslint-disable-next-line @typescript-eslint/no-var-requires
-    require('@theme/NavBarItem/DocNavbarItem').default,
+    require('@theme/NavbarItem/DocNavbarItem').default,
 } as const;
 
 const getNavbarItemComponent = (

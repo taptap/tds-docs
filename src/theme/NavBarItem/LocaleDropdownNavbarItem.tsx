@@ -6,8 +6,8 @@
  */
 
 import React from 'react';
-import DefaultNavbarItem from '@theme/NavBarItem/DefaultNavbarItem';
-import type { Props } from '@theme/NavBarItem/LocaleDropdownNavbarItem';
+import DefaultNavbarItem from '@theme/NavbarItem/DefaultNavbarItem';
+import type { Props } from '@theme/NavbarItem/LocaleDropdownNavbarItem';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import { useAlternatePageUtils } from '@docusaurus/theme-common';
 import IconIntl from './IconIntl';
