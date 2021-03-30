@@ -30,8 +30,10 @@ module.exports = {
           'api/android-tapmoment'],
         },
         {
-          iOS: ['api/ios-initializer', 'api/ios-loginhelper',
+          iOS: [
+          //'api/ios-initializer', 'api/ios-loginhelper',
           //'api/ios-tapdb',
+          'api/ios-tapbootstrap',
           'api/ios-tapmoment'],
         },
         {

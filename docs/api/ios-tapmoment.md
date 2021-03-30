@@ -1,7 +1,9 @@
 ---
 id: ios-tapmoment
-title: TDSMomentSdk
+title: TapMoment
 ---
+import {Highlight} from '../component';
+
 ## method
 
 ### setDelegate
@@ -11,15 +13,22 @@ title: TDSMomentSdk
 #### API  
 
 ```objectivec
-+ (void)setDelegate:(id <TDSMomentDelegate>)delegate;
++ (void)setDelegate:(id <TapMomentDelegate>)delegate;
 ```
 
 #### 示例代码
 
 ```objectivec
-[TDSMomentSdk setDelegate:self];
-```
+@interface ViewController ()<TapMomentDelegate>
+@end
 
+[TapMoment setDelegate:self];
+- (void)onMomentCallbackWithCode:(NSInteger)code msg:(NSString *)msg
+{
+  NSLog (@"msg:%@, code:%i" ,msg, code);
+}  
+```
+<!--
 ### onMomentCallbackWithCode
 
 动态回调结果  
@@ -40,7 +49,7 @@ title: TDSMomentSdk
 - (void)onMomentCallbackWithCode:(NSInteger)code msg:(NSString *)msg {
     NSLog (@"msg:%@, code:%i" ,msg, code);
 }
-```
+``` -->
 
 <!-- ### setAccessToken
 
@@ -58,75 +67,64 @@ title: TDSMomentSdk
 [TDSMomentSdk setAccessToken:[TDSMomentAccessToken build:[[TapLoginHelper currentAccessToken]toJsonString]]];
 ``` -->
 
-### openTapMomentWithConfig
+### open
 
 打开动态页面
 
 #### API  
 
 ```objectivec
-  + (void)openTapMomentWithConfig:(TDSMomentConfig *) config;
++ (void)open:(TapMomentConfig *)config;
 ```
 
 #### 示例代码
 
 ```objectivec
-TDSMomentConfig *momentConfig = [[TDSMomentConfig alloc] init];
-momentConfig.orientation = TDSMomentOrientationDefault;
-[TDSMomentSdk openTapMomentWithConfig:momentConfig];
+TapMomentConfig *mConfig = TapMomentConfig.new;
+mConfig.orientation = TapMomentOrientationDefault;
+[TapMoment open:mConfig];
 ```
 
-### openPostMomentPageWithContent
+### publish
 
 发布动态
 
 #### API  
 
 ```objectivec
-+ (void)openPostMomentPageWithContent:(TDSPostMomentData * _Nonnull)content
-                               config:(TDSMomentConfig * _Nonnull)config;
++ (void)publish:(TapMomentConfig *_Nonnull)config
+      content:(TapMomentPostData *_Nonnull)content;
 ```
 
 #### 示例代码
 
 ```objectivec
-// 发布图片动态
-TDSImageMomentData *imageMoment = [[TDSImageMomentData alloc] init];
-imageMoment.images = @[@"file://..."];
-imageMoment.content = @"我是发图片动态的内容";
-TDSMomentConfig *config = [[TDSMomentConfig alloc] init];
-config.orientation = TDSMomentOrientationDefault;
-[TDSMomentSdk openPostMomentPageWithContent:imageMoment config:config];
-
-// 发布视频动态
-TDSVideoMomentData *videoMoment = [[TDSVideoMomentData alloc] init];
-videoMoment.images = @[@"file://..."];
-videoMoment.videos = @[@"file://..."];
-videoMoment.title = @"我是发送视频动态的标题";
-videoMoment.content = @"我是发送视频动态的内容";
-TDSMomentConfig *config = [[TDSMomentConfig alloc] init];
-config.orientation = TDSMomentOrientationDefault;
-[TDSMomentSdk openPostMomentPageWithContent:videoMoment config:config];
+//发布动态配置横竖屏
+TapMomentConfig * tconfig = TapMomentConfig.new;
+tconfig.orientation = TapMomentOrientationDefault;
+//发布图片动态
+TapMomentImageData *postData = TapMomentImageData.new;
+postData.images = @[@"file://..."];
+postData.content = @"我是图片描述";
+[TapMoment publish:tconfig content:(postData)];
 ```
 
 **参数说明**
 
 | 字段         | 可为空 | 说明               |
 | ---------- | --- | ---------------- |
-| config     | 否   | 发布动态图片或者视频的横竖屏配置 |
-| videoPaths | 否   | 视频文件路径，数组形式呈现    |
-| imgPaths   | 是   | 视频封面图，可以不配置      |
-| title      | 否   | 动态标题             |
+| config     | 否   | 发布动态图片横竖屏配置 |
+| images   | 是   | 图片地址     |
 | content    | 是   | 动态描述             |
 
-### fetchNewMessage
+### fetchNotification
 
 获取用户新通知数量   
 
 #### API  
 
 ```objectivec
-+ (void)fetchNewMessage;
++ (void)fetchNotification;
 ```
 
   结果在 `Delegate` 下的 `onMomentCallbackWithCode:msg:`, code == TM_RESULT_CODE_NEW_MSG_SUCCEED 时，`msg` 0 为无新消息，1 为有新消息
@@ -134,7 +132,7 @@ config.orientation = TDSMomentOrientationDefault;
 #### 示例代码
 
 ```objectivec
-[TDSMomentSdk fetchNewMessage];
+[TapMoment fetchNotification];
 ```
 <!--
 ### openUserCenterWithConfig
@@ -167,42 +165,44 @@ config.orientation = TDSMomentOrientationDefault;
 #### API  
 
 ```objectivec
-+ (void)closeMoment;
++ (void)close;
 ```
 
 #### 示例代码
 
 ```objectivec
-[TDSMomentSdk closeMoment];
+[TapMoment close];
 ```
 
-### closeMomentWithTitle
+### closeWithTitle
 
 确认方式关闭动态页面
 
 #### API  
 
 ```objectivec
-+ (void)closeMomentWithTitle:(NSString *)title content:(NSString *)content showConfirm:(BOOL)showConfirm;
++ (void)closeWithTitle:(NSString *)title
+               content:(NSString *)content
+           showConfirm:(BOOL)showConfirm;
 ```
 
 #### 示例代码
 
 ```objectivec
-[TDSMomentSdk closeMomentWithTitle:@"title" content:@"content" showConfirm:true];
+[TapMoment closeWithTitle:@"title" content:@"content" showConfirm:YES];
 ```
 
 **参数说明**
 
 | 字段          | 可为空 | 说明       |
 | ----------- | --- | -------- |
-| title       | 否   | 动态标题     |
-| content     | 否   | 动态描述     |
+| title       | 否   | 弹窗Title     |
+| content     | 否   | 弹窗描述     |
 | showConfirm | 否   | 是否显示确认弹窗 |
 
 ### getSdkVersion
 
-获取动态功能版本。**注意** 并非是 TapSDK version。此 API 不建议调用
+获取动态功能版本。<Highlight color='#f00'>注意</Highlight> 并非是 TapSDK version。此 API 不建议调用
 
 #### API  
 
@@ -213,12 +213,12 @@ config.orientation = TDSMomentOrientationDefault;
 #### 示例代码
 
 ```objectivec
-NSString *version =  [TDSMomentSdk getSdkVersion];
+NSString *version =  [TapMoment getSdkVersion];
 ```
 
 ### getSdkVersionCode
 
-获取动态功能版本 code，**注意** 并非是 TapSDK version。此 API 不建议调用
+获取动态功能版本 code，<Highlight color='#f00'>注意</Highlight> 并非是 TapSDK version。此 API 不建议调用
 
 #### API  
 
@@ -229,7 +229,7 @@ NSString *version =  [TDSMomentSdk getSdkVersion];
 #### 示例代码
 
 ```objectivec
- NSString *versionCode =  [TDSMomentSdk getSdkVersionCode];
+ NSString *versionCode =  [TapMoment getSdkVersionCode];
 ```
 
 ## 回调
