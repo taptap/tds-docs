@@ -7,7 +7,7 @@ slug: /sdk
 本文主要介绍 Android 如何将 TapSDK 快速接入并实现登录功能。
 
 :::note
-如需通过示例项目了解如何在 Android 应用中集成 TapSDK，请参阅 GitHub 中的 [TapSDK_Android](https://github.com/xindong/TapSDK_Android) 示例项目。
+如需通过示例项目了解如何在 Android 应用中集成 TapSDK，请参阅 GitHub 中的 [TapSDK_Android_Demo](https://github.com/TapTap/TapSDK-Android) 示例项目。
 :::
 
 ## 1. 登录 TapTap 开发者中心
@@ -28,7 +28,7 @@ dependencies {
 }
 ```   -->
 <!-- ### 方法二、手动添加 -->
-1. 将 [下载](https://github.com/xindong/TapSDK_Android/releases) 的 SDK 包，导入到 **your project** > **app** > **libs** 目录下  
+1. 将 [下载](https://github.com/TapTap/TapSDK_Android) 的 SDK 包，导入到 **your project** > **app** > **libs** 目录下  
 2. 打开你工程的 **your project ** > **app** > **build.gradle** 文件，添加 gradle 配置如下  
 ```java  
 repositories{  
@@ -63,6 +63,7 @@ TapSDK 初始化
 TapConfig tapConfig = new TapConfig.Builder()
                 .withAppContext(getApplicationContext())
                 .withClientId("client Id") // 开发者中心获取到的 client Id
+                .withRegionType(TapRegionType.CN) // TapRegionType.CN: 国内  TapRegionType.IO: 国外
                 .build();
 TapBootstrap.init(MainActivity.this, tapConfig);  
 ```

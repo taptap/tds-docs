@@ -14,7 +14,7 @@ import {Highlight} from '../component';
 ## 1. 介绍
 内嵌动态基于 TapTap 内容社区的功能和游戏本身的账号系统的更多融合，成功接入内嵌动态 SDK 后玩家即可通过游戏直接访问 TapTap 内容和自带功能。同时内嵌动态 SDK 也为游戏打造个性化内容或服务提供了开放功能。
 
-## 3. 设置回调
+## 2. 设置回调
 调用 enableMoment 后，需要设置动态回调，用于获取动态的状态变化
 
 #### API
@@ -183,7 +183,7 @@ TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
 </Tabs> -->
 
 
-## 4. 打开动态页面
+## 3. 打开动态页面
 在游戏中，显示游戏动态页面。
 > <Highlight color='#f00'> 打开动态页面时，请先屏蔽游戏自身的声音，避免与动态内视频声音产生重合 </Highlight>    
 
@@ -263,7 +263,7 @@ TapMoment.Open(TapSDK.Orientation.ORIENTATION_LANDSCAPE);
 </Tabs>
 
 
-## 5. 发布动态
+## 4. 发布动态
 
 普通动态包括图片和对应的内容描述
 
@@ -455,7 +455,7 @@ content | 是 | 动态描述 -->
 
 
 
-## 6. 获取用户新通知数量
+## 5. 获取用户新通知数量
 当游戏需要获取当前用户的新的通知信息数量时，调用该接口
 
 #### API  
@@ -566,7 +566,7 @@ TapTapMomentSdk.openUserMoment(config, openId);
   </TabItem>
 </Tabs> -->
 
-## 7. 关闭动态页面
+## 6. 关闭动态页面
 
 当游戏在特定场景下需要主动关闭动态窗口时调用
 ### 直接关闭  
@@ -660,7 +660,7 @@ desc | 否 | 动态描述
   </TabItem>
 </Tabs>
 
-## 8. 注意事项
+## 7. 注意事项
 - 打开动态页面时，请先屏蔽游戏自身的声音，避免与动态内视频声音产生重合
 - 如需要动态能支持横竖屏随设备自动旋转，需要游戏 app 自身能支持横竖屏 (Xcode 配置 Device Orientation)
 - 小红点建议请求频率 1 次 / 1 分钟
