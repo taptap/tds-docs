@@ -229,7 +229,7 @@ AccessToken *accessToken = [TapBootstrap getCurrentToken];
 [TapBootstrap setPreferredLanguage:0];
 ```
 
-### isTapTapGlobalClientSupport
+<!-- ### isTapTapGlobalClientSupport
 当前是否有国外客户端支持
 #### API
 
@@ -241,7 +241,7 @@ AccessToken *accessToken = [TapBootstrap getCurrentToken];
 
 ```objectivec
 bool isIOSuport = [TapLoginHelper isTapTapGlobalClientSupport];
-```
+``` -->
 
 ## 错误码
 | 字段          | code | 说明       |
