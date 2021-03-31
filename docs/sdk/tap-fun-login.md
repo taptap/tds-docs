@@ -40,7 +40,7 @@ public static AccessToken getCurrentToken;
   <TabItem value="unity">
 
 ```cs
-public static void GetCurrentAccessToken(Action<TDSAccessToken> callback)
+public static void Login (LoginType loginType, string[] permissions);
 ```
 
   </TabItem>
@@ -82,15 +82,15 @@ AccessToken *accessToken = [TapBootstrap getCurrentToken];
   <TabItem value="unity">
 
 ```cs
-TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
-  if (token != null)
-  {
-      // 用户已经登录
-      Debug.Log(token.toJSON());
-  }
-  else {
-      // 用户未登录
-  }
+TapBootstrap.GetAccessToken((accessToken, error) => {
+   if (accessToken == null)
+   {
+       Debug.Log("当前未登录");
+   }
+   else
+   {
+       Debug.Log("已登录");
+   }
 });
 ```
   </TabItem>
@@ -126,7 +126,7 @@ public static void getUserDetails(Callback<TapUserDetails> userDetails);
   <TabItem value="unity">
 
 ```cs
-public static void GetCurrentProfile(Action<TDSLoginProfile> callback)
+public static void GetDetailUser (Action<TapUserDetail, TapError> action);
 ```
 
   </TabItem>
@@ -148,7 +148,7 @@ groupId="tap-platform"
 TapBootStrap.getUser(new Callback<TapUser>() {
     @Override
     public void onSuccess(TapUser tapUser) {
-                
+
     }
 
     @Override
@@ -160,7 +160,7 @@ TapBootStrap.getUser(new Callback<TapUser>() {
 TapBootStrap.getUserDetails(new Callback<TapUserDetails>() {
     @Override
     public void onSuccess(TapUserDetails tapUserDetails) {
-                
+
     }
 
     @Override
@@ -188,10 +188,8 @@ TapBootStrap.getUserDetails(new Callback<TapUserDetails>() {
 
 ```cs
 // 需要先判空，否则会崩溃
-TapSDK.TDSLogin.GetCurrentProfile((profile) => {
-    if (profile != null) {
-        Debug.Log(profile.toJSON());
-    }
+TapBootstrap.GetDetailUser((userDetail, error) => {
+  Debug.Log(userDetail.ToJSON());
 });
 ```
   </TabItem>
@@ -230,7 +228,7 @@ groupId="tap-platform"
   <TabItem value="unity">
 
 ```cs
-public static void StartLogin(string[] permissions)
+public static void Login (LoginType loginType, string[] permissions);
 ```
 
   </TabItem>
@@ -249,7 +247,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-// 登陆类型：0 表示TapTap登陆, 1 表示苹果登陆, 2 表示游客登陆 
+// 登陆类型：0 表示TapTap登陆, 1 表示苹果登陆, 2 表示游客登陆
 // 本例使用TapTap登陆
 TapBootStrap.login(MainActivity.this, 0);
   ```
@@ -265,7 +263,9 @@ TapBootstrapLoginType loginType = TapBootstrapLoginTypeTapTap;
   <TabItem value="unity">
 
 ```cs
-TapSDK.TDSLogin.StartLogin(new string[]{"public_profile"});
+TapBootstrap.TapConfig config = new TapConfig();
+LoginType loginType = LoginType.TAPTAP;
+TapBootstrap.Login(loginType, new string[] { "public_profile" });
 ```
   </TabItem>
 </Tabs>
@@ -299,7 +299,7 @@ public static void logout();
   <TabItem value="unity">
 
 ```cs
-public static void Logout();
+public static void Logout()
 ```
 
   </TabItem>
@@ -331,7 +331,7 @@ TapBootStrap.logout();
   <TabItem value="unity">
 
 ```cs
-TapSDK.TDSLogin.Logout();
+TapBootstrap.Logout();
 ```
   </TabItem>
 </Tabs>

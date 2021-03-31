@@ -221,4 +221,4 @@ TapBootstrapLoginType loginType = TapBootstrapLoginTypeTapTap;
 ```
 
 #### API
-[registerLoginCallback](/api/ios-tapbootstrap#logout)
+[logout](/api/ios-tapbootstrap#logout)
