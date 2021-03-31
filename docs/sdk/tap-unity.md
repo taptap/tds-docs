@@ -14,7 +14,7 @@ import {Highlight} from '../component';
 
 
 ## 1. 登录 TapTap 开发者中心
-请登录 [TapTap 开发者中心](https://www.taptap.com/developer-center) 来创建应用或注册为开发者。
+请登录 [TapTap 开发者中心](https://developer.taptap.com/) 来创建应用或注册为开发者。
 
 ## 2. 下载 TapTap 应用
 点击下载 [TapTap 应用](https://www.taptap.com/mobile)
@@ -69,13 +69,13 @@ import {Highlight} from '../component';
 </plist>
 ```
 
-## 6. 添加 SDK 引用
+<!-- ## 6. 添加 SDK 引用
 **<Highlight color="#f00"> 默认无需配置，如果错误提示缺少 TapSDK 时请按下面步骤配置 </Highlight>**
 
-1. 在 <项目脚本语言根目录> 下面创建.amsdef 文件如下图即可。
+1. 在 <项目脚本语言根目录> 下面创建.amsdef 文件如下图即可。 -->
 <!-- 如果项目业务只在指定目录调用 TapSDK，也可以只在调用 TapSDK 处的同级目录下创建
 ![](https://qnblog.ijemy.com/xd_amsdefpng.png) -->
-![](https://qnblog.ijemy.com/xd_unity_amsdef.png)
+<!-- ![](https://qnblog.ijemy.com/xd_unity_amsdef.png)
 
 2. 添加如下配置
 
@@ -95,49 +95,56 @@ import {Highlight} from '../component';
         "iOS"
     ],
 }
-```
+``` -->
 
-## 7. 初始化
+## 6. 初始化
 TapSDK 的初始化操作
 #### 示例代码
 ```cs
-TapSDK.TDSCore.Init("clientId");
+TapConfig tapConfig = new TapConfig("FwFdCIr6u71WQDQwQN", true);
+TapBootstrap.Init(tapConfig);
 ```
 #### API
-[Init](/api/unity-login.md/#init)
+[Init](/api/unity-tapbootstrap.md/#init)
 
 ## 8. 注册回调
 注册登录回调，成功与否的信息在回调中处理
 #### 示例代码
 ```cs
-TapSDK.TDSLogin.RegisterLoginCallback(new MyLoginCallback());
-public class MyLoginCallback : TapSDK.LoginCallback{
-   public void LoginSuccess(TapSDK.TDSAccessToken accessToken){
-       Debug.Log("Login success");
-   }
+TapBootstrap.RegisterLoginResultListener(new MyLoginCallback());
+public class MyLoginCallback : TapBootstrap.ITapLoginResultListener {
+  public void OnLoginSuccess(AccessToken accessToken)
+  {
+      Debug.Log("登录成功:  " + accessToken.ToJSON());
+  }
 
-   public void LoginCancel(){
-       Debug.Log("LoginCancel");
-   }
+  public void OnLoginError(TapError error)
+  {
+      Debug.Log("登录失败的error信息:  " + error.errorDescription);
 
-   public void LoginError(TapSDK.TDSAccountError error){
-       Debug.Log(error.ToString());
-   }
+  }
+
+  public void OnLoginCancel()
+  {
+      Debug.Log("登录取消");
+  }
 }
 ```
 
 #### API
-[RegisterLoginCallback](/api/unity-login.md/#registerlogincallback)
+[RegisterLoginCallback](/api/unity-tapbootstrap.md/#registerloginresultlistener)
 
 ## 9. 登录
 TapSDK 提供的登录功能，开始登录
 #### 示例代码
 ```cs
-TapSDK.TDSLogin.StartLogin(new string[]{"public_profile"});
+TapBootstrap.TapConfig config = new TapConfig();
+LoginType loginType = LoginType.TAPTAP;
+TapBootstrap.Login(loginType, new string[] { "public_profile" });
 ```
 
 #### API
-[StartLogin](/api/unity-login.md/#startlogin)
+[StartLogin](/api/unity-tapbootstrap.md/#login)
 
 ## 10. 登出
 
@@ -147,10 +154,10 @@ TapSDK.TDSLogin.StartLogin(new string[]{"public_profile"});
 
 #### 示例代码
 ```cs
-TapSDK.TDSLogin.Logout();
+TapBootstrap.Logout();
 ```
 #### API
-[Logout](/api/unity-login.md/#logout)
+[Logout](/api/unity-tapbootstrap.md/#logout)
 
 ## 11. 导出到 Android
 unity 打包 apk 步骤  
