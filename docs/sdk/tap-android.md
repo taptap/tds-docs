@@ -11,7 +11,7 @@ slug: /sdk
 :::
 
 ## 1. 登录 TapTap 开发者中心
-请登录 [TapTap 开发者中心](https://www.taptap.com/developer-center) 来创建应用或注册为开发者。
+请登录 [TapTap 开发者中心](https://developer.taptap.com/) 来创建应用或注册为开发者。
 
 ## 2. 下载 TapTap 应用
 点击下载 [TapTap 应用](https://www.taptap.com/mobile)
@@ -38,7 +38,7 @@ repositories{
 }  
 dependencies {  
 ...  
-    implementation (name:'TapBootStrap_2.0.0', ext:'aar')  // 必选: x.x.x 代表所下载的 SDK 的版本号
+    implementation (name:'TapBootstrap_2.0.0', ext:'aar')  // 必选: x.x.x 代表所下载的 SDK 的版本号
     implementation (name:'TapCommon_1.1.11', ext:'aar') // 必选:x.x.x 代表所下载的 SDK 的版本号
     implementation (name:'TapMoment_1.2.4', ext:'aar') // 必选:x.x.x 代表所下载的 SDK 的版本号
 }  
@@ -63,19 +63,19 @@ TapConfig tapConfig = new TapConfig.Builder()
                 .withAppContext(getApplicationContext())
                 .withClientId("client Id") // 开发者中心获取到的 client Id
                 .build();
-TapBootStrap.init(MainActivity.this, tapConfig);  
+TapBootstrap.init(MainActivity.this, tapConfig);  
 ```
 
 #### API
 
-[TapBootStrap.init()](/api/android-tapbootstrap.md#init)  
+[TapBootstrap.init()](/api/android-tapbootstrap.md#init)  
 
 ## 6. 注册登录回调
 监听登录的结果  
 
 #### 示例代码
 ```java
-TapBootStrap.registerLoginResultListener(new TapLoginResultListener() {
+TapBootstrap.registerLoginResultListener(new TapLoginResultListener() {
     @Override
     public void loginSuccess(AccessToken accessToken) {
         Log.d(TAG, "onLoginSuccess: " + accessToken.toJSON());
@@ -103,7 +103,11 @@ TapTap 登录，当没有安装 TapTap app 时，会打开内置 webview 进行 
 可以用下面代码直接登录：  
 
 ```java
-TapBootStrap.login(MainActivity.this, 0);
+/**
+ * @param activity 当前Activity
+ * @param type {TapTap = 0, apple = 1, guest = 2}
+ */
+TapBootstrap.login(MainActivity.this, 0);
 ```
 #### API
 [login()](/api/android-tapbootstrap.md#login)  
@@ -113,4 +117,4 @@ TapBootStrap.login(MainActivity.this, 0);
 :::caution
 当用户退出登录的时候请务必调用此方法执行退出功能， 避免用户信息错乱。
 :::
-调用`TapBootStrap.logout()` 实现登出功能。
+调用`TapBootstrap.logout()` 实现登出功能。

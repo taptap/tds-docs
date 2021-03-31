@@ -60,7 +60,7 @@ groupId="tap-platform"
 
   ```java
   // 未登录用户会返回 null
-  if (TTapBootStrap.getCurrentToken() == null) {
+  if (TapBootstrap.getCurrentToken() == null) {
       //TODO 用户未登录
   } else {
      //TODO 用户已经登录过
@@ -145,7 +145,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-TapBootStrap.getUser(new Callback<TapUser>() {
+TapBootstrap.getUser(new Callback<TapUser>() {
     @Override
     public void onSuccess(TapUser tapUser) {
 
@@ -157,7 +157,7 @@ TapBootStrap.getUser(new Callback<TapUser>() {
     }
 });
 
-TapBootStrap.getUserDetails(new Callback<TapUserDetails>() {
+TapBootstrap.getUserDetails(new Callback<TapUserDetails>() {
     @Override
     public void onSuccess(TapUserDetails tapUserDetails) {
 
@@ -249,7 +249,7 @@ groupId="tap-platform"
   ```java
 // 登陆类型：0 表示TapTap登陆, 1 表示苹果登陆, 2 表示游客登陆
 // 本例使用TapTap登陆
-TapBootStrap.login(MainActivity.this, 0);
+TapBootstrap.login(MainActivity.this, 0);
   ```
   </TabItem>
 
@@ -318,7 +318,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-TapBootStrap.logout();
+TapBootstrap.logout();
   ```
   </TabItem>
 
