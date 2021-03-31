@@ -196,6 +196,35 @@ config.region = TapSDKRegionTypeCN;
     NSLog (@"onLoginError error");
 }
 ```
+
+#### AccessToken 使用说明
+- AccessToken 包含过期时间，90天，过期后SDK会自动清除本地缓存
+- AccessToken 信息解出来之后，可以传到游戏服务端去获取用户信息，[获取用户信息](/api/service#流程)
+
+正确的返回 AccessToken 如下  
+
+```cs
+{
+  "accessToken":"accessToken",
+  "kid":"kid",
+  "macAlgorithm":"macAlgorithm",
+  "tokenType":"tokenType",
+  "macKey":"macKey",
+  "expireIn" :7776000
+}
+```
+
+#### 参数说明
+参数  | 描述
+| ------ | ------ |
+accessToken | 用户登录后的凭证
+kid  | 服务端使用需要
+macAlgorithm  | 固定为'hmac-sha-1'
+tokenType  | 固定为'mac'
+macKey  | 服务端使用需要
+expireIn  | 过期时间
+
+
 #### API
 [registerLoginResultDelegate](/api/ios-tapbootstrap#registerloginresultdelegate)
 

@@ -24,6 +24,6 @@ client_id 获取位置如 [图示](http://qnblog.ijemy.com/tap_clientid.png)
 游戏在 TapTap 商店的唯一身份标识  
 例如：https://www.taptap.com/app/187168 ，其中 "187168" 是 app id
 
-## tap user id
+<!-- ## tap user id
 taptap 主站的数字 id，用户在 TapTap 社区的唯一身份标识（开发者不可获取，需用户主动提供）  
-tap user id获取位置如[图示](http://qnblog.ijemy.com/tap_tapid.png)
+tap user id获取位置如[图示](http://qnblog.ijemy.com/tap_tapid.png) -->

@@ -98,7 +98,7 @@ TapBootstrap.GetAccessToken((accessToken, error) => {
 
 
 ## 获取用户信息
-退出登录，清除用户登录缓存记录
+获取用户信息
 #### API
 <Tabs
 groupId="tap-platform"

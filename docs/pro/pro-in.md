@@ -29,5 +29,5 @@ SDK 集成步骤请参考 [快速开始](/sdk/tap-unity)
 
 ![](https://qnblog.ijemy.com/xd-taploginview.png)
 
-## 四、开始测试
-如需要测试SDK功能，可以[点击下载](https://qnblog.ijemy.com/TapSDK测试用例.xlsx)测试用例
+<!-- ## 四、开始测试
+如需要测试SDK功能，可以[点击下载](https://qnblog.ijemy.com/TapSDK测试用例.xlsx)测试用例 -->
