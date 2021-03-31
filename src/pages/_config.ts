@@ -41,10 +41,10 @@ export const entryList: Array<Entry> = [
         label: '品牌素材库',
         href: 'https://www.taptap.com/about-us/brand-resources',
       },
-      {
-        label: 'SDK工具包',
-        to: '/sdk/tap-download',
-      },
+      // {
+      //   label: 'SDK工具包',
+      //   to: '/sdk/tap-download',
+      // },
     ],
   },
   {
