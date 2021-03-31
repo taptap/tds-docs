@@ -15,7 +15,7 @@ sidebar_label: iOS
 请登录 [TapTap 开发者中心](https://developer.taptap.com/) 来创建应用或注册为开发者。
 
 ## 2. 下载 TapTap 应用
-[点击下载](https://www.taptap.com/mobile) TapTap 应用
+点击下载 [TapTap 应用](https://www.taptap.com/mobile)
 
 ## 3. 环境配置
 - 最低支持到 iOS 10.0  
