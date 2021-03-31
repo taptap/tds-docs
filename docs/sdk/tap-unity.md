@@ -9,7 +9,7 @@ import {Highlight} from '../component';
 
 
 :::note
-如需通过示例项目了解如何在 Unity 引擎中集成 TapSDK，请参阅 GitHub 中的 [TapSDK_Unity_Demo](https://github.com/xindong/TapSDK_Unity_Demo) 示例项目。
+如需通过示例项目了解如何在 Unity 引擎中集成 TapSDK，请参阅 GitHub 中的 [TapSDK_Unity_Demo](https://github.com/TapTap) 示例项目。
 :::
 
 
@@ -25,16 +25,16 @@ import {Highlight} from '../component';
 - Android 目标为 API level 21 或更高版本
 
 ## 4. 工程导入
-在 YourProjectPath/Packages/manifest.json 中添加以下代码，[点击](https://github.com/xindong/TAPSDK_UPM/releases) 参考最新版本 SDK
+在 YourProjectPath/Packages/manifest.json 中添加以下代码，[点击](https://github.com/TapTap) 参考最新版本 SDK
 
 ```json
 "dependencies":{
 //登录部分
-"com.tapsdk.login":"https://github.com/EingShaw/TapLogin.git#2.0.0",
-"com.tapsdk.common":"https://github.com/EingShaw/TapCommon.git#2.0.0",
-"com.tapsdk.bootstrap":"https://github.com/EingShaw/TapBootstrap.git#2.0.0",
+"com.tapsdk.login":"https://github.com/TapTap/TapLogin-Unity.git#2.0.0",
+"com.tapsdk.common":"https://github.com/TapTap/TapCommon-Unity.git#2.0.0",
+"com.tapsdk.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#2.0.0",
 //动态部分
-"com.tapsdk.moment":"https://github.com/EingShaw/TapMoment.git#2.0.0",
+"com.tapsdk.moment":"https://github.com/EingSTapTaphaw/TapMoment-Unity.git#2.0.0",
 }
 ```
 
