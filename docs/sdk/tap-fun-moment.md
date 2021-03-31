@@ -65,10 +65,10 @@ groupId="tap-platform"
 
   ```java
 TapMoment.setCallback(new TapMoment.TapMomentCallback() {
-  @Override
-  public void onCallback(int code, String msg) {
+    @Override
+    public void onCallback(int code, String msg) {
 
-  }
+    }
 });
   ```
   </TabItem>

@@ -23,7 +23,7 @@ TapConfig tapConfig = new TapConfig.Builder()
                 .withAppContext(getApplicationContext())
                 .withClientId("client Id")
                 .build();
-TapBootStrap.init(MainActivity.this, tapConfig);
+TapBootstrap.init(MainActivity.this, tapConfig);
 ```
 
 **TapConfig 参数说明**  
@@ -46,7 +46,7 @@ public static void isInitialized(Callback<TapSdkInitResult> callback);
 #### 示例代码
 
 ```java
-TapBootStrap.isInitialized(new Callback<TapSdkInitResult>() {
+TapBootstrap.isInitialized(new Callback<TapSdkInitResult>() {
     @Override
     public void onSuccess(TapSdkInitResult tapSdkInitResult) {
         // 初始化成功
@@ -72,7 +72,7 @@ public static void registerLoginResultListener(TapLoginResultListener loginResul
 #### 示例代码
 
 ```java
-TapBootStrap.registerLoginResultListener(new TapLoginResultListener() {
+TapBootstrap.registerLoginResultListener(new TapLoginResultListener() {
     @Override
     public void loginSuccess(AccessToken accessToken) {
         Log.d(TAG, "onLoginSuccess: " + accessToken.toJSON());
@@ -113,7 +113,7 @@ public static void login(Activity activity, int type, String... permissions);
 
 ```java
 // 使用TapTap登陆
-TapBootStrap.login(MainActivity.this, 0);
+TapBootstrap.login(MainActivity.this, 0);
 ```
 
 ### registerUserStatusChangedListener
@@ -130,7 +130,7 @@ TapBootStrap.login(MainActivity.this, 0);
 #### 示例代码
 
 ```java
-TapBootStrap.registerUserStatusChangeListener(new TapUserStatusChangedListener() {
+TapBootstrap.registerUserStatusChangeListener(new TapUserStatusChangedListener() {
     @Override
     public void onLogout(TapError tapError) {
     
@@ -158,7 +158,7 @@ TapBootStrap.registerUserStatusChangeListener(new TapUserStatusChangedListener()
 #### 示例代码
 
 ```java
-TapBootStrap.getUser(new Callback<TapUser>() {
+TapBootstrap.getUser(new Callback<TapUser>() {
     @Override
     public void onSuccess(TapUser tapUser) {
                 
@@ -170,7 +170,7 @@ TapBootStrap.getUser(new Callback<TapUser>() {
     }
 });
 
-TapBootStrap.getUserDetails(new Callback<TapUserDetails>() {
+TapBootstrap.getUserDetails(new Callback<TapUserDetails>() {
     @Override
     public void onSuccess(TapUserDetails tapUserDetails) {
                 
@@ -197,7 +197,7 @@ TapBootStrap.getUserDetails(new Callback<TapUserDetails>() {
 #### 示例代码
 
 ```java
-TapBootStrap.getCurrentToken();
+TapBootstrap.getCurrentToken();
 ```
 
 ### openUserCenter
@@ -208,13 +208,12 @@ TapBootStrap.getCurrentToken();
 
 ```java
  public static void openUserCenter(Activity activity);
-
 ```
 
 #### 示例代码
 
 ```java
-TapBootStrap.openUserCenter(MainActivity.this);
+TapBootstrap.openUserCenter(MainActivity.this);
 ```
 
 
@@ -236,7 +235,7 @@ public static void void setPreferredLanguage(@TapLanguageType language);
 #### 示例代码
 
 ```java
-TapBootStrap.setPreferredLanguage(TapLanguageType.ZH_HANS);
+TapBootstrap.setPreferredLanguage(TapLanguageType.ZH_HANS);
 ```
 
 
@@ -248,11 +247,10 @@ TapBootStrap.setPreferredLanguage(TapLanguageType.ZH_HANS);
 
 ```java
 public static void logout();
-
 ```
 
 #### 示例代码
 
 ```java
-TapBootStrap.logout();
+TapBootstrap.logout();
 ```
