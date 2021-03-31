@@ -200,7 +200,7 @@ config.orientation = TDSMomentOrientationDefault;
 | content     | 否   | 弹窗描述     |
 | showConfirm | 否   | 是否显示确认弹窗 |
 
-### getSdkVersion
+<!-- ### getSdkVersion
 
 获取动态功能版本。<Highlight color='#f00'>注意</Highlight> 并非是 TapSDK version。此 API 不建议调用
 
@@ -230,7 +230,7 @@ NSString *version =  [TapMoment getSdkVersion];
 
 ```objectivec
  NSString *versionCode =  [TapMoment getSdkVersionCode];
-```
+``` -->
 
 ## 回调
 | 字段          | code | 说明       |

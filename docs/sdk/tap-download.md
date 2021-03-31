@@ -22,5 +22,5 @@ Unity Demo 下载：[Unity_TapDemo](https://github.com/xindong/TapSDK_Unity_Demo
 - 数美定制版 SDK [点击下载](https://qnblog.ijemy.com/xdwl-pri-release.aar)  
 - OAID 推荐版 [oaid_sdk_1.0.23.aar](https://qnblog.ijemy.com/oaid_sdk_1.0.23.aar)
 
-#### 测试用例
-TapSDK 测试用例[点击下载](https://qnblog.ijemy.com/TapSDK测试用例.xlsx)
+<!-- #### 测试用例
+TapSDK 测试用例[点击下载](https://qnblog.ijemy.com/TapSDK测试用例.xlsx) -->
