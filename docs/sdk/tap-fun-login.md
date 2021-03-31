@@ -60,7 +60,7 @@ groupId="tap-platform"
 
   ```java
   // 未登录用户会返回 null
-  if (TTapBootStrap.getCurrentToken() == null) {
+  if (TapBootStrap.getCurrentToken() == null) {
       //TODO 用户未登录
   } else {
      //TODO 用户已经登录过
