@@ -26,7 +26,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-public static AccessToken getCurrentAccessToken();
+public static AccessToken getCurrentToken;
   ```  
   </TabItem>
 
@@ -60,7 +60,7 @@ groupId="tap-platform"
 
   ```java
   // 未登录用户会返回 null
-  if (TapLoginHelper.getCurrentAccessToken() == null) {
+  if (TTapBootStrap.getCurrentToken() == null) {
       //TODO 用户未登录
   } else {
      //TODO 用户已经登录过
@@ -111,7 +111,8 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-public static Profile getCurrentProfile();
+public static void getUser(Callback<TapUser> user);
+public static void getUserDetails(Callback<TapUserDetails> userDetails);
   ```  
   </TabItem>
 
@@ -144,11 +145,29 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-// 需要先判空，否则会崩溃
-Profile profile = Profile.getCurrentProfile();
-if (profile != null) {
-    Log.e(TAG, profile.toString());
-}
+TapBootStrap.getUser(new Callback<TapUser>() {
+    @Override
+    public void onSuccess(TapUser tapUser) {
+                
+    }
+
+    @Override
+    public void onFail(TapError tapError) {
+
+    }
+});
+
+TapBootStrap.getUserDetails(new Callback<TapUserDetails>() {
+    @Override
+    public void onSuccess(TapUserDetails tapUserDetails) {
+                
+    }
+
+    @Override
+    public void onFail(TapError tapError) {
+
+    }
+});
   ```
   </TabItem>
 
@@ -194,7 +213,10 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-  public void startTapLogin(Activity activity, String... permissions);
+  /**
+ * @param type like {TapTap = 0, apple = 1, guest = 2}
+ */
+  public static void login(Activity activity, int type, String... permissions);
   ```  
   </TabItem>
 
@@ -227,7 +249,9 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-TapLoginHelper.startTapLogin(MainActivity.this, TapTapSdk.SCOPE_PUIBLIC_PROFILE);
+// 登陆类型：0 表示TapTap登陆, 1 表示苹果登陆, 2 表示游客登陆 
+// 本例使用TapTap登陆
+TapBootStrap.login(MainActivity.this, 0);
   ```
   </TabItem>
 
@@ -294,7 +318,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-TapLoginHelper.logout();
+TapBootStrap.logout();
   ```
   </TabItem>
 

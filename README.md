@@ -2,7 +2,7 @@
 
 **需要nodejs环境，自己建站需要走下面步骤；直接运行本项目请跳过【建站】这步**  
 1. npx @docusaurus/init@latest init [projectName] classic  
-2. 初始化后的目录  
+2. 初始化后的目录。  
 tap-sdk-doc  
 ├── blog  
 │   ├── 2019-05-28-hola.md  

@@ -25,8 +25,10 @@ module.exports = {
     {
       API: [
         {
-          Android: ['api/android-initializer', 'api/android-loginhelper',
+          Android: [
+          //'api/android-initializer', 'api/android-loginhelper',
           //'api/android-tapdb',
+          'api/android-tapbootstrap',
           'api/android-tapmoment'],
         },
         {

@@ -29,7 +29,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
 ```java
-TapTapMomentSdk.setCallback(TapTapMomentSdk.TapMomentCallback var0);
+public static void setCallback(TapMoment.TapMomentCallback tapMomentCallback);
 ```
   </TabItem>
 
@@ -64,7 +64,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-TapTapMomentSdk.setCallback(new TapTapMomentSdk.TapMomentCallback() {
+TapMoment.setCallback(new TapMoment.TapMomentCallback() {
   @Override
   public void onCallback(int code, String msg) {
 
@@ -100,19 +100,18 @@ TapSDK.TDSMoment.SetCallback((code,msg)=>{
 
 回调方法中 code 表示事件类型，现支持的回调类型如下：
 
-回调 | 回调值 | 说明
---- | --- | ---
-CALLBACK\_CODE_PUBLISH\_SUCCESS | 10000 | 动态发布成功
-CALLBACK\_CODE_PUBLISH\_FAIL | 10100 | 动态发布失败
-CALLBACK\_CODE\_PUBLISH\_CANCEL | 10200 | 动态发布失败
-CALLBACK\_CODE\_GET\_NOTICE\_SUCCESS | 20000| 获取通知数量成功，附带信息为通知数量
-CALLBACK\_CODE\_GET\_NOTICE\_FAIL | 20100 | 获取通知数量失败，附带信息为错误原因
-CALLBACK\_CODE_MOMENT\_APPEAR | 30000 | 动态页面显示时触发
-CALLBACK\_CODE_MOMENT\_DISAPPEAR | 30100 | 动态页面消失时触发
-CALLBACK_CODE_INIT_SUCCESS | 40000 | 动态初始化成功
-CALLBACK_CODE_INIT_FAIL | 40100 | 动态初始化失败
-CALLBACK_CODE_ClOSE_CANCEL | 50000 | 弹出关闭动态弹窗时，用户取消
-CALLBACK_CODE_ClOSE_CONFIRM | 50100 | 弹出关闭动态弹窗时，用户确认
+ 回调          | 回调值 | 说明       |
+ ----------- | --- | -------- |
+ CALLBACK_CODE_PUBLISH_SUCCESS       | 10000   | 动态发布成功     |
+ CALLBACK_CODE_PUBLISH_FAIL     | 10100   | 动态发布失败     |
+ CALLBACK_CODE_PUBLISH_CANCEL       | 10200   | 关闭动态发布页面     |
+ CALLBACK_CODE_GET_NOTICE_SUCCESS | 20000   | 获取新消息成功 |
+ CALLBACK_CODE_GET_NOTICE_FAIL | 20100   | 获取新消息失败 |
+ CALLBACK_CODE_MOMENT_APPEAR | 30000   | 自己 / 好友动态页面打开 |
+ CALLBACK_CODE_MOMENT_DISAPPEAR | 30100   | 自己 / 好友动态页面关闭 |
+ CALLBACK_CODE_ClOSE_CANCEL | 50000   | 取消关闭所有动态界面（弹框点击取消按钮） |
+ CALLBACK_CODE_ClOSE_CONFIRM | 50100   | 确认关闭所有动态界面（弹框点击确认按钮） |
+ CALLBACK_CODE_LOGIN_SUCCESS | 60000   | 动态页面内登录成功 |
 
 <!--
 ## 4. 设置登录信息
@@ -207,7 +206,11 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-TapTapMomentSdk.openTapMoment(TapTapMomentSdk.Config);
+/**
+ * @param orientation 设置动态显示方向
+ * {TapMoment.ORIENTATION_PORTRAIT、TapMoment.ORIENTATION_PORTRAIT}
+ */
+public static void open(int orientation);
   ```
   </TabItem>
 
@@ -238,10 +241,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-  TapTapMomentSdk.Config config = new TapTapMomentSdk.Config();
-  //config 用来设置页面显示配置，包括显示方向等
-  //config.orientation = TapTapMomentSdk.ORIENTATION_LANDSCAPE;
-  TapTapMomentSdk.openTapMoment(config);
+  TapMoment.open(TapMoment.ORIENTATION_PORTRAIT);
   ```
   </TabItem>
 
@@ -279,7 +279,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-  TapTapMomentSdk.publishMoment(TapTapMomentSdk.Config config, String imgPaths, String content);
+  public static void publish(int orientation, String[] imagePath, String content);
   ```
   </TabItem>
 
@@ -311,11 +311,10 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-TapTapMomentSdk.Config config = new TapTapMomentSdk.Config();
-config.orientation = TapTapMomentSdk.ORIENTATION_DEFAULT;  
-String content = "普通动态描述";
-String[] imagePaths = new String[] { "content://***.jpg","/sdcard/**.jpg" };
-TapTapMomentSdk.publishMoment(config, imagePaths, content);
+int orientation = TapMoment.ORIENTATION_PORTRAIT;
+String content = "发布动态内容描述";
+String[] imagePaths = new String[]{"content://***.jpg", "/sdcard/**.jpg"};
+TapMoment.publish(orientation, imagePaths, content);
   ```
   </TabItem>
 
@@ -471,7 +470,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-TapTapMomentSdk.getNoticeData();
+public static void fetchNotification();
   ```
   返回结果会通过动态回调通知游戏。  
   `code == CALLBACK_CODE_GET_NOTICE_SUCCESS`(20000) 表示获取成功，`msg` 为 0 表示无新消息，为 1 表示有新消息。   
@@ -585,7 +584,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-TapTapMomentSdk.closeMoment();
+TapMoment.close();
   ```
 
   </TabItem>
@@ -619,7 +618,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-TapTapMomentSdk.closeMoment(title, content)
+TapMoment.closeWithConfirmWindow(title, content);
   ```
   **参数说明**
 

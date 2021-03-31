@@ -38,9 +38,9 @@ repositories{
 }  
 dependencies {  
 ...  
-    implementation (name:'TapSDK_v1.0.1', ext:'aar')  // 必选: x.x.x 代表所下载的 SDK 的版本号
-    implementation (name:'TDSCommon_1.1.4', ext:'aar') // 必选:x.x.x 代表所下载的 SDK 的版本号
-    implementation (name:'oaid_sdk_1.0.23', ext:'aar')  // 可选：使用 TapDB 数据分析功能必选， 以获得更精准的统计
+    implementation (name:'TapBootStrap_2.0.0', ext:'aar')  // 必选: x.x.x 代表所下载的 SDK 的版本号
+    implementation (name:'TapCommon_1.1.11', ext:'aar') // 必选:x.x.x 代表所下载的 SDK 的版本号
+    implementation (name:'TapMoment_1.2.4', ext:'aar') // 必选:x.x.x 代表所下载的 SDK 的版本号
 }  
 ```  
 3. 打开 AndroidManifest.xml 添加网络权限  
@@ -59,42 +59,42 @@ TapSDK 初始化
 
 #### 示例代码  
 ```java
-TdsConfig tdsConfig = new TdsConfig.Builder()
-                .appContext(Activity)
-                .clientId (your cient id)// 开发者中心获取到的 client Id
+TapConfig tapConfig = new TapConfig.Builder()
+                .withAppContext(getApplicationContext())
+                .withClientId("client Id") // 开发者中心获取到的 client Id
                 .build();
-TdsInitializer.init(tdsConfig);  
+TapBootStrap.init(MainActivity.this, tapConfig);  
 ```
 
 #### API
 
-[TdsInitializer.init()](/api/android-initializer.md#init)  
+[TapBootStrap.init()](/api/android-tapbootstrap.md#init)  
 
 ## 6. 注册登录回调
 监听登录的结果  
 
 #### 示例代码
 ```java
-TapLoginHelper.registerLoginCallback(new TapLoginResultCallback() {
-     @Override
-     public void onLoginSuccess(AccessToken accessToken) {
-         Log.e(TAG, "onLoginSuccess" + "" + accessToken);
-     }
+TapBootStrap.registerLoginResultListener(new TapLoginResultListener() {
+    @Override
+    public void loginSuccess(AccessToken accessToken) {
+        Log.d(TAG, "onLoginSuccess: " + accessToken.toJSON());
+    }
 
-     @Override
-     public void onLoginCancel() {
-         Log.e(TAG, "onLoginCancel" + "");
-     }
+    @Override
+    public void loginFail(TapError tapError) {
+        Log.d(TAG, "onLoginError: " + tapError.getMessage());
+    }
 
-     @Override
-     public void onLoginError(com.taptap.sdk.AccountGlobalError accountGlobalError) {
-         Log.e(TAG, "onLoginError" + " " + accountGlobalError.toJsonString());
-     }
- });
+    @Override
+    public void loginCancel() {
+        Log.d(TAG, "onLoginCancel");
+    }
+});
 ```
 
 #### API  
-[registerLoginCallback()](/api/android-loginhelper.md#registerlogincallback)
+[registerLoginResultListener()](/api/android-tapbootstrap.md#registerLoginResultListener)
 
 ## 7. 登录
 TapTap 登录，当没有安装 TapTap app 时，会打开内置 webview 进行 TapTap 验证登录
@@ -103,14 +103,14 @@ TapTap 登录，当没有安装 TapTap app 时，会打开内置 webview 进行 
 可以用下面代码直接登录：  
 
 ```java
-TapLoginHelper.startTapLogin(MainActivity.this,TapLoginHelper.SCOPE_PUBLIC_PROFILE);
+TapBootStrap.login(MainActivity.this, 0);
 ```
 #### API
-[startTapLogin()](/api/android-loginhelper.md#starttaplogin)  
+[login()](/api/android-tapbootstrap.md#login)  
 
 ## 8. 登出
 
 :::caution
 当用户退出登录的时候请务必调用此方法执行退出功能， 避免用户信息错乱。
 :::
-调用`TapLoginHelper.logout()` 实现登出功能。
+调用`TapBootStrap.logout()` 实现登出功能。
