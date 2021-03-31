@@ -39,7 +39,9 @@ module.exports = {
           'api/ios-tapmoment'],
         },
         {
-          Unity: ['api/unity-login',
+          Unity: [
+            //'api/unity-login',
+            'api/unity-tapbootstrap',
           //'api/unity-tapdb',
           'api/unity-tapmoment'],
         },

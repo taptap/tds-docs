@@ -42,7 +42,7 @@ public static void setCallback(TapMoment.TapMomentCallback tapMomentCallback);
   <TabItem value="unity">
 
 ```cs
-public static void SetCallback(Action<int, string> callback);
+public static void SetCallback (Action<int, string> callback);
 ```
 
   </TabItem>
@@ -65,10 +65,10 @@ groupId="tap-platform"
 
   ```java
 TapMoment.setCallback(new TapMoment.TapMomentCallback() {
-  @Override
-  public void onCallback(int code, String msg) {
+    @Override
+    public void onCallback(int code, String msg) {
 
-  }
+    }
 });
   ```
   </TabItem>
@@ -89,7 +89,7 @@ TapMoment.setCallback(new TapMoment.TapMomentCallback() {
   <TabItem value="unity">
 
 ```cs
-TapSDK.TDSMoment.SetCallback((code,msg)=>{
+TapMoment.SetCallback((code,msg)=>{
     Debug.Log(code+"---"+msg);
 });
 ```
@@ -223,7 +223,7 @@ public static void open(int orientation);
   <TabItem value="unity">
 
 ```cs
-public static void OpenMoment(Orientation config);
+public static void Open (Orientation config);
 ```
 
   </TabItem>
@@ -256,7 +256,7 @@ groupId="tap-platform"
   <TabItem value="unity">
 
 ```cs
-TapSDK.TDSMoment.OpenMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE);
+TapMoment.Open(TapSDK.Orientation.ORIENTATION_LANDSCAPE);
 ```
 
   </TabItem>
@@ -293,7 +293,7 @@ groupId="tap-platform"
   <TabItem value="unity">
 
 ```cs
-public static void PublishMoment(Orientation config, string[] imagePaths, string content);
+public static void Publish (Orientation config, string[] imagePaths, string content);
 ```
 
   </TabItem>
@@ -336,7 +336,7 @@ tconfig.orientation = TapMomentOrientationDefault;
 ```cs
 string content = "我是描述";
 string[] images = {"imgpath01","imgpath02","imgpath03"};
-TapSDK.TDSMoment.PublishMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE, images, content);
+TapMoment.Publish(TapMoment.Orientation.ORIENTATION_LANDSCAPE, images, content);
 ```
 
   </TabItem>
@@ -489,9 +489,9 @@ public static void fetchNotification();
   <TabItem value="unity">
 
 ```cs
-public static void GetNoticeData();
+public static void GetNoticeData ();
 ```
-结果在 `TapSDK.TDSMoment.SetCallback` 进行回调
+结果在 `TapMoment.SetCallback` 进行回调
 
   </TabItem>
 </Tabs>
@@ -598,7 +598,7 @@ TapMoment.close();
   <TabItem value="unity">
 
 ```cs
-TapSDK.TDSMoment.CloseMoment();
+TapMoment.Close();
 ```
 
   </TabItem>
@@ -647,7 +647,7 @@ showConfirm | 否 | 是否显示确认弹窗
   <TabItem value="unity">
 
 ```cs
-TapSDK.TDSMoment.CloseMoment(title, desc);
+TapMoment.Close(title, desc);
 ```
 
 **参数说明**
