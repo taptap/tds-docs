@@ -29,7 +29,12 @@ import {Highlight} from '../component';
 
 ```json
 "dependencies":{
-    "com.tds.sdk":"https://github.com/xindong/TAPSDK_UPM.git#1.0.1"
+//登录部分
+"com.tapsdk.login":"https://github.com/EingShaw/TapLogin.git#2.0.0",
+"com.tapsdk.common":"https://github.com/EingShaw/TapCommon.git#2.0.0",
+"com.tapsdk.bootstrap":"https://github.com/EingShaw/TapBootstrap.git#2.0.0",
+//动态部分
+"com.tapsdk.moment":"https://github.com/EingShaw/TapMoment.git#2.0.0",
 }
 ```
 
@@ -107,7 +112,7 @@ TapBootstrap.Init(tapConfig);
 #### API
 [Init](/api/unity-tapbootstrap.md/#init)
 
-## 8. 注册回调
+## 7. 注册回调
 注册登录回调，成功与否的信息在回调中处理
 #### 示例代码
 ```cs
@@ -121,7 +126,6 @@ public class MyLoginCallback : TapBootstrap.ITapLoginResultListener {
   public void OnLoginError(TapError error)
   {
       Debug.Log("登录失败的error信息:  " + error.errorDescription);
-
   }
 
   public void OnLoginCancel()
@@ -131,10 +135,38 @@ public class MyLoginCallback : TapBootstrap.ITapLoginResultListener {
 }
 ```
 
+#### AccessToken 使用说明
+- AccessToken 包含过期时间，90天，过期后SDK会自动清除本地缓存
+- AccessToken 信息解出来之后，可以传到游戏服务端去获取用户信息，[获取用户信息](/api/service#流程)
+
+正确的返回 AccessToken 如下  
+
+```cs
+{
+  "accessToken":"accessToken",
+  "kid":"kid",
+  "macAlgorithm":"macAlgorithm",
+  "tokenType":"tokenType",
+  "macKey":"macKey",
+  "expireIn" :7776000
+}
+```
+
+#### 参数说明
+参数  | 描述
+| ------ | ------ |
+accessToken | 用户登录后的凭证
+kid  | 服务端使用需要
+macAlgorithm  | 固定为'hmac-sha-1'
+tokenType  | 固定为'mac'
+macKey  | 服务端使用需要
+expireIn  | 过期时间
+
+
 #### API
 [RegisterLoginCallback](/api/unity-tapbootstrap.md/#registerloginresultlistener)
 
-## 9. 登录
+## 8. 登录
 TapSDK 提供的登录功能，开始登录
 #### 示例代码
 ```cs
@@ -146,7 +178,7 @@ TapBootstrap.Login(loginType, new string[] { "public_profile" });
 #### API
 [StartLogin](/api/unity-tapbootstrap.md/#login)
 
-## 10. 登出
+## 9. 登出
 
 :::caution
 当用户退出登录的时候请务必调用此方法执行退出功能， 避免用户信息错乱。
@@ -159,7 +191,7 @@ TapBootstrap.Logout();
 #### API
 [Logout](/api/unity-tapbootstrap.md/#logout)
 
-## 11. 导出到 Android
+## 10. 导出到 Android
 unity 打包 apk 步骤  
 
 `需要配置 package name 和签名文件`  
@@ -167,7 +199,7 @@ unity 打包 apk 步骤
 **<Highlight color='#f00'> 需要注意:</Highlight>**  
 到 Player Settings-->Other Settings-->Target APILevel 确认是否 >= 29  
 当 Target APILever < 29 时，需要配置 manifest，在 application 节点添加 `tools:remove="android:requestLegacyExternalStorage"`
-## 12. 导出到 Xcode
+## 11. 导出到 Xcode
 `需要配置 icon 和 bundleId`
 
 1. Unity 导出 Xcode 工程步骤

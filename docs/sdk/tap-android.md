@@ -38,9 +38,9 @@ repositories{
 }  
 dependencies {  
 ...  
-    implementation (name:'TapBootStrap_2.0.0', ext:'aar')  // 必选: x.x.x 代表所下载的 SDK 的版本号
-    implementation (name:'TapCommon_1.1.11', ext:'aar') // 必选:x.x.x 代表所下载的 SDK 的版本号
-    implementation (name:'TapMoment_1.2.4', ext:'aar') // 必选:x.x.x 代表所下载的 SDK 的版本号
+    implementation (name:'TapBootstrap_2.0.0', ext:'aar')  // 必选: x.x.x 代表所下载的 SDK 的版本号
+    implementation (name:'TapCommon_2.0.0', ext:'aar') // 必选:x.x.x 代表所下载的 SDK 的版本号
+    implementation (name:'TapMoment_2.0.0', ext:'aar') // 必选:x.x.x 代表所下载的 SDK 的版本号
 }  
 ```  
 3. 打开 AndroidManifest.xml 添加网络权限  
@@ -92,6 +92,35 @@ TapBootStrap.registerLoginResultListener(new TapLoginResultListener() {
     }
 });
 ```
+
+
+#### AccessToken 使用说明
+- AccessToken 包含过期时间，90天，过期后SDK会自动清除本地缓存
+- AccessToken 信息解出来之后，可以传到游戏服务端去获取用户信息，[获取用户信息](/api/service#流程)
+
+正确的返回 AccessToken 如下  
+
+```cs
+{
+  "accessToken":"accessToken",
+  "kid":"kid",
+  "macAlgorithm":"macAlgorithm",
+  "tokenType":"tokenType",
+  "macKey":"macKey",
+  "expireIn" :7776000
+}
+```
+
+#### 参数说明
+参数  | 描述
+| ------ | ------ |
+accessToken | 用户登录后的凭证
+kid  | 服务端使用需要
+macAlgorithm  | 固定为'hmac-sha-1'
+tokenType  | 固定为'mac'
+macKey  | 服务端使用需要
+expireIn  | 过期时间
+
 
 #### API  
 [registerLoginResultListener()](/api/android-tapbootstrap.md#registerLoginResultListener)
