@@ -208,7 +208,6 @@ TapBootstrap.getCurrentToken();
 
 ```java
  public static void openUserCenter(Activity activity);
-
 ```
 
 #### 示例代码
@@ -248,7 +247,6 @@ TapBootstrap.setPreferredLanguage(TapLanguageType.ZH_HANS);
 
 ```java
 public static void logout();
-
 ```
 
 #### 示例代码
