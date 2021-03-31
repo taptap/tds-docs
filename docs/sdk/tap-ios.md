@@ -53,7 +53,7 @@ pod update
 ``` -->
 
 <!-- ### 方式二、手动导入 -->
-直接拖拽 [下载](https://github.com/xindong/TapSDK_iOS/releases) 的 SDK 到项目目录即可   
+直接拖拽 [下载](https://github.com/TapTap/TapSDK-iOS) 的 SDK 到项目目录即可   
 
 下载目录包含的以下资源文件视需要导入都需要导入  
 ```objectivec
