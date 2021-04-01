@@ -8,7 +8,7 @@ sidebar_label: iOS
 
 
 :::note
-如需通过示例项目了解如何在 iOS 应用中集成 TapSDK，请参阅[下载](/tap-download)页面中的示例项目。
+如需通过示例项目了解如何在 iOS 应用中集成 TapSDK，请参阅[下载](/sdk/tap-download)页面中的示例项目。
 :::
 
 ## 1. 登录 TapTap 开发者中心

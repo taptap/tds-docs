@@ -7,7 +7,7 @@ slug: /sdk
 本文主要介绍 Android 如何将 TapSDK 快速接入并实现登录功能。
 
 :::note
-如需通过示例项目了解如何在 Android 应用中集成 TapSDK，请参阅[下载](/tap-download)页面中的示例项目。
+如需通过示例项目了解如何在 Android 应用中集成 TapSDK，请参阅[下载](/sdk/tap-download)页面中的示例项目。
 :::
 
 ## 1. 登录 TapTap 开发者中心

@@ -1,7 +1,7 @@
 ---
 id: tap-fun-moment
-title: 动态社区
-sidebar_label: 动态
+title: 内嵌动态
+sidebar_label: 内嵌动态
 ---
 
 
