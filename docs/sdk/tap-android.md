@@ -28,7 +28,7 @@ dependencies {
 }
 ```   -->
 <!-- ### 方法二、手动添加 -->
-1. 将 [下载](/tap-download) 的 SDK 包，导入到 **your project** > **app** > **libs** 目录下  
+1. 将 [下载](/sdk/tap-download) 的 SDK 包，导入到 **your project** > **app** > **libs** 目录下  
 2. 打开你工程的 **your project ** > **app** > **build.gradle** 文件，添加 gradle 配置如下  
 ```java  
 repositories{  
