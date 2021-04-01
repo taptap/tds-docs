@@ -1,42 +1,57 @@
 import { translate } from '@docusaurus/Translate';
 
-export const innerLinkList = [
-  {
-    label: '广告',
-    link: 'https://www.taptap.com/ads',
-  },
-  {
-    label: '工作',
-    link: 'https://www.taptap.com/hr',
-  },
-  {
-    label: '认证',
-    link: 'https://www.taptap.com/verify',
-  },
-  {
-    label: '篝火计划',
-    link: 'https://www.taptap.com/campfire',
-  },
-  {
-    label: '隐私政策',
-    link: 'https://www.taptap.com/privacy-policy',
-  },
-  {
-    label: '侵权投诉',
-    link: 'https://www.taptap.com/copyright',
-  },
-  {
-    label: '联系我们',
-    link: 'https://www.taptap.com/developer-center/doc/7?id=50',
-  },
-].map((i, index) => ({
-  ...i,
-  label: translate({
-    message: i.label,
-    id: `tds-footer-${i.label}`,
-    description: `from Footer Left Link ${index + 1}`,
-  }),
-}));
+type InnerLinkRaw = {
+  label: string,
+  url?: string, // 外跳地址
+  link?: string, // 内部地址
+}
+
+/**
+ * 生成站内链接
+ * @param localePath 非默认语言下的路径后缀，可能为 `` | `en/` 等
+ * */
+export const toInnerLinkList = (localePath: string) => {
+  const isIntl = localePath !== '';
+  const innerLinkSource: Array<InnerLinkRaw | false> = [
+    {
+      label: '广告',
+      url: `https://biz.taptap.com/${localePath}`,
+    },
+    !isIntl && {
+      label: '工作',
+      url: 'https://www.taptap.com/hr',
+    },
+    {
+      label: '认证',
+      url: 'https://www.taptap.com/verify',
+    },
+    !isIntl && {
+      label: '篝火计划',
+      url: 'https://www.taptap.com/campfire',
+    },
+    {
+      label: '隐私政策',
+      url: 'https://www.taptap.com/privacy-policy',
+    },
+    {
+      label: '侵权投诉',
+      link: `/store/store-complaint`,
+    },
+    {
+      label: '联系我们',
+      link: `/store/store-contact`,
+    },
+  ];
+  return (innerLinkSource.filter(i => i) as Array<InnerLinkRaw>)
+    .map((i: InnerLinkRaw, index) => ({
+      ...i,
+      label: translate({
+        message: i.label,
+        id: `tds-footer-${i.label}`,
+        description: `from Footer Left Link ${index + 1}`,
+      }),
+    }));
+};
 
 export const externalLinkList = [
   {

@@ -1,26 +1,39 @@
 import React from 'react';
+import Link from '@docusaurus/Link';
 import Translate from '@docusaurus/Translate';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import styles from './styles.module.scss';
 import Logo from "@theme/Logo";
-import { externalLinkList, innerLinkList } from './_config';
+import { externalLinkList, toInnerLinkList } from './_config';
 
 function Footer() {
   const { i18n: { currentLocale, defaultLocale } } = useDocusaurusContext();
+  const isDefaultLocale = currentLocale === defaultLocale;
+  const localePath = isDefaultLocale ? '' : `${currentLocale}/`;
   return (
     <footer className={styles.footerContainer}>
       <div className={styles.footerContent}>
         <div className={styles.logoRow}><Logo noLabel /></div>
         <div className={styles.linkRow}>
-          {innerLinkList.map(item => <a
-            key={item.label + item.link}
-            className={styles.linkItem}
-            href={item.link}
-            rel='noreferrer nofollow noopener'
-            target='_blank'
-          >
-            {item.label}
-          </a>)}
+          {toInnerLinkList(localePath).map(item => {
+            return item.link
+              ? <Link
+                key={item.label + item.link}
+                className={styles.linkItem}
+                to={item.link}
+              >
+                {item.label}
+              </Link>
+              : <a
+                key={item.label + item.url}
+                className={styles.linkItem}
+                href={item.url}
+                rel='noreferrer nofollow noopener'
+                target='_blank'
+              >
+                {item.label}
+              </a>;
+          })}
         </div>
         <div className={styles.infoRow}>
           <div className={styles.externalItem}>
@@ -42,7 +55,7 @@ function Footer() {
             ©2021 TapTap
           </div>
         </div>
-        {currentLocale === defaultLocale && <div className={styles.recordRow}>
+        {isDefaultLocale && <div className={styles.recordRow}>
           {externalLinkList.map(item => <a
             key={item.label + item.link}
             className={styles.externalItem}
