@@ -43,7 +43,7 @@ import {Highlight,Link,ImageLink} from '../component';
 
 ## **二、 开始接入SDK**
 
-### **0. 更新日志**
+### **1. 更新日志**
 
 <center>
 
@@ -59,9 +59,9 @@ import {Highlight,Link,ImageLink} from '../component';
 
 ![小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)
 
-### **1. TapLicense 购买激活**
+### **2. TapLicense 购买激活**
 
-#### **1.1 修改AndroidManifest.xml**
+#### **2.1 修改AndroidManifest.xml**
 
 添加如下权限：
 
@@ -73,7 +73,7 @@ import {Highlight,Link,ImageLink} from '../component';
 
 ![小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)
 
-#### **1.2 检测授权**
+#### **2.2 检测授权**
 
 <Highlight color='#A0A0A0'>为了保证授权验证长期有效，建议每次打开游戏时，都进行授权检测。</Highlight>
 
@@ -94,7 +94,7 @@ https://img.tapimg.com/market/images/a6c4670a09d7e42dd68d910cfd29865e.png
 TapLicense.INSTANCE.checkLicense();
 ```
 
-③ 需要授权成功的回调的话请使用如下代码（参考Demo.cs）
+③ 需要授权成功的回调的话请使用如下代码（参考 Demo.cs）
 
 ```cs
 TapLicense.INSTANCE.checkLicense(onLicenseSuccess);
@@ -135,7 +135,7 @@ protected void onActivityResult(int requestCode, int resultCode, @Nullable Inten
 
 ##### **· 其他平台**
 
-① 点击下载按钮，下载SDK  
+① 点击下载按钮，下载 SDK  
 
 
 <ImageLink href="https://doc-files.tapimg.com/dev/TapTap_license_v2.6.2.aar">
@@ -171,7 +171,7 @@ protected void onActivityResult(int requestCode, int resultCode, @Nullable Inten
 
 ![小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)
 
-### **2. TapAnti 防沉迷**
+### **3. TapAnti 防沉迷**
 
 <Highlight color='#A0A0A0'>如需使用防沉迷模块，请先调授权验证，回调之后再调用防沉迷验证。</Highlight>
 
@@ -365,7 +365,6 @@ AntiAddictionKit.init(this, new AntiAddictionKit.AntiAddictionCallback() {
 
 ```java
 AntiAddictionKit.checkState();
-
 ```
 
 
@@ -385,7 +384,6 @@ AntiAddictionKit.checkState();
       super.onStop();
       AntiAddictionKit.onStop();
   }
-
 ```
 
 ⑥ 付费检查

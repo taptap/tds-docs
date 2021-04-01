@@ -6,7 +6,7 @@ sidebar_label: 资源下载
 
 ## SDK 下载  
 
-我们计划 2021 年 4 月 9 日正式发布 TapSDK，敬请期待。
+我们计划将于近期正式发布 TapSDK，敬请期待。
 
 <!-- 
 Android SDK 下载：[TapSDK](https://github.com/TapTap/TapSDK-Android/releases)  
@@ -16,7 +16,7 @@ Unity SDK 下载：[TapSDK_UPM](https://github.com/TapTap/Tapbootstrap-Unity/rel
 
 ## Demo 下载
 
-2021 年 4 月 9 日开始，Demo 会随正式版 SDK 一起发布，敬请期待。
+Demo 会随近期发布的正式版 SDK 一起发布，敬请期待。
 
 <!-- 
 Android Demo 下载：[Android_TapDemo](https://github.com/xindong/TapSDK_Android)  

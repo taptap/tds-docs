@@ -12,7 +12,7 @@ OpenAPI 采用统一的 Mac Token 头部签算来传递用户身份。
 以下接口，凡标示类似 `GET` `MAC Token` 的，表示这是一个 `GET` 请求，头部要用 `MAC Token` 签算。
 
 ## 流程
-1. 移动端用SDK的TapTap登录，可以通过 `GetCurrentAccessToken` 获取 AccessToken，里面包含
+1. 移动端用 SDK 的 TapTap 登录，可以通过 `GetCurrentAccessToken` 获取 AccessToken，里面包含
 ```java
   public String kid;
   public String access_token;
@@ -23,9 +23,9 @@ OpenAPI 采用统一的 Mac Token 头部签算来传递用户身份。
 ```
 
 2. 再把 access_token 和 mac_key 发到游戏业务服务器，服务端签算 mac token。
-3. 请求https://openapi.taptap.com/account/profile/v1 ， header携带mac token
+3. 请求 https://openapi.taptap.com/account/profile/v1 ， header 携带 mac token
 
-> 注意：当前实际返回的kid和access_token值相等，建议使用access_token
+> 注意：当前实际返回的 kid 和 access_token 值相等，建议使用 access_token
 
 ## API
 
@@ -50,7 +50,7 @@ openid          | string        | 授权用户唯一标识(每个 client 
 unionid         | string        | 授权用户唯一标识(每个 union 不同)
 
 #### 请求示例
-替换其中的`MAC id`和`client id`为自己签算的mac token和控制台的 Client ID
+替换其中的 `MAC id` 和 `client id` 为自己签算的 mac token 和控制台的 Client ID
 ```
 curl -s -H 'Authorization:MAC id="1/hhykMJFMExXBLJrbW823QN3j-O2-MRLBm13XaHNscXgRvLEGQiE2mjXvFIWN_fapPk5dfAcq59kkRD1BUrsocJ1uVWpq5OzGBZ9rwae9-nZ50nzpDLRooFTNT8iTPHmRSH3v0nTk1m4b2-NhXqpGya8t96DQF9zkhf68IkbwIgmDy4GoGVrgVcjFh0xHwLG_4rlwtVR5BZ8-Twyx1PhPjDc8trycgN2i6e-2ivfP6zxrnQr5kW03yQ0QMMgS01Inx4DRcgXMSYPCeNqIxwA6j7WlyrNgU0X0qwnnWBugKOzbJPxA-rgKDu8zVmaly6Xl654V21z2GhWwIfLnil0R6A",ts="1615196300",nonce="abcdef",mac="RgNtmn57fFQB5Ztw7a2KuQyiWkg="' "https://openapi.taptap.com/account/profile/v1?client_id=<clien id>"
 ```
@@ -86,8 +86,8 @@ MAC Token 包含以下字段：
 使用 Mac Token 签算一个接口：
 
 #### 脚本
-可用此脚本验证直接替换参数，用来验证自己服务端签算的mac token是否正确  
-CLIENT_ID替换为控制台获取的`Client ID`，ACCESS_TOKEN 和 MAC_KEY 为客户端登录成功后的`access_token`、`mac_key`
+可用此脚本验证直接替换参数，用来验证自己服务端签算的 mac token 是否正确  
+CLIENT_ID 替换为控制台获取的 `Client ID`，ACCESS_TOKEN 和 MAC_KEY 为客户端登录成功后的 `access_token`、`mac_key`
 ```
 #!/usr/bin/env bash
 
@@ -117,17 +117,17 @@ AUTHORIZATION=$(printf 'MAC id="%s",ts="%s",nonce="%s",mac="%s"' "${ACCESS_TOKEN
 curl -s -H"Authorization:${AUTHORIZATION}" "https://openapi.taptap.com/account/profile/v1?client_id=${CLIENT_ID}"
 ```
 
-#### nodejs代码示例
+#### nodejs 代码示例
 
 ```javascript
 const urllib = require('urllib');
 const format = require('string-format');
 /**
-TapSDK登录后信息获取
+TapSDK 登录后信息获取
 **/
-var kid = "";//替换为客户端获取的kid或者access_token
-var mac_key = "";//替换为客户端获取的mac_key
-var nonce = "adssd";//自行生成5位字符串
+var kid = "";//替换为客户端获取的 kid 或者 access_token
+var mac_key = "";//替换为客户端获取的 mac_key
+var nonce = "adssd";//自行生成 5 位字符串
 var client_id = "";
 
 
@@ -186,8 +186,8 @@ function hmacSha1(encodedFlags, secretKey) {
 | ------------------------- | ----------- | ------------------------------------------------------------ |
 | invalid_request           | 400         | 请求缺少某个必需参数，包含一个不支持的参数或参数值，或者格式不正确 |
 | invalid_time              | 400         | MAC Token 算法中，ts 时间不合法，**应请求服务器时间重新构造** |
-| invalid_client            | 401         | client_id、client_secret参数无效                             |
+| invalid_client            | 401         | client_id、client_secret 参数无效                             |
 | access_denied             | 401         | 授权服务器拒绝请求 **这个状态出现在拿着 token 请求用户资源时，如出现，客户端应退出本地的用户登录信息，引导用户重新登录** |
 | forbidden       | 403         | 用户没有对当前动作的权限，**引导重新身份验证并不能提供任何帮助，而且这个请求也不应该被重复提交** |
 | not_found       | 404         | 请求失败，请求所希望得到的资源未被在服务器上发现。**在参数相同的情况下，不应该重复请求** |
-| server_error              | 500         | 服务器出现异常情况 **可稍等后重新尝试请求，但需有尝试上限，建议最多3次，如一直失败，则中断并告知用户** |
+| server_error              | 500         | 服务器出现异常情况 **可稍等后重新尝试请求，但需有尝试上限，建议最多 3 次，如一直失败，则中断并告知用户** |

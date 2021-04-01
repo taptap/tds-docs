@@ -124,7 +124,7 @@ TapBootstrapLoginType loginType = TapBootstrapLoginTypeTapTap;
 
 **API 说明**  
 
-调用该接口会触发 [registerLoginResultDelegate](#registerLoginResultDelegate) 回调
+调用该接口会触发 [registerLoginResultDelegate](#registerloginresultdelegate) 回调
 
 
 ### logout
@@ -187,7 +187,7 @@ TapBootstrapLoginType loginType = TapBootstrapLoginTypeTapTap;
 ```
 ### getCurrentToken
 
-获取AccessToken
+获取 AccessToken
 
 #### API  
 

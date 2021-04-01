@@ -16,9 +16,9 @@ error: failed processing manifest.
 
 原因：  
 SDK 内部默认配置了 android:requestLegacyExternalStorage = true  
-当 targetSdkVersion<29 时会报这个错误  
+当 targetSdkVersion < 29 时会报这个错误  
 解决：  
-方法一、设置 targetSdkVersion=29  
-方法二、targetSdkVersion<29 时  
+方法一、设置 targetSdkVersion = 29  
+方法二、targetSdkVersion < 29 时  
 manifest 节点配置 `xmlns:tools="http://schemas.android.com/tools"`  
 application 节点配置 `tools:remove="android:requestLegacyExternalStorage"`

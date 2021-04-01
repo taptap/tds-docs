@@ -8,7 +8,7 @@ sidebar_label: iOS
 检查一下 client ID 设置，info.plist 和初始化代码里面保持一致
 
 ## [UIWindow tds_topWindow]: unrecognized selector sent to class 0xxxxxxxx
-到 Build Setting-->Other Linker Flags 添加 - ObjC
+到 Build Setting --> Other Linker Flags 添加 - ObjC
 ![](https://qnblog.ijemy.com/xd_ios_003.png)
 
 ## ld: symbol(s) not found for architecture arm64 clang: error: linker command failed with exit code 1 (use -v to see invocation)
