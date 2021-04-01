@@ -33,7 +33,7 @@ TapBootstrap.init(MainActivity.this, tapConfig);
 | :--------- | :-- | :---------------- |
 | context   | 否   | 上下文 |
 | clientId | 否   | 开发者中心获取的 Client ID |
-| regionType   | 否   | 区域选择 TapRegionType.CN: 国内  TapRegionType.IO: 国外|
+| regionType   | 否   | 区域类型 TapRegionType.CN 表示国内，TapRegionType.IO 表示国外|
 
 ### isInitialized
 

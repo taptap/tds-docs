@@ -10,7 +10,7 @@ import {Highlight} from '../component';
 2. 选择适用地区
 3. 点击开启，并获得相应的 Client ID ，即可开始接入流程
 - 目前移动应用上提供原生授权登录，需用户安装 TapTap 客户端配合使用
-- 如用户没有安装 TapTap 客户端，则会唤起 webview 进行登录
+- 如用户没有安装 TapTap 客户端，则会唤起 Webview 进行登录
 
 ![](https://qnblog.ijemy.com/xd-taplogin.png)
 
@@ -22,7 +22,7 @@ import {Highlight} from '../component';
 ## 三、集成 SDK 到你的应用
 你将需要下载 TapTap SDK，集成到你的应用中，请按照技术对接文档按序调用 API，实现 TapTap 登录功能。
 
-TapTap SDK 支持唤起 TapTap 原生应用授权登录，当用户未安装 TapTap 客户端时，采用内嵌 webview 授权登录的方式。  
+TapTap SDK 支持唤起 TapTap 原生应用授权登录，当用户未安装 TapTap 客户端时，采用内嵌 Webview 授权登录的方式。  
 SDK 集成步骤请参考 [快速开始](/sdk/tap-unity)
 
 登录成功界面示例：

@@ -9,7 +9,7 @@ import {Highlight} from '../component';
 
 
 :::note
-如需通过示例项目了解如何在 Unity 引擎中集成 TapSDK，请参阅[下载](/sdk/tap-download)页面中的示例项目。
+如需通过示例项目了解如何在 Unity 引擎中集成 TapSDK，请参阅 [下载](/sdk/tap-download) 页面中的示例项目。
 :::
 
 
@@ -25,7 +25,7 @@ import {Highlight} from '../component';
 - Android 目标为 API level 21 或更高版本
 
 ## 4. 工程导入
-在 YourProjectPath/Packages/manifest.json 中添加以下代码，[点击](https://github.com/TapTap) 参考最新版本 SDK
+在项目 Packages/manifest.json 中添加以下代码，[点击](https://github.com/TapTap) 参考最新版本 SDK
 
 ```json
 "dependencies":{
@@ -147,7 +147,7 @@ public class MyLoginCallback : TapBootstrap.ITapLoginResultListener {
 
 #### AccessToken 使用说明
 - AccessToken 包含过期时间（90 天），过期后 SDK 会自动清除本地缓存。
-- AccessToken 信息解出来之后，可以传到游戏服务端去获取用户信息，可参考[获取用户信息](/api/service#流程)。
+- AccessToken 信息解出来之后，可以传到游戏服务端去获取用户信息，可参考 [获取用户信息](/api/service#流程)。
 
 正确的返回 AccessToken 如下：
 

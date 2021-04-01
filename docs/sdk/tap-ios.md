@@ -8,7 +8,7 @@ sidebar_label: iOS
 
 
 :::note
-如需通过示例项目了解如何在 iOS 应用中集成 TapSDK，请参阅[下载](/sdk/tap-download)页面中的示例项目。
+如需通过示例项目了解如何在 iOS 应用中集成 TapSDK，请参阅 [下载](/sdk/tap-download) 页面中的示例项目。
 :::
 
 ## 1. 登录 TapTap 开发者中心
@@ -107,7 +107,7 @@ WebKit.framework
 ```
 
 ### 配置跳转 TapTap 应用
-`用户无 TapTap 应用时，默认会打开 webview 登录`
+`用户无 TapTap 应用时，默认会打开 Webview 登录`
 
 1. 打开 info.plist，添加如下配置，然后请替换 clientID 为你在控制台获取的 Client ID。
 
@@ -212,7 +212,7 @@ config.region = TapSDKRegionTypeCN;
 
 #### AccessToken 使用说明
 - AccessToken 包含过期时间（90 天），过期后 SDK 会自动清除本地缓存。
-- AccessToken 信息解出来之后，可以传到游戏服务端去获取用户信息，可参考[获取用户信息](/api/service#流程)。
+- AccessToken 信息解出来之后，可以传到游戏服务端去获取用户信息，可参考 [获取用户信息](/api/service#流程)。
 
 正确的返回 AccessToken 如下：
 
@@ -243,7 +243,7 @@ expireIn  | 过期时间
 -->
 
 ## 9. 登录
-TapTap 登录，当没有安装 TapTap app 时，会打开内置 webview 进行 TapTap 验证登录  
+TapTap 登录，当没有安装 TapTap app 时，会打开内置 Webview 进行 TapTap 验证登录  
 
 #### 示例代码
 

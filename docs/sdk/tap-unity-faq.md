@@ -15,4 +15,4 @@ sidebar_label: Unity
 请在 `openTapMoment` 调用时，主动屏蔽游戏声音
 
 ## 点击动态后小红点未消失
-OpenMoment后会刷新动态，小红点逻辑需要游戏手动根据GetNoticeData来改变
+OpenMoment 后会刷新动态，小红点逻辑需要游戏手动根据 GetNoticeData 来改变
