@@ -51,9 +51,9 @@ module.exports = {
     {
       常见问题: ['sdk/tap-android-faq', 'sdk/tap-ios-faq', 'sdk/tap-unity-faq'],
     },
-    'sdk/tap-noun'
+    'sdk/tap-noun',
     //'sdk/tap-changelog',
-    //'sdk/tap-download'
+    'sdk/tap-download'
   ],
   store: [
     'store/store-about',
