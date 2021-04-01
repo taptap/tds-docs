@@ -7,14 +7,14 @@ slug: /sdk
 本文主要介绍 Android 如何将 TapSDK 快速接入并实现登录功能。
 
 :::note
-如需通过示例项目了解如何在 Android 应用中集成 TapSDK，请参阅 GitHub 中的 [TapSDK_Android_Demo](https://github.com/TapTap/TapSDK-Android) 示例项目。
+如需通过示例项目了解如何在 Android 应用中集成 TapSDK，请参阅[下载](/sdk/tap-download)页面中的示例项目。
 :::
 
 ## 1. 登录 TapTap 开发者中心
 请登录 [TapTap 开发者中心](https://developer.taptap.com/) 来创建应用或注册为开发者。
 
 ## 2. 下载 TapTap 应用
-点击下载 [TapTap 应用](https://www.taptap.com/mobile)
+点击下载 [TapTap 应用](https://www.taptap.com/mobile)。
 
 ## 3. 环境要求
 - 最低支持 Android level 21+。
@@ -28,7 +28,7 @@ dependencies {
 }
 ```   -->
 <!-- ### 方法二、手动添加 -->
-1. 将 [下载](https://github.com/TapTap/TapSDK-Android) 的 SDK 包，导入到 **your project** > **app** > **libs** 目录下  
+1. 将 [下载](/sdk/tap-download) 的 SDK 包，导入到 **your project** > **app** > **libs** 目录下  
 2. 打开你工程的 **your project ** > **app** > **build.gradle** 文件，添加 gradle 配置如下  
 ```java  
 repositories{  
@@ -50,9 +50,9 @@ dependencies {
 ```
 
 4. 配置存储模型  
-当你的 targetSdkVersion<29 时，需要添加如下配置    
-manifest 节点添加 `xmlns:tools="http://schemas.android.com/tools"`  
-application 节点添加 `tools:remove="android:requestLegacyExternalStorage"`
+当你的 `targetSdkVersion<29` 时，需要添加如下配置：  
+- manifest 节点添加 `xmlns:tools="http://schemas.android.com/tools"`  
+- application 节点添加 `tools:remove="android:requestLegacyExternalStorage"`
 
 ## 5. 初始化
 
@@ -68,9 +68,11 @@ TapConfig tapConfig = new TapConfig.Builder()
 TapBootstrap.init(MainActivity.this, tapConfig);  
 ```
 
+<!--
 #### API
 
 [TapBootstrap.init()](/api/android-tapbootstrap.md#init)  
+-->
 
 ## 6. 注册登录回调
 监听登录的结果  
@@ -97,10 +99,10 @@ TapBootstrap.registerLoginResultListener(new TapLoginResultListener() {
 
 
 #### AccessToken 使用说明
-- AccessToken 包含过期时间，90天，过期后SDK会自动清除本地缓存
-- AccessToken 信息解出来之后，可以传到游戏服务端去获取用户信息，[获取用户信息](/api/service#流程)
+- AccessToken 包含过期时间(90 天)，过期后 SDK 会自动清除本地缓存。
+- AccessToken 信息解出来之后，可以传到游戏服务端去获取用户信息，可参考[获取用户信息](/api/service#流程)。
 
-正确的返回 AccessToken 如下  
+正确的返回 AccessToken 如下：
 
 ```cs
 {
@@ -140,12 +142,16 @@ TapTap 登录，当没有安装 TapTap app 时，会打开内置 webview 进行 
  */
 TapBootstrap.login(MainActivity.this, 0);
 ```
+
+<!--
 #### API
 [login()](/api/android-tapbootstrap.md#login)  
+-->
 
 ## 8. 登出
 
 :::caution
 当用户退出登录的时候请务必调用此方法执行退出功能， 避免用户信息错乱。
 :::
-调用`TapBootstrap.logout()` 实现登出功能。
+
+调用 `TapBootstrap.logout()` 实现登出功能。
