@@ -62,7 +62,7 @@ TapSDK 初始化
 ```java
 TapConfig tapConfig = new TapConfig.Builder()
                 .withAppContext(getApplicationContext())
-                .withClientId("client Id") // 开发者中心获取到的 client Id
+                .withClientId("clientId") // 开发者中心获取到的 Client ID
                 .withRegionType(TapRegionType.CN) // TapRegionType.CN: 国内  TapRegionType.IO: 国外
                 .build();
 TapBootstrap.init(MainActivity.this, tapConfig);  

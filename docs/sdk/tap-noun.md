@@ -4,9 +4,9 @@ title: TapSDK 名词解释
 sidebar_label: 名词解释
 ---
 
-## client_id
-是一个游戏实体包在 TapTap 开发者中心的唯一身份标识，TapTap 通过 client_id 来鉴别游戏包的身份  
-client_id 获取位置如 [图示](http://qnblog.ijemy.com/tap_clientid.png)  
+## Client ID
+是一个游戏实体包在 TapTap 开发者中心的唯一身份标识，TapTap 通过 Client ID 来鉴别游戏包的身份  
+Client ID 获取位置如 [图示](http://qnblog.ijemy.com/tap_clientid.png)  
 ## token
 每次登录后，都会在 [LoginSuccess](/sdk/tap-unity#8 - 注册回调) 回调里面返回 token 及相关信息，token 是用户本次授权的唯一标识。  
 每次登录返回 token 会不一样，logout 后自动清理

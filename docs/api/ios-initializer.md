@@ -27,7 +27,7 @@ config.clientId =clientID;
 
 | 参数       | 可选  | 备注                |
 | :------- | :-- | :---------------- |
-| clientId | 否   | 开发者中心获取的 client Id |
+| clientId | 否   | 开发者中心获取的 Client ID |
 
 ### enableTapDBWithChannel
 

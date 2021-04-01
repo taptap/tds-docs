@@ -21,7 +21,8 @@ public static void init(Activity activity, TapConfig tapConfig);
 ```java
 TapConfig tapConfig = new TapConfig.Builder()
                 .withAppContext(getApplicationContext())
-                .withClientId("client Id")
+                .withClientId("clientId")
+                .withRegionType(TapRegionType.CN) 
                 .build();
 TapBootstrap.init(MainActivity.this, tapConfig);
 ```
@@ -31,7 +32,8 @@ TapBootstrap.init(MainActivity.this, tapConfig);
 | 参数         | 可选  | 备注                |
 | :--------- | :-- | :---------------- |
 | context   | 否   | 上下文 |
-| clientId | 否   | 开发者中心获取的 client Id |
+| clientId | 否   | 开发者中心获取的 Client ID |
+| regionType   | 否   | 区域选择 TapRegionType.CN: 国内  TapRegionType.IO: 国外|
 
 ### isInitialized
 
@@ -186,7 +188,7 @@ TapBootstrap.getUserDetails(new Callback<TapUserDetails>() {
 
 ### getCurrentToken
 
-获取用户登录后的Token信息
+获取用户登录后的 Token 信息
 
 #### API  
 
@@ -230,7 +232,7 @@ public static void void setPreferredLanguage(@TapLanguageType language);
 
 | 字段         | 可为空 | 说明               |
 | ---------- | --- | ---------------- |
-| language   | 否   | 语言类型：TapLanguageType.AUTO 自动, TapLanguageType.ZH_HANS, 简体中文, TapLanguageType.EN 2英文 |
+| language   | 否   | 语言类型：TapLanguageType.AUTO 自动, TapLanguageType.ZH_HANS, 简体中文, TapLanguageType.EN 英文 |
 
 #### 示例代码
 

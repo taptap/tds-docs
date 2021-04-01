@@ -9,7 +9,7 @@ title: TapBootstrap
 #### API
 
 ```cs
-public TapConfig (string cliendID, bool isCn);
+public TapConfig (string cliendId, bool isCn);
 public static void Init (TapConfig tapConfig);
 ```
 
@@ -23,7 +23,7 @@ TapBootstrap.Init(tapConfig);
 
 | 字段        | 可为空 | 说明                                                           |
 | --------- | --- | ------------------------------------------------------------ |
-| clientId    | 否   | 开发者中心获取到的 clientId |
+| clientId    | 否   | 开发者中心获取到的 Client ID |
 | isCN    | 是   | true 为国内，false 为国外，默认 true                                           |
 
 

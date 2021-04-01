@@ -12,7 +12,7 @@ OpenAPI 采用统一的 Mac Token 头部签算来传递用户身份。
 以下接口，凡标示类似 `GET` `MAC Token` 的，表示这是一个 `GET` 请求，头部要用 `MAC Token` 签算。
 
 ## 流程
-1. 移动端用SDK的TapTap登录，可以通过`GetCurrentAccessToken`获取AccessToken，里面包含
+1. 移动端用SDK的TapTap登录，可以通过 `GetCurrentAccessToken` 获取 AccessToken，里面包含
 ```java
   public String kid;
   public String access_token;
@@ -22,7 +22,7 @@ OpenAPI 采用统一的 Mac Token 头部签算来传递用户身份。
   private String json = null;
 ```
 
-2. 再把access_token和mac_key发到游戏业务服务器，服务端签算mac token。
+2. 再把 access_token 和 mac_key 发到游戏业务服务器，服务端签算 mac token。
 3. 请求https://openapi.taptap.com/account/profile/v1 ， header携带mac token
 
 > 注意：当前实际返回的kid和access_token值相等，建议使用access_token
@@ -37,7 +37,7 @@ OpenAPI 采用统一的 Mac Token 头部签算来传递用户身份。
 
 | 字段      | 类型   | 说明   |
 | --------- | ------ | ------ |
-| client_id | string | 该应用的 client_id，应与约定相同 |
+| client_id | string | 该应用的 Client ID，应与约定相同 |
 
 #### Response
 
@@ -50,7 +50,7 @@ openid          | string        | 授权用户唯一标识(每个 client 
 unionid         | string        | 授权用户唯一标识(每个 union 不同)
 
 #### 请求示例
-替换其中的`MAC id`和`client id`为自己签算的mac token和控制台的client id
+替换其中的`MAC id`和`client id`为自己签算的mac token和控制台的 Client ID
 ```
 curl -s -H 'Authorization:MAC id="1/hhykMJFMExXBLJrbW823QN3j-O2-MRLBm13XaHNscXgRvLEGQiE2mjXvFIWN_fapPk5dfAcq59kkRD1BUrsocJ1uVWpq5OzGBZ9rwae9-nZ50nzpDLRooFTNT8iTPHmRSH3v0nTk1m4b2-NhXqpGya8t96DQF9zkhf68IkbwIgmDy4GoGVrgVcjFh0xHwLG_4rlwtVR5BZ8-Twyx1PhPjDc8trycgN2i6e-2ivfP6zxrnQr5kW03yQ0QMMgS01Inx4DRcgXMSYPCeNqIxwA6j7WlyrNgU0X0qwnnWBugKOzbJPxA-rgKDu8zVmaly6Xl654V21z2GhWwIfLnil0R6A",ts="1615196300",nonce="abcdef",mac="RgNtmn57fFQB5Ztw7a2KuQyiWkg="' "https://openapi.taptap.com/account/profile/v1?client_id=<clien id>"
 ```
@@ -87,12 +87,12 @@ MAC Token 包含以下字段：
 
 #### 脚本
 可用此脚本验证直接替换参数，用来验证自己服务端签算的mac token是否正确  
-CLIENT_ID替换为控制台获取的`client id`，ACCESS_TOKEN和MAC_KEY为客户端登录成功后的`access_token`、`mac_key`
+CLIENT_ID替换为控制台获取的`Client ID`，ACCESS_TOKEN 和 MAC_KEY 为客户端登录成功后的`access_token`、`mac_key`
 ```
 #!/usr/bin/env bash
 
 # 客户端 ID
-CLIENT_ID="请替换为控制台的client id"
+CLIENT_ID="请替换为控制台的 Client ID"
 # SDK 获取的 access_token
 ACCESS_TOKEN="1/hhykMJFMExXBLJrbW823QN3j-O2-MRLBm13XaHNscXgRvLEGQiE2mjXvFIWN_fapPk5dfAcq59kkRD1BUrsocJ1uVWpq5OzGBZ9rwae9-nZ50nzpDLRooFTNT8iTPHmRSH3v0nTk1m4b2-NhXqpGya8t96DQF9zkhf68IkbwIgmDy4GoGVrgVcjFh0xHwLG_4rlwtVR5BZ8-Twyx1PhPjDc8trycgN2i6e-2ivfP6zxrnQr5kW03yQ0QMMgS01Inx4DRcgXMSYPCeNqIxwA6j7WlyrNgU0X0qwnnWBugKOzbJPxA-rgKDu8zVmaly6Xl654V21z2GhWwIfLnil0R6A"
 # SDK 获取的 mac_key
