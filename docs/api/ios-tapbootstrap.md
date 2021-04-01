@@ -18,7 +18,7 @@ title: TapBootstrap
 
 ```objectivec
 TapConfig *config = TapConfig.new;
-config.clientId = @"client id";
+config.clientId = @"clientId";
 config.region = TapSDKRegionTypeCN;
 [TapBootstrap initWithConfig:config];
 ```
@@ -27,7 +27,7 @@ config.region = TapSDKRegionTypeCN;
 
 | 参数       | 可选  | 备注                |
 | :------- | :-- | :---------------- |
-| clientId | 否   | 开发者中心获取的 client Id |
+| clientId | 否   | 开发者中心获取的 Client ID |
 | region | 否   | 海外或者国内 |
 
 ### isInitialized

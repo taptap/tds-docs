@@ -15,7 +15,7 @@ public static void Init(string clientId, string channel, string gameVersion)
 #### 示例代码
 
 ```cs
-TapSDK.TDSTapDB.Init("clientID","channel","gameVersion");
+TapSDK.TDSTapDB.Init("clientId","channel","gameVersion");
 ```
 
 ### SetUser

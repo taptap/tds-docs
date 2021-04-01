@@ -22,7 +22,7 @@ init(TdsConfig config);
 ```java
 TdsConfig tdsConfig = new TdsConfig.Builder()
                 .appContext(MainActivity.this)
-                .clientId("client id")
+                .clientId("clientId")
                 .build();
 TdsInitializer.init(tdsConfig);
 ```
@@ -31,8 +31,8 @@ TdsInitializer.init(tdsConfig);
 
 | 参数         | 可选  | 备注                |
 | :--------- | :-- | :---------------- |
-| clientId   | 否   | 开发者中心获取的 client Id |
 | appContext | 否   | 当前 Activity        |
+| clientId   | 否   | 开发者中心获取的 Client ID |
 
 <!-- ### enableTapDB
 

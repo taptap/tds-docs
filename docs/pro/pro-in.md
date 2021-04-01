@@ -8,7 +8,7 @@ import {Highlight} from '../component';
 ## 一、开启 "TapTap 登录" 功能
 1. 进入已经通过审核的应用，在菜单中找到 “TapTap 登录” 功能
 2. 选择适用地区
-3. 点击开启，并获得相应的 client id ，即可开始接入流程
+3. 点击开启，并获得相应的 Client ID ，即可开始接入流程
 - 目前移动应用上提供原生授权登录，需用户安装 TapTap 客户端配合使用
 - 如用户没有安装 TapTap 客户端，则会唤起 webview 进行登录
 

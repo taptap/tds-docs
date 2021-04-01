@@ -109,7 +109,7 @@ WebKit.framework
 ### 配置跳转 TapTap 应用
 `用户无 TapTap 应用时，默认会打开 webview 登录`
 
-1. 打开 info.plist，添加如下配置，然后请替换 clientID 为你在控制台获取的 clientID。
+1. 打开 info.plist，添加如下配置，然后请替换 clientID 为你在控制台获取的 Client ID。
 
 ![](https://qnblog.ijemy.com/xd_ios_info.png)
 
@@ -173,7 +173,7 @@ WebKit.framework
 #### 示例代码
 ```objectivec
 TapConfig *config = TapConfig.new;
-config.clientId = @"client id";
+config.clientId = @"clientId";
 config.region = TapSDKRegionTypeCN;
 [TapBootstrap initWithConfig:config];
 ```

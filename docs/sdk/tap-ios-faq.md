@@ -5,7 +5,7 @@ sidebar_label: iOS
 ---
 
 ## registerLoginCallback 代理无法回调
-检查一下 clientID 设置，info.plist 和初始化代码里面保持一致
+检查一下 client ID 设置，info.plist 和初始化代码里面保持一致
 
 ## [UIWindow tds_topWindow]: unrecognized selector sent to class 0xxxxxxxx
 到 Build Setting-->Other Linker Flags 添加 - ObjC

@@ -26,7 +26,7 @@ TapSDK.TDSLogin.Init("clientId", true,true);
 
 | 字段        | 可为空 | 说明                                                           |
 | --------- | --- | ------------------------------------------------------------ |
-| clientId    | 否   | 开发者中心获取到的 clientId |
+| clientId    | 否   | 开发者中心获取到的 Client ID |
 | isCN    | 是   | true 为国内，false 为国外，默认 true                                           |
 | isRoundCorner | 是   | 登录框：true 为圆角，false 为直角，默认为 true                     |
 
