@@ -5,11 +5,20 @@ sidebar_label: 资源下载
 ---
 
 ## SDK 下载  
-Android SDK 下载：[TapSDK](https://github.com/xindong/TapSDK_Android/releases)  
-iOS SDK 下载：[TapSDK.kit](https://github.com/xindong/TapSDK_iOS/releases)  
-Unity SDK 下载：[TapSDK_UPM](https://github.com/xindong/TAPSDK_UPM/releases)  
+
+我们计划 2021 年 4 月 9 日正式发布 TapSDK，敬请期待。
+
+<!-- 
+Android SDK 下载：[TapSDK](https://github.com/TapTap/TapSDK-Android/releases)  
+iOS SDK 下载：[TapSDK.kit](https://github.com/TapTap/TapSDK-iOS/releases)  
+Unity SDK 下载：[TapSDK_UPM](https://github.com/TapTap/Tapbootstrap-Unity/releases)  
+-->
 
 ## Demo 下载
+
+2021 年 4 月 9 日开始，Demo 会随正式版 SDK 一起发布，敬请期待。
+
+<!-- 
 Android Demo 下载：[Android_TapDemo](https://github.com/xindong/TapSDK_Android)  
 iOS Demo 下载：[iOS_TapDemo](https://github.com/xindong/TapSDK_iOS)  
 Unity Demo 下载：[Unity_TapDemo](https://github.com/xindong/TapSDK_Unity_Demo)  
@@ -21,6 +30,7 @@ Unity Demo 下载：[Unity_TapDemo](https://github.com/xindong/TapSDK_Unity_Demo
 #### SDK 附加为可选择接入项
 - 数美定制版 SDK [点击下载](https://qnblog.ijemy.com/xdwl-pri-release.aar)  
 - OAID 推荐版 [oaid_sdk_1.0.23.aar](https://qnblog.ijemy.com/oaid_sdk_1.0.23.aar)
+-->
 
 <!-- #### 测试用例
 TapSDK 测试用例[点击下载](https://qnblog.ijemy.com/TapSDK测试用例.xlsx) -->
