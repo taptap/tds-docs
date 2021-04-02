@@ -14,7 +14,7 @@ import {Highlight,Link,ImageLink} from '../component';
 
 当游戏在 TapTap 开放售卖时，建议接入购买激活 SDK 。
 
-接入后，使用 TapTap 账号购买游戏的用户，能够正常打开游戏。通过特殊渠道直接下载 APK 并安装的用户，在游戏开启时，将会看到 “**游戏未激活，请前往 TapTap 购买此游戏**” <Highlight color='#A0A0A0'>（如下图）</Highlight>，并且无法正常开启游戏。
+接入后，使用 TapTap 账号购买游戏的用户，能够正常打开游戏。通过特殊渠道直接下载 APK 并安装的用户，在游戏开启时，将会看到 「**游戏未激活，请前往 TapTap 购买此游戏**」 <Highlight color='#A0A0A0'>（如下图）</Highlight>，并且无法正常开启游戏。
 
 ![游戏未激活，请前往 TapTap 购买此游戏](https://img.tapimg.com/market/images/d62dd12c9ac8f2e2b9bb236506380dfe.jpg)
 
