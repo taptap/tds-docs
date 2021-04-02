@@ -115,12 +115,14 @@ import {Highlight} from '../component';
 ![用来空行的小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)  
 
 ### **3.4 详情页顶部图、推广图及旧版推广图**
+
 <Highlight color='#A0A0A0'>为方便说明统一称为 “ 推广图 ”</Highlight>  
+
 3.4.1 推广图不得含有除游戏名称之外的宣传文案，不得含有人物名片、游戏 UI 元素等内容；  
 3.4.2 不得以游戏截图充当推广图，不得多图拼接、平铺作为推广图；  
 3.4.3 推广图需含有游戏 Logo（方形推广图除外） ，背景不得大面积留白；  
 3.4.4 推广图不得出现实物手机；  
-3.4.5 推广图不得出现游戏 ICON ；  
+3.4.5 推广图不得出现游戏 ICON ；   
 3.4.6 推广图不得使用人物三视图、草稿图、建模图；  
 ![用来空行的小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)  
 
