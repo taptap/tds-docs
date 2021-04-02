@@ -46,7 +46,7 @@ bool isInit = [TapBootstrap isInitialized];
 
 ### registerLoginResultDelegate
 
-开启动态
+注册登录回调
 
 #### API  
 
@@ -57,7 +57,7 @@ bool isInit = [TapBootstrap isInitialized];
 #### 示例代码
 
 ```objectivec
-// 注册登录回调
+// 监听用户登陆状态
 [TapBootstrap registerLoginResultDelegate:self];
 
 // 实现回调方法
@@ -81,7 +81,7 @@ bool isInit = [TapBootstrap isInitialized];
 
 ### registerUserStatusChangedDelegate
 
-开启动态
+监听用户账号的登陆状态
 
 #### API  
 
@@ -248,5 +248,5 @@ bool isIOSuport = [TapLoginHelper isTapTapGlobalClientSupport];
 | ----------- | --- | -------- |
 |   ERROR_CODE_UNDEFINED     | 80000    | 未定义   |
 | ERROR_CODE_UNINITIALIZED     | 80001    |  未初始化   |
-| ERROR_CODE_LOGOUT_INVALID_LOGIN_STATE      | 80004    | token失    |
+| ERROR_CODE_LOGOUT_INVALID_LOGIN_STATE      | 80004    | token失效   |
 |ERROR_CODE_LOGOUT_KICKED     | 80007     | 账号被踢     |
