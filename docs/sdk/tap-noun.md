@@ -20,9 +20,9 @@ Client ID 获取位置如 [图示](/img/tap_clientid.png)
 ## 分包渠道
 标识游戏安装包渠道来源，需要在代码中设置
 
-## app id
+## App ID
 游戏在 TapTap 商店的唯一身份标识  
-例如：https://www.taptap.com/app/187168 ，其中 "187168" 是 app id
+例如：https://www.taptap.com/app/187168 ，其中 "187168" 是 App ID
 
 <!-- ## tap user id
 taptap 主站的数字 id，用户在 TapTap 社区的唯一身份标识（开发者不可获取，需用户主动提供）  
