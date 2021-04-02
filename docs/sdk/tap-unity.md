@@ -112,7 +112,7 @@ import {Highlight} from '../component';
 
 #### 示例代码
 ```cs
-TapConfig tapConfig = new TapConfig("FwFdCIr6u71WQDQwQN", true);
+TapConfig tapConfig = new TapConfig("FwFdCIr6u71WQDQwQ", true);
 TapBootstrap.Init(tapConfig);
 ```
 

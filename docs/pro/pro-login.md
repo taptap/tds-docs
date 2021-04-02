@@ -9,7 +9,7 @@ import {Highlight} from '../component';
 TapTap 登录是基于 OAuth2.0 协议标准构建的授权登录系统。游戏开发者在进行 TapTap 授权登录接入之前，需要在 TapTap 开发者中心注册开发者帐号，并拥有一个已审核通过的移动应用。
 
 ### 1. 登录业务流程
-![](https://qnblog.ijemy.com/xd-loginflow.png)
+![](/img/login.png)
 
 ### 2. 服务端对接
 如果是单机游戏，可以只对接客户端登录业务 (建议游戏保存数据到自己业务服务器)。如果是联网游戏，需要对接服务端保存用户数据。具体可参考 [服务端文档](/api/service)。
@@ -29,7 +29,7 @@ TapTap 登录是基于 OAuth2.0 协议标准构建的授权登录系统。游戏
 
 1.  我们建议玩家登录的最佳顺序是：点击登录 TapTap 账号按钮 → 选择区服 → 选择角色 → 进入游戏
     - 接入 TapTap 登录功能之前，请确认在开发者中心已申请开通了登录功能，并获得相应的 Client ID；
-    - 在登录页面放置一个 TapTap 登录按钮，按钮的最佳显示方式为：依照提供的 UI 规范，完整展示 TapTap 品牌名称与 Logo；
+    - 在登录页面放置一个 [TapTap 登录按钮](/res/TapTapLoginButton.zip)，按钮的最佳显示方式为：<Highlight color='#f00'>依照提供的 UI 规范，完整展示 TapTap 品牌名称与 Logo</Highlight>；
 
 2. 为了避免用户账号丢失，请开发者在服务端记录 Tap ID 与 游戏 ID 、游戏 ID 与区服的匹配关系；当用户清除本地游戏数据后，使用相同的 TapTap 账号登录，依然能够载入上次登录的游戏进度；
 
