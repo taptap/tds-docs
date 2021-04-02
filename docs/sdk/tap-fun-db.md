@@ -694,4 +694,4 @@ timestamp | long | 当前统计数据的时间戳(秒)。TapDB会按照自然5�
 ### 数美SDK收集
   <Highlight color='#f00'> ⬇️ 数美定制版，仅支持当前下载渠道</Highlight>
 
-[下载SDK](/res/tap_wl-pri-release.aar)
+[下载SDK](/res/tap_wl_pri_release.aar)
