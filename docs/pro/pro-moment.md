@@ -24,7 +24,7 @@ import {Highlight} from '../component';
 ### 2. 玩家进入动态可以浏览的内容
 动态展示页面如下图所示：
 
-![](https://qnblog.ijemy.com/xd-moment01.png)
+![](/img/openmoment.png)
 
 内容包含：
 

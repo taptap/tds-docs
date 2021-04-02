@@ -15,7 +15,7 @@ import {Highlight} from '../component';
 内嵌动态基于 TapTap 内容社区的功能和游戏本身的账号系统的更多融合，成功接入内嵌动态 SDK 后玩家即可通过游戏直接访问 TapTap 内容和自带功能。同时内嵌动态 SDK 也为游戏打造个性化内容或服务提供了开放功能。
 
 ## 2. 设置回调
-调用 enableMoment 后，需要设置动态回调，用于获取动态的状态变化
+设置动态回调，用于获取动态的状态变化
 
 #### API
 <Tabs
@@ -107,8 +107,8 @@ TapMoment.SetCallback((code,msg)=>{
  CALLBACK_CODE_PUBLISH_CANCEL       | 10200   | 关闭动态发布页面     |
  CALLBACK_CODE_GET_NOTICE_SUCCESS | 20000   | 获取新消息成功 |
  CALLBACK_CODE_GET_NOTICE_FAIL | 20100   | 获取新消息失败 |
- CALLBACK_CODE_MOMENT_APPEAR | 30000   | 自己 / 好友动态页面打开 |
- CALLBACK_CODE_MOMENT_DISAPPEAR | 30100   | 自己 / 好友动态页面关闭 |
+ CALLBACK_CODE_MOMENT_APPEAR | 30000   | 动态页面打开 |
+ CALLBACK_CODE_MOMENT_DISAPPEAR | 30100   | 动态页面关闭 |
  CALLBACK_CODE_ClOSE_CANCEL | 50000   | 取消关闭所有动态界面（弹框点击取消按钮） |
  CALLBACK_CODE_ClOSE_CONFIRM | 50100   | 确认关闭所有动态界面（弹框点击确认按钮） |
  CALLBACK_CODE_LOGIN_SUCCESS | 60000   | 动态页面内登录成功 |
