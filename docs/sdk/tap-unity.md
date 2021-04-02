@@ -44,7 +44,7 @@ import {Highlight} from '../component';
 
 1. 导航栏 -> File -> Build Settings，添加 Android 配置文件。
 
-    ![](/img/tap_unity_amanifest.png)。
+    ![](/img/tap_unity_amanifest.png)
 
 2. 编辑 Assets/Plugins/Android/AndroidManifest.xml 文件，在 Application Tag 下添加以下代码。
 
