@@ -18,8 +18,8 @@ sidebar_label: iOS
 点击下载 [TapTap 应用](https://www.taptap.com/mobile)
 
 ## 3. 环境配置
-- 最低支持到 iOS 10.0；
-- 请在 Xcode 选择工程，到 `Build Setting`-->`Other Linker Flags`， 添加 `- ObjC`；
+- 最低支持 `iOS 10.0`。
+- 请在 Xcode 选择工程，到 `Build Setting`-->`Other Linker Flags`， 添加 `- ObjC`。
 
 ## 4. 工程导入
 <!-- ### 方式一、自动导入 (推荐 pod 集成)  
@@ -90,7 +90,8 @@ WebKit.framework
 
 ## 6. 跳转 TapTap 登录和打开多媒体
 ### 配置多媒体权限
-`在使用到动态功能时，需要授权相册 / 相机 / 麦克风访问权限`  
+
+**动态功能需要授权相册 / 相机 / 麦克风访问权限。**
 
 打开 info.plist，添加如下配置：
 
@@ -107,70 +108,70 @@ WebKit.framework
 ```
 
 ### 配置跳转 TapTap 应用
-`用户无 TapTap 应用时，默认会打开 Webview 登录`
 
-1. 打开 info.plist，添加如下配置，然后请替换 clientID 为你在控制台获取的 Client ID。
+用户无 TapTap 应用时，默认会打开 Webview 登录。
 
-![](/img/tap_ios_info.png)
+1. 打开 info.plist，添加如下配置（请替换 clientID 为你在控制台获取的 Client ID）。
 
-```objectivec
-<key>CFBundleURLTypes</key>
-<array>
-    <dict>
-        <key>CFBundleTypeRole</key>
-        <string>Editor</string>
-        <key>CFBundleURLName</key>
-        <string>taptap</string>
-        <key>CFBundleURLSchemes</key>
-        <array>
-            <string>tt[clientID]</string>
-        </array>
-    </dict>
-</array>
+    ![](/img/tap_ios_info.png)
 
-<key>LSApplicationQueriesSchemes</key>
-<array>
-   <string>tapiosdk</string>
-   <string>tapsdk</string>
-</array>
-```
+    ```objectivec
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLName</key>
+            <string>taptap</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>tt[clientID]</string>
+            </array>
+        </dict>
+    </array>
+
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+      <string>tapiosdk</string>
+      <string>tapsdk</string>
+    </array>
+    ```
 
 2. 根据项目中是否有 SceneDelegate.m 文件分两种情况：
 
-  - 如果有 SceneDelegate.m，请添加如下代码到 SceneDelegate.m 文件中即可。
+   - 如果有 SceneDelegate.m，添加如下代码到 SceneDelegate.m 文件即可。
 
-```objectivec
-#import <TapBootstrapSDK/TapBootstrapSDK.h>
-- (void)scene:(UIScene *)scene openURLContexts:(NSSet<UIOpenURLContext *> *)URLContexts{
-    [TapBootstrap handleOpenURL:URLContexts.allObjects.firstObject.URL];
-}
-```
+      ```objectivec
+      #import <TapBootstrapSDK/TapBootstrapSDK.h>
+      - (void)scene:(UIScene *)scene openURLContexts:(NSSet<UIOpenURLContext *> *)URLContexts{
+          [TapBootstrap handleOpenURL:URLContexts.allObjects.firstObject.URL];
+      }
+      ```
 
-  - 如果没有 SceneDelegate.m，只有 AppDelegate.m，请添加如下代码到 AppDelegate.m 文件中。
+   - 如果没有 SceneDelegate.m，只有 AppDelegate.m，请添加如下代码到 AppDelegate.m 文件。
 
-```objectivec
-- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
-   return [TapBootstrap handleOpenURL:url];
-}
+      ```objectivec
+      - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
+        return [TapBootstrap handleOpenURL:url];
+      }
 
-- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
-   return [TapBootstrap handleOpenURL:url];
-}
-```
+      - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
+        return [TapBootstrap handleOpenURL:url];
+      }
+      ```
 
-并在 AppDelegate.h 中添加 UIWindow，然后删除 info.plist 里面的 Application Scene Manifest
+    并在 AppDelegate.h 中添加 UIWindow，然后删除 info.plist 里面的 Application Scene Manifest
 
-```objectivec
-@property (strong, nonatomic) UIWindow *window;
-```
+    ```objectivec
+    @property (strong, nonatomic) UIWindow *window;
+    ```
 
-![](/img/tap_ios_appmanifest.png)
+    ![](/img/tap_ios_appmanifest.png)
 
 ## 7. 初始化
 
-接下来我们要进行 TapSDK 初始化操作。 
+ 调用 [initWithConfig](/api/ios-tapbootstrap#initwithconfig) 方法，传入应用配置信息，即可初始化 TapSDK：
 
-#### 示例代码
 ```objectivec
 TapConfig *config = TapConfig.new;
 config.clientId = @"clientId";
@@ -178,15 +179,10 @@ config.region = TapSDKRegionTypeCN;
 [TapBootstrap initWithConfig:config];
 ```
 
-<!--
-#### API
-[initWithConfig](/api/ios-tapbootstrap#initwithconfig)
--->
-
 ## 8. 注册登录回调
+
 注册登录回调，登录结果会通过回调告知前端。
 
-#### 示例代码
 ```objectivec
 // 注册登录回调
 [TapBootstrap registerLoginResultDelegate:self];
@@ -210,11 +206,12 @@ config.region = TapSDKRegionTypeCN;
 }
 ```
 
-#### AccessToken 使用说明
-- AccessToken 包含过期时间（90 天），过期后 SDK 会自动清除本地缓存。
-- AccessToken 信息解出来之后，可以传到游戏服务端去获取用户信息，可参考 [获取用户信息](/api/service#流程)。
+### AccessToken 使用说明
 
-正确的返回 AccessToken 如下：
+- AccessToken 过期时间为 90 天，过期后 SDK 会自动清除本地缓存。
+- AccessToken 可以传到游戏服务端去获取用户信息，参见 [获取用户信息](/api/service#流程)。
+
+AccessToken 示例：
 
 ```cs
 {
@@ -228,14 +225,16 @@ config.region = TapSDKRegionTypeCN;
 ```
 
 #### 参数说明
+
 参数  | 描述
 | ------ | ------ |
 accessToken | 用户登录后的凭证
-kid  | 服务端使用需要
-macAlgorithm  | 固定为'hmac-sha-1'
-tokenType  | 固定为'mac'
-macKey  | 服务端使用需要
+kid  | 当前实际返回的 kid 和 accessToken 值相等，建议使用 accessToken
+macAlgorithm  | 固定为 `hmac-sha-1`
+tokenType  | 固定为 `mac`
+macKey  | mac 密钥
 expireIn  | 过期时间
+
 
 <!--
 #### API
@@ -243,9 +242,6 @@ expireIn  | 过期时间
 -->
 
 ## 9. 登录
-TapTap 登录，当没有安装 TapTap app 时，会打开内置 Webview 进行 TapTap 验证登录  
-
-#### 示例代码
 
 ```objectivec
 TapBootstrapLoginType loginType = TapBootstrapLoginTypeTapTap;
@@ -262,7 +258,6 @@ TapBootstrapLoginType loginType = TapBootstrapLoginTypeTapTap;
 当用户退出登录的时候请务必调用此方法执行退出功能， 避免用户信息错乱。
 :::
 
-#### 示例代码
 ```objectivec
 [TapBootstrap logout];
 ```

@@ -4,7 +4,7 @@ title: TapBootstrap
 ---
 ## method
 
-TapSDK 核心组建，负责 SDK 初始化和功能开启
+TapSDK 核心组件，负责 SDK 初始化和功能开启
 
 ### init
 
