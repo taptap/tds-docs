@@ -68,7 +68,7 @@ TapLoginSDK.framework
 TapMomentResource.bundle
 TapMomentSDK.framework
 ```
-<!-- ![](https://qnblog.ijemy.com/tap_ios_import2.png) -->
+<!-- ![](/img/tap_ios_import2.png) -->
 
 ## 5. 添加系统依赖库
 请仔细核对下面依赖库是否都添加成功：
@@ -111,7 +111,7 @@ WebKit.framework
 
 1. 打开 info.plist，添加如下配置，然后请替换 clientID 为你在控制台获取的 Client ID。
 
-![](https://qnblog.ijemy.com/xd_ios_info.png)
+![](/img/tap_ios_info.png)
 
 ```objectivec
 <key>CFBundleURLTypes</key>
@@ -164,7 +164,7 @@ WebKit.framework
 @property (strong, nonatomic) UIWindow *window;
 ```
 
-![](https://qnblog.ijemy.com/xd_ios_appmanifest.png)
+![](/img/tap_ios_appmanifest.png)
 
 ## 7. 初始化
 

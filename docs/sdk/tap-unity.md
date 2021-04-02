@@ -43,7 +43,7 @@ import {Highlight} from '../component';
 ### Android 配置
 1. 导航栏 -> File -> Build Settings，添加 Android 配置文件。
 
-![](https://qnblog.ijemy.com/xd_unity_amanifest.png)。
+![](/img/tap_unity_amanifest.png)。
 
 2. 编辑 Assets/Plugins/Android/AndroidManifest.xml 文件，在 Application Tag 下添加以下代码。
 
@@ -84,8 +84,8 @@ import {Highlight} from '../component';
 
 1. 在 <项目脚本语言根目录> 下面创建.amsdef 文件如下图即可。 -->
 <!-- 如果项目业务只在指定目录调用 TapSDK，也可以只在调用 TapSDK 处的同级目录下创建
-![](https://qnblog.ijemy.com/xd_amsdefpng.png) -->
-<!-- ![](https://qnblog.ijemy.com/xd_unity_amsdef.png)
+![](/img/tap_amsdefpng.png) -->
+<!-- ![](/img/tap_unity_amsdef.png)
 
 2. 添加如下配置
 
@@ -212,7 +212,7 @@ TapBootstrap.Logout();
 Unity 打包 apk 步骤如下： 
 
 `需要配置 package name 和签名文件`  
-![](http://qnblog.ijemy.com/xd_unity_android_build.png)
+![](/img/tap_unity_android_build.png)
 **<Highlight color='#f00'> 需要注意：</Highlight>**  
 到 Player Settings-->Other Settings-->Target APILevel 确认是否 >= 29，当 Target APILever < 29 时，需要配置 manifest，在 application 节点添加 `tools:remove="android:requestLegacyExternalStorage"`。
 
@@ -221,5 +221,5 @@ Unity 打包 apk 步骤如下：
 
 1. Unity 导出 Xcode 工程步骤
 
-![](http://qnblog.ijemy.com/xd_ios_build.png)
+![](/img/tap_ios_build.png)
 2. 保存的文件点击 'Unity-iPhone.xcodeproj' 打开 Xcode 工程
