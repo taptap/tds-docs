@@ -42,28 +42,18 @@ TapBootstrap.init(MainActivity.this, tapConfig);
 #### API  
 
 ```java
-public static void isInitialized(Callback<TapSdkInitResult> callback);
+public static boolean isInitialized();
 ```
 
 #### 示例代码
 
 ```java
-TapBootstrap.isInitialized(new Callback<TapSdkInitResult>() {
-    @Override
-    public void onSuccess(TapSdkInitResult tapSdkInitResult) {
-        // 初始化成功
-    }
-
-    @Override
-    public void onFail(TapError tapError) {
-        // 初始化失败
-    }
-});
+boolean isInited = TapBootstrap.isInitialized();
 ```
 
 ### registerLoginResultListener
 
-是否完成初始化
+注册登录回调
 
 #### API  
 
@@ -120,7 +110,7 @@ TapBootstrap.login(MainActivity.this, 0);
 
 ### registerUserStatusChangedListener
 
-监听用户切换账号
+监听用户账号的登陆状态
 
 #### API  
 
@@ -135,12 +125,12 @@ TapBootstrap.login(MainActivity.this, 0);
 TapBootstrap.registerUserStatusChangeListener(new TapUserStatusChangedListener() {
     @Override
     public void onLogout(TapError tapError) {
-    
+        // 如果是因为出错导致的退登，则返回错误信息
     }
 
     @Override
     public void onBind(TapError tapError) {
-
+        
     }
 });
 ```
@@ -148,7 +138,7 @@ TapBootstrap.registerUserStatusChangeListener(new TapUserStatusChangedListener()
 
 ### getUser / getUserDetails
 
-获取用户登录信息
+获取用户 基本 / 详细 登录信息
 
 #### API  
 
@@ -256,3 +246,11 @@ public static void logout();
 ```java
 TapBootstrap.logout();
 ```
+
+## 错误码
+| 字段          | code | 说明       |
+| ----------- | --- | -------- |
+|   ERROR_CODE_UNDEFINED     | 80000    | 未定义   |
+| ERROR_CODE_UNINITIALIZED     | 80001    |  未初始化   |
+| ERROR_CODE_LOGOUT_INVALID_LOGIN_STATE      | 80004    | token失效    |
+|ERROR_CODE_LOGOUT_KICKED     | 80007     | 账号被踢     |

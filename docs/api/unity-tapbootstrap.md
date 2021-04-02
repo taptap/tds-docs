@@ -46,7 +46,7 @@ TapBootstrap.Login(loginType, new string[] { "public_profile" });
 
 
 ### RegisterLoginResultListener
-设置登录回调
+注册登录回调
 
 #### API
 
@@ -79,7 +79,7 @@ public class MyLoginCallback : TapBootstrap.ITapLoginResultListener {
 ```
 
 ### RegisterUserStatusChangedListener
-设置登录回调
+监听用户账号的登陆状态
 
 #### API
 
@@ -125,7 +125,7 @@ TapBootstrap.GetAccessToken((accessToken, error) => {
 });
 ```
 ### getUser
-修改登录配置
+获取用户基本信息
 
 #### API
 
@@ -142,7 +142,7 @@ TapBootstrap.GetUser((user, error) => {
 ```
 
 ### GetDetailUser
-获取登录信息
+获取用户详细信息
 
 #### API
 
@@ -174,7 +174,7 @@ TapBootstrap.Logout();
 ```
 
 ### SetPreferLanguage
-获取 accessToken
+设定游戏倾向语言, TapLanguageType 0-自动 1-简中 2-英文
 #### API
 
 ```cs
@@ -188,7 +188,7 @@ TapBootstrap.SetPreferLanguage(TapLanguage.ZH_HANS);
 ```
 
 ### Bind
-修改登录配置
+绑定用户
 
 #### API
 
