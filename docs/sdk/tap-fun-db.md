@@ -689,9 +689,9 @@ timestamp | long | 当前统计数据的时间戳(秒)。TapDB会按照自然5�
 ### OAID方式
 自行选择是否引入OAID，TapSDK支持OAID版本为1.0.5-1.0.23
 - 如果自己有集成其他SDK使用到OAID，TapSDK可以直接使用
-- 如果没有集成其他OAID版本，我们推荐下载 [oaid_sdk_1.0.23.aar](https://qnblog.ijemy.com/oaid_sdk_1.0.23.aar)
+- 如果没有集成其他OAID版本，我们推荐下载 [oaid_sdk_1.0.23.aar](/res/tap_oaid_sdk_1.0.23.aar)
 
 ### 数美SDK收集
   <Highlight color='#f00'> ⬇️ 数美定制版，仅支持当前下载渠道</Highlight>
 
-[下载SDK](https://qnblog.ijemy.com/xdwl-pri-release.aar)
+[下载SDK](/res/tap_wl_pri_release.aar)

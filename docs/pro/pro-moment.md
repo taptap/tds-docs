@@ -13,7 +13,7 @@ import {Highlight} from '../component';
 ### 1. 游戏内设置动态的入口
 如下图所示：
 
-![](https://qnblog.ijemy.com/xd-moment06.png)
+![](/img/tap_moment06.png)
 
 请注意如下几点提示：
 - 小红点对于使用率的提升至关重要，建议将入口放在显眼的位置；
@@ -41,23 +41,23 @@ import {Highlight} from '../component';
 
 - 玩家可以在内嵌动态内发布 **图文动态** 和 **视频动态**。
 
-![](https://qnblog.ijemy.com/xd-moment05.png)
+![](/img/tap_moment05.png)
 
 - 接入「一键发布」API，对接到游戏内任意场景触发，一键发布到 TapTap 社区（一键发布目前只支持图文动态）。
 
-![](https://qnblog.ijemy.com/xd_moment_publish1.png)
+![](/img/tap_moment_publish1.png)
 
 ### 4. 动态内互动
 
 - 玩家可以直接关注其他用户，也可以通过内容进行点赞，评论和转发。玩家之间的互动会触发通知。提供玩家之间更多建立联系和沉淀关系的方式。
 
-![](https://qnblog.ijemy.com/xd-moment03.png)
+![](/img/tap_moment03.png)
 
 ### 5. 关闭动态页面
 
 当游戏在特定场景下（比如玩家正在排位等待结束，准备进入对局），游戏可以提示玩家关闭动态。
 
-![](https://qnblog.ijemy.com/xd_moment_close.png)
+![](/img/tap_moment_close.png)
 
 ### 6. 动态运营配置
 

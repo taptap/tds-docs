@@ -24,13 +24,13 @@ iOS Demo 下载：[iOS_TapDemo](https://github.com/xindong/TapSDK_iOS)
 Unity Demo 下载：[Unity_TapDemo](https://github.com/xindong/TapSDK_Unity_Demo)  
 
 ## 登录素材下载
-登录按钮素材 [icon.zip](https://qnblog.ijemy.com/xd_icon.zip)
+登录按钮素材 [icon.zip](/res/tap_icon.zip)
 
 ## SDK 附加
 #### SDK 附加为可选择接入项
-- 数美定制版 SDK [点击下载](https://qnblog.ijemy.com/xdwl-pri-release.aar)  
-- OAID 推荐版 [oaid_sdk_1.0.23.aar](https://qnblog.ijemy.com/oaid_sdk_1.0.23.aar)
+- 数美定制版 SDK [点击下载](/res/tap_wl_pri_release.aar)  
+- OAID 推荐版 [oaid_sdk_1.0.23.aar](/res/tap_oaid_sdk_1.0.23.aar)
 -->
 
 <!-- #### 测试用例
-TapSDK 测试用例[点击下载](https://qnblog.ijemy.com/TapSDK测试用例.xlsx) -->
+TapSDK 测试用例[点击下载](/res/TapSDK测试用例.xlsx) -->
