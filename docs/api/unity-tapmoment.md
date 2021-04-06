@@ -105,19 +105,19 @@ string desc = "我是描述";
 TapMoment.PublishVideoMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE, videos,title,desc);
 ``` -->
 
-### GetNoticeData
+### FetchNotification
 获取用户新增通知
 
 #### API
 
 ```cs
-public static void GetNoticeData ();
+public static void FetchNotification ();
 ```
 
 #### 示例代码
 
 ```cs
-TapMoment.GetNoticeData();
+TapMoment.FetchNotification();
 ```
 
 ### Close

@@ -25,6 +25,19 @@ import {Highlight} from '../component';
 - Android 目标为 API level 21 或更高版本
 
 ## 4. 工程导入
+我们提供两种导入方式，可以根据需求进行选择
+
+### unitypackage导入
+[点击下载 TapSDK.zip](/sdk/tap-download.md)，然后将该 SDK 解压到方便的位置。
+
+- 在你打开的 Unity 项目中，依次转到 Assets > Import Packages > Custom Packages。
+- 从解压缩中的 TapSDK 中，选择您希望在应用中使用的TapSDK产品导入。
+    - TapBootstrap.unitypackage ： 必选。TapSDK 启动器
+    - TapCommon.unitypackag ： 必选。TapSDK 基础库
+    - TapLogin.unitypackage ：必选 TapTap登陆
+    - TapMoment.unitypackage ： TapTap内嵌动态
+
+### 使用 Unity Package Manager
 在项目 Packages/manifest.json 中添加以下代码，[点击](https://github.com/TapTap) 参考 SDK 最新版本号。
 
 ```json
@@ -70,12 +83,16 @@ import {Highlight} from '../component';
             <key>client_id</key>
             <string>ClientId</string>
         </dict>
+        <key>Apple_SignIn_Enable</key>
+        <string>false</string>
         <key>NSPhotoLibraryUsageDescription</key>
         <string>App 需要你的同意，才能访问相册 </string>
         <key>NSCameraUsageDescription</key>
         <string>App 需要你的同意，才能访问相机 </string>
         <key>NSMicrophoneUsageDescription</key>
         <string>App 需要你的同意，才能访问麦克风 </string>
+        <key>NSUserTrackingUsageDescription</key>
+        <string>App需要追踪你的信息</string>
     </dict>
     </plist>
     ```
@@ -189,6 +206,14 @@ TapBootstrap.Login(loginType, new string[] { "public_profile" });
 #### API
 [StartLogin](/api/unity-tapbootstrap.md/#login)
 -->
+
+#### LoginType参数说明
+
+参数  | 描述
+| ------ | ------ |
+LoginType.TAPTAP | TapTap 登录
+LoginType.APPLE  | Apple 登录
+LoginType.GUEST  | 游客登录
 
 ## 9. 登出
 

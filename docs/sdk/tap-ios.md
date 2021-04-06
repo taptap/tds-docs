@@ -253,6 +253,15 @@ TapBootstrapLoginType loginType = TapBootstrapLoginTypeTapTap;
 [login](/api/ios-tapbootstrap#login)
 -->
 
+#### LoginType参数说明
+ 
+参数  | 描述
+| ------ | ------ |
+TapBootstrapLoginTypeTapTap | TapTap 登录
+TapBootstrapLoginTypeApple  | Apple 登录
+TapBootstrapLoginTypeGuest  | 游客登录
+
+
 ## 10. 登出
 :::caution
 当用户退出登录的时候请务必调用此方法执行退出功能， 避免用户信息错乱。
