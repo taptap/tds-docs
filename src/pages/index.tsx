@@ -1,13 +1,19 @@
 import React, { Fragment } from 'react';
+import Head from '@docusaurus/Head';
 import Translate from '@docusaurus/Translate';
 import useBaseUrl from '@docusaurus/useBaseUrl';
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import { Link } from 'react-router-dom';
 import Layout from "@theme/Layout";
 import styles from './styles.module.scss';
 import { entryList } from "./_config";
 
 const HomePage = () => {
+  const { siteConfig } = useDocusaurusContext();
   return <Layout>
+    <Head>
+      <title>{siteConfig.title}</title>
+    </Head>
     <div className={styles.container}>
       <div className={styles.containerContent}>
         <div className={styles.topTitle}>
