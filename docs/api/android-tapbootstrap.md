@@ -92,7 +92,7 @@ TapBootstrap.registerLoginResultListener(new TapLoginResultListener() {
 /**
  * @param type like {TapTap = 0, apple = 1, guest = 2}
  */
-public static void login(Activity activity, int type, String... permissions);
+public static void login(Activity activity, @LoginType.ThirdPartyType int type, String... permissions);
 ```
 ** 参数说明 **
 
@@ -105,7 +105,7 @@ public static void login(Activity activity, int type, String... permissions);
 
 ```java
 // 使用TapTap登陆
-TapBootstrap.login(MainActivity.this, 0);
+TapBootstrap.login(MainActivity.this, LoginType.TAPTAP);
 ```
 
 ### registerUserStatusChangedListener

@@ -489,7 +489,7 @@ public static void fetchNotification();
   <TabItem value="unity">
 
 ```cs
-public static void GetNoticeData ();
+public static void FetchNotification ();
 ```
 结果在 `TapMoment.SetCallback` 进行回调
 
