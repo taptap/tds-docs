@@ -90,7 +90,7 @@ TapBootstrap.registerLoginResultListener(new TapLoginResultListener() {
 
 ```java
 /**
- * @param type like {TapTap = 0, apple = 1, guest = 2}
+ * @param type like {LoginType.TAPTAP, LoginType.APPLE, LoginType.GUEST}
  */
 public static void login(Activity activity, @LoginType.ThirdPartyType int type, String... permissions);
 ```
@@ -99,13 +99,14 @@ public static void login(Activity activity, @LoginType.ThirdPartyType int type, 
 | 字段         | 可为空 | 说明               |
 | ---------- | --- | ---------------- |
 | activity | 否   | 当前Activity |
-| type   | 否   | 登陆类型：0 表示TapTap登陆, 1 表示苹果登陆, 2 表示游客登陆      |
+| type   | 否   | 登陆类型：LoginType.TAPTAP 表示 TapTap 登陆, LoginType.APPLE 表示苹果登陆, LoginType.GUEST 表示游客登陆 
+| public_profile | 否   | 获取 TapTap 主站信息 |
 
 #### 示例代码
 
 ```java
 // 使用TapTap登陆
-TapBootstrap.login(MainActivity.this, LoginType.TAPTAP);
+TapBootstrap.login(MainActivity.this, LoginType.TAPTAP, "public_profile");
 ```
 
 ### registerUserStatusChangedListener
