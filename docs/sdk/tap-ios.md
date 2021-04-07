@@ -243,6 +243,19 @@ expireIn  | 过期时间
 
 ## 9. 登录
 
+### 检查登录状态
+```objectivec
+AccessToken *accessToken = [TapBootstrap getCurrentToken];
+   if(accessToken == nil){
+       //未登录，请登录
+   }else{
+       //已经登录
+   }
+```
+
+
+### 登录 
+
 ```objectivec
 TapBootstrapLoginType loginType = TapBootstrapLoginTypeTapTap;
 [TapBootstrap login:(loginType) permissions:@[@"public_profile"]];

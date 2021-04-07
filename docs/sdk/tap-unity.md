@@ -194,6 +194,23 @@ expireIn  | 过期时间
 
 ## 8. 登录
 
+### 检查登录状态
+对已经登录过的用户，可以直接开始游戏 
+
+```cs
+TapBootstrap.GetAccessToken((accessToken, error) => {
+   if (accessToken == null)
+   {
+       Debug.Log("当前未登录");
+   }
+   else
+   {
+       Debug.Log("已登录");
+   }
+});
+```
+
+### 登录
 使用 TapSDK 提供的登录功能：
 
 ```cs

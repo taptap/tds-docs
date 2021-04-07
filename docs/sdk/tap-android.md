@@ -127,6 +127,19 @@ expireIn  | 过期时间
 
 ## 7. 登录
 
+### 检查登录状态
+
+```java
+// 未登录用户会返回 null
+if (TapBootstrap.getCurrentToken() == null) {
+    //TODO 用户未登录
+} else {
+    //TODO 用户已经登录过
+}
+```
+
+### 登录
+
 ```java
 /**
  * @param activity 当前Activity
