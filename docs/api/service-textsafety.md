@@ -1,13 +1,14 @@
 ---
 id: service-textsafety
-title: 文本过滤
-sidebar_label: 文本过滤
+title: 文本检测
+sidebar_label: 文本检测
 ---
+
 ## 1. 介绍
 
 ### 1.1 API列表
 
-统一对外服务域名：https://whisper.tapapis.com
+统一服务域名：https://whisper.tapapis.com
 
 API路径 | 介绍
 --- | ---
@@ -15,7 +16,7 @@ API路径 | 介绍
 
 ### 1.2 API协议
 
-API以HTTP协议对外提供，对于POST和PUT请求，请求主体必须是JSON格式，并且HTTP Header的Conntent-Type需要设置为application/json
+API以HTTP协议提供，对于POST和PUT请求，请求主体必须是JSON格式，并且HTTP Header的Conntent-Type需要设置为application/json
 
 ## 2. API鉴权
 
@@ -165,3 +166,4 @@ curl --location --request POST 'https://whisper.tapapis.com/v2/text/check' \
     }
 }
 ```
+
