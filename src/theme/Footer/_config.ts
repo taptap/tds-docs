@@ -25,9 +25,9 @@ export const toInnerLinkList = (localePath: string) => {
       label: '认证',
       url: 'https://www.taptap.com/verify',
     },
-    !isIntl && {
-      label: '篝火计划',
-      url: 'https://www.taptap.com/campfire',
+    {
+      label: '服务协议',
+      url: 'https://www.taptap.com/terms',
     },
     {
       label: '隐私政策',
