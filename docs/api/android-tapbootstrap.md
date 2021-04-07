@@ -98,9 +98,9 @@ public static void login(Activity activity, @LoginType.ThirdPartyType int type, 
 
 | 字段         | 可为空 | 说明               |
 | ---------- | --- | ---------------- |
-| activity | 否   | 当前Activity |
+| activity | 否   | 当前 Activity |
 | type   | 否   | 登陆类型：LoginType.TAPTAP 表示 TapTap 登陆, LoginType.APPLE 表示苹果登陆, LoginType.GUEST 表示游客登陆 
-| public_profile | 否   | 获取 TapTap 主站信息 |
+| public_profile | 否   | 获取用户公开信息 |
 
 #### 示例代码
 
