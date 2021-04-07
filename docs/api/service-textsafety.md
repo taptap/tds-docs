@@ -78,8 +78,8 @@ replacement | string | 是 | 对命中关键词进行替换的符号，默认值
 参数 | 类型 | 必须 | 说明 | 示例值
 --- | --- | --- | --- | ---
 request_id | string | 是 | 请求唯一标识，后续可用于查询数据 | c1i1955tqehouf41di20
-result | int | 是 | 返回检测结果<br>0: 通过<br>1: 拒绝<br>2: 复核 | 1
-type | string | 是 | 返回识别类型：<br> 健康: Health <br> 广告: Adv <br> 政治: Politics <br>辱骂: Abuse <br>犯罪: Crime <br>邪教: Heresy <br>恐怖主义: Terrorism <br>色情: Porn <br>赌博: Gamble <br>违禁品: Contraband <br>突发敏感事件: SensitiveEvent <br>违规网站: IllegalWebsite <br> | Politics
+result | int | 是 | 返回检测结果<br/>0: 通过<br/>1: 拒绝<br/>2: 复核 | 1
+type | string | 是 | 返回识别类型：<br/> 健康: Health <br/> 广告: Adv <br/> 政治: Politics <br/>辱骂: Abuse <br/>犯罪: Crime <br/>邪教: Heresy <br/>恐怖主义: Terrorism <br/>色情: Porn <br/>赌博: Gamble <br/>违禁品: Contraband <br/>突发敏感事件: SensitiveEvent <br/>违规网站: IllegalWebsite <br/> | Politics
 filtered_text | string | 是 | 过滤后的文本内容(text)，当且仅当结果是拒绝时，才会返回文本过滤后的结果。若返回的内容为空字符串代表文本需要屏蔽，不能执行后续行为 | 小明你好*，*就要多读书
 hint | object | 是 | 检测线索 | [线索数据结构](#线索数据结构)
 
