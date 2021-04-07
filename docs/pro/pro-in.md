@@ -11,12 +11,12 @@ import {Highlight} from '../component';
 2. 选择适用地区；
 3. 点击开启，获得相应的 Client ID ，即可开始接入流程。
 
-![](/img/tap_taplogin.png)
+![](/img/tap_taplogin_cn.png)
 
 ## 二、配置平台信息
 开启功能后，需要配置与应用包体一致的平台信息。一个平台可以设置多条信息以供不同场景使用。如开发者后台配置的信息与实际应用使用的信息不一致，则 TapTap 登录功能无法生效。配置步骤如下：
 
-![](/img/tap_tapconfig.png)
+![](/img/tap_tapconfig_cn.png)
 
 ## 三、集成 SDK 到你的应用
 

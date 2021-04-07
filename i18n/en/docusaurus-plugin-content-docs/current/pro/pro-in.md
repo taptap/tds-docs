@@ -11,12 +11,12 @@ import {Highlight} from '../component';
 2. Select the Applicable Region.
 3. Click to turn on and obtain the corresponding Client ID. Now you are ready to go.
 
-![](/img/tap_taplogin.png)
+![](/img/tap_taplogin_en.png)
 
 ## II. Configure Platform Information
 After turning on, you will need to configure the platform information which should be consistent with the application’s package. For one platform you may configure multiple sets of information for different scenarios. TapTap login feature will not function properly if the information configured in the Developer Center does not match the actual information of the application.  The configuration steps are as follows.
 
-![](/img/tap_tapconfig.png)
+![](/img/tap_tapconfig_en.png)
 
 ## III. Integrate SDK into your application
 
