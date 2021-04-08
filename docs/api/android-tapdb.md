@@ -3,8 +3,33 @@ id: android-tapdb
 title: TapDB
 ---
 ## method
-### setUser
 
+### init
+
+#### API
+
+```java
+public static void init(Context context, String clientId, String channel);
+public static void init(Context context, String clientId, String channel, boolean isCN);
+```
+
+#### 示例代码
+
+```java
+TapDB.init(getApplicationContext(), "Client ID", "taptap");
+TapDB.init(getApplicationContext(), "Client ID", "taptap", true);
+```
+**init 参数说明**  
+
+| 参数         | 可选  | 备注                |
+| :--------- | :-- | :---------------- |
+| context   | 否   | 上下文 |
+| clientId | 否   | 开发者中心获取的 Client ID |
+| channel   | 否   | 渠道信息|
+| isCN   | 否   | 区域类型: true 表示国内; false 表示国外  默认为 true|
+
+
+### setUser
 当 enableTapDB 后，可以调用此 API  
 
 #### API
@@ -147,88 +172,222 @@ TapDB.onCharge ("0xueiEns","大宝剑","100","CNY","wechat");
 
 常见货币类型的格式参考 <a target="_blank" href="https://www.tapdb.com/docs/zh_CN/features/exchangeRate.html"> 汇率表 </a>
 
-### onEvent
 
-推送自定义事件。需要在控制台预先进行配置。
+### deviceInitialize
 
-#### API  
+设备初始化操作
+
+#### API
 
 ```java
-public static void onEvent(String eventCode, JSONObject properties);
+public static void deviceInitialize(final JSONObject properties);
+```
+如果需要初始化设备的某些属性，可以调用 deviceInitialize 来进行设置。如果相应属性之前已近被初始化，那么后续对这些属性的初始化操作将会被忽略。以首次活跃服务器为例：
+
+#### 示例代码
+
+```java
+JSONObject properties = new JSONObject();
+properties.put("firstActiveServer","server1");
+TapDB.deviceInitialize(properties);
+```
+
+### deviceUpdate
+
+设备属性更新操作
+
+#### API
+
+```java
+public static void deviceUpdate(final JSONObject properties);
+```
+
+如果需要更新设备的某些属性，可以调用 deviceUpdate 来进行设置。通过该接口上传的属性会将原有属性值进行覆盖。以当前积分为例：
+
+#### 示例代码
+
+```java
+JSONObject properties = new JSONObject();
+properties.put("currentPoints", 10);
+// 此时设备表的 "currentPoints" 字段值为 10
+TapDB.deviceUpdate(properties);
+
+JSONObject nextProperties = new JSONObject();
+nextProperties.put("currentPoints", 42);
+// 此时设备表的 "currentPoints" 字段值为 42 
+TapDB.deviceUpdate(nextProperties);
+```
+
+### deviceAdd
+
+设备属性累加操作
+
+#### API
+
+```java
+public static void deviceAdd(final JSONObject properties);
+```
+如果需要对设备的某些数值属性有加减的需求，可以调用 deviceAdd 来进行操作。未初始化数值属性在操作时会被当做 0 进行计算。以当前总积分为例：
+
+#### 示例代码
+
+```java
+JSONObject properties = new JSONObject();
+properties.put("totalPoints", 10);
+// 此时设备表的 "totalPoints" 字段值为 10
+TapDB.deviceUpdate(properties);
+
+JSONObject nextProperties = new JSONObject();
+nextProperties.put("totalPoints", -2);
+// 此时设备表的 "totalPoints" 字段值为 8 
+deviceAdd(nextProperties);
+```
+
+### userInitialize
+
+账号初始化操作
+
+#### API
+
+```java
+public static void userInitialize(final JSONObject properties);
 ```
 
 #### 示例代码
 
 ```java
-try {
-    JSONObject object = new JSONObject("{\"param1\":\"param1\",\"param2\":\"param2\"}");
-    TapDB.setLevel(4);TapDB.onEvent("1000",object);
-} catch (JSONException e) {
-    e.printStackTrace();
-}
+JSONObject properties = new JSONObject();
+properties.put("params", "user");
+TapDB.deviceUpdate(properties);
 ```
 
-**参数说明**
+### userUpdate
 
-| 字段         | 可为空 | 说明                                                   |
-| ---------- | --- | ---------------------------------------------------- |
-| eventCode  | 否   | 在控制台中配置得到的事件编码                                       |
-| properties | 是   | 事件属性。需要和控制台的配置匹配。值需要是长度大于 0 并小于等于 256 的字符串或绝对值小于 1E11 的浮点数 |
+账号属性更新操作
 
-<!-- ### onResume&onStop
-
-跟踪用户游戏次数和游戏时长。需要给游戏中每个 Activity 的 onResume 和 onStop 中添加对应的调用。如果多个 Activity 继承同一个父类，只需要在父类中添加调用即可。比如 onResume 方法，直接在 Activity 的 onResume 方法的最后添加 TapDB.onResume (this) 即可。  
-#### API  
-
+#### API
 
 ```java
-public static void onResume(Activity activity);
-public static void onStop(Activity activity);
+public static void userUpdate(final JSONObject properties);
 ```
-
-
-```objectivec
-
-```
-
-
-
 
 #### 示例代码
 
+```java
+JSONObject properties = new JSONObject();
+properties.put("deviceName", "HUAWEI");
+TapDB.deviceUpdate(properties);
+```
+
+### userAdd
+
+账号属性累加操作
+
+#### API
 
 ```java
-public class GameActivity extends Activity {
-    private GameView gameView;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_game);
-    }
+public static void userAdd(final JSONObject properties);
+```
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        TapDB.onResume(GameActivity.this);
-    }
+#### 示例代码
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        TapDB.onStop(GameActivity.this);
-    }
-}
+```java
+JSONObject properties = new JSONObject();
+properties.put("userName", "LeeJiEun");
+TapDB.deviceUpdate(properties);
+```
+
+### registerStaticProperties
+
+添加静态事件属性
+
+#### API
+
+```java
+public static void registerStaticProperties(final JSONObject properties);
+```
+如果需要添加的通用属性的值在所有事件中相对固定，那么可以调用 registerStaticProperties 方法注册静态通用属性。以来源渠道为例：
+
+#### 示例代码
+
+```java
+// 设置了静态属性 "channel"，值固定为 "TapDB"
+JSONObject properties = new JSONObject();
+properties.put("channel", "TapDB");
+TapDB.registerStaticProperties(properties); 
+```
+
+### unregisterStaticProperties
+
+删除单个静态事件属性
+
+#### API
+
+```java
+public static void unregisterStaticProperties(final JSONObject properties);
+```
+
+#### 示例代码
+
+```java
+JSONObject properties = new JSONObject();
+properties.put("channel", "TapDB");
+TapDB.unregisterStaticProperties(properties); 
+```
+
+### registerDynamicProperties
+
+添加动态事件属性
+
+#### API
+
+```java
+public static void registerDynamicProperties(final TapDBDataDynamicProperties dynamicProperties);
+```
+
+如果需要添加的通用属性的值在不同的上传事件中具有动态的赋值逻辑，那么可以调用 registerDynamicProperties 方法，注册相应的取值逻辑。以用户事件调用当前等级为例：
+
+#### 示例代码
+
+```java
+registerDynamicProperties(
+	() -> {
+			JSONObject properties = new JSONObject();
+			// getCurrentLevel 在这里仅作为案例，表示开发者任何的自有逻辑实现
+			long level = getCurrentLevel();
+			properties.put("#currentLevel", level);
+			return properties; 
+	}
+);
 ```
 
 
-```objectivec
 
+### clearStaticProperties
+
+删除所有静态事件属性
+
+#### API
+
+```java
+public static void clearStaticProperties();
+```
+
+#### 示例代码
+
+```java
+TapDB.clearStaticProperties();
 ```
 
 
 
 
 
-字段 | 可为空 | 说明
-| ------ | ------ | ------ |
-activity | 否 | 当前Activity对象。一般传递"this" -->
+
+
+
+
+
+
+
+
