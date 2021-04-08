@@ -1,6 +1,6 @@
 ---
 id: unity-tapdb
-title: TDSTapDB
+title: TapDB
 ---
 ## method
 ### Init
@@ -9,13 +9,13 @@ title: TDSTapDB
 #### API
 
 ```cs
-public static void Init(string clientId, string channel, string gameVersion)
+public static void Init (string clientId, string channel, string gameVersion, bool isCN);
 ```
 
 #### 示例代码
 
 ```cs
-TapSDK.TDSTapDB.Init("clientId","channel","gameVersion");
+TapDB.Init("clientId","channel","gameVersion",true);
 ```
 
 ### SetUser
@@ -26,14 +26,14 @@ TapSDK.TDSTapDB.Init("clientId","channel","gameVersion");
 ```cs
 public static void SetUser(string userId)
 
-public static void SetUser(string userId, string openId, string loginType)
+public static void SetUser(string userId, string loginType)
 ```
 
 #### 示例代码
 
 ```cs
-TapSDK.TDSTapDB.SetUser("userId");
-TapSDK.TDSTapDB.SetUser("userId","openId","loginType");
+TapDB.SetUser("userId");
+TapDB.SetUser("userId", "loginType");
 ```
 
 **setUser 参数说明 **
@@ -41,24 +41,15 @@ TapSDK.TDSTapDB.SetUser("userId","openId","loginType");
 | 字段        | 可为空 | 说明                                                           |
 | --------- | --- | ------------------------------------------------------------ |
 | userId    | 否   | 长度大于 0 并小于等于 256。只能包含数字、大小写字母、下划线 (\_)、横线 (-)，用户 ID。不同用户需要保证 ID 的唯一性 |
-| openId    | 否   | 通过第三方登录获取到的 openId                                            |
 | loginType | 否   | 第三方登录枚举类型，具体见下面说明                                            |
 
 **loginType 类型说明 **
 
-| 参数          | 说明                                                           |
-| :---------- | :----------------------------------------------------------- |
-| TapTap      | TapTap 登录                                                     |
-| WeiXin      | 微信登录                                                         |
-| QQ          | QQ 登录                                                         |
-| Tourist     | 游客登录                                                         |
-| Apple       | Apple 登录                                                      |
-| Alipay      | 支付宝登录                                                        |
-| Facebook    | facebook 登录                                                   |
-| Google      | Google 登录                                                     |
-| Twitter     | Twitter 登录                                                    |
-| PhoneNumber | 手机号登录                                                        |
-| Custom      | 用户自定义登录类型  （默认名字为 Custom, 如需修改可以调用 LoginType.Custom.changeType） |
+参数  | 描述
+| ------ | ------ |
+LoginType.TAPTAP | TapTap 登录
+LoginType.APPLE  | Apple 登录
+LoginType.GUEST  | 游客登录
 
 ### SetName
 设置姓名
@@ -72,7 +63,7 @@ public static void SetName(string name);
 #### 示例代码
 
 ```cs
-TapSDK.TDSTapDB.SetName("name");
+TapDB.SetName("name");
 ```
 
 ### SetLevel
@@ -87,7 +78,7 @@ public static void SetLevel(int level);
 #### 示例代码
 
 ```cs
-TapSDK.TDSTapDB.SetLevel(5);
+TapDB.SetLevel(5);
 ```
 
 ### SetServer
@@ -102,7 +93,7 @@ public static void SetServer(string server);
 #### 示例代码
 
 ```cs
-TapSDK.TDSTapDB.SetServer("https://test.taptap.com/callback");
+TapDB.SetServer("https://test.taptap.com/callback");
 ```
 
 ### OnCharge
@@ -117,7 +108,7 @@ public static void OnCharge(string orderId, string productId, string amount, str
 #### 示例代码
 
 ```cs
-TapSDK.TDSTapDB.OnCharge ("0xueiEns","大宝剑","100","CNY","wechat");
+TapDB.OnCharge ("0xueiEns","大宝剑","100","CNY","wechat");
 ```
 
 **参数说明**
@@ -132,24 +123,187 @@ TapSDK.TDSTapDB.OnCharge ("0xueiEns","大宝剑","100","CNY","wechat");
 
 常见货币类型的格式参考 <a target="_blank" href="https://www.tapdb.com/docs/zh_CN/features/exchangeRate.html"> 汇率表 </a>
 
-### OnEvent
-自定义回调事件
-
-#### API
-
-```cs
-public static void OnEvent(string eventCode, string properties)
-```
-
-#### 示例代码
-
-```cs
-TapSDK.TDSTapDB.OnEvent("1000","{\"param1\":\"param1\",\"param2\":\"param2\"}");
-```
-
 **参数说明**
 
 | 字段         | 可为空 | 说明                                                   |
 | ---------- | --- | ---------------------------------------------------- |
 | eventCode  | 否   | 在控制台中配置得到的事件编码                                       |
 | properties | 是   | 事件属性。需要和控制台的配置匹配。值需要是长度大于0并小于等于256的字符串或绝对值小于1E11的浮点数 |
+
+<!-- ### Track
+自定义回调事件
+
+#### API
+
+```cs
+public static void Track (string eventName, string properties);
+```
+
+#### 示例代码
+
+```cs
+TapDB.Track("tracktest","{\"param1\":\"param1\",\"param2\":\"param2\"}");
+```
+
+**参数说明**
+
+| 字段         | 可为空 | 说明                                                   |
+| ---------- | --- | ---------------------------------------------------- |
+| eventName  | 否   | 在控制台中配置得到的事件编码                                       |
+| properties | 是   | 事件属性。需要和控制台的配置匹配。值需要是长度大于0并小于等于256的字符串或绝对值小于1E11的浮点数 | -->
+
+### RegisterStaticProperties
+添加静态事件属性
+
+#### API
+
+```cs
+public static void RegisterStaticProperties (string properties);
+```
+
+#### 示例代码
+
+```cs
+TapDB.RegisterStaticProperties("{\"channel\":\"TapDB\"}");
+```
+
+### UnregisterStaticProperty 
+删除单个静态事件属性
+
+#### API
+
+```cs
+public static void UnregisterStaticProperty (string propertKey);
+```
+
+#### 示例代码
+
+```cs
+TapDB.UnregisterStaticProperty("{\"channel\":\"TapDB\"}");
+```
+
+### ClearStaticProperties
+删除所有静态事件属性
+
+#### API
+
+```cs
+public static void ClearStaticProperties();
+```
+
+#### 示例代码
+
+```cs
+TapDB.ClearStaticProperties();
+```
+
+### DeviceInitialize
+设备属性初始化
+
+#### API
+
+```cs
+public static void DeviceInitialize (string properties);
+```
+
+#### 示例代码
+
+```cs
+TapDB.DeviceInitialize("{\"firstActiveServer\":\"server1\"}");
+```
+
+### DeviceAdd 
+增加设备属性
+
+#### API
+
+```cs
+public static void DeviceAdd (string properties);
+```
+
+#### 示例代码
+
+```cs
+TapDB.DeviceAdd("{\"totalPoints\":10}");
+TapDB.DeviceAdd("{\"totalPoints\":-2}");
+// 此时设备表的 "totalPoints" 字段值为 8 
+```
+
+### DeviceUpdate 
+设备属性更新
+
+#### API
+
+```cs
+public static void DeviceUpdate (string properties);
+```
+
+#### 示例代码
+
+```cs
+TapDB.DeviceUpdate("{\"currentPoints\":10}");
+TapDB.DeviceUpdate("{\"currentPoints\":42}");
+// 此时设备表的 "currentPoints" 字段值为 42 
+```
+
+
+### UserInitialize
+初始化用户属性
+
+#### API
+
+```cs
+public static void UserInitialize (string properties);
+```
+
+#### 示例代码
+
+```cs
+TapDB.UserInitialize("{\"param2\":\"param2\"}");
+```
+
+### UserUpdate
+更新用户信息
+
+#### API
+
+```cs
+public static void UserUpdate (string properties);
+```
+
+#### 示例代码
+
+```cs
+TapDB.UserUpdate("{\"param2\":2}");
+```
+
+### UserAdd 
+增加用户
+
+#### API
+
+```cs
+public static void UserAdd (string properties);
+```
+
+#### 示例代码
+
+```cs
+TapDB.UserAdd ("{\"param2\":2}");
+```
+
+
+### ClearUser
+清除用户
+
+#### API
+
+```cs
+public static void ClearUser ();
+```
+
+#### 示例代码
+
+```cs
+TapDB.ClearUser ();
+```

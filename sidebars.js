@@ -1,7 +1,7 @@
 module.exports = {
   tapsdk: [
     {
-      产品指南:[
+      产品指南: [
         'pro/pro-login',
         'pro/pro-moment'
       ]
@@ -17,33 +17,33 @@ module.exports = {
     },
     {
       功能介绍: ['sdk/tap-fun-login',
-      //'sdk/tap-fun-db',
-      'sdk/tap-fun-moment',
-      'sdk/tap-fun-paysdk',
-      'sdk/tap-fun-usertest'],
+        'sdk/tap-fun-db',
+        'sdk/tap-fun-moment',
+        'sdk/tap-fun-paysdk',
+        'sdk/tap-fun-usertest'],
     },
     {
       API: [
         {
           Android: [
-          //'api/android-initializer', 'api/android-loginhelper',
-          //'api/android-tapdb',
-          'api/android-tapbootstrap',
-          'api/android-tapmoment'],
+            //'api/android-initializer', 'api/android-loginhelper',
+            //'api/android-tapdb',
+            'api/android-tapbootstrap',
+            'api/android-tapmoment'],
         },
         {
           iOS: [
-          //'api/ios-initializer', 'api/ios-loginhelper',
-          //'api/ios-tapdb',
-          'api/ios-tapbootstrap',
-          'api/ios-tapmoment'],
+            //'api/ios-initializer', 'api/ios-loginhelper',
+            'api/ios-tapdb',
+            'api/ios-tapbootstrap',
+            'api/ios-tapmoment'],
         },
         {
           Unity: [
             //'api/unity-login',
             'api/unity-tapbootstrap',
-          //'api/unity-tapdb',
-          'api/unity-tapmoment'],
+            'api/unity-tapdb',
+            'api/unity-tapmoment'],
         },
         'api/service',
       ]

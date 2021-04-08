@@ -16,7 +16,7 @@ import {Highlight} from '../component';
 ## 1. 介绍
 TapSDK 提供一套可供游戏开发者收集用户数据的API。系统会收集用户数据并进行分析，最终形成数据报表，帮助游戏开发者分析用户行为并优化游戏。  
 
-## 2. 功能开启
+## 2. 初始化SDK
 放在初始化 SDK 之后调用即可
 
 #### API  
@@ -45,7 +45,7 @@ groupId="tap-platform"
   <TabItem value="unity">
 
 ```cs
-public static void EnableTapDB(string gameVersion, string channel);
+public static void Init (string clientId, string channel, string gameVersion, bool isCN);
 ```
 
   </TabItem>
@@ -77,7 +77,7 @@ groupId="tap-platform"
   <TabItem value="unity">
 
 ```cs
-TapSDK.TDSCore.EnableTapDB(gameVersion,gameChannel);
+TapDB.Init("clientId","channel","gameVersion",true);
 ```
 
   </TabItem>
@@ -157,8 +157,8 @@ groupId="tap-platform"
   <TabItem value="unity">
 
 ```cs
-TapSDK.TDSTapDB.SetUser("userId");
-TapSDK.TDSTapDB.SetUser("userId","loginType");
+TapDB.SetUser("userId");
+TapDB.SetUser("userId","loginType");
 ```
 
   </TabItem>
@@ -173,19 +173,11 @@ loginType | 否 | 第三方登录枚举类型，具体见下面说明
 
 **loginType 类型说明**
 
-| 参数      |    说明   |
-| :-------- | :-------- |
-| TapTap      |    TapTap 登录   |
-| WeiXin      |    微信登录   |
-| QQ      |    QQ 登录   |
-| Tourist      |    游客登录   |
-| Apple      |    Apple 登录   |
-| Alipay      |    支付宝登录 |
-| Facebook      |    facebook 登录   |
-| Google      |    Google 登录   |
-| Twitter      |    Twitter 登录   |
-| PhoneNumber      |    手机号登录   |
-| Custom      |   用户自定义登录类型  （默认名字为 Custom, 如需修改可以调用 LoginType.Custom.changeType） |
+参数  | 描述
+| ------ | ------ |
+LoginType.TAPTAP | TapTap 登录
+LoginType.APPLE  | Apple 登录
+LoginType.GUEST  | 游客登录
 <!--
 ### TapTap登录时openId获取方式
 
@@ -226,7 +218,7 @@ NSString *openId = [currentProfile openid];
   <TabItem value="unity">
 
 ```cs
-TapSDK.TDSLogin.GetCurrentProfile((profile) => {
+Login.GetCurrentProfile((profile) => {
     string openid = profile.openid;
 });
 ```
@@ -294,7 +286,7 @@ groupId="tap-platform"
   <TabItem value="unity">
 
 ```cs
-TapSDK.TDSTapDB.SetName("name");
+TapDB.SetName("name");
 ```
 
   </TabItem>
@@ -364,7 +356,7 @@ groupId="tap-platform"
   <TabItem value="unity">
 
 ```cs
-TapSDK.TDSTapDB.SetLevel(5);
+TapDB.SetLevel(5);
 ```
 
   </TabItem>
@@ -435,7 +427,7 @@ groupId="tap-platform"
   <TabItem value="unity">
 
 ```cs
-TapSDK.TDSTapDB.SetServer("https://test.taptap.com/callback");
+TapDB.SetServer("https://test.taptap.com/callback");
 ```
 
   </TabItem>
@@ -508,7 +500,7 @@ groupId="tap-platform"
   <TabItem value="unity">
 
 ```cs
-TapSDK.TDSTapDB.OnCharge("0xueiEns","大宝剑","100","CNY","wechat");
+TapDB.OnCharge("0xueiEns","大宝剑","100","CNY","wechat");
 ```
 
   </TabItem>
@@ -560,7 +552,7 @@ payment | 是 | 充值渠道。长度大于0并小于等于256。
 
 常见货币类型的格式参考<a target="_blank" href="https://www.tapdb.com/docs/zh_CN/features/exchangeRate.html">汇率表</a>
 
-
+<!-- 
 ## 8. 自定义事件
 
 推送自定义事件。需要在控制台预先进行配置。
@@ -627,7 +619,7 @@ NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:@"name",@"Tap zh
   <TabItem value="unity">
 
 ```cs
-TapSDK.TDSTapDB.OnEvent("1000","{\"param1\":\"param1\",\"param2\":\"param2\"}");
+TapDB.OnEvent("1000","{\"param1\":\"param1\",\"param2\":\"param2\"}");
 ```
 
   </TabItem>
@@ -637,10 +629,60 @@ TapSDK.TDSTapDB.OnEvent("1000","{\"param1\":\"param1\",\"param2\":\"param2\"}");
 字段 | 可为空 | 说明
 | ------ | ------ | ------ |
 eventCode | 否 | 在控制台中配置得到的事件编码
-properties | 是 | 事件属性。需要和控制台的配置匹配。值需要是长度大于0并小于等于256的字符串或绝对值小于1E11的浮点数
+properties | 是 | 事件属性。需要和控制台的配置匹配。值需要是长度大于0并小于等于256的字符串或绝对值小于1E11的浮点数 -->
+
+## 8. 设置通用事件属性
+对于某些重要的属性需要在每个上传的事件中出现，用户可以将这些属性设置为全局通用的自定义属性，包括静态固定属性和动态计算属性。这些通用属性在注册之后，会被附带在TapDB上传的事件中。这里需要注意 track 中传入的属性优先级 > 动态通用属性优先级 > 静态通用属性优先级，也就是说动态通用属性会覆盖同名的静态通用属性。track 中的属性会覆盖同名的动态通用属性和静态通用属性。
+
+以下举例设备属性用法（unity），用户属性请参考[Unity API文档](/api/unity-tapdb)  
+Android 请参考[Android API文档](/api/android-tapdb)  
+iOS 请参考[iOS API文档](/api/ios-tapdb)  
+
+### 添加静态事件属性
+如果需要添加的通用属性的值在所有事件中相对固定，那么可以调用 registerStaticProperties 方法注册静态通用属性。以来源渠道为例：
+
+```cs
+TapDB.RegisterStaticProperties("{\"channel\":\"TapDB\"}");
+```
+
+### 删除所有静态事件属性
+```cs
+TapDB.ClearStaticProperties();
+```
+
+## 9. 事件主体操作（用户、设备）
+以下举例设备属性用法（unity），用户属性请参考[Unity API文档](/api/unity-tapdb)  
+Android 请参考[Android API文档](/api/android-tapdb)  
+iOS 请参考[iOS API文档](/api/ios-tapdb)  
+
+### 设备初始化操作
+如果需要初始化设备的某些属性，可以调用 deviceInitialize 来进行设置。如果相应属性之前已近被初始化，那么后续对这些属性的初始化操作将会被忽略。以首次活跃服务器为例：
+```cs
+TapDB.DeviceInitialize("{\"firstActiveServer\":\"server1\"}");
+
+TapDB.DeviceInitialize("{\"firstActiveServer\":\"server2\"}");
+// 此时设备表的 "firstActiveServer" 字段值还是为 "server1" 
+```
+
+### 设备属性更新操作
+如果需要更新设备的某些属性，可以调用 DeviceUpdate 来进行设置。通过该接口上传的属性会将原有属性值进行覆盖。以当前积分为例：
+```cs
+TapDB.DeviceUpdate("{\"currentPoints\":10}");
+TapDB.DeviceUpdate("{\"currentPoints\":42}");
+// 此时设备表的 "currentPoints" 字段值为 42 
+```
+
+### 设备属性累加操作
+如果需要对设备的某些属性增减，可以调用 DeviceAdd 来进行设置。通过该接口上传的属性会将原有属性值进行覆盖。以当前积分为例：
+```cs
+TapDB.DeviceAdd("{\"totalPoints\":10}");
+TapDB.DeviceAdd("{\"totalPoints\":-2}");
+// 此时设备表的 "totalPoints" 字段值为 8 
+```
 
 
-## 9. 服务端在线人数推送
+
+## 10. 服务端在线人数推送
 
 由于SDK无法推送准确的在线数据，这里提供服务端在线数据推送接口。游戏服务端可以每隔5分钟`自行统计`在线人数，通过接口推送到TapDB。TapDB进行数据汇总展现。
 
@@ -685,7 +727,7 @@ timestamp | long | 当前统计数据的时间戳(秒)。TapDB会按照自然5�
 
 成功判断：返回的HTTP Code为200时认为发送成功，否则认为失败
 
-## 10. 收集设备指纹
+## 11. 收集设备指纹
 ### OAID方式
 自行选择是否引入OAID，TapSDK支持OAID版本为1.0.5-1.0.23
 - 如果自己有集成其他SDK使用到OAID，TapSDK可以直接使用

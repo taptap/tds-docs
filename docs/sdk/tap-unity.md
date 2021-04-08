@@ -140,7 +140,7 @@ TapBootstrap.Init(tapConfig);
 
 ```cs
 TapBootstrap.RegisterLoginResultListener(new MyLoginCallback());
-public class MyLoginCallback : TapBootstrap.ITapLoginResultListener {
+public class MyLoginCallback : ITapLoginResultListener {
   public void OnLoginSuccess(AccessToken accessToken)
   {
       Debug.Log("登录成功:  " + accessToken.ToJSON());
@@ -214,7 +214,7 @@ TapBootstrap.GetAccessToken((accessToken, error) => {
 使用 TapSDK 提供的登录功能：
 
 ```cs
-TapBootstrap.TapConfig config = new TapConfig();
+TapConfig config = new TapConfig();
 LoginType loginType = LoginType.TAPTAP;
 TapBootstrap.Login(loginType, new string[] { "public_profile" });
 ```
