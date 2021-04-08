@@ -39,7 +39,7 @@ public static void Login (LoginType loginType, string[] permissions);
 #### 示例代码
 
 ```cs
-TapBootstrap.TapConfig config = new TapConfig();
+TapConfig config = new TapConfig();
 LoginType loginType = LoginType.TAPTAP;
 TapBootstrap.Login(loginType, new string[] { "public_profile" });
 ```
@@ -59,7 +59,7 @@ public static void RegisterLoginResultListener (ITapLoginResultListener listener
 ```cs
 TapBootstrap.RegisterLoginResultListener(new MyLoginCallback());
 
-public class MyLoginCallback : TapBootstrap.ITapLoginResultListener {
+public class MyLoginCallback : ITapLoginResultListener {
   public void OnLoginSuccess(AccessToken accessToken)
   {
       Debug.Log("登录成功:  " + accessToken.ToJSON());
@@ -199,7 +199,7 @@ public static void Bind (LoginType loginType, string[] permissions);
 #### 示例代码
 
 ```cs
-TapBootstrap.TapConfig config = new TapConfig();
+TapConfig config = new TapConfig();
 LoginType loginType = LoginType.TAPTAP;
 TapBootstrap.Bind(loginType, new string[] { "public_profile" });
 ```

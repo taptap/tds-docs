@@ -286,7 +286,7 @@ TapBootstrapLoginType loginType = TapBootstrapLoginTypeTapTap;
   <TabItem value="unity">
 
 ```cs
-TapBootstrap.TapConfig config = new TapConfig();
+TapConfig config = new TapConfig();
 LoginType loginType = LoginType.TAPTAP;
 TapBootstrap.Login(loginType, new string[] { "public_profile" });
 ```

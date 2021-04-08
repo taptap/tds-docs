@@ -4,21 +4,34 @@ title: TapDB
 ---
 ## method
 
-### setUser
+### onStartWithClientId
 
-当 enableTapDB 后，可以调用此 API  
+初始化TapDB功能
 
 #### API
-
 ```objectivec
-+ (void)setUser:(NSString *)userId;
-+ (void)setUser:(NSString *)userId openId:(NSString *)openId loginType:(TapDBLoginType)loginType;
++ (void)onStartWithClientId:(NSString *)clientId channel:(nullable NSString *)channel version:(nullable NSString *)gameVersion isCN:(BOOL)isCN;
 ```
 
 #### 示例代码
 
 ```objectivec
-[TapDB setUser:@"userId" openId:@"openId" loginType:TapDBLoginTypeTapTap];
+[TapDB onStartWithClientId:@"clientid" channel:@"taptap" version:@"2.0.0" isCN:true];
+```
+
+### setUser
+
+#### API
+
+```objectivec
++ (void)setUser:(NSString *)userId;
++ (void)setUser:(NSString *)userId loginType:(TapDBLoginType)loginType;
+```
+
+#### 示例代码
+
+```objectivec
+[TapDB setUser:@"userId" loginType:TapDBLoginTypeTapTap];
 ```
 
 **setUser 参数说明**
@@ -26,31 +39,16 @@ title: TapDB
 | 字段        | 可为空 | 说明                                                           |
 | --------- | --- | ------------------------------------------------------------ |
 | userId    | 否   | 长度大于 0 并小于等于 256。只能包含数字、大小写字母、下划线 (\_)、横线 (-)，用户 ID。不同用户需要保证 ID 的唯一性 |
-| openId    | 否   | 通过第三方登录获取到的 openId                                            |
 | loginType | 否   | 第三方登录枚举类型，具体见下面说明                                            |
 
 **loginType 类型说明**
 
-| 参数          | 说明                                                           |
-| :---------- | :----------------------------------------------------------- |
-| TapTap      | TapTap 登录                                                     |
-| WeiXin      | 微信登录                                                         |
-| QQ          | QQ 登录                                                         |
-| Tourist     | 游客登录                                                         |
-| Apple       | Apple 登录                                                      |
-| Alipay      | 支付宝登录                                                        |
-| Facebook    | facebook 登录                                                   |
-| Google      | Google 登录                                                     |
-| Twitter     | Twitter 登录                                                    |
-| PhoneNumber | 手机号登录                                                        |
-| Custom      | 用户自定义登录类型  （默认名字为 Custom, 如需修改可以调用 LoginType.Custom.changeType） |
+参数  | 描述
+| ------ | ------ |
+TapBootstrapLoginTypeTapTap | TapTap 登录
+TapBootstrapLoginTypeApple  | Apple 登录
+TapBootstrapLoginTypeGuest  | 游客登录
 
-### Tap 登录后 openId 获取方式
-
-```objectivec
-TTSDKProfile *currentProfile = [TapLoginHelper currentProfile];
-NSString *openId = [currentProfile openid];
-```
 
 ### setName
 
@@ -137,7 +135,7 @@ NSString *openId = [currentProfile openid];
 | payment      | 是   | 充值渠道。长度大于 0 并小于等于 256。                               |
 
 常见货币类型的格式参考 <a target="_blank" href="https://www.tapdb.com/docs/zh_CN/features/exchangeRate.html"> 汇率表 </a>
-
+<!-- 
 ### onEvent
 
 推送自定义事件。需要在控制台预先进行配置。
@@ -158,4 +156,163 @@ NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:@"name",@"Tap zh
 | 字段         | 可为空 | 说明                                                   |
 | ---------- | --- | ---------------------------------------------------- |
 | eventCode  | 否   | 在控制台中配置得到的事件编码                                       |
-| properties | 是   | 事件属性。需要和控制台的配置匹配。值需要是长度大于0并小于等于256的字符串或绝对值小于1E11的浮点数 |
+| properties | 是   | 事件属性。需要和控制台的配置匹配。值需要是长度大于0并小于等于256的字符串或绝对值小于1E11的浮点数 | -->
+### deviceInitialize
+
+
+#### API  
+
+```objectivec
++ (void)deviceInitialize:(NSDictionary *)properties;
+```
+
+#### 示例代码
+
+```objectivec
+NSDictionary* dic = @{@"firstActiveServer":@"server1"};
+[TapDB deviceInitialize:dic];
+```
+
+### deviceUpdate
+
+
+#### API  
+
+```objectivec
++ (void)deviceUpdate:(NSDictionary *)properties;
+```
+
+#### 示例代码
+
+```objectivec
+ NSDictionary* dic = @{@"currentPoints":@10};
+[TapDB deviceUpdate:dic];
+```
+
+### deviceAdd
+
+
+#### API  
+
+```objectivec
++ (void)deviceAdd:(NSDictionary *)properties;
+```
+
+#### 示例代码
+
+```objectivec
+ NSDictionary* dic = @{@"totalPoints":@10};
+[TapDB deviceAdd:dic];
+```
+
+### userInitialize
+
+
+#### API  
+
+```objectivec
++ (void)userInitialize:(NSDictionary *)properties;
+```
+
+#### 示例代码
+
+```objectivec
+ NSDictionary* dic = @{@"params":@"user"};
+[TapDB userInitialize:dic];
+```
+
+### userUpdate
+
+
+#### API  
+
+```objectivec
++ (void)userUpdate:(NSDictionary *)properties;
+```
+
+#### 示例代码
+
+```objectivec
+ NSDictionary* dic = @{@"params":@"1"};
+[TapDB userUpdate:dic];
+```
+
+### userAdd
+
+
+#### API  
+
+```objectivec
++ (void)userAdd:(NSDictionary *)properties;
+```
+
+#### 示例代码
+
+```objectivec
+ NSDictionary* dic = @{@"params":@"1"};
+[TapDB userAdd:dic];
+```
+
+
+### registerDynamicProperties
+
+
+#### API  
+
+```objectivec
++ (void)registerDynamicProperties:(NSDictionary* (^)(void))dynamicPropertiesCaculator;
+```
+
+#### 示例代码
+
+```objectivec
+NSDictionary* dic1 = @{@"params":@"param1"};
+[TapDB registerStaticProperties:dic1];
+```
+
+### registerStaticProperties
+
+
+#### API  
+
+```objectivec
++ (void)registerStaticProperties:(NSDictionary *)staticProperties;
+```
+
+#### 示例代码
+
+```objectivec
+NSDictionary* dic = @{@"params":@"param1"};
+[TapDB registerStaticProperties:dic];
+```
+
+### clearStaticProperties
+
+
+#### API  
+
+```objectivec
++ (void)clearStaticProperties;
+```
+
+#### 示例代码
+
+```objectivec
+[TapDB clearStaticProperties];
+```
+
+### unregisterStaticProperty
+
+
+#### API  
+
+```objectivec
++ (void)unregisterStaticProperty:(NSString *)propertyName;
+```
+
+#### 示例代码
+
+```objectivec
+NSDictionary* dic = @{@"params":@"param1"};
+[TapDB unregisterStaticProperty:dic];
+```

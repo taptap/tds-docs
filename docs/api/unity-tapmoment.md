@@ -71,7 +71,7 @@ public static void Publish (Orientation config, string[] imagePaths, string cont
 ```cs
 string content = "我是描述";
 string[] images = {"imgpath01","imgpath02","imgpath03"};
-TapMoment.Publish(TapMoment.Orientation.ORIENTATION_LANDSCAPE, images, content);
+TapMoment.Publish(Orientation.ORIENTATION_LANDSCAPE, images, content);
 ```
 
 <!-- ### PublishVideoMoment
