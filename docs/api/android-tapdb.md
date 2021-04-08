@@ -66,25 +66,7 @@ TapDB.setUser("xxxxuser1", LoginType.TapTap);
 | Google      | Google 登录                                                     |
 | Twitter     | Twitter 登录                                                    |
 | PhoneNumber | 手机号登录                                                        |
-| Custom      | 用户自定义登录类型  （默认名字为 Custom, 如需修改可以调用 LoginType.Custom.changeType） |
-
-### Tap 登录后 openId 获取方式
-
-```java
-Profile.fetchProfileForCurrentAccessToken(new Api.ApiCallback<Profile>() {
-            @Override
-            public void onSuccess(Profile data) {
-                Log.e(Tag, "checkLogin-onSuccess");
-                String openId = Profile.getCurrentProfile().getOpenid();
-            }
-
-            @Override
-            public void onError(Throwable error) {
-                Log.e(Tag, "checkLogin-onError");
-                login();
-            }
-        });
-```
+| Custom      | 用户自定义登录类型  |
 
 ### setName
 
@@ -157,7 +139,7 @@ public static void onCharge(String orderId, String product, long amount, String 
 #### 示例代码
 
 ```java
-TapDB.onCharge ("0xueiEns","大宝剑","100","CNY","wechat");
+TapDB.onCharge ("0xueiEns", "LeeJiEun 5th Album", "1000", "CNY", "wechat");
 ```
 
 **参数说明**  
@@ -235,12 +217,12 @@ public static void deviceAdd(final JSONObject properties);
 JSONObject properties = new JSONObject();
 properties.put("totalPoints", 10);
 // 此时设备表的 "totalPoints" 字段值为 10
-TapDB.deviceUpdate(properties);
+TapDB.deviceAdd(properties);
 
 JSONObject nextProperties = new JSONObject();
 nextProperties.put("totalPoints", -2);
 // 此时设备表的 "totalPoints" 字段值为 8 
-deviceAdd(nextProperties);
+TapDB.deviceAdd(nextProperties);
 ```
 
 ### userInitialize
@@ -257,8 +239,8 @@ public static void userInitialize(final JSONObject properties);
 
 ```java
 JSONObject properties = new JSONObject();
-properties.put("params", "user");
-TapDB.deviceUpdate(properties);
+properties.put("userName", "LeeJiEun");
+TapDB.userInitialize(properties);
 ```
 
 ### userUpdate
@@ -275,8 +257,8 @@ public static void userUpdate(final JSONObject properties);
 
 ```java
 JSONObject properties = new JSONObject();
-properties.put("deviceName", "HUAWEI");
-TapDB.deviceUpdate(properties);
+properties.put("useAge", 29);
+TapDB.userUpdate(properties);
 ```
 
 ### userAdd
@@ -294,7 +276,7 @@ public static void userAdd(final JSONObject properties);
 ```java
 JSONObject properties = new JSONObject();
 properties.put("userName", "LeeJiEun");
-TapDB.deviceUpdate(properties);
+TapDB.userAdd(properties);
 ```
 
 ### registerStaticProperties
