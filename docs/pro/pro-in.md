@@ -5,6 +5,14 @@ sidebar_label: 接入准备
 ---
 import {Highlight} from '../component';
 
+## <Highlight color='#f00'>注意事项</Highlight>
+
+- 第一步开启登录时，请注意国内国外选择，选定后不可变更 
+- 测试用户管理功能是针对游戏在“未上线时”进行添加白名单测试，游戏上架前一定要点“上线应用”  
+![](/img/tap_login_online.png)
+- 登录按钮需要符合TapTap规范，请下载 [TapTap 登录按钮](/res/TapTapLoginButton.zip)  
+- 集成应用所使用的的client id与上架app时的商店页要强关联，即不能将测试服的参数打包上架正式服  
+
 ## 一、开启 "TapTap 登录" 功能
 
 1. 在开发者中心进入已经通过审核的应用，在菜单中找到「TapTap 登录」功能；
@@ -27,3 +35,5 @@ SDK 集成步骤请参考 [快速开始](/sdk/tap-unity)。
 
 <!-- ## 四、开始测试
 如需要测试SDK功能，可以[点击下载](/res/TapSDK测试用例.xlsx)测试用例 -->
+
+

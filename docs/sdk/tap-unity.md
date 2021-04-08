@@ -32,10 +32,11 @@ import {Highlight} from '../component';
 
 - 在你打开的 Unity 项目中，依次转到 Assets > Import Packages > Custom Packages。
 - 从解压缩中的 TapSDK 中，选择您希望在应用中使用的TapSDK产品导入。
-    - TapBootstrap.unitypackage ： 必选。TapSDK 启动器
-    - TapCommon.unitypackag ： 必选。TapSDK 基础库
-    - TapLogin.unitypackage ：必选 TapTap登陆
-    - TapMoment.unitypackage ： TapTap内嵌动态
+    - TapTap_TapBootstrap.unitypackage ： 必选。TapSDK 启动器
+    - TapTap_TapCommon.unitypackag ： 必选。TapSDK 基础库
+    - TapTap_TapLogin.unitypackage ：必选 TapTap登陆
+    - TapTap_TapMoment.unitypackage ： TapTap内嵌动态
+    - TapTap_TapDB.unitypackage：TapDB
 
 ### 使用 Unity Package Manager
 在项目 Packages/manifest.json 中添加以下代码，[点击](https://github.com/TapTap) 参考 SDK 最新版本号。
@@ -43,11 +44,13 @@ import {Highlight} from '../component';
 ```json
 "dependencies":{
 //登录部分
-"com.tapsdk.login":"https://github.com/TapTap/TapLogin-Unity.git#2.0.0",
-"com.tapsdk.common":"https://github.com/TapTap/TapCommon-Unity.git#2.0.0",
-"com.tapsdk.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#2.0.0",
+"com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#2.0.0",
+"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#2.0.0",
+"com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#2.0.0",
 //动态部分
-"com.tapsdk.moment":"https://github.com/EingSTapTaphaw/TapMoment-Unity.git#2.0.0",
+"com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#2.0.0",
+//TapDB部分
+"com.taptap.tds.tapdb": "https://github.com/TapTap/TapDB-Unity.git#2.0.0",
 }
 ```
 

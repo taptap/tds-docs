@@ -27,7 +27,7 @@ module.exports = {
         {
           Android: [
             //'api/android-initializer', 'api/android-loginhelper',
-            //'api/android-tapdb',
+            'api/android-tapdb',
             'api/android-tapbootstrap',
             'api/android-tapmoment'],
         },
@@ -41,8 +41,8 @@ module.exports = {
         {
           Unity: [
             //'api/unity-login',
-            'api/unity-tapbootstrap',
             'api/unity-tapdb',
+            'api/unity-tapbootstrap',
             'api/unity-tapmoment'],
         },
         'api/service',

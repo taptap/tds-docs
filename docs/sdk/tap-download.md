@@ -6,22 +6,18 @@ sidebar_label: 资源下载
 
 ## SDK 下载  
 
-我们计划将于近期正式发布 TapSDK，敬请期待。
+Android SDK 下载：[TapSDK_Android](https://github.com/TapTap/TapSDK-Android/releases/tag/v2.0.0)  
+iOS SDK 下载：[TapSDK_iOS](https://github.com/TapTap/TapSDK-iOS/releases/tag/v2.0.0)  
+Unity SDK 下载：[TapSDK_Unity](https://github.com/TapTap/TapSDK-Unity/releases/tag/2.0.0)  
 
-<!-- 
-Android SDK 下载：[TapSDK](https://github.com/TapTap/TapSDK-Android/releases)  
-iOS SDK 下载：[TapSDK.kit](https://github.com/TapTap/TapSDK-iOS/releases)  
-Unity SDK 下载：[TapSDK_UPM](https://github.com/TapTap/Tapbootstrap-Unity/releases)  
--->
 
 ## Demo 下载
-
-Demo 会随近期发布的正式版 SDK 一起发布，敬请期待。
 
 <!-- 
 Android Demo 下载：[Android_TapDemo](https://github.com/xindong/TapSDK_Android)  
 iOS Demo 下载：[iOS_TapDemo](https://github.com/xindong/TapSDK_iOS)  
 Unity Demo 下载：[Unity_TapDemo](https://github.com/xindong/TapSDK_Unity_Demo)  
+-->
 
 ## 登录素材下载
 登录按钮素材 [icon.zip](/res/tap_icon.zip)
@@ -30,7 +26,7 @@ Unity Demo 下载：[Unity_TapDemo](https://github.com/xindong/TapSDK_Unity_Demo
 #### SDK 附加为可选择接入项
 - 数美定制版 SDK [点击下载](/res/tap_wl_pri_release.aar)  
 - OAID 推荐版 [oaid_sdk_1.0.23.aar](/res/tap_oaid_sdk_1.0.23.aar)
--->
+
 
 <!-- #### 测试用例
 TapSDK 测试用例[点击下载](/res/TapSDK测试用例.xlsx) -->

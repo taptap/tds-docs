@@ -19,7 +19,7 @@ sidebar_label: iOS
 
 ## 3. 环境配置
 - 最低支持 `iOS 10.0`。
-- 请在 Xcode 选择工程，到 `Build Setting`-->`Other Linker Flags`， 添加 `- ObjC`。
+- 请在 Xcode 选择工程，到 `Build Setting`-->`Other Linker Flags`， 添加 `-ObjC`。
 
 ## 4. 工程导入
 <!-- ### 方式一、自动导入 (推荐 pod 集成)  
@@ -67,6 +67,8 @@ TapLoginSDK.framework
 //动态：TapMoment
 TapMomentResource.bundle
 TapMomentSDK.framework
+//TapDB：TapDB
+TapDB.framework
 ```
 <!-- ![](/img/tap_ios_import2.png) -->
 
@@ -105,6 +107,9 @@ WebKit.framework
 <!-- 麦克风 -->
 <key>NSMicrophoneUsageDescription</key>
 <string>App 需要你的同意，才能访问麦克风 </string>
+<!-- TapDB需要使用IDFA -->
+<key>NSUserTrackingUsageDescription</key>
+<string>App需要追踪你的信息</string>
 ```
 
 ### 配置跳转 TapTap 应用
