@@ -15,8 +15,8 @@ import {Highlight} from '../component';
 
 ## 一、开启 "TapTap 登录" 功能
 
-1. 在开发者中心进入已经通过审核的应用，在菜单中找到「TapTap 登录」功能；
-2. 选择适用地区；
+1. 在开发者中心进入已经通过审核的应用，在菜单中找到「TapTap 登录」功能。
+2. 选择适用地区。
 3. 点击开启，获得相应的 Client ID ，即可开始接入流程。
 
 ![](/img/tap_taplogin_cn.png)
