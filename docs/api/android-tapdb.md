@@ -360,16 +360,3 @@ public static void clearStaticProperties();
 ```java
 TapDB.clearStaticProperties();
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
