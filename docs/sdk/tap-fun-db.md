@@ -17,7 +17,6 @@ import {Highlight} from '../component';
 TapSDK 提供一套可供游戏开发者收集用户数据的API。系统会收集用户数据并进行分析，最终形成数据报表，帮助游戏开发者分析用户行为并优化游戏。  
 
 ## 2. 初始化SDK
-放在初始化 SDK 之后调用即可
 
 #### API  
 <Tabs
@@ -31,7 +30,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-  public static void enableTapDB(Activity activity, String gameVersion, String gameChannel)
+public static void init(Context context, String clientId, String channel, boolean isCN);
   ```  
   </TabItem>
 
@@ -64,7 +63,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
 ```java
-  TdsInitializer.enableTapDB(MainActivity.this, "1.0", "taptap");
+  TapDB.init(getApplicationContext(), "Client ID", "taptap", true);
 ```
   </TabItem>
 
@@ -88,9 +87,9 @@ TapDB.Init("clientId","channel","gameVersion",true);
 字段 | 必须 | 说明  
 ------ | ------ | ------
 clientid | 是 | 开发者后台获取到
-channel | 否 | [分包渠道](/sdk/tap-noun#分包渠道)。长度大于0并小于等于256的字符串。
+channel | 否 | [分包渠道](/sdk/tap-noun#分包渠道), 长度大于0并小于等于256的字符串
 gameVersion | 否 | 游戏版本。长度大于0并小于等于256的字符串。为空时，自动获取游戏安装包的版本（AndroidManifest.xml中的versionName）
-
+isCN | 是 | 区域类型: true 表示国内; false 表示国外  默认为 true
 
 ## 3. 记录一个用户
 当初始化 sdk 之后，可以调用此 API 来记录一个用户  
