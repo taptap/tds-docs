@@ -62,7 +62,7 @@ KQ",ts="1618221750",nonce="adssd",mac="XWTPmq6A6LzgK8BbNDwj+kE4gzs="' "https://t
 
 `POST` `MAC Token` <https://tds-tapsdk.cn.tapapis.com/api/v1/token>
 
-token续签，防止过期
+token续签，防止过期。token默认90天时效，7776000秒。续签一次延长7776000秒
 
 
 #### Request
