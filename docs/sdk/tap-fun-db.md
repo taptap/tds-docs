@@ -176,8 +176,7 @@ loginType | 否 | 第三方登录枚举类型，具体见下面说明
 参数  | 描述
 | ------ | ------ |
 LoginType.TAPTAP | TapTap 登录
-LoginType.APPLE  | Apple 登录
-LoginType.GUEST  | 游客登录
+
 <!--
 ### TapTap登录时openId获取方式
 

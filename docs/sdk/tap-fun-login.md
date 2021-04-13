@@ -212,7 +212,7 @@ groupId="tap-platform"
 
   ```java
   /**
- * @param type like {TapTap = 0, apple = 1, guest = 2}
+ * @param type TapTap = 0
  */
   public static void login(Activity activity, @LoginType.ThirdPartyType int type, String... permissions);
   ``` 
@@ -221,8 +221,7 @@ groupId="tap-platform"
 参数  | 描述
 | ------ | ------ |
 0 | TapTap 登录
-1  | Apple 登录
-2  | 游客登录
+
  
   </TabItem>
 
@@ -237,8 +236,7 @@ groupId="tap-platform"
 参数  | 描述
 | ------ | ------ |
 TapBootstrapLoginTypeTapTap | TapTap 登录
-TapBootstrapLoginTypeApple  | Apple 登录
-TapBootstrapLoginTypeGuest  | 游客登录
+
   </TabItem>
 
   <TabItem value="unity">
@@ -252,8 +250,7 @@ public static void Login (LoginType loginType, string[] permissions);
 参数  | 描述
 | ------ | ------ |
 LoginType.TAPTAP | TapTap 登录
-LoginType.APPLE  | Apple 登录
-LoginType.GUEST  | 游客登录
+
   </TabItem>
 </Tabs>
 
@@ -270,7 +267,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-// 登陆类型：0 表示TapTap登陆, 1 表示苹果登陆, 2 表示游客登陆
+// 登陆类型：固定0 表示TapTap登陆
 // 本例使用TapTap登陆
 TapBootstrap.login(MainActivity.this, LoginType.TAPTAP);
   ```

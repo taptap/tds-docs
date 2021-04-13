@@ -143,7 +143,7 @@ if (TapBootstrap.getCurrentToken() == null) {
 ```java
 /**
  * @param activity 当前Activity
- * @param @param type like {LoginType.TAPTAP, LoginType.APPLE, LoginType.GUEST}
+ * @param @param LoginType.TAPTAP
  */
 TapBootstrap.login(MainActivity.this, LoginType.TAPTAP);
 ```
