@@ -30,7 +30,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
   ```java
-public static void init(Context context, String clientId, String channel, boolean isCN);
+public static void init(Context context, String clientId, String channel, String gameVersion, boolean isCN);
   ```  
   </TabItem>
 
@@ -63,7 +63,7 @@ groupId="tap-platform"
   <TabItem value="android">
 
 ```java
-  TapDB.init(getApplicationContext(), "Client ID", "taptap", true);
+  TapDB.init(getApplicationContext(), "Client ID", "taptap", "2.0.0", true);
 ```
   </TabItem>
 
@@ -82,10 +82,11 @@ TapDB.Init("clientId","channel","gameVersion",true);
   </TabItem>
 </Tabs>
 
-**enableTapDB 参数说明：**   
+**init 参数说明：**   
 
 字段 | 必须 | 说明  
 ------ | ------ | ------
+context | 是 | 上下文(仅安卓原生)
 clientid | 是 | 开发者后台获取到
 channel | 否 | [分包渠道](/sdk/tap-noun#分包渠道), 长度大于0并小于等于256的字符串
 gameVersion | 否 | 游戏版本。长度大于0并小于等于256的字符串。为空时，自动获取游戏安装包的版本（AndroidManifest.xml中的versionName）
