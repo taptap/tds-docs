@@ -57,7 +57,7 @@ curl -s -H 'Authorization:MAC id="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJk
 gCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTs
 KQ",ts="1618221750",nonce="adssd",mac="XWTPmq6A6LzgK8BbNDwj+kE4gzs="' "https://tds-tapsdk.cn.tapapis.com/api/v1/user/info?client_id=<clien id>"
 ```
-
+<!-- 
 ### 刷新 Token
 
 `POST` `MAC Token` <https://tds-tapsdk.cn.tapapis.com/api/v1/token>
@@ -83,7 +83,7 @@ token_type          | string        | 固定为 `mac`
 expire_in         | int       | 过期时间
 mac_key          | string        | mac 密钥
 mac_algorithm         | string       | 固定为 `hmac-sha-1`
-
+ -->
 
 
 
