@@ -80,6 +80,10 @@ TapDB.framework
 WebKit.framework
 Security.framework
 SystemConfiguration.framework
+// TapCommon
+CoreTelephony.framework
+SystemConfiguration.framework
+libc++.tbd
 
 // 动态：TapMoment
 AVFoundation.framework
@@ -88,6 +92,16 @@ MobileCoreServices.framework
 Photos.framework
 SystemConfiguration.framework
 WebKit.framework
+
+//TapDB：TapDB
+AppTrackingTransparency.framework
+AdSupport.framework
+CoreMotion.framework
+Security.framework
+SystemConfiguration.framework
+libresolv.tbd
+libsqlite3.0.tbd
+libz.tbd
 ```  
 
 ## 6. 跳转 TapTap 登录和打开多媒体
