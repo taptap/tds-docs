@@ -232,8 +232,7 @@ TapBootstrap.Login(loginType, new string[] { "public_profile" });
 参数  | 描述
 | ------ | ------ |
 LoginType.TAPTAP | TapTap 登录
-LoginType.APPLE  | Apple 登录
-LoginType.GUEST  | 游客登录
+
 
 ## 9. 登出
 

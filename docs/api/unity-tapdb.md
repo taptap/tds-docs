@@ -48,8 +48,6 @@ TapDB.SetUser("userId", "loginType");
 参数  | 描述
 | ------ | ------ |
 LoginType.TAPTAP | TapTap 登录
-LoginType.APPLE  | Apple 登录
-LoginType.GUEST  | 游客登录
 
 ### SetName
 设置姓名

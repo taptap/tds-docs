@@ -13,11 +13,11 @@ Unity SDK 下载：[TapSDK_Unity](https://github.com/TapTap/TapSDK-Unity/release
 
 ## Demo 下载
 
-<!-- 
+
 Android Demo 下载：[Android_TapDemo](https://github.com/xindong/TapSDK_Android)  
-iOS Demo 下载：[iOS_TapDemo](https://github.com/xindong/TapSDK_iOS)  
-Unity Demo 下载：[Unity_TapDemo](https://github.com/xindong/TapSDK_Unity_Demo)  
--->
+iOS Demo 下载：[iOS_TapDemo](https://github.com/TapTap/TapSDK-iOS)  
+Unity Demo 下载：[Unity_TapDemo](https://github.com/TapTap/TapSDK-Unity-Demo)  
+
 
 ## 登录素材下载
 登录按钮素材 [icon.zip](/res/tap_icon.zip)
