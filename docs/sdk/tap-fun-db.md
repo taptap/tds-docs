@@ -38,7 +38,7 @@ groupId="tap-platform"
   <TabItem value="ios">
 
 ```objectivec
-(void)enableTapDBWithChannel:(nullable NSString *)channel gameVersion:(nullable NSString *)gameVersion;
++ (void)onStartWithClientId:(NSString *)clientId channel:(nullable NSString *)channel version:(nullable NSString *)gameVersion isCN:(BOOL)isCN;
 ```
   </TabItem>
 
@@ -71,7 +71,7 @@ groupId="tap-platform"
   <TabItem value="ios">
 
 ```objectivec
-[TDSInitializer enableTapDBWithChannel:@"taptap" gameVersion:@"v1.0.0"];
+[TapDB onStartWithClientId:@"clientid" channel:@"taptap" version:@"2.0.0" isCN:true];
 ```
   </TabItem>
   <TabItem value="unity">
@@ -87,12 +87,13 @@ TapDB.Init("clientId","channel","gameVersion",true);
 
 字段 | 必须 | 说明  
 ------ | ------ | ------
+clientid | 是 | 开发者后台获取到
 channel | 否 | [分包渠道](/sdk/tap-noun#分包渠道)。长度大于0并小于等于256的字符串。
 gameVersion | 否 | 游戏版本。长度大于0并小于等于256的字符串。为空时，自动获取游戏安装包的版本（AndroidManifest.xml中的versionName）
 
 
 ## 3. 记录一个用户
-当 enableTapD B后，可以调用此 API 来记录一个用户  
+当初始化 sdk 之后，可以调用此 API 来记录一个用户  
 
 #### API
 <Tabs
