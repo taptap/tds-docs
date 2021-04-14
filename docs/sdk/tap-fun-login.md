@@ -6,6 +6,7 @@ sidebar_label: 登录
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import MultiLang from '@theme/MultiLang';
 
 本文主要介绍登录的使用方式，详细介绍请参考 [登录产品介绍](/pro/pro-login)
 ## 介绍
@@ -15,36 +16,22 @@ import TabItem from '@theme/TabItem';
 可以先校验该用户是否登录过，对未登录的用户调用 login ()  
 
 #### API
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
 
-  ```java
+<MultiLang>
+
+```java
 public static AccessToken getCurrentToken;
-  ```  
-  </TabItem>
-
-  <TabItem value="ios">
+```
 
 ```objectivec
 + (AccessToken *)getCurrentToken;
 ```
-  </TabItem>
-
-  <TabItem value="unity">
 
 ```cs
 public static void GetAccessToken (Action<AccessToken, TapError> action);
 ```
 
-  </TabItem>
-</Tabs>
+</MultiLang>
 
 #### 示例代码
 
