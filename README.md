@@ -1,33 +1,3 @@
-## 建站测试
-
-**需要nodejs环境，自己建站需要走下面步骤；直接运行本项目请跳过【建站】这步**  
-1. npx @docusaurus/init@latest init [projectName] classic  
-2. 初始化后的目录。  
-tap-sdk-doc  
-├── blog  
-│   ├── 2019-05-28-hola.md  
-│   ├── 2019-05-29-hello-world.md  
-│   └── 2020-05-30-welcome.md  
-├── docs  
-│   ├── doc1.md  
-│   ├── doc2.md  
-│   ├── doc3.md  
-│   └── mdx.md  
-├── src  
-│   ├── css  
-│   │   └── custom.css  
-│   └── pages  
-│       ├── styles.module.css  
-│       └── index.js  
-├── static  
-│   └── img  
-├── docusaurus.config.js   
-├── package.json  
-├── README.md  
-├── sidebars.js  
-└── yarn.lock  
-3. npm start，开始项目，默认会打开本地3000端口  
-
 ## 文档发布  
 1. git clone 本项目   
 2. npm install，安装所有需要的包  
@@ -36,6 +6,7 @@ tap-sdk-doc
 5. npm start，浏览器默认打开3000端口，即可   
 
 ## 文档发布注意事项  
+- docs 下部分中文文件名 markdown 是沿用产品提供的文档原本使用的文件名或其他迁移过来的文件名。新创建的文件请使用英文，单词之间用 `-` 连接，例如 `hello-world.md`。
 - 不支持html文件脚本，直接复制markdown过来的文件可能无法初始化
 - markdown跳转需要将空格换成 `-`，比如 `[<FaqLink>2. 安卓端测试形式</FaqLink>](./store-test#二、 安卓端测试形式)` 替换成 `[<FaqLink>2. 安卓端测试形式</FaqLink>](./store-test#二、-安卓端测试形式)`    
 - 仔细检查sidebars.js结构，可能无法初始化左侧导航栏    
@@ -45,16 +16,109 @@ tap-sdk-doc
 - 若端口冲突，可手动修改package.json#start脚本；可以添加外部访问ip段，或者指定全部docusaurus start --port 3000 --host 0.0.0.0
 - master 分支为主分支，其他分支均为开发使用，无特殊含义。
 
+## 多编程语言
+
+多种编程语言的代码示例可以使用 `MultiLang` 组件：
+
+```mdx
+<MultiLang>
+
+```cs
+public static void GetAccessToken (Action<AccessToken, TapError> action);
+```
+
+```java
+public static AccessToken getCurrentToken;
+```
+
+```objectivec
++ (AccessToken *)getCurrentToken;
+```
+
+</MultiLang>
+```
+
+注意：
+
+- 如果文件开头没有引入 `MultiLang` 组件，那么需要引入一下：`import MultiLang from '@theme/MultiLang';`
+- `<MultiLang>` 后、`</MultiLang>` 前、以及不同语言的代码片段之间都要空一行，否则 MDX 语法无法正确解析。
+- 语言的顺序为 C#、Java、Objective-C，不能乱。
+- 有些地方多语言代码示例使用 `Tabs` 组件，它的效果和 `MultiLang` 是等效的（实际上 `MultiLang` 最终会生成 `Tabs` 组件）。因为 `MultiLang` 更简洁，所以新编写的多语言代码示例推荐使用 `MultiLang`。
+
+实际上，`MultiLang` 里不仅可以放入代码片段，还可以放入其他各种组件，只需保证：1) 内容顺序为 C#、Java、Objective-C，2) 不同编程语言内容在组件层级上是同级的。
+下面是一个例子：
+
+```mdx
+<MultiLang>
+<>
+
+```cs
+public static void Login (LoginType loginType, string[] permissions);
+```
+
+**LoginType参数说明**
+
+参数  | 描述
+| ------ | ------ |
+LoginType.TAPTAP | TapTap 登录
+
+</>
+
+<>
+
+```java
+/**
+ * @param type TapTap = 0
+ */
+public static void login(Activity activity, @LoginType.ThirdPartyType int type, String... permissions);
+``` 
+
+**LoginType参数说明**
+ 
+参数  | 描述
+| ------ | ------ |
+0 | TapTap 登录
+
+</>
+
+<>
+
+```objectivec
++ (void)login:(TapBootstrapLoginType)type permissions:(NSArray *_Nullable)permissions;
+```
+
+**LoginType参数说明**
+ 
+参数  | 描述
+| ------ | ------ |
+TapBootstrapLoginTypeTapTap | TapTap 登录
+
+</>
+</MultiLang>
+```
+
+上面的例子中，我们使用了空标签 `<>...</>` (React 的 Fragment 组件) 将 C#、Java、Objective-C 的不同内容包成三组。
+同样，空标签和 markdown 之间也需要留出空行。
+
 ## 关于国际化
 > 参考 [docusaurus文档](https://v2.docusaurus.io/docs/i18n/tutorial)
+
 - 国际化文件存放于`i18n`文件夹下，对应的目录结构如下：
-```
-└── en
-   ├── code.json  默认的翻译（自定义页面等）
-   ├── docusaurus-plugin-content-docs
-   │  ├── current 翻译文档的文件夹（层级相当于/doc，需要一一对应）
-   │  └── current.json  文档目录Sidebar的翻译
-   └── docusaurus-theme-classic
-      └── navbar.json 顶栏Header的翻译
-```
-- 可通过weblate进行协作翻译：https://translate.gametaptap.com/projects/taptap-developer/
+
+    ```
+    └── en
+      ├── code.json  默认的翻译（自定义页面等）
+      ├── docusaurus-plugin-content-docs
+      │  ├── current 翻译文档的文件夹（层级相当于/doc，需要一一对应）
+      │  └── current.json  文档目录Sidebar的翻译
+      └── docusaurus-theme-classic
+         └── navbar.json 顶栏Header的翻译
+    ```
+
+- 运行 `npm start -- --locale en` 可预览英文文档效果。
+
+- 文档翻译使用 [memsource]，UI 文案翻译使用 [weblate]，详询 yangyuning
+
+[memsource]: https://www.memsource.com/
+[weblate]: https://translate.gametaptap.com/projects/taptap-developer/
+ 

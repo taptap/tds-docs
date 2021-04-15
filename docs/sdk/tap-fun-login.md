@@ -6,6 +6,7 @@ sidebar_label: 登录
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import MultiLang from '@theme/MultiLang';
 
 本文主要介绍登录的使用方式，详细介绍请参考 [登录产品介绍](/pro/pro-login)
 ## 介绍
@@ -15,71 +16,26 @@ import TabItem from '@theme/TabItem';
 可以先校验该用户是否登录过，对未登录的用户调用 login ()  
 
 #### API
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
 
-  ```java
-public static AccessToken getCurrentToken;
-  ```  
-  </TabItem>
-
-  <TabItem value="ios">
-
-```objectivec
-+ (AccessToken *)getCurrentToken;
-```
-  </TabItem>
-
-  <TabItem value="unity">
+<MultiLang>
 
 ```cs
 public static void GetAccessToken (Action<AccessToken, TapError> action);
 ```
 
-  </TabItem>
-</Tabs>
+```java
+public static AccessToken getCurrentToken;
+```
+
+```objectivec
++ (AccessToken *)getCurrentToken;
+```
+
+</MultiLang>
 
 #### 示例代码
 
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
-
-  ```java
-  // 未登录用户会返回 null
-  if (TapBootstrap.getCurrentToken() == null) {
-      //TODO 用户未登录
-  } else {
-     //TODO 用户已经登录过
-  }
-  ```
-  </TabItem>
-
-  <TabItem value="ios">
-
-```objectivec
-AccessToken *accessToken = [TapBootstrap getCurrentToken];
-   if(accessToken == nil){
-       //未登录，请登录
-   }else{
-       //已经登录
-   }
-```
-  </TabItem>
-  <TabItem value="unity">
+<MultiLang>
 
 ```cs
 TapBootstrap.GetAccessToken((accessToken, error) => {
@@ -93,58 +49,62 @@ TapBootstrap.GetAccessToken((accessToken, error) => {
    }
 });
 ```
-  </TabItem>
-</Tabs>
+
+```java
+// 未登录用户会返回 null
+if (TapBootstrap.getCurrentToken() == null) {
+    //TODO 用户未登录
+} else {
+    //TODO 用户已经登录过
+}
+```
+
+```objectivec
+AccessToken *accessToken = [TapBootstrap getCurrentToken];
+   if(accessToken == nil){
+       //未登录，请登录
+   }else{
+       //已经登录
+   }
+```
+
+</MultiLang>
+
 
 
 ## 获取用户信息
 获取用户信息
 #### API
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
 
-  ```java
-public static void getUser(Callback<TapUser> user);
-public static void getUserDetails(Callback<TapUserDetails> userDetails);
-  ```  
-  </TabItem>
-
-  <TabItem value="ios">
-
-```objectivec
-+ (void)getUserDetails:(TapUserDetailsHandler)handler;
-```
-  </TabItem>
-
-  <TabItem value="unity">
+<MultiLang>
 
 ```cs
 public static void GetDetailUser (Action<TapUserDetail, TapError> action);
 ```
 
-  </TabItem>
-</Tabs>
+```java
+public static void getUser(Callback<TapUser> user);
+public static void getUserDetails(Callback<TapUserDetails> userDetails);
+```  
+
+```objectivec
++ (void)getUserDetails:(TapUserDetailsHandler)handler;
+```
+
+</MultiLang>
 
 #### 示例代码
 
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
+<MultiLang>
 
-  ```java
+```cs
+// 需要先判空，否则会崩溃
+TapBootstrap.GetDetailUser((userDetail, error) => {
+  Debug.Log(userDetail.ToJSON());
+});
+```
+
+```java
 TapBootstrap.getUser(new Callback<TapUser>() {
     @Override
     public void onSuccess(TapUser tapUser) {
@@ -168,10 +128,7 @@ TapBootstrap.getUserDetails(new Callback<TapUserDetails>() {
 
     }
 });
-  ```
-  </TabItem>
-
-  <TabItem value="ios">
+```
 
 ```objectivec
 // 需要先判空，否则会崩溃
@@ -183,63 +140,17 @@ TapBootstrap.getUserDetails(new Callback<TapUserDetails>() {
     }
 }];
 ```
-  </TabItem>
-  <TabItem value="unity">
 
-```cs
-// 需要先判空，否则会崩溃
-TapBootstrap.GetDetailUser((userDetail, error) => {
-  Debug.Log(userDetail.ToJSON());
-});
-```
-  </TabItem>
-</Tabs>
+</MultiLang>
 
 
 ## 登录
 执行登录操作，优先跳转 TapTap APP 登录，当没有 TapTap APP 时，会打开内置 Webview 登录  
 
 #### API
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
 
-  ```java
-  /**
- * @param type TapTap = 0
- */
-  public static void login(Activity activity, @LoginType.ThirdPartyType int type, String... permissions);
-  ``` 
-  **LoginType参数说明**
- 
-参数  | 描述
-| ------ | ------ |
-0 | TapTap 登录
-
- 
-  </TabItem>
-
-  <TabItem value="ios">
-
-```objectivec
-+ (void)login:(TapBootstrapLoginType)type permissions:(NSArray *_Nullable)permissions;
-```
-
-**LoginType参数说明**
- 
-参数  | 描述
-| ------ | ------ |
-TapBootstrapLoginTypeTapTap | TapTap 登录
-
-  </TabItem>
-
-  <TabItem value="unity">
+<MultiLang>
+<>
 
 ```cs
 public static void Login (LoginType loginType, string[] permissions);
@@ -251,107 +162,97 @@ public static void Login (LoginType loginType, string[] permissions);
 | ------ | ------ |
 LoginType.TAPTAP | TapTap 登录
 
-  </TabItem>
-</Tabs>
+</>
+
+<>
+
+```java
+/**
+ * @param type TapTap = 0
+ */
+public static void login(Activity activity, @LoginType.ThirdPartyType int type, String... permissions);
+``` 
+
+**LoginType参数说明**
+ 
+参数  | 描述
+| ------ | ------ |
+0 | TapTap 登录
+
+</>
+
+<>
+
+```objectivec
++ (void)login:(TapBootstrapLoginType)type permissions:(NSArray *_Nullable)permissions;
+```
+
+**LoginType参数说明**
+ 
+参数  | 描述
+| ------ | ------ |
+TapBootstrapLoginTypeTapTap | TapTap 登录
+
+</>
+</MultiLang>
 
 #### 示例代码
 
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
-
-  ```java
-// 登陆类型：固定0 表示TapTap登陆
-// 本例使用TapTap登陆
-TapBootstrap.login(MainActivity.this, LoginType.TAPTAP);
-  ```
-  </TabItem>
-
-  <TabItem value="ios">
-
-```objectivec  
-TapBootstrapLoginType loginType = TapBootstrapLoginTypeTapTap;
-[TapBootstrap login:(loginType) permissions:@[@"public_profile"]];
-```
-  </TabItem>
-  <TabItem value="unity">
+<MultiLang>
 
 ```cs
 TapConfig config = new TapConfig();
 LoginType loginType = LoginType.TAPTAP;
 TapBootstrap.Login(loginType, new string[] { "public_profile" });
 ```
-  </TabItem>
-</Tabs>
 
+```java
+// 登陆类型：固定0 表示TapTap登陆
+// 本例使用TapTap登陆
+TapBootstrap.login(MainActivity.this, LoginType.TAPTAP);
+```
+
+```objectivec  
+TapBootstrapLoginType loginType = TapBootstrapLoginTypeTapTap;
+[TapBootstrap login:(loginType) permissions:@[@"public_profile"]];
+```
+
+</MultiLang>
 
 ## 登出
 退出登录，清除用户登录缓存记录  
 #### API
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
 
-  ```java
-public static void logout();
-  ```  
-  </TabItem>
-
-  <TabItem value="ios">
-
-```objectivec
-+ (void)logout;
-```
-  </TabItem>
-
-  <TabItem value="unity">
+<MultiLang>
 
 ```cs
 public static void Logout()
 ```
 
-  </TabItem>
-</Tabs>
+```java
+public static void logout();
+```
+
+```objectivec
++ (void)logout;
+```
+
+</MultiLang>
 
 #### 示例代码
 
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
-
-  ```java
-TapBootstrap.logout();
-  ```
-  </TabItem>
-
-  <TabItem value="ios">
-
-```objectivec
-[TapBootstrap logout];
-```
-  </TabItem>
-  <TabItem value="unity">
+<MultiLang>
 
 ```cs
 TapBootstrap.Logout();
 ```
-  </TabItem>
-</Tabs>
+
+```java
+TapBootstrap.logout();
+```
+
+```objectivec
+[TapBootstrap logout];
+```
+
+</MultiLang>
