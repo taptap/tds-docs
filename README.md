@@ -23,16 +23,16 @@
 ```mdx
 <MultiLang>
 
+```cs
+public static void GetAccessToken (Action<AccessToken, TapError> action);
+```
+
 ```java
 public static AccessToken getCurrentToken;
 ```
 
 ```objectivec
 + (AccessToken *)getCurrentToken;
-```
-
-```cs
-public static void GetAccessToken (Action<AccessToken, TapError> action);
 ```
 
 </MultiLang>
@@ -42,7 +42,63 @@ public static void GetAccessToken (Action<AccessToken, TapError> action);
 
 - 如果文件开头没有引入 `MultiLang` 组件，那么需要引入一下：`import MultiLang from '@theme/MultiLang';`
 - `<MultiLang>` 后、`</MultiLang>` 前、以及不同语言的代码片段之间都要空一行，否则 MDX 语法无法正确解析。
+- 语言的顺序为 C#、Java、Objective-C，不能乱。
 - 有些地方多语言代码示例使用 `Tabs` 组件，它的效果和 `MultiLang` 是等效的（实际上 `MultiLang` 最终会生成 `Tabs` 组件）。因为 `MultiLang` 更简洁，所以新编写的多语言代码示例推荐使用 `MultiLang`。
+
+实际上，`MultiLang` 里不仅可以放入代码片段，还可以放入其他各种组件，只需保证：1) 内容顺序为 C#、Java、Objective-C，2) 不同编程语言内容在组件层级上是同级的。
+下面是一个例子：
+
+```mdx
+<MultiLang>
+<>
+
+```cs
+public static void Login (LoginType loginType, string[] permissions);
+```
+
+**LoginType参数说明**
+
+参数  | 描述
+| ------ | ------ |
+LoginType.TAPTAP | TapTap 登录
+
+</>
+
+<>
+
+```java
+/**
+ * @param type TapTap = 0
+ */
+public static void login(Activity activity, @LoginType.ThirdPartyType int type, String... permissions);
+``` 
+
+**LoginType参数说明**
+ 
+参数  | 描述
+| ------ | ------ |
+0 | TapTap 登录
+
+</>
+
+<>
+
+```objectivec
++ (void)login:(TapBootstrapLoginType)type permissions:(NSArray *_Nullable)permissions;
+```
+
+**LoginType参数说明**
+ 
+参数  | 描述
+| ------ | ------ |
+TapBootstrapLoginTypeTapTap | TapTap 登录
+
+</>
+</MultiLang>
+```
+
+上面的例子中，我们使用了空标签 `<>...</>` (React 的 Fragment 组件) 将 C#、Java、Objective-C 的不同内容包成三组。
+同样，空标签和 markdown 之间也需要留出空行。
 
 ## 关于国际化
 > 参考 [docusaurus文档](https://v2.docusaurus.io/docs/i18n/tutorial)
