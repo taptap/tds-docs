@@ -44,6 +44,7 @@ dependencies {
         implementation (name:'TapBootstrap_2.0.0', ext:'aar')  // 必选: x.x.x 代表所下载的 SDK 的版本号
         implementation (name:'TapCommon_2.0.0', ext:'aar') // 必选: x.x.x 代表所下载的 SDK 的版本号
         implementation (name:'TapMoment_2.0.0', ext:'aar') // 必选: x.x.x 代表所下载的 SDK 的版本号
+		implementation (name:'TapLogin_2.5.4', ext:'aar') // 必选: x.x.x 代表所下载的 SDK 的版本号
     }  
     ```
  
