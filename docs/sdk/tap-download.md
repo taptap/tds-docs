@@ -24,7 +24,7 @@ Unity Demo 下载：[Unity_TapDemo](https://github.com/TapTap/TapSDK-Unity-Demo)
 
 ## SDK 附加
 #### SDK 附加为可选择接入项
-- 数美定制版 SDK [点击下载](/res/tap_wl_pri_release.aar)  
+<!-- - 数美定制版 SDK [点击下载](/res/tap_wl_pri_release.aar)   -->
 - OAID 推荐版 [oaid_sdk_1.0.23.aar](/res/tap_oaid_sdk_1.0.23.aar)
 
 
