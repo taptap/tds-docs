@@ -7,6 +7,7 @@ sidebar_label: 数据收集
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import {Highlight} from '../component';
+import MultiLang from '@theme/MultiLang';
 
 :::caution
 **目前 需要联系运营团队获取 TapDB 的使用权限。**
@@ -19,68 +20,40 @@ TapSDK 提供一套可供游戏开发者收集用户数据的API。系统会收�
 ## 2. 初始化SDK
 
 #### API  
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
-
-  ```java
-public static void init(Context context, String clientId, String channel, String gameVersion, boolean isCN);
-  ```  
-  </TabItem>
-
-  <TabItem value="ios">
-
-```objectivec
-+ (void)onStartWithClientId:(NSString *)clientId channel:(nullable NSString *)channel version:(nullable NSString *)gameVersion isCN:(BOOL)isCN;
-```
-  </TabItem>
-
-  <TabItem value="unity">
+<MultiLang>
 
 ```cs
 public static void Init (string clientId, string channel, string gameVersion, bool isCN);
 ```
 
-  </TabItem>
-</Tabs>
+```java
+public static void init(Context context, String clientId, String channel, String gameVersion, boolean isCN);
+```  
+  
+
+```objectivec
++ (void)onStartWithClientId:(NSString *)clientId channel:(nullable NSString *)channel version:(nullable NSString *)gameVersion isCN:(BOOL)isCN;
+```
+
+</MultiLang>
 
 #### 示例代码
 
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
-
-```java
-  TapDB.init(getApplicationContext(), "Client ID", "taptap", "2.0.0", true);
-```
-  </TabItem>
-
-  <TabItem value="ios">
-
-```objectivec
-[TapDB onStartWithClientId:@"clientid" channel:@"taptap" version:@"2.0.0" isCN:true];
-```
-  </TabItem>
-  <TabItem value="unity">
+<MultiLang>
 
 ```cs
 TapDB.Init("clientId","channel","gameVersion",true);
 ```
 
-  </TabItem>
-</Tabs>
+```java
+  TapDB.init(getApplicationContext(), "Client ID", "taptap", "2.0.0", true);
+```
+ 
+```objectivec
+[TapDB onStartWithClientId:@"clientid" channel:@"taptap" version:@"2.0.0" isCN:true];
+```
+ 
+</MultiLang>
 
 **init 参数说明：**   
 
@@ -96,74 +69,46 @@ isCN | 是 | 区域类型: true 表示国内; false 表示国外  默认为 true
 当初始化 sdk 之后，可以调用此 API 来记录一个用户  
 
 #### API
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
+
+<MultiLang>
+
+```cs
+public static void SetUser(string userId);
+
+public static void SetUser(string userId, string loginType);
+```
 
 ```java
   public static void setUser(String userId)
   public static void setUser(String userId,  LoginType loginType)
 ```
-  </TabItem>
-
-  <TabItem value="ios">
-
-  ```objectivec  
+ 
+```objectivec  
 + (void)setUser:(NSString *)userId;
 + (void)setUser:(NSString *)userId  loginType:(TapDBLoginType)loginType;
-  ```
-  </TabItem>
-  <TabItem value="unity">
-
-```cs
-public static void SetUser(string userId)
-
-public static void SetUser(string userId, string loginType)
 ```
 
-  </TabItem>
-</Tabs>
-
-
-
+ </MultiLang>
 
 #### 示例代码
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
 
-  ```java
-  TapDB.setUser("xxxxuser1", LoginType.TapTap);
-  ```
-  </TabItem>
-
-  <TabItem value="ios">
-
-  ```objectivec
- [TapDB setUser:@"userId" loginType:TapDBLoginTypeTapTap];
-  ```
-  </TabItem>
-  <TabItem value="unity">
+<MultiLang>
 
 ```cs
 TapDB.SetUser("userId");
 TapDB.SetUser("userId","loginType");
 ```
 
-  </TabItem>
-</Tabs>
+```java
+TapDB.setUser("xxxxuser1", LoginType.TapTap);
+```
+
+
+```objectivec
+[TapDB setUser:@"userId" loginType:TapDBLoginTypeTapTap];
+```
+
+ </MultiLang>
 
 **setUser 参数说明**
 
@@ -231,66 +176,42 @@ Login.GetCurrentProfile((profile) => {
 设置用户名称
 
 #### API  
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
 
-  ```java
-  public static void setName(String name)
-  ```
-  </TabItem>
-
-  <TabItem value="ios">
-
-  ```objectivec
-+ (void)setName:(NSString *)name;
-  ```
-  </TabItem>
-  <TabItem value="unity">
+<MultiLang>
 
 ```cs
 public static void SetName(string name);
 ```
 
-  </TabItem>
-</Tabs>
-
-#### 示例代码
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
-
   ```java
-  TapDB.setName("taptap");
+  public static void setName(String name)
   ```
-  </TabItem>
-
-  <TabItem value="ios">
+ 
 
   ```objectivec
- [TapDB setName:@"Tap zhang"];
++ (void)setName:(NSString *)name;
   ```
-  </TabItem>
-  <TabItem value="unity">
+ 
+  </MultiLang>
+
+#### 示例代码
+
+<MultiLang>
 
 ```cs
 TapDB.SetName("name");
 ```
 
-  </TabItem>
-</Tabs>
+
+```java
+TapDB.setName("taptap");
+```
+
+```objectivec
+[TapDB setName:@"Tap zhang"];
+```
+
+ </MultiLang>
 
 
 字段 | 可为空 | 说明
@@ -301,67 +222,42 @@ name | 否 | 长度大于0并小于等于256。用户名
 设置用户等级。用户登录或升级时调用  
 
 #### API  
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
-
-  ```java
-  public static void setLevel(int level)
-  ```
-  </TabItem>
-
-  <TabItem value="ios">
-
-  ```objectivec
-+ (void)setLevel:(NSInteger)level;
-  ```
-  </TabItem>
-  <TabItem value="unity">
+<MultiLang>
 
 ```cs
 public static void SetLevel(int level);
 ```
 
-  </TabItem>
-</Tabs>
+```java
+public static void setLevel(int level)
+```
+
+
+```objectivec
++ (void)setLevel:(NSInteger)level;
+```
+
+</MultiLang>
+
 
 #### 示例代码
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
-
-  ```java
-  TapDB.setLevel(5);
-  ```
-  </TabItem>
-
-  <TabItem value="ios">
-
-  ```objectivec
-[TapDB setLevel:10];
-  ```
-  </TabItem>
-  <TabItem value="unity">
+<MultiLang>
 
 ```cs
 TapDB.SetLevel(5);
 ```
 
-  </TabItem>
-</Tabs>
+```java
+TapDB.setLevel(5);
+```
 
+
+```objectivec
+[TapDB setLevel:10];
+```
+
+
+</MultiLang>
 
 字段 | 可为空 | 说明
 | ------ | ------ | ------ |
@@ -372,66 +268,41 @@ level | 否 | 大于等于0。用户等级
 设置用户所在服务器。用户登陆或切换服务器时调用
 
 #### API   
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
-
-  ```java
-  public static void setServer(String server)
-  ```
-  </TabItem>
-
-  <TabItem value="ios">
-
-  ```objectivec
-+ (void)setServer:(NSString *)server;
-  ```
-  </TabItem>
-  <TabItem value="unity">
+<MultiLang>
 
 ```cs
 public static void SetServer(string server);
 ```
 
-  </TabItem>
-</Tabs>
+```java
+public static void setServer(String server)
+```
+
+
+```objectivec
++ (void)setServer:(NSString *)server;
+```
+
+</MultiLang>
+
 
 #### 示例代码
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
-
-  ```java
-  TapDB.setServer("https://test.taptap.com/callback");
-  ```
-  </TabItem>
-
-  <TabItem value="ios">
-
-  ```objectivec
-[TapDB setServer:@"https://test.taptap.com/callback"];
-  ```
-  </TabItem>
-  <TabItem value="unity">
+<MultiLang>
 
 ```cs
 TapDB.SetServer("https://test.taptap.com/callback");
 ```
 
-  </TabItem>
-</Tabs>
+```java
+TapDB.setServer("https://test.taptap.com/callback");
+```
+
+
+```objectivec
+[TapDB setServer:@"https://test.taptap.com/callback"];
+```
+
+</MultiLang>
 
 
 字段 | 可为空 | 说明
@@ -445,66 +316,43 @@ server | 否 | 用户所在服务器。长度大于0并小于等于256。
 充值成功时调用。SDK推送和[服务端充值推送](#101-充值推送接口)只能选择其中一种。建议优先选择服务端推送方式，以保证数据的准确性。
 
 #### API  
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
-
-  ```java
-  public static void onCharge(String orderId, String product, long amount, String currencyType, String payment)
-  ```
-  </TabItem>
-
-  <TabItem value="ios">
-
-  ```objectivec
-+ (void)onChargeSuccess:(NSString *)orderId product:(NSString *)product amount:(NSInteger)amount currencyType:(NSString *)currencyType payment:(NSString *)payment;
-  ```
-  </TabItem>
-  <TabItem value="unity">
+<MultiLang>
 
 ```cs
 public static void OnCharge(string orderId, string productId, string amount, string currencyType, string payment)
 ```
 
-  </TabItem>
-</Tabs>
+
+```java
+public static void onCharge(String orderId, String product, long amount, String currencyType, String payment)
+```
+
+
+```objectivec
++ (void)onChargeSuccess:(NSString *)orderId product:(NSString *)product amount:(NSInteger)amount currencyType:(NSString *)currencyType payment:(NSString *)payment;
+```
+
+</MultiLang>
 
 #### 示例代码
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
-
-  ```java
-  TapDB.onCharge("0xueiEns","轩辕剑","100","CNY","wechat");
-  ```
-  </TabItem>
-
-  <TabItem value="ios">
-
-  ```objectivec
-[TapDB onChargeSuccess:@"0xueiEns" product:@"轩辕剑" amount:10 currencyType:@"CNY" payment:@"wechat"];
-  ```
-  </TabItem>
-  <TabItem value="unity">
+<MultiLang>
 
 ```cs
 TapDB.OnCharge("0xueiEns","大宝剑","100","CNY","wechat");
 ```
 
-  </TabItem>
-</Tabs>
+```java
+TapDB.onCharge("0xueiEns","轩辕剑","100","CNY","wechat");
+```
+
+
+```objectivec
+[TapDB onChargeSuccess:@"0xueiEns" product:@"轩辕剑" amount:10 currencyType:@"CNY" payment:@"wechat"];
+```
+
+</MultiLang>
+
+
 
 **参数说明**
 
