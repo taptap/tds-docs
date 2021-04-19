@@ -443,17 +443,14 @@ TapMoment.close();
 ```cs
 TapMoment.Close(title, desc);
 ```
-我是unity参数说明
 
 ```java
 TapMoment.closeWithConfirmWindow(title, content);
 ```
-我是android参数说明
 
 ```objectivec
 [TapMoment closeWithTitle:@"title" content:@"content" showConfirm:YES];
 ```
-我是ios参数说明
 
 </MultiLang>
 
