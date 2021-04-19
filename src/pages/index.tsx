@@ -46,7 +46,7 @@ const HomePage = () => {
                         ? <a
                           className={styles.entryCellActionButton}
                           href={link.href}
-                          rel='noreferrer nofollow noopener'
+                          rel='nofollow noopener'
                           target='_blank'
                         >
                           {link.label}
