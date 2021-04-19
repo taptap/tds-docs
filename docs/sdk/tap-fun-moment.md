@@ -8,6 +8,7 @@ sidebar_label: 内嵌动态
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import {Highlight} from '../component';
+import MultiLang from '@theme/MultiLang';
 
 本文主要介绍动态相关的使用方式，详细产品介绍请参考 [动态产品介绍](/pro/pro-moment)
 
@@ -18,50 +19,32 @@ import {Highlight} from '../component';
 设置动态回调，用于获取动态的状态变化
 
 #### API
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
 
-```java
-public static void setCallback(TapMoment.TapMomentCallback tapMomentCallback);
-```
-  </TabItem>
-
-  <TabItem value="ios">
-
-  ```objectivec
-+ (void)setDelegate:(id <TapMomentDelegate>)delegate;
-  ```
-  </TabItem>
-  <TabItem value="unity">
+<MultiLang>
 
 ```cs
 public static void SetCallback (Action<int, string> callback);
 ```
 
-  </TabItem>
-</Tabs>
+```java
+public static void setCallback(TapMoment.TapMomentCallback tapMomentCallback);
+```
+ 
 
-
+  ```objectivec
++ (void)setDelegate:(id <TapMomentDelegate>)delegate;
+  ```
+ </MultiLang>
 
 
 #### 示例代码
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
+<MultiLang>
 
-  <TabItem value="android">
+```cs
+TapMoment.SetCallback((code,msg)=>{
+    Debug.Log(code+"---"+msg);
+});
+```
 
   ```java
 TapMoment.setCallback(new TapMoment.TapMomentCallback() {
@@ -71,32 +54,22 @@ TapMoment.setCallback(new TapMoment.TapMomentCallback() {
     }
 });
   ```
-  </TabItem>
 
-  <TabItem value="ios">
 
-  ```objectivec
+```objectivec
 @interface ViewController ()<TapMomentDelegate>
 @end
 
 [TapMoment setDelegate:self];
 - (void)onMomentCallbackWithCode:(NSInteger)code msg:(NSString *)msg
 {
-    NSLog (@"msg:%@, code:%i" ,msg, code);
+  NSLog (@"msg:%@, code:%i" ,msg, code);
 }  
-  ```
-  </TabItem>
-  <TabItem value="unity">
-
-```cs
-TapMoment.SetCallback((code,msg)=>{
-    Debug.Log(code+"---"+msg);
-});
 ```
+ 
 
-  </TabItem>
 
-</Tabs>
+ </MultiLang>
 
 回调方法中 code 表示事件类型，现支持的回调类型如下：
 
@@ -118,60 +91,37 @@ TapMoment.SetCallback((code,msg)=>{
 游戏在使用 TapTap 登录完成后，需要调用该接口设置登录信息
 
 #### API  
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
+
 
   ```java
 TapTapMomentSdk.setLoginToken(AccessToken);
   ```
-  </TabItem>
 
-  <TabItem value="ios">
 
   ```objectivec
 + (void)setAccessToken:(TDSMomentAccessToken *)token;
   ```
-  </TabItem>
-  <TabItem value="unity">
+ 
 
 ```cs
 public static void SetLoginToken(string accessToken);
 ```
 
-  </TabItem>
-</Tabs>
+
 
 #### 示例代码
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
+
 
   ```java
 AccessToken currentAccessToken = AccessToken.getCurrentAccessToken();
 TapTapMomentSdk.setLoginToken(currentAccessToken);
   ```
-  </TabItem>
 
-  <TabItem value="ios">
 
   ```objectivec
 [TDSMomentSdk setAccessToken:[TDSMomentAccessToken build:[[TapLoginHelper currentAccessToken]toJsonString]]];
   ```
-  </TabItem>
-  <TabItem value="unity">
+ 
 
 ```cs
 TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
@@ -179,8 +129,7 @@ TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
 });
 ```
 
-  </TabItem>
-</Tabs> -->
+ -->
 
 
 ## 3. 打开动态页面
@@ -195,15 +144,12 @@ TapSDK.TDSLogin.GetCurrentAccessToken((token)=>{
 :::
 
 #### API  
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
+
+<MultiLang>
+
+```cs
+public static void Open (Orientation config);
+```
 
   ```java
 /**
@@ -212,55 +158,35 @@ groupId="tap-platform"
  */
 public static void open(int orientation);
   ```
-  </TabItem>
 
-  <TabItem value="ios">
 
   ```objectivec
 + (void)open:(TapMomentConfig *)config;
   ```
-  </TabItem>
-  <TabItem value="unity">
+ 
+ </MultiLang>
 
-```cs
-public static void Open (Orientation config);
-```
-
-  </TabItem>
-</Tabs>
 
 #### 示例代码
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
-
-  ```java
-  TapMoment.open(TapMoment.ORIENTATION_PORTRAIT);
-  ```
-  </TabItem>
-
-  <TabItem value="ios">
-
-  ```objectivec
-  TapMomentConfig *mConfig = TapMomentConfig.new;
-  mConfig.orientation = TapMomentOrientationDefault;
-  [TapMoment open:mConfig];
-  ```
-  </TabItem>
-  <TabItem value="unity">
+<MultiLang>
 
 ```cs
 TapMoment.Open(TapSDK.Orientation.ORIENTATION_LANDSCAPE);
 ```
 
-  </TabItem>
-</Tabs>
+```java
+TapMoment.open(TapMoment.ORIENTATION_PORTRAIT);
+```
+
+
+```objectivec
+TapMomentConfig *mConfig = TapMomentConfig.new;
+mConfig.orientation = TapMomentOrientationDefault;
+[TapMoment open:mConfig];
+```
+ 
+
+ </MultiLang>
 
 
 ## 4. 发布动态
@@ -268,47 +194,33 @@ TapMoment.Open(TapSDK.Orientation.ORIENTATION_LANDSCAPE);
 普通动态包括图片和对应的内容描述
 
 #### API   
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
-
-  ```java
-  public static void publish(int orientation, String[] imagePath, String content);
-  ```
-  </TabItem>
-
-  <TabItem value="ios">
-
-  ```objectivec
-  + (void)publish:(TapMomentConfig *_Nonnull)config
-        content:(TapMomentPostData *_Nonnull)content;
-  ```
-  </TabItem>
-  <TabItem value="unity">
+<MultiLang>
 
 ```cs
 public static void Publish (Orientation config, string[] imagePaths, string content);
 ```
 
-  </TabItem>
-</Tabs>
+```java
+public static void publish(int orientation, String[] imagePath, String content);
+```
+
+
+```objectivec
++ (void)publish:(TapMomentConfig *_Nonnull)config
+      content:(TapMomentPostData *_Nonnull)content;
+```
+ 
+</MultiLang>
+
 
 #### 示例代码
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
+<MultiLang>
+
+```cs
+string content = "我是描述";
+string[] images = {"imgpath01","imgpath02","imgpath03"};
+TapMoment.Publish(Orientation.ORIENTATION_LANDSCAPE, images, content);
+```
 
   ```java
 int orientation = TapMoment.ORIENTATION_PORTRAIT;
@@ -316,9 +228,7 @@ String content = "发布动态内容描述";
 String[] imagePaths = new String[]{"content://***.jpg", "/sdcard/**.jpg"};
 TapMoment.publish(orientation, imagePaths, content);
   ```
-  </TabItem>
 
-  <TabItem value="ios">
 
   ```objectivec
   //发布动态配置横竖屏
@@ -330,47 +240,30 @@ tconfig.orientation = TapMomentOrientationDefault;
  postData.content = @"我是图片描述";
  [TapMoment publish:tconfig content:(postData)];
   ```
-  </TabItem>
-  <TabItem value="unity">
+ 
+</MultiLang>
 
-```cs
-string content = "我是描述";
-string[] images = {"imgpath01","imgpath02","imgpath03"};
-TapMoment.Publish(Orientation.ORIENTATION_LANDSCAPE, images, content);
-```
 
-  </TabItem>
-</Tabs>
+
 
 <!-- ### 发布视频动态
 
 视频动态包括视频和图片（可选）
 
 #### API  
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
+
 
   ```java
   TapTapMomentSdk.publishVideoMoment(TapTapMomentSdk.Config config, String[] videoPaths,
   String[] imagePaths, String title, String content);
   ```
-  </TabItem>
 
-  <TabItem value="ios">
 
   ```objectivec
   + (void)openPostMomentPageWithContent:(TDSPostMomentData * _Nonnull)content
                                  config:(TDSMomentConfig * _Nonnull)config;
   ```
-  </TabItem>
-  <TabItem value="unity">
+ 
 
 ```cs
 // 带封面
@@ -380,19 +273,10 @@ public static void PublishVideoMoment(Orientation config, string[] videoPaths, s
 public static void PublishVideoMoment(Orientation config, string[] videoPaths, string title, string desc)
 ```
 
-  </TabItem>
-</Tabs>
+
 
 #### 示例代码
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
+
 
   ```java
 TapTapMomentSdk.Config config = new TapTapMomentSdk.Config();
@@ -405,9 +289,7 @@ TapTapMomentSdk.publishVideoMoment(config, videoPaths, imagePaths, title, conten
 //TapTapMomentSdk.publishVideoMoment(config, videoPaths, title, content);
 
   ```
-  </TabItem>
 
-  <TabItem value="ios">
 
   ```objectivec
   TDSVideoMomentData *videoMoment = [[TDSVideoMomentData alloc] init];
@@ -421,8 +303,7 @@ TapTapMomentSdk.publishVideoMoment(config, videoPaths, imagePaths, title, conten
 
   [TDSMomentSdk openPostMomentPageWithContent:videoMoment config:config];
   ```
-  </TabItem>
-  <TabItem value="unity">
+ 
 
 ```cs
 // 带封面
@@ -440,8 +321,7 @@ string content = "我是描述";
 TapSDK.TDSMoment.PublishVideoMoment(TapSDK.Orientation.ORIENTATION_LANDSCAPE, videos, title, content);
 ```
 
-  </TabItem>
-</Tabs>
+
 
 **参数说明**
 
@@ -459,42 +339,26 @@ content | 是 | 动态描述 -->
 当游戏需要获取当前用户的新的通知信息数量时，调用该接口
 
 #### API  
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
-
-  ```java
-public static void fetchNotification();
-  ```
-  返回结果会通过动态回调通知游戏。  
-  `code == CALLBACK_CODE_GET_NOTICE_SUCCESS`(20000) 表示获取成功，`msg` 为 0 表示无新消息，为 1 表示有新消息。   
-  `CALLBACK_CODE_GET_NOTICE_FAIL`(20100) 表示获取失败
-  </TabItem>
-
-  <TabItem value="ios">
-
-  ```objectivec
-+ (void)fetchNotification;
-  ```
-  结果在 `Delegate` 下的 `onMomentCallbackWithCode:msg:` 中返回。  
-  `code == CALLBACK_CODE_GET_NOTICE_SUCCESS`(20000) 表示获取成功，`msg` 为 0 表示无新消息，为 1 表示有新消息。   
-  `CALLBACK_CODE_GET_NOTICE_FAIL`(20100) 表示获取失败
-  </TabItem>
-  <TabItem value="unity">
+<MultiLang>
 
 ```cs
 public static void FetchNotification ();
 ```
-结果在 `TapMoment.SetCallback` 进行回调
 
-  </TabItem>
-</Tabs>
+
+```java
+public static void fetchNotification();
+```
+
+```objectivec
++ (void)fetchNotification;
+```
+
+</MultiLang>
+
+结果在注册的回调中返回。  
+`code == CALLBACK_CODE_GET_NOTICE_SUCCESS`(20000) 表示获取成功，`msg` 为 0 表示无新消息，非 0 表示新消息数量。   
+`CALLBACK_CODE_GET_NOTICE_FAIL`(20100) 表示获取失败
 
 
 <!-- ## 7. 进入好友动态主页
@@ -502,46 +366,26 @@ public static void FetchNotification ();
 当游戏需要进入指定用户的动态页面时，调用该接口
 
 #### API  
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
+
 
   ```java
 TapTapMomentSdk.openUserMoment(TapTapMomentSdk.Config config, String openId);
   ```
-  </TabItem>
 
-  <TabItem value="ios">
 
   ```objectivec
 + (void)openUserCenterWithConfig:(TDSMomentConfig *)config userId:(NSString *)userId;
   ```
-  </TabItem>
-  <TabItem value="unity">
+ 
 
 ```cs
 
 ```
 
-  </TabItem>
-</Tabs>
+
 
 #### 示例代码
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
+
 
   ```java
 TapTapMomentSdk.Config config = new TapTapMomentSdk.Config();
@@ -556,15 +400,13 @@ TapTapMomentSdk.openUserMoment(config, openId);
   config.orientation = TDSMomentOrientationDefault;
   [TDSMomentSdk openUserCenterWithConfig:config userId:@"userId"];
   ```
-  </TabItem>
-  <TabItem value="unity">
+ 
 
 ```cs
 
 ```
 
-  </TabItem>
-</Tabs> -->
+ -->
 
 ## 6. 关闭动态页面
 
@@ -573,69 +415,51 @@ TapTapMomentSdk.openUserMoment(config, openId);
 
 该接口会直接关闭动态窗口，不会弹出二次确认弹窗，接口示例：
 
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
-
-  ```java
-TapMoment.close();
-  ```
-
-  </TabItem>
-
-  <TabItem value="ios">
-
-  ```objectivec
- [TapMoment close];
-  ```
-  </TabItem>
-  <TabItem value="unity">
+<MultiLang>
 
 ```cs
 TapMoment.Close();
 ```
 
-  </TabItem>
-</Tabs>
+```java
+TapMoment.close();
+```
+
+
+
+```objectivec
+[TapMoment close];
+```
+ 
+
+</MultiLang>
+
 
 ### 弹出二次确认  
 
 该接口会弹出二次确认弹窗，由用户确定是否关闭，示例如下：
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
+<MultiLang>
 
-  ```java
+```cs
+TapMoment.Close(title, desc);
+```
+我是unity参数说明
+
+```java
 TapMoment.closeWithConfirmWindow(title, content);
-  ```
-  **参数说明**
+```
+我是android参数说明
 
-字段 | 可为空 | 说明
-| ------ | ------ | ------ |
-title | 否 | 动态标题
-content | 否 | 动态描述
+```objectivec
+[TapMoment closeWithTitle:@"title" content:@"content" showConfirm:YES];
+```
+我是ios参数说明
+
+</MultiLang>
 
 参数为二次弹窗的标题和内容，默认为 "提示" 和 "匹配成功，进入游戏", 用户选择接口会通过回调 `CALLBACK_CODE_ClOSE_CANCEL`(50000) 和 `CALLBACK_CODE_ClOSE_CONFIRM`(50100) 通知游戏  
-  </TabItem>
 
-  <TabItem value="ios">
-
-  ```objectivec
-[TapMoment closeWithTitle:@"title" content:@"content" showConfirm:YES];
-  ```
-  **参数说明**
+**参数说明**
 
 字段 | 可为空 | 说明
 | ------ | ------ | ------ |
@@ -643,22 +467,7 @@ title | 否 | 动态标题
 content | 否 | 动态描述
 showConfirm | 否 | 是否显示确认弹窗
 
-  </TabItem>
-  <TabItem value="unity">
 
-```cs
-TapMoment.Close(title, desc);
-```
-
-**参数说明**
-
-字段 | 可为空 | 说明
-| ------ | ------ | ------ |
-title | 否 | 动态标题
-desc | 否 | 动态描述
-
-  </TabItem>
-</Tabs>
 
 ## 7. 注意事项
 - 打开动态页面时，请先屏蔽游戏自身的声音，避免与动态内视频声音产生重合
