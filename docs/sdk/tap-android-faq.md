@@ -8,7 +8,7 @@ sidebar_label: Android
 TapSDK 的使用，对于 Android，强制需要签名文件、包名、Client ID 三个都能鉴权通过
 
 ## 登录时报 404 或者 405
-请检查 `LoginSdkConfig.regionType` 配置，国内请配置为 RegionType.CN
+请检查 `TapConfig.Builder()` 配置，国内请配置为 TapRegionType.CN
 
 ## Android resource linking failed
 error: attribute android:requestLegacyExternalStorage not found.  
