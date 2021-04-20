@@ -1,5 +1,4 @@
 import React, { Fragment } from 'react';
-import Head from '@docusaurus/Head';
 import Translate from '@docusaurus/Translate';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
@@ -9,13 +8,10 @@ import styles from './styles.module.scss';
 import { entryList } from "./_config";
 
 const HomePage = () => {
-  const { siteConfig, i18n: { currentLocale, defaultLocale } } = useDocusaurusContext();
+  const { i18n: { currentLocale, defaultLocale } } = useDocusaurusContext();
   const isDefaultLocale = currentLocale === defaultLocale;
   const localePath = isDefaultLocale ? '' : `${currentLocale}/`;
   return <Layout>
-    <Head>
-      <title>{siteConfig.title}</title>
-    </Head>
     <div className={styles.container}>
       <div className={styles.containerContent}>
         <div className={styles.topTitle}>
