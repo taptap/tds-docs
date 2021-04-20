@@ -57,7 +57,11 @@ module.exports = {
           items: [
             {
               label: '品牌素材',
-              href: 'https://www.taptap.com/about-us/brand-resources',
+              // hack for i18n
+              i18nHref: {
+                'zh-Hans': 'https://www.taptap.com/about-us/brand-resources',
+                en: 'https://www.taptap.com/about-us/brand-resources2'
+              },
             },
             {
               label: 'SDK工具包',
