@@ -19,7 +19,7 @@ sidebar_label: 资源下载
 
 
 ## 登录按钮素材
-点击下载[icon.zip](/res/tap_icon.zip)
+点击下载[icon.zip](/res/TapTapLoginButton.zip)
 
 ## SDK 附加
 
