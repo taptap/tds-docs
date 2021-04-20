@@ -1,6 +1,7 @@
 import React from 'react';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 
-export const Highlight = ({children, color}) => (
+export const Highlight = ({ children, color }) => (
   <span style={{
     color: color,
     padding: '0.2rem',
@@ -9,20 +10,20 @@ export const Highlight = ({children, color}) => (
   </span>
 );
 
-export const Link = ({href, children}) => (
+export const Link = ({ href, children }) => (
   <a href={href} rel="noreferrer nofollow noopener" target="_blank">
     {children}
   </a>
 );
 
-export const ImageLink = ({href, alt, children}) => (
+export const ImageLink = ({ href, alt, children }) => (
   <a href={href} rel='noreferrer nofollow noopener'>
     <img src={children} alt={alt} />
   </a>
 );
 
-export const FaqLink = ({href, children}) => (
-  <span style={{fontSize: 16, color: '#666666'}}>
+export const FaqLink = ({ href, children }) => (
+  <span style={{ fontSize: 16, color: '#666666' }}>
     {children}
   </span>
 );
