@@ -37,7 +37,7 @@ function NavLink({
     <Link
       {...(href || i18nHref
         ? {
-          rel: withRef ? 'noopener noreferrer' : 'noopener',
+          rel: withRef ? 'noopener' : 'noopener noreferrer',
           href: i18nHref?.[currentLocale] ?? (prependBaseUrlToHref ? normalizedHref : href),
         }
         : {

@@ -57,6 +57,7 @@ module.exports = {
           items: [
             {
               label: '品牌素材',
+              withRef: true,
               // hack for i18n
               i18nHref: {
                 'zh-Hans': 'https://www.taptap.com/developer/location_page?force_region=CN&redirect_url=https%3A%2F%2Fwww.taptap.com%2F',
