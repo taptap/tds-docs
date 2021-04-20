@@ -1,5 +1,4 @@
 import React from 'react';
-import useBaseUrl from '@docusaurus/useBaseUrl';
 
 export const Highlight = ({ children, color }) => (
   <span style={{

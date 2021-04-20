@@ -20,6 +20,7 @@ function NavLink({
   to,
   href,
   i18nHref,
+  withRef,
   label,
   activeClassName = 'navbar__link--active',
   prependBaseUrlToHref,
@@ -29,13 +30,14 @@ function NavLink({
   // {to: 'version'} should probably be forbidden, in favor of {to: '/version'}
   const toUrl = useBaseUrl(to);
   const activeBaseUrl = useBaseUrl(activeBasePath);
-  const normalizedHref =  useBaseUrl(href, { forcePrependBaseUrl: true });
+  const normalizedHref = useBaseUrl(href, { forcePrependBaseUrl: true });
   const { i18n: { currentLocale, defaultLocale } } = useDocusaurusContext();
 
   return (
     <Link
       {...(href || i18nHref
         ? {
+          rel: withRef ? 'noopener noreferrer' : 'noopener',
           href: i18nHref?.[currentLocale] ?? (prependBaseUrlToHref ? normalizedHref : href),
         }
         : {
@@ -119,7 +121,7 @@ function NavItemDesktop({
         {props.children ?? props.label}
       </NavLink>
       <ul ref={dropdownMenuRef} className="dropdown__menu">
-        {items.map(({className: childItemClassName, ...childItemProps}, i) => (
+        {items.map(({ className: childItemClassName, ...childItemProps }, i) => (
           <li key={i}>
             <NavLink
               onKeyDown={(e) => {
@@ -154,7 +156,7 @@ function NavItemMobile({
   ...props
 }: DesktopOrMobileNavBarItemProps) {
   const menuListRef = useRef<HTMLUListElement>(null);
-  const {pathname} = useLocation();
+  const { pathname } = useLocation();
   const [collapsed, setCollapsed] = useState(
     () => !items?.some((item) => isSamePath(item.to, pathname)) ?? true,
   );
@@ -201,7 +203,7 @@ function NavItemMobile({
         style={{
           height: !collapsed ? menuListHeight : undefined,
         }}>
-        {items.map(({className: childItemClassName, ...childItemProps}, i) => (
+        {items.map(({ className: childItemClassName, ...childItemProps }, i) => (
           <li className="menu__list-item" key={i}>
             <NavLink
               activeClassName="menu__link--active"
@@ -216,7 +218,7 @@ function NavItemMobile({
   );
 }
 
-function DefaultNavbarItem({mobile = false, ...props}: Props): JSX.Element {
+function DefaultNavbarItem({ mobile = false, ...props }: Props): JSX.Element {
   const Comp = mobile ? NavItemMobile : NavItemDesktop;
   return <Comp {...props} />;
 }
