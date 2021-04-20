@@ -7,26 +7,26 @@
 
 import React from 'react';
 import clsx from 'clsx';
-import Head from '@docusaurus/Head';
-import { useTitleFormatter } from '@docusaurus/theme-common';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import useBaseUrl from '@docusaurus/useBaseUrl';
 import DocPaginator from '@theme/DocPaginator';
 import DocVersionSuggestions from '@theme/DocVersionSuggestions';
+import Seo from '@theme/Seo';
+import LastUpdated from '@theme/LastUpdated';
+import type {Props} from '@theme/DocItem';
 import TOC from '@theme/TOC';
-import IconEdit from '@theme/IconEdit';
+import EditThisPage from '@theme/EditThisPage';
 import styles from './styles.module.scss';
 import { useActivePlugin, useActiveVersion, useVersions } from '@theme/hooks/useDocs';
 import './override.scss'
 
-function DocItem(props): JSX.Element {
+function DocItem(props: Props): JSX.Element {
   const { siteConfig } = useDocusaurusContext();
   const { url: siteUrl } = siteConfig;
   const { content: DocContent } = props;
   const {
     metadata,
     frontMatter: {
-      image: metaImage,
+      image,
       keywords,
       hide_title: hideTitle,
       hide_table_of_contents: hideTableOfContents,
@@ -35,13 +35,13 @@ function DocItem(props): JSX.Element {
   const {
     description,
     title,
-    permalink,
     editUrl,
     lastUpdatedAt,
+    formattedLastUpdatedAt,
     lastUpdatedBy,
   } = metadata;
 
-  const { pluginId } = useActivePlugin({ failfast: true });
+  const {pluginId} = useActivePlugin({failfast: true});
   const versions = useVersions(pluginId);
   const version = useActiveVersion(pluginId);
 
@@ -50,29 +50,9 @@ function DocItem(props): JSX.Element {
   // See https://github.com/facebook/docusaurus/issues/3362
   const showVersionBadge = versions.length > 1;
 
-  const metaTitle = useTitleFormatter(title);
-  const metaImageUrl = useBaseUrl(metaImage, { absolute: true });
   return (
     <>
-      <Head>
-        <title>{metaTitle}</title>
-        <meta property="og:title" content={metaTitle} />
-        {description && <meta name="description" content={description} />}
-        {description && (
-          <meta property="og:description" content={description} />
-        )}
-        {keywords && keywords.length && (
-          <meta name="keywords" content={keywords.join(',')} />
-        )}
-        {metaImage && <meta property="og:image" content={metaImageUrl} />}
-        {metaImage && <meta name="twitter:image" content={metaImageUrl} />}
-        {metaImage && (
-          <meta name="twitter:image:alt" content={`Image for ${title}`} />
-        )}
-        {permalink && <meta property="og:url" content={siteUrl + permalink} />}
-        {permalink && <link rel="canonical" href={siteUrl + permalink} />}
-      </Head>
-
+      <Seo {...{title, description, keywords, image}} />
       <div className="row">
         <div
           className={clsx('col', {
@@ -101,52 +81,14 @@ function DocItem(props): JSX.Element {
               <div className="margin-vert--xl">
                 <div className="row">
                   <div className="col">
-                    {editUrl && (
-                      <a
-                        href={editUrl}
-                        target="_blank"
-                        rel="noreferrer noopener">
-                        <IconEdit />
-                        Edit this page
-                      </a>
-                    )}
+                    {editUrl && <EditThisPage editUrl={editUrl} />}
                   </div>
                   {(lastUpdatedAt || lastUpdatedBy) && (
-                    <div className="col text--right">
-                      <em>
-                        <small>
-                          Last updated{' '}
-                          {lastUpdatedAt && (
-                            <>
-                              on{' '}
-                              <time
-                                dateTime={new Date(
-                                  lastUpdatedAt * 1000,
-                                ).toISOString()}
-                                className={styles.docLastUpdatedAt}>
-                                {new Date(
-                                  lastUpdatedAt * 1000,
-                                ).toLocaleDateString()}
-                              </time>
-                              {lastUpdatedBy && ' '}
-                            </>
-                          )}
-                          {lastUpdatedBy && (
-                            <>
-                              by <strong>{lastUpdatedBy}</strong>
-                            </>
-                          )}
-                          {process.env.NODE_ENV === 'development' && (
-                            <div>
-                              <small>
-                                {' '}
-                                (Simulated during dev for better perf)
-                              </small>
-                            </div>
-                          )}
-                        </small>
-                      </em>
-                    </div>
+                    <LastUpdated
+                      lastUpdatedAt={lastUpdatedAt}
+                      formattedLastUpdatedAt={formattedLastUpdatedAt}
+                      lastUpdatedBy={lastUpdatedBy}
+                    />
                   )}
                 </div>
               </div>

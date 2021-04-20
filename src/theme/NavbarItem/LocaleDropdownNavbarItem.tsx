@@ -7,21 +7,21 @@
 
 import React from 'react';
 import DefaultNavbarItem from '@theme/NavbarItem/DefaultNavbarItem';
-import type { Props } from '@theme/NavbarItem/LocaleDropdownNavbarItem';
+import type {Props} from '@theme/NavbarItem/LocaleDropdownNavbarItem';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
-import { useAlternatePageUtils } from '@docusaurus/theme-common';
+import {useAlternatePageUtils} from '@docusaurus/theme-common';
 import IconIntl from './IconIntl';
 
 import styles from './styles.module.scss';
 
 export default function LocaleDropdownNavbarItem({
-                                                   mobile,
-                                                   dropdownItemsBefore,
-                                                   dropdownItemsAfter,
-                                                   ...props
-                                                 }: Props): JSX.Element {
+  mobile,
+  dropdownItemsBefore,
+  dropdownItemsAfter,
+  ...props
+}: Props): JSX.Element {
   const {
-    i18n: { currentLocale, locales, localeConfigs },
+    i18n: {currentLocale, locales, localeConfigs},
   } = useDocusaurusContext();
   const alternatePageUtils = useAlternatePageUtils();
 
@@ -41,6 +41,7 @@ export default function LocaleDropdownNavbarItem({
       target: '_self',
       autoAddBaseUrl: false,
       className: locale === currentLocale ? 'dropdown__link--active' : '',
+      style: {textTransform: 'capitalize'},
     };
   });
 
