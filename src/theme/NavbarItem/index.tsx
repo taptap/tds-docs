@@ -7,9 +7,9 @@
 
 import React from 'react';
 import DefaultNavbarItem from '@theme/NavbarItem/DefaultNavbarItem';
+import LocaleDropdownNavbarItem from '@theme/NavbarItem/LocaleDropdownNavbarItem';
 import SearchNavbarItem from '@theme/NavbarItem/SearchNavbarItem';
 import type {Props} from '@theme/NavbarItem';
-import LocaleDropdownNavbarItem from '@theme/NavbarItem/LocaleDropdownNavbarItem';
 
 const NavbarItemComponents = {
   default: () => DefaultNavbarItem,
@@ -19,13 +19,13 @@ const NavbarItemComponents = {
   // Need to lazy load these items as we don't know for sure the docs plugin is loaded
   // See https://github.com/facebook/docusaurus/issues/3360
   docsVersion: () =>
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
     require('@theme/NavbarItem/DocsVersionNavbarItem').default,
   docsVersionDropdown: () =>
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
     require('@theme/NavbarItem/DocsVersionDropdownNavbarItem').default,
   doc: () =>
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // eslint-disable-next-line @typescript-eslint/no-var-requires, global-require
     require('@theme/NavbarItem/DocNavbarItem').default,
 } as const;
 
