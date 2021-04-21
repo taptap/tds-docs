@@ -21,8 +21,8 @@ module.exports = {
         'sdk/tap-fun-moment',
         'sdk/tap-fun-usertest',
         'sdk/tap-fun-paysdk',
-        'tap-fun-alive',
-        'tap-fun-dlc'
+        'sdk/tap-fun-alive',
+        'sdk/tap-fun-dlc'
       ],
     },
     {
