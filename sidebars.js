@@ -8,13 +8,7 @@ module.exports = {
     },
 
     'pro/pro-in',
-    {
-      快速开始: [
-        'sdk/tap-android',
-        'sdk/tap-ios',
-        'sdk/tap-unity'
-      ],
-    },
+    'sdk/tap-quickstart',
     {
       功能介绍: ['sdk/tap-fun-login',
         'sdk/tap-fun-db',

@@ -4,8 +4,7 @@ title: 登录功能
 sidebar_label: 登录
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+
 import MultiLang from '@theme/MultiLang';
 
 本文主要介绍登录的使用方式，详细介绍请参考 [登录产品介绍](/pro/pro-login)
