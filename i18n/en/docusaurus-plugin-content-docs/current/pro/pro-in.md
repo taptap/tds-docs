@@ -23,7 +23,7 @@ After turning on, you will need to configure the platform information which shou
 Download TapTap SDK and integrate it into your application. Then refer to the documents to call the API to implement the TapTap login function.
 
 TapTap SDK supports TapTap authorized login in your native application. For users who have not installed TapTap yet, they may log in on an inline Webview authorization page.  
-See [Quick Start](/sdk/tap-unity) for SDK integration steps.
+See [Quick Start](/sdk/) for SDK integration steps.
 
 <!-- ## 四、开始测试
 如需要测试SDK功能，可以[点击下载](/res/TapSDK测试用例.xlsx)测试用例 -->

@@ -8,7 +8,7 @@ sidebar_label: 名词解释
 是一个游戏实体包在 TapTap 开发者中心的唯一身份标识，TapTap 通过 Client ID 来鉴别游戏包的身份  
 Client ID 获取位置如 [图示](/img/tap_clientid.png)  
 ## token
-每次登录后，都会在 [LoginSuccess](tap-unity#7-注册回调) 回调里面返回 AccessToken， AccessToken 是用户本次授权的唯一标识。  
+每次登录后，都会在 [LoginSuccess](/sdk#登录回调) 回调里面返回 AccessToken， AccessToken 是用户本次授权的唯一标识。  
 每次登录返回 AccessToken 会不一样，logout 后自动清理
 
 ## 玩家

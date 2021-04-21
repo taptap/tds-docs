@@ -15,7 +15,7 @@ TapTap Login is an authorized login system built on the OAuth2.0 protocol. Devel
 For single-player games, developers can access only the client login (it is recommended to store the data to its own server). For multiplayer games, developers need to access the server to save user data. See [Server Documents](/api/service) for details.
 
 ### 3\. Implement Login
-See [Quick Start](/sdk/tap-unity) on how to implement TapTap Login.  
+See [Quick Start](/sdk/) on how to implement TapTap Login.  
 
 ### 4\. Example
 ![](/img/tap_taploginview.png)
