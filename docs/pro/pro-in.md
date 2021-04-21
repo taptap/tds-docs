@@ -31,7 +31,7 @@ import {Highlight} from '../component';
 下载 TapTap SDK 集成到应用中，再按照技术对接文档调用 API，即可实现 TapTap 登录功能。
 
 TapTap SDK 支持唤起 TapTap 原生应用授权登录。用户未安装 TapTap 客户端时，采用内嵌 Webview 授权登录的方式。  
-SDK 集成步骤请参考 [快速开始](/sdk/tap-unity)。
+SDK 集成步骤请参考 [快速开始](/sdk/)。
 
 <!-- ## 四、开始测试
 如需要测试SDK功能，可以[点击下载](/res/TapSDK测试用例.xlsx)测试用例 -->
