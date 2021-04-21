@@ -63,7 +63,6 @@ public static void Login (LoginType loginType, string[] permissions);
 LoginType.TAPTAP | TapTap 登录
 
 </>
-
 <>
 
 ```java
@@ -80,7 +79,6 @@ public static void login(Activity activity, @LoginType.ThirdPartyType int type, 
 0 | TapTap 登录
 
 </>
-
 <>
 
 ```objectivec
