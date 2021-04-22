@@ -104,9 +104,7 @@ TapBootstrap.Login(loginType, new string[] { "public_profile" });
 ```
 
 ```java
-// 登陆类型：固定0 表示TapTap登陆
-// 本例使用TapTap登陆
-TapBootstrap.login(MainActivity.this, LoginType.TAPTAP);
+TapBootstrap.login(MainActivity.this, LoginType.TAPTAP, "public_profile");
 ```
 
 ```objectivec  
@@ -116,7 +114,7 @@ TapBootstrapLoginType loginType = TapBootstrapLoginTypeTapTap;
 
 </MultiLang>
 
-上述代码示例中，登录类型固定为 TapTap 登录。
+上述代码示例中，登录类型固定为 TapTap 登录，权限固定为 `public_profile`。
 
 ## 登出
 

@@ -497,7 +497,7 @@ TapBootstrap.Login(loginType, new string[] { "public_profile" });
  * @param activity 当前Activity
  * @param @param LoginType.TAPTAP
  */
-TapBootstrap.login(MainActivity.this, LoginType.TAPTAP);
+TapBootstrap.login(MainActivity.this, LoginType.TAPTAP, "public_profile");
 ```
 
 ```objectivec
