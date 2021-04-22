@@ -60,8 +60,8 @@ module.exports = {
               withRef: true,
               // hack for i18n
               i18nHref: {
-                'zh-Hans': 'https://www.taptap.com/developer/location_page?force_region=CN&redirect_url=https%3A%2F%2Fwww.taptap.com%2F',
-                en: 'https://www.taptap.com/developer/location_page?force_region=US&redirect_url=https%3A%2F%2Fwww.taptap.com%2F'
+                'zh-Hans': 'https://www.taptap.com/developer/location_page?force_region=CN&redirect_url=https://www.taptap.com/about-us/brand-resources',
+                en: 'https://www.taptap.com/developer/location_page?force_region=US&redirect_url=https://www.taptap.com/about-us/brand-resources'
               },
             },
             {

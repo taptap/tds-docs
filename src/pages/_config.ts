@@ -41,7 +41,7 @@ export const entryList: (localePath: string) => Array<Entry> = (localePath: stri
       links: [
         {
           label: '品牌素材库',
-          href: isIntl ? 'https://www.taptap.com/developer/location_page?force_region=US&redirect_url=https%3A%2F%2Fwww.taptap.com%2F' : 'https://www.taptap.com/developer/location_page?force_region=CN&redirect_url=https%3A%2F%2Fwww.taptap.com%2F',
+          href: isIntl ? 'https://www.taptap.com/developer/location_page?force_region=US&redirect_url=https://www.taptap.com/about-us/brand-resources' : 'https://www.taptap.com/developer/location_page?force_region=CN&redirect_url=https://www.taptap.com/about-us/brand-resources',
         },
         {
           label: 'SDK工具包',
