@@ -465,19 +465,19 @@ TapBootstrap.GetAccessToken((accessToken, error) => {
 
 ```java
 if (TapBootstrap.getCurrentToken() == null) {
-    //TODO 用户未登录
+    // 未登录
 } else {
-    //TODO 用户已登录
+    // 已登录
 }
 ```
 
 ```objectivec
 AccessToken *accessToken = [TapBootstrap getCurrentToken];
-   if(accessToken == nil){
-       //未登录，请登录
-   }else{
-       //已经登录
-   }
+if (accessToken == nil) {
+    // 未登录
+} else {
+    // 已登录
+}
 ```
 
 </MultiLang>
@@ -497,7 +497,7 @@ TapBootstrap.Login(loginType, new string[] { "public_profile" });
  * @param activity 当前Activity
  * @param @param LoginType.TAPTAP
  */
-TapBootstrap.login(MainActivity.this, LoginType.TAPTAP);
+TapBootstrap.login(MainActivity.this, LoginType.TAPTAP, "public_profile");
 ```
 
 ```objectivec
