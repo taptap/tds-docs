@@ -111,20 +111,20 @@ mConfig.orientation = TapMomentOrientationDefault;
 
 
 :::note
-打开动态页面时，请先屏蔽游戏自身的声音，避免与动态内视频声音产生重合。
+打开动态页面时，请先屏蔽游戏自身的声音，以免干扰动态内的视频声音。
 
 如需要动态能支持横竖屏随设备自动旋转，需要游戏自身能支持横竖屏。
 
-如前所述，打开动态页面后别忘了清除动态页面入口处的小数点。
+如前所述，打开动态页面后别忘了清除动态页面入口处的小红点。
 :::
 
-动态页面的背景图可以配置，[点击查看](/img/tap_moment_bg.png)具体配置位置。
+动态页面的背景图可以配置，[点击查看图解](/img/tap_moment_bg.png)。
 背景图需要人工审核后才能生效，请预留充足的时间。
 
 ## 关闭动态页面
 
 玩家可以在动态页面退出。
-但在特定场景下，游戏可以主动关闭动态页面。
+但在特定场景下，游戏可能需要主动关闭动态页面。
 
 比如，玩家排位等待结束，准备进入对局时提示玩家关闭动态页面，玩家确认后关闭。
 
@@ -187,7 +187,7 @@ TapMoment.Publish(Orientation.ORIENTATION_LANDSCAPE, images, content);
 
 ```java
 int orientation = TapMoment.ORIENTATION_PORTRAIT;
-String content = "发布动态内容描述";
+String content = "描述";
 String[] imagePaths = new String[]{"content://hello.jpg", "/sdcard/world.jpg"};
 TapMoment.publish(orientation, imagePaths, content);
 ```
