@@ -7,7 +7,7 @@ import {Highlight} from '../component';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 ## 1.TapTap 登录入口内，信息的构成形式
-由于 TapTap 没有图形符号标志，因此 TapTap 登录入口的信息构成形式，应该使用 "TapTap" 标志 + "登录"文字的方式。
+TapTap 登录入口的信息构成形式，应该使用 "TapTap" 标志 + "登录"文字的方式。
 
 ✅ 正确入口信息构成 |- | ❌ 错误入口信息构成 | -|
 | ------ | ------ |------ |------ |

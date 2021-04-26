@@ -9,12 +9,12 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 ## 1. Information Displayed on TapTap Login Button
 
-The TapTap login button should be composed of the TapTap logo and login text. TapTap does not specify the icon.
+The TapTap login button should be composed of the TapTap logo and the `Log in with TapTap` text.
 ​
 
 ✅ Right |- | ❌ Wrong | -|
 | ------ | ------ |------ |------ |
-| <Highlight color="#15c5ce">TapTap logo + login text</Highlight>   |![](/img/design-1.1.png) |<Highlight color='#f00'>Do not use the logo following the text ‘TapTap Login’</Highlight>  | ![](/img/design-1.2.png)
+| <Highlight color="#15c5ce">Tap logo + the ‘Login with TapTap’ text</Highlight>   |![](/img/design-1.1-en.png) |<Highlight color='#f00'>Do not use the TapTap logo following the ‘Login with TapTap’ text</Highlight> | ![](/img/design-1.2-en.png)
 
 ## 2. Design Guidelines for TapTap Logo
 ​
@@ -26,16 +26,16 @@ When adding colors to the TapTap logo, you will have to use the designated Blue-
 
 ✅ Right |- | ❌ Wrong | -|
 | ------ | ------ |------ |------ |
-| <Highlight color="#15c5ce">1. Minor adjustments are allowed but they have to be based on the designated Blue-Green brand color of TapTap.<br/>2. In dark background, you can use TapTap Logo in reverse white. </Highlight> |![](/img/design-2.1.1.png)<br/> ![](/img/design-2.1.2.png)| <Highlight color='#f00'>You must not change the designated brand color of TapTap when the logo needs a fill color.</Highlight> | ![](/img/design-2.1.3.png)
+| <Highlight color="#15c5ce">1. Minor adjustments are allowed but they have to be based on the designated Blue-Green brand color of TapTap.<br/>2. In dark background, you can use TapTap Logo in reverse white. </Highlight> |![](/img/design-2.1.1-en.png)<br/> ![](/img/design-2.1.2-en.png)| <Highlight color='#f00'>You must not change the designated brand color of TapTap when the logo needs a fill color.</Highlight> | ![](/img/design-2.1.3-en.png)
 
 ### 2.2 Guidelines for Customizing TapTap Logo
-When the Login SDK is integrated into different games, the TapTap login button will need to fit in the UI of the game. Therefore, developers are allow to make some minor customization of TapTap Logo. But such adjustments cannot affect TapTap’s brand recognition. **No restrictions on frame, background, font of the login text, but ‘TapTap’ can only be based on the svg provided.**
+When the Login SDK is integrated into different games, the TapTap login button will need to fit in the UI of the game. Therefore, developers are allowed to make some minor customization of the TapTap Logo. But such adjustments cannot affect TapTap’s brand recognition. **No restrictions on frame, background, font of the login text, but ‘TapTap’ can only be based on the svg provided.**
 
 
 
 ✅ Right |- | ❌ Wrong | -|
 | ------ | ------ |------ |------ |
-| <Highlight color="#15c5ce">1.Keep the design of TapTap’s Logo.<br/>2. Shades are allowed.<br/>3. Texture effect is allowed.<br/>4. Outline effect is allowed.  </Highlight> |![](/img/design-2.2.1.png)<br/> ![](/img/design-2.2.2.png)| <Highlight color='#f00'>1.The design of TapTap Logo cannot be changed.<br/>2\. TapTap Logo cannot be blurred.<br/>3\. TapTap Logo cannot be replaced by other content.</Highlight> | ![](/img/design-2.2.3.png)<br/>![](/img/design-2.2.4.png)<br/>![](/img/design-2.2.5.png)
+| <Highlight color="#15c5ce">1.Keep the design of TapTap’s Logo.<br/>2. Shades are allowed.<br/>3. Texture effect is allowed.<br/>4. Outline effect is allowed.  </Highlight> |![](/img/design-2.2.1-en.png)<br/> ![](/img/design-2.2.2-en.png)| <Highlight color='#f00'>1.The design of TapTap Logo cannot be changed.<br/>2\. TapTap Logo cannot be blurred.<br/>3\. TapTap Logo cannot be replaced by other content.</Highlight> | ![](/img/design-2.2.3-en.png)<br/>![](/img/design-2.2.4-en.png)<br/>![](/img/design-2.2.5-en.png)
 
 <!-- <table>
 <tbody>
