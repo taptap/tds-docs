@@ -53,13 +53,13 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 
 ```json
 "dependencies":{
-//登录部分
+// 登录
 "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#2.0.0",
 "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#2.0.0",
 "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#2.0.0",
-//动态部分
+// 动态
 "com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#2.0.0",
-//TapDB部分
+// 数据收集 
 "com.taptap.tds.tapdb": "https://github.com/TapTap/TapDB-Unity.git#2.0.0",
 }
 ```
@@ -115,13 +115,13 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
     <key>Apple_SignIn_Enable</key>
     <string>false</string>
     <key>NSPhotoLibraryUsageDescription</key>
-    <string>App 需要你的同意，才能访问相册 </string>
+    <string>说明为何应用需要此项权限</string>
     <key>NSCameraUsageDescription</key>
-    <string>App 需要你的同意，才能访问相机 </string>
+    <string>说明为何应用需要此项权限</string>
     <key>NSMicrophoneUsageDescription</key>
-    <string>App 需要你的同意，才能访问麦克风 </string>
+    <string>说明为何应用需要此项权限</string>
     <key>NSUserTrackingUsageDescription</key>
-    <string>App需要追踪你的信息</string>
+    <string>说明为何应用需要此项权限</string>
 </dict>
 </plist>
 ```
@@ -129,9 +129,9 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 </>
 <>
 
-1. [点击下载 TapSDK_Android_v2.0.0.zip](/sdk/tap-download)，将 SDK 包导入到项目 **project > app > libs** 目录下。
+1. [点击下载 TapSDK_Android_v2.0.0.zip](/sdk/tap-download)，将 SDK 包导入到项目 `project/app/libs` 目录下。
  
-2. 打开项目的 **project > app > build.gradle** 文件，添加 gradle 配置如下：
+2. 打开项目的 `project/app/build.gradle` 文件，添加 gradle 配置如下：
     
     ```java
     repositories{  
@@ -172,7 +172,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 
 2. 直接拖拽 [下载的 TapSDK_iOS_v2.0.0.zip](/sdk/tap-download) 到项目目录即可。
 
-3. 下载目录包含的以下资源文件视需要导入：
+3. 视需要导入下载的资源文件：
 
     - 必选：TapTap 启动器、基础库、登录
 
@@ -231,28 +231,28 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 
 **TapTap 内嵌动态功能需要相册、相机、麦克风访问权限，数据收集功能需要 IDFA 权限。**
 
-因此，如果游戏加入了 TapTap 内嵌动态功能或数据收集功能，那么需要在 `info.plist` 添加如下配置（可根据项目需要替换授权文案）：
+因此，如果游戏加入了 TapTap 内嵌动态功能或数据收集功能，那么需要在 `info.plist` 添加如下配置（请替换授权文案）：
 
 ```xml
 <!-- 相册 -->
 <key>NSPhotoLibraryUsageDescription</key>
-<string>App 需要你的同意，才能访问相册 </string>
+<string>说明为何应用需要此项权限</string>
 <!-- 相机 -->
 <key>NSCameraUsageDescription</key>
-<string>App 需要你的同意，才能访问相机 </string>
+<string>说明为何应用需要此项权限</string>
 <!-- 麦克风 -->
 <key>NSMicrophoneUsageDescription</key>
-<string>App 需要你的同意，才能访问麦克风 </string>
+<string>说明为何应用需要此项权限</string>
 <!-- IDFA -->
 <key>NSUserTrackingUsageDescription</key>
-<string>App需要追踪你的信息</string>
+<string>说明为何应用需要此项权限</string>
 ```
 
 ### 配置跳转 TapTap 应用
 
-用户无 TapTap 应用时，默认会打开 Webview 登录。
+用户无 TapTap 应用时，默认会通过 WebView 登录。
 
-1. 打开 `info.plist`，添加如下配置（请替换 `clientID` 为你在控制台获取的 Client ID）。
+1. 打开 `info.plist`，添加如下配置（请替换 `clientID` 为你在控制台获取的 Client ID）：
 
     ![](/img/tap_ios_info.png)
 
@@ -280,7 +280,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 
 2. 根据项目中是否有 `SceneDelegate.m` 文件分两种情况：
 
-   - 如果有 `SceneDelegate.m`，添加如下代码到 `SceneDelegate.m` 文件即可。
+   - 如果有 `SceneDelegate.m`，在其中添加如下代码即可：
 
       ```objectivec
       #import <TapBootstrapSDK/TapBootstrapSDK.h>
@@ -289,7 +289,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
       }
       ```
 
-   - 如果没有 `SceneDelegate.m`，只有 `AppDelegate.m`，请添加如下代码到 `AppDelegate.m` 文件。
+   - 如果没有 `SceneDelegate.m`，请添加如下代码到 `AppDelegate.m` 文件：
 
       ```objectivec
       - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
@@ -343,7 +343,7 @@ config.region = TapSDKRegionTypeCN;
 
 ## 登录回调
 
-注册登录回调，登录结果会通过回调告知前端。
+注册登录回调，以接收登录结果。
 
 <MultiLang>
 
@@ -494,7 +494,7 @@ TapBootstrap.Login(loginType, new string[] { "public_profile" });
 
 ```java
 /**
- * @param activity 当前Activity
+ * @param activity 当前 Activity
  * @param @param LoginType.TAPTAP
  */
 TapBootstrap.login(MainActivity.this, LoginType.TAPTAP, "public_profile");
