@@ -32,7 +32,21 @@ import {Highlight,Link,ImageLink} from '../component';
 
 ### **3. 申请接入SDK**
 
-具有<Highlight color='#00b9c8'>更新游戏</Highlight>权限的管理员或者<Highlight color='#00b9c8'>主管理员</Highlight>，前往开发者中心   >>   选择<Highlight color='#00b9c8'>SDK控制台 </Highlight>   >> 选择<Highlight color='#00b9c8'>购买激活 SDK</Highlight>   >>   选择<Highlight color='#00b9c8'>申请SDK</Highlight>，填写游戏，并提交审核。审核通过后，可以进行之后的<Highlight color='#00b9c8'>配置</Highlight>。  
+可将接入付费游戏需求邮件发送至运营部邮箱 [operation@taptap.com](mailto:operation@taptap.com) 。
+TapTap 运营人员预计将在收到邮件后的2个工作日内为你进行操作。邮件发送后，你也可以主动联系对接的运营，加速相关流程。
+
+**【 邮件格式 】**  
+> 
+**【 邮件格式 】**  
+> **<u>邮件主题</u>**  
+> 付费游戏申请  -  XXX 游戏名称  或  XXX 厂商名称   
+
+> ---  
+
+> 申请厂商链接：  
+> 申请游戏名称与链接：（如游戏未上线，无需填写）
+> 申请人联系方式：  
+  
 
 ### **4. 要求**  
 请确保在 TapTap 进行付费下载的游戏安装包包名带有 TapTap 或 taptap 后缀。  
