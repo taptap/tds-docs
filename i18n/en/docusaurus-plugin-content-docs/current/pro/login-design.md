@@ -14,7 +14,7 @@ The TapTap login button should be composed of the TapTap logo and the `Log in wi
 
 ✅ Right |- | ❌ Wrong | -|
 | ------ | ------ |------ |------ |
-| <Highlight color="#15c5ce">Tap logo + the ‘Login with TapTap’ text</Highlight>   |![](/img/design-1.1-en.png) |<Highlight color='#f00'>Do not use the TapTap logo following the ‘Login with TapTap’ text</Highlight> | ![](/img/design-1.2-en.png)
+| <Highlight color="#15c5ce">Tap logo + the ‘Log in with TapTap’ text</Highlight>   |![](/img/design-1.1-en.png) |<Highlight color='#f00'>Do not use the TapTap logo following the ‘Log in with TapTap’ text</Highlight> | ![](/img/design-1.2-en.png)
 
 ## 2. Design Guidelines for TapTap Logo
 ​
