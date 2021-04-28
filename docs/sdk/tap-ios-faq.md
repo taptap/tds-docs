@@ -12,7 +12,7 @@ a、没有在 TapTap 开发者中心开启登陆功能;
 b、由于 TapTap 客户端授权登陆, 会对 Client ID、BundleID 进行校验, 其中任何一项配置错误都会导致登陆失败。
 
 c、登录时报 404 或者 405 
-请检查 `TapConfig` 的区域配置，国内请配置为 TapSDKRegionTypeCN
+请检查 `TapConfig` 的区域配置，中国大陆请配置为 TapSDKRegionTypeCN
 ```c#
 // TapSDK 初始化
 TapConfig *config = TapConfig.new;

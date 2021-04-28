@@ -319,7 +319,7 @@ Initialize TapSDK with required application configuration information (Client ID
 <MultiLang>
 
 ```cs
-TapConfig tapConfig = new TapConfig("your-client-id", true); // true: Mainland China, false: International
+TapConfig tapConfig = new TapConfig("your-client-id", false); // true: Mainland China, false: International
 TapBootstrap.Init(tapConfig);
 ```
 
@@ -327,7 +327,7 @@ TapBootstrap.Init(tapConfig);
 TapConfig tapConfig = new TapConfig.Builder()
                 .withAppContext(getApplicationContext())
                 .withClientId ("clientId") // You can find the Client ID in TapTap Developer Center.
-                .withRegionType (TapRegionType.CN)// TapRegionType.CN: Mainland China, TapRegionType.IO: International
+                .withRegionType (TapRegionType.IO)// TapRegionType.CN: Mainland China, TapRegionType.IO: International
                 .build();
 TapBootstrap.init(MainActivity.this, tapConfig);  
 ```
@@ -335,7 +335,7 @@ TapBootstrap.init(MainActivity.this, tapConfig);
 ```objectivec
 TapConfig *config = TapConfig.new;
 config.clientId = @"clientId";
-config.region = TapSDKRegionTypeCN;
+config.region = TapSDKRegionTypeCN; // TapRegionTypeCN: Mainland China, TapRegionTypeIO: International
 [TapBootstrap initWithConfig:config];
 ```
 
