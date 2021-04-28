@@ -1,17 +1,17 @@
 ---
 id: tap-fun-moment
-title: Moment
-sidebar_label: Moment
+title: Embedded Moments
+sidebar_label: Embedded Moments
 ---
 
 
 import MultiLang from'@theme/MultiLang';
 
-This guide describes how to integrate [TapTap Moment](/pro/pro-moment) to your game.
+This guide describes how to integrate [TapTap Embedded Moments](/pro/pro-moment) to your game.
 
 ## Set up Callback
 
-Set up callbacks to receive Moment state changes.
+Set up callbacks to receive state changes of Embedded Moments.
 
 <MultiLang>
 
@@ -43,24 +43,24 @@ TapMoment.setCallback(new TapMoment.TapMomentCallback() {
 
 </MultiLang>
 
-The code parameter in the callback method represents the event type. Currently, the following callback types are supported:
+The code parameter in the callback method represents the event type. The following callback types are supported:
 
- Callback          | Callback Value | Description       |
+ Callback         | Callback Value | Description       |
  ----------- | --- | -------- |
- CALLBACK_CODE_PUBLISH_SUCCESS       | 10000   | Moment published successfully.     |
- CALLBACK_CODE_PUBLISH_FAIL     | 10100   | Failed to publish the moment.     |
- CALLBACK_CODE_PUBLISH_CANCEL       | 10200   | The moment publishing view is closed.     |
- CALLBACK_CODE_GET_NOTICE_SUCCESS | 20000   | Retrieve new messages successfully. |
- CALLBACK_CODE_GET_NOTICE_FAIL | 20100   | Failed to retrieve new messages. |
- CALLBACK_CODE_MOMENT_APPEAR | 30000   | The moment view is opened. |
- CALLBACK_CODE_MOMENT_DISAPPEAR | 30100   | The moment view is closed. |
- CALLBACK_CODE_ClOSE_CANCEL | 50000   | Canceling to close moment view. (The cancel button in the pop-up view is clicked.) |
- CALLBACK_CODE_ClOSE_CONFIRM | 50100   | Confirming to close moment view. (The confirm button in the pop-up view is clicked.) |
- CALLBACK_CODE_LOGIN_SUCCESS | 60000   | Successfully signed in in the moment view. |
+ CALLBACK\_CODE\_PUBLISH\_SUCCESS       | 10000   | Moment published successfully.    |
+ CALLBACK\_CODE\_PUBLISH\_FAIL     | 10100   | Failed to publish the moment.     |
+ CALLBACK\_CODE\_PUBLISH\_CANCEL       | 10200   | The Moment editor is closed.     |
+ CALLBACK\_CODE\_GET\_NOTICE\_SUCCESS | 20000   | New messages retrieved successfully. |
+ CALLBACK\_CODE\_GET\_NOTICE\_FAIL | 20100   | Failed to retrieve new messages. |
+ CALLBACK\_CODE\_MOMENT\_APPEAR | 30000   | The moment view is opened. |
+ CALLBACK\_CODE\_MOMENT\_DISAPPEAR | 30100   | The moment view is closed. |
+ CALLBACK\_CODE\_ClOSE\_CANCEL | 50000   | Cancel closing moment view. (The cancel button in the pop-up is clicked.)
+ CALLBACK\_CODE\_ClOSE\_CONFIRM | 50100   | Confirm closing the moment view. (The confirm button in the pop-up is clicked.) |
+ CALLBACK\_CODE\_LOGIN\_SUCCESS | 60000   | Successfully logging in on the Moment view. |
 
-## Fetching Notifications
+## Fetch Notifications
 
-Invoke the fetching notifications method periodically. When new messages arrive, a small red dot can be displayed on the TapTap Moment entry point, reminding the user to check for new messages.
+Invoke the fetching notifications method regularly so that when new messages arrives, a small red dot can be displayed on the TapTap Moment portal, reminding the user to check for new messages.
 
 <MultiLang>
 
@@ -78,18 +78,18 @@ TapMoment.fetchNotification();
 
 </MultiLang>
 
-The result will be returned in the callback specified at the beginning of this guide. If the `code` value is `CALLBACK_CODE_GET_NOTICE_SUCCESS` ( `20000` ), then the retrieving succeeded. If the value is `CALLBACK_CODE_GET_NOTICE_FAIL` ( `20100` ), then the retrieving failed.
-When successfully retrieving the notifications, `msg` will be the number of new messages, and `0` means that there are no new messages.
+The result will be returned in the callback specified at the beginning of this guide. If the `code value` is `CALLBACK_CODE_GET_NOTICE_SUCCESS` ( `20000` ), then the messages are successfully retrieved. If the value is `CALLBACK_CODE_GET_NOTICE_FAIL` ( `20100` ), then the messages failed to be retrieved.
+When the messages are fetched successfully, `msg` will be the number of new messages, while `0` means that there are no new messages.
 
 :::tip
-In order to make it easier for players to check for their friends' moments, game announcements, etc., we recommend to place the TapTap Moment entry point in a conspicuous position, and to invoke the fetching notifications method **once every minute**.
+In order to make it easier for players to check for their friends' Moments and other messages, we recommend to place the TapTap Moment portal in a noticeable location. We also recommend you to invoke the fetching notifications method **once every minute**.
 
-When fetching the message notifications, if there is no new message ( `msg` is `0` ), then you need to clear the small red dot on the user interface.
-Similarly, after the player opened the TapTap Moment view, you also need to clear the small red dot.
+When fetching the message notifications, if there is no new message ( `msg` is `0` ), you will need to clear the small red dot on the user interface.
+Similarly, after the player opened TapTap Moments, you will also need to clear the red dot.
 :::
-## TapTap Moment View
+## Display TapTap Moments
 
-Let’s see how to display the TapTap Moment view. In this view, players can view and post moments.
+Embed the TapTap Moments in your game so  players can view and post Moments without leaving.
 
 <MultiLang>
 
@@ -111,27 +111,27 @@ mConfig.orientation = TapMomentOrientationDefault;
 
 
 :::note
-When opening the TapTap Moment view, please mute the game's own sound first to avoid interfering the video sound of the moment.
+When opening the TapTap Moments, mute the game's own sound first to avoid interfering the sound of videos in Moments.
 
-If you want the moment view to auto rotate itself according to the orientation of the device, the game itself needs to support both landscape and portrait modes.
+If you want the Moments view to auto-rotate following the screen of the device, the game itself needs to support both landscape and portrait modes.
 
-As mentioned above, do not forget to clear the red dot at the moment view entry point after opening the moment view.
+As mentioned above, do not forget to clear the red dot at the Moments portal after the user opens the Moments.
 :::
 
-The background image of the moment view is configurable. [Click here to see the illustration](/img/tap_moment_bg.png). 
-The background image will take effect after reviewed. Make sure to allow sufficient time for manual review.
+The background image of the moment view is configurable. [Click here to see the details](/img/tap_moment_bg.png).
+The background image will only be effective after passing the review. Make sure to leave sufficient time for manual review in your plan.
 
-## Close TapTap Moment View
+## Close TapTap Moments
 
-Players can exit right in the TapTap Moment view.
-However, under certain scenarios, the game itself may also need to close the moment view.
+Players can exit the TapTap Moments.
+However, under certain scenarios, the game itself may also need to close the Moments.
 
-For example, when the player is ready to start the battle, the game can prompt the player to close the moment view. And the moment view will be closed upon the player’s confirmation.
+For example, when the player is ready to start the battle, the game may remind the player to close the Moments, which will be closed after player confirms.
 
 <MultiLang>
 
 ```cs
-TapMoment.Close("Prompt", "Prepare yourself for battle.");
+TapMoment.Close("Prompt", "Prepare yourself for the battle.");
 ```
 
 ```java
@@ -146,8 +146,8 @@ TapMoment.closeWithConfirmWindow("Prompt", "Prepare yourself for battle.");
 
 The user's choice will be returned via callback:
 
-- `CALLBACK_CODE_ClOSE_CANCEL` (50000) means that the player clicked "Cancel" and chose to not close the moment view.
-- `CALLBACK_CODE_ClOSE_CONFIRM` (50100) means that the player clicked "Confirm" and chose to close the moment view.
+- `CALLBACK_CODE_ClOSE_CANCEL` (50000) means that the player has clicked "Cancel" and chose to not close the Moments.
+- `CALLBACK_CODE_ClOSE_CONFIRM` (50100) means that the player clicked "Confirm" and chose to close the Moments.
 
 If you need to close the moment view without confirmation:
 
@@ -170,17 +170,17 @@ TapMoment.close();
 ## One-Click Publish
 
 :::info
-This is optional. You need to decide whether your game needs this feature based on your design.
+This is optional. You need to decide whether to integrate it based on your own needs.
 :::
 
-We recommend to let players post new moments directly in the moment view.
-However, the SDK also provides an API for publish a new moment. This allows for the “one-click publish” feature required by some games.
-A moment includes single or multiple pictures and corresponding text content.
+We recommend to let players post new Moment directly in the Embedded Moments.
+However, the SDK also provides an API for publish a new Moment. This will support the “one-click publish” feature required by some games.
+This type of Moment can include single or multiple images and the corresponding text.
 
 <MultiLang>
 
 ```cs
-string content = "I am the description";
+string content = "description";
 string[] images = {"imgpath01","imgpath02","imgpath03"};
 TapMoment.Publish(Orientation.ORIENTATION_LANDSCAPE, images, content);
 ```
@@ -205,6 +205,6 @@ postData.content = @"I am a picture description";
 </MultiLang>
 
 :::info
-Players can post both images and videos within the moment view.
-"One-click publish" only supports images.
+Players can post images and videos on the Moments.
+However, "One-click publish" only supports images.
 :::
