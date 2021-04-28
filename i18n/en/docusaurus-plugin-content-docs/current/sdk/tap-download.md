@@ -24,8 +24,6 @@ Click to download [icon.zip](/res/TapTapLoginButton.zip)
 ## SDK Add-ons
 
 SDK add-ons are optional.
-<!-- - 数美定制版 SDK [点击下载](/res/tap_wl_pri_release.aar)   -->
+
 - OAID SDK [oaid_sdk_1.0.23.aar](/res/tap_oaid_sdk_1.0.23.aar)
 
-<!-- #### 测试用例
-TapSDK 测试用例[点击下载](/res/TapSDK测试用例.xlsx) -->
