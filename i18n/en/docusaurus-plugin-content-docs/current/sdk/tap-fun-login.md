@@ -1,17 +1,17 @@
 ---
 id: tap-fun-login
-title: Sign-in
-sidebar_label: Sign-in
+title: Login
+sidebar_label: Login
 ---
 
 import MultiLang from'@theme/MultiLang';
 
-The [quick start](/sdk) guide briefly describes [how to integrate TapTap Sign-in to your game](/sdk#TapTap-登录). This is a detailed introduction to the [TapTap Sign-in function](/pro/pro-login/) of the TapSDK.
+The [Quick Start](/sdk) briefly describes [how to integrate TapTap Login to your game](/sdk#TapTap-登录). Here you can find the details about the [TapTap Login feature](/pro/pro-login/) of TapSDK.
 
-## Check the Sign-in Status
+## Check the Login Status
 
-Try to obtain the Access Token of the current user. If the Access Token is empty, the user is not logged in.
-Before invoking the loginmethod, check the sign-in status first. This avoids repeated logins.
+Obtain the Access Token of the current user. If the Access Token is empty, the user is not logged in.
+Before invoking the login method, check the login status first to avoids repeated logins.
 
 <MultiLang>
 
@@ -49,10 +49,10 @@ if (accessToken == nil) {
 
 ## Get User Information
 
-Get basic information of the currently logged-in user, such as the user ID, nickname, and avatar.
+Get basic information of the logged-in user, such as the user ID, nickname, and profile picture.
 
 :::caution
-Please only get user information when the user is logged in. If the user is not logged in, getting the user information regardless may cause abnormal behavior or program crash.
+Please only request user information when the user is logged in. If the user is not logged in, getting the user information may cause abnormality or crash of the program.
 :::
 
 <MultiLang>
@@ -82,7 +82,7 @@ TapBootstrap.getUser(new Callback<TapUser>() {
     if (error) {
         NSLog(@"Failed to get user information%@", error);
     } else {
-        NSLog(@"Get user information successfully%@", userInfo);
+        NSLog(@"User information received successfully%@", userInfo);
     }
 }];
 ```
@@ -90,10 +90,10 @@ TapBootstrap.getUser(new Callback<TapUser>() {
 </MultiLang>
 
 
-## Sign-in
+## Login
 
-TapSDK will first try to utilize the TapTap application to complete the sign-in process. When the TapTap application is not installed, it will use the built-in WebView.
-Please also check the [login button design guidelines](/pro/login-design.md).  
+TapSDK will first launch the TapTap application to complete the login process. When the TapTap application is not installed, it will use the built-in WebView.
+Please also refer to [Login Button Design Guidelines](/pro/login-design.md).  
 
 
 <MultiLang>
@@ -116,9 +116,9 @@ TapBootstrapLoginType loginType = TapBootstrapLoginTypeTapTap;
 
 In the above code sample, the login type is a fixed value (TapTap login), and the permission is also a fixed value (`public_profile`).
 
-## Sign Out
+## Log Out
 
-Signing out the user will clear the login cache.
+Logging out will clear the user’s login cache.
 
 <MultiLang>
 
