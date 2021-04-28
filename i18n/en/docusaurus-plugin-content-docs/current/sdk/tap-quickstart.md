@@ -6,17 +6,17 @@ slug: /sdk
 ---
 import MultiLang from '@theme/MultiLang';
 
-This quick start guide describes how to setup TapSDK and implement [TapTap sign-in.](/pro/pro-login)
+This guide describes how to setup TapSDK and implement [TapTap Login.](/pro/pro-login)
 
 :::note
-Check the [download page](/sdk/tap-download) for Unity, Android, and iOS demos.
+Go to [download](/sdk/tap-download) the demos of Unity, Android, and iOS .
 :::
 
-## Create an Application
-Please register a developer account at the [TapTap Developer Center](https://developer.taptap.com/) and create an application.
+## Create Application
+Register a developer account at the [TapTap Developer Center](https://developer.taptap.com/) and create an application.
 
 ## Download TapTap
-Click to download [the TapTap application](https://www.taptap.com/mobile)
+Click to download [TapTap Application](https://www.tap.io/mobile)
 
 ## Prerequisites
 
@@ -40,55 +40,55 @@ Click to download [the TapTap application](https://www.taptap.com/mobile)
 </>
 </MultiLang>
 
-## Project Setup
+## Setup
 
 <MultiLang>
 <>
 
-Depending on your project needs, you can choose to use Unity Package Manger or import the SDK manually.
+You can choose to use Unity Package Manger or import the SDK manually.
 
-### Using Unity Package Manager
+### Unity Package Manager
 
 Add the following dependencies in `Packages/manifest.json`:
 
 ```json
 "dependencies":{
-// Sign-in
+// Login
 "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#2.0.0",
 "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#2.0.0",
 "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#2.0.0",
 // Moment
 "com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#2.0.0",
-// Analytics 
+// Data Acquisition
 "com.taptap.tds.tapdb": "https://github.com/TapTap/TapDB-Unity.git#2.0.0",
 }
 ```
 
-[Click here](https://github.com/TapTap) to refer to the latest version number.
+Refer to the latest version number [here](https://github.com/TapTap).
 
-### Manual Import
+### Import Manually
 
-1. [Click here to download the TapSDK-UnityPackage.zip](/sdk/tap-download.md)and then unzip it.
+1. Download [TapSDK-UnityPackage.zip](/sdk/tap-download.md).
 
 2. In your Unity project, access **Assets > Import Packages > Custom Packages**.
 
-3. Import the interested packages to your project.
+3. Import the interested packages in TapSDK to your project according to your own needs.
    
-    - `TapTap_TapBootstrap.unitypackage` TapSDK Launcher (mandatory)
-    - `TapTap_TapCommon.unitypackag` TapSDK Foundation Library (mandatory)
-    - `TapTap_TapLogin.unitypackage` TapTap Sign-in (mandatory)
-    - `TapTap_TapMoment.unitypackage` TapTap Moment
-    - `TapTap_TapDB.unitypackage` Analytics
+    - `TapTap_TapBootstrap.unitypackage` TapSDK Launcher (required)
+    - `TapTap_TapCommon.unitypackag` TapSDK Foundation Library (required)
+    - `TapTap_TapLogin.unitypackage` TapTap Login (required)
+    - `TapTap_TapMoment.unitypackage` TapTap Embedded Moments
+    - `TapTap_TapDB.unitypackage` Data Acquisition
 
-Change Android and iOS related configurations afterwards.
+You will need to complete the configuration for Android and iOS afterward.
 
-### Android Configuration
+### Android 
 
 1. Add Android profile via **File > Build Settings**. 
 
     ![](/img/tap_unity_amanifest.png)
 
-2. Add the following code under Application Tag in the `Assets/Plugins/Android/AndroidManifest.xml` file.
+2. Add the following codes under Application Tag in the `Assets/Plugins/Android/AndroidManifest.xml` file.
 
     ```xml
     <activity
@@ -98,7 +98,7 @@ Change Android and iOS related configurations afterwards.
         android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
     ```
     
-### iOS Configuration
+### iOS 
 
 Create a `TDS-Info.plist` file under the `Assets/Plugins/iOS/Resource` directory. Then copy and paste the following code. Please replace the `ClientId` and the purpose strings accordingly.
 
@@ -129,7 +129,7 @@ Create a `TDS-Info.plist` file under the `Assets/Plugins/iOS/Resource` directory
 </>
 <>
 
-1. [Click here to download TapSDK_Android_v2.0.0.zip](/sdk/tap-download) and import the SDK package into the `project/app/libs` directory.
+1. Download [TapSDK_Android_v2.0.0.zip](/sdk/tap-download) and import the SDK package into the `project/app/libs` directory.
  
 2. Open the `project/app/build.gradle` file and edit the gradle configuration as follows:
     
@@ -141,12 +141,12 @@ Create a `TDS-Info.plist` file under the `Assets/Plugins/iOS/Resource` directory
     }  
     }  
     dependencies {  
-    ...  
-        implementation (name:'TapBootstrap_2.0.0', ext:'aar')  //  TapSDK Launcher (mandatory) 
-        implementation (name:'TapCommon_2.0.0', ext:'aar') //  TapSDK Foundation Library (mandatory) 
-		implementation (name:'TapLogin_2.5.4', ext:'aar') //  TapTap Sign-in (mandatory) 
-        executive (name:'TapMoment_2.0.0', ext:'aar') // TapTap Moment
-        name:'TapDB_3.0.2', ext:'aar') // Analytics
+      
+        implementation (name:'TapBootstrap_2.0.0', ext:'aar')  // Required: TapSDK Launcher 
+        implementation (name:'TapCommon_2.0.0', ext:'aar') // Required: TapSDK Foundation Library 
+		implementation (name:'TapLogin_2.5.4', ext:'aar') // Required: TapTap Login 
+        implementation (name:'TapMoment_2.0.0', ext:'aar') // TapTap Moment
+        implementation (name:'TapDB_3.0.2', ext:'aar') // Data Acquisition
     }  
     ```
  
@@ -156,7 +156,7 @@ Create a `TDS-Info.plist` file under the `Assets/Plugins/iOS/Resource` directory
     <uses-permission android:name="android.permission.INTERNET"></uses-permission>
     ```
 
-4. Extra configuration for outdated Android versions: 
+4. Extra configuration for older Android versions: 
 
     Add the following configuration if `targetSdkVersion < 29`:  
 
@@ -166,15 +166,15 @@ Create a `TDS-Info.plist` file under the `Assets/Plugins/iOS/Resource` directory
 </>
 <>
 
-### Import the SDK
+### Import SDK
 
-1. Select the project in Xcode, and then add `-ObjC` in **Build Settings > Other Linker Flags**.
+1. Select the project in Xcode, and then add `-ObjC` to **Build Settings > Other Linker Flags**.
 
-2. Just drag and drop [the downloaded TapSDK_iOS_v2.0.0.zip](/sdk/tap-download) file to the project directory.
+2. Drag and drop the downloaded [TapSDK_iOS_v2.0.0.zip](/sdk/tap-download) file to the project directory.
 
-3. Import the following downloaded resource files as needed:
+3. Import the following downloaded resource files if necessary:
 
-    - Mandatory: TapTap launcher, foundation library, sign-in
+    - Required: TapTap Launcher, Foundation Library, Login
 
         ```
         TapBootstrapResource.bundle
@@ -184,23 +184,23 @@ Create a `TDS-Info.plist` file under the `Assets/Plugins/iOS/Resource` directory
         TapLoginSDK.framework
         ```
 
-    - TapTap Moment    
+    - TapTap Embedded Moments    
 
         ```
         TapMomentResource.bundle
         TapMomentSDK.framework
         ```
     
-    - Analytics
+    - Data Acquisition
 
         ```
         TapDB.framework
         ```
 
-4. Please make sure the following dependencies were added:
+4. Make sure the following dependencies were added:
 
     ```
-    // mandatory
+    // Required
     WebKit.framework
     Security.framework
     SystemConfiguration.framework
@@ -208,7 +208,7 @@ Create a `TDS-Info.plist` file under the `Assets/Plugins/iOS/Resource` directory
     SystemConfiguration.framework
     libc++.tbd
 
-    // TapTap Moment
+    // TapTap Embedded Moments
     AVFoundation.framework
     CoreTelephony.framework
     MobileCoreServices.framework
@@ -216,7 +216,7 @@ Create a `TDS-Info.plist` file under the `Assets/Plugins/iOS/Resource` directory
     SystemConfiguration.framework
     WebKit.framework
 
-    // Analytics
+    // Data Acquisition 
     AppTrackingTransparency.framework
     AdSupport.framework
     CoreMotion.framework
@@ -229,30 +229,30 @@ Create a `TDS-Info.plist` file under the `Assets/Plugins/iOS/Resource` directory
 
 ### Configure Permissions
 
-**TapTap Moment requires to access album, camera, and microphone. Analytics requires the IDFA permission. **
+**TapTap Embedded Moments will require access to the album, camera, and microphone, and Data Acquisition will require the IDFA permission.**
 
-Therefore, if your game uses TapTap Moment or Analytics, you need to specify the following permission requests in `info.plist` (please change the purpose strings accordingly):
+Therefore, if your game uses TapTap Embedded Moments or Data Acquisition, you will need to specify the following permission requests in `info.plist` (remember to change the purpose strings accordingly):
 
 ```xml
 <!-- Photo Library -->
 <key>NSPhotoLibraryUsageDescription</key>
-Explain why your app requires this permission.
+<string>Explain why your app needs this permission.</string>
 <!-- Camera -->
 <key>NSCameraUsageDescription</key>
-Explain why your app requires this permission.
+<string>Explain why your app needs this permission.</string>
 <!-- Microphone -->
 <key>NSMicrophoneUsageDescription</key>
-Explain why your app requires this permission.
+<string>Explain why your app needs this permission.</string>
 <!-- IDFA -->
 <key>NSUserTrackingUsageDescription</key>
-Explain why your app requires this permission.
+<string>Explain why your app needs this permission.</string>
 ```
 
-### Configure Opening the TapTap Application
+### Configure Launching TapTap Application
 
-When a user does not install the TapTap application on their device, TapTap Sign-in will use WebView by default.
+When users have not installed the TapTap application on their device, TapTap Login will use WebView by default.
 
-1. Add the following configuration in `info.plist` (replace the `clientID` with the value shown on the dashboard):
+1. Add the following configuration in `info.plist` (replace the `clientID` with the value shown on the Console):
 
     ![](/img/tap_ios_info.png)
 
@@ -280,7 +280,7 @@ When a user does not install the TapTap application on their device, TapTap Sign
 
 2. Depending on whether the project has a `SceneDelegate.m` file:
 
-   - If `SceneDelegate.m` is present, add the following code to it:
+   - If there is a `SceneDelegate.m`, add the following code to it:
 
       ```objectivec
       #import <TapBootstrapSDK/TapBootstrapSDK.h>
@@ -289,7 +289,7 @@ When a user does not install the TapTap application on their device, TapTap Sign
       }
       ```
 
-   - If `SceneDelegate.m` is absent, add the following code to `AppDelegate.m`:
+   - If there is no `SceneDelegate.m`, add the following code to `AppDelegate.m`:
 
       ```objectivec
       - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
@@ -314,12 +314,12 @@ When a user does not install the TapTap application on their device, TapTap Sign
 
 ## Initialization
 
-Initialize TapSDK with required application configuration information (Client ID, region etc.):
+Initialize TapSDK with required application configuration information (Client ID, region, etc.):
 
 <MultiLang>
 
 ```cs
-TapConfig tapConfig = new TapConfig("your-client-id", true); // true: China, false: Global
+TapConfig tapConfig = new TapConfig("your-client-id", true); // true: Mainland China, false: International
 TapBootstrap.Init(tapConfig);
 ```
 
@@ -327,7 +327,7 @@ TapBootstrap.Init(tapConfig);
 TapConfig tapConfig = new TapConfig.Builder()
                 .withAppContext(getApplicationContext())
                 .withClientId ("clientId") // You can find the Client ID in TapTap Developer Center.
-                .withRegionType (TapRegionType.CN)// TapRegionType.CN: China, TapRegionType.IO: Global
+                .withRegionType (TapRegionType.CN)// TapRegionType.CN: Mainland China, TapRegionType.IO: International
                 .build();
 TapBootstrap.init(MainActivity.this, tapConfig);  
 ```
@@ -341,9 +341,9 @@ config.region = TapSDKRegionTypeCN;
 
 </MultiLang>
 
-## Sign-in Callback
+## Login Callback
 
-Register the sign-in callback to receive the sign-in results:
+Register the login callback to receive the login results:
 
 <MultiLang>
 
@@ -352,7 +352,7 @@ TapBootstrap.RegisterLoginResultListener(new MyLoginCallback());
 public class MyLoginCallback : ITapLoginResultListener {
   public void OnLoginSuccess(AccessToken accessToken)
   {
-      Debug.Log ("Login Success: " and accessToken.ToJSON());
+      Debug.Log ("Login successful: " + accessToken.ToJSON());
   }
 
   public void OnLoginError(TapError error)
@@ -387,23 +387,23 @@ TapBootstrap.registerLoginResultListener(new TapLoginResultListener() {
 ```
 
 ```objectivec
-// register the sign-in callback
+// Register the login callback
 [TapBootstrap registerLoginResultDelegate:self];
 
 // implement the callback method
-
+// Login successful callback
 // @param token the token object
 - (void)onLoginSuccess:(AccessToken *)token{
     NSLog (@"onLoginSuccess");
 }
 
-
+// Login canceled
 - (void)onLoginCancel{
     NSLog (@"onLoginCancel");
 }
 
-
-@param error failure cause
+// Login failed
+// @param error Reason for failure
 - (void)onLoginError:(NSError *)error{
     NSLog (@"onLoginError error");
 }
@@ -413,7 +413,7 @@ TapBootstrap.registerLoginResultListener(new TapLoginResultListener() {
 
 ## AccessToken
 
- `AccessToken` in the code sample above is used for user authentication. It will expire in 90 days (the SDK automatically clears the local cache after its expiration). You can pass it  to the server side to get user information (see [Get User Information](/api/service#流程)).
+ `AccessToken` in the code sample above is used for user authentication. It will expire in 90 days (the SDK will automatically clear the local cache after its expiration). You can pass it to the server to get user information.
 
 `AccessToken` example:
 
@@ -430,23 +430,23 @@ TapBootstrap.registerLoginResultListener(new TapLoginResultListener() {
 
 ### Parameters
 
-parameter  | description
+Parameter  | Description
 | ------ | ------ |
-accessToken | user credential
+accessToken | User credential
 kid  | Currently its value is identical to accessToken. We recommend to use the value of accessToken.
-macAlgorithm  | Currently its value is fixed: `hmac-sha-1`.
-tokenType  | Currently its value is fixed: `mac`.
+macAlgorithm  | Currently its value is fixed to `hmac-sha-1`.
+tokenType  | Currently its value is fixed to `mac`.
 macKey  | mac key
-expireIn  | expiration time
+expireIn  | Expiration time
 
 
-## TapTap Sign-in
+## TapTap Login
 
-Check the sign-in status first. If the user has already signed in, they can start playing directly. Otherwise they need to sign in.
+Check the login status before trying to log in a user.
 
-### Check the Sign-in Status
+### Check Login Status
 
-Try to get Access Token for the current user. If the token is empty, the user is not logged in.
+Try to get Access Token for the current user. If Access Token is empty, the user is not logged in.
 
 <MultiLang>
 
@@ -454,13 +454,13 @@ Try to get Access Token for the current user. If the token is empty, the user is
 TapBootstrap.GetAccessToken((accessToken, error) => {
    if (accessToken == null)
    {
-       Debug.Log ("not logged in");
+       Debug.Log("not logged in");
    }
    else
    {
-       Debug.Log ("logged in");
+       Debug.Log("logged in");
    }
-});
+
 ```
 
 ```java
@@ -482,7 +482,7 @@ if (accessToken == nil) {
 
 </MultiLang>
 
-### Sign In
+### Log In
 
 <MultiLang>
 
@@ -494,7 +494,7 @@ TapBootstrap.Login(loginType, new string[] { "public_profile" });
 
 ```java
 /**
- * @param activity current Activity
+ * @param activity Current Activity
  * @param @param LoginType.TAPTAP
  */
 TapBootstrap.login(MainActivity.this, LoginType.TAPTAP, "public_profile");
@@ -507,10 +507,10 @@ TapBootstrapLoginType loginType = TapBootstrapLoginTypeTapTap;
 
 </MultiLang>
 
-### Sign Out
+### Log Out
 
 :::caution
-Be sure to invoke this method when the user signs out, avoiding to corrupt the user information.
+Remember to invoke this method when the user logs out to avoid corrupting the user information.
 :::
 
 <MultiLang>
