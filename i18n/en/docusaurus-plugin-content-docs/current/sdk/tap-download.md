@@ -18,12 +18,10 @@ sidebar_label: Download
 - [iOS](https://github.com/TapTap/TapSDK-iOS)  
 
 
-## Login Button Graphic Resources
+## Assets for Login Buttons
 Click to download [icon.zip](/res/TapTapLoginButton.zip)
 
 ## SDK Add-ons
 
 SDK add-ons are optional.
-
-- OAID SDK [oaid_sdk_1.0.23.aar](/res/tap_oaid_sdk_1.0.23.aar)
-
+- OAID SDK [oaid\_sdk\_1.0.23.aar](/res/tap_oaid_sdk_1.0.23.aar)
