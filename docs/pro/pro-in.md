@@ -3,9 +3,9 @@ id: pro-in
 title: 接入准备
 sidebar_label: 接入准备
 ---
-import {Highlight} from '../component';
+import {Red, Blue, Black, Gray} from '../component';
 
-## <Highlight color='#f00'>注意事项</Highlight>
+## <Red>注意事项</Red>
 
 - 第一步开启登录时，请注意区域选择，选定后不可变更 
 - 测试用户管理功能是针对游戏在“未上线时”进行添加白名单测试，游戏上架前一定要点“上线应用”  

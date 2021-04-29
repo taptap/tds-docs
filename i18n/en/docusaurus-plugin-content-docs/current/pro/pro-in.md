@@ -3,7 +3,7 @@ id: pro-in
 title: Prerequisites 
 sidebar_label: Prerequisites
 ---
-import {Highlight} from '../component';
+import {Red, Blue, Black, Gray} from '../component';
 
 ## I. Enable TapTap Login
 

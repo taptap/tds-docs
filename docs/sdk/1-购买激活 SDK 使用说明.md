@@ -4,9 +4,9 @@ title: 购买激活 SDK 使用说明
 sidebar_label: 购买激活
 ---
 
-import {Highlight,Link,ImageLink} from '../component';
+import {Gray,Blue, Red, Black,Link,ImageLink} from '../component';
 
-<Highlight color='#A0A0A0'>为了游戏售卖服务的 SDK ，避免 APK 流出导致盗版横行；当游戏准备在 TapTap 开放售卖时，请按照此文档操作。</Highlight>
+<Gray>为了游戏售卖服务的 SDK ，避免 APK 流出导致盗版横行；当游戏准备在 TapTap 开放售卖时，请按照此文档操作。</Gray>
 
 ## **防盗版利器：购买激活 SDK**
 
@@ -14,7 +14,7 @@ import {Highlight,Link,ImageLink} from '../component';
 
 当游戏在 TapTap 开放售卖时，建议接入购买激活 SDK 。
 
-接入后，使用 TapTap 账号购买游戏的用户，能够正常打开游戏。通过特殊渠道直接下载 APK 并安装的用户，在游戏开启时，将会看到 「**游戏未激活，请前往 TapTap 购买此游戏**」 <Highlight color='#A0A0A0'>（如下图）</Highlight>，并且无法正常开启游戏。
+接入后，使用 TapTap 账号购买游戏的用户，能够正常打开游戏。通过特殊渠道直接下载 APK 并安装的用户，在游戏开启时，将会看到 「**游戏未激活，请前往 TapTap 购买此游戏**」 <Gray>（如下图）</Gray>，并且无法正常开启游戏。
 
 ![游戏未激活，请前往 TapTap 购买此游戏](https://img.tapimg.com/market/images/d62dd12c9ac8f2e2b9bb236506380dfe.jpg)
 
@@ -85,7 +85,7 @@ TapTap 运营人员预计将在收到邮件后的2个工作日内为你进行操
 
 #### **2.2 检测授权**
 
-<Highlight color='#A0A0A0'>为了保证授权验证长期有效，建议每次打开游戏时，都进行授权检测。</Highlight>
+<Gray>为了保证授权验证长期有效，建议每次打开游戏时，都进行授权检测。</Gray>
 
 ##### **· Unity平台**
 
@@ -183,7 +183,7 @@ protected void onActivityResult(int requestCode, int resultCode, @Nullable Inten
 
 ### **3. TapAnti 防沉迷**
 
-<Highlight color='#A0A0A0'>如需使用防沉迷模块，请先调授权验证，回调之后再调用防沉迷验证。</Highlight>
+<Gray>如需使用防沉迷模块，请先调授权验证，回调之后再调用防沉迷验证。</Gray>
 
 ##### **· Unity平台**
 
@@ -464,13 +464,13 @@ AntiAddictionKit.paySuccess(50*100);
 
 ### **2. 配置SDK**
 
-前往开发者中心   >>   选择<Highlight color='#00b9c8'>SDK控制台 </Highlight>   >>   选择<Highlight color='#00b9c8'>购买激活SDK</Highlight>   >>   选择相应的游戏的<Highlight color='#00b9c8'>配置</Highlight>   >>   填写测试用户的 TapTap ID 。
+前往开发者中心   >>   选择<Blue>SDK控制台 </Blue>   >>   选择<Blue>购买激活SDK</Blue>   >>   选择相应的游戏的<Blue>配置</Blue>   >>   填写测试用户的 TapTap ID 。
 
-或者，前往开发者中心   >>   选择已经开放售卖的游戏 >>   选择<Highlight color='#00b9c8'>购买激活SDK设置</Highlight>   >>   填写测试用户的 TapTap ID 。
+或者，前往开发者中心   >>   选择已经开放售卖的游戏 >>   选择<Blue>购买激活SDK设置</Blue>   >>   填写测试用户的 TapTap ID 。
 
 ### **3. 开始测试**
 
-点击下载按钮，下载自测用例。在 TapTap 客户端使用已填写的测试用户账号登录。如需测试防沉迷效果，可使用测试用户账号，在<Highlight color='#00b9c8'>个人中心 </Highlight> >> <Highlight color='#00b9c8'>编辑资料</Highlight>，修改生日后测试。  
+点击下载按钮，下载自测用例。在 TapTap 客户端使用已填写的测试用户账号登录。如需测试防沉迷效果，可使用测试用户账号，在<Blue>个人中心 </Blue> >> <Blue>编辑资料</Blue>，修改生日后测试。  
 
 <ImageLink href="https://doc-files.tapimg.com/dev/%E8%B4%AD%E4%B9%B0%E6%BF%80%E6%B4%BBSDK%E8%87%AA%E6%B5%8B%E5%86%85%E5%AE%B9.xls">
   https://img.tapimg.com/market/images/a6c4670a09d7e42dd68d910cfd29865e.png
@@ -488,7 +488,7 @@ AntiAddictionKit.paySuccess(50*100);
 
 ### **2. 设置售卖价格**
 
-前往开发者中心 >> <Highlight color='#00b9c8'>售卖设置</Highlight> ，开启售卖开关，设置游戏售卖金额，提交审核，并同步对接的 TapTap 运营相关信息。
+前往开发者中心 >> <Blue>售卖设置</Blue> ，开启售卖开关，设置游戏售卖金额，提交审核，并同步对接的 TapTap 运营相关信息。
 
 ### **3. 正式上线**
 

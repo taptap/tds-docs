@@ -3,7 +3,7 @@ id: pro-moment
 title: 内嵌动态指南
 sidebar_label: 内嵌动态指南
 ---
-import {Highlight} from '../component';
+import {Red, Blue, Black, Gray} from '../component';
 
 
 内嵌动态能让玩家在游戏内访问 TapTap 社区，同时也可以查看好友的游戏动态，参与其他玩家、官方和大神之间的互动。

@@ -3,7 +3,7 @@ id: pro-moment
 title: Embedded Moments 
 sidebar_label: Embedded Moments
 ---
-import {Highlight} from '../component';
+import {Red, Blue, Black, Gray} from '../component';
 
 
 Embedded Moments allow players can visit TapTap's Community inside the game and join other players, officials and gamers.

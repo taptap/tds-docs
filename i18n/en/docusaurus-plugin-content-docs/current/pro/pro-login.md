@@ -3,7 +3,7 @@ id: pro-login
 title: Login 
 sidebar_label: Login
 ---
-import {Highlight} from '../component';
+import {Red, Blue, Black, Gray} from '../component';
 
 ## I. TapTap Login
 TapTap Login is an authorized login system built on the OAuth2.0 protocol. Developers need to register a developer account in the TapTap Developer Center and have an approved mobile application before they can implement TapTap Login.
@@ -29,7 +29,7 @@ See [Quick Start](/sdk/) on how to implement TapTap Login.
 
 1.  The most recommended order for players login is: select login with TapTap → select the server → select the role → enter the game.
     - Before implementing TapTap Login, please make sure you have applied to enable the login feature and have obtained the Client ID.
-    - Add a [TapTap Login button](/res/TapTapLoginButton.zip) on the login page, which is highly recommended to be displayed  <Highlight color='#f00'>according to the provided UI specifications, showing the full title and logo of TapTap.</Highlight>
+    - Add a [TapTap Login button](/res/TapTapLoginButton.zip) on the login page, which is highly recommended to be displayed  <Red>according to the provided UI specifications, showing the full title and logo of TapTap.</Red>
 
 2. To avoid losing user accounts data, developers should store in the server the matching details between the Tap ID and the game ID, as well as the game ID and the game’s sever. This way, after clearing the local game data, users will still be able to load their previous progress by logging into the game with the same TapTap account.
 

@@ -6,7 +6,7 @@ sidebar_label: 数据收集
 
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import {Highlight} from '../component';
+import {Red, Blue, Black, Gray} from '../component';
 import MultiLang from '@theme/MultiLang';
 
 :::caution
@@ -582,6 +582,6 @@ timestamp | long | 当前统计数据的时间戳(秒)。TapDB会按照自然5�
 - 如果没有集成其他OAID版本，我们推荐下载 [oaid_sdk_1.0.23.aar](/res/tap_oaid_sdk_1.0.23.aar)
 
 <!-- ### 数美SDK收集
-  <Highlight color='#f00'> ⬇️ 数美定制版，仅支持当前下载渠道</Highlight>
+  <Red> ⬇️ 数美定制版，仅支持当前下载渠道</Red>
 
 [下载SDK](/res/tap_wl_pri_release.aar) -->

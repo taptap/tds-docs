@@ -3,7 +3,7 @@ id: store-agree
 title: TapTap 游戏审核规范细则
 sidebar_label: TapTap 游戏审核规范细则
 ---
-import {Highlight} from '../component';
+import {Red, Blue, Black, Gray} from '../component';
 
 
 请确保你在开发者后台提交的游戏资料符合《 TapTap 游戏审核规范细则 》，违规游戏可能被处罚或下架。  
@@ -116,7 +116,7 @@ import {Highlight} from '../component';
 
 ### **3.4 详情页顶部图、推广图及旧版推广图**
 
-<Highlight color='#A0A0A0'>为方便说明统一称为 “ 推广图 ”</Highlight>  
+<Gray>为方便说明统一称为 “ 推广图 ”</Gray>  
 
 3.4.1 推广图不得含有除游戏名称之外的宣传文案，不得含有人物名片、游戏 UI 元素等内容；  
 3.4.2 不得以游戏截图充当推广图，不得多图拼接、平铺作为推广图；  
