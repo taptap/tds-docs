@@ -19,7 +19,7 @@ API路径 | 介绍
 
 ### 1.2 API协议
 
-API以HTTP协议对外提供，对于POST和PUT请求，请求主体必须是JSON格式，并且HTTP Header的Conntent-Type需要设置为application/json
+API以HTTP协议对外提供，对于POST和PUT请求，请求主体必须是JSON格式，并且HTTP Header的Content-Type需要设置为application/json
 
 ## 2. API鉴权
 
@@ -27,10 +27,10 @@ API鉴权通过HTTP Header设置键值参数进行授权，参数列表如下：
 
 Key | Value | 描述 
 --- | --- | ---
-X-Client-ID | ${tds_client_id} | TDS客户标识（请前往开发者中心获取）
-X-Client-Secret | ${tds_secret} | TDS客户密钥（请前往开发者中心获取）
+X-Client-ID | ${client_id} | TDS客户标识（请前往开发者中心获取 Client ID）
+X-Server-Secret | ${server_secret} | TDS服务密钥（请前往开发者中心获取 Server Secret）
 
-## 3. API 详细说明
+## 3 API 详细说明
 
 ### 3.1 文本智能检测
 
@@ -57,7 +57,7 @@ URI: https://{{domain}}/v2/text/check
 参数 | 类型 | 必须 | 说明 | 示例值
 --- | --- | --- | --- | ---
 scene | string | 是 | 业务场景，通过配置不同场景实现多种识别检测规则。请前往过滤场景中获取 | c1hh9bttqehouf41di00
-data | object | 是 | 文本数据提供进行内容识别检测 | [文本数据参数](#文本信息参数)
+data | object | 是 | 文本数据提供进行内容识别检测 | [文本信息参数](#文本信息参数)
 opt | object | 否 | 检测可选项，助力一些业务方需求 | [检测选项参数](#检测选项参数)
 
 ##### 文本信息参数
@@ -110,11 +110,11 @@ end_index | int64 | 是 | 结束下标 | 3
 
 #### 请求示例
 ```
-curl --location --request POST 'https://whisper.tapapis.com/v2/text/check' \
+curl --location --request POST 'https://whisper.cn.tapapis.com/v2/text/check' \
 --header 'Content-Type: application/json' \
 --header 'X-Client-ID: *' \
 --header 'X-Client-Secret: *' \
---data-raw {
+--data-raw '{
   "data": {
     "data_id": "49a12d8d-7dc1-41cb-968f-31ddbd2ab3f2",
     "text": "你好，欢迎使用文本检测",
@@ -126,7 +126,7 @@ curl --location --request POST 'https://whisper.tapapis.com/v2/text/check' \
   "opt": {
     "replacement": "*"
   }
-}
+}'
 ```
 
 #### 响应示例
@@ -177,7 +177,7 @@ curl --location --request POST 'https://whisper.tapapis.com/v2/text/check' \
 当HTTP返回码不等于200时，即遇到了错误情况将返回以下信息。
 
 参数名称 | 类型 | 必须 | 描述
----|---|---
+---|---|---|---
 code | int | 是 | 接口错误码，返回码见 (https://developers.google.com/maps-booking/reference/grpc-api/status_codes) 
 message | string | 是 | 错误消息
 details | object | 否 | 详情信息，具体结构根据不同code表示
@@ -186,7 +186,7 @@ details | object | 否 | 详情信息，具体结构根据不同code表示
 // 响应body为json格式
 {
     "code": 5, 
-    "message": "Text checker is not exists for 'c1eqbi0e3pi1useb840fg' scene.
+    "message": "Text checker is not exists for 'c1exxxxe3pi1useb840fg' scene",
     "details": []
 }
 ```
