@@ -7,7 +7,7 @@ import {Highlight} from '../component';
 
 ## <Highlight color='#f00'>注意事项</Highlight>
 
-- 第一步开启登录时，请注意国内国外选择，选定后不可变更 
+- 第一步开启登录时，请注意区域选择，选定后不可变更 
 - 测试用户管理功能是针对游戏在“未上线时”进行添加白名单测试，游戏上架前一定要点“上线应用”  
 ![](/img/tap_login_online.png)
 - 登录按钮需要符合[TapTap规范](/pro/login-design.md)，请下载 [TapTap 登录按钮](/sdk/tap-download#登录按钮素材)  

@@ -23,12 +23,12 @@ android:configChanges="orientation|keyboardHidden|screenSize|locale|uiMode|scree
 否则会导致无法正常登陆, 登陆回调方法不会被执行.
 
 e、登录时报 404 或者 405 
-请检查 `TapConfig.Builder()` 配置，国内请配置为 TapRegionType.CN
+请检查 `TapConfig.Builder()` 配置，中国大陆请配置为 TapRegionType.CN
 ```java
 // TapSDK 初始化
 TapConfig tapConfig = new TapConfig.Builder()
         .withAppContext(getApplicationContext())
-        .withRegionType(TapRegionType.CN) // TapRegionType.CN: 国内  TapRegionType.IO: 国外
+        .withRegionType(TapRegionType.CN) // TapRegionType.CN: 中国大陆  TapRegionType.IO: 国际
         .withClientId("Client ID") // TapTap开发者中心创建应用后获取对Client ID
         .build();
 TapBootstrap.init(MainActivity.this, tapConfig);

@@ -1,7 +1,7 @@
 ---
 id: tap-download
-title: 资源下载
-sidebar_label: 资源下载
+title: Download
+sidebar_label: Download
 ---
 
 ## SDK  
@@ -18,12 +18,10 @@ sidebar_label: 资源下载
 - [iOS](https://github.com/TapTap/TapSDK-iOS)  
 
 
-## 登录按钮素材
-点击下载[icon.zip](/res/TapTapLoginButton.zip)
+## Assets for Login Buttons
+Click to download [icon.zip](/res/TapTapLoginButton.zip)
 
-## SDK 附加
+## SDK Add-ons
 
-SDK 附加为可选择接入项
-
-- OAID SDK [oaid_sdk_1.0.23.aar](/res/tap_oaid_sdk_1.0.23.aar)
-
+SDK add-ons are optional.
+- OAID SDK [oaid\_sdk\_1.0.23.aar](/res/tap_oaid_sdk_1.0.23.aar)

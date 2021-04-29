@@ -319,7 +319,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 <MultiLang>
 
 ```cs
-TapConfig tapConfig = new TapConfig("your-client-id", true); // true 表示国内，false 表示国外
+TapConfig tapConfig = new TapConfig("your-client-id", true); // true 表示中国大陆，false 表示国际
 TapBootstrap.Init(tapConfig);
 ```
 
@@ -327,7 +327,7 @@ TapBootstrap.Init(tapConfig);
 TapConfig tapConfig = new TapConfig.Builder()
                 .withAppContext(getApplicationContext())
                 .withClientId("clientId") // 开发者中心获取到的 Client ID
-                .withRegionType(TapRegionType.CN) // TapRegionType.CN: 国内  TapRegionType.IO: 国外
+                .withRegionType(TapRegionType.CN) // TapRegionType.CN: 中国大陆  TapRegionType.IO: 国际
                 .build();
 TapBootstrap.init(MainActivity.this, tapConfig);  
 ```
@@ -335,7 +335,7 @@ TapBootstrap.init(MainActivity.this, tapConfig);
 ```objectivec
 TapConfig *config = TapConfig.new;
 config.clientId = @"clientId";
-config.region = TapSDKRegionTypeCN;
+config.region = TapSDKRegionTypeCN; // TapSDKRegionTypeCN: 中国大陆  TapSDKRegionTypeIO: 国际
 [TapBootstrap initWithConfig:config];
 ```
 
@@ -442,7 +442,7 @@ expireIn  | 过期时间
 
 ## TapTap 登录
 
-先检查登录状态，已登录可以直接开始游戏，未登录则进行登录。
+在尝试登录用户前先检查登录状态。
 
 ### 检查登录状态
 
