@@ -113,7 +113,7 @@ end_index | int64 | 是 | 结束下标 | 3
 curl --location --request POST 'https://whisper.cn.tapapis.com/v2/text/check' \
 --header 'Content-Type: application/json' \
 --header 'X-Client-ID: *' \
---header 'X-Client-Secret: *' \
+--header 'X-Server-Secret: *' \
 --data-raw '{
   "data": {
     "data_id": "49a12d8d-7dc1-41cb-968f-31ddbd2ab3f2",
