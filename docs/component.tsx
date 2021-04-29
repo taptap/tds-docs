@@ -1,8 +1,35 @@
 import React from 'react';
 
-export const Highlight = ({ children, color }) => (
+export const Red = ({ children }) => (
   <span style={{
-    color: color,
+    color: '#f00',
+    padding: '0.2rem',
+  }}>
+    {children}
+  </span>
+);
+
+export const Blue = ({ children }) => (
+  <span style={{
+    color: '#00b9c8',
+    padding: '0.2rem',
+  }}>
+    {children}
+  </span>
+);
+
+export const Black = ({ children }) => (
+  <span style={{
+    color: '#333',
+    padding: '0.2rem',
+  }}>
+    {children}
+  </span>
+);
+
+export const Gray = ({ children }) => (
+  <span style={{
+    color: '#A0A0A0',
     padding: '0.2rem',
   }}>
     {children}

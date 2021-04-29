@@ -2,7 +2,7 @@
 id: ios-tapmoment
 title: TapMoment
 ---
-import {Highlight} from '../component';
+import {Red, Blue, Black, Gray} from '../component';
 
 ## method
 
@@ -202,7 +202,7 @@ config.orientation = TDSMomentOrientationDefault;
 
 <!-- ### getSdkVersion
 
-获取动态功能版本。<Highlight color='#f00'>注意</Highlight> 并非是 TapSDK version。此 API 不建议调用
+获取动态功能版本。<Red>注意</Red> 并非是 TapSDK version。此 API 不建议调用
 
 #### API  
 
@@ -218,7 +218,7 @@ NSString *version =  [TapMoment getSdkVersion];
 
 ### getSdkVersionCode
 
-获取动态功能版本 code，<Highlight color='#f00'>注意</Highlight> 并非是 TapSDK version。此 API 不建议调用
+获取动态功能版本 code，<Red>注意</Red> 并非是 TapSDK version。此 API 不建议调用
 
 #### API  
 
