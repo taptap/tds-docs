@@ -419,7 +419,7 @@ TapBootstrap.registerLoginResultListener(new TapLoginResultListener() {
 
 ```json
 {
-  "accessToken":"accessToken",
+  "access_token":"accessToken",
   "kid":"kid",
   "macAlgorithm":"macAlgorithm",
   "tokenType":"tokenType",
@@ -432,7 +432,7 @@ TapBootstrap.registerLoginResultListener(new TapLoginResultListener() {
 
 参数  | 描述
 | ------ | ------ |
-accessToken | 用户登录后的凭证
+access_token | 用户登录后的凭证
 kid  | 当前实际返回的 kid 和 accessToken 值相等，建议使用 accessToken
 macAlgorithm  | 固定为 `hmac-sha-1`
 tokenType  | 固定为 `mac`
