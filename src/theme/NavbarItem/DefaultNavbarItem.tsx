@@ -5,13 +5,17 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
-import { useLocation } from '@docusaurus/router';
-import { isSamePath } from '@docusaurus/theme-common';
-import type { DesktopOrMobileNavBarItemProps, NavLinkProps, Props } from '@theme/NavbarItem/DefaultNavbarItem';
+import {useLocation} from '@docusaurus/router';
+import {isSamePath} from '@docusaurus/theme-common';
+import type {
+  NavLinkProps,
+  DesktopOrMobileNavBarItemProps,
+  Props,
+} from '@theme/NavbarItem/DefaultNavbarItem';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 
 function NavLink({
@@ -121,7 +125,7 @@ function NavItemDesktop({
         {props.children ?? props.label}
       </NavLink>
       <ul ref={dropdownMenuRef} className="dropdown__menu">
-        {items.map(({ className: childItemClassName, ...childItemProps }, i) => (
+        {items.map(({className: childItemClassName, ...childItemProps}, i) => (
           <li key={i}>
             <NavLink
               onKeyDown={(e) => {
@@ -156,7 +160,7 @@ function NavItemMobile({
   ...props
 }: DesktopOrMobileNavBarItemProps) {
   const menuListRef = useRef<HTMLUListElement>(null);
-  const { pathname } = useLocation();
+  const {pathname} = useLocation();
   const [collapsed, setCollapsed] = useState(
     () => !items?.some((item) => isSamePath(item.to, pathname)) ?? true,
   );
@@ -203,7 +207,7 @@ function NavItemMobile({
         style={{
           height: !collapsed ? menuListHeight : undefined,
         }}>
-        {items.map(({ className: childItemClassName, ...childItemProps }, i) => (
+        {items.map(({className: childItemClassName, ...childItemProps}, i) => (
           <li className="menu__list-item" key={i}>
             <NavLink
               activeClassName="menu__link--active"
@@ -218,7 +222,7 @@ function NavItemMobile({
   );
 }
 
-function DefaultNavbarItem({ mobile = false, ...props }: Props): JSX.Element {
+function DefaultNavbarItem({mobile = false, ...props}: Props): JSX.Element {
   const Comp = mobile ? NavItemMobile : NavItemDesktop;
   return <Comp {...props} />;
 }
