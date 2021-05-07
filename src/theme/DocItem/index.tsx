@@ -6,8 +6,6 @@
  */
 
 import React from 'react';
-import clsx from 'clsx';
-import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import DocPaginator from '@theme/DocPaginator';
 import DocVersionSuggestions from '@theme/DocVersionSuggestions';
 import Seo from '@theme/Seo';
@@ -15,23 +13,25 @@ import LastUpdated from '@theme/LastUpdated';
 import type {Props} from '@theme/DocItem';
 import TOC from '@theme/TOC';
 import EditThisPage from '@theme/EditThisPage';
-import styles from './styles.module.scss';
-import { useActivePlugin, useActiveVersion, useVersions } from '@theme/hooks/useDocs';
+
+import clsx from 'clsx';
+import styles from './styles.module.css';
+import {
+  useActivePlugin,
+  useVersions,
+  useActiveVersion,
+} from '@theme/hooks/useDocs';
 import './override.scss'
 
 function DocItem(props: Props): JSX.Element {
-  const { siteConfig } = useDocusaurusContext();
-  const { url: siteUrl } = siteConfig;
-  const { content: DocContent } = props;
+  const {content: DocContent} = props;
+  const {metadata, frontMatter} = DocContent;
   const {
-    metadata,
-    frontMatter: {
-      image,
-      keywords,
-      hide_title: hideTitle,
-      hide_table_of_contents: hideTableOfContents,
-    },
-  } = DocContent;
+    image,
+    keywords,
+    hide_title: hideTitle,
+    hide_table_of_contents: hideTableOfContents,
+  } = frontMatter;
   const {
     description,
     title,
@@ -50,9 +50,14 @@ function DocItem(props: Props): JSX.Element {
   // See https://github.com/facebook/docusaurus/issues/3362
   const showVersionBadge = versions.length > 1;
 
+  // For meta title, using frontMatter.title in priority over a potential # title found in markdown
+  // See https://github.com/facebook/docusaurus/issues/4665#issuecomment-825831367
+  const metaTitle = frontMatter.title || title;
+
   return (
     <>
-      <Seo {...{title, description, keywords, image}} />
+      <Seo {...{title: metaTitle, description, keywords, image}} />
+
       <div className="row">
         <div
           className={clsx('col', {
