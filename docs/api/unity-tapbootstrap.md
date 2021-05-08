@@ -203,3 +203,12 @@ TapConfig config = new TapConfig();
 LoginType loginType = LoginType.TAPTAP;
 TapBootstrap.Bind(loginType, new string[] { "public_profile" });
 ```
+
+## 错误码
+| 字段          | code | 说明       |
+| ----------- | --- | -------- |
+|   ERROR_CODE_UNDEFINED     | 80000    | 未定义   |
+| ERROR_CODE_UNINITIALIZED     | 80001    |  未初始化   |
+| ERROR_CODE_LOGOUT_INVALID_LOGIN_STATE      | 80004    | token失效   |
+|ERROR_CODE_LOGOUT_KICKED     | 80007     | 账号被踢     |
+|ERROR_CODE_BRIDGE_EXECUTE     | 80008     | Unity桥接错误     |

@@ -487,7 +487,6 @@ if (accessToken == nil) {
 <MultiLang>
 
 ```cs
-TapConfig config = new TapConfig();
 LoginType loginType = LoginType.TAPTAP;
 TapBootstrap.Login(loginType, new string[] { "public_profile" });
 ```
