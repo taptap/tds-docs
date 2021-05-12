@@ -22,7 +22,17 @@ TapFriends.AddFriend("tds id",(err)=> {
 ```
 
 ```java
-1
+TapFriends.addFriend("userID", new Callback<Boolean>() {
+    @Override
+    public void onSuccess(Boolean aBoolean) {
+        Log.d("TapTap", "添加好友成功");
+    }
+
+    @Override
+    public void onFail(TapFriendError tapFriendError) {
+        Log.d("TapTap", "添加好友失败" + tapFriendError.detailMessage);
+    }
+});
 ```
 
 
@@ -52,7 +62,17 @@ TapFriends.DeleteFriend("tds id", (err) => {
 });
 ```
 ```java
-1
+TapFriends.deleteFriend("userID", new Callback<Boolean>() {
+    @Override
+    public void onSuccess(Boolean aBoolean) {
+        Log.d("TapTap", "删除好友成功");
+    }
+
+    @Override
+    public void onFail(TapFriendError tapFriendError) {
+        Log.d("TapTap", "删除好友失败" + tapFriendError.detailMessage);
+    }
+});
 ```
 
 
@@ -79,7 +99,17 @@ TapFriends.BlockUser("tds id", (err) => {
 ```
 
 ```java
-1
+TapFriends.blockUser("userID", new Callback<Boolean>() {
+    @Override
+    public void onSuccess(Boolean aBoolean) {
+        Log.d("TapTap", "拉黑好友成功");
+    }
+
+    @Override
+    public void onFail(TapFriendError tapFriendError) {
+        Log.d("TapTap", "拉黑好友失败" + tapFriendError.detailMessage);
+    }
+});
 ```
 
 
@@ -109,7 +139,17 @@ TapFriends.UnblockUser("tds id", (err) => {
 ```
 
 ```java
-1
+TapFriends.unblockUser("userID", new Callback<Boolean>() {
+    @Override
+    public void onSuccess(Boolean aBoolean) {
+        Log.d("TapTap", "取消拉黑好友成功");
+    }
+
+    @Override
+    public void onFail(TapFriendError tapFriendError) {
+        Log.d("TapTap", "取消拉黑好友失败" + tapFriendError.detailMessage);
+    }
+});
 ```
 
 
@@ -141,7 +181,19 @@ TapFriends.UnblockUser("tds id", (err) => {
 ```
 
 ```java
-1
+TapFriends.getFollowingList(0, true, 100, new ListCallback<TapUserRelationship>() {
+    @Override
+    public void onSuccess(List<TapUserRelationship> list) {
+        for (TapUserRelationship i : list){
+            System.out.println(i);
+        }
+    }
+
+    @Override
+    public void onFail(TapFriendError tapFriendError) {
+        Log.d("TapTap", "关注好友列表失败： " + tapFriendError.detailMessage);
+    }
+});
 ```
 
 
@@ -185,7 +237,19 @@ TapFriends.GetFollowerList(0, 100, (relationShip, err) => {
 
 
 ```java
-1
+TapFriends.getFollowerList(0, 100, new ListCallback<TapUserRelationship>() {
+    @Override
+    public void onSuccess(List<TapUserRelationship> list) {
+        for (TapUserRelationship f : list){
+            System.out.println(f);
+        }
+    }
+
+    @Override
+    public void onFail(TapFriendError tapFriendError) {
+        Log.d("TapTap", "关注粉丝列表失败： " + tapFriendError.detailMessage);
+    }
+});
 ```
 
 
@@ -217,7 +281,19 @@ TapFriends.GetBlockList(0, 100, (relationShip, err) => {
 
 
 ```java
-1
+TapFriends.getBlockList(0, 100, new ListCallback<TapUserRelationship>() {
+    @Override
+    public void onSuccess(List<TapUserRelationship> list) {
+        for (TapUserRelationship b : list){
+            System.out.println(b);
+        }
+    }
+
+    @Override
+    public void onFail(TapFriendError tapFriendError) {
+        Log.d("TapTap", "获取黑白单列表失败： " + tapFriendError.detailMessage);
+    }
+});
 ```
 
 
