@@ -65,6 +65,24 @@ channel | 否 | [分包渠道](/sdk/tap-noun#分包渠道), 长度大于0并小�
 gameVersion | 否 | 游戏版本。长度大于0并小于等于256的字符串。为空时，自动获取游戏安装包的版本（AndroidManifest.xml中的versionName）
 isCN | 是 | 区域类型: true 表示国内; false 表示国外  默认为 true
 
+### 设置获取IDFA
+
+针对iOS14.3+，设置是否获取IDFA，默认开启。如果开启，则需要在应用层配置相关弹窗权限，不开启时无需配置
+
+<MultiLang>
+
+```cs
+TapDB.Init("clientId","channel","gameVersion",true);
+```
+
+
+ 
+```objectivec
+[TapDB setAdvertiserIDCollectionEnabled:YES];
+```
+ 
+</MultiLang>
+
 ## 3. 记录一个用户
 当初始化 sdk 之后，可以调用此 API 来记录一个用户  
 

@@ -47,6 +47,64 @@ if (accessToken == nil) {
 
 </MultiLang>
 
+## 登录资格校验
+
+:::tip
+该功能仅用于需要上线「篝火测试服」的游戏，对有登录白名单的用户进行资格校验，防止测试阶段开发包外传被利用
+:::
+
+请在登录成功的回调里调用相关API进行校验，[点击](https://www.taptap.com/campfire)了解篝火计划
+
+<MultiLang>
+
+```cs
+  public void OnLoginSuccess(AccessToken accessToken)
+    {
+        Debug.Log("登录成功:  " + accessToken.ToJSON());
+        TapBootstrap.GetTestQualification((valid, error) => {
+            if (valid)
+            {
+                Debug.Log("该用户已拥有测试资格");
+            }
+            else
+            {
+                Debug.Log("不具备测试资格，游戏层面进行拦截");
+            }
+        });
+    }
+```
+
+```java
+TapBootstrap.getUser(new Callback<TapUser>() {
+    @Override
+    public void onSuccess(TapUser tapUser) {
+
+    }
+
+    @Override
+    public void onFail(TapError tapError) {
+
+    }
+});
+```
+
+```objectivec
+- (void)onLoginSuccess:(AccessToken *)token{
+    NSLog (@"onLoginSuccess");
+    [TapBootstrap getTestQualification:^(BOOL isQualified, NSError *_Nullable error) {
+        if (error) {
+            // 网络异常或游戏未开启篝火测试
+        } else {
+            if (isQualified) {
+                // 有篝火测试资格
+            }
+        }
+    }];
+}
+```
+
+</MultiLang>
+
 ## 获取用户信息
 
 获取当前登录用户的 ID、昵称、头像等基本信息。

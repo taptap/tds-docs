@@ -319,7 +319,14 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 <MultiLang>
 
 ```cs
-TapConfig tapConfig = new TapConfig("your-client-id", true); // true 表示中国大陆，false 表示国际
+
+TapConfig tapConfig = new TapConfig.Builder()
+    .ClientID("clientId")//必须
+    .ClientSecret("client_secret")//必须
+    .RegionType(RegionType.CN)//非必须，默认CN
+    .TapDBConfig(true, "gameChannel", "gameVersion", true) // 非必须，TapDB 会根据 TapConfig 的配置进行自动初始化
+    .ConfigBuilder();
+
 TapBootstrap.Init(tapConfig);
 ```
 
@@ -334,6 +341,7 @@ TapBootstrap.init(MainActivity.this, tapConfig);
 
 ```objectivec
 TapConfig *config = TapConfig.new;
+config.clientSecret = @"clientSecret";
 config.clientId = @"clientId";
 config.region = TapSDKRegionTypeCN; // TapSDKRegionTypeCN: 中国大陆  TapSDKRegionTypeIO: 国际
 [TapBootstrap initWithConfig:config];
