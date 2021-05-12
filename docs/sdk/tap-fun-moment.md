@@ -121,6 +121,40 @@ mConfig.orientation = TapMomentOrientationDefault;
 动态页面的背景图可以配置，[点击查看图解](/img/tap_moment_bg.png)。
 背景图需要人工审核后才能生效，请预留充足的时间。
 
+## 场景化入口
+
+打开动态页面跳转到指定的页面
+
+:::info
+该功能当前处于测试阶段，如需开通，请联系商务
+:::
+
+<MultiLang>
+
+```cs
+var sceneDic = new Dictionary<string, object>() { { TapMomentConstants.TapMomentPageShortCutKey, sceneId } };
+TapMoment.DirectlyOpen(Orientation.ORIENTATION_DEFAULT, TapMomentConstants.TapMomentPageShortCut, sceneDic);
+```
+
+```java
+TapMoment.open(TapMoment.ORIENTATION_PORTRAIT);
+```
+
+```objectivec
+TapMomentConfig *mConfig = TapMomentConfig.new;
+mConfig.orientation = TapMomentOrientationDefault;
+[TapMoment directlyOpen:mConfig page:TapMomentPageShortcut extras:@{ TapMomentPageShortcutKey: @"sceneid" }];
+```
+
+</MultiLang>
+
+#### 参数说明
+ 参数           | 说明       |
+ ----------- | -------- |
+ orientation    |    打开方向  |
+page    |    固定为TapMomentConstants.TapMomentPageShortCut  |
+ Dictionary     | 其中TapMomentConstants.TapMomentPageShortCutKey固定，第二个参数为要需要跳转的页面id     |
+
 ## 关闭动态页面
 
 玩家可以在动态页面退出。

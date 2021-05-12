@@ -3,6 +3,10 @@ id: tap-changelog
 title: TapSDK 更新日志
 sidebar_label: 更新日志
 ---
+## v2.1.1
+
+
+
 ## v1.0.6
 **修改**
 - iOS 配置目录，Plugins/IOS-->Plugins/iOS  
