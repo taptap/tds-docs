@@ -142,11 +142,11 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
     }  
     dependencies {  
     ...  
-        implementation (name:'TapBootstrap_2.0.0', ext:'aar')  // 必选: TapSDK 启动器 
-        implementation (name:'TapCommon_2.0.0', ext:'aar') // 必选: TapSDK 基础库 
-		implementation (name:'TapLogin_2.5.4', ext:'aar') // 必选: TapTap 登录 
-        implementation (name:'TapMoment_2.0.0', ext:'aar') // TapTap 内嵌动态
-        implementation (name:'TapDB_3.0.2', ext:'aar') // 数据收集
+        implementation (name:'TapBootstrap_2.1.1', ext:'aar')  // 必选: TapSDK 启动器 
+        implementation (name:'TapCommon_2.1.1', ext:'aar') // 必选: TapSDK 基础库 
+		implementation (name:'TapLogin_2.1.1', ext:'aar') // 必选: TapTap 登录 
+        implementation (name:'TapMoment_2.1.1', ext:'aar') // TapTap 内嵌动态
+        implementation (name:'TapDB_2.1.1', ext:'aar') // 数据统计
     }  
     ```
  
@@ -334,6 +334,7 @@ TapBootstrap.Init(tapConfig);
 TapConfig tapConfig = new TapConfig.Builder()
                 .withAppContext(getApplicationContext())
                 .withClientId("clientId") // 开发者中心获取到的 Client ID
+                .withClientSecret("Server Secret") // 开发者中心获取的 Server Secret
                 .withRegionType(TapRegionType.CN) // TapRegionType.CN: 中国大陆  TapRegionType.IO: 国际
                 .build();
 TapBootstrap.init(MainActivity.this, tapConfig);  
