@@ -17,14 +17,24 @@ public static void Init (TapConfig tapConfig);
 #### 示例代码
 
 ```cs
-TapConfig tapConfig = new TapConfig("FwFdCIr6u71WQDQwQN", true);
+TapConfig tapConfig = new TapConfig.Builder()
+    .ClientID("clientId")//必须
+    .ClientSecret("server_secret")//必须
+    .RegionType(RegionType.CN)//非必须，默认CN
+    .TapDBConfig(true, "gameChannel", "gameVersion", true) // 非必须，TapDB 会根据 TapConfig 的配置进行自动初始化
+    .ConfigBuilder();
+
 TapBootstrap.Init(tapConfig);
 ```
 
+**TapConfig 参数说明** 
+
 | 字段        | 可为空 | 说明                                                           |
 | --------- | --- | ------------------------------------------------------------ |
-| clientId    | 否   | 开发者中心获取到的 Client ID |
-| isCN    | 是   | true 为国内，false 为国外，默认 true                                           |
+| ClientID    | 否   | 开发者中心获取到的 Client ID |
+| ClientSecret    | 否   | 开发者中心获取到的 Server Secret |
+| RegionType    | 是   | RegionType.CN 为国内，TapRegionType.IO 为国外，默认国内     |
+| TapDBConfig    | 是  | 数据统计相关配置  |
 
 
 ### Login
