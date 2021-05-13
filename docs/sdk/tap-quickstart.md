@@ -54,13 +54,15 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 ```json
 "dependencies":{
 // 登录
-"com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#2.0.0",
-"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#2.0.0",
-"com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#2.0.0",
+"com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#2.1.1",
+"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#2.1.1",
+"com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#2.1.1",
 // 动态
-"com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#2.0.0",
+"com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#2.1.1",
 // 数据收集 
-"com.taptap.tds.tapdb": "https://github.com/TapTap/TapDB-Unity.git#2.0.0",
+"com.taptap.tds.tapdb": "https://github.com/TapTap/TapDB-Unity.git#2.1.1",
+//付费购买
+"com.taptap.tds.dlc": "https://github.com/TapTap/TapLicense-Unity.git#2.1.1",
 }
 ```
 
