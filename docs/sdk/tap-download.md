@@ -6,9 +6,9 @@ sidebar_label: 资源下载
 
 ## SDK  
 
-- [Unity](https://github.com/TapTap/TapSDK-Unity/releases/tag/2.0.0)  
-- [Android](https://github.com/TapTap/TapSDK-Android/releases/tag/v2.0.0)  
-- [iOS](https://github.com/TapTap/TapSDK-iOS/releases/tag/v2.0.0)  
+- [Unity](https://github.com/TapTap/TapSDK-Unity/releases)  
+- [Android](https://github.com/TapTap/TapSDK-Android/releases)  
+- [iOS](https://github.com/TapTap/TapSDK-iOS/releases)  
 
 
 ## Demo
