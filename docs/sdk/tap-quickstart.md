@@ -47,7 +47,7 @@ import MultiLang from '@theme/MultiLang';
 
 SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需要选择。
 
-### 使用 Unity Package Manager
+#### 使用 Unity Package Manager
 
 在项目的 `Packages/manifest.json` 文件中添加以下依赖：
 
@@ -68,7 +68,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 
 [点击](https://github.com/TapTap) 参考 SDK 最新版本号。
 
-### 手动导入
+#### 手动导入
 
 1. [点击下载 TapSDK-UnityPackage.zip](/sdk/tap-download.md)，然后将该 SDK 解压到方便的位置。
 
@@ -84,7 +84,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 
 导入 SDK 后还需进行 Android、iOS 平台的相关配置。
 
-### Android 配置
+#### Android 配置
 
 1. **File > Build Settings** 添加 Android 配置文件。
 
@@ -100,7 +100,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
         android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
     ```
     
-### iOS 配置
+#### iOS 配置
 
 在 `Assets/Plugins/iOS/Resource` 目录下创建 `TDS-Info.plist` 文件，复制以下代码并且替换其中的 `ClientId` 和授权文案：
 
@@ -168,7 +168,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 </>
 <>
 
-### 导入 SDK
+#### 导入 SDK
 
 1. 在 Xcode 选择工程，到 **Build Setting > Other Linker Flags** 添加 `-ObjC`。
 
@@ -229,7 +229,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
     libz.tbd
     ```
 
-### 配置权限
+#### 配置权限
 
 **TapTap 内嵌动态功能需要相册、相机、麦克风访问权限，数据收集功能需要 IDFA 权限。**
 
@@ -250,7 +250,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 <string>说明为何应用需要此项权限</string>
 ```
 
-### 配置跳转 TapTap 应用
+#### 配置跳转 TapTap 应用
 
 用户无 TapTap 应用时，默认会通过 WebView 登录。
 
