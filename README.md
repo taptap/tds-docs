@@ -21,23 +21,21 @@
 
 多种编程语言的代码示例可以使用 `MultiLang` 组件：
 
-```mdx
-<MultiLang>
+    <MultiLang>
 
-```cs
-public static void GetAccessToken (Action<AccessToken, TapError> action);
-```
+    ```cs
+    public static void GetAccessToken (Action<AccessToken, TapError> action);
+    ```
 
-```java
-public static AccessToken getCurrentToken;
-```
+    ```java
+    public static AccessToken getCurrentToken;
+    ```
 
-```objectivec
-+ (AccessToken *)getCurrentToken;
-```
+    ```objectivec
+    + (AccessToken *)getCurrentToken;
+    ```
 
-</MultiLang>
-```
+    </MultiLang>
 
 注意：
 
@@ -49,56 +47,54 @@ public static AccessToken getCurrentToken;
 实际上，`MultiLang` 里不仅可以放入代码片段，还可以放入其他各种组件，只需保证：1) 内容顺序为 C#、Java、Objective-C，2) 不同编程语言内容在组件层级上是同级的。
 下面是一个例子：
 
-```mdx
-<MultiLang>
-<>
+    <MultiLang>
+    <>
 
-```cs
-public static void Login (LoginType loginType, string[] permissions);
-```
+    ```cs
+    public static void Login (LoginType loginType, string[] permissions);
+    ```
 
-**LoginType参数说明**
+    **LoginType参数说明**
 
-参数  | 描述
-| ------ | ------ |
-LoginType.TAPTAP | TapTap 登录
+    参数  | 描述
+    | ------ | ------ |
+    LoginType.TAPTAP | TapTap 登录
 
-</>
-<>
+    </>
+    <>
 
-```java
-/**
- * @param type TapTap = 0
- */
-public static void login(Activity activity, @LoginType.ThirdPartyType int type, String... permissions);
-``` 
+    ```java
+    /**
+    * @param type TapTap = 0
+    */
+    public static void login(Activity activity, @LoginType.ThirdPartyType int type, String... permissions);
+    ``` 
 
-**LoginType参数说明**
- 
-参数  | 描述
-| ------ | ------ |
-0 | TapTap 登录
+    **LoginType参数说明**
+    
+    参数  | 描述
+    | ------ | ------ |
+    0 | TapTap 登录
 
-</>
-<>
+    </>
+    <>
 
-```objectivec
-+ (void)login:(TapBootstrapLoginType)type permissions:(NSArray *_Nullable)permissions;
-```
+    ```objectivec
+    + (void)login:(TapBootstrapLoginType)type permissions:(NSArray *_Nullable)permissions;
+    ```
 
-**LoginType参数说明**
- 
-参数  | 描述
-| ------ | ------ |
-TapBootstrapLoginTypeTapTap | TapTap 登录
+    **LoginType参数说明**
+    
+    参数  | 描述
+    | ------ | ------ |
+    TapBootstrapLoginTypeTapTap | TapTap 登录
 
-</>
-</MultiLang>
-```
+    </>
+    </MultiLang>
 
 上面的例子中，我们使用了空标签 `<>...</>` (React 的 Fragment 组件) 将 C#、Java、Objective-C 的不同内容包成三组。
 同样，空标签和 markdown 之间也需要留出空行。
-
+另外，由于 docsaurus 的 TOC 生成并不能正确处理这种情况下的小标题（仅会根据第一个标签的内容生成小标题，切换标签后 TOC 的内容不变），请不要在 `Multilang` 标签中使用 `h1`、`h2`、`h3` 级别的标题。
 ## 关于国际化
 > 参考 [docusaurus文档](https://v2.docusaurus.io/docs/i18n/tutorial)
 
