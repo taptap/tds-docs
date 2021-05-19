@@ -6,10 +6,19 @@ include:
       - /shared/deploy-kubefiles.yml
 
 stages:
+  - sync-content
   - build
   - image
   - deploy-staging
   - deploy-production
+
+sync-content:
+  stage: sync-content
+  image: taptap-img-registry.cn-beijing.cr.aliyuncs.com/public/deploy-tools:alpine3.12
+  only:
+    - pipelines
+  script:
+    - bash .ci/sync_content.sh
 
 build:
   stage: build
@@ -19,13 +28,18 @@ build:
     - yarn install
   script:
     - node_modules/.bin/docusaurus build
+  cache:
+    key: ${CI_COMMIT_REF_SLUG}
+    paths:
+      - node_modules
   artifacts:
     paths:
       - build
-    expire_in: 1 day
-  cache:
-    paths:
-      - node_modules
+  except:
+    - pipelines
+  only:
+    - master
+    - auto-sync
 
 build-and-push-image:
   stage: image
@@ -36,6 +50,11 @@ build-and-push-image:
     DOCKER_REGISTRY_REPO: tapsdkdoc
   dependencies:
     - build
+  except:
+    - pipelines
+  only:
+    - master
+    - auto-sync
 
 deploy-staging:
   stage: deploy-staging
@@ -45,8 +64,12 @@ deploy-staging:
     PROJECT_PATH: tds/tapsdkdoc
   needs:
     - build-and-push-image
+  when: on_success
+  except:
+    - pipelines
   only:
     - master
+    - auto-sync
 
 deploy-production:
   stage: deploy-production
