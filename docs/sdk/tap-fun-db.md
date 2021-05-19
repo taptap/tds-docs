@@ -4,261 +4,110 @@ title: TapDB数据收集
 sidebar_label: 数据收集
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-import {Red, Blue, Black, Gray} from '../component';
 import MultiLang from '@theme/MultiLang';
 
 :::caution
-**目前 需要联系运营团队获取 TapDB 的使用权限。**
+**目前需要联系运营团队申请使用 TapDB。**
 :::
+## 介绍
 
-`本文介绍数据收集相关功能和使用方式`
-## 1. 介绍
-TapSDK 提供一套可供游戏开发者收集用户数据的API。系统会收集用户数据并进行分析，最终形成数据报表，帮助游戏开发者分析用户行为并优化游戏。  
+TapSDK 提供了一套可供游戏开发者收集用户数据的 API。
+系统会收集用户数据并进行分析，最终形成数据报表，帮助游戏开发者分析用户行为并优化游戏。  
 
-## 2. 初始化SDK
-
-#### API  
-<MultiLang>
-
-```cs
-public static void Init (string clientId, string channel, string gameVersion, bool isCN);
-```
-
-```java
-public static void init(Context context, String clientId, String channel, String gameVersion, boolean isCN);
-```  
-  
-
-```objectivec
-+ (void)onStartWithClientId:(NSString *)clientId channel:(nullable NSString *)channel version:(nullable NSString *)gameVersion isCN:(BOOL)isCN;
-```
-
-</MultiLang>
-
-#### 示例代码
+## 初始化SDK
 
 <MultiLang>
 
 ```cs
-TapDB.Init("clientId","channel","gameVersion",true);
+TapDB.Init("clientId", "taptap", "gameVersion", true);
 ```
 
 ```java
-  TapDB.init(getApplicationContext(), "Client ID", "taptap", "2.0.0", true);
+TapDB.init(getApplicationContext(), "clientId", "taptap", "gameVersion", true);
 ```
  
 ```objectivec
-[TapDB onStartWithClientId:@"clientid" channel:@"taptap" version:@"2.0.0" isCN:true];
+[TapDB onStartWithClientId:@"clientid" channel:@"taptap" version:@"gameVersion" isCN:true];
 ```
  
 </MultiLang>
 
-**init 参数说明：**   
-
-字段 | 必须 | 说明  
------- | ------ | ------
-context | 是 | 上下文(仅安卓原生)
-clientid | 是 | 开发者后台获取到
-channel | 否 | [分包渠道](/sdk/tap-noun#分包渠道), 长度大于0并小于等于256的字符串
-gameVersion | 否 | 游戏版本。长度大于0并小于等于256的字符串。为空时，自动获取游戏安装包的版本（AndroidManifest.xml中的versionName）
-isCN | 是 | 区域类型: true 表示国内; false 表示国外  默认为 true
+上述代码示例中，`clientId` 可以在控制台获取，`taptap` 为分包渠道（游戏安装包渠道），`gameVersion` 为游戏版本号，最后一个参数表示区域，`true` 表示中国大陆，`false` 表示国际。
+分包渠道和游戏版本号的长度不大于 256，可以为 `null`。
+分包渠道为 `null` 时，就无法根据渠道筛选收集到的数据了。
+游戏版本号为 `null` 时，TapSDK 会自动获取游戏安装包的版本。
 
 ### 设置获取IDFA
 
-针对iOS14.3+，设置是否获取IDFA，默认开启。如果开启，则需要在应用层配置相关弹窗权限，不开启时无需配置
+针对 `iOS14.5+`，可以设置是否获取IDFA。
+默认不获取 IDFA，如果设置获取 IDFA，还需要在应用层额外配置相关弹窗权限。
 
 <MultiLang>
 
 ```cs
-TapDB.Init("clientId","channel","gameVersion",true);
+TapDB.AdvertiserIDCollectionEnabled(true);
 ```
 
+```java
+// Android 平台不适用
+```
 
- 
 ```objectivec
 [TapDB setAdvertiserIDCollectionEnabled:YES];
 ```
  
 </MultiLang>
 
-## 3. 记录一个用户
-当初始化 sdk 之后，可以调用此 API 来记录一个用户  
+## 设置用户
 
-#### API
-
-<MultiLang>
-
-```cs
-public static void SetUser(string userId);
-
-public static void SetUser(string userId, string loginType);
-```
-
-```java
-  public static void setUser(String userId)
-  public static void setUser(String userId,  LoginType loginType)
-```
- 
-```objectivec  
-+ (void)setUser:(NSString *)userId;
-+ (void)setUser:(NSString *)userId  loginType:(TapDBLoginType)loginType;
-```
-
- </MultiLang>
-
-#### 示例代码
+调用该 API 记录用户。
 
 <MultiLang>
 
 ```cs
 TapDB.SetUser("userId");
-TapDB.SetUser("userId","loginType");
 ```
 
 ```java
-TapDB.setUser("xxxxuser1", LoginType.TapTap);
+TapDB.setUser("userId");
 ```
 
 
 ```objectivec
-[TapDB setUser:@"userId" loginType:TapDBLoginTypeTapTap];
+[TapDB setUser:@"userId"];
 ```
 
  </MultiLang>
 
-**setUser 参数说明**
+`userId` 是代表用户的唯一字符串，字符串长度不大于 256，只能包含数字、大小写字母、下划线(`_`)、短横(`-`)。
+开发者需要保证不同用户的 `userId` 均不相同。
 
-字段 | 可为空 | 说明
-| ------ | ------ | ------ |
-userId | 否 | 长度大于0并小于等于256。只能包含数字、大小写字母、下划线(_)、横线(-)，用户ID。不同用户需要保证ID的唯一性
-loginType | 否 | 第三方登录枚举类型，具体见下面说明
+## 用户昵称
 
-**loginType 类型说明**
-
-参数  | 描述
-| ------ | ------ |
-LoginType.TAPTAP | TapTap 登录
-
-<!--
-### TapTap登录时openId获取方式
-
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
-
-  ```java
-  Profile.fetchProfileForCurrentAccessToken(new Api.ApiCallback<Profile>() {
-              @Override
-              public void onSuccess(Profile data) {
-                  Log.e(Tag, "checkLogin-onSuccess");
-                  String openId = Profile.getCurrentProfile().getOpenid();
-              }
-
-              @Override
-              public void onError(Throwable error) {
-                  Log.e(Tag, "checkLogin-onError");
-                  login();
-              }
-          });
-  ```
-  </TabItem>
-
-  <TabItem value="ios">
-
-```objectivec
-TTSDKProfile *currentProfile = [TapLoginHelper currentProfile];
-NSString *openId = [currentProfile openid];
-```
-  </TabItem>
-  <TabItem value="unity">
-
-```cs
-Login.GetCurrentProfile((profile) => {
-    string openid = profile.openid;
-});
-```
-  </TabItem>
-
-</Tabs> -->
-
-
-## 4. 用户名称
-设置用户名称
-
-#### API  
+游戏设置用户昵称时调用。
 
 <MultiLang>
 
 ```cs
-public static void SetName(string name);
-```
-
-  ```java
-  public static void setName(String name)
-  ```
- 
-
-  ```objectivec
-+ (void)setName:(NSString *)name;
-  ```
- 
-  </MultiLang>
-
-#### 示例代码
-
-<MultiLang>
-
-```cs
-TapDB.SetName("name");
-```
-
-
-```java
-TapDB.setName("taptap");
-```
-
-```objectivec
-[TapDB setName:@"Tap zhang"];
-```
-
- </MultiLang>
-
-
-字段 | 可为空 | 说明
-| ------ | ------ | ------ |
-name | 否 | 长度大于0并小于等于256。用户名
-
-## 5. 用户等级
-设置用户等级。用户登录或升级时调用  
-
-#### API  
-<MultiLang>
-
-```cs
-public static void SetLevel(int level);
+TapDB.SetName("Tarara");
 ```
 
 ```java
-public static void setLevel(int level)
+TapDB.setName("Tarara");
 ```
 
-
 ```objectivec
-+ (void)setLevel:(NSInteger)level;
+[TapDB setName:@"Tarara"];
 ```
 
 </MultiLang>
 
+参数的类型为字符串，不可为空，长度不大于 256。
 
-#### 示例代码
+## 用户等级
+
+通常在用户升级时调用。
+
 <MultiLang>
 
 ```cs
@@ -271,312 +120,320 @@ TapDB.setLevel(5);
 
 
 ```objectivec
-[TapDB setLevel:10];
+[TapDB setLevel:5];
 ```
 
+等级参数为整型，不可为空，大于等于 0。
 
 </MultiLang>
 
-字段 | 可为空 | 说明
-| ------ | ------ | ------ |
-level | 否 | 大于等于0。用户等级
+## 用户所在服务器
 
-## 6. 用户所在服务器
+通常在用户登录或切换服务器时调用。
 
-设置用户所在服务器。用户登陆或切换服务器时调用
-
-#### API   
 <MultiLang>
 
 ```cs
-public static void SetServer(string server);
+TapDB.SetServer("https://test.example.com/callback");
 ```
 
 ```java
-public static void setServer(String server)
+TapDB.setServer("https://test.example.com/callback");
 ```
 
-
 ```objectivec
-+ (void)setServer:(NSString *)server;
+[TapDB setServer:@"https://test.example.com/callback"];
 ```
 
 </MultiLang>
 
+服务器参数为非空字符串，长度不大于 256。
 
-#### 示例代码
+## 充值
+
+充值成功时调用。
+可以选择通过客户端 SDK 推送和通过服务端推送。
+建议优先选择服务端推送方式，以保证数据的准确性。
+
+### 客户端推送
+
 <MultiLang>
 
 ```cs
-TapDB.SetServer("https://test.taptap.com/callback");
-```
-
-```java
-TapDB.setServer("https://test.taptap.com/callback");
-```
-
-
-```objectivec
-[TapDB setServer:@"https://test.taptap.com/callback"];
-```
-
-</MultiLang>
-
-
-字段 | 可为空 | 说明
-| ------ | ------ | ------ |
-server | 否 | 用户所在服务器。长度大于0并小于等于256。
-
-## 7. 充值
-
-### 客户端充值推送
-
-充值成功时调用。SDK推送和[服务端充值推送](#101-充值推送接口)只能选择其中一种。建议优先选择服务端推送方式，以保证数据的准确性。
-
-#### API  
-<MultiLang>
-
-```cs
-public static void OnCharge(string orderId, string productId, string amount, string currencyType, string payment)
-```
-
-
-```java
-public static void onCharge(String orderId, String product, long amount, String currencyType, String payment)
-```
-
-
-```objectivec
-+ (void)onChargeSuccess:(NSString *)orderId product:(NSString *)product amount:(NSInteger)amount currencyType:(NSString *)currencyType payment:(NSString *)payment;
-```
-
-</MultiLang>
-
-#### 示例代码
-<MultiLang>
-
-```cs
-TapDB.OnCharge("0xueiEns","大宝剑","100","CNY","wechat");
+TapDB.OnCharge("0xueiEns","轩辕剑","100","CNY","wechat");
 ```
 
 ```java
 TapDB.onCharge("0xueiEns","轩辕剑","100","CNY","wechat");
 ```
 
-
 ```objectivec
-[TapDB onChargeSuccess:@"0xueiEns" product:@"轩辕剑" amount:10 currencyType:@"CNY" payment:@"wechat"];
+[TapDB onChargeSuccess:@"0xueiEns" product:@"轩辕剑" amount:100 currencyType:@"CNY" payment:@"wechat"];
 ```
 
 </MultiLang>
 
+上述代码示例中，`0xueiEns` 是订单 ID，`轩辕剑` 是商品名，`100` 是金额，`CNY` 是货币名称，`wechat` 是充值渠道。
+订单 ID、商品名、充值渠道是长度大于 0、不大于 256 的字符串，可以为 `null`。
+传递订单 ID 方便排重，防止重复计算。
+金额是大于0、小于等于 100000000000 的整数，单位为分（主币价值的百分之一），不可为 `null`。
+货币名称由三位字母组成，遵循 ISO 4217 标准，为 `null` 时表示使用默认值 `CNY`。
 
+### 服务端推送
 
-**参数说明**
+由于客户端推送可能会不太准确，因此推荐通过服务端推送。
 
-字段 | 可为空 | 说明
-| ------ | ------ | ------ |
-orderId | 是 | 订单ID。长度大于0并小于等于256。传递订单ID可进行排重，防止计算多次
-product | 是 | 商品名称。长度大于0并小于等于256。
-amount | 否 | 充值金额。大于0并小于等于100000000000。单位分，即无论什么币种，都需要乘以100
-currencyType | 是 | 货币类型。国际通行三字母表示法，为空时默认CNY。参考：人民币 CNY，美元 USD；欧元 EUR
-payment | 是 | 充值渠道。长度大于0并小于等于256。
+请求地址：`https://e.tapdb.net/event`
 
-常见货币类型的格式参考<a target="_blank" href="https://www.tapdb.com/docs/zh_CN/features/exchangeRate.html">汇率表</a>
+POST 数据（实际发送请求时需去除注释、空格、换行符并 urlencode）：
 
-### 服务端充值推送
-
-
-由于SDK推送可能会不太准确，这里提供服务端充值推送方法。需要忽略掉SDK中的相关充值推送接口。
-
-```
-接口：https://e.tapdb.net/event
-内容（注意后面还需要处理一下）：
+```json
 {
-    "module": "GameAnalysis", // 固定参数
-    "ip": "8.8.8.8", // 可选。充值用户的IP
-    "name": "charge", // 固定参数
-    "index": "APPID", // 必需。注意APPID需要被替换成TapDB的appid
-    "identify": "userId", // 必需。用户ID。必须和SDK的setUser接口传递的userId一样，并且该用户已经通过SDK接口进行过推送
-    "properties": {
-        "order_id": "100000", // 可选。长度大于0并小于等于256。订单ID。传递订单ID可进行排重，防止计算多次
-        "amount": 100, // 必需。大于0并小于等于100000000000。充值金额。单位分，即无论什么币种，都需要乘以100
-        "currency_type": "CNY", // 可选。货币类型。国际通行三字母表示法，为空时默认CNY。参考：人民币 CNY，美元 USD；欧元 EUR
-        "product": "item1", // 可选。长度大于0并小于等于256。商品名称
-        "payment": "alipay" // 可选。长度大于0并小于等于256。充值渠道
+    "module": "GameAnalysis", // 固定值
+    "ip": "172.16.254.1", // 可选，充值用户的 IP
+    "name": "charge", // 固定值
+    // 必需，需要替换成 TapDB 的 appid, 
+    // 可以在 tapdb.com 控制台查看。
+    "index": "APPID",
+    // 必需，用户 ID。
+    // 必须和 SDK 的 setUser 接口传递的用户 ID 相一致，
+    // 并且对应用户已经通过 SDK 接口进行过推送。
+    "identify": "userId",
+    "properties": { // 详见上节「客户端推送」的说明
+        "order_id": "0xueiEns", // 可选，订单 ID
+        "amount": 100, // 必需，金额
+        "currency_type": "CNY", // 可选，货币名称
+        "product": "item1", // 可选，商品名
+        "payment": "alipay" // 可选，充值渠道
     }
 }
-
-假如游戏的appid为abcd1234。构建出json字符串后，去掉空格和换行符，然后再进行一次urlencode。再把结果作为POST数据推送
-先替换换行符和空格，变成：
-{"module":"GameAnalysis","name":"charge","index":"abcd1234","identify":"user_id","properties":{"order_id":"100000","amount":100,"virtual_currency_amount":100,"currency_type":"CNY","product":"item1","payment":"alipay"}}
-然后urlencode，变成如下形式。某些版本的urlencode可能会把':'和','进行编码，不会影响实际使用。
-%7B%22module%22:%22GameAnalysis%22,%22name%22:%22charge%22,%22index%22:%22abcd1234%22,%22identify%22:%22user_id%22,%22properties%22:%7B%22order_id%22:%22100000%22,%22amount%22:100,%22virtual_currency_amount%22:100,%22currency_type%22:%22CNY%22,%22product%22:%22item1%22,%22payment%22:%22alipay%22%7D%7D
 ```
 
-成功判断：返回的HTTP Code为200时认为发送成功，否则认为失败
+返回的 HTTP Code 为 200 时发送成功，否则发送失败。
 
-常见货币类型的格式参考<a target="_blank" href="https://www.tapdb.com/docs/zh_CN/features/exchangeRate.html">汇率表</a>
+## 设置通用事件属性
 
-<!-- 
-## 8. 自定义事件
+开发者可以注册全局通用的自定义属性，这些属性会被附带在 TapDB 上传的事件中。
+### 添加事件属性
 
-推送自定义事件。需要在控制台预先进行配置。
+例如，添加来源渠道：
 
-#### API  
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
-
-  ```java
-  public static void onEvent(String eventCode, JSONObject properties)
-  ```
-  </TabItem>
-
-  <TabItem value="ios">
-
-  ```objectivec
-+ (void)onEvent:(NSString *)eventCode properties:(NSDictionary *)properties;
-  ```
-  </TabItem>
-  <TabItem value="unity">
+<MultiLang>
 
 ```cs
-public static void OnEvent(string eventCode, string properties)
+Dictionary<string, object> properties = new Dictionary<string, object>();
+properties.Add("channel", "TapDB");
+TapDB.registerStaticProperties(properties);
 ```
 
-  </TabItem>
-</Tabs>
+```java
+JSONObject commonProperties = new JSONObject();
+commonProperties.put("channel", "TapDB");
+TapDB.registerStaticProperties(properties);
+```
 
-#### 示例代码
-<Tabs
-groupId="tap-platform"
-  defaultValue="Android"
-  values={[
-    {label: 'Android', value: 'android'},
-    {label: 'iOS', value: 'ios'},
-    {label: 'unity', value: 'unity'},
-  ]}>
-  <TabItem value="android">
+```objectivec
+[TapDB registerStaticProperties:@{@"channel":@"TapDB"}];
+```
 
-  ```java
-  try {
-      JSONObject object = new JSONObject("{\"param1\":\"param1\",\"param2\":\"param2\"}");
-      TapDB.setLevel(4);TapDB.onEvent("1000",object);
-  } catch (JSONException e) {
-      e.printStackTrace();
-  }
-  ```
-  </TabItem>
+</MultiLang>
 
-  <TabItem value="ios">
+### 删除事件属性
 
-  ```objectivec
-NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:@"name",@"Tap zhang",@"age",@"18",nil];
-[TapDB onEvent:@"userInfo" properties:dict];
-  ```
-  </TabItem>
-  <TabItem value="unity">
+删除单个已添加的事件属性：
+
+<MultiLang>
 
 ```cs
-TapDB.OnEvent("1000","{\"param1\":\"param1\",\"param2\":\"param2\"}");
+TapDB.unregisterStaticProperty("channel");
 ```
 
-  </TabItem>
-</Tabs>
-
-
-字段 | 可为空 | 说明
-| ------ | ------ | ------ |
-eventCode | 否 | 在控制台中配置得到的事件编码
-properties | 是 | 事件属性。需要和控制台的配置匹配。值需要是长度大于0并小于等于256的字符串或绝对值小于1E11的浮点数 -->
-
-## 8. 设置通用事件属性
-对于某些重要的属性需要在每个上传的事件中出现，用户可以将这些属性设置为全局通用的自定义属性，包括静态固定属性和动态计算属性。这些通用属性在注册之后，会被附带在TapDB上传的事件中。这里需要注意 track 中传入的属性优先级 > 动态通用属性优先级 > 静态通用属性优先级，也就是说动态通用属性会覆盖同名的静态通用属性。track 中的属性会覆盖同名的动态通用属性和静态通用属性。
-
-以下举例设备属性用法（unity），用户属性请参考[Unity API文档](/api/unity-tapdb)  
-Android 请参考[Android API文档](/api/android-tapdb)  
-iOS 请参考[iOS API文档](/api/ios-tapdb)  
-
-### 添加静态事件属性
-如果需要添加的通用属性的值在所有事件中相对固定，那么可以调用 registerStaticProperties 方法注册静态通用属性。以来源渠道为例：
-
-```cs
-TapDB.RegisterStaticProperties("{\"channel\":\"TapDB\"}");
+```java
+TapDB.unregisterStaticProperty("channel");
 ```
 
-### 删除所有静态事件属性
+```objectivec
+[TapDB unregisterStaticProperty:@"channel"];
+```
+
+</MultiLang>
+
+删除所有事件属性：
+
+<MultiLang>
+
 ```cs
 TapDB.ClearStaticProperties();
 ```
 
-## 9. 事件主体操作（用户、设备）
-以下举例设备属性用法（unity），用户属性请参考[Unity API文档](/api/unity-tapdb)  
-Android 请参考[Android API文档](/api/android-tapdb)  
-iOS 请参考[iOS API文档](/api/ios-tapdb)  
+```java
+TapDB.ClearStaticProperties();
+```
 
-### 设备初始化操作
-如果需要初始化设备的某些属性，可以调用 deviceInitialize 来进行设置。如果相应属性之前已近被初始化，那么后续对这些属性的初始化操作将会被忽略。以首次活跃服务器为例：
+```objectivec
+[TapDB clearStaticProperties];
+```
+
+</MultiLang>
+
+## 事件主体操作
+
+目前支持设备和账号这两个主体，支持初始化、更新、累加这三种主体操作。
+三种操作的主要区别是数据更新策略。
+
+### 初始化
+
+初始化操作用于初始化属性。
+已初始化的属性，后续的初始化操作会被忽略。
+以上报首次活跃服务器为例：
+
+<MultiLang>
+
 ```cs
-TapDB.DeviceInitialize("{\"firstActiveServer\":\"server1\"}");
+Dictionary<string, object> properties = new Dictionary<string, object>();
+properties.Add("firstActiveServer", "server1");
+TapDB.deviceInitialize(properties);
 
-TapDB.DeviceInitialize("{\"firstActiveServer\":\"server2\"}");
-// 此时设备表的 "firstActiveServer" 字段值还是为 "server1" 
+properties["firstActiveServer"] = "server2";
+TapDB.deviceInitialize(properties);
 ```
 
-### 设备属性更新操作
-如果需要更新设备的某些属性，可以调用 DeviceUpdate 来进行设置。通过该接口上传的属性会将原有属性值进行覆盖。以当前积分为例：
+```java
+JSONObject properties = new JSONObject();
+properties.put("firstActiveServer", "server1");
+TapDB.deviceInitialize(properties);
+
+properties.put("firstActiveServer", "server2");
+TapDB.deviceInitialize(properties);
+```
+
+```objectivec
+[TapDB deviceInitialize:@{@"firstActiveServer":@"server1"}];
+
+[TapDB deviceInitialize:@{@"firstActiveServer":@"server2"}];
+```
+
+</MultiLang>
+
+运行上述代码后，设备表的 `firstActiveServer` 字段值仍为 `server1`。
+
+### 更新
+
+更新操作用于更新属性。
+该操作会覆盖原属性值。
+以上报当前点数为例：
+
+<MultiLang>
+
 ```cs
-TapDB.DeviceUpdate("{\"currentPoints\":10}");
-TapDB.DeviceUpdate("{\"currentPoints\":42}");
-// 此时设备表的 "currentPoints" 字段值为 42 
+Dictionary<string, object> properties = new Dictionary<string, object>();
+properties.Add("currentPoints", 10);
+TapDB.deviceUpdate(properties);
+
+properties["currentPoints"] = 42;
+TapDB.deviceUpdate(properties);
 ```
 
-### 设备属性累加操作
-如果需要对设备的某些属性增减，可以调用 DeviceAdd 来进行设置。通过该接口上传的属性会将原有属性值进行覆盖。以当前积分为例：
+```java
+JSONObject properties = new JSONObject();
+properties.put("currentPoints", 10);
+TapDB.deviceUpdate(properties);
+
+properties.put("currentPoints", 42);
+TapDB.deviceUpdate(properties);
+```
+
+```objectivec
+[TapDB deviceUpdate:@{@"currentPoints":@10}];
+
+[TapDB deviceUpdate:@{@"currentPoints":@42}];
+```
+
+</MultiLang>
+
+运行上述代码后，设备表的 `currentPoints` 字段值为 `42`。
+
+### 累加
+
+累加操作用于增减属性，目前只支持数字属性。
+该操作会在原属性值基础上累加数值，原属性不存在时，原属性值计为 0.
+以上报总点数为例：
+
+<MultiLang>
+
 ```cs
-TapDB.DeviceAdd("{\"totalPoints\":10}");
-TapDB.DeviceAdd("{\"totalPoints\":-2}");
-// 此时设备表的 "totalPoints" 字段值为 8 
+Dictionary<string, object> properties = new Dictionary<string, object>();
+properties.Add("totalPoints", 10);
+TapDB.deviceAdd(properties);
+
+properties["totalPoints"] = -2;
+TapDB.deviceAdd(properties);
 ```
 
+```java
+JSONObject properties = new JSONObject();
+properties.put("totalPoints", 10);
+TapDB.deviceAdd(properties);
 
-
-## 10. 服务端在线人数推送
-
-由于SDK无法推送准确的在线数据，这里提供服务端在线数据推送接口。游戏服务端可以每隔5分钟`自行统计`在线人数，通过接口推送到TapDB。TapDB进行数据汇总展现。
-
-```
-接口：https://se.tapdb.net/tapdb/online
-方法：POST
-格式：json
-必需头信息：Content-Type: application/json
+properties.put("totalPoints", -2);
+TapDB.deviceAdd(properties);
 ```
 
-请求内容：
+```objectivec
+[TapDB deviceAdd:@{@"totalPoints":@10}];
+
+[TapDB deviceAdd:@{@"totalPoints":@(-2)}];
+```
+</MultiLang>
+
+运行上述代码后，设备表的 `totalPoints` 字段值为 `8`。
+
+上述代码示例中，属性值为整数。
+累加操作也支持浮点数，不过浮点数相加有精度问题，开发者还需留意。
+
+初始化、更新、累加操作同样适用于账号主体：
+
+<MultiLang>
+
+```cs
+TapDB.userInitialize(properties);
+TapDB.userUpdate(properties);
+TapDB.userAdd(properties);
+```
+
+```java
+TapDB.userInitialize(properties);
+TapDB.userUpdate(properties);
+TapDB.userAdd(properties);
+```
+
+```objectivec
+[TapDB userInitialize:@{@"firstActiveServer":@"server1"}];
+[TapDB userUpdate:@{@"currentPoints":@10}];
+[TapDB userAdd:@{@"totalPoints":@10}];
+```
+</MultiLang>
+
+## 服务端在线人数推送
+
+游戏服务端自行统计在线人数，每隔 5 分钟向 `https://se.tapdb.net/tapdb/online` 发送 POST 请求，请求内容为 json 格式的数据，包含以下信息：
 
 参数名 | 参数类型 | 参数说明
 | ------ | ------ | ------ |
-appid | string | 游戏的 App ID
-onlines | array | 多条在线数据（最多100条）
+appid | string | 游戏的 App ID （可在 TapDB 控制台查看）
+onlines | array | 多条在线数据（最多 100 条）
 
-其中onlines数组的结构为
+其中 `onlines` 数组元素的结构为：
 
 参数名 | 参数类型 | 参数说明
 | ------ | ------ | ------ |
-server | string | 服务器。TapDB对同一服务器每一个自然5分钟仅接受一次数据
+server | string | 服务器。自然时间 5 分钟内，TapDB 对同一服务器仅接受一次数据。
 online | int | 在线人数
-timestamp | long | 当前统计数据的时间戳(秒)。TapDB会按照自然5分钟进行数据对齐
+timestamp | long | 当前统计数据的时间戳（秒）。TapDB 会按照自然时间 5 分钟对齐数据。
 
 示例：
 
-```
+```json
 {
   "appid":"gkjasd13bbsa1sdk",
   "onlines":[{
@@ -591,15 +448,16 @@ timestamp | long | 当前统计数据的时间戳(秒)。TapDB会按照自然5�
 }
 ```
 
-成功判断：返回的HTTP Code为200时认为发送成功，否则认为失败
+返回的 HTTP Code 为 200 时发送成功，否则发送失败。
 
-## 11. 收集设备指纹
-### OAID方式
-自行选择是否引入OAID，TapSDK支持OAID版本为1.0.5-1.0.23
-- 如果自己有集成其他SDK使用到OAID，TapSDK可以直接使用
-- 如果没有集成其他OAID版本，我们推荐下载 [oaid_sdk_1.0.23.aar](/res/tap_oaid_sdk_1.0.23.aar)
+注意，因为请求内容为 json 格式数据，所以发送请求时别忘了加上 `Content-Type: application/json` 的 HTTP 头。
 
-<!-- ### 数美SDK收集
-  <Red> ⬇️ 数美定制版，仅支持当前下载渠道</Red>
+## 收集设备指纹
 
-[下载SDK](/res/tap_wl_pri_release.aar) -->
+### OAID
+
+游戏可以自行选择是否引入OAID.
+TapSDK 支持的OAID版本为 `1.0.5-1.0.23`。
+
+如果游戏集成的其他 SDK 引入了 OAID，TapSDK 可以直接使用。
+否则，推荐集成 [oaid_sdk_1.0.23.aar](/res/tap_oaid_sdk_1.0.23.aar)。
