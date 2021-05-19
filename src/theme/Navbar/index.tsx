@@ -7,6 +7,7 @@
 
 import React, {useCallback, useState, useEffect} from 'react';
 import clsx from 'clsx';
+
 import SearchBar from '@theme/SearchBar';
 import Toggle from '@theme/Toggle';
 import useThemeContext from '@theme/hooks/useThemeContext';
