@@ -203,8 +203,8 @@ POST 数据（实际发送请求时需去除注释、空格、换行符并 urlen
         "order_id": "0xueiEns", // 可选，订单 ID
         "amount": 100, // 必需，金额
         "currency_type": "CNY", // 可选，货币名称
-        "product": "item1", // 可选，商品名
-        "payment": "alipay" // 可选，充值渠道
+        "product": "轩辕剑", // 可选，商品名
+        "payment": "wechat" // 可选，充值渠道
     }
 }
 ```
@@ -223,7 +223,7 @@ POST 数据（实际发送请求时需去除注释、空格、换行符并 urlen
 ```cs
 Dictionary<string, object> properties = new Dictionary<string, object>();
 properties.Add("channel", "TapDB");
-TapDB.registerStaticProperties(properties);
+TapDB.RegisterStaticProperties(properties);
 ```
 
 ```java
@@ -245,7 +245,7 @@ TapDB.registerStaticProperties(properties);
 <MultiLang>
 
 ```cs
-TapDB.unregisterStaticProperty("channel");
+TapDB.UnregisterStaticProperty("channel");
 ```
 
 ```java
@@ -267,7 +267,7 @@ TapDB.ClearStaticProperties();
 ```
 
 ```java
-TapDB.ClearStaticProperties();
+TapDB.clearStaticProperties();
 ```
 
 ```objectivec
@@ -292,10 +292,10 @@ TapDB.ClearStaticProperties();
 ```cs
 Dictionary<string, object> properties = new Dictionary<string, object>();
 properties.Add("firstActiveServer", "server1");
-TapDB.deviceInitialize(properties);
+TapDB.DeviceInitialize(properties);
 
 properties["firstActiveServer"] = "server2";
-TapDB.deviceInitialize(properties);
+TapDB.DeviceInitialize(properties);
 ```
 
 ```java
@@ -328,10 +328,10 @@ TapDB.deviceInitialize(properties);
 ```cs
 Dictionary<string, object> properties = new Dictionary<string, object>();
 properties.Add("currentPoints", 10);
-TapDB.deviceUpdate(properties);
+TapDB.DeviceUpdate(properties);
 
 properties["currentPoints"] = 42;
-TapDB.deviceUpdate(properties);
+TapDB.DeviceUpdate(properties);
 ```
 
 ```java
@@ -364,10 +364,10 @@ TapDB.deviceUpdate(properties);
 ```cs
 Dictionary<string, object> properties = new Dictionary<string, object>();
 properties.Add("totalPoints", 10);
-TapDB.deviceAdd(properties);
+TapDB.DeviceAdd(properties);
 
 properties["totalPoints"] = -2;
-TapDB.deviceAdd(properties);
+TapDB.DeviceAdd(properties);
 ```
 
 ```java
@@ -396,9 +396,9 @@ TapDB.deviceAdd(properties);
 <MultiLang>
 
 ```cs
-TapDB.userInitialize(properties);
-TapDB.userUpdate(properties);
-TapDB.userAdd(properties);
+TapDB.UserInitialize(properties);
+TapDB.UserUpdate(properties);
+TapDB.UserAdd(properties);
 ```
 
 ```java
