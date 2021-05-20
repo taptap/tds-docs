@@ -23,7 +23,12 @@ import MultiLang from '@theme/MultiLang';
 ```
 
 ```java
-
+TapFriends.registerMessageCallback(new ComponentMessageCallback() {
+    @Override
+    public void onMessage(int code, Map<String, String> map) {
+                
+    }
+});
 ```
 
 
@@ -367,7 +372,17 @@ TapFriends.SendFriendInvitation((isInvitation, error) =>
 
 
 ```java
+TapFriends.sendFriendInvitation(Activity activity, new Callback<Boolean>() {
+    @Override
+    public void onSuccess(Boolean aBoolean) {
+        // 分享好友邀请成功
+    }
 
+    @Override
+    public void onFail(TapFriendError tapFriendError) {
+        // 分享好友邀请失败
+    }
+});
 ```
 
 
@@ -407,7 +422,17 @@ TapFriends.SendFriendInvitation((isInvitation, error) =>
 
 
 ```java
+TapFriends.generateFriendInvitation(new Callback<String>() {
+    @Override
+    public void onSuccess(String s) {
+        // 获取好友邀请链接成功
+    }
 
+    @Override
+    public void onFail(TapFriendError tapFriendError) {
+        // 获取好友邀请链接失败
+    }
+});
 ```
 
 
@@ -419,7 +444,6 @@ TapFriends.SendFriendInvitation((isInvitation, error) =>
         NSLog(@"url %@", invitationString);
     }
 }];
-
 ```
 
 </MultiLang>
@@ -454,7 +478,18 @@ TapFriends.SearchUser(userId, (relationShip, error) =>
 
 
 ```java
+TapFriends.searchUser("userID", new Callback<TapUserRelationship>() {
+    @Override
+    public void onSuccess(TapUserRelationship tapUserRelationship) {
+        // 搜索好友成功
+        tapUserRelationship.toJSON();
+    }
 
+    @Override
+    public void onFail(TapFriendError tapFriendError) {
+        // 搜索好友失败
+    }
+});
 ```
 
 
