@@ -8,7 +8,35 @@ import MultiLang from '@theme/MultiLang';
 
 该功能暂未对外开放
 
-## 1 添加好友
+## 1. 注册消息回调
+
+
+<MultiLang>
+
+```cs
+//实现ITapMessageListener接口
+ public void OnMessageWithCode(int code, Dictionary<string, object> extras)
+{
+    Debug.Log( "code: " + code + " extras: " + Json.Serialize(extras));
+}
+
+```
+
+```java
+
+```
+
+
+```objectivec
+- (void)onMessageWithCode:(NSInteger)code extras:(NSDictionary *)extras
+{
+    NSLog(@"code %@, %@", code,extras);
+}
+```
+
+</MultiLang>
+
+## 2. 添加好友
 
 <MultiLang>
 
@@ -49,7 +77,7 @@ TapFriends.addFriend("userID", new Callback<Boolean>() {
 #### 参数说明
 userId : tds id，登录成功后从服务端获取
 
-## 2 删除好友
+## 3. 删除好友
 
 <MultiLang>
 
@@ -85,7 +113,7 @@ TapFriends.deleteFriend("userID", new Callback<Boolean>() {
 ```
 </MultiLang>
 
-## 3 拉黑好友
+## 4. 拉黑好友
 
 <MultiLang>
 
@@ -126,7 +154,7 @@ TapFriends.blockUser("userID", new Callback<Boolean>() {
 
 
 
-## 4 取消拉黑
+## 5. 取消拉黑
 
 <MultiLang>
 
@@ -163,7 +191,7 @@ TapFriends.unblockUser("userID", new Callback<Boolean>() {
 
 </MultiLang>
 
-## 5 获取关注列表
+## 6. 获取关注列表
 以下列表形式获取均为分页获取
 
 
@@ -222,7 +250,7 @@ avatar  | 头像地址
 gender | UNKNOWN = 0;<br/>MALE = 1;<br/> FEMALE = 2;
 mutualAttention | 是否互相关注 <br/>false:不是互相关注 <br/>true: 互相关注
 
-## 6 获取粉丝列表
+## 7. 获取粉丝列表
 
 <MultiLang>
 
@@ -267,7 +295,7 @@ TapFriends.getFollowerList(0, 100, new ListCallback<TapUserRelationship>() {
 
 
 
-## 7 获取黑名单
+## 8. 获取黑名单
 
 <MultiLang>
 
@@ -308,3 +336,145 @@ TapFriends.getBlockList(0, 100, new ListCallback<TapUserRelationship>() {
 ```
 
 </MultiLang>
+
+
+
+## 9. 分享好友邀请链接
+
+1. 生成链接并唤起系统分享控件
+2. 选择分享应用，分享链接给对方
+3. 对方点击链接，会打开下面图示
+4. 如果对方已经安装该游戏，则直接打开游戏并添加关注；如果对方未安装该游戏，则选额跳转到TapTap进行安装
+
+![friends](/img/friends-follow.jpg)
+
+<MultiLang>
+
+```cs
+TapFriends.SendFriendInvitation((isInvitation, error) =>
+{
+    if (error != null)
+    {
+        label = $"Error:{error.code} Description:{error.errorDescription}";
+    }
+    else
+    {
+        label = "分享好友邀请: ";
+        this.label = this.label + (isInvitation ? "成功" : "失败");
+    }
+});
+```
+
+
+```java
+
+```
+
+
+```objectivec
+[TapFriends sendFriendInvitationWithHandler:^(BOOL success, NSError *_Nullable error) {
+    if (success) {
+        NSLog(@"分享成功");
+    } else {
+        NSLog(@"分享失败 %@", error);
+    }
+}];
+
+```
+
+</MultiLang>
+
+##  10. 获取好友邀请链接
+
+获取到上图示「关注好友」的分享链接（「分享好友邀请链接」功能的简略版，省去了分享，只生成相关链接），游戏可以通过自己的方式将该链接分享出去
+
+<MultiLang>
+
+```cs
+ TapFriends.GenerateFriendInvitation((invitationString, error) =>
+{
+    if (error != null)
+    {
+        label = $"Error:{error.code} Description:{error.errorDescription}";
+    }
+    else
+    {
+        label = "获取好友邀请链接成功: ";
+        this.label = this.label + invitationString;
+    }
+});
+```
+
+
+```java
+
+```
+
+
+```objectivec
+[TapFriends generateFriendInvitationWithHandler:^(NSString *_Nullable invitationString, NSError *_Nullable error) {
+    if (error) {
+        NSLog(@"error:%@", error);
+    } else {
+        NSLog(@"url %@", invitationString);
+    }
+}];
+
+```
+
+</MultiLang>
+
+
+
+
+## 11. 搜索用户
+
+<MultiLang>
+
+```cs
+
+TapFriends.SearchUser(userId, (relationShip, error) =>
+{
+    if (error != null)
+    {
+        label = $"Error:{error.code} Description:{error.errorDescription}";
+    }
+    else
+    {
+        label = "搜索用户成功";
+        this.label = this.label + "userId：" + relationShip.userId +
+                        " name：" + relationShip.name +
+                        " avatar：" + relationShip.avatar +
+                        " gender：" + relationShip.gender +
+                        " mutualAttention：" + relationShip.mutualAttention +
+                        " relationship：" + relationShip.relationship + "\n";
+    }
+});
+```
+
+
+```java
+
+```
+
+
+```objectivec
+[TapFriends searchUserWithUserId:@"tds id" handler:^(TapUserRelationShip *_Nullable user, NSError *_Nullable error) {
+    if (error) {
+        NSLog(@"error:%@", error);
+    } else {
+        NSString *str = @"";
+
+        str = [str stringByAppendingString:[self beanToString:user]];
+        str = [str stringByAppendingString:@"\n\n"];
+
+        NSLog(@"friend list %@ %@ %@ %@", str, user.isBlocked ? @"yes" : @"no", user.isFollowed ? @"yes" : @"no", user.isFollowing ? @"yes" : @"no");
+    }
+}];
+
+```
+
+</MultiLang>
+
+
+
