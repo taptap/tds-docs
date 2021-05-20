@@ -321,7 +321,6 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 <MultiLang>
 
 ```cs
-
 TapConfig tapConfig = new TapConfig.Builder()
     .ClientID("clientId")//必须
     .ClientSecret("client_secret")//必须
