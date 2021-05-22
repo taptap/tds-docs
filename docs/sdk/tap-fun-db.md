@@ -221,8 +221,7 @@ POST 数据（实际发送请求时需去除注释、空格、换行符并 urlen
 <MultiLang>
 
 ```cs
-Dictionary<string, object> properties = new Dictionary<string, object>();
-properties.Add("channel", "TapDB");
+string properties = "{\"channel\":\"TapDB\"}";
 TapDB.RegisterStaticProperties(properties);
 ```
 
@@ -290,11 +289,10 @@ TapDB.clearStaticProperties();
 <MultiLang>
 
 ```cs
-Dictionary<string, object> properties = new Dictionary<string, object>();
-properties.Add("firstActiveServer", "server1");
+string properties = "{\"firstActiveServer\":\"server1\"}";
 TapDB.DeviceInitialize(properties);
 
-properties["firstActiveServer"] = "server2";
+string properties = "{\"firstActiveServer\":\"server2\"}";
 TapDB.DeviceInitialize(properties);
 ```
 
@@ -326,8 +324,7 @@ TapDB.deviceInitialize(properties);
 <MultiLang>
 
 ```cs
-Dictionary<string, object> properties = new Dictionary<string, object>();
-properties.Add("currentPoints", 10);
+string properties = "{\"currentPoints\":10}";
 TapDB.DeviceUpdate(properties);
 
 properties["currentPoints"] = 42;
@@ -362,8 +359,7 @@ TapDB.deviceUpdate(properties);
 <MultiLang>
 
 ```cs
-Dictionary<string, object> properties = new Dictionary<string, object>();
-properties.Add("totalPoints", 10);
+string properties = "{\"totalPoints\":10}";
 TapDB.DeviceAdd(properties);
 
 properties["totalPoints"] = -2;
