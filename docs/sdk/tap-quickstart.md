@@ -54,15 +54,15 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 ```json
 "dependencies":{
 // 登录
-"com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#2.1.1",
-"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#2.1.1",
-"com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#2.1.1",
+"com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#2.1.2",
+"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#2.1.2",
+"com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#2.1.2",
 // 动态
-"com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#2.1.1",
+"com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#2.1.2",
 // 数据收集 
-"com.taptap.tds.tapdb": "https://github.com/TapTap/TapDB-Unity.git#2.1.1",
+"com.taptap.tds.tapdb": "https://github.com/TapTap/TapDB-Unity.git#2.1.2",
 //付费购买
-"com.taptap.tds.dlc": "https://github.com/TapTap/TapLicense-Unity.git#2.1.1",
+"com.taptap.tds.dlc": "https://github.com/TapTap/TapLicense-Unity.git#2.1.2",
 }
 ```
 
@@ -81,6 +81,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
     - `TapTap_TapLogin.unitypackage` 必选，TapTap 登录
     - `TapTap_TapMoment.unitypackage` TapTap 内嵌动态
     - `TapTap_TapDB.unitypackage` 数据收集
+    - `TapTap_TapLicense.unitypackage` 付费验证
 
 导入 SDK 后还需进行 Android、iOS 平台的相关配置。
 
@@ -122,6 +123,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
     <string>说明为何应用需要此项权限</string>
     <key>NSMicrophoneUsageDescription</key>
     <string>说明为何应用需要此项权限</string>
+    <!--TapDB需要用到，收集IDFA，如应用程序不想弹框，可以设置TapDB.AdvertiserIDCollectionEnabled(false)-->
     <key>NSUserTrackingUsageDescription</key>
     <string>说明为何应用需要此项权限</string>
 </dict>
@@ -131,7 +133,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 </>
 <>
 
-1. [点击下载 TapSDK_Android_v2.0.0.zip](/sdk/tap-download)，将 SDK 包导入到项目 `project/app/libs` 目录下。
+1. [点击下载 TapSDK_Android_v2.1.2.zip](/sdk/tap-download)，将 SDK 包导入到项目 `project/app/libs` 目录下。
  
 2. 打开项目的 `project/app/build.gradle` 文件，添加 gradle 配置如下：
     
@@ -144,11 +146,11 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
     }  
     dependencies {  
     ...  
-        implementation (name:'TapBootstrap_2.1.1', ext:'aar')  // 必选: TapSDK 启动器 
-        implementation (name:'TapCommon_2.1.1', ext:'aar') // 必选: TapSDK 基础库 
-		implementation (name:'TapLogin_2.1.1', ext:'aar') // 必选: TapTap 登录 
-        implementation (name:'TapMoment_2.1.1', ext:'aar') // TapTap 内嵌动态
-        implementation (name:'TapDB_2.1.1', ext:'aar') // 数据统计
+        implementation (name:'TapBootstrap_2.1.2', ext:'aar')  // 必选: TapSDK 启动器 
+        implementation (name:'TapCommon_2.1.2', ext:'aar') // 必选: TapSDK 基础库 
+		implementation (name:'TapLogin_2.1.2', ext:'aar') // 必选: TapTap 登录 
+        implementation (name:'TapMoment_2.1.2', ext:'aar') // TapTap 内嵌动态
+        implementation (name:'TapDB_2.1.2', ext:'aar') // 数据统计
     }  
     ```
  
@@ -172,7 +174,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 
 1. 在 Xcode 选择工程，到 **Build Setting > Other Linker Flags** 添加 `-ObjC`。
 
-2. 直接拖拽 [下载的 TapSDK_iOS_v2.0.0.zip](/sdk/tap-download) 到项目目录即可。
+2. 直接拖拽 [下载的 TapSDK_iOS_v2.1.2.zip](/sdk/tap-download) 到项目目录即可。
 
 3. 视需要导入下载的资源文件：
 
@@ -198,6 +200,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
         ```
         TapDB.framework
         ```
+
 
 4. 请仔细核对下面依赖库是否都添加成功：
 

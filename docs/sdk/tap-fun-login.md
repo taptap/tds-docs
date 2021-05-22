@@ -105,6 +105,8 @@ TapBootstrap.getUser(new Callback<TapUser>() {
 
 </MultiLang>
 
+** Error信息为网络错误，或者该游戏未开通篝火测试服 **
+
 ## 获取用户信息
 
 获取当前登录用户的 ID、昵称、头像等基本信息。
