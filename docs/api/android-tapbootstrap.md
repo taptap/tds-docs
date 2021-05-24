@@ -22,7 +22,7 @@ public static void init(Activity activity, TapConfig tapConfig);
 TapConfig tapConfig = new TapConfig.Builder()
                 .withAppContext(getApplicationContext())
                 .withClientId("clientId")
-                .withClientSecret("Server Secret")
+                .withClientSecret("Client Token")
                 .withRegionType(TapRegionType.CN) 
                 .build();
 TapBootstrap.init(MainActivity.this, tapConfig);
@@ -34,7 +34,7 @@ TapBootstrap.init(MainActivity.this, tapConfig);
 | :--------- | :-- | :---------------- |
 | context   | 否   | 上下文 |
 | clientId | 否   | 开发者中心获取的 Client ID |
-| withClientSecret | 否   | 开发者中心获取的 Server Secret |
+| withClientSecret | 否   | 开发者中心获取的 Client Token |
 | regionType   | 否   | 区域类型 TapRegionType.CN 表示国内，TapRegionType.IO 表示国外|
 
 ### isInitialized
