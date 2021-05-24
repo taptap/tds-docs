@@ -75,15 +75,15 @@ if (accessToken == nil) {
 ```
 
 ```java
-TapBootstrap.getUser(new Callback<TapUser>() {
+TapBootstrap.getTestQualification(new Callback<Boolean>() {
     @Override
-    public void onSuccess(TapUser tapUser) {
-
+    public void onSuccess(Boolean aBoolean) {
+        // 该玩家已拥有测试资格
     }
 
     @Override
     public void onFail(TapError tapError) {
-
+        // 该玩家不具备测试资格， 游戏层面进行拦截
     }
 });
 ```
