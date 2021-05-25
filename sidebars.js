@@ -3,7 +3,9 @@ module.exports = {
     {
       产品指南: [
         'pro/pro-login',
-        'pro/pro-moment'
+        'pro/pro-moment',
+        'pro/login-design',
+        'pro/moment-design'
       ]
     },
 
