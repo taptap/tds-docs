@@ -137,7 +137,11 @@ TapMoment.DirectlyOpen(Orientation.ORIENTATION_DEFAULT, TapMomentConstants.TapMo
 ```
 
 ```java
-TapMoment.open(TapMoment.ORIENTATION_PORTRAIT);
+Map<String, String> extras = new HashMap<>();
+// 注意：这里的 key 是固定的，"scene_id"； 第二个参数：开发者后台开启场景化入口并配置相关项后可以得到
+extras.put("scene_id", "xxxx");
+// 注意：第二个参数固定为 "tap://moment/scene/" 
+TapMoment.directlyOpen(TapMoment.ORIENTATION_DEFAULT,"tap://moment/scene/", extras);
 ```
 
 ```objectivec
