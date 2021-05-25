@@ -452,8 +452,8 @@ timestamp | long | 当前统计数据的时间戳（秒）。TapDB 会按照自�
 
 ### OAID
 
-游戏可以自行选择是否引入OAID.
-TapSDK 支持的OAID版本为 `1.0.5-1.0.23`。
+当需要采集设备指纹时，需要引入OAID.  
+TapSDK 支持的OAID版本为 `1.0.5-1.0.25`。
 
-如果游戏集成的其他 SDK 引入了 OAID，TapSDK 可以直接使用。
-否则，推荐集成 [oaid_sdk_1.0.23.aar](/res/tap_oaid_sdk_1.0.23.aar)。
+当游戏集成的其他 SDK 引入了 OAID，TapSDK 里面无需引入，可以直接使用。
+
