@@ -283,18 +283,9 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
     </array>
     ```
 
-2. 根据项目中是否有 `SceneDelegate.m` 文件分两种情况：
+2. 配置openUrl：
 
-   - 如果有 `SceneDelegate.m`，在其中添加如下代码即可：
-
-      ```objectivec
-      #import <TapBootstrapSDK/TapBootstrapSDK.h>
-      - (void)scene:(UIScene *)scene openURLContexts:(NSSet<UIOpenURLContext *> *)URLContexts{
-          [TapBootstrap handleOpenURL:URLContexts.allObjects.firstObject.URL];
-      }
-      ```
-
-   - 如果没有 `SceneDelegate.m`，请添加如下代码到 `AppDelegate.m` 文件：
+   a) 如果项目中有 `SceneDelegate.m`，请先删除，然后请添加如下代码到 `AppDelegate.m` 文件：
 
       ```objectivec
       - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
@@ -306,13 +297,32 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
       }
       ```
 
-    并在 `AppDelegate.h` 中添加 `UIWindow`，然后删除 `info.plist` 里面的 Application Scene Manifest
+    b) 删除 `info.plist` 里面的 Application Scene Manifest  
+        ![](/img/tap_ios_appmanifest.png)
+
+    c) 删除AppDelegate.m文件中的两个管理Scenedelegate生命周期代理方法
+
+    ```objectivec
+
+        #pragma mark - UISceneSession lifecycle
+        - (UISceneConfiguration *)application:(UIApplication *)application configurationForConnectingSceneSession:(UISceneSession *)connectingSceneSession options:(UISceneConnectionOptions *)options {
+    
+        return [[UISceneConfiguration alloc] initWithName:@"Default Configuration" sessionRole:connectingSceneSession.role];
+        }
+
+        - (void)application:(UIApplication *)application didDiscardSceneSessions:(NSSet<UISceneSession *> *)sceneSessions {
+     
+        }
+
+    ```
+    
+    d) 在 `AppDelegate.h` 中添加 `UIWindow`
 
     ```objectivec
     @property (strong, nonatomic) UIWindow *window;
     ```
 
-    ![](/img/tap_ios_appmanifest.png)
+   
 
 </>
 </MultiLang>
