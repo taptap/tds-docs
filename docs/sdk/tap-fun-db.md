@@ -1,7 +1,7 @@
 ---
 id: tap-fun-db
-title: TapDB数据收集
-sidebar_label: 数据收集
+title: TapDB数据分析
+sidebar_label: 数据分析
 ---
 
 import MultiLang from '@theme/MultiLang';
