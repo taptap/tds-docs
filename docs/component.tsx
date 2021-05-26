@@ -36,24 +36,6 @@ export const Gray = ({ children }) => (
   </span>
 );
 
-export const Green = ({ children }) => (
-  <span style={{
-    color: '#008000',
-    padding: '0.2rem',
-  }}>
-    {children}
-  </span>
-);
-
-export const BlueBlack = ({ children }) => (
-  <span style={{
-    color: '#000066',
-    padding: '0.2rem',
-  }}>
-    {children}
-  </span>
-);
-
 export const Link = ({ href, children }) => (
   <a href={href} rel="noreferrer nofollow noopener" target="_blank">
     {children}
