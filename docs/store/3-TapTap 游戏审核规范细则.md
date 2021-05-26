@@ -3,7 +3,7 @@ id: store-agree
 title: TapTap 游戏审核规范细则
 sidebar_label: TapTap 游戏审核规范细则
 ---
-import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
+import {Red, Blue, Black, Gray} from '../component';
 
 
 请确保你在开发者后台提交的游戏资料符合《 TapTap 游戏审核规范细则 》，违规游戏可能被处罚或下架。  
