@@ -8,7 +8,64 @@ import MultiLang from '@theme/MultiLang';
 
 该功能暂未对外开放
 
-## 1. 注册消息回调
+## 1. 应用配置
+
+### 工程导入
+
+<MultiLang>
+<>
+
+
+
+```json
+"com.taptap.tds.friends": "https://github.com/TapTap/TapFriends-Unity.git#2.1.2",
+```
+
+</>
+<>
+
+```json
+TapFriendUI_2.1.2.arr  
+TapFriend_2.1.2.arr
+```
+
+</>
+<>
+
+- TapFriendSDK.framework
+- TapFriendUISDK.framework
+- TapFriendResource.bundle
+
+</>
+</MultiLang>
+
+### 工程配置
+Android或者unity开发时，都需要在manifest中加入以下代码 
+
+```java
+<activity
+    android:name="com.tapsdk.friends.TapFriendsRouterPageActivity"
+    android:allowTaskReparenting="true"
+    android:exported="true"
+    android:launchMode="singleTask"
+    android:screenOrientation="nosensor"
+    android:theme="@android:style/Theme.Translucent.NoTitleBar">
+    <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+
+        <data
+            android:host="{client_id}"
+            android:path="/friends"
+            android:scheme="tapsdk" />
+    </intent-filter>
+</activity>
+
+```
+
+## 2. 注册消息回调
 
 
 <MultiLang>
@@ -41,7 +98,7 @@ TapFriends.registerMessageCallback(new ComponentMessageCallback() {
 
 </MultiLang>
 
-## 2. 添加好友
+## 3. 添加好友
 
 <MultiLang>
 
@@ -82,7 +139,7 @@ TapFriends.addFriend("userID", new Callback<Boolean>() {
 #### 参数说明
 userId : tds id，登录成功后从服务端获取
 
-## 3. 删除好友
+## 4. 删除好友
 
 <MultiLang>
 
@@ -118,7 +175,7 @@ TapFriends.deleteFriend("userID", new Callback<Boolean>() {
 ```
 </MultiLang>
 
-## 4. 拉黑好友
+## 5. 拉黑好友
 
 <MultiLang>
 
@@ -159,7 +216,7 @@ TapFriends.blockUser("userID", new Callback<Boolean>() {
 
 
 
-## 5. 取消拉黑
+## 6. 取消拉黑
 
 <MultiLang>
 
@@ -196,7 +253,7 @@ TapFriends.unblockUser("userID", new Callback<Boolean>() {
 
 </MultiLang>
 
-## 6. 获取关注列表
+## 7. 获取关注列表
 以下列表形式获取均为分页获取
 
 
@@ -255,7 +312,7 @@ avatar  | 头像地址
 gender | UNKNOWN = 0;<br/>MALE = 1;<br/> FEMALE = 2;
 mutualAttention | 是否互相关注 <br/>false:不是互相关注 <br/>true: 互相关注
 
-## 7. 获取粉丝列表
+## 8. 获取粉丝列表
 
 <MultiLang>
 
@@ -300,7 +357,7 @@ TapFriends.getFollowerList(0, 100, new ListCallback<TapUserRelationship>() {
 
 
 
-## 8. 获取黑名单
+## 9. 获取黑名单
 
 <MultiLang>
 
@@ -344,7 +401,7 @@ TapFriends.getBlockList(0, 100, new ListCallback<TapUserRelationship>() {
 
 
 
-## 9. 分享好友邀请链接
+## 10. 分享好友邀请链接
 
 1. 生成链接并唤起系统分享控件
 2. 选择分享应用，分享链接给对方
@@ -399,7 +456,7 @@ TapFriends.sendFriendInvitation(Activity activity, new Callback<Boolean>() {
 
 </MultiLang>
 
-##  10. 获取好友邀请链接
+##  11. 获取好友邀请链接
 
 获取到上图示「关注好友」的分享链接（「分享好友邀请链接」功能的简略版，省去了分享，只生成相关链接），游戏可以通过自己的方式将该链接分享出去
 
@@ -451,7 +508,7 @@ TapFriends.generateFriendInvitation(new Callback<String>() {
 
 
 
-## 11. 搜索用户
+## 12. 搜索用户
 
 <MultiLang>
 
