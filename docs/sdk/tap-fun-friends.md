@@ -8,6 +8,35 @@ import MultiLang from '@theme/MultiLang';
 
 该功能暂未对外开放
 
+## 好友功能概览
+
+### 通用功能
+在开发者中心后台，开启「好友」功能后即可使用SDK
+
+通用功能         | 说明      |
+ ----------- | -------- |
+[获取互关列表](3-获取关注列表)    |   获取TapTap相互关注的好友列表  |
+
+
+:::info
+下面为深度功能。需要联系商务获取权限后，在开发者中心进行手动开启。商务联系方式 operation@taptap.com
+:::
+
+### 深度功能
+
+深度功能         | 说明      |
+ ----------- | -------- |
+[添加好友](#4-添加好友) |   添加好友，同步到TapTap   |
+[删除好友](#5-删除好友)    |    -  |
+[拉黑好友](#6-拉黑好友)    |   -  |
+[取消拉黑](#7-取消拉黑) |   -   |
+[获取粉丝列表](#8-获取粉丝列表)  |   -  |
+[获取黑名单](#9-获取黑名单) |   -   |
+[分享好友邀请链接](#10-分享好友邀请链接)    |   自动生成分享链接，同时调用起系统分享组建进行选择分享  |
+[获取好友邀请链接](#11-获取好友邀请链接)   |  生成邀请链接  |
+[搜索用户](#12-搜索用户)  |   可以主动搜索tds id然后进行添加好友  |
+
+
 ## 1. 应用配置
 
 ### 工程导入
@@ -40,7 +69,7 @@ TapFriend_2.1.2.arr
 </MultiLang>
 
 ### 工程配置
-Android或者unity开发时，都需要在manifest中加入以下代码 
+Android或者unity开发时，都需要在manifest中加入以下代码
 
 ```java
 <activity
@@ -98,164 +127,13 @@ TapFriends.registerMessageCallback(new ComponentMessageCallback() {
 
 </MultiLang>
 
-## 3. 添加好友
 
-<MultiLang>
+## 3. 获取关注列表
 
-```cs
-TapFriends.AddFriend("tds id",(err)=> {
-    if (err != null)
-    {
-        Debug.Log("添加好友成功");
-    }
-});
-```
-
-```java
-TapFriends.addFriend("userID", new Callback<Boolean>() {
-    @Override
-    public void onSuccess(Boolean aBoolean) {
-        Log.d("TapTap", "添加好友成功");
-    }
-
-    @Override
-    public void onFail(TapFriendError tapFriendError) {
-        Log.d("TapTap", "添加好友失败" + tapFriendError.detailMessage);
-    }
-});
-```
-
-
-```objectivec
-[TapFriends addFriend:@"tds id" handler:^(NSError * _Nullable error) {
-    if (error!=nil){
-        NSLog (@"添加成功");
-    }
-}];
-```
-
-</MultiLang>
-
-#### 参数说明
-userId : tds id，登录成功后从服务端获取
-
-## 4. 删除好友
-
-<MultiLang>
-
-```cs
-TapFriends.DeleteFriend("tds id", (err) => {
-    if (err != null)
-    {
-        Debug.Log("删除好友成功");
-    }
-});
-```
-```java
-TapFriends.deleteFriend("userID", new Callback<Boolean>() {
-    @Override
-    public void onSuccess(Boolean aBoolean) {
-        Log.d("TapTap", "删除好友成功");
-    }
-
-    @Override
-    public void onFail(TapFriendError tapFriendError) {
-        Log.d("TapTap", "删除好友失败" + tapFriendError.detailMessage);
-    }
-});
-```
-
-
-```objectivec
-[TapFriends deleteFriend:@"tds id" handler:^(NSError * _Nullable error) {
-    if (error!=nil){
-        NSLog (@"删除成功");
-    }
-}];
-```
-</MultiLang>
-
-## 5. 拉黑好友
-
-<MultiLang>
-
-```cs
-TapFriends.BlockUser("tds id", (err) => {
-    if (err != null)
-    {
-        Debug.Log("拉黑成功");
-    }
-});
-```
-
-```java
-TapFriends.blockUser("userID", new Callback<Boolean>() {
-    @Override
-    public void onSuccess(Boolean aBoolean) {
-        Log.d("TapTap", "拉黑好友成功");
-    }
-
-    @Override
-    public void onFail(TapFriendError tapFriendError) {
-        Log.d("TapTap", "拉黑好友失败" + tapFriendError.detailMessage);
-    }
-});
-```
-
-
-```objectivec
-[TapFriends blockUser:@"tds id" handler:^(NSError * _Nullable error) {
-    if (error!=nil){
-        NSLog (@"拉黑成功");
-    }
-}];
-
-```
-
-</MultiLang>
-
-
-
-## 6. 取消拉黑
-
-<MultiLang>
-
-```cs
-TapFriends.UnblockUser("tds id", (err) => {
-    if (err != null) {
-        Debug.Log("取消拉黑成功");
-    }
-});
-```
-
-```java
-TapFriends.unblockUser("userID", new Callback<Boolean>() {
-    @Override
-    public void onSuccess(Boolean aBoolean) {
-        Log.d("TapTap", "取消拉黑好友成功");
-    }
-
-    @Override
-    public void onFail(TapFriendError tapFriendError) {
-        Log.d("TapTap", "取消拉黑好友失败" + tapFriendError.detailMessage);
-    }
-});
-```
-
-
-```objectivec
-[TapFriends unblockUser:@"tds id" handler:^(NSError * _Nullable error) {
-    if (error!=nil){
-        NSLog (@"取消拉黑成功");
-    }
-}];
-```
-
-</MultiLang>
-
-## 7. 获取关注列表
-以下列表形式获取均为分页获取
-
+以下列表形式获取均为分页获取  
+int from：起始位置  
+bool mutualAttention: true 为互相关注；false 为单向关注其他人  
+int limit：结束位置  
 
 <MultiLang>
 
@@ -302,7 +180,7 @@ TapFriends.getFollowingList(0, true, 100, new ListCallback<TapUserRelationship>(
 
 
 #### 参数说明
-TapUserRelationShip  
+TapUserRelationShip
 
 参数  | 描述
 | ------ | ------ |
@@ -311,6 +189,162 @@ name  | 用户nick name
 avatar  | 头像地址
 gender | UNKNOWN = 0;<br/>MALE = 1;<br/> FEMALE = 2;
 mutualAttention | 是否互相关注 <br/>false:不是互相关注 <br/>true: 互相关注
+
+## 4. 添加好友
+
+<MultiLang>
+
+```cs
+TapFriends.AddFriend("tds id",(err)=> {
+    if (err != null)
+    {
+        Debug.Log("添加好友成功");
+    }
+});
+```
+
+```java
+TapFriends.addFriend("userID", new Callback<Boolean>() {
+    @Override
+    public void onSuccess(Boolean aBoolean) {
+        Log.d("TapTap", "添加好友成功");
+    }
+
+    @Override
+    public void onFail(TapFriendError tapFriendError) {
+        Log.d("TapTap", "添加好友失败" + tapFriendError.detailMessage);
+    }
+});
+```
+
+
+```objectivec
+[TapFriends addFriend:@"tds id" handler:^(NSError * _Nullable error) {
+    if (error!=nil){
+        NSLog (@"添加成功");
+    }
+}];
+```
+
+</MultiLang>
+
+#### 参数说明
+userId : tds id，登录成功后从服务端获取
+
+## 5. 删除好友
+
+<MultiLang>
+
+```cs
+TapFriends.DeleteFriend("tds id", (err) => {
+    if (err != null)
+    {
+        Debug.Log("删除好友成功");
+    }
+});
+```
+```java
+TapFriends.deleteFriend("userID", new Callback<Boolean>() {
+    @Override
+    public void onSuccess(Boolean aBoolean) {
+        Log.d("TapTap", "删除好友成功");
+    }
+
+    @Override
+    public void onFail(TapFriendError tapFriendError) {
+        Log.d("TapTap", "删除好友失败" + tapFriendError.detailMessage);
+    }
+});
+```
+
+
+```objectivec
+[TapFriends deleteFriend:@"tds id" handler:^(NSError * _Nullable error) {
+    if (error!=nil){
+        NSLog (@"删除成功");
+    }
+}];
+```
+</MultiLang>
+
+## 6. 拉黑好友
+
+<MultiLang>
+
+```cs
+TapFriends.BlockUser("tds id", (err) => {
+    if (err != null)
+    {
+        Debug.Log("拉黑成功");
+    }
+});
+```
+
+```java
+TapFriends.blockUser("userID", new Callback<Boolean>() {
+    @Override
+    public void onSuccess(Boolean aBoolean) {
+        Log.d("TapTap", "拉黑好友成功");
+    }
+
+    @Override
+    public void onFail(TapFriendError tapFriendError) {
+        Log.d("TapTap", "拉黑好友失败" + tapFriendError.detailMessage);
+    }
+});
+```
+
+
+```objectivec
+[TapFriends blockUser:@"tds id" handler:^(NSError * _Nullable error) {
+    if (error!=nil){
+        NSLog (@"拉黑成功");
+    }
+}];
+
+```
+
+</MultiLang>
+
+
+
+## 7. 取消拉黑
+
+<MultiLang>
+
+```cs
+TapFriends.UnblockUser("tds id", (err) => {
+    if (err != null) {
+        Debug.Log("取消拉黑成功");
+    }
+});
+```
+
+```java
+TapFriends.unblockUser("userID", new Callback<Boolean>() {
+    @Override
+    public void onSuccess(Boolean aBoolean) {
+        Log.d("TapTap", "取消拉黑好友成功");
+    }
+
+    @Override
+    public void onFail(TapFriendError tapFriendError) {
+        Log.d("TapTap", "取消拉黑好友失败" + tapFriendError.detailMessage);
+    }
+});
+```
+
+
+```objectivec
+[TapFriends unblockUser:@"tds id" handler:^(NSError * _Nullable error) {
+    if (error!=nil){
+        NSLog (@"取消拉黑成功");
+    }
+}];
+```
+
+</MultiLang>
+
 
 ## 8. 获取粉丝列表
 
