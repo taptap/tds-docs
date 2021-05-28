@@ -15,7 +15,7 @@ import TOC from '@theme/TOC';
 import EditThisPage from '@theme/EditThisPage';
 
 import clsx from 'clsx';
-import styles from './styles.module.css';
+import styles from './styles.module.scss';
 import {
   useActivePlugin,
   useVersions,
