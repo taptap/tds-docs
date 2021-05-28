@@ -1,6 +1,6 @@
 ---
 id: userinfo
-title: 获取用户信息
+title: 获取登录信息
 ---
 
 ## 概述
