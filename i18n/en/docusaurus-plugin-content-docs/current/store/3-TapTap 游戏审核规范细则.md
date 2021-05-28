@@ -3,7 +3,7 @@ id: store-agree
 title: TapTap Game Audit Specification and Rules
 sidebar_label: TapTap Game Audit Specification and Rules
 ---
-import {Red, Blue, Black, Gray} from '../component';
+import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
 
 Please make sure that the game information you submit in the Developer Center conforms to the TapTap Game Audit Specification and Rules. Games that violate the above rules may be punished or removed.  
 ![](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)  
