@@ -1,6 +1,6 @@
 ---
-id: service
-title: 服务端文档
+id: userinfo
+title: 获取用户信息
 ---
 
 ## 概述
