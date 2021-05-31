@@ -443,7 +443,7 @@ public void onFail(TapFriendError tapFriendError) {
 3. 对方点击链接，会打开下面图示
 4. 如果对方已经安装该游戏，则直接打开游戏并添加关注；如果对方未安装该游戏，则选额跳转到TapTap进行安装
 
-<img src={useBaseUrl('/img/friends-follow01.jpg')} alt="" width="400" />
+<img src={useBaseUrl('/img/friends-follow01.png')} alt="" width="400" />
 
 <MultiLang>
 
