@@ -2,7 +2,28 @@ import React from 'react';
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-function MultiLang({children}) {
+function MultiLang({children, kind}) {
+  if (kind === 'engine') {
+    const [js, python, php, java, cs, go] = children;
+    return <Tabs
+      groupId="tap-platform"
+      defaultValue="js"
+      values={[
+        {label: 'JavaScript', value: 'javascript'},
+        {label: 'Python', value: 'python'},
+        {label: 'PHP', value: 'php'},
+        {label: 'Java', value: 'java'},
+        {label: 'C#', value: 'csharp'},
+        {label: 'Go', value: 'go'},
+      ]}>
+        <TabItem value="javascript">{js}</TabItem>
+        <TabItem value="python">{python}</TabItem>
+        <TabItem value="php">{php}</TabItem>
+        <TabItem value="java">{java}</TabItem>
+        <TabItem value="csharp">{cs}</TabItem>
+        <TabItem value="go">{go}</TabItem>
+      </Tabs>
+  } else {
     const [cs, java, objc] = children;
     return <Tabs
         groupId="tap-platform"
@@ -16,6 +37,7 @@ function MultiLang({children}) {
             <TabItem value="android">{java}</TabItem>
             <TabItem value="ios">{objc}</TabItem>
             </Tabs>;
+  }
 }
 
 export default MultiLang;
