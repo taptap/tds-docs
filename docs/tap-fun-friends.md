@@ -5,12 +5,13 @@ sidebar_label: 好友
 ---
 
 import MultiLang from '@theme/MultiLang';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 
 该功能暂未对外开放
 
 ## 好友功能概览
 
-### 通用功能
+### 通用服务
 在开发者中心后台，开启「好友」功能后即可使用SDK
 
 通用功能         | 说明      |
@@ -22,7 +23,7 @@ import MultiLang from '@theme/MultiLang';
 下面为深度功能。需要联系商务获取权限后，在开发者中心进行手动开启。商务联系方式 operation@taptap.com
 :::
 
-### 深度功能
+### 深度服务
 
 深度功能         | 说明      |
  ----------- | -------- |
@@ -32,7 +33,7 @@ import MultiLang from '@theme/MultiLang';
 [取消拉黑](#7-取消拉黑) |   -   |
 [获取粉丝列表](#8-获取粉丝列表)  |   -  |
 [获取黑名单](#9-获取黑名单) |   -   |
-[分享好友邀请链接](#10-分享好友邀请链接)    |   自动生成分享链接，同时调用起系统分享组建进行选择分享  |
+[分享好友邀请链接](#10-分享好友邀请链接)    |   自动生成分享链接，同时调用起系统分享组组件行选择分享  |
 [获取好友邀请链接](#11-获取好友邀请链接)   |  生成邀请链接  |
 [搜索用户](#12-搜索用户)  |   可以主动搜索tds id然后进行添加好友  |
 
@@ -442,7 +443,7 @@ public void onFail(TapFriendError tapFriendError) {
 3. 对方点击链接，会打开下面图示
 4. 如果对方已经安装该游戏，则直接打开游戏并添加关注；如果对方未安装该游戏，则选额跳转到TapTap进行安装
 
-![friends](/img/friends-follow.jpg)
+<img src={useBaseUrl('/img/friends-follow01.jpg')} alt="" width="400" />
 
 <MultiLang>
 

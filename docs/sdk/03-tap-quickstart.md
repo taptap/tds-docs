@@ -59,7 +59,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#2.1.2",
 // 动态
 "com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#2.1.2",
-// 数据收集 
+// 数据分析
 "com.taptap.tds.tapdb": "https://github.com/TapTap/TapDB-Unity.git#2.1.2",
 //付费购买
 "com.taptap.tds.dlc": "https://github.com/TapTap/TapLicense-Unity.git#2.1.2",
@@ -80,7 +80,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
    - `TapTap_TapCommon.unitypackag` 必选，TapSDK 基础库
    - `TapTap_TapLogin.unitypackage` 必选，TapTap 登录
    - `TapTap_TapMoment.unitypackage` TapTap 内嵌动态
-   - `TapTap_TapDB.unitypackage` 数据收集
+   - `TapTap_TapDB.unitypackage` 数据分析
    - `TapTap_TapLicense.unitypackage` 付费验证
 
 导入 SDK 后还需进行 Android、iOS 平台的相关配置。
@@ -195,7 +195,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
        TapMomentSDK.framework
        ```
 
-   - 数据收集
+   - 数据分析
 
        ```
        TapDB.framework
@@ -221,7 +221,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
     SystemConfiguration.framework
     WebKit.framework
 
-    // 数据收集
+    // 数据分析
     AppTrackingTransparency.framework
     AdSupport.framework
     CoreMotion.framework
@@ -234,9 +234,9 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 
 #### 配置权限
 
-**TapTap 内嵌动态功能需要相册、相机、麦克风访问权限，数据收集功能需要 IDFA 权限。**
+**TapTap 内嵌动态功能需要相册、相机、麦克风访问权限，数据分析功能需要 IDFA 权限。**
 
-因此，如果游戏加入了 TapTap 内嵌动态功能或数据收集功能，那么需要在 `info.plist` 添加如下配置（请替换授权文案）：
+因此，如果游戏加入了 TapTap 内嵌动态功能或数据分析功能，那么需要在 `info.plist` 添加如下配置（请替换授权文案）：
 
 ```xml
 <!-- 相册 -->
@@ -329,7 +329,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 
 ## 初始化
 
-初始化 TapSDK 时需传入 Client ID、区域等应用配置信息。
+初始化 TapSDK 时需传入 Client ID、区域等应用配置信息。如需使用 TapDB 功能，请联系商务进行获取
 
 <MultiLang>
 
@@ -345,21 +345,37 @@ TapBootstrap.Init(tapConfig);
 ```
 
 ```java
+//TapDB不配置则不开启
+TapDBConfig tapDBConfig = new TapDBConfig();
+        tapDBConfig.setEnable(true);
+        tapDBConfig.setChannel("gameChannel");
+        
 TapConfig tapConfig = new TapConfig.Builder()
         .withAppContext(getApplicationContext())
-        .withClientId("clientId") // 开发者中心获取到的 Client ID
-        .withClientSecret("Client Token") // 开发者中心获取的 Client Token
-        .withRegionType(TapRegionType.CN) // TapRegionType.CN: 中国大陆  TapRegionType.IO: 国际
+        .withRegionType(TapRegionType.CN) // TapRegionType.CN: 国内  TapRegionType.IO: 国外
+        .withClientId("clientId")
+        .withClientSecret("clientSecret")
+        .withTapDBConfig(tapDBConfig)
         .build();
-        TapBootstrap.init(MainActivity.this, tapConfig);  
+TapBootstrap.init(MainActivity.this, tapConfig);
 ```
 
 ```objectivec
-TapConfig *config = TapConfig.new;
-config.clientSecret = @"clientSecret";
-config.clientId = @"clientId";
-config.region = TapSDKRegionTypeCN; // TapSDKRegionTypeCN: 中国大陆  TapSDKRegionTypeIO: 国际
-[TapBootstrap initWithConfig:config];
+    //初始化SDK
+    TapConfig *config = TapConfig.new;
+    config.clientId = @"clientId";
+    config.clientSecret=@"clientSecret";
+    
+    //配置TapDB初始化，不配置则不开启
+    TapDBConfig * dbConfig = [[TapDBConfig alloc]init];
+    dbConfig.enable = true;
+    dbConfig.channel=@"taptap";
+    dbConfig.gameVersion=@"1.0.0";
+    dbConfig.advertiserIDCollectionEnabled=true;
+    config.dbConfig = dbConfig;
+    
+    config.region = TapSDKRegionTypeCN;
+    [TapBootstrap initWithConfig:config];
 ```
 
 </MultiLang>

@@ -16,6 +16,8 @@ TapSDK 提供了一套可供游戏开发者收集用户数据的 API。
 
 ## 初始化SDK
 
+在[TapSDK初始化](/sdk/03-tap-quickstart.md#初始化)时，配置过TapDBConfig后此步骤可以不用再次调用
+
 <MultiLang>
 
 ```cs
@@ -143,6 +145,33 @@ TapDB.setServer("https://test.example.com/callback");
 
 ```objectivec
 [TapDB setServer:@"https://test.example.com/callback"];
+```
+
+</MultiLang>
+
+服务器参数为非空字符串，长度不大于 256。
+
+## 自定义事件
+
+需要发送自定义事件时调用，自定义事件的 eventName 和 properties 属性都必须在元数据管理预先配置，才可以使用SDK进行发送
+
+<MultiLang>
+
+```cs
+TapDB.TapDB.TrackEvent("eventName", "{\"weapon\":\"axe\"}");	
+```
+
+```java
+JSONObject properties = new JSONObject();
+properties.put("#weapon", "axe");
+properties.put("#level", 10);
+properties.put("#map", "atrium");
+TapDB.trackEvent("#battle", properties); 
+```
+
+```objectivec
+ NSDictionary* dic = @{@"aaa":@"xxx",@"bbb":@"yyy"};    
+[TapDB trackEvent:@"testEvent2" properties:dic];
 ```
 
 </MultiLang>
