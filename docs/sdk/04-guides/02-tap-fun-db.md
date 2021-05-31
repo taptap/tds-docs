@@ -14,9 +14,66 @@ import MultiLang from '@theme/MultiLang';
 TapSDK 提供了一套可供游戏开发者收集用户数据的 API。
 系统会收集用户数据并进行分析，最终形成数据报表，帮助游戏开发者分析用户行为并优化游戏。
 
-## 初始化SDK
+## 初始化 SDK
 
-在[TapSDK初始化](/sdk/03-tap-quickstart.md#初始化)时，配置过TapDBConfig后此步骤可以不用再次调用
+:::info
+以下两种初始化方式结合使用场景任选其一即可
+:::
+
+### TapSDK 初始化 
+
+在 TapSDK 初始化时，同步初始化 TapDB
+
+<MultiLang>
+
+```cs
+TapConfig tapConfig = new TapConfig.Builder()
+    .ClientID("clientId")//必须
+    .ClientSecret("client_secret")//必须
+    .RegionType(RegionType.CN)//非必须，默认CN
+    .TapDBConfig(true, "gameChannel", "gameVersion", true) // TapDB 会根据 TapConfig 的配置进行自动初始化
+    .ConfigBuilder();
+
+TapBootstrap.Init(tapConfig);
+```
+
+```java
+TapDBConfig tapDBConfig = new TapDBConfig();
+        tapDBConfig.setEnable(true);
+        tapDBConfig.setChannel("gameChannel");
+        
+TapConfig tapConfig = new TapConfig.Builder()
+        .withAppContext(getApplicationContext())
+        .withRegionType(TapRegionType.CN) // TapRegionType.CN: 国内  TapRegionType.IO: 国外
+        .withClientId("clientId")
+        .withClientSecret("clientSecret")
+        .withTapDBConfig(tapDBConfig)
+        .build();
+TapBootstrap.init(MainActivity.this, tapConfig);
+```
+
+```objectivec
+    //初始化SDK
+    TapConfig *config = TapConfig.new;
+    config.clientId = @"clientId";
+    config.clientSecret=@"clientSecret";
+
+    TapDBConfig * dbConfig = [[TapDBConfig alloc]init];
+    dbConfig.enable = true;
+    dbConfig.channel=@"taptap";
+    dbConfig.gameVersion=@"1.0.0";
+    dbConfig.advertiserIDCollectionEnabled=true;
+    config.dbConfig = dbConfig;
+
+    config.region = TapSDKRegionTypeCN;
+    [TapBootstrap initWithConfig:config];
+```
+
+</MultiLang>
+
+### TapDB 单独使用
+
+在单独使用 TapDB 功能时（即不接登录功能时，不导入 TapBootstrap 包时），可以通过以下方式初始化 TapDB
 
 <MultiLang>
 
@@ -39,7 +96,7 @@ TapDB.init(getApplicationContext(), "clientId", "taptap", "gameVersion", true);
 分包渠道为 `null` 时，就无法根据渠道筛选收集到的数据了。
 游戏版本号为 `null` 时，TapSDK 会自动获取游戏安装包的版本。
 
-### 设置获取IDFA
+## 设置获取IDFA
 
 针对 `iOS14.5+`，可以设置是否获取IDFA。
 默认不获取 IDFA，如果设置获取 IDFA，还需要在应用层额外配置相关弹窗权限。

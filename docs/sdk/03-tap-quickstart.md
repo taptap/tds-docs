@@ -329,7 +329,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 
 ## 初始化
 
-初始化 TapSDK 时需传入 Client ID、区域等应用配置信息。如需使用 TapDB 功能，请联系商务进行获取
+初始化 TapSDK 时需传入 Client ID、区域等应用配置信息。
 
 <MultiLang>
 
@@ -338,24 +338,17 @@ TapConfig tapConfig = new TapConfig.Builder()
     .ClientID("clientId")//必须
     .ClientSecret("client_secret")//必须
     .RegionType(RegionType.CN)//非必须，默认CN
-    .TapDBConfig(true, "gameChannel", "gameVersion", true) // 非必须，TapDB 会根据 TapConfig 的配置进行自动初始化
     .ConfigBuilder();
 
 TapBootstrap.Init(tapConfig);
 ```
 
-```java
-//TapDB不配置则不开启
-TapDBConfig tapDBConfig = new TapDBConfig();
-        tapDBConfig.setEnable(true);
-        tapDBConfig.setChannel("gameChannel");
-        
+```java       
 TapConfig tapConfig = new TapConfig.Builder()
         .withAppContext(getApplicationContext())
         .withRegionType(TapRegionType.CN) // TapRegionType.CN: 国内  TapRegionType.IO: 国外
         .withClientId("clientId")
         .withClientSecret("clientSecret")
-        .withTapDBConfig(tapDBConfig)
         .build();
 TapBootstrap.init(MainActivity.this, tapConfig);
 ```
@@ -365,15 +358,7 @@ TapBootstrap.init(MainActivity.this, tapConfig);
     TapConfig *config = TapConfig.new;
     config.clientId = @"clientId";
     config.clientSecret=@"clientSecret";
-    
-    //配置TapDB初始化，不配置则不开启
-    TapDBConfig * dbConfig = [[TapDBConfig alloc]init];
-    dbConfig.enable = true;
-    dbConfig.channel=@"taptap";
-    dbConfig.gameVersion=@"1.0.0";
-    dbConfig.advertiserIDCollectionEnabled=true;
-    config.dbConfig = dbConfig;
-    
+
     config.region = TapSDKRegionTypeCN;
     [TapBootstrap initWithConfig:config];
 ```
