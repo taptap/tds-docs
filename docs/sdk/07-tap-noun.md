@@ -11,8 +11,8 @@ Client ID 获取位置如 [图示](/img/tap_clientid.png)
 每次登录后，都会在 [LoginSuccess](/sdk#登录回调) 回调里面返回 AccessToken， AccessToken 是用户本次授权的唯一标识。  
 每次登录返回 AccessToken 会不一样，logout 后自动清理
 
-## 玩家
-对应一个玩家账户，需要一个唯一的标识符。玩家是统计系统的数据统计基本单位
+## 账号
+玩家登录的平台账号
 ## 设备
 安装了对应游戏的设备
 ## 付费

@@ -11,8 +11,8 @@ import MultiLang from '@theme/MultiLang';
 :::
 ## 介绍
 
-TapSDK 提供了一套可供游戏开发者收集用户数据的 API。
-系统会收集用户数据并进行分析，最终形成数据报表，帮助游戏开发者分析用户行为并优化游戏。
+TapSDK 提供了一套可供游戏开发者收集账号数据的 API。
+系统会收集账号数据并进行分析，最终形成数据报表，帮助游戏开发者分析账号行为并优化游戏。
 
 ## 初始化 SDK
 
@@ -59,10 +59,10 @@ TapBootstrap.init(MainActivity.this, tapConfig);
     config.clientSecret=@"clientSecret";
 
     TapDBConfig * dbConfig = [[TapDBConfig alloc]init];
-    dbConfig.enable = true;
+    dbConfig.enable = YES;
     dbConfig.channel=@"taptap";
     dbConfig.gameVersion=@"1.0.0";
-    dbConfig.advertiserIDCollectionEnabled=true;
+    dbConfig.advertiserIDCollectionEnabled=YES;
     config.dbConfig = dbConfig;
 
     config.region = TapSDKRegionTypeCN;
@@ -86,7 +86,7 @@ TapDB.init(getApplicationContext(), "clientId", "taptap", "gameVersion", true);
 ```
 
 ```objectivec
-[TapDB onStartWithClientId:@"clientid" channel:@"taptap" version:@"gameVersion" isCN:true];
+[TapDB onStartWithClientId:@"clientid" channel:@"taptap" version:@"gameVersion" isCN:YES];
 ```
 
 </MultiLang>
@@ -117,9 +117,9 @@ TapDB.AdvertiserIDCollectionEnabled(true);
 
 </MultiLang>
 
-## 设置用户
+## 设置账号
 
-调用该 API 记录用户。
+调用该 API 记录一个账号，当账号登录时调用。
 
 <MultiLang>
 
@@ -138,12 +138,12 @@ TapDB.setUser("userId");
 
  </MultiLang>
 
-`userId` 是代表用户的唯一字符串，字符串长度不大于 256，只能包含数字、大小写字母、下划线(`_`)、短横(`-`)。
-开发者需要保证不同用户的 `userId` 均不相同。
+`userId` 是代表账号的唯一字符串，字符串长度不大于 256，只能包含数字、大小写字母、下划线(`_`)、短横(`-`)。
+开发者需要保证不同账号的 `userId` 均不相同。
 
-## 用户昵称
+## 账号昵称
 
-游戏设置用户昵称时调用。
+游戏设置账号昵称时调用。
 
 <MultiLang>
 
@@ -163,9 +163,9 @@ TapDB.setName("Tarara");
 
 参数的类型为字符串，不可为空，长度不大于 256。
 
-## 用户等级
+## 账号等级
 
-通常在用户升级时调用。
+设置账号等级，通常在账号升级时调用。
 
 <MultiLang>
 
@@ -186,54 +186,28 @@ TapDB.setLevel(5);
 
 </MultiLang>
 
-## 用户所在服务器
+## 账号所在服务器
 
-通常在用户登录或切换服务器时调用。
+通常在账号登录或切换服务器时调用。
 
 <MultiLang>
 
 ```cs
-TapDB.SetServer("https://test.example.com/callback");
+TapDB.SetServer("1区");
 ```
 
 ```java
-TapDB.setServer("https://test.example.com/callback");
+TapDB.setServer("1区");
 ```
 
 ```objectivec
-[TapDB setServer:@"https://test.example.com/callback"];
+[TapDB setServer:@"1区"];
 ```
 
 </MultiLang>
 
 服务器参数为非空字符串，长度不大于 256。
 
-## 自定义事件
-
-需要发送自定义事件时调用，自定义事件的 eventName 和 properties 属性都必须在元数据管理预先配置，才可以使用SDK进行发送
-
-<MultiLang>
-
-```cs
-TapDB.TapDB.TrackEvent("eventName", "{\"weapon\":\"axe\"}");	
-```
-
-```java
-JSONObject properties = new JSONObject();
-properties.put("#weapon", "axe");
-properties.put("#level", 10);
-properties.put("#map", "atrium");
-TapDB.trackEvent("#battle", properties); 
-```
-
-```objectivec
- NSDictionary* dic = @{@"aaa":@"xxx",@"bbb":@"yyy"};    
-[TapDB trackEvent:@"testEvent2" properties:dic];
-```
-
-</MultiLang>
-
-服务器参数为非空字符串，长度不大于 256。
 
 ## 充值
 
@@ -276,14 +250,13 @@ POST 数据（实际发送请求时需去除注释、空格、换行符并 urlen
 ```json
 {
   "module": "GameAnalysis", // 固定值
-  "ip": "172.16.254.1", // 可选，充值用户的 IP
+  "ip": "172.16.254.1", // 可选，充值账号的 IP
   "name": "charge", // 固定值
-  // 必需，需要替换成 TapDB 的 appid, 
-  // 可以在 tapdb.com 控制台查看。
-  "index": "APPID",
-  // 必需，用户 ID。
-  // 必须和 SDK 的 setUser 接口传递的用户 ID 相一致，
-  // 并且对应用户已经通过 SDK 接口进行过推送。
+  // 必需，需要替换成 client id
+  "client_id": "CLIENTID",
+  // 必需，账号 ID。
+  // 必须和 SDK 的 setUser 接口传递的账号 ID 相一致，
+  // 并且对应账号已经通过 SDK 接口进行过推送。
   "identify": "userId",
   "properties": { // 详见上节「客户端推送」的说明
     "order_id": "0xueiEns", // 可选，订单 ID
@@ -297,10 +270,39 @@ POST 数据（实际发送请求时需去除注释、空格、换行符并 urlen
 
 返回的 HTTP Code 为 200 时发送成功，否则发送失败。
 
+## 自定义事件
+
+需要发送自定义事件时调用，自定义事件的 eventName 和 properties 属性都必须在元数据管理预先配置，才可以使用SDK进行发送
+
+用户可以通过调用 trackEvent 方法上传需要跟踪的自定义事件。eventName 为自定义事件的事件名，需要保证以 '#' 开头，取值规则请参考自定义属性登记页面。properties 为自定义事件所包含的自定义属性（以 Key : Value 的形式保存），其中 Key 代表了自定义属性的属性名，Value 代表了该属性的值。这里需要注意的是 Key 的命名规则同 eventName 一致，也需要保证以 '#' 开头。目前所支持的 Value 类型为 String, Number, Boolean。String 类型支持最大长度为 256。Number 类型取值区间为 [-9E15, 9E15]。以战斗事件为例：
+
+<MultiLang>
+
+```cs
+TapDB.TrackEvent("eventName", "{\"weapon\":\"axe\"}");	
+```
+
+```java
+JSONObject properties = new JSONObject();
+properties.put("#weapon", "axe");
+properties.put("#level", 10);
+properties.put("#map", "atrium");
+TapDB.trackEvent("#battle", properties); 
+```
+
+```objectivec
+ NSDictionary* dic = @{@"aaa":@"xxx",@"bbb":@"yyy"};    
+[TapDB trackEvent:@"testEvent2" properties:dic];
+```
+
+</MultiLang>
+
+
 ## 设置通用事件属性
 
-开发者可以注册全局通用的自定义属性，这些属性会被附带在 TapDB 上传的事件中。
-### 添加事件属性
+对于某些重要的属性需要在每个上传的事件中出现，用户可以将这些属性设置为全局通用的自定义属性，包括静态通用属性和动态通用属性，静态通用属性为固定值，动态通用属性每次获取的值由用户所设置的计算逻辑产生。这些通用属性在注册之后，会被附带在TapDB上传的事件中。这里需要注意 trackEvent 中传入的属性优先级 > 动态通用属性优先级 > 静态通用属性优先级，也就是说动态通用属性会覆盖同名的静态通用属性。trackEvent 中的属性会覆盖同名的动态通用属性和静态通用属性。
+
+### 添加静态通用属性
 
 例如，添加来源渠道：
 
@@ -323,7 +325,7 @@ JSONObject commonProperties = new JSONObject();
 
 </MultiLang>
 
-### 删除事件属性
+### 删除静态通用属性
 
 删除单个已添加的事件属性：
 
@@ -361,10 +363,54 @@ TapDB.clearStaticProperties();
 
 </MultiLang>
 
+### 添加动态通用属性
+
+如果需要添加的通用属性的值在不同的上传事件中具有动态的赋值逻辑，那么可以调用 registerDynamicProperties 方法，注册相应的取值逻辑。以用户事件调用当前等级为例：
+
+<MultiLang>
+
+```cs
+public class TapDBDynamicPropertiesImpl : IDynamicProperties
+{
+        public Dictionary<string, object> GetDynamicProperties()
+        {
+                Dictionary<string, object> dic = new Dictionary<string, object>();
+                dic["#currentLevel"] = level;
+                return dic;
+        }
+}
+TapDB.RegisterDynamicProperties(new TapDBDynamicPropertiesImpl());
+```
+
+```java
+
+TapDB.registerDynamicProperties(
+    () -> {
+              JSONObject properties = new JSONObject();
+            // getCurrentLevel 在这里仅作为案例，表示用户任何的自有逻辑实现
+            long level = getCurrentLevel();
+            properties.put("#currentLevel", level);
+            return properties; 
+    }
+);
+```
+
+```objectivec
+[TapDB registerDynamicProperties:^NSDictionary *_Nonnull {
+      return @{
+          @"#currentLevel": level
+      };
+  }];
+```
+
+</MultiLang>
+
+
+
+
 ## 事件主体操作
 
-目前支持设备和账号这两个主体，支持初始化、更新、累加这三种主体操作。
-三种操作的主要区别是数据更新策略。
+TapDB 目前支持两个事件主体：设备，账号。相应支持主体属性的操作为初始化，更新和累加。累加操作只支持数值类型。需要注意的是，传入的自定义属性需要同预登记属性名保持一致。
 
 ### 初始化
 
@@ -502,7 +548,7 @@ TapDB.userInitialize(properties);
 
 参数名 | 参数类型 | 参数说明
 | ------ | ------ | ------ |
-appid | string | 游戏的 App ID （可在 TapDB 控制台查看）
+client_id | string | 游戏的 client id
 onlines | array | 多条在线数据（最多 100 条）
 
 其中 `onlines` 数组元素的结构为：
@@ -517,7 +563,7 @@ timestamp | long | 当前统计数据的时间戳（秒）。TapDB 会按照自�
 
 ```json
 {
-  "appid":"gkjasd13bbsa1sdk",
+  "client_id":"gkjasd13bbsa1sdk",
   "onlines":[{
     "server":"s1",
     "online":123,
