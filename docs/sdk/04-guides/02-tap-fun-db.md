@@ -279,7 +279,7 @@ POST 数据（实际发送请求时需去除注释、空格、换行符并 urlen
 <MultiLang>
 
 ```cs
-TapDB.TapDB.TrackEvent("eventName", "{\"weapon\":\"axe\"}");	
+TapDB.TrackEvent("eventName", "{\"weapon\":\"axe\"}");	
 ```
 
 ```java
@@ -302,7 +302,7 @@ TapDB.trackEvent("#battle", properties);
 
 对于某些重要的属性需要在每个上传的事件中出现，用户可以将这些属性设置为全局通用的自定义属性，包括静态通用属性和动态通用属性，静态通用属性为固定值，动态通用属性每次获取的值由用户所设置的计算逻辑产生。这些通用属性在注册之后，会被附带在TapDB上传的事件中。这里需要注意 trackEvent 中传入的属性优先级 > 动态通用属性优先级 > 静态通用属性优先级，也就是说动态通用属性会覆盖同名的静态通用属性。trackEvent 中的属性会覆盖同名的动态通用属性和静态通用属性。
 
-### 添加事件属性
+### 添加静态通用属性
 
 例如，添加来源渠道：
 
@@ -325,7 +325,7 @@ JSONObject commonProperties = new JSONObject();
 
 </MultiLang>
 
-### 删除事件属性
+### 删除静态通用属性
 
 删除单个已添加的事件属性：
 
@@ -362,6 +362,51 @@ TapDB.clearStaticProperties();
 ```
 
 </MultiLang>
+
+### 添加动态通用属性
+
+如果需要添加的通用属性的值在不同的上传事件中具有动态的赋值逻辑，那么可以调用 registerDynamicProperties 方法，注册相应的取值逻辑。以用户事件调用当前等级为例：
+
+<MultiLang>
+
+```cs
+public class TapDBDynamicPropertiesImpl : IDynamicProperties
+{
+        public Dictionary<string, object> GetDynamicProperties()
+        {
+                Dictionary<string, object> dic = new Dictionary<string, object>();
+                dic["#currentLevel"] = level;
+                return dic;
+        }
+}
+TapDB.RegisterDynamicProperties(new TapDBDynamicPropertiesImpl());
+```
+
+```java
+
+TapDB.registerDynamicProperties(
+    () -> {
+              JSONObject properties = new JSONObject();
+            // getCurrentLevel 在这里仅作为案例，表示用户任何的自有逻辑实现
+            long level = getCurrentLevel();
+            properties.put("#currentLevel", level);
+            return properties; 
+    }
+);
+```
+
+```objectivec
+[TapDB registerDynamicProperties:^NSDictionary *_Nonnull {
+      return @{
+          @"#currentLevel": level
+      };
+  }];
+```
+
+</MultiLang>
+
+
+
 
 ## 事件主体操作
 
