@@ -76,7 +76,10 @@ module.exports = {
         },
       ],
     },
-    footer: {}
+    footer: {},
+    googleAnalytics: {
+      trackingID: 'UA-73963350-1',
+    },
   },
   i18n: {
     defaultLocale: 'zh-Hans',
