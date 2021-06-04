@@ -336,7 +336,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 ```cs
 TapConfig tapConfig = new TapConfig.Builder()
     .ClientID("clientId")//必须
-    .ClientSecret("client_secret")//必须
+    .ClientSecret("client_secret")//必须，开发者中心对应Client Token
     .RegionType(RegionType.CN)//非必须，默认CN
     .ConfigBuilder();
 
@@ -348,7 +348,7 @@ TapConfig tapConfig = new TapConfig.Builder()
         .withAppContext(getApplicationContext())
         .withRegionType(TapRegionType.CN) // TapRegionType.CN: 国内  TapRegionType.IO: 国外
         .withClientId("clientId")
-        .withClientSecret("clientSecret")
+        .withClientSecret("clientSecret")//开发者中心对应Client Token
         .build();
 TapBootstrap.init(MainActivity.this, tapConfig);
 ```
@@ -357,7 +357,7 @@ TapBootstrap.init(MainActivity.this, tapConfig);
     //初始化SDK
     TapConfig *config = TapConfig.new;
     config.clientId = @"clientId";
-    config.clientSecret=@"clientSecret";
+    config.clientSecret=@"clientSecret";//开发者中心对应Client Token
 
     config.region = TapSDKRegionTypeCN;
     [TapBootstrap initWithConfig:config];
