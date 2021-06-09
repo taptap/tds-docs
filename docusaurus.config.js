@@ -15,7 +15,7 @@ module.exports = {
   projectName: 'TapSDK Document',
   themeConfig: {
     prism: {
-      theme: require('prism-react-renderer/themes/dracula'),
+      theme: require('./src/theme/prism-taptap'),
       additionalLanguages: ['csharp', 'java'],
     },
     image: '/img/logo.svg',
