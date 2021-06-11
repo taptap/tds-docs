@@ -133,7 +133,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 </>
 <>
 
-1. [点击下载 TapSDK_Android_v2.1.2.zip](/sdk/tap-download)，将 SDK 包导入到项目 `project/app/libs` 目录下。
+1. [点击下载 TapSDK_Android](/sdk/tap-download)，将 SDK 包导入到项目 `project/app/libs` 目录下。
 
 2. 打开项目的 `project/app/build.gradle` 文件，添加 gradle 配置如下：
 
