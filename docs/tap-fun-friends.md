@@ -35,7 +35,8 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 [获取黑名单](#9-获取黑名单) |   -   |
 [分享好友邀请链接](#10-分享好友邀请链接)    |   自动生成分享链接，同时调用起系统分享组组件行选择分享  |
 [获取好友邀请链接](#11-获取好友邀请链接)   |  生成邀请链接  |
-[搜索用户](#12-搜索用户)  |   可以主动搜索tds id然后进行添加好友  |
+[搜索用户](#12-搜索用户)  |   可以根据tds id进行搜索以获取好友信息  |
+|[富信息](#13-富信息) | 设置用户自身状态，会在好友相关操作时回调|
 
 
 ## 1. 应用配置
@@ -440,7 +441,7 @@ public void onFail(TapFriendError tapFriendError) {
 1. 生成链接并唤起系统分享控件
 2. 选择分享应用，分享链接给对方
 3. 对方点击链接，会打开下面图示
-4. 如果对方已经安装该游戏，则直接打开游戏并添加关注；如果对方未安装该游戏，则先额跳转到 TapTap 进行安装
+4. 如果对方已经安装该游戏，则直接打开游戏并添加关注；如果对方未安装该游戏，则先跳转到 TapTap 提示安装
 
 <img src={useBaseUrl('/img/friends-follow01.png')} alt="" width="400" />
 
@@ -620,7 +621,9 @@ public void onFail(TapFriendError tapFriendError) {
 
 ```cs
 
-TapFriends.SetRichPresence("display", "playing", (,error) =>
+//设置value时需要注意，#playing表示令牌，playing表示变量，详情参考服务端配置信息
+
+TapFriends.SetRichPresence("display", "#playing", (,error) =>
 {
     if (error != null)
     {
@@ -652,7 +655,7 @@ TapFriends.SetRichPresence("leadboard", "100", (,error) =>
 
 
 ```objectivec
-[TapFriends setRichPresence:@"display" value:@"playing" handler:^(NSError * _Nullable error) {
+[TapFriends setRichPresence:@"display" value:@"#playing" handler:^(NSError * _Nullable error) {
         if (error) {
             NSLog(@"error:%@", error);
         } else {
@@ -792,7 +795,7 @@ name  | 用户nick name
 avatar  | 头像地
 gender | UNKNOWN = 0;<br/>MALE = 1;<br/> FEMALE = 2;
 mutualAttention | 是否互相关注 <br/>false:不是互相关注 <br/>true: 互相关注
-relationship | 返回字符串类型【000】<br/>从左到右：是否关注，是否被关注，是否拉黑<br/>如:【010】为粉丝（单向被关注），【110】为好友（双向互关）
+relationship | 返回字符串类型【000】<br/>从右往左：是否关注，是否被关注，是否拉黑<br/>如:【010】为粉丝（单向被关注），【011】为好友（双向互关）
 online | 是否在线
 time | 事件触发时间，关注列表回调的是你关注他的时间，粉丝列表回调表示他关注你的时间，单位s 
 richPresence | 回调好友的富信息 [富信息使用说明](#使用说明)
