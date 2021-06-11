@@ -48,15 +48,15 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 
 ```json
-"com.taptap.tds.friends": "https://github.com/TapTap/TapFriends-Unity.git#2.1.2",
+"com.taptap.tds.friends": "https://github.com/TapTap/TapFriends-Unity.git#2.1.4",
 ```
 
 </>
 <>
 
 ```json
-TapFriendUI_2.1.2.arr  
-TapFriend_2.1.2.arr
+TapFriendUI_2.1.4.arr  
+TapFriend_2.1.4.arr
 ```
 
 </>
@@ -96,6 +96,10 @@ Android或者unity开发时，都需要在manifest中加入以下代码
 ```
 
 ## 2. 注册消息回调
+
+code  | msg |说明
+| ------ | ------ |------|
+130001 | 用户id (tds id) | 打开他人的分享链接唤起游戏后回调，在回调里处理tds id，如：[关注TA](#4-添加好友)
 
 
 <MultiLang>
