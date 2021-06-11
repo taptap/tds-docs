@@ -56,13 +56,13 @@ module.exports = {
           position: 'right',
           items: [
             {
-              label: '品牌素材',
-              withRef: true,
-              // hack for i18n
-              i18nHref: {
-                'zh-Hans': 'https://www.taptap.com/developer/location_page?force_region=CN&redirect_url=https://www.taptap.com/about-us/brand-resources',
-                en: 'https://www.taptap.com/developer/location_page?force_region=US&redirect_url=https://www.taptap.com/about-us/brand-resources'
-              },
+              label: '设计资源',
+              to: '/design'
+              //withRef: true,
+              // i18nHref: {
+              //   'zh-Hans': 'https://www.taptap.com/developer/location_page?force_region=CN&redirect_url=https://www.taptap.com/about-us/brand-resources',
+              //   en: 'https://www.taptap.com/developer/location_page?force_region=US&redirect_url=https://www.taptap.com/about-us/brand-resources'
+              // },
             },
             {
               label: 'SDK工具包',

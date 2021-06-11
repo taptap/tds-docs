@@ -93,7 +93,7 @@ TapBootstrap.getUser(new Callback<TapUser>() {
 ## Login
 
 TapSDK will first launch the TapTap application to complete the login process. When the TapTap application is not installed, it will use the built-in WebView.
-Please also refer to [Login Button Design Guidelines](/login-design).  
+Please also refer to [Login Button Design Guidelines](/design).  
 
 
 <MultiLang>
