@@ -1,7 +1,8 @@
 ---
-id: login-design
+id: design-login
 title: TapTap Login Button Design Guidelines
 sidebar_label: Login Specifications
+slug: /design
 ---
 
 import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
