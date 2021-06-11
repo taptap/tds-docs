@@ -315,8 +315,8 @@ TapDB.RegisterStaticProperties(properties);
 
 ```java
 JSONObject commonProperties = new JSONObject();
-        commonProperties.put("channel", "TapDB");
-        TapDB.registerStaticProperties(properties);
+commonProperties.put("channel", "TapDB");
+TapDB.registerStaticProperties(properties);
 ```
 
 ```objectivec
@@ -386,11 +386,11 @@ TapDB.RegisterDynamicProperties(new TapDBDynamicPropertiesImpl());
 
 TapDB.registerDynamicProperties(
     () -> {
-              JSONObject properties = new JSONObject();
-            // getCurrentLevel 在这里仅作为案例，表示用户任何的自有逻辑实现
-            long level = getCurrentLevel();
-            properties.put("#currentLevel", level);
-            return properties; 
+        JSONObject properties = new JSONObject();
+        // getCurrentLevel 在这里仅作为案例，表示用户任何的自有逻辑实现
+        long level = getCurrentLevel();
+        properties.put("#currentLevel", level);
+        return properties; 
     }
 );
 ```
@@ -430,11 +430,11 @@ TapDB.DeviceInitialize(properties);
 
 ```java
 JSONObject properties = new JSONObject();
-        properties.put("firstActiveServer", "server1");
-        TapDB.deviceInitialize(properties);
+properties.put("firstActiveServer", "server1");
+TapDB.deviceInitialize(properties);
 
-        properties.put("firstActiveServer", "server2");
-        TapDB.deviceInitialize(properties);
+properties.put("firstActiveServer", "server2");
+TapDB.deviceInitialize(properties);
 ```
 
 ```objectivec
@@ -465,11 +465,11 @@ TapDB.DeviceUpdate(properties);
 
 ```java
 JSONObject properties = new JSONObject();
-        properties.put("currentPoints", 10);
-        TapDB.deviceUpdate(properties);
+properties.put("currentPoints", 10);
+TapDB.deviceUpdate(properties);
 
-        properties.put("currentPoints", 42);
-        TapDB.deviceUpdate(properties);
+properties.put("currentPoints", 42);
+TapDB.deviceUpdate(properties);
 ```
 
 ```objectivec
@@ -500,11 +500,11 @@ TapDB.DeviceAdd(properties);
 
 ```java
 JSONObject properties = new JSONObject();
-        properties.put("totalPoints", 10);
-        TapDB.deviceAdd(properties);
+properties.put("totalPoints", 10);
+TapDB.deviceAdd(properties);
 
-        properties.put("totalPoints", -2);
-        TapDB.deviceAdd(properties);
+properties.put("totalPoints", -2);
+TapDB.deviceAdd(properties);
 ```
 
 ```objectivec
@@ -531,8 +531,8 @@ TapDB.UserAdd(properties);
 
 ```java
 TapDB.userInitialize(properties);
-        TapDB.userUpdate(properties);
-        TapDB.userAdd(properties);
+TapDB.userUpdate(properties);
+TapDB.userAdd(properties);
 ```
 
 ```objectivec

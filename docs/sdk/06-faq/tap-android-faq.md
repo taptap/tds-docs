@@ -30,6 +30,7 @@ TapConfig tapConfig = new TapConfig.Builder()
         .withAppContext(getApplicationContext())
         .withRegionType(TapRegionType.CN) // TapRegionType.CN: 中国大陆  TapRegionType.IO: 国际
         .withClientId("Client ID") // TapTap开发者中心创建应用后获取对Client ID
+        .withClientSecret("Client Token") // TapTap开发者中心创建应用后获取对Client Token
         .build();
 TapBootstrap.init(MainActivity.this, tapConfig);
 ```

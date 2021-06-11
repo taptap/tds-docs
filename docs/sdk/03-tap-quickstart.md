@@ -143,14 +143,14 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
             dirs 'libs'  
         }  
     }  
-    }  
+    
     dependencies {  
     ...  
-        implementation (name:'TapBootstrap_2.1.2', ext:'aar')  // 必选: TapSDK 启动器 
-        implementation (name:'TapCommon_2.1.2', ext:'aar') // 必选: TapSDK 基础库 
-		implementation (name:'TapLogin_2.1.2', ext:'aar') // 必选: TapTap 登录 
-        implementation (name:'TapMoment_2.1.2', ext:'aar') // TapTap 内嵌动态
-        implementation (name:'TapDB_2.1.2', ext:'aar') // 数据统计
+        implementation (name:'TapBootstrap_2.1.4', ext:'aar')  // 必选: TapSDK 启动器 
+        implementation (name:'TapCommon_2.1.4', ext:'aar') // 必选: TapSDK 基础库 
+		implementation (name:'TapLogin_2.1.4', ext:'aar') // 必选: TapTap 登录 
+        implementation (name:'TapMoment_2.1.4', ext:'aar') // TapTap 内嵌动态
+        implementation (name:'TapDB_2.1.4', ext:'aar') // 数据统计
     }  
     ```
 
@@ -393,21 +393,21 @@ public class MyLoginCallback : ITapLoginResultListener {
 
 ```java
 TapBootstrap.registerLoginResultListener(new TapLoginResultListener() {
-@Override
-public void loginSuccess(AccessToken accessToken) {
+    @Override
+    public void loginSuccess(AccessToken accessToken) {
         Log.d(TAG, "onLoginSuccess: " + accessToken.toJSON());
-        }
+    }
 
-@Override
-public void loginFail(TapError tapError) {
+    @Override
+    public void loginFail(TapError tapError) {
         Log.d(TAG, "onLoginError: " + tapError.getMessage());
-        }
+    }
 
-@Override
-public void loginCancel() {
+    @Override
+    public void loginCancel() {
         Log.d(TAG, "onLoginCancel");
-        }
-        });
+    }
+});
 ```
 
 ```objectivec
@@ -489,10 +489,10 @@ TapBootstrap.GetAccessToken((accessToken, error) => {
 
 ```java
 if (TapBootstrap.getCurrentToken() == null) {
-        // 未登录
-        } else {
-        // 已登录
-        }
+    // 未登录
+} else {
+    // 已登录
+}
 ```
 
 ```objectivec
