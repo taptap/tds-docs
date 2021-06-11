@@ -134,7 +134,9 @@ TapFriends.registerMessageCallback(new ComponentMessageCallback() {
 以下列表形式获取均为分页获取  
 int from：起始位置  
 bool mutualAttention: true 为互相关注；false 为单向关注其他人  
-int limit：结束位置
+int limit：结束位置  
+
+返回参数请参考[参数说明](#14-参数说明)
 
 <MultiLang>
 
@@ -180,16 +182,7 @@ TapFriends.getFollowingList(0, true, 100, new ListCallback<TapUserRelationship>(
 </MultiLang>
 
 
-#### 参数说明
-TapUserRelationShip
 
-参数  | 描述
-| ------ | ------ |
-userid | 用户id (tds id)
-name  | 用户nick name
-avatar  | 头像地址
-gender | UNKNOWN = 0;<br/>MALE = 1;<br/> FEMALE = 2;
-mutualAttention | 是否互相关注 <br/>false:不是互相关注 <br/>true: 互相关注
 
 ## 4. 添加好友
 
@@ -348,6 +341,7 @@ TapFriends.unblockUser("userID", new Callback<Boolean>() {
 
 
 ## 8. 获取粉丝列表
+返回参数请参考[参数说明](#14-参数说明)
 
 <MultiLang>
 
@@ -393,6 +387,7 @@ public void onFail(TapFriendError tapFriendError) {
 
 
 ## 9. 获取黑名单
+返回参数请参考[参数说明](#14-参数说明)
 
 <MultiLang>
 
@@ -441,7 +436,7 @@ public void onFail(TapFriendError tapFriendError) {
 1. 生成链接并唤起系统分享控件
 2. 选择分享应用，分享链接给对方
 3. 对方点击链接，会打开下面图示
-4. 如果对方已经安装该游戏，则直接打开游戏并添加关注；如果对方未安装该游戏，则选额跳转到TapTap进行安装
+4. 如果对方已经安装该游戏，则直接打开游戏并添加关注；如果对方未安装该游戏，则先额跳转到 TapTap 进行安装
 
 <img src={useBaseUrl('/img/friends-follow01.png')} alt="" width="400" />
 
@@ -581,12 +576,12 @@ public void onSuccess(TapUserRelationship tapUserRelationship) {
 public void onFail(TapFriendError tapFriendError) {
         // 搜索好友失败
         }
-        });
+        })
 ```
 
 
 ```objectivec
-[TapFriends searchUserWithUserId:@"tds id" handler:^(TapUserRelationShip *_Nullable user, NSError *_Nullable error) {
+[TapFriends searchUserWithUserId:@"tds id" value:@"playing" handler:^(TapSimpleHandler *_Nullable user, NSError *_Nullable error) {
     if (error) {
         NSLog(@"error:%@", error);
     } else {
@@ -604,4 +599,197 @@ public void onFail(TapFriendError tapFriendError) {
 </MultiLang>
 
 
+
+## 13. 富信息
+
+#### 使用说明
+
+- 使用富信息需要先按[服务端配置](#服务端配置)格式提供给技术支持进行
+- 最多支持配置20个 key，移动端以 key-value 键值对发送信息
+- key-不支持空字符串，最短长度2位，最长长度64位；value-不支持空字符串，最短长度2位，最长长度256位
+
+### 移动端 
+
+#### 设置富信息
+
+<MultiLang>
+
+```cs
+
+TapFriends.SetRichPresence("display", "playing", (,error) =>
+{
+    if (error != null)
+    {
+        label = $"Error:{error.code} Description:{error.errorDescription}";
+    }
+    else
+    {
+        label = "设置富信息成功";
+    }
+});
+
+TapFriends.SetRichPresence("leadboard", "100", (,error) =>
+{
+    if (error != null)
+    {
+        label = $"Error:{error.code} Description:{error.errorDescription}";
+    }
+    else
+    {
+        label = "设置富信息成功";
+    }
+});
+```
+
+
+```java
+//TODO
+```
+
+
+```objectivec
+[TapFriends setRichPresence:@"display" value:@"playing" handler:^(NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"error:%@", error);
+        } else {
+            NSLog(@"设置成功");
+        }
+}];
+
+```
+
+</MultiLang>
+
+#### 清除富信息
+
+<MultiLang>
+
+```cs
+
+TapFriends.SetRichPresence("display", "playing", (,error) =>
+{
+    if (error != null)
+    {
+        label = $"Error:{error.code} Description:{error.errorDescription}";
+    }
+    else
+    {
+        label = "设置富信息成功";
+    }
+});
+
+TapFriends.ClearRichPresence("leadboard", (,error) =>
+{
+    if (error != null)
+    {
+        label = $"Error:{error.code} Description:{error.errorDescription}";
+    }
+    else
+    {
+        label = "清除富信息成功";
+    }
+});
+```
+
+
+```java
+//TODO
+```
+
+
+```objectivec
+   [TapFriends clearRichPresence:@"display" handler:^(NSError * _Nullable error) {
+            if (error) {
+                NSLog(@"error:%@", error);
+            } else {
+                NSLog(@"清除成功");
+            }
+    }];
+
+```
+
+</MultiLang>
+
+
+### 服务端
+
+请先确认好要配置的key-value，按照下面格式发给技术支持 
+
+#### 服务端配置
+
+服务端支持两种配置，用 type 进行区分 `令牌`和`变量`
+
+```
+[
+  {
+	  "key": "display",
+	  "type": "token"
+  }, {
+	  "key": "leadboard",
+	  "type": "token"
+  }, {
+	  "key": "inviteable",
+	  "type": "variable"
+  }, {
+	  "key": "score",
+	  "type": "variable"
+  }
+]
+```
+
+#### 令牌
+对于令牌，提供key之后，需要提供与之对应的value  
+
+如上type = token的令牌有`display`和`leadboard`。如需配置多语言也请标识，语言标识没有要求，如 "CN"、"US"、"TW" 能理解即可
+
+```
+{
+	"CN": {
+		"display": {
+			"#playing": "游戏中",
+			"#idle": "在线",
+			"#room": "准备中",
+			"#matching": "组队中"
+		},
+		"leadboard": {
+			"#rank": "%rank%名", // 如需要提供占位符，请用%%标识
+			"#score": "%score%分"
+		}
+	},
+	"US": {
+		"display": {
+			"#playing": "Playing",
+			"#idle": "Idle",
+			"#room": "Room",
+			"#matching": "Matching"
+		},
+		"leadboard": {
+			"#rank": "%rank% rank",
+			"#score": "%score% score"
+		}
+	}
+}
+```
+
+#### 变量
+对于变量，value 值游戏可以在移动端自行指定，设置后会传递给好友  
+如上，type = variable的变量有两个 `inviteable`和`score`  
+
+
+
+
+## 14. 参数说明
+TapUserRelationShip
+
+参数  | 描述
+| ------ | ------ |
+userid | 用户id (tds id)
+name  | 用户nick name
+avatar  | 头像地
+gender | UNKNOWN = 0;<br/>MALE = 1;<br/> FEMALE = 2;
+mutualAttention | 是否互相关注 <br/>false:不是互相关注 <br/>true: 互相关注
+relationship | 返回字符串类型【000】<br/>从左到右：是否关注，是否被关注，是否拉黑<br/>如:【010】为粉丝（单向被关注），【110】为好友（双向互关）
+online | 是否在线
+time | 事件触发时间，关注列表回调的是你关注他的时间，粉丝列表回调表示他关注你的时间，单位s 
+richPresence | 回调好友的富信息 [富信息使用说明](#使用说明)
 
