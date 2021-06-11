@@ -3,7 +3,11 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
 function MultiLang({children, kind}) {
-  if (kind === 'engine') {
+  // hide swift (not available under TapSDK)
+  if (kind === 'ios') {
+    const [swift, objc] = children;
+    return <>{objc}</>
+  } else if (kind === 'engine') {
     const [js, python, php, java, cs, go] = children;
     return <Tabs
       groupId="tap-platform"
