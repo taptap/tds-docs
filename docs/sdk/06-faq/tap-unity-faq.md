@@ -14,7 +14,12 @@ b、由于 TapTap 客户端授权登陆, 会对 Android 应用的 Client ID、�
 c、登录时报 404 或者 405 
 请检查 `TapConfig` 的区域配置，中国大陆请配置为 true
 ```c#
-TapConfig tapConfig = new TapConfig("FwFdCIr6u71WQDQwQN", true);
+TapConfig tapConfig = new TapConfig.Builder()
+    .ClientID("clientId")//必须
+    .ClientSecret("client_secret")//必须，开发者中心对应Client Token
+    .RegionType(RegionType.CN)//非必须，默认CN
+    .ConfigBuilder();
+
 TapBootstrap.Init(tapConfig);
 ```
 

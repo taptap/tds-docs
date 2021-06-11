@@ -17,6 +17,7 @@ c、登录时报 404 或者 405
 // TapSDK 初始化
 TapConfig *config = TapConfig.new;
 config.clientId = @"clientId";
+config.clientSecret=@"clientSecret";//开发者中心对应Client Token
 config.region = TapSDKRegionTypeCN;
 [TapBootstrap initWithConfig:config];
 ```

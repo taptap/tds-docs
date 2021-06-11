@@ -63,8 +63,8 @@ TapCommon.OpenReviewInTapTap(appId, openSuccess =>
 
 ```java
 if(TapGameUtil.isTapTapInstalled(this)){
-        Log.d(TAG, "已经安装TapTap客户端");
-        }
+    Log.d(TAG, "已经安装TapTap客户端");
+}
 ```
 
 
@@ -72,8 +72,8 @@ if(TapGameUtil.isTapTapInstalled(this)){
 
 ```java
 if(TapGameUtil.updateGameInTapTap(this,"appid")){
-        Log.d(TAG, "唤起TapTap客户端成功");
-        }
+    Log.d(TAG, "唤起TapTap客户端成功");
+}
 ```
 appid: 游戏在 TapTap 商店的唯一身份标识  
 例如：https://www.taptap.com/app/187168 ，其中 "187168" 是 appid
@@ -83,8 +83,8 @@ appid: 游戏在 TapTap 商店的唯一身份标识
 
 ```java
 if(TapGameUtil.openReviewInTapTap(this,"appid")){
-        Log.d(TAG, "打开评论区成功");
-        }
+    Log.d(TAG, "打开评论区成功");
+}
 
 ```
 

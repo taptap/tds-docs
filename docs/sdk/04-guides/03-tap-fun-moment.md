@@ -139,9 +139,9 @@ TapMoment.DirectlyOpen(Orientation.ORIENTATION_DEFAULT, TapMomentConstants.TapMo
 ```java
 Map<String, String> extras = new HashMap<>();
 // 注意：这里的 key 是固定的，"scene_id"； 第二个参数：开发者后台开启场景化入口并配置相关项后可以得到
-        extras.put("scene_id", "xxxx");
+extras.put("scene_id", "xxxx");
 // 注意：第二个参数固定为 "tap://moment/scene/" 
-        TapMoment.directlyOpen(TapMoment.ORIENTATION_DEFAULT,"tap://moment/scene/", extras);
+TapMoment.directlyOpen(TapMoment.ORIENTATION_DEFAULT,"tap://moment/scene/", extras);
 ```
 
 ```objectivec
@@ -225,9 +225,9 @@ TapMoment.Publish(Orientation.ORIENTATION_LANDSCAPE, images, content);
 
 ```java
 int orientation = TapMoment.ORIENTATION_PORTRAIT;
-        String content = "描述";
-        String[] imagePaths = new String[]{"content://hello.jpg", "/sdcard/world.jpg"};
-        TapMoment.publish(orientation, imagePaths, content);
+String content = "描述";
+String[] imagePaths = new String[]{"content://hello.jpg", "/sdcard/world.jpg"};
+TapMoment.publish(orientation, imagePaths, content);
 ```
 
 ```objectivec
