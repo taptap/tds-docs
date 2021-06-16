@@ -362,18 +362,18 @@ TapFriends.GetFollowerList(0, 100, (relationShip, err) => {
 
 ```java
 TapFriends.getFollowerList(0, 100, new ListCallback<TapUserRelationship>() {
-@Override
-public void onSuccess(List<TapUserRelationship> list) {
+    @Override
+    public void onSuccess(List<TapUserRelationship> list) {
         for (TapUserRelationship f : list){
-        System.out.println(f);
+            System.out.println(f);
         }
-        }
+    }
 
-@Override
-public void onFail(TapFriendError tapFriendError) {
+    @Override
+    public void onFail(TapFriendError tapFriendError) {
         Log.d("TapTap", "关注粉丝列表失败： " + tapFriendError.detailMessage);
-        }
-        });
+    }
+});
 ```
 
 
@@ -407,28 +407,28 @@ TapFriends.GetBlockList(0, 100, (relationShip, err) => {
 
 ```java
 TapFriends.getBlockList(0, 100, new ListCallback<TapUserRelationship>() {
-@Override
-public void onSuccess(List<TapUserRelationship> list) {
+    @Override
+    public void onSuccess(List<TapUserRelationship> list) {
         for (TapUserRelationship b : list){
-        System.out.println(b);
+            System.out.println(b);
         }
-        }
+    }
 
-@Override
-public void onFail(TapFriendError tapFriendError) {
+    @Override
+    public void onFail(TapFriendError tapFriendError) {
         Log.d("TapTap", "获取黑白单列表失败： " + tapFriendError.detailMessage);
-        }
-        });
+    }
+});
 ```
 
 
 ```objectivec
 [TapFriends getBlockList:0 limit:100 handler:^(NSArray<TapUserRelationShip *> * _Nullable userList, NSError * _Nullable error) {
-        if (error!=nil){
-            for (int i=0; userList.count; i++) {
-                NSLog(@"%@", userList[0]);
-            }
+    if (error!=nil){
+        for (int i=0; userList.count; i++) {
+            NSLog(@"%@", userList[0]);
         }
+    }
 }];
 ```
 
@@ -465,16 +465,16 @@ TapFriends.SendFriendInvitation((isInvitation, error) =>
 
 ```java
 TapFriends.sendFriendInvitation(Activity activity, new Callback<Boolean>() {
-@Override
-public void onSuccess(Boolean aBoolean) {
+    @Override
+    public void onSuccess(Boolean aBoolean) {
         // 分享好友邀请成功
-        }
+    }
 
-@Override
-public void onFail(TapFriendError tapFriendError) {
+    @Override
+    public void onFail(TapFriendError tapFriendError) {
         // 分享好友邀请失败
-        }
-        });
+    }
+});
 ```
 
 
@@ -515,16 +515,16 @@ public void onFail(TapFriendError tapFriendError) {
 
 ```java
 TapFriends.generateFriendInvitation(new Callback<String>() {
-@Override
-public void onSuccess(String s) {
+    @Override
+    public void onSuccess(String s) {
         // 获取好友邀请链接成功
-        }
+    }
 
-@Override
-public void onFail(TapFriendError tapFriendError) {
+    @Override
+    public void onFail(TapFriendError tapFriendError) {
         // 获取好友邀请链接失败
-        }
-        });
+    }
+});
 ```
 
 
@@ -571,17 +571,17 @@ TapFriends.SearchUser(userId, (relationShip, error) =>
 
 ```java
 TapFriends.searchUser("userID", new Callback<TapUserRelationship>() {
-@Override
-public void onSuccess(TapUserRelationship tapUserRelationship) {
+    @Override
+    public void onSuccess(TapUserRelationship tapUserRelationship) {
         // 搜索好友成功
         tapUserRelationship.toJSON();
-        }
+    }
 
-@Override
-public void onFail(TapFriendError tapFriendError) {
+    @Override
+    public void onFail(TapFriendError tapFriendError) {
         // 搜索好友失败
-        }
-        })
+    }
+})
 ```
 
 
@@ -598,7 +598,6 @@ public void onFail(TapFriendError tapFriendError) {
         NSLog(@"friend list %@ %@ %@ %@", str, user.isBlocked ? @"yes" : @"no", user.isFollowed ? @"yes" : @"no", user.isFollowing ? @"yes" : @"no");
     }
 }];
-
 ```
 
 </MultiLang>
@@ -620,9 +619,8 @@ public void onFail(TapFriendError tapFriendError) {
 <MultiLang>
 
 ```cs
-
-//设置value时需要注意，#playing表示令牌，playing表示变量，详情参考服务端配置信息
-
+//设置value时需要注意，"#playing" 表示令牌，"playing"表示变量，详情参考服务端配置信息
+//这里的"display"是先在服务端配置成"token"令牌形式的，所以value值需要以#开头，
 TapFriends.SetRichPresence("display", "#playing", (,error) =>
 {
     if (error != null)
@@ -635,7 +633,20 @@ TapFriends.SetRichPresence("display", "#playing", (,error) =>
     }
 });
 
-TapFriends.SetRichPresence("leadboard", "100", (,error) =>
+TapFriends.SetRichPresence("leadboard", "#100", (,error) =>
+{
+    if (error != null)
+    {
+        label = $"Error:{error.code} Description:{error.errorDescription}";
+    }
+    else
+    {
+        label = "设置富信息成功";
+    }
+});
+
+// "score" 在服务端设置的类型是 "variable" 类型，所以 对应value值不需要以#开头
+TapFriends.SetRichPresence("score", "100", (,error) =>
 {
     if (error != null)
     {
@@ -650,7 +661,35 @@ TapFriends.SetRichPresence("leadboard", "100", (,error) =>
 
 
 ```java
-//TODO
+private void taptapRichVar() {
+    // 富信息 令牌形式 参考文档中的服务端设置，这里的key值"display"文档中是令牌形式， 所以value值需要以#开头
+    TapFriends.setRichPresence("display", "#playing", new Callback0() {
+        @Override
+        public void handlerResult(TapFriendError tapFriendError) {
+            
+        }
+    });
+}
+
+private void taptapRichToken() {
+    // 富信息令牌形式
+    TapFriends.setRichPresence("leadboard", "#100", new Callback0() {
+        @Override
+        public void handlerResult(TapFriendError tapFriendError) {
+
+        }
+    });
+}
+
+// "score" 在服务端设置的类型是 "variable" 变量类型，所以 对应value值不需要以#开头
+private void taptapRichToken() {
+    TapFriends.setRichPresence("score", "100", new Callback0() {
+        @Override
+        public void handlerResult(TapFriendError tapFriendError) {
+
+        }
+    });
+}
 ```
 
 
@@ -672,19 +711,6 @@ TapFriends.SetRichPresence("leadboard", "100", (,error) =>
 <MultiLang>
 
 ```cs
-
-TapFriends.SetRichPresence("display", "playing", (,error) =>
-{
-    if (error != null)
-    {
-        label = $"Error:{error.code} Description:{error.errorDescription}";
-    }
-    else
-    {
-        label = "设置富信息成功";
-    }
-});
-
 TapFriends.ClearRichPresence("leadboard", (,error) =>
 {
     if (error != null)
