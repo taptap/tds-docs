@@ -96,6 +96,30 @@
 另外，由于 docsaurus 的 TOC 生成并不能正确处理这种情况下的小标题（仅会根据第一个标签的内容生成小标题，切换标签后 TOC 的内容不变），请不要在 `Multilang` 标签中使用 `h1`、`h2`、`h3` 级别的标题。
 最后，某些文档面向的平台并不是 Unity、iOS、Android，这种情况下可以用 `kind` 参数指定使用 MultiLang 的变体，比如云引擎文档使用 `<MultiLang kind="engine">`，顺序为 JavaScript、Python、PHP、Java、C#、Go.
 
+## 图表
+
+支持 [Mermaid](https://mermaid-js.github.io/mermaid/#/)。
+
+在文件开头引入 Mermaid 组件：
+
+```js
+import Mermaid from '@theme/Mermaid';
+```
+
+然后在 Mermaid 组件的 diagram 属性中写 Mermaid 语法：
+
+```js
+<Mermaid diagram={`
+graph LR
+A((delete))-->|beforeDelete|H{error?}
+H-->Y(Yes)
+Y-->Z((interrupted))
+H-->N(No)
+N-->B[delete object on the cloud]
+B -->|afterDelete|C((done))
+`} />
+```
+
 ## 关于国际化
 
 > 参考 [docusaurus文档](https://v2.docusaurus.io/docs/i18n/tutorial)
