@@ -16,7 +16,7 @@ module.exports = {
   themeConfig: {
     prism: {
       theme: require('./src/theme/prism-taptap'),
-      additionalLanguages: ['csharp', 'java'],
+      additionalLanguages: ['csharp', 'java', 'php', 'groovy'],
     },
     image: '/img/logo.svg',
     metadatas: [{
