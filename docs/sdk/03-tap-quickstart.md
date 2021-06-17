@@ -400,7 +400,7 @@ TapBootstrap.registerLoginResultListener(new TapLoginResultListener() {
 
     @Override
     public void loginFail(TapError tapError) {
-        Log.d(TAG, "onLoginError: " + tapError.getMessage());
+        Log.d(TAG, "onLoginError: " + tapError.toJSON());
     }
 
     @Override

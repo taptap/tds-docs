@@ -666,7 +666,12 @@ private void taptapRichVar() {
     TapFriends.setRichPresence("display", "#playing", new Callback0() {
         @Override
         public void handlerResult(TapFriendError tapFriendError) {
-            
+            if (null == tapFriendError){
+                // 设置成功
+            }else {
+                Log.d("LeeJiEun ==>", tapFriendError.detailMessage);
+                Log.d("LeeJiEun ==>", String.valueOf(tapFriendError.code));
+            }
         }
     });
 }
@@ -676,7 +681,12 @@ private void taptapRichToken() {
     TapFriends.setRichPresence("leadboard", "#100", new Callback0() {
         @Override
         public void handlerResult(TapFriendError tapFriendError) {
-
+            if (null == tapFriendError){
+                // 设置成功
+            }else {
+                Log.d("LeeJiEun ==>", tapFriendError.detailMessage);
+                Log.d("LeeJiEun ==>", String.valueOf(tapFriendError.code));
+            }
         }
     });
 }
@@ -686,7 +696,12 @@ private void taptapRichToken() {
     TapFriends.setRichPresence("score", "100", new Callback0() {
         @Override
         public void handlerResult(TapFriendError tapFriendError) {
-
+            if (null == tapFriendError){
+                // 设置成功
+            }else {
+                Log.d("LeeJiEun ==>", tapFriendError.detailMessage);
+                Log.d("LeeJiEun ==>", String.valueOf(tapFriendError.code));
+            }
         }
     });
 }
@@ -726,7 +741,17 @@ TapFriends.ClearRichPresence("leadboard", (,error) =>
 
 
 ```java
-//TODO
+TapFriends.clearRichPresence("display", new Callback0() {
+    @Override
+    public void handlerResult(TapFriendError tapFriendError) {
+        if (null == tapFriendError){
+            // 富信息清除成功
+        }else {
+            Log.d("LeeJiEun ==>", tapFriendError.detailMessage);
+            Log.d("LeeJiEun ==>", String.valueOf(tapFriendError.code));
+        }
+    }
+});
 ```
 
 
