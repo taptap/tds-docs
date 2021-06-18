@@ -14,7 +14,7 @@ sidebar_label: 资源下载
 ## Demo
 
 - [Unity](https://github.com/TapTap/TapSDK-Unity-Demo)  
-- [Android](https://github.com/xindong/TapSDK_Android)  
+- [Android](https://github.com/taptap/TapSDK-Android)  
 - [iOS](https://github.com/TapTap/TapSDK-iOS)  
 
 
