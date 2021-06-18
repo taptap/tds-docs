@@ -53,7 +53,7 @@ if (accessToken == nil) {
 该功能仅用于需要上线「篝火测试服」的游戏，对有登录白名单的用户进行资格校验，防止测试阶段开发包外传被利用
 :::
 
-请在登录成功的回调里调用相关API进行校验，[点击](https://www.taptap.com/campfire)了解篝火计划
+请在登录成功的回调里调用相关 API 进行校验，[点击](https://www.taptap.com/campfire)了解篝火计划
 
 <MultiLang>
 
@@ -105,7 +105,7 @@ TapBootstrap.getTestQualification(new Callback<Boolean>() {
 
 </MultiLang>
 
-** Error信息为网络错误，或者该游戏未开通篝火测试服 **
+** Error 信息为网络错误，或者该游戏未开通篝火测试服 **
 
 ## 获取用户信息
 

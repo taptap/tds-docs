@@ -65,7 +65,7 @@ import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
 
 提示：
 
-> 开启场景化入口能力需要权限，相关事宜请联系Tap技术对接
+> 开启场景化入口能力需要权限，相关事宜请联系 TapTap 技术对接
 
 
 
