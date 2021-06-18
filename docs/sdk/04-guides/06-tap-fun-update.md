@@ -5,7 +5,7 @@ sidebar_label: 唤起更新
 ---
 ## Unity
 
-### 检查TapTap是否安装
+### 检查 TapTap 是否安装
 
 在项目的 `Packages/manifest.json` 文件中添加以下依赖：
 
@@ -29,7 +29,7 @@ TapCommon.IsTapTapInstalled(installed =>
 
 
 
-### 唤起TapTap检查更新
+### 唤起 TapTap 检查更新
 
 ```cs
 TapCommon.UpdateGameInTapTap("appid", callSuccess =>
@@ -57,9 +57,9 @@ TapCommon.OpenReviewInTapTap(appId, openSuccess =>
 
 ## Android
 
-### 检查TapTap是否安装
+### 检查 TapTap 是否安装
 
-接口在TapGameUtil里面，`import com.tds.common.utils.TapGameUtil;`
+接口在 TapGameUtil 里面，`import com.tds.common.utils.TapGameUtil;`
 
 ```java
 if(TapGameUtil.isTapTapInstalled(this)){
@@ -68,7 +68,7 @@ if(TapGameUtil.isTapTapInstalled(this)){
 ```
 
 
-### 唤起TapTap检查更新
+### 唤起 TapTap 检查更新
 
 ```java
 if(TapGameUtil.updateGameInTapTap(this,"appid")){
@@ -90,23 +90,23 @@ if(TapGameUtil.openReviewInTapTap(this,"appid")){
 
 ## 常见问题
 
-### **1.关于Android 11 无法拉起TapTap 客户端的解决方案** ###
+### **1.关于 Android 11 无法拉起 TapTap 客户端的解决方案** ###
 
-Android 11 加强了隐私保护策略，引入了大量变更和限制，其中一个重要变更 —— [软件包可见性](https://developer.android.com/about/versions/11/privacy/package-visibility) ，将会导致第三方应用无法拉起 TapTap 客户端，从而影响TapTap 相关功能的正常使用 ，包括但不限于更新唤起 TapTap 、购买验证等功能。
+Android 11 加强了隐私保护策略，引入了大量变更和限制，其中一个重要变更 —— [软件包可见性](https://developer.android.com/about/versions/11/privacy/package-visibility) ，将会导致第三方应用无法拉起 TapTap 客户端，从而影响 TapTap 相关功能的正常使用 ，包括但不限于更新唤起 TapTap 、购买验证等功能。
 特别需要注意的是，Android 11 的该变更只会影响到升级` targetSdkVersion=30 `的应用，未升级的应用暂不受影响。
 
 **方案一：**
 
-编译时将` targetSdkVersion` 改为29（目前=30会触发该问题）
+编译时将 `targetSdkVersion` 改为 29（目前=30会触发该问题）
 
 **方案二：**
 
-1. 将gradle build tools 改为4.1.0+
+1. 将 gradle build tools 改为 4.1.0+
 ```java
 classpath 'com.android.tools.build:gradle:4.1.0'
 ```
 
-2. 在AndroidManifest.xml 里添加如下内容
+2. 在 AndroidManifest.xml 里添加如下内容
 ```xml
 <queries>
   <package android:name="com.taptap" />
