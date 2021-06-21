@@ -23,19 +23,19 @@ config.region = TapSDKRegionTypeCN;
 ```
 
 ## 2、registerLoginCallback 代理无法回调
-检查一下 client ID 设置，info.plist 和初始化代码里面保持一致
+检查一下 client ID 设置，info.plist 和初始化代码里面保持一致。
 
 ## 3、[UIWindow tds_topWindow]: unrecognized selector sent to class 0xxxxxxxx
-到 Build Setting --> Other Linker Flags 添加 - ObjC
+到 Build Setting --> Other Linker Flags 添加 - ObjC 。
 ![](/img/tap_ios_003.png)
 
 ## 4、ld: symbol(s) not found for architecture arm64 clang: error: linker command failed with exit code 1 (use -v to see invocation)
-到这个位置，再检查一遍包导入情况
+到下图所示位置，再检查一遍包的导入情况。
 
 ![](/img/tap_ios_faq_libc.png)
 
 ## 5、Xcode 版本过低导致的异常
 
-下图异常主要是 Xcode 版本过低导致，TapSDK2.X 版本, iOS 建议使用 Xcode12.3 及其以上版本打包;
+下图异常主要是 Xcode 版本过低导致，TapSDK2.X 版本, iOS 建议使用 Xcode12.3 及其以上版本打包。
 
 ![](/img/tap_fqa_ios_xcode.png)
