@@ -5,7 +5,7 @@ sidebar_label: Android
 ---
 
 ## 1、登陆失败?
-可能有几个原因: 
+可能有以下几个原因导致: 
 
 a、没有在 TapTap 开发者中心开启登陆功能;
 
@@ -49,3 +49,8 @@ SDK 内部默认配置了 android:requestLegacyExternalStorage = true
 manifest 节点配置 `xmlns:tools="http://schemas.android.com/tools"`  
 application 节点配置 `tools:remove="android:requestLegacyExternalStorage"`
 
+## 3、"抱歉，该游戏/应用暂未开放"
+
+该异常提示主要是开发者未在控制台的「测试用户管理」中添加用户导致。如何添加测试用户，详情请参考[「测试用户管理」](https://developer.taptap.com/v2-doc/sdk/pro-in#%E4%B8%89%E3%80%81%E6%B5%8B%E8%AF%95%E7%94%A8%E6%88%B7%E7%AE%A1%E7%90%86)。
+
+![](/img/tap_android_test.png)
