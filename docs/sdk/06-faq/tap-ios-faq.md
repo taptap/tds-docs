@@ -33,3 +33,9 @@ config.region = TapSDKRegionTypeCN;
 到这个位置，再检查一遍包导入情况
 
 ![](/img/tap_ios_faq_libc.png)
+
+## 5、Xcode 版本过低导致的异常
+
+下图异常主要是 Xcode 版本过低导致，TapSDK2.X 版本, iOS 建议使用 Xcode12.3 及其以上版本打包;
+
+![](/img/tap_fqa_ios_xcode.png)
