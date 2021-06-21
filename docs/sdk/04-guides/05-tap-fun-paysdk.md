@@ -1,14 +1,14 @@
 ---
 id: tap-fun-paysdk
-title: 付费购买
-sidebar_label: 付费购买
+title: 正版验证 + DLC
+sidebar_label: 正版验证 + DLC
 ---
 import MultiLang from '@theme/MultiLang';
 
 import {Gray,Blue, Red, Black,Link,ImageLink} from '/src/docComponents/doc';
 
 
-## 付费认证
+## 正版验证
 
 <Gray>为了游戏售卖服务的功能，避免 APK 流出导致盗版横行；当游戏准备在 TapTap 开放售卖时，可以接入此功能。</Gray>
 
