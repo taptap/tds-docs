@@ -66,6 +66,10 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 }
 ```
 
+:::tip
+如果是手动下载unitypackage进行SDK导入，需要将 `Assets/TapTap/Common/Plugins/iOS/TapTap.Common.dll` 设置为只支持iOS
+:::
+
 [点击](https://github.com/TapTap) 参考 SDK 最新版本号。
 
 #### 手动导入
