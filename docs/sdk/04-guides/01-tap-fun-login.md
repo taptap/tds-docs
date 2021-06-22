@@ -111,10 +111,6 @@ TapBootstrap.getTestQualification(new Callback<Boolean>() {
 
 获取当前登录用户的 ID、昵称、头像等基本信息。
 
-:::caution
-请仅在用户已登录的情况下获取用户信息，如用户未登录，强行获取用户信息，可能导致程序异常甚至崩溃。
-:::
-
 <MultiLang>
 
 ```cs
