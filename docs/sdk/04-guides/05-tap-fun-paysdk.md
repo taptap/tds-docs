@@ -23,7 +23,7 @@ import {Gray,Blue, Red, Black,Link,ImageLink} from '/src/docComponents/doc';
 }
 ```
 
-### 1. 设置授权回调
+### 设置授权回调
 
 <MultiLang>
 
@@ -53,7 +53,7 @@ TapLicenseHelper.setLicenseCallback(new TapLicenseCallback() {
 ```
 </MultiLang>
 
-### 2. 检查付费授权
+### 检查付费授权
 
 <MultiLang>
 
@@ -68,7 +68,7 @@ TapLicenseHelper.check(Activity activity);
 
 ## DLC 查询和购买
 
-### 1. DLC 回调设置
+### DLC 回调设置
 
 <MultiLang>
 
@@ -105,7 +105,7 @@ TapLicenseHelper.setDLCCallback(new DLCManager.InventoryCallback() {
 </MultiLang>
 
 
-### 2. DLC 查询
+### DLC 查询
 
 <MultiLang>
 
@@ -118,7 +118,7 @@ TapLicenseHelper.queryDLC(Activity activity, String[] skuIds);
 ```
 </MultiLang>
 
-### 3. DLC 购买
+### DLC 购买
 
 <MultiLang>
 
@@ -149,31 +149,31 @@ ERROR_CODE_UNDEFINED       | 80000   | 未知错误     |
 
 为了保证上线后，游戏对于用户是否购买的判断能够正常生效，**请务必按照以下说明完成自测。**
 
-### **1. 上传APK**
+### 上传 APK
 
 上传需要测试的APK至开发者中心，并通过审核。
 
-### **2. 配置SDK**
+### 配置 SDK
 
 前往开发者中心   >>   选择<Blue>SDK控制台 </Blue>   >>   选择<Blue>购买激活SDK</Blue>   >>   选择相应的游戏的<Blue>配置</Blue>   >>   填写测试用户的 TapTap ID 。
 
 或者，前往开发者中心   >>   选择已经开放售卖的游戏 >>   选择<Blue>购买激活SDK设置</Blue>   >>   填写测试用户的 TapTap ID 。
 
-### **3. 开始测试**
+### 开始测试
 
 在 TapTap 客户端使用已填写的测试用户账号登录。
 
 ## 正式开始售卖
 
-### **1. 完善应用信息**
+### 完善应用信息
 
 前往开发者中心，按照[物料要求](/store/7-物料要求.md)填写应用信息，并审核通过。
 
-### **2. 设置售卖价格**
+### 设置售卖价格
 
 前往开发者中心 >> <Blue>售卖设置</Blue> ，开启售卖开关，设置游戏售卖金额，提交审核，并同步对接的 TapTap 运营相关信息。
 
-### **3. 正式上线**
+### 正式上线
 
 所有流程都确保顺利后，游戏可[正式上线](/store/12-游戏上线.md)。
 ![用来空行的小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)
@@ -182,7 +182,7 @@ ERROR_CODE_UNDEFINED       | 80000   | 未知错误     |
 
 ## 常见问题
 
-### **1.关于Android 11 无法拉起TapTap 客户端的解决方案** ###
+### 关于Android 11 无法拉起TapTap 客户端的解决方案
 
 Android 11 加强了隐私保护策略，引入了大量变更和限制，其中一个重要变更 —— [软件包可见性](https://developer.android.com/about/versions/11/privacy/package-visibility) ，将会导致第三方应用无法拉起 TapTap 客户端，从而影响 TapTap 相关功能的正常使用 ，包括但不限于更新唤起 TapTap 、购买验证等功能。
 特别需要注意的是，Android 11 的该变更只会影响到升级` targetSdkVersion=30 `的应用，未升级的应用暂不受影响。
