@@ -21,14 +21,14 @@ sidebar_position: 4
 
 留存分析页面主要有查询主体，数据范围（此二者在事件分析中已描述，此处不再赘述），选择初始事件 ，回访事件，进而选择聚合数据的维度，查询逻辑为完成初始事件的用户中进而完成回访事件的用户数和占比。点击查询按钮生成报表。留存报表中，拿2021-03-04这一天的数据举例，指标的第一列为“当日”，这里查询的是在2021-03-04同时完成初始事件和回访事件的用户（不分先后顺序），接下来为第n日的留存，业务含义为，比如：第1日指的是2021-03-04完成了初始事件的用户中，在2021-03-05又完成了回访事件的用户数和占比。
 
-![查询逻辑](https://static.tapdb.net/web/res/img/upload/2021/04/retention_analyse_query_logic.png)
+![查询逻辑](/img/customEvent/retention_analyse_query_logic.png)
 
 
 ## 2.2 选择事件
 
 分别选择初始事件以及回访事件，可以分别对其做筛选。值得注意的是，针对初始/回访的筛选项目中， 只允许选择事件属性，如果想要选择用户属性的过滤，可以在全局筛选中进行。
 
-![选择事件](https://static.tapdb.net/web/res/img/upload/2021/04/retention_analyse_select_event.png)
+![选择事件](/img/customEvent/retention_analyse_select_event.png)
 
 
 ## 2.3 同时展示
@@ -39,7 +39,7 @@ sidebar_position: 4
 
 在这个例子中，就是对付费用户再做一次付费金额阶段累计总和的统计，可以使用同时展示功能来完成。
 
-![同时展示](https://static.tapdb.net/web/res/img/upload/2021/04/retention_analyse_display_sametime.png!)
+![同时展示](/img/customEvent/retention_analyse_display_sametime.png)
 
 与事件分析模版不同，同时展示功能中，针对数值类型的属性，分析角度由“总和、中位数，均值、最大值、最小值、人均值、去重数”变为了“总和、人均值、阶段累计总和、阶段累计人均”。而且，此处仅可选数值类型和布尔类型的属性，不能选时间，字符串，列表类型的属性，因为这些类型的属性不能统计“阶段累计”。利用同时展示功能，客户可以分析完成回访事件的用户在接下来一段时间的某某属性值的阶段累计总和/人均，比如LTV，n日付费，累计副本伤害值，累计人均购买礼包数等等。
 
@@ -57,21 +57,21 @@ sidebar_position: 4
 
 与事件分析中不同，留存分析模版中“事件发生时间”为必选维度，原因是留存天然与时间关联。除了时间维度外，还可额外再选最多5个维度。
 
-![同时展示](https://static.tapdb.net/web/res/img/upload/2021/04/retention_analyse_select_dimension.png)
+![同时展示](/img/customEvent/retention_analyse_select_dimension.png)
 
 
 # 三、报表
 
 留存分析的报表依然是透视表形态，与事件分析报表不同的是，“事件发生时间”这一个维度是不能拖拽改变先后聚合顺序的，只能在第一列。
 
-![报表](https://static.tapdb.net/web/res/img/upload/2021/04/retention_analyse_table.png)
+![报表](/img/customEvent/retention_analyse_table.png)
 
 时间选择器与对比日期在事件分析中已有描述。
 
 
 ## 3.1 选择留存的分析期限
 
-![分析期限](https://static.tapdb.net/web/res/img/upload/2021/04/retention_analyse_date_range.png)
+![分析期限](/img/customEvent/retention_analyse_date_range.png)
 
 留存的分析期限默认为7日。点击之后下拉框可选：
 
@@ -92,7 +92,7 @@ sidebar_position: 4
 
 ## 3.2 留存/流失
 
-![分析期限](https://static.tapdb.net/web/res/img/upload/2021/04/retention_analyse_retention_loss.png)
+![分析期限](/img/customEvent/retention_analyse_retention_loss.png)
 
 n日留存的判断逻辑：在x月x日触发了初始事件的用户有x人在第n日触发了回访事件，“留存百分比”即为x/n。
 
@@ -103,4 +103,4 @@ n日流失的判断逻辑：在x月x日触发了“初始事件”的用户，�
 
 报表右侧可选择显示全部/仅显示百分比/仅显示数量
 
-![表显示](https://static.tapdb.net/web/res/img/upload/2021/04/retention_analyse_dispaly_mode.png)
+![表显示](/img/customEvent/retention_analyse_dispaly_mode.png)

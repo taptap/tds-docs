@@ -8,14 +8,14 @@ sidebar_position: 7
 # 1 概述
 看板是多张报表的集合，将构建的指标、留存、漏斗等保存为报表后，可将报表添加至看板中，方便日常数据的监控。
 
-![概述](https://static.tapdb.net/web/res/img/upload/2021/06/kanban_summary.png)
+![概述](/img/customEvent/kanban_summary.png)
 
 # 2 使用看板进行数据分析与协作
 在该部分将以demo项目为例，演示从新建一个看板，到在团队中通过看板进行数据协作的全流程。
 
 # 2.1 进入看板页
 
-![进入看板](https://static.tapdb.net/web/res/img/upload/2021/06/kanban_layout.png)
+![进入看板](/img/customEvent/kanban_layout.png)
 
 数据看板由 ”看板目录、看板设置、报表展示“ 三部分构成：
 
@@ -28,27 +28,27 @@ sidebar_position: 7
 # 2.2 新建看板
 现在，我们需要将一些核心指标形成日报进行每日汇报，因而我们决定将日常核心指标的相关报表汇总在一个看板中。
 
-![新建看板](https://static.tapdb.net/web/res/img/upload/2021/06/kanban_create_1.png)
+![新建看板](/img/customEvent/kanban_create_1.png)
 
-![新建看板](https://static.tapdb.net/web/res/img/upload/2021/06/kanban_create_2.png)
+![新建看板](/img/customEvent/kanban_create_2.png)
 
 
 因此，我们在看板左侧栏点击右上角“+”，选择“新建看板”，并命名为”日报看板“。
 
 # 2.3 编辑、重命名、删除看板
 
-![编辑、重命名、删除看板](https://static.tapdb.net/web/res/img/upload/2021/06/kanban_operation.png)
+![编辑、重命名、删除看板](/img/customEvent/kanban_operation.png)
 
 对于已经存在的看板，我们可以编辑该看板的相关信息，或删除该看板。
 
 # 2.4 使用文件夹对看板进行管理
 文件夹用以收纳看板，我们可新建文件夹，并进行重命名、删除，系统内置“未分组”文件夹和“共享给我的”文件夹。
 
-![文件夹](https://static.tapdb.net/web/res/img/upload/2021/06/kanban_create_folder.png)
+![文件夹](/img/customEvent/kanban_create_folder.png)
 
 在看板左侧栏点击右上角“+”，选择“新建文件夹”，并命名为”游戏运营“，用以收纳游戏运营的相关看板。
 
-![移动](https://static.tapdb.net/web/res/img/upload/2021/06/kanban_move.png)
+![移动](/img/customEvent/kanban_move.png)
 
 此时，我们可以将之前新建的看板”日报看板“移动到文件夹”游戏运营“中。
 
@@ -57,23 +57,23 @@ sidebar_position: 7
 
 为了满足日报汇报需求，我们在事件分析中构建出登录账号数、App启动设备数等报表，在留存分析中构建出用户App启动7日留存等报表，现在我们将这些报表添加到看板中。
 
-![添加](https://static.tapdb.net/web/res/img/upload/2021/06/kanban_add_report_1.png)
+![添加](/img/customEvent/kanban_add_report_1.png)
 
 点击看板右上方的”报表“按钮，点击”+“添加报表。
 
-![添加](https://static.tapdb.net/web/res/img/upload/2021/06/kanban_add_report_2.png)
+![添加](/img/customEvent/kanban_add_report_2.png)
 
 鼠标移入右侧的待添加报表中的报表行，点击”+“可将报表添加至当前看板。
 
 # 2.6 设置报表
 
-![设置](https://static.tapdb.net/web/res/img/upload/2021/06/kanban_setting_1.png)
+![设置](/img/customEvent/kanban_setting_1.png)
 
-![设置](https://static.tapdb.net/web/res/img/upload/2021/06/kanban_setting_2.png)
+![设置](/img/customEvent/kanban_setting_2.png)
 
 对于添加到看板中的报表，可以调整报表的大小尺寸、可视化方式、时间筛选、展示指标、展示维度等信息。
 
-![看板](https://static.tapdb.net/web/res/img/upload/2021/06/kanban_function.png)
+![看板](/img/customEvent/kanban_function.png)
 
 将活跃账号数、活跃设备数等报表设置为小，便于我们快速浏览当日的流量情况。
 
@@ -86,7 +86,7 @@ sidebar_position: 7
 # 2.7 设置看板
 将报表添加到看板之后，我们可以对看板的更新和是否近似计算进行设置。
 
-![设置看板](https://static.tapdb.net/web/res/img/upload/2021/06/kanban_refresh.png)
+![设置看板](/img/customEvent/kanban_refresh.png)
 
 看板默认为定时更新，系统将每天定时为看板刷新计算结果，缓存该结果以便下次查看，对于看板中加载报表较多或计算量较大的场景建议打开定时更新，以提高展示效率。
 
@@ -101,6 +101,6 @@ sidebar_position: 7
 
 共享权限分为共享、可见两类，两类权限互相独立，可分别授予，用户可将共享、可见权限授予”全部用户“，任何成员加入该项目后即拥有该权限，不必频繁更新。
 
-![共享看板](https://static.tapdb.net/web/res/img/upload/2021/06/kanban_share.png)
+![共享看板](/img/customEvent/kanban_share.png)
 
 作为整个团队都关注的”日常看板“且并不包含敏感的营收等敏感收入，因此我们将可见权限授予”全部用户“，同时我们希望另一位运营同事与我们一同维护、更新该看板，因此我们将协作权限共享给该同事。

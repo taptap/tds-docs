@@ -31,7 +31,7 @@ sidebar_position: 6
 
 前端工程师通过查看“曾否上报”为“否”的预登记自定义事件属性，进行埋点开发。
 
-![事件属性管理](https://static.tapdb.net/web/res/img/upload/2021/04/metadata_event_prop_overview.png)
+![事件属性管理](/img/customEvent/metadata_event_prop_overview.png)
 
 ## 3.1 概念解释
 
@@ -52,13 +52,13 @@ sidebar_position: 6
 
 ## 3.2 创建
 
-![事件属性创建](https://static.tapdb.net/web/res/img/upload/2021/04/metadata_event_prop_create.png)
+![事件属性创建](/img/customEvent/metadata_event_prop_create.png)
 
 填写事件属性的基本信息，即完成自定义属性的创建。可在”事件管理“中将其与事件进行关联。
 
 ## 3.3 查看与编辑
 
-![事件属性查看与编辑](https://static.tapdb.net/web/res/img/upload/2021/04/metadata_event_prop_edit.png)
+![事件属性查看与编辑](/img/customEvent/metadata_event_prop_edit.png)
 
 点击属性名可查看到此属性的基本信息，以及所有关联事件。
 
@@ -78,7 +78,7 @@ A1：增加一个新事件在数据表中仅为一条数据记录，而增加一
 
 前端工程师通过查看“曾否上报”为“否”的预登记自定义事件，进行埋点开发。
 
-![事件管理](https://static.tapdb.net/web/res/img/upload/2021/04/metadata_event_overview.png)
+![事件管理](/img/customEvent/metadata_event_overview.png)
 
 ## 4.1 概念解释
 
@@ -98,7 +98,7 @@ A1：增加一个新事件在数据表中仅为一条数据记录，而增加一
 
 ## 4.2 创建自定义事件
 
-![创建自定义事件](https://static.tapdb.net/web/res/img/upload/2021/04/metadata_event_create2.png)
+![创建自定义事件](/img/customEvent/metadata_event_create2.png)
 
 填写事件的基本信息，此时系统默认关联所有的预置属性，且默认不关联所有的自定义属性。
 
@@ -106,7 +106,7 @@ A1：增加一个新事件在数据表中仅为一条数据记录，而增加一
 
 ## 4.3 查看、编辑、删除事件
 
-![查看、编辑、删除事件](https://static.tapdb.net/web/res/img/upload/2021/04/metadata_event_edit.png)
+![查看、编辑、删除事件](/img/customEvent/metadata_event_edit.png)
 
 点击事件名可查看到此事件的基本信息，以及所有关联属性。
 
@@ -131,7 +131,7 @@ A1：未发生上报的事件不保留记录，已发生上报的事件则会保
 
 前端工程师通过查看“曾否上报”为“否”的预登记自定义用户属性，进行埋点开发。
 
-![用户属性管理](https://static.tapdb.net/web/res/img/upload/2021/04/metadata_user_prop_overview.png)
+![用户属性管理](/img/customEvent/metadata_user_prop_overview.png)
 
 
 ## 5.1 概念解释
@@ -154,13 +154,13 @@ A1：未发生上报的事件不保留记录，已发生上报的事件则会保
 
 ## 5.2 创建
 
-![创建](https://static.tapdb.net/web/res/img/upload/2021/04/metadata_user_prop_create.png)
+![创建](/img/customEvent/metadata_user_prop_create.png)
 
 填写用户属性的基本信息，即完成自定义属性的创建。目前，自定义用户属性一旦被创建便不可被删除。
 
 ## 5.3 查看、编辑与复制
 
-![查看、编辑与复制](https://static.tapdb.net/web/res/img/upload/2021/04/metadata_user_prop_edit.png)
+![查看、编辑与复制](/img/customEvent/metadata_user_prop_edit.png)
 
 点击属性名可查看到此属性的基本信息。
 

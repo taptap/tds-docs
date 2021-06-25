@@ -14,7 +14,7 @@ sidebar_position: 1
    
     如果能在页面内看见如图所示菜单，则意味着已开启，可正常使用。
     
-![菜单](https://static.tapdb.net/web/res/img/upload/2021/06/event_menu2.png)
+![菜单](/img/customEvent/event_menu2.png)
 
 2. 如果没有开启该功能，我该如何申请？
    

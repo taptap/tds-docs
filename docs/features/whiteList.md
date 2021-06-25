@@ -29,7 +29,7 @@ Unity 3D：v1.4.2
 
 1.下载TapDB移动客户端
 
-![图片描述](https://static.tapdb.net/web/res/img/upload/2018/05/15/04.png)
+![图片描述](/img/whiteList/04.png)
 
 2.打开App
 
@@ -37,11 +37,11 @@ Unity 3D：v1.4.2
 
 已登录：点击左上角“设置”-“测试设备”进入添加页面
 
-![图片描述](https://static.tapdb.net/web/res/img/upload/2018/05/15/02.png)
+![图片描述](/img/whiteList/02.png)
 
 3.点击添加设备，扫描Web端“企业设置”-“测试设备”-“+添加设备”中的二维码
 
-![图片描述](https://static.tapdb.net/web/res/img/upload/2018/05/15/01.png)
+![图片描述](/img/whiteList/01.png)
 
 <br/>
  __方法二：手动添加__
@@ -50,7 +50,7 @@ Unity 3D：v1.4.2
  2. 选择“自定义添加”
  3. 选择系统
 
-![图片描述](https://static.tapdb.net/web/res/img/upload/2018/05/15/03.png)
+![图片描述](/img/whiteList/03.png)
 
 4.iOS填写IDFA
 >  __如何获取IDFA__

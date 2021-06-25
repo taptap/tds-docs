@@ -25,45 +25,45 @@ sidebar_position: 5
 
 一个漏斗中至少包含 2 个步骤，每个步骤对应一个事件。可增加更多步骤，拖动步骤前的序号可以改变步骤顺序。
 
-![查询条件](https://static.tapdb.net/web/res/img/upload/2021/04/funnel_analyse_query_condition_1.png)
+![查询条件](/img/customEvent/funnel_analyse_query_condition_1.png)
 
 选择分组维度，可选择用户属性、用户分群以及所有步骤的公共事件属性作为分组维度，漏斗分析的分组逻辑详见本文第4部分。
 
-![查询条件](https://static.tapdb.net/web/res/img/upload/2021/04/funnel_analyse_query_condition_2.png)
+![查询条件](/img/customEvent/funnel_analyse_query_condition_2.png)
 
 点击全局筛选，设置漏斗分析的筛选条件，此处为事件属性是筛选是对所有事件的公共筛选，而不是单个步骤。
 
-![查询条件](https://static.tapdb.net/web/res/img/upload/2021/04/funnel_analyse_query_condition_3.png)
+![查询条件](/img/customEvent/funnel_analyse_query_condition_3.png)
 
 用户完成漏斗的时间限制，也即只有在这个时间范围内，用户从第一个步骤，行进到最后一个步骤，才能被视为一次成功的转化
 
-![查询条件](https://static.tapdb.net/web/res/img/upload/2021/04/funnel_analyse_query_condition_4.png)
+![查询条件](/img/customEvent/funnel_analyse_query_condition_4.png)
 
 选择时间范围限制漏斗中第一步骤该时间范围内，勾选限制窗口期，则限制所有步骤都在该时间范围内
 
-![查询条件](https://static.tapdb.net/web/res/img/upload/2021/04/funnel_analyse_query_condition_5.png)
+![查询条件](/img/customEvent/funnel_analyse_query_condition_5.png)
 
 ## 3.2 设置展示结果
 
 可选择进行分析的步骤范围，并根据“对比/趋势”、“转化/流失”设置，能够得到4类报表：转化对比表、流失对比表、转化趋势表、流失趋势表
 
-![展示结果](https://static.tapdb.net/web/res/img/upload/2021/04/funnel_analyse_result_type.png)
+![展示结果](/img/customEvent/funnel_analyse_result_type.png)
 
 转化对比表：用以分析从步骤一到后续步骤的累计的转化率
 
-![转化对比表](https://static.tapdb.net/web/res/img/upload/2021/04/funnel_analyse_table_1.png)
+![转化对比表](/img/customEvent/funnel_analyse_table_1.png)
 
 流失对比表：用以分析每个步骤之间的流失率
 
-![流失对比表](https://static.tapdb.net/web/res/img/upload/2021/04/funnel_analyse_table_2.png)
+![流失对比表](/img/customEvent/funnel_analyse_table_2.png)
 
 转化趋势表：用以分析不同日期的转化率变化趋势
 
-![转化趋势表](https://static.tapdb.net/web/res/img/upload/2021/04/funnel_analyse_table_3.png)
+![转化趋势表](/img/customEvent/funnel_analyse_table_3.png)
 
 流失趋势表：用以分析不同日期的流失率变化趋势
 
-![流失趋势表](https://static.tapdb.net/web/res/img/upload/2021/04/funnel_analyse_table_4.png)
+![流失趋势表](/img/customEvent/funnel_analyse_table_4.png)
 
 # 4. 漏斗分析原理
 
