@@ -33,7 +33,9 @@ TapDB 提供一套 SDK，游戏开发者可以将其集成到游戏中。系统�
 
 **若需要收集广告标识符（IDFA），可调用以下接口。请在初始化之前调用**
 
-	[TapDB setAdvertiserIDCollectionEnabled:YES];
+```objc
+[TapDB setAdvertiserIDCollectionEnabled:YES];
+```
 
 **iOS 14开始，获取IDFA需要配置单独权限声明**，在 info.plist 中配置 NSUserTrackingUsageDescription 及描述文案。如：请允许xxx获取并使用您的IDFA,来为您提供更好的服务。
 
@@ -68,7 +70,7 @@ libsqlite3.0.tbd |
 
 在需要调用统计接口的代码中引入头文件TapDB.h，并按照后面的接口介绍调用统计接口。
 
-```
+```objc
 #import <TapDB/TapDB.h>
 ```
 注：如果 Xcode 提示找不到 TapDB.h 头文件，请确保 Xcode 工程中的 Build Settings -> Search Paths -> Framework Search Paths 中的路径设置正确。
@@ -85,7 +87,7 @@ libsqlite3.0.tbd |
 一般建议在AppDelegate的 `application:didFinishLaunchingWithOptions:` 中调用。
 
 
-```
+```objc
 + (void)onStart:(NSString *)appId channel:(nullable NSString *)channel version:(nullable NSString *)gameVersion properties:(nullable NSDictionary *)properties;
 ```
 
@@ -101,7 +103,7 @@ properties | 是 | 自定义属性，随初始化事件上传
 ### 3.2.登录
 
 记录一个账号，当账号登陆时调用。
-```
+```objc
 + (void)setUser:(NSString *)userId properties:(nullable NSDictionary *)properties;
 ```
 
@@ -114,7 +116,7 @@ properties | 是 | 自定义属性，随用户登录事件上传
 
 设置账号名称。
 
-```
+```objc
 /// 设置账号名
 /// @param name 必传，长度大于0并小于等于256，账号名
 + (void)setName:(NSString *)name;
@@ -128,7 +130,7 @@ name | 否 | 长度大于0并小于等于256，账号名
 
 设置账号等级，账号登陆时或升级时调用。
 
-```
+```objc
 + (void)setLevel:(NSInteger)level;
 ```
 
@@ -141,7 +143,7 @@ level | 否 | 账号等级
 
 设置账号区服，账号登陆时或更换区服时调用。
 
-```
+```objc
 + (void)setServer:(NSString *)server;
 ```
 
@@ -155,7 +157,7 @@ server | 否 | 账号服务器
 <p style={{position: 'absolute',top:'-50px',left:'150px'}}>(<span style={{color: '#080'}}>推荐使用服务端充值统计接口</span>)</p></div>
 充值成功时调用。
 
-```
+```objc
 + (void)onChargeSuccess:(NSString *)orderId product:(NSString *)product amount:(NSInteger)amount currencyType:(NSString *)currencyType payment:(NSString *)payment;
 ```
 
@@ -172,7 +174,7 @@ payment | 是 | 支付方式，如：支付宝
 ### 3.7.登出
 账号登出时，需要调用以下接口清空用户数据。
 
-```
+```objc
 /**
 登出清理账号
 */
@@ -187,13 +189,13 @@ payment | 是 | 支付方式，如：支付宝
 
 需要发送自定义事件时调用，自定义事件的 eventName 和 properties 属性都必须在元数据管理预先配置，才可以使用SDK进行发送
 
-```
+```objc
  + (void)trackEvent:(NSString *)eventName properties:(NSDictionary *)properties;
 ```
 
 用户可以通过调用 trackEvent 方法上传需要跟踪的自定义事件。eventName 为自定义事件的事件名，需要保证以 '#' 开头，取值规则请参考自定义属性登记页面。properties 为自定义事件所包含的自定义属性（以 Key : Value 的形式保存），其中 Key 代表了自定义属性的属性名，Value 代表了该属性的值。这里需要注意的是 Key 的命名规则同 eventName 一致，也需要保证以 '#' 开头。目前所支持的 Value 类型为 String, Number, Boolean。String 类型支持最大长度为 256。Number 类型取值区间为 [-9E15, 9E15]。以战斗事件为例：
 
-```
+```objc
 [TapDB trackEvent:@"#battle"
                          withProperties:@{@"#weapon":@"axe")}];
 ```
@@ -210,7 +212,7 @@ TapDB 目前支持两个事件主体：设备，账号。相应支持的主体�
 
 ### 设备属性初始化操作
 
-```
+```objc
 /// 初始化设备属性操作
 /// @param properties 属性字典
 + (void)deviceInitialize:(NSDictionary *)properties;
@@ -218,7 +220,7 @@ TapDB 目前支持两个事件主体：设备，账号。相应支持的主体�
 
 如果需要初始化设备的某些属性，可以调用 deviceInitialize 来进行设置。如果相应属性之前已近被初始化，那么后续对这些属性的初始化操作将会被忽略。以首次活跃服务器为例：
 
-```
+```objc
 [TapDB deviceInitialize:@{@"firstActiveServer":@"server1"}];
 // 此时设备表的 "firstActiveServer" 字段值为 "server1"
 
@@ -228,7 +230,7 @@ TapDB 目前支持两个事件主体：设备，账号。相应支持的主体�
 
 ### 设备属性更新操作
 
-```
+```objc
 /// 更新设备属性操作
 /// @param properties 属性字典
 + (void)deviceUpdate:(NSDictionary *)properties;
@@ -236,7 +238,7 @@ TapDB 目前支持两个事件主体：设备，账号。相应支持的主体�
 
 如果需要更新设备的某些属性，可以调用 deviceUpdate 来进行设置。通过该接口上传的属性会将原有属性值进行覆盖。以当前积分为例：
 
-```
+```objc
 [TapDB deviceUpdate:@{@"currentPoints":@10}];
 // 此时设备表的 "currentPoints" 字段值为 10
 
@@ -246,7 +248,7 @@ TapDB 目前支持两个事件主体：设备，账号。相应支持的主体�
 
 ### 设备属性累加操作 
 
-```
+```objc
 /// 设备属性增加操作
 /// @param properties 属性字典 暂时只支持数字属性
 + (void)deviceAdd:(NSDictionary *)properties;
@@ -254,7 +256,7 @@ TapDB 目前支持两个事件主体：设备，账号。相应支持的主体�
 
 如果需要更新设备的某些属性，可以调用 deviceUpdate 来进行设置。通过该接口上传的属性会将原有属性值进行覆盖。以当前积分为例：
 
-```
+```objc
 [TapDB deviceAdd:@{@"totalPoints":@10}];
 // 此时设备表的 "totalPoints" 字段值为 10
 
@@ -264,7 +266,7 @@ TapDB 目前支持两个事件主体：设备，账号。相应支持的主体�
 
 ### 账号属性初始化操作 
 
-```
+```objc
 /// 账号属性初始化操作 
 /// @param properties 属性字典
 + (void)userInitialize:(NSDictionary *)properties;
@@ -272,7 +274,7 @@ TapDB 目前支持两个事件主体：设备，账号。相应支持的主体�
 
 ### 账号属性更新操作
 使用方法同设备属性更新操作
-```
+```objc
 /// 账号属性更新操作
 /// @param properties 属性字典
 + (void)userUpdate:(NSDictionary *)properties;
@@ -280,7 +282,7 @@ TapDB 目前支持两个事件主体：设备，账号。相应支持的主体�
 
 ### 账号属性累加操作
 使用方法同设备属性累加操作
-```
+```objc
 /// 账号属性累加操作
 /// @param properties 属性字典 暂时只支持数字属性
 + (void)userAdd:(NSDictionary *)properties;
@@ -293,13 +295,13 @@ TapDB 目前支持两个事件主体：设备，账号。相应支持的主体�
 
 ### 添加静态事件属性 
 
-```
+```objc
 /// 添加静态事件属性，每个事件都将会发送
 /// @param staticProperties 属性字典
 + (void)registerStaticProperties:(NSDictionary *)staticProperties;
 ```
 
-```
+```objc
 [TapDB registerStaticProperties:@{@"channel":@"TapDB"}];
 // 设置了静态属性 "channel"，值固定为 "TapDB"
 
@@ -314,7 +316,7 @@ TapDB 目前支持两个事件主体：设备，账号。相应支持的主体�
 
 如果要删除某个已添加的静态通用属性，不想让它出现在之后的每个事件中，可以调用 unregisterStaticProperty 方法，将不需要的静态通用属性删除。
 
-```
+```objc
 /// 删除添加的某个静态事件属性
 /// @param propertyName 属性Key
 + (void)unregisterStaticProperty:(NSString *)propertyName;
@@ -322,7 +324,7 @@ TapDB 目前支持两个事件主体：设备，账号。相应支持的主体�
 
 
 ### 删除所有静态事件属性  
-```
+```objc
 /// 删除所有静态事件属性
 + (void)clearStaticProperties;
 ```
@@ -333,7 +335,7 @@ TapDB 目前支持两个事件主体：设备，账号。相应支持的主体�
 
 ### 添加动态事件属性 
 
-```
+```objc
 /// 添加动态事件属性，每次发送事件会调用dynamicPropertiesCaculator
 /// @param dynamicPropertiesCaculator 动态属性回调，需返回希望上传的属性字典
 + (void)registerDynamicProperties:(NSDictionary* (^)(void))dynamicPropertiesCaculator;
@@ -341,7 +343,7 @@ TapDB 目前支持两个事件主体：设备，账号。相应支持的主体�
 
 如果需要添加的通用属性的值在不同的上传事件中具有动态的赋值逻辑，那么可以调用 registerDynamicProperties 方法，注册相应的取值逻辑。以用户事件调用当前等级为例：
 
-```
+```objc
 [TapDB registerDynamicProperties:^NSDictionary *_Nonnull {
       return @{
           @"#currentLevel": level
@@ -378,7 +380,7 @@ timestamp | long | 当前统计数据的时间戳(秒)。TapDB会按照自然5�
 
 示例：
 
-```
+```js
 {
 "appid":"gkjasd13bbsa1sdk",
 "onlines":[{
@@ -403,7 +405,7 @@ timestamp | long | 当前统计数据的时间戳(秒)。TapDB会按照自然5�
 接口：https://e.tapdb.net/event
 ```
 内容（注意后面还需要处理一下）：
-```
+```js
 {
   "module": "GameAnalysis", // 固定参数
   "ip": "8.8.8.8", // 可选。充值用户的IP
@@ -424,10 +426,10 @@ timestamp | long | 当前统计数据的时间戳(秒)。TapDB会按照自然5�
 假如游戏的appid为abcd1234。构建出json字符串后，去掉空格和换行符，然后再进行一次urlencode。再把结果作为POST数据推送
 先替换换行符和空格，变成：   
 
-`{"module":"GameAnalysis","name":"charge","index":"abcd1234","identify":"user_id","properties":{"order_id":"100000","amount":100,"virtual_currency_amount":100,"currency_type":"CNY","product":"item1","payment":"alipay"}}`
+>{"module":"GameAnalysis","name":"charge","index":"abcd1234","identify":"user_id","properties":{"order_id":"100000","amount":100,"virtual_currency_amount":100,"currency_type":"CNY","product":"item1","payment":"alipay"}}
 
-然后urlencode，变成如下形式。某些版本的urlencode可能会把':'和','进行编码，不会影响实际使用。   
+然后urlencode，变成如下形式。某些版本的urlencode可能会把 `:` 和 `,` 进行编码，不会影响实际使用。   
 
-`%7B%22module%22:%22GameAnalysis%22,%22name%22:%22charge%22,%22index%22:%22abcd1234%22,%22identify%22:%22user_id%22,%22properties%22:%7B%22order_id%22:%22100000%22,%22amount%22:100,%22virtual_currency_amount%22:100,%22currency_type%22:%22CNY%22,%22product%22:%22item1%22,%22payment%22:%22alipay%22%7D%7D`
+>%7B%22module%22:%22GameAnalysis%22,%22name%22:%22charge%22,%22index%22:%22abcd1234%22,%22identify%22:%22user_id%22,%22properties%22:%7B%22order_id%22:%22100000%22,%22amount%22:100,%22virtual_currency_amount%22:100,%22currency_type%22:%22CNY%22,%22product%22:%22item1%22,%22payment%22:%22alipay%22%7D%7D
 
 成功判断：返回的HTTP Code为200时认为发送成功，否则认为失败

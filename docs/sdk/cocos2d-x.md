@@ -32,9 +32,13 @@ sidebar_position: 4
 
 添加Android v4支持库到项目中，Android v4支持库的版本必须不低于23.0.0，否则可能导致闪退。
 
-如果使用gradle依赖安装版本高于24.2.0版本的v4支持库，可以仅安装support-compat模块，参见文档： https://developer.android.com/topic/libraries/support-library/setup.html 、 https://developer.android.com/topic/libraries/support-library/features.html 。
+如果使用gradle依赖安装版本高于24.2.0版本的v4支持库，可以仅安装support-compat模块，参见文档： 
+<https://developer.android.com/topic/libraries/support-library/setup.html>
 
-如果不方便使用gradle进行自动化依赖安装，之前也没有使用到v4支持库，可以使用此处提供的support-compat模块的jar文件， https://static.tapdb.net/web/res/file/upload/2017/0926/android-support-v4.jar 。
+<https://developer.android.com/topic/libraries/support-library/features.html>
+
+如果不方便使用gradle进行自动化依赖安装，之前也没有使用到v4支持库，可以使用此处提供的support-compat模块的jar文件:
+[android-support-v4.jar](https://static.tapdb.net/web/res/file/upload/2017/0926/android-support-v4.jar)
 
 ## 2.4.Android添加需要的权限
 
@@ -69,7 +73,7 @@ TapDB.h包含了类TapDB，还定义了TGTUserType/TGTUserSex两个枚举类型�
 
 Android需要引入libTyrantdbGameTracker.jar，并且在主 Activity 的 onCreate() 中调用 TyrantdbGameTracker.init(Activity activity, String appId, String channelId, String version, bool requestPermission)，最后一个参数固定传递false。
 
-```
+```java
 public static void onStart(string appId, string channel, string version)
 ```
 
@@ -83,7 +87,7 @@ version | 是 | 游戏版本，为空时，自动获取游戏安装包的版本
 
 跟踪玩家游戏次数和游戏时长。需要给游戏中每个Activity的onResume和onStop中添加对应的调用。如：在MainActivity里面调用TyrantdbGameTracker.onStop (this);即可。
 
-```
+```java
 public static void onResume(Context ctx)
 public static void onStop(Context ctx)
 ```
@@ -92,7 +96,7 @@ public static void onStop(Context ctx)
 
 记录一个玩家（注意是平台用户，不是游戏角色），当玩家登陆时调用，如果是试玩用户，userId由游戏自己生成，但需要保证唯一性。
 
-```
+```java
 public static void setUser(const char *userId, TGTUserType userType, TGTUserSex userSex,
  int userAge, const char *userName)
 ```
@@ -109,7 +113,7 @@ userName | 是 | 玩家名称
 
 设置玩家等级，玩家登陆时或升级时调用。
 
-```
+```java
 public static void setLevel(int level)
 ```
 
@@ -121,7 +125,7 @@ level | 否 | 玩家等级
 
 设置玩家区服，玩家登陆时或更换区服时调用。
 
-```
+```cpp
 public static void setServer(const char *server)
 ```
 
@@ -131,7 +135,7 @@ server | 否 | 玩家服务器
 
 ## 3.6.发起充值请求
 
-<div style={{'font-size': '18px','font-weight': '500',position: 'relative'}}>
+<div style={{'fontSize': '18px','fontWeight': '500',position: 'relative'}}>
 <p style={{position: 'absolute',top:'-50px',left:'150px'}}>(<span style={{color:'#080'}}>推荐使用服务端充值统计接口</span>)</p></div>
 
 当玩家发起充值请求时调用。
@@ -140,7 +144,7 @@ server | 否 | 玩家服务器
 如果没有通过服务器校验，一定会造成数据不准确，强烈建议使用服务器接口进行充值数据回调。</span>
 (<a href="docs/zh_CN/sdk/cocos2d-x.html#aea457feb3d22f612ac7505de9b800e5">4.1.充值统计接口</a>)</p>
 
-```
+```cpp
 public static void onChargeRequest(const char *orderId, const char *product,
  long amount, const char * currencyType, long virtualCurrencyAmount, const char *payment)
 ```
@@ -158,7 +162,7 @@ payment | 是 | 支付方式，如：支付宝
 
 充值成功时调用，需要与充值请求成对调用
 
-```
+```cpp
 public static void onChargeSuccess(const char *orderId)
 ```
 
@@ -170,7 +174,7 @@ orderId | 否 | 订单ID，与之前调用的充值请求传递的ID对应
 
 充值失败时调用，需要与充值请求成对调用
 
-```
+```cpp
 public static void onChargeFail(const char *orderId, const char *reason)
 ```
 
@@ -183,7 +187,7 @@ reason | 是 | 失败原因
 
 当客户端无法跟踪充值请求发起，只能跟踪到充值成功的事件时，调用该接口记录充值信息
 
-```
+```cpp
 public static void onChargeOnlySuccess(const char *orderId, const char *product,
 long amount, const char *currencyType, long virtualCurrencyAmount, const char *payment)
 ```
@@ -205,7 +209,9 @@ payment | 是 | 支付方式，如：支付宝
 
 ```
 接口：https://e.tapdb.net/event
+```
 内容（注意后面还需要处理一下）：
+```js
 {
     "module": "GameAnalysis", //固定
     "ip": "8.8.8.8", //充值用户的IP，可选
@@ -221,13 +227,15 @@ payment | 是 | 支付方式，如：支付宝
         "payment": "alipay" //充值途径，可选
     }
 }
-
+```
 假如游戏的appid为abcd1234，构建出json字符串后，需要去掉空格和换行符，然后再进行一次urlencode，再把结果作为post数据发过来
 先替换换行符和空格，变成：
-{"module":"GameAnalysis","name":"charge","index":"abcd1234","identify":"user_id","properties":{"order_id":"100000","amount":100,"virtual_currency_amount":100,"currency_type":"CNY","product":"item1","payment":"alipay"}}
+>{"module":"GameAnalysis","name":"charge","index":"abcd1234","identify":"user_id","properties":{"order_id":"100000","amount":100,"virtual_currency_amount":100,"currency_type":"CNY","product":"item1","payment":"alipay"}}
+
 然后urlencode，变成如下形式，某些版本的urlencode可能会把':'和','进行编码，不影响实际使用。
-%7B%22module%22:%22GameAnalysis%22,%22name%22:%22charge%22,%22index%22:%22abcd1234%22,%22identify%22:%22user_id%22,%22properties%22:%7B%22order_id%22:%22100000%22,%22amount%22:100,%22virtual_currency_amount%22:100,%22currency_type%22:%22CNY%22,%22product%22:%22item1%22,%22payment%22:%22alipay%22%7D%7D
-```
+
+>%7B%22module%22:%22GameAnalysis%22,%22name%22:%22charge%22,%22index%22:%22abcd1234%22,%22identify%22:%22user_id%22,%22properties%22:%7B%22order_id%22:%22100000%22,%22amount%22:100,%22virtual_currency_amount%22:100,%22currency_type%22:%22CNY%22,%22product%22:%22item1%22,%22payment%22:%22alipay%22%7D%7D
+
 
 货币类型的格式参考<a target="_blank" href="docs/zh_CN/features/exchangeRate.html">汇率表</a>
 
@@ -261,7 +269,7 @@ timestamp | long | 当前统计数据的时间戳(秒)，TapDB会按照自然5�
 
 示例：
 
-```
+```js
 {
   "appid":"gkjasd13bbsa1sdk",
   "onlines":[{

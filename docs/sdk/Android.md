@@ -2,6 +2,7 @@
 title: Android SDK文档
 sidebar_position: 3
 ---
+
 # 1.简介
 
 ## 1.1.适用范围
@@ -30,7 +31,7 @@ TapDB 提供一套 SDK，游戏开发者可以将其集成到游戏中。系统�
 在 TapDB 网站上下载最新的 SDK，其中包含一个库文件 libTapDB-xxx.aar（强烈建议使用最新版本）。将该库文件加入到项目依赖库中。
 
 ## 2.3.添加权限
-```
+```markup
 <!--必选权限-->
 <uses-permission android:name="android.permission.INTERNET" />
 <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -46,7 +47,7 @@ TapDB 提供一套 SDK，游戏开发者可以将其集成到游戏中。系统�
 ## 3.1.初始化
 初始化 TapDB SDK，调用这个接口是使用其它接口的先决条件，需要尽早调用。一般建议在游戏的主 Activity 中调用，如果多次调用，只有第一次调用视为有效。
 
-```
+```java
 public static void init(Context context, String appId, String channel, String appVersion)
 
 public static void init(Context context, String appId, String channel, String appVersion, JSONObject properties)
@@ -64,7 +65,7 @@ properties | 否 | 自定义属性，会随着初始化事件上报
 
 记录一个账号，当账号登陆时调用。
 
-```
+```java
 public static void setUser(String userId)
 
 public static void setUser(String userId, JSONObject properties)
@@ -78,7 +79,7 @@ properties | 否 | 自定义属性
 
 设置账号名称。
 
-```
+```java
 public static void setName(String name)
 ```
 
@@ -90,7 +91,7 @@ name | 否 | 长度大于0并小于等于256。账号名
 
 设置账号等级，账号登陆时或升级时调用。
 
-```
+```java
 public static void setLevel(int level)
 ```
 
@@ -102,7 +103,7 @@ level | 否 | 大于等于0。用户等级
 
 设置账号区服，账号登陆时或更换区服时调用。
 
-```
+```java
 public static void setServer(String server)
 ```
 
@@ -112,11 +113,11 @@ server | 否 | 长度大于0并小于等于256。用户所在服务器
 
 ## 3.6.充值
 
-<div style={{'font-size': '18px','font-weight': '500',position: 'relative'}}>
+<div style={{'fontSize': '18px','fontWeight': '500',position: 'relative'}}>
 <p style={{position: 'absolute',top:'-50px',left:'150px'}}>(<span style={{color:'#080'}}>推荐使用服务端充值统计接口</span>)</p></div>
 充值成功时调用。
 
-```
+```java
 public static void onCharge(String orderId, String product, long amount, String currencyType, String payment)
 ```
 
@@ -132,7 +133,7 @@ payment | 是 | 长度大于0并小于等于256。充值渠道
 
 ## 3.7.登出
 账号登出时，需要调用以下接口清空账号数据。
-```
+```java
 public static void clearUser()
 ```
 
@@ -140,13 +141,13 @@ public static void clearUser()
 
 需要发送自定义事件时调用，自定义事件的 eventName 和 properties 属性都必须在元数据管理预先配置，才可以使用SDK进行发送
 
-```
+```java
 public static void trackEvent(String eventName, JSONObject properties)
 ```
 
 用户可以通过调用 trackEvent 方法上传需要跟踪的自定义事件。eventName 为自定义事件的事件名，需要保证以 '#' 开头，取值规则请参考自定义属性登记页面。properties 为自定义事件所包含的自定义属性（以 Key : Value 的形式保存），其中 Key 代表了自定义属性的属性名，Value 代表了该属性的值。这里需要注意的是 Key 的命名规则同 eventName 一致，也需要保证以 '#' 开头。目前所支持的 Value 类型为 String, Number, Boolean。String 类型支持最大长度为 256。Number 类型取值区间为 [-9E15, 9E15]。以战斗事件为例：
 
-```
+```java
 JSONObject properties = new JSONObject();
 properties.put("#weapon", "axe");
 properties.put("#level", 10);
@@ -165,13 +166,13 @@ TapDB 目前支持两个事件主体：设备，账号。相应支持的主体�
 需要注意的是，传入的自定义属性需要同预登记属性名保持一致。
 
 ### 设备属性初始化操作
-```
+```java
 public static void deviceInitialize(final JSONObject properties)
 ```
 
 如果需要初始化设备的某些属性，可以调用 deviceInitialize 来进行设置。如果相应属性之前已近被初始化，那么后续对这些属性的初始化操作将会被忽略。以首次活跃服务器为例：
 
-```
+```java
 JSONObject properties = new JSONObject();
 properties.put("firstActiveServer", "server1");
 TapDB.deviceInitialize(properties);
@@ -184,13 +185,13 @@ TapDB.deviceInitialize(nextProperties);
 ```
 
 ### 设备属性更新操作
-```
+```java
 public static void deviceUpdate(final JSONObject properties)
 ```
 
 如果需要更新设备的某些属性，可以调用 deviceUpdate 来进行设置。通过该接口上传的属性会将原有属性值进行覆盖。以当前积分为例：
 
-```
+```java
 JSONObject properties = new JSONObject();
 properties.put("currentPoints", 10);
 TapDB.deviceUpdate(properties);
@@ -204,13 +205,13 @@ TapDB.deviceUpdate(nextProperties);
 ```
 
 ### 设备属性累加操作 
-```
+```java
 public static void deviceAdd(final JSONObject properties)
 ```
 
 如果需要对设备的某些数值属性有加减的需求，可以调用 deviceAdd 来进行操作。未初始化数值属性在操作时会被当做 0 进行计算。以当前总积分为例：
 
-```
+```java
 JSONObject properties = new JSONObject();
 properties.put("totalPoints", 10);
 deviceAdd(properties);
@@ -225,19 +226,19 @@ deviceAdd(nextProperties);
 
 ### 账号属性初始化操作 
 使用方法同设备属性初始化操作
-```
+```java
 public static void userInitialize(final JSONObject properties)
 ```
 
 ### 账号属性更新操作
 使用方法同设备属性更新操作
-```
+```java
 public static void userUpdate(final JSONObject properties)
 ```
 
 ### 账号属性累加操作
 使用方法同设备属性累加操作
-```
+```java
 public static void userAdd(final JSONObject properties)
 ```
 
@@ -246,13 +247,13 @@ public static void userAdd(final JSONObject properties)
 对于某些重要的属性需要在每个上传的事件中出现，用户可以将这些属性设置为全局通用的自定义属性，包括静态通用属性和动态通用属性，静态通用属性为固定值，动态通用属性每次获取的值由用户所设置的计算逻辑产生。这些通用属性在注册之后，会被附带在TapDB上传的事件中。这里需要注意 trackEvent 中传入的属性优先级 > 动态通用属性优先级 > 静态通用属性优先级，也就是说动态通用属性会覆盖同名的静态通用属性。trackEvent 中的属性会覆盖同名的动态通用属性和静态通用属性。 
 
 ### 添加静态通用属性 
-```
+```java
 public static void registerStaticProperties(final JSONObject staticProperties)
 ```
 
 如果需要添加的通用属性的值在所有事件中相对固定，那么可以调用 registerStaticProperties 方法注册静态通用属性。以来源渠道为例：
 
-```
+```java
 JSONObject commonProperties = new JSONObject();
 commonProperties.put("channel", "TapDB");
 TapDB.registerStaticProperties(properties); 
@@ -266,14 +267,14 @@ TapDB.trackEvent("#customEvent", properties);
 ```
 
 ### 删除单个静态通用属性 
-```
+```java
 public static void unregisterStaticProperty(final String propertyName)
 ```
 
 如果要删除某个已添加的静态通用属性，不想让它出现在之后的每个事件中，可以调用 unregisterStaticProperty 方法，将不需要的静态通用属性删除。
 
 ### 删除所有静态通用属性 
-```
+```java
 public static void clearStaticProperties()
 ```
 
@@ -281,13 +282,13 @@ public static void clearStaticProperties()
 
 
 ### 添加动态通用属性 
-```
+```java
 public static void registerDynamicProperties(final TapDBDataDynamicProperties dynamicProperties)
 ```
 
 如果需要添加的通用属性的值在不同的上传事件中具有动态的赋值逻辑，那么可以调用 registerDynamicProperties 方法，注册相应的取值逻辑。以用户事件调用当前等级为例：
 
-``` 
+``` java
 TapDB.registerDynamicProperties(
     () -> {
           	JSONObject properties = new JSONObject();
@@ -319,7 +320,7 @@ TapDB SDK当前支持oaid sdk 1.0.5~1.0.25的版本，当应用集成进去之�
 **注意：
 SDK 默认使用 HTTP 传输数据，在 targetSdkVersion >= 28 时需要在 AndroidManifest.xml 增加如下配置**
 
-```
+```markup
 <application
   ...
   android:usesCleartextTraffic="true"
@@ -355,7 +356,7 @@ timestamp | long | 当前统计数据的时间戳(秒)。TapDB会按照自然5�
 
 示例：
 
-```
+```js
 {
   "appid":"gkjasd13bbsa1sdk",
   "onlines":[{
@@ -380,7 +381,7 @@ timestamp | long | 当前统计数据的时间戳(秒)。TapDB会按照自然5�
 接口：https://e.tapdb.net/event
 ```
 内容（注意后面还需要处理一下）：
-```
+```js
 {
     "module": "GameAnalysis", // 固定参数
     "ip": "8.8.8.8", // 可选。充值用户的IP
@@ -401,10 +402,10 @@ timestamp | long | 当前统计数据的时间戳(秒)。TapDB会按照自然5�
 假如游戏的appid为abcd1234。构建出json字符串后，去掉空格和换行符，然后再进行一次urlencode。再把结果作为POST数据推送
 先替换换行符和空格，变成：
 
-`{"module":"GameAnalysis","name":"charge","index":"abcd1234","identify":"user_id","properties":{"order_id":"100000","amount":100,"virtual_currency_amount":100,"currency_type":"CNY","product":"item1","payment":"alipay"}}`
+>{"module":"GameAnalysis","name":"charge","index":"abcd1234","identify":"user_id","properties":{"order_id":"100000","amount":100,"virtual_currency_amount":100,"currency_type":"CNY","product":"item1","payment":"alipay"}}
 
-然后urlencode，变成如下形式。某些版本的urlencode可能会把':'和','进行编码，不会影响实际使用。
+然后urlencode，变成如下形式。某些版本的urlencode可能会把 `:` 和 `,` 进行编码，不会影响实际使用。
 
-`%7B%22module%22:%22GameAnalysis%22,%22name%22:%22charge%22,%22index%22:%22abcd1234%22,%22identify%22:%22user_id%22,%22properties%22:%7B%22order_id%22:%22100000%22,%22amount%22:100,%22virtual_currency_amount%22:100,%22currency_type%22:%22CNY%22,%22product%22:%22item1%22,%22payment%22:%22alipay%22%7D%7D`
+>%7B%22module%22:%22GameAnalysis%22,%22name%22:%22charge%22,%22index%22:%22abcd1234%22,%22identify%22:%22user_id%22,%22properties%22:%7B%22order_id%22:%22100000%22,%22amount%22:100,%22virtual_currency_amount%22:100,%22currency_type%22:%22CNY%22,%22product%22:%22item1%22,%22payment%22:%22alipay%22%7D%7D
 
 成功判断：返回的HTTP Code为200时认为发送成功，否则认为失败

@@ -56,7 +56,7 @@ TapDB SDK当前支持oaid sdk 1.0.5~1.0.25的版本，当应用集成进去之�
 
 **在AndroidManifest.xml添加如下权限**
 
-```
+```markup
 <!-- 必选权限 -->
 <uses-permission android:name="android.permission.INTERNET" />
 <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -70,7 +70,7 @@ TapDB SDK当前支持oaid sdk 1.0.5~1.0.25的版本，当应用集成进去之�
 
 **注意：
 SDK 默认使用 HTTP 传输数据，在 targetSdkVersion >= 28 时需要在 AndroidManifest.xml 增加如下配置**
-```
+```markup
 <application
 ...
 android:usesCleartextTraffic="true"
@@ -86,7 +86,10 @@ android:usesCleartextTraffic="true"
 
 **若需要收集广告标识符（IDFA），可调用以下接口。请在初始化之前调用**
 
-	TapDB.enableAdvertiserIDCollection(true);
+```csharp
+TapDB.enableAdvertiserIDCollection(true);
+```
+
 
  **iOS 14开始，获取IDFA需要配置单独权限声明**，在 info.plist 中配置 NSUserTrackingUsageDescription 及描述文案。如：请允许xxx获取并使用您的IDFA,来为您提供更好的服务。
  
@@ -126,7 +129,7 @@ libsqlite3.0.tbd ||
 
 初始化统计系统SDK，调用这个接口是使用其它接口的先决条件，需要尽早调用。一般建议在Unity里的Start()里面调用。
 
-```
+```csharp
 public static void onStart(string appId, string channel, string gameVersion);
 public static void onStartWithProperties(string appId, string channel, string gameVersion,Dictionary<string, object> properties)
 ```
@@ -143,7 +146,7 @@ properties | 否 | 自定义属性，随初始化上传
 
 记录一个账号，当账号登陆时调用。
 
-```
+```csharp
 public static void setUser(string userId)
 public static void setUserWithProperties(string userId,Dictionary<string, object> properties)
 ```
@@ -158,7 +161,7 @@ properties | 否 | 自定义属性
 
 设置账号名称。
 
-```
+```csharp
 public static void setName(string name)
 ```
 
@@ -171,7 +174,7 @@ name | 否 | 长度大于0并小于等于256，账号名
 
 设置账号等级，账号登陆时或升级时调用。
 
-```
+```csharp
 public static void setLevel(int level)
 ```
 
@@ -183,7 +186,7 @@ level | 否 | 账号等级
 
 设置账号区服，账号登陆时或更换区服时调用。
 
-```
+```csharp
 public static void setServer(string server)
 ```
 
@@ -194,7 +197,7 @@ server | 否 | 账号服务器
 ## 3.6.充值
 
 
-<div style={{'font-size': '18px','font-weight': '500',position: 'relative'}}>
+<div style={{'fontSize': '18px','fontWeight': '500',position: 'relative'}}>
 <p style={{position: 'absolute',top:'-50px',left:'150px'}}>(<span style={{color:'#080'}}>推荐使用服务端充值统计接口</span>)</p></div>
 
 
@@ -205,7 +208,7 @@ server | 否 | 账号服务器
 如果没有通过服务器校验，一定会造成数据不准确，强烈建议使用服务器接口进行充值数据回调。</span>
 (<a href="docs/zh_CN/sdk/unity.html#09119adcfbdeceac797a914952974bd9">4.2.充值</a>)</p>
 
-```
+```csharp
 public static void onChargeSuccess(string orderId, string product, Int32 amount, string currencyType, string payment)
 ```
 
@@ -221,7 +224,7 @@ payment | 是 | 支付方式，如：支付宝
 
 账号登出时，需要调用以下接口清空用户数据。
 
-```
+```csharp
 public static void clearUser() 
 
 ```
@@ -232,13 +235,13 @@ public static void clearUser()
 
 需要发送自定义事件时调用，自定义事件的 eventName 和 properties 属性都必须在元数据管理预先配置，才可以使用SDK进行发送
 
-```
+```csharp
 public static void trackEvent(string eventName, Dictionary<string, object> properties)
 ```
 
 用户可以通过调用 trackEvent 方法上传需要跟踪的自定义事件。eventName 为自定义事件的事件名，需要保证以 '#' 开头，取值规则请参考自定义属性登记页面。properties 为自定义事件所包含的自定义属性（以 Key : Value 的形式保存），其中 Key 代表了自定义属性的属性名，Value 代表了该属性的值。这里需要注意的是 Key 的命名规则同 eventName 一致，也需要保证以 '#' 开头。目前所支持的 Value 类型为 String, Number, Boolean。String 类型支持最大长度为 256。Number 类型取值区间为 [-9E15, 9E15]。以战斗事件为例：
 
-```
+```csharp
 Dictionary<string, object> properties = new Dictionary<string, object>();
 properties.Add("#weapon", "axe");
 TapDB.trackEvent("#battle", properties);
@@ -258,7 +261,7 @@ TapDB的事件主体分为账号和设备，支持对主体的某个属性做相
 
 ### 设备属性初始化操作
 
-```
+```csharp
 /// 初始化设备属性操作
 /// @param properties 属性字典
 public static void deviceInitialize(Dictionary<string, object> properties)
@@ -266,7 +269,7 @@ public static void deviceInitialize(Dictionary<string, object> properties)
 
 如果需要初始化设备的某些属性，可以调用 deviceInitialize 来进行设置。如果相应属性之前已近被初始化，那么后续对这些属性的初始化操作将会被忽略。以首次活跃服务器为例：
 
-```
+```csharp
 Dictionary<string, object> properties = new Dictionary<string, object>();
 properties.Add("firstActiveServer", "server1");
 TapDB.deviceInitialize(properties);
@@ -280,7 +283,7 @@ TapDB.deviceInitialize(properties);
 
 ### 设备属性更新操作
 
-```
+```csharp
 /// 更新设备属性操作
 /// @param properties 属性字典
 public static void deviceUpdate(Dictionary<string, object> properties)
@@ -288,7 +291,7 @@ public static void deviceUpdate(Dictionary<string, object> properties)
 
 如果需要更新设备的某些属性，可以调用 deviceUpdate 来进行设置。通过该接口上传的属性会将原有属性值进行覆盖。以当前积分为例：
 
-```
+```csharp
 Dictionary<string, object> properties = new Dictionary<string, object>();
 properties.Add("currentPoints", 10);
 TapDB.deviceUpdate(properties);
@@ -302,14 +305,14 @@ TapDB.deviceUpdate(properties);
 
 ### 设备属性累加操作 
 
-```
+```csharp
 /// 设备属性累加操作
 /// @param properties 属性字典 暂时只支持数字属性
 public static void deviceAdd(Dictionary<string, object> properties)
 ```
 
 
-```
+```csharp
 Dictionary<string, object> properties = new Dictionary<string, object>();
 properties.Add("totalPoints", 10);
 TapDB.deviceInitialize(properties);
@@ -323,7 +326,7 @@ TapDB.deviceInitialize(properties);
 
 ### 账号属性初始化操作 
 
-```
+```csharp
 /// 初始化账号属性操作
 /// @param properties 属性字典
 public static void userInitialize(Dictionary<string, object> properties)
@@ -332,7 +335,7 @@ public static void userInitialize(Dictionary<string, object> properties)
 ### 账号属性更新操作
 使用方法同设备属性更新操作
 
-```
+```csharp
 /// 更新账号属性操作
 /// @param properties 属性字典
 public static void userUpdate(Dictionary<string, object> properties)
@@ -341,7 +344,7 @@ public static void userUpdate(Dictionary<string, object> properties)
 ### 账号属性累加操作
 使用方法同设备属性累加操作
 
-```	
+```	csharp
 /// 账号属性累加操作
 /// @param properties 属性字典 暂时只支持数字属性
 public static void userAdd(Dictionary<string, object> properties)
@@ -353,13 +356,13 @@ public static void userAdd(Dictionary<string, object> properties)
 
 ### 添加静态事件属性 
 
-```
+```csharp
 /// 添加静态事件属性，每个事件都将会发送
 /// @param staticProperties 属性字典
 public static void registerStaticProperties(Dictionary<string, object> properties)
 ```
 
-```
+```csharp
 Dictionary<string, object> properties = new Dictionary<string, object>();
 properties.Add("channel", "TapDB");
 TapDB.registerStaticProperties(properties);
@@ -378,7 +381,7 @@ TapDB.trackEvent("#custom1", custom);
 
 如果要删除某个已添加的静态通用属性，不想让它出现在之后的每个事件中，可以调用 unregisterStaticProperty 方法，将不需要的静态通用属性删除。
 
-```
+```csharp
 /// 删除添加的某个静态事件属性
 /// @param propertyName 属性Key
 public static void unregisterStaticProperty(string propertyName)
@@ -386,7 +389,7 @@ public static void unregisterStaticProperty(string propertyName)
 
 ### 删除所有静态事件属性  
 
-```
+```csharp
 /// 删除添加的静态事件属性
 public static void clearStaticProperties()
 ```
@@ -420,7 +423,7 @@ timestamp | long | 当前统计数据的时间戳(秒)。TapDB会按照自然5�
 
 示例：
 
-```
+```js
 {
 "appid":"gkjasd13bbsa1sdk",
 "onlines":[{
@@ -445,7 +448,7 @@ timestamp | long | 当前统计数据的时间戳(秒)。TapDB会按照自然5�
 接口：https://e.tapdb.net/event
 ```
 内容（注意后面还需要处理一下）：
-```
+```js
 {
   "module": "GameAnalysis", // 固定参数
   "ip": "8.8.8.8", // 可选。充值用户的IP
@@ -466,10 +469,10 @@ timestamp | long | 当前统计数据的时间戳(秒)。TapDB会按照自然5�
 假如游戏的appid为abcd1234。构建出json字符串后，去掉空格和换行符，然后再进行一次urlencode。再把结果作为POST数据推送
 先替换换行符和空格，变成：   
 
-`{"module":"GameAnalysis","name":"charge","index":"abcd1234","identify":"user_id","properties":{"order_id":"100000","amount":100,"virtual_currency_amount":100,"currency_type":"CNY","product":"item1","payment":"alipay"}}`
+>{"module":"GameAnalysis","name":"charge","index":"abcd1234","identify":"user_id","properties":{"order_id":"100000","amount":100,"virtual_currency_amount":100,"currency_type":"CNY","product":"item1","payment":"alipay"}}
 
-然后urlencode，变成如下形式。某些版本的urlencode可能会把':'和','进行编码，不会影响实际使用。   
+然后urlencode，变成如下形式。某些版本的urlencode可能会把`:` 和`,` 进行编码，不会影响实际使用。   
 
-`%7B%22module%22:%22GameAnalysis%22,%22name%22:%22charge%22,%22index%22:%22abcd1234%22,%22identify%22:%22user_id%22,%22properties%22:%7B%22order_id%22:%22100000%22,%22amount%22:100,%22virtual_currency_amount%22:100,%22currency_type%22:%22CNY%22,%22product%22:%22item1%22,%22payment%22:%22alipay%22%7D%7D`
+>%7B%22module%22:%22GameAnalysis%22,%22name%22:%22charge%22,%22index%22:%22abcd1234%22,%22identify%22:%22user_id%22,%22properties%22:%7B%22order_id%22:%22100000%22,%22amount%22:100,%22virtual_currency_amount%22:100,%22currency_type%22:%22CNY%22,%22product%22:%22item1%22,%22payment%22:%22alipay%22%7D%7D
 
 成功判断：返回的HTTP Code为200时认为发送成功，否则认为失败
