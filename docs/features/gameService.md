@@ -3,7 +3,7 @@ title: 游戏区服
 sidebar_position: 3
 ---
 
-# TapDB 区服使用攻略
+## TapDB 区服使用攻略
 TapDB 支持『设备』和『用户』2个层级的用户实体。
 * 其中『用户』由 SetUser 接口定义，可以根据游戏需要传递『账号』或『角色』。
 

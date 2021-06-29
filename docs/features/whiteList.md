@@ -1,8 +1,11 @@
 ---
 sidebar_position: 2
+title: 测试设备白名单
+hide_title: true
+hide_table_of_contents: true
 ---
 
-# 测试设备白名单
+## 测试设备白名单
 
 当你需要用旧设备测试分包渠道或广告是否调通时，可以使用测试设备白名单功能来完成这个任务。
 

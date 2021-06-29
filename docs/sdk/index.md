@@ -1,8 +1,8 @@
 ---
+title: 接入文档
 sidebar_position: 1
 ---
 
-# 接入文档
 
 ## 对接SDK的开发者请仔细阅读
 

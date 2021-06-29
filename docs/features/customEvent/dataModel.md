@@ -5,7 +5,7 @@ sidebar_position: 2
 
 > English manual coming soon, we apologize for the temporary inconvenience.
 
-# 1. 用户事件模型
+## 1. 用户事件模型
 
 `TapDB` 的数据分析基于用户事件数据模型，如下图：
 
@@ -15,7 +15,7 @@ sidebar_position: 2
 
 “用户事件模型”包含“事件”、“用户”两个实体，及用来描述它们特征的属性。在事件模型下，用户在游戏中的登录、付费等行为的事实数据都会被详尽地记录下来，便于进行精细化分析。
 
-# 2. 用户表
+## 2. 用户表
 
 `TapDB` 提供了“设备表”、“账号表”两类“用户表”，在使用分析模型时，可在两者之间自由切换。
 

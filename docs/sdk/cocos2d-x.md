@@ -3,13 +3,13 @@ title: Cocos2d-x SDK文档
 sidebar_position: 4
 ---
 
-# 1.简介
+## 1.简介
 
-## 1.1.适用范围
+### 1.1.适用范围
 
 封装了TapDB的SDK，适用于 Cocos2d-x 开发的游戏，同时支持 iOS 和 Android 平台。
 
-## 1.2.名词解释
+### 1.2.名词解释
 
 名词 | 含义
 - | -
@@ -18,17 +18,17 @@ sidebar_position: 4
 付费 | 玩家使用真实货币换取游戏虚拟币或游戏道具
 分包渠道 | 标识游戏安装包渠道来源，需要在代码中设置
 
-# 2.接入方式
+## 2.接入方式
 
-## 2.1.申请应用
+### 2.1.申请应用
 
 在TapDB控制台中注册一个游戏，获得游戏对应的APP ID，这是一个16位的字符串，iOS和Android可共用一个APP ID。
 
-## 2.2.向工程中导入SDK
+### 2.2.向工程中导入SDK
 
 在TapDB网站上下载最新的SDK，其中包含一个 TapDB_sdk.zip 文件，解压得到3个文件夹，include文件夹里面是头文件，iOS和Android文件夹里面是对应平台的实现代码和库文件。另外，在Android.mk里面添加对TapDB.cpp的引用。
 
-## 2.3.添加Android支持库
+### 2.3.添加Android支持库
 
 添加Android v4支持库到项目中，Android v4支持库的版本必须不低于23.0.0，否则可能导致闪退。
 
@@ -40,7 +40,7 @@ sidebar_position: 4
 如果不方便使用gradle进行自动化依赖安装，之前也没有使用到v4支持库，可以使用此处提供的support-compat模块的jar文件:
 [android-support-v4.jar](https://static.tapdb.net/web/res/file/upload/2017/0926/android-support-v4.jar)
 
-## 2.4.Android添加需要的权限
+### 2.4.Android添加需要的权限
 
 需要为工程中的AndroidManifest.xml添加下列权限
 
@@ -50,7 +50,7 @@ android.permission.INTERNET | 必选 | 使用网络的权限
 android.permission.ACCESS_NETWORK_STATE | 必选 | 获取手机网络连接状态
 android.permission.WRITE_EXTERNAL_STORAGE | 可选 | 使用SD卡辅助存储设备标识等信息，若不具备此权限，有一部分设备无法进行很好的设备跟踪
 
-## 2.5.iOS引入依赖的框架
+### 2.5.iOS引入依赖的框架
 
 需要为Xcode工程引入下列依赖的框架或库
 
@@ -59,15 +59,15 @@ android.permission.WRITE_EXTERNAL_STORAGE | 可选 | 使用SD卡辅助存储设�
 AdSupport.framework | 用来获取设备广告标识，跟踪设备
 Security.framework | 用来进行更好的持久化存储
 
-## 2.6.调用统计接口
+### 2.6.调用统计接口
 
 在需要调用统计接口的代码中引入TapDB.h，并按照后面的接口介绍调用统计接口。
 
-# 3.接口说明
+## 3.接口说明
 
 TapDB.h包含了类TapDB，还定义了TGTUserType/TGTUserSex两个枚举类型。TapDB包含的都是静态方法，直接用类名调用即可。TGTUserType表示玩家类型，TGTUserSex表示玩家性别。
 
-## 3.1.初始化
+### 3.1.初始化
 
 初始化统计系统SDK，调用这个接口是使用其它接口的先决条件，需要尽早调用。init 方法会初始化 SDK，在此之前不可以调用 SDK 的其他方法。
 
@@ -83,7 +83,7 @@ appId | 否 | 注册游戏时获得的APP ID
 channel | 是 | 分包渠道，1.2.名词解释中有介绍
 version | 是 | 游戏版本，为空时，自动获取游戏安装包的版本
 
-## 3.2.跟踪游戏的启停（只适用于Android）
+### 3.2.跟踪游戏的启停（只适用于Android）
 
 跟踪玩家游戏次数和游戏时长。需要给游戏中每个Activity的onResume和onStop中添加对应的调用。如：在MainActivity里面调用TyrantdbGameTracker.onStop (this);即可。
 
@@ -92,7 +92,7 @@ public static void onResume(Context ctx)
 public static void onStop(Context ctx)
 ```
 
-## 3.3.记录一个玩家
+### 3.3.记录一个玩家
 
 记录一个玩家（注意是平台用户，不是游戏角色），当玩家登陆时调用，如果是试玩用户，userId由游戏自己生成，但需要保证唯一性。
 
@@ -109,7 +109,7 @@ userSex | 否 | 玩家性别，见类型详细定义
 userAge | 否 | 玩家年龄，无法获知玩家年龄直接传递0
 userName | 是 | 玩家名称
 
-## 3.4.玩家等级
+### 3.4.玩家等级
 
 设置玩家等级，玩家登陆时或升级时调用。
 
@@ -121,7 +121,7 @@ public static void setLevel(int level)
 - | - | -
 level | 否 | 玩家等级
 
-## 3.5.玩家区服
+### 3.5.玩家区服
 
 设置玩家区服，玩家登陆时或更换区服时调用。
 
@@ -133,7 +133,7 @@ public static void setServer(const char *server)
 - | - | -
 server | 否 | 玩家服务器
 
-## 3.6.发起充值请求
+### 3.6.发起充值请求
 
 <div style={{'fontSize': '18px','fontWeight': '500',position: 'relative'}}>
 <p style={{position: 'absolute',top:'-50px',left:'150px'}}>(<span style={{color:'#080'}}>推荐使用服务端充值统计接口</span>)</p></div>
@@ -158,7 +158,7 @@ currencyType | 是 | 货币类型，参考：人民币 CNY，美元 USD；欧元
 virtualCurrencyAmount | 否 | 充值获得的虚拟币
 payment | 是 | 支付方式，如：支付宝
 
-## 3.7.充值成功
+### 3.7.充值成功
 
 充值成功时调用，需要与充值请求成对调用
 
@@ -170,7 +170,7 @@ public static void onChargeSuccess(const char *orderId)
 - | - | -
 orderId | 否 | 订单ID，与之前调用的充值请求传递的ID对应
 
-## 3.8.充值失败
+### 3.8.充值失败
 
 充值失败时调用，需要与充值请求成对调用
 
@@ -183,7 +183,7 @@ public static void onChargeFail(const char *orderId, const char *reason)
 orderId | 否 | 订单ID，与之前调用的充值请求传递的ID对应
 reason | 是 | 失败原因
 
-## 3.9.仅充值成功
+### 3.9.仅充值成功
 
 当客户端无法跟踪充值请求发起，只能跟踪到充值成功的事件时，调用该接口记录充值信息
 
@@ -201,9 +201,9 @@ currencyType | 是 | 货币类型，参考：人民币 CNY，美元 USD；欧元
 virtualCurrencyAmount | 否 | 充值获得的虚拟币
 payment | 是 | 支付方式，如：支付宝
 
-# 4.服务端统计接口
+## 4.服务端统计接口
 
-## 4.1.充值统计接口
+### 4.1.充值统计接口
 
 由于客户端接入充值统计可能会不太准确，这里提供服务端充值统计方法，需要忽略掉SDK中的相关充值统计接口
 
@@ -241,7 +241,7 @@ payment | 是 | 支付方式，如：支付宝
 
 成功判断：返回的HTTP Code为200认为发送成功，否则认为失败
 
-## 4.2.在线数据统计接口
+### 4.2.在线数据统计接口
 
 由于SDK无法进行准确的在线数据统计，这里提供服务端在线数据统计接口。游戏服务端可以每隔5分钟自行统计在线人数，通过接口发送到TapDB，TapDB进行数据汇总和展现。
 
