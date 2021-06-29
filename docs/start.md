@@ -1,8 +1,8 @@
 ---
 title: 现在开始
 sidebar_position: 1
+hide_title: true
 ---
-import {Red} from '/src/components/Color';
 
 ## 现在开始
 ### 第一步：注册账号
