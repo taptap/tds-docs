@@ -56,7 +56,7 @@ TapDB SDK当前支持oaid sdk 1.0.5~1.0.25的版本，当应用集成进去之�
 
 **在AndroidManifest.xml添加如下权限**
 
-```markup
+```xml
 <!-- 必选权限 -->
 <uses-permission android:name="android.permission.INTERNET" />
 <uses-permission android:name="android.permission.READ_PHONE_STATE" />
@@ -70,7 +70,7 @@ TapDB SDK当前支持oaid sdk 1.0.5~1.0.25的版本，当应用集成进去之�
 
 **注意：
 SDK 默认使用 HTTP 传输数据，在 targetSdkVersion >= 28 时需要在 AndroidManifest.xml 增加如下配置**
-```markup
+```xml
 <application
 ...
 android:usesCleartextTraffic="true"

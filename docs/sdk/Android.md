@@ -31,7 +31,7 @@ TapDB 提供一套 SDK，游戏开发者可以将其集成到游戏中。系统�
 在 TapDB 网站上下载最新的 SDK，其中包含一个库文件 libTapDB-xxx.aar（强烈建议使用最新版本）。将该库文件加入到项目依赖库中。
 
 ### 2.3.添加权限
-```markup
+```xml
 <!--必选权限-->
 <uses-permission android:name="android.permission.INTERNET" />
 <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -320,7 +320,7 @@ TapDB SDK当前支持oaid sdk 1.0.5~1.0.25的版本，当应用集成进去之�
 **注意：
 SDK 默认使用 HTTP 传输数据，在 targetSdkVersion >= 28 时需要在 AndroidManifest.xml 增加如下配置**
 
-```markup
+```xml
 <application
   ...
   android:usesCleartextTraffic="true"
