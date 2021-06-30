@@ -2,7 +2,6 @@
 id: design-login
 title: TapTap 登录入口的设计规则
 sidebar_label: 登录设计指南
-slug: /design
 ---
 import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
 import useBaseUrl from '@docusaurus/useBaseUrl';
@@ -17,7 +16,7 @@ A. 符号型| B.长胶囊按钮型 |
 ## A. 符号型登录入口
 
 ### 1.符号型登录入口内，信息的构成形式
-由"Tap"字样标志 + 按钮底板构成
+由"Tap"字样标志 + 按钮底板构成 .
 
 ✅ 正确入口信息构成 |- | ❌ 错误入口信息构成 | -|
 | ------ | ------ |------ |------ |
