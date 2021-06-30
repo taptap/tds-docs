@@ -6,7 +6,7 @@ sidebar_label: 开发流程
 
 import MultiLang from '@theme/MultiLang';
 
-[快速开始](/sdk)中简单介绍了[如何在游戏中加入 Tap 登录](/sdk#TapTap-登录)，这里详细介绍 TapSDK 的[登录功能](/sdk/features/pro-login/)。
+[快速开始](/sdk)中简单介绍了[如何在游戏中加入 Tap 登录](/sdk#TapTap-登录)，这里详细介绍 TapSDK 的[登录功能](/sdk/taptap-login/features)。
 
 ## 检查登录状态
 

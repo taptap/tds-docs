@@ -7,7 +7,7 @@ sidebar_label: 开发流程
 
 import MultiLang from '@theme/MultiLang';
 
-本文介绍如何在游戏中加入 [TapTap 动态](/sdk/features/pro-moment)。
+本文介绍如何在游戏中加入 [TapTap 动态](/sdk/embedded-moments/features)。
 
 ## 设置回调
 
