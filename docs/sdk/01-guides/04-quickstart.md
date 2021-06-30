@@ -1,5 +1,5 @@
 ---
-id: tap-quickstart
+id: quickstart
 title: TapSDK 快速开始
 sidebar_label: 快速开始
 slug: /sdk
