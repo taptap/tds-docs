@@ -7,9 +7,6 @@ sidebar_label: 开发流程
 
 import MultiLang from '@theme/MultiLang';
 
-:::caution
-**目前需要联系运营团队申请使用 TapDB。**
-:::
 ## 介绍
 
 TapSDK 提供了一套可供游戏开发者收集账号数据的 API。

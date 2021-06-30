@@ -2,7 +2,6 @@
 id: quickstart
 title: TapSDK 快速开始
 sidebar_label: 快速开始
-slug: /sdk
 ---
 import MultiLang from '@theme/MultiLang';
 
@@ -441,7 +440,7 @@ TapBootstrap.registerLoginResultListener(new TapLoginResultListener() {
 
 ## AccessToken
 
-上面代码示例中的 `AccessToken` 用于用户鉴权，过期时间为 90 天（过期后 SDK 会自动清除本地缓存），可以传到游戏服务端去获取用户信息，参见 [获取用户信息](/sdk/api/service/userinfo#流程)。
+上面代码示例中的 `AccessToken` 用于用户鉴权，过期时间为 90 天（过期后 SDK 会自动清除本地缓存），可以传到游戏服务端去获取用户信息，参见 [获取用户信息](/sdk/taptap-login/userinfo#流程)。
 
 `AccessToken` 示例：
 
