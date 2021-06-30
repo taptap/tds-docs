@@ -149,7 +149,7 @@ TapBootstrap.getUser(new Callback<TapUser>() {
 ## 登录
 
 执行登录操作，优先跳转 TapTap APP 登录，当没有 TapTap APP 时，会打开内置 WebView 登录。
-另外，请仔细阅读[登录按钮设计规范](/sdk/design/design-login)。  
+另外，请仔细阅读[登录按钮设计规范](/design/design-login)。  
 
 
 <MultiLang>
