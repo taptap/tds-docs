@@ -25,5 +25,5 @@ sidebar_label: 功能介绍
 
 ## 4. 接入方式
 
-提供便捷灵活的 API 接入方式，详细 API 文档参考 [文本检测 API 文档](/service-textsafety) 
+提供便捷灵活的 API 接入方式，详细 API 文档参考 [文本检测 API 文档](/sdk/text-moderation/start) 
 
