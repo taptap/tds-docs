@@ -1,7 +1,7 @@
 ---
-id: start
-title: 开发流程
-sidebar_label: 开发流程
+id: guide
+title: 开发指南
+sidebar_label: 开发指南
 ---
 
 :::info

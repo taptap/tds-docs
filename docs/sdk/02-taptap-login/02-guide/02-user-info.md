@@ -15,20 +15,21 @@ OpenAPI 采用统一的 Mac Token 头部签算来传递用户身份。
 
 ## 流程
 1. 移动端用 SDK 的 TapTap 登录，可以通过 `GetAccessToken` 获取 AccessToken，里面包含
-```java
-  public String kid;
-  public String access_token;
-  public String token_type;
-  public String mac_key;
-  public String mac_algorithm;
-  public String expire_in;
-  private String json = null;
-```
+
+    ```java
+    public String kid;
+    public String access_token;
+    public String token_type;
+    public String mac_key;
+    public String mac_algorithm;
+    public String expire_in;
+    private String json = null;
+    ```
 
 2. 再把移动端获取的参数发到游戏务服务器，服务端签算 mac token。
 3. 请求 `https://tds-tapsdk.cn.tapapis.com/api/v1/user/info` ， header 携带 mac token
 
-> 注意：当前实际返回的 kid 和 access_token 值相等，建议使用 access_token
+注意：当前实际返回的 kid 和 access_token 值相等，建议使用 access_token
 
 ## API
 
@@ -56,11 +57,13 @@ is_guest         | bool       | 是否是游客，暂时弃用
 
 #### 请求示例
 替换其中的 `MAC id` 和 `client id` 为自己签算的 mac token 和控制台的 Client ID
+
 ```
 curl -s -H 'Authorization:MAC id="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJa
 gCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTs
 KQ",ts="1618221750",nonce="adssd",mac="XWTPmq6A6LzgK8BbNDwj+kE4gzs="' "https://tds-tapsdk.cn.tapapis.com/api/v1/user/info?client_id=<clien id>"
 ```
+
 <!-- 
 ### 刷新 Token
 

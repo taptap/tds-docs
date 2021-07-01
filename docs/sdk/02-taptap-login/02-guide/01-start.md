@@ -1,7 +1,7 @@
 ---
 id: start
-title: 开发流程
-sidebar_label: 开发流程
+title: 接入 TapTap 登录
+sidebar_label: 功能接入
 ---
 
 import MultiLang from '@theme/MultiLang';
