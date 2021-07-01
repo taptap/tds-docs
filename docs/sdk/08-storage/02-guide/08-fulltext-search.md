@@ -203,6 +203,8 @@ searchQuery.sortBy(new AV.SearchSortBuilder().descending('scores', 'avg', 'last'
 - [AV.SearchQuery](https://leancloud.github.io/javascript-sdk/docs/AV.SearchQuery.html)
 - [AV.SearchSortBuilder](https://leancloud.github.io/javascript-sdk/docs/AV.SearchSortBuilder.html)
 
+</>
+
 </MultiLang>
 
 
