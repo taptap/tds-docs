@@ -194,4 +194,3 @@ details | object | 否 | 详情信息，具体结构根据不同code表示
     "details": []
 }
 ```
-
