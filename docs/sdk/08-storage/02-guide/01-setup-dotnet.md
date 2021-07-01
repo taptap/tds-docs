@@ -23,23 +23,25 @@ sidebar_label: .NET SDK 配置
 
 ### 安装
 
-- .NET Core 或其他支持 .NET Standard 2.0 的项目请下载 LeanCloud-SDK-XXX-Standard.zip，解压后设置依赖即可。
+#### Unity 项目
+
+- 直接导入：请下载 LeanCloud-SDK-XXX-Unity.zip，解压后为 Plugins 文件夹，拖拽至 Unity 即可。
+
+- UPM：请在项目的 Packages/manifest.json 中添加依赖项
+
+    ```json
+    "dependencies": {
+    "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-0.7.5",
+    "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-0.7.5"
+    }
+    ```
+
+注意：仅支持 Unity 2018+，即 Unity Api Compatibility Level 支持 .NET Standard 2.0 的版本。
+
+#### 非 Unity 项目
+
+.NET Core 或其他支持 .NET Standard 2.0 的项目请下载 LeanCloud-SDK-XXX-Standard.zip，解压后设置依赖即可。
 （XXX 指云服务，包括存储 Storage，即时通讯（含 LiveQuery） Realtime，云引擎 Engine）
-
-- Unity
-  
-    - 直接导入：请下载 LeanCloud-SDK-XXX-Unity.zip，解压后为 Plugins 文件夹，拖拽至 Unity 即可。
-
-    - UPM：请在项目的 Packages/manifest.json 中添加依赖项
-
-        ```json
-        "dependencies": {
-        "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-0.7.5",
-        "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-0.7.5"
-        }
-        ```
-
-    注意：仅支持 Unity 2018+，即 Unity Api Compatibility Level 支持 .NET Standard 2.0 的版本。
 
 ### 模块及依赖关系
 
