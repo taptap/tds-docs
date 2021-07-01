@@ -120,6 +120,15 @@ B -->|afterDelete|C((done))
 `} />
 ```
 
+## 本地预览
+
+```sh
+npm start
+```
+
+注意，`npm start` 并不会检查坏链。
+如需检查坏链，需要运行 `npm run build`。
+
 ## 关于国际化
 
 > 参考 [docusaurus文档](https://v2.docusaurus.io/docs/i18n/tutorial)
