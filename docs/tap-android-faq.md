@@ -11,7 +11,7 @@ sidebar_label: Android
 
 2. 由于 TapTap 客户端授权登录，会对 Client ID、应用包名、签名文件的 MD5 进行校验, 其中任何一项配置错误都会导致登录失败。
 例如:{"status":403,"data":{"code":-1,"msg":"暂未开通","error":"forbidden","error_description":"The action forbidden."}}
-原因：Client ID 没有配置正确，检查 Client ID。 由 Client ID、应用包名、签名文件的 MD5 错误导致的登录失败是最常见的情况，建议参考 [接入准备](/sdk/guides/get-ready)  进行检查，该问题开发者自己就可以解决；
+原因：Client ID 没有配置正确，检查 Client ID。 由 Client ID、应用包名、签名文件的 MD5 错误导致的登录失败是最常见的情况，建议参考 [接入准备](/sdk/start/get-ready)  进行检查，该问题开发者自己就可以解决；
 
 3. 设备系统时间不准确，此类情况大多数是因为设备的系统时间没有开启自动联网同步导致；
 
