@@ -1,0 +1,1726 @@
+---
+title: 云引擎 FAQ
+sidebar_label: FAQ
+---
+
+import MultiLang from '@theme/MultiLang';
+
+# 云引擎 FAQ
+
+## 综合
+### 云引擎都支持哪些语言
+
+目前支持 Node.js、Python、Java、PHP、.Net、Go 运行环境，未来可能还会引入其他语言。
+
+### 云引擎支持托管纯静态网站吗
+
+支持。命令行工具初始化项目选择语言环境时，依次选择 Others > Static Site 即可。
+
+### 云引擎支持 HTTPS 吗
+
+- 自定义域名在绑定时启用 SSL 即可支持 HTTPS。
+- 如需配置自动跳转，请看[云引擎下如何重定向到 HTTPS？](#云引擎下如何重定向到-https？)。
+
+### 云引擎采用什么样的休眠策略？
+
+标准实例不会休眠。
+
+体验实例会执行休眠策略：
+
+* 如果应用最近一段时间（半小时）没有任何外部请求，则休眠。
+* 休眠后如果有新的外部请求实例则马上启动。访问者的体验是第一个请求响应时间是 5 ~ 30 秒（视实例启动时间而定），后续访问响应速度恢复正常。
+* 强制休眠：如果最近 24 小时内累计运行超过 18 小时，则强制休眠。此时新的请求会收到 503 的错误响应码，该错误可在 **云服务控制台 > 云引擎 > 云引擎分组 > 统计** 中查看。
+
+### 云引擎的请求有哪些限制？
+
+云引擎的负载均衡组件限制了请求不能超过 100 MB（包括直接上传文件到云引擎）、请求处理不得超过 60 秒，WebSocket 60 秒无数据会被断开连接。
+
+国内节点未绑定独立 IP 的云引擎默认为纯静态站点优化。请求会先经过边缘节点，再视缓存命中情况回源到负载均衡组件，最后到达你的应用。
+边缘节点额外限制了请求不能超过 60 MB、请求处理不得超过 10 秒，另外边缘节点不支持 WebSocket 请求和 HTTP PATCH 方法，也不支持获取客户端 IP。
+因此，如果您在国内节点云引擎托管动态网站，我们建议您绑定独立 IP，使用独立入口，不经过边缘节点，自然也就没有上述限制。
+
+### 云引擎运行日志大小有限制吗？
+
+日志单行最大 4096 个字符，多余部分会被丢弃；日志输出频率大于 600 行/分钟，多余的部分会被丢弃。
+
+### 云引擎使用什么时区？
+
+国内版使用北京时间（东八区），国际版使用 UTC+0 时区。
+
+### 如何查看云引擎的出入口 IP 地址？
+
+如果开发者希望在第三方服务平台（如微信开放平台）上配置 IP 白名单而需要获取云引擎的入口或出口 IP 地址，请进入 **云服务控制台 > 云引擎 > 设置 > 出入口 IP** 来自助查询。
+
+我们会尽可能减少出入口 IP 的变化频率，但 IP 突然变换的可能性仍然存在。因此在遇到与出入口 IP 相关的问题，我们建议先进入控制台来核实一下 IP 列表是否有变化。
+
+如需保持入口 IP 不变，建议为云引擎绑定独立 IP。
+
+### 如何访问云引擎预备环境中托管的网站？
+
+需要在控制台手动绑定一个 `stg-` 开头的域名。`stg-` 开头的自定义域名（例如 stg-web.example.com）会被自动地绑定到预备环境。
+
+### 如何判断当前云引擎是预备环境还是生产环境？
+
+默认情况，云引擎只有一个「生产环境」，对应的域名是 web.example.com。在生产环境中有一个「体验实例」来运行应用。
+
+当生产环境的体验实例升级到「标准实例」后会有一个额外的「预备环境」，对应域名 stg-web.example.com，两个环境所访问的都是同样的数据，你可以用预备环境测试你的云引擎代码，每次修改先部署到预备环境，测试通过后再发布到生产环境；如果你希望有一个独立数据源的测试环境，建议单独创建一个应用。
+
+另外，stg-web.example.com 域名是需要在控制台自行绑定的。
+
+### Application not found 错误
+
+访问云引擎服务时，服务端返回错误「Application not found」或在云引擎日志中出现这个错误，可能有以下原因：
+
+* 调用错了环境。最常见的情况是，免费的体验实例是没有预备环境，开发者却主动设置去调用预备环境。
+* 云引擎自定义域名填错了，比如微信回调地址。
+* 因为免费版（体验版）的云引擎是有休眠的，休眠期间被调用会出现这个错误。建议升级到标准实例以保证实例一直运行。
+
+### 云引擎会重复提交请求吗？
+
+云引擎的负载均衡对于幂等的请求（GET、PUT），在 HTTP 层面出错或超时的情况下是会重试的。
+可以使用正确的谓词（例如 POST）避免此类重试。
+
+### 云引擎中如何处理用户登录和 Cookie？
+
+如果你的页面主要由服务端渲染，可以使用我们在部分 SDK 中提供的管理 Cookie 和 Session 的中间件或模块，也可以其他第三方的中间件或模块，在 Cookie 中维护用户状态。
+
+使用 Cookie 作为鉴权方式需要注意防范 [CSRF](https://github.com/pillarjs/understanding-csrf) 攻击（其他站点伪造带有正确 Cookie 的恶意请求）。
+业界通常使用 CSRF Token 来防御 CSRF 攻击，你需要传递给客户端一个随机字符串（即 CSRF Token，可通过 Cookie 传递），客户端在每个有副作用的请求中都要将 CSRF 包含在请求正文或 Header 中，服务器端需要校验这个 CSRF Token 是否正确。
+
+如果你的页面主要是由浏览器端渲染，那么建议在前端使用 SDK 登录用户，调用 SDK 的接口获取 session token，通过 HTTP Header 等方式将 session token 发送给后端。
+
+例如，在前端登录用户并通过 `user.getSessionToken()` 获取 `sessionToken` 并发送给后端：
+
+```js
+AV.User.login(user, pass).then(user => {
+  return fetch('/profile', {
+    headers: {
+      'X-LC-Session': user.getSessionToken()
+    }
+  });
+});
+```
+
+相应的后端 Node.js 代码：
+
+```js
+app.get('/profile', function (req, res) {
+  AV.User.become(req.headers['x-lc-session']).then(user => {
+    res.send(user);
+  }).catch(err => {
+    res.send({ error: err.message });
+  });
+});
+
+app.post('/todos', function (req, res) {
+  var todo = new Todo();
+  todo.save(req.body, { sessionToken: req.headers['x-lc-session'] }).then(() => {
+    res.send(todo);
+  }).catch(err => {
+    res.send({ error: err.message });
+  });
+});
+```
+
+### 云引擎下如何管理用户会话？
+
+使用各框架自带的组件或第三方模块即可。
+
+例如：
+
+- Node.js 的 Express 框架可以使用 [cookie-session](https://github.com/expressjs/cookie-session) 组件。它和 `AV.Cloud.CookieSession` 组件可以并存。注意，Express 框架的 `express.session.MemoryStore` 在云引擎中是无法正常工作的，因为云引擎是多主机、多进程运行，因此内存型 session 是无法共享的。
+- Python 的 Flask 框架和 Django 框架都自带 session 组件。
+- PHP 可以使用 SDK 提供的 `CookieStorage` 保存会话属性。注意，PHP 默认的 `$_SESSION` 在云引擎中是无法正常工作的，因为云引擎是多主机、多进程运行，因此内存型 session 是无法共享的。
+### 云引擎下如何发送 HTTP 请求？
+
+使用各语言的标准库或社区提供的模块即可。
+
+例如：
+
+- Node.js 项目可以使用 [superagent] 等社区提供的模块。
+- Python 项目可以使用标准库中的 `urllib.request` 模块或社区的 [requests] 模块。
+- PHP 项目可以使用 PHP 内置的 `curl` 模块或 [guzzle] 等第三方库。
+- Java 项目可以使用 `URL` 或者是 `HttpClient` 等基础类或 [OkHttp] 等第三方库。
+
+[superagent]: https://www.npmjs.com/package/superagent
+[requests]: https://docs.python-requests.org/en/master/
+[guzzle]: https://docs.guzzlephp.org/en/stable/
+[OkHttp]: https://square.github.io/okhttp/
+
+### 云引擎下如何获取客户端 IP？
+
+如果你想获取客户端的 IP，可以直接从用户请求的 HTTP 头的 `x-real-ip` 字段获取。
+下面给出各语言的示例代码。
+
+Node.js（Express）：
+
+```js
+app.get('/', function (req, res) {
+  var ipAddress = req.headers['x-real-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  console.log(ipAddress);
+  res.send(ipAddress);
+});
+```
+
+Python（Flask）：
+
+```python
+from flask import Flask
+from flask import request
+
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    print(request.headers['x-real-ip'])
+    return 'ok'
+```
+
+Python（Django）：
+
+```python
+def index(request):
+    print(request.META['HTTP_X_REAL_IP'])
+    return render(request, 'index.html', {})
+```
+
+PHP：
+
+```php
+$app->get('/', function($req, $res) {
+  error_log($_SERVER['HTTP_X_REAL_IP]);
+  return $res;
+});
+```
+
+Java：
+
+```java
+EngineRequestContext.getRemoteAddress();
+```
+
+Go（Echo）：
+
+```go
+func fetchRealIP(c echo.Context) error {
+  realIP = c.RealIP()
+  //...
+}
+```
+
+注意，国内节点的云引擎应用，如果启用了边缘节点加速功能，由于边缘节点的限制，可能无法获取客户端 IP。
+如需获取客户端 IP，建议绑定独立 IP。
+
+### 云引擎如何上传文件？
+
+托管在云引擎的网站可以使用相应 SDK 提供的接口上传文件。
+不过，一般情况下建议在客户端 SDK 上传文件，而不是通过云引擎中转，以免增加不必要的云引擎流量。
+
+### 云引擎下如何重定向到 HTTPS？
+
+大部分 SDK 提供了重定向至 HTTPS 的中间件。
+部署并发布到生产环境之后，访问你的 LeanEngine 网站都会强制通过 HTTPS 访问。
+
+Node.js（Express）：
+
+```js
+app.enable('trust proxy');
+app.use(AV.Cloud.HttpsRedirect());
+```
+
+Node.js（Koa）：
+
+```js
+app.proxy = true;
+app.use(AV.Cloud.HttpsRedirect({ framework: 'koa' }));
+```
+
+Python：
+
+```python
+import leancloud
+
+application = get_your_wsgi_func()
+
+application = leancloud.HttpsRedirectMiddleware(application)
+```
+
+PHP（Slim）：
+
+```php
+SlimEngine::enableHttpsRedirect();
+$app->add(new SlimEngine());
+```
+
+Java：
+
+```java
+LeanEngine.setHttpsRedirectEnabled(true);
+```
+
+Go SDK 暂未提供跳转至 HTTPS 的中间件。
+
+.NET：
+
+```cs
+app.UseHttpsRedirection();
+```
+
+### 如何判断请求是通过 HTTPS 还是 HTTP 访问的？
+
+因为 HTTPS 加密是在负载均衡层面处理的，所以通常部署在云引擎上的 web 框架获取的请求 URL 总是使用 HTTP 协议，建议通过 `X-Forwarded-Proto` HTTP 头来判断原请求是通过 HTTP 还是 HTTPS 访问的。
+
+
+### 每个应用最多有几个实例？
+
+每个应用最多拥有 12 个实例，如果需要更多资源请通过工单联系我们的技术支持。
+
+### 在线上无法读取到项目中的文件怎么办？
+
+建议先检查文件大小写是否正确，线上的文件系统是区分大小写的，而 Windows 和 macOS 通常不区分大小写。
+
+### 云引擎响应时间增加怎么办
+
+响应时间的增加有很多种原因：可能因为只是单纯的请求处理的数据更加复杂导致耗时变长；也有可能是因为请求量过高实例的处理能力不足从而导致响应时间增加。
+建议分析当前的代码并参考 CPU、内存占用量找出瓶颈，确定是否需要调高实例规格或增加实例数量。
+如果需要定位具体是哪些 API 或云函数响应较慢，可以下载访问日志分析。
+
+### 如何下载云引擎的应用日志和访问日志
+
+云引擎的应用日志（程序的标准输出和标准错误输出）可以在 **云服务控制台 > 云引擎 > 云引擎分组 > 日志** 查看；并且可以使用命令行工具导出最长 7 天的日志。
+
+云引擎的访问日志（Access Log）同样可以在**云服务控制台 > 云引擎 > 访问日志**导出。
+## 部署
+
+### 云引擎下如何自定义系统级依赖？
+
+在云引擎的线上环境中，你可以通过 `leanengine.yaml` 文件的 `systemDependencies` 部分来自定义系统级依赖：
+
+```yaml
+systemDependencies:
+  - imagemagick
+```
+
+目前支持的选项包括：
+
+- `ffmpeg` 一个音视频处理工具库。
+- `imagemagick` 一个图片处理工具库。
+- `fonts-wqy` 文泉驿点阵宋体、文泉驿微米黑，通常和 `phantomjs` 或 `chrome-headless` 配合来显示中文。
+- `fonts-noto` 思源黑体（体积较大）。
+- `phantomjs` 一个无 UI 的 WebKit 浏览器（该项目已停止维护）。
+- `chrome-headless` 一个无 UI 的 Chrome 浏览器（体积很大，会显著增加部署耗时，运行时也会消耗大量 CPU 和内存；如果使用 `puppeter` 的话，需要给 `puppeteer.launch` 传递这些参数：`{executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox', '--disable-setuid-sandbox']}`；暂不支持 Java）。
+- `node-canvas` 安装 `node-canvas` 所需要的系统级依赖（你仍需要安装 `node-canvas`）。
+- `python-talib` 金融市场数据分析库。
+
+注意添加系统依赖将会拖慢部署速度，因此请不要添加未用到的依赖。
+
+### 云引擎中设置的环境变量无效？
+
+默认情况下，应用在运行阶段才能够读取到内置环境变量和自定义环境变量。
+如果希望在安装依赖或编译阶段就能读取到这些环境变量，需要在 `leanengine.yaml` 里设置：
+
+```yaml
+exposeEnvironmentsOnBuild: true
+```
+
+云引擎运行环境默认提供的环境变量（以及 Node.js 环境变量 `NODE_ENV`）无法被自定义环境变量覆盖（覆盖无效）。
+
+### 部署更新云引擎会导致服务中断吗？
+
+服务不会中断。在代码部署时，系统会优先启动使用新版本代码的实例，待新实例通过了健康检查，系统修改路由将请求转发至新实例后，再关闭旧版本的实例，让服务保持零中断。 
+
+
+### 部署时长时间卡在「正在下载和安装依赖」怎么办？
+
+这个步骤对应在云端调用各个语言的包管理器（`npm`、`pip`、`composer`、`maven`）安装依赖的过程，我们有一个依赖缓存机制来加速这个安装过程，但缓存可能会因为很多原因失效（比如修改了依赖列表），在缓存失效时会比平时慢很多，请耐心等待。如果你在 `leanengine.yaml` 中指定了系统依赖也会在这个步骤中安装，因此请不要添加未用到的依赖。
+
+对于 Node.js 建议检查是否在 `package-lock.json` 或 `yarn.lock` 中指定了较慢的源。
+
+### 部署到多个实例时，部分实例失败需要重新部署吗？
+
+同一环境（预备/生产）下有多个实例时，云引擎会同时在所有实例上部署项目。如因偶然因素部分实例部署不成功，会在几分钟后自动尝试再次部署，无需手动重新部署。
+
+### 云引擎实例部署后控制台多次显示「部署中」是怎么回事？
+
+控制台显示的「部署中」状态泛指所有运维操作，例如唤醒休眠实例、服务器偶发故障引起的重新部署，不只是用户主动进行的部署。
+
+### 云引擎的健康检查是什么？
+
+云引擎的管理系统会每隔几分钟检查所有实例的工作状态（通过 HTTP 检查，详见《网站托管开发指南》的《健康监测》一节。
+如果实例无法正确响应的话，管理系统会触发一次重新部署，并在控制台上打印类似下面的日志：
+
+> 健康检查失败：web1 检测到 Error connect ECONNREFUSED 10.19.30.220:51797
+
+如果一周内发生一两次属正常现象（有可能是我们的服务器出现偶发的故障，因为会立刻重新部署，对服务影响很小），如果频繁发生可能是你的程序资源不足，或存在其他问题（运行一段时间后不再响应 HTTP 请求），需结合具体情况来分析。
+
+### 不使用 SDK 的情况下，该如何实现健康监测和云函数元信息路由？
+
+不使用 SDK 的情况下，需要自行实现相关路由。
+下面给出 Java 和 PHP 的例子供参考。
+
+健康监测：
+
+```java
+// 健康监测 router
+@WebServlet(name = "LeanEngineHealthServlet", urlPatterns = {"/__engine/1/ping"})
+public class LeanEngineHealthCheckServlet extends HttpServlet {
+
+  @Override
+  protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+      throws ServletException, IOException {
+    resp.setHeader("content-type", "application/json; charset=UTF-8");
+    JSONObject result = new JSONObject();
+    result.put("runtime", System.getProperty("java.version"));
+    result.put("version", "custom");
+    resp.getWriter().write(result.toJSONString());
+  }
+}
+```
+
+```php
+$app->get('/__engine/1/ping', function($req, $res) {
+    // PSR-7 response is immutable
+    $response = $res->withHeader("Content-Type", "application/json");
+    $response->getBody()->write(json_encode(array(
+        "runtime" => "php-" . phpversion(),
+        "version" => "custom"
+    )));
+    return $response;
+});
+```
+
+云函数元信息：
+
+```java
+@WebServlet(name = "LeanEngineMetadataServlet", urlPatterns = {"/1.1/functions/_ops/metadatas"})
+public class LeanEngineMetadataServlet extends HttpServlet {
+
+  @Override
+  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException,
+      IOException {
+    resp.setContentType("application/json; charset=UTF-8");
+    resp.getWriter().write("{\"result\":[]}");
+  }
+}
+```
+
+```php
+app.get('/1.1/_ops/functions/metadatas', function(req, res) {
+    $response = $res->withHeader("Content-Type", "application/json");
+    $response->getBody()->write(json_encode(array(
+        "result" => array()
+    )));
+    return $response;
+});
+```
+
+### 云引擎的启动限制时间是多久？
+
+你的应用在启动时，云引擎的管理程序会每秒去检查你的应用是否启动成功，如果超过启动时间限制仍未启动成功，即认为启动失败。
+启动时间限制默认为 30 秒，如需延长或缩短，可以在 leanengine.yaml` 文件中指定 `startupTimeout`，可设置范围为 15 – 120 秒。
+
+### 多次部署同一个项目时镜像大小为什么差别那么大？
+
+云引擎底层有一套缓存机制以加速构建过程，所以部署时显示的「存储镜像到仓库」后面的大小表示本次构建新产生的数据，可用于评估是否利用到了缓存，不代表整个项目的大小。
+
+### Gitlab 部署常见问题
+
+很多用户自己使用 [Gitlab](http://gitlab.org/) 搭建了自己的源码仓库，有时可能会遇到无法部署到 LeanCloud 的问题，即使设置了 Deploy Key，却仍然要求输入密码。
+
+可能的原因和解决办法如下：
+
+* 确保你 Gitlab 运行所在服务器的 /etc/shadow 文件里的 git（或者 gitlab）用户一行的 `!`修改为 `*`，原因参考 [Stackoverflow - SSH Key asks for password](http://stackoverflow.com/questions/15664561/ssh-key-asks-for-password)，并重启 SSH 服务：`sudo service ssh restart`。
+* 在拷贝 Deploy Key 时，确保没有多余的换行符号。
+* Gitlab 目前不支持有注释的 Deploy Key。早期 LeanCloud 用户生成的 Deploy Key 末尾可能带有注释（类似于 `App dxzag3zdjuxbbfufuy58x1mvjq93udpblx7qoq0g27z51cx3's cloud code deploy key`），需要删除掉这部分再保存到 Gitlab。
+
+## 命令行工具
+### 使用 Homebrew 安装命令行工具失败
+
+有些地区 Homebrew 访问网络可能很慢，可以通过设置环境变量 `http_proxy`、`https_proxy`、`all_proxy` 加速访问（详见 [man brew]），或者也可以配置 Homebrew [索引][tuna]和[二进制预编译包][tuna-bottles]的镜像。
+
+[man brew]: https://docs.brew.sh/Manpage
+[tuna]: https://mirror.tuna.tsinghua.edu.cn/help/homebrew/
+[tuna-bottles]: https://mirrors.tuna.tsinghua.edu.cn/help/homebrew-bottles/
+
+或者也可以在 [GitHub releases 页面]下载适用于 macOS 的二进制文件，重命名为 `lean`　后移动到 `$PATH` 下的路径，并添加可执行权限（`chmod a+x /path/to/lean`）。
+如果运行 `lean` 时 macOS 报错「来自身份不明的开发者」，那么需要在 macOS 系统设置「隐私与安全」下配置一下，详见 [Apple 官方文档][HT202491]。
+
+[GitHub releases 页面]: https://releases.leanapp.cn/#/leancloud/lean-cli/releases
+[HT202491]: https://support.apple.com/en-us/HT202491
+
+### 之前使用 `npm` 装过旧版的命令行工具，如果升级到新版？
+
+如果之前使用 `npm` 安装过旧版本的命令行工具，为了避免与新版本产生冲突，建议使用 `npm uninstall -g leancloud-cli` 卸载旧版本命令行工具。或者直接按照 `homebrew` 的提示，执行 `brew link --overwrite lean-cli` 覆盖掉之前的 `lean` 命令来解决。
+
+### 命令行工具初始化项目时报错 `please login first`，可是之前明明已经通过 `lean login` 成功登录了？
+
+如果通过 `lean login` 登录的账号名下没有 LeanCloud 应用，会碰到这一问题。
+需要创建一个应用再重新运行一下 `lean login`，之后就可以正常使用了。
+
+### 使用命令行工具部署失败怎么办？
+
+部署失败有多种原因，请根据显示的报错信息耐心排查。
+一般来说，如果您使用命令行工具部署，首先建议您检查命令行工具是否是最新版，如果不是最新版，先升级到最新版再重试。
+
+### 命令行工具在本地调试时提示 `Error: listen EADDRINUSE :::3000`，无法访问应用
+
+`listen EADDRINUSE :::3000` 表示你的程序默认使用的 3000 端口被其他应用占用了，可以按照下面的方法找到并关闭占用 3000 端口的程序：
+
+* [macOS 使用 `lsof` 和 `kill`](http://stackoverflow.com/questions/3855127/find-and-kill-process-locking-port-3000-on-mac)
+* [Linux 使用 `fuser`](http://stackoverflow.com/questions/11583562/how-to-kill-a-process-running-on-particular-port-in-linux)
+* [Windows 使用 `netstat` 和 `taskkill`](http://stackoverflow.com/questions/6204003/kill-a-process-by-looking-up-the-port-being-used-by-it-from-a-bat)
+
+也可以修改命令行工具默认使用的 3000 端口：
+```
+lean -p 3002
+```
+
+### 同一个项目如何批量部署到多个应用的云引擎？
+
+可以通过 `lean switch` 切换项目所属应用，然后通过 `lean deploy` 部署。
+`lean switch` 支持通过参数以非交互的方式使用：
+
+```sh
+lean switch --region REGION --group GROUP_NAME APP_ID
+lean deploy --prod 1
+```
+
+上述命令中，`REGION` 代表应用所在区域，目前支持的值为 `cn-n1`（华北节点）、`cn-e1`（华东节点）、`us-w1`（国际版）。
+`--prod 1` 表示部署到生产环境，如果希望部署到预备环境，换成 `lean deploy` 即可。
+基于这两个命令可以自行编写 CI 脚本快速部署至多个应用的云引擎实例。
+
+### 命令行工具的 metric 命令有什么用？
+
+使用 `metric` 命令可以查看 LeanStorage 的状态报告：
+
+```sh
+$ lean metric --from 2017-09-07
+[INFO] Retrieving xxxxxx storage report
+Date                 2017-09-07   2017-09-08   2017-09-09
+API Requests         49           35           14
+Max Concurrent       2            2            2
+Mean Concurrent      1            1            1
+Exceed Time          0            0            0
+Max QPS              5            5            5
+Mean Duration Time   9ms          21ms         7ms
+80% Duration Time    15ms         22ms         9ms
+95% Duration Time    26ms         110ms        25ms
+```
+
+相关状态的描述如下：
+
+<table>
+	<tr><th width="35%">状态</th><th>描述</th></tr>
+	<tr><td>`Date`</td><td>日期</td></tr>
+	<tr><td>`API Requests`</td><td>API 请求次数</td></tr>
+	<tr><td>`Max Concurrent`</td><td>最大工作线程数</td></tr>
+	<tr><td>`Mean Concurrent`</td><td>平均工作线程数</td></tr>
+	<tr><td>`Exceed Time`</td><td>超限请求数</td></tr>
+	<tr><td>`Max QPS`</td><td>最大 QPS</td></tr>
+	<tr><td>`Mean Duration Time`</td><td>平均响应时间</td></tr>
+	<tr><td>`80% Duration Time`</td><td>80% 响应时间</td></tr>
+	<tr><td>`95% Duration Time`</td><td>95% 响应时间</td></tr>
+</table>
+
+`metric` 接收参数与 `logs` 类似，具体参考 `lean metric -h`。
+
+### 如何通过命令行工具上传文件至文件服务？
+
+
+```sh
+$ lean upload public/index.html
+Uploads /Users/dennis/programming/avos/new_app/public/index.html successfully at: http://ac-7104en0u.qiniudn.com/f9e13e69-10a2-1742-5e5a-8e71de75b9fc.html
+```
+
+文件上传成功后会自动生成在云端的 URL，即上例中 `successfully at:` 之后的信息。
+
+上传 images 目录下的所有文件：
+
+```sh
+$ lean upload images/
+```
+
+### 如何扩展命令行工具的功能？
+
+有时我们需要对某个应用进行特定并且频繁的操作，比如查看应用 `_User` 表的记录总数，这样可以使用命令行工具的自定义命令来实现。
+
+只要在当前系统的 `PATH` 环境变量下，或者在项目目录 `.leancloud/bin` 下存在一个以 `lean-` 开头的可执行文件，比如 `lean-usercount`，那么执行 `$ lean usercount`，命令行工具就会自动调用这个可执行文件。与直接执行 `$ lean-usercount` 不同的是，这个命令可以获取与应用相关的环境变量，方便访问对应的数据。
+
+例如将如下脚本放到当前系统的 `PATH` 环境变量中（比如 `/usr/local/bin`）：
+
+```python
+#! /bin/env python
+
+import sys
+
+import leancloud
+
+app_id = os.environ['LEANCLOUD_APP_ID']
+master_key = os.environ['LEANCLOUD_APP_MASTER_KEY']
+
+leancloud.init(app_id, master_key=master_key)
+print(leancloud.User.query.count())
+```
+
+同时赋予这个脚本可执行权限 `$ chmod +x /usr/local/bin/lean-usercount`，然后执行 `$ lean usercount`，就可以看到当前应用对应的 `_User` 表中记录总数了。
+
+## 云函数
+
+### 云函数有哪些限制？
+
+云函数是 LeanCloud 提供的一个 **相对受限** 的自定义服务器端逻辑的功能，和我们的 SDK 有比较 **深度的集成**。我们将云函数设计为一种类似 **RPC** 的机制，在云函数中你只能关注参数和结果，而不能自定义超时时间、HTTP Method、URL，不能读取和设置 Header。如果希望更加自由地使用这些 HTTP 的语义化功能，或者希望使用第三方的框架提供标准的 RESTful API，请使用云引擎的网站托管功能自行来处理 HTTP 请求。
+
+### 项目部署成功了，但云函数和 Hook 不可用？
+
+为了支持云引擎的云函数和 Hook 功能，云引擎的管理程序会使用 `/1.1/functions/_ops/metadatas` 这个 URL 和 SDK 交互，请确保将这个 URL 交给 SDK 处理。
+默认情况下，云引擎会尝试从 `/1.1/functions/_ops/metadatas` 获取云函数和 Hook 的元信息，如果失败，则云函数和 Hook 功能不可用，但不会中断部署。
+如果希望在获取元信息失败后中断部署，可以在 `leanengine.yaml` 文件中指定 `functionsMode` 为 `strict`。
+如果应用不使用云函数和 Hook 功能，那么你可以：
+
+- 在 `leanengine.yaml` 中不指定 `functionsMode`，同时 `/1.1/functions/_ops/metadatas` **返回一个 HTTP `404`** 表示不使用云函数和 Hook 相关的功能；
+- 或者在 `leanengine.yaml` 中指定 `functionsMode` 为 `disabled`。注意，这种情况下，即使应用代码中定义了云函数和 Hook，Hook 也不会生效，云函数调用（通过 SDK 发起远程调用或通过 REST API 向 API 域名发起云函数调用）有可能因为被转发到错误的云引擎分组而失败。 
+
+### 部署中断，提示有同名云函数怎么办？
+
+云引擎支持多个分组。
+如果当前部署代码中部分云函数与其他组的同名，默认情况会提示错误并中断部署，防止意外重复定义云函数。
+我们建议你移除不需要的云函数，毕竟重复定义的云函数并不易于理解和维护。
+不过，你也可以通过在每次部署时额外指定 `--overwrite-functions` 参数强制替换其他组云函数的实现。
+
+### 为什么 Class Hook 没有被运行？
+
+首先确认一下 Hook 被调用的时机是否与你的理解一致：
+
+* `beforeSave`：对象保存或创建之前
+* `afterSave`：对象保存或创建之后
+* `beforeUpdate`：对象更新之前
+* `afterUpdate`：对象更新之后
+* `beforeDelete`：对象删除之前
+* `afterDelete`：对象删除之后
+* `onVerified`：用户通过邮箱或手机验证后
+* `onLogin`：用户在进行登录操作时（`become(sessionToken)` 不是登录操作，因此不会调用 `onLogin`）
+
+还需注意在本地进行云引擎调试时，运行的会是线上预备环境的 Hook，如果没有预备环境则不会运行。
+
+然后检查 Hook 函数是否被执行过：
+
+可以先在 Hook 函数的入口打印一行日志，然后进行操作，再到云引擎日志中检查该行日志是否被打印出来，如果没有看到日志原因可能包括：
+
+* 代码没有被部署到正确的应用
+* 代码没有被部署到生产环境（或没有部署成功）
+* Hook 的类名不正确
+
+如果日志已打出，则继续检查函数是否成功，检查控制台上是否有错误信息被打印出。如果是 before 类 Hook，需要保证 Hook 函数在 15 秒内结束，否则会被系统认为超时。
+
+after 类 Hook 超时时间为 3 秒，如果你的体验实例已经休眠，很可能因为启动时间过长无法收到 after 类 Hook，建议升级到云引擎的标准实例避免休眠。
+
+### 可以在云函数中未登录的情况下查询 _User 表吗？
+
+在云函数里可以用 masterKey 跳过权限检查，未登录也可直接查询 _User 表。
+
+因为云引擎运行在可信的服务器端环境中，所以你可以全局开启超级权限（Master Key），这样云端会跳过包括 ACL 和 Class 权限在内的检查，让你自由地操作所有云存储中的数据。具体细节可以参考《云函数开发指南》的《Master Key 和超级权限》一节。
+
+### 调用云函数时，如何指定请求所发往的环境？
+
+云引擎应用有「生产环境」和「预备环境」之分。在云引擎通过 SDK 调用云函数时，包括显式调用以及隐式调用（由于触发 hook 条件导致 hook 函数被调用），SDK 会根据云引擎所属环境（预备、生产）调用相应环境的云函数。例如，假定定义了 `beforeDelete` 云函数，在预备环境通过 SDK 删除一个对象，会触发预备环境的 `beforeDelete` hook 函数。
+
+在云引擎以外的环境通过 SDK 显式或隐式调用云函数时，`X-LC-Prod` 的默认值一般为 `1`，也就是调用生产环境。但由于历史原因，各 SDK 的具体行为有一些差异：
+
+- 在 Node.js、PHP、Java、C# 这三个 SDK 下，默认总是调用生产环境的云函数。
+- 在 Python SDK 下，配合 lean-cli 本地调试时，且应用存在预备环境时，默认调用预备环境的云函数，其他情况默认调用生产环境的云函数。
+- 云引擎 Java 环境的模板项目 [java-war-getting-started] 和 [spring-boot-getting-started] 做了处理，配合 lean-cli 本地调试时，且应用存在预备环境时，默认调用预备环境的云函数，其他情况默认调用生产环境的云函数（与 Python SDK 的行为一致）。
+
+[java-war-getting-started]: https://github.com/leancloud/java-war-getting-started/
+[spring-boot-getting-started]: https://github.com/leancloud/spring-boot-getting-started/
+
+你还可以在 SDK 中指定客户端将请求所发往的环境：
+
+<MultiLang>
+
+```cs
+LCCloud.IsProduction = true; // production (default)
+LCCloud.IsProduction = false; // stage
+```
+```java
+LCCloud.setProductionMode(true); // production
+LCCloud.setProductionMode(false); // stage
+```
+```objc
+[LCCloud setProductionMode:YES]; // production (default)
+[LCCloud setProductionMode:NO]; // stage
+```
+```swift
+// production by default
+
+// stage
+do {
+    let environment: LCApplication.Environment = [.cloudEngineDevelopment]
+    let configuration = LCApplication.Configuration(environment: environment)
+    try LCApplication.default.set(
+        id: {{appid}},
+        key: {{appkey}},
+        serverURL: "https://please-replace-with-your-customized.domain.com",
+        configuration: configuration)
+} catch {
+    print(error)
+}
+```
+```dart
+LCCloud.setProduction(true); // production (default)
+LCCloud.setProduction(false); // stage
+```
+```js
+AV.setProduction(true); // production (default)
+AV.setProduction(false); // stage
+```
+```python
+leancloud.use_production(True) # production (default)
+leancloud.use_production(False) # stage
+# 需要在 SDK 初始化语句 `leancloud.init` 之前调用
+```
+```php
+LeanClient::useProduction(true); // production (default)
+LeanClient::useProduction(false); // stage
+```
+```go
+// 暂不支持（总是使用生产环境）
+```
+
+</MultiLang>
+
+免费版云引擎应用只有「生产环境」，因此请不要切换到预备环境。
+
+### 云引擎创建的新的分组，可以调试云函数吗？
+
+云引擎的各个分组都支持定义云函数（包括 Hook 函数和定时任务）。
+
+每个分组都有独立的预备环境用于测试代码、独立的域名供外部访问，每个分组的环境变量、代码仓库等设置也是独立的，可以单独对一个组部署代码。你可以在分组中创建和管理实例，如果组中没有实例就无法响应请求，如果组中有多个实例便可以提供负载均衡和高可用的能力。
+
+### 客户端如何调用云引擎分组中的云函数？
+
+2020 年 10 月份云引擎已经[在所有分组上支持了云函数](https://leancloudblog.com/cloud-functions-on-all-groups/)，如果你的应用的不同分组上不存在重复定义的云函数，客户端直接调用云函数，在云引擎这边能自动根据名称路由到正确的分组（对客户端来说是透明的）。
+
+## 定时任务和云队列
+
+### 定时任务应该在预备环境还是生产环境执行？
+
+系统赠送的预备环境体验实例会自动休眠，可能干扰定时任务的执行，因此一般建议在预备环境测试定时任务，在生产环境正式执行定时任务。
+如果定时任务 CPU、内存占用非常高，担心影响生产环境的网站托管功能或其他云函数访问，那么可以在预备环境购买标准实例，并在预备环境执行定时任务。
+
+## Node.js
+
+### 怎么添加第三方模块
+
+只需要像普通的 Node.js 项目那样，在项目根目录的 `package.json` 中添加依赖即可：
+
+```
+{
+  "dependencies": {
+    "lodash": "^4.17.11",
+    "nanoid": "^3.1.10"
+  }
+}
+```
+
+`dependencies` 内的内容表明了该项目依赖的三方模块（比如示例中的 `lodash` 和 `nanoid`）。关于 `package.json` 的更多信息见《网站托管开发指南》。
+
+然后即可在代码中使用第三方包（`const { nanoid } = require("nanoid");`），如需在本地调试还需运行 `npm install` 来安装这些包。
+
+**注意**：命令行工具部署时不会上传 `node_modules` 目录，因为云引擎服务器会根据 `package.json` 的内容自动下载三方包。所以也建议将 `node_modules` 目录添加到 `.gitignore` 中，使其不加入版本控制。
+
+### Node.js 项目的 `devDependencies` 没有安装？
+
+云引擎会在部署时用 `npm ci` 为你安装项目依赖，包括 `devDependencies`。
+不过，如果项目的 Node.js 版本小于 10，则会使用 `npm install --production` 安装依赖，相应地，`devDependencies` 中列出的依赖**不会**安装。
+如需安装 `devDependencies`，请在项目的 `leanengine.yaml` 中指定 `installDevDependencies: true`。
+
+### `npm ERR! peer dep missing` 错误怎么办？
+
+部署时出现类似错误：
+
+```
+npm ERR! peer dep missing: graphql@^0.10.0 || ^0.11.0, required by express-graphql@0.6.11
+```
+
+说明有一部分 peer dependency 没有安装成功，因为 Node.js 版本小于 10 时，线上只会安装 dependencies 部分的依赖，所以请确保 dependencies 部分依赖所需要的所有依赖也都列在了 dependencies 部分（而不是 devDependencies）。
+
+你可以在本地删除 node_modules，然后用 `npm install --production` 重新安装依赖来重现这个问题。
+
+或者，你也可以考虑将项目升级到 Node.js 10 以上的版本。
+
+### Node.js 项目中同时包含 `package-lock.json` 和 `yarn.lock` 时，以哪个文件为准？
+
+- 如果你的应用目录中含有 `package-lock.json`，那么会根据 lock 中的描述进行安装（需要 Node.js 8.0 以上）。
+- 如果你的应用目录中含有 `yarn.lock`，那么会使用 `yarn install` 代替 `npm install` 来安装依赖（需要 Node.js 4.8 以上）。
+- 如果你的应用目录中同时包含 `package-lock.json` 和 `yarn.lock`，云引擎会使用 `yarn install`。换言之，`yarn.lock` 优先。
+
+如果不希望使用 `yarn.lock`，请将它们加入 `.gitignore`（Git 部署时）或 `.leanengineignore`（命令行工具部署时）。
+
+另外，也请注意 `yarn.lock` 中包含了下载依赖的 URL，请选择合适的源，否则可能拖慢云引擎部署。
+
+### Node.js 项目如何打印 SDK 发出的网络请求？
+
+你可以通过设置一个 `DEBUG=leancloud:request` 的环境变量来打印由 SDK 发出的网络请求。在本地调试时你可以通过这样的命令启动程序：
+
+```sh
+env DEBUG=leancloud:request lean up
+```
+
+当有对 LeanCloud 的调用时，你可以看到类似这样的日志：
+
+```sh
+leancloud:request request(0) +0ms GET https://{{host}}/1.1/classes/Todo?&where=%7B%7D&order=-createdAt { where: '{}', order: '-createdAt' }
+leancloud:request response(0) +220ms 200 {"results":[{"content":"1","createdAt":"2016-08-09T06:18:13.028Z","updatedAt":"2016-08-09T06:18:13.028Z","objectId":"57a975a55bbb5000643fb690"}]}
+```
+
+我们不建议在线上生产环境开启这个日志，否则将会打印大量的日志。如有必要，可以指定 `DEBUG=leancloud:request:error`，只打印出错的网络请求。
+
+### 如何排查云引擎 Node.js 内存使用过高（内存泄漏）？
+
+首先建议检查云引擎日志，检查每分钟请求数、响应时间、CPU、内存统计，查看是否存在其他异常情况，如果有的话，先解决其他的问题。如果是从某个时间点开始内存使用变高，建议检查这个时间点之前是否有部署新版本，然后检查新版本的代码改动或尝试回滚版本。
+
+然后这里有一些常见的原因可供对照检查：
+
+- 如果使用 cluster 多进程运行，内存使用会成倍增加（取决于运行几个 Worker）。
+- 如果在代码中不断地向一个全局对象（或生命周期较长的对象）上添加新的对象或闭包的引用（例如某种缓存），那么在运行过程中内存使用会逐渐增加（即内存泄漏）。
+- 如果响应时间增加（例如对请求的处理卡在慢查询、第三方网络请求），那么程序同时处理的请求数量会增加（即请求堆积），会占用很多内存。
+- 也有可能是业务本身在增加，确实需要这么多内存。
+
+如果还不能找到原因，可以尝试一些更高级的工具：
+
+- [heapdump](https://github.com/bnoordhuis/node-heapdump) 或 [v8-profiler](https://github.com/node-inspector/v8-profiler)：可以导出一份内存快照，快照文件可以被下载到本地，通过 Chrome 打开，可以看到内存被哪些对象占用。如果能在本地复现的话，建议尽量在本地运行，如需线上运行则你需要自己编码实现发送信号、下载快照文件等功能。
+- `--trace_gc`：可以在 GC 时在标准输出打印简要的日志，包括 GC 的类型、耗时，GC 前后的堆体积和对象数量（在 `package.json` 的 `scripts.start` 里改成 `node --trace_gc server.js` 来开启）。
+
+其他参考资料（第三方）：
+
+- [Node.js 调试 GC 以及内存暴涨的分析](https://blog.devopszen.com/node-js_gc)
+- [Node.js Performance Tip: Managing Garbage Collection](https://strongloop.com/strongblog/node-js-performance-garbage-collection/)
+- [Node.JS Profile 1.2 V8 GC详解](https://xenojoshua.com/2018/01/node-v8-gc/)
+
+### 如何排查云引擎 Node.js CPU 使用过高（响应缓慢）？
+
+首先建议检查云引擎日志，检查每分钟请求数、响应时间、CPU、内存统计，查看是否存在其他异常情况，如果有的话，先解决其他的问题。如果是从某个时间点开始 CPU 使用变高，建议检查这个时间点之前是否有部署新版本，然后检查新版本的代码改动或尝试回滚版本。
+
+然后这里有一些常见的原因可供对照检查：
+
+- 如果内存使用率较高、或频繁分配和释放大量对象，那么 GC 会占用一些 CPU 也会导致卡顿，可以用 `--trace_gc` 打开 GC 日志来确认 GC 的影响。
+- 程序中有死循环或失去控制（数量不断增加）的 setTimeout 或 setInterval。
+- 也有可能是业务本身在增加，确实需要这么多 CPU。
+
+因为 Node.js 是基于单线程的事件循环模型，如果事件循环中新的任务一直得不到执行（即事件循环被「阻塞」），那么就会造成 CPU 不高，但响应缓慢或不响应的情况。导致事件循环被阻塞的场景情况包括：
+
+- 密集的纯计算，例如执行时间非常长的同步循环、序列化（JSON 等）、复杂的数学（密码学）运算、复杂度非常高的正则表达式。
+- 同步的 IO 操作，例如 `fs.readFileSync`、`child_process.execSync` 或含有这些同步操作的第三方包（例如 `sync-request`）。
+- 不断向事件循环中添加新的任务，例如 `process.nextTick` 或 `setImmediate`，导致事件队列中的任务一直执行不完。
+
+其他会导致 Node.js 响应慢或不响应的情况：
+
+- 使用了 Node.js 中底层采用线程数实现的 API，包括 `dns.lookup`（多数 HTTP 客户端间接使用了该函数）、所有文件系统 API，如果大量使用这些 API 或这些操作非常慢，则会产生额外的等待。
+
+如果能不能找到原因，可以尝试一些更高级的工具：
+
+- `node --prof`：可以统计程序中每一个函数的执行耗时和调用关系，导出一份日志文件，可以用 `node --prof-process` 来生成一份报告，包括占用 CPU 时间最多的函数（包括 JavaScript 和 C++ 部分）列表。`node --prof` 对性能本身的影响很大，长时间运行生成的日志也很大，建议尽量在本地运行，如需在线上运行则需要你自己编码实现生成报告、下载报告等功能。
+- [v8-profiler](https://github.com/node-inspector/v8-profiler)：可以生成一份 CPU 日志，可以下载到本地后通过 Chrome 打开，可以看到每个函数的执行时间和调用关系。v8-profiler 对性能本身的影响很大，长时间运行生成的日志也很大，建议尽量在本地运行，如需在线上运行则需要你自己编码实现开始生成日志、下载报告等功能。
+
+其他参考资料（第三方）：
+
+- [不要阻塞你的事件循环](https://nodejs.org/zh-cn/docs/guides/dont-block-the-event-loop/)
+- [Node.JS Profile 4.1 Profile实践](https://xenojoshua.com/2018/02/node-profile-practice/)
+- [手把手测试你的JS代码性能](https://cnodejs.org/topic/58b562f97872ea0864fee1a7)
+- [Speed Up JavaScript Execution](https://developers.google.com/web/tools/chrome-devtools/rendering-tools/js-execution)
+
+### Maximum call stack size exceeded 如何解决？
+
+**将 JavaScript SDK 和 Node SDK 升级到 1.2.2 以上版本可以彻底解决该问题。** 
+
+如果你的应用时不时出现 `Maximum call stack size exceeded` 异常，可能是因为在 hook 中调用了 `AV.Object.extend`。有两种方法可以避免这种异常：
+
+- 升级 leanengine 到 v1.2.2 或以上版本
+- 在 hook 外定义 Class（即定义在 `AV.Cloud.define` 方法之外），确保不会对一个 Class 执行多次 `AV.Object.extend`
+
+### 「在线编辑」和「项目部署」可以混用吗？
+
+「在线编辑」的产生是为了方便大家初次体验云引擎，或者只是需要一些简单 hook 方法的应用使用。我们的实现方式就是把定义的函数拼接起来，生成一个云引擎项目然后部署。
+
+所以可以认为「在线编辑」和 「项目部署」最终是一样的，都是一个完整的项目。
+
+定义函数是一个单独功能，可以不用使用基础包，git 等工具快速的生成和编辑云引擎。
+
+当然，你也可以使用基础包，自己写代码并部署项目。
+
+这两条路是分开的，任何一个部署，就会导致另一种方式失效掉。
+
+### 如何从「在线编辑」迁移到项目部署？
+
+1. 按照《命令行工具使用指南》安装命令行工具，使用 `lean init` 初始化项目，模板选择 `Node.js > Express`（我们的 Node.js 示例项目）。
+2. 在**云服务控制台 > 云引擎 > 云引擎分组 > 部署 > 在线编辑**点击 **预览**，将全部函数的代码拷贝到新建项目中的 `cloud.js`（替换掉原有内容）。
+3. 运行 `lean up`，在 <http://localhost:3001> 的调试界面中测试云函数和 Hook，然后运行 `lean deploy` 部署代码到云引擎（使用标准实例的用户还需要执行 `lean publish`）。
+4. 部署后请留意云引擎控制台上是否有错误产生。
+
+如果在线编辑使用的是 0.x 版本 的Node.js SDK，那么还需要修改不兼容的代码。
+比如将 `AV.User.current()` 改为 `request.currentUser`。
+详见 [升级到云引擎 Node.js SDK 1.0](https://leancloud.cn/docs/leanengine-node-sdk-upgrade-1.html)。
+
+### 在云引擎 Node.js 环境下如何本地调用云函数？
+
+云引擎 Node.js 环境下，默认会直接进行一次本地的函数调用，而不会像客户端一样发起一个 HTTP 请求。
+
+```js
+AV.Cloud.run('averageStars', {
+  movie: '夏洛特烦恼'
+}).then(function (data) {
+  // 调用成功，得到成功的应答 data
+}, function (error) {
+  // 处理调用失败
+});
+```
+
+如果你希望发起 HTTP 请求来调用云函数，可以传入一个 `remote: true` 的选项。当你在云引擎之外运行 Node.js SDK（包括调用位于其他分组上的云函数）时这个选项非常有用：
+
+```js
+AV.Cloud.run('averageStars', { movie: '夏洛特烦恼' }, { remote: true }).then(function (data) {
+  // 成功
+}, function (error) {
+  // 处理调用失败
+});
+```
+
+上面的 `remote` 选项实际上是作为 `AV.Cloud.run` 的可选参数 options 对象的属性传入的。这个 `options` 对象包括以下参数：
+
+- `remote?: boolean`：上面的例子用到的 `remote` 选项，默认为假。
+- `user?: AV.User`：以特定的用户运行云函数（建议在 `remote` 为假时使用）。
+- `sessionToken?: string`：以特定的 `sessionToken` 调用云函数（建议在 `remote` 为真时使用）。
+- `req?: http.ClientRequest | express.Request`：为被调用的云函数提供 `remoteAddress` 等属性。
+
+### 云引擎下如何通过 JavaScript SDK 创建推送？
+
+请参考 SDK 的 API 文档 [AV.Push](https://leancloud.github.io/javascript-sdk/docs/AV.Push.html)。
+这里举两个简单的例子：
+
+推送给所有订阅了 `public` 频道的设备：
+
+```js
+AV.Push.send({
+  channels: [ 'public' ],
+  data: {
+    alert: 'public message'
+  }
+});
+```
+
+如果希望按照某个 `_Installation` 表的查询条件来推送，例如推送给某个 `installationId` 的 Android 设备，可以传入一个 `AV.Query` 对象作为 `where` 条件：
+
+```js
+const query = new AV.Query('_Installation');
+query.equalTo('installationId', installationId);
+AV.Push.send({
+  where: query,
+  data: {
+    alert: 'Public message'
+  }
+});
+```
+
+### 如何在云引擎中使用 Node.js SDK 提供的 CookieSession 中间件？
+
+如果你的页面主要是由服务器端渲染（例如使用 EJS、Pug），在前端不需要使用 JavaScript SDK 进行数据操作，那么建议你使用我们提供的一个 `CookieSession` 中间件，在 Cookie 中维护用户状态：
+
+```js
+app.use(AV.Cloud.CookieSession({ secret: 'my secret', maxAge: 3600000, fetchUser: true }));
+```
+
+Koa 需要添加一个 `framework: 'koa'` 的参数：
+
+```js
+app.use(AV.Cloud.CookieSession({ framework: 'koa', secret: 'my secret', maxAge: 3600000, fetchUser: true }));
+```
+
+使用 `CookieSession` 的同时需要添加 CSRF Token 来防御 CSRF 攻击。
+
+你需要传入一个 `secret` 用于签名 Cookie（必须提供），这个中间件会将 `AV.User` 的登录状态信息记录到 Cookie 中，用户下次访问时自动检查用户是否已经登录，如果已经登录，可以通过 `req.currentUser` 获取当前登录用户。
+
+`AV.Cloud.CookieSession` 支持的选项包括：
+
+- **fetchUser**：是否自动 `fetch` 当前登录的 `AV.User` 对象。默认为 `false`。如果设置为 `true`，每个 HTTP 请求都将发起一次 LeanCloud API 调用来 `fetch` 用户对象。如果设置为 `false`，默认只可以访问 `req.currentUser` 的 `id`（`_User` 表记录的 `objectId`）和 `sessionToken` 属性，你可以在需要时再手动 `fetch` 整个用户。
+- **name**：Cookie 的名字，默认为 `avos.sess`。
+- **maxAge**：Cookie 的过期时间。单位为毫秒。
+
+在 Node SDK 1.x 之后我们不再允许通过 `AV.User.current()` 获取登录用户的信息，而是需要你：
+
+- 通过 `request.currentUser` 获取用户信息。
+- 在后续的方法调用显式传递 user 对象。
+
+你可以这样简单地实现一个具有登录功能的站点：
+
+```js
+app.post('/login', function (req, res) {
+  AV.User.logIn(req.body.username, req.body.password).then(function (user) {
+    res.saveCurrentUser(user); // save cookie
+    res.redirect('/profile');
+  }, function (error) {
+    res.redirect('/login');
+  });
+})
+
+app.get('/profile', function (req, res) {
+  if (req.currentUser) {
+    res.send(req.currentUser);
+  } else {
+    res.redirect('/login');
+  }
+});
+
+app.get('/logout', function (req, res) {
+  req.currentUser.logOut();
+  res.clearCurrentUser(); // clear cookie 
+  res.redirect('/profile');
+});
+```
+
+### 跨域 POST 请求未携带 Cookie 怎么办？
+
+Chrome 80 起 `SameSite` 的默认值为 `Lax`，如果你的应用的前端没部署在云引擎上，又需要向云引擎发送携带 Cookie 的 POST 请求，那么需要设置 `SameSite` 为 `none`。
+`AV.Cloud.CookieSession` 会将所有参数都传递给浏览器的 `cookies.set()`，所以你可以将 `sameSite` 传入：
+
+```js
+AV.Cloud.CookieSession({sameSite: 'none'})
+```
+
+注意：
+
+0. `SameSite` 要求与 `Secure` 标记一同发送，因此请确保你的客户端是通过 HTTPS 协议访问云引擎的。
+1. 请仅在有必要的时候设置 `SameSite` 为 `none`，以免平白增加 CSRF 风险。
+
+### 为什么云函数中 include 的字段没有被完整地发给客户端？
+
+> 将 JavaScript SDK 和 Node SDK 升级到 3.0 以上版本可以彻底解决该问题。  
+
+云函数在响应时会调用到 `AV.Object#toJSON` 方法，将结果序列化为 JSON 对象返回给客户端。在早期版本中 `AV.Object#toJSON` 方法为了防止循环引用，当遇到属性是 Pointer 类型会返回 Pointer 元信息，不会将 include 的其他字段添加进去，我们在 [JavaScript SDK 3.0](https://github.com/leancloud/javascript-sdk/releases/tag/v3.0.0) 中对序列化相关的逻辑做了重新设计，**将 JavaScript SDK 和 Node SDK 升级到 3.0 以上版本便可以彻底解决该问题**。
+
+如果暂时无法升级 SDK 版本，可以通过这样的方式绕过：
+
+```javascript
+AV.Cloud.define('querySomething', function(req, res) {
+  var query = new AV.Query('Something');
+  // user 是 Something 表的一个 Pointer 字段
+  query.include('user');
+  query.find().then(function(results) {
+    // 手动进行一次序列化
+    results.forEach(function(result){
+      result.set('user', result.get('user') ?  result.get('user').toJSON() : null);
+    });
+    // 再返回查询结果给客户端
+    res.success(results);
+  }).catch(res.error);
+});
+```
+
+Python SDK 也存在类似的问题，只会返回 Pointer 元信息，因此也需要额外进行一次查询并手动进行序列化。 
+
+### RPC 调用云函数时，为什么会返回预期之外的空对象？
+
+使用 Node SDK 定义的云函数，如果返回一个不是 AVObject 的值，比如字符串、数字，RPC 调用得到的是空对象（`{}`）。
+类似地，如果返回一个包含非 AVObject 成员的数组，RPC 调用的结果中该数组的相应成员也会被序列化为 `{}`。
+这个问题将在 Node SDK 的下一个大版本（4.0）中修复。
+目前绕过这一个问题的方法是将返回结果放在对象（`{}`）中返回。 
+
+### `node --max-http-header-size` 无效？
+
+云引擎负载均衡限制 HTTP Header 大小为 8 KB（和[Node.js 的默认值][cli_max_http_header_size_size]保持一致）。
+因此无法通过 `--max-http-header-size` 指定大于 8 KB 的值。
+
+[cli_max_http_header_size_size]: https://nodejs.org/api/cli.html#cli_max_http_header_size_size
+
+### 如何使用云引擎批量更新数据？
+
+可以参考我们的 [Demo: batch-update](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/routes/batch-update.js)。
+
+### 如何接入 Node.js 框架？
+
+细心的开发者已经发现在示例项目中的 `package.json` 中引用了一个流行的 Node Web 框架 [Express](http://expressjs.com/)。
+
+Node.js SDK 为 [Express](http://expressjs.com/) 和 [Koa](http://koajs.com/) 提供了集成支持。
+
+如果你已经有了现成的项目使用的是这两个框架，只需通过下面的方式加载 Node.js SDK 提供的中间件到当前项目中即可：
+
+```sh
+npm install --save leanengine leancloud-storage
+```
+
+引用和配置的代码如下：
+
+#### Express
+
+```js
+var express = require('express');
+var AV = require('leanengine');
+
+AV.init({
+  appId: process.env.LEANCLOUD_APP_ID || '{{appid}}',
+  appKey: process.env.LEANCLOUD_APP_KEY || '{{appkey}}',
+  masterKey: process.env.LEANCLOUD_APP_MASTER_KEY || '{{masterkey}}'
+});
+
+var app = express();
+app.use(AV.express());
+app.listen(process.env.LEANCLOUD_APP_PORT);
+```
+
+其中，`AV.express` 接受一个可选参数 `options`，`options` 是一个对象，目前支持以下两个可选属性：
+
+- `onError`：全局错误处理函数，云函数（包括 Hook 函数）抛出异常时会调用该函数。该函数的使用场景包括统一发送错误报告。
+- `ignoreInvalidSessionToken`：布尔值，为真时忽略客户端发来的错误的 `sessionToken`（`X-LC-session` 头），为假时抛出 `401` 错误 `{"code": 211, "error": "Verify sessionToken failed, maybe login expired: ..."}`。客户端 SDK 发送请求时会统一发送 `X-LC-session` 头（其中指定了 `sessionToken`），`sessionToken` 可能因种种原因失效，而云函数在很多情况下并不关心 `sessionToken`。因此，云引擎提供了 `ignoreInvalidSessionToken` 这个选项，设为真时忽略 `sessionToken` 错误。反之，如果该选项设为假，客户端收到相应报错时，需要重新登录。
+
+你可以使用 Express 的路由定义功能来提供自定义的 HTTP API：
+
+```js
+app.get('/', function (req, res) {
+  res.render('index', { title: 'Hello World' });
+});
+
+app.get('/time', function (req, res) {
+  res.json({
+    time: new Date()
+  });
+});
+
+app.get('/todos', function (req, res) {
+  new AV.Query('Todo').find().then(function (todos) {
+    res.json(todos);
+  }).catch(function (err) {
+    res.status(500).json({
+      error: err.message
+    });
+  });
+});
+```
+
+更多最佳实践请参考我们的 [项目模板](https://github.com/leancloud/node-js-getting-started) 和 [云引擎 Node.js Demo 仓库](https://github.com/leancloud/leanengine-nodejs-demos)。
+
+#### Koa
+
+```js
+var koa = require('koa');
+var AV = require('leanengine');
+
+AV.init({
+  appId: process.env.LEANCLOUD_APP_ID || '{{appid}}',
+  appKey: process.env.LEANCLOUD_APP_KEY || '{{appkey}}',
+  masterKey: process.env.LEANCLOUD_APP_MASTER_KEY || '{{masterkey}}'
+});
+
+var app = koa();
+app.use(AV.koa());
+app.listen(process.env.LEANCLOUD_APP_PORT);
+```
+
+`AV.koa` 同样接受可选参数 `options`，关于 `options` 对象的具体说明，请参考上节。
+
+你可以使用 Koa 来渲染页面、提供自定义的 HTTP API：
+
+```js
+app.use(function* (next) {
+  if (this.url === '/todos') {
+    return new AV.Query('Todo').find().then(todos => {
+      this.body = todos;
+    });
+  } else {
+    yield next;
+  }
+});
+```
+
+使用 Koa 时建议将 `package.json` 中的 Node.js 的版本设置为 `4.x` 以上。
+
+#### 其他 Web 框架
+
+你也可以使用其他的 Web 框架进行开发，但你需要自行去实现云引擎健康监测的逻辑。
+下面是一个使用 Node.js 内建的 [`http`](https://nodejs.org/api/http.html) 实现的最简示例，可供参考：
+
+```js
+require('http').createServer(function (req, res) {
+  if (req.url == '/') {
+    res.statusCode = 200;
+    res.end();
+  } else {
+    res.statusCode = 404;
+    res.end();
+  }
+}).listen(process.env.LEANCLOUD_APP_PORT);
+```
+
+你需要将 Web 服务监听在 `0.0.0.0` 上（Node.js 和 Express 的默认行为）而不是 `127.0.0.1`。
+
+可参考《在云引擎中使用其他 Node 框架》这篇指南。
+
+#### 路由超时设置
+
+因为 Node.js 的异步调用容易因运行时错误或编码疏忽中断，为了减少在这种情况下对服务器内存的占用，也为了客户端能够更早地收到错误提示，所以需要添加这个设置，一旦发生超时，服务端会返回一个 HTTP 错误码给客户端。
+
+使用 Express 框架实现自定义路由的时候，请求默认的超时时间为 15 秒，该值可以在 `app.js` 中进行调整：
+
+```js
+// 设置默认超时时间
+app.use(timeout('15s'));
+```
+
+### 自行接入 Node.js 框架时如何使用云服务的数据存储功能？
+
+模板项目已经集成了 Node.js SDK，并且包含 SDK 初始化的逻辑。
+
+如果项目自行接入 Web 框架，那么需要安装 Node.js SDK （`leanengine`），另外， JavaScript SDK（`leancloud-storage`）也需要作为 peer dependency 一同安装，在升级 Node.js SDK 时也请记得升级 JavaScript SDK：
+
+```sh
+npm install --save leanengine leancloud-storage
+```
+
+同时也需要自行初始化 SDK（注意我们在云引擎中开启了 masterKey 权限，这将会跳过 ACL 和其他权限限制）：
+
+```js
+const AV = require('leanengine'); 
+
+AV.init({
+  appId: process.env.LEANCLOUD_APP_ID,
+  appKey: process.env.LEANCLOUD_APP_KEY,
+  masterKey: process.env.LEANCLOUD_APP_MASTER_KEY
+});
+
+AV.Cloud.useMasterKey();
+```
+
+### Node.js SDK 不同版本的主要差异？
+
+Node SDK 的历史版本：
+
+- `0.x`：最初的版本，对 Node.js 4.x 及以上版本兼容不佳，建议用户参考[升级到云引擎 Node.js SDK 1.0](https://leancloud.cn/docs/leanengine-node-sdk-upgrade-1.html) 来更新。
+- `1.x`：彻底废弃了全局的 `currentUser`，依赖的 JavaScript 也升级到了 1.x 分支，支持了 Koa 和 Node.js 4.x 及以上版本。
+- `2.x`：提供了对 Promise 风格的云函数、Hook 写法的支持，移除了一些被弃用的特性（`AV.Cloud.httpRequest`），不再支持 Backbone 风格的回调函数。
+- `3.x`：**推荐使用** 的版本，指定 JavaScript SDK 为 peer dependency（允许自定义 JS SDK 的版本），升级 JS SDK 到 3.x。
+
+详见 Node.js SDK 的 [更新日志](https://github.com/leancloud/leanengine-node-sdk/releases)。
+
+## Python
+
+### 云引擎支持哪些 Python 版本？
+
+目前仅支持 CPython 版本，暂时不支持 PyPy、Jython、IronPython 等其他 Python 实现。
+另外建议尽量使用 3.6 或以上版本的 Python 进行开发，如果仍然在使用 Python 2 ，请使用 Python 2.7 进行开发。
+
+### 自行接入 Python WSGI 框架时如何使用云服务的数据存储功能？
+
+模板项目已经集成了 Python SDK，并且包含 SDK 初始化的逻辑。
+
+如果项目自行接入 Web 框架，那么需要将 `leancloud` 添加到 `requirements.txt` 中，部署到线上即可自动安装此依赖。在本地运行和调试项目的时候，可以在项目目录下使用如下命令进行依赖安装：
+
+```sh
+pip install -r requirements.txt
+```
+
+同时也需要自行初始化 SDK。
+因为 `wsgi.py` 是项目最先被执行的文件，推荐在此文件进行 Python SDK 的初始化工作：
+
+```python
+import os
+import leancloud
+
+APP_ID = os.environ['LEANCLOUD_APP_ID']
+APP_KEY = os.environ['LEANCLOUD_APP_KEY']
+MASTER_KEY = os.environ['LEANCLOUD_APP_MASTER_KEY']
+
+leancloud.init(APP_ID, app_key=APP_KEY, master_key=MASTER_KEY)
+
+leancloud.use_master_key(True)
+```
+
+注意我们在云引擎中开启了 masterKey 权限，这将会跳过 ACL 和其他权限限制。
+
+### PyPI 上有 `leancloud-sdk` 和 `leancloud` 两个包，该用哪一个？
+
+请使用 `leancloud`。
+
+`leancloud-sdk` 是旧版的 Python SDK，已经不再维护。
+
+不同版本的差别详见 Python SDK 的[更新日志](https://github.com/leancloud/python-sdk/blob/master/changelog)。
+
+### 如何在云引擎使用 Python SDK 提供的 WSGI 中间件管理 Cookies？
+
+Python SDK 提供了一个 `leancloud.engine.CookieSessionMiddleware` 的 WSGI 中间件，使用 Cookie 来维护用户（`leancloud.User`）的登录状态。要使用这个中间件，可以在 `wsgi.py` 中将：
+
+```python
+application = engine
+```
+
+替换为：
+
+```python
+application = leancloud.engine.CookieSessionMiddleware(engine, secret=YOUR_APP_SECRET)
+```
+
+你需要传入一个 `secret` 的参数用于签名 Cookie（必须提供），这个中间件会将 `AV.User` 的登录状态信息记录到 Cookie 中，用户下次访问时自动检查用户是否已经登录，如果已经登录，可以通过 `leancloud.User.get_current()` 获取当前登录用户。
+
+`leancloud.engine.CookieSessionMiddleware` 初始化时支持的非必须选项包括：
+
+- **name**：在 cookie 中保存的 session token 的 key 的名称，默认为 `leancloud:session`。
+- **excluded_paths**：指定哪些 URL path 不处理 session token，比如在处理静态文件的 URL path 上不进行处理，防止无谓的性能浪费。接受参数类型 `list`。
+- **fetch_user**：处理请求时是否要从存储服务获取用户数据，如果为 `False` 的话，`leancloud.User.get_current()` 获取到的用户数据上除了 `session_token` 之外没有任何其他数据，需要自己调用 `fetch()` 来获取。为 `True` 的话，会自动在用户对象上调用 `fetch()`，这样将会产生一次数据存储的 API 调用。默认为 `False`。
+- **expires**：设置 cookie 的失效日期（参考 [Werkzeug Document](http://werkzeug.pocoo.org/docs/0.12/http/#werkzeug.http.dump_cookie)）。
+- **max_age**：设置 cookie 在多少秒后失效（参考 [Werkzeug Document](http://werkzeug.pocoo.org/docs/0.12/http/#werkzeug.http.dump_cookie)）。
+
+### 在云引擎 Python 环境下如何本地调用云函数？
+
+云引擎 Python 环境下，默认会进行远程调用。
+例如，以下代码会发起一次 HTTP 请求，去请求部署在云引擎上的云函数。
+
+```python
+from leancloud import cloud
+
+cloud.run('averageStars', movie='夏洛特烦恼')
+```
+
+如果想要直接调用本地（当前进程）中的云函数，或者发起调用就是在云引擎中，想要省去一次 HTTP 调用的开销，可以使用 `leancloud.cloud.run.local` 来取代 `leanengine.cloud.run`，这样会直接在当前进程中执行一个函数调用，而不会发起 HTTP 请求来调用此云函数。
+
+## PHP
+
+### 云引擎支持哪些 PHP 版本？
+
+目前云引擎支持 `5.6`、`7.0`、`7.1`、`7.2`、`7.3`、`7.4`、`8.0` 这几个版本，后续如果有新版本发布，也会添加支持。
+
+### 云引擎的 PHP 环境支持哪些扩展？
+
+所有版本的 PHP 默认开启以下扩展：`fpm`、`curl`、`mysql`、`zip`、`xml`、`mbstring`、`gd`、`soap`、`sqlite3`。
+7.0 以上版本的 PHP 还默认开启了 `mongodb` 扩展。
+在 PHP 7.2 中官方从核心中移除了 `mcrypt` 这个拓展，云引擎以选装的方式继续提供支持，在 `composer.json` 的 `require` 中加入 `ext-mcrypt: *` 即可，使用 `mcrypt` 会增加部署耗时，如果没有用到请不要加。
+如果您需要用到其他扩展，请提交工单联系我们。
+
+### 云引擎的 PHP 环境如何指定 FPM Worker 数量？
+
+对于 PHP 项目，我们默认每 64 MB 内存分配一个 PHP-FPM Worker，如果希望自定义 Worker 数量，可以在云引擎设置页面的「自定义环境变量」中添加名为 `PHP_WORKERS` 的环境变量，值是一个数字。设置过低会导致收到新请求时无可用的 Worker；过高会导致内存不足、请求处理失败，建议谨慎调整。
+
+### 是否支持 `path` 类型的 composer 本地仓库？
+
+由于构建时会复制 `composer.json` 和 `composer.lock` 到专门的目录安装依赖，因此不支持 `path` 类型的 composer 本地仓库。
+如果您的项目使用了 `path` 类型的本地仓库，我们建议改为 `vcs` 类型。
+
+### 何时使用 PHP SDK 的 `Cloud::start`？
+
+PHP SDK 提供了 `Cloud::start` 函数，可以方便快捷地初始化云函数服务。例如，一个专门提供云函数服务的云引擎项目的 `index.php`：
+
+```php
+<?php
+use \LeanCloud\Engine\Cloud;
+require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../src/cloud.php'; // 其中包含云函数定义
+Cloud::start();
+```
+
+如上所述，`Cloud::start` 只适用于专门提供云函数服务的项目。
+如果项目同时用到了云函数和网站托管，请勿使用 `Cloud::start`。
+
+### 在云引擎 PHP 环境下如何本地调用云函数？
+
+云引擎中默认会直接进行一次本地的函数调用，而不是像客户端一样发起一个 HTTP 请求。
+
+```php
+try {
+    $result = Cloud::run("averageStars", array("movie" => "夏洛特烦恼"));
+} catch (\Exception $ex) {
+    // 云函数错误
+}
+```
+
+如果想要通过 HTTP 调用，可以使用 `runRemote` 方法：
+
+```php
+try {
+    $token = User::getCurrentSessionToken(); // 以特定的 `sessionToken` 调用云函数，可选
+    $result = Cloud::runRemote("averageStars", array("movie" => "夏洛特烦恼"), $token);
+} catch (\Exception $ex) {
+    // 云函数错误
+}
+```
+
+### PHP 项目从 files.phpcomposer.com 下载文件失败，部署失败怎么办？
+
+phpcomposer.com 镜像已经停止服务，PHP 项目的 `composer.lock` 文件如果包含了这个地址的 url，会导致依赖安装失败。
+解决方法有两种：
+
+1. 移除 `composer.lock` 后再部署（云引擎会直接根据 `coposer.json` 安装依赖）。
+2. 在本地正确配置仓库地址后，运行 `composer update --lock` 更新 `composer.lock` 文件中的下载链接（不改变具体的版本）。
+
+### 自行接入 PHP 框架时如何使用云服务的数据存储功能？
+
+模板项目已经集成了 PHP SDK，并且包含 SDK 初始化的逻辑。
+
+如果自行接入 [Slim 框架](http://www.slimframework.com)，可以参考示例项目直接使用 SDK 提供的中间件。
+
+如果自行接入其他框架，则需要自己配置依赖：
+
+```sh
+composer require leancloud/leancloud-sdk
+```
+
+同时也需要自行初始化 SDK（注意我们在云引擎中开启了 masterKey 权限，这将会跳过 ACL 和其他权限限制）。
+
+```php
+use \LeanCloud\Client;
+
+Client::initialize(
+    getenv("LEANCLOUD_APP_ID"),
+    getenv("LEANCLOUD_APP_KEY"),
+    getenv("LEANCLOUD_APP_MASTER_KEY")
+);
+
+Client::useMasterKey(true);
+```
+
+### 如何在云引擎使用 PHP SDK 提供的 CookieStorage 模块？
+
+云引擎提供了一个 `LeanCloud\Storage\CookieStorage` 模块，用 Cookie 来维护用户（`User`）的登录状态，要使用它可以在 `app.php` 中添加下列代码：
+
+```php
+use \LeanCloud\Storage\CookieStorage;
+Client::setStorage(new CookieStorage(60 * 60 * 24, "/"));
+```
+
+`CookieStorage` 支持传入秒作为过期时间，以及路径作为 cookie 的作用域。默认过期时间为 7 天。
+
+可以通过 `User::getCurrentUser()` 来获取当前登录用户。你可以这样简单地实现一个具有登录功能的站点：
+
+```php
+$app->get('/login', function($req, $res) {
+  // login page
+});
+
+$app->post('/login', function($req, $res) {
+    $params = $req->getQueryParams();
+    try {
+        User::logIn($params["username"], $params["password"]);
+        return $res->withRedirect('/profile');
+    } catch (Exception $ex) {
+        return $res->withRedirect('/login');
+    }
+});
+
+$app->get('/profile', function($req, $res) {
+    $user = User::getCurrentUser();
+    if ($user) {
+        return $res->getBody()->write($user->getUsername());
+    } else {
+        return $res->withRedirect('/login');
+    }
+});
+
+$app->get('/logout', function($req, $res) {
+    User::logOut();
+    return $res->redirect("/");
+});
+```
+
+一个简单的登录页面可以是这样：
+
+```html
+<html>
+  <head></head>
+  <body>
+    <form method="post" action="/login">
+      <label>Username</label>
+      <input name="username">
+      <label>Password</label>
+      <input name="password" type="password">
+      <input class="button" type="submit" value="login">
+    </form>
+  </body>
+</html>
+```
+
+`CookieStorage` 也支持保存其他属性：
+
+```php
+$cookieStorage = Client::getStorage();
+$cookieStorage->set("key", "val");
+```
+
+## Java
+
+### 如何定制 Java 的堆内存大小？
+
+云引擎运行 Java 应用时，会自动将 `-Xmx` 参数设置为实例规格的 70%，剩下的 30% 留给堆外内存和其他开销。如果你的应用比较特殊（比如大量使用堆外内存）可以自己定制 `-Xmx` 参数。假设使用 2 GB 内存规格的实例运行，则可以在云引擎的设置页面增加「自定义环境变量」，名称为 `JAVA_OPTS`，值为 `-Xmx1500m`，这样会限制 JVM 堆最大为 1.5 GB，剩下 500 MB 留给持久代、堆外内存或者其他一些杂项使用。**注意：`-Xmx` 参数如果设置得过小可能会导致大量 CPU 消耗在反复的的 GC 任务上**。
+
+### 如何脱离命令行工具本地启动云引擎 Java 项目？
+
+设置云引擎运行需要的环境变量后，可以通过脱离命令行工具，直接运行相应命令或使用 IDE 本地启动 Java 项目。
+
+通过命令行启动 Jetty 项目或 JAR 项目，先设置环境变量：
+
+```sh
+eval "$(lean env)"
+```
+
+提示：命令 `lean env` 可以输出当前应用所需环境变量的设置语句，外层的 `eval` 是直接执行这些语句。
+Windows 系统下需要手动设置 `lean env` 输出的环境变量。
+
+如果是 Jetty 项目，运行：
+
+```
+mvn jetty:run
+```
+
+如果是 JAR 项目，使用 Maven 打包项目并运行：
+
+```sh
+mvn package
+java -jar target/{zipped jar file}
+```
+
+使用 Eclipse 启动应用：
+
+首先确保 Eclipse 已经安装 Maven 插件，并将项目以 **Maven Project** 方式导入 Eclipse 中。
+
+在 **Package Explorer** 视图右键点击项目：
+
+- 如果是 Jetty 项目，选择 **Run As** > **Maven build…**，将 **Main** 标签页的 **Goals** 设置为 `jetty:run`。
+- 如果是 JAR 项目，选择 **Run As** > **Run Configurations…**，选择 `Application`，设置 `Main class:`（示例项目为 `cn.leancloud.demo.todo.Application`）。
+
+最后在 **Environment** 标签页增加以下环境变量和相应的值：
+
+名称 | 值
+--- | ---
+`LEANCLOUD_APP_ENV` | `development`
+`LEANCLOUD_APP_ID` | `{{appid}}`
+`LEANCLOUD_APP_KEY` | `{{appkey}}`
+`LEANCLOUD_APP_MASTER_KEY` | `{{masterkey}}`
+`LEANCLOUD_APP_PORT` | `3000`
+
+配置完成后，以后只需点击 run 按钮即可启动应用。
+
+### 自行接入 Java 框架时如何使用云服务的数据存储功能？
+
+模板项目已经集成了 [Java Unified SDK](https://github.com/leancloud/java-unified-sdk) 的 [engine-core](https://github.com/leancloud/java-unified-sdk/tree/master/leanengine) 模块，engine-core 又依赖于存储核心模块 storage-core，因此开发者可以直接使用云服务的数据存储功能。
+模板项目也包含了SDK 初始化的逻辑。
+
+如果自行接入其他框架，则需要在 `pom.xml` 中增加依赖配置来增加 LeanEngine Java SDK 的依赖：
+
+```xml
+<dependencies>
+  <dependency>
+    <groupId>cn.leancloud</groupId>
+    <artifactId>engine-core</artifactId>
+    <version>7.2.6</version>
+  </dependency>
+</dependencies>
+```
+
+同时也需要自行初始化 SDK（注意我们在云引擎中开启了 masterKey 权限，这将会跳过 ACL 和其他权限限制）。
+
+```java
+import cn.leancloud.LCCloud;
+import cn.leancloud.LCObject;
+import cn.leancloud.core.GeneralRequestSignature;
+import cn.leancloud.LeanEngine;
+
+
+String appId = System.getenv("LEANCLOUD_APP_ID");
+String appKey = System.getenv("LEANCLOUD_APP_KEY");
+String appMasterKey = System.getenv("LEANCLOUD_APP_MASTER_KEY");
+String hookKey = System.getenv("LEANCLOUD_APP_HOOK_KEY");
+
+LeanEngine.initialize(appId, appKey, appMasterKey);
+
+GeneralRequestSignature.setMasterKey(appMasterKey);
+```
+
+### 如何在云引擎使用 PHP SDK 提供的 CookieStorage 模块？
+
+云引擎提供了一个 `LeanCloud\Storage\CookieStorage` 模块，用 Cookie 来维护用户（`User`）的登录状态，要使用它可以在 `app.php` 中添加下列代码：
+
+```php
+use \LeanCloud\Storage\CookieStorage;
+Client::setStorage(new CookieStorage(60 * 60 * 24, "/"));
+```
+
+`CookieStorage` 支持传入秒作为过期时间，以及路径作为 cookie 的作用域。默认过期时间为 7 天。
+
+可以通过 `User::getCurrentUser()` 来获取当前登录用户。你可以这样简单地实现一个具有登录功能的站点：
+
+```php
+$app->get('/login', function($req, $res) {
+  // login page
+});
+
+$app->post('/login', function($req, $res) {
+    $params = $req->getQueryParams();
+    try {
+        User::logIn($params["username"], $params["password"]);
+        return $res->withRedirect('/profile');
+    } catch (Exception $ex) {
+        return $res->withRedirect('/login');
+    }
+});
+
+$app->get('/profile', function($req, $res) {
+    $user = User::getCurrentUser();
+    if ($user) {
+        return $res->getBody()->write($user->getUsername());
+    } else {
+        return $res->withRedirect('/login');
+    }
+});
+
+$app->get('/logout', function($req, $res) {
+    User::logOut();
+    return $res->redirect("/");
+});
+```
+
+一个简单的登录页面可以是这样：
+
+```html
+<html>
+  <head></head>
+  <body>
+    <form method="post" action="/login">
+      <label>Username</label>
+      <input name="username">
+      <label>Password</label>
+      <input name="password" type="password">
+      <input class="button" type="submit" value="login">
+    </form>
+  </body>
+</html>
+```
+
+`CookieStorage` 也支持保存其他属性：
+
+```php
+$cookieStorage = Client::getStorage();
+$cookieStorage->set("key", "val");
+```
+
+### 在云引擎 Java 环境下如何本地调用云函数？
+
+Java SDK 不支持本地调用云函数。
+如有代码复用需求，建议将公共逻辑提取成普通函数（Java 方法），在多个云函数中调用。
+
+## .NET
+
+### 自行接入 .NET 框架时如何使用云服务的数据存储功能？
+
+模板项目已经集成了 .NET SDK，并且包含 SDK 初始化的逻辑。
+
+如果自行接入其他框架，则需要自己添加依赖：
+
+```sh
+dotnet add package LeanCloud.Storage
+```
+
+同时也需要自行初始化 SDK：
+
+```cs
+LCEngine.Initialize(services);
+```
+
+### 在云引擎 .NET 环境下如何本地调用云函数？
+
+.NET SDK 不支持本地调用云函数。
+如有代码复用需求，建议将公共逻辑提取成普通函数，在多个云函数中调用。
+
+## Go
+
+### 如何接入 Go 框架？
+
+细心的开发者已经发现示例项目是一个基于 [echo](https://github.com/labstack/echo) 的 Web 应用。
+
+Go SDK 以标准库 HTTP 方法的形式提供了可供任意框架接入的接口，以 **echo** 为示例：
+
+```go
+// ./adapters/echo.go
+//...
+func Echo(e *echo.Echo) {
+	e.Any("/1/*", echo.WrapHandler(leancloud.Handler(nil)), setResponseContentType)
+	e.Any("/1.1/*", echo.WrapHandler(leancloud.Handler(nil)), setResponseContentType)
+	e.Any("/__engine/*", echo.WrapHandler(leancloud.Handler(nil)), setResponseContentType)
+}
+
+func setResponseContentType(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		c.Response().Header().Set("Content-Type", "application/json; charset=UTF-8")
+		return next(c)
+	}
+}
+```
+
+函数 **Echo** 接收 echo 实例对象，将 Go SDK 中提供 LeanEngine 相关功能的接口绑定到 `/1/` `/1.1/` 和 `/__engine/` 开头的路由前缀上，保证 LeanEngine 相关的底层功能正常。
+
+函数 `setResponseContentType` 设置所有和 LeanEngine 相关的请求的 `Content-Type` 为 `application/json`，并且编码为 `UTF-8`。
+
+大多数 Go Web 框架均提供将标准库 HTTP Handler 转换为特有 Handler 的方法，只要保证能够在其他框架中接入以上两个部件，即可将 LeanEngine 集成入你喜爱的 Go Web 框架中。
+
+### 自行接入 Go 框架时如何使用云服务的
+
+模板项目已经集成了 Go SDK，并且包含 SDK 初始化的逻辑。
+
+如果自行接入其他框架，则需要自己添加依赖：
+
+```go
+import "github.com/leancloud/go-sdk/leancloud"
+```
+
+同时也需要自行初始化 SDK：
+
+```go
+client := leancloud.NewEnvClient()
+```
+
+### 在云引擎 Go 环境下如何本地调用云函数？
+
+云引擎下默认会在本地调用：
+
+```go
+averageStars, err := leancloud.Run("averageStars", Review{Movie: "夏洛特烦恼"})
+if err != nil {
+  panic(err)
+}
+```
+
+如果你希望发起 HTTP 请求来调用云函数，可以传入 `WithRemote()` 参考。
+`Run` 的可选参数如下：
+
+- `WithRemote()` 强制云函数远程执行
+- `WithSessionToken(token)` 为当前的调用请求传入 `sessionToken`
+- `WithUser(user)` 为当前的调用请求传入对应的用户对象
+
+
+## 计费
+
+### 如果更改了实例规格或数量，当天的云引擎费用如何收取？
+
+云引擎资源使用量按 **当天最大的实例数量** 计算，次日凌晨从账户余额中扣费，假设某天从 0 点至 24 点之间：
+
+* 应用本来有 4 个 standard-512 的实例；
+* 发现资源数量不足，将实例规格调整到了 standard-1024；
+* 发现资源过多，减少到 2 个实例。
+
+则当天费用按照 standard-1024 的价格乘上 4 个实例计算。
+
+### 云引擎如何收费？
+
+云引擎中如果有云服务的存储等 API 调用，按 API 收费策略照常收费。
+云引擎标准实例也会产生使用费，具体请参考《云引擎运行方案》。
+
+### Hook 函数算 API 请求次数吗，afterUpdate 执行一次算 1 次请求次数吗？
+
+AfterUpdate 是在云引擎内执行的，执行 afetrUpdate 不算 API 请求，自然也不计入 API 请求数。如果 afterUpdate 里发起了 API 请求，那么照常计算 API 请求数（和客户端请求 API 一样）。
+
+### 组管理功能收费吗？
+
+组管理功能免费使用，但组下面创建的实例按照实例价格收取费用。
+
+## 国际版
+
+### 国际版云引擎必须绑定自定义域名吗？
+
+国际版可以在「控制台 > 云引擎 > 设置」配置 `avosapps.us` 子域名，也可以绑定云引擎自定义域名（不要求备案）。
+
+### 国际版云引擎可以绑定裸域名吗？
+
+如果希望在国际版云引擎绑定裸域名，我们建议选择支持 ANAME 或 CNAME Flattening 记录的域名服务商。
