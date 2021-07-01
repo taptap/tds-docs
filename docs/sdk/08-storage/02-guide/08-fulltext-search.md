@@ -125,7 +125,7 @@ query.find().then(function(results) {
 });
 ```
 
-<MultiLang>
+</MultiLang>
 
 
 有关查询语法，可以参考 [q 查询语法](/sdk/storage/guide/fulltext-search-rest#q_查询语法)。
