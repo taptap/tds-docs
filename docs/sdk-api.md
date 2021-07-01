@@ -21,6 +21,3 @@ import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
 |  Unity   | [Unity-API](https://leancloud.github.io/csharp-sdk/html)   | 
 |  Android | [Android-API](https://leancloud.cn/api-docs/android/index.html)   | 
 |   iOS  | [iOS-API](https://leancloud.cn/api-docs/iOS/index.html)   | 
-|   Python  | [Python-API](https://leancloud.github.io/python-sdk)   | 
-|   PHP  | [PHP-API](https://leancloud.github.io/php-sdk)   | 
-|   Go  | [Go-API](https://pkg.go.dev/github.com/leancloud/go-sdk/leancloud)   | 
