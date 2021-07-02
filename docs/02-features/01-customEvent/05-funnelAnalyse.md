@@ -1,6 +1,5 @@
 ---
 title: 漏斗分析
-sidebar_position: 5
 ---
 
 > English manual coming soon, we apologize for the temporary inconvenience.

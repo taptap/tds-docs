@@ -1,6 +1,5 @@
 ---
 title: 游戏区服
-sidebar_position: 3
 ---
 
 ## TapDB 区服使用攻略

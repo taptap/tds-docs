@@ -1,6 +1,5 @@
 ---
 title: Cocos2d-x SDK文档
-sidebar_position: 4
 ---
 
 ## 1.简介

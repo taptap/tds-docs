@@ -1,6 +1,5 @@
 ---
 title: iOS SDK文档
-sidebar_position: 2
 ---
 
 ## 1.简介

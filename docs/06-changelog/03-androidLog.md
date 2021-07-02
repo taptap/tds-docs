@@ -1,7 +1,7 @@
 ---
 title: Android
-sidebar_position: 3
 ---
+
 # 2019-10-08 V1.7.4 更新日志
 **新增**
 1. 新添加了支持运营事件功能

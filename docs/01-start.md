@@ -1,6 +1,5 @@
 ---
 title: 现在开始
-sidebar_position: 1
 hide_title: true
 ---
 

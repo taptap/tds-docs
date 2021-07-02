@@ -1,6 +1,5 @@
 ---
 title: 看板
-sidebar_position: 7
 ---
 
 > English manual coming soon, we apologize for the temporary inconvenience.

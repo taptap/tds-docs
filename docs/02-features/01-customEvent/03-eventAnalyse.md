@@ -1,6 +1,5 @@
 ---
 title: 事件分析
-sidebar_position: 3
 ---
 
 > English manual coming soon, we apologize for the temporary inconvenience.

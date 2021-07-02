@@ -1,6 +1,5 @@
 ---
 title: Android SDK文档
-sidebar_position: 3
 ---
 
 ## 1.简介

@@ -1,6 +1,5 @@
 ---
 title: TapDB无网络连接问题解决方案
-position: 2
 ---
 
 ## TapDB无网络连接问题解决方案

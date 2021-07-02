@@ -1,8 +1,6 @@
 ---
-sidebar_position: 7
+title: 汇率表
 ---
-
-# 汇率表
 
 import {ExchangeTable} from '/src/components/ExchangeTable';
 

@@ -1,6 +1,5 @@
 ---
 title: 下载 SDK
-sidebar_position: 4
 ---
 
 import {usePluginData} from '@docusaurus/useGlobalData';

@@ -1,5 +1,4 @@
 ---
-sidebar_position: 2
 title: 测试设备白名单
 hide_title: true
 hide_table_of_contents: true

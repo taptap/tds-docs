@@ -1,6 +1,5 @@
 ---
 title: 元数据管理
-sidebar_position: 6
 ---
 
 > English manual coming soon, we apologize for the temporary inconvenience.

@@ -1,6 +1,5 @@
 ---
 title: 自定义事件分析
-sidebar_position: 1
 hide_title: true
 ---
 

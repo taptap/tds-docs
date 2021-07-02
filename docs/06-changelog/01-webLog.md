@@ -1,6 +1,5 @@
 ---
 title: 网页版
-sidebar_position: 1
 ---
 
 # 2.0.0 | 2021-06-17 发布

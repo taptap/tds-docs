@@ -1,6 +1,5 @@
 ---
 title: 数据模型介绍
-sidebar_position: 2
 ---
 
 > English manual coming soon, we apologize for the temporary inconvenience.

@@ -1,6 +1,5 @@
 ---
 title: iOS
-sidebar_position: 2
 ---
 
 # 2019-10-08 V1.7.4 更新日志

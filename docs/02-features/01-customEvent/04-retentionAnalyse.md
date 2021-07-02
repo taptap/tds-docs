@@ -1,6 +1,5 @@
 ---
 title: 留存分析
-sidebar_position: 4
 ---
 
 > English manual coming soon, we apologize for the temporary inconvenience.
