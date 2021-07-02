@@ -152,41 +152,6 @@ REST API 请求的 Base URL 可以在**云服务控制台 > 设置 > 应用 Keys
       <td>POST</td>
       <td>请求验证用户邮箱</td>
     </tr>
-    <tr>
-      <td>/1.1/requestMobilePhoneVerify</td>
-      <td>POST</td>
-      <td>请求发送用户手机号码验证短信</td>
-    </tr>
-    <tr>
-      <td>/1.1/verifyMobilePhone/&lt;code&gt;</td>
-      <td>POST</td>
-      <td>使用"验证码"验证用户手机号码</td>
-    </tr>
-    <tr>
-      <td>/1.1/requestChangePhoneNumber</td>
-      <td>POST</td>
-      <td>请求发送手机短信验证码以绑定或更新手机号。</td>
-    </tr>
-    <tr>
-      <td>/1.1/changePhoneNumber</td>
-      <td>POST</td>
-      <td>验证手机短信验证码并绑定或更新手机号。</td>
-    </tr>
-    <tr>
-      <td>/1.1/requestLoginSmsCode</td>
-      <td>POST</td>
-      <td>请求发送手机号码登录短信。</td>
-    </tr>
-    <tr>
-      <td>/1.1/requestPasswordResetBySmsCode</td>
-      <td>POST</td>
-      <td>请求发送手机短信验证码重置用户密码。</td>
-    </tr>
-    <tr>
-      <td>/1.1/resetPasswordBySmsCode/&lt;code&gt;</td>
-      <td>PUT</td>
-      <td>验证手机短信验证码并重置密码。</td>
-    </tr>
   </tbody>
 </table>
 
