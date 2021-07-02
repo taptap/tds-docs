@@ -8,7 +8,7 @@ import MultiLang from '@theme/MultiLang';
 本文介绍如何快速接入 TapSDK 并实现 [TapTap 登录](/sdk/taptap-login/guide/start)功能。
 
 :::note
-[下载](/sdk/tap-download) 页面提供了 Unity、Android、iOS 示例项目，可供参考。
+[下载](/tap-download) 页面提供了 Unity、Android、iOS 示例项目，可供参考。
 :::
 
 ## 创建应用
@@ -53,15 +53,9 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 ```json
 "dependencies":{
 // 登录
-"com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#2.1.4",
-"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#2.1.4",
-"com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#2.1.4",
-// 动态
-"com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#2.1.4",
-// 数据分析
-"com.taptap.tds.tapdb": "https://github.com/TapTap/TapDB-Unity.git#2.1.4",
-//付费购买
-"com.taptap.tds.dlc": "https://github.com/TapTap/TapLicense-Unity.git#2.1.4",
+"com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#2.1.6",
+"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#2.1.6",
+"com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#2.1.6",
 }
 ```
 
@@ -73,7 +67,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 
 #### 手动导入
 
-1. [点击下载 TapSDK-UnityPackage.zip](/sdk/tap-download)，然后将该 SDK 解压到方便的位置。
+1. [点击下载 TapSDK-UnityPackage.zip](/tap-download)，然后将该 SDK 解压到方便的位置。
 
 2. 在 Unity 项目中依次转到 **Assets > Import Packages > Custom Packages**。
 
@@ -82,9 +76,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
    - `TapTap_TapBootstrap.unitypackage` 必选，TapSDK 启动器
    - `TapTap_TapCommon.unitypackag` 必选，TapSDK 基础库
    - `TapTap_TapLogin.unitypackage` 必选，TapTap 登录
-   - `TapTap_TapMoment.unitypackage` TapTap 内嵌动态
-   - `TapTap_TapDB.unitypackage` 数据分析
-   - `TapTap_TapLicense.unitypackage` 付费验证
+
 
 导入 SDK 后还需进行 Android、iOS 平台的相关配置。
 
@@ -118,8 +110,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
         <key>client_id</key>
         <string>ClientId</string>
     </dict>
-    <key>Apple_SignIn_Enable</key>
-    <string>false</string>
+   
     <key>NSPhotoLibraryUsageDescription</key>
     <string>说明为何应用需要此项权限</string>
     <key>NSCameraUsageDescription</key>
@@ -136,7 +127,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 </>
 <>
 
-1. [点击下载 TapSDK_Android](/sdk/tap-download)，将 SDK 包导入到项目 `project/app/libs` 目录下。
+1. [点击下载 TapSDK_Android](/tap-download)，将 SDK 包导入到项目 `project/app/libs` 目录下。
 
 2. 打开项目的 `project/app/build.gradle` 文件，添加 gradle 配置如下：
 
@@ -149,11 +140,10 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
     
     dependencies {  
     ...  
-        implementation (name:'TapBootstrap_2.1.4', ext:'aar')  // 必选: TapSDK 启动器 
-        implementation (name:'TapCommon_2.1.4', ext:'aar') // 必选: TapSDK 基础库 
-		implementation (name:'TapLogin_2.1.4', ext:'aar') // 必选: TapTap 登录 
-        implementation (name:'TapMoment_2.1.4', ext:'aar') // TapTap 内嵌动态
-        implementation (name:'TapDB_2.1.4', ext:'aar') // 数据统计
+        implementation (name:'TapBootstrap_2.1.6', ext:'aar')  // 必选: TapSDK 启动器 
+        implementation (name:'TapCommon_2.1.6', ext:'aar') // 必选: TapSDK 基础库 
+		implementation (name:'TapLogin_2.1.6', ext:'aar') // 必选: TapTap 登录 
+
     }  
     ```
 
@@ -177,7 +167,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 
 1. 在 Xcode 选择工程，到 **Build Setting > Other Linker Flags** 添加 `-ObjC`。
 
-2. 直接拖拽 [下载的 TapSDK_iOS_v2.1.2.zip](/sdk/tap-download) 到项目目录即可。
+2. 直接拖拽 [下载的 TapSDK_iOS_v2.1.2.zip](/tap-download) 到项目目录即可。
 
 3. 视需要导入下载的资源文件：
 
@@ -189,19 +179,6 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
        TapCommonResource.bundle
        TapCommonSDK.framework
        TapLoginSDK.framework
-       ```
-
-   - TapTap 内嵌动态
-
-       ```
-       TapMomentResource.bundle
-       TapMomentSDK.framework
-       ```
-
-   - 数据分析
-
-       ```
-       TapDB.framework
        ```
 
 

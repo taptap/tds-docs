@@ -7,7 +7,54 @@ sidebar_label: 开发指南
 
 import MultiLang from '@theme/MultiLang';
 
-本文介绍如何在游戏中加入 [TapTap 动态](/sdk/embedded-moments/features)。
+本文介绍如何在游戏中加入 [TapTap 动态](/sdk/embedded-moments/features)。使用内嵌动态功能需依赖 TapTap 登录。
+
+## SDK 获取
+
+请先[下载](/tap-download) SDK，并添加相关依赖
+
+<MultiLang>
+
+```cs
+"dependencies":{
+// 登录
+"com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#2.1.6",
+"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#2.1.6",
+"com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#2.1.6",
+// 动态
+"com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#2.1.4",
+}
+```
+
+```java
+repositories{  
+    flatDir {  
+        dirs 'libs'  
+    }  
+}  
+
+dependencies {  
+...  
+    implementation (name:'TapBootstrap_2.1.6', ext:'aar')  // 必选: TapSDK 启动器 
+    implementation (name:'TapCommon_2.1.6', ext:'aar') // 必选: TapSDK 基础库 
+    implementation (name:'TapLogin_2.1.6', ext:'aar') // 必选: TapTap 登录 
+    implementation (name:'TapMoment_2.1.6', ext:'aar') // TapTap 内嵌动态
+}  
+```
+
+```objectivec
+//基础库
+TapBootstrapResource.bundle
+TapBootstrapSDK.framework
+TapCommonResource.bundle
+TapCommonSDK.framework
+TapLoginSDK.framework
+//内嵌动态
+TapMomentResource.bundle
+TapMomentSDK.framework
+```
+
+</MultiLang>
 
 ## 设置回调
 
