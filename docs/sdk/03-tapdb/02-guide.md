@@ -12,6 +12,53 @@ import MultiLang from '@theme/MultiLang';
 TapSDK 提供了一套可供游戏开发者收集账号数据的 API。
 系统会收集账号数据并进行分析，最终形成数据报表，帮助游戏开发者分析账号行为并优化游戏。
 
+## SDK 获取
+
+请先[下载](/tap-download) SDK，并添加相关依赖.  
+如果只需要单独使用TapDB，可以只依赖 `common+tapdb`
+
+<MultiLang>
+
+```cs
+"dependencies":{
+// 登录
+"com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#2.1.6",
+"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#2.1.6",
+"com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#2.1.6",
+// 数据分析
+"com.taptap.tds.tapdb": "https://github.com/TapTap/TapDB-Unity.git#2.1.6",
+}
+```
+
+```java
+repositories{  
+    flatDir {  
+        dirs 'libs'  
+    }  
+}  
+
+dependencies {  
+...  
+    implementation (name:'TapBootstrap_2.1.6', ext:'aar')  // 必选: TapSDK 启动器 
+    implementation (name:'TapCommon_2.1.6', ext:'aar') // 必选: TapSDK 基础库 
+    implementation (name:'TapLogin_2.1.6', ext:'aar') // 必选: TapTap 登录 
+    implementation (name:'TapDB_2.1.6', ext:'aar') // 数据统计
+}  
+```
+
+```objectivec
+//登录
+TapBootstrapResource.bundle
+TapBootstrapSDK.framework
+TapCommonResource.bundle
+TapCommonSDK.framework
+TapLoginSDK.framework
+//TapDB
+TapDB.framework
+```
+
+</MultiLang>
+
 ## 初始化 SDK
 
 :::info

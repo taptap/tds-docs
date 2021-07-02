@@ -22,7 +22,7 @@ import MultiLang from '@theme/MultiLang';
 "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#2.1.6",
 "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#2.1.6",
 // 动态
-"com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#2.1.4",
+"com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#2.1.6",
 }
 ```
 
