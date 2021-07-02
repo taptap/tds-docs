@@ -963,7 +963,7 @@ LCFile file = new LCFile("avatar.jpg", "./avatar.jpg");
 
 ```cs
 await file.Save();
-print(file.ObjectId);
+print(file.Url);
 ```
 
 文件上传后，可以在 `_File` class 中找到。已上传的文件无法再被修改。如果需要修改文件，只能重新上传修改过的文件并取得新的 `objectId` 和 URL。

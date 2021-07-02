@@ -1160,7 +1160,7 @@ LCFile file = LCFile.withAbsoluteLocalPath("avatar.jpg", "/tmp/avatar.jpg");
 file.saveInBackground().subscribe(new Observer<LCFile>() {
     public void onSubscribe(Disposable disposable) {}
     public void onNext(LCFile file) {
-        System.out.println("文件保存完成。objectId：" + file.getObjectId());
+        System.out.println("文件保存完成。URL: " + file.getUrl());
     }
     public void onError(Throwable throwable) {
         // 保存失败，可能是文件无法被读取，或者上传过程中出现问题

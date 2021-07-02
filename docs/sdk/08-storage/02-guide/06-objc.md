@@ -1126,7 +1126,7 @@ LCFile *file = [LCFile fileWithLocalPath:imagePath error:&error];
 ```objc
 [file uploadWithCompletionHandler:^(BOOL succeeded, NSError *error) {
     if (succeeded) {
-        NSLog(@"文件保存完成。objectId：%@", file.objectId);
+        NSLog(@"文件保存完成。URL: %@", file.url);
     } else {
         // 保存失败，可能是文件无法被读取，或者上传过程中出现问题
     }
