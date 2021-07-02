@@ -66,7 +66,7 @@ module.exports = {
             },
             {
               label: 'SDK工具包',
-              to: '/sdk/tap-download',
+              to: '/tap-download',
             },
           ],
         },
