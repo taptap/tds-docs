@@ -5,15 +5,16 @@ sidebar_label: 开发指南
 ---
 
 :::info
-**目前需要联系运营团队申请使用 文本检测功能。**
+**目前需要联系运营团队申请开通文本检测功能。**
+**申请方式详见[开启文本检测服务](/sdk/text-moderation/features#开启文本检测服务)**
 :::
 
-## 1. 介绍
+## 介绍
 
 文本检测为昵称、聊天、个性签名等场景，提供实时、智能、个性化的风险文本检测服务。
 基于 AI 及多重识别策略，及时、准确、高效地抵御政治、暴恐、色情、辱骂等违规内容风险。
 
-### 1.1 API列表
+### API列表
 
 对外服务域名：https://whisper.cn.tapapis.com
 
@@ -21,11 +22,11 @@ API路径 | 介绍
 --- | ---
 /v2/text/check | 文本智能识别检测API，提供准确的判定和类型识别结果
 
-### 1.2 API协议
+### API协议
 
 API以HTTP协议对外提供，对于POST和PUT请求，请求主体必须是JSON格式，并且HTTP Header的Content-Type需要设置为application/json
 
-## 2. API鉴权
+## API鉴权
 
 API鉴权通过HTTP Header设置键值参数进行授权，参数列表如下：
 
@@ -34,11 +35,9 @@ Key | Value | 描述
 X-Client-ID | ${client_id} | TDS客户标识（请前往开发者中心获取 Client ID）
 X-Server-Secret | ${server_secret} | TDS服务密钥（请前往开发者中心获取 Server Secret）
 
-## 3 API 详细说明
+## API 详细说明
 
-### 3.1 文本智能检测
-
-#### 接口描述
+### 接口描述
 
 提供场景进行区分识别检测效果，可利用多个词库组合，配置多种智能算法进行识别检测。API会根据聚合后的结果返回一个准确的检测结果，分别是以下三种状态，用户可以根据响应的结果进行过滤：
 
@@ -48,23 +47,23 @@ X-Server-Secret | ${server_secret} | TDS服务密钥（请前往开发者中心�
 
 > 提示：单次请求数据不得超过 5 MB 大小，文本长度超过1万字将会进行截断处理，批量处理情况可能还会截断更多请仔细阅读文档
 
-#### 请求方式
+### 请求方式
 
 ```
 METHOD: POST
 URI: https://{{domain}}/v2/text/check
 ```
 
-#### 请求参数
+### 请求参数
 
-##### 基本参数
+#### 基本参数
 参数 | 类型 | 必须 | 说明 | 示例值
 --- | --- | --- | --- | ---
 scene | string | 是 | 业务场景，通过配置不同场景实现多种识别检测规则。请前往过滤场景中获取 | c1hh9bttqehouf41di00
 data | object | 是 | 文本数据提供进行内容识别检测 | [文本信息参数](#文本信息参数)
 opt | object | 否 | 检测可选项，助力一些业务方需求 | [检测选项参数](#检测选项参数)
 
-##### 文本信息参数
+#### 文本信息参数
 
 参数 | 类型 | 必须 | 说明 | 示例值
 --- | --- | --- | --- | ---
@@ -75,14 +74,14 @@ publish_time | int64 | 否 | 内容创建时间戳（毫秒）。不填默认当
 user_id | string | 是 | 业务使用方，用户唯一id。长度不超过256个字节 | taptap-123456
 nickname | string | 否 | 用户昵称，辅助校验和数据查询用途。长度不超过128个字节 | 小明
 
-##### 检测选项参数
+#### 检测选项参数
 参数 | 类型 | 必须 | 说明 | 示例值
 --- | --- | --- | --- | ---
 replacement | string | 否 | 对命中关键词进行替换的符号，默认值"*" | * 
 
-#### 响应结果
+### 响应结果
 
-##### 检测结果数据结构
+#### 检测结果数据结构
 
 > 提示：**filtered_text**字段可能不存在，Null以及空串。当返回空串时要结合result和type进行业务逻辑处理，建议是响应结果为拒绝且过滤后的内容为空代表该内容需要屏蔽。
 
@@ -94,25 +93,25 @@ type | string | 是 | 返回识别类型：<br/> 健康: Health <br/> 广告: Ad
 filtered_text | string | 否 | 通过命中关键词返回过滤后的文本内容(text) | 小明你好*，*就要多读书
 hint | object | 是 | 检测线索 | [线索数据结构](#线索数据结构)
 
-##### 线索数据结构
+#### 线索数据结构
 参数 | 类型 | 必须 | 说明 | 示例值
 --- | --- | --- | --- | ---
 hit_words | array[object]| 是 | 命中的关键词 | [命中词数据结构](#命中词数据结构)
 
-##### 命中词数据结构
+#### 命中词数据结构
 参数 | 类型 | 必须 | 说明 | 示例值
 --- | --- | --- | --- | ---
 word | string | 是 | 关键词 | xxx
 type | string | 是 | 识别类型（同上）| Adv
 positions | object | 是 | 关键词位置信息 | [关键词位置结构](#关键词位置结构)
 
-##### 关键词位置结构
+#### 关键词位置结构
 参数 | 类型 | 必须 | 说明 | 示例值
 --- | --- | --- | --- | ---
 start_index | int64 | 是 | 起始下标（从0开始）| 0
 end_index | int64 | 是 | 结束下标 | 3
 
-#### 请求示例
+### 请求示例
 ```
 curl --location --request POST 'https://whisper.cn.tapapis.com/v2/text/check' \
 --header 'Content-Type: application/json' \
@@ -133,7 +132,7 @@ curl --location --request POST 'https://whisper.cn.tapapis.com/v2/text/check' \
 }'
 ```
 
-#### 响应示例
+### 响应示例
 拒绝情况示例
 ```
 {
@@ -177,7 +176,7 @@ curl --location --request POST 'https://whisper.cn.tapapis.com/v2/text/check' \
 }
 ```
 
-## 4. API错误响应
+## API错误响应
 当HTTP返回码不等于200时，即遇到了错误情况将返回以下信息。
 
 参数名称 | 类型 | 必须 | 描述
