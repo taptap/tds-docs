@@ -3,36 +3,81 @@ id: features
 title: 功能介绍
 sidebar_label: 功能介绍
 ---
+
 import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
 
-## 登录
-TapTap 登录是基于 OAuth2.0 协议标准构建的授权登录系统。游戏开发者在进行 TapTap 授权登录接入之前，需要在 TapTap 开发者中心注册开发者帐号，并拥有一个已审核通过的移动应用。
+为了访问 TapTap Deverlop Server （以下简称 TDS）的相关服务功能，你的用户需要拥有一个 TapTap 账号。如果用户未使用 TapTap 账号，你的应用在调用 TDS 服务 API 时可能会遇到错误。本文档介绍了如何在你的应用中实现 TapTap 登录体验。
 
-### 登录业务流程
-![](/img/tap_login.png)
+## 业务介绍
 
-### 服务端对接
-如果是单机游戏，可以只对接客户端登录业务 (建议游戏保存数据到自己业务服务器)。如果是联网游戏，需要对接服务端保存用户数据。具体可参考 [服务端文档](/sdk/taptap-login/guide/userinfo)。
+TapTap 账号服务，基于标准的 OAuth 2.0 协议构建的授权登录系统，为开发者提供了简单、安全、快速的账号登录授权功能，为用户免去输入账号密码的繁琐步骤，一键通过 TapTap 账号授权，即刻使用你的应用。  
 
-### 登录实现
-请参考 [快速开始](/sdk/start/quickstart) 实现 TapTap 登录功能。  
+在取得用户授权之后，开发者可以通过接口调用的方式获得 TapTap 用户的相关公开信息，包括用户昵称、头像、性别等信息，可用于提高应用内的用户体验设计。  
 
-### 界面示例
-![](/img/tap_taploginview.png)
 
-<!-- ## 二、数据收集
-如需开通，请联系我们的技术支持 QQ：3171097571 邮件：support@tapdb.com -->
 
-## 最佳实践
+## 前期工作
 
-目的：简化用户登录流程，优化用户账号体验。
+请确认已经在 TapTap 开发者中 - 应用配置完成了开启操作。可参照入门指南-准备工作。
 
-1.  我们建议玩家登录的最佳顺序是：点击登录 TapTap 账号按钮 → 选择区服 → 选择角色 → 进入游戏。
-    - 接入 TapTap 登录功能之前，请确认在开发者中心已申请开通了登录功能，并获得相应的 Client ID；
-    - 在登录页面放置一个 [TapTap 登录按钮](/res/TapTapLoginButton.zip)，按钮的最佳显示方式为：<Red>依照提供的 UI 规范，完整展示 TapTap 品牌名称与 Logo</Red>；
+配置签名证书
 
-2. 为了避免用户账号丢失，请开发者在服务端记录 Tap ID 与 游戏 ID 、游戏 ID 与区服的匹配关系。这样，用户清除本地游戏数据后，使用相同的 TapTap 账号登录，依然能够载入之前的游戏进度。
+为了更高的安全性，TapTap 登录服务需要校验你的游戏。你需要提交游戏的 package name（Android 包名）、Bundle id（iOS 包名）以及 Android 签名。
 
-3. 可在游戏中添加账号绑定功能，为玩家提供多种登录方式。
+:::tip
 
-4. 用户切换账号时，务必调用 `logout` 接口，以保证登录账号与其他游戏服务（动态）账号保持一致。
+1、Android 的包名请使用符合 Android 规范的命名方式。参考文档：[Android 开发者-设置应用 ID](https://developer.android.com/studio/build/application-id)
+
+2、Android 的签名为 Keystore 文件中的 MD5 字符串（32 位），填入时请去除特殊符号
+
+3、iOS 的 Bundle ID 请使用符合苹果规范的命名方式。参考文档：[Property List Key - CFBundle 标识符](https://developer.apple.com/documentation/bundleresources/information_property_list/cfbundleidentifier)
+
+:::
+
+## 实现交互式登录 
+
+检查当前如果没有用户登录状态时，需要为用户提供一个可视化点击交互的登录界面。TapTap 审核团队会在应用上架 TapTap 商店时审核你的登录界面，请务必参照《登录按钮设计规范》进行绘制。
+
+## 单个登录方式
+
+当应用中仅提供 TapTap 一种登录方式时，建议在开始游戏的主界面，绘制一个可交互的登录按钮。按钮的范围大小、按钮上的文案使用，均不能误导、不能阻碍用户的正常顺畅点击。
+
+登录按钮的设计样式，在[《登录按钮设计规范》](/design)允许的范围内，可适当添加与游戏气质相符的风格元素。此外，TDS 也为你准备了不同场景下 TapTap 登录按钮的设计图标，帮助你快速实现登录流程，点击 [《TapTap 登录按钮设计图标  》](/tap-download)下载资源。
+
+
+<img src={useBaseUrl('/img/login-feature01.png')} alt="" width="800" />
+
+
+## 多种登录方式
+
+如果游戏还有其他登录方式同时存在时，为用户提供合理布局的登录界面，尽可能的从外观明显区分每种登录方式的不同，让用户可以快速找到目标。
+
+<img src={useBaseUrl('/img/login-feature02.png')} alt="" width="800" />
+      
+
+## 实现静默登录
+
+静默登录可以帮助用户节省登录的流程，通常用于用户下一次启动游戏时，仍有登录状态的场景。  
+
+当用户启动游戏时，你可以尝试获取当前用户的 Access Token  来检查用户是否已经当前设备上登录过。则可以尝试在不显示登录按钮或界面的情况下帮用户完成登录过程。
+
+
+
+## 登录授权
+
+移动应用的 TapTap 账号服务，需要与 TapTap 移动端客配合使用。TapSDK 会根据用户设备中，TapTap 客户端的安装情况，来自动选择使用合适的登录流程。  
+
+点击此处下载 TapTap 移动客户端
+
+## 唤起 TapTap 客户端授权登录
+
+当用户单击 TapTap 登录按钮时，TapSDK 检测到用户设备中已经安装了 TapTap 客户端，会自动唤起设备中的 TapTap 客户端，并识别客户端中的登录信息，进行授权登录。
+
+<img src={useBaseUrl('/img/login-taptapclient.png')} alt="" width="800" />
+
+
+## 打开 webview 授权登录
+
+当用户单击 TapTap 登录按钮时，TapSDK 检测到用户设备中未安装 TapTap 客户端，则会打开 webview 进行登录流程。  
+
+<img src={useBaseUrl('/img/login-webview.png')} alt="" width="800" />
