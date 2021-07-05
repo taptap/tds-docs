@@ -3,38 +3,29 @@ id: get-ready
 title: 准备工作
 sidebar_label: 准备工作
 ---
-import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
-
-## <Red>注意事项</Red>
-
-- 第一步开启登录时，请注意区域选择，选定后不可变更 
-- 测试用户管理功能是针对游戏在“未上线时”进行添加白名单测试，游戏上架前一定要点「上线应用”」 
-![](/img/tap_login_online.png)
-- 登录按钮需要符合 [TapTap 规范](/design)，请下载 [TapTap 登录按钮](/tap-download#登录按钮素材)  
-- 集成应用所使用的的 Client ID 与上架 App 时的商店页要强关联，即不能将测试服的参数打包上架正式服  
-
-## 开启「TapTap 登录」功能
-
-1. 在开发者中心进入已经通过审核的应用，在菜单中找到「TapTap 登录」功能。
-2. 选择适用地区。
-3. 点击开启，获得相应的 Client ID ，即可开始接入流程。
-
-![](/img/tap_taplogin_cn.png)
-
-## 配置平台信息
-开启功能后，需要配置与应用包体一致的平台信息。一个平台可以设置多条信息以供不同场景使用。如开发者后台配置的信息与实际应用使用的信息不一致，则 TapTap 登录功能无法生效(注意: 签名 MD5 的格式由数字和字母组成， 没有冒号，字母不区分大小写)。配置步骤如下：
-
-![](/img/tap_tapconfig_cn.png)
 
 
-## 集成 SDK 到你的应用
+为了能使用 TapTap 开发者服务（TapTap Developer Services，简称 TDS 服务），你需要完成前期的配置工作。
 
-下载 TapTap SDK 集成到应用中，再按照技术对接文档调用 API，即可实现 TapTap 登录功能。
+## 创建应用
 
-TapTap SDK 支持唤起 TapTap 原生应用授权登录。用户未安装 TapTap 客户端时，采用内嵌 Webview 授权登录的方式。  
-SDK 集成步骤请参考 [快速开始](/sdk/)。
+在使用 TDS 服务之前，你需要创建一个应用，来完成对接前的准备工作。创建应用请参考[商店指南](/store/store-creategame)。
 
-<!-- ## 四、开始测试
-如需要测试SDK功能，可以[点击下载](/res/TapSDK测试用例.xlsx)测试用例 -->
+## 开启应用配置
 
+在 「TapTap 开发者中心」 - 「游戏服务」 - 「应用配置」，点击「开启」，获得当前应用的基本信息。
+
+### 基本信息
+
+`client_id` 是一个应用实体包在 TapTap 开发者中心的唯一身份标识，TapTap 通过 `client_id` 来鉴别应用的身份。每个应用仅能拥有一个 `client id`，如同一个应用区分测试服与正式服，需要创建两个不同的应用，分别开启应用配置。
+
+### 适用地区
+
+一个 client 仅能对应一个地区。这是由于在 TapTap 的账号系统内，将中国大陆用户与全球用户做了隔离区分，互不相通。
+
+![](/img/tap_get_ready.png)
+
+## 隐私声明
+
+集成账号服务的功能，需要先签订[《TapTap 平台开发者协议》](/store/store-devagreement)。使用 TDS 服务，视为你同意前述所有协议，且你将基于这些协议承担相应的法律责任与义务。
 
