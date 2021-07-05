@@ -2,6 +2,7 @@
 id: tap-download
 title: 资源下载
 sidebar_label: 资源下载
+slug: /tap-download
 ---
 
 ## SDK  
