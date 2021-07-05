@@ -90,7 +90,7 @@ TapLicenseHelper.queryDLC(Activity activity, String skuIds);
 回调          | 回调值 | 说明       |
 ----------- | --- | -------- |
 QUERY_RESULT_OK       | 0   | 查询成功     |
-QUERY_RESULT_NOT_INSTALL_TAPTAP       | 1   | 检查测试机未安装TapTap客户端     |
+QUERY_RESULT_NOT_INSTALL_TAPTAP       | 1   | 检查测试机未安装 TapTap 客户端     |
 QUERY_RESULT_ERR       | 2   | 查询失败     |
 ERROR_CODE_UNDEFINED       | 80000   | 未知错误     |
 
@@ -109,9 +109,9 @@ ERROR_CODE_UNDEFINED       | 80000   | 未知错误     |
 
 ### 配置 SDK
 
-前往开发者中心   >>   选择<Blue>SDK控制台 </Blue>   >>   选择<Blue>购买激活SDK</Blue>   >>   选择相应的游戏的<Blue>配置</Blue>   >>   填写测试用户的 TapTap ID 。
+前往开发者中心   >>   选择<Blue>SDK 控制台 </Blue>   >>   选择<Blue>购买激活 SDK</Blue>   >>   选择相应的游戏的<Blue>配置</Blue>   >>   填写测试用户的 TapTap ID 。
 
-或者，前往开发者中心   >>   选择已经开放售卖的游戏 >>   选择<Blue>购买激活SDK设置</Blue>   >>   填写测试用户的 TapTap ID 。
+或者，前往开发者中心   >>   选择已经开放售卖的游戏 >>   选择<Blue>购买激活 SDK 设置</Blue>   >>   填写测试用户的 TapTap ID 。
 
 ### 开始测试
 
