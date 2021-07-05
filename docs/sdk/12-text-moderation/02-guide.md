@@ -134,7 +134,7 @@ curl --location --request POST 'https://whisper.cn.tapapis.com/v2/text/check' \
 
 ### 响应示例
 拒绝情况示例
-```
+```json
 {
     "result": 1,
     "type": "Politics",
@@ -164,7 +164,7 @@ curl --location --request POST 'https://whisper.cn.tapapis.com/v2/text/check' \
 ```
 
 健康情况示例
-```
+```json
 {
     "result": 0,
     "type": "Health",
@@ -185,7 +185,7 @@ code | int | 是 | 接口错误码，返回码见 (https://developers.google.com
 message | string | 是 | 错误消息
 details | object | 否 | 详情信息，具体结构根据不同code表示
 
-```
+```json
 // 响应body为json格式
 {
     "code": 5, 

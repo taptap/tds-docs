@@ -33,7 +33,7 @@ sidebar_label: 最佳实践
 
 **Golang**
 
-``` golang
+``` go
 rs := client.Check("游戏不好玩")
 if rs.result == 1 {
     // todo: reject create user
@@ -72,7 +72,7 @@ if rs.result == 1 {
 
 **Golang**
 
-``` golang
+``` go
 rs := client.Check("G市偷井盖，真讨厌")
 if rs.result == 1 && rs.filtered_text != "" {
     // todo: can send 'rs.filterd_text' in chat room
@@ -100,7 +100,7 @@ if rs.result == 1 && rs.filtered_text != "" {
 
 **Golang**
 
-``` golang
+``` go
 rs := client.Check("工作室，+v xxxx")
 if rs.result == 1 && rs.type == "Adv" {
     // todo: reject send to chat room
