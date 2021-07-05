@@ -1,7 +1,6 @@
-## 文档发布
+## 文档内容修改
 
-1. 请到 https://git.gametaptap.com/tds/client-sdk/tds-sdk-all/tapsdk-doc 项目中编写文档
-
+内容方面的改动，请到 https://git.gametaptap.com/tds/client-sdk/tds-sdk-all/TapSDK-Doc-Content/ 提交。
 ## 文档发布注意事项
 
 - docs 下部分中文文件名 markdown 是沿用产品提供的文档原本使用的文件名或其他迁移过来的文件名。新创建的文件请使用英文，单词之间用 `-` 连接，例如 `hello-world.md`。
@@ -14,7 +13,7 @@
 - 用不到的内容尽量删除（git 会保留历史）而不是注释掉，因为翻译人员不一定熟悉 HTML 注释标记，可能因此做无用功。
 - 一定要本地运行一下，检查更改过的代码文件是否能正常打开再pr
 - 若端口冲突，可手动修改package.json#start脚本；可以添加外部访问ip段，或者指定全部docusaurus start --port 3000 --host 0.0.0.0
-- master 分支为主分支，其他分支均为开发使用，无特殊含义。
+- `master` 分支为主分支，`auto-sync` 自动同步 TapSDK-Doc-Content 的改动。其他分支均为开发使用，无特殊含义。
 
 ## 多编程语言
 
@@ -128,6 +127,14 @@ npm start
 
 注意，`npm start` 并不会检查坏链。
 如需检查坏链，需要运行 `npm run build`。
+
+## 文档发布
+
+`auto-sync` 分支会自动发布到预览环境：https://developer.xdrnd.com/v2-doc/
+
+`master` 分支点第四个（最后一个） job （`deploy-production`）的按钮可以发布到线上（只有 `master` 分支可以发到线上）
+
+![deploy production](deploy-production.png)
 
 ## 关于国际化
 
