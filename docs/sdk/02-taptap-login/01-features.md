@@ -4,7 +4,7 @@ title: 功能介绍
 sidebar_label: 功能介绍
 ---
 
-import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 
 为了访问 TapTap Deverlop Server （以下简称 TDS）的相关服务功能，你的用户需要拥有一个 TapTap 账号。如果用户未使用 TapTap 账号，你的应用在调用 TDS 服务 API 时可能会遇到错误。本文档介绍了如何在你的应用中实现 TapTap 登录体验。
 
