@@ -23,7 +23,7 @@ await todo.Save();
 
 ## SDK 安装与初始化
 
-请阅读 《.Net 安装指南》。
+请阅读 [数据存储、即时通讯 .NET SDK 配置指南](/sdk/storage/guide/setup-dotnet)。
 
 > C#/.Net/Unity SDK 老版本迁移
 >
@@ -87,7 +87,7 @@ object["dictValue"] = dict;
 
 **云服务控制台 > 数据存储 > 结构化数据** 中展示的日期数据也会依据操作系统的时区进行转换。一个例外是当你通过 REST API 获得数据时，这些数据将以 UTC 呈现。你可以手动对它们进行转换。
 
-若想了解云服务是如何保护应用数据的，请阅读《数据和安全》。
+若想了解云服务是如何保护应用数据的，请阅读[数据和安全](/sdk/storage/guide/security)。
 
 ### 构建对象
 
@@ -291,7 +291,7 @@ todo.Unset("priority");
 await todo.Save();
 ```
 
-注意，删除对象是一个较为敏感的操作，我们建议你阅读《ACL 权限管理开发指南》 来了解潜在的风险。熟悉 class 级别、对象级别和字段级别的权限可以帮助你有效阻止未经授权的操作。
+注意，删除对象是一个较为敏感的操作，我们建议你阅读[《ACL 权限管理开发指南》](https://leancloud.cn/docs/acl-guide.html) 来了解潜在的风险。熟悉 class 级别、对象级别和字段级别的权限可以帮助你有效阻止未经授权的操作。
 
 ### 批量操作
 
@@ -516,7 +516,7 @@ string content = todo["content"] as string; // √
 string notes = todo["notes"] as string; // null
 ```
 
-`Select` 支持点号（`author.firstName`），详见《点号使用指南》。
+`Select` 支持点号（`author.firstName`），详见[《点号使用指南》](https://leancloud.cn/docs/dot-notation.html)。
 
 另外，字段名前添加减号前缀表示反向选择，例如 `-author` 表示不返回 `author` 字段。
 反向选择同样适用于内置字段，比如 `-objectId`，也可以和点号组合使用，比如 `-pubUser.createdAt`。
@@ -656,7 +656,7 @@ foreach (LCObject comment in comments) {
 ```
 
 
-可以用 dot 符号（`.`）来获取多级关系，例如 `post.author`，详见《点号使用指南》的《在查询对象时使用点号》一节。
+可以用 dot 符号（`.`）来获取多级关系，例如 `post.author`，详见[《点号使用指南》](https://leancloud.cn/docs/dot-notation.html)的《在查询对象时使用点号》一节。
 
 可以在同一查询上应用多次 `Include` 以包含多个属性。
 
@@ -1283,7 +1283,7 @@ await LCUser.RequestPasswordReset("tom@leancloud.rocks");
 
 上面的代码会查询 `_User` 表中是否有对象的 `email` 属性与前面提供的邮箱匹配。如果有的话，则向该邮箱发送一封密码重置邮件。之前提到过，应用可以让 `username` 与 `email` 保持一致，也可以单独收集用户的邮箱并将其存为 `email`。
 
-密码重置邮件的内容可在应用的 **云服务控制台 > 数据存储 > 用户 > 邮件模版** 中自定义。更多关于自定义邮件模板和验证链接的内容，请参考《自定义邮件验证和重设密码页面》。
+密码重置邮件的内容可在应用的 **云服务控制台 > 数据存储 > 用户 > 邮件模版** 中自定义。更多关于自定义邮件模板和验证链接的内容，请参考[《自定义邮件验证和重设密码页面》](https://leancloud.cn/docs/custom-reset-verify-page.html)。
 
 
 ### 用户的查询
@@ -1296,7 +1296,7 @@ LCQuery<LCUser> userQuery = LCUser.GetQuery();
 
 为了安全起见，**新创建的应用的 `_User` 表默认关闭了 `find` 权限**，这样每位用户登录后只能查询到自己在 `_User` 表中的数据，无法查询其他用户的数据。如果需要让其查询其他用户的数据，建议单独创建一张表来保存这类数据，并开放这张表的 `find` 查询权限。除此之外，还可以在云引擎里封装用户查询相关的方法。
 
-可以参见 [用户对象的安全](#用户对象的安全) 来了解 `_User` 表的一些限制，还可以阅读《数据和安全》来了解更多 class 级权限设置的方法。
+可以参见 [用户对象的安全](#用户对象的安全) 来了解 `_User` 表的一些限制，还可以阅读[数据和安全](/sdk/storage/guide/security)来了解更多 class 级权限设置的方法。
 
 ### 关联用户对象
 
@@ -1353,7 +1353,7 @@ try {
 
 ### 其他对象的安全
 
-对于给定的一个对象，可以指定哪些用户有权限读取或修改它。为实现该功能，每个对象都有一个由 `ACL` 对象组成的访问控制表。请参阅《ACL 权限管理开发指南》。
+对于给定的一个对象，可以指定哪些用户有权限读取或修改它。为实现该功能，每个对象都有一个由 `ACL` 对象组成的访问控制表。请参阅[《ACL 权限管理开发指南》](https://leancloud.cn/docs/acl-guide.html)。
 
 ### 第三方账户登录
 
@@ -1651,7 +1651,7 @@ LCUser currentUser = await LCUser.LoginWithAuthDataAndUnionId(
     option: option);
 ```
 
-> 注意代码中将微信传回来的 openid 属性改为了 uid，这是因为云端要求对于自定义的 platform，只能使用 uid 这样的属性名，才能保证自动建立 `authData.<PLATFORM>.uid` 的唯一索引，具体可以参考《数据存储 REST API 使用详解》的《连接用户账户和第三方平台》一节。
+> 注意代码中将微信传回来的 openid 属性改为了 uid，这是因为云端要求对于自定义的 platform，只能使用 uid 这样的属性名，才能保证自动建立 `authData.<PLATFORM>.uid` 的唯一索引，具体可以参考[数据存储 REST API 使用详解](/sdk/storage/guide/rest)的《连接用户账户和第三方平台》一节。
 
 如果用户 A 是第一次在「云服务通讯」中通过微信登录，那么 _User 表中会增加一个新用户（假设其 objectId 为 `ThisIsUserA`），其 `authData` 的结果如下：
 
@@ -1888,8 +1888,8 @@ if (currentUser.IsAnonymous) {
 
 ## 角色
 
-随着用户量的增长，你可能会发现相比于为每一名用户单独设置权限，将预先设定好的权限直接分配给一部分用户是更好的选择。为了迎合这种需求，云服务支持基于角色的权限管理。请参阅《ACL 权限管理开发指南》。
+随着用户量的增长，你可能会发现相比于为每一名用户单独设置权限，将预先设定好的权限直接分配给一部分用户是更好的选择。为了迎合这种需求，云服务支持基于角色的权限管理。请参阅[《ACL 权限管理开发指南》](https://leancloud.cn/docs/acl-guide.html)。
 
 ## 全文搜索
 
-全文搜索是一个针对应用数据进行全局搜索的接口，它基于搜索引擎构建，提供更强大的搜索功能。要深入了解其用法和阅读示例代码，请阅读《全文搜索指南》。
+全文搜索是一个针对应用数据进行全局搜索的接口，它基于搜索引擎构建，提供更强大的搜索功能。要深入了解其用法和阅读示例代码，请阅读[全文搜索指南](/sdk/storage/guide/fulltext-search)。

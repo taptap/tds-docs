@@ -193,7 +193,7 @@ dependencies {
     - 使用 `mixpush-android` 的开发者，调用 `cn.leancloud.LCMixPushManager.registerHMSPush(context, profile)` 完成 HMS 推送的初始化。
     - 使用 `mixpush-hms` 的开发者，调用 `cn.leancloud.hms.LCMixPushManager.registerHMSPush(context, profile)` 完成 HMS 推送的初始化。
 
-    这里参数 `profile` 的用法可以参考《推送 REST API 使用指南》的《Android 混合推送多配置区分》一节。
+    这里参数 `profile` 的用法可以参考[推送 REST API 使用指南](/sdk/push/guide/rest)的《Android 混合推送多配置区分》一节。
   
 2. 务必在应用启动的首个 activity 的 `onCreate` 方法中调用 `LCMixPushManager.connectHMS(activity)` ，确保 HMS SDK 连接成功。如果开发者不通过 AppGallery Connect 配置文件来集成，我们也提供了 `LCMixPushManager.connectHMS(activity, huaweiAppId)` 来显式指定华为应用 id 完成连接。
 
@@ -449,7 +449,7 @@ dependencies {
 这里：
 
 - 参数 `miAppKey` 需要的是 AppKey，而在控制台的混合推送配置中 Profile 的第二个参数是 AppSecret，请注意区分，并分别正确填写。
-- 参数 `profile` 的用法可以参考 《推送 REST API 使用指南》的《Android 混合推送多配置区分》一节。
+- 参数 `profile` 的用法可以参考 [推送 REST API 使用指南](/sdk/push/guide/rest)的《Android 混合推送多配置区分》一节。
 
 云端只有在**满足以下全部条件**的情况下才会使用小米推送：
 
@@ -541,7 +541,7 @@ dependencies {
 - 使用 `mixpush-android` 的开发者，调用 `cn.leancloud.LCMixPushManager.registerFlymePush(context, flymeId, flymeKey, profile)` 。
 - 使用 `mixpush-meizu` 的开发者，调用 `cn.leancloud.flyme.LCMixPushManager.registerFlymePush(context, flymeId, flymeKey, profile)` 。
 
-这里参数 `profile` 的用法可以参考《推送 REST API 使用指南》的《Android 混合推送多配置区分》一节。
+这里参数 `profile` 的用法可以参考[推送 REST API 使用指南](/sdk/push/guide/rest)的《Android 混合推送多配置区分》一节。
 
 注意，云端只有在以下三个条件都满足的情况下，才会使用魅族推送。
 

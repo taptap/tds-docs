@@ -10,7 +10,7 @@ sidebar_label: 推送 REST API
 
 请求的 Base URL 可以在**云服务控制台 > 设置 > 应用 Keys > 服务器地址**查看。
 对于 POST 和 PUT 请求，请求的主体必须是 JSON 格式，而且 HTTP Header 的 Content-Type 需要设置为 `application/json`。
-请求的鉴权是通过 HTTP Header 里面包含的键值对来进行的，详见《存储 REST API 使用指南》中《请求格式》一节的说明。
+请求的鉴权是通过 HTTP Header 里面包含的键值对来进行的，详见[数据存储 REST API 使用详解](/sdk/storage/guide/rest)中《请求格式》一节的说明。
 
 ### Installation
 
@@ -326,7 +326,7 @@ curl -X POST \
 名称| 约束 | 描述
 ---|--- | ---
 data| **必填**| 推送的内容数据，JSON 对象，请参考 [消息内容](#消息内容-Data)。
-where| 可选 | 检索 `_Installation` 表使用的查询条件，JSON 对象。如果查询条件内包含日期或二进制等需要做编码的特殊类型数据，查询条件内需要包含编码后的数据。如查询 `createdAt` 字段大于某个时间的设备，where 条件需要为 `{"createdAt":{"$gte":{"__type":"Date","iso":"2015-06-21T18:02:52.249Z"}}}`。更多信息请参看《存储 REST API 使用指南》的《数据类型》一节的说明。
+where| 可选 | 检索 `_Installation` 表使用的查询条件，JSON 对象。如果查询条件内包含日期或二进制等需要做编码的特殊类型数据，查询条件内需要包含编码后的数据。如查询 `createdAt` 字段大于某个时间的设备，where 条件需要为 `{"createdAt":{"$gte":{"__type":"Date","iso":"2015-06-21T18:02:52.249Z"}}}`。更多信息请参看[数据存储 REST API 使用详解](/sdk/storage/guide/rest)的《数据类型》一节的说明。
 channels| 可选 | 推送给哪些频道，将作为条件加入 where 对象。
 push_time| 可选 | 设置定时推送的发送时间，需为 UTC 时间且符合 ISO8601 格式要求，例如：`2019-04-01T06:19:29.000Z`。请注意发送时间与当前时间如果小于 1 分钟则推送会立即发出，不会遵循 push_time 参数要求。如果需要实现周期推送，可以参照 [使用云引擎实现周期推送](#使用云引擎实现周期推送) 实现。
 expiration_time| 可选 | 消息过期的绝对日期时间，需为 UTC 时间且符合 ISO8601 格式要求，例如："2019-04-01T06:19:29.000Z"。如果客户端收到消息的时间超过消息过期的时间，那么消息将不显示给用户。
@@ -337,11 +337,11 @@ prod| 可选 | ***仅对 iOS 推送有效***。当使用 Token Authentication �
 topic | 可选 | ***仅对使用 Token Authentication 鉴权方式的 iOS 推送有效***。当使用 Token Authentication 鉴权方式发 iOS 推送时需要提供设备对应的 APNs Topic 做鉴权。一般情况下，iOS SDK 会自动读取 iOS app 的 bundle ID 作为 topic 存入 Installation 记录的 apnsTopic 字段，所以推送请求中无需带有该参数。但以下情况需要手工指定： 1. 使用低于 v4.2.0 的 iOS SDK; 2. 不使用 iOS SDK （如 React Native）；3. 推送目标设备使用的 topic 与 iOS Bundle ID 不同。
 apns_team_id | 可选 | ***仅对使用 Token Authentication 鉴权方式的 iOS 推送有效***。当使用 Token Authentication 鉴权方式发 iOS 推送时需要提供设备对应的 Team ID 做鉴权。一般情况下如果您配置的所有 Team ID 下的 APNs Topic 均不重复，或在存储 Installation 时主动设置过 apnsTeamId 值，则无需提供本参数，我们会为每个设备匹配对应的 Team ID 来发推送。否则必须提供本参数且需要通过 where 查询条件保证单次推送请求的目标设备均属于本参数指定的 Team ID，以保证推送正常进行。
 flow_control | 可选 | 是否开启平缓发送，默认不开启。其值代表推送的速度，即每秒推送的目标终端用户数。最低值 1000，低于最低值按最低值计算。
-_notificationChannel | 可选 | Android 8.0 以上设备在推送时需要传递 channnel id 才能正常接收推送，请参看《Android 消息推送开发指南》的《Android 8.0 推送适配》一节。
+_notificationChannel | 可选 | Android 8.0 以上设备在推送时需要传递 channnel id 才能正常接收推送，请参看[Android 推送指南](/sdk/push/guide/android)的《Android 8.0 推送适配》一节。
 
 `_Installation` 表中的所有属性，无论是内置的还是自定义的，都可以作为查询条件通过 where 来指定，并且支持各种复杂查询。
 
-下面会举一些例子，更多例子请参考《存储 REST API 使用指南》的《查询》一节。
+下面会举一些例子，更多例子请参考[数据存储 REST API 使用详解](/sdk/storage/guide/rest)的《查询》一节。
 
 ##### 推送给所有的设备
 
@@ -623,7 +623,7 @@ data 和 alert 内属性的具体含义请参考 [Apple 官方关于 Payload Key
 }
 ```
 
-关于 `silent` 参数请参看 [Android 推送区分透传和通知栏消息](#Android-推送区分透传和通知栏消息)，关于自定义 Receiver 请参看《Android 消息推送开发指南》的《自定义 Receiver》一节。
+关于 `silent` 参数请参看 [Android 推送区分透传和通知栏消息](#Android-推送区分透传和通知栏消息)，关于自定义 Receiver 请参看[Android 推送指南](/sdk/push/guide/android)的《自定义 Receiver》一节。
 
 ##### 为多种类型设备设置不同推送内容
 
@@ -679,7 +679,7 @@ Android 推送（包括 Android 混合推送）支持透传和通知栏两种消
 推送服务通过推送请求中 `data` 参数内的 `silent` 字段区分透传和通知栏消息。
 `silent` 为 `true` 表示这个消息是透传消息，为 `false` 表示消息是通知栏消息。
 如果不传递 `silent` 则默认其值为 `false`。
-另外请注意，如果希望接收透传消息请不要忘记自行实现自定义 Receiver，参见《Android 消息推送开发指南》的《自定义 Receiver》一节的说明。
+另外请注意，如果希望接收透传消息请不要忘记自行实现自定义 Receiver，参见[Android 推送指南](/sdk/push/guide/android)的《自定义 Receiver》一节的说明。
 
 #### 过期时间和定时推送
 
@@ -796,11 +796,11 @@ curl -X GET \
 
 其中 URL 里的 `:objectId` 替换成 `/push` 接口返回的 objectId 。
 
-将返回推送记录对象，推送记录各字段含义参考《推送服务总览》的《Notification》一节。
+将返回推送记录对象，推送记录各字段含义参考[推送通知总览](/sdk/push/guide/overview)的《Notification》一节。
 
 ### 推送状态查看和取消
 
-在发推送的过程中，我们会随着推送任务的执行更新推送状态到 **云服务控制台 > 推送 > 推送记录** 中，可以在这里查看推送的最新状态。对不同推送状态的说明请参看《推送服务总览》的《Notification》一节。
+在发推送的过程中，我们会随着推送任务的执行更新推送状态到 **云服务控制台 > 推送 > 推送记录** 中，可以在这里查看推送的最新状态。对不同推送状态的说明请参看[推送通知总览](/sdk/push/guide/overview)的《Notification》一节。
 
 在一条推送记录状态到达 **done** 即完成推送之前，其状态信息旁边会显示 “取消推送” 按钮，点击后就能将本次推送取消。并且取消了的推送会从推送记录中删除。
 

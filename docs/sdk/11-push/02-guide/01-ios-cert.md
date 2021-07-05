@@ -118,7 +118,7 @@ sidebar_label: iOS 推送设置
 注意，Token Authentication 鉴权方式和老的证书鉴权方式是互斥的，一旦配置了 Token Authentication 则应用下所有推送均会使用 Token Authentication 方式进行，所以请确保为所有需要发推送的 App 都添加了 Token Authentication 配置。
 
 如果目标推送设备中有使用版本低于 v4.2.0 的 iOS SDK，请在调用推送接口发推送时主动带上 topic 参数。
-用法请参考《推送 REST API 使用指南》的《推送消息》一节。
+用法请参考[推送 REST API 使用指南](/sdk/push/guide/rest)的《推送消息》一节。
 
 ## 创建推送证书（不推荐使用）
 
@@ -238,7 +238,7 @@ Apple 未来可能会修改推送证书的名字前缀，我们会及时更新�
 
 LeanCloud 后端在收到推送请求时都会去检查 `prod` 参数指明的证书是否过期，没有 `prod` 则默认检查正式环境证书，如果发现过期并且 query 条件查出的目标设备可能存在 iOS 设备，就直接拒绝本次推送。
 
-一种解决方法是替换过期的证书，另一种方法是在 query 条件中通过 `deviceType` 字段明确指定 `_Installation` 表中设备类型为非 iOS 设备来推送，方法参见《推送 REST API 使用指南》的《通过查询条件发推送》一节。
+一种解决方法是替换过期的证书，另一种方法是在 query 条件中通过 `deviceType` 字段明确指定 `_Installation` 表中设备类型为非 iOS 设备来推送，方法参见[推送 REST API 使用指南](/sdk/push/guide/rest)的《通过查询条件发推送》一节。
 
 ## 验证推送服务状态
 

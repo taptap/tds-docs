@@ -1,7 +1,7 @@
 ---
 id: systemconv
 title: 四，详解消息 hook 与系统对话 
-sidebar_label: 开发指南四
+sidebar_label: Hook 与系统对话
 ---
 
 import MultiLang from '@theme/MultiLang';
@@ -11,7 +11,7 @@ import Mermaid from '@theme/Mermaid';
 
 ## 本章导读
 
-在前一篇《安全与签名、黑名单和权限管理、玩转聊天室和临时对话》中，我们解释了一些第三方鉴权以及成员权限设置方面的问题，在这里我们会更进一步，给大家说明：
+在前一篇[安全与签名、黑名单和权限管理、玩转聊天室和临时对话](/sdk/im/guide/senior)中，我们解释了一些第三方鉴权以及成员权限设置方面的问题，在这里我们会更进一步，给大家说明：
 
 - 即时通讯的消息 Hook 机制
 - 系统对话的使用方法
@@ -69,7 +69,7 @@ Hook 也可以称为「钩子」，是一种特殊的消息处理机制，与 Wi
 * **_clientOffline**<br/>
   客户端下线，客户端登出成功或意外下线后调用。
 
-开发者可以利用这两个 Hook 函数，结合 LeanCache 来完成一组客户端实时状态查询的 endpoint，具体可以参考文档《即时通讯中的在线状态查询》。
+开发者可以利用这两个 Hook 函数，结合 LeanCache 来完成一组客户端实时状态查询的 endpoint，具体可以参考文档[《即时通讯中的在线状态查询》](https://leancloud.cn/docs/realtime-guide-onoff-status.html)。
 
 ### Hook 与云引擎的关系
 
@@ -89,7 +89,7 @@ Hook 也可以称为「钩子」，是一种特殊的消息处理机制，与 Wi
 
 请注意，在这个 hook 的代码实现的任何分支上 **请确保最终会调用 `response.success` 返回结果**，使得消息可以尽快投递给收件人。这个 hook 将 **阻塞发送流程**，因此请尽量减少无谓的代码调用，提升效率。
 
-如果你使用了默认提供的富媒体消息格式，云引擎参数中的 `content` 接收的是 JSON 结构的字符串形式。关于这个结构的详细说明，请参考《即时通讯 REST API 使用指南》的《富媒体消息格式说明》一节。
+如果你使用了默认提供的富媒体消息格式，云引擎参数中的 `content` 接收的是 JSON 结构的字符串形式。关于这个结构的详细说明，请参考[即时通讯 REST API 使用指南](/sdk/im/guide/rest)的《富媒体消息格式说明》一节。
 
 参数：
 
@@ -460,7 +460,7 @@ public static Dictionary<string, object> OnMessageSent(Dictionary<string, object
 
 请注意，在这个 hook 的代码实现的任何分支上 **请确保最终会调用 `response.success` 返回结果**，使得修改消息可以尽快投递给收件人。这个 hook 将 **阻塞发送流程**，因此请尽量减少无谓的代码调用，提升效率。
 
-如果你使用了默认提供的富媒体消息格式，云引擎参数中的 `content` 接收的是 JSON 结构的字符串形式。关于这个结构的详细说明，请参考《即时通讯 REST API 使用指南》的《富媒体消息》一节。
+如果你使用了默认提供的富媒体消息格式，云引擎参数中的 `content` 接收的是 JSON 结构的字符串形式。关于这个结构的详细说明，请参考[即时通讯 REST API 使用指南](/sdk/im/guide/rest)的《富媒体消息》一节。
 
 参数：
 
@@ -1288,7 +1288,7 @@ public static void OnClientOffline(Dictionary<string, object> parameters) {
 </MultiLang>
 
 
-《即时通讯中的在线状态查询》提供了完整的 Node.js 示例（包括 LeanCache 连接，久未上线的客户端清理，配套的返回在线状态的云函数，以及如何在客户端调用），可以参考。
+[《即时通讯中的在线状态查询》](https://leancloud.cn/docs/realtime-guide-onoff-status.html)提供了完整的 Node.js 示例（包括 LeanCache 连接，久未上线的客户端清理，配套的返回在线状态的云函数，以及如何在客户端调用），可以参考。
 
 ## 「系统对话」的使用
 
@@ -1296,10 +1296,10 @@ public static void OnClientOffline(Dictionary<string, object> parameters) {
 
 ### 系统对话的创建
 
-系统对话也是对话的一种，创建后也是在 `_Conversation` 表中增加一条记录，只是该记录 `sys` 列的值为 `true`，从而与普通会话进行区别。具体创建方法请参考《即时通讯 REST API 使用指南》的《创建服务号》一节。
+系统对话也是对话的一种，创建后也是在 `_Conversation` 表中增加一条记录，只是该记录 `sys` 列的值为 `true`，从而与普通会话进行区别。具体创建方法请参考[即时通讯 REST API 使用指南](/sdk/im/guide/rest)的《创建服务号》一节。
 ### 系统对话消息的发送
 
-系统对话给用户发消息请参考《即时通讯 REST API 使用指南》的《给任意用户单独发消息》一节。用户给系统对话发送消息跟用户给普通对话发消息方法一致。
+系统对话给用户发消息请参考[即时通讯 REST API 使用指南](/sdk/im/guide/rest)的《给任意用户单独发消息》一节。用户给系统对话发送消息跟用户给普通对话发消息方法一致。
 
 您还可以利用系统对话发送广播消息给全部用户。相比遍历所有用户 ID 逐个发送，广播消息只需要调用一次 REST API。广播消息具有以下特征：
 
@@ -1308,11 +1308,11 @@ public static void OnClientOffline(Dictionary<string, object> parameters) {
 * 广播消息具有实效性，可以设置过期时间；过期的消息不会作为离线消息发送给用户，不过仍然可以在历史消息中获取到
 * 新用户第一次登录后，会收到最近一条未过期的系统广播消息
 
-除此以外广播消息与普通消息的处理完全一致。广播消息的发送可以参考《即时通讯 REST API 使用指南》的《全局广播》一节。
+除此以外广播消息与普通消息的处理完全一致。广播消息的发送可以参考[即时通讯 REST API 使用指南](/sdk/im/guide/rest)的《全局广播》一节。
 
 ### 获取系统对话消息记录
 
-获取系统对话给用户发送的消息记录请参考：《即时通讯 REST API 使用指南》的《查询服务号给某用户发的消息》一节。
+获取系统对话给用户发送的消息记录请参考：[即时通讯 REST API 使用指南](/sdk/im/guide/rest)的《查询服务号给某用户发的消息》一节。
 
 获取用户给系统对话发送的消息记录有以下两种方式实现：
 

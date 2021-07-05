@@ -21,7 +21,7 @@ import Mermaid from '@theme/Mermaid';
 这时，你可以使用云引擎的云函数。
 云函数是一段部署在服务端的 JavaScript、Python、PHP、C#、Go 代码，可以很好地完成上述需求。
 
-如果还不知道如何创建云引擎项目、本地调试并部署到云端，请阅读《云引擎快速入门》。
+如果还不知道如何创建云引擎项目、本地调试并部署到云端，请阅读[云引擎快速入门](/sdk/engine/guide/quickstart)。
 
 
 ## 云函数
@@ -240,7 +240,7 @@ AV.Cloud.define('averageStars', { fetchUser: false, internal: true }, function (
 
 我们推荐大家使用链式的 Promise 写法来完成业务逻辑，这样会极大地方便异步任务的处理和异常处理，**请注意一定要将 Promise 串联起来并在云函数中 return** 以保证上述逻辑正确工作，推荐阅读 [JavaScript Promise 迷你书](http://liubin.org/promises-book/) 来深入地了解 Promise。
 
-在 2.0 之前的早期版本中，云函数接受 `request` 和 `response` 两个参数，我们会继续兼容这种用法到下一个大版本，希望开发者尽快迁移到 Promise 风格的云函数上。之前版本的文档见《[Node SDK v1 API 文档](https://github.com/leancloud/leanengine-node-sdk/blob/v1/API.md)》。
+在 2.0 之前的早期版本中，云函数接受 `request` 和 `response` 两个参数，我们会继续兼容这种用法到下一个大版本，希望开发者尽快迁移到 Promise 风格的云函数上。之前版本的文档见[Node SDK v1 API 文档](https://github.com/leancloud/leanengine-node-sdk/blob/v1/API.md)。
 
 </>
 <>
@@ -1571,7 +1571,7 @@ leancloud.OnLogin(func(req *ClassHookRequest) error {
 
 ### 即时通讯 Hook 函数
 
-参见《即时通讯概览第四篇》的《万能的 Hook 机制》章节。
+参见[即时通讯指南第四篇](/sdk/im/guide/systemconv)的《万能的 Hook 机制》章节。
 
 ### Hook 函数错误响应码
 
@@ -1743,7 +1743,7 @@ leancloud.Define("logTimer", func(req *FunctionRequest) (interface{}, error) {
 
 以 Cron 表达式为例，比如每周一早上 8 点打印日志（运行之前定义的 `logTimer` 函数），创建定时任务的时候，选择 **Cron 表达式** 并填入 `0 0 8 ? * MON`。
 
-Cron 表达式的语法可以参考《云队列使用指南》的《Cron 表达式》一节。
+Cron 表达式的语法可以参考[云队列指南](/sdk/engine/guide/cloudqueue)的《Cron 表达式》一节。
 
 点击「非必填」会展开更多选项：
 
@@ -1849,4 +1849,4 @@ SDK 中每个请求都可以使用 `UseMasterKey()` 为请求带上 Master Key �
 - 如果你的云引擎代码中特权操作比较多、操作不属于用户的全局数据比较多，那么建议全局开启 Master Key，并自行做好对于用户请求的权限检查。
 - 如果你的云引擎代码中的请求通常和单个用户自己的数据相关、需要遵守 ACL，那么建议不开启 Master Key，将用户请求的 `sessionToken` 传入数据修改的相关操作。
 
-关于云引擎上的权限问题，还可以参考《ACL 权限管理开发指南》和《在云引擎中使用 ACL》。
+关于云引擎上的权限问题，还可以参考[《ACL 权限管理开发指南》](https://leancloud.cn/docs/acl-guide.html)和[《在云引擎中使用 ACL》](https://leancloud.cn/docs/acl_guide_leanengine.html)。
