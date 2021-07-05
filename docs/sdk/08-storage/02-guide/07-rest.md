@@ -541,7 +541,7 @@ curl -X GET \
 ```
 
 顺带提一下，获取用户推荐使用 `GET /users/<objectId>`，而不是直接查询 `_User` 类。
-参见后文《获取用户》一节。
+参见后文[获取用户](#获取用户)一节。
 
 ### 更新对象
 
@@ -1956,7 +1956,7 @@ Location: https://{{host}}/1.1/users/55a4800fe4b05001a7745c41
 ```
 
 云端会自动验证部分平台 access token 的有效性。
-详见数据存储开发指南《自动验证第三方平台授权信息》章节的说明。
+详见[自动验证第三方平台授权信息](/sdk/storage/guide/dotnet#自动验证第三方平台授权信息)。
 
 #### UnionID 注册和登录
 
@@ -1977,7 +1977,7 @@ Location: https://{{host}}/1.1/users/55a4800fe4b05001a7745c41
 
 使用 UnionID 注册登录，需要提供带有 `unionid` 参数的 `authData`。另外需要配合传递 `platform` 和 `main_account` 这两个字段。
 
-* `platform`：unionId 对应的注册平台，可由应用自行指定，微信、QQ、微博平台建议设为《数据存储开发指南·该如何指定 unionIdPlatform》中推荐的值。
+* `platform`：unionId 对应的注册平台，可由应用自行指定，微信、QQ、微博平台建议设为[这些推荐的值](/sdk/storage/guide/dotnet#该如何指定-unionidplatform)。
 * `main_account`： `main_account` 为 true 时把当前平台的鉴权信息作为主账号。
 
 在服务端进行存储的时候会根据 `platform` 来命名新增的平台，如传入 `"platform" = "weixin"` 时，返回数据中会增加 `_weixin_unionid` 字段存储 `{"uid":"xxxxx"}`。
@@ -2062,7 +2062,7 @@ curl -X POST \
 }
 ```
 
-可参见《数据存储开发指南》的《扩展：接入_UnionID_体系，打通不同子产品的账号系统》一节的详细说明。
+参见[扩展：接入_UnionID_体系，打通不同子产品的账号系统](/sdk/storage/guide/dotnet#扩展：接入-unionid-体系，打通不同子产品的账号系统)。
 
 #### 连接
 
@@ -2440,7 +2440,7 @@ curl -X POST \
   https://{{host}}/1.1/files
 ```
 
-响应和返回值请参考前文《创建对象》一节。
+响应和返回值请参考前文[创建对象](#创建对象)一节。
 
 ### 关联文件到对象
 

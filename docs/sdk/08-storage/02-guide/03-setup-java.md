@@ -309,7 +309,7 @@ public class MyLeanCloudApp extends Application {
 }
 ```
 
-这时候程序初始化不再需要 appKey，避免了核心配置信息在客户端泄漏可能带来的潜在风险。具体的集成方法可参看文档《Android SDK 更安全的接入和初始化方式》。
+这时候程序初始化不再需要 appKey，避免了核心配置信息在客户端泄漏可能带来的潜在风险。具体的集成方法可参看文档[《Android SDK 更安全的接入和初始化方式》](https://leancloud.cn/docs/sdk_setup_android_securely.html)。
 
 ### Java 平台初始化代码
 
@@ -322,7 +322,7 @@ LeanCloud.initialize("your-client-id", "your-client-token", "https://please-repl
 ```
 
 注意，云引擎内部访问 API 是通过内网，所以不需要也不应该配置 API 自定义域名（`serverUrl`）。
-模板项目和《云引擎网站托管开发指南》中的示例代码均未配置 API 自定义域名，
+模板项目和[云引擎网站托管指南](/sdk/engine/guide/webhosting)中的示例代码均未配置 API 自定义域名，
 请勿调用 `setServer`，否则会变成公网访问，影响性能。
 
 realtime-core library 也支持在纯 Java Application 中使用，但是与 Android 的调用方式有细微差异，Java Application 中需要开发者显式建立与云端的长链接（Android 平台是通过 PushService 自动建立的）。建立长链接的方法如下：

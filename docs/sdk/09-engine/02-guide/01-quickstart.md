@@ -12,7 +12,7 @@ import MultiLang from '@theme/MultiLang';
 
 ## 创建项目
 
-请根据《命令行工具使用指南》的《安装命令行工具》一节安装最新版的命令行工具，并确保你已经在本地机器上可以成功运行命令行工具：
+请根据[云引擎命令行工具使用指南](/sdk/engine/guide/cli)的《安装命令行工具》一节安装最新版的命令行工具，并确保你已经在本地机器上可以成功运行命令行工具：
 
 ```sh
 tds help
@@ -290,7 +290,7 @@ func createTodo(req *leancloud.FunctionRequest) (interface{}, error) {
 </MultiLang>
 
 还有一类特殊的云函数是由云端系统在特定事件发生时自动触发，这类云函数称为 Hook 函数。
-想要了解 Hook 函数的详情以及如何调用我们上面定义的 `createTodo` 云函数，请参考《云函数开发指南》。
+想要了解 Hook 函数的详情以及如何调用我们上面定义的 `createTodo` 云函数，请参考[云函数指南](/sdk/engine/guide/cloudfunction)。
 
 ## 部署到云端
 
