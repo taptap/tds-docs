@@ -77,9 +77,9 @@ TapLicenseHelper.check(Activity activity);
 
 ### 配置 SDK
 
-前往开发者中心   >>   选择<Blue>SDK控制台 </Blue>   >>   选择<Blue>购买激活SDK</Blue>   >>   选择相应的游戏的<Blue>配置</Blue>   >>   填写测试用户的 TapTap ID 。
+前往开发者中心   >>   选择<Blue>SDK控制台 </Blue>   >>   选择<Blue>购买激活 SDK</Blue>   >>   选择相应的游戏的<Blue>配置</Blue>   >>   填写测试用户的 TapTap ID 。
 
-或者，前往开发者中心   >>   选择已经开放售卖的游戏 >>   选择<Blue>购买激活SDK设置</Blue>   >>   填写测试用户的 TapTap ID 。
+或者，前往开发者中心   >>   选择已经开放售卖的游戏 >>   选择<Blue>购买激活 SDK 设置</Blue>   >>   填写测试用户的 TapTap ID 。
 
 ### 开始测试
 
@@ -111,7 +111,7 @@ Android 11 加强了隐私保护策略，引入了大量变更和限制，其中
 
 **方案一：**
 
-编译时将` targetSdkVersion` 改为29（目前=30会触发该问题）
+编译时将` targetSdkVersion` 改为29（目前设置成30会触发该问题）
 
 **方案二：**
 
