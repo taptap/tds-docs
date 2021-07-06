@@ -618,7 +618,7 @@ after 类 Hook 超时时间为 3 秒，如果你的体验实例已经休眠，�
 
 在云函数里可以用 masterKey 跳过权限检查，未登录也可直接查询 _User 表。
 
-因为云引擎运行在可信的服务器端环境中，所以你可以全局开启超级权限（Master Key），这样云端会跳过包括 ACL 和 Class 权限在内的检查，让你自由地操作所有云存储中的数据。具体细节可以参考[云函数指南](/sdk/engine/guide/cloudfunction)的《Master Key 和超级权限》一节。
+因为云引擎运行在可信的服务器端环境中，所以你可以全局开启超级权限（`Master Key`），这样云端会跳过包括 ACL 和 Class 权限在内的检查，让你自由地操作所有云存储中的数据。具体细节可以参考[云函数指南](/sdk/engine/guide/cloudfunction)的《Master Key 和超级权限》一节。
 
 ### 调用云函数时，如何指定请求所发往的环境？
 

@@ -42,7 +42,7 @@ OpenAPI 采用统一的 Mac Token 头部签算来传递用户身份。
 
 | 字段      | 类型   | 说明   |
 | --------- | ------ | ------ |
-| client_id | string | 该应用的 Client ID，应与约定相同 |
+| client_id | string | 该应用的 `Client ID`，应与约定相同 |
 
 #### 响应参数
 
@@ -56,12 +56,12 @@ is_guest         | bool       | 是否是游客，暂时弃用
 
 
 #### 请求示例
-替换其中的 `MAC id` 和 `client id` 为自己签算的 mac token 和控制台的 Client ID
+替换其中的 `MAC id` 和 `Client ID` 为自己签算的 mac token 和控制台的 `Client ID`
 
 ```
 curl -s -H 'Authorization:MAC id="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJa
 gCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTs
-KQ",ts="1618221750",nonce="adssd",mac="XWTPmq6A6LzgK8BbNDwj+kE4gzs="' "https://tds-tapsdk.cn.tapapis.com/api/v1/user/info?client_id=<clien id>"
+KQ",ts="1618221750",nonce="adssd",mac="XWTPmq6A6LzgK8BbNDwj+kE4gzs="' "https://tds-tapsdk.cn.tapapis.com/api/v1/user/info?client_id=<Client ID>"
 ```
 
 <!-- 
@@ -117,7 +117,7 @@ CLIENT_ID 替换为控制台获取的 `Client ID`，ACCESS_TOKEN 和 MAC_KEY 为
 #!/usr/bin/env bash
 
 # 客户端 ID
-CLIENT_ID="请替换为控制台的 Client ID"
+CLIENT_ID="请替换为控制台的 `Client ID`"
 # SDK 获取的 access_token
 ACCESS_TOKEN="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ"
 # SDK 获取的 mac_key

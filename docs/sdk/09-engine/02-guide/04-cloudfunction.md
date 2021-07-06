@@ -226,7 +226,7 @@ leancloud.Define("averageStars", func(req *leancloud.FunctionRequest) (interface
 这个 `options` 对象上的属性包括：
 
 - `fetchUser: boolean`：是否自动抓取客户端的用户信息，默认为真。设置为假时，`Request` 将不会有 `currentUser` 属性。
-- `internal: boolean`：是否只允许在云引擎内（使用 `AV.Cloud.run` 且未开启 `remote` 选项）或使用 Master Key （使用 `AV.Cloud.run` 时传入 `useMasterKey`）调用，不允许客户端直接调用。默认为假。
+- `internal: boolean`：是否只允许在云引擎内（使用 `AV.Cloud.run` 且未开启 `remote` 选项）或使用 `Master Key` （使用 `AV.Cloud.run` 时传入 `useMasterKey`）调用，不允许客户端直接调用。默认为假。
 
 例如，假设我们不希望客户端直接调用上述函数，也不关心客户端用户信息，那么上述函数的定义可以改写为：
 
@@ -1774,7 +1774,7 @@ CloudQueue 运行失败 24e1b480-aeb5-4222-ab7d-7d4b8ee170b9: hello !! {"error":
 
 ## Master Key 和超级权限
 
-因为云引擎运行在可信的服务器端环境中，所以你可以全局开启超级权限（Master Key），这样云端会跳过包括 ACL 和 Class 权限在内的检查，让你自由地操作所有云存储中的数据，当然这种方式也允许调用一些仅供 Master Key 使用的 API。开启 Master Key 的方法如下：
+因为云引擎运行在可信的服务器端环境中，所以你可以全局开启超级权限（`Master Key`），这样云端会跳过包括 ACL 和 Class 权限在内的检查，让你自由地操作所有云存储中的数据，当然这种方式也允许调用一些仅供 `Master Key` 使用的 API。开启 `Master Key` 的方法如下：
 
 <MultiLang kind="engine">
 <>
@@ -1797,7 +1797,7 @@ post.save(
 );
 ```
 
-或者你也可单独对某一个操作使用 Master Key，跳过权限检查：
+或者你也可单独对某一个操作使用 `Master Key`，跳过权限检查：
 
 ```js
 post.destroy({ useMasterKey: true });
@@ -1839,14 +1839,14 @@ RequestSignImplementation.setMasterKey(appMasterKey);
 </>
 <>
 
-SDK 中每个请求都可以使用 `UseMasterKey()` 为请求带上 Master Key 来开启超级权限，只需要作为可选参数传入最后即可，例如 `Create` `Set` `Update` 等操作。
+SDK 中每个请求都可以使用 `UseMasterKey()` 为请求带上 `Master Key` 来开启超级权限，只需要作为可选参数传入最后即可，例如 `Create` `Set` `Update` 等操作。
 
 </>
 </MultiLang>
 
 那么究竟是否应该使用超级权限呢，我们的建议如下：
 
-- 如果你的云引擎代码中特权操作比较多、操作不属于用户的全局数据比较多，那么建议全局开启 Master Key，并自行做好对于用户请求的权限检查。
-- 如果你的云引擎代码中的请求通常和单个用户自己的数据相关、需要遵守 ACL，那么建议不开启 Master Key，将用户请求的 `sessionToken` 传入数据修改的相关操作。
+- 如果你的云引擎代码中特权操作比较多、操作不属于用户的全局数据比较多，那么建议全局开启 `Master Key`，并自行做好对于用户请求的权限检查。
+- 如果你的云引擎代码中的请求通常和单个用户自己的数据相关、需要遵守 ACL，那么建议不开启 `Master Key`，将用户请求的 `sessionToken` 传入数据修改的相关操作。
 
 关于云引擎上的权限问题，还可以参考[《ACL 权限管理开发指南》](https://leancloud.cn/docs/acl-guide.html)和[《在云引擎中使用 ACL》](https://leancloud.cn/docs/acl_guide_leanengine.html)。

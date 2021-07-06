@@ -9,7 +9,7 @@ sidebar_label: iOS 推送设置
 
 ## 注册 App ID
 
-首先注册 App ID。如果你已经注册过带有推送通知 App ID，可以跳过以下步骤：
+首先注册 `App ID`。如果你已经注册过带有推送通知 `App ID`，可以跳过以下步骤：
 
 1. 登录 [Apple Developer Center](https://developer.apple.com/account/)
 
@@ -19,7 +19,7 @@ sidebar_label: iOS 推送设置
 
 4. 点击右上方的加号按钮
 
-5. 填写 App ID 的基本信息
+5. 填写 `App ID` 的基本信息
 
     ![Create App ID](/img/ios_cert_v2/create_app_id.png)
 
@@ -27,7 +27,7 @@ sidebar_label: iOS 推送设置
 
     ![Enter Explicit bundle ID](/img/ios_cert_v2/enter_explicit_app_id.png)
 
-7. 选择 App ID 需要开启的服务，此处要勾选 **Push Notifications**。
+7. 选择 `App ID` 需要开启的服务，此处要勾选 **Push Notifications**。
    
     ![Select push notification](/img/ios_cert_v2/select_push_notification.png)
 
@@ -39,9 +39,9 @@ sidebar_label: iOS 推送设置
 
 ## 开启推送通知
 
-为已有的 App ID 开启推送通知的步骤如下：
+为已有的 `App ID` 开启推送通知的步骤如下：
 
-1. 选择要开启推送通知的 App ID
+1. 选择要开启推送通知的 `App ID`
 
 2. 勾选 **Push Notifications** 复选框
    
@@ -122,7 +122,7 @@ sidebar_label: iOS 推送设置
 
 ## 创建推送证书（不推荐使用）
 
-每个 App ID 都需要单独的客户端 SSL 证书来和 APNs 通信。从 2015 年 12 月 17 日起，APNs 服务全面支持 HTTP/2 协议，推送证书也进行了相应的调整，即推出了 Universal Push Notification Client SSL 证书，以下简称 **Universal 推送证书**。通过下图中红框标注的 **Apple Push Notification service SSL (Sandbox & Production)** 这种方式创建的推送证书就是「Universal 推送证书」。
+每个 `App ID` 都需要单独的客户端 SSL 证书来和 APNs 通信。从 2015 年 12 月 17 日起，APNs 服务全面支持 HTTP/2 协议，推送证书也进行了相应的调整，即推出了 Universal Push Notification Client SSL 证书，以下简称 **Universal 推送证书**。通过下图中红框标注的 **Apple Push Notification service SSL (Sandbox & Production)** 这种方式创建的推送证书就是「Universal 推送证书」。
 
 我们推荐使用「Universal 推送证书」来进行推送服务。
 
@@ -154,9 +154,9 @@ sidebar_label: iOS 推送设置
   
     ![Select push certificate](/img/ios_cert_v2/what_is_universal_push_notification_client_ssl_certificate.png)
 
-6. 从 App ID 下拉菜单中选择相应的 App ID，点击下一步。
+6. 从 `App ID` 下拉菜单中选择相应的 `App ID`，点击下一步。
 
-    ![select App ID](/img/ios_cert_v2/select_app_id.png)
+    ![select `App ID`](/img/ios_cert_v2/select_app_id.png)
 
 7. 这时会出现 **About Creating a Certificate Signing Request (CSR)**。
 
@@ -242,12 +242,12 @@ LeanCloud 后端在收到推送请求时都会去检查 `prod` 参数指明的�
 
 ## 验证推送服务状态
 
-按以下步骤来验证 App ID 的推送服务是否打开：
+按以下步骤来验证 `App ID` 的推送服务是否打开：
 
 1. 点击 **Identifiers** 下的 **App IDs**
 
-2. 选择与应用 Bundle ID 匹配的 App ID
+2. 选择与应用 Bundle ID 匹配的 `App ID`
 
-3. 如果下图中红色方框中显示 **Enabled**，表示 App ID 的推送证书已配置好。
+3. 如果下图中红色方框中显示 **Enabled**，表示 `App ID` 的推送证书已配置好。
 
     ![Verify push notification](/img/ios_cert_v2/verify_push_notification.png)

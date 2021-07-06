@@ -205,7 +205,7 @@ curl -X POST \
 
 参数 | 说明
 --- | ---
-client_ids | 要静音的 Client ID，数组
+client_ids | 要静音的 `Client ID`，数组
 
 返回
 
@@ -443,7 +443,7 @@ curl -X POST \
 
 参数 | 说明
 --- | ---
-client_id | 要禁言的 Client ID，字符串
+client_id | 要禁言的 `Client ID`，字符串
 ttl | 禁言的时间，秒数，最长 24 小时
 
 返回
@@ -590,7 +590,7 @@ curl -X POST \
 
 参数 | 说明
 --- | ---
-client_ids | 要禁言的 Client ID 列表，数组
+client_ids | 要禁言的 `Client ID` 列表，数组
 
 返回
 
@@ -661,7 +661,7 @@ curl -X POST \
 
 参数 | 说明
 --- | ---
-client_ids | 要拉黑的 Client ID 列表，数组
+client_ids | 要拉黑的 `Client ID` 列表，数组
 
 返回
 
@@ -1174,7 +1174,7 @@ curl -X POST \
 
 参数 | 说明
 --- | ---
-client_ids | 要禁言的 Client ID 列表，数组
+client_ids | 要禁言的 `Client ID` 列表，数组
 
 返回
 
@@ -1246,7 +1246,7 @@ curl -X POST \
 
 参数 | 说明
 --- | ---
-client_ids | 要拉黑的 Client ID 列表，数组
+client_ids | 要拉黑的 `Client ID` 列表，数组
 
 返回
 
@@ -1688,7 +1688,7 @@ curl -X POST \
 
 参数 | 说明
 --- | ---
-client_ids | 要拉黑的 Client ID 列表，数组
+client_ids | 要拉黑的 `Client ID` 列表，数组
 
 返回
 

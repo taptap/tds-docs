@@ -251,7 +251,7 @@ REST API 请求的 Base URL 可以在**云服务控制台 > 设置 > 应用 Keys
 
 对于 POST 和 PUT 请求，请求的主体必须是 JSON 格式，而且 HTTP header 的 Content-Type 需要设置为 `application/json`。
 
-用户验证通过 HTTP header 来进行，**X-LC-Id** 标明正在运行的是哪个应用（应用的 App ID），
+用户验证通过 HTTP header 来进行，**X-LC-Id** 标明正在运行的是哪个应用（应用的 `App ID`），
 **X-LC-Key** 用来授权鉴定 endpoint：
 
 ```
@@ -263,9 +263,9 @@ curl -X PUT \
   https://{{host}}/1.1/classes/Post/<objectId>
 ```
 
-**X-LC-Key** 通常情况下是应用的 App Key，
-有些情况（需要超级权限的操作）下是应用的 Master Key。
-当 **X-LC-Key** 值为 Master Key 时，需要在其后添加 `,master` 后缀以示区分，例如：
+**X-LC-Key** 通常情况下是应用的 `App Key`，
+有些情况（需要超级权限的操作）下是应用的 `Master Key`。
+当 **X-LC-Key** 值为 `Master Key` 时，需要在其后添加 `,master` 后缀以示区分，例如：
 
 ```
 X-LC-Key: {{masterkey}},master
@@ -277,7 +277,7 @@ REST API 通讯支持 `gzip` 和 `brotli` 压缩，客户端可以通过指定�
 
 #### 更安全的鉴权方式
 
-我们还支持一种新的 API 鉴权方式，即在 HTTP header 中使用 **X-LC-Sign** 来代替 **X-LC-Key**，以降低 App Key 的泄露风险。例如：
+我们还支持一种新的 API 鉴权方式，即在 HTTP header 中使用 **X-LC-Sign** 来代替 **X-LC-Key**，以降低 `App Key` 的泄露风险。例如：
 
 ```
 curl -X PUT \
@@ -292,7 +292,7 @@ curl -X PUT \
 
 | 取值        | 约束   | 描述                                       |
 | --------- | ---- | ---------------------------------------- |
-| sign      | 必须   | 将 timestamp 加上 App Key 或 Master Key 组成的字符串，再对它做 MD5 签名后的结果。 |
+| sign      | 必须   | 将 timestamp 加上 `App Key` 或 `Master Key` 组成的字符串，再对它做 MD5 签名后的结果。 |
 | timestamp | 必须   | 客户端产生本次请求的 unix 时间戳（UTC），精确到**毫秒**。      |
 | master    | 可选   | 字符串 `"master"`，当使用 master key 签名请求的时候，必须加上这个后缀明确说明是使用 master key。 |
 
@@ -323,7 +323,7 @@ curl -X PUT \
   </tbody>
 </table>
 
-**使用 App Key 来计算 sign**：
+**使用 `App Key` 来计算 sign**：
 
 ```
 md5( timestamp + App Key )
@@ -335,7 +335,7 @@ md5( timestamp + App Key )
   -H "X-LC-Sign: d5bcbb897e19b2f6633c716dfdfaf9be,1453014943466" \
 ```
 
-**使用 Master Key 来计算 sign**：
+**使用 `Master Key` 来计算 sign**：
 
 ```
 md5( timestamp + Master Key )
@@ -1615,7 +1615,7 @@ curl -X PUT \
   https://{{host}}/1.1/users/57e3bcca67f35600577c3063/refreshSessionToken
 ```
 
-调用这个 API 要求传入登录返回的 `X-LC-Session` 作为认证，或者使用 Master Key。
+调用这个 API 要求传入登录返回的 `X-LC-Session` 作为认证，或者使用 `Master Key`。
 
 重置成功将返回新的 sessionToken 及用户信息：
 
@@ -1864,7 +1864,7 @@ curl -X DELETE \
 {
   "第三方平台名称，例如facebook": {
     "uid": "在第三方平台上的唯一用户 ID 字符串",
-    "access_token": "在第三方平台的 access token",
+    "access_token": "在第三方平台的 `Access Token`",
     // ……其他可选属性
   }
 }
@@ -1874,7 +1874,7 @@ curl -X DELETE \
 
 注意：
 
-- 其他第三方平台不支持校验 access token。
+- 其他第三方平台不支持校验 `Access Token`。
 - 其他第三方平台不支持后面提到的 UnionID 登录功能，因此也不用设置相应的 `unionid`、`platform`、`main_account` 字段。
 - 其他第三方平台请使用 `uid` 字段储存第三方平台的唯一用户 ID 字符串，不要使用 `openid`。
 
@@ -1955,7 +1955,7 @@ Location: https://{{host}}/1.1/users/55a4800fe4b05001a7745c41
 }
 ```
 
-云端会自动验证部分平台 access token 的有效性。
+云端会自动验证部分平台 `Access Token` 的有效性。
 详见[自动验证第三方平台授权信息](/sdk/storage/guide/dotnet#自动验证第三方平台授权信息)。
 
 #### UnionID 注册和登录
@@ -2475,7 +2475,7 @@ curl -X DELETE \
 ```
 ## 数据 Schema
 
-为了方便开发者使用、自行研发一些代码生成工具或者内部使用的管理平台。我们提供了获取数据 Class Schema 的开放 API，基于安全考虑，强制要求使用 Master Key 才可以访问。
+为了方便开发者使用、自行研发一些代码生成工具或者内部使用的管理平台。我们提供了获取数据 Class Schema 的开放 API，基于安全考虑，强制要求使用 `Master Key` 才可以访问。
 
 查询一个应用下面所有 Class 的 Schema:
 

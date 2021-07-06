@@ -10,7 +10,7 @@ import MultiLang from '@theme/MultiLang';
 
 ## 检查登录状态
 
-尝试获取当前用户的 Access Token，如 Access Token 为空则用户未登录。
+尝试获取当前用户的 `Access Token`，如 `Access Token` 为空则用户未登录。
 调用登录方法前先检查登录状态，可以避免重复登录。
 
 <MultiLang>

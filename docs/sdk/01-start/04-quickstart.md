@@ -237,7 +237,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 
 用户无 TapTap 应用时，默认会通过 WebView 登录。
 
-1. 打开 `info.plist`，添加如下配置（请替换 `clientID` 为你在控制台获取的 Client ID）：
+1. 打开 `info.plist`，添加如下配置（请替换 `clientID` 为你在控制台获取的 `Client ID`）：
 
    ![](/img/tap_ios_info.png)
 
@@ -309,7 +309,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 
 ## 初始化
 
-初始化 TapSDK 时需传入 Client ID、区域等应用配置信息。
+初始化 TapSDK 时需传入 `Client ID`、区域等应用配置信息。
 
 <MultiLang>
 
@@ -450,7 +450,7 @@ expireIn  | 过期时间
 
 ### 检查登录状态
 
-尝试获取当前用户的 Access Token，如 Access Token 为空则用户未登录。
+尝试获取当前用户的 `Access Token`，如 `Access Token` 为空则用户未登录。
 
 <MultiLang>
 
@@ -551,7 +551,7 @@ TapBootstrap.logout();
 
 ### 导出 Xcode 工程
 
-需要配置 icon 和 bundleId
+需要配置 icon 和 `BundleID`
 
 ![](/img/tap_ios_build.png)
 
