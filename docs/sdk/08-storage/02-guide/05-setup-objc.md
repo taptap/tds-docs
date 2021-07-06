@@ -31,7 +31,7 @@ pod 'LeanCloudObjc'   # 集成所有服务模块
 `LeanCloudObjc` 包含多个 Subspecs。如果只需要部分功能，可以按需选择：
 
 ```ruby
-pod 'LeanCloudObjc/Foundation'    # 数据存储、短信、推送、云引擎等基础服务模块
+pod 'LeanCloudObjc/Foundation'    # 数据存储、短信、云引擎等基础服务模块
 pod 'LeanCloudObjc/Realtime'      # 即时通讯、LiveQuery 模块
 ```
 
