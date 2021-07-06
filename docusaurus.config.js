@@ -52,6 +52,11 @@ module.exports = {
           position: 'right',
         },
         {
+          label: 'API索引',
+          to: '/SDK-API',
+          position: 'right',
+        },
+        {
           label: '资源下载',
           position: 'right',
           items: [
