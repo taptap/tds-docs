@@ -70,7 +70,7 @@ libsqlite3.0.tbd |
 在需要调用统计接口的代码中引入头文件TapDB.h，并按照后面的接口介绍调用统计接口。
 
 ```objc
-##import <TapDB/TapDB.h>
+#import <TapDB/TapDB.h>
 ```
 注：如果 Xcode 提示找不到 TapDB.h 头文件，请确保 Xcode 工程中的 Build Settings -> Search Paths -> Framework Search Paths 中的路径设置正确。
 
