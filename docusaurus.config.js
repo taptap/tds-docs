@@ -53,7 +53,7 @@ module.exports = {
         },
         {
           label: 'API索引',
-          to: '/SDK-API',
+          to: '/sdk-api',
           position: 'right',
         },
         {
