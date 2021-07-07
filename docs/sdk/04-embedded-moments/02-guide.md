@@ -104,6 +104,7 @@ CALLBACK_CODE_MOMENT_DISAPPEAR | 30100   | 动态页面关闭 |
 CALLBACK_CODE_ClOSE_CANCEL | 50000   | 取消关闭所有动态界面（弹框点击取消按钮） |
 CALLBACK_CODE_ClOSE_CONFIRM | 50100   | 确认关闭所有动态界面（弹框点击确认按钮） |
 CALLBACK_CODE_LOGIN_SUCCESS | 60000   | 动态页面内登录成功 |
+CALLBACK_CODE_SCENE_EVENT | 70000   | 场景化入口回调 |
 
 ## 获取新消息
 
@@ -168,47 +169,6 @@ mConfig.orientation = TapMomentOrientationDefault;
 动态页面的背景图可以配置，[点击查看图解](/img/tap_moment_bg.png)。
 背景图需要人工审核后才能生效，请预留充足的时间。
 
-## 注册场景化入口回调
-
-#### 示例代码
-
-<MultiLang>
-
-```cs
-
-```
-
-```java
-
-```
-
-```objectivec
-
-```
-
-</MultiLang>
-
-#### 回调格式说明
-**SDK回调结构**
-
-字段名           | 值类型       |required       |说明       |
- ----------- | -------- |-------- |-------- |
-sceneId    |  字符串    | 是 | 场景化入口ID |
-eventType    |   字符串   | 是 | 枚举的事件类型，如VIEW，FORWARD，VOTE等 |
-eventPayload     |   字符串   | 是 | 根据类型自定义的JSON字符串 |
-timestamp     |   整数   |  是 | unix 时间戳，ms |
-
-**事件类型**
-
-eventType            | eventPayload(未序列化)       | 说明
- ----------- | -------- | -------- |
- READY  |    {}  | 已成功落地，将在dom挂载时触发（获取数据之前） |
-REPOST    |    {}  | 转发 | 
-VOTE     | { isCancel: boolean }     | 点赞（含是否取消），仅帖子本身 |
-FOLLOW     | { isCancel: boolean }     | 点赞（含是否取消），仅帖子本身 |
-COMMENT     | {}    | 评论，仅帖子本身 |
-
-
 
 ## 场景化入口
 
@@ -245,8 +205,29 @@ mConfig.orientation = TapMomentOrientationDefault;
 参数           | 说明       |
  ----------- | -------- |
 orientation    |    打开方向  |
-page    |    固定为TapMomentConstants.TapMomentPageShortCut  |
-Dictionary     | 其中TapMomentConstants.TapMomentPageShortCutKey固定，第二个参数为要需要跳转的页面id     |
+page    |    固定为 TapMomentConstants.TapMomentPageShortCut  |
+Dictionary     | 其中 TapMomentConstants.TapMomentPageShortCutKey 固定，第二个参数为要需要跳转的页面 id     |
+
+### 场景化入口回调格式说明
+
+**SDK回调结构**
+
+字段名           | 值类型       |required       |说明       |
+ ----------- | -------- |-------- |-------- |
+sceneId    |  字符串    | 是 | 场景化入口 ID |
+eventType    |   字符串   | 是 | 枚举的事件类型，如 VIEW，FORWARD，VOTE 等 |
+eventPayload     |   字符串   | 是 | 根据类型自定义的 JSON 字符串 |
+timestamp     |   整数   |  是 | unix 时间戳，ms |
+
+**事件类型**
+
+eventType            | eventPayload (未序列化)       | 说明
+ ----------- | -------- | -------- |
+ READY  |    {}  | 已成功落地，将在dom挂载时触发（获取数据之前） |
+REPOST    |    {}  | 转发 | 
+VOTE     | { isCancel: boolean }     | 点赞（含是否取消），仅帖子本身 |
+FOLLOW     | { isCancel: boolean }     | 关注（含是否取消），仅帖子本身 |
+COMMENT     | {}    | 评论，仅帖子本身 |
 
 ## 关闭动态页面
 
