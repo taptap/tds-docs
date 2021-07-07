@@ -32,7 +32,7 @@ API鉴权通过HTTP Header设置键值参数进行授权，参数列表如下：
 
 Key | Value | 描述 
 --- | --- | ---
-X-Client-ID | ${client_id} | TDS客户标识（请前往开发者中心获取 Client ID）
+X-Client-ID | ${client_id} | TDS客户标识（请前往开发者中心获取 `Client ID`）
 X-Server-Secret | ${server_secret} | TDS服务密钥（请前往开发者中心获取 Server Secret）
 
 ## API 详细说明

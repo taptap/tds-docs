@@ -1238,7 +1238,7 @@ LCUser currentUser = await LCUser.GetCurrent();
 
 以下是一些应用可能需要用到 session token 的场景：
 
-- 应用根据以前缓存的 session token 登录（可以通过 `SessionToken` 属性获取到当前用户的 session token，在服务端等受信任的环境下，可以通过 Master Key 读取任意用户的 `sessionToken` 字段以获取 session token）。
+- 应用根据以前缓存的 session token 登录（可以通过 `SessionToken` 属性获取到当前用户的 session token，在服务端等受信任的环境下，可以通过 `Master Key` 读取任意用户的 `sessionToken` 字段以获取 session token）。
 - 应用内的某个 WebView 需要知道当前登录的用户。
 - 在服务端登录后，返回 session token 给客户端，客户端根据返回的 session token 登录。
 
@@ -1428,7 +1428,7 @@ LCUser currentUser = await LCUser.LoginWithAuthData(thirdPartyData, "weixin");
 
 ##### 获取 Client ID
 
-Client ID 用于校验 `identity_token` 及获取 `access_token`，指的是 Apple 应用的 identifier，也就是 AppID 或 serviceID。对于原生应用来说，指的是 Xcode 中的 Bundle Identifier，例如 `com.mytest.app`。详情请参考 [Apple 的文档](https://developer.apple.com/documentation/sign_in_with_apple/generate_and_validate_tokens)。
+Client ID 用于校验 `identity_token` 及获取 `access_token`，指的是 Apple 应用的 identifier，也就是 `AppID` 或 `serviceID`。对于原生应用来说，指的是 Xcode 中的 Bundle Identifier，例如 `com.mytest.app`。详情请参考 [Apple 的文档](https://developer.apple.com/documentation/sign_in_with_apple/generate_and_validate_tokens)。
 
 ##### 获取 Private Key 及 Private Key ID
 
@@ -1514,12 +1514,12 @@ Team ID 用于获取 `access_token`。登录 Apple 开发者平台，在右上�
 
 #### 自动验证第三方平台授权信息
 
-为了确保账户数据的有效性，云端还支持对部分平台的 access token 的有效性进行自动验证，以防止伪造账户数据。如果有效性验证不通过，云端会返回 `invalid authData` 错误，关联不会被建立。对于云端无法识别的服务，开发者需要自己去验证 access token 的有效性。
-比如，注册、登录时分别通过云引擎的 `beforeSave hook`、`beforeUpdate hook` 来验证 access token 有效性。
+为了确保账户数据的有效性，云端还支持对部分平台的 `Access Token` 的有效性进行自动验证，以防止伪造账户数据。如果有效性验证不通过，云端会返回 `invalid authData` 错误，关联不会被建立。对于云端无法识别的服务，开发者需要自己去验证 `Access Token` 的有效性。
+比如，注册、登录时分别通过云引擎的 `beforeSave hook`、`beforeUpdate hook` 来验证 `Access Token` 有效性。
 
 如果希望使用这一功能，则在开始使用前，需要在 **云服务控制台 > 数据存储 > 用户 > 设置** 配置相应平台的 **应用 ID** 和 **应用 Secret Key**。
 
-如果不希望云端自动验证 access token，可以在 **云服务控制台 > 数据存储 > 设置** 里面取消勾选 **第三方登录时，验证用户 AccessToken 合法性**。
+如果不希望云端自动验证 `Access Token`，可以在 **云服务控制台 > 数据存储 > 设置** 里面取消勾选 **第三方登录时，验证用户 AccessToken 合法性**。
 
 配置平台账号的目的在于创建 `LCUser` 时，云端会使用相关信息去校验请求参数 `thirdPartyData` 的合法性，确保 `LCUser` 实际对应着一个合法真实的用户，确保平台安全性。
 

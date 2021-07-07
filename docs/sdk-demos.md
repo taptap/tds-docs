@@ -1,9 +1,10 @@
 ---
 id: sdk-demos
 title: Demos
+slug: demos
 ---
 
-## TapSDK 
+## 生态服务 
 
 TapTap登录、TapDB、好友关系与内嵌动态。
 

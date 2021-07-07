@@ -1,12 +1,12 @@
 ---
 id: design-moment
-title: Tap动态 - 主题规范设计规则
+title: TapTap 动态 - 主题规范设计规则
 sidebar_label: 内嵌动态设计指南
 ---
 import {Red, Blue, Black, Gray, Green, BlueBlack} from '/src/docComponents/doc';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-## Tap动态 - 主题规范设计规则（基于内嵌动态V1.30）
+## TapTap 动态 - 主题规范设计规则（基于内嵌动态V1.30）
 
 ## 1.导航主题字符规则
 
@@ -43,7 +43,7 @@ Tap动态同时支持横屏和竖屏，因此每个接入游戏需要分别提�
 | <b>竖屏:</b> <br/> - 高为2436px    - 宽为1125px <br/> <img src={useBaseUrl('/img/design-moment-2.1.1.png')} alt="" width="230" />|
 
 ### 2.2 背景图裁切适配方式
-在小屏手机中体验Tap动态时，背景图会被裁切适配。
+在小屏手机中体验 TapTap 动态时，背景图会被裁切适配。
 
 | 示例 |
 | ------ |

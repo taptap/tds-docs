@@ -31,7 +31,7 @@ pod 'LeanCloudObjc'   # 集成所有服务模块
 `LeanCloudObjc` 包含多个 Subspecs。如果只需要部分功能，可以按需选择：
 
 ```ruby
-pod 'LeanCloudObjc/Foundation'    # 数据存储、短信、推送、云引擎等基础服务模块
+pod 'LeanCloudObjc/Foundation'    # 数据存储、短信、云引擎等基础服务模块
 pod 'LeanCloudObjc/Realtime'      # 即时通讯、LiveQuery 模块
 ```
 
@@ -89,9 +89,9 @@ $ pod install --repo-update
 
 在 **开发者中心 > 你的游戏 > 游戏服务 > 基本信息** 可以查看应用凭证：
 
-- **Client ID**，又称 App ID，在 SDK 初始化时用到。联系技术支持时，提供 Client ID 可以方便我们更快定位到你的应用。
-- **Client Token**，又称 App Key，在 SDK 初始化时用到。
-- **Server Secret**，又称 Master Key，用于在自有服务器、云引擎等**受信任环境**调用管理接口，具备跳过一切权限验证的超级权限。所以**一定注意保密，千万不要在客户端代码中使用该凭证**。
+- **Client ID**，又称 `App ID`，在 SDK 初始化时用到。联系技术支持时，提供 `Client ID` 可以方便我们更快定位到你的应用。
+- **Client Token**，又称 `App Key`，在 SDK 初始化时用到。
+- **Server Secret**，又称 `Master Key`，用于在自有服务器、云引擎等**受信任环境**调用管理接口，具备跳过一切权限验证的超级权限。所以**一定注意保密，千万不要在客户端代码中使用该凭证**。
 
 ### 初始化
 
@@ -102,7 +102,7 @@ $ pod install --repo-update
 ```
 
 
-然后在 `application:didFinishLaunchingWithOptions:` 方法中设置 App ID，App Key 以及服务器地址：
+然后在 `application:didFinishLaunchingWithOptions:` 方法中设置 `App ID`，`App Key` 以及服务器地址：
 
 ```objc
 [LCApplication setApplicationId:@"your-client-id"
@@ -173,7 +173,7 @@ SDK 安装指南基于当前最新版本的 SDK 编写，所以排查问题前�
 }
 ```
 
-则可认定为 App ID 或者 App Key 输入有误，或者是不匹配，很多开发者同时注册了多个应用，导致拷贝粘贴的时候，用 A 应用的 App ID 匹配 B 应用的 App Key，这样就会出现服务端鉴权失败的错误。
+则可认定为 `App ID` 或者 `App Key` 输入有误，或者是不匹配，很多开发者同时注册了多个应用，导致拷贝粘贴的时候，用 A 应用的 App ID 匹配 B 应用的 `App Key`，这样就会出现服务端鉴权失败的错误。
 
 ### 客户端无法访问网络
 

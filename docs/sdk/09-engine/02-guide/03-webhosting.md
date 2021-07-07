@@ -365,9 +365,9 @@ Node.js 项目可以通过检查环境变量 `NODE_ENV` 的值来判断：值为
 
 变量名 | 说明
 --- | ---
-`LEANCLOUD_APP_ID` | 当前应用的 App ID。
-`LEANCLOUD_APP_KEY` | 当前应用的 App Key。
-`LEANCLOUD_APP_MASTER_KEY`| 当前应用的 Master Key。
+`LEANCLOUD_APP_ID` | 当前应用的 `App ID`。
+`LEANCLOUD_APP_KEY` | 当前应用的 `App Key`。
+`LEANCLOUD_APP_MASTER_KEY`| 当前应用的 `Master Key`。
 `LEANCLOUD_APP_ENV` | 当前的应用环境：开发环境没有该环境变量，或值为 `development`（通过命令行工具启动）。预备环境值为 `stage`。生产环境值为 `production`。
 `LEANCLOUD_APP_PORT` | 当前应用开放给外网的端口，只有监听此端口，用户才可以访问到你的服务。
 `LEANCLOUD_API_SERVER` | 访问存储服务时使用的地址。该值会因为所在数据中心等原因导致不一样，所以使用 REST API 请求存储服务或其他云服务时请使用此环境变量的值。

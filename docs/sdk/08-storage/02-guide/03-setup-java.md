@@ -49,8 +49,7 @@ Java SDK 主要包含以下几个 library，其层次结构以及平台对应关
 
 ### Android 特有的包
 - storage-android：是 storage-core 在 Android 平台的定制化实现，接口与 storage-core 完全相同。
-- realtime-android：是 realtime-core 在 Android 平台的定制化实现，并且增加 Android 推送相关接口。
-- mixpush-android：是 LeanCloud 混合推送的 library，支持华为、小米、魅族、vivo 以及 oppo 的官方推送。
+- realtime-android：是 realtime-core 在 Android 平台的定制化实现。
 - leancloud-fcm：是 Firebase Cloud Messaging 的封装 library，供美国节点的 app 使用推送服务。
 
 
@@ -62,9 +61,7 @@ Java SDK 一共包含如下几个模块：
 ./core | storage-core，存储核心 library | java | 无，它是 LeanCloud 最核心的 library
 ./realtime | realtime-core，LiveQuery 与实时通讯核心 library | java | storage-core
 ./android-sdk/storage-android | storage-android，Android 存储 library | Android | storage-core
-./android-sdk/realtime-android | realtime-android，Android 推送、LiveQuery、即时通讯 library | Android | storage-android, realtime-core
-./android-sdk/mixpush-android | Android 混合推送 library | Android | realtime-android
-./android-sdk/leancloud-fcm | Firebase Cloud Messaging library | Android | realtime-android
+./android-sdk/realtime-android | realtime-android，LiveQuery、即时通讯 library | Android | storage-android, realtime-core
 
 ## 获取 SDK
 
@@ -109,7 +106,7 @@ implementation 'cn.leancloud:storage-android:8.0.1'
 implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 ```
 
-#### 使用即时通讯 / 推送服务
+#### 使用即时通讯服务
 
 Maven：
 
@@ -139,16 +136,6 @@ Gradle:
 implementation 'cn.leancloud:realtime-android:8.0.1'
 implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 ```
-
-#### 使用混合推送服务
-
-Gradle：
-
-```groovy
-implementation 'cn.leancloud:mixpush-android:8.0.1'
-implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-```
-
 
 #### 对 maven 源的特别说明
 
@@ -233,9 +220,9 @@ $ gradle clean assemble
 
 在 **开发者中心 > 你的游戏 > 游戏服务 > 基本信息** 可以查看应用凭证：
 
-- **Client ID**，又称 App ID，在 SDK 初始化时用到。联系技术支持时，提供 Client ID 可以方便我们更快定位到你的应用。
-- **Client Token**，又称 App Key，在 SDK 初始化时用到。
-- **Server Secret**，又称 Master Key，用于在自有服务器、云引擎等**受信任环境**调用管理接口，具备跳过一切权限验证的超级权限。所以**一定注意保密，千万不要在客户端代码中使用该凭证**。
+- **Client ID**，又称 `App ID`，在 SDK 初始化时用到。联系技术支持时，提供 Client ID 可以方便我们更快定位到你的应用。
+- **Client Token**，又称 `App Key`，在 SDK 初始化时用到。
+- **Server Secret**，又称 `Master Key`，用于在自有服务器、云引擎等**受信任环境**调用管理接口，具备跳过一切权限验证的超级权限。所以**一定注意保密，千万不要在客户端代码中使用该凭证**。
 
 ### Android 平台初始化
 
@@ -264,31 +251,6 @@ public class MyLeanCloudApp extends Application {
 <uses-permission android:name="android.permission.INTERNET"/>
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 <!-- 基本模块 END -->
-
-<application
-  …
-  android:name=".MyLeanCloudApp" >
-
-  <!-- 即时通讯和推送 START -->
-  <!-- 即时通讯和推送都需要 PushService -->
-  <service android:name="cn.leancloud.push.PushService"/>
-  <receiver android:name="cn.leancloud.push.LCBroadcastReceiver">
-    <intent-filter>
-      <action android:name="android.intent.action.BOOT_COMPLETED"/>
-      <action android:name="android.intent.action.USER_PRESENT"/>
-      <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
-    </intent-filter>
-  </receiver>
-  <!-- 即时通讯和推送 END -->
-</application>
-
-```
-
-> 注意：对于**只使用即时通讯服务**，而**不使用推送服务**的应用来说，在初始化的时候设置 LCIMOptions#disableAutoLogin4Push 选项，可以加快即时通讯用户登录的过程。设置方法如下：
-
-```java
-// 在 LeanCloud#initialize 之后调用，禁止自动发送推送服务的 login 请求。
-LCIMOptions.getGlobalOptions().setDisableAutoLogin4Push(true);
 ```
 
 #### 更安全的客户端初始化方法
@@ -402,7 +364,7 @@ SDK 安装指南基于当前最新版本的 SDK 编写，所以排查问题前�
 }
 ```
 
-则可认定为 App ID 或者 App Key 输入有误，或者是不匹配，很多开发者同时注册了多个应用，导致拷贝粘贴的时候，用 A 应用的 App ID 匹配 B 应用的 App Key，这样就会出现服务端鉴权失败的错误。
+则可认定为 `App ID` 或者 `App Key` 输入有误，或者是不匹配，很多开发者同时注册了多个应用，导致拷贝粘贴的时候，用 A 应用的 `App ID` 匹配 B 应用的 `App Key`，这样就会出现服务端鉴权失败的错误。
 
 ### 客户端无法访问网络
 

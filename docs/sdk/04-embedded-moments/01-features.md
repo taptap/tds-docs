@@ -11,6 +11,9 @@ import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
 
 内嵌动态能让玩家在游戏内访问 TapTap 社区，同时也可以查看好友的游戏动态，参与其他玩家、官方和大神之间的互动。
 
+<video controls poster="https://capacity-files.lncld.net/mhJHi9jngyobIlPVADDM8X7eGOqmTBAb/0af2062a4ee1cc2ff29bdf56a96c3041.png" src="https://capacity-files.lncld.net/SuC1cUIOwPHvXhiePM8Q79uKDqSVnuyS/%E5%86%85%E5%B5%8C%E5%8A%A8%E6%80%8107061201.mp4" width='100%' ></video>
+
+
 ## Web 层面功能介绍
 ### 全新首页
 玩家在新版首页信息流可以浏览更多推荐内容，游戏官方可以通过推荐位和运营位更好地进行内容运营。

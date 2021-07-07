@@ -9,7 +9,7 @@ sidebar_label: Unity
 
 1. 没有在 TapTap 开发者中心开启登录功能；
 
-2. 由于 TapTap 客户端授权登录, 会对 Android 应用的 Client ID、应用包名、签名文件的 MD5 进行校验; iOS 应用的 Client ID 和 BundleID 进行校验, 其中任何一项配置错误都会导致登录失败。
+2. 由于 TapTap 客户端授权登录, 会对 Android 应用的 `Client ID`、应用包名、签名文件的 MD5 进行校验; iOS 应用的 `Client ID` 和 `BundleID` 进行校验, 其中任何一项配置错误都会导致登录失败。
 
 3. 登录时报 404 或者 405 
 请检查 `TapConfig` 的区域配置，中国大陆请配置为 `true`。
