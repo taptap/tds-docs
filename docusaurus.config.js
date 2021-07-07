@@ -57,6 +57,11 @@ module.exports = {
           position: 'right',
         },
         {
+          label: 'Demos',
+          to: '/demos',
+          position: 'right',
+        },
+        {
           label: '资源下载',
           position: 'right',
           items: [
