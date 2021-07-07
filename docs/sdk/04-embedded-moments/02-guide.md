@@ -168,6 +168,48 @@ mConfig.orientation = TapMomentOrientationDefault;
 动态页面的背景图可以配置，[点击查看图解](/img/tap_moment_bg.png)。
 背景图需要人工审核后才能生效，请预留充足的时间。
 
+## 注册场景化入口回调
+
+#### 示例代码
+
+<MultiLang>
+
+```cs
+
+```
+
+```java
+
+```
+
+```objectivec
+
+```
+
+</MultiLang>
+
+#### 回调格式说明
+**SDK回调结构**
+
+字段名           | 值类型       |required       |说明       |
+ ----------- | -------- |-------- |-------- |
+sceneId    |  字符串    | 是 | 场景化入口ID |
+eventType    |   字符串   | 是 | 枚举的事件类型，如VIEW，FORWARD，VOTE等 |
+eventPayload     |   字符串   | 是 | 根据类型自定义的JSON字符串 |
+timestamp     |   整数   |  是 | unix 时间戳，ms |
+
+**事件类型**
+
+eventType            | eventPayload(未序列化)       | 说明
+ ----------- | -------- | -------- |
+ READY  |    {}  | 已成功落地，将在dom挂载时触发（获取数据之前） |
+REPOST    |    {}  | 转发 | 
+VOTE     | { isCancel: boolean }     | 点赞（含是否取消），仅帖子本身 |
+FOLLOW     | { isCancel: boolean }     | 点赞（含是否取消），仅帖子本身 |
+COMMENT     | {}    | 评论，仅帖子本身 |
+
+
+
 ## 场景化入口
 
 打开动态页面跳转到指定的页面
