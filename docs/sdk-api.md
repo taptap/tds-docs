@@ -1,7 +1,7 @@
 ---
 id: SDK-API
 title: SDK-API
-slug: SDK-API
+slug: sdk-api
 ---
 import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
 
