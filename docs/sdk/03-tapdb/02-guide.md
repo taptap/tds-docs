@@ -504,7 +504,7 @@ TapDB.deviceInitialize(properties);
 string properties = "{\"currentPoints\":10}";
 TapDB.DeviceUpdate(properties);
 
-properties["currentPoints"] = 42;
+properties = "{\"currentPoints\":42}";
 TapDB.DeviceUpdate(properties);
 ```
 
@@ -539,7 +539,7 @@ TapDB.deviceUpdate(properties);
 string properties = "{\"totalPoints\":10}";
 TapDB.DeviceAdd(properties);
 
-properties["totalPoints"] = -2;
+properties = "{\"totalPoints\":-2}";
 TapDB.DeviceAdd(properties);
 ```
 
