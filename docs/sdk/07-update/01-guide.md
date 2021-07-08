@@ -14,7 +14,7 @@ TapTap 开发者服务为游戏和玩家提供唤起 TapTap 客户端进行游�
 
 ```json
 "dependencies":{
-// 公共库,{version}为具体版本号
+// 公共库，{version} 为具体版本号
 "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#{version}",
 }
 ```
@@ -23,7 +23,7 @@ TapTap 开发者服务为游戏和玩家提供唤起 TapTap 客户端进行游�
 TapCommon.IsTapTapInstalled(installed =>
 {
     if (installed) {
-        Debug.Log("TapTap已经安装");
+        Debug.Log("TapTap 已经安装");
     }
 });
 
@@ -38,7 +38,7 @@ TapCommon.IsTapTapInstalled(installed =>
 TapCommon.UpdateGameInTapTap("appid", callSuccess =>
 {
     if (callSuccess) {
-        Debug.Log("TapTap唤起成功");
+        Debug.Log("TapTap 唤起成功");
     }
 });
 ```
@@ -66,7 +66,7 @@ TapCommon.OpenReviewInTapTap(appId, openSuccess =>
 
 ```java
 if(TapGameUtil.isTapTapInstalled(this)){
-    Log.d(TAG, "已经安装TapTap客户端");
+    Log.d(TAG, "已经安装 TapTap 客户端");
 }
 ```
 
@@ -75,7 +75,7 @@ if(TapGameUtil.isTapTapInstalled(this)){
 
 ```java
 if(TapGameUtil.updateGameInTapTap(this,"appid")){
-    Log.d(TAG, "唤起TapTap客户端成功");
+    Log.d(TAG, "唤起 TapTap 客户端成功");
 }
 ```
 appid: 游戏在 TapTap 商店的唯一身份标识  
@@ -96,11 +96,11 @@ if(TapGameUtil.openReviewInTapTap(this,"appid")){
 ### 关于 Android 11 无法拉起 TapTap 客户端的解决方案
 
 Android 11 加强了隐私保护策略，引入了大量变更和限制，其中一个重要变更 —— [软件包可见性](https://developer.android.com/about/versions/11/privacy/package-visibility) ，将会导致第三方应用无法拉起 TapTap 客户端，从而影响 TapTap 相关功能的正常使用 ，包括但不限于更新唤起 TapTap 、购买验证等功能。
-特别需要注意的是，Android 11 的该变更只会影响到升级` targetSdkVersion=30 `的应用，未升级的应用暂不受影响。
+特别需要注意的是，Android 11 的该变更只会影响到升级 `targetSdkVersion=30` 的应用，未升级的应用暂不受影响。
 
 **方案一：**
 
-编译时将 `targetSdkVersion` 改为 29（目前=30会触发该问题）
+编译时将 `targetSdkVersion` 改为 29（目前 `=30` 会触发该问题）
 
 **方案二：**
 

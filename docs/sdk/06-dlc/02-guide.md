@@ -16,7 +16,7 @@ import {Gray,Blue, Red, Black,Link,ImageLink} from '/src/docComponents/doc';
 "dependencies":{
 // 公共库
 "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#{version}",
-//付费购买
+// 付费购买
 "com.taptap.tds.dlc": "https://github.com/TapTap/TapLicense-Unity.git#{version}",
 }
 ```
@@ -105,7 +105,7 @@ ERROR_CODE_UNDEFINED       | 80000   | 未知错误     |
 
 ### 上传 APK
 
-上传需要测试的APK至开发者中心，并通过审核。
+上传需要测试的 APK 至开发者中心，并通过审核。
 
 ### 配置 SDK
 

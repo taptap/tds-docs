@@ -10,7 +10,7 @@ import MultiLang from '@theme/MultiLang';
 
 ## 本章导读
 
-在前一章[从简单的单聊、群聊、收发图文消息开始](/sdk/im/guide/beginner)里面，我们说明了如何在产品中增加一个基本的单聊/群聊页面，并响应服务端实时事件通知。接下来，在本篇文档中我们会讲解如何实现一些更复杂的业务需求，例如：
+在前一章[从简单的单聊、群聊、收发图文消息开始](/sdk/im/guide/beginner)里面，我们说明了如何在产品中增加一个基本的单聊／群聊页面，并响应服务端实时事件通知。接下来，在本篇文档中我们会讲解如何实现一些更复杂的业务需求，例如：
 
 - 支持消息被接收和被阅读的状态回执，实现「Ding」一下的效果
 - 发送带有成员提醒的消息（@ 某人），在超多用户群聊的场合提升目标用户的响应积极性
@@ -194,7 +194,7 @@ public void onMessage(LCIMAudioMessage msg, LCIMConversation conv, LCIMClient cl
 }
 ```
 ```objc
-// 示例代码演示 LCIMTypedMessage 接收时，获取该条消息提醒的 clientId 列表，同理可以用类似的代码操作 LCIMMessage 的其他子类
+// 示例代码演示 LCIMTypedMessage 接收时，获取该条消息提醒的 clientId 列表，同理可以用类似的代码操作 LCIMMessage  的其他子类
 - (void)conversation:(LCIMConversation *)conversation didReceiveTypedMessage:(LCIMTypedMessage *)message {
     // 读取消息 @ 的 clientId 列表
     NSArray *mentionList = message.mentionList;
@@ -263,7 +263,7 @@ public void onMessage(LCIMAudioMessage msg, LCIMConversation conv, LCIMClient cl
 }
 ```
 ```objc
-// 示例代码演示 LCIMTypedMessage 接收时，获取该条消息是否 @ 了当前对话里的所有成员或当前用户，同理可以用类似的代码操作 LCIMMessage 的其他子类
+// 示例代码演示 LCIMTypedMessage 接收时，获取该条消息是否 @ 了当前对话里的所有成员或当前用户，同理可以用类似的代码操作 LCIMMessage  的其他子类
 - (void)conversation:(LCIMConversation *)conversation didReceiveTypedMessage:(LCIMTypedMessage *)message {
     // 读取消息是否 @ 了对话的所有成员
     BOOL mentionAll = message.mentionAll;
@@ -293,7 +293,7 @@ func client(_ client: IMClient, conversation: IMConversation, event: IMConversat
 }
 ```
 ```dart
-//暂不支持
+// 暂不支持
 ```
 
 
@@ -676,7 +676,7 @@ public void sendMessage(final LCIMMessage message, final LCIMMessageOption messa
  * 「遗愿消息」会延迟到当前用户掉线后发送，常用来实现「下线通知」功能
  * @param {MessagePriority} [options.priority] 消息优先级，仅在聊天室中有效，
  * see: {@link module:leancloud-realtime.MessagePriority MessagePriority}
- * @param {Object} [options.pushData] 消息对应的离线推送内容，如果消息接收方不在线，会推送指定的内容。其结构说明参见: {@link https://url.leanapp.cn/pushData 推送消息内容}
+ * @param {Object} [options.pushData] 消息对应的离线推送内容，如果消息接收方不在线，会推送指定的内容。其结构说明参见： {@link https://url.leanapp.cn/pushData 推送消息内容 }
  * @return {Promise.<Message>} 发送的消息
  */
 async send(message, options)
@@ -783,7 +783,7 @@ do {
 try {
   TextMessage message = TextMessage();
   message.text = 'Tom 正在输入…';
-//发送一条暂态消息
+// 发送一条暂态消息
   await conversation.send(message: message, transient: true);
 } catch (e) {
   print(e);
@@ -942,7 +942,7 @@ tom.onMessageDelivered = ({
   String toClientID,
   DateTime atDate,
 }) {
-  //消息已送达，在这里可以书写消息送达之后的业务逻辑代码
+  // 消息已送达，在这里可以书写消息送达之后的业务逻辑代码
 };
 ```
 
@@ -959,7 +959,7 @@ tom.onMessageDelivered = ({
 
 由于即时通讯服务端是顺序下发新消息的，客户端不需要对每一条消息单独进行「已读」确认。我们设想的场景如下图所示：
 
-![在一个标题为「欢迎回来」的对话框中写着「好久不见！你有5002条未读消息。是否跳过这些消息？（选择“是”将清除所有未读消息标记）」。对话框的底部有两个按钮，分别为「是，跳过」和「否」。](/img/realtime_read_confirm.png)
+![在一个标题为「欢迎回来」的对话框中写着「好久不见！你有 5002 条未读消息。是否跳过这些消息？（选择“是”将清除所有未读消息标记）」。对话框的底部有两个按钮，分别为「是，跳过」和「否」。](/img/realtime_read_confirm.png)
 
 用户在进入一个对话的时候，一次性清除当前对话的所有未读消息即可。`Conversation` 的清除接口如下：
 
@@ -1272,7 +1272,7 @@ try {
 
 Will 消息有 **如下限制**：
 
-- Will 消息是与当前用户绑定的，并且只对最后一次设置的「对话+消息」生效。如果用户在多个对话中设置了 Will 消息，那么只有最后一次设置有效；如果用户在同一个对话中设置了多条 Will 消息，也只有最后一次设置有效。
+- Will 消息是与当前用户绑定的，并且只对最后一次设置的「对话 + 消息」生效。如果用户在多个对话中设置了 Will 消息，那么只有最后一次设置有效；如果用户在同一个对话中设置了多条 Will 消息，也只有最后一次设置有效。
 - Will 消息不会进入目标对话的消息历史记录。
 - 当用户主动退出即时通讯服务时，系统会认为这是计划性下线，不会下发 Will 消息（如有）。
 

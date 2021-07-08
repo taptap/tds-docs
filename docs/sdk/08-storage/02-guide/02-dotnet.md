@@ -168,7 +168,7 @@ DateTime updatedAt = todo.UpdatedAt;
 DateTime createdAt = todo.CreatedAt;
 ```
 
-对象拿到之后，可以通过 `get` 方法来获取各个属性的值。注意 `objectId`、`updatedAt`和`createdAt` 这三个内置属性不能通过 `get` 获取或通过 `set` 修改，只能由云端自动进行填充。尚未保存的 `LCObject` 不存在这些属性。
+对象拿到之后，可以通过 `get` 方法来获取各个属性的值。注意 `objectId`、`updatedAt` 和 `createdAt` 这三个内置属性不能通过 `get` 获取或通过 `set` 修改，只能由云端自动进行填充。尚未保存的 `LCObject` 不存在这些属性。
 
 如果你试图获取一个不存在的属性，SDK 不会报错，而是会返回 null。
 #### 同步对象
@@ -338,11 +338,11 @@ await LCObject.SaveAll(results);
 // 创建 post
 LCObject post = new LCObject("Post");
 post["title"] = "饿了……";
-post["content"] = "中午去哪吃呢?";
+post["content"] = "中午去哪吃呢 ?";
 
 // 创建 comment
 LCObject comment = new LCObject("Comment");
-comment["content"] = "当然是肯德基啦!";
+comment["content"] = "当然是肯德基啦 !";
 
 // 将 post 设为 comment 的一个属性值
 comment["parent"] = post;
@@ -558,7 +558,7 @@ query.WhereMatches("title", "^((?!ticket).)*\$", modifiers: "i");
 
 ### 数组查询
 
-下面的代码查找所有数组属性 `tags` 包含 `工作` 的对象：
+下面的代码查找所有数组属性 `tags` 包含 ` 工作 ` 的对象：
 
 ```cs
 query.WhereEqualTo("tags", "工作");
@@ -573,7 +573,7 @@ query.WhereSizeEqualTo("tags", 3);
 ```
 
 
-下面的代码查找所有数组属性 `tags` **同时包含** `工作`、`销售` 和 `会议` 的对象：
+下面的代码查找所有数组属性 `tags` **同时包含** ` 工作 `、` 销售 ` 和 ` 会议 ` 的对象：
 
 
 ```cs
@@ -664,7 +664,7 @@ foreach (LCObject comment in comments) {
 
 #### 关系查询的注意事项
 
-云端使用的并非关系型数据库，无法做到真正的联表查询，所以实际的处理方式是：先执行内嵌/子查询（和普通查询一样，`limit` 默认为 `100`，最大 `1000`），然后将子查询的结果填入主查询的对应位置，再执行主查询。如果子查询匹配到的记录数量超出 `limit`，且主查询有其他查询条件，那么可能会出现没有结果或结果不全的情况，因为只有 `limit` 数量以内的结果会被填入主查询。
+云端使用的并非关系型数据库，无法做到真正的联表查询，所以实际的处理方式是：先执行内嵌 / 子查询（和普通查询一样，`limit` 默认为 `100`，最大 `1000`），然后将子查询的结果填入主查询的对应位置，再执行主查询。如果子查询匹配到的记录数量超出 `limit`，且主查询有其他查询条件，那么可能会出现没有结果或结果不全的情况，因为只有 `limit` 数量以内的结果会被填入主查询。
 
 我们建议采用以下方案进行改进：
 
@@ -812,7 +812,7 @@ await query.Subscribe();
 
 LiveQuery 不支持内嵌查询，也不支持返回指定属性。
 
-订阅成功后，就可以接收到和 `LCObject` 相关的更新了。假如在另一个客户端上创建了一个 `Todo` 对象，对象的 `title` 设为 `更新作品集`，那么下面的代码可以获取到这个新的 `Todo`：
+订阅成功后，就可以接收到和 `LCObject` 相关的更新了。假如在另一个客户端上创建了一个 `Todo` 对象，对象的 `title` 设为 ` 更新作品集 `，那么下面的代码可以获取到这个新的 `Todo`：
 
 ```cs
 LCQuery<LCObject> query = new LCQuery<LCObject>("Todo");
@@ -823,7 +823,7 @@ liveQuery.OnCreate = (obj) => {
 ```
 
 
-此时如果有人把 `Todo` 的 `content` 改为 `把我最近画的插画放上去`，那么下面的代码可以获取到本次更新：
+此时如果有人把 `Todo` 的 `content` 改为 ` 把我最近画的插画放上去 `，那么下面的代码可以获取到本次更新：
 
 ```cs
 liveQuery.OnUpdate = (updatedTodo, updatedKeys) => {
@@ -988,7 +988,7 @@ LCQuery<LCObject> query = LCFile.GetQuery();
 需要注意的是，内部文件（上传到文件服务的文件）的 `url` 字段是由云端动态生成的，其中涉及切换自定义域名的相关处理逻辑。
 因此，通过 url 字段查询文件仅适用于外部文件（直接保存外部 URL 到 `_File` 表创建的文件），内部文件请改用 key 字段（URL 中的路径）查询。
 
-注意，如果文件被保存到了 `LCObject` 的一个数组属性中，那么在查询 `LCObject` 时如果需要包含文件，则要用到 `LCQuery` 的 `Include` 方法。比如说，在获取所有标题为 `买蛋糕` 的 todo 的同时获取附件中的文件：
+注意，如果文件被保存到了 `LCObject` 的一个数组属性中，那么在查询 `LCObject` 时如果需要包含文件，则要用到 `LCQuery` 的 `Include` 方法。比如说，在获取所有标题为 ` 买蛋糕 ` 的 todo 的同时获取附件中的文件：
 
 ```cs
 // 获取同一标题且包含附件的 todo
@@ -1120,7 +1120,7 @@ GeoPoint 的经纬度的类型是数字，且经度需在 -180.0 到 180.0 之�
 - `email`：用户的电子邮箱。
 - `emailVerified`：用户的电子邮箱是否已验证。
 - `mobilePhoneNumber`：用户的手机号。
-- `mobilePhoneVerified`用户的手机号是否已验证。
+- `mobilePhoneVerified` 用户的手机号是否已验证。
 
 在接下来对用户功能的介绍中我们会逐一了解到这些属性。
 
@@ -1507,7 +1507,7 @@ Team ID 用于获取 `access_token`。登录 Apple 开发者平台，在右上�
 }
 ```
 
-云端首先会查找账户系统（_User 表），看看是否存在 authData.weixin.openid = “OPENID” 的账户，如果存在，则返回现有账户，如果不存在那么就创建一个新账户，同时将上面的鉴权信息写入新账户的 `authData` 属性中，并将新账户的数据当成结果返回。
+云端首先会查找账户系统（_User 表），看看是否存在 authData.weixin.openid = “ OPENID ” 的账户，如果存在，则返回现有账户，如果不存在那么就创建一个新账户，同时将上面的鉴权信息写入新账户的 `authData` 属性中，并将新账户的数据当成结果返回。
 
 云端会自动为 `_User` class 中每个用户的 `authData.<PLATFORM>.<uid>` 创建唯一索引，从而避免重复数据。
 `<uid>` 在微信等部分云服务内建支持的第三方平台上为 `openid` 字段，在其他第三方平台（包括部分云服务专门支持的第三方平台和所有云服务没有专门支持的第三方平台）上为 `uid` 字段。
@@ -1588,7 +1588,7 @@ try {
   user.Mobile = "+8618200008888";
   await user.Save();
 } catch (LCException e) {
-    //其他报错信息
+    // 其他报错信息
 }
 ```
 
@@ -1607,7 +1607,7 @@ try {
 云服务支持 `UnionID` 体系。你只需要给 `loginWithauthData` 和 `associateWithauthData` 接口传入更多的第三方鉴权信息，即可完成新 UnionID 体系的集成。新增加的第三方鉴权登录选项包括：
 
 - unionId，指第三方平台返回的 UnionId 字符串。
-- unionId platform，指 unionId 对应的 platform 字符串，由应用层自己指定，[后面](#该如何指定-unionIdPlatform)会详述。
+- unionId platform，指 unionId 对应的 platform 字符串，由应用层自己指定，[后面](#该如何指定 -unionIdPlatform)会详述。
 - asMainAccount，指示是否把当前平台的鉴权信息作为主账号来使用。如果作为主账号，那么就由当前用户唯一占有该 unionId，以后其他平台使用同样的 unionId 登录的话，会绑定到当前的用户记录上来；否则，当前应用的鉴权信息会被绑定到其他账号上去。
 
 下面让我们通过一个例子来说明如何使用这些参数完成 UnionID 登录。

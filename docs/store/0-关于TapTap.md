@@ -1,7 +1,7 @@
 ---
 id: store-about
-title: 关于TapTap
-sidebar_label: 关于TapTap
+title: 关于 TapTap
+sidebar_label: 关于 TapTap
 slug: /store
 ---
 

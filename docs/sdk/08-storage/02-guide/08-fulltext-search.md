@@ -52,7 +52,7 @@ Debug.Log(response.Sid);
 LCSearchQuery searchQuery = new LCSearchQuery("dennis");
 searchQuery.setClassName("GameScore");
 searchQuery.setLimit(10);
-searchQuery.orderByAscending("score"); //根据score字段升序排序。
+searchQuery.orderByAscending("score"); // 根据 score 字段升序排序。
 searchQuery.findInBackground().subscribe(new Observer<List<LCObject>>() {
   @Override
   public void onSubscribe(Disposable disposable) {}
@@ -123,7 +123,7 @@ query.find().then(function(results) {
   console.log(results[0].get('_highlight').player);
   // 打印输出：[ '<em>dennis</em> ZX' ]
 }).catch(function(err){
-  //处理 err
+  // 处理 err
 });
 ```
 
@@ -225,5 +225,5 @@ searchQuery.sortBy(new AV.SearchSortBuilder().descending('scores', 'avg', 'last'
 
 将其保存为文本文件，如 `words.txt`，上传即可。上传后，分词将于 3 分钟后生效。开发者可以通过 [`analyze` API](/sdk/storage/guide/fulltext-search-rest#分词结果查询)（要求使用 master key）来测试。
 
-自定义词库生效后，**仅对新添加或者更新的文档/记录才有效**，如果需要对原有的文档也生效的话，需要在 **存储** > **全文搜索** 点击「重建索引」按钮，重建原有索引。
+自定义词库生效后，**仅对新添加或者更新的文档／记录才有效**，如果需要对原有的文档也生效的话，需要在 **存储** > **全文搜索** 点击「重建索引」按钮，重建原有索引。
 同样，如果更新了自定义词库（包括删除自定义词库），也需要重建索引。

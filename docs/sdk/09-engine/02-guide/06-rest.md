@@ -90,7 +90,7 @@ curl -X POST \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{appkey}}" \
   -H "Content-Type: application/json" \
-  -d '{"__type": "Object", "className": "Post", "pubUser": "LeanCloud官方客服"}' \
+  -d '{"__type": "Object", "className": "Post", "pubUser": "LeanCloud 官方客服"}' \
   https://{{host}}/1.1/call/addPost
 ```
 

@@ -5,11 +5,11 @@ sidebar_label: iOS
 ---
 
 ## 登录失败
-可能有几个以下原因: 
+可能有几个以下原因：
 
 1. 没有在 TapTap 开发者中心开启登录功能；
 
-2. 由于 TapTap 客户端授权登陆, 会对 `Client ID`、`BundleID` 进行校验，其中任何一项配置错误都会导致登录失败。
+2. 由于 TapTap 客户端授权登陆，会对 `Client ID`、`BundleID` 进行校验，其中任何一项配置错误都会导致登录失败。
 
 3. 登录时报 404 或者 405 
 请检查 `TapConfig` 的区域配置，中国大陆请配置为 `TapSDKRegionTypeCN`。
@@ -17,7 +17,7 @@ sidebar_label: iOS
 // TapSDK 初始化
 TapConfig *config = TapConfig.new;
 config.clientId = @"clientId";
-config.clientSecret=@"clientSecret";//开发者中心对应Client Token
+config.clientSecret=@"clientSecret";// 开发者中心对应 Client Token
 config.region = TapSDKRegionTypeCN;
 [TapBootstrap initWithConfig:config];
 ```
@@ -36,6 +36,6 @@ config.region = TapSDKRegionTypeCN;
 
 ## Xcode 版本过低导致的异常
 
-下图异常主要是 Xcode 版本过低导致，TapSDK2.X 版本, iOS 建议使用 Xcode12.3 及其以上版本打包。
+下图异常主要是 Xcode 版本过低导致，TapSDK2.X 版本，iOS 建议使用 Xcode12.3 及其以上版本打包。
 
 ![](/img/tap_fqa_ios_xcode.png)

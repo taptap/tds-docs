@@ -14,8 +14,8 @@ TapSDK 提供了一套可供游戏开发者收集账号数据的 API。
 
 ## SDK 获取
 
-请先[下载](/tap-download) SDK，并添加相关依赖.  
-如果只需要单独使用TapDB，可以只依赖 `common+tapdb`
+请先[下载](/tap-download) SDK，并添加相关依赖 .  
+如果只需要单独使用 TapDB，可以只依赖 `common+tapdb`
 
 <MultiLang>
 
@@ -39,15 +39,15 @@ repositories{
 
 dependencies {  
 ...  
-    implementation (name:'TapBootstrap_2.1.6', ext:'aar')  // 必选: TapSDK 启动器 
-    implementation (name:'TapCommon_2.1.6', ext:'aar') // 必选: TapSDK 基础库 
-    implementation (name:'TapLogin_2.1.6', ext:'aar') // 必选: TapTap 登录 
+    implementation (name:'TapBootstrap_2.1.6', ext:'aar')  // 必选： TapSDK 启动器 
+    implementation (name:'TapCommon_2.1.6', ext:'aar') // 必选：TapSDK 基础库 
+    implementation (name:'TapLogin_2.1.6', ext:'aar') // 必选：TapTap 登录 
     implementation (name:'TapDB_2.1.6', ext:'aar') // 数据统计
 }  
 ```
 
 ```objectivec
-//登录
+// 登录
 TapBootstrapResource.bundle
 TapBootstrapSDK.framework
 TapCommonResource.bundle
@@ -73,9 +73,9 @@ TapDB.framework
 
 ```cs
 TapConfig tapConfig = new TapConfig.Builder()
-    .ClientID("clientId")//必须
-    .ClientSecret("client_secret")//必须
-    .RegionType(RegionType.CN)//非必须，默认CN
+    .ClientID("clientId")// 必须
+    .ClientSecret("client_secret")// 必须
+    .RegionType(RegionType.CN)// 非必须，默认 CN
     .TapDBConfig(true, "gameChannel", "gameVersion", true) // TapDB 会根据 TapConfig 的配置进行自动初始化
     .ConfigBuilder();
 
@@ -98,7 +98,7 @@ TapBootstrap.init(MainActivity.this, tapConfig);
 ```
 
 ```objectivec
-    //初始化SDK
+    // 初始化 SDK
     TapConfig *config = TapConfig.new;
     config.clientId = @"clientId";
     config.clientSecret=@"clientSecret";
@@ -141,7 +141,7 @@ TapDB.init(getApplicationContext(), "clientId", "taptap", "gameVersion", true);
 分包渠道为 `null` 时，就无法根据渠道筛选收集到的数据了。
 游戏版本号为 `null` 时，TapSDK 会自动获取游戏安装包的版本。
 
-## 设置获取IDFA
+## 设置获取 IDFA
 
 针对 `iOS14.5+`，可以设置是否获取 IDFA。
 默认不获取 IDFA，如果设置获取 IDFA，还需要在应用层额外配置相关弹窗权限。
@@ -238,15 +238,15 @@ TapDB.setLevel(5);
 <MultiLang>
 
 ```cs
-TapDB.SetServer("1区");
+TapDB.SetServer("1 区");
 ```
 
 ```java
-TapDB.setServer("1区");
+TapDB.setServer("1 区");
 ```
 
 ```objectivec
-[TapDB setServer:@"1区"];
+[TapDB setServer:@"1 区"];
 ```
 
 </MultiLang>

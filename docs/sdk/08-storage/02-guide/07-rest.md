@@ -130,7 +130,7 @@ REST API 请求的 Base URL 可以在**云服务控制台 > 设置 > 应用 Keys
     <tr>
       <td>/1.1/users/&lt;objectId&gt;</td>
       <td>PUT</td>
-      <td>更新用户<br/>用户连接<br/>验证Email</td>
+      <td>更新用户<br/>用户连接<br/>验证 Email</td>
     </tr>
     <tr>
       <td>/1.1/users</td>
@@ -552,7 +552,7 @@ curl -X PUT \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{appkey}}" \
   -H "Content-Type: application/json" \
-  -d '{"content": "每个 JavaScript 程序员必备的 8 个开发工具: http://buzzorange.com/techorange/2015/03/03/9-javascript-ide-editor/"}' \
+  -d '{"content": "每个 JavaScript 程序员必备的 8 个开发工具：http://buzzorange.com/techorange/2015/03/03/9-javascript-ide-editor/"}' \
   https://{{host}}/1.1/classes/Post/<objectId>
 ```
 
@@ -993,7 +993,7 @@ curl -X GET \
 
 通过 `where` 参数的形式可以对查询对象做出约束。
 
-`where` 参数的值应该是 JSON 编码过的。就是说，如果你查看真正被发出的 URL 请求，它应该是先被 JSON 编码过，然后又被 URL 编码过。最简单的使用 `where` 参数的方式就是包含应有的 key 和 value。例如，如果我们想要看到「官方客服」发布的所有微博，我们应该这样构造查询:
+`where` 参数的值应该是 JSON 编码过的。就是说，如果你查看真正被发出的 URL 请求，它应该是先被 JSON 编码过，然后又被 URL 编码过。最简单的使用 `where` 参数的方式就是包含应有的 key 和 value。例如，如果我们想要看到「官方客服」发布的所有微博，我们应该这样构造查询：
 
 ```sh
 curl -X GET \
@@ -1350,7 +1350,7 @@ curl -X GET \
 
 之前我们简要介绍过 GeoPoint。
 
-假如在发布微博的时候，我们也支持用户加上当时的位置信息（新增一个 `location` 字段），如果想看看指定的地点附近发生的事情，可以通过 GeoPoint 数据类型加上在查询中使用 `$nearSphere` 做到。获取离当前用户最近的 10 条微博应该看起来像下面这个样子:
+假如在发布微博的时候，我们也支持用户加上当时的位置信息（新增一个 `location` 字段），如果想看看指定的地点附近发生的事情，可以通过 GeoPoint 数据类型加上在查询中使用 `$nearSphere` 做到。获取离当前用户最近的 10 条微博应该看起来像下面这个样子：
 
 ```sh
 curl -X GET \
@@ -1372,7 +1372,7 @@ curl -X GET \
 
 这会按照距离纬度 39.9、经度 116.4（当前用户所在位置）的远近排序返回一系列结果，第一个就是最近的对象。(注意：**如果指定了 order 参数的话，它会覆盖按距离排序。**）
 
-为了限定搜索的最大距离，需要加入 `$maxDistanceInMiles` 和 `$maxDistanceInKilometers`或者 `$maxDistanceInRadians` 参数来限定。比如要找的半径在 10 英里内的话：
+为了限定搜索的最大距离，需要加入 `$maxDistanceInMiles` 和 `$maxDistanceInKilometers` 或者 `$maxDistanceInRadians` 参数来限定。比如要找的半径在 10 英里内的话：
 
 ```sh
 curl -X GET \
@@ -1525,7 +1525,7 @@ where={"$and":[{"$or":[{"pubUserCertificate":{"$gt":2}},{"pubUserCertificate":{"
 
 你还可以在 **云服务控制台 > 存储 > 设置 > 用户账号**，勾选**未验证邮箱的用户，禁止登录**。
 
-为了注册一个新的用户，需要向 user 路径发送一个 POST 请求，你可以加入一个新的字段，例如，创建一个新的用户有一个电话号码:
+为了注册一个新的用户，需要向 user 路径发送一个 POST 请求，你可以加入一个新的字段，例如，创建一个新的用户有一个电话号码：
 
 ```sh
 curl -X POST \
@@ -1536,7 +1536,7 @@ curl -X POST \
   https://{{host}}/1.1/users
 ```
 
-当创建成功时，HTTP返回为 201 Created，Location 头包含了新用户的 URL：
+当创建成功时，HTTP 返回为 201 Created，Location 头包含了新用户的 URL：
 
 ```sh
 Status: 201 Created
@@ -1645,7 +1645,7 @@ emailVerified 字段有 3 种状态可以参考：
 
 1. **true**：用户已经点击了发送到邮箱的验证地址，邮箱被验证为真实有效。云端保证在新创建用户的时候 emailVerified 一定为 false。
 2. **false**：User 对象最后一次被更新的时候，用户并没有确认过他的 email 地址。如果你看到 emailVerified 为 false 的话，你可以考虑刷新 User 对象或者再次请求验证用户邮箱。
-3. **null**：User对象在 email 验证没有打开的时候就已经创建了，或者 User 没有 email。
+3. **null**：User 对象在 email 验证没有打开的时候就已经创建了，或者 User 没有 email。
 
 邮件模板和验证链接可以在**云服务控制台 > 数据存储 > 用户 > 邮件模板**定制。
 
@@ -1681,7 +1681,7 @@ curl -X POST \
 
 ### 获取用户
 
-和[获取对象](#获取对象)类似，你可以发送一个 GET 请求到 URL 以获取用户的账户信息。比如，为了获取上面创建的用户:
+和[获取对象](#获取对象)类似，你可以发送一个 GET 请求到 URL 以获取用户的账户信息。比如，为了获取上面创建的用户：
 
 ```sh
 curl -X GET \
@@ -1718,7 +1718,7 @@ curl -X GET \
 
 为了改动一个用户已经有的数据，需要对这个用户的 URL 发送一个 PUT 请求。任何你没有指定的 key 都会保持不动，所以你可以只改动用户数据中的一部分。
 
-比如，如果我们想对 「tom」 的手机号码做出一些改动:
+比如，如果我们想对 「tom」 的手机号码做出一些改动：
 
 ```sh
 curl -X PUT \
@@ -1730,7 +1730,7 @@ curl -X PUT \
   https://{{host}}/1.1/users/55a47496e4b05001a7732c5f
 ```
 
-返回的 body 是一个 JSON 对象，只有一个 `updatedAt` 字段表明更新发生的时间.
+返回的 body 是一个 JSON 对象，只有一个 `updatedAt` 字段表明更新发生的时间。
 
 ```json
 {
@@ -1862,7 +1862,7 @@ curl -X DELETE \
 
 ```json
 {
-  "第三方平台名称，例如facebook": {
+  "第三方平台名称，例如 facebook": {
     "uid": "在第三方平台上的唯一用户 ID 字符串",
     "access_token": "在第三方平台的 `Access Token`",
     // ……其他可选属性
@@ -2111,7 +2111,7 @@ curl -X PUT \
 }
 ```
 
-取消微信关联通过删除 `authData.weixin` 来实现:
+取消微信关联通过删除 `authData.weixin` 来实现：
 
 ```sh
 curl -X PUT \
@@ -2138,7 +2138,7 @@ curl -X PUT \
 
 ACL 按 JSON 对象格式来表示，JSON 对象的 key 是 objectId 或者一个特别的 key（`*`，表示公共访问权限）。ACL 的值是权限对象，这个 JSON 对象的 key 即是权限名，而这些 key 的值总是 true。
 
-举个例子，如果你想让一个 id 为 55a47496e4b05001a7732c5f 的用户有读和写一个对象的权限，而且这个对象应该可以被公共读取，符合的 ACL 应该是:
+举个例子，如果你想让一个 id 为 55a47496e4b05001a7732c5f 的用户有读和写一个对象的权限，而且这个对象应该可以被公共读取，符合的 ACL 应该是：
 
 ```json
 {
@@ -2209,7 +2209,7 @@ Location: https://{{host}}/1.1/roles/55a483f0e4b05001a774b837
 }
 ```
 
-你可以通过加入已有的对象到 roles 和 users 关系中来创建一个有子角色和用户的角色:
+你可以通过加入已有的对象到 roles 和 users 关系中来创建一个有子角色和用户的角色：
 
 ```sh
 curl -X POST \
@@ -2285,7 +2285,7 @@ curl -X GET \
 
 ### 更新角色
 
-更新一个角色通常可以像更新其他对象一样使用，但是 name 字段是不可以更改的。加入和删除 users 和 roles 可以通过使用`AddRelation` 和 `RemoveRelation`操作来进行。
+更新一个角色通常可以像更新其他对象一样使用，但是 name 字段是不可以更改的。加入和删除 users 和 roles 可以通过使用 `AddRelation` 和 `RemoveRelation` 操作来进行。
 
 举例来说，我们对 Manager 角色加入 1 个用户：
 
@@ -2621,7 +2621,7 @@ curl -i -X GET \
     https://{{host}}/1.1/date
 ```
 
-返回 UTC 日期:
+返回 UTC 日期：
 
 ```json
 {

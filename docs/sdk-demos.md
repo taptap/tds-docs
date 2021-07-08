@@ -6,7 +6,7 @@ slug: demos
 
 ## 生态服务 
 
-TapTap登录、TapDB、好友关系与内嵌动态。
+TapTap 登录、TapDB、好友关系与内嵌动态。
 
 1. [TapSDK-Unity-Demo](https://github.com/TapTap/TapSDK-Unity-Demo)  
 2. [TapSDK-Android](https://github.com/taptap/TapSDK-Android)  

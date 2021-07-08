@@ -60,7 +60,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 ```
 
 :::tip
-如果是手动下载unitypackage进行SDK导入，需要将 `Assets/TapTap/Common/Plugins/iOS/TapTap.Common.dll` 设置为只支持iOS
+如果是手动下载 unitypackage 进行 SDK 导入，需要将 `Assets/TapTap/Common/Plugins/iOS/TapTap.Common.dll` 设置为只支持 iOS
 :::
 
 [点击](https://github.com/TapTap) 参考 SDK 最新版本号。
@@ -117,7 +117,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
     <string>说明为何应用需要此项权限</string>
     <key>NSMicrophoneUsageDescription</key>
     <string>说明为何应用需要此项权限</string>
-    <!--TapDB需要用到，收集IDFA，如应用程序不想弹框，可以设置TapDB.AdvertiserIDCollectionEnabled(false)-->
+    <!--TapDB 需要用到，收集 IDFA，如应用程序不想弹框，可以设置 TapDB.AdvertiserIDCollectionEnabled(false)-->
     <key>NSUserTrackingUsageDescription</key>
     <string>说明为何应用需要此项权限</string>
 </dict>
@@ -140,9 +140,9 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
     
     dependencies {  
     ...  
-        implementation (name:'TapBootstrap_2.1.6', ext:'aar')  // 必选: TapSDK 启动器 
-        implementation (name:'TapCommon_2.1.6', ext:'aar') // 必选: TapSDK 基础库 
-		implementation (name:'TapLogin_2.1.6', ext:'aar') // 必选: TapTap 登录 
+        implementation (name:'TapBootstrap_2.1.6', ext:'aar')  // 必选：TapSDK 启动器 
+        implementation (name:'TapCommon_2.1.6', ext:'aar') // 必选：TapSDK 基础库 
+		implementation (name:'TapLogin_2.1.6', ext:'aar') // 必选：TapTap 登录 
 
     }  
     ```
@@ -263,7 +263,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
     </array>
     ```
 
-2. 配置openUrl：
+2. 配置 openUrl：
 
    a) 如果项目中有 `SceneDelegate.m`，请先删除，然后请添加如下代码到 `AppDelegate.m` 文件：
 
@@ -280,7 +280,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
    b) 删除 `info.plist` 里面的 Application Scene Manifest  
    ![](/img/tap_ios_appmanifest.png)
 
-   c) 删除AppDelegate.m文件中的两个管理Scenedelegate生命周期代理方法
+   c) 删除 AppDelegate.m 文件中的两个管理 Scenedelegate 生命周期代理方法
 
     ```objectivec
 
@@ -315,9 +315,9 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 
 ```cs
 TapConfig tapConfig = new TapConfig.Builder()
-    .ClientID("clientId")//必须
-    .ClientSecret("client_secret")//必须，开发者中心对应Client Token
-    .RegionType(RegionType.CN)//非必须，默认CN
+    .ClientID("clientId")// 必须
+    .ClientSecret("client_secret")// 必须，开发者中心对应 Client Token
+    .RegionType(RegionType.CN)// 非必须，默认 CN
     .ConfigBuilder();
 
 TapBootstrap.Init(tapConfig);
@@ -328,16 +328,16 @@ TapConfig tapConfig = new TapConfig.Builder()
         .withAppContext(getApplicationContext())
         .withRegionType(TapRegionType.CN) // TapRegionType.CN: 国内  TapRegionType.IO: 国外
         .withClientId("clientId")
-        .withClientSecret("clientSecret")//开发者中心对应Client Token
+        .withClientSecret("clientSecret")// 开发者中心对应 Client Token
         .build();
 TapBootstrap.init(MainActivity.this, tapConfig);
 ```
 
 ```objectivec
-    //初始化SDK
+    // 初始化 SDK
     TapConfig *config = TapConfig.new;
     config.clientId = @"clientId";
-    config.clientSecret=@"clientSecret";//开发者中心对应Client Token
+    config.clientSecret=@"clientSecret";// 开发者中心对应 Client Token
 
     config.region = TapSDKRegionTypeCN;
     [TapBootstrap initWithConfig:config];

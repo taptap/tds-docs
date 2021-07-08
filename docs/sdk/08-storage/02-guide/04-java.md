@@ -202,7 +202,7 @@ query.getInBackground("582570f38ac247004f39c24b").subscribe(new Observer<LCObjec
 });
 ```
 
-对象拿到之后，可以通过 `get` 方法来获取各个属性的值。注意 `objectId`、`updatedAt`和`createdAt` 这三个内置属性不能通过 `get` 获取或通过 `set` 修改，只能由云端自动进行填充。尚未保存的 `LCObject` 不存在这些属性。
+对象拿到之后，可以通过 `get` 方法来获取各个属性的值。注意 `objectId`、`updatedAt` 和 `createdAt` 这三个内置属性不能通过 `get` 获取或通过 `set` 修改，只能由云端自动进行填充。尚未保存的 `LCObject` 不存在这些属性。
 
 如果你试图获取一个不存在的属性，SDK 不会报错，而是会返回 `null`。
 
@@ -765,7 +765,7 @@ query.findInBackground().subscribe(new Observer<List<LCObject>>() {
 
 #### 关系查询的注意事项
 
-云端使用的并非关系型数据库，无法做到真正的联表查询，所以实际的处理方式是：先执行内嵌/子查询（和普通查询一样，`limit` 默认为 `100`，最大 `1000`），然后将子查询的结果填入主查询的对应位置，再执行主查询。如果子查询匹配到的记录数量超出 `limit`，且主查询有其他查询条件，那么可能会出现没有结果或结果不全的情况，因为只有 `limit` 数量以内的结果会被填入主查询。
+云端使用的并非关系型数据库，无法做到真正的联表查询，所以实际的处理方式是：先执行内嵌／子查询（和普通查询一样，`limit` 默认为 `100`，最大 `1000`），然后将子查询的结果填入主查询的对应位置，再执行主查询。如果子查询匹配到的记录数量超出 `limit`，且主查询有其他查询条件，那么可能会出现没有结果或结果不全的情况，因为只有 `limit` 数量以内的结果会被填入主查询。
 
 我们建议采用以下方案进行改进：
 
@@ -1417,7 +1417,7 @@ GeoPoint 的经纬度的类型是数字，且经度需在 -180.0 到 180.0 之�
 - `email`：用户的电子邮箱。
 - `emailVerified`：用户的电子邮箱是否已验证。
 - `mobilePhoneNumber`：用户的手机号。
-- `mobilePhoneVerified`用户的手机号是否已验证。
+- `mobilePhoneVerified`：用户的手机号是否已验证。
 
 在接下来对用户功能的介绍中我们会逐一了解到这些属性。
 
@@ -1732,7 +1732,7 @@ Map<String, Object> thirdPartyData = new HashMap<String, Object>();
 thirdPartyData.put("expires_in", 7200);
 thirdPartyData.put("openid", "OPENID");
 thirdPartyData.put("access_token", "ACCESS_TOKEN");
-//可选
+// 可选
 thirdPartyData.put("refresh_token", "REFRESH_TOKEN");
 thirdPartyData.put("scope", "SCOPE");
 LCUser.loginWithAuthData(thirdPartyData, "weixin").subscribe(new Observer<LCUser>() {
@@ -1845,7 +1845,7 @@ LCUser.loginWithAuthData(thirdPartyData, "weixin").subscribe(new Observer<LCUser
 }
 ```
 
-云端首先会查找账户系统（_User 表），看看是否存在 authData.weixin.openid = “OPENID” 的账户，如果存在，则返回现有账户，如果不存在那么就创建一个新账户，同时将上面的鉴权信息写入新账户的 `authData` 属性中，并将新账户的数据当成结果返回。
+云端首先会查找账户系统（_User 表），看看是否存在 `authData.weixin.openid = "OPENID"` 的账户，如果存在，则返回现有账户，如果不存在那么就创建一个新账户，同时将上面的鉴权信息写入新账户的 `authData` 属性中，并将新账户的数据当成结果返回。
 
 云端会自动为 `_User` class 中每个用户的 `authData.<PLATFORM>.<uid>` 创建唯一索引，从而避免重复数据。
 `<uid>` 在微信等部分云服务内建支持的第三方平台上为 `openid` 字段，在其他第三方平台（包括部分云服务专门支持的第三方平台和所有云服务没有专门支持的第三方平台）上为 `uid` 字段。
@@ -1947,7 +1947,7 @@ user.loginWithAuthData(thirdPartyData, "weixin", failOnNotExist).subscribe(new O
         if (code == 211){
             // 跳转到输入用户名、密码、手机号等业务页面
         } else {
-            System.out.println("发生错误:" + e.getMessage());
+            System.out.println("发生错误：" + e.getMessage());
         }
     }
     @Override

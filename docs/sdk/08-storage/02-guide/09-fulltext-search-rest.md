@@ -53,18 +53,18 @@ curl -X GET \
 
 查询的参数支持：
 
-参数|约束|说明
+参数 | 约束 | 说明
 ---|---|---
-`q`|必须|查询文本，支持 elasticsearch 的 query string 语法。参见 [q 查询语法](#q-查询语法)。
-`skip`|可选|跳过的文档数目，默认为 0
-`limit`|可选|返回集合大小，默认 100，最大 1000
-`sid`|可选|之前查询结果中返回的 sid 值，用于分页，对应于 elasticsearch 中的 [scroll id]。
-`fields`|可选|逗号隔开的字段列表，查询的字段列表
-`highlights`|可选|高亮字段，可以是通配符 `*`，也可以是字段列表逗号隔开的字符串。
-`clazz`|可选|类名，如果没有指定或者为空字符串，则搜索所有启用了全文搜索的 class。
-`include`|可选|关联查询内联的 Pointer 字段列表，逗号隔开，形如 `user,comment` 的字符串。**仅支持 include Pointer 类型**。
-`order`|可选|排序字段，形如 `-score,createdAt` 逗号隔开的字段，负号表示倒序，可以多个字段组合排序。
-`sort`|可选|复杂排序字段，例如地理位置信息排序，见下文描述。
+`q`| 必须 | 查询文本，支持 elasticsearch 的 query string 语法。参见 [q 查询语法](#q- 查询语法)。
+`skip`| 可选 | 跳过的文档数目，默认为 0
+`limit`| 可选 | 返回集合大小，默认 100，最大 1000
+`sid`| 可选 | 之前查询结果中返回的 sid 值，用于分页，对应于 elasticsearch 中的 [scroll id]。
+`fields`| 可选 | 逗号隔开的字段列表，查询的字段列表
+`highlights`| 可选 | 高亮字段，可以是通配符 `*`，也可以是字段列表逗号隔开的字符串。
+`clazz`| 可选 | 类名，如果没有指定或者为空字符串，则搜索所有启用了全文搜索的 class。
+`include`| 可选 | 关联查询内联的 Pointer 字段列表，逗号隔开，形如 `user,comment` 的字符串。**仅支持 include Pointer 类型**。
+`order`| 可选 | 排序字段，形如 `-score,createdAt` 逗号隔开的字段，负号表示倒序，可以多个字段组合排序。
+`sort`| 可选 | 复杂排序字段，例如地理位置信息排序，见下文描述。
 
 [scroll id]: https://www.elastic.co/guide/en/elasticsearch/reference/7.4/search-request-body.html#request-body-search-scroll
 
@@ -137,7 +137,7 @@ name:/joh?n(ath[oa]n)/
 // 数字 1 到 5：
 count:[1 TO 5]
 
-// 2012年内
+// 2012 年内
 date:[2012-01-01 TO 2012-12-31]
 
 //2012 年之前
@@ -167,7 +167,7 @@ age:<=10
 
 - objectId 在全文搜索的类型为 string，因此可以按照字符串查询： `objectId: 558e20cbe4b060308e3eb36c`，不过这个没有特别必要了，你可以直接走 SDK 查询，效率更好。
 - createdAt 和 updatedAt 映射为 date 类型，例如 `createdAt:["2015-07-30T00:00:00.000Z" TO "2015-08-15T00:00:00.000Z"]` 或者 `updatedAt: [2012-01-01 TO 2012-12-31]`
-- 除了createdAt 和 updatedAt之外的 Date 字段类型，需要加上 `.iso` 后缀做查询： `birthday.iso: [2012-01-01 TO 2012-12-31]`
+- 除了 createdAt 和 updatedAt 之外的 Date 字段类型，需要加上 `.iso` 后缀做查询： `birthday.iso: [2012-01-01 TO 2012-12-31]`
 - Pointer 类型，可以采用 `字段名.objectId` 的方式来查询： `player.objectId: 558e20cbe4b060308e3eb36c and player.className: Player`，pointer 只有这两个属性，全文搜索不会 include 其他属性。
 - Relation 字段的查询不支持。
 - File 字段，可以根据 url 或者 id 来查询：`avartar.url: "https://leancloud.cn/docs/app_search_guide.html#搜索_API"`，无法根据文件内容做全文搜索。
@@ -207,7 +207,7 @@ age:<=10
 
 ### 地理位置信息查询
 
-如果 class 里某个列是 `GeoPoint` 类型，那么可以根据这个字段的地理位置远近来排序，例如假设字段 `location` 保存的是 `GeoPoint`类型，那么查询 `[39.9, 116.4]` 附近的玩家可以通过设定 sort 为：
+如果 class 里某个列是 `GeoPoint` 类型，那么可以根据这个字段的地理位置远近来排序，例如假设字段 `location` 保存的是 `GeoPoint` 类型，那么查询 `[39.9, 116.4]` 附近的玩家可以通过设定 sort 为：
 
 ``` json
 {
@@ -273,18 +273,18 @@ curl -X GET \
 
 更详细的查询参数说明：
 
-参数|约束|说明
+参数 | 约束 | 说明
 ---|---|---
-`clazz`|必须|类名
-`like`|可选|**和 `likeObjectIds` 参数二者必须提供其中之一**。代表相似的文本关键字。
-`likeObjectIds`|可选|**和 `like` 参数二者必须提供其中之一**。代表相似的对象 objectId 列表，用逗号隔开。
-`min_term_freq`|可选|**文档中一个词语至少出现次数，小于这个值的词将被忽略，默认是 2**，如果返回文档数目过少，可以尝试调低此值。
-`min_doc_freq`|可选|**词语至少出现的文档个数，少于这个值的词将被忽略，默认值为 5**，同样，如果返回文档数目过少，可以尝试调低此值。
-`max_doc_freq`|可选|词语最多出现的文档个数，超过这个值的词将被忽略，防止一些无意义的热频词干扰结果，默认无限制。
-`skip`|可选|跳过的文档数目，默认为 0
-`limit`|可选|返回集合大小，默认 100，最大 1000
-`fields`|可选|相似搜索匹配的字段列表，用逗号隔开，默认为所有索引字段 `_all`
-`include`|可选|关联查询内联的 Pointer 字段列表，逗号隔开，形如 `user,comment` 的字符串。**仅支持 include Pointer 类型**。
+`clazz`| 必须 | 类名
+`like`| 可选 |**和 `likeObjectIds` 参数二者必须提供其中之一**。代表相似的文本关键字。
+`likeObjectIds`| 可选 |**和 `like` 参数二者必须提供其中之一**。代表相似的对象 objectId 列表，用逗号隔开。
+`min_term_freq`| 可选 |**文档中一个词语至少出现次数，小于这个值的词将被忽略，默认是 2**，如果返回文档数目过少，可以尝试调低此值。
+`min_doc_freq`| 可选 |**词语至少出现的文档个数，少于这个值的词将被忽略，默认值为 5**，同样，如果返回文档数目过少，可以尝试调低此值。
+`max_doc_freq`| 可选 | 词语最多出现的文档个数，超过这个值的词将被忽略，防止一些无意义的热频词干扰结果，默认无限制。
+`skip`| 可选 | 跳过的文档数目，默认为 0
+`limit`| 可选 | 返回集合大小，默认 100，最大 1000
+`fields`| 可选 | 相似搜索匹配的字段列表，用逗号隔开，默认为所有索引字段 `_all`
+`include`| 可选 | 关联查询内联的 Pointer 字段列表，逗号隔开，形如 `user,comment` 的字符串。**仅支持 include Pointer 类型**。
 
 更多内容参考 [ElasticSearch 文档](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/query-dsl-mlt-query.html)。
 

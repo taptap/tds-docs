@@ -41,7 +41,7 @@ import MultiLang from '@theme/MultiLang';
 
 ### 云引擎运行日志大小有限制吗？
 
-日志单行最大 4096 个字符，多余部分会被丢弃；日志输出频率大于 600 行/分钟，多余的部分会被丢弃。
+日志单行最大 4096 个字符，多余部分会被丢弃；日志输出频率大于 600 行／分钟，多余的部分会被丢弃。
 
 ### 云引擎使用什么时区？
 
@@ -338,7 +338,7 @@ exposeEnvironmentsOnBuild: true
 
 ### 部署到多个实例时，部分实例失败需要重新部署吗？
 
-同一环境（预备/生产）下有多个实例时，云引擎会同时在所有实例上部署项目。如因偶然因素部分实例部署不成功，会在几分钟后自动尝试再次部署，无需手动重新部署。
+同一环境（预备／生产）下有多个实例时，云引擎会同时在所有实例上部署项目。如因偶然因素部分实例部署不成功，会在几分钟后自动尝试再次部署，无需手动重新部署。
 
 ### 云引擎实例部署后控制台多次显示「部署中」是怎么回事？
 
@@ -429,7 +429,7 @@ app.get('/1.1/_ops/functions/metadatas', function(req, res) {
 
 可能的原因和解决办法如下：
 
-* 确保你 Gitlab 运行所在服务器的 /etc/shadow 文件里的 git（或者 gitlab）用户一行的 `!`修改为 `*`，原因参考 [Stackoverflow - SSH Key asks for password](http://stackoverflow.com/questions/15664561/ssh-key-asks-for-password)，并重启 SSH 服务：`sudo service ssh restart`。
+* 确保你 Gitlab 运行所在服务器的 /etc/shadow 文件里的 git（或者 gitlab）用户一行的 `!` 修改为 `*`，原因参考 [Stackoverflow - SSH Key asks for password](http://stackoverflow.com/questions/15664561/ssh-key-asks-for-password)，并重启 SSH 服务：`sudo service ssh restart`。
 * 在拷贝 Deploy Key 时，确保没有多余的换行符号。
 * Gitlab 目前不支持有注释的 Deploy Key。早期 LeanCloud 用户生成的 Deploy Key 末尾可能带有注释（类似于 `App dxzag3zdjuxbbfufuy58x1mvjq93udpblx7qoq0g27z51cx3's cloud code deploy key`），需要删除掉这部分再保存到 Gitlab。
 
@@ -795,7 +795,7 @@ leancloud:request response(0) +220ms 200 {"results":[{"content":"1","createdAt":
 
 - [Node.js 调试 GC 以及内存暴涨的分析](https://blog.devopszen.com/node-js_gc)
 - [Node.js Performance Tip: Managing Garbage Collection](https://strongloop.com/strongblog/node-js-performance-garbage-collection/)
-- [Node.JS Profile 1.2 V8 GC详解](https://xenojoshua.com/2018/01/node-v8-gc/)
+- [Node.JS Profile 1.2 V8 GC 详解](https://xenojoshua.com/2018/01/node-v8-gc/)
 
 ### 如何排查云引擎 Node.js CPU 使用过高（响应缓慢）？
 
@@ -825,8 +825,8 @@ leancloud:request response(0) +220ms 200 {"results":[{"content":"1","createdAt":
 其他参考资料（第三方）：
 
 - [不要阻塞你的事件循环](https://nodejs.org/zh-cn/docs/guides/dont-block-the-event-loop/)
-- [Node.JS Profile 4.1 Profile实践](https://xenojoshua.com/2018/02/node-profile-practice/)
-- [手把手测试你的JS代码性能](https://cnodejs.org/topic/58b562f97872ea0864fee1a7)
+- [Node.JS Profile 4.1 Profile 实践](https://xenojoshua.com/2018/02/node-profile-practice/)
+- [手把手测试你的 JS 代码性能](https://cnodejs.org/topic/58b562f97872ea0864fee1a7)
 - [Speed Up JavaScript Execution](https://developers.google.com/web/tools/chrome-devtools/rendering-tools/js-execution)
 
 ### Maximum call stack size exceeded 如何解决？
@@ -857,7 +857,7 @@ leancloud:request response(0) +220ms 200 {"results":[{"content":"1","createdAt":
 3. 运行 `lean up`，在 <http://localhost:3001> 的调试界面中测试云函数和 Hook，然后运行 `lean deploy` 部署代码到云引擎（使用标准实例的用户还需要执行 `lean publish`）。
 4. 部署后请留意云引擎控制台上是否有错误产生。
 
-如果在线编辑使用的是 0.x 版本 的Node.js SDK，那么还需要修改不兼容的代码。
+如果在线编辑使用的是 0.x 版本 的 Node.js SDK，那么还需要修改不兼容的代码。
 比如将 `AV.User.current()` 改为 `request.currentUser`。
 详见 [升级到云引擎 Node.js SDK 1.0](https://leancloud.cn/docs/leanengine-node-sdk-upgrade-1.html)。
 
@@ -1496,7 +1496,7 @@ java -jar target/{zipped jar file}
 ### 自行接入 Java 框架时如何使用云服务的数据存储功能？
 
 模板项目已经集成了 [Java Unified SDK](https://github.com/leancloud/java-unified-sdk) 的 [engine-core](https://github.com/leancloud/java-unified-sdk/tree/master/leanengine) 模块，engine-core 又依赖于存储核心模块 storage-core，因此开发者可以直接使用云服务的数据存储功能。
-模板项目也包含了SDK 初始化的逻辑。
+模板项目也包含了 SDK 初始化的逻辑。
 
 如果自行接入其他框架，则需要在 `pom.xml` 中增加依赖配置来增加 LeanEngine Java SDK 的依赖：
 

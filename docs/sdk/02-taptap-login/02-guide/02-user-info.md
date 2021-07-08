@@ -11,7 +11,7 @@ OpenAPI 采用统一的 Mac Token 头部签算来传递用户身份。
 
 接入客户端  SDK  后，经过用户的授权流程，会获得这个用户在当前应用中的 Mac Token。Mac Token 长期有效，只有在用户更新自己账号相关安全信息、注销对当前应用的授权时才会失效。开发者应当将 Mac Token 妥善保管于自己的服务器上，作为后续与 TapTap 服务端通讯的标示。（Mac Token 算法细节见文档中的 `其他-MacToken` 部分）
 
-以下接口，均提供为国内示例，海外用户请参考[海外API说明](#海外api说明)。
+以下接口，均提供为国内示例，海外用户请参考[海外 API 说明](#海外-api-说明)。
 
 ## 流程
 1. 移动端用 SDK 的 TapTap 登录，可以通过 `GetAccessToken` 获取 AccessToken，里面包含
@@ -69,16 +69,16 @@ KQ",ts="1618221750",nonce="adssd",mac="XWTPmq6A6LzgK8BbNDwj+kE4gzs="' "https://t
 
 `POST` `MAC Token` <https://tds-tapsdk.cn.tapapis.com/api/v1/token>
 
-token续签，防止过期。token默认90天时效，7776000秒。续签一次延长7776000秒
+token 续签，防止过期。token 默认 90 天时效，7776000 秒。续签一次延长 7776000 秒
 
 
 #### Request
 
 | 字段      | 类型   | 说明   |
 | --------- | ------ | ------ |
-| grant_type | string | 固定为'refresh_token' |
-| token | string | 客户端授权access_token |
-| token_type_hint | string | 固定为'access_token' |
+| grant_type | string | 固定为 'refresh_token' |
+| token | string | 客户端授权 access_token |
+| token_type_hint | string | 固定为 'access_token' |
 
 #### Response
 
@@ -106,7 +106,7 @@ MAC Token 包含以下字段：
 | access_token  | string | 该字段暂无作用                    |
 | token_type    | string | Token 类型，如 mac               |
 | mac_key       | string | mac 密钥                         |
-| mac_algorithm | string | mac计算的算法名称 hmac-sha-1      |
+| mac_algorithm | string | mac 计算的算法名称 hmac-sha-1      |
 
 使用 Mac Token 签算一个接口：
 
@@ -149,7 +149,7 @@ const urllib = require('urllib');
 var format = require('string-format');
 const utils = require('./utils');
 /**
-TapSDK登录后信息获取
+TapSDK 登录后信息获取
 **/
 var kid = "1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ";
 var mac_key = "mSUQNYUGRBPXyRyW";
@@ -349,7 +349,7 @@ public class Authorization {
 | not_found       | 404         | 请求失败，请求所希望得到的资源未被在服务器上发现。**在参数相同的情况下，不应该重复请求** |
 | server_error              | 500         | 服务器出现异常情况 **可稍等后重新尝试请求，但需有尝试上限，建议最多 3 次，如一直失败，则中断并告知用户** | 
 
-### 海外API说明
+### 海外 API 说明
 当移动端初始化为海外时
 ```cs
 TapConfig tapConfig = new TapConfig("your-client-id", false); // true 表示国内，false 表示国外

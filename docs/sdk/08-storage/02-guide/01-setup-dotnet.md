@@ -45,10 +45,10 @@ sidebar_label: .NET SDK 配置
 
 ### 模块及依赖关系
 
-名称|模块描述
+名称 | 模块描述
 --|---
-`LeanCloud-SDK-Storage`|存储服务。
-`LeanCloud-SDK-Realtime`|即时通信、LiveQuery 服务，依赖于存储服务。
+`LeanCloud-SDK-Storage`| 存储服务。
+`LeanCloud-SDK-Realtime`| 即时通信、LiveQuery 服务，依赖于存储服务。
 `LeanCloud-SDK-Engine`| 云引擎服务，依赖于存储，适用于云引擎服务端环境。
 
 如只需使用某种服务，可下载最小依赖包，减小程序体积。
@@ -76,7 +76,7 @@ sidebar_label: .NET SDK 配置
 
 - **Client ID**，又称 `App ID`，在 SDK 初始化时用到。联系技术支持时，提供 `Client ID` 可以方便我们更快定位到你的应用。
 - **Client Token**，又称 ``App Key``，在 SDK 初始化时用到。
-- **Server Secret**，又称 `Master Key`，用于在自有服务器、云引擎等**受信任环境**调用管理接口，具备跳过一切权限验证的超级权限。所以**一定注意保密，千万不要在客户端代码中使用该凭证**。
+- **Server Secret**，又称 `Master Key`，用于在自有服务器、云引擎等**受信任环境**调用管理接口，具备跳过一切权限验证的超级权限。所以**一定注意保密，千万不要在客户端代码中使用该凭证**。
 
 ### 导入模块
 

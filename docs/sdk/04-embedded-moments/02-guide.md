@@ -35,21 +35,21 @@ repositories{
 
 dependencies {  
 ...  
-    implementation (name:'TapBootstrap_2.1.6', ext:'aar')  // 必选: TapSDK 启动器 
-    implementation (name:'TapCommon_2.1.6', ext:'aar') // 必选: TapSDK 基础库 
-    implementation (name:'TapLogin_2.1.6', ext:'aar') // 必选: TapTap 登录 
+    implementation (name:'TapBootstrap_2.1.6', ext:'aar')  // 必选：TapSDK 启动器 
+    implementation (name:'TapCommon_2.1.6', ext:'aar') // 必选：TapSDK 基础库 
+    implementation (name:'TapLogin_2.1.6', ext:'aar') // 必选：TapTap 登录 
     implementation (name:'TapMoment_2.1.6', ext:'aar') // TapTap 内嵌动态
 }  
 ```
 
 ```objectivec
-//基础库
+// 基础库
 TapBootstrapResource.bundle
 TapBootstrapSDK.framework
 TapCommonResource.bundle
 TapCommonSDK.framework
 TapLoginSDK.framework
-//内嵌动态
+// 内嵌动态
 TapMomentResource.bundle
 TapMomentSDK.framework
 ```
@@ -210,9 +210,9 @@ Dictionary     | 其中 TapMomentConstants.TapMomentPageShortCutKey 固定，第
 
 ### 场景化入口回调格式说明
 
-**SDK回调结构**
+**SDK 回调结构**
 
-字段名           | 值类型       |required       |说明       |
+字段名           | 值类型       |required       | 说明       |
  ----------- | -------- |-------- |-------- |
 sceneId    |  字符串    | 是 | 场景化入口 ID |
 eventType    |   字符串   | 是 | 枚举的事件类型，如 VIEW，FORWARD，VOTE 等 |
@@ -223,7 +223,7 @@ timestamp     |   整数   |  是 | unix 时间戳，ms |
 
 eventType            | eventPayload (未序列化)       | 说明
  ----------- | -------- | -------- |
- READY  |    {}  | 已成功落地，将在dom挂载时触发（获取数据之前） |
+ READY  |    {}  | 已成功落地，将在 dom 挂载时触发（获取数据之前） |
 REPOST    |    {}  | 转发 | 
 VOTE     | { isCancel: boolean }     | 点赞（含是否取消），仅帖子本身 |
 FOLLOW     | { isCancel: boolean }     | 关注（含是否取消），仅帖子本身 |
