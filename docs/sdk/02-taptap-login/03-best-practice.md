@@ -34,7 +34,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 ### 提供账号绑定功能
  
-为了避免用户账号丢失，请开发者在服务端记录 Tap ID 与 游戏 ID 、游戏 ID 与区服的匹配关系；当用户清除本地游戏数据后，使用相同的 TapTap ID登录，依然能够载入上次登录的游戏进度；  
+为了避免用户账号丢失，请开发者在服务端记录 Tap ID 与 游戏 ID 、游戏 ID 与区服的匹配关系；当用户清除本地游戏数据后，使用相同的 TapTap ID 登录，依然能够载入上次登录的游戏进度；  
 
 为了更好的用户体验，在您的游戏中添加账号绑定功能，为用户提供多种登录方式；  
 
@@ -46,6 +46,6 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 ## 妥善处理敏感信息，提高客户端安全性
 
-1、AppId / AppKey 不要存储在apk里，这样很容易被反编译；  
+1、AppId / AppKey 不要存储在 apk 里，这样很容易被反编译；  
 
 2、提交给 TapTap 平台的游戏包名必须是唯一的，且游戏上线后不要轻易修改，以免影响线上用户的体验；   

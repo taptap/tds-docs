@@ -12,11 +12,11 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 ## 好友功能概览
 
 ### 通用服务
-在开发者中心后台，开启「好友」功能后即可使用SDK
+在开发者中心后台，开启「好友」功能后即可使用 SDK
 
 通用功能         | 说明      |
  ----------- | -------- |
-[获取互关列表](#3-获取关注列表)    |   获取TapTap相互关注的好友列表  |
+[获取互关列表](#获取关注列表)    |   获取 TapTap 相互关注的好友列表  |
 
 
 :::info
@@ -27,19 +27,19 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 深度功能         | 说明      |
  ----------- | -------- |
-[添加好友](#4-添加好友) |   添加好友，同步到TapTap   |
-[删除好友](#5-删除好友)    |    -  |
-[拉黑好友](#6-拉黑好友)    |   -  |
-[取消拉黑](#7-取消拉黑) |   -   |
-[获取粉丝列表](#8-获取粉丝列表)  |   -  |
-[获取黑名单](#9-获取黑名单) |   -   |
-[分享好友邀请链接](#10-分享好友邀请链接)    |   自动生成分享链接，同时调用起系统分享组组件行选择分享  |
-[获取好友邀请链接](#11-获取好友邀请链接)   |  生成邀请链接  |
-[搜索用户](#12-搜索用户)  |   可以根据tds id进行搜索以获取好友信息  |
-|[富信息](#13-富信息) | 设置用户自身状态，会在好友相关操作时回调|
+[添加好友](#添加好友) |   添加好友，同步到 TapTap   |
+[删除好友](#删除好友)    |    -  |
+[拉黑好友](#拉黑好友)    |   -  |
+[取消拉黑](#取消拉黑) |   -   |
+[获取粉丝列表](#获取粉丝列表)  |   -  |
+[获取黑名单](#获取黑名单) |   -   |
+[分享好友邀请链接](#分享好友邀请链接)    |   自动生成分享链接，同时调用起系统分享组组件行选择分享  |
+[获取好友邀请链接](#获取好友邀请链接)   |  生成邀请链接  |
+[搜索用户](#搜索用户)  |   可以根据 tds id 进行搜索以获取好友信息  |
+|[富信息](#富信息) | 设置用户自身状态，会在好友相关操作时回调 |
 
 
-## 1. 应用配置
+## 应用配置
 
 ### 工程导入
 
@@ -71,7 +71,7 @@ TapFriend_2.1.4.arr
 </MultiLang>
 
 ### 工程配置
-Android或者unity开发时，都需要在manifest中加入以下代码
+Android 或者 unity 开发时，都需要在 manifest 中加入以下代码
 
 ```java
 <activity
@@ -96,17 +96,17 @@ Android或者unity开发时，都需要在manifest中加入以下代码
 
 ```
 
-## 2. 注册消息回调
+## 注册消息回调
 
-code  | msg |说明
+code  | msg | 说明
 | ------ | ------ |------|
-130001 | 用户id (tds id) | 打开他人的分享链接唤起游戏后回调，在回调里处理tds id，如：[关注TA](#4-添加好友)
+130001 | 用户 id (tds id) | 打开他人的分享链接唤起游戏后回调，在回调里处理 tds id，如：[关注 TA](#添加好友)
 
 
 <MultiLang>
 
 ```cs
-//实现ITapMessageListener接口
+// 实现 ITapMessageListener 接口
  public void OnMessageWithCode(int code, Dictionary<string, object> extras)
 {
     Debug.Log( "code: " + code + " extras: " + Json.Serialize(extras));
@@ -134,14 +134,14 @@ TapFriends.registerMessageCallback(new ComponentMessageCallback() {
 </MultiLang>
 
 
-## 3. 获取关注列表
+## 获取关注列表
 
 以下列表形式获取均为分页获取  
 int from：起始位置  
 bool mutualAttention: true 为互相关注；false 为单向关注其他人  
 int limit：结束位置  
 
-返回参数请参考[参数说明](#14-参数说明)
+返回参数请参考[参数说明](#参数说明)
 
 <MultiLang>
 
@@ -189,7 +189,7 @@ TapFriends.getFollowingList(0, true, 100, new ListCallback<TapUserRelationship>(
 
 
 
-## 4. 添加好友
+## 添加好友
 
 <MultiLang>
 
@@ -230,7 +230,7 @@ TapFriends.addFriend("userID", new Callback<Boolean>() {
 #### 参数说明
 userId : tds id，登录成功后从服务端获取
 
-## 5. 删除好友
+## 删除好友
 
 <MultiLang>
 
@@ -266,7 +266,7 @@ TapFriends.deleteFriend("userID", new Callback<Boolean>() {
 ```
 </MultiLang>
 
-## 6. 拉黑好友
+## 拉黑好友
 
 <MultiLang>
 
@@ -307,7 +307,7 @@ TapFriends.blockUser("userID", new Callback<Boolean>() {
 
 
 
-## 7. 取消拉黑
+## 取消拉黑
 
 <MultiLang>
 
@@ -345,8 +345,8 @@ TapFriends.unblockUser("userID", new Callback<Boolean>() {
 </MultiLang>
 
 
-## 8. 获取粉丝列表
-返回参数请参考[参数说明](#14-参数说明)
+## 获取粉丝列表
+返回参数请参考[参数说明](#参数说明)
 
 <MultiLang>
 
@@ -391,8 +391,8 @@ TapFriends.getFollowerList(0, 100, new ListCallback<TapUserRelationship>() {
 
 
 
-## 9. 获取黑名单
-返回参数请参考[参数说明](#14-参数说明)
+## 获取黑名单
+返回参数请参考[参数说明](#参数说明)
 
 <MultiLang>
 
@@ -436,7 +436,7 @@ TapFriends.getBlockList(0, 100, new ListCallback<TapUserRelationship>() {
 
 
 
-## 10. 分享好友邀请链接
+## 分享好友邀请链接
 
 1. 生成链接并唤起系统分享控件
 2. 选择分享应用，分享链接给对方
@@ -456,7 +456,7 @@ TapFriends.SendFriendInvitation((isInvitation, error) =>
     }
     else
     {
-        label = "分享好友邀请: ";
+        label = "分享好友邀请 : ";
         this.label = this.label + (isInvitation ? "成功" : "失败");
     }
 });
@@ -491,7 +491,7 @@ TapFriends.sendFriendInvitation(Activity activity, new Callback<Boolean>() {
 
 </MultiLang>
 
-##  11. 获取好友邀请链接
+##  获取好友邀请链接
 
 获取到上图示「关注好友」的分享链接（「分享好友邀请链接」功能的简略版，省去了分享，只生成相关链接），游戏可以通过自己的方式将该链接分享出去
 
@@ -506,7 +506,7 @@ TapFriends.sendFriendInvitation(Activity activity, new Callback<Boolean>() {
     }
     else
     {
-        label = "获取好友邀请链接成功: ";
+        label = "获取好友邀请链接成功 : ";
         this.label = this.label + invitationString;
     }
 });
@@ -543,7 +543,7 @@ TapFriends.generateFriendInvitation(new Callback<String>() {
 
 
 
-## 12. 搜索用户
+## 搜索用户
 
 <MultiLang>
 
@@ -604,13 +604,13 @@ TapFriends.searchUser("userID", new Callback<TapUserRelationship>() {
 
 
 
-## 13. 富信息
+## 富信息
 
 #### 使用说明
 
 - 使用富信息需要先按[服务端配置](#服务端配置)格式提供给技术支持进行配置
-- 最多支持配置20个 key，移动端以 key-value 键值对发送信息
-- key-不支持空字符串，最短长度2位，最长长度64位；value-不支持空字符串，最短长度2位，最长长度256位
+- 最多支持配置 20 个 key，移动端以 key-value 键值对发送信息
+- key- 不支持空字符串，最短长度 2 位，最长长度 64 位；value- 不支持空字符串，最短长度 2 位，最长长度 256 位
 
 ### 移动端 
 
@@ -619,8 +619,8 @@ TapFriends.searchUser("userID", new Callback<TapUserRelationship>() {
 <MultiLang>
 
 ```cs
-//设置value时需要注意，"#playing" 表示令牌，"playing"表示变量，详情参考服务端配置信息
-//这里的"display"是先在服务端配置成"token"令牌形式的，所以value值需要以#开头，
+// 设置 value 时需要注意，"#playing" 表示令牌，"playing"表示变量，详情参考服务端配置信息
+// 这里的"display"是先在服务端配置成"token"令牌形式的，所以 value 值需要以#开头，
 TapFriends.SetRichPresence("display", "#playing", (,error) =>
 {
     if (error != null)
@@ -645,7 +645,7 @@ TapFriends.SetRichPresence("leadboard", "#100", (,error) =>
     }
 });
 
-// "score" 在服务端设置的类型是 "variable" 类型，所以 对应value值不需要以#开头
+// "score" 在服务端设置的类型是 "variable" 类型，所以 对应 value 值不需要以#开头
 TapFriends.SetRichPresence("score", "100", (,error) =>
 {
     if (error != null)
@@ -662,7 +662,7 @@ TapFriends.SetRichPresence("score", "100", (,error) =>
 
 ```java
 private void taptapRichVar() {
-    // 富信息 令牌形式 参考文档中的服务端设置，这里的key值"display"文档中是令牌形式， 所以value值需要以#开头
+    // 富信息 令牌形式 参考文档中的服务端设置，这里的 key 值"display"文档中是令牌形式， 所以 value 值需要以#开头
     TapFriends.setRichPresence("display", "#playing", new Callback0() {
         @Override
         public void handlerResult(TapFriendError tapFriendError) {
@@ -691,7 +691,7 @@ private void taptapRichToken() {
     });
 }
 
-// "score" 在服务端设置的类型是 "variable" 变量类型，所以 对应value值不需要以#开头
+// "score" 在服务端设置的类型是 "variable" 变量类型，所以 对应 value 值不需要以#开头
 private void taptapRichToken() {
     TapFriends.setRichPresence("score", "100", new Callback0() {
         @Override
@@ -771,11 +771,11 @@ TapFriends.clearRichPresence("display", new Callback0() {
 
 ### 服务端
 
-请先确认好要配置的key-value，按照下面格式发给技术支持 
+请先确认好要配置的 key-value，按照下面格式发给技术支持 
 
 #### 服务端配置
 
-服务端支持两种配置，用 type 进行区分 `令牌`和`变量`
+服务端支持两种配置，用 type 进行区分 ` 令牌 ` 和 ` 变量 `
 
 ```
 [
@@ -796,9 +796,9 @@ TapFriends.clearRichPresence("display", new Callback0() {
 ```
 
 #### 令牌
-对于令牌，提供key之后，需要提供与之对应的value  
+对于令牌，提供 key 之后，需要提供与之对应的 value  
 
-如上type = token的令牌有`display`和`leadboard`。如需配置多语言也请标识，语言标识没有要求，如 "CN"、"US"、"TW" 能理解即可
+如上 type = token 的令牌有 `display` 和 `leadboard`。如需配置多语言也请标识，语言标识没有要求，如 "CN"、"US"、"TW" 能理解即可
 
 ```
 {
@@ -810,8 +810,8 @@ TapFriends.clearRichPresence("display", new Callback0() {
 			"#matching": "组队中"
 		},
 		"leadboard": {
-			"#rank": "%rank%名", // 如需要提供占位符，请用%%标识
-			"#score": "%score%分"
+			"#rank": "%rank% 名", // 如需要提供占位符，请用 %% 标识
+			"#score": "%score% 分"
 		}
 	},
 	"US": {
@@ -831,7 +831,7 @@ TapFriends.clearRichPresence("display", new Callback0() {
 
 #### 变量
 对于变量，value 值游戏可以在移动端自行指定，设置后会传递给好友  
-如上，type = variable的变量有两个 `inviteable`和`score`  
+如上，type = variable 的变量有两个 `inviteable` 和 `score`  
 
 
 
@@ -841,13 +841,13 @@ TapUserRelationShip
 
 参数  | 描述
 | ------ | ------ |
-userid | 用户id (tds id)
-name  | 用户nick name
+userid | 用户 id (tds id)
+name  | 用户 nick name
 avatar  | 头像地
 gender | UNKNOWN = 0;<br/>MALE = 1;<br/> FEMALE = 2;
-mutualAttention | 是否互相关注 <br/>false:不是互相关注 <br/>true: 互相关注
-relationship | 返回字符串类型【000】<br/>从右往左：是否关注，是否被关注，是否拉黑<br/>如:【010】为粉丝（单向被关注），【011】为好友（双向互关）
+mutualAttention | 是否互相关注 <br/>false: 不是互相关注 <br/>true: 互相关注
+relationship | 返回字符串类型【 000 】<br/>从右往左：是否关注，是否被关注，是否拉黑<br/>如 : 【 010 】为粉丝（单向被关注），【 011 】为好友（双向互关）
 online | 是否在线
-time | 事件触发时间，关注列表回调的是你关注他的时间，粉丝列表回调表示他关注你的时间，单位s 
+time | 事件触发时间，关注列表回调的是你关注他的时间，粉丝列表回调表示他关注你的时间，单位 s 
 richPresence | 回调好友的富信息 [富信息使用说明](#使用说明)
 

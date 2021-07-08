@@ -14,13 +14,13 @@ import Mermaid from '@theme/Mermaid';
 在很多产品里面，都存在让用户实时沟通的需求，例如：
 
 - 员工与客户之间的实时交流，如房地产行业经纪人与客户的沟通，商业产品客服与客户的沟通，等等。
-- 企业内部沟通协作，如内部的工作流系统、文档/知识库系统，增加实时互动的方式可能就会让工作效率得到极大提升。
+- 企业内部沟通协作，如内部的工作流系统、文档／知识库系统，增加实时互动的方式可能就会让工作效率得到极大提升。
 - 直播互动，不论是文体行业的大型电视节目中的观众互动、重大赛事直播，娱乐行业的游戏现场直播、网红直播，还是教育行业的在线课程直播、KOL 知识分享，在支持超大规模用户积极参与的同时，也需要做好内容审核管理。
 - 应用内社交，游戏公会嗨聊，等等。社交产品要能长时间吸引住用户，除了实时性之外，还需要更多的创新玩法，对于标准化通讯服务会存在更多的功能扩展需求。
 
 根据功能需求的层次性和技术实现的难易程度不同，我们分为多篇文档来一步步地讲解如何利用即时通讯服务实现不同业务场景需求：
 
-- 本篇文档，我们会从实现简单的单聊/群聊开始，演示创建和加入「对话」、发送和接收富媒体「消息」的流程，同时让大家了解历史消息云端保存与拉取的机制，希望可以满足在成熟产品中快速集成一个简单的聊天页面的需求。
+- 本篇文档，我们会从实现简单的单聊／群聊开始，演示创建和加入「对话」、发送和接收富媒体「消息」的流程，同时让大家了解历史消息云端保存与拉取的机制，希望可以满足在成熟产品中快速集成一个简单的聊天页面的需求。
 - 第二篇文档会介绍一些特殊消息的处理，例如 @ 成员提醒、撤回和修改、消息送达和被阅读的回执通知等，离线状态下的推送通知和消息同步机制，多设备登录的支持方案，以及如何扩展自定义消息类型，希望可以满足一个社交类产品的多方面需求。
 - 第三篇文档会介绍一下系统的安全机制，包括第三方的操作签名，以及「对话」成员的权限管理和黑名单机制，同时也会介绍直播聊天室和临时对话的用法，希望可以帮助开发者提升产品的安全性和易用性，并满足特殊场景的需求。
 - 第四篇文档会介绍即时通讯服务端 Hook 机制，系统对话的用法，以及给出一个基于这两个功能打造一个属于自己的聊天机器人的方案，希望可以满足业务层多种多样的扩展需求。
@@ -308,7 +308,7 @@ try {
   Conversation conversation = await tom.createConversation(
       isUnique: true, members: {'Jerry'}, name: 'Tom & Jerry');
 } catch (e) {
-  print('创建会话失败:$e');
+  print('创建会话失败：$e');
 }
 ```
 
@@ -535,7 +535,7 @@ Future<TemporaryConversation> createTemporaryConversation({
 
 </MultiLang>
 
-虽然不同语言/平台接口声明有所不同，但是支持的参数是基本一致的。在创建一个对话的时候，我们主要可以指定：
+虽然不同语言／平台接口声明有所不同，但是支持的参数是基本一致的。在创建一个对话的时候，我们主要可以指定：
 
 1. `members`：必要参数，包含对话的初始成员列表，请注意当前用户作为对话的创建者，是默认包含在成员里面的，所以 `members` 数组中可以不包含当前用户的 `clientId`。
 
@@ -1037,7 +1037,7 @@ func client(_ client: IMClient, conversation: IMConversation, event: IMConversat
 <>
 
 ```dart
-//加入成员通知
+// 加入成员通知
 jerry.onMembersJoined = ({
   Client client,
   Conversation conversation,
@@ -1367,7 +1367,7 @@ jerry.onMembersLeft = ({
   String byClientID,
   DateTime atDate,
 }) {
-  print('成员 ${members.toString()} 离开会话，操作者为: $byClientID');
+  print('成员 ${members.toString()} 离开会话，操作者为： $byClientID');
 };
 // 有用户被踢出某个对话
 jerry.onKicked = ({
@@ -1477,7 +1477,7 @@ Cloud-->>Tom: 2. 下发通知：William 加入对话
 Cloud-->>Jerry: 2. 下发通知：William 加入对话
 `} />
 
-其他人则通过订阅 `MEMBERS_JOINED` 来接收 William 加入对话的通知:
+其他人则通过订阅 `MEMBERS_JOINED` 来接收 William 加入对话的通知 :
 
 <MultiLang>
 
@@ -1875,7 +1875,7 @@ do {
 ```dart
 import 'package:flutter/services.dart' show rootBundle;
 
-//假设项目根目录有 assets 文件夹存放图片，并且在 pubspec.yaml 中已经将 assets 文件夹添加到工程中。
+// 假设项目根目录有 assets 文件夹存放图片，并且在 pubspec.yaml 中已经将 assets 文件夹添加到工程中。
 ByteData imageData = await rootBundle.load('assets/test.png');
 // image message
 ImageMessage imageMessage = ImageMessage.from(
@@ -2035,7 +2035,7 @@ client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
    switch (message.type) {
       case ImageMessage.TYPE:
         file = message.getFile();
-        console.log('收到图像消息，URL：' + file.url());
+        console.log(' 收到图像消息，URL：' + file.url());
         break;
    }
 }
@@ -2074,7 +2074,7 @@ lient.onMessage = ({
 
 </MultiLang>
 
-### 发送音频消息/视频/文件
+### 发送音频消息／视频／文件
 
 #### 发送流程
 
@@ -2163,7 +2163,7 @@ do {
 ```dart
 import 'package:flutter/services.dart' show rootBundle;
 
-//假设项目根目录有 assets 文件夹存放 mp3 文件，并且在 pubspec.yaml 中已经将 assets 文件夹添加到工程中。
+// 假设项目根目录有 assets 文件夹存放 mp3 文件，并且在 pubspec.yaml 中已经将 assets 文件夹添加到工程中。
 ByteData audioData = await rootBundle.load('assets/test.mp3');
 AudioMessage audioMessage = AudioMessage.from(
   binaryData: audioData.buffer.asUint8List(),
@@ -2586,7 +2586,7 @@ jerry.onMessage = ({
     } else if (message is VideoMessage) {
       print('收到视频消息，消息时长：${message.duration}');
     } else {
-      print('收到.txt/.doc/.md 等各种类型的普通文件消息，URL：${message.url}');
+      print('收到 .txt/.doc/.md 等各种类型的普通文件消息，URL：${message.url}');
     }
   } else if (message is CustomMessage) {
     // CustomMessage 是自定义的消息类型
@@ -3159,7 +3159,7 @@ do {
 }
 ```
 ```dart
-//暂不支持
+// 暂不支持
 ```
 
 </MultiLang>
@@ -3396,7 +3396,7 @@ query.matches('language',/[\\u4e00-\\u9fa5]/); // language 是中文字符
 try conversationQuery.where("language", .matchedRegularExpression("[\\u4e00-\\u9fa5]", option: nil))
 ```
 ```dart
-//暂不支持
+// 暂不支持
 ```
 
 </MultiLang>
@@ -3423,7 +3423,7 @@ query.startsWith('name','教育');
 try conversationQuery.where("name", .prefixedBy("教育"))
 ```
 ```dart
-//暂不支持
+// 暂不支持
 ```
 
 </MultiLang>
@@ -3443,13 +3443,13 @@ query.whereContains("name","教育");
 [query whereKey:@"name" containsString:@"教育"];
 ```
 ```js
-query.contains('name','教育');
+query.contains('name',' 教育 ');
 ```
 ```swift
 try conversationQuery.where("name", .matchedSubstring("教育"))
 ```
 ```dart
-//暂不支持
+// 暂不支持
 ```
 
 </MultiLang>
@@ -3476,7 +3476,7 @@ query.matches('name', regExp);
 try conversationQuery.where("name", .matchedRegularExpression("^((?!教育).)* $ ", option: nil))
 ```
 ```dart
-//暂不支持
+// 暂不支持
 ```
 
 </MultiLang>
@@ -3504,7 +3504,7 @@ query.containedIn('m', ['Tom']);
 try conversationQuery.where("m", .containedIn(["Tom"]))
 ```
 ```dart
-//暂不支持
+// 暂不支持
 ```
 
 </MultiLang>
@@ -3531,7 +3531,7 @@ query.doesNotExist('lm')
 try conversationQuery.where("lm", .notExisted)
 ```
 ```dart
-//暂不支持
+// 暂不支持
 ```
 
 </MultiLang>
@@ -3556,7 +3556,7 @@ query.exists('lm')
 try conversationQuery.where("lm", .existed)
 ```
 ```dart
-//暂不支持
+// 暂不支持
 ```
 
 </MultiLang>
@@ -3588,7 +3588,7 @@ try conversationQuery.where("keywords", .matchedSubstring("教育"))
 try conversationQuery.where("age", .lessThan(18))
 ```
 ```dart
-//暂不支持
+// 暂不支持
 ```
 
 </MultiLang>
@@ -3600,7 +3600,7 @@ try conversationQuery.where("age", .lessThan(18))
 <MultiLang>
 
 ```cs
-//暂不支持
+// 暂不支持
 ```
 ```java
 LCIMConversationsQuery ageQuery = tom.getConversationsQuery();
@@ -3637,7 +3637,7 @@ do {
 }
 ```
 ```dart
-//暂不支持
+// 暂不支持
 ```
 
 </MultiLang>
@@ -3665,7 +3665,7 @@ query.addAscending('name').addDescending('createdAt');
 try conversationQuery.where("createdAt", .descending)
 ```
 ```dart
-//暂不支持
+// 暂不支持
 ```
 
 </MultiLang>
@@ -4065,7 +4065,7 @@ do {
 ```dart
 List<Message> messages;
 try {
-//第一次查询成功
+// 第一次查询成功
   messages = await conversation.queryMessage(
     limit: 10,
   );
@@ -4616,22 +4616,22 @@ func client(_ client: IMClient, event: IMClientEvent) {
 var { Event } = require('leancloud-realtime');
 
 realtime.on(Event.DISCONNECT, function() {
-  console.log('服务器连接已断开');
+  console.log(' 服务器连接已断开 ');
 });
 realtime.on(Event.OFFLINE, function() {
-  console.log('离线（网络连接已断开）');
+  console.log(' 离线（网络连接已断开）');
 });
 realtime.on(Event.ONLINE, function() {
-  console.log('已恢复在线');
+  console.log(' 已恢复在线 ');
 });
 realtime.on(Event.SCHEDULE, function(attempt, delay) {
-  console.log(delay + ' ms 后进行第 ' + (attempt + 1) + ' 次重连');
+  console.log(delay + ' ms 后进行第 ' + (attempt + 1) + ' 次重连 ');
 });
 realtime.on(Event.RETRY, function(attempt) {
-  console.log('正在进行第 ' + (attempt + 1) + ' 次重连');
+  console.log(' 正在进行第 ' + (attempt + 1) + ' 次重连 ');
 });
 realtime.on(Event.RECONNECT, function() {
-  console.log('与服务端连接恢复');
+  console.log(' 与服务端连接恢复 ');
 });
 ```
 
@@ -4659,7 +4659,7 @@ realtime.on(Event.RECONNECT, function() {
 
 - 临时对话，例如客服系统中用户和客服人员之间建立的临时通道，它与普通的「一对一单聊」的主要差别在于对话总是临时创建并且不会长期存在，在提升实现便利性的同时，还能降低服务使用成本（能有效减少存储空间方面的花费）。有兴趣的开发者可以参考[即时通讯开发指南第三篇](/sdk/im/guide/senior)的《使用临时对话》一节。
 
-- 系统对话，例如在微信里面常见的公众号/服务号，系统全局的广播账号，与普通「多人群聊」的主要差别，在于「服务号」是以订阅的形式加入的，也没有成员限制，并且订阅用户和服务号的消息交互是一对一的，一个用户的上行消息不会群发给其他订阅用户。有兴趣的开发者可以参考[即时通讯开发指南第四篇](/sdk/im/guide/systemconv)《「系统对话」的使用》一节。
+- 系统对话，例如在微信里面常见的公众号／服务号，系统全局的广播账号，与普通「多人群聊」的主要差别，在于「服务号」是以订阅的形式加入的，也没有成员限制，并且订阅用户和服务号的消息交互是一对一的，一个用户的上行消息不会群发给其他订阅用户。有兴趣的开发者可以参考[即时通讯开发指南第四篇](/sdk/im/guide/systemconv)《「系统对话」的使用》一节。
 ## 进一步阅读
 
 《二，消息收发的更多方式，离线推送与消息同步，多设备登录》

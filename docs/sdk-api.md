@@ -7,9 +7,9 @@ import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
 
 
 
-## TapTap登录、TapDB、好友关系与内嵌动态
+## TapTap 登录、TapDB、好友关系与内嵌动态
 
-| 平台         | API总览 |   
+| 平台         | API 总览 |   
 | ---------- | --- | 
 |  Unity   | [Unity-API](https://taptap.github.io/TapSDK-Unity/html/namespaces.html)   | 
 |  Android | [Android-API](https://taptap.github.io/TapSDK-Android/)   | 
@@ -17,7 +17,7 @@ import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
 
 ## 游戏存储、IM 与云引擎
 
-| 平台         | API总览 |   
+| 平台         | API 总览 |   
 | ---------- | --- | 
 |  Unity   | [Unity-API](https://leancloud.github.io/csharp-sdk/html)   | 
 |  Android | [Android-API](https://leancloud.cn/api-docs/android/index.html)   | 

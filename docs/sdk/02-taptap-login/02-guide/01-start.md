@@ -60,7 +60,7 @@ if (accessToken == nil) {
 ```cs
   public void OnLoginSuccess(AccessToken accessToken)
     {
-        Debug.Log("登录成功:  " + accessToken.ToJSON());
+        Debug.Log("登录成功：" + accessToken.ToJSON());
         TapBootstrap.GetTestQualification((valid, error) => {
             if (valid)
             {

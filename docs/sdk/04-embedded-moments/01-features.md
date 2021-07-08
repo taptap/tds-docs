@@ -102,7 +102,7 @@ import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
 
 ## 后台功能介绍
 ### 数据回收和查看
-在开发者中心-内嵌动态后台，点击右上角可直接跳转论坛管理中心，查看数据。
+在开发者中心 - 内嵌动态后台，点击右上角可直接跳转论坛管理中心，查看数据。
 
 ![](/img/moment-1.3.9.png)
 提示：
@@ -117,5 +117,5 @@ import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
 
 
 ### 运营位和推荐位配置
-运营位配置位于开发者中心-内嵌动态后台，推荐位配置位于论坛管理中心。
+运营位配置位于开发者中心 - 内嵌动态后台，推荐位配置位于论坛管理中心。
 ![](/img/moment-1.3.11.png)

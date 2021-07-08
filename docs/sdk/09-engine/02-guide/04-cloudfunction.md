@@ -274,7 +274,7 @@ def my_cloud_func(foo, bar, baz, **params):
 云函数中可以获取的参数和上下文信息有：
 
 - `@EngineFunctionParam`：客户端发送的参数。
-- `EngineRequestContext`有关客户端的更多信息，其中 `EngineRequestContext.getSessionToken()` 会返回客户端所关联用户的 sessionToken（根据客户端发送的 `X-LC-Session` 头），`EngineRequestContext.getRemoteAddress()` 会返回客户端的实际地址。
+- `EngineRequestContext` 有关客户端的更多信息，其中 `EngineRequestContext.getSessionToken()` 会返回客户端所关联用户的 sessionToken（根据客户端发送的 `X-LC-Session` 头），`EngineRequestContext.getRemoteAddress()` 会返回客户端的实际地址。
 
 </>
 <>
@@ -1659,12 +1659,12 @@ Before 类 Hook 函数的超时时间为 10 秒，其他类 Hook 函数的超时
 
 目前在线编辑仅支持 Node.js，提供了 4 种 SDK 版本：
 
-在线编辑版本|Node.js SDK|JS SDK|Node.js|备注|可用依赖
+在线编辑版本 |Node.js SDK|JS SDK|Node.js| 备注 | 可用依赖
 ---|---|---|---|---|---
-v0|0.x|0.x|0.12|已不推荐使用|moment, request, underscore
+v0|0.x|0.x|0.12| 已不推荐使用 |moment, request, underscore
 v1|1.x|1.x|4||async, bluebird, co, ejs, handlebars, joi, lodash, marked, moment, q, request, superagent, underscore
-v2|2.x|2.x|6|需要使用 Promise 写法|async, bluebird, crypto, debug, ejs, jade, lodash, moment, nodemailer, qiniu, redis, request, request-promise, superagent, underscore, uuid, wechat-api, xml2js
-v3|3.x|3.x|8|需要使用 Promise 写法|async, bluebird, crypto, debug, ejs, jade, lodash, moment, nodemailer, qiniu, redis, request, request-promise, superagent, underscore, uuid, wechat-api, xml2js
+v2|2.x|2.x|6| 需要使用 Promise 写法 |async, bluebird, crypto, debug, ejs, jade, lodash, moment, nodemailer, qiniu, redis, request, request-promise, superagent, underscore, uuid, wechat-api, xml2js
+v3|3.x|3.x|8| 需要使用 Promise 写法 |async, bluebird, crypto, debug, ejs, jade, lodash, moment, nodemailer, qiniu, redis, request, request-promise, superagent, underscore, uuid, wechat-api, xml2js
 
 **从 v0 升级到 v1：**
 

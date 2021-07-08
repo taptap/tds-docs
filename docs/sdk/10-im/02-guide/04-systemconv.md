@@ -30,7 +30,7 @@ Hook 也可以称为「钩子」，是一种特殊的消息处理机制，与 Wi
 
 ### 消息类 Hook
 
-一条消息，在即时通讯的流程中，从终端用户 A 发送开始，到其他用户接收到为止，考虑到存在接收方在线/不在线的可能，会经历多个不同阶段，这里每一个阶段都会触发 Hook 函数：
+一条消息，在即时通讯的流程中，从终端用户 A 发送开始，到其他用户接收到为止，考虑到存在接收方在线／不在线的可能，会经历多个不同阶段，这里每一个阶段都会触发 Hook 函数：
 
 * **_messageReceived**<br/>
   消息达到服务器，群组成员已解析完成之后，发送给收件人之前调用。开发者在这里还可以修改消息内容，实时改变消息接收者的列表，以及其他类似操作。
@@ -1156,7 +1156,7 @@ public static object OnConversationUpdate(Dictionary<string, object> parameters)
 
 请注意本 Hook 仅作为用户上线后的通知。如果用户快速的进行上下线切换或有多个设备同时进行上下线，则上线和下线 Hook 调用顺序并不做严格保证，即可能出现某用户 `_clientOffline` Hook 先于 `_clientOnline` Hook 而调用。
 
-参数:
+参数：
 
 参数 | 说明
 ----- | ------
@@ -1165,7 +1165,7 @@ sourceIP | 登录者的 IP
 tag | 无值或值为 "default" 表示主动登录时不会根据 tag 踢其它设备下线，其它情况下会踢当前登录的相同 tag 的设备下线
 reconnect | 标识客户端本次登录是否是自动重连，无值或值为 0 表示主动登录，值为 1 表示自动重连
 
-返回:
+返回：
 
 这个 hook 不会对返回值进行检查。
 
@@ -1219,7 +1219,7 @@ public static void OnClientOnline(Dictionary<string, object> parameters) {
 
 请注意本 Hook 仅作为用户下线后的通知。如果用户快速的进行上下线切换或有多个设备同时进行上下线，则上线和下线 Hook 调用顺序并不做严格保证，即可能出现某用户 `_clientOffline` Hook 先于 `_clientOnline` Hook 而调用。
 
-参数:
+参数：
 
 参数 | 说明
 ----- | ------
@@ -1241,7 +1241,7 @@ errorMsg | 导致连接断开的错误信息，可选
 4114 | UNPARSEABLE_RAW_MSG | 消息格式错误无法解析
 4200 | INTERNAL_ERROR | 服务器内部错误
 
-返回:
+返回：
 
 这个 hook 不会对返回值进行检查。
 

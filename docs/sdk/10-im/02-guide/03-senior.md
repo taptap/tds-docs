@@ -28,7 +28,7 @@ import Mermaid from '@theme/Mermaid';
 使用操作签名可以保证聊天通道的安全，这一功能默认是关闭的，可以在 **云服务控制台 > 即时通讯 > 设置 > 即时通讯选项** 中进行开启：
 
 - **登录启用签名认证**，用于控制所有的用户登录
-- **对话操作启用签名认证**，用于控制新建或加入对话、邀请/踢出对话成员等操作
+- **对话操作启用签名认证**，用于控制新建或加入对话、邀请／踢出对话成员等操作
 - **聊天记录查询启用签名认证**，用于控制聊天记录查询操作
 - **黑名单操作启用签名认证**，用于控制修改对话的黑名单用户列表操作（关于黑名单，请参考下一节）
 
@@ -348,7 +348,7 @@ if (!error) {
 var signatureFactory = function(clientId) {
   return AV.Cloud.rpc('sign', { clientId: clientId }); // AV.Cloud.rpc 返回一个 Promise
 };
-// 基于云引擎进行对话创建/加入、邀请成员、踢出成员等操作签名的 signature 工厂方法
+// 基于云引擎进行对话创建／加入、邀请成员、踢出成员等操作签名的 signature 工厂方法
 var conversationSignatureFactory = function(conversationId, clientId, targetIds, action) {
   return AV.Cloud.rpc('sign-conversation', {
     conversationId: conversationId,
@@ -501,7 +501,7 @@ _ = LCUser.logIn(username: "username", password: "password") { (result) in
 
 ## 权限管理与黑名单
 
-第三方鉴权是一种服务端对全局进行控制的机制，具体到单个对话的群组，例如开放聊天室，出于产品运营的需求，我们还需要对成员权限进行区分，以及允许管理员来限时/永久屏蔽部分用户。下面我们详细说明一下这样的需求该如何实现。
+第三方鉴权是一种服务端对全局进行控制的机制，具体到单个对话的群组，例如开放聊天室，出于产品运营的需求，我们还需要对成员权限进行区分，以及允许管理员来限时／永久屏蔽部分用户。下面我们详细说明一下这样的需求该如何实现。
 
 ### 设置成员权限
 
@@ -848,7 +848,7 @@ Future<QueryMemberResult> queryMutedMembers({int limit = 50, String next})
 </MultiLang>
 
 
-注意这里对用户禁言/解除禁言的结果与以往的操作结果不一样，这里是 ***部分成功结果***，里面包含三部分数据：
+注意这里对用户禁言／解除禁言的结果与以往的操作结果不一样，这里是 ***部分成功结果***，里面包含三部分数据：
 
 - `error`/`exception`，表示整体是否成功。如果整体操作失败，这里会有异常信息返回，此时不必再看下面两部分结果。
 - `successfulClientIds`，表示操作成功了的成员 ID 列表。
@@ -1441,7 +1441,7 @@ await chatRoom.mute();
 
 > 使用建议：
 >
-> - 对话内消息的静音/取消静音操作不光对聊天室有效，普通的群聊对话也可以执行该操作。
+> - 对话内消息的静音／取消静音操作不光对聊天室有效，普通的群聊对话也可以执行该操作。
 > - `mute` 和 `unmute` 操作会修改云端 `_Conversation` 里面的 `mu` 属性。**开发者切勿在控制台中对 `mu` 随意进行修改**，否则可能会引起即时通讯云端的离线推送功能失效。
 
 ### 消息内容的实时过滤
