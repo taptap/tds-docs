@@ -29,11 +29,11 @@ __二、添加测试设备__
 
 __方法一：扫码添加__
 
-1.下载TapDB移动客户端
+1. 下载TapDB移动客户端
 
 ![图片描述](/img/whiteList/04.png)
 
-2.打开App
+2. 打开App
 
 未登录：在登录界面左上角点击"!"进入添加页面
 
@@ -41,7 +41,7 @@ __方法一：扫码添加__
 
 ![图片描述](/img/whiteList/02.png)
 
-3.点击添加设备，扫描Web端“企业设置”-“测试设备”-“+添加设备”中的二维码
+3. 点击添加设备，扫描Web端“企业设置”-“测试设备”-“+添加设备”中的二维码
 
 ![图片描述](/img/whiteList/01.png)
 
@@ -54,11 +54,11 @@ __方法二：手动添加__
 
 ![图片描述](/img/whiteList/03.png)
 
-4.iOS填写IDFA
+4. iOS填写IDFA
 >  __如何获取IDFA__
 > 1. 下载TapDB客户端，点击测试设备，获取IDFA
 
-5.Android 填写Android ID 或 Google ID
+5. Android 填写Android ID 或 Google ID
 >  __如何获取Android ID或Google ID？__
 >  1. 下载 TapDB 客户端，点击测试设备，获取 Android ID 和 Google ID
 >  2. 获取 Android ID：打开手机拨号键，输入\*#\*#8255#\*#\*
