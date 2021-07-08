@@ -20,7 +20,7 @@ TapTap 账号服务，基于标准的 OAuth 2.0 协议构建的授权登录系�
 
 请确认已经在 TapTap 开发者中 - 应用配置完成了开启操作。可参照入门指南-[准备工作](/sdk/start/get-ready)。
 
-配置签名证书
+### 配置签名证书
 
 为了更高的安全性，TapTap 登录服务需要校验你的游戏。你需要提交游戏的 package name（Android 包名）、Bundle id（iOS 包名）以及 Android 签名。
 
@@ -38,7 +38,7 @@ TapTap 账号服务，基于标准的 OAuth 2.0 协议构建的授权登录系�
 
 检查当前如果没有用户登录状态时，需要为用户提供一个可视化点击交互的登录界面。TapTap 审核团队会在应用上架 TapTap 商店时审核你的登录界面，请务必参照[《登录按钮设计规范》](/design) 进行绘制。
 
-## 单个登录方式
+### 单个登录方式
 
 当应用中仅提供 TapTap 一种登录方式时，建议在开始游戏的主界面，绘制一个可交互的登录按钮。按钮的范围大小、按钮上的文案使用，均不能误导、不能阻碍用户的正常顺畅点击。
 
@@ -48,7 +48,7 @@ TapTap 账号服务，基于标准的 OAuth 2.0 协议构建的授权登录系�
 <img src={useBaseUrl('/img/login-feature01.png')} alt="" width="800" />
 
 
-## 多种登录方式
+### 多种登录方式
 
 如果游戏还有其他登录方式同时存在时，为用户提供合理布局的登录界面，尽可能的从外观明显区分每种登录方式的不同，让用户可以快速找到目标。
 
@@ -69,14 +69,14 @@ TapTap 账号服务，基于标准的 OAuth 2.0 协议构建的授权登录系�
 
 [点击此处](https://www.taptap.com/mobile)下载 TapTap 移动客户端
 
-## 唤起 TapTap 客户端授权登录
+### 唤起 TapTap 客户端授权登录
 
 当用户单击 TapTap 登录按钮时，TapSDK 检测到用户设备中已经安装了 TapTap 客户端，会自动唤起设备中的 TapTap 客户端，并识别客户端中的登录信息，进行授权登录。
 
 <img src={useBaseUrl('/img/login-taptapclient.png')} alt="" width="800" />
 
 
-## 打开 webview 授权登录
+### 打开 webview 授权登录
 
 当用户单击 TapTap 登录按钮时，TapSDK 检测到用户设备中未安装 TapTap 客户端，则会打开 webview 进行登录流程。  
 
