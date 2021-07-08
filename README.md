@@ -119,6 +119,16 @@ B -->|afterDelete|C((done))
 `} />
 ```
 
+## 上传文件
+
+视频等大文件可以上传到 LC 华北节点的 capacity-center 应用（App ID：lhzo7z96ayhad9flpynyiu79t2jpzuasz2ke8cdb09zduvug）。
+
+0. 初次上传前，先找 jiangruoxu、suixiaoxu 加你为应用的协作者，之后即可通过 LC 控制台上传文件。
+1. 登录 LC 控制台 > 数据存储 > 文件： <https://console.leancloud.cn/apps/lhzo7z96ayhad9flpynyiu79t2jpzuasz2ke8cdb09zduvug/storage/file>
+2. 点击「上传」按钮上传文件，上传完成后，文件表格中的 URL 即为文件的 URL
+
+图片等小文件请直接提交至仓库。
+
 ## 优化图片
 
 运行 `npm run optimg` 任务可以优化 `static/img` 下的 JPEG （有损压缩）和 PNG 图片（无损压缩）。
