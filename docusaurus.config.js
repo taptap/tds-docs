@@ -110,6 +110,13 @@ module.exports = {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
           routeBasePath: '/',
+          "lastVersion": "current",
+          "versions": {
+            "current": {
+              "label": "3.x",
+              "path": ""
+            }
+          }
         },
         theme: {
           customCss: require.resolve('./src/styles/index.scss'),
