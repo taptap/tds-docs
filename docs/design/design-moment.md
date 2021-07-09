@@ -1,12 +1,11 @@
 ---
 id: design-moment
-title: TapTap 动态 - 主题规范设计规则
+title: TapTap 动态 - 主题规范设计规则（基于内嵌动态 V1.30）
 sidebar_label: 内嵌动态设计指南
 ---
 import {Red, Blue, Black, Gray, Green, BlueBlack} from '/src/docComponents/doc';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-## TapTap 动态 - 主题规范设计规则（基于内嵌动态 V1.30）
 
 ## 导航主题字符规则
 
