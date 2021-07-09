@@ -6,7 +6,7 @@ const baseUrl = '/v2-doc/';
 
 module.exports = {
   title: 'TapTap 开发者文档中心',
-  url: 'https://developer.taptap.com/v2-doc',
+  url: 'https://developer.taptap.com',
   baseUrl: baseUrl,
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
