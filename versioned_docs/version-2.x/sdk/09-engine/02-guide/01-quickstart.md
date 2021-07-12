@@ -12,7 +12,7 @@ import MultiLang from '@theme/MultiLang';
 
 ## 创建项目
 
-请根据《云引擎命令行工具使用指南》的[《安装命令行工具》](/sdk/engine/guide/cli#安装命令行工具)一节安装最新版的命令行工具，并确保你已经在本地机器上可以成功运行命令行工具：
+请根据《云引擎命令行工具使用指南》的[《安装命令行工具》](/2.x/sdk/engine/guide/cli#安装命令行工具)一节安装最新版的命令行工具，并确保你已经在本地机器上可以成功运行命令行工具：
 
 ```sh
 tds help
@@ -20,7 +20,7 @@ tds help
 
 如果一切正常，你应该看到命令行工具的帮助信息。
 
-如果你尚未登录，请根据《云引擎命令行工具使用指南》的[《登录》](/sdk/engine/guide/cli#登录)一节完成登录。
+如果你尚未登录，请根据《云引擎命令行工具使用指南》的[《登录》](/2.x/sdk/engine/guide/cli#登录)一节完成登录。
 
 然后使用命令行工具创建项目：
 
@@ -292,7 +292,7 @@ func createTodo(req *leancloud.FunctionRequest) (interface{}, error) {
 </MultiLang>
 
 还有一类特殊的云函数是由云端系统在特定事件发生时自动触发，这类云函数称为 Hook 函数。
-想要了解 Hook 函数的详情以及如何调用我们上面定义的 `createTodo` 云函数，请参考[云函数指南](/sdk/engine/guide/cloudfunction)。
+想要了解 Hook 函数的详情以及如何调用我们上面定义的 `createTodo` 云函数，请参考[云函数指南](/2.x/sdk/engine/guide/cloudfunction)。
 
 ## 部署到云端
 

@@ -6,7 +6,7 @@ sidebar_label: 开发指南
 
 :::info
 **目前需要联系运营团队申请开通文本检测功能。**
-**申请方式详见[开启文本检测服务](/sdk/text-moderation/features#开启文本检测服务)**
+**申请方式详见[开启文本检测服务](/2.x/sdk/text-moderation/features#开启文本检测服务)**
 :::
 
 ## 介绍

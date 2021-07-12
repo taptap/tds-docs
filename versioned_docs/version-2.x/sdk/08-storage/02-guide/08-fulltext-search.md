@@ -26,7 +26,7 @@ import MultiLang from '@theme/MultiLang';
 
 ## 搜索 API
 
-我们提供了 [全文搜索的 REST API 接口](/sdk/storage/guide/fulltext-search-rest)。
+我们提供了 [全文搜索的 REST API 接口](/2.x/sdk/storage/guide/fulltext-search-rest)。
 SDK 封装了这一接口。
 
 假设你对 GameScore 类[启用了全文搜索](#为_Class_启用搜索)，你就可以尝试传入关键字来搜索：
@@ -130,7 +130,7 @@ query.find().then(function(results) {
 </MultiLang>
 
 
-有关查询语法，可以参考 [q 查询语法](/sdk/storage/guide/fulltext-search-rest#q_查询语法)。
+有关查询语法，可以参考 [q 查询语法](/2.x/sdk/storage/guide/fulltext-search-rest#q_查询语法)。
 
 因为每次请求都有 limit 限制，所以一次请求可能并不能获取到所有满足条件的记录。
 `SearchQuery` 的 `hits()` 标示所有满足查询条件的记录数。
@@ -223,7 +223,7 @@ searchQuery.sortBy(new AV.SearchSortBuilder().descending('scores', 'avg', 'last'
 响应式设计
 ```
 
-将其保存为文本文件，如 `words.txt`，上传即可。上传后，分词将于 3 分钟后生效。开发者可以通过 [`analyze` API](/sdk/storage/guide/fulltext-search-rest#分词结果查询)（要求使用 master key）来测试。
+将其保存为文本文件，如 `words.txt`，上传即可。上传后，分词将于 3 分钟后生效。开发者可以通过 [`analyze` API](/2.x/sdk/storage/guide/fulltext-search-rest#分词结果查询)（要求使用 master key）来测试。
 
 自定义词库生效后，**仅对新添加或者更新的文档／记录才有效**，如果需要对原有的文档也生效的话，需要在 **存储** > **全文搜索** 点击「重建索引」按钮，重建原有索引。
 同样，如果更新了自定义词库（包括删除自定义词库），也需要重建索引。

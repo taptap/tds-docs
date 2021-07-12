@@ -23,7 +23,7 @@ await todo.Save();
 
 ## SDK 安装与初始化
 
-请阅读 [数据存储、即时通讯 .NET SDK 配置指南](/sdk/storage/guide/setup-dotnet)。
+请阅读 [数据存储、即时通讯 .NET SDK 配置指南](/2.x/sdk/storage/guide/setup-dotnet)。
 
 > C#/.Net/Unity SDK 老版本迁移
 >
@@ -87,7 +87,7 @@ object["dictValue"] = dict;
 
 **云服务控制台 > 数据存储 > 结构化数据** 中展示的日期数据也会依据操作系统的时区进行转换。一个例外是当你通过 REST API 获得数据时，这些数据将以 UTC 呈现。你可以手动对它们进行转换。
 
-若想了解云服务是如何保护应用数据的，请阅读[数据和安全](/sdk/storage/guide/security)。
+若想了解云服务是如何保护应用数据的，请阅读[数据和安全](/2.x/sdk/storage/guide/security)。
 
 ### 构建对象
 
@@ -1296,7 +1296,7 @@ LCQuery<LCUser> userQuery = LCUser.GetQuery();
 
 为了安全起见，**新创建的应用的 `_User` 表默认关闭了 `find` 权限**，这样每位用户登录后只能查询到自己在 `_User` 表中的数据，无法查询其他用户的数据。如果需要让其查询其他用户的数据，建议单独创建一张表来保存这类数据，并开放这张表的 `find` 查询权限。除此之外，还可以在云引擎里封装用户查询相关的方法。
 
-可以参见 [用户对象的安全](#用户对象的安全) 来了解 `_User` 表的一些限制，还可以阅读[数据和安全](/sdk/storage/guide/security)来了解更多 class 级权限设置的方法。
+可以参见 [用户对象的安全](#用户对象的安全) 来了解 `_User` 表的一些限制，还可以阅读[数据和安全](/2.x/sdk/storage/guide/security)来了解更多 class 级权限设置的方法。
 
 ### 关联用户对象
 
@@ -1651,7 +1651,7 @@ LCUser currentUser = await LCUser.LoginWithAuthDataAndUnionId(
     option: option);
 ```
 
-> 注意代码中将微信传回来的 openid 属性改为了 uid，这是因为云端要求对于自定义的 platform，只能使用 uid 这样的属性名，才能保证自动建立 `authData.<PLATFORM>.uid` 的唯一索引，具体可以参考[数据存储 REST API 使用详解](/sdk/storage/guide/rest)的《连接用户账户和第三方平台》一节。
+> 注意代码中将微信传回来的 openid 属性改为了 uid，这是因为云端要求对于自定义的 platform，只能使用 uid 这样的属性名，才能保证自动建立 `authData.<PLATFORM>.uid` 的唯一索引，具体可以参考[数据存储 REST API 使用详解](/2.x/sdk/storage/guide/rest)的《连接用户账户和第三方平台》一节。
 
 如果用户 A 是第一次在「云服务通讯」中通过微信登录，那么 _User 表中会增加一个新用户（假设其 objectId 为 `ThisIsUserA`），其 `authData` 的结果如下：
 
@@ -1892,4 +1892,4 @@ if (currentUser.IsAnonymous) {
 
 ## 全文搜索
 
-全文搜索是一个针对应用数据进行全局搜索的接口，它基于搜索引擎构建，提供更强大的搜索功能。要深入了解其用法和阅读示例代码，请阅读[全文搜索指南](/sdk/storage/guide/fulltext-search)。
+全文搜索是一个针对应用数据进行全局搜索的接口，它基于搜索引擎构建，提供更强大的搜索功能。要深入了解其用法和阅读示例代码，请阅读[全文搜索指南](/2.x/sdk/storage/guide/fulltext-search)。

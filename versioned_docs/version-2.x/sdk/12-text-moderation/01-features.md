@@ -24,7 +24,7 @@ sidebar_label: 功能介绍
 
 ### 接入方式
 
-提供便捷灵活的 API 接入方式，详细 API 参考 [开发指南](/sdk/text-moderation/guide) 
+提供便捷灵活的 API 接入方式，详细 API 参考 [开发指南](/2.x/sdk/text-moderation/guide) 
 
 
 ## 开启文本检测服务
@@ -102,7 +102,7 @@ sidebar_label: 功能介绍
 ### 控制台 - 场景配置
 ![](/img/textsafety4.png)
 
-在该页可对场景进行策略配置，包括启用的识别类型、使用的词库。此处可获取场景 ID ，用于 API 请求时指定场景进行检测，场景参数详见 [开发指南](/sdk/text-moderation/guide)
+在该页可对场景进行策略配置，包括启用的识别类型、使用的词库。此处可获取场景 ID ，用于 API 请求时指定场景进行检测，场景参数详见 [开发指南](/2.x/sdk/text-moderation/guide)
 
 #### 1. 场景介绍
 开启服务即默认提供两个场景：
@@ -193,5 +193,5 @@ sidebar_label: 功能介绍
 
 - 以上模块之外的 UGC 文本模块，调用服务时，使用「聊天检测」的场景 ID 作为参数。
 
-详细 API 使用见 [开发指南](/sdk/text-moderation/guide)
+详细 API 使用见 [开发指南](/2.x/sdk/text-moderation/guide)
 
