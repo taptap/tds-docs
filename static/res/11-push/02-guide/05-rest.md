@@ -4,7 +4,6 @@ title: 推送 REST API
 sidebar_label: 推送 REST API
 ---
 
-# 推送 REST API
 
 当 App 安装到用户设备后，如果要使用推送功能，云服务 SDK 会自动生成一个 Installation 对象。Installation 对象包含了推送所需要的所有信息。你可以使用 REST API，通过 Installation 对象进行推送。
 

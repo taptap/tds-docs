@@ -7,7 +7,7 @@ sidebar_label: 基础功能
 import MultiLang from '@theme/MultiLang';
 import Mermaid from '@theme/Mermaid';
 
-# 一，从简单的单聊、群聊、收发图文消息开始
+
 
 ## 本章导读
 

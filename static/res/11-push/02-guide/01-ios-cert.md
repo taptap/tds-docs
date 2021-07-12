@@ -5,7 +5,6 @@ sidebar_label: iOS 推送设置
 ---
 
 
-# iOS 推送设置指南
 
 ## 注册 App ID
 

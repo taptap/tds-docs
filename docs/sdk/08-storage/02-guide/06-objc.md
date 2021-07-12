@@ -4,7 +4,7 @@ title: 数据存储开发指南 · Objective-C
 sidebar_label: Objective-C 指南
 ---
 
-# 数据存储开发指南 · Objective-C
+
 
 数据存储是云服务提供的核心功能之一，可用于存放和查询应用数据。下面的代码展示了如何创建一个对象并将其存入云端：
 

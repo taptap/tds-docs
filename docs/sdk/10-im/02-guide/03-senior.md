@@ -7,7 +7,7 @@ sidebar_label: 权限与聊天室
 import MultiLang from '@theme/MultiLang';
 import Mermaid from '@theme/Mermaid';
 
-# 三，安全与签名、黑名单和权限管理、玩转聊天室和临时对话
+
 
 ## 本章导读
 

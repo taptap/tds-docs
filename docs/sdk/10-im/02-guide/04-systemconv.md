@@ -7,7 +7,7 @@ sidebar_label: Hook 与系统对话
 import MultiLang from '@theme/MultiLang';
 import Mermaid from '@theme/Mermaid';
 
-# 四，详解消息 hook 与系统对话
+
 
 ## 本章导读
 
