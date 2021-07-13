@@ -82,6 +82,7 @@ module.exports = {
         },
         {
           type: 'docsVersionDropdown',
+          position: 'right',
         },
         {
           type: 'localeDropdown',
