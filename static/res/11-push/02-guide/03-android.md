@@ -4,7 +4,6 @@ title: Android 推送指南
 sidebar_label: Android 推送
 ---
 
-# Android 推送指南
 
 请先阅读[推送通知总览](/sdk/push/guide/overview)了解相关概念。
 

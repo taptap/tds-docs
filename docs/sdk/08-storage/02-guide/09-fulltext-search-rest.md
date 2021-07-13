@@ -4,7 +4,7 @@ title: 全文搜索 REST API
 sidebar_label: 全文搜索 REST API
 ---
 
-# 全文搜索 REST API
+
 
 全文搜索服务提供以下 REST API 接口：
 

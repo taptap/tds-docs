@@ -167,7 +167,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 
 1. 在 Xcode 选择工程，到 **Build Setting > Other Linker Flags** 添加 `-ObjC`。
 
-2. 直接拖拽 [下载的 TapSDK_iOS_v2.1.2.zip](/tap-download) 到项目目录即可。
+2. 直接拖拽 [下载的 TapSDK_iOS](/tap-download) 到项目目录即可。
 
 3. 视需要导入下载的资源文件：
 

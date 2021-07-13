@@ -89,7 +89,7 @@ TapLicenseHelper.check(Activity activity);
 
 ### 完善应用信息
 
-前往开发者中心，按照[物料要求](/store/7- 物料要求 .md)填写应用信息，并审核通过。
+前往开发者中心，按照[物料要求](/store/7-物料要求.md)填写应用信息，并审核通过。
 
 ### 设置售卖价格
 
@@ -97,7 +97,7 @@ TapLicenseHelper.check(Activity activity);
 
 ### 正式上线
 
-所有流程都确保顺利后，游戏可[正式上线](/store/12- 游戏上线 .md)。
+所有流程都确保顺利后，游戏可[正式上线](/store/12-游戏上线.md)。
 ![用来空行的小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)
 
 ---
@@ -106,7 +106,7 @@ TapLicenseHelper.check(Activity activity);
 
 ### 关于 Android 11 无法拉起 TapTap 客户端的解决方案
 
-Android 11 加强了隐私保护策略，引入了大量变更和限制，其中一个重要变更 —— [软件包可见性](https://developer.android.com/about/versions/11/privacy/package-visibility) ，将会导致第三方应用无法拉起 TapTap 客户端，从而影响 TapTap 相关功能的正常使用 ，包括但不限于更新唤起 TapTap 、购买验证等功能。
+Android 11 加强了隐私保护策略，引入了大量变更和限制，其中一个重要变更 — [软件包可见性](https://developer.android.com/about/versions/11/privacy/package-visibility) ，将会导致第三方应用无法拉起 TapTap 客户端，从而影响 TapTap 相关功能的正常使用 ，包括但不限于更新唤起 TapTap 、购买验证等功能。
 特别需要注意的是，Android 11 的该变更只会影响到升级 ` targetSdkVersion=30 ` 的应用，未升级的应用暂不受影响。
 
 **方案一：**

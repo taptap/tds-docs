@@ -5,7 +5,7 @@ sidebar_label: LeanDB MySQL
 ---
 
 
-# LeanDB MySQL 指南
+
 
 LeanDB 是 LeanCloud 推出的数据库托管方案，开发者可以在「控制台 => 云引擎 => LeanDB」中创建托管在 LeanCloud 的数据库实例。
 

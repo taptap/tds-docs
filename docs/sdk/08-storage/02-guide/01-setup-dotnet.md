@@ -4,7 +4,7 @@ title: 数据存储、即时通讯 .NET SDK 配置指南
 sidebar_label: .NET SDK 配置
 ---
 
-# 数据存储、即时通讯 .NET SDK 配置指南
+
 
 我们于 2020 年 12 月推出了基于 .Net Standard 2.0 接口标准实现的[新版 .Net SDK](https://github.com/leancloud/csharp-sdk)。旧版 .Net SDK（类名以 `AV` 开头的） 已不再更新，欢迎旧版 SDK 的用户尽快切换到[新版 .Net SDK](https://github.com/leancloud/csharp-sdk)，具体迁移方法详见 [.Net SDK 迁移指南]。
 
