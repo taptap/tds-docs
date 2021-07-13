@@ -6,7 +6,7 @@ sidebar_label: 网站托管
 
 import MultiLang from '@theme/MultiLang';
 
-# 云引擎网站托管指南
+
 
 网站托管是云引擎的一个子模块，允许你用各种程序语言开发 Web 程序，提供云函数和 Hook，还可以提供静态文件的托管和自定义的路由、绑定你自己的域名。
 你可以用它为你的移动应用提供一个介绍和下载页、开发一个管理员控制台或完整的网站，或者运行一些必须在服务器端运行的自定义逻辑。
@@ -17,7 +17,7 @@ import MultiLang from '@theme/MultiLang';
 
 我们为云引擎支持的各种语言准备了示例项目，建议从示例项目着手开始开发。
 
-要理解如何从示例项目开始开发云引擎项目，本地调试，部署到云端，请先阅读[云引擎快速入门](/2.x/sdk/engine/guide/quickstart)。
+要理解如何从示例项目开始开发云引擎项目，本地调试，部署到云端，请先阅读[云引擎快速入门](/sdk/engine/guide/quickstart)。
 
 ### 本地运行和调试
 
@@ -27,7 +27,7 @@ import MultiLang from '@theme/MultiLang';
 tds up
 ```
 
-更多有关命令行工具和本地调试的内容请看[云引擎命令行工具使用指南](/2.x/sdk/engine/guide/cli)。
+更多有关命令行工具和本地调试的内容请看[云引擎命令行工具使用指南](/sdk/engine/guide/cli)。
 
 ### 部署到云端
 
@@ -210,9 +210,9 @@ mvn package
 tds up
 ```
 
-更多有关命令行工具和本地调试的内容请参考[云引擎命令行工具使用指南](/2.x/sdk/engine/guide/cli)。
+更多有关命令行工具和本地调试的内容请参考[云引擎命令行工具使用指南](/sdk/engine/guide/cli)。
 
-除了使用命令行工具本地启动应用外，还可以手动设置相应环境变量后，直接启动应用，详见[云引擎 FAQ](/2.x/sdk/engine/guide/faq)。
+除了使用命令行工具本地启动应用外，还可以手动设置相应环境变量后，直接启动应用，详见[云引擎 FAQ](/sdk/engine/guide/faq)。
 
 </>
 <>
@@ -259,7 +259,7 @@ SDK 可以让你更加方便地使用这些功能。
 建议在客户端（浏览器端、移动端）登录用户，调用 SDK 的接口获取 session token。
 对于需要后端以当前用户的身份完成的操作，客户端通过 HTTP Header 等方式将 session token 发送给后端。
 
-参见[数据存储指南](/2.x/sdk/storage/guide/dotnet)。
+参见[数据存储指南](/sdk/storage/guide/dotnet)。
 
 ## 健康监测
 

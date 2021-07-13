@@ -4,7 +4,7 @@ title: LeanCache 指南
 sidebar_label: LeanCache
 ---
 
-# LeanCache 指南
+
 
 LeanCache 使用 [Redis](http://redis.io/) （3.0.x）来提供高性能、高可用的 Key-Value 内存存储，主要用作缓存数据的存储，也可以用作持久化数据的存储。它非常适合用于以下场景：
 

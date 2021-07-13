@@ -4,7 +4,7 @@ title: 数据存储、即时通讯 Objective-C SDK 配置
 sidebar_label: Objective-C SDK 配置
 ---
 
-# 数据存储、即时通讯 Objective-C SDK 配置指南
+
 
 ## 获取 SDK
 

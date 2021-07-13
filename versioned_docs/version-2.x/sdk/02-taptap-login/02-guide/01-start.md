@@ -6,7 +6,7 @@ sidebar_label: 功能接入
 
 import MultiLang from '@theme/MultiLang';
 
-[快速开始](/2.x/sdk/start/quickstart)中简单介绍了[如何在游戏中加入 Tap 登录](/2.x/sdk/start/quickstart#taptap-登录)，这里详细介绍 TapSDK 的[登录功能](/2.x/sdk/taptap-login/features)。
+[快速开始](/sdk/start/quickstart)中简单介绍了[如何在游戏中加入 Tap 登录](/sdk/start/quickstart#taptap-登录)，这里详细介绍 TapSDK 的[登录功能](/sdk/taptap-login/features)。
 
 ## 检查登录状态
 
@@ -149,7 +149,7 @@ TapBootstrap.getUser(new Callback<TapUser>() {
 ## 登录
 
 执行登录操作，优先跳转 TapTap APP 登录，当没有 TapTap APP 时，会打开内置 WebView 登录。
-另外，请仔细阅读[登录按钮设计规范](/2.x/design)。  
+另外，请仔细阅读[登录按钮设计规范](/design)。  
 
 
 <MultiLang>

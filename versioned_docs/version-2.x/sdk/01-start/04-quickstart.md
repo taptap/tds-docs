@@ -5,7 +5,7 @@ sidebar_label: 快速开始
 ---
 import MultiLang from '@theme/MultiLang';
 
-本文介绍如何快速接入 TapSDK 并实现 [TapTap 登录](/2.x/sdk/taptap-login/guide/start)功能。
+本文介绍如何快速接入 TapSDK 并实现 [TapTap 登录](/sdk/taptap-login/guide/start)功能。
 
 :::note
 [下载](/tap-download) 页面提供了 Unity、Android、iOS 示例项目，可供参考。
@@ -167,7 +167,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 
 1. 在 Xcode 选择工程，到 **Build Setting > Other Linker Flags** 添加 `-ObjC`。
 
-2. 直接拖拽 [下载的 TapSDK_iOS_v2.1.2.zip](/tap-download) 到项目目录即可。
+2. 直接拖拽 [下载的 TapSDK_iOS](/tap-download) 到项目目录即可。
 
 3. 视需要导入下载的资源文件：
 
@@ -417,7 +417,7 @@ TapBootstrap.registerLoginResultListener(new TapLoginResultListener() {
 
 ## AccessToken
 
-上面代码示例中的 `AccessToken` 用于用户鉴权，过期时间为 90 天（过期后 SDK 会自动清除本地缓存），可以传到游戏服务端去获取用户信息，参见 [获取用户信息](/2.x/sdk/taptap-login/guide/userinfo#流程)。
+上面代码示例中的 `AccessToken` 用于用户鉴权，过期时间为 90 天（过期后 SDK 会自动清除本地缓存），可以传到游戏服务端去获取用户信息，参见 [获取用户信息](/sdk/taptap-login/guide/userinfo#流程)。
 
 `AccessToken` 示例：
 

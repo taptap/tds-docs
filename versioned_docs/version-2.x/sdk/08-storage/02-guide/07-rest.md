@@ -4,7 +4,7 @@ title: 存储 REST API
 sidebar_label: 存储 REST API
 ---
 
-# 数据存储 REST API 使用详解
+
 
 REST API 可以让你用任何支持发送 HTTP 请求的设备来与云服务进行交互，你可以使用 REST API 做很多事情，比如：
 
@@ -1956,7 +1956,7 @@ Location: https://{{host}}/1.1/users/55a4800fe4b05001a7745c41
 ```
 
 云端会自动验证部分平台 `Access Token` 的有效性。
-详见[自动验证第三方平台授权信息](/2.x/sdk/storage/guide/dotnet#自动验证第三方平台授权信息)。
+详见[自动验证第三方平台授权信息](/sdk/storage/guide/dotnet#自动验证第三方平台授权信息)。
 
 #### UnionID 注册和登录
 
@@ -1977,7 +1977,7 @@ Location: https://{{host}}/1.1/users/55a4800fe4b05001a7745c41
 
 使用 UnionID 注册登录，需要提供带有 `unionid` 参数的 `authData`。另外需要配合传递 `platform` 和 `main_account` 这两个字段。
 
-* `platform`：unionId 对应的注册平台，可由应用自行指定，微信、QQ、微博平台建议设为[这些推荐的值](/2.x/sdk/storage/guide/dotnet#该如何指定-unionidplatform)。
+* `platform`：unionId 对应的注册平台，可由应用自行指定，微信、QQ、微博平台建议设为[这些推荐的值](/sdk/storage/guide/dotnet#该如何指定-unionidplatform)。
 * `main_account`： `main_account` 为 true 时把当前平台的鉴权信息作为主账号。
 
 在服务端进行存储的时候会根据 `platform` 来命名新增的平台，如传入 `"platform" = "weixin"` 时，返回数据中会增加 `_weixin_unionid` 字段存储 `{"uid":"xxxxx"}`。
@@ -2062,7 +2062,7 @@ curl -X POST \
 }
 ```
 
-参见[扩展：接入_UnionID_体系，打通不同子产品的账号系统](/2.x/sdk/storage/guide/dotnet#扩展：接入-unionid-体系，打通不同子产品的账号系统)。
+参见[扩展：接入_UnionID_体系，打通不同子产品的账号系统](/sdk/storage/guide/dotnet#扩展：接入-unionid-体系，打通不同子产品的账号系统)。
 
 #### 连接
 

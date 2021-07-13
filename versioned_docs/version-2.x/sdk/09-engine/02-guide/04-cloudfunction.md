@@ -7,7 +7,7 @@ sidebar_label: 云函数
 import MultiLang from '@theme/MultiLang';
 import Mermaid from '@theme/Mermaid';
 
-# 云函数指南
+
 
 当你开发移动端应用时，可能会有下列需求：
 
@@ -21,7 +21,7 @@ import Mermaid from '@theme/Mermaid';
 这时，你可以使用云引擎的云函数。
 云函数是一段部署在服务端的 JavaScript、Python、PHP、C#、Go 代码，可以很好地完成上述需求。
 
-如果还不知道如何创建云引擎项目、本地调试并部署到云端，请阅读[云引擎快速入门](/2.x/sdk/engine/guide/quickstart)。
+如果还不知道如何创建云引擎项目、本地调试并部署到云端，请阅读[云引擎快速入门](/sdk/engine/guide/quickstart)。
 
 
 ## 云函数
@@ -1571,7 +1571,7 @@ leancloud.OnLogin(func(req *ClassHookRequest) error {
 
 ### 即时通讯 Hook 函数
 
-参见[即时通讯指南第四篇](/2.x/sdk/im/guide/systemconv)的《万能的 Hook 机制》章节。
+参见[即时通讯指南第四篇](/sdk/im/guide/systemconv)的《万能的 Hook 机制》章节。
 
 ### Hook 函数错误响应码
 
@@ -1743,7 +1743,7 @@ leancloud.Define("logTimer", func(req *FunctionRequest) (interface{}, error) {
 
 以 Cron 表达式为例，比如每周一早上 8 点打印日志（运行之前定义的 `logTimer` 函数），创建定时任务的时候，选择 **Cron 表达式** 并填入 `0 0 8 ? * MON`。
 
-Cron 表达式的语法可以参考[云队列指南](/2.x/sdk/engine/guide/cloudqueue)的《Cron 表达式》一节。
+Cron 表达式的语法可以参考[云队列指南](/sdk/engine/guide/cloudqueue)的《Cron 表达式》一节。
 
 点击「非必填」会展开更多选项：
 

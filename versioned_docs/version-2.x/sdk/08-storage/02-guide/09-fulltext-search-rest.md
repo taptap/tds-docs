@@ -4,7 +4,7 @@ title: 全文搜索 REST API
 sidebar_label: 全文搜索 REST API
 ---
 
-# 全文搜索 REST API
+
 
 全文搜索服务提供以下 REST API 接口：
 
@@ -15,7 +15,7 @@ sidebar_label: 全文搜索 REST API
 | /1.1/search/analyze | GET | 分词结果查询 |
 
 在调用全文搜索的 REST API 接口前，需要首先为相应的 Class 启用搜索。
-另外也请参考[数据存储 REST API 使用详解](/2.x/sdk/storage/guide/rest)中关于 API Base URL、请求格式、响应格式的说明，以及[全文搜索指南](/2.x/sdk/storage/guide/fulltext-search)的《自定义分词》章节。
+另外也请参考[数据存储 REST API 使用详解](/sdk/storage/guide/rest)中关于 API Base URL、请求格式、响应格式的说明，以及[全文搜索指南](/sdk/storage/guide/fulltext-search)的《自定义分词》章节。
 
 ## 条件查询
 

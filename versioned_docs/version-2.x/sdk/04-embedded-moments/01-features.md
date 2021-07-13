@@ -4,9 +4,10 @@ title: 功能介绍
 sidebar_label: 功能介绍
 ---
 import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 
 :::info
-如需配置[主题](#内嵌动态主题配置)，可参考[动态设计规范](/2.x/design/design-moment)
+如需配置[主题](#内嵌动态主题配置)，可参考[动态设计规范](/design/design-moment)
 :::
 
 内嵌动态能让玩家在游戏内访问 TapTap 社区，同时也可以查看好友的游戏动态，参与其他玩家、官方和大神之间的互动。
@@ -113,9 +114,11 @@ import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
 ### 内嵌动态主题配置
 
 为了更好地配合游戏方做好内容运营，使内嵌动态更贴合游戏画风，降低玩家的割裂感，内嵌动态支持配置动态主题。游戏运营人员可以在开发者中心的内嵌动态后台自定义皮肤主题，以及内嵌动态的框体配色和背景图等。图片需要人工审核，一般会在 2 个工作日内审核完成。
-![](/img/moment-1.3.10.png)
+
+<img src={useBaseUrl('/img/moment-1.3.10.png')} alt="" width="1000" />
 
 
 ### 运营位和推荐位配置
 运营位配置位于开发者中心 - 内嵌动态后台，推荐位配置位于论坛管理中心。
-![](/img/moment-1.3.11.png)
+
+<img src={useBaseUrl('/img/moment-1.3.11.png')} alt="" width="1000" />

@@ -9,7 +9,7 @@ import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
 
 OpenAPI 采用统一的 Mac Token 头部签算来传递用户身份。
 
-接入客户端  SDK  后，经过用户的授权流程，会获得这个用户在当前应用中的 Mac Token。Mac Token 长期有效，只有在用户更新自己账号相关安全信息、注销对当前应用的授权时才会失效。开发者应当将 Mac Token 妥善保管于自己的服务器上，作为后续与 TapTap 服务端通讯的标示。（Mac Token 算法细节见文档中的 `其他-MacToken` 部分）
+接入客户端  SDK  后，经过用户的授权流程，会获得这个用户在当前应用中的 Mac Token。Mac Token 长期有效，只有在用户更新自己账号相关安全信息、注销对当前应用的授权时才会失效。开发者应当将 Mac Token 妥善保管于自己的服务器上，作为后续与 TapTap 服务端通讯的标示。（Mac Token 算法细节见文档中的 [MAC Token 算法](#mac-token-算法) 部分）
 
 以下接口，均提供为国内示例，海外用户请参考[海外 API 说明](#海外-api-说明)。
 
