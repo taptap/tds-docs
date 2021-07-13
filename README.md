@@ -175,4 +175,24 @@ npm start
 [memsource]: https://www.memsource.com/
 
 [weblate]: https://translate.gametaptap.com/projects/taptap-developer/
+
+## 多版本
+
+按照以下流程增加一个版本：（请将 `N` 替换为具体的数值）
+
+1. 确认当前仓库没有包含任何新版本（`N+1` 版本）的内容
+2. 新建一个分支，比如 `N.x`，运行 `npm run docusaurus docs:version N.x`
+3. 替换 `versioned_docs/version-N.x/` 下的内链，替换的正则是 `\]\(/(sdk|store|design)` 替换值为 `](/N.x/$1`
+4. 提交 `versioned_docs`、`versioned_sidebars`、`versions.json` 等改动
+5. 在 tapsdk-doc 仓库上新建一个分支，比如 `vN+1`，更新 `docs` 目录，准备好 `N+1` 版本的内容
+6. 合并 `N.x` 至 master
+7. `vN+1` rebase master 后合并到 master
+8. 通过 rnd 查看效果，确认没问题
+9. deploy 至线上
+
+6 - 9 需要一次性完成，开弓没有回头箭（其实是有的，但是比较麻烦），在此期间 Content 仓库处于冻结状态，不接受新的改动。
+完成第 2 步后，Content 仓库最好也冻结，如果有非常必要的改动（比如 N.x 的重要错误修复），需要回滚第 4 步的提交后，将改动合并到 master，然后重新开始第 2 步。
+第 9 步完成后，Content 仓库只接受针对 `N+1` 版本的改动，旧版文档一般就不修改了，如有必要修改（重要错误修复），需直接至 tapsdk-doc 仓库提交修改。
+
+
  
