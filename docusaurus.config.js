@@ -52,17 +52,13 @@ module.exports = {
           position: 'right',
         },
         {
-          label: 'API索引',
+          label: 'API',
           to: '/sdk-api',
           position: 'right',
         },
+
         {
-          label: 'Demos',
-          to: '/demos',
-          position: 'right',
-        },
-        {
-          label: '资源下载',
+          label: '下载',
           position: 'right',
           items: [
             {
@@ -77,6 +73,10 @@ module.exports = {
             {
               label: 'SDK工具包',
               to: '/tap-download',
+            },
+            {
+              label: 'Demos',
+              to: '/demos',
             },
           ],
         },
