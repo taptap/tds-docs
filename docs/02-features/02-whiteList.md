@@ -1,7 +1,7 @@
 ---
 title: 测试设备白名单
 hide_title: true
-hide_table_of_contents: true
+hide_table_of_contents: false
 ---
 
 ## 测试设备白名单
