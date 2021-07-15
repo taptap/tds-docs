@@ -11,7 +11,7 @@ import MultiLang from '@theme/MultiLang';
 
 ## 登录
 
-如果开发者在游戏中同时接入了多家第三方（例如支持苹果、微信、Facebook 等账户登录），只把 TapTap 当成一个普通的登录渠道，那么在客户端可以只依赖 `TapTapLogin` 这一个模块，并按照如下的流程来接入：
+如果开发者在游戏中同时接入了多家第三方（例如支持苹果、微信、Facebook 等账户登录），只把 TapTap 当成一个普通的登录渠道，那么在客户端可以只依赖 `TapLogin` 和 `TapCommon` 这两个模块，并按照如下的流程来接入：
 
 ### 初始化
 
@@ -19,11 +19,11 @@ import MultiLang from '@theme/MultiLang';
 
 
 ```cs
-
+TapLogin.Init(string clientID);
 ```
 
 ```java
-TapLoginHelper.init(applicationContext, clientId);
+TapLoginHelper.init(Context context, String clientID);
 ```
 
 ```objectivec
@@ -33,6 +33,10 @@ if (accessToken == nil) {
 } else {
     // 已登录
 }
+```
+
+```objectivec
+[TapLoginHelper initWithClientID:@"your clientId"];
 ```
 
 </MultiLang>
@@ -43,38 +47,56 @@ if (accessToken == nil) {
 
 
 ```cs
-
+// 唤起 TapTap 网页 或者 TapTap 客户端进行登陆
+var accessToken = await TapLogin.Login();
+// 获取 TapTap AccessToken
+var accessToken = await TapLogin.GetAccessToken();
+// 获取 TapTap Profile  可以获得当前用户的一些基本信息，例如名称、头像、性别。
+var profile = await TapLogin.FetchProfile();
 ```
 
 ```java
 TapLoginHelper.TapLoginResultCallback loginCallback = new TapLoginHelper.TapLoginResultCallback() {
-      @Override
-      public void onLoginSuccess(com.taptap.sdk.AccessToken token) {
-        logger.i("TapTap authorization succeed");
+    @Override
+    public void onLoginSuccess(AccessToken token) {
+        Log.d(TAG, "TapTap authorization succeed");
         // 开发者调用 TapLoginHelper.getCurrentProfile() 可以获得当前用户的一些基本信息，例如名称、头像、性别。
         Profile profile = TapLoginHelper.getCurrentProfile();
-      }
+    }
 
-      @Override
-      public void onLoginCancel() {
-        logger.w("TapTap authorization cancelled");
-      }
+    @Override
+    public void onLoginCancel() {
+        Log.d(TAG, "TapTap authorization cancelled");
+    }
 
-      @Override
-      public void onLoginError(AccountGlobalError globalError) {
-        logger.w("TapTap authorization failed. cause: " + globalError.getMessage());
-      }
-    };
-    TapLoginHelper.registerLoginCallback(loginCallback);
-    TapLoginHelper.startTapLogin(activity, permissions);
+    @Override
+    public void onLoginError(AccountGlobalError globalError) {
+        Log.d(TAG, "TapTap authorization failed. cause: " + globalError.getMessage());
+    }
+};
+TapLoginHelper.registerLoginCallback(loginCallback);
+TapLoginHelper.startTapLogin(MainActivity.this, TapLoginHelper.SCOPE_PUBLIC_PROFILE);
 ```
 
 ```objectivec
-AccessToken *accessToken = [TapBootstrap getCurrentToken];
-if (accessToken == nil) {
-    // 未登录
+[TapLoginHelper registerLoginResultDelegate:delegator];
+if ([TapLoginHelper currentProfile]) {
+    // 当前已经登录
 } else {
-    // 已登录
+    [TapLoginHelper startTapLogin:@[@"public_profile"]];
+}
+
+// delegator
+- (void)onLoginCancel {
+    // 登录取消
+}
+
+- (void)onLoginError:(nonnull NSError *)error {
+    // 登录失败
+}
+
+- (void)onLoginSuccess:(nonnull TTSDKAccessToken *)token {
+    // 登录成功
 }
 ```
 
@@ -85,12 +107,19 @@ if (accessToken == nil) {
 从 TapSDK 3.0 开始，我们在单纯的 TapTap 登录之外，还提供了一个内建账户系统供游戏使用：开发者可以直接用 TapTap OAuth 授权的结果生成一个游戏内的账号（TDSUser），然后用该账号保存更多玩家数据。同时，我们也支持将更多第三方认证登录的结果绑定到这一账号上来（以及后续的解绑操作）。
 
 ### 初始化
-如果要使用内建账户系统，开发者必须至少依赖 `TapBootstrap` 模块，并按照如下方式完成初始化：
+如果要使用内建账户系统，开发者必须至少依赖 `TapBootstrap`、`TapLogin`、`TapCommon` 以及 `LeanCloudObjc` 模块，并按照如下方式完成初始化：
 <MultiLang>
 
 
 ```cs
-
+var config = new TapConfig.TapConfigBuilder()
+                .ClientID("client_id")
+                .ClientSecret("client_secret")
+                .ServerURL("https://ikggdre2.lc-cn-n1-shared.com")
+                .RegionType(RegionType.CN)
+                .TapDBConfig(true,"channel","gameVersion",true)
+                .Builder();
+TapBootstrap.Init(config);
 ```
 
 ```java
@@ -109,7 +138,16 @@ TapBootstrap.init(MainActivity.this, tdsConfig);
 ```
 
 ```objectivec
-
+TapConfig *config = [TapConfig new];
+config.clientId = @"{your client id}";
+config.clientToken = @"{your client token}";
+config.region = TapSDKRegionTypeCN;
+config.serverURL = @"{your server url}";
+config.dbConfig = [TapDBConfig new];
+config.dbConfig.enable = YES;
+config.dbConfig.channel = @"{current channel}";
+config.dbConfig.gameVersion = @"{your game version}";
+[TapBootstrap initWithConfig:config];
 ```
 
 </MultiLang>
@@ -120,7 +158,7 @@ TapBootstrap.init(MainActivity.this, tdsConfig);
 
 
 ```cs
-
+var tdsUser = await TDSUser.LoginWithTapTap();
 ```
 
 ```java
@@ -131,7 +169,7 @@ TapBootstrap.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
         // 开发者可以调用 resultUser 的方法获取更多属性。
         String userId = resultUser.getObjectId();
         String userName = resultUser.getUsername();
-        String avatar = resultUser.get("avatar");
+        String avatar = (String) resultUser.get("avatar");
     }
 
     @Override
@@ -142,7 +180,16 @@ TapBootstrap.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
 ```
 
 ```objectivec
-
+[TDSUser loginByTapTapWithPermissions:@[@"public_profile"] callback:^(TDSUser * _Nullable user, NSError * _Nullable error) {
+    if (user) {
+        // 开发者可以调用 user 的方法获取更多属性。
+        NSString *userId = user.objectId;
+        NSString *username = user[@"nickname"];
+        NSString *avatar = user[@"avatar"];
+    } else {
+        NSLog(@"%@", error);
+    }
+}];
 ```
 
 </MultiLang>
@@ -159,7 +206,7 @@ TapBootstrap.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
 
 
 ```cs
-
+var tdsUser = await TDSUser.LoginAnonymously();
 ```
 
 ```java
@@ -188,7 +235,13 @@ TDSUser.logInAnonymously().subscribe(new Observer<TDSUser>() {
 
 
 ```objectivec
-
+[TDSUser loginAnonymously:^(TDSUser * _Nullable user, NSError * _Nullable error) {
+    if (user) {
+        NSString *userId = user.objectId;
+    } else {
+        NSLog(@"%@", error);
+    }
+}];
 ```
 
 </MultiLang>
@@ -222,31 +275,47 @@ authData.put("openid", "OPENID");
 authData.put("access_token", "ACCESS_TOKEN");
 authData.put("expires_in", 7200);
 authData.put("scope", "SCOPE");
-currentUser.associateWithAuthData(authData, "weixin").subscribe(new Observer<TDSUser>() {
-  @Override
-  public void onSubscribe(Disposable disposable) {
 
-  }
+currentUser.associateWithAuthData(authData, "weixin").subscribe(new Observer<LCUser>() {
+    @Override
+    public void onSubscribe(@NotNull Disposable d) {
 
-  @Override
-  public void onNext(TDSUser resultUser) {
-    // 绑定成功
-  }
+    }
 
-  @Override
-  public void onError(Throwable throwable) {
-    
-  }
+    @Override
+    public void onNext(@NotNull LCUser lcUser) {
+        // 绑定成功
+        TDSUser tdsUser = (TDSUser) lcUser;
+    }
 
-  @Override
-  public void onComplete() {
-  }
+    @Override
+    public void onError(@NotNull Throwable e) {
+
+    }
+
+    @Override
+    public void onComplete() {
+
+    }
 });
 ```
 
 
 ```objectivec
-
+// 以绑定微信账户为例子
+NSDictionary *authData = @{
+    @"openid" : @"OPENID",
+    @"access_token" : @"ACCESS_TOKEN",
+    @"expires_in" : @7200,
+    @"scope" : @"SCOPE",
+};
+[[TDSUser currentUser] associateWithAuthData:authData platformId:@"weixin" options:nil callback:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+        // 绑定成功
+    } else {
+        NSLog(@"%@", error);
+    }
+}];
 ```
 
 </MultiLang>
@@ -262,6 +331,8 @@ await currentUser.DisassociateWithAuthData("weixin");
 ```
 
 ```java
+// 以解绑微信账户为例子
+TDSUser currentUser = TDSUser.currentUser();
 currentUser.disassociateWithAuthData("weixin").subscribe(new Observer<TDSUser>() {
   @Override
   public void onSubscribe(Disposable disposable) {
@@ -286,7 +357,14 @@ currentUser.disassociateWithAuthData("weixin").subscribe(new Observer<TDSUser>()
 
 
 ```objectivec
-
+// 以解绑微信账户为例子
+[[TDSUser currentUser] disassociateWithPlatformId:@"weixin" callback:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+        // 解绑成功
+    } else {
+        NSLog(@"%@", error);
+    }
+}];
 ```
 
 </MultiLang>
@@ -303,33 +381,45 @@ currentUser.disassociateWithAuthData("weixin").subscribe(new Observer<TDSUser>()
 ```
 
 ```java
+TDSUser currentUser = TDSUser.currentUser();
 currentUser.put("nickname", "打不死的青铜");
 currentUser.put("cups", 256);
-currentUser.saveInBackground().subscribe(new Observer<TDSUser>() {
-  @Override
-  public void onSubscribe(Disposable disposable) {
+currentUser.saveInBackground().subscribe(new Observer<LCObject>() {
+    @Override
+    public void onSubscribe(@NotNull Disposable d) {
 
-  }
+    }
 
-  @Override
-  public void onNext(TDSUser resultUser) {
-    // 保存成功，currentUser 的属性得到更新。
-  }
+    @Override
+    public void onNext(@NotNull LCObject lcObject) {
+        // 保存成功，currentUser 的属性得到更新。
+        TDSUser tdsUser = (TDSUser) lcObject;
+    }
 
-  @Override
-  public void onError(Throwable throwable) {
-    
-  }
+    @Override
+    public void onError(@NotNull Throwable e) {
 
-  @Override
-  public void onComplete() {
-  }
+    }
+
+    @Override
+    public void onComplete() {
+
+    }
 });
 ```
 
 
 ```objectivec
-
+TDSUser *currentUser = [TDSUser currentUser];
+currentUser[@"nickname"] = @"打不死的青铜";
+currentUser[@"cups"] = @256;
+[currentUser saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+        // 保存成功
+    } else {
+        NSLog(@"%@", error);
+    }
+}];
 ```
 
 </MultiLang>
@@ -341,15 +431,16 @@ currentUser.saveInBackground().subscribe(new Observer<TDSUser>() {
 
 
 ```cs
-
+TDSUser.Logout();
 ```
 
 ```java
+TDSUser currentUser = TDSUser.currentUser();
 currentUser.logOut().
 ```
 
 ```objectivec
-
+[TDSUser logOut];
 ```
 
 </MultiLang>
@@ -364,6 +455,11 @@ currentUser.logOut().
 
 #### 如果游戏之前是接入 TapSDK 2.x 版本完成的 TapTap 登录，可以直接升级到 TapSDK 3.0 吗？
 在 TapSDK 2.x 中，TapTap 登录是调用 TapBootstrap 的 API 完成的，其示例如下：
+
+```cs
+
+```
+
 ```java
 TapBootstrap.registerLoginResultListener(new TapLoginResultListener() {
     @Override
@@ -395,7 +491,15 @@ TapBootstrap.registerLoginResultListener(new TapLoginResultListener() {
 TapBootstrap.login(MainActivity.this, LoginType.TAPTAP, "public_profile");
 ```
 
+```objectivec
+[TapBootstrap login:TapBootstrapLoginTypeTapTap permissions:nil];
+```
+
 由于我们把登录接口做了调整，在 3.0 版本的 SDK 中开发者可以通过 `TapBootstrap#loginWithTapTap` 一次调用直接得到登录用户信息：
+
+```cs
+
+```
 
 ```java
 TapBootstrap.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
@@ -405,7 +509,7 @@ TapBootstrap.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
         // 开发者可以调用 resultUser 的方法获取更多属性。
         String userId = resultUser.getObjectId();
         String userName = resultUser.getUsername();
-        String avatar = resultUser.get("avatar");
+        String avatar = (String) resultUser.get("avatar");
     }
 
     @Override
@@ -413,6 +517,16 @@ TapBootstrap.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
         Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
     }
 }, "public_profile");
+```
+
+```objectivec
+[TDSUser loginByTapTapWithPermissions:@[@"public_profile"] callback:^(TDSUser * _Nullable user, NSError * _Nullable error) {
+    if (user) {
+        NSString *userId = user.objectId;
+    } else {
+        NSLog(@"%@", error);
+    }
+}];
 ```
 
 不过这需要我们后端做一些调整，计划在 3.2 版本中支持 2.x 游戏直接升级使用。
