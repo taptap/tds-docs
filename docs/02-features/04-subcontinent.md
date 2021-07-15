@@ -1,6 +1,6 @@
 ---
 title: 次大陆
-hide_title: true
+hide_title: false
 ---
 
 ## 次大陆

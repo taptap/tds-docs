@@ -1,6 +1,6 @@
 ---
 title: 测试设备白名单
-hide_title: true
+hide_title: false
 hide_table_of_contents: false
 ---
 
