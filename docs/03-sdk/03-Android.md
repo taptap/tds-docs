@@ -1,5 +1,5 @@
 ---
-title: Android SDK文档
+title: Android SDK 文档
 ---
 
 ## 1.简介
@@ -23,7 +23,7 @@ TapDB 提供一套 SDK，游戏开发者可以将其集成到游戏中。系统�
 
 ### 2.1.申请应用
 
-在 TapDB 控制台中注册一个游戏，获得游戏对应的 APP ID。这是一个长度为16的字符串。iOS 和 Android 可共用一个 APP ID。
+在 TapDB 控制台中注册一个游戏，获得游戏对应的 APP ID。这是一个长度为 16 的字符串。iOS 和 Android 可共用一个 APP ID。
 
 ### 2.2.向工程中导入 SDK
 
@@ -36,7 +36,7 @@ TapDB 提供一套 SDK，游戏开发者可以将其集成到游戏中。系统�
 <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
-<!--强烈建议权限  sdk获取IMEI时会需要此权限;获取不到不影响功能正常使用，IMEI用于辅助数据分析，使统计结果更加精确--> 
+<!--强烈建议权限  sdk 获取 IMEI 时会需要此权限；获取不到不影响功能正常使用，IMEI 用于辅助数据分析，使统计结果更加精确--> 
 <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 ```
   
@@ -56,8 +56,8 @@ public static void init(Context context, String appId, String channel, String ap
 ------ | ------ | ------
 context | 否 | 当前应用的 Context 对象。一般使用 MainActivity 对象
 appId | 否 | 在控制台注册得到到的 APP ID
-channel | 是 | 长度大于0并小于等于256。分包渠道。1.2.名词解释中有介绍
-appVersion | 是 | 为空的话,会获取 AndroidManifest.xml 中 versionCode 作为 appVersion
+channel | 是 | 长度大于 0 并小于等于 256。分包渠道。1.2.名词解释中有介绍
+appVersion | 是 | 为空的话，会获取 AndroidManifest.xml 中 versionCode 作为 appVersion
 properties | 否 | 自定义属性，会随着初始化事件上报
 
 ### 3.2.登录
@@ -71,7 +71,7 @@ public static void setUser(String userId, JSONObject properties)
 ```
 字段 | 可为空 | 说明
 ------ | ------ | ------
-userId | 否 | 长度大于0并小于等于256。只能包含数字、大小写字母、下划线(_)、横线(-)，用户ID。不同账号需要保证ID的唯一性
+userId | 否 | 长度大于 0 并小于等于 256。只能包含数字、大小写字母、下划线(_)、横线(-)，用户 ID。不同账号需要保证 ID 的唯一性
 properties | 否 | 自定义属性
 
 ### 3.3.账号名称
@@ -84,7 +84,7 @@ public static void setName(String name)
 
 字段 | 可为空 | 说明
 ------ | ------ | ------
-name | 否 | 长度大于0并小于等于256。账号名
+name | 否 | 长度大于 0 并小于等于 256。账号名
 
 ### 3.4.账号等级
 
@@ -96,7 +96,7 @@ public static void setLevel(int level)
 
 字段 | 可为空 | 说明
 ------ | ------ | ------
-level | 否 | 大于等于0。用户等级
+level | 否 | 大于等于 0。用户等级
 
 ### 3.5.账号区服
 
@@ -108,7 +108,7 @@ public static void setServer(String server)
 
 字段 | 可为空 | 说明
 ------ | ------ | ------
-server | 否 | 长度大于0并小于等于256。用户所在服务器
+server | 否 | 长度大于 0 并小于等于 256。用户所在服务器
 
 ### 3.6.充值
 
@@ -122,11 +122,11 @@ public static void onCharge(String orderId, String product, long amount, String 
 
 字段 | 可为空 | 说明
 ------ | ------ | ------
-orderId | 是 | 长度大于0并小于等于256。订单ID。传递订单ID可进行排重，防止计算多次
-product | 是 | 长度大于0并小于等于256。商品名称
-amount | 否 | 大于0并小于等于100000000000。充值金额。单位分，即无论什么币种，都需要乘以100
-currencyType | 是 | 货币类型。国际通行三字母表示法，为空时默认CNY。参考：人民币 CNY，美元 USD；欧元 EUR
-payment | 是 | 长度大于0并小于等于256。充值渠道
+orderId | 是 | 长度大于 0 并小于等于 256。订单 ID。传递订单 ID 可进行排重，防止计算多次
+product | 是 | 长度大于 0 并小于等于 256。商品名称
+amount | 否 | 大于 0 并小于等于 100000000000。充值金额。单位分，即无论什么币种，都需要乘以 100
+currencyType | 是 | 货币类型。国际通行三字母表示法，为空时默认 CNY。参考：人民币 CNY，美元 USD；欧元 EUR
+payment | 是 | 长度大于 0 并小于等于 256。充值渠道
 
 常见货币类型的格式参考<a target="_blank" href="https://www.tapdb.com/docs/zh_CN/features/exchangeRate.html">汇率表</a>
 
@@ -136,15 +136,15 @@ payment | 是 | 长度大于0并小于等于256。充值渠道
 public static void clearUser()
 ```
 
-### 3.8.自定义事件（如需开通自定义事件，请联系技术支持QQ：3171097571）
+### 3.8.自定义事件（如需开通自定义事件，请联系技术支持 QQ：3171097571）
 
-需要发送自定义事件时调用，自定义事件的 eventName 和 properties 属性都必须在元数据管理预先配置，才可以使用SDK进行发送
+需要发送自定义事件时调用，自定义事件的 eventName 和 properties 属性都必须在元数据管理预先配置，才可以使用 SDK 进行发送
 
 ```java
 public static void trackEvent(String eventName, JSONObject properties)
 ```
 
-用户可以通过调用 trackEvent 方法上传需要跟踪的自定义事件。eventName 为自定义事件的事件名，需要保证以 '#' 开头，取值规则请参考自定义属性登记页面。properties 为自定义事件所包含的自定义属性（以 Key : Value 的形式保存），其中 Key 代表了自定义属性的属性名，Value 代表了该属性的值。这里需要注意的是 Key 的命名规则同 eventName 一致，也需要保证以 '#' 开头。目前所支持的 Value 类型为 String, Number, Boolean。String 类型支持最大长度为 256。Number 类型取值区间为 [-9E15, 9E15]。以战斗事件为例：
+用户可以通过调用 trackEvent 方法上传需要跟踪的自定义事件。eventName 为自定义事件的事件名，需要保证以 '#' 开头，取值规则请参考自定义属性登记页面。properties 为自定义事件所包含的自定义属性（以 Key : Value 的形式保存），其中 Key 代表了自定义属性的属性名，Value 代表了该属性的值。这里需要注意的是 Key 的命名规则同 eventName 一致，也需要保证以 '#' 开头。目前所支持的 Value 类型为 String， Number， Boolean。String 类型支持最大长度为 256。Number 类型取值区间为 [-9E15， 9E15]。以战斗事件为例：
 
 ```java
 JSONObject properties = new JSONObject();
@@ -157,7 +157,7 @@ TapDB.trackEvent("#battle", properties);
 字段 | 可为空 | 说明
 ------ | ------ | ------
 eventName | 否 | 自定义事件名，注意需要保证以 ’#‘ 开头
-properties | 是 | 事件属性。需要和预登记自定义属性名一致，注意需要保证以 ’#‘ 开头。值需要是长度大于0并小于等于256的字符串或绝对值小于9E15的浮点数
+properties | 是 | 事件属性。需要和预登记自定义属性名一致，注意需要保证以 ’#‘ 开头。值需要是长度大于 0 并小于等于 256 的字符串或绝对值小于 9E15 的浮点数
 
 
 ### 3.9.事件主体操作（账号、设备）
@@ -243,7 +243,7 @@ public static void userAdd(final JSONObject properties)
 
 ### 3.10.设置通用事件属性
 
-对于某些重要的属性需要在每个上传的事件中出现，用户可以将这些属性设置为全局通用的自定义属性，包括静态通用属性和动态通用属性，静态通用属性为固定值，动态通用属性每次获取的值由用户所设置的计算逻辑产生。这些通用属性在注册之后，会被附带在TapDB上传的事件中。这里需要注意 trackEvent 中传入的属性优先级 > 动态通用属性优先级 > 静态通用属性优先级，也就是说动态通用属性会覆盖同名的静态通用属性。trackEvent 中的属性会覆盖同名的动态通用属性和静态通用属性。 
+对于某些重要的属性需要在每个上传的事件中出现，用户可以将这些属性设置为全局通用的自定义属性，包括静态通用属性和动态通用属性，静态通用属性为固定值，动态通用属性每次获取的值由用户所设置的计算逻辑产生。这些通用属性在注册之后，会被附带在 TapDB 上传的事件中。这里需要注意 trackEvent 中传入的属性优先级 > 动态通用属性优先级 > 静态通用属性优先级，也就是说动态通用属性会覆盖同名的静态通用属性。trackEvent 中的属性会覆盖同名的动态通用属性和静态通用属性。 
 
 #### 添加静态通用属性 
 ```java
@@ -262,7 +262,7 @@ JSONObject properties = new JSONObject();
 properties.put("#custom1", "custom");
 properties.put("#custom2", 42); 
 TapDB.trackEvent("#customEvent", properties);
-// 使用 trackEvent 方法上传自定义事件，此时上传的事件中带有上面设置的公共属性 "channel", 值为 "TapDB"
+// 使用 trackEvent 方法上传自定义事件，此时上传的事件中带有上面设置的公共属性 "channel"， 值为 "TapDB"
 ```
 
 #### 删除单个静态通用属性 
@@ -302,17 +302,17 @@ TapDB.registerDynamicProperties(
 
 ### 3.11.上报应用时长
 
-初始化TapDB sdk之后，sdk会自动在应用置于后台时上报当前时长，并以此次上报作为起始点，下次若置于后台，则上报此时间段的时长。事件名为：play_game；时长属性为：duration
+初始化 TapDB sdk 之后，sdk 会自动在应用置于后台时上报当前时长，并以此次上报作为起始点，下次若置于后台，则上报此时间段的时长。事件名为：play_game；时长属性为：duration
 
-**说明：之前版本，需要应用Activity生命周期回调函数onResume方法里调用TapDB.onResume方法，onStop方法里调用TapDB.onStop方法**
+**说明：之前版本，需要应用 Activity 生命周期回调函数 onResume 方法里调用 TapDB.onResume 方法，onStop 方法里调用 TapDB.onStop 方法**
 
 
 
-## 4.第三方设备ID
-**说明：设备ID会使数据统计更加精确，建议添加，TapDB SDK支持获取OAID的设备ID(需要手动添加oaid的sdk)，获取到的设备id,会上报到服务器，辅助数据分析，使统计结果更加精准，如果不需要可以跳过该步骤**
-### 4.1. OAID sdk获取设备ID
+## 4.第三方设备 ID
+**说明：设备 ID 会使数据统计更加精确，建议添加，TapDB SDK 支持获取 OAID 的设备 ID(需要手动添加 OAID 的 sdk)，获取到的设备 id，会上报到服务器，辅助数据分析，使统计结果更加精准，如果不需要可以跳过该步骤**
+### 4.1. OAID sdk 获取设备 ID
 
-TapDB SDK当前支持oaid sdk 1.0.5~1.0.25的版本，当应用集成进去之后，会自动使用oaid从而获取设备id，可以自行从OAID官网下载，也可以从此处下载[1.0.25](https://res.xdcdn.net/tapdb/Android/oaid/oaid_sdk_1.0.25.aar)的版本【如需其它版本请自行去oaid官网下载；然后将oaid sdk（下载下来是个aar)， 导入应用的工程目录
+TapDB SDK 当前支持 OAID sdk 1.0.5~1.0.25 的版本，当应用集成进去之后，会自动使用 oaid 从而获取设备 id，可以自行从 OAID 官网下载，也可以从此处下载[1.0.25](https://res.xdcdn.net/tapdb/Android/oaid/oaid_sdk_1.0.25.aar)的版本【如需其它版本请自行去 oaid 官网下载；然后将 oaid sdk（下载下来是个 aar)， 导入应用的工程目录
 
 
 
@@ -329,7 +329,7 @@ SDK 默认使用 HTTP 传输数据，在 targetSdkVersion >= 28 时需要在 And
 ## 5.服务端推送接口
 ### 5.1.在线人数
 
-由于SDK无法推送准确的在线数据，这里提供服务端在线数据推送接口。游戏服务端可以每隔5分钟自行统计在线人数，通过接口推送到TapDB。TapDB进行数据汇总展现。
+由于 SDK 无法推送准确的在线数据，这里提供服务端在线数据推送接口。游戏服务端可以每隔 5 分钟自行统计在线人数，通过接口推送到 TapDB。TapDB 进行数据汇总展现。
 
 ```
 接口：https://se.tapdb.net/tapdb/online
@@ -342,16 +342,16 @@ SDK 默认使用 HTTP 传输数据，在 targetSdkVersion >= 28 时需要在 And
 
 参数名 | 参数类型 | 参数说明
 ------ | ------ | ------
-appid | string | 游戏的APP ID
-onlines | array | 多条在线数据（最多100条）
+appid | string | 游戏的 APP ID
+onlines | array | 多条在线数据（最多 100 条）
 
-其中onlines数组的结构为
+其中 onlines 数组的结构为
 
 参数名 | 参数类型 | 参数说明
 ------ | ------ | ------
-server | string | 服务器。TapDB对同一服务器每一个自然5分钟仅接受一次数据
+server | string | 服务器。TapDB 对同一服务器每一个自然 5 分钟仅接受一次数据
 online | int | 在线人数
-timestamp | long | 当前统计数据的时间戳(秒)。TapDB会按照自然5分钟进行数据对齐
+timestamp | long | 当前统计数据的时间戳(秒)。TapDB 会按照自然 5 分钟进行数据对齐
 
 示例：
 
@@ -370,11 +370,11 @@ timestamp | long | 当前统计数据的时间戳(秒)。TapDB会按照自然5�
 }
 ```
 
-成功判断：返回的HTTP Code为200时认为发送成功，否则认为失败
+成功判断：返回的 HTTP Code 为 200 时认为发送成功，否则认为失败
 
 ### 5.2.充值
 
-由于SDK推送可能会不太准确，这里提供服务端充值推送方法。需要忽略掉SDK中的相关充值推送接口。
+由于 SDK 推送可能会不太准确，这里提供服务端充值推送方法。需要忽略掉 SDK 中的相关充值推送接口。
 
 ```
 接口：https://e.tapdb.net/event
@@ -383,28 +383,28 @@ timestamp | long | 当前统计数据的时间戳(秒)。TapDB会按照自然5�
 ```js
 {
     "module": "GameAnalysis", // 固定参数
-    "ip": "8.8.8.8", // 可选。充值用户的IP
+    "ip": "8.8.8.8", // 可选。充值用户的 IP
     "name": "charge", // 固定参数
-    "index": "APPID", // 必需。注意APPID需要被替换成TapDB的appid
-    "identify": "userId", // 必需。用户ID。必须和SDK的setUser接口传递的userId一样，并且该用户已经通过SDK接口进行过推送
+    "index": "APPID", // 必需。注意 APPID 需要被替换成 TapDB 的 appid
+    "identify": "userId", // 必需。用户 ID。必须和 SDK 的 setUser 接口传递的 userId 一样，并且该用户已经通过 SDK 接口进行过推送
     "properties": {
-        "order_id": "100000", // 可选。长度大于0并小于等于256。订单ID。传递订单ID可进行排重，防止计算多次
-        "amount": 100, // 必需。大于0并小于等于100000000000。充值金额。单位分，即无论什么币种，都需要乘以100
-        "virtual_currency_amount": 100, //获赠虚拟币数量，必传，可为0
-        "currency_type": "CNY", // 可选。货币类型。国际通行三字母表示法，为空时默认CNY。参考：人民币 CNY，美元 USD；欧元 EUR
-        "product": "item1", // 可选。长度大于0并小于等于256。商品名称
-        "payment": "alipay" // 可选。长度大于0并小于等于256。充值渠道
+        "order_id": "100000", // 可选。长度大于 0 并小于等于 256。订单 ID。传递订单 ID 可进行排重，防止计算多次
+        "amount": 100, // 必需。大于 0 并小于等于 100000000000。充值金额。单位分，即无论什么币种，都需要乘以 100
+        "virtual_currency_amount": 100, //获赠虚拟币数量，必传，可为 0
+        "currency_type": "CNY", // 可选。货币类型。国际通行三字母表示法，为空时默认 CNY。参考：人民币 CNY，美元 USD；欧元 EUR
+        "product": "item1", // 可选。长度大于 0 并小于等于 256。商品名称
+        "payment": "alipay" // 可选。长度大于 0 并小于等于 256。充值渠道
     }
 }
 ```
 
-假如游戏的appid为abcd1234。构建出json字符串后，去掉空格和换行符，然后再进行一次urlencode。再把结果作为POST数据推送
+假如游戏的 appid 为 abcd1234。构建出 json 字符串后，去掉空格和换行符，然后再进行一次 urlencode。再把结果作为 POST 数据推送
 先替换换行符和空格，变成：
 
 >{"module":"GameAnalysis","name":"charge","index":"abcd1234","identify":"user_id","properties":{"order_id":"100000","amount":100,"virtual_currency_amount":100,"currency_type":"CNY","product":"item1","payment":"alipay"}}
 
-然后urlencode，变成如下形式。某些版本的urlencode可能会把 `:` 和 `,` 进行编码，不会影响实际使用。
+然后 urlencode，变成如下形式。某些版本的 urlencode 可能会把 `:` 和 `,` 进行编码，不会影响实际使用。
 
 >%7B%22module%22:%22GameAnalysis%22,%22name%22:%22charge%22,%22index%22:%22abcd1234%22,%22identify%22:%22user_id%22,%22properties%22:%7B%22order_id%22:%22100000%22,%22amount%22:100,%22virtual_currency_amount%22:100,%22currency_type%22:%22CNY%22,%22product%22:%22item1%22,%22payment%22:%22alipay%22%7D%7D
 
-成功判断：返回的HTTP Code为200时认为发送成功，否则认为失败
+成功判断：返回的 HTTP Code 为 200 时认为发送成功，否则认为失败

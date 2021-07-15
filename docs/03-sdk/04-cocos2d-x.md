@@ -1,12 +1,12 @@
 ---
-title: Cocos2d-x SDK文档
+title: Cocos2d-x SDK 文档
 ---
 
 ## 1.简介
 
 ### 1.1.适用范围
 
-封装了TapDB的SDK，适用于 Cocos2d-x 开发的游戏，同时支持 iOS 和 Android 平台。
+封装了 TapDB 的 SDK，适用于 Cocos2d-x 开发的游戏，同时支持 iOS 和 Android 平台。
 
 ### 1.2.名词解释
 
@@ -21,37 +21,37 @@ title: Cocos2d-x SDK文档
 
 ### 2.1.申请应用
 
-在TapDB控制台中注册一个游戏，获得游戏对应的APP ID，这是一个16位的字符串，iOS和Android可共用一个APP ID。
+在 TapDB 控制台中注册一个游戏，获得游戏对应的 APP ID，这是一个 16 位的字符串，iOS 和 Android 可共用一个 APP ID。
 
-### 2.2.向工程中导入SDK
+### 2.2.向工程中导入 SDK
 
-在TapDB网站上下载最新的SDK，其中包含一个 TapDB_sdk.zip 文件，解压得到3个文件夹，include文件夹里面是头文件，iOS和Android文件夹里面是对应平台的实现代码和库文件。另外，在Android.mk里面添加对TapDB.cpp的引用。
+在 TapDB 网站上下载最新的 SDK，其中包含一个 TapDB_sdk.zip 文件，解压得到 3 个文件夹，include 文件夹里面是头文件，iOS 和 Android 文件夹里面是对应平台的实现代码和库文件。另外，在 Android.mk 里面添加对 TapDB.cpp 的引用。
 
-### 2.3.添加Android支持库
+### 2.3.添加 Android 支持库
 
-添加Android v4支持库到项目中，Android v4支持库的版本必须不低于23.0.0，否则可能导致闪退。
+添加 Android v4 支持库到项目中，Android v4 支持库的版本必须不低于 23.0.0，否则可能导致闪退。
 
-如果使用gradle依赖安装版本高于24.2.0版本的v4支持库，可以仅安装support-compat模块，参见文档： 
+如果使用 gradle 依赖安装版本高于 24.2.0 版本的 v4 支持库，可以仅安装 support-compat 模块，参见文档： 
 <https://developer.android.com/topic/libraries/support-library/setup.html>
 
 <https://developer.android.com/topic/libraries/support-library/features.html>
 
-如果不方便使用gradle进行自动化依赖安装，之前也没有使用到v4支持库，可以使用此处提供的support-compat模块的jar文件:
+如果不方便使用 gradle 进行自动化依赖安装，之前也没有使用到 v4 支持库，可以使用此处提供的 support-compat 模块的 jar 文件:
 [android-support-v4.jar](https://static.tapdb.net/web/res/file/upload/2017/0926/android-support-v4.jar)
 
-### 2.4.Android添加需要的权限
+### 2.4.Android 添加需要的权限
 
-需要为工程中的AndroidManifest.xml添加下列权限
+需要为工程中的 AndroidManifest.xml 添加下列权限
 
 权限 | 是否必须 | 用途
 - | - | -
 android.permission.INTERNET | 必选 | 使用网络的权限
 android.permission.ACCESS_NETWORK_STATE | 必选 | 获取手机网络连接状态
-android.permission.WRITE_EXTERNAL_STORAGE | 可选 | 使用SD卡辅助存储设备标识等信息，若不具备此权限，有一部分设备无法进行很好的设备跟踪
+android.permission.WRITE_EXTERNAL_STORAGE | 可选 | 使用 SD 卡辅助存储设备标识等信息，若不具备此权限，有一部分设备无法进行很好的设备跟踪
 
-### 2.5.iOS引入依赖的框架
+### 2.5.iOS 引入依赖的框架
 
-需要为Xcode工程引入下列依赖的框架或库
+需要为 Xcode 工程引入下列依赖的框架或库
 
 框架或库 | 用途
 - | -
@@ -60,17 +60,17 @@ Security.framework | 用来进行更好的持久化存储
 
 ### 2.6.调用统计接口
 
-在需要调用统计接口的代码中引入TapDB.h，并按照后面的接口介绍调用统计接口。
+在需要调用统计接口的代码中引入 TapDB.h，并按照后面的接口介绍调用统计接口。
 
 ## 3.接口说明
 
-TapDB.h包含了类TapDB，还定义了TGTUserType/TGTUserSex两个枚举类型。TapDB包含的都是静态方法，直接用类名调用即可。TGTUserType表示玩家类型，TGTUserSex表示玩家性别。
+TapDB.h 包含了类 TapDB，还定义了 TGTUserType/TGTUserSex 两个枚举类型。TapDB 包含的都是静态方法，直接用类名调用即可。TGTUserType 表示玩家类型，TGTUserSex 表示玩家性别。
 
 ### 3.1.初始化
 
-初始化统计系统SDK，调用这个接口是使用其它接口的先决条件，需要尽早调用。init 方法会初始化 SDK，在此之前不可以调用 SDK 的其他方法。
+初始化统计系统 SDK，调用这个接口是使用其它接口的先决条件，需要尽早调用。init 方法会初始化 SDK，在此之前不可以调用 SDK 的其他方法。
 
-Android需要引入libTyrantdbGameTracker.jar，并且在主 Activity 的 onCreate() 中调用 TyrantdbGameTracker.init(Activity activity, String appId, String channelId, String version, bool requestPermission)，最后一个参数固定传递false。
+Android 需要引入 libTyrantdbGameTracker.jar，并且在主 Activity 的 onCreate() 中调用 TyrantdbGameTracker.init(Activity activity， String appId， String channelId， String version， bool requestPermission)，最后一个参数固定传递 false。
 
 ```java
 public static void onStart(string appId, string channel, string version)
@@ -78,13 +78,13 @@ public static void onStart(string appId, string channel, string version)
 
 字段 | 可为空 | 说明
 - | - | -
-appId | 否 | 注册游戏时获得的APP ID
+appId | 否 | 注册游戏时获得的 APP ID
 channel | 是 | 分包渠道，1.2.名词解释中有介绍
 version | 是 | 游戏版本，为空时，自动获取游戏安装包的版本
 
-### 3.2.跟踪游戏的启停（只适用于Android）
+### 3.2.跟踪游戏的启停（只适用于 Android）
 
-跟踪玩家游戏次数和游戏时长。需要给游戏中每个Activity的onResume和onStop中添加对应的调用。如：在MainActivity里面调用TyrantdbGameTracker.onStop (this);即可。
+跟踪玩家游戏次数和游戏时长。需要给游戏中每个 Activity 的 onResume 和 onStop 中添加对应的调用。如：在 MainActivity 里面调用 TyrantdbGameTracker.onStop (this)；即可。
 
 ```java
 public static void onResume(Context ctx)
@@ -93,7 +93,7 @@ public static void onStop(Context ctx)
 
 ### 3.3.记录一个玩家
 
-记录一个玩家（注意是平台用户，不是游戏角色），当玩家登陆时调用，如果是试玩用户，userId由游戏自己生成，但需要保证唯一性。
+记录一个玩家（注意是平台用户，不是游戏角色），当玩家登陆时调用，如果是试玩用户，userId 由游戏自己生成，但需要保证唯一性。
 
 ```java
 public static void setUser(const char *userId, TGTUserType userType, TGTUserSex userSex,
@@ -102,10 +102,10 @@ public static void setUser(const char *userId, TGTUserType userType, TGTUserSex 
 
 字段 | 可为空 | 说明
 - | - | -
-userId | 否 | 玩家ID（注意是平台用户ID，不是游戏角色ID），不同玩家要是唯一的，不同用户平台可能存在相同的用户ID，需要想办法做区分
+userId | 否 | 玩家 ID（注意是平台用户 ID，不是游戏角色 ID），不同玩家要是唯一的，不同用户平台可能存在相同的用户 ID，需要想办法做区分
 userType | 否 | 玩家类型，见类型详细定义
 userSex | 否 | 玩家性别，见类型详细定义
-userAge | 否 | 玩家年龄，无法获知玩家年龄直接传递0
+userAge | 否 | 玩家年龄，无法获知玩家年龄直接传递 0
 userName | 是 | 玩家名称
 
 ### 3.4.玩家等级
@@ -150,9 +150,9 @@ public static void onChargeRequest(const char *orderId, const char *product,
 
 字段 | 可为空 | 说明
 - | - | -
-orderId | 否 | 订单ID
+orderId | 否 | 订单 ID
 product | 是 | 产品名称
-amount | 否 | 充值金额（单位分，即无论什么币种，都需要乘以100）
+amount | 否 | 充值金额（单位分，即无论什么币种，都需要乘以 100）
 currencyType | 是 | 货币类型，参考：人民币 CNY，美元 USD；欧元 EUR
 virtualCurrencyAmount | 否 | 充值获得的虚拟币
 payment | 是 | 支付方式，如：支付宝
@@ -167,7 +167,7 @@ public static void onChargeSuccess(const char *orderId)
 
 字段 | 可为空 | 说明
 - | - | -
-orderId | 否 | 订单ID，与之前调用的充值请求传递的ID对应
+orderId | 否 | 订单 ID，与之前调用的充值请求传递的 ID 对应
 
 ### 3.8.充值失败
 
@@ -179,7 +179,7 @@ public static void onChargeFail(const char *orderId, const char *reason)
 
 字段 | 可为空 | 说明
 - | - | -
-orderId | 否 | 订单ID，与之前调用的充值请求传递的ID对应
+orderId | 否 | 订单 ID，与之前调用的充值请求传递的 ID 对应
 reason | 是 | 失败原因
 
 ### 3.9.仅充值成功
@@ -193,9 +193,9 @@ long amount, const char *currencyType, long virtualCurrencyAmount, const char *p
 
 字段 | 可为空 | 说明
 - | - | -
-orderId | 是 | 订单ID
+orderId | 是 | 订单 ID
 product | 是 | 产品名称
-amount | 否 | 充值金额（单位分，即无论什么币种，都需要乘以100）
+amount | 否 | 充值金额（单位分，即无论什么币种，都需要乘以 100）
 currencyType | 是 | 货币类型，参考：人民币 CNY，美元 USD；欧元 EUR
 virtualCurrencyAmount | 否 | 充值获得的虚拟币
 payment | 是 | 支付方式，如：支付宝
@@ -204,7 +204,7 @@ payment | 是 | 支付方式，如：支付宝
 
 ### 4.1.充值统计接口
 
-由于客户端接入充值统计可能会不太准确，这里提供服务端充值统计方法，需要忽略掉SDK中的相关充值统计接口
+由于客户端接入充值统计可能会不太准确，这里提供服务端充值统计方法，需要忽略掉 SDK 中的相关充值统计接口
 
 ```
 接口：https://e.tapdb.net/event
@@ -213,36 +213,36 @@ payment | 是 | 支付方式，如：支付宝
 ```js
 {
     "module": "GameAnalysis", //固定
-    "ip": "8.8.8.8", //充值用户的IP，可选
+    "ip": "8.8.8.8", //充值用户的 IP，可选
     "name": "charge", //固定
-    "index": "APPID", //APPID注意替换成TapDB的appid
-    "identify": "user_id", //user_id，必须和客户端的setUser接口传递的user_id一样，并且该用户已经通过SDK接口进行过统计
+    "index": "APPID", //APPID 注意替换成 TapDB 的 appid
+    "identify": "user_id", //user_id，必须和客户端的 setUser 接口传递的 user_id 一样，并且该用户已经通过 SDK 接口进行过统计
     "properties": {
-        "order_id": "100000", //order_id，可选，若传递此参数，需要保证order_id唯一，重复订单不计入统计
-        "amount": 100, //充值金额（必须是整数，单位分，即无论什么币种，都需要乘以100），必传
-        "virtual_currency_amount": 100, //获赠虚拟币数量，必传，可为0
+        "order_id": "100000", //order_id，可选，若传递此参数，需要保证 order_id 唯一，重复订单不计入统计
+        "amount": 100, //充值金额（必须是整数，单位分，即无论什么币种，都需要乘以 100），必传
+        "virtual_currency_amount": 100, //获赠虚拟币数量，必传，可为 0
         "currency_type": "CNY", //货币类型，可选，不传或者不是正确的货币类型，统一处理成人民币分
         "product": "item1", //充值包名称，可选
         "payment": "alipay" //充值途径，可选
     }
 }
 ```
-假如游戏的appid为abcd1234，构建出json字符串后，需要去掉空格和换行符，然后再进行一次urlencode，再把结果作为post数据发过来
+假如游戏的 appid 为 abcd1234，构建出 json 字符串后，需要去掉空格和换行符，然后再进行一次 urlencode，再把结果作为 post 数据发过来
 先替换换行符和空格，变成：
 >{"module":"GameAnalysis","name":"charge","index":"abcd1234","identify":"user_id","properties":{"order_id":"100000","amount":100,"virtual_currency_amount":100,"currency_type":"CNY","product":"item1","payment":"alipay"}}
 
-然后urlencode，变成如下形式，某些版本的urlencode可能会把':'和','进行编码，不影响实际使用。
+然后 urlencode，变成如下形式，某些版本的 urlencode 可能会把':'和','进行编码，不影响实际使用。
 
 >%7B%22module%22:%22GameAnalysis%22,%22name%22:%22charge%22,%22index%22:%22abcd1234%22,%22identify%22:%22user_id%22,%22properties%22:%7B%22order_id%22:%22100000%22,%22amount%22:100,%22virtual_currency_amount%22:100,%22currency_type%22:%22CNY%22,%22product%22:%22item1%22,%22payment%22:%22alipay%22%7D%7D
 
 
 货币类型的格式参考<a target="_blank" href="docs/zh_CN/features/exchangeRate.html">汇率表</a>
 
-成功判断：返回的HTTP Code为200认为发送成功，否则认为失败
+成功判断：返回的 HTTP Code 为 200 认为发送成功，否则认为失败
 
 ### 4.2.在线数据统计接口
 
-由于SDK无法进行准确的在线数据统计，这里提供服务端在线数据统计接口。游戏服务端可以每隔5分钟自行统计在线人数，通过接口发送到TapDB，TapDB进行数据汇总和展现。
+由于 SDK 无法进行准确的在线数据统计，这里提供服务端在线数据统计接口。游戏服务端可以每隔 5 分钟自行统计在线人数，通过接口发送到 TapDB，TapDB 进行数据汇总和展现。
 
 ```
 接口：https://se.tapdb.net/tapdb/online
@@ -255,16 +255,16 @@ payment | 是 | 支付方式，如：支付宝
 
 参数名 | 参数类型 | 参数说明
 - | - | -
-appid | string | TapDB的appid
-onlines | array | 多条在线数据（最多100条）
+appid | string | TapDB 的 appid
+onlines | array | 多条在线数据（最多 100 条）
 
-其中onlines数组的结构为
+其中 onlines 数组的结构为
 
 参数名 | 参数类型 | 参数说明
 - | - | -
-server | string | 服务器，TapDB对同一服务器每一个自然5分钟仅接受一次数据
+server | string | 服务器，TapDB 对同一服务器每一个自然 5 分钟仅接受一次数据
 online | int | 在线人数
-timestamp | long | 当前统计数据的时间戳(秒)，TapDB会按照自然5分钟进行数据对齐
+timestamp | long | 当前统计数据的时间戳(秒)，TapDB 会按照自然 5 分钟进行数据对齐
 
 示例：
 
@@ -283,4 +283,4 @@ timestamp | long | 当前统计数据的时间戳(秒)，TapDB会按照自然5�
 }
 ```
 
-成功判断：返回的HTTP Code为200认为发送成功，否则认为失败
+成功判断：返回的 HTTP Code 为 200 认为发送成功，否则认为失败

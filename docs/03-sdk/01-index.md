@@ -3,12 +3,12 @@ title: 接入文档
 ---
 
 
-## 对接SDK的开发者请仔细阅读
+## 对接 SDK 的开发者请仔细阅读
 
-1. 目前支持iOS、Android、U3D、cocos的SDK及文档方便开发者选择
+1. 目前支持 iOS、Android、U3D、cocos 的 SDK 及文档方便开发者选择
 
 2. 已传递的数据不可修改，请正确传递渠道，玩家，收入等相关数据，以便后续的数据分析
 
 3. 充值和玩家在线数据提供服务端传递方式，让数据更加准确
 
-4. 接入时遇到任何问题，可以联系技术支持QQ: <Data field="tapdb.support.QQ"/>
+4. 接入时遇到任何问题，可以联系技术支持 QQ: <Data field="tapdb.support.QQ"/>
