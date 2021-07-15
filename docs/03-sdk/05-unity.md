@@ -41,17 +41,17 @@ android.permission.INTERNET | 是 | 使用网络的权限
 android.permission.ACCESSNETWORKSTATE | 是 | 获取手机网络连接状态
 android.permission.ACCESS_WIFI_STATE | 是 | WIFI
 
-可选权限，强烈建议添加。sdk 获取 IMEI 时会需要此权限；获取不到不影响功能正常使用，IMEI 用于辅助数据分析，使统计结果更加精确
+可选权限，强烈建议添加。SDK 获取 IMEI 时会需要此权限；获取不到不影响功能正常使用，IMEI 用于辅助数据分析，使统计结果更加精确
 
 权限 | 是否必须 | 用途 
 --- | --- | ---
 android.permission.READ_PHONE_STATE | 否 | 获取手机状态信息 
 
 #### 2.3.2.第三方设备 ID 说明
-**说明：设备 ID 会使数据统计更加精确，建议添加，TapDB SDK 支持获取 OAID 的设备 ID(需要手动添加 OAID 的 sdk)，获取到的设备 id，会上报到服务器，辅助数据分析，使统计结果更加精准，如果不需要可以跳过该步骤**
-#### OAID sdk 获取设备 ID
+**说明：设备 ID 会使数据统计更加精确，建议添加，TapDB SDK 支持获取 OAID 的设备 ID(需要手动添加 OAID 的 SDK)，获取到的设备 id，会上报到服务器，辅助数据分析，使统计结果更加精准，如果不需要可以跳过该步骤**
+#### OAID SDK 获取设备 ID
 
-TapDB SDK 当前支持 OAID sdk 1.0.5~1.0.25 的版本，当应用集成进去之后，会自动使用 oaid 从而获取设备 id，可以自行从 OAID 官网下载，也可以从此处下载[1.0.25](https://res.xdcdn.net/tapdb/Android/oaid/oaid_sdk_1.0.25.aar)的版本【如需其它版本请自行去 oaid 官网下载；然后将 oaid sdk（下载下来是个 aar)， 导入应用的工程目录
+TapDB SDK 当前支持 OAID SDK 1.0.5~1.0.25 的版本，当应用集成进去之后，会自动使用 OAID 从而获取设备 id，可以自行从 OAID 官网下载，也可以从此处下载[1.0.25](https://res.xdcdn.net/tapdb/Android/oaid/oaid_sdk_1.0.25.aar)的版本【如需其它版本请自行去 OAID 官网下载；然后将 OAID SDK（下载下来是个 aar)， 导入应用的工程目录
 
 **在 AndroidManifest.xml 添加如下权限**
 
