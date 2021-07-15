@@ -2,8 +2,6 @@
 title: 漏斗分析
 ---
 
-> English manual coming soon, we apologize for the temporary inconvenience.
-
 ## 1 概述
 
 漏斗模型主要用于分析一个多步骤过程中每一步的转化与流失情况。

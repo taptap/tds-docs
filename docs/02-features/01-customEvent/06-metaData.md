@@ -2,8 +2,6 @@
 title: 元数据管理
 ---
 
-> English manual coming soon, we apologize for the temporary inconvenience.
-
 ## 一、概述
 
 元数据管理是系统中的数据管理模块，是用户用以统一管理元数据的地方。

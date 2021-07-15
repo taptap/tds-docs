@@ -3,8 +3,6 @@ title: 自定义事件分析
 hide_title: true
 ---
 
-> English manual coming soon, we apologize for the temporary inconvenience.
-
 ## 自定义事件分析
 
 这里将介绍 `TapDB` 自定义事件分析的使用指引。

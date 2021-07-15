@@ -2,8 +2,6 @@
 title: 事件分析
 ---
 
-> English manual coming soon, we apologize for the temporary inconvenience.
-
 ## 一、概述
 
 用户（设备/账号）在 APP内 产生的行为称为事件（EVENT），值得强调的是， `TapDB` 将“用户”的概念一分为二，即设备或者账号，设备即用户所使用的手机/平板/pc等等，账号即SDK通过setuser埋点所上传至 `TapDB` 的userid，该概念贯穿整个 `TapDB 2.0`。客户可以通过切换查询主体来定义当前查询的是账号还是设备的数据。点击设备/账号之后要点击查询按钮方可生效。

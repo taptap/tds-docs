@@ -2,8 +2,6 @@
 title: 看板
 ---
 
-> English manual coming soon, we apologize for the temporary inconvenience.
-
 ## 1 概述
 看板是多张报表的集合，将构建的指标、留存、漏斗等保存为报表后，可将报表添加至看板中，方便日常数据的监控。
 

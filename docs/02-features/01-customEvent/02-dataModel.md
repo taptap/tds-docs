@@ -2,8 +2,6 @@
 title: 数据模型介绍
 ---
 
-> English manual coming soon, we apologize for the temporary inconvenience.
-
 ## 1. 用户事件模型
 
 `TapDB` 的数据分析基于用户事件数据模型，如下图：

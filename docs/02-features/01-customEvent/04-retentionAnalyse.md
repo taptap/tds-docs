@@ -2,8 +2,6 @@
 title: 留存分析
 ---
 
-> English manual coming soon, we apologize for the temporary inconvenience.
-
 ## 一、概述
 
 与 `TapDB` 老版本中留存的概念不同，2.0版本中将留存的概念进行了泛化。旨在帮助客户分析完成某项初始事件的用户中，在一段时间内会进而进行回访事件的人数和比例。比如有以下场景：
