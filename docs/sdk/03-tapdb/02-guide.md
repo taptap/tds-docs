@@ -22,11 +22,11 @@ TapSDK 提供了一套可供游戏开发者收集账号数据的 API。
 ```cs
 "dependencies":{
 // 登录
-"com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#2.1.6",
-"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#2.1.6",
-"com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#2.1.6",
+"com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#2.1.7",
+"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#2.1.7",
+"com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#2.1.7",
 // 数据分析
-"com.taptap.tds.tapdb": "https://github.com/TapTap/TapDB-Unity.git#2.1.6",
+"com.taptap.tds.tapdb": "https://github.com/TapTap/TapDB-Unity.git#2.1.7",
 }
 ```
 
@@ -39,10 +39,10 @@ repositories{
 
 dependencies {  
 ...  
-    implementation (name:'TapBootstrap_2.1.6', ext:'aar')  // 必选： TapSDK 启动器 
-    implementation (name:'TapCommon_2.1.6', ext:'aar') // 必选：TapSDK 基础库 
-    implementation (name:'TapLogin_2.1.6', ext:'aar') // 必选：TapTap 登录 
-    implementation (name:'TapDB_2.1.6', ext:'aar') // 数据统计
+    implementation (name:'TapBootstrap_2.1.7', ext:'aar')  // 必选： TapSDK 启动器 
+    implementation (name:'TapCommon_2.1.7', ext:'aar') // 必选：TapSDK 基础库 
+    implementation (name:'TapLogin_2.1.7', ext:'aar') // 必选：TapTap 登录 
+    implementation (name:'TapDB_2.1.7', ext:'aar') // 数据统计
 }  
 ```
 
@@ -265,20 +265,22 @@ TapDB.setServer("1 区");
 <MultiLang>
 
 ```cs
-TapDB.OnCharge("0xueiEns","轩辕剑","100","CNY","wechat");
+TapDB.OnCharge("0xueiEns", "轩辕剑", "100", "CNY", "wechat", "{\"on_sell\":true}");
 ```
 
 ```java
-TapDB.onCharge("0xueiEns","轩辕剑","100","CNY","wechat");
+JSONObject info = new JSONObject();
+info.put("on_sell": true);
+TapDB.onCharge("0xueiEns", "轩辕剑", "100", "CNY", "wechat", info);
 ```
 
 ```objectivec
-[TapDB onChargeSuccess:@"0xueiEns" product:@"轩辕剑" amount:100 currencyType:@"CNY" payment:@"wechat"];
+[TapDB onChargeSuccess:@"0xueiEns" product:@"轩辕剑" amount:100 currencyType:@"CNY" payment:@"wechat", properties:@{@"on_sell":YES}];
 ```
 
 </MultiLang>
 
-上述代码示例中，`0xueiEns` 是订单 ID，`轩辕剑` 是商品名，`100` 是金额，`CNY` 是货币名称，`wechat` 是充值渠道。
+上述代码示例中，`0xueiEns` 是订单 ID，`轩辕剑` 是商品名，`100` 是金额，`CNY` 是货币名称，`wechat` 是充值渠道，最后一个参数传入自定义字段，示例中传入了一个 `on_sell` 字段，表示这个商品是否正在促销。
 订单 ID、商品名、充值渠道是长度大于 0、不大于 256 的字符串，可以为 `null`。
 传递订单 ID 方便排重，防止重复计算。
 金额是大于 0、小于等于 100000000000 的整数，单位为分（主币价值的百分之一），不可为 `null`。
@@ -309,6 +311,7 @@ POST 数据（实际发送请求时需去除注释、空格、换行符并 urlen
     "currency_type": "CNY", // 可选，货币名称
     "product": "轩辕剑", // 可选，商品名
     "payment": "wechat" // 可选，充值渠道
+    "on_sell": true // 自定义字段
   }
 }
 ```
