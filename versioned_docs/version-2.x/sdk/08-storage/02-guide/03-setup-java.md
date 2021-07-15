@@ -284,7 +284,7 @@ LeanCloud.initialize("your-client-id", "your-client-token", "https://please-repl
 ```
 
 注意，云引擎内部访问 API 是通过内网，所以不需要也不应该配置 API 自定义域名（`serverUrl`）。
-模板项目和[云引擎网站托管指南](/sdk/engine/guide/webhosting)中的示例代码均未配置 API 自定义域名，
+模板项目和[云引擎网站托管指南](/2.x/sdk/engine/guide/webhosting)中的示例代码均未配置 API 自定义域名，
 请勿调用 `setServer`，否则会变成公网访问，影响性能。
 
 realtime-core library 也支持在纯 Java Application 中使用，但是与 Android 的调用方式有细微差异，Java Application 中需要开发者显式建立与云端的长链接（Android 平台是通过 PushService 自动建立的）。建立长链接的方法如下：

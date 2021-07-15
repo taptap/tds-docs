@@ -5,7 +5,7 @@ sidebar_label: 快速开始
 ---
 import MultiLang from '@theme/MultiLang';
 
-本文介绍如何快速接入 TapSDK 并实现 [TapTap 登录](/sdk/taptap-login/guide/start)功能。
+本文介绍如何快速接入 TapSDK 并实现 [TapTap 登录](/2.x/sdk/taptap-login/guide/start)功能。
 
 :::note
 [下载](/tap-download) 页面提供了 Unity、Android、iOS 示例项目，可供参考。
@@ -53,9 +53,9 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 ```json
 "dependencies":{
 // 登录
-"com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#2.1.6",
-"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#2.1.6",
-"com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#2.1.6",
+"com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#2.1.7",
+"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#2.1.7",
+"com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#2.1.7",
 }
 ```
 
@@ -140,9 +140,9 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
     
     dependencies {  
     ...  
-        implementation (name:'TapBootstrap_2.1.6', ext:'aar')  // 必选：TapSDK 启动器 
-        implementation (name:'TapCommon_2.1.6', ext:'aar') // 必选：TapSDK 基础库 
-		implementation (name:'TapLogin_2.1.6', ext:'aar') // 必选：TapTap 登录 
+        implementation (name:'TapBootstrap_2.1.7', ext:'aar')  // 必选：TapSDK 启动器 
+        implementation (name:'TapCommon_2.1.7', ext:'aar') // 必选：TapSDK 基础库 
+		implementation (name:'TapLogin_2.1.7', ext:'aar') // 必选：TapTap 登录 
 
     }  
     ```
@@ -417,7 +417,7 @@ TapBootstrap.registerLoginResultListener(new TapLoginResultListener() {
 
 ## AccessToken
 
-上面代码示例中的 `AccessToken` 用于用户鉴权，过期时间为 90 天（过期后 SDK 会自动清除本地缓存），可以传到游戏服务端去获取用户信息，参见 [获取用户信息](/sdk/taptap-login/guide/userinfo#流程)。
+上面代码示例中的 `AccessToken` 用于用户鉴权，过期时间为 90 天（过期后 SDK 会自动清除本地缓存），可以传到游戏服务端去获取用户信息，参见 [获取用户信息](/2.x/sdk/taptap-login/guide/userinfo#流程)。
 
 `AccessToken` 示例：
 

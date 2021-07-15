@@ -10,8 +10,8 @@ sidebar_label: 最佳实践
 
 ### 前提条件
 
- - 已[开启文本检测服务](/sdk/text-moderation/features#开启文本检测服务)
- - 已阅读[开发指南](/sdk/text-moderation/guide)
+ - 已[开启文本检测服务](/2.x/sdk/text-moderation/features#开启文本检测服务)
+ - 已阅读[开发指南](/2.x/sdk/text-moderation/guide)
 
 ### 应用场景
 
@@ -51,8 +51,8 @@ if rs.result == 1 {
 
 ### 前提条件
 
- - 已[开启文本检测服务](/sdk/text-moderation/features#开启文本检测服务)
- - 已阅读[开发指南](/sdk/text-moderation/guide)
+ - 已[开启文本检测服务](/2.x/sdk/text-moderation/features#开启文本检测服务)
+ - 已阅读[开发指南](/2.x/sdk/text-moderation/guide)
 
 ### 应用场景
 
