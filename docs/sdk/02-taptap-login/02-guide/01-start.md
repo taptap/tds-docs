@@ -1,112 +1,17 @@
 ---
 id: start
-title: TapTap 登录与内建账户系统
+title: TapTap内建账户系统
 sidebar_label: 功能接入
 ---
 
 import MultiLang from '@theme/MultiLang';
 
-[快速开始](/sdk/start/quickstart)中简单介绍了[如何在游戏中加入 Tap 登录](/sdk/start/quickstart#taptap-登录)，这里详细介绍 TapSDK 的[登录功能](/sdk/taptap-login/features)。
+[快速开始](/sdk/start/quickstart)中简单介绍了如何在游戏中加入 Tap 登录，这里详细介绍 TapSDK 的[登录功能](/sdk/taptap-login/features)。
 
-
-## 登录
-
-如果开发者在游戏中同时接入了多家第三方（例如支持苹果、微信、Facebook 等账户登录），只把 TapTap 当成一个普通的登录渠道，那么在客户端可以只依赖 `TapLogin` 和 `TapCommon` 这两个模块，并按照如下的流程来接入：
-
-### 初始化
-
-<MultiLang>
-
-
-```cs
-TapLogin.Init(string clientID);
-```
-
-```java
-TapLoginHelper.init(Context context, String clientID);
-```
-
-```objectivec
-AccessToken *accessToken = [TapBootstrap getCurrentToken];
-if (accessToken == nil) {
-    // 未登录
-} else {
-    // 已登录
-}
-```
-
-```objectivec
-[TapLoginHelper initWithClientID:@"your clientId"];
-```
-
-</MultiLang>
-
-### 开始 TapTap 登录
-
-<MultiLang>
-
-
-```cs
-// 唤起 TapTap 网页 或者 TapTap 客户端进行登陆
-var accessToken = await TapLogin.Login();
-// 获取 TapTap AccessToken
-var accessToken = await TapLogin.GetAccessToken();
-// 获取 TapTap Profile  可以获得当前用户的一些基本信息，例如名称、头像、性别。
-var profile = await TapLogin.FetchProfile();
-```
-
-```java
-TapLoginHelper.TapLoginResultCallback loginCallback = new TapLoginHelper.TapLoginResultCallback() {
-    @Override
-    public void onLoginSuccess(AccessToken token) {
-        Log.d(TAG, "TapTap authorization succeed");
-        // 开发者调用 TapLoginHelper.getCurrentProfile() 可以获得当前用户的一些基本信息，例如名称、头像、性别。
-        Profile profile = TapLoginHelper.getCurrentProfile();
-    }
-
-    @Override
-    public void onLoginCancel() {
-        Log.d(TAG, "TapTap authorization cancelled");
-    }
-
-    @Override
-    public void onLoginError(AccountGlobalError globalError) {
-        Log.d(TAG, "TapTap authorization failed. cause: " + globalError.getMessage());
-    }
-};
-TapLoginHelper.registerLoginCallback(loginCallback);
-TapLoginHelper.startTapLogin(MainActivity.this, TapLoginHelper.SCOPE_PUBLIC_PROFILE);
-```
-
-```objectivec
-[TapLoginHelper registerLoginResultDelegate:delegator];
-if ([TapLoginHelper currentProfile]) {
-    // 当前已经登录
-} else {
-    [TapLoginHelper startTapLogin:@[@"public_profile"]];
-}
-
-// delegator
-- (void)onLoginCancel {
-    // 登录取消
-}
-
-- (void)onLoginError:(nonnull NSError *)error {
-    // 登录失败
-}
-
-- (void)onLoginSuccess:(nonnull TTSDKAccessToken *)token {
-    // 登录成功
-}
-```
-
-</MultiLang>
-
-## TDS 内建账户系统
 
 从 TapSDK 3.0 开始，我们在单纯的 TapTap 登录之外，还提供了一个内建账户系统供游戏使用：开发者可以直接用 TapTap OAuth 授权的结果生成一个游戏内的账号（TDSUser），然后用该账号保存更多玩家数据。同时，我们也支持将更多第三方认证登录的结果绑定到这一账号上来（以及后续的解绑操作）。
 
-### 初始化
+## 初始化
 如果要使用内建账户系统，开发者必须至少依赖 `TapBootstrap`、`TapLogin`、`TapCommon` 以及 `LeanCloudObjc` 模块，并按照如下方式完成初始化：
 <MultiLang>
 
@@ -152,7 +57,7 @@ config.dbConfig.gameVersion = @"{your game version}";
 
 </MultiLang>
 
-### 用 TapTap OAuth 授权结果直接登录账户系统
+## 用 TapTap OAuth 授权结果直接登录账户系统
 
 <MultiLang>
 
@@ -199,7 +104,7 @@ TapBootstrap.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
 对于 `TDSUser`， 我们还支持一些其他操作，例如：
 :::
 
-### 游客登录
+## 游客登录
 内建账户系统支持游戏创建一个游客账号，其调用示例如下：
 
 <MultiLang>
@@ -246,7 +151,7 @@ TDSUser.logInAnonymously().subscribe(new Observer<TDSUser>() {
 
 </MultiLang>
 
-### 绑定其他第三方平台账号
+## 绑定其他第三方平台账号
 游戏内经常会发生玩家先用游客身份登录，之后通过绑定第三方账号的认证结果切换到正式账号，这一过程可以通过如下方式完成： 
 
 <MultiLang>
@@ -321,7 +226,7 @@ NSDictionary *authData = @{
 </MultiLang>
 
 
-### 解绑第三方平台账号
+## 解绑第三方平台账号
 <MultiLang>
 
 
@@ -370,7 +275,7 @@ currentUser.disassociateWithAuthData("weixin").subscribe(new Observer<TDSUser>()
 </MultiLang>
 
 
-### 设置其他属性并保存
+## 设置其他属性并保存
 开发者可以使用内建账户系统保存更多玩家的信息，例如当前玩家的昵称、获得奖杯数等，示意代码如下：
 
 <MultiLang>
@@ -424,7 +329,7 @@ currentUser[@"cups"] = @256;
 
 </MultiLang>
 
-### 登出当前账户
+## 登出当前账户
 账户的登出非常简单，调用 `logOut` 方法即可。
 
 <MultiLang>
@@ -445,11 +350,11 @@ currentUser.logOut().
 
 </MultiLang>
 
-### 检查登录状态
+## 检查登录状态
 `TDSUser` 会在本地缓存当前用户的登录信息，所以如果一个玩家在游戏内登录之后，下次启动用户通过调用 `TDSUser#currentUser` 可以得到之前登录的账户实例，此时玩家无需再次登录即可使用。
 如果玩家在游戏内进行了登出，则本地缓存的登录信息也会被删除，下次进入游戏时 `TDSUser#currentUser` 会返回一个 null 对象。
 
-### 一些疑问
+## 一些疑问
 #### TapSDK 1.x 可以直接升级到 TapSDK 3.0 吗？
 可以。
 
