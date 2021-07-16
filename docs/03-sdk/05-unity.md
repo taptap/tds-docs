@@ -2,15 +2,15 @@
 title: Unity-3D SDK 文档
 ---
 
-## 1.简介
+## 1. 简介
 
-### 1.1.适用范围
+### 1.1. 适用范围
 
 TapDB 提供一套 SDK，游戏开发者可以将其集成到游戏中，系统会收集玩家数据，并进行分析，最终形成数据报表，帮助游戏开发者分析玩家行为并优化游戏。
 
 适用于 Unity 开发的游戏，Android 支持 4.0 及以上的系统，iOS 支持 9.0 及以上的系统。
 
-### 1.2.名词解释
+### 1.2. 名词解释
 
 | 名词     | 含义                                     |
 | -------- | ---------------------------------------- |
@@ -19,19 +19,19 @@ TapDB 提供一套 SDK，游戏开发者可以将其集成到游戏中，系统�
 | 付费     | 玩家使用真实货币换取游戏虚拟币或游戏道具 |
 | 分包渠道 | 标识游戏安装包渠道来源，需要在代码中设置 |
 
-## 2.接入方式
+## 2. 接入方式
 
-### 2.1.申请应用
+### 2.1. 申请应用
 
 在 TapDB 控制台中注册一个游戏，获得游戏对应的 APP ID，这是一个 16 位的字符串，iOS 和 Android 可共用一个 APP ID。
 
-### 2.2.向工程中导入 SDK
+### 2.2. 向工程中导入 SDK
 
 在 TapDB 网站上下载最新的 SDK，其中包含一个 TapDB.unitypackage 文件，在 Unity3D 编译器中选择 Assets --> Import Package --> Custom Package 找到 TapDB.unitypackage 文件，点击"打开按钮"即可导入成功。其中 demo.cs 仅是示例代码，不是 SDK 所需的代码。
 
 ### 2.3.Android
 
-#### 2.3.1.权限
+#### 2.3.1. 权限
 
 SDK 为中需要下列权限。
 
@@ -47,7 +47,7 @@ SDK 为中需要下列权限。
 | ----------------------------------- | -------- | ---------------- |
 | android.permission.READ_PHONE_STATE | 否       | 获取手机状态信息 |
 
-#### 2.3.2.第三方设备 ID 说明
+#### 2.3.2. 第三方设备 ID 说明
 
 **说明：设备 ID 会使数据统计更加精确，建议添加，TapDB SDK 支持获取 OAID 的设备 ID(需要手动添加 OAID 的 SDK)，获取到的设备 id，会上报到服务器，辅助数据分析，使统计结果更加精准，如果不需要可以跳过该步骤**
 
@@ -82,7 +82,7 @@ android:usesCleartextTraffic="true"
 
 ### 2.4.iOS
 
-#### 2.4.1.权限
+#### 2.4.1. 权限
 
 **若需要收集广告标识符（IDFA），可调用以下接口。请在初始化之前调用**
 
@@ -100,7 +100,7 @@ TapDB.enableAdvertiserIDCollection(true);
 
 需要为 iOS 导出的 Xcode 工程引入下列依赖的框架或库
 
-#### 2.4.2.系统依赖
+#### 2.4.2. 系统依赖
 
 需要为 Xcode 工程引入下列依赖的框架或库
 
@@ -117,9 +117,9 @@ TapDB.enableAdvertiserIDCollection(true);
 | libz.tbd                          |                                |
 | libsqlite3.0.tbd                  |                                |
 
-## 3.接口说明
+## 3. 接口说明
 
-### 3.1.初始化
+### 3.1. 初始化
 
 初始化统计系统 SDK，调用这个接口是使用其它接口的先决条件，需要尽早调用。一般建议在 Unity 里的 Start()里面调用。
 
@@ -135,7 +135,7 @@ public static void onStartWithProperties(string appId, string channel, string ga
 | gameVersion | 是     | 游戏版本，为空时，自动获取游戏安装包的版本（Android 是 AndroidManifest.xml 中的 versionName，iOS 是 Xcode 配置中的 Version） |
 | properties  | 否     | 自定义属性，随初始化上传                                                                                                     |
 
-### 3.2.登录
+### 3.2. 登录
 
 记录一个账号，当账号登陆时调用。
 
@@ -149,7 +149,7 @@ public static void setUserWithProperties(string userId,Dictionary<string, object
 | userId     | 否     | 长度大于 0 并小于等于 256。只能包含数字、大小写字母、下划线(\_)、横线(-)，用户 ID。不同账号需要保证 ID 的唯一性 |
 | properties | 否     | 自定义属性                                                                                                      |
 
-### 3.3.账号名称
+### 3.3. 账号名称
 
 设置账号名称。
 
@@ -161,7 +161,7 @@ public static void setName(string name)
 | ---- | ------ | --------------------------------- |
 | name | 否     | 长度大于 0 并小于等于 256，账号名 |
 
-### 3.4.账号等级
+### 3.4. 账号等级
 
 设置账号等级，账号登陆时或升级时调用。
 
@@ -173,7 +173,7 @@ public static void setLevel(int level)
 | ----- | ------ | -------- |
 | level | 否     | 账号等级 |
 
-### 3.5.账号区服
+### 3.5. 账号区服
 
 设置账号区服，账号登陆时或更换区服时调用。
 
@@ -185,7 +185,7 @@ public static void setServer(string server)
 | ------ | ------ | ---------- |
 | server | 否     | 账号服务器 |
 
-### 3.6.充值
+### 3.6. 充值
 
 <div style={{ fontSize: "18px", fontWeight: "500", position: "relative" }}>
   (<Green>推荐使用服务端充值统计接口</Green>)
@@ -207,7 +207,7 @@ public static void onChargeSuccess(string orderId, string product, Int32 amount,
 | currencyType | 是     | 货币类型，参考：人民币 CNY，美元 USD；欧元 EUR     |
 | payment      | 是     | 支付方式，如：支付宝                               |
 
-### 3.7.登出
+### 3.7. 登出
 
 账号登出时，需要调用以下接口清空用户数据。
 
@@ -216,7 +216,9 @@ public static void clearUser()
 
 ```
 
-### 3.8.自定义事件（如需开通自定义事件，请联系技术支持 QQ：3171097571）
+### 3.8. 自定义事件
+
+**（如需开通自定义事件，请联系技术支持 QQ：<Data field="tapdb.support.QQ"/>）**
 
 需要发送自定义事件时调用，自定义事件的 eventName 和 properties 属性都必须在元数据管理预先配置，才可以使用 SDK 进行发送
 
@@ -237,7 +239,7 @@ TapDB.trackEvent("#battle", properties);
 | eventName  | 否     | 事件 code，需要在控制后台预先配置        |
 | properties | 是     | 事件属性，具体字段需要在控制后台预先配置 |
 
-### 3.9.事件主体操作（账号、设备）
+### 3.9. 事件主体操作（账号、设备）
 
 TapDB 的事件主体分为账号和设备，支持对主体的某个属性做相关操作。
 
@@ -333,7 +335,7 @@ public static void userUpdate(Dictionary<string, object> properties)
 public static void userAdd(Dictionary<string, object> properties)
 ```
 
-### 3.10.设置通用事件属性
+### 3.10. 设置通用事件属性
 
 对于某些重要的属性需要在每个上传的事件中出现，用户可以将这些属性设置为全局通用的自定义属性，静态通用属性为固定值，这些通用属性在注册之后，会被附带在 TapDB 上传的事件中。这里需要注意 trackEvent 中传入的属性优先级 > 静态通用属性优先级，trackEvent 中的属性会覆盖同名的静态通用属性。
 
@@ -376,9 +378,9 @@ public static void unregisterStaticProperty(string propertyName)
 public static void clearStaticProperties()
 ```
 
-## 4.服务端推送接口
+## 4. 服务端推送接口
 
-### 4.1.在线人数
+### 4.1. 在线人数
 
 由于 SDK 无法推送准确的在线数据，这里提供服务端在线数据推送接口。游戏服务端可以每隔 5 分钟自行统计在线人数，通过接口推送到 TapDB。TapDB 进行数据汇总展现。
 
@@ -426,7 +428,7 @@ public static void clearStaticProperties()
 
 成功判断：返回的 HTTP Code 为 200 时认为发送成功，否则认为失败
 
-### 4.2.充值
+### 4.2. 充值
 
 由于 SDK 推送可能会不太准确，这里提供服务端充值推送方法。需要忽略掉 SDK 中的相关充值推送接口。
 

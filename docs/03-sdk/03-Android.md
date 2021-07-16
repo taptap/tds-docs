@@ -2,15 +2,15 @@
 title: Android SDK 文档
 ---
 
-## 1.简介
+## 1. 简介
 
-### 1.1.适用范围
+### 1.1. 适用范围
 
 TapDB 提供一套 SDK，游戏开发者可以将其集成到游戏中。系统会收集用户数据，并进行分析，最终形成数据报表，帮助游戏开发者分析用户行为并优化游戏。
 
 目前 SDK 适用于 Android 4.0 及以上的系统。
 
-### 1.2.名词解释
+### 1.2. 名词解释
 
 | 名词     | 含义                                                             |
 | -------- | ---------------------------------------------------------------- |
@@ -19,17 +19,17 @@ TapDB 提供一套 SDK，游戏开发者可以将其集成到游戏中。系统�
 | 用户     | 默认的用户主体包括设备和账号                                     |
 | 付费     | 用户使用真实货币换取游戏虚拟币或游戏道具                         |
 
-## 2.使用方法
+## 2. 使用方法
 
-### 2.1.申请应用
+### 2.1. 申请应用
 
 在 TapDB 控制台中注册一个游戏，获得游戏对应的 APP ID。这是一个长度为 16 的字符串。iOS 和 Android 可共用一个 APP ID。
 
-### 2.2.向工程中导入 SDK
+### 2.2. 向工程中导入 SDK
 
 在 TapDB 网站上下载最新的 SDK，其中包含一个库文件 libTapDB-xxx.aar（强烈建议使用最新版本）。将该库文件加入到项目依赖库中。
 
-### 2.3.添加权限
+### 2.3. 添加权限
 
 ```xml
 <!--必选权限-->
@@ -41,9 +41,9 @@ TapDB 提供一套 SDK，游戏开发者可以将其集成到游戏中。系统�
 <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 ```
 
-## 3.接口说明
+## 3. 接口说明
 
-### 3.1.初始化
+### 3.1. 初始化
 
 初始化 TapDB SDK，调用这个接口是使用其它接口的先决条件，需要尽早调用。一般建议在游戏的主 Activity 中调用，如果多次调用，只有第一次调用视为有效。
 
@@ -61,7 +61,7 @@ public static void init(Context context, String appId, String channel, String ap
 | appVersion | 是     | 为空的话，会获取 AndroidManifest.xml 中 versionCode 作为 appVersion |
 | properties | 否     | 自定义属性，会随着初始化事件上报                                    |
 
-### 3.2.登录
+### 3.2. 登录
 
 记录一个账号，当账号登陆时调用。
 
@@ -76,7 +76,7 @@ public static void setUser(String userId, JSONObject properties)
 | userId     | 否     | 长度大于 0 并小于等于 256。只能包含数字、大小写字母、下划线(\_)、横线(-)，用户 ID。不同账号需要保证 ID 的唯一性 |
 | properties | 否     | 自定义属性                                                                                                      |
 
-### 3.3.账号名称
+### 3.3. 账号名称
 
 设置账号名称。
 
@@ -88,7 +88,7 @@ public static void setName(String name)
 | ---- | ------ | --------------------------------- |
 | name | 否     | 长度大于 0 并小于等于 256。账号名 |
 
-### 3.4.账号等级
+### 3.4. 账号等级
 
 设置账号等级，账号登陆时或升级时调用。
 
@@ -100,7 +100,7 @@ public static void setLevel(int level)
 | ----- | ------ | -------------------- |
 | level | 否     | 大于等于 0。用户等级 |
 
-### 3.5.账号区服
+### 3.5. 账号区服
 
 设置账号区服，账号登陆时或更换区服时调用。
 
@@ -112,7 +112,7 @@ public static void setServer(String server)
 | ------ | ------ | ----------------------------------------- |
 | server | 否     | 长度大于 0 并小于等于 256。用户所在服务器 |
 
-### 3.6.充值
+### 3.6. 充值
 
 <div style={{ fontSize: "18px", fontWeight: "500", position: "relative" }}>
   (<Green>推荐使用服务端充值统计接口</Green>)
@@ -134,7 +134,7 @@ public static void onCharge(String orderId, String product, long amount, String 
 
 常见货币类型的格式参考[汇率表](../exchangeRate "_blank")
 
-### 3.7.登出
+### 3.7. 登出
 
 账号登出时，需要调用以下接口清空账号数据。
 
@@ -142,7 +142,9 @@ public static void onCharge(String orderId, String product, long amount, String 
 public static void clearUser()
 ```
 
-### 3.8.自定义事件（如需开通自定义事件，请联系技术支持 QQ：3171097571）
+### 3.8. 自定义事件
+
+**（如需开通自定义事件，请联系技术支持 QQ：<Data field="tapdb.support.QQ"/>）**
 
 需要发送自定义事件时调用，自定义事件的 eventName 和 properties 属性都必须在元数据管理预先配置，才可以使用 SDK 进行发送
 
@@ -165,7 +167,7 @@ TapDB.trackEvent("#battle", properties);
 | eventName  | 否     | 自定义事件名，注意需要保证以 ’#‘ 开头                                                                                                 |
 | properties | 是     | 事件属性。需要和预登记自定义属性名一致，注意需要保证以 ’#‘ 开头。值需要是长度大于 0 并小于等于 256 的字符串或绝对值小于 9E15 的浮点数 |
 
-### 3.9.事件主体操作（账号、设备）
+### 3.9. 事件主体操作（账号、设备）
 
 TapDB 目前支持两个事件主体：设备，账号。相应支持的主体操作为初始化，更新和累加。累加操作只支持数值类型。
 需要注意的是，传入的自定义属性需要同预登记属性名保持一致。
@@ -256,7 +258,7 @@ public static void userUpdate(final JSONObject properties)
 public static void userAdd(final JSONObject properties)
 ```
 
-### 3.10.设置通用事件属性
+### 3.10. 设置通用事件属性
 
 对于某些重要的属性需要在每个上传的事件中出现，用户可以将这些属性设置为全局通用的自定义属性，包括静态通用属性和动态通用属性，静态通用属性为固定值，动态通用属性每次获取的值由用户所设置的计算逻辑产生。这些通用属性在注册之后，会被附带在 TapDB 上传的事件中。这里需要注意 trackEvent 中传入的属性优先级 > 动态通用属性优先级 > 静态通用属性优先级，也就是说动态通用属性会覆盖同名的静态通用属性。trackEvent 中的属性会覆盖同名的动态通用属性和静态通用属性。
 
@@ -317,13 +319,13 @@ TapDB.registerDynamicProperties(
 );
 ```
 
-### 3.11.上报应用时长
+### 3.11. 上报应用时长
 
 初始化 TapDB SDK 之后，SDK 会自动在应用置于后台时上报当前时长，并以此次上报作为起始点，下次若置于后台，则上报此时间段的时长。事件名为：play_game；时长属性为：duration
 
 **说明：之前版本，需要应用 Activity 生命周期回调函数 onResume 方法里调用 TapDB.onResume 方法，onStop 方法里调用 TapDB.onStop 方法**
 
-## 4.第三方设备 ID
+## 4. 第三方设备 ID
 
 **说明：设备 ID 会使数据统计更加精确，建议添加，TapDB SDK 支持获取 OAID 的设备 ID(需要手动添加 OAID 的 SDK)，获取到的设备 id，会上报到服务器，辅助数据分析，使统计结果更加精准，如果不需要可以跳过该步骤**
 
@@ -341,9 +343,9 @@ SDK 默认使用 HTTP 传输数据，在 targetSdkVersion >= 28 时需要在 And
   ...
 ```
 
-## 5.服务端推送接口
+## 5. 服务端推送接口
 
-### 5.1.在线人数
+### 5.1. 在线人数
 
 由于 SDK 无法推送准确的在线数据，这里提供服务端在线数据推送接口。游戏服务端可以每隔 5 分钟自行统计在线人数，通过接口推送到 TapDB。TapDB 进行数据汇总展现。
 
@@ -391,7 +393,7 @@ SDK 默认使用 HTTP 传输数据，在 targetSdkVersion >= 28 时需要在 And
 
 成功判断：返回的 HTTP Code 为 200 时认为发送成功，否则认为失败
 
-### 5.2.充值
+### 5.2. 充值
 
 由于 SDK 推送可能会不太准确，这里提供服务端充值推送方法。需要忽略掉 SDK 中的相关充值推送接口。
 

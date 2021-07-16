@@ -5,13 +5,13 @@ hide_title: false
 
 这里将介绍 `TapDB` 自定义事件分析的使用指引。
 
-自定义事件功能申请 FAQ
+## 1. 自定义事件功能申请 FAQ
 
 1. 我如何知道是否已开启自定义事件分析功能？
 
    如果能在页面内看见如图所示菜单，则意味着已开启，可正常使用。
 
-![菜单](/img/customEvent/event_menu2.png)
+   ![菜单](/img/customEvent/event_menu2.png)
 
 2. 如果没有开启该功能，我该如何申请？
 
