@@ -146,10 +146,9 @@ TapDB 提供一套 SDK，游戏开发者可以将其集成到游戏中。系统�
 ### 3.6.充值
 
 <div style={{ fontSize: "18px", fontWeight: "500", position: "relative" }}>
-  <p style={{ position: "absolute", top: "-50px", left: "150px" }}>
-    (<span style={{ color: "#080" }}>推荐使用服务端充值统计接口</span>)
-  </p>
+  (<Green>推荐使用服务端充值统计接口</Green>)
 </div>
+
 充值成功时调用。
 
 ```objc
@@ -164,7 +163,7 @@ TapDB 提供一套 SDK，游戏开发者可以将其集成到游戏中。系统�
 | currencyType | 是     | 货币类型，参考：人民币 CNY，美元 USD；欧元 EUR     |
 | payment      | 是     | 支付方式，如：支付宝                               |
 
-常见货币类型的格式参考<a target="_blank" href="https://www.tapdb.com/docs/zh_CN/features/exchangeRate.html">汇率表</a>
+常见货币类型的格式参考[汇率表](../exchangeRate "_blank")
 
 #### 3.7.登出
 

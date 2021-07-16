@@ -251,7 +251,7 @@ title: 网页版
 ###### 更新日期 2017-07-12
 
 「实时在线」功能可帮你进行实时在线分析，通过分钟级在线量展现实时现数据动态。
-您可在 <a target="_blank" href="../../dm/m/t/extensions">【工具-拓展功能】</a> 或 <a target="_blank" href="../../dm/m/g/active/online">【在线分析】</a> 中自主开启并使用了。
+您可在[【工具-拓展功能】](/dm/m/t/extensions "_tapdb")或[【在线分析】](/dm/m/g/active/online "_tapdb")中自主开启并使用了。
 
 ![Alt text](/img/changelog/2017_07_25_4.png)
 

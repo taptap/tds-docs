@@ -115,10 +115,9 @@ public static void setServer(String server)
 ### 3.6.充值
 
 <div style={{ fontSize: "18px", fontWeight: "500", position: "relative" }}>
-  <p style={{ position: "absolute", top: "-50px", left: "150px" }}>
-    (<span style={{ color: "#080" }}>推荐使用服务端充值统计接口</span>)
-  </p>
+  (<Green>推荐使用服务端充值统计接口</Green>)
 </div>
+
 充值成功时调用。
 
 ```java
@@ -133,7 +132,7 @@ public static void onCharge(String orderId, String product, long amount, String 
 | currencyType | 是     | 货币类型。国际通行三字母表示法，为空时默认 CNY。参考：人民币 CNY，美元 USD；欧元 EUR |
 | payment      | 是     | 长度大于 0 并小于等于 256。充值渠道                                                  |
 
-常见货币类型的格式参考<a target="_blank" href="https://www.tapdb.com/docs/zh_CN/features/exchangeRate.html">汇率表</a>
+常见货币类型的格式参考[汇率表](../exchangeRate "_blank")
 
 ### 3.7.登出
 
@@ -309,7 +308,7 @@ public static void registerDynamicProperties(final TapDBDataDynamicProperties dy
 ```java
 TapDB.registerDynamicProperties(
     () -> {
-          	JSONObject properties = new JSONObject();
+        	JSONObject properties = new JSONObject();
             // getCurrentLevel 在这里仅作为案例，表示用户任何的自有逻辑实现
             long level = getCurrentLevel();
             properties.put("#currentLevel", level);
