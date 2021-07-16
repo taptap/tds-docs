@@ -145,8 +145,11 @@ TapDB 提供一套 SDK，游戏开发者可以将其集成到游戏中。系统�
 
 ### 3.6.充值
 
-<div style={{fontSize: '18px', fontWeight: '500', position: 'relative'}}>
-<p style={{position: 'absolute',top:'-50px',left:'150px'}}>(<span style={{color: '#080'}}>推荐使用服务端充值统计接口</span>)</p></div>
+<div style={{ fontSize: "18px", fontWeight: "500", position: "relative" }}>
+  <p style={{ position: "absolute", top: "-50px", left: "150px" }}>
+    (<span style={{ color: "#080" }}>推荐使用服务端充值统计接口</span>)
+  </p>
+</div>
 充值成功时调用。
 
 ```objc

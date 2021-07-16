@@ -187,14 +187,24 @@ public static void setServer(string server)
 
 ### 3.6.充值
 
-<div style={{'fontSize': '18px','fontWeight': '500',position: 'relative'}}>
-<p style={{position: 'absolute',top:'-50px',left:'150px'}}>(<span style={{color:'#080'}}>推荐使用服务端充值统计接口</span>)</p></div>
+<div style={{ fontSize: "18px", fontWeight: "500", position: "relative" }}>
+  <p style={{ position: "absolute", top: "-50px", left: "150px" }}>
+    (<span style={{ color: "#080" }}>推荐使用服务端充值统计接口</span>)
+  </p>
+</div>
 
 充值成功时调用
 
-<p>提醒：<span style={{color:'#FA6456'}}>由于客户端行为，不可避免会有投机者尝试破解充值；
-如果没有通过服务器校验，一定会造成数据不准确，强烈建议使用服务器接口进行充值数据回调。</span>
-(<a href="docs/zh_CN/sdk/unity.html#09119adcfbdeceac797a914952974bd9">4.2.充值</a>)</p>
+<p>
+  提醒：
+  <span style={{ color: "#FA6456" }}>
+    由于客户端行为，不可避免会有投机者尝试破解充值；
+    如果没有通过服务器校验，一定会造成数据不准确，强烈建议使用服务器接口进行充值数据回调。
+  </span>
+  (<a href="docs/zh_CN/sdk/unity.html#09119adcfbdeceac797a914952974bd9">
+    4.2.充值
+  </a>)
+</p>
 
 ```csharp
 public static void onChargeSuccess(string orderId, string product, Int32 amount, string currencyType, string payment)
