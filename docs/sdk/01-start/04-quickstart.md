@@ -183,6 +183,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
        TapCommonResource.bundle
        TapCommonSDK.framework
        TapLoginSDK.framework
+       LeanCloudObjc.framework
        ```
 
 
