@@ -16,9 +16,7 @@ iOS：<Data field="sdk.0.version"/>
 
 Android：<Data field="sdk.1.version"/>
 
-Cocos2d-x：<Data field="sdk.2.version"/>
-
-Unity 3D：<Data field="sdk.3.version"/>
+Unity 3D：<Data field="sdk.2.version"/>
 
 [下载 SDK](../download "_blank")
 
