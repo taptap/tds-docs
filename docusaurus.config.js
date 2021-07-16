@@ -6,7 +6,7 @@ const baseUrl = '/v2-doc/';
 
 module.exports = {
   title: 'TapTap 开发者文档中心',
-  url: 'https://developer.taptap.com/v2-doc',
+  url: 'https://developer.taptap.com',
   baseUrl: baseUrl,
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -52,17 +52,13 @@ module.exports = {
           position: 'right',
         },
         {
-          label: 'API索引',
+          label: 'API',
           to: '/sdk-api',
           position: 'right',
         },
+
         {
-          label: 'Demos',
-          to: '/demos',
-          position: 'right',
-        },
-        {
-          label: '资源下载',
+          label: '下载',
           position: 'right',
           items: [
             {
@@ -78,7 +74,15 @@ module.exports = {
               label: 'SDK工具包',
               to: '/tap-download',
             },
+            {
+              label: 'Demos',
+              to: '/demos',
+            },
           ],
+        },
+        {
+          type: 'docsVersionDropdown',
+          position: 'right',
         },
         {
           type: 'localeDropdown',
@@ -109,7 +113,14 @@ module.exports = {
       {
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
-          routeBasePath: "/",
+          routeBasePath: '/',
+          "lastVersion": "current",
+          "versions": {
+            "current": {
+              "label": "3.x",
+              "path": ""
+            }
+          }
         },
         theme: {
           customCss: require.resolve('./src/styles/index.scss'),
