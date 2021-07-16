@@ -334,13 +334,13 @@ TapBootstrap.init(MainActivity.this, tapConfig);
 ```
 
 ```objectivec
-    // 初始化 SDK
-    TapConfig *config = TapConfig.new;
-    config.clientId = @"clientId";
-    config.clientSecret=@"clientSecret";// 开发者中心对应 Client Token
+// 初始化 SDK
+TapConfig *config = TapConfig.new;
+config.clientId = @"clientId";
+config.clientSecret=@"clientSecret";// 开发者中心对应 Client Token
 
-    config.region = TapSDKRegionTypeCN;
-    [TapBootstrap initWithConfig:config];
+config.region = TapSDKRegionTypeCN;
+[TapBootstrap initWithConfig:config];
 ```
 
 </MultiLang>
