@@ -12,19 +12,18 @@ TapDB 提供一套 SDK，游戏开发者可以将其集成到游戏中。系统�
 
 ### 1.2.名词解释
 
-名词 | 含义
---- | ---
-设备 | 安装了游戏的设备
-分包渠道 | 标识游戏安装包的渠道，需要在代码中设置，可作为控制后台的过滤条件
-用户 | 默认用户主体分为设备和账号
-付费 | 用户使用真实货币换取游戏虚拟币或游戏道具
+| 名词     | 含义                                                             |
+| -------- | ---------------------------------------------------------------- |
+| 设备     | 安装了游戏的设备                                                 |
+| 分包渠道 | 标识游戏安装包的渠道，需要在代码中设置，可作为控制后台的过滤条件 |
+| 用户     | 默认用户主体分为设备和账号                                       |
+| 付费     | 用户使用真实货币换取游戏虚拟币或游戏道具                         |
 
 ## 2.使用方法
 
 ### 2.1.申请应用
 
-在 TapDB 控制台中注册一个游戏，获得游戏对应的 APP ID。这是一个长度为 16 的字符串。iOS 和 Android 可共用一个 APP ID。  
-
+在 TapDB 控制台中注册一个游戏，获得游戏对应的 APP ID。这是一个长度为 16 的字符串。iOS 和 Android 可共用一个 APP ID。
 
 ### 2.2.向 Xcode 工程中导入 SDK
 
@@ -40,10 +39,9 @@ TapDB 提供一套 SDK，游戏开发者可以将其集成到游戏中。系统�
 
 **TapDB 版本 2.2.3 及以上，请使用 Xcode12.3 或更高**。
 
-权限声明 | 含义
---- | ---
-NSUserTrackingUsageDescription | 用来获取设备广告标识，跟踪设备
-
+| 权限声明                       | 含义                           |
+| ------------------------------ | ------------------------------ |
+| NSUserTrackingUsageDescription | 用来获取设备广告标识，跟踪设备 |
 
 ### 2.3.引入依赖的框架
 
@@ -51,19 +49,18 @@ NSUserTrackingUsageDescription | 用来获取设备广告标识，跟踪设备
 
 需要为 Xcode 工程引入下列依赖的框架或库
 
-名词 | 含义 | 备注
---- | --- | ---
-AdSupport.framework | 用来获取设备广告标识，跟踪设备
-AdService.framework | 广告框架 | optional
-AppTrackingTransparency.framework | iOS14 新增 app 追踪框架 | optional
-SystemConfiguration.framework | 
-CoreMotion.framework | 
-Security.framework | 用来进行更好的持久化存储
-libc++.tdb | c++ 
-libresolv.tbd | 
-libz.tbd |  
-libsqlite3.0.tbd |  
-
+| 名词                              | 含义                           | 备注     |
+| --------------------------------- | ------------------------------ | -------- |
+| AdSupport.framework               | 用来获取设备广告标识，跟踪设备 |
+| AdService.framework               | 广告框架                       | optional |
+| AppTrackingTransparency.framework | iOS14 新增 app 追踪框架        | optional |
+| SystemConfiguration.framework     |
+| CoreMotion.framework              |
+| Security.framework                | 用来进行更好的持久化存储       |
+| libc++.tdb                        | c++                            |
+| libresolv.tbd                     |
+| libz.tbd                          |
+| libsqlite3.0.tbd                  |
 
 ### 2.4.调用统计接口
 
@@ -72,9 +69,8 @@ libsqlite3.0.tbd |
 ```objc
 #import <TapDB/TapDB.h>
 ```
+
 注：如果 Xcode 提示找不到 TapDB.h 头文件，请确保 Xcode 工程中的 Build Settings -> Search Paths -> Framework Search Paths 中的路径设置正确。
-
-
 
 ## 3.接口说明
 
@@ -85,31 +81,29 @@ libsqlite3.0.tbd |
 初始化统计系统 SDK，调用这个接口是使用其它接口的先决条件，需要尽早调用。
 一般建议在 AppDelegate 的 `application:didFinishLaunchingWithOptions:` 中调用。
 
-
 ```objc
 + (void)onStart:(NSString *)appId channel:(nullable NSString *)channel version:(nullable NSString *)gameVersion properties:(nullable NSDictionary *)properties;
 ```
 
-
-字段 | 可为空 | 说明
---- | --- | ---
-appId | 否 | 注册游戏时获得的 APP ID
-channel | 是 | 分包渠道，1.2.名词解释中有介绍
-version | 是 | 游戏版本，为空时，自动获取游戏安装包的版本（Xcode 配置中的 Version）
-properties | 是 | 自定义属性，随初始化事件上传
-
+| 字段       | 可为空 | 说明                                                                 |
+| ---------- | ------ | -------------------------------------------------------------------- |
+| appId      | 否     | 注册游戏时获得的 APP ID                                              |
+| channel    | 是     | 分包渠道，1.2.名词解释中有介绍                                       |
+| version    | 是     | 游戏版本，为空时，自动获取游戏安装包的版本（Xcode 配置中的 Version） |
+| properties | 是     | 自定义属性，随初始化事件上传                                         |
 
 #### 3.2.登录
 
 记录一个账号，当账号登陆时调用。
+
 ```objc
 + (void)setUser:(NSString *)userId properties:(nullable NSDictionary *)properties;
 ```
 
-字段 | 可为空 | 说明
---- | --- | ---
-userId | 否 | 长度大于 0 并小于等于 256。只能包含数字、大小写字母、下划线(_)、横线(-)，用户 ID。不同用户需要保证 ID 的唯一性
-properties | 是 | 自定义属性，随用户登录事件上传
+| 字段       | 可为空 | 说明                                                                                                            |
+| ---------- | ------ | --------------------------------------------------------------------------------------------------------------- |
+| userId     | 否     | 长度大于 0 并小于等于 256。只能包含数字、大小写字母、下划线(\_)、横线(-)，用户 ID。不同用户需要保证 ID 的唯一性 |
+| properties | 是     | 自定义属性，随用户登录事件上传                                                                                  |
 
 ### 3.3.账号名称
 
@@ -121,9 +115,9 @@ properties | 是 | 自定义属性，随用户登录事件上传
 + (void)setName:(NSString *)name;
 ```
 
-字段 | 可为空 | 说明
---- | --- | ---
-name | 否 | 长度大于 0 并小于等于 256，账号名
+| 字段 | 可为空 | 说明                              |
+| ---- | ------ | --------------------------------- |
+| name | 否     | 长度大于 0 并小于等于 256，账号名 |
 
 ### 3.4.账号等级
 
@@ -133,10 +127,9 @@ name | 否 | 长度大于 0 并小于等于 256，账号名
 + (void)setLevel:(NSInteger)level;
 ```
 
-字段 | 可为空 | 说明
---- | --- | ---
-level | 否 | 账号等级
-
+| 字段  | 可为空 | 说明     |
+| ----- | ------ | -------- |
+| level | 否     | 账号等级 |
 
 ### 3.5.账号区服
 
@@ -146,9 +139,9 @@ level | 否 | 账号等级
 + (void)setServer:(NSString *)server;
 ```
 
-字段 | 可为空 | 说明
---- | --- | ---
-server | 否 | 账号服务器
+| 字段   | 可为空 | 说明       |
+| ------ | ------ | ---------- |
+| server | 否     | 账号服务器 |
 
 ### 3.6.充值
 
@@ -160,17 +153,18 @@ server | 否 | 账号服务器
 + (void)onChargeSuccess:(NSString *)orderId product:(NSString *)product amount:(NSInteger)amount currencyType:(NSString *)currencyType payment:(NSString *)payment;
 ```
 
-字段 | 可为空 | 说明
---- | --- | ---
-orderId | 否 | 订单 ID
-product | 是 | 产品名称
-amount | 否 | 充值金额（单位分，即无论什么币种，都需要乘以 100）
-currencyType | 是 | 货币类型，参考：人民币 CNY，美元 USD；欧元 EUR
-payment | 是 | 支付方式，如：支付宝
+| 字段         | 可为空 | 说明                                               |
+| ------------ | ------ | -------------------------------------------------- |
+| orderId      | 否     | 订单 ID                                            |
+| product      | 是     | 产品名称                                           |
+| amount       | 否     | 充值金额（单位分，即无论什么币种，都需要乘以 100） |
+| currencyType | 是     | 货币类型，参考：人民币 CNY，美元 USD；欧元 EUR     |
+| payment      | 是     | 支付方式，如：支付宝                               |
 
 常见货币类型的格式参考<a target="_blank" href="https://www.tapdb.com/docs/zh_CN/features/exchangeRate.html">汇率表</a>
 
 #### 3.7.登出
+
 账号登出时，需要调用以下接口清空用户数据。
 
 ```objc
@@ -180,11 +174,7 @@ payment | 是 | 支付方式，如：支付宝
 + (void)clearUser;
 ```
 
-
-
 ### 3.8.自定义事件（如需开通自定义事件，请联系技术支持 QQ：3171097571）
-  
-
 
 需要发送自定义事件时调用，自定义事件的 eventName 和 properties 属性都必须在元数据管理预先配置，才可以使用 SDK 进行发送
 
@@ -199,13 +189,13 @@ payment | 是 | 支付方式，如：支付宝
                          withProperties:@{@"#weapon":@"axe")}];
 ```
 
-
-字段 | 可为空 | 说明
---- | --- | ---
-eventName | 否 | 事件 code，需要在元数据管理预先配置
-properties | 是 | 事件属性，具体字段需要在元数据管理预先配置
+| 字段       | 可为空 | 说明                                       |
+| ---------- | ------ | ------------------------------------------ |
+| eventName  | 否     | 事件 code，需要在元数据管理预先配置        |
+| properties | 是     | 事件属性，具体字段需要在元数据管理预先配置 |
 
 ### 3.9.事件主体操作（账号、设备）
+
 TapDB 目前支持两个事件主体：设备，账号。相应支持的主体操作为初始化，更新和累加。累加操作只支持数值类型。
 需要注意的是，传入的自定义属性需要同预登记属性名保持一致。
 
@@ -224,7 +214,7 @@ TapDB 目前支持两个事件主体：设备，账号。相应支持的主体�
 // 此时设备表的 "firstActiveServer" 字段值为 "server1"
 
 [TapDB deviceInitialize:@{@"firstActiveServer":@"server2"}];
-// 此时设备表的 "firstActiveServer" 字段值还是为 "server1" 
+// 此时设备表的 "firstActiveServer" 字段值还是为 "server1"
 ```
 
 #### 设备属性更新操作
@@ -242,10 +232,10 @@ TapDB 目前支持两个事件主体：设备，账号。相应支持的主体�
 // 此时设备表的 "currentPoints" 字段值为 10
 
 [TapDB deviceUpdate:@{@"currentPoints":@42}];
-// 此时设备表的 "currentPoints" 字段值为 42 
+// 此时设备表的 "currentPoints" 字段值为 42
 ```
 
-#### 设备属性累加操作 
+#### 设备属性累加操作
 
 ```objc
 /// 设备属性增加操作
@@ -260,19 +250,21 @@ TapDB 目前支持两个事件主体：设备，账号。相应支持的主体�
 // 此时设备表的 "totalPoints" 字段值为 10
 
 [TapDB deviceAdd:@{@"totalPoints":@(-2)}];
-// 此时设备表的 "totalPoints" 字段值为 8 
+// 此时设备表的 "totalPoints" 字段值为 8
 ```
 
-#### 账号属性初始化操作 
+#### 账号属性初始化操作
 
 ```objc
-/// 账号属性初始化操作 
+/// 账号属性初始化操作
 /// @param properties 属性字典
 + (void)userInitialize:(NSDictionary *)properties;
 ```
 
 #### 账号属性更新操作
+
 使用方法同设备属性更新操作
+
 ```objc
 /// 账号属性更新操作
 /// @param properties 属性字典
@@ -280,19 +272,20 @@ TapDB 目前支持两个事件主体：设备，账号。相应支持的主体�
 ```
 
 #### 账号属性累加操作
+
 使用方法同设备属性累加操作
+
 ```objc
 /// 账号属性累加操作
 /// @param properties 属性字典 暂时只支持数字属性
 + (void)userAdd:(NSDictionary *)properties;
 ```
 
-
 ### 3.10.设置通用事件属性
 
-对于某些重要的属性需要在每个上传的事件中出现，用户可以将这些属性设置为全局通用的自定义属性，包括静态通用属性和动态通用属性，静态通用属性为固定值，动态通用属性每次获取的值由用户所设置的计算逻辑产生。这些通用属性在注册之后，会被附带在 TapDB 上传的事件中。这里需要注意 trackEvent 中传入的属性优先级 > 动态通用属性优先级 > 静态通用属性优先级，也就是说动态通用属性会覆盖同名的静态通用属性。trackEvent 中的属性会覆盖同名的动态通用属性和静态通用属性。 
+对于某些重要的属性需要在每个上传的事件中出现，用户可以将这些属性设置为全局通用的自定义属性，包括静态通用属性和动态通用属性，静态通用属性为固定值，动态通用属性每次获取的值由用户所设置的计算逻辑产生。这些通用属性在注册之后，会被附带在 TapDB 上传的事件中。这里需要注意 trackEvent 中传入的属性优先级 > 动态通用属性优先级 > 静态通用属性优先级，也就是说动态通用属性会覆盖同名的静态通用属性。trackEvent 中的属性会覆盖同名的动态通用属性和静态通用属性。
 
-#### 添加静态事件属性 
+#### 添加静态事件属性
 
 ```objc
 /// 添加静态事件属性，每个事件都将会发送
@@ -306,12 +299,12 @@ TapDB 目前支持两个事件主体：设备，账号。相应支持的主体�
 
 [TapDB trackEvent:@"#customEvent"
                          withProperties:@{@"#custom1":@"custom")}];
-// 使用 trackEvent 方法上传自定义事件，此时上传的事件中带有上面设置的公共属性 "channel"， 值为 "TapDB" 
+// 使用 trackEvent 方法上传自定义事件，此时上传的事件中带有上面设置的公共属性 "channel"， 值为 "TapDB"
 ```
+
 如果需要添加的通用属性的值在所有事件中相对固定，那么可以调用 registerStaticProperties 方法注册静态通用属性
 
-
-#### 删除单个静态事件属性 
+#### 删除单个静态事件属性
 
 如果要删除某个已添加的静态通用属性，不想让它出现在之后的每个事件中，可以调用 unregisterStaticProperty 方法，将不需要的静态通用属性删除。
 
@@ -321,18 +314,16 @@ TapDB 目前支持两个事件主体：设备，账号。相应支持的主体�
 + (void)unregisterStaticProperty:(NSString *)propertyName;
 ```
 
+#### 删除所有静态事件属性
 
-#### 删除所有静态事件属性  
 ```objc
 /// 删除所有静态事件属性
 + (void)clearStaticProperties;
 ```
 
-
 如果想要删除之前添加的所有静态通用属性，那么可以调用快捷方法 clearStaticProperties，清空所有注册的静态通用方法。
 
-
-#### 添加动态事件属性 
+#### 添加动态事件属性
 
 ```objc
 /// 添加动态事件属性，每次发送事件会调用 dynamicPropertiesCaculator
@@ -351,6 +342,7 @@ TapDB 目前支持两个事件主体：设备，账号。相应支持的主体�
 ```
 
 ## 4 服务端推送接口
+
 ### 4.1 在线人数
 
 由于 SDK 无法推送准确的在线数据，这里提供服务端在线数据推送接口。游戏服务端可以每隔 5 分钟自行统计在线人数，通过接口推送到 TapDB。TapDB 进行数据汇总展现。
@@ -364,33 +356,36 @@ TapDB 目前支持两个事件主体：设备，账号。相应支持的主体�
 
 请求内容：
 
-参数名 | 参数类型 | 参数说明
------- | ------ | ------
-appid | string | 游戏的 APP ID
-onlines | array | 多条在线数据（最多 100 条）
+| 参数名  | 参数类型 | 参数说明                    |
+| ------- | -------- | --------------------------- |
+| appid   | string   | 游戏的 APP ID               |
+| onlines | array    | 多条在线数据（最多 100 条） |
 
 其中 onlines 数组的结构为
 
-参数名 | 参数类型 | 参数说明
------- | ------ | ------
-server | string | 服务器。TapDB 对同一服务器每一个自然 5 分钟仅接受一次数据
-online | int | 在线人数
-timestamp | long | 当前统计数据的时间戳(秒)。TapDB 会按照自然 5 分钟进行数据对齐
+| 参数名    | 参数类型 | 参数说明                                                      |
+| --------- | -------- | ------------------------------------------------------------- |
+| server    | string   | 服务器。TapDB 对同一服务器每一个自然 5 分钟仅接受一次数据     |
+| online    | int      | 在线人数                                                      |
+| timestamp | long     | 当前统计数据的时间戳(秒)。TapDB 会按照自然 5 分钟进行数据对齐 |
 
 示例：
 
-```js
+```json
 {
-"appid":"gkjasd13bbsa1sdk",
-"onlines":[{
-  "server":"s1",
-  "online":123,
-  "timestamp":1489739590
-},{
-  "server":"s2",
-  "online":188,
-  "timestamp":1489739560
-}]
+  "appid": "gkjasd13bbsa1sdk",
+  "onlines": [
+    {
+      "server": "s1",
+      "online": 123,
+      "timestamp": 1489739590
+    },
+    {
+      "server": "s2",
+      "online": 188,
+      "timestamp": 1489739560
+    }
+  ]
 }
 ```
 
@@ -403,8 +398,10 @@ timestamp | long | 当前统计数据的时间戳(秒)。TapDB 会按照自然 5
 ```
 接口：https://e.tapdb.net/event
 ```
+
 内容（注意后面还需要处理一下）：
-```js
+
+```json
 {
   "module": "GameAnalysis", // 固定参数
   "ip": "8.8.8.8", // 可选。充值用户的 IP
@@ -412,23 +409,23 @@ timestamp | long | 当前统计数据的时间戳(秒)。TapDB 会按照自然 5
   "index": "APPID", // 必需。注意 APPID 需要被替换成 TapDB 的 appid
   "identify": "userId", // 必需。用户 ID。必须和 SDK 的 setUser 接口传递的 userId 一样，并且该用户已经通过 SDK 接口进行过推送
   "properties": {
-      "order_id": "100000", // 可选。长度大于 0 并小于等于 256。订单 ID。传递订单 ID 可进行排重，防止计算多次
-      "amount": 100, // 必需。大于 0 并小于等于 100000000000。充值金额。单位分，即无论什么币种，都需要乘以 100
-      "virtual_currency_amount": 100, //获赠虚拟币数量，必传，可为 0
-      "currency_type": "CNY", // 可选。货币类型。国际通行三字母表示法，为空时默认 CNY。参考：人民币 CNY，美元 USD；欧元 EUR
-      "product": "item1", // 可选。长度大于 0 并小于等于 256。商品名称
-      "payment": "alipay" // 可选。长度大于 0 并小于等于 256。充值渠道
+    "order_id": "100000", // 可选。长度大于 0 并小于等于 256。订单 ID。传递订单 ID 可进行排重，防止计算多次
+    "amount": 100, // 必需。大于 0 并小于等于 100000000000。充值金额。单位分，即无论什么币种，都需要乘以 100
+    "virtual_currency_amount": 100, //获赠虚拟币数量，必传，可为 0
+    "currency_type": "CNY", // 可选。货币类型。国际通行三字母表示法，为空时默认 CNY。参考：人民币 CNY，美元 USD；欧元 EUR
+    "product": "item1", // 可选。长度大于 0 并小于等于 256。商品名称
+    "payment": "alipay" // 可选。长度大于 0 并小于等于 256。充值渠道
   }
 }
 ```
 
 假如游戏的 appid 为 abcd1234。构建出 json 字符串后，去掉空格和换行符，然后再进行一次 urlencode。再把结果作为 POST 数据推送
-先替换换行符和空格，变成：   
+先替换换行符和空格，变成：
 
->{"module":"GameAnalysis","name":"charge","index":"abcd1234","identify":"user_id","properties":{"order_id":"100000","amount":100,"virtual_currency_amount":100,"currency_type":"CNY","product":"item1","payment":"alipay"}}
+> {"module":"GameAnalysis","name":"charge","index":"abcd1234","identify":"user_id","properties":{"order_id":"100000","amount":100,"virtual_currency_amount":100,"currency_type":"CNY","product":"item1","payment":"alipay"}}
 
-然后 urlencode，变成如下形式。某些版本的 urlencode 可能会把 `:` 和 `,` 进行编码，不会影响实际使用。   
+然后 urlencode，变成如下形式。某些版本的 urlencode 可能会把 `:` 和 `,` 进行编码，不会影响实际使用。
 
->%7B%22module%22:%22GameAnalysis%22,%22name%22:%22charge%22,%22index%22:%22abcd1234%22,%22identify%22:%22user_id%22,%22properties%22:%7B%22order_id%22:%22100000%22,%22amount%22:100,%22virtual_currency_amount%22:100,%22currency_type%22:%22CNY%22,%22product%22:%22item1%22,%22payment%22:%22alipay%22%7D%7D
+> %7B%22module%22:%22GameAnalysis%22,%22name%22:%22charge%22,%22index%22:%22abcd1234%22,%22identify%22:%22user_id%22,%22properties%22:%7B%22order_id%22:%22100000%22,%22amount%22:100,%22virtual_currency_amount%22:100,%22currency_type%22:%22CNY%22,%22product%22:%22item1%22,%22payment%22:%22alipay%22%7D%7D
 
 成功判断：返回的 HTTP Code 为 200 时认为发送成功，否则认为失败
