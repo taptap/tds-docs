@@ -321,18 +321,13 @@ var config = new TapConfig.TapConfigBuilder()
     .ClientSecret("client_secret")  // 必须，开发者中心对应 Client Token
     .ServerURL("https://ikggdre2.lc-cn-n1-shared.com")
     .RegionType(RegionType.CN)  // 非必须，默认 CN 表示国内
-    .TapDBConfig(true,"channel","gameVersion",true)
     .Builder();
 TapBootstrap.Init(config);
 ```
 
 ```java  
-TapDBConfig tapDBConfig = new TapDBConfig();
-tapDBConfig.setGameVersion("{your game version}");
-tapDBConfig.setChannel("{current channel}");
 TapConfig tdsConfig = new TapConfig.Builder()
         .withAppContext(MainActivity.this)  // Context 上下文
-        .withTapDBConfig(tapDBConfig)
         .withClientId("{your client id}")  // 开发者中心对应 Client ID
         .withClientToken("{your client token}}")  // 开发者中心对应 Client Token
         .withServerUrl("{your server url}}")  // 开发者中心获取
@@ -348,10 +343,6 @@ config.clientId = @"{your client id}";
 config.clientToken = @"{your client token}";
 config.region = TapSDKRegionTypeCN;
 config.serverURL = @"{your server url}";
-config.dbConfig = [TapDBConfig new];
-config.dbConfig.enable = YES;
-config.dbConfig.channel = @"{current channel}";
-config.dbConfig.gameVersion = @"{your game version}";
 [TapBootstrap initWithConfig:config];
 ```
 

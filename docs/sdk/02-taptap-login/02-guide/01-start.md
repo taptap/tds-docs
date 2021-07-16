@@ -22,18 +22,13 @@ var config = new TapConfig.TapConfigBuilder()
                 .ClientSecret("client_secret")
                 .ServerURL("https://ikggdre2.lc-cn-n1-shared.com")
                 .RegionType(RegionType.CN)
-                .TapDBConfig(true,"channel","gameVersion",true)
                 .Builder();
 TapBootstrap.Init(config);
 ```
 
 ```java
-TapDBConfig tapDBConfig = new TapDBConfig();
-tapDBConfig.setGameVersion("{your game version}");
-tapDBConfig.setChannel("{current channel}");
 TapConfig tdsConfig = new TapConfig.Builder()
         .withAppContext(MainActivity.this)
-        .withTapDBConfig(tapDBConfig)
         .withClientId("{your client id}")
         .withClientToken("{your client token}}")
         .withServerUrl("{your server url}}")
@@ -48,10 +43,6 @@ config.clientId = @"{your client id}";
 config.clientToken = @"{your client token}";
 config.region = TapSDKRegionTypeCN;
 config.serverURL = @"{your server url}";
-config.dbConfig = [TapDBConfig new];
-config.dbConfig.enable = YES;
-config.dbConfig.channel = @"{current channel}";
-config.dbConfig.gameVersion = @"{your game version}";
 [TapBootstrap initWithConfig:config];
 ```
 
