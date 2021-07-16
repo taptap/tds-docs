@@ -53,9 +53,10 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 ```json
 "dependencies":{
 // 登录
-"com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#2.1.7",
-"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#2.1.7",
-"com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#2.1.7",
+"com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#3.0.0",
+"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#3.0.0",
+"com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#3.0.0",
+"com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-0.8.2",
 }
 ```
 
@@ -67,7 +68,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 
 #### 手动导入
 
-1. [点击下载 TapSDK-UnityPackage.zip](/tap-download)，然后将该 SDK 解压到方便的位置。
+1. [点击下载](/tap-download) `TapSDK-UnityPackage.zip` 和 `LeanCloud-SDK-Storage-Unity.zip`，然后将该 SDK 解压到方便的位置。
 
 2. 在 Unity 项目中依次转到 **Assets > Import Packages > Custom Packages**。
 
@@ -76,6 +77,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
    - `TapTap_TapBootstrap.unitypackage` 必选，TapSDK 启动器
    - `TapTap_TapCommon.unitypackag` 必选，TapSDK 基础库
    - `TapTap_TapLogin.unitypackage` 必选，TapTap 登录
+   - `LeanCloud-SDK-Storage-Unity.zip` 必须，解压后为 Plugins 文件夹，拖拽至 Unity 即可
 
 
 导入 SDK 后还需进行 Android、iOS 平台的相关配置。
@@ -140,9 +142,11 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
     
     dependencies {  
     ...  
-        implementation (name:'TapBootstrap_2.1.7', ext:'aar')  // 必选：TapSDK 启动器 
-        implementation (name:'TapCommon_2.1.7', ext:'aar') // 必选：TapSDK 基础库 
-		implementation (name:'TapLogin_2.1.7', ext:'aar') // 必选：TapTap 登录 
+        implementation name:'TapBootstrap_3.0.0', ext:'aar'   
+        implementation name:'TapCommon_3.0.0', ext:'aar' 
+		implementation name:'TapLogin_3.0.0', ext:'aar' 
+        implementation 'cn.leancloud:storage-android:8.0.3' 
+        implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 
     }  
     ```
@@ -167,7 +171,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 
 1. 在 Xcode 选择工程，到 **Build Setting > Other Linker Flags** 添加 `-ObjC`。
 
-2. 直接拖拽 [下载的 TapSDK_iOS](/tap-download) 到项目目录即可。
+2. 直接拖拽 [下载的 TapSDK_iOS.zip](/tap-download) 到项目目录即可。
 
 3. 视需要导入下载的资源文件：
 
@@ -228,7 +232,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 <!-- 麦克风 -->
 <key>NSMicrophoneUsageDescription</key>
 <string>说明为何应用需要此项权限</string>
-<!-- IDFA -->
+<!--TapDB 需要用到，收集 IDFA，如应用程序不想弹框，可以设置 TapDB.AdvertiserIDCollectionEnabled(false)-->
 <key>NSUserTrackingUsageDescription</key>
 <string>说明为何应用需要此项权限</string>
 ```
@@ -283,17 +287,14 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
    c) 删除 AppDelegate.m 文件中的两个管理 Scenedelegate 生命周期代理方法
 
     ```objectivec
-
-        #pragma mark - UISceneSession lifecycle
-        - (UISceneConfiguration *)application:(UIApplication *)application configurationForConnectingSceneSession:(UISceneSession *)connectingSceneSession options:(UISceneConnectionOptions *)options {
+    #pragma mark - UISceneSession lifecycle
+    - (UISceneConfiguration *)application:(UIApplication *)application configurationForConnectingSceneSession:(UISceneSession *)connectingSceneSession options:(UISceneConnectionOptions *)options {
     
-        return [[UISceneConfiguration alloc] initWithName:@"Default Configuration" sessionRole:connectingSceneSession.role];
-        }
+    return [[UISceneConfiguration alloc] initWithName:@"Default Configuration" sessionRole:connectingSceneSession.role];
+    }
 
-        - (void)application:(UIApplication *)application didDiscardSceneSessions:(NSSet<UISceneSession *> *)sceneSessions {
-     
-        }
-
+    - (void)application:(UIApplication *)application didDiscardSceneSessions:(NSSet<UISceneSession *> *)sceneSessions {
+    }
     ```
 
    d) 在 `AppDelegate.h` 中添加 `UIWindow`
@@ -301,7 +302,6 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
     ```objectivec
     @property (strong, nonatomic) UIWindow *window;
     ```
-
 
 
 </>
@@ -314,161 +314,66 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 <MultiLang>
 
 ```cs
-TapConfig tapConfig = new TapConfig.Builder()
-    .ClientID("clientId")// 必须
-    .ClientSecret("client_secret")// 必须，开发者中心对应 Client Token
-    .RegionType(RegionType.CN)// 非必须，默认 CN
-    .ConfigBuilder();
+using TapTap.Bootstrap; // 命名空间
 
-TapBootstrap.Init(tapConfig);
+var config = new TapConfig.TapConfigBuilder()
+    .ClientID("client_id")  // 必须，开发者中心对应 Client ID
+    .ClientSecret("client_secret")  // 必须，开发者中心对应 Client Token
+    .ServerURL("https://ikggdre2.lc-cn-n1-shared.com")
+    .RegionType(RegionType.CN)  // 非必须，默认 CN 表示国内
+    .Builder();
+TapBootstrap.Init(config);
 ```
 
-```java       
-TapConfig tapConfig = new TapConfig.Builder()
-        .withAppContext(getApplicationContext())
-        .withRegionType(TapRegionType.CN) // TapRegionType.CN: 国内  TapRegionType.IO: 国外
-        .withClientId("clientId")
-        .withClientSecret("clientSecret")// 开发者中心对应 Client Token
+```java  
+TapConfig tdsConfig = new TapConfig.Builder()
+        .withAppContext(MainActivity.this)  // Context 上下文
+        .withClientId("{your client id}")  // 开发者中心对应 Client ID
+        .withClientToken("{your client token}}")  // 开发者中心对应 Client Token
+        .withServerUrl("{your server url}}")  // 开发者中心获取
+        .withRegionType(TapRegionType.CN)  // TapRegionType.CN: 国内  TapRegionType.IO: 国外
         .build();
-TapBootstrap.init(MainActivity.this, tapConfig);
+TapBootstrap.init(MainActivity.this, tdsConfig);     
 ```
 
 ```objectivec
-    // 初始化 SDK
-    TapConfig *config = TapConfig.new;
-    config.clientId = @"clientId";
-    config.clientSecret=@"clientSecret";// 开发者中心对应 Client Token
-
-    config.region = TapSDKRegionTypeCN;
-    [TapBootstrap initWithConfig:config];
+// 开发者必须至少依赖 `TapBootstrap`、`TapLogin`、`TapCommon` 以及 `LeanCloudObjc` 模块，并按照如下方式完成初始化：
+TapConfig *config = [TapConfig new];
+config.clientId = @"{your client id}";
+config.clientToken = @"{your client token}";
+config.region = TapSDKRegionTypeCN;
+config.serverURL = @"{your server url}";
+[TapBootstrap initWithConfig:config];
 ```
 
 </MultiLang>
 
-## 登录回调
+## 登录
 
-注册登录回调，以接收登录结果。
-
-<MultiLang>
-
-```cs
-TapBootstrap.RegisterLoginResultListener(new MyLoginCallback());
-public class MyLoginCallback : ITapLoginResultListener {
-  public void OnLoginSuccess(AccessToken accessToken)
-  {
-      Debug.Log("登录成功： " + accessToken.ToJSON());
-  }
-
-  public void OnLoginError(TapError error)
-  {
-      Debug.Log("登录失败： " + error.errorDescription);
-  }
-
-  public void OnLoginCancel()
-  {
-      Debug.Log("登录取消");
-  }
-}
-```
-
-```java
-TapBootstrap.registerLoginResultListener(new TapLoginResultListener() {
-    @Override
-    public void loginSuccess(AccessToken accessToken) {
-        Log.d(TAG, "onLoginSuccess: " + accessToken.toJSON());
-    }
-
-    @Override
-    public void loginFail(TapError tapError) {
-        Log.d(TAG, "onLoginError: " + tapError.toJSON());
-    }
-
-    @Override
-    public void loginCancel() {
-        Log.d(TAG, "onLoginCancel");
-    }
-});
-```
-
-```objectivec
-// 注册登录回调
-[TapBootstrap registerLoginResultDelegate:self];
-
-// 实现回调方法
-// 登录成功回调
-// @param token token 对象
-- (void)onLoginSuccess:(AccessToken *)token{
-    NSLog (@"onLoginSuccess");
-}
-
-// 登录取消
-- (void)onLoginCancel{
-    NSLog (@"onLoginCancel");
-}
-
-// 登录失败
-// @param error 失败原因
-- (void)onLoginError:(NSError *)error{
-    NSLog (@"onLoginError error");
-}
-```
-
-</MultiLang>
-
-## AccessToken
-
-上面代码示例中的 `AccessToken` 用于用户鉴权，过期时间为 90 天（过期后 SDK 会自动清除本地缓存），可以传到游戏服务端去获取用户信息，参见 [获取用户信息](/sdk/taptap-login/guide/userinfo#流程)。
-
-`AccessToken` 示例：
-
-```json
-{
-   "access_token":"accessToken",
-   "kid":"kid",
-   "macAlgorithm":"macAlgorithm",
-   "tokenType":"tokenType",
-   "macKey":"macKey",
-   "expireIn" :7776000
-}
-```
-
-### 参数说明
-
-参数  | 描述
-| ------ | ------ |
-access_token | 用户登录后的凭证
-kid  | 当前实际返回的 kid 和 accessToken 值相等，建议使用 accessToken
-macAlgorithm  | 固定为 `hmac-sha-1`
-tokenType  | 固定为 `mac`
-macKey  | mac 密钥
-expireIn  | 过期时间
-
-
-## TapTap 登录
-
-在尝试登录用户前先检查登录状态。
+注册登录回调，以接收登录结果。在尝试登录用户前先检查登录状态。
 
 ### 检查登录状态
 
-尝试获取当前用户的 `Access Token`，如 `Access Token` 为空则用户未登录。
+`TDSUser` 会在本地缓存当前用户的登录信息，所以如果一个玩家在游戏内登录之后，下次启动用户通过调用 `TDSUser#currentUser` 可以得到之前登录的账户实例，此时玩家无需再次登录即可使用。
+如果玩家在游戏内进行了登出，则本地缓存的登录信息也会被删除，下次进入游戏时 `TDSUser#currentUser` 会返回一个 null 对象。
+
 
 <MultiLang>
 
 ```cs
-TapBootstrap.GetAccessToken((accessToken, error) => {
-   if (accessToken == null)
-   {
-       Debug.Log("当前未登录");
-   }
-   else
-   {
-       Debug.Log("已登录");
-   }
-});
+var currentUser = await TDSUser.GetCurrent();
+if (null == currentUser)
+{
+    Debug.Log("当前未登录");
+}
+else 
+{
+    Debug.Log("已登录");
+}
 ```
 
 ```java
-if (TapBootstrap.getCurrentToken() == null) {
+if (null == TDSUser.currentUser()) {
     // 未登录
 } else {
     // 已登录
@@ -476,14 +381,13 @@ if (TapBootstrap.getCurrentToken() == null) {
 ```
 
 ```objectivec
-AccessToken *accessToken = [TapBootstrap getCurrentToken];
-if (accessToken == nil) {
+TDSUser *currentUser = [TDSUser currentUser]
+if (currentUser == nil) {
     // 未登录
 } else {
     // 已登录
 }
 ```
-
 </MultiLang>
 
 ### 登录
@@ -491,21 +395,38 @@ if (accessToken == nil) {
 <MultiLang>
 
 ```cs
-LoginType loginType = LoginType.TAPTAP;
-TapBootstrap.Login(loginType, new string[] { "public_profile" });
+var tdsUser = await TDSUser.LoginWithTapTap();
 ```
 
 ```java
-/**
- * @param activity 当前 Activity
- * @param @param LoginType.TAPTAP
- */
-TapBootstrap.login(MainActivity.this, LoginType.TAPTAP, "public_profile");
+TDSUser.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
+    @Override
+    public void onSuccess(TDSUser resultUser) {
+        Toast.makeText(MainActivity.this, "succeed to login with Taptap.", Toast.LENGTH_SHORT).show();
+        // 开发者可以调用 resultUser 的方法获取更多属性。
+        String userId = resultUser.getObjectId();
+        String userName = resultUser.getUsername();
+        String avatar = (String) resultUser.get("avatar");
+    }
+
+    @Override
+    public void onFail(TapError error) {
+        Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+    }
+}, TapLoginHelper.SCOPE_PUBLIC_PROFILE);
 ```
 
 ```objectivec
-TapBootstrapLoginType loginType = TapBootstrapLoginTypeTapTap;
-[TapBootstrap login:(loginType) permissions:@[@"public_profile"]];
+[TDSUser loginByTapTapWithPermissions:@[@"public_profile"] callback:^(TDSUser * _Nullable user, NSError * _Nullable error) {
+    if (user) {
+        // 开发者可以调用 user 的方法获取更多属性。
+        NSString *userId = user.objectId;
+        NSString *username = user[@"nickname"];
+        NSString *avatar = user[@"avatar"];
+    } else {
+        NSLog(@"%@", error);
+    }
+}];
 ```
 
 </MultiLang>
@@ -519,15 +440,16 @@ TapBootstrapLoginType loginType = TapBootstrapLoginTypeTapTap;
 <MultiLang>
 
 ```cs
-TapBootstrap.Logout();
+TDSUser.Logout();
 ```
 
 ```java
-TapBootstrap.logout();
+TDSUser currentUser = TDSUser.currentUser();
+currentUser.logOut().
 ```
 
 ```objectivec
-[TapBootstrap logout];
+[TDSUser logOut];
 ```
 
 </MultiLang>
