@@ -1,6 +1,6 @@
 ---
 id: start
-title: TapTap内建账户系统
+title: 内建账户系统
 sidebar_label: 功能接入
 ---
 
@@ -67,7 +67,7 @@ var tdsUser = await TDSUser.LoginWithTapTap();
 ```
 
 ```java
-TapBootstrap.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
+TDSUser.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
     @Override
     public void onSuccess(TDSUser resultUser) {
         Toast.makeText(MainActivity.this, "succeed to login with Taptap.", Toast.LENGTH_SHORT).show();
@@ -181,6 +181,7 @@ authData.put("access_token", "ACCESS_TOKEN");
 authData.put("expires_in", 7200);
 authData.put("scope", "SCOPE");
 
+TDSUser currentUser = TDSUser.currentUser();  // 获取当前登录的账户实例
 currentUser.associateWithAuthData(authData, "weixin").subscribe(new Observer<LCUser>() {
     @Override
     public void onSubscribe(@NotNull Disposable d) {
@@ -237,7 +238,7 @@ await currentUser.DisassociateWithAuthData("weixin");
 
 ```java
 // 以解绑微信账户为例子
-TDSUser currentUser = TDSUser.currentUser();
+TDSUser currentUser = TDSUser.currentUser();  // 获取当前登录的账户实例
 currentUser.disassociateWithAuthData("weixin").subscribe(new Observer<TDSUser>() {
   @Override
   public void onSubscribe(Disposable disposable) {
@@ -286,7 +287,7 @@ currentUser.disassociateWithAuthData("weixin").subscribe(new Observer<TDSUser>()
 ```
 
 ```java
-TDSUser currentUser = TDSUser.currentUser();
+TDSUser currentUser = TDSUser.currentUser();  // 获取当前登录的账户实例
 currentUser.put("nickname", "打不死的青铜");
 currentUser.put("cups", 256);
 currentUser.saveInBackground().subscribe(new Observer<LCObject>() {
@@ -340,7 +341,7 @@ TDSUser.Logout();
 ```
 
 ```java
-TDSUser currentUser = TDSUser.currentUser();
+TDSUser currentUser = TDSUser.currentUser();  // 获取当前登录的账户实例
 currentUser.logOut().
 ```
 
@@ -361,8 +362,11 @@ currentUser.logOut().
 #### 如果游戏之前是接入 TapSDK 2.x 版本完成的 TapTap 登录，可以直接升级到 TapSDK 3.0 吗？
 在 TapSDK 2.x 中，TapTap 登录是调用 TapBootstrap 的 API 完成的，其示例如下：
 
-```cs
+<MultiLang>
 
+```cs
+LoginType loginType = LoginType.TAPTAP;
+TapBootstrap.Login(loginType, new string[] { "public_profile" });
 ```
 
 ```java
@@ -400,10 +404,14 @@ TapBootstrap.login(MainActivity.this, LoginType.TAPTAP, "public_profile");
 [TapBootstrap login:TapBootstrapLoginTypeTapTap permissions:nil];
 ```
 
+</MultiLang>
+
 由于我们把登录接口做了调整，在 3.0 版本的 SDK 中开发者可以通过 `TapBootstrap#loginWithTapTap` 一次调用直接得到登录用户信息：
 
-```cs
+<MultiLang>
 
+```cs
+var tdsUser = await TDSUser.LoginWithTapTap();
 ```
 
 ```java
@@ -433,5 +441,8 @@ TapBootstrap.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
     }
 }];
 ```
+</MultiLang>
 
+:::info
 不过这需要我们后端做一些调整，计划在 3.2 版本中支持 2.x 游戏直接升级使用。
+:::
