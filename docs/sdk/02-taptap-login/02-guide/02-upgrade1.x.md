@@ -1,7 +1,7 @@
 ---
 id: upgrade1.x
-title: 1.x升级3.x指南
-sidebar_label: 1.x升级3.x
+title: 1.x 升级 3.x 指南
+sidebar_label: 1.x 升级 3.x
 ---
 
 import MultiLang from '@theme/MultiLang';

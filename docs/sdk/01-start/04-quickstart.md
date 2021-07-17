@@ -317,12 +317,12 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 ```cs
 using TapTap.Bootstrap; // 命名空间
 
-var config = new TapConfig.TapConfigBuilder()
+var config =  new TapConfig.Builder()
     .ClientID("client_id")  // 必须，开发者中心对应 Client ID
-    .ClientSecret("client_secret")  // 必须，开发者中心对应 Client Token
+    .ClientToken("client_token")  // 必须，开发者中心对应 Client Token
     .ServerURL("https://ikggdre2.lc-cn-n1-shared.com")
     .RegionType(RegionType.CN)  // 非必须，默认 CN 表示国内
-    .Builder();
+    .ConfigBuilder();
 TapBootstrap.Init(config);
 ```
 
