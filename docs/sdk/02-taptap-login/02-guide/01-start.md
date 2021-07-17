@@ -12,7 +12,7 @@ import MultiLang from '@theme/MultiLang';
 从 TapSDK 3.0 开始，我们在单纯的 TapTap 登录之外，还提供了一个内建账户系统供游戏使用：开发者可以直接用 TapTap OAuth 授权的结果生成一个游戏内的账号（TDSUser），然后用该账号保存更多玩家数据。同时，我们也支持将更多第三方认证登录的结果绑定到这一账号上来（以及后续的解绑操作）。
 
 ## 初始化
-如果要使用内建账户系统，开发者必须至少依赖 `TapBootstrap`、`TapLogin`、`TapCommon` 以及 `LeanCloudObjc` 模块，并按照如下方式完成初始化：
+
 <MultiLang>
 
 
@@ -224,6 +224,7 @@ NSDictionary *authData = @{
 
 ```cs
 // 与微信账户解除绑定
+var currentUser = await TDSUser.GetCurrent();  // 获取当前登录的账户实例
 await currentUser.DisassociateWithAuthData("weixin");
 ```
 
@@ -346,94 +347,7 @@ currentUser.logOut().
 `TDSUser` 会在本地缓存当前用户的登录信息，所以如果一个玩家在游戏内登录之后，下次启动用户通过调用 `TDSUser#currentUser` 可以得到之前登录的账户实例，此时玩家无需再次登录即可使用。
 如果玩家在游戏内进行了登出，则本地缓存的登录信息也会被删除，下次进入游戏时 `TDSUser#currentUser` 会返回一个 null 对象。
 
-## 一些疑问
-#### TapSDK 1.x 可以直接升级到 TapSDK 3.0 吗？
-可以。
-
-#### 如果游戏之前是接入 TapSDK 2.x 版本完成的 TapTap 登录，可以直接升级到 TapSDK 3.0 吗？
-在 TapSDK 2.x 中，TapTap 登录是调用 TapBootstrap 的 API 完成的，其示例如下：
-
-<MultiLang>
-
-```cs
-LoginType loginType = LoginType.TAPTAP;
-TapBootstrap.Login(loginType, new string[] { "public_profile" });
-```
-
-```java
-TapBootstrap.registerLoginResultListener(new TapLoginResultListener() {
-    @Override
-    public void loginSuccess(AccessToken accessToken) {
-        Log.d(TAG, "onLoginSuccess: " + accessToken.toJSON());
-        TapBootstrap.getUser(new Callback<TapUser>() {
-            @Override
-            public void onSuccess(TapUser tapUser) {
-                // 通过 tapUser 获取到当前登录用户的 ID、昵称、头像等基本信息
-            }
-
-            @Override
-            public void onFail(TapError tapError) {
-
-            }
-        });
-    }
-
-    @Override
-    public void loginFail(TapError tapError) {
-        Log.d(TAG, "onLoginError: " + tapError.toJSON());
-    }
-
-    @Override
-    public void loginCancel() {
-        Log.d(TAG, "onLoginCancel");
-    }
-});
-TapBootstrap.login(MainActivity.this, LoginType.TAPTAP, "public_profile");
-```
-
-```objectivec
-[TapBootstrap login:TapBootstrapLoginTypeTapTap permissions:nil];
-```
-
-</MultiLang>
-
-由于我们把登录接口做了调整，在 3.0 版本的 SDK 中开发者可以通过 `TapBootstrap#loginWithTapTap` 一次调用直接得到登录用户信息：
-
-<MultiLang>
-
-```cs
-var tdsUser = await TDSUser.LoginWithTapTap();
-```
-
-```java
-TapBootstrap.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
-    @Override
-    public void onSuccess(TDSUser resultUser) {
-        Toast.makeText(MainActivity.this, "succeed to login with Taptap.", Toast.LENGTH_SHORT).show();
-        // 开发者可以调用 resultUser 的方法获取更多属性。
-        String userId = resultUser.getObjectId();
-        String userName = resultUser.getUsername();
-        String avatar = (String) resultUser.get("avatar");
-    }
-
-    @Override
-    public void onFail(TapError error) {
-        Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
-    }
-}, "public_profile");
-```
-
-```objectivec
-[TDSUser loginByTapTapWithPermissions:@[@"public_profile"] callback:^(TDSUser * _Nullable user, NSError * _Nullable error) {
-    if (user) {
-        NSString *userId = user.objectId;
-    } else {
-        NSLog(@"%@", error);
-    }
-}];
-```
-</MultiLang>
 
 :::info
-不过这需要我们后端做一些调整，计划在 3.2 版本中支持 2.x 游戏直接升级使用。
+TapSDK 2.x 版本暂不支持升级到 3.0 版本，计划在 TapSDK 3.2 版本中支持对 TapSDK 2.x 的升级。
 :::
