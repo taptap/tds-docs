@@ -17,12 +17,12 @@ import MultiLang from '@theme/MultiLang';
 
 
 ```cs
-var config = new TapConfig.TapConfigBuilder()
+var config = new TapConfig.Builder()
                 .ClientID("client_id")
                 .ClientSecret("client_secret")
                 .ServerURL("https://ikggdre2.lc-cn-n1-shared.com")
                 .RegionType(RegionType.CN)
-                .Builder();
+                .ConfigBuilder();
 TapBootstrap.Init(config);
 ```
 
