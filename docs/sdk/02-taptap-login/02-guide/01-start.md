@@ -18,11 +18,11 @@ import MultiLang from '@theme/MultiLang';
 
 ```cs
 var config = new TapConfig.Builder()
-                .ClientID("client_id")
-                .ClientSecret("client_secret")
-                .ServerURL("https://ikggdre2.lc-cn-n1-shared.com")
-                .RegionType(RegionType.CN)
-                .ConfigBuilder();
+                          .ClientID("client_id")
+                          .ClientSecret("client_secret")
+                          .ServerURL("https://ikggdre2.lc-cn-n1-shared.com")
+                          .RegionType(RegionType.CN)
+                          .ConfigBuilder();
 TapBootstrap.Init(config);
 ```
 
@@ -333,8 +333,7 @@ TDSUser.Logout();
 ```
 
 ```java
-TDSUser currentUser = TDSUser.currentUser();  // 获取当前登录的账户实例
-currentUser.logOut().
+TDSUser.logOut().
 ```
 
 ```objectivec
