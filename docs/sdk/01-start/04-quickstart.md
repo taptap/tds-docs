@@ -445,8 +445,7 @@ TDSUser.Logout();
 ```
 
 ```java
-TDSUser currentUser = TDSUser.currentUser();
-currentUser.logOut().
+TDSUser.logOut().
 ```
 
 ```objectivec
