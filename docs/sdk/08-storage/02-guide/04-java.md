@@ -1404,7 +1404,7 @@ GeoPoint 的经纬度的类型是数字，且经度需在 -180.0 到 180.0 之�
 
 ## 用户
 
-我们在[登录功能的开发指南](/sdk/taptapt-login/guide/start) 中简单介绍了内建账户系统（TDSUser）的基本用法。
+我们在[登录功能的开发指南](/sdk/taptap-login/guide/start) 中简单介绍了内建账户系统（TDSUser）的基本用法。
 这里再详细介绍 TDSUser 的用法。
 
 ### TDSUser 和 LCUser
@@ -1569,7 +1569,7 @@ TDSUser.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
 
 ### 第三方账户登录
 
-我们在登录功能的开发指南中已经介绍了如何[使用 TapTap OAuth 授权结果直接登录账户系统](/sdk/taptapt-login/guide/start#用-taptap-oauth-授权结果直接登录账户系统)。
+我们在登录功能的开发指南中已经介绍了如何[使用 TapTap OAuth 授权结果直接登录账户系统](/sdk/taptap-login/guide/start#用-taptap-oauth-授权结果直接登录账户系统)。
 
 其实除了 TapTap 外，我们也支持直接使用第三方社交平台（例如微信、微博、QQ 等）的账户信息来创建自己的账户体系并完成登录，也允许将既有账户与第三方账户绑定起来，这样终端用户后续可以直接用第三方账户信息来便捷登录。
 
