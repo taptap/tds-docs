@@ -1404,138 +1404,20 @@ GeoPoint 的经纬度的类型是数字，且经度需在 -180.0 到 180.0 之�
 
 ## 用户
 
-用户系统几乎是每款应用都要加入的功能，我们为此专门提供了一个 `LCUser` 类来方便应用使用各项用户管理的功能。
+我们在[登录功能的开发指南](/sdk/taptap-login/guide/start) 中简单介绍了内建账户系统（TDSUser）的基本用法。
+这里再详细介绍 TDSUser 的用法。
 
-`LCUser` 是 `LCObject` 的子类，这意味着任何 `LCObject` 提供的方法也适用于 `LCUser`，唯一的区别就是 `LCUser` 提供一些额外的用户管理相关的功能。每个应用都有一个专门的 `_User` class 用于存放所有的 `LCUser`。
+### TDSUser 和 LCUser
 
-### 用户的属性
-
-`LCUser` 相比一个普通的 `LCObject` 多出了以下属性：
-
-- `username`：用户的用户名。
-- `password`：用户的密码。
-- `email`：用户的电子邮箱。
-- `emailVerified`：用户的电子邮箱是否已验证。
-- `mobilePhoneNumber`：用户的手机号。
-- `mobilePhoneVerified`：用户的手机号是否已验证。
-
-在接下来对用户功能的介绍中我们会逐一了解到这些属性。
-
-### 注册
-
-用户第一次打开应用的时候，可以让用户注册一个账户。下面的代码展示了一个典型的使用用户名和密码注册的流程：
-
-```java
-// 创建实例
-LCUser user = new LCUser();
-
-// 等同于 user.put("username", "Tom")
-user.setUsername("Tom");
-user.setPassword("cat!@#123");
-
-// 可选
-user.setEmail("tom@leancloud.rocks");
-user.setMobilePhoneNumber("+8618200008888");
-
-// 设置其他属性的方法跟 LCObject 一样
-user.put("gender", "secret");
-
-user.signUpInBackground().subscribe(new Observer<LCUser>() {
-    public void onSubscribe(Disposable disposable) {}
-    public void onNext(LCUser user) {
-        // 注册成功
-        System.out.println("注册成功。objectId：" + user.getObjectId());
-    }
-    public void onError(Throwable throwable) {
-        // 注册失败（通常是因为用户名已被使用）
-    }
-    public void onComplete() {}
-});
-```
-
-新建 `LCUser` 的操作应使用 `signUpInBackground` 而不是 `saveInBackground`，但以后的更新操作就可以用 `saveInBackground` 了。
-
-如果收到 `202` 错误码，意味着 `_User` 表里已经存在使用同一 `username` 的账号，此时应提示用户换一个用户名。除此之外，每个用户的 `email` 和 `mobilePhoneNumber` 也需要保持唯一性，否则会收到 `203` 或 `214` 错误。
-可以考虑在注册时把用户的 `username` 设为与 `email` 相同，这样用户可以直接 [用邮箱重置密码](#重置密码)。
-
-采用「用户名 + 密码」注册时需要注意：密码是以明文方式通过 HTTPS 加密传输给云端，云端会以密文存储密码（云端对密码的长度、复杂度不作限制），并且我们的加密算法是无法通过所谓「彩虹表撞库」获取的，这一点请开发者放心。换言之，用户的密码只可能用户本人知道，开发者不论是通过控制台还是 API 都是无法获取。另外我们需要强调 **在客户端，应用切勿再次对密码加密，这会导致 [重置密码](#重置密码) 等功能失效**。
-
-### 登录
-
-下面的代码用用户名和密码登录一个账户：
-
-```java
-LCUser.logIn("Tom", "cat!@#123").subscribe(new Observer<LCUser>() {
-    public void onSubscribe(Disposable disposable) {}
-    public void onNext(LCUser user) {
-        // 登录成功
-    }
-    public void onError(Throwable throwable) {
-        // 登录失败（可能是密码错误）
-    }
-    public void onComplete() {}
-});
-```
-
-#### 邮箱登录
-
-下面的代码用邮箱和密码登录一个账户：
-
-```java
-LCUser.loginByEmail("tom@leancloud.rocks", "cat!@#123").subscribe(new Observer<LCUser>() {
-    public void onSubscribe(Disposable disposable) {}
-    public void onNext(LCUser user) {
-        // 登录成功
-    }
-    public void onError(Throwable throwable) {
-        // 登录失败（可能是密码错误）
-    }
-    public void onComplete() {}
-});
-```
-
-#### 单设备登录
-
-某些场景下需要确保用户的账户在同一时间只在一台设备上登录，也就是说当用户在一台设备上登录后，其他设备上的会话全部失效。可以按照以下方案来实现：
-
-1. 新建一个专门用于记录用户登录信息和当前设备信息的 class。
-2. 每当用户在新设备上登录时，将该 class 中该用户对应的设备更新为该设备。
-3. 在另一台设备上打开客户端时，检查该设备是否与云端保存的一致。若不一致，则将用户 [登出](#当前用户)。
-
-#### 账户锁定
-
-输入错误的密码或验证码会导致用户登录失败。如果在 15 分钟内，同一个用户登录失败的次数大于 6 次，该用户账户即被云端暂时锁定，此时云端会返回错误码 `{ "code": 1, "error": "You have exceeded the maximum number of login attempts, please try again later, or consider resetting your password." }`，开发者可在客户端进行必要提示。
-
-锁定将在最后一次错误登录的 15 分钟之后由云端自动解除，开发者无法通过 SDK 或 REST API 进行干预。在锁定期间，即使用户输入了正确的验证信息也不允许登录。这个限制在 SDK 和云引擎中都有效。
-
-### 验证邮箱
-
-可以通过要求用户在登录或使用特定功能之前验证邮箱的方式防止恶意注册。默认情况下，当用户注册或变更邮箱后，`emailVerified` 会被设为 `false`。在应用的 **云服务控制台 > 数据存储 > 用户 > 设置** 中，可以开启 **启用邮箱验证功能** 选项，这样当用户注册或变更邮箱时，会收到一封含有验证链接的邮件。在同一设置页面还可找到阻止未验证邮箱的用户登录的选项。
-
-如果用户忘记点击链接并且在未来某一时刻需要进行验证，可以用下面的代码发送一封新的邮件：
-
-```java
-LCUser.requestEmailVerifyInBackground("tom@leancloud.rocks").subscribe(new Observer<LCNull>() {
-    public void onSubscribe(Disposable disposable) {}
-    public void onNext(LCNull null) {
-        // 成功调用
-    }
-    public void onError(Throwable throwable) {
-        // 调用出错
-    }
-    public void onComplete() {}
-});
-```
-
-用户点击邮件内的链接后，`emailVerified` 会变为 `true`。如果用户的 `email` 属性为空，则该属性永远不会为 `true`。
+TDSUser 类继承自 LCUser 类。
+LCUser 是 LeanCloud 提供的账户系统，TDSUser 基本沿用了其功能和接口，并针对 TDS 的需求进行了细微调整，所以我们推荐大家使用 TDSUser 类来构建玩家账户系统。
 
 ### 当前用户
 
 用户登录后，SDK 会自动将会话信息存储到客户端，这样用户在下次打开客户端时无需再次登录。下面的代码检查是否有已经登录的用户：
 
-
 ```java
-LCUser currentUser = LCUser.getCurrentUser();
+TDSUser currentUser = TDSUser.getCurrentUser();
 if (currentUser != null) {
     // 跳到首页
 } else {
@@ -1543,25 +1425,22 @@ if (currentUser != null) {
 }
 ```
 
-
 会话信息会长期有效，直到用户主动登出：
 
-
 ```java
-LCUser.logOut();
+TDSUser.logOut();
 
 // currentUser 变为 null
-LCUser currentUser = LCUser.getCurrentUser();
+TDSUser currentUser = TDSUser.getCurrentUser();
 ```
-
 
 ### 设置当前用户
 
-用户登录后，云端会返回一个 **session token** 给客户端，它会由 SDK 缓存起来并用于日后同一 `LCUser` 的鉴权请求。session token 会被包含在每个客户端发起的 HTTP 请求的 header 里面，这样云端就知道是哪个 `LCUser` 发起的请求了。
+用户登录后，云端会返回一个 **session token** 给客户端，它会由 SDK 缓存起来并用于日后同一 `TDSUser` 的鉴权请求。session token 会被包含在每个客户端发起的 HTTP 请求的 header 里面，这样云端就知道是哪个 `TDSUser` 发起的请求了。
 
 以下是一些应用可能需要用到 session token 的场景：
 
-- 应用根据以前缓存的 session token 登录（可以用 `LCUser.getCurrentUser().getSessionToken()` 获取到当前用户的 session token，在服务端等受信任的环境下，可以通过 `Master Key` 读取任意用户的 `sessionToken` 字段以获取 session token）。
+- 应用根据以前缓存的 session token 登录（可以用 `TDSUser.getCurrentUser().getSessionToken()` 获取到当前用户的 session token，在服务端等受信任的环境下，可以通过 `Master Key` （即 `Server Secret`）读取任意用户的 `sessionToken` 字段以获取 session token）。
 - 应用内的某个 WebView 需要知道当前登录的用户。
 - 在服务端登录后，返回 session token 给客户端，客户端根据返回的 session token 登录。
 
@@ -1569,11 +1448,11 @@ LCUser currentUser = LCUser.getCurrentUser();
 
 
 ```java
-LCUser.becomeWithSessionTokenInBackground("anmlwi96s381m6ca7o7266pzf").subscribe(new Observer<LCUser>() {
+TDSUser.becomeWithSessionTokenInBackground("anmlwi96s381m6ca7o7266pzf").subscribe(new Observer<TDSUser>() {
     public void onSubscribe(Disposable disposable) {}
-    public void onNext(LCUser user) {
+    public void onNext(TDSUser user) {
         // 修改 currentUser
-        LCUser.changeCurrentUser(user, true);
+        TDSUser.changeCurrentUser(user, true);
     }
     public void onError(Throwable throwable) {
         // session token 无效
@@ -1591,7 +1470,7 @@ LCUser.becomeWithSessionTokenInBackground("anmlwi96s381m6ca7o7266pzf").subscribe
 
 
 ```java
-boolean authenticated = LCUser.getCurrentUser().isAuthenticated();
+boolean authenticated = TDSUser.getCurrentUser().isAuthenticated();
 if (authenticated) {
     // session token 有效
 } else {
@@ -1599,44 +1478,12 @@ if (authenticated) {
 }
 ```
 
-
-### 重置密码
-
-我们都知道，应用一旦加入账户密码系统，那么肯定会有用户忘记密码的情况发生。对于这种情况，我们为用户提供了多种重置密码的方法。
-
-邮箱重置密码的流程如下：
-
-1. 用户输入注册的电子邮箱，请求重置密码；
-2. 云端向该邮箱发送一封包含重置密码的特殊链接的电子邮件；
-3. 用户点击重置密码链接后，一个特殊的页面会打开，让他们输入新密码；
-4. 用户的密码已被重置为新输入的密码。
-
-首先让用户填写注册账户时使用的邮箱，然后调用下面的方法：
-
-```java
-LCUser.requestPasswordResetInBackground("tom@leancloud.rocks").subscribe(new Observer<LCNull>() {
-    public void onSubscribe(Disposable disposable) {}
-    public void onNext(LCNull null) {
-        // 成功调用
-    }
-    public void onError(Throwable throwable) {
-        // 调用出错
-    }
-    public void onComplete() {}
-});
-```
-
-上面的代码会查询 `_User` 表中是否有对象的 `email` 属性与前面提供的邮箱匹配。如果有的话，则向该邮箱发送一封密码重置邮件。之前提到过，应用可以让 `username` 与 `email` 保持一致，也可以单独收集用户的邮箱并将其存为 `email`。
-
-密码重置邮件的内容可在应用的 **云服务云服务控制台 > 数据存储 > 用户 > 邮件模版** 中自定义。更多关于自定义邮件模板和验证链接的内容，请参考[《自定义邮件验证和重设密码页面》](https://leancloud.cn/docs/custom-reset-verify-page.html)。
-
-
 ### 用户的查询
 
 可以直接构建一个针对 `_User` 的 `LCQuery` 来查询用户：
 
 ```java
-LCQuery<LCUser> userQuery = LCUser.getQuery();
+LCQuery<TDSUser> userQuery = TDSUser.getQuery(TDSUser.class);
 ```
 
 
@@ -1646,11 +1493,11 @@ LCQuery<LCUser> userQuery = LCUser.getQuery();
 
 ### 关联用户对象
 
-关联 `LCUser` 的方法和 `LCObject` 是一样的。下面的代码为一名作者保存了一本书，然后获取所有该作者写的书：
+关联 `TDSUser` 的方法和 `LCObject` 是一样的。下面的代码为一名作者保存了一本书，然后获取所有该作者写的书：
 
 ```java
 LCObject book = new LCObject("Book");
-LCUser author = LCUser.getCurrentUser();
+TDSUser author = TDSUser.getCurrentUser();
 book.put("title", "我的第五本书");
 book.put("author", author);
 book.saveInBackground().subscribe(new Observer<LCObject>() {
@@ -1675,28 +1522,27 @@ book.saveInBackground().subscribe(new Observer<LCObject>() {
 
 ### 用户对象的安全
 
-`LCUser` 类自带安全保障，只有通过 `logIn` 或者 `signUpInBackground` 这种经过鉴权的方法获取到的 `LCUser` 才能进行保存或删除相关的操作，保证每个用户只能修改自己的数据。
+`TDSUser` 类自带安全保障，只有通过登录等经过鉴权的方法获取到的 `TDSUser` 才能进行保存或删除相关的操作，保证每个用户只能修改自己的数据。
 
-这样设计是因为 `LCUser` 中存储的大多数数据都比较敏感，包括手机号、社交网络账号等等。为了用户的隐私安全，即使是应用的开发者也应避免直接接触这些数据。
+这样设计是因为 `TDSUser` 中存储的大多数数据都比较敏感，包括手机号、社交网络账号等等。为了用户的隐私安全，即使是应用的开发者也应避免直接接触这些数据。
 
 下面的代码展现了这种安全措施：
 
 ```java
-LCUser.logIn("Tom", "cat!@#123").subscribe(new Observer<LCUser>() {
-    public void onSubscribe(Disposable disposable) {}
-    public void onNext(LCUser user) {
-        // 试图修改用户名
-        user.put("username", "Jerry");
-        // 密码已被加密，这样做会获取到空字符串
-        String password = user.getString("password");
-        // 可以执行，因为用户已鉴权
-        user.save();
-
+TDSUser.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
+    @Override
+    public void onSuccess(TDSUser resultUser) {
+        Toast.makeText(MainActivity.this, "succeed to login with Taptap.", Toast.LENGTH_SHORT).show();
+        // 可以修改，因为已经鉴权
+        resultUser.put("username", "Toodle");
+        // 仅为示意，实际项目中需使用异步方法以免阻塞
+        resultUser.save();
+        
         // 绕过鉴权直接获取用户
-        LCQuery<LCUser> query = new LCQuery<>("_User");
-        query.getInBackground(user.getObjectId()).subscribe(new Observer<LCUser>() {
+        LCQuery<TDSUser> query = new LCQuery<>("_User");
+        query.getInBackground(user.getObjectId()).subscribe(new Observer<TDSUser>() {
             public void onSubscribe(Disposable disposable) {}
-            public void onNext(LCUser unauthenticatedUser) {
+            public void onNext(TDSUser unauthenticatedUser) {
                 unauthenticatedUser.put("username", "Toodle");
                 // 会出错，因为用户未鉴权
                 unauthenticatedUser.save();
@@ -1705,16 +1551,17 @@ LCUser.logIn("Tom", "cat!@#123").subscribe(new Observer<LCUser>() {
             public void onComplete() {}
         });
     }
-    public void onError(Throwable throwable) {}
-    public void onComplete() {}
-});
+
+    @Override
+    public void onFail(TapError error) {
+        Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+    }
+}, "public_profile");
 ```
 
-通过 `LCUser.getCurrentUser()` 获取的 `LCUser` 总是经过鉴权的。
+通过 `TDSUser.getCurrentUser()` 获取的 `TDSUser` 总是经过鉴权的。
 
-要查看一个 `LCUser` 是否经过鉴权，可以调用 `isAuthenticated` 方法。通过经过鉴权的方法获取到的 `LCUser` 无需进行该检查。
-
-注意，用户的密码只能在注册的时候进行设置，日后如需修改，只能通过 [重置密码](#重置密码) 的方式进行。密码不会被缓存在本地。如果尝试直接获取已登录用户的密码，会得到 `null`。
+要查看一个 `TDSUser` 是否经过鉴权，可以调用 `isAuthenticated` 方法。通过经过鉴权的方法获取到的 `TDSUser` 无需进行该检查。
 
 ### 其他对象的安全
 
@@ -1722,7 +1569,9 @@ LCUser.logIn("Tom", "cat!@#123").subscribe(new Observer<LCUser>() {
 
 ### 第三方账户登录
 
-云服务支持应用层直接使用第三方社交平台（例如微信、微博、QQ 等）的账户信息来创建自己的账户体系并完成登录，也允许将既有账户与第三方账户绑定起来，这样终端用户后续可以直接用第三方账户信息来便捷登录。
+我们在登录功能的开发指南中已经介绍了如何[使用 TapTap OAuth 授权结果直接登录账户系统](/sdk/taptap-login/guide/start#用-taptap-oauth-授权结果直接登录账户系统)。
+
+其实除了 TapTap 外，我们也支持直接使用第三方社交平台（例如微信、微博、QQ 等）的账户信息来创建自己的账户体系并完成登录，也允许将既有账户与第三方账户绑定起来，这样终端用户后续可以直接用第三方账户信息来便捷登录。
 
 例如以下的代码展示了终端用户使用微信登录的处理流程：
 
@@ -1735,10 +1584,10 @@ thirdPartyData.put("access_token", "ACCESS_TOKEN");
 // 可选
 thirdPartyData.put("refresh_token", "REFRESH_TOKEN");
 thirdPartyData.put("scope", "SCOPE");
-LCUser.loginWithAuthData(thirdPartyData, "weixin").subscribe(new Observer<LCUser>() {
+TDSUser.loginWithAuthData(TDSUser.class, thirdPartyData, "weixin").subscribe(new Observer<TDSUser>() {
     public void onSubscribe(Disposable disposable) {
     }
-    public void onNext(LCUser avUser) {
+    public void onNext(TDSUser avUser) {
        System.out.println("成功登录");
     }
     public void onError(Throwable throwable) {
@@ -1749,7 +1598,7 @@ LCUser.loginWithAuthData(thirdPartyData, "weixin").subscribe(new Observer<LCUser
 });
 ```
 
-`LCUser#loginWithAuthData` 系列方法需要两个参数来唯一确定一个账户：
+`TDSUser#loginWithAuthData` 系列方法需要两个参数来唯一确定一个账户：
 
 - 第三方平台的名字，就是前例中的 `weixin`，该名字由应用层自己决定。
 - 第三方平台的授权信息，就是前例中的 `thirdPartyData`（一般包括 `uid`、`token`、`expires` 等信息，与具体的第三方平台有关）。
@@ -1859,22 +1708,22 @@ LCUser.loginWithAuthData(thirdPartyData, "weixin").subscribe(new Observer<LCUser
 
 如果不希望云端自动验证 `Access Token`，可以在 **控制台 > 存储 > 设置** 里面取消勾选 **第三方登录时，验证用户 AccessToken 合法性**。
 
-配置平台账号的目的在于创建 `LCUser` 时，云端会使用相关信息去校验请求参数 `thirdPartyData` 的合法性，确保 `LCUser` 实际对应着一个合法真实的用户，确保平台安全性。
+配置平台账号的目的在于创建 `TDSUser` 时，云端会使用相关信息去校验请求参数 `thirdPartyData` 的合法性，确保 `TDSUser` 实际对应着一个合法真实的用户，确保平台安全性。
 
 #### 绑定第三方账户
 
-用户已经有了 LCUser 并登录成功后，可以绑定新的第三方账号信息。
-绑定成功后，新的第三方账户信息会被添加到 LCUser 的 authData 字段里。
+用户已经有了 TDSUser 并登录成功后，可以绑定新的第三方账号信息。
+绑定成功后，新的第三方账户信息会被添加到 TDSUser 的 authData 字段里。
 
 例如，下面的代码可以关联微信账户：
 
 ```java
-avUser.associateWithAuthData(weixinData, "weixin").subscribe(new Observer<LCUser>() {
+avUser.associateWithAuthData(weixinData, "weixin").subscribe(new Observer<TDSUser>() {
     @Override
     public void onSubscribe(Disposable d) {
     }
     @Override
-    public void onNext(LCUser avUser) {
+    public void onNext(TDSUser avUser) {
         System.out.println("绑定成功");
     }
     @Override
@@ -1897,13 +1746,13 @@ avUser.associateWithAuthData(weixinData, "weixin").subscribe(new Observer<LCUser
 例如，下面的代码可以解除用户和微信账户的关联：
 
 ```java
-LCUser avUser = LCUser.currentUser();
-avUser.dissociateWithAuthData("weixin").subscribe(new Observer<LCUser>() {
+TDSUser avUser = TDSUser.currentUser();
+avUser.dissociateWithAuthData("weixin").subscribe(new Observer<TDSUser>() {
     @Override
     public void onSubscribe(Disposable d) {
     }
     @Override
-    public void onNext(LCUser avUser) {
+    public void onNext(TDSUser avUser) {
         System.out.println("解绑成功");
     }
     @Override
@@ -1915,68 +1764,6 @@ avUser.dissociateWithAuthData("weixin").subscribe(new Observer<LCUser>() {
     }
 });
 ```
-
-
-#### 扩展：第三方登录时补充完整的用户信息
-
-有些产品，新用户在使用第三方账号授权拿到相关信息后，仍然需要补充设置用户名、手机号、密码等重要信息后，才被允许登录成功。
-
-这时要使用 `loginWithauthData` 登录接口的 `failOnNotExist` 参数并将其设置为 `true`。服务端会判断是否已存在能匹配上的 `authData`，如果不存在则会返回 `211` 错误码和 `Could not find user` 报错信息。开发者根据这个 `211` 错误码，跳转到要求输入用户名、密码、手机号等信息的页面，实例化一个 `LCUser` 对象，保存上述补充数据，再次调用 `loginWithauthData` 接口进行登录，并 **不再传入 `failOnNotExist` 参数**。示例代码如下：
-
-```java
-Map<String, Object> thirdPartyData = new HashMap<String, Object>();
-thirdPartyData.put("expires_in", 7200);
-thirdPartyData.put("openid", "OPENID");
-thirdPartyData.put("access_token", "ACCESS_TOKEN");
-thirdPartyData.put("refresh_token", "REFRESH_TOKEN");
-thirdPartyData.put("scope", "SCOPE");
-Boolean failOnNotExist = true;
-LCUser user = new LCUser();
-user.loginWithAuthData(thirdPartyData, "weixin", failOnNotExist).subscribe(new Observer<LCUser>() {
-    @Override
-    public void onSubscribe(Disposable d) {
-    }
-    @Override
-    public void onNext(LCUser avUser) {
-        System.out.println("存在匹配的用户，登录成功");
-    }
-    @Override
-    public void onError(Throwable e) {
-        LCException avException = new LCException(e);
-        int code = avException.getCode();
-        if (code == 211){
-            // 跳转到输入用户名、密码、手机号等业务页面
-        } else {
-            System.out.println("发生错误：" + e.getMessage());
-        }
-    }
-    @Override
-    public void onComplete() {
-    }
-});
-
-// 跳转到输入用户名、密码、手机号等业务页面之后
-LCUser avUser = new LCUser();
-avUser.setUsername("Tom");
-avUser.setMobilePhoneNumber("+8618200008888");
-avUser.loginWithAuthData(thirdPartyData, "weixin").subscribe(new Observer<LCUser>() {
-    @Override
-    public void onSubscribe(Disposable d) {
-    }
-    @Override
-    public void onNext(LCUser avUser) {
-        System.out.println("登录成功");
-    }
-    @Override
-    public void onError(Throwable e) {
-        System.out.println("登录失败：" + e.getMessage());
-    }
-    @Override
-    public void onComplete() {
-    }
-});
-```
-
 
 #### 扩展：接入 UnionID 体系，打通不同子产品的账号系统
 
@@ -2023,15 +1810,15 @@ thirdPartyData.put("expires_in", 1384686496);
 thirdPartyData.put("uid", "officeopenid");
 thirdPartyData.put("access_token", "officetoken");
 thirdPartyData.put("scope", "SCOPE");
-LCUser.loginWithAuthData(thirdPartyData, "wxleanoffice",
+TDSUser.loginWithAuthData(TDSUser.class, thirdPartyData, "wxleanoffice",
    "unionid4a", "weixin", true)   // 新增参数，分别表示 uniondId，unionIdPlatform，asMainAccount
                                   // 对于 unionIdPlatform，这里使用「weixin」来指代微信平台。
-   .subscribe(new Observer<LCUser>() {
+   .subscribe(new Observer<TDSUser>() {
     @Override
     public void onSubscribe(Disposable d) {
     }
     @Override
-    public void onNext(LCUser avUser) {
+    public void onNext(TDSUser avUser) {
         System.out.println("登录成功");
     }
     @Override
@@ -2079,14 +1866,14 @@ thirdPartyData.put("expires_in", 1384686496);
 thirdPartyData.put("uid", "supportopenid");
 thirdPartyData.put("access_token", "supporttoken");
 thirdPartyData.put("scope", "SCOPE");
-LCUser.loginWithAuthData(thirdPartyData, "wxleansupport", "unionid4a",
+TDSUser.loginWithAuthData(TDSUser.class, thirdPartyData, "wxleansupport", "unionid4a",
   "weixin",     // 这里指定 unionIdPlatform，使用「weixin」来指代微信平台。
-  false).subscribe(new Observer<LCUser>() {
+  false).subscribe(new Observer<TDSUser>() {
     @Override
     public void onSubscribe(Disposable d) {
     }
     @Override
-    public void onNext(LCUser avUser) {
+    public void onNext(TDSUser avUser) {
         System.out.println("登录成功");
     }
     @Override
@@ -2126,9 +1913,9 @@ LCUser.loginWithAuthData(thirdPartyData, "wxleansupport", "unionid4a",
 }
 ```
 
-在新的登录方式中，当一个用户以「平台名为 `wxleanoffice`、uid 为 `officeopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息登录得到新的 `LCUser` 后，接下来这个用户以「平台名为 `wxleansupport`、uid 为 `supportopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息登录时，云端判定是同样的 UnionID，就直接把来自 `wxleansupport` 的新用户数据加入到已有账户的 `authData` 里了，不会再创建新的账户。
+在新的登录方式中，当一个用户以「平台名为 `wxleanoffice`、uid 为 `officeopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息登录得到新的 `TDSUser` 后，接下来这个用户以「平台名为 `wxleansupport`、uid 为 `supportopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息登录时，云端判定是同样的 UnionID，就直接把来自 `wxleansupport` 的新用户数据加入到已有账户的 `authData` 里了，不会再创建新的账户。
 
-这样一来，云端通过识别平台性的用户唯一标识 UnionID，让来自同一个 UnionID 体系内的应用程序、小程序等不同平台的用户都绑定到了一个 `LCUser` 上，实现互通。
+这样一来，云端通过识别平台性的用户唯一标识 UnionID，让来自同一个 UnionID 体系内的应用程序、小程序等不同平台的用户都绑定到了一个 `TDSUser` 上，实现互通。
 
 ##### 为 UnionID 建立索引
 
@@ -2161,7 +1948,7 @@ LCUser.loginWithAuthData(thirdPartyData, "wxleansupport", "unionid4a",
 
 上面的流程是用户先登录了「云服务通讯」这个主应用，然后再登录「云服务技术支持」这个副应用，所以账号都被通过 UnionID 有效关联起来了。可能有人会想到另外一个问题，如果用户 B 先登录副应用，后登录主应用，这时候会发生什么事情呢？
 
-用户 B 首先登录副应用的时候，提供了「平台名为 `wxleansupport`、uid 为 `supportopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息，并且指定「UnionIDPlatform 为 `weixin`、`asMainAccount` 为 false」（与上面的调用完全一致），此时云端由于找不到存在的 UnionID，会新建一个 `LCUser` 对象，该账户 `authData` 结果为：
+用户 B 首先登录副应用的时候，提供了「平台名为 `wxleansupport`、uid 为 `supportopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息，并且指定「UnionIDPlatform 为 `weixin`、`asMainAccount` 为 false」（与上面的调用完全一致），此时云端由于找不到存在的 UnionID，会新建一个 `TDSUser` 对象，该账户 `authData` 结果为：
 
 ```json
 {
@@ -2176,7 +1963,7 @@ LCUser.loginWithAuthData(thirdPartyData, "wxleansupport", "unionid4a",
 }
 ```
 
-用户 B 接着又使用了主应用，ta 再次通过微信登录，此时以「平台名为 `wxleanoffice`、uid 为 `officeopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息，以及「UnionIDPlatform 为 `weixin`、`asMainAccount` 为 true」的参数进行登录，此时云端由于找不到存在的 UnionID，会再次新建一个 `LCUser` 对象，该账户 `authData` 结果为：
+用户 B 接着又使用了主应用，ta 再次通过微信登录，此时以「平台名为 `wxleanoffice`、uid 为 `officeopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息，以及「UnionIDPlatform 为 `weixin`、`asMainAccount` 为 true」的参数进行登录，此时云端由于找不到存在的 UnionID，会再次新建一个 `TDSUser` 对象，该账户 `authData` 结果为：
 
 ```json
 {
@@ -2252,64 +2039,6 @@ objectId | 微信用户 | authData.{platform} | authData._{platform}_unionid
 4 | UserC | openid4（对应产品 2） | N/A
 5 | UserB | openid5（对应产品 1）/openid2（对应产品 2）/openid11（对应产品 3） | unionId_user_B
 6 | UserD | openid7（对应产品 1）/openid8（对应产品 2）/openid12（对应产品 3） | unionId_user_D
-
-### 匿名用户
-
-将数据与用户关联需要首先创建一个用户，但有时你不希望强制用户在一开始就进行注册。使用匿名用户，可以让应用不提供注册步骤也能创建用户。下面的代码创建一个新的匿名用户：
-
-```java
-LCUser.logInAnonymously().subscribe(new Observer<LCUser>() {
-    public void onSubscribe(Disposable disposable) {}
-    public void onNext(LCUser user) {
-        // user 是新的匿名用户
-    }
-    public void onError(Throwable throwable) {}
-    public void onComplete() {}
-});
-```
-
-
-可以像给普通用户设置属性那样给匿名用户设置 `username`、`password`、`email` 等属性，还可以通过走正常的注册流程来将匿名用户转化为普通用户。匿名用户能够：
-
-- [使用用户名和密码注册](#注册)
-- [关联第三方平台](#第三方账户登录)，比如微信
-
-下面的代码为一名匿名用户设置用户名和密码：
-
-```java
-// currentUser 是个匿名用户
-LCUser currentUser = LCUser.getCurrentUser();
-
-currentUser.setUsername("Tom");
-currentUser.setPassword("cat!@#123");
-
-currentUser.signUpInBackground().subscribe(new Observer<LCUser>() {
-    public void onSubscribe(Disposable disposable) {}
-    public void onNext(LCUser user) {
-        // currentUser 已经转化为普通用户
-    }
-    public void onError(Throwable throwable) {
-        // 注册失败（通常是因为用户名已被使用）
-    }
-    public void onComplete() {}
-});
-```
-
-
-下面的代码检查当前用户是否为匿名用户：
-
-```java
-LCUser currentUser = LCUser.getCurrentUser();
-if (currentUser.isAnonymous()) {
-  // currentUser 是匿名用户
-} else {
-  // currentUser 不是匿名用户
-}
-```
-
-
-如果匿名用户未能在登出前转化为普通用户，那么该用户将无法再次登录同一账户，且之前产生的数据也无法被取回。
-
 
 ## 角色
 

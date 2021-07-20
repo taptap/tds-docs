@@ -4,29 +4,6 @@ title: 数据存储、即时通讯 Java SDK 配置
 sidebar_label: Java SDK 配置
 ---
 
-
-
-## SDK 维护期说明
-
-我们于 2018 年 9 月推出了新的 [Java Unified SDK](https://leancloudblog.com/java-unified-sdk-kai-fang-ce-shi-tong-zhi/)，兼容纯 Java、云引擎和 Android 等多个平台，老的 Android SDK（版本号低于 `5.0.0`，`groupId` 为 `cn.leancloud.android` 的 libraries）已于 2019 年 9 月底停止维护。
-
-Java Unified SDK 根据底层依赖的 JSON 解析库的不同，有两个不同分支：
-
-- 6.x 分支依赖 [fastjson](https://github.com/alibaba/fastjson) 来进行 JSON 解析；
-- 7.0 以后版本使用 [Gson](https://github.com/google/gson) 来进行 JSON 解析（最新版本）；
-
-两个版本的对外接口完全一致，但是考虑到平台兼容性和稳定性，我们推荐大家使用带 Gson 库的版本来进行开发。
-
-从 2021 年 6 月开始，我们推出了 8.0 版本，与 7.x 版本相比，主要的变化是改变了公开类的前缀（`AV` -> `LC`），同时也删除了一些长期处于 `deprecated` 状态的接口，它将是我们今后会长期维护的版本。欢迎老 SDK 的用户尽快切换到新的 Java Unified SDK，具体迁移方法见 [Java SDK 的 README](https://github.com/leancloud/java-unified-sdk#migration-to-8x)。
-
-请开发者注意，各个版本 SDK 的维护期如下：
-
-1. 6.0 以前版本已经停止维护。
-2. 原 7.x 版本从现在开始进入维护期（只改 bug，不增加新功能），并计划于 2022 年 6 月停止维护。
-3. 8.x 会是我们今后长期维护版本。
-
-> 下面的流程都是基于 8.x 版本 Java Unified SDK 书写。
-
 ## 平台与 SDK 对应关系
 Java SDK 主要包含以下几个 library，其层次结构以及平台对应关系如下：
 
