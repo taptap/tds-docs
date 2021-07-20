@@ -1409,7 +1409,8 @@ GeoPoint 的经纬度的类型是数字，且经度需在 -180.0 到 180.0 之�
 
 ### TDSUser 和 LCUser
 
-TDSUser 类继承自 LCUser 类，我们推荐应用使用 TDSUser 类。
+TDSUser 类继承自 LCUser 类。
+LCUser 是 LeanCloud 提供的账户系统，TDSUser 基本沿用了其功能和接口，并针对 TDS 的需求进行了细微调整，所以我们推荐大家使用 TDSUser 类来构建玩家账户系统。
 
 ### 当前用户
 
@@ -1439,7 +1440,7 @@ TDSUser currentUser = TDSUser.getCurrentUser();
 
 以下是一些应用可能需要用到 session token 的场景：
 
-- 应用根据以前缓存的 session token 登录（可以用 `TDSUser.getCurrentUser().getSessionToken()` 获取到当前用户的 session token，在服务端等受信任的环境下，可以通过 `Master Key` 读取任意用户的 `sessionToken` 字段以获取 session token）。
+- 应用根据以前缓存的 session token 登录（可以用 `TDSUser.getCurrentUser().getSessionToken()` 获取到当前用户的 session token，在服务端等受信任的环境下，可以通过 `Master Key` （即 `Server Secret`）读取任意用户的 `sessionToken` 字段以获取 session token）。
 - 应用内的某个 WebView 需要知道当前登录的用户。
 - 在服务端登录后，返回 session token 给客户端，客户端根据返回的 session token 登录。
 
@@ -1482,7 +1483,7 @@ if (authenticated) {
 可以直接构建一个针对 `_User` 的 `LCQuery` 来查询用户：
 
 ```java
-LCQuery<TDSUser> userQuery = TDSUser.getQuery();
+LCQuery<TDSUser> userQuery = TDSUser.getQuery(TDSUser.class);
 ```
 
 
@@ -1583,7 +1584,7 @@ thirdPartyData.put("access_token", "ACCESS_TOKEN");
 // 可选
 thirdPartyData.put("refresh_token", "REFRESH_TOKEN");
 thirdPartyData.put("scope", "SCOPE");
-TDSUser.loginWithAuthData(thirdPartyData, "weixin").subscribe(new Observer<TDSUser>() {
+TDSUser.loginWithAuthData(TDSUser.class, thirdPartyData, "weixin").subscribe(new Observer<TDSUser>() {
     public void onSubscribe(Disposable disposable) {
     }
     public void onNext(TDSUser avUser) {
@@ -1809,7 +1810,7 @@ thirdPartyData.put("expires_in", 1384686496);
 thirdPartyData.put("uid", "officeopenid");
 thirdPartyData.put("access_token", "officetoken");
 thirdPartyData.put("scope", "SCOPE");
-TDSUser.loginWithAuthData(thirdPartyData, "wxleanoffice",
+TDSUser.loginWithAuthData(TDSUser.class, thirdPartyData, "wxleanoffice",
    "unionid4a", "weixin", true)   // 新增参数，分别表示 uniondId，unionIdPlatform，asMainAccount
                                   // 对于 unionIdPlatform，这里使用「weixin」来指代微信平台。
    .subscribe(new Observer<TDSUser>() {
@@ -1865,7 +1866,7 @@ thirdPartyData.put("expires_in", 1384686496);
 thirdPartyData.put("uid", "supportopenid");
 thirdPartyData.put("access_token", "supporttoken");
 thirdPartyData.put("scope", "SCOPE");
-TDSUser.loginWithAuthData(thirdPartyData, "wxleansupport", "unionid4a",
+TDSUser.loginWithAuthData(TDSUser.class, thirdPartyData, "wxleansupport", "unionid4a",
   "weixin",     // 这里指定 unionIdPlatform，使用「weixin」来指代微信平台。
   false).subscribe(new Observer<TDSUser>() {
     @Override
