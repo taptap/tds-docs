@@ -2,7 +2,7 @@
  * doc: https://v2.docusaurus.io/docs/docusaurus.config.js
  * */
 
-const baseUrl = '/v2-doc/';
+const baseUrl = '/docs/';
 
 module.exports = {
   title: 'TapTap 开发者文档中心',
