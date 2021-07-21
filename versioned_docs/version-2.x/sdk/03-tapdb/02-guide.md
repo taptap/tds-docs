@@ -22,11 +22,11 @@ TapSDK 提供了一套可供游戏开发者收集账号数据的 API。
 ```cs
 "dependencies":{
 // 登录
-"com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#2.1.7",
-"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#2.1.7",
-"com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#2.1.7",
+"com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#2.1.8",
+"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#2.1.8",
+"com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#2.1.8",
 // 数据分析
-"com.taptap.tds.tapdb": "https://github.com/TapTap/TapDB-Unity.git#2.1.7",
+"com.taptap.tds.tapdb": "https://github.com/TapTap/TapDB-Unity.git#2.1.8",
 }
 ```
 
@@ -39,10 +39,10 @@ repositories{
 
 dependencies {  
 ...  
-    implementation (name:'TapBootstrap_2.1.7', ext:'aar')  // 必选： TapSDK 启动器 
-    implementation (name:'TapCommon_2.1.7', ext:'aar') // 必选：TapSDK 基础库 
-    implementation (name:'TapLogin_2.1.7', ext:'aar') // 必选：TapTap 登录 
-    implementation (name:'TapDB_2.1.7', ext:'aar') // 数据统计
+    implementation (name:'TapBootstrap_2.1.8', ext:'aar')  // 必选： TapSDK 启动器 
+    implementation (name:'TapCommon_2.1.8', ext:'aar') // 必选：TapSDK 基础库 
+    implementation (name:'TapLogin_2.1.8', ext:'aar') // 必选：TapTap 登录 
+    implementation (name:'TapDB_2.1.8', ext:'aar') // 数据统计
 }  
 ```
 
