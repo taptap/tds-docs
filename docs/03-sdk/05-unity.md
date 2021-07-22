@@ -193,7 +193,7 @@ public static void setServer(string server)
 
 充值成功时调用
 
-提醒：<Red>由于客户端行为，不可避免会有投机者尝试破解充值；如果没有通过服务器校验，一定会造成数据不准确，强烈建议使用服务器接口进行充值数据回调。</Red>（ [4.2.充值](#42充值)）
+提醒：<Red>由于客户端行为，不可避免会有投机者尝试破解充值；如果没有通过服务器校验，一定会造成数据不准确，强烈建议使用服务器接口进行充值数据回调。</Red>（ [4.2.充值](#42-充值)）
 
 ```csharp
 public static void onChargeSuccess(string orderId, string product, Int32 amount, string currencyType, string payment)
