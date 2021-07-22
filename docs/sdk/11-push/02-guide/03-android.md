@@ -277,7 +277,7 @@ LCQuery pushQuery = LCInstallation.getQuery();
 // 假设 THE_INSTALLATION_ID 是保存在用户表里的 installationId，
 // 可以在应用启动的时候获取并保存到用户表
 pushQuery.whereEqualTo("installationId", THE_INSTALLATION_ID);
-LCPush.sendMessageInBackground("installationId1112",pushQuery).subscribe(new Observer() {
+LCPush.sendMessageInBackground("Tarara invited you to play Arc Symphony with her!",pushQuery).subscribe(new Observer() {
     @Override
     public void onSubscribe(Disposable d) {
     }
