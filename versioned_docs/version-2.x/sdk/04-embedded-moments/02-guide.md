@@ -18,11 +18,11 @@ import MultiLang from '@theme/MultiLang';
 ```cs
 "dependencies":{
 // 登录
-"com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#2.1.7",
-"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#2.1.7",
-"com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#2.1.7",
+"com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#2.1.8",
+"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#2.1.8",
+"com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#2.1.8",
 // 动态
-"com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#2.1.7",
+"com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#2.1.8",
 }
 ```
 
@@ -35,10 +35,10 @@ repositories{
 
 dependencies {  
 ...  
-    implementation (name:'TapBootstrap_2.1.7', ext:'aar')  // 必选：TapSDK 启动器 
-    implementation (name:'TapCommon_2.1.7', ext:'aar') // 必选：TapSDK 基础库 
-    implementation (name:'TapLogin_2.1.7', ext:'aar') // 必选：TapTap 登录 
-    implementation (name:'TapMoment_2.1.7', ext:'aar') // TapTap 内嵌动态
+    implementation (name:'TapBootstrap_2.1.8', ext:'aar')  // 必选：TapSDK 启动器 
+    implementation (name:'TapCommon_2.1.8', ext:'aar') // 必选：TapSDK 基础库 
+    implementation (name:'TapLogin_2.1.8', ext:'aar') // 必选：TapTap 登录 
+    implementation (name:'TapMoment_2.1.8', ext:'aar') // TapTap 内嵌动态
 }  
 ```
 
