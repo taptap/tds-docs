@@ -10,10 +10,10 @@ sidebar_label: 即时通讯 REST API
 
 请求的 Base URL 可以在**云服务控制台 > 设置 > 应用 Keys > 服务器地址**查看。
 对于 POST 和 PUT 请求，请求的主体必须是 JSON 格式，而且 HTTP Header 的 Content-Type 需要设置为 `application/json`。
-请求的鉴权是通过 HTTP Header 里面包含的键值对来进行的，详见[数据存储 REST API 使用详解](/sdk/storage/guide/rest/)中《请求格式》一节的说明。
+请求的鉴权是通过 HTTP Header 里面包含的键值对来进行的，详见[数据存储 REST API 使用详解](/sdk/storage/guide/rest)中《请求格式》一节的说明。
 
 
-`_Conversation` 表包含一些内置的关键字段定义了对话的属性、成员等，单聊、群聊、聊天室、服务号均在此表中，详见[即时通讯总览](/sdk/im/guide/overview/)的《对话》一节。
+`_Conversation` 表包含一些内置的关键字段定义了对话的属性、成员等，单聊、群聊、聊天室、服务号均在此表中，详见[即时通讯总览](/sdk/im/guide/overview)的《对话》一节。
 不过为了避免出现数据不一致问题，我们不推荐调用数据存储相关的 API 直接操作 `_Conversation` 表中的数据。
 
 当前的 API 版本为 `1.2`：
@@ -41,7 +41,7 @@ curl -X POST \
 ```
 
 上面的例子会创建一个最简单的对话，包括两个 client ID 为 BillGates 和 SteveJobs 的初始成员。对话创建成功会返回 objectId，即即时通讯中的对话 ID，客户端就可以通过这个 ID 发送消息了。新创建的对话可以在 `_Conversation` 表内找到。
-对话的字段可参考[即时通讯总览](/sdk/im/guide/overview/)的《对话》一节。
+对话的字段可参考[即时通讯总览](/sdk/im/guide/overview)的《对话》一节。
 传入 `"unique": true` 参数可以保证对话的唯一性。
 
 返回
@@ -79,7 +79,7 @@ curl -X GET \
 ---|---|---
 skip | 可选 |
 limit | 可选 | 与 skip 联合使用实现分页
-where | 可选 | 参见[数据存储 REST API 使用详解](/sdk/storage/guide/rest/)的《查询》一节
+where | 可选 | 参见[数据存储 REST API 使用详解](/sdk/storage/guide/rest)的《查询》一节
 
 
 返回
@@ -273,7 +273,7 @@ from_client | 必填 | 消息的发件人 client Id
 message | 必填 | 消息内容（这里的消息内容的本质是字符串，但是我们对字符串内部的格式没有做限定，理论上开发者可以随意发送任意格式，只要大小不超过 5 KB 限制即可。）
 transient | 可选 | 是否为暂态消息，默认 false
 no_sync | 可选 | 默认情况下消息会被同步给在线的 from_client 用户的客户端，设置为 true 禁用此功能。
-push_data | 可选 | 以消息附件方式设置本条消息的离线推送通知内容。如果目标接收者使用的是 iOS 设备并且当前不在线，我们会按照该参数填写的内容来发离线推送。请参看[即时通讯开发指南第二篇](/sdk/im/guide/intermediate/)的《离线推送通知》一节的说明。
+push_data | 可选 | 以消息附件方式设置本条消息的离线推送通知内容。如果目标接收者使用的是 iOS 设备并且当前不在线，我们会按照该参数填写的内容来发离线推送。请参看[即时通讯开发指南第二篇](/sdk/im/guide/intermediate)的《离线推送通知》一节的说明。
 priority | 可选 | 定义消息优先级，可选值为 high、normal、low，分别对应高、中、低三种优先级。该参数大小写不敏感，默认为中优先级 normal。本参数仅对暂态消息或聊天室的消息有效，高优先级下在服务端与用户设备的连接拥塞时依然排队。
 mention_all | 可选 | 布尔类型，用于提醒对话内所有成员注意本消息。
 mention_client_ids | 可选 | 数组类型，表示需要提醒注意本消息的对话内成员 client_id 列表，最多能包含 20 个 client Id。 
@@ -289,7 +289,7 @@ mention_client_ids | 可选 | 数组类型，表示需要提醒注意本消息�
 ### 查询历史消息
 
 该接口要求使用 master key。
-为了保证获取聊天记录的安全性，可以开启签名认证，具体可以参考[即时通讯开发指南第三篇](/sdk/im/guide/senior/)的《安全与签名》一节。
+为了保证获取聊天记录的安全性，可以开启签名认证，具体可以参考[即时通讯开发指南第三篇](/sdk/im/guide/senior)的《安全与签名》一节。
 
 ```sh
 curl -X GET \
@@ -473,7 +473,7 @@ curl -X DELETE \
 
 ### 对话权限
 
-该功能介绍可参考[即时通讯开发指南第三篇](/sdk/im/guide/senior/)中的《权限管理与黑名单》一节。
+该功能介绍可参考[即时通讯开发指南第三篇](/sdk/im/guide/senior)中的《权限管理与黑名单》一节。
 
 #### 增加权限
 
@@ -642,7 +642,7 @@ next | 可选 | 第一次查询时返回，后面的查询带着这个参数，�
 
 ### 黑名单
 
-该功能介绍可参考[即时通讯开发指南第三篇](/sdk/im/guide/senior/)中的《权限管理与黑名单》一节。
+该功能介绍可参考[即时通讯开发指南第三篇](/sdk/im/guide/senior)中的《权限管理与黑名单》一节。
 
 #### 增加对话黑名单
 
@@ -725,7 +725,7 @@ curl -X POST \
   https://{{host}}/1.2/rtm/chatrooms
 ```
 
-对话的字段可参考[即时通讯总览](/sdk/im/guide/overview/)的《对话》一节。
+对话的字段可参考[即时通讯总览](/sdk/im/guide/overview)的《对话》一节。
 
 返回
 
@@ -752,7 +752,7 @@ curl -X GET \
 ---|---|---
 skip | 可选 |
 limit | 可选 | 与 skip 联合使用实现分页
-where | 可选 | 请参考[数据存储 REST API 使用详解](/sdk/storage/guide/rest/)的《查询》一节。
+where | 可选 | 请参考[数据存储 REST API 使用详解](/sdk/storage/guide/rest)的《查询》一节。
 
 
 返回
@@ -873,7 +873,7 @@ mention_client_ids | 可选 | 数组类型，表示需要提醒注意本消息�
 ### 查询历史消息
 
 该接口要求使用 master key。
-为了保证获取聊天记录的安全性，可以开启签名认证，具体可以参考[即时通讯开发指南第三篇](/sdk/im/guide/senior/)的《安全与签名》一节。
+为了保证获取聊天记录的安全性，可以开启签名认证，具体可以参考[即时通讯开发指南第三篇](/sdk/im/guide/senior)的《安全与签名》一节。
 
 ```sh
 curl -X GET \
@@ -1057,7 +1057,7 @@ curl -X DELETE \
 
 ### 对话权限
 
-该功能介绍可参考[即时通讯开发指南第三篇](/sdk/im/guide/senior/)中的《权限管理与黑名单》一节。
+该功能介绍可参考[即时通讯开发指南第三篇](/sdk/im/guide/senior)中的《权限管理与黑名单》一节。
 
 #### 增加权限
 
@@ -1227,7 +1227,7 @@ next | 可选 | 第一次查询时返回，后面的查询带着这个参数，�
 
 ### 黑名单
 
-该功能介绍可参考[即时通讯开发指南第三篇](/sdk/im/guide/senior/)中的《权限管理与黑名单》一节。
+该功能介绍可参考[即时通讯开发指南第三篇](/sdk/im/guide/senior)中的《权限管理与黑名单》一节。
 
 #### 增加聊天室黑名单
 
@@ -1310,7 +1310,7 @@ curl -X POST \
   https://{{host}}/1.2/rtm/service-conversations
 ```
 
-对话的字段可参考[即时通讯总览](/sdk/im/guide/overview/)的《对话》一节。
+对话的字段可参考[即时通讯总览](/sdk/im/guide/overview)的《对话》一节。
 
 返回
 
@@ -1337,7 +1337,7 @@ curl -X GET \
 ---|---|---
 skip | 可选 |
 limit | 可选 | 与 skip 联合使用实现分页
-where | 可选 | 请参考[数据存储 REST API 使用详解](/sdk/storage/guide/rest/)的《查询》一节。
+where | 可选 | 请参考[数据存储 REST API 使用详解](/sdk/storage/guide/rest)的《查询》一节。
 
 
 返回
@@ -1563,7 +1563,7 @@ to_clients | 必填 | 数组类型，表示接收消息的 client Id 列表，�
 message | 必填 | 消息内容（这里的消息内容的本质是字符串，但是我们对字符串内部的格式没有做限定，<br/>理论上开发者可以随意发送任意格式，只要大小不超过 5 KB 限制即可。）
 transient | 可选 | 是否为暂态消息，默认 false
 no_sync | 可选 | 默认情况下消息会被同步给在线的 from_client 用户的客户端，设置为 true 禁用此功能。
-push_data | 可选 | 以消息附件方式设置本条消息的离线推送通知内容。如果目标接收者使用的是 iOS 设备并且当前不在线，我们会按照该参数填写的内容来发离线推送。请参看[即时通讯开发指南第三篇](/sdk/im/guide/senior/)的《离线推送通知》一节。
+push_data | 可选 | 以消息附件方式设置本条消息的离线推送通知内容。如果目标接收者使用的是 iOS 设备并且当前不在线，我们会按照该参数填写的内容来发离线推送。请参看[即时通讯开发指南第三篇](/sdk/im/guide/senior)的《离线推送通知》一节。
 priority | 可选 | 定义消息优先级，可选值为 high、normal、low，分别对应高、中、低三种优先级。该参数大小写不敏感，默认为中优先级 normal。本参数仅对暂态消息或聊天室的消息有效，高优先级下在服务端与用户设备的连接拥塞时依然排队。
 
 返回说明：
@@ -1669,7 +1669,7 @@ curl -X GET \
 
 ### 黑名单
 
-该功能介绍可参考[即时通讯开发指南第三篇](/sdk/im/guide/senior/)中的《权限管理与黑名单》一节。
+该功能介绍可参考[即时通讯开发指南第三篇](/sdk/im/guide/senior)中的《权限管理与黑名单》一节。
 
 #### 增加服务号黑名单
 

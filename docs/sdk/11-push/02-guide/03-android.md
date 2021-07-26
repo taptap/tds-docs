@@ -5,7 +5,7 @@ sidebar_label: Android 推送
 ---
 
 
-请先阅读[推送通知总览](/sdk/push/guide/overview/)了解相关概念。
+请先阅读[推送通知总览](/sdk/push/guide/overview)了解相关概念。
 
 Android 消息推送有专门的 Demo，请见 [Android-Push-Demo](https://github.com/leancloud/android-push-demo) 项目。
 
@@ -298,11 +298,11 @@ LCPush.sendMessageInBackground("Tarara invited you to play Arc Symphony with her
 ## 深入阅读：如何响应推送消息
 
 注意，以下内容不适用于混合推送。
-混合推送中，需要使用各厂商提供的机制指定特定的 activity 来响应推送消息，详见[Android 混合推送指南](/sdk/push/guide/android-mixpush/)。
+混合推送中，需要使用各厂商提供的机制指定特定的 activity 来响应推送消息，详见[Android 混合推送指南](/sdk/push/guide/android-mixpush)。
 
 ### 消息格式
 
-具体的消息格式，可参考[推送 REST API 使用指南](/sdk/push/guide/rest/)的《推送消息》一节。
+具体的消息格式，可参考[推送 REST API 使用指南](/sdk/push/guide/rest)的《推送消息》一节。
 对于 Android 设备，默认的消息内容参数支持下列属性：
 
 ```json
@@ -391,7 +391,7 @@ curl -X POST \
 
 ## 混合推送
 
-自 Android 8.0 之后，系统权限控制越来越严，第三方推送通道的生命周期受到较大限制，同时国内主流厂商也开始推出自己独立的推送服务。因此我们提供「混合推送」的方案来提升推送到达率，具体请参考[Android 混合推送指南](/sdk/push/guide/android-mixpush/)。
+自 Android 8.0 之后，系统权限控制越来越严，第三方推送通道的生命周期受到较大限制，同时国内主流厂商也开始推出自己独立的推送服务。因此我们提供「混合推送」的方案来提升推送到达率，具体请参考[Android 混合推送指南](/sdk/push/guide/android-mixpush)。
 
 ### 让 PushService 前台运行
 

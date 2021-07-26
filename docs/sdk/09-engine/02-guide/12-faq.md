@@ -346,7 +346,7 @@ exposeEnvironmentsOnBuild: true
 
 ### 云引擎的健康检查是什么？
 
-云引擎的管理系统会每隔几分钟检查所有实例的工作状态（通过 HTTP 检查，详见[云引擎网站托管指南](/sdk/engine/guide/webhosting/)的《健康监测》一节。
+云引擎的管理系统会每隔几分钟检查所有实例的工作状态（通过 HTTP 检查，详见[云引擎网站托管指南](/sdk/engine/guide/webhosting)的《健康监测》一节。
 如果实例无法正确响应的话，管理系统会触发一次重新部署，并在控制台上打印类似下面的日志：
 
 > 健康检查失败：web1 检测到 Error connect ECONNREFUSED 10.19.30.220:51797
@@ -618,7 +618,7 @@ after 类 Hook 超时时间为 3 秒，如果你的体验实例已经休眠，�
 
 在云函数里可以用 masterKey 跳过权限检查，未登录也可直接查询 _User 表。
 
-因为云引擎运行在可信的服务器端环境中，所以你可以全局开启超级权限（`Master Key`），这样云端会跳过包括 ACL 和 Class 权限在内的检查，让你自由地操作所有云存储中的数据。具体细节可以参考[云函数指南](/sdk/engine/guide/cloudfunction/)的《Master Key 和超级权限》一节。
+因为云引擎运行在可信的服务器端环境中，所以你可以全局开启超级权限（`Master Key`），这样云端会跳过包括 ACL 和 Class 权限在内的检查，让你自由地操作所有云存储中的数据。具体细节可以参考[云函数指南](/sdk/engine/guide/cloudfunction)的《Master Key 和超级权限》一节。
 
 ### 调用云函数时，如何指定请求所发往的环境？
 
@@ -722,7 +722,7 @@ LeanClient::useProduction(false); // stage
 }
 ```
 
-`dependencies` 内的内容表明了该项目依赖的三方模块（比如示例中的 `lodash` 和 `nanoid`）。关于 `package.json` 的更多信息见[云引擎网站托管指南](/sdk/engine/guide/webhosting/)。
+`dependencies` 内的内容表明了该项目依赖的三方模块（比如示例中的 `lodash` 和 `nanoid`）。关于 `package.json` 的更多信息见[云引擎网站托管指南](/sdk/engine/guide/webhosting)。
 
 然后即可在代码中使用第三方包（`const { nanoid } = require("nanoid");`），如需在本地调试还需运行 `npm install` 来安装这些包。
 
@@ -852,7 +852,7 @@ leancloud:request response(0) +220ms 200 {"results":[{"content":"1","createdAt":
 
 ### 如何从「在线编辑」迁移到项目部署？
 
-1. 按照[云引擎命令行工具使用指南](/sdk/engine/guide/cli/)安装命令行工具，使用 `lean init` 初始化项目，模板选择 `Node.js > Express`（我们的 Node.js 示例项目）。
+1. 按照[云引擎命令行工具使用指南](/sdk/engine/guide/cli)安装命令行工具，使用 `lean init` 初始化项目，模板选择 `Node.js > Express`（我们的 Node.js 示例项目）。
 2. 在**云服务控制台 > 云引擎 > 云引擎分组 > 部署 > 在线编辑**点击 **预览**，将全部函数的代码拷贝到新建项目中的 `cloud.js`（替换掉原有内容）。
 3. 运行 `lean up`，在 <http://localhost:3001> 的调试界面中测试云函数和 Hook，然后运行 `lean deploy` 部署代码到云引擎（使用标准实例的用户还需要执行 `lean publish`）。
 4. 部署后请留意云引擎控制台上是否有错误产生。
@@ -1705,7 +1705,7 @@ if err != nil {
 ### 云引擎如何收费？
 
 云引擎中如果有云服务的存储等 API 调用，按 API 收费策略照常收费。
-云引擎标准实例也会产生使用费，具体请参考[云引擎运行方案](/sdk/engine/guide/plan/)。
+云引擎标准实例也会产生使用费，具体请参考[云引擎运行方案](/sdk/engine/guide/plan)。
 
 ### Hook 函数算 API 请求次数吗，afterUpdate 执行一次算 1 次请求次数吗？
 

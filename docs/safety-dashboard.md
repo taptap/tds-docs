@@ -79,7 +79,7 @@ import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
 ### 5. 场景配置
 ![](/img/textsafety4.png)
 
-在该页可对场景进行策略配置，包括启用的识别类型、使用的词库。此处可获取场景 ID ，用于 API 请求时指定场景进行检测，场景参数详见 [API 文档](/sdk/text-moderation/guide/)
+在该页可对场景进行策略配置，包括启用的识别类型、使用的词库。此处可获取场景 ID ，用于 API 请求时指定场景进行检测，场景参数详见 [API 文档](/sdk/text-moderation/guide)
 
 #### 5.1 场景介绍
 开启服务即默认提供两个场景：
@@ -184,5 +184,5 @@ import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
 
 - 以上模块之外的 UGC 文本模块，调用服务时，使用「聊天检测」的场景 ID 作为参数。
 
-详细 API 使用见 [API 文档](/sdk/text-moderation/guide/)
+详细 API 使用见 [API 文档](/sdk/text-moderation/guide)
 

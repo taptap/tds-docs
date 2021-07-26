@@ -292,7 +292,7 @@ func createTodo(req *leancloud.FunctionRequest) (interface{}, error) {
 </MultiLang>
 
 还有一类特殊的云函数是由云端系统在特定事件发生时自动触发，这类云函数称为 Hook 函数。
-想要了解 Hook 函数的详情以及如何调用我们上面定义的 `createTodo` 云函数，请参考[云函数指南](/sdk/engine/guide/cloudfunction/)。
+想要了解 Hook 函数的详情以及如何调用我们上面定义的 `createTodo` 云函数，请参考[云函数指南](/sdk/engine/guide/cloudfunction)。
 
 ## 部署到云端
 

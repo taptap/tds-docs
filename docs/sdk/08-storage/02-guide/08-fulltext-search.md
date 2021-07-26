@@ -26,7 +26,7 @@ import MultiLang from '@theme/MultiLang';
 
 ## 搜索 API
 
-我们提供了 [全文搜索的 REST API 接口](/sdk/storage/guide/fulltext-search-rest/)。
+我们提供了 [全文搜索的 REST API 接口](/sdk/storage/guide/fulltext-search-rest)。
 SDK 封装了这一接口。
 
 假设你对 GameScore 类[启用了全文搜索](#为_Class_启用搜索)，你就可以尝试传入关键字来搜索：
