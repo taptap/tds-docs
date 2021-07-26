@@ -21,7 +21,7 @@ var config = new TapConfig.Builder()
                           .ClientID("client_id")
                           .ClientSecret("client_secret")
                           .ServerURL("https://ikggdre2.lc-cn-n1-shared.com")
-                          .RegionType(RegionType.CN)
+                          .RegionType(RegionType.CN)  // CN 标识国内，IO标识海外，目前暂不支持海外授权登陆。
                           .ConfigBuilder();
 TapBootstrap.Init(config);
 ```
@@ -32,7 +32,7 @@ TapConfig tdsConfig = new TapConfig.Builder()
         .withClientId("{your client id}")
         .withClientToken("{your client token}}")
         .withServerUrl("{your server url}}")
-        .withRegionType(TapRegionType.CN)
+        .withRegionType(TapRegionType.CN)  // CN 标识国内，IO标识海外，目前暂不支持海外授权登陆。
         .build();
 TapBootstrap.init(MainActivity.this, tdsConfig);
 ```
@@ -41,12 +41,16 @@ TapBootstrap.init(MainActivity.this, tdsConfig);
 TapConfig *config = [TapConfig new];
 config.clientId = @"{your client id}";
 config.clientToken = @"{your client token}";
-config.region = TapSDKRegionTypeCN;
+config.region = TapSDKRegionTypeCN;  // CN 标识国内，IO标识海外，目前暂不支持海外授权登陆。
 config.serverURL = @"{your server url}";
 [TapBootstrap initWithConfig:config];
 ```
 
 </MultiLang>
+
+:::info
+TapSDK 3.0 版本目前暂不支持海外，预计本季度部署海外节点，敬请期待。
+:::
 
 ## 用 TapTap OAuth 授权结果直接登录账户系统
 
@@ -63,9 +67,9 @@ TDSUser.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
     public void onSuccess(TDSUser resultUser) {
         Toast.makeText(MainActivity.this, "succeed to login with Taptap.", Toast.LENGTH_SHORT).show();
         // 开发者可以调用 resultUser 的方法获取更多属性。
-        String userId = resultUser.getObjectId();
-        String userName = resultUser.getUsername();
-        String avatar = (String) resultUser.get("avatar");
+        String userId = resultUser.getObjectId();  // 用户唯一标识
+        String avatar = (String) resultUser.get("avatar");  // 头像
+        String nickName = (String) resultUser.get("nickname");  // 昵称
     }
 
     @Override
@@ -90,6 +94,65 @@ TDSUser.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
 
 </MultiLang>
 
+
+## 登录资格校验
+
+:::tip
+该功能仅用于需要上线「篝火测试服」的游戏，对有登录白名单的用户进行资格校验，防止测试阶段开发包外传被利用
+:::
+请在登录成功的回调里调用相关API进行校验，[点击](https://www.taptap.com/campfire)了解篝火计划
+
+<MultiLang>
+
+```cs
+TapLogin.GetTestQualification((valid, error) => {
+    if (error)
+    {
+        // 网络异常或游戏未开启篝火测试
+    }
+    else
+    {
+        if(valid)
+        {
+            // 有篝火测试资格
+        }
+    }
+});
+```
+
+```java
+TapLoginHelper.getTestQualification(new Callback<Boolean>() {
+    @Override
+    public void onSuccess(Boolean aBoolean) {
+        if（aboolean）{
+            // 该玩家已拥有测试资格
+        }else{
+            // 该玩家不具备测试资格
+        }
+    }
+
+    @Override
+    public void onFail(TapError tapError) {
+        // 网络异常或查询失败
+    }
+});
+```
+
+```objectivec
+[TapLoginHelper getTestQualification:^(BOOL isQualified, NSError *_Nullable error) {
+    if (error) {
+        // 网络异常或游戏未开启篝火测试
+    } else {
+        if (isQualified) {
+            // 有篝火测试资格
+        }
+    }
+}];
+```
+
+</MultiLang>
+
+** Error信息为网络错误，或者该游戏未开通篝火测试服 **
 
 :::info
 对于 `TDSUser`， 我们还支持一些其他操作，例如：
