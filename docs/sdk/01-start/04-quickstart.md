@@ -256,6 +256,7 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
             <string>taptap</string>
             <key>CFBundleURLSchemes</key>
             <array>
+                <!-- 这里注意下，中括号需要去掉，最终是 clientID 前拼接上 tt 的形式； 例如：ttFwFdCxxxxxxxQDQwQN -->
                 <string>tt[clientID]</string>
             </array>
         </dict>
@@ -405,9 +406,9 @@ TDSUser.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
     public void onSuccess(TDSUser resultUser) {
         Toast.makeText(MainActivity.this, "succeed to login with Taptap.", Toast.LENGTH_SHORT).show();
         // 开发者可以调用 resultUser 的方法获取更多属性。
-        String userId = resultUser.getObjectId();
-        String userName = resultUser.getUsername();
-        String avatar = (String) resultUser.get("avatar");
+        String userId = resultUser.getObjectId();  // 用户唯一标识
+        String avatar = (String) resultUser.get("avatar");  // 头像
+        String nickName = (String) resultUser.get("nickname");  // 昵称
     }
 
     @Override
@@ -421,9 +422,9 @@ TDSUser.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
 [TDSUser loginByTapTapWithPermissions:@[@"public_profile"] callback:^(TDSUser * _Nullable user, NSError * _Nullable error) {
     if (user) {
         // 开发者可以调用 user 的方法获取更多属性。
-        NSString *userId = user.objectId;
-        NSString *username = user[@"nickname"];
-        NSString *avatar = user[@"avatar"];
+        NSString *userId = user.objectId;  // 用户唯一标识
+        NSString *username = user[@"nickname"];  // 昵称
+        NSString *avatar = user[@"avatar"];  // 头像
     } else {
         NSLog(@"%@", error);
     }

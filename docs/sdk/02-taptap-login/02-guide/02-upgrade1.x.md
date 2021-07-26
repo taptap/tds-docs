@@ -29,7 +29,8 @@ clientID | TapTap 开发者中心对应应用的 Client ID
 <>
 
 ```java
-TapLoginHelper.init(Context context, String clientID);
+LoginSdkConfig loginSdkConfig = new LoginSdkConfig(true, true, RegionType.CN);
+TapLoginHelper.init(Context context, String clientID, LoginSdkConfig config);
 ```
 
 **参数说明**
@@ -38,6 +39,7 @@ TapLoginHelper.init(Context context, String clientID);
 | ------ | ------ |
 context | 上下文
 clientID | TapTap 开发者中心对应应用的 Client ID
+config | TapSDK 初始化相关配置
 
 </>
 <>
@@ -55,7 +57,6 @@ clientId | TapTap 开发者中心对应应用的 Client ID
 
 
 </MultiLang>
-
 
 
 ## TapTap 登录并获取登陆结果

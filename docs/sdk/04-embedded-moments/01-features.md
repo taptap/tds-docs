@@ -12,7 +12,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 内嵌动态能让玩家在游戏内访问 TapTap 社区，同时也可以查看好友的游戏动态，参与其他玩家、官方和大神之间的互动。
 
-<video controls poster="https://capacity-files.lncld.net/mhJHi9jngyobIlPVADDM8X7eGOqmTBAb/0af2062a4ee1cc2ff29bdf56a96c3041.png" src="https://capacity-files.lncld.net/SuC1cUIOwPHvXhiePM8Q79uKDqSVnuyS/%E5%86%85%E5%B5%8C%E5%8A%A8%E6%80%8107061201.mp4" width='100%' ></video>
+<video controls poster="https://capacity-files.lncld.net/mhJHi9jngyobIlPVADDM8X7eGOqmTBAb/0af2062a4ee1cc2ff29bdf56a96c3041.png" src="https://capacity-files.lncld.net/t68F6kSo2u1GFRUsY6vlYfGA8juBlzaW/07181438%20%E5%86%85%E5%B5%8C%E5%8A%A8%E6%80%81%E4%BB%8B%E7%BB%8D.mp4" width='100%' ></video>
 
 
 ## Web 层面功能介绍
