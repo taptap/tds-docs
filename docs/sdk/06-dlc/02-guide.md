@@ -121,7 +121,7 @@ ERROR_CODE_UNDEFINED       | 80000   | 未知错误     |
 
 ### 完善应用信息
 
-前往开发者中心，按照[物料要求](/store/store-material)填写应用信息，并审核通过。
+前往开发者中心，按照[物料要求](/store/store-material/)填写应用信息，并审核通过。
 
 ### 设置售卖价格
 
@@ -129,7 +129,7 @@ ERROR_CODE_UNDEFINED       | 80000   | 未知错误     |
 
 ### 正式上线
 
-所有流程都确保顺利后，游戏可[正式上线](/store/store-release)。
+所有流程都确保顺利后，游戏可[正式上线](/store/store-release/)。
 ![用来空行的小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)
 
 ---

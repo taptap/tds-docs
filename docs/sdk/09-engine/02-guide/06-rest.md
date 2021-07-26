@@ -45,7 +45,7 @@ REST API 请求的 Base URL 可以在**云服务控制台 > 设置 > 应用 Keys
 * `X-LC-Prod: 0` 表示调用预备环境
 * `X-LC-Prod: 1` 表示调用生产环境
 
-通过 SDK 调用云函数时，SDK 会根据当前环境设置 `X-LC-Prod` HTTP 头，详见[云函数指南](/sdk/engine/guide/cloudfunction)中《切换云引擎环境》一节的说明。
+通过 SDK 调用云函数时，SDK 会根据当前环境设置 `X-LC-Prod` HTTP 头，详见[云函数指南](/sdk/engine/guide/cloudfunction/)中《切换云引擎环境》一节的说明。
 
 ## 云函数
 
@@ -135,4 +135,4 @@ RPC 调用时，不仅可以返回单个 LCObject，还可以返回包含 LCObje
 
 如果云函数超时，客户端会收到 HTTP status code 为 503、524、141 等的响应。
 
-你还可以阅读[云函数指南](/sdk/engine/guide/cloudfunction)来获取更多的信息。
+你还可以阅读[云函数指南](/sdk/engine/guide/cloudfunction/)来获取更多的信息。
