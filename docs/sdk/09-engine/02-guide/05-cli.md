@@ -214,7 +214,7 @@ $ tds up
 $ tds debug --remote=http://remote-url-or-ip-address:remote-port --app-id=xxxxxx
 ```
 
-更多关于云引擎开发的内容，请参考[云引擎服务总览](/sdk/engine/guide/overview)。
+更多关于云引擎开发的内容，请参考[云引擎服务总览](/sdk/engine/guide/overview/)。
 
 ## 部署
 
@@ -285,7 +285,7 @@ $ tds deploy -g
 
 - `-g` 选项要求从 Git 仓库部署，Git 仓库地址必须已经在云引擎菜单中保存。
 - 默认部署使用 **master** 分支的最新代码，你可以通过 `-r <revision>` 来指定部署特定的 commit 或者 branch。
-- 设置 git repo 地址以及 deploy key 的方法可以参考[云引擎网站托管指南](/sdk/engine/guide/webhosting)的《Git 部署》一节。
+- 设置 git repo 地址以及 deploy key 的方法可以参考[云引擎网站托管指南](/sdk/engine/guide/webhosting/)的《Git 部署》一节。
 ## 发布到生产环境
 
 以下步骤仅适用于生产环境是标准实例的用户。

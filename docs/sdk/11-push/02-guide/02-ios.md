@@ -7,11 +7,11 @@ sidebar_label: iOS 推送
 import MultiLang from '@theme/MultiLang';
 
 
-本文介绍了如何在 iOS 设备中使用推送通知功能。建议先阅读[推送通知总览](/sdk/push/guide/overview)了解相关概念。
+本文介绍了如何在 iOS 设备中使用推送通知功能。建议先阅读[推送通知总览](/sdk/push/guide/overview/)了解相关概念。
 
 ## 配置 APNs 推送证书
 
-配置 APNs 证书是使用推送服务的前提，详情请参考[iOS 推送设置指南](/sdk/push/guide/ios-cert)。
+配置 APNs 证书是使用推送服务的前提，详情请参考[iOS 推送设置指南](/sdk/push/guide/ios-cert/)。
 
 ## iOS 流程简介
 
@@ -603,7 +603,7 @@ LCPush *push = [[LCPush alloc] init];
 `sound`|应用 bundle 里的声音文件名称。
 `content-available`|如果使用了 Newsstand，设置为 1 来开始一次后台下载。
 
-更多可用的保留字段，请参考[推送 REST API 使用指南](/sdk/push/guide/rest)的《消息内容 Data》一节。
+更多可用的保留字段，请参考[推送 REST API 使用指南](/sdk/push/guide/rest/)的《消息内容 Data》一节。
 
 递增 badge 数字并播放声音：
 

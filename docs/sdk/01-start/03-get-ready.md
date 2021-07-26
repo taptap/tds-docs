@@ -9,7 +9,7 @@ sidebar_label: 准备工作
 
 ## 创建应用
 
-在使用 TDS 服务之前，你需要创建一个应用，来完成对接前的准备工作。创建应用请参考[商店指南](/store/store-creategame)。
+在使用 TDS 服务之前，你需要创建一个应用，来完成对接前的准备工作。创建应用请参考[商店指南](/store/store-creategame/)。
 
 ## 开启应用配置
 
@@ -27,5 +27,5 @@ sidebar_label: 准备工作
 
 ## 隐私声明
 
-集成账号服务的功能，需要先签订[《TapTap 平台开发者协议》](/store/store-devagreement)。使用 TDS 服务，视为你同意前述所有协议，且你将基于这些协议承担相应的法律责任与义务。
+集成账号服务的功能，需要先签订[《TapTap 平台开发者协议》](/store/store-devagreement/)。使用 TDS 服务，视为你同意前述所有协议，且你将基于这些协议承担相应的法律责任与义务。
 
