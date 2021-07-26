@@ -146,7 +146,7 @@ npm start
 
 ## 文档发布
 
-`auto-sync` 分支会自动发布到预览环境：https://developer.xdrnd.com/v2-doc/
+`auto-sync` 分支会自动发布到预览环境：https://developer.xdrnd.com/docs/
 
 `master` 分支点第四个（最后一个） job （`deploy-production`）的按钮可以发布到线上（只有 `master` 分支可以发到线上）
 
