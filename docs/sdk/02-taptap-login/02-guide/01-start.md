@@ -20,7 +20,7 @@ import MultiLang from '@theme/MultiLang';
 var config = new TapConfig.Builder()
                           .ClientID("client_id")
                           .ClientSecret("client_secret")
-                          .ServerURL("https://ikggdre2.lc-cn-n1-shared.com")
+                          .ServerURL("https://ikggdre2.lc-cn-n1-shared.com") // TODO 
                           .RegionType(RegionType.CN)  // CN 标识国内，IO标识海外，目前暂不支持海外授权登陆。
                           .ConfigBuilder();
 TapBootstrap.Init(config);
@@ -58,7 +58,19 @@ TapSDK 3.0 版本目前暂不支持海外，预计本季度部署海外节点，
 
 
 ```cs
-var tdsUser = await TDSUser.LoginWithTapTap();
+try
+{
+    var tdsUser = await TDSUser.LoginWithTapTap();
+    Debug.Log($"login sucess:{tdsUser}");
+}
+catch (Exception e)
+{
+    if (e is TapException tapError)  // using TapTap.Common
+    {
+        Debug.Log($"get AccessToken exception:{tapError.code} message:{tapError.message}");
+    }
+}
+
 ```
 
 ```java
@@ -105,19 +117,24 @@ TDSUser.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
 <MultiLang>
 
 ```cs
-TapLogin.GetTestQualification((valid, error) => {
-    if (error)
+try
+{
+    var test = await TapLogin.GetTestQualification();
+    if(test)
     {
-        // 网络异常或游戏未开启篝火测试
+        Debug.Log("该玩家具备篝火测试资格");
     }
     else
     {
-        if(valid)
-        {
-            // 有篝火测试资格
-        }
+        Debug.Log("该玩家不具备篝火测试资格");
     }
-});
+        
+}
+catch(Exception e)
+{
+    Debug.Log($"篝火测试 error：{e.Message}");
+}
+
 ```
 
 ```java
@@ -165,7 +182,13 @@ TapLoginHelper.getTestQualification(new Callback<Boolean>() {
 
 
 ```cs
-var tdsUser = await TDSUser.LoginAnonymously();
+try{
+    // 通过 tdsUSer 给出用户唯一标识，如果有的话，
+    var tdsUser = await TDSUser.LoginAnonymously();
+}catch(Exception e){
+    //登录失败
+    Debug.Log($"{e.code} : {e.message}");
+}
 ```
 
 ```java
@@ -338,7 +361,10 @@ currentUser.disassociateWithAuthData("weixin").subscribe(new Observer<TDSUser>()
 
 
 ```cs
-
+var currentUser = await TDSUser.GetCurrent();  // 获取当前登录的账户实例
+currentUser["nickname"] = "打不死的青铜";
+currentUser["cups"] = 256;
+await currentUser.Save();
 ```
 
 ```java

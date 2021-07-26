@@ -397,7 +397,12 @@ if (currentUser == nil) {
 <MultiLang>
 
 ```cs
-var tdsUser = await TDSUser.LoginWithTapTap();
+try{
+    var tdsUser = await TDSUser.LoginWithTapTap();
+}catch(Exception e){
+    //登录失败
+    Debug.Log($"{e.code} : {e.message}");
+}
 ```
 
 ```java

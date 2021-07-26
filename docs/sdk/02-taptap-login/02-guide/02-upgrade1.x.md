@@ -66,9 +66,29 @@ clientId | TapTap 开发者中心对应应用的 Client ID
 
 ```cs
 // 唤起 TapTap 网页 或者 TapTap 客户端进行登陆
-var accessToken = await TapLogin.Login();
+try{
+    //登录成功
+    var loginTask = TapLogin.Login();
+    var accessToken = await loginTask;
+    if(loginTask.IsCanceled){
+        // 登陆取消
+    }
+    if(accessToken !=null){
+        // 登录成功
+    }
+}catch(Exception e){
+    //TODO 登录失败
+    if(e is TapException tapError){
+        Debug.Log($"code:{tapError.code} message:{tapError.message}")
+    }
+}
 // 获取 TapTap Profile  可以获得当前用户的一些基本信息，例如名称、头像、性别。
 var profile = await TapLogin.FetchProfile();
+// 补充通过 profile 获取用户的：昵称、头像、唯一标识 查看 
+profile.name  
+profile.avatar 
+profile.openId
+profile.unionid
 ```
 
 ```java
