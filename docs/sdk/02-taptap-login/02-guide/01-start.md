@@ -6,7 +6,7 @@ sidebar_label: 功能接入
 
 import MultiLang from '@theme/MultiLang';
 
-[快速开始](/sdk/start/quickstart)中简单介绍了如何在游戏中加入 Tap 登录，这里详细介绍 TapSDK 的[登录功能](/sdk/taptap-login/features)。
+[快速开始](/sdk/start/quickstart/)中简单介绍了如何在游戏中加入 Tap 登录，这里详细介绍 TapSDK 的[登录功能](/sdk/taptap-login/features/)。
 
 
 从 TapSDK 3.0 开始，我们在单纯的 TapTap 登录之外，还提供了一个内建账户系统供游戏使用：开发者可以直接用 TapTap OAuth 授权的结果生成一个游戏内的账号（TDSUser），然后用该账号保存更多玩家数据。同时，我们也支持将更多第三方认证登录的结果绑定到这一账号上来（以及后续的解绑操作）。

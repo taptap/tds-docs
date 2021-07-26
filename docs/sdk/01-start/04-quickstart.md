@@ -5,7 +5,7 @@ sidebar_label: 快速开始
 ---
 import MultiLang from '@theme/MultiLang';
 
-本文介绍如何快速接入 TapSDK 并实现 [TapTap 登录](/sdk/taptap-login/guide/start)功能。
+本文介绍如何快速接入 TapSDK 并实现 [TapTap 登录](/sdk/taptap-login/guide/start/)功能。
 
 :::note
 [下载](/tap-download) 页面提供了 Unity、Android、iOS 示例项目，可供参考。
