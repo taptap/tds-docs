@@ -135,9 +135,9 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 ## 游戏内的展示
 
-我们提供游戏内的成就面板展示，玩家根据你指定的入口打开成就界面，查看已经拥有和未被解锁的游戏成就。请参阅[「开发指南」](/sdk/achievement/guide#打开成就展示页）。
+我们提供游戏内的成就面板展示，玩家根据你指定的入口打开成就界面，查看已经拥有和未被解锁的游戏成就。请参阅[「开发指南」](/sdk/achievement/guide#打开成就展示页)。
 
-<img src={useBaseUrl('/img/achievement10.png')} alt="" width="500" />
+<img src={useBaseUrl('/img/achievement10.png')} alt="" width="600" />
 
 <!-- 
 ## 在 TapTap 展示游戏成就
