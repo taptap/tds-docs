@@ -319,9 +319,9 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 using TapTap.Bootstrap; // 命名空间
 
 var config =  new TapConfig.Builder()
-    .ClientID("client_id")  // 必须，开发者中心对应 Client ID
-    .ClientToken("client_token")  // 必须，开发者中心对应 Client Token
-    .ServerURL("https://ikggdre2.lc-cn-n1-shared.com")
+    .ClientID("your_client_id")  // 必须，开发者中心对应 Client ID
+    .ClientToken("your_client_token")  // 必须，开发者中心对应 Client Token
+    .ServerURL("https://your_server_url")
     .RegionType(RegionType.CN)  // 非必须，默认 CN 表示国内
     .ConfigBuilder();
 TapBootstrap.Init(config);
@@ -330,9 +330,9 @@ TapBootstrap.Init(config);
 ```java  
 TapConfig tdsConfig = new TapConfig.Builder()
         .withAppContext(MainActivity.this)  // Context 上下文
-        .withClientId("{your client id}")  // 开发者中心对应 Client ID
-        .withClientToken("{your client token}}")  // 开发者中心对应 Client Token
-        .withServerUrl("{your server url}}")  // 开发者中心获取
+        .withClientId("your_client_id")  // 开发者中心对应 Client ID
+        .withClientToken("your_client_token")  // 开发者中心对应 Client Token
+        .withServerUrl("https://your_server_url")  // 开发者中心获取
         .withRegionType(TapRegionType.CN)  // TapRegionType.CN: 国内  TapRegionType.IO: 国外
         .build();
 TapBootstrap.init(MainActivity.this, tdsConfig);     
@@ -341,14 +341,17 @@ TapBootstrap.init(MainActivity.this, tdsConfig);
 ```objectivec
 // 开发者必须至少依赖 `TapBootstrap`、`TapLogin`、`TapCommon` 以及 `LeanCloudObjc` 模块，并按照如下方式完成初始化：
 TapConfig *config = [TapConfig new];
-config.clientId = @"{your client id}";
-config.clientToken = @"{your client token}";
+config.clientId = @"your_client_id";
+config.clientToken = @"your_client_token";
 config.region = TapSDKRegionTypeCN;
-config.serverURL = @"{your server url}";
+config.serverURL = @"https://your_server_url";
 [TapBootstrap initWithConfig:config];
 ```
 
 </MultiLang>
+
+`client_id`、`client_token`、`server_url` 等信息均可在控制台查看。
+详见文档关于[绑定域名](/sdk/storage/guide/setup-dotnet#绑定域名)、[应用凭证](/sdk/storage/guide/setup-dotnet#应用凭证)的说明。
 
 ## 登录
 

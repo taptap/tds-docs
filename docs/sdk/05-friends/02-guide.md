@@ -4,6 +4,8 @@ title: 好友指南
 sidebar_label: 开发指南
 ---
 
+import MultiLang from '@theme/MultiLang';
+
 游戏好友模块基于 TDS 内建账户系统，下文中的用户均指 `TDSUser`。
 
 ## 申请成为好友
