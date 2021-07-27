@@ -21,7 +21,7 @@ Android 的推送主要依赖客户端的 PushService 服务。PushService 是�
 ```groovy
 dependencies {
 
-implementation 'cn.leancloud:realtime-android:8.0.1'
+implementation 'cn.leancloud:realtime-android:8.0.4'
 implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
 
 }
