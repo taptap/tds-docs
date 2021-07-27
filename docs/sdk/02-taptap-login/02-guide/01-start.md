@@ -20,9 +20,9 @@ import MultiLang from '@theme/MultiLang';
 
 ```cs
 var config = new TapConfig.Builder()
-                          .ClientID("client_id")
-                          .ClientSecret("client_secret")
-                          .ServerURL("https://ikggdre2.lc-cn-n1-shared.com") // TODO 
+                          .ClientID("your_client_id")
+                          .ClientSecret("your_client_secret")
+                          .ServerURL("https://your_server_url") 
                           .RegionType(RegionType.CN)  // CN 标识国内，IO标识海外，目前暂不支持海外授权登陆。
                           .ConfigBuilder();
 TapBootstrap.Init(config);
@@ -31,9 +31,9 @@ TapBootstrap.Init(config);
 ```java
 TapConfig tdsConfig = new TapConfig.Builder()
         .withAppContext(MainActivity.this)
-        .withClientId("{your client id}")
-        .withClientToken("{your client token}}")
-        .withServerUrl("{your server url}}")
+        .withClientId("your_client_id")
+        .withClientToken("your_client_token")
+        .withServerUrl("https://your_server_url")
         .withRegionType(TapRegionType.CN)  // CN 标识国内，IO标识海外，目前暂不支持海外授权登陆。
         .build();
 TapBootstrap.init(MainActivity.this, tdsConfig);
@@ -41,10 +41,10 @@ TapBootstrap.init(MainActivity.this, tdsConfig);
 
 ```objectivec
 TapConfig *config = [TapConfig new];
-config.clientId = @"{your client id}";
-config.clientToken = @"{your client token}";
+config.clientId = @"your_client_id";
+config.clientToken = @"your_client_token";
 config.region = TapSDKRegionTypeCN;  // CN 标识国内，IO标识海外，目前暂不支持海外授权登陆。
-config.serverURL = @"{your server url}";
+config.serverURL = @"https://your_server_url";
 [TapBootstrap initWithConfig:config];
 ```
 
@@ -53,6 +53,9 @@ config.serverURL = @"{your server url}";
 :::info
 TapSDK 3.0 版本目前暂不支持海外，预计本季度部署海外节点，敬请期待。
 :::
+
+`client_id`、`client_token`、`server_url` 等信息均可在控制台查看。
+详见文档关于[绑定域名](/sdk/storage/guide/setup-dotnet#绑定域名)、[应用凭证](/sdk/storage/guide/setup-dotnet#应用凭证)的说明。
 
 ## 用 TapTap OAuth 授权结果直接登录账户系统
 

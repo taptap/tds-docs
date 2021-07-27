@@ -53,11 +53,11 @@ errors| | 本次推送过程中的错误信息。
 
 ## Unity 推送
 
-Unity SDK 即将支持推送通知，敬请期待！
+请阅读 [Unity 推送指南](/sdk/push/guide/unity/)。
 
 ## iOS 推送
 
-请阅读[iOS 推送指南](/sdk/push/guide/ios/)。
+请阅读 [iOS 推送指南](/sdk/push/guide/ios/)。
 
 ## Android 推送
 

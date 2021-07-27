@@ -1,6 +1,6 @@
 ---
 id: guide
-title: 开发指南
+title: 数据分析指南
 sidebar_label: 开发指南
 ---
 

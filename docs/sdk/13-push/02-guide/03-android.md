@@ -21,7 +21,7 @@ Android 的推送主要依赖客户端的 PushService 服务。PushService 是�
 ```groovy
 dependencies {
 
-implementation 'cn.leancloud:realtime-android:8.0.1'
+implementation 'cn.leancloud:realtime-android:8.0.4'
 implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
 
 }
@@ -213,7 +213,10 @@ curl -X POST \
 
 ## 推送消息
 
-**云服务控制台 > 推送 > 设置** 中默认选中了 **禁止从客户端进行消息推送**，从而避免了客户端可以不经限制的给应用内任意目标设备推送消息的可能。我们建议用户都将此限制启用。如果有需求要从客户端发推送，需要先打开这个限制。
+
+**云服务控制台 > 推送 > 设置** 中默认选中了 **禁止从客户端进行消息推送**，避免客户端可以不经限制地给应用内任意目标设备推送消息。
+我们建议开发者都勾选此项，通过 REST API 或云服务控制台发送推送消息。
+如果有从客户端发推送的需求，需要先取消勾选此项。
  
 ### 推送给所有的设备
 
