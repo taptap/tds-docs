@@ -37,7 +37,7 @@ sidebar_label: 最佳实践
 rs := client.Check("游戏不好玩")
 if rs.result == 1 {
     // todo: reject create user
-} else if rs.result = 2 {
+} else if rs.result == 2 {
     // todo: can create user, log result for auditor review
 } else {
     // todo: get pass, can create user
@@ -76,9 +76,9 @@ if rs.result == 1 {
 rs := client.Check("G 市偷井盖，真讨厌")
 if rs.result == 1 && rs.filtered_text != "" {
     // todo: can send 'rs.filterd_text' in chat room
-} else if rs.result = 2 {
+} else if rs.result == 2 {
     // todo: can send msg, log result for auditor review
-} else if rs.result = 0 {
+} else if rs.result == 0 {
     // todo: get pass, can send msg
 } else {
     // todo: warning info send to user
@@ -104,7 +104,7 @@ if rs.result == 1 && rs.filtered_text != "" {
 rs := client.Check("工作室，+v xxxx")
 if rs.result == 1 && rs.type == "Adv" {
     // todo: reject send to chat room
-} else if rs.result = 2 {
+} else if rs.result == 2 {
     // todo: can send msg, log result for auditor review
 } else {
     // todo: get pass, can send msg
