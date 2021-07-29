@@ -11,7 +11,7 @@ import MultiLang from '@theme/MultiLang';
 
 ## SDK 获取
 
-请先[下载](/tap-download) SDK，并添加相关依赖
+请先[下载](/tap-download) SDK，并添加相关依赖。
 
 <MultiLang>
 

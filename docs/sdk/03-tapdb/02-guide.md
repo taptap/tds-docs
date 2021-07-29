@@ -14,8 +14,8 @@ TapSDK 提供了一套可供游戏开发者收集账号数据的 API。
 
 ## SDK 获取
 
-请先[下载](/tap-download) SDK，并添加相关依赖 .  
-如果只需要单独使用 TapDB，可以只依赖 `common+tapdb`
+请先[下载](/tap-download) SDK，并添加相关依赖。
+如果只需要单独使用 TapDB，可以只依赖 `common+tapdb`。
 
 <MultiLang>
 
