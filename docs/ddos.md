@@ -1,6 +1,6 @@
 ---
 id: ddos
-title: 应对 DDoS 攻击
+title: 开发者应对 DDoS 攻击问题的指引文档
 slug: ddos
 ---
 
