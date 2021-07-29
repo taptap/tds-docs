@@ -3,6 +3,8 @@ title: 现在开始
 hide_title: false
 ---
 
+点击这里了解 [TapTap](https://www.taptap.com/about-us) 以及 [TapTap 开发者中心](https://developer.taptap.com/)。如果你打算将游戏上架 TapTap，我们强烈建议你访问 TapTap 开发者中心，通过开发者中心提供的 TapSDK 接入 TapDB 的数据分析能力。你可以获得与接入 TapDB SDK 完全一样的数据分析能力，外加使用 TapTap 开发者服务给游戏增值的机会。TapDB 与 TapTap 开发者服务都属于 TapTap 团队，我们会确保两边版本的同步。
+
 ## 1. 注册账号
 
 ### 注册
