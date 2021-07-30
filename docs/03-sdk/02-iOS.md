@@ -178,8 +178,6 @@ TapDB 提供一套 SDK，游戏开发者可以将其集成到游戏中。系统�
 
 ### 3.8. 自定义事件
 
-**（如需开通自定义事件，请联系技术支持 QQ：<Data field="tapdb.support.QQ"/>）**
-
 需要发送自定义事件时调用，自定义事件的 eventName 和 properties 属性都必须在元数据管理预先配置，才可以使用 SDK 进行发送
 
 ```objc
