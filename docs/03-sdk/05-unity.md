@@ -218,8 +218,6 @@ public static void clearUser()
 
 ### 3.8. 自定义事件
 
-**（如需开通自定义事件，请联系技术支持 QQ：<Data field="tapdb.support.QQ"/>）**
-
 需要发送自定义事件时调用，自定义事件的 eventName 和 properties 属性都必须在元数据管理预先配置，才可以使用 SDK 进行发送
 
 ```csharp
