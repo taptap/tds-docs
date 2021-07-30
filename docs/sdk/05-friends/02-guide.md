@@ -19,23 +19,25 @@ await tom.ApplyFriendship(jerry);
 ```
 
 ```java
+// 假设 tom 是当前玩家，而 jerry 是另外一位玩家， tom 想加 jerry 为好友，tom 需要发送一个好友申请
+TDSUser tom = TDSUser.currentUser(); // currentUser 为 tom
+TDSUser jerry = LCObject.createWithoutData(TDSUser.class, jerryObjectId);  // 通过玩家授权后返回的 ObjectId 得到 TDSUser 类型玩家实例
 tom.applyFriendshipInBackground(jerry, null).subscribe(new Observer<LCFriendshipRequest>() {
-            @Override
-            public void onSubscribe(@NonNull Disposable d) {}
+    @Override
+    public void onSubscribe(@NonNull Disposable d) {}
 
-            @Override
-            public void onNext(@NonNull LCFriendshipRequest lcFriendshipRequest) {
-                System.out.println("succeed to apply friend request to jerry.");
-            }
+    @Override
+    public void onNext(@NonNull LCFriendshipRequest lcFriendshipRequest) {
+        System.out.println("succeed to apply friend request to jerry.");
+    }
 
-            @Override
-            public void onError(@NonNull Throwable e) {
-                System.out.println("failed to apply friend request to jerry.");
-                latch.countDown();
-            }
+    @Override
+    public void onError(@NonNull Throwable e) {
+        System.out.println("failed to apply friend request to jerry.");
+    }
 
-            @Override
-            public void onComplete() {}
+    @Override
+    public void onComplete() {}
 });
 ```
 
@@ -111,26 +113,26 @@ foreach (LCFriendshipRequest req in reqs) {
 
 ```java
 jerry.friendshipRequestQuery(LCFriendshipRequest.STATUS_PENDING, false, true)
-                .findInBackground()
-                .subscribe(new Observer<List<LCFriendshipRequest>>() {
-            @Override
-            public void onSubscribe(@NonNull Disposable d) {}
+     .findInBackground()
+     .subscribe(new Observer<List<LCFriendshipRequest>>() {
+        @Override
+        public void onSubscribe(@NonNull Disposable d) {}
 
-            @Override
-            public void onNext(List<LCFriendshipRequest> lcFriendshipRequests) {
-                System.out.println("friendship requests number to jerry is: " +lcFriendshipRequests.size());
-                for(LCFriendshipRequest request: lcFriendshipRequests) {
-                    System.out.println(request);
-                }
+        @Override
+        public void onNext(List<LCFriendshipRequest> lcFriendshipRequests) {
+            System.out.println("friendship requests number to jerry is: " +lcFriendshipRequests.size());
+            for(LCFriendshipRequest request: lcFriendshipRequests) {
+                System.out.println(request);
             }
+        }
 
-            @Override
-            public void onError(@NonNull Throwable e) {
-                System.out.println("failed to query friendship request of jerry. cause: " + e.getMessage());
-            }
+        @Override
+        public void onError(@NonNull Throwable e) {
+            System.out.println("failed to query friendship request of jerry. cause: " + e.getMessage());
+        }
 
-            @Override
-            public void onComplete() {}
+        @Override
+        public void onComplete() {}
 });
 ```
 
@@ -161,53 +163,53 @@ await jerry.DeleteFriendshipRequest(otherRequest);
 ```java
 // jerry 拒绝了来自 tom 的好友请求
 jerry.declineFriendshipRequest(tomRequest).subscribe(new Observer<LCFriendshipRequest>() {
-            @Override
-            public void onSubscribe(@NonNull Disposable d) {}
+    @Override
+    public void onSubscribe(@NonNull Disposable d) {}
 
-            @Override
-            public void onNext(LCFriendshipRequest result) {}
+    @Override
+    public void onNext(LCFriendshipRequest result) {}
 
-            @Override
-            public void onError(@NonNull Throwable e) {
-                System.out.println("failed to decline friendship request of jerry. cause: " + e.getMessage());
-            }
+    @Override
+    public void onError(@NonNull Throwable e) {
+        System.out.println("failed to decline friendship request of jerry. cause: " + e.getMessage());
+    }
 
-            @Override
-            public void onComplete() {}
+    @Override
+    public void onComplete() {}
 });
 
 // jerry 同意了来自 tuffy 的好友请求
 jerry.acceptFriendshipRequest(tuffyRequest, null).subscribe(new Observer<LCFriendshipRequest>() {
-            @Override
-            public void onSubscribe(@NonNull Disposable d) {}
+    @Override
+    public void onSubscribe(@NonNull Disposable d) {}
 
-            @Override
-            public void onNext(LCFriendshipRequest result) {}
+    @Override
+    public void onNext(LCFriendshipRequest result) {}
 
-            @Override
-            public void onError(@NonNull Throwable e) {
-                System.out.println("failed to accept friendship request of jerry. cause: " + e.getMessage());
-            }
+    @Override
+    public void onError(@NonNull Throwable e) {
+        System.out.println("failed to accept friendship request of jerry. cause: " + e.getMessage());
+    }
 
-            @Override
-            public void onComplete() {}
+    @Override
+    public void onComplete() {}
 });
 
 // jerry 直接删除了陌生人的请求
 jerry.deleteFriendshipRequest(otherRequest).subscribe(new Observer<Boolean>() {
-            @Override
-            public void onSubscribe(@NonNull Disposable d) {}
+    @Override
+    public void onSubscribe(@NonNull Disposable d) {}
 
-            @Override
-            public void onNext(Boolean result) {}
+    @Override
+    public void onNext(Boolean result) {}
 
-            @Override
-            public void onError(@NonNull Throwable e) {
-                System.out.println("failed to delete friendship request of jerry. cause: " + e.getMessage());
-            }
+    @Override
+    public void onError(@NonNull Throwable e) {
+        System.out.println("failed to delete friendship request of jerry. cause: " + e.getMessage());
+    }
 
-            @Override
-            public void onComplete() {}
+    @Override
+    public void onComplete() {}
 });
 ```
 
@@ -245,7 +247,7 @@ jerry.deleteFriendshipRequest(otherRequest).subscribe(new Observer<Boolean>() {
 注意：
 
 1. 在 jerry 拒绝了 tom 的好友请求之后，如果 tom 再次请求成为 jerry 的好友，tom 在执行 applyFriendshipInBackground 时会直接得到错误的应答，表明 jerry 不想和 ta 成为好友。
-2. jerry 同意了 tuffy 的好友请求之后，它们就成为了好友，之后两个人中任何一人再次调用 applyFriendshipInBackground 申请成为好友时，也会直接得到错误的应答，表明它们已经是好友无需再次申请。
+2. jerry 同意了 tom 的好友请求之后，它们就成为了好友，之后两个人中任何一人再次调用 applyFriendshipInBackground 申请成为好友时，也会直接得到错误的应答，表明它们已经是好友无需再次申请。
 3. jerry 删除陌生人的好友请求后，对方还可以再次发起请求。
 
 ## 响应好友变化通知
@@ -378,23 +380,23 @@ LCQuery<LCObject> query = jerry.GetFirendshipQuery();
 
 LCQuery<LCFriendship> query = jerry.friendshipQuery();
 query.findInBackground().subscribe(new Observer<List<LCFriendship>>() {
-            @Override
-            public void onSubscribe(@NonNull Disposable d) {}
+    @Override
+    public void onSubscribe(@NonNull Disposable d) {}
 
-            @Override
-            public void onNext(List<LCFriendship> lcFriendships) {
-                if (null != lcFriendships) {
-                    // lcFriendships 即为好友关系
-                }
-            }
+    @Override
+    public void onNext(List<LCFriendship> lcFriendships) {
+        if (null != lcFriendships) {
+            // lcFriendships 即为好友关系
+        }
+    }
 
-            @Override
-            public void onError(@NonNull Throwable e) {
-                System.out.println("failed to query friendship of jerry. cause: " + e.getMessage());
-            }
+    @Override
+    public void onError(@NonNull Throwable e) {
+        System.out.println("failed to query friendship of jerry. cause: " + e.getMessage());
+    }
 
-            @Override
-            public void onComplete() {}
+    @Override
+    public void onComplete() {}
 });
 ```
 
@@ -429,22 +431,22 @@ await friendship.Delete();
 
 ```java
 friendship.deleteInBackground().subscribe(new Observer<LCNull>() {
-            @Override
-            public void onSubscribe(@NonNull Disposable d) {}
+    @Override
+    public void onSubscribe(@NonNull Disposable d) {}
 
-            @Override
-            public void onNext(LCNull response) {
-                // succeed to delete friendship.
-            }
+    @Override
+    public void onNext(LCNull response) {
+        // succeed to delete friendship.
+    }
 
-            @Override
-            public void onError(@NonNull Throwable e) {
-                System.out.println("failed to delete friendship of jerry. cause: " + e.getMessage());
-            }
+    @Override
+    public void onError(@NonNull Throwable e) {
+        System.out.println("failed to delete friendship of jerry. cause: " + e.getMessage());
+    }
 
-            @Override
-            public void onComplete() {}
-        });
+    @Override
+    public void onComplete() {}
+});
 ```
 
 ```objc
@@ -482,25 +484,25 @@ String tomObjectId;
 LCQuery<LCFriendship> query = jerry.friendshipQuery();
 query.whereEqualTo(LCFriendship.ATTR_FOLLOWEE, TDSUser.createWithoutData(TDSUser.class, tomObjectId));
 query.countInBackground().subscribe(new Observer<Integer>() {
-            @Override
-            public void onSubscribe(@NonNull Disposable d) {}
+    @Override
+    public void onSubscribe(@NonNull Disposable d) {}
 
-            @Override
-            public void onNext(Integer result) {
-                if (null != result && result > 0) {
-                	// tom is a friend of jerry.
-                } else {
-                	// tom isn't a friend of jerry.
-                }
-            }
+    @Override
+    public void onNext(Integer result) {
+        if (null != result && result > 0) {
+            // tom is a friend of jerry.
+        } else {
+            // tom isn't a friend of jerry.
+        }
+    }
 
-            @Override
-            public void onError(@NonNull Throwable e) {
-                System.out.println("failed to query friendship of jerry. cause: " + e.getMessage());
-            }
+    @Override
+    public void onError(@NonNull Throwable e) {
+        System.out.println("failed to query friendship of jerry. cause: " + e.getMessage());
+    }
 
-            @Override
-            public void onComplete() {}
+    @Override
+    public void onComplete() {}
 });
 ```
 
