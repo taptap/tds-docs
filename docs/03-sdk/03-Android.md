@@ -150,7 +150,7 @@ public static void clearUser()
 public static void trackEvent(String eventName, JSONObject properties)
 ```
 
-用户可以通过调用 trackEvent 方法上传需要跟踪的自定义事件。eventName 为自定义事件的事件名，需要保证以 '#' 开头，取值规则请参考自定义属性登记页面。properties 为自定义事件所包含的自定义属性（以 Key : Value 的形式保存），其中 Key 代表了自定义属性的属性名，Value 代表了该属性的值。这里需要注意的是 Key 的命名规则同 eventName 一致，也需要保证以 '#' 开头。目前所支持的 Value 类型为 String， Number， Boolean。String 类型支持最大长度为 256。Number 类型取值区间为 [-9E15， 9E15]。以战斗事件为例：
+用户可以通过调用 trackEvent 方法上传需要跟踪的自定义事件。eventName 为自定义事件的事件名，需要保证以 '#' 开头，取值规则请参考自定义属性登记页面。properties 为自定义事件所包含的自定义属性（以 Key : Value 的形式保存），其中 Key 代表了自定义属性的属性名，Value 代表了该属性的值。这里需要注意的是 Key 的命名规则同 eventName 一致，也需要保证以 '#' 开头。目前所支持的 Value 类型为 String， Number， Boolean。String 类型支持最大长度为 256。Number 类型取值区间为 [-9E15， 9E15]、时间类型的属性请传入毫秒级时间戳。以战斗事件为例：
 
 ```java
 JSONObject properties = new JSONObject();
