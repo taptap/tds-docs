@@ -53,10 +53,11 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 ```json
 "dependencies":{
 // 登录
-"com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#3.0.0",
-"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#3.0.0",
-"com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#3.0.0",
-"com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-0.8.2",
+"com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#3.1.0",
+"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#3.1.0",
+"com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#3.1.0",
+"com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-0.9.2",
+"com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-0.9.2",
 }
 ```
 
@@ -142,10 +143,11 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
     
     dependencies {  
     ...  
-        implementation name:'TapBootstrap_3.0.0', ext:'aar'   
-        implementation name:'TapCommon_3.0.0', ext:'aar' 
-		implementation name:'TapLogin_3.0.0', ext:'aar' 
-        implementation 'cn.leancloud:storage-android:8.0.3' 
+        implementation name:'TapBootstrap_3.1.0', ext:'aar'   
+        implementation name:'TapCommon_3.1.0', ext:'aar' 
+		implementation name:'TapLogin_3.1.0', ext:'aar' 
+        implementation 'cn.leancloud:realtime-android:8.0.4'
+        implementation 'cn.leancloud:storage-android:8.0.4'
         implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 
     }  
@@ -321,7 +323,7 @@ using TapTap.Bootstrap; // 命名空间
 var config =  new TapConfig.Builder()
     .ClientID("your_client_id")  // 必须，开发者中心对应 Client ID
     .ClientToken("your_client_token")  // 必须，开发者中心对应 Client Token
-    .ServerURL("https://your_server_url")
+    .ServerURL("https://your_server_url") // 开发者中心 > 你的游戏 > 游戏服务 > 技术服务 > 数据存储 > 文件 > 设置 > 文件访问域名 绑定域名
     .RegionType(RegionType.CN)  // 非必须，默认 CN 表示国内
     .ConfigBuilder();
 TapBootstrap.Init(config);
@@ -332,7 +334,7 @@ TapConfig tdsConfig = new TapConfig.Builder()
         .withAppContext(MainActivity.this)  // Context 上下文
         .withClientId("your_client_id")  // 开发者中心对应 Client ID
         .withClientToken("your_client_token")  // 开发者中心对应 Client Token
-        .withServerUrl("https://your_server_url")  // 开发者中心获取
+        .withServerUrl("https://your_server_url")  // 开发者中心 > 你的游戏 > 游戏服务 > 技术服务 > 数据存储 > 文件 > 设置 > 文件访问域名 绑定域名
         .withRegionType(TapRegionType.CN)  // TapRegionType.CN: 国内  TapRegionType.IO: 国外
         .build();
 TapBootstrap.init(MainActivity.this, tdsConfig);     
@@ -341,10 +343,10 @@ TapBootstrap.init(MainActivity.this, tdsConfig);
 ```objectivec
 // 开发者必须至少依赖 `TapBootstrap`、`TapLogin`、`TapCommon` 以及 `LeanCloudObjc` 模块，并按照如下方式完成初始化：
 TapConfig *config = [TapConfig new];
-config.clientId = @"your_client_id";
-config.clientToken = @"your_client_token";
-config.region = TapSDKRegionTypeCN;
-config.serverURL = @"https://your_server_url";
+config.clientId = @"your_client_id";  // 开发者中心对应 Client ID
+config.clientToken = @"your_client_token";  // 开发者中心对应 Client Token
+config.region = TapSDKRegionTypeCN;  // TapSDKRegionTypeCN: 国内  TapSDKRegionTypeIO: 国外
+config.serverURL = @"https://your_server_url";  // 开发者中心 > 你的游戏 > 游戏服务 > 技术服务 > 数据存储 > 文件 > 设置 > 文件访问域名 绑定域名
 [TapBootstrap initWithConfig:config];
 ```
 

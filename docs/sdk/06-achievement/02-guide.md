@@ -30,8 +30,8 @@ using TapTap.Achievement;
 ```cs
 TapAchievement.RegisterCallback(IAchievementCallback callback);
 
-private class AchievementCallback:IAchievementCallback{
-
+private class AchievementCallback:IAchievementCallback
+{
     public void OnAchievementSDKInitSuccess()
     {
         //成就SDK 初始化成功
@@ -58,7 +58,6 @@ private class AchievementCallback:IAchievementCallback{
             // 成就状态更新更新
         }
     }
-
 }
 ```
 
@@ -67,28 +66,27 @@ private class AchievementCallback:IAchievementCallback{
 
 ```java
 TapAchievement.registerCallback(new AchievementCallback() {
+  @Override
+  public void onAchievementSDKInitSuccess() {
+    // 数据加载成功
+  }
 
-      @Override
-      public void onAchievementSDKInitSuccess() {
-        // 数据加载成功
-      }
+  @Override
+  public void onAchievementSDKInitFail(AchievementException exception) {
+    // 数据加载失败，请重试
+  }
 
-      @Override
-      public void onAchievementSDKInitFail(AchievementException exception) {
-        // 数据加载失败，请重试
-      }
-
-      @Override
-      public void onAchievementStatusUpdate(TapAchievementBean item, AchievementException exception) {
-        if (exception != null) {
-          // 成就更新失败
-          return;
-        }
-        if (item != null) {
-          // item 更新成功
-        }
-      }
-    });
+  @Override
+  public void onAchievementStatusUpdate(TapAchievementBean item, AchievementException exception) {
+    if (exception != null) {
+      // 成就更新失败
+      return;
+    }
+    if (item != null) {
+      // item 更新成功
+    }
+  }
+});
 ```
 
 </>
@@ -182,21 +180,21 @@ List<TapAchievementBean> allList = TapAchievement.getLocalAllAchievementList();
 
 // 服务端数据
 TapAchievement.fetchAllAchievementList(new GetAchievementListCallBack() {
-      @Override
-      public void onGetAchievementList(List<TapAchievementBean> achievementList, AchievementException exception) {
-        if (exception != null) {
-          switch (exception.errorCode) {
-            case AchievementException.SDK_NOT_INIT:
-              // SDK 还未初始化数据
-              break;
-            default:
-              // 数据获取失败
-          }
-        } else {
-          // 成功获取数据
-        }
+  @Override
+  public void onGetAchievementList(List<TapAchievementBean> achievementList, AchievementException exception) {
+    if (exception != null) {
+      switch (exception.errorCode) {
+        case AchievementException.SDK_NOT_INIT:
+          // SDK 还未初始化数据
+          break;
+        default:
+          // 数据获取失败
       }
-    });
+    } else {
+      // 成功获取数据
+    }
+  }
+});
 ```
 
 ```objectivec
@@ -261,21 +259,21 @@ List<TapAchievementBean> userList = TapAchievement.getLocalUserAchievementList()
 
 // 服务端数据
 TapAchievement.fetchUserAchievementList(new GetAchievementListCallBack() {
-      @Override
-      public void onGetAchievementList(List<TapAchievementBean> achievementList, AchievementException exception) {
-        if (exception != null) {
-          switch (exception.errorCode) {
-            case AchievementException.SDK_NOT_INIT:
-              // SDK 还未初始化数据
-              break;
-            default:
-              // 数据获取失败
-          }
-        } else {
-          // 成功获取数据
-        }
+  @Override
+  public void onGetAchievementList(List<TapAchievementBean> achievementList, AchievementException exception) {
+    if (exception != null) {
+      switch (exception.errorCode) {
+        case AchievementException.SDK_NOT_INIT:
+          // SDK 还未初始化数据
+          break;
+        default:
+          // 数据获取失败
       }
-    });
+    } else {
+      // 成功获取数据
+    }
+  }
+});
 ```
 
 ```objectivec
@@ -323,7 +321,7 @@ TapAchievement.reach("displayID");
 </MultiLang>
 
 ## 多步长成就增长步数
-成就增长步数提供两种方式调用，`growSteps` 中传递当前增量达成的步数（例如：多走了5步，则传递5即可），`makeSteps` 中传递当前成就已达成的步数，(例如：当前已经走了100步，则传递100)，调用 `growSteps` 时 SDK 内部会计算当前全量步数。
+成就增长步数提供两种方式调用，`growSteps` 中传递当前增量达成的步数（例如：多走了 5 步，则传递 5 即可），`makeSteps` 中传递当前成就已达成的步数，(例如：当前已经走了 100 步，则传递 100)，调用 `growSteps` 时 SDK 内部会计算当前全量步数。
 
 <MultiLang>
 
