@@ -123,6 +123,7 @@ TapSDK 支持直接使用第三方社交平台（例如微信、微博、QQ 等�
 例如以下的代码展示了终端用户使用微信登录的处理流程：
 
 <MultiLang>
+
 ```cs
 Dictionary<string, object> thirdPartyData = new Dictionary<string, object> {
   // 必须
@@ -182,6 +183,7 @@ option.platform = LeanCloudSocialPlatformWeiXin;
     }
 }];
 ```
+
 </MultiLang>
 
 `TDSUser#loginWithAuthData` 系列方法需要两个参数来唯一确定一个账户：
