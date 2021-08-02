@@ -21,7 +21,7 @@ import MultiLang from '@theme/MultiLang';
 ```cs
 var config = new TapConfig.Builder()
                           .ClientID("your_client_id")
-                          .ClientSecret("your_client_secret")
+                          .ClientToken("your_client_token")
                           .ServerURL("https://your_server_url") 
                           .RegionType(RegionType.CN)  // CN 标识国内，IO标识海外，目前暂不支持海外授权登陆。
                           .ConfigBuilder();
@@ -118,11 +118,12 @@ TDSUser.logInAnonymously().subscribe(new Observer<TDSUser>() {
 
 ### 第三方平台账户登录
 
-TapSDK 支持直接使用第三方社交平台（例如微信、微博、QQ 等）的账户信息来创建自己的账户体系并完成登录，也允许将既有账户与第三方账户绑定起来，这样终端用户后续可以直接用第三方账户信息来便捷登录。
+TapSDK 支持直接使用第三方社交平台（例如微信、微博、QQ、Google、Facebook 等）的账户信息来创建自己的账户体系并完成登录，也允许将既有账户与第三方账户绑定起来，这样终端用户后续可以直接用第三方账户信息来便捷登录。
 
 例如以下的代码展示了终端用户使用微信登录的处理流程：
 
 <MultiLang>
+
 
 ```cs
 Dictionary<string, object> thirdPartyData = new Dictionary<string, object> {
@@ -191,7 +192,7 @@ option.platform = LeanCloudSocialPlatformWeiXin;
 - 第三方平台的名字，就是前例中的 `weixin`，该名字由应用层自己决定。
 - 第三方平台的授权信息，就是前例中的 `thirdPartyData`（一般包括 uid、token、expires 等信息，与具体的第三方平台有关）。
 
-云端会使用第三方平台的鉴权信息来查询是否已经存在与之关联的账户。如果存在的话，则返回 200 OK 状态码，同时附上用户的信息。如果第三方平台的信息没有和任何账户关联，客户端会收到 201 Created 状态码，意味着新账户被创建，同时附上用户的 objectId、createdAt、sessionToken 和一个自动生成的 username，例如：
+云端会使用第三方平台的鉴权信息来查询是否已经存在与之关联的账户。如果存在的话，则返回 200 OK 状态码，同时附上用户的信息。如果第三方平台的信息没有和任何账户关联，客户端会收到 201 Created 状态码，意味着新账户被创建，同时附上用户的 `objectId`、`createdAt`、`sessionToken` 和一个自动生成的 `username`，例如：
 
 ```json
 {
@@ -216,7 +217,9 @@ option.platform = LeanCloudSocialPlatformWeiXin;
 
 这时候我们会看到内建账户表中出现了一条新的账户记录，账户中有一个名为 `authData` 的列，保存了第三方平台的授权信息。出于安全考虑，`authData`不会被返回给客户端，除非它属于当前用户。
 
-开发者需要自己完成第三方平台的鉴权流程（一般通过 OAuth 1.0 或 2.0），以获取鉴权信息，继而到云端来登录。请注意，这里只是用微信来举例，并不表示 `TDSUser#loginWithAuthData` 接口只支持微信登录。对于 TapSDK 来说，我们采用开放的接口设计，平台标识和唯一授权信息都由开发者指定，所以是可以兼容所有的第三方账户登录需求的。例如，海外开发者拿到 Facebook 授权信息之后，一样可以调用 `TDSUser#loginWithAuthData` 接口完成玩家账户的登录（平台名字可指为 `facebook`）。
+开发者需要自己完成第三方平台的鉴权流程（一般通过 OAuth 1.0 或 2.0），以获取鉴权信息，继而到云端来登录。
+
+请注意，这里只是用微信来举例，并不表示 `TDSUser#loginWithAuthData` 接口只支持微信登录。对于 TapSDK 来说，我们采用开放的接口设计，平台标识和唯一授权信息都由开发者指定，所以是可以兼容所有的第三方账户登录需求的。例如，海外开发者拿到 Facebook 授权信息之后，一样可以调用 `TDSUser#loginWithAuthData` 接口完成玩家账户的登录（平台名字可指定为 `facebook`）。
 
 #### 自动验证第三方平台授权信息
 
@@ -229,9 +232,10 @@ option.platform = LeanCloudSocialPlatformWeiXin;
 
 ### 用 TapTap OAuth 授权结果直接登录账户系统
 
-对于「TapTap 用户登录」，TapSDK 提供了特别的支持，以帮助开发者以最便捷的方式和最少的时间完成接入。开发者可以直接调用 `TDSUser#loginWithTapTap` 方法来一键登录，例如：
+对于「TapTap 用户登录」，TapSDK 提供了特别的支持，以帮助开发者以最便捷的方式和最少的时间完成接入。你可以直接调用 `TDSUser#loginWithTapTap` 方法来一键登录，例如：
 
 <MultiLang>
+
 
 ```cs
 try
@@ -288,11 +292,12 @@ TDSUser.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
 - 通过访问 `avatar` 属性来获得 TapTap 账户的头像；
 - 通过访问 `objectId` 来得到该账户系统的 id，可用于游戏服务器内玩家与 TDS 内建账户的绑定或匹配。
 
-在 TapTap 登录完成之后，开发者就可以使用其他 TapTap 生态的能力，例如：
+在 TapTap 登录完成之后，开发者就可以使用其他 TapTap 生态能力，例如：
 
 #### 获取 TapTap 平台用户详细信息
 
 TapTap 用户登录成功之后，开发者可以通过如下方式获取到 TapTap 授权结果的详细信息：
+
 <MultiLang>
 
 ```cs
@@ -374,6 +379,8 @@ TapLoginHelper.getTestQualification(new Callback<Boolean>() {
     } else {
         if (isQualified) {
             // 有篝火测试资格
+        } else {
+            // 没有篝火测试资格
         }
     }
 }];
@@ -571,6 +578,8 @@ currentUser[@"cups"] = @256;
 ```
 
 </MultiLang>
+
+`TDSUser` 是 `LCObject` 的子类，所以 `LCObject` 支持的数据增删改查方式，`TDSUser` 也都可用。感兴趣的读者可以参考[数据存储的开发文档](/sdk/storage/features/)了解更多信息。
 
 ## 登出当前账户
 账户的登出非常简单，调用 `logOut` 方法即可。
