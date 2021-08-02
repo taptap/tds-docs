@@ -1,12 +1,12 @@
 ---
 id: guide
-title: Development Guide
-sidebar_label: Development Guide
+title: Text Moderation Development Guide
+sidebar_label: Guide
 ---
 
 :::info
 **Currently, you need to contact the operation team to apply for activating the features of Text Moderation. **
-** For details on how to apply, please refer to [Activate Text Moderation Service](/sdk/text-moderation/features#Activate Text Moderation Service).**
+** For details on how to apply, please refer to [Activate Text Moderation Service](/sdk/text-moderation/features#activate-text-moderation-service).**
 :::
 
 ## Introduction
@@ -41,9 +41,9 @@ X-Server-Secret | ${server_secret} | TDS service key (please go to Developer Cen
 
 Provide a scenario to distinguish and identify the check-up effect. The combination of multiple lexicons can be used to configure a variety of intelligent algorithms for identifying and checking the target text. Based on the aggregated result, API can return an accurate check-up result, which is one of the following three states. The user can filter the check-up result based on the response result:
 
--Passed: This indicates that the text content is healthy and is allowed to be let go and can be recorded.
--Rejected: This indicates that there are illegal words in the text content and the content cannot be let go or recorded.
--In Review: This means that the text content is suspected to be illegal and needs to be further manually confirmed. The review result can also be processed with special offline strategies on a regular basis.
+- Passed: This indicates that the text content is healthy and is allowed to be let go and can be recorded.
+- Rejected: This indicates that there are illegal words in the text content and the content cannot be let go or recorded.
+- In Review: This means that the text content is suspected to be illegal and needs to be further manually confirmed. The review result can also be processed with special offline strategies on a regular basis.
 
 >Caution: The size of a single request should not exceed 5 MB of data. If the text length exceeds 10,000 words, the text will be truncated. Such batch processing may also truncate more text content. Please read the documentation carefully.
 
@@ -112,7 +112,7 @@ start_index | int64 | Yes | Starting index (starting from 0) | 0
 end_index | int64 | Yes | End index | 3
 
 ### Request example
-```
+```sh
 curl --location --request POST 'https://whisper.cn.tapapis.com/v2/text/check' \
 --header 'Content-Type: application/json' \
 --header 'X-Client-ID: *' \
@@ -134,7 +134,7 @@ curl --location --request POST 'https://whisper.cn.tapapis.com/v2/text/check' \
 
 ### Response example 
 Example of rejected case
-```
+```json
 {
     "result": 1,
     "type": "Politics",
@@ -164,7 +164,7 @@ Example of rejected case
 ```
 
 Example of healthy situation
-```
+```json
 {
     "result": 0,
     "type": "Health",
@@ -185,7 +185,7 @@ code | int | Yes | Interface  error code. As for return codes, please refer to  
 message | string | Yes | Error message
 details | object | No | Detailed information, whose specific structure is expressed according to different codes
 
-```
+```json
 // The response body is in json format 
 {
     "code": 5, 
