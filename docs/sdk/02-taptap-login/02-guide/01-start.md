@@ -21,7 +21,7 @@ import MultiLang from '@theme/MultiLang';
 ```cs
 var config = new TapConfig.Builder()
                           .ClientID("your_client_id")
-                          .ClientSecret("your_client_secret")
+                          .ClientToken("your_client_token")
                           .ServerURL("https://your_server_url") 
                           .RegionType(RegionType.CN)  // CN 标识国内，IO标识海外，目前暂不支持海外授权登陆。
                           .ConfigBuilder();
@@ -57,138 +57,9 @@ TapSDK 3.0 版本目前暂不支持海外，预计本季度部署海外节点，
 `client_id`、`client_token`、`server_url` 等信息均可在控制台查看。
 详见文档关于[绑定域名](/sdk/storage/guide/setup-dotnet#绑定域名)、[应用凭证](/sdk/storage/guide/setup-dotnet#应用凭证)的说明。
 
-## 用 TapTap OAuth 授权结果直接登录账户系统
+## 用户登录
 
-<MultiLang>
-
-
-```cs
-try
-{
-    var tdsUser = await TDSUser.LoginWithTapTap();
-    Debug.Log($"login sucess:{tdsUser}");
-}
-catch (Exception e)
-{
-    if (e is TapException tapError)  // using TapTap.Common
-    {
-        Debug.Log($"get AccessToken exception:{tapError.code} message:{tapError.message}");
-    }
-}
-
-```
-
-```java
-TDSUser.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
-    @Override
-    public void onSuccess(TDSUser resultUser) {
-        Toast.makeText(MainActivity.this, "succeed to login with Taptap.", Toast.LENGTH_SHORT).show();
-        // 开发者可以调用 resultUser 的方法获取更多属性。
-        String userId = resultUser.getObjectId();  // 用户唯一标识
-        String avatar = (String) resultUser.get("avatar");  // 头像
-        String nickName = (String) resultUser.get("nickname");  // 昵称
-    }
-
-    @Override
-    public void onFail(TapError error) {
-        Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
-    }
-}, "public_profile");
-```
-
-```objectivec
-[TDSUser loginByTapTapWithPermissions:@[@"public_profile"] callback:^(TDSUser * _Nullable user, NSError * _Nullable error) {
-    if (user) {
-        // 开发者可以调用 user 的方法获取更多属性。
-        NSString *userId = user.objectId;
-        NSString *username = user[@"nickname"];
-        NSString *avatar = user[@"avatar"];
-    } else {
-        NSLog(@"%@", error);
-    }
-}];
-```
-
-</MultiLang>
-
-`TDSUser` 即是当前玩家的账户系统，登录成功之后开发者可以：
-
-- 通过访问 `nickname` 属性来获得 TapTap 账户的用户名；
-- 通过访问 `avatar` 属性来获得 TapTap 账户的头像；
-- 通过访问 `objectId` 来得到该账户系统的 id，可用于游戏服务器内玩家与 TDS 内建账户的绑定或匹配。
-
-TDS 内建账户系统除了支持直接以 TapTap 用户授权登录之外，还支持其他登录方式，例如：
-
-## 登录资格校验
-
-:::tip
-该功能仅用于需要上线「篝火测试服」的游戏，对有登录白名单的用户进行资格校验，防止测试阶段开发包外传被利用
-:::
-请在登录成功的回调里调用相关API进行校验，[点击](https://www.taptap.com/campfire)了解篝火计划
-
-<MultiLang>
-
-```cs
-try
-{
-    var test = await TapLogin.GetTestQualification();
-    if(test)
-    {
-        Debug.Log("该玩家具备篝火测试资格");
-    }
-    else
-    {
-        Debug.Log("该玩家不具备篝火测试资格");
-    }
-        
-}
-catch(Exception e)
-{
-    Debug.Log($"篝火测试 error：{e.Message}");
-}
-
-```
-
-```java
-TapLoginHelper.getTestQualification(new Callback<Boolean>() {
-    @Override
-    public void onSuccess(Boolean aBoolean) {
-        if（aboolean）{
-            // 该玩家已拥有测试资格
-        }else{
-            // 该玩家不具备测试资格
-        }
-    }
-
-    @Override
-    public void onFail(TapError tapError) {
-        // 网络异常或查询失败
-    }
-});
-```
-
-```objectivec
-[TapLoginHelper getTestQualification:^(BOOL isQualified, NSError *_Nullable error) {
-    if (error) {
-        // 网络异常或游戏未开启篝火测试
-    } else {
-        if (isQualified) {
-            // 有篝火测试资格
-        }
-    }
-}];
-```
-
-</MultiLang>
-
-** Error信息为网络错误，或者该游戏未开通篝火测试服 **
-
-:::info
-对于 `TDSUser`， 我们还支持一些其他操作，例如：
-:::
-
-## 游客登录
-
+### 游客登录
 内建账户系统支持游戏创建一个游客账号，其调用示例如下：
 
 <MultiLang>
@@ -245,11 +116,288 @@ TDSUser.logInAnonymously().subscribe(new Observer<TDSUser>() {
 这里的「游客账户」，可以保证玩家在同一个设备上多次登录都得到同一个账户，但是如果玩家卸载游戏重装之后，再以「游客」身份登录则无法保证账户的唯一性。
 :::
 
-## 绑定其他第三方平台账号
-游戏内经常会发生玩家先用游客身份登录，之后通过绑定第三方账号的认证结果切换到正式账号，这可以通过调用 `TDSUser#associateAuthData` 类方法完成，示例代码如下： 
+### 第三方平台账户登录
+
+TapSDK 支持直接使用第三方社交平台（例如微信、微博、QQ、Google、Facebook 等）的账户信息来创建自己的账户体系并完成登录，也允许将既有账户与第三方账户绑定起来，这样终端用户后续可以直接用第三方账户信息来便捷登录。
+
+例如以下的代码展示了终端用户使用微信登录的处理流程：
 
 <MultiLang>
 
+
+```cs
+Dictionary<string, object> thirdPartyData = new Dictionary<string, object> {
+  // 必须
+  { "openid", "OPENID" },
+  { "access_token", "ACCESS_TOKEN" },
+  { "expires_in", 7200 },
+
+  // 可选
+  { "refresh_token", "REFRESH_TOKEN" },
+  { "scope", "SCOPE" }
+};
+TDSUser currentUser = await TDSUser.LoginWithAuthData(thirdPartyData, "weixin");
+```
+
+```java
+Map<String, Object> thirdPartyData = new HashMap<String, Object>();
+// 必须
+thirdPartyData.put("expires_in", 7200);
+thirdPartyData.put("openid", "OPENID");
+thirdPartyData.put("access_token", "ACCESS_TOKEN");
+//可选
+thirdPartyData.put("refresh_token", "REFRESH_TOKEN");
+thirdPartyData.put("scope", "SCOPE");
+TDSUser.loginWithAuthData(thirdPartyData, "weixin").subscribe(new Observer<TDSUser>() {
+    public void onSubscribe(Disposable disposable) {
+    }
+    public void onNext(TDSUser avUser) {
+       System.out.println("成功登录");
+    }
+    public void onError(Throwable throwable) {
+       System.out.println("尝试使用第三方账号登录，发生错误。");
+    }
+    public void onComplete() {
+    }
+});
+```
+
+```objectivec
+NSDictionary *thirdPartyData = @{
+                            // 必须
+                            @"openid":@"OPENID",
+                            @"access_token":@"ACCESS_TOKEN",
+                            @"expires_in":@7200,
+
+                            // 可选
+                            @"refresh_token":@"REFRESH_TOKEN",
+                            @"scope":@"SCOPE",
+                            };
+TDSUser *user = [TDSUser user];
+LCUserAuthDataLoginOption *option = [LCUserAuthDataLoginOption new];
+option.platform = LeanCloudSocialPlatformWeiXin;
+[user loginWithAuthData:thirdPartyData platformId:LeanCloudSocialPlatformWeiXin options:option callback:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+        NSLog(@"登录成功");
+    }else{
+        NSLog(@"登录失败：%@",error.localizedFailureReason);
+    }
+}];
+```
+
+</MultiLang>
+
+`TDSUser#loginWithAuthData` 系列方法需要两个参数来唯一确定一个账户：
+
+- 第三方平台的名字，就是前例中的 `weixin`，该名字由应用层自己决定。
+- 第三方平台的授权信息，就是前例中的 `thirdPartyData`（一般包括 uid、token、expires 等信息，与具体的第三方平台有关）。
+
+云端会使用第三方平台的鉴权信息来查询是否已经存在与之关联的账户。如果存在的话，则返回 200 OK 状态码，同时附上用户的信息。如果第三方平台的信息没有和任何账户关联，客户端会收到 201 Created 状态码，意味着新账户被创建，同时附上用户的 `objectId`、`createdAt`、`sessionToken` 和一个自动生成的 `username`，例如：
+
+```json
+{
+  "username":     "k9mjnl7zq9mjbc7expspsxlls",
+  "objectId":     "5b029266fb4ffe005d6c7c2e",
+  "createdAt":    "2021-05-21T09:33:26.406Z",
+  "updatedAt":    "2021-05-21T09:33:26.575Z",
+  "sessionToken": "…",
+  // authData 通常不会返回，继续阅读以了解其中原因
+  "authData": {
+    "weixin": {
+      "openid":        "OPENID",
+      "access_token":  "ACCESS_TOKEN",
+      "expires_in":    7200,
+      "refresh_token": "REFRESH_TOKEN",
+      "scope":         "SCOPE"
+    }
+  }
+  // …
+}
+```
+
+这时候我们会看到内建账户表中出现了一条新的账户记录，账户中有一个名为 `authData` 的列，保存了第三方平台的授权信息。出于安全考虑，`authData`不会被返回给客户端，除非它属于当前用户。
+
+开发者需要自己完成第三方平台的鉴权流程（一般通过 OAuth 1.0 或 2.0），以获取鉴权信息，继而到云端来登录。
+
+请注意，这里只是用微信来举例，并不表示 `TDSUser#loginWithAuthData` 接口只支持微信登录。对于 TapSDK 来说，我们采用开放的接口设计，平台标识和唯一授权信息都由开发者指定，所以是可以兼容所有的第三方账户登录需求的。例如，海外开发者拿到 Facebook 授权信息之后，一样可以调用 `TDSUser#loginWithAuthData` 接口完成玩家账户的登录（平台名字可指定为 `facebook`）。
+
+#### 自动验证第三方平台授权信息
+
+为了确保账户数据的有效性，TDS 云端还支持对部分平台的 access token 的有效性进行自动验证，以防止伪造账户数据。如果有效性验证不通过，在绑定或登录时云端会返回 `invalid authData` 错误，关联不会被建立。对于云端无法识别的服务，开发者需要自己去验证 access token 的有效性。
+比如，注册、登录时分别通过云引擎的 `beforeSave hook`、`beforeUpdate hook` 来验证 access token 有效性。
+
+如果希望使用这一功能，则在开始使用前，需要在 **开发者中心（游戏） > 游戏服务 > 云服务 > 数据存储 > 用户 > 设置** 配置相应平台的 **应用 ID** 和 **应用 Secret Key**。
+
+如果不希望云端自动验证 access token，可以在 **开发者中心（游戏） > 游戏服务 > 云服务 > 数据存储 > 用户 > 设置** 里面取消勾选 **第三方登录时，验证用户 AccessToken 合法性**。
+
+### 用 TapTap OAuth 授权结果直接登录账户系统
+
+对于「TapTap 用户登录」，TapSDK 提供了特别的支持，以帮助开发者以最便捷的方式和最少的时间完成接入。你可以直接调用 `TDSUser#loginWithTapTap` 方法来一键登录，例如：
+
+<MultiLang>
+
+
+```cs
+try
+{
+    var tdsUser = await TDSUser.LoginWithTapTap();
+    Debug.Log($"login sucess:{tdsUser}");
+}
+catch (Exception e)
+{
+    if (e is TapException tapError)  // using TapTap.Common
+    {
+        Debug.Log($"encounter exception:{tapError.code} message:{tapError.message}");
+    }
+}
+
+```
+
+```java
+TDSUser.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
+    @Override
+    public void onSuccess(TDSUser resultUser) {
+        Toast.makeText(MainActivity.this, "succeed to login with Taptap.", Toast.LENGTH_SHORT).show();
+        // 开发者可以调用 resultUser 的方法获取更多属性。
+        String userId = resultUser.getObjectId();  // 用户唯一标识
+        String avatar = (String) resultUser.get("avatar");  // 头像
+        String nickName = (String) resultUser.get("nickname");  // 昵称
+    }
+
+    @Override
+    public void onFail(TapError error) {
+        Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+    }
+}, "public_profile");
+```
+
+```objectivec
+[TDSUser loginByTapTapWithPermissions:@[@"public_profile"] callback:^(TDSUser * _Nullable user, NSError * _Nullable error) {
+    if (user) {
+        // 开发者可以调用 user 的方法获取更多属性。
+        NSString *userId = user.objectId;
+        NSString *username = user[@"nickname"];
+        NSString *avatar = user[@"avatar"];
+    } else {
+        NSLog(@"%@", error);
+    }
+}];
+```
+
+</MultiLang>
+
+`TDSUser` 即是当前玩家的账户系统，登录成功之后开发者可以：
+
+- 通过访问 `nickname` 属性来获得 TapTap 账户的用户名；
+- 通过访问 `avatar` 属性来获得 TapTap 账户的头像；
+- 通过访问 `objectId` 来得到该账户系统的 id，可用于游戏服务器内玩家与 TDS 内建账户的绑定或匹配。
+
+在 TapTap 登录完成之后，开发者就可以使用其他 TapTap 生态能力，例如：
+
+#### 获取 TapTap 平台用户详细信息
+
+TapTap 用户登录成功之后，开发者可以通过如下方式获取到 TapTap 授权结果的详细信息：
+
+<MultiLang>
+
+```cs
+// 获取 TapTap Profile  可以获得当前用户的一些基本信息，例如名称、头像、性别。
+var profile = await TapLogin.FetchProfile();
+```
+
+```java
+// 开发者调用 TapLoginHelper.getCurrentProfile() 可以获得当前用户的一些基本信息，例如名称、头像、性别。
+Profile profile = TapLoginHelper.getCurrentProfile();
+```
+
+```objectivec
+[TapLoginHelper currentProfile]
+```
+
+</MultiLang>
+
+这里的 `Profile` 类会包含如下信息：
+
+- TapTap 平台 openId，每个玩家在每个游戏中的 openId 都是不一样的；
+- TapTap 平台的 unionId，一个玩家在一个厂商的所有游戏中 unionId 都是一样的，不同厂商 unionId 不同；
+- username，玩家在 TapTap 平台的用户名；
+- avatar，玩家在 TapTap 平台的头像；
+
+#### 测试资格校验
+
+:::tip
+该功能仅用于需要上线「篝火测试服」的游戏，对有登录白名单的用户进行资格校验，防止测试阶段开发包外传被利用
+:::
+
+请在登录成功的回调里调用相关 API 进行资格校验，[点击](https://www.taptap.com/campfire)了解篝火计划。
+
+<MultiLang>
+
+```cs
+try
+{
+    var test = await TapLogin.GetTestQualification();
+    if(test)
+    {
+        Debug.Log("该玩家具备篝火测试资格");
+    }
+    else
+    {
+        Debug.Log("该玩家不具备篝火测试资格");
+    }
+        
+}
+catch(Exception e)
+{
+    Debug.Log($"篝火测试 error：{e.Message}");
+}
+
+```
+
+```java
+TapLoginHelper.getTestQualification(new Callback<Boolean>() {
+    @Override
+    public void onSuccess(Boolean aBoolean) {
+        if（aboolean）{
+            // 该玩家已拥有测试资格
+        }else{
+            // 该玩家不具备测试资格
+        }
+    }
+
+    @Override
+    public void onFail(TapError tapError) {
+        // 网络异常或查询失败
+    }
+});
+```
+
+```objectivec
+[TapLoginHelper getTestQualification:^(BOOL isQualified, NSError *_Nullable error) {
+    if (error) {
+        // 网络异常或游戏未开启篝火测试
+    } else {
+        if (isQualified) {
+            // 有篝火测试资格
+        } else {
+            // 没有篝火测试资格
+        }
+    }
+}];
+```
+
+</MultiLang>
+
+** Error 信息为网络错误，或者该游戏未开通篝火测试服。 **
+
+## 绑定与解绑第三方平台账号
+
+如果玩家已经登录，也可以在当前账户上绑定或解绑更多第三方平台信息。例如，玩家先用游客身份登录，再绑定 TapTap 和微信账号，那么以后该玩家通过 TapTap/微信授权登录，都可以得到完全相同的游戏账号。
+
+### 绑定更多第三方账号
+游戏内经常会发生玩家先用游客身份登录，之后通过绑定第三方账号的认证结果切换到正式账号，这可以通过调用 `TDSUser#associateAuthData` 类方法完成，示例代码如下： 
+
+<MultiLang>
 
 ```cs
 // 绑定微信账户
@@ -322,22 +470,11 @@ NSDictionary *authData = @{
 
 一个 TDSUser 账号，可以绑定多个不同的第三方平台账号，并且以后通过第三方平台 OAuth 结果进行登录，也会得到同样的账号。
 
-### 自动验证第三方平台授权信息
-
-为了确保账户数据的有效性，TDS 云端还支持对部分平台的 access token 的有效性进行自动验证，以防止伪造账户数据。如果有效性验证不通过，在绑定或登录时云端会返回 `invalid authData` 错误，关联不会被建立。对于云端无法识别的服务，开发者需要自己去验证 access token 的有效性。
-比如，注册、登录时分别通过云引擎的 `beforeSave hook`、`beforeUpdate hook` 来验证 access token 有效性。
-
-如果希望使用这一功能，则在开始使用前，需要在 **开发者中心（游戏） > 游戏服务 > 云服务 > 数据存储 > 用户 > 设置** 配置相应平台的 **应用 ID** 和 **应用 Secret Key**。
-
-如果不希望云端自动验证 access token，可以在 **开发者中心（游戏） > 游戏服务 > 云服务 > 数据存储 > 用户 > 设置** 里面取消勾选 **第三方登录时，验证用户 AccessToken 合法性**。
-
-
-## 解绑第三方平台账号
+### 解绑第三方平台账号
 
 通过调用 `TDSUser#disassociateWithAuthData` 方法可以完成当前账号与第三方平台的解绑，示例代码如下：
 
 <MultiLang>
-
 
 ```cs
 // 与微信账户解除绑定
@@ -442,6 +579,8 @@ currentUser[@"cups"] = @256;
 
 </MultiLang>
 
+`TDSUser` 是 `LCObject` 的子类，所以 `LCObject` 支持的数据增删改查方式，`TDSUser` 也都可用。感兴趣的读者可以参考[数据存储的开发文档](/sdk/storage/features/)了解更多信息。
+
 ## 登出当前账户
 账户的登出非常简单，调用 `logOut` 方法即可。
 
@@ -463,12 +602,13 @@ TDSUser.logOut().
 </MultiLang>
 
 ## 检查登录状态
-`TDSUser` 会在本地缓存当前用户的登录信息，所以如果一个玩家在游戏内登录之后，下次启动用户通过调用 `TDSUser#currentUser` 可以得到之前登录的账户实例，此时玩家无需再次登录即可使用。
+
+TapSDK 会在本地缓存当前用户的登录信息，所以如果一个玩家在游戏内登录之后，下次启动用户通过调用 `TDSUser#currentUser` 可以得到之前登录的账户实例，此时玩家无需再次登录即可使用。
 如果玩家在游戏内进行了登出，则本地缓存的登录信息也会被删除，下次进入游戏时 `TDSUser#currentUser` 会返回一个 null 对象。
 
 ## 单纯的 TapTap 用户认证使用方式
 
-如果您仅仅只需要接入「TapTap 用户登录」这一种登录方式，确认不使用 TDS 其他云服务，可以看这里的文档。请注意，如果刚开始只选择接入「TapTap 登录」，后面又需要使用其他云服务的话，后期可能有一定的升级成本。
+如果您仅仅只需要接入 TapTap 这一种登录方式，确认不使用 TDS 其他云服务，可以看这里的文档。请注意，如果刚开始只选择接入「TapTap 登录」，后面又需要使用其他云服务的话，后期可能有一定的升级成本。
 
 使用原来 TapSDK v1.x 版本的开发者，也可以参考这里的说明来完成 TapSDK 的升级。
 

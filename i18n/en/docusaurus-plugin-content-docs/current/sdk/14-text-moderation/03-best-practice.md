@@ -1,7 +1,7 @@
 ---
 id: best-practice
-title: Good practice
-sidebar_label: Good practice
+title: Text Moderation Best Practice
+sidebar_label: Best Practice
 ---
 
 ## Game nickname check-up
@@ -10,8 +10,8 @@ According to "Internet Information Service Management Measures", "Network Inform
 
 ### Prerequisites
 
- - Already [Enable Text Moderation Service](/sdk/text-moderation/features#Enable Text Moderation service)
- - Already read [Development Guide](/sdk/text-moderation/guide)
+ - Already [Enable Text Moderation Service](/sdk/text-moderation/features#enable-text-moderation-service)
+ - Already read [Development Guide](/sdk/text-moderation/guide/)
 
 ### Application scenarios
 
@@ -51,8 +51,8 @@ Most online games have instant messaging, broadcast, chat room and other scenari
 
 ### Prerequisites
 
- - Already [Activate Text Moderation Service](/sdk/text-moderation/features#Enable Text Moderation service)
- - Already read [Development Guide](/sdk/text-moderation/guide)
+ - Already [Activate Text Moderation Service](/sdk/text-moderation/features#enable-text-moderation-service)
+ - Already read [Development Guide](/sdk/text-moderation/guide/)
 
 ### Application scenarios
 
