@@ -74,7 +74,7 @@ The top function menu of the Text Moderation Console is as follows:
 - [Custom lexicon] page: used to configure user-defined blacklisted and white-listed words.
 
 ### Console - Statistics 
-![](/img/textsafety1.png)
+![](/img/text-moderation-en-01.png)
 
 On this page, you can view recent check-up core data indicators.
 
@@ -84,7 +84,7 @@ By selecting a Scene and date query, you can view the chart under the correspond
 - [Distribution statistics of identification types of rejects] chart: in the chart, the broken line indicates the number of each identification type.
 
 ### Console - Check-up history 
-![](/img/textsafety2.png)
+![](/img/text-moderation-en-02.png)
 
 On this page, you can query the details of each recent check-up history, including check-up text, check-up result, identification type, time, etc.
 
@@ -92,7 +92,7 @@ On this page, you can query the details of each recent check-up history, includi
 - When the mouse moves over the text, a complete text bubble will be displayed. If the text fails to pass the check-up, the words and sentences that may violate the rules will be displayed in red in the bubble.
 
 ### Console - On-line check-up 
-![](/img/textsafety3.png)
+![](/img/text-moderation-en-03.png)
 
 On this page, you can enter the text online, use the selected Scene to check the text and output the check-up result in real time.
 
@@ -100,7 +100,7 @@ On this page, you can enter the text online, use the selected Scene to check the
 - The text of on-line check-up carries “admin_000000” as user ID in the record by default. You can use this item to distinguish which records are generated via on-line check-up.
 
 ### Console - Scene configuration
-![](/img/textsafety4.png)
+![](/img/text-moderation-en-04.png)
 
 On this page, you can configure the Scene strategically, including the identification type enabled and the lexicon used. The Scene ID can be obtained here, which can be used to specify the Scene for check-up under API requests. For details regarding Scene parameters, please refer to [Development Guide](/sdk/text-moderation/guide/)
 
@@ -126,7 +126,7 @@ In the [Modify] pop-up window, select an identification type. This means that th
 > Generally, the priority of the custom lexicon is configured to be higher than that of the default lexicon
 
 ### Console - Custom lexicon configuration
-![](/img/textsafety5.png)
+![](/img/text-moderation-en-05.png)
 
 Custom lexicons can be managed on this page. After a custom lexicon is used by a Scene, it can play a role in the Scene and identify words in the lexicon.
 
@@ -134,7 +134,7 @@ Custom lexicons can be managed on this page. After a custom lexicon is used by a
 Currently, up to 5 custom lexicons can be supported at the same time, and multiple lexicons can be maintained for the use of Scenes based on operational needs.
 
 #### 2. Manage words in the lexicon
-[](/img/textsafety6.png)
+![](/img/text-moderation-en-06.png)
 
 In the pop-up window for adding and deleting words, you can add new words, delete words and modify the identification types of words.
 
