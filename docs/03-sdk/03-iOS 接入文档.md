@@ -12,7 +12,7 @@ title: iOS SDK 文档
 
 #### 1.2.导入 SDK
 
-请 [下载最新的 SDK]()，将 TapDB.framework 导入到 Xcode 工程中。
+请 [下载最新的 SDK](../download)，将 TapDB.framework 导入到 Xcode 工程中。
 
 #### 1.3.添加依赖
 
