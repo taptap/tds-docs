@@ -1,5 +1,5 @@
 ---
-title: User - Event 模型
+id: user-event-model
 ---
 
 我们很清楚，用户在玩游戏的过程中，会在游戏内产生各种不同类型的行为。比如：
