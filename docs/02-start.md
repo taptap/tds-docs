@@ -9,7 +9,7 @@ hide_title: false
 
 你必须使用 AppID 才能完成 SDK 集成。AppID 可以按以下方式申请
 
-1. 登录 TapDB ：通过 TapDB 账号登录 TapDB。如果你还没有 TapDB 账号，请先 注册。
+1. 登录 TapDB ：通过 TapDB 账号登录 TapDB。如果你还没有 TapDB 账号，请先 [注册](/../dm/register)。
 
 2. 创建企业：进入 TapDB 后首先创建企业，完善企业名称和企业 Logo。
 
