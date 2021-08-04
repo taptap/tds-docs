@@ -355,19 +355,22 @@ catch(Exception e)
 ```
 
 ```java
-TapLoginHelper.getTestQualification(new Callback<Boolean>() {
+TapLoginHelper.getTestQualification(new Api.ApiCallback<Boolean>() {
     @Override
     public void onSuccess(Boolean aBoolean) {
-        if（aboolean）{
+        if(aBoolean){
             // 该玩家已拥有测试资格
-        }else{
-            // 该玩家不具备测试资格
+            Toast.makeText(MainActivity.this, "该玩家已具有篝火测试资格", Toast.LENGTH_SHORT).show();
+        }else {
+            // 该玩家不具备测试资格， 游戏层面进行拦截
+            Toast.makeText(MainActivity.this, "该玩家不具备篝火测试资格", Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
-    public void onFail(TapError tapError) {
-        // 网络异常或查询失败
+    public void onError(Throwable throwable) {
+        // 服务端检查出错或者网络异常
+        Toast.makeText(MainActivity.this, "服务端检查出错或者网络异常", Toast.LENGTH_SHORT).show();
     }
 });
 ```
