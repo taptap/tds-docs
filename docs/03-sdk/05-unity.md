@@ -1,8 +1,6 @@
 ---
-title: Unity-3D SDK 文档
+title: Unity SDK 文档
 ---
-
-## Unity SDK 文档
 
 ### 1.SDK 集成
 

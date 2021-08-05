@@ -3,8 +3,6 @@ id: iOS
 title: iOS SDK 文档
 ---
 
-## iOS SDK 文档
-
 ### 1.SDK 集成
 
 #### 1.1.系统要求

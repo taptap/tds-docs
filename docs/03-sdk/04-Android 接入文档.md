@@ -3,8 +3,6 @@ id: Android
 title: Android SDK 文档
 ---
 
-## Android SDK 文档
-
 ### 1.SDK 集成
 
 #### 1.1.系统要求
