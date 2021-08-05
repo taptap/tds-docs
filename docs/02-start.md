@@ -29,17 +29,17 @@ hide_title: false
 
 为了能更好的理解和使用 TapDB，建议你阅读 埋点设计指南 后集成 SDK。
 
-[iOS 接入指南](sdk/iOS "_blank")
+[iOS 接入指南](/sdk/iOS "_blank")
 
-[Android 接入指南](sdk/Android "_blank")
+[Android 接入指南](/sdk/Android "_blank")
 
-[Unity 接入指南](sdk/unity "_blank")
+[Unity 接入指南](/sdk/unity "_blank")
 
-[服务端接入指南](sdk/服务端接入文档 "_blank")
+[服务端接入指南](/sdk/服务端接入文档 "_blank")
 
 ## 第三步：校验数据
 
-App 集成 SDK 后，使用一台联网设备下载 App，在「配置」-「埋点管理」测试埋点上报情况。数据校验通过后项目才可正式上线。点击 埋点管理（此处加链接-埋点管理） 查看详细校验指导。
+App 集成 SDK 后，使用一台联网设备下载 App，在「配置」-「埋点管理」测试埋点上报情况。数据校验通过后项目才可正式上线。点击 [埋点管理](/features/customEvent/metaData) 查看详细校验指导。
 
 在操作过程中，如遇到任何问题，请先查阅说明文档和 FAQ文档，若文档无法解决问题，可填写 [工单](/dm/m/workOrder "_tapdb") 寻求帮助。
 
