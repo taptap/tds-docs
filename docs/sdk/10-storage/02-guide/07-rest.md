@@ -1594,6 +1594,7 @@ https://{{host}}/1.1/login
 ```
 
 可以将 sessionToken 理解为用户的登录凭证，每个用户的 sessionToken 在同一个应用内都是唯一的， 类似于 Cookie 的概念。
+SDK 在客户端会一直缓存 sessionToken，直到用户登出或重新登录。
 
 正常情况下，用户的 sessionToken 是固定不变的，但在以下情况下会发生改变：
 
