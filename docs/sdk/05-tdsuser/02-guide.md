@@ -963,6 +963,8 @@ option.isMainAccount = true;
 
 接下来，用户 A 继续在「云服务技术支持」中进行微信登录，其登录逻辑为：
 
+<MultiLang>
+
 ```cs
 Dictionary<string, object> thirdPartyData = new Dictionary<string, object> {
   // 必须
