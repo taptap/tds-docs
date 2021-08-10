@@ -229,25 +229,25 @@ C：属性的分析指标：根据属性值类型，可存在以下分析指标�
 
 选择完主维度和指标后，点击保存报表将该报表保存下来，输入名字后点击确认，则该报表被保存至“已保存报表”中。
 
-
+![](/img/customEvent/event_analyse_save_report_1.png)
 
 
 首次保存某报表后，再次打开该报表即会出现“另存为”按钮，点击后另存为一张新的报表，若点击“保存报表”，则是更新之前保存的报表。
 
-
+![](/img/customEvent/event_analyse_save_report_2.png)
 
 
 被保存/另存为的报表展现在屏幕右侧“我的报表”，可以点击自己保存的报表直接查询。
+
+![](/img/customEvent/event_analyse_save_report_3.png)
 
 ## 五、透视表
 
 透视表是一种可交互的数据报表形态，其特点为所进行的计算与数据跟数据透视表中的排列有关。之所以称为数据透视表，是因为可动态改变数据的聚合维度的先后顺序，从而使得客户可以用多重角度观察数据。下面我们对比以下两张透视表：
 
+![](/img/customEvent/event_analyse_pivot_table_1.png)
 
-
-
-
-
+![](/img/customEvent/event_analyse_pivot_table_2.png)
 
 上下两张透视表（分别简称上表和下表，以下同）。
 
@@ -262,6 +262,8 @@ C：属性的分析指标：根据属性值类型，可存在以下分析指标�
 ### 5.2 搜索
 
 透视表的维度表头处，可以点击搜索输入文字，快速筛选出符合条件的项目，这里为结果筛选，筛选后不会重新进入查询。
+
+![](/img/customEvent/event_analyse_table_filter.png)
 
 ### 5.3 排序
 
