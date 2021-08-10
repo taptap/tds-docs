@@ -22,7 +22,7 @@ LCUser 是 LeanCloud 提供的账户系统，TDSUser 基本沿用了其功能和
 
 直接调用 `TDSUser#loginWithTapTap` 方法即可一键登录，详见[接入 TapTap 登录](/sdk/taptap-login/guide/start/)。
 
-### 游客登录
+## 游客登录
 
 内建账户系统支持游戏创建一个游客账号，其调用示例如下：
 
