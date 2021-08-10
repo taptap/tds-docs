@@ -329,7 +329,7 @@ Profile profile = TapLoginHelper.getCurrentProfile();
 该功能仅用于需要上线「篝火测试服」的游戏，对有登录白名单的用户进行资格校验，防止测试阶段开发包外传被利用
 :::
 
-请在登录成功的回调里调用相关 API 进行资格校验，[点击](https://www.taptap.com/campfire)了解篝火计划。
+请在登录成功的回调里调用相关 API 进行资格校验。
 
 <MultiLang>
 
@@ -351,7 +351,6 @@ catch(Exception e)
 {
     Debug.Log($"篝火测试 error：{e.Message}");
 }
-
 ```
 
 ```java
