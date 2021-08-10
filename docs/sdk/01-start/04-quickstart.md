@@ -355,116 +355,16 @@ config.serverURL = @"https://your_server_url";  // 开发者中心 > 你的游�
 `client_id`、`client_token`、`server_url` 等信息均可在控制台查看。
 详见文档关于[绑定域名](/sdk/storage/guide/setup-dotnet#绑定域名)、[应用凭证](/sdk/storage/guide/setup-dotnet#应用凭证)的说明。
 
-## 登录
-
-注册登录回调，以接收登录结果。在尝试登录用户前先检查登录状态。
-
-### 检查登录状态
-
-`TDSUser` 会在本地缓存当前用户的登录信息，所以如果一个玩家在游戏内登录之后，下次启动用户通过调用 `TDSUser#currentUser` 可以得到之前登录的账户实例，此时玩家无需再次登录即可使用。
-缓存不会自动清除。
-如果玩家在游戏内进行了登出或者玩家手动清除了游戏的存储数据，则本地缓存的登录信息也会被删除，下次进入游戏时 `TDSUser#currentUser` 会返回一个 null 对象。
-
-
-<MultiLang>
-
-```cs
-var currentUser = await TDSUser.GetCurrent();
-if (null == currentUser)
-{
-    Debug.Log("当前未登录");
-}
-else 
-{
-    Debug.Log("已登录");
-}
-```
-
-```java
-if (null == TDSUser.currentUser()) {
-    // 未登录
-} else {
-    // 已登录
-}
-```
-
-```objectivec
-TDSUser *currentUser = [TDSUser currentUser]
-if (currentUser == nil) {
-    // 未登录
-} else {
-    // 已登录
-}
-```
-</MultiLang>
-
-### 登录
-
-<MultiLang>
-
-```cs
-try{
-    var tdsUser = await TDSUser.LoginWithTapTap();
-}catch(Exception e){
-    //登录失败
-    Debug.Log($"{e.code} : {e.message}");
-}
-```
-
-```java
-TDSUser.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
-    @Override
-    public void onSuccess(TDSUser resultUser) {
-        Toast.makeText(MainActivity.this, "succeed to login with Taptap.", Toast.LENGTH_SHORT).show();
-        // 开发者可以调用 resultUser 的方法获取更多属性。
-        String userId = resultUser.getObjectId();  // 用户唯一标识
-        String avatar = (String) resultUser.get("avatar");  // 头像
-        String nickName = (String) resultUser.get("nickname");  // 昵称
-    }
-
-    @Override
-    public void onFail(TapError error) {
-        Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
-    }
-}, TapLoginHelper.SCOPE_PUBLIC_PROFILE);
-```
-
-```objectivec
-[TDSUser loginByTapTapWithPermissions:@[@"public_profile"] callback:^(TDSUser * _Nullable user, NSError * _Nullable error) {
-    if (user) {
-        // 开发者可以调用 user 的方法获取更多属性。
-        NSString *userId = user.objectId;  // 用户唯一标识
-        NSString *username = user[@"nickname"];  // 昵称
-        NSString *avatar = user[@"avatar"];  // 头像
-    } else {
-        NSLog(@"%@", error);
-    }
-}];
-```
-
-</MultiLang>
-
-### 登出
-
-:::caution
-当用户退出登录的时候请务必调用此方法执行退出功能， 避免用户信息错乱。
+:::info
+TapSDK 3.0 版本目前暂不支持海外，预计本季度部署海外节点，敬请期待。
 :::
 
-<MultiLang>
+## 接入功能
 
-```cs
-TDSUser.Logout();
-```
+TapSDK 提供了众多功能。请在初始化 SDK 后，根据项目需要，参考相应功能的文档，接入相应功能。
+绝大多数游戏都会接入 TapTap 登录，所以我们推荐从这一功能开始：
 
-```java
-TDSUser.logOut().
-```
-
-```objectivec
-[TDSUser logOut];
-```
-
-</MultiLang>
+[快速上手，接入 TapTap 一键登录](/sdk/taptap-login/guide/start)
 
 ## 打包
 
