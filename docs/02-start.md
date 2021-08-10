@@ -9,13 +9,15 @@ hide_title: false
 
 你必须使用 AppID 才能完成 SDK 集成。AppID 可以按以下方式申请
 
-1. 登录 TapDB ：通过 TapDB 账号登录 TapDB。如果你还没有 TapDB 账号，请先 [注册](/../dm/register "_blank")。
+1. 登录 TapDB：通过 TapDB 账号登录 TapDB。如果你还没有 TapDB 账号，请先 [注册](/../dm/register "_blank")。
 
 2. 创建企业：进入 TapDB 后首先创建企业，完善企业名称和企业 Logo。
 
-3. 创建项目：在「游戏」界面下创建游戏项目，创建完成后会系统会为项目分配 AppID。
+3. 创建项目：在「游戏」界面下创建游戏项目，创建完成后系统会为项目分配 AppID。
 
 注意：建议同一个应用的 iOS 和 Android 版共用一个 AppID。一家企业创建项目的上限是 20 个。
+![](/img/customEvent/appid.png)
+
 
 ## 第二步：集成 SDK
 
@@ -41,5 +43,5 @@ hide_title: false
 
 App 集成 SDK 后，使用一台联网设备下载 App，在「配置」-「埋点管理」测试埋点上报情况。数据校验通过后项目才可正式上线。点击 [埋点管理](/features/customEvent/metaData) 查看详细校验指导。
 
-在操作过程中，如遇到任何问题，请先查阅说明文档和 FAQ文档，若文档无法解决问题，可填写 [工单](/dm/m/workOrder "_tapdb") 寻求帮助。
+在操作过程中，如遇到任何问题，请先查阅说明文档和 FAQ 文档，若文档无法解决问题，可填写 [工单](/dm/m/workOrder "_tapdb") 寻求帮助。
 
