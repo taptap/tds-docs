@@ -13,7 +13,7 @@ title: Unity SDK 文档
 
 ### 1.2.导入 SDK
 
-请 [下载最新的 SDK](../download "_blank")，将 TapDB.unitypackage 导入到 Unity 工程中。
+请 [下载最新的 SDK](/05-download.md "_blank")，将 TapDB.unitypackage 导入到 Unity 工程中。
 
 
 **注意：Unity SDK 中的 Android TapDB SDK 支持获取 OAID (需要手动添加 OAID 的 SDK)，使归因更加精准**
