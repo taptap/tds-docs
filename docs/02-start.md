@@ -41,7 +41,7 @@ hide_title: false
 
 ## 第三步：校验数据
 
-App 集成 SDK 后，使用一台联网设备下载 App，在「配置」-「埋点管理」测试埋点上报情况。数据校验通过后项目才可正式上线。点击 [埋点管理](/features/customEvent/metaData "_blank") 查看详细校验指导。
+App 集成 SDK 后，使用一台联网设备下载 App，在「配置」-「埋点管理」测试埋点上报情况。数据校验通过后项目才可正式上线。点击 [埋点管理](/features/customEvent/trackingManagement "_blank") 查看详细校验指导。
 
 在操作过程中，如遇到任何问题，请先查阅说明文档和 FAQ 文档，若文档无法解决问题，可填写 [工单](/dm/m/workOrder "_tapdb") 寻求帮助。
 
