@@ -18,7 +18,7 @@ title: Android SDK 文档
 
 **注意：TapDB SDK 支持获取 OAID (需要手动添加 OAID 的 SDK)，使归因更加精准**
 
-当前支持 OAID SDK 1.0.5~1.0.25 版本，当集成 OAID SDK 后，TapDB SDK 会自动获取 OAID 并进行上报。OAID SDK 可以自行从OAID官网下载，也可以从此处下载 [OAID 1.0.25](https://res.xdcdn.net/tapdb/Android/oaid/oaid_sdk_1.0.25.aar)。
+当前支持 OAID SDK 1.0.5~1.0.25 版本，当集成 OAID SDK 后，TapDB SDK 会自动获取 OAID 并进行上报。OAID SDK 可以自行从 OAID 官网下载，也可以从此处下载 [OAID 1.0.25](https://res.xdcdn.net/tapdb/Android/oaid/oaid_sdk_1.0.25.aar)。
 
 
 
@@ -72,14 +72,14 @@ public static void setUser(String userId, JSONObject properties)
 
 字段 | 可为空 | 说明
 --- | --- | ---
-userId | 否 | 长度大于 0 并小于等于 256。只能包含数字、大小写字母、下划线(_)、横线(-)，用户ID。不同账号需要保证ID的唯一性
+userId | 否 | 长度大于 0 并小于等于 256。只能包含数字、大小写字母、下划线(_)、横线(-)，用户 ID。不同账号需要保证 ID 的唯一性
 properties | 是 | 账号登录（ `user_login` ）的事件属性
 
 
 
 ### 2.2.清除账号 ID
 
-当用户进行登出时，可调用 clearUser 清除当前 SDK 中保存账号 ID，后续上报的事件将不会带有账号 ID，调用该接口不会上报任何事件。
+当用户进行登出时，可调用 clearUser 清除当前 SDK 中保存的账号 ID，后续上报的事件将不会带有账号 ID，调用该接口不会上报任何事件。
 
 ```
 public static void clearUser()
@@ -96,7 +96,7 @@ public static void setName(String name)
 
 字段 | 可为空 | 说明
 --- | --- | ---
-name | 否 | 长度大于0并小于等于256，账号名
+name | 否 | 长度大于 0 并小于等于 256，账号名
 
 
 ### 2.4.设置账号等级
@@ -137,9 +137,9 @@ public static void onCharge(String orderId, String product, long amount, String 
 
 字段 | 可为空 | 说明
 --- | --- | ---
-orderId | 否 | 订单ID
+orderId | 否 | 订单 ID
 product | 是 | 产品名称
-amount | 否 | 充值金额（单位分，即无论什么币种，都需要乘以100）
+amount | 否 | 充值金额（单位分，即无论什么币种，都需要乘以 100）
 currencyType | 是 | 货币类型，参考：人民币 CNY，美元 USD；欧元 EUR
 payment | 是 | 支付方式，如：支付宝
 properties | 是 | 充值（ `charge` ）的事件属性

@@ -40,7 +40,7 @@ libsqlite3.0.tbd |
 ```
 
 初始化 TapDB SDK 并上报一个设备登录（ `device_login` ）事件，调用这个接口是使用其它接口的先决条件，需要尽早调用。
-一般建议在AppDelegate的 `application:didFinishLaunchingWithOptions:` 中调用。
+一般建议在 AppDelegate的 `application:didFinishLaunchingWithOptions:` 中调用。
 
 ```
 + (void)onStart:(NSString *)appId channel:(nullable NSString *)channel version:(nullable NSString *)gameVersion;
@@ -51,7 +51,7 @@ libsqlite3.0.tbd |
 
 字段 | 可为空 | 说明
 --- | --- | ---
-appId | 否 | 创建游戏时获得的APP ID
+appId | 否 | 创建游戏时获得的APPID
 channel | 是 | 分包渠道
 version | 是 | 游戏版本，为空时，自动获取游戏安装包的版本（ Xcode 配置中的 Version ）
 properties | 是 | 设备登录（ `device_login` ）的事件属性，可以传入预置属性覆盖 SDK 的默认取值，也可以传入在后台配置过的自定义属性
@@ -78,7 +78,7 @@ properties | 是 | 账号登录（ `user_login` ）的事件属性
 
 ### 2.2.清除账号 ID
 
-当用户进行登出时，可调用 clearUser 清除当前 SDK 中保存账号 ID，后续上报的事件将不会带有账号 ID，调用该接口不会上报任何事件。
+当用户进行登出时，可调用 clearUser 清除当前 SDK 中保存的账号 ID，后续上报的事件将不会带有账号 ID，调用该接口不会上报任何事件。
 
 ```
 + (void)clearUser;
@@ -95,7 +95,7 @@ properties | 是 | 账号登录（ `user_login` ）的事件属性
 
 字段 | 可为空 | 说明
 --- | --- | ---
-name | 否 | 长度大于0并小于等于256，账号名
+name | 否 | 长度大于 0 并小于等于 256，账号名
 
 
 ### 2.4.设置账号等级
@@ -136,9 +136,9 @@ server | 否 | 账号服务器
 
 字段 | 可为空 | 说明
 --- | --- | ---
-orderId | 否 | 订单ID
+orderId | 否 | 订单 ID
 product | 是 | 产品名称
-amount | 否 | 充值金额（单位分，即无论什么币种，都需要乘以100）
+amount | 否 | 充值金额（单位分，即无论什么币种，都需要乘以 100）
 currencyType | 是 | 货币类型，参考：人民币 CNY，美元 USD；欧元 EUR
 payment | 是 | 支付方式，如：支付宝
 properties | 是 | 充值（ `charge` ）的事件属性

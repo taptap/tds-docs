@@ -18,7 +18,7 @@ title: Unity SDK 文档
 
 **注意：Unity SDK 中的 Android TapDB SDK 支持获取 OAID (需要手动添加 OAID 的 SDK)，使归因更加精准**
 
-当前支持 OAID SDK 1.0.5 ~ 1.0.25 版本，当集成 OAID SDK 后，TapDB SDK 会自动获取 OAID 并进行上报。OAID SDK 可以自行从OAID官网下载，也可以从此处下载 [OAID 1.0.25](https://res.xdcdn.net/tapdb/Android/oaid/oaid_sdk_1.0.25.aar)。
+当前支持 OAID SDK 1.0.5 ~ 1.0.25 版本，当集成 OAID SDK 后，TapDB SDK 会自动获取 OAID 并进行上报。OAID SDK 可以自行从 OAID 官网下载，也可以从此处下载 [OAID 1.0.25](https://res.xdcdn.net/tapdb/Android/oaid/oaid_sdk_1.0.25.aar)。
 
 
 
@@ -71,7 +71,7 @@ public static void onStartWithProperties(string appId, string channel, string ga
 
 字段 | 可为空 | 说明
 --- | --- | ---
-appId | 否 | 创建游戏时获得的APP ID
+appId | 否 | 创建游戏时获得的APPID
 channel | 是 | 分包渠道
 version | 是 | 游戏版本，为空时，自动获取游戏安装包的版本
 properties | 是 | 设备登录（ `device_login` ）的事件属性，可以传入预置属性覆盖 SDK 的默认取值，也可以传入在后台配置过的自定义属性
@@ -90,7 +90,7 @@ public static void setUserWithProperties(string userId,Dictionary<string, object
 
 字段 | 可为空 | 说明
 --- | --- | ---
-userId | 否 | 长度大于 0 并小于等于 256。只能包含数字、大小写字母、下划线(_)、横线(-)，用户ID。不同用户需要保证ID的唯一性
+userId | 否 | 长度大于 0 并小于等于 256。只能包含数字、大小写字母、下划线(_)、横线(-)，用户ID。不同用户需要保证 ID 的唯一性
 properties | 是 | 账号登录（ `user_login` ）的事件属性
 
 
@@ -153,9 +153,9 @@ public static void onChargeSuccess(string orderId, string product, Int32 amount,
 
 字段 | 可为空 | 说明
 --- | --- | ---
-orderId | 否 | 订单ID
+orderId | 否 | 订单 ID
 product | 是 | 产品名称
-amount | 否 | 充值金额（单位分，即无论什么币种，都需要乘以100）
+amount | 否 | 充值金额（单位分，即无论什么币种，都需要乘以 100）
 currencyType | 是 | 货币类型，参考：人民币 CNY，美元 USD；欧元 EUR
 payment | 是 | 支付方式，如：支付宝
 properties | 是 | 充值（ `charge` ）的事件属性

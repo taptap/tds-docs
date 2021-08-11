@@ -16,7 +16,6 @@ hide_title: false
 3. 创建项目：在「游戏」界面下创建游戏项目，创建完成后系统会为项目分配 AppID。
 
 注意：建议同一个应用的 iOS 和 Android 版共用一个 AppID。一家企业创建项目的上限是 20 个。
-![](/img/customEvent/appid.png)
 
 
 ## 第二步：集成 SDK
