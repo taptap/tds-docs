@@ -13,7 +13,7 @@ title: Android SDK 文档
 
 ### 1.2.导入 SDK
 
-请 [下载最新的 SDK](../download)，将 TapDB.aar 导入到 Android Studio 工程中。
+请 [下载最新的 SDK](../download "_blank")，将 TapDB.aar 导入到 Android Studio 工程中。
 
 
 **注意：TapDB SDK 支持获取 OAID (需要手动添加 OAID 的 SDK)，使归因更加精准**
@@ -144,7 +144,7 @@ currencyType | 是 | 货币类型，参考：人民币 CNY，美元 USD；欧元
 payment | 是 | 支付方式，如：支付宝
 properties | 是 | 充值（ `charge` ）的事件属性
 
-**注意:在条件允许的情况下推荐使用服务端充值统计接口，请参考 [服务端接入文档](./服务端接入文档)**
+**注意:在条件允许的情况下推荐使用服务端充值统计接口，请参考 [服务端接入文档](./服务端接入文档 "_blank")**
 
 
 ## 4.上报事件

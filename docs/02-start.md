@@ -28,7 +28,7 @@ hide_title: false
 
 ### 集成 SDK：
 
-为了能更好的理解和使用 TapDB，建议你阅读 [埋点设计指南](/features/customEvent/dataModel) 后集成 SDK。
+为了能更好的理解和使用 TapDB，建议你阅读 [埋点设计指南](/features/customEvent/dataModel "_blank") 后集成 SDK。
 
 [iOS 接入指南](/sdk/iOS "_blank")
 

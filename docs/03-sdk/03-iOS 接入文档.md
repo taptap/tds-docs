@@ -11,7 +11,7 @@ title: iOS SDK 文档
 
 ### 1.2.导入 SDK
 
-请 [下载最新的 SDK](../download)，将 TapDB.framework 导入到 Xcode 工程中。
+请 [下载最新的 SDK](../download "_blank")，将 TapDB.framework 导入到 Xcode 工程中。
 
 ### 1.3.添加依赖
 
@@ -143,7 +143,7 @@ currencyType | 是 | 货币类型，参考：人民币 CNY，美元 USD；欧元
 payment | 是 | 支付方式，如：支付宝
 properties | 是 | 充值（ `charge` ）的事件属性
 
-**注意:在条件允许的情况下推荐使用服务端充值统计接口，请参考 [服务端接入文档](./服务端接入文档)**
+**注意:在条件允许的情况下推荐使用服务端充值统计接口，请参考 [服务端接入文档](./服务端接入文档 "_blank")**
 
 
 ## 4.上报事件
