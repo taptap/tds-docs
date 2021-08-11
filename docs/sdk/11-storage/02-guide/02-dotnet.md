@@ -974,7 +974,7 @@ print(file.Url);
 ```cs
 LCObject todo = new LCObject("Todo");
 todo["title"] = "买蛋糕";
-// attachments 是一个 File 类型
+// attachments 是一个 LCFile[] 类型
 todo.Add("attachments", file);
 await todo.Save();
 ```
