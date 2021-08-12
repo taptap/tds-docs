@@ -82,7 +82,7 @@ try{
         Debug.Log($"code:{tapError.code} message:{tapError.message}")
     }
 }
-// 获取 TapTap Profile  可以获得当前用户的一些基本信息，例如名称、头像、性别。
+// 获取 TapTap Profile  可以获得当前用户的一些基本信息，例如名称、头像。
 var profile = await TapLogin.FetchProfile();
 // 补充通过 profile 获取用户的：昵称、头像、唯一标识 查看 
 profile.name  
@@ -96,7 +96,7 @@ TapLoginHelper.TapLoginResultCallback loginCallback = new TapLoginHelper.TapLogi
     @Override
     public void onLoginSuccess(AccessToken token) {
         Log.d(TAG, "TapTap authorization succeed");
-        // 开发者调用 TapLoginHelper.getCurrentProfile() 可以获得当前用户的一些基本信息，例如名称、头像、性别。
+        // 开发者调用 TapLoginHelper.getCurrentProfile() 可以获得当前用户的一些基本信息，例如名称、头像。
         Profile profile = TapLoginHelper.getCurrentProfile();
     }
 

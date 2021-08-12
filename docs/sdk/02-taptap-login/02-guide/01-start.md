@@ -91,12 +91,12 @@ TapTap 用户登录成功之后，开发者可以通过如下方式获取到 Tap
 <MultiLang>
 
 ```cs
-// 获取 TapTap Profile  可以获得当前用户的一些基本信息，例如名称、头像、性别。
+// 获取 TapTap Profile  可以获得当前用户的一些基本信息，例如名称、头像。
 var profile = await TapLogin.FetchProfile();
 ```
 
 ```java
-// 开发者调用 TapLoginHelper.getCurrentProfile() 可以获得当前用户的一些基本信息，例如名称、头像、性别。
+// 开发者调用 TapLoginHelper.getCurrentProfile() 可以获得当前用户的一些基本信息，例如名称、头像。
 Profile profile = TapLoginHelper.getCurrentProfile();
 ```
 
@@ -306,7 +306,7 @@ clientId | TapTap 开发者中心对应应用的 Client ID
 ```cs
 // 唤起 TapTap 网页 或者 TapTap 客户端进行登陆
 var accessToken = await TapLogin.Login();
-// 获取 TapTap Profile  可以获得当前用户的一些基本信息，例如名称、头像、性别。
+// 获取 TapTap Profile  可以获得当前用户的一些基本信息，例如名称、头像。
 var profile = await TapLogin.FetchProfile();
 ```
 
@@ -315,7 +315,7 @@ TapLoginHelper.TapLoginResultCallback loginCallback = new TapLoginHelper.TapLogi
     @Override
     public void onLoginSuccess(AccessToken token) {
         Log.d(TAG, "TapTap authorization succeed");
-        // 开发者调用 TapLoginHelper.getCurrentProfile() 可以获得当前用户的一些基本信息，例如名称、头像、性别。
+        // 开发者调用 TapLoginHelper.getCurrentProfile() 可以获得当前用户的一些基本信息，例如名称、头像。
         Profile profile = TapLoginHelper.getCurrentProfile();
     }
 
