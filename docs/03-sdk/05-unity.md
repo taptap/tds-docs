@@ -336,13 +336,13 @@ TapDB.deviceInitialize(properties);
 
 使用方法同设备属性更新操作
 ```
-public static void userInitialize(Dictionary<string, object> properties)
+public static void userUpdate(Dictionary<string, object> properties)
 ```
 
 **账号属性初始化操作**
 
 ```
-public static void userUpdate(Dictionary<string, object> properties)
+public static void userInitialize(Dictionary<string, object> properties)
 ```
 
 **账号属性累加操作**
