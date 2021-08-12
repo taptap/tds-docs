@@ -1350,7 +1350,7 @@ iOS 8.0 之后，使用定位服务之前，需要调用 `[locationManager reque
 
 ## 用户
 
-请参阅[内建账户指南](/sdk/tdsuser/guide/)。
+请参阅[内建账户指南](/sdk/authentication/guide/)。
 
 ## 角色
 

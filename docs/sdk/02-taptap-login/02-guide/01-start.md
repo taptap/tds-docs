@@ -8,7 +8,7 @@ import MultiLang from '@theme/MultiLang';
 
 接入 TapTap 登录有两种方式：
 
-1. 基于[内建账户系统](/sdk/tdsuser/features)接入 TapTap 登录；
+1. 基于[内建账户系统](/sdk/authentication/features)接入 TapTap 登录；
 2. [单纯 TapTap 用户认证](#单纯的-taptap-用户认证使用方式)。
 
 第一种方式是我们推荐的方式，一般适用于以下场景：
@@ -242,7 +242,7 @@ TDSUser.logOut();
 
 ## 更多功能
 
-请阅读[内建账户指南](/sdk/tdsuser/guide/)了解内建账户系统的更多功能。
+请阅读[内建账户指南](/sdk/authentication/guide/)了解内建账户系统的更多功能。
 
 ## 单纯的 TapTap 用户认证使用方式
 
