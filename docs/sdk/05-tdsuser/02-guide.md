@@ -6,7 +6,7 @@ sidebar_label: 开发指南
 
 import MultiLang from '@theme/MultiLang';
 
-从 TapSDK 3.0 开始，我们提供了一个内建账户系统供游戏使用：开发者可以直接用 TapTap OAuth 授权的结果生成一个游戏内的账号（TDSUser），然后用该账号保存更多玩家数据，同时我们也支持将更多第三方认证登录的结果绑定到该账号上来。
+从 TapSDK 3.0 开始，我们提供了一个内建账户系统供游戏使用：开发者可以直接用 TapTap OAuth 授权的结果生成一个游戏内的账号（TDSUser），同时我们也支持将更多第三方认证登录的结果绑定到该账号上来。
 TapSDK 提供的游戏内好友、成就等服务和功能，也都基于这一账户系统。
 
 ## 初始化
@@ -228,21 +228,19 @@ NSString *token = currentUser.sessionToken;
 
 ## 设置其他用户属性
 
-开发者可以使用内建账户系统设置更多用户信息，例如在游戏中设置玩家的昵称、奖杯数等：
+开发者可以使用内建账户系统设置更多用户信息，比如游戏可以记录玩家的生日，以便在生日当天给玩家发放生日礼包：
 
 <MultiLang>
 
 ```cs
 var currentUser = await TDSUser.GetCurrent();  // 获取当前登录的账户实例
-currentUser["nickname"] = "打不死的青铜";
-currentUser["cups"] = 256;
+currentUser["birthday"] = "01-01";
 await currentUser.Save();
 ```
 
 ```java
 TDSUser currentUser = TDSUser.currentUser();  // 获取当前登录的账户实例
-currentUser.put("nickname", "打不死的青铜");
-currentUser.put("cups", 256);
+currentUser.put("birthday", "01-01");
 currentUser.saveInBackground().subscribe(new Observer<LCObject>() {
     @Override
     public void onSubscribe(@NotNull Disposable d) {
@@ -270,8 +268,7 @@ currentUser.saveInBackground().subscribe(new Observer<LCObject>() {
 
 ```objectivec
 TDSUser *currentUser = [TDSUser currentUser];
-currentUser[@"nickname"] = @"打不死的青铜";
-currentUser[@"cups"] = @256;
+currentUser[@"birthday"] = @"01-01";
 [currentUser saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
     if (succeeded) {
         // 保存成功
@@ -283,30 +280,53 @@ currentUser[@"cups"] = @256;
 
 </MultiLang>
 
-`TDSUser` 是 `LCObject` 的子类，所以 `LCObject` 支持的数据增删改查方式，`TDSUser` 也都可用。感兴趣的读者可以参考[数据存储的开发文档](/sdk/storage/features/)了解更多信息。
+一些开发者可能会利用这一机制将所有用户相关的信息都一股脑地存在内建账户系统，比如游戏可能将用户的等级、拥有的装备等信息都存在内建账户里，但我们并不推荐这么做。
+内建账户系统保存了用户的鉴权信息，也可能保存了邮箱、手机等敏感信息，因此默认会设置非常严格的权限，以防用户信息泄露。
+假设在内建账户系统中保存了游戏等级信息，由于很多游戏场景下需要展示玩家的等级，往往需要放宽内建账户系统的权限限制，以方便客户端查询这些信息，这就可能形成泄露用户敏感信息的安全隐患。
+另外，在内建账户系统中保存过多数据，也容易导致慢查询等性能问题。
+所以，我们建议仅在内建账户系统中保存和鉴权相关的信息。
+从实现上的简单性出发，少量仅用户本人可见的信息，一并保存在内建账户系统中，也未尝不可。
+但其他和鉴权无关的用户信息，建议另外创建专门的 Class（比如 `UserProfile`）保存。
 
+`TDSUser` 是 `LCObject` 的子类，所以 `LCObject` 支持的数据增删改查方式，`TDSUser` 也都可用。感兴趣的读者可以参考[数据存储的开发文档](/sdk/storage/features/)了解更多信息。
 
 ## 用户的查询
 
-可以直接构建一个针对 `_User` 的 `LCQuery` 来查询用户：
+可以直接构建一个针对 `_User` 的 [LCQuery](/sdk/storage/guide/dotnet/#查询) 来查询用户。
+例如，查询有多少玩家是 1 月 1 日生日的：
 
 <MultiLang>
 
 ```cs
 LCQuery<TDSUser> userQuery = TDSUser.GetQuery();
+userQuery.WhereEqualTo("birthday", "01-01");
+int count = await userQuery.Count(); 
 ```
 
 ```java
 LCQuery<TDSUser> userQuery = TDSUser.getQuery(TDSUser.class);
+userQuery.whereEqualTo("birthday", "01-01");
+userQuery.countInBackground().subscribe(new Observer<Integer>() {
+  public void onSubscribe(Disposable disposable) {}
+  public void onNext(Integer count) {
+    System.out.println(count + " 个玩家的生日是 1 月 1 日。");
+  }
+  public void onError(Throwable throwable) {}
+  public void onComplete() {}
+});
 ```
 
 ```objc
 LCQuery *userQuery = [TDSUser query];
+[userQuery whereKey:@"birthday" equalTo:@"01-01"];
+[query countObjectsInBackgroundWithBlock:^(NSInteger count, NSError *error) {
+  NSLog(@"%ld 个玩家的生日是 1 月 1 日。", count);
+}];
 ```
 
 </MultiLang>
 
-为了安全起见，**新创建的应用的 `_User` 表默认关闭了 `find` 权限**，这样每位用户登录后只能查询到自己在 `_User` 表中的数据，无法查询其他用户的数据。如果需要让其查询其他用户的数据，建议单独创建一张表来保存这类数据，并开放这张表的 `find` 查询权限。除此之外，还可以在云引擎里封装用户查询相关的方法。
+为了安全起见，**内建账户系统（`_User` 表）默认关闭了 `find` 权限**，这样每位用户登录后只能查询到自己在 `_User` 表中的数据，无法查询其他用户的数据。如果需要让其查询其他用户的数据，建议单独创建一张表来保存这类数据，并开放这张表的 `find` 查询权限。除此之外，还可以在云引擎里封装用户查询相关的方法。
 
 可以参见 [用户对象的安全](#用户对象的安全) 来了解 `_User` 表的一些限制，还可以阅读[数据和安全](/sdk/storage/guide/security/)来了解更多 class 级权限设置的方法。
 
