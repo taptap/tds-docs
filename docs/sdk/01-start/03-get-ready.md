@@ -27,7 +27,7 @@ sidebar_label: 准备工作
 
 ## 应用信息配置
 
-Android 和 iOS 应用需要在 「TapTap 开发者中心」 - 「游戏服务」- 「生态服务」 - 「TapTap 登陆」 配置应用的相关信息， 否则无法正常使用 TapSDK 的登陆功能。 具体配置如下所示
+Android 和 iOS 应用需要在 「TapTap 开发者中心」 - 「游戏服务」- 「生态服务」 - 「TapTap 登陆」 配置应用的相关信息， 否则无法正常使用 TapSDK 的登录功能。 具体配置如下所示：
 
 ![](/img/start_getready_info.png)
 
