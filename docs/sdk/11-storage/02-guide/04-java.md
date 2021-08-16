@@ -1410,6 +1410,138 @@ GeoPoint 的经纬度的类型是数字，且经度需在 -180.0 到 180.0 之�
 
 随着用户量的增长，你可能会发现相比于为每一名用户单独设置权限，将预先设定好的权限直接分配给一部分用户是更好的选择。为了迎合这种需求，云服务支持基于角色的权限管理。请参阅[《ACL 权限管理开发指南》](https://leancloud.cn/docs/acl-guide.html)。
 
+## 子类化
+
+子类化推荐给进阶的开发者在进行代码重构的时候做参考。你可以用 `LCObject#get` 访问任意字段；你也可以使用子类化的属性来封装获取字段的方法，增强编码体验。
+子类化有很多优势，包括减少代码的编写量，具有更好的扩展性，和支持自动补全等等。
+
+### 实现
+
+要实现子类化，需要下面 4 个步骤：
+
+1. 首先声明一个子类继承自 `LCObject`；
+2. 添加 `@LCClassName` 注解。它的值必须是一个字符串，也就是你过去传入 `LCObject` 构造函数的类名。这样以来，后续就不需要再在代码中出现这个字符串类名；
+3. 确保你的子类有一个 public 的默认（参数个数为 0）的构造函数。切记不要在构造函数里修改任何 `LCObject` 的字段；
+4. 在你的应用初始化的地方，在调用 `LeanCloud.initialize()` 之前注册子类 `LCObject.registerSubclass(YourClass.class)`。
+
+下面是实现 `Student` 子类化的例子:
+
+``` java
+// Student.java
+import cn.leancloud.LCClassName;
+import cn.leancloud.LCObject;
+
+@LCClassName("Student")
+public class Student extends LCObject {
+  // 添加访问器
+  public String getContent() {
+    return getString("content");
+  }
+  // 添加修改器
+  public void setContent(String value) {
+    put("content", value);
+  }
+  // 添加自定义方法
+  public void handleReport() {
+    // 处理用户举报，当达到某个条数的时候，自动打上屏蔽标志
+    increment("report", 1);
+    if (getReport() > 50) {
+      setSpam(true);
+    }
+  }
+}
+
+// App.java
+import cn.leancloud.LeanCloud;
+
+public class MyLeanCloudApp extends Application {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        LCObject.registerSubclass(Student.class);
+        LeanCloud.initialize(this, "your-client-id", "your-client-token", "https://please-replace-with-your-customized.domain.com");
+    }
+}
+```
+
+### 初始化子类
+
+你可以使用你自定义的构造函数来创建你的子类对象。你的子类必须定义一个公开的默认构造函数，并且不修改任何父类 LCObject 中的字段，这个默认构造函数将会被 SDK 使用来创建子类的强类型的对象。
+
+要创建一个到现有对象的引用，可以使用 `LCObject.createWithoutData()`:
+
+```java
+Student postReference = LCObject.createWithoutData(Student.class, student.getObjectId());
+```
+
+### 子类的序列化与反序列化
+
+如果希望 LCObject 子类也支持 Parcelable，则需要至少满足以下几个要求：
+1. 确保子类有一个 public 并且参数为 Parcel 的构造函数，并且在内部调用父类的该构造函数。
+2. 内部需要有一个静态变量 CREATOR 实现 `Parcelable.Creator`。
+
+```java
+// Stduent.java
+@LCClassName("Student")
+public class Student extends LCObject {
+  public Student(){
+    super();
+  }
+
+  public Student(Parcel in){
+    super(in);
+  }
+  //此处为我们的默认实现，当然你也可以自行实现
+  public static final Creator CREATOR = AVObjectCreator.instance;
+}
+```
+
+### 查询子类
+
+你可以通过 `LCObject.getQuery()` 或者 `LCQuery.getQuery` 的静态方法获取特定的子类的查询对象。下面的例子就查询了用户发表的所有微博列表：
+
+```java
+LCQuery<Student> query = LCObject.getQuery(Student.class);
+query.whereEqualTo("pubUser", LCUser.getCurrentUser().getUsername());
+List<Student> results = query.find();
+for (Student a : results) {
+    // ...
+}
+```
+
+### LCUser 的子类化
+
+LCUser 作为 AVObject 的子类，同样允许子类化，你可以定义自己的 User 对象，不过比起 LCObject 子类化会更简单一些，只要继承 LCUser 就可以了：
+
+```java
+import cn.leancloud.LCObject;
+import cn.leancloud.LCUser;
+
+public class MyUser extends LCUser {
+    public void setNickName(String name) {
+        this.put("nickName", name);
+    }
+
+    public String getNickName() {
+        return this.getString("nickName");
+    }
+}
+```
+
+不需要添加 @LCClassname 注解，所有 LCUser 的子类的类名都是内建的 `_User`。同样也不需要注册 MyUser。
+
+当用户子类化 LCUser 后，如果希望以后查询 LCUser 所得到的对象会自动转化为用户子类化的对象，则需要在调用 LeanCloud.initialize() 之前添加：
+
+```java
+LCUser.alwaysUseSubUserClass(subUser.class);
+```
+
+注册跟普通的 LCUser 对象没有什么不同，但是登录如果希望返回自定义的子类，必须这样：
+
+```java
+MyUser cloudUser = LCUser.logIn(username, password, MyUser.class);
+```
 
 ## 全文搜索
 
