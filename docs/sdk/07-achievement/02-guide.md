@@ -6,7 +6,7 @@ sidebar_label: 开发指南
 
 import MultiLang from '@theme/MultiLang';
 
-本文介绍如何在游戏中加入成就系统。TDS 推出的成就系统模块，是基于内建账户系统（TDSUser）的，具体请阅读[登录系统 > 开发指南](/sdk/taptap-login/guide/start/)。
+本文介绍如何在游戏中加入成就系统。TDS 推出的成就系统模块，是基于内建账户系统（TDSUser）的，具体请阅读[内建账户 > 开发指南](/sdk/authentication/guide/)。
 
 ## 注册监听回调
 成就 SDK 中包含多个监听回调，分别会在初始化数据成功、初始化数据失败以及成就进度更新时被调用，请特别注意初始化数据成功的回调，这是成就 SDK 正常使用的前提，初始化数据失败时请提示用户或者在合适的时候重新初始化数据。
