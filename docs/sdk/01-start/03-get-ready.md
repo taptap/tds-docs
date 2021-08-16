@@ -25,12 +25,6 @@ sidebar_label: 准备工作
 
 ![](/img/tap_get_ready.png)
 
-## 应用信息配置
-
-Android 和 iOS 应用需要在 「TapTap 开发者中心」 - 「游戏服务」- 「生态服务」 - 「TapTap 登陆」 配置应用的相关信息， 否则无法正常使用 TapSDK 的登录功能。 具体配置如下所示：
-
-![](/img/start_getready_info.png)
-
 ## 隐私声明
 
 集成账号服务的功能，需要先签订[《TapTap 平台开发者协议》](/store/store-devagreement/)。使用 TDS 服务，视为你同意前述所有协议，且你将基于这些协议承担相应的法律责任与义务。

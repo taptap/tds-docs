@@ -5,7 +5,7 @@ sidebar_label: 快速开始
 ---
 import MultiLang from '@theme/MultiLang';
 
-本文介绍如何快速接入 TapSDK 并实现 [TapTap 登录](/sdk/taptap-login/guide/start/)功能。
+本文介绍如何快速接入 TapSDK 并实现 **[TapTap 登录](/sdk/taptap-login/guide/start/)** 功能。
 
 :::note
 [下载](/tap-download) 页面提供了 Unity、Android、iOS 示例项目，可供参考。
@@ -15,7 +15,7 @@ import MultiLang from '@theme/MultiLang';
 请登录 [TapTap 开发者中心](https://developer.taptap.com/) 注册为开发者并创建应用。
 
 ## 下载 TapTap 应用
-点击下载 [TapTap 应用](https://www.taptap.com/mobile)
+在测试设备中下载 [TapTap 客户端](https://www.taptap.com/mobile)，测试时会唤起 TapTap 客户端授权登录。若用户设备中未安装 TapTap 客户端，则会打开 webview 进行登录。
 
 ## 环境要求
 
@@ -44,42 +44,42 @@ import MultiLang from '@theme/MultiLang';
 <MultiLang>
 <>
 
-SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需要选择。
+SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选其一。请根据项目需要选择。
 
-#### 使用 Unity Package Manager
+#### 方法一：使用 Unity Package Manager
 
 在项目的 `Packages/manifest.json` 文件中添加以下依赖：
 
 ```json
 "dependencies":{
-// 登录
-"com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#3.1.0",
-"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#3.1.0",
-"com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#3.1.0",
-"com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-0.9.2",
-"com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-0.9.2",
+    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#3.1.0",
+    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#3.1.0",
+    "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#3.1.0",
+    "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-0.9.2",
+    "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-0.9.2",
 }
 ```
 
-:::tip
-如果是手动下载 unitypackage 进行 SDK 导入，需要将 `Assets/TapTap/Common/Plugins/iOS/TapTap.Common.dll` 设置为只支持 iOS
-:::
+[点击](https://github.com/TapTap/TapSDK-Unity/releases) 参考 SDK 最新版本号。
 
-[点击](https://github.com/TapTap) 参考 SDK 最新版本号。
+#### 方法二：手动导入
 
-#### 手动导入
-
-1. [点击下载](/tap-download) `TapSDK-UnityPackage.zip` 和 `LeanCloud-SDK-Storage-Unity.zip`，然后将该 SDK 解压到方便的位置。
+1. [点击下载](/tap-download) `TapSDK-UnityPackage.zip` 和 `LeanCloud-SDK-Storage-Unity.zip`，然后将该 SDK 解压。
 
 2. 在 Unity 项目中依次转到 **Assets > Import Packages > Custom Packages**。
 
-3. 从解压缩中的 TapSDK 中，选择希望在应用中使用的 TapSDK 包导入，其中：
+3. 从解压后的 TapSDK 中，选择希望在应用中使用的 TapSDK 包导入，其中：
 
    - `TapTap_Bootstrap.unitypackage` TapSDK 启动器，必选。
    - `TapTap_Common.unitypackage` TapSDK 基础库，必选。
    - `TapTap_Login.unitypackage` TapTap 登录，必选。
    - `LeanCloud-SDK-Storage-Unity.zip` 必选，解压后为 Plugins 文件夹，拖拽至 Unity 即可。
 
+在 Unity 顶部菜单中选择 **Window > Package Manager** 可查看已经安装在项目中的包。
+
+:::tip
+如果是手动下载 unitypackage 进行 SDK 导入，需要将 `Assets/TapTap/Common/Plugins/iOS/TapTap.Common.dll` 设置为只支持 iOS
+:::
 
 导入 SDK 后还需进行 Android、iOS 平台的相关配置。
 
@@ -362,9 +362,25 @@ TapSDK 3.0 版本目前暂不支持海外，预计本季度部署海外节点，
 ## 接入功能
 
 TapSDK 提供了众多功能。请在初始化 SDK 后，根据项目需要，参考相应功能的文档，接入相应功能。
-绝大多数游戏都会接入 TapTap 登录，所以我们推荐从这一功能开始：
+绝大多数游戏都会接入 TapTap 登录，所以我们推荐从这一功能开始。
 
-[快速上手，接入 TapTap 一键登录](/sdk/taptap-login/guide/start)
+完成以上配置和初始化工作后，接入「TapTap 登录」只需三个步骤：
+
+### 接入 TapTap 登录
+
+请根据开发者指南：[快速上手，接入 TapTap 一键登录](/sdk/taptap-login/guide/start) 完成操作，可以选择单纯的 TapTap 登录，或者基于内建账户系统接入 TapTap 登录。
+
+### 配置签名证书
+
+Android 和 iOS 应用需要在 TapTap 开发者中心进入你的游戏，依次选择 **游戏服务 > 生态服务 > TapTap 登录** 配置应用的相关信息（如下图所示），否则测试登录功能时会返回 `signature not match` 报错信息，无法正常使用 TapTap 登录功能。
+
+![](/img/start_getready_info.png)
+
+### 添加测试用户
+
+请见[测试用户管理](/sdk/start/test-accounts/)。
+
+接下来，就可以打包应用，测试 TapTap 登录功能了。
 
 ## 打包
 
