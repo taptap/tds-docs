@@ -73,12 +73,12 @@ SDK 可以通过 Unity Package Manger 导入或手动导入，请根据项目需
 
 2. 在 Unity 项目中依次转到 **Assets > Import Packages > Custom Packages**。
 
-3. 从解压缩中的 TapSDK 中，选择希望在应用中使用的 TapSDK 包导入。
+3. 从解压缩中的 TapSDK 中，选择希望在应用中使用的 TapSDK 包导入，其中：
 
-   - `TapTap_TapBootstrap.unitypackage` 必选，TapSDK 启动器
-   - `TapTap_TapCommon.unitypackag` 必选，TapSDK 基础库
-   - `TapTap_TapLogin.unitypackage` 必选，TapTap 登录
-   - `LeanCloud-SDK-Storage-Unity.zip` 必须，解压后为 Plugins 文件夹，拖拽至 Unity 即可
+   - `TapTap_Bootstrap.unitypackage` TapSDK 启动器，必选。
+   - `TapTap_Common.unitypackage` TapSDK 基础库，必选。
+   - `TapTap_Login.unitypackage` TapTap 登录，必选。
+   - `LeanCloud-SDK-Storage-Unity.zip` 必选，解压后为 Plugins 文件夹，拖拽至 Unity 即可。
 
 
 导入 SDK 后还需进行 Android、iOS 平台的相关配置。
