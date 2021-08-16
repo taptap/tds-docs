@@ -384,36 +384,24 @@ Android 和 iOS 应用需要在 TapTap 开发者中心进入你的游戏，依�
 
 ## 打包
 
-<MultiLang>
-<>
+Android 或 iOS 请按通常的 Android APK 或者 iOS 应用打包流程操作即可。这里介绍一下 Unity 打包流程：
 
 ### 打包 APK
 
-1. 配置 package name 和签名文件：
+第一步，配置 package name 和签名文件：
 
-   ![](/img/tap_unity_android_build.png)
+![](/img/tap_unity_android_build.png)
 
-2. 检查 **Player Settings > Other Settings > Target APILevel** 版本，当 `Target APILever < 29` 时，需要配置 manifest，在 application 节点添加
+第二步，检查 **File > Build Settings > Player Settings > Other Settings > Target API Level** 版本，当 API Level 小于 29 时，需要配置 manifest，在 application 节点添加：
 
-    ```
-    tools:remove="android:requestLegacyExternalStorage"
-    ```
+```
+tools:remove="android:requestLegacyExternalStorage"
+```
+
+这是因为 SDK 内部默认配置了 `android:requestLegacyExternalStorage = true`，当 `targetSdkVersion < 29` 时会报错 `Android resource linking failed`。
 
 ### 导出 Xcode 工程
 
-需要配置 icon 和 `BundleID`
+需要配置 icon 和 `BundleID`：
 
 ![](/img/tap_ios_build.png)
-
-</>
-<>
-
-按通常的 Android APK 打包流程操作即可。
-
-</>
-<>
-
-按通常的 iOS 应用打包流程操作即可。
-
-</>
-</MultiLang>
