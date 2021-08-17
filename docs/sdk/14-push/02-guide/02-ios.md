@@ -603,7 +603,7 @@ LCPush *push = [[LCPush alloc] init];
 `sound`|应用 bundle 里的声音文件名称。
 `content-available`|如果使用了 Newsstand，设置为 1 来开始一次后台下载。
 
-更多可用的保留字段，请参考[推送 REST API 使用指南](/sdk/push/guide/rest/)的《消息内容 Data》一节。
+更多可用的保留字段，请参考[推送 REST API 使用指南](/sdk/push/guide/rest/)的《消息内容参数》一节。
 
 递增 badge 数字并播放声音：
 

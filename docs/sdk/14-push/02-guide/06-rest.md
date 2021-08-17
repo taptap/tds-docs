@@ -139,7 +139,7 @@ curl -X GET \
 }
 ```
 
-#### 更新 Installation 
+#### 更新 Installation
 
 安装对象可以向相应的 URL 发送 PUT 请求来更新。例如，通过设置 `channels` 属性来订阅某个推送频道：
 
@@ -187,7 +187,7 @@ curl -X PUT \
   -d '{
         "userObjectId": "<用户的 objectId>"
       }' \
-  https://{{host}}/1.1/installations/51ff1808e4b074ac5c34d7fd 
+  https://{{host}}/1.1/installations/51ff1808e4b074ac5c34d7fd
 ```
 
 #### 查询 Installation
@@ -251,49 +251,18 @@ curl -X DELETE \
 
 对于 iOS 设备，除了上述过期机制外还多拥有一套过期机制。当我们根据 Apple 推送服务的反馈获取到某设备的 deviceToken 已过期时，我们也会将这个设备在 `_Installation` 表中的信息删除，并标记这个已过期的 deviceToken 为无效，丢弃后续所有发送到该 deviceToken 的消息。
 
-### 推送消息
+### 
 
-<table>
-  <thead>
-    <tr>
-      <th>URL</th>
-      <th>HTTP</th>
-      <th>功能</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>/1.1/push</td>
-      <td>POST</td>
-      <td>推送通知</td>
-    </tr>
-    <tr>
-      <td>/1.1/notifications</td>
-      <td>GET</td>
-      <td>查询推送记录</td>
-    </tr>
-    <tr>
-      <td>/1.1/notifications/:notification_id</td>
-      <td>GET</td>
-      <td>根据 ID 查推送记录</td>
-    </tr>
-    <tr>
-      <td>/1.1/notifications/:notification_id</td>
-      <td>DELETE</td>
-      <td>根据 ID 删推送记录</td>
-    </tr>
-    <tr>
-      <td>/1.1/scheduledPushMessages</td>
-      <td>GET</td>
-      <td>查询应用下所有的定时推送</td>
-    </tr>
-    <tr>
-      <td>/1.1/scheduledPushMessages/:id</td>
-      <td>DELETE</td>
-      <td>根据 ID 删定时推送</td>
-    </tr>
-  </tbody>
-</table>
+#### API 接口一览
+
+Path|Method|描述
+---|---|---
+/1.1/push|POST|推送通知
+/1.1/notifications|GET|查询推送记录
+/1.1/notifications/:notification_id|GET|根据 ID 查推送记录
+/1.1/notifications/:notification_id|DELETE|根据 ID 删推送记录
+/1.1/scheduledPushMessages|GET|查询应用下所有的定时推送
+/1.1/scheduledPushMessages/:id|DELETE|根据 ID 删定时推送
 
 #### master key 校验
 
@@ -301,6 +270,223 @@ curl -X DELETE \
 必须通过 **master key** 才能发送推送，从而避免了客户端可以不经限制的给应用内任意目标设备推送消息的可能。
 这一限制默认为启用状态。
 我们建议用户都将此限制启用。
+
+#### 消息内容参数
+
+##### iOS 设备推送消息内容参数
+
+iOS 设备中 data 和 alert 内属性的具体含义请参考：
+1. [Apple 官方关于 Payload Key 的文档](https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/generating_a_remote_notification)，
+2. [Apple 官方关于 Request Header 的文档](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingwithAPNs.html)，以及 
+3. [Apple 官方关于 UserNotifications 的文档](https://developer.apple.com/documentation/usernotifications)。
+
+下面是对各属性的一些具体说明：
+
+##### iOS 设备 data 各属性说明
+
+名称|格式|约束|描述
+---|---|---|---
+alert|普通字符串或 JSON 字符串|必填|表示消息内容。如果目标设备中只包含 iOS 设备则还可以是 JSON 类型，下面详述 JSON 类型时支持的属性,
+title|字符串|可选|表示推送内容标题，如果 alert 字段为字符串可以在此补充提供 title，如果 alert 是 JSON 类型则无需再提供本字段,
+category|字符串|可选|通知类型,
+thread-id|字符串|可选|通知分类名称,
+badge|数字|可选|未读消息数目，应用图标边上的小红点数字，可以是数字，也可以是字符串 "Increment"（大小写敏感）,
+sound|普通字符串或 JSON 字符串|可选|指定推送声音信息，下面详述 JSON 类型时支持的属性,
+content-available|数字|可选|如果使用 Newsstand，设置为 1 来开始一次后台下载,
+mutable-content|数字|可选|用于支持 UNNotificationServiceExtension 功能，设置为 1 时启用,
+collapse-id|字符串|可选|对应 APNs request header 的 apns-collapse-id 参数，用于多条推送合并展示，具体请点击下面 Apple 官方关于 Request Header 的文档链接进行查阅,
+apns-priority|数字|可选|只能是 10 或 5，对应 APNs request header 的 apns-priority 参数，用于控制是否以节电模式发推送，具体请点击下面 Apple 官方关于 Request Header 的文档链接进行查阅,
+apns-push-type|字符串|可选|用于设置推送展示类型，在 iOS 13 或 watchOS 6 以上设备支持，只能为 "background" 或 "alert"，默认为 "alert",
+url-args|字符串|可选|列表类型，用于 Safari 推送，详情见 APNs 文档关于 url-args 参数的描述,
+target-content-id|字符串|可选|详情见 APNs 文档关于 target-content-id 参数的描述,
+自定义属性|自定义类型|可选|由用户添加的自定义属性，字段名和字段类型任意。
+
+示例：
+
+```json
+{
+  "alert": "hi"
+}
+```
+
+##### iOS 设备 alert 各属性说明
+
+并且 iOS 设备支持 `alert` 本地化消息推送，只需要将上面 `alert` 参数从 String 替换为一个由本地化消息推送属性组成的 JSON 即可：
+
+名称|格式|约束|描述
+---|---|---| ---
+title|字符串|可选|表示推送内容标题,
+title-loc-key|字符串列表|可选|详情请参看 Apple 关于推送提醒本地化的说明,
+title-loc-args|字符串列表|可选|详情请参看 Apple 关于推送提醒本地化的说明,
+subtitle|字符串|可选|表示推送内容副标题,
+subtitle-loc-key|字符串|可选|详情请参看 Apple 关于推送提醒本地化的说明,
+subtitle-loc-args|字符串列表|可选|详情请参看 Apple 关于推送提醒本地化的说明,
+body|字符串|可选|表示消息内容,
+action-loc-key|字符串|可选|详情请参看 Apple 关于推送提醒本地化的说明,
+loc-key|字符串|可选|详情请参看 Apple 关于推送提醒本地化的说明,
+loc-args|字符串列表|可选|详情请参看 Apple 关于推送提醒本地化的说明,
+launch-image|字符串|可选|设置点击推送后启动图片文件名,
+summary-arg|字符串|可选|用于设置 Summary,
+summary-arg-count|数字|可选|用于设置 Summary 参数数量
+
+示例：
+
+```json
+{
+  "alert": {
+    "title": "A message"
+    "body": "A body"
+  }
+}
+```
+
+##### iOS 设备 sound 各属性说明
+
+iOS 支持通过 sound 参数设置推送声音，可以是字符串类型的声音文件名，指向一个在应用内存在的声音文件，或是 JSON 类型：
+
+名称|格式|约束|描述
+---|---|---|---
+name|字符串|可选|声音文件名，指向一个在应用内存在的声音文件
+critical|布尔类型|可选|true 表示使用 "Critical" 提示音，默认为 false
+volume|数字类型|可选|指定声音大小，必须为 0 到 1 之间的小数
+
+示例：
+
+```json
+{
+  "alert": "New weixin message.",
+  "badge": 9,
+  "sound": "biubiubiu.aiff"
+}
+```
+
+```json
+{
+  "alert": "消费 13 元",
+  "sound": {
+    "name": "ding.aiff",
+    "volume": "0.8"
+  }
+}
+```
+
+##### iOS 设备其他说明
+
+另外，我们也支持按照上述 Apple 官方文档的方式构造推送参数例如：
+
+```json
+{
+  "aps": {
+    "alert": "New weixin message.",
+    "badge": 9,
+    "sound": "biubiubiu.aiff"
+  }
+}
+```
+
+更详细的描述如下面例子描述：
+
+```json
+{
+  "aps": {
+    "alert": {
+      "title":             "字符串类型，表示推送内容标题",
+      "title-loc-key":     "字符串列表，详情请参看 Apple 关于推送提醒本地化的说明",
+      "title-loc-args":    "字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明",
+      "subtitle":          "字符串类型，表示推送内容副标题",
+      "subtitle-loc-key":  "字符串类型，详情请参看 Apple 关于推送提醒本地化的说明",
+      "subtitle-loc-args": "字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明",
+      "body":              "字符串类型，表示消息内容",
+      "action-loc-key":    "字符串类型，详情请参看 Apple 关于推送提醒本地化的说明",
+      "loc-key":           "字符串类型，详情请参看 Apple 关于推送提醒本地化的说明",
+      "loc-args":          "字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明",
+      "launch-image":      "字符串类型，设置点击推送后启动图片文件名",
+      "summary-arg":       "字符串类型，用于设置 Summary",
+      "summary-arg-count": "数字类型，用于设置 Summary 参数数量"
+    },
+    "category":            "字符串类型，通知类型",
+    "thread-id":           "字符串类型，通知分类名称",
+    "badge":               "数字类型，未读消息数目，应用图标边上的小红点数字，可以是数字，也可以是字符串 Increment（大小写敏感）",
+    "sound":               "普通字符串或 JSON 字符串类型，指定推送声音信息",
+    "content-available":   "数字类型，如果使用 Newsstand，设置为 1 来开始一次后台下载",
+    "mutable-content":     "数字类型，用于支持 UNNotificationServiceExtension 功能，设置为 1 时启用"
+  },
+  "collapse-id":           "字符串类型，对应 APNs request header 的 apns-collapse-id 参数，用于多条推送合并展示，具体请点击下面 Apple 官方关于 Request Header 的文档链接进行查阅",
+  "apns-priority":         "数字类型，只能是 10 或 5，对应 APNs request header 的 apns-priority 参数，用于控制是否以节电模式发推送，具体请点击上面 Apple 官方关于 Request Header 的文档链接进行查阅",
+  "apns-push-type":        "字符串类型，用于设置推送展示类型，只能为 background，voip，complication，fileprovider，mdm，alert，默认为 alert",
+  "custom-key":            "由用户添加的自定义属性，字段名和字段类型任意，custom-key 仅是举例，可随意替换。"
+}
+```
+
+##### Android 设备通用推送消息内容参数
+
+如果是 Android 设备，默认的消息栏通知消息内容参数支持下列属性：
+
+名称|格式|约束|描述
+---|---|---|---
+alert|字符串|必填|表示消息内容。
+title|字符串|可选|表示显示在通知栏的标题。
+silent|布尔|可选|指定透传消息或通知栏消息，默认为 false，即 `通知栏消息`。
+action|字符串|可选|注册 Receiver 时提供的 action name，仅当需要自定义 Receiver 时设置。
+自定义名称|任意类型|可选|由用户添加的自定义属性，字段名和字段类型任意。
+
+示例：
+
+```json
+{
+  "alert": "你好小明，家里来客人了，快回家吃饭！",
+  "title": "小明，您收一条微信消息"
+}
+```
+
+```json
+{
+  "alert": "支付宝到账 13 元！",
+  "my-custom-key": "my-custom-value"
+}
+```
+
+关于 `silent` 参数请参看 [Android 推送区分透传和通知栏消息](#android-推送区分透传和通知栏消息)，关于自定义 Receiver 请参看《Android 消息推送开发指南》的《自定义 Receiver》一节。
+
+##### 为多种类型设备设置不同推送内容
+
+单次推送中，如果查询条件覆盖的目标推送设备包含多种类型，如既包含 iOS 设备，又包含云服务自有渠道的 Android 设备，又有混合推送的小米华为设备等，可以为不同推送设备单独填写推送内容参数，我们会按照设备类型取出对应设备类型的推送内容来发推送，例如：
+
+```json
+{
+  "ios": {
+    "alert":             "Hello iOS",
+    "badge":             "Increment",
+    "custom-key":        "custom-value"
+  },
+  "android": {
+    "alert":             "Hello Android",
+    "action":            "com.your_company.push",
+    "custom-key":        "custom-value"
+  },
+  "mi": {
+    "alert":             "Hello Mi",
+    "custom-key":        "custom-value"
+  },
+  "hms": {
+    "alert":             "Hello Huawei",
+    "custom-key":        "custom-value"
+  }
+}
+```
+
+其中属性名称和推送平台对应关系如下：
+
+属性名称 | 平台
+-------- | ----
+ios | Apple APNs
+android | 云服务自有 Android 平台
+mi | 小米推送
+hms | 华为 HMS 推送 （仅国内版适用）
+mz | 魅族推送 （仅国内版适用）
+vivo | vivo 推送 （仅国内版适用）
+oppo | oppo 推送 （仅国内版适用）
+fcm | FCM 推送（仅国际版适用）
 
 #### 通过查询条件发推送
 
@@ -324,7 +510,7 @@ curl -X POST \
 
 名称| 约束 | 描述
 ---|--- | ---
-data| **必填**| 推送的内容数据，JSON 对象，请参考 [消息内容](#消息内容-Data)。
+data| **必填**| 推送的内容数据，JSON 对象，请参考 [消息内容](#消息内容参数)。
 where| 可选 | 检索 `_Installation` 表使用的查询条件，JSON 对象。如果查询条件内包含日期或二进制等需要做编码的特殊类型数据，查询条件内需要包含编码后的数据。如查询 `createdAt` 字段大于某个时间的设备，where 条件需要为 `{"createdAt":{"$gte":{"__type":"Date","iso":"2015-06-21T18:02:52.249Z"}}}`。更多信息请参看[数据存储 REST API 使用详解](/sdk/storage/guide/rest/)的《数据类型》一节的说明。
 channels| 可选 | 推送给哪些频道，将作为条件加入 where 对象。
 push_time| 可选 | 设置定时推送的发送时间，需为 UTC 时间且符合 ISO8601 格式要求，例如：`2019-04-01T06:19:29.000Z`。请注意发送时间与当前时间如果小于 1 分钟则推送会立即发出，不会遵循 push_time 参数要求。如果需要实现周期推送，可以参照 [使用云引擎实现周期推送](#使用云引擎实现周期推送) 实现。
@@ -487,22 +673,22 @@ curl -X POST \
 ---|--- | ---
 device_type | **必填** | 目标设备类型，目前只能为 android、ios 两种。一次推送只能给一种类型的设备发推送。
 device_ids | **必填** | 目标设备 ID 列表，最多包含 500 个 ID 。对于 iOS 设备来说，设备 ID 是 _Installation 表中的 deviceToken 字段；对于使用混合推送的 Android 设备来说，设备 ID 是 _Installation 表中的 registrationId 字段；对于非混合推送的 Android 设备来说，设备 ID 是 _Installation 表中的 installationId 字段。
-data| **必填**| 见[通过查询条件发推送](#通过查询条件发推送)。
+data| **必填**| 同[通过查询条件发推送](#通过查询条件发推送)。
 expiration_interval| 可选 | 同上。
-expiration_time| 可选 | 同上。 
-notification_id | 可选 | 同上。 
+expiration_time| 可选 | 同上。
+notification_id | 可选 | 同上。
 req_id | 可选 | 同上。
 
 如果目标设备为 iOS 设备，则在上述通用参数之外，还可以附带如下参数：
 
 名称 | 约束 | 描述
 ---- | ---- | ----
-prod| 可选 | 见[通过查询条件发推送](#通过查询条件发推送)。
-topic | 可选 | 同上。 
+prod| 可选 | 同[通过查询条件发推送](#通过查询条件发推送)。
+topic | 可选 | 同上。
 apns_team_id | 可选 | 同上。
 device_profile | 可选 | 用于指定使用的 iOS 自定义推送证书。如果使用 Token Authentication 鉴权方式，或者使用的推送证书为配置的「生产环境证书」或「开发环境证书」则无需提供本参数。我们会根据您填写的 `prod` 参数值来使用对应的证书。
 
-如果目标为 Android 设备，则在前述通用参数之外，还可以附带如下参数： 
+如果目标为 Android 设备，则在前述通用参数之外，还可以附带如下参数：
 
 名称 | 约束 | 描述
 ---- | ---- | ----
@@ -511,157 +697,6 @@ vendor | 可选 | ***仅对开启混合推送的设备有效*** 对应混合推�
 device_profile | 可选 | ***仅对开启混合推送的设备有效*** 当目标混合推送平台下配置了多份配置时需要通过该参数指定配置名。默认值为 _default
 
 [android-channel]: https://developer.android.com/guide/topics/ui/notifiers/notifications.html?hl=zh-cn#ManageChannels
-
-
-#### 消息内容 Data
-
-##### iOS 设备推送消息内容
-
-对于 iOS 设备，消息内容参数 data 内属性可以是：
-
-```
-{
-  "alert":             字符串类型，表示消息内容。如果目标设备中只包含 iOS 设备则还可以是 JSON 类型，下面详述 JSON 类型时支持的属性,
-  "title":             字符串类型，表示推送内容标题，如果 alert 字段为字符串可以在此补充提供 title，如果 alert 是 JSON 类型则无需再提供本字段,
-  "category":          字符串类型，通知类型,
-  "thread-id":         字符串类型，通知分类名称,
-  "badge":             数字类型，未读消息数目，应用图标边上的小红点数字，可以是数字，也可以是字符串 "Increment"（大小写敏感）,
-  "sound":             字符串或 JSON 类型，指定推送声音信息，下面详述 JSON 类型时支持的属性,
-  "content-available": 数字类型，如果使用 Newsstand，设置为 1 来开始一次后台下载,
-  "mutable-content":   数字类型，用于支持 UNNotificationServiceExtension 功能，设置为 1 时启用,
-  "collapse-id":       字符串类型，对应 APNs request header 的 apns-collapse-id 参数，用于多条推送合并展示，具体请点击下面 Apple 官方关于 Request Header 的文档链接进行查阅,
-  "apns-priority":     数字类型，只能是 10 或 5，对应 APNs request header 的 apns-priority 参数，用于控制是否以节电模式发推送，具体请点击下面 Apple 官方关于 Request Header 的文档链接进行查阅,
-  "apns-push-type":    字符串类型，用于设置推送展示类型，在 iOS 13 或 watchOS 6 以上设备支持，只能为 "background" 或 "alert"，默认为 "alert",
-  "url-args":          字符串列表类型，用于 Safari 推送，详情见 APNs 文档关于 url-args 参数的描述,
-  "target-content-id": 字符串类型，详情见 APNs 文档关于 target-content-id 参数的描述,
-  "custom-key":        由用户添加的自定义属性，custom-key 仅是举例，可随意替换
-}
-```
-
-并且 iOS 设备支持 `alert` 本地化消息推送，只需要将上面 `alert` 参数从 String 替换为一个由本地化消息推送属性组成的 JSON 即可：
-
-```
-{
-  "alert": {
-    "title":               字符串类型，表示推送内容标题,
-    "title-loc-key":       字符串列表，详情请参看 Apple 关于推送提醒本地化的说明,
-    "title-loc-args":      字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明,
-    "subtitle":            字符串类型，表示推送内容副标题,
-    "subtitle-loc-key":    字符串类型，详情请参看 Apple 关于推送提醒本地化的说明,
-    "subtitle-loc-args":   字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明,
-    "body":                字符串类型，表示消息内容,
-    "action-loc-key":      字符串类型，详情请参看 Apple 关于推送提醒本地化的说明,
-    "loc-key":             字符串类型，详情请参看 Apple 关于推送提醒本地化的说明,
-    "loc-args":            字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明,
-    "launch-image":        字符串类型，设置点击推送后启动图片文件名,
-    "summary-arg":         字符串类型，用于设置 Summary,
-    "summary-arg-count":   数字类型，用于设置 Summary 参数数量
-   }
-}
-```
-
-iOS 支持通过 sound 参数设置推送声音，可以是字符串类型的声音文件名，指向一个在应用内存在的声音文件，或是 JSON 类型：
-
-```
-{
-  "sound": {
-    "name":     字符串类型的声音文件名，指向一个在应用内存在的声音文件,
-    "critical": 布尔类型，true 表示使用 "Critical" 提示音，默认为 false,
-    "volume":   指定声音大小，必须为 0 到 1 之间的小数
-  }
-}
-```
-
-data 和 alert 内属性的具体含义请参考 [Apple 官方关于 Payload Key 的文档](https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/generating_a_remote_notification)，[Apple 官方关于 Request Header 的文档](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingwithAPNs.html)，以及 [Apple 官方关于 UserNotifications 的文档](https://developer.apple.com/documentation/usernotifications)。
-
-另外，我们也支持按照上述 Apple 官方文档的方式构造推送参数，如：
-
-```
-{
-  "aps": {
-     "alert": {
-       "title":               字符串类型，表示推送内容标题,
-       "title-loc-key":       字符串列表，详情请参看 Apple 关于推送提醒本地化的说明,
-       "title-loc-args":      字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明,
-       "subtitle":            字符串类型，表示推送内容副标题,
-       "subtitle-loc-key":    字符串类型，详情请参看 Apple 关于推送提醒本地化的说明,
-       "subtitle-loc-args":   字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明,
-       "body":                字符串类型，表示消息内容,
-       "action-loc-key":      字符串类型，详情请参看 Apple 关于推送提醒本地化的说明,
-       "loc-key":             字符串类型，详情请参看 Apple 关于推送提醒本地化的说明,
-       "loc-args":            字符串列表类型，详情请参看 Apple 关于推送提醒本地化的说明,
-       "launch-image":        字符串类型，设置点击推送后启动图片文件名,
-       "summary-arg":         字符串类型，用于设置 Summary,
-       "summary-arg-count":   数字类型，用于设置 Summary 参数数量
-     }
-     "category":              字符串类型，通知类型,
-     "thread-id":             字符串类型，通知分类名称,
-     "badge":                 数字类型，未读消息数目，应用图标边上的小红点数字，可以是数字，也可以是字符串 "Increment"（大小写敏感）,
-     "sound":                 字符串或 JSON 类型，指定推送声音信息,
-     "content-available":     数字类型，如果使用 Newsstand，设置为 1 来开始一次后台下载,
-     "mutable-content":       数字类型，用于支持 UNNotificationServiceExtension 功能，设置为 1 时启用
-   }
-   "collapse-id":             字符串类型，对应 APNs request header 的 apns-collapse-id 参数，用于多条推送合并展示，具体请点击下面 Apple 官方关于 Request Header 的文档链接进行查阅,
-   "apns-priority":           数字类型，只能是 10 或 5，对应 APNs request header 的 apns-priority 参数，用于控制是否以节电模式发推送，具体请点击上面 Apple 官方关于 Request Header 的文档链接进行查阅,
-   "apns-push-type":          字符串类型，用于设置推送展示类型，只能为 "background"，"voip"，"complication"，"fileprovider"，"mdm"，"alert"，默认为 "alert",
-   "custom-key":              由用户添加的自定义属性，custom-key 仅是举例，可随意替换
-}
-```
-
-##### Android 设备通用推送消息内容
-
-如果是 Android 设备，默认的消息栏通知消息内容参数支持下列属性：
-
-```
-{
-  "alert":      "字符串类型，表示消息内容",
-  "title":      "字符串类型，表示显示在通知栏的标题",
-  "silent":     "布尔类型，指定透传消息或通知栏消息，默认为 false（通知栏消息）",
-  "custom-key": "由用户添加的自定义属性，custom-key 仅是举例，可随意替换",
-  "action":     "字符串类型，注册 Receiver 时提供的 action name，仅当需要自定义 Receiver 时设置",
-}
-```
-
-关于 `silent` 参数请参看 [Android 推送区分透传和通知栏消息](#Android-推送区分透传和通知栏消息)，关于自定义 Receiver 请参看[Android 推送指南](/sdk/push/guide/android/)的《自定义 Receiver》一节。
-
-##### 为多种类型设备设置不同推送内容
-
-单次推送中，如果查询条件覆盖的目标推送设备包含多种类型，如既包含 iOS 设备，又包含云服务自有渠道的 Android 设备，又有混合推送的小米华为设备等，可以为不同推送设备单独填写推送内容参数，我们会按照设备类型取出对应设备类型的推送内容来发推送，例如：
-
-```json
-{
-  "ios": {
-    "alert":             "Hello iOS",
-    "badge":             "Increment",
-    "custom-key":        "custom-value"
-  },
-  "android": {
-    "alert":             "Hello Android",
-    "action":            "com.your_company.push",
-    "custom-key":        "custom-value"
-  },
-  "mi": {
-    "alert":             "Hello Mi",
-    "custom-key":        "custom-value"
-  },
-  "hms": {
-    "alert":             "Hello Huawei",
-    "custom-key":        "custom-value"
-  }
-}
-```
-
-其中属性名称和推送平台对应关系如下：
-
-属性名称 | 平台
--------- | ----
-ios | Apple APNs
-android | 云服务自有 Android 平台
-mi | 小米推送
-hms | 华为 HMS 推送
-mz | 魅族推送
-vivo | vivo 推送
-oppo | oppo 推送
 
 #### Android 混合推送多配置区分
 
