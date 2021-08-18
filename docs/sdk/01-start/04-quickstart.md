@@ -323,7 +323,7 @@ using TapTap.Bootstrap; // 命名空间
 var config =  new TapConfig.Builder()
     .ClientID("your_client_id")  // 必须，开发者中心对应 Client ID
     .ClientToken("your_client_token")  // 必须，开发者中心对应 Client Token
-    .ServerURL("https://your_server_url") // 开发者中心 > 你的游戏 > 游戏服务 > 技术服务 > 数据存储 > 文件 > 设置 > 文件访问域名 绑定域名
+    .ServerURL("https://your_server_url") // 开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 文件 > 设置 > 文件访问域名 绑定域名
     .RegionType(RegionType.CN)  // 非必须，默认 CN 表示国内
     .ConfigBuilder();
 TapBootstrap.Init(config);
@@ -334,7 +334,7 @@ TapConfig tdsConfig = new TapConfig.Builder()
         .withAppContext(MainActivity.this)  // Context 上下文
         .withClientId("your_client_id")  // 开发者中心对应 Client ID
         .withClientToken("your_client_token")  // 开发者中心对应 Client Token
-        .withServerUrl("https://your_server_url")  // 开发者中心 > 你的游戏 > 游戏服务 > 技术服务 > 数据存储 > 文件 > 设置 > 文件访问域名 绑定域名
+        .withServerUrl("https://your_server_url")  // 开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 文件 > 设置 > 文件访问域名 绑定域名
         .withRegionType(TapRegionType.CN)  // TapRegionType.CN: 国内  TapRegionType.IO: 国外
         .build();
 TapBootstrap.init(MainActivity.this, tdsConfig);     
@@ -346,7 +346,7 @@ TapConfig *config = [TapConfig new];
 config.clientId = @"your_client_id";  // 开发者中心对应 Client ID
 config.clientToken = @"your_client_token";  // 开发者中心对应 Client Token
 config.region = TapSDKRegionTypeCN;  // TapSDKRegionTypeCN: 国内  TapSDKRegionTypeIO: 国外
-config.serverURL = @"https://your_server_url";  // 开发者中心 > 你的游戏 > 游戏服务 > 技术服务 > 数据存储 > 文件 > 设置 > 文件访问域名 绑定域名
+config.serverURL = @"https://your_server_url";  // 开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 文件 > 设置 > 文件访问域名 绑定域名
 [TapBootstrap initWithConfig:config];
 ```
 
