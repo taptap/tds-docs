@@ -569,7 +569,7 @@ option.platform = LeanCloudSocialPlatformWeiXin;
 `loginWithAuthData` 系列方法需要两个参数来唯一确定一个账户：
 
 - 第三方平台的名字，就是前例中的 `weixin`，该名字由应用层自己决定。
-- 第三方平台的授权信息，就是前例中的 `thirdPartyData`（一般包括 `uid`、`token`、`expires` 等信息，与具体的第三方平台有关）。
+- 第三方平台的授权信息，就是前例中的 `thirdPartyData`（一般包括 `uid`、`access_token`、`expires_in` 等信息，与具体的第三方平台有关）。
 
 云端会使用第三方平台的鉴权信息来查询是否已经存在与之关联的账户。如果存在的话，则返回 `200 OK` 状态码，同时附上用户的信息（包括 [`sessionToken`](#设置当前用户)）。如果第三方平台的信息没有和任何账户关联，客户端会收到 `201 Created` 状态码，意味着新账户被创建，同时附上用户的 `objectId`、`createdAt`、`sessionToken` 和一个自动生成的 `username`，例如：
 
