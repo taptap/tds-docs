@@ -366,6 +366,8 @@ if ([TapLoginHelper currentProfile]) {
 
 开发者可以合理使用这些信息。
 
+参见[TapTap OAuth 接口文档](/sdk/taptap-login/guide/taptap-oauth/)。
+
 ### 如何从 TapTap 用户认证接口升级到内建账户系统
 
 前面说过，如果前期开发时只把「TapTap 登录」作为一个第三方渠道进行了接入，后期要使用内建账户系统，或者老的 v1.x 版本的游戏要升级到 3.x 版本并使用其他服务，这时候会有「一定的开发成本」。这里我们就来具体说说这种情况下该如何处理。
