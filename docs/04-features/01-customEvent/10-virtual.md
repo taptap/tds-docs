@@ -68,7 +68,7 @@ title: 虚拟属性
 
 ![创建规则](/img/customEvent/virtual_5.png)
 
-虚拟属性的 `SQL` 表达式使用 presto 语法，可以访问 [presto 文档](https://prestodb.io/docs/current/functions.html) 获取 presto 的语法以及函数的使用方法。
+虚拟属性的 `SQL` 表达式使用 presto 语法，可以访问 [presto 文档](https://trino.io/docs/332/functions.html) 获取 presto 的语法以及函数的使用方法。
 
 可通过「插入模板」功能，插入常用的应用场景所需的代码片段，通过替换字段名和修改逻辑即可简单快捷实现虚拟属性的创建。
 
