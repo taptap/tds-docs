@@ -44,9 +44,7 @@ dependencies {
 
 ```objectivec
 // 基础库
-TapBootstrapResource.bundle
 TapBootstrapSDK.framework
-TapCommonResource.bundle
 TapCommonSDK.framework
 TapLoginSDK.framework
 // 内嵌动态

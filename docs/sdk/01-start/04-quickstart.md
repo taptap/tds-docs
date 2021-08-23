@@ -180,9 +180,7 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
    - 必选：TapTap 启动器、基础库、登录
 
        ```
-       TapBootstrapResource.bundle
        TapBootstrapSDK.framework
-       TapCommonResource.bundle
        TapCommonSDK.framework
        TapLoginSDK.framework
        LeanCloudObjc.framework
