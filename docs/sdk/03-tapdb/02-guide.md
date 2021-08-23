@@ -48,9 +48,7 @@ dependencies {
 
 ```objectivec
 // 登录
-TapBootstrapResource.bundle
 TapBootstrapSDK.framework
-TapCommonResource.bundle
 TapCommonSDK.framework
 TapLoginSDK.framework
 //TapDB

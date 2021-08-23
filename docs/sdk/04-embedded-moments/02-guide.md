@@ -44,9 +44,7 @@ dependencies {
 
 ```objectivec
 // 基础库
-TapBootstrapResource.bundle
 TapBootstrapSDK.framework
-TapCommonResource.bundle
 TapCommonSDK.framework
 TapLoginSDK.framework
 // 内嵌动态
@@ -166,8 +164,10 @@ mConfig.orientation = TapMomentOrientationDefault;
 如前所述，打开动态页面后别忘了清除动态页面入口处的小红点。
 :::
 
-动态页面的背景图可以配置，[点击查看图解](/img/tap_moment_bg.png)。
+动态页面的背景图可以配置，步骤如下图所示。
 背景图需要人工审核后才能生效，请预留充足的时间。
+
+![](/img/tap_moment_bg.png)
 
 
 ## 场景化入口
