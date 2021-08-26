@@ -54,7 +54,7 @@ title: 漏斗分析
 
 在漏斗分析页面，点击「设置步骤」，可以看到「添加漏斗步骤」界面。
 
-![TapTap > 漏斗分析（doing） > 1-漏斗分析-设置漏斗.png](https://confluence.xindong.com/download/attachments/275357919/1-%E6%BC%8F%E6%96%97%E5%88%86%E6%9E%90-%E8%AE%BE%E7%BD%AE%E6%BC%8F%E6%96%97.png?version=1&modificationDate=1629877300000&api=v2)
+![](/img/customEvent/funnel/exp/1-漏斗分析-设置漏斗.png)
 
 在「添加漏斗步骤」界面，可以选择漏斗步骤和添加漏斗步骤：
 
@@ -66,19 +66,19 @@ title: 漏斗分析
 
 2、添加步骤：给要分析的漏斗增加更多步骤。
 
-![TapTap > 漏斗分析（doing） > 2-漏斗分析-设置漏斗.png](https://confluence.xindong.com/download/attachments/275357919/2-%E6%BC%8F%E6%96%97%E5%88%86%E6%9E%90-%E8%AE%BE%E7%BD%AE%E6%BC%8F%E6%96%97.png?version=1&modificationDate=1629878062000&api=v2)
+![](/img/customEvent/funnel/exp/2-漏斗分析-设置漏斗.png)
 
 #### 4.2 设置维度
 
 在维度下拉框，会展示第一个事件步骤的用户属性、事件属性和用户分群。
 
-![TapTap > 漏斗分析（doing） > 3-漏斗分析-选择维度.png](https://confluence.xindong.com/download/attachments/275357919/3-%E6%BC%8F%E6%96%97%E5%88%86%E6%9E%90-%E9%80%89%E6%8B%A9%E7%BB%B4%E5%BA%A6.png?version=1&modificationDate=1629879259000&api=v2)
+![](/img/customEvent/funnel/exp/3-漏斗分析-选择维度.png)
 
 #### 4.3 设置漏斗周期
 
 **漏斗周期：**用户触发步骤 1 起，在窗口期内完成后续步骤，算作后续步骤的转化。
 
-![TapTap > 漏斗分析（doing） > 4-漏斗分析-漏斗窗口期.png](https://confluence.xindong.com/download/attachments/275357919/4-%E6%BC%8F%E6%96%97%E5%88%86%E6%9E%90-%E6%BC%8F%E6%96%97%E7%AA%97%E5%8F%A3%E6%9C%9F.png?version=2&modificationDate=1629880015000&api=v2)
+![](/img/customEvent/funnel/exp/4-漏斗分析-漏斗窗口期.png)
 
 **限制窗口期在时间区间内：表示**只有在这个时间范围内，用户从第一个步骤，行进到最后一个步骤，才被视为一次完整的漏斗转化。
 
@@ -86,29 +86,29 @@ title: 漏斗分析
 
 可选择进行分析的步骤范围，并根据“对比/趋势”、“转化/流失”设置，能够得到4类报表：转化对比表、流失对比表、转化趋势表、流失趋势表
 
-![TapTap > 漏斗分析（doing） > image2021-4-22_16-1-42.png](https://confluence.xindong.com/download/attachments/275357919/image2021-4-22_16-1-42.png?version=1&modificationDate=1629874537000&api=v2)
+![展示结果](/img/customEvent/funnel_analyse_result_type.png)
 
 转化对比表：用以分析从步骤一到后续步骤的累计的转化率
 
-![TapTap > 漏斗分析（doing） > image2021-4-22_16-2-8.png](https://confluence.xindong.com/download/attachments/275357919/image2021-4-22_16-2-8.png?version=1&modificationDate=1629874537000&api=v2)
+![转化对比表](/img/customEvent/funnel_analyse_table_1.png)
 
 流失对比表：用以分析每个步骤之间的流失率
 
-![TapTap > 漏斗分析（doing） > image2021-4-22_16-2-27.png](https://confluence.xindong.com/download/attachments/275357919/image2021-4-22_16-2-27.png?version=1&modificationDate=1629874537000&api=v2)
+![流失对比表](/img/customEvent/funnel_analyse_table_2.png)
 
 转化趋势表：用以分析不同日期的转化率变化趋势
 
-![TapTap > 漏斗分析（doing） > image2021-4-22_16-2-54.png](https://confluence.xindong.com/download/attachments/275357919/image2021-4-22_16-2-54.png?version=1&modificationDate=1629874537000&api=v2)
+![转化趋势表](/img/customEvent/funnel_analyse_table_3.png)
 
 流失趋势表：用以分析不同日期的流失率变化趋势
 
-![TapTap > 漏斗分析（doing） > image2021-4-22_16-3-23.png](https://confluence.xindong.com/download/attachments/275357919/image2021-4-22_16-3-23.png?version=1&modificationDate=1629874537000&api=v2)
+![流失趋势表](/img/customEvent/funnel_analyse_table_4.png)
 
 ### 4.5 保存到看板
 
 将设置好的查询结果保存为报表，再基于报表创建看板，漏斗分析结果一触即达。
 
-![TapTap > 漏斗分析（doing） > 5-漏斗分析-保存报表.png](https://confluence.xindong.com/download/attachments/275357919/5-%E6%BC%8F%E6%96%97%E5%88%86%E6%9E%90-%E4%BF%9D%E5%AD%98%E6%8A%A5%E8%A1%A8.png?version=1&modificationDate=1629892703000&api=v2)
+![](/img/customEvent/funnel/exp/5-漏斗分析-保存报表.png)
 
 ### 5. 漏斗分析原理
 
@@ -140,96 +140,3 @@ title: 漏斗分析
 
 基于公共事件属性的分组与筛选：在完成转化/流失的用户的基础上，以该用户在步骤1的事件属性进行分组与筛选
 
-
-原始文档
-
-## 1. 概述
-
-漏斗模型主要用于分析一个多步骤过程中每一步的转化与流失情况。
-
-例如，用户游戏内充值的完整流程可能包含以下步骤：打开商城、浏览游戏道具、加入购物车、提交订单、完成支付，在漏斗分析中，可将以上事件按照顺序设置为一个漏斗，分析整个流程以及每一步的的转化情况。
-
-## 2. 适用角色与用途
-
-| 角色            | 用途                                             |
-| --------------- | ------------------------------------------------ |
-| 分析师/业务人员 | 分析用户行为中各步骤的转化、流失情况             |
-| 分析师          | 探索性构造漏斗模板，在项目内部共享漏斗分析方法论 |
-
-## 3. 进行漏斗分析
-
-### 3.1. 设置漏斗与查询条件
-
-漏斗步骤由一个事件（可添加一个或者多个筛选条件）组成，表示一个转化流程中的一个关键性的步骤。
-
-一个漏斗中至少包含 2 个步骤，每个步骤对应一个事件。可增加更多步骤，拖动步骤前的序号可以改变步骤顺序。
-
-![查询条件](/img/customEvent/funnel_analyse_query_condition_1.png)
-
-选择分组维度，可选择用户属性、用户分群以及所有步骤的公共事件属性作为分组维度，漏斗分析的分组逻辑详见本文第 4 部分。
-
-![查询条件](/img/customEvent/funnel_analyse_query_condition_2.png)
-
-点击全局筛选，设置漏斗分析的筛选条件，此处为事件属性是筛选是对所有事件的公共筛选，而不是单个步骤。
-
-![查询条件](/img/customEvent/funnel_analyse_query_condition_3.png)
-
-用户完成漏斗的时间限制，也即只有在这个时间范围内，用户从第一个步骤，行进到最后一个步骤，才能被视为一次成功的转化
-
-![查询条件](/img/customEvent/funnel_analyse_query_condition_4.png)
-
-选择时间范围限制漏斗中第一步骤该时间范围内，勾选限制窗口期，则限制所有步骤都在该时间范围内
-
-![查询条件](/img/customEvent/funnel_analyse_query_condition_5.png)
-
-### 3.2. 设置展示结果
-
-可选择进行分析的步骤范围，并根据「对比/趋势」、「转化/流失」设置，能够得到 4 类报表：转化对比表、流失对比表、转化趋势表、流失趋势表
-
-![展示结果](/img/customEvent/funnel_analyse_result_type.png)
-
-转化对比表：用以分析从步骤一到后续步骤的累计的转化率
-
-![转化对比表](/img/customEvent/funnel_analyse_table_1.png)
-
-流失对比表：用以分析每个步骤之间的流失率
-
-![流失对比表](/img/customEvent/funnel_analyse_table_2.png)
-
-转化趋势表：用以分析不同日期的转化率变化趋势
-
-![转化趋势表](/img/customEvent/funnel_analyse_table_3.png)
-
-流失趋势表：用以分析不同日期的流失率变化趋势
-
-![流失趋势表](/img/customEvent/funnel_analyse_table_4.png)
-
-## 4. 漏斗分析原理
-
-接下来将会描述漏斗分析原理，尤其是有分组和筛选情况时，计算原理就会显得较为复杂，此处将详细说明。
-
-### 4.1. 基本计算原理
-
-假设一个由步骤 1、2、3、4、5 构成的漏斗，选择的时间范围为 2021 年 3 月 1 日到 2021 年 3 月 7 日，窗口期是 3 天，如果用户在 2021 年 3 月 1 日到 2021 年 3 月 7 日触发了步骤 1，并且在步骤 1 发生的 3 天内，依顺序依次触发了步骤 2、3、4、5，则认为该用户完成了一次完整的漏斗转化，若依次触发了步骤 1 > 2 > 4 > 5，则该用户仅完成了步骤 1>2 的转化。
-
-如果步骤中间夹杂了一些其它的步骤或者行为，如用户的行为顺序是 1 > X > 2 > X > 3 > 4 > X > 5（其中 X 代表其他事件），则依然认为该用户完成了一次完整的漏斗转化。
-
-当一个用户在所选时段内有多个事件都符合某个转化步骤的定义，则会优先选择更靠近最终转化目标的事件作为转化事件，并在第一次达到最终转化目标时停止转化计算。
-
-假设一个漏斗的步骤定义为：浏览商城、选择道具、生成订单、支付成功，那么不同用户的行为序列及实际转化步骤（加粗部分）如下：
-
-例 1：**浏览商城** > 选择道具（道具 B） > **选择道具（道具 A）** > **生成订单** > **支付成功**
-
-例 2：浏览商城 > 选择道具（道具 B） > **浏览商城** > **选择道具（道具 A）** > **生成订单** > **支付成功**
-
-例 3：浏览商城 > 选择道具（道具 B） > **浏览商城** > **选择道具（道具 A）** > **生成订单** > **支付成功** > 选择道具（道具 A） > 生成订单 > 支付成功
-
-漏斗分析中展示的数字代表转化/流失的独立用户数，而非触发的事件次数。在该时间范围内，即使一个用户多次完成漏斗，也仅计数一次。
-
-### 4.2. 分组与筛选
-
-漏斗分析的分组与筛选，均基于完成转化/流失的用户
-
-基于用户属性、用户分群的分组与筛选：在完成转化/流失的用户的基础上，根据用户属性、用户分群进行分组与筛选
-
-基于公共事件属性的分组与筛选：在完成转化/流失的用户的基础上，以该用户在步骤 1 的事件属性进行分组与筛选
