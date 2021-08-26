@@ -11,29 +11,37 @@ title: 事件分析
 
 ![](/img/customEvent/1-选择指标-主体.png)
 
+![](/img/customEvent/event/event-1.png)
+
 点击「选择指标」，在弹出的窗口里我们选择事件和筛选条件，并且对指标重命名（我们也可以在事件分析的主界面进行筛选条件的设置）。
 
 ![](/img/customEvent/2-选择指标.png)
+![](/img/customEvent/event/event-2.png)
 
 **2、确定维度**：iOS 和 Android 就是我们分析指标的维度，所以我们在维度选择里选择「设备系统类型」。
 
 ![](/img/customEvent/3-选择维度.png)
+![](/img/customEvent/event/event-3.png)
 
 **3、选择时间段**：我们需要关注最近 30 天的数据变化，所以在日期选择器里选择「近 30 日」
 
 ![](/img/customEvent/4-日期选择器-2.png)
+![](/img/customEvent/event/event-4.png)
 
 **4、选择对比时间段**：我们用最近 30 天的数据变化，对比前一个月。
 
 ![](/img/customEvent/5-时间对比器.png)
+![](/img/customEvent/event/event-5.png)
 
 条件已经设置完成，点击「查询」，输出结果。
 
 ![](/img/customEvent/6-查询.png)
+![](/img/customEvent/event/event-6.png)
 
 **5、保存报表**：我们将查询结果保存为报表。再将报表转变为看板，就可以每天方便快捷的看最终报表数据。
 
 ![](/img/customEvent/7-保存报表.png)
+![](/img/customEvent/event/event-7.png)
 
 **以上就是我们通过事件分析来查看分系统的日活用户的步骤**。
 
@@ -86,6 +94,8 @@ title: 事件分析
 
 ![](/img/customEvent/事件分析how1查询主体.png)
 
+![](/img/customEvent/event/event-2-1.png)
+
 
 任意设置的调整，需点击「查询」按钮才能生效。
 
@@ -95,11 +105,15 @@ title: 事件分析
 
 ![](/img/customEvent/事件分析how2指标设置.png)
 
+![](/img/customEvent/event/event-2-2.png)
+
 「**选择事件**」：**下拉选项里可选择所有预置事件和自定义事件**；
 
 「**选择属性或指标名**」：下拉选项里展示事件的分析角度以及属性，如下图：
 
 ![](/img/customEvent/事件分析how3指标设置-选择属性或指标.png)
+
+![](/img/customEvent/event/event-2-3.png)
 
 A：分析指标：任何事件都至少有这三个分析指标：总次数，触发用户数，人均次数；
 
@@ -130,10 +144,14 @@ C：属性的分析指标：根据属性值类型，可存在以下分析指标�
 
 ![](/img/customEvent/事件分析how4指标设置-指标公式.png)
 
+![](/img/customEvent/event/event-2-4.png)
+
 #### 4.1.4「筛选」
 
 点击后设置指标的限制条件。可在【指标选择】界面设置单个指标的筛选，也可在事件分析主界面，设置全局筛选。
 ![](/img/customEvent/筛选条件.png)
+
+![](/img/customEvent/event/event-2-5.png)
 
 ##### 4.1.4.1 筛选的数据类型
 
@@ -200,6 +218,8 @@ C：属性的分析指标：根据属性值类型，可存在以下分析指标�
 
 ![](/img/customEvent/维度选择下拉框.png)
 
+![](/img/customEvent/event/event-2-6.png)
+
 其次阐述二者在数据逻辑上的区别：
 
 - 事件属性：即每一条事件所带的参数。比如通过 SDK 传“中秋节”事件，该事件带有 3 个属性，“中秋道具个数”、“粽子种类”和“用户购买龙舟数量”。在选择事件属性的维度时，可选的维度受到所选事件的约束，比如事件选定为“中秋节”的情况下，事件属性只能选择这 3 个。
@@ -218,6 +238,8 @@ C：属性的分析指标：根据属性值类型，可存在以下分析指标�
 选择我们关注的日期。
 
 ![](/img/customEvent/时间选择.png)
+
+![](/img/customEvent/event/event-2-7.png)
 
 ### 4.4 选择对比日期
 
