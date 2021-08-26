@@ -6,24 +6,24 @@ title: 漏斗分析
 在埋点设计指南里，我们基于「用户从打开 App 到真正创建角色」的转化过程进行了埋点设计，在这里我们用「漏斗分析」功能对这个转化过程来进行分析。
 
 **1、设置步骤**：将用户从打开 App 到真正创建角色的全过程创建事件，并按照用户操作顺序设置为漏斗步骤；
-![](img/customEvent/funnel/案例-1.png)
+![](/img/customEvent/funnel/案例-1.png)
 
 **2、设置维度**：不同系统类型可能会对转化情况有影响，所以在维度里选择「设备系统类型」；
 
-![](img/customEvent/funnel/案例-2.png)
+![](/img/customEvent/funnel/案例-2.png)
 
 **3、设置漏斗周期**：我们将漏斗窗口期设置为 7 天；
 
-![](img/customEvent/funnel/案例-3.png)
+![](/img/customEvent/funnel/案例-3.png)
 
 **4、设置展示结果**：设置时间段和其他参数，并点击查询查看分析结果；
 
-![](img/customEvent/funnel/案例-4.5.png)
+![](/img/customEvent/funnel/案例-4.5.png)
 
 
 **5、保存报表**：将查询结果保存为报表。再将报表转变为看板，就可以每天方便快捷的看漏斗分析。
 
-![](img/customEvent/funnel/案例-5.png)
+![](/img/customEvent/funnel/案例-5.png)
 
 ### 2、什么是漏斗分析
 
