@@ -9,38 +9,36 @@ title: 事件分析
 **1、确定指标和筛选条件**：要分析的是账号下的 DAU 和新增用户，分 iOS 和 Android 两端显示。所以在「事件分析」界面设置**查询主体**为「**账号**」。
 
 
-![](/img/customEvent/1-选择指标-主体.png)
-
 ![](/img/customEvent/event/event-1.png)
 
 点击「选择指标」，在弹出的窗口里我们选择事件和筛选条件，并且对指标重命名（我们也可以在事件分析的主界面进行筛选条件的设置）。
 
-![](/img/customEvent/2-选择指标.png)
+
 ![](/img/customEvent/event/event-2.png)
 
 **2、确定维度**：iOS 和 Android 就是我们分析指标的维度，所以我们在维度选择里选择「设备系统类型」。
 
-![](/img/customEvent/3-选择维度.png)
+
 ![](/img/customEvent/event/event-3.png)
 
 **3、选择时间段**：我们需要关注最近 30 天的数据变化，所以在日期选择器里选择「近 30 日」
 
-![](/img/customEvent/4-日期选择器-2.png)
+
 ![](/img/customEvent/event/event-4.png)
 
 **4、选择对比时间段**：我们用最近 30 天的数据变化，对比前一个月。
 
-![](/img/customEvent/5-时间对比器.png)
+
 ![](/img/customEvent/event/event-5.png)
 
 条件已经设置完成，点击「查询」，输出结果。
 
-![](/img/customEvent/6-查询.png)
+
 ![](/img/customEvent/event/event-6.png)
 
 **5、保存报表**：我们将查询结果保存为报表。再将报表转变为看板，就可以每天方便快捷的看最终报表数据。
 
-![](/img/customEvent/7-保存报表.png)
+
 ![](/img/customEvent/event/event-7.png)
 
 **以上就是我们通过事件分析来查看分系统的日活用户的步骤**。
@@ -92,7 +90,7 @@ title: 事件分析
 
 开启之后仅查询部分样本的数据，准确率 99.9%，查询速度更快。
 
-![](/img/customEvent/事件分析how1查询主体.png)
+
 
 ![](/img/customEvent/event/event-2-1.png)
 
@@ -103,7 +101,7 @@ title: 事件分析
 
 在选择指标界面，包括「选择事件」、「选择属性」、「重命名」、「切换指标公式」和「筛选」功能，如下图：
 
-![](/img/customEvent/事件分析how2指标设置.png)
+
 
 ![](/img/customEvent/event/event-2-2.png)
 
@@ -111,7 +109,7 @@ title: 事件分析
 
 「**选择属性或指标名**」：下拉选项里展示事件的分析角度以及属性，如下图：
 
-![](/img/customEvent/事件分析how3指标设置-选择属性或指标.png)
+
 
 ![](/img/customEvent/event/event-2-3.png)
 
@@ -142,14 +140,14 @@ C：属性的分析指标：根据属性值类型，可存在以下分析指标�
 - 我们设置事件和指标公式「用户付费 - 触发用户数」/「账号登录 - 触发用户数」；
 - 在设置好指标计算公式后，可以选择“百分比”、“两位小数”、“三位小数”、“取整”三种展现样式，我们选择两位小数；
 
-![](/img/customEvent/事件分析how4指标设置-指标公式.png)
+
 
 ![](/img/customEvent/event/event-2-4.png)
 
 #### 4.1.4「筛选」
 
 点击后设置指标的限制条件。可在【指标选择】界面设置单个指标的筛选，也可在事件分析主界面，设置全局筛选。
-![](/img/customEvent/筛选条件.png)
+
 
 ![](/img/customEvent/event/event-2-5.png)
 
@@ -216,7 +214,7 @@ C：属性的分析指标：根据属性值类型，可存在以下分析指标�
 - 用户属性：描述触发事件的用户的状态。比如：现在在美国的用户充了多少钱？这里查询现在在美国的用户（包含曾经不在美国）触发的付费事件。
 - 用户分群：即用户属于所选中的分群里的用户。
 
-![](/img/customEvent/维度选择下拉框.png)
+
 
 ![](/img/customEvent/event/event-2-6.png)
 
@@ -237,7 +235,7 @@ C：属性的分析指标：根据属性值类型，可存在以下分析指标�
 
 选择我们关注的日期。
 
-![](/img/customEvent/时间选择.png)
+
 
 ![](/img/customEvent/event/event-2-7.png)
 
