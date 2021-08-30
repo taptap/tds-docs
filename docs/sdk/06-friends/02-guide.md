@@ -368,16 +368,21 @@ tom.unregisterFriendshipNotification();
 
 ## 获取好友列表
 
-调用 `TDSUser#friendshipQuery()` 可以得到查询好友的 `LCQuery` 实例，之后调用 `LCQuery#findInBackground()` 方法就可以得到好友列表。示例如下：
+调用 `GetFriendshipQuery` 可以构造好友关系查询，之后调用查询的 `Find` 方法就可以得到好友关系列表。
+每条好友关系的 `followee` 属性即为该用户的其中一个好友。
+示例如下：
 
 <MultiLang>
 
 ```cs
-LCQuery<LCObject> query = jerry.GetFirendshipQuery();
+LCQuery<LCObject> query = jerry.GetFriendshipQuery();
+var objects = await query.Find();
+foreach (LCObject object in objects) {
+    var friend = object["followee"];
+}
 ```
 
 ```java
-
 LCQuery<LCFriendship> query = jerry.friendshipQuery();
 query.findInBackground().subscribe(new Observer<List<LCFriendship>>() {
     @Override
@@ -386,7 +391,9 @@ query.findInBackground().subscribe(new Observer<List<LCFriendship>>() {
     @Override
     public void onNext(List<LCFriendship> lcFriendships) {
         if (null != lcFriendships) {
-            // lcFriendships 即为好友关系
+            for (LCFriendship lcFriendship : lcFriendships) {
+                LCUser friend = lcFriendship.getFollowee()
+            }
         }
     }
 
@@ -404,20 +411,12 @@ query.findInBackground().subscribe(new Observer<List<LCFriendship>>() {
 LCQuery *query = [TDSUser friendshipQuery];
 [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
     for (LCObject *object in objects) {
-        // 好友
         TDSUser *friend = object[@"followee"];
-        // 自己
-        TDSUser *selfUser = object[@"user"];
     }
 }];
 ```
 
 </MultiLang>
-
-LCFriendship 里面会包含两个用户：
-
-- `LCFriendship#getLCUser(LCFriendship.ATTR_USER)` 得到的是 jerry 自己；
-- `LCFriendship#getLCUser(LCFriendship.ATTR_FOLLOWEE)` 得到的就是另一方的用户信息。
 
 ## 删除好友
 
@@ -464,12 +463,13 @@ friendship.deleteInBackground().subscribe(new Observer<LCNull>() {
 
 ## 查询好友关系
 
-我们使用 LCQuery 可以单独查询两个用户是否为好友关系。
+上文[获取好友列表](#获取好友列表)一节介绍了如何构造好友关系查询，其中提到每条好友关系的 `followee` 属性指向用户的其中一个好友。
+那么，只需在这样的查询上附加一个查询条件，`followee` 属性等于某特定用户，即可单独查询两个用户是否为好友。
 
 <MultiLang>
 
 ```cs
-LCQuery<LCObject> query = jerry.GetFirendshipQuery();
+LCQuery<LCObject> query = jerry.GetFriendshipQuery();
 query.whereEqualTo("followee", tom);
 int count = await query.Count();
 if (count > 0) {

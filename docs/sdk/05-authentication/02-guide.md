@@ -530,7 +530,7 @@ thirdPartyData.put("scope", "SCOPE");
 TDSUser.loginWithAuthData(TDSUser.class, thirdPartyData, "weixin").subscribe(new Observer<TDSUser>() {
     public void onSubscribe(Disposable disposable) {
     }
-    public void onNext(TDSUser avUser) {
+    public void onNext(TDSUser user) {
        System.out.println("成功登录");
     }
     public void onError(Throwable throwable) {
@@ -767,12 +767,12 @@ await currentUser.AssociateAuthData(weixinData, "weixin");
 ```
 
 ```java
-avUser.associateWithAuthData(weixinData, "weixin").subscribe(new Observer<TDSUser>() {
+user.associateWithAuthData(weixinData, "weixin").subscribe(new Observer<TDSUser>() {
     @Override
     public void onSubscribe(Disposable d) {
     }
     @Override
-    public void onNext(TDSUser avUser) {
+    public void onNext(TDSUser user) {
         System.out.println("绑定成功");
     }
     @Override
@@ -813,13 +813,13 @@ await currentUser.DisassociateWithAuthData("weixin");
 ```
 
 ```java
-TDSUser avUser = TDSUser.currentUser();
-avUser.dissociateWithAuthData("weixin").subscribe(new Observer<TDSUser>() {
+TDSUser user = TDSUser.currentUser();
+user.dissociateWithAuthData("weixin").subscribe(new Observer<TDSUser>() {
     @Override
     public void onSubscribe(Disposable d) {
     }
     @Override
-    public void onNext(TDSUser avUser) {
+    public void onNext(TDSUser user) {
         System.out.println("解绑成功");
     }
     @Override
@@ -919,7 +919,7 @@ TDSUser.loginWithAuthData(TDSUser.class, thirdPartyData, "wxleanoffice",
     public void onSubscribe(Disposable d) {
     }
     @Override
-    public void onNext(TDSUser avUser) {
+    public void onNext(TDSUser user) {
         System.out.println("登录成功");
     }
     @Override
@@ -1018,7 +1018,7 @@ TDSUser.loginWithAuthData(TDSUser.class, thirdPartyData, "wxleansupport", "union
     public void onSubscribe(Disposable d) {
     }
     @Override
-    public void onNext(TDSUser avUser) {
+    public void onNext(TDSUser user) {
         System.out.println("登录成功");
     }
     @Override
