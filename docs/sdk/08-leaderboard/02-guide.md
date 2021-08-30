@@ -413,6 +413,7 @@ public static LCLeaderboard createWithoutData(String name, String memberType)
 
 - `name` 为排行榜名称，这里需要传入云端已经存在的排行榜名称。上例中是 `world`。
 - `memberType` 为排行榜成员类型，传入 `LCLeaderboard.MEMBER_TYPE_USER` 表示成员类型为用户，传入 `LCLeaderboard.MEMBER_TYPE_ENTITY` 表示成员类型为 entity，成员类型为 object 时请传入相应 Class 名称。用户是最常用的排行榜类型，因此 `createWithoutData` 还提供了一个单参数的重载方法，上例中就只传入了排行榜名称，此时成员类型为用户。
+
 </>
 <>
 
@@ -1028,7 +1029,7 @@ leaderboard.updateUpdateStrategy(LCLeaderboard.LCLeaderboardUpdateStrategy.Last)
 // 不支持
 ```
 
-</Multilang>
+</MultiLang>
 
 ### 删除排行榜
 
