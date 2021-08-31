@@ -55,8 +55,8 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
     "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#3.1.0",
     "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#3.1.0",
     "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#3.1.0",
-    "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-0.9.2",
-    "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-0.9.2",
+    "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-0.9.6",
+    "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-0.9.6",
 }
 ```
 
@@ -146,8 +146,8 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
         implementation name:'TapBootstrap_3.1.0', ext:'aar'   
         implementation name:'TapCommon_3.1.0', ext:'aar' 
 		implementation name:'TapLogin_3.1.0', ext:'aar' 
-        implementation 'cn.leancloud:realtime-android:8.0.4'
-        implementation 'cn.leancloud:storage-android:8.0.4'
+        implementation 'cn.leancloud:realtime-android:8.1.0'
+        implementation 'cn.leancloud:storage-android:8.1.0'
         implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 
     }  
@@ -350,8 +350,9 @@ config.serverURL = @"https://your_server_url";  // 开发者中心 > 你的游�
 
 </MultiLang>
 
-`client_id`、`client_token`、`server_url` 等信息均可在控制台查看。
-详见文档关于[绑定域名](/sdk/storage/guide/setup-dotnet#绑定域名)、[应用凭证](/sdk/storage/guide/setup-dotnet#应用凭证)的说明。
+`client_id`、`client_token`信息可在 **开发者中心 > 你的游戏 > 游戏服务 > 应用配置** 查看。
+
+`server_url` 可参考 **[域名绑定](/sdk/start/get-ready/#绑定域名)** 的文档。
 
 :::info
 TapSDK 3.0 版本目前暂不支持海外，预计本季度部署海外节点，敬请期待。
