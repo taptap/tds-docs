@@ -654,14 +654,15 @@ option.selectKeys = @[@"username"];
 
 如果想要包含的属性是 Pointer 类型或文件类型，那么 `selectKeys` 只会返回 Pointer 本身。
 想要一并获取 Pointer 指向的另一个 class 的数据的话，需要额外使用 `includeKeys` 指定。
+例如，假设 `club` 是一个指向 `Club` 类的 Pointer：
 
 <MultiLang>
 
 ```cs
 var leaderboard = LCLeaderboard.CreateWithoutData("weapons", "Weapon");
 var rankings = await leaderboard.GetResults(limit: 10,
-  selectKeys: new List<string> { "name", "image" },
-  includeKeys: new List<string> { "image" });
+  selectKeys: new List<string> { "name", "club" },
+  includeKeys: new List<string> { "club" });
 ```
 
 ```java
@@ -672,8 +673,8 @@ var rankings = await leaderboard.GetResults(limit: 10,
 LCLeaderboard leaderboard = [[LCLeaderboard alloc] initWithStatisticName:@"weapons"];
 leaderboard.limit = 10;
 LCLeaderboardQueryOption *option = [[LCLeaderboardQueryOption alloc] init];
-option.selectKeys = @[@"name", @"image"];
-option.includeKeys = @[@"image"];
+option.selectKeys = @[@"name", @"club"];
+option.includeKeys = @[@"club"];
 [leaderboard getUserResultsWithOption:option, callback:^(NSArray *rankings, NSInteger count, NSError *error) {
   // 略
 }];
@@ -1589,77 +1590,7 @@ curl -X GET \
 }
 ```
 
-你可以在请求中用 `selectKeys` 来指定一同返回 object 在数据存储中的字段数据，多个字段用英文逗号 `,` 隔开，能否返回数据受 ACL 限制。
-例如一并返回 object 的 `name` 和 `level` 字段属性：
 
-```sh
-curl -X GET \
-  -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
-  --data-urlencode 'statistics=wins' \
-  --data-urlencode 'selectKeys=name,level' \
-  https://{{host}}/1.1/leaderboard/objects/<objectId>/statistics
-```
-
-返回值示例：
-
-```json
-{
-  "results": [
-    {
-      "statisticName": "wins",
-      "statisticValue": 5,
-      "version": 0,
-      "object": {
-        "__type": "Pointer",
-        "className": "Weapon",
-        "name": "sword",
-        "level": "10",
-        "objectId": "60d1b38b9be318093f000002"
-      }
-    }
-  ]
-}
-```
-
-如果 object 的某个字段属性是 pointer 或文件类型，可以进一步使用 `includeKeys` 来获取该 pointer 字段的数据，多个字段同样用英文逗号 `,` 隔开。例如获取 `memberType` 是 `Weapon` 的某个 object 的 `image` 字段：
-
-```sh
-curl -X GET \
-  -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
-  --data-urlencode 'statistics=wins' \
-  --data-urlencode 'selectKeys=image' \
-  --data-urlencode 'includeKeys=image' \
-  https://{{host}}/1.1/leaderboard/objects/<objectId>/statistics
-```
-
-返回结果中会包含 `image` 的全部信息：
-
-```json
-{
-  "results": [
-    {
-      "statisticName": "wins",
-      "statisticValue": 8.5,
-      "version": 0,
-      "object": {
-        "__type": "Pointer",
-        "className": "Weapon",
-        "image": {
-          "bucket": "test_files",
-          "provider": "leancloud",
-          "name": "weapon.jpg",
-          "url": "https://example.com/weapon.jpg",
-          "objectId": "60d2ceb09be318244c000004",
-          "__type": "File"
-        },
-        "objectId": "60d2ceb09be318244c000005"
-      }
-    }
-  ]
-}
-```
 
 获取某个 entity 成绩时则需指定该 entity 的字符串：
 
@@ -1745,8 +1676,6 @@ curl -X POST \
   https://{{host}}/1.1/leaderboard/objects/statistics/<statisticName>
 ```
 
-像获取单个 object 的成绩一样，获取多个 object 成绩时同样可以使用 `selectKeys` 和 `includeKeys`。
-
 传入 entity 的字符串数组则可以一次性获取多个 entity 的成绩（最多不超过 200 个）：
 
 ```sh
@@ -1771,8 +1700,8 @@ curl -X GET \
   -G \
   --data-urlencode 'startPosition=0' \
   --data-urlencode 'maxResultsCount=20' \
-  --data-urlencode 'selectKeys=username' \
-  --data-urlencode 'includeKeys=idCard' \
+  --data-urlencode 'selectKeys=username,club' \
+  --data-urlencode 'includeKeys=club' \
   --data-urlencode 'includeStatistics=wins' \
   https://{{host}}/1.1/leaderboard/leaderboards/user/<statisticName>/ranks
 ```
@@ -1802,10 +1731,9 @@ curl -X GET \
         "updatedAt": "2021-07-21T03:08:10.487Z",
         "username": "zw1stza3fy701rvgxqwiikex7",
         "createdAt": "2020-09-04T04:23:04.795Z",
-        "photo": {
+        "club": {
           "objectId": "60f78f98d9f1465d3b1da12d",
-          "__type": "File",
-          "url": "https://example.com/user_1.jpg",
+          "name": "board games",
           "updatedAt": "2021-07-21T03:08:08.692Z",
           "createdAt": "2021-07-21T03:08:08.692Z",
         },
@@ -1827,10 +1755,45 @@ curl -X GET \
   -G \
   --data-urlencode 'startPosition=0' \
   --data-urlencode 'maxResultsCount=2' \
-  --data-urlencode 'selectKeys=name,idCard' \
-  --data-urlencode 'includeKeys=idCard' \
+  --data-urlencode 'selectKeys=name,image' \
+  --data-urlencode 'includeKeys=image' \
   --data-urlencode 'count=1' \
   https://{{host}}/1.1/leaderboard/leaderboards/object/<statisticName>/ranks
+```
+
+返回结果：
+
+```json
+{
+  "results": [
+    {
+      "statisticName": "wins",
+      "statisticValue": 4,
+      "rank": 0,
+      "object": {
+        "__type": "Pointer",
+        "className": "Weapon",
+        "name": "sword",
+        "image": {
+          "bucket": "test_files",
+          "provider": "leancloud",
+          "name": "sword.jpg",
+          "url": "https://example.com/sword.jpg",
+          "objectId": "60d2f3a39be3183377000002",
+          "__type": "File"
+        },
+        "objectId": "60d2f22f9be318328b000007"
+      }
+    },
+    {
+      "statisticName": "wins",
+      "statisticValue": 3,
+      "rank": 1,
+      "object": {...}
+    }
+  ],
+  "count": 500
+}
 ```
 
 同理，URL 中的 `user` 替换为 `entity` 可查询 entity 排行榜的 Top 排名：
@@ -1846,6 +1809,28 @@ curl -X GET \
   https://{{host}}/1.1/leaderboard/leaderboards/entity/<statisticName>/ranks
 ```
 
+返回结果：
+
+```json
+{
+  "results": [
+    {
+      "statisticName": "wins",
+      "statisticValue": 4,
+      "rank": 0,
+      "entity": "1234567890"
+    },
+    {
+      "statisticName": "wins",
+      "statisticValue": 3,
+      "rank": 1,
+      "entity": "2345678901"
+    }
+  ],
+  "count": 500
+}
+```
+
 #### 获取附近排名
 
 在 URL 末端附加相应的 objectId 可获取某用户或 object 附近的排名。
@@ -1859,8 +1844,8 @@ curl -X GET \
   -G \
   --data-urlencode 'startPosition=0' \
   --data-urlencode 'maxResultsCount=20' \
-  --data-urlencode 'selectKeys=username,idCard' \
-  --data-urlencode 'includeKeys=idCard' \
+  --data-urlencode 'selectKeys=username,club' \
+  --data-urlencode 'includeKeys=club' \
   https://{{host}}/1.1/leaderboard/leaderboards/user/<statisticName>/ranks/<objectId>
 ```
 
@@ -1885,12 +1870,11 @@ curl -X GET \
         "__type": "Pointer",
         "className": "_User",
         "username": "kate",
-        "idCard": {
-          "bucket": "test_files",
-          "url": "https://example.com/kate.jpg",
-          "objectId": "60d2faa99be3183623000000",
-          "__type": "File",
-          "provider": "qiniu"
+        "club": {
+          "objectId": "60f78f98d9f1465d3b1da12d",
+          "name": "board games",
+          "updatedAt": "2021-07-21T03:08:08.692Z",
+          "createdAt": "2021-07-21T03:08:08.692Z",
         },
         "objectId": "60d2faa99be3183623000001"
       }
@@ -1915,8 +1899,8 @@ curl -X GET \
   -G \
   --data-urlencode 'startPosition=0' \
   --data-urlencode 'maxResultsCount=2' \
-  --data-urlencode 'selectKeys=name,idCard' \
-  --data-urlencode 'includeKeys=idCard' \
+  --data-urlencode 'selectKeys=name,image' \
+  --data-urlencode 'includeKeys=image' \
   --data-urlencode 'count=1' \
   https://{{host}}/1.1/leaderboard/leaderboards/object/<statisticName>/ranks/<objectId>
 ```
