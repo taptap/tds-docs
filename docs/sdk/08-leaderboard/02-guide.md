@@ -1636,7 +1636,7 @@ curl -X POST \
   https://{{host}}/1.1/leaderboard/users/statistics/<statisticName>
 ```
 
-返回示例：
+查询一组成绩的的返回结果与[查询单个成绩](#查询某个成绩)类似：
 
 ```json
 {
@@ -1689,7 +1689,7 @@ curl -X POST \
 
 ### 查询排行榜
 
-#### 获取指定区间的排名
+#### 获取区间排名
 
 你可以使用这个接口来获取 Top 排名。
 
@@ -1835,6 +1835,7 @@ curl -X GET \
 
 在 URL 末端附加相应的 objectId 可获取某用户或 object 附近的排名。
 
+
 获取某用户附近的排名：
 
 ```sh
@@ -1849,9 +1850,8 @@ curl -X GET \
   https://{{host}}/1.1/leaderboard/leaderboards/user/<statisticName>/ranks/<objectId>
 ```
 
-参数含义参见上面[获取指定区间的排名](#获取指定区间的排名)一节。
-
-返回：
+参数含义参见上面[获取区间排名](#获取区间排名)一节。
+获取附近排名的返回结果与[获取区间排名](#获取区间排名)类似。
 
 ```json
 {
