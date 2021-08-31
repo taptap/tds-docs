@@ -9,11 +9,14 @@ import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
 
 TapTap OpenAPI 采用统一的 Mac Token 头部签算来传递用户身份。
 
-客户端 SDK 通过[单纯 TapTap 用户认证方式接入](#单纯的-taptap-用户认证使用方式)后，经过用户的授权流程，会获得这个用户在当前应用中的 Mac Token。Mac Token 长期有效，只有在用户更新自己账号相关安全信息、注销对当前应用的授权时才会失效。开发者应当将 Mac Token 妥善保管于自己的服务器上，作为后续与 TapTap 服务端通讯的标示。（Mac Token 算法细节见文档中的 [MAC Token 算法](#mac-token-算法) 部分）
+客户端 SDK 通过[单纯 TapTap 用户认证方式接入](/sdk/taptap-login/guide/start/#单纯的-taptap-用户认证使用方式)后，经过用户的授权流程，会获得这个用户在当前应用中的 Mac Token。Mac Token 长期有效，只有在用户更新自己账号相关安全信息、注销对当前应用的授权时才会失效。开发者应当将 Mac Token 妥善保管于自己的服务器上，作为后续与 TapTap 服务端通讯的标示。
 
-以下接口，均提供为国内示例，海外用户请参考[海外 API 说明](#海外-api-说明)。
+Mac Token 算法细节见文档中的 [MAC Token 算法](#mac-token-算法) 部分。
+
+以下接口均为国内示例。当移动端初始化为海外时，登录即为海外，以下服务端文档流程不变，将示例中的请求域名 `openapi.taptap.com` 更换为海外域名 `openapi.tap.io` 即可。
 
 ## 流程
+
 1. 移动端用 SDK 的 TapTap 登录，可以通过 `GetAccessToken` 获取 AccessToken，里面包含
 
     ```java
@@ -27,15 +30,15 @@ TapTap OpenAPI 采用统一的 Mac Token 头部签算来传递用户身份。
     ```
 
 2. 再把移动端获取的参数发到游戏务服务器，服务端签算 mac token。
-3. 请求 `https://tds-tapsdk.cn.tapapis.com/api/v1/user/info` ， header 携带 mac token
+3. 请求 `https://openapi.taptap.com/account/profile/v1` ， header 携带 `mac token`。
 
-注意：当前实际返回的 kid 和 access_token 值相等，建议使用 access_token
+注意：当前实际返回的 `kid` 和 `access_token` 值相等，建议使用 `access_token`。
 
 ## API
 
 ### 获取当前账户详细信息
 
->  <Red> GET </Red> https://tds-tapsdk.cn.tapapis.com/api/v1/user/info?client_id=xxx <br/><Blue> Authorization </Blue> mac token
+>  <Red> GET </Red> https://openapi.taptap.com/account/profile/v1?client_id=xxx <br/><Blue> Authorization </Blue> mac token
 
 
 #### 请求参数
@@ -48,20 +51,20 @@ TapTap OpenAPI 采用统一的 Mac Token 头部签算来传递用户身份。
 
 字段             | 类型           | 说明
 --------------- | ------------- | ------------
-user_id            | string        | tds id，用户唯一标识
 name            | string        | 用户名
-avatar          | string        | 用户头像图片
-gender         | int       | UNKNOWN = 0;<br/>MALE = 1;<br/> FEMALE = 2
-is_guest         | bool       | 是否是游客，暂时弃用
-
+avatar          | string        | 用户头像图片地址
+gender          | string        | "female"，"male"或空字符串
+openid          | string        | 授权用户唯一标识，每个玩家在每个游戏中的 openid 都是不一样的，同一游戏获取同一玩家的 openid 总是相同
+unionid         | string        | 授权用户唯一标识，一个玩家在一个厂商的所有游戏中 unionid 都是一样的，不同厂商 unionid 不同
 
 #### 请求示例
-替换其中的 `MAC id` 和 `Client ID` 为自己签算的 mac token 和控制台的 `Client ID`
+
+替换其中的 `MAC id` 和 `Client ID` 为自己签算的 mac token 和控制台的 `Client ID`。
 
 ```
 curl -s -H 'Authorization:MAC id="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJa
 gCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTs
-KQ",ts="1618221750",nonce="adssd",mac="XWTPmq6A6LzgK8BbNDwj+kE4gzs="' "https://tds-tapsdk.cn.tapapis.com/api/v1/user/info?client_id=<Client ID>"
+KQ",ts="1618221750",nonce="adssd",mac="XWTPmq6A6LzgK8BbNDwj+kE4gzs="' "https://openapi.taptap.com/account/profile/v1?client_id=<Client ID>"
 ```
 
 ## 其他
@@ -101,15 +104,15 @@ TS=$(date +%s)
 # 请求方法
 METHOD="GET"
 # 请求地址 (带 query string)
-REQUEST_URI="/api/v1/user/info?client_id=${CLIENT_ID}"
+REQUEST_URI="/account/profile/v1?client_id=${CLIENT_ID}"
 # 请求域名
-REQUEST_HOST="tds-tapsdk.cn.tapapis.com"
+REQUEST_HOST="openapi.taptap.com"
 
 MAC=$(printf "%s\n%s\n%s\n%s\n%s\n443\n\n" "${TS}" "${NONCE}" "${METHOD}" "${REQUEST_URI}" "${REQUEST_HOST}" | openssl dgst -binary -sha1 -hmac ${MAC_KEY} | base64)
 
 AUTHORIZATION=$(printf 'MAC id="%s",ts="%s",nonce="%s",mac="%s"' "${ACCESS_TOKEN}" "${TS}" "${NONCE}" "${MAC}")
 
-curl -s -H"Authorization:${AUTHORIZATION}" "https://tds-tapsdk.cn.tapapis.com/api/v1/user/info?client_id=${CLIENT_ID}"
+curl -s -H"Authorization:${AUTHORIZATION}" "https://openapi.taptap.com/account/profile/v1?client_id=${CLIENT_ID}"
 ```
 
 ### nodejs 请求示例
@@ -129,7 +132,7 @@ var client_id = "0RiAlMny7jiz086FaU";
 
 var ts = Math.ceil(Date.now() / 1000);
 var ext = "";
-var signArray = [ts, nonce, 'GET', '/api/v1/user/info?client_id=' + client_id, 'tds-tapsdk.cn.tapapis.com', 443, ext];
+var signArray = [ts, nonce, 'GET', '/account/profile/v1?client_id=' + client_id, 'openapi.taptap.com', 443, ext];
 
 var mac = utils.hmacSha1(signArray.join("\n")+"\n", mac_key);
 var auth = format('MAC id={id},ts={ts},nonce={nonce},mac={mac}', {
@@ -148,7 +151,7 @@ var reqData = {
   headers: headers
 }
 
-urllib.request("https://tds-tapsdk.cn.tapapis.com/api/v1/user/info?client_id=" + client_id, reqData,
+urllib.request("https://openapi.taptap.com/account/profile/v1?client_id=" + client_id, reqData,
   (err, data, response) => {
     if(!err){
       console.log("返回数据：" + data.toString());
@@ -199,7 +202,7 @@ public class Authorization {
         String kid = "1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ"; // kid
         String mac_key = "mSUQNYUGRBPXyRyW"; // mac_key
         String method = "GET";
-        String request_url = "https://tds-tapsdk.cn.tapapis.com/api/v1/user/info?client_id=" + client_id; //
+        String request_url = "https://openapi.taptap.com/account/profile/v1?client_id=" + client_id; //
         String authorization = getAuthorization(request_url, method, kid, mac_key);
         System.out.println(authorization);
         URL url = new URL(request_url);
@@ -319,20 +322,3 @@ public class Authorization {
 | not_found       | 404         | 请求失败，请求所希望得到的资源未被在服务器上发现。**在参数相同的情况下，不应该重复请求** |
 | server_error              | 500         | 服务器出现异常情况 **可稍等后重新尝试请求，但需有尝试上限，建议最多 3 次，如一直失败，则中断并告知用户** | 
 
-### 海外 API 说明
-当移动端初始化为海外时
-```cs
-TapConfig tapConfig = new TapConfig("your-client-id", false); // true 表示国内，false 表示国外
-TapBootstrap.Init(tapConfig);
-```
-登录即为海外，服务端文档以上流程不变，变更海外域名即可
-
-#### 海外域名：    
-##### main domain
-    - host: tds-tapsdk0.intl.tapapis.com
-    - host: tds-tapsdk1.intl.tapapis.com
-    - host: tds-tapsdk2.intl.tapapis.com
-
-##### backup domain
-    - host: tds-tapsdk-b0.intl.tapapis.com
-    - host: tds-tapsdk-b1.intl.tapapis.com
