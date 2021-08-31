@@ -350,8 +350,9 @@ config.serverURL = @"https://your_server_url";  // 开发者中心 > 你的游�
 
 </MultiLang>
 
-`client_id`、`client_token`、`server_url` 等信息均可在控制台查看。
-详见文档关于[绑定域名](/sdk/storage/guide/setup-dotnet#绑定域名)、[应用凭证](/sdk/storage/guide/setup-dotnet#应用凭证)的说明。
+`client_id`、`client_token`信息可在 **开发者中心 > 你的游戏 > 游戏服务 > 应用配置** 查看。
+
+`server_url` 可参考 **[域名绑定](/sdk/start/get-ready/#绑定域名)** 的文档。
 
 :::info
 TapSDK 3.0 版本目前暂不支持海外，预计本季度部署海外节点，敬请期待。
