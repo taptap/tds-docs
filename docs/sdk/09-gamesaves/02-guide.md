@@ -198,9 +198,9 @@ LCQuery *query = [TapGameSave queryWithCurrentUser];
 
 
 
-## 删改存档
+## 删除用户存档
 
-玩家只能删除或修改自己的存档。
+玩家只能删除自己的存档。
 
 删除存档：
 
