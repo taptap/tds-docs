@@ -86,8 +86,10 @@ NSDictionary *statistic = @{
   @"world" : 20.0,
 };
 [LCLeaderboard updateCurrentUserStatistics:statistic, callback:^(NSArray *statistics, NSError *error) {
-  if (!error) {
-    // scores saved
+  if (statistics) {
+    // statistics 是更新后你的最好/最新成绩
+  } else if (error) {
+    // 处理错误
   }
 }];
 ```
@@ -214,10 +216,11 @@ await LCLeaderboard.DeleteStatistics(currentUser, new List<string> { "world" });
 ```
 
 ```objc
-[LCLeaderboard deleteCurrentUserStatistics:@[@"world"], callback:^(BOOL succeeded, NSError *error) {
+[LCLeaderboard deleteCurrentUserStatistics:@[@"world"], callback:^(BOOL succeeded, NSError * _Nullable error) {
   if (succeeded) {
-    // deleted
-  }
+    // 删除成功
+  } else if (error) {
+    // 处理错误
 }];
 ```
 
@@ -269,10 +272,14 @@ LCLeaderboard.getUserStatistics(otherUser).subscribe(new Observer<LCStatisticRes
 
 ```objc
 NSString *otherUserObjectId = @"5c76107144d90400536fc88b";
-[LCLeaderboard getStatisticsWithUserId:otherUserObjectId, statisticNames:nil, callback:^(NSArray *statistics, NSError *error) {
-  for (LCLeaderboardStatistic *statistic in statistics) {
-    NSLog(@"排行榜名称：%@", statistic.name);
-    NSLog(@"成绩：%f", statistic.value);
+[LCLeaderboard getStatisticsWithUserId:otherUserObjectId, statisticNames:nil, callback:^(NSArray<LCLeaderboardStatistic *> * _Nullable *statistics, NSError _Nullable *error) {
+  if (statistics) {
+    for (LCLeaderboardStatistic *statistic in statistics) {
+      NSLog(@"排行榜名称：%@", statistic.name);
+      NSLog(@"成绩：%f", statistic.value);
+    }
+  } else if (error) {
+        // 处理错误
   }
 }];
 ```
@@ -293,7 +300,7 @@ LCLeaderboard.getUserStatistics(otherUser, Arrays.asList("world")).subscribe(/**
 ```
 
 ```objc
-[LCLeaderboard getStatisticsWithUserId:otherUserObjectId, statisticNames:@[@"world"], callback:^(NSArray *statistics, NSError *error) {
+[LCLeaderboard getStatisticsWithUserId:otherUserObjectId, statisticNames:@[@"world"], callback:^(NSArray<LCLeaderboardStatistic *> * _Nullable statistics, NSError * _Nullable error) {
   // 略
 }];
 ```
@@ -326,20 +333,20 @@ var statistics = await LCLeaderboard.GetStatistics("excalibur", new List<string>
 ```java
 String excaliburObjectId = "582570f38ac247004f39c24b";
 LCLeaderboard.getMemberStatistics("Weapon", excaliburObjectId,
-  Arrays.asList("world")).subscribe(/** 略 **/);
+  Arrays.asList("weapons")).subscribe(/** 略 **/);
 ```
 
 如果武器排行榜是 entity 排行榜：
 
 ```java
 LCLeaderboard.getMemberStatistics(LCLeaderboard.MEMBER_TYPE_ENTITY, "excalibur",
-  Arrays.asList("world")).subscribe(/** 略 **/);
+  Arrays.asList("weapons")).subscribe(/** 略 **/);
 ```
 
 顺便提下，之前提到的 `getUserStatistics` 方法
 
 ```java
-LCLeaderboard.getUserStatistics(otherUser, Arrays.asList("world")).subscribe(/** 略 **/);
+LCLeaderboard.getUserStatistics(otherUser, Arrays.asList("weapons")).subscribe(/** 略 **/);
 ```
 
 等价于：
@@ -347,7 +354,7 @@ LCLeaderboard.getUserStatistics(otherUser, Arrays.asList("world")).subscribe(/**
 ```java
 LCLeaderboard.getMemberStatistics(LCLeaderboard.LCLeaderboard.MEMBER_TYPE_USER,
   otherUser.getObjectId(),
-  Arrays.asList("world")).subscribe(/** 略 **/);
+  Arrays.asList("weapons")).subscribe(/** 略 **/);
 ```
 
 </>
@@ -357,7 +364,9 @@ LCLeaderboard.getMemberStatistics(LCLeaderboard.LCLeaderboard.MEMBER_TYPE_USER,
 
 ```objc
 NSString *excaliburObjectId = @"582570f38ac247004f39c24b";
-[LCLeaderboard getStatisticsWithObjectId:excaliburObjectId, statisticNames:@[@"world"], callback:^(NSArray *statistics, NSError *error) {
+[LCLeaderboard getStatisticsWithObjectId:excaliburObjectId, statisticNames:@[@"weapons"],
+  option:nil
+  callback:^(NSArray *statistics, NSError *error) {
   // 略
 }];
 ```
@@ -365,12 +374,57 @@ NSString *excaliburObjectId = @"582570f38ac247004f39c24b";
 如果武器排行榜是 entity 排行榜：
 
 ```objc
-[LCLeaderboard getStatisticsWithEntity:@"excalibur", statisticNames:@[@"world"], callback:^(NSArray *statistics, NSError *error) {
+[LCLeaderboard getStatisticsWithEntity:@"excalibur", statisticNames:@[@"weapons"], 
+  callback:^(NSArray<LCLeaderboardStatistic *> * _Nullable *statistics, NSError * _Nullable error) {
   // 略
 }];
 ```
 
 </>
+</MultiLang>
+
+最后，还可以查询一组成员的成绩：
+
+<MultiLang>
+
+```cs
+var otherUser = LCObject.CreateWithoutData<LCUser>("5c76107144d90400536fc88b");
+var anotherUser = LCObject.CreateWithoutData<LCUser>("672a127144a90d00536f3456");
+var statistics = await LCLeaderboard.GetStatistics({otherUser, anotherUser}, new List<string> { "world" });
+
+var oneObject = LCObject.CreateWithoutData<LCObject>("abccb27133a90ddd536ffffa");
+var anotherUser = LCObject.CreateWithoutData<LCObject>("672a1279345777005a2b2444");
+var statistics = await LCLeaderboard.GetStatistics({oneObject, anotherObject}, new List<string> { "weapons" });
+
+var statistics = await LCLeaderboard.GetStatistics({"Sylgr", "Leiptr"}, new List<string> { "rivers" });
+```
+
+```java
+// 暂未支持
+```
+
+```objc
+NSString *otherUserObjectId = @"5c76107144d90400536fc88b";
+NSString *anotherUserObjectId = @"672a127144a90d00536f3456";
+[leaderboard getStatisticsWithUserIds:@[otherUserObjectId, anotherUserObjectId]
+  callback:^(NSArray<LCLeaderboardStatistic *> * _Nullable statistics, NSError * _Nullable error) {
+// 略
+}];
+
+NSString *oneObjectId = @"abccb27133a90ddd536ffffa";
+NSString *anotherObjectId = @"672a1279345777005a2b2444";
+[leaderboard getStatisticsWithObjectIds:@[oneObjectId, anotherObjectId]
+  option:nil
+  callback:^(NSArray<LCLeaderboardStatistic *> * _Nullable statistics, NSError * _Nullable error) {
+// 略
+}];
+
+[leaderboard getStatisticsWithEntities:@[@"Sylgr", "Leiptr"]
+  callback:^(NSArray<LCLeaderboardStatistic *> * _Nullable statistics, NSError * _Nullable error) {
+// 略 
+}];
+```
+
 </MultiLang>
 
 
@@ -529,7 +583,8 @@ List<LCStatistic> getIncludedStatistics()
 
 ```objc
 leaderboard.limit = 10;
-[leaderboard getUserResultsWithOption:nil, callback:^(NSArray *rankings, NSInteger count, NSError *error) {
+[leaderboard getUserResultsWithOption:nil,
+  callback:^(NSArray <LCLeaderboardRanking *> * _Nullable *rankings, NSInteger count, NSError * _Nullable error) {
   // rankings 是排行榜前十的排名信息
 }];
 ```
@@ -609,7 +664,8 @@ leaderboard.getResults(0, 10, selectKeys, null).subscribe(/* 略 */);
 leaderboard.limit = 10;
 LCLeaderboardQueryOption *option = [[LCLeaderboardQueryOption alloc] init];
 option.selectKeys = @[@"username"];
-[leaderboard getUserResultsWithOption:option, callback:^(NSArray *rankings, NSInteger count, NSError *error) {
+[leaderboard getUserResultsWithOption:option,
+  callback:^(NSArray<LCLeaderboardRanking *> * _Nullable rankings, NSInteger count, NSError * _Nullable error) {
   // 略
 }];
 ```
@@ -645,7 +701,8 @@ leaderboard.limit = 10;
 leaderboard.includeStatistics = @[@"kills"];
 LCLeaderboardQueryOption *option = [[LCLeaderboardQueryOption alloc] init];
 option.selectKeys = @[@"username"];
-[leaderboard getUserResultsWithOption:option, callback:^(NSArray *rankings, NSInteger count, NSError *error) {
+[leaderboard getUserResultsWithOption:option,
+  callback:^(NSArray<LCLeaderboardRanking *> * _Nullable rankings, NSInteger count, NSError * _Nullable error) {
   // 略
 }];
 ```
@@ -675,7 +732,8 @@ leaderboard.limit = 10;
 LCLeaderboardQueryOption *option = [[LCLeaderboardQueryOption alloc] init];
 option.selectKeys = @[@"name", @"club"];
 option.includeKeys = @[@"club"];
-[leaderboard getUserResultsWithOption:option, callback:^(NSArray *rankings, NSInteger count, NSError *error) {
+[leaderboard getUserResultsWithOption:option,
+  callback:^(NSArray<LCLeaderboardRanking *> * _Nullable rankings, NSInteger count, NSError * _Nullable error) {
   // 略
 }];
 ```
@@ -723,7 +781,9 @@ leaderboard.getAroundResults(currentUser.getObjectId(), 0, 3, selectKeys, null).
 
 ```objc
 leaderboard.limit = 3;
-[leaderboard getUserResultsAroundUser:currentUser.objectId, nil, callback:^(NSArray *rankings, NSInteger count, NSError *error) {
+[leaderboard getUserResultsAroundUser:currentUser.objectId,
+  option:nil,
+  callback:^(NSArray<LCLeaderboardRanking *> * _Nullable rankings, NSInteger count, NSError * _Nullable error) {
   // 略
 }];
 ```
@@ -762,7 +822,9 @@ leaderboard.limit = 3;
 LCLeaderboardQueryOption *option = [[LCLeaderboardQueryOption alloc] init];
 option.selectKeys = @[@"name", @"attack", @"level"];
 NSString *excaliburObjectId = @"582570f38ac247004f39c24b"; 
-[leaderboard getObjectResultsAroundObject:excaliburObjectId, option:option, callback:^(NSArray *rankings, NSInteger count, NSError *error) {
+[leaderboard getObjectResultsAroundObject:excaliburObjectId,
+  option:option,
+  callback:^(NSArray<LCLeaderboardRanking *> * _Nullable rankings, NSInteger count, NSError * _Nullable error) {
   // 略
 }];
 ```
@@ -787,7 +849,8 @@ leaderboard.getAroundResults("excalibur", 0, 3, null, null).subscribe(/* 略 */)
 ```objc
 LCLeaderboard leaderboard = [[LCLeaderboard alloc] initWithStatisticName:@"weapons"];
 leaderboard.limit = 3;
-[leaderboard getEntityResultsAroundEntity:@"excalibur", callback:^(NSArray *rankings, NSInteger count, NSError *error) {
+[leaderboard getEntityResultsAroundEntity:@"excalibur",
+  callback:^(NSArray^(NSArray<LCLeaderboardRanking *> * _Nullable rankings, NSInteger count, NSError * _Nullable error) {
   // 略
 }];
 ```
