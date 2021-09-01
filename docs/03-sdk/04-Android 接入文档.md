@@ -54,7 +54,7 @@ public static void init(Context context, String appId, String channel, String ap
 context | 否 | 当前 Application 或 Activity 的 Context 对象
 appId | 否 | 创建游戏时获得的APP ID
 channel | 是 | 分包渠道
-appVersion | 是 | 游戏版本，为空时，自动获取游戏安装包的版本（ Xcode 配置中的 Version ）
+appVersion | 是 | 游戏版本，为空时，自动获取游戏安装包的版本
 properties | 是 | 设备登录（ `device_login` ）的事件属性，可以传入预置属性覆盖 SDK 的默认取值，也可以传入在后台配置过的自定义属性
 
 
