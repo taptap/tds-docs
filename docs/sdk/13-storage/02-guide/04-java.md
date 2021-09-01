@@ -533,7 +533,7 @@ query.limit(10);
 
 由于性能原因，`limit` 最大只能设为 `1000`。即使将其设为大于 `1000` 的数，云端也只会返回 1,000 条结果。
 
-如果只需要一条结果，可以直接用 ``：
+如果只需要一条结果，可以直接用 `getFirstInBackground`：
 
 ```java
 LCQuery<LCObject> query = new LCQuery<>("Todo");

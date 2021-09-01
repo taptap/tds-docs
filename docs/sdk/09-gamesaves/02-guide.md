@@ -10,6 +10,11 @@ import MultiLang from '@theme/MultiLang';
 
 ## 创建存档
 
+SDK 会自动获取当前登录玩家信息，关联到存档上。
+因此，用户已登录时才能创建存档。
+
+<MultiLang>
+
 ```cs
 var gameSave = new TapGameSave
 {
@@ -18,24 +23,74 @@ var gameSave = new TapGameSave
     ModifiedAt = DateTime.Now.ToLocalTime(),
     PlayedTime = 60000L, // ms
     ProgressValue = 100,
-    CoverFilePath = pic_path,
-    GameFilePath = dll_path
+    CoverFilePath = image_local_path, // jpg/png
+    GameFilePath = dll_local_path
 };
 await gameSave.Save();
 ```
 
+```java
+TapGameSave snapshot = new TapGameSave();
+snapshot.setName("internal name");
+snapshot.setSummary("description");
+snapshot.setPlayedTime(60000); // ms
+snapshot.setProgressValue(100);
+snapshot.setCover(image_local_path); // jpg/png
+snapshot.setGameFile(dll_local_path);
+snapshot.setModifiedAt(new Date());
+snapshot.saveInBackground().subscribe(new Observer<TapGameSave>() {
+    @Override
+    public void onSubscribe(@NotNull Disposable d) {}
+
+    @Override
+    public void onNext(@NotNull TapGameSave gameSave) {
+        System.out.println("存档保存成功：" + gameSave.toJSONString());
+    }
+
+    @Override
+    public void onError(@NotNull Throwable e) {
+        e.printStackTrace();
+    }
+
+    @Override
+    public void onComplete() {}
+});
+```
+
+```objc
+TapGameSave *gameSave = [TapGameSave new];
+gameSave.name = @"internal name";
+gameSave.summary = @"description";
+gameSave.modifiedAt = [NSDate date];
+gameSave.playedTime = 60000; // ms
+gameSave.progressValue = 100;
+[gameSave setCoverWithLocalPath:@"image_local_path" error:&error]; // jpg/png
+[gameSave setGameFileWithLocalPath:@"dll_local_path" error:&error];
+[gameSave saveInBackgroundWithBlock:^(BOOL succeeded, NSError *_Nullable error) {
+    if (succeeded) {
+        NSLog(@"保存成功。objectId：%@", gameSave.objectId);
+    } else {
+        // 异常处理
+    }
+}];
+```
+
+</MultiLang>
+
 上面的例子中，存档元信息字段的含义请参考[云存档保存的游戏元数据](/sdk/gamesaves/features#云存档保存的游戏元数据)。
-保存时，SDK 会自动获取当前登录玩家信息，关联到存档上，同时会限制仅当前玩家可以读写存档本身及关联的存档文件、封面文件。
+保存时，SDK 会限制仅当前玩家可以读写存档本身及关联的存档文件、封面文件。
 
 ## 查询用户存档
 
 最常见的场景是获取当前玩家的所有存档：
 
+<MultiLang>
+
 ```cs
 var collection = await TapGameSave.GetCurrentUserGameSaves();
 
 foreach(var gameSave in collection){
-    var name = gameSave.Summary; 
+    var summary = gameSave.Summary; 
     var modifiedAt = gameSave.ModifiedAt;
     var playedTime = gameSave.PlayedTime;
     var progressValue = gameSave.ProgressValue;
@@ -45,16 +100,103 @@ foreach(var gameSave in collection){
 }
 ```
 
-当然也可以查询满足特定条件的存档，比如查询游戏进度超过第 3 关的存档：
+```java
+TapGameSave.getCurrentUserGameSaves()
+        .subscribe(new Observer<List<TapGameSave>>() {
+    @Override
+    public void onSubscribe(@NotNull Disposable d) {}
+
+    @Override
+    public void onNext(@NotNull List<TapGameSave> tapGameSaves) {
+        for (TapGameSave gameSave : tapGameSaves) {
+            String summary = gameSave.getSummary();
+            Date modifiedAt = gameSave.getModifiedAt();
+            double playedTime = gameSave.getPlayedTime();
+            int progressValue = gameSave.getProgressValue();
+            LCFile cover = gameSave.getCover();
+            LCFile gameFile = gameSave.getGameFile();
+        }
+    }
+
+    @Override
+    public void onError(@NotNull Throwable e) {
+        e.printStackTrace();
+    }
+
+    @Override
+    public void onComplete() {}
+});
+```
+
+```objc
+LCQuery *query = [TapGameSave queryWithCurrentUser];
+[query findObjectsInBackgroundWithBlock:^(NSArray *_Nullable gameSaves, NSError *_Nullable error) {
+    if (error) {
+        NSLog(@"test fail because %@", error);
+    } else {
+        for (TapGameSave *gameSave in gameSaves) {
+            NSString *summary = gameSave.summary;
+            NSDate *modifiedAt = gameSave.modifiedAt;
+            double playedTime = gameSave.playedTime;
+            int progressValue = gameSave.progressValue;
+            LCFile* cover = gameSave.cover;
+            LCFile* gameFile = gameSave.gameFile;
+        }
+    }
+}];
+```
+
+</MultiLang>
+
+当然也可以查询满足特定条件的存档，比如查询当前玩家游戏进度超过第 3 关的存档：
+
+<MultiLang>
+
+<>
 
 ```cs
 TDSUser user = await TDSUser.GetCurrent();
 LCQuery<TapGameSave> gameSaveQuery = TapGameSave.GetQueryWithUser(user);
-gameSaveQuery.WhereGreaterThan("progressValue","3");
+gameSaveQuery.WhereGreaterThan("progressValue", 3);
 var collections = await gameSaveQuery.Find();
 ```
 
 查询条件的构造请参考[数据存储指南查询章节的说明](/sdk/storage/guide/dotnet/)。
+
+</>
+<>
+
+```java
+LCQuery<TapGameSave> gameSaveQuery = TapGameSave.getQueryWithUser();
+gameSaveQuery.whereGreaterThan("progressValue", 3);
+gameSaveQuery.findInBackground().subscribe(new Observer<List<LCObject>>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(List<TapGameSave> gamesaves) {
+        // gamesaves 是包含满足条件的云存档对象的数组
+    }
+    public void onError(Throwable throwable) {}
+    public void onComplete() {}
+});
+```
+
+查询条件的构造请参考[数据存储指南查询章节的说明](/sdk/storage/guide/java/)。
+
+</>
+<>
+
+```objc
+LCQuery *query = [TapGameSave queryWithCurrentUser];
+[query whereKey:@"progressValue" greaterThan:@3];
+[query findObjectsInBackgroundWithBlock:^(NSArray *_Nullable gameSaves, NSError *_Nullable error) {
+    // 略
+}];
+```
+
+</>
+
+</MultiLang>
+
+
 
 ## 删改存档
 
@@ -62,16 +204,24 @@ var collections = await gameSaveQuery.Find();
 
 删除存档：
 
+<MultiLang>
+
 ```cs
 await gameSave.Delete();
 ```
 
-修改存档：
-
-```cs
-gameSave.Summary = "new description";
-await gameSave.Save();
+```java
+gameSave.delete();
 ```
+
+```objc
+[gameSave deleteInBackground];
+```
+
+</MultiLang>
+
+注意，删除存档时关联的封面文件和存档原文件并不会一并删除。
+如需清理，可以在服务端写脚本批量[删除](/sdk/storage/guide/rest#删除文件)。
 
 ## REST API
 
@@ -253,6 +403,10 @@ curl -X PUT \
 失败时会报错，例如：
 
 - `Forbidden to add new fields by class '_GameSave' permissions.`：提交了非法字段，云存档目前暂不支持添加自定义字段。
+
+注意，更新封面文件和存档原文件后，原本关联的封面文件和存档原文件并不会一并删除。
+同理，删除存档时关联的封面文件和存档原文件并不会一并删除。
+这些文件需要另外[删除](/sdk/storage/guide/rest#删除文件)。
 
 ### 删除存档
 
