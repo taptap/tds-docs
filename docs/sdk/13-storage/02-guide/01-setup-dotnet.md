@@ -25,8 +25,8 @@ sidebar_label: .NET SDK 配置
 
     ```json
     "dependencies": {
-    "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-0.9.6",
-    "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-0.9.6"
+    "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-0.9.7",
+    "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-0.9.7"
     }
     ```
 
