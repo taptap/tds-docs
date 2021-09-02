@@ -52,9 +52,9 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
 
 ```json
 "dependencies":{
-    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#3.1.0",
-    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#3.1.0",
-    "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#3.1.0",
+    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#3.2.0",
+    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#3.2.0",
+    "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#3.2.0",
     "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-0.9.6",
     "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-0.9.6",
 }
@@ -143,9 +143,9 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
     
     dependencies {  
     ...  
-        implementation name:'TapBootstrap_3.1.0', ext:'aar'   
-        implementation name:'TapCommon_3.1.0', ext:'aar' 
-		implementation name:'TapLogin_3.1.0', ext:'aar' 
+        implementation name:'TapBootstrap_3.2.1', ext:'aar'   
+        implementation name:'TapCommon_3.2.1', ext:'aar' 
+		implementation name:'TapLogin_3.2.1', ext:'aar' 
         implementation 'cn.leancloud:realtime-android:8.1.0'
         implementation 'cn.leancloud:storage-android:8.1.0'
         implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
