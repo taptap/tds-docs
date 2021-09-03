@@ -174,10 +174,6 @@ mConfig.orientation = TapMomentOrientationDefault;
 
 打开动态页面跳转到指定的页面
 
-:::info
-该功能当前处于测试阶段，如需开通，请联系商务
-:::
-
 <MultiLang>
 
 ```cs
