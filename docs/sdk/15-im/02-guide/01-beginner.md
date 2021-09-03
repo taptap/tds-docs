@@ -119,7 +119,7 @@ tom.open(new LCIMClientCallback() {
 ```objc
 // 定义一个常驻内存的属性变量
 @property (nonatomic) LCIMClient *tom;
-// 初始化，然后登陆
+// 初始化，然后登录
 NSError *error;
 tom = [[LCIMClient alloc] initWithClientId:@"Tom" error:&error];
 if (error) {
@@ -141,7 +141,7 @@ realtime.createIMClient('Tom').then(function(tom) {
 ```swift
 // 定义一个常驻内存的全局变量
 var tom: IMClient
-// 初始化，然后登陆
+// 初始化，然后登录
 do {
     tom = try IMClient(ID: "Tom")
     tom.open { (result) in
@@ -198,7 +198,7 @@ LCUser.logIn("Tom", "cat!@#123").subscribe(new Observer<LCUser>() {
 ```objc
 // 定义一个常驻内存的属性变量
 @property (nonatomic) LCIMClient *client;
-// 登陆 User，然后使用登陆成功的 User 初始化 Client 并登陆
+// 登录 User，然后使用登录成功的 User 初始化 Client 并登录
 [LCUser logInWithUsernameInBackground:USER_NAME password:PASSWORD block:^(LCUser * _Nullable user, NSError * _Nullable error) {
     if (user) {
         NSError *err;
@@ -225,7 +225,7 @@ AV.User.logIn('username', 'password').then(function(user) {
 ```swift
 // 定义一个常驻内存的全局变量
 var client: IMClient
-// 登陆 User，然后使用登陆成功的 User 初始化 Client 并登陆
+// 登录 User，然后使用登录成功的 User 初始化 Client 并登录
 LCUser.logIn(username: USER_NAME, password: PASSWORD) { (result) in
     switch result {
     case .success(object: let user):
@@ -4543,7 +4543,7 @@ await tom.close();
 * `imClientResumed`：连接自动恢复了
 * `imClientPaused`：连接断开了；该事件被触发的常见场景：网络无法访问、应用进入后台
 * `imClientResuming`：正在重新建立连接
-* `imClientClosed`：连接关闭，且不会自动重连；该事件被触发的常见场景：单设备登陆冲突、后台主动把该 client 下线
+* `imClientClosed`：连接关闭，且不会自动重连；该事件被触发的常见场景：单设备登录冲突、后台主动把该 client 下线
 
 ```objc
 - (void)imClientResumed:(LCIMClient *)imClient
@@ -4575,7 +4575,7 @@ await tom.close();
 * `sessionDidOpen`：连接自动恢复了
 * `sessionDidPause`：连接断开了；该事件被触发的常见场景：网络无法访问、应用进入后台
 * `sessionDidResume`：正在重新建立连接
-* `sessionDidClose`：连接关闭，且不会自动重连；该事件被触发的常见场景：单设备登陆冲突、后台主动把该 client 下线
+* `sessionDidClose`：连接关闭，且不会自动重连；该事件被触发的常见场景：单设备登录冲突、后台主动把该 client 下线
 
 ```swift
 func client(_ client: IMClient, event: IMClientEvent) {

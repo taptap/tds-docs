@@ -29,7 +29,7 @@ Mac Token 算法细节见文档中的 [MAC Token 算法](#mac-token-算法) 部�
     private String json = null;
     ```
 
-2. 再把移动端获取的参数发到游戏务服务器，服务端签算 mac token。
+2. 再把移动端获取的参数发到游戏服务器，服务端签算 mac token。
 3. 请求 `https://openapi.taptap.com/account/profile/v1` ， header 携带 `mac token`。
 
 注意：当前实际返回的 `kid` 和 `access_token` 值相等，建议使用 `access_token`。

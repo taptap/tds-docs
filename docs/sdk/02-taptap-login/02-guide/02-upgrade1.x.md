@@ -59,19 +59,19 @@ clientId | TapTap 开发者中心对应应用的 Client ID
 </MultiLang>
 
 
-## TapTap 登录并获取登陆结果
+## TapTap 登录并获取登录结果
 
 <MultiLang>
 
 
 ```cs
-// 唤起 TapTap 网页 或者 TapTap 客户端进行登陆
+// 唤起 TapTap 网页 或者 TapTap 客户端进行登录
 try{
     //登录成功
     var loginTask = TapLogin.Login();
     var accessToken = await loginTask;
     if(loginTask.IsCanceled){
-        // 登陆取消
+        // 登录取消
     }
     if(accessToken !=null){
         // 登录成功

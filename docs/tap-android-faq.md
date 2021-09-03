@@ -15,7 +15,7 @@ sidebar_label: Android
 
 3. 设备系统时间不准确，此类情况大多数是因为设备的系统时间没有开启自动联网同步导致；
 
-4. 登录功能所在的 Activity 设置横竖屏时添加 android:configChanges 属性配置，需要在 AndroidMainfest.xml 文件中对登陆功能所在的 Activity 添加如下配置(以横屏为例)：
+4. 登录功能所在的 Activity 设置横竖屏时添加 android:configChanges 属性配置，需要在 AndroidMainfest.xml 文件中对登录功能所在的 Activity 添加如下配置(以横屏为例)：
 ```xml
 android:screenOrientation="landscape"
 android:configChanges="orientation|keyboardHidden|screenSize|locale|uiMode|screenLayout"

@@ -304,7 +304,7 @@ clientId | TapTap 开发者中心对应应用的 Client ID
 
 
 ```cs
-// 唤起 TapTap 网页 或者 TapTap 客户端进行登陆
+// 唤起 TapTap 网页 或者 TapTap 客户端进行登录
 var accessToken = await TapLogin.Login();
 // 获取 TapTap Profile  可以获得当前用户的一些基本信息，例如名称、头像。
 var profile = await TapLogin.FetchProfile();
