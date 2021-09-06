@@ -1833,7 +1833,7 @@ RequestSignImplementation.setMasterKey(appMasterKey);
 <>
 
 ```cs
-// 暂不支持
+LCApplication.UseMasterKey = true;
 ```
 
 </>
