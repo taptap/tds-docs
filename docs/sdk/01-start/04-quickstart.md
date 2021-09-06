@@ -207,6 +207,7 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
     WebKit.framework
 
     // 数据分析
+    // 如果不需要获取 idfa 则不要添加这 `AppTrackingTransparency` 和 `AdSupport`两个系统库
     AppTrackingTransparency.framework
     AdSupport.framework
     CoreMotion.framework

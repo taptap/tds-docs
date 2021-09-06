@@ -252,7 +252,7 @@ TDSUser.logOut();
 
 ### 初始化
 
-单纯接入「TapTap 登录」，可以只依赖于 `TapLogin` 模块，调用该模块的初始化方法完成整个 SDK 初始化。示例如下：
+单纯接入「TapTap 登录」，需要依赖 `TapLogin` 和 `TapCommon` 模块，调用该模块的初始化方法完成整个 SDK 初始化。示例如下：
 
 <MultiLang>
 <>
@@ -306,11 +306,15 @@ clientId | TapTap 开发者中心对应应用的 Client ID
 ```cs
 // 唤起 TapTap 网页 或者 TapTap 客户端进行登录
 var accessToken = await TapLogin.Login();
+Debug.Log($"LeeJiEun 登陆成功 accessToken: {accessToken.ToJson()}");
+
 // 获取 TapTap Profile  可以获得当前用户的一些基本信息，例如名称、头像。
 var profile = await TapLogin.FetchProfile();
+Debug.Log($"LeeJiEun 登陆成功 profile: {profile.ToJson()}");
 ```
 
 ```java
+// 实例化监听
 TapLoginHelper.TapLoginResultCallback loginCallback = new TapLoginHelper.TapLoginResultCallback() {
     @Override
     public void onLoginSuccess(AccessToken token) {
@@ -329,7 +333,9 @@ TapLoginHelper.TapLoginResultCallback loginCallback = new TapLoginHelper.TapLogi
         Log.d(TAG, "TapTap authorization failed. cause: " + globalError.getMessage());
     }
 };
+// 注册监听
 TapLoginHelper.registerLoginCallback(loginCallback);
+// 登陆
 TapLoginHelper.startTapLogin(MainActivity.this, TapLoginHelper.SCOPE_PUBLIC_PROFILE);
 ```
 
@@ -378,8 +384,3 @@ if ([TapLoginHelper currentProfile]) {
 
     - 不绑定是可行的，因为 TapSDK 内部会缓存当前用户的登录状态，需要的时候调用 `TDSUser#currentUser` 总能得到之前登录的 TDS 账户；
     - 绑定带来的好处则是使用上更加简单，同时也可以将 TDS 账户信息扩展到更多的第三方平台。
-
-
-:::info
-TapSDK 2.x 版本暂不支持升级到 3.0 版本，计划在 TapSDK 3.2 版本中支持对 TapSDK 2.x 的升级。
-:::
