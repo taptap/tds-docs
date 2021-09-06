@@ -306,11 +306,11 @@ clientId | TapTap 开发者中心对应应用的 Client ID
 ```cs
 // 唤起 TapTap 网页 或者 TapTap 客户端进行登录
 var accessToken = await TapLogin.Login();
-Debug.Log($"LeeJiEun 登陆成功 accessToken: {accessToken.ToJson()}");
+Debug.Log($"LeeJiEun 登录成功 accessToken: {accessToken.ToJson()}");
 
 // 获取 TapTap Profile  可以获得当前用户的一些基本信息，例如名称、头像。
 var profile = await TapLogin.FetchProfile();
-Debug.Log($"LeeJiEun 登陆成功 profile: {profile.ToJson()}");
+Debug.Log($"LeeJiEun 登录成功 profile: {profile.ToJson()}");
 ```
 
 ```java
@@ -335,7 +335,7 @@ TapLoginHelper.TapLoginResultCallback loginCallback = new TapLoginHelper.TapLogi
 };
 // 注册监听
 TapLoginHelper.registerLoginCallback(loginCallback);
-// 登陆
+// 登录
 TapLoginHelper.startTapLogin(MainActivity.this, TapLoginHelper.SCOPE_PUBLIC_PROFILE);
 ```
 
