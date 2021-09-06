@@ -43,7 +43,7 @@ title: Android SDK 文档
 
 初始化 TapDB SDK 并上报一个设备登录（ `device_login` ）事件，调用这个接口是使用其它接口的先决条件，需要尽早调用，建议在游戏的主 Activity 中调用。
 
-```
+```java
 public static void init(Context context, String appId, String channel, String appVersion)
 
 public static void init(Context context, String appId, String channel, String appVersion, JSONObject properties)
@@ -64,7 +64,7 @@ properties | 是 | 设备登录（ `device_login` ）的事件属性，可以传
 
 当用户进行账号登录时，可调用设置账号 ID （ `setUser` ）接口在记录该账号 ID。调用后会上报一个账号登录（ `user_login` ）事件，并将这个设备的是否有用户注册过 （ `has_user` ） 属性置为 `true`。在重启应用或调用清除账号 ID （ `clearUser` ） 前，上报的事件都会带有该账号 ID。
 
-```
+```java
 public static void setUser(String userId)
 
 public static void setUser(String userId, JSONObject properties)
@@ -81,7 +81,7 @@ properties | 是 | 账号登录（ `user_login` ）的事件属性
 
 当用户进行登出时，可调用 clearUser 清除当前 SDK 中保存的账号 ID，后续上报的事件将不会带有账号 ID，调用该接口不会上报任何事件。
 
-```
+```java
 public static void clearUser()
 ```
 
@@ -90,7 +90,7 @@ public static void clearUser()
 
 在用户进行账号登录后，可调用该接口设置该账号的名称，调用后将更新账号的账号名称（ `user_name` ）属性。
 
-```
+```java
 public static void setName(String name)
 ```
 
@@ -103,7 +103,7 @@ name | 否 | 长度大于 0 并小于等于 256，账号名
 
 在用户进行账号登录后，可调用该接口设置该账号的等级，调用将更新账号的账号等级（ `level` ）属性。
 
-```
+```java
 public static void setLevel(int level)
 ```
 
@@ -116,7 +116,7 @@ level | 否 | 账号等级
 
 在用户进行账号登录后，可调用该接口设置该账号的区服信息，调用将初始化账号的首次区服（ `first_server` ）属性、更新账号的当前区服（ `current_server` ）属性。
 
-```
+```java
 public static void setServer(String server)
 ```
 
@@ -129,7 +129,7 @@ server | 否 | 账号服务器
 
 在用户进行充值后，可调用该接口上报充值信息，调用后将上报 `charge` 事件，并将传入的参数作为事件的属性。
 
-```
+```java
 public static void onCharge(String orderId, String product, long amount, String currencyType, String payment)
 
 public static void onCharge(String orderId, String product, long amount, String currencyType, String payment, JSONObject properties)
@@ -144,7 +144,7 @@ currencyType | 是 | 货币类型，参考：人民币 CNY，美元 USD；欧元
 payment | 是 | 支付方式，如：支付宝
 properties | 是 | 充值（ `charge` ）的事件属性
 
-**注意:在条件允许的情况下推荐使用服务端充值统计接口，请参考 [服务端接入文档](./服务端接入文档 "_blank")**
+**注意:在条件允许的情况下推荐使用服务端充值统计接口，请参考 [服务端接入文档](/docs/sdk/server-side-integration "_blank")**
 
 
 ## 4.上报事件
@@ -153,7 +153,7 @@ properties | 是 | 充值（ `charge` ）的事件属性
 
 在 SDK 初始化完成后可使用该接口上报事件
 
-```
+```java
 public static void trackEvent(String eventName, JSONObject properties)
 ```
 
@@ -178,7 +178,7 @@ properties | 是 | 事件的属性
 
 **添加静态通用事件属性**
 
-```
+```java
 public static void registerStaticProperties(final JSONObject staticProperties)
 ```
 
@@ -188,7 +188,7 @@ staticProperties | 否 | 静态通用事件属性字典
 
 示例：
 
-```
+```java
 //当设置了静态通用事件属性 #current_channel，值固定为 TapDB 后
 JSONObject commonProperties = new JSONObject();
 commonProperties.put("#current_channel", "TapDB");
@@ -209,7 +209,7 @@ TapDB.trackEvent("#customEvent", properties);
 
 **删除单个静态通用事件属性**
 
-```
+```java
 public static void unregisterStaticProperty(String propertyName)
 ```
 
@@ -219,7 +219,7 @@ propertyName | 否 | 静态通用属性名
 
 **清空全部静态通用属性**
 
-```
+```java
 public static void clearStaticProperties()
 ```
 
@@ -227,7 +227,7 @@ public static void clearStaticProperties()
 
 对于可能随时发生变化的通用事件属性，可以注册动态通用事件属性，`getDynamicProperties` 将在每次调用时触发，将计算好的属性添加到本次上报事件属性中。
 
-```
+```java
 public static void registerDynamicProperties(TapDBDataDynamicProperties dynamicProperties)
 ```
 
@@ -237,7 +237,7 @@ dynamicProperties | 否 | 动态通用事件属性计算回调
 
 示例:
 
-```
+```java
 //后续上报的事件都将携带 #currentLevel 属性，值为变量 level 在事件上报时刻的值
 
 TapDB.registerDynamicProperties(
@@ -264,7 +264,7 @@ TapDB 支持两种用户模型：设备和账号，你可以通过如下接口�
 
 对于常规的用设备属性，可使用改接口进行赋值操作，新的属性值将会直接覆盖旧的属性值
 
-```
+```java
 public static void deviceUpdate(final JSONObject properties)
 ```
 
@@ -275,7 +275,7 @@ properties | 否 | 属性字典
 
 例如:
 
-```
+```java
 JSONObject properties = new JSONObject();
 properties.put("currentPoints", 10);
 TapDB.deviceUpdate(properties);
@@ -291,7 +291,7 @@ TapDB.deviceUpdate(nextProperties);
 
 对于需要保证只有首次设置时有效的属性，可以使用该接口进行赋值操作，仅当前值为空时赋值操作才会生效，如当前值不为空，则赋值操作会被忽略。
 
-```
+```java
 public static void deviceInitialize(final JSONObject properties)
 ```
 
@@ -303,7 +303,7 @@ properties | 否 | 属性字典
 例如：
 记录用户首次登陆的区服，客户端无法得知该属性是否已经被设置过，使用该接口保证仅第一次的设置会生效。
 
-```
+```java
 JSONObject properties = new JSONObject();
 properties.put("firstActiveServer", "server1");
 TapDB.deviceInitialize(properties);
@@ -318,7 +318,7 @@ TapDB.deviceInitialize(nextProperties);
 **设备属性累加操作**
 
 对于数值类型的属性，可以使用该接口进行累加操作，调用后 TapDB 将对原属性值进行累加后保存结果值
-```
+```java
 public static void deviceAdd(final JSONObject properties)
 ```
 
@@ -329,7 +329,7 @@ properties | 否 | 属性字典，value 仅支持 NSNumber 类型
 
 例如：
 
-```
+```java
 JSONObject properties = new JSONObject();
 properties.put("totalPoints", 10);
 deviceAdd(properties);
@@ -344,19 +344,19 @@ deviceAdd(nextProperties);
 **账号属性更新操作**
 
 使用方法同设备属性更新操作
-```
+```java
 public static void userUpdate(final JSONObject properties)
 ```
 
 **账号属性初始化操作**
 
-```
+```java
 public static void userInitialize(final JSONObject properties)
 ```
 
 **账号属性累加操作**
 
 使用方法同设备属性累加操作
-```
+```java
 public static void userAdd(final JSONObject properties)
 ```

@@ -36,7 +36,7 @@ hide_title: false
 
 [Unity 接入指南](/sdk/unity "_blank")
 
-[服务端接入指南](/sdk/服务端接入文档 "_blank")
+[服务端接入指南](/docs/sdk/server-side-integration "_blank")
 
 ## 第三步：校验数据
 
