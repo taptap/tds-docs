@@ -88,7 +88,20 @@ appid: 游戏在 TapTap 商店的唯一身份标识
 if(TapGameUtil.openReviewInTapTap(this,"appid")){
     Log.d(TAG, "打开评论区成功");
 }
+```
 
+## iOS
+
+### 检查 TapTap 是否安装
+
+需要在info.plist里配置 LSApplicationQueriesSchemes 增加 tapsdk 和 tapiosdk
+
+```objectivec
+#import <TapCommonSDK/TapCommonSDK.h>
+# 国内
+BOOL isInstalled = [TapGameUtil isTapTapInstalled];
+# 海外
+BOOL isInstalled = [TapGameUtil isTapGlobalInstalled];
 ```
 
 ## 常见问题
