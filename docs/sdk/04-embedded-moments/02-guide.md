@@ -7,22 +7,23 @@ sidebar_label: 开发指南
 
 import MultiLang from '@theme/MultiLang';
 
-本文介绍如何在游戏中加入 [TapTap 动态](/sdk/embedded-moments/features/)。使用内嵌动态功能需依赖 TapTap 登录。
+本文介绍如何在游戏中加入 [TapTap 内嵌动态](/sdk/embedded-moments/features/)。使用内嵌动态功能需依赖 TapTap 登录，需要导入`TapMoment` 模块。
 
 ## SDK 获取
 
-请先[下载](/tap-download) SDK，并添加相关依赖。
+:::info
+- 如果使用 [单纯的 TapTap 登录](/sdk/taptap-login/guide/start/#单纯的-taptap-用户认证使用方式) 并接入内嵌动态，初始化和 SDK 获取请参考：[单纯的内嵌动态初始化](#单纯的内嵌动态初始化)。
+:::
+
+假设你已经在 [快速开始](/sdk/start/quickstart/#初始化) 部分完成了 SDK 初始化，可以通过 [下载](/tap-download) 获得 SDK，添加 `TapMoment` 模块：
 
 <MultiLang>
 
 ```cs
 "dependencies":{
-// 登录
-"com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#3.2.0",
-"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#3.2.0",
-"com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#3.2.0",
-// 动态
-"com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#3.2.0",
+  ...
+  // 内嵌动态
+  "com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#3.2.0",
 }
 ```
 
@@ -34,19 +35,12 @@ repositories{
 }  
 
 dependencies {  
-...  
-    implementation (name:'TapBootstrap_3.2.0', ext:'aar')  // 必选：TapSDK 启动器 
-    implementation (name:'TapCommon_3.2.0', ext:'aar') // 必选：TapSDK 基础库 
-    implementation (name:'TapLogin_3.2.0', ext:'aar') // 必选：TapTap 登录 
+    ... 
     implementation (name:'TapMoment_3.2.0', ext:'aar') // TapTap 内嵌动态
 }  
 ```
 
 ```objectivec
-// 基础库
-TapBootstrapSDK.framework
-TapCommonSDK.framework
-TapLoginSDK.framework
 // 内嵌动态
 TapMomentResource.bundle
 TapMomentSDK.framework
@@ -312,3 +306,93 @@ postData.content = @"我是图片描述";
 玩家在动态页面可以发布图文动态和视频动态。
 「一键发布」只支持发布图文动态。
 :::
+
+## 单纯的内嵌动态初始化
+
+这里 SDK 获取及初始化，仅供使用 [单纯的 TapTap 登录](/sdk/taptap-login/guide/start/#单纯的-taptap-用户认证使用方式) 的开发者参考。
+
+请先 [下载](/tap-download) SDK，并添加相关依赖。内嵌动态功能依赖 `TapLogin`、`TapCommon` 和 `TapMoment` 模块。
+
+<MultiLang>
+
+```cs
+"dependencies":{
+  "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#3.2.0",
+  "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#3.2.0",
+  "com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#3.2.0",
+}
+```
+
+```java
+repositories{  
+    flatDir {  
+        dirs 'libs'  
+    }  
+}  
+
+dependencies {  
+...  
+    implementation (name:'TapCommon_3.2.0', ext:'aar') // 必选：TapSDK 基础库 
+    implementation (name:'TapLogin_3.2.0', ext:'aar') // 必选：TapTap 登录 
+    implementation (name:'TapMoment_3.2.0', ext:'aar') // TapTap 内嵌动态
+}  
+```
+
+```objectivec
+// 基础库
+TapCommonSDK.framework
+TapLoginSDK.framework
+// 内嵌动态
+TapMomentResource.bundle
+TapMomentSDK.framework
+```
+
+</MultiLang>
+
+请确认完成了 [单纯 TapTap 登录的初始化](/sdk/taptap-login/guide/start/#初始化)。
+
+内嵌动态功能的**初始化**示例如下：
+
+<MultiLang>
+<>
+
+```cs
+TapMoment.Init(string clientID);
+```
+
+**参数说明**
+
+参数  | 描述
+| ------ | ------ |
+clientID | TapTap 开发者中心对应游戏的 Client ID。
+
+</>
+<>
+
+```java
+TapMoment.init(Context context, String clientID);
+```
+
+**参数说明**
+
+参数  | 描述
+| ------ | ------ |
+context | 上下文，一般是当前 Application。
+clientID | TapTap 开发者中心对应游戏的 Client ID。
+
+</>
+<>
+
+```objectivec
+[TapMoment initWithClientID:@"your clientId"];
+```
+**参数说明**
+
+参数  | 描述
+| ------ | ------ |
+clientId | TapTap 开发者中心对应应用的 Client ID
+
+</>
+
+
+</MultiLang>

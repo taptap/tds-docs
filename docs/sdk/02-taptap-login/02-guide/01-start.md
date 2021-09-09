@@ -252,7 +252,9 @@ TDSUser.logOut();
 
 ### 初始化
 
-单纯接入「TapTap 登录」，需要依赖 `TapLogin` 和 `TapCommon` 模块，调用该模块的初始化方法完成整个 SDK 初始化。示例如下：
+单纯接入「TapTap 登录」，需要依赖 `TapLogin` 和 `TapCommon` 模块。请先 [下载](/tap-download) SDK，并添加相关依赖。
+
+初始化示例如下：
 
 <MultiLang>
 <>
