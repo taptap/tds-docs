@@ -20,7 +20,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 
 :::info
-下面为深度功能。需要联系商务获取权限后，在开发者中心进行手动开启。商务联系方式 operation@taptap.com
+下面为深度功能。需要联系商务获取权限后，在开发者中心进行手动开启。商务联系方式 <operation@taptap.com>
 :::
 
 ### 深度服务

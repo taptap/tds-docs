@@ -96,7 +96,7 @@ ERROR_CODE_UNDEFINED       | 80000   | 未知错误     |
 
 
 #### skuId:
-内购商品 id，需要联系 TapTap 运营同学进行配置；
+内购商品 id，需要提交工单联系 TapTap 运营同学进行配置；
 
 
 ## 测试

@@ -4,11 +4,15 @@ title: 开发指南
 sidebar_label: 开发指南
 ---
 
+import MultiLang from '@theme/MultiLang';
+
 TapTap 开发者服务为游戏和玩家提供唤起 TapTap 客户端进行游戏更新的功能。当游戏发布了新版本，且需要玩家进行更新才能体验新版本时，在游戏内绘制一个界面告知玩家，需要进行新版本更新，并且提供一个更新的按钮。玩家点击后，会跳转到 TapTap 客户端内的游戏详情页面，进行更新。
 
-## Unity
+## 检查 TapTap 是否安装
 
-### 检查 TapTap 是否安装
+<MultiLang>
+
+<>
 
 在项目的 `Packages/manifest.json` 文件中添加以下依赖：
 
@@ -26,41 +30,10 @@ TapCommon.IsTapTapInstalled(installed =>
         Debug.Log("TapTap 已经安装");
     }
 });
-
 ```
 
-
-
-
-### 唤起 TapTap 检查更新
-
-```cs
-TapCommon.UpdateGameInTapTap("appid", callSuccess =>
-{
-    if (callSuccess) {
-        Debug.Log("TapTap 唤起成功");
-    }
-});
-```
-appid: 游戏在 TapTap 商店的唯一身份标识  
-例如：https://www.taptap.com/app/187168 ，其中 "187168" 是 appid
-
-
-### 打开游戏评论区
-
-```cs
-TapCommon.OpenReviewInTapTap(appId, openSuccess =>
-{
-    if (openSuccess) {
-        Debug.Log("打开游戏评论区成功");
-    }
-});
-
-```
-
-## Android
-
-### 检查 TapTap 是否安装
+</>
+<>
 
 接口在 TapGameUtil 里面，`import com.tds.common.utils.TapGameUtil;`
 
@@ -70,19 +43,64 @@ if(TapGameUtil.isTapTapInstalled(this)){
 }
 ```
 
+</>
+<>
 
-### 唤起 TapTap 检查更新
+需要在 info.plist 里配置 `LSApplicationQueriesSchemes` 增加 `tapsdk` 和 `tapiosdk`。
+
+```objc
+#import <TapCommonSDK/TapCommonSDK.h>
+// 国内
+BOOL isInstalled = [TapGameUtil isTapTapInstalled];
+// 海外
+BOOL isInstalled = [TapGameUtil isTapGlobalInstalled];
+```
+
+</>
+
+</MultiLang>
+
+
+## 唤起 TapTap 检查更新
+
+<MultiLang>
+
+```cs
+TapCommon.UpdateGameInTapTap("appid", callSuccess =>
+{
+    if (callSuccess) {
+        Debug.Log("TapTap 唤起成功");
+    }
+});
+```
 
 ```java
 if(TapGameUtil.updateGameInTapTap(this,"appid")){
     Log.d(TAG, "唤起 TapTap 客户端成功");
 }
 ```
+
+```objc
+// 受限于苹果政策，iOS 平台的 TapTap 客户端不提供游戏更新功能 
+```
+
+</MultiLang>
+
 appid: 游戏在 TapTap 商店的唯一身份标识  
-例如：https://www.taptap.com/app/187168 ，其中 "187168" 是 appid
+例如：https://www.taptap.com/app/187168 ，其中 `187168` 是 `appid`.
 
+## 打开游戏评论区
 
-### 打开游戏评论区
+<MultiLang>
+
+```cs
+TapCommon.OpenReviewInTapTap(appId, openSuccess =>
+{
+    if (openSuccess) {
+        Debug.Log("打开游戏评论区成功");
+    }
+});
+```
 
 ```java
 if(TapGameUtil.openReviewInTapTap(this,"appid")){
@@ -90,19 +108,13 @@ if(TapGameUtil.openReviewInTapTap(this,"appid")){
 }
 ```
 
-## iOS
-
-### 检查 TapTap 是否安装
-
-需要在info.plist里配置 LSApplicationQueriesSchemes 增加 tapsdk 和 tapiosdk
-
-```objectivec
-#import <TapCommonSDK/TapCommonSDK.h>
-# 国内
-BOOL isInstalled = [TapGameUtil isTapTapInstalled];
-# 海外
-BOOL isInstalled = [TapGameUtil isTapGlobalInstalled];
+```objc
+// 未支持
 ```
+
+</MultiLang>
+
+
 
 ## 常见问题
 
@@ -130,3 +142,13 @@ classpath 'com.android.tools.build:gradle:4.1.0'
   <package android:name="com.taptap.global" />
 </queries>
 ```
+
+### 未接入 TapSDK 的游戏如何引导用户下载最新版本的 TapTap 客户端
+
+未接入 TapSDK 的游戏可以唤起浏览器访问如下 URL 下载最新版本的 TapTap 客户端。
+
+```
+https://d.taptap.com/latest?app_id=187168
+```
+
+将 `187168` 替换为你的游戏的 `appid`，可以让 TapTap 启动时将指定游戏显示在首页最前位置。

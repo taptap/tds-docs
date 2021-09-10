@@ -39,6 +39,12 @@ import MultiLang from '@theme/MultiLang';
 </>
 </MultiLang>
 
+:::note
+- 下面的**项目配置**以及**初始化**部分，预设开发者使用基于[内建账户](/sdk/authentication/features/)系统的 TDS 服务。
+- 如果游戏已经有了完整的账户系统，仅需要接入 TapTap 登录、内嵌动态，且不需要 TDS 更多云服务，则不必参考下面的配置和初始化方式，可跳转至 [单纯的 TapTap 登录开发指南](/sdk/taptap-login/guide/start/#单纯的-taptap-用户认证使用方式)，[内嵌动态开发指南](/sdk/embedded-moments/guide/)。
+- 请慎重选择，如果之后需要其他 TDS 服务，升级需要一定的开发成本。
+:::
+
 ## 项目配置
 
 <MultiLang>
@@ -55,8 +61,8 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
     "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#3.2.0",
     "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#3.2.0",
     "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#3.2.0",
-    "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-0.9.6",
-    "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-0.9.6",
+    "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-0.9.8",
+    "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-0.9.8",
 }
 ```
 
@@ -74,6 +80,7 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
    - `TapTap_Common.unitypackage` TapSDK 基础库，必选。
    - `TapTap_Login.unitypackage` TapTap 登录，必选。
    - `LeanCloud-SDK-Storage-Unity.zip` 必选，解压后为 Plugins 文件夹，拖拽至 Unity 即可。
+   - `LeanCloud-SDK-Realtime-Unity.zip` 必选，解压后为 Plugins 文件夹，拖拽至 Unity 即可。
 
 在 Unity 顶部菜单中选择 **Window > Package Manager** 可查看已经安装在项目中的包。
 
@@ -152,6 +159,8 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
 
     }  
     ```
+
+    如不使用 LiveQuery、即时通讯、推送通知功能，则无需引入 `cn.leancloud:realtime-android`。
 
 3. 在 `AndroidManifest.xml` 添加网络权限：
 
