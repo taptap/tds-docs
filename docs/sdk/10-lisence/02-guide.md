@@ -77,9 +77,7 @@ TapLicenseHelper.check(Activity activity);
 
 ### 配置 SDK
 
-前往开发者中心   >>   选择<Blue>SDK 控制台 </Blue>   >>   选择<Blue>购买激活 SDK</Blue>   >>   选择相应的游戏的<Blue>配置</Blue>   >>   填写测试用户的 TapTap ID 。
-
-或者，前往开发者中心   >>   选择已经开放售卖的游戏 >>   选择<Blue>购买激活 SDK 设置</Blue>   >>   填写测试用户的 TapTap ID 。
+前往开发者中心   >>   点击<Blue>游戏服务</Blue>   >>   点击<Blue>生态服务</Blue>   >>   点击<Blue>正版验证</Blue>   >>   填写测试用户的 TapTap ID 。
 
 ### 开始测试
 

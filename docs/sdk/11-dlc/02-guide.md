@@ -81,7 +81,7 @@ TapLicense.PurchaseDLC(string skuId);
 ```
 
 ```java
-TapLicenseHelper.queryDLC(Activity activity, String skuIds);
+TapLicenseHelper.purchaseDLC(Activity activity, String skuIds);
 ```
 </MultiLang>
 
