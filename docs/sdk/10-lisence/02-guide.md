@@ -75,7 +75,7 @@ TapLicenseHelper.check(Activity activity);
 
 上传需要测试的 APK 至开发者中心，并通过审核。
 
-### 配置 SDK
+### 添加测试用户
 
 前往开发者中心   >>   点击<Blue>游戏服务</Blue>   >>   点击<Blue>生态服务</Blue>   >>   点击<Blue>正版验证</Blue>   >>   填写测试用户的 TapTap ID 。
 
