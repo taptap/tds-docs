@@ -115,7 +115,7 @@ leaderboard.getResults(0, 10, null, null).subscribe(new Observer<LCLeaderboardRe
 
     @Override
     public void onNext(@NotNull LCLeaderboardResult leaderboardResult) {
-      List<LCRanking> rankings = leaderboardResult.getResults()
+      List<LCRanking> rankings = leaderboardResult.getResults();
       // process rankings
     }
 
