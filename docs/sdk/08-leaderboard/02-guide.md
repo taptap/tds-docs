@@ -246,27 +246,34 @@ foreach(var statistic in statistics) {
 ```
 
 ```java
-LCUser otherUser = LCUser.createWithoutData(LCUser.class, "5c76107144d90400536fc88b");
+// 查询排行榜成员成绩
+LCUser otherUser = null;
+try {
+    otherUser = LCUser.createWithoutData(LCUser.class, "5c76107144d90400536fc88b");
+} catch (LCException e) {
+    e.printStackTrace();
+}
 LCLeaderboard.getUserStatistics(otherUser).subscribe(new Observer<LCStatisticResult>() {
-  @Override
-  public void onSubscribe(@NotNull Disposable disposable) {}
+    @Override
+    public void onSubscribe(@NotNull Disposable disposable) {}
 
-  @Override
-  public void onNext(@NotNull LCStatisticResult lcStatisticResult) {
-    List<LCStatistic> lcStatisticResult.getResults();
-    for (LCStatistic statistic : statistics) {
-      Log.d(statistic.getName());
-      Log.d(statistic.getValue());
+    @Override
+    public void onNext(@NotNull LCStatisticResult lcStatisticResult) {
+        List<LCStatistic> statistics = lcStatisticResult.getResults();
+        for (LCStatistic statistic : statistics) {
+            Log.d(TAG, statistic.getName());
+            Log.d(TAG, String.valueOf(statistic.getValue()));
+        }
     }
-  }
 
-  @Override
-  public void onError(@NotNull Throwable throwable) {
-      // handle error
-  }
+    @Override
+    public void onError(@NotNull Throwable throwable) {
+        // handle error
+        Toast.makeText(MainActivity.this, "查询失败： " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+    }
 
-  @Override
-  public void onComplete() {}
+    @Override
+    public void onComplete() {}
 });
 ```
 
@@ -529,7 +536,7 @@ leaderboard.getResults(0, 10, null, null).subscribe(new Observer<LCLeaderboardRe
 
     @Override
     public void onNext(@NotNull LCLeaderboardResult leaderboardResult) {
-      List<LCRanking> rankings = leaderboardResult.getResults() 
+      List<LCRanking> rankings = leaderboardResult.getResults(); 
     }
 
     @Override
