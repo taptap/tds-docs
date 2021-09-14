@@ -1091,6 +1091,30 @@ liveQuery.unsubscribeInBackground(new LCLiveQuerySubscribeCallback() {
 
 而另外一种极端情况——**当用户在移动端使用手机的进程管理工具，杀死了进程或者直接关闭了网页的情况下**，SDK 无法自动重新订阅，此时需要开发者根据实际情况实现重新订阅。
 
+### 网络状态响应
+
+可以调用 `setConnectionHandler` 静态方法监听 LiveQuery 连接的建立、断开、异常：
+
+```java
+LCLiveQuery.setConnectionHandler(new LCLiveQueryConnectionHandler() {
+    @Override
+    public void onConnectionOpen() {
+        System.out.println("============ LiveQuery Connection opened ============");
+    }
+
+    @Override
+    public void onConnectionClose() {
+        System.out.println("============ LiveQuery Connection closed ============");
+    }
+
+    @Override
+    public void onConnectionError(int code, String reason) {
+        System.out.println("============ LiveQuery Connection error. code:" + code
+            + ", reason:" + reason + " ============");
+    }
+});
+```
+
 ### LiveQuery 的注意事项
 
 因为 LiveQuery 的实时性，很多用户会陷入一个误区，试着用 LiveQuery 来实现一个简单的聊天功能。
