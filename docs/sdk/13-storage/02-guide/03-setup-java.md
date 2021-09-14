@@ -382,6 +382,11 @@ SDK 安装指南基于当前最新版本的 SDK 编写，所以排查问题前�
 -dontwarn cn.leancloud.**
 -keep class cn.leancloud.** { *;}
 
+-dontwarn com.tds.**
+-keep class com.tds.** { *;}
+-keep,allowobfuscation @interface com.tds.common.annotation.Keep
+-keep @com.tds.common.annotation.Keep class * {*;}
+
 -keep public class android.net.http.SslError
 -keep public class android.webkit.WebViewClient
 

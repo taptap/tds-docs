@@ -97,7 +97,7 @@ ACCESS_TOKEN="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb
 MAC_KEY="mSUQNYUGRBPXyRyW"
 
 # 随机数，正式上线请替换
-NONCE="abcdef"
+NONCE="8IBTHwOdqNKAWeKl7plt8g=="
 # 当前时间戳
 TS=$(date +%s)
 
@@ -118,6 +118,7 @@ curl -s -H"Authorization:${AUTHORIZATION}" "https://openapi.taptap.com/account/p
 ### nodejs 请求示例
 
 ```javascript
+const crypto = require('crypto');
 const urllib = require('urllib');
 var format = require('string-format');
 const utils = require('./utils');
@@ -126,7 +127,7 @@ TapSDK 登录后信息获取
 **/
 var kid = "1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ";
 var mac_key = "mSUQNYUGRBPXyRyW";
-var nonce = "adssd";
+var nonce = crypto.randomBytes(16).toString('base64');
 var client_id = "0RiAlMny7jiz086FaU";
 
 
@@ -193,6 +194,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.util.*;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -231,7 +233,7 @@ public class Authorization {
         try {
             URL url = new URL(request_url);
             String time = String.format(Locale.US, "%010d", System.currentTimeMillis() / 1000);
-            String randomStr = getRandomString(5);
+            String randomStr = getRandomString(16);
             String host = url.getHost();
             String uri = request_url.substring(request_url.lastIndexOf(host) + host.length());
             String port = "80";
@@ -248,15 +250,11 @@ public class Authorization {
         }
         return null;
     }
-    private static String getRandomString(int length) { //length
-        String base = "abcdefghijklmnopqrstuvwxyz0123456789";
-        Random random = new Random();
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0; i < length; i++) {
-            int number = random.nextInt(base.length());
-            sb.append(base.charAt(number));
-        }
-        return sb.toString();
+    private static String getRandomString(int length) {
+        byte[] bytes = new byte[length];
+        new SecureRandom().nextBytes(bytes);
+        String base64String = Base64.getEncoder().encodeToString(bytes);
+        return base64String;
     }
     private static String mergeSign(String time, String randomCode, String httpType, String uri,
                                     String domain, String port, String other) {
@@ -294,7 +292,6 @@ public class Authorization {
         return key + "=" + "\"" + value + "\"";
     }
 }
-
 ```
 
 
