@@ -17,7 +17,7 @@ title: 分布分析
 
 **3、设置展示结果**：设置时间段和其他参数，并点击查询查看分析结果；
 
-![](/img/customEvent/distribution/fenbu-1-3.png)
+![](/img/customEvent/distribution/fenbu-1-2-3.png)
 
 **4、保存报表**：将查询结果保存为报表。再将报表转变为看板，就可以每天方便快捷的看分布分析。
 
