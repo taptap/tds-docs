@@ -1529,71 +1529,44 @@ LeanEngine.initialize(appId, appKey, appMasterKey);
 GeneralRequestSignature.setMasterKey(appMasterKey);
 ```
 
-### 如何在云引擎使用 PHP SDK 提供的 CookieStorage 模块？
+### 如何在云引擎中依赖内部 library（也称为「二方库」）？
 
-云引擎提供了一个 `LeanCloud\Storage\CookieStorage` 模块，用 Cookie 来维护用户（`User`）的登录状态，要使用它可以在 `app.php` 中添加下列代码：
+云引擎构建环境只能访问公开的程序库（library），如果你项目中使用了一些公司内部的依赖库，可以按照如下方式进行引用：
 
-```php
-use \LeanCloud\Storage\CookieStorage;
-Client::setStorage(new CookieStorage(60 * 60 * 24, "/"));
+1. 首先在项目根目录下新建 libs 目录，把所有依赖的 jar 文件拷贝进来；
+2. 然后在项目根目录下新建 leanengine.yaml 文件，并自定义 install 环节（详见下文示例）；
+3. 最后修改 pom.xml 中 `spring-boot-maven-plugin` 配置，增加 `includeSystemScope` 设置项（详见下文示例）；
+
+最终的工程目录结构如下：
+
+```
+{root}
+|---libs
+|       |- yourdependency.jar etc.
+|---leanengine.yaml
+\---pom.xml
 ```
 
-`CookieStorage` 支持传入秒作为过期时间，以及路径作为 cookie 的作用域。默认过期时间为 7 天。
+leanengine.yaml 内容如下：
 
-可以通过 `User::getCurrentUser()` 来获取当前登录用户。你可以这样简单地实现一个具有登录功能的站点：
-
-```php
-$app->get('/login', function($req, $res) {
-  // login page
-});
-
-$app->post('/login', function($req, $res) {
-    $params = $req->getQueryParams();
-    try {
-        User::logIn($params["username"], $params["password"]);
-        return $res->withRedirect('/profile');
-    } catch (Exception $ex) {
-        return $res->withRedirect('/login');
-    }
-});
-
-$app->get('/profile', function($req, $res) {
-    $user = User::getCurrentUser();
-    if ($user) {
-        return $res->getBody()->write($user->getUsername());
-    } else {
-        return $res->withRedirect('/login');
-    }
-});
-
-$app->get('/logout', function($req, $res) {
-    User::logOut();
-    return $res->redirect("/");
-});
+```yaml
+install:
+  - require:
+    - libs
+  - {use: 'default'}
 ```
 
-一个简单的登录页面可以是这样：
+pom.xml 中对 `spring-boot-maven-plugin` 改动如下：
 
-```html
-<html>
-  <head></head>
-  <body>
-    <form method="post" action="/login">
-      <label>Username</label>
-      <input name="username">
-      <label>Password</label>
-      <input name="password" type="password">
-      <input class="button" type="submit" value="login">
-    </form>
-  </body>
-</html>
-```
-
-`CookieStorage` 也支持保存其他属性：
-
-```php
-$cookieStorage = Client::getStorage();
-$cookieStorage->set("key", "val");
+```xml
+<plugin>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-maven-plugin</artifactId>
+  <configuration>
+    <executable>true</executable>
+    <includeSystemScope>true</includeSystemScope>
+  </configuration>
+</plugin>
 ```
 
 ### 在云引擎 Java 环境下如何本地调用云函数？
