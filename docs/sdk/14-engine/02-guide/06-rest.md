@@ -12,7 +12,8 @@ sidebar_label: REST API
 
 ## Base URL
 
-REST API 请求的 Base URL 可以在**云服务控制台 > 设置 > 应用 Keys > 服务器地址**查看。
+REST API 请求的 Base URL（下文 curl 示例中用 `{{host}}` 表示）即应用绑定的 API 自定义域名，可以在控制台绑定、查看。
+详见文档关于[绑定域名](/sdk/storage/guide/setup-dotnet#绑定域名)的说明。
 
 ## 概览
 
