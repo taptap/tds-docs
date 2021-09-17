@@ -35,7 +35,8 @@ Postman 还支持自动生成多种语言（库）调用 REST API 的代码。
 
 ### Base URL
 
-REST API 请求的 Base URL 可以在**云服务控制台 > 设置 > 应用 Keys > 服务器地址**查看。
+REST API 请求的 Base URL（下文 curl 示例中用 `{{host}}` 表示）即应用绑定的 API 自定义域名，可以在控制台绑定、查看。
+详见文档关于[绑定域名](/sdk/storage/guide/setup-dotnet#绑定域名)的说明。
 
 ### 对象
 
@@ -1858,6 +1859,25 @@ curl -X DELETE \
   }
 }
 ```
+
+[TapTap](https://www.taptap.com) 的 authData 内容：
+
+```json
+{
+  "taptap": {
+    "kid" : "mac_key id",
+    "access_token" : "当前与 kid 相同",
+    "token_type" : "mac",
+    "mac_key" : "mac 密钥",
+    "mac_algorithm" : "hmac-sha-1",
+    "openid": "授权用户唯一标识，不同应用的同一用户 openid 不同",
+    "name": "用户名",
+    "avatar" : "用户头像图片 URL（不保证永久有效）",
+    "unionid": "授权用户唯一标识，开发者旗下所有应用，同一用户的 unionid 总是相同"
+  }
+}
+```
+
 
 其他任意第三方平台：
 

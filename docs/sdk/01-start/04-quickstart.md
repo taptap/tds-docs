@@ -153,8 +153,8 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
         implementation name:'TapBootstrap_3.2.1', ext:'aar'   
         implementation name:'TapCommon_3.2.1', ext:'aar' 
 		implementation name:'TapLogin_3.2.1', ext:'aar' 
-        implementation 'cn.leancloud:realtime-android:8.1.0'
-        implementation 'cn.leancloud:storage-android:8.1.0'
+        implementation 'cn.leancloud:realtime-android:8.1.1'
+        implementation 'cn.leancloud:storage-android:8.1.1'
         implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 
     }  
@@ -373,7 +373,10 @@ TapSDK 3.0 版本目前暂不支持海外，预计本季度部署海外节点，
 TapSDK 提供了众多功能。请在初始化 SDK 后，根据项目需要，参考相应功能的文档，接入相应功能。
 绝大多数游戏都会接入 TapTap 登录，所以我们推荐从这一功能开始。
 
-完成以上配置和初始化工作后，接入「TapTap 登录」只需三个步骤：
+:::note
+完成以上配置和初始化工作后，接入「TapTap 登录」只需完成以下三个步骤：**接入 TapTap 登录**、 **配置签名证书**、 **添加测试用户**；
+温馨提示：[配置签名证书](#配置签名证书) 和 [添加测试用户](#添加测试用户) 在测试登陆功能前务必完成配置，否则无法正常登陆；
+:::
 
 ### 接入 TapTap 登录
 

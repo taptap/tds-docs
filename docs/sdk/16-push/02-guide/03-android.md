@@ -21,7 +21,7 @@ Android 的推送主要依赖客户端的 PushService 服务。PushService 是�
 ```groovy
 dependencies {
 
-implementation 'cn.leancloud:realtime-android:8.1.0'
+implementation 'cn.leancloud:realtime-android:8.1.1'
 implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
 
 }
@@ -94,7 +94,7 @@ public class MyLeanCloudApp extends Application {
   android:name=".MyLeanCloudApp" >
 
   <!-- 即时通讯和推送 START -->
-  <!-- 即时通讯和推送都需要 PushService -->
+  <!-- 即时通讯、推送、LiveQuery 都需要 PushService -->
   <service android:name="cn.leancloud.push.PushService"/>
   <receiver android:name="cn.leancloud.push.LCBroadcastReceiver">
     <intent-filter>

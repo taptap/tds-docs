@@ -1521,6 +1521,7 @@ AV.Cloud.onLogin(function (request) {
   }
 });
 ```
+
 ```python
 @engine.on_login
 def on_login(user):
@@ -1530,6 +1531,7 @@ def on_login(user):
       raise LeanEngineError('Forbidden')
     # 没有抛出异常，函数正常执行完毕的话，用户可以登录
 ```
+
 ```php
 Cloud::onLogin(function($user) {
     error_log("User {$user->getUsername()} is trying to log in.");
@@ -1540,6 +1542,7 @@ Cloud::onLogin(function($user) {
     // 没有抛出异常，函数正常执行完毕的话，用户可以登录
 });
 ```
+
 ```java
 @EngineHook(className = "_User", type = EngineHookType.onLogin)
 public static LCUser userOnLoginHook(LCUser user) throws Exception {
@@ -1550,6 +1553,7 @@ public static LCUser userOnLoginHook(LCUser user) throws Exception {
   }
 }
 ```
+
 ```cs
 [LCEngineUserHook(LCEngineUserHookType.OnLogin)]
 public static LCUser OnLogin(LCUser user) {
@@ -1559,11 +1563,67 @@ public static LCUser OnLogin(LCUser user) {
     return user;
 }
 ```
+
 ```go
 leancloud.OnLogin(func(req *ClassHookRequest) error {
   fmt.Println("用户 ", req.User.ID, " 已登录。")
 })
 ```
+
+</MultiLang>
+
+该 hook 属于 before 类 hook.
+
+### OnAuthData
+
+在云存储处理第三方登录的 `authData` 时触发，开发者可以在这个 Hook 中进行对 `authData` 的校验或转换。比如：
+
+<MultiLang kind="engine">
+
+```js
+AV.Cloud.onAuthData(function (request) {
+  let authData = request.authData;
+  console.log(authData)
+
+  if (authData.weixin.code === '12345') {
+    authData.weixin.accessToken = '45678';
+  } else {
+    // 校验失败，抛出异常，则用户无法登录
+    throw new AV.Cloud.Error('invalid code');
+  }
+  // 校验成功，返回校验或转换之后的 authData，用户继续登录流程
+  return authData;
+})
+```
+
+```python
+@engine.on_auth_data
+def on_auth_data(auth_data):
+    if auth_data['weixin']['code'] == '12345':
+        # 校验成功，返回校验或转换之后的 auth_data，用户继续登录流程
+        auth_data['weixin']['code'] = '45678'
+        return auth_data
+    else:
+        # 校验失败，抛出异常，则用户无法登录
+        raise LeanEngineError('invalid code')
+```
+
+```php
+// 暂未支持
+```
+
+```java
+// 暂未支持
+```
+
+```cs
+// 暂未支持
+```
+
+```go
+// 暂未支持
+```
+
 
 </MultiLang>
 

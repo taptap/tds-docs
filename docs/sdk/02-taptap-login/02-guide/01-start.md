@@ -6,6 +6,10 @@ sidebar_label: 功能接入
 
 import MultiLang from '@theme/MultiLang';
 
+:::note
+温馨提示：[配置签名证书](#配置签名证书) 和 [添加测试用户](#添加测试用户) 在测试登陆功能前务必完成配置，否则无法正常登陆；
+:::
+
 接入 TapTap 登录有两种方式：
 
 1. 基于[内建账户系统](/sdk/authentication/features)接入 TapTap 登录；
