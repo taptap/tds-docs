@@ -1535,7 +1535,7 @@ GeneralRequestSignature.setMasterKey(appMasterKey);
 
 1. 首先在项目根目录下新建 libs 目录，把所有依赖的 jar 文件拷贝进来；
 2. 然后在项目根目录下新建 leanengine.yaml 文件，并自定义 install 环节（详见下文示例）；
-3. 最后修改 pom.xml 中 `spring-boot-maven-plugin` 配置，增加 `includeSystemScope` 设置项（详见下文示例）；
+3. 最后修改 pom.xml 中依赖项和 `spring-boot-maven-plugin` 配置，增加 `includeSystemScope` 设置项（详见下文示例）；
 
 最终的工程目录结构如下：
 
@@ -1554,6 +1554,18 @@ install:
   - require:
     - libs
   - {use: 'default'}
+```
+
+pom.xml 中增加依赖项目：
+
+```xml
+<dependency>
+    <groupId>com.sample</groupId>
+    <artifactId>sample</artifactId>
+    <version>1.0</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/libs/yourdependency.jar</systemPath>
+</dependency>
 ```
 
 pom.xml 中对 `spring-boot-maven-plugin` 改动如下：
