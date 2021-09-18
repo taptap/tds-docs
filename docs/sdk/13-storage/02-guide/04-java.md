@@ -1316,12 +1316,12 @@ avFile.getDataInBackground().subscribe(new Observer<byte[]>() {
 
     @Override
     public void onNext(byte[] bytes) {
-        Log.d("file data length: " + bytes.length);
+        Log.d("LCFile", "file data length: " + bytes.length);
     }
 
     @Override
     public void onError(Throwable e) {
-        Log.d("failed to get data. cause: " + e.getMessage());
+        Log.d("LCFile", "failed to get data. cause: " + e.getMessage());
     }
 
     @Override
@@ -1337,7 +1337,7 @@ avFile.getDataStreamInBackground().subscribe(new Observer<InputStream>() {
         try {
             byte[] buffer = new byte[102400];
             int read = inputStream.read(buffer);
-            Log.d("file data length: " + read);
+            Log.d("LCFile", "file data length: " + read);
             inputStream.close();
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -1346,7 +1346,7 @@ avFile.getDataStreamInBackground().subscribe(new Observer<InputStream>() {
 
     @Override
     public void onError(Throwable e) {
-        Log.d("failed to get data. cause: " + e.getMessage());
+        Log.d("LCFile", "failed to get data. cause: " + e.getMessage());
     }
 
     @Override
