@@ -7,7 +7,7 @@ sidebar_label: 功能接入
 import MultiLang from '@theme/MultiLang';
 
 :::note
-温馨提示：[配置签名证书](#配置签名证书) 和 [添加测试用户](#添加测试用户) 在测试登陆功能前务必完成配置，否则无法正常登陆；
+温馨提示：[配置签名证书](/sdk/start/quickstart/#配置签名证书) 和 [添加测试用户](/sdk/start/test-accounts/) 在测试登陆功能前务必完成配置，否则无法正常登陆；
 :::
 
 接入 TapTap 登录有两种方式：
@@ -42,9 +42,12 @@ catch (Exception e)
     if (e is TapException tapError)  // using TapTap.Common
     {
         Debug.Log($"encounter exception:{tapError.code} message:{tapError.message}");
+        if (tapError.code == TapErrorCode.ERROR_CODE_BIND_CANCEL) // 取消登陆
+        {
+            Debug.Log("登陆取消");
+        }
     }
 }
-
 ```
 
 ```java
@@ -97,6 +100,7 @@ TapTap 用户登录成功之后，开发者可以通过如下方式获取到 Tap
 ```cs
 // 获取 TapTap Profile  可以获得当前用户的一些基本信息，例如名称、头像。
 var profile = await TapLogin.FetchProfile();
+Debug.Log($"profile: {profile.ToJson()}");
 ```
 
 ```java
@@ -310,9 +314,23 @@ clientId | TapTap 开发者中心对应应用的 Client ID
 
 
 ```cs
-// 唤起 TapTap 网页 或者 TapTap 客户端进行登录
-var accessToken = await TapLogin.Login();
-Debug.Log($"LeeJiEun 登录成功 accessToken: {accessToken.ToJson()}");
+try
+{
+    // 唤起 TapTap 网页 或者 TapTap 客户端进行登录
+    var accessToken = await TapLogin.Login();
+    Debug.Log($"LeeJiEun 登录成功 accessToken: {accessToken.ToJson()}");
+}
+catch (Exception e)
+{
+    if (e is TapException tapError)  // using TapTap.Common
+    {
+        Debug.Log($"encounter exception:{tapError.code} message:{tapError.message}");
+        if (tapError.code == TapErrorCode.ERROR_CODE_BIND_CANCEL) // 取消登陆
+        {
+            Debug.Log("登陆取消");
+        }
+    }
+}
 
 // 获取 TapTap Profile  可以获得当前用户的一些基本信息，例如名称、头像。
 var profile = await TapLogin.FetchProfile();
