@@ -9,9 +9,9 @@ sidebar_label: 文本检测
 
 本文涉及到即时通讯服务 hook、文本检测服务以及云引擎在线编辑云函数功能，首先请阅读相关文档了解这些功能：
 
-1. [详解消息 hook 与系统对话](/docs/sdk/im/guide/systemconv/)
-2. 文本检测服务的[功能介绍](/docs/sdk/text-moderation/features/)、[开发指南](/docs/sdk/text-moderation/guide/)、[最佳实践](/docs/sdk/text-moderation/best-practice/)
-3. [在线编写云函数](/docs/sdk/engine/guide/cloudfunction#在线编写云函数)
+1. [详解消息 hook 与系统对话](/sdk/im/guide/systemconv/)
+2. 文本检测服务的[功能介绍](/sdk/text-moderation/features/)、[开发指南](/sdk/text-moderation/guide/)、[最佳实践](/sdk/text-moderation/best-practice/)
+3. [在线编写云函数](/sdk/engine/guide/cloudfunction#在线编写云函数)
 
 ## 操作步骤
 
@@ -103,5 +103,5 @@ return new Promise((resolve, reject)=>{
 以上代码简单展示了如何在即时通讯服务中使用语心文本检测服务，代码仅供参考，你需要根据实际业务场景来处理请求和响应结果。
 涉及到的即时通讯 hook 参数和语心文本检测服务请求与响应参数，请参考相应文档：
 
-[即时通讯 _messageReceived Hook](/docs/sdk/im/guide/systemconv/#_messagereceived)
-[语心文本检测 API 接口说明](/docs/sdk/text-moderation/guide/#api-%E8%AF%A6%E7%BB%86%E8%AF%B4%E6%98%8E)
+[即时通讯 _messageReceived Hook](/sdk/im/guide/systemconv/#_messagereceived)
+[语心文本检测 API 接口说明](/sdk/text-moderation/guide/#api-%E8%AF%A6%E7%BB%86%E8%AF%B4%E6%98%8E)
