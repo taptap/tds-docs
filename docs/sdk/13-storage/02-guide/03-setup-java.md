@@ -54,32 +54,32 @@ Maven：
 <dependency>
     <groupId>cn.leancloud</groupId>
     <artifactId>storage-core</artifactId>
-    <version>8.1.1</version>
+    <version>8.1.2</version>
 </dependency>
 ```
 
 Ivy：
 
 ```xml
-<dependency org="cn.leancloud" name="storage-core" rev="8.1.1" />
+<dependency org="cn.leancloud" name="storage-core" rev="8.1.2" />
 ```
 
 SBT：
 
 ```scala
-libraryDependencies += "cn.leancloud" %% "storage-core" % "8.1.1"
+libraryDependencies += "cn.leancloud" %% "storage-core" % "8.1.2"
 ```
 
 Gradle：
 
 ```groovy
-implementation 'cn.leancloud:storage-core:8.1.1'
+implementation 'cn.leancloud:storage-core:8.1.2'
 ```
 
 如果是 Android 项目，则换成以下这些包：
 
 ```groovy
-implementation 'cn.leancloud:storage-android:8.1.1'
+implementation 'cn.leancloud:storage-android:8.1.2'
 implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 ```
 
@@ -91,26 +91,26 @@ Maven：
 <dependency>
     <groupId>cn.leancloud</groupId>
     <artifactId>realtime-core</artifactId>
-    <version>8.1.1</version>
+    <version>8.1.2</version>
 </dependency>
 ```
 
 Ivy:
 
 ```xml
-<dependency org="cn.leancloud" name="realtime-core" rev="8.1.1" />
+<dependency org="cn.leancloud" name="realtime-core" rev="8.1.2" />
 ```
 
 SBT:
 
 ```scala
-libraryDependencies += "cn.leancloud" %% "realtime-core" % "8.1.1"
+libraryDependencies += "cn.leancloud" %% "realtime-core" % "8.1.2"
 ```
 
 Gradle:
 
 ```groovy
-implementation 'cn.leancloud:realtime-android:8.1.1'
+implementation 'cn.leancloud:realtime-android:8.1.2'
 implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 ```
 
