@@ -1930,7 +1930,7 @@ LCIMImageMessage *message = [LCIMImageMessage messageWithText:@"萌妹子一枚"
 ```
 ```js
 var AV = require('leancloud-storage');
-var { ImageMessage } = require('leancloud-realtime-plugin-typed-messages');
+var { ImageMessage } = initPlugin(AV, IM);
 // 从网络链接直接构建一个图像消息
 var file = new AV.File.withURL('萌妹子', 'http://pic2.zhimg.com/6c10e6053c739ed0ce676a0aff15cf1c.gif');
 file.save().then(function() {
@@ -2028,7 +2028,7 @@ LCIMMessageManager.registerMessageHandler(LCIMImageMessage.class,
 ```
 ```js
 var { Event, TextMessage } = require('leancloud-realtime');
-var { ImageMessage } = require('leancloud-realtime-plugin-typed-messages');
+var { ImageMessage } = initPlugin(AV, IM);
 
 client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
    var file;
@@ -2130,7 +2130,7 @@ if (!error) {
 ```
 ```js
 var AV = require('leancloud-storage');
-var { AudioMessage } = require('leancloud-realtime-plugin-typed-messages');
+var { AudioMessage } = initPlugin(AV, IM);
 
 var fileUploadControl = $('#musicFileUpload')[0];
 var file = new AV.File('忐忑.mp3', fileUploadControl.files[0]);
@@ -2213,7 +2213,7 @@ LCIMAudioMessage *message = [LCIMAudioMessage messageWithText:@"来自苹果发�
 ```
 ```js
 var AV = require('leancloud-storage');
-var { AudioMessage } = require('leancloud-realtime-plugin-typed-messages');
+var { AudioMessage } = initPlugin(AV, IM);
 
 var file = new AV.File.withURL('apple.aac', 'https://some.website.com/apple.aac');
 file.save().then(function() {
@@ -2293,7 +2293,7 @@ LCIMLocationMessage *message = [LCIMLocationMessage messageWithText:@"蛋糕店�
 ```
 ```js
 var AV = require('leancloud-storage');
-var { LocationMessage } = require('leancloud-realtime-plugin-typed-messages');
+var { LocationMessage } = initPlugin(AV, IM);
 
 var location = new AV.GeoPoint(31.3753285, 120.9664658);
 var message = new LocationMessage(location);
@@ -2609,7 +2609,7 @@ jerry.onMessage = ({
 ```js
 // 在初始化 Realtime 时，需加载 TypedMessagesPlugin
 var { Event, TextMessage } = require('leancloud-realtime');
-var { FileMessage, ImageMessage, AudioMessage, VideoMessage, LocationMessage } = require('leancloud-realtime-plugin-typed-messages');
+var { FileMessage, ImageMessage, AudioMessage, VideoMessage, LocationMessage } = initPlugin(AV, IM);
 // 注册 MESSAGE 事件的 handler
 client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
   // 请按自己需求改写
