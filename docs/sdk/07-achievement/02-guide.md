@@ -6,7 +6,42 @@ sidebar_label: 开发指南
 
 import MultiLang from '@theme/MultiLang';
 
-本文介绍如何在游戏中加入成就系统。TDS 推出的成就系统模块，是基于内建账户系统（TDSUser）的，具体请阅读[内建账户 > 开发指南](/sdk/authentication/guide/)。
+本文介绍如何在游戏中加入成就系统。TDS 推出的成就系统模块，是基于内建账户系统（TDSUser）的，具体请阅读 **[内建账户 > 开发指南](/sdk/authentication/guide/)**。
+
+## SDK 获取
+
+假设你已经在 [快速开始](/sdk/start/quickstart/#初始化) 部分完成了 **SDK 初始化**，可以在 [下载页](/tap-download) 获得 SDK，添加 `TapAchievement` 模块：
+
+<MultiLang>
+
+```cs
+"dependencies":{
+  ...
+  // 成就系统
+  "com.taptap.tds.achievement": "https://github.com/TapTap/TapAchievement-Unity.git#3.2.0",
+}
+```
+
+```java
+repositories{  
+    flatDir {  
+        dirs 'libs'  
+    }  
+}  
+
+dependencies {  
+    ... 
+    implementation (name:'TapAchievement_3.2.1', ext:'aar') // TapTap 成就系统
+}  
+```
+
+```objectivec
+// 成就系统
+TapAchievementResource.bundle
+TapAchievementSDK.framework
+```
+
+</MultiLang>
 
 ## 注册监听回调
 成就 SDK 中包含多个监听回调，分别会在初始化数据成功、初始化数据失败以及成就进度更新时被调用，请特别注意初始化数据成功的回调，这是成就 SDK 正常使用的前提，初始化数据失败时请提示用户或者在合适的时候重新初始化数据。
