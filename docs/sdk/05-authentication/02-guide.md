@@ -598,16 +598,16 @@ option.platform = LeanCloudSocialPlatformWeiXin;
 
 开发者需要自己完成第三方平台的鉴权流程（一般通过 OAuth 1.0 或 2.0），以获取鉴权信息，继而到云端来登录。
 
-### Signin With Apple
+### Sign in with Apple
 
-如果你需要开发 [Signin With Apple](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api)，云服务可以帮你校验 `identityToken`，并获取 Apple 的 `access_token`。Apple Sign In 的 `authData` 结构如下：
+如果你需要开发 [Sign in with Apple](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api)，云服务可以帮你校验 `identityToken`，并获取 Apple 的 `access_token`。Apple Sign In 的 `authData` 结构如下：
 
 ```json
 {
   "lc_apple": {
-    "uid" : "从 Apple 获取到的 User Identifier",
-    "identity_token" : "从苹果获取到的 identityToken"
-    "code" : "从苹果获取到的 Authorization Code"
+    "uid": "从 Apple 获取到的 User Identifier",
+    "identity_token": "从苹果获取到的 identityToken",
+    "code": "从苹果获取到的 Authorization Code"
   }
 }
 ```
