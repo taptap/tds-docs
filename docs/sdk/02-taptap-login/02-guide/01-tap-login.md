@@ -4,6 +4,8 @@ title: 单纯 TapTap 用户认证
 sidebar_label: 单纯认证
 ---
 
+import MultiLang from '@theme/MultiLang';
+
 如果您仅仅只需要接入 TapTap 这一种登录方式，确认不使用 TDS 其他云服务，可以看这里的文档。请注意，如果刚开始只选择接入「TapTap 登录」，后面又需要使用其他云服务的话，后期可能有一定的升级成本。
 
 使用原来 TapSDK v1.x 版本的开发者，也可以参考这里的说明来完成 TapSDK 的升级。
