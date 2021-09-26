@@ -213,8 +213,6 @@ NSArray *keys = [NSArray arrayWithObjects:@"priority", @"location", nil];
 
 要更新一个对象，只需指定需要更新的属性名和属性值，然后调用 `saveInBackground` 方法。例如：
 
-要更新一个对象，只需指定需要更新的属性名和属性值，然后调用 `saveInBackground` 方法。例如：
-
 ```objc
 LCObject *todo = [LCObject objectWithClassName:@"Todo" objectId:@"582570f38ac247004f39c24b"];
 [todo setObject:@"这周周会改到周三下午三点。" forKey:@"content"];
