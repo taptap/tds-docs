@@ -61,7 +61,6 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
     "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#3.2.0",
     "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#3.2.0",
     "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#3.2.0",
-    "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-0.9.8",
     "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-0.9.8",
 }
 ```
@@ -79,7 +78,6 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
    - `TapTap_Bootstrap.unitypackage` TapSDK 启动器，必选。
    - `TapTap_Common.unitypackage` TapSDK 基础库，必选。
    - `TapTap_Login.unitypackage` TapTap 登录，必选。
-   - `LeanCloud-SDK-Storage-Unity.zip` 必选，解压后为 Plugins 文件夹，拖拽至 Unity 即可。
    - `LeanCloud-SDK-Realtime-Unity.zip` 必选，解压后为 Plugins 文件夹，拖拽至 Unity 即可。
 
 在 Unity 顶部菜单中选择 **Window > Package Manager** 可查看已经安装在项目中的包。
