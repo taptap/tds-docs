@@ -9,7 +9,7 @@ import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
 
 TapTap OpenAPI 采用统一的 Mac Token 头部签算来传递用户身份。
 
-客户端 SDK 通过[单纯 TapTap 用户认证方式接入](/sdk/taptap-login/guide/start/#单纯的-taptap-用户认证使用方式)后，经过用户的授权流程，会获得这个用户在当前应用中的 Mac Token。Mac Token 长期有效，只有在用户更新自己账号相关安全信息、注销对当前应用的授权时才会失效。开发者应当将 Mac Token 妥善保管于自己的服务器上，作为后续与 TapTap 服务端通讯的标示。
+客户端 SDK 通过[单纯 TapTap 用户认证方式接入](/sdk/taptap-login/guide/tap-login/)后，经过用户的授权流程，会获得这个用户在当前应用中的 Mac Token。Mac Token 长期有效，只有在用户更新自己账号相关安全信息、注销对当前应用的授权时才会失效。开发者应当将 Mac Token 妥善保管于自己的服务器上，作为后续与 TapTap 服务端通讯的标示。
 
 Mac Token 算法细节见文档中的 [MAC Token 算法](#mac-token-算法) 部分。
 

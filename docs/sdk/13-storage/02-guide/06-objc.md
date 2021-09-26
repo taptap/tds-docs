@@ -1133,7 +1133,7 @@ LCFile *file = [LCFile fileWithLocalPath:imagePath error:&error];
 }];
 ```
 
-文件上传后，可以在 `_File` class 中找到。已上传的文件无法再被修改。如果需要修改文件，只能重新上传修改过的文件并取得新的 `objectId` 和 URL。
+文件上传后，可以在文件服务中找到。已上传的文件无法再被修改。如果需要修改文件，只能重新上传修改过的文件并取得新的 `objectId` 和 URL。
 
 
 已经保存到云端的文件可以关联到 `LCObject`：
@@ -1154,7 +1154,7 @@ LCQuery *query = [LCQuery queryWithClassName:@"_File"];
 
 
 需要注意的是，内部文件（上传到文件服务的文件）的 `url` 字段是由云端动态生成的，其中涉及切换自定义域名的相关处理逻辑。
-因此，通过 url 字段查询文件仅适用于外部文件（直接保存外部 URL 到 `_File` 表创建的文件），内部文件请改用 key 字段（URL 中的路径）查询。
+因此，通过 url 字段查询文件仅适用于外部文件（直接保存外部 URL 到文件服务创建的文件），内部文件请改用 key 字段（URL 中的路径）查询。
 
 注意，如果文件被保存到了 `LCObject` 的一个数组属性中，那么在查询 `LCObject` 时如果需要包含文件，则要用到 `LCQuery` 的 `includeKey` 方法。比如说，在获取所有标题为 `买蛋糕` 的 todo 的同时获取附件中的文件：
 
@@ -1260,7 +1260,8 @@ LCFile *file = [LCFile getFileWithObjectId:@"552e0a27e4b0643b709e891e"];
 [file deleteInBackground];
 ```
 
-默认情况下，文件的删除权限是关闭的，需要进入 **云服务控制台 > 数据存储 > 结构化数据 > `_File`**，选择 **其他** > **权限设置** > **`delete`** 来开启。
+默认情况下，文件的删除权限是关闭的，需要进入 **云服务控制台 > 数据存储 > 文件**，选择 **权限** > **Class 访问权限** > **`delete`** 来开启。
+
 
 #### iOS 9 适配
 

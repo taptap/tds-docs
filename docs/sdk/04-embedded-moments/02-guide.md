@@ -12,7 +12,7 @@ import MultiLang from '@theme/MultiLang';
 ## SDK 获取
 
 :::info
-- 如果使用 [单纯的 TapTap 登录](/sdk/taptap-login/guide/start/#单纯的-taptap-用户认证使用方式) 并接入内嵌动态，初始化和 SDK 获取请参考：[单纯的内嵌动态初始化](#单纯的内嵌动态初始化)。
+- 如果使用 [单纯的 TapTap 登录](/sdk/taptap-login/guide/tap-login/) 并接入内嵌动态，初始化和 SDK 获取请参考：[单纯的内嵌动态初始化](#单纯的内嵌动态初始化)。
 :::
 
 假设你已经在 [快速开始](/sdk/start/quickstart/#初始化) 部分完成了 SDK 初始化，可以通过 [下载](/tap-download) 获得 SDK，添加 `TapMoment` 模块：
@@ -309,7 +309,7 @@ postData.content = @"我是图片描述";
 
 ## 单纯的内嵌动态初始化
 
-这里 SDK 获取及初始化，仅供使用 [单纯的 TapTap 登录](/sdk/taptap-login/guide/start/#单纯的-taptap-用户认证使用方式) 的开发者参考。
+这里 SDK 获取及初始化，仅供使用 [单纯的 TapTap 登录](/sdk/taptap-login/guide/tap-login/) 的开发者参考。
 
 请先 [下载](/tap-download) SDK，并添加相关依赖。内嵌动态功能依赖 `TapLogin`、`TapCommon` 和 `TapMoment` 模块。
 

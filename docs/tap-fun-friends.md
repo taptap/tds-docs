@@ -608,7 +608,7 @@ TapFriends.searchUser("userID", new Callback<TapUserRelationship>() {
 
 #### 使用说明
 
-- 使用富信息需要先按[服务端配置](#服务端配置)格式提供给技术支持进行配置
+- 使用富信息需要先按[服务端配置](#服务端配置)格式提交工单进行配置
 - 最多支持配置 20 个 key，移动端以 key-value 键值对发送信息
 - key- 不支持空字符串，最短长度 2 位，最长长度 64 位；value- 不支持空字符串，最短长度 2 位，最长长度 256 位
 
@@ -771,7 +771,7 @@ TapFriends.clearRichPresence("display", new Callback0() {
 
 ### 服务端
 
-请先确认好要配置的 key-value，按照下面格式发给技术支持 
+请先确认好要配置的 key-value，按照下面格式提交工单：
 
 #### 服务端配置
 
