@@ -3,11 +3,8 @@ id: SDK-API
 title: SDK-API
 slug: sdk-api
 ---
-import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
 
-
-
-## TapTap 登录、TapDB、好友关系与内嵌动态
+## TapTap 登录、内嵌动态、好友、成就、云存档、数据分析
 
 | 平台         | API 总览 |   
 | ---------- | --- | 
@@ -15,7 +12,7 @@ import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
 |  Android | [Android-API](https://taptap.github.io/TapSDK-Android/)   | 
 |   iOS  | [iOS-API](https://taptap.github.io/TapSDK-iOS/index.html)   | 
 
-## 游戏存储、IM 与云引擎
+## 数据存储、即时通讯、推送通知、云引擎、排行榜
 
 | 平台         | API 总览 |   
 | ---------- | --- | 
