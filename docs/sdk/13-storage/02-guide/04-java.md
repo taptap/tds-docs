@@ -245,12 +245,19 @@ todo.fetchInBackground(keys).subscribe(new Observable<LCObject>() {
 
 要更新一个对象，只需指定需要更新的属性名和属性值，然后调用 `saveInBackground` 方法。例如：
 
-要更新一个对象，只需指定需要更新的属性名和属性值，然后调用 `save` 方法。例如：
-
 ```java
 LCObject todo = LCObject.createWithoutData("Todo", "582570f38ac247004f39c24b");
 todo.put("content", "这周周会改到周三下午三点。");
-todo.save();
+todo.saveInBackground(option).subscribe(new Observer<LCObject>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCObject savedTodo) {
+        System.out.println("保存成功");
+    }
+    public void onError(Throwable throwable) {
+        System.out.println("保存失败！");
+    }
+    public void onComplete() {}
+});;
 ```
 
 云服务会自动识别需要更新的属性并将对应的数据发往云端，未更新的属性会保持原样。
