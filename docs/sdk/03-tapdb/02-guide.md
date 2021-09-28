@@ -337,7 +337,7 @@ TapDB.trackEvent("#battle", properties);
 ```
 
 ```objectivec
- NSDictionary* dic = @{@"aaa":@"xxx",@"bbb":@"yyy"};    
+NSDictionary* dic = @{@"aaa":@"xxx",@"bbb":@"yyy"};   
 [TapDB trackEvent:@"testEvent2" properties:dic];
 ```
 
