@@ -6,7 +6,7 @@ sidebar_label: 功能介绍
 
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
-为了访问 TapTap Deverloper Services（以下简称 TDS）的相关服务功能，你的用户需要拥有一个 TapTap 账号。如果用户未使用 TapTap 账号，你的应用在调用 TDS 服务 API 时可能会遇到错误。本文档介绍了如何在你的应用中实现 TapTap 登录体验。
+为了访问 TapTap Developer Services（以下简称 TDS）的相关服务功能，你的用户需要拥有一个 TapTap 账号。如果用户未使用 TapTap 账号，你的应用在调用 TDS 服务 API 时可能会遇到错误。本文档介绍了如何在你的应用中实现 TapTap 登录体验。
 
 ## 业务介绍
 
@@ -59,7 +59,7 @@ TapTap 账号服务，基于标准的 OAuth 2.0 协议构建的授权登录系�
 
 静默登录可以帮助用户节省登录的流程，通常用于用户下一次启动游戏时，仍有登录状态的场景。  
 
-当用户启动游戏时，你可以尝试获取当前用户的 `Access Token`  来检查用户是否已经当前设备上登录过。则可以尝试在不显示登录按钮或界面的情况下帮用户完成登录过程。
+当用户启动游戏时，你可以尝试获取当前用户的 `Access Token`  来检查用户是否已经在当前设备上登录过。这样可以尝试在不显示登录按钮或界面的情况下帮用户完成登录过程。
 
 
 
