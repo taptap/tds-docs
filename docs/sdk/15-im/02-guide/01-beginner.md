@@ -4003,7 +4003,7 @@ conv.queryMessages(10, new LCIMMessagesQueryCallback() {
       LCIMMessage oldestMessage = messages.get(0);
 
       conv.queryMessages(oldestMessage.getMessageId(), oldestMessage.getTimestamp(),20,
-          new LCIMMessageQueryCallback(){
+          new LCIMMessagesQueryCallback(){
             @Override
             public void done(List<LCIMMessage> messagesInPage,LCIMException e){
               if(e== null){
