@@ -33,10 +33,18 @@ title: 网页版
 
 「[用户分群](/04-features/01-customEvent/09-cluster.md "_blank")」
 
-「[埋点管理？](/04-features/01-customEvent/11-trackingManagement.md "_blank")」
+「[埋点管理](/04-features/01-customEvent/11-trackingManagement.md "_blank")」
 
-「[虚拟属性](/04-features/01-customEvent/12-virtual.md"_blank")」
+「[虚拟属性](/04-features/01-customEvent/12-virtual.md "_blank")」
 
+
+「[关于我们](/01-aboutUs.md "_blank")」
+
+「[数据模型](/03-sdk/01-数据模型.md "_blank")」
+
+「[快速接入](/02-start.md "_blank")」
+
+「[服务端接入文档](/03-sdk/06-服务端接入文档.md "_blank")」
 
 ## 2.5.0 | 2021-09-16 发布
 **自定义事件分析**更新
@@ -44,8 +52,8 @@ title: 网页版
 2. 对「漏斗分析」、「查询主体」切换、「虚拟属性」进行了使用体验优化
 
 **文档**更新
-1. 新增「分布分析」文档，以便于大家更好的了解和使用分布分析功能
-2. 在「常见问题」里新增了一些问题说明
+1. 新增「[分布分析](/04-features/01-customEvent/06-distribution.md "_blank")」文档，以便于大家更好的了解和使用分布分析功能
+2. 在「[常见问题](/06-QA/01-tran.md "_blank")」里新增了一些问题说明
 3. 新增搜索框，方便大家更快捷的查找问题答案
 
 ## 2.4.0 | 2021-09-02 发布
@@ -61,7 +69,7 @@ title: 网页版
 
 **文档**更新
 
-1. 对「留存分析」内容进行修改，帮助大家更好的了解和使用留存分析功能
+1. 对「[留存分析](/04-features/01-customEvent/04-retentionAnalyse.md "_blank")」内容进行修改，帮助大家更好的了解和使用留存分析功能
 
 
 ## 2.3.0 | 2021-08-20 发布
@@ -74,17 +82,17 @@ title: 网页版
 1. 对「运营」-「付费」-「付费数据」报表的付费人数、活跃人数在跨天计算时进行了去重优化
 
 **文档**更新
-1. 新增「虚拟属性」，以便于大家更好的了解和使用虚拟属性功能
-2. 在「埋点管理」补充了监测开关使用说明
+1. 新增「[虚拟属性](/04-features/01-customEvent/12-virtual.md"_blank")」，以便于大家更好的了解和使用虚拟属性功能
+2. 在「[埋点管理](/04-features/01-customEvent/11-trackingManagement.md "_blank")」补充了监测开关使用说明
 
 ## 文档更新 | 2021-08-12 发布
 
 **文档**更新
 
-1. 新增「关于我们」，以便于大家更好的了解 TapDB
-2. 新增「埋点设计指南」，用于指导大家更好的设计自定义事件
-3. 新增「服务端接入文档」，介绍如何进行服务端接入
-4. 对「快速接入」、「数据模型」和「事件分析」的内容进行了修改，帮助大家更好的理解接入过程、基础概念和事件分析功能
+1. 新增「[关于我们](/01-aboutUs.md "_blank")」，以便于大家更好的了解 TapDB
+2. 新增「[埋点设计指南](/04-features/01-customEvent/02-dataModel.md "_blank")」，用于指导大家更好的设计自定义事件
+3. 新增「[服务端接入文档](/03-sdk/06-服务端接入文档.md "_blank")」，介绍如何进行服务端接入
+4. 对「[快速接入](/02-start.md "_blank")」、「[数据模型](/03-sdk/01-数据模型.md "_blank")」和「[事件分析](/04-features/01-customEvent/03-eventAnalyse.md "_blank")」的内容进行了修改，帮助大家更好的理解接入过程、基础概念和事件分析功能
 5. 调优了文档结构
 
 ---
@@ -96,7 +104,7 @@ title: 网页版
 
 **文档**更新
 
-1. 新增埋点管理，用户分群的使用文档
+1. 新增「[埋点管理](/04-features/01-customEvent/11-trackingManagement.md "_blank")」、「[用户分群](/04-features/01-customEvent/09-cluster.md "_blank")」的使用文档
 2. 调优了文档结构
 3. 优化了基础指标的说明，以便于大家更准确地理解指标含义
 
