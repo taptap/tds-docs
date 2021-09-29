@@ -7,9 +7,39 @@ title: 网页版
 1. 新增「属性分析」功能，帮助大家分析玩家群体的属性特征
 
 **文档**更新
-1. 新增「属性分析」文档，以便于大家更好的了解和使用属性分析功能
+1. 新增「[属性分析](/04-features/01-customEvent/07-characterAnalyse.md "_blank")」文档，以便于大家更好的了解和使用属性分析功能
 
-[属性分析](/04-features/01-customEvent/07-characterAnalyse.md "_blank")
+
+
+
+「[属性分析](/04-features/01-customEvent/07-characterAnalyse.md "_blank")」
+
+「[分布分析](/04-features/01-customEvent/06-distribution.md "_blank")」
+
+
+「[事件分析](/04-features/01-customEvent/03-eventAnalyse.md "_blank")」
+
+
+「[留存分析](/04-features/01-customEvent/04-retentionAnalyse.md "_blank")」
+
+
+
+「[漏斗分析](/04-features/01-customEvent/05-funnelAnalyse.md "_blank")」
+
+「[常见问题](/06-QA/01-tran.md "_blank")」
+
+
+「[元数据管理](/04-features/01-customEvent/10-metaData.md "_blank")」
+
+「[数据模型](/04-features/01-customEvent/02-dataModel.md "_blank")」
+
+「[用户分群](/04-features/01-customEvent/09-cluster.md "_blank")」
+
+「[埋点管理？](/04-features/01-customEvent/11-trackingManagement.md "_blank")」
+
+「[可视化](/04-features/01-customEvent/12-virtual.md"_blank")」
+
+
 
 ## 2.5.0 | 2021-09-16 发布
 **自定义事件分析**更新
