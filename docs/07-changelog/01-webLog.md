@@ -23,22 +23,19 @@ title: 网页版
 「[留存分析](/04-features/01-customEvent/04-retentionAnalyse.md "_blank")」
 
 
-
 「[漏斗分析](/04-features/01-customEvent/05-funnelAnalyse.md "_blank")」
 
 「[常见问题](/06-QA/01-tran.md "_blank")」
 
-
 「[元数据管理](/04-features/01-customEvent/10-metaData.md "_blank")」
 
-「[数据模型](/04-features/01-customEvent/02-dataModel.md "_blank")」
+「[埋点设计指南](/04-features/01-customEvent/02-dataModel.md "_blank")」
 
 「[用户分群](/04-features/01-customEvent/09-cluster.md "_blank")」
 
 「[埋点管理？](/04-features/01-customEvent/11-trackingManagement.md "_blank")」
 
-「[可视化](/04-features/01-customEvent/12-virtual.md"_blank")」
-
+「[虚拟属性](/04-features/01-customEvent/12-virtual.md"_blank")」
 
 
 ## 2.5.0 | 2021-09-16 发布
