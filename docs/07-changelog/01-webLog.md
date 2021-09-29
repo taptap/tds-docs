@@ -46,7 +46,7 @@ title: 网页版
 1. 对「运营」-「付费」-「付费数据」报表的付费人数、活跃人数在跨天计算时进行了去重优化
 
 **文档**更新
-1. 新增「[虚拟属性](/04-features/01-customEvent/12-virtual.md" _blank")」，以便于大家更好的了解和使用虚拟属性功能
+1. 新增「[虚拟属性](/04-features/01-customEvent/12-virtual.md "_blank")」，以便于大家更好的了解和使用虚拟属性功能
 2. 在「[埋点管理](/04-features/01-customEvent/11-trackingManagement.md "_blank")」补充了监测开关使用说明
 
 ## 文档更新 | 2021-08-12 发布
