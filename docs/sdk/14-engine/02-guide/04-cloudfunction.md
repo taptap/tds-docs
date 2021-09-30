@@ -891,12 +891,12 @@ AV.Cloud.afterSave('_User', function (request) {
 ```python
 @engine.after_save('_User')
 def after_user_save(user):
-    print user
+    print(user)
     user.set('from', 'LeanCloud')
     try:
         user.save()
     except LeanCloudError, e:
-        print 'Error: ', e
+        print('Error: ', e)
 ```
 
 </>
@@ -1441,7 +1441,7 @@ AV.Cloud.onVerified('sms', function (request) {
 ```python
 @engine.on_verified('sms')
 def on_sms_verified(user):
-    print user
+    print(user)
 ```
 
 </>
@@ -1525,7 +1525,7 @@ AV.Cloud.onLogin(function (request) {
 ```python
 @engine.on_login
 def on_login(user):
-    print user
+    print(user)
     if user.get('username') == 'noLogin':
       # 如果抛出 LeanEngineError，则用户无法登录（收到 401 响应）
       raise LeanEngineError('Forbidden')
