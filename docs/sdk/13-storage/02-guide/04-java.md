@@ -347,7 +347,23 @@ todo.save();
 
 ```java
 LCObject todo = LCObject.createWithoutData("Todo", "582570f38ac247004f39c24b");
-todo.delete();
+todo.deleteInBackground().subscribe(new Observer<LCNull>() {
+    @Override
+    public void onSubscribe(@NonNull Disposable d) {}
+
+    @Override
+    public void onNext(LCNull response) {
+        // succeed to delete a todo.
+    }
+
+    @Override
+    public void onError(@NonNull Throwable e) {
+        System.out.println("failed to delete a todo: " + e.getMessage());
+    }
+
+    @Override
+    public void onComplete() {}
+});
 ```
 
 注意，删除对象是一个较为敏感的操作，我们建议你阅读[《ACL 权限管理开发指南》](https://leancloud.cn/docs/acl-guide.html)来了解潜在的风险。熟悉 class 级别、对象级别和字段级别的权限可以帮助你有效阻止未经授权的操作。
@@ -1370,7 +1386,23 @@ avFile.getDataStreamInBackground().subscribe(new Observer<InputStream>() {
 
 ```java
 LCObject file = LCObject.createWithoutData("_File", "552e0a27e4b0643b709e891e");
-file.delete()
+file.deleteInBackground().subscribe(new Observer<LCNull>() {
+    @Override
+    public void onSubscribe(@NonNull Disposable d) {}
+
+    @Override
+    public void onNext(LCNull response) {
+        // succeed to delete the file
+    }
+
+    @Override
+    public void onError(@NonNull Throwable e) {
+        System.out.println("failed to delete the file: " + e.getMessage());
+    }
+
+    @Override
+    public void onComplete() {}
+});
 ```
 
 默认情况下，文件的删除权限是关闭的，需要进入 **云服务控制台 > 数据存储 > 文件**，选择 **权限** > **Class 访问权限** > **`delete`** 来开启。
