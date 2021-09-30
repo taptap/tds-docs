@@ -69,7 +69,7 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
 
 #### 方法二：手动导入
 
-1. [点击下载](/tap-download) `TapSDK-UnityPackage.zip` 和 `LeanCloud-SDK-Storage-Unity.zip`，然后将该 SDK 解压。
+1. [点击下载](/tap-download) `TapSDK-UnityPackage.zip` 和 `LeanCloud-SDK-Realtime-Unity.zip`，然后将该 SDK 解压。
 
 2. 在 Unity 项目中依次转到 **Assets > Import Packages > Custom Packages**。
 
