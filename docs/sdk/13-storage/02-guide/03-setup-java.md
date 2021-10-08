@@ -199,7 +199,7 @@ $ gradle clean assemble
 
 - **Client ID**，又称 `App ID`，在 SDK 初始化时用到。提交工单联系技术支持时，提供 Client ID 可以方便我们更快定位到你的应用。
 - **Client Token**，又称 `App Key`，在 SDK 初始化时用到。
-- **Server Secret**，又称 `Master Key`，用于在自有服务器、云引擎等**受信任环境**调用管理接口 ，具备跳过一切权限验证的超级权限。所以**一定注意保密，千万不要在客户端代码中使用该凭证**。
+- **Server Secret**，又称 `Master Key`，用于在自有服务器、云引擎等**受信任环境**调用管理接口 ，具备跳过一切权限验证的超级权限。所以**一定注意保密，千万不要在客户端代码中使用该凭证**。
 
 ### Android 平台初始化
 
@@ -290,9 +290,9 @@ LCConnectionManager.getInstance().startConnection(new LCCallback() {
 LeanCloud.setLogLevel(LCLogger.Level.DEBUG);
 ```
 
-详细调试流程可以参考[Android SDK 调试指南][android-debug-guide]。
+详细调试流程可以参考[Android SDK 调试指南][android-debug-guide]。
 
-[android-debug-guide]: https://forum.leancloud.cn/t/leancloud-sdk-android-sdk/21829
+[android-debug-guide]: https://forum.leancloud.cn/t/leancloud-sdk-android-sdk/21829
 
 注意，在应用发布之前，请关闭调试日志，以免暴露敏感数据。
 

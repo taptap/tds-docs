@@ -15,7 +15,7 @@ import MultiLang from '@theme/MultiLang';
 1. 基于[内建账户系统](/sdk/authentication/features)接入 TapTap 登录；
 2. [单纯 TapTap 用户认证](/sdk/taptap-login/guide/tap-login/)。
 
-第一种方式是我们推荐的方式，一般适用于以下场景：
+第一种方式是我们推荐的方式，一般适用于以下场景：
 
 - 希望直接使用 TapSDK 提供的账户系统
 - 希望将更多第三方账号（比如 QQ、微信、Apple 等）绑定到玩家账号上

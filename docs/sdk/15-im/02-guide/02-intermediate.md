@@ -194,7 +194,7 @@ public void onMessage(LCIMAudioMessage msg, LCIMConversation conv, LCIMClient cl
 }
 ```
 ```objc
-// 示例代码演示 LCIMTypedMessage 接收时，获取该条消息提醒的 clientId 列表，同理可以用类似的代码操作 LCIMMessage  的其他子类
+// 示例代码演示 LCIMTypedMessage 接收时，获取该条消息提醒的 clientId 列表，同理可以用类似的代码操作 LCIMMessage  的其他子类
 - (void)conversation:(LCIMConversation *)conversation didReceiveTypedMessage:(LCIMTypedMessage *)message {
     // 读取消息 @ 的 clientId 列表
     NSArray *mentionList = message.mentionList;
@@ -263,7 +263,7 @@ public void onMessage(LCIMAudioMessage msg, LCIMConversation conv, LCIMClient cl
 }
 ```
 ```objc
-// 示例代码演示 LCIMTypedMessage 接收时，获取该条消息是否 @ 了当前对话里的所有成员或当前用户，同理可以用类似的代码操作 LCIMMessage  的其他子类
+// 示例代码演示 LCIMTypedMessage 接收时，获取该条消息是否 @ 了当前对话里的所有成员或当前用户，同理可以用类似的代码操作 LCIMMessage  的其他子类
 - (void)conversation:(LCIMConversation *)conversation didReceiveTypedMessage:(LCIMTypedMessage *)message {
     // 读取消息是否 @ 了对话的所有成员
     BOOL mentionAll = message.mentionAll;
