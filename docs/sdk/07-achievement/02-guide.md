@@ -118,7 +118,7 @@ TapAchievement.registerCallback(new AchievementCallback() {
       return;
     }
     if (item != null) {
-      // item 更新成功
+      // item 更新成功
     }
   }
 });
@@ -155,7 +155,7 @@ TapAchievement.registerCallback(new AchievementCallback() {
 </MultiLang>
 
 ## 初始化数据
-由于成就系统会在本地记录用户的成就数据，所以请在用户登录后初始化数据。如果用户切换账号时，务必重新调用该接口，不然数据可能会存在账号存储混乱的问题。
+由于成就系统会在本地记录用户的成就数据，所以请在用户登录后初始化数据。如果用户切换账号时，务必重新调用该接口，不然数据可能会存在账号存储混乱的问题。
 
 这个步骤是异步操作，需要确认收到成功回调时才能进行更多操作。
 
@@ -380,7 +380,7 @@ TapAchievement.makeSteps("displayID", 100);
 
 </MultiLang>
 
-## 设置冒泡开关
+## 设置冒泡开关
 默认情况下，成就达成时 SDK 会自行展示一个冒泡浮窗提示玩家已达成相应成就。需要关闭请调用如下接口：
 
 <MultiLang>

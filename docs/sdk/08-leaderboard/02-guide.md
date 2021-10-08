@@ -450,7 +450,7 @@ NSString *anotherObjectId = @"672a1279345777005a2b2444";
 var leaderboard = LCLeaderboard.CreateWithoutData("world");
 ```
 
-`LCLeaderboard.CreateWithoutData` 方法接受两个参数：
+`LCLeaderboard.CreateWithoutData` 方法接受两个参数：
 
 ```cs
 public static LCLeaderboard CreateWithoutData(string statisticName, string memberType = LCLeaderboard.USER_MEMBER_TYPE)
@@ -635,7 +635,7 @@ LCLeaderboardRanking 包含如下属性：
 
 如果排行榜是 object 排行榜或 entity 排行榜，那么相应地需要调用 `getObjectResultsWithOption` 及 `getEntityResultsWithCallback` 方法。
 `getObjectResultsWithOption` 的参数和 `getUserResultsWithOption` 相同。
-因为 entity 排行榜的成员为字符串，所以 `getEntityResultsWithCallback` 不支持 `LCLeaderboardQueryOption`，第一个参数就是回调，回调的参数和 `getUserResultsWithOption`、`getObjectResultsWithOption` 相同：
+因为 entity 排行榜的成员为字符串，所以 `getEntityResultsWithCallback` 不支持 `LCLeaderboardQueryOption`，第一个参数就是回调，回调的参数和 `getUserResultsWithOption`、`getObjectResultsWithOption` 相同：
 
 ```objc
 - (void)getEntityResultsWithCallback:(void (^)(NSArray<LCLeaderboardRanking *> * _Nullable rankings, NSInteger count, NSError * _Nullable error))callback;
@@ -947,7 +947,7 @@ LCLeaderboard.createWithMemberType(LCLeaderboard.MEMBER_TYPE_USER, "time",
 
     @Override
     public void onComplete() {}
-});            
+});            
 ```
 
 你可以指定以下参数：

@@ -634,8 +634,8 @@ leancloud.Define("customErrorCode", func(req *leancloud.FunctionRequest) (interf
 不过，对于 before 类 hook 函数，改为异步处理通常没有意义。
 虽然改为异步后能保证 before 类函数能够运行完成，不会因超时而报错。
 但是，只要 before 类 hook 函数不能及时抛出异常，就无法起到中断操作执行的作用。
-对于超时的 before 类 hook 函数，如果无法优化代码，压缩执行时间的话，那只能改为 after 类函数。
-例如，假设某个 beforeSave 函数需要调用耗时较久的第三方的自然语言处理接口判断用户提交的评论是否来自真实用户，导致超时，
+对于超时的 before 类 hook 函数，如果无法优化代码，压缩执行时间的话，那只能改为 after 类函数。
+例如，假设某个 beforeSave 函数需要调用耗时较久的第三方的自然语言处理接口判断用户提交的评论是否来自真实用户，导致超时，
 那么可以改为 afterSave 函数，在保存评论后再调用第三方接口，如果判断是水军评论，那么再行删除。
 
 ## Hook 函数

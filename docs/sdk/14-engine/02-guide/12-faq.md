@@ -258,12 +258,12 @@ Java：
 LeanEngine.setHttpsRedirectEnabled(true);
 ```
 
-Go SDK 暂未提供跳转至 HTTPS 的中间件。
+Go SDK 暂未提供跳转至 HTTPS 的中间件。
 
 .NET：
 
 ```cs
-app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 ```
 
 ### 如何判断请求是通过 HTTPS 还是 HTTP 访问的？
