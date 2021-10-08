@@ -355,7 +355,7 @@ TapAchievement.reach("displayID");
 
 </MultiLang>
 
-## 多步长成就增长步数
+## 分步成就增长步数
 成就增长步数提供两种方式调用，`growSteps` 中传递当前增量达成的步数（例如：多走了 5 步，则传递 5 即可），`makeSteps` 中传递当前成就已达成的步数，(例如：当前已经走了 100 步，则传递 100)，调用 `growSteps` 时 SDK 内部会计算当前全量步数。
 
 <MultiLang>
