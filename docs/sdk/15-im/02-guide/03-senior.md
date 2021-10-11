@@ -1,6 +1,6 @@
 ---
 id: senior
-title: 三，安全与签名、黑名单和权限管理、玩转聊天室和临时对话 
+title: 三，安全与签名、黑名单和权限管理、玩转聊天室和临时对话
 sidebar_label: 权限与聊天室
 ---
 
@@ -1637,4 +1637,4 @@ try {
 
 ## 进一步阅读
 
-即时通讯开发指南第四篇[详解消息 hook 与系统对话](/sdk/im/guide/systemconv/)
+- 《即时通讯开发指南》第四篇[详解消息 hook 与系统对话](/sdk/im/guide/systemconv/)

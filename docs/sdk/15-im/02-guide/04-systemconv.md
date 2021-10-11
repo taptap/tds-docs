@@ -1,6 +1,6 @@
 ---
 id: systemconv
-title: 四，详解消息 hook 与系统对话 
+title: 四，详解消息 hook 与系统对话
 sidebar_label: Hook 与系统对话
 ---
 
@@ -1373,10 +1373,7 @@ public static void OnClientOffline(Dictionary<string, object> parameters) {
 
 ## 即时通讯开发指南一览
 
-《服务总览》
-
-《一，从简单的单聊、群聊、收发图文消息开始》
-
-《二，消息收发的更多方式，离线推送与消息同步，多设备登录》
-
-《三，安全与签名、黑名单和权限管理、玩转直播聊天室和临时对话》
+- [服务总览](/sdk/im/guide/overview/)
+- 《即时通讯开发指南》第一篇[从简单的单聊、群聊、收发图文消息开始](/sdk/im/guide/beginner/)
+- 《即时通讯开发指南》第二篇[消息收发的更多方式，离线推送与消息同步，多设备登录](/sdk/im/guide/intermediate/)
+- 《即时通讯开发指南》第三篇[安全与签名、黑名单和权限管理、玩转聊天室和临时对话](/sdk/im/guide/senior/)
