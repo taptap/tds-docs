@@ -1,6 +1,6 @@
 ---
 id: intermediate
-title: 二，消息收发的更多方式，离线推送与消息同步，多设备登录 
+title: 二，消息收发的更多方式，离线推送与消息同步，多设备登录
 sidebar_label: 离线消息
 ---
 
@@ -1945,5 +1945,5 @@ TypedMessage.register(() => CustomMessage());
 
 ## 进一步阅读
 
-- [即时通讯开发指南第三篇](/sdk/im/guide/senior/)《安全与签名、黑名单和权限管理、玩转直播聊天室和临时对话》。
-- [即时通讯开发指南第四篇](/sdk/im/guide/systemconv/)[详解消息 hook 与系统对话](/sdk/im/guide/systemconv/)。
+- 《即时通讯开发指南》第三篇[安全与签名、黑名单和权限管理、玩转聊天室和临时对话](/sdk/im/guide/senior/)
+- 《即时通讯开发指南》第四篇[详解消息 hook 与系统对话](/sdk/im/guide/systemconv/)
