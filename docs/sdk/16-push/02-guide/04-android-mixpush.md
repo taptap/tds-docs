@@ -63,10 +63,10 @@ vendor | 厂商
 
 ### 环境配置
 
-1. **注册华为账号**：在 [华为开发者联盟](http://developer.huawei.com/cn/consumer/) 注册华为开发者账号。
+1. **注册华为账号**：在 [华为开发者联盟](https://developer.huawei.com/consumer/cn/) 注册华为开发者账号。
 2. **开发前准备**：接入华为 PUSH 之前，需要创建应用并配置应用签名，具体可参考华为官方文档：[开发准备](https://developer.huawei.com/consumer/cn/doc/development/HMSCore-Guides/android-config-agc-0000001050170137)。
 3. **打开推送服务开关**：登录华为开发者联盟，按照开发准备一文中的提示开通推送服务。
-4. **将华为 App 信息保存到 LeanCloud 控制台**：将上面创建的华为 App 信息（主要有 AppId 和 AppSecret），通过  **云服务控制台 > 推送 > 设置 > 混合推送** 与应用关联。
+4. **将华为 App 信息保存到 LeanCloud 控制台**：将上面创建的华为 App 信息（主要有 AppId 和 AppSecret），通过 **云服务控制台 > 推送 > 设置 > 混合推送** 与应用关联。
 
 ### 接入 SDK
 
@@ -259,16 +259,18 @@ curl -X POST \
 云端最终发送给 HMS Server 的请求中 payload 字段为（其中 `{"k1" : "v1","k2" : "v2"}` 这个 JSON 串经过了 URLEncode 处理）：
 
 ```json
-{"hps":
-  {"msg":
-    {"type":3,
-     "body": {
-       "title": "显示在通知栏的标题",
-       "content": "消息内容"},
-     "action" {
-       "type": 1,
-       "param": {
-         "intent": "intent://cn.leancloud.push/notify_detail?S.content=%7B%22k1%22%3A%22v1%22%2C%22k2%22%3A%22v2%22%7D#Intent;scheme=lcpushscheme;launchFlags=0x10000000;end"
+{
+  "hps": {
+    "msg": {
+      "type": 3,
+      "body": {
+        "title": "显示在通知栏的标题",
+        "content": "消息内容"
+      },
+      "action": {
+        "type": 1,
+        "param": {
+          "intent": "intent://cn.leancloud.push/notify_detail?S.content=%7B%22k1%22%3A%22v1%22%2C%22k2%22%3A%22v2%22%7D#Intent;scheme=lcpushscheme;launchFlags=0x10000000;end"
         }
       }
     }
@@ -334,7 +336,7 @@ public class MyHuaweiReceiver extends LCHMSMessageService {
 
 请参考[华为的开发者文档][huawei-classification]了解服务与通讯、资讯营销两个分类的具体差异。
 
-[huawei-classification]: https://developer.huawei.com/consumer/cn/doc/development/HMSCore-Guides/message-classification-0000001102439210
+[huawei-classification]: https://developer.huawei.com/consumer/cn/doc/development/HMSCore-Guides/message-classification-management-solution-0000001149358835
 ### 参考 demo
 
 我们提供了一个 [最新的华为推送 demo](https://github.com/leancloud/mixpush-demos/tree/master/huawei)，可供你在接入过程中参考。
@@ -343,11 +345,11 @@ public class MyHuaweiReceiver extends LCHMSMessageService {
 
 ### 环境配置
 
-1. **注册小米账号**：在 [小米开放平台][xiaomi] 上注册小米开发者账号并完成实名认证（[详细流程](http://dev.xiaomi.com/doc/?p=90)）。
-2. **创建小米推送服务应用**（[详细流程](http://dev.xiaomi.com/doc/?p=1621)）。
+1. **注册小米账号**：在 [小米开放平台][xiaomi] 上注册小米开发者账号并完成实名认证（[详细流程](https://dev.mi.com/console/doc/detail?pId=848)）。
+2. **创建小米推送服务应用**（[详细流程](https://dev.mi.com/console/doc/detail?pId=68)）。
 3. **设置小米的 AppId 及 AppSecret**：在 [小米开放平台][xiaomi] > **管理控制台** > **消息推送** > **相关应用** 可以查到具体的小米推送服务应用的 AppId 及 AppSecret。将此 AppId 及 AppSecret 通过 **云服务控制台 > 推送 > 设置 > 混合推送** 与云服务应用关联。
 
-[xiaomi]: http://dev.xiaomi.com/index
+[xiaomi]: https://dev.mi.com/console/
 
 ### 接入 SDK
 
@@ -475,8 +477,8 @@ LCMixPushManager.registerXiaomiPush(context, miAppId, miAppKey, profile, true);
 
 ### 环境配置
 
-1. **注册魅族账号**：在 [Flyme开放平台](https://open.flyme.cn) 上注册魅族开发者账号并完成开发者认证 ([详细流程](http://open-wiki.flyme.cn/index.php?title=%E6%96%B0%E6%89%8B%E6%8C%87%E5%8D%97))。
-2. **创建魅族推送服务应用** ([详细流程](http://open-wiki.flyme.cn/index.php?title=%E9%AD%85%E6%97%8F%E6%8E%A8%E9%80%81%E5%B9%B3%E5%8F%B0%E4%BD%BF%E7%94%A8%E6%89%8B%E5%86%8C))。
+1. **注册魅族账号**：在 [Flyme开放平台](https://open.flyme.cn) 上注册魅族开发者账号并完成开发者认证 ([详细流程](http://open-wiki.flyme.cn/doc-wiki/index#id?8))。
+2. **创建魅族推送服务应用** ([详细流程](http://open.res.flyme.cn/fileserver/upload/file/202102/d2e53035310b407cb3f21f1b0433202d.pdf))。
 3. **设置魅族的 AppId 及 AppSecret**：在 [魅族推送平台](http://push.meizu.com/) > **应用列表** > **打开应用** > **配置管理** 可以查到具体的魅族推送服务应用的 AppId 及 AppSecret。将此 AppId 及 AppSecret 通过 **云服务控制台 > 推送 > 设置 > 混合推送**，与云服务应用关联。
 
 ### 接入 SDK
@@ -562,7 +564,7 @@ vivo 混合推送 demo：可参照 [这里](https://github.com/leancloud/mixpush
 
 ### 接入 SDK
 
-当前版本的 SDK 是基于 vivo 官方文档 [push SDK 接入文档](https://dev.vivo.com.cn/documentCenter/doc/158) 封装而来，使用的 vivo push SDK 基线版本是 `2.9.0.0`。我们会结合 demo（[源码](https://github.com/leancloud/mixpush-demos/tree/master/vivo/)）来解释整个接入流程。
+当前版本的 SDK 是基于 vivo 官方文档 [push SDK 接入文档](https://dev.vivo.com.cn/documentCenter/doc/365) 封装而来，使用的 vivo push SDK 基线版本是 `2.9.0.0`。我们会结合 demo（[源码](https://github.com/leancloud/mixpush-demos/tree/master/vivo/)）来解释整个接入流程。
 
 首先将 demo 工程 `app/libs` 目录下的所有 jar 包（如有）拷贝到目标工程的 libs 目录下，然后修改 `build.gradle` 文件，在 `dependencies` 中添加依赖：
 
@@ -731,7 +733,7 @@ public class MyPushMessageReceiver extends LCVIVOPushMessageReceiver {
 混合推送 Oppo 模块基于 oppo Push SDK v2.1.0 版本，支持 Android 4.4 或以上版本的手机系统，服务支持信息如下：
 
 - 支持平台：ColorOS 3.1 及以上的系统的 OPPO 机型，一加 5/5t 及以上机型，realme 所有机型。
-- 通知消息类型：只支持通知栏消息的推送。消息下发到 OS 系统模块并由系统通知模块展示，在用户点击通知前，不启动应用。具体限制可参考 [oppo 官方文档](https://open.oppomobile.com/wiki/doc#id=10704)。
+- 通知消息类型：只支持通知栏消息的推送。消息下发到 OS 系统模块并由系统通知模块展示，在用户点击通知前，不启动应用。具体限制可参考 [oppo 官方文档](https://open.oppomobile.com/wiki/doc#id=10611)。
 
 在接入时，开发者可以参考我们的 [demo](https://github.com/leancloud/mixpush-demos/tree/master/oppo)。
 
@@ -839,7 +841,7 @@ public class MyApp extends Application {
 }
 ```
 
-开发者也可以在 `onCreate` 方法中调用 LCMixPushManager 的其他方法，以使用 oppo 推送的全部客户端功能，具体可以参看 LCMixPushManager 的接口文档，或参考[官方文档-详细 API 说明](https://open.oppomobile.com/wiki/doc#id=10704) 来了解具体信息。
+开发者也可以在 `onCreate` 方法中调用 LCMixPushManager 的其他方法，以使用 oppo 推送的全部客户端功能，具体可以参看 LCMixPushManager 的接口文档，或参考[官方文档-详细 API 说明](https://open.oppomobile.com/wiki/doc#id=11050) 来了解具体信息。
 
 
 #### 添加 oppo 推送配置
@@ -976,7 +978,7 @@ dependencies {
       android:resource="@color/colorAccent" />
     ```
 
-- （可选）从 Android 8.0（API 级别 26）和更高版本开始，Android 系统支持并推荐使用[通知渠道](https://developer.android.com/guide/topics/ui/notifiers/notifications.html?hl=zh-cn#ManageChannels)。FCM 提供具有基本设置的默认通知渠道。如果您希望[创建](https://developer.android.com/guide/topics/ui/notifiers/notifications.html?hl=zh-cn#CreateChannel)和使用您自己的默认渠道，请将 `default_notification_channel_id` 设为您的通知渠道对象的 ID（如下所示）；如果传入的消息未明确设置通知渠道，FCM 就会使用此值。
+- （可选）从 Android 8.0（API 级别 26）和更高版本开始，Android 系统支持并推荐使用[通知渠道](https://developer.android.com/guide/topics/ui/notifiers/notifications.html?hl=zh-cn#ManageChannels)。FCM 提供具有基本设置的默认通知渠道。如果您希望[创建](https://developer.android.com/training/notify-user/channels?hl=zh-cn)和使用您自己的默认渠道，请将 `default_notification_channel_id` 设为您的通知渠道对象的 ID（如下所示）；如果传入的消息未明确设置通知渠道，FCM 就会使用此值。
 
     ```xml
     <meta-data
