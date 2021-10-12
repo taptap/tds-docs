@@ -14,46 +14,71 @@ import MultiLang from '@theme/MultiLang';
 
 单纯接入「TapTap 登录」，需要依赖 `TapLogin` 和 `TapCommon` 模块。请先 [下载](/tap-download) SDK，并添加相关依赖。
 
-初始化示例如下：
+:::note
+游戏 [**适用地区**](/sdk/start/get-ready/#适用地区) 在开启应用配置时选定。
+初始化时需要区分适用于中国大陆还是其他国家或地区。
+:::
 
 <MultiLang>
 <>
 
 ```cs
+// 适用于中国大陆
 TapLogin.Init(string clientID);
+
+// 适用于其他国家或地区
+TapLogin.Init(string clientID, bool isCn, bool roundCorner);
 ```
 
 **参数说明**
 
 参数  | 描述
 | ------ | ------ |
-clientID | TapTap 开发者中心对应应用的 Client ID。
+clientID | TapTap 开发者中心对应应用的 Client ID
+isCn | 中国大陆为 true，其他国家或地区为 false
+roundCorner | 网页登录时边框是否使用圆角，使用圆⻆边框为 true，使用直⻆边框为 false
 
 </>
 <>
 
 ```java
+// 适用于中国大陆
 TapLoginHelper.init(Context context, String clientID);
+
+// 适用于其他国家或地区
+LoginSdkConfig config = new LoginSdkConfig();
+config.regionType = RegionType.IO;
+TapLoginHelper.init(Context context, String clientID, config);
 ```
 
 **参数说明**
 
 参数  | 描述
 | ------ | ------ |
-context | 上下文，一般是当前 Application。
-clientID | TapTap 开发者中心对应应用的 Client ID。
+context | 上下文，一般是当前 Application
+clientID | TapTap 开发者中心对应应用的 Client ID
 
 </>
 <>
 
 ```objectivec
-[TapLoginHelper initWithClientID:@"your clientId"];
+// 适用于中国大陆
+[TapLoginHelper initWithClientID:clientID];
+
+// 适用于其他国家或地区
+TTSDKConfig *config = [[TTSDKConfig alloc] init];
+config.regionType = RegionTypeIO;
+config.roundCorner = YES;
+[TapLoginHelper initWithClientID:clientID config:config];
 ```
+
 **参数说明**
 
 参数  | 描述
 | ------ | ------ |
-clientId | TapTap 开发者中心对应应用的 Client ID
+clientID | TapTap 开发者中心对应应用的 Client ID
+regionType | 适用地区。适用于中国大陆为`RegionTypeCN`，适用于其他国家或地区为`RegionTypeIO` 
+roundCorner | 是否为圆角
 
 </>
 
