@@ -733,7 +733,7 @@ public class MyPushMessageReceiver extends LCVIVOPushMessageReceiver {
 混合推送 Oppo 模块基于 oppo Push SDK v2.1.0 版本，支持 Android 4.4 或以上版本的手机系统，服务支持信息如下：
 
 - 支持平台：ColorOS 3.1 及以上的系统的 OPPO 机型，一加 5/5t 及以上机型，realme 所有机型。
-- 通知消息类型：只支持通知栏消息的推送。消息下发到 OS 系统模块并由系统通知模块展示，在用户点击通知前，不启动应用。具体限制可参考 [oppo 官方文档](https://open.oppomobile.com/wiki/doc#id=10611)。
+- 通知消息类型：只支持通知栏消息的推送。消息下发到 OS 系统模块并由系统通知模块展示，在用户点击通知前，不启动应用。具体限制可参考 [oppo 官方文档](https://open.oppomobile.com/wiki/doc#id=10743)。
 
 在接入时，开发者可以参考我们的 [demo](https://github.com/leancloud/mixpush-demos/tree/master/oppo)。
 
@@ -841,7 +841,7 @@ public class MyApp extends Application {
 }
 ```
 
-开发者也可以在 `onCreate` 方法中调用 LCMixPushManager 的其他方法，以使用 oppo 推送的全部客户端功能，具体可以参看 LCMixPushManager 的接口文档，或参考[官方文档-详细 API 说明](https://open.oppomobile.com/wiki/doc#id=11050) 来了解具体信息。
+开发者也可以在 `onCreate` 方法中调用 LCMixPushManager 的其他方法，以使用 oppo 推送的全部客户端功能，具体可以参看 LCMixPushManager 的接口文档，或参考[官方文档-详细 API 说明](https://open.oppomobile.com/wiki/doc#id=10688) 来了解具体信息。
 
 
 #### 添加 oppo 推送配置
