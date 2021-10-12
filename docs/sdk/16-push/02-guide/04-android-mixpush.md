@@ -230,7 +230,7 @@ dependencies {
 这可以通过在 intent-filter 中配置不一样的 `android:host` 解决。
 在云服务控制台，增加华为 HMS 推送配置的时候，开发者可以指定自己的 Android Intent Hostname（不指定就使用默认值 `cn.leancloud.push`），然后在这里的 intent-filter 中填上***同样***的值，客户端就可以区分不同应用的通知栏消息了。
 
-在 HMS 推送中，只能通过自定义 `intent` 参数来指定响应 activity 的（具体可参考华为文档[服务端发送 push 消息](https://developer.huawei.com/consumer/cn/service/hms/catalog/huaweipush_agent.html?page=hmssdk_huaweipush_api_reference_agent_s2)）。
+在 HMS 推送中，只能通过自定义 `intent` 参数来指定响应 activity 的（具体可参考华为文档[服务端发送 push 消息](https://developer.huawei.com/consumer/cn/doc/development/HMSCore-Guides/android-server-dev-0000001050040110)）。
 云端在调用 HMS 推送接口的时候，会把开发者自定义的属性，使用固定的 intentUri pattern 来封装成 `intent` 数据，其中 `intentUri` 的固定格式为：
 
 ```
@@ -477,8 +477,8 @@ LCMixPushManager.registerXiaomiPush(context, miAppId, miAppKey, profile, true);
 
 ### 环境配置
 
-1. **注册魅族账号**：在 [Flyme开放平台](https://open.flyme.cn) 上注册魅族开发者账号并完成开发者认证 ([详细流程](http://open-wiki.flyme.cn/doc-wiki/index#id?8))。
-2. **创建魅族推送服务应用** ([详细流程](http://open.res.flyme.cn/fileserver/upload/file/202102/d2e53035310b407cb3f21f1b0433202d.pdf))。
+1. **注册魅族账号**：在 [Flyme开放平台](https://open.flyme.cn) 上注册魅族开发者账号并完成开发者认证（[详细流程](http://open-wiki.flyme.cn/doc-wiki/index#id?8)）。
+2. **创建魅族推送服务应用**（[详细流程](http://open.res.flyme.cn/fileserver/upload/file/202102/d2e53035310b407cb3f21f1b0433202d.pdf)）。
 3. **设置魅族的 AppId 及 AppSecret**：在 [魅族推送平台](http://push.meizu.com/) > **应用列表** > **打开应用** > **配置管理** 可以查到具体的魅族推送服务应用的 AppId 及 AppSecret。将此 AppId 及 AppSecret 通过 **云服务控制台 > 推送 > 设置 > 混合推送**，与云服务应用关联。
 
 ### 接入 SDK
