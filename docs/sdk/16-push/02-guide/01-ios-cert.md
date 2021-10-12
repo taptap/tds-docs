@@ -101,7 +101,7 @@ sidebar_label: iOS 推送设置
 
 ### 上传 Token Authentication Key
 
-1. 在 **云服务控制台 > 推送 > 设置 > iOS 推送 Token Authentication** 点击 **新增 Token Authentication** 按钮。
+1. 在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置 > iOS 推送 Token Authentication** 点击 **新增 Token Authentication** 按钮。
 
 2. 后弹出对话框：
 
@@ -112,7 +112,7 @@ sidebar_label: iOS 推送设置
 
    点击 **创建** 之后就完成了上传 Token Authentication Key 的工作。
 
-4. 可以通过 **云服务控制台 > 推送 > 在线发送** 测试推送功能。
+4. 可以通过 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 在线发送** 测试推送功能。
 
 注意，Token Authentication 鉴权方式和老的证书鉴权方式是互斥的，一旦配置了 Token Authentication 则应用下所有推送均会使用 Token Authentication 方式进行，所以请确保为所有需要发推送的 App 都添加了 Token Authentication 配置。
 
@@ -196,7 +196,7 @@ sidebar_label: iOS 推送设置
 ### 上传证书
 
 
-1. 在 **云服务控制台 > 推送 > 设置 > iOS 推送证书 > 生产环境** 上传「Universal 推送证书」。
+1. 在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置 > iOS 推送证书 > 生产环境** 上传「Universal 推送证书」。
   
     **根据你的证书类别进行上传。这里请注意区分证书的类别，测试环境证书和生产环境证书请勿混淆。**
 
@@ -204,7 +204,7 @@ sidebar_label: iOS 推送设置
 
   上传测试证书后，那么就可以在控制台看到生产证书和测试证书都上传完成：
 
-3. 可以通过 **云服务控制台 > 推送 > 在线发送** 测试推送功能。
+3. 可以通过 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 在线发送** 测试推送功能。
  
 ### 上传证书失败
 

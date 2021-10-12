@@ -17,7 +17,7 @@ sidebar_label: Android 混合推送
 
 整个流程与苹果的 APNs 推送类似，SDK 在客户端基本不会得到调用，消息的下发和展示都依赖厂商客户端的行为。所以如果部分厂商在某些推送中夹带了其他非开发者提交的消息，或者在服务启用的时候，有额外营销性质的弹窗，这都是厂商自己的行为，与我们完全无关，还请大家了解。另外，如果开发者碰到厂商 SDK 的问题，我们也无法深入调查，还请大家自行到厂商的论坛或技术支持渠道咨询解决。
 
-Android 混合推送功能仅对商用版应用开放，如果希望使用该功能，请进入 **云服务控制台 > 推送 > 设置 > 混合推送**，打开混合推送的开关。
+Android 混合推送功能仅对商用版应用开放，如果希望使用该功能，请进入 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置 > 混合推送**，打开混合推送的开关。
 
 注意，混合推送可以随时按需开关。当该选项关闭后，下一次 Android 推送会与普通推送一样自动选择自有通道送达客户端，除了会再次遇到上面提到的自有通道在部分 ROM 上会受到限制的问题之外，不会有别的影响。而当该选项再次开启后，Android 推送又会去选择厂商推送渠道。
 
@@ -66,7 +66,7 @@ vendor | 厂商
 1. **注册华为账号**：在 [华为开发者联盟](https://developer.huawei.com/consumer/cn/) 注册华为开发者账号。
 2. **开发前准备**：接入华为 PUSH 之前，需要创建应用并配置应用签名，具体可参考华为官方文档：[开发准备](https://developer.huawei.com/consumer/cn/doc/development/HMSCore-Guides/android-config-agc-0000001050170137)。
 3. **打开推送服务开关**：登录华为开发者联盟，按照开发准备一文中的提示开通推送服务。
-4. **将华为 App 信息保存到 LeanCloud 控制台**：将上面创建的华为 App 信息（主要有 AppId 和 AppSecret），通过 **云服务控制台 > 推送 > 设置 > 混合推送** 与应用关联。
+4. **将华为 App 信息保存到 LeanCloud 控制台**：将上面创建的华为 App 信息（主要有 AppId 和 AppSecret），通过 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置 > 混合推送** 与应用关联。
 
 ### 接入 SDK
 
@@ -347,7 +347,7 @@ public class MyHuaweiReceiver extends LCHMSMessageService {
 
 1. **注册小米账号**：在 [小米开放平台][xiaomi] 上注册小米开发者账号并完成实名认证（[详细流程](https://dev.mi.com/console/doc/detail?pId=848)）。
 2. **创建小米推送服务应用**（[详细流程](https://dev.mi.com/console/doc/detail?pId=68)）。
-3. **设置小米的 AppId 及 AppSecret**：在 [小米开放平台][xiaomi] > **管理控制台** > **消息推送** > **相关应用** 可以查到具体的小米推送服务应用的 AppId 及 AppSecret。将此 AppId 及 AppSecret 通过 **云服务控制台 > 推送 > 设置 > 混合推送** 与云服务应用关联。
+3. **设置小米的 AppId 及 AppSecret**：在 [小米开放平台][xiaomi] > **管理控制台** > **消息推送** > **相关应用** 可以查到具体的小米推送服务应用的 AppId 及 AppSecret。将此 AppId 及 AppSecret 通过 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置 > 混合推送** 与云服务应用关联。
 
 [xiaomi]: https://dev.mi.com/console/
 
@@ -479,7 +479,7 @@ LCMixPushManager.registerXiaomiPush(context, miAppId, miAppKey, profile, true);
 
 1. **注册魅族账号**：在 [Flyme开放平台](https://open.flyme.cn) 上注册魅族开发者账号并完成开发者认证（[详细流程](http://open-wiki.flyme.cn/doc-wiki/index#id?8)）。
 2. **创建魅族推送服务应用**（[详细流程](http://open.res.flyme.cn/fileserver/upload/file/202102/d2e53035310b407cb3f21f1b0433202d.pdf)）。
-3. **设置魅族的 AppId 及 AppSecret**：在 [魅族推送平台](http://push.meizu.com/) > **应用列表** > **打开应用** > **配置管理** 可以查到具体的魅族推送服务应用的 AppId 及 AppSecret。将此 AppId 及 AppSecret 通过 **云服务控制台 > 推送 > 设置 > 混合推送**，与云服务应用关联。
+3. **设置魅族的 AppId 及 AppSecret**：在 [魅族推送平台](http://push.meizu.com/) > **应用列表** > **打开应用** > **配置管理** 可以查到具体的魅族推送服务应用的 AppId 及 AppSecret。将此 AppId 及 AppSecret 通过 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置 > 混合推送**，与云服务应用关联。
 
 ### 接入 SDK
 
@@ -689,7 +689,7 @@ public class LCMixPushManager {
 
 #### 添加 vivo 推送配置
 
-在**云服务控制台 > 推送 > 设置** 页面开启混合推送服务，并且在「vivo 推送配置」一节设置好准备阶段申请好的 `vivo appId`、`vivo appKey`、`vivo Secret`，就可以了。
+在**开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置** 页面开启混合推送服务，并且在「vivo 推送配置」一节设置好准备阶段申请好的 `vivo appId`、`vivo appKey`、`vivo Secret`，就可以了。
 
 
 
@@ -846,7 +846,7 @@ public class MyApp extends Application {
 
 #### 添加 oppo 推送配置
 
-在**云服务控制台 > 推送 > 设置**页面开启混合推送服务，并且在「oppo 推送配置」一节设置好准备阶段申请好的「oppo app key」和「oppo master secret」，就可以了。
+在**开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置**页面开启混合推送服务，并且在「oppo 推送配置」一节设置好准备阶段申请好的「oppo app key」和「oppo master secret」，就可以了。
 
 #### 响应通知栏消息的点击事件
 
@@ -994,7 +994,7 @@ dependencies {
 
 ### 配置控制台（设置 FCM 的 ProjectId 及 私钥文件）
 
-在 [Firebase 控制台](https://console.firebase.google.com/) > **项目设置** > **服务账号** > **Firebase Admin SDK** > **生成新的秘钥** 可以获得服务端发送推送请求的私钥文件。将此 文件 及 ProjectId 通过 **云服务控制台 > 推送 > 设置 > 混合推送**，与云服务应用关联。
+在 [Firebase 控制台](https://console.firebase.google.com/) > **项目设置** > **服务账号** > **Firebase Admin SDK** > **生成新的秘钥** 可以获得服务端发送推送请求的私钥文件。将此 文件 及 ProjectId 通过 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置 > 混合推送**，与云服务应用关联。
 
 ## 取消混合推送注册
 

@@ -88,11 +88,9 @@ SDK 提供默认的 Installation 对象，用来保存推送所需的 token 以�
 LCInstallation lcInstallation = await LCInstallation.GetCurrent();
 ```
 
-可以在 **云服务控制台 > 数据存储 > 结构话数据 > `_Installation`** 查看所有保存成功的 Installation 对象的数据。
-
 ## 推送消息
 
-**云服务控制台 > 推送 > 设置** 中默认选中了 **禁止从客户端进行消息推送**，避免客户端可以不经限制地给应用内任意目标设备推送消息。
+**开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置** 中默认选中了 **禁止从客户端进行消息推送**，避免客户端可以不经限制地给应用内任意目标设备推送消息。
 我们建议开发者都勾选此项，通过 REST API 或云服务控制台发送推送消息。
 
 如果有从客户端发推送的需求，需要先取消勾选此项。
@@ -160,7 +158,7 @@ Dictionary<string, object> launchData = await LCPushBridge.Instance.GetLaunchDat
 
 初始化 SDK 后，在 iOS/Android 真机运行项目，`_Installation` 表会生成一条设备信息的数据。
 
-在**云服务控制台 > 推送 > 在线发送**可以自定义推送条件发送一条推送，测试当前设备能否正常收到推送。
+在**开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 在线发送**可以自定义推送条件发送一条推送，测试当前设备能否正常收到推送。
 这里可以根据 Installation 的 objectId 推送，iOS 设备也可以根据 deviceToken 推送，Android 设备可以根据 registrationId 推送。
 
 ## 其他

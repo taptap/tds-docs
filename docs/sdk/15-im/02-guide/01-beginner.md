@@ -318,7 +318,7 @@ try {
 
 </MultiLang>
 
-`createConversation` 这个接口会直接创建一个对话，并且该对话会被存储在 `_Conversation` 表内，可以打开 **云服务控制台 > 存储 > 结构化数据** 查看数据。不同 SDK 提供的创建对话接口如下：
+`createConversation` 这个接口会直接创建一个对话，并且该对话会被存储在 `_Conversation` 表内，可以打开 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 结构化数据** 查看数据。不同 SDK 提供的创建对话接口如下：
 
 <MultiLang>
 

@@ -87,7 +87,7 @@ $ pod install --repo-update
 
 ### 应用凭证
 
-在 **开发者中心 > 你的游戏 > 游戏服务 > 基本信息** 可以查看应用凭证：
+在 **开发者中心 > 你的游戏 > 游戏服务 > 应用配置** 可以查看应用凭证：
 
 - **Client ID**，又称 `App ID`，在 SDK 初始化时用到。提交工单联系技术支持时，提供 `Client ID` 可以方便我们更快定位到你的应用。
 - **Client Token**，又称 `App Key`，在 SDK 初始化时用到。
@@ -154,7 +154,7 @@ LCObject *testObject = [LCObject objectWithClassName:@"TestObject"];
 
 然后，点击 `Run` 运行调试，真机和虚拟机均可。
 
-然后打开 **云服务控制台 > 数据存储 > 结构化数据 > `TestObject`**，如果看到数据表中出现一行「words」列的值为「Hello world!」的数据，说明 SDK 已经正确地执行了上述代码，配置完毕。
+然后打开 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 结构化数据 > `TestObject`**，如果看到数据表中出现一行「words」列的值为「Hello world!」的数据，说明 SDK 已经正确地执行了上述代码，配置完毕。
 
 如果控制台没有发现对应的数据，请参考 [问题排查](#问题排查)。
 
