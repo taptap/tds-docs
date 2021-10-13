@@ -10,11 +10,11 @@ import MultiLang from '@theme/MultiLang';
 
 ## TapSDK 3.x 版本的导入
 
-去除 2.x 方式导入的 SDK 相关包和文件，引入 3.x SDK，详情请参考[项目配置](/sdk/start/quickstart/#项目配置)：
+去除 2.x 方式导入的 SDK 相关包和文件，引入 3.x SDK，详情请参考[项目配置](/sdk/start/quickstart/#项目配置)。
 
 ## 初始化
 
-TapSDK 3.x 的初始化方法较 TapSDK 2.x 只多了一个参数的设置，即 ServerUrl，具体初始化方式请参考[初始化参数](/sdk/start/quickstart/#初始化)
+TapSDK 3.x 的初始化方法较 TapSDK 2.x 只多了一个参数的设置，即 ServerUrl，具体初始化方式请参考[初始化参数](/sdk/start/quickstart/#初始化)。
 
 
 ## TapTap 登录并获取登录结果

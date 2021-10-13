@@ -17,7 +17,7 @@ Mac Token 算法细节见文档中的 [MAC Token 算法](#mac-token-算法) 部�
 
 ## 流程
 
-1. 移动端用 SDK 的 TapTap 登录，可以通过 `GetAccessToken` 获取 AccessToken，里面包含
+1. 移动端用 SDK 的 TapTap 登录，可以 [获取 AccessToken](/sdk/taptap-login/guide/tap-login/#检查登录状态和用户信息)，里面包含：
 
     ```java
     public String kid;
