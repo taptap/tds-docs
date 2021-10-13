@@ -175,6 +175,75 @@ if ([TapLoginHelper currentProfile]) {
 
 参见[TapTap OAuth 接口文档](/sdk/taptap-login/guide/taptap-oauth/)。
 
+## 检查登录状态和用户信息
+
+登录状态和用户信息存在本地缓存中，重新登录将会重置，登出将会清除。
+
+<MultiLang>
+
+```cs
+// 获取登录状态
+await TapLogin.GetAccessToken();
+
+// 获取用户信息
+await TapLogin.GetProfile();
+
+// 获取实时更新的用户信息
+await TapLogin.FetchProfile();
+```
+
+```java
+// 获取登录状态
+TapLoginHelper.getCurrentAccessToken();
+
+// 获取用户信息
+TapLoginHelper.getCurrentProfile();
+
+// 获取实时更新的用户信息
+TapLoginHelper.fetchProfileForCurrentAccessToken(new ApiCallback<Profile>() {
+  @Override
+  public void onSuccess(Profile data) {
+
+  }
+
+  @Override
+  public void onError(Throwable error) {
+    
+  }
+});
+```
+
+```objectivec
+// 获取登录状态
+[TapLoginHelper currentAccessToken];
+
+// 获取用户信息
+[TapLoginHelper currentProfile];
+
+// 获取实时更新的用户信息
+[TapLoginHelper fetchProfileForCurrentAccessToken:^(TTSDKProfile *_Nonnull profile, NSError *_Nonnull error) {}];
+```
+
+</MultiLang>
+
+## 登出
+
+<MultiLang>
+
+```cs
+await TapLogin.Logout();
+```
+
+```java
+TapLoginHelper.logout();
+```
+
+```objectivec
+[TapLoginHelper logout];
+```
+
+</MultiLang>
+
 :::note
 重要提示：在**测试登录功能前**务必完成 [配置签名证书](/sdk/start/quickstart/#配置签名证书) 和 [添加测试用户](/sdk/start/test-accounts/)，否则无法正常使用 TapTap 登录功能。
 :::
