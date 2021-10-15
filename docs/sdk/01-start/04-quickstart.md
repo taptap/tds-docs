@@ -58,9 +58,9 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
 
 ```json
 "dependencies":{
-    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#3.2.0",
-    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#3.2.0",
-    "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#3.2.0",
+    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#3.3.0",
+    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#3.3.0",
+    "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#3.3.0",
     "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-0.9.11",
 }
 ```
