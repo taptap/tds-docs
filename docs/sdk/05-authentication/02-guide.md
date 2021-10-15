@@ -228,18 +228,21 @@ NSString *token = currentUser.sessionToken;
 
 ## 设置其他用户属性
 
-开发者可以使用内建账户系统设置更多用户信息，比如游戏可以记录玩家的生日，以便在生日当天给玩家发放生日礼包：
+开发者可以使用内建账户系统设置更多用户信息，比如通过设置 `nickname` 字段来添加昵称，
+再比如游戏可以记录玩家的生日，以便在生日当天给玩家发放生日礼包。
 
 <MultiLang>
 
 ```cs
 var currentUser = await TDSUser.GetCurrent();  // 获取当前登录的账户实例
+currentUser["nickname"] = "Tarara";
 currentUser["birthday"] = "01-01";
 await currentUser.Save();
 ```
 
 ```java
 TDSUser currentUser = TDSUser.currentUser();  // 获取当前登录的账户实例
+currentUser.put("nickname");
 currentUser.put("birthday", "01-01");
 currentUser.saveInBackground().subscribe(new Observer<LCObject>() {
     @Override
@@ -268,6 +271,7 @@ currentUser.saveInBackground().subscribe(new Observer<LCObject>() {
 
 ```objectivec
 TDSUser *currentUser = [TDSUser currentUser];
+currentUser[@"nickname"] = @"Tarara";
 currentUser[@"birthday"] = @"01-01";
 [currentUser saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
     if (succeeded) {
@@ -279,6 +283,8 @@ currentUser[@"birthday"] = @"01-01";
 ```
 
 </MultiLang>
+
+建议开发者使用 `nickname` 字段存储昵称信息，[TDS 游戏好友模块](/sdk/friends/guide/) 的**根据昵称查找好友、好友邀请链接功能都使用了 `nickname` 字段**。
 
 一些开发者可能会利用这一机制将所有用户相关的信息都一股脑地存在内建账户系统，比如游戏可能将用户的等级、拥有的装备等信息都存在内建账户里，但我们并不推荐这么做。
 内建账户系统保存了用户的鉴权信息，也可能保存了邮箱、手机等敏感信息，因此默认会设置非常严格的权限，以防用户信息泄露。
