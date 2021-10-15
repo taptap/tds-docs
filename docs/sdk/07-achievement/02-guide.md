@@ -18,7 +18,7 @@ import MultiLang from '@theme/MultiLang';
 "dependencies":{
   ...
   // 成就系统
-  "com.taptap.tds.achievement": "https://github.com/TapTap/TapAchievement-Unity.git#3.2.0",
+  "com.taptap.tds.achievement": "https://github.com/TapTap/TapAchievement-Unity.git#3.3.0",
 }
 ```
 

@@ -221,6 +221,7 @@ await LCLeaderboard.DeleteStatistics(currentUser, new List<string> { "world" });
     // 删除成功
   } else if (error) {
     // 处理错误
+  }
 }];
 ```
 
