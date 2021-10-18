@@ -42,8 +42,8 @@ iOS 平台配置：
 
 最低支持 Android 5.0，编译环境为 Android Studio。
 
-- 将 `AntiAddiction_3.3.0.aar` 拷贝到游戏目录下的 `src/main/libs` 目录中
-- 将 `AntiAddictionUI_3.3.0.aar` 拷贝到游戏目录下的 `src/main/libs` 目录中
+- 将 `AntiAddiction_1.0.0.aar` 拷贝到游戏目录下的 `src/main/libs` 目录中
+- 将 `AntiAddictionUI_1.0.0.aar` 拷贝到游戏目录下的 `src/main/libs` 目录中
 - 将 `gson-2.8.6.jar` 拷贝到游戏目录下的 `src/main/libs` 目录中
 
 在游戏目录下 `build.gradle` 文件中添加代码
@@ -53,8 +53,8 @@ repositories{flatDir{dirs 'src/main/libs'}}
 
 dependencies {
     // ...
-    implementation(name: "AntiAddiction_${AntiAddictionVersion}", ext: "aar")
-    implementation(name: "AntiAddictionUI_${AntiAddictionVersion}", ext: "aar")
+    implementation(name: "AntiAddiction_1.0.0", ext: "aar")
+    implementation(name: "AntiAddictionUI_1.0.0", ext: "aar")
     implementation(name: "gson-2.8.6", ext: "jar")
     // ...
 }
