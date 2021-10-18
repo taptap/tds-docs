@@ -454,26 +454,25 @@ action|字符串|可选|注册 Receiver 时提供的 action name，仅当需要�
 
 ```json
 {
-  "ios": {
-    "alert":             "Hello iOS",
-    "badge":             "Increment",
-    "custom-key":        "custom-value"
-  },
-  "android": {
-    "alert":             "Hello Android",
-    "action":            "com.your_company.push",
-    "custom-key":        "custom-value"
-  },
+  "alert": "Body default",
+  "title": "Title default",
   "mi": {
-    "alert":             "Hello Mi",
-    "custom-key":        "custom-value"
+    "title": "Title for xiaomi"
   },
   "hms": {
-    "alert":             "Hello Huawei",
-    "custom-key":        "custom-value"
+    "title": "Title for huawei"
+  },
+  "vivo": {
+    "title": "Title for vivo",
+    "alert": "body for vivo",
+    "pushMode": 1
   }
 }
 ```
+
+上述示例中，我们向不同类型的设备推送了不同的标题。
+另外，每个厂商所支持的参数都不尽相同，我们对最常用的参数做了适配，为不同设备设置不同的推送内容也意味着可以针对不同的设备使用相应厂商特有的推送参数。
+比如上面我们在推送给 vivo 设备时设定了 `pushMode` 参数，这个参数是 vivo 特有的参数，用来标记推送模式是正式推送还是测试推送。
 
 其中属性名称和推送平台对应关系如下：
 
