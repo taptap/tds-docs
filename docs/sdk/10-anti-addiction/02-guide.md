@@ -1,6 +1,7 @@
 ---
 id: anti-addiction
-title: 防沉迷
+title: 防沉迷开发指南
+sidebar_label: 开发指南
 ---
 
 import MultiLang from '@theme/MultiLang';
