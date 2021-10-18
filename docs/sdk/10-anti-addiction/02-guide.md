@@ -153,7 +153,7 @@ AntiAddictionUIKit.init(activity, gameIdentifier, config,
 <>
 
 ```objc
-NSString *gameIdentifier = "游戏的 Client ID";
+NSString *gameIdentifier = @"游戏的 Client ID";
 AntiAddictionConfiguration *config = [[AntiAddictionConfiguration alloc] init];
 // 是否启用消费限制功能
 BOOL config.useSdkPaymentLimit = YES;
@@ -223,13 +223,19 @@ iOS SDK 回调中的 `extras` 是字符串（`NSString`）。
 
 ## 防沉迷授权
 
-传入玩家的唯一标识和 TapTap 的鉴权信息以便进行防沉迷授权。
-这个接口会根据相应玩家在 TapTap 的实名信息判断玩家是否可以进行游戏。
+SDK 支持两种防沉迷授权方式：
+
+1. 使用 TapTap 快速认证，传入玩家的唯一标识和 TapTap 的鉴权信息，TDS 云端会根据相应玩家在 TapTap 的实名信息判断玩家是否可以进行游戏。
+2. 不使用 TapTap 快速认证，玩家在 SDK 提供的界面中手动输入身份证号等实名信息，TDS 云端会将相应信息上报至中宣部防沉迷实名认证系统。
+
+这两种方式都需要传入的玩家唯一标识，该标识由游戏自己定义。
+如果使用 TDS 内建账户系统，可以使用玩家的 `objectId`。
+
+### TapTap 快速认证
 
 <MultiLang>
 
 ```cs
-// 当前只支持使用 TapTap 登录的游戏
 bool useTapLogin = true;
 string userIdentifier = "玩家的唯一标识";
 string tapTapAccessToken = "TapTap 第三方登录的 access token";
@@ -238,7 +244,6 @@ AntiAddictionUIKit.Startup(useTapLogin, userIdentifier, tapTapAccessToken);
 ```
 
 ```java
-// 当前只支持使用 TapTap 登录的游戏
 boolean useTapLogin = true;
 String userIdentifier = "玩家的唯一标识";
 String tapTapAccessToken = "TapTap 第三方登录的 access token";
@@ -246,18 +251,33 @@ AntiAddictionUIKit.startup(activity, useTapLogin, userIdentifier, tapTapAccessTo
 ```
 
 ```objc
-// 当前只支持使用 TapTap 登录的游戏
 BOOL useTapLogin = YES;
-NSString *userIdentifier = "玩家的唯一标识";
-NSString *tapTapAccessToken = "TapTap 第三方登录的 access token";
+NSString *userIdentifier = @"玩家的唯一标识";
+NSString *tapTapAccessToken = @"TapTap 第三方登录的 access token";
 [AntiAddiction startUpUseTapLogin:useTapLogin
 userIdentifier:userIdentifier tapAccesssToken:tapTapAccessToken];
 ```
 
 </MultiLang>
 
-初始化时传入的玩家唯一标识由游戏自己定义。
-如果使用 TDS 内建账户系统，可以使用玩家的 `objectId`。
+### 手动输入实名信息
+
+```cs
+string userIdentifier = "玩家的唯一标识";
+AntiAddictionUIKit.Startup(false, userIdentifier, "");
+```
+
+```java
+String userIdentifier = "玩家的唯一标识";
+AntiAddictionUIKit.startup(activity, false, userIdentifier, "");
+```
+
+```objc
+NSString *userIdentifier = @"玩家的唯一标识";
+[AntiAddiction startUpUseTapLogin:@NO
+userIdentifier:userIdentifier tapAccesssToken:@""];
+```
+
 
 ### 获取 TapTap Access Token
 
