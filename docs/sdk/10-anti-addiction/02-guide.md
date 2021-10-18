@@ -1,7 +1,6 @@
 ---
 id: anti-addiction
 title: 防沉迷
-slug: /sdk/anti-addiction/guide/
 ---
 
 import MultiLang from '@theme/MultiLang';
