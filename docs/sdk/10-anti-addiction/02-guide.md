@@ -69,6 +69,7 @@ iOS 防沉迷 SDK 结构：
 
 - `AntiAddictionService` 防沉迷基础库，源码由 Swift 编写。
 - `AntiAddictionUI` 带 UI 的防沉迷库，依赖 `AntiAddictionService`，源码由  Objective-C 编写。
+- `AntiAdictionResources.bundle` 资源文件
 
 添加防沉迷库文件：
 
@@ -76,9 +77,7 @@ iOS 防沉迷 SDK 结构：
 
 - 引用代码：
 
-    ```objc
-    // AntiAddictionService
-    @import AntiAddictionService;
+    ``` objc
     // AntiAddictionUI
     #import <AntiAddictionUI/AntiAddiction.h>
     ```
@@ -187,7 +186,7 @@ completionHandler:^(BOOL success) {
 | :-------------------------------- | :--- | :----------------------------------------------------------- | :------------------------- |
 | `CALLBACK_CODE_LOGIN_SUCCESS`      | 500  | 玩家登录后判断当前玩家可以进行游戏                           | 有 |
 | `CALLBACK_CODE_TIME_LIMIT`          | 1030 | 未成年玩家当前无法进行游戏                                         | 有 |
-| `CALLBACK_CODE_OPEN_ALERT_TIP`      | 1095 | 未成年玩家登录成功、游戏剩余 15 分钟、剩余 1 分钟、已经到达非游戏时间时提示                                  | 有 |
+| `CALLBACK_CODE_OPEN_ALERT_TIP`      | 1095 | 未成年允许游戏弹窗                                  | 有 |
 | `CALLBACK_CODE_LOGOUT` | 1000 | 退出账号 | 无                         |
 | `CALLBACK_CODE_REAL_NAME_STOP` | 9002 | 实名过程中点击了关闭实名窗 | 无 |          
 
@@ -198,12 +197,6 @@ Unity SDK 定义了 `MsgExtraParams` 类：
 ```cs
 public class MsgExtraParams
 {
-    // 用户类型，详见后文「获取用户类型」一节
-    public int userType = -1;
-    // 提示类型：
-    // "0"，启动提示（玩家成功进入游戏）
-    // "1"，禁止游戏提示
-    public string limit_tip_type = "";
     // 限制类型：
     // "0"，无限制（成年玩家）
     // "1"，有限制（未成年玩家）
@@ -212,8 +205,6 @@ public class MsgExtraParams
     public string description = "";
     // 显示给玩家的提示标题
     public string title = "";
-    // 未成年玩家登录成功、游戏剩余时间将尽的提示信息
-    public string remaining_time_str = "";
 }
 ```
 
@@ -274,7 +265,7 @@ AntiAddictionUIKit.startup(activity, false, userIdentifier, "");
 
 ```objc
 NSString *userIdentifier = @"玩家的唯一标识";
-[AntiAddiction startUpUseTapLogin:@NO
+[AntiAddiction startUpUseTapLogin:NO
 userIdentifier:userIdentifier tapAccesssToken:@""];
 ```
 
@@ -445,7 +436,7 @@ AntiAddictionUIKit.SubmitPayResult(amount,
 
 ```java
 long amount = 100;
-AntiAddictionUIKit.paySuccess(amount,
+AntiAddictionUIKit.submitPayResult(amount,
     new Callback<SubmitPayResult>() {
         @Override
         public void onSuccess(SubmitPayResult result) {
@@ -462,7 +453,7 @@ AntiAddictionUIKit.paySuccess(amount,
 
 ```objc
 NSInteger amount = 100;
-[AntiAddiction reportConsumption:amount
+[AntiAddiction submitPayResult:amount
 callBack:^(BOOL success) {
     if (success) {
         // 提交成功
