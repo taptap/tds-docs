@@ -4,7 +4,7 @@ title: 好友
 sidebar_label: 好友
 ---
 
-import MultiLang from '@theme/MultiLang';
+import MultiLang from '/src/docComponents/MultiLang';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 该功能暂未对外开放

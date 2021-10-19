@@ -4,7 +4,7 @@ title: 1.x 升级 3.x 指南
 sidebar_label: 1.x 升级 3.x
 ---
 
-import MultiLang from '@theme/MultiLang';
+import MultiLang from '/src/docComponents/MultiLang';
 
 因新版接口与旧版接口有明显差别，所以需将旧版接口删除，通过如下方式重新接入以便使用新版本接口。
 

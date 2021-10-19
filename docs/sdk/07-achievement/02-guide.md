@@ -4,7 +4,7 @@ title: 开发指南
 sidebar_label: 开发指南
 ---
 
-import MultiLang from '@theme/MultiLang';
+import MultiLang from '/src/docComponents/MultiLang';
 
 本文介绍如何在游戏中加入成就系统。TDS 推出的成就系统模块，是基于内建账户系统（TDSUser）的，具体请阅读 **[内建账户 > 开发指南](/sdk/authentication/guide/)**。
 

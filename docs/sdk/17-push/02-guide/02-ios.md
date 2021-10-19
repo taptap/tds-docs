@@ -4,7 +4,7 @@ title: iOS 推送指南
 sidebar_label: iOS 推送
 ---
 
-import MultiLang from '@theme/MultiLang';
+import MultiLang from '/src/docComponents/MultiLang';
 
 
 本文介绍了如何在 iOS 设备中使用推送通知功能。建议先阅读[推送通知总览](/sdk/push/guide/overview/)了解相关概念。
