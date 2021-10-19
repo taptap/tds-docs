@@ -37,7 +37,7 @@
 
 注意：
 
-- 如果文件开头没有引入 `MultiLang` 组件，那么需要引入一下：`import MultiLang from '@theme/MultiLang';`
+- 如果文件开头没有引入 `MultiLang` 组件，那么需要引入一下：`import MultiLang from '/src/docComponents/MultiLang';`
 - `<MultiLang>` 后、`</MultiLang>` 前、以及不同语言的代码片段之间都要空一行，否则 MDX 语法无法正确解析。
 - 语言的顺序为 C#、Java、Objective-C，不能乱。
 - 有些地方多语言代码示例使用 `Tabs` 组件，它的效果和 `MultiLang` 是等效的（实际上 `MultiLang` 最终会生成 `Tabs` 组件）。因为 `MultiLang`
@@ -102,7 +102,7 @@
 在文件开头引入 Mermaid 组件：
 
 ```js
-import Mermaid from '@theme/Mermaid';
+import Mermaid from '/src/docComponents/Mermaid';
 ```
 
 然后在 Mermaid 组件的 diagram 属性中写 Mermaid 语法：

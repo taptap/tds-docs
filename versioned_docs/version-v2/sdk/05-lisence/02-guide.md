@@ -4,7 +4,7 @@ title: 开发指南
 sidebar_label: 开发指南
 ---
 
-import MultiLang from '@theme/MultiLang';
+import MultiLang from '/src/docComponents/MultiLang';
 
 import {Gray,Blue, Red, Black,Link,ImageLink} from '/src/docComponents/doc';
 

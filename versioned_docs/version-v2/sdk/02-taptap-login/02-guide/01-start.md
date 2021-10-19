@@ -4,7 +4,7 @@ title: 接入 TapTap 登录
 sidebar_label: 功能接入
 ---
 
-import MultiLang from '@theme/MultiLang';
+import MultiLang from '/src/docComponents/MultiLang';
 
 [快速开始](/v2/sdk/start/quickstart)中简单介绍了[如何在游戏中加入 Tap 登录](/v2/sdk/start/quickstart#taptap-登录)，这里详细介绍 TapSDK 的[登录功能](/v2/sdk/taptap-login/features)。
 

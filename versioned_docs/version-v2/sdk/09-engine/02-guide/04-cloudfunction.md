@@ -4,8 +4,8 @@ title: 云函数指南
 sidebar_label: 云函数
 ---
 
-import MultiLang from '@theme/MultiLang';
-import Mermaid from '@theme/Mermaid';
+import MultiLang from '/src/docComponents/MultiLang';
+import Mermaid from '/src/docComponents/Mermaid';
 
 
 
