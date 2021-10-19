@@ -11,7 +11,7 @@ function MultiLang({children, kind}) {
     const [js, python, php, java, cs, go] = children;
     return <Tabs
       groupId="tap-platform"
-      defaultValue="js"
+      defaultValue="javascript"
       values={[
         {label: 'JavaScript', value: 'javascript'},
         {label: 'Python', value: 'python'},
