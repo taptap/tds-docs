@@ -5,7 +5,7 @@ sidebar_label: 开发指南
 ---
 
 
-import MultiLang from '@theme/MultiLang';
+import MultiLang from '/src/docComponents/MultiLang';
 
 ## 介绍
 

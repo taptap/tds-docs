@@ -4,7 +4,7 @@ title: 云引擎快速入门
 sidebar_label: 快速入门
 ---
 
-import MultiLang from '@theme/MultiLang';
+import MultiLang from '/src/docComponents/MultiLang';
 
 
 

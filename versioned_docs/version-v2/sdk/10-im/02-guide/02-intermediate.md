@@ -4,7 +4,7 @@ title: 二，消息收发的更多方式，离线推送与消息同步，多设�
 sidebar_label: 离线消息
 ---
 
-import MultiLang from '@theme/MultiLang';
+import MultiLang from '/src/docComponents/MultiLang';
 
 
 
