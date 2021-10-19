@@ -158,8 +158,6 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
     }  
     ```
 
-    如不使用 LiveQuery、即时通讯、推送通知功能，则无需引入 `cn.leancloud:realtime-android`。
-
 3. 在 `AndroidManifest.xml` 添加网络权限：
 
     ```java
