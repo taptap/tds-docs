@@ -5,7 +5,7 @@ sidebar_label: 开发指南
 ---
 
 
-import MultiLang from '@theme/MultiLang';
+import MultiLang from '/src/docComponents/MultiLang';
 
 本文介绍如何在游戏中加入 [TapTap 内嵌动态](/sdk/embedded-moments/features/)。使用内嵌动态功能需依赖 TapTap 登录，需要导入`TapMoment` 模块。
 

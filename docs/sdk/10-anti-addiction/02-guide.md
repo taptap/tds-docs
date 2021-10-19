@@ -4,7 +4,7 @@ title: 实名认证和防沉迷开发指南
 sidebar_label: 开发指南
 ---
 
-import MultiLang from '@theme/MultiLang';
+import MultiLang from '/src/docComponents/MultiLang';
 
 ## SDK 配置
 

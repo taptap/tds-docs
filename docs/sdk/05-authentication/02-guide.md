@@ -4,7 +4,7 @@ title: 内建账户指南
 sidebar_label: 开发指南
 ---
 
-import MultiLang from '@theme/MultiLang';
+import MultiLang from '/src/docComponents/MultiLang';
 
 从 TapSDK 3.0 开始，我们提供了一个内建账户系统供游戏使用：开发者可以直接用 TapTap OAuth 授权的结果生成一个游戏内的账号（TDSUser），同时我们也支持将更多第三方认证登录的结果绑定到该账号上来。
 TapSDK 提供的游戏内好友、成就等服务和功能，也都基于这一账户系统。

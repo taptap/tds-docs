@@ -4,7 +4,7 @@ title: 客服系统
 slug: /sdk/tap-support/guide/
 ---
 
-import MultiLang from '@theme/MultiLang';
+import MultiLang from '/src/docComponents/MultiLang';
 
 本文介绍如何在游戏中接入 TDS 提供的客服系统 SaaS 服务。
 为了兼容尽可能多的游戏，目前 SDK 只生成网页地址，游戏需要自己加载 webview。

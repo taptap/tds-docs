@@ -4,7 +4,7 @@ title: 云引擎网站托管指南
 sidebar_label: 网站托管
 ---
 
-import MultiLang from '@theme/MultiLang';
+import MultiLang from '/src/docComponents/MultiLang';
 
 
 

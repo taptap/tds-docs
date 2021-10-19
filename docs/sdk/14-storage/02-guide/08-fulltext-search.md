@@ -4,7 +4,7 @@ title: 全文搜索指南
 sidebar_label: 全文搜索指南
 ---
 
-import MultiLang from '@theme/MultiLang';
+import MultiLang from '/src/docComponents/MultiLang';
 
 
 

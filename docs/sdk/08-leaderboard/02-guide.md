@@ -4,7 +4,7 @@ title: 排行榜指南
 sidebar_label: 开发指南
 ---
 
-import MultiLang from '@theme/MultiLang';
+import MultiLang from '/src/docComponents/MultiLang';
 
 阅读此文档前请先阅读：
 

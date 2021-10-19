@@ -3,7 +3,7 @@ title: 云引擎 FAQ
 sidebar_label: FAQ
 ---
 
-import MultiLang from '@theme/MultiLang';
+import MultiLang from '/src/docComponents/MultiLang';
 
 
 

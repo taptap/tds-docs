@@ -4,8 +4,8 @@ title: 三，安全与签名、黑名单和权限管理、玩转聊天室和临�
 sidebar_label: 权限与聊天室
 ---
 
-import MultiLang from '@theme/MultiLang';
-import Mermaid from '@theme/Mermaid';
+import MultiLang from '/src/docComponents/MultiLang';
+import Mermaid from '/src/docComponents/Mermaid';
 
 
 

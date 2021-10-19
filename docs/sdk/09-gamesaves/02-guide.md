@@ -4,7 +4,7 @@ title: 云存档开发指南
 sidebar_label: 开发指南
 ---
 
-import MultiLang from '@theme/MultiLang';
+import MultiLang from '/src/docComponents/MultiLang';
 
 阅读此文档前请先阅读[云存档功能介绍](/sdk/gamesaves/features/)，了解云存档的核心概念及功能。
 

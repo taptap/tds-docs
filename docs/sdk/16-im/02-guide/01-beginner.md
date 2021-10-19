@@ -4,8 +4,8 @@ title: 一，从简单的单聊、群聊、收发图文消息开始
 sidebar_label: 基础功能
 ---
 
-import MultiLang from '@theme/MultiLang';
-import Mermaid from '@theme/Mermaid';
+import MultiLang from '/src/docComponents/MultiLang';
+import Mermaid from '/src/docComponents/Mermaid';
 
 
 
