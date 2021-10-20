@@ -46,15 +46,15 @@ vendor | 厂商
 ### 混合推送 library 的构成
 
 我们提供了一个 all-in-one 的混合推送模块，统一支持华为（HMS）、小米、Oppo、Vivo、魅族推送，开发者依赖如下:
-'cn.leancloud:mixpush-android:8.1.3@aar'
+'cn.leancloud:mixpush-android:8.1.4@aar'
 
 从 6.5.1 版本开始，我们额外提供了单一厂商的推送 library，以支持不希望全部集成的产品之需求，新 library 与厂商的对应关系如下：
 
-- 华为（HMS) 'cn.leancloud:mixpush-hms:8.1.3'
-- 小米 'cn.leancloud:mixpush-xiaomi:8.1.3'
-- 魅族 'cn.leancloud:mixpush-meizu:8.1.3'
-- Oppo 'cn.leancloud:mixpush-oppo:8.1.3'
-- Vivo 'cn.leancloud:mixpush-vivo:8.1.3'
+- 华为（HMS) 'cn.leancloud:mixpush-hms:8.1.4'
+- 小米 'cn.leancloud:mixpush-xiaomi:8.1.4'
+- 魅族 'cn.leancloud:mixpush-meizu:8.1.4'
+- Oppo 'cn.leancloud:mixpush-oppo:8.1.4'
+- Vivo 'cn.leancloud:mixpush-vivo:8.1.4'
 
 两组 library 的使用方法基本相同，开发者可以根据自己的需要选取合适的 library。有一点需要注意的是，在 6.5.1 及后续版本的 library 中，由于小米、Oppo、Vivo 并没有将他们的 SDK 包发布到公开源供开发者引用，所以如果是使用这几个厂商的推送，需要开发者将对应的 jar/aar 包（下载地址见[这里](https://github.com/leancloud/java-unified-sdk/tree/master/android-sdk/mixpush-android/libs)）手动加入工程中。
 
@@ -153,9 +153,9 @@ SDK 从 7.2.5 版本开始升级到华为 PushKit V5 版本，开发者可以参
 ```groovy
 dependencies {
   //混合推送需要的包
-  implementation 'cn.leancloud:mixpush-android:8.1.3'
+  implementation 'cn.leancloud:mixpush-android:8.1.4'
   //即时通信与推送需要的包
-  implementation 'cn.leancloud:realtime-android:8.1.3'
+  implementation 'cn.leancloud:realtime-android:8.1.4'
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
 
   implementation 'com.huawei.hms:push:4.0.2.300'
@@ -359,9 +359,9 @@ public class MyHuaweiReceiver extends LCHMSMessageService {
 dependencies {
   //混合推送需要的包
   implementation fileTree(dir: 'libs', include: ['*.jar']) // 需将 MiPush_SDK_Client_3_7_5.jar 放入应用的 libs 目录下
-  implementation 'cn.leancloud:mixpush-android:8.1.3'
+  implementation 'cn.leancloud:mixpush-android:8.1.4'
   //即时通信与推送需要的包
-  implementation 'cn.leancloud:realtime-android:8.1.3'
+  implementation 'cn.leancloud:realtime-android:8.1.4'
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 }
 ```
@@ -490,9 +490,9 @@ dependencies {
   //魅族推送需要的包
   implementation 'com.meizu.flyme.internet:push-internal:3.6.+@aar'
   //混合推送需要的包
-  implementation 'cn.leancloud:mixpush-android:8.1.3'
+  implementation 'cn.leancloud:mixpush-android:8.1.4'
   //即时通信与推送需要的包
-  implementation 'cn.leancloud:realtime-android:8.1.3'
+  implementation 'cn.leancloud:realtime-android:8.1.4'
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
 }
 ```
@@ -572,9 +572,9 @@ vivo 混合推送 demo：可参照 [这里](https://github.com/leancloud/mixpush
 dependencies {
   //混合推送需要的包
   implementation files("libs/vivo_pushsdk-v2.9.0.0.aar") // 将 vivo_pushsdk-v2.9.0.0.aar 置于应用 libs 目录下
-  implementation 'cn.leancloud:mixpush-android:8.1.3'
+  implementation 'cn.leancloud:mixpush-android:8.1.4'
   //即时通信与推送需要的包
-  implementation 'cn.leancloud:realtime-android:8.1.3'
+  implementation 'cn.leancloud:realtime-android:8.1.4'
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
 }
 ```
@@ -759,9 +759,9 @@ public class MyPushMessageReceiver extends LCVIVOPushMessageReceiver {
 dependencies {
   //混合推送需要的包
   implementation fileTree(dir: 'libs', include: ['*.aar'])
-  implementation 'cn.leancloud:mixpush-oppo:8.1.3'
+  implementation 'cn.leancloud:mixpush-oppo:8.1.4'
   //即时通信与推送需要的包
-  implementation 'cn.leancloud:realtime-android:8.1.3'
+  implementation 'cn.leancloud:realtime-android:8.1.4'
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
 }
 ```
@@ -931,9 +931,9 @@ android {
 
 ```xml
 dependencies {
-    implementation 'cn.leancloud:leancloud-fcm:8.1.3@aar'
+    implementation 'cn.leancloud:leancloud-fcm:8.1.4@aar'
     //即时通信与推送需要的包
-    implementation 'cn.leancloud:realtime-android:8.1.3'
+    implementation 'cn.leancloud:realtime-android:8.1.4'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
 
     // Import the BoM for the Firebase platform
