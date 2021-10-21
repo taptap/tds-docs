@@ -327,7 +327,7 @@ exposeEnvironmentsOnBuild: true
 
 ### 部署更新云引擎会导致服务中断吗？
 
-服务不会中断。在代码部署时，系统会优先启动使用新版本代码的实例，待新实例通过了健康检查，系统修改路由将请求转发至新实例后，再关闭旧版本的实例，让服务保持零中断。 
+服务不会中断。在代码部署时，系统会优先启动使用新版本代码的实例，待新实例通过了健康检查，系统修改路由将请求转发至新实例后，再关闭旧版本的实例，让服务保持零中断。
 
 
 ### 部署时长时间卡在「正在下载和安装依赖」怎么办？
@@ -578,7 +578,7 @@ print(leancloud.User.query.count())
 如果应用不使用云函数和 Hook 功能，那么你可以：
 
 - 在 `leanengine.yaml` 中不指定 `functionsMode`，同时 `/1.1/functions/_ops/metadatas` **返回一个 HTTP `404`** 表示不使用云函数和 Hook 相关的功能；
-- 或者在 `leanengine.yaml` 中指定 `functionsMode` 为 `disabled`。注意，这种情况下，即使应用代码中定义了云函数和 Hook，Hook 也不会生效，云函数调用（通过 SDK 发起远程调用或通过 REST API 向 API 域名发起云函数调用）有可能因为被转发到错误的云引擎分组而失败。 
+- 或者在 `leanengine.yaml` 中指定 `functionsMode` 为 `disabled`。注意，这种情况下，即使应用代码中定义了云函数和 Hook，Hook 也不会生效，云函数调用（通过 SDK 发起远程调用或通过 REST API 向 API 域名发起云函数调用）有可能因为被转发到错误的云引擎分组而失败。
 
 ### 部署中断，提示有同名云函数怎么办？
 
@@ -831,7 +831,7 @@ leancloud:request response(0) +220ms 200 {"results":[{"content":"1","createdAt":
 
 ### Maximum call stack size exceeded 如何解决？
 
-**将 JavaScript SDK 和 Node SDK 升级到 1.2.2 以上版本可以彻底解决该问题。** 
+**将 JavaScript SDK 和 Node SDK 升级到 1.2.2 以上版本可以彻底解决该问题。**
 
 如果你的应用时不时出现 `Maximum call stack size exceeded` 异常，可能是因为在 hook 中调用了 `AV.Object.extend`。有两种方法可以避免这种异常：
 
@@ -972,7 +972,7 @@ app.get('/profile', function (req, res) {
 
 app.get('/logout', function (req, res) {
   req.currentUser.logOut();
-  res.clearCurrentUser(); // clear cookie 
+  res.clearCurrentUser(); // clear cookie
   res.redirect('/profile');
 });
 ```
@@ -993,7 +993,7 @@ AV.Cloud.CookieSession({sameSite: 'none'})
 
 ### 为什么云函数中 include 的字段没有被完整地发给客户端？
 
-> 将 JavaScript SDK 和 Node SDK 升级到 3.0 以上版本可以彻底解决该问题。  
+> 将 JavaScript SDK 和 Node SDK 升级到 3.0 以上版本可以彻底解决该问题。
 
 云函数在响应时会调用到 `AV.Object#toJSON` 方法，将结果序列化为 JSON 对象返回给客户端。在早期版本中 `AV.Object#toJSON` 方法为了防止循环引用，当遇到属性是 Pointer 类型会返回 Pointer 元信息，不会将 include 的其他字段添加进去，我们在 [JavaScript SDK 3.0](https://github.com/leancloud/javascript-sdk/releases/tag/v3.0.0) 中对序列化相关的逻辑做了重新设计，**将 JavaScript SDK 和 Node SDK 升级到 3.0 以上版本便可以彻底解决该问题**。
 
@@ -1015,14 +1015,14 @@ AV.Cloud.define('querySomething', function(req, res) {
 });
 ```
 
-Python SDK 也存在类似的问题，只会返回 Pointer 元信息，因此也需要额外进行一次查询并手动进行序列化。 
+Python SDK 也存在类似的问题，只会返回 Pointer 元信息，因此也需要额外进行一次查询并手动进行序列化。
 
 ### RPC 调用云函数时，为什么会返回预期之外的空对象？
 
 使用 Node SDK 定义的云函数，如果返回一个不是 AVObject 的值，比如字符串、数字，RPC 调用得到的是空对象（`{}`）。
 类似地，如果返回一个包含非 AVObject 成员的数组，RPC 调用的结果中该数组的相应成员也会被序列化为 `{}`。
 这个问题将在 Node SDK 的下一个大版本（4.0）中修复。
-目前绕过这一个问题的方法是将返回结果放在对象（`{}`）中返回。 
+目前绕过这一个问题的方法是将返回结果放在对象（`{}`）中返回。
 
 ### `node --max-http-header-size` 无效？
 
@@ -1177,7 +1177,7 @@ npm install --save leanengine leancloud-storage
 同时也需要自行初始化 SDK（注意我们在云引擎中开启了 masterKey 权限，这将会跳过 ACL 和其他权限限制）：
 
 ```js
-const AV = require('leanengine'); 
+const AV = require('leanengine');
 
 AV.init({
   appId: process.env.LEANCLOUD_APP_ID,
@@ -1621,9 +1621,9 @@ Go SDK 以标准库 HTTP 方法的形式提供了可供任意框架接入的接�
 // ./adapters/echo.go
 //...
 func Echo(e *echo.Echo) {
-	e.Any("/1/*", echo.WrapHandler(leancloud.Handler(nil)), setResponseContentType)
-	e.Any("/1.1/*", echo.WrapHandler(leancloud.Handler(nil)), setResponseContentType)
-	e.Any("/__engine/*", echo.WrapHandler(leancloud.Handler(nil)), setResponseContentType)
+	e.Any("/1/*", echo.WrapHandler(leancloud.Engine.Handler()), setResponseContentType)
+	e.Any("/1.1/*", echo.WrapHandler(leancloud.Engine.Handler()), setResponseContentType)
+	e.Any("/__engine/*", echo.WrapHandler(leancloud.Engine.Handler()), setResponseContentType)
 }
 
 func setResponseContentType(next echo.HandlerFunc) echo.HandlerFunc {
@@ -1654,26 +1654,26 @@ import "github.com/leancloud/go-sdk/leancloud"
 
 ```go
 client := leancloud.NewEnvClient()
+leancloud.Engine.Init(client)
 ```
 
 ### 在云引擎 Go 环境下如何本地调用云函数？
 
-云引擎下默认会在本地调用：
+使用 `Engine.Run` 即是本地调用：
 
 ```go
-averageStars, err := leancloud.Run("averageStars", Review{Movie: "夏洛特烦恼"})
+averageStars, err := leancloud.Engine.Run("averageStars", Review{Movie: "夏洛特烦恼"})
 if err != nil {
   panic(err)
 }
 ```
 
-如果你希望发起 HTTP 请求来调用云函数，可以传入 `WithRemote()` 参考。
+如果希望发起 HTTP 请求来调用云函数，请使用 `Client.Run`。
+
 `Run` 的可选参数如下：
 
-- `WithRemote()` 强制云函数远程执行
 - `WithSessionToken(token)` 为当前的调用请求传入 `sessionToken`
 - `WithUser(user)` 为当前的调用请求传入对应的用户对象
-
 
 ## 计费
 
