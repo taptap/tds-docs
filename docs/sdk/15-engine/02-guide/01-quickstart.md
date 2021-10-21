@@ -249,7 +249,7 @@ public static void createTodo(@EngineFunctionParam("content") String content)
     throws AVException {
   AVObject todo = new AVObject("Todo");
   todo.put("content", content);
-  todo.save();   
+  todo.save();
 }
 ```
 ```cs
@@ -275,7 +275,7 @@ type Todo struct {
 }
 
 func init() {
-  leancloud.Define("createdTodo", createTodo) // 注册云函数
+  leancloud.Engine.Define("createdTodo", createTodo) // 注册云函数
 }
 
 func createTodo(req *leancloud.FunctionRequest) (interface{}, error) {

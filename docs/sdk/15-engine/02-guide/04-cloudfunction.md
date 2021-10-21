@@ -192,7 +192,7 @@ type Review struct {
   Comment string `json:"comment"`
 }
 
-leancloud.Define("averageStars", func(req *leancloud.FunctionRequest) (interface{}, error) {
+leancloud.Engine.Define("averageStars", func(req *leancloud.FunctionRequest) (interface{}, error) {
   reviews := make([]Review, 10) // 预留一小部分空间
   if err := client.Class("Review").NewQuery().EqualTo("movie", req.Params["movie"].(string)).Find(&reviews); err != nil {
     return nil, err
@@ -605,7 +605,7 @@ public static void ThrowLCException() {
 }
 ```
 ```go
-leancloud.Define("customErrorCode", func(req *leancloud.FunctionRequest) (interface{}, error) {
+leancloud.Engine.Define("customErrorCode", func(req *leancloud.FunctionRequest) (interface{}, error) {
   return nil, leancloud.CloudError{123, "自定义错误信息。"}
 })
 ```
@@ -775,7 +775,7 @@ public static LCObject ReviewBeforeSave(LCObject review) {
 <>
 
 ```go
-leancloud.BeforeSave("Review", func(req *ClassHookRequest) (interface{}, error) {
+leancloud.Engine.BeforeSave("Review", func(req *ClassHookRequest) (interface{}, error) {
   review := new(Review)
   if err := req.Object.Clone(review); err != nil {
     return nil, err
@@ -850,12 +850,12 @@ public static async Task ReviewAfterSave(LCObject review) {
 }
 ```
 ```go
-leancloud.AfterSave("Review", func(req *ClassHookRequest) error {
+leancloud.Engine.AfterSave("Review", func(req *ClassHookRequest) error {
   review := new(Review)
   if err := req.Object.Clone(review); err != nil {
     return err
   }
-  
+
   if err := client.Object(review.Post).Update(map[string]interface{}{
     "comment": leancloud.OpIncrement(1),
   }); err != nil {
@@ -939,7 +939,7 @@ public static async Task UserAfterSave(LCObject user) {
 <>
 
 ```go
-leancloud.AfterSave("_User", func(req *ClassHookRequest) error{
+leancloud.Engine.AfterSave("_User", func(req *ClassHookRequest) error{
   if req.User != nil {
     if err := client.User(req.User).Set("from", "LeanCloud"); err != nil {
       return err
@@ -1013,7 +1013,7 @@ public static LCObject ReviewBeforeUpdate(LCObject review) {
 }
 ```
 ```go
-leancloud.BeforeUpdate("Review", func(req *ClassHookRequest) (interface{}, error) {
+leancloud.Engine.BeforeUpdate("Review", func(req *ClassHookRequest) (interface{}, error) {
   updatedKeys = req.UpdatedKeys()
   for _, v := range updatedKeys {
     if v == "comment" {
@@ -1027,7 +1027,7 @@ leancloud.BeforeUpdate("Review", func(req *ClassHookRequest) (interface{}, error
       }
     }
   }
-  
+
   return nil, nil
 })
 ```
@@ -1095,7 +1095,7 @@ public static void ReviewAfterUpdate(LCObject review) {
 }
 ```
 ```go
-leancloud.AfterUpdate("Review", func(req *ClassHookRequest) error {
+leancloud.Engine.AfterUpdate("Review", func(req *ClassHookRequest) error {
   updatedKeys := req.UpdatedKeys()
   for _, v := range updatedKeys {
     if v == "comment" {
@@ -1223,7 +1223,7 @@ post.DisableAfterHook();
 await post.Save();
 ```
 ```go
-// Go SDK 目前尚未提供 DisableAfterHook 接口。 
+// Go SDK 目前尚未提供 DisableAfterHook 接口。
 ```
 
 </MultiLang>
@@ -1307,7 +1307,7 @@ public static async Task<LCObject> AlbumBeforeDelete(LCObject album) {
 }
 ```
 ```go
-leancloud.BeforeDelete("Album", func(req *ClassHookRequest) (interface{}, error) {
+leancloud.Engine.BeforeDelete("Album", func(req *ClassHookRequest) (interface{}, error) {
   photo := new(Photo)
   if err := req.Object.Clone(photo); err != nil {
     return nil, err
@@ -1325,7 +1325,7 @@ leancloud.BeforeDelete("Album", func(req *ClassHookRequest) (interface{}, error)
   fmt.Println("Deleted.")
 
   return nil, nil
-})  
+})
 ```
 
 </MultiLang>
@@ -1395,7 +1395,7 @@ public static async Task AlbumAfterDelete(LCObject album) {
 }
 ```
 ```go
-leancloud.AfterDelete("Album", func(req *ClassHookRequest) error {
+leancloud.Engine.AfterDelete("Album", func(req *ClassHookRequest) error {
   photo := new(Photo)
   if err := req.Object.Clone(photo); err != nil {
     return nil, err
@@ -1411,9 +1411,8 @@ leancloud.AfterDelete("Album", func(req *ClassHookRequest) error {
   }
 
   fmt.Println("Deleted.")
-  
+
   return nil, nil
-})  
 })
 ```
 
@@ -1489,11 +1488,11 @@ public static void OnVerifiedEmail(LCUser user) {
 <>
 
 ```go
-leancloud.OnVerified("sms", func(req *ClassHookRequest) error {
+leancloud.Engine.OnVerified("sms", func(req *ClassHookRequest) error {
   fmt.Println("用户 ", req.User.ID, " 已通过短信验证。")
 })
 
-leancloud.OnVerified("email", func(req *ClassHookRequest) error {
+leancloud.Engine.OnVerified("email", func(req *ClassHookRequest) error {
   fmt.Println("用户 ", req.User.ID, " 已通过邮箱验证。")
 })
 ```
@@ -1565,7 +1564,7 @@ public static LCUser OnLogin(LCUser user) {
 ```
 
 ```go
-leancloud.OnLogin(func(req *ClassHookRequest) error {
+leancloud.Engine.OnLogin(func(req *ClassHookRequest) error {
   fmt.Println("用户 ", req.User.ID, " 已登录。")
 })
 ```
@@ -1682,7 +1681,7 @@ public static void ReviewBeforeDelete(LCObject review) {
 }
 ```
 ```go
-leancloud.BeforeSave("Review", func(req *ClassHookRequest) (interface{}, error) {
+leancloud.Engine.BeforeSave("Review", func(req *ClassHookRequest) (interface{}, error) {
   return nil, leancloud.CloudError{Code: 123, Message: "An error occurred."}
 })
 ```
@@ -1788,7 +1787,7 @@ public static void LogTimer() {
 }
 ```
 ```go
-leancloud.Define("logTimer", func(req *FunctionRequest) (interface{}, error) {
+leancloud.Engine.Define("logTimer", func(req *FunctionRequest) (interface{}, error) {
   fmt.Println("This log is printed by logTimer.")
   return nil, nil
 })
