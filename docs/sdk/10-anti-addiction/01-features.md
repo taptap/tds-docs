@@ -14,15 +14,15 @@ sidebar_label: 功能介绍
 - 应用标识 `APP ID` 
 - 应用密钥
 
-![](/img/image2021-10-19_10-58-7.png)
-![](/img/image2021-10-19_11-0-19.png)
-![](/img/image2021-10-19_11-2-37.png)
+![](/img/anti-addiction/biz-id.png)
+![](/img/anti-addiction/testcase.png)
+![](/img/anti-addiction/secretkey.png)
 
 ### 完成开发者中心配置
 
 在 TapTap 开发者中心对应的游戏里，找到**游戏服务 > 合规认证**菜单，按照要求完成参数配置。
 
-![](/img/image2021-10-19_11-22-6.png)
+![](/img/anti-addiction/anti-addiction-qualification.png)
 
 如需使用 TapTap 快速认证（详见下节），还请提交工单（分类选择「游戏服务支持 > 防沉迷新政相关」）联系我们开通。
 
@@ -41,11 +41,11 @@ TDS 提供了 TapTap 账号的快速实名认证功能，对使用 TapTap 账号
 
 业务流程：
 
-![](/img/image2021-10-19_11-30-2.png)
+![](/img/anti-addiction/anti-addiction-flow.png)
 
 界面预览：
 
-![](/img/image2021-10-18_17-57-51.png)
+![](/img/anti-addiction/image2021-10-18_17-57-51.png)
 
 ### 游戏实名认证与防沉迷
 
@@ -60,18 +60,18 @@ TDS 提供了 TapTap 账号的快速实名认证功能，对使用 TapTap 账号
 - 在玩家登录时，调用 SDK 实名认证的接口，如账号为未实名状态，则会触发实名认证界面，完成真实信息填写。
 - 完成填写后，TDS 会将信息提交至中宣部系统中进行真实性校验（请先确认已完成开发者中心的配置工作，否则无法成功校验）。
 
-![](/img/image2021-10-19_17-9-45.png)
+![](/img/anti-addiction/anti-addiction-flow-2.png)
 
 ##### 界面预览
 
-![](/img/image2021-10-19_17-4-12.png)
+![](/img/anti-addiction/image2021-10-19_17-4-12.png)
 
 ### 防沉迷策略
 
 《通知》中要求，游戏企业必须严格管理未成年的游戏时间以及付费额度。
 SDK 封装了相应接口，游戏可通过 TDS 云端查询未成年玩家是否处于可以游戏的时间段内，以及未成年玩家的某笔消费是否受限。
 
-![](/img/image2021-10-19_17-6-17.png)
+![](/img/anti-addiction/image2021-10-19_17-6-17.png)
 
 
 #### 游戏时间限制
