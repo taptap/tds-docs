@@ -31,7 +31,7 @@ export default function DocItem(props: Props): JSX.Element {
     toc_min_heading_level: tocMinHeadingLevel,
     toc_max_heading_level: tocMaxHeadingLevel,
   } = frontMatter;
-  const {description, title} = metadata;
+  const {description, title, slug} = metadata;
 
   // We only add a title if:
   // - user asks to hide it with frontmatter
@@ -47,6 +47,9 @@ export default function DocItem(props: Props): JSX.Element {
   const renderTocDesktop =
     canRenderTOC && (windowSize === 'desktop' || windowSize === 'ssr');
 
+  const docsRequiringVersionBadge = ['sdk', 'design', 'tap-download', 'sdk-api'];
+  const shouldDisplayVersionBadge = docsRequiringVersionBadge.includes(slug.split('/')[1]);
+
   return (
     <>
       <Seo {...{title, description, keywords, image}} />
@@ -59,7 +62,7 @@ export default function DocItem(props: Props): JSX.Element {
           <DocVersionBanner versionMetadata={versionMetadata} />
           <div className={styles.docItemContainer}>
             <article>
-              {versionMetadata.badge && (
+              {versionMetadata.badge && shouldDisplayVersionBadge && (
                 <span
                   className={clsx(
                     ThemeClassNames.docs.docVersionBadge,
