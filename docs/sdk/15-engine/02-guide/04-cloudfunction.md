@@ -1616,7 +1616,22 @@ def on_auth_data(auth_data):
 ```
 
 ```cs
-// 暂未支持
+[LCEngineUserHook(LCEngineUserHookType.OnAuthData)]
+public static Dictionary<string, object> OnAuthData(Dictionary<string, object> authData) {
+  if (authData.TryGetValue("fake_platform", out object tokenObj)) {
+    if (tokenObj is Dictionary<string, object> token) {
+      // 模拟校验
+      if (token["openid"] as string == "123" && token["access_token"] as string == "haha") {
+        LCLogger.Debug("Auth data Verified OK.");
+      } else {
+        throw new Exception("Invalid auth data.");
+      }
+    } else {
+      throw new Exception("Invalid auth data");
+    }
+  }
+  return authData;
+}
 ```
 
 ```go
