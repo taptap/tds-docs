@@ -129,6 +129,61 @@ B -->|afterDelete|C((done))
 
 图片等小文件请直接提交至仓库。
 
+## SDK 版本号
+
+SDK 版本号统一维护在 `/src/docComponents/sdkVersions.ts`。当 SDK 版本有更新时，只需在这里更新对应 SDK 的版本号，文档中所有引用这个版本号的地方就会跟着更新。
+
+如果一篇文档需要引用 SDK 版本号，需要先在开头引入前面提到的这个文件：
+
+```js
+import sdkVersions from '/src/docComponents/sdkVersions';
+```
+
+如果版本号会出现在代码块中，还需要额外引入 `CodeBlock`：
+
+```js
+import CodeBlock from '@theme/CodeBlock';
+```
+
+根据版本号出现的位置不同，引用的方法也略有不同。如果版本号出现在一般段落中（非代码块），需要先将这部分段落用 JSX 语法改写，然后在版本号出现的地方插值：
+
+```diff
+- - 华为（HMS) 'cn.leancloud:mixpush-hms:8.1.4'
+- - 小米 'cn.leancloud:mixpush-xiaomi:8.1.4'
++ <ul>
++   <li>华为（HMS) 'cn.leancloud:mixpush-hms:{sdkVersions.leancloud.java}'</li>
++   <li>小米 'cn.leancloud:mixpush-xiaomi:{sdkVersions.leancloud.java}'</li>
++ </ul>
+```
+
+如果版本号出现在代码块中，需要先将包裹代码块的 ` ``` ``` ` 用 `<CodeBlock>{``}</CodeBlock>` 替换，然后在版本号出现的地方插值。代码的语言可通过 `className` 传递给 `CodeBlock`：
+
+```diff
+- ```groovy
+- dependencies {
+-   //混合推送需要的包
+-   implementation 'cn.leancloud:mixpush-android:8.1.4'
+-   //即时通信与推送需要的包
+-   implementation 'cn.leancloud:realtime-android:8.1.4'
+-   implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
+- 
+-   implementation 'com.huawei.hms:push:4.0.2.300'
+- }
+- ```
++ <CodeBlock className="groovy">
++ {`dependencies {
++   //混合推送需要的包
++   implementation 'cn.leancloud:mixpush-android:${sdkVersions.leancloud.java}'
++   //即时通信与推送需要的包
++   implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
++   implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'\n
++   implementation 'com.huawei.hms:push:4.0.2.300'
++ }`}
++ </CodeBlock>
+```
+
+注意：如果代码中有空行，需要替换成 `\n` 放在前一行结尾，否则会报错。
+
 ## 优化图片
 
 运行 `npm run optimg` 任务可以优化 `static/img` 下的 JPEG （有损压缩）和 PNG 图片（无损压缩）。
