@@ -17,7 +17,7 @@ TapTap 开发者服务为游戏和玩家提供唤起 TapTap 客户端进行游�
 ```cs
 "dependencies":{
   ...
-  "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#3.3.0",
+  "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#3.3.1",
 }
 ```
 
@@ -30,7 +30,7 @@ repositories{
 
 dependencies {  
     ... 
-    implementation (name:'TapCommon_3.3.0', ext:'aar')
+    implementation (name:'TapCommon_3.3.1', ext:'aar')
 }  
 ```
 

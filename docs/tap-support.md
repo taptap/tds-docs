@@ -23,7 +23,7 @@ TapSupport SDK 可独立运行：
 ```cs
 "dependencies":{
   ...
-  "com.taptap.tds.support": "https://github.com/TapTap/TapSupport-Unity.git#3.3.0",
+  "com.taptap.tds.support": "https://github.com/TapTap/TapSupport-Unity.git#3.3.1",
 }
 ```
 
@@ -41,8 +41,8 @@ repositories{
 
 dependencies {  
     ... 
-    implementation name:'TapCommon_3.3.0', ext:'aar'
-    implementation (name:'TapSupport_3.3.0', ext:'aar')
+    implementation name:'TapCommon_3.3.1', ext:'aar'
+    implementation (name:'TapSupport_3.3.1', ext:'aar')
 }  
 ```
 
