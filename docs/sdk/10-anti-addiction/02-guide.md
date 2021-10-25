@@ -6,6 +6,10 @@ sidebar_label: 开发指南
 
 import MultiLang from '/src/docComponents/MultiLang';
 
+:::info
+使用 TDS 实名认证和防沉迷服务之前，需要完成[中宣部实名认证系统的注册和接口测试](/sdk/anti-addiction/features/#准备工作)工作，并在 TapTap 开发者中心后台完成[参数配置](/sdk/anti-addiction/features/#完成开发者中心配置)。
+:::
+
 ## SDK 配置
 
 可以在 [下载页](/tap-download) 获得 SDK，引入防沉迷模块。

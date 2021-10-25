@@ -10,9 +10,9 @@ sidebar_label: 功能介绍
 
 在使用 TDS 实名认证和防沉迷服务之前，你需要完成[中宣部网络游戏防沉迷实名认证系统](https://wlc.nppa.gov.cn/fcm_company/index.html#/login?redirect=%2F)的注册工作，通过接口测试，并获取相关凭证：
 
-- 游戏备案识别码（`bizID`）
+- 游戏备案识别码 `bizID`
 - 应用标识 `APP ID` 
-- 应用密钥
+- 应用密钥 `Secret Key`
 
 ![](/img/anti-addiction/biz-id.png)
 ![](/img/anti-addiction/testcase.png)
