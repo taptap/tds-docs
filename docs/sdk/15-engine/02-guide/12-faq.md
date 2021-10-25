@@ -1694,7 +1694,7 @@ if err != nil {
 
 ### Hook 函数算 API 请求次数吗，afterUpdate 执行一次算 1 次请求次数吗？
 
-AfterUpdate 是在云引擎内执行的，执行 afetrUpdate 不算 API 请求，自然也不计入 API 请求数。如果 afterUpdate 里发起了 API 请求，那么照常计算 API 请求数（和客户端请求 API 一样）。
+AfterUpdate 是在云引擎内执行的，执行 afterUpdate 不算 API 请求，自然也不计入 API 请求数。如果 afterUpdate 里发起了 API 请求，那么照常计算 API 请求数（和客户端请求 API 一样）。
 
 ### 组管理功能收费吗？
 
