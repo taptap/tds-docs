@@ -3,7 +3,8 @@ id: android-mixpush
 title: Android 混合推送指南
 sidebar_label: Android 混合推送
 ---
-
+import CodeBlock from '@theme/CodeBlock';
+import sdkVersions from '/src/docComponents/sdkVersions';
 
 ## 混合推送概述
 
@@ -45,16 +46,17 @@ vendor | 厂商
 
 ### 混合推送 library 的构成
 
-我们提供了一个 all-in-one 的混合推送模块，统一支持华为（HMS）、小米、Oppo、Vivo、魅族推送，开发者依赖如下:
-'cn.leancloud:mixpush-android:8.1.4@aar'
+<p>我们提供了一个 all-in-one 的混合推送模块，统一支持华为（HMS）、小米、Oppo、Vivo、魅族推送，开发者依赖如下：'cn.leancloud:mixpush-android:{sdkVersions.leancloud.java}@aar'</p>
 
 从 6.5.1 版本开始，我们额外提供了单一厂商的推送 library，以支持不希望全部集成的产品之需求，新 library 与厂商的对应关系如下：
 
-- 华为（HMS) 'cn.leancloud:mixpush-hms:8.1.4'
-- 小米 'cn.leancloud:mixpush-xiaomi:8.1.4'
-- 魅族 'cn.leancloud:mixpush-meizu:8.1.4'
-- Oppo 'cn.leancloud:mixpush-oppo:8.1.4'
-- Vivo 'cn.leancloud:mixpush-vivo:8.1.4'
+<ul>
+  <li>华为（HMS) 'cn.leancloud:mixpush-hms:{sdkVersions.leancloud.java}'</li>
+  <li>小米 'cn.leancloud:mixpush-xiaomi:{sdkVersions.leancloud.java}'</li>
+  <li>魅族 'cn.leancloud:mixpush-meizu:{sdkVersions.leancloud.java}'</li>
+  <li>Oppo 'cn.leancloud:mixpush-oppo:{sdkVersions.leancloud.java}'</li>
+  <li>Vivo 'cn.leancloud:mixpush-vivo:{sdkVersions.leancloud.java}'</li>
+</ul>
 
 两组 library 的使用方法基本相同，开发者可以根据自己的需要选取合适的 library。有一点需要注意的是，在 6.5.1 及后续版本的 library 中，由于小米、Oppo、Vivo 并没有将他们的 SDK 包发布到公开源供开发者引用，所以如果是使用这几个厂商的推送，需要开发者将对应的 jar/aar 包（下载地址见[这里](https://github.com/leancloud/java-unified-sdk/tree/master/android-sdk/mixpush-android/libs)）手动加入工程中。
 
@@ -150,17 +152,16 @@ SDK 从 7.2.5 版本开始升级到华为 PushKit V5 版本，开发者可以参
 
 首先导入 `mixpush-android` 包，修改 `build.gradle` 文件，在 `dependencies` 中添加依赖：
 
-```groovy
-dependencies {
+<CodeBlock className="groovy">
+{`dependencies {
   //混合推送需要的包
-  implementation 'cn.leancloud:mixpush-android:8.1.4'
+  implementation 'cn.leancloud:mixpush-android:${sdkVersions.leancloud.java}'
   //即时通信与推送需要的包
-  implementation 'cn.leancloud:realtime-android:8.1.4'
-  implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
-
+  implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
+  implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'\n
   implementation 'com.huawei.hms:push:4.0.2.300'
-}
-```
+}`}
+</CodeBlock>
 
 如果只希望接入华为推送，可以将 `mixpush-android` 替换为 `mixpush-hms`。
 
@@ -355,16 +356,16 @@ public class MyHuaweiReceiver extends LCHMSMessageService {
 
 我们混合推送基于小米 3.7.5 版本 SDK 进行开发。开发者需要首先导入 `mixpush-android` 包：修改 `build.gradle` 文件，在 **dependencies** 中添加依赖：
 
-```groovy
-dependencies {
+<CodeBlock className="groovy">
+{`dependencies {
   //混合推送需要的包
   implementation fileTree(dir: 'libs', include: ['*.jar']) // 需将 MiPush_SDK_Client_3_7_5.jar 放入应用的 libs 目录下
-  implementation 'cn.leancloud:mixpush-android:8.1.4'
+  implementation 'cn.leancloud:mixpush-android:${sdkVersions.leancloud.java}'
   //即时通信与推送需要的包
-  implementation 'cn.leancloud:realtime-android:8.1.4'
+  implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-}
-```
+}`}
+</CodeBlock>
 
 如果只希望接入小米推送，可以将 `mixpush-android` 替换为 `mixpush-xiaomi`。
 如果是通过 jar 包导入，则需要手动下载 jar 包 [小米 Push SDK](http://dev.xiaomi.com/mipush/downpage/)。
@@ -485,17 +486,17 @@ LCMixPushManager.registerXiaomiPush(context, miAppId, miAppKey, profile, true);
 
 首先导入 `mixpush-android` 包。修改 `build.gradle` 文件，在 **dependencies** 中添加依赖：
 
-```groovy
-dependencies {
+<CodeBlock className="groovy">
+{`dependencies {
   //魅族推送需要的包
   implementation 'com.meizu.flyme.internet:push-internal:3.6.+@aar'
   //混合推送需要的包
-  implementation 'cn.leancloud:mixpush-android:8.1.4'
+  implementation 'cn.leancloud:mixpush-android:${sdkVersions.leancloud.java}'
   //即时通信与推送需要的包
-  implementation 'cn.leancloud:realtime-android:8.1.4'
+  implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
-}
-```
+}`}
+</CodeBlock>
 
 如果只希望接入魅族推送，可以将 `mixpush-android` 替换为 `mixpush-meizu`。
 
@@ -568,16 +569,16 @@ vivo 混合推送 demo：可参照 [这里](https://github.com/leancloud/mixpush
 
 首先将 demo 工程 `app/libs` 目录下的所有 jar 包（如有）拷贝到目标工程的 libs 目录下，然后修改 `build.gradle` 文件，在 `dependencies` 中添加依赖：
 
-```groovy
-dependencies {
+<CodeBlock className="groovy">
+{`dependencies {
   //混合推送需要的包
   implementation files("libs/vivo_pushsdk-v2.9.0.0.aar") // 将 vivo_pushsdk-v2.9.0.0.aar 置于应用 libs 目录下
-  implementation 'cn.leancloud:mixpush-android:8.1.4'
+  implementation 'cn.leancloud:mixpush-android:${sdkVersions.leancloud.java}'
   //即时通信与推送需要的包
-  implementation 'cn.leancloud:realtime-android:8.1.4'
+  implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
-}
-```
+}`}
+</CodeBlock>
 
 如果只希望接入 vivo 推送，可以将 `mixpush-android` 替换为 `mixpush-vivo`。
 
@@ -755,16 +756,16 @@ public class MyPushMessageReceiver extends LCVIVOPushMessageReceiver {
 
 - 将之前下载的 SDK（com.heytap.msp-push-2.1.0.aar）复制到工程 libs/ 目录下，然后修改 `build.gradle` 文件，在 `dependencies` 中添加依赖：
 
-```groovy
-dependencies {
+<CodeBlock className="groovy">
+{`dependencies {
   //混合推送需要的包
   implementation fileTree(dir: 'libs', include: ['*.aar'])
-  implementation 'cn.leancloud:mixpush-oppo:8.1.4'
+  implementation 'cn.leancloud:mixpush-oppo:${sdkVersions.leancloud.java}'
   //即时通信与推送需要的包
-  implementation 'cn.leancloud:realtime-android:8.1.4'
+  implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-}
-```
+}`}
+</CodeBlock>
 
 #### 配置 AndroidManifest.xml
 
@@ -929,21 +930,20 @@ android {
 
 在模块（应用级）Gradle 文件（通常是 app/build.gradle）中，在 dependencies 中添加依赖：
 
-```xml
-dependencies {
-    implementation 'cn.leancloud:leancloud-fcm:8.1.4@aar'
+<CodeBlock className="xml">
+{`dependencies {
+    implementation 'cn.leancloud:leancloud-fcm:${sdkVersions.leancloud.java}@aar'
     //即时通信与推送需要的包
-    implementation 'cn.leancloud:realtime-android:8.1.4'
-    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
-
+    implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'\n
     // Import the BoM for the Firebase platform
     implementation platform('com.google.firebase:firebase-bom:27.0.0')
     // Declare the dependencies for the Firebase Cloud Messaging and Analytics libraries
     // When using the BoM, you don't specify versions in Firebase library dependencies
     implementation 'com.google.firebase:firebase-messaging'
     implementation 'com.google.firebase:firebase-analytics'
-}
-```
+}`}
+</CodeBlock>
 
 #### 修改应用清单
 

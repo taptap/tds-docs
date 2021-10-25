@@ -3,7 +3,8 @@ id: android
 title: Android 推送指南
 sidebar_label: Android 推送
 ---
-
+import CodeBlock from '@theme/CodeBlock';
+import sdkVersions from '/src/docComponents/sdkVersions';
 
 请先阅读[推送通知总览](/sdk/push/guide/overview/)了解相关概念。
 
@@ -18,14 +19,12 @@ Android 的推送主要依赖客户端的 PushService 服务。PushService 是�
 
 要接入推送服务，需要依赖 realtime-android library。首先打开 `app` 目录下的 `build.gradle` 进行如下配置：
 
-```groovy
-dependencies {
-
-implementation 'cn.leancloud:realtime-android:8.1.4'
-implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'
-
-}
-```
+<CodeBlock className="groovy">
+{`dependencies {\n
+implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
+implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'\n
+}`}
+</CodeBlock>
 
 然后新建一个 Java Class ，名字叫做 **MyLeanCloudApp**，让它继承自 **Application** 类，实例代码如下:
 

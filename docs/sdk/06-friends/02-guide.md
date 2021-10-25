@@ -1180,7 +1180,8 @@ public class DeepLinkManager : MonoBehaviour
 
 ```objc
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
-    return [TDSFriends handleFriendInvitationLink:url callback:^(BOOL succeeded, NSError * _Nullable error) {
+    return [TDSFriends handleFriendInvitationLink:url
+    callback:^(BOOL succeeded, TDSFriendsLinkInfo * _Nullable linkInfo, NSError * _Nullable error) {
         if (error) {
             // handle error
         }
