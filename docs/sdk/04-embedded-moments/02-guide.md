@@ -23,7 +23,7 @@ import MultiLang from '/src/docComponents/MultiLang';
 "dependencies":{
   ...
   // 内嵌动态
-  "com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#3.3.0",
+  "com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#3.3.1",
 }
 ```
 
@@ -36,7 +36,7 @@ repositories{
 
 dependencies {  
     ... 
-    implementation (name:'TapMoment_3.3.0', ext:'aar') // TapTap 内嵌动态
+    implementation (name:'TapMoment_3.3.1', ext:'aar') // TapTap 内嵌动态
 }  
 ```
 
@@ -317,9 +317,9 @@ postData.content = @"我是图片描述";
 
 ```cs
 "dependencies":{
-  "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#3.3.0",
-  "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#3.3.0",
-  "com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#3.3.0",
+  "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#3.3.1",
+  "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#3.3.1",
+  "com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#3.3.1",
 }
 ```
 
@@ -332,9 +332,9 @@ repositories{
 
 dependencies {  
 ...  
-    implementation (name:'TapCommon_3.3.0', ext:'aar') // 必选：TapSDK 基础库 
-    implementation (name:'TapLogin_3.3.0', ext:'aar') // 必选：TapTap 登录 
-    implementation (name:'TapMoment_3.3.0', ext:'aar') // TapTap 内嵌动态
+    implementation (name:'TapCommon_3.3.1', ext:'aar') // 必选：TapSDK 基础库 
+    implementation (name:'TapLogin_3.3.1', ext:'aar') // 必选：TapTap 登录 
+    implementation (name:'TapMoment_3.3.1', ext:'aar') // TapTap 内嵌动态
 }  
 ```
 

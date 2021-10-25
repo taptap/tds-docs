@@ -17,7 +17,7 @@ import MultiLang from '/src/docComponents/MultiLang';
 ```cs
 "dependencies":{
   ...
-  "com.taptap.tds.friends": "https://github.com/TapTap/TapFriends-Unity.git#3.3.0",
+  "com.taptap.tds.friends": "https://github.com/TapTap/TapFriends-Unity.git#3.3.1",
 }
 ```
 
@@ -30,7 +30,7 @@ repositories{
 
 dependencies {  
     ... 
-    implementation (name:'TapFriend_3.3.0', ext:'aar')
+    implementation (name:'TapFriend_3.3.1', ext:'aar')
 }
 ```
 
@@ -70,7 +70,7 @@ TDSFriends.FriendStatusChangedDelegate = new TDSFriendStatusChangedDelegate {
     // 当前玩家长连接断开，SDK 会自动重试，开发者通常无需额外处理
     OnDisconnected = () => {},
     // 当前连接异常
-    OnConnectionError = (code, message) => {}
+    OnConnectionError = (code, message) => {},
 };
 ```
 
@@ -84,6 +84,10 @@ TDSFriends.registerFriendStatusChangedListener(new FriendStatusChangedListener()
     @Override
     public void onNewRequestComing(LCFriendshipRequest request) {}
     
+    // 通过分享链接进入游戏 SDK 自动发送好友申请时触发
+    @Override
+    public void onSendFriendRequestToSharer(boolean isSuccess, String nickname, TDSFriendError error) {}    
+
     // 已发送的好友申请被接受
     @Override
     public void onRequestAccepted(LCFriendshipRequest request) {}
@@ -1164,6 +1168,9 @@ public class DeepLinkManager : MonoBehaviour
 {
     // 略
     private async void onDeepLinkActivated(string url) {
+        Dictionary<string, object> invitation = TDSFriends.ParseFriendInvitationLink(url);
+        string userId = invitation["identity"];
+        string nickname = invitation["nickname"];
         await TDSFriends.HandleFriendInvitationLink(url);
     }
 }
