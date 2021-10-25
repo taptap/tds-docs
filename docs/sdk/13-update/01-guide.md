@@ -220,9 +220,46 @@ if(TapGameUtil.updateGameInTapTap(this,"appid")){
 appid: 游戏在 TapTap 商店的唯一身份标识。
 例如：`https://www.taptap.com/app/187168` ，其中 `187168` 是 `appid`.
 
-考虑到可能有部分游戏无法升级 TapSDK、跨版本升级兼容性暂时无法保证等因素，因此将 TapSDK 更新功能源码开放作为一种解决方案供参考。
+## 常见问题
+
+### 关于 Android 11 无法拉起 TapTap 客户端的解决方案
+
+Android 11 加强了隐私保护策略，引入了大量变更和限制，其中一个重要变更 —— [软件包可见性](https://developer.android.com/about/versions/11/privacy/package-visibility) ，将会导致第三方应用无法拉起 TapTap 客户端，从而影响 TapTap 相关功能的正常使用 ，包括但不限于更新唤起 TapTap 、购买验证等功能。
+
+特别需要注意的是，Android 11 的该变更只会影响到升级 `targetSdkVersion=30` 的应用，未升级的应用暂不受影响。
+
+**方案一：**
+
+编译时将 `targetSdkVersion` 改为 29（目前 `=30` 会触发该问题）。
+
+**方案二：**
+
+1. 将 gradle build tools 改为 4.1.0+
+```java
+classpath 'com.android.tools.build:gradle:4.1.0'
+```
+
+2. 在 AndroidManifest.xml 里添加如下内容：
+```xml
+<queries>
+  <package android:name="com.taptap" />
+  <package android:name="com.taptap.pad" />
+  <package android:name="com.taptap.global" />
+</queries>
+```
+
+### 未接入 TapSDK 的游戏如何引导用户下载最新版本的 TapTap 客户端
+
+未接入 TapSDK、使用旧版 TapSDK 难以升级的游戏，可以通过访问以下短链手动唤起 TapTap 客户端更新游戏：
+
+- 中国大陆 `https://l.taptap.com/5d1NGyET?subc1=YOUR-GAME-ID`
+- 其他国家或地区 `https://l.taptap.io/GNYwFaZr?subc1=YOUR-GAME-ID`
+
+注意，除了打开 URL 外，还需要检测设备是否已经安装 TapTap 客户端，以及处理唤起失败的逻辑，这些代码都需要自行编写。
+下面提供 TapSDK 唤起更新的代码供参考。
+
 <details>
-<summary>代码示例</summary>
+<summary>参考代码</summary>
 
 ```java
 package com.tds.common.utils;
@@ -377,42 +414,3 @@ public class TapGameUtil {
 ```
 
 </details>
-
-
-## 常见问题
-
-### 关于 Android 11 无法拉起 TapTap 客户端的解决方案
-
-Android 11 加强了隐私保护策略，引入了大量变更和限制，其中一个重要变更 —— [软件包可见性](https://developer.android.com/about/versions/11/privacy/package-visibility) ，将会导致第三方应用无法拉起 TapTap 客户端，从而影响 TapTap 相关功能的正常使用 ，包括但不限于更新唤起 TapTap 、购买验证等功能。
-
-特别需要注意的是，Android 11 的该变更只会影响到升级 `targetSdkVersion=30` 的应用，未升级的应用暂不受影响。
-
-**方案一：**
-
-编译时将 `targetSdkVersion` 改为 29（目前 `=30` 会触发该问题）。
-
-**方案二：**
-
-1. 将 gradle build tools 改为 4.1.0+
-```java
-classpath 'com.android.tools.build:gradle:4.1.0'
-```
-
-2. 在 AndroidManifest.xml 里添加如下内容：
-```xml
-<queries>
-  <package android:name="com.taptap" />
-  <package android:name="com.taptap.pad" />
-  <package android:name="com.taptap.global" />
-</queries>
-```
-
-### 未接入 TapSDK 的游戏如何引导用户下载最新版本的 TapTap 客户端
-
-未接入 TapSDK 的游戏可以唤起浏览器访问如下 URL 下载最新版本的 TapTap 客户端。
-
-```
-https://d.taptap.com/latest?app_id=187168
-```
-
-将 `187168` 替换为你的游戏的 `appid`，可以让 TapTap 启动时将指定游戏显示在首页最前位置。
