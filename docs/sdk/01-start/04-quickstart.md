@@ -4,6 +4,8 @@ title: TapSDK 快速开始
 sidebar_label: 快速开始
 ---
 import MultiLang from '/src/docComponents/MultiLang';
+import CodeBlock from '@theme/CodeBlock';
+import sdkVersions from '/src/docComponents/sdkVersions';
 
 本文介绍如何快速接入 TapSDK 并实现 **[TapTap 登录](/sdk/taptap-login/guide/start/)** 功能。
 
@@ -56,14 +58,14 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
 
 在项目的 `Packages/manifest.json` 文件中添加以下依赖：
 
-```json
-"dependencies":{
+<CodeBlock className="json">
+{`"dependencies":{
     "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#3.3.0",
     "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#3.3.0",
     "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#3.3.0",
-    "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-0.9.12",
-}
-```
+    "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}",
+}`}
+</CodeBlock>
 
 [点击](https://github.com/TapTap/TapSDK-Unity/releases) 参考 SDK 最新版本号。
 
@@ -139,24 +141,22 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
 
 2. 打开项目的 `project/app/build.gradle` 文件，添加 gradle 配置如下：
 
-    ```java
-    repositories{  
+    <CodeBlock className="java">
+    {`repositories{  
         flatDir {  
             dirs 'libs'  
         }  
-    }  
-    
+    }  \n
     dependencies {  
     ...  
         implementation name:'TapBootstrap_3.2.1', ext:'aar'   
         implementation name:'TapCommon_3.2.1', ext:'aar' 
-		implementation name:'TapLogin_3.2.1', ext:'aar' 
-        implementation 'cn.leancloud:realtime-android:8.1.4'
-        implementation 'cn.leancloud:storage-android:8.1.4'
+        implementation name:'TapLogin_3.2.1', ext:'aar' 
+        implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
+        implementation 'cn.leancloud:storage-android:${sdkVersions.leancloud.java}'
         implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-
-    }  
-    ```
+    }`}
+    </CodeBlock>
 
 3. 在 `AndroidManifest.xml` 添加网络权限：
 

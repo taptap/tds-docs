@@ -3,6 +3,8 @@ id: setup-java
 title: 数据存储、即时通讯 Java SDK 配置 
 sidebar_label: Java SDK 配置
 ---
+import CodeBlock from '@theme/CodeBlock';
+import sdkVersions from '/src/docComponents/sdkVersions';
 
 ## 平台与 SDK 对应关系
 Java SDK 主要包含以下几个 library，其层次结构以及平台对应关系如下：
@@ -50,69 +52,69 @@ Java SDK 一共包含如下几个模块：
 
 Maven：
 
-```xml
-<dependency>
+<CodeBlock className="xml">
+{`<dependency>
     <groupId>cn.leancloud</groupId>
     <artifactId>storage-core</artifactId>
-    <version>8.1.4</version>
-</dependency>
-```
+    <version>${sdkVersions.leancloud.java}</version>
+</dependency>`}
+</CodeBlock>
 
 Ivy：
 
-```xml
-<dependency org="cn.leancloud" name="storage-core" rev="8.1.4" />
-```
+<CodeBlock className="xml">
+{`<dependency org="cn.leancloud" name="storage-core" rev="${sdkVersions.leancloud.java}" />`}
+</CodeBlock>
 
 SBT：
 
-```scala
-libraryDependencies += "cn.leancloud" %% "storage-core" % "8.1.4"
-```
+<CodeBlock className="scala">
+{`libraryDependencies += "cn.leancloud" %% "storage-core" % "${sdkVersions.leancloud.java}"`}
+</CodeBlock>
 
 Gradle：
 
-```groovy
-implementation 'cn.leancloud:storage-core:8.1.4'
-```
+<CodeBlock className="groovy">
+{`implementation 'cn.leancloud:storage-core:${sdkVersions.leancloud.java}'`}
+</CodeBlock>
 
 如果是 Android 项目，则换成以下这些包：
 
-```groovy
-implementation 'cn.leancloud:storage-android:8.1.4'
-implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-```
+<CodeBlock className="groovy">
+{`implementation 'cn.leancloud:storage-android:${sdkVersions.leancloud.java}'
+implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'`}
+</CodeBlock>
 
 #### 使用即时通讯服务
 
 Maven：
 
-```xml
-<dependency>
+<CodeBlock className="xml">
+{`<dependency>
     <groupId>cn.leancloud</groupId>
     <artifactId>realtime-core</artifactId>
-    <version>8.1.4</version>
-</dependency>
-```
+    <version>${sdkVersions.leancloud.java}</version>
+</dependency>`}
+</CodeBlock>
 
 Ivy:
 
-```xml
-<dependency org="cn.leancloud" name="realtime-core" rev="8.1.4" />
-```
+<CodeBlock className="xml">
+{`<dependency org="cn.leancloud" name="realtime-core" rev="${sdkVersions.leancloud.java}" />`}
+</CodeBlock>
 
 SBT:
 
-```scala
-libraryDependencies += "cn.leancloud" %% "realtime-core" % "8.1.4"
-```
+<CodeBlock className="scala">
+{`libraryDependencies += "cn.leancloud" %% "realtime-core" % "${sdkVersions.leancloud.java}"`}
+</CodeBlock>
 
 Gradle:
 
-```groovy
-implementation 'cn.leancloud:realtime-android:8.1.4'
-implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-```
+<CodeBlock className="groovy">
+{`implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
+implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'`}
+</CodeBlock>
 
 #### 对 maven 源的特别说明
 

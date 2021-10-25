@@ -3,6 +3,8 @@ id: setup-dotnet
 title: 数据存储、即时通讯 .NET SDK 配置指南
 sidebar_label: .NET SDK 配置
 ---
+import CodeBlock from '@theme/CodeBlock';
+import sdkVersions from '/src/docComponents/sdkVersions';
 
 .Net SDK 基于 .Net Standard 2.0 接口标准实现，支持框架如下：
 
@@ -22,13 +24,12 @@ sidebar_label: .NET SDK 配置
 - 直接导入：请下载 LeanCloud-SDK-XXX-Unity.zip，解压后为 Plugins 文件夹，拖拽至 Unity 即可。
 
 - UPM：请在项目的 Packages/manifest.json 中添加依赖项
-
-    ```json
-    "dependencies": {
-    "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-0.9.12",
-    "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-0.9.12"
-    }
-    ```
+  <CodeBlock className="json">
+  {`"dependencies": {
+  "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
+  "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}"
+  }`}
+  </CodeBlock>
 
 注意：仅支持 Unity 2018+，即 Unity Api Compatibility Level 支持 .NET Standard 2.0 的版本。
 
