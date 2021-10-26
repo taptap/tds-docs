@@ -340,7 +340,7 @@ dependencies {
 </CodeBlock>
 
 <CodeBlock className="objectivec">
-{`
+{`// 基础库
 TapCommonSDK.framework
 TapLoginSDK.framework
 // 内嵌动态
