@@ -5,6 +5,8 @@ slug: /sdk/tap-support/guide/
 ---
 
 import MultiLang from '/src/docComponents/MultiLang';
+import CodeBlock from '@theme/CodeBlock';
+import sdkVersions from '/src/docComponents/sdkVersions';
 
 本文介绍如何在游戏中接入 TDS 提供的客服系统 SaaS 服务。
 为了兼容尽可能多的游戏，目前 SDK 只生成网页地址，游戏需要自己加载 webview。
@@ -20,31 +22,30 @@ import MultiLang from '/src/docComponents/MultiLang';
 
 TapSupport SDK 可独立运行：
 
-```cs
-"dependencies":{
+<CodeBlock className="json">
+{`"dependencies":{
   ...
-  "com.taptap.tds.support": "https://github.com/TapTap/TapSupport-Unity.git#3.3.1",
-}
-```
+  "com.taptap.tds.support": "https://github.com/TapTap/TapSupport-Unity.git#${sdkVersions.taptap.unity}",
+}`}
+</CodeBlock>
 
 </>
 <>
 
 TapSupport SDK 依赖 TapCommon 模块：
 
-```java
-repositories{  
+<CodeBlock className="groovy">
+{`repositories{  
     flatDir {  
         dirs 'libs'  
     }  
-}  
-
+}
 dependencies {  
     ... 
-    implementation name:'TapCommon_3.3.1', ext:'aar'
-    implementation (name:'TapSupport_3.3.1', ext:'aar')
-}  
-```
+    implementation name:'TapCommon_${sdkVersions.taptap.android}', ext:'aar'
+    implementation (name:'TapSupport_${sdkVersions.taptap.android}', ext:'aar')
+}`}
+</CodeBlock>
 
 确认 `AndroidManifest.xml` 已添加网络权限：
 

@@ -5,6 +5,8 @@ sidebar_label: 开发指南
 ---
 
 import MultiLang from '/src/docComponents/MultiLang';
+import CodeBlock from '@theme/CodeBlock';
+import sdkVersions from '/src/docComponents/sdkVersions';
 
 游戏好友模块基于 [TDS 内建账户系统](/sdk/authentication/features/)，下文中的玩家、用户均指 `TDSUser`。
 
@@ -14,31 +16,30 @@ import MultiLang from '/src/docComponents/MultiLang';
 
 <MultiLang>
 
-```cs
-"dependencies":{
+<CodeBlock className="json">
+{`"dependencies":{
   ...
-  "com.taptap.tds.friends": "https://github.com/TapTap/TapFriends-Unity.git#3.3.1",
-}
-```
+  "com.taptap.tds.friends": "https://github.com/TapTap/TapFriends-Unity.git#${sdkVersions.taptap.unity}",
+}`}
+</CodeBlock>
 
-```java
-repositories{  
+<CodeBlock className="groovy">
+{`repositories{  
     flatDir {  
         dirs 'libs'  
     }  
 }  
-
 dependencies {  
     ... 
-    implementation (name:'TapFriend_3.3.1', ext:'aar')
-}
-```
+    implementation (name:'TapFriend_${sdkVersions.taptap.android}', ext:'aar')
+}`}
+</CodeBlock>
 
-```objc
-TapFriendResource.bundle
+<CodeBlock className="objectivec">
+{`TapFriendResource.bundle
 TapFriendSDK.framework
-TapFriendUISDK.framework
-```
+TapFriendUISDK.framework`}
+</CodeBlock>
 
 </MultiLang>
 

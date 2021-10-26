@@ -3,6 +3,7 @@ const sdkVersions = {
     unity: "3.3.1",
     android: "3.3.1",
     ios: "3.3.1",
+    anti_addiction: "1.0.0",
   },
   leancloud: {
     objc: "13.5.0",

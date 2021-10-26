@@ -5,6 +5,8 @@ sidebar_label: 开发指南
 ---
 
 import MultiLang from '/src/docComponents/MultiLang';
+import CodeBlock from '@theme/CodeBlock';
+import sdkVersions from '/src/docComponents/sdkVersions';
 
 :::info
 使用 TDS 实名认证和防沉迷服务之前，需要完成[中宣部实名认证系统的注册和接口测试](/sdk/anti-addiction/features/#准备工作)工作，并在 TapTap 开发者中心后台完成[参数配置](/sdk/anti-addiction/features/#完成开发者中心配置)。
@@ -46,23 +48,24 @@ iOS 平台配置：
 
 最低支持 Android 5.0，编译环境为 Android Studio。
 
-- 将 `AntiAddiction_1.0.0.aar` 拷贝到游戏目录下的 `src/main/libs` 目录中
-- 将 `AntiAddictionUI_1.0.0.aar` 拷贝到游戏目录下的 `src/main/libs` 目录中
-- 将 `gson-2.8.6.jar` 拷贝到游戏目录下的 `src/main/libs` 目录中
+<ul>
+<li>将 <code>AntiAddiction_{sdkVersions.taptap.anti_addiction}.aar</code> 拷贝到游戏目录下的 <code>src/main/libs</code> 目录中
+<li>将 <code>AntiAddictionUI_{sdkVersions.taptap.anti_addiction}.aar</code> 拷贝到游戏目录下的 <code>src/main/libs</code> 目录中
+<li>将 <code>gson-2.8.6.jar</code> 拷贝到游戏目录下的 <code>src/main/libs</code> 目录中
+</ul>
 
 在游戏目录下 `build.gradle` 文件中添加代码
 
-```groovy
-repositories{flatDir{dirs 'src/main/libs'}}
-
+<CodeBlock className="groovy">
+{`repositories{flatDir{dirs 'src/main/libs'}}
 dependencies {
     // ...
-    implementation(name: "AntiAddiction_1.0.0", ext: "aar")
-    implementation(name: "AntiAddictionUI_1.0.0", ext: "aar")
+    implementation(name: "AntiAddiction_${sdkVersions.taptap.anti_addiction}", ext: "aar")
+    implementation(name: "AntiAddictionUI_${sdkVersions.taptap.anti_addiction}", ext: "aar")
     implementation(name: "gson-2.8.6", ext: "jar")
     // ...
-}
-```
+}`}
+</CodeBlock>
 
 </>
 <>
