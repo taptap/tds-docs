@@ -3,6 +3,7 @@ id: quickstart
 title: TapSDK 快速开始
 sidebar_label: 快速开始
 ---
+
 import MultiLang from '/src/docComponents/MultiLang';
 import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';
@@ -60,9 +61,9 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
 
 <CodeBlock className="json">
 {`"dependencies":{
-    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#3.3.1",
-    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#3.3.1",
-    "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#3.3.1",
+    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#${sdkVersions.taptap.unity}",
     "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}",
 }`}
 </CodeBlock>

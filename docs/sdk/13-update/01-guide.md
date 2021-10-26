@@ -5,6 +5,8 @@ sidebar_label: 开发指南
 ---
 
 import MultiLang from '/src/docComponents/MultiLang';
+import CodeBlock from '@theme/CodeBlock';
+import sdkVersions from '/src/docComponents/sdkVersions';
 
 TapTap 开发者服务为游戏和玩家提供唤起 TapTap 客户端进行游戏更新的功能。当游戏发布了新版本，且需要玩家进行更新才能体验新版本时，在游戏内绘制一个界面告知玩家，需要进行新版本更新，并且提供一个更新的按钮。玩家点击后，会跳转到 TapTap 客户端内的游戏详情页面，进行更新。
 
@@ -14,29 +16,28 @@ TapTap 开发者服务为游戏和玩家提供唤起 TapTap 客户端进行游�
 
 <MultiLang>
 
-```cs
-"dependencies":{
+<CodeBlock className="json">
+{`"dependencies":{
   ...
-  "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#3.3.1",
-}
-```
+  "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+}`}
+</CodeBlock>
 
-```java
-repositories{  
+<CodeBlock className="groovy">
+{`repositories{  
     flatDir {  
         dirs 'libs'  
     }  
 }  
-
 dependencies {  
     ... 
-    implementation (name:'TapCommon_3.3.1', ext:'aar')
-}  
-```
+    implementation (name:'TapCommon_${sdkVersions.taptap.android}', ext:'aar')
+}`}
+</CodeBlock>
 
-```objectivec
-TapCommonSDK.framework
-```
+<CodeBlock className="objectivec">
+{`TapCommonSDK.framework`}
+</CodeBlock>
 
 </MultiLang>
 

@@ -6,6 +6,8 @@ sidebar_label: 开发指南
 
 
 import MultiLang from '/src/docComponents/MultiLang';
+import CodeBlock from '@theme/CodeBlock';
+import sdkVersions from '/src/docComponents/sdkVersions';
 
 本文介绍如何在游戏中加入 [TapTap 内嵌动态](/sdk/embedded-moments/features/)。使用内嵌动态功能需依赖 TapTap 登录，需要导入`TapMoment` 模块。
 
@@ -19,32 +21,32 @@ import MultiLang from '/src/docComponents/MultiLang';
 
 <MultiLang>
 
-```cs
-"dependencies":{
+<CodeBlock className="json">
+{`"dependencies":{
   ...
   // 内嵌动态
-  "com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#3.3.1",
-}
-```
+  "com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#${sdkVersions.taptap.unity}",
+}`}
+</CodeBlock>
 
-```java
-repositories{  
+<CodeBlock className="groovy">
+{`repositories{  
     flatDir {  
         dirs 'libs'  
     }  
 }  
-
 dependencies {  
     ... 
-    implementation (name:'TapMoment_3.3.1', ext:'aar') // TapTap 内嵌动态
-}  
-```
+    implementation (name:'TapMoment_${sdkVersions.taptap.android}', ext:'aar') // TapTap 内嵌动态
+}`}
+</CodeBlock>
 
-```objectivec
-// 内嵌动态
+<CodeBlock className="objectivec">
+{`// 内嵌动态
 TapMomentResource.bundle
 TapMomentSDK.framework
-```
+`}
+</CodeBlock>
 
 </MultiLang>
 
@@ -315,39 +317,40 @@ postData.content = @"我是图片描述";
 
 <MultiLang>
 
-```cs
-"dependencies":{
-  "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#3.3.1",
-  "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#3.3.1",
-  "com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#3.3.1",
-}
-```
+<CodeBlock className="json">
+{`"dependencies":{
+  "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}",
+  "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+  "com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#${sdkVersions.taptap.unity}",
+}`}
+</CodeBlock>
 
-```java
-repositories{  
+<CodeBlock className="groovy">
+{`repositories{  
     flatDir {  
         dirs 'libs'  
     }  
 }  
-
 dependencies {  
-...  
-    implementation (name:'TapCommon_3.3.1', ext:'aar') // 必选：TapSDK 基础库 
-    implementation (name:'TapLogin_3.3.1', ext:'aar') // 必选：TapTap 登录 
-    implementation (name:'TapMoment_3.3.1', ext:'aar') // TapTap 内嵌动态
-}  
-```
+    ...
+    implementation (name:'TapCommon_${sdkVersions.taptap.android}', ext:'aar') // 必选：TapSDK 基础库 
+    implementation (name:'TapLogin_${sdkVersions.taptap.android}', ext:'aar') // 必选：TapTap 登录  
+    implementation (name:'TapMoment_${sdkVersions.taptap.android}', ext:'aar') // TapTap 内嵌动态
+}`}
+</CodeBlock>
 
-```objectivec
-// 基础库
+<CodeBlock className="objectivec">
+{`// 基础库
 TapCommonSDK.framework
 TapLoginSDK.framework
 // 内嵌动态
 TapMomentResource.bundle
 TapMomentSDK.framework
-```
+`}
+</CodeBlock>
 
 </MultiLang>
+
 
 请确认完成了 [单纯 TapTap 登录的初始化](/sdk/taptap-login/guide/start/#初始化)。
 

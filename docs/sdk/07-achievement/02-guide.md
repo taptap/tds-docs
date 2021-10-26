@@ -5,6 +5,8 @@ sidebar_label: 开发指南
 ---
 
 import MultiLang from '/src/docComponents/MultiLang';
+import CodeBlock from '@theme/CodeBlock';
+import sdkVersions from '/src/docComponents/sdkVersions';
 
 本文介绍如何在游戏中加入成就系统。TDS 推出的成就系统模块，是基于内建账户系统（TDSUser）的，具体请阅读 **[内建账户 > 开发指南](/sdk/authentication/guide/)**。
 
@@ -14,32 +16,31 @@ import MultiLang from '/src/docComponents/MultiLang';
 
 <MultiLang>
 
-```cs
-"dependencies":{
+<CodeBlock className="json">
+{`"dependencies":{
   ...
   // 成就系统
-  "com.taptap.tds.achievement": "https://github.com/TapTap/TapAchievement-Unity.git#3.3.1",
-}
-```
+  "com.taptap.tds.achievement": "https://github.com/TapTap/TapAchievement-Unity.git#${sdkVersions.taptap.unity}",
+}`}
+</CodeBlock>
 
-```java
-repositories{  
+<CodeBlock className="groovy">
+{`repositories{  
     flatDir {  
         dirs 'libs'  
     }  
 }  
-
 dependencies {  
     ... 
-    implementation (name:'TapAchievement_3.2.1', ext:'aar') // TapTap 成就系统
-}  
-```
+    implementation (name:'TapAchievement_${sdkVersions.taptap.android}', ext:'aar') // TapTap 成就系统
+}`}
+</CodeBlock>
 
-```objectivec
-// 成就系统
+<CodeBlock className="objectivec">
+{`// 成就系统
 TapAchievementResource.bundle
-TapAchievementSDK.framework
-```
+TapAchievementSDK.framework`}
+</CodeBlock>
 
 </MultiLang>
 
