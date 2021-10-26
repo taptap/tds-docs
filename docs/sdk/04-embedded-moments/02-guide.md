@@ -30,7 +30,7 @@ import sdkVersions from '/src/docComponents/sdkVersions';
 </CodeBlock>
 
 <CodeBlock className="groovy">
-{`{repositories{  
+{`repositories{  
     flatDir {  
         dirs 'libs'  
     }  
@@ -326,7 +326,7 @@ postData.content = @"我是图片描述";
 </CodeBlock>
 
 <CodeBlock className="groovy">
-{`{repositories{  
+{`repositories{  
     flatDir {  
         dirs 'libs'  
     }  
