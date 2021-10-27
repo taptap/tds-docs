@@ -32,9 +32,23 @@ title: 维度表属性
 
 ![上传入口](/img/customEvent/dimension_table_2.png)
 
-### 3.2 文件格式要求
+### 3.2 文件编码要求 {#encoding}
 
-UTF-8 编码格式保存的文件大小不超过 2G 的 csv 文件；
+系统支持 `UTF-8` 或 `UTF-8 with Bom` 编码格式的 `CSV` 文件，文件大小不超过 2G。
+
+可使用 Excel 在保存文档时选择「**CSV UTF-8(逗号分隔符)（.csv）**」格式；
+
+![Excel](/img/customEvent/dimension_table_7.png)
+
+或使用 WPS 在保存文档时选择「**CSV (逗号分隔符)（*.csv）**」格式；
+
+![WPS](/img/customEvent/dimension_table_8.png)
+
+同样可使用 Sublime、NotePad ++ 等文本编辑工具，将文件以 `UTF-8` 或 `UTF-8 with Bom` 编码保存；
+
+![Sublime、NotePad ++ 等](/img/customEvent/dimension_table_9.png)
+
+### 3.3 文件格式要求
 
 首行内容将作为维度表属性的字段名称，需要以英文开头，英文、数字或 `_` 组成；
 
@@ -51,19 +65,19 @@ UTF-8 编码格式保存的文件大小不超过 2G 的 csv 文件；
 
 对于所选数据类型与文件内容类型不一致的行，该行将被完全抛弃，请注意保持数据类型一致。
 
-### 3.3 填写显示名和字段类型
+### 3.4 填写显示名和字段类型
 
 根据需求填写映射后的维度表字段显示名和数据类型。
 
 ![填写显示名和字段类型](/img/customEvent/dimension_table_3.png)
 
-### 3.4 解析结果
+### 3.5 解析结果
 
 展示解析总行数、成功行数、错误丢弃行数与错误丢弃原因。
 
 ![解析结果](/img/customEvent/dimension_table_4.png)
 
-### 3.5 替换
+### 3.6 替换
 
 若解析结果不符合预期，可更新文件后进行替换。
 
