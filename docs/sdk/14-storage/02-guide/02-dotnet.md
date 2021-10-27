@@ -255,7 +255,7 @@ post.Increment("likes", 1);
 - `AddUnique(key, value)` 将指定对象附加到数组末尾，确保对象唯一。
 - `AddAllUnique(key, values)` 将指定对象数组附加到数组末尾，确保对象唯一。
 - `Remove(key, value)` 从数组字段中删除指定对象的所有实例。
-- `RemoveAll(key, values)` 从数组字段中删除指定的对象数组。
+- `RemoveAll(key, values)` 从数组对象中删除指定数组中的所有对象。
 
 
 例如，`Todo` 用一个 `alarms` 属性保存所有闹钟的时间。下面的代码将多个时间加入这个属性：
