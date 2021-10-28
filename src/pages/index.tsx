@@ -19,9 +19,9 @@ const HomePage = () => {
           <Translate id="tds-home-开发者文档中心" description="from HomePage Title">开发者文档中心</Translate>
         </div>
         <div className={styles.topSubtitle}>
-          <Translate id="tds-home-这里为用户提供游戏开发者相关文档和常见问题，包含游戏商店设置、SDK功能说明及TapTap品牌资源下载。"
+          <Translate id="tds-home-这里为用户提供游戏开发者相关文档和常见问题，包含游戏商店设置、游戏服务说明及TapTap品牌资源下载。"
             description="from HomePage Subtitle">
-            这里为用户提供游戏开发者相关文档和常见问题，包含游戏商店设置、SDK功能说明及TapTap品牌资源下载。
+            这里为用户提供游戏开发者相关文档和常见问题，包含游戏商店设置、游戏服务说明及TapTap品牌资源下载。
           </Translate>
         </div>
         <Link className={styles.topEntryButton} to="store/store-register">
