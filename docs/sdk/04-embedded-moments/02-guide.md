@@ -171,11 +171,23 @@ mConfig.orientation = TapMomentOrientationDefault;
 打开动态页面跳转到指定的页面
 
 <MultiLang>
+<>
 
 ```cs
 var sceneDic = new Dictionary<string, object>() { { TapMomentConstants.TapMomentPageShortCutKey, sceneId } };
+// sceneId 当在 TapDC 后台创建场景化入口时会自动生成 sceneId
 TapMoment.DirectlyOpen(Orientation.ORIENTATION_DEFAULT, TapMomentConstants.TapMomentPageShortCut, sceneDic);
 ```
+
+#### 参数说明
+参数           | 说明       |
+ ----------- | -------- |
+orientation    |    打开方向  |
+page    |    固定为 TapMomentConstants.TapMomentPageShortCut  |
+Dictionary     | 其中 TapMomentConstants.TapMomentPageShortCutKey 固定，第三个参数为要需要跳转的页面 id     |
+
+</>
+<>
 
 ```java
 Map<String, String> extras = new HashMap<>();
@@ -185,20 +197,32 @@ extras.put("scene_id", "xxxx");
 TapMoment.directlyOpen(TapMoment.ORIENTATION_DEFAULT,"tap://moment/scene/", extras);
 ```
 
+#### 参数说明
+参数           | 说明       |
+ ----------- | -------- |
+orientation    |    打开方向  |
+page    |    固定为 `tap://moment/scene/`  |
+HashMap     | 集合中的 Key 固定为 `scene_id` 表示需要跳转的页面 id     |
+
+</>
+<>
+
 ```objectivec
 TapMomentConfig *mConfig = TapMomentConfig.new;
 mConfig.orientation = TapMomentOrientationDefault;
 [TapMoment directlyOpen:mConfig page:TapMomentPageShortcut extras:@{ TapMomentPageShortcutKey: @"sceneid" }];
 ```
 
-</MultiLang>
-
 #### 参数说明
 参数           | 说明       |
  ----------- | -------- |
 orientation    |    打开方向  |
-page    |    固定为 TapMomentConstants.TapMomentPageShortCut  |
-Dictionary     | 其中 TapMomentConstants.TapMomentPageShortCutKey 固定，第二个参数为要需要跳转的页面 id     |
+page    |    固定为 TapMomentPageShortcut  |
+Dictionary     | TapMomentPageShortcutKey 为固定写法，表示需要跳转的页面 id     |
+
+</>
+
+</MultiLang>
 
 ### 场景化入口回调格式说明
 
