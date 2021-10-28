@@ -850,7 +850,7 @@ curl -X POST \
 ```
 
 **注意**，由于这个接口的管理性质，当你通过这个接口发送消息时，我们不会检查 **from_client** 是否有权限给这个聊天室发送消息，而是统统放行，请谨慎使用这个接口。
-如果你在应用中使用了我们内部定义的富媒体消息格式，在发送消息时 **message** 字段需要相应的格式要求。
+如果你在应用中使用了我们内部定义的富媒体消息格式，在发送消息时 **message** 字段需要遵守相应的格式要求。
 此外，聊天室目前**不支持**将消息同步发送给在线的 **from_client**。
 
 参数 | 约束 | 说明
@@ -2128,6 +2128,182 @@ curl -X GET \
 ```
 
 参数与返回值可以参考 `GET /1.2/rtm/conversations/{conv_id}/messages` 接口。
+
+## 富媒体消息格式
+
+[富媒体消息](/sdk/im/guide/overview/#富媒体消息)的参数格式相对于普通文本来说，仅仅是将 `message` 参数换成了一个 JSON 字符串。
+其中 JSON 字段的含义见[即时通讯总览·富媒体消息](/sdk/im/guide/overview/#富媒体消息)中的说明。
+下面给出内置富媒体消息类型序列化为 JSON 的例子。
+### 文本消息
+
+```json
+{
+  "_lctype": -1,
+  "_lctext": "这是一个纯文本消息",
+  "_lcattrs": {
+    "a": "_lcattrs 是用来存储用户自定义的一些键值对"
+  }
+}
+```
+
+### 图像消息
+
+```json
+{
+  "_lctype":    -2,                    // 必要参数
+  "_lctext":    "图像的文字说明",
+  "_lcattrs": {
+    "a":        "_lcattrs 是用来存储用户自定义的一些键值对",
+    "b":        true,
+    "c":        12
+  },
+  "_lcfile": {
+    "url":      "http://ac-p2bpmgci.clouddn.com/246b8acc-2e12-4a9d-a255-8d17a3059d25", // 必要参数
+    "objId":    "54699d87e4b0a56c64f470a4", // 文件对应的 LCFile.objectId
+    "metaData": {
+      "name":   "IMG_20141223.jpeg",   // 图像的名称
+      "format": "png",                 // 图像的格式
+      "height": 768,                   // 单位：像素
+      "width":  1024,                  // 单位：像素
+      "size":   18                     // 单位：b
+    }
+  }
+}
+```
+
+上面是完整的例子，如果只想简单的发送图像 URL：
+
+```json
+{
+  "_lctype": -2,
+  "_lcfile": {
+    "url":   "http://ac-p2bpmgci.clouddn.com/246b8acc-2e12-4a9d-a255-8d17a3059d25"
+  }
+}
+```
+
+### 音频消息
+
+```json
+{
+  "_lctype":      -3,
+  "_lctext":      "这是一个音频消息",
+  "_lcattrs": {
+    "a":          "_lcattrs 是用来存储用户自定义的一些键值对"
+  },
+  "_lcfile": {
+    "url":        "http://ac-p2bpmgci.clouddn.com/246b8acc-2e12-4a9d-a255-8d17a3059d25",
+    "objId":      "54699d87e4b0a56c64f470a4", // 文件对应的 LCFile.objectId
+    "metaData": {
+      "name":     "我的滑板鞋.wav",
+      "format":   "wav",
+      "duration": 26,    // 单位：秒
+      "size":     2738   // 单位：b
+    }
+  }
+}
+```
+
+简略版：
+
+```json
+{
+  "_lctype": -3,
+  "_lcfile": {
+    "url":   "http://www.somemusic.com/x.mp3"
+  }
+}
+```
+
+### 视频消息
+
+```json
+{
+  "_lctype":      -4,
+  "_lctext":      "这是一个视频消息",
+  "_lcattrs": {
+    "a":          "_lcattrs 是用来存储用户自定义的一些键值对"
+  },
+  "_lcfile": {
+    "url":        "http://ac-p2bpmgci.clouddn.com/99de0f45-171c-4fdd-82b8-1877b29bdd12",
+    "objId":      "54699d87e4b0a56c64f470a4", // 文件对应的 LCFile.objectId
+    "metaData": {
+      "name":     "录制的视频.mov",
+      "format":   "avi",
+      "duration": 168,      // 单位：秒
+      "size":     18689     // 单位：b
+    }
+  }
+}
+```
+
+简略版：
+
+```json
+{
+  "_lctype": -4,
+  "_lcfile": {
+    "url":   "http://www.somevideo.com/Y.flv"
+  }
+}
+```
+
+### 通用文件消息
+
+```json
+{
+  "_lctype": -6,
+  "_lctext": "这是一个普通文件类型",
+  "_lcattrs": {
+    "a":     "_lcattrs 是用来存储用户自定义的一些键值对"
+  },
+  "_lcfile": {
+    "url":   "http://www.somefile.com/jianli.doc",
+    "name":  "我的简历.doc",
+    "size":  18689          // 单位：b
+  }
+}
+```
+
+简略版：
+
+```json
+{
+  "_lctype": -6,
+  "_lcfile": {
+    "url":   "http://www.somefile.com/jianli.doc",
+    "name":  "我的简历.doc"
+  }
+}
+```
+
+### 地理位置消息
+
+```json
+{
+  "_lctype":     -5,
+  "_lctext":     "这是一个地理位置消息",
+  "_lcattrs": {
+    "a":         "_lcattrs 是用来存储用户自定义的一些键值对"
+  },
+  "_lcloc": {
+    "longitude": 23.2,
+    "latitude":  45.2
+  }
+}
+```
+
+简略版：
+
+```json
+{
+  "_lctype":     -5,
+  "_lcloc": {
+    "longitude": 23.2,
+    "latitude":  45.2
+  }
+}
+```
 
 ## 接口请求频率限制
 

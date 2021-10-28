@@ -93,7 +93,8 @@ roundCorner | 是否为圆角
 ```cs
 try
 {
-    // 唤起 TapTap 网页 或者 TapTap 客户端进行登录
+    // 在 iOS、Android 系统下，会唤起 TapTap 网页 或者 TapTap 客户端进行登录
+    // 在其他平台，会显示二维码，玩家可以通过移动设备上的 TapTap 客户端扫码登录
     var accessToken = await TapLogin.Login();
     Debug.Log($"LeeJiEun 登录成功 accessToken: {accessToken.ToJson()}");
 }
