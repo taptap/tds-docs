@@ -49,7 +49,7 @@ const config = {
             position: 'right',
           },
           {
-            label: 'SDK功能',
+            label: '游戏服务',
             to: 'sdk',
             position: 'right',
           },

@@ -26,7 +26,7 @@ export const entryList: (localePath: string) => Array<Entry> = (localePath: stri
       ],
     },
     {
-      title: 'SDK功能',
+      title: '游戏服务',
       description: 'TDS为游戏开发提供的全套SDK服务',
       links: [
         {
