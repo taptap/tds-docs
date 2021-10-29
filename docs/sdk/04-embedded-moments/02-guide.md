@@ -376,7 +376,7 @@ TapMomentSDK.framework
 </MultiLang>
 
 
-请确认完成了 [单纯 TapTap 登录的初始化](/sdk/taptap-login/guide/start/#初始化)。
+请确认完成了 [单纯 TapTap 登录的初始化](/sdk/taptap-login/guide/tap-login/#初始化)。
 
 内嵌动态功能的**初始化**示例如下：
 
