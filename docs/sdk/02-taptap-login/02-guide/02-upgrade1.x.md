@@ -8,9 +8,13 @@ import MultiLang from '/src/docComponents/MultiLang';
 
 因新版接口与旧版接口有明显差别，所以需将旧版接口删除，通过如下方式重新接入以便使用新版本接口。
 
+## TapSDK 3.x 版本的导入
+
+去除 1.x 方式导入的 SDK 相关包和文件，引入 3.x SDK，详情请参考[项目配置](/sdk/start/quickstart/#项目配置)。
+
 ## 初始化
 
-该接口应尽早并在调用 SDK 的其他接口前调用，示例如下：
+该接口应尽早并在调用 TapSDK 的其他接口前调用，示例如下：
 
 <MultiLang>
 <>
@@ -84,7 +88,7 @@ try{
 }
 // 获取 TapTap Profile  可以获得当前用户的一些基本信息，例如名称、头像。
 var profile = await TapLogin.FetchProfile();
-// 补充通过 profile 获取用户的：昵称、头像、唯一标识 查看 
+// 补充: 通过 profile 获取用户的：昵称、头像、唯一标识 查看 
 profile.name  
 profile.avatar 
 profile.openId
