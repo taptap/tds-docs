@@ -24,11 +24,16 @@ AdService.framework | 广告框架 | optional
 AppTrackingTransparency.framework | iOS 14 新增 app 追踪框架（若无需在 iOS 14 以上追踪 IDFA 可不添加该依赖） | optional
 SystemConfiguration.framework | 
 CoreMotion.framework | 
+CoreTelephony.framework | 
 Security.framework | 用来持久化存储设备 ID
 libc++.tdb |
 libresolv.tbd | 
 libz.tbd |  
 libsqlite3.0.tbd |  
+
+### 1.4.编译配置
+
+在 `Build Settings` 中的 `link` -> `Other Linker Flags` 中加入： `-ObjC`
 
 
 ### 1.4.初始化
