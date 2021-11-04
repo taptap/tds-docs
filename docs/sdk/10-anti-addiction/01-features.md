@@ -24,8 +24,6 @@ sidebar_label: 功能介绍
 
 ![](/img/anti-addiction/anti-addiction-qualification.png)
 
-如需使用 TapTap 快速认证（详见下节），还请提交工单（分类选择「游戏服务支持 > 防沉迷新政相关」）联系我们开通。
-
 ## 接入 TDS 实名认证和防沉迷服务
 
 完成准备工作后，可接入 TDS 实名认证和防沉迷服务。TDS 提供的实名认证和防沉迷模块，分为两个部分：
