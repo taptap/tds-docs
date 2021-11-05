@@ -249,14 +249,28 @@ classpath 'com.android.tools.build:gradle:4.1.0'
 </queries>
 ```
 
-### 未接入 TapSDK 的游戏如何引导用户下载最新版本的 TapTap 客户端
+### 未接入 TapSDK，如何唤起 TapTap 客户端更新游戏
 
-未接入 TapSDK、使用旧版 TapSDK 难以升级的游戏，可以通过访问以下短链手动唤起 TapTap 客户端更新游戏：
+受限于苹果政策，iOS 平台的 TapTap 客户端不提供游戏更新功能，以下方案仅限于 Android 平台使用。
 
-- 中国大陆 `https://l.taptap.com/5d1NGyET?subc1=YOUR-GAME-ID`
-- 其他国家或地区 `https://l.taptap.io/GNYwFaZr?subc1=YOUR-GAME-ID`
+未接入 TapSDK、使用旧版 TapSDK 难以升级的游戏，可以通过以下方案进行手动唤起 TapTap 客户端更新游戏：
+
+根据玩家设备是否安装 TapTap 客户端来对应打开 URL:
+- 如果玩家设备安装 TapTap 客户端则直接唤起 TapTap 客户端到游戏详情页进行更新；
+- 如果玩家设备没有安装 TapTap 客户端，则以 Web 形式打开游戏详情页，根据页面底部提示引导玩家下载 TapTap 客户端，安装成功后打开 TapTap 客户端，玩家根据提示选择在 TapTap 客户端里打开游戏详情页进行更新。
+
+未安装 TapTap 客户端对应的 URL：
+- 中国大陆 `https://l.taptap.com/5d1NGyET?subc1=AppID`
+- 其他国家或地区 `https://l.taptap.io/GNYwFaZr?subc1=AppID`
+
+已安装 TapTap 客户端对应的 URL：
+- 中国大陆 `taptap://taptap.com/app?app_id=AppID&source=outer|update`
+- 其他国家或地区 `tapglobal://taptap.tw/app?app_id=游戏商店id&source=outer|update`
+
+注意替换其中的 `AppID`。`AppID` 是游戏在 TapTap 商店的唯一身份标识，例如：https://www.taptap.com/app/187168 ，其中 "187168" 是 AppID。
 
 注意，除了打开 URL 外，还需要检测设备是否已经安装 TapTap 客户端，以及处理唤起失败的逻辑，这些代码都需要自行编写。
+
 下面提供 TapSDK 唤起更新的代码供参考。
 
 <details>
