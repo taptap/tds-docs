@@ -262,6 +262,8 @@ userIdentifier:userIdentifier tapAccesssToken:tapTapAccessToken];
 
 ### 手动输入实名信息
 
+<MultiLang>
+
 ```cs
 string userIdentifier = "玩家的唯一标识";
 AntiAddictionUIKit.Startup(false, userIdentifier, "");
@@ -278,6 +280,7 @@ NSString *userIdentifier = @"玩家的唯一标识";
 userIdentifier:userIdentifier tapAccesssToken:@""];
 ```
 
+</MultiLang>
 
 ### 获取 TapTap Access Token
 
