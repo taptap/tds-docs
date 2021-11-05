@@ -220,8 +220,7 @@ gameSave.delete();
 
 </MultiLang>
 
-注意，删除存档时关联的封面文件和存档原文件并不会一并删除。
-如需清理，可以在服务端写脚本批量[删除](/sdk/storage/guide/rest#删除文件)。
+删除存档时云端会自动删除关联的封面文件和存档原文件。
 
 ## REST API
 
@@ -381,8 +380,28 @@ https://API_BASE_URL/1.1/gamesaves
 - `gameFile is required.`：遗漏了必填字段 `gameFile`。
 - `Forbidden to add new fields by class '_GameSave' permissions.`：提交了非法字段，云存档目前暂不支持添加自定义字段。
 
-### 更新存档
+### 删除存档
 
+```
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Session: <sessionToken>" \
+  https://API_BASE_URL/1.1/gamesave/<objectId>
+```
+
+会返回
+
+```json
+{}
+```
+
+删除存档时也可以附加 `where` 条件，防止误删。
+参见[有条件删除对象](/sdk/storage/guide/rest#有条件删除对象)。
+
+删除存档时云端会自动删除关联的封面文件和存档原文件。
+
+### 更新存档
 
 ```sh
 curl -X PUT \
@@ -405,24 +424,5 @@ curl -X PUT \
 - `Forbidden to add new fields by class '_GameSave' permissions.`：提交了非法字段，云存档目前暂不支持添加自定义字段。
 
 注意，更新封面文件和存档原文件后，原本关联的封面文件和存档原文件并不会一并删除。
-同理，删除存档时关联的封面文件和存档原文件并不会一并删除。
 这些文件需要另外[删除](/sdk/storage/guide/rest#删除文件)。
-
-### 删除存档
-
-```
-curl -X DELETE \
-  -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
-  -H "X-LC-Session: <sessionToken>" \
-  https://API_BASE_URL/1.1/gamesave/<objectId>
-```
-
-会返回
-
-```json
-{}
-```
-
-删除存档时也可以附加 `where` 条件，防止误删。
-参见[有条件删除对象](/sdk/storage/guide/rest#有条件删除对象)。
+所以一般建议通过删除存档后重新创建存档的方式「更新」存档，这个更新存档的接口主要供服务端在一些管理场景下使用。

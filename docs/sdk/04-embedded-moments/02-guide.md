@@ -136,7 +136,7 @@ TapMoment.fetchNotification();
 <MultiLang>
 
 ```cs
-TapMoment.Open(TapSDK.Orientation.ORIENTATION_LANDSCAPE);
+TapMoment.Open(Orientation.ORIENTATION_LANDSCAPE);
 ```
 
 ```java

@@ -203,8 +203,9 @@ LCObject *todo = [LCObject objectWithClassName:@"Todo" objectId:@"582570f38ac247
 
 ```objc
 LCObject *todo = [LCObject objectWithClassName:@"Todo" objectId:@"582570f38ac247004f39c24b"];
-NSArray *keys = [NSArray arrayWithObjects:@"priority", @"location", nil];
-[todo fetchInBackgroundWithKeys:keys block:^(LCObject *todo, NSError *error) {
+LCObjectFetchOption *option = [LCObjectFetchOption new];
+option.selectKeys = @[@"priority", @"location"];
+[todo fetchInBackgroundWithOption:option block:^(LCObject * _Nullable object, NSError * _Nullable error) {
     // 只有 priority 和 location 会被获取和刷新
 }];
 ```
@@ -419,24 +420,14 @@ LCObject *todo = [[LCObject alloc] initWithClassName:@"Todo"]; // 构建对象
 [todo setObject:[LCUser currentUser] forKey:@"owner"]; // 这里就是一个 Pointer 类型，指向当前登录的用户
 
 NSMutableDictionary *serializedJSONDictionary = [todo dictionaryForObject]; // 获取序列化后的字典
-NSError *err;
-NSData *jsonData = [NSJSONSerialization dataWithJSONObject:serializedJSONDictionary options:0 error:&err]; // 获取 JSON 数据
-NSString *serializedString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding]; // 获取 JSON 字符串
-// serializedString 的内容是：{"title":"马拉松报名","className":"Todo","priority":2}
 ```
 
 
 反序列化：
 
 ```objc
-NSMutableDictionary *objectDictionary = [NSMutableDictionary dictionaryWithCapacity:10];// 声明一个 NSMutableDictionary
-[objectDictionary setObject:@"马拉松报名" forKey:@"title"];
-[objectDictionary setObject:@2 forKey:@"priority"];
-[objectDictionary setObject:@"Todo" forKey:@"className"];
-
-LCObject *todo = [LCObject objectWithDictionary:objectDictionary]; // 由 NSMutableDictionary 转化一个 LCObject
-
-[todo saveInBackground]; // 保存到云端
+// 由 NSMutableDictionary 转化一个 LCObject
+LCObject *todo = [LCObject objectWithDictionary:serializedJSONDictionary];
 ```
 
 ## 查询
