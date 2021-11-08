@@ -288,7 +288,7 @@ room.GetRtcRangeAudioCtrl().UpdateAudioReceiverRange(range);
 
 范围（`range`）之外的其他小队成员无法听到。
 
-如果同时[启用 3D 语音](#开关 3D 语音)，那么距离远近还会影响音量大小：
+如果同时[启用 3D 语音](#开关-3d-语音)，那么距离远近还会影响音量大小：
 
 | 音源距离 | 音量衰减 |
 | - | - |
@@ -313,7 +313,7 @@ Forward forward = new Forward(axisForward, axisRight, axisUp);
 bool ok = TapRTC.UpdateSelfPosition(position, forward);
 ```
 
-朝向不影响是否能听到语音，因此如未[启用 3D 语音](#开关 3D 语音)，更新声源方位朝向时，朝向参数可随意设置。
+朝向不影响是否能听到语音，因此如未[启用 3D 语音](#开关-3d-语音)，更新声源方位朝向时，朝向参数可随意设置。
 但启用 3D 语音时，需正确设置朝向，这样才能得到准确的 3D 音效。
 
 ### 开关 3D 语音
