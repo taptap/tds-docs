@@ -150,7 +150,7 @@ bool ok = room.EnableUserAudio("userId");
 bool ok = room.DisableUserAudio("userId");
 ```
 
-### 开启/关闭房间语音
+### 开关语音
 
 ```cs
 // 开启
@@ -160,6 +160,7 @@ bool ok = room.EnableAudioReceiver(true);
 bool ok = room.EnableAudioReceiver(false);
 ```
 
+也可以让玩家直接使用设备的麦克风、扬声器开关。
 
 ### 切换音频质量
 
@@ -174,7 +175,7 @@ room.ChangeRoomType(AudioPerfProfile.HIGH);
 ### 获取当前房间的用户
 
 ```cs
-Collection<string> userIdList = room.Users;
+HashSet<string> userIdList = room.Users;
 ```
 
 ## 音频控制相关接口
@@ -218,7 +219,7 @@ int micVolume = TapRTC.GetAudioDevice().GetMicVolume();
 int speakerVolume = TapRTC.GetAudioDevice().GetSpeakerVolume();
 ```
 
-### 打开/关闭声音播放
+### 开关播放设备
 
 ```cs
 // 打开
