@@ -31,7 +31,7 @@ import Mermaid from '/src/docComponents/Mermaid';
 
 RTC 通过 `TapRTCConfig` 来进行初始化配置。初始化的过程是异步的，需要等待初始化结果返回之后，才能进行下一步的操作。
 
-* `AppId`、`AppKey`、`ServerUrl`，参见关于[应用凭证](/sdk/storage/guide/setup-dotnet#应用凭证)的说明。
+* `ClientId`、`ClientToken`、`ServerUrl`，参见关于[应用凭证](/sdk/storage/guide/setup-dotnet#应用凭证)的说明。
 * `UserId`: 开发者自定义的用户 Id
 * `DeviceId`: 设备 Id
 * `AudioPerfProfile`: 音频质量配置（`LOW`、`MID`、`HIGH`，默认为 `MID`）
@@ -40,8 +40,8 @@ RTC 通过 `TapRTCConfig` 来进行初始化配置。初始化的过程是异步
 using TapTap.RTC;
 
 var config = new TapRTCConfig.Builder()
-            .AppId("AppId")
-            .AppKey("AppKey")
+            .ClientID("ClientId")
+            .ClientToken("ClientToken")
             .ServerUrl("ServerUrl")
             .UserId("UserId")
             .DeviceId("DeviceId")
@@ -150,7 +150,7 @@ bool ok = room.EnableUserAudio("userId");
 bool ok = room.DisableUserAudio("userId");
 ```
 
-### 开关语音
+### 打开/关闭语音
 
 ```cs
 // 开启
@@ -160,7 +160,8 @@ bool ok = room.EnableAudioReceiver(true);
 bool ok = room.EnableAudioReceiver(false);
 ```
 
-也可以让玩家直接使用设备的麦克风、扬声器开关。
+这个接口设置音频下行的开关。
+一般来说，推荐游戏使用[打开/关闭扬声器的接口](#打开关闭扬声器)。
 
 ### 切换音频质量
 

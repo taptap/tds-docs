@@ -866,6 +866,8 @@ curl -X GET \
 {
     "clientId": "YOUR CLIENT ID",
     "enabled": 1,
+    "richMsgEnabled": true,
+    "onlineMsgEnabled": true,
     "webSocketUrl": "wss://XXX.ws.tds1.tapapis.cn/ws/leancloud/v1",
     "richPresenceFields": [
         {
@@ -941,7 +943,8 @@ curl -X POST \
   -H "X-LC-Key: {{masterkey}},master" \
   -H "Content-Type: application/json" \
   -d '{
-    "enableWebsocket":true,
+    "enableRichMsg":true,
+    "enableOnlineMsg":true,
     "richPresenceFields":[
         {"key":"display","type":"token"},
         {"key":"leadboard","type":"token"},
@@ -950,8 +953,11 @@ curl -X POST \
         {"key":"rank","type":"variable"}
     ]
   }' \
-  https://{{host}}/friend/v1/rich-presence/config/base-info
+  https://{{host}}/friend/v2/rich-presence/config/base-info
 ```
+
+`enableRichMsg` 和 `enableOnlineMsg` 分别用于设置是否启用富信息通知、是否启用好友上下线通知，建议两者均指定为 `true`。
+注意，**这个接口 URL 地址中的版本号是 `v2`**，和其他接口的 `v1` 不同。
 
 返回结果示例：
 
