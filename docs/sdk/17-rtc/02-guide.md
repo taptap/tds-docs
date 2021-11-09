@@ -273,7 +273,7 @@ bool ok = room.GetRtcRangeAudioCtrl().SetRangeAudioMode(RangeAudioMode.WORLD);
 bool ok = room.GetRtcRangeAudioCtrl().SetRangeAudioMode(RangeAudioMode.TEAM);
 ```
 
-然后进入房间，并[设置语音接收范围](#设置语音接收范围)、[更新声源方位](#更新声源方位)，范围语音即可生效。
+然后进入房间，并[设置语音接收范围](#设置语音接收范围)、[更新声源方位](#更新声源方位朝向)，范围语音即可生效。
 
 进入房间后，如需切换语音模式，可再次调用 `SetRangeAudioMode`。
 
@@ -593,8 +593,8 @@ var authBuffer = AuthBufferHelper.GenToken(appId, roomId, userId, masterKey);
 
     注意：
 
-        - **请直接从 HTTP 请求体中读取 JSON 内容**，反序列化到程序语言的数据结构可能会改变字段顺序，导致校验失败
-        - POST 和 body 直接连接，中间无空格。
+    - **请直接从 HTTP 请求体中读取 JSON 内容**，反序列化到程序语言的数据结构可能会改变字段顺序，导致校验失败
+    - POST 和 body 直接连接，中间无空格。
 
 2. 对 payload 进行 HMAC-SHA1 加密，密钥为游戏应用的 `Server Secret`。
 
