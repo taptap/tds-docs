@@ -107,6 +107,7 @@ room.RegisterEventAction(new TapRTCEvent()
     OnUserExit = userId => { label.text += "\n" + $"玩家{userId}退出房间"; },
     OnUserSpeaker = (userId, volume) => { label.text += "\n" + $"玩家{userId}在房间说话，音量{volume}"; },
     OnUserSpeakEnd = userId => { label.text += "\n" + $"玩家{userId}在房间说话结束"; },
+    // 返回切换后的音质，参见下文「切换音频质量」一节
     OnRoomTypeChanged = (i) => { label.text += "\n" + $"房间音质改为{i}"; },
     OnRoomQualityChanged = (weight, loss, delay) =>
     {
@@ -165,13 +166,17 @@ bool ok = room.EnableAudioReceiver(false);
 
 ### 切换音频质量
 
-进入房间后，可以切换音频质量：
+音频质量分为 LOW、MID、HIGH 三档。
+
+进入房间后，可以切换音频质量。
 
 ```cs
 room.ChangeRoomType(AudioPerfProfile.LOW);
 room.ChangeRoomType(AudioPerfProfile.MID);
 room.ChangeRoomType(AudioPerfProfile.HIGH);
 ```
+
+切换音频质量会触发 `OnRoomTypeChanged` 回调。
 
 ### 获取当前房间的用户
 
