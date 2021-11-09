@@ -20,11 +20,15 @@ sidebar_label: 功能介绍
 
 在 TapCanary [控制台](https://canary.developer.taptap.com/dashboard/plan-list)，创建一个测试计划，按照步骤提示上传你的应用（`.apk`），并填写相关的测试信息。
 
+![](/img/canary/create-plan.png)
+
 ### 添加指定测试用户
 
 你可以在第一步创建测试计划时就添加用户，也可以通过再次编辑测试计划来补充或修改测试用户。如测试计划已经开启，被添加的测试账号在 TapCanary APP 中，可以看见并访问应用。
 
 每个测试计划至多支持 1000 个测试用户。
+
+![](/img/canary/manage-participants.jpg)
 
 #### 单次少量添加
 
@@ -38,13 +42,17 @@ sidebar_label: 功能介绍
 
 在合适的时间，点击**开启**测试计划，测试用户可在 TapCanary APP 访问应用。已开启的测试计划不能切换测试模式，如不支持从云玩模式切换到沙盒模式，反之亦然。
 
+![](/img/canary/start.jpg)
+
 ## 测试应用
 
-被开启的测试计划会在 TapCanary APP 中展示并访问。前往 TapTap 商店直接下载 TapCanary APP，或前往 TapCanary 官网扫码下载。
+被开启的测试计划会在 TapCanary APP 中展示并访问。前往 TapTap 商店直接[下载 TapCanary APP](https://www.taptap.com/app/222711)，或前往 TapCanary 官网[扫码下载](https://canary.developer.taptap.com/)。
 
 ## 更新应用版本
 
 你可以在测试计划的编辑模式中，上传应用的新版 APK。提交成功后，TapCanary APP 中会立即自动获取到最新的应用。请注意填写新版本的更新日志，让测试用户知晓应用的新特性。
+
+![](/img/canary/edit-plan.jpg)
 
 ## 多模式测试
 
@@ -53,3 +61,5 @@ sidebar_label: 功能介绍
 ## 结束测试
 
 测试计划会按照预先设置的测试时间自动结束测试。你也可以提前结束测试计划，在控制台中找到 **终止计划** 并点击执行。测试计划结束或终止后，应用将不可被再次下载、更新、访问。
+
+![](/img/canary/end.jpg)
