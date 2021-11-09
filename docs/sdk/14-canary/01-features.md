@@ -42,7 +42,7 @@ sidebar_label: 功能介绍
 
 在合适的时间，点击**开启**测试计划，测试用户可在 TapCanary APP 访问应用。已开启的测试计划不能切换测试模式，如不支持从云玩模式切换到沙盒模式，反之亦然。
 
-![](/img/canary/start.jpg)
+![](/img/canary/start.png)
 
 ## 测试应用
 
