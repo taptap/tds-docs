@@ -468,3 +468,171 @@ public AchievmentStats stats;         //当前成就稀有度指标
 ```
 
 </MultiLang>
+
+## REST API
+
+下面我们介绍成就相关的 REST API 接口。
+开发者可以自行编写程序或脚本调用这些接口在服务端进行管理性质的操作。
+
+### 请求格式
+
+POST 请求的主体必须是 JSON 格式，而且 HTTP Header 的 Content-Type 需要设置为 `application/json`。
+
+请求的鉴权是通过 HTTP Header 里面包含的键值对来进行的，参数如下表：
+
+Key|Value|含义
+---|----|---
+`X-TDS-Id`|`{{clientId}}`|游戏的 `Client Id`，可在控制台查看
+`X-TDS-Server-Secret`|`{{serverSecret}}`|游戏的 `Server Secret`，可在控制台查看
+
+参见文档关于[应用凭证](/sdk/storage/guide/setup-dotnet#应用凭证)的说明。
+
+除了在 `X-TDS-Id` 这个 HTTP Header 中传入 `Client Id` 外，还需要在 URL 中指定 `Client Id`，两者的值需要一致。
+
+获取成就的接口需要在 URL 中指定语言，语言代码使用 ISO 639-1 中定义的双小写字母语言代码（例如，`en` 表示英语，`jp` 表示日语），但：
+
+1. ISO 639-1 中未包括的语言，使用 ISO 632-2 中定义的三小写字母语言代码（例如，`fil` 表示菲律宾语）
+2. 仅使用语言代码无法表示所需语言时，附加 ISO 3166-1 中定义的地区代码（例如，`zh_CN` 表示简体中文）
+
+异常时返回 500 （HTTP 状态码）错误，例如：
+
+```json
+{
+    "code": "500",
+    "msg": "成就服务忙，稍后请求",
+}
+```
+
+### 全部成就列表
+
+获取游戏的全部成就，调用时需在 URL 中指定相应的语言。
+
+```sh
+curl -X GET \
+  -H "X-TDS-Id: {{clientId}}" \
+  -H "X-TDS-Server-Secret: {{serverSecret}}" \
+  https://tds-tapsdk.cn.tapapis.com/achievement/open/v1/clients/{{clientId}}/achievements/languages/<lang>
+```
+
+返回数据结构体：
+
+```json
+{
+  "success": true,
+  "data": {
+    "list": [
+      {
+        "achievement_id": "成就id",
+        "client_id": "游戏id",
+        "achievement_open_id": "成就外部id（游戏在DC新增成就时绑定的ID）",
+        "achievement_type": 成就类型：1-普通成就，99-白金成就,
+        "is_hide": 是否隐藏：0-不隐藏，1-隐藏,
+        "count_step": 成就步数，不分步时是1,
+        "show_order": 成就顺序，白金成就是0,
+        "achievement_config_out_dto": {
+          "achievement_config_id": "成就配置id",
+          "achievement_id": "成就id",
+          "language_id": "语言id",
+          "achievement_icon": "成就icon链接",
+          "achievement_title": "成就标题",
+          "achievement_sub_title": "成就副标题"
+        },
+        "achievement_rarity": {
+          "rarity": 稀有度比率,
+          "level": 稀有度：1-普通，2-稀有，3-珍贵，4-
+        }
+      }
+    ]
+  }
+}
+```
+
+### 玩家成就列表
+
+获取某一玩家取得的成就，调用时需在 URL 中指定该玩家对应的 TDS 内建账户的 objectId 和语言。
+
+```sh
+curl -X GET \
+  -H "X-TDS-Id: {{clientId}}" \
+  -H "X-TDS-Server-Secret: {{serverSecret}}" \
+  https://tds-tapsdk.cn.tapapis.com/achievement/open/v1/clients/{{clientId}}/users/<objectId>/achievements/languages/<lang>
+```
+
+返回数据结构体：
+
+```json
+{
+  "success": true,
+  "data": {
+    "list": [
+      {
+        "achievement_id": "成就id",
+        "client_id": "游戏id",
+        "achievement_open_id": "成就外部id（游戏在DC新增成就时绑定的ID）",
+        "achievement_type": 成就类型：1-普通成就，99-白金成就,
+        "is_hide": 是否隐藏：0-不隐藏，1-隐藏,
+        "count_step": 成就步数，不分步时是1,
+        "show_order": 成就顺序，白金成就是0,
+        "achievement_config_out_dto": {
+          "achievement_config_id": "成就配置id",
+          "achievement_id": "成就id",
+          "language_id": "语言id",
+          "achievement_icon": "成就icon链接",
+          "achievement_title": "成就标题",
+          "achievement_sub_title": "成就副标题"
+        },
+        "achievement_rarity": {
+          "rarity": 稀有度比率,
+          "level": 稀有度：1-普通，2-稀有，3-珍贵，4-极为珍贵
+        } ,
+        "user_achievement_id": "用户成就id",
+        "complete_time": 完成时间戳,
+        "completed_step": 完成步数,
+        "full_completed": 是否完全完成，true-是，fasle-否
+      }
+    ]
+  }
+}
+```
+
+### 提交成就
+
+可以调用这一接口提交单个或多个玩家取得的成就，提交的成就会**追加**到玩家已达成的成就列表。
+
+```sh
+curl -X POST \
+  -H "X-TDS-Id: {{clientId}}" \
+  -H "X-TDS-Server-Secret: {{serverSecret}}" \
+  -H "Content-Type: application/json" \
+  -d '{"data": [{"userId": <objectId>, "list":
+        [{
+          "achievement_open_id": "成就外部id",
+          "complete_time": <完成时间戳>,
+          "completed_step": <完成步数>
+        }]
+      }]
+    }' \
+  https://tds-tapsdk.cn.tapapis.com/achievement/open/v1/clients/{{clientId}}/achievements
+```
+
+返回数据结构体：
+
+```json
+{
+  "success": true,
+  "data": {
+    "list": [
+      {
+        "user_id": "TDSId",
+        "result_list": [
+          {
+            "result": 本条数据上报是否成功，true 成功，false 失败,
+            "code": 成功时，返回 0，失败时，返回对应错误码,
+            "msg": 成功时，无返回，失败时，返回对应错误信息
+          }
+        ]
+      }
+    ]
+  }
+}
+```
