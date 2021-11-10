@@ -69,22 +69,19 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
 }`}
 </CodeBlock>
 
-[点击](https://github.com/TapTap/TapSDK-Unity/releases) 参考 SDK 最新版本号。
+在 Unity 顶部菜单中选择 **Window > Package Manager** 可查看已经安装在项目中的包。
 
 #### 方法二：手动导入
 
-1. [点击下载](/tap-download) `TapSDK-UnityPackage.zip` 和 `LeanCloud-SDK-Realtime-Unity.zip`，然后将该 SDK 解压。
+1. [点击下载](/tap-download) `TapSDK-UnityPackage.zip` 和 `LeanCloud-SDK-Realtime-Unity.zip`。
 
-2. 在 Unity 项目中依次转到 **Assets > Import Packages > Custom Packages**。
-
-3. 从解压后的 TapSDK 中，选择希望在应用中使用的 TapSDK 包导入，其中：
+2. 在 Unity 项目中依次转到 **Assets > Import Packages > Custom Packages**，从解压后的 `TapSDK-UnityPackage.zip` 中，选择希望在游戏中使用的 TapSDK 包导入，其中：
 
    - `TapTap_Bootstrap.unitypackage` TapSDK 启动器，必选。
    - `TapTap_Common.unitypackage` TapSDK 基础库，必选。
    - `TapTap_Login.unitypackage` TapTap 登录，必选。
-   - `LeanCloud-SDK-Realtime-Unity.zip` 必选，解压后为 Plugins 文件夹，拖拽至 Unity 即可。
 
-在 Unity 顶部菜单中选择 **Window > Package Manager** 可查看已经安装在项目中的包。
+3. 解压后的 `LeanCloud-SDK-Realtime-Unity.zip` 为 Plugins 文件夹，拖拽至 Unity 即可。
 
 :::tip
 如果是手动下载 unitypackage 进行 SDK 导入，需要将 `Assets/TapTap/Common/Plugins/iOS/TapTap.Common.dll` 设置为只支持 iOS
