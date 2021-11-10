@@ -606,6 +606,7 @@ curl -X POST \
   -H "Content-Type: application/json" \
   -d '{"data": [{"userId": <objectId>, "list":
         [{
+          "achievement_id": "成就id",
           "achievement_open_id": "成就外部id",
           "complete_time": <完成时间戳>,
           "completed_step": <完成步数>
