@@ -539,7 +539,7 @@ curl -X GET \
         },
         "achievement_rarity": {
           "rarity": 稀有度比率,
-          "level": 稀有度：1-普通，2-稀有，3-珍贵，4-
+          "level": 稀有度：1-普通，2-稀有，3-珍贵，4-极为珍贵
         }
       }
     ]
