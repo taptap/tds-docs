@@ -95,9 +95,9 @@ SQL 查询功能默认按照东 8 区对时间类型的字段进行转化展示�
 format_datetime("time" at time zone 'America/Chicago', 'yyyy-MM-dd')
 ```
 
-「part_date」、「$part_date」为按照项目时区进行转化后的字符串格式的日期，若无精准查询时、分、秒的需求，建议使用分区建的筛选满足时间筛选需求。
+「part_date」、「$part_date」为按照项目时区进行转化后的字符串格式的日期，若无精准查询时、分、秒的需求，建议使用分区键的筛选满足时间筛选需求。
 
-### 4.2 动态参数
+### 4.3 动态参数
 
 使用动态参数功能可对查询语句中的参数进行替换，后续查询时只需在参数输入框下方输入参数值即可满足新的查询需求。
 
@@ -105,7 +105,7 @@ format_datetime("time" at time zone 'America/Chicago', 'yyyy-MM-dd')
 
 ![](/img/customEvent/sql/sql_5.png)
 
-### 4.3 工具栏操作
+### 4.4 工具栏操作
 
 工具栏位于输入框下方，可执行以下操作：
 
@@ -117,7 +117,7 @@ format_datetime("time" at time zone 'America/Chicago', 'yyyy-MM-dd')
 
 ![](/img/customEvent/sql/sql_6.png)
 
-### 4.4 快捷操作
+### 4.5 快捷操作
 
 光标位于输入框时，可执行以下快捷操作：
 
@@ -129,7 +129,7 @@ Ctrl + Z：撤销上一步操作
 
 Ctrl + Y：恢复上一步操作
 
-### 4.5 执行查询
+### 4.6 执行查询
 
 完成 SQL 语句编写后，可点击「计算」按钮，或者快捷键 Ctrl + Enter ，发起数据查询。
 
@@ -223,7 +223,7 @@ from hive.tapdb.view_{{项目 ID}}_events
 where 「$part_date」 between ‘2021-11-05’ and ‘2021-11-11’
 ```
 
-### 6.2 个性化取数与分析
+### 6.3 个性化取数与分析
 
 各种 TapDB 现有分析模型无法满足的个性化分析需求。
 
