@@ -29,6 +29,8 @@ tds up
 
 更多有关命令行工具和本地调试的内容请看[云引擎命令行工具使用指南](/sdk/engine/guide/cli/)。
 
+注意，[Spring Boot 示例项目](https://github.com/leancloud/spring-boot-getting-started)暂不支持 `tds up`，请设置相应环境变量后，[直接运行 Maven 打包的 JAR 文件](/sdk/engine/guide/faq/#如何脱离命令行工具本地启动云引擎-Java-项目？)。
+
 ### 部署到云端
 
 在你的项目根目录运行：
