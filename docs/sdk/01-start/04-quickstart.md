@@ -148,9 +148,9 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
     }  \n
     dependencies {  
     ...  
-        implementation name:'TapBootstrap_3.2.1', ext:'aar'   
-        implementation name:'TapCommon_3.2.1', ext:'aar' 
-        implementation name:'TapLogin_3.2.1', ext:'aar' 
+        implementation name:'TapBootstrap_${sdkVersions.taptap.android}', ext:'aar'   
+        implementation name:'TapCommon_${sdkVersions.taptap.android}', ext:'aar' 
+        implementation name:'TapLogin_${sdkVersions.taptap.android}', ext:'aar' 
         implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
         implementation 'cn.leancloud:storage-android:${sdkVersions.leancloud.java}'
         implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
