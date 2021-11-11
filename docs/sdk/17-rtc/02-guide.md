@@ -12,13 +12,13 @@ import Mermaid from '/src/docComponents/Mermaid';
 
 ## SDK 获取
 
-假设你已经在 [快速开始](/sdk/start/quickstart/#初始化) 部分完成了 **SDK 初始化**，可以在 [下载页](/tap-download) 获得 SDK，添加 `TapRTC` 模块：
+可以在 [下载页](/tap-download) 获得 SDK，引入 `TapRTC` 模块：
 
 
 <CodeBlock className="json">
 {`"dependencies":{
   ...
-  "com.taptap.tds.rtc":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+  "com.taptap.tds.rtc":"https://github.com/TapTap/TapRTC-Unity.git#${sdkVersions.taptap.unity}",
 }`}
 </CodeBlock>
 
@@ -32,8 +32,8 @@ import Mermaid from '/src/docComponents/Mermaid';
 RTC 通过 `TapRTCConfig` 来进行初始化配置。初始化的过程是异步的，需要等待初始化结果返回之后，才能进行下一步的操作。
 
 * `ClientId`、`ClientToken`、`ServerUrl`，参见关于[应用凭证](/sdk/storage/guide/setup-dotnet#应用凭证)的说明。
-* `UserId`: 开发者自定义的用户 Id
-* `DeviceId`: 设备 Id
+* `UserId`: 开发者自定义的用户 Id，用于标记玩家
+* `DeviceId`: 开发者自定义的设备 Id，用于标记设备
 * `AudioPerfProfile`: 音频质量配置（`LOW`、`MID`、`HIGH`，默认为 `MID`）
 
 ```cs
