@@ -28,6 +28,8 @@ import MultiLang from '/src/docComponents/MultiLang';
 
 我们首先介绍第一种方式，然后介绍[第二种方式](/sdk/taptap-login/guide/tap-login/)。
 
+无论使用哪种方式，首先都需要在 **开发者中心 > 游戏服务 > 功能接入** 开启「TapTap 登录」。
+
 ## 用 TapTap OAuth 授权结果直接登录账户系统
 
 对于「TapTap 用户登录」，TapSDK 提供了特别的支持，以帮助开发者以最便捷的方式和最少的时间完成接入。你可以直接调用 `TDSUser#loginWithTapTap` 方法来一键登录，例如：
