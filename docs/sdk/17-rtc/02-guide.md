@@ -12,12 +12,13 @@ import Mermaid from '/src/docComponents/Mermaid';
 
 ## SDK 获取
 
-可以在 [下载页](/tap-download) 获得 SDK，引入 `TapRTC` 模块：
+可以在 [下载页](/tap-download) 获得 SDK，引入 `TapRTC` 模块，以及 `TapRTC` 依赖的 `TapCommon` 模块：
 
 
 <CodeBlock className="json">
 {`"dependencies":{
   ...
+  "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
   "com.taptap.tds.rtc":"https://github.com/TapTap/TapRTC-Unity.git#${sdkVersions.taptap.unity}",
 }`}
 </CodeBlock>
