@@ -42,7 +42,7 @@ import sdkVersions from '/src/docComponents/sdkVersions';
 </>
 </MultiLang>
 
-:::note
+:::caution
 - 下面的**项目配置**以及**初始化**部分，预设开发者使用基于[内建账户](/sdk/authentication/features/)系统的 TDS 服务。
 - 如果游戏已经有了完整的账户系统，仅需要接入 TapTap 登录、内嵌动态，且不需要 TDS 更多云服务，则不必参考下面的配置和初始化方式，可跳转至 [单纯的 TapTap 登录开发指南](/sdk/taptap-login/guide/tap-login/)，[内嵌动态开发指南](/sdk/embedded-moments/guide/)。
 - 请慎重选择，如果之后需要其他 TDS 服务，升级需要一定的开发成本。
@@ -326,7 +326,7 @@ using TapTap.Bootstrap; // 命名空间
 var config =  new TapConfig.Builder()
     .ClientID("your_client_id")  // 必须，开发者中心对应 Client ID
     .ClientToken("your_client_token")  // 必须，开发者中心对应 Client Token
-    .ServerURL("https://your_server_url") // 开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 服务设置 > 自定义域名 绑定域名
+    .ServerURL("https://your_server_url") // 必须，开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 服务设置 > 自定义域名 绑定域名
     .RegionType(RegionType.CN)  // 非必须，默认 CN 表示国内
     .ConfigBuilder();
 TapBootstrap.Init(config);
