@@ -6,8 +6,8 @@ const sdkVersions = {
     anti_addiction: "1.0.1",
   },
   leancloud: {
-    objc: "13.5.0",
-    swift: "17.10.0",
+    objc: "13.6.0",
+    swift: "17.10.1",
     js: {
       storage: "4.12.0",
       realtime: "5.0.0-rc.7",
