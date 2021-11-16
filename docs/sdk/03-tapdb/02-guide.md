@@ -16,20 +16,21 @@ TapSDK 提供了一套可供游戏开发者收集账号数据的 API。
 ## SDK 获取
 
 请先[下载](/tap-download) SDK，并添加相关依赖。
-如果只需要单独使用 TapDB，可以只依赖 `common+tapdb`。
+
+如果只需要单独使用 TapDB，可以只导入依赖 `common` 和 `tapdb`。
 
 <MultiLang>
 
 <CodeBlock className="json">
 {`"dependencies":{
-// 登录
-"com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#2.1.7",
-"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#2.1.7",
-"com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#2.1.7",
-// 数据分析
-"com.taptap.tds.tapdb": "https://github.com/TapTap/TapDB-Unity.git#2.1.7",
-}
-`}
+    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#${sdkVersions.taptap.unity}",
+    "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}",
+    "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
+    // 数据分析
+    "com.taptap.tds.tapdb": "https://github.com/TapTap/TapDB-Unity.git#${sdkVersions.taptap.unity}",
+}`}
 </CodeBlock>
 
 <CodeBlock className="java">
@@ -38,11 +39,14 @@ TapSDK 提供了一套可供游戏开发者收集账号数据的 API。
         dirs 'libs'  
     }  
 }  
-dependencies {  
+dependencies {
 ...  
     implementation (name:'TapBootstrap_${sdkVersions.taptap.android}', ext:'aar')  // 必选： TapSDK 启动器 
     implementation (name:'TapCommon_${sdkVersions.taptap.android}', ext:'aar') // 必选：TapSDK 基础库 
-    implementation (name:'TapLogin_${sdkVersions.taptap.android}', ext:'aar') // 必选：TapTap 登录 
+    implementation (name:'TapLogin_${sdkVersions.taptap.android}', ext:'aar') // 必选：TapTap 登录
+    implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
+    implementation 'cn.leancloud:storage-android:${sdkVersions.leancloud.java}'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
     implementation (name:'TapDB_${sdkVersions.taptap.android}', ext:'aar') // 数据统计
 }`}
 </CodeBlock>
@@ -52,6 +56,7 @@ dependencies {
 TapBootstrapSDK.framework
 TapCommonSDK.framework
 TapLoginSDK.framework
+LeanCloudObjc.framework
 //TapDB
 TapDB.framework`}
 </CodeBlock>
@@ -71,14 +76,17 @@ TapDB.framework`}
 <MultiLang>
 
 ```cs
-TapConfig tapConfig = new TapConfig.Builder()
-    .ClientID("clientId")// 必须
-    .ClientSecret("client_secret")// 必须
-    .RegionType(RegionType.CN)// 非必须，默认 CN
-    .TapDBConfig(true, "gameChannel", "gameVersion", true) // TapDB 会根据 TapConfig 的配置进行自动初始化
+using TapTap.Bootstrap; // 命名空间
+
+var config = new TapConfig.Builder()
+    .ClientID("your_client_id")  // 必须，开发者中心对应 Client ID
+    .ClientToken("your_client_token")  // 必须，开发者中心对应 Client Token
+    .ServerURL("https://your_server_url")  // 必须，开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 服务设置 > 自定义域名 绑定域名
+    .RegionType(RegionType.CN)  // 非必须，默认 CN
+    .TapDBConfig(true, "gameChannel", "gameVersion", true)  // TapDB 会根据 TapConfig 的配置进行自动初始化
     .ConfigBuilder();
 
-TapBootstrap.Init(tapConfig);
+TapBootstrap.Init(config);
 ```
 
 ```java
@@ -88,9 +96,10 @@ TapDBConfig tapDBConfig = new TapDBConfig();
         
 TapConfig tapConfig = new TapConfig.Builder()
         .withAppContext(getApplicationContext())
-        .withRegionType(TapRegionType.CN) // TapRegionType.CN: 国内  TapRegionType.IO: 国外
-        .withClientId("clientId")
-        .withClientSecret("clientSecret")
+        .withClientId("your_client_id")  // 开发者中心对应 Client ID
+        .withClientToken("your_client_token")  // 开发者中心对应 Client Token
+        .withServerUrl("https://your_server_url")  // 开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 服务设置 > 自定义域名 绑定域名
+        .withRegionType(TapRegionType.CN)  // TapRegionType.CN: 国内  TapRegionType.IO: 国外
         .withTapDBConfig(tapDBConfig)
         .build();
 TapBootstrap.init(MainActivity.this, tapConfig);
@@ -98,9 +107,11 @@ TapBootstrap.init(MainActivity.this, tapConfig);
 
 ```objectivec
     // 初始化 SDK
-    TapConfig *config = TapConfig.new;
-    config.clientId = @"clientId";
-    config.clientSecret=@"clientSecret";
+    TapConfig *config = [TapConfig new];
+    config.clientId = @"your_client_id";  // 开发者中心对应 Client ID
+    config.clientToken = @"your_client_token";  // 开发者中心对应 Client Token
+    config.region = TapSDKRegionTypeCN;  // TapSDKRegionTypeCN: 国内  TapSDKRegionTypeIO: 国外
+    config.serverURL = @"https://your_server_url";  // 开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 服务设置 > 自定义域名 绑定域名
 
     TapDBConfig * dbConfig = [[TapDBConfig alloc]init];
     dbConfig.enable = YES;
