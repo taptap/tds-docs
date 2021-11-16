@@ -1,4 +1,5 @@
 ---
+id: propertyAnalyse
 title: 属性分析
 ---
 

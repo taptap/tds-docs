@@ -1,4 +1,5 @@
 ---
+id: distributionAnalyse
 title: 分布分析
 ---
 
