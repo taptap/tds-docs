@@ -281,15 +281,15 @@ title: 网页版
 
 - 监控今日的点击、新增、转化是否正常
 
-![Alt text](/img/changelog/2018_04_12_1.png)
+![](/img/changelog/2018_04_12_1.png)
 
 - 了解今日投放量 Top10 的广告平台
 
-![Alt text](/img/changelog/2018_04_12_2.png)
+![](/img/changelog/2018_04_12_2.png)
 
 - 分析近 30 日的新用户获取趋势、支出和费用趋势
 
-![Alt text](/img/changelog/2018_04_12_3.png)
+![](/img/changelog/2018_04_12_3.png)
 
 ---
 
@@ -299,7 +299,7 @@ title: 网页版
 
 广告监测支持导出广告平台、广告、标签的细分数据，导出后方便查看每个广告下每天的数据
 
-![Alt text](/img/changelog/2018_01_11_01.jpeg)
+![](/img/changelog/2018_01_11_01.jpeg)
 
 ---
 
@@ -316,10 +316,10 @@ title: 网页版
 
 其中周活跃、月活跃可以细分不同的分包渠道来查看渠道活跃明细。
 
-![Alt text](/img/changelog/2017_12_15_1.png)
+![](/img/changelog/2017_12_15_1.png)
 
 2. 概览中增加月活跃曲线（MAU）
-   ![Alt text](/img/changelog/2017_12_15_2.png)
+   ![](/img/changelog/2017_12_15_2.png)
 
 ---
 
@@ -329,7 +329,7 @@ title: 网页版
 
 创建项目的时候可以选择不同的时区，方便不同地区发行的游戏更好的分析数据
 
-![Alt text](/img/changelog/2017_12_06_01.jpeg)
+![](/img/changelog/2017_12_06_01.jpeg)
 
 ---
 
@@ -339,7 +339,7 @@ title: 网页版
 
 现在可以按照不同的货币类型来查看收入数据了
 
-![Alt text](/img/changelog/2017_10_17_01.jpeg)
+![](/img/changelog/2017_10_17_01.jpeg)
 
 ---
 
@@ -349,7 +349,7 @@ title: 网页版
 
 在工具中使用，可以根据广告平台或广告标签导出新增用户的具体信息，比如新增帐号，IDFA 等
 
-![Alt text](/img/changelog/2017_07_25_6.png)
+![](/img/changelog/2017_07_25_6.png)
 
 ---
 
@@ -359,7 +359,7 @@ title: 网页版
 
 可在企业设置里查看操作日志，目前已上线项目、权限、广告三种日志类型，方便您更加快捷地了解项目状态、人员及权限变化、广告投放等情况。
 
-![Alt text](/img/changelog/2017_07_25_5.png)
+![](/img/changelog/2017_07_25_5.png)
 
 ---
 
@@ -370,7 +370,7 @@ title: 网页版
 「实时在线」功能可帮你进行实时在线分析，通过分钟级在线量展现实时现数据动态。
 您可在[【工具-拓展功能】](/dm/m/t/extensions "_tapdb")或[【在线分析】](/dm/m/g/active/online "_tapdb")中自主开启并使用了。
 
-![Alt text](/img/changelog/2017_07_25_4.png)
+![](/img/changelog/2017_07_25_4.png)
 
 ---
 
@@ -391,7 +391,7 @@ title: 网页版
 
 对比日期，在运营和广告模块增加对比日期功能，可以对不同时间段的数据进行对比，在图和表中均可查看对比数据的详情
 
-![Alt text](/img/changelog/2017_07_25_3.png)
+![](/img/changelog/2017_07_25_3.png)
 
 ---
 
@@ -401,7 +401,7 @@ title: 网页版
 
 在选择游戏概览中的对比日期时，新增了历史日记录功能，最多记录您最近 5 次选择的日期，您可以钉住其中常用的日期，并为之特殊命名，钉住的日期将一直保存，方便您下次使用。
 
-![Alt text](/img/changelog/2017_07_25_2.jpeg)
+![](/img/changelog/2017_07_25_2.jpeg)
 
 ---
 
@@ -411,7 +411,7 @@ title: 网页版
 
 可以对分包渠道的名称进行备注，在工具栏里可以使用
 
-![Alt text](/img/changelog/2017_07_25_1.jpeg)
+![](/img/changelog/2017_07_25_1.jpeg)
 
 ---
 
