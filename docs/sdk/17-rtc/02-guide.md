@@ -318,7 +318,7 @@ float[] axisForward = new float[3] {1.0, 0.0, 0.0};
 float[] axisRight = new float[3] {0.0, 1.0, 0.0};
 float[] axisUp = new float[3] {0.0, 0.0, 1.0};
 Forward forward = new Forward(axisForward, axisRight, axisUp);
-bool ok = TapRTC.UpdateSelfPosition(position, forward);
+bool ok = room.GetRtcRangeAudioCtrl().UpdateSelfPosition(position, forward);
 ```
 
 朝向不影响是否能听到语音，因此如未[启用 3D 语音](#开关-3d-语音)，更新声源方位朝向时，朝向参数可随意设置。
