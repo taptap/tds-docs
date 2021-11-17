@@ -4,8 +4,6 @@ title: 云引擎 REST API
 sidebar_label: REST API
 ---
 
-
-
 云服务提供了统一的访问云函数的 REST API 接口，所有的客户端 SDK 也都是封装了这个接口从而实现对云函数的调用。
 
 我们推荐使用 [Postman](http://www.getpostman.com/) 来调试 REST API。
@@ -136,4 +134,4 @@ RPC 调用时，不仅可以返回单个 LCObject，还可以返回包含 LCObje
 
 如果云函数超时，客户端会收到 HTTP status code 为 503、524、141 等的响应。
 
-你还可以阅读[云函数指南](/sdk/engine/guide/cloudfunction/)来获取更多的信息。
+你还可以阅读[云函数指南](/sdk/engine/cloud-function/)来获取更多的信息。

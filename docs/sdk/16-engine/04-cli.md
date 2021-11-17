@@ -4,9 +4,7 @@ title: 云引擎命令行工具使用指南
 sidebar_label: 命令行工具
 ---
 
-
-
-命令行工具是用来管理和部署云引擎项目的工具。它不仅可以部署、发布和回滚云引擎代码，对同一个云引擎项目做多应用管理，还能查看云引擎日志，批量将文件上传到云端。
+命令行工具（lean-cli）是用来管理和部署云引擎项目的工具。它不仅可以部署、发布和回滚云引擎代码，对同一个云引擎项目做多应用管理，还能查看云引擎日志，批量将文件上传到云端。
 
 ## 安装命令行工具
 
@@ -113,7 +111,7 @@ OPTIONS:
    --overwrite-functions                           Overwrite cloud functions with the same name in other groups
    --leanignore value                              Rule file for ignored files in deployment (default: ".leanignore")
    --message value, -m value                       Comment for this deployment, only applicable when deploying from local files
-   --keep-deploy-file                              
+   --keep-deploy-file
    --revision value, -r value                      Git revision or branch. Only applicable when deploying from Git (default: "master")
    --options --options build-root=app&atomic=true  Send additional deploy options to server, in urlencode format(like --options build-root=app&atomic=true)
    --prod --prod 1                                 Deploy to production(--prod 1) or staging(`--prod 0`) environment, default to staging if it exists
@@ -323,10 +321,10 @@ $ tds logs
       2019-11-20 17:17:12  Deploying 20191120-171431 to web1
       2019-11-20 17:17:12  Creating new instance ...
       2019-11-20 17:17:22  Starting new instance ...
-web1  2019-11-20 17:17:22  
+web1  2019-11-20 17:17:22
 web1  2019-11-20 17:17:22  > node-js-getting-started@1.0.0 start /home/leanengine/app
 web1  2019-11-20 17:17:22  > node server.js
-web1  2019-11-20 17:17:22  
+web1  2019-11-20 17:17:22
 web1  2019-11-20 17:17:23  Node app is running on port: 3000
       2019-11-20 17:17:23  Instance started: {"runtime":"nodejs-v12.13.1","version":"3.4.0"}
       2019-11-20 17:17:23  Updating cloud functions metadata ...
