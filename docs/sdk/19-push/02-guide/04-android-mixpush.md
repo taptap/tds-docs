@@ -74,7 +74,7 @@ vivo | 否（老版本有透传接口，新版本已不建议使用）
 
 最低 Android 版本要求：
 
-- 华为推送需要用户手机上安装 HMS Core（APK）4.0.0.300 及以上版本，最低 Android 版本为 4.1（minSdkVersion 19）。
+- 华为推送需要用户手机上安装 HMS Core（APK）4.0.0.300 及以上版本，最低 Android 版本为 4.4（minSdkVersion 19）。
 - 小米推送服务 SDK 支持的最低安卓版本为 2.3（minSdkVersion：9）。
 - vivo 推送服务支持的最低 Android 版本为 6.0（minSdkVersion：23）。
 - OPPO 推送只支持 Android 4.4 或以上版本的手机系统（minSdkVersion：19）。
@@ -1004,6 +1004,7 @@ vivo 桌面图标角标默认是关闭的，开发者接入完成后还需要终
   //即时通信与推送需要的包
   implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+  implementation 'commons-codec:commons-codec:1.6'
 }`}
 </CodeBlock>
 
