@@ -199,7 +199,7 @@ curl -X PUT \
 ```sh
 curl -X GET \
   -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
   https://{{host}}/1.1/installations
 ```
 
@@ -232,7 +232,9 @@ curl -X GET \
 }
 ```
 
-所有对普通的对象的查询都对 installatin 对象起作用，所以可以查看之前的查询部分以获取详细信息。通过做 channels 的数组查询，你可以查找一个订阅了给定的推送频道的所有设备.
+所有对普通的对象的查询都对 installatin 对象起作用，所以可以查看之前的查询部分以获取详细信息。通过做 channels 的数组查询，你可以查找一个订阅了给定的推送频道的所有设备。
+
+出于安全性考虑，云端默认未开放 installation 查找权限，所以通常这个接口需要使用 master key 鉴权。
 
 #### 删除 Installaion
 
@@ -241,9 +243,11 @@ curl -X GET \
 ```sh
 curl -X DELETE \
   -H "X-LC-Id: {{appid}}" \
-  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
   https://{{host}}/1.1/installations/51fcb74ee4b074ac5c34cf85
 ```
+
+出于安全性考虑，云端默认未开放 installation 删除权限，所以通常这个接口需要使用 master key 鉴权。
 
 #### Installation 自动过期和清理
 
