@@ -503,7 +503,7 @@ curl -X POST \
   -H "X-LC-Key: {{masterkey}},master"        \
   -H "Content-Type: application/json" \
   -d '{
-        "where": {"channels" : ["public"]},
+        "where": {"channels" : "public"},
         "data": {"alert" : "Hello from LeanCloud"}
      }' \
   https://{{host}}/1.1/push
@@ -572,7 +572,7 @@ curl -X POST \
   -H "X-LC-Key: {{masterkey}},master"        \
   -H "Content-Type: application/json" \
   -d '{
-        "channels":["public"],
+        "channels":"public",
         "data": {
           "alert": "问好！"
         }

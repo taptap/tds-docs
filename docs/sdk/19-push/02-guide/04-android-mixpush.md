@@ -416,7 +416,7 @@ curl -X POST \
   -H "X-LC-Key: {your app key}"        \
   -H "Content-Type: application/json" \
   -d '{
-        "where": {"channels" : ["public"]}
+        "where": {"channels" : "public"}
         "data": {"alert" : "消息内容",
                  "title": "显示在通知栏的标题",
                  "k1" : "v1",
