@@ -174,6 +174,7 @@ completionHandler:^(BOOL success) {
         // 初始化成功
     }
 }];
+```
 
 `antiAddictionCallbackDelegate` 参数中传入接受回调的对象，其中需实现如下回调：
 
