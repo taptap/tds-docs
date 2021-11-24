@@ -5,21 +5,29 @@ sidebar_label: FAQ
 
 import MultiLang from '/src/docComponents/MultiLang';
 
+## 云引擎功能
 
-
-## 综合
 ### 云引擎都支持哪些语言
 
-目前支持 Node.js、Python、Java、PHP、.Net、Go 运行环境，未来可能还会引入其他语言。
-
-### 云引擎支持托管纯静态网站吗
-
-支持。命令行工具初始化项目选择语言环境时，依次选择 Others > Static Site 即可。
+目前支持 Node.js、Python、Java、PHP、.Net、Go 运行环境，也支持基于 Node.js 的 Web 前端项目，未来可能还会引入其他语言，详见 [总览](/sdk/engine/cloud-engine/)。
 
 ### 云引擎支持 HTTPS 吗
 
 - 自定义域名在绑定时启用 SSL 即可支持 HTTPS。
 - 如需配置自动跳转，请看[云引擎下如何重定向到 HTTPS？](#云引擎下如何重定向到-https？)。
+
+## 疑难问题
+
+### 在线上无法读取到项目中的文件怎么办？
+
+建议先检查文件大小写是否正确，线上的文件系统是区分大小写的，而 Windows 和 macOS 通常不区分大小写。
+
+
+- - - -
+
+### 云引擎支持托管纯静态网站吗
+
+支持。命令行工具初始化项目选择语言环境时，依次选择 Others > Static Site 即可。
 
 ### 云引擎采用什么样的休眠策略？
 
@@ -275,9 +283,6 @@ app.UseHttpsRedirection();
 
 每个应用最多拥有 12 个实例，如果需要更多资源请通过工单联系我们的技术支持。
 
-### 在线上无法读取到项目中的文件怎么办？
-
-建议先检查文件大小写是否正确，线上的文件系统是区分大小写的，而 Windows 和 macOS 通常不区分大小写。
 
 ### 云引擎响应时间增加怎么办
 
@@ -322,8 +327,6 @@ systemDependencies:
 ```yaml
 exposeEnvironmentsOnBuild: true
 ```
-
-云引擎运行环境默认提供的环境变量（以及 Node.js 环境变量 `NODE_ENV`）无法被自定义环境变量覆盖（覆盖无效）。
 
 ### 部署更新云引擎会导致服务中断吗？
 
@@ -422,16 +425,6 @@ app.get('/1.1/_ops/functions/metadatas', function(req, res) {
 ### 多次部署同一个项目时镜像大小为什么差别那么大？
 
 云引擎底层有一套缓存机制以加速构建过程，所以部署时显示的「存储镜像到仓库」后面的大小表示本次构建新产生的数据，可用于评估是否利用到了缓存，不代表整个项目的大小。
-
-### Gitlab 部署常见问题
-
-很多用户自己使用 [Gitlab](http://gitlab.org/) 搭建了自己的源码仓库，有时可能会遇到无法部署到 LeanCloud 的问题，即使设置了 Deploy Key，却仍然要求输入密码。
-
-可能的原因和解决办法如下：
-
-* 确保你 Gitlab 运行所在服务器的 /etc/shadow 文件里的 git（或者 gitlab）用户一行的 `!` 修改为 `*`，原因参考 [Stackoverflow - SSH Key asks for password](http://stackoverflow.com/questions/15664561/ssh-key-asks-for-password)，并重启 SSH 服务：`sudo service ssh restart`。
-* 在拷贝 Deploy Key 时，确保没有多余的换行符号。
-* Gitlab 目前不支持有注释的 Deploy Key。早期 LeanCloud 用户生成的 Deploy Key 末尾可能带有注释（类似于 `App dxzag3zdjuxbbfufuy58x1mvjq93udpblx7qoq0g27z51cx3's cloud code deploy key`），需要删除掉这部分再保存到 Gitlab。
 
 ## 命令行工具
 ### 使用 Homebrew 安装命令行工具失败
@@ -1634,6 +1627,16 @@ AfterUpdate 是在云引擎内执行的，执行 afterUpdate 不算 API 请求�
 ### 组管理功能收费吗？
 
 组管理功能免费使用，但组下面创建的实例按照实例价格收取费用。
+
+### 流量如何计费？
+
+每个云引擎实例每天有 1 G 免费额度，超出部分价格可以在当前节点的价格页面查看。
+
+一个应用下的流量额度会合并计算，即每天的免费额度为 `max(n, 1)` GB，其中 `n` 为该应用所有云引擎分组下的标准实例总数。
+
+**云引擎不适合分发大文件之类的场景**，有此需求的开发者可以使用文件服务。
+
+在**开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 云引擎 > 云引擎分组 > 统计 > 流量**可以查看最近流量统计。
 
 ## 国际版
 

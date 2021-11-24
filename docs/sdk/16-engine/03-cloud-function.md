@@ -6,17 +6,17 @@ sidebar_label: 云函数和 Hook
 
 import MultiLang from '/src/docComponents/MultiLang';
 import EngineRuntimes from '/src/docComponents/MultiLang/engine';
-import Distributions, {LeanCloud, TDS} from '/src/docComponents/MultiLang/distributions';
 import Mermaid from '/src/docComponents/Mermaid';
 import QuickStartInit from './_partials/quick-start-init.mdx';
 import QuickStartDeploy from './_partials/quick-start-deploy.mdx';
 import {CLI_BINARY} from '/src/constants/env.ts';
+import TabItem from '@theme/TabItem';
 
 云函数是云引擎提供的一种经过高度封装的函数计算功能，在我们的各个客户端 SDK 中也有对应的支持，可以自动地序列化 [数据存储](/sdk/storage/features/) 服务中的各种数据类型。
 
 适合使用云函数和 Hook 的场景包括：
 
-- 讲跨平台应用（同时有 Android、iOS、浏览器客户端）中复杂的计算逻辑集中到一处，而不必每个客户端单独实现一遍。
+- 将跨平台应用（同时有 Android、iOS、浏览器客户端）中复杂的计算逻辑集中到一处，而不必每个客户端单独实现一遍。
 - 需要在服务器端对一些逻辑进行灵活调整，而不必更新客户端。
 - 需要越过 ACL 或表权限的限制，对数据进行查询或修改。
 - 需要使用 Hook 在数据存储中的对象被创建、更新、删除，或用户登录、认证时，触发自定义的逻辑、进行额外的权限检查。
@@ -606,7 +606,7 @@ RPC 会处理以下形式的请求和响应：
 - 包含 LCObject 的散列表（HashMap）
 - 包含 LCObject 的数组（Array）
 
-其他形式的数据 SDK 会保持原因，不进行处理。
+其他形式的数据 SDK 会保持原样，不进行处理。
 
 ### 云函数错误响应码
 

@@ -29,7 +29,7 @@ import BuildingScripts from '../_partials/building-scripts.mdx';
 }
 ```
 
-如果你希望创建一个新的项目，请从我们的 [Node.js 示例项目](https://github.com/leancloud/node-js-getting-started) 开始。
+如果你希望创建一个新的项目，推荐从我们的 [Node.js 示例项目](https://github.com/leancloud/node-js-getting-started) 开始。
 
 ## 启动命令
 
@@ -99,7 +99,24 @@ import BuildingScripts from '../_partials/building-scripts.mdx';
 
 ## 使用数据存储服务
 
-## 容量管理
+在云引擎中你可以使用云服务提供的数据存储作为应用的后端数据库，以及使用其他云服务提供的功能。
+SDK 可以让你更加方便地使用这些功能。
+
+建议使用云引擎模板项目。
+模板项目已经集成了 SDK，也包含了初始化 SDK 的逻辑，可以直接使用。
+
+建议在客户端（浏览器端、移动端）登录用户，调用 SDK 的接口获取 session token。
+对于需要后端以当前用户的身份完成的操作，客户端通过 HTTP Header 等方式将 session token 发送给后端。
+
+参见[数据存储指南](/sdk/storage/guide/dotnet/)。
+
+## 健康检查
+
+你的应用在启动时，云引擎的管理程序会每秒去检查你的应用是否启动成功，如果超过启动时间限制仍未启动成功，即认为启动失败。
+在之后应用正常运行的过程中，也会有定期的「健康检查」，以确保你的应用正常运行，如果健康检查失败，云引擎管理程序会自动重启你的应用。
+
+健康检查的 URL 包括你的应用首页（`/`）和 SDK 负责处理的 `/__engine/1/ping`，只要 **两者之一** 返回了 HTTP `200` 的响应，就视作成功。
+因此请确保你的应用使用了 SDK，或你的应用 **首页能够正常地返回 HTTP `200`** 响应。
 
 ## 云端环境
 
@@ -107,7 +124,7 @@ import BuildingScripts from '../_partials/building-scripts.mdx';
 
 <CloudEnvironments />
 
-## FAQ
+## 疑难问题
 ### 如何排查云引擎 Node.js 内存使用过高（内存泄漏）？
 
 首先建议检查云引擎日志，检查每分钟请求数、响应时间、CPU、内存统计，查看是否存在其他异常情况，如果有的话，先解决其他的问题。如果是从某个时间点开始内存使用变高，建议检查这个时间点之前是否有部署新版本，然后检查新版本的代码改动或尝试回滚版本。

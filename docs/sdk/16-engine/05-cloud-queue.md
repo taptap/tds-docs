@@ -1,6 +1,6 @@
 ---
-id: cloudqueue
-title: 云队列指南 
+id: cloud-queue
+title: 云队列开发指南
 sidebar_label: 云队列
 ---
 
