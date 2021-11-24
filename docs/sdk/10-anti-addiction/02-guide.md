@@ -57,12 +57,15 @@ iOS 平台配置：
 在游戏目录下 `build.gradle` 文件中添加代码
 
 <CodeBlock className="groovy">
-{`repositories{flatDir{dirs 'src/main/libs'}}
+{`repositories{
+    flatDir{   
+        dirs 'src/main/libs'
+    }
+}
 dependencies {
     // ...
     implementation(name: "AntiAddiction_${sdkVersions.taptap.anti_addiction}", ext: "aar")
     implementation(name: "AntiAddictionUI_${sdkVersions.taptap.anti_addiction}", ext: "aar")
-    implementation(name: "gson-2.8.6", ext: "jar")
     // ...
 }`}
 </CodeBlock>
@@ -152,6 +155,9 @@ AntiAddictionUIKit.init(activity, gameIdentifier, config,
         @Override
         public void onCallback(int code, Map<String, Object> extras) {
             // 根据 code 不同提示玩家不同信息，详见下面的说明
+            if (code == Constants.ANTI_ADDICTION_CALLBACK_CODE.LOGIN_SUCCESS){
+                Log.d("LeeJiEun", "玩家登陆后判断当前玩家可以进行游戏");
+            }
         }       
     }
 );
