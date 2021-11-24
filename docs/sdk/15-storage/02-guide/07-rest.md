@@ -1309,7 +1309,8 @@ curl -X GET \
   https://{{host}}/1.1/classes/Comment
 ```
 
-不是作为一个 Pointer 表示，`post` 字段现在已经被展开为一个完整的对象：`__type` 被设置为 Object 而 `className` 同样也被提供了。例如，一个指向 Post 的 Pointer 可能被展示为：
+在返回结果中，`post` 字段会被展开为一个完整的对象，但 `__type` 仍将保持为 `Pointer`。
+例如，不传入 `include` 参数的情况下，返回结果中包含的指向 Post 的 Pointer 只包含 `__type`、`className`、`objectId`：
 
 ```json
 {
@@ -1319,11 +1320,11 @@ curl -X GET \
 }
 ```
 
-当一个查询使用 `include` 参数来包含进去来取代 pointer 之后，可以看到 pointer 被展开为：
+传入 `include=post` 后，可以看到 pointer 被展开为：
 
 ```json
 {
-  "__type": "Object",
+  "__type": "Pointer",
   "className": "Post",
   "objectId": "51e3a359e4b015ead4d95ddc",
   "createdAt": "2015-06-29T09:31:20.371Z",
