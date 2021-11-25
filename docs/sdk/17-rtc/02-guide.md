@@ -4,16 +4,18 @@ title: 实时语音开发指南
 sidebar_label: 开发指南
 ---
 
+import MultiLang from '/src/docComponents/MultiLang';
 import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';
 import Mermaid from '/src/docComponents/Mermaid';
 
-实时语音服务目前仅支持 Unity 平台。
+实时语音服务目前支持 Unity 和 Android 原生两个平台，iOS 原生支持正在开发中，敬请期待。
 
 ## SDK 获取
 
-可以在 [下载页](/tap-download) 获得 SDK，引入 `TapRTC` 模块，以及 `TapRTC` 依赖的 `TapCommon` 模块：
+可以在 [下载页](/tap-download) 获得 SDK，引入 `TapRTC` 模块：
 
+<MultiLang>
 
 <CodeBlock className="json">
 {`"dependencies":{
@@ -23,10 +25,29 @@ import Mermaid from '/src/docComponents/Mermaid';
 }`}
 </CodeBlock>
 
+<CodeBlock className="groovy">
+{`repositories{  
+    flatDir {  
+        dirs 'libs'  
+    }  
+}  
+dependencies {  
+    ... 
+    implementation (name:'TapRTC_${sdkVersions.taptap.android}', ext:'aar')
+}`}
+</CodeBlock>
+
+<CodeBlock className="objectivec">
+// 暂未支持
+</CodeBlock>
+
+</MultiLang>
+
 ## 注意事项
 
 * RTC 使用前需要在开发者中心进行相关配置。
-* RTC 需要周期性的调用 `TapRTC.Poll` 接口，才能触发相关的事件回调。
+* 开发者需要在自己的服务器上实现[相应的签名鉴权服务](#服务端鉴权)。
+* C# SDK 需要周期性的调用 `TapRTC.Poll` 接口，才能触发相关的事件回调。
 
 ## 核心接口
 
@@ -37,6 +58,8 @@ RTC 通过 `TapRTCConfig` 来进行初始化配置。初始化的过程是异步
 * `DeviceId`: 开发者自定义的设备 Id，用于标记设备
 * `AudioPerfProfile`: 音频质量配置（`LOW`、`MID`、`HIGH`，默认为 `MID`）
 
+<MultiLang>
+
 ```cs
 using TapTap.RTC;
 
@@ -46,7 +69,7 @@ var config = new TapRTCConfig.Builder()
             .ServerUrl("ServerUrl")
             .UserId("UserId")
             .DeviceId("DeviceId")
-            .AudioProfile(AudioPerfProfile.DEFAULT)
+            .AudioProfile(AudioPerfProfile.MID)
             .ConfigBuilder();
             
 var isInit = await TapRTC.Init(config);
@@ -56,10 +79,45 @@ if (isInit) {
 }
 ```
 
+```java
+import android.app.Application;
+import com.taptap.taprtc.Config;
+import com.taptap.taprtc.Config.AudioPerfProfile;
+import com.taptap.taprtc.DeviceID;
+import com.taptap.taprtc.UserID;
+import com.taptap.taprtc.TapRTCEngine;
+
+public class MyApp extends Application {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        Config config = new Config();
+        config.appId = "AppId";
+        config.appKey = "AppKey";
+        config.serverUrl = "ServerUrl";
+        config.userId = new UserID("UserId");
+        config.deviceId = new DeviceID("DeviceId");
+        // 如需使用范围语音功能，此项必须设为 LOW
+        config.profile = AudioPerfProfile.MID;
+        try {
+            TapRTCEngine.get().init(this, config);
+        } catch (TapRTCException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
+```
+
+```objc
+// 暂未支持
+```
+
+</MultiLang>
+
 ### 触发回调事件
 
-可以在 `Update` 方法中调用 `Poll` 方法触发事件回调。如果不调用该方法，会导致 SDK 运行异常。
-
+C# SDK 需要在 `Update` 方法中调用 `Poll` 方法触发事件回调。如果不调用该方法，会导致 SDK 运行异常。
 
 ```cs
 public void Update()
@@ -68,34 +126,80 @@ public void Update()
 }
 ```
 
+Java SDK 无需定期调用 `Poll` 方法。
 
 ### 恢复系统
+
+<MultiLang>
 
 ```cs
 TapRTC.Resume();
 ```
 
+```java
+import com.taptap.taprtc.TapRTCEngine;
+
+boolean ok = TapRTCEngine.get().resume();
+```
+
+```objc
+// 暂未支持
+```
+
+</MultiLang>
+
 ### 暂停系统
+
+<MultiLang>
 
 ```cs
 TapRTC.Pause();
 ```
+
+```java
+import com.taptap.taprtc.TapRTCEngine;
+
+boolean ok = TapRTCEngine.get().pause();
+```
+
+```objc
+// 暂未支持
+```
+
+</MultiLang>
 
 ## 房间相关接口
 
 ### 创建房间
 
 初始化成功之后，SDK 在创建房间之后，才可以进行实时语音通话。
-创建房间时需指定房间号（`roomId`）以及这个房间[是否启用范围语音](#范围语音)，默认不启用。
+创建房间时需指定房间号（`roomId`）。
+[是否启用范围语音](#范围语音)也需在创建房间时设置，C# SDK 默认不启用，Java SDK 使用单独的接口创建范围语音房间。
 
+<MultiLang>
 
 ```cs
 bool enableRangeAudio = false;
 var room = await TapRTC.AcquireRoom("roomId", enableRangeAudio);
 ```
 
+```java
+import com.taptap.taprtc.TapRTCEngine;
+import com.taptap.taprtc.RoomID;
+
+RoomId roomId = new RoomID("roomId");
+TapRTCRoom room = TapRTCEngine.get().acquireRoom(roomId);
+```
+
+```objc
+// 暂未支持
+```
+
+</MultiLang>
 
 ### 注册房间相关的回调事件
+
+<MultiLang>
 
 ```cs
 room.RegisterEventAction(new TapRTCEvent()
@@ -118,6 +222,45 @@ room.RegisterEventAction(new TapRTCEvent()
 });
 ```
 
+```java
+import com.taptap.taprtc.UserID;
+import com.taptap.taprtc.TapRTCRoom;
+
+room.registerCallback(new TapRTCRoom.Callback() {
+    // 进入房间成功
+    @Override public void onEnterSuccess() {}
+
+    // 进入房间失败
+    @Override public void onEnterFailure(String msg) {}
+
+    // 连接断开
+    @Override public void onDisconnect() {}
+
+    // 重连成功
+    @Override public void onReConnected() {}
+
+    // 当前玩家退出房间
+    @Override public void onExit() {}
+
+    // 当前玩家进入房间
+    @Override public void onUserEnter(UserID userId) {}
+
+    // 其他玩家退出房间
+    @Override public void onUserExit(UserID userId) {}
+
+    // 玩家说话开始
+    @Override public void onUserSpeakStart(UserID userId, int volume) {}
+
+    // 玩家说话结束
+    @Override public void onUserSpeakEnd(UserID userId) {}
+});
+```
+
+```objc
+// 暂未支持
+```
+
+</MultiLang>
 
 ### 加入房间
 
@@ -125,9 +268,24 @@ room.RegisterEventAction(new TapRTCEvent()
 
 进入房间成功之后，会通过 `TapRTCEvent` 中的 `OnEnterSuccess` 进行回调。
 
+<MultiLang>
+
 ```cs
 room.Join("authBuffer");
 ```
+
+```java
+import com.taptap.taprtc.Authority;
+
+Authority authBuffer = new Authority("authBuffer");
+room.join(authBuffer);
+```
+
+```objc
+// 暂未支持
+```
+
+</MultiLang>
 
 `authBuffer` 是在服务端生成的鉴权信息，详见下文[服务端鉴权](#服务端鉴权)一节的说明。
 
@@ -135,24 +293,64 @@ room.Join("authBuffer");
 
 退出房间之后，会通过 `TapRTCEvent` 中的 `OnExit` 进行回调。
 
+<MultiLang>
+
 ```cs
 room.Exit();
 ```
 
+```java
+room.exit();
+```
+
+```objc
+// 暂未支持
+```
+
+</MultiLang>
 
 ### 收听某人语音（默认收听）
+
+<MultiLang>
 
 ```cs
 bool ok = room.EnableUserAudio("userId");
 ```
 
+```java
+import com.taptap.taprtc.UserID;
+
+UserId userId = new UserID("userId");
+boolean ok = room.enableUserAudio(userId);
+```
+
+```objc
+// 暂未支持
+```
+
+</MultiLang>
+
 ### 拒收某人语音
+
+<MultiLang>
 
 ```cs
 bool ok = room.DisableUserAudio("userId");
 ```
 
+```java
+import com.taptap.taprtc.UserID;
+
+UserId userId = new UserID("userId");
+boolean ok = room.disableUserAudio(userId);
+```
+
 ### 打开/关闭语音
+
+这个接口设置音频下行的开关。
+一般来说，推荐游戏使用[打开/关闭扬声器的接口](#打开关闭扬声器)。
+
+<MultiLang>
 
 ```cs
 // 开启
@@ -162,8 +360,19 @@ bool ok = room.EnableAudioReceiver(true);
 bool ok = room.EnableAudioReceiver(false);
 ```
 
-这个接口设置音频下行的开关。
-一般来说，推荐游戏使用[打开/关闭扬声器的接口](#打开关闭扬声器)。
+```java
+// 开启
+boolean ok = room.enableAudioReceiver(true);
+
+// 关闭
+boolean ok = room.enableAudioReceiver(false);
+```
+
+```objc
+// 暂未支持
+```
+
+</MultiLang>
 
 ### 切换音频质量
 
@@ -171,23 +380,49 @@ bool ok = room.EnableAudioReceiver(false);
 
 进入房间后，可以切换音频质量。
 
+<MultiLang>
+
 ```cs
 room.ChangeRoomType(AudioPerfProfile.LOW);
 room.ChangeRoomType(AudioPerfProfile.MID);
 room.ChangeRoomType(AudioPerfProfile.HIGH);
 ```
 
+```java
+// 暂未支持
+```
+
+```objc
+// 暂未支持
+```
+
+</MultiLang>
+
 切换音频质量会触发 `OnRoomTypeChanged` 回调。
 
 ### 获取当前房间的用户
+
+<MultiLang>
 
 ```cs
 HashSet<string> userIdList = room.Users;
 ```
 
+```java
+List<UserID> userIdList = room.getUsers();
+```
+
+```objc
+// 暂未支持
+```
+
+</MultiLang>
+
 ## 音频控制相关接口
 
 ### 打开/关闭麦克风
+
+<MultiLang>
 
 ```cs
 // 打开
@@ -197,7 +432,23 @@ bool ok = TapRTC.GetAudioDevice().EnableMic(true);
 bool ok = TapRTC.GetAudioDevice().EnableMic(false);
 ```
 
+```java
+// 打开
+boolean ok = TapRTCEngine.get().getAudioDevice().enableMic(true);
+
+// 关闭
+boolean ok = TapRTCEngine.get().getAudioDevice().enableMic(false);
+```
+
+```objc
+// 暂未支持
+```
+
+</MultiLang>
+
 ### 打开/关闭扬声器
+
+<MultiLang>
 
 ```cs
 // 打开
@@ -207,10 +458,25 @@ bool ok = TapRTC.GetAudioDevice().EnableSpeaker(true);
 bool ok = TapRTC.GetAudioDevice().EnableSpeaker(false);
 ```
 
+```java
+// 打开
+boolean ok = TapRTCEngine.get().getAudioDevice().enableSpeaker(true);
+
+// 关闭
+boolean ok = TapRTCEngine.get().getAudioDevice().enableSpeaker(false);
+```
+
+```objc
+// 暂未支持
+```
+
+</MultiLang>
+
 ### 设置/获取音量
 
 音量是 0 到 100 之间的整数。
 
+<MultiLang>
 
 ```cs
 int vol = 60;
@@ -226,7 +492,29 @@ int micVolume = TapRTC.GetAudioDevice().GetMicVolume();
 int speakerVolume = TapRTC.GetAudioDevice().GetSpeakerVolume();
 ```
 
-### 开关播放设备
+```java
+int vol = 60;
+
+// 设置麦克风音量
+boolean ok = TapRTCEngine.get().getAudioDevice().setMicVolume(vol);
+// 设置扬声器音量
+boolean ok = TapRTCEngine.get().getAudioDevice().setSpeakerVolume(vol);
+
+// 获取麦克风音量
+int micVolume = TapRTCEngine.get().getAudioDevice().getMicVolume();
+// 获取扬声器音量
+int speakerVolume = TapRTCEngine.get().getAudioDevice().getSpeakerVolume();
+```
+
+```objc
+// 暂未支持
+```
+
+</MultiLang>
+
+### 打开/关闭播放设备
+
+<MultiLang>
 
 ```cs
 // 打开
@@ -235,7 +523,22 @@ bool ok = TapRTC.GetAudioDevice().EnableAudioPlay(true);
 bool ok = TapRTC.GetAudioDevice().EnableAudioPlay(false);
 ```
 
+```java
+// 打开
+boolean ok = TapRTCEngine.get().getAudioDevice().enableAudioPlay(true);
+// 关闭
+boolean ok = TapRTCEngine.get().getAudioDevice().enableAudioPlay(false);
+```
+
+```objc
+// 暂未支持
+```
+
+</MultiLang>
+
 ### 打开/关闭耳返
+
+<MultiLang>
 
 ```cs
 // 打开
@@ -243,6 +546,19 @@ bool ok = TapRTC.GetAudioDevice().EnableLoopback(true);
 // 关闭
 bool ok = TapRTC.GetAudioDevice().EnableLoopback(false);
 ```
+
+```java
+// 打开
+boolean ok = TapRTCEngine.get().getAudioDevice().enableLoopback(true);
+// 关闭
+boolean ok = TapRTCEngine.get().getAudioDevice().enableLoopback(false);
+```
+
+```objc
+// 暂未支持
+```
+
+</MultiLang>
 
 ## 范围语音
 
@@ -253,33 +569,82 @@ bool ok = TapRTC.GetAudioDevice().EnableLoopback(false);
 
 要使用范围语音功能，首先创建房间时需要指定启用范围语音功能：
 
+<MultiLang>
+
 ```cs
 bool enableRangeAudio = true;
 var room = await TapRTC.AcquireRoom("roomId", enableRangeAudio);
 ```
 
-其次，玩家进入房间前，需要**切换音频质量为 LOW** 并设定小队号：
+```java
+import com.taptap.taprtc.TapRTCEngine;
+import com.taptap.taprtc.RoomID;
+
+RoomId anotherRoomId = new RoomID("anotherRoomId");
+TapRTCRoom room = TapRTCEngine.get().acquireRangeAudioRoom(anotherRoomId);
+```
+
+```objc
+// 暂未支持
+```
+
+</MultiLang>
+
+其次，玩家进入房间前，需要**切换音频质量为 LOW**：
+
+<MultiLang>
 
 ```cs
 room.ChangeRoomType(AudioPerfProfile.LOW);
-
-int teamId = 12345678;
-bool ok = room.GetRtcRangeAudioCtrl().SetRangeAudioTeam(teamId);
 ```
 
-接着需要指定语音模式：
+```java
+// Java SDK 未提供切换音频质量的接口。
+// Java SDK 下，如需使用范围语音功能，**SDK 初始化时音频质量需设置为 LOW**。
+```
+
+```objc
+// 暂未支持
+```
+
+</MultiLang>
+
+接着设定小队号，并指定语音模式：
 
 - 世界模式：距离当前玩家[一定范围](#设置语音接收范围)内的其他小队成员也可以听到该玩家的语音；
 - 小队模式：仅小队成员之间可以互相通话。
 
 无论哪种模式下，小队成员之间都能互相通话，不论距离远近。
 
+<MultiLang>
+
 ```cs
+int teamId = 12345678;
+room.GetRtcRangeAudioCtrl().SetRangeAudioTeam(teamId);
+
 // 世界模式 
-bool ok = room.GetRtcRangeAudioCtrl().SetRangeAudioMode(RangeAudioMode.WORLD);
+room.GetRtcRangeAudioCtrl().SetRangeAudioMode(RangeAudioMode.WORLD);
 // 小队模式
-bool ok = room.GetRtcRangeAudioCtrl().SetRangeAudioMode(RangeAudioMode.TEAM);
+room.GetRtcRangeAudioCtrl().SetRangeAudioMode(RangeAudioMode.TEAM);
 ```
+
+```java
+import com.taptap.taprtc.TapRTCRangeAudioCtrl.RangeAudioMode;
+
+int teamId = 12345678;
+room.rangeAudioCtrl().setRangeAudioTeam(new TeamID(teamId));
+
+// 世界模式
+boolean ok = room.rangeAudioCtrl().setRangeAudioMode(RangeAudioMode.WORLD);
+// 小队模式
+boolean ok = room.rangeAudioCtrl().setRangeAudioMode(RangeAudioMode.TEAM);
+```
+
+```objc
+// 暂未支持
+```
+
+</MultiLang>
 
 然后进入房间，并[设置语音接收范围](#设置语音接收范围)、[更新声源方位](#更新声源方位朝向)，范围语音即可生效。
 
@@ -289,10 +654,23 @@ bool ok = room.GetRtcRangeAudioCtrl().SetRangeAudioMode(RangeAudioMode.TEAM);
 
 语音接收范围控制世界模式下其他小队成员能否听到声音，在进房后调用，一般仅需设置一次。
 
+<MultiLang>
+
 ```cs
 int range = 300;
 room.GetRtcRangeAudioCtrl().UpdateAudioReceiverRange(range);
 ```
+
+```java
+int range = 300;
+room.rangeAudioCtrl().updateAudioReceiverRange(range);
+```
+
+```objc
+// 暂未支持
+```
+
+</MultiLang>
 
 范围（`range`）之外的其他小队成员无法听到。
 
@@ -308,6 +686,8 @@ room.GetRtcRangeAudioCtrl().UpdateAudioReceiverRange(range);
 成功进入房间后，需要在 Unity 的 Update 方法中调用该接口更新声源方位、朝向，范围语音才能生效。
 方位通过世界坐标系的前、右、上三个坐标指定，朝向通过自身坐标系的前、右、上轴的单位向量指定。
 
+<MultiLang>
+
 ```cs
 int x = 1;
 int y = 2;
@@ -321,6 +701,29 @@ Forward forward = new Forward(axisForward, axisRight, axisUp);
 bool ok = room.GetRtcRangeAudioCtrl().UpdateSelfPosition(position, forward);
 ```
 
+```java
+import com.taptap.taprtc.TapRTCRangeAudioCtrl.Position;
+import com.taptap.taprtc.TapRTCRangeAudioCtrl.Forward;
+
+int x = 1;
+int y = 2;
+int z = 3;
+Position position = new Position(x, y, z);
+
+float[] axisForward = {1.0, 0.0, 0.0};
+float[] axisRight = {0.0, 1.0, 0.0};
+float[] axisUp = {0.0, 0.0, 1.0};
+Forward forward = new Forward(axisForward, axisRight, axisUp);
+
+boolean ok = room.rangeAudioCtrl().updateSelfPosition(position, forward);
+```
+
+```objc
+// 暂未支持
+```
+
+</MultiLang>
+
 朝向不影响是否能听到语音，因此如未[启用 3D 语音](#开关-3d-语音)，更新声源方位朝向时，朝向参数可随意设置。
 但启用 3D 语音时，需正确设置朝向，这样才能得到准确的 3D 音效。
 
@@ -329,11 +732,25 @@ bool ok = room.GetRtcRangeAudioCtrl().UpdateSelfPosition(position, forward);
 开启 3D 语音，可以将无方位感的声音处理成带有声源方位感的声音，以增加玩家的沉浸感。
 这个接口接受两个参数，第一个参数指定当前玩家是否可以听到 3D 音效，第二个参数指定 3D 语音是否作用于[小队内部](#范围语音)。
 
+<MultiLang>
+
 ```cs
 bool enable3D = true;
 bool applyToTeam = true;
 bool ok = TapRTC.GetAudioDevice().EnableSpatializer(enable3D, applyToTeam);
 ```
+
+```java
+boolean enable3D = true;
+boolean applyToTeam = true;
+boolean ok = TapRTCEngine.get().getAudioDevice().enableSpatializer(enable3D, applyToTeam);
+```
+
+```objc
+// 暂未支持
+```
+
+</MultiLang>
 
 ## 服务端
 
