@@ -133,6 +133,13 @@ AntiAddictionUIKit.Init(gameIdentifier, useTimeLimit, usePaymentLimit,
         int code = antiAddictionCallbackData.code;
         MsgExtraParams extras = antiAddictionCallbackData.extras;
         // 根据 code 不同提示玩家不同信息，详见下面的说明
+        if (code == 500)
+        {
+            // 开始计时
+            AntiAddictionUIKit.EnterGame();
+            Debug.Log("玩家登陆后判断当前玩家可以进行游戏");
+        }
+
     },
     (exception) => {
         // 处理异常
@@ -156,6 +163,8 @@ AntiAddictionUIKit.init(activity, gameIdentifier, config,
         public void onCallback(int code, Map<String, Object> extras) {
             // 根据 code 不同提示玩家不同信息，详见下面的说明
             if (code == Constants.ANTI_ADDICTION_CALLBACK_CODE.LOGIN_SUCCESS){
+                // 开始计时
+                AntiAddictionUIKit.enterGame();
                 Log.d("LeeJiEun", "玩家登陆后判断当前玩家可以进行游戏");
             }
         }       
