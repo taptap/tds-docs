@@ -29,7 +29,7 @@ title: 虚拟事件
 
 填入虚拟事件名、虚拟事件显示名和说明，事件名默认以“#ve@”开头。
 
-![填写基础信息](/img/customEvent/virtualEvent_3.png)
+![填写基础信息](/img/customEvent/virtualEvent_4.png)
 
 ### 3.2. 编辑虚拟事件的定义规则
 
@@ -37,13 +37,13 @@ title: 虚拟事件
 
 当虚拟事件由2个或以上基础事件构成时，可对其进行全局筛选，全部基础事件均需满足该筛选条件。
 
-![编辑虚拟事件的定义规则](/img/customEvent/virtualEvent_4.png)
+![编辑虚拟事件的定义规则](/img/customEvent/virtualEvent_3.png)
 
 ## 4. 虚拟事件的管理与使用
 
 ### 4.1. 管理虚拟事件
 
-可在事件管理页面中，对虚拟事件进行管理，虚拟事件可创建数量上限为300，可以进行编辑、删除操作。
+可在事件管理页面中，对虚拟事件进行管理，虚拟事件可创建数量上限为300，可以进行编辑、复制和删除操作。
 
 ![管理虚拟事件](/img/customEvent/virtualEvent_5.png)
 
