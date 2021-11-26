@@ -345,6 +345,8 @@ UserId userId = new UserID("userId");
 boolean ok = room.disableUserAudio(userId);
 ```
 
+</MultiLang>
+
 ### 打开/关闭语音
 
 这个接口设置音频下行的开关。
