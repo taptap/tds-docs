@@ -12,6 +12,10 @@ import QuickStartDeploy from './_partials/quick-start-deploy.mdx';
 import {CLI_BINARY} from '/src/constants/env.ts';
 import TabItem from '@theme/TabItem';
 
+:::info
+这篇文档专注在「云函数和 Hook」这种云引擎上的特殊的应用场景，如需部署通用的后端应用，或需要了解云引擎平台提供的更多功能，请看 [云引擎开发指南](/sdk/engine/cloud-engine/)。
+:::
+
 云函数是云引擎提供的一种经过高度封装的函数计算功能，在我们的各个客户端 SDK 中也有对应的支持，可以自动地序列化 [数据存储](/sdk/storage/features/) 服务中的各种数据类型。
 
 适合使用云函数和 Hook 的场景包括：
@@ -26,7 +30,7 @@ import TabItem from '@theme/TabItem';
 
 ## 快速开始
 
-:::note
+:::info
 如果希望使用 Node.js 编写简单的云函数或 Hook，也可以尝试 [在线编写云函数](#在线编写云函数)。
 :::
 

@@ -6,6 +6,7 @@ sidebar_label: 部署应用
 
 import QuickStartInit from './_partials/quick-start-init.mdx';
 import QuickStartDeploy from './_partials/quick-start-deploy.mdx';
+import CloudCustomDomain from './_partials/cloud-custom-domain.mdx';
 import EngineRuntimes from '/src/docComponents/MultiLang/engine';
 import {CLI_BINARY, BRAND, REGION} from '/src/constants/env.ts';
 import TabItem from '@theme/TabItem';
@@ -25,7 +26,7 @@ import {Distributions} from '/src/docComponents/distributions';
 
 ## 快速开始
 
-:::tip
+:::info
 如果仅希望使用云函数和 Hook 而不是部署通用的后端程序，建议查看 [云函数和 Hook 开发指南 § 快速开始](/sdk/engine/cloud-function#快速开始)。
 :::
 
@@ -346,14 +347,6 @@ Switching to my-engine-app (group: web)`}
 
 你也可以在 **开发者中心 » 你的游戏 » 游戏服务 » 云服务 » 云引擎 » 云引擎分组 » 设置 » 自定义环境变量** 页面中添加自定义的环境变量。其中名字必须是字母、数字、下划线且以字母开头，值必须是字符串，修改环境变量后会在下一次部署时生效。
 
-### 设置域名
+### 绑定自定义域名
 
-云引擎需要设置域名才能访问。在 **开发者中心 » 你的游戏 » 游戏服务 » 云服务 » 云引擎 » 你的分组 » 设置 » 访问域名** 处可以绑定域名。
-
-如果你绑定的域名以 `stg-` 开头（如 `stg-api.example.com`），会自动关联到预备环境。
-
-<Distributions if={BRAND === 'tds' || REGION === 'global'}>
-
-对于测试阶段的应用，我们提供了共享域名，你可以自定义共享域名的前缀部分。
-
-</Distributions>
+<CloudCustomDomain />

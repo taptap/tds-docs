@@ -4,8 +4,7 @@ title: LeanDB MySQL 指南
 sidebar_label: LeanDB MySQL
 ---
 
-
-
+import EngineRuntimes from '/src/docComponents/MultiLang/engine';
 
 LeanDB 是 LeanCloud 推出的数据库托管方案，开发者可以在「控制台 => 云引擎 => LeanDB」中创建托管在 LeanCloud 的数据库实例。
 
@@ -35,7 +34,8 @@ LeanDB 所在的应用的云引擎在部署时，会被注入几个包含 MySQL 
 
 其中 `<NAME>` 是你在创建 LeanDB 时为它指定的名字，如果你的 LeanDB 名为 `MYRDB` 的话，就会有名为 `MYSQL_HOST_MYRDB` 的环境变量（以及其他三个）。
 
-### Node.js
+<EngineRuntimes>
+<TabItem value='nodejs'>
 
 在 Node.js 中你可以这样连接到 MySQL:
 
@@ -62,71 +62,8 @@ mysqlPool.queryAsync('SELECT 1 + 1 AS solution').then( rows => {
 - 你需要运行 `npm install --save mysql bluebird` 来安装上面代码中用到的依赖
 - 更多的用法请参考 [mysqljs/mysql 的文档](https://github.com/mysqljs/mysql)
 
-### PHP
-
-在 PHP 中你可以这样连接到 MySQL:
-
-```php
-try {
-  $mysqlHost = getenv('MYSQL_HOST_MYRDB');
-  $mysqlPort = getenv('MYSQL_PORT_MYRDB');
-  $pdo = new PDO("mysql:host=$mysqlHost:$mysqlPort;dbname=test", getenv('MYSQL_ADMIN_USER_MYRDB'), getenv('MYSQL_ADMIN_PASSWORD_MYRDB'));
-
-  foreach($pdo->query('SELECT 1 + 1 AS solution') as $row) {
-    print "The solution is {$row['solution']}";
-  }
-} catch (PDOException $e) {
-  print $e->getMessage();
-}
-```
-
-- 更多的用法请参考 [PDO 的文档](https://www.php.net/manual/zh/class.pdo.php)
-
-### Java
-
-在 Java 中你可以这样连接到 MySQL:
-
-```java
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.Statement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
-String host = System.getenv("MYSQL_HOST_MYRDB");
-String port = System.getenv("MYSQL_PORT_MYRDB");
-String user = System.getenv("MYSQL_ADMIN_USER_MYRDB");
-String password = System.getenv("MYSQL_ADMIN_PASSWORD_MYRDB");
-try {
-  Class.forName("com.mysql.jdbc.Driver").newInstance();
-} catch (Exception ex) {
-  // 处理异常
-}
-try {
-  Connection connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/test?" +
-  "user=" + user + "&password=" + password);
-  Statement statement = connection.createStatement();
-  ResultSet resultSet = statement.executeQuery("SELECT 1 + 1 AS solution");
-  resultSet.first();
-  System.out.format("The solution is %d", resultSet.getInt("solution"));
-} catch (SQLException ex) {
-  // 处理异常
-}
-```
-
-- 需要在 `pom.xml` 中加入 mysql connector 依赖：
-
-    ```xml
-    <dependency>
-      <groupId>mysql</groupId>
- 	    <artifactId>mysql-connector-java</artifactId>
-      <version>8.0.16</version>
-    </dependency>
-    ```
-
-- 更多的用法请参考 [MySQL Connector/J 文档](https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-usagenotes-connect-drivermanager.html)
-
-### Python
+</TabItem>
+<TabItem value='python'>
 
 在 Python 中你可以这样连接到 MySQL:
 
@@ -163,6 +100,74 @@ except mysql.connector.Error as err:
 - 上面用的是 MySQL 官方的 python driver，你需要在 `requirements.txt` 中列出这一依赖，例如：`mysql-connector-python>=8.0.16,<9.0.0`
 - 更多的用法请参考 [MySQL Connector/Python 文档](https://dev.mysql.com/doc/connector-python/en/)
 
+</TabItem>
+<TabItem value='php'>
+
+在 PHP 中你可以这样连接到 MySQL:
+
+```php
+try {
+  $mysqlHost = getenv('MYSQL_HOST_MYRDB');
+  $mysqlPort = getenv('MYSQL_PORT_MYRDB');
+  $pdo = new PDO("mysql:host=$mysqlHost:$mysqlPort;dbname=test", getenv('MYSQL_ADMIN_USER_MYRDB'), getenv('MYSQL_ADMIN_PASSWORD_MYRDB'));
+
+  foreach($pdo->query('SELECT 1 + 1 AS solution') as $row) {
+    print "The solution is {$row['solution']}";
+  }
+} catch (PDOException $e) {
+  print $e->getMessage();
+}
+```
+
+- 更多的用法请参考 [PDO 的文档](https://www.php.net/manual/zh/class.pdo.php)
+
+</TabItem>
+<TabItem value='java'>
+
+在 Java 中你可以这样连接到 MySQL:
+
+```java
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+String host = System.getenv("MYSQL_HOST_MYRDB");
+String port = System.getenv("MYSQL_PORT_MYRDB");
+String user = System.getenv("MYSQL_ADMIN_USER_MYRDB");
+String password = System.getenv("MYSQL_ADMIN_PASSWORD_MYRDB");
+try {
+  Class.forName("com.mysql.jdbc.Driver").newInstance();
+} catch (Exception ex) {
+  // 处理异常
+}
+try {
+  Connection connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/test?" +
+  "user=" + user + "&password=" + password);
+  Statement statement = connection.createStatement();
+  ResultSet resultSet = statement.executeQuery("SELECT 1 + 1 AS solution");
+  resultSet.first();
+  System.out.format("The solution is %d", resultSet.getInt("solution"));
+} catch (SQLException ex) {
+  // 处理异常
+}
+```
+
+- 需要在 `pom.xml` 中加入 mysql connector 依赖：
+
+```xml
+<dependency>
+  <groupId>mysql</groupId>
+  <artifactId>mysql-connector-java</artifactId>
+  <version>8.0.16</version>
+</dependency>
+```
+
+- 更多的用法请参考 [MySQL Connector/J 文档](https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-usagenotes-connect-drivermanager.html)
+
+</TabItem>
+</EngineRuntimes>
 
 ## 常见问题
 

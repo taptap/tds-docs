@@ -1,0 +1,160 @@
+import {Distributions} from '/src/docComponents/distributions';
+import EngineRuntimes from '/src/docComponents/MultiLang/engine';
+
+所有对云引擎的 HTTP 请求都会经过负载均衡，负载均衡组件会处理 HTTPS 加密、重定向到 HTTPS、对响应进行压缩等一般性工作，因此云引擎上的程序不需要自己实现这些功能。
+
+<Distributions if={!props.noClientIp}>
+#### 客户端 IP
+云引擎的负载均衡会在 HTTP 的 `X-Real-IP` 头部中传递客户端 IP:
+
+<EngineRuntimes only={props.only}>
+<TabItem value='nodejs'>
+
+在 Express 中：
+
+```js
+app.get('/', function (req, res) {
+  var ipAddress = req.headers['x-real-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  console.log(ipAddress);
+  res.send(ipAddress);
+});
+```
+
+</TabItem>
+<TabItem value='python'>
+
+Python（Flask）：
+
+```python
+from flask import Flask
+from flask import request
+
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    print(request.headers['x-real-ip'])
+    return 'ok'
+```
+
+Python（Django）：
+
+```python
+def index(request):
+    print(request.META['HTTP_X_REAL_IP'])
+    return render(request, 'index.html', {})
+```
+
+</TabItem>
+<TabItem value='php'>
+
+```php
+$app->get('/', function($req, $res) {
+  error_log($_SERVER['HTTP_X_REAL_IP']);
+  return $res;
+});
+```
+
+</TabItem>
+<TabItem value='java'>
+
+```java
+EngineRequestContext.getRemoteAddress();
+```
+
+</TabItem>
+<TabItem value='go'>
+
+Go（Echo）：
+
+```go
+func fetchRealIP(c echo.Context) error {
+  realIP = c.RealIP()
+  //...
+}
+```
+
+</TabItem>
+</EngineRuntimes>
+</Distributions>
+
+<Distributions region='cn-mainland'>
+
+:::info
+中国大陆节点的云引擎应用会默认启用加速节点，取决于底层的供应商，可能无法获取到正确的客户端 IP。如果确实需要客户端 IP，可以开通独立 IP。
+:::
+
+</Distributions>
+
+#### 重定向到 HTTPS
+
+在绑定云引擎自定义域名时，可以选择「强制 HTTPS」，勾选后负载均衡组件会将 HTTP 的请求重定向到 HTTPS 的同一路径。
+
+<Distributions if={!props.noDeprecatedMiddleware}>
+<details>
+<summary>点击展开关于 SDK 中重定向到 HTTPS 的用法（不推荐）</summary>
+
+一些 SDK 提供了重定向至 HTTPS 的中间件,部署并发布到生产环境之后，访问你的 LeanEngine 网站都会强制通过 HTTPS 访问。
+
+<EngineRuntimes only={props.only}>
+<TabItem value='nodejs'>
+
+Node.js（Express）：
+
+```js
+app.enable('trust proxy');
+app.use(AV.Cloud.HttpsRedirect());
+```
+
+Node.js（Koa）：
+
+```js
+app.proxy = true;
+app.use(AV.Cloud.HttpsRedirect({framework: 'koa'}));
+```
+
+</TabItem>
+<TabItem value='python'>
+
+```python
+import leancloud
+
+application = get_your_wsgi_func()
+
+application = leancloud.HttpsRedirectMiddleware(application)
+```
+
+</TabItem>
+<TabItem value='php'>
+
+```php
+SlimEngine::enableHttpsRedirect();
+$app->add(new SlimEngine());
+```
+
+</TabItem>
+<TabItem value='java'>
+
+```java
+LeanEngine.setHttpsRedirectEnabled(true);
+```
+
+</TabItem>
+<TabItem value='dotnet'>
+
+```cs
+app.UseHttpsRedirection();
+```
+
+</TabItem>
+</EngineRuntimes>
+</details>
+</Distributions>
+
+<Distributions region='cn-mainland'>
+
+#### 加速缓存
+
+如果你将自定义域名解析到加速节点（也包括云引擎的共享域名），那么边缘节点会对请求进行缓存，边缘节点会有一些默认的缓存规则，如不希望请求被缓存，可以在 HTTP 的响应头中添加 `Control-Cache` 来控制缓存的行为。
+
+</Distributions>

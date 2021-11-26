@@ -4,6 +4,8 @@ title: LeanCache 指南
 sidebar_label: LeanCache
 ---
 
+import EngineRuntimes from '/src/docComponents/MultiLang/engine';
+
 LeanCache 使用 [Redis](http://redis.io/) 5.x 版本来提供高性能、高可用的 Key-Value 内存存储，主要用作缓存数据的存储，也可以用作持久化数据的存储。它非常适合用于以下场景：
 
 * 某些数据量少，但是读写比例很高，比如某些应用的菜单可以通过后台调整，所有用户会频繁读取该信息。
@@ -100,7 +102,10 @@ $ lean cache list
 
 **注意**：命令行工具操作 LeanCache 时，是通过 HTTPS 请求来进行通讯的，因此类似 `pub/sub`、`blpop` 等需要长连接的命令不能直接使用。但是线上没有这个限制，可以直接使用。
 
-### 在云引擎中使用（Node.js 环境）
+### 在云引擎中使用
+
+<EngineRuntimes>
+<TabItem value='nodejs'>
 
 首先添加相关依赖到云引擎应用中：
 
@@ -121,7 +126,8 @@ client.on('error', function(err) {
 });
 ```
 
-### 在云引擎中使用（Python 环境）
+</TabItem>
+<TabItem value='python'>
 
 首先添加相关依赖到云引擎应用的 `requirements.txt` 中：
 
@@ -141,7 +147,8 @@ import redis
 r = redis.from_url(os.environ.get("REDIS_URL_MYCACHE"))
 ```
 
-### 在云引擎中使用（PHP 环境）
+</TabItem>
+<TabItem value='php'>
 
 首先添加 redis 库的依赖，比如 predis：
 
@@ -157,7 +164,8 @@ $redis = new Predis\Client(getenv("REDIS_URL_MYCACHE"));
 $redis->ping();
 ```
 
-### 在云引擎中使用（Java 环境）
+</TabItem>
+<TabItem value='java'>
 
 在 `pom.xml` 中添加 redis client 的依赖：
 
@@ -209,7 +217,8 @@ public class RedisHelper {
 }
 ```
 
-### 在云引擎中使用（.NET Core 环境）
+</TabItem>
+<TabItem value='dotnet'>
 
 首先在项目里面安装 nuget 依赖：
 
@@ -251,6 +260,9 @@ var bar = db.StringGet("foo");
 ```
 
 关于 `IConnectionMultiplexer` 的用法和相关文档请参阅：[StackExchange.Redis](https://stackexchange.github.io/StackExchange.Redis/)，这个库是 .NET Core 环境中比较推荐的 Redis Client。
+
+</TabItem>
+</EngineRuntimes>
 
 ### 在本地调试依赖 LeanCache 的应用
 

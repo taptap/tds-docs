@@ -11,23 +11,43 @@ import MultiLang from '/src/docComponents/MultiLang';
 
 目前支持 Node.js、Python、Java、PHP、.Net、Go 运行环境，也支持基于 Node.js 的 Web 前端项目，未来可能还会引入其他语言，详见 [总览](/sdk/engine/cloud-engine/)。
 
+### 云引擎支持托管纯静态网站吗
+
+支持，请看 [云引擎 Web 前端应用运行环境](/sdk/engine/runtime/webapp/)。
+
 ### 云引擎支持 HTTPS 吗
 
 - 自定义域名在绑定时启用 SSL 即可支持 HTTPS。
-- 如需配置自动跳转，请看[云引擎下如何重定向到 HTTPS？](#云引擎下如何重定向到-https？)。
+- 如需配置自动跳转，请看 [云引擎下如何重定向到 HTTPS？](#云引擎下如何重定向到-https？)。
+
+## 限制和费用
+
+### 每个应用最多有几个实例？
+
+每个应用最多拥有 12 个实例，如果需要更多资源请通过工单联系我们的技术支持。
+
 
 ## 疑难问题
+
+### Application not found 错误
+
+访问云引擎服务时，服务端返回错误「Application not found」或在云引擎日志中出现这个错误，可能有以下原因：
+
+* 调用错了环境。最常见的情况是，免费的体验实例是没有预备环境，开发者却主动设置去调用预备环境。
+* 云引擎自定义域名填错了，比如微信回调地址。
+* 因为免费版（体验版）的云引擎是有休眠的，休眠期间被调用会出现这个错误。建议升级到标准实例以保证实例一直运行。
+
 
 ### 在线上无法读取到项目中的文件怎么办？
 
 建议先检查文件大小写是否正确，线上的文件系统是区分大小写的，而 Windows 和 macOS 通常不区分大小写。
 
+### 云引擎会重复提交请求吗？
+
+云引擎的负载均衡对于幂等的请求（GET、PUT），在 HTTP 层面出错或超时的情况下是会重试的。
+可以使用正确的谓词（例如 POST）避免此类重试。
 
 - - - -
-
-### 云引擎支持托管纯静态网站吗
-
-支持。命令行工具初始化项目选择语言环境时，依次选择 Others > Static Site 即可。
 
 ### 云引擎采用什么样的休眠策略？
 
@@ -47,22 +67,6 @@ import MultiLang from '/src/docComponents/MultiLang';
 边缘节点额外限制了请求不能超过 60 MB、请求处理不得超过 10 秒，另外边缘节点不支持 WebSocket 请求和 HTTP PATCH 方法，也不支持获取客户端 IP。
 因此，如果你在国内节点云引擎托管动态网站，我们建议你绑定独立 IP，使用独立入口，不经过边缘节点，自然也就没有上述限制。
 
-### 云引擎运行日志大小有限制吗？
-
-日志单行最大 4096 个字符，多余部分会被丢弃；日志输出频率大于 600 行／分钟，多余的部分会被丢弃。
-
-### 云引擎使用什么时区？
-
-国内版使用北京时间（东八区），国际版使用 UTC+0 时区。
-
-### 如何查看云引擎的出入口 IP 地址？
-
-如果开发者希望在第三方服务平台（如微信开放平台）上配置 IP 白名单而需要获取云引擎的入口或出口 IP 地址，请进入 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 云引擎 > 云引擎分组 > 设置 > 出入口 IP** 来自助查询。
-
-我们会尽可能减少出入口 IP 的变化频率，但 IP 突然变换的可能性仍然存在。因此在遇到与出入口 IP 相关的问题，我们建议先进入控制台来核实一下 IP 列表是否有变化。
-
-如需保持入口 IP 不变，建议为云引擎绑定独立 IP。
-
 ### 如何访问云引擎预备环境中托管的网站？
 
 需要在控制台手动绑定一个 `stg-` 开头的域名。`stg-` 开头的自定义域名（例如 stg-web.example.com）会被自动地绑定到预备环境。
@@ -74,19 +78,6 @@ import MultiLang from '/src/docComponents/MultiLang';
 当生产环境的体验实例升级到「标准实例」后会有一个额外的「预备环境」，对应域名 stg-web.example.com，两个环境所访问的都是同样的数据，你可以用预备环境测试你的云引擎代码，每次修改先部署到预备环境，测试通过后再发布到生产环境；如果你希望有一个独立数据源的测试环境，建议单独创建一个应用。
 
 另外，stg-web.example.com 域名是需要在控制台自行绑定的。
-
-### Application not found 错误
-
-访问云引擎服务时，服务端返回错误「Application not found」或在云引擎日志中出现这个错误，可能有以下原因：
-
-* 调用错了环境。最常见的情况是，免费的体验实例是没有预备环境，开发者却主动设置去调用预备环境。
-* 云引擎自定义域名填错了，比如微信回调地址。
-* 因为免费版（体验版）的云引擎是有休眠的，休眠期间被调用会出现这个错误。建议升级到标准实例以保证实例一直运行。
-
-### 云引擎会重复提交请求吗？
-
-云引擎的负载均衡对于幂等的请求（GET、PUT），在 HTTP 层面出错或超时的情况下是会重试的。
-可以使用正确的谓词（例如 POST）避免此类重试。
 
 ### 云引擎中如何处理用户登录和 Cookie？
 
@@ -155,133 +146,14 @@ app.post('/todos', function (req, res) {
 [guzzle]: https://docs.guzzlephp.org/en/stable/
 [OkHttp]: https://square.github.io/okhttp/
 
-### 云引擎下如何获取客户端 IP？
-
-如果你想获取客户端的 IP，可以直接从用户请求的 HTTP 头的 `x-real-ip` 字段获取。
-下面给出各语言的示例代码。
-
-Node.js（Express）：
-
-```js
-app.get('/', function (req, res) {
-  var ipAddress = req.headers['x-real-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress;
-  console.log(ipAddress);
-  res.send(ipAddress);
-});
-```
-
-Python（Flask）：
-
-```python
-from flask import Flask
-from flask import request
-
-app = Flask(__name__)
-
-@app.route('/')
-def index():
-    print(request.headers['x-real-ip'])
-    return 'ok'
-```
-
-Python（Django）：
-
-```python
-def index(request):
-    print(request.META['HTTP_X_REAL_IP'])
-    return render(request, 'index.html', {})
-```
-
-PHP：
-
-```php
-$app->get('/', function($req, $res) {
-  error_log($_SERVER['HTTP_X_REAL_IP]);
-  return $res;
-});
-```
-
-Java：
-
-```java
-EngineRequestContext.getRemoteAddress();
-```
-
-Go（Echo）：
-
-```go
-func fetchRealIP(c echo.Context) error {
-  realIP = c.RealIP()
-  //...
-}
-```
-
-注意，国内节点的云引擎应用，如果启用了边缘节点加速功能，由于边缘节点的限制，可能无法获取客户端 IP。
-如需获取客户端 IP，建议绑定独立 IP。
-
 ### 云引擎如何上传文件？
 
 托管在云引擎的网站可以使用相应 SDK 提供的接口上传文件。
 不过，一般情况下建议在客户端 SDK 上传文件，而不是通过云引擎中转，以免增加不必要的云引擎流量。
 
-### 云引擎下如何重定向到 HTTPS？
-
-大部分 SDK 提供了重定向至 HTTPS 的中间件。
-部署并发布到生产环境之后，访问你的 LeanEngine 网站都会强制通过 HTTPS 访问。
-
-Node.js（Express）：
-
-```js
-app.enable('trust proxy');
-app.use(AV.Cloud.HttpsRedirect());
-```
-
-Node.js（Koa）：
-
-```js
-app.proxy = true;
-app.use(AV.Cloud.HttpsRedirect({ framework: 'koa' }));
-```
-
-Python：
-
-```python
-import leancloud
-
-application = get_your_wsgi_func()
-
-application = leancloud.HttpsRedirectMiddleware(application)
-```
-
-PHP（Slim）：
-
-```php
-SlimEngine::enableHttpsRedirect();
-$app->add(new SlimEngine());
-```
-
-Java：
-
-```java
-LeanEngine.setHttpsRedirectEnabled(true);
-```
-
-Go SDK 暂未提供跳转至 HTTPS 的中间件。
-
-.NET：
-
-```cs
-app.UseHttpsRedirection();
-```
-
 ### 如何判断请求是通过 HTTPS 还是 HTTP 访问的？
 
 因为 HTTPS 加密是在负载均衡层面处理的，所以通常部署在云引擎上的 web 框架获取的请求 URL 总是使用 HTTP 协议，建议通过 `X-Forwarded-Proto` HTTP 头来判断原请求是通过 HTTP 还是 HTTPS 访问的。
-
-
-### 每个应用最多有几个实例？
-
-每个应用最多拥有 12 个实例，如果需要更多资源请通过工单联系我们的技术支持。
 
 
 ### 云引擎响应时间增加怎么办
@@ -297,27 +169,6 @@ app.UseHttpsRedirection();
 云引擎的访问日志（Access Log）同样可以在**开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 云引擎 > 访问日志**导出。
 ## 部署
 
-### 云引擎下如何自定义系统级依赖？
-
-在云引擎的线上环境中，你可以通过 `leanengine.yaml` 文件的 `systemDependencies` 部分来自定义系统级依赖：
-
-```yaml
-systemDependencies:
-  - imagemagick
-```
-
-目前支持的选项包括：
-
-- `ffmpeg` 一个音视频处理工具库。
-- `imagemagick` 一个图片处理工具库。
-- `fonts-wqy` 文泉驿点阵宋体、文泉驿微米黑，通常和 `phantomjs` 或 `chrome-headless` 配合来显示中文。
-- `fonts-noto` 思源黑体（体积较大）。
-- `phantomjs` 一个无 UI 的 WebKit 浏览器（该项目已停止维护）。
-- `chrome-headless` 一个无 UI 的 Chrome 浏览器（体积很大，会显著增加部署耗时，运行时也会消耗大量 CPU 和内存；如果使用 `puppeter` 的话，需要给 `puppeteer.launch` 传递这些参数：`{executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox', '--disable-setuid-sandbox']}`；暂不支持 Java）。
-- `node-canvas` 安装 `node-canvas` 所需要的系统级依赖（你仍需要安装 `node-canvas`）。
-- `python-talib` 金融市场数据分析库。
-
-注意添加系统依赖将会拖慢部署速度，因此请不要添加未用到的依赖。
 
 ### 云引擎中设置的环境变量无效？
 
@@ -702,25 +553,6 @@ LeanClient::useProduction(false); // stage
 
 ## Node.js
 
-### 怎么添加第三方模块
-
-只需要像普通的 Node.js 项目那样，在项目根目录的 `package.json` 中添加依赖即可：
-
-```
-{
-  "dependencies": {
-    "lodash": "^4.17.11",
-    "nanoid": "^3.1.10"
-  }
-}
-```
-
-`dependencies` 内的内容表明了该项目依赖的三方模块（比如示例中的 `lodash` 和 `nanoid`）。关于 `package.json` 的更多信息见[云引擎网站托管指南](/sdk/engine/guide/webhosting/)。
-
-然后即可在代码中使用第三方包（`const { nanoid } = require("nanoid");`），如需在本地调试还需运行 `npm install` 来安装这些包。
-
-**注意**：命令行工具部署时不会上传 `node_modules` 目录，因为云引擎服务器会根据 `package.json` 的内容自动下载三方包。所以也建议将 `node_modules` 目录添加到 `.gitignore` 中，使其不加入版本控制。
-
 ### Node.js 项目的 `devDependencies` 没有安装？
 
 云引擎会在部署时用 `npm ci` 为你安装项目依赖，包括 `devDependencies`。
@@ -853,59 +685,6 @@ AV.Push.send({
 
 ### 如何在云引擎中使用 Node.js SDK 提供的 CookieSession 中间件？
 
-如果你的页面主要是由服务器端渲染（例如使用 EJS、Pug），在前端不需要使用 JavaScript SDK 进行数据操作，那么建议你使用我们提供的一个 `CookieSession` 中间件，在 Cookie 中维护用户状态：
-
-```js
-app.use(AV.Cloud.CookieSession({ secret: 'my secret', maxAge: 3600000, fetchUser: true }));
-```
-
-Koa 需要添加一个 `framework: 'koa'` 的参数：
-
-```js
-app.use(AV.Cloud.CookieSession({ framework: 'koa', secret: 'my secret', maxAge: 3600000, fetchUser: true }));
-```
-
-使用 `CookieSession` 的同时需要添加 CSRF Token 来防御 CSRF 攻击。
-
-你需要传入一个 `secret` 用于签名 Cookie（必须提供），这个中间件会将 `AV.User` 的登录状态信息记录到 Cookie 中，用户下次访问时自动检查用户是否已经登录，如果已经登录，可以通过 `req.currentUser` 获取当前登录用户。
-
-`AV.Cloud.CookieSession` 支持的选项包括：
-
-- **fetchUser**：是否自动 `fetch` 当前登录的 `AV.User` 对象。默认为 `false`。如果设置为 `true`，每个 HTTP 请求都将发起一次 LeanCloud API 调用来 `fetch` 用户对象。如果设置为 `false`，默认只可以访问 `req.currentUser` 的 `id`（`_User` 表记录的 `objectId`）和 `sessionToken` 属性，你可以在需要时再手动 `fetch` 整个用户。
-- **name**：Cookie 的名字，默认为 `avos.sess`。
-- **maxAge**：Cookie 的过期时间。单位为毫秒。
-
-在 Node SDK 1.x 之后我们不再允许通过 `AV.User.current()` 获取登录用户的信息，而是需要你：
-
-- 通过 `request.currentUser` 获取用户信息。
-- 在后续的方法调用显式传递 user 对象。
-
-你可以这样简单地实现一个具有登录功能的站点：
-
-```js
-app.post('/login', function (req, res) {
-  AV.User.logIn(req.body.username, req.body.password).then(function (user) {
-    res.saveCurrentUser(user); // save cookie
-    res.redirect('/profile');
-  }, function (error) {
-    res.redirect('/login');
-  });
-})
-
-app.get('/profile', function (req, res) {
-  if (req.currentUser) {
-    res.send(req.currentUser);
-  } else {
-    res.redirect('/login');
-  }
-});
-
-app.get('/logout', function (req, res) {
-  req.currentUser.logOut();
-  res.clearCurrentUser(); // clear cookie
-  res.redirect('/profile');
-});
-```
 
 ### 跨域 POST 请求未携带 Cookie 怎么办？
 
@@ -965,124 +744,6 @@ Python SDK 也存在类似的问题，只会返回 Pointer 元信息，因此也
 
 可以参考我们的 [Demo: batch-update](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/routes/batch-update.js)。
 
-### 如何接入 Node.js 框架？
-
-细心的开发者已经发现在示例项目中的 `package.json` 中引用了一个流行的 Node Web 框架 [Express](http://expressjs.com/)。
-
-Node.js SDK 为 [Express](http://expressjs.com/) 和 [Koa](http://koajs.com/) 提供了集成支持。
-
-如果你已经有了现成的项目使用的是这两个框架，只需通过下面的方式加载 Node.js SDK 提供的中间件到当前项目中即可：
-
-```sh
-npm install --save leanengine leancloud-storage
-```
-
-引用和配置的代码如下：
-
-#### Express
-
-```js
-var express = require('express');
-var AV = require('leanengine');
-
-AV.init({
-  appId: process.env.LEANCLOUD_APP_ID || '{{appid}}',
-  appKey: process.env.LEANCLOUD_APP_KEY || '{{appkey}}',
-  masterKey: process.env.LEANCLOUD_APP_MASTER_KEY || '{{masterkey}}'
-});
-
-var app = express();
-app.use(AV.express());
-app.listen(process.env.LEANCLOUD_APP_PORT);
-```
-
-其中，`AV.express` 接受一个可选参数 `options`，`options` 是一个对象，目前支持以下两个可选属性：
-
-- `onError`：全局错误处理函数，云函数（包括 Hook 函数）抛出异常时会调用该函数。该函数的使用场景包括统一发送错误报告。
-- `ignoreInvalidSessionToken`：布尔值，为真时忽略客户端发来的错误的 `sessionToken`（`X-LC-session` 头），为假时抛出 `401` 错误 `{"code": 211, "error": "Verify sessionToken failed, maybe login expired: ..."}`。客户端 SDK 发送请求时会统一发送 `X-LC-session` 头（其中指定了 `sessionToken`），`sessionToken` 可能因种种原因失效，而云函数在很多情况下并不关心 `sessionToken`。因此，云引擎提供了 `ignoreInvalidSessionToken` 这个选项，设为真时忽略 `sessionToken` 错误。反之，如果该选项设为假，客户端收到相应报错时，需要重新登录。
-
-你可以使用 Express 的路由定义功能来提供自定义的 HTTP API：
-
-```js
-app.get('/', function (req, res) {
-  res.render('index', { title: 'Hello World' });
-});
-
-app.get('/time', function (req, res) {
-  res.json({
-    time: new Date()
-  });
-});
-
-app.get('/todos', function (req, res) {
-  new AV.Query('Todo').find().then(function (todos) {
-    res.json(todos);
-  }).catch(function (err) {
-    res.status(500).json({
-      error: err.message
-    });
-  });
-});
-```
-
-更多最佳实践请参考我们的 [项目模板](https://github.com/leancloud/node-js-getting-started) 和 [云引擎 Node.js Demo 仓库](https://github.com/leancloud/leanengine-nodejs-demos)。
-
-#### Koa
-
-```js
-var koa = require('koa');
-var AV = require('leanengine');
-
-AV.init({
-  appId: process.env.LEANCLOUD_APP_ID || '{{appid}}',
-  appKey: process.env.LEANCLOUD_APP_KEY || '{{appkey}}',
-  masterKey: process.env.LEANCLOUD_APP_MASTER_KEY || '{{masterkey}}'
-});
-
-var app = koa();
-app.use(AV.koa());
-app.listen(process.env.LEANCLOUD_APP_PORT);
-```
-
-`AV.koa` 同样接受可选参数 `options`，关于 `options` 对象的具体说明，请参考上节。
-
-你可以使用 Koa 来渲染页面、提供自定义的 HTTP API：
-
-```js
-app.use(function* (next) {
-  if (this.url === '/todos') {
-    return new AV.Query('Todo').find().then(todos => {
-      this.body = todos;
-    });
-  } else {
-    yield next;
-  }
-});
-```
-
-使用 Koa 时建议将 `package.json` 中的 Node.js 的版本设置为 `4.x` 以上。
-
-#### 其他 Web 框架
-
-你也可以使用其他的 Web 框架进行开发，但你需要自行去实现云引擎健康监测的逻辑。
-下面是一个使用 Node.js 内建的 [`http`](https://nodejs.org/api/http.html) 实现的最简示例，可供参考：
-
-```js
-require('http').createServer(function (req, res) {
-  if (req.url == '/') {
-    res.statusCode = 200;
-    res.end();
-  } else {
-    res.statusCode = 404;
-    res.end();
-  }
-}).listen(process.env.LEANCLOUD_APP_PORT);
-```
-
-你需要将 Web 服务监听在 `0.0.0.0` 上（Node.js 和 Express 的默认行为）而不是 `127.0.0.1`。
-
-可参考[在云引擎中使用其他 Node 框架](https://leancloud.cn/docs/leanengine-web-frameworks.html)这篇指南。
-
 #### 路由超时设置
 
 因为 Node.js 的异步调用容易因运行时错误或编码疏忽中断，为了减少在这种情况下对服务器内存的占用，也为了客户端能够更早地收到错误提示，所以需要添加这个设置，一旦发生超时，服务端会返回一个 HTTP 错误码给客户端。
@@ -1093,41 +754,6 @@ require('http').createServer(function (req, res) {
 // 设置默认超时时间
 app.use(timeout('15s'));
 ```
-
-### 自行接入 Node.js 框架时如何使用云服务的数据存储功能？
-
-模板项目已经集成了 Node.js SDK，并且包含 SDK 初始化的逻辑。
-
-如果项目自行接入 Web 框架，那么需要安装 Node.js SDK （`leanengine`），另外， JavaScript SDK（`leancloud-storage`）也需要作为 peer dependency 一同安装，在升级 Node.js SDK 时也请记得升级 JavaScript SDK：
-
-```sh
-npm install --save leanengine leancloud-storage
-```
-
-同时也需要自行初始化 SDK（注意我们在云引擎中开启了 masterKey 权限，这将会跳过 ACL 和其他权限限制）：
-
-```js
-const AV = require('leanengine');
-
-AV.init({
-  appId: process.env.LEANCLOUD_APP_ID,
-  appKey: process.env.LEANCLOUD_APP_KEY,
-  masterKey: process.env.LEANCLOUD_APP_MASTER_KEY
-});
-
-AV.Cloud.useMasterKey();
-```
-
-### Node.js SDK 不同版本的主要差异？
-
-Node SDK 的历史版本：
-
-- `0.x`：最初的版本，对 Node.js 4.x 及以上版本兼容不佳，建议用户参考[升级到云引擎 Node.js SDK 1.0](https://leancloud.cn/docs/leanengine-node-sdk-upgrade-1.html) 来更新。
-- `1.x`：彻底废弃了全局的 `currentUser`，依赖的 JavaScript 也升级到了 1.x 分支，支持了 Koa 和 Node.js 4.x 及以上版本。
-- `2.x`：提供了对 Promise 风格的云函数、Hook 写法的支持，移除了一些被弃用的特性（`AV.Cloud.httpRequest`），不再支持 Backbone 风格的回调函数。
-- `3.x`：**推荐使用** 的版本，指定 JavaScript SDK 为 peer dependency（允许自定义 JS SDK 的版本），升级 JS SDK 到 3.x。
-
-详见 Node.js SDK 的 [更新日志](https://github.com/leancloud/leanengine-node-sdk/releases)。
 
 ## Python
 
