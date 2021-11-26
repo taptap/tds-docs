@@ -9,7 +9,6 @@ import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';
 import Mermaid from '/src/docComponents/Mermaid';
 
-实时语音服务目前支持 Unity 和 Android 原生两个平台，iOS 原生支持正在开发中，敬请期待。
 
 ## SDK 获取
 
@@ -20,7 +19,6 @@ import Mermaid from '/src/docComponents/Mermaid';
 <CodeBlock className="json">
 {`"dependencies":{
   ...
-  "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
   "com.taptap.tds.rtc":"https://github.com/TapTap/TapRTC-Unity.git#${sdkVersions.taptap.unity}",
 }`}
 </CodeBlock>
