@@ -38,7 +38,7 @@ dependencies {
 </CodeBlock>
 
 <CodeBlock className="objectivec">
-// 暂未支持
+TapRTC.framework
 </CodeBlock>
 
 </MultiLang>
@@ -110,7 +110,17 @@ public class MyApp extends Application {
 ```
 
 ```objc
-// 暂未支持
+TapRTCConfig *config = [[TapRTCConfig alloc] initWithAppId:@"AppId"
+appKey:@"AppKey" serverUrl:@"ServerUrl"
+userId:@"UserId" deviceId:@"DeviceId"
+profile:AudioPerfProfileLOW]; // 如需使用范围语音功能，此项必须设为 LOW
+TapRTCEngine *engine = [TapRTCEngine defaultEngine];
+TapRTCResultCode resultCode = [engine initializeWithConfig:config];
+if (resultCode == TapRTCResultCode_Success) {
+    // success
+} else {
+    // handle error
+}
 ```
 
 </MultiLang>
@@ -126,7 +136,7 @@ public void Update()
 }
 ```
 
-Java SDK 无需定期调用 `Poll` 方法。
+Java SDK、Objective-C SDK 无需定期调用 `Poll` 方法。
 
 ### 恢复系统
 
@@ -143,7 +153,12 @@ boolean ok = TapRTCEngine.get().resume();
 ```
 
 ```objc
-// 暂未支持
+TapRTCResultCode resultCode = [engine resume];
+if (resultCode == TapRTCResultCode_Success) {
+    // resumed
+} else {
+    // failed to resume
+}
 ```
 
 </MultiLang>
@@ -163,7 +178,12 @@ boolean ok = TapRTCEngine.get().pause();
 ```
 
 ```objc
-// 暂未支持
+TapRTCResultCode resultCode = [engine pause];
+if (resultCode == TapRTCResultCode_Success) {
+    // paused
+} else {
+    // failed to pause
+}
 ```
 
 </MultiLang>
@@ -174,7 +194,7 @@ boolean ok = TapRTCEngine.get().pause();
 
 初始化成功之后，SDK 在创建房间之后，才可以进行实时语音通话。
 创建房间时需指定房间号（`roomId`）。
-[是否启用范围语音](#范围语音)也需在创建房间时设置，C# SDK 默认不启用，Java SDK 使用单独的接口创建范围语音房间。
+[是否启用范围语音](#范围语音)也需在创建房间时设置，C# SDK 默认不启用，Java SDK、Objective-C SDK 使用单独的接口创建范围语音房间。
 
 <MultiLang>
 
@@ -192,7 +212,7 @@ TapRTCRoom room = TapRTCEngine.get().acquireRoom(roomId);
 ```
 
 ```objc
-// 暂未支持
+TapRTCRoom *room = [engine acquireRoomWithRoomId:@"roomID"];
 ```
 
 </MultiLang>
@@ -242,7 +262,7 @@ room.registerCallback(new TapRTCRoom.Callback() {
     // 当前玩家退出房间
     @Override public void onExit() {}
 
-    // 当前玩家进入房间
+    // 其他玩家进入房间
     @Override public void onUserEnter(UserID userId) {}
 
     // 其他玩家退出房间
@@ -257,7 +277,37 @@ room.registerCallback(new TapRTCRoom.Callback() {
 ```
 
 ```objc
-// 暂未支持
+// 需实现 TapRTCRoomDelegate
+
+// 进入房间成功
+- (void)onEnterSuccess;
+
+// 进入房间失败
+- (void)onEnterFailure:(NSString *)message;
+
+// 其他玩家进入房间
+- (void)onUserEnter:(NSString *)userId;
+
+// 其他玩家退出房间
+- (void)onUserExit:(NSString *)userId;
+
+// 当前玩家退出房间
+- (void)onExit;
+
+// 连接断开
+- (void)onDisconnect;
+
+// 重连成功
+- (void)onReconnected;
+
+// 玩家说话开始
+- (void)onUserSpeakStart:(NSString *)userId volume:(NSInteger)volume;
+
+// 玩家说话结束
+- (void)onUserSpeakEnd:(NSString *)userId;
+
+// 音频质量变化（返回音频质量、丢包率、延迟）
+- (void)onQualityCallBackWithWeight:(int)weight loss:(float)loss delay:(int)delay;
 ```
 
 </MultiLang>
@@ -282,7 +332,12 @@ room.join(authBuffer);
 ```
 
 ```objc
-// 暂未支持
+TapRTCResultCode resultCode = [room joinWithAuth:@"authBuffer"];
+if (resultCode == TapRTCResultCode_Success) {
+    // joined
+} else {
+    // failed to join
+}
 ```
 
 </MultiLang>
@@ -304,7 +359,12 @@ room.exit();
 ```
 
 ```objc
-// 暂未支持
+TapRTCResultCode resultCode = [room exit];
+if (resultCode == TapRTCResultCode_Success) {
+    // exited
+} else {
+    // failed exit
+}
 ```
 
 </MultiLang>
@@ -325,7 +385,7 @@ boolean ok = room.enableUserAudio(userId);
 ```
 
 ```objc
-// 暂未支持
+TapRTCResultCode resultCode = [room enableUserAudioWithUserId:@"userId"];
 ```
 
 </MultiLang>
@@ -343,6 +403,10 @@ import com.taptap.taprtc.UserID;
 
 UserId userId = new UserID("userId");
 boolean ok = room.disableUserAudio(userId);
+```
+
+```objc
+TapRTCResultCode resultCode = [room disableUserAudioWithUserId:@"userId"];
 ```
 
 </MultiLang>
@@ -371,7 +435,7 @@ boolean ok = room.enableAudioReceiver(false);
 ```
 
 ```objc
-// 暂未支持
+TapRTCResultCode resultCode = [room enableAudioReceiver:YES];
 ```
 
 </MultiLang>
@@ -415,7 +479,7 @@ List<UserID> userIdList = room.getUsers();
 ```
 
 ```objc
-// 暂未支持
+NSArray <NSString *> *userIdList = [room getUsers];
 ```
 
 </MultiLang>
@@ -443,7 +507,11 @@ boolean ok = TapRTCEngine.get().getAudioDevice().enableMic(false);
 ```
 
 ```objc
-// 暂未支持
+// 打开
+TapRTCResultCode code = [engine.audioDevice enableMic:YES];
+
+// 关闭
+TapRTCResultCode code = [engine.audioDevice enableMic:NO];
 ```
 
 </MultiLang>
@@ -469,7 +537,11 @@ boolean ok = TapRTCEngine.get().getAudioDevice().enableSpeaker(false);
 ```
 
 ```objc
-// 暂未支持
+// 打开
+TapRTCResultCode code = [engine.audioDevice enableSpeaker:YES];
+
+// 关闭
+TapRTCResultCode code = [engine.audioDevice enableSpeaker:NO];
 ```
 
 </MultiLang>
@@ -509,7 +581,17 @@ int speakerVolume = TapRTCEngine.get().getAudioDevice().getSpeakerVolume();
 ```
 
 ```objc
-// 暂未支持
+int vol = 60;
+
+// 设置麦克风音量
+TapRTCResultCode code = [engine.audioDevice setMicVolume:vol];
+// 设置扬声器音量
+TapRTCResultCode code = [engine.audioDevice setSpeakerVolume:vol];
+
+// 获取麦克风音量
+int micVolume = [engine.audioDevice getMicVolume];
+// 获取扬声器音量
+int speakerVolume = [engine.audioDevice getSpeakerVolume];
 ```
 
 </MultiLang>
@@ -533,7 +615,11 @@ boolean ok = TapRTCEngine.get().getAudioDevice().enableAudioPlay(false);
 ```
 
 ```objc
-// 暂未支持
+// 打开
+TapRTCResultCode code = [engine.audioDevice enableAudioPlay:YES];
+
+// 关闭
+TapRTCResultCode code = [engine.audioDevice enableAudioPlay:NO];
 ```
 
 </MultiLang>
@@ -557,7 +643,11 @@ boolean ok = TapRTCEngine.get().getAudioDevice().enableLoopback(false);
 ```
 
 ```objc
-// 暂未支持
+// 打开
+TapRTCResultCode code = [engine.audioDevice enableLoopback:YES];
+
+// 关闭
+TapRTCResultCode code = [engine.audioDevice enableLoopback:NO];
 ```
 
 </MultiLang>
@@ -582,12 +672,12 @@ var room = await TapRTC.AcquireRoom("roomId", enableRangeAudio);
 import com.taptap.taprtc.TapRTCEngine;
 import com.taptap.taprtc.RoomID;
 
-RoomId anotherRoomId = new RoomID("anotherRoomId");
-TapRTCRoom room = TapRTCEngine.get().acquireRangeAudioRoom(anotherRoomId);
+RoomId roomId = new RoomID("roomId");
+TapRTCRoom room = TapRTCEngine.get().acquireRangeAudioRoom(roomId);
 ```
 
 ```objc
-// 暂未支持
+TapRTCRoom *room = [engine acquireRangeAudioRoomWithRoomId:@"roomID"];
 ```
 
 </MultiLang>
@@ -606,7 +696,8 @@ room.ChangeRoomType(AudioPerfProfile.LOW);
 ```
 
 ```objc
-// 暂未支持
+// Objective-C SDK 未提供切换音频质量的接口。
+// Objective-C SDK 下，如需使用范围语音功能，**SDK 初始化时音频质量需设置为 LOW**。
 ```
 
 </MultiLang>
@@ -643,7 +734,12 @@ boolean ok = room.rangeAudioCtrl().setRangeAudioMode(RangeAudioMode.TEAM);
 ```
 
 ```objc
-// 暂未支持
+int teamId = 12345678;
+TapRTCResultCode resultCode = [room setRangeAudioTeamId:teamId];
+
+// 世界模式
+TapRTCResultCode code = [room setRangeAudioMode:TapRTCRangeAudioModeWorld];
+TapRTCResultCode code = [room setRangeAudioMode:TapRTCRangeAudioModeTeam];
 ```
 
 </MultiLang>
@@ -669,7 +765,8 @@ room.rangeAudioCtrl().updateAudioReceiverRange(range);
 ```
 
 ```objc
-// 暂未支持
+int range = 300;
+TapRTCResultCode code = [room updateAudioReceiverRange:range];
 ```
 
 </MultiLang>
@@ -721,7 +818,29 @@ boolean ok = room.rangeAudioCtrl().updateSelfPosition(position, forward);
 ```
 
 ```objc
-// 暂未支持
+TapRTCPosition position;
+position.x = 1.0;
+position.y = 2.0;
+position.z = 3.0;
+
+TapRTCAxis axisForward;
+axisForward.x = 1.0;
+axisForward.y = 0.0;
+axisForward.z = 0.0;
+TapRTCAxis axisRight;
+axisRight.x = 0.0;
+axisRight.y = 1.0;
+axisRight.z = 0.0;
+TapRTCAxis axisUp;
+axisUp.x = 0.0;
+axisUp.y = 0.0;
+axisUp.z = 1.0;
+
+TapRTCForward forward;
+forward.forward = axisForward;
+forward.rightward = axisRight;
+forward.upward = axisUp;
+TapRTCResultCode code = [room updateSelfPosition:position forward:forward];
 ```
 
 </MultiLang>
@@ -749,7 +868,7 @@ boolean ok = TapRTCEngine.get().getAudioDevice().enableSpatializer(enable3D, app
 ```
 
 ```objc
-// 暂未支持
+TapRTCResultCode code = [engine.audioDevice EnableSpatializer:YES applyTeam:YES];
 ```
 
 </MultiLang>
