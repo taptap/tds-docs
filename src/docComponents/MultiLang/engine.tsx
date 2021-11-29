@@ -17,15 +17,15 @@ interface EngineRuntimesProps {
   children: React.ReactElement[] | React.ReactElement
 }
 
-export default function EngineRuntimes({only, group, children}: EngineRuntimesProps): JSX.Element | undefined {
+export default function EngineRuntimes({only, group, children}: EngineRuntimesProps): JSX.Element | null {
   const values: typeof runtimes = []
   const tabItems: JSX.Element[] = []
 
   if (only) {
     if (children instanceof Array) {
-      return children.find( child => child.props.value === only)
+      return children.find( child => child.props.value === only) || null
     } else {
-      return children.props.value === only ? children : undefined
+      return children.props.value === only ? children : null
     }
   }
 

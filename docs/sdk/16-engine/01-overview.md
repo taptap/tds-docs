@@ -10,7 +10,7 @@ sidebar_label: 总览
 
 运行环境 | 支持版本 | 支持包管理器 | 文档页面 | 示例项目
 --- | --- | --- | --- | ---
-Web 前端应用 | Node.js >= 0.12 | NPM 或 Yarn | [Web 应用运行环境](/sdk/engine/runtime/webapp/) | [static-getting-started](https://github.com/leancloud/static-getting-started)<br />[react-getting-started](https://github.com/leancloud/react-getting-started) (WIP) |
+Web 前端 | Node.js >= 0.12 | NPM 或 Yarn | [Web 前端运行环境](/sdk/engine/runtime/webapp/) | [static-getting-started](https://github.com/leancloud/static-getting-started)<br />[react-getting-started](https://github.com/leancloud/react-getting-started) (WIP) |
 Node.js | >= 0.12 | NPM 或 Yarn | [Node.js 运行环境](/sdk/engine/runtime/nodejs/) | [node-js-getting-started](https://github.com/leancloud/node-js-getting-started/) (Express)<br />[koa-getting-started](https://github.com/leancloud/koa-getting-started/)
 Python | >= 2.7 | pip | [Python 运行环境](/sdk/engine/runtime/python/) | [python-getting-started](https://github.com/leancloud/python-getting-started) (Flask)<br />[django-getting-started](https://github.com/leancloud/django-getting-started)
 Java | 8, 11 - 15 | Maven | [Java 运行环境](/sdk/engine/runtime/java/) | [java-war-getting-started](https://github.com/leancloud/java-war-getting-started) (Servlet)<br />[spring-boot-getting-started](https://github.com/leancloud/spring-boot-getting-started)

@@ -1,7 +1,7 @@
 ---
 id: webapp
-title: 云引擎 Web 前端应用运行环境
-sidebar_label: Web 前端应用
+title: 云引擎 Web 前端运行环境
+sidebar_label: Web 前端
 ---
 
 import CloudTimezone from '../_partials/cloud-timezone.mdx';
@@ -11,6 +11,10 @@ import BuildingBuildLogs from '../_partials/building-build-logs.mdx';
 import NodejsSetupDependencies from '../_partials/nodejs-setup-dependencies.mdx';
 import CloudLoadBalancer from '../_partials/cloud-load-balancer.mdx';
 import CloudCustomDomain from '../_partials/cloud-custom-domain.mdx';
+
+:::info
+这篇文档是针对 Web 前端运行环境的深入介绍，如希望快速地开始使用云引擎，请查看 [云引擎开发指南 § 快速开始](/sdk/engine/cloud-engine#快速开始)。
+:::
 
 云引擎支持通过两种方式部署 Web 前端项目：
 

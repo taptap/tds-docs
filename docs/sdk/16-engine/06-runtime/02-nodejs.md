@@ -6,18 +6,23 @@ sidebar_label: Node.js
 
 import CloudEnvironments from '../_partials/cloud-environments.mdx';
 import CloudTimezone from '../_partials/cloud-timezone.mdx';
+import CloudLogs from '../_partials/cloud-logs.mdx';
+import CloudInternetAddress from '../_partials/cloud-internet-address.mdx';
 import CloudLoadBalancer from '../_partials/cloud-load-balancer.mdx';
+import CloudFilesystem from '../_partials/cloud-filesystem.mdx';
 import BuildingScripts from '../_partials/building-scripts.mdx';
 import BuildingBuildLogs from '../_partials/building-build-logs.mdx';
 import NodejsSetupRuntime from '../_partials/nodejs-setup-runtime.mdx';
 import NodejsSetupDependencies from '../_partials/nodejs-setup-dependencies.mdx';
 import CloudCustomDomain from '../_partials/cloud-custom-domain.mdx';
+import CloudHealthCheck from '../_partials/cloud-health-check.mdx';
+import BuildingSystemDependencies from '../_partials/building-system-dependencies.mdx';
 
 :::info
 这篇文档是针对 Node.js 运行环境的深入介绍，如希望快速地开始使用云引擎，请查看 [云引擎开发指南 § 快速开始](/sdk/engine/cloud-engine#快速开始)。
 :::
 
-所有 Node.js 项目都必须在根目录包含一个 [package.json](https://docs.npmjs.com/cli/v7/configuring-npm/package-json) 才会被云引擎识别为 Node.js 项目，云引擎也会从中读取项目对于环境的需求：
+所有 Node.js 项目都必须在根目录包含一个 [package.json](https://docs.npmjs.com/cli/v7/configuring-npm/package-json) 才会被云引擎正确识别，云引擎也会从中读取项目对于环境的需求：
 
 ```json title='package.json'
 {
@@ -75,44 +80,11 @@ import CloudCustomDomain from '../_partials/cloud-custom-domain.mdx';
 
 ### 系统级依赖
 
-在云引擎的线上环境中，你可以通过 `leanengine.yaml` 文件的 `systemDependencies` 部分来自定义系统级依赖：
-
-```yaml title='leanengine.yaml'
-systemDependencies:
-  - imagemagick
-```
-
-目前支持的选项包括：
-
-- `ffmpeg` 一个音视频处理工具库。
-- `imagemagick` 一个图片处理工具库。
-- `fonts-wqy` 文泉驿点阵宋体、文泉驿微米黑，通常和 `phantomjs` 或 `chrome-headless` 配合来显示中文。
-- `fonts-noto` 思源黑体（体积较大）。
-- `phantomjs` 一个无 UI 的 WebKit 浏览器（该项目已停止维护）。
-- `chrome-headless` 一个无 UI 的 Chrome 浏览器（体积很大，会显著增加部署耗时，运行时也会消耗大量 CPU 和内存；如果使用 `puppeter` 的话，需要给 `puppeteer.launch` 传递这些参数：`{executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox', '--disable-setuid-sandbox']}`；暂不支持 Java）。
-- `node-canvas` 安装 `node-canvas` 所需要的系统级依赖（你仍需要安装 `node-canvas`）。
-- `python-talib` 金融市场数据分析库。
-
-:::caution
-注意添加系统依赖将会显著增加部署耗时，因此请不要添加未用到的依赖。
-:::
+<BuildingSystemDependencies />
 
 ## 健康检查
 
-云引擎目前主要为 Web 应用优化，应用在启动后需要在环境变量 `LEANCLOUD_APP_PORT` 中指定的端口上提供 HTTP 服务，注意需要监听在 `0.0.0.0` 地址（所有接口）上，而不是一些框架默认的 `127.0.0.1`。
-
-在应用部署时，云引擎的管理程序会每隔一秒去检查应用是否启动成功，如果超过启动时间限制仍未启动成功，即认为启动失败，部署会中止。在之后的运行过程中，也会有定期的健康检查来确保应用正常运行，如果健康检查失败，云引擎管理程序会自动重启你的应用。
-
-健康检查会通过 HTTP 检查应用的首页（`/`），如果返回 HTTP 2xx 的响应，就视作成功。
-
-<details>
-<summary>点击展开健康检查与云引擎 SDK 的关联</summary>
-
-云引擎还会尝试检查由 SDK 处理的 `/__engine/1/ping`，如果 SDK 接入正确，便不再要求首页（`/`）返回 HTTP 2xx。
-
-如果 **开发者中心 » 你的游戏 » 游戏服务 » 云服务 » 云引擎 » 你的分组 » 设置 » 云函数模式** 设置为「开启」或 `leanengine.yaml` 中 `functionsMode` 设置为 `strict`，云引擎会检查 SDK 是否被正确地接入，否则会视作启动失败。
-
-</details>
+<CloudHealthCheck />
 
 ## 云引擎 SDK
 云引擎 SDK 提供了云函数和 Hook 等功能的支持，但并不是必须的。
@@ -226,9 +198,7 @@ app.use(AV.Cloud.CookieSession({ framework: 'koa', secret: 'my secret', maxAge: 
 ```
 
 :::danger
-
 使用 `CookieSession` 的同时需要添加 CSRF Token 来 [防御 CSRF 攻击](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html)。
-
 :::
 
 你需要传入一个 `secret` 用于签名 Cookie（必须提供），这个中间件会将 `AV.User` 的登录状态信息记录到 Cookie 中，用户下次访问时自动检查用户是否已经登录，如果已经登录，可以通过 `req.currentUser` 获取当前登录用户。
@@ -290,14 +260,7 @@ app.get('/logout', function (req, res) {
 
 ### 日志
 
-应用的日志可以直接输出到「标准输出」或者「标准错误」，这些信息会分别对应日志的 `info` 和 `error` 级别，比如下列代码会在 info 级别记录参数信息：
-
-```js
-console.log('hello');
-console.error('some error!');
-```
-
-日志单行最大 4096 个字符，多余部分会被丢弃；日志输出频率大于 600 行/分钟，多余的部分会被丢弃。
+<CloudLogs only='nodejs' />
 
 ### 时区
 
@@ -305,20 +268,11 @@ console.error('some error!');
 
 ### 文件系统
 
-你可以向 `/home/leanengine` 或 `/tmp` 目录写入临时文件，最多不能超过 1 GB。
-
-:::caution
-云引擎每次部署都会产生一个新的容器，即使不部署系统偶尔也会进行一些自动调度，这意味着你 **不能将本地文件系统当作持久的存储**，只能用作临时存储。
-:::
-
-如果你写入的文件体积较大，建议在使用后自动删除他们，否则如果占用磁盘空间超过 1 GB，继续写入文件可能会收到类似 `Disk quota exceeded` 的错误，这种情况下你可以重新部署一下，这样文件就会被清空了。
+<CloudFilesystem />
 
 ### 出入口 IP 地址
-如果开发者希望在第三方服务平台（如微信开放平台）上配置 IP 白名单而需要获取云引擎的入口或出口 IP 地址，请进入 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 云引擎 > 云引擎分组 > 设置 > 出入口 IP** 来自助查询。
 
-我们会尽可能减少出入口 IP 的变化频率，但 IP 突然变换的可能性仍然存在。因此在遇到与出入口 IP 相关的问题，我们建议先进入控制台来核实一下 IP 列表是否有变化。
-
-如需保持入口 IP 不变，建议为云引擎绑定独立 IP。
+<CloudInternetAddress />
 
 ## 疑难问题
 ### 排查云引擎 Node.js 内存使用过高（内存泄漏）
@@ -374,3 +328,30 @@ console.error('some error!');
 - [Node.JS Profile 4.1 Profile 实践](https://xenojoshua.com/2018/02/node-profile-practice/)
 - [手把手测试你的 JS 代码性能](https://cnodejs.org/topic/58b562f97872ea0864fee1a7)
 - [Speed Up JavaScript Execution](https://developers.google.com/web/tools/chrome-devtools/rendering-tools/js-execution)
+
+### `node --max-http-header-size` 无效？
+
+云引擎负载均衡限制 HTTP Header 大小为 8 KB（和[Node.js 的默认值][cli_max_http_header_size_size]保持一致）。
+因此无法通过 `--max-http-header-size` 指定大于 8 KB 的值。
+
+[cli_max_http_header_size_size]: https://nodejs.org/api/cli.html#cli_max_http_header_size_size
+
+### Node.js 项目的 `devDependencies` 没有安装？
+
+云引擎会在部署时用 `npm ci` 为你安装项目依赖，包括 `devDependencies`。
+不过，如果项目的 Node.js 版本小于 10，则会使用 `npm install --production` 安装依赖，相应地，`devDependencies` 中列出的依赖**不会**安装。
+如需安装 `devDependencies`，请在项目的 `leanengine.yaml` 中指定 `installDevDependencies: true`。
+
+### `npm ERR! peer dep missing` 错误怎么办？
+
+部署时出现类似错误：
+
+```
+npm ERR! peer dep missing: graphql@^0.10.0 || ^0.11.0, required by express-graphql@0.6.11
+```
+
+说明有一部分 peer dependency 没有安装成功，因为 Node.js 版本小于 10 时，线上只会安装 dependencies 部分的依赖，所以请确保 dependencies 部分依赖所需要的所有依赖也都列在了 dependencies 部分（而不是 devDependencies）。
+
+你可以在本地删除 node_modules，然后用 `npm install --production` 重新安装依赖来重现这个问题。
+
+或者，你也可以考虑将项目升级到 Node.js 10 以上的版本。

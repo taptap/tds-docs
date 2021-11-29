@@ -553,26 +553,6 @@ LeanClient::useProduction(false); // stage
 
 ## Node.js
 
-### Node.js 项目的 `devDependencies` 没有安装？
-
-云引擎会在部署时用 `npm ci` 为你安装项目依赖，包括 `devDependencies`。
-不过，如果项目的 Node.js 版本小于 10，则会使用 `npm install --production` 安装依赖，相应地，`devDependencies` 中列出的依赖**不会**安装。
-如需安装 `devDependencies`，请在项目的 `leanengine.yaml` 中指定 `installDevDependencies: true`。
-
-### `npm ERR! peer dep missing` 错误怎么办？
-
-部署时出现类似错误：
-
-```
-npm ERR! peer dep missing: graphql@^0.10.0 || ^0.11.0, required by express-graphql@0.6.11
-```
-
-说明有一部分 peer dependency 没有安装成功，因为 Node.js 版本小于 10 时，线上只会安装 dependencies 部分的依赖，所以请确保 dependencies 部分依赖所需要的所有依赖也都列在了 dependencies 部分（而不是 devDependencies）。
-
-你可以在本地删除 node_modules，然后用 `npm install --production` 重新安装依赖来重现这个问题。
-
-或者，你也可以考虑将项目升级到 Node.js 10 以上的版本。
-
 ### Node.js 项目如何打印 SDK 发出的网络请求？
 
 你可以通过设置一个 `DEBUG=leancloud:request` 的环境变量来打印由 SDK 发出的网络请求。在本地调试时你可以通过这样的命令启动程序：
@@ -683,8 +663,6 @@ AV.Push.send({
 });
 ```
 
-### 如何在云引擎中使用 Node.js SDK 提供的 CookieSession 中间件？
-
 
 ### 跨域 POST 请求未携带 Cookie 怎么办？
 
@@ -733,12 +711,6 @@ Python SDK 也存在类似的问题，只会返回 Pointer 元信息，因此也
 这个问题将在 Node SDK 的下一个大版本（4.0）中修复。
 目前绕过这一个问题的方法是将返回结果放在对象（`{}`）中返回。
 
-### `node --max-http-header-size` 无效？
-
-云引擎负载均衡限制 HTTP Header 大小为 8 KB（和[Node.js 的默认值][cli_max_http_header_size_size]保持一致）。
-因此无法通过 `--max-http-header-size` 指定大于 8 KB 的值。
-
-[cli_max_http_header_size_size]: https://nodejs.org/api/cli.html#cli_max_http_header_size_size
 
 ### 如何使用云引擎批量更新数据？
 
@@ -757,70 +729,6 @@ app.use(timeout('15s'));
 
 ## Python
 
-### 云引擎支持哪些 Python 版本？
-
-目前仅支持 CPython 版本，暂时不支持 PyPy、Jython、IronPython 等其他 Python 实现。
-另外建议尽量使用 3.6 或以上版本的 Python 进行开发，如果仍然在使用 Python 2 ，请使用 Python 2.7 进行开发。
-
-### 自行接入 Python WSGI 框架时如何使用云服务的数据存储功能？
-
-模板项目已经集成了 Python SDK，并且包含 SDK 初始化的逻辑。
-
-如果项目自行接入 Web 框架，那么需要将 `leancloud` 添加到 `requirements.txt` 中，部署到线上即可自动安装此依赖。在本地运行和调试项目的时候，可以在项目目录下使用如下命令进行依赖安装：
-
-```sh
-pip install -r requirements.txt
-```
-
-同时也需要自行初始化 SDK。
-因为 `wsgi.py` 是项目最先被执行的文件，推荐在此文件进行 Python SDK 的初始化工作：
-
-```python
-import os
-import leancloud
-
-APP_ID = os.environ['LEANCLOUD_APP_ID']
-APP_KEY = os.environ['LEANCLOUD_APP_KEY']
-MASTER_KEY = os.environ['LEANCLOUD_APP_MASTER_KEY']
-
-leancloud.init(APP_ID, app_key=APP_KEY, master_key=MASTER_KEY)
-
-leancloud.use_master_key(True)
-```
-
-注意我们在云引擎中开启了 masterKey 权限，这将会跳过 ACL 和其他权限限制。
-
-### PyPI 上有 `leancloud-sdk` 和 `leancloud` 两个包，该用哪一个？
-
-请使用 `leancloud`。
-
-`leancloud-sdk` 是旧版的 Python SDK，已经不再维护。
-
-不同版本的差别详见 Python SDK 的[更新日志](https://github.com/leancloud/python-sdk/blob/master/changelog)。
-
-### 如何在云引擎使用 Python SDK 提供的 WSGI 中间件管理 Cookies？
-
-Python SDK 提供了一个 `leancloud.engine.CookieSessionMiddleware` 的 WSGI 中间件，使用 Cookie 来维护用户（`leancloud.User`）的登录状态。要使用这个中间件，可以在 `wsgi.py` 中将：
-
-```python
-application = engine
-```
-
-替换为：
-
-```python
-application = leancloud.engine.CookieSessionMiddleware(engine, secret=YOUR_APP_SECRET)
-```
-
-你需要传入一个 `secret` 的参数用于签名 Cookie（必须提供），这个中间件会将 `AV.User` 的登录状态信息记录到 Cookie 中，用户下次访问时自动检查用户是否已经登录，如果已经登录，可以通过 `leancloud.User.get_current()` 获取当前登录用户。
-
-`leancloud.engine.CookieSessionMiddleware` 初始化时支持的非必须选项包括：
-
-- **name**：在 cookie 中保存的 session token 的 key 的名称，默认为 `leancloud:session`。
-- **excluded_paths**：指定哪些 URL path 不处理 session token，比如在处理静态文件的 URL path 上不进行处理，防止无谓的性能浪费。接受参数类型 `list`。
-- **fetch_user**：处理请求时是否要从存储服务获取用户数据，如果为 `False` 的话，`leancloud.User.get_current()` 获取到的用户数据上除了 `session_token` 之外没有任何其他数据，需要自己调用 `fetch()` 来获取。为 `True` 的话，会自动在用户对象上调用 `fetch()`，这样将会产生一次数据存储的 API 调用。默认为 `False`。
-- **expires**：设置 cookie 的失效日期（参考 [Werkzeug Document](http://werkzeug.pocoo.org/docs/0.12/http/#werkzeug.http.dump_cookie)）。
-- **max_age**：设置 cookie 在多少秒后失效（参考 [Werkzeug Document](http://werkzeug.pocoo.org/docs/0.12/http/#werkzeug.http.dump_cookie)）。
 
 ### 在云引擎 Python 环境下如何本地调用云函数？
 
@@ -1164,52 +1072,6 @@ LCEngine.Initialize(services);
 如有代码复用需求，建议将公共逻辑提取成普通函数，在多个云函数中调用。
 
 ## Go
-
-### 如何接入 Go 框架？
-
-细心的开发者已经发现示例项目是一个基于 [echo](https://github.com/labstack/echo) 的 Web 应用。
-
-Go SDK 以标准库 HTTP 方法的形式提供了可供任意框架接入的接口，以 **echo** 为示例：
-
-```go
-// ./adapters/echo.go
-//...
-func Echo(e *echo.Echo) {
-	e.Any("/1/*", echo.WrapHandler(leancloud.Engine.Handler()), setResponseContentType)
-	e.Any("/1.1/*", echo.WrapHandler(leancloud.Engine.Handler()), setResponseContentType)
-	e.Any("/__engine/*", echo.WrapHandler(leancloud.Engine.Handler()), setResponseContentType)
-}
-
-func setResponseContentType(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		c.Response().Header().Set("Content-Type", "application/json; charset=UTF-8")
-		return next(c)
-	}
-}
-```
-
-函数 **Echo** 接收 echo 实例对象，将 Go SDK 中提供 LeanEngine 相关功能的接口绑定到 `/1/` `/1.1/` 和 `/__engine/` 开头的路由前缀上，保证 LeanEngine 相关的底层功能正常。
-
-函数 `setResponseContentType` 设置所有和 LeanEngine 相关的请求的 `Content-Type` 为 `application/json`，并且编码为 `UTF-8`。
-
-大多数 Go Web 框架均提供将标准库 HTTP Handler 转换为特有 Handler 的方法，只要保证能够在其他框架中接入以上两个部件，即可将 LeanEngine 集成入你喜爱的 Go Web 框架中。
-
-### 自行接入 Go 框架时如何使用云服务的
-
-模板项目已经集成了 Go SDK，并且包含 SDK 初始化的逻辑。
-
-如果自行接入其他框架，则需要自己添加依赖：
-
-```go
-import "github.com/leancloud/go-sdk/leancloud"
-```
-
-同时也需要自行初始化 SDK：
-
-```go
-client := leancloud.NewEnvClient()
-leancloud.Engine.Init(client)
-```
 
 ### 在云引擎 Go 环境下如何本地调用云函数？
 
