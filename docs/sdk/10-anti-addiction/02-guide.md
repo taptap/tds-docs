@@ -177,7 +177,7 @@ AntiAddictionUIKit.init(activity, gameIdentifier, config,
 
 ```objc
 NSString *gameIdentifier = @"游戏的 Client ID";
-AntiAddictionConfiguration *config = [[AntiAddictionConfiguration alloc] init];
+AntiAddictionConfiguration *config = AntiAddictionService.configuration;
 // 是否启用消费限制功能
 BOOL config.useSdkPaymentLimit = YES;
 // 是否启用时长限制功能
