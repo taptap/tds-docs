@@ -57,12 +57,15 @@ iOS 平台配置：
 在游戏目录下 `build.gradle` 文件中添加代码
 
 <CodeBlock className="groovy">
-{`repositories{flatDir{dirs 'src/main/libs'}}
+{`repositories{
+    flatDir{   
+        dirs 'src/main/libs'
+    }
+}
 dependencies {
     // ...
     implementation(name: "AntiAddiction_${sdkVersions.taptap.anti_addiction}", ext: "aar")
     implementation(name: "AntiAddictionUI_${sdkVersions.taptap.anti_addiction}", ext: "aar")
-    implementation(name: "gson-2.8.6", ext: "jar")
     // ...
 }`}
 </CodeBlock>
@@ -130,6 +133,13 @@ AntiAddictionUIKit.Init(gameIdentifier, useTimeLimit, usePaymentLimit,
         int code = antiAddictionCallbackData.code;
         MsgExtraParams extras = antiAddictionCallbackData.extras;
         // 根据 code 不同提示玩家不同信息，详见下面的说明
+        if (code == 500)
+        {
+            // 开始计时
+            AntiAddictionUIKit.EnterGame();
+            Debug.Log("玩家登陆后判断当前玩家可以进行游戏");
+        }
+
     },
     (exception) => {
         // 处理异常
@@ -152,6 +162,11 @@ AntiAddictionUIKit.init(activity, gameIdentifier, config,
         @Override
         public void onCallback(int code, Map<String, Object> extras) {
             // 根据 code 不同提示玩家不同信息，详见下面的说明
+            if (code == Constants.ANTI_ADDICTION_CALLBACK_CODE.LOGIN_SUCCESS){
+                // 开始计时
+                AntiAddictionUIKit.enterGame();
+                Log.d("LeeJiEun", "玩家登陆后判断当前玩家可以进行游戏");
+            }
         }       
     }
 );
@@ -162,7 +177,7 @@ AntiAddictionUIKit.init(activity, gameIdentifier, config,
 
 ```objc
 NSString *gameIdentifier = @"游戏的 Client ID";
-AntiAddictionConfiguration *config = [[AntiAddictionConfiguration alloc] init];
+AntiAddictionConfiguration *config = AntiAddictionService.configuration;
 // 是否启用消费限制功能
 BOOL config.useSdkPaymentLimit = YES;
 // 是否启用时长限制功能
@@ -174,6 +189,7 @@ completionHandler:^(BOOL success) {
         // 初始化成功
     }
 }];
+```
 
 `antiAddictionCallbackDelegate` 参数中传入接受回调的对象，其中需实现如下回调：
 

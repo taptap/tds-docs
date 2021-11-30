@@ -282,7 +282,7 @@ func createTodo(req *leancloud.FunctionRequest) (interface{}, error) {
   todo := &Todo{
     Content: req.Params["content"].(string),
   }
-  if err := client.Class("Todo").Create(todo); err != nil {
+  if _, err := client.Class("Todo").Create(todo); err != nil {
     return nil, err
   }
   return nil, nil

@@ -1,6 +1,6 @@
 ---
 id: features
-title: 功能介绍
+title: 文本检测功能介绍
 sidebar_label: 功能介绍
 ---
 

@@ -1,6 +1,6 @@
 ---
 id: guide
-title: 开发指南
+title: 成就系统开发指南
 sidebar_label: 开发指南
 ---
 

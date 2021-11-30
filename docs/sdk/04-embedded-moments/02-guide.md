@@ -1,6 +1,6 @@
 ---
 id: guide
-title: 开发指南
+title: 内嵌动态开发指南
 sidebar_label: 开发指南
 ---
 

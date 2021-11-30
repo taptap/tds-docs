@@ -1,6 +1,6 @@
 ---
 id: best-practice
-title: 最佳实践
+title: TapTap 登录最佳实践
 sidebar_label: 最佳实践
 ---
 

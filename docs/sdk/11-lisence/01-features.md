@@ -1,6 +1,6 @@
 ---
 id: features
-title: 功能介绍
+title: 正版验证功能介绍
 sidebar_label: 功能介绍
 ---
 
