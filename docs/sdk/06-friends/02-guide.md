@@ -1435,12 +1435,13 @@ option.cachePolicy = TDSThirdPartyFriendCachePolicyOnlyNetwork;
 
 </MultiLang>
 
-目前第三方平台仅支持 TapTap.
+**目前第三方平台仅支持 TapTap，且该功能需要提交工单联系我们开通。**
 
 
 ## 在 TapTap 上关注好友
 
 调用以下接口可以在 TapTap 上关注游戏中的好友。
+**注意，该功能需要提交工单联系我们开通。**
 
 <MultiLang>
 

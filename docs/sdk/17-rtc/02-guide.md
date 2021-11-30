@@ -16,13 +16,21 @@ import Mermaid from '/src/docComponents/Mermaid';
 
 <MultiLang>
 
+<>
+
+请先确保系统已安装 [git-lfs]，然后通过 UPM 方式添加依赖：
+
+[git-lfs]: https://git-lfs.github.com
+
 <CodeBlock className="json">
 {`"dependencies":{
   ...
   "com.taptap.tds.rtc":"https://github.com/TapTap/TapRTC-Unity.git#${sdkVersions.taptap.unity}",
 }`}
 </CodeBlock>
+</>
 
+<>
 <CodeBlock className="groovy">
 {`repositories{  
     flatDir {  
@@ -34,10 +42,21 @@ dependencies {
     implementation (name:'TapRTC_${sdkVersions.taptap.android}', ext:'aar')
 }`}
 </CodeBlock>
+</>
+
+<>
+
+1. 在 Xcode 选择工程，到 Build Setting > Other Linker Flags 添加 `-ObjC`。
+2. 拖拽 `TapRTC_SDK` 目录到项目目录。
+3. `TapRTC.framework` 和 `GMESDK.framework` 文件拖进项目，选择 `Do Not Embed`。
+4. 将资源文件 TapRTC.bundle 拖进项目。
+5. 添加 SDK 依赖的系统库：libz、libresolv、libiconv、libc++、CoreMedia.framework、CoreAudio.framework、AVFoundation.framework、SystemConfiguration.framework、UIKit.framework、AudioToolbox.framework、OpenAL.framework、Security.framework
 
 <CodeBlock className="objectivec">
 TapRTC.framework
 </CodeBlock>
+
+</>
 
 </MultiLang>
 
@@ -46,6 +65,20 @@ TapRTC.framework
 * RTC 使用前需要在开发者中心进行相关配置。
 * 开发者需要在自己的服务器上实现[相应的签名鉴权服务](#服务端鉴权)。
 * C# SDK 需要周期性的调用 `TapRTC.Poll` 接口，才能触发相关的事件回调。
+
+Android 平台需要申请网络、音频相关权限：
+
+```xml
+<uses-permission android:name="android.permission.RECORD_AUDIO" />
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+<uses-permission android:name="android.permission.BLUETOOTH"/>
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+```
+
+iOS 平台需要申请麦克风权限（`Privacy - Microphone Usage Description`）。
 
 ## 核心接口
 
