@@ -168,14 +168,14 @@ mConfig.orientation = TapMomentOrientationDefault;
 
 ## 场景化入口
 
-打开动态页面跳转到指定的页面
+开发者可以[结合游戏场景绘制入口](/sdk/embedded-moments/features/#场景化入口)，玩家打开入口跳转到指定的页面。使用前需要在开发者中心后台完成[场景化入口配置](/sdk/embedded-moments/features/#场景化入口配置)。
 
 <MultiLang>
 <>
 
 ```cs
 var sceneDic = new Dictionary<string, object>() { { TapMomentConstants.TapMomentPageShortCutKey, sceneId } };
-// sceneId 当在 TapDC 后台创建场景化入口时会自动生成 sceneId
+// sceneId 为开发者中心后台创建场景化入口后生成的「入口 ID」
 TapMoment.DirectlyOpen(Orientation.ORIENTATION_DEFAULT, TapMomentConstants.TapMomentPageShortCut, sceneDic);
 ```
 
@@ -191,7 +191,7 @@ Dictionary     | 其中 TapMomentConstants.TapMomentPageShortCutKey 固定，第
 
 ```java
 Map<String, String> extras = new HashMap<>();
-// 注意：这里的 key 是固定的，"scene_id"； 第二个参数：开发者后台开启场景化入口并配置相关项后可以得到
+// 注意：这里的 key 是固定的，"scene_id"；第二个参数是开发者中心后台创建场景化入口后生成的「入口 ID」
 extras.put("scene_id", "xxxx");
 // 注意：第二个参数固定为 "tap://moment/scene/" 
 TapMoment.directlyOpen(TapMoment.ORIENTATION_DEFAULT,"tap://moment/scene/", extras);
