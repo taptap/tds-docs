@@ -5,6 +5,7 @@ sidebar_label: Python
 ---
 
 import BuildingScripts from '../_partials/building-scripts.mdx';
+import LeanstorageUsages from '../_partials/leanstorage-usages.mdx';
 import CloudLogs from '../_partials/cloud-logs.mdx';
 import CloudFilesystem from '../_partials/cloud-filesystem.mdx';
 import BuildingSystemDependencies from '../_partials/building-system-dependencies.mdx';
@@ -125,6 +126,8 @@ leancloud.use_master_key(True)
 注意我们在云引擎中开启了 masterKey 权限，这将会跳过 ACL 和其他权限限制。
 
 ### 使用数据存储服务
+
+<LeanstorageUsages />
 
 ### CookieSessionMiddleware
 

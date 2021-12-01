@@ -612,6 +612,113 @@ RPC 会处理以下形式的请求和响应：
 
 其他形式的数据 SDK 会保持原样，不进行处理。
 
+### 云函数内部调用云函数
+
+<EngineRuntimes>
+<TabItem value='nodejs'>
+
+云引擎 Node.js 环境下，默认会直接进行一次本地的函数调用，而不会像客户端一样发起一个 HTTP 请求。
+
+```js
+AV.Cloud.run('averageStars', {
+  movie: '夏洛特烦恼'
+}).then(function (data) {
+  // 调用成功，得到成功的应答 data
+}, function (error) {
+  // 处理调用失败
+});
+```
+
+如果你希望发起 HTTP 请求来调用云函数，可以传入一个 `remote: true` 的选项。当你在云引擎之外运行 Node.js SDK（包括调用位于其他分组上的云函数）时这个选项非常有用：
+
+```js
+AV.Cloud.run('averageStars', { movie: '夏洛特烦恼' }, { remote: true }).then(function (data) {
+  // 成功
+}, function (error) {
+  // 处理调用失败
+});
+```
+
+上面的 `remote` 选项实际上是作为 `AV.Cloud.run` 的可选参数 options 对象的属性传入的。这个 `options` 对象包括以下参数：
+
+- `remote?: boolean`：上面的例子用到的 `remote` 选项，默认为假。
+- `user?: AV.User`：以特定的用户运行云函数（建议在 `remote` 为假时使用）。
+- `sessionToken?: string`：以特定的 `sessionToken` 调用云函数（建议在 `remote` 为真时使用）。
+- `req?: http.ClientRequest | express.Request`：为被调用的云函数提供 `remoteAddress` 等属性。
+
+
+</TabItem>
+<TabItem value='python'>
+
+云引擎 Python 环境下，默认会进行远程调用。
+例如，以下代码会发起一次 HTTP 请求，去请求部署在云引擎上的云函数。
+
+```python
+from leancloud import cloud
+
+cloud.run('averageStars', movie='夏洛特烦恼')
+```
+
+如果想要直接调用本地（当前进程）中的云函数，或者发起调用就是在云引擎中，想要省去一次 HTTP 调用的开销，可以使用 `leancloud.cloud.run.local` 来取代 `leanengine.cloud.run`，这样会直接在当前进程中执行一个函数调用，而不会发起 HTTP 请求来调用此云函数。
+
+</TabItem>
+<TabItem value='java'>
+
+Java SDK 不支持本地调用云函数。
+如有代码复用需求，建议将公共逻辑提取成普通函数（Java 方法），在多个云函数中调用。
+
+</TabItem>
+<TabItem value='php'>
+
+云引擎中默认会直接进行一次本地的函数调用，而不是像客户端一样发起一个 HTTP 请求。
+
+```php
+try {
+    $result = Cloud::run("averageStars", array("movie" => "夏洛特烦恼"));
+} catch (\Exception $ex) {
+    // 云函数错误
+}
+```
+
+如果想要通过 HTTP 调用，可以使用 `runRemote` 方法：
+
+```php
+try {
+    $token = User::getCurrentSessionToken(); // 以特定的 `sessionToken` 调用云函数，可选
+    $result = Cloud::runRemote("averageStars", array("movie" => "夏洛特烦恼"), $token);
+} catch (\Exception $ex) {
+    // 云函数错误
+}
+```
+
+</TabItem>
+<TabItem value='dotnet'>
+
+.NET SDK 不支持本地调用云函数。
+如有代码复用需求，建议将公共逻辑提取成普通函数，在多个云函数中调用。
+
+</TabItem>
+<TabItem value='go'>
+
+使用 `Engine.Run` 即是本地调用：
+
+```go
+averageStars, err := leancloud.Engine.Run("averageStars", Review{Movie: "夏洛特烦恼"})
+if err != nil {
+  panic(err)
+}
+```
+
+如果希望发起 HTTP 请求来调用云函数，请使用 `Client.Run`。
+
+`Run` 的可选参数如下：
+
+- `WithSessionToken(token)` 为当前的调用请求传入 `sessionToken`
+- `WithUser(user)` 为当前的调用请求传入对应的用户对象
+
+</TabItem>
+</EngineRuntimes>
+
 ### 云函数错误响应码
 
 可以根据 [HTTP status codes](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes) 自定义错误响应码。

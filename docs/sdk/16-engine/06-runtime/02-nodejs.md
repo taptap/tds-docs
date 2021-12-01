@@ -5,6 +5,7 @@ sidebar_label: Node.js
 ---
 
 import CloudEnvironments from '../_partials/cloud-environments.mdx';
+import LeanstorageUsages from '../_partials/leanstorage-usages.mdx';
 import CloudTimezone from '../_partials/cloud-timezone.mdx';
 import CloudLogs from '../_partials/cloud-logs.mdx';
 import CloudInternetAddress from '../_partials/cloud-internet-address.mdx';
@@ -172,16 +173,7 @@ Node SDK 的历史版本：
 
 ### 使用数据存储服务
 
-在云引擎中你可以使用云服务提供的数据存储作为应用的后端数据库，以及使用其他云服务提供的功能。
-SDK 可以让你更加方便地使用这些功能。
-
-建议使用云引擎模板项目。
-模板项目已经集成了 SDK，也包含了初始化 SDK 的逻辑，可以直接使用。
-
-建议在客户端（浏览器端、移动端）登录用户，调用 SDK 的接口获取 session token。
-对于需要后端以当前用户的身份完成的操作，客户端通过 HTTP Header 等方式将 session token 发送给后端。
-
-参见[数据存储指南](/sdk/storage/guide/dotnet/)。
+<LeanstorageUsages />
 
 ### CookieSession
 

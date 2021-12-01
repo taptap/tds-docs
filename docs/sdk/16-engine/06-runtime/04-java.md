@@ -4,48 +4,264 @@ title: 云引擎 Java 运行环境
 sidebar_label: Java
 ---
 
-云引擎目前支持 Java 8、11、12、13、14 运行环境和 war 包运行，你的项目需要遵循一定格式才会被云引擎识别并运行。
+import {CLI_BINARY} from '/src/constants/env.ts';
+import CloudEnvironments from '../_partials/cloud-environments.mdx';
+import LeanstorageUsages from '../_partials/leanstorage-usages.mdx';
+import CloudTimezone from '../_partials/cloud-timezone.mdx';
+import CloudLogs from '../_partials/cloud-logs.mdx';
+import CloudInternetAddress from '../_partials/cloud-internet-address.mdx';
+import CloudLoadBalancer from '../_partials/cloud-load-balancer.mdx';
+import CloudFilesystem from '../_partials/cloud-filesystem.mdx';
+import BuildingScripts from '../_partials/building-scripts.mdx';
+import BuildingBuildLogs from '../_partials/building-build-logs.mdx';
+import CloudCustomDomain from '../_partials/cloud-custom-domain.mdx';
+import CloudHealthCheck from '../_partials/cloud-health-check.mdx';
+import BuildingSystemDependencies from '../_partials/building-system-dependencies.mdx';
 
-云引擎 Java 运行环境使用 Maven 进行构建，所以 LeanEngine Java 项目必须有 `$PROJECT_DIR/pom.xml` 文件，该文件为整个项目的配置文件。构建完成后云引擎会尝试到 `$PROJECT_DIR/target` 目录下寻找可以使用的包：
+:::info
+这篇文档是针对 Java 运行环境的深入介绍，如希望快速地开始使用云引擎，请查看 [云引擎开发指南 § 快速开始](/sdk/engine/cloud-engine#快速开始)。
+:::
 
-- WAR：如果项目打包成 WAR 文件，则云引擎会将其放入 Servlet 容器（当前是 Jetty 9.x）来运行。
-- JAR：如果项目打包成 JAR 文件，则云引擎会通过 `java -jar <packageName>.jar` 来运行。
+云引擎目前支持使用 Maven 构建出的 WAR 或 JAR 项目。也支持直接上传 WAR 包。
 
-我们建议使用示例项目做为起步，因为一些细节的开发环境的配置会让开发调试方便很多：
+如果要开始一个新的项目，建议从我们的示例项目开始：
 
-- [`java-war-getting-started`](https://github.com/leancloud/java-war-getting-started)：使用 Servlet，集成 LeanEngine Java SDK 的一个简单项目，打包成 WAR 文件。
-- [`spring-boot-getting-started`](https://github.com/leancloud/spring-boot-getting-started)：使用 [Spring Boot](https://projects.spring.io/spring-boot/) 作为项目框架，集成 LeanEngine Java SDK 的一个简单的项目，打包成 JAR 文件。
+- [Servlet 示例项目](https://github.com/leancloud/java-war-getting-started)
+- [Spring Boot 示例项目](https://github.com/leancloud/spring-boot-getting-started)
 
-Java 运行环境对内存的使用较多，所以建议：
+:::caution
+Java 对内存的需求较高，体验版实例的 256M 内存可能会导致 Java 进程启动时内存不足而崩溃（OOM）导致部署失败，或运行时内存不足而频繁重启。
 
-- 以 [示例项目](https://github.com/leancloud/java-war-getting-started) 起步的应用，建议使用 512 MB 或以上规格的实例。
-- 使用 [Spring Boot](https://projects.spring.io/spring-boot/) 的应用，建议使用 1 GB 或以上规格的实例。
-- 本地启动并模拟完成主要业务流程操作，待应用充分初始化后，根据 Java 进程内存占用量选择相应的实例规格，需要注意保留一定的余量用以应对请求高峰。
+我们建议 Java 项目至少选用 512 MB 以上的内存，Spring Boot 项目至少选用 1024 MB 以上的内存，并在之后的运行过程中根据内存用量统计随时调整。调整内存规格的方法详见 [云引擎开发指南 § 调整实例规格和数量](/sdk/engine/cloud-engine#调整实例规格和数量)。
+:::
 
-如果云引擎实例规格**选择不当**，可能造成应用启动时因为内存溢出（OOM）导致部署失败，或运行期内存溢出导致应用频繁重启。
+## 启动命令
 
-Java 云引擎默认使用 Java 11 运行环境，如果希望使用其他版本的 Java，可以在项目根目录创建一个名为 `system.properties` 的文件，指定 `java.runtime.version`：
+在完成构建后，云引擎会在 `target` 目录下查找 `.war` 或者 `.jar` 文件：
+
+- 如果找到 `.war` 会将其放入 Servlet 容器（Jetty 9.x）来运行
+- 如果找到 `.jar` 会通过 `java -jar` 来运行
+
+### 配置 JVM 参数
+
+云引擎运行 Java 应用时，会自动将 `-Xmx` 参数设置为实例规格的 70%，剩下的 30% 留给堆外内存和其他开销。如果你的应用比较特殊（比如大量使用堆外内存）可以自己定制 `-Xmx` 参数。假设使用 2 GB 内存规格的实例运行，则可以在云引擎的设置页面增加「自定义环境变量」，名称为 `JAVA_OPTS`，值为 `-Xmx1500m`，这样会限制 JVM 堆最大为 1.5 GB，剩下 500 MB 留给持久代、堆外内存或者其他一些杂项使用。**注意：`-Xmx` 参数如果设置得过小可能会导致大量 CPU 消耗在反复的的 GC 任务上**。
+
+## 配置 Java 版本
+
+在项目根目录创建一个 `system.properties` 即可配置 Java 的版本：
+
+```plain title='system.properties'
+java.runtime.version=11
+```
+
+目前云引擎支持的版本有 AdoptOpenJDK `8`、`11`、`12`、`13`、`14`。
+
+:::note
+对于新创建的应用，如未设置 Java 版本，云引擎会默认使用支持的版本中最新的稳定版本（LTS）。在 2021-09-02 之前创建的分组因兼容考虑会默认使用 Java `8`。
+:::
+
+## 直接上传 WAR 包
+
+在本地构建（如使用 `mvn package`）出 WAR 包后，可以在使用命令行工具部署时添加 `--war` 选项表示上传 WAR 包而不是源代码：
+
+<pre>
+<CodeBlock className='sh'>
+{`${CLI_BINARY} deploy --war`}
+</CodeBlock>
+</pre>
+
+这种情况下在云端不会有安装依赖和构建的过程，WAR 包会被直接放入 Servlet 容器运行。
+
+## 安装依赖和构建
+
+如果上传了源代码，云引擎会使用 Maven 来安装 `pom.xml` 中列出的依赖，然后使用 `mvn package` 来进行构建。
+
+## 自定义构建过程
+
+<BuildingScripts />
+
+### 构建日志
+
+<BuildingBuildLogs />
+
+### 系统级依赖
+
+<BuildingSystemDependencies />
+
+## 健康检查
+
+<CloudHealthCheck />
+
+## 云引擎 SDK
+云引擎 SDK 提供了云函数和 Hook 等功能的支持，但并不是必须的。
+
+### 接入云引擎 SDK
+模板项目已经集成了 [Java Unified SDK](https://github.com/leancloud/java-unified-sdk) 的 [engine-core](https://github.com/leancloud/java-unified-sdk/tree/master/leanengine) 模块，engine-core 又依赖于存储核心模块 storage-core，因此开发者可以直接使用云服务的数据存储功能。
+模板项目也包含了 SDK 初始化的逻辑。
+
+如果自行接入其他框架，则需要在 `pom.xml` 中增加依赖配置来增加 LeanEngine Java SDK 的依赖：
+
+```xml
+<dependencies>
+  <dependency>
+    <groupId>cn.leancloud</groupId>
+    <artifactId>engine-core</artifactId>
+    <version>7.2.6</version>
+  </dependency>
+</dependencies>
+```
+
+同时也需要自行初始化 SDK（注意我们在云引擎中开启了 masterKey 权限，这将会跳过 ACL 和其他权限限制）。
+
+```java
+import cn.leancloud.LCCloud;
+import cn.leancloud.LCObject;
+import cn.leancloud.core.GeneralRequestSignature;
+import cn.leancloud.LeanEngine;
+
+
+String appId = System.getenv("LEANCLOUD_APP_ID");
+String appKey = System.getenv("LEANCLOUD_APP_KEY");
+String appMasterKey = System.getenv("LEANCLOUD_APP_MASTER_KEY");
+String hookKey = System.getenv("LEANCLOUD_APP_HOOK_KEY");
+
+LeanEngine.initialize(appId, appKey, appMasterKey);
+
+GeneralRequestSignature.setMasterKey(appMasterKey);
+```
+
+### 使用数据存储服务
+
+### CookieSession
+
+## 云端环境
+
+### 绑定自定义域名
+
+<CloudCustomDomain />
+
+### 负载均衡和加速节点
+
+<CloudLoadBalancer only='java' />
+
+### 环境变量
+
+<CloudEnvironments />
+
+### 日志
+
+<CloudLogs only='java' />
+
+### 时区
+
+<CloudTimezone />
+
+### 文件系统
+
+<CloudFilesystem />
+
+### 出入口 IP 地址
+
+<CloudInternetAddress />
+
+## 疑难问题
+### 如何脱离命令行工具本地启动云引擎 Java 项目？
+
+设置云引擎运行需要的环境变量后，可以通过脱离命令行工具，直接运行相应命令或使用 IDE 本地启动 Java 项目。
+
+通过命令行启动 Jetty 项目或 JAR 项目，先设置环境变量：
+
+```sh
+eval "$(lean env)"
+```
+
+提示：命令 `lean env` 可以输出当前应用所需环境变量的设置语句，外层的 `eval` 是直接执行这些语句。
+Windows 系统下需要手动设置 `lean env` 输出的环境变量。
+
+如果是 Jetty 项目，运行：
 
 ```
-java.runtime.version=14
+mvn jetty:run
 ```
 
-#### 打包成 WAR 文件的项目
-
-首先确认项目 `pom.xml` 中配置了 [Jetty plugin](https://www.eclipse.org/jetty/documentation/9.4.x/jetty-maven-plugin.html)，并且 web server 的端口通过环境变量 `LEANCLOUD_APP_PORT` 获取，具体配置可以参考我们的 [示例代码](https://github.com/leancloud/java-war-getting-started/blob/master/pom.xml)。
-
-然后使用 Maven 安装依赖并打包：
+如果是 JAR 项目，使用 Maven 打包项目并运行：
 
 ```sh
 mvn package
+java -jar target/{zipped jar file}
 ```
 
-然后使用命令行工具本地启动应用：
+使用 Eclipse 启动应用：
 
-```sh
-tds up
+首先确保 Eclipse 已经安装 Maven 插件，并将项目以 **Maven Project** 方式导入 Eclipse 中。
+
+在 **Package Explorer** 视图右键点击项目：
+
+- 如果是 Jetty 项目，选择 **Run As** > **Maven build…**，将 **Main** 标签页的 **Goals** 设置为 `jetty:run`。
+- 如果是 JAR 项目，选择 **Run As** > **Run Configurations…**，选择 `Application`，设置 `Main class:`（示例项目为 `cn.leancloud.demo.todo.Application`）。
+
+最后在 **Environment** 标签页增加以下环境变量和相应的值：
+
+名称 | 值
+--- | ---
+`LEANCLOUD_APP_ENV` | `development`
+`LEANCLOUD_APP_ID` | `{{appid}}`
+`LEANCLOUD_APP_KEY` | `{{appkey}}`
+`LEANCLOUD_APP_MASTER_KEY` | `{{masterkey}}`
+`LEANCLOUD_APP_PORT` | `3000`
+
+配置完成后，以后只需点击 run 按钮即可启动应用。
+
+
+### 如何在云引擎中依赖内部 library（也称为「二方库」）？
+
+云引擎构建环境只能访问公开的程序库（library），如果你项目中使用了一些公司内部的依赖库，可以按照如下方式进行引用：
+
+1. 首先在项目根目录下新建 libs 目录，把所有依赖的 jar 文件拷贝进来；
+2. 然后在项目根目录下新建 leanengine.yaml 文件，并自定义 install 环节（详见下文示例）；
+3. 最后修改 pom.xml 中依赖项和 `spring-boot-maven-plugin` 配置，增加 `includeSystemScope` 设置项（详见下文示例）；
+
+最终的工程目录结构如下：
+
+```
+{root}
+|---libs
+|       |- yourdependency.jar etc.
+|---leanengine.yaml
+\---pom.xml
 ```
 
-更多有关命令行工具和本地调试的内容请参考[云引擎命令行工具使用指南](/sdk/engine/guide/cli/)。
+leanengine.yaml 内容如下：
 
-除了使用命令行工具本地启动应用外，还可以手动设置相应环境变量后，直接启动应用，详见[云引擎 FAQ](/sdk/engine/guide/faq/)。
+```yaml
+install:
+  - require:
+    - libs
+  - {use: 'default'}
+```
+
+pom.xml 中增加依赖项目：
+
+```xml
+<dependency>
+    <groupId>com.sample</groupId>
+    <artifactId>sample</artifactId>
+    <version>1.0</version>
+    <scope>system</scope>
+    <systemPath>${project.basedir}/libs/yourdependency.jar</systemPath>
+</dependency>
+```
+
+pom.xml 中对 `spring-boot-maven-plugin` 改动如下：
+
+```xml
+<plugin>
+  <groupId>org.springframework.boot</groupId>
+  <artifactId>spring-boot-maven-plugin</artifactId>
+  <configuration>
+    <executable>true</executable>
+    <includeSystemScope>true</includeSystemScope>
+  </configuration>
+</plugin>
+```
+
