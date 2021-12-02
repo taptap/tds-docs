@@ -46,7 +46,7 @@ vendor | 厂商
 华为 | 支持角标 | 是 | 请参考下文[华为角标适配说明](#华为角标适配说明)
 小米 | 支持角标 | 否 | 遵从系统默认逻辑，感应通知栏通知数目，按 1 自动增减
 OPPO | 支持红点 | 否 | 圆点展示需由用户在通知设置中手动开启，遵从系统默认逻辑，有通知则展示，无则不展示；数值展示只对指定应用开启，例如 QQ、微信，需向官方进行权限申请，暂无明确适配说明。
-vivo | 支持角标 | 是 | 参考下文[vivo 手机角标适配说明](#vivo_手机角标适配说明)
+vivo | 支持角标 | 是 | 参考下文[vivo 手机角标适配说明](#vivo-手机角标适配说明)
 魅族 | 支持红点 | 否 | 遵从系统默认逻辑，仅支持红点展示，有通知则展示，无则不展示
 
 ### 通知栏消息与透传消息
@@ -158,7 +158,7 @@ vivo | 否（老版本有透传接口，新版本已不建议使用）
 
 ## 混合推送 library 的构成
 
-我们提供了一个 all-in-one 的混合推送模块，统一支持华为（HMS）、小米、OPPO、Vivo、魅族推送，开发者依赖如下：
+我们提供了一个 all-in-one 的混合推送模块，统一支持华为（HMS）、小米、OPPO、vivo、魅族推送，开发者依赖如下：
 <code>cn.leancloud:mixpush-android:{sdkVersions.leancloud.java}@aar</code>
 
 从 6.5.1 版本开始，我们额外提供了单一厂商的推送 library，以支持不希望全部集成的产品之需求，新 library 与厂商的对应关系如下：
@@ -167,7 +167,7 @@ vivo | 否（老版本有透传接口，新版本已不建议使用）
 - 小米 <code>cn.leancloud:mixpush-xiaomi:{sdkVersions.leancloud.java}</code>
 - 魅族 <code>cn.leancloud:mixpush-meizu:{sdkVersions.leancloud.java}</code>
 - OPPO <code>cn.leancloud:mixpush-oppo:{sdkVersions.leancloud.java}</code>
-- Vivo <code>cn.leancloud:mixpush-vivo:{sdkVersions.leancloud.java}</code>
+- vivo <code>cn.leancloud:mixpush-vivo:{sdkVersions.leancloud.java}</code>
 
 两组 library 的使用方法基本相同，开发者可以根据自己的需要选取合适的 library。有一点需要注意的是，在 6.5.1 及后续版本的 library 中，由于小米、OPPO、vivo 并没有将他们的 SDK 包发布到公开源供开发者引用，所以如果是使用这几个厂商的推送，需要开发者将厂商的 SDK 包手动加入工程中。
 
@@ -178,7 +178,7 @@ vivo | 否（老版本有透传接口，新版本已不建议使用）
 1. **注册华为账号**：在 [华为开发者联盟](https://developer.huawei.com/consumer/cn/) 注册华为开发者账号。
 2. **开发前准备**：接入华为 PUSH 之前，需要创建应用并配置应用签名，具体可参考华为官方文档：[开发准备](https://developer.huawei.com/consumer/cn/doc/development/HMSCore-Guides/android-config-agc-0000001050170137)。
 3. **打开推送服务开关**：登录华为开发者联盟，按照开发准备一文中的提示开通推送服务。
-4. **将华为 App 信息保存到 LeanCloud 控制台**：将上面创建的华为 App 信息（主要有 AppId 和 AppSecret），通过 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置 > 混合推送** 与应用关联。
+4. **将华为 App 信息保存到 开发者中心 控制台**：将上面创建的华为 App 信息（主要有 AppId 和 AppSecret），通过 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置 > 混合推送** 与应用关联。
 
 ### 接入 SDK
 
