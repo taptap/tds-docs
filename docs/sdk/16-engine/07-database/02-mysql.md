@@ -1,27 +1,39 @@
 ---
 id: mysql
-title: LeanDB MySQL 指南
+title: LeanDB MySQL 使用指南
 sidebar_label: LeanDB MySQL
 ---
 
 import EngineRuntimes from '/src/docComponents/MultiLang/engine';
+import LeandbCliAccess from '../_partials/leandb-cli-access.mdx';
+import LeandbCreateInstance from '../_partials/leandb-create-instance.mdx';
 
-LeanDB 是 LeanCloud 推出的数据库托管方案，开发者可以在「控制台 => 云引擎 => LeanDB」中创建托管在 LeanCloud 的数据库实例。
+LeanDB MySQL 是云引擎提供的托管数据库，开发者可以在云引擎中使用 MySQL 客户端类库连接，访问完整的 MySQL 功能，更多其他托管数据库请查看 [云引擎总览]。
 
-开发者可以在云引擎中连接到自己的 LeanDB 实例，使用通用的 MySQL 客户端类库，访问完整的 MySQL 功能。
+## 创建和管理实例
+开发者可以在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 云引擎 > MySQL** 页面创建和管理 LeanDB 实例。
 
-## 实例规格
+### 创建实例
 
-- LeanDB MySQL 提供 MySQL 5.6 版本。
-- LeanDB MySQL 的规格分为 `0.5G`、`1G`、`2G`、`4G` 几种，代表不同的运算能力。
-- 每个实例默认有 20G 的存储空间，如果不够的话还可以选配 100G 或者 500G 的存储空间。
-- 具体的价格可以在控制台上点击「创建 LeanDB 实例」来查看。
+<LeandbCreateInstance>
 
-## 在线管理
+- **实例名称** 用于在云引擎中通过环境变量引用到该 LeanDB 实例，在账户下需唯一。
+- **内存规格** 目前提供 0.5G、1G、2G、4G 几种，代表不同的运算能力，是计费的基础。
+- **存储空间** 每个实例默认有 20G 的存储空间，可以选配 100G 或者 500G 的存储空间。
 
-为方便开发和调试，我们为开发者提供了一个 Web 界面来对 MySQL 进行管理，你可以在控制台上点击「管理员面板」链接来访问这个 Web 界面。
+</LeandbCreateInstance>
 
-开发者可以在这个页面上进行 SQL 查询和更新，创建和管理数据库，创建和管理索引等操作。
+### MySQL 版本
+
+目前 LeanDB MySQL 仅提供 MySQL 5.6 版本。
+
+### 在线扩容
+
+目前 LeanDB 不提供自助扩容的能力，如需扩容请提交工单联系我们的技术支持。
+
+### 管理共享
+
+可以使用控制台上的「管理共享」功能将 LeanCache 实例共享给其他应用，被共享的应用的 LeanCache 页面可能看到这个实例，相关的环境变量也会出现在其他应用的云引擎中。
 
 ## 在云引擎中使用
 
@@ -169,9 +181,14 @@ try {
 </TabItem>
 </EngineRuntimes>
 
-## 常见问题
+## 管理数据
+除了在云引擎中通过编程的方式访问 LeanDB，我们还提供了用于进行管理、调试或一次性数据操作的方式。
 
-- 目前 LeanDB 只支持从云引擎（和控制台的 Web 界面）中访问，在本地调试时无法访问。
-- 目前 LeanDB 不提供自助扩容的能力，如需扩容请提交工单联系我们的技术支持。
-- 如账户欠费超过 3 天，LeanDB 及其中的数据会被彻底删除。
-- LeanDB 每天扣费，不足一天按照一天扣费。
+### 在线管理面板
+为方便开发和调试，我们为开发者提供了一个 Web 界面来对 MySQL 进行管理，你可以在控制台上点击「管理员面板」链接来访问这个 Web 界面。
+
+开发者可以在这个页面上进行 SQL 查询和更新，创建和管理数据库，创建和管理索引等操作。
+
+### 使用命令行工具连接
+
+<LeandbCliAccess />

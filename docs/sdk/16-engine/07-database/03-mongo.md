@@ -1,6 +1,6 @@
 ---
 id: mongo
-title: LeanDB MongoDB 指南
+title: LeanDB MongoDB 使用指南
 sidebar_label: LeanDB MongoDB
 ---
 
