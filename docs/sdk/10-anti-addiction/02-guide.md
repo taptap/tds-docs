@@ -165,7 +165,7 @@ AntiAddictionUIKit.init(activity, gameIdentifier, config,
             if (code == Constants.ANTI_ADDICTION_CALLBACK_CODE.LOGIN_SUCCESS){
                 // 开始计时
                 AntiAddictionUIKit.enterGame();
-                Log.d("LeeJiEun", "玩家登陆后判断当前玩家可以进行游戏");
+                Log.d("TapTap-AntiAddiction", "玩家登录后判断当前玩家可以进行游戏");
             }
         }       
     }
@@ -210,7 +210,7 @@ completionHandler:^(BOOL success) {
 | 回调类型                          | code | 触发逻辑                                                     | 附带信息                     |
 | :-------------------------------- | :--- | :----------------------------------------------------------- | :------------------------- |
 | `CALLBACK_CODE_LOGIN_SUCCESS`      | 500  | 玩家登录后判断当前玩家可以进行游戏                           | 有 |
-| `CALLBACK_CODE_TIME_LIMIT`          | 1030 | 未成年玩家当前无法进行游戏                                         | 有 |
+| `CALLBACK_CODE_NIGHT_STRICT`          | 1030 | 未成年玩家当前无法进行游戏                                         | 有 |
 | `CALLBACK_CODE_OPEN_ALERT_TIP`      | 1095 | 未成年允许游戏弹窗                                  | 有 |
 | `CALLBACK_CODE_LOGOUT` | 1000 | 退出账号 | 无                         |
 | `CALLBACK_CODE_REAL_NAME_STOP` | 9002 | 实名过程中点击了关闭实名窗 | 无 |          
