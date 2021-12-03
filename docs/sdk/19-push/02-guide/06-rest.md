@@ -529,6 +529,18 @@ _notificationChannel | 可选 | Android 8.0 以上设备在推送时需要传递
 
 `_Installation` 表中的所有属性，无论是内置的还是自定义的，都可以作为查询条件通过 where 来指定，并且支持各种复杂查询。
 
+成功时会返回本次推送的 objectId，后续可以用返回的 objectId [查询推送记录](#推送记录查询)。
+
+```json
+{"objectId":"i4OcyCnyjckJOtzz","createdAt":"2021-11-23T08:05:54.921Z"}
+```
+
+失败时会返回错误码和错误原因：
+
+```json
+{"code":107,"error":"Malformed json object. A json dictionary is expected."}
+```
+
 下面会举一些例子，更多例子请参考[数据存储 REST API 使用详解](/sdk/storage/guide/rest/)的《查询》一节。
 
 ##### 推送给所有的设备
