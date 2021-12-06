@@ -100,8 +100,8 @@ return new Promise((resolve, reject)=>{
 })
 ```
 
-以上代码简单展示了如何在即时通讯服务中使用语心文本检测服务，代码仅供参考，你需要根据实际业务场景来处理请求和响应结果。
-涉及到的即时通讯 hook 参数和语心文本检测服务请求与响应参数，请参考相应文档：
+以上代码简单展示了如何在即时通讯服务中使用文本检测服务，代码仅供参考，你需要根据实际业务场景来处理请求和响应结果。
+涉及到的即时通讯 hook 参数和文本检测服务请求与响应参数，请参考相应文档：
 
 [即时通讯 _messageReceived Hook](/sdk/im/guide/systemconv/#_messagereceived)
-[语心文本检测 API 接口说明](/sdk/text-moderation/guide/#api-%E8%AF%A6%E7%BB%86%E8%AF%B4%E6%98%8E)
+[文本检测 API 接口说明](/sdk/text-moderation/guide/#api-%E8%AF%A6%E7%BB%86%E8%AF%B4%E6%98%8E)
