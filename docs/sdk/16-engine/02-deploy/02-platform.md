@@ -1,125 +1,25 @@
 ---
 id: cloud-engine
-title: 云引擎开发指南
-sidebar_label: 部署应用
+title: 云引擎平台功能
+sidebar_label: 平台功能
 ---
 
-import QuickStartInit from './_partials/quick-start-init.mdx';
-import QuickStartDeploy from './_partials/quick-start-deploy.mdx';
-import CloudCustomDomain from './_partials/cloud-custom-domain.mdx';
+import CloudCustomDomain from '../_partials/cloud-custom-domain.mdx';
+import PlatformIntroduction from '../_partials/platform-introduction.mdx';
+import PlatformRuntimes from '../_partials/platform-runtimes.mdx';
 import EngineRuntimes from '/src/docComponents/MultiLang/engine';
 import {CLI_BINARY, BRAND, REGION} from '/src/constants/env.ts';
 import TabItem from '@theme/TabItem';
 import {Distributions} from '/src/docComponents/distributions';
 
-云引擎是一个托管后端程序的平台，开发者可以将 Web 应用（例如一个网站），或者 Node.js、Python、Java、PHP、.Net、Go 等语言的后端程序（例如一个 RESTful API 服务器）部署到运行上，云引擎会自动从源代码构建出可运行的「版本」，然后将它运行在独立的容器中，同时提供日志和监控、负载均衡、平滑发布、弹性扩容等能力。此外，云引擎还提供了定时任务、域名和证书管理和 Redis、MySQL、MongoDB、Elasticsearch 等多种托管数据库供开发者使用。
-
-这篇文档会帮助你快速地部署第一个云引擎应用、了解云引擎平台提供的功能，有关具体运行环境的详情请查看专门的文档页面：
-
-- [Web 应用运行环境](/sdk/engine/runtime/webapp)
-- [Node.js 运行环境](/sdk/engine/runtime/nodejs)
-- [Python 运行环境](/sdk/engine/runtime/python)
-- [Java 运行环境](/sdk/engine/runtime/java)
-- [PHP 运行环境](/sdk/engine/runtime/php)
-- [.NET (C#) 运行环境](/sdk/engine/runtime/dotnet)
-- [Go 运行环境](/sdk/engine/runtime/go)
-
-## 快速开始
+<PlatformIntroduction />
 
 :::info
-如果仅希望使用云函数和 Hook 而不是部署通用的后端程序，建议查看 [云函数和 Hook 开发指南 § 快速开始](/sdk/engine/cloud-function#快速开始)。
+这篇文档会帮助了解云引擎平台提供的功能，有关具体运行环境的详情请查看专门的文档页面：
+
+<PlatformRuntimes />
+
 :::
-
-### 创建项目
-
-如果你想要快速开始新项目，推荐基于我们的示例项目来开始部署第一个应用。
-
-<QuickStartInit />
-
-在示例项目中你可以使用这个语言的 Web 框架来定义路由，处理某一路径下的请求，在示例项目中可以看到一些例子：
-
-<EngineRuntimes>
-<TabItem value='nodejs'>
-
-```javascript title='app.js'
-app.get('/', function(req, res) {
-  res.render('index', { currentTime: new Date() });
-});
-```
-
-</TabItem>
-<TabItem value='python'>
-
-```python title='app.py'
-@app.route('/')
-def index():
-    return render_template('index.html')
-```
-
-</TabItem>
-<TabItem value='php'>
-
-```php title='src/app.php'
-$app->get('/', function (Request $request, Response $response) {
-    return $this->view->render($response, "index.phtml", array(
-        "currentTime" => new \DateTime(),
-    ));
-});
-```
-
-</TabItem>
-<TabItem value='java'>
-
-```java title='src/main/webapp/WEB-INF/web.xml'
-<welcome-file-list>
-  <welcome-file>index.html</welcome-file>
-</welcome-file-list>
-```
-
-</TabItem>
-<TabItem value='dotnet'>
-
-```cs title='web/Startup.cs'
-app.UseEndpoints(endpoints => {
-    endpoints.MapControllerRoute(
-        name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}");
-})
-```
-
-</TabItem>
-<TabItem value='go'>
-
-```go title='main.go'
-e.GET("/", routes.Index)
-```
-
-```go title='routes/index.go'
-func Index(c echo.Context) error {
-  return c.Render(http.StatusOK, "index", time.Now().String())
-}
-```
-
-</TabItem>
-</EngineRuntimes>
-
-### 本地运行和调试
-
-在确保所有的依赖都正确安装之后，就可以在项目根目录用我们的命令行工具来启动本地运行了：
-
-<pre>
-<CodeBlock className='sh'>
-{`$ ${CLI_BINARY} up`}
-</CodeBlock>
-</pre>
-
-更多有关命令行工具和本地调试的内容请看 [云引擎命令行工具使用指南](/sdk/engine/cli/)。
-
-### 部署到云引擎
-
-<QuickStartDeploy />
-
-你可以在控制台绑定云引擎域名，绑定域名后，即可通过绑定域名访问你的应用。例如你在控制台绑定了 `web.example.com` 这个域名，即可通过 `https://web.example.com` 访问你的应用（生产环境）。
 
 ## 什么可以被部署到云引擎
 

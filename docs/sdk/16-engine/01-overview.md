@@ -4,9 +4,13 @@ title: 云引擎服务总览
 sidebar_label: 总览
 ---
 
-云引擎是一个托管后端程序的平台，开发者可以将 Web 应用（例如一个网站），或者 Node.js、Python、Java、PHP、.Net、Go 等语言的后端程序（例如一个 RESTful API 服务器）部署到云引擎上，云引擎会自动从源代码构建出可运行的「版本」，然后将它运行在独立的容器中，同时提供日志和监控、负载均衡、平滑发布、弹性扩容等能力。此外，云引擎还提供了定时任务、域名和证书管理和 Redis、MySQL、MongoDB、Elasticsearch 等多种托管数据库供开发者使用。
+import PlatformIntroduction from './_partials/platform-introduction.mdx';
 
-如果希望快速开始，请从 [云引擎开发指南](/sdk/engine/cloud-engine/) 开始部署你的第一个应用，然后阅读特定语言的文档来了解更多有关云引擎运行环境的信息：
+<PlatformIntroduction />
+
+## 部署应用
+
+如果希望快速开始，请从 [快速开始部署云引擎应用](/sdk/engine/deploy/getting-started/) 开始部署你的第一个应用，然后阅读特定语言的文档来了解更多有关云引擎运行环境的信息：
 
 运行环境 | 支持版本 | 支持包管理器 | 文档页面 | 示例项目
 --- | --- | --- | --- | ---

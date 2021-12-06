@@ -1,7 +1,7 @@
 ---
 id: rest
 title: 云函数 REST API
-sidebar_label: 云函数 REST API
+sidebar_label: REST API
 ---
 
 云服务提供了统一的访问云函数的 REST API 接口，所有的客户端 SDK 也都是封装了这个接口从而实现对云函数的调用。
