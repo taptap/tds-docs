@@ -1,11 +1,14 @@
 // @ts-check
 
+/** env */
+const REGION = process.env.DOCUSAURUS_REGION;
+
 const baseUrl = '/docs/';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'TapTap 开发者文档中心',
-  url: 'https://developer.taptap.com',
+  title: REGION == 'cn' ? 'TapTap 开发者文档' : 'TapTap Developer Documentation',
+  url: REGION == 'cn' ? 'https://developer.taptap.com' : 'https://developer.taptap.io',
   baseUrl,
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
