@@ -96,7 +96,7 @@ try
     // 在 iOS、Android 系统下，会唤起 TapTap 网页 或者 TapTap 客户端进行登录
     // 在其他平台，会显示二维码，玩家可以通过移动设备上的 TapTap 客户端扫码登录
     var accessToken = await TapLogin.Login();
-    Debug.Log($"LeeJiEun 登录成功 accessToken: {accessToken.ToJson()}");
+    Debug.Log($"TapTap 登录成功 accessToken: {accessToken.ToJson()}");
 }
 catch (Exception e)
 {
@@ -112,7 +112,7 @@ catch (Exception e)
 
 // 获取 TapTap Profile  可以获得当前用户的一些基本信息，例如名称、头像。
 var profile = await TapLogin.FetchProfile();
-Debug.Log($"LeeJiEun 登录成功 profile: {profile.ToJson()}");
+Debug.Log($"TapTap 登录成功 profile: {profile.ToJson()}");
 ```
 
 ```java
@@ -184,7 +184,17 @@ if ([TapLoginHelper currentProfile]) {
 
 ```cs
 // 获取登录状态
-await TapLogin.GetAccessToken();
+try 
+{
+    var accesstoken = await TapLogin.GetAccessToken();
+    Debug.Log("已登录");
+    // 直接进入游戏
+} 
+catch (Exception e)
+{
+    Debug.Log("当前未登录");
+    // 开始登录
+}
 
 // 获取用户信息
 await TapLogin.GetProfile();
