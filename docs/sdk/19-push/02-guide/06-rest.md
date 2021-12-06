@@ -495,7 +495,7 @@ fcm | FCM 推送（仅国际版适用）
 
 本接口用于根据提供的查询条件，给在 _Installation 表内所有符合查询条件的有效设备记录发推送消息。例如下面是给所有在 _Installation 表中 `channels` 字段包含 `public` 值的有效设备推送一条内容为 `Hello from LeanCloud` 的消息。
 
-请注意，本接口限制请求的 HTTP Body 大小必须小于 4096 个字节，即您调用本接口传递的所有参数做 JSON 序列化后得到的结果不能超过此限制。
+请注意，本接口限制请求的 HTTP Body 大小必须小于 4096 个字节，即你调用本接口传递的所有参数做 JSON 序列化后得到的结果不能超过此限制。
 
 ```sh
 curl -X POST \
@@ -523,7 +523,7 @@ notification_id | 可选 | 自定义推送 id，最长 16 个字符且只能由�
 req_id | 可选 | 自定义请求 id，最长 16 个字符且只能由英文字母和数字组成。5 分钟内带有相同 req_id 的不同推送请求我们认为是重复请求，只会发一次推送。用户可以在请求中带着唯一的 req_id 从而在接口出现超时等异常时将请求重发一次，以避免漏掉失败的推送请求。并且由于前后两次请求中 req_id 相同，我们会自动过滤重复的推送请求以保证每个目标终端用户最多只会收到一次推送消息。**重发过频或次数过多会影响正常的消息推送**，请注意控制。
 prod| 可选 | ***仅对 iOS 推送有效***。当使用 Token Authentication 鉴权方式发 iOS 推送时，该参数用于设置将推送发至 APNs 的开发环境（***dev***）还是生产环境（***prod***）。当使用证书鉴权方式发 iOS 推送时，该参数用于设置使用开发证书（***dev***）还是生产证书（***prod***）。未传入 `prod` 时，如果传入了 `X-LC-Prod` HTTP 头，且其值不为 1，那么视同 `"prod": "dev"`，否则默认 `"prod": "prod"`。在使用证书鉴权方式下，当设备在 Installation 记录中设置了 deviceProfile 时我们优先按照 deviceProfile 指定的证书推送。
 topic | 可选 | ***仅对使用 Token Authentication 鉴权方式的 iOS 推送有效***。当使用 Token Authentication 鉴权方式发 iOS 推送时需要提供设备对应的 APNs Topic 做鉴权。一般情况下，iOS SDK 会自动读取 iOS app 的 bundle ID 作为 topic 存入 Installation 记录的 apnsTopic 字段，所以推送请求中无需带有该参数。但以下情况需要手工指定： 1. 使用低于 v4.2.0 的 iOS SDK; 2. 不使用 iOS SDK （如 React Native）；3. 推送目标设备使用的 topic 与 iOS Bundle ID 不同。
-apns_team_id | 可选 | ***仅对使用 Token Authentication 鉴权方式的 iOS 推送有效***。当使用 Token Authentication 鉴权方式发 iOS 推送时需要提供设备对应的 Team ID 做鉴权。一般情况下如果您配置的所有 Team ID 下的 APNs Topic 均不重复，或在存储 Installation 时主动设置过 apnsTeamId 值，则无需提供本参数，我们会为每个设备匹配对应的 Team ID 来发推送。否则必须提供本参数且需要通过 where 查询条件保证单次推送请求的目标设备均属于本参数指定的 Team ID，以保证推送正常进行。
+apns_team_id | 可选 | ***仅对使用 Token Authentication 鉴权方式的 iOS 推送有效***。当使用 Token Authentication 鉴权方式发 iOS 推送时需要提供设备对应的 Team ID 做鉴权。一般情况下如果你配置的所有 Team ID 下的 APNs Topic 均不重复，或在存储 Installation 时主动设置过 apnsTeamId 值，则无需提供本参数，我们会为每个设备匹配对应的 Team ID 来发推送。否则必须提供本参数且需要通过 where 查询条件保证单次推送请求的目标设备均属于本参数指定的 Team ID，以保证推送正常进行。
 flow_control | 可选 | 是否开启平缓发送，默认不开启。其值代表推送的速度，即每秒推送的目标终端用户数。最低值 1000，低于最低值按最低值计算。
 _notificationChannel | 可选 | Android 8.0 以上设备在推送时需要传递 channnel id 才能正常接收推送，请参看[Android 推送指南](/sdk/push/guide/android/)的《Android 8.0 推送适配》一节。
 
@@ -701,7 +701,7 @@ req_id | 可选 | 同上。
 prod| 可选 | 同[通过查询条件发推送](#通过查询条件发推送)。
 topic | 可选 | 同上。
 apns_team_id | 可选 | 同上。
-device_profile | 可选 | 用于指定使用的 iOS 自定义推送证书。如果使用 Token Authentication 鉴权方式，或者使用的推送证书为配置的「生产环境证书」或「开发环境证书」则无需提供本参数。我们会根据您填写的 `prod` 参数值来使用对应的证书。
+device_profile | 可选 | 用于指定使用的 iOS 自定义推送证书。如果使用 Token Authentication 鉴权方式，或者使用的推送证书为配置的「生产环境证书」或「开发环境证书」则无需提供本参数。我们会根据你填写的 `prod` 参数值来使用对应的证书。
 
 如果目标为 Android 设备，则在前述通用参数之外，还可以附带如下参数：
 
@@ -742,7 +742,7 @@ curl -X POST \
   -d '{
         "expiration_time": "2015-10-07T00:51:13Z",
         "data": {
-          "alert": "您的优惠券将于 10 月 7 日到期。"
+          "alert": "你的优惠券将于 10 月 7 日到期。"
         }
       }' \
   https://{{host}}/1.1/push
@@ -851,7 +851,7 @@ curl -X GET \
 
 在发推送的过程中，我们会随着推送任务的执行更新推送状态到 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 推送记录** 中，可以在这里查看推送的最新状态。对不同推送状态的说明请参看[推送通知总览](/sdk/push/guide/overview/)的《Notification》一节。
 
-在一条推送记录状态到达 **done** 即完成推送之前，其状态信息旁边会显示 “取消推送” 按钮，点击后就能将本次推送取消。并且取消了的推送会从推送记录中删除。
+在一条推送记录状态到达 **done** 即完成推送之前，其状态信息旁边会显示「取消推送」按钮，点击后就能将本次推送取消。并且取消了的推送会从推送记录中删除。
 
 请注意取消推送的意思是取消还排在队列中未发出的推送，已经发出或已存入离线缓存的推送是无法取消的。同理，推送状态显示已经完成的推送也无法取消。请尽量在发推送前做好测试，确认好发送内容和目标设备查询条件。
 

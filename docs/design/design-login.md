@@ -114,7 +114,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 由于登录 SDK 会接入到各种手游中，TapTap 登录入口的风格需要与游戏 UI 一致才能融合到游戏界面中，因此游戏厂商可以对 TapTap 标志进行轻微的定制，但必须保持 TapTap 标志的品牌识别度。
 
-**不限制外框、背景、“登录”字样，TapTap 字样只能基于提供的 svg 去做填充。**
+**不限制外框、背景、「登录」字样，TapTap 字样只能基于提供的 svg 去做填充。**
 
 <Background>
 

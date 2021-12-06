@@ -29,8 +29,8 @@ import Mermaid from '/src/docComponents/Mermaid';
 
 阅读准备
 
-在阅读本章之前，如果您还不太了解即时通讯服务的总体架构，建议先阅读[即时通讯服务总览](/sdk/im/guide/overview/)。
-另外，如果您还没有下载对应开发环境（语言）的 SDK，请参考相应语言的 SDK 配置指南完成 SDK 安装与初始化：
+在阅读本章之前，如果你还不太了解即时通讯服务的总体架构，建议先阅读[即时通讯服务总览](/sdk/im/guide/overview/)。
+另外，如果你还没有下载对应开发环境（语言）的 SDK，请参考相应语言的 SDK 配置指南完成 SDK 安装与初始化：
 
 - [C# SDK 配置](/sdk/storage/guide/setup-dotnet/)
 - [Java SDK 配置](/sdk/storage/guide/setup-java/)
