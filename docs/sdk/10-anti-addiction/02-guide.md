@@ -716,7 +716,7 @@ POST /addict/api/v1/playcheck
         "remain_time": {{remainTime}},
         "cost_time": {{costtime}},
         "restrict_type":1,
-        "title":"健康游戏提示","description":"你当前为未成年账号，已被纳入防沉迷系统。根据国家相关规定，周五、周六、周日及法定节假日 20 点 - 21 点之外为健康保护时段。你今日游戏时间还剩余${remianTime}分钟，请注意适当休息。"
+        "title":"健康游戏提示","description":"你当前为未成年账号，已被纳入防沉迷系统。根据国家相关规定，周五、周六、周日及法定节假日 20 点 - 21 点之外为健康保护时段。你今日游戏时间还剩余${remainTime}分钟，请注意适当休息。"
     }
 }
 
