@@ -6,7 +6,7 @@ sidebar_label: 权限与聊天室
 
 import MultiLang from '/src/docComponents/MultiLang';
 import Mermaid from '/src/docComponents/Mermaid';
-import import {Distributions} from '/src/docComponents/distributions';
+import {Distributions} from '/src/docComponents/distributions';
 
 
 

@@ -297,6 +297,9 @@ curl -X PUT \
 | timestamp | 必须   | 客户端产生本次请求的 unix 时间戳（UTC），精确到**毫秒**。      |
 | master    | 可选   | 字符串 `"master"`，当使用 master key 签名请求的时候，必须加上这个后缀明确说明是使用 master key。 |
 
+注意，`sign` 中的 MD5 签名的 hex 值中的字母请使用小写。
+如果使用大写字母，会导致签名校验失败。
+
 举例来说，假设应用的信息如下：
 
 <table class="noheading">
