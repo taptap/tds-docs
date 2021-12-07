@@ -1,22 +1,45 @@
 ---
 id: cli
-title: 云引擎命令行工具使用指南
+title: 命令行工具 CLI 使用指南
 sidebar_label: 命令行工具
 ---
 
-命令行工具是用来管理和部署云引擎项目的工具。它不仅可以部署、发布和回滚云引擎代码，对同一个云引擎项目做多应用管理，还能查看云引擎日志，批量将文件上传到云端。
+import LeandbCliAccess from './_partials/leandb-cli-access.mdx';
+import {Distributions} from '/src/docComponents/distributions';
+import {CLI_BINARY} from '/src/constants/env.ts';
 
-## 安装命令行工具
+<p>命令行工具（<code>{CLI_BINARY}</code>）是用来部署云引擎应用和和进行其他管理操作的客户端工具。</p>
+
+## 安装
 
 ### macOS
 
-目前 `tds` 暂未发布到 Homebrew，macOS 用户请先到 [GitHub releases 页面] 下载二进制文件 `tds-macos-x64`，赋予可执行权限（`chmod a+x tds-macos-x64`），重命名为 `tds` 并放到已经在 PATH 环境变量中声明的任意目录中即可。
+<Distributions brand='leancloud'>
 
-[GitHub releases 页面]: https://releases.leanapp.cn/#/leancloud/lean-cli/releases
+推荐通过 [Homebrew](https://brew.sh/) 安装：
+
+```sh
+brew update && brew install lean-cli
+```
+
+<details>
+<summary>点击展开 Homebrew 安装常见问题（安装失败）</summary>
+
+如访问 Homebrew 网络不畅，可以 [设置 `http_proxy` 等环境变量来加速访问](https://docs.brew.sh/Manpage#using-homebrew-behind-a-proxy)，或为 Homebrew 配置镜像源（如 [TUNA](https://mirror.tuna.tsinghua.edu.cn/help/homebrew/)）
+
+或者也可以在 [GitHub releases 页面] 下载适用于 macOS 的二进制文件，重命名为 `lean`　后移动到 `$PATH` 下的路径，并添加可执行权限（`chmod a+x /path/to/lean`）。
+</details>
+
+</Distributions>
+<Distributions brand='tds'>
+
+macOS 用户可以在 [GitHub releases 页面] 下载二进制文件 `tds-macos-x64`，赋予可执行权限（`chmod a+x tds-macos-x64`），重命名为 `tds`　后移动到 `$PATH` 下的路径，并添加可执行权限（`chmod a+x /path/to/tds`）。
+
+</Distributions>
 
 ### Windows
 
-Windows 用户可以在 [GitHub releases 页面]根据操作系统版本下载最新的 32 位 或 64 位 **msi** 安装包进行安装，安装成功之后在 Windows 命令提示符（或 PowerShell）下直接输入 `tds` 命令即可使用。
+Windows 用户可以在 [GitHub releases 页面] 根据操作系统版本下载最新的 32 位 或 64 位 **msi** 安装包进行安装，安装成功之后在 Windows 命令提示符（或 PowerShell）下直接输入 `tds` 命令即可使用。
 
 也可以选择编译好的绿色版 **exe** 文件，下载后将此文件更名为 `tds.exe`，并将其路径加入到系统 **PATH** 环境变量（[设置方法](https://www.java.com/zh_CN/download/help/path.xml)）中去。这样使用时在 Windows 命令提示符（或 PowerShell）下，在任意目录下输入 `tds` 就可以使用命令行工具了。当然也可以将此文件直接放到已经在 PATH 环境变量中声明的任意目录中去，比如 `C:\Windows\System32` 中。
 
@@ -24,29 +47,27 @@ Windows 用户可以在 [GitHub releases 页面]根据操作系统版本下载�
 
 基于 Debian 的发行版可以从 [GitHub releases 页面] 下载 deb 包安装。
 
-其他发行版可以从 [GitHub releases 页面] 下载预编译好的二进制文件 `tds-linux-x64`，赋予可执行权限（`chmod a+x tds-linux-x64`），重命名为 `tds` 并放到已经在 PATH 环境变量中声明的任意目录中即可。
+其他发行版可以从 [GitHub releases 页面] 下载预编译好的二进制文件 `tds-linux-x64`，重命名为 `tds`　后移动到 `$PATH` 下的路径，并添加可执行权限（`chmod a+x /path/to/tds`）。
 
-### 通过源码安装
+[GitHub releases 页面]: https://releases.leanapp.cn/#/leancloud/lean-cli/releases
 
-请参考项目源码 [README](https://github.com/leancloud/lean-cli)。
-
-### 升级
+### 升级版本
 
 下载最新的文件，重新执行一遍安装流程，即可把旧版本的命令行工具覆盖，升级到最新版。
 
-## 使用
+## 命令介绍
 
 安装成功之后，直接在 terminal 终端运行 `tds help`，输出帮助信息：
 
-```sh
+<details>
+<summary>点击展开 <code>tds help</code> 的输出</summary>
+
+```
 NAME:
    tds - Command line to manage and deploy LeanCloud apps
 
 USAGE:
    tds [global options] command [command options] [arguments...]
-
-VERSION:
-   0.25.0
 
 COMMANDS:
      login    Log in to LeanCloud
@@ -69,35 +90,39 @@ GLOBAL OPTIONS:
    --version, -v  print the version
 ```
 
+</details>
+
+可以通过 `--version` 选项查看命令行工具的版本：
+
+```
+$ tds --version
+tds version 0.25.0
+```
+
 简单介绍下主要的子命令：
 
 命令 | 用途
 - | -
 `login` | 登录 LeanCloud 账号
-`switch` | 切换关联的云引擎项目
-`metric` | 当前项目的 LeanStorage 统计信息
-`info` | 当前用户、应用
-`up` | 启动本地开发调试实例
+`switch` | 切换关联的云引擎应用和分组
+`info` | 显示当前应用和分组信息
+`up` | 启动本地开发调试
 `init` | 初始化云引擎项目
 `deploy` | 部署项目至云引擎
-`publish` | 部署至生产环境
-`upload` | 上传文件至当前应用（可以在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 文件** 中查看）
+`publish` | 将预备环境的版本发布至生产环境
+`upload` | 上传文件至数据存储服务（可以在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 文件** 中查看）
 `logs` | 显示云引擎日志
-`debug` | 单独运行云函数调试功能，而不在本地运行项目本身
+`debug` | 单独启动云函数调试控制台（不运行应用本身）
 `env` | 显示当前项目的环境变量
-`cache` | LeanCache 命令行
+`db` | 连接到云端的 LeanCache 或 LeanDB
 
-可以通过 `--version` 选项查看版本：
 
-```sh
-$ tds --version
-tds version 0.25.0
+用 `tds <command> --help` 可以进一步了解每个子命令的用法，例如：
+
+<details>
+<summary>点击展开 <code>tds deploy --help</code> 的输出</summary>
+
 ```
-
-`tds command -h` 可以查看子命令的帮助信息，例如：
-
-```sh
-$ tds deploy -h
 NAME:
    tds deploy - Deploy the project to LeanEngine
 
@@ -118,22 +143,20 @@ OPTIONS:
    --direct                                        Upload project's tarball to remote directly
 ```
 
-下文中凡是以 `$ tds` 开头的文字即表示在终端里执行命令。
+</details>
 
-## 登录
+## 登录帐号
 
 安装完命令行工具之后，首先第一步需要登录云服务账户。
 请进入开发者后台，点击左侧「创建游戏」按照需要填写基础信息和基础游戏资料，然后进入对应的游戏，依次进入**游戏服务 > 云服务 > 云引擎 > 开启 > 部署项目 > 命令行工具部署**，按照指引登录你的云服务账户。
 
-### 切换账户
-
-要切换到另一账户，重新执行 `tds login` 即可。
+如要切换到另一账户，重新执行 `tds login` 即可。
 
 ## 初始化项目
 
 登录完成之后，可以使用 `tds init` 命令来初始化一个项目，并且关联到已有的云服务应用上。
 
-```sh
+```
 [?] Please select an app:
  1) AwesomeApp
  2) Foobar
@@ -141,7 +164,7 @@ OPTIONS:
 
 选择项目语言／框架：
 
-```sh
+```
 [?] Please select a language
  1) Node.js
  2) Python
@@ -154,47 +177,43 @@ OPTIONS:
 
 之后命令行工具会将此项目模版下载到本地，这样初始化就完成了：
 
-```sh
+```
 [INFO] Downloading templates 6.33 KiB / 6.33 KiB [==================] 100.00% 0s
 [INFO] Creating project...
 ```
 
 进入以应用名命名的目录就可以看到新建立的项目。
 
-## 关联已有项目
+## 关联应用和分组
 
-如果已经使用其他方法创建好了项目，可以直接在项目目录执行：
-
-```sh
-$ tds switch
-```
-
-将已有项目关联到云服务应用上。
-
-## 切换分组
-
-如果应用启用了云引擎多分组功能，同样可以使用 `$ tds switch` 命令切换当前目录关联的分组。
-
-## 本地运行
-
-如果想将一份代码简单地部署到服务器而不在本地运行和调试，可以暂时跳过此章节。
-
-进入项目目录：
+命令行工具的大部分操作都是针对关联的应用进行的，使用 `tds swtich` 可以将已有的项目关联到云端的应用：
 
 ```sh
-$ cd AwesomeApp
+tds switch
 ```
 
-安装此项目相关的依赖后，可以通过命令行工具启动应用：
+如应用中有多个分组，则会需要你选择一个分组。
+
+如需管理项目到其他应用，可以重新运行 `tds swtich`。
+
+另外还可以直接执行 `$ tds switch 其他应用的id` 来快速切换关联应用。
+
+使用 `tds info` 可以查看当前项目关联的应用。
+
+## 本地运行调试
+
+在项目根目录运行：
 
 ```sh
-$ tds up
+tds up
 ```
+
+即可开始本地调试，命令行工具会在启动你的应用同时启动一个云函数调试控制台。
 
 - 在浏览器中打开 <http://localhost:3000>，进入 web 应用的首页。
-- 在浏览器中打开 <http://localhost:3001>，进入云引擎云函数和 Hook 函数调试界面。
+- 在浏览器中打开 <http://localhost:3001>，进入云引擎云函数和 Hook 函数调试控制台。
 
-注意，如果想变更启动端口号，可以使用 `tds up --port 新端口号` 命令来指定。
+如果想变更启动端口号，可以使用 `tds up --port 新端口号` 命令来指定。
 
 旧版命令行工具可以在 `$ tds up` 的过程中，监测项目文件的变更，实现自动重启开发服务进程。新版命令行工具移除了这一功能，转由项目代码本身来实现，以便更好地与项目使用的编程语言或框架集成。
 
@@ -221,18 +240,18 @@ $ tds debug --remote=http://remote-url-or-ip-address:remote-port --app-id=xxxxxx
 当开发和本地测试云引擎项目通过后，你可以直接将本地源码推送到 LeanCloud 云引擎平台运行：
 
 ```sh
-$ tds deploy
+tds deploy
 ```
 
 对于生产环境是**体验实例**的云引擎的应用，这个命令会将本地源码部署到线上的生产环境，无条件覆盖之前的代码（无论是从本地仓库部署、Git 部署还是在线定义）；而对于生产环境是**标准实例**的云引擎的应用，这个命令会先部署到**预备环境**，后续需要使用 `tds publish` 来完成向生产环境的部署，如需直接部署到生产环境，可额外添加 `--prod 1` 选项：
 
 ```sh
-$ tds deploy --prod 1
+tds deploy --prod 1
 ```
 
 部署过程会实时打印进度：
 
-```sh
+```
 $ tds deploy
 [INFO] Current CLI tool version:  0.21.0
 [INFO] Retrieving app info ...
@@ -260,12 +279,13 @@ $ tds deploy
 默认部署备注为「从命令行工具构建」，显示在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 云引擎 > 云引擎分组 > 日志** 中。你可以通过 `-m` 选项来自定义部署的备注信息：
 
 ```sh
-$ tds deploy -m 'fix #42'
+tds deploy -m 'fix #42'
 ```
 
 部署之后需要绑定一个云引擎自定义域名，然后就可以通过 curl 命令来测试你的云引擎代码，或者通过浏览器访问相应的网址。
 
-#### 部署时忽略部分文件
+<details>
+<summary>点击展开如何在部署时忽略部分文件（<code>.leanignore</code>）</summary>
 
 部署项目时，如果有一些临时文件或是项目源码管理软件用到的文件，不需要上传到服务器，可以将它们加入到 `.leanignore` 文件。
 
@@ -273,30 +293,33 @@ $ tds deploy -m 'fix #42'
 
 [defaultIgnorePatterns]: https://github.com/leancloud/lean-cli/blob/master/runtimes/ignorefiles.go#L13
 
-### 从 Git 仓库部署
+</details>
+
+### 触发 Git 部署
 
 如果代码保存在某个 Git 仓库上，例如 [GitHub](https://github.com)，并且在 LeanCloud 控制台已经正确设置了 git repo 地址以及 deploy key，你也可以请求云引擎从 Git 仓库获取源码并自动部署。这个操作可以在云引擎的部署菜单里完成，也可以在本地执行：
 
 ```sh
-$ tds deploy -g
+tds deploy -g
 ```
 
 - `-g` 选项要求从 Git 仓库部署，Git 仓库地址必须已经在云引擎菜单中保存。
 - 默认部署使用 **master** 分支的最新代码，你可以通过 `-r <revision>` 来指定部署特定的 commit 或者 branch。
 - 设置 git repo 地址以及 deploy key 的方法可以参考[云引擎网站托管指南](/sdk/engine/guide/webhosting/)的《Git 部署》一节。
-## 发布到生产环境
+
+### 发布到生产环境
 
 以下步骤仅适用于生产环境是标准实例的用户。
 
 如果预备环境如果测试没有问题，此时需要将预备环境的云引擎代码切换到生产环境，可以在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 云引擎 > 云引擎分组 > 部署** 中发布，也可以直接运行 `publish` 命令：
 
 ```sh
-$ tds publish
+tds publish
 ```
 
 这样预备环境的云引擎代码就发布到了生产环境：
 
-```sh
+```
 $ tds publish
 [INFO] Current CLI tool version:  0.21.0
 [INFO] Retrieving app info ...
@@ -316,7 +339,7 @@ $ tds publish
 
 使用 `logs` 命令可以查询云引擎的最新日志：
 
-```sh
+```
 $ tds logs
       2019-11-20 17:17:12  Deploying 20191120-171431 to web1
       2019-11-20 17:17:12  Creating new instance ...
@@ -333,71 +356,45 @@ web1  2019-11-20 17:17:23  Node app is running on port: 3000
 
 默认返回最新的 30 条，最新的在最下面。
 
-可以通过 `-l` 选项设定返回的日志数目，例如返回最近的 100 条：
+可以加上 `-f` 选项来自动滚动更新日志，类似 `tail -f` 命令的效果：
 
 ```sh
-$ tds logs -l 100
-```
-
-也可以加上 `-f` 选项来自动滚动更新日志，类似 `tail -f` 命令的效果：
-
-```sh
-$ tds logs -f
+tds logs -f
 ```
 
 新的云引擎日志产生后，都会被自动填充到屏幕下方。
 
+<details>
+<summary>点击展开 <code>tds logs</code> 的更多用法（时间筛选等）</summary>
+
+可以通过 `-l` 选项设定返回的日志数目，例如返回最近的 100 条：
+
+```sh
+tds logs -l 100
+```
+
 如果想查询某一段时间的日志，可以指定 `--from` 和 `--to` 参数：
 
 ```
-$ tds logs --from=2017-07-01 --to=2017-07-07
+tds logs --from=2017-07-01 --to=2017-07-07
 ```
 
 单独使用 `--from` 参数导出从某一天到现在的日志：
 
 ```
-$ tds logs --from=2017-07-01
+tds logs --from=2017-07-01
 ```
 
 另外可以配合重定向功能，将一段时间内的 JSON 格式日志导出到文件，再配合本地工具进行查看：
 
 ```
-$ tds logs --from=2017-07-01 --to=2017-07-07 --format=json > leanengine.logs
+tds logs --from=2017-07-01 --to=2017-07-07 --format=json > leanengine.logs
 ```
 
 `--from`、`--to` 的时区为本地时区（运行 lean-cli 命令行工具的机器的本地时区）。
 
-## 多应用管理
+</details>
 
-一个项目的代码可以同时部署到多个云服务应用上。
+## 连接到云端的 LeanDB
 
-### 查看当前应用状态
-
-使用 `tds info` 可以查看当前项目关联的应用：
-
-```sh
-$ tds info
-[INFO] Retrieving user info from region: cn
-[INFO] Retrieving app info ...
-[INFO] Current region:  cn User: lan (lan@leancloud.rocks)
-[INFO] Current region: cn App: AwesomeApp (xxxxxx)
-[INFO] Current group: web
-```
-
-此时，执行 `deploy`、`publish`、`logs` 等命令都是针对当前被激活的应用。
-
-### 切换应用
-
-如果需要将当前项目切换到其他应用，可以使用 `switch` 命令：
-
-```sh
-$ tds switch
-```
-
-之后运行向导会给出可供切换的应用列表。
-
-另外还可以直接执行 `$ tds switch 其他应用的id` 来快速切换关联应用。
-
-## 贡献
-
-`lean-cli` 是开源项目，基于 [Apache](https://github.com/leancloud/lean-cli/blob/master/LICENSE.txt) 协议，源码托管在  <https://github.com/leancloud/lean-cli>，欢迎大家贡献。
+<LeandbCliAccess />

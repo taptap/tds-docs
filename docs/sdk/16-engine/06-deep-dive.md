@@ -4,7 +4,7 @@ title: 深入了解云引擎
 sidebar_label: 深入了解
 ---
 
-:::tip
+:::note
 这篇文档希望向有经验的开发者介绍云引擎背后的更多细节，如希望快速地开始使用云引擎，请查看 [云引擎开发指南](/sdk/engine/cloud-engine)。
 :::
 

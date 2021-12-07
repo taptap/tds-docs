@@ -44,7 +44,7 @@ LeanCache 使用 [Redis](http://redis.io/) 提供了高性能、高可用的 Key
 
 ### 创建实例
 
-<LeandbCreateInstance>
+<LeandbCreateInstance instanceName='LeanCache'>
 
 - **实例名称** 用于在云引擎中通过环境变量引用到该 LeanDB 实例，在账户下需唯一。
 - **数据删除策略** 内存用满时的删除策略，默认为 `volatile-lru`，详见 [数据删除策略](#数据删除策略)
@@ -85,7 +85,7 @@ LeanDB 所在的应用的云引擎在部署时，会被注入几个包含 Redis 
 
 - `REDIS_URL_<NAME>`
 
-其中 `<NAME>` 是你在创建 LeanDB 时为它指定的名字，如果你的 LeanDB 名为 `MYRDB` 的话，就会有名为 `REDIS_URL_MYRDB` 的环境变量（以及其他三个）。
+其中 `<NAME>` 是你在创建 LeanDB 时为它指定的名字，如果你的 LeanDB 名为 `MYRDB` 的话，就会有名为 `REDIS_URL_MYRDB` 的环境变量。
 
 <EngineRuntimes>
 <TabItem value='nodejs'>

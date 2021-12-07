@@ -5,21 +5,43 @@ sidebar_label: LeanDB MongoDB
 ---
 
 import EngineRuntimes from '/src/docComponents/MultiLang/engine';
+import LeandbCliAccess from '../_partials/leandb-cli-access.mdx';
+import LeandbCreateInstance from '../_partials/leandb-create-instance.mdx';
 
-LeanDB 是 LeanCloud 推出的数据库托管方案，开发者可以在「控制台 => 云引擎 => LeanDB」中创建托管在 LeanCloud 的数据库实例，这篇文章主要介绍其中的 MongoDB 数据库。
+LeanDB MySQL 是云引擎提供的托管数据库，开发者可以在云引擎中使用 MongoDB 客户端类库连接，访问完整的 MongoDB 功能，更多其他托管数据库请查看 [云引擎总览]。
 
-开发者可以在云引擎中连接到自己的 LeanDB 实例，使用通用的 MongoDB 客户端类库，访问完整的 MongoDB 功能。
+## 创建和管理实例
+开发者可以在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 云引擎 > MySQL** 页面创建和管理 LeanDB 实例。
 
-## 实例规格
+### 创建实例
 
-- LeanDB MongoDB 提供 MongoDB 4.0 版本。
-- LeanDB MongoDB 的规格分为 `512`、`1024`、`2048`、`4096`、`8192` 几种，代表不同的运算能力。
-- 每种规格有固定的连接数和存储空间限制，如需要更多连接数或存储空间需要升级到更高的规格。
-- 具体的价格可以在控制台上点击「创建 LeanDB 实例」来查看。
+<LeandbCreateInstance>
+
+- **实例规格** 目前提供 `512M`、`1GB`、`2GB`、`4GB`、`8GB` 几种，代表不同的运算能力，是计费的基础。
+
+每种规格有固定的连接数和存储空间限制，如需要更多连接数或存储空间需要升级到更高的规格。
+
+</LeandbCreateInstance>
+
+### MongoDB 版本
+
+目前 LeanDB 仅提供 MongoDB 4.0 版本。
+
+### 在线扩容
+
+目前 LeanDB MongoDB 不提供自助扩容的能力，如需扩容请提交工单联系我们的技术支持。
+
+### 管理共享
+
+可以使用控制台上的「管理共享」功能将 LeanCache 实例共享给其他应用，被共享的应用的 LeanCache 页面可能看到这个实例，相关的环境变量也会出现在其他应用的云引擎中。
 
 ## 在云引擎中使用
 
-LeanDB 所在的应用的云引擎在部署时，会被注入包含 MongoDB 连接字符串的环境变量 `MONGODB_URL_<NAME>`，其中 `<NAME>` 是你在创建 LeanDB 时为它指定的名字，如果你的 LeanDB 名为 `MYDB` 的话，就会有名为 `MONGODB_URL_MYDB` 的环境变量。
+LeanDB 所在的应用的云引擎在部署时，会被注入几个包含 Redis 连接信息的环境变量，包括：
+
+- `MONGODB_URL_<NAME>`
+
+其中 `<NAME>` 是你在创建 LeanDB 时为它指定的名字，如果你的 LeanDB 名为 `MYDB` 的话，就会有名为 `MONGODB_URL_MYDB` 的环境变量。
 
 <EngineRuntimes>
 <TabItem value='nodejs'>
@@ -53,9 +75,9 @@ app.get('/', (req, res) => {
 </TabItem>
 </EngineRuntimes>
 
-## 常见问题
+## 管理数据
+除了在云引擎中通过编程的方式访问 LeanDB，我们还提供了用于进行管理、调试或一次性数据操作的方式。
 
-- 目前 LeanDB 只支持从云引擎中访问，在本地调试时无法访问。
-- 目前 LeanDB 不提供自助扩容的能力，如需扩容请提交工单联系我们的技术支持。
-- 如账户欠费超过 3 天，LeanDB 及其中的数据会被彻底删除。
-- LeanDB 每天扣费，不足一天按照一天扣费。
+### 使用命令行工具连接
+
+<LeandbCliAccess />

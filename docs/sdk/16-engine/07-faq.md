@@ -482,28 +482,10 @@ app.get('/1.1/_ops/functions/metadatas', function(req, res) {
 云引擎底层有一套缓存机制以加速构建过程，所以部署时显示的「存储镜像到仓库」后面的大小表示本次构建新产生的数据，可用于评估是否利用到了缓存，不代表整个项目的大小。
 
 ## 命令行工具
-### 使用 Homebrew 安装命令行工具失败
-
-有些地区 Homebrew 访问网络可能很慢，可以通过设置环境变量 `http_proxy`、`https_proxy`、`all_proxy` 加速访问（详见 [man brew]），或者也可以配置 Homebrew [索引][tuna]和[二进制预编译包][tuna-bottles]的镜像。
-
-[man brew]: https://docs.brew.sh/Manpage
-[tuna]: https://mirror.tuna.tsinghua.edu.cn/help/homebrew/
-[tuna-bottles]: https://mirrors.tuna.tsinghua.edu.cn/help/homebrew-bottles/
-
-或者也可以在 [GitHub releases 页面]下载适用于 macOS 的二进制文件，重命名为 `lean`　后移动到 `$PATH` 下的路径，并添加可执行权限（`chmod a+x /path/to/lean`）。
-如果运行 `lean` 时 macOS 报错「来自身份不明的开发者」，那么需要在 macOS 系统设置「隐私与安全」下配置一下，详见 [Apple 官方文档][HT202491]。
-
-[GitHub releases 页面]: https://releases.leanapp.cn/#/leancloud/lean-cli/releases
-[HT202491]: https://support.apple.com/en-us/HT202491
 
 ### 之前使用 `npm` 装过旧版的命令行工具，如果升级到新版？
 
 如果之前使用 `npm` 安装过旧版本的命令行工具，为了避免与新版本产生冲突，建议使用 `npm uninstall -g leancloud-cli` 卸载旧版本命令行工具。或者直接按照 `homebrew` 的提示，执行 `brew link --overwrite lean-cli` 覆盖掉之前的 `lean` 命令来解决。
-
-### 命令行工具初始化项目时报错 `please login first`，可是之前明明已经通过 `lean login` 成功登录了？
-
-如果通过 `lean login` 登录的账号名下没有 LeanCloud 应用，会碰到这一问题。
-需要创建一个应用再重新运行一下 `lean login`，之后就可以正常使用了。
 
 ### 使用命令行工具部署失败怎么办？
 

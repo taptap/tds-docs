@@ -1,5 +1,5 @@
 ---
-id: cloud-function
+id: guide
 title: 云函数和 Hook 开发指南
 sidebar_label: 开发指南
 ---
