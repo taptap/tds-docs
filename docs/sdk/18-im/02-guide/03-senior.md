@@ -6,6 +6,7 @@ sidebar_label: 权限与聊天室
 
 import MultiLang from '/src/docComponents/MultiLang';
 import Mermaid from '/src/docComponents/Mermaid';
+import {Distributions} from '/src/docComponents/distributions';
 
 
 
@@ -1455,7 +1456,21 @@ await chatRoom.mute();
 敏感词文件为 UTF-8 编码的纯文本文件，一行一个敏感词。
 开发者上传的自定义敏感词词库会替换默认提供的词库。
 
-如果开发者有较为复杂的过滤需求，我们推荐使用云引擎 hook `_messageReceived` 来实现过滤，在 hook 中开发者对消息的内容有完全的控制力。
+<Distributions brand='tds'>
+
+如果开发者有较为复杂的过滤需求，我们推荐开发者接入[文本检测](/sdk/text-moderation/features/)服务。
+文本检测基于 AI 及多重识别策略，及时、准确、高效地抵御政治、暴恐、色情、辱骂等违规内容风险。
+开发者可以在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 即时通讯 > 设置 > 消息敏感词过滤** 中修改过滤方式为「接入文本检测服务」。
+
+开发者也可以使用云引擎 hook `_messageReceived` 来实现过滤，在 hook 中开发者对消息的内容有完全的控制力。
+
+</Distributions>
+
+<Distributions brand='leancloud'>
+
+如果开发者有较为复杂的过滤需求，可以使用云引擎 hook `_messageReceived` 来实现过滤，在 hook 中开发者对消息的内容有完全的控制力。
+
+</Distributions>
 
 ## 使用临时对话
 
@@ -1544,7 +1559,7 @@ try {
 
 </MultiLang>
 
-与其他对话类型不同的是，临时对话有一个 **重要** 的属性：TTL。它标记着这个对话的有效期，系统默认是 1 天，但是在创建对话的时候是可以指定这个时间的，最高不超过 30 天。如果您的需求是一定要超过 30 天，请使用普通对话。传入 TTL 创建临时对话的代码如下：
+与其他对话类型不同的是，临时对话有一个 **重要** 的属性：TTL。它标记着这个对话的有效期，系统默认是 1 天，但是在创建对话的时候是可以指定这个时间的，最高不超过 30 天。如果你的需求是一定要超过 30 天，请使用普通对话。传入 TTL 创建临时对话的代码如下：
 
 <MultiLang>
 

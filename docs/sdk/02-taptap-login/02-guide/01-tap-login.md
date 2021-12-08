@@ -6,7 +6,7 @@ sidebar_label: 单纯认证
 
 import MultiLang from '/src/docComponents/MultiLang';
 
-如果您仅仅只需要接入 TapTap 这一种登录方式，确认不使用 TDS 其他云服务，可以看这里的文档。请注意，如果刚开始只选择接入「TapTap 登录」，后面又需要使用其他云服务的话，后期可能有一定的升级成本。
+如果你仅仅只需要接入 TapTap 这一种登录方式，确认不使用 TDS 其他云服务，可以看这里的文档。请注意，如果刚开始只选择接入「TapTap 登录」，后面又需要使用其他云服务的话，后期可能有一定的升级成本。
 
 使用原来 TapSDK v1.x 版本的开发者，也可以参考这里的说明来完成 TapSDK 的升级。
 
@@ -96,7 +96,7 @@ try
     // 在 iOS、Android 系统下，会唤起 TapTap 网页 或者 TapTap 客户端进行登录
     // 在其他平台，会显示二维码，玩家可以通过移动设备上的 TapTap 客户端扫码登录
     var accessToken = await TapLogin.Login();
-    Debug.Log($"LeeJiEun 登录成功 accessToken: {accessToken.ToJson()}");
+    Debug.Log($"TapTap 登录成功 accessToken: {accessToken.ToJson()}");
 }
 catch (Exception e)
 {
@@ -112,7 +112,7 @@ catch (Exception e)
 
 // 获取 TapTap Profile  可以获得当前用户的一些基本信息，例如名称、头像。
 var profile = await TapLogin.FetchProfile();
-Debug.Log($"LeeJiEun 登录成功 profile: {profile.ToJson()}");
+Debug.Log($"TapTap 登录成功 profile: {profile.ToJson()}");
 ```
 
 ```java
@@ -184,7 +184,17 @@ if ([TapLoginHelper currentProfile]) {
 
 ```cs
 // 获取登录状态
-await TapLogin.GetAccessToken();
+try 
+{
+    var accesstoken = await TapLogin.GetAccessToken();
+    Debug.Log("已登录");
+    // 直接进入游戏
+} 
+catch (Exception e)
+{
+    Debug.Log("当前未登录");
+    // 开始登录
+}
 
 // 获取用户信息
 await TapLogin.GetProfile();

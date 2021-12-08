@@ -244,10 +244,36 @@ SDK 支持两种防沉迷授权方式：
 1. 使用 TapTap 快速认证，传入玩家的唯一标识和 TapTap 的鉴权信息，TDS 云端会根据相应玩家在 TapTap 的实名信息判断玩家是否可以进行游戏。
 2. 不使用 TapTap 快速认证，玩家在 SDK 提供的界面中手动输入身份证号等实名信息，TDS 云端会将相应信息上报至中宣部防沉迷实名认证系统。
 
-这两种方式都需要传入的玩家唯一标识，该标识由游戏自己定义。
-如果使用 TDS 内建账户系统，可以使用玩家的 `objectId`。
-
 ### TapTap 快速认证
+
+使用 TapTap 快速认证需要接入 [TapTap 登录](/sdk/taptap-login/features/)功能。
+
+游戏可以选择通过[TDS 内建账户系统](/sdk/taptap-login/guide/start/#用-taptap-oauth-授权结果直接登录账户系统)接入 TapTap 登录，或者以[单纯 TapTap 用户认证](/sdk/taptap-login/guide/tap-login/#taptap-登录并获取登录结果)的方式接入 TapTap 登录。
+
+客户端可以在玩家完成 TapTap 登录之后，通过如下接口获取 TapTap 的 `access token`：
+
+<MultiLang>
+
+```cs
+AccessToken accessToken = TapLogin.GetAccessToken();
+string tapTapAccessToken = JsonUtility.ToJson(accessToken);
+```
+
+```java
+AccessToken accessToken = TapLoginHelper.getCurrentAccessToken();
+String tapTapAccessToken = accessToken.toJsonString();
+```
+
+```objc
+TTSDKAccessToken *accessToken = [TapLoginHelper currentAccessToken];
+NSString *tapTapAccessToken = [accessToken toJsonString];
+```
+
+</MultiLang>
+
+传入 `access token` 和玩家唯一标识 `userIdentifier`，开始 TapTap 快速认证。
+
+其中的**玩家唯一标识** `userIdentifier`，如果接入 [TDS 内建账户系统](/sdk/taptap-login/guide/start/#用-taptap-oauth-授权结果直接登录账户系统)，可以用玩家的 `objectId`；如果使用[单纯 TapTap 用户认证](/sdk/taptap-login/guide/tap-login/#taptap-登录并获取登录结果)则可以用 `openid` 或 `unionid`。
 
 <MultiLang>
 
@@ -278,6 +304,8 @@ userIdentifier:userIdentifier tapAccesssToken:tapTapAccessToken];
 
 ### 手动输入实名信息
 
+如果不使用 TapTap 快速认证，可以通过下面的接口开始防沉迷授权。需要传入的**玩家唯一标识** `userIdentifier`，由游戏自己定义。
+
 <MultiLang>
 
 ```cs
@@ -294,31 +322,6 @@ AntiAddictionUIKit.startup(activity, false, userIdentifier, "");
 NSString *userIdentifier = @"玩家的唯一标识";
 [AntiAddiction startUpUseTapLogin:NO
 userIdentifier:userIdentifier tapAccesssToken:@""];
-```
-
-</MultiLang>
-
-### 获取 TapTap Access Token
-
-初始化时需要传入 TapTap 的 `access token`，以便从 TapTap 获取玩家的实名信息。
-
-无论游戏使用[TDS 内建账户系统](/sdk/taptap-login/guide/start/#用-taptap-oauth-授权结果直接登录账户系统)，还是使用[单纯 TapTap 用户认证](/sdk/taptap-login/guide/tap-login/#taptap-登录并获取登录结果)的方式接入 TapTap 登录，在玩家已登录 TapTap 的情况下，都可以通过如下接口获取 TapTap 的 `access token`：
-
-<MultiLang>
-
-```cs
-AccessToken accessToken = TapLogin.GetAccessToken();
-string tapTapAccessToken = JsonUtility.ToJson(accessToken);
-```
-
-```java
-AccessToken accessToken = TapLoginHelper.getCurrentAccessToken();
-String tapTapAccessToken = accessToken.toJsonString();
-```
-
-```objc
-TTSDKAccessToken *accessToken = [TapLoginHelper currentAccessToken];
-NSString *tapTapAccessToken = [accessToken toJsonString];
 ```
 
 </MultiLang>
@@ -716,7 +719,7 @@ POST /addict/api/v1/playcheck
         "remain_time": {{remainTime}},
         "cost_time": {{costtime}},
         "restrict_type":1,
-        "title":"健康游戏提示","description":"您当前为未成年账号，已被纳入防沉迷系统。根据国家相关规定，周五、周六、周日及法定节假日 20 点 - 21 点之外为健康保护时段。您今日游戏时间还剩余${remianTime}分钟，请注意适当休息。"
+        "title":"健康游戏提示","description":"你当前为未成年账号，已被纳入防沉迷系统。根据国家相关规定，周五、周六、周日及法定节假日 20 点 - 21 点之外为健康保护时段。你今日游戏时间还剩余${remainTime}分钟，请注意适当休息。"
     }
 }
 
@@ -731,7 +734,7 @@ POST /addict/api/v1/playcheck
         "cost_time": 60,
         "restrict_type":1,
         "title":"健康游戏提示",
-        "description":"您当前为未成年账号，已被纳入防沉迷系统。根据国家相关规定，周五、周六、周日及法定节假日 20 点 - 21 点之外为健康保护时段。当前时间段无法游玩，请合理安排时间。"
+        "description":"你当前为未成年账号，已被纳入防沉迷系统。根据国家相关规定，周五、周六、周日及法定节假日 20 点 - 21 点之外为健康保护时段。当前时间段无法游玩，请合理安排时间。"
     }
 }
 ```
