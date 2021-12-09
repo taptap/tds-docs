@@ -11,27 +11,95 @@ import BuildingBuildLogs from '../_partials/building-build-logs.mdx';
 import NodejsSetupDependencies from '../_partials/nodejs-setup-dependencies.mdx';
 import CloudLoadBalancer from '../_partials/cloud-load-balancer.mdx';
 import CloudCustomDomain from '../_partials/cloud-custom-domain.mdx';
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import QuickStartDeploy from '../_partials/quick-start-deploy.mdx';
+
+云引擎同样对托管 Web 前端应用（例如一个网站）提供了支持，对于使用了 React、Vue 等框架的应用，云引擎可以在线上完成构建的过程，开发者不需要将构建产物提交进 Git 仓库也不需要额外的 CI 环境。云引擎还提供了自定义域名绑定、自动申请 SSL 证书、重定向到 HTTPS 等常用的功能，减轻前端开发者在部署和运维环节的工作量。
 
 :::info
-这篇文档是针对 Web 前端运行环境的深入介绍，如希望快速地开始使用云引擎，请查看 [云引擎开发指南 § 快速开始](/sdk/engine/cloud-engine#快速开始)。
+这篇文档是针对 Web 前端运行环境的介绍，如需了解云引擎平台提供的功能，请看 [云引擎平台功能](/sdk/engine/deploy/platform)。
 :::
 
-云引擎支持通过两种方式部署 Web 前端项目：
+如果项目根目录包含一个 `static.json` 或 `index.html`，云引擎就会将其识别为 Web 前端项目，使用 Node.js 运行环境进行构建，然后自动使用 [serve](https://www.npmjs.com/package/serve) 来启动一个 HTTP 服务器。
 
-- **纯静态项目** 只需项目根目录包含一个 `index.html`，云引擎会自动使用 serve 来启动一个 HTTP 服务器。
-- **Node.js 构建的项目** 需要项目根目录包含 `package.json`，云引擎会将其视作 Node.js 项目进行构建和运行。
+## 快速开始
 
-下面会分别介绍这两种部署方式。
+大多前端脚手架都可以通过简单地配置运行在云引擎上，推荐使用它们来创建新的项目。
 
-## 纯静态项目
+<Tabs>
+<TabItem value='react' label='React' default>
 
-只需项目根目录包含一个 `index.html`（或 `static.json`），云引擎会自动使用 [serve](https://www.npmjs.com/package/serve) 来启动一个 HTTP 服务器。
+[create-react-app](https://create-react-app.dev/) 提供了开箱即用的 React 工具链，会自动配置好 React 的构建工具链，让开发者能专注在核心功能上：
 
-如果你希望创建一个新的项目，推荐从我们的 [纯静态示例项目](https://github.com/leancloud/static-getting-started) 开始。
+```sh
+npx create-react-app react-for-engine --use-npm
+```
 
-### 配置 serve
+然后切换到项目目录（上面的例子中是 `react-for-engine`）创建一个配置文件 `static.json` 将不存在的 URL 都重写到 `index.html`，以便我们的单页应用可以使用自己的前端路由（如 `react-router`）：
 
-你可以在项目根目录创建一个 `static.json` 来配置 serve 的行为：
+```json title='static.json'
+{
+  "public": "build",
+  "rewrites": [
+    { "source": "**", "destination": "/index.html" }
+  ]
+}
+```
+
+再创建一个 `leanengine.yaml` 来配置构建命令：
+
+```yaml title='leanengine.yaml'
+build: npm run build
+```
+
+</TabItem>
+<TabItem value='vue' label='Vue'>
+
+可以使用官方的 [Vue CLI](https://cli.vuejs.org/)：
+
+```sh
+npm install -g @vue/cli
+vue create vue-for-engine
+```
+
+然后切换到项目目录（上面的例子中是 `vue-for-engine`）创建一个配置文件 `static.json` 将不存在的 URL 都重写到 `index.html`，以便我们的单页应用可以使用自己的前端路由（如 `vue-router`）：
+
+```json title='static.json'
+{
+  "public": "dist",
+  "rewrites": [
+    { "source": "**", "destination": "/index.html" }
+  ]
+}
+```
+
+再创建一个 `leanengine.yaml` 来配置构建命令：
+
+```yaml title='leanengine.yaml'
+build: npm run build
+```
+
+</TabItem>
+</Tabs>
+
+云引擎可以在线上完成构建过程，开发者不需要将构建产物提交进 Git 仓库也不需要额外的 CI 环境。
+
+### 部署到云引擎
+
+<QuickStartDeploy noCustomDomain={true} />
+
+## 配置 Node.js 版本
+
+<NodejsSetupRuntime />
+
+## 安装依赖（`package.json`）
+
+<NodejsSetupDependencies />
+
+## 配置 serve
+
+你可以在项目根目录创建一个 `static.json` 来配置 serve 的行为。
 
 ```json title='static.json'
 {
@@ -43,73 +111,6 @@ import CloudCustomDomain from '../_partials/cloud-custom-domain.mdx';
 ```
 
 更多 serve 的选项和用法见 [serve-handler · Options](https://github.com/vercel/serve-handler#options)。
-
-## Node.js 构建的项目
-
-如果项目根目录包含 `package.json`，云引擎会将其视作 Node.js 项目进行构建和运行。
-
-应用需要自己启动一个 HTTP Server 来提供静态文件的访问，我们推荐使用 [serve](https://www.npmjs.com/package/serve) 模块：
-
-```sh
-npm install serve
-```
-
-在 `leanengine.yaml` 中添加：
-
-``` title='leanengine.yaml'
-run: $(npm bin)/serve -c static.json -l ${LEANCLOUD_APP_PORT}
-```
-
-### 使用 create-react-app
-
-如果你希望创建一个新的项目，推荐使用 [create-react-app](https://create-react-app.dev/) 来创建项目，它会自动配置好 React 的构建工具链，让开发者能专注在核心功能上：
-
-```sh
-npx create-react-app react-for-engine --use-npm
-```
-
-等待一小会，我们就可以在本地启动页面的预览了：
-
-```sh
-cd react-for-engine
-npm start # 会自动打开 http://localhost:3000
-```
-
-就像我们前面提到的，create-react-app 提供了开箱即用的 React 工具链，现在你可以编辑 `src/App.js` 中的代码，甚至不需要刷新就可以在浏览器中看到页面发生了变化。
-
-如果要把这个应用部署到云引擎的话，我们需要使用 serve 来启动 HTTP 服务：
-
-```sh
-npm install serve
-```
-
-然后为 serve 创建一个配置文件（`static.json`）这里我们将不存在的 URL 都重写到 index.html，以便我们的单页应用可以使用自己的前端路由（如 react-router）：
-
-```json title='static.json'
-{
-  "public": "build",
-  "rewrites": [
-    { "source": "**", "destination": "/index.html" }
-  ]
-}
-```
-
-再创建一个云引擎的配置文件（`leanengine.yaml`），来配置构建和启动 Web server 的命令：
-
-```yaml title='leanengine.yaml'
-build: npm run build
-run: $(npm bin)/serve -c static.json -l ${LEANCLOUD_APP_PORT}
-```
-
-这样云引擎可以在线上完成 React 的构建过程，开发者不需要将构建产物提交进 Git 仓库也不需要额外的 CI 环境。
-
-### 配置 Node.js 版本
-
-<NodejsSetupRuntime />
-
-### 安装依赖（`package.json`）
-
-<NodejsSetupDependencies />
 
 ## 自定义构建过程
 

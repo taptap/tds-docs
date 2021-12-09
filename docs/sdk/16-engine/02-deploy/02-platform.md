@@ -1,5 +1,5 @@
 ---
-id: cloud-engine
+id: platform
 title: 云引擎平台功能
 sidebar_label: 平台功能
 ---
@@ -10,7 +10,6 @@ import PlatformRuntimes from '../_partials/platform-runtimes.mdx';
 import EngineRuntimes from '/src/docComponents/MultiLang/engine';
 import {CLI_BINARY, BRAND, REGION} from '/src/constants/env.ts';
 import TabItem from '@theme/TabItem';
-import {Distributions} from '/src/docComponents/distributions';
 
 <PlatformIntroduction />
 
@@ -163,7 +162,16 @@ Switching to my-engine-app (group: web)`}
 
 云引擎对于每个应用都默认赠送一个 0.5 CPU、256 MB 的体验实例，可以免费使用，供开发者学习和测试云引擎。
 
-**体验实例会执行休眠策略**，没有请求时会休眠，有请求时启动（首次启动可能需要十几秒的时间），每天最多运行 18 个小时，详见 [云引擎 FAQ](/sdk/engine/guide/faq/)。
+**体验实例会执行休眠策略**，没有请求时会休眠，有请求时启动（首次启动可能需要十几秒的时间），每天最多运行 18 个小时。
+
+<details>
+<summary>点击展开体验实例休眠详情</summary>
+
+- 如果应用最近一段时间（半小时）没有任何外部请求，则休眠。
+- 休眠后如果有新的外部请求实例则马上启动。访问者的体验是第一个请求响应时间是 5 ~ 30 秒（视实例启动时间而定），后续访问响应速度恢复正常。
+- 强制休眠：如果最近 24 小时内累计运行超过 18 小时，则强制休眠。此时新的请求会收到 503 的错误响应码，该错误可在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 云引擎 > 云引擎分组 > 统计** 中查看。
+
+</details>
 
 ### 标准版云引擎
 

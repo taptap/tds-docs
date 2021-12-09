@@ -19,7 +19,7 @@ import CloudHealthCheck from '../_partials/cloud-health-check.mdx';
 import BuildingSystemDependencies from '../_partials/building-system-dependencies.mdx';
 
 :::info
-这篇文档是针对 Java 运行环境的深入介绍，如希望快速地开始使用云引擎，请查看 [云引擎开发指南 § 快速开始](/sdk/engine/cloud-engine#快速开始)。
+这篇文档是针对 Java 运行环境的深入介绍，如希望快速地开始使用云引擎，请查看 [快速开始部署云引擎应用](/sdk/engine/deploy/getting-started)。
 :::
 
 云引擎目前支持使用 Maven 构建出的 WAR 或 JAR 项目。也支持直接上传 WAR 包。
@@ -32,7 +32,7 @@ import BuildingSystemDependencies from '../_partials/building-system-dependencie
 :::caution
 Java 对内存的需求较高，体验版实例的 256M 内存可能会导致 Java 进程启动时内存不足而崩溃（OOM）导致部署失败，或运行时内存不足而频繁重启。
 
-我们建议 Java 项目至少选用 512 MB 以上的内存，Spring Boot 项目至少选用 1024 MB 以上的内存，并在之后的运行过程中根据内存用量统计随时调整。调整内存规格的方法详见 [云引擎开发指南 § 调整实例规格和数量](/sdk/engine/cloud-engine#调整实例规格和数量)。
+我们建议 Java 项目至少选用 512 MB 以上的内存，Spring Boot 项目至少选用 1024 MB 以上的内存，并在之后的运行过程中根据内存用量统计随时调整。调整内存规格的方法详见 [云引擎平台功能 § 调整实例规格和数量](/sdk/engine/deploy/platform#调整实例规格和数量)。
 :::
 
 ## 启动命令

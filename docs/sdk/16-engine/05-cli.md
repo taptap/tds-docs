@@ -5,7 +5,8 @@ sidebar_label: 命令行工具
 ---
 
 import LeandbCliAccess from './_partials/leandb-cli-access.mdx';
-import {Distributions} from '/src/docComponents/distributions';
+import QuickStartInit from './_partials/quick-start-init.mdx';
+import {Conditional} from '/src/docComponents/conditional';
 import {CLI_BINARY} from '/src/constants/env.ts';
 
 <p>命令行工具（<code>{CLI_BINARY}</code>）是用来部署云引擎应用和和进行其他管理操作的客户端工具。</p>
@@ -14,7 +15,7 @@ import {CLI_BINARY} from '/src/constants/env.ts';
 
 ### macOS
 
-<Distributions brand='leancloud'>
+<Conditional brand='leancloud'>
 
 推荐通过 [Homebrew](https://brew.sh/) 安装：
 
@@ -30,12 +31,12 @@ brew update && brew install lean-cli
 或者也可以在 [GitHub releases 页面] 下载适用于 macOS 的二进制文件，重命名为 `lean`　后移动到 `$PATH` 下的路径，并添加可执行权限（`chmod a+x /path/to/lean`）。
 </details>
 
-</Distributions>
-<Distributions brand='tds'>
+</Conditional>
+<Conditional brand='tds'>
 
 macOS 用户可以在 [GitHub releases 页面] 下载二进制文件 `tds-macos-x64`，赋予可执行权限（`chmod a+x tds-macos-x64`），重命名为 `tds`　后移动到 `$PATH` 下的路径，并添加可执行权限（`chmod a+x /path/to/tds`）。
 
-</Distributions>
+</Conditional>
 
 ### Windows
 
@@ -156,33 +157,7 @@ OPTIONS:
 
 登录完成之后，可以使用 `tds init` 命令来初始化一个项目，并且关联到已有的云服务应用上。
 
-```
-[?] Please select an app:
- 1) AwesomeApp
- 2) Foobar
-```
-
-选择项目语言／框架：
-
-```
-[?] Please select a language
- 1) Node.js
- 2) Python
- 3) Java
- 4) PHP
- 5) .Net
- 6）Go
- 7) Others
-```
-
-之后命令行工具会将此项目模版下载到本地，这样初始化就完成了：
-
-```
-[INFO] Downloading templates 6.33 KiB / 6.33 KiB [==================] 100.00% 0s
-[INFO] Creating project...
-```
-
-进入以应用名命名的目录就可以看到新建立的项目。
+<QuickStartInit noCliSetup={true} noCustomDomain={true} />
 
 ## 关联应用和分组
 
@@ -231,7 +206,7 @@ tds up
 $ tds debug --remote=http://remote-url-or-ip-address:remote-port --app-id=xxxxxx
 ```
 
-更多关于云引擎开发的内容，请参考[云引擎服务总览](/sdk/engine/guide/overview/)。
+更多关于云引擎开发的内容，请参考[云引擎服务总览](/sdk/engine/overview/)。
 
 ## 部署
 
@@ -305,7 +280,7 @@ tds deploy -g
 
 - `-g` 选项要求从 Git 仓库部署，Git 仓库地址必须已经在云引擎菜单中保存。
 - 默认部署使用 **master** 分支的最新代码，你可以通过 `-r <revision>` 来指定部署特定的 commit 或者 branch。
-- 设置 git repo 地址以及 deploy key 的方法可以参考[云引擎网站托管指南](/sdk/engine/guide/webhosting/)的《Git 部署》一节。
+- 设置 git repo 地址以及 deploy key 的方法可以参考 [云引擎平台功能 § Git 部署](/sdk/engine/deploy/platform/#git-部署)。
 
 ### 发布到生产环境
 
@@ -398,3 +373,81 @@ tds logs --from=2017-07-01 --to=2017-07-07 --format=json > leanengine.logs
 ## 连接到云端的 LeanDB
 
 <LeandbCliAccess />
+
+## 疑难问题
+
+### 使用命令行工具部署失败怎么办？
+
+部署失败有多种原因，请根据显示的报错信息耐心排查。
+一般来说，如果您使用命令行工具部署，首先建议您检查命令行工具是否是最新版，如果不是最新版，先升级到最新版再重试。
+
+### 之前使用 `npm` 装过旧版的命令行工具，如果升级到新版？
+
+如果之前使用 `npm` 安装过旧版本的命令行工具，为了避免与新版本产生冲突，建议使用 `npm uninstall -g leancloud-cli` 卸载旧版本命令行工具。或者直接按照 `homebrew` 的提示，执行 `brew link --overwrite lean-cli` 覆盖掉之前的 `lean` 命令来解决。
+
+### 命令行工具在本地调试时提示 `Error: listen EADDRINUSE :::3000`，无法访问应用
+
+`listen EADDRINUSE :::3000` 表示你的程序默认使用的 3000 端口被其他应用占用了，可以按照下面的方法找到并关闭占用 3000 端口的程序：
+
+* [macOS 使用 `lsof` 和 `kill`](http://stackoverflow.com/questions/3855127/find-and-kill-process-locking-port-3000-on-mac)
+* [Linux 使用 `fuser`](http://stackoverflow.com/questions/11583562/how-to-kill-a-process-running-on-particular-port-in-linux)
+* [Windows 使用 `netstat` 和 `taskkill`](http://stackoverflow.com/questions/6204003/kill-a-process-by-looking-up-the-port-being-used-by-it-from-a-bat)
+
+也可以修改命令行工具默认使用的 3000 端口：
+```
+lean -p 3002
+```
+
+### 如何通过命令行工具上传文件至文件服务？
+
+```sh
+$ lean upload public/index.html
+Uploads /Users/dennis/programming/avos/new_app/public/index.html successfully at: http://ac-7104en0u.qiniudn.com/f9e13e69-10a2-1742-5e5a-8e71de75b9fc.html
+```
+
+文件上传成功后会自动生成在云端的 URL，即上例中 `successfully at:` 之后的信息。
+
+上传 images 目录下的所有文件：
+
+```sh
+$ lean upload images/
+```
+
+### 同一个项目如何批量部署到多个应用的云引擎？
+
+可以通过 `lean switch` 切换项目所属应用，然后通过 `lean deploy` 部署。
+`lean switch` 支持通过参数以非交互的方式使用：
+
+```sh
+lean switch --region REGION --group GROUP_NAME APP_ID
+lean deploy --prod 1
+```
+
+上述命令中，`REGION` 代表应用所在区域，目前支持的值为 `cn-n1`（华北节点）、`cn-e1`（华东节点）、`us-w1`（国际版）。
+`--prod 1` 表示部署到生产环境，如果希望部署到预备环境，换成 `lean deploy` 即可。
+基于这两个命令可以自行编写 CI 脚本快速部署至多个应用的云引擎实例。
+
+
+### 如何扩展命令行工具的功能？
+
+有时我们需要对某个应用进行特定并且频繁的操作，比如查看应用 `_User` 表的记录总数，这样可以使用命令行工具的自定义命令来实现。
+
+只要在当前系统的 `PATH` 环境变量下，或者在项目目录 `.leancloud/bin` 下存在一个以 `lean-` 开头的可执行文件，比如 `lean-usercount`，那么执行 `$ lean usercount`，命令行工具就会自动调用这个可执行文件。与直接执行 `$ lean-usercount` 不同的是，这个命令可以获取与应用相关的环境变量，方便访问对应的数据。
+
+例如将如下脚本放到当前系统的 `PATH` 环境变量中（比如 `/usr/local/bin`）：
+
+```python
+#! /bin/env python
+
+import sys
+
+import leancloud
+
+app_id = os.environ['LEANCLOUD_APP_ID']
+master_key = os.environ['LEANCLOUD_APP_MASTER_KEY']
+
+leancloud.init(app_id, master_key=master_key)
+print(leancloud.User.query.count())
+```
+
+同时赋予这个脚本可执行权限 `$ chmod +x /usr/local/bin/lean-usercount`，然后执行 `$ lean usercount`，就可以看到当前应用对应的 `_User` 表中记录总数了。

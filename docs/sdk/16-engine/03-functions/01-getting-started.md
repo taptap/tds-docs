@@ -13,7 +13,7 @@ import EngineRuntimes from '/src/docComponents/MultiLang/engine';
 import TabItem from '@theme/TabItem';
 
 :::info
-这篇文档会帮助你快速地部署第一个云函数，如需了解云函数和 Hook 的详细功能请看 [云函数和 Hook 开发指南]。
+这篇文档会帮助你快速地部署第一个云函数，如需了解云函数和 Hook 的详细功能请看 [云函数和 Hook 开发指南](/sdk/engine/functions/guides)。
 :::
 
 <FunctionsIntroduction />
@@ -24,7 +24,7 @@ import TabItem from '@theme/TabItem';
 
 ## 创建项目
 
-<QuickStartInit />
+<QuickStartInit appName='my-functions' />
 
 ## 编写云函数
 
@@ -123,10 +123,10 @@ Hook 的编写和云函数很类似，在后文中我们会详细介绍云函数
 
 ## 部署到云引擎
 
-<QuickStartDeploy />
+<QuickStartDeploy noCustomDomain={true} />
 
 ## 更多
 
-接下来可以查看 [云函数和 Hook 开发指南] 来了解云函数开发的详细信息、查看 [云引擎平台功能] 来了解云引擎提供的更多功能，或查看专门的页面来了解具体运行环境的详情：
+接下来可以查看 [云函数和 Hook 开发指南](/sdk/engine/functions/guides) 来了解云函数开发的详细信息、查看 [云引擎平台功能] 来了解云引擎提供的更多功能，或查看专门的页面来了解具体运行环境的详情：
 
 <PlatformRuntimes />

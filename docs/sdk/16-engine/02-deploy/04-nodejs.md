@@ -20,7 +20,7 @@ import CloudHealthCheck from '../_partials/cloud-health-check.mdx';
 import BuildingSystemDependencies from '../_partials/building-system-dependencies.mdx';
 
 :::info
-这篇文档是针对 Node.js 运行环境的深入介绍，如希望快速地开始使用云引擎，请查看 [云引擎开发指南 § 快速开始](/sdk/engine/cloud-engine#快速开始)。
+这篇文档是针对 Node.js 运行环境的深入介绍，如希望快速地开始使用云引擎，请查看 [快速开始部署云引擎应用](/sdk/engine/deploy/getting-started)。
 :::
 
 所有 Node.js 项目都必须在根目录包含一个 [package.json](https://docs.npmjs.com/cli/v7/configuring-npm/package-json) 才会被云引擎正确识别，云引擎也会从中读取项目对于环境的需求：
@@ -347,3 +347,91 @@ npm ERR! peer dep missing: graphql@^0.10.0 || ^0.11.0, required by express-graph
 你可以在本地删除 node_modules，然后用 `npm install --production` 重新安装依赖来重现这个问题。
 
 或者，你也可以考虑将项目升级到 Node.js 10 以上的版本。
+
+### Node.js 项目如何打印 SDK 发出的网络请求？
+
+你可以通过设置一个 `DEBUG=leancloud:request` 的环境变量来打印由 SDK 发出的网络请求。在本地调试时你可以通过这样的命令启动程序：
+
+```sh
+env DEBUG=leancloud:request lean up
+```
+
+当有对 LeanCloud 的调用时，你可以看到类似这样的日志：
+
+```sh
+leancloud:request request(0) +0ms GET https://{{host}}/1.1/classes/Todo?&where=%7B%7D&order=-createdAt { where: '{}', order: '-createdAt' }
+leancloud:request response(0) +220ms 200 {"results":[{"content":"1","createdAt":"2016-08-09T06:18:13.028Z","updatedAt":"2016-08-09T06:18:13.028Z","objectId":"57a975a55bbb5000643fb690"}]}
+```
+
+我们不建议在线上生产环境开启这个日志，否则将会打印大量的日志。如有必要，可以指定 `DEBUG=leancloud:request:error`，只打印出错的网络请求。
+
+### Maximum call stack size exceeded 如何解决？
+
+**将 JavaScript SDK 和 Node SDK 升级到 1.2.2 以上版本可以彻底解决该问题。**
+
+如果你的应用时不时出现 `Maximum call stack size exceeded` 异常，可能是因为在 hook 中调用了 `AV.Object.extend`。有两种方法可以避免这种异常：
+
+- 升级 leanengine 到 v1.2.2 或以上版本
+- 在 hook 外定义 Class（即定义在 `AV.Cloud.define` 方法之外），确保不会对一个 Class 执行多次 `AV.Object.extend`
+
+### 跨域 POST 请求未携带 Cookie 怎么办？
+
+Chrome 80 起 `SameSite` 的默认值为 `Lax`，如果你的应用的前端没部署在云引擎上，又需要向云引擎发送携带 Cookie 的 POST 请求，那么需要设置 `SameSite` 为 `none`。
+`AV.Cloud.CookieSession` 会将所有参数都传递给浏览器的 `cookies.set()`，所以你可以将 `sameSite` 传入：
+
+```js
+AV.Cloud.CookieSession({sameSite: 'none'})
+```
+
+注意：
+
+0. `SameSite` 要求与 `Secure` 标记一同发送，因此请确保你的客户端是通过 HTTPS 协议访问云引擎的。
+1. 请仅在有必要的时候设置 `SameSite` 为 `none`，以免平白增加 CSRF 风险。
+
+### 为什么云函数中 include 的字段没有被完整地发给客户端？
+
+> 将 JavaScript SDK 和 Node SDK 升级到 3.0 以上版本可以彻底解决该问题。
+
+云函数在响应时会调用到 `AV.Object#toJSON` 方法，将结果序列化为 JSON 对象返回给客户端。在早期版本中 `AV.Object#toJSON` 方法为了防止循环引用，当遇到属性是 Pointer 类型会返回 Pointer 元信息，不会将 include 的其他字段添加进去，我们在 [JavaScript SDK 3.0](https://github.com/leancloud/javascript-sdk/releases/tag/v3.0.0) 中对序列化相关的逻辑做了重新设计，**将 JavaScript SDK 和 Node SDK 升级到 3.0 以上版本便可以彻底解决该问题**。
+
+如果暂时无法升级 SDK 版本，可以通过这样的方式绕过：
+
+```javascript
+AV.Cloud.define('querySomething', function(req, res) {
+  var query = new AV.Query('Something');
+  // user 是 Something 表的一个 Pointer 字段
+  query.include('user');
+  query.find().then(function(results) {
+    // 手动进行一次序列化
+    results.forEach(function(result){
+      result.set('user', result.get('user') ?  result.get('user').toJSON() : null);
+    });
+    // 再返回查询结果给客户端
+    res.success(results);
+  }).catch(res.error);
+});
+```
+
+Python SDK 也存在类似的问题，只会返回 Pointer 元信息，因此也需要额外进行一次查询并手动进行序列化。
+
+### RPC 调用云函数时，为什么会返回预期之外的空对象？
+
+使用 Node SDK 定义的云函数，如果返回一个不是 AVObject 的值，比如字符串、数字，RPC 调用得到的是空对象（`{}`）。
+类似地，如果返回一个包含非 AVObject 成员的数组，RPC 调用的结果中该数组的相应成员也会被序列化为 `{}`。
+这个问题将在 Node SDK 的下一个大版本（4.0）中修复。
+目前绕过这一个问题的方法是将返回结果放在对象（`{}`）中返回。
+
+### 如何使用云引擎批量更新数据？
+
+可以参考我们的 [Demo: batch-update](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/routes/batch-update.js)。
+
+#### 路由超时设置
+
+因为 Node.js 的异步调用容易因运行时错误或编码疏忽中断，为了减少在这种情况下对服务器内存的占用，也为了客户端能够更早地收到错误提示，所以需要添加这个设置，一旦发生超时，服务端会返回一个 HTTP 错误码给客户端。
+
+使用 Express 框架实现自定义路由的时候，请求默认的超时时间为 15 秒，该值可以在 `app.js` 中进行调整：
+
+```js
+// 设置默认超时时间
+app.use(timeout('15s'));
+```

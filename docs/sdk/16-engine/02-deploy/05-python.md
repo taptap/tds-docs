@@ -17,7 +17,7 @@ import CloudCustomDomain from '../_partials/cloud-custom-domain.mdx';
 import CloudInternetAddress from '../_partials/cloud-internet-address.mdx';
 
 :::info
-这篇文档是针对 Python 运行环境的深入介绍，如希望快速地开始使用云引擎，请查看 [云引擎开发指南 § 快速开始](/sdk/engine/cloud-engine#快速开始)。
+这篇文档是针对 Python 运行环境的深入介绍，如希望快速地开始使用云引擎，请查看 [快速开始部署云引擎应用](/sdk/engine/deploy/getting-started)。
 :::
 
 所有 Python 项目都必须在根目录下包含有 `wsgi.py` 和 `requirements.txt` 文件才会被云引擎正确识别。

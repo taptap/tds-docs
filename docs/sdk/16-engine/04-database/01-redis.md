@@ -7,8 +7,9 @@ sidebar_label: LeanCache
 import EngineRuntimes from '/src/docComponents/MultiLang/engine';
 import LeandbCliAccess from '../_partials/leandb-cli-access.mdx';
 import LeandbCreateInstance from '../_partials/leandb-create-instance.mdx';
+import TabItem from '@theme/TabItem';
 
-LeanCache 是云引擎提供的托管 Redis，开发者可以在云引擎中使用 Redis 客户端类库连接，访问完整的 Redis 功能，更多其他托管数据库请查看 [云引擎总览]。
+LeanCache 是云引擎提供的托管 Redis，开发者可以在云引擎中使用 Redis 客户端类库连接，访问完整的 Redis 功能，更多其他托管数据库请查看 [云引擎服务总览](/sdk/engine/overview)。
 
 LeanCache 使用 [Redis](http://redis.io/) 提供了高性能、高可用的 Key-Value 内存存储，主要用作缓存数据的存储，也可以用作持久化数据的存储。LeanCache 采用主从架构的 **高可用** 配置，通过 AOF 和 RDB 进行数据的持久化，还提供来在不中断服务的情况下在线扩容的能力。
 

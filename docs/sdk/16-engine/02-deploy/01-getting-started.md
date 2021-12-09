@@ -15,13 +15,12 @@ import TabItem from '@theme/TabItem';
 :::info
 这篇文档会帮助你快速地部署第一个云引擎应用，如需了解云引擎平台提供的功能，请看 [云引擎平台功能](/sdk/engine/deploy/platform)。
 
+如果仅希望使用云函数和 Hook 而不是部署通用的后端程序，请看 [快速开始部署云函数和 Hook](/sdk/engine/functions/getting-started)。
+
+如希望部署 Web 前端应用，请看 [云引擎 Web 前端运行环境 § 快速开始](/sdk/engine/deploy/webapp#快速开始)。
 :::
 
 <PlatformIntroduction />
-
-:::info
-如果仅希望使用云函数和 Hook 而不是部署通用的后端程序，请看 [快速开始部署云函数和 Hook](/sdk/engine/cloud-function#快速开始)。
-:::
 
 ## 创建项目
 
@@ -112,10 +111,8 @@ func Index(c echo.Context) error {
 
 <QuickStartDeploy />
 
-你可以在控制台绑定云引擎域名，绑定域名后，即可通过绑定域名访问你的应用。例如你在控制台绑定了 `web.example.com` 这个域名，即可通过 `https://web.example.com` 访问你的应用（生产环境）。
-
 ## 更多
 
-接下来可以查看 [云引擎平台功能] 来了解云引擎提供的更多功能，或查看专门的页面来了解具体运行环境的详情：
+接下来可以查看 [云引擎平台功能](/sdk/engine/deploy/platform) 来了解云引擎提供的更多功能，或查看专门的页面来了解具体运行环境的详情：
 
 <PlatformRuntimes />

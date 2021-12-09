@@ -7,8 +7,9 @@ sidebar_label: LeanDB MySQL
 import EngineRuntimes from '/src/docComponents/MultiLang/engine';
 import LeandbCliAccess from '../_partials/leandb-cli-access.mdx';
 import LeandbCreateInstance from '../_partials/leandb-create-instance.mdx';
+import TabItem from '@theme/TabItem';
 
-LeanDB MySQL 是云引擎提供的托管数据库，开发者可以在云引擎中使用 MySQL 客户端类库连接，访问完整的 MySQL 功能，更多其他托管数据库请查看 [云引擎总览]。
+LeanDB MySQL 是云引擎提供的托管数据库，开发者可以在云引擎中使用 MySQL 客户端类库连接，访问完整的 MySQL 功能，更多其他托管数据库请查看 [云引擎服务总览](/sdk/engine/overview)。
 
 ## 创建和管理实例
 开发者可以在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 云引擎 > MySQL** 页面创建和管理 LeanDB 实例。

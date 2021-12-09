@@ -18,7 +18,7 @@ import CloudHealthCheck from '../_partials/cloud-health-check.mdx';
 import BuildingSystemDependencies from '../_partials/building-system-dependencies.mdx';
 
 :::info
-这篇文档是针对 PHP 运行环境的深入介绍，如希望快速地开始使用云引擎，请查看 [云引擎开发指南 § 快速开始](/sdk/engine/cloud-engine#快速开始)。
+这篇文档是针对 PHP 运行环境的深入介绍，如希望快速地开始使用云引擎，请查看 [快速开始部署云引擎应用](/sdk/engine/deploy/getting-started)。
 :::
 
 所有 PHP 项目必须在根目录包含一个 `composer.json` 和 `public/index.php` 才会被云引擎正确识别。

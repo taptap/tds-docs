@@ -1,5 +1,5 @@
 ---
-id: guide
+id: guides
 title: 云函数和 Hook 开发指南
 sidebar_label: 开发指南
 ---
@@ -11,7 +11,7 @@ import Mermaid from '/src/docComponents/Mermaid';
 import TabItem from '@theme/TabItem';
 
 :::info
-这篇文档专注在「云函数和 Hook」这种云引擎上的特殊的应用场景，如需部署通用的后端应用，或需要了解云引擎平台提供的更多功能，请看 [云引擎开发指南](/sdk/engine/cloud-engine/)。
+这篇文档专注在「云函数和 Hook」这种云引擎上的特殊的应用场景，如需部署通用的后端应用，或需要了解云引擎平台提供的更多功能，请看 [云引擎平台功能](/sdk/engine/deploy/platform)。
 :::
 
 <FunctionsIntroduction />
@@ -1980,7 +1980,7 @@ v3|3.x|3.x|8| 需要使用 Promise 写法 |async, bluebird, crypto, debug, ejs, 
 <details>
 <summary>点击展开如何从在先编辑迁移到项目部署</summary>
 
-1. 按照[云引擎命令行工具使用指南](/sdk/engine/guide/cli/)安装命令行工具，使用 `lean init` 初始化项目，模板选择 `Node.js > Express`（我们的 Node.js 示例项目）。
+1. 按照[云引擎命令行工具使用指南](/sdk/engine/cli/)安装命令行工具，使用 `lean init` 初始化项目，模板选择 `Node.js > Express`（我们的 Node.js 示例项目）。
 2. 在**开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 云引擎 > 云引擎分组 > 部署 > 在线编辑**点击 **预览**，将全部函数的代码拷贝到新建项目中的 `cloud.js`（替换掉原有内容）。
 3. 运行 `lean up`，在 <http://localhost:3001> 的调试界面中测试云函数和 Hook，然后运行 `lean deploy` 部署代码到云引擎（使用标准实例的用户还需要执行 `lean publish`）。
 4. 部署后请留意云引擎控制台上是否有错误产生。
@@ -2078,7 +2078,7 @@ leancloud.Engine.Define("logTimer", func(req *FunctionRequest) (interface{}, err
 
 以 Cron 表达式为例，比如每周一早上 8 点打印日志（运行之前定义的 `logTimer` 函数），创建定时任务的时候，选择 **Cron 表达式** 并填入 `0 0 8 ? * MON`。
 
-Cron 表达式的语法可以参考[云队列指南](/sdk/engine/guide/cloudqueue/)的《Cron 表达式》一节。
+Cron 表达式的语法可以参考 [云队列（Cloud Queue）开发指南 § CRON 表达式](/sdk/engine/functions/cloud-queue/#cron-表达式) 。
 
 在配置定时任务时可以指定一些额外的非必填选项：
 
@@ -2096,6 +2096,76 @@ Cron 表达式的语法可以参考[云队列指南](/sdk/engine/guide/cloudqueu
 - `retryAt` 下次重试时间（仅限失败任务）
 
 定时任务的结果（执行日志）可以在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 云引擎 > 云引擎分组 > 日志** 中查看。
+
+## 生产环境和预备环境
+
+云引擎应用有「生产环境」和「预备环境」之分。在云引擎通过 SDK 调用云函数时，包括显式调用以及隐式调用（由于触发 hook 条件导致 hook 函数被调用），SDK 会根据云引擎所属环境（预备、生产）调用相应环境的云函数。例如，假定定义了 `beforeDelete` 云函数，在预备环境通过 SDK 删除一个对象，会触发预备环境的 `beforeDelete` hook 函数。
+
+在云引擎以外的环境通过 SDK 显式或隐式调用云函数时，`X-LC-Prod` 的默认值一般为 `1`，也就是调用生产环境。但由于历史原因，各 SDK 的具体行为有一些差异：
+
+- 在 Node.js、PHP、Java、C# 这三个 SDK 下，默认总是调用生产环境的云函数。
+- 在 Python SDK 下，配合 lean-cli 本地调试时，且应用存在预备环境时，默认调用预备环境的云函数，其他情况默认调用生产环境的云函数。
+- 云引擎 Java 环境的模板项目 [java-war-getting-started] 和 [spring-boot-getting-started] 做了处理，配合 lean-cli 本地调试时，且应用存在预备环境时，默认调用预备环境的云函数，其他情况默认调用生产环境的云函数（与 Python SDK 的行为一致）。
+
+[java-war-getting-started]: https://github.com/leancloud/java-war-getting-started/
+[spring-boot-getting-started]: https://github.com/leancloud/spring-boot-getting-started/
+
+你还可以在 SDK 中指定客户端将请求所发往的环境：
+
+<MultiLang>
+
+```cs
+LCCloud.IsProduction = true; // production (default)
+LCCloud.IsProduction = false; // stage
+```
+```java
+LCCloud.setProductionMode(true); // production
+LCCloud.setProductionMode(false); // stage
+```
+```objc
+[LCCloud setProductionMode:YES]; // production (default)
+[LCCloud setProductionMode:NO]; // stage
+```
+```swift
+// production by default
+
+// stage
+do {
+    let environment: LCApplication.Environment = [.cloudEngineDevelopment]
+    let configuration = LCApplication.Configuration(environment: environment)
+    try LCApplication.default.set(
+        id: {{appid}},
+        key: {{appkey}},
+        serverURL: "https://please-replace-with-your-customized.domain.com",
+        configuration: configuration)
+} catch {
+    print(error)
+}
+```
+```dart
+LCCloud.setProduction(true); // production (default)
+LCCloud.setProduction(false); // stage
+```
+```js
+AV.setProduction(true); // production (default)
+AV.setProduction(false); // stage
+```
+```python
+leancloud.use_production(True) # production (default)
+leancloud.use_production(False) # stage
+# 需要在 SDK 初始化语句 `leancloud.init` 之前调用
+```
+```php
+LeanClient::useProduction(true); // production (default)
+LeanClient::useProduction(false); // stage
+```
+```go
+// 暂不支持（总是使用生产环境）
+```
+
+</MultiLang>
+
+体验版云引擎应用只有「生产环境」，因此请不要切换到预备环境。
 
 ## 使用超级权限
 
