@@ -4,7 +4,7 @@ title: 接入问题
 
 **Q：游戏只有 AppID 没有 clientid，初始化时如何处理？**
 
-A：分别使用 [iOS SDK 文档](/03-sdk/03-iOS 接入文档.md "_blank")、[Android SDK 文档](/03-sdk/04-Android 接入文档.md "_blank")、[Unity SDK 文档](/03-sdk/05-unity.md "_blank") 里提到的初始化方式即可。
+A：分别使用 [iOS SDK 文档](/03-sdk/03-iOSsdk.md "_blank")、[Android SDK 文档](/03-sdk/04-Androidsdk.md "_blank")、[Unity SDK 文档](/03-sdk/05-unity.md "_blank") 里提到的初始化方式即可。
 
 
 **Q：SDK 初始化成功，为什么没有新增数据？**
