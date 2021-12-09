@@ -147,13 +147,7 @@ AntiAddictionUIKit.Init(gameIdentifier, useTimeLimit, usePaymentLimit,
 );
 ```
 
-</>
-<>
-
 如果游戏没有切换账号功能，可以在初始化阶段配置隐藏切换账号按钮：
-
-<MultiLang>
-<>
 
 ```cs
 string gameIdentifier = "游戏的 Client ID";
@@ -240,7 +234,6 @@ completionHandler:^(BOOL success) {
 
 
 </>
-
 </MultiLang>
 
 代码示例中的 `gameIdentifier`，是游戏的 `Client ID`，可以在控制台查看（**开发者中心 > 你的游戏 > 游戏服务 > 应用配置**）。
