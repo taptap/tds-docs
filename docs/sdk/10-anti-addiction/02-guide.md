@@ -128,33 +128,6 @@ string gameIdentifier = "游戏的 Client ID";
 bool useTimeLimit = true;
 // 是否启用消费限制功能
 bool usePaymentLimit = true;
-AntiAddictionUIKit.Init(gameIdentifier, useTimeLimit, usePaymentLimit,
-    (antiAddictionCallbackData) => {
-        int code = antiAddictionCallbackData.code;
-        MsgExtraParams extras = antiAddictionCallbackData.extras;
-        // 根据 code 不同提示玩家不同信息，详见下面的说明
-        if (code == 500)
-        {
-            // 开始计时
-            AntiAddictionUIKit.EnterGame();
-            Debug.Log("玩家登陆后判断当前玩家可以进行游戏");
-        }
-
-    },
-    (exception) => {
-        // 处理异常
-    },
-);
-```
-
-如果游戏没有切换账号功能，可以在初始化阶段配置隐藏切换账号按钮：
-
-```cs
-string gameIdentifier = "游戏的 Client ID";
-// 是否启用时长限制功能
-bool useTimeLimit = true;
-// 是否启用消费限制功能
-bool usePaymentLimit = true;
 // 是否显示切换账号按钮
 bool showSwitchAccount = false;
 
@@ -167,7 +140,7 @@ AntiAddictionUIKit.Init(gameIdentifier, useTimeLimit, usePaymentLimit, showSwitc
         {
             // 开始计时
             AntiAddictionUIKit.EnterGame();
-            Debug.Log("玩家登陆后判断当前玩家可以进行游戏");
+            Debug.Log("玩家登录后判断当前玩家可以进行游戏");
         }
 
     },
@@ -236,10 +209,19 @@ completionHandler:^(BOOL success) {
 </>
 </MultiLang>
 
-代码示例中的 `gameIdentifier`，是游戏的 `Client ID`，可以在控制台查看（**开发者中心 > 你的游戏 > 游戏服务 > 应用配置**）。
+### 参数说明
 
+- `gameIdentifier` 是游戏的 `Client ID`，可以在控制台查看（**开发者中心 > 你的游戏 > 游戏服务 > 应用配置**）。
 
-回调类型：
+- `useTimeLimit` 是否启用时长限制功能。如果使用这个功能，需要[上报游戏时长](#上报游戏时长)。
+
+- `usePaymentLimit` 是否启用消费限制功能。如果使用这个功能，需要[检查消费上限](#检查消费上限)。
+
+- `showSwitchAccount` 是否显示切换账号按钮。如果游戏没有切换账号功能，可以在初始化阶段配置隐藏切换账号按钮；如果游戏选择显示切换账号按钮(如下图所示)，玩家点击之后会触发 `1001` 回调，游戏可根据这个回调 code 做相应处理。
+
+![切换账号界面](/img/anti-addiction/switch-account.png)
+
+### 回调类型
 
 | 回调类型                          | code | 触发逻辑                                                     | 附带信息                     |
 | :-------------------------------- | :--- | :----------------------------------------------------------- | :------------------------- |
