@@ -147,8 +147,39 @@ AntiAddictionUIKit.Init(gameIdentifier, useTimeLimit, usePaymentLimit,
 );
 ```
 
+如果游戏没有切换账号功能，可以在初始化阶段配置隐藏切换账号按钮：
+
+```cs
+string gameIdentifier = "游戏的 Client ID";
+// 是否启用时长限制功能
+bool useTimeLimit = true;
+// 是否启用消费限制功能
+bool usePaymentLimit = true;
+// 是否显示切换账号按钮
+bool showSwitchAccount = false;
+
+AntiAddictionUIKit.Init(gameIdentifier, useTimeLimit, usePaymentLimit, showSwitchAccount,
+    (antiAddictionCallbackData) => {
+        int code = antiAddictionCallbackData.code;
+        MsgExtraParams extras = antiAddictionCallbackData.extras;
+        // 根据 code 不同提示玩家不同信息，详见下面的说明
+        if (code == 500)
+        {
+            // 开始计时
+            AntiAddictionUIKit.EnterGame();
+            Debug.Log("玩家登陆后判断当前玩家可以进行游戏");
+        }
+
+    },
+    (exception) => {
+        // 处理异常
+    },
+);
+```
+
 </>
 <>
+
 
 ```java
 // Android SDK 的各接口第一个参数是当前 Activity，以下不再说明
@@ -156,6 +187,7 @@ String gameIdentifier = "游戏的 Client ID";
 AntiAddictionFunctionConfig config = new AntiAddictionFunctionConfig.Builder()
     .enablePaymentLimit(true) // 是否启用消费限制功能
     .enableOnLineTimeLimit(true) // 是否启用时长限制功能
+    .showSwitchAccount(true)    // 是否显示切换账号按钮
     .build();
 AntiAddictionUIKit.init(activity, gameIdentifier, config,
     new AntiAddictionUICallback() {
@@ -179,9 +211,12 @@ AntiAddictionUIKit.init(activity, gameIdentifier, config,
 NSString *gameIdentifier = @"游戏的 Client ID";
 AntiAddictionConfiguration *config = AntiAddictionService.configuration;
 // 是否启用消费限制功能
-BOOL config.useSdkPaymentLimit = YES;
+config.useSdkPaymentLimit = YES;
 // 是否启用时长限制功能
-BOOL config.useSdkOnlineTimeLimit = YES;
+config.useSdkOnlineTimeLimit = YES;
+// 是否显示切换账号按钮
+config.showSwitchAccount = YES;
+
 [AntiAddiction initGameIdentifier:gameIdentifier antiAddictionConfig:config
 antiAddictionCallbackDelegate:self
 completionHandler:^(BOOL success) {
@@ -199,7 +234,6 @@ completionHandler:^(BOOL success) {
 
 
 </>
-
 </MultiLang>
 
 代码示例中的 `gameIdentifier`，是游戏的 `Client ID`，可以在控制台查看（**开发者中心 > 你的游戏 > 游戏服务 > 应用配置**）。
@@ -209,11 +243,12 @@ completionHandler:^(BOOL success) {
 
 | 回调类型                          | code | 触发逻辑                                                     | 附带信息                     |
 | :-------------------------------- | :--- | :----------------------------------------------------------- | :------------------------- |
-| `CALLBACK_CODE_LOGIN_SUCCESS`      | 500  | 玩家登录后判断当前玩家可以进行游戏                           | 有 |
+| `CALLBACK_CODE_LOGIN_SUCCESS`      | 500  | 玩家登录后判断当前玩家可以进行游戏                           | 无 |
 | `CALLBACK_CODE_NIGHT_STRICT`          | 1030 | 未成年玩家当前无法进行游戏                                         | 有 |
 | `CALLBACK_CODE_OPEN_ALERT_TIP`      | 1095 | 未成年允许游戏弹窗                                  | 有 |
 | `CALLBACK_CODE_LOGOUT` | 1000 | 退出账号 | 无                         |
 | `CALLBACK_CODE_REAL_NAME_STOP` | 9002 | 实名过程中点击了关闭实名窗 | 无 |          
+| `CALLBACK_CODE_SWITCH_ACCOUNT` | 1001 | 点击切换账号按钮（v1.0.2 新增） | 无 |         
 
 附带信息：
 
