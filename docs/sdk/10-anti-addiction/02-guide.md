@@ -250,7 +250,7 @@ completionHandler:^(BOOL success) {
 
 | 回调类型                          | code | 触发逻辑                                                     | 附带信息                     |
 | :-------------------------------- | :--- | :----------------------------------------------------------- | :------------------------- |
-| `CALLBACK_CODE_LOGIN_SUCCESS`      | 500  | 玩家登录后判断当前玩家可以进行游戏                           | 有 |
+| `CALLBACK_CODE_LOGIN_SUCCESS`      | 500  | 玩家登录后判断当前玩家可以进行游戏                           | 无 |
 | `CALLBACK_CODE_NIGHT_STRICT`          | 1030 | 未成年玩家当前无法进行游戏                                         | 有 |
 | `CALLBACK_CODE_OPEN_ALERT_TIP`      | 1095 | 未成年允许游戏弹窗                                  | 有 |
 | `CALLBACK_CODE_LOGOUT` | 1000 | 退出账号 | 无                         |
