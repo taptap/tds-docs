@@ -429,8 +429,8 @@ AntiAddictionUIKit.checkPayLimit(activity, amount,
     new Callback<CheckPayResult>() {
         @Override
         public void onSuccess(CheckPayResult result) {
-            // status 为 1 时可以支付
-            if (result.status != 1) {
+            // status 为 true 时可以支付，false 则限制消费
+            if (!result.status) {
                 // 限制消费提示标题
                 String title = result.title;
                 // 限制消费提示描述（例如法规说明）
