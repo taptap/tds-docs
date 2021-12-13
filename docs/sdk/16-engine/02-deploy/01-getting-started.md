@@ -7,6 +7,7 @@ sidebar_label: 快速开始
 import QuickStartInit from '../_partials/quick-start-init.mdx';
 import QuickStartDeploy from '../_partials/quick-start-deploy.mdx';
 import PlatformIntroduction from '../_partials/platform-introduction.mdx';
+import CloudCustomDomain from '../_partials/cloud-custom-domain.mdx';
 import PlatformRuntimes from '../_partials/platform-runtimes.mdx';
 import {CLI_BINARY} from '/src/constants/env.ts';
 import EngineRuntimes from '/src/docComponents/MultiLang/engine';
@@ -17,7 +18,7 @@ import TabItem from '@theme/TabItem';
 
 如果仅希望使用云函数和 Hook 而不是部署通用的后端程序，请看 [快速开始部署云函数和 Hook](/sdk/engine/functions/getting-started)。
 
-如希望部署 Web 前端应用，请看 [云引擎 Web 前端运行环境 § 快速开始](/sdk/engine/deploy/webapp#快速开始)。
+如希望部署 Web 前端应用，请看 [Web 前端运行环境 § 快速开始](/sdk/engine/deploy/webapp#快速开始)。
 :::
 
 <PlatformIntroduction />
@@ -28,7 +29,9 @@ import TabItem from '@theme/TabItem';
 
 <QuickStartInit />
 
-在示例项目中你可以使用这个语言的 Web 框架来定义路由，处理某一路径下的请求，在示例项目中可以看到一些例子：
+## 本地运行和调试
+
+你可以使用这个语言的 Web 框架来定义路由，处理某一路径下的请求，在示例项目中可以看到一些例子：
 
 <EngineRuntimes>
 <TabItem value='nodejs'>
@@ -95,8 +98,6 @@ func Index(c echo.Context) error {
 </TabItem>
 </EngineRuntimes>
 
-## 本地运行和调试
-
 在确保所有的依赖都正确安装之后，就可以在项目根目录用我们的命令行工具来启动本地运行了：
 
 <pre>
@@ -110,6 +111,14 @@ func Index(c echo.Context) error {
 ## 部署到云引擎
 
 <QuickStartDeploy />
+
+<Conditional if={!props.noCustomDomain}>
+
+<CloudCustomDomain noStaging={true} />
+
+例如你在控制台绑定了 `web.example.com` 这个域名，即可通过 `https://web.example.com` 访问你的应用（生产环境）。
+
+</Conditional>
 
 ## 更多
 

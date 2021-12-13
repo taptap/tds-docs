@@ -8,15 +8,17 @@ import MultiLang from '/src/docComponents/MultiLang';
 
 ## 云引擎功能
 
-### 云引擎都支持哪些语言
+### 云引擎都支持哪些语言？
 
-目前支持 Node.js、Python、Java、PHP、.Net、Go 运行环境，也支持基于 Node.js 的 Web 前端项目，未来可能还会引入其他语言，详见 [云引擎服务总览](/sdk/engine/overview/)。
+目前支持 Node.js、Python、Java、PHP、.Net、Go 运行环境，也支持基于 Node.js 的 Web 前端项目，详见 [云引擎服务总览](/sdk/engine/overview/)。
 
-### 云引擎支持托管纯静态网站吗
+如果你还需要其他运行环境的支持，欢迎向我们反馈。
+
+### 云引擎支持托管纯静态网站吗？
 
 支持，请看 [云引擎 Web 前端应用运行环境](/sdk/engine/deploy/webapp/)。
 
-### 云引擎支持 HTTPS 吗
+### 云引擎支持 HTTPS 吗？
 
 - 自定义域名在绑定时启用 SSL 即可支持 HTTPS。
 - 如需配置自动跳转，请看 [云引擎下如何重定向到 HTTPS？](#云引擎下如何重定向到-https？)。
@@ -25,11 +27,21 @@ import MultiLang from '/src/docComponents/MultiLang';
 
 服务不会中断。在代码部署时，系统会优先启动使用新版本代码的实例，待新实例通过了健康检查，系统修改路由将请求转发至新实例后，再关闭旧版本的实例，让服务保持零中断。
 
+### 云引擎和云函数是什么关系？
+
+云引擎是一个托管后端服务的平台，适用于所有的 Web 后端应用，对于程序内部的逻辑没有侵入。
+
+在此基础上，开发者可以选择在程序内接入云引擎的 SDK，来使用云函数和 Hook 等功能，云函数与 [数据存储](/sdk/storage/features/) 服务有深度的整合，对于已经在使用数据存储服务的开发会非常方便。
+
+不接入云引擎 SDK 也可以使用云函数以外的所有功能，云引擎也提供了业界广泛使用的 [Redis](/sdk/engine/database/redis/)、[MongoDB](/sdk/engine/database/mongo/) 和 [Elasticsearch](/sdk/engine/database/es/) 供开发者存储数据。
+
 ## 云函数
 
 ### 云函数有哪些限制？
 
-云函数是 LeanCloud 提供的一个 **相对受限** 的自定义服务器端逻辑的功能，和我们的 SDK 有比较 **深度的集成**。我们将云函数设计为一种类似 **RPC** 的机制，在云函数中你只能关注参数和结果，而不能自定义超时时间、HTTP Method、URL，不能读取和设置 Header。如果希望更加自由地使用这些 HTTP 的语义化功能，或者希望使用第三方的框架提供标准的 RESTful API，请使用云引擎的网站托管功能自行来处理 HTTP 请求。
+云函数是 LeanCloud 提供的一个 **相对受限** 的自定义服务器端逻辑的功能，和我们的 SDK 有比较 **深度的集成**。我们将云函数设计为一种类似 **RPC** 的机制，在云函数中你只能关注参数和结果，而不能自定义超时时间、HTTP method、URL，不能读取和设置 Header。
+
+如果希望更加自由地使用这些 HTTP 的语义化功能，或者希望使用第三方的框架提供标准的 RESTful API，请在你的应用中自行来处理 HTTP 请求而不是使用云函数。
 
 ### 云函数可以同时存在于多个分组么？
 
@@ -87,23 +99,9 @@ after 类 Hook 超时时间为 3 秒，如果你的体验实例已经休眠，�
 
 ## 部署
 
-### 云引擎的启动限制时间是多久？
-
-你的应用在启动时，云引擎的管理程序会每秒去检查你的应用是否启动成功，如果超过启动时间限制仍未启动成功，即认为启动失败。
-启动时间限制默认为 30 秒，如需延长或缩短，可以在 leanengine.yaml` 文件中指定 `startupTimeout`，可设置范围为 15 – 120 秒。
-
 ### 多次部署同一个项目时镜像大小为什么差别那么大？
 
 云引擎底层有一套缓存机制以加速构建过程，所以部署时显示的「存储镜像到仓库」后面的大小表示本次构建新产生的数据，可用于评估是否利用到了缓存，不代表整个项目的大小。
-
-### 云引擎中设置的环境变量无效？
-
-默认情况下，应用在运行阶段才能够读取到内置环境变量和自定义环境变量。
-如果希望在安装依赖或编译阶段就能读取到这些环境变量，需要在 `leanengine.yaml` 里设置：
-
-```yaml
-exposeEnvironmentsOnBuild: true
-```
 
 ### 部署时长时间卡在「正在下载和安装依赖」怎么办？
 
@@ -223,9 +221,7 @@ app.post('/todos', function (req, res) {
 例如：
 
 - Node.js 的 Express 框架可以使用 [cookie-session](https://github.com/expressjs/cookie-session) 组件。它和 `AV.Cloud.CookieSession` 组件可以并存。注意，Express 框架的 `express.session.MemoryStore` 在云引擎中是无法正常工作的，因为云引擎是多主机、多进程运行，因此内存型 session 是无法共享的。
-- Python 的 Flask 框架和 Django 框架都自带 session 组件。
 - PHP 可以使用 SDK 提供的 `CookieStorage` 保存会话属性。注意，PHP 默认的 `$_SESSION` 在云引擎中是无法正常工作的，因为云引擎是多主机、多进程运行，因此内存型 session 是无法共享的。
-
 
 ### 云引擎如何上传文件？
 

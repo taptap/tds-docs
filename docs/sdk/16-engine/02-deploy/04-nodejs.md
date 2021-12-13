@@ -421,10 +421,6 @@ Python SDK 也存在类似的问题，只会返回 Pointer 元信息，因此也
 这个问题将在 Node SDK 的下一个大版本（4.0）中修复。
 目前绕过这一个问题的方法是将返回结果放在对象（`{}`）中返回。
 
-### 如何使用云引擎批量更新数据？
-
-可以参考我们的 [Demo: batch-update](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/routes/batch-update.js)。
-
 #### 路由超时设置
 
 因为 Node.js 的异步调用容易因运行时错误或编码疏忽中断，为了减少在这种情况下对服务器内存的占用，也为了客户端能够更早地收到错误提示，所以需要添加这个设置，一旦发生超时，服务端会返回一个 HTTP 错误码给客户端。

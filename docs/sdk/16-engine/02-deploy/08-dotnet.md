@@ -1,7 +1,7 @@
 ---
 id: dotnet
 title: 云引擎 .NET 运行环境
-sidebar_label: .NET (C#)
+sidebar_label: .NET
 ---
 
 import CloudEnvironments from '../_partials/cloud-environments.mdx';

@@ -7,7 +7,7 @@ const runtimes = [
   {label: 'Python', value: 'python'},
   {label: 'PHP', value: 'php'},
   {label: 'Java', value: 'java'},
-  {label: '.Net (C#)', value: 'dotnet'},
+  {label: '.NET (C#)', value: 'dotnet'},
   {label: 'Go', value: 'go'}
 ]
 
