@@ -2122,7 +2122,7 @@ conv.sendMessage(m, new LCIMConversationCallback() {
 ```
 ```objc
 NSError *error = nil;
-LCFile *file = [AVFile fileWithLocalPath:localPath error:&error];
+LCFile *file = [LCFile fileWithLocalPath:localPath error:&error];
 if (!error) {
     LCIMAudioMessage *message = [LCIMAudioMessage messageWithText:@"听听人类的神曲" file:file attributes:nil];
     [conversation sendMessage:message callback:^(BOOL succeeded, NSError *error) {
