@@ -21,7 +21,7 @@ Node.js | >= 0.12 | NPM / Yarn | [Node.js 运行环境](/sdk/engine/deploy/nodej
 Python | >= 2.7 | pip | [Python 运行环境](/sdk/engine/deploy/python/) | [python-getting-started](https://github.com/leancloud/python-getting-started) (Flask)
 Java | 8, 11 - 15 | Maven | [Java 运行环境](/sdk/engine/deploy/java/) | [servlet-getting-started](https://github.com/leancloud/servlet-getting-started)<br />[spring-boot-getting-started](https://github.com/leancloud/spring-boot-getting-started)
 PHP | 5.6, 7.0 - 8.0 | Composer(v1) | [PHP 运行环境](/sdk/engine/deploy/php/) | [slim-getting-started](https://github.com/leancloud/slim-getting-started)
-.NET | 2.1 | dotnet | [.Net 运行环境](/sdk/engine/deploy/dotnet/) | [dotNET-getting-started](https://github.com/leancloud/dotNET-getting-started)
+.NET | 2.1 | dotnet | [.Net 运行环境](/sdk/engine/deploy/dotnet/) | [dotnet-core-getting-started](https://github.com/leancloud/dotnet-core-getting-started)
 Go | >= 1.10 | go mod | [Go 运行环境](/sdk/engine/deploy/go/) | [golang-getting-started](https://github.com/leancloud/golang-getting-started) (Echo)
 
 ## 云函数和 Hook

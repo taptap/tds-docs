@@ -5,7 +5,6 @@ sidebar_label: Python
 ---
 
 import BuildingScripts from '../_partials/building-scripts.mdx';
-import LeanstorageUsages from '../_partials/leanstorage-usages.mdx';
 import CloudLogs from '../_partials/cloud-logs.mdx';
 import CloudFilesystem from '../_partials/cloud-filesystem.mdx';
 import BuildingSystemDependencies from '../_partials/building-system-dependencies.mdx';
@@ -95,64 +94,6 @@ Flask>=1.0.0
 
 <CloudHealthCheck />
 
-## 云引擎 SDK
-云引擎 SDK 提供了云函数和 Hook 等功能的支持，但并不是必须的。
-
-### 接入云引擎 SDK
-模板项目已经集成了 Python SDK，并且包含 SDK 初始化的逻辑。
-
-如果项目自行接入 Web 框架，那么需要将 `leancloud` 添加到 `requirements.txt` 中，部署到线上即可自动安装此依赖。在本地运行和调试项目的时候，可以在项目目录下使用如下命令进行依赖安装：
-
-```sh
-pip install -r requirements.txt
-```
-
-同时也需要自行初始化 SDK。
-因为 `wsgi.py` 是项目最先被执行的文件，推荐在此文件进行 Python SDK 的初始化工作：
-
-```python
-import os
-import leancloud
-
-APP_ID = os.environ['LEANCLOUD_APP_ID']
-APP_KEY = os.environ['LEANCLOUD_APP_KEY']
-MASTER_KEY = os.environ['LEANCLOUD_APP_MASTER_KEY']
-
-leancloud.init(APP_ID, app_key=APP_KEY, master_key=MASTER_KEY)
-
-leancloud.use_master_key(True)
-```
-
-注意我们在云引擎中开启了 masterKey 权限，这将会跳过 ACL 和其他权限限制。
-
-### 使用数据存储服务
-
-<LeanstorageUsages />
-
-### CookieSessionMiddleware
-
-Python SDK 提供了一个 `leancloud.engine.CookieSessionMiddleware` 的 WSGI 中间件，使用 Cookie 来维护用户（`leancloud.User`）的登录状态。要使用这个中间件，可以在 `wsgi.py` 中将：
-
-```python
-application = engine
-```
-
-替换为：
-
-```python
-application = leancloud.engine.CookieSessionMiddleware(engine, secret=YOUR_APP_SECRET)
-```
-
-你需要传入一个 `secret` 的参数用于签名 Cookie（必须提供），这个中间件会将 `AV.User` 的登录状态信息记录到 Cookie 中，用户下次访问时自动检查用户是否已经登录，如果已经登录，可以通过 `leancloud.User.get_current()` 获取当前登录用户。
-
-`leancloud.engine.CookieSessionMiddleware` 初始化时支持的非必须选项包括：
-
-- **name**：在 cookie 中保存的 session token 的 key 的名称，默认为 `leancloud:session`。
-- **excluded_paths**：指定哪些 URL path 不处理 session token，比如在处理静态文件的 URL path 上不进行处理，防止无谓的性能浪费。接受参数类型 `list`。
-- **fetch_user**：处理请求时是否要从存储服务获取用户数据，如果为 `False` 的话，`leancloud.User.get_current()` 获取到的用户数据上除了 `session_token` 之外没有任何其他数据，需要自己调用 `fetch()` 来获取。为 `True` 的话，会自动在用户对象上调用 `fetch()`，这样将会产生一次数据存储的 API 调用。默认为 `False`。
-- **expires**：设置 cookie 的失效日期（参考 [Werkzeug Document](http://werkzeug.pocoo.org/docs/0.12/http/#werkzeug.http.dump_cookie)）。
-- **max_age**：设置 cookie 在多少秒后失效（参考 [Werkzeug Document](http://werkzeug.pocoo.org/docs/0.12/http/#werkzeug.http.dump_cookie)）。
-
 ## 云端环境
 
 ### 绑定自定义域名
@@ -184,10 +125,3 @@ application = leancloud.engine.CookieSessionMiddleware(engine, secret=YOUR_APP_S
 <CloudInternetAddress />
 
 ## 疑难问题
-### PyPI 上有 `leancloud-sdk` 和 `leancloud` 两个包，该用哪一个？
-
-请使用 `leancloud`。
-
-`leancloud-sdk` 是旧版的 Python SDK，已经不再维护。
-
-不同版本的差别详见 Python SDK 的[更新日志](https://github.com/leancloud/python-sdk/blob/master/changelog)。

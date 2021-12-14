@@ -6,7 +6,6 @@ sidebar_label: Java
 
 import {CLI_BINARY} from '/src/constants/env.ts';
 import CloudEnvironments from '../_partials/cloud-environments.mdx';
-import LeanstorageUsages from '../_partials/leanstorage-usages.mdx';
 import CloudTimezone from '../_partials/cloud-timezone.mdx';
 import CloudLogs from '../_partials/cloud-logs.mdx';
 import CloudInternetAddress from '../_partials/cloud-internet-address.mdx';
@@ -91,48 +90,6 @@ java.runtime.version=11
 ## 健康检查
 
 <CloudHealthCheck />
-
-## 云引擎 SDK
-云引擎 SDK 提供了云函数和 Hook 等功能的支持，但并不是必须的。
-
-### 接入云引擎 SDK
-模板项目已经集成了 [Java Unified SDK](https://github.com/leancloud/java-unified-sdk) 的 [engine-core](https://github.com/leancloud/java-unified-sdk/tree/master/leanengine) 模块，engine-core 又依赖于存储核心模块 storage-core，因此开发者可以直接使用云服务的数据存储功能。
-模板项目也包含了 SDK 初始化的逻辑。
-
-如果自行接入其他框架，则需要在 `pom.xml` 中增加依赖配置来增加 LeanEngine Java SDK 的依赖：
-
-```xml
-<dependencies>
-  <dependency>
-    <groupId>cn.leancloud</groupId>
-    <artifactId>engine-core</artifactId>
-    <version>7.2.6</version>
-  </dependency>
-</dependencies>
-```
-
-同时也需要自行初始化 SDK（注意我们在云引擎中开启了 masterKey 权限，这将会跳过 ACL 和其他权限限制）。
-
-```java
-import cn.leancloud.LCCloud;
-import cn.leancloud.LCObject;
-import cn.leancloud.core.GeneralRequestSignature;
-import cn.leancloud.LeanEngine;
-
-
-String appId = System.getenv("LEANCLOUD_APP_ID");
-String appKey = System.getenv("LEANCLOUD_APP_KEY");
-String appMasterKey = System.getenv("LEANCLOUD_APP_MASTER_KEY");
-String hookKey = System.getenv("LEANCLOUD_APP_HOOK_KEY");
-
-LeanEngine.initialize(appId, appKey, appMasterKey);
-
-GeneralRequestSignature.setMasterKey(appMasterKey);
-```
-
-### 使用数据存储服务
-
-### CookieSession
 
 ## 云端环境
 

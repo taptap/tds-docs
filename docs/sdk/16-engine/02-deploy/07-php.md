@@ -5,7 +5,6 @@ sidebar_label: PHP
 ---
 
 import CloudEnvironments from '../_partials/cloud-environments.mdx';
-import LeanstorageUsages from '../_partials/leanstorage-usages.mdx';
 import CloudTimezone from '../_partials/cloud-timezone.mdx';
 import CloudLogs from '../_partials/cloud-logs.mdx';
 import CloudInternetAddress from '../_partials/cloud-internet-address.mdx';
@@ -75,106 +74,6 @@ import BuildingSystemDependencies from '../_partials/building-system-dependencie
 ## 健康检查
 
 <CloudHealthCheck />
-
-## 云引擎 SDK
-云引擎 SDK 提供了云函数和 Hook 等功能的支持，但并不是必须的。
-
-### 接入云引擎 SDK
-
-模板项目已经集成了 PHP SDK，并且包含 SDK 初始化的逻辑。
-
-如果自行接入 [Slim 框架](http://www.slimframework.com)，可以参考示例项目直接使用 SDK 提供的中间件。
-
-如果自行接入其他框架，则需要自己配置依赖：
-
-```sh
-composer require leancloud/leancloud-sdk
-```
-
-同时也需要自行初始化 SDK（注意我们在云引擎中开启了 masterKey 权限，这将会跳过 ACL 和其他权限限制）。
-
-```php
-use \LeanCloud\Client;
-
-Client::initialize(
-    getenv("LEANCLOUD_APP_ID"),
-    getenv("LEANCLOUD_APP_KEY"),
-    getenv("LEANCLOUD_APP_MASTER_KEY")
-);
-
-Client::useMasterKey(true);
-```
-
-### 使用数据存储服务
-
-<LeanstorageUsages />
-
-### CookieSession
-
-云引擎提供了一个 `LeanCloud\Storage\CookieStorage` 模块，用 Cookie 来维护用户（`User`）的登录状态，要使用它可以在 `app.php` 中添加下列代码：
-
-```php
-use \LeanCloud\Storage\CookieStorage;
-Client::setStorage(new CookieStorage(60 * 60 * 24, "/"));
-```
-
-`CookieStorage` 支持传入秒作为过期时间，以及路径作为 cookie 的作用域。默认过期时间为 7 天。
-
-可以通过 `User::getCurrentUser()` 来获取当前登录用户。你可以这样简单地实现一个具有登录功能的站点：
-
-```php
-$app->get('/login', function($req, $res) {
-  // login page
-});
-
-$app->post('/login', function($req, $res) {
-    $params = $req->getQueryParams();
-    try {
-        User::logIn($params["username"], $params["password"]);
-        return $res->withRedirect('/profile');
-    } catch (Exception $ex) {
-        return $res->withRedirect('/login');
-    }
-});
-
-$app->get('/profile', function($req, $res) {
-    $user = User::getCurrentUser();
-    if ($user) {
-        return $res->getBody()->write($user->getUsername());
-    } else {
-        return $res->withRedirect('/login');
-    }
-});
-
-$app->get('/logout', function($req, $res) {
-    User::logOut();
-    return $res->redirect("/");
-});
-```
-
-一个简单的登录页面可以是这样：
-
-```html
-<html>
-  <head></head>
-  <body>
-    <form method="post" action="/login">
-      <label>Username</label>
-      <input name="username">
-      <label>Password</label>
-      <input name="password" type="password">
-      <input class="button" type="submit" value="login">
-    </form>
-  </body>
-</html>
-```
-
-`CookieStorage` 也支持保存其他属性：
-
-```php
-$cookieStorage = Client::getStorage();
-$cookieStorage->set("key", "val");
-```
 
 ## 云端环境
 

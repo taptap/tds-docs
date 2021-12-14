@@ -689,7 +689,7 @@ leancloud.Engine.Define("customErrorCode", func(req *leancloud.FunctionRequest) 
 例如，假设某个 beforeSave 函数需要调用耗时较久的第三方的自然语言处理接口判断用户提交的评论是否来自真实用户，导致超时，
 那么可以改为 afterSave 函数，在保存评论后再调用第三方接口，如果判断是水军评论，那么再行删除。
 
-## Hook 函数
+## 数据存储 Hook
 
 Hook 函数本质上是云函数，但它有固定的名称，定义之后会 **由系统** 在特定事件或操作（如数据保存前、保存后，数据更新前、更新后等等）发生时 **自动触发**，而不是由开发者来控制其触发时机。需要注意：
 
@@ -1673,13 +1673,30 @@ def on_auth_data(auth_data):
 ```
 
 </TabItem>
+<TabItem value='dotnet'>
+
+```cs
+[LCEngineUserHook(LCEngineUserHookType.OnAuthData)]
+public static Dictionary<string, object> OnAuthData(Dictionary<string, object> authData) {
+  if (authData.TryGetValue("fake_platform", out object tokenObj)) {
+    if (tokenObj is Dictionary<string, object> token) {
+      // 模拟校验
+      if (token["openid"] as string == "123" && token["access_token"] as string == "haha") {
+        LCLogger.Debug("Auth data Verified OK.");
+      } else {
+        throw new Exception("Invalid auth data.");
+      }
+    } else {
+      throw new Exception("Invalid auth data");
+    }
+  }
+  return authData;
+```
+
+</TabItem>
 </EngineRuntimes>
 
 该 hook 属于 before 类 hook.
-
-### 即时通讯 Hook 函数
-
-参见[即时通讯指南第四篇](/sdk/im/guide/systemconv/)的《万能的 Hook 机制》章节。
 
 ### 防止死循环调用
 
@@ -1742,24 +1759,6 @@ def after_post_update(post):
     post.save()
 ```
 
-<<<<<<< HEAD:docs/sdk/16-engine/02-guide/04-cloudfunction.md
-```cs
-[LCEngineUserHook(LCEngineUserHookType.OnAuthData)]
-public static Dictionary<string, object> OnAuthData(Dictionary<string, object> authData) {
-  if (authData.TryGetValue("fake_platform", out object tokenObj)) {
-    if (tokenObj is Dictionary<string, object> token) {
-      // 模拟校验
-      if (token["openid"] as string == "123" && token["access_token"] as string == "haha") {
-        LCLogger.Debug("Auth data Verified OK.");
-      } else {
-        throw new Exception("Invalid auth data.");
-      }
-    } else {
-      throw new Exception("Invalid auth data");
-    }
-  }
-  return authData;
-=======
 </TabItem>
 <TabItem value='java'>
 
@@ -1779,7 +1778,6 @@ public static void afterUpdatePost(LCObject post) throws LCException {
   post = LCObject.createWithoutData("Post", post.getObjectId());
   post.disableAfterHook();
   post.save();
->>>>>>> da77e60 (:recycle: Rewrite cloud function guide):docs/sdk/16-engine/03-cloud-function.md
 }
 ```
 
@@ -1913,6 +1911,10 @@ Before 类 Hook 函数的超时时间为 10 秒，其他类 Hook 函数的超时
 
 例如，如果一个 `BeforeSave` 函数是被一个已经运行了 13 秒的云函数触发，那么它就只剩下 2 秒的时间来运行。同时请参考 [云函数超时及处理方案](#云函数超时)。
 
+## 即时通讯 Hook
+
+参见[即时通讯指南第四篇](/sdk/im/guide/systemconv/)的《万能的 Hook 机制》章节。
+
 ## 在线编写云函数
 
 很多人使用云引擎是为了在服务端提供一些个性化的方法供各终端调用，而不希望关心诸如代码托管、npm 依赖管理等问题。为此我们提供了在线维护云函数的功能。使用此功能需要注意：
@@ -1998,6 +2000,76 @@ v3|3.x|3.x|8| 需要使用 Promise 写法 |async, bluebird, crypto, debug, ejs, 
 这里显示的是应用下所有分组中的云函数，包括在线编辑也包括项目部署。
 
 ![云函数列表](/img/cloud-engine/engine-functions-list.png)
+
+## 生产环境和预备环境
+
+云引擎应用有「生产环境」和「预备环境」之分。在云引擎通过 SDK 调用云函数时，包括显式调用以及隐式调用（由于触发 hook 条件导致 hook 函数被调用），SDK 会根据云引擎所属环境（预备、生产）调用相应环境的云函数。例如，假定定义了 `beforeDelete` 云函数，在预备环境通过 SDK 删除一个对象，会触发预备环境的 `beforeDelete` hook 函数。
+
+在云引擎以外的环境通过 SDK 显式或隐式调用云函数时，`X-LC-Prod` 的默认值一般为 `1`，也就是调用生产环境。但由于历史原因，各 SDK 的具体行为有一些差异：
+
+- 在 Node.js、PHP、Java、C# 这三个 SDK 下，默认总是调用生产环境的云函数。
+- 在 Python SDK 下，配合 lean-cli 本地调试时，且应用存在预备环境时，默认调用预备环境的云函数，其他情况默认调用生产环境的云函数。
+- 云引擎 Java 环境的模板项目 [java-war-getting-started] 和 [spring-boot-getting-started] 做了处理，配合 lean-cli 本地调试时，且应用存在预备环境时，默认调用预备环境的云函数，其他情况默认调用生产环境的云函数（与 Python SDK 的行为一致）。
+
+[java-war-getting-started]: https://github.com/leancloud/java-war-getting-started/
+[spring-boot-getting-started]: https://github.com/leancloud/spring-boot-getting-started/
+
+你还可以在 SDK 中指定客户端将请求所发往的环境：
+
+<MultiLang>
+
+```cs
+LCCloud.IsProduction = true; // production (default)
+LCCloud.IsProduction = false; // stage
+```
+```java
+LCCloud.setProductionMode(true); // production
+LCCloud.setProductionMode(false); // stage
+```
+```objc
+[LCCloud setProductionMode:YES]; // production (default)
+[LCCloud setProductionMode:NO]; // stage
+```
+```swift
+// production by default
+
+// stage
+do {
+    let environment: LCApplication.Environment = [.cloudEngineDevelopment]
+    let configuration = LCApplication.Configuration(environment: environment)
+    try LCApplication.default.set(
+        id: {{appid}},
+        key: {{appkey}},
+        serverURL: "https://please-replace-with-your-customized.domain.com",
+        configuration: configuration)
+} catch {
+    print(error)
+}
+```
+```dart
+LCCloud.setProduction(true); // production (default)
+LCCloud.setProduction(false); // stage
+```
+```js
+AV.setProduction(true); // production (default)
+AV.setProduction(false); // stage
+```
+```python
+leancloud.use_production(True) # production (default)
+leancloud.use_production(False) # stage
+# 需要在 SDK 初始化语句 `leancloud.init` 之前调用
+```
+```php
+LeanClient::useProduction(true); // production (default)
+LeanClient::useProduction(false); // stage
+```
+```go
+// 暂不支持（总是使用生产环境）
+```
+
+</MultiLang>
+
+体验版云引擎应用只有「生产环境」，因此请不要切换到预备环境。
 
 ## 定时任务
 
@@ -2096,155 +2168,3 @@ Cron 表达式的语法可以参考 [云队列（Cloud Queue）开发指南 § C
 - `retryAt` 下次重试时间（仅限失败任务）
 
 定时任务的结果（执行日志）可以在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 云引擎 > 云引擎分组 > 日志** 中查看。
-
-## 生产环境和预备环境
-
-云引擎应用有「生产环境」和「预备环境」之分。在云引擎通过 SDK 调用云函数时，包括显式调用以及隐式调用（由于触发 hook 条件导致 hook 函数被调用），SDK 会根据云引擎所属环境（预备、生产）调用相应环境的云函数。例如，假定定义了 `beforeDelete` 云函数，在预备环境通过 SDK 删除一个对象，会触发预备环境的 `beforeDelete` hook 函数。
-
-在云引擎以外的环境通过 SDK 显式或隐式调用云函数时，`X-LC-Prod` 的默认值一般为 `1`，也就是调用生产环境。但由于历史原因，各 SDK 的具体行为有一些差异：
-
-- 在 Node.js、PHP、Java、C# 这三个 SDK 下，默认总是调用生产环境的云函数。
-- 在 Python SDK 下，配合 lean-cli 本地调试时，且应用存在预备环境时，默认调用预备环境的云函数，其他情况默认调用生产环境的云函数。
-- 云引擎 Java 环境的模板项目 [java-war-getting-started] 和 [spring-boot-getting-started] 做了处理，配合 lean-cli 本地调试时，且应用存在预备环境时，默认调用预备环境的云函数，其他情况默认调用生产环境的云函数（与 Python SDK 的行为一致）。
-
-[java-war-getting-started]: https://github.com/leancloud/java-war-getting-started/
-[spring-boot-getting-started]: https://github.com/leancloud/spring-boot-getting-started/
-
-你还可以在 SDK 中指定客户端将请求所发往的环境：
-
-<MultiLang>
-
-```cs
-LCCloud.IsProduction = true; // production (default)
-LCCloud.IsProduction = false; // stage
-```
-```java
-LCCloud.setProductionMode(true); // production
-LCCloud.setProductionMode(false); // stage
-```
-```objc
-[LCCloud setProductionMode:YES]; // production (default)
-[LCCloud setProductionMode:NO]; // stage
-```
-```swift
-// production by default
-
-// stage
-do {
-    let environment: LCApplication.Environment = [.cloudEngineDevelopment]
-    let configuration = LCApplication.Configuration(environment: environment)
-    try LCApplication.default.set(
-        id: {{appid}},
-        key: {{appkey}},
-        serverURL: "https://please-replace-with-your-customized.domain.com",
-        configuration: configuration)
-} catch {
-    print(error)
-}
-```
-```dart
-LCCloud.setProduction(true); // production (default)
-LCCloud.setProduction(false); // stage
-```
-```js
-AV.setProduction(true); // production (default)
-AV.setProduction(false); // stage
-```
-```python
-leancloud.use_production(True) # production (default)
-leancloud.use_production(False) # stage
-# 需要在 SDK 初始化语句 `leancloud.init` 之前调用
-```
-```php
-LeanClient::useProduction(true); // production (default)
-LeanClient::useProduction(false); // stage
-```
-```go
-// 暂不支持（总是使用生产环境）
-```
-
-</MultiLang>
-
-体验版云引擎应用只有「生产环境」，因此请不要切换到预备环境。
-
-## 使用超级权限
-
-因为云引擎运行在可信的服务器端环境中，所以可以使用 Master Key（超级权限）跳过 ACL 和 Class 权限的检查，没有限制地修改数据存储中的数据；还可以使用一些仅限 Master Key 调用的管理员接口，如 [遍历 Class（scan）](/sdk/storage/guide/rest/#遍历-class)。
-
-所以你可以全局开启超级权限（`Master Key`），这样会跳过包括 ACL 和 Class 权限在内的检查，让你自由地操作所有云存储中的数据，也允许调用一些仅供 `Master Key` 使用的 API。
-
-<EngineRuntimes>
-<TabItem value='nodejs'>
-
-全局开启 Master Key:
-
-```js title='sever.js'
-AV.Cloud.useMasterKey();
-```
-
-如果没有添加这些代码，默认是没有超级权限的，这意味着在云引擎中你也不能修改被 ACL 保护的数据，你需要在进行操作时手动指定 `sessionToken`，让操作以这个用户的权限来执行：
-
-```js
-const post = new Post();
-post.save(
-  { author: user },
-  // 或者使用 request.sessionToken（网站托管中需启用 `Cloud.CookieSession`）
-  // {
-  //  sessionToken: user.getSessionToken()
-  // }
-);
-```
-
-或者你也可单独对某一个操作使用 `Master Key`，跳过权限检查：
-
-```js
-post.destroy({ useMasterKey: true });
-```
-
-当然你也可以在启用了 Master Key 的情况下使用 `useMasterKey: false` 来对单个操作关掉 Master Key。
-
-</TabItem>
-<TabItem value='python'>
-
-```python
-# 通常位于 wsgi.py
-leancloud.use_master_key(True)
-```
-
-</TabItem>
-<TabItem value='java'>
-
-```java
-// 通常位于 src/…/AppInitListener.java
-RequestSignImplementation.setMasterKey(appMasterKey);
-```
-
-</TabItem>
-<TabItem value='php'>
-
-```php
-// 通常位于 src/app.php
-Client::useMasterKey(true);
-```
-
-</TabItem>
-<TabItem value='dotnet'>
-
-```cs
-LCApplication.UseMasterKey = true;
-```
-
-</TabItem>
-<TabItem value='go'>
-
-SDK 中每个请求都可以使用 `UseMasterKey()` 为请求带上 `Master Key` 来开启超级权限，只需要作为可选参数传入最后即可，例如 `Create` `Set` `Update` 等操作。
-
-</TabItem>
-</EngineRuntimes>
-
-那么究竟是否应该使用 Master Key 呢，我们的建议如下：
-
-- 如果你的云引擎代码中特权操作比较多、操作不属于用户的全局数据比较多，那么建议全局开启 `Master Key`，并自行做好对于用户请求的权限检查。
-- 如果你的云引擎代码中的请求通常和单个用户自己的数据相关、需要遵守 ACL，那么建议不开启 `Master Key`，将用户请求的 `sessionToken` 传入数据修改的相关操作。
-
-关于云引擎上的权限问题，还可以参考 [ACL 权限管理开发指南](https://leancloud.cn/docs/acl-guide.html) 和 [在云引擎中使用 ACL](https://leancloud.cn/docs/acl_guide_leanengine.html)。

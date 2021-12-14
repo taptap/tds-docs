@@ -128,7 +128,7 @@ build: npm run build
 
 ### 负载均衡和加速节点
 
-<CloudLoadBalancer only='nodejs' noDeprecatedMiddleware={true} noClientIp={true} />
+<CloudLoadBalancer only='nodejs' noClientIp={true} />
 
 ### 时区
 

@@ -214,15 +214,6 @@ app.post('/todos', function (req, res) {
 });
 ```
 
-### 云引擎下如何管理用户会话？
-
-使用各框架自带的组件或第三方模块即可。
-
-例如：
-
-- Node.js 的 Express 框架可以使用 [cookie-session](https://github.com/expressjs/cookie-session) 组件。它和 `AV.Cloud.CookieSession` 组件可以并存。注意，Express 框架的 `express.session.MemoryStore` 在云引擎中是无法正常工作的，因为云引擎是多主机、多进程运行，因此内存型 session 是无法共享的。
-- PHP 可以使用 SDK 提供的 `CookieStorage` 保存会话属性。注意，PHP 默认的 `$_SESSION` 在云引擎中是无法正常工作的，因为云引擎是多主机、多进程运行，因此内存型 session 是无法共享的。
-
 ### 云引擎如何上传文件？
 
 托管在云引擎的网站可以使用相应 SDK 提供的接口上传文件。

@@ -127,6 +127,6 @@ Hook 的编写和云函数很类似，在后文中我们会详细介绍云函数
 
 ## 更多
 
-接下来可以查看 [云函数和 Hook 开发指南](/sdk/engine/functions/guides) 来了解云函数开发的详细信息、查看 [云引擎平台功能](/sdk/engine/deploy/platform) 来了解云引擎提供的更多功能，或查看专门的页面来了解具体运行环境的详情：
+接下来可以查看 [云函数和 Hook 开发指南](/sdk/engine/functions/guides) 来了解云函数开发的详细信息、查看 [云引擎 SDK 使用指南](/sdk/engine/functions/sdk) 了解 SDK 的进阶用法、查看 [云引擎平台功能](/sdk/engine/deploy/platform) 来了解云引擎提供的更多功能，或查看专门的页面来了解具体运行环境的详情：
 
 <PlatformRuntimes />

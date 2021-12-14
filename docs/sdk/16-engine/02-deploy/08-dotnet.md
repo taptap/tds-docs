@@ -5,7 +5,6 @@ sidebar_label: .NET
 ---
 
 import CloudEnvironments from '../_partials/cloud-environments.mdx';
-import LeanstorageUsages from '../_partials/leanstorage-usages.mdx';
 import CloudTimezone from '../_partials/cloud-timezone.mdx';
 import CloudLogs from '../_partials/cloud-logs.mdx';
 import CloudInternetAddress from '../_partials/cloud-internet-address.mdx';
@@ -36,7 +35,7 @@ import BuildingSystemDependencies from '../_partials/building-system-dependencie
 └── global.json
 ```
 
-如果你希望创建一个新的项目，推荐从我们的 [.NET 示例项目](https://github.com/leancloud/dotNET-getting-started) 开始。
+如果你希望创建一个新的项目，推荐从我们的 [.NET 示例项目](https://github.com/leancloud/dotnet-core-getting-started) 开始。
 
 ## 启动命令
 
@@ -65,29 +64,6 @@ import BuildingSystemDependencies from '../_partials/building-system-dependencie
 ## 健康检查
 
 <CloudHealthCheck />
-
-## 云引擎 SDK
-云引擎 SDK 提供了云函数和 Hook 等功能的支持，但并不是必须的。
-
-### 接入云引擎 SDK
-
-模板项目已经集成了 .NET SDK，并且包含 SDK 初始化的逻辑。
-
-如果自行接入其他框架，则需要自己添加依赖：
-
-```sh
-dotnet add package LeanCloud.Storage
-```
-
-同时也需要自行初始化 SDK：
-
-```cs
-LCEngine.Initialize(services);
-```
-
-### 使用数据存储服务
-
-<LeanstorageUsages />
 
 ## 云端环境
 
