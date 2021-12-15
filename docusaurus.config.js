@@ -7,8 +7,8 @@ const baseUrl = '/docs/';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: REGION == 'cn' ? 'TapTap 开发者文档' : 'TapTap Developer Documentation',
-  url: REGION == 'cn' ? 'https://developer.taptap.com' : 'https://developer.taptap.io',
+  title: REGION === 'cn' ? 'TapTap 开发者文档' : 'TapTap Developer Documentation',
+  url: REGION === 'cn' ? 'https://developer.taptap.com' : 'https://developer.taptap.io',
   baseUrl,
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -27,7 +27,7 @@ const config = {
       image: '/img/logo.svg',
       metadatas: [{
         name: 'keywords',
-        content: 'taptap tds 开发者 文档中心'
+        content: REGION === 'cn' ? 'taptap tds 开发者 文档' : 'taptap tds developer documentation',
       }],
       colorMode: {
         defaultMode: 'light',
