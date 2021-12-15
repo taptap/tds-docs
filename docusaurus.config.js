@@ -1,7 +1,7 @@
 // @ts-check
 
 /** env */
-const REGION = process.env.DOCUSAURUS_REGION;
+const REGION = process.env.TDS_REGION ?? 'cn';
 
 const baseUrl = '/docs/';
 
