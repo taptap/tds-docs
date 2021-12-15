@@ -10,10 +10,12 @@ type Entry = {
   title: string;
   description: string;
   links?: [ActionCellLink] | [ActionCellLink, ActionCellLink];
+  id: string;
 }
 
-export const entryList: (localePath: string) => Array<Entry> = (localePath: string) => {
+export const entryList: (localePath: string, region: string) => Array<Entry> = (localePath: string, region: string) => {
   const isIntl = localePath !== '';
+  const isCN = region === 'cn';
   const innerLinkSource: Array<Entry> = [
     {
       title: '游戏商店',
@@ -24,6 +26,7 @@ export const entryList: (localePath: string) => Array<Entry> = (localePath: stri
           to: '/store',
         },
       ],
+      id: 'store',
     },
     {
       title: '游戏服务',
@@ -34,6 +37,7 @@ export const entryList: (localePath: string) => Array<Entry> = (localePath: stri
           to: '/sdk',
         },
       ],
+      id: 'sdk',
     },
     {
       title: '资源下载',
@@ -49,6 +53,7 @@ export const entryList: (localePath: string) => Array<Entry> = (localePath: stri
           to: '/tap-download',
         },
       ],
+      id: 'download',
     },
     {
       title: '栏目收录申请',
@@ -59,6 +64,7 @@ export const entryList: (localePath: string) => Array<Entry> = (localePath: stri
           to: '/ad-apply',
         },
       ],
+      id: 'apply'
     },
   ].map((i, index) => ({
     title: translate({
@@ -79,6 +85,11 @@ export const entryList: (localePath: string) => Array<Entry> = (localePath: stri
         description: `from HomePage Cell Link`,
       }),
     })) as Entry['links'],
+    id: i.id,
   }))
-  return innerLinkSource
+  if (isCN) {
+    return innerLinkSource;
+  } else {
+    return innerLinkSource.filter((elem) => elem.id !== 'sdk');
+  }
 }

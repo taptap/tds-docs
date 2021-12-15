@@ -8,9 +8,10 @@ import styles from './styles.module.scss';
 import { entryList } from "./_config";
 
 const HomePage = () => {
-  const { i18n: { currentLocale, defaultLocale } } = useDocusaurusContext();
+  const { i18n: { currentLocale, defaultLocale }, siteConfig } = useDocusaurusContext();
   const isDefaultLocale = currentLocale === defaultLocale;
   const localePath = isDefaultLocale ? '' : `${currentLocale}/`;
+  const region = (siteConfig.customFields?.region ?? '') as string;
   return <Layout>
     <div className={styles.container}>
       <div className={styles.containerContent}>
@@ -22,7 +23,7 @@ const HomePage = () => {
           <Translate id="tds-home-入门指南" description="from HomePage Main Button">入门指南</Translate>
         </Link>
         <div className={styles.entryContainer}>
-          {entryList(localePath).map(item =>
+          {entryList(localePath, region).map(item =>
             <div key={item.title} className={styles.entryCell}>
               <div>
                 <div className={styles.entryCellTitle}>{item.title}</div>
