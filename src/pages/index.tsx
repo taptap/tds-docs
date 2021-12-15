@@ -16,7 +16,7 @@ const HomePage = () => {
       <div className={styles.containerContent}>
         <div className={styles.topTitle}>
           <img src={useBaseUrl('img/logo.svg')} alt="TapTap" />
-          <Translate id="tds-home-开发者文档中心" description="from HomePage Title">开发者文档中心</Translate>
+          <Translate id="tds-home-开发者文档" description="from HomePage Title">开发者文档</Translate>
         </div>
         <Link className={styles.topEntryButton} to="store/store-register">
           <Translate id="tds-home-入门指南" description="from HomePage Main Button">入门指南</Translate>
