@@ -2,8 +2,9 @@
 
 /** env */
 const REGION = process.env.TDS_REGION ?? 'cn';
+const PREVIEW = process.env.PREVIEW ?? 'false';
 
-const baseUrl = '/docs/';
+const baseUrl = PREVIEW === 'true' ? '/' : '/docs/';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
