@@ -101,8 +101,8 @@ const config = {
     }),
 
   i18n: {
-    defaultLocale: 'zh-Hans',
-    locales: ['zh-Hans', 'en'],
+    defaultLocale: REGION === 'cn' ? 'zh-Hans' : 'en',
+    locales: REGION === 'cn' ? ['zh-Hans', 'en'] : ['en'],
     localeConfigs: {
       en: {
         label: 'English',
