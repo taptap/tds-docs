@@ -39,7 +39,7 @@ const config = {
         appId: 'TVQNXY05EF',
       },
       navbar: {
-        items: [
+        items: REGION === 'cn' ? [
           {
             label: '文档首页',
             to: '/',
@@ -69,11 +69,6 @@ const config = {
               {
                 label: '设计资源',
                 to: '/design'
-                //withRef: true,
-                // i18nHref: {
-                //   'zh-Hans': 'https://www.taptap.com/developer/location_page?force_region=CN&redirect_url=https://www.taptap.com/about-us/brand-resources',
-                //   en: 'https://www.taptap.com/developer/location_page?force_region=US&redirect_url=https://www.taptap.com/about-us/brand-resources'
-                // },
               },
               {
                 label: 'SDK工具包',
@@ -91,6 +86,18 @@ const config = {
           },
           {
             type: 'localeDropdown',
+            position: 'right',
+          },
+        ] : [
+          {
+            label: '文档首页',
+            to: '/',
+            position: 'right',
+            activeBaseRegex: '^' + baseUrl + '(?!.+)',
+          },
+          {
+            label: '游戏商店',
+            to: 'store',
             position: 'right',
           },
         ],
