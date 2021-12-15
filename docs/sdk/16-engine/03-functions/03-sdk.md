@@ -8,7 +8,7 @@ import EngineRuntimes from '/src/docComponents/MultiLang/engine';
 import TabItem from '@theme/TabItem';
 
 :::info
-这篇文档会是关于云引擎 SDK 的深入介绍，如需了解云函数和 Hook 的用法请看 [云函数和 Hook 开发指南](/sdk/engine/functions/guides)。
+这篇文档是关于云引擎 SDK 的深入介绍，如需了解云函数和 Hook 的用法请看 [云函数和 Hook 开发指南](/sdk/engine/functions/guides)。
 :::
 
 云引擎 SDK 通常基于 [数据存储](/sdk/storage/features) 服务的 SDK，并提供了云函数和 Hook 等额外能力，供开发者在云引擎上更方便地开发后端应用。
@@ -73,7 +73,7 @@ app.listen(process.env.LEANCLOUD_APP_PORT);
 
 Node SDK 的历史版本：
 
-- `0.x`：最初的版本，对 Node.js 4.x 及以上版本兼容不佳，建议用户参考[升级到云引擎 Node.js SDK 1.0](https://leancloud.cn/docs/leanengine-node-sdk-upgrade-1.html) 来更新。
+- `0.x`：最初的版本，对 Node.js 4.x 及以上版本兼容不佳，建议用户参考 [升级到云引擎 Node.js SDK 1.0](https://leancloud.cn/docs/leanengine-node-sdk-upgrade-1.html) 来更新。
 - `1.x`：彻底废弃了全局的 `currentUser`，依赖的 JavaScript 也升级到了 1.x 分支，支持了 Koa 和 Node.js 4.x 及以上版本。
 - `2.x`：提供了对 Promise 风格的云函数、Hook 写法的支持，移除了一些被弃用的特性（`AV.Cloud.httpRequest`），不再支持 Backbone 风格的回调函数。
 - `3.x`：**推荐使用** 的版本，指定 JavaScript SDK 为 peer dependency（允许自定义 JS SDK 的版本），升级 JS SDK 到 3.x。
@@ -114,14 +114,14 @@ leancloud.init(APP_ID, app_key=APP_KEY, master_key=MASTER_KEY)
 leancloud.use_master_key(True)
 ```
 
-SDK 默认开启了 masterKey 权限，会跳过 ACL 和其他权限限制，详见 [云函数和 Hook 开发指南 § 使用超级权限](/sdk/functions/guides#使用超级权限)。
+SDK 默认开启了 masterKey 权限，会跳过 ACL 和其他权限限制，详见 [使用超级权限](#使用超级权限)。
 
 <details>
-<summary>点击展开 PyPI 上 `leancloud-sdk` 和 `leancloud` 两个包的差别</summary>
+<summary>点击展开 PyPI 上 <code>leancloud-sdk</code> 和 <code>leancloud</code> 两个包的差别</summary>
 
 `leancloud-sdk` 是旧版的 Python SDK，已经不再维护，请使用 `leancloud`。
 
-不同版本的差别详见 Python SDK 的[更新日志](https://github.com/leancloud/python-sdk/blob/master/changelog)。
+不同版本的差别详见 Python SDK 的 [更新日志](https://github.com/leancloud/python-sdk/blob/master/changelog)。
 
 </details>
 
@@ -130,29 +130,25 @@ SDK 默认开启了 masterKey 权限，会跳过 ACL 和其他权限限制，详
 </TabItem>
 <TabItem value='java'>
 
-模板项目已经集成了 [Java Unified SDK](https://github.com/leancloud/java-unified-sdk) 的 [engine-core](https://github.com/leancloud/java-unified-sdk/tree/master/leanengine) 模块，engine-core 又依赖于存储核心模块 storage-core，因此开发者可以直接使用云服务的数据存储功能。
-模板项目也包含了 SDK 初始化的逻辑。
-
-如果自行接入其他框架，则需要在 `pom.xml` 中增加依赖配置来增加 LeanEngine Java SDK 的依赖：
+在 `pom.xml` 中增加依赖配置来增加 LeanEngine Java SDK 的依赖：
 
 ```xml
 <dependencies>
   <dependency>
     <groupId>cn.leancloud</groupId>
     <artifactId>engine-core</artifactId>
-    <version>7.2.6</version>
+    <version>8.2.1</version>
   </dependency>
 </dependencies>
 ```
 
-同时也需要自行初始化 SDK（注意我们在云引擎中开启了 masterKey 权限，这将会跳过 ACL 和其他权限限制）。
+在程序中初始化 SDK：
 
 ```java
 import cn.leancloud.LCCloud;
 import cn.leancloud.LCObject;
 import cn.leancloud.core.GeneralRequestSignature;
 import cn.leancloud.LeanEngine;
-
 
 String appId = System.getenv("LEANCLOUD_APP_ID");
 String appKey = System.getenv("LEANCLOUD_APP_KEY");
@@ -164,22 +160,20 @@ LeanEngine.initialize(appId, appKey, appMasterKey);
 GeneralRequestSignature.setMasterKey(appMasterKey);
 ```
 
+上面的代码默认开启了 masterKey 权限，会跳过 ACL 和其他权限限制，详见 [使用超级权限](#使用超级权限)。
+
 你可以在 [GitHub](https://github.com/leancloud/java-unified-sdk) 上找到 Java SDK 的源代码。
 
 </TabItem>
 <TabItem value='php'>
 
-模板项目已经集成了 PHP SDK，并且包含 SDK 初始化的逻辑。
-
-如果自行接入 [Slim 框架](http://www.slimframework.com)，可以参考示例项目直接使用 SDK 提供的中间件。
-
-如果自行接入其他框架，则需要自己配置依赖：
+安装依赖：
 
 ```sh
 composer require leancloud/leancloud-sdk
 ```
 
-同时也需要自行初始化 SDK（注意我们在云引擎中开启了 masterKey 权限，这将会跳过 ACL 和其他权限限制）。
+初始化 SDK：
 
 ```php
 use \LeanCloud\Client;
@@ -193,20 +187,20 @@ Client::initialize(
 Client::useMasterKey(true);
 ```
 
+上面的代码默认开启了 masterKey 权限，会跳过 ACL 和其他权限限制，详见 [使用超级权限](#使用超级权限)。
+
 你可以在 [GitHub](https://github.com/leancloud/php-sdk) 上找到 PHP SDK 的源代码。
 
 </TabItem>
 <TabItem value='dotnet'>
 
-模板项目已经集成了 .NET SDK，并且包含 SDK 初始化的逻辑。
-
-如果自行接入其他框架，则需要自己添加依赖：
+添加依赖：
 
 ```sh
 dotnet add package LeanCloud.Storage
 ```
 
-同时也需要自行初始化 SDK：
+初始化 SDK：
 
 ```cs
 LCEngine.Initialize(services);
@@ -217,22 +211,18 @@ LCEngine.Initialize(services);
 </TabItem>
 <TabItem value='go'>
 
-模板项目已经集成了 Go SDK，并且包含 SDK 初始化的逻辑。
-
-如果自行接入其他框架，则需要自己添加依赖：
+添加依赖：
 
 ```go
 import "github.com/leancloud/go-sdk/leancloud"
 ```
 
-同时也需要自行初始化 SDK：
+初始化 SDK：
 
 ```go
 client := leancloud.NewEnvClient()
 leancloud.Engine.Init(client)
 ```
-
-细心的开发者已经发现示例项目是一个基于 [echo](https://github.com/labstack/echo) 的 Web 应用。
 
 Go SDK 以标准库 HTTP 方法的形式提供了可供任意框架接入的接口，以 **echo** 为示例：
 
@@ -255,9 +245,7 @@ func setResponseContentType(next echo.HandlerFunc) echo.HandlerFunc {
 
 函数 **Echo** 接收 echo 实例对象，将 Go SDK 中提供 LeanEngine 相关功能的接口绑定到 `/1/` `/1.1/` 和 `/__engine/` 开头的路由前缀上，保证 LeanEngine 相关的底层功能正常。
 
-函数 `setResponseContentType` 设置所有和 LeanEngine 相关的请求的 `Content-Type` 为 `application/json`，并且编码为 `UTF-8`。
-
-大多数 Go Web 框架均提供将标准库 HTTP Handler 转换为特有 Handler 的方法，只要保证能够在其他框架中接入以上两个部件，即可将 LeanEngine 集成入你喜爱的 Go Web 框架中。
+大多数 Go Web 框架均提供将标准库 HTTP Handler 转换为特有 Handler 的方法，只要保证能够在其他框架中接入以上两个部件，即可将 LeanEngine 集成入你的 Go Web 框架中。
 
 你可以在 [GitHub](https://github.com/leancloud/go-sdk) 上找到 Go SDK 的源代码。
 
@@ -266,7 +254,9 @@ func setResponseContentType(next echo.HandlerFunc) echo.HandlerFunc {
 
 ## 使用数据存储服务
 
-接入 SDK 后，在云引擎中你就可以调用 [数据存储](/sdk/storage/features) 服务作为数据库来存储数据，或者使用文件、短信、推送等功能。
+接入 SDK 后，在云引擎中你就可以调用 [数据存储](/sdk/storage/features) 服务作为数据库来存储数据，或者使用文件、短信、推送等功能。可以查看数据存储服务对应语言的文档了解详情。
+
+数据存储相关功能可以在云函数和 Hook 中使用，也可以在程序的其他部分（如自行选用的 Web 框架）中使用。
 
 ## 使用超级权限
 
@@ -338,7 +328,7 @@ LCApplication.UseMasterKey = true;
 </TabItem>
 <TabItem value='go'>
 
-SDK 中每个请求都可以使用 `UseMasterKey()` 为请求带上 `Master Key` 来开启超级权限，只需要作为可选参数传入最后即可，例如 `Create` `Set` `Update` 等操作。
+Go SDK 中每个请求都可以使用 `UseMasterKey()` 为请求带上 `Master Key` 来开启超级权限，只需要作为可选参数传入最后即可，例如 `Create` `Set` `Update` 等操作。
 
 </TabItem>
 </EngineRuntimes>
@@ -356,28 +346,68 @@ SDK 中每个请求都可以使用 `UseMasterKey()` 为请求带上 `Master Key`
 因云引擎属于多主机、多进程的运行环境，因此内存型的 Session 是无法正确工作的（如 Node.js 的 [express-session](https://github.com/expressjs/express-session) 默认的 MemoryStore、PHP 内建的 `$_SESSION`）。
 :::
 
-###
+### 使用 HTTP Header
+
+如果你的页面主要是由浏览器端渲染，那么建议在前端使用 SDK 登录用户，调用 SDK 的接口获取 Session Token，通过 HTTP Header 等方式将 Session Token 发送给后端。
+
+<EngineRuntimes>
+<TabItem value='nodejs'>
+
+例如，在前端登录用户并通过 `user.getSessionToken()` 获取 Session Token 并发送给后端：
+
+```js
+AV.User.login(user, pass).then(user => {
+  return fetch('/profile', {
+    headers: {
+      'X-LC-Session': user.getSessionToken()
+    }
+  });
+});
+```
+
+相应的后端 Node.js 代码：
+
+```js
+app.get('/profile', function (req, res) {
+  AV.User.become(req.headers['x-lc-session']).then(user => {
+    res.send(user);
+  }).catch(err => {
+    res.send({ error: err.message });
+  });
+});
+
+app.post('/todos', function (req, res) {
+  var todo = new Todo();
+  todo.save(req.body, { sessionToken: req.headers['x-lc-session'] }).then(() => {
+    res.send(todo);
+  }).catch(err => {
+    res.send({ error: err.message });
+  });
+});
+```
+
+</TabItem>
+</EngineRuntimes>
 
 ### CookieSession
 
-在部分 SDK 中我们提供了一个 Cookie Session 组件，它可以将数据存储服务中的 Session Token 存储在 Cookie 中，简化服务器端对于用户登录状态的管理。
+如果你的页面主要由服务端渲染，可以使用我们在部分 SDK 中提供的 Cookie Session 组件，它可以将数据存储服务中的 Session Token 存储在 Cookie 中，简化服务器端对于用户登录状态的管理。
 
 :::danger
-使用 Cookie Session 的同时需要添加 CSRF Token 来 [防御 CSRF 攻击](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html)。
+使用 Cookie 作为鉴权方式需要注意防范 [防御 CSRF 攻击](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html)。
+
+业界通常使用 CSRF Token 来防御 CSRF 攻击，你需要传递给客户端一个随机字符串（即 CSRF Token，可通过 Cookie 传递），客户端在每个有副作用的请求中都要将 CSRF 包含在请求正文或 Header 中，服务器端需要校验这个 CSRF Token 是否正确。
 :::
 
 <EngineRuntimes>
 <TabItem value='nodejs'>
 
-如果你的页面主要是由服务器端渲染（例如使用 EJS、Pug），在前端不需要使用 JavaScript SDK 进行数据操作，那么可以我们提供的一个 `CookieSession` 中间件，在 Cookie 中维护用户状态：
+如果你的页面主要是由服务器端渲染（例如使用 EJS、Pug），在前端不需要使用 JavaScript SDK 进行数据操作，那么可以使用 `AV.Cloud.CookieSession` 中间件，在 Cookie 中维护用户状态：
 
 ```js
+// Express
 app.use(AV.Cloud.CookieSession({ secret: 'my secret', maxAge: 3600000, fetchUser: true }));
-```
-
-Koa 需要添加一个 `framework: 'koa'` 的参数：
-
-```js
+// Koa
 app.use(AV.Cloud.CookieSession({ framework: 'koa', secret: 'my secret', maxAge: 3600000, fetchUser: true }));
 ```
 
@@ -541,10 +571,12 @@ $cookieStorage->set("key", "val");
 ## FAQ
 ### 如何使用 SDK 重定向到 HTTPS？
 
-一些 SDK 提供了重定向至 HTTPS 的中间件,部署并发布到生产环境之后，访问你的 LeanEngine 网站都会强制通过 HTTPS 访问。
+我们目前推荐在绑定自定义域名时勾选「强制 HTTPS」（详见 [云引擎平台功能 § 重定向到 HTTPS](/sdk/engine/deploy/platform/#重定向到-https)）而不是使用 SDK 中的重定向中间件。
 
 <details>
 <summary>点击展开关于 SDK 中重定向到 HTTPS 的用法（不推荐）</summary>
+
+一些 SDK 提供了重定向至 HTTPS 的中间件，部署并发布到生产环境之后，访问你的 LeanEngine 网站都会强制通过 HTTPS 访问。
 
 <EngineRuntimes>
 <TabItem value='nodejs'>

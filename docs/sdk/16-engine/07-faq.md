@@ -4,8 +4,6 @@ title: 云引擎 FAQ
 sidebar_label: FAQ
 ---
 
-import MultiLang from '/src/docComponents/MultiLang';
-
 ## 云引擎功能
 
 ### 云引擎都支持哪些语言？
@@ -20,8 +18,9 @@ import MultiLang from '/src/docComponents/MultiLang';
 
 ### 云引擎支持 HTTPS 吗？
 
-- 自定义域名在绑定时启用 SSL 即可支持 HTTPS。
-- 如需配置自动跳转，请看 [云引擎下如何重定向到 HTTPS？](#云引擎下如何重定向到-https？)。
+支持，在绑定自定义域名时可以上传 SSL 证书或自动管理证书。
+
+绑定自定义域名时还可以配置「强制 HTTPS」来实现自动跳转。
 
 ### 部署更新云引擎会导致服务中断吗？
 
@@ -36,7 +35,6 @@ import MultiLang from '/src/docComponents/MultiLang';
 不接入云引擎 SDK 也可以使用云函数以外的所有功能，云引擎也提供了业界广泛使用的 [Redis](/sdk/engine/database/redis/)、[MongoDB](/sdk/engine/database/mongo/) 和 [Elasticsearch](/sdk/engine/database/es/) 供开发者存储数据。
 
 ## 云函数
-
 ### 云函数有哪些限制？
 
 云函数是 LeanCloud 提供的一个 **相对受限** 的自定义服务器端逻辑的功能，和我们的 SDK 有比较 **深度的集成**。我们将云函数设计为一种类似 **RPC** 的机制，在云函数中你只能关注参数和结果，而不能自定义超时时间、HTTP method、URL，不能读取和设置 Header。
@@ -172,129 +170,15 @@ AfterUpdate 是在云引擎内执行的，执行 afetrUpdate 不算 API 请求�
 
 ## 最佳实践
 
-### 云引擎中如何处理用户登录和 Cookie？
-
-如果你的页面主要由服务端渲染，可以使用我们在部分 SDK 中提供的管理 Cookie 和 Session 的中间件或模块，也可以其他第三方的中间件或模块，在 Cookie 中维护用户状态。
-
-使用 Cookie 作为鉴权方式需要注意防范 [CSRF](https://github.com/pillarjs/understanding-csrf) 攻击（其他站点伪造带有正确 Cookie 的恶意请求）。
-业界通常使用 CSRF Token 来防御 CSRF 攻击，你需要传递给客户端一个随机字符串（即 CSRF Token，可通过 Cookie 传递），客户端在每个有副作用的请求中都要将 CSRF 包含在请求正文或 Header 中，服务器端需要校验这个 CSRF Token 是否正确。
-
-如果你的页面主要是由浏览器端渲染，那么建议在前端使用 SDK 登录用户，调用 SDK 的接口获取 session token，通过 HTTP Header 等方式将 session token 发送给后端。
-
-例如，在前端登录用户并通过 `user.getSessionToken()` 获取 `sessionToken` 并发送给后端：
-
-```js
-AV.User.login(user, pass).then(user => {
-  return fetch('/profile', {
-    headers: {
-      'X-LC-Session': user.getSessionToken()
-    }
-  });
-});
-```
-
-相应的后端 Node.js 代码：
-
-```js
-app.get('/profile', function (req, res) {
-  AV.User.become(req.headers['x-lc-session']).then(user => {
-    res.send(user);
-  }).catch(err => {
-    res.send({ error: err.message });
-  });
-});
-
-app.post('/todos', function (req, res) {
-  var todo = new Todo();
-  todo.save(req.body, { sessionToken: req.headers['x-lc-session'] }).then(() => {
-    res.send(todo);
-  }).catch(err => {
-    res.send({ error: err.message });
-  });
-});
-```
-
 ### 云引擎如何上传文件？
 
 托管在云引擎的网站可以使用相应 SDK 提供的接口上传文件。
 不过，一般情况下建议在客户端 SDK 上传文件，而不是通过云引擎中转，以免增加不必要的云引擎流量。
 
-### 如何判断请求是通过 HTTPS 还是 HTTP 访问的？
+### 定时任务应该在预备环境还是生产环境执行？
 
-因为 HTTPS 加密是在负载均衡层面处理的，所以通常部署在云引擎上的 web 框架获取的请求 URL 总是使用 HTTP 协议，建议通过 `X-Forwarded-Proto` HTTP 头来判断原请求是通过 HTTP 还是 HTTPS 访问的。
-
-### 云引擎响应时间增加怎么办
-
-响应时间的增加有很多种原因：可能因为只是单纯的请求处理的数据更加复杂导致耗时变长；也有可能是因为请求量过高实例的处理能力不足从而导致响应时间增加。
-建议分析当前的代码并参考 CPU、内存占用量找出瓶颈，确定是否需要调高实例规格或增加实例数量。
-如果需要定位具体是哪些 API 或云函数响应较慢，可以下载访问日志分析。
-
-### 如何下载云引擎的应用日志和访问日志
-
-云引擎的应用日志（程序的标准输出和标准错误输出）可以在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 云引擎 > 云引擎分组 > 日志** 查看；并且可以使用命令行工具导出最长 7 天的日志。
-
-云引擎的访问日志（Access Log）同样可以在**开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 云引擎 > 访问日志**导出。
-
-### 不使用 SDK 的情况下，该如何实现健康监测和云函数元信息路由？
-
-不使用 SDK 的情况下，需要自行实现相关路由。
-下面给出 Java 和 PHP 的例子供参考。
-
-健康监测：
-
-```java
-// 健康监测 router
-@WebServlet(name = "LeanEngineHealthServlet", urlPatterns = {"/__engine/1/ping"})
-public class LeanEngineHealthCheckServlet extends HttpServlet {
-
-  @Override
-  protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-      throws ServletException, IOException {
-    resp.setHeader("content-type", "application/json; charset=UTF-8");
-    JSONObject result = new JSONObject();
-    result.put("runtime", System.getProperty("java.version"));
-    result.put("version", "custom");
-    resp.getWriter().write(result.toJSONString());
-  }
-}
-```
-
-```php
-$app->get('/__engine/1/ping', function($req, $res) {
-    // PSR-7 response is immutable
-    $response = $res->withHeader("Content-Type", "application/json");
-    $response->getBody()->write(json_encode(array(
-        "runtime" => "php-" . phpversion(),
-        "version" => "custom"
-    )));
-    return $response;
-});
-```
-
-云函数元信息：
-
-```java
-@WebServlet(name = "LeanEngineMetadataServlet", urlPatterns = {"/1.1/functions/_ops/metadatas"})
-public class LeanEngineMetadataServlet extends HttpServlet {
-
-  @Override
-  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException,
-      IOException {
-    resp.setContentType("application/json; charset=UTF-8");
-    resp.getWriter().write("{\"result\":[]}");
-  }
-}
-```
-
-```php
-app.get('/1.1/_ops/functions/metadatas', function(req, res) {
-    $response = $res->withHeader("Content-Type", "application/json");
-    $response->getBody()->write(json_encode(array(
-        "result" => array()
-    )));
-    return $response;
-});
-```
+系统赠送的预备环境体验实例会自动休眠，可能干扰定时任务的执行，因此一般建议在预备环境测试定时任务，在生产环境正式执行定时任务。
+如果定时任务 CPU、内存占用非常高，担心影响生产环境的网站托管功能或其他云函数访问，那么可以在预备环境购买标准实例，并在预备环境执行定时任务。
 
 ### 如何判断当前云引擎是预备环境还是生产环境？
 
@@ -304,22 +188,6 @@ app.get('/1.1/_ops/functions/metadatas', function(req, res) {
 
 另外，stg-web.example.com 域名是需要在控制台自行绑定的。
 
-### 云引擎下如何发送 HTTP 请求？
-
-使用各语言的标准库或社区提供的模块即可。
-
-例如：
-
-- Node.js 项目可以使用 [superagent] 等社区提供的模块。
-- Python 项目可以使用标准库中的 `urllib.request` 模块或社区的 [requests] 模块。
-- PHP 项目可以使用 PHP 内置的 `curl` 模块或 [guzzle] 等第三方库。
-- Java 项目可以使用 `URL` 或者是 `HttpClient` 等基础类或 [OkHttp] 等第三方库。
-
-[superagent]: https://www.npmjs.com/package/superagent
-[requests]: https://docs.python-requests.org/en/master/
-[guzzle]: https://docs.guzzlephp.org/en/stable/
-[OkHttp]: https://square.github.io/okhttp/
-
 ### 如何访问云引擎预备环境中托管的网站？
 
 需要在控制台手动绑定一个 `stg-` 开头的域名。`stg-` 开头的自定义域名（例如 stg-web.example.com）会被自动地绑定到预备环境。
@@ -327,11 +195,6 @@ app.get('/1.1/_ops/functions/metadatas', function(req, res) {
 ### 云引擎可以绑定裸域名吗？
 
 如果希望在国际版云引擎绑定裸域名，我们建议选择支持 ANAME 或 CNAME Flattening 记录的域名服务商。
-
-### 定时任务应该在预备环境还是生产环境执行？
-
-系统赠送的预备环境体验实例会自动休眠，可能干扰定时任务的执行，因此一般建议在预备环境测试定时任务，在生产环境正式执行定时任务。
-如果定时任务 CPU、内存占用非常高，担心影响生产环境的网站托管功能或其他云函数访问，那么可以在预备环境购买标准实例，并在预备环境执行定时任务。
 
 ## 疑难问题
 
@@ -343,11 +206,16 @@ app.get('/1.1/_ops/functions/metadatas', function(req, res) {
 * 云引擎自定义域名填错了，比如微信回调地址。
 * 因为免费版（体验版）的云引擎是有休眠的，休眠期间被调用会出现这个错误。建议升级到标准实例以保证实例一直运行。
 
+### 云引擎响应时间增加怎么办
+
+响应时间的增加有很多种原因：可能因为只是单纯的请求处理的数据更加复杂导致耗时变长；也有可能是因为请求量过高实例的处理能力不足从而导致响应时间增加。
+建议分析当前的代码并参考 CPU、内存占用量找出瓶颈，确定是否需要调高实例规格或增加实例数量。
+如果需要定位具体是哪些 API 或云函数响应较慢，可以下载访问日志分析。
+
 ### 在线上无法读取到项目中的文件怎么办？
 
 建议先检查文件大小写是否正确，线上的文件系统是区分大小写的，而 Windows 和 macOS 通常不区分大小写。
 
 ### 云引擎会重复提交请求吗？
 
-云引擎的负载均衡对于幂等的请求（GET、PUT），在 HTTP 层面出错或超时的情况下是会重试的。
-可以使用正确的谓词（例如 POST）避免此类重试。
+云引擎的负载均衡对于幂等的请求（GET、PUT），在 HTTP 层面出错或超时的情况下是会重试的，建议使用正确的谓词（例如 POST）避免此类重试。

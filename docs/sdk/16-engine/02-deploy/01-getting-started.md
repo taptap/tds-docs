@@ -14,8 +14,6 @@ import EngineRuntimes from '/src/docComponents/MultiLang/engine';
 import TabItem from '@theme/TabItem';
 
 :::info
-这篇文档会帮助你快速地部署第一个云引擎应用，如需了解云引擎平台提供的功能，请看 [云引擎平台功能](/sdk/engine/deploy/platform)。
-
 如果仅希望使用云函数和 Hook 而不是部署通用的后端程序，请看 [快速开始部署云函数和 Hook](/sdk/engine/functions/getting-started)。
 
 如希望部署 Web 前端应用，请看 [Web 前端运行环境 § 快速开始](/sdk/engine/deploy/webapp#快速开始)。

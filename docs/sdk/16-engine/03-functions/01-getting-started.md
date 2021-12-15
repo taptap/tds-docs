@@ -12,10 +12,6 @@ import {CLI_BINARY} from '/src/constants/env.ts';
 import EngineRuntimes from '/src/docComponents/MultiLang/engine';
 import TabItem from '@theme/TabItem';
 
-:::info
-这篇文档会帮助你快速地部署第一个云函数，如需了解云函数和 Hook 的详细功能请看 [云函数和 Hook 开发指南](/sdk/engine/functions/guides)。
-:::
-
 <FunctionsIntroduction />
 
 :::info

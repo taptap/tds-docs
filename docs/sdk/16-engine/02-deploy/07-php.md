@@ -28,7 +28,6 @@ import BuildingSystemDependencies from '../_partials/building-system-dependencie
 
 云引擎会使用 Nginx 和 PHP-FPM 来运行你的应用，项目中的 `public` 目录会被映射为网站的根目录（document root），其中 `.php` 文件由 PHP-FPM 处理，其他静态文件由 Nginx 处理。如果被请求的路径不存在则会由 `public/index.php` 处理，这一点可以满足绝大部分框架对应用入口点的需求。
 
-
 云引擎默认每 64 MB 内存分配一个 PHP-FPM Worker，如果希望自定义 Worker 数量，可以在云引擎设置页面的「自定义环境变量」中添加名为 `PHP_WORKERS` 的环境变量，值是一个数字。设置过低会导致收到新请求时无可用的 Worker；过高会导致内存不足、请求处理失败，建议谨慎调整。
 
 ## 配置 PHP 版本
