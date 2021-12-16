@@ -30,7 +30,7 @@ const HomePage = () => {
                 <div>{item.description}</div>
               </div>
               <div className={styles.entryCellActionContainer}>
-                {item.links?.map((link, index, links) =>
+                {item.links.map((link, index, links) =>
                   <Fragment key={link.label}>
                     {
                       link.href
@@ -52,6 +52,7 @@ const HomePage = () => {
                     {index < links.length - 1 && <div className={styles.entryCellActionDivider} />}
                   </Fragment>,
                 )}
+                { item.links.length === 0 && <div className={styles.entryCellActionButton}>Coming Soon</div> }
               </div>
             </div>)}
         </div>

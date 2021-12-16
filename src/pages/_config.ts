@@ -9,7 +9,7 @@ type ActionCellLink = {
 type Entry = {
   title: string;
   description: string;
-  links?: [ActionCellLink] | [ActionCellLink, ActionCellLink];
+  links: [] | [ActionCellLink] | [ActionCellLink, ActionCellLink];
   id: string;
 }
 
@@ -90,6 +90,11 @@ export const entryList: (localePath: string, region: string) => Array<Entry> = (
   if (isCN) {
     return innerLinkSource;
   } else {
-    return innerLinkSource.filter((elem) => elem.id !== 'sdk');
+    return innerLinkSource.map((elem) => {
+      if (elem.id === 'sdk') {
+        elem.links = [];
+      }
+      return elem;
+    })
   }
 }
