@@ -14,7 +14,7 @@ export const toInnerLinkList = (localePath: string) => {
   const isIntl = localePath !== '';
   const innerLinkSource: Array<InnerLinkRaw | false> = [
     {
-      label: '广告',
+      label: '推广',
       url: `https://biz.taptap.com/${localePath}`,
     },
     !isIntl && {
