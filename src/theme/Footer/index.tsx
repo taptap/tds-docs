@@ -1,10 +1,20 @@
 import React from 'react';
+import { DateTime } from 'luxon';
 import Link from '@docusaurus/Link';
 import Translate from '@docusaurus/Translate';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import styles from './styles.module.scss';
 import Logo from "@theme/Logo";
 import { externalLinkList, toInnerLinkList } from './_config';
+
+function copyRightNotice(region) {
+  // taptap.com is operated by YiWan (Shanghai), and taptap.io is operated by TapTap Inc (in singapore).
+  // 'Asia/Shanghai' and 'Asia/Singapore' are both UTC+8 currently, but this might change in future.
+  const timezone = region === 'cn' ? 'Asia/Shanghai' : 'Asia/Singapore';
+  const currentYear = DateTime.now().setZone(timezone).year;
+  const year = currentYear > 2021 ? `2021–${currentYear}` : '2021';
+  return `©${year} TapTap`;
+}
 
 function Footer() {
   const { i18n: { currentLocale, defaultLocale }, siteConfig } = useDocusaurusContext();
@@ -56,7 +66,7 @@ function Footer() {
             </Translate>
           </div>
           <div className={styles.externalItem}>
-            ©2021 TapTap
+            {copyRightNotice(region)}
           </div>
         </div>
         {region === 'cn' && isDefaultLocale && <div className={styles.recordRow}>
