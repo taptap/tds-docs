@@ -15,7 +15,6 @@ type Entry = {
 
 export const entryList: (localePath: string, region: string) => Array<Entry> = (localePath: string, region: string) => {
   const isIntl = localePath !== '';
-  const isCN = region === 'cn';
   const innerLinkSource: Array<Entry> = [
     {
       title: '游戏商店',
@@ -87,7 +86,7 @@ export const entryList: (localePath: string, region: string) => Array<Entry> = (
     })) as Entry['links'],
     id: i.id,
   }))
-  if (isCN) {
+  if (region === 'cn') {
     return innerLinkSource;
   } else {
     return innerLinkSource.map((elem) => {
