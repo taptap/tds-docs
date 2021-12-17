@@ -50,6 +50,7 @@ function Footer() {
           })}
         </div>
         <div className={styles.infoRow}>
+          {region === 'cn' ? <div>
           <div className={styles.externalItem}>
             <Translate id="tds-footer-易玩（上海）网络科技有限公司" description="from Footer">
               易玩（上海）网络科技有限公司
@@ -65,6 +66,9 @@ function Footer() {
               注册地址: 上海市闵行区紫星路 588 号 2 幢 2122 室
             </Translate>
           </div>
+          </div> : <div className={styles.externalItem}>
+            TapTap Pte. Ltd.
+          </div>}
           <div className={styles.externalItem}>
             {copyRightNotice(region)}
           </div>
