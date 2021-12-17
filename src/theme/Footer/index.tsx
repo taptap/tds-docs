@@ -7,9 +7,13 @@ import Logo from "@theme/Logo";
 import { externalLinkList, toInnerLinkList } from './_config';
 
 function Footer() {
-  const { i18n: { currentLocale, defaultLocale } } = useDocusaurusContext();
+  const { i18n: { currentLocale, defaultLocale }, siteConfig } = useDocusaurusContext();
+
   const isDefaultLocale = currentLocale === defaultLocale;
   const localePath = isDefaultLocale ? '' : `${currentLocale}/`;
+
+  const region = (siteConfig.customFields?.region ?? '') as string;
+
   return (
     <footer className={styles.footerContainer}>
       <div className={styles.footerContent}>
@@ -55,7 +59,7 @@ function Footer() {
             ©2021 TapTap
           </div>
         </div>
-        {isDefaultLocale && <div className={styles.recordRow}>
+        {region === 'cn' && isDefaultLocale && <div className={styles.recordRow}>
           {externalLinkList.map(item => <a
             key={item.label + item.link}
             className={styles.externalItem}
