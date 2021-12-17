@@ -6,6 +6,31 @@ const PREVIEW = process.env.PREVIEW ?? 'false';
 
 const baseUrl = PREVIEW === 'true' ? '/' : '/docs/';
 
+function regionDependantSidebarItems(items) {
+  if (REGION === 'cn') {
+    return items;
+  } else {
+    // TODO generate based on filesystem structure
+    const hardCodedList = [
+      'store-about',
+      'store-devagreement',
+      'store-agree',
+      'store-admin',
+      'store-register',
+      'store-auth',
+      'store-material',
+      'store-creategame',
+      'store-publish-game',
+      'store-update',
+      'store-test',
+      'store-complaint',
+      'store-contact',
+      'store-faq',
+    ].map((elem) => `store/${elem}`);
+    return items.filter(item => hardCodedList.includes(item.id));
+  }
+}
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   customFields: {
@@ -131,6 +156,13 @@ const config = {
       ({
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
+          sidebarItemsGenerator: async function ({
+            defaultSidebarItemsGenerator,
+            ...args
+          }) {
+            const defaultItems = await defaultSidebarItemsGenerator(args);
+            return regionDependantSidebarItems(defaultItems);
+          },
           routeBasePath: '/',
           lastVersion: 'current',
           versions: {
