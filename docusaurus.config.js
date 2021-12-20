@@ -131,8 +131,10 @@ const config = {
           },
         ],
       },
-      googleAnalytics: {
+      googleAnalytics: REGION === 'cn' ?  {
         trackingID: 'UA-73963350-1',
+      } : {
+        trackingID: 'UA-73963350-4',
       },
     }),
 
