@@ -80,6 +80,10 @@ Android 平台需要申请网络、音频相关权限：
 
 iOS 平台需要申请麦克风权限（`Privacy - Microphone Usage Description`）。
 
+游戏通常没有后台通话的需求，玩家一般边玩游戏边语音，游戏保持在前台。
+如果游戏类型比较特殊，需要支持后台通话，那么还需申请后台播放权限：
+在 target 中配置 **Capability >  Background Modes > Audio, AirPlay, and Picture in Picture**。
+
 ## 核心接口
 
 RTC 通过 `TapRTCConfig` 来进行初始化配置。初始化的过程是异步的，需要等待初始化结果返回之后，才能进行下一步的操作。
@@ -144,7 +148,7 @@ public class MyApp extends Application {
 TapRTCConfig *config = [[TapRTCConfig alloc] initWithAppId:@"AppId"
 appKey:@"AppKey" serverUrl:@"ServerUrl"
 userId:@"UserId" deviceId:@"DeviceId"
-profile:AudioPerfProfileLOW]; // 如需使用范围语音功能，此项必须设为 LOW
+profile:AudioPerfProfileMID];
 TapRTCEngine *engine = [TapRTCEngine defaultEngine];
 TapRTCResultCode resultCode = [engine initializeWithConfig:config];
 if (resultCode == TapRTCResultCode_Success) {
@@ -727,8 +731,7 @@ room.ChangeRoomType(AudioPerfProfile.LOW);
 ```
 
 ```objc
-// Objective-C SDK 未提供切换音频质量的接口。
-// Objective-C SDK 下，如需使用范围语音功能，**SDK 初始化时音频质量需设置为 LOW**。
+// Objective-C SDK 在进入范围语言房间时会自动把音质设为 LOW
 ```
 
 </MultiLang>

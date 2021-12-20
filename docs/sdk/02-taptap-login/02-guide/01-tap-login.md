@@ -19,6 +19,53 @@ import MultiLang from '/src/docComponents/MultiLang';
 初始化时需要区分适用于中国大陆还是其他国家或地区。
 :::
 
+TapTap.Login 支持在 Windows、macOS 下让玩家扫码登录或跳转网页浏览器登录。
+
+![PC 登录](/img/taptap-login-pc.png)
+
+扫码登录默认支持，跳转浏览器登录需要额外配置。
+
+如果想要在 Windows 使用跳转网页浏览器登录功能，需要在注册表添加相应配置：
+
+```
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\open-taptap-{client_id}]
+@="{游戏名称}"
+"URL Protocol"="{程序.exe 安装路径}}"
+
+[HKEY_CLASSES_ROOT\open-taptap-{client_id}]
+@="{游戏名称}"
+
+[HKEY_CLASSES_ROOT\open-taptap-{client_id}]
+
+[HKEY_CLASSES_ROOT\open-taptap-{client_id}\Shell\Open]
+
+[HKEY_CLASSES_ROOT\open-taptap-{client_id}\Shell\Open\Command]
+@="\"{程序.exe 安装路径}\" \"%1\""
+```
+
+在 macOS 平台下，SDK 会自动配置 `CFBundleURLTypes`。
+请通过以下步骤确认配置无误：
+
+- 在 Unity 下打开 `BuildSetting` 选择 `PC、Mac & Linux Standalone` Platform，`Target Platform` 选择 `macOS`。
+- 勾选 `Create XCode Project`，选择输出 `XCode` 工程进行编译。
+- 打开输出的 `XCode Project`，选择 `Target`，点击 `Info`，展开 `URL Types`，检查是否自动添加以下 `URL Scheme`，如未添加，则手动添加：
+
+```xml
+<key>CFBundleURLTypes</key>
+<array>
+    <dict>
+        <key>CFBundleURLName</key>
+        <string>TapWeb</string>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>open-taptap-{client_id}</string>
+        </array>
+    </dict>
+</array>
+```
+
 <MultiLang>
 <>
 
@@ -93,8 +140,10 @@ roundCorner | 是否为圆角
 ```cs
 try
 {
-    // 在 iOS、Android 系统下，会唤起 TapTap 网页 或者 TapTap 客户端进行登录
-    // 在其他平台，会显示二维码，玩家可以通过移动设备上的 TapTap 客户端扫码登录
+    // 在 iOS、Android 系统下，会唤起 TapTap 网页 或者 TapTap 客户端进行登录；
+    // 在 Windows、macOS 系统下，会显示二维码和跳转链接，
+    // 玩家可以选择通过移动设备上的 TapTap 客户端扫码登录，
+    // 也可以点击跳转链接通过网页浏览器登录。
     var accessToken = await TapLogin.Login();
     Debug.Log($"TapTap 登录成功 accessToken: {accessToken.ToJson()}");
 }
