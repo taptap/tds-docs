@@ -27,7 +27,7 @@ function Footer() {
   return (
     <footer className={styles.footerContainer}>
       <div className={styles.footerContent}>
-        <div className={styles.logoRow}><Logo noLabel /></div>
+        <div className={styles.logoRow}><Logo /></div>
         <div className={styles.linkRow}>
           {toInnerLinkList(localePath, region).map(item => {
             return item.link
