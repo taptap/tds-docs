@@ -45,7 +45,6 @@ export const entryList: (localePath: string, region: string) => Array<Entry> = (
         {
           label: '设计资源',
           to: '/design'
-          //href: isIntl ? 'https://www.taptap.com/developer/location_page?force_region=US&redirect_url=https://www.taptap.com/about-us/brand-resources' : 'https://www.taptap.com/developer/location_page?force_region=CN&redirect_url=https://www.taptap.com/about-us/brand-resources',
         },
         {
           label: 'SDK工具包',
@@ -65,7 +64,37 @@ export const entryList: (localePath: string, region: string) => Array<Entry> = (
       ],
       id: 'apply'
     },
-  ].map((i, index) => ({
+  ]
+
+  // Ugly patching for now since these links may change in recent future.
+  const innerLinks: Array<Entry> = innerLinkSource.map((elem) => {
+    if (region === 'cn') {
+      return elem;
+    } else {
+      if (elem.id === 'sdk') {
+        elem.links = [];
+        return elem;
+      } else if (elem.id === 'download') {
+        const brandResourcesLink: ActionCellLink = {
+          label: '设计资源',
+          href: 'https://www.taptap.io/about-us/brand-resources',
+        };
+        elem.links = [brandResourcesLink];
+        return elem;
+      } else if (elem.id === 'apply') {
+        const applyLink: ActionCellLink = {
+          label: '查看更多',
+          href: 'https://www.taptap.io/doc/19',
+        };
+        elem.links = [applyLink];
+        return elem;
+      } else {
+        return elem;
+      }
+    }
+  })
+
+  return innerLinks.map((i, index) => ({
     title: translate({
       message: i.title,
       id: `tds-home-${i.title}`,
@@ -86,14 +115,4 @@ export const entryList: (localePath: string, region: string) => Array<Entry> = (
     })) as Entry['links'],
     id: i.id,
   }))
-  if (region === 'cn') {
-    return innerLinkSource;
-  } else {
-    return innerLinkSource.map((elem) => {
-      if (elem.id === 'sdk') {
-        elem.links = [];
-      }
-      return elem;
-    })
-  }
 }
