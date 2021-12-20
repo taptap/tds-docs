@@ -29,7 +29,7 @@ function Footer() {
       <div className={styles.footerContent}>
         <div className={styles.logoRow}><Logo noLabel /></div>
         <div className={styles.linkRow}>
-          {toInnerLinkList(localePath).map(item => {
+          {toInnerLinkList(localePath, region).map(item => {
             return item.link
               ? <Link
                 key={item.label + item.link}
