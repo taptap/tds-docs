@@ -983,7 +983,7 @@ vivo 桌面图标角标默认是关闭的，开发者接入完成后还需要终
 在开始接入之前，有两项准备工作：
 
 - 在 [OPPO 开放平台](https://open.oppomobile.com/)注册一个账号，并创建好应用。
-- 从 OPPO 官网下载 aar 资源。OPPO 官方 aar 下载地址为：<https://pfs.oppomobile.com/static/document/com.heytap.msp-push-2.1.0.aar>。
+- 从 OPPO 官网下载 aar 资源。OPPO 官方 aar 下载地址为：<https://openfs.oppomobile.com/open/oop/202109/18/a6165ca79f20025a21a8158a30dd6964.zip>。
 
 这里假设大家已经完成上述操作，创建好了应用，并获取了 `appKey`、`appSecret`、`masterSecret`，请保存好这三个值，下一步接入的时候会用到：
 
