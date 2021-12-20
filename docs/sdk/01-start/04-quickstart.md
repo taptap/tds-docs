@@ -359,10 +359,6 @@ config.serverURL = @"https://your_server_url";  // 开发者中心 > 你的游�
 
 `server_url` 可参考 **[域名绑定](/sdk/start/get-ready/#绑定域名)** 的文档。
 
-:::info
-TapSDK 3.0 版本目前暂不支持海外，预计本季度部署海外节点，敬请期待。
-:::
-
 ## 接入功能
 
 TapSDK 提供了众多功能。请在初始化 SDK 后，根据项目需要，参考相应功能的文档，接入相应功能。
