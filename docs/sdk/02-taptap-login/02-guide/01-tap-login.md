@@ -19,53 +19,6 @@ import MultiLang from '/src/docComponents/MultiLang';
 初始化时需要区分适用于中国大陆还是其他国家或地区。
 :::
 
-TapTap.Login 支持在 Windows、macOS 下让玩家扫码登录或跳转网页浏览器登录。
-
-![PC 登录](/img/taptap-login-pc.png)
-
-扫码登录默认支持，跳转浏览器登录需要额外配置。
-
-如果想要在 Windows 使用跳转网页浏览器登录功能，需要在注册表添加相应配置：
-
-```
-Windows Registry Editor Version 5.00
-
-[HKEY_CLASSES_ROOT\open-taptap-{client_id}]
-@="{游戏名称}"
-"URL Protocol"="{程序.exe 安装路径}}"
-
-[HKEY_CLASSES_ROOT\open-taptap-{client_id}]
-@="{游戏名称}"
-
-[HKEY_CLASSES_ROOT\open-taptap-{client_id}]
-
-[HKEY_CLASSES_ROOT\open-taptap-{client_id}\Shell\Open]
-
-[HKEY_CLASSES_ROOT\open-taptap-{client_id}\Shell\Open\Command]
-@="\"{程序.exe 安装路径}\" \"%1\""
-```
-
-在 macOS 平台下，SDK 会自动配置 `CFBundleURLTypes`。
-请通过以下步骤确认配置无误：
-
-- 在 Unity 下打开 `BuildSetting` 选择 `PC、Mac & Linux Standalone` Platform，`Target Platform` 选择 `macOS`。
-- 勾选 `Create XCode Project`，选择输出 `XCode` 工程进行编译。
-- 打开输出的 `XCode Project`，选择 `Target`，点击 `Info`，展开 `URL Types`，检查是否自动添加以下 `URL Scheme`，如未添加，则手动添加：
-
-```xml
-<key>CFBundleURLTypes</key>
-<array>
-    <dict>
-        <key>CFBundleURLName</key>
-        <string>TapWeb</string>
-        <key>CFBundleURLSchemes</key>
-        <array>
-          <string>open-taptap-{client_id}</string>
-        </array>
-    </dict>
-</array>
-```
-
 <MultiLang>
 <>
 
@@ -140,10 +93,8 @@ roundCorner | 是否为圆角
 ```cs
 try
 {
-    // 在 iOS、Android 系统下，会唤起 TapTap 网页 或者 TapTap 客户端进行登录；
-    // 在 Windows、macOS 系统下，会显示二维码和跳转链接，
-    // 玩家可以选择通过移动设备上的 TapTap 客户端扫码登录，
-    // 也可以点击跳转链接通过网页浏览器登录。
+    // 在 iOS、Android 系统下，会唤起 TapTap 客户端或以 webview 方式进行登录
+    // 在 Windows、macOS 系统下显示二维码（默认）和跳转链接（需配置）
     var accessToken = await TapLogin.Login();
     Debug.Log($"TapTap 登录成功 accessToken: {accessToken.ToJson()}");
 }
@@ -308,7 +259,13 @@ TapLoginHelper.logout();
 重要提示：在**测试登录功能前**务必完成 [配置签名证书](/sdk/start/quickstart/#配置签名证书) 和 [添加测试用户](/sdk/start/test-accounts/)，否则无法正常使用 TapTap 登录功能。
 :::
 
-## 如何从 TapTap 用户认证接口升级到内建账户系统
+## PC 登录配置
+
+Unity SDK 自 3.5.2 起支持在 Windows、macOS 下让玩家扫码或跳转网页浏览器完成 TapTap 登录。
+
+SDK **默认支持扫码登录**，跳转浏览器登录需要[额外配置](/sdk/taptap-login/guide/start/#pc-登录配置)。
+
+## 升级到内建账户系统
 
 前面说过，如果前期开发时只把「TapTap 登录」作为一个第三方渠道进行了接入，后期要使用内建账户系统，或者老的 v1.x 版本的游戏要升级到 3.x 版本并使用其他服务，这时候会有「一定的开发成本」。这里我们就来具体说说这种情况下该如何处理。
 
