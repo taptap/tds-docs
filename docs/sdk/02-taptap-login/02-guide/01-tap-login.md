@@ -93,8 +93,8 @@ roundCorner | 是否为圆角
 ```cs
 try
 {
-    // 在 iOS、Android 系统下，会唤起 TapTap 网页 或者 TapTap 客户端进行登录
-    // 在其他平台，会显示二维码，玩家可以通过移动设备上的 TapTap 客户端扫码登录
+    // 在 iOS、Android 系统下，会唤起 TapTap 客户端或以 webview 方式进行登录
+    // 在 Windows、macOS 系统下显示二维码（默认）和跳转链接（需配置）
     var accessToken = await TapLogin.Login();
     Debug.Log($"TapTap 登录成功 accessToken: {accessToken.ToJson()}");
 }
@@ -259,7 +259,13 @@ TapLoginHelper.logout();
 重要提示：在**测试登录功能前**务必完成 [配置签名证书](/sdk/start/quickstart/#配置签名证书) 和 [添加测试用户](/sdk/start/test-accounts/)，否则无法正常使用 TapTap 登录功能。
 :::
 
-## 如何从 TapTap 用户认证接口升级到内建账户系统
+## PC 登录配置
+
+Unity SDK 自 3.5.2 起支持在 Windows、macOS 下让玩家扫码或跳转网页浏览器完成 TapTap 登录。
+
+SDK **默认支持扫码登录**，跳转浏览器登录需要[额外配置](/sdk/taptap-login/guide/start/#pc-登录配置)。
+
+## 升级到内建账户系统
 
 前面说过，如果前期开发时只把「TapTap 登录」作为一个第三方渠道进行了接入，后期要使用内建账户系统，或者老的 v1.x 版本的游戏要升级到 3.x 版本并使用其他服务，这时候会有「一定的开发成本」。这里我们就来具体说说这种情况下该如何处理。
 

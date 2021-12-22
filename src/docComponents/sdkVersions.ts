@@ -2,6 +2,8 @@ const sdkVersions = {
   taptap: {
     unity: "3.5.0",
     unity_achievement: "3.5.1",
+    unity_common: "3.5.2",
+    unity_login: "3.5.2",
     android: "3.5.1",
     ios: "3.5.0",
     anti_addiction: "1.0.2",
