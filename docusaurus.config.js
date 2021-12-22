@@ -54,7 +54,7 @@ const config = {
         additionalLanguages: ['csharp', 'java', 'php', 'groovy'],
       },
       image: '/img/logo.svg',
-      metadatas: [{
+      metadata: [{
         name: 'keywords',
         content: REGION === 'cn' ? 'taptap tds 开发者 文档' : 'taptap tds developer documentation',
       }],
@@ -153,7 +153,7 @@ const config = {
 
   presets: [
     [
-      '@docusaurus/preset-classic',
+      'classic',
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
         docs: {

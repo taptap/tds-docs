@@ -61,8 +61,8 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
 
 <CodeBlock className="json">
 {`"dependencies":{
-    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}",
-    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity_login}",
+    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity_common}",
     "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#${sdkVersions.taptap.unity}",
     "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}",
     "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
@@ -358,10 +358,6 @@ config.serverURL = @"https://your_server_url";  // 开发者中心 > 你的游�
 `client_id`、`client_token`信息可在 **开发者中心 > 你的游戏 > 游戏服务 > 应用配置** 查看。
 
 `server_url` 可参考 **[域名绑定](/sdk/start/get-ready/#绑定域名)** 的文档。
-
-:::info
-TapSDK 3.0 版本目前暂不支持海外，预计本季度部署海外节点，敬请期待。
-:::
 
 ## 接入功能
 

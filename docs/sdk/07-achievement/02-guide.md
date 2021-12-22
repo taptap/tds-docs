@@ -20,7 +20,7 @@ import sdkVersions from '/src/docComponents/sdkVersions';
 {`"dependencies":{
   ...
   // 成就系统
-  "com.taptap.tds.achievement": "https://github.com/TapTap/TapAchievement-Unity.git#${sdkVersions.taptap.unity}",
+  "com.taptap.tds.achievement": "https://github.com/TapTap/TapAchievement-Unity.git#${sdkVersions.taptap.unity_achievement}",
 }`}
 </CodeBlock>
 

@@ -87,7 +87,7 @@ sidebar_label: iOS 推送设置
 
     ![Create Auth Keys](/img/ios_cert_v2/create_auth_keys.png)
 
-5. 根据您的需要自行填写 **Key Description** 并勾选 **APNs** 后点击最下面的 Continue 按钮。
+5. 根据你的需要自行填写 **Key Description** 并勾选 **APNs** 后点击最下面的 Continue 按钮。
   
     ![Create New Key](/img/ios_cert_v2/create_new_key.png)
 

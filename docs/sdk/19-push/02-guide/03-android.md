@@ -192,7 +192,7 @@ public static void createNotificationChannel(Context context, String channelId, 
 
 记下这里的 `channelId`，因为之后发送推送通知的时候，我们还需要用到它。在发送推送请求的时候，通过 `_notificationChannel` 这个自定义的关键字可以选择不同的 channel 进行消息展示。
 
-例如如下的请求会在客户端通知 id 为 “1” 的通道进行显示：
+例如如下的请求会在客户端通知 id 为「1」的通道进行显示：
 
 ```sh
 curl -X POST \
