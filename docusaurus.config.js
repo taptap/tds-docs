@@ -1,11 +1,43 @@
 // @ts-check
 
-const baseUrl = '/docs/';
+/** env */
+const REGION = process.env.TDS_REGION ?? 'cn';
+const PREVIEW = process.env.PREVIEW ?? 'false';
+
+const baseUrl = PREVIEW === 'true' ? '/' : '/docs/';
+
+function regionDependantSidebarItems(items) {
+  if (REGION === 'cn') {
+    return items;
+  } else {
+    // TODO generate based on filesystem structure
+    const hardCodedList = [
+      'store-about',
+      'store-devagreement',
+      'store-agree',
+      'store-admin',
+      'store-register',
+      'store-auth',
+      'store-material',
+      'store-creategame',
+      'store-publish-game',
+      'store-update',
+      'store-test',
+      'store-complaint',
+      'store-contact',
+      'store-faq',
+    ].map((elem) => `store/${elem}`);
+    return items.filter(item => hardCodedList.includes(item.id));
+  }
+}
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'TapTap 开发者文档中心',
-  url: 'https://developer.taptap.com',
+  customFields: {
+    region: REGION,
+  },
+  title: REGION === 'cn' ? 'TapTap 开发者文档' : 'TapTap Developer Documentation',
+  url: REGION === 'cn' ? 'https://developer.taptap.com' : 'https://developer.taptap.io',
   baseUrl,
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -24,7 +56,7 @@ const config = {
       image: '/img/logo.svg',
       metadata: [{
         name: 'keywords',
-        content: 'taptap tds 开发者 文档中心'
+        content: REGION === 'cn' ? 'taptap tds 开发者 文档' : 'taptap tds developer documentation',
       }],
       colorMode: {
         defaultMode: 'light',
@@ -36,7 +68,7 @@ const config = {
         appId: 'TVQNXY05EF',
       },
       navbar: {
-        items: [
+        items: REGION === 'cn' ? [
           {
             label: '文档首页',
             to: '/',
@@ -66,11 +98,6 @@ const config = {
               {
                 label: '设计资源',
                 to: '/design'
-                //withRef: true,
-                // i18nHref: {
-                //   'zh-Hans': 'https://www.taptap.com/developer/location_page?force_region=CN&redirect_url=https://www.taptap.com/about-us/brand-resources',
-                //   en: 'https://www.taptap.com/developer/location_page?force_region=US&redirect_url=https://www.taptap.com/about-us/brand-resources'
-                // },
               },
               {
                 label: 'SDK工具包',
@@ -90,16 +117,30 @@ const config = {
             type: 'localeDropdown',
             position: 'right',
           },
+        ] : [
+          {
+            label: '文档首页',
+            to: '/',
+            position: 'right',
+            activeBaseRegex: '^' + baseUrl + '(?!.+)',
+          },
+          {
+            label: '游戏商店',
+            to: 'store',
+            position: 'right',
+          },
         ],
       },
-      googleAnalytics: {
+      googleAnalytics: REGION === 'cn' ?  {
         trackingID: 'UA-73963350-1',
+      } : {
+        trackingID: 'UA-73963350-4',
       },
     }),
 
   i18n: {
-    defaultLocale: 'zh-Hans',
-    locales: ['zh-Hans', 'en'],
+    defaultLocale: REGION === 'cn' ? 'zh-Hans' : 'en',
+    locales: REGION === 'cn' ? ['zh-Hans', 'en'] : ['en'],
     localeConfigs: {
       en: {
         label: 'English',
@@ -117,6 +158,13 @@ const config = {
       ({
         docs: {
           sidebarPath: require.resolve('./sidebars.js'),
+          sidebarItemsGenerator: async function ({
+            defaultSidebarItemsGenerator,
+            ...args
+          }) {
+            const defaultItems = await defaultSidebarItemsGenerator(args);
+            return regionDependantSidebarItems(defaultItems);
+          },
           routeBasePath: '/',
           lastVersion: 'current',
           versions: {

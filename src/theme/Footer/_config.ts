@@ -10,11 +10,11 @@ type InnerLinkRaw = {
  * 生成站内链接
  * @param localePath 非默认语言下的路径后缀，可能为 `` | `en/` 等
  * */
-export const toInnerLinkList = (localePath: string) => {
+export const toInnerLinkList = (localePath: string, region: string) => {
   const isIntl = localePath !== '';
   const innerLinkSource: Array<InnerLinkRaw | false> = [
     {
-      label: '广告',
+      label: '推广',
       url: `https://biz.taptap.com/${localePath}`,
     },
     !isIntl && {
@@ -35,14 +35,15 @@ export const toInnerLinkList = (localePath: string) => {
     },
     {
       label: '侵权投诉',
-      link: `/store/store-complaint`,
+      link: `/store/store-complaint/`,
     },
     {
       label: '联系我们',
-      link: `/store/store-contact`,
+      link: `/store/store-contact/`,
     },
   ];
-  return (innerLinkSource.filter(i => i) as Array<InnerLinkRaw>)
+  if (region === 'cn') {
+    return (innerLinkSource.filter(i => i) as Array<InnerLinkRaw>)
     .map((i: InnerLinkRaw, index) => ({
       ...i,
       label: translate({
@@ -51,6 +52,26 @@ export const toInnerLinkList = (localePath: string) => {
         description: `from Footer Left Link ${index + 1}`,
       }),
     }));
+  } else {
+    return [
+      {
+        label: 'Terms of Service',
+        url: 'https://www.taptap.io/terms',
+      },
+      {
+        label: 'Privacy Policy',
+        url: 'https://www.taptap.io/privacy-policy',
+      },
+      {
+        label: 'Report Infringement',
+        link: '/store/store-complaint/',
+      },
+      {
+        label: 'Contact Us',
+        link: '/store/store-contact/'
+      }
+    ]
+  }
 };
 
 export const externalLinkList = [

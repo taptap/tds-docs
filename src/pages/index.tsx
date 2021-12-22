@@ -8,34 +8,29 @@ import styles from './styles.module.scss';
 import { entryList } from "./_config";
 
 const HomePage = () => {
-  const { i18n: { currentLocale, defaultLocale } } = useDocusaurusContext();
+  const { i18n: { currentLocale, defaultLocale }, siteConfig } = useDocusaurusContext();
   const isDefaultLocale = currentLocale === defaultLocale;
   const localePath = isDefaultLocale ? '' : `${currentLocale}/`;
+  const region = (siteConfig.customFields?.region ?? '') as string;
   return <Layout>
     <div className={styles.container}>
       <div className={styles.containerContent}>
         <div className={styles.topTitle}>
           <img src={useBaseUrl('img/logo.svg')} alt="TapTap" />
-          <Translate id="tds-home-开发者文档中心" description="from HomePage Title">开发者文档中心</Translate>
-        </div>
-        <div className={styles.topSubtitle}>
-          <Translate id="tds-home-这里为用户提供游戏开发者相关文档和常见问题，包含游戏商店设置、游戏服务说明及TapTap品牌资源下载。"
-            description="from HomePage Subtitle">
-            这里为用户提供游戏开发者相关文档和常见问题，包含游戏商店设置、游戏服务说明及TapTap品牌资源下载。
-          </Translate>
+          <Translate id="tds-home-开发者文档" description="from HomePage Title">开发者文档</Translate>
         </div>
         <Link className={styles.topEntryButton} to="store/store-register">
           <Translate id="tds-home-入门指南" description="from HomePage Main Button">入门指南</Translate>
         </Link>
         <div className={styles.entryContainer}>
-          {entryList(localePath).map(item =>
+          {entryList(localePath, region).map(item =>
             <div key={item.title} className={styles.entryCell}>
               <div>
                 <div className={styles.entryCellTitle}>{item.title}</div>
                 <div>{item.description}</div>
               </div>
               <div className={styles.entryCellActionContainer}>
-                {item.links?.map((link, index, links) =>
+                {item.links.map((link, index, links) =>
                   <Fragment key={link.label}>
                     {
                       link.href
@@ -57,6 +52,7 @@ const HomePage = () => {
                     {index < links.length - 1 && <div className={styles.entryCellActionDivider} />}
                   </Fragment>,
                 )}
+                { item.links.length === 0 && <div className={styles.entryCellActionButton}>Coming Soon</div> }
               </div>
             </div>)}
         </div>
