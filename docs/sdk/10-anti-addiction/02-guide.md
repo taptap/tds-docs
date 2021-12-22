@@ -128,7 +128,10 @@ string gameIdentifier = "游戏的 Client ID";
 bool useTimeLimit = true;
 // 是否启用消费限制功能
 bool usePaymentLimit = true;
-AntiAddictionUIKit.Init(gameIdentifier, useTimeLimit, usePaymentLimit,
+// 是否显示切换账号按钮
+bool showSwitchAccount = false;
+
+AntiAddictionUIKit.Init(gameIdentifier, useTimeLimit, usePaymentLimit, showSwitchAccount,
     (antiAddictionCallbackData) => {
         int code = antiAddictionCallbackData.code;
         MsgExtraParams extras = antiAddictionCallbackData.extras;
@@ -137,7 +140,7 @@ AntiAddictionUIKit.Init(gameIdentifier, useTimeLimit, usePaymentLimit,
         {
             // 开始计时
             AntiAddictionUIKit.EnterGame();
-            Debug.Log("玩家登陆后判断当前玩家可以进行游戏");
+            Debug.Log("玩家登录后判断当前玩家可以进行游戏");
         }
 
     },
@@ -150,12 +153,14 @@ AntiAddictionUIKit.Init(gameIdentifier, useTimeLimit, usePaymentLimit,
 </>
 <>
 
+
 ```java
 // Android SDK 的各接口第一个参数是当前 Activity，以下不再说明
 String gameIdentifier = "游戏的 Client ID";
 AntiAddictionFunctionConfig config = new AntiAddictionFunctionConfig.Builder()
     .enablePaymentLimit(true) // 是否启用消费限制功能
     .enableOnLineTimeLimit(true) // 是否启用时长限制功能
+    .showSwitchAccount(true)    // 是否显示切换账号按钮
     .build();
 AntiAddictionUIKit.init(activity, gameIdentifier, config,
     new AntiAddictionUICallback() {
@@ -179,9 +184,12 @@ AntiAddictionUIKit.init(activity, gameIdentifier, config,
 NSString *gameIdentifier = @"游戏的 Client ID";
 AntiAddictionConfiguration *config = AntiAddictionService.configuration;
 // 是否启用消费限制功能
-BOOL config.useSdkPaymentLimit = YES;
+config.useSdkPaymentLimit = YES;
 // 是否启用时长限制功能
-BOOL config.useSdkOnlineTimeLimit = YES;
+config.useSdkOnlineTimeLimit = YES;
+// 是否显示切换账号按钮
+config.showSwitchAccount = YES;
+
 [AntiAddiction initGameIdentifier:gameIdentifier antiAddictionConfig:config
 antiAddictionCallbackDelegate:self
 completionHandler:^(BOOL success) {
@@ -199,21 +207,30 @@ completionHandler:^(BOOL success) {
 
 
 </>
-
 </MultiLang>
 
-代码示例中的 `gameIdentifier`，是游戏的 `Client ID`，可以在控制台查看（**开发者中心 > 你的游戏 > 游戏服务 > 应用配置**）。
+### 参数说明
 
+- `gameIdentifier` 是游戏的 `Client ID`，可以在控制台查看（**开发者中心 > 你的游戏 > 游戏服务 > 应用配置**）。
 
-回调类型：
+- `useTimeLimit` 是否启用时长限制功能。如果使用这个功能，需要[上报游戏时长](#上报游戏时长)。
+
+- `usePaymentLimit` 是否启用消费限制功能。如果使用这个功能，需要[检查消费上限](#检查消费上限)。
+
+- `showSwitchAccount` 是否显示切换账号按钮。如果游戏没有切换账号功能，可以在初始化阶段配置隐藏切换账号按钮；如果游戏选择显示切换账号按钮(如下图所示)，玩家点击之后会触发 `1001` 回调，游戏可根据这个回调 code 做相应处理。
+
+![切换账号界面](/img/anti-addiction/switch-account.png)
+
+### 回调类型
 
 | 回调类型                          | code | 触发逻辑                                                     | 附带信息                     |
 | :-------------------------------- | :--- | :----------------------------------------------------------- | :------------------------- |
-| `CALLBACK_CODE_LOGIN_SUCCESS`      | 500  | 玩家登录后判断当前玩家可以进行游戏                           | 有 |
+| `CALLBACK_CODE_LOGIN_SUCCESS`      | 500  | 玩家登录后判断当前玩家可以进行游戏                           | 无 |
 | `CALLBACK_CODE_NIGHT_STRICT`          | 1030 | 未成年玩家当前无法进行游戏                                         | 有 |
 | `CALLBACK_CODE_OPEN_ALERT_TIP`      | 1095 | 未成年允许游戏弹窗                                  | 有 |
 | `CALLBACK_CODE_LOGOUT` | 1000 | 退出账号 | 无                         |
 | `CALLBACK_CODE_REAL_NAME_STOP` | 9002 | 实名过程中点击了关闭实名窗 | 无 |          
+| `CALLBACK_CODE_SWITCH_ACCOUNT` | 1001 | 点击切换账号按钮（v1.0.2 新增） | 无 |         
 
 附带信息：
 
@@ -244,10 +261,36 @@ SDK 支持两种防沉迷授权方式：
 1. 使用 TapTap 快速认证，传入玩家的唯一标识和 TapTap 的鉴权信息，TDS 云端会根据相应玩家在 TapTap 的实名信息判断玩家是否可以进行游戏。
 2. 不使用 TapTap 快速认证，玩家在 SDK 提供的界面中手动输入身份证号等实名信息，TDS 云端会将相应信息上报至中宣部防沉迷实名认证系统。
 
-这两种方式都需要传入的玩家唯一标识，该标识由游戏自己定义。
-如果使用 TDS 内建账户系统，可以使用玩家的 `objectId`。
-
 ### TapTap 快速认证
+
+使用 TapTap 快速认证需要接入 [TapTap 登录](/sdk/taptap-login/features/)功能。
+
+游戏可以选择通过[TDS 内建账户系统](/sdk/taptap-login/guide/start/#用-taptap-oauth-授权结果直接登录账户系统)接入 TapTap 登录，或者以[单纯 TapTap 用户认证](/sdk/taptap-login/guide/tap-login/#taptap-登录并获取登录结果)的方式接入 TapTap 登录。
+
+客户端可以在玩家完成 TapTap 登录之后，通过如下接口获取 TapTap 的 `access token`：
+
+<MultiLang>
+
+```cs
+AccessToken accessToken = TapLogin.GetAccessToken();
+string tapTapAccessToken = JsonUtility.ToJson(accessToken);
+```
+
+```java
+AccessToken accessToken = TapLoginHelper.getCurrentAccessToken();
+String tapTapAccessToken = accessToken.toJsonString();
+```
+
+```objc
+TTSDKAccessToken *accessToken = [TapLoginHelper currentAccessToken];
+NSString *tapTapAccessToken = [accessToken toJsonString];
+```
+
+</MultiLang>
+
+传入 `access token` 和玩家唯一标识 `userIdentifier`，开始 TapTap 快速认证。
+
+其中的**玩家唯一标识** `userIdentifier`，如果接入 [TDS 内建账户系统](/sdk/taptap-login/guide/start/#用-taptap-oauth-授权结果直接登录账户系统)，可以用玩家的 `objectId`；如果使用[单纯 TapTap 用户认证](/sdk/taptap-login/guide/tap-login/#taptap-登录并获取登录结果)则可以用 `openid` 或 `unionid`。
 
 <MultiLang>
 
@@ -278,6 +321,8 @@ userIdentifier:userIdentifier tapAccesssToken:tapTapAccessToken];
 
 ### 手动输入实名信息
 
+如果不使用 TapTap 快速认证，可以通过下面的接口开始防沉迷授权。需要传入的**玩家唯一标识** `userIdentifier`，由游戏自己定义。
+
 <MultiLang>
 
 ```cs
@@ -294,31 +339,6 @@ AntiAddictionUIKit.startup(activity, false, userIdentifier, "");
 NSString *userIdentifier = @"玩家的唯一标识";
 [AntiAddiction startUpUseTapLogin:NO
 userIdentifier:userIdentifier tapAccesssToken:@""];
-```
-
-</MultiLang>
-
-### 获取 TapTap Access Token
-
-初始化时需要传入 TapTap 的 `access token`，以便从 TapTap 获取玩家的实名信息。
-
-无论游戏使用[TDS 内建账户系统](/sdk/taptap-login/guide/start/#用-taptap-oauth-授权结果直接登录账户系统)，还是使用[单纯 TapTap 用户认证](/sdk/taptap-login/guide/tap-login/#taptap-登录并获取登录结果)的方式接入 TapTap 登录，在玩家已登录 TapTap 的情况下，都可以通过如下接口获取 TapTap 的 `access token`：
-
-<MultiLang>
-
-```cs
-AccessToken accessToken = TapLogin.GetAccessToken();
-string tapTapAccessToken = JsonUtility.ToJson(accessToken);
-```
-
-```java
-AccessToken accessToken = TapLoginHelper.getCurrentAccessToken();
-String tapTapAccessToken = accessToken.toJsonString();
-```
-
-```objc
-TTSDKAccessToken *accessToken = [TapLoginHelper currentAccessToken];
-NSString *tapTapAccessToken = [accessToken toJsonString];
 ```
 
 </MultiLang>
@@ -409,8 +429,8 @@ AntiAddictionUIKit.checkPayLimit(activity, amount,
     new Callback<CheckPayResult>() {
         @Override
         public void onSuccess(CheckPayResult result) {
-            // status 为 1 时可以支付
-            if (result.status != 1) {
+            // status 为 true 时可以支付，false 则限制消费
+            if (!result.status) {
                 // 限制消费提示标题
                 String title = result.title;
                 // 限制消费提示描述（例如法规说明）
@@ -716,7 +736,7 @@ POST /addict/api/v1/playcheck
         "remain_time": {{remainTime}},
         "cost_time": {{costtime}},
         "restrict_type":1,
-        "title":"健康游戏提示","description":"您当前为未成年账号，已被纳入防沉迷系统。根据国家相关规定，周五、周六、周日及法定节假日 20 点 - 21 点之外为健康保护时段。您今日游戏时间还剩余${remianTime}分钟，请注意适当休息。"
+        "title":"健康游戏提示","description":"你当前为未成年账号，已被纳入防沉迷系统。根据国家相关规定，周五、周六、周日及法定节假日 20 点 - 21 点之外为健康保护时段。你今日游戏时间还剩余${remainTime}分钟，请注意适当休息。"
     }
 }
 
@@ -731,7 +751,7 @@ POST /addict/api/v1/playcheck
         "cost_time": 60,
         "restrict_type":1,
         "title":"健康游戏提示",
-        "description":"您当前为未成年账号，已被纳入防沉迷系统。根据国家相关规定，周五、周六、周日及法定节假日 20 点 - 21 点之外为健康保护时段。当前时间段无法游玩，请合理安排时间。"
+        "description":"你当前为未成年账号，已被纳入防沉迷系统。根据国家相关规定，周五、周六、周日及法定节假日 20 点 - 21 点之外为健康保护时段。当前时间段无法游玩，请合理安排时间。"
     }
 }
 ```

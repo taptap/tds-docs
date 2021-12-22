@@ -19,7 +19,7 @@ TapTap 开发者服务为游戏和玩家提供唤起 TapTap 客户端进行游�
 <CodeBlock className="json">
 {`"dependencies":{
   ...
-  "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+  "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity_common}",
 }`}
 </CodeBlock>
 

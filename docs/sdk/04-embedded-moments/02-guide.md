@@ -343,8 +343,8 @@ postData.content = @"我是图片描述";
 
 <CodeBlock className="json">
 {`"dependencies":{
-  "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}",
-  "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+  "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity_login}",
+  "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity_common}",
   "com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#${sdkVersions.taptap.unity}",
 }`}
 </CodeBlock>

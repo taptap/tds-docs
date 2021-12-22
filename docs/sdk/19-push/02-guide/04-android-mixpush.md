@@ -321,7 +321,7 @@ vivo | 否（老版本有透传接口，新版本已不建议使用）
 透传消息是由客户端应用负责处理的消息。终端设备收到透传消息后不直接展示，而是将数据传递给应用，由应用自主解析内容，并触发相关动作（如跳转网页、应用内页面等等）。透传消息的常用场景包括好友邀请、VoIP 呼叫、语音播报等。
 按照华为官方说明，透传消息的到达率受 Android 系统和应用是否驻留在后台影响，推送服务不保证透传消息的高到达率，并且会让应用层处理变得复杂，所以还是推荐大家使用普通的通知栏消息。
 
-> 当使用华为推送发透传消息时，如果目标设备上应用进程被杀，会出现推送消息无法接收的情况。这个是华为 ROM 对透传消息广播的限制导致的，需要引导用户在华为 「权限设置」中对应用开启自启动权限来避免。
+> 当使用华为推送发透传消息时，如果目标设备上应用进程被杀，会出现推送消息无法接收的情况。这个是华为 ROM 对透传消息广播的限制导致的，需要引导用户在华为「权限设置」中对应用开启自启动权限来避免。
 ### 应用在前台时自己处理通知栏消息
 
 华为手机可以支持这一需求，但需要在调用 REST API 发送消息时，指定 `message.android.notification.foreground_show` 值为 `false`，同时客户端 Manifest 中声明 HmsMessageService 子类，并声明 `queries` 节点（针对 Android 11 以上系统）。
@@ -833,7 +833,7 @@ import cn.leancloud.LCMixPushManager;      // 使用 mixpush-android 的场合
 //import cn.leancloud.vivo.LCMixPushManager; // 使用 mixpush-vivo 的场合
 
 public class MyApp extends Application {
-  // 请替换成您自己的 appId 和 appKey
+  // 请替换成你自己的 appId 和 appKey
   private static final String LC_APP_ID = "xxx";
   private static final String LC_APP_KEY = "xxx";
 
@@ -983,7 +983,7 @@ vivo 桌面图标角标默认是关闭的，开发者接入完成后还需要终
 在开始接入之前，有两项准备工作：
 
 - 在 [OPPO 开放平台](https://open.oppomobile.com/)注册一个账号，并创建好应用。
-- 从 OPPO 官网下载 aar 资源。OPPO 官方 aar 下载地址为：<https://pfs.oppomobile.com/static/document/com.heytap.msp-push-2.1.0.aar>。
+- 从 OPPO 官网下载 aar 资源。OPPO 官方 aar 下载地址为：<https://openfs.oppomobile.com/open/oop/202109/18/a6165ca79f20025a21a8158a30dd6964.zip>。
 
 这里假设大家已经完成上述操作，创建好了应用，并获取了 `appKey`、`appSecret`、`masterSecret`，请保存好这三个值，下一步接入的时候会用到：
 
@@ -1059,7 +1059,7 @@ import cn.leancloud.oppo.LCMixPushManager;     // 使用 mixpush-oppo 的场合
 
 // Customized Application.
 public class MyApp extends Application {
-  // 请替换成您自己的 appId 和 appKey
+  // 请替换成你自己的 appId 和 appKey
   private static final String LC_APP_ID = "xxx";
   private static final String LC_APP_KEY = "xxx";
   private String OPPO_APPKEY = "your OPPO app id";
@@ -1218,7 +1218,7 @@ android {
       android:resource="@color/colorAccent" />
     ```
 
-- （可选）从 Android 8.0（API 级别 26）和更高版本开始，Android 系统支持并推荐使用[通知渠道](https://developer.android.com/guide/topics/ui/notifiers/notifications.html?hl=zh-cn#ManageChannels)。FCM 提供具有基本设置的默认通知渠道。如果您希望[创建](https://developer.android.com/training/notify-user/channels?hl=zh-cn)和使用您自己的默认渠道，请将 `default_notification_channel_id` 设为您的通知渠道对象的 ID（如下所示）；如果传入的消息未明确设置通知渠道，FCM 就会使用此值。
+- （可选）从 Android 8.0（API 级别 26）和更高版本开始，Android 系统支持并推荐使用[通知渠道](https://developer.android.com/guide/topics/ui/notifiers/notifications.html?hl=zh-cn#ManageChannels)。FCM 提供具有基本设置的默认通知渠道。如果你希望[创建](https://developer.android.com/training/notify-user/channels?hl=zh-cn)和使用你自己的默认渠道，请将 `default_notification_channel_id` 设为你的通知渠道对象的 ID（如下所示）；如果传入的消息未明确设置通知渠道，FCM 就会使用此值。
 
     ```xml
     <meta-data

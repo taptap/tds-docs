@@ -631,7 +631,7 @@ Client ID 用于校验 `identity_token` 及获取 `access_token`，指的是 App
 
 #### 获取 Private Key 及 Private Key ID
 
-Private Key 用于获取 `access_token`。登录 Apple 开发者平台，在左侧的 「Certificates, Identifiers & Profiles」 中选择 「Keys」，添加一个用于 Apple Sign In 的 Private Key，下载 XXXXX.p8 文件，同时在下载 Key 的页面获得 Private Key ID。详情请参考[ Apple 的文档](https://help.apple.com/developer-account/#/dev77c875b7e)。
+Private Key 用于获取 `access_token`。登录 Apple 开发者平台，在左侧的「Certificates, Identifiers & Profiles」中选择「Keys」，添加一个用于 Apple Sign In 的 Private Key，下载 XXXXX.p8 文件，同时在下载 Key 的页面获得 Private Key ID。详情请参考[ Apple 的文档](https://help.apple.com/developer-account/#/dev77c875b7e)。
 
 将 Key ID 填写到控制台，将下载下来的 Private Key 文件上传到控制台。控制台只能上传 Private Key 文件，无法查看及下载其内容。
 
@@ -744,7 +744,7 @@ TDSUser *user = [TDSUser user];
 }
 ```
 
-云端首先会查找账户系统（_User 表），看看是否存在 authData.weixin.openid = “ OPENID ” 的账户，如果存在，则返回现有账户，如果不存在那么就创建一个新账户，同时将上面的鉴权信息写入新账户的 `authData` 属性中，并将新账户的数据当成结果返回。
+云端首先会查找账户系统（_User 表），看看是否存在 authData.weixin.openid = 「OPENID」的账户，如果存在，则返回现有账户，如果不存在那么就创建一个新账户，同时将上面的鉴权信息写入新账户的 `authData` 属性中，并将新账户的数据当成结果返回。
 
 云端会自动为 `_User` class 中每个用户的 `authData.<PLATFORM>.<uid>` 创建唯一索引，从而避免重复数据。
 `<uid>` 在微信等部分云服务内建支持的第三方平台上为 `openid` 字段，在其他第三方平台（包括部分云服务专门支持的第三方平台和所有云服务没有专门支持的第三方平台）上为 `uid` 字段。

@@ -5,21 +5,23 @@ sidebar_label: 开发指南
 ---
 
 import MultiLang from '/src/docComponents/MultiLang';
-
+import CodeBlock from '@theme/CodeBlock';
+import sdkVersions from '/src/docComponents/sdkVersions';
 import {Gray,Blue, Red, Black,Link,ImageLink} from '/src/docComponents/doc';
 
 ## DLC 查询和购买
 
 在项目的 `Packages/manifest.json` 文件中添加以下依赖：
 
-```json
-"dependencies":{
+<CodeBlock className="json">
+{`"dependencies":{
 // 公共库
-"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#{version}",
+"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity_common}",
 // 付费购买
-"com.taptap.tds.dlc": "https://github.com/TapTap/TapLicense-Unity.git#{version}",
-}
-```
+"com.taptap.tds.dlc": "https://github.com/TapTap/TapLicense-Unity.git#${sdkVersions.taptap.unity}",
+}`}
+</CodeBlock>
+
 ## DLC 查询和购买
 
 ### DLC 回调设置
