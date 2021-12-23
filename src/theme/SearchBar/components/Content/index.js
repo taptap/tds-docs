@@ -1,7 +1,7 @@
 import React from "react";
 
-import Suggestions from "../Suggestions";
-import NoSuggestions from "../NoSuggestions";
+import History from "../History";
+import NoHistory from "../NoHistory";
 import Results from "../Results";
 import NoResults from "../NoResults";
 
@@ -11,13 +11,9 @@ const Content = ({ query, recentHits, groupedHits, ...props }) => (
   <div className={styles.content}>
     {groupedHits === null ? (
       recentHits.length ? (
-        <Suggestions
-          recentHits={recentHits}
-          {...props}
-          key={recentHits.length}
-        />
+        <History recentHits={recentHits} {...props} key={recentHits.length} />
       ) : (
-        <NoSuggestions />
+        <NoHistory />
       )
     ) : groupedHits.length ? (
       <Results groupedHits={groupedHits} {...props} key={query} />

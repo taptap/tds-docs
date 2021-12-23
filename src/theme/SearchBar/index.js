@@ -141,7 +141,7 @@ const SearchBar = () => {
     <>
       <button className={styles.searchBar} onClick={openSearch}>
         <IconSearchBtn />
-        <span>请输入关键字进行搜索</span>
+        <span>搜索文档</span>
       </button>
       {isSearchOpen && <SearchBox closeSearch={closeSearch} />}
     </>

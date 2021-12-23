@@ -7,7 +7,7 @@ import styles from "./index.module.scss";
 import IconClear from "../../icons/clear.svg";
 import IconRecent from "../../icons/recent.svg";
 
-const Suggestions = ({
+const History = ({
   recentHits,
   searchFormEl,
   searchInputEl,
@@ -60,4 +60,4 @@ const Suggestions = ({
   );
 };
 
-export default Suggestions;
+export default History;
