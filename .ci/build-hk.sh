@@ -2,6 +2,7 @@
 
 set -e
 
+rm -rf i18n/en
 mv i18n/eng i18n/en
 
 rm -rf docs/*
