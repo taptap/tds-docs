@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
+import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
+import Translate from "@docusaurus/Translate";
 import axios from "axios";
 
 import Input from "./components/Input";
@@ -8,8 +10,6 @@ import Footer from "./components/Footer";
 import styles from "./index.module.scss";
 
 import IconSearchBtn from "./icons/search-btn.svg";
-
-const SEARCH_API_URL = "https://tds-doc-search-api.cn-e1.leanapp.cn/search";
 
 const useRecentHits = () => {
   const getRecentHitsFromLocalStorage = () => {
@@ -141,7 +141,9 @@ const SearchBar = () => {
     <>
       <button className={styles.searchBar} onClick={openSearch}>
         <IconSearchBtn />
-        <span>搜索文档</span>
+        <span>
+          <Translate id="tds.search.search">搜索文档</Translate>
+        </span>
       </button>
       {isSearchOpen && <SearchBox closeSearch={closeSearch} />}
     </>
@@ -149,8 +151,11 @@ const SearchBar = () => {
 };
 
 const SearchBox = ({ closeSearch }) => {
+  const { siteConfig } = useDocusaurusContext();
+  const { searchUrl } = siteConfig.customFields;
+
   const [recentHits, setRecentHits] = useRecentHits();
-  const [query, setQuery, groupedHits] = useSearch(SEARCH_API_URL);
+  const [query, setQuery, groupedHits] = useSearch(searchUrl);
   const searchFormEl = useRef(null);
   const searchInputEl = useRef(null);
 

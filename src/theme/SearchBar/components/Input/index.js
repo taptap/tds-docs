@@ -1,4 +1,5 @@
 import React from "react";
+import Translate, { translate } from "@docusaurus/Translate";
 
 import styles from "./index.module.scss";
 
@@ -42,7 +43,10 @@ const Input = ({
             autoComplete="off"
             autoCorrect="off"
             spellCheck="false"
-            placeholder="搜索文档"
+            placeholder={translate({
+              id: "tds.search.search",
+              message: "搜索文档",
+            })}
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
@@ -55,7 +59,10 @@ const Input = ({
           <button
             className={styles.clearButton}
             type="reset"
-            title="清除搜索词"
+            title={translate({
+              id: "tds.search.clearQuery",
+              message: "清除搜索词",
+            })}
           >
             <IconClear />
           </button>
@@ -63,7 +70,7 @@ const Input = ({
       </form>
       <div className={styles.divider} />
       <button className={styles.cancelButton} onClick={closeSearch}>
-        取消
+        <Translate id="tds.search.cancel">取消</Translate>
       </button>
     </div>
   );

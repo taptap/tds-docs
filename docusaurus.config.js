@@ -35,6 +35,7 @@ function regionDependantSidebarItems(items) {
 const config = {
   customFields: {
     region: REGION,
+    searchUrl: 'https://tds-doc-search-api.cn-e1.leanapp.cn/search'
   },
   title: REGION === 'cn' ? 'TapTap 开发者文档' : 'TapTap Developer Documentation',
   url: REGION === 'cn' ? 'https://developer.taptap.com' : 'https://developer.taptap.io',
@@ -62,11 +63,6 @@ const config = {
         defaultMode: 'light',
         disableSwitch: true,
       },
-      algolia: {
-        apiKey: '9158d2e78cea72731892281efc0509c4',
-        indexName: 'tap-sdk-doc',
-        appId: 'TVQNXY05EF',
-      },
       navbar: {
         items: REGION === 'cn' ? [
           {
@@ -90,7 +86,7 @@ const config = {
             to: '/sdk-api',
             position: 'right',
           },
-  
+
           {
             label: '下载',
             position: 'right',
@@ -131,7 +127,7 @@ const config = {
           },
         ],
       },
-      googleAnalytics: REGION === 'cn' ?  {
+      googleAnalytics: REGION === 'cn' ? {
         trackingID: 'UA-73963350-1',
       } : {
         trackingID: 'UA-73963350-4',
