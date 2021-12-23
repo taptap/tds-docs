@@ -1,4 +1,5 @@
 import React from "react";
+import { translate } from "@docusaurus/Translate";
 
 import { useSelection, List, Group, Card } from "../common";
 
@@ -24,7 +25,10 @@ const History = ({
 
   return (
     <List>
-      <Group title="最近看过" zIndex={1}>
+      <Group
+        title={translate({ id: "tds.search.recent", message: "最近看过" })}
+        zIndex={1}
+      >
         {recentHits.map((hit, hitIndex) => (
           <Card
             hit={hit}
@@ -43,7 +47,10 @@ const History = ({
               </div>
               <button
                 className={styles.clearButton}
-                title="清除该项目"
+                title={translate({
+                  id: "tds.search.removeItem",
+                  message: "删除该项目",
+                })}
                 onClick={(e) => {
                   removeRecentHit(hit);
                   e.preventDefault();

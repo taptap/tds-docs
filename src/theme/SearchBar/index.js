@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import Translate from "@docusaurus/Translate";
 import axios from "axios";
 
 import Input from "./components/Input";
@@ -141,7 +142,9 @@ const SearchBar = () => {
     <>
       <button className={styles.searchBar} onClick={openSearch}>
         <IconSearchBtn />
-        <span>搜索文档</span>
+        <span>
+          <Translate id="tds.search.search">搜索文档</Translate>
+        </span>
       </button>
       {isSearchOpen && <SearchBox closeSearch={closeSearch} />}
     </>
