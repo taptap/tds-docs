@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import Translate from "@docusaurus/Translate";
 import axios from "axios";
 
@@ -152,8 +153,11 @@ const SearchBar = () => {
 };
 
 const SearchBox = ({ closeSearch }) => {
+  const { siteConfig } = useDocusaurusContext();
+  const { searchUrl } = siteConfig.customFields;
+
   const [recentHits, setRecentHits] = useRecentHits();
-  const [query, setQuery, groupedHits] = useSearch(SEARCH_API_URL);
+  const [query, setQuery, groupedHits] = useSearch(searchUrl);
   const searchFormEl = useRef(null);
   const searchInputEl = useRef(null);
 
