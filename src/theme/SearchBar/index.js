@@ -11,8 +11,6 @@ import styles from "./index.module.scss";
 
 import IconSearchBtn from "./icons/search-btn.svg";
 
-const SEARCH_API_URL = "https://tds-doc-search-api.cn-e1.leanapp.cn/search";
-
 const useRecentHits = () => {
   const getRecentHitsFromLocalStorage = () => {
     const recentHits =
