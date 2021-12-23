@@ -139,10 +139,13 @@ const config = {
     }),
 
   i18n: {
-    defaultLocale: REGION === 'cn' ? 'zh-Hans' : 'en',
-    locales: REGION === 'cn' ? ['zh-Hans', 'en'] : ['en'],
+    defaultLocale: REGION === 'cn' ? 'zh-Hans' : 'eng',
+    locales: REGION === 'cn' ? ['zh-Hans', 'en'] : ['eng'],
     localeConfigs: {
       en: {
+        label: 'English',
+      },
+      eng: {
         label: 'English',
       },
       'zh-Hans': {
