@@ -40,7 +40,7 @@ const getUpdatedRecentHits = (recentHits, hit, addHit) => {
   return updatedRecentHits;
 };
 
-const useSearch = (url) => {
+const useSearch = (url, locale) => {
   const groupHits = (hits) => {
     const groupedHits = [];
 
@@ -73,16 +73,16 @@ const useSearch = (url) => {
   useEffect(() => {
     let ignore = false;
 
-    const fetchHits = async (url, query) => {
+    const fetchHits = async (url, query, locale) => {
       const config = {
-        params: { q: query },
+        params: { q: query, locale },
       };
       const response = await axios.get(url, config);
       return response.data.hits;
     };
 
     const search = async () => {
-      const hits = await fetchHits(url, query);
+      const hits = await fetchHits(url, query, locale);
       if (!ignore) {
         const groupedHits = groupHits(hits);
         setGroupedHits(groupedHits);
@@ -151,11 +151,13 @@ const SearchBar = () => {
 };
 
 const SearchBox = ({ closeSearch }) => {
-  const { siteConfig } = useDocusaurusContext();
-  const { searchUrl } = siteConfig.customFields;
+  const { siteConfig, i18n } = useDocusaurusContext();
+  const { customFields } = siteConfig;
+  const { searchUrl } = customFields;
+  const { currentLocale } = i18n;
 
   const [recentHits, setRecentHits] = useRecentHits();
-  const [query, setQuery, groupedHits] = useSearch(searchUrl);
+  const [query, setQuery, groupedHits] = useSearch(searchUrl, currentLocale);
   const searchFormEl = useRef(null);
   const searchInputEl = useRef(null);
 
