@@ -4,6 +4,10 @@ title: TapSDK Android FAQ
 sidebar_label: Android
 ---
 
+<head>
+  <meta name="robots" content="noindex" />
+</head>
+
 ## 登录失败
 可能有以下几个原因：
 

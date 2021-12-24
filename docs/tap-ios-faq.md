@@ -4,6 +4,10 @@ title: TapSDK iOS FAQ
 sidebar_label: iOS
 ---
 
+<head>
+  <meta name="robots" content="noindex" />
+</head>
+
 ## 登录失败
 可能有几个以下原因：
 
