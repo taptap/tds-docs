@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
+import Head from "@docusaurus/Head";
 import Translate from "@docusaurus/Translate";
 import axios from "axios";
 
@@ -197,32 +198,41 @@ const SearchBox = ({ closeSearch }) => {
   }, [recentHits, query]);
 
   return (
-    <div className={styles.searchBox}>
-      <div className={styles.scrim} onClick={closeSearch} />
-      <div
-        className={`${styles.panel} ${
-          groupedHits === null && !recentHits.length ? styles.short : ""
-        }`}
-      >
-        <Input
-          query={query}
-          setQuery={setQuery}
-          searchFormEl={searchFormEl}
-          searchInputEl={searchInputEl}
-          closeSearch={closeSearch}
+    <>
+      <Head>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1, maximum-scale=1"
         />
-        <Content
-          query={query}
-          recentHits={recentHits}
-          groupedHits={groupedHits}
-          searchFormEl={searchFormEl}
-          searchInputEl={searchInputEl}
-          openHit={openHit}
-          removeRecentHit={removeRecentHit}
-        />
-        <Footer />
+      </Head>
+
+      <div className={styles.searchBox}>
+        <div className={styles.scrim} onClick={closeSearch} />
+        <div
+          className={`${styles.panel} ${
+            groupedHits === null && !recentHits.length ? styles.short : ""
+          }`}
+        >
+          <Input
+            query={query}
+            setQuery={setQuery}
+            searchFormEl={searchFormEl}
+            searchInputEl={searchInputEl}
+            closeSearch={closeSearch}
+          />
+          <Content
+            query={query}
+            recentHits={recentHits}
+            groupedHits={groupedHits}
+            searchFormEl={searchFormEl}
+            searchInputEl={searchInputEl}
+            openHit={openHit}
+            removeRecentHit={removeRecentHit}
+          />
+          <Footer />
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
