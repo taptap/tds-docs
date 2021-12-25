@@ -35,7 +35,9 @@ function regionDependantSidebarItems(items) {
 const config = {
   customFields: {
     region: REGION,
-    searchUrl: 'https://tds-doc-search-api.cn-e1.leanapp.cn/search'
+    searchUrl: REGION === 'cn'
+      ? 'https://tds-doc-search-api.cn-e1.leanapp.cn/search'
+      : 'https://tds-doc-search-api.avosapps.us/search'
   },
   title: REGION === 'cn' ? 'TapTap 开发者文档' : 'TapTap Developer Documentation',
   url: REGION === 'cn' ? 'https://developer.taptap.com' : 'https://developer.taptap.io',
