@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import BrowserOnly from "@docusaurus/BrowserOnly";
+import ExecutionEnvironment from "@docusaurus/ExecutionEnvironment";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import Head from "@docusaurus/Head";
 import Translate from "@docusaurus/Translate";
@@ -17,7 +17,9 @@ import IconSearchBtn from "./icons/search-btn.svg";
 const useRecentHits = () => {
   const getRecentHitsFromLocalStorage = () => {
     const recentHits =
-      JSON.parse(localStorage.getItem("tdsDocSearchRecentHits")) || [];
+      (ExecutionEnvironment.canUseDOM &&
+        JSON.parse(localStorage.getItem("tdsDocSearchRecentHits"))) ||
+      [];
     return recentHits;
   };
 
@@ -25,8 +27,10 @@ const useRecentHits = () => {
 
   useEffect(() => {
     const saveRecentHitsToLocalStorage = (recentHits) => {
-      const recentHitsInString = JSON.stringify(recentHits);
-      localStorage.setItem("tdsDocSearchRecentHits", recentHitsInString);
+      if (ExecutionEnvironment.canUseDOM) {
+        const recentHitsInString = JSON.stringify(recentHits);
+        localStorage.setItem("tdsDocSearchRecentHits", recentHitsInString);
+      }
     };
 
     saveRecentHitsToLocalStorage(recentHits);
@@ -164,7 +168,7 @@ const SearchBar = () => {
   }, [isSearchOpen]);
 
   return (
-    <BrowserOnly>
+    <>
       <button className={styles.searchBar} onClick={openSearch}>
         <IconSearchBtn />
         <span>
@@ -181,7 +185,7 @@ const SearchBar = () => {
           removeRecentHit={removeRecentHit}
         />
       )}
-    </BrowserOnly>
+    </>
   );
 };
 
