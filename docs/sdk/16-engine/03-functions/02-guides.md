@@ -1980,7 +1980,7 @@ v3|3.x|3.x|8| 需要使用 Promise 写法 |async, bluebird, crypto, debug, ejs, 
 </details>
 
 <details>
-<summary>点击展开如何从在先编辑迁移到项目部署</summary>
+<summary>点击展开如何从在线编辑迁移到项目部署</summary>
 
 1. 按照[云引擎命令行工具使用指南](/sdk/engine/cli/)安装命令行工具，使用 `lean init` 初始化项目，模板选择 `Node.js > Express`（我们的 Node.js 示例项目）。
 2. 在**开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 云引擎 > 云引擎分组 > 部署 > 在线编辑**点击 **预览**，将全部函数的代码拷贝到新建项目中的 `cloud.js`（替换掉原有内容）。

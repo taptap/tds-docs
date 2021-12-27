@@ -48,7 +48,7 @@ LeanCache 使用 [Redis](http://redis.io/) 提供了高性能、高可用的 Key
 <LeandbCreateInstance instanceName='LeanCache'>
 
 - **实例名称** 用于在云引擎中通过环境变量引用到该 LeanDB 实例，在账户下需唯一。
-- **数据删除策略** 内存用满时的删除策略，默认为 `volatile-lru`，详见 [数据删除策略](#数据删除策略)
+- **数据删除策略** 内存用满时的删除策略，默认为 `volatile-lru`，详见 [数据删除策略](#数据删除策略)。
 - **实例容量** 目前提供 `128M`、`256M`、`512M`、`1G`、`2G `、`4G`、`8G` 几种，代表不同的内存容量，是计费的基础。
 
 </LeandbCreateInstance>
