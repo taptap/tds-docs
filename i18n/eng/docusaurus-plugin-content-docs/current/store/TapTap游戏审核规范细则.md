@@ -1,11 +1,8 @@
 --
-
 id: store-agree
-
 title: TapTap Game Review Specifications and Rules
-
-sidebarlabel: TapTap Game Review Specifications and Rules
-
+sidebar_label: TapTap Game Review Specifications and Rules
+sidebar_position: 20
 --
 
  

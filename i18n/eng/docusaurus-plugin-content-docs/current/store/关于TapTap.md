@@ -2,6 +2,7 @@
 id: store-about
 title: About TapTap
 sidebar_label: About TapTap
+sidebar_position: 10
 slug: /store
 ---
 

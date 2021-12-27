@@ -2,6 +2,7 @@
 id: store-admin 
 title: TapTap Developer Agreement
 sidebar_label: TapTap Developer Agreement
+sidebar_position: 15
 ---
 
 
