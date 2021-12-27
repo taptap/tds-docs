@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import BrowserOnly from "@docusaurus/BrowserOnly";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import Head from "@docusaurus/Head";
 import Translate from "@docusaurus/Translate";
@@ -163,7 +164,7 @@ const SearchBar = () => {
   }, [isSearchOpen]);
 
   return (
-    <>
+    <BrowserOnly>
       <button className={styles.searchBar} onClick={openSearch}>
         <IconSearchBtn />
         <span>
@@ -180,7 +181,7 @@ const SearchBar = () => {
           removeRecentHit={removeRecentHit}
         />
       )}
-    </>
+    </BrowserOnly>
   );
 };
 
