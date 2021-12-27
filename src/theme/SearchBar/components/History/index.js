@@ -43,7 +43,7 @@ const History = ({
             <div className={styles.wrapper}>
               <div className={styles.content}>
                 <IconRecent />
-                <h3>{hit._source.heading}</h3>
+                <h3 className={styles.excerpt}>{hit._source.heading}</h3>
               </div>
               <button
                 className={styles.clearButton}
