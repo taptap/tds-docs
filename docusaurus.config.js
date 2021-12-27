@@ -40,7 +40,7 @@ const config = {
       : 'https://tds-doc-search-api.avosapps.us/search'
   },
   title: REGION === 'cn' ? 'TapTap 开发者文档' : 'TapTap Developer Documentation',
-  url: REGION === 'cn' ? 'https://developer.taptap.com' : 'https://developer.taptap.io',
+  url: PREVIEW === 'true' ? 'https://doc-preview.cn-e1.leanapp.cn' : (REGION === 'cn' ? 'https://developer.taptap.com' : 'https://developer.taptap.io'),
   baseUrl,
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
