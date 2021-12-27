@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import Link from "@docusaurus/Link";
 
 import styles from "./index.module.scss";
 
@@ -97,15 +98,15 @@ const Card = ({ hit, selected, onSelect, selectionEl, openHit, children }) => (
     onMouseMove={onSelect}
     ref={selected ? selectionEl : null}
   >
-    <a
-      href={hit._source.url}
+    <Link
+      to={`/${hit._source.url}`}
       onClick={(e) => {
         openHit(hit);
         e.preventDefault();
       }}
     >
       {children}
-    </a>
+    </Link>
   </li>
 );
 
