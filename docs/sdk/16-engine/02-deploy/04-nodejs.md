@@ -59,7 +59,7 @@ import BuildingSystemDependencies from '../_partials/building-system-dependencie
 ```
 
 :::note
-在使用 [命令行工具] 本地调试时，`lean up` 会优先使用 `npm run dev` 来启动项目。
+在使用 [命令行工具](/sdk/engine/cli) 本地调试时，`lean up` 会优先使用 `npm run dev` 来启动项目。
 :::
 
 ## 配置 Node.js 版本

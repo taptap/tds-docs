@@ -15,7 +15,7 @@ import TabItem from '@theme/TabItem';
 <FunctionsIntroduction />
 
 :::info
-如果希望使用 Node.js 编写简单的云函数或 Hook，也可以尝试 [在线编写云函数](#在线编写云函数)。
+如果希望使用 Node.js 编写简单的云函数或 Hook，也可以尝试 [云函数和 Hook 开发指南 § 在线编写云函数](/sdk/engine/functions/guides/#在线编写云函数)。
 :::
 
 ## 创建项目

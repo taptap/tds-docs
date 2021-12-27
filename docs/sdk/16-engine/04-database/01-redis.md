@@ -258,7 +258,7 @@ var bar = db.StringGet("foo");
 ## 常见问题
 ### 在本地调试依赖 LeanCache 的应用
 
-目前不支持直接连接线上的 LeanCache 进行调试，所以需要先在本地安装好 Redis。
+你可以 [使用命令行工具连接](#使用命令行工具连接) 云端的 LeanCache 进行调试，或在本地安装 Redis:
 
 * Mac 上运行 `brew install redis` 来安装 Redis，然后使用 `redis-server` 启动服务。
 * Debian/Ubuntu 上运行 `apt-get install redis-server`

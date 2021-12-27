@@ -32,7 +32,7 @@ Go | >= 1.10 | go mod | [Go 运行环境](/sdk/engine/deploy/go/) | [golang-gett
 使用云函数几乎不需要你有传统后端开发经验，可以帮助开发者专注在业务逻辑上，请从 [快速部署云函数和 Hook](/sdk/engine/functions/getting-started/) 开始编写你的第一个云函数。
 :::
 
-基于云函数我们还提供了 [定时任务](/sdk/engine/functions/guides#定时任务) 的功能，能够在特定时间或基于一定时间间隔来运行云函数。
+基于云函数我们还提供了 [定时任务](/sdk/engine/functions/guides#定时任务) 和 [云队列](/sdk/engine/functions/cloud-queue/) 等功能，可以对云函数进行更复杂的调度。如在特定时间或基于一定时间间隔来运行云函数，还有重试、去重、结果查询、延时任务等功能。
 
 ## LeanDB 数据库
 
@@ -49,5 +49,4 @@ Elasticsearch | 单节点 / 三个节点 | 默认高可用，自动切换（三�
 
 - **命令行工具** 可以用来部署、调试云函数项目，详见 [命令行工具 CLI 使用指南](/sdk/engine/cli/)。
 - 除了使用数据存储 SDK，云函数也提供了 **REST API**，详见 [云引擎 REST API 指南](/sdk/engine/functions/rest-api/)。
-- **云队列** 提供了额外的调度云函数的能力，包括重试、去重、结果查询、延时任务等功能，详见 [云队列（Cloud Queue）开发指南](/sdk/engine/functions/cloud-queue/)。
 - 在 [深入了解云引擎](/sdk/engine/deep-dive/) 中我们会向有经验的开发者介绍云引擎背后的一些细节。
