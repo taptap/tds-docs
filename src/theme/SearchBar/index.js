@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import Head from "@docusaurus/Head";
 import Translate from "@docusaurus/Translate";
+import { useHistory } from "@docusaurus/router";
 import axios from "axios";
 
 import Input from "./components/Input";
@@ -119,7 +120,30 @@ const useToggle = () => {
 };
 
 const SearchBar = () => {
+  const { siteConfig, i18n } = useDocusaurusContext();
+  const { customFields, baseUrl } = siteConfig;
+  const { searchUrl } = customFields;
+  const { currentLocale } = i18n;
+
   const [isSearchOpen, openSearch, closeSearch] = useToggle();
+  const [recentHits, setRecentHits] = useRecentHits();
+
+  const history = useHistory();
+
+  const openHit = (hit) => {
+    closeSearch();
+
+    const updatedRecentHits = getUpdatedRecentHits(recentHits, hit, true);
+    setRecentHits(updatedRecentHits);
+
+    const url = hit._source.url;
+    history.push(`${baseUrl}${url}`);
+  };
+
+  const removeRecentHit = (hit) => {
+    const updatedRecentHits = getUpdatedRecentHits(recentHits, hit, false);
+    setRecentHits(updatedRecentHits);
+  };
 
   useEffect(() => {
     const handleKeyDown = (e) => {
@@ -146,33 +170,31 @@ const SearchBar = () => {
           <Translate id="tds.search.search">搜索文档</Translate>
         </span>
       </button>
-      {isSearchOpen && <SearchBox closeSearch={closeSearch} />}
+      {isSearchOpen && (
+        <SearchBox
+          searchUrl={searchUrl}
+          locale={currentLocale}
+          recentHits={recentHits}
+          closeSearch={closeSearch}
+          openHit={openHit}
+          removeRecentHit={removeRecentHit}
+        />
+      )}
     </>
   );
 };
 
-const SearchBox = ({ closeSearch }) => {
-  const { siteConfig, i18n } = useDocusaurusContext();
-  const { customFields } = siteConfig;
-  const { searchUrl } = customFields;
-  const { currentLocale } = i18n;
-
-  const [recentHits, setRecentHits] = useRecentHits();
-  const [query, setQuery, groupedHits] = useSearch(searchUrl, currentLocale);
+const SearchBox = ({
+  searchUrl,
+  locale,
+  recentHits,
+  closeSearch,
+  openHit,
+  removeRecentHit,
+}) => {
+  const [query, setQuery, groupedHits] = useSearch(searchUrl, locale);
   const searchFormEl = useRef(null);
   const searchInputEl = useRef(null);
-
-  const openHit = (hit) => {
-    const updatedRecentHits = getUpdatedRecentHits(recentHits, hit, true);
-    setRecentHits(updatedRecentHits);
-    const url = hit._source.url;
-    window.location.href = url;
-  };
-
-  const removeRecentHit = (hit) => {
-    const updatedRecentHits = getUpdatedRecentHits(recentHits, hit, false);
-    setRecentHits(updatedRecentHits);
-  };
 
   useEffect(() => {
     const handleKeyDown = (e) => {
