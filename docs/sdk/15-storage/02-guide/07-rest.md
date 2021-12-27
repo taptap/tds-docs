@@ -302,7 +302,7 @@ curl -X PUT \
 
 举例来说，假设应用的信息如下：
 
-<table class="noheading">
+<table>
   <tbody>
     <tr>
       <td scope="row">App Id</td>
