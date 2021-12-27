@@ -14,11 +14,13 @@ import styles from "./index.module.scss";
 
 import IconSearchBtn from "./icons/search-btn.svg";
 
-const useRecentHits = () => {
+const useRecentHits = (locale) => {
+  const localStorageItemKey = `tds_doc_search_recent_hits_for_${locale}`;
+
   const getRecentHitsFromLocalStorage = () => {
     const recentHits =
       (ExecutionEnvironment.canUseDOM &&
-        JSON.parse(localStorage.getItem("tdsDocSearchRecentHits"))) ||
+        JSON.parse(localStorage.getItem(localStorageItemKey))) ||
       [];
     return recentHits;
   };
@@ -29,7 +31,7 @@ const useRecentHits = () => {
     const saveRecentHitsToLocalStorage = (recentHits) => {
       if (ExecutionEnvironment.canUseDOM) {
         const recentHitsInString = JSON.stringify(recentHits);
-        localStorage.setItem("tdsDocSearchRecentHits", recentHitsInString);
+        localStorage.setItem(localStorageItemKey, recentHitsInString);
       }
     };
 
@@ -131,7 +133,7 @@ const SearchBar = () => {
   const { currentLocale } = i18n;
 
   const [isSearchOpen, openSearch, closeSearch] = useToggle();
-  const [recentHits, setRecentHits] = useRecentHits();
+  const [recentHits, setRecentHits] = useRecentHits(currentLocale);
 
   const history = useHistory();
 
