@@ -4,6 +4,10 @@ title: 客服系统
 slug: /sdk/tap-support/guide/
 ---
 
+<head>
+  <meta name="robots" content="noindex" />
+</head>
+
 import MultiLang from '/src/docComponents/MultiLang';
 import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';

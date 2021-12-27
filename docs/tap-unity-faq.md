@@ -4,6 +4,10 @@ title: TapSDK Unity FAQ
 sidebar_label: Unity
 ---
 
+<head>
+  <meta name="robots" content="noindex" />
+</head>
+
 ## 登录失败
 可能有以下几个原因：
 

@@ -4,6 +4,10 @@ title: 开发者应对 DDoS 攻击问题的指引文档
 slug: ddos
 ---
 
+<head>
+  <meta name="robots" content="noindex" />
+</head>
+
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 亲爱的开发者伙伴们，
