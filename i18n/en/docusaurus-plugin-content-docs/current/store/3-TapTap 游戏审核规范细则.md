@@ -17,7 +17,7 @@ Please make sure that the game information you submit in the Developer Center co
 1.1.4 The game shall not be personally offensive, insulting, or defamatory; it shall not infringe on the legitimate rights and interests of others (including but not limited to the copyright, trademark rights, portrait rights, rights to reputation, etc.)  
 1.1.5 The game shall not make overly realistic representations of weapons (e.g. it must not address the manufacturing process and parameters of weapons, etc.), and it shall not promote violation of laws or misuse of weapons.  
 1.1.6 The game shall not contain any content that is anti-government, anti-social, incompatible with or prohibited by state laws.  
-1.1.7 The platform has the right to refuse to release games that contains security risks, such as information that convenes, promotes, instigates crimes, violates social customs, disrupts social order, or is suspected of violating laws and regulations.  
+1.1.7 The platform has the right to refuse to release games that contain security risks, such as information that convenes, promotes, instigates crimes, violates social customs, disrupts social order, or is suspected of violating laws and regulations.  
 ![](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)  
 
 ### **1.2 In-app Purchases**
