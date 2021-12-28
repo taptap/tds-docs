@@ -1,5 +1,5 @@
 ---
-id: store-admin 
+id: store-devagreement
 title: TapTap Developer Agreement
 sidebar_label: TapTap Developer Agreement
 sidebar_position: 15
