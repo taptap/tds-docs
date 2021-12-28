@@ -40,7 +40,7 @@ Your game shall not make overly realistic representations of weapons. For exampl
 
 
 1.1.5
-The platform has the right to refuse to release games that contains security risks, such as information that convenes, promotes, instigates crimes, or is suspected of violating laws and regulations.
+The platform has the right to refuse to release games that contain security risks, such as information that convenes, promotes, instigates crimes, or is suspected of violating laws and regulations.
 
  
 
@@ -96,7 +96,7 @@ The advertisements in your game cannot include any bundled downloads. For exampl
 
  
 
-1.4.1 Your game’s start screen should not have a option that is checked by default to allow downloading other applications without the user's permission. If there are other options checked by default, users must be clearly notified.
+1.4.1 Your game’s start screen should not have an option that is checked by default to allow downloading other applications without the user's permission. If there are other options checked by default, users must be clearly notified.
 
  
 
@@ -141,7 +141,7 @@ Games that involve fraud or mislead users will be removed. The developer account
  
 
 1.6.2
-You should keep monitoring the content of your game before and after it passes the review. Games that provides illegal services after the release will be removed. The developer account may also be suspended.
+You should keep monitoring the content of your game before and after it passes the review. Games that provide illegal services after the release will be removed. The developer account may also be suspended.
 
 
 
@@ -198,7 +198,7 @@ Games involving gambling, casinos or lottery (including but not limited to cards
 
  
 
-2.1.5 The tittle of the provider cannot be the combination or list of multiple providers' titles.
+2.1.5 The title of the provider cannot be the combination or list of multiple providers' titles.
 
  
 
@@ -292,7 +292,7 @@ All visual materials must not contain any infringing content. Licensed or purcha
 
  
 
-3.3.3 Do not use repeated screenshots as the promotion image for the the game detail page on TapTap.
+3.3.3 Do not use repeated screenshots as the promotion image for the game detail page on TapTap.
 
  
 
@@ -352,7 +352,7 @@ The above are hereafter collectively referred to as ‘Promotion Image’
 
  
 
-3.5.4 The text must not contain information that promote conflicts and hatred.
+3.5.4 The text must not contain information that promotes conflicts and hatred.
 
  
 
@@ -453,7 +453,7 @@ The above are hereafter collectively referred to as ‘Promotion Image’
 
  
 
-The link must the game's official website; it cannot be a link to any third-party website.
+The link must be the game's official website; it cannot be a link to any third-party website.
 
 
 
@@ -537,7 +537,7 @@ APK must not be signed with a public certificate
 
  
 
-6.1.2 A complete and valid and of the license chain is required if the assets, storyline, music and other content of the game involve another IP.
+6.1.2 A complete and valid proof of the license chain is required if the assets, storyline, music and other content of the game involve another IP.
 
 
 
@@ -565,7 +565,7 @@ APK must not be signed with a public certificate
 
  
 
-6.2.4 The proof of order are required if the assets in the game are purchased.
+6.2.4 The proof of order is required if the assets in the game are purchased.
 
 
 
