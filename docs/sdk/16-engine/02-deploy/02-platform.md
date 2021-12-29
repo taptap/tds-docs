@@ -50,7 +50,7 @@ Switching to my-engine-app (group: web)`}
 
 ![云引擎日志](/img/cloud-engine/engine-logs.png)
 
-可以使用命令行工具将运行日志导出至本地，详见 [命令行工具使用指南 § 日志](/sdk/engine/cli#日志)。
+可以使用命令行工具将运行日志导出至本地，详见 [命令行工具使用指南 § 查看日志](/sdk/engine/cli#查看日志)。
 
 ### 访问日志
 
