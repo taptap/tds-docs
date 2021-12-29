@@ -131,11 +131,6 @@ const config = {
           },
         ],
       },
-      googleAnalytics: REGION === 'cn' ? {
-        trackingID: 'UA-73963350-1',
-      } : {
-        trackingID: 'UA-73963350-4',
-      },
     }),
 
   i18n: {
@@ -175,6 +170,9 @@ const config = {
         },
         theme: {
           customCss: require.resolve('./src/styles/index.scss'),
+        },
+        googleAnalytics: {
+          trackingID: 'UA-73963350-1',
         },
       }),
     ],
