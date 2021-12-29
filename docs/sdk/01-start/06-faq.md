@@ -12,4 +12,4 @@ TDS 默认提供了 2 Gbps 的防护带宽，可以防护小规模的攻击，�
 
 ## 云引擎
 
-[云引擎 FAQ](/sdk/engine/faq/)
+[云引擎 FAQ](/sdk/engine/guide/faq/)

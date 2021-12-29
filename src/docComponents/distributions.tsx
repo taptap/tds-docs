@@ -1,13 +1,13 @@
 import {BRAND, REGION} from '../constants/env'
 
-interface ConditionalProps {
+interface DistributionsProps {
   children: React.ReactElement[]
   brand?: typeof BRAND
   region?: typeof REGION
   if?: boolean
 }
 
-export function Conditional(props: ConditionalProps) {
+export function Distributions(props: DistributionsProps) {
   const {children, brand, region} = props
 
   if ((!brand || brand === BRAND) &&

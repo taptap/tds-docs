@@ -68,7 +68,7 @@ push-time| | 定时推送的发送时间
 因此，建议商用版应用使用我们的「混合推送」方案，该方案对接了国内主流厂商的不同接口，让开发者通过统一的 API 完成推送任务。
 详见[Android 混合推送指南](/sdk/push/guide/android-mixpush/)。
 
-如果想要使用 LeanCloud 自有通道推送，请阅读[Android 推送指南](/sdk/push/guide/android/)。
+如果想要使用 LeanCloud 自有通道推送，请阅读[Android 推送指南](/sdk/push/guide/android/)。 
 
 ## 使用 REST API 推送消息
 
@@ -76,29 +76,5 @@ push-time| | 定时推送的发送时间
 
 ## 云引擎下通过 JavaScript SDK 创建推送
 
-JavaScript SDK 也提供了创建推送的接口，使用场景主要面向云引擎。请参考 SDK 的 API 文档 [AV.Push](https://leancloud.github.io/javascript-sdk/docs/AV.Push.html)。
-这里举两个简单的例子：
-
-推送给所有订阅了 `public` 频道的设备：
-
-```js
-AV.Push.send({
-  channels: [ 'public' ],
-  data: {
-    alert: 'public message'
-  }
-});
-```
-
-如果希望按照某个 `_Installation` 表的查询条件来推送，例如推送给某个 `installationId` 的 Android 设备，可以传入一个 `AV.Query` 对象作为 `where` 条件：
-
-```js
-const query = new AV.Query('_Installation');
-query.equalTo('installationId', installationId);
-AV.Push.send({
-  where: query,
-  data: {
-    alert: 'Public message'
-  }
-});
-```
+JavaScript SDK 也提供了创建推送的接口，使用场景主要面向云引擎。
+详见[云引擎 FAQ](/sdk/engine/guide/faq/)的《云引擎下如何通过 JavaScript SDK 创建推送？》。

@@ -11,7 +11,7 @@ sidebar_label: 文本检测
 
 1. [详解消息 hook 与系统对话](/sdk/im/guide/systemconv/)
 2. 文本检测服务的[功能介绍](/sdk/text-moderation/features/)、[开发指南](/sdk/text-moderation/guide/)、[最佳实践](/sdk/text-moderation/best-practice/)
-3. [云函数和 Hook 开发指南 § 在线编写云函数](/sdk/engine/functions/guides#在线编写云函数)
+3. [在线编写云函数](/sdk/engine/guide/cloudfunction#在线编写云函数)
 
 ## 操作步骤
 

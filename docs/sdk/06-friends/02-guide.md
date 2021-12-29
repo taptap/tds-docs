@@ -24,13 +24,13 @@ import sdkVersions from '/src/docComponents/sdkVersions';
 </CodeBlock>
 
 <CodeBlock className="groovy">
-{`repositories{
-    flatDir {
-        dirs 'libs'
-    }
-}
-dependencies {
-    ...
+{`repositories{  
+    flatDir {  
+        dirs 'libs'  
+    }  
+}  
+dependencies {  
+    ... 
     implementation (name:'TapFriend_${sdkVersions.taptap.android}', ext:'aar')
 }`}
 </CodeBlock>
@@ -84,14 +84,14 @@ TDSFriends.registerFriendStatusChangedListener(new FriendStatusChangedListener()
     // 新增好友（触发时机同「已发送的好友申请被接受」）
     @Override
     public void onFriendAdd(TDSFriendInfo friendInfo) {}
-
+    
     // 新增好友申请
     @Override
     public void onNewRequestComing(LCFriendshipRequest request) {}
-
+    
     // 通过分享链接进入游戏 SDK 自动发送好友申请时触发
     @Override
-    public void onSendFriendRequestToSharer(boolean isSuccess, String nickname, TDSFriendError error) {}
+    public void onSendFriendRequestToSharer(boolean isSuccess, String nickname, TDSFriendError error) {}    
 
     // 已发送的好友申请被接受
     @Override
@@ -100,7 +100,7 @@ TDSFriends.registerFriendStatusChangedListener(new FriendStatusChangedListener()
     // 已发送的好友申请被拒绝
     @Override
     public void onRequestDeclined(LCFriendshipRequest request) {}
-
+    
     // 好友上线
     @Override
     public void onFriendOnline(String userId) {}
@@ -487,7 +487,7 @@ option.limit = 100;
     option:option
     callback:^(NSArray<LCFriendshipRequest *> * _Nullable requests, NSError * _Nullable error) {
         // requests 就是处于 pending 状态中的好友申请列表
-}];
+}];        
 ```
 
 上述代码示例中的 TDSUserFriendshipRequestStatusPending 即表示好友申请状态为 `pending`。
@@ -583,7 +583,7 @@ callback:^(BOOL succeeded, NSError * _Nullable error) {
 [TDSFriends deleteFriendRequest:request
 callback:^(BOOL succeeded, NSError * _Nullable error) {
     // 略
-}];
+}];       
 ```
 
 </MultiLang>
@@ -796,7 +796,7 @@ TDSFriends.searchUserByShortCode(shortId, new Callback<TDSFriendInfo>() {
 ```objc
 [TDSFriends searchUserWithShortCode:shortId
 callback:^(TDSFriendInfo * _Nullable friendInfo, NSError * _Nullable error) {
-    // 略（参见上节）
+    // 略（参见上节） 
 }];
 ```
 
@@ -836,7 +836,7 @@ TDSFriends.setRichPresence("score", "60",  new Callback<Boolean>() {
   } else if (error) {
     // Failed to set rich presence.
   }
-}];
+}];     
 ```
 
 </MultiLang>
@@ -926,7 +926,7 @@ TDSFriends.clearRichPresence(keys, new Callback<Boolean>() {
 [TDSFriends clearRichPresencesWithKeys:@[@"score", @"display"]
 callback:^(BOOL succeeded, NSError * _Nullable error) {
     // 略
-});
+}); 
 ```
 
 </MultiLang>
@@ -1181,7 +1181,7 @@ curl -X GET \
 ### 落地页
 
 使用分享链接功能需要首先部署落地页网站。
-落地页网站可以部署在[云引擎](/sdk/engine/overview/)或其他支持部署纯静态网站的服务器上。
+落地页网站可以部署在[云引擎](/sdk/engine/guide/overview/)或其他支持部署纯静态网站的服务器上。
 如果计划部署在云引擎上，需注意云引擎的免费实例会自动休眠，请购买标准实例使用。
 
 我们提供了[开源的落地页示例项目][repo]，修改相应配置后可直接构建、部署、使用。
@@ -1322,7 +1322,7 @@ public class DeepLinkManager : MonoBehaviour
 指定游标和返回数量，可以实现翻页功能。
 
 返回的第三方平台好友列表中会包括玩家在第三方平台的 ID、昵称、头像。
-如果好友已经使用 TapTap 账号登录该游戏，那么还会返回相应的 `TDSFriendInfo`，否则此项会返回 `null`。
+如果好友已经使用 TapTap 账号登录该游戏，那么还会返回相应的 `TDSFriendInfo`，否则此项会返回 `null`。 
 
 <MultiLang>
 
@@ -1369,10 +1369,10 @@ TDSFriends.queryThirdPartyFriendList(config, null, new Callback<ThirdPartyFriend
         TDSFriends.queryThirdPartyFriendList(config, cursor, new Callback<ThirdPartyFriendResult>() {
             /* 略 */
         }
-    }
+    }  
     @Override
     public void onFail(TDSFriendError error) {
-        toast("query error = " + error.code + " msg = " + error.detailMessage);
+        toast("query error = " + error.code + " msg = " + error.detailMessage);       
     }
 });
 ```
