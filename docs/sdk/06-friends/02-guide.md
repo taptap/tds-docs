@@ -1369,7 +1369,7 @@ TDSFriends.queryThirdPartyFriendList(config, null, new Callback<ThirdPartyFriend
         TDSFriends.queryThirdPartyFriendList(config, cursor, new Callback<ThirdPartyFriendResult>() {
             /* 略 */
         }
-    }  
+    }
     @Override
     public void onFail(TDSFriendError error) {
         toast("query error = " + error.code + " msg = " + error.detailMessage);
