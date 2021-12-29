@@ -37,7 +37,9 @@ const config = {
     region: REGION,
     searchUrl: REGION === 'cn'
       ? 'https://tds-doc-search-api.cn-e1.leanapp.cn/search'
-      : 'https://tds-doc-search-api.avosapps.us/search'
+      : 'https://tds-doc-search-api.avosapps.us/search',
+    mainDomainHost: REGION === 'cn' ? 'https://www.taptap.com' : 'https://www.taptap.io',
+    dcDomainHost: REGION === 'cn' ? 'https://developer.taptap.com' : 'https://developer.taptap.io',
   },
   title: REGION === 'cn' ? 'TapTap 开发者文档' : 'TapTap Developer Documentation',
   url: PREVIEW === 'true' ? 'https://doc-preview.cn-e1.leanapp.cn' : (REGION === 'cn' ? 'https://developer.taptap.com' : 'https://developer.taptap.io'),
