@@ -6,7 +6,7 @@ sidebar_label: 权限与聊天室
 
 import MultiLang from '/src/docComponents/MultiLang';
 import Mermaid from '/src/docComponents/Mermaid';
-import {Distributions} from '/src/docComponents/distributions';
+import {Conditional} from '/src/docComponents/conditional';
 
 
 
@@ -122,7 +122,7 @@ appid:client_id:convid:nonce:timestamp
   ```
 
   - `action` 是此次行为的动作，`client-block-conversations` 表示添加黑名单，`client-unblock-conversations` 表示取消黑名单。
-  
+
 2. `conversation` 对 `client`
 
   ```
@@ -380,12 +380,12 @@ realtime.createIMClient('Tom', {
 ```
 ```swift
 class SignatureDelegator: IMSignatureDelegate {
-    
+
     // 基于云引擎的获取客户端登录签名的函数
     func getClientOpenSignature(completion: (IMSignature) -> Void) {
         // 具体实现可以参考章节「云引擎签名范例」
     }
-    
+
     func client(_ client: IMClient, action: IMSignature.Action, signatureHandler: @escaping (IMClient, IMSignature?) -> Void) {
         switch action {
         case .open:
@@ -747,7 +747,7 @@ public void queryMutedMembers(int offset, int limit, final LCIMConversationSimpl
 ```objc
 /**
  将部分成员禁言。
- 
+
  @param memberIds 成员列表
  @param callback 结果回调函数
  */
@@ -755,7 +755,7 @@ public void queryMutedMembers(int offset, int limit, final LCIMConversationSimpl
            callback:(void (^)(NSArray<NSString *> * _Nullable successfulIds, NSArray<LCIMOperationFailure *> * _Nullable failedIds, NSError * _Nullable error))callback;
 /**
  将部分成员解除禁言。
- 
+
  @param memberIds 成员列表
  @param callback 结果回调函数
  */
@@ -763,7 +763,7 @@ public void queryMutedMembers(int offset, int limit, final LCIMConversationSimpl
              callback:(void (^)(NSArray<NSString *> * _Nullable successfulIds, NSArray<LCIMOperationFailure *> * _Nullable failedIds, NSError * _Nullable error))callback;
 /**
  查询被禁言的成员列表。
- 
+
  @param limit 查询结果集上限
  @param next 查询结果的起始点；若 next 是 nil 或为空，则意味着没有更多被禁言的成员
  @param callback 结果回调函数
@@ -880,7 +880,7 @@ Future<QueryMemberResult> queryMutedMembers({int limit = 50, String next})
 /// <returns></returns>
 public async Task<LCIMPartiallySuccessResult> BlockMembers(IEnumerable<string> clientIds);
 /// <summary>
-/// Removes members from the blocklist of this conversation. 
+/// Removes members from the blocklist of this conversation.
 /// </summary>
 /// <param name="clientIds">Member list.</param>
 /// <returns></returns>
@@ -1060,7 +1060,7 @@ tom.createChatRoom("聊天室", null,
 ```
 ```objc
 [client createChatRoomWithCallback:^(LCIMChatRoom * _Nullable chatRoom, NSError * _Nullable error) {
-    if (chatRoom && !error) {        
+    if (chatRoom && !error) {
         LCIMTextMessage *textMessage = [LCIMTextMessage messageWithText:@"这是一条消息" attributes:nil];
         [chatRoom sendMessage:textMessage callback:^(BOOL success, NSError *error) {
             if (success && !error) {
@@ -1127,7 +1127,7 @@ query.findInBackground(new LCIMConversationQueryCallback() {
 ```
 ```objc
 LCIMConversationQuery *query = [tom conversationQuery];
-[query whereKey:@"tr" equalTo:@(YES)]; 
+[query whereKey:@"tr" equalTo:@(YES)];
 ```
 ```js
 var query = tom.getQuery().equalTo('tr',true); // 聊天室对象
@@ -1456,7 +1456,7 @@ await chatRoom.mute();
 敏感词文件为 UTF-8 编码的纯文本文件，一行一个敏感词。
 开发者上传的自定义敏感词词库会替换默认提供的词库。
 
-<Distributions brand='tds'>
+<Conditional brand='tds'>
 
 如果开发者有较为复杂的过滤需求，我们推荐开发者接入[文本检测](/sdk/text-moderation/features/)服务。
 文本检测基于 AI 及多重识别策略，及时、准确、高效地抵御政治、暴恐、色情、辱骂等违规内容风险。
@@ -1464,13 +1464,13 @@ await chatRoom.mute();
 
 开发者也可以使用云引擎 hook `_messageReceived` 来实现过滤，在 hook 中开发者对消息的内容有完全的控制力。
 
-</Distributions>
+</Conditional>
 
-<Distributions brand='leancloud'>
+<Conditional brand='leancloud'>
 
 如果开发者有较为复杂的过滤需求，可以使用云引擎 hook `_messageReceived` 来实现过滤，在 hook 中开发者对消息的内容有完全的控制力。
 
-</Distributions>
+</Conditional>
 
 ## 使用临时对话
 
