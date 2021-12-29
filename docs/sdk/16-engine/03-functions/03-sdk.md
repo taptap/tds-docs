@@ -1,0 +1,704 @@
+---
+id: sdk
+title: 云引擎 SDK 使用指南
+sidebar_label: 云引擎 SDK
+---
+
+import EngineRuntimes from '/src/docComponents/MultiLang/engine';
+import TabItem from '@theme/TabItem';
+
+:::info
+这篇文档是关于云引擎 SDK 的深入介绍，如需了解云函数和 Hook 的用法请看 [云函数和 Hook 开发指南](/sdk/engine/functions/guides)。
+:::
+
+云引擎 SDK 通常基于 [数据存储](/sdk/storage/features) 服务的 SDK，并提供了云函数和 Hook 等额外能力，供开发者在云引擎上更方便地开发后端应用。
+
+## 接入云引擎 SDK
+
+我们的示例项目默认已经接入了 SDK，如果你需要将云引擎 SDK 接入到已有的项目中的的话可以按照下面的步骤操作：
+
+<EngineRuntimes>
+<TabItem value='nodejs'>
+
+```sh
+npm install leanengine leancloud-storage
+```
+
+然后在代码中将云引擎中间件挂载到 Express 框架上：
+
+```js title='app.js'
+var express = require('express');
+var AV = require('leanengine');
+
+AV.init({
+  appId: process.env.LEANCLOUD_APP_ID,
+  appKey: process.env.LEANCLOUD_APP_KEY,
+  masterKey: process.env.LEANCLOUD_APP_MASTER_KEY
+});
+
+var app = express();
+app.use(AV.express());
+app.listen(process.env.LEANCLOUD_APP_PORT);
+```
+
+其中，`AV.express` 接受一个可选参数 `options`，`options` 是一个对象，目前支持以下两个可选属性：
+
+- `onError`：全局错误处理函数，云函数（包括 Hook 函数）抛出异常时会调用该函数。该函数的使用场景包括统一发送错误报告。
+- `ignoreInvalidSessionToken`：布尔值，为真时忽略客户端发来的错误的 `sessionToken`（`X-LC-session` 头），为假时抛出 `401` 错误 `{"code": 211, "error": "Verify sessionToken failed, maybe login expired: ..."}`。客户端 SDK 发送请求时会统一发送 `X-LC-session` 头（其中指定了 `sessionToken`），`sessionToken` 可能因种种原因失效，而云函数在很多情况下并不关心 `sessionToken`。因此，云引擎提供了 `ignoreInvalidSessionToken` 这个选项，设为真时忽略 `sessionToken` 错误。反之，如果该选项设为假，客户端收到相应报错时，需要重新登录。
+
+关于云引擎 SDK 的详细 API 文档见 [LeanEngine Node SDK · API.md](https://github.com/leancloud/leanengine-node-sdk/blob/master/API.md)。
+
+<details>
+<summary>点击展开 Koa 框架接入方法</summary>
+
+```js title='app.js'
+var koa = require('koa');
+var AV = require('leanengine');
+
+AV.init({
+  appId: process.env.LEANCLOUD_APP_ID,
+  appKey: process.env.LEANCLOUD_APP_KEY,
+  masterKey: process.env.LEANCLOUD_APP_MASTER_KEY
+});
+
+var app = koa();
+app.use(AV.koa());
+app.listen(process.env.LEANCLOUD_APP_PORT);
+```
+
+</details>
+
+<details>
+<summary>点击展开 Node SDK 不同版本的差异</summary>
+
+Node SDK 的历史版本：
+
+- `0.x`：最初的版本，对 Node.js 4.x 及以上版本兼容不佳，建议用户参考 [升级到云引擎 Node.js SDK 1.0](https://leancloud.cn/docs/leanengine-node-sdk-upgrade-1.html) 来更新。
+- `1.x`：彻底废弃了全局的 `currentUser`，依赖的 JavaScript 也升级到了 1.x 分支，支持了 Koa 和 Node.js 4.x 及以上版本。
+- `2.x`：提供了对 Promise 风格的云函数、Hook 写法的支持，移除了一些被弃用的特性（`AV.Cloud.httpRequest`），不再支持 Backbone 风格的回调函数。
+- `3.x`：**推荐使用** 的版本，指定 JavaScript SDK 为 peer dependency（允许自定义 JS SDK 的版本），升级 JS SDK 到 3.x。
+
+详见 Node.js SDK 的 [更新日志](https://github.com/leancloud/leanengine-node-sdk/releases)。
+
+</details>
+
+你可以在 [GitHub](https://github.com/leancloud/leanengine-node-sdk) 上找到 Node SDK 的源代码。
+
+</TabItem>
+<TabItem value='python'>
+
+将 `leancloud` 添加到 `requirements.txt` 中：
+
+```
+leancloud>=2.9.4,<3.0.0
+```
+
+在本地运行和调试项目的时候，可以在项目目录下使用如下命令进行依赖安装：
+
+```sh
+pip install -r requirements.txt
+```
+
+然后在代码中加载 SDK，因为 `wsgi.py` 是项目最先被执行的文件，推荐在此文件进行 Python SDK 的初始化：
+
+```python
+import os
+import leancloud
+
+APP_ID = os.environ['LEANCLOUD_APP_ID']
+APP_KEY = os.environ['LEANCLOUD_APP_KEY']
+MASTER_KEY = os.environ['LEANCLOUD_APP_MASTER_KEY']
+
+leancloud.init(APP_ID, app_key=APP_KEY, master_key=MASTER_KEY)
+
+leancloud.use_master_key(True)
+```
+
+SDK 默认开启了 masterKey 权限，会跳过 ACL 和其他权限限制，详见 [使用超级权限](#使用超级权限)。
+
+<details>
+<summary>点击展开 PyPI 上 <code>leancloud-sdk</code> 和 <code>leancloud</code> 两个包的差别</summary>
+
+`leancloud-sdk` 是旧版的 Python SDK，已经不再维护，请使用 `leancloud`。
+
+不同版本的差别详见 Python SDK 的 [更新日志](https://github.com/leancloud/python-sdk/blob/master/changelog)。
+
+</details>
+
+你可以在 [GitHub](https://github.com/leancloud/python-sdk) 上找到 Python SDK 的源代码。
+
+</TabItem>
+<TabItem value='java'>
+
+在 `pom.xml` 中增加依赖配置来增加 LeanEngine Java SDK 的依赖：
+
+```xml
+<dependencies>
+  <dependency>
+    <groupId>cn.leancloud</groupId>
+    <artifactId>engine-core</artifactId>
+    <version>8.2.1</version>
+  </dependency>
+</dependencies>
+```
+
+在程序中初始化 SDK：
+
+```java
+import cn.leancloud.LCCloud;
+import cn.leancloud.LCObject;
+import cn.leancloud.core.GeneralRequestSignature;
+import cn.leancloud.LeanEngine;
+
+String appId = System.getenv("LEANCLOUD_APP_ID");
+String appKey = System.getenv("LEANCLOUD_APP_KEY");
+String appMasterKey = System.getenv("LEANCLOUD_APP_MASTER_KEY");
+String hookKey = System.getenv("LEANCLOUD_APP_HOOK_KEY");
+
+LeanEngine.initialize(appId, appKey, appMasterKey);
+
+GeneralRequestSignature.setMasterKey(appMasterKey);
+```
+
+上面的代码默认开启了 masterKey 权限，会跳过 ACL 和其他权限限制，详见 [使用超级权限](#使用超级权限)。
+
+你可以在 [GitHub](https://github.com/leancloud/java-unified-sdk) 上找到 Java SDK 的源代码。
+
+</TabItem>
+<TabItem value='php'>
+
+安装依赖：
+
+```sh
+composer require leancloud/leancloud-sdk
+```
+
+初始化 SDK：
+
+```php
+use \LeanCloud\Client;
+
+Client::initialize(
+    getenv("LEANCLOUD_APP_ID"),
+    getenv("LEANCLOUD_APP_KEY"),
+    getenv("LEANCLOUD_APP_MASTER_KEY")
+);
+
+Client::useMasterKey(true);
+```
+
+上面的代码默认开启了 masterKey 权限，会跳过 ACL 和其他权限限制，详见 [使用超级权限](#使用超级权限)。
+
+你可以在 [GitHub](https://github.com/leancloud/php-sdk) 上找到 PHP SDK 的源代码。
+
+</TabItem>
+<TabItem value='dotnet'>
+
+添加依赖：
+
+```sh
+dotnet add package LeanCloud.Storage
+```
+
+初始化 SDK：
+
+```cs
+LCEngine.Initialize(services);
+```
+
+你可以在 [GitHub](https://github.com/leancloud/csharp-sdk) 上找到 .NET SDK 的源代码。
+
+</TabItem>
+<TabItem value='go'>
+
+添加依赖：
+
+```go
+import "github.com/leancloud/go-sdk/leancloud"
+```
+
+初始化 SDK：
+
+```go
+client := leancloud.NewEnvClient()
+leancloud.Engine.Init(client)
+```
+
+Go SDK 以标准库 HTTP 方法的形式提供了可供任意框架接入的接口，以 **echo** 为示例：
+
+```go
+// ./adapters/echo.go
+//...
+func Echo(e *echo.Echo) {
+	e.Any("/1/*", echo.WrapHandler(leancloud.Engine.Handler()), setResponseContentType)
+	e.Any("/1.1/*", echo.WrapHandler(leancloud.Engine.Handler()), setResponseContentType)
+	e.Any("/__engine/*", echo.WrapHandler(leancloud.Engine.Handler()), setResponseContentType)
+}
+
+func setResponseContentType(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		c.Response().Header().Set("Content-Type", "application/json; charset=UTF-8")
+		return next(c)
+	}
+}
+```
+
+函数 **Echo** 接收 echo 实例对象，将 Go SDK 中提供 LeanEngine 相关功能的接口绑定到 `/1/` `/1.1/` 和 `/__engine/` 开头的路由前缀上，保证 LeanEngine 相关的底层功能正常。
+
+大多数 Go Web 框架均提供将标准库 HTTP Handler 转换为特有 Handler 的方法，只要保证能够在其他框架中接入以上两个部件，即可将 LeanEngine 集成入你的 Go Web 框架中。
+
+你可以在 [GitHub](https://github.com/leancloud/go-sdk) 上找到 Go SDK 的源代码。
+
+</TabItem>
+</EngineRuntimes>
+
+## 使用数据存储服务
+
+接入 SDK 后，在云引擎中你就可以调用 [数据存储](/sdk/storage/features) 服务作为数据库来存储数据，或者使用文件、短信、推送等功能。可以查看数据存储服务对应语言的文档了解详情。
+
+数据存储相关功能可以在云函数和 Hook 中使用，也可以在程序的其他部分（如自行选用的 Web 框架）中使用。
+
+## 使用超级权限
+
+因为云引擎运行在可信的服务器端环境中，所以可以使用 Master Key（超级权限）跳过 ACL 和 Class 权限的检查，没有限制地修改数据存储中的数据；还可以使用一些仅限 Master Key 调用的管理员接口，如 [遍历 Class（scan）](/sdk/storage/guide/rest/#遍历-class)。
+
+所以你可以全局开启超级权限（`Master Key`），这样会跳过包括 ACL 和 Class 权限在内的检查，让你自由地操作所有云存储中的数据，也允许调用一些仅供 `Master Key` 使用的 API。
+
+<EngineRuntimes>
+<TabItem value='nodejs'>
+
+全局开启 Master Key:
+
+```js title='sever.js'
+AV.Cloud.useMasterKey();
+```
+
+如果没有添加这些代码，默认是没有超级权限的，这意味着在云引擎中你也不能修改被 ACL 保护的数据，你需要在进行操作时手动指定 `sessionToken`，让操作以这个用户的权限来执行：
+
+```js
+const post = new Post();
+post.save(
+  { author: user },
+  // 或者使用 request.sessionToken（网站托管中需启用 `Cloud.CookieSession`）
+  // {
+  //  sessionToken: user.getSessionToken()
+  // }
+);
+```
+
+或者你也可单独对某一个操作使用 `Master Key`，跳过权限检查：
+
+```js
+post.destroy({ useMasterKey: true });
+```
+
+当然你也可以在启用了 Master Key 的情况下使用 `useMasterKey: false` 来对单个操作关掉 Master Key。
+
+</TabItem>
+<TabItem value='python'>
+
+```python
+# 通常位于 wsgi.py
+leancloud.use_master_key(True)
+```
+
+</TabItem>
+<TabItem value='java'>
+
+```java
+// 通常位于 src/…/AppInitListener.java
+RequestSignImplementation.setMasterKey(appMasterKey);
+```
+
+</TabItem>
+<TabItem value='php'>
+
+```php
+// 通常位于 src/app.php
+Client::useMasterKey(true);
+```
+
+</TabItem>
+<TabItem value='dotnet'>
+
+```cs
+LCApplication.UseMasterKey = true;
+```
+
+</TabItem>
+<TabItem value='go'>
+
+Go SDK 中每个请求都可以使用 `UseMasterKey()` 为请求带上 `Master Key` 来开启超级权限，只需要作为可选参数传入最后即可，例如 `Create` `Set` `Update` 等操作。
+
+</TabItem>
+</EngineRuntimes>
+
+那么究竟是否应该使用 Master Key 呢，我们的建议如下：
+
+- 如果你的云引擎代码中特权操作比较多、操作不属于用户的全局数据比较多，那么建议全局开启 `Master Key`，并自行做好对于用户请求的权限检查。
+- 如果你的云引擎代码中的请求通常和单个用户自己的数据相关、需要遵守 ACL，那么建议不开启 `Master Key`，将用户请求的 `sessionToken` 传入数据修改的相关操作。
+
+关于云引擎上的权限问题，还可以参考 [ACL 权限管理开发指南](https://leancloud.cn/docs/acl-guide.html) 和 [在云引擎中使用 ACL](https://leancloud.cn/docs/acl_guide_leanengine.html)。
+
+## 用户状态管理
+
+:::caution
+因云引擎属于多主机、多进程的运行环境，因此内存型的 Session 是无法正确工作的（如 Node.js 的 [express-session](https://github.com/expressjs/express-session) 默认的 MemoryStore、PHP 内建的 `$_SESSION`）。
+:::
+
+### 使用 HTTP Header
+
+如果你的页面主要是由浏览器端渲染，那么建议在前端使用 SDK 登录用户，调用 SDK 的接口获取 Session Token，通过 HTTP Header 等方式将 Session Token 发送给后端。
+
+<EngineRuntimes>
+<TabItem value='nodejs'>
+
+例如，在前端登录用户并通过 `user.getSessionToken()` 获取 Session Token 并发送给后端：
+
+```js
+AV.User.login(user, pass).then(user => {
+  return fetch('/profile', {
+    headers: {
+      'X-LC-Session': user.getSessionToken()
+    }
+  });
+});
+```
+
+相应的后端 Node.js 代码：
+
+```js
+app.get('/profile', function (req, res) {
+  AV.User.become(req.headers['x-lc-session']).then(user => {
+    res.send(user);
+  }).catch(err => {
+    res.send({ error: err.message });
+  });
+});
+
+app.post('/todos', function (req, res) {
+  var todo = new Todo();
+  todo.save(req.body, { sessionToken: req.headers['x-lc-session'] }).then(() => {
+    res.send(todo);
+  }).catch(err => {
+    res.send({ error: err.message });
+  });
+});
+```
+
+</TabItem>
+</EngineRuntimes>
+
+### CookieSession
+
+如果你的页面主要由服务端渲染，可以使用我们在部分 SDK 中提供的 Cookie Session 组件，它可以将数据存储服务中的 Session Token 存储在 Cookie 中，简化服务器端对于用户登录状态的管理。
+
+:::danger
+使用 Cookie 作为鉴权方式需要注意防范 [防御 CSRF 攻击](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html)。
+
+业界通常使用 CSRF Token 来防御 CSRF 攻击，你需要传递给客户端一个随机字符串（即 CSRF Token，可通过 Cookie 传递），客户端在每个有副作用的请求中都要将 CSRF 包含在请求正文或 Header 中，服务器端需要校验这个 CSRF Token 是否正确。
+:::
+
+<EngineRuntimes>
+<TabItem value='nodejs'>
+
+如果你的页面主要是由服务器端渲染（例如使用 EJS、Pug），在前端不需要使用 JavaScript SDK 进行数据操作，那么可以使用 `AV.Cloud.CookieSession` 中间件，在 Cookie 中维护用户状态：
+
+```js
+// Express
+app.use(AV.Cloud.CookieSession({ secret: 'my secret', maxAge: 3600000, fetchUser: true }));
+// Koa
+app.use(AV.Cloud.CookieSession({ framework: 'koa', secret: 'my secret', maxAge: 3600000, fetchUser: true }));
+```
+
+你需要传入一个 `secret` 用于签名 Cookie（必须提供），这个中间件会将 `AV.User` 的登录状态信息记录到 Cookie 中，用户下次访问时自动检查用户是否已经登录，如果已经登录，可以通过 `req.currentUser` 获取当前登录用户。
+
+`AV.Cloud.CookieSession` 支持的选项包括：
+
+- **fetchUser**：是否自动 `fetch` 当前登录的 `AV.User` 对象。默认为 `false`。如果设置为 `true`，每个 HTTP 请求都将发起一次 LeanCloud API 调用来 `fetch` 用户对象。如果设置为 `false`，默认只可以访问 `req.currentUser` 的 `id`（`_User` 表记录的 `objectId`）和 `sessionToken` 属性，你可以在需要时再手动 `fetch` 整个用户。
+- **name**：Cookie 的名字，默认为 `avos.sess`。
+- **maxAge**：Cookie 的过期时间。单位为毫秒。
+
+在 Node SDK 中不再允许通过 `AV.User.current()` 获取登录用户的信息，而是需要你：
+
+- 通过 `request.currentUser` 获取用户信息。
+- 在后续的方法调用显式传递 user 对象。
+
+<details>
+<summary>点击展开一个具有登录功能的站点的例子</summary>
+
+```js
+app.post('/login', function (req, res) {
+  AV.User.logIn(req.body.username, req.body.password).then(function (user) {
+    res.saveCurrentUser(user); // save cookie
+    res.redirect('/profile');
+  }, function (error) {
+    res.redirect('/login');
+  });
+})
+
+app.get('/profile', function (req, res) {
+  if (req.currentUser) {
+    res.send(req.currentUser);
+  } else {
+    res.redirect('/login');
+  }
+});
+
+app.get('/logout', function (req, res) {
+  req.currentUser.logOut();
+  res.clearCurrentUser(); // clear cookie
+  res.redirect('/profile');
+});
+```
+
+</details>
+
+<details>
+<summary>点击展开浏览器对跨域 Cookie 的限制（`SameSite`）</summary>
+
+Chrome 80 起 `SameSite` 的默认值为 `Lax`，如果你的应用的前端没部署在云引擎上，又需要向云引擎发送携带 Cookie 的 POST 请求，那么需要设置 `SameSite` 为 `none`。
+
+`AV.Cloud.CookieSession` 会将所有参数都传递给浏览器的 `cookies.set()`，所以你可以将 `sameSite` 传入：
+
+```js
+AV.Cloud.CookieSession({sameSite: 'none'})
+```
+
+注意：
+
+- `SameSite` 要求与 `Secure` 标记一同发送，因此请确保你的客户端是通过 HTTPS 协议访问云引擎的。
+- 请仅在有必要的时候设置 `SameSite` 为 `none`，以免平白增加 CSRF 风险。
+
+</details>
+
+</TabItem>
+<TabItem value='python'>
+
+Python SDK 提供了一个 `leancloud.engine.CookieSessionMiddleware` 的 WSGI 中间件，使用 Cookie 来维护用户（`leancloud.User`）的登录状态。要使用这个中间件，可以在 `wsgi.py` 中将：
+
+```python
+application = engine
+```
+
+替换为：
+
+```python
+application = leancloud.engine.CookieSessionMiddleware(engine, secret=YOUR_APP_SECRET)
+```
+
+你需要传入一个 `secret` 的参数用于签名 Cookie（必须提供），这个中间件会将 `AV.User` 的登录状态信息记录到 Cookie 中，用户下次访问时自动检查用户是否已经登录，如果已经登录，可以通过 `leancloud.User.get_current()` 获取当前登录用户。
+
+`leancloud.engine.CookieSessionMiddleware` 初始化时支持的非必须选项包括：
+
+- **name**：在 cookie 中保存的 session token 的 key 的名称，默认为 `leancloud:session`。
+- **excluded_paths**：指定哪些 URL path 不处理 session token，比如在处理静态文件的 URL path 上不进行处理，防止无谓的性能浪费。接受参数类型 `list`。
+- **fetch_user**：处理请求时是否要从存储服务获取用户数据，如果为 `False` 的话，`leancloud.User.get_current()` 获取到的用户数据上除了 `session_token` 之外没有任何其他数据，需要自己调用 `fetch()` 来获取。为 `True` 的话，会自动在用户对象上调用 `fetch()`，这样将会产生一次数据存储的 API 调用。默认为 `False`。
+- **expires**：设置 cookie 的失效日期（参考 [Werkzeug Document](http://werkzeug.pocoo.org/docs/0.12/http/#werkzeug.http.dump_cookie)）。
+- **max_age**：设置 cookie 在多少秒后失效（参考 [Werkzeug Document](http://werkzeug.pocoo.org/docs/0.12/http/#werkzeug.http.dump_cookie)）。
+
+</TabItem>
+<TabItem value='php'>
+
+云引擎提供了一个 `LeanCloud\Storage\CookieStorage` 模块，用 Cookie 来维护用户（`User`）的登录状态，要使用它可以在 `app.php` 中添加下列代码：
+
+```php
+use \LeanCloud\Storage\CookieStorage;
+Client::setStorage(new CookieStorage(60 * 60 * 24, "/"));
+```
+
+`CookieStorage` 支持传入秒作为过期时间，以及路径作为 cookie 的作用域。默认过期时间为 7 天。
+
+可以通过 `User::getCurrentUser()` 来获取当前登录用户。你可以这样简单地实现一个具有登录功能的站点：
+
+```php
+$app->get('/login', function($req, $res) {
+  // login page
+});
+
+$app->post('/login', function($req, $res) {
+    $params = $req->getQueryParams();
+    try {
+        User::logIn($params["username"], $params["password"]);
+        return $res->withRedirect('/profile');
+    } catch (Exception $ex) {
+        return $res->withRedirect('/login');
+    }
+});
+
+$app->get('/profile', function($req, $res) {
+    $user = User::getCurrentUser();
+    if ($user) {
+        return $res->getBody()->write($user->getUsername());
+    } else {
+        return $res->withRedirect('/login');
+    }
+});
+
+$app->get('/logout', function($req, $res) {
+    User::logOut();
+    return $res->redirect("/");
+});
+```
+
+一个简单的登录页面可以是这样：
+
+```html
+<html>
+  <head></head>
+  <body>
+    <form method="post" action="/login">
+      <label>Username</label>
+      <input name="username">
+      <label>Password</label>
+      <input name="password" type="password">
+      <input class="button" type="submit" value="login">
+    </form>
+  </body>
+</html>
+```
+
+`CookieStorage` 也支持保存其他属性：
+
+```php
+$cookieStorage = Client::getStorage();
+$cookieStorage->set("key", "val");
+```
+
+</TabItem>
+</EngineRuntimes>
+
+## FAQ
+### 如何使用 SDK 重定向到 HTTPS？
+
+我们目前推荐在绑定自定义域名时勾选「强制 HTTPS」（详见 [云引擎平台功能 § 重定向到 HTTPS](/sdk/engine/deploy/platform/#重定向到-https)）而不是使用 SDK 中的重定向中间件。
+
+<details>
+<summary>点击展开关于 SDK 中重定向到 HTTPS 的用法（不推荐）</summary>
+
+一些 SDK 提供了重定向至 HTTPS 的中间件，部署并发布到生产环境之后，访问你的 LeanEngine 网站都会强制通过 HTTPS 访问。
+
+<EngineRuntimes>
+<TabItem value='nodejs'>
+
+Node.js（Express）：
+
+```js
+app.enable('trust proxy');
+app.use(AV.Cloud.HttpsRedirect());
+```
+
+Node.js（Koa）：
+
+```js
+app.proxy = true;
+app.use(AV.Cloud.HttpsRedirect({framework: 'koa'}));
+```
+
+</TabItem>
+<TabItem value='python'>
+
+```python
+import leancloud
+
+application = get_your_wsgi_func()
+
+application = leancloud.HttpsRedirectMiddleware(application)
+```
+
+</TabItem>
+<TabItem value='php'>
+
+```php
+SlimEngine::enableHttpsRedirect();
+$app->add(new SlimEngine());
+```
+
+</TabItem>
+<TabItem value='java'>
+
+```java
+LeanEngine.setHttpsRedirectEnabled(true);
+```
+
+</TabItem>
+<TabItem value='dotnet'>
+
+```cs
+app.UseHttpsRedirection();
+```
+
+</TabItem>
+</EngineRuntimes>
+</details>
+
+### 如何打印 SDK 发出的网络请求？
+
+<EngineRuntimes>
+<TabItem value='nodejs'>
+
+你可以通过设置一个 `DEBUG=leancloud:request` 的环境变量来打印由 SDK 发出的网络请求。在本地调试时你可以通过这样的命令启动程序：
+
+```sh
+env DEBUG=leancloud:request lean up
+```
+
+当有对 LeanCloud 的调用时，你可以看到类似这样的日志：
+
+```sh
+leancloud:request request(0) +0ms GET https://{{host}}/1.1/classes/Todo?&where=%7B%7D&order=-createdAt { where: '{}', order: '-createdAt' }
+leancloud:request response(0) +220ms 200 {"results":[{"content":"1","createdAt":"2016-08-09T06:18:13.028Z","updatedAt":"2016-08-09T06:18:13.028Z","objectId":"57a975a55bbb5000643fb690"}]}
+```
+
+我们不建议在线上生产环境开启这个日志，否则将会打印大量的日志。如有必要，可以指定 `DEBUG=leancloud:request:error`，只打印出错的网络请求。
+
+</TabItem>
+</EngineRuntimes>
+
+### 为什么 Pointer 字段中的数据没有完整地发给客户端？
+
+<EngineRuntimes>
+<TabItem value='nodejs'>
+
+> 将 JavaScript SDK 和 Node SDK 升级到 3.0 以上版本可以彻底解决该问题。
+
+云函数在响应时会调用到 `AV.Object#toJSON` 方法，将结果序列化为 JSON 对象返回给客户端。在早期版本中 `AV.Object#toJSON` 方法为了防止循环引用，当遇到属性是 Pointer 类型会返回 Pointer 元信息，不会将 include 的其他字段添加进去，我们在 [JavaScript SDK 3.0](https://github.com/leancloud/javascript-sdk/releases/tag/v3.0.0) 中对序列化相关的逻辑做了重新设计，**将 JavaScript SDK 和 Node SDK 升级到 3.0 以上版本便可以彻底解决该问题**。
+
+如果暂时无法升级 SDK 版本，可以通过这样的方式绕过：
+
+```javascript
+AV.Cloud.define('querySomething', function(req, res) {
+  var query = new AV.Query('Something');
+  // user 是 Something 表的一个 Pointer 字段
+  query.include('user');
+  query.find().then(function(results) {
+    // 手动进行一次序列化
+    results.forEach(function(result){
+      result.set('user', result.get('user') ?  result.get('user').toJSON() : null);
+    });
+    // 再返回查询结果给客户端
+    res.success(results);
+  }).catch(res.error);
+});
+```
+
+</TabItem>
+<TabItem value='python'>
+
+Python SDK 只会返回 Pointer 元信息，因此也需要额外进行一次查询并手动进行序列化（见 Node.js 的代码）。
+
+</TabItem>
+</EngineRuntimes>
+
+### RPC 调用云函数时，为什么会返回预期之外的空对象？
+
+<EngineRuntimes>
+<TabItem value='nodejs'>
+
+使用 Node SDK 定义的云函数，如果返回一个不是 AVObject 的值，比如字符串、数字，RPC 调用得到的是空对象（`{}`）。
+类似地，如果返回一个包含非 AVObject 成员的数组，RPC 调用的结果中该数组的相应成员也会被序列化为 `{}`。
+这个问题将在 Node SDK 的下一个大版本（4.0）中修复。
+目前绕过这一个问题的方法是将返回结果放在对象（`{}`）中返回。
+
+</TabItem>
+</EngineRuntimes>

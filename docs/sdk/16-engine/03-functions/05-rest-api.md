@@ -1,10 +1,12 @@
 ---
-id: rest
-title: 云引擎 REST API
+id: rest-api
+title: 云函数 REST API
 sidebar_label: REST API
 ---
 
-
+:::info
+这篇文档会是关于 REST API 的深入介绍，如需了解云函数和 Hook 的用法请看 [云函数和 Hook 开发指南](/sdk/engine/functions/guides)。
+:::
 
 云服务提供了统一的访问云函数的 REST API 接口，所有的客户端 SDK 也都是封装了这个接口从而实现对云函数的调用。
 
@@ -46,7 +48,7 @@ REST API 请求的 Base URL（下文 curl 示例中用 `{{host}}` 表示）即�
 * `X-LC-Prod: 0` 表示调用预备环境
 * `X-LC-Prod: 1` 表示调用生产环境
 
-通过 SDK 调用云函数时，SDK 会根据当前环境设置 `X-LC-Prod` HTTP 头，详见[云函数指南](/sdk/engine/guide/cloudfunction/)中《切换云引擎环境》一节的说明。
+通过 SDK 调用云函数时，SDK 会根据当前环境设置 `X-LC-Prod` HTTP 头，详见 [云函数开发指南 § 生产环境和预备环境](/sdk/engine/functions/guides/#生产环境和预备环境) 中的说明。
 
 ## 云函数
 
@@ -135,5 +137,3 @@ RPC 调用时，不仅可以返回单个 LCObject，还可以返回包含 LCObje
 在通过 SDK 进行 RPC 调用时，SDK 会据此自动反序列化。
 
 如果云函数超时，客户端会收到 HTTP status code 为 503、524、141 等的响应。
-
-你还可以阅读[云函数指南](/sdk/engine/guide/cloudfunction/)来获取更多的信息。

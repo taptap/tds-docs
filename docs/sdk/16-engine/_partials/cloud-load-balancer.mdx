@@ -1,0 +1,122 @@
+import {Conditional} from '/src/docComponents/conditional';
+import EngineRuntimes from '/src/docComponents/MultiLang/engine';
+import TabItem from '@theme/TabItem';
+
+所有对云引擎的 HTTP 请求都会经过负载均衡，负载均衡组件会处理 HTTPS 加密、重定向到 HTTPS、对响应进行压缩等一般性工作，因此云引擎上的程序不需要自己实现这些功能。同时负载均衡带来的一些限制，在云引擎程序内进行修改也无法越过（如请求头大小等）。
+
+<details>
+<summary>点击展开负载均衡的一些限制</summary>
+
+- 请求头（URL 和 header）每行最大 8K，总计最大 64K。
+- 请求体积（上传文件体积）最大 100M。
+- 连接或等待响应的超时时间为 60 秒。
+
+</details>
+
+<Conditional if={!props.noClientIp}>
+
+#### 客户端 IP
+云引擎的负载均衡会在 HTTP 的 `X-Real-IP` 头部中传递客户端 IP:
+
+<EngineRuntimes only={props.only}>
+<TabItem value='nodejs'>
+
+在 Express 中：
+
+```js
+app.get('/', function (req, res) {
+  var ipAddress = req.headers['x-real-ip'] || req.headers['x-forwarded-for'] || req.connection.remoteAddress;
+  console.log(ipAddress);
+  res.send(ipAddress);
+});
+```
+
+</TabItem>
+<TabItem value='python'>
+
+Python（Flask）：
+
+```python
+from flask import Flask
+from flask import request
+
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    print(request.headers['x-real-ip'])
+    return 'ok'
+```
+
+Python（Django）：
+
+```python
+def index(request):
+    print(request.META['HTTP_X_REAL_IP'])
+    return render(request, 'index.html', {})
+```
+
+</TabItem>
+<TabItem value='php'>
+
+```php
+$app->get('/', function($req, $res) {
+  error_log($_SERVER['HTTP_X_REAL_IP']);
+  return $res;
+});
+```
+
+</TabItem>
+<TabItem value='java'>
+
+```java
+EngineRequestContext.getRemoteAddress();
+```
+
+</TabItem>
+<TabItem value='go'>
+
+Go（Echo）：
+
+```go
+func fetchRealIP(c echo.Context) error {
+  realIP = c.RealIP()
+  //...
+}
+```
+
+</TabItem>
+</EngineRuntimes>
+
+<Conditional region='cn-mainland'>
+
+:::info
+中国大陆节点的云引擎应用会默认启用加速节点，取决于底层的供应商，可能无法获取到正确的客户端 IP。如果确实需要客户端 IP，可以开通独立 IP。
+:::
+</Conditional>
+</Conditional>
+
+#### 重定向到 HTTPS
+
+在绑定云引擎自定义域名时，可以选择「强制 HTTPS」，勾选后负载均衡组件会将 HTTP 的请求重定向到 HTTPS 的同一路径。
+
+<details>
+<summary>点击展开如何判断请求是否通过 HTTPS 访问</summary>
+
+因为 HTTPS 加密是在负载均衡层面处理的，所以部署在云引擎上的程序收到的请求总是 HTTP 协议，这时可以通过 `X-Forwarded-Proto` HTTP 头来判断原请求是通过 HTTP 还是 HTTPS 访问的。
+
+<Conditional region='cn-mainland'>
+
+:::info
+中国大陆节点的云引擎应用会默认启用加速节点，取决于底层的供应商，可能无法获取到正确的客户端 `X-Forwarded-Proto`。
+:::
+</Conditional>
+</details>
+
+<Conditional region='cn-mainland'>
+
+#### 加速缓存
+
+如果你将自定义域名解析到加速节点（也包括云引擎的共享域名），那么边缘节点会对请求进行缓存，边缘节点会有一些默认的缓存规则，如不希望请求被缓存，可以在 HTTP 的响应头中添加 `Control-Cache` 来控制缓存的行为。
+
+</Conditional>

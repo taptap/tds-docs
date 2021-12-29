@@ -1,0 +1,150 @@
+---
+id: nodejs
+title: 云引擎 Node.js 运行环境
+sidebar_label: Node.js
+---
+
+import CloudEnvironments from '../_partials/cloud-environments.mdx';
+import CloudTimezone from '../_partials/cloud-timezone.mdx';
+import CloudLogs from '../_partials/cloud-logs.mdx';
+import CloudInternetAddress from '../_partials/cloud-internet-address.mdx';
+import CloudLoadBalancer from '../_partials/cloud-load-balancer.mdx';
+import CloudFilesystem from '../_partials/cloud-filesystem.mdx';
+import BuildingScripts from '../_partials/building-scripts.mdx';
+import BuildingBuildLogs from '../_partials/building-build-logs.mdx';
+import NodejsSetupRuntime from '../_partials/nodejs-setup-runtime.mdx';
+import NodejsSetupDependencies from '../_partials/nodejs-setup-dependencies.mdx';
+import CloudCustomDomain from '../_partials/cloud-custom-domain.mdx';
+import CloudHealthCheck from '../_partials/cloud-health-check.mdx';
+import BuildingSystemDependencies from '../_partials/building-system-dependencies.mdx';
+
+:::info
+这篇文档是针对 Node.js 运行环境的深入介绍，如希望快速地开始使用云引擎，请查看 [快速开始部署云引擎应用](/sdk/engine/deploy/getting-started)。
+:::
+
+所有 Node.js 项目都必须在根目录包含一个 [package.json](https://docs.npmjs.com/cli/v7/configuring-npm/package-json) 才会被云引擎正确识别，云引擎也会从中读取项目对于环境的需求：
+
+```json title='package.json'
+{
+  "name": "node-js-getting-started",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js -- "
+  },
+  "dependencies": {
+    "leancloud-storage": "^3.11.0",
+    "leanengine": "^3.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.7"
+  },
+  "engines": {
+    "node": "16.x"
+  }
+}
+```
+
+如果你希望创建一个新的项目，推荐从我们的 [Node.js 示例项目](https://github.com/leancloud/node-js-getting-started) 开始。
+
+## 启动命令
+
+云引擎默认使用 `npm start` 来启动项目，你可以在 `package.json` 中修改 `scripts.start` 来使用不同的程序入口或向 `node` 添加额外的参数。
+
+```json title='package.json'
+{
+  "scripts": {
+    "start": "node server.js"
+  }
+}
+```
+
+:::note
+在使用 [命令行工具](/sdk/engine/cli) 本地调试时，`lean up` 会优先使用 `npm run dev` 来启动项目。
+:::
+
+## 配置 Node.js 版本
+
+<NodejsSetupRuntime />
+
+## 安装依赖（`package.json`）
+
+<NodejsSetupDependencies />
+
+## 自定义构建过程
+
+<BuildingScripts />
+
+### 构建日志
+
+<BuildingBuildLogs />
+
+### 系统级依赖
+
+<BuildingSystemDependencies />
+
+## 健康检查
+
+<CloudHealthCheck />
+
+## 云端环境
+
+### 绑定自定义域名
+
+<CloudCustomDomain />
+
+### 负载均衡和加速节点
+
+<CloudLoadBalancer only='nodejs' />
+
+### 环境变量
+
+<CloudEnvironments />
+
+### 日志
+
+<CloudLogs only='nodejs' />
+
+### 时区
+
+<CloudTimezone />
+
+### 文件系统
+
+<CloudFilesystem />
+
+### 出入口 IP 地址
+
+<CloudInternetAddress />
+
+## 疑难问题
+
+### Node.js 项目的 `devDependencies` 没有安装？
+
+云引擎会在部署时用 `npm ci` 为你安装项目依赖，包括 `devDependencies`。
+不过，如果项目的 Node.js 版本小于 10，则会使用 `npm install --production` 安装依赖，相应地，`devDependencies` 中列出的依赖**不会**安装。
+如需安装 `devDependencies`，请在项目的 `leanengine.yaml` 中指定 `installDevDependencies: true`。
+
+### `npm ERR! peer dep missing` 错误怎么办？
+
+部署时出现类似错误：
+
+```
+npm ERR! peer dep missing: graphql@^0.10.0 || ^0.11.0, required by express-graphql@0.6.11
+```
+
+说明有一部分 peer dependency 没有安装成功，因为 Node.js 版本小于 10 时，线上只会安装 dependencies 部分的依赖，所以请确保 dependencies 部分依赖所需要的所有依赖也都列在了 dependencies 部分（而不是 devDependencies）。
+
+你可以在本地删除 node_modules，然后用 `npm install --production` 重新安装依赖来重现这个问题。
+
+或者，你也可以考虑将项目升级到 Node.js 10 以上的版本。
+
+#### 路由超时设置
+
+因为 Node.js 的异步调用容易因运行时错误或编码疏忽中断，为了减少在这种情况下对服务器内存的占用，也为了客户端能够更早地收到错误提示，所以需要添加这个设置，一旦发生超时，服务端会返回一个 HTTP 错误码给客户端。
+
+使用 Express 框架实现自定义路由的时候，请求默认的超时时间为 15 秒，该值可以在 `app.js` 中进行调整：
+
+```js
+// 设置默认超时时间
+app.use(timeout('15s'));
+```
