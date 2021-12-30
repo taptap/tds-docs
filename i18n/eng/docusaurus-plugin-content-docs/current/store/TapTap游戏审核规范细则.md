@@ -425,7 +425,7 @@ The above are hereafter collectively referred to as ‘Promotion Image’
 
  
 
-4.2 Language Settings
+### 4.2 Language Settings
 
  
 
