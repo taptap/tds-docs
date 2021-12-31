@@ -2,7 +2,6 @@
 id: features
 title: 内嵌动态功能介绍
 sidebar_label: 功能介绍
-keywords: [社区]
 ---
 
 ## 产品介绍
