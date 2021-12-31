@@ -77,8 +77,57 @@ config.roundCorner = YES;
 参数  | 描述
 | ------ | ------ |
 clientID | TapTap 开发者中心对应应用的 Client ID
-regionType | 适用地区。适用于中国大陆为`RegionTypeCN`，适用于其他国家或地区为`RegionTypeIO` 
+regionType | 适用地区。适用于中国大陆为 `RegionTypeCN`，适用于其他国家或地区为 `RegionTypeIO` 
 roundCorner | 是否为圆角
+
+**配置跳转 TapTap 应用**
+
+
+用户无 TapTap 应用时，默认会打开 webview 登录
+
+打开 info.plist，添加如下配置，然后请替换 clientID 为您在控制台获取的 clientID
+
+```xml
+<key>CFBundleURLTypes</key>
+<array>
+    <dict>
+        <key>CFBundleTypeRole</key>
+        <string>Editor</string>
+        <key>CFBundleURLName</key>
+        <string>taptap</string>
+        <key>CFBundleURLSchemes</key>
+        <array>
+            <string>tt[clientID]</string>
+        </array>
+    </dict>
+</array>
+
+<key>LSApplicationQueriesSchemes</key>
+<array>
+   <string>tapiosdk</string>
+   <string>tapsdk</string>
+</array>
+```
+
+
+如果项目中有 SceneDelegate.m，请先删除，然后添加如下代码到 AppDelegate.m 文件中。
+
+```objectivec
+#import <TapLoginSDK/TapLoginSDK.h>  
+- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
+   return [TapLoginHelper handleTapTapOpenURL:url];
+}
+
+- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
+   return [TapLoginHelper handleTapTapOpenURL:url];
+}
+```
+
+并在 AppDelegate.h 中添加 UIWindow，然后删除 info.plist 里面的 Application Scene Manifest
+
+```objectivec
+@property (strong, nonatomic) UIWindow *window;
+```
 
 </>
 
