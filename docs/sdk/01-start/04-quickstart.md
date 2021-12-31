@@ -384,6 +384,19 @@ Android 和 iOS 应用需要在 TapTap 开发者中心进入你的游戏，依�
 
 接下来，就可以打包应用，测试 TapTap 登录功能了。
 
+### Android 代码混淆
+
+TapSDK 已经做了混淆处理，再次混淆会导致不可预期的错误，请在项目的混淆脚本中添加如下配置，跳过对 TapSDK 的混淆操作：
+
+```java
+-keep class com.tds.** { *;}
+-keep class com.taptap.** { *;}
+-keep class com.tapsdk.** { *;}
+-keep class tds.androidx.** { *;}
+```
+
+如果使用到基于**数据存储**的云服务，比如**内建账户**方式登陆则需要额外添加 **[数据存储](/sdk/storage/guide/setup-java/#android-代码混淆)** 相关的混淆代码。
+
 ## 打包
 
 Android 或 iOS 请按通常的 Android APK 或者 iOS 应用打包流程操作即可。这里介绍一下 Unity 打包流程：
