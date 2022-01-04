@@ -168,7 +168,15 @@ BOOL isInstalled = [TapGameUtil isTapGlobalInstalled];
 <MultiLang>
 
 ```cs
+// 适用于中国大陆
 TapCommon.OpenReviewInTapTap(appId, openSuccess =>
+{
+    if (openSuccess) {
+        Debug.Log("打开游戏评论区成功");
+    }
+});
+// 适用于其他国家或地区
+TapCommon.OpenReviewInTapGlobal(appId, openSuccess =>
 {
     if (openSuccess) {
         Debug.Log("打开游戏评论区成功");
