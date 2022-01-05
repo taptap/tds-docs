@@ -1,5 +1,4 @@
 export const BRAND: 'leancloud' | 'tds' = 'tds'
-export const REGION: 'cn-mainland' | 'global' = 'cn-mainland'
 
 // Cloud Engine
 export const CLI_BINARY = BRAND === 'tds' ? 'tds' : 'lean'
