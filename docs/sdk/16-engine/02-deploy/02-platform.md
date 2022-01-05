@@ -8,7 +8,7 @@ import CloudCustomDomain from '../_partials/cloud-custom-domain.mdx';
 import PlatformIntroduction from '../_partials/platform-introduction.mdx';
 import PlatformRuntimes from '../_partials/platform-runtimes.mdx';
 import EngineRuntimes from '/src/docComponents/MultiLang/engine';
-import {CLI_BINARY, BRAND} from '/src/constants/env.ts';
+import {CLI_BINARY, BRAND, REGION} from '/src/constants/env.ts';
 import TabItem from '@theme/TabItem';
 
 <PlatformIntroduction />
