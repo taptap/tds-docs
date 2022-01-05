@@ -145,13 +145,13 @@ substring("post_id", 6, 6)
 ```sql
 case
 
-    when "url" like "%home%" then "首页"
+    when "url" like '%home%' then '首页'
 
-    when "url" like "%store%" then "商城"
+    when "url" like '%store%' then '商城'
 
-    when "url" like "%stage%" then "剧情"
+    when "url" like '%stage%' then '剧情'
 
-    else "其他"
+    else '其他'
 
 end
 ```
