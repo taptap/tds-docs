@@ -1,5 +1,5 @@
 ---
-id: mutual
+id: follow
 title: 单向关注模型
 sidebar_label: 单向关注
 ---
