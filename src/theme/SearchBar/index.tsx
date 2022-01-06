@@ -14,23 +14,30 @@ import styles from "./index.module.scss";
 
 import IconSearchBtn from "./icons/search-btn.svg";
 
-const useRecentHits = (locale) => {
-  const localStorageItemKey = `tds_doc_search_recent_hits_for_${locale}`;
+import type { HitItem, HitGroup } from "./common";
 
-  const getRecentHitsFromLocalStorage = () => {
-    const recentHits =
-      (ExecutionEnvironment.canUseDOM &&
-        JSON.parse(localStorage.getItem(localStorageItemKey))) ||
-      [];
+const useRecentHits = (locale: string) => {
+  const localStorageItemKey: string = `tds_doc_search_recent_hits_for_${locale}`;
+
+  const getRecentHitsFromLocalStorage = (): HitItem[] => {
+    let localStorageItem: string | null = null;
+    if (ExecutionEnvironment.canUseDOM) {
+      localStorageItem = localStorage.getItem(localStorageItemKey);
+    }
+    const recentHits: HitItem[] = localStorageItem
+      ? JSON.parse(localStorageItem)
+      : [];
     return recentHits;
   };
 
-  const [recentHits, setRecentHits] = useState(getRecentHitsFromLocalStorage);
+  const [recentHits, setRecentHits] = useState<HitItem[]>(
+    getRecentHitsFromLocalStorage
+  );
 
   useEffect(() => {
-    const saveRecentHitsToLocalStorage = (recentHits) => {
+    const saveRecentHitsToLocalStorage = (recentHits: HitItem[]) => {
       if (ExecutionEnvironment.canUseDOM) {
-        const recentHitsInString = JSON.stringify(recentHits);
+        const recentHitsInString: string = JSON.stringify(recentHits);
         localStorage.setItem(localStorageItemKey, recentHitsInString);
       }
     };
@@ -38,20 +45,37 @@ const useRecentHits = (locale) => {
     saveRecentHitsToLocalStorage(recentHits);
   }, [recentHits]);
 
-  return [recentHits, setRecentHits];
+  return [recentHits, setRecentHits] as const;
 };
 
-const getUpdatedRecentHits = (recentHits, hit, addHit) => {
-  const updatedRecentHits = [
+const getUpdatedRecentHits = (
+  recentHits: HitItem[],
+  hit: HitItem,
+  addHit: boolean
+): HitItem[] => {
+  const updatedRecentHits: HitItem[] = [
     ...(addHit ? [hit] : []),
     ...recentHits.filter((recentHit) => recentHit._id !== hit._id),
   ].slice(0, 15);
   return updatedRecentHits;
 };
 
-const useSearch = (url, locale) => {
-  const groupHits = (hits) => {
-    const groupedHits = [];
+const useSearch = (url: string, locale: string) => {
+  interface SearchRequestConfig {
+    params: {
+      q: string;
+      locale: string;
+    };
+  }
+
+  interface SearchResponse {
+    data: {
+      hits: HitItem[];
+    };
+  }
+
+  const groupHits = (hits: HitItem[]): HitGroup[] => {
+    const groupedHits: HitGroup[] = [];
 
     hits.forEach((hit) => {
       for (const group of groupedHits) {
@@ -67,33 +91,39 @@ const useSearch = (url, locale) => {
       });
     });
 
-    groupedHits.sort((a, b) => {
-      const getAvgScore = ({ hits }) =>
-        hits.reduce((p, c) => p + c._score, 0) / hits.length;
+    groupedHits.sort((a: HitGroup, b: HitGroup): number => {
+      const getAvgScore = ({ hits }: HitGroup): number =>
+        hits.reduce((p: number, c: HitItem) => p + c._score, 0) / hits.length;
       return getAvgScore(b) - getAvgScore(a);
     });
 
     return groupedHits;
   };
 
-  const [query, setQuery] = useState("");
-  const [groupedHits, setGroupedHits] = useState(null);
+  const [query, setQuery] = useState<string>("");
+  const [groupedHits, setGroupedHits] = useState<null | HitGroup[]>(null);
 
   useEffect(() => {
-    let ignore = false;
+    let ignore: boolean = false;
 
-    const fetchHits = async (url, query, locale) => {
-      const config = {
+    const fetchHits = async (
+      url: string,
+      query: string,
+      locale: string
+    ): Promise<HitItem[]> => {
+      const config: SearchRequestConfig = {
         params: { q: query, locale },
       };
-      const response = await axios.get(url, config);
-      return response.data.hits;
+      const {
+        data: { hits },
+      }: SearchResponse = await axios.get(url, config);
+      return hits;
     };
 
     const search = async () => {
-      const hits = await fetchHits(url, query, locale);
+      const hits: HitItem[] = await fetchHits(url, query, locale);
       if (!ignore) {
-        const groupedHits = groupHits(hits);
+        const groupedHits: HitGroup[] = groupHits(hits);
         setGroupedHits(groupedHits);
       }
     };
@@ -109,11 +139,11 @@ const useSearch = (url, locale) => {
     };
   }, [query]);
 
-  return [query, setQuery, groupedHits];
+  return [query, setQuery, groupedHits] as const;
 };
 
 const useToggle = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const open = () => {
     setIsOpen(true);
@@ -123,37 +153,46 @@ const useToggle = () => {
     setIsOpen(false);
   };
 
-  return [isOpen, open, close];
+  return [isOpen, open, close] as const;
 };
 
 const SearchBar = () => {
-  const { siteConfig, i18n } = useDocusaurusContext();
-  const { customFields, baseUrl } = siteConfig;
-  const { searchUrl } = customFields;
-  const { currentLocale } = i18n;
+  const {
+    siteConfig: { customFields, baseUrl },
+    i18n: { currentLocale },
+  } = useDocusaurusContext();
+  const searchUrl = customFields?.searchUrl as string;
 
   const [isSearchOpen, openSearch, closeSearch] = useToggle();
   const [recentHits, setRecentHits] = useRecentHits(currentLocale);
 
   const history = useHistory();
 
-  const openHit = (hit) => {
+  const openHit = (hit: HitItem) => {
     closeSearch();
 
-    const updatedRecentHits = getUpdatedRecentHits(recentHits, hit, true);
+    const updatedRecentHits: HitItem[] = getUpdatedRecentHits(
+      recentHits,
+      hit,
+      true
+    );
     setRecentHits(updatedRecentHits);
 
-    const url = hit._source.url;
+    const url: string = hit._source.url;
     history.push(`${baseUrl}${url}`);
   };
 
-  const removeRecentHit = (hit) => {
-    const updatedRecentHits = getUpdatedRecentHits(recentHits, hit, false);
+  const removeRecentHit = (hit: HitItem) => {
+    const updatedRecentHits: HitItem[] = getUpdatedRecentHits(
+      recentHits,
+      hit,
+      false
+    );
     setRecentHits(updatedRecentHits);
   };
 
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (((e.metaKey && e.key === "k") || e.key === "/") && !isSearchOpen) {
         openSearch();
       } else {
@@ -191,6 +230,15 @@ const SearchBar = () => {
   );
 };
 
+interface SearchBoxProps {
+  searchUrl: string;
+  locale: string;
+  recentHits: HitItem[];
+  closeSearch: () => void;
+  openHit: (hit: HitItem) => void;
+  removeRecentHit: (hit: HitItem) => void;
+}
+
 const SearchBox = ({
   searchUrl,
   locale,
@@ -198,13 +246,13 @@ const SearchBox = ({
   closeSearch,
   openHit,
   removeRecentHit,
-}) => {
+}: SearchBoxProps) => {
   const [query, setQuery, groupedHits] = useSearch(searchUrl, locale);
-  const searchFormEl = useRef(null);
-  const searchInputEl = useRef(null);
+  const searchFormEl = useRef<HTMLFormElement>(null);
+  const searchInputEl = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey && e.key === "k") || e.key === "Escape") {
         closeSearch();
       } else {
@@ -223,7 +271,7 @@ const SearchBox = ({
   }, []);
 
   useEffect(() => {
-    searchInputEl.current.focus();
+    searchInputEl.current?.focus();
   }, [recentHits, query]);
 
   return (

@@ -7,7 +7,24 @@ import NoResults from "../NoResults";
 
 import styles from "./index.module.scss";
 
-const Content = ({ query, recentHits, groupedHits, ...props }) => (
+import type { HitItem, HitGroup } from "../../common";
+
+interface ContentProps {
+  query: string;
+  recentHits: HitItem[];
+  groupedHits: HitGroup[] | null;
+  searchFormEl: React.RefObject<HTMLFormElement>;
+  searchInputEl: React.RefObject<HTMLInputElement>;
+  openHit: (hit: HitItem) => void;
+  removeRecentHit: (hit: HitItem) => void;
+}
+
+const Content = ({
+  query,
+  recentHits,
+  groupedHits,
+  ...props
+}: ContentProps) => (
   <div className={styles.content}>
     {groupedHits === null ? (
       recentHits.length ? (
