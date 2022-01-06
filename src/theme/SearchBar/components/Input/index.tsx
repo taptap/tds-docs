@@ -6,28 +6,40 @@ import styles from "./index.module.scss";
 import IconClear from "../../icons/clear.svg";
 import IconSearch from "../../icons/search.svg";
 
+interface InputProps {
+  query: string;
+  setQuery: (query: string) => void;
+  searchFormEl: React.RefObject<HTMLFormElement>;
+  searchInputEl: React.RefObject<HTMLInputElement>;
+  closeSearch: () => void;
+}
+
 const Input = ({
   query,
   setQuery,
   searchFormEl,
   searchInputEl,
   closeSearch,
-}) => {
-  const handleSubmit = (e) => {
+}: InputProps) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
   };
 
-  const handleKeyDown = (e) => {
+  const handleReset = (e: React.FormEvent<HTMLFormElement>) => {
+    setQuery("");
+    e.preventDefault();
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     switch (e.key) {
       case "ArrowUp":
       case "ArrowDown":
         e.preventDefault();
     }
-  };
-
-  const handleReset = (e) => {
-    setQuery("");
-    e.preventDefault();
   };
 
   return (
@@ -48,9 +60,7 @@ const Input = ({
               message: "搜索文档",
             })}
             value={query}
-            onChange={(e) => {
-              setQuery(e.target.value);
-            }}
+            onChange={handleChange}
             onKeyDown={handleKeyDown}
             ref={searchInputEl}
           />

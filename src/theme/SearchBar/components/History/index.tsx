@@ -8,14 +8,24 @@ import styles from "./index.module.scss";
 import IconClear from "../../icons/clear.svg";
 import IconRecent from "../../icons/recent.svg";
 
+import type { HitItem, HitGroup } from "../../common";
+
+interface HistoryProps {
+  recentHits: HitItem[];
+  searchFormEl: React.RefObject<HTMLFormElement>;
+  searchInputEl: React.RefObject<HTMLInputElement>;
+  openHit: (hit: HitItem) => void;
+  removeRecentHit: (hit: HitItem) => void;
+}
+
 const History = ({
   recentHits,
   searchFormEl,
   searchInputEl,
   openHit,
   removeRecentHit,
-}) => {
-  const groupedHits = [{ hits: recentHits }];
+}: HistoryProps) => {
+  const groupedHits: HitGroup[] = [{ title: "", hits: recentHits }];
   const [selection, setSelection, selectionEl] = useSelection(
     groupedHits,
     searchFormEl,
@@ -29,7 +39,7 @@ const History = ({
         title={translate({ id: "tds.search.recent", message: "最近看过" })}
         zIndex={1}
       >
-        {recentHits.map((hit, hitIndex) => (
+        {recentHits.map((hit: HitItem, hitIndex: number) => (
           <Card
             hit={hit}
             selected={selection[0] === 0 && selection[1] === hitIndex}
@@ -53,7 +63,7 @@ const History = ({
                   id: "tds.search.removeItem",
                   message: "删除该项目",
                 })}
-                onClick={(e) => {
+                onClick={(e: React.MouseEvent<HTMLButtonElement>) => {
                   removeRecentHit(hit);
                   e.preventDefault();
                   e.stopPropagation();
