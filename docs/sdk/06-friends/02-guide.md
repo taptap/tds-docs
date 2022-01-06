@@ -8,7 +8,29 @@ import MultiLang from '/src/docComponents/MultiLang';
 import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';
 
-游戏好友模块基于 [TDS 内建账户系统](/sdk/authentication/features/)，下文中的玩家、用户均指 `TDSUser`。
+TDS 提供了两种好友模型：
+
+- [互为好友](/sdk/friends/mutual/)
+- [单向关注](/sdk/friends/follow/)
+
+开发者可根据游戏项目需求，选择其中一种模型。
+注意：
+
+- 只能选择一种模型，**同一游戏无法混用两种模型**。
+- 选定一种模型后，**后续无法变更为另一种模型**。
+
+此外，还支持获取[第三方平台的好友关系](/sdk/friends/third-party/)（此功能需要通过工单申请开通）。
+
+我们建议开发者按照以下顺序入手：
+
+- 了解 [TDS 内建账户系统](/sdk/authentication/features/)，好友功能依赖内建账户，下文中的玩家、用户均指 `TDSUser`。
+
+- 阅读本篇指南，了解两种好友模型下均通用的接口。
+
+- 根据游戏项目需求，选定游戏将采用的好友模型，然后阅读相应的开发指南：
+
+    * [互为好友](/sdk/friends/mutual/)
+    * [单向关注](/sdk/friends/follow/)
 
 ## SDK 初始化
 
@@ -80,7 +102,7 @@ TDSFriends.FriendStatusChangedDelegate = new TDSFriendStatusChangedDelegate {
 ```
 
 ```java
-TDSFriends.registerFriendStatusChangedListener(new FriendStatusChangedListener() {
+TDSFriendCommon.registerFriendStatusChangedListener(new FriendStatusChangedListener() {
     // 新增好友（触发时机同「已发送的好友申请被接受」）
     @Override
     public void onFriendAdd(TDSFriendInfo friendInfo) {}
@@ -172,7 +194,7 @@ TDSFriends.FriendStatusChangedDelegate = null;
 ```
 
 ```java
-TDSFriends.removeFriendStatusChangedListener();
+TDSFriendCommon.removeFriendStatusChangedListener();
 ```
 
 ```objc
@@ -197,7 +219,7 @@ await TDSFriends.Online();
 <>
 
 ```java
-TDSFriends.online(new Callback<Boolean>() {
+TDSFriendCommon.online(new Callback<Boolean>() {
     @Override
     public void onSuccess(Boolean ok) {
         toast("online success");
@@ -233,475 +255,11 @@ await TDSFriends.Offline();
 ```
 
 ```java
-TDSFriends.offline();
+TDSFriendCommon.offline();
 ```
 
 ```objc
 [TDSFriends offline];
-```
-
-</MultiLang>
-
-## 添加好友
-
-每个已登录玩家都有一个好友码，可以分享给其他玩家用于添加好友。
-
-访问 `TDSUser` 的 `shortId` 属性可获取好友码：
-
-<MultiLang>
-
-```cs
-// currentUser 是已登录的 TDSUser
-string shortId = currentUser["shortId"];
-```
-
-```java
-String shortId = currentUser.getString("shortId");
-```
-
-```objc
-NSString *shortId = currentUser[@"shortId"];
-```
-
-</MultiLang>
-
-可以通过指定好友码添加相应玩家为好友。
-
-<MultiLang>
-
-```cs
-await TDSFriends.AddFriendByShortCode(shortId);
-```
-
-```java
-TDSFriends.addFriendByShortCode(shortId, null, new Callback<Boolean>() {
-    @Override
-    public void onSuccess(Boolean ok) {
-        toast("Applied or added.");
-    }
-
-    @Override
-    public void onFail(TDSFriendError error) {
-        toast("Failed to add a friend: " + error.detailMessage);
-    }
-});
-```
-
-```objc
-[TDSFriends addFriendWithShortCode:shortId attributes:nil callback:^(BOOL succeeded, NSError * _Nullable error) {
-  if (succeeded) {
-    // Applied or added.
-  } else if (error) {
-    // Failed to add a friend.
-  }
-}];
-```
-
-</MultiLang>
-
-
-如果当前玩家已经在对方的好友列表中，那么对方会直接成为当前玩家的好友。
-否则，会向对方发送好友申请。
-
-添加好友时可以指定额外的属性，例如，将对方放入 `coworkers`（同事）分组：
-
-<MultiLang>
-
-```cs
-Dictionary<string, object> attrs = new Dictionary<string, object> {
-    { "group", "coworkers" }
-};
-await TDSFriends.AddFriendByShortCode(shortId, attrs);
-```
-
-```java
-Map<String, Object> attrs = new HashMap<String, Object>();
-attrs.put("group", "coworkers");
-TDSFriends.addFriendByShortCode(shortId, attrs, new Callback<Boolean>() {
-    // 略（参见上面的例子）
-});
-```
-
-```objc
-NSDictionary *attributes = @{
-    @"group" : @"coworkers",
-};
-[TDSFriends addFriendWithShortCode:shortId attributes:attributes
-callback:^(BOOL succeeded, NSError * _Nullable error) {
-    // 略（参见上面的例子）
-}];
-```
-
-</MultiLang>
-
-此外，也可以通过指定某个 `TDSUser` 的 `objectId` 来添加他为好友。
-比如，假设 Tarara 的 `objectId` 是 `5b0b97cf06f4fd0abc0abe35`，可以通过以下代码添加她为好友：
-
-<MultiLang>
-
-```cs
-await TDSFriends.AddFriend("5b0b97cf06f4fd0abc0abe35");
-```
-
-```java
-TDSFriends.addFriend("5b0b97cf06f4fd0abc0abe35", new Callback<Boolean>() {
-    // 略（参见上面的例子）
-});
-```
-
-```objc
-[TDSFriends addFriendWithUserId:@"5b0b97cf06f4fd0abc0abe35" attributes:nil
-callback:^(BOOL succeeded, NSError * _Nullable error) {
-    // 略（参见上面的例子）
-}];
-```
-
-</MultiLang>
-
-通过 `objectId` 添加好友同样可以指定额外属性：
-
-<MultiLang>
-
-```cs
-Dictionary<string, object> attrs = new Dictionary<string, object> {
-    { "group", "coworkers" }
-};
-await TDSFriends.AddFriend("5b0b97cf06f4fd0abc0abe35", attrs);
-```
-
-```java
-Map<String, Object> attrs = new HashMap<String, Object>();
-attrs.put("group", "coworkers");
-TDSFriends.addFriend("5b0b97cf06f4fd0abc0abe35", attrs, new Callback<Boolean>() {
-    // 略（参见上面的例子）
-});
-```
-
-```objc
-NSDictionary *attributes = @{
-    @"group" : @"coworkers",
-};
-[TDSFriends addFriendWithUserId:@"5b0b97cf06f4fd0abc0abe35" attributes:attributes callback:^(BOOL succeeded, NSError * _Nullable error) {
-    // 略（参见上面的例子）
-}];
-```
-
-</MultiLang>
-
-## 删除好友
-
-成为好友的两个玩家，之后也可以单方面删除好友。
-例如，和 Tarara 成为好友后，当前玩家又改变主意，不想和 Tarara 做朋友了：
-
-<MultiLang>
-
-```cs
-await TDSFriends.DeleteFriend("5b0b97cf06f4fd0abc0abe35");
-```
-
-```java
-TDSFriends.deleteFriend("5b0b97cf06f4fd0abc0abe35", new Callback<Boolean>() {
-    @Override
-    public void onSuccess(Boolean ok) {
-        toast("Deleted.");
-    }
-
-    @Override
-    public void onFail(TDSFriendError error) {
-        toast("Failed to delete a friend: " + error.detailMessage);
-    }
-});
-```
-
-```objc
-[TDSFriends deleteFriendWithUserId:@"5b0b97cf06f4fd0abc0abe35" callback:^(BOOL succeeded, NSError * _Nullable error) {
-  if (succeeded) {
-    // Deleted.
-  } else if (error) {
-    // Failed to delete a friend.
-  }
-}];
-```
-
-</MultiLang>
-
-## 查询好友申请列表
-
-好友申请有三种状态：
-
-- `pending`，对方没有回应，还处于等待中。好友申请创建之后默认是此状态。
-- `accepted`，对方已经接受，现在双方成为好友。
-- `declined`，对方已经拒绝。
-
-SDK 提供了查询好友申请的接口。
-例如，查询处于 `pending` 状态的前 20 条申请：
-
-<MultiLang>
-<>
-
-```cs
-var from = 0;
-var limit = 100;
-ReadOnlyCollection<LCFriendshipRequest> requests = await TDSFriends.QueryFriendRequestList (
-    LCFriendshipRequest.STATUS_PENDING, from, limit
-);
-```
-
-`LCFriendshipRequest.STATUS_PENDING` 即表示好友申请状态为 `pending`。
-类似地，`LCFriendshipRequest.STATUS_ACCEPTED` 和 `LCFriendshipRequest.STATUS_DECLINED` 分别表示好友申请状态为 `accepted` 和 `declined`。
-`LCFriendshipRequest.STATUS_ANY` 则表示任意状态。
-
-</>
-<>
-
-```java
-int from = 0;
-int limit = 100;
-TDSFriends.queryFriendRequestList(LCFriendshipRequest.STATUS_PENDING, from, limit,
-    new ListCallback<LCFriendshipRequest>(){
-
-        @Override
-        public void onSuccess(List<LCFriendshipRequest> requests) {
-            // requests 就是处于 pending 状态中的好友申请列表
-        }
-
-        @Override
-        public void onFail(TDSFriendError error) {
-            toast("Failed to query friendship requests: " + error.detailMessage);
-        }
-});
-```
-
-上述代码示例中的 `LCFriendshipRequest.STATUS_PENDING` 即表示好友申请状态为 `pending`。
-类似地，`LCFriendshipRequest.STATUS_ACCEPTED` 和 `LCFriendshipRequest.STATUS_DECLINED` 分别表示好友申请状态为 `accepted` 和 `declined`。
-`LCFriendshipRequest.STATUS_ANY` 则表示任意状态。
-
-</>
-<>
-
-```objc
-TDSFriendsQueryOption *option = [TDSFriendsQueryOption new];
-option.from = 0;
-option.limit = 100;
-[TDSFriends queryFriendRequestWithStatus:TDSUserFriendshipRequestStatusPending
-    option:option
-    callback:^(NSArray<LCFriendshipRequest *> * _Nullable requests, NSError * _Nullable error) {
-        // requests 就是处于 pending 状态中的好友申请列表
-}];
-```
-
-上述代码示例中的 TDSUserFriendshipRequestStatusPending 即表示好友申请状态为 `pending`。
-类似地，`TDSUserFriendshipRequestStatusAccepted` 和 `TDSUserFriendshipRequestStatusDeclined;` 分别表示好友申请状态为 `accepted` 和 `declined`。
-`TDSUserFriendshipRequestStatusAny` 则表示任意状态。
-
-</>
-
-</MultiLang>
-
-## 处理好友申请
-
-对于新的好友请求，玩家可以同意或者拒绝，也可以什么都不做，无视这些请求，甚至直接删除。
-
-<MultiLang>
-
-```cs
-// LCFriendshipRequest request
-
-// 接受
-await TDSFriends.AcceptFriendshipRequest(request);
-// 接受并添加额外属性
-Dictionary<string, object> attrs = new Dictionary<string, object> {
-    { "group", "coworkers" }
-};
-await TDSFriends.AcceptFriendshipRequest(request, attrs);
-
-// 拒绝
-await TDSFriends.DeclineFriendshipRequest(request);
-// 删除
-await request.Delete();
-```
-
-```java
-// LCFriendshipRequest request
-
-// 接受
-TDSFriends.acceptFriendRequest(request, new Callback<Boolean>() {
-    @Override
-    public void onSuccess(Boolean ok) {
-        toast("Accepted.");
-    }
-
-    @Override
-    public void onFail(TDSFriendError error) {
-        toast("Failed to delete a friend: " + error.detailMessage);
-    }
-});
-// 接受并添加额外属性
-Map<String, Object> attrs = new HashMap<String, Object>();
-attrs.put("group", "coworkers");
-TDSFriends.acceptFriendRequest(request, attrs, new Callback<Boolean>() {
-    // 略
-});
-
-// 拒绝
-TDSFriends.declineFriendRequest(request, new Callback<Boolean>() {
-    // 略
-});
-// 删除
-TDSFriends.deleteFriendRequest(request, new Callback<Boolean>() {
-    // 略
-});
-```
-
-```objc
-// LCFriendshipRequest request
-
-// 接受
-[TDSFriends acceptFriendRequest:request attributes:nil
-callback:^(BOOL succeeded, NSError * _Nullable error) {
-  if (succeeded) {
-    // Accepted.
-  } else if (error) {
-    // Failed to accept a friend request.
-  }
-}];
-// 接受并添加额外属性
-NSDictionary *attributes = @{
-    @"group" : @"coworkers",
-};
-[TDSFriends acceptFriendRequest:request attributes:attributes
-callback:^(BOOL succeeded, NSError * _Nullable error) {
-    // 略
-}];
-
-// 拒绝
-[TDSFriends declineFriendRequest:request
-callback:^(BOOL succeeded, NSError * _Nullable error) {
-    // 略
-}];
-
-[TDSFriends deleteFriendRequest:request
-callback:^(BOOL succeeded, NSError * _Nullable error) {
-    // 略
-}];
-```
-
-</MultiLang>
-
-注意：
-
-1. 对方拒绝了当前玩家发起的好友申请之后，玩家通过之前接口的添加好友接口再次发送申请时会收到报错，表明对方不想和当前玩家成为好友。
-3. 对方删除了当前玩家发起的好友请求后，当前玩家还可以再次发起申请。
-
-## 查询好友列表
-
-玩家可以查询自己的好友列表。查询时可以限定返回结果数量及起始位置：
-
-<MultiLang>
-
-```cs
-var from = 0;
-var limit = 100;
-ReadOnlyCollection<TDSFriendInfo> friendInfos = await TDSFriends.QueryFriendList(from, limit);
-foreach (TDSFriendInfo info in friendInfos) {
-    // 玩家信息
-    TDSUser user = info.User;
-    // 富信息数据，详见后文
-    Dictionary<string, string> richPresence = info.RichPresence;
-    // 好友是否在线
-    bool online = info.Online;
-}
-```
-
-```java
-int from = 0;
-int limit = 100;
-TDSFriends.queryFriendList(from, limit,
-    new ListCallback<TDSFriendInfo>(){
-
-        @Override
-        public void onSuccess(List<TDSFriendInfo> friendInfoList) {
-           for (TDSFriendInfo info : friendInfoList) {
-               // 玩家信息
-               TDSUser user = info.getUser();
-               // 富信息数据，详见后文
-               TDSRichPresence richPresence = info.getRichPresence();
-               // 好友是否在线
-               boolean online = info.isOnline();
-           }
-        }
-
-        @Override
-        public void onFail(TDSFriendError error) {
-            toast("Failed to query friend list" + error.detailMessage);
-        }
-});
-```
-
-```objc
-TDSFriendsQueryOption *option = [TDSFriendsQueryOption new];
-option.from = 0;
-option.limit = 100;
-[TDSFriends queryFriendWithOption:option
-    callback:^(NSArray<TDSFriendInfo *> * _Nullable friendInfos, NSError * _Nullable error) {
-        if (friendInfos) {
-            for (TDSFriendInfo *info in friendInfos) {
-                // 玩家信息
-                TDSUser *user = info.user;
-                // 富信息数据，详见后文
-                NSDictionary *richPresence = info.richPresence;
-                // 好友是否在线
-                BOOL online = info.online;
-            }
-        } else if (error) {
-            // 处理错误
-        }
-}];
-```
-
-</MultiLang>
-
-## 查询是否好友
-
-可以通过指定某个 `TDSUser` 的 `objectId` 来查询他是否是当前玩家的好友。
-比如，假设 Tarara 的 `objectId` 是 `5b0b97cf06f4fd0abc0abe35`：
-
-<MultiLang>
-
-```cs
-bool isFriend = await TDSFriends.CheckFriendship("5b0b97cf06f4fd0abc0abe35");
-```
-
-```java
-TDSFriends.checkFriendship("5b0b97cf06f4fd0abc0abe35", new Callback<Boolean>() {
-    @Override
-    public void onSuccess(Boolean isFriend) {
-        if (isFriend) {
-            toast("Tarara is my friend.");
-        } else {
-            toast("Tarara is not my friend.");
-        }
-    }
-
-    @Override
-    public void onFail(TDSFriendError error) {
-        toast("Failed to query friendship: " + error.detailMessage);
-    }
-});
-```
-
-```objc
-[TDSFriends checkFriendshipWithUserId:@"5b0b97cf06f4fd0abc0abe35"
-    callback:^(NSNumber * _Nullable isFriend, NSError * _Nullable error) {
-        if (error) {
-            // 处理错误
-        }
-        if (isFriend.boolValue) {
-            NSLog(@"Tarara is my friend.");
-        } else {
-            NSLog(@"Tarara is not my friend.");
-        }
-}];
 ```
 
 </MultiLang>
@@ -727,7 +285,7 @@ foreach (TDSFriendInfo info in friendInfos) {
 ```
 
 ```java
-TDSFriends.searchUserByName("Tarara", new ListCallback<TDSFriendInfo>() {
+TDSFriendCommon.searchUserByName("Tarara", new ListCallback<TDSFriendInfo>() {
     @Override
     public void onSuccess(List<TDSFriendInfo> friendInfoList) {
         for (TDSFriendInfo info : friendInfoList) {
@@ -773,9 +331,30 @@ callback:^(NSArray<TDSFriendInfo *> * _Nullable friendInfos, NSError * _Nullable
 注意，**使用这一功能的前提是内建账户系统中设置了 `nickname`（昵称）字段**。
 参见[内建账户系统文档](/sdk/authentication/guide/#设置其他用户属性)。
 
-## 根据好友码查询好友
+## 好友码
 
-也可以通过好友码查询好友：
+每个已登录玩家都有一个好友码，可以分享给其他玩家用于添加好友。
+
+访问 `TDSUser` 的 `shortId` 属性可获取好友码：
+
+<MultiLang>
+
+```cs
+// currentUser 是已登录的 TDSUser
+string shortId = currentUser["shortId"];
+```
+
+```java
+String shortId = currentUser.getString("shortId");
+```
+
+```objc
+NSString *shortId = currentUser[@"shortId"];
+```
+
+</MultiLang>
+
+可以通过好友码查询玩家：
 
 <MultiLang>
 
@@ -784,7 +363,7 @@ TDSFriendInfo friendInfo = await TDSFriends.SearchUserByShortCode(shortId);
 ```
 
 ```java
-TDSFriends.searchUserByShortCode(shortId, new Callback<TDSFriendInfo>() {
+TDSFriendCommon.searchUserByShortCode(shortId, new Callback<TDSFriendInfo>() {
     @Override
     public void onSuccess(TDSFriendInfo friendInfo) { /* 略（参见上节） */ }
 
@@ -802,6 +381,8 @@ callback:^(TDSFriendInfo * _Nullable friendInfo, NSError * _Nullable error) {
 
 </MultiLang>
 
+
+
 ## 富信息
 
 富信息用于呈现玩家状态等信息，如在线状态、正在使用哪个英雄、正处于哪个游戏模式等。
@@ -815,7 +396,7 @@ await TDSFriends.SetRichPresence("score", "60");
 ```
 
 ```java
-TDSFriends.setRichPresence("score", "60",  new Callback<Boolean>() {
+TDSFriendCommon.setRichPresence("score", "60",  new Callback<Boolean>() {
     @Override
     public void onSuccess(Boolean ok) {
         toast("Succeed to set rich presence.");
@@ -863,7 +444,7 @@ await TDSFriends.SetRichPresences(info);
 Map<String,String> info = new HashMap<>();
 info.put("score", "60");
 info.put("display", "#matching");
-TDSFriends.setRichPresence(info, new Callback<Boolean>() {
+TDSFriendCommon.setRichPresence(info, new Callback<Boolean>() {
     // 略
 });
 ```
@@ -890,7 +471,7 @@ TDSFriends.clearRichPresence("score");
 ```
 
 ```java
-TDSFriends.clearRichPresence("score", new Callback<Boolean>() {
+TDSFriendCommon.clearRichPresence("score", new Callback<Boolean>() {
     // 略
 });
 ```
@@ -1173,306 +754,3 @@ curl -X GET \
 }
 ```
 
-## 分享链接
-
-注意，**使用这一功能的前提是内建账户系统中设置了 `nickname`（昵称）字段**。
-参见[内建账户系统文档](/sdk/authentication/guide/#设置其他用户属性)。
-
-### 落地页
-
-使用分享链接功能需要首先部署落地页网站。
-落地页网站可以部署在[云引擎](/sdk/engine/overview/)或其他支持部署纯静态网站的服务器上。
-如果计划部署在云引擎上，需注意云引擎的免费实例会自动休眠，请购买标准实例使用。
-
-我们提供了[开源的落地页示例项目][repo]，修改相应配置后可直接构建、部署、使用。
-注意，示例项目中的 `VITE_ANDROID_LINK` 环境变量格式为 `scheme://host/path`。
-`host` 和 `path` 的值需和 Android 的 `AndroidManifest.xml` 中的值保持一致。
-
-[repo]: https://github.com/taptap/TapFriends-landing-page
-
-例如，假设 `AndroidManifest.xml` 中的相关配置如下：
-
-```xml
-<activity
-    android:name="com.tapsdk.friends.TDSFriendsRouterPageActivity"
-    android:allowTaskReparenting="true"
-    android:configChanges="keyboardHidden|orientation"
-    android:exported="true"
-    android:launchMode="singleTask"
-    android:screenOrientation="nosensor"
-    android:theme="@android:style/Theme.Translucent.NoTitleBar">
-    <intent-filter>
-        <action android:name="android.intent.action.VIEW" />
-
-        <category android:name="android.intent.category.DEFAULT" />
-        <category android:name="android.intent.category.BROWSABLE" />
-
-        <data
-            android:host="游戏应用ID"
-            android:path="/friends"
-            android:scheme="tapsdk" />
-            <!-- scheme不能出现大写或者下划线，<a href="[scheme]://[host]/[path]?[query]">启动应用程序</a> -->
-        </intent-filter>
-</activity>
-```
-
-那么落地页项目中 `VITE_ANDROID_LINK` 的值为 `tapsdk://游戏应用ID/friends`。
-
-落地页网站的地址需要在客户端配置：
-
-<MultiLang>
-
-```cs
-TDSFriends.SetShareLink("https://please-replace-with-your-domain.example.com");
-```
-
-```java
-TDSFriends.setShareLink("https://please-replace-with-your-domain.example.com");
-```
-
-```objc
-[TDSFriends setShareLink:@"https://please-replace-with-your-domain.example.com"];
-```
-
-</MultiLang>
-
-如果落地页部署在云引擎网站上，那么地址就是 `https://你的云引擎自定义域名`。
-
-### 生成链接
-
-部署完落地页网站并在客户端配置好相应地址后，调用以下接口即可生成好友邀请页网址：
-
-<MultiLang>
-
-```cs
-string inviteUrl = await TDSFriends.GenerateFriendInvitationLink();
-```
-
-```java
-TDSFriends.generateFriendInvitationLink(new Callback<String>() {
-    @Override
-    public void onSuccess(String inviteUrl) {
-        System.out.println("share this link to invite your friends: " + inviteUrl);
-    }
-
-    @Override
-    public void onFail(TDSFriendError error) {
-        System.out.println("Failed to generate invite link: " + error.detailMessage);
-    }
-});
-```
-
-```objc
-NSError *error;
-NSString *inviteUrl = [TDSFriends generateFriendInvitationLinkWithError:&error];
-```
-
-</MultiLang>
-
-### 处理链接
-
-玩家通过邀请链接打开游戏后，开发者需要调用该接口。
-调用该接口后，SDK 会自动向对应的玩家发起好友申请。
-
-<MultiLang>
-
-<>
-
-```cs
-public class DeepLinkManager : MonoBehaviour
-{
-    // 略
-    private async void onDeepLinkActivated(string url) {
-        Dictionary<string, object> invitation = TDSFriends.ParseFriendInvitationLink(url);
-        string userId = invitation["identity"];
-        string nickname = invitation["nickname"];
-        await TDSFriends.HandleFriendInvitationLink(url);
-    }
-}
-```
-
-</>
-<>
-
-如果玩家通过好友邀请链接打开游戏，那么 Android SDK 会自动发送对应的好友申请。
-开发者只需确保玩家登录后调用了 `online()` 方法建立长连接，无需对打开邀请链接进行特别处理。
-
-</>
-<>
-
-```objc
-- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
-    return [TDSFriends handleFriendInvitationLink:url
-    callback:^(BOOL succeeded, TDSFriendsLinkInfo * _Nullable linkInfo, NSError * _Nullable error) {
-        if (error) {
-            // handle error
-        }
-    }];
-}
-```
-
-</>
-
-</MultiLang>
-
-## 查询第三方平台好友
-
-调用以下接口可以查询当前玩家在第三方平台（比如 TapTap）上的好友。
-该接口除了会返回好友列表外，还会返回游标。
-指定游标和返回数量，可以实现翻页功能。
-
-返回的第三方平台好友列表中会包括玩家在第三方平台的 ID、昵称、头像。
-如果好友已经使用 TapTap 账号登录该游戏，那么还会返回相应的 `TDSFriendInfo`，否则此项会返回 `null`。
-
-<MultiLang>
-
-```cs
-// 首次查询
-string platform = "taptap";
-string cursor = null;
-// 默认 50，最大 500
-int limit = 50;
-ThirdPartyFriendResult result = await TDSFriends.QueryThirdPartyFriendList(platform, cursor, limit);
-
-ReadOnlyCollection<ThirdPartyFriend> friends = result.FriendList;
-foreach (ThirdPartyFriend frined in friends) {
-    string thirdPartyId = friend.Id;
-    string thirdPartyNickName = friend.Name;
-    string thirdPartyAvatarUrl = friend.Avatar;
-    TDSFriendInfo info = friend.FriendInfo;
-}
-
-// 翻页
-string cursor = result.Cursor;
-ThirdPartyFriendResult more = await TDSFriends.QueryThirdPartyFriendList(platform, cursor, limit);
-```
-
-```java
-ThirdPartyFriendRequestConfig config = new ThirdPartyFriendRequestConfig.Builder()
-    .platform(ThirdPartyFriendRequestConfig.PLATFORM_TAPTAP)
-    .pageSize(50)  /* 默认 50，最大 500 */
-    .build();
-// 首次查询
-TDSFriends.queryThirdPartyFriendList(config, null, new Callback<ThirdPartyFriendResult>() {
-    @Override
-    public void onSuccess(ThirdPartyFriendResult result) {
-        List<ThirdPartyFriend> friends = result.getFriendList();
-        for (ThirdPartyFriend friend : friends) {
-            String thirdPartyId = friend.getUserId();
-            String thirdPartyNickName = friend.getUserName();
-            String thirdPartyAvatarUrl = friend.getUserAvatar();
-            TDSFriendInfo info = friend.getTdsFriendInfo();
-        }
-
-        // 翻页
-        String cursor = result.getCursor();
-        TDSFriends.queryThirdPartyFriendList(config, cursor, new Callback<ThirdPartyFriendResult>() {
-            /* 略 */
-        }
-    }
-    @Override
-    public void onFail(TDSFriendError error) {
-        toast("query error = " + error.code + " msg = " + error.detailMessage);
-    }
-});
-```
-
-```objc
-TDSThirdPartyFriendQueryOption *option = [TDSThirdPartyFriendQueryOption new];
-option.platform = TDSThirdPartyFriendPlatformTaptap;
-option.pageSize = 50; // 默认 50，最大 500
-__block NSString *cursor; // 游标
-
-[TDSThirdPartyFriend queryThirdPartyFriendListWithOption:option
-callback:^(TDSThirdPartyFriendResult * _Nullable result, NSError * _Nullable error) {
-    for (TDSThirdPartyFriend* friend in friends) {
-        NSString *thirdPartyId = friend.userId;
-        NSString *thirdPartyNickName = friend.userName;
-        NSString *thirdPartyAvatarUrl = friend.userAvatar;
-        TDSFriendInfo *info = friend.tdsFriendInfo;
-    }
-    cursor = result.cursor;
-}];
-
-// 翻页
-option.cursor = cursor;
-[TDSThirdPartyFriend queryThirdPartyFriendListWithOption:option
-callback:^(TDSThirdPartyFriendResult * _Nullable result, NSError * _Nullable error) {
-    // 略
-}];
-```
-
-</MultiLang>
-
-默认情况下，SDK 优先从本地缓存中查询，以避免不必要的网络开销。
-游戏如果希望总是从网络获取查询结果，可以在查询时指定缓存策略。
-无论查询时是否指定缓存策略，SDK 总是会缓存查询的结果。
-换句话说，缓存策略只决定是否读缓存，不决定是否写缓存。
-
-<MultiLang>
-
-```cs
-ThirdPartyFriendResult result = await TDSFriends.QueryThirdPartyFriendList(platform, cursor, limit,
-    TDSFriends.ThirdPartyFriendRequestCachePolicy.OnlyNetwork);
-```
-
-```java
-ThirdPartyFriendRequestConfig config = new ThirdPartyFriendRequestConfig.Builder()
-    .platform(ThirdPartyFriendRequestConfig.PLATFORM_TAPTAP)
-    .cachePolicy(ThirdPartyFriendRequestConfig.CachePolicy.ONLY_NETWORK)
-    .pageSize(50)
-    .build();
-```
-
-```objc
-option.cachePolicy = TDSThirdPartyFriendCachePolicyOnlyNetwork;
-```
-
-</MultiLang>
-
-**目前第三方平台仅支持 TapTap，且该功能需要提交工单联系我们开通。**
-
-
-## 在 TapTap 上关注好友
-
-调用以下接口可以在 TapTap 上关注游戏中的好友。
-**注意，该功能需要提交工单联系我们开通。**
-
-<MultiLang>
-
-```cs
-// TDSUser friend
-await TDSFriends.FollowTapUser(friend);
-```
-
-```java
-// TDSUser friend
-TDSFriends.followTapUser(friend, new Callback<Boolean>() {
-    @Override
-    public void onSuccess(Boolean ok) {
-        toast("关注成功");
-    }
-
-    @Override
-    public void onFail(TDSFriendError error) {
-        toast("tap 关注失败 error: " + error.detailMessage);
-    }
-});
-```
-
-```objc
-// TDSUser *friend
-[TDSThirdPartyFriend followTapUser:friend
-callback:^(BOOL succeeded, NSError * _Nullable error) {
-  if (succeeded) {
-    // Followed.
-  } else if (error) {
-    // Failed to follow the friend on TapTap.
-  }
-}];
-```
-
-</MultiLang>
-
-注意，使用这一接口的前提是**对方使用 TapTap 账号登录游戏**。
-另外，目前云端未限制仅可关注游戏好友，不是自己好友的玩家，也可以通过以上接口在 TapTap 上关注。
