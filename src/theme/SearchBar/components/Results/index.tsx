@@ -6,7 +6,21 @@ import styles from "./index.module.scss";
 
 import IconEnter from "../../icons/enter.svg";
 
-const Results = ({ groupedHits, searchFormEl, searchInputEl, openHit }) => {
+import type { HitItem, HitGroup } from "../../common";
+
+interface ResultsProps {
+  groupedHits: HitGroup[];
+  searchFormEl: React.RefObject<HTMLFormElement>;
+  searchInputEl: React.RefObject<HTMLInputElement>;
+  openHit: (hit: HitItem) => void;
+}
+
+const Results = ({
+  groupedHits,
+  searchFormEl,
+  searchInputEl,
+  openHit,
+}: ResultsProps) => {
   const [selection, setSelection, selectionEl] = useSelection(
     groupedHits,
     searchFormEl,
@@ -16,13 +30,13 @@ const Results = ({ groupedHits, searchFormEl, searchInputEl, openHit }) => {
 
   return (
     <List>
-      {groupedHits.map((group, groupIndex) => (
+      {groupedHits.map((group: HitGroup, groupIndex: number) => (
         <Group
           title={group.title}
           zIndex={groupedHits.length - groupIndex}
           key={group.title}
         >
-          {group.hits.map((hit, hitIndex) => (
+          {group.hits.map((hit: HitItem, hitIndex: number) => (
             <Hit
               hit={hit}
               selected={
@@ -42,7 +56,15 @@ const Results = ({ groupedHits, searchFormEl, searchInputEl, openHit }) => {
   );
 };
 
-const Hit = ({ hit, selected, onSelect, selectionEl, openHit }) => (
+interface HitProps {
+  hit: HitItem;
+  selected: boolean;
+  onSelect: () => void;
+  selectionEl: React.RefObject<HTMLLIElement>;
+  openHit: (hit: HitItem) => void;
+}
+
+const Hit = ({ hit, selected, onSelect, selectionEl, openHit }: HitProps) => (
   <Card
     hit={hit}
     selected={selected}
