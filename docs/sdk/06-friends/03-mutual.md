@@ -6,7 +6,457 @@ sidebar_label: 好友模式
 
 import MultiLang from '/src/docComponents/MultiLang';
 
-阅读本文前请先了解[好友模块的通用接口](/sdk/friends/guide/)。
+阅读本文前请先[完成 SDK 初始化](/sdk/friends/guide/)。
+
+## 响应好友变化通知
+
+好友模块支持客户端监听好友状态变化，在游戏中实时给玩家提示。
+你需要在调用上线接口前注册好友状态变更监听实例，这样，玩家上线后就能收到相应通知：
+
+<MultiLang>
+
+```cs
+TDSFriends.FriendStatusChangedDelegate = new TDSFriendStatusChangedDelegate {
+    // 新增好友（触发时机同「已发送的好友申请被接受」）
+    OnFriendAdd = friendInfo => {},
+    // 新增好友申请
+    OnNewRequestComing = req => {},
+    // 已发送的好友申请被接受
+    OnRequestAccepted = req => {},
+    // 已发送的好友申请被拒绝
+    OnRequestDeclined = req => {},
+    // 好友上线
+    OnFriendOnline = userId => {},
+    // 好友下线
+    OnFriendOffline = userId => {},
+    // 好友富信息变更
+    OnRichPresenceChanged = (userId, richPresence) => {},
+    // 当前玩家成功上线（长连接建立成功）
+    OnConnected = () => {},
+    // 当前玩家长连接断开，SDK 会自动重试，开发者通常无需额外处理
+    OnDisconnected = () => {},
+    // 当前连接异常
+    OnConnectionError = (code, message) => {},
+};
+```
+
+```java
+TDSFriends.registerFriendStatusChangedListener(new FriendStatusChangedListener() {
+    // 新增好友（触发时机同「已发送的好友申请被接受」）
+    @Override
+    public void onFriendAdd(TDSFriendInfo friendInfo) {}
+
+    // 新增好友申请
+    @Override
+    public void onNewRequestComing(LCFriendshipRequest request) {}
+
+    // 通过分享链接进入游戏 SDK 自动发送好友申请时触发
+    @Override
+    public void onSendFriendRequestToSharer(boolean isSuccess, String nickname, TDSFriendError error) {}
+
+    // 已发送的好友申请被接受
+    @Override
+    public void onRequestAccepted(LCFriendshipRequest request) {}
+
+    // 已发送的好友申请被拒绝
+    @Override
+    public void onRequestDeclined(LCFriendshipRequest request) {}
+
+    // 好友上线
+    @Override
+    public void onFriendOnline(String userId) {}
+
+    // 好友下线
+    @Override
+    public void onFriendOffline(String userId) {}
+
+    // 好友富信息变更
+    @Override
+    public void onRichPresenceChanged(String userId, TDSRichPresence richPresence) {}
+
+    // 当前玩家成功上线（长连接建立成功）
+    @Override
+    public void onConnected() {}
+
+    // 当前玩家长连接断开，SDK 会自动重试，开发者通常无需额外处理
+    @Override
+    public void onDisconnected() {}
+
+    // 当前连接异常
+    @Override
+    public void onConnectError(int code, String msg){});
+}
+```
+
+```objc
+[TDSFriends registerNotificationDelegate:self];
+
+// 新增好友（触发时机同「已发送的好友申请被接受」）
+- (void)onFriendAdd:(TDSFriendInfo *)info {}
+
+// 新增好友申请
+- (void)onNewRequestComing:(LCFriendshipRequest *)request {}
+
+// 已发送的好友申请被接受
+- (void)onRequestAccepted:(LCFriendshipRequest *)request {}
+
+// 已发送的好友申请被拒绝
+- (void)onRequestDeclined:(LCFriendshipRequest *)request {}
+
+// 好友上线
+- (void)onFriendOnline:(NSString *)userId {}
+
+// 好友下线
+- (void)onFriendOffline:(NSString *)userId {}
+
+// 好友富信息变更
+- (void)onRichPresenceChanged:(NSString *)userId dictionary:(NSDictionary * _Nullable)dictionary {}
+
+// 当前玩家成功上线（长连接建立成功）
+- (void)onConnected {}
+
+// 当前玩家长连接断开，SDK 会自动重试，开发者通常无需额外处理
+- (void)onDisconnected {}
+
+// 当前连接异常
+- (void)onDisconnectedWithError:(NSError * _Nullable)error {}
+```
+
+</MultiLang>
+
+上述事件中的「好友」，均指「好友模式」下的「好友」。
+目前 SDK 暂不支持监听关注模式下的事件。
+
+如果想要停止监听：
+
+<MultiLang>
+
+```cs
+TDSFriends.FriendStatusChangedDelegate = null;
+```
+
+```java
+TDSFriends.removeFriendStatusChangedListener();
+```
+
+```objc
+[TDSFriends unregisterNotificationDelegate];
+```
+
+</MultiLang>
+
+## 玩家上线
+
+玩家成功登录后，需要调用该接口建立和好友服务云端的长连接。
+长连接建立后，如果网络临时中断，SDK 会在网络恢复后自动重连。
+
+<MultiLang>
+<>
+
+```cs
+await TDSFriends.Online();
+```
+
+</>
+<>
+
+```java
+TDSFriends.online(new Callback<Boolean>() {
+    @Override
+    public void onSuccess(Boolean ok) {
+        toast("online success");
+    }
+
+    @Override
+    public void onFail(TDSFriendError error) {
+        toast("online failure: " + error.detailMessage);
+    }
+});
+```
+
+建立长连接后，如果玩家通过好友邀请链接打开游戏，那么 Android SDK 也会自动发送对应的好友申请。
+
+</>
+<>
+
+```objc
+[TDSFriends online];
+```
+
+</>
+</MultiLang>
+
+## 玩家下线
+
+玩家登出后，需要调用此接口断开和云端的长连接。
+
+<MultiLang>
+
+```cs
+await TDSFriends.Offline();
+```
+
+```java
+TDSFriends.offline();
+```
+
+```objc
+[TDSFriends offline];
+```
+
+</MultiLang>
+
+## 根据昵称查询好友
+
+在不知道玩家 objectId 的情况下，可以通过玩家昵称查询好友。
+例如，搜索昵称为 `Tarara` 的好友：
+
+<MultiLang>
+
+```cs
+ReadOnlyCollection<TDSFriendInfo> friendInfos = await TDSFriends.SearchUserByName("Tarara");
+foreach (TDSFriendInfo info in friendInfos) {
+    // 玩家信息
+    TDSUser user = info.User;
+    // 富信息数据，详见后文
+    Dictionary<string, string> richPresence = RichPresence;
+    // 好友是否在线
+    bool online = info.Online;
+}
+```
+
+```java
+TDSFriends.searchUserByName("Tarara", new ListCallback<TDSFriendInfo>() {
+    @Override
+    public void onSuccess(List<TDSFriendInfo> friendInfoList) {
+        for (TDSFriendInfo info : friendInfoList) {
+            // 玩家信息
+            TDSUser user = info.getUser();
+            // 富信息数据，详见后文
+            TDSRichPresence richPresence = info.getRichPresence();
+            // 好友是否在线
+            boolean online = info.isOnline();
+        }
+    }
+
+    @Override
+    public void onFail(TDSFriendError error) {
+        toast("Failed search friend by nickname" + error.detailMessage);
+    }
+});
+```
+
+```objc
+TDSFriendQueryOption *option = [TDSFriendQueryOption new];
+option.from = 0;
+option.limit = 100;
+[TDSFriends searchUserWithNickname:@"Tarara" option:option
+callback:^(NSArray<TDSFriendInfo *> * _Nullable friendInfos, NSError * _Nullable error) {
+    if (friendInfos) {
+        for (TDSFriendInfo *info in friendInfos) {
+            // 玩家信息
+            TDSUser *user = info.user;
+            // 富信息数据，详见后文
+            NSDictionary *richPresence = info.richPresence;
+            // 好友是否在线
+            BOOL online = info.online;
+        }
+    } else if (error) {
+        // 处理错误
+    }
+}];
+```
+
+</MultiLang>
+
+注意，**使用这一功能的前提是内建账户系统中设置了 `nickname`（昵称）字段**。
+参见[内建账户系统文档](/sdk/authentication/guide/#设置其他用户属性)。
+
+## 好友码
+
+每个已登录玩家都有一个好友码，可以分享给其他玩家用于添加好友。
+
+访问 `TDSUser` 的 `shortId` 属性可获取好友码：
+
+<MultiLang>
+
+```cs
+// currentUser 是已登录的 TDSUser
+string shortId = currentUser["shortId"];
+```
+
+```java
+String shortId = currentUser.getString("shortId");
+```
+
+```objc
+NSString *shortId = currentUser[@"shortId"];
+```
+
+</MultiLang>
+
+可以通过好友码查询玩家：
+
+<MultiLang>
+
+```cs
+TDSFriendInfo friendInfo = await TDSFriends.SearchUserByShortCode(shortId);
+```
+
+```java
+TDSFriends.searchUserByShortCode(shortId, new Callback<TDSFriendInfo>() {
+    @Override
+    public void onSuccess(TDSFriendInfo friendInfo) { /* 略（参见上节） */ }
+
+    @Override
+    public void onFail(TDSFriendError error) { /* 略（参见上节） */ }
+});
+```
+
+```objc
+[TDSFriends searchUserWithShortCode:shortId
+callback:^(TDSFriendInfo * _Nullable friendInfo, NSError * _Nullable error) {
+    // 略（参见上节）
+}];
+```
+
+</MultiLang>
+
+
+
+## 富信息
+
+富信息用于呈现玩家状态等信息，如在线状态、正在使用哪个英雄、正处于哪个游戏模式等。
+
+在控制台添加富信息相关配置后，可以根据已配置的富信息字段，设置对应的富信息内容：
+
+<MultiLang>
+
+```cs
+await TDSFriends.SetRichPresence("score", "60");
+```
+
+```java
+TDSFriends.setRichPresence("score", "60",  new Callback<Boolean>() {
+    @Override
+    public void onSuccess(Boolean ok) {
+        toast("Succeed to set rich presence.");
+    }
+
+    @Override
+    public void onFail(TDSFriendError error) {
+        toast("Failed to set rich presence: " + error.detailMessage);
+    }
+});
+```
+
+```objc
+[TDSFriends setRichPresenceWithKey:@"score" value:@"60"
+    callback:^(BOOL succeeded, NSError * _Nullable error) {
+  if (succeeded) {
+    // Succeed to set rich presence.
+  } else if (error) {
+    // Failed to set rich presence.
+  }
+}];
+```
+
+</MultiLang>
+
+这里 `score` 是在控制台配置的富信息字段。
+富信息的字段有两种类型：
+
+- `variable` 类型，值是字符串。例如，之前的代码实例中，`score` 在控制台配置为 `variable` 类型，因此客户端设置富信息字段的值时填了 `60`，云端返回给客户端的富信息为 `"score": "60"`，在游戏界面该玩家的好友会看到当前玩家的富信息显示为「得分 60」之类。这里，开发者需要自行实现将 `score` 显示为「得分」等本地化内容的逻辑。
+
+- `token` 类型，值是以 `#` 开头的字符串。例如，下面的代码实例中 `display` 字段的类型是 `token`，客户端设置富信息字段的值时填了 `#matching`，这个值在云端会进行多语言匹配，返回给客户端的富信息会直接替换为本地化的内容：`"display": "匹配中"`。注意，如果多语言匹配失败则会返回空字符串（`"display": " "`）。
+
+需要一次性配置多个字段时，可以传入一组字段：
+
+<MultiLang>
+
+```cs
+Dictionary<string, string> info = new Dictionary<string, string>();
+info.Add("score", "60");
+info.Add("display", "#matching");
+await TDSFriends.SetRichPresences(info);
+```
+
+```java
+Map<String,String> info = new HashMap<>();
+info.put("score", "60");
+info.put("display", "#matching");
+TDSFriends.setRichPresence(info, new Callback<Boolean>() {
+    // 略
+});
+```
+
+```objc
+[TDSFriends setRichPresencesWithDictionary:@{
+    @"score" : @"60",
+    @"display" : @"#matching",
+} callback:^(BOOL succeeded, NSError * _Nullable error) {
+    // 略
+}];
+```
+
+</MultiLang>
+
+控制台**最多配置 20 个富信息字段**，字段名（key）长度不超过 128 bytes，字段值（value）长度不超过 256 bytes。
+
+如需清除当前玩家的某项富信息，可以调用以下接口：
+
+<MultiLang>
+
+```cs
+TDSFriends.ClearRichPresence("score");
+```
+
+```java
+TDSFriends.clearRichPresence("score", new Callback<Boolean>() {
+    // 略
+});
+```
+
+```objc
+[TDSFriends clearRichPresenceWithKey:@"score"
+callback:^(BOOL succeeded, NSError * _Nullable error) {
+    // 略
+}];
+```
+
+</MultiLang>
+
+同样，可以批量清除一组富信息：
+
+<MultiLang>
+
+```cs
+IEnumerable<string> keys = new string[] {"score", "display"}
+await TDSFriends.ClearRichPresences(keys);
+```
+
+```java
+List<String> keys = new ArrayList<>();
+keys.add("score");
+keys.add("display");
+TDSFriends.clearRichPresence(keys, new Callback<Boolean>() {
+    // 略
+});
+```
+
+```objc
+[TDSFriends clearRichPresencesWithKeys:@[@"score", @"display"]
+callback:^(BOOL succeeded, NSError * _Nullable error) {
+    // 略
+});
+```
+
+</MultiLang>
+
+设置和清除富信息接口有调用频率限制，每 30s 最多各触发一次。
+
+富信息提供了 [REST API 接口](/sdk/friends/guide/#富信息-rest-api)。
+开发者可以自行编写程序或脚本调用这些接口在服务端进行管理性质的操作。
 
 ## 添加好友
 
@@ -33,7 +483,7 @@ TDSFriends.addFriendByShortCode(shortId, null, new Callback<Boolean>() {
 ```
 
 ```objc
-[TDSFriends addFriendWithShortCode:shortId attributes:nil callback:^(BOOL succeeded, NSError * _Nullable error) {
+[TDSFriends addFriendWithShortCode:shortId callback:^(BOOL succeeded, NSError * _Nullable error) {
   if (succeeded) {
     // Applied or added.
   } else if (error) {
@@ -95,7 +545,7 @@ TDSFriends.addFriend("5b0b97cf06f4fd0abc0abe35", new Callback<Boolean>() {
 ```
 
 ```objc
-[TDSFriends addFriendWithUserId:@"5b0b97cf06f4fd0abc0abe35" attributes:nil
+[TDSFriends addFriendWithUserId:@"5b0b97cf06f4fd0abc0abe35"
 callback:^(BOOL succeeded, NSError * _Nullable error) {
     // 略（参见上面的例子）
 }];
@@ -225,7 +675,7 @@ TDSFriends.queryFriendRequestList(LCFriendshipRequest.STATUS_PENDING, from, limi
 <>
 
 ```objc
-TDSFriendsQueryOption *option = [TDSFriendsQueryOption new];
+TDSFriendQueryOption *option = [TDSFriendQueryOption new];
 option.from = 0;
 option.limit = 100;
 [TDSFriends queryFriendRequestWithStatus:TDSUserFriendshipRequestStatusPending
@@ -384,7 +834,7 @@ TDSFriends.queryFriendList(from, limit,
 ```
 
 ```objc
-TDSFriendsQueryOption *option = [TDSFriendsQueryOption new];
+TDSFriendQueryOption *option = [TDSFriendQueryOption new];
 option.from = 0;
 option.limit = 100;
 [TDSFriends queryFriendWithOption:option
@@ -501,7 +951,7 @@ TDSFriends.checkFriendship("5b0b97cf06f4fd0abc0abe35", new Callback<Boolean>() {
 <MultiLang>
 
 ```cs
-TDSFriendCore.SetShareLink("https://please-replace-with-your-domain.example.com");
+TDSFriends.SetShareLink("https://please-replace-with-your-domain.example.com");
 ```
 
 ```java
@@ -523,7 +973,7 @@ TDSFriends.setShareLink("https://please-replace-with-your-domain.example.com");
 <MultiLang>
 
 ```cs
-string inviteUrl = await TDSFriendCore.GenerateFriendInvitationLink();
+string inviteUrl = await TDSFriends.GenerateFriendInvitationLink();
 ```
 
 ```java
@@ -561,7 +1011,7 @@ public class DeepLinkManager : MonoBehaviour
 {
     // 略
     private async void onDeepLinkActivated(string url) {
-        Dictionary<string, object> invitation = TDSFriendCore.ParseFriendInvitationLink(url);
+        Dictionary<string, object> invitation = TDSFriends.ParseFriendInvitationLink(url);
         string userId = invitation["identity"];
         string nickname = invitation["nickname"];
         await TDSFriends.HandleFriendInvitationLink(url);

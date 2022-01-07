@@ -77,12 +77,12 @@ TDSFollows.queryThirdPartyMutualList(config, null, new Callback<ThirdPartyFriend
 ```objc
 TDSThirdPartyFriendQueryOption *option = [TDSThirdPartyFriendQueryOption new];
 option.platform = TDSThirdPartyFriendPlatformTaptap;
-option.pageSize = 50; // 默认 50，最大 500
+option.limit = 50;// 默认 50，最大 500
 __block NSString *cursor; // 游标
 
-[TDSThirdPartyFriend queryThirdPartyFriendListWithOption:option
+[TDSFriends queryThirdPartyFriendListWithOption:option
 callback:^(TDSThirdPartyFriendResult * _Nullable result, NSError * _Nullable error) {
-    for (TDSThirdPartyFriend* friend in friends) {
+    for (TDSThirdPartyFriend* friend in result.friendList) {
         NSString *thirdPartyId = friend.userId;
         NSString *thirdPartyNickName = friend.userName;
         NSString *thirdPartyAvatarUrl = friend.userAvatar;
@@ -92,7 +92,7 @@ callback:^(TDSThirdPartyFriendResult * _Nullable result, NSError * _Nullable err
 }];
 
 // 翻页
-option.cursor = cursor;
+option.from = cursor;
 [TDSThirdPartyFriend queryThirdPartyFriendListWithOption:option
 callback:^(TDSThirdPartyFriendResult * _Nullable result, NSError * _Nullable error) {
     // 略
@@ -168,7 +168,7 @@ TDSFollows.followTapUser(tdsUser, new Callback<Boolean>() {
 
 ```objc
 // TDSUser *friend
-[TDSThirdPartyFriend followTapUser:friend
+[TDSFollows followTapUser:friend
 callback:^(BOOL succeeded, NSError * _Nullable error) {
   if (succeeded) {
     // Followed.
@@ -199,7 +199,11 @@ TDSFollows.followTapUserByShortCode(shortId, new Callback<Boolean>() {
 ```
 
 ```objc
-
+// TDSUser *friend
+[TDSFollows followTapUserWithShortCode:shortId
+callback:^(BOOL succeeded, NSError * _Nullable error) {
+    // 略
+}];
 ```
 
 </MultiLang>
