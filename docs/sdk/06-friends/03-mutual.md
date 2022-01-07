@@ -1,7 +1,7 @@
 ---
 id: mutual
-title: 互为好友模型
-sidebar_label: 互为好友
+title: 好友模式
+sidebar_label: 好友模式
 ---
 
 import MultiLang from '/src/docComponents/MultiLang';
@@ -351,7 +351,7 @@ ReadOnlyCollection<TDSFriendInfo> friendInfos = await TDSFriends.QueryFriendList
 foreach (TDSFriendInfo info in friendInfos) {
     // 玩家信息
     TDSUser user = info.User;
-    // 富信息数据，详见后文
+    // 富信息数据
     Dictionary<string, string> richPresence = info.RichPresence;
     // 好友是否在线
     bool online = info.Online;
@@ -501,7 +501,7 @@ TDSFriends.checkFriendship("5b0b97cf06f4fd0abc0abe35", new Callback<Boolean>() {
 <MultiLang>
 
 ```cs
-TDSFriends.SetShareLink("https://please-replace-with-your-domain.example.com");
+TDSFriendCore.SetShareLink("https://please-replace-with-your-domain.example.com");
 ```
 
 ```java
@@ -523,7 +523,7 @@ TDSFriends.setShareLink("https://please-replace-with-your-domain.example.com");
 <MultiLang>
 
 ```cs
-string inviteUrl = await TDSFriends.GenerateFriendInvitationLink();
+string inviteUrl = await TDSFriendCore.GenerateFriendInvitationLink();
 ```
 
 ```java
@@ -561,7 +561,7 @@ public class DeepLinkManager : MonoBehaviour
 {
     // 略
     private async void onDeepLinkActivated(string url) {
-        Dictionary<string, object> invitation = TDSFriends.ParseFriendInvitationLink(url);
+        Dictionary<string, object> invitation = TDSFriendCore.ParseFriendInvitationLink(url);
         string userId = invitation["identity"];
         string nickname = invitation["nickname"];
         await TDSFriends.HandleFriendInvitationLink(url);

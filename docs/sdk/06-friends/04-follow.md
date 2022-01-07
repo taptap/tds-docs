@@ -1,7 +1,7 @@
 ---
 id: follow
-title: 单向关注模型
-sidebar_label: 单向关注
+title: 关注模式
+sidebar_label: 关注模式
 ---
 
 import MultiLang from '/src/docComponents/MultiLang';
@@ -15,7 +15,7 @@ import MultiLang from '/src/docComponents/MultiLang';
 <MultiLang>
 
 ```cs
-
+await TDSFollows.FollowByShortCode(shortId);
 ```
 
 ```java
@@ -43,7 +43,10 @@ TDSFollows.followByShortCode(shortId, new Callback<Boolean>() {
 <MultiLang>
 
 ```cs
-
+Dictionary<string, object> attrs = new Dictionary<string, object> {
+    { "group", "coworkers" }
+};
+await TDSFollows.FollowByShortCode(shortId);
 ```
 
 ```java
@@ -67,7 +70,7 @@ TDSFollows.followByShortCode(shortId, attrs, new Callback<Boolean>() {
 <MultiLang>
 
 ```cs
-
+await TDSFollows.Follow("5b0b97cf06f4fd0abc0abe35");
 ```
 
 ```java
@@ -90,6 +93,7 @@ TDSFollows.follow("5b0b97cf06f4fd0abc0abe35", new Callback<Boolean>() {
 Dictionary<string, object> attrs = new Dictionary<string, object> {
     { "group", "coworkers" }
 };
+await TDSFollows.Follow("5b0b97cf06f4fd0abc0abe35");
 ```
 
 ```java
@@ -118,7 +122,9 @@ NSDictionary *attributes = @{
 <MultiLang>
 
 ```cs
+await TDSFollows.UnFollow("5b0b97cf06f4fd0abc0abe35");
 
+await TDSFollows.UnFollowByShortCode(shortIdOfTarara);
 ```
 
 ```java
@@ -155,7 +161,27 @@ TDSFollows.unfollowByShortCode(shortIdOfTarara, new Callback<Boolean>() {
 <MultiLang>
 
 ```cs
+// 首次查询
+string cursor = null;
+// 默认 50，最大 500
+int limit = 50;
+// 根据在线状态排序
+SortCondition sortCondition = SortCondition.OnlineCondition
+FriendResult result = await TDSFollows.QueryMutualList(cursor, limit, sortCondition);
 
+ReadOnlyCollection<TDSFriendInfo> friendInfos = result.FriendList;
+foreach (TDSFriendInfo info in friendInfos) {
+    // 玩家信息
+    TDSUser user = info.User;
+    // 富信息数据
+    Dictionary<string, string> richPresence = info.RichPresence;
+    // 玩家是否在线
+    bool online = info.Online;    
+}
+
+// 翻页
+string cursor = result.Cursor;
+FriendResult more = await TDSFollows.QueryMutualList(cursor, limit, sortCondition);
 ```
 
 ```java
@@ -173,7 +199,7 @@ TDSFollows.queryMutualList(config, null, new Callback<FriendResult>() {
             TDSUser user = info.getUser();
             // 富信息数据
             TDSRichPresence richPresence = info.getRichPresence();
-            // 好友是否在线
+            // 玩家是否在线
             boolean online = info.isOnline();
         }
 
@@ -205,7 +231,7 @@ TDSFollows.queryMutualList(config, null, new Callback<FriendResult>() {
 <MultiLang>
 
 ```cs
-
+FriendResult result = await TDSFollows.QueryFolloweeList(cursor, limit, sortCondition);
 ```
 
 ```java
@@ -227,7 +253,7 @@ TDSFollows.queryFolloweeList(config, cursor, new Callback<FriendResult>() {
 <MultiLang>
 
 ```cs
-
+FriendResult result = await TDSFollows.QueryFollowerList(cursor, limit, sortCondition);
 ```
 
 ```java
@@ -244,3 +270,81 @@ TDSFollows.queryFollowerList(config, cursor, new Callback<FriendResult>() {
 </MultiLang>
 
 如果查询时指定了根据在线状态排序，**云端会忽略这一条件**，仍然返回未排序的查询结果。
+
+### 落地页
+
+使用分享链接功能需要首先部署落地页网站。
+落地页网站可以部署在[云引擎](/sdk/engine/overview/)或其他支持部署纯静态网站的服务器上。
+如果计划部署在云引擎上，需注意云引擎的免费实例会自动休眠，请购买标准实例使用。
+
+我们提供了[开源的落地页示例项目][repo]，修改相应配置后可直接构建、部署、使用。
+注意，示例项目中的 `VITE_ANDROID_LINK` 环境变量格式为 `scheme://host/path`。
+`host` 和 `path` 的值需和 Android 的 `AndroidManifest.xml` 中的值保持一致。
+
+[repo]: https://github.com/taptap/TapFriends-landing-page
+
+例如，假设 `AndroidManifest.xml` 中的相关配置如下：
+
+```xml
+<activity
+    android:name="com.tapsdk.friends.TDSFriendsRouterPageActivity"
+    android:allowTaskReparenting="true"
+    android:configChanges="keyboardHidden|orientation"
+    android:exported="true"
+    android:launchMode="singleTask"
+    android:screenOrientation="nosensor"
+    android:theme="@android:style/Theme.Translucent.NoTitleBar">
+    <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+
+        <data
+            android:host="游戏应用ID"
+            android:path="/friends"
+            android:scheme="tapsdk" />
+            <!-- scheme不能出现大写或者下划线，<a href="[scheme]://[host]/[path]?[query]">启动应用程序</a> -->
+        </intent-filter>
+</activity>
+```
+
+那么落地页项目中 `VITE_ANDROID_LINK` 的值为 `tapsdk://游戏应用ID/friends`。
+
+落地页网站的地址需要在客户端配置：
+
+```cs
+TDSFriendCore.SetShareLink("https://please-replace-with-your-domain.example.com");
+```
+
+如果落地页部署在云引擎网站上，那么地址就是 `https://你的云引擎自定义域名`。
+
+### 生成链接
+
+部署完落地页网站并在客户端配置好相应地址后，调用以下接口即可生成好友邀请页网址：
+
+```cs
+string inviteUrl = await TDSFriendCore.GenerateFriendInvitationLink();
+```
+
+### 处理链接
+
+玩家通过邀请链接打开游戏后，开发者需要调用 SDK 提供的接口解析链接，获取玩家的 userId，然后通过 userId 关注玩家。
+
+
+```cs
+public class DeepLinkManager : MonoBehaviour
+{
+    // 略
+    private async void onDeepLinkActivated(string url) {
+        Dictionary<string, object> invitation = TDSFriendCore.ParseFriendInvitationLink(url);
+        string userId = invitation["identity"];
+        await TDSFollows.Follow(userId);
+    }
+}
+```
+
+注意：
+
+- 目前关注模式下只有 C# SDK 支持分享链接功能，Java、Objective-C SDK 暂不支持。
+- 落地页示例项目默认使用好友模式，需要设置环境变量 `INVITE_TYPE` 为 `follow` 切换为关注模式。

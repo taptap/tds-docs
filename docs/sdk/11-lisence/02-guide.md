@@ -19,7 +19,7 @@ import {Gray,Blue, Red, Black,Link,ImageLink} from '/src/docComponents/doc';
 <CodeBlock className="json">
 {`"dependencies":{
 // 公共库
-"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity_common}",
+"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
 // 付费购买
 "com.taptap.tds.dlc": "https://github.com/TapTap/TapLicense-Unity.git#${sdkVersions.taptap.unity}",
 }`}

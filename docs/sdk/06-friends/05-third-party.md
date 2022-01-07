@@ -26,7 +26,9 @@ string platform = "taptap";
 string cursor = null;
 // 默认 50，最大 500
 int limit = 50;
-ThirdPartyFriendResult result = await TDSFriends.QueryThirdPartyFriendList(platform, cursor, limit);
+// 根据在线状态排序
+SortCondition sortCondition = SortCondition.OnlineCondition
+ThirdPartyFriendResult result = await TDSFriends.QueryThirdPartyFriendList(platform, cursor, limit, condition: sortCondition);
 
 ReadOnlyCollection<ThirdPartyFriend> friends = result.FriendList;
 foreach (ThirdPartyFriend frined in friends) {
@@ -38,7 +40,7 @@ foreach (ThirdPartyFriend frined in friends) {
 
 // 翻页
 string cursor = result.Cursor;
-ThirdPartyFriendResult more = await TDSFriends.QueryThirdPartyFriendList(platform, cursor, limit);
+ThirdPartyFriendResult more = await TDSFriends.QueryThirdPartyFriendList(platform, cursor, limit, condition: sortCondition);
 ```
 
 ```java
@@ -108,7 +110,7 @@ callback:^(TDSThirdPartyFriendResult * _Nullable result, NSError * _Nullable err
 
 ```cs
 ThirdPartyFriendResult result = await TDSFriends.QueryThirdPartyFriendList(platform, cursor, limit,
-    TDSFriends.ThirdPartyFriendRequestCachePolicy.OnlyNetwork);
+    TDSFriends.ThirdPartyFriendRequestCachePolicy.OnlyNetwork, sortCondition);
 ```
 
 ```java
@@ -187,7 +189,7 @@ callback:^(BOOL succeeded, NSError * _Nullable error) {
 <MultiLang>
 
 ```cs
-
+await TDSFollows.FollowTapUserByShortCode(shortId);
 ```
 
 ```java

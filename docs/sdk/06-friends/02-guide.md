@@ -10,8 +10,8 @@ import sdkVersions from '/src/docComponents/sdkVersions';
 
 TDS 提供了两种好友模型：
 
-- [互为好友](/sdk/friends/mutual/)
-- [单向关注](/sdk/friends/follow/)
+- [好友模式](/sdk/friends/mutual/)
+- [关注模式](/sdk/friends/follow/)
 
 开发者可根据游戏项目需求，选择其中一种模型。
 注意：
@@ -29,8 +29,8 @@ TDS 提供了两种好友模型：
 
 - 根据游戏项目需求，选定游戏将采用的好友模型，然后阅读相应的开发指南：
 
-    * [互为好友](/sdk/friends/mutual/)
-    * [单向关注](/sdk/friends/follow/)
+    * [好友模式](/sdk/friends/mutual/)
+    * [关注模式](/sdk/friends/follow/)
 
 ## SDK 初始化
 
@@ -77,7 +77,7 @@ TapFriendUISDK.framework`}
 <MultiLang>
 
 ```cs
-TDSFriends.FriendStatusChangedDelegate = new TDSFriendStatusChangedDelegate {
+TDSFriendCore.FriendStatusChangedDelegate = new TDSFriendStatusChangedDelegate {
     // 新增好友（触发时机同「已发送的好友申请被接受」）
     OnFriendAdd = friendInfo => {},
     // 新增好友申请
@@ -185,12 +185,15 @@ TDSFriendCommon.registerFriendStatusChangedListener(new FriendStatusChangedListe
 
 </MultiLang>
 
+上述事件中的「好友」，均指「好友模式」下的「好友」。
+目前 SDK 暂不支持监听关注模式下的事件。
+
 如果想要停止监听：
 
 <MultiLang>
 
 ```cs
-TDSFriends.FriendStatusChangedDelegate = null;
+TDSFriendCore.FriendStatusChangedDelegate = null;
 ```
 
 ```java
@@ -212,7 +215,7 @@ TDSFriendCommon.removeFriendStatusChangedListener();
 <>
 
 ```cs
-await TDSFriends.Online();
+await TDSFriendCore.Online();
 ```
 
 </>
@@ -251,7 +254,7 @@ TDSFriendCommon.online(new Callback<Boolean>() {
 <MultiLang>
 
 ```cs
-await TDSFriends.Offline();
+await TDSFriendCore.Offline();
 ```
 
 ```java
@@ -272,8 +275,7 @@ TDSFriendCommon.offline();
 <MultiLang>
 
 ```cs
-ReadOnlyCollection<TDSFriendInfo> friendInfos = await TDSFriends.SearchUserByName("Tarara");
-ReadOnlyCollection<TDSFriendInfo> friendInfos = await TDSFriends.QueryFriendList(from, limit);
+ReadOnlyCollection<TDSFriendInfo> friendInfos = await TDSFriendCore.SearchUserByName("Tarara");
 foreach (TDSFriendInfo info in friendInfos) {
     // 玩家信息
     TDSUser user = info.User;
@@ -359,7 +361,7 @@ NSString *shortId = currentUser[@"shortId"];
 <MultiLang>
 
 ```cs
-TDSFriendInfo friendInfo = await TDSFriends.SearchUserByShortCode(shortId);
+TDSFriendInfo friendInfo = await TDSFriendCore.SearchUserByShortCode(shortId);
 ```
 
 ```java
@@ -392,7 +394,7 @@ callback:^(TDSFriendInfo * _Nullable friendInfo, NSError * _Nullable error) {
 <MultiLang>
 
 ```cs
-await TDSFriends.SetRichPresence("score", "60");
+await TDSFriendCore.SetRichPresence("score", "60");
 ```
 
 ```java
@@ -437,7 +439,7 @@ TDSFriendCommon.setRichPresence("score", "60",  new Callback<Boolean>() {
 Dictionary<string, string> info = new Dictionary<string, string>();
 info.Add("score", "60");
 info.Add("display", "#matching");
-await TDSFriends.SetRichPresences(info);
+await TDSFriendCore.SetRichPresences(info);
 ```
 
 ```java
@@ -467,7 +469,7 @@ TDSFriendCommon.setRichPresence(info, new Callback<Boolean>() {
 <MultiLang>
 
 ```cs
-TDSFriends.clearRichPresence("score");
+TDSFriendCore.ClearRichPresence("score");
 ```
 
 ```java
@@ -491,7 +493,7 @@ callback:^(BOOL succeeded, NSError * _Nullable error) {
 
 ```cs
 IEnumerable<string> keys = new string[] {"score", "display"}
-await TDSFriends.ClearRichPresences(keys);
+await TDSFriendCore.ClearRichPresences(keys);
 ```
 
 ```java
@@ -754,3 +756,8 @@ curl -X GET \
 }
 ```
 
+## 3.5 与 3.6 兼容性
+
+3.6 新增了关注模式（`TDSFollows` 类），因此将一些通用的接口移动到了新的公共类中。
+但 `TDSFriends` 在 3.6 下继承了新增的公共类，因此这些公共类的接口也可以通过 `TDSFriends` 访问。
+所以，使用好友模式的游戏从 3.5 升级到 3.6，可以不更新原先通过 `TDSFriends` 访问的接口。
