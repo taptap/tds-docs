@@ -1,21 +1,18 @@
 const sdkVersions = {
   taptap: {
-    unity: "3.5.0",
-    unity_achievement: "3.5.1",
-    unity_common: "3.5.2",
-    unity_login: "3.5.2",
-    android: "3.5.1",
-    ios: "3.5.0",
+    unity: "3.6.0",
+    android: "3.6.0",
+    ios: "3.6.0",
     anti_addiction: "1.0.2",
   },
   leancloud: {
-    objc: "13.6.0",
+    objc: "13.6.1",
     swift: "17.10.1",
     js: {
       storage: "4.12.0",
       realtime: "5.0.0-rc.7",
     },
-    java: "8.2.0",
+    java: "8.2.2",
     csharp: "0.10.0",
   },
 };

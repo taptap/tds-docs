@@ -2509,17 +2509,17 @@ Objective-C SDK 是通过实现 `LCIMClientDelegate` 代理来响应新消息到
 ```objc
 // 处理默认类型消息
 - (void)conversation:(LCIMConversation *)conversation didReceiveTypedMessage:(LCIMTypedMessage *)message {
-    if (message.mediaType == kLCIMMessageMediaTypeImage) {
+    if (message.mediaType == LCIMMessageMediaTypeImage) {
         LCIMImageMessage *imageMessage = (LCIMImageMessage *)message; // 处理图像消息
-    } else if(message.mediaType == kLCIMMessageMediaTypeAudio){
+    } else if(message.mediaType == LCIMMessageMediaTypeAudio){
         // 处理音频消息
-    } else if(message.mediaType == kLCIMMessageMediaTypeVideo){
+    } else if(message.mediaType == LCIMMessageMediaTypeVideo){
         // 处理视频消息
-    } else if(message.mediaType == kLCIMMessageMediaTypeLocation){
+    } else if(message.mediaType == LCIMMessageMediaTypeLocation){
         // 处理位置消息
-    } else if(message.mediaType == kLCIMMessageMediaTypeFile){
+    } else if(message.mediaType == LCIMMessageMediaTypeFile){
         // 处理文件消息
-    } else if(message.mediaType == kLCIMMessageMediaTypeText){
+    } else if(message.mediaType == LCIMMessageMediaTypeText){
         // 处理文本消息
     } else if(message.mediaType == 123){
         // 处理自定义的消息类型
@@ -4143,7 +4143,7 @@ conversation.queryMessagesByType(msgType, limit, new LCIMMessagesQueryCallback()
 });
 ```
 ```objc
-[conversation queryMediaMessagesFromServerWithType:kLCIMMessageMediaTypeImage limit:10 fromMessageId:nil fromTimestamp:0 callback:^(NSArray *messages, NSError *error) {
+[conversation queryMediaMessagesFromServerWithType:LCIMMessageMediaTypeImage limit:10 fromMessageId:nil fromTimestamp:0 callback:^(NSArray *messages, NSError *error) {
     if (!error) {
         NSLog(@"查询成功！");
     }
