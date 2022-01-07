@@ -5,6 +5,7 @@ sidebar_label: 单纯认证
 ---
 
 import MultiLang from '/src/docComponents/MultiLang';
+import {Conditional} from '/src/docComponents/conditional';
 
 如果你仅仅只需要接入 TapTap 这一种登录方式，确认不使用 TDS 其他云服务，可以看这里的文档。请注意，如果刚开始只选择接入「TapTap 登录」，后面又需要使用其他云服务的话，后期可能有一定的升级成本。
 
@@ -14,13 +15,19 @@ import MultiLang from '/src/docComponents/MultiLang';
 
 单纯接入「TapTap 登录」，需要依赖 `TapLogin` 和 `TapCommon` 模块。请先 [下载](/tap-download) SDK，并添加相关依赖。
 
+<Conditional region='cn'>
+
 :::note
 游戏 [**适用地区**](/sdk/start/get-ready/#适用地区) 在开启应用配置时选定。
 初始化时需要区分适用于中国大陆还是其他国家或地区。
 :::
 
+</Conditional>
+
 <MultiLang>
 <>
+
+<Conditional region='cn'>
 
 ```cs
 // 适用于中国大陆
@@ -29,6 +36,16 @@ TapLogin.Init(string clientID);
 // 适用于其他国家或地区
 TapLogin.Init(string clientID, bool isCn, bool roundCorner);
 ```
+
+</Conditional>
+
+<Conditional region='global'>
+
+```cs
+TapLogin.Init(string clientID, bool isCn, bool roundCorner);
+```
+
+</Conditional>
 
 **参数说明**
 
@@ -41,6 +58,8 @@ roundCorner | 网页登录时边框是否使用圆角，使用圆⻆边框为 tr
 </>
 <>
 
+<Conditional region='cn'>
+
 ```java
 // 适用于中国大陆
 TapLoginHelper.init(Context context, String clientID);
@@ -50,6 +69,18 @@ LoginSdkConfig config = new LoginSdkConfig();
 config.regionType = RegionType.IO;
 TapLoginHelper.init(Context context, String clientID, config);
 ```
+
+</Conditional>
+
+<Conditional region='global'>
+
+```java
+LoginSdkConfig config = new LoginSdkConfig();
+config.regionType = RegionType.IO;
+TapLoginHelper.init(Context context, String clientID, config);
+```
+
+</Conditional>
 
 **参数说明**
 
@@ -61,6 +92,8 @@ clientID | TapTap 开发者中心对应应用的 Client ID
 </>
 <>
 
+<Conditional region='cn'>
+
 ```objectivec
 // 适用于中国大陆
 [TapLoginHelper initWithClientID:clientID];
@@ -71,6 +104,19 @@ config.regionType = RegionTypeIO;
 config.roundCorner = YES;
 [TapLoginHelper initWithClientID:clientID config:config];
 ```
+
+</Conditional>
+
+<Conditional region='global'>
+
+```objectivec
+TTSDKConfig *config = [[TTSDKConfig alloc] init];
+config.regionType = RegionTypeIO;
+config.roundCorner = YES;
+[TapLoginHelper initWithClientID:clientID config:config];
+```
+
+</Conditional>
 
 **参数说明**
 

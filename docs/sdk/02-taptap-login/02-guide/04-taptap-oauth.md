@@ -4,6 +4,7 @@ title: TapTap OAuth 接口
 ---
 
 import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
+import {Conditional} from '/src/docComponents/conditional';
 
 ## 概述
 
@@ -13,7 +14,11 @@ TapTap OpenAPI 采用统一的 Mac Token 头部签算来传递用户身份。
 
 Mac Token 算法细节见文档中的 [MAC Token 算法](#mac-token-算法) 部分。
 
+<Conditional region='cn'>
+
 以下接口均为国内示例。当移动端初始化为海外时，登录即为海外，以下服务端文档流程不变，将示例中的请求域名 `openapi.taptap.com` 更换为海外域名 `openapi.tap.io` 即可。
+
+</Conditional>
 
 ## 流程
 
@@ -30,7 +35,7 @@ Mac Token 算法细节见文档中的 [MAC Token 算法](#mac-token-算法) 部�
     ```
 
 2. 再把移动端获取的参数发到游戏服务器，服务端签算 mac token。
-3. 请求 `https://openapi.taptap.com/account/profile/v1` ， header 携带 `mac token`。
+3. 请求 <Conditional region='cn'>`https://openapi.taptap.com/account/profile/v1`</Conditional><Conditional region='global'>`https://openapi.tap.io/account/profile/v1`</Conditional> ， header 携带 `mac token`。
 
 注意：当前实际返回的 `kid` 和 `access_token` 值相等，建议使用 `access_token`。
 
@@ -38,7 +43,9 @@ Mac Token 算法细节见文档中的 [MAC Token 算法](#mac-token-算法) 部�
 
 ### 获取当前账户详细信息
 
->  <Red> GET </Red> https://openapi.taptap.com/account/profile/v1?client_id=xxx <br/><Blue> Authorization </Blue> mac token
+
+
+>  <Red> GET </Red> <Conditional region='cn'>https://openapi.taptap.com/account/profile/v1?client_id=xxx</Conditional><Conditional region='global'>https://openapi.tap.io/account/profile/v1?client_id=xxx</Conditional> <br/><Blue> Authorization </Blue> mac token
 
 
 #### 请求参数
@@ -61,11 +68,25 @@ unionid         | string        | 授权用户唯一标识，一个玩家在一�
 
 替换其中的 `MAC id` 和 `Client ID` 为自己签算的 mac token 和控制台的 `Client ID`。
 
+<Conditional region='cn'>
+
 ```
 curl -s -H 'Authorization:MAC id="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJa
 gCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTs
 KQ",ts="1618221750",nonce="adssd",mac="XWTPmq6A6LzgK8BbNDwj+kE4gzs="' "https://openapi.taptap.com/account/profile/v1?client_id=<Client ID>"
 ```
+
+</Conditional>
+
+<Conditional region='global'>
+
+```
+curl -s -H 'Authorization:MAC id="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJa
+gCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTs
+KQ",ts="1618221750",nonce="adssd",mac="XWTPmq6A6LzgK8BbNDwj+kE4gzs="' "https://openapi.tap.io/account/profile/v1?client_id=<Client ID>"
+```
+
+</Conditional>
 
 ## 其他
 
@@ -84,8 +105,13 @@ MAC Token 包含以下字段：
 使用 Mac Token 签算一个接口：
 
 ### 脚本请求示例
-可用此脚本验证直接替换参数，用来验证自己服务端签算的 mac token 是否正确  
-CLIENT_ID 替换为控制台获取的 `Client ID`，ACCESS_TOKEN 和 MAC_KEY 为客户端登录成功后的 `access_token`、`mac_key`
+
+可用此脚本验证直接替换参数，用来验证自己服务端签算的 mac token 是否正确。
+
+CLIENT_ID 替换为控制台获取的 `Client ID`，ACCESS_TOKEN 和 MAC_KEY 为客户端登录成功后的 `access_token`、`mac_key`：
+
+<Conditional region='cn'>
+
 ```
 #!/usr/bin/env bash
 
@@ -112,10 +138,47 @@ MAC=$(printf "%s\n%s\n%s\n%s\n%s\n443\n\n" "${TS}" "${NONCE}" "${METHOD}" "${REQ
 
 AUTHORIZATION=$(printf 'MAC id="%s",ts="%s",nonce="%s",mac="%s"' "${ACCESS_TOKEN}" "${TS}" "${NONCE}" "${MAC}")
 
-curl -s -H"Authorization:${AUTHORIZATION}" "https://openapi.taptap.com/account/profile/v1?client_id=${CLIENT_ID}"
+curl -s -H"Authorization:${AUTHORIZATION}" "https://${REQUEST_HOST}${REQUEST_URI}${CLIENT_ID}"
 ```
 
+</Conditional>
+
+<Conditional region='global'>
+
+```
+#!/usr/bin/env bash
+
+# 客户端 ID
+CLIENT_ID="请替换为控制台的 `Client ID`"
+# SDK 获取的 access_token
+ACCESS_TOKEN="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ"
+# SDK 获取的 mac_key
+MAC_KEY="mSUQNYUGRBPXyRyW"
+
+# 随机数，正式上线请替换
+NONCE="8IBTHwOdqNKAWeKl7plt8g=="
+# 当前时间戳
+TS=$(date +%s)
+
+# 请求方法
+METHOD="GET"
+# 请求地址 (带 query string)
+REQUEST_URI="/account/profile/v1?client_id=${CLIENT_ID}"
+# 请求域名
+REQUEST_HOST="openapi.tap.io"
+
+MAC=$(printf "%s\n%s\n%s\n%s\n%s\n443\n\n" "${TS}" "${NONCE}" "${METHOD}" "${REQUEST_URI}" "${REQUEST_HOST}" | openssl dgst -binary -sha1 -hmac ${MAC_KEY} | base64)
+
+AUTHORIZATION=$(printf 'MAC id="%s",ts="%s",nonce="%s",mac="%s"' "${ACCESS_TOKEN}" "${TS}" "${NONCE}" "${MAC}")
+
+curl -s -H"Authorization:${AUTHORIZATION}" "https://${REQUEST_HOST}${REQUEST_URI}${CLIENT_ID}"
+```
+
+</Conditional>
+
 ### nodejs 请求示例
+
+<Conditional region='cn'>
 
 ```javascript
 const crypto = require('crypto');
@@ -161,6 +224,56 @@ urllib.request("https://openapi.taptap.com/account/profile/v1?client_id=" + clie
 
 ```
 
+</Conditional>
+
+<Conditional region='global'>
+
+```javascript
+const crypto = require('crypto');
+const urllib = require('urllib');
+var format = require('string-format');
+const utils = require('./utils');
+/**
+TapSDK 登录后信息获取
+**/
+var kid = "1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ";
+var mac_key = "mSUQNYUGRBPXyRyW";
+var nonce = crypto.randomBytes(16).toString('base64');
+var client_id = "0RiAlMny7jiz086FaU";
+
+
+var ts = Math.ceil(Date.now() / 1000);
+var ext = "";
+var signArray = [ts, nonce, 'GET', '/account/profile/v1?client_id=' + client_id, 'openapi.tap.io', 443, ext];
+
+var mac = utils.hmacSha1(signArray.join("\n")+"\n", mac_key);
+var auth = format('MAC id={id},ts={ts},nonce={nonce},mac={mac}', {
+  id: '\"'+kid+'\"',
+  ts: '\"'+ts+'\"',
+  nonce: '\"'+nonce+'\"',
+  mac: '\"'+mac+'\"'
+});
+
+var headers = {
+  Authorization: auth
+}
+
+var reqData = {
+  method: "GET",
+  headers: headers
+}
+
+urllib.request("https://openapi.tap.io/account/profile/v1?client_id=" + client_id, reqData,
+  (err, data, response) => {
+    if(!err){
+      console.log("返回数据：" + data.toString());
+    }
+  });
+
+```
+
+</Conditional>
+
 ```javascript
 //utils
 var crypto = require('crypto');
@@ -182,6 +295,8 @@ exports.hmacSha1 = function (encodedFlags, secretKey) {
 ```
 
 ### java 请求示例
+
+<Conditional region='cn'>
 
 ```java
 package com.taptap;
@@ -294,6 +409,122 @@ public class Authorization {
 }
 ```
 
+</Conditional>
+
+<Conditional region='global'>
+
+```java
+package com.taptap;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.*;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+public class Authorization {
+    public static void main(String[] args) throws IOException {
+        String client_id = "0RiAlMny7jiz086FaU";
+        String kid = "1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ"; // kid
+        String mac_key = "mSUQNYUGRBPXyRyW"; // mac_key
+        String method = "GET";
+        String request_url = "https://openapi.tap.io/account/profile/v1?client_id=" + client_id; //
+        String authorization = getAuthorization(request_url, method, kid, mac_key);
+        System.out.println(authorization);
+        URL url = new URL(request_url);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        // Http
+        conn.setRequestProperty("Authorization", authorization);
+        conn.setRequestMethod("GET");
+        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        String line;
+        StringBuilder result = new StringBuilder();
+        while ((line = rd.readLine()) != null) {
+            result.append(line);
+        }
+        rd.close();
+        System.out.println(result.toString());
+    }
+    /**
+     * @param request_url
+     * @param method "GET" or "POST"
+     * @param key_id key id by OAuth 2.0
+     * @param mac_key mac key by OAuth 2.0
+     * @return authorization string
+     */
+    public static String getAuthorization(String request_url, String method, String key_id, String
+            mac_key) {
+        try {
+            URL url = new URL(request_url);
+            String time = String.format(Locale.US, "%010d", System.currentTimeMillis() / 1000);
+            String randomStr = getRandomString(16);
+            String host = url.getHost();
+            String uri = request_url.substring(request_url.lastIndexOf(host) + host.length());
+            String port = "80";
+            if (request_url.startsWith("https")) {
+                port = "443";
+            }
+            String other = "";
+            String sign = sign(mergeSign(time, randomStr, method, uri, host, port, other), mac_key);
+            return "MAC " + getAuthorizationParam("id", key_id) + "," + getAuthorizationParam("ts", time)
+                    + "," + getAuthorizationParam("nonce", randomStr) + "," + getAuthorizationParam("mac",
+                    sign);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    private static String getRandomString(int length) {
+        byte[] bytes = new byte[length];
+        new SecureRandom().nextBytes(bytes);
+        String base64String = Base64.getEncoder().encodeToString(bytes);
+        return base64String;
+    }
+    private static String mergeSign(String time, String randomCode, String httpType, String uri,
+                                    String domain, String port, String other) {
+        if (time.isEmpty() || randomCode.isEmpty() || httpType.isEmpty() || domain.isEmpty() || port.isEmpty())
+        {
+            return null;
+        }
+        String prefix =
+                time + "\n" + randomCode + "\n" + httpType + "\n" + uri + "\n" + domain + "\n" + port
+                        + "\n";
+        if (other.isEmpty()) {
+            prefix += "\n";
+        } else {
+            prefix += (other + "\n");
+        }
+        return prefix;
+    }
+    private static String sign(String signatureBaseString, String key) {
+        try {
+            SecretKeySpec signingKey = new SecretKeySpec(key.getBytes(), "HmacSHA1");
+            Mac mac = Mac.getInstance("HmacSHA1");
+            mac.init(signingKey);
+            byte[] text = signatureBaseString.getBytes(StandardCharsets.UTF_8);
+            byte[] signatureBytes = mac.doFinal(text);
+            signatureBytes = Base64.getEncoder().encode(signatureBytes);
+            return new String(signatureBytes, StandardCharsets.UTF_8);
+        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+    private static String getAuthorizationParam(String key, String value) {
+        if (key.isEmpty() || value.isEmpty()) {
+            return null;
+        }
+        return key + "=" + "\"" + value + "\"";
+    }
+}
+```
+
+</Conditional>
 
 
 ### 通用接口错误信息

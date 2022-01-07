@@ -128,104 +128,13 @@ option.cachePolicy = TDSThirdPartyFriendCachePolicyOnlyNetwork;
 
 </MultiLang>
 
-目前支持的第三方平台如下：
+目前支持的第三方平台（platform）如下：
 
 <Conditional region='cn'>
-- `taptap`（需要提交工单联系我们开通）
+- <code>taptap</code>（需要提交工单联系我们开通）
 </Conditional>
 
 <Conditional region='global'>
-- `taptap`（需要提交工单联系我们开通）
-- `facebook`
+- <code>taptap</code>（需要提交工单联系我们开通）
+- <code>facebook</code>
 </Conditional>
-
-## 在 TapTap 上关注、取关玩家
-
-调用以下接口可以在 TapTap 上关注、取关游戏中的玩家。
-**注意，该功能需要提交工单联系我们开通。**
-
-<MultiLang>
-
-```cs
-// TDSUser tdsUser
-await TDSFriends.FollowTapUser(tdsUser);
-
-await TDSFollows.UnfollowTapUser(tdsUser);
-```
-
-```java
-// TDSUser tdsUser
-TDSFollows.followTapUser(tdsUser, new Callback<Boolean>() {
-    @Override
-    public void onSuccess(Boolean ok) {
-        toast("关注成功");
-    }
-
-    @Override
-    public void onFail(TDSFriendError error) {
-        toast("tap 关注失败 error: " + error.detailMessage);
-    }
-});
-
-TDSFollows.unfollowTapUser(tdsUser, new Callback<Boolean>() {
-    // 略
-});
-```
-
-```objc
-// TDSUser *tdsUser
-[TDSFollows followTapUser:tdsUser
-callback:^(BOOL succeeded, NSError * _Nullable error) {
-  if (succeeded) {
-    // Followed.
-  } else if (error) {
-    // Failed to follow the friend on TapTap.
-  }
-}];
-
-[TDSFollows unfollowTapUser:friend
-callback:^(BOOL succeeded, NSError * _Nullable error) {
-    // 略
-});
-```
-
-</MultiLang>
-
-注意，使用关注接口的前提是**对方使用 TapTap 账号登录游戏**。
-另外，目前云端未限制仅可关注、取关游戏好友，不是自己好友的玩家，也可以通过以上接口在 TapTap 上关注、取关。
-
-上述关注接口需要传入 TDSUser 作为参数。
-已知 TDSUser 的好友码的情况下，也可以使用下列直接传入好友码作为参数的接口：
-
-<MultiLang>
-
-```cs
-await TDSFollows.FollowTapUserByShortCode(shortId);
-
-await TDSFollows.UnfollowTapUserByShortCode(shortId);
-```
-
-```java
-TDSFollows.followTapUserByShortCode(shortId, new Callback<Boolean>() {
-    // 略
-});
-
-TDSFollows.unfollowTapUserByShortCode(shortId, new Callback<Boolean>() {
-    // 略
-});
-```
-
-```objc
-// TDSUser *friend
-[TDSFollows followTapUserWithShortCode:shortId
-callback:^(BOOL succeeded, NSError * _Nullable error) {
-    // 略
-}];
-
-[TDSFollows unfollowTapUserWithShortCode:shortId
-callback:^(BOOL succeeded, NSError * _Nullable error) {
-    // 略
-}];
-```
-
-</MultiLang>
