@@ -7,6 +7,7 @@ sidebar_label: 快速开始
 import MultiLang from '/src/docComponents/MultiLang';
 import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';
+import {Conditional} from '/src/docComponents/conditional';
 
 本文介绍如何快速接入 TapSDK 并实现 **[TapTap 登录](/sdk/taptap-login/guide/start/)** 功能。
 
@@ -15,10 +16,10 @@ import sdkVersions from '/src/docComponents/sdkVersions';
 :::
 
 ## 创建应用
-请登录 [TapTap 开发者中心](https://developer.taptap.com/) 注册为开发者并创建应用。
+请登录 <Conditional region='cn'>[TapTap 开发者中心](https://developer.taptap.com/)</Conditional><Conditional region='global'>[TapTap 开发者中心](https://developer.taptap.io/)</Conditional> 注册为开发者并创建应用。
 
 ## 下载 TapTap 应用
-在测试设备中下载 [TapTap 客户端](https://www.taptap.com/mobile)，测试时会唤起 TapTap 客户端授权登录。若用户设备中未安装 TapTap 客户端，则会打开 webview 进行登录。
+在测试设备中下载 <Conditional region='cn'>[TapTap 客户端](https://www.taptap.com/mobile)</Conditional><Conditional region='global'>[TapTap 客户端](https://www.taptap.io/mobile)</Conditional>，测试时会唤起 TapTap 客户端授权登录。若用户设备中未安装 TapTap 客户端，则会打开 webview 进行登录。
 
 ## 环境要求
 
@@ -327,7 +328,7 @@ var config =  new TapConfig.Builder()
     .ClientID("your_client_id")  // 必须，开发者中心对应 Client ID
     .ClientToken("your_client_token")  // 必须，开发者中心对应 Client Token
     .ServerURL("https://your_server_url") // 必须，开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 服务设置 > 自定义域名 绑定域名
-    .RegionType(RegionType.CN)  // 非必须，默认 CN 表示国内
+    .RegionType(RegionType.CN)  // 非必须，默认 CN 表示国内，IO 为国外
     .ConfigBuilder();
 TapBootstrap.Init(config);
 ```
@@ -357,7 +358,7 @@ config.serverURL = @"https://your_server_url";  // 开发者中心 > 你的游�
 
 `client_id`、`client_token`信息可在 **开发者中心 > 你的游戏 > 游戏服务 > 应用配置** 查看。
 
-`server_url` 可参考 **[域名绑定](/sdk/start/get-ready/#绑定域名)** 的文档。
+`server_url` 可参考 **[域名绑定](/sdk/start/get-ready/#域名)** 的文档。
 
 ## 接入功能
 
@@ -395,7 +396,7 @@ TapSDK 已经做了混淆处理，再次混淆会导致不可预期的错误，�
 -keep class tds.androidx.** { *;}
 ```
 
-如果使用到基于**数据存储**的云服务，比如**内建账户**方式登陆则需要额外添加 **[数据存储](/sdk/storage/guide/setup-java/#android-代码混淆)** 相关的混淆代码。
+如果使用到基于**数据存储**的云服务，比如**内建账户**方式登录则需要额外添加 **[数据存储](/sdk/storage/guide/setup-java/#android-代码混淆)** 相关的混淆代码。
 
 ## 打包
 

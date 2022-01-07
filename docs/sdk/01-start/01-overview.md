@@ -5,6 +5,7 @@ sidebar_label: 概览
 slug: /sdk
 ---
 
+import {Conditional} from '/src/docComponents/conditional';
 
 TapTap 开发者服务（TapTap Developer Services，简称 TDS 服务） 旨在帮助开发者降低游戏研发、运营维护等阶段投入的精力和成本，TDS 整合了各项服务，让开发者能够聚焦在游戏核心乐趣的创造上，创作更优秀的游戏，进而促进游戏行业生态的良性循环，最终让开发者与玩家双双受益。
 
@@ -20,13 +21,21 @@ TDS 提供以下服务，开发者可以通过在游戏中集成 TapSDK 来开�
 
 - **[游戏好友](/sdk/friends/features/)**：为游戏开发者提供完整的添加、删除、查找好友的功能接口，帮助游戏快速形成社交网络。
 
+<Conditional region='cn'>
+
 - **[成就系统](/sdk/achievement/features/)**：可以在游戏中设置「普通成就」和「白金成就」，增加玩家在游戏中的参与度，鼓励玩家以不同的玩法来玩游戏。
+
+</Conditional>
 
 - **[排行榜](/sdk/leaderboard/features/)**：基于内建账户系统在游戏中设立排行榜功能，可以推动玩家之间的趣味性竞争，从而帮助提升游戏的玩家活跃度。
 
 - **[云存档](/sdk/gamesaves/features/)**：将玩家的游戏进程保存到 TDS 服务器，游戏可以检索已保存的游戏数据，允许玩家从任何设备上的任意一个保存点继续游戏。
 
+<Conditional region='cn'>
+
 - **[防沉迷](/sdk/anti-addiction/features/)**：基于 TapTap 账号的快速实名认证功能，对使用 TapTap 账号登录游戏的玩家，在经过玩家同意授权之后，允许玩家使用在 TapTap 里已经通过国家认证的实名信息快速完成游戏中的认证流程。
+
+</Conditional>
 
 - **[正版验证](/sdk/lisence/features/)**：帮助开发者验证玩家设备中的付费游戏是否通过 TapTap 商店付费购买下载，有效地控制了未付费玩家从其他途径获得游戏的场景。
 
@@ -46,7 +55,10 @@ TDS 提供以下服务，开发者可以通过在游戏中集成 TapSDK 来开�
 
 - **[推送通知](/sdk/push/features/)**：整合了 Android 推送、iOS 推送的统一推送服务。
 
+<Conditional region='cn'>
+
 - **[文本检测](/sdk/text-moderation/features/)**：为昵称、聊天、个性签名等场景，提供实时、智能、个性化的风险文本检测服务。基于 AI 及多重识别策略，及时、准确、高效地抵御政治、暴恐、色情、辱骂等违规内容风险。
 
+</Conditional>
 
 使用对应的服务请先完成[开发者注册](/store/store-register/)，之后登录开发者中心开启「游戏服务」。
