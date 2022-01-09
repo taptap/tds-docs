@@ -14,8 +14,11 @@ interface HitItem {
 }
 
 interface HitGroup {
-  title: string;
   hits: HitItem[];
 }
 
-export type { HitItem, HitGroup };
+interface HitGroupWithTitle extends HitGroup {
+  title: string;
+}
+
+export type { HitItem, HitGroup, HitGroupWithTitle };

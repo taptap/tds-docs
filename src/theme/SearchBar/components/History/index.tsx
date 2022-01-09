@@ -25,7 +25,7 @@ const History = ({
   openHit,
   removeRecentHit,
 }: HistoryProps) => {
-  const groupedHits: HitGroup[] = [{ title: "", hits: recentHits }];
+  const groupedHits: HitGroup[] = [{ hits: recentHits }];
   const [selection, setSelection, selectionEl] = useSelection(
     groupedHits,
     searchFormEl,

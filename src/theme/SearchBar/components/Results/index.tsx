@@ -6,10 +6,10 @@ import styles from "./index.module.scss";
 
 import IconEnter from "../../icons/enter.svg";
 
-import type { HitItem, HitGroup } from "../../common";
+import type { HitItem, HitGroupWithTitle } from "../../common";
 
 interface ResultsProps {
-  groupedHits: HitGroup[];
+  groupedHits: HitGroupWithTitle[];
   searchFormEl: React.RefObject<HTMLFormElement>;
   searchInputEl: React.RefObject<HTMLInputElement>;
   openHit: (hit: HitItem) => void;
@@ -30,7 +30,7 @@ const Results = ({
 
   return (
     <List>
-      {groupedHits.map((group: HitGroup, groupIndex: number) => (
+      {groupedHits.map((group: HitGroupWithTitle, groupIndex: number) => (
         <Group
           title={group.title}
           zIndex={groupedHits.length - groupIndex}

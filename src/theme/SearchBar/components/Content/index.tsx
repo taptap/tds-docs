@@ -7,12 +7,12 @@ import NoResults from "../NoResults";
 
 import styles from "./index.module.scss";
 
-import type { HitItem, HitGroup } from "../../common";
+import type { HitItem, HitGroupWithTitle } from "../../common";
 
 interface ContentProps {
   query: string;
   recentHits: HitItem[];
-  groupedHits: HitGroup[] | null;
+  groupedHits: HitGroupWithTitle[] | null;
   searchFormEl: React.RefObject<HTMLFormElement>;
   searchInputEl: React.RefObject<HTMLInputElement>;
   openHit: (hit: HitItem) => void;

@@ -14,7 +14,7 @@ import styles from "./index.module.scss";
 
 import IconSearchBtn from "./icons/search-btn.svg";
 
-import type { HitItem, HitGroup } from "./common";
+import type { HitItem, HitGroupWithTitle } from "./common";
 
 const useRecentHits = (locale: string) => {
   const localStorageItemKey: string = `tds_doc_search_recent_hits_for_${locale}`;
@@ -74,8 +74,8 @@ const useSearch = (url: string, locale: string) => {
     };
   }
 
-  const groupHits = (hits: HitItem[]): HitGroup[] => {
-    const groupedHits: HitGroup[] = [];
+  const groupHits = (hits: HitItem[]): HitGroupWithTitle[] => {
+    const groupedHits: HitGroupWithTitle[] = [];
 
     hits.forEach((hit) => {
       for (const group of groupedHits) {
@@ -91,8 +91,8 @@ const useSearch = (url: string, locale: string) => {
       });
     });
 
-    groupedHits.sort((a: HitGroup, b: HitGroup): number => {
-      const getAvgScore = ({ hits }: HitGroup): number =>
+    groupedHits.sort((a: HitGroupWithTitle, b: HitGroupWithTitle): number => {
+      const getAvgScore = ({ hits }: HitGroupWithTitle): number =>
         hits.reduce((p: number, c: HitItem) => p + c._score, 0) / hits.length;
       return getAvgScore(b) - getAvgScore(a);
     });
@@ -101,7 +101,9 @@ const useSearch = (url: string, locale: string) => {
   };
 
   const [query, setQuery] = useState<string>("");
-  const [groupedHits, setGroupedHits] = useState<null | HitGroup[]>(null);
+  const [groupedHits, setGroupedHits] = useState<null | HitGroupWithTitle[]>(
+    null
+  );
 
   useEffect(() => {
     let ignore: boolean = false;
@@ -123,7 +125,7 @@ const useSearch = (url: string, locale: string) => {
     const search = async () => {
       const hits: HitItem[] = await fetchHits(url, query, locale);
       if (!ignore) {
-        const groupedHits: HitGroup[] = groupHits(hits);
+        const groupedHits: HitGroupWithTitle[] = groupHits(hits);
         setGroupedHits(groupedHits);
       }
     };
