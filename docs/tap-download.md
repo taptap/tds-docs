@@ -5,11 +5,17 @@ sidebar_label: 资源下载
 slug: /tap-download
 ---
 
-## SDK
+## TapSDK
 
 - [Unity](https://github.com/taptap/TapSDK-Unity/releases)
 - [Android](https://github.com/taptap/TapSDK-Android/releases)
 - [iOS](https://github.com/taptap/TapSDK-iOS/releases)
+
+## TapSDKSuite 悬浮窗
+
+- [Unity](https://github.com/taptap/TapSDKSuite-Unity)
+- [Android](https://github.com/taptap/TapSDKSuite-Android)
+- [iOS](https://github.com/taptap/TapSDKSuite-iOS)
 
 ## Demo
 
