@@ -43,6 +43,10 @@ try
     // 在 Windows、macOS 系统下显示二维码（默认）和跳转链接（需配置）
     var tdsUser = await TDSUser.LoginWithTapTap();
     Debug.Log($"login sucess:{tdsUser}");
+    // 获取 TDSUser 属性
+    var objectId = tdsUser.ObjectId;     // 用户唯一标识
+    var nickname = tdsUser["nickname"];  // 昵称
+    var avatar = tdsUser["avatar"];      // 头像
 }
 catch (Exception e)
 {
