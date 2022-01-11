@@ -53,6 +53,10 @@ TapLicenseHelper.setLicenseCallback(new TapLicenseCallback() {
     }
 });
 ```
+
+```objc
+// 暂不支持
+```
 </MultiLang>
 
 ### 检查付费授权
@@ -65,6 +69,10 @@ TapLicense.Check();
 
 ```java
 TapLicenseHelper.check(Activity activity);
+```
+
+```objc
+// 暂不支持
 ```
 </MultiLang>
 
@@ -97,7 +105,7 @@ TapLicenseHelper.check(Activity activity);
 ### 正式上线
 
 所有流程都确保顺利后，游戏可[正式上线](/store/store-release/)。
-![用来空行的小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)
+
 
 ---
 
@@ -115,15 +123,17 @@ Android 11 加强了隐私保护策略，引入了大量变更和限制，其中
 **方案二：**
 
 1. 将 gradle build tools 改为 4.1.0+
-```java
-classpath 'com.android.tools.build:gradle:4.1.0'
-```
+
+    ```java
+    classpath 'com.android.tools.build:gradle:4.1.0'
+    ```
 
 2. 在 AndroidManifest.xml 里添加如下内容
-```xml
-<queries>
-  <package android:name="com.taptap" />
-  <package android:name="com.taptap.pad" />
-  <package android:name="com.taptap.global" />
-</queries>
-```
+
+    ```xml
+    <queries>
+        <package android:name="com.taptap" />
+        <package android:name="com.taptap.pad" />
+        <package android:name="com.taptap.global" />
+    </queries>
+    ```
