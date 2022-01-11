@@ -4,6 +4,7 @@ title: Manage Testers
 sidebar_label: Manage Testers
 ---
 
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import {Conditional} from '/src/docComponents/conditional';
 
 You can manage the tester list for TapTap login, Copyright Verification, and other related services. Users can join the testing of your game with TapTap Login before it passes the review and is officially released.  After your game is released on TapTap, you can make the login available for all users at ‘TapTap Login - Status’.
@@ -18,17 +19,17 @@ You can manage the tester list for TapTap login, Copyright Verification, and oth
 2. Find ‘Manage Participants’. You can add TapTap users as testers on this page.
 
     <Conditional region='cn'>
-    ![](/img/sdk-test-accounts-1.png)
+    <img src={useBaseUrl('/img/sdk-test-accounts-1.png')} alt="" />
     </Conditional>
     <Conditional region='global'>
-    ![](/img/io/sdk-test-accounts-1.png)
+    <img src={useBaseUrl('/img/io/test-account-1.png')} alt="" />
     </Conditional>
 
 3. Search for users with their ID or nickname and submit the information to add to the tester list.
 
     <Conditional region='cn'>
-    ![](/img/sdk-test-accounts-2.png)
+    <img src={useBaseUrl('/img/sdk-test-accounts-2.png')} alt="" />
     </Conditional>
     <Conditional region='global'>
-    ![](/img/io/sdk-test-accounts-2.png)
+    <img src={useBaseUrl('/img/io/test-account-2.png')} alt="" />
     </Conditional>
