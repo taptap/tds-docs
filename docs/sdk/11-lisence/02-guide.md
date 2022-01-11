@@ -4,6 +4,7 @@ title: 正版验证开发指南
 sidebar_label: 开发指南
 ---
 
+import {Conditional} from '/src/docComponents/conditional';
 import MultiLang from '/src/docComponents/MultiLang';
 import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';
@@ -104,8 +105,7 @@ TapLicenseHelper.check(Activity activity);
 
 ### 正式上线
 
-所有流程都确保顺利后，游戏可[正式上线](/store/store-release/)。
-
+所有流程都确保顺利后，游戏可<Conditional region='cn'>[正式上线](/store/store-release/)</Conditional><Conditional region='global'>[正式上线](/store/store-publish-game)</Conditional>.
 
 ---
 

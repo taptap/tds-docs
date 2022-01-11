@@ -4,6 +4,7 @@ title: 测试用户管理
 sidebar_label: 测试用户管理
 ---
 
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import {Conditional} from '/src/docComponents/conditional';
 
 
@@ -19,18 +20,18 @@ import {Conditional} from '/src/docComponents/conditional';
 2. 选择「测试用户管理」，进入页面，点击「添加用户」按钮。
 
     <Conditional region='cn'>
-    ![](/img/sdk-test-accounts-1.png)
+    <img src={useBaseUrl('/img/sdk-test-accounts-1.png')} alt="" />
     </Conditional>
     <Conditional region='global'>
-    ![](/img/io/sdk-test-accounts-1.png)
+    <img src={useBaseUrl('/img/io/sdk-test-accounts-1.png')} alt="" />
     </Conditional>
 
 3. 填写用户 ID 或昵称搜索用户，选择用户并提交，成功将用户添加进名单。
 
     <Conditional region='cn'>
-    ![](/img/sdk-test-accounts-2.png)
+    <img src={useBaseUrl('/img/sdk-test-accounts-2.png')} alt="" />
     </Conditional>
     <Conditional region='global'>
-    ![](/img/io/sdk-test-accounts-2.png)
+    <img src={useBaseUrl('/img/io/sdk-test-accounts-2.png')} alt="" />
     </Conditional>
 

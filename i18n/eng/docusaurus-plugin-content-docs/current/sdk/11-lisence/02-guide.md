@@ -4,6 +4,7 @@ title: Copyright Verification
 sidebar_label: Guide
 ---
 
+import {Conditional} from '/src/docComponents/conditional';
 import MultiLang from '/src/docComponents/MultiLang';
 import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';
@@ -63,9 +64,9 @@ TapLicenseHelper.setLicenseCallback(new TapLicenseCallback() {
 // Not supported for now.
 ```
 
-### Payment and Authorization Verification
+</MultiLang>
 
-<MultiLang>
+### Payment and Authorization Verification
 
 <MultiLang>
 
@@ -110,7 +111,7 @@ Go to Developer Center >> <Blue>Price Settings</Blue>, make your game a paid gam
 
 ### Official Release
 
-After completing the above steps, your game will be ready for the [Official Release](/store/store-release/).
+After completing the above steps, your game will be ready for the <Conditional region='cn'>[Official Release](/store/store-release/)</Conditional><Conditional region='global'>[Official Release](/store/store-publish-game)</Conditional>.
 
 
 ---
