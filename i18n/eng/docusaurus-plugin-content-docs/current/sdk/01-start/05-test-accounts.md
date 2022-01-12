@@ -11,8 +11,8 @@ You can manage the tester list for TapTap login, Copyright Verification, and oth
 
 **Attention**
 
-* Make sure you already have the permission to manage the testers. The following roles have this permission by default: Super Administrator, Game Administrator, Publisher, and Developer. **
-* Make sure that your game’s configuration has been enabled.**
+* **Make sure you already have the permission to manage the testers. The following roles have this permission by default: Super Administrator, Game Administrator, Publisher, and Developer.**
+* **Make sure that your game’s configuration has been enabled.**
 
 1. Log into <Conditional region='cn'>[TapTap Developer Center](https://developer.taptap.com/)</Conditional><Conditional region='global'>[TapTap Developer Center](https://developer.taptap.io/)</Conditional>, go to the game page and click on ‘Game Services’.
 
