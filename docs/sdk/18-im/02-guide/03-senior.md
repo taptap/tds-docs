@@ -1456,21 +1456,7 @@ await chatRoom.mute();
 敏感词文件为 UTF-8 编码的纯文本文件，一行一个敏感词。
 开发者上传的自定义敏感词词库会替换默认提供的词库。
 
-<Conditional brand='tds'>
-
-如果开发者有较为复杂的过滤需求，我们推荐开发者接入[文本检测](/sdk/text-moderation/features/)服务。
-文本检测基于 AI 及多重识别策略，及时、准确、高效地抵御政治、暴恐、色情、辱骂等违规内容风险。
-开发者可以在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 即时通讯 > 设置 > 消息敏感词过滤** 中修改过滤方式为「接入文本检测服务」。
-
-开发者也可以使用云引擎 hook `_messageReceived` 来实现过滤，在 hook 中开发者对消息的内容有完全的控制力。
-
-</Conditional>
-
-<Conditional brand='leancloud'>
-
 如果开发者有较为复杂的过滤需求，可以使用云引擎 hook `_messageReceived` 来实现过滤，在 hook 中开发者对消息的内容有完全的控制力。
-
-</Conditional>
 
 ## 使用临时对话
 
