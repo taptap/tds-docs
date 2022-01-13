@@ -131,7 +131,7 @@ roundCorner | 是否为圆角
 
 用户无 TapTap 应用时，默认会打开 webview 登录
 
-打开 info.plist，添加如下配置，然后请替换 clientID 为您在控制台获取的 clientID
+打开 info.plist，添加如下配置，然后请替换 clientID 为你在控制台获取的 clientID
 
 ```xml
 <key>CFBundleURLTypes</key>
