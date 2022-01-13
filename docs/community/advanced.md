@@ -20,17 +20,17 @@ sidebar_position: 30
 以下三种参与方式在 TapTap 社区相对常见，但请不要限制你的想象力，玩家是创意度和热情度极高的群体，你的脑洞会决定活动上限。
 
 <table>
-  <tbody>
+  <thead>
     <tr>
       <th>参与方式</th>
       <th>模式说明</th>
       <th>适用阶段</th>
     </tr>
+  </thead>
+  <tbody>
     <tr>
-      <td rowspan="3">
-        <p>发帖参与</p>
-      </td>
-      <td rowspan="3">
+      <td rowSpan="3">发帖参与</td>
+      <td rowSpan="3">
         <p>发帖可分为图文、纯文字、视频；</p>
         <p>
           内容门槛高价值大，需要玩家具有一定创作能力，对不了解游戏内容的玩家参与门槛较高，预约期慎重举办；
@@ -88,8 +88,8 @@ sidebar_position: 30
       </td>
     </tr>
     <tr>
-      <td rowspan="3">回帖参与</td>
-      <td rowspan="3">
+      <td rowSpan="3">回帖参与</td>
+      <td rowSpan="3">
         <p>回帖可分为图片、图文、视频；</p>
         <p>
           此类活动参与门槛较低，互动性更强，社区价值较少，适合吸引玩家快速关注，或短期加入活动，不适宜长期留存；
@@ -147,8 +147,8 @@ sidebar_position: 30
       </td>
     </tr>
     <tr>
-      <td rowspan="3">互动参与</td>
-      <td rowspan="3">
+      <td rowSpan="3">互动参与</td>
+      <td rowSpan="3">
         <p>玩家点赞或转发，参与更简单；</p>
         <p>
           适合配合大型活动的小活动部分或需要快速出具活动的情况，能快速引起玩家强互动，对社区内容价值没有增益，只提高活动周期内论坛活跃度；
