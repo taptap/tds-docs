@@ -1,75 +1,16 @@
-import React from 'react';
+import React from "react";
 
-export const Red = ({ children }) => (
-  <span style={{
-    color: '#f00',
-    padding: '0.2rem',
-  }}>
-    {children}
-  </span>
-);
+export const [Red, Blue, Black, Gray, Green, BlueBlack] = [
+  "#F64C4C",
+  "#15C5CE",
+  "#1F1F1F",
+  "#8E8E8E",
+  "#47B881",
+  "#3B82F6",
+].map((color) => ({ children }) => <span style={{ color }}>{children}</span>);
 
-export const Blue = ({ children }) => (
-  <span style={{
-    color: '#00b9c8',
-    padding: '0.2rem',
-  }}>
-    {children}
-  </span>
-);
-
-export const Black = ({ children }) => (
-  <span style={{
-    color: '#333',
-    padding: '0.2rem',
-  }}>
-    {children}
-  </span>
-);
-
-export const Gray = ({ children }) => (
-  <span style={{
-    color: '#A0A0A0',
-    padding: '0.2rem',
-  }}>
-    {children}
-  </span>
-);
-
-export const Green = ({ children }) => (
-  <span style={{
-    color: '#008000',
-    padding: '0.2rem',
-  }}>
-    {children}
-  </span>
-);
-
-export const BlueBlack = ({ children }) => (
-  <span style={{
-    color: '#000066',
-    padding: '0.2rem',
-  }}>
-    {children}
-  </span>
-);
-
-export const Link = ({ href, children }) => (
-  <a href={href} rel="noreferrer nofollow noopener" target="_blank">
-    {children}
-  </a>
-);
-
-export const ImageLink = ({ href, alt, children }) => (
-  <a href={href} rel='noreferrer nofollow noopener'>
-    <img src={children} alt={alt}/>
-  </a>
-);
-
-export const FaqLink = ({ href, children }) => (
-  <span style={{ fontSize: 16, color: '#666666' }}>
-    {children}
-  </span>
+export const FaqLink = ({ children }) => (
+  <span style={{ fontSize: 16, color: "#666666" }}>{children}</span>
 );
 
 const COLORS = {
