@@ -7,7 +7,7 @@ sidebar_label: 开发指南
 import MultiLang from '/src/docComponents/MultiLang';
 import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';
-import {Gray,Blue, Red, Black,Link,ImageLink} from '/src/docComponents/doc';
+import {Gray,Blue, Red, Black} from '/src/docComponents/doc';
 
 ## DLC 查询和购买
 
