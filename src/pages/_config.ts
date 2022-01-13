@@ -29,7 +29,7 @@ export const entryList: (localePath: string, region: string) => Array<Entry> = (
     },
     {
       title: '游戏服务',
-      description: 'TDS为游戏开发提供的全套SDK服务',
+      description: 'TDS 为游戏开发提供的全套 SDK 服务',
       links: [
         {
           label: '查看更多',
@@ -39,15 +39,26 @@ export const entryList: (localePath: string, region: string) => Array<Entry> = (
       id: 'sdk',
     },
     {
+      title: '社区运营指南',
+      description: 'TapTap为开发者提供的社区新手攻略',
+      links: [
+        {
+          label: '查看更多',
+          to: '/community',
+        }
+      ],
+      id: 'community',
+    },
+    {
       title: '资源下载',
-      description: 'TapTap相关品牌元素及开发工具包下载',
+      description: 'TapTap 相关品牌元素及开发工具包下载',
       links: [
         {
           label: '设计资源',
           to: '/design'
         },
         {
-          label: 'SDK工具包',
+          label: 'SDK 工具包',
           to: '/tap-download',
         },
       ],
@@ -55,7 +66,7 @@ export const entryList: (localePath: string, region: string) => Array<Entry> = (
     },
     {
       title: '栏目收录申请',
-      description: 'TapTap首页栏目申请',
+      description: 'TapTap 首页栏目申请',
       links: [
         {
           label: '查看更多',
