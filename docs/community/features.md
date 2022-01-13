@@ -64,7 +64,7 @@ sidebar_position: 10
 
 推送完成后，该条信息将显示在玩家的通知栏中，并新增消息提醒。
 
-![官方帖通知推送](/img/officital-posts-notification.jpg)
+![官方帖通知推送](/img/official-posts-notification.jpg)
 
 #### 论坛置顶
 
