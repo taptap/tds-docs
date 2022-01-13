@@ -6,7 +6,7 @@ sidebar_label: 开发指南
 
 import MultiLang from '/src/docComponents/MultiLang';
 
-import {Gray,Blue, Red, Black,Link,ImageLink} from '/src/docComponents/doc';
+import {Gray,Blue, Red, Black} from '/src/docComponents/doc';
 
 
 ## 正版验证
