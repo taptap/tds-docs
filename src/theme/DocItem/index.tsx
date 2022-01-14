@@ -41,9 +41,10 @@ export default function DocItem(props: Props): JSX.Element {
     !hideTitle && typeof DocContent.contentTitle === 'undefined';
 
   const windowSize = useWindowSize();
-
+ 
+  const toc = DocContent.frontMatter["toc"] ?? DocContent.toc
   const canRenderTOC =
-    !hideTableOfContents && DocContent.toc && DocContent.toc.length > 0;
+    !hideTableOfContents && toc && toc.length > 0;
 
   const renderTocDesktop =
     canRenderTOC && (windowSize === 'desktop' || windowSize === 'ssr');
@@ -67,7 +68,7 @@ export default function DocItem(props: Props): JSX.Element {
 
               {canRenderTOC && (
                 <TOCCollapsible
-                  toc={DocContent.toc}
+                  toc={toc}
                   minHeadingLevel={tocMinHeadingLevel}
                   maxHeadingLevel={tocMaxHeadingLevel}
                   className={clsx(
@@ -85,7 +86,6 @@ export default function DocItem(props: Props): JSX.Element {
                 See https://github.com/facebook/docusaurus/pull/4882#issuecomment-853021120
                 */}
                 {shouldAddTitle && <MainHeading>{title}</MainHeading>}
-
                 <DocContent />
               </div>
 
@@ -98,7 +98,7 @@ export default function DocItem(props: Props): JSX.Element {
         {renderTocDesktop && (
           <div className="col col--3">
             <TOC
-              toc={DocContent.toc}
+              toc={toc}
               minHeadingLevel={tocMinHeadingLevel}
               maxHeadingLevel={tocMaxHeadingLevel}
               className={ThemeClassNames.docs.docTocDesktop}
