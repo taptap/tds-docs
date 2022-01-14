@@ -13,6 +13,18 @@ export const FaqLink = ({ children }) => (
   <span style={{ fontSize: 16, color: "#666666" }}>{children}</span>
 );
 
+export const Anchor = ({ id }) => (
+  <a
+    style={{
+      display: "block",
+      position: "relative",
+      top: "-4.5rem",
+      visibility: "hidden",
+    }}
+    id={id}
+  />
+);
+
 const COLORS = {
   grey05: "#666666",
   grey04: "#888888",
