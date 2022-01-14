@@ -16,9 +16,7 @@ export const FaqLink = ({ children }) => (
 export const Anchor = ({ id }) => (
   <a
     style={{
-      display: "block",
-      position: "relative",
-      top: "-4.5rem",
+      scrollMarginTop: "4.5rem",
       visibility: "hidden",
     }}
     id={id}
