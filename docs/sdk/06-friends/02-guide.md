@@ -101,6 +101,7 @@ REST API 请求的 Base URL（下文 curl 示例中用 `{{host}}` 表示）即�
 curl -X GET \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Session: {{sessionToken}}" \
   https://{{host}}/friend/v1/rich-presence/config
 ```
 
@@ -284,7 +285,8 @@ curl -X POST \
 curl -X GET \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{appkey}}" \
-  --data-urlencode 'ids=userObjectId,anotherUserObjectId'
+  -H "X-LC-Session: {{sessionToken}}" \
+  --data-urlencode 'ids={userObjectId,anotherUserObjectId}'
   https://{{host}}/friend/v1/rich-presence/users
 ```
 
