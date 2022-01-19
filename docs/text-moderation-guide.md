@@ -2,6 +2,7 @@
 id: text-moderation-guide
 title: 文本检测开发指南
 sidebar_label: /sdk/text-moderation/features/
+slug: /sdk/text-moderation/guide/
 ---
 
 :::info
