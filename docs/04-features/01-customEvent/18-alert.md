@@ -65,6 +65,7 @@ title: 数据预警
         <td rowspan="3">小时</td>
         <td>固定值</td>
         <td>数值</td>
+    </tr>
     <tr>
         <td>上一小时、昨天同一小时</td>
         <td>数值、百分比</td>
