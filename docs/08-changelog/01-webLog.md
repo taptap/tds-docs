@@ -7,7 +7,7 @@ title: 网页版
 2. 优化了部分功能体验
 
 **文档**更新
-1. 新增「[数据预警](/04-features/01-customEvent/17-userTag.md "_blank")」文档，以便于大家更方便的使用数据预警功能
+1. 新增「[数据预警](/04-features/01-customEvent/18-alert.md "_blank")」文档，以便于大家更方便的使用数据预警功能
 
 
 
