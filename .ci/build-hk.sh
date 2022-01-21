@@ -35,4 +35,4 @@ rm -rf versioned_sidebars
 rm -rf versions.json
 rm -rf versioned_docs
 
-TDS_REGION=global node_modules/.bin/docusaurus build --out-dir build-hk
+REGION=global node_modules/.bin/docusaurus build --out-dir build-hk
