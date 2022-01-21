@@ -390,7 +390,8 @@ TapSDK has already undergone obfuscation. Therefore, initiating another obfuscat
 -keep class tds.androidx.** { *;}
 ```
 
-If cloud services based on **Data Storage** are used (ex: **TDS Authentication** login), then it requires you to add the corresponding obfuscation code: **[Data Storage](/sdk/storage/guide/setup-java/#android-code-obfuscation)**.
+<!-- TODO -->
+<!-- If cloud services based on **Data Storage** are used (ex: **TDS Authentication** login), then it requires you to add the corresponding obfuscation code: **[Data Storage](/sdk/storage/guide/setup-java/#android-code-obfuscation)**. -->
 
 ## Package
 
