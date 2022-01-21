@@ -120,7 +120,7 @@ After completing the above steps, your game will be ready for the <Conditional r
 
 ### How to fix Android 11 being unable to launch TapTap app
 
-Android 11 has ramped up its privacy protection policies resulting in a series of changes and restrictions, one of the key changes being [Package Visibility](https://developer.android.com/about/versions/11/privacy/package-visibility), which prevents third-party apps from launching the TapTap client. This has affected related TapTap services from functioning properly, including but not limited to accessing TapTap during updates, purchase verification, and other functions. Notice that this change on Android 11 only affects apps that have been upgraded to `targetSdkVersion=30`. Apps that haven't been upgraded will not be affected.
+Android 11 has ramped up its privacy protection policies resulting in a series of changes and restrictions, one of the key changes being [Package Visibility](https://developer.android.com/about/versions/11/privacy/package-visibility), which prevents third-party apps from launching the TapTap app. This has affected related TapTap services from functioning properly, including but not limited to accessing TapTap during updates, purchase verification, and other functions. Notice that this change on Android 11 only affects apps that have been upgraded to `targetSdkVersion=30`. Apps that haven't been upgraded will not be affected.
 
 **Solution 1**
 

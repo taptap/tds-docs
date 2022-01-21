@@ -115,7 +115,6 @@ export const Background = ({ children, title, content }) => (
 );
 
 export const Figure = ({
-  children,
   subtitle,
   caption,
   imgSrc,

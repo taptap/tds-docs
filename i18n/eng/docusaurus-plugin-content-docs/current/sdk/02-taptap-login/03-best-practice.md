@@ -1,0 +1,57 @@
+---
+id: best-practice
+title: Best TapTap Login Practices
+sidebar_label: Best Practices
+---
+
+import useBaseUrl from '@docusaurus/useBaseUrl';
+
+## Login Process
+
+Conversion rate increases when players have a streamlined login process. Use the simplest method that retains all necessary steps, so players can quickly enter the game. As shown below:
+
+<img src={useBaseUrl('/img/io/login-practice.png')} alt="" width="800" />
+
+### Login Interface
+
+Provide players with a TapTap Login button designed according to [Login Design Guide](/design/). Refer to [Feature Summary](/sdk/taptap-login/features/) for information on displaying single/multiple login methods.
+
+### Using Players' Public Info
+
+When players create characters in-game, the system can utilize authorized public info upon logging into the game, such as the player's TapTap avatar, nickname, etc., to help players complete the registration process automatically.
+
+If you are using the TDS Authentication system, refer to [Setting Other Users' Properties](/sdk/authentication/guide/#Setting Other Users' Properties) section to set user info.
+
+If you are using the basic TapTap Login, refer to the following flow chart: 
+
+<img src={useBaseUrl('/img/io/login-flow.png')} alt="" width="800" />
+
+*Reference the TapTap Login Guide.
+
+### Provide a Switch Account Function
+
+We recommend providing players with a Switch Account function in-game.
+
+- When switching accounts, the player will be logged out. This guarantees that other in-game services (i.e. Moments) stay consistent with the logged-in account.
+- When players have logged out, automatically display the login screen with the option for players to log in with another account.
+
+### Provide a Bind Account Function
+
+We recommend providing players with a Bind Account function. This gives players additional login methods.
+
+If you are using TDS Authentication to create the account system, refer to [Binding Third-Party Accounts](/sdk/authentication/guide/#binding-third-party-accounts) section.
+
+If you have your own account system and only use the basic TapTap Login, the game must have a Bind Account function so players can bind their game account with their unique ID returned after logging into TapTap.
+
+## Checklist
+
+Prior to providing players with a login function, developers must test the login process to see if it can be completed as intended. Check the following:
+
+- Whether the game meets [SDK Environment Requirements](/sdk/start/quickstart/#environment-requirements).
+- Whether the developer understands the two TapTap Login methods in TapSDK. See [Integrating TapTap Login](/sdk/taptap-login/guide/start/).
+- Whether the TapTap developer added the corresponding Android or iOS platform configurations to the backend. See [Configure Signature Certification](/sdk/start/quickstart/#configure-signature-certificate) and [Format Requirements](/sdk/taptap-login/features/#format-requirements).
+- Whether testers have the necessary qualifications. See [Manage Testers](/sdk/start/test-accounts/).
+- Whether users without the TapTap app can log in using WebView. Then check if the developer is able to obtain players' authorized basic info.
+- Whether users with the most recent TapTap app can open the game and log in. Then check if the developer is able to obtain players' authorized basic info.
+- Whether Silent Login is available after logging out once login authorization is complete. See [Silent Login](/sdk/taptap-login/features/#performing-silent-login).
+- Whether the login process will restart upon leaving and re-entering the game without completing login authorization.
