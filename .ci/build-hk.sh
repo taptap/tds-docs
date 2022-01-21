@@ -6,8 +6,7 @@ rm -rf i18n/en
 mv i18n/eng i18n/en
 
 rm -rf docs/*
-cp -r i18n/en/docusaurus-plugin-content-docs/current/store docs/
-cp -r i18n/en/docusaurus-plugin-content-docs/current/sdk docs/
+cp -r i18n/en/docusaurus-plugin-content-docs/current/* docs/
 
 cat<<END > sidebars.js
 // @ts-check
