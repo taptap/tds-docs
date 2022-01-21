@@ -47,7 +47,7 @@ TDS provides the following services that developers can use by integrating TapSD
 
 </Conditional>
 
-- **[Copyright Verification](/sdk/license/features/)**: Helps developers verify whether the player's copy of the game is purchased and downloaded from TapTap. This makes it difficult for players to obtain the game with unauthorized manners.
+- **[Copyright Verification](/sdk/lisence/features/)**: Helps developers verify whether the player's copy of the game is purchased and downloaded from TapTap. This makes it difficult for players to obtain the game with unauthorized manners.
 
 <!--
 
