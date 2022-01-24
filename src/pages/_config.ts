@@ -58,7 +58,7 @@ export const entryList: (localePath: string, region: string) => Array<Entry> = (
           to: '/design'
         },
         {
-          label: 'SDK 工具包',
+          label: 'SDK',
           to: '/tap-download',
         },
       ],
