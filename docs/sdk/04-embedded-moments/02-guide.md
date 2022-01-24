@@ -184,7 +184,7 @@ TapMoment.DirectlyOpen(Orientation.ORIENTATION_DEFAULT, TapMomentConstants.TapMo
  ----------- | -------- |
 orientation    |    打开方向  |
 page    |    固定为 TapMomentConstants.TapMomentPageShortCut  |
-Dictionary     | 其中 TapMomentConstants.TapMomentPageShortCutKey 固定，第三个参数为要需要跳转的页面 id     |
+Dictionary     | 其中 TapMomentConstants.TapMomentPageShortCutKey 固定，第三个参数为需要跳转的页面 id     |
 
 </>
 <>
