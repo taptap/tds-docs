@@ -7,6 +7,7 @@ sidebar_label: 开发指南
 import MultiLang from '/src/docComponents/MultiLang';
 import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';
+import Languages from '../_partials/languages.mdx';
 
 本文介绍如何在游戏中加入成就系统。TDS 推出的成就系统模块，是基于内建账户系统（TDSUser）的，具体请阅读 **[内建账户 > 开发指南](/sdk/authentication/guide/)**。
 
@@ -469,6 +470,12 @@ public AchievmentStats stats;         //当前成就稀有度指标
 
 </MultiLang>
 
+## 国际化
+
+成就支持设置语言：
+
+<Languages />
+
 ## REST API
 
 下面我们介绍成就相关的 REST API 接口。
@@ -636,14 +643,14 @@ curl -X POST \
 }
 ```
 
-## 语言代码列表
+### 语言代码列表
 
 使用 ISO 639-1 中定义的双小写字母语言代码（例如，`en` 表示英语，`jp` 表示日语），但：
 
 1. ISO 639-1 中未包括的语言，使用 ISO 632-2 中定义的三小写字母语言代码（例如，`fil` 表示菲律宾语）
 2. 仅使用语言代码无法表示所需语言时，附加 ISO 3166-1 中定义的地区代码（例如，`zh_CN` 表示简体中文）
 
-当前支持的语言代码如下：
+当前 REST API 支持的语言代码如下：
 
 | 代码 | 语言         |
 | ------- | ----------- |
@@ -691,3 +698,5 @@ curl -X POST \
 | tr       | 土耳其语     |
 | uk       | 乌克兰语     |
 | zu       | 祖鲁语       |
+
+注意，上表中的部分语言虽然 REST API 支持，但[客户端 SDK 并没有支持](#国际化)。 
