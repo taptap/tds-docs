@@ -12,8 +12,6 @@ const CONFIG_TDS_CN = {
     url: "https://developer.taptap.com",
     baseUrl: PREVIEW === "true" ? "/" : "/docs/",
     favicon: "/img/favicon.ico",
-    organizationName: "TapTap",
-    projectName: "TapSDK-Doc",
   },
   custom: {
     searchUrl: "https://tds-doc-search-api.cn-e1.leanapp.cn/search",
@@ -30,8 +28,6 @@ const CONFIG_TDS_GLOBAL = {
     url: "https://developer.taptap.io",
     baseUrl: PREVIEW === "true" ? "/" : "/docs/",
     favicon: "/img/favicon.ico",
-    organizationName: "TapTap",
-    projectName: "TapSDK-Doc",
   },
   custom: {
     searchUrl: "https://tds-doc-search-api.avosapps.us/search",
@@ -48,8 +44,6 @@ const CONFIG_LEANCLOUD_CN = {
     url: "https://docs.leancloud.cn",
     baseUrl: "/",
     favicon: "/img/lc-favicon.ico",
-    organizationName: "LeanCloud",
-    projectName: "LeanCloud-Doc",
   },
   custom: {
     searchUrl: "", // TODO
@@ -137,6 +131,8 @@ const NAVBAR_ITEMS =
 const config = {
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
+  organizationName: "taptap",
+  projectName: "tds-docs",
   trailingSlash: true,
   ...CONFIG.root,
 
