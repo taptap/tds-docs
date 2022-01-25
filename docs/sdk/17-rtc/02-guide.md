@@ -111,6 +111,8 @@ ResultCode code = await TapRTC.Init(config);
 
 if (code == ResultCode.OK) {
     // 初始化成功
+} else {
+    // 失败
 }
 // SDK 的 RTC 模块中，返回 ResultCode 的接口均以 ResultCode.OK 表示操作成功。
 ```
@@ -137,12 +139,19 @@ public class MyApp extends Application {
         // 如需使用范围语音功能，此项必须设为 LOW
         config.profile = AudioPerfProfile.MID;
         try {
-            TapRTCEngine.get().init(this, config);
+            TapRTCEngine.get().init(this, config, resultCode -> {
+                if (resultCode == ResultCode.OK) {
+                    // 初始化成功
+                } else {
+                    // 初始化失败
+                }
+            });
         } catch (TapRTCException e) {
             throw new RuntimeException(e);
         }
     }
 }
+// SDK 的 RTC 模块中，返回 ResultCode 的接口均以 ResultCode.OK 表示操作成功。
 ```
 
 ```objc
@@ -170,8 +179,7 @@ public void Update()
     ResultCode code = TapRTC.Poll();
     if (code == ResultCode.OK) {
         // 成功触发回调
-    }
-    if (code == ResultCode.ERROR_UNKNOWN) {
+    } else {
         // 失败
     }
 }
@@ -187,8 +195,7 @@ Java SDK、Objective-C SDK 无需定期调用 `Poll` 方法。
 ResultCode code = TapRTC.Resume();
 if (code == ResultCode.OK) {
     // 成功恢复
-}
-if (code == ResultCode.ERROR_UNKNOWN) {
+} else {
     // 失败
 }
 ```
@@ -196,7 +203,7 @@ if (code == ResultCode.ERROR_UNKNOWN) {
 ```java
 import com.taptap.taprtc.TapRTCEngine;
 
-boolean ok = TapRTCEngine.get().resume();
+ResultCode code = TapRTCEngine.get().resume();
 ```
 
 ```objc
@@ -219,8 +226,7 @@ ResultCode code = TapRTC.Pause();
 ResultCode code = TapRTC.Resume();
 if (code == ResultCode.OK) {
     // 成功暂停
-}
-if (code == ResultCode.ERROR_UNKNOWN) {
+} else {
     // 失败
 }
 ```
@@ -228,7 +234,7 @@ if (code == ResultCode.ERROR_UNKNOWN) {
 ```java
 import com.taptap.taprtc.TapRTCEngine;
 
-boolean ok = TapRTCEngine.get().pause();
+ResultCode code = TapRTCEngine.get().pause();
 ```
 
 ```objc
@@ -248,7 +254,7 @@ if (resultCode == TapRTCResultCode_Success) {
 
 初始化成功之后，SDK 在创建房间之后，才可以进行实时语音通话。
 创建房间时需指定房间号（`roomId`）。
-[是否启用范围语音](#范围语音)也需在创建房间时设置，C# SDK 默认不启用，Java SDK、Objective-C SDK 使用单独的接口创建范围语音房间。
+[是否启用范围语音](#范围语音)也需在创建房间时设置，C# SDK 默认不启用，Java SDK 创建时必须指定是否启用范围语音，Objective-C SDK 使用单独的接口创建范围语音房间。
 
 <MultiLang>
 
@@ -262,7 +268,8 @@ import com.taptap.taprtc.TapRTCEngine;
 import com.taptap.taprtc.RoomID;
 
 RoomId roomId = new RoomID("roomId");
-TapRTCRoom room = TapRTCEngine.get().acquireRoom(roomId);
+boolean enableRangeAudio = false;
+TapRTCRoom room = TapRTCEngine.get().acquireRoom(roomId, enableRangeAudio);
 ```
 
 ```objc
@@ -327,6 +334,9 @@ room.registerCallback(new TapRTCRoom.Callback() {
 
     // 玩家说话结束
     @Override public void onUserSpeakEnd(UserID userId) {}
+
+    // 音频质量变化
+    @Override public void onRoomQualityChanged(int weight, double loss, int delay) {}
 });
 ```
 
@@ -388,7 +398,13 @@ if (code == ResultCode.ERROR_ALREADY_IN_ROOM) {
 import com.taptap.taprtc.Authority;
 
 Authority authBuffer = new Authority("authBuffer");
-room.join(authBuffer);
+ResultCode code = room.join(authBuffer);
+if (code == ResultCode.OK) {
+    // 成功加入
+}
+if (code == ResultCode.ERROR_ALREADY_IN_ROOM) {
+    // 玩家已经在此房间内
+}
 ```
 
 ```objc
@@ -410,7 +426,7 @@ ResultCode code = room.Exit();
 ```
 
 ```java
-room.exit();
+ResultCode code = room.exit();
 ```
 
 ```objc
@@ -442,7 +458,13 @@ if (code == ResultCode.ERROR_USER_NOT_EXIST) {
 import com.taptap.taprtc.UserID;
 
 UserId userId = new UserID("userId");
-boolean ok = room.enableUserAudio(userId);
+ResultCode code = room.enableUserAudio(userId);
+if (code == ResultCode.OK) {
+    // 成功
+}
+if (code == ResultCode.ERROR_USER_NOT_EXIST) {
+    // 玩家不存在
+}
 ```
 
 ```objc
@@ -469,7 +491,13 @@ if (code == ResultCode.ERROR_USER_NOT_EXIST) {
 import com.taptap.taprtc.UserID;
 
 UserId userId = new UserID("userId");
-boolean ok = room.disableUserAudio(userId);
+ResultCode code = room.disableUserAudio(userId);
+if (code == ResultCode.OK) {
+    // 成功
+}
+if (code == ResultCode.ERROR_USER_NOT_EXIST) {
+    // 玩家不存在
+}
 ```
 
 ```objc
@@ -495,10 +523,10 @@ ResultCode code = room.EnableAudioReceiver(false);
 
 ```java
 // 开启
-boolean ok = room.enableAudioReceiver(true);
+ResultCode code = room.enableAudioReceiver(true);
 
 // 关闭
-boolean ok = room.enableAudioReceiver(false);
+ResultCode code = room.enableAudioReceiver(false);
 ```
 
 ```objc
@@ -643,7 +671,7 @@ int speakerVolume = TapRTC.GetAudioDevice().GetSpeakerVolume();
 int vol = 60;
 
 // 设置麦克风音量
-boolean ok = TapRTCEngine.get().getAudioDevice().setMicVolume(vol);
+TapRTCEngine.get().getAudioDevice().setMicVolume(vol);
 // 设置扬声器音量
 boolean ok = TapRTCEngine.get().getAudioDevice().setSpeakerVolume(vol);
 
@@ -746,7 +774,8 @@ import com.taptap.taprtc.TapRTCEngine;
 import com.taptap.taprtc.RoomID;
 
 RoomId roomId = new RoomID("roomId");
-TapRTCRoom room = TapRTCEngine.get().acquireRangeAudioRoom(roomId);
+boolean enableRangeAudio = true;
+TapRTCRoom room = TapRTCEngine.get().acquireRoom(roomId, enableRangeAudio);
 ```
 
 ```objc
@@ -815,12 +844,31 @@ if (resultCode == ResultCode.ERROR_NOT_RANGE_ROOM) {
 import com.taptap.taprtc.TapRTCRangeAudioCtrl.RangeAudioMode;
 
 int teamId = 12345678;
-room.rangeAudioCtrl().setRangeAudioTeam(new TeamID(teamId));
+ResultCode code = room.rangeAudioCtrl().setRangeAudioTeam(new TeamID(teamId));
+if (code == ResultCode.OK) {
+    // 成功
+}
+if (code == ResultCode.ERROR_NOT_RANGE_ROOM) {
+    // 该房间未启用范围语音
+}
 
 // 世界模式
-boolean ok = room.rangeAudioCtrl().setRangeAudioMode(RangeAudioMode.WORLD);
+ResultCode resultCode = room.rangeAudioCtrl().setRangeAudioMode(RangeAudioMode.WORLD);
+if (resultCode == ResultCode.OK) {
+    // 成功
+}
+if (resultCode == ResultCode.ERROR_NOT_RANGE_ROOM) {
+    // 该房间未启用范围语音
+}
+
 // 小队模式
-boolean ok = room.rangeAudioCtrl().setRangeAudioMode(RangeAudioMode.TEAM);
+ResultCode resultCode = room.rangeAudioCtrl().setRangeAudioMode(RangeAudioMode.TEAM);
+if (resultCode == ResultCode.OK) {
+    // 成功
+}
+if (resultCode == ResultCode.ERROR_NOT_RANGE_ROOM) {
+    // 该房间未启用范围语音
+}
 ```
 
 ```objc
@@ -857,7 +905,13 @@ if (code == ResultCode.ERROR_NOT_RANGE_ROOM) {
 
 ```java
 int range = 300;
-room.rangeAudioCtrl().updateAudioReceiverRange(range);
+ResultCode code = room.rangeAudioCtrl().updateAudioReceiverRange(range);
+if (code == ResultCode.OK) {
+    // 成功
+}
+if (code == ResultCode.ERROR_NOT_RANGE_ROOM) {
+    // 该房间未启用范围语音
+}
 ```
 
 ```objc
@@ -916,7 +970,13 @@ float[] axisRight = {0.0, 1.0, 0.0};
 float[] axisUp = {0.0, 0.0, 1.0};
 Forward forward = new Forward(axisForward, axisRight, axisUp);
 
-boolean ok = room.rangeAudioCtrl().updateSelfPosition(position, forward);
+ResultCode code = room.rangeAudioCtrl().updateSelfPosition(position, forward);
+if (code == ResultCode.OK) {
+    // 成功
+}
+if (code == ResultCode.ERROR_NOT_RANGE_ROOM) {
+    // 该房间未启用范围语音
+}
 ```
 
 ```objc
@@ -1008,6 +1068,62 @@ namespace TapTap.RTC
         ERROR_NOT_RANGE_ROOM = 109,
     }
 }
+```
+
+```java
+public enum ResultCode {
+    OK(0, "Success"),
+    ERROR_UNKNOWN(1, "Unknown Error"),
+    ERROR_UNIMPLEMENTED(2, "Unimplemented Functionality"),
+    ERROR_NOT_ON_MAIN_THREAD(3, "Not running on the main thread"),
+    ERROR_INVALID_ARGUMENT(4, "Invalid parameter"),
+    ERROR_NOT_INIT(5, "Uninitialized"),
+    ERROR_CONFIG_ERROR(11, "Configuration error"),
+    ERROR_NET(21, "Network error"),
+    ERROR_NET_TIMEOUT(22, "Network request timeout"),
+    ERROR_USER_NOT_EXIST(101, "User does not exist"),
+    ERROR_ROOM_NOT_EXIST(102, "Room does not exist"),
+    ERROR_DEVICE_NOT_EXIST(103, "Device does not exist"),
+    ERROR_TEAM_ID_NOT_NULL(104, "TeamID cannot be Zero"),
+    ERROR_ALREADY_IN_ROOM(105, "It's already in the other room"),
+    ERROR_NO_PERMISSION(106, "TapRTCCode_Error_NoPermission\tNo Permission"),
+    ERROR_AUTH_FAILED(107, "Authorization failure"),
+    ERROR_LIB_ERROR(108, "Service provider library error"),
+    ERROR_NOT_RANGE_ROOM(109, "Not Support Range Room"),
+}
+```
+
+```objc
+FOUNDATION_EXPORT NSString * const TapRTCNetworkErrorDomain;
+FOUNDATION_EXPORT NSString * const TapRTCResultErrorDomain;
+
+typedef NS_ENUM(NSInteger, TapRTCResultCode) {
+    TapRTCCode_OK         = 0,
+    TapRTCCode_Error_Unknown     = 1,
+    TapRTCCode_Error_Unimplemented     = 2,
+    TapRTCCode_Error_NotOnMainThread,
+    TapRTCCode_Error_InvaidArgs,
+    TapRTCCode_Error_NotInit,
+    
+    TapRTCCode_ConfigError_Error  = 11,
+    TapRTCCode_ConfigError_AppID,
+    TapRTCCode_ConfigError_AppKey,
+    TapRTCCode_ConfigError_ServerUrl,
+    TapRTCCode_ConfigError_UserID,
+    TapRTCCode_ConfigError_DeviceID,
+    
+    TapRTCCode_NetError_Error = 21,
+    TapRTCCode_NetError_Timeout,
+    
+    TapRTCCode_Error_UserNotExist = 101,
+    TapRTCCode_Error_RoomNotExist,
+    TapRTCCode_Error_DeviceNotExist,
+    TapRTCCode_Error_TeamIDNotBeZero,
+    TapRTCCode_Error_AlreadyInOtherRoom,
+    TapRTCCode_Error_NoPermission,
+    TapRTCCode_Error_AuthFailed,
+    TapRTCCode_LibError,
+};
 ```
 
 </MultiLang>
