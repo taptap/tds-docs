@@ -14,14 +14,6 @@ yarn start -- --locale en
 
 ## 目录结构
 
-### 非技术人员看这里
-
-所有文档内容均存放在 `content` 目录中。其中 `zh-Hans`、`en`、`eng` 分别用于存放中文文档、英文文档、海外版英文文档，`public` 用于存放文档配图和下载资源。
-
-### 技术人员看这里
-
-前面提到的 `content` 目录实际上是保存了一些文档内容的 symbolic links，目的是为了让内容编辑人员能够快速访问。整个文档项目的实际目录结构如下：
-
 ```
 .
 ├── docs                                     中文文档
@@ -51,6 +43,8 @@ yarn start -- --locale en
 ├── versioned_sidebars                       旧版文档菜单配置
 └── versions.json                            历史版本配置
 ```
+
+其中编辑人员常用的目录有 `docs`（中文文档）、`i18n/en/docusaurus-plugin-content-docs/current`（英文文档）、`i18n/eng/docusaurus-plugin-content-docs/current`（海外版英文文档）、`static`（文档配图和下载资源）。
 
 ## 文档编写
 
@@ -292,10 +286,10 @@ import CodeBlock from "@theme/CodeBlock";
 
 链接时使用基于对应语言文档根目录的绝对路径，**不要使用相对路径**。
 
-- `content/zh-Hans/sdk/02-taptap-login/01-features.md` 在其他 md 文件中跳转需写作 `[跳转标题](/sdk/taptap-login/features/)`
-- `content/zh-Hans/sdk/02-taptap-login/01-features.md` 如果 id 为 `functions`（**建议文件名 ID 同步，仅作说明**），在其他 md 文件中跳转需写作 `[跳转标题](/sdk/taptap-login/functions/)`
-- `content/zh-Hans/design/design-moment.md` 在其他 md 文件中跳转需写作 `[跳转标题](/design/design-moment/)`
-- `content/en/sdk/02-taptap-login/01-features.md` 在其他 md 文件中跳转需写作 `[跳转标题](/sdk/taptap-login/features/)`
+- `docs/sdk/02-taptap-login/01-features.md` 在其他 md 文件中跳转需写作 `[跳转标题](/sdk/taptap-login/features/)`
+- `docs/sdk/02-taptap-login/01-features.md` 如果 id 为 `functions`（**建议文件名 ID 同步，仅作说明**），在其他 md 文件中跳转需写作 `[跳转标题](/sdk/taptap-login/functions/)`
+- `docs/design/design-moment.md` 在其他 md 文件中跳转需写作 `[跳转标题](/design/design-moment/)`
+- `i18n/en/docusaurus-plugin-content-docs/current/sdk/02-taptap-login/01-features.md` 在其他 md 文件中跳转需写作 `[跳转标题](/sdk/taptap-login/features/)`
 - 标题跳转需要将空格换成 `-`，比如 `[<FaqLink>2. 安卓端测试形式</FaqLink>](./store-test#二、 安卓端测试形式)` 替换成 `[<FaqLink>2. 安卓端测试形式</FaqLink>](./store-test#二、-安卓端测试形式)
 
 ##### 链接到外部网站
@@ -308,7 +302,7 @@ import CodeBlock from "@theme/CodeBlock";
 
 ##### 在文档中插入图片
 
-- 要插入位于 `content/public/img/design-1.1.png` 的图片，在 md 文件中引用需写作 `![图片说明](/img/design-1.1.png)`
+- 要插入位于 `static/img/design-1.1.png` 的图片，在 md 文件中引用需写作 `![图片说明](/img/design-1.1.png)`
 - 要插入位于 `https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png` 的图片，在 md 文件中引用需写作 `![图片说明](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)`
 
 ##### 如何用 Figma 为截图添加标注
