@@ -32,7 +32,7 @@ yarn start -- --locale en
 │   └── eng                                  海外版英文文档
 ├── sidebars.js                              菜单配置
 ├── src
-│   ├── docComponents                        自定义组件（用于文档内容，如语言切换）
+│   ├── docComponents                        自定义组件（用于文档内容，如多编程语言）
 │   ├── pages                                首页等特殊页面
 │   ├── styles                               一些共享样式
 │   └── theme                                自定义组件（用于文档内容以外的地方，如文档搜索）
@@ -188,7 +188,7 @@ public static void login(Activity activity, @LoginType.ThirdPartyType int type, 
 </MultiLang>
 ````
 
-上面的例子中，我们使用了空标签 `<>...</>` (React 的 Fragment 组件) 将 C#、Java、Objective-C 的不同内容包成三组。
+上面的例子中，我们使用了空标签 `<>...</>`（React 的 Fragment 组件）将 C#、Java、Objective-C 的不同内容包成三组。
 同样，空标签和 markdown 之间也需要留出空行。
 另外，由于 Docusaurus 的 TOC 生成并不能正确处理这种情况下的小标题（仅会根据第一个标签的内容生成小标题，切换标签后 TOC 的内容不变），请不要在 `MultiLang` 标签中使用 `h1`、`h2`、`h3` 级别的标题。
 最后，某些文档面向的平台并不是 Unity、iOS、Android，这种情况下可以用 `kind` 参数指定使用 `MultiLang` 的变体，比如云引擎文档使用 `<MultiLang kind="engine">`，顺序为 JavaScript、Python、PHP、Java、C#、Go。
@@ -290,7 +290,7 @@ import CodeBlock from "@theme/CodeBlock";
 - `docs/sdk/02-taptap-login/01-features.md` 如果 id 为 `functions`（**建议文件名 ID 同步，仅作说明**），在其他 md 文件中跳转需写作 `[跳转标题](/sdk/taptap-login/functions/)`
 - `docs/design/design-moment.md` 在其他 md 文件中跳转需写作 `[跳转标题](/design/design-moment/)`
 - `i18n/en/docusaurus-plugin-content-docs/current/sdk/02-taptap-login/01-features.md` 在其他 md 文件中跳转需写作 `[跳转标题](/sdk/taptap-login/features/)`
-- 标题跳转需要将空格换成 `-`，比如 `[<FaqLink>2. 安卓端测试形式</FaqLink>](./store-test#二、 安卓端测试形式)` 替换成 `[<FaqLink>2. 安卓端测试形式</FaqLink>](./store-test#二、-安卓端测试形式)
+- 标题跳转需要将空格换成 `-`，比如 `[<FaqLink>2. 安卓端测试形式</FaqLink>](./store-test#二、 安卓端测试形式)` 替换成 `[<FaqLink>2. 安卓端测试形式</FaqLink>](./store-test#二、-安卓端测试形式)`
 
 ##### 链接到外部网站
 
