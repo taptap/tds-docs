@@ -4,6 +4,7 @@ const sdkVersions = {
     android: "3.6.1",
     ios: "3.6.1",
     anti_addiction: "1.1.0",
+    rtc: "1.1.0",
   },
   leancloud: {
     objc: "13.6.1",
