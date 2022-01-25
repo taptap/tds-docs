@@ -1013,7 +1013,7 @@ public class DeepLinkManager : MonoBehaviour
     private async void onDeepLinkActivated(string url) {
         Dictionary<string, object> invitation = TDSFriends.ParseFriendInvitationLink(url);
         string userId = invitation["identity"];
-        string nickname = invitation["nickname"];
+        string nickname = invitation["role_name"];
         await TDSFriends.HandleFriendInvitationLink(url);
     }
 }
