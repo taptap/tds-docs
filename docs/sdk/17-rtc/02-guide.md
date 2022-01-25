@@ -25,7 +25,7 @@ import Mermaid from '/src/docComponents/Mermaid';
 <CodeBlock className="json">
 {`"dependencies":{
   ...
-  "com.taptap.tds.rtc":"https://github.com/TapTap/TapRTC-Unity.git#${sdkVersions.taptap.rtc}",
+  "com.taptap.tds.rtc":"https://github.com/TapTap/TapRTC-Unity.git#${sdkVersions.taptap.unity}",
 }`}
 </CodeBlock>
 </>
