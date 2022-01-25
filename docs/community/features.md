@@ -8,6 +8,7 @@ toc: [{"value":"2.1 沟通入门课：发帖","id":"21-沟通入门课发帖","c
 ---
 
 import { Anchor } from "/src/docComponents/doc";
+import useBaseUrl from '@docusaurus/useBaseUrl';
 
 在运营方面，如何最大化展示游戏特色，并持续提供给玩家新鲜感，是在 TapTap 社区良好运营的核心法则。同时，时刻注意论坛内玩家行为，以此为依据调整并随时更新运营规划。我们将在下述内容中，逐步讲解 TapTap 社区的各个功能模块，及运营思路。
 
@@ -30,7 +31,7 @@ import { Anchor } from "/src/docComponents/doc";
 
 你的申请将于 1-3 个工作日内完成，完成后账号效果如下图显示。详细认证规则请参考[开发者管理](/store/store-auth/)。
 
-![蓝 V 认证展示](/img/verified-developer.png)
+<img alt="蓝 V 认证展示" src={useBaseUrl("/img/verified-developer.png")} width="30%" />
 
 ### 如何创作官方帖？
 
@@ -68,7 +69,7 @@ import { Anchor } from "/src/docComponents/doc";
 
 推送完成后，该条信息将显示在玩家的通知栏中，并新增消息提醒。
 
-![官方帖通知推送](/img/official-posts-notification.jpg)
+<img alt="官方帖通知推送" src="/img/official-posts-notification.jpg" width="50%" />
 
 #### 论坛置顶
 
@@ -100,7 +101,7 @@ import { Anchor } from "/src/docComponents/doc";
 
 获得权限后，前往**开发者中心** >> **商店** >> **更新游戏** 中设置游戏资料（含**开发者的话**），开发者的话前两行文本在详情页默认露出。
 
-![开发者的话](/img/words-from-the-developer.png)
+<img alt="开发者的话" src={useBaseUrl("/img/words-from-the-developer.png")} width="30%" />
 
 
 ## 2.2 强力信息板：推荐位
@@ -111,13 +112,13 @@ import { Anchor } from "/src/docComponents/doc";
 
 推荐位的 icon 设计：尺寸为**200*200**，设计上建议简洁明了，可以用游戏内的 UI/ 角色头像，如没有合适素材，可[点击这里](https://capacity-files.lncld.net/Pl6AF7puMeUSwvlTVKBt039jsdhEEeVD/recommends-icons.zip)获取 TapTap 默认素材包。
 
-![推荐位](/img/recommends.png)
+<img alt="推荐位" src={useBaseUrl("/img/recommends.png")} width="30%" />
 
 设置推荐位内需遵循如下逻辑：玩家所需内容>官方想展示内容。
 
 官方可结合论坛搜索热词，了解玩家的需求风向（以香肠派对为例）。
 
-![论坛搜索热词](/img/popular-searches.png)
+<img alt="论坛搜索热词" src={useBaseUrl("/img/popular-searches.png")} width="50%" />
 
 后台数据显示，进入论坛的玩家均为游戏的核心玩家，此类玩家更关注游戏更深度的内容 & 福利，品宣类内容对他们影响较弱。
 
@@ -157,7 +158,7 @@ import { Anchor } from "/src/docComponents/doc";
 
 子版块是 TapTap 社区全部内容（含帖子、视频、动态等）的分类合集，具备划分内容、聚集讨论、内容曝光的功能。可根据运营需要进行设置和更改。
 
-![子版块](/img/subforum.png)
+<img alt="子版块" src={useBaseUrl("/img/subforum.png")} width="30%" />
 
 ### 如何添加子版块权限
 
