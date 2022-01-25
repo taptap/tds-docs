@@ -8,6 +8,7 @@ sidebar_label: 开发指南
 import MultiLang from '/src/docComponents/MultiLang';
 import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';
+import Languages from '../_partials/languages.mdx';
 
 本文介绍如何在游戏中加入 [TapTap 内嵌动态](/sdk/embedded-moments/features/)。使用内嵌动态功能需依赖 TapTap 登录，需要导入`TapMoment` 模块。
 
@@ -332,6 +333,12 @@ postData.content = @"我是图片描述";
 玩家在动态页面可以发布图文动态和视频动态。
 「一键发布」只支持发布图文动态。
 :::
+
+## 国际化
+
+内嵌动态支持设置语言：
+
+<Languages />
 
 ## 单纯的内嵌动态初始化
 

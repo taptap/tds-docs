@@ -132,9 +132,9 @@ bool usePaymentLimit = true;
 bool showSwitchAccount = false;
 
 AntiAddictionUIKit.Init(gameIdentifier, useTimeLimit, usePaymentLimit, showSwitchAccount,
-    (antiAddictionCallbackData) => {
-        int code = antiAddictionCallbackData.code;
-        MsgExtraParams extras = antiAddictionCallbackData.extras;
+    (antiAddictionCallbackData) => {
+        int code = antiAddictionCallbackData.code;
+        MsgExtraParams extras = antiAddictionCallbackData.extras;
         // 根据 code 不同提示玩家不同信息，详见下面的说明
         if (code == 500)
         {
@@ -143,10 +143,10 @@ AntiAddictionUIKit.Init(gameIdentifier, useTimeLimit, usePaymentLimit, showSwitc
             Debug.Log("玩家登录后判断当前玩家可以进行游戏");
         }
 
-    },
-    (exception) => {
-        // 处理异常
-    },
+    },
+    (exception) => {
+        // 处理异常
+    },
 );
 ```
 
@@ -223,14 +223,14 @@ completionHandler:^(BOOL success) {
 
 ### 回调类型
 
-| 回调类型                          | code | 触发逻辑                                                     | 附带信息                     |
+| 回调类型                          | code | 触发逻辑                                                     | 附带信息                     |
 | :-------------------------------- | :--- | :----------------------------------------------------------- | :------------------------- |
-| `CALLBACK_CODE_LOGIN_SUCCESS`      | 500  | 玩家登录后判断当前玩家可以进行游戏                           | 无 |
-| `CALLBACK_CODE_NIGHT_STRICT`          | 1030 | 未成年玩家当前无法进行游戏                                         | 有 |
-| `CALLBACK_CODE_OPEN_ALERT_TIP`      | 1095 | 未成年允许游戏弹窗                                  | 有 |
-| `CALLBACK_CODE_LOGOUT` | 1000 | 退出账号 | 无                         |
-| `CALLBACK_CODE_REAL_NAME_STOP` | 9002 | 实名过程中点击了关闭实名窗 | 无 |          
-| `CALLBACK_CODE_SWITCH_ACCOUNT` | 1001 | 点击切换账号按钮（v1.0.2 新增） | 无 |         
+| `CALLBACK_CODE_LOGIN_SUCCESS`      | 500  | 玩家登录后判断当前玩家可以进行游戏                           | 无 |
+| `CALLBACK_CODE_NIGHT_STRICT`          | 1030 | 未成年玩家当前无法进行游戏                                         | 有 |
+| `CALLBACK_CODE_OPEN_ALERT_TIP`      | 1095 | 未成年允许游戏弹窗                                  | 有 |
+| `CALLBACK_CODE_LOGOUT` | 1000 | 退出账号 | 无                         |
+| `CALLBACK_CODE_REAL_NAME_STOP` | 9002 | 实名过程中点击了关闭实名窗 | 无 |          
+| `CALLBACK_CODE_SWITCH_ACCOUNT` | 1001 | 点击切换账号按钮（v1.0.2 新增） | 无 |         
 
 附带信息：
 
@@ -239,14 +239,14 @@ Unity SDK 定义了 `MsgExtraParams` 类：
 ```cs
 public class MsgExtraParams
 {
-    // 限制类型：
+    // 限制类型：
     // "0"，无限制（成年玩家）
     // "1"，有限制（未成年玩家）
-    public string restrict_type = "";
-    // 显示给玩家的提示内容
-    public string description = "";
-    // 显示给玩家的提示标题
-    public string title = "";
+    public string restrict_type = "";
+    // 显示给玩家的提示内容
+    public string description = "";
+    // 显示给玩家的提示标题
+    public string title = "";
 }
 ```
 
@@ -267,28 +267,7 @@ SDK 支持两种防沉迷授权方式：
 
 游戏可以选择通过[TDS 内建账户系统](/sdk/taptap-login/guide/start/#用-taptap-oauth-授权结果直接登录账户系统)接入 TapTap 登录，或者以[单纯 TapTap 用户认证](/sdk/taptap-login/guide/tap-login/#taptap-登录并获取登录结果)的方式接入 TapTap 登录。
 
-客户端可以在玩家完成 TapTap 登录之后，通过如下接口获取 TapTap 的 `access token`：
-
-<MultiLang>
-
-```cs
-AccessToken accessToken = TapLogin.GetAccessToken();
-string tapTapAccessToken = JsonUtility.ToJson(accessToken);
-```
-
-```java
-AccessToken accessToken = TapLoginHelper.getCurrentAccessToken();
-String tapTapAccessToken = accessToken.toJsonString();
-```
-
-```objc
-TTSDKAccessToken *accessToken = [TapLoginHelper currentAccessToken];
-NSString *tapTapAccessToken = [accessToken toJsonString];
-```
-
-</MultiLang>
-
-传入 `access token` 和玩家唯一标识 `userIdentifier`，开始 TapTap 快速认证。
+传入玩家唯一标识 `userIdentifier`，即可开始 TapTap 快速认证。
 
 其中的**玩家唯一标识** `userIdentifier`，如果接入 [TDS 内建账户系统](/sdk/taptap-login/guide/start/#用-taptap-oauth-授权结果直接登录账户系统)，可以用玩家的 `objectId`；如果使用[单纯 TapTap 用户认证](/sdk/taptap-login/guide/tap-login/#taptap-登录并获取登录结果)则可以用 `openid` 或 `unionid`。
 
@@ -297,27 +276,27 @@ NSString *tapTapAccessToken = [accessToken toJsonString];
 ```cs
 bool useTapLogin = true;
 string userIdentifier = "玩家的唯一标识";
-string tapTapAccessToken = "TapTap 第三方登录的 access token";
 
-AntiAddictionUIKit.Startup(useTapLogin, userIdentifier, tapTapAccessToken);
+AntiAddictionUIKit.Startup(useTapLogin, userIdentifier);
 ```
 
 ```java
 boolean useTapLogin = true;
 String userIdentifier = "玩家的唯一标识";
-String tapTapAccessToken = "TapTap 第三方登录的 access token";
-AntiAddictionUIKit.startup(activity, useTapLogin, userIdentifier, tapTapAccessToken);
+AntiAddictionUIKit.startup(activity, useTapLogin, userIdentifier);
 ```
 
 ```objc
 BOOL useTapLogin = YES;
 NSString *userIdentifier = @"玩家的唯一标识";
-NSString *tapTapAccessToken = @"TapTap 第三方登录的 access token";
-[AntiAddiction startUpUseTapLogin:useTapLogin
-userIdentifier:userIdentifier tapAccesssToken:tapTapAccessToken];
+[AntiAddiction startUpUseTapLogin:useTapLogin userIdentifier:userIdentifier];
 ```
 
 </MultiLang>
+
+快速认证基于 TapTap 的 `access token`，SDK 会自动获取 `access token`。
+如果自动获取失败，那么会显示手动输入实名信息的用户界面。
+
 
 ### 手动输入实名信息
 
