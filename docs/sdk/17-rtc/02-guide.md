@@ -25,7 +25,7 @@ import Mermaid from '/src/docComponents/Mermaid';
 <CodeBlock className="json">
 {`"dependencies":{
   ...
-  "com.taptap.tds.rtc":"https://github.com/TapTap/TapRTC-Unity.git#${sdkVersions.taptap.unity}",
+  "com.taptap.tds.rtc":"https://github.com/TapTap/TapRTC-Unity.git#${sdkVersions.taptap.rtc}",
 }`}
 </CodeBlock>
 </>
@@ -39,7 +39,7 @@ import Mermaid from '/src/docComponents/Mermaid';
 }  
 dependencies {  
     ... 
-    implementation (name:'TapRTC_${sdkVersions.taptap.android}', ext:'aar')
+    implementation (name:'TapRTC_${sdkVersions.taptap.rtc}', ext:'aar')
 }`}
 </CodeBlock>
 </>
