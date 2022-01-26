@@ -22,8 +22,8 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 对需要发帖的角色，请务必设置「发布官方帖」权限。相关问题请参考[权限管理](/store/store-admin/)。
 
-![gameadmin](https://img.tapimg.com/market/images/a08674151cb066ee2866a9e482d983bb.png) 
-![gameadmin](https://img.tapimg.com/market/images/3caca6221805097762bf8f82a1c59e90.png)
+![gameadmin](/img/a08674151cb066ee2866a9e482d983bb.png) 
+![gameadmin](/img/3caca6221805097762bf8f82a1c59e90.png)
 
 ### 发帖前的第二步
 
