@@ -38,17 +38,17 @@ export const entryList: (localePath: string, region: string) => Array<Entry> = (
       ],
       id: 'sdk',
     },
-    // {
-    //   title: '社区运营指南',
-    //   description: 'TapTap为开发者提供的社区新手攻略',
-    //   links: [
-    //     {
-    //       label: '查看更多',
-    //       to: '/community',
-    //     }
-    //   ],
-    //   id: 'community',
-    // },
+    {
+      title: '社区运营指南',
+      description: 'TapTap为开发者提供的社区新手攻略',
+      links: [
+        {
+          label: '查看更多',
+          to: '/community',
+        }
+      ],
+      id: 'community',
+    },
     {
       title: '资源下载',
       description: 'TapTap相关品牌元素及开发工具包下载',
