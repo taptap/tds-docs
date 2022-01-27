@@ -7,7 +7,7 @@ slug: /store
 ---
 
 
-## **Content. Amplified.**
+## **Content. Amplified.** Blah.
 
 Welcome to TapTap, the intersection where video game fanatics and creators meet to celebrate truly amazing content. We're a digital storefront, a community, and a distribution platform designed to build genuine connections and amplify unheard voices via video games. 
 
