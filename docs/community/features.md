@@ -69,7 +69,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 推送完成后，该条信息将显示在玩家的通知栏中，并新增消息提醒。
 
-<img alt="官方帖通知推送" src="/img/official-posts-notification.jpg" width="50%" />
+<img alt="官方帖通知推送" src={useBaseUrl("/img/official-posts-notification.jpg")} width="50%" />
 
 #### 论坛置顶
 
