@@ -78,7 +78,9 @@ export const entryList: (localePath: string, region: string) => Array<Entry> = (
   ]
 
   // Ugly patching for now since these links may change in recent future.
-  const innerLinks: Array<Entry> = innerLinkSource.map((elem) => {
+  const innerLinks: Array<Entry> = innerLinkSource
+    .filter((item) => item.id != 'community')
+    .map((elem) => {
     if (region === 'cn') {
       return elem;
     } else {
