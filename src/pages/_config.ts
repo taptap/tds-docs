@@ -78,34 +78,35 @@ export const entryList: (localePath: string, region: string) => Array<Entry> = (
   ]
 
   // Ugly patching for now since these links may change in recent future.
-  const innerLinks: Array<Entry> = innerLinkSource
-    .filter((item) => item.id != 'community')
-    .map((elem) => {
-    if (region === 'cn') {
-      return elem;
-    } else {
-      if (elem.id === 'sdk') {
-        elem.links = [];
-        return elem;
-      } else if (elem.id === 'download') {
-        const brandResourcesLink: ActionCellLink = {
-          label: '设计资源',
-          href: 'https://www.taptap.io/about-us/brand-resources',
-        };
-        elem.links = [brandResourcesLink];
-        return elem;
-      } else if (elem.id === 'apply') {
-        const applyLink: ActionCellLink = {
-          label: '查看更多',
-          href: 'https://www.taptap.io/doc/19',
-        };
-        elem.links = [applyLink];
-        return elem;
-      } else {
-        return elem;
-      }
-    }
-  })
+  let innerLinks: Array<Entry>
+  
+  if (region === 'cn') {
+    innerLinks = innerLinkSource
+  } else {
+    innerLinks = innerLinkSource.filter(elem => elem.id !== 'community')
+      .map((elem) => {
+        if (elem.id === 'sdk') {
+          elem.links = [];
+          return elem;
+        } else if (elem.id === 'download') {
+          const brandResourcesLink: ActionCellLink = {
+            label: '设计资源',
+            href: 'https://www.taptap.io/about-us/brand-resources',
+          };
+          elem.links = [brandResourcesLink];
+          return elem;
+        } else if (elem.id === 'apply') {
+          const applyLink: ActionCellLink = {
+            label: '查看更多',
+            href: 'https://www.taptap.io/doc/19',
+          };
+          elem.links = [applyLink];
+          return elem;
+        } else {
+          return elem;
+        }
+    })
+  }
 
   return innerLinks.map((i, index) => ({
     title: translate({
