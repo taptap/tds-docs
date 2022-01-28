@@ -25,4 +25,4 @@ slug: /tap-download
 
 ## Login Button
 
-Click [icon.zip](https://capacity-files.lncld.net/z7xSKYDvAc1ff19cDfq3Vx01v50KNR6j/TapTapLoginButton.zip) to download TapTap Login Button.
+Click [icon.zip](https://capacity-files.lcfile.com/z7xSKYDvAc1ff19cDfq3Vx01v50KNR6j/TapTapLoginButton.zip) to download TapTap Login Button.
