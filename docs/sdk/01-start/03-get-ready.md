@@ -38,7 +38,7 @@ import {Conditional} from '/src/docComponents/conditional';
 
 <Conditional region='global'>
 
-在[TapTap 开发者中心](https://developer.taptap.io/)后台开启服务配置，适用地区为中国大陆以外的国家和地区。
+在[TapTap 开发者中心](https://developer.taptap.io/)后台开启服务配置，适用地区为中国大陆以外的国家或地区。
 
 </Conditional>
 
