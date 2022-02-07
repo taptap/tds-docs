@@ -566,6 +566,8 @@ NSString *token = [AntiAddiction currentToken];
 
 </MultiLang>
 
+鉴权 Token 永久有效。
+
 ### 上报消费金额
 
 接口：
