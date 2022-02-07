@@ -28,12 +28,12 @@ import {Conditional} from '/src/docComponents/conditional';
 
 - Unity 2018.3 或更高版本
 - iOS 10 或更高版本
-- Android level 21 或更高版本
+- Android 5.0（API level 21）或更高版本
 
 </>
 <>
 
-- Android level 21 或更高版本
+- Android 5.0（API level 21）或更高版本
 
 </>
 <>

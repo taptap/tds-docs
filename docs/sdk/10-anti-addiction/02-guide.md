@@ -46,7 +46,7 @@ iOS 平台配置：
 </>
 <>
 
-最低支持 Android 5.0，编译环境为 Android Studio。
+最低支持 Android 5.0（API level 21），编译环境为 Android Studio。
 
 <ul>
 <li>将 <code>AntiAddiction_{sdkVersions.taptap.anti_addiction}.aar</code> 拷贝到游戏目录下的 <code>src/main/libs</code> 目录中</li>
