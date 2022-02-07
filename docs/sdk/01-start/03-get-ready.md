@@ -31,7 +31,7 @@ import {Conditional} from '/src/docComponents/conditional';
 ![](/img/tap_get_ready.png)
 
 :::info
-出海游戏可前往 [TapTap 国际版开发者中心](https://developer.taptap.io/)创建游戏，开启游戏服务时适用地区为其他国家和地区。
+出海游戏可前往 [TapTap 国际版开发者中心](https://developer.taptap.io/)创建游戏，开启游戏服务时适用地区为其他国家或地区。
 :::
 
 </Conditional>
