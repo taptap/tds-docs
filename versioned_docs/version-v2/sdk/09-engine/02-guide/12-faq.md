@@ -510,16 +510,20 @@ Mean Duration Time   9ms          21ms         7ms
 相关状态的描述如下：
 
 <table>
-	<tr><th width="35%">状态</th><th>描述</th></tr>
-	<tr><td>`Date`</td><td>日期</td></tr>
-	<tr><td>`API Requests`</td><td>API 请求次数</td></tr>
-	<tr><td>`Max Concurrent`</td><td>最大工作线程数</td></tr>
-	<tr><td>`Mean Concurrent`</td><td>平均工作线程数</td></tr>
-	<tr><td>`Exceed Time`</td><td>超限请求数</td></tr>
-	<tr><td>`Max QPS`</td><td>最大 QPS</td></tr>
-	<tr><td>`Mean Duration Time`</td><td>平均响应时间</td></tr>
-	<tr><td>`80% Duration Time`</td><td>80% 响应时间</td></tr>
-	<tr><td>`95% Duration Time`</td><td>95% 响应时间</td></tr>
+  <thead>
+	  <tr><th width="35%">状态</th><th>描述</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>`Date`</td><td>日期</td></tr>
+    <tr><td>`API Requests`</td><td>API 请求次数</td></tr>
+    <tr><td>`Max Concurrent`</td><td>最大工作线程数</td></tr>
+    <tr><td>`Mean Concurrent`</td><td>平均工作线程数</td></tr>
+    <tr><td>`Exceed Time`</td><td>超限请求数</td></tr>
+    <tr><td>`Max QPS`</td><td>最大 QPS</td></tr>
+    <tr><td>`Mean Duration Time`</td><td>平均响应时间</td></tr>
+    <tr><td>`80% Duration Time`</td><td>80% 响应时间</td></tr>
+    <tr><td>`95% Duration Time`</td><td>95% 响应时间</td></tr>
+  </tbody>
 </table>
 
 `metric` 接收参数与 `logs` 类似，具体参考 `lean metric -h`。
