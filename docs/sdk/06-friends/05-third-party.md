@@ -5,6 +5,7 @@ sidebar_label: 第三方好友
 ---
 
 import {Conditional} from '/src/docComponents/conditional';
+import MultiLang from '/src/docComponents/MultiLang';
 
 阅读本文前请先了解[好友模块的通用接口](/sdk/friends/guide/)。
 
