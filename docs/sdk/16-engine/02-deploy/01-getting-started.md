@@ -110,13 +110,9 @@ func Index(c echo.Context) error {
 
 <QuickStartDeploy />
 
-<Conditional if={!props.noCustomDomain}>
-
 <CloudCustomDomain noStaging={true} />
 
 例如你在控制台绑定了 `web.example.com` 这个域名，即可通过 `https://web.example.com` 访问你的应用（生产环境）。
-
-</Conditional>
 
 ## 更多
 

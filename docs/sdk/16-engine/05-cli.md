@@ -157,7 +157,7 @@ OPTIONS:
 
 登录完成之后，可以使用 `tds init` 命令来初始化一个项目，并且关联到已有的云服务应用上。
 
-<QuickStartInit noCliSetup={true} noCustomDomain={true} />
+<QuickStartInit noCliSetup={true} />
 
 ## 关联应用和分组
 

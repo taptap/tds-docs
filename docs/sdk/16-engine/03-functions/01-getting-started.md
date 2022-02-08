@@ -119,7 +119,7 @@ Hook 的编写和云函数很类似，在后文中我们会详细介绍云函数
 
 ## 部署到云引擎
 
-<QuickStartDeploy noCustomDomain={true} />
+<QuickStartDeploy />
 
 ## 更多
 

@@ -87,7 +87,7 @@ build: npm run build
 
 ### 部署到云引擎
 
-<QuickStartDeploy noCustomDomain={true} />
+<QuickStartDeploy />
 
 ## 配置 Node.js 版本
 
