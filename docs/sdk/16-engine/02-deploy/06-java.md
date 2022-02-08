@@ -16,6 +16,7 @@ import BuildingBuildLogs from '../_partials/building-build-logs.mdx';
 import CloudCustomDomain from '../_partials/cloud-custom-domain.mdx';
 import CloudHealthCheck from '../_partials/cloud-health-check.mdx';
 import BuildingSystemDependencies from '../_partials/building-system-dependencies.mdx';
+import CodeBlock from '@theme/CodeBlock';
 
 :::info
 这篇文档是针对 Java 运行环境的深入介绍，如希望快速地开始使用云引擎，请查看 [快速开始部署云引擎应用](/sdk/engine/deploy/getting-started)。

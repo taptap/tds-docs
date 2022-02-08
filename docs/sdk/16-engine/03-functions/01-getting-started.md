@@ -11,6 +11,7 @@ import PlatformRuntimes from '../_partials/platform-runtimes.mdx';
 import {CLI_BINARY} from '/src/constants/env.ts';
 import EngineRuntimes from '/src/docComponents/MultiLang/engine';
 import TabItem from '@theme/TabItem';
+import CodeBlock from '@theme/CodeBlock';
 
 <FunctionsIntroduction />
 
