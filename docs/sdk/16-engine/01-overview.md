@@ -49,4 +49,5 @@ Elasticsearch | 单节点 / 三个节点 | 默认高可用，自动切换（三�
 
 - **命令行工具** 可以用来部署、调试云函数项目，详见 [命令行工具 CLI 使用指南](/sdk/engine/cli/)。
 - 除了使用数据存储 SDK，云函数也提供了 **REST API**，详见 [云引擎 REST API 指南](/sdk/engine/functions/rest-api/)。
+- 云引擎支持绑定 **独立 IP**，详见 [云引擎独立 IP 指南](/sdk/engine/dedicated-IP)。
 - 在 [深入了解云引擎](/sdk/engine/deep-dive/) 中我们会向有经验的开发者介绍云引擎背后的一些细节。
