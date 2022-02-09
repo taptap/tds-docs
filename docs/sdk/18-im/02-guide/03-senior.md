@@ -1117,7 +1117,7 @@ LCIMConversationsQuery query = tom.getChatRoomQuery();
 query.findInBackground(new LCIMConversationQueryCallback() {
     @Override
     public void done(List<LCIMConversation> conversations, LCIMException e) {
-        if (null != e) {
+        if (null == e) {
             // 获取成功
         } else {
             // 获取失败
