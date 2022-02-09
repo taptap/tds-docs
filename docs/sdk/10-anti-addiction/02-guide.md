@@ -306,18 +306,18 @@ NSString *userIdentifier = @"玩家的唯一标识";
 
 ```cs
 string userIdentifier = "玩家的唯一标识";
-AntiAddictionUIKit.Startup(false, userIdentifier, "");
+AntiAddictionUIKit.Startup(false, userIdentifier);
 ```
 
 ```java
 String userIdentifier = "玩家的唯一标识";
-AntiAddictionUIKit.startup(activity, false, userIdentifier, "");
+AntiAddictionUIKit.startup(activity, false, userIdentifier);
 ```
 
 ```objc
 NSString *userIdentifier = @"玩家的唯一标识";
 [AntiAddiction startUpUseTapLogin:NO
-userIdentifier:userIdentifier tapAccesssToken:@""];
+userIdentifier:userIdentifier];
 ```
 
 </MultiLang>
