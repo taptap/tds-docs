@@ -1,4 +1,4 @@
-const BRAND: string = "tds";
+const BRAND: string = "leancloud";
 const REGION: string = "cn";
 
 // Cloud Engine
