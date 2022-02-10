@@ -4,8 +4,8 @@ const PREVIEW = process.env.PREVIEW ?? "false";
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: "TapTap 开发者文档",
-  url: "https://developer.taptap.com",
+  title: "TapTap Developer Documentation",
+  url: "https://developer.taptap.io",
   baseUrl: PREVIEW === "true" ? "/" : "/docs/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
@@ -14,9 +14,9 @@ const config = {
   projectName: "tds-docs",
   trailingSlash: true,
   customFields: {
-    searchUrl: "https://tds-doc-search-api.cn-e1.leanapp.cn/search",
-    mainDomainHost: "https://www.taptap.com",
-    dcDomainHost: "https://developer.taptap.com",
+    searchUrl: "https://tds-doc-search-api.avosapps.us/search",
+    mainDomainHost: "https://www.taptap.io",
+    dcDomainHost: "https://developer.taptap.io",
   },
 
   presets: [
@@ -61,42 +61,6 @@ const config = {
             to: "store",
             position: "right",
           },
-          {
-            label: "游戏服务",
-            to: "sdk",
-            position: "right",
-          },
-          {
-            label: "API",
-            to: "/sdk-api",
-            position: "right",
-          },
-          {
-            label: "下载",
-            position: "right",
-            items: [
-              {
-                label: "设计资源",
-                to: "/design",
-              },
-              {
-                label: "SDK工具包",
-                to: "/tap-download",
-              },
-              {
-                label: "Demos",
-                to: "/demos",
-              },
-            ],
-          },
-          {
-            type: "docsVersionDropdown",
-            position: "right",
-          },
-          {
-            type: "localeDropdown",
-            position: "right",
-          },
         ],
       },
       prism: {
@@ -107,7 +71,7 @@ const config = {
       metadata: [
         {
           name: "keywords",
-          content: "taptap tds 开发者 文档",
+          content: "taptap tds developer documentation",
         },
       ],
       colorMode: {
@@ -125,8 +89,8 @@ const config = {
         label: "简体中文",
       },
     },
-    defaultLocale: "zh-Hans",
-    locales: ["zh-Hans", "en"],
+    defaultLocale: "en",
+    locales: ["en"],
   },
 
   plugins: ["docusaurus-plugin-sass"],

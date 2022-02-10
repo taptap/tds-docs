@@ -1,5 +1,5 @@
-const BRAND: string = "tds";
-const REGION: string = "global";
+export const BRAND: string = "tds";
+export const REGION: string = "global";
 
 // Cloud Engine
 export const CLI_BINARY: string = BRAND === "tds" ? "tds" : "lean";
