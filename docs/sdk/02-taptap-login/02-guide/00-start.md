@@ -39,7 +39,7 @@ import MultiLang from '/src/docComponents/MultiLang';
 ```cs
 try
 {
-    // 在 iOS、Android 系统下会唤起 TapTap 客户端或以 webview 方式进行登录
+    // 在 iOS、Android 系统下会唤起 TapTap 客户端或以 WebView 方式进行登录
     // 在 Windows、macOS 系统下显示二维码（默认）和跳转链接（需配置）
     var tdsUser = await TDSUser.LoginWithTapTap();
     Debug.Log($"login sucess:{tdsUser}");
