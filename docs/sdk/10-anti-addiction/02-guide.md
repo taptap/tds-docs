@@ -254,9 +254,9 @@ Andorid SDK 回调中的 `extras` 是一个 `Map<String, Object>`，其中的内
 
 iOS SDK 回调中的 `extras` 是字符串（`NSString`）。
 
-## 防沉迷授权
+## 防沉迷认证
 
-SDK 支持两种防沉迷授权方式：
+SDK 支持两种防沉迷认证方式：
 
 1. 使用 TapTap 快速认证，传入玩家的唯一标识和 TapTap 的鉴权信息，TDS 云端会根据相应玩家在 TapTap 的实名信息判断玩家是否可以进行游戏。
 2. 不使用 TapTap 快速认证，玩家在 SDK 提供的界面中手动输入身份证号等实名信息，TDS 云端会将相应信息上报至中宣部防沉迷实名认证系统。

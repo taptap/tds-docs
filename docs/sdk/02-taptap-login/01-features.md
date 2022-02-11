@@ -79,8 +79,8 @@ TapTap 账号服务，基于标准的 OAuth 2.0 协议构建的授权登录系�
 <img src={useBaseUrl('/img/login-taptapclient.png')} alt="" width="800" />
 
 
-### 打开 webview 授权登录
+### 打开 Wbview 授权登录
 
-当用户单击 TapTap 登录按钮时，如果 TapSDK 检测到用户设备中未安装 TapTap 客户端，则会打开 webview 进行登录流程。  
+当用户单击 TapTap 登录按钮时，如果 TapSDK 检测到用户设备中未安装 TapTap 客户端，则会打开 Webview 进行登录流程。  
 
 <img src={useBaseUrl('/img/login-webview.png')} alt="" width="800" />

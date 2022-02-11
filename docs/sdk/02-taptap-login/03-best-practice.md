@@ -47,11 +47,11 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 向玩家提供登录功能前，开发者需要测试登录流程是否正常完成，检查以下事项：
 
-* 游戏是否达到[SDK 环境要求](/sdk/start/quickstart/#环境要求)。
+* 游戏是否达到 [SDK 环境要求](/sdk/start/quickstart/#环境要求)。
 * 开发者是否了解 TapSDK 中两种 TapTap 登录方式，并选择了适合游戏的一种。参考[接入 TapTap 登录](/sdk/taptap-login/guide/start/)。
 * 是否在 TapTap 开发者后台填写了 Android 平台或 iOS 平台相关配置。参考[配置签名证书](/sdk/start/quickstart/#配置签名证书)和[格式要求](/sdk/taptap-login/features/#配置签名证书)。
 * 测试用户是否具备相关权限。参考[测试用户管理](/sdk/start/test-accounts/)。
-* 在未安装 TapTap 客户端的设备上打开游戏，是否能以 webview 方式完成登录流程，是否能获取玩家授权的基本信息。
+* 在未安装 TapTap 客户端的设备上打开游戏，是否能以 Webview 方式完成登录流程，是否能获取玩家授权的基本信息。
 * 在安装了最新版 TapTap 客户端的设备上打开游戏，是否能拉起 TapTap 客户端完成登录流程，是否能获取玩家授权的基本信息。
 * 登录授权完成后，退出游戏再次进入，是否可以[静默登录](/sdk/taptap-login/features/#实现静默登录)。
 * 登录授权未完成就退出游戏，或者点了取消，再次进入游戏，是否能重新开始登录流程。
