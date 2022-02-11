@@ -316,6 +316,7 @@ LCPush.sendMessageInBackground("Tarara invited you to play Arc Symphony with her
   "action":     "com.your_company.push" // 在使用自定义 receiver 时必须提供
 }
 ```
+
 上面 silent 属性，是透传消息与通知栏消息的标志。silent 为 true，表示消息不展示在通知栏；silent 为 false，表示消息会展示在通知栏。
 
 前面讲过，在 PushService 里面接收到推送消息之后，在转发消息之前，会判断消息是否过期，以及是否收到了重复的消息，只有非过期、非重复的消息，才会会通过发送本地通知或者广播，将事件告知应用程序。
