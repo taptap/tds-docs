@@ -129,7 +129,7 @@ roundCorner | 是否为圆角
 **配置跳转 TapTap 应用**
 
 
-用户无 TapTap 应用时，默认会打开 webview 登录
+用户无 TapTap 应用时，默认会打开 WebView 登录
 
 打开 info.plist，添加如下配置，然后请替换 clientID 为你在控制台获取的 clientID
 
@@ -188,7 +188,7 @@ roundCorner | 是否为圆角
 ```cs
 try
 {
-    // 在 iOS、Android 系统下，会唤起 TapTap 客户端或以 webview 方式进行登录
+    // 在 iOS、Android 系统下，会唤起 TapTap 客户端或以 WebView 方式进行登录
     // 在 Windows、macOS 系统下显示二维码（默认）和跳转链接（需配置）
     var accessToken = await TapLogin.Login();
     Debug.Log($"TapTap 登录成功 accessToken: {accessToken.ToJson()}");

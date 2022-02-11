@@ -13,7 +13,7 @@ import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';
 
 本文介绍如何在游戏中接入 TDS 提供的客服系统 SaaS 服务。
-为了兼容尽可能多的游戏，目前 SDK 只生成网页地址，游戏需要自己加载 webview。
+为了兼容尽可能多的游戏，目前 SDK 只生成网页地址，游戏需要自己加载 WebView。
 
 ## SDK 初始化
 
@@ -190,7 +190,7 @@ https://{your-domain}/in-app/v1/categories/{rootCategoryID}{path}
       * `/tickets` 用户工单列表页，可以看到用户所有历史工单。
       * `/tickets/new?category_id={id}` 提交新工单的页面，一般是用户从落地页选择分类之后自动跳转过去，也可以由应用带着指定的 `category_id` 直接打开。`category_id` 的值可以在客服系统后台的工单分类详情页面找到（**客服后台右上角 > 设置 > 客服设置 > 工单分类**）。
 
-如前所述，目前游戏需要自己加载 webview。
+如前所述，目前游戏需要自己加载 WebView。
 不过 SDK 提供了接口帮助生成工单 URL。
 
 <MultiLang>
@@ -278,7 +278,7 @@ NSString *webUrl = [TapSupport getSupportWebUrl:@"path"];
 
 ## 未读通知
 
-玩家成功登录且打开工单 webview 后，就可以调用 `FetchUnReadStatus` 方法查询当前是否有未读工单。
+玩家成功登录且打开工单 WebView 后，就可以调用 `FetchUnReadStatus` 方法查询当前是否有未读工单。
 如有未读工单，则会调用初始化时传入的回调函数。
 
 <MultiLang>
@@ -324,4 +324,4 @@ SDK 提供的自动轮询策略为 10s 一次，如果没有未读消息则增�
 一旦轮询到未读消息，则间隔重置为 10s
 另外，调用 `Pause`、`Resume` 方法都会重置轮询间隔时间为 10s。
 
-注意，如果玩家没有成功登录，或者之前从未打开工单 webview，那么轮询会一直返回错误，因为客服系统尚未关联这个用户。
+注意，如果玩家没有成功登录，或者之前从未打开工单 WebView，那么轮询会一直返回错误，因为客服系统尚未关联这个用户。
