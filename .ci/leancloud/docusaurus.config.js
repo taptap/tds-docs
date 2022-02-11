@@ -4,19 +4,19 @@ const PREVIEW = process.env.PREVIEW ?? "false";
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: "TapTap 开发者文档",
-  url: "https://developer.taptap.com",
-  baseUrl: PREVIEW === "true" ? "/" : "/docs/",
+  title: "LeanCloud 开发者文档",
+  url: "https://docs.leancloud.cn",
+  baseUrl: "/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
-  favicon: "img/favicon.ico",
+  favicon: "img/lc-favicon.ico",
   organizationName: "taptap",
   projectName: "tds-docs",
   trailingSlash: true,
   customFields: {
-    searchUrl: "https://tds-doc-search-api.cn-e1.leanapp.cn/search",
-    mainDomainHost: "https://www.taptap.com",
-    dcDomainHost: "https://developer.taptap.com",
+    searchUrl: "", // TODO
+    mainDomainHost: "https://www.leancloud.cn",
+    dcDomainHost: "https://www.leancloud.cn",
   },
 
   presets: [
@@ -53,49 +53,7 @@ const config = {
             label: "文档首页",
             to: "/",
             position: "right",
-            activeBaseRegex:
-              "^" + PREVIEW === "true" ? "/" : "/docs/" + "(?!.+)",
-          },
-          {
-            label: "游戏商店",
-            to: "store",
-            position: "right",
-          },
-          {
-            label: "游戏服务",
-            to: "sdk",
-            position: "right",
-          },
-          {
-            label: "API",
-            to: "/sdk-api",
-            position: "right",
-          },
-          {
-            label: "下载",
-            position: "right",
-            items: [
-              {
-                label: "设计资源",
-                to: "/design",
-              },
-              {
-                label: "SDK工具包",
-                to: "/tap-download",
-              },
-              {
-                label: "Demos",
-                to: "/demos",
-              },
-            ],
-          },
-          {
-            type: "docsVersionDropdown",
-            position: "right",
-          },
-          {
-            type: "localeDropdown",
-            position: "right",
+            activeBaseRegex: "^" + "/" + "(?!.+)",
           },
         ],
       },
@@ -107,7 +65,7 @@ const config = {
       metadata: [
         {
           name: "keywords",
-          content: "taptap tds 开发者 文档",
+          content: "leancloud 开发者 文档",
         },
       ],
       colorMode: {
@@ -126,7 +84,7 @@ const config = {
       },
     },
     defaultLocale: "zh-Hans",
-    locales: ["zh-Hans", "en"],
+    locales: ["zh-Hans"],
   },
 
   plugins: ["docusaurus-plugin-sass"],

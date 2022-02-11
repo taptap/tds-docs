@@ -1,4 +1,4 @@
-import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
+import { BRAND, REGION } from "../constants/env";
 
 interface ConditionalProps {
   children: React.ReactElement[];
@@ -9,11 +9,6 @@ interface ConditionalProps {
 
 export function Conditional(props: ConditionalProps) {
   const { children, brand, region } = props;
-
-  const { siteConfig } = useDocusaurusContext();
-  const BRAND = (siteConfig.customFields?.brand ?? "tds") as string;
-  const REGION = (siteConfig.customFields?.region ?? "cn") as string;
-
   if (
     (!brand || brand === BRAND) &&
     (!region || region === REGION) &&
