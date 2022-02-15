@@ -127,7 +127,7 @@ sidebar_label: 功能介绍
 
 ### 一键发布
 
-游戏内任意场景需要截图分享的，TDS 提供[一键发布](/sdk/embedded-moments/guide/#一键发布)到内嵌动态内，仅支持图文动态发布。
+游戏内任意场景需要截图分享的，TDS 提供一键发布到内嵌动态内，仅支持图文动态发布。
 
 ![](/img/embedded-moments/share.png)
 
