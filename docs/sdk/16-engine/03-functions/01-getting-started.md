@@ -106,13 +106,11 @@ Hook 的编写和云函数很类似，在后文中我们会详细介绍云函数
 
 <p>可以使用 <code>{CLI_BINARY} up</code> 进行本地运行和调试，命令行工具会自动注入关联应用的环境变量，让云函数可以访问到线上数据存储中的数据。</p>
 
-<pre>
 <CodeBlock className='sh'>
 {`$ ${CLI_BINARY} up
 [INFO] The project is running at: http://localhost:3000
 [INFO] Cloud function debug console (if available) is accessible at: http://localhost:3001`}
 </CodeBlock>
-</pre>
 
 <p><code>{CLI_BINARY} up</code> 同时默认在 3001 端口启动了一个用于调试云函数的控制台（<a href='http://localhost:3001'>http://localhost:3001</a>），开发者可以通过这个控制台来调试云函数和 Hook，模拟特定的输入。</p>
 

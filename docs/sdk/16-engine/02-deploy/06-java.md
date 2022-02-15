@@ -64,11 +64,9 @@ java.runtime.version=11
 
 在本地构建（如使用 `mvn package`）出 WAR 包后，可以在使用命令行工具部署时添加 `--war` 选项表示上传 WAR 包而不是源代码：
 
-<pre>
 <CodeBlock className='sh'>
 {`${CLI_BINARY} deploy --war`}
 </CodeBlock>
-</pre>
 
 这种情况下在云端不会有安装依赖和构建的过程，WAR 包会被直接放入 Servlet 容器运行。
 

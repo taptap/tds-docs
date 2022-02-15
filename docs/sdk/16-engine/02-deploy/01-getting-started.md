@@ -99,11 +99,9 @@ func Index(c echo.Context) error {
 
 在确保所有的依赖都正确安装之后，就可以在项目根目录用我们的命令行工具来启动本地运行了：
 
-<pre>
 <CodeBlock className='sh'>
 {`$ ${CLI_BINARY} up`}
 </CodeBlock>
-</pre>
 
 更多有关命令行工具和本地调试的内容请看 [云引擎命令行工具使用指南](/sdk/engine/cli/)。
 

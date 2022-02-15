@@ -33,7 +33,6 @@ import CodeBlock from '@theme/CodeBlock';
 
 <p>要将一个已有的项目关联到云引擎应用，可以使用 <code>{CLI_BINARY} switch</code>：</p>
 
-<pre>
 <CodeBlock>
 {`$ ${CLI_BINARY} switch
 [?] Please select an app:
@@ -41,7 +40,6 @@ import CodeBlock from '@theme/CodeBlock';
  => 1
 Switching to my-engine-app (group: web)`}
 </CodeBlock>
-</pre>
 
 ## 查看日志
 
@@ -97,11 +95,9 @@ Switching to my-engine-app (group: web)`}
 
 在你的项目根目录运行：
 
-<pre>
 <CodeBlock className='sh'>
 {`${CLI_BINARY} deploy`}
 </CodeBlock>
-</pre>
 
 就会开始上传本地的代码，体验版云引擎会直接部署到生产环境；标准版云引擎则会先部署到一个与生产环境几乎完全相同的预备环境以供测试。
 
