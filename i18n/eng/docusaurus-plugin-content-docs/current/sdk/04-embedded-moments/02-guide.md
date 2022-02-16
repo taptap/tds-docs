@@ -96,8 +96,8 @@ The `code` in the callback function refers to the type of the event. The followi
 | CALLBACK_CODE_GET_NOTICE_FAIL    | 20100 | Failed to retrieve notifications.                                                                          |
 | CALLBACK_CODE_MOMENT_APPEAR      | 30000 | Embedded Moments is opened.                                                                                |
 | CALLBACK_CODE_MOMENT_DISAPPEAR   | 30100 | Embedded Moments is closed.                                                                                |
-| CALLBACK_CODE_ClOSE_CANCEL       | 50000 | The user refused to close all the Embedded Moments pages (the "Cancel" button on the pop-up is tapped).    |
-| CALLBACK_CODE_ClOSE_CONFIRM      | 50100 | The user confirmed to close all the Embedded Moments pages (the "Confirm" button on the pop-up is tapped). |
+| CALLBACK_CODE_CLOSE_CANCEL       | 50000 | The user refused to close all the Embedded Moments pages (the "Cancel" button on the pop-up is tapped).    |
+| CALLBACK_CODE_CLOSE_CONFIRM      | 50100 | The user confirmed to close all the Embedded Moments pages (the "Confirm" button on the pop-up is tapped). |
 | CALLBACK_CODE_LOGIN_SUCCESS      | 60000 | Logged in successfully.                                                                                    |
 | CALLBACK_CODE_SCENE_EVENT        | 70000 | Callback for scenario-based portals.                                                                       |
 
@@ -235,7 +235,7 @@ mConfig.orientation = TapMomentOrientationDefault;
 | Field name   | Type    | Required | Description                                                |
 | ------------ | ------- | -------- | ---------------------------------------------------------- |
 | sceneId      | String  | Yes      | The ID of the scenario-based portal.                       |
-| eventType    | String  | Yes      | The type of the event, like `VIEW`, `FORWARD`, and` VOTE`. |
+| eventType    | String  | Yes      | The type of the event, like `VIEW`, `FORWARD`, and `VOTE`. |
 | eventPayload | String  | Yes      | Custom JSON string depending on the event type.            |
 | timestamp    | Integer | Yes      | UNIX timestamp in ms.                                      |
 
@@ -273,8 +273,8 @@ TapMoment.closeWithConfirmWindow("Are you ready?", "The game is ready to start."
 
 The player's selection will be returned with a callback:
 
-- `CALLBACK_CODE_ClOSE_CANCEL` (50000) means the player selected "Cancel" and wants to stay in Embedded Moments.
-- `CALLBACK_CODE_ClOSE_CONFIRM` (50100) means the player selected "Confirm" and wants to return to the game.
+- `CALLBACK_CODE_CLOSE_CANCEL` (50000) means the player selected "Cancel" and wants to stay in Embedded Moments.
+- `CALLBACK_CODE_CLOSE_CONFIRM` (50100) means the player selected "Confirm" and wants to return to the game.
 
 To close the Embedded Moments without confirming:
 
