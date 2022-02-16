@@ -11,5 +11,6 @@ sidebar_position: 30
 4. 游戏与部分第三方 SDK 可能存在冲突，建议开发者优先接入 TDS 提供的服务，并使用 [TapCanary](https://www.taptap.com/app/222711) 进行自测，如遇问题，可提交工单咨询
 5. 请保证 TapTap 商店内为游戏的最新资源包，通过 WebView 的方式实现更新可能导致游戏更新文件安装到本地，与 TapPlay 环境内文件发生冲突
 6. 目前暂不支持微信/QQ 登录，游戏如需登录，推荐开发者接入 [Tap 登录](/sdk/taptap-login/features/) 或使用手机验证码登录
-7. 如游戏支持内购，请确保接入的第三方支付 SDK 为[微信官方 JSAPi](https://pay.weixin.qq.com/wiki/doc/api/H5.php?chapter=15_1) & [支付宝官方 JSSDK ](https://opendocs.alipay.com/open/203/105285)
+7. 如游戏支持内购，请确保接入的第三方支付 SDK 为[微信官方 JSAPI](https://pay.weixin.qq.com/wiki/doc/api/H5.php?chapter=15_1) & [支付宝官方 JSSDK ](https://opendocs.alipay.com/open/203/105285)
+
 8. 未避免用户卸载游戏需存档丢失，TapPlay 现已支持存档备份功能，详情请前往 DC 后台 - 商店 - TapPlay 查看
