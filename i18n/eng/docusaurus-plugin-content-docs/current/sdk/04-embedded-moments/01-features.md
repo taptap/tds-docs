@@ -53,7 +53,7 @@ The following functions are also available to you:
 
 ![](/img/embedded-moments/post.png)
 
-- **Interactions**: Players can **like, comment, and forward** other players' moments.
+- **Interactions**: Players can **like, comment, and repost** other players' moments.
 
 ![](/img/embedded-moments/repost.png)
 
@@ -130,7 +130,7 @@ You can place buttons that can display badges in your game so that the players c
 
 :::
 
-### One-Tap Publishing
+### Quick Sharing
 
 Players can take screenshots within the game and quickly share them to Embedded Moments. Only text and images can be shared through this method.
 
