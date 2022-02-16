@@ -13,4 +13,4 @@ sidebar_position: 30
 6. 目前暂不支持微信/QQ 登录，游戏如需登录，推荐开发者接入 [Tap 登录](/sdk/taptap-login/features/) 或使用手机验证码登录
 7. 如游戏支持内购，请确保接入的第三方支付 SDK 为[微信官方 JSAPI](https://pay.weixin.qq.com/wiki/doc/api/H5.php?chapter=15_1) & [支付宝官方 JSSDK ](https://opendocs.alipay.com/open/203/105285)
 
-8. 未避免用户卸载游戏需存档丢失，TapPlay 现已支持存档备份功能，详情请前往 DC 后台 - 商店 - TapPlay 查看
+8. 为避免用户卸载游戏导致存档丢失，TapPlay 现已支持存档备份功能，详情请前往 DC 后台 - 商店 - TapPlay 查看
