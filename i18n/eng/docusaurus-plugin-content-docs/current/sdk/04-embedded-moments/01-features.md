@@ -109,7 +109,7 @@ You can make any of the objects in your game as a portal that opens up Embedded 
 
 :::tip
 
-1. The styles of the portals shall be designed to match the scenes they're placed at. TDS doesn't provide any guidelines for such portals so that it's possible for your game to convey a feeling of unity to the players.
+1. TDS doesn't provide any guidelines for the design of portals. We encourage you to design your portals so they look harmonious with the scenes they're placed at.
 2. The landing page of a portal can be set up to be an article or a specific module according to your own needs.
 
 :::
