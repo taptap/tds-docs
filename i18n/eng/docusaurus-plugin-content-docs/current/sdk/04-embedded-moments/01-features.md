@@ -156,7 +156,7 @@ To have Embedded Moments better fit in the scenes in the game and not make playe
 
 :::
 
-![](/img/embedded-moments/tapmoment-theme-config.png)
+![](/img/io/embedded-moments/tapmoment-theme-config.png)
 
 ### Banner Configuration
 
@@ -169,17 +169,17 @@ You can set up banners in Embedded Moments to help you broadcast your events to 
 
 :::
 
-![](/img/embedded-moments/banner-config.png)
+![](/img/io/embedded-moments/banner-config.png)
 
 ### Scenario-Based Portal Configuration
 
 You can set up scenario-based portals in "Game Services" > "Embedded Moments" > "Scenario-based Portal". Once you submit a **portal name, landing page type, and landing page**, you can use the generated portal ID in your game. This module doesn't require any reviews, and you are free to change the landing page of each portal.
 
-![](/img/embedded-moments/scenario-based-portal-configuration.png)
+![](/img/io/embedded-moments/scenario-based-portal-configuration.png)
 
 ## Group Management Center
 
-![](/img/embedded-moments/forum-management.png)
+![](/img/io/embedded-moments/forum-management.png)
 
 ### Group Data
 
