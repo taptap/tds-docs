@@ -79,7 +79,7 @@ If you want to add a "Walkthroughs" module, please reach out to us by submitting
 
 #### Can I set up walkthroughs in the TapTap Developer Center? How should I do it?
 
-Unfortunately you can't set up walkthroughs yourself at this time. Please submit a **ticket** to us and we will have our professional editor team help you figure things out.
+Unfortunately, you can't set up walkthroughs yourself at this time. Please submit a **ticket** to us and we will have our professional editor team help you figure things out.
 
 #### Submitting Tickets
 
@@ -87,7 +87,7 @@ Unfortunately you can't set up walkthroughs yourself at this time. Please submit
 
 ### Feeds
 
-Players who logged in to TapTap can view the moments posted by their friends and the officials. When there are new moments available, there will be a **badge** on the "Follow" section on the navigation bar. This ensures that players will never miss out important updates.
+Players who logged in to TapTap can view the moments posted by their friends and the officials. When there are new moments available, there will be a **badge** on the "Follow" section on the navigation bar. This ensures that players will never miss out on important updates.
 
 ![](/img/embedded-moments/follow.png)
 
@@ -105,7 +105,7 @@ Players can view notifications by tapping the "Alarm" icon on the top right corn
 
 ### Scenario-Based Portals
 
-You can make any of the objects in your game as a portal that opens up Embedded Moments. You can even specify landing pages for certain scenes in the [Developer Center](#scenario-based-portals). This could be helpful if you want to allow players to quickly get help from the community when they're stuck on certain scenes in the game.
+You can make any of the objects in your game as a portal that opens up Embedded Moments. You can even specify landing pages for certain scenes in the [Developer Center](#scenario-based-portal-configuration). This could be helpful if you want to allow players to quickly get help from the community when they're stuck on certain scenes in the game.
 
 :::tip
 
@@ -144,7 +144,7 @@ While the player is browsing Embedded Moments, if there are events that demand t
 
 ## Administration
 
-### Theme
+### Theme Configuration
 
 To have Embedded Moments better fit in the scenes in the game and not make players feel cut off, TDS allows you to customize the theme of the Embedded Moments. You can upload a background image and specify the colors of texts in "Game Services" > "Embedded Moments" > "Theme".
 
@@ -158,7 +158,7 @@ To have Embedded Moments better fit in the scenes in the game and not make playe
 
 ![](/img/embedded-moments/tapmoment-theme-config.png)
 
-### Banners
+### Banner Configuration
 
 You can set up banners in Embedded Moments to help you broadcast your events to the players. To set up banners, go to "Game Services" > "Embedded Moments" > "Banner Configuration". **A title, background image, and link** is required for each banner.
 
@@ -171,7 +171,7 @@ You can set up banners in Embedded Moments to help you broadcast your events to 
 
 ![](/img/embedded-moments/banner-config.png)
 
-### Scenario-Based Portals
+### Scenario-Based Portal Configuration
 
 You can set up scenario-based portals in "Game Services" > "Embedded Moments" > "Scenario-based Portal". Once you submit a **portal name, landing page type, and landing page**, you can use the generated portal ID in your game. This module doesn't require any reviews, and you are free to change the landing page of each portal.
 
@@ -187,8 +187,8 @@ To help you better assess the value of Embedded Moments and get feedback about t
 
 ### Recommendations
 
-You can set up recommendations in "Group Management Center" > "Recommendation". **A title, image, and link** is required for each recommendation. Adding and editing recommendations is subject to review.
+You can set up recommendations in "Group Management Center" > "Recommendation". **A title, image, and link** is required for each recommendation. Adding and editing recommendations are subject to review.
 
 ### Sub-groups
 
-You can set up sub-groups in "Group Management Center" > "Sub-group". **A name (in multiple languages)** is required for each sub-group. Adding and editing sub-groups is subject to review.
+You can set up sub-groups in "Group Management Center" > "Sub-group". **A name (in multiple languages)** is required for each sub-group. Adding and editing sub-groups are subject to review.
