@@ -249,7 +249,7 @@ mConfig.orientation = TapMomentOrientationDefault;
 | FOLLOW    | { isCancel: boolean }       | The user follows (or unfollows) a post.           |
 | COMMENT   | {}                          | The user comments on a post.                      |
 
-## CLosing Embedded Moments
+## Closing Embedded Moments
 
 The player can close the Embedded Moments at any time to return to the game. In certain scenarios, the game itself can also request to close the Embedded Moments.
 
