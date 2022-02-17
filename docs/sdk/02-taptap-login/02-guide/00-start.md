@@ -10,6 +10,11 @@ import MultiLang from '/src/docComponents/MultiLang';
 重要提示：在**测试登录功能前**务必完成 [配置签名证书](/sdk/start/quickstart/#配置签名证书) 和 [添加测试用户](/sdk/start/test-accounts/)，否则无法正常使用 TapTap 登录功能。
 :::
 
+:::tip
+推荐阅读博客文章[登录最佳实践](https://blog.taptap.dev/posts/tapsdk-taplogin-bestpractice)，了解 TapSDK 登录的整个流程。
+:::
+:::
+
 接入 TapTap 登录有两种方式：
 
 1. 基于[内建账户系统](/sdk/authentication/features)接入 TapTap 登录；
