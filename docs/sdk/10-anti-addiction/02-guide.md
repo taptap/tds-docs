@@ -10,7 +10,10 @@ import sdkVersions from '/src/docComponents/sdkVersions';
 
 :::info
 使用 TDS 实名认证和防沉迷服务之前，需要完成[中宣部实名认证系统的注册和接口测试](/sdk/anti-addiction/features/#准备工作)工作，并在 TapTap 开发者中心后台完成[参数配置](/sdk/anti-addiction/features/#完成开发者中心配置)。
-推荐阅读博客：**[实名认证和防沉迷功能接入](https://blog.taptap.dev/posts/tapsdk-tap-antiaddiction-practice)**，了解 TapSDK 登录的整个流程
+:::
+
+:::tip
+推荐阅读博客：[实名认证和防沉迷功能接入](https://blog.taptap.dev/posts/tapsdk-tap-antiaddiction-practice)，加深对实名认证和防沉迷功能的理解。
 :::
 
 ## SDK 配置
