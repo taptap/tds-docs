@@ -89,22 +89,24 @@ function Footer() {
           </section>
         </div>
 
-        <div>
-          <section className={styles.licence}>
-            {getLicenceLinks(BRAND, REGION, currentLocale).map((item) => (
-              <a
-                href={item.link}
-                target="_blank"
-                rel="noreferrer nofollow noopener"
-                className={styles.licenceItem}
-                key={item.label}
-              >
-                {item.icon && <img src={item.icon} alt={item.label} />}
-                {item.label}
-              </a>
-            ))}
-          </section>
-        </div>
+        {getLicenceLinks(BRAND, REGION, currentLocale).length > 0 && (
+          <div>
+            <section className={styles.licence}>
+              {getLicenceLinks(BRAND, REGION, currentLocale).map((item) => (
+                <a
+                  href={item.link}
+                  target="_blank"
+                  rel="noreferrer nofollow noopener"
+                  className={styles.licenceItem}
+                  key={item.label}
+                >
+                  {item.icon && <img src={item.icon} alt={item.label} />}
+                  {item.label}
+                </a>
+              ))}
+            </section>
+          </div>
+        )}
       </div>
     </footer>
   );
