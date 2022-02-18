@@ -8,7 +8,6 @@
 import React from 'react';
 import clsx from 'clsx';
 import DocPaginator from '@theme/DocPaginator';
-import DocVersionBanner from '@theme/DocVersionBanner';
 import DocVersionBadge from '@theme/DocVersionBadge';
 import Seo from '@theme/Seo';
 import type {Props} from '@theme/DocItem';
@@ -60,7 +59,6 @@ export default function DocItem(props: Props): JSX.Element {
           className={clsx('col', {
             [styles.docItemCol]: !hideTableOfContents,
           })}>
-          <DocVersionBanner />
           <div className={styles.docItemContainer}>
             <article>
               {shouldDisplayVersionBadge && <DocVersionBadge />}
