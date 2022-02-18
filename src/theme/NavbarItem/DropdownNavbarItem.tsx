@@ -22,6 +22,7 @@ import type {LinkLikeNavbarItemProps} from '@theme/NavbarItem';
 
 import NavbarNavLink from '@theme/NavbarItem/NavbarNavLink';
 import NavbarItem from '@theme/NavbarItem';
+import './override.scss';
 
 const dropdownLinkActiveClass = 'dropdown__link--active';
 
