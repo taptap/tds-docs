@@ -41,7 +41,7 @@ TDS 提供了两种好友模型：
 <CodeBlock className="json">
 {`"dependencies":{
   ...
-  "com.taptap.tds.friends": "https://github.com/TapTap/TapFriends-Unity.git#${sdkVersions.taptap.unity}",
+  "com.taptap.tds.friends": "https://github.com/TapTap/TapFriends-Unity.git#${sdkVersions.taptap.unity_friends}",
 }`}
 </CodeBlock>
 
