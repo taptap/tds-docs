@@ -14,7 +14,7 @@ const config = {
   projectName: "tds-docs",
   trailingSlash: true,
   customFields: {
-    searchUrl: "", // TODO
+    searchUrl: "https://lc-doc-search-api.cn-e1.leanapp.cn/search",
     mainDomainHost: "https://www.leancloud.cn",
     dcDomainHost: "https://www.leancloud.cn",
   },
