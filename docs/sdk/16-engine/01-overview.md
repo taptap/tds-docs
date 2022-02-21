@@ -5,6 +5,7 @@ sidebar_label: 总览
 ---
 
 import PlatformIntroduction from './_partials/platform-introduction.mdx';
+import {BRAND} from '/src/constants/env.ts';
 
 <PlatformIntroduction />
 
@@ -26,7 +27,7 @@ Go | >= 1.10 | go mod | [Go 运行环境](/sdk/engine/deploy/go/) | [golang-gett
 
 ## 云函数和 Hook
 
-云函数是云引擎提供的一种经过高度封装的函数计算功能，可以自动地序列化 [数据存储](/sdk/storage/features/) 服务中的各种数据类型，在我们的各个客户端 SDK 中也有对应的支持。Hook 功能则允许开发者在数据存储中的对象被创建、更新、删除，或用户登录、认证，实时通讯发送消息、创建对话、客户端上下线时触发自定义的逻辑，进行额外的权限检查。
+<p>云函数是云引擎提供的一种经过高度封装的函数计算功能，可以自动地序列化 <a href={BRAND==='leancloud'?'https://leancloud.cn/docs/storage_overview.html':'/sdk/storage/features'}>数据存储</a> 服务中的各种数据类型，在我们的各个客户端 SDK 中也有对应的支持。Hook 功能则允许开发者在数据存储中的对象被创建、更新、删除，或用户登录、认证，实时通讯发送消息、创建对话、客户端上下线时触发自定义的逻辑，进行额外的权限检查。</p>
 
 :::tip
 使用云函数几乎不需要你有传统后端开发经验，可以帮助开发者专注在业务逻辑上，请从 [快速部署云函数和 Hook](/sdk/engine/functions/getting-started/) 开始编写你的第一个云函数。
@@ -36,7 +37,7 @@ Go | >= 1.10 | go mod | [Go 运行环境](/sdk/engine/deploy/go/) | [golang-gett
 
 ## LeanDB 数据库
 
-除了使用 [数据存储](/sdk/storage/features/) 服务外，云引擎也提供了业界使用广泛的一些数据库的托管方案：
+除了使用 <a href={BRAND==='leancloud'?'https://leancloud.cn/docs/storage_overview.html':'/sdk/storage/features'}>数据存储</a> 服务外，云引擎也提供了业界使用广泛的一些数据库的托管方案：
 
 数据库 | 集群配置 | 集群可用性 | 文档页面
 --- | --- | --- | ---

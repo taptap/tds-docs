@@ -8,7 +8,7 @@ import CloudCustomDomain from '../_partials/cloud-custom-domain.mdx';
 import PlatformIntroduction from '../_partials/platform-introduction.mdx';
 import PlatformRuntimes from '../_partials/platform-runtimes.mdx';
 import EngineRuntimes from '/src/docComponents/MultiLang/engine';
-import {CLI_BINARY} from '/src/constants/env.ts';
+import {BRAND, CLI_BINARY} from '/src/constants/env.ts';
 import TabItem from '@theme/TabItem';
 import CodeBlock from '@theme/CodeBlock';
 
@@ -29,7 +29,7 @@ import CodeBlock from '@theme/CodeBlock';
 
 云引擎对应用进程内部几乎没有干预，你可以选用你喜欢的开发框架和第三方组件库、自行组织项目的目录结构。云引擎的负载均衡会转发绑定域名下的所有 HTTP 请求，你可以在应用内使用 Web 框架来自行设计 HTTP API 中的路径、请求和响应的格式。
 
-目前云引擎主要为无状态的 HTTP 服务而优化，不支持在文件系统上持久地存储数据，应用可以将数据存储到 [数据存储](/sdk/storage/features) 或 LeanDB 提供的 [Redis](/sdk/engine/database/redis/)、[MongoDB](/sdk/engine/database/mongo/) 和 [Elasticsearch](/sdk/engine/database/es/) 中。
+<p>目前云引擎主要为无状态的 HTTP 服务而优化，不支持在文件系统上持久地存储数据，应用可以将数据存储到 <a href={BRAND==='leancloud'?'https://leancloud.cn/docs/storage_overview.html':'/sdk/storage/features'}>数据存储</a> 或 LeanDB 提供的 <a href="/sdk/engine/database/redis/">Redis</a>、<a href="/sdk/engine/database/mongo/">MongoDB</a> 和 <a href="/sdk/engine/database/es/">Elasticsearch</a> 中。</p>
 
 <p>要将一个已有的项目关联到云引擎应用，可以使用 <code>{CLI_BINARY} switch</code>：</p>
 

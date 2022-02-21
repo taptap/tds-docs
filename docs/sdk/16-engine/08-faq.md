@@ -4,6 +4,8 @@ title: 云引擎 FAQ
 sidebar_label: FAQ
 ---
 
+import {BRAND} from '/src/constants/env.ts';
+
 ## 云引擎功能
 
 ### 云引擎都支持哪些语言？
@@ -30,7 +32,7 @@ sidebar_label: FAQ
 
 云引擎是一个托管后端服务的平台，适用于所有的 Web 后端应用，对于程序内部的逻辑没有侵入。
 
-在此基础上，开发者可以选择在程序内接入云引擎的 SDK，来使用云函数和 Hook 等功能，云函数与 [数据存储](/sdk/storage/features/) 服务有深度的整合，对于已经在使用数据存储服务的开发会非常方便。
+<p>在此基础上，开发者可以选择在程序内接入云引擎的 SDK，来使用云函数和 Hook 等功能，云函数与 <a href={BRAND==='leancloud'?'https://leancloud.cn/docs/storage_overview.html':'/sdk/storage/features'}>数据存储</a> 服务有深度的整合，对于已经在使用数据存储服务的开发会非常方便。</p>
 
 不接入云引擎 SDK 也可以使用云函数以外的所有功能，云引擎也提供了业界广泛使用的 [Redis](/sdk/engine/database/redis/)、[MongoDB](/sdk/engine/database/mongo/) 和 [Elasticsearch](/sdk/engine/database/es/) 供开发者存储数据。
 
