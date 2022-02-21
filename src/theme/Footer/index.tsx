@@ -21,7 +21,7 @@ function Footer() {
 
   return (
     <footer className={styles.footer}>
-      <div className={styles.footerContent}>
+      <div className={styles.stage}>
         <div>
           <section className={styles.logo}>
             {/* @ts-ignore */}

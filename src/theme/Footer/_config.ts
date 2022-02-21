@@ -108,11 +108,11 @@ export const getNavLinks = (
     return NAV_LINKS_LEANCLOUD_CN;
   } else {
     if (region === "cn") {
-      return NAV_LINKS_TDS_CN.map((item, index) => ({
-        ...item,
+      return NAV_LINKS_TDS_CN.map((link, index) => ({
+        ...link,
         label: translate({
-          message: item.label,
-          id: `tds-footer-${item.label}`,
+          message: link.label,
+          id: `tds-footer-${link.label}`,
           description: `from Footer Left Link ${index + 1}`,
         }),
       }));
@@ -184,11 +184,11 @@ export const getLicenceLinks = (
   } else {
     if (region === "cn") {
       if (locale === "zh-Hans") {
-        return LICENCE_LINKS_TDS_CN.map((item, index) => ({
-          ...item,
+        return LICENCE_LINKS_TDS_CN.map((link, index) => ({
+          ...link,
           label: translate({
-            message: item.label,
-            id: `tds-footer-${item.label}`,
+            message: link.label,
+            id: `tds-footer-${link.label}`,
             description: `from Footer Right Link ${index + 1}`,
           }),
         }));

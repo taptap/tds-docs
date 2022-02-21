@@ -42,13 +42,16 @@ const LOGOS = {
 interface LogoProps {
   noLabel?: boolean;
   reversed?: boolean;
+  size?: number;
 }
 
-const Logo = ({ noLabel, reversed }: LogoProps) => {
+const Logo = ({ noLabel, reversed, size = 1 }: LogoProps) => {
   const { siteConfig } = useDocusaurusContext();
   const mainDomainHost = (siteConfig.customFields?.mainDomainHost ??
     "") as string;
   const dcDomainHost = (siteConfig.customFields?.dcDomainHost ?? "") as string;
+
+  const getHeight = (base: number): number => base * size;
 
   return (
     <div className={styles.logo}>
@@ -57,7 +60,7 @@ const Logo = ({ noLabel, reversed }: LogoProps) => {
           title={BRAND === "leancloud" ? "LeanCloud" : "TapTap"}
           className={`${styles.logoImage} ${reversed ? styles.reversed : ""}`}
           style={{
-            height: BRAND === "leancloud" ? 20 : 24,
+            height: getHeight(BRAND === "leancloud" ? 20 : 24),
             transform: BRAND === "leancloud" ? "none" : "translateY(1px)",
           }}
         >
