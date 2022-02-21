@@ -14,5 +14,5 @@ mv tmp docs/sdk
 
 yarn build --out-dir build-leancloud
 
-git clean -df
-git checkout -f
+# git clean -df
+# git checkout -f
