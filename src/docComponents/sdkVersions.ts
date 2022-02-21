@@ -15,7 +15,7 @@ const sdkVersions = {
       realtime: "5.0.0-rc.7",
     },
     java: "8.2.4",
-    csharp: "0.10.1",
+    csharp: "0.10.2",
   },
 };
 
