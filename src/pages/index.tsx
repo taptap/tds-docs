@@ -15,7 +15,7 @@ const HomePage = () => (
         <div className={styles.hero}>
           <div className={styles.title}>
             {/* @ts-ignore */}
-            <Logo noLabel size={BRAND === "leancloud" ? 1.04 : 1.6} />
+            <Logo noLabel noLink size={BRAND === "leancloud" ? 1.04 : 1.6} />
             <Translate
               id="tds-home-开发者文档"
               description="from HomePage Title"
