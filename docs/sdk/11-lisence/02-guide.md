@@ -120,21 +120,21 @@ TapLicenseHelper.check(Activity activity);
 
 为了保证上线后，正版验证服务能够正常生效，**请务必按照以下说明完成自测。**
 
-#### 1.上传 APK
+#### 1. 上传 APK
 
 前往开发者中心选择需要测试的游戏，依次转入**游戏服务 > 生态服务 > 正版验证 > 游戏配置 > 包名**。
 
 上传需要测试的 APK 至开发者中心，等待审核通过。
 
-#### 2.添加测试用户
+#### 2. 添加测试用户
 
 前往**开发者中心 > 游戏服务 > 生态服务 > 正版验证 > 游戏配置 > 测试用户管理**，填写测试用户的 TapTap ID 。
 
-#### 3.售卖设置
+#### 3. 售卖设置
 
 在**开发者中心 > 商店 > 售卖设置**中为游戏设置测试价格，建议测试价格设置为 0.01 元，提交并等待审核通过。
 
-#### 4.开始测试
+#### 4. 开始测试
 
 打开 TapTap 客户端，使用上面填写的测试用户账号登录，从游戏商店页面开始正版验证的测试。
 
@@ -146,28 +146,27 @@ TapLicenseHelper.check(Activity activity);
 
 完成上面的测试环节后，游戏可以开始售卖。按照以下步骤操作：
 
-#### 1.完善应用信息
+#### 1. 完善应用信息
 
 前往开发者中心，按照[物料要求](/store/store-material/)填写应用信息，等待审核通过。
 
-#### 2.设置售卖价格
+#### 2. 设置售卖价格
 
 前往**开发者中心 > 商店 > 售卖设置**，开启售卖开关，设置游戏正常售卖金额，提交审核，并同步对接的 TapTap 运营相关信息。
 
-#### 3.正式上线
+#### 3. 正式上线
 
 所有流程都确保顺利后，游戏可<Conditional region='cn'>[正式上线](/store/store-release/)</Conditional><Conditional region='global'>[正式上线](/store/store-publish-game)</Conditional>.
 
 ## 常见问题
 
-### Android 11 无法拉起 TapTap 客户端
+### Android 11 或更高版本无法拉起 TapTap 客户端
 
-Android 11 加强了隐私保护策略，引入了大量变更和限制，其中一个重要变更——[软件包可见性](https://developer.android.com/about/versions/11/privacy/package-visibility) ，将会导致第三方应用无法拉起 TapTap 客户端，从而影响 TapTap 相关功能的正常使用 ，包括但不限于更新唤起 TapTap 、购买验证等功能。
-特别需要注意的是，Android 11 的该变更只会影响到升级 ` targetSdkVersion=30 ` 的应用，未升级的应用暂不受影响。
+Android 11（API level 30）之后加强了隐私保护策略，引入了大量变更和限制，其中一个重要变更——[软件包可见性](https://developer.android.com/about/versions/11/privacy/package-visibility)，将会导致第三方应用无法拉起 TapTap 客户端，从而影响 TapTap 相关功能的正常使用，包括但不限于更新唤起 TapTap、购买验证等功能。
 
 **方案一：**
 
-编译时将 `targetSdkVersion` 改为 29（目前设置成 30 会触发该问题）。
+编译时将 `targetSdkVersion` 改为 29（目前设置成 >= 30 会触发该问题）。
 
 **方案二：**
 
