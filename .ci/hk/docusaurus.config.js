@@ -61,6 +61,10 @@ const config = {
             to: "store",
             position: "right",
           },
+          {
+            type: "localeDropdown",
+            position: "right",
+          },
         ],
       },
       prism: {
@@ -90,7 +94,7 @@ const config = {
       },
     },
     defaultLocale: "en",
-    locales: ["en"],
+    locales: ["en", "zh-Hans"],
   },
 
   plugins: ["docusaurus-plugin-sass"],

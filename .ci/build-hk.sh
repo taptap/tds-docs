@@ -7,6 +7,7 @@ cp .ci/hk/env.ts src/constants/env.ts
 cp .ci/hk/docusaurus.config.js docusaurus.config.js
 cp .ci/hk/sidebars.js sidebars.js
 mv i18n/eng i18n/en
+mv i18n/zh-Hansg i18n/zh-Hans
 cp -r i18n/en/docusaurus-plugin-content-docs/current docs
 
 yarn build --out-dir build-hk

@@ -56,19 +56,19 @@ export const getNavLinks = (
 
   const NAV_LINKS_TDS_GLOBAL: (NavLinkInternal | NavLinkExternal)[] = [
     {
-      label: "Terms of Service",
+      label: "服务协议",
       url: "https://www.taptap.io/terms",
     },
     {
-      label: "Privacy Policy",
+      label: "隐私政策",
       url: "https://www.taptap.io/privacy-policy",
     },
     {
-      label: "Report Infringement",
+      label: "侵权投诉",
       link: "/store/store-complaint/",
     },
     {
-      label: "Contact Us",
+      label: "联系我们",
       link: "/store/store-contact/",
     },
   ];
@@ -107,18 +107,15 @@ export const getNavLinks = (
   if (brand === "leancloud") {
     return NAV_LINKS_LEANCLOUD_CN;
   } else {
-    if (region === "cn") {
-      return NAV_LINKS_TDS_CN.map((link, index) => ({
-        ...link,
-        label: translate({
-          message: link.label,
-          id: `tds-footer-${link.label}`,
-          description: `from Footer Left Link ${index + 1}`,
-        }),
-      }));
-    } else {
-      return NAV_LINKS_TDS_GLOBAL;
-    }
+    const NAV_LINKS = region === "cn" ? NAV_LINKS_TDS_CN : NAV_LINKS_TDS_GLOBAL;
+    return NAV_LINKS.map((link, index) => ({
+      ...link,
+      label: translate({
+        message: link.label,
+        id: `tds-footer-${link.label}`,
+        description: `from Footer Left Link ${index + 1}`,
+      }),
+    }));
   }
 };
 
