@@ -47,7 +47,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 向玩家提供登录功能前，开发者需要测试登录流程是否正常完成，检查以下事项：
 
-* 游戏是否达到 [SDK 环境要求](/sdk/start/quickstart/#环境要求)。
+* 游戏是否达到[SDK 环境要求](/sdk/start/quickstart/#环境要求)。
 * 开发者是否了解 TapSDK 中两种 TapTap 登录方式，并选择了适合游戏的一种。参考[接入 TapTap 登录](/sdk/taptap-login/guide/start/)。
 * 是否在 TapTap 开发者后台填写了 Android 平台或 iOS 平台相关配置。参考[配置签名证书](/sdk/start/quickstart/#配置签名证书)和[格式要求](/sdk/taptap-login/features/#配置签名证书)。
 * 测试用户是否具备相关权限。参考[测试用户管理](/sdk/start/test-accounts/)。

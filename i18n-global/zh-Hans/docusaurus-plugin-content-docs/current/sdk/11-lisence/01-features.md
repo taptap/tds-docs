@@ -23,7 +23,7 @@ TapTap 的正版验证服务适用于付费下载的游戏，当玩家在使用�
 
 ## 售卖设置
 
-TapTap 的正版验证服务需与付费游戏的售卖设置配合使用。TapTap 为开发者和玩家提供游戏付费下载的服务，并支持多种支付渠道。开发者可在 <Conditional region='cn'>[TapTap 开发者中心](https://developer.taptap.com/)</Conditional><Conditional region='global'>[TapTap 开发者中心](https://developer.taptap.io/)</Conditional> 的售卖设置中，开启付费下载的服务，并设定游戏价格。如游戏有折扣活动，可以开启折扣功能并设定折扣时间与折扣价格。
+TapTap 的正版验证服务需与付费游戏的售卖设置配合使用。TapTap 为开发者和玩家提供游戏付费下载的服务，并支持多种支付渠道。开发者可在 <Conditional region='cn'>[TapTap 开发者中心](https://developer.taptap.com/)</Conditional><Conditional region='global'>[TapTap 开发者中心](https://developer.taptap.io/)</Conditional>的售卖设置中，开启付费下载的服务，并设定游戏价格。如游戏有折扣活动，可以开启折扣功能并设定折扣时间与折扣价格。
 
 <Conditional region='cn'>
 <img src={useBaseUrl('/img/license_introduce2.png')} alt="" width="1000" />

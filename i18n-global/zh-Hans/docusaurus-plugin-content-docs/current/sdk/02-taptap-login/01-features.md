@@ -5,6 +5,7 @@ sidebar_label: 功能介绍
 ---
 
 import useBaseUrl from '@docusaurus/useBaseUrl';
+import {Conditional} from '/src/docComponents/conditional';
 
 为了访问 TapTap Developer Services（以下简称 TDS）的相关服务功能，你的用户需要拥有一个 TapTap 账号。如果用户未使用 TapTap 账号，你的应用在调用 TDS 服务 API 时可能会遇到错误。本文档介绍了如何在你的应用中实现 TapTap 登录体验。
 
@@ -44,9 +45,17 @@ TapTap 账号服务，基于标准的 OAuth 2.0 协议构建的授权登录系�
 
 登录按钮的设计样式，在[《登录按钮设计规范》](/design/)允许的范围内，可适当添加与游戏气质相符的风格元素。此外，TDS 也为你准备了不同场景下 TapTap 登录按钮的设计图标，帮助你快速实现登录流程，点击 [《TapTap 登录按钮设计图标》](/tap-download)下载资源。
 
+<Conditional region='cn'>
 
 <img src={useBaseUrl('/img/login-feature01.png')} alt="" width="800" />
 
+</Conditional>
+
+<Conditional region='global'>
+
+<img src={useBaseUrl('/img/io/login-feature01.png')} alt="" width="800" />
+
+</Conditional>
 
 ### 多种登录方式
 
@@ -70,17 +79,36 @@ TapTap 账号服务，基于标准的 OAuth 2.0 协议构建的授权登录系�
 
 移动应用的 TapTap 账号服务，需要与 TapTap 移动客户端配合使用。TapSDK 会根据用户设备中，TapTap 客户端的安装情况，来自动选择使用合适的登录流程。  
 
-[点击此处](https://www.taptap.com/mobile)下载 TapTap 移动客户端。
+<Conditional region='cn'>[点击此处](https://www.taptap.com/mobile)</Conditional><Conditional region='global'>[点击此处](https://www.taptap.io/mobile)</Conditional>下载 TapTap 移动客户端。
 
 ### 唤起 TapTap 客户端授权登录
 
 当用户单击 TapTap 登录按钮时，如果 TapSDK 检测到用户设备中已经安装了 TapTap 客户端，会自动唤起设备中的 TapTap 客户端，并识别客户端中的登录信息，进行授权登录。
 
+<Conditional region='cn'>
+
 <img src={useBaseUrl('/img/login-taptapclient.png')} alt="" width="800" />
 
+</Conditional>
+
+<Conditional region='global'>
+
+<img src={useBaseUrl('/img/io/login-taptapclient.png')} alt="" width="800" />
+
+</Conditional>
 
 ### 打开 WebView 授权登录
 
 当用户单击 TapTap 登录按钮时，如果 TapSDK 检测到用户设备中未安装 TapTap 客户端，则会打开 WebView 进行登录流程。  
 
+<Conditional region='cn'>
+
 <img src={useBaseUrl('/img/login-webview.png')} alt="" width="800" />
+
+</Conditional>
+
+<Conditional region='global'>
+
+<img src={useBaseUrl('/img/io/login-webview.png')} alt="" width="800" />
+
+</Conditional>

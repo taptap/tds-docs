@@ -28,12 +28,12 @@ import {Conditional} from '/src/docComponents/conditional';
 
 - Unity 2018.3 或更高版本
 - iOS 10 或更高版本
-- Android 5.0（API level 21）或更高版本
+- Android level 21 或更高版本
 
 </>
 <>
 
-- Android 5.0（API level 21）或更高版本
+- Android level 21 或更高版本
 
 </>
 <>
@@ -62,8 +62,8 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
 
 <CodeBlock className="json">
 {`"dependencies":{
-    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}",
-    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity_login}",
+    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity_common}",
     "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#${sdkVersions.taptap.unity}",
     "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}",
     "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
@@ -290,7 +290,7 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
       ```
 
    b) 删除 `info.plist` 里面的 Application Scene Manifest  
-   ![](/img/tap_ios_appmanifest.png)
+      ![](/img/tap_ios_appmanifest.png)
 
    c) 删除 AppDelegate.m 文件中的两个管理 Scenedelegate 生命周期代理方法
 
@@ -328,7 +328,7 @@ var config =  new TapConfig.Builder()
     .ClientID("your_client_id")  // 必须，开发者中心对应 Client ID
     .ClientToken("your_client_token")  // 必须，开发者中心对应 Client Token
     .ServerURL("https://your_server_url") // 必须，开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 服务设置 > 自定义域名 绑定域名
-    .RegionType(RegionType.CN)  // 非必须，默认 CN 表示中国大陆，IO 表示其他国家或地区
+    .RegionType(RegionType.CN)  // 非必须，默认 CN 表示国内，IO 为国外
     .ConfigBuilder();
 TapBootstrap.Init(config);
 ```
@@ -339,7 +339,7 @@ TapConfig tdsConfig = new TapConfig.Builder()
         .withClientId("your_client_id")  // 开发者中心对应 Client ID
         .withClientToken("your_client_token")  // 开发者中心对应 Client Token
         .withServerUrl("https://your_server_url")  // 开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 服务设置 > 自定义域名 绑定域名
-        .withRegionType(TapRegionType.CN)  // TapRegionType.CN: 中国大陆  TapRegionType.IO: 其他国家或地区
+        .withRegionType(TapRegionType.CN)  // TapRegionType.CN: 国内  TapRegionType.IO: 国外
         .build();
 TapBootstrap.init(MainActivity.this, tdsConfig);     
 ```
@@ -349,7 +349,7 @@ TapBootstrap.init(MainActivity.this, tdsConfig);
 TapConfig *config = [TapConfig new];
 config.clientId = @"your_client_id";  // 开发者中心对应 Client ID
 config.clientToken = @"your_client_token";  // 开发者中心对应 Client Token
-config.region = TapSDKRegionTypeCN;  // TapSDKRegionTypeCN: 中国大陆  TapSDKRegionTypeIO: 其他国家或地区
+config.region = TapSDKRegionTypeCN;  // TapSDKRegionTypeCN: 国内  TapSDKRegionTypeIO: 国外
 config.serverURL = @"https://your_server_url";  // 开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 服务设置 > 自定义域名 绑定域名
 [TapBootstrap initWithConfig:config];
 ```
@@ -358,7 +358,7 @@ config.serverURL = @"https://your_server_url";  // 开发者中心 > 你的游�
 
 `client_id`、`client_token`信息可在 **开发者中心 > 你的游戏 > 游戏服务 > 应用配置** 查看。
 
-`server_url` 请**使用 HTTPS 协议**，其中的域名请参考 **[域名绑定](/sdk/start/get-ready/#域名)** 的文档。
+`server_url` 可参考 **[域名绑定](/sdk/start/get-ready/#域名)** 的文档。
 
 ## 接入功能
 
@@ -377,7 +377,7 @@ TapSDK 提供了众多功能。请在初始化 SDK 后，根据项目需要，�
 
 Android 和 iOS 应用需要在 TapTap 开发者中心进入你的游戏，依次选择 **游戏服务 > 生态服务 > TapTap 登录** 配置应用的相关信息（如下图所示），否则测试登录功能时会返回 `signature not match` 报错信息，无法正常使用 TapTap 登录功能。
 
-![](/img/start_getready_info.png)
+![](/img/io/login-config.png)
 
 ### 添加测试用户
 

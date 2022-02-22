@@ -26,19 +26,15 @@ import {Conditional} from '/src/docComponents/conditional';
 
 一个 client 仅能对应一个地区。这是由于在 TapTap 的账号系统内，将中国大陆用户与全球用户做了隔离区分，互不相通。
 
-在 [TapTap 开发者中心](https://developer.taptap.com/)后台开启服务配置，适用地区为中国大陆。
-
 ![](/img/tap_get_ready.png)
-
-:::info
-出海游戏可前往 [TapTap 国际版开发者中心](https://developer.taptap.io/)创建游戏，开启游戏服务时适用地区为其他国家或地区。
-:::
 
 </Conditional>
 
 <Conditional region='global'>
 
-在[TapTap 开发者中心](https://developer.taptap.io/)后台开启服务配置，适用地区为中国大陆以外的国家或地区。
+适用于中国大陆以外的国家和地区。
+
+![](/img/io/tap_get_ready.png)
 
 </Conditional>
 

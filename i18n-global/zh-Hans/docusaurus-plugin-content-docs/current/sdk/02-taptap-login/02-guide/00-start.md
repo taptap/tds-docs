@@ -5,13 +5,10 @@ sidebar_label: 功能接入
 ---
 
 import MultiLang from '/src/docComponents/MultiLang';
-
-:::info
-重要提示：在**测试登录功能前**务必完成 [配置签名证书](/sdk/start/quickstart/#配置签名证书) 和 [添加测试用户](/sdk/start/test-accounts/)，否则无法正常使用 TapTap 登录功能。
-:::
+import {Conditional} from '/src/docComponents/conditional';
 
 :::tip
-推荐阅读博客文章[登录最佳实践](https://blog.taptap.dev/posts/tapsdk-taplogin-bestpractice)，了解 TapSDK 登录的整个流程。
+重要提示：在**测试登录功能前**务必完成 [配置签名证书](/sdk/start/quickstart/#配置签名证书) 和 [添加测试用户](/sdk/start/test-accounts/)，否则无法正常使用 TapTap 登录功能。
 :::
 
 接入 TapTap 登录有两种方式：
@@ -27,8 +24,12 @@ import MultiLang from '/src/docComponents/MultiLang';
 
 相反，如果你的游戏自己实现了账户系统，也不打算使用好友、成就等 TapSDK 提供的其他功能，仅仅需要接入「TapTap 用户登录」功能，那么可以考虑使用第二种方式。
 
+<Conditional region='cn'>
+
 注意，第一种方式基于内建账户系统，使用量超出免费额度后需要[付费](https://developer.taptap.com/product-intro/price)。
 因此，使用第一种方式时请确保余额充足，以免因为欠费导致服务停用，玩家无法登录。
+
+</Conditional>
 
 我们首先介绍第一种方式，然后介绍[第二种方式](/sdk/taptap-login/guide/tap-login/)。
 
@@ -47,10 +48,6 @@ try
     // 在 Windows、macOS 系统下显示二维码（默认）和跳转链接（需配置）
     var tdsUser = await TDSUser.LoginWithTapTap();
     Debug.Log($"login sucess:{tdsUser}");
-    // 获取 TDSUser 属性
-    var objectId = tdsUser.ObjectId;     // 用户唯一标识
-    var nickname = tdsUser["nickname"];  // 昵称
-    var avatar = tdsUser["avatar"];      // 头像
 }
 catch (Exception e)
 {
@@ -275,7 +272,7 @@ SDK **默认支持扫码登录**。
 
 :::
 
-![PC 登录](/img/taptap-login-pc.png)
+![PC 登录](/img/io/taptap-login-pc.png)
 
 ### Windows 平台
 

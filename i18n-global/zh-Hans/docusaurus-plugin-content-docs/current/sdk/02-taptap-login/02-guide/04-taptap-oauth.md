@@ -138,7 +138,7 @@ MAC=$(printf "%s\n%s\n%s\n%s\n%s\n443\n\n" "${TS}" "${NONCE}" "${METHOD}" "${REQ
 
 AUTHORIZATION=$(printf 'MAC id="%s",ts="%s",nonce="%s",mac="%s"' "${ACCESS_TOKEN}" "${TS}" "${NONCE}" "${MAC}")
 
-curl -s -H"Authorization:${AUTHORIZATION}" "https://${REQUEST_HOST}${REQUEST_URI}"
+curl -s -H"Authorization:${AUTHORIZATION}" "https://${REQUEST_HOST}${REQUEST_URI}${CLIENT_ID}"
 ```
 
 </Conditional>
@@ -171,7 +171,7 @@ MAC=$(printf "%s\n%s\n%s\n%s\n%s\n443\n\n" "${TS}" "${NONCE}" "${METHOD}" "${REQ
 
 AUTHORIZATION=$(printf 'MAC id="%s",ts="%s",nonce="%s",mac="%s"' "${ACCESS_TOKEN}" "${TS}" "${NONCE}" "${MAC}")
 
-curl -s -H"Authorization:${AUTHORIZATION}" "https://${REQUEST_HOST}${REQUEST_URI}"
+curl -s -H"Authorization:${AUTHORIZATION}" "https://${REQUEST_HOST}${REQUEST_URI}${CLIENT_ID}"
 ```
 
 </Conditional>
