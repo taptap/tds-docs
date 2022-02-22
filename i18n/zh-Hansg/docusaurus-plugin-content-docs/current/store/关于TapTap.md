@@ -2,6 +2,7 @@
 id: store-about
 title: 关于 TapTap
 sidebar_label: 关于 TapTap
+sidebar_position: 10
 slug: /store
 ---
 

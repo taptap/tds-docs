@@ -2,6 +2,7 @@
 id: store-agree
 title: TapTap 游戏审核规范细则
 sidebar_label: TapTap 游戏审核规范细则
+sidebar_position: 20
 ---
 import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
 

@@ -2,6 +2,7 @@
 id: store-devagreement
 title: TapTap 平台开发者协议
 sidebar_label: TapTap 平台开发者协议
+sidebar_position: 15
 ---
 
 欢迎您使用 TapTap 平台提供的服务！
