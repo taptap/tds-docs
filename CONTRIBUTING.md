@@ -15,55 +15,61 @@
 
 ## 文本格式
 
-所有博客文章都在 `_posts` 路径下： https://github.com/taptap/tds-blog/tree/main/_posts
+当前最新版本的中文文档在 `docs` 路径下，图片在 `static/img` 目录下，这是最常用到的两个目录。
 
-所有博客文章用到的图片放在 `public/post-images` 下： https://github.com/taptap/tds-blog/tree/main/public/post-images
+完整的目录结构见 README 「目录结构」小节的说明。
 
-博客文章使用 [markdown] 语法，文章开头的 front matter 通过 [YAML] 指定文章的元数据（标题、发布日期、摘要等）。
-文件名会成为 URL 的一部分，因此请使用小写英文字母、数字、连字符（`-`），例如 `taptap-design-system.md`。
+文档使用 [markdown] 语法（在标准 Markdown 语法之外，还支持[一些扩展][docusaurus-markdown]。
+文章开头的 front matter 通过 [YAML] 指定一些元数据，包括标题、侧边栏标签、URL 路径等。
 
 [markdown]: https://www.markdown-cheatsheet.com
+[docusaurus-markdown]: https://docusaurus.io/docs/markdown-features
 [YAML]: https://quickref.me/yaml
 
 下面是一个例子：
 
 ```markdown
 ---
-title: "标题"
-excerpt: "摘要"
-date: "YYYY-MM-DD"
-author: "作者"
+id: features
+title: TapPlay 功能介绍
+sidebar_label: 功能介绍
+sidebar_position: 10
 ---
 
-markdown 内容
+## TapPlay 是什么？
+
+​TapPlay 是利用沙盒技术实现的可以让用户直接通过 TapTap 玩游戏的功能服务，旨在帮助开发者实现低成本、高效率的游戏开发，并提高游戏分发的转化率
+
+（以下省略）
 ```
 
-如有 markdown 无法表达的内容，可以使用 HTML。
-
-如果你了解 markdown 和 github 协作的一般流程，那么现在就可以开始给 TDS 博客贡献内容了。
+如果你了解 markdown 和 github 协作的一般流程，那么现在就可以开始给 TDS 文档贡献内容了。
 期待你的第一个 [PR]！
 
 [PR]: https://docs.github.com/en/get-started/quickstart/github-flow
 
 如果你不了解这些，也没关系，可以继续阅读下面的指南。
 
-## GitHub 在线编辑博客
+## GitHub 在线编辑
 
 ### 编辑
 
-在[博客的 GitHub 仓库页面][repo]点击右上角的「Fork」图标，fork 本仓库。
+刚开始向文档贡献内容，一般从编辑现有文档开始。
+因此，我们先介绍编辑现有文档的流程。
 
-![fork](images/github-fork.png)
+在[TDS 文档的 GitHub 仓库页面][repo]点击右上角的「Fork」图标，fork 本仓库。
+
+![fork](github-fork.png)
 
 如果之前没有 fork 过，会 fork 一个新仓库；如果之前已经 fork 过，会提示你的 fork 的地址：
 
-![already forked](images/forked.png)
+![already forked](forked.png)
 
-
+TODO: 自己 fork 上的内容可能不是最新的，需要到 GitHub 上去点 Fetch upstream
 
 **在你 fork 的仓库页面**， 按下 `.` （英文句号），即可进入 GitHub 的编辑模式。
 
-[repo]: https://github.com/taptap/tds-blog/
+[repo]: https://github.com/taptap/tds-docs
 
 取决于操作系统和浏览器配置，这个快捷键也可能失效。
 如果快捷键不起效，可以把浏览器地址栏的 `github.com` 换成 `github.dev`，通过这种方式同样可以进入编辑模式。
@@ -71,6 +77,127 @@ markdown 内容
 这个 GitHub 编辑模式其实是一个功能精（shòu）简（xiàn）的 vscode 编辑器，所以它的用法可以参考 [vscode 的官方文档](https://code.visualstudio.com/docs)。
 
 最左侧由上往下的图标依次是菜单、文件、查找、源码控制等功能。
+
+要编辑现有文档，首先需要找到对应的文件。
+最直观的方式是直接搜索。
+比如，《学习社区模块》中的「只有论坛主管理员可添加/删除版主权限」，我们想要把 `/` 改成顿号（`、`），这样更符合中文的行文习惯。
+那我们就可以直接点击最左侧的「查找」（放大镜图标），搜索这句话：
+
+![search text](github-dev-search.png)
+
+点击即可跳转到相应文件的相应位置。
+
+注意，默认情况下搜索只会显示部分结果。
+如果找不到相应文件，**需要点击 `Enable indexing` 启用索引。**
+
+![search index](enable-index.png)
+
+启用索引会把整个仓库的索引保存在本地浏览器中，所以需要一些时间，请耐心等待。
+索引完成后即可搜索整个仓库。
+
+还有一种方式是根据 URL 路径来查找文件。
+比如《学习社区模块》的 URL 是 `https://developer.taptap.com/docs/community/features/`.
+去掉网络协议（`https://`）、域名（`developer.taptap.com`）后，URL 路径为 `/docs/community/features/`，那么对应的文件路径即为 `/docs/community/features.md`。
+
+再比如，《开发者应对 DDoS 攻击问题的指引文档》的 URL 为 `https://developer.taptap.com/docs/ddos/`，所以对应的文件路径为 `/docs/ddos.md`。
+
+注意，有部分不在侧边栏显示的、隐藏入口的页面的 URL 和文件路径并不对应，这种情况请通过搜索查找。
+还有一些文件的命名没有遵循和 URL 路径保持一致的原则，这些属于历史遗留问题，会逐渐切换到标准的命名方式。
+如果受此问题困扰，可以在文档仓库提个 issue。
+
+### 预览和提交
+
+右上角有三个图标，最左侧的图标可以分栏显示预览，可以实时预览 markdown 的渲染效果。
+
+![preview icon](github-preview.png)
+
+预览仅供参考：
+
+- 图片无法在 GitHub 在线编辑界面预览，在预览界面图片都显示为损坏图标。
+- 许多 docusaurus 的 markdown 语法扩展预览 GitHub 在线编辑界面都不支持。
+- 个别 markdown 的渲染实现细节，docusaurus 和 GitHub 在线编辑界面存在差异。
+- docusaurs 定制了 CSS 样式。
+
+![preview UI](split-preview.png)
+
+最后在 Source Control 面板看一下变动情况，没问题的话就**点击 Changes 右侧的加号，让改动进入 Staged Changes**.
+
+![stage](git-stage.png)
+
+最后在上面的 Message 文本框写一下 Commit Message，简单说明下做了什么改动。
+大多数情况下，用一句话简短描述改动内容即可。
+如有更多细节需要说明，可以空一行写详情。
+
+```
+简短描述
+
+可选的详情
+```
+
+按 Ctrl/Command + Enter 即可提交。
+
+![commit](git-commit.png)
+
+提交后访问 https://github.com/YOUR-GITHUB-USERNAME/tds-docs/pulls （请替换 URL 中的用户名）
+
+![new pull request](new-pull-request.png)
+
+在 Pull Requests 页面点击右上方绿色的 New pull request 按钮，会显示你所做的改动。
+
+![compare changes](compare-changes.png)
+
+大致看一下有没有问题，如果有问题的话，就关闭页面，重新回到 https://github.com/YOUR-GITHUB-USERNAME/tds-docs/ 按 `.` 进入编辑模式再修改。
+
+没问题的话，点绿色的 Create pull request 按钮进入 PR 表单。
+PR 标题 GitHub 会自动填写，如果不满意，可以修改一下。
+右方 Reviewer 选择 weakish 或 fuchenshi 或 kylinbin 或其他相关的同事，然后再点绿色的 Create pull request 按钮提交。
+
+![open a pull request](open-a-pr.png)
+
+如果你还不是文档仓库的协作者，那么右方 Reviewer 处有可能无法选择 reviewer。
+如果你是内部贡献者，可以在 slack 上找 fuchenshi 添加为协作者；
+如果你是外部贡献者，reviewer 可以留空，我们会定期 review 文档仓库的 PR.
+
+提交后 CI 会自动构建博客预览，请稍候。
+预览构建完成后，机器人 netlify bot 的回复中会出现「😎 Browse the preview: 」，点击后面的 URL 即可查看效果。
+不同于 GitHub 编辑模式自动的预览，这个是真正的预览，未来发布后，线上显示的效果和预览一模一样，包括各种格式和图片。
+有两条机器人回复，第一个回复（URL 中的路径为 `tds-docs`）的是 TDS 文档国内版的预览，第二个回复（URL 中的路径为 `tds-docs-intl`）的是 TDS 文档国际版的预览。
+
+![ci preview](ci-preview.png)
+
+上图中，「All checks have passed」标明预览构建成功。
+
+如果查看预览的过程中发现了问题，请重新回到 https://github.com/YOUR-GITHUB-USERNAME/tds-blog/ 按 `.` 进入编辑模式再修改。
+提交修改（Source Control 面板按 Ctrl/Command + Enter）后，PR 会自动更新，也会自动再次触发预览构建，请再次等待机器人 netlify bot 的回复中出现「😎 Browse the preview: 」,再次查看预览效果。
+
+一切就绪后，等 reviewer 通过 PR 并合并，文章就正式发布到线上了。
+正式发布之后，再进入编辑模式修改就不会自动更新 PR 了（因为相关 PR 已经合并了），需要开新的 PR.
+
+如果预览构建失败，netlify 机器人的回复中会显示「❌ Deploy Preview for tds-docs-intl failed.」。
+
+![ci failed](ci-failed.png)
+
+请点击 Netlify 机器人回复的「🔍 Inspect the deploy log」后的链接查看构建日志。
+结合构建日志检查构建失败的原因。
+常见的错误包括修改内容不符合 docusaurus 的 markdown 扩展语法，以及指向的内部页面不存在。
+如认为所做修改没有问题，或者无法确定问题所在，可以在 PR 的评论中注明情况（比如怀疑可能是哪里有问题）。
+内部贡献者也可以在 slack 上询问。
+
+## Tips
+
+Confluence wiki、Notion 等网页上的富文本内容，可以复制到 [Mark Text]（开源，推荐使用）、[Typora]（收费）、[StackEdit] （开源，可以在浏览器中直接使用，但对一些复杂格式的支持不如 Mark Text 和 Typora 全）可以快速转换为 markdown 代码。
+注意，部分格式转换时会丢失或错误，需要手工修正。
+
+[Mark Text]: https://marktext.app
+[StackEdit]: https://stackedit.io/app
+[Typora]: https://typora.io
+
+命令行工具 [pandoc] 支持转换多种文件为 markdown，同样，部分格式转换时会丢失或错误，需要手工修正。
+
+[pandoc]: https://pandoc.org/index.html
+
+
+TODO
 
 1. 点击「文件」图标，在左栏点击 `_posts` 旁的箭头可展开文件夹，之后在鼠标悬浮到 EXPLORER 右侧的 `...` 的下方，会出现四个图标，点击最左侧的「New File」文件即可新增文件。
 
@@ -91,11 +218,6 @@ markdown 内容
     markdown 内容
     ```
 
-
-4. 右上角有三个图标，最左侧的图标可以分栏显示预览，可以实时预览 markdown 的渲染效果（仅供参考，部分格式预览效果不一定准确）
-
-    ![preview](images/preview.png)
-
 5. 如果需要添加图片，依次点击 public -> post-images 左侧的箭头，展开文件夹后，直接把图片拖过去即可上传。
 
     - 图片的命名也请使用小写英文字母、数字、连字符（`-`），**不要包含空格**（URL 中空格需要转义，如果文件名包含空格，后续 markdown 里引用图片的时候还要转义空格，比较麻烦，而且万一忘了转义图片就无法显示。图片文件名不用空格就可以避免这些烦心事）。
@@ -113,66 +235,5 @@ markdown 内容
 
     **GitHub 在线编辑器的 markdown 预览不支持显示图片。**
 
-### 提交
 
-最后在 Source Control 面板看一下变动情况，没问题的话就**点击 Changes 右侧的加号，让改动进入 Staged Changes**.
 
-![stage](images/stage.png)
-
-最后在上面的 Message 文本框写一下 Commit Message，简单说明下做了什么改动。
-大多数情况下，用一句话简短描述改动内容即可。
-如有更多细节需要说明，可以空一行写详情。
-
-```
-简短描述
-
-可选的详情
-```
-
-按 Ctrl/Command + Enter 即可提交。
-
-![commit](images/commit.png)
-
-提交后访问 https://github.com/YOUR-GITHUB-USERNAME/tds-blog/pulls （请替换 URL 中的用户名）
-
-![new pull request](images/new-pull-request.png)
-
-在 Pull Requests 页面点击右上方绿色的 New pull request 按钮，会显示你所做的改动。
-
-![compare changes](images/compare-changes.png)
-
-大致看一下有没有问题，如果有问题的话，就关闭页面，重新回到 https://github.com/YOUR-GITHUB-USERNAME/tds-blog/ 按 `.` 进入编辑模式再修改。
-
-没问题的话，点绿色的 Create pull request 按钮进入 PR 表单。
-PR 标题 GitHub 会自动填写，如果不满意，可以修改一下。
-右方 Reviewer 选择 weakish 或 fuchenshi，然后再点绿色的 Create pull request 按钮提交。
-
-![open a pull request](images/open-a-pr.png)
-
-提交后 CI 会自动构建博客预览，请稍候。
-预览构建完成后，机器人 netlify bot 的回复中会出现「😎 Browse the preview: 」，点击后面的 URL 即可查看效果。
-不同于 GitHub 编辑模式自动的预览，这个是真正的预览，未来发布后，线上显示的效果和预览一模一样，包括各种格式和图片。
-
-![ci](images/ci.png)
-
-上图中，「All checks have passed」标明预览构建成功。
-红色的「Review required」是表示 reviewer 还没有 approve，属正常现象，不是构建错误，不必惊慌。
-
-如果查看预览的过程中发现了问题，请重新回到 https://github.com/YOUR-GITHUB-USERNAME/tds-blog/ 按 `.` 进入编辑模式再修改。
-提交修改（Source Control 面板按 Ctrl/Command + Enter）后，PR 会自动更新，也会自动再次触发预览构建，请再次等待机器人 netlify bot 的回复中出现「😎 Browse the preview: 」,再次查看预览效果。
-
-一切就绪后，等 reviewer 通过 PR 并合并，文章就正式发布到线上了。
-正式发布之后，再进入编辑模式修改就不会自动更新 PR 了（因为相关 PR 已经合并了），需要开新的 PR.
-
-## Tips
-
-Confluence wiki、Notion 等网页上的富文本内容，可以复制到 [Mark Text]（开源，推荐使用）、[Typora]（收费）、[StackEdit] （开源，可以在浏览器中直接使用，但对一些复杂格式的支持不如 Mark Text 和 Typora 全）可以快速转换为 markdown 代码。
-注意，部分格式转换时会丢失或错误，需要手工修正。
-
-[Mark Text]: https://marktext.app
-[StackEdit]: https://stackedit.io/app
-[Typora]: https://typora.io
-
-命令行工具 [pandoc] 支持转换多种文件为 markdown，同样，部分格式转换时会丢失或错误，需要手工修正。
-
-[pandoc]: https://pandoc.org/index.html
