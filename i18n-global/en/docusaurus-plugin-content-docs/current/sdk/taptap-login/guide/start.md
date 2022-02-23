@@ -1,0 +1,328 @@
+---
+id: start
+title: Integrate TapTap Login
+sidebar_label: Integrate Functions
+sidebar_position: 0
+---
+
+import MultiLang from '/src/docComponents/MultiLang';
+import {Conditional} from '/src/docComponents/conditional';
+
+:::tip
+Important: You must [Configure Signature Certification](/sdk/start/quickstart/#configure-signature-certificate) and [Add Testers](/sdk/start/test-accounts/) prior to using the **Test Login Function**. Otherwise, TapTap Login will not operate normally.
+:::
+
+Integrate TapTap Login Methods:
+
+1. Integrate TapTap login via [TDS Authentication System](/sdk/authentication/features).
+2. [Basic TapTap User Verification](/sdk/taptap-login/guide/tap-login/).
+
+We recommend the first method for the following scenarios:
+
+- Integrating the account system provided by TapSDK.
+- Allowing players to bind additional third-party accounts to their account (Ex: QQ, WeChat, Apple).
+- Integrating basic TapSDK system functions in TDS Authentication such as Friends or Achievements.
+
+Otherwise, if you already have an account system and do not plan on using TapSDK functions such as Friends or Achievements, you can integrate TapTap User Login via the second method.
+
+<Conditional region='cn'>
+
+Note: The first method is based on the built-in user system. If you exceed the free quota provided by the service when using this method, you must [make a payment](https://developer.taptap.com/product-intro/price) to continue using the service.
+Therefore, ensure that your account has enough balance to cover the potential fee incurred by the first method, or the players of your game may not be able to log in.
+
+</Conditional>
+
+We will introduce the first method and then the [second method](/sdk/taptap-login/guide/tap-login/).
+
+Both methods require visiting **Developer Center > Game Services > Integrate Functions** to activate TapTap Login.
+
+## Use results from TapTap OAuth to directly log into the account system.
+
+Regarding TapTap User Login, TapSDK provides special support to developers with the fastest and most convenient integration. Call `TDSUser#loginWithTapTap` to log in with a press of a button. For example:
+
+<MultiLang>
+
+```cs
+try
+{
+    // On iOS and Android, the TapTap app will be called or WebView will be used to log in.
+    // On Windows and macOS, the SDK will display a QR code (default) and a jump link (to be configured).
+    var tdsUser = await TDSUser.LoginWithTapTap();
+    Debug.Log($"login sucess:{tdsUser}");
+}
+catch (Exception e)
+{
+    if (e is TapException tapError)  // using TapTap.Common
+    {
+        Debug.Log($"encounter exception:{tapError.code} message:{tapError.message}");
+        if (tapError.code == TapErrorCode.ERROR_CODE_BIND_CANCEL) // Cancel Login
+        {
+            Debug.Log("Login cancelled");
+        }
+    }
+}
+```
+
+```java
+TDSUser.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
+    @Override
+    public void onSuccess(TDSUser resultUser) {
+        Toast.makeText(MainActivity.this, "succeed to login with Taptap.", Toast.LENGTH_SHORT).show();
+        // Developers can call the resultUser method to obtain additional properties.
+        String userId = resultUser.getObjectId();  // Unique User ID
+        String avatar = (String) resultUser.get("avatar");  // Avatar
+        String nickName = (String) resultUser.get("nickname");  // Nickname
+    }
+
+    @Override
+    public void onFail(TapError error) {
+        Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+    }
+}, "public_profile");
+```
+
+```objectivec
+[TDSUser loginByTapTapWithPermissions:@[@"public_profile"] callback:^(TDSUser * _Nullable user, NSError * _Nullable error) {
+    if (user) {
+        // Developers can call the user method to obtain additional properties.
+        NSString *userId = user.objectId;
+        NSString *username = user[@"nickname"];
+        NSString *avatar = user[@"avatar"];
+    } else {
+        NSLog(@"%@", error);
+    }
+}];
+```
+
+</MultiLang>
+
+`TDSUser` is the current user's account system. Upon logging in, developers can:
+
+- Visit `nickname` properties to obtain the user's TapTap account name.
+- Visit `avatar` properties to obtain the TapTap account's avatar.
+- Visit `objectId` to obtain the user's system ID, which can be used to bind or match the player on the game server with TDS Authentication.
+
+Once TapTap login is complete, developers can access TapTap ecosystem capabilities. For example:
+
+### Obtain TapTap User details
+
+Once TapTap user login is complete, developers can use the following methods to obtain information on TapTap authorization results:
+
+<MultiLang>
+
+```cs
+// Fetch TapTap Profile to obtain basic user info, such as their nickname and avatar.
+var profile = await TapLogin.FetchProfile();
+Debug.Log($"profile: {profile.ToJson()}");
+```
+
+```java
+// Call TapLoginHelper.getCurrentProfile() to obtain basic user info, such as nickname and avatar.
+Profile profile = TapLoginHelper.getCurrentProfile();
+```
+
+```objectivec
+[TapLoginHelper currentProfile]
+```
+
+</MultiLang>
+
+`Profile` will contain the following info:
+
+- TapTap openId: Each player's openId in each game is different.
+- TapTap unionId: The same player will have the same unionId among different games from the same vendor. When the player enters a game from a different vendor, they will get a different unionId.
+- Username: Each player's username on TapTap.
+- Avatar: Each player's avatar on TapTap.
+
+### Test Qualification Verification
+
+:::tip
+This feature is only applicable if you plan to conduct a Bonfire Test for your game. With this feature, you can ensure that only the whitelisted users can log in to your game, which prevents unauthorized users from accessing your game in case your game gets leaked.
+:::
+
+Call the corresponding APIs in the login callback to verify qualification.
+
+<MultiLang>
+
+```cs
+try
+{
+    var test = await TapLogin.GetTestQualification();
+    if(test)
+    {
+        Debug.Log("This player is qualified for Bonfire Test");
+    }
+    else
+    {
+        Debug.Log("This player is not qualified for Bonfire Test");
+    }
+        
+}
+catch(Exception e)
+{
+    Debug.Log($"Bonfire Test error：{e.Message}");
+}
+
+```
+
+```java
+TapLoginHelper.getTestQualification(new Api.ApiCallback<Boolean>() {
+    @Override
+    public void onSuccess(Boolean aBoolean) {
+        if(aBoolean){
+            // This player is already qualified for the test.
+            Toast.makeText(MainActivity.this, "This player is already qualified for Bonfire Test.", Toast.LENGTH_SHORT).show();
+        }else {
+            // This player is not qualified for the test. Intercepted at the game interface.
+            Toast.makeText(MainActivity.this, "This player is not qualified for Bonfire Test", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    @Override
+    public void onError(Throwable throwable) {
+        // Server has detected an error or network anomaly.
+        Toast.makeText(MainActivity.this, "Server has detected an error or network anomaly", Toast.LENGTH_SHORT).show();
+    }
+});
+```
+
+```objectivec
+[TapLoginHelper getTestQualification:^(BOOL isQualified, NSError *_Nullable error) {
+    if (error) {
+        //Network error or game has not activated Bonfire Test.
+    } else {
+        if (isQualified) {
+            // Qualified for Bonfire Test
+        } else {
+            // Not qualified for Bonfire Test
+        }
+    }
+}];
+```
+
+</MultiLang>
+
+** Error: Network anomaly or this game has not activated Bonfire Test. **
+
+## Check Login Status
+
+`TDSUser` will save user login data in the local cache. When a player logs into the game, the next login will retrieve login data via `TDSUser#currentUser`. This will allow the player to enter the game without having to log in.
+Cache will not automatically be cleared.
+If the player logs out of the game or clears the game's cache, then the login info will also be deleted. Next time the player logs in, `TDSUser#currentUser` will return a null target.
+
+<MultiLang>
+
+```cs
+var currentUser = await TDSUser.GetCurrent();
+if (null == currentUser)
+{
+    Debug.Log("Not logged in");
+}
+else 
+{
+    Debug.Log("Logged in");
+}
+```
+
+```java
+if (null == TDSUser.currentUser()) {
+    // Not logged in
+} else {
+    // Logged in
+}
+```
+
+```objectivec
+TDSUser *currentUser = [TDSUser currentUser]
+if (currentUser == nil) {
+    // Not logged in
+} else {
+    // Logged in
+}
+```
+
+</MultiLang>
+
+## User Logout
+
+Players can easily log out by calling `logOut`.
+
+<MultiLang>
+
+```cs
+await TDSUser.Logout();
+```
+
+```java
+TDSUser.logOut();
+```
+
+```objectivec
+[TDSUser logOut];
+```
+
+</MultiLang>
+
+## PC Login Configurations
+
+:::tip
+
+Unity SDK 3.5.2 onwards on Windows and macOS supports using a QR code or jump link for players to access the TapTap login page.
+
+SDK **supports QR scanning to log in by default**.
+
+Jump links must be configured. See below for examples:
+
+:::
+
+![PC Login](/img/io/taptap-login-pc.png)
+
+### Windows
+
+Using a jump link on Windows requires filling out the following configurations in the Registry:
+
+```
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\open-taptap-{client_id}]
+@="{Game Name}"
+"URL Protocol"="{Program.exe installation path}}"
+
+[HKEY_CLASSES_ROOT\open-taptap-{client_id}]
+@="{Game Name}"
+
+[HKEY_CLASSES_ROOT\open-taptap-{client_id}]
+
+[HKEY_CLASSES_ROOT\open-taptap-{client_id}\Shell\Open]
+
+[HKEY_CLASSES_ROOT\open-taptap-{client_id}\Shell\Open\Command]
+@="\"{Program.exe installation path}\" \"%1\""
+```
+
+### macOS
+
+On macOS, SDK will automatically configure `CFBundleURLTypes`.
+
+Use the following steps to configure without errors:
+
+- On Unity, open `BuildSetting` and select `PC, Mac & Linux Standalone` Platform. In `Target Platform`, select `macOS`.
+- Check `Create XCode Project`, select `XCode` to compile.
+- Open output `XCode Project`, select `Target`, click `Info`, open `URL Types`, inspect whether you have input the `URL Scheme`: `TapWeb : open-taptap-{clientId}`. If not, then enter:
+
+```xml
+<key>CFBundleURLTypes</key>
+<array>
+    <dict>
+        <key>CFBundleURLName</key>
+        <string>TapWeb</string>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>open-taptap-{client_id}</string>
+        </array>
+    </dict>
+</array>
+```
+
+## Additional Functions
+
+View the [TDS Authentication Guide](/sdk/authentication/guide/) for info on the other functions of TDS Authorization.

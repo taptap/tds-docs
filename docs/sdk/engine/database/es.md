@@ -1,0 +1,126 @@
+---
+id: es
+title: LeanDB Elasticsearch 使用指南
+sidebar_label: LeanDB Elasticsearch
+sidebar_position: 4
+---
+
+import EngineRuntimes from '/src/docComponents/MultiLang/engine';
+import LeandbCliAccess from '../_partials/leandb-cli-access.mdx';
+import LeandbCreateInstance from '../_partials/leandb-create-instance.mdx';
+import TabItem from '@theme/TabItem';
+
+LeanDB MySQL 是云引擎提供的托管数据库，开发者可以在云引擎中使用 ElasticSearch 客户端类库或 HTTP API 连接，访问完整的 ElasticSearch 功能，更多其他托管数据库请查看 [云引擎服务总览](/sdk/engine/overview)。
+
+ElasticSearch 的主要特性：
+
+* **高可用**：多节点集群方案，可以容忍单节点故障。
+* **在线扩容**：在线调整容量和规格，数据平滑迁移。
+* **多实例**：满足更大容量或更高性能的需求。
+* **中文分词**：内置中文分词插件并支持自定义词库。
+
+## 创建和管理实例
+开发者可以在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 云引擎 > MySQL** 页面创建和管理 LeanDB 实例。
+
+### 创建实例
+
+<LeandbCreateInstance>
+
+- **实例规格** 目前提供 `512M`、`1GB`、`2GB`、`4GB`、`8GB` 几种，代表不同的运算能力，是计费的基础。
+
+每种规格有固定的存储空间限制，如需要更多存储空间需要升级到更高的规格。
+
+</LeandbCreateInstance>
+
+### MongoDB 版本
+
+目前 LeanDB 仅提供 Elasticsearch 7.9 版本。
+
+### 在线扩容
+
+目前 LeanDB Elasticsearch 不提供自助扩容的能力，如需扩容请提交工单联系我们的技术支持。
+
+### 管理共享
+
+可以使用控制台上的「管理共享」功能将 LeanCache 实例共享给其他应用，被共享的应用的 LeanCache 页面可能看到这个实例，相关的环境变量也会出现在其他应用的云引擎中。
+
+## 在云引擎中使用
+
+LeanDB 所在的应用的云引擎在部署时，会被注入几个包含 Redis 连接信息的环境变量，包括：
+
+- `ELASTICSEARCH_URL_<NAME>`
+
+其中 `<NAME>` 是你在创建 LeanDB 时为它指定的名字，如果你的 LeanDB 名为 `MYES` 的话，就会有名为 `ELASTICSEARCH_URL_MYES` 的环境变量。
+
+该环境变量的格式是 `http://username:password@host:port`，其中包含了所有连接 Elasticsearch 所需的信息，包括认证信息。
+
+<EngineRuntimes>
+<TabItem value='nodejs'>
+
+在 Node.js 中你可以这样连接到 ElasticSearch：
+
+```javascript
+const { Client } = require('@elastic/elasticsearch')
+const client = new Client({
+  node: process.env.ELASTICSEARCH_URL_MYES
+})
+
+// promise API
+const result = await client.search({
+  index: 'my-index',
+  body: {
+    query: {
+      match: { hello: 'world' }
+    }
+  }
+})
+
+// callback API
+client.search({
+  index: 'my-index',
+  body: {
+    query: {
+      match: { hello: 'world' }
+    }
+  }
+}, (err, result) => {
+  if (err) console.log(err)
+})
+```
+
+* 你需要运行 `npm install @elastic/elasticsearch` 来安装上面代码中用到的依赖
+* 更多的用法请参考 [Elasticsearch Node.js client](https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/index.html)
+
+</TabItem>
+</EngineRuntimes>
+
+## 中文分词
+除了 elasticsearch 自带的分词器，我们还提供了
+[Elasticsearch ik plugin](https://github.com/medcl/elasticsearch-analysis-ik) 以支持中文分词。
+我们可以通过以下途径指定使用 IK 插件进行中文分词：
+1. 在搜索时，指定分词器
+2. 在创建索引时，为特定 `field` 指定搜索分词器
+3. 在创建索引时，指定索引的默认分词器
+4. 在创建索引时，为特定 `field` 指定分词器
+
+它们的优先级依次降低，当都未指定时，会使用默认的标准分词器（standard analyzer）。具体细节及参数见 [specify an analyzer](https://www.elastic.co/guide/en/elasticsearch/reference/7.x/specify-analyzer.html)。
+
+### 自定义词库
+除此之外，自定义词库也是支持的。用户可以在控制台上传自定义词库。
+词库文件要求为 UTF-8 编码，每个词单独一行，文件大小不能超过 10MB，例如：
+
+```
+面向对象编程
+函数式编程
+高阶函数
+响应式设计
+```
+
+将其保存为文本文件，例如 `dict.txt`，上传即可。上传之后，分词将于 2 分钟后生效。开发者可以通过 [analyze API](https://www.elastic.co/guide/en/elasticsearch/reference/7.x/test-analyzer.html) 来测试。需要注意使用 analyze API 时要指定 index，使用 `curl -X POST "localhost:9200/my-index/_analyze?pretty"` 的形式。
+
+## 管理数据
+除了在云引擎中通过编程的方式访问 LeanDB，我们还提供了用于进行管理、调试或一次性数据操作的方式。
+
+### 使用命令行工具连接
+
+<LeandbCliAccess />
