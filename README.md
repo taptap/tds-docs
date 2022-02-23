@@ -289,7 +289,7 @@ import CodeBlock from "@theme/CodeBlock";
 - `docs/sdk/taptap-login/features.md` 在其他 md 文件中跳转需写作 `[跳转标题](/sdk/taptap-login/features/)`
 - `docs/design/design-moment.md` 在其他 md 文件中跳转需写作 `[跳转标题](/design/design-moment/)`
 - `i18n/en/docusaurus-plugin-content-docs/current/sdk/taptap-login/features.md` 在其他 md 文件中跳转需写作 `[跳转标题](/sdk/taptap-login/features/)`
-- 标题跳转需要去除标点并将空格换成 `-`，比如 `[<FaqLink>1. 如何进行游戏认领？</FaqLink>](/store/store-creategame#我的游戏已经被 TapTap 收录，可以进行游戏认领吗？)` 应写作 `[<FaqLink>1. 如何进行游戏认领？</FaqLink>](/store/store-creategame#我的游戏已经被-TapTap-收录可以进行游戏认领吗)`
+- 标题跳转需要去除标点、将空格换成 `-` 并将大写字母改为小写，比如 `[<FaqLink>1. 如何进行游戏认领？</FaqLink>](/store/store-creategame#我的游戏已经被 TapTap 收录，可以进行游戏认领吗？)` 应写作 `[<FaqLink>1. 如何进行游戏认领？</FaqLink>](/store/store-creategame#我的游戏已经被-taptap-收录可以进行游戏认领吗)`
 
 ##### 链接到外部网站
 
