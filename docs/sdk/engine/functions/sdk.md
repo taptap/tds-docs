@@ -574,6 +574,8 @@ $cookieStorage->set("key", "val");
 ### 如何使用 SDK 重定向到 HTTPS？
 
 我们目前推荐在绑定自定义域名时勾选「强制 HTTPS」（详见 [云引擎平台功能 § 重定向到 HTTPS](/sdk/engine/deploy/platform/#重定向到-https)）而不是使用 SDK 中的重定向中间件。
+不过，「强制 HTTPS」选项目前只支持独立 IP。
+如果使用加速节点，仍需在项目代码层面实现重定向。 
 
 <details>
 <summary>点击展开关于 SDK 中重定向到 HTTPS 的用法（不推荐）</summary>
