@@ -98,11 +98,17 @@ After importing SDK, you must configure the corresponding Android/iOS platform.
 
 1. **File > Build Settings** to add the Android configuration file.
 
-![](/img/tap_unity_amanifest.png)
+   ![](/img/tap_unity_amanifest.png)
 
 2. Edit the `Assets/Plugins/Android/AndroidManifest.xml` file in the Application Tag to add the following code:
 
-`xml <activity android:name="com.taptap.sdk.TapTapActivity" android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation" android:exported="false" android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" /> `
+    ```xml
+    <activity
+        android:name="com.taptap.sdk.TapTapActivity"
+        android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
+        android:exported="false"
+        android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
+    ```
 
 #### iOS Configuration
 
@@ -139,7 +145,7 @@ In the `Assets/Plugins/iOS/Resource` directory, download the `TDS-Info.plist`
 
 2. Open the project's `project/app/build.gradle` file and add the following gradle configurations:
 
-<CodeBlock className="java">
+    <CodeBlock className="java">
     {`repositories{  
         flatDir {  
             dirs 'libs'  
@@ -158,13 +164,15 @@ In the `Assets/Plugins/iOS/Resource` directory, download the `TDS-Info.plist`
 
 3. Add network permission to `AndroidManifest.xml`:
 
-`java <uses-permission android:name="android.permission.INTERNET"></uses-permission> `
+    ```java
+    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+    ```
 
 4. Add additional configurations for older Android versions.
 
-If `targetSdkVersion < 29`, you must add the following configurations:
+   If `targetSdkVersion < 29`, you must add the following configurations:
 
-- Manifest node adds `xmlns:tools="http://schemas.android.com/tools"`
+   - Manifest node adds `xmlns:tools="http://schemas.android.com/tools"`
    - Application node adds `tools:remove="android:requestLegacyExternalStorage"`
 
 </>
@@ -178,18 +186,18 @@ If `targetSdkVersion < 29`, you must add the following configurations:
 
 3. Import downloaded resource files as needed:
 
-- Must select: TapTap Launcher, Basic Library, and Login
+    - Must select: TapTap Launcher, Basic Library, and Login
 
-```
-TapBootstrapSDK.framework 
-TapCommonSDK.framework 
-TapLoginSDK.framework 
-LeanCloudObjc.framework
-```
+        ```
+        TapBootstrapSDK.framework 
+        TapCommonSDK.framework 
+        TapLoginSDK.framework 
+        LeanCloudObjc.framework
+        ```
 
 4. Please carefully check whether the following dependency libraries are added successfully:
 
-```
+    ```
     // Must select
     WebKit.framework
     Security.framework
@@ -216,7 +224,7 @@ LeanCloudObjc.framework
     libresolv.tbd
     libsqlite3.0.tbd
     libz.tbd
-```
+    ```
 
 #### Configuration Permission
 
@@ -245,9 +253,9 @@ When a user does not have any TapTap applications, the WebView login will be dis
 
 1. Open `info.plist`, then add the following configurations (replace `clientID` as the `Client ID` you obtained from the control panel):
 
-![](/img/tap_ios_info.png)
+    ![](/img/tap_ios_info.png)
 
-```xml
+    ```xml
     <key>CFBundleURLTypes</key>
     <array>
         <dict>
@@ -263,48 +271,48 @@ When a user does not have any TapTap applications, the WebView login will be dis
         </dict>
     </array>
 
-<key>LSApplicationQueriesSchemes</key>
+    <key>LSApplicationQueriesSchemes</key>
     <array>
       <string>tapiosdk</string>
       <string>tapsdk</string>
     </array>
-```
+    ```
 
 2. Configure openUrl：
 
-a) If the project has `SceneDelegate.m`, delete it first and then add the following code into the `AppDelegate.m` file:
+    a) If the project has `SceneDelegate.m`, delete it first and then add the following code into the `AppDelegate.m` file:
 
-```objectivec
-- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
-  return [TapBootstrap handleOpenURL:url];
-}
+        ```objectivec
+        - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
+        return [TapBootstrap handleOpenURL:url];
+        }
 
-- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
-  return [TapBootstrap handleOpenURL:url];
-}
-```
+        - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
+        return [TapBootstrap handleOpenURL:url];
+        }
+        ```
 
-b) Delete the Application Scene Manifest in `info.plist`.
-   ![](/img/tap_ios_appmanifest.png)
+    b) Delete the Application Scene Manifest in `info.plist`.
+       ![](/img/tap_ios_appmanifest.png)
 
-c) Delete the two methods for regulating the Scenedelegate lifecycle agent in AppDelegate.m.
+    c) Delete the two methods for regulating the Scenedelegate lifecycle agent in AppDelegate.m.
 
-```objectivec
-    #pragma mark - UISceneSession lifecycle
-    - (UISceneConfiguration *)application:(UIApplication *)application configurationForConnectingSceneSession:(UISceneSession *)connectingSceneSession options:(UISceneConnectionOptions *)options {
+        ```objectivec
+        #pragma mark - UISceneSession lifecycle
+        - (UISceneConfiguration *)application:(UIApplication *)application configurationForConnectingSceneSession:(UISceneSession *)connectingSceneSession options:(UISceneConnectionOptions *)options {
+        
+        return [[UISceneConfiguration alloc] initWithName:@"Default Configuration" sessionRole:connectingSceneSession.role];
+        }
 
-return [[UISceneConfiguration alloc] initWithName:@"Default Configuration" sessionRole:connectingSceneSession.role];
-    }
+        - (void)application:(UIApplication *)application didDiscardSceneSessions:(NSSet<UISceneSession *> *)sceneSessions {
+        }
+        ```
 
-- (void)application:(UIApplication *)application didDiscardSceneSessions:(NSSet<UISceneSession *> \*)sceneSessions {
-    }
-```
+    d) Add `UIWindow` to `AppDelegate.h`.
 
-d) Add `UIWindow` to `AppDelegate.h`.
-
-```objectivec
-objectivec @property (strong, nonatomic) UIWindow *window; 
-```
+    ```objectivec
+    @property (strong, nonatomic) UIWindow *window;
+    ```
 
 </>
 </MultiLang>
