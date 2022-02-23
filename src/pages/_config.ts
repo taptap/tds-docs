@@ -80,7 +80,7 @@ export const getEntries = (brand: string, region: string): Entry[] => {
             ],
     },
     {
-      title: "栏目收录申请",
+      title: "平台功能申请",
       description: "TapTap 首页栏目申请",
       links:
         region === "cn"

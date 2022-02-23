@@ -1,5 +1,7 @@
 ---
-title: 栏目收录申请
+title: 即将上线
+slug: /ad-apply
+sidebar_position: 1
 ---
 
 import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
