@@ -25,7 +25,7 @@ By adding Embedded Moments to your game, you can have players access TapTap's fo
 
 For a player to make a post or interact with other posts using Embedded Moments, they have to log in to a TapTap account. Therefore, you need to enable **[TapTap Login](/sdk/taptap-login/features/)** for your game before you can use Embedded Moments.
 
-![](/img/embedded-moments/taplogin-moment.png)
+![](/img/io/embedded-moments/taplogin-moment.png)
 
 ## Moments
 
@@ -33,11 +33,11 @@ For a player to make a post or interact with other posts using Embedded Moments,
 
 A player can access the TapTap forum directly from the "Games" module:
 
-![](/img/embedded-moments/game.png)
+![](/img/io/embedded-moments/game.png)
 
 The following modules are included in the "Games" module:
 
-![](/img/embedded-moments/game-detail.png)
+![](/img/io/embedded-moments/game-detail.png)
 
 1. **Sub-groups**: Sub-groups can help users filter feeds by categories. The settings of sub-groups are shared between the TapTap forum and Embedded Moments. You can edit sub-groups in "Group Management Center > Sub-group" and the edits will be displayed to the players once they are approved.
 
@@ -51,11 +51,11 @@ The following functions are also available to you:
 
 - **Posting moments**: Players can post moments containing pictures and videos to the forum.
 
-![](/img/embedded-moments/post.png)
+![](/img/io/embedded-moments/post.png)
 
 - **Interactions**: Players can **like, comment, and repost** other players' moments.
 
-![](/img/embedded-moments/repost.png)
+![](/img/io/embedded-moments/repost.png)
 
 <!-- ### Walkthroughs
 
@@ -89,17 +89,17 @@ Unfortunately, you can't set up walkthroughs yourself at this time. Please submi
 
 Players who logged in to TapTap can view the moments posted by their friends and the officials. When there are new moments available, there will be a **badge** on the "Follow" section on the navigation bar. This ensures that players will never miss out on important updates.
 
-![](/img/embedded-moments/follow.png)
+![](/img/io/embedded-moments/follow.png)
 
 ### Profile Page
 
 Players can find their past moments on the "Me" page. Here players can share their moments to other apps or delete their moments.
 
-![](/img/embedded-moments/me.png)
+![](/img/io/embedded-moments/me.png)
 
 Players can view notifications by tapping the "Alarm" icon on the top right corner. Interactions between players will trigger notifications, which encourages players to interact more with each other.
 
-![](/img/embedded-moments/msg.png)
+![](/img/io/embedded-moments/msg.png)
 
 ## SDK Features
 
@@ -114,13 +114,13 @@ You can make any of the objects in your game as a portal that opens up Embedded 
 
 :::
 
-![](/img/embedded-moments/scenario-portal.png)
+![](/img/io/embedded-moments/scenario-portal.png)
 
 ### Badges
 
 You can place buttons that can display badges in your game so that the players can be attracted to open the Embedded Moments when they see the badges.
 
-![](/img/embedded-moments/red-dot.png)
+![](/img/io/embedded-moments/red-dot.png)
 
 :::tip
 
@@ -134,13 +134,13 @@ You can place buttons that can display badges in your game so that the players c
 
 Players can take screenshots within the game and quickly share them to Embedded Moments. Only text and images can be shared through this method.
 
-![](/img/embedded-moments/share.png)
+![](/img/io/embedded-moments/share.png)
 
 ### Pop-up for Dynamically Closing Embedded Moments
 
 While the player is browsing Embedded Moments, if there are events that demand the player to immediately return to the game, a pop-up can be displayed to serve as a reminder and offer a shortcut for the player to close the Embedded Moments.
 
-![](/img/embedded-moments/popup.png)
+![](/img/io/embedded-moments/popup.png)
 
 ## Administration
 
