@@ -1,5 +1,4 @@
 ---
-id: go
 title: 云引擎 Go 运行环境
 sidebar_label: Go
 sidebar_position: 9

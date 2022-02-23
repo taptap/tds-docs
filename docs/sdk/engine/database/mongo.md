@@ -1,5 +1,4 @@
 ---
-id: mongo
 title: LeanDB MongoDB 使用指南
 sidebar_label: LeanDB MongoDB
 sidebar_position: 3

@@ -1,7 +1,5 @@
 ---
-id: agreement
 title: TapSDK Privacy Policy
-sidebar_label: TapSDK Privacy Policy
 sidebar_position: 8
 ---
 

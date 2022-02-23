@@ -1,5 +1,4 @@
 ---
-id: features
 title: Copyright Verification
 sidebar_label: Features
 sidebar_position: 1

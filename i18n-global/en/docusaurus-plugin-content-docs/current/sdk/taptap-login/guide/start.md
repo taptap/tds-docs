@@ -1,5 +1,4 @@
 ---
-id: start
 title: Integrate TapTap Login
 sidebar_label: Integrate Functions
 sidebar_position: 0

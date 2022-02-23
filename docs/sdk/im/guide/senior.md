@@ -1,5 +1,4 @@
 ---
-id: senior
 title: 三，安全与签名、黑名单和权限管理、玩转聊天室和临时对话
 sidebar_label: 权限与聊天室
 sidebar_position: 3

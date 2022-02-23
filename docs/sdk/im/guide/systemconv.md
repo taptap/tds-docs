@@ -1,5 +1,4 @@
 ---
-id: systemconv
 title: 四，详解消息 hook 与系统对话
 sidebar_label: Hook 与系统对话
 sidebar_position: 4

@@ -58,8 +58,7 @@ yarn start -- --locale en
 
 ### 名称风格
 
-文件路径和文件名请注意和 URL 路径保持一致，比如 URL 路径为 `/docs/community/features/` 的页面，文件路径请使用 `/docs/community/features.md`.
-虽然 Docusaurus 生成站点的时候会根据 `id` 生成 URL 路径，并不会使用文件名，文件名可随意命名，但保持一致便于快速地从页面 URL 找到对应的 markdown 文件进行编辑。
+文件路径和文件名请注意和 URL 路径保持一致，比如 URL 路径为 `/docs/community/features/` 的页面，文件路径请使用 `/docs/community/features.md`。
 
 ### 文档前言（元信息 metadata）
 
@@ -71,11 +70,10 @@ yarn start -- --locale en
 
 ```markdown
 ---
-id: *[全局唯一的标识符，在不指定 slug 时，该 id 为 URL 路径]
 title: *[正文的标题，同时也会显示在浏览器标签处]
-sidebar_position: *[数字，决定左侧边栏的顺序，数字越小越靠前]
 sidebar_label: [显示在左侧边栏的标题，回退到 title]
-slug: [URL 路径，一般情况下无需指定，回退到 id]
+sidebar_position: [数字，决定左侧边栏的顺序，数字越小越靠前]
+slug: [URL 路径，一般情况下无需指定，回退到文件路径]
 ---
 
 > 之后是你的文档内容
@@ -93,7 +91,6 @@ slug: [URL 路径，一般情况下无需指定，回退到 id]
 
 ```markdown
 ---
-id: tap-support
 title: 客服系统
 slug: /sdk/tap-support/guide/
 ---
@@ -287,17 +284,12 @@ import CodeBlock from "@theme/CodeBlock";
 
 ##### 链接到其他文档
 
-> 程序默认会以 **id > title > 文件名** 的优先级进行查找文件。
->
-> 可以通过 URL 快速知晓当前页面的路径引用。
-
 链接时使用基于对应语言文档根目录的绝对路径，**不要使用相对路径**。
 
-- `docs/sdk/02-taptap-login/01-features.md` 在其他 md 文件中跳转需写作 `[跳转标题](/sdk/taptap-login/features/)`
-- `docs/sdk/02-taptap-login/01-features.md` 如果 id 为 `functions`（**建议文件名 ID 同步，仅作说明**），在其他 md 文件中跳转需写作 `[跳转标题](/sdk/taptap-login/functions/)`
+- `docs/sdk/taptap-login/features.md` 在其他 md 文件中跳转需写作 `[跳转标题](/sdk/taptap-login/features/)`
 - `docs/design/design-moment.md` 在其他 md 文件中跳转需写作 `[跳转标题](/design/design-moment/)`
-- `i18n/en/docusaurus-plugin-content-docs/current/sdk/02-taptap-login/01-features.md` 在其他 md 文件中跳转需写作 `[跳转标题](/sdk/taptap-login/features/)`
-- 标题跳转需要将空格换成 `-`，比如 `[<FaqLink>2. 安卓端测试形式</FaqLink>](./store-test#二、 安卓端测试形式)` 替换成 `[<FaqLink>2. 安卓端测试形式</FaqLink>](./store-test#二、-安卓端测试形式)`
+- `i18n/en/docusaurus-plugin-content-docs/current/sdk/taptap-login/features.md` 在其他 md 文件中跳转需写作 `[跳转标题](/sdk/taptap-login/features/)`
+- 标题跳转需要去除标点并将空格换成 `-`，比如 `[<FaqLink>1. 如何进行游戏认领？</FaqLink>](/store/store-creategame#我的游戏已经被 TapTap 收录，可以进行游戏认领吗？)` 应写作 `[<FaqLink>1. 如何进行游戏认领？</FaqLink>](/store/store-creategame#我的游戏已经被-TapTap-收录可以进行游戏认领吗)`
 
 ##### 链接到外部网站
 
@@ -354,6 +346,7 @@ import CodeBlock from "@theme/CodeBlock";
 ```json
 {
   "label": "中文侧边栏名",
+  "collapsed": true,
   "position": 3
 }
 ```
@@ -371,7 +364,7 @@ import CodeBlock from "@theme/CodeBlock";
 }
 ```
 
-注意：**文件夹名翻译与层级无关**，例如 `docs/sdk/04-中文父级/中文子级/02-排序中文/xxxx.md` 目录下，应添加目录翻译如下：
+注意：**文件夹名翻译与层级无关**，例如 `docs/sdk/中文父级/中文子级/排序中文/xxxx.md` 目录下，应添加目录翻译如下：
 
 ```json
 {

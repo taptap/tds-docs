@@ -1,0 +1,91 @@
+---
+title: Best Practice
+sidebar_position: 2
+---
+import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
+
+Whether you're getting ready to open pre-registration or officially release your work on TapTap, we have prepared the following tips that will help you get more users and better reputations.  
+
+## **Practical Advice**  
+
+The following tips are based on experience with games that have been on TapTap before. They do not necessarily guarantee significant improvements in your game’s reputation or an increase in new users. The best way to run your game is to do it according to your game's features  
+
+![用来空行的小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)  
+
+### **1. To keep players interested, start with optimizing your game’s details page**  
+
+What you put on the detail page determines players’ first impression of your game, so try to make your game's detail page interesting and intriguing for the new players.  
+See  >>  [TapTap Material Requirements](https://www.taptap.com/developer/help_docs/7?id=42)  
+
+**<Blue>Game Introduction</Blue>**  
+A concise and highlighted introduction will help players to quickly understand your game's features. Information including your game's plot, gameplay, and special qualities can all help improve your game's recognition. Please pay attention to the aesthetics of the layout, as a long text without proper segmentation can be annoying to read. The design concept, easter eggs, and some funny words can all help to earn the player's interest.   
+
+**<Blue>Screenshots</Blue>**  
+Be sure to include some actual scenes in your screenshots to show players the core gameplay and highlights of the game. Players will definitely not like graphics that encourage charges or purchases in a too obvious way. They also will not remember your game strongly if there are not enough images of the actual scenes, for pure CG-style concept art may lower players’ recognition of the game because they cannot judge the quality of the game based on those.  
+
+**<Blue>Videos</Blue>**  
+Like screenshots of the game, it is recommended to use a demo video (with music and sound effects) that can shed light on the quality of the game, its highlights, and core gameplay. Videos with only CGs, plots, or commercials are not as effective as actual demo videos and may lead to some unexpected users that might affect your game's reputation.  
+
+![用来空行的小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)   
+
+---
+
+
+### **2. Maintenance of players’ reviews is the key to improve your game’s reputation**
+
+You will earn players’ approval if you can remain objective, unbiased, sincere, and open to critics, and your game will get better promotion.  
+
+**<Blue>Don't meddle in the rating</Blue>**  
+ TapTap has zero-tolerance for faking data in the rating and rankings. Any form of fake reviews is strictly forbidden. If confirmed, the game’s exposure will be strictly limited across the site or even removed from the store! Don't ask your staff to rush to write nice things about your game, for it can turn out counterproductive if the players think those are paid counterfeits.  
+
+**<Blue>Honesty is the core spirit of review maintenance</Blue>**  
+TapTap users love to discuss games with staff from developers, and this is a great opportunity to earn their trust. It's best to keep responding to every long review and quality comment that makes other users feel related. Arranging for a discussion with a producer or planner who knows the game well is an easy way to win approval, while the "customer service" style of copy and pastes will seem less sincere.  
+
+When the player brings up the game's deficiencies, further communication and an active reply will make the player feel that the official is sincere, open-minded, and willing to listen. If you feel that the player has misunderstood, you can always explain (some players will change their rating because of the official's attitude, and other players can see the official's attitude from their responses). Creating an account with a popular character in the game and having some in-character communication with players so that the official can appear friendly and easy to talk to.  
+
+![用来空行的小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)  
+
+---
+
+### **3. Moments can keep your game vibrant**
+
+"Moments" is the newest form of presentation in the TapTap community. It is an important way for players to get official information about the game. With the help of Moments, users can increase players’ loyalty to the game and slow down the loss of players.  
+
+**<Blue>Plan your Moments</Blue>**  
+Possible content of a game’s Moments include but are not limited to game announcements, developer logs, news with pictures, videos, events for players, etc.. The key to Moments management is to make users develop the habit of using Moments to keep them interested in the game when they are not playing. Combining the features of the game with data analysis to find the content that users are most interested in, such as rewards events, artists' information, Cosplayers, version introduction, guides, and so on. Using Moments only as game announcements will lower the user's attention.  
+
+**<Blue>Build a better community together</Blue>**  
+Interaction in official Moments and other methods can help to find the active users with high quality published works in the TapTap gaming community. It can keep the player's passion and encourage active users to become the KOL. They may in turn produce more high-quality content about the game and help to improve the game’s community in TapTap, forming a good cycle of a community environment.  
+
+![用来空行的小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)  
+
+---
+
+### **4. Prepare the server to avoid the breakdown**  
+
+**<Blue>User Estimation</Blue>**  
+Before your game is officially open for downloads or beta test in TapTap, we recommend that you estimate the number of users in advance based on the number of pre-registrations and the way you screen test users. We also recommend that you conduct a stress test on the server to avoid the server’s breakdown due to overloads. According to our experience, too many login attempts and registrations by users at the start of the service is one of the main causes of sever’s crash. Therefore, we recommend that you stress-test your server's streaming capacity and use the "pre-download" function with caution (pre-downloads tend to cause multiple users to log in at the same time).  
+
+**<Blue>Accident Shutdown Protection</Blue>**  
+In case you still have server problems after making the above preparations, please submit an "Accident Shutdown Protection Application" in time. All Ratings made in the "Accidental Protection" period will not be counted towards the total rating.  
+
+![用来空行的小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)  
+
+---
+
+### **5. Exclusive partnerships for more support**  
+
+If your game is a good fit for TapTap players and you value the communication with them, we recommend you to consider TapTap as an exclusive platform.  
+
+**<Blue>Operation Support</Blue>**  
+For games exclusively available in TapTap, we will provide additional resources and operation staff on and off-site to support the publishing and management of your game on TapTap. For featured exclusive games, we will assign an editor to assist you in all aspects of the game's publishing, including the game's editorial review, support in community and resources management, Moments planning, and arranging marketing decisions or releases. All can lead to a successful case of game publishing.  
+
+![用来空行的小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)  
+
+---
+
+### **6. Advertising to attract more users**
+
+It doesn't cost anything to release a legitimate, licensed game on TapTap, but if you need to attract more players users on top of that, advertising is a great way to go.  
+
+TapTap has one and only one CPA-based promotion space on the site, which you can directly place your ad there after topping up your ad backend. After launching on the TapTap site, there will be a probability of getting new downloads from other natural users. We will calculate the costs of user acquisition by direct ad placement and overall user acquisition for you in the advertising backend so that you can more accurately evaluate the effect of ad placement.  

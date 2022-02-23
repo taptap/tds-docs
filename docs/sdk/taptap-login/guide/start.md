@@ -1,5 +1,4 @@
 ---
-id: start
 title: 接入 TapTap 登录
 sidebar_label: 功能接入
 sidebar_position: 0

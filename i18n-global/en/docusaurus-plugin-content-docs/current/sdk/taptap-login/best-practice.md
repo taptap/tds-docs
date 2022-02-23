@@ -1,5 +1,4 @@
 ---
-id: best-practice
 title: Best TapTap Login Practices
 sidebar_label: Best Practices
 sidebar_position: 3

@@ -1,7 +1,5 @@
 ---
-id: tap-android-faq
 title: TapSDK Android FAQ
-sidebar_label: Android
 ---
 
 <head>

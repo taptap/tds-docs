@@ -1,5 +1,4 @@
 ---
-id: redis
 title: LeanCache 使用指南
 sidebar_label: LeanCache
 sidebar_position: 1

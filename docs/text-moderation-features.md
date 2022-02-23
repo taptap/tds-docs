@@ -1,7 +1,5 @@
 ---
-id: text-moderation-features
 title: 文本检测功能介绍
-sidebar_label: 功能介绍
 slug: /sdk/text-moderation/features/
 ---
 

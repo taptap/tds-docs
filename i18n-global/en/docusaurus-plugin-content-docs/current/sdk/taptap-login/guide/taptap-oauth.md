@@ -1,5 +1,4 @@
 ---
-id: taptap-oauth
 title: TapTap OAuth Interface
 sidebar_position: 4
 ---

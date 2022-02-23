@@ -1,7 +1,5 @@
 ---
-id: SDK-API
 title: SDK-API
-slug: sdk-api
 ---
 
 ## TapTap 登录、内嵌动态、好友、成就、云存档、数据分析

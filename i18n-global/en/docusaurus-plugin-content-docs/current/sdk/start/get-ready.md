@@ -1,7 +1,5 @@
 ---
-id: get-ready
 title: Work Preparation
-sidebar_label: Work Preparation
 sidebar_position: 3
 ---
 

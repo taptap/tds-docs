@@ -1,5 +1,4 @@
 ---
-id: beginner
 title: 一，从简单的单聊、群聊、收发图文消息开始
 sidebar_label: 基础功能
 sidebar_position: 1

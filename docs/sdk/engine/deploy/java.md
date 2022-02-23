@@ -1,5 +1,4 @@
 ---
-id: java
 title: 云引擎 Java 运行环境
 sidebar_label: Java
 sidebar_position: 6

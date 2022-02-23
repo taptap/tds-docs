@@ -1,5 +1,4 @@
 ---
-id: features
 title: TapTap Login Features
 sidebar_label: Features
 sidebar_position: 1

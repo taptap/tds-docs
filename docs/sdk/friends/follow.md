@@ -1,7 +1,5 @@
 ---
-id: follow
 title: 关注模式
-sidebar_label: 关注模式
 sidebar_position: 4
 ---
 

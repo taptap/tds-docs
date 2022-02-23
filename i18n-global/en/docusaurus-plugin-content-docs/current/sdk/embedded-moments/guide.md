@@ -1,5 +1,4 @@
 ---
-id: guide
 title: Embedded Moments Guide
 sidebar_label: Guide
 sidebar_position: 2

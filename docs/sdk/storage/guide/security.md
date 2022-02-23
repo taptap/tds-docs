@@ -1,5 +1,4 @@
 ---
-id: security
 title: 数据和安全 
 sidebar_position: 10
 ---

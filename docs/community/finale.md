@@ -1,5 +1,4 @@
 ---
-id: 写在结尾
 sidebar_label: 写在结尾
 sidebar_position: 40
 ---

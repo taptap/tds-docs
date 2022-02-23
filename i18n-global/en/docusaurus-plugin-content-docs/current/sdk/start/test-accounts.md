@@ -1,7 +1,5 @@
 ---
-id: test-accounts
 title: Manage Testers
-sidebar_label: Manage Testers
 sidebar_position: 5
 ---
 

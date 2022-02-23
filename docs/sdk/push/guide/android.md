@@ -1,5 +1,4 @@
 ---
-id: android
 title: Android 推送指南
 sidebar_label: Android 推送
 sidebar_position: 3

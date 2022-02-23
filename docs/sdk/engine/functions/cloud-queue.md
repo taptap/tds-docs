@@ -1,5 +1,4 @@
 ---
-id: cloud-queue
 title: 云队列（Cloud Queue）开发指南
 sidebar_label: 云队列
 sidebar_position: 4

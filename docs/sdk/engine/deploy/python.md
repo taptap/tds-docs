@@ -1,5 +1,4 @@
 ---
-id: python
 title: 云引擎 Python 运行环境
 sidebar_label: Python
 sidebar_position: 5

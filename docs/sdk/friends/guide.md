@@ -1,5 +1,4 @@
 ---
-id: guide
 title: 好友指南
 sidebar_label: 开发指南
 sidebar_position: 2

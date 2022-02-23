@@ -1,5 +1,4 @@
 ---
-id: features
 title: 即时通讯功能介绍
 sidebar_label: 功能介绍
 sidebar_position: 1

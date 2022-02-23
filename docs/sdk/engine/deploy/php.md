@@ -1,5 +1,4 @@
 ---
-id: php
 title: 云引擎 PHP 运行环境
 sidebar_label: PHP
 sidebar_position: 7

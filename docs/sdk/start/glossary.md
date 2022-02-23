@@ -1,7 +1,5 @@
 ---
-id: glossary
 title: 常用词汇术语
-sidebar_label: 常用词汇术语
 sidebar_position: 7
 ---
 

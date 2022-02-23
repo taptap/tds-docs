@@ -1,5 +1,4 @@
 ---
-id: faq
 title: 云引擎 FAQ
 sidebar_label: FAQ
 sidebar_position: 8

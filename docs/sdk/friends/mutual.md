@@ -1,7 +1,5 @@
 ---
-id: mutual
 title: 好友模式
-sidebar_label: 好友模式
 sidebar_position: 3
 ---
 

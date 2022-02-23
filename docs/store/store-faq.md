@@ -1,0 +1,97 @@
+---
+title: 常见问题
+sidebar_position: 17
+---
+import {FaqLink} from '/src/docComponents/doc';
+
+## **一、 开发者注册及厂商账号**  
+
+### [<FaqLink>1. 开发者注册流程</FaqLink>](/store/store-register/)  
+### [<FaqLink>2. 如何进入开发者中心？</FaqLink>](/store/store-register#后台入口)  
+### [<FaqLink>3. 个人开发者和企业开发者可以相互转换吗？</FaqLink>](/store/store-register#个人开发者与企业开发者有什么区别可以互相转换吗)  
+### [<FaqLink>4. 个人开发者如何填写厂商名称？</FaqLink>](/store/store-register#个人开发者没有公司如何填写厂商名称)  
+### [<FaqLink>5. 如何认领厂商账号？</FaqLink>](/store/store-register#厂商名称已存在如何进行厂商账号认领)  
+### [<FaqLink>6. 如何修改厂商名称？</FaqLink>](/store/store-register#如何修改厂商名称)  
+![小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)  
+
+
+## **二、 厂商账号后台管理员**  
+
+### [<FaqLink>1. 如何添加管理员？</FaqLink>](/store/store-admin/)  
+### [<FaqLink>2. 如何设置管理员权限？</FaqLink>](/store/store-admin#管理角色配置)  
+### [<FaqLink>3. 如何删除管理员？</FaqLink>](/store/store-admin#删除游戏成员)  
+### [<FaqLink>4. 如何解绑或更换主管理员？</FaqLink>](/store/store-admin#主管理员可以解绑吗可以设置新的主管理员吗)  
+![小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)  
+
+
+## **三、 开发者认证**  
+
+### [<FaqLink>1. 什么是开发者认证？</FaqLink>](/store/store-auth/)  
+### [<FaqLink>2. 如何获得开发者认证？</FaqLink>](/store/store-auth#如何获得开发者认证)  
+### [<FaqLink>3. 如何移除开发者认证？</FaqLink>](/store/store-auth#如何移除开发者认证)  
+![小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)  
+
+
+## **四、 物料要求**  
+
+### [<FaqLink>1. 图标要求</FaqLink>](/store/store-material/)  
+### [<FaqLink>2. 简介要求及展示位置</FaqLink>](/store/store-material#简介)  
+### [<FaqLink>3. 截图要求及展示位置</FaqLink>](/store/store-material#视频及截图)  
+### [<FaqLink>4. 推广图要求及展示位置</FaqLink>](/store/store-material#推广图)  
+### [<FaqLink>5. 视频要求及展示位置</FaqLink>](/store/store-material#视频)  
+### [<FaqLink>6. 资质上传要求</FaqLink>](/store/store-material#资质)  
+### [<FaqLink>7. 游戏必须有版号吗？</FaqLink>](/store/store-material#游戏必须有版号吗)  
+### [<FaqLink>8. 素材过审注意点</FaqLink>](/store/store-material#素材过审有哪些注意点)  
+![小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)  
+
+
+## **五、 创建游戏**  
+
+### [<FaqLink>1. 游戏入库流程</FaqLink>](/store/store-creategame/)  
+### [<FaqLink>2. 游戏入库后需要立即发布吗？</FaqLink>](/store/store-creategame#创建游戏审核通过后可暂不发布游戏吗)  
+### [<FaqLink>3. TapTap 游戏收录标准</FaqLink>](/store/store-creategame#TapTap-是所有的游戏都收录吗)  
+![小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)  
+
+
+## **六、 游戏认领、转移及下架**  
+
+### [<FaqLink>1. 如何进行游戏认领？</FaqLink>](/store/store-creategame#我的游戏已经被-TapTap-收录可以进行游戏认领吗)  
+### [<FaqLink>2. 如何进行游戏转移？</FaqLink>](/store/store-creategame#游戏主体可以进行转移吗)  
+### [<FaqLink>3. 如何进行游戏下架？</FaqLink>](/store/store-creategame#如何进行游戏下架)  
+![小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)  
+
+## **七、 游戏预约**  
+
+### [<FaqLink>1. 如何开启预约功能？</FaqLink>](/store/store-order/)  
+### [<FaqLink>2. 为什么要开启预约？</FaqLink>](/store/store-order#为什么要开放游戏预约)  
+### [<FaqLink>3. 什么是预约里程碑？</FaqLink>](/store/store-order#预约里程碑)  
+### [<FaqLink>4. 预约里程碑内容注意点</FaqLink>](/store/store-order#预约里程碑内容有限制吗)  
+### [<FaqLink>5. 如何修改预约里程碑？</FaqLink>](/store/store-order#预约里程碑可以修改吗)  
+### [<FaqLink>6. 如何发放预约里程碑奖励？</FaqLink>](/store/store-order#如何向玩家发放预约里程碑奖励)  
+### [<FaqLink>7. 如何获得预约资源位？</FaqLink>](/store/store-order#游戏预约资源位)  
+![小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)  
+
+
+## **八、 游戏更新**  
+
+### [<FaqLink>1. 如何进行游戏更新？</FaqLink>](/store/store-update/)  
+### [<FaqLink>2. 如何进行游戏更名？</FaqLink>](/store/store-update#游戏名称可以修改吗)  
+![小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)  
+
+
+## **九、 游戏测试**  
+
+### [<FaqLink>1. 安卓端测试流程</FaqLink>](/store/store-test/)  
+### [<FaqLink>2. 安卓端测试形式</FaqLink>](/store/store-test#安卓端测试形式)  
+### [<FaqLink>3. 篝火测试</FaqLink>](/store/campfire/)  
+### [<FaqLink>4. iOS端测试流程</FaqLink>](/store/store-test#iOS-端测试)  
+### [<FaqLink>5. 关于测试服</FaqLink>](/store/store-test#什么是测试服测试服有什么优点如何创建测试服)  
+### [<FaqLink>6. 如何获得测试资源位？</FaqLink>](/store/store-test#测试资源)  
+![小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)  
+
+
+## **十、 游戏上线**  
+
+### [<FaqLink>1. 游戏上线流程</FaqLink>](/store/store-release/)  
+### [<FaqLink>2. 如何获得游戏上线资源位？</FaqLink>](/store/store-release#首发资源)  
+![小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)  

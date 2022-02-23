@@ -1,5 +1,4 @@
 ---
-id: features
 title: TapPlay 功能介绍
 sidebar_label: 功能介绍
 sidebar_position: 10

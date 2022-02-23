@@ -1,5 +1,4 @@
 ---
-id: dotnet
 title: 数据存储指南 · .NET
 sidebar_label: .NET 指南
 sidebar_position: 2

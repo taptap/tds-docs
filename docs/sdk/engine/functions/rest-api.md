@@ -1,5 +1,4 @@
 ---
-id: rest-api
 title: 云函数 REST API
 sidebar_label: REST API
 sidebar_position: 5

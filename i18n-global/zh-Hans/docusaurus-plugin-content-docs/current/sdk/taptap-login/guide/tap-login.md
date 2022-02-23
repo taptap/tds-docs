@@ -1,5 +1,4 @@
 ---
-id: tap-login
 title: 单纯 TapTap 用户认证
 sidebar_label: 单纯认证
 sidebar_position: 1

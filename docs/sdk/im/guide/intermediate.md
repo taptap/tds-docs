@@ -1,5 +1,4 @@
 ---
-id: intermediate
 title: 二，消息收发的更多方式，离线推送与消息同步，多设备登录
 sidebar_label: 离线消息
 sidebar_position: 2

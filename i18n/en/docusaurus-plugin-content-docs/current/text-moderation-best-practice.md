@@ -1,7 +1,5 @@
 ---
-id: text-moderation-best-practice
 title: Text Moderation Best Practice
-sidebar_label: Best Practice
 slug: /sdk/text-moderation/best-practice/
 ---
 

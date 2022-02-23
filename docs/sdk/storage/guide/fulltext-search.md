@@ -1,7 +1,5 @@
 ---
-id: fulltext-search
 title: 全文搜索指南
-sidebar_label: 全文搜索指南
 sidebar_position: 8
 ---
 

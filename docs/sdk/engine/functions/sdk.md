@@ -1,5 +1,4 @@
 ---
-id: sdk
 title: 云引擎 SDK 使用指南
 sidebar_label: 云引擎 SDK
 sidebar_position: 3

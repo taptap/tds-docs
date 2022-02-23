@@ -1,5 +1,4 @@
 ---
-id: ios
 title: iOS 推送指南
 sidebar_label: iOS 推送
 sidebar_position: 2

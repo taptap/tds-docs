@@ -1,7 +1,5 @@
 ---
-id: fulltext-search-rest
 title: 全文搜索 REST API
-sidebar_label: 全文搜索 REST API
 sidebar_position: 9
 ---
 

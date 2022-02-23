@@ -1,7 +1,5 @@
 ---
-id: get-ready
 title: 准备工作
-sidebar_label: 准备工作
 sidebar_position: 3
 ---
 

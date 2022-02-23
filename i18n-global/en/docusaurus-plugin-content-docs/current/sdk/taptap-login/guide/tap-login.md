@@ -1,5 +1,4 @@
 ---
-id: tap-login
 title: Basic TapTap User Verification
 sidebar_label: Basic Verification
 sidebar_position: 1

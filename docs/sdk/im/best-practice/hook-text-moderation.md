@@ -1,5 +1,4 @@
 ---
-id: hook-text-moderation
 title: 即时通讯文本检测
 sidebar_label: 文本检测
 ---

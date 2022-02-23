@@ -1,5 +1,4 @@
 ---
-id: guide
 title: DLC 开发指南
 sidebar_label: 开发指南
 sidebar_position: 2

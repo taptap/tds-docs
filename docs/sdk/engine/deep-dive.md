@@ -1,5 +1,4 @@
 ---
-id: deep-dive
 title: 深入了解云引擎
 sidebar_label: 深入了解
 sidebar_position: 6

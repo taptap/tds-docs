@@ -1,5 +1,4 @@
 ---
-id: design-login
 title: TapTap Login Button Design Guidelines
 sidebar_label: Login Specifications
 slug: /design

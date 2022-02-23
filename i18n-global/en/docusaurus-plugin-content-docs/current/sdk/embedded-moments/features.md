@@ -1,5 +1,4 @@
 ---
-id: features
 title: Embedded Moments Features
 sidebar_label: Features
 sidebar_position: 1

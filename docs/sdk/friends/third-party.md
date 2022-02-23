@@ -1,5 +1,4 @@
 ---
-id: third-party
 title: 第三方平台好友
 sidebar_label: 第三方好友
 sidebar_position: 5

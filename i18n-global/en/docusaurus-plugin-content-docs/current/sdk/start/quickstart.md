@@ -1,5 +1,4 @@
 ---
-id: quickstart
 title: TapSDK Quickstart
 sidebar_label: Quickstart
 sidebar_position: 4

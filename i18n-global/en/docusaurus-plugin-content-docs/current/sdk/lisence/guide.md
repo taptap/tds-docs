@@ -1,5 +1,4 @@
 ---
-id: guide
 title: Copyright Verification
 sidebar_label: Guide
 sidebar_position: 2

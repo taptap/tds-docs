@@ -1,5 +1,4 @@
 ---
-id: start
 title: 快速了解社区，分享独特基因
 sidebar_label: 快速了解社区
 sidebar_position: 1

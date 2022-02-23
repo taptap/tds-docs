@@ -1,5 +1,4 @@
 ---
-id: java
 title: 数据存储开发指南 · Java 
 sidebar_label: Java 指南
 sidebar_position: 4

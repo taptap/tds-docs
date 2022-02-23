@@ -1,5 +1,4 @@
 ---
-id: features
 title: 实名认证和防沉迷功能介绍
 sidebar_label: 功能介绍
 sidebar_position: 1

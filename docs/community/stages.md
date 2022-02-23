@@ -1,5 +1,4 @@
 ---
-id: stages
 title: 区分运营阶段，解决宣发难点
 sidebar_label: 区分运营阶段
 sidebar_position: 20

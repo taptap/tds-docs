@@ -1,5 +1,4 @@
 ---
-id: features
 title: 学习社区模块，掌握基本操作
 sidebar_label: 学习社区模块
 sidebar_position: 10

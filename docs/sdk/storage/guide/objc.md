@@ -1,5 +1,4 @@
 ---
-id: objc
 title: 数据存储开发指南 · Objective-C
 sidebar_label: Objective-C 指南
 sidebar_position: 6

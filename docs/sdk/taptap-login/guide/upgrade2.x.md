@@ -1,5 +1,4 @@
 ---
-id: upgrade2.x
 title: 2.x 升级 3.x 指南
 sidebar_label: 2.x 升级 3.x
 sidebar_position: 3

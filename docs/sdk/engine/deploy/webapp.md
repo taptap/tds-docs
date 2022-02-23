@@ -1,5 +1,4 @@
 ---
-id: webapp
 title: 云引擎 Web 前端运行环境
 sidebar_label: Web 前端
 sidebar_position: 3

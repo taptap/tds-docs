@@ -1,5 +1,4 @@
 ---
-id: guides
 title: 云函数和 Hook 开发指南
 sidebar_label: 开发指南
 sidebar_position: 2

@@ -1,5 +1,4 @@
 ---
-id: platform
 title: 云引擎平台功能
 sidebar_label: 平台功能
 sidebar_position: 2

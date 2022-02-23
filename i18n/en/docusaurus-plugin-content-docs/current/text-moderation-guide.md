@@ -1,7 +1,5 @@
 ---
-id: text-moderation-guide
 title: Text Moderation Development Guide
-sidebar_label: Guide
 slug: /sdk/text-moderation/guide/
 ---
 

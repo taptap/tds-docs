@@ -1,7 +1,5 @@
 ---
-id: test-accounts
 title: 测试用户管理
-sidebar_label: 测试用户管理
 sidebar_position: 5
 ---
 

@@ -1,5 +1,4 @@
 ---
-id: ios-cert
 title: iOS 推送设置指南
 sidebar_label: iOS 推送设置
 sidebar_position: 1

@@ -1,5 +1,4 @@
 ---
-id: faq
 title: TapPlay FAQ
 sidebar_label: FAQ
 sidebar_position: 30

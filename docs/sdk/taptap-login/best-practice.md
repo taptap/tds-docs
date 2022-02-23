@@ -1,5 +1,4 @@
 ---
-id: best-practice
 title: TapTap 登录最佳实践
 sidebar_label: 最佳实践
 sidebar_position: 3

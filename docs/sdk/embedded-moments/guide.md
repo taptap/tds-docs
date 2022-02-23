@@ -1,5 +1,4 @@
 ---
-id: guide
 title: 内嵌动态开发指南
 sidebar_label: 开发指南
 sidebar_position: 2

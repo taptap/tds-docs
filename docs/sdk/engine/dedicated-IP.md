@@ -1,5 +1,4 @@
 ---
-id: dedicated-IP
 title: 云引擎独立 IP
 sidebar_label: 独立 IP
 sidebar_position: 7

@@ -1,5 +1,4 @@
 ---
-id: tap-support
 title: 客服系统
 slug: /sdk/tap-support/guide/
 ---

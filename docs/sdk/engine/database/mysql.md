@@ -1,5 +1,4 @@
 ---
-id: mysql
 title: LeanDB MySQL 使用指南
 sidebar_label: LeanDB MySQL
 sidebar_position: 2

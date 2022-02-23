@@ -1,5 +1,4 @@
 ---
-id: es
 title: LeanDB Elasticsearch 使用指南
 sidebar_label: LeanDB Elasticsearch
 sidebar_position: 4

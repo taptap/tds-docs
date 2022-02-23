@@ -1,5 +1,4 @@
 ---
-id: cli
 title: 命令行工具 CLI 使用指南
 sidebar_label: 命令行工具
 sidebar_position: 5

@@ -1,5 +1,4 @@
 ---
-id: features
 title: 成就系统功能介绍
 sidebar_label: 功能介绍
 sidebar_position: 1

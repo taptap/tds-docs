@@ -1,5 +1,4 @@
 ---
-id: advanced
 title: 挑战进阶操作，玩转社区运营
 sidebar_label: 挑战进阶操作
 sidebar_position: 30

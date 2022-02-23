@@ -1,7 +1,5 @@
 ---
-id: text-moderation-features
 title: Text Moderation Features
-sidebar_label: Features
 slug: /sdk/text-moderation/features/
 ---
 

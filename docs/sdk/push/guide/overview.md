@@ -1,5 +1,4 @@
 ---
-id: overview
 title: 推送通知总览
 sidebar_label: 总览
 sidebar_position: 0

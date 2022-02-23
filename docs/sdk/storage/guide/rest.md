@@ -1,7 +1,5 @@
 ---
-id: rest
 title: 存储 REST API
-sidebar_label: 存储 REST API
 sidebar_position: 7
 ---
 

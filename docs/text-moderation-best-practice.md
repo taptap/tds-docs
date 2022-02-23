@@ -1,7 +1,5 @@
 ---
-id: text-moderation-best-practice
 title: 文本检测最佳实践
-sidebar_label: 最佳实践
 slug: /sdk/text-moderation/best-practice/
 ---
 

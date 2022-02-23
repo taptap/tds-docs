@@ -1,5 +1,4 @@
 ---
-id: setup-java
 title: 数据存储、即时通讯 Java SDK 配置
 sidebar_label: Java SDK 配置
 sidebar_position: 3

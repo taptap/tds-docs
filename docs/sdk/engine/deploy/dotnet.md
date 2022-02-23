@@ -1,5 +1,4 @@
 ---
-id: dotnet
 title: 云引擎 .NET 运行环境
 sidebar_label: .NET
 sidebar_position: 8

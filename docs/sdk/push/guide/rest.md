@@ -1,7 +1,5 @@
 ---
-id: rest
 title: 推送 REST API
-sidebar_label: 推送 REST API
 sidebar_position: 6
 ---
 

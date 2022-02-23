@@ -1,5 +1,4 @@
 ---
-id: setup-dotnet
 title: 数据存储、即时通讯 .NET SDK 配置指南
 sidebar_label: .NET SDK 配置
 sidebar_position: 1

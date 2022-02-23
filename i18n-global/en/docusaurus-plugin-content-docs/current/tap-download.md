@@ -1,8 +1,5 @@
 ---
-id: tap-download
 title: Download
-sidebar_label: Download
-slug: /tap-download
 ---
 
 ## TapSDK
