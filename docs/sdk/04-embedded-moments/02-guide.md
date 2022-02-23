@@ -96,8 +96,8 @@ CALLBACK_CODE_GET_NOTICE_SUCCESS | 20000   | 获取新消息成功 |
 CALLBACK_CODE_GET_NOTICE_FAIL | 20100   | 获取新消息失败 |
 CALLBACK_CODE_MOMENT_APPEAR | 30000   | 动态页面打开 |
 CALLBACK_CODE_MOMENT_DISAPPEAR | 30100   | 动态页面关闭 |
-CALLBACK_CODE_ClOSE_CANCEL | 50000   | 取消关闭所有动态界面（弹框点击取消按钮） |
-CALLBACK_CODE_ClOSE_CONFIRM | 50100   | 确认关闭所有动态界面（弹框点击确认按钮） |
+CALLBACK_CODE_CLOSE_CANCEL | 50000   | 取消关闭所有动态界面（弹框点击取消按钮） |
+CALLBACK_CODE_CLOSE_CONFIRM | 50100   | 确认关闭所有动态界面（弹框点击确认按钮） |
 CALLBACK_CODE_LOGIN_SUCCESS | 60000   | 动态页面内登录成功 |
 CALLBACK_CODE_SCENE_EVENT | 70000   | 场景化入口回调 |
 
@@ -271,8 +271,8 @@ TapMoment.closeWithConfirmWindow("提示", "匹配成功，进入游戏");
 
 用户的选择会通过回调返回：
 
-- `CALLBACK_CODE_ClOSE_CANCEL`（50000），表示玩家点了「取消」，选择不关闭动态页面。
-- `CALLBACK_CODE_ClOSE_CONFIRM`（50100），表示玩家点了「确认」，选择关闭动态页面。
+- `CALLBACK_CODE_CLOSE_CANCEL`（50000），表示玩家点了「取消」，选择不关闭动态页面。
+- `CALLBACK_CODE_CLOSE_CONFIRM`（50100），表示玩家点了「确认」，选择关闭动态页面。
 
 如果需要直接关闭动态窗口，不弹出二次确认框：
 
