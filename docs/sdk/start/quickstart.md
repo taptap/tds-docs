@@ -108,7 +108,7 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
 
 #### iOS 配置
 
-在 `Assets/Plugins/iOS/Resource` 目录下创建 `TDS-Info.plist` 文件，复制以下代码并且替换其中的 `ClientId` 和授权文案：
+在 `Assets/Plugins/iOS/Resource` 目录下创建 `TDS-Info.plist` 文件，复制以下代码并且**替换其中的 `ClientId`**。如果游戏使用了 TapTap [内嵌动态](/sdk/embedded-moments/features/)或[数据分析](/sdk/tapdb/features/)服务，需要配置相关权限并**替换授权文案**：
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -120,14 +120,15 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
         <key>client_id</key>
         <string>ClientId</string>
     </dict>
-   
+
+    <!--使用内嵌动态服务，需要相册、相机、麦克风权限-->
     <key>NSPhotoLibraryUsageDescription</key>
     <string>说明为何应用需要此项权限</string>
     <key>NSCameraUsageDescription</key>
     <string>说明为何应用需要此项权限</string>
     <key>NSMicrophoneUsageDescription</key>
     <string>说明为何应用需要此项权限</string>
-    <!--TapDB 需要用到，收集 IDFA，如应用程序不想弹框，可以设置 TapDB.AdvertiserIDCollectionEnabled(false)-->
+    <!--使用数据分析服务需要 IDFA 权限。如应用程序不想弹框，可以设置 TapDB.AdvertiserIDCollectionEnabled(false)-->
     <key>NSUserTrackingUsageDescription</key>
     <string>说明为何应用需要此项权限</string>
 </dict>
@@ -225,21 +226,17 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
 
 #### 配置权限
 
-**TapTap 内嵌动态功能需要相册、相机、麦克风访问权限，数据分析功能需要 IDFA 权限。**
-
-因此，如果游戏加入了 TapTap 内嵌动态功能或数据分析功能，那么需要在 `info.plist` 添加如下配置（请替换授权文案）：
+如果游戏使用了 TapTap [内嵌动态](/sdk/embedded-moments/features/)或[数据分析](/sdk/tapdb/features/)服务，那么需要在 `info.plist` 需要配置相关权限并**替换授权文案**：
 
 ```xml
-<!-- 相册 -->
+<!--使用内嵌动态服务，需要相册、相机、麦克风权限-->
 <key>NSPhotoLibraryUsageDescription</key>
 <string>说明为何应用需要此项权限</string>
-<!-- 相机 -->
 <key>NSCameraUsageDescription</key>
 <string>说明为何应用需要此项权限</string>
-<!-- 麦克风 -->
 <key>NSMicrophoneUsageDescription</key>
 <string>说明为何应用需要此项权限</string>
-<!--TapDB 需要用到，收集 IDFA，如应用程序不想弹框，可以设置 TapDB.AdvertiserIDCollectionEnabled(false)-->
+<!--使用数据分析服务需要 IDFA 权限。如应用程序不想弹框，可以设置 TapDB.AdvertiserIDCollectionEnabled(false)-->
 <key>NSUserTrackingUsageDescription</key>
 <string>说明为何应用需要此项权限</string>
 ```
