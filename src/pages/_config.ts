@@ -118,19 +118,19 @@ export const getEntries = (brand: string, region: string): Entry[] => {
     return ENTRIES_TDS.map((entry, index) => ({
       title: translate({
         message: entry.title,
-        id: `tds-home-${entry.title.replaceAll(" ", "-")}`,
+        id: `tds-home-${entry.title}`,
         description: `from HomePage Cell ${index + 1} Title`,
       }),
       description: translate({
         message: entry.description,
-        id: `tds-home-${entry.description.replaceAll(" ", "-")}`,
+        id: `tds-home-${entry.description}`,
         description: `from HomePage Cell ${index + 1} Desc`,
       }),
       links: entry.links.map((link) => ({
         ...link,
         label: translate({
           message: link.label,
-          id: `tds-home-link-${link.label.replaceAll(" ", "-")}`,
+          id: `tds-home-link-${link.label}`,
           description: `from HomePage Cell Link`,
         }),
       })),
