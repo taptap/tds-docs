@@ -8,6 +8,7 @@ import MultiLang from '/src/docComponents/MultiLang';
 import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';
 import {Gray,Blue, Red, Black} from '/src/docComponents/doc';
+import {Conditional} from '/src/docComponents/conditional';
 
 ## DLC 查询和购买
 
@@ -129,7 +130,4 @@ ERROR_CODE_UNDEFINED       | 80000   | 未知错误     |
 
 ### 正式上线
 
-所有流程都确保顺利后，游戏可[正式上线](/store/store-release/)。
-![用来空行的小白条](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)
-
----
+所有流程都确保顺利后，游戏可<Conditional region='cn'>[正式上线](/store/store-release/)</Conditional><Conditional region='global'>[正式上线](/store/store-publish-game/)</Conditional>。
