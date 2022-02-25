@@ -8,6 +8,7 @@ import {Conditional} from '/src/docComponents/conditional';
 import MultiLang from '/src/docComponents/MultiLang';
 import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';
+import AndroidFaq from '../_partials/android-package-visibility.mdx';
 
 正版验证适用于在 TapTap 上架的付费下载游戏。游戏集成 TapSDK 的正版验证之后，当玩家第一次启动游戏时（包含卸载后再次安装），SDK 会前往 TapTap 查询玩家是否购买游戏，如已购买，则可正常进入游戏，如查询到未购买，则会引导购买。
 
@@ -162,26 +163,4 @@ TapLicenseHelper.check(Activity activity);
 
 ### Android 11 或更高版本无法拉起 TapTap 客户端
 
-Android 11（API level 30）之后加强了隐私保护策略，引入了大量变更和限制，其中一个重要变更——[软件包可见性](https://developer.android.com/about/versions/11/privacy/package-visibility)，将会导致第三方应用无法拉起 TapTap 客户端，从而影响 TapTap 相关功能的正常使用，包括但不限于更新唤起 TapTap、购买验证等功能。
-
-**方案一：**
-
-编译时将 `targetSdkVersion` 改为 29（目前设置成 >= 30 会触发该问题）。
-
-**方案二：**
-
-1. 将 gradle build tools 改为 4.1.0+：
-
-    ```java
-    classpath 'com.android.tools.build:gradle:4.1.0'
-    ```
-
-2. 在 AndroidManifest.xml 里添加如下内容：
-
-    ```xml
-    <queries>
-        <package android:name="com.taptap" />
-        <package android:name="com.taptap.pad" />
-        <package android:name="com.taptap.global" />
-    </queries>
-    ```
+<AndroidFaq />
