@@ -22,7 +22,7 @@ import {Conditional} from '/src/docComponents/conditional';
     <img src={useBaseUrl('/img/sdk-test-accounts-1.png')} alt="" />
     </Conditional>
     <Conditional region='global'>
-    <img src={useBaseUrl('/img/io/sdk-test-accounts-1.png')} alt="" />
+    <img src={useBaseUrl('/img/io/test-account-1.png')} alt="" />
     </Conditional>
 
 3. 填写用户 ID 或昵称搜索用户，选择用户并提交，成功将用户添加进名单。
@@ -31,6 +31,6 @@ import {Conditional} from '/src/docComponents/conditional';
     <img src={useBaseUrl('/img/sdk-test-accounts-2.png')} alt="" />
     </Conditional>
     <Conditional region='global'>
-    <img src={useBaseUrl('/img/io/sdk-test-accounts-2.png')} alt="" />
+    <img src={useBaseUrl('/img/io/test-account-2.png')} alt="" />
     </Conditional>
 

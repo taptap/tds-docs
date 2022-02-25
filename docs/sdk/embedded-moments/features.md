@@ -4,6 +4,8 @@ sidebar_label: 功能介绍
 sidebar_position: 1
 ---
 
+import {Conditional} from '/src/docComponents/conditional';
+
 ## 产品介绍
 
 玩家可以在游戏内进入 TapTap 的社区论坛，查看攻略资讯，分享自己的游戏精彩瞬间，也可以参与其他玩家、官方和大神之间的互动。
@@ -55,6 +57,8 @@ sidebar_position: 1
 
 ![](/img/embedded-moments/repost.png)
 
+<Conditional region='cn'>
+
 ### 攻略站
 
 - **攻略标签**：玩家可以在右侧快捷导航栏里查找相应的攻略「标签」，查看三条攻略：
@@ -83,6 +87,8 @@ sidebar_position: 1
 #### 提交工单方式
 
 进入 TapTap 开发者中心后台，点击右上角「工单」，创建工单时请选择「TDS 游戏服务」-「内嵌动态」-「其他问题」，提交你的诉求，我们会尽快给你答复。
+
+</Conditional>
 
 ### 关注流
 
