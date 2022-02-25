@@ -337,6 +337,33 @@ import CodeBlock from "@theme/CodeBlock";
 
 请放在其他语言（如 `en`）文件夹「相同路径」下。如想翻译 `docs/tap-download.md` 文件，则需要把翻译文件放在 `i18n/en/docusaurus-plugin-content-docs/current/tap-download.md`。
 
+### 文件夹翻译（如有困难可直接联系技术支持）
+
+首先请确保通过 `_category_.json` 为文件夹设置了中文 label：
+
+```json
+{
+  "label": "中文侧边栏名",
+  "collapsed": true,
+  "position": 3
+}
+```
+
+在非中文 `docs` 目录下有一个 `current.json` 文件用来存放所有中文 label 对应的英文翻译。下面的示例展示了包含 `docs/sdk/taptap-login`（TapTap 登录）和 `docs/sdk/taptap-login/guide`（开发指南）这两个目录的翻译的 `current.json` 文件：
+
+```json
+{
+  "sidebar.sdk.category.TapTap 登录": {
+    "message": "TapTap Login",
+    "description": "The label for category TapTap 登录 in sidebar sdk"
+  },
+  "sidebar.sdk.category.开发指南": {
+    "message": "Guides",
+    "description": "The label for category 开发指南 in sidebar sdk"
+  }
+}
+```
+
 ## 文档发布注意事项
 
 - 不支持 html 文件脚本，直接复制 markdown 过来的文件可能无法初始化
