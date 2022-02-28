@@ -11,6 +11,7 @@ import EngineRuntimes from '/src/docComponents/MultiLang/engine';
 import {BRAND, CLI_BINARY} from '/src/constants/env.ts';
 import TabItem from '@theme/TabItem';
 import CodeBlock from '@theme/CodeBlock';
+import {Conditional} from '/src/docComponents/conditional';
 
 <PlatformIntroduction />
 
@@ -105,7 +106,7 @@ Switching to my-engine-app (group: web)`}
 
 ### Git 部署
 
-云引擎还支持从 Git 仓库拉取代码进行部署，包括 [GitHub](https://github.com/) 或 [Gitee](https://gitee.com/) 这样的第三方托管平台，和 [GitLab](https://about.gitlab.com/install/) 这样自己搭建的 Git 托管服务。你可以在 **开发者中心 » 你的游戏 » 游戏服务 » 云服务 » 云引擎 » 你的分组 » 部署 » Git 部署** 中设置 Git 仓库的地址。
+云引擎还支持从 Git 仓库拉取代码进行部署，包括 [GitHub](https://github.com/)<Conditional region='cn'> 或 [Gitee](https://gitee.com/)</Conditional> 这样的第三方托管平台，和 [GitLab](https://about.gitlab.com/install/) 这样自己搭建的 Git 托管服务。你可以在 **开发者中心 » 你的游戏 » 游戏服务 » 云服务 » 云引擎 » 你的分组 » 部署 » Git 部署** 中设置 Git 仓库的地址。
 
 云引擎支持 SSH 协议的私有仓库（如 `git@github.com:leancloud/node-js-getting-started.git`），你需要在设置 Git 仓库地址后在 Git 托管服务处为云引擎配置 deploy key。如果你的仓库是公开的，则推荐使用 HTTPS 形式的仓库地址。
 
