@@ -1,6 +1,7 @@
 ---
 title: 数据存储、即时通讯 Objective-C SDK 配置 
 sidebar_label: Objective-C SDK 配置
+slug: /sdk/storage/guide/setup-objc/
 sidebar_position: 5
 ---
 

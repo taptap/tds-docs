@@ -1,6 +1,7 @@
 ---
 title: 数据存储、即时通讯 Java SDK 配置
 sidebar_label: Java SDK 配置
+slug: /sdk/storage/guide/setup-java/
 sidebar_position: 3
 ---
 import CodeBlock from '@theme/CodeBlock';

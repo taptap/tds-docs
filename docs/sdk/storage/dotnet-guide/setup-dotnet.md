@@ -1,6 +1,7 @@
 ---
 title: 数据存储、即时通讯 .NET SDK 配置指南
 sidebar_label: .NET SDK 配置
+slug: /sdk/storage/guide/setup-dotnet/
 sidebar_position: 1
 ---
 import CodeBlock from '@theme/CodeBlock';
@@ -15,7 +16,19 @@ import sdkVersions from '/src/docComponents/sdkVersions';
 
 更多支持框架可参考：https://docs.microsoft.com/en-us/dotnet/standard/net-standard
 
+## SDK 获取
+
 通过 GitHub 仓库 [Releases](https://github.com/leancloud/csharp-sdk/releases) 下载最新版本 SDK。
+
+### 模块及依赖关系
+
+名称 | 模块描述
+--|---
+`LeanCloud-SDK-Storage`| 存储服务。
+`LeanCloud-SDK-Realtime`| 即时通信、LiveQuery 服务，依赖于存储服务。
+`LeanCloud-SDK-Engine`| 云引擎服务，依赖于存储，适用于云引擎服务端环境。
+
+如只需使用某种服务，可下载最小依赖包，减小程序体积。
 
 ### 安装
 
@@ -37,16 +50,6 @@ import sdkVersions from '/src/docComponents/sdkVersions';
 
 .NET Core 或其他支持 .NET Standard 2.0 的项目请下载 LeanCloud-SDK-XXX-Standard.zip，解压后设置依赖即可。
 （XXX 指云服务，包括存储 Storage，即时通讯（含 LiveQuery） Realtime，云引擎 Engine）
-
-### 模块及依赖关系
-
-名称 | 模块描述
---|---
-`LeanCloud-SDK-Storage`| 存储服务。
-`LeanCloud-SDK-Realtime`| 即时通信、LiveQuery 服务，依赖于存储服务。
-`LeanCloud-SDK-Engine`| 云引擎服务，依赖于存储，适用于云引擎服务端环境。
-
-如只需使用某种服务，可下载最小依赖包，减小程序体积。
 
 ## 快速开始
 

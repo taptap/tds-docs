@@ -1,5 +1,6 @@
 ---
-title: 数据和安全 
+title: 数据和安全
+slug: /sdk/storage/guide/security/
 sidebar_position: 10
 ---
 

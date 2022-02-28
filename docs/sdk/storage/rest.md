@@ -1,5 +1,6 @@
 ---
 title: 存储 REST API
+slug: /sdk/storage/guide/rest/
 sidebar_position: 7
 ---
 
