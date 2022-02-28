@@ -99,8 +99,18 @@ ERROR_CODE_UNDEFINED       | 80000   | 未知错误     |
 
 
 #### skuId:
+
+<Conditional region='cn'>
+
 内购商品 id，需要提交工单联系 TapTap 运营同学进行配置；
 
+</Conditional>
+
+<Conditional region='global'>
+
+内购商品 id，需要发邮件到 [international_operation@taptap.com](mailto:international_operation@taptap.com) 联系 TapTap 运营同学进行配置；
+
+</Conditional>
 
 ## 测试
 
