@@ -53,12 +53,18 @@ const config = {
             label: "文档首页",
             to: "/",
             position: "right",
-            activeBaseRegex:
-              "^" + PREVIEW === "true" ? "/" : "/docs/" + "(?!.+)",
+            activeBaseRegex: `^${
+              PREVIEW === "true" ? "/" : "/docs/"
+            }(zh-Hans/)?(?!.+)`,
           },
           {
             label: "游戏商店",
             to: "store",
+            position: "right",
+          },
+          {
+            label: "游戏服务",
+            to: "sdk",
             position: "right",
           },
           {

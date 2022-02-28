@@ -3,10 +3,6 @@ title: TapTap Developer Agreement
 sidebar_position: 15
 ---
 
-# **TapTap Developer Agreement**
-
- 
-
 **Release date: December 29, 2021**
 
 **Effective date: December 29, 2021**

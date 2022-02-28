@@ -53,7 +53,7 @@ const config = {
             label: "文档首页",
             to: "/",
             position: "right",
-            activeBaseRegex: "^" + "/" + "(?!.+)",
+            activeBaseRegex: "^/(?!.+)",
           },
         ],
       },

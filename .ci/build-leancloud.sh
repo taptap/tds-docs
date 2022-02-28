@@ -3,7 +3,7 @@
 set -e
 
 mkdir tmp
-cp -r docs/sdk/_partials docs/sdk/16-engine tmp
+cp -r docs/sdk/_partials docs/sdk/engine tmp
 rm -rf docs i18n src/constants/env.ts src/styles/override.scss versioned_docs versioned_sidebars docusaurus.config.js sidebars.js versions.json
 cp .ci/leancloud/env.ts src/constants/env.ts
 cp .ci/leancloud/override.scss src/styles/override.scss

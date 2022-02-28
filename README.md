@@ -289,7 +289,7 @@ import CodeBlock from "@theme/CodeBlock";
 - `docs/sdk/taptap-login/features.md` 在其他 md 文件中跳转需写作 `[跳转标题](/sdk/taptap-login/features/)`
 - `docs/design/design-moment.md` 在其他 md 文件中跳转需写作 `[跳转标题](/design/design-moment/)`
 - `i18n/en/docusaurus-plugin-content-docs/current/sdk/taptap-login/features.md` 在其他 md 文件中跳转需写作 `[跳转标题](/sdk/taptap-login/features/)`
-- 标题跳转需要去除标点并将空格换成 `-`，比如 `[<FaqLink>1. 如何进行游戏认领？</FaqLink>](/store/store-creategame#我的游戏已经被 TapTap 收录，可以进行游戏认领吗？)` 应写作 `[<FaqLink>1. 如何进行游戏认领？</FaqLink>](/store/store-creategame#我的游戏已经被-TapTap-收录可以进行游戏认领吗)`
+- 标题跳转需要去除标点、将空格换成 `-` 并将大写字母改为小写，比如 `[<FaqLink>1. 如何进行游戏认领？</FaqLink>](/store/store-creategame#我的游戏已经被 TapTap 收录，可以进行游戏认领吗？)` 应写作 `[<FaqLink>1. 如何进行游戏认领？</FaqLink>](/store/store-creategame#我的游戏已经被-taptap-收录可以进行游戏认领吗)`
 
 ##### 链接到外部网站
 
@@ -336,6 +336,33 @@ import CodeBlock from "@theme/CodeBlock";
 ### md 文档文件翻译
 
 请放在其他语言（如 `en`）文件夹「相同路径」下。如想翻译 `docs/tap-download.md` 文件，则需要把翻译文件放在 `i18n/en/docusaurus-plugin-content-docs/current/tap-download.md`。
+
+### 文件夹翻译（如有困难可直接联系技术支持）
+
+首先请确保通过 `_category_.json` 为文件夹设置了中文 label：
+
+```json
+{
+  "label": "中文侧边栏名",
+  "collapsed": true,
+  "position": 3
+}
+```
+
+在非中文 `docs` 目录下有一个 `current.json` 文件用来存放所有中文 label 对应的英文翻译。下面的示例展示了包含 `docs/sdk/taptap-login`（TapTap 登录）和 `docs/sdk/taptap-login/guide`（开发指南）这两个目录的翻译的 `current.json` 文件：
+
+```json
+{
+  "sidebar.sdk.category.TapTap 登录": {
+    "message": "TapTap Login",
+    "description": "The label for category TapTap 登录 in sidebar sdk"
+  },
+  "sidebar.sdk.category.开发指南": {
+    "message": "Guides",
+    "description": "The label for category 开发指南 in sidebar sdk"
+  }
+}
+```
 
 ## 文档发布注意事项
 

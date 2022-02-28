@@ -53,8 +53,9 @@ const config = {
             label: "文档首页",
             to: "/",
             position: "right",
-            activeBaseRegex:
-              "^" + PREVIEW === "true" ? "/" : "/docs/" + "(?!.+)",
+            activeBaseRegex: `^${
+              PREVIEW === "true" ? "/" : "/docs/"
+            }(en/)?(?!.+)`,
           },
           {
             label: "游戏商店",

@@ -39,11 +39,11 @@ import {FaqLink} from '/src/docComponents/doc';
 
 ### [<FaqLink>1. 游戏入库流程</FaqLink>](/store/store-creategame/)  
 ### [<FaqLink>2. 游戏入库后需要立即发布吗？</FaqLink>](/store/store-creategame#创建游戏审核通过后可暂不发布游戏吗)  
-### [<FaqLink>3. TapTap 游戏收录标准</FaqLink>](/store/store-creategame#TapTap-是所有的游戏都收录吗)  
+### [<FaqLink>3. TapTap 游戏收录标准</FaqLink>](/store/store-creategame#taptap-是所有的游戏都收录吗)  
 
 ## **六、 游戏认领、转移及下架**  
 
-### [<FaqLink>1. 如何进行游戏认领？</FaqLink>](/store/store-creategame#我的游戏已经被-TapTap-收录可以进行游戏认领吗)  
+### [<FaqLink>1. 如何进行游戏认领？</FaqLink>](/store/store-creategame#我的游戏已经被-taptap-收录可以进行游戏认领吗)  
 ### [<FaqLink>2. 如何进行游戏转移？</FaqLink>](/store/store-creategame#游戏主体可以进行转移吗)  
 ### [<FaqLink>3. 如何进行游戏下架？</FaqLink>](/store/store-creategame#如何进行游戏下架)  
 
@@ -56,7 +56,7 @@ import {FaqLink} from '/src/docComponents/doc';
 
 ### [<FaqLink>1. 安卓端测试流程</FaqLink>](/store/store-test/)  
 ### [<FaqLink>2. 安卓端测试形式</FaqLink>](/store/store-test#安卓端测试形式)  
-### [<FaqLink>3. iOS端测试流程</FaqLink>](/store/store-test#iOS-端测试流程)  
+### [<FaqLink>3. iOS端测试流程</FaqLink>](/store/store-test#ios-端测试流程)  
 ### [<FaqLink>4. 关于测试服</FaqLink>](/store/store-test#什么是测试服测试服有什么优点如何创建测试服)  
 ### [<FaqLink>5. 如何获得测试资源位？</FaqLink>](/store/store-test#测试资源)  
 
