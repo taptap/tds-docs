@@ -5,6 +5,7 @@ sidebar_position: 8
 ---
 
 import {BRAND} from '/src/constants/env.ts';
+import {Conditional} from '/src/docComponents/conditional';
 
 ## 云引擎功能
 
@@ -148,7 +149,7 @@ after 类 Hook 超时时间为 3 秒，如果你的体验实例已经休眠，�
 
 ### 流量如何计费？
 
-每个云引擎实例每天有 1 G 免费额度，超出部分价格可以在当前节点的价格页面查看。
+每个云引擎实例每天有 1 G 免费额度，超出部分价格可以在<Conditional brand='leancloud'>当前节点的</Conditional>价格页面查看。
 
 一个应用下的流量额度会合并计算，即每天的免费额度为 `max(n, 1)` GB，其中 `n` 为该应用所有云引擎分组下的标准实例总数。
 
