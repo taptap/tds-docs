@@ -7,6 +7,7 @@ sidebar_position: 3
 import EngineRuntimes from '/src/docComponents/MultiLang/engine';
 import TabItem from '@theme/TabItem';
 import {BRAND} from '/src/constants/env.ts';
+import {Conditional} from '/src/docComponents/conditional';
 
 :::info
 这篇文档是关于云引擎 SDK 的深入介绍，如需了解云函数和 Hook 的用法请看 [云函数和 Hook 开发指南](/sdk/engine/functions/guides)。
@@ -573,6 +574,15 @@ $cookieStorage->set("key", "val");
 ### 如何使用 SDK 重定向到 HTTPS？
 
 我们目前推荐在绑定自定义域名时勾选「强制 HTTPS」（详见 [云引擎平台功能 § 重定向到 HTTPS](/sdk/engine/deploy/platform/#重定向到-https)）而不是使用 SDK 中的重定向中间件。
+
+<Conditional region='cn'>
+
+:::info
+不过，「强制 HTTPS」选项目前只支持独立 IP。
+如果使用加速节点，仍需在项目代码层面实现重定向。
+:::
+
+</Conditional>
 
 <details>
 <summary>点击展开关于 SDK 中重定向到 HTTPS 的用法（不推荐）</summary>
