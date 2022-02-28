@@ -5,6 +5,7 @@ sidebar_position: 1
 ---
 
 import useBaseUrl from '@docusaurus/useBaseUrl';
+import {Conditional} from '/src/docComponents/conditional';
 
 
 TapTap 开发者服务，支持付费的可下载内容（DLC），让玩家不离开游戏便能浏览、购买、拥有新内容。你需要在游戏内向玩家显示 DLC 的示意内容与购买按钮，所销售的商品内容由游戏决定，你也可以随意决定游戏内商品的数量，可以单独出售商品，也可以捆绑销售。每个 DLC 内容都拥有一个唯一的身份标识（商品 ID）。DLC SDK 会向玩家显示购买环节的操作。
@@ -15,7 +16,17 @@ TapTap 开发者服务，支持付费的可下载内容（DLC），让玩家不�
 
 ## 开通与配置
 
+<Conditional region='cn'>
+
 如需要使用 DLC 服务，请先联系对接的 TapTap 商务或运营进行开通。
+
+</Conditional>
+
+<Conditional region='global'>
+
+如需要使用 DLC 服务，请发邮件至 [international_operation@taptap.com](mailto:international_operation@taptap.com) 联系我们进行开通。
+
+</Conditional>
 
 ## 更新 DLC
 
