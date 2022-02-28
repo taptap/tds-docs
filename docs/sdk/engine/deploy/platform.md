@@ -177,7 +177,11 @@ Switching to my-engine-app (group: web)`}
 
 ### 标准版云引擎
 
+<Conditional brand='leancloud'>
+
 云引擎的计费独立于开发版、商用版方案，开通或取消商用版不影响云引擎的实例和计费。
+
+</Conditional>
 
 :::tip
 对于商业项目和正式上线的产品，我们建议开发者升级到标准版云引擎，并使用至少两个实例，来保证业务的可用性。
