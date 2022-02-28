@@ -47,9 +47,6 @@ export default function LocaleDropdownNavbarItem({
 
   const items = [...dropdownItemsBefore, ...localeItems, ...dropdownItemsAfter];
 
-  // Mobile is handled a bit differently
-  const dropdownLabel = mobile ? 'Languages' : getLocaleLabel(currentLocale);
-
   return (
     <DropdownNavbarItem
       {...props}

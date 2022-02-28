@@ -21,9 +21,8 @@ import './override.scss';
 
 export default function DocItem(props: Props): JSX.Element {
   const {content: DocContent} = props;
-  const {metadata, frontMatter} = DocContent;
+  const {metadata, frontMatter, assets} = DocContent;
   const {
-    image,
     keywords,
     hide_title: hideTitle,
     hide_table_of_contents: hideTableOfContents,
@@ -31,6 +30,7 @@ export default function DocItem(props: Props): JSX.Element {
     toc_max_heading_level: tocMaxHeadingLevel,
   } = frontMatter;
   const {description, title, slug} = metadata;
+  const image = assets.image ?? frontMatter.image;
 
   // We only add a title if:
   // - user asks to hide it with front matter
@@ -78,8 +78,9 @@ export default function DocItem(props: Props): JSX.Element {
               <div
                 className={clsx(ThemeClassNames.docs.docMarkdown, 'markdown')}>
                 {/*
-                Title can be declared inside md content or declared through front matter and added manually
-                To make both cases consistent, the added title is added under the same div.markdown block
+                Title can be declared inside md content or declared through
+                front matter and added manually. To make both cases consistent,
+                the added title is added under the same div.markdown block
                 See https://github.com/facebook/docusaurus/pull/4882#issuecomment-853021120
                 */}
                 {shouldAddTitle && (

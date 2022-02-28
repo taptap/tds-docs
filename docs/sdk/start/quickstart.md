@@ -108,7 +108,7 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
 
 #### iOS 配置
 
-在 `Assets/Plugins/iOS/Resource` 目录下创建 `TDS-Info.plist` 文件，复制以下代码并且**替换其中的 `ClientId`**。如果游戏使用了 TapTap [内嵌动态](/sdk/embedded-moments/features/)或[数据分析](/sdk/tapdb/features/)服务，需要配置相关权限并**替换授权文案**：
+在 `Assets/Plugins/iOS/Resource` 目录下创建 `TDS-Info.plist` 文件，复制以下代码并且**替换其中的 `ClientId`**。如果游戏使用了 TapTap [内嵌动态](/sdk/embedded-moments/features/)<Conditional region='cn'>或[数据分析](/sdk/tapdb/features/)</Conditional>服务，需要配置相关权限并**替换授权文案**：
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -226,7 +226,7 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
 
 #### 配置权限
 
-如果游戏使用了 TapTap [内嵌动态](/sdk/embedded-moments/features/)或[数据分析](/sdk/tapdb/features/)服务，那么需要在 `info.plist` 需要配置相关权限并**替换授权文案**：
+如果游戏使用了 TapTap [内嵌动态](/sdk/embedded-moments/features/)<Conditional region='cn'>或[数据分析](/sdk/tapdb/features/)</Conditional>服务，那么需要在 `info.plist` 需要配置相关权限并**替换授权文案**：
 
 ```xml
 <!--使用内嵌动态服务，需要相册、相机、麦克风权限-->
@@ -374,7 +374,17 @@ TapSDK 提供了众多功能。请在初始化 SDK 后，根据项目需要，�
 
 Android 和 iOS 应用需要在 TapTap 开发者中心进入你的游戏，依次选择 **游戏服务 > 生态服务 > TapTap 登录** 配置应用的相关信息（如下图所示），否则测试登录功能时会返回 `signature not match` 报错信息，无法正常使用 TapTap 登录功能。
 
+<Conditional region='cn'>
+
 ![](/img/start_getready_info.png)
+
+</Conditional>
+
+<Conditional region='global'>
+
+![](/img/io/login-config.png)
+
+</Conditional>
 
 ### 添加测试用户
 
@@ -393,7 +403,11 @@ TapSDK 已经做了混淆处理，再次混淆会导致不可预期的错误，�
 -keep class tds.androidx.** { *;}
 ```
 
+<Conditional region='cn'>
+
 如果使用到基于**数据存储**的云服务，比如**内建账户**方式登录则需要额外添加 **[数据存储](/sdk/storage/guide/setup-java/#android-代码混淆)** 相关的混淆代码。
+
+</Conditional>
 
 ## 打包
 

@@ -221,7 +221,7 @@ function NavbarMobileSidebar({
   );
 }
 
-function Navbar(): JSX.Element {
+export default function Navbar(): JSX.Element {
   const {
     navbar: {hideOnScroll, style},
   } = useThemeConfig();
@@ -297,5 +297,3 @@ function Navbar(): JSX.Element {
     </nav>
   );
 }
-
-export default Navbar;
