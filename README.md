@@ -16,26 +16,23 @@ yarn start -- --locale en
 
 ```
 .
-├── docs                                     中国大陆版中文文档
+├── docs                                     中文文档
 │   ├── ddos.md                              隐藏文档
-│   └── sdk                                  一级导航
-│       └── start                            二级导航
+│   └── sdk                                  顶栏菜单项
+│       └── start                            侧栏菜单项
 │           └── overview.md                  文档内容
 ├── i18n
-│   └── en                                   中国大陆版英文文档
+│   └── en                                   英文文档
 │       ├── code.json                        UI 翻译（用于文档内容以外的地方，如文档搜索）
 │       ├── docusaurus-plugin-content-docs
-│       │   ├── current                      全部文档内容，需与 `docs`（中国大陆版中文文档）结构一致
+│       │   ├── current                      全部文档内容，需与 `docs`（中文文档）结构一致
 │       │   └── current.json                 侧栏菜单项翻译
 │       └── docusaurus-theme-classic
 │           └── navbar.json                  顶栏菜单项翻译
-├── i18n-global
-│   ├── en                                   海外版英文文档
-│   └── zh-Hans                              海外版中文文档
 ├── sidebars.js                              菜单配置
 ├── src
 │   ├── docComponents                        自定义组件（用于文档内容，如多编程语言）
-│   ├── pages                                首页等特殊页面
+│   ├── pages                                文档以外的页面（目前只包含首页）
 │   ├── styles                               一些共享样式
 │   └── theme                                自定义组件（用于文档内容以外的地方，如文档搜索）
 ├── static
@@ -48,10 +45,8 @@ yarn start -- --locale en
 
 其中编辑人员常用的目录有：
 
-- `docs`（中国大陆版中文文档）
-- `i18n/en/docusaurus-plugin-content-docs/current`（中国大陆版英文文档）
-- `i18n-global/en/docusaurus-plugin-content-docs/current`（海外版英文文档）
-- `i18n-global/zh-Hans/docusaurus-plugin-content-docs/current`（海外版中文文档）
+- `docs`（中文文档）
+- `i18n/en/docusaurus-plugin-content-docs/current`（英文文档）
 - `static`（文档配图和下载资源）
 
 ## 文档编写
@@ -192,7 +187,7 @@ public static void login(Activity activity, @LoginType.ThirdPartyType int type, 
 </MultiLang>
 ````
 
-上面的例子中，我们使用了空标签 `<>...</>`（React 的 Fragment 组件）将 C#、Java、Objective-C 的不同内容包成三组。
+上面的例子中，我们使用了空标签 `<>...</>`（React 的 `Fragment` 组件）将 C#、Java、Objective-C 的不同内容包成三组。
 同样，空标签和 markdown 之间也需要留出空行。
 另外，由于 Docusaurus 的 TOC 生成并不能正确处理这种情况下的小标题（仅会根据第一个标签的内容生成小标题，切换标签后 TOC 的内容不变），请不要在 `MultiLang` 标签中使用 `h1`、`h2`、`h3` 级别的标题。
 最后，某些文档面向的平台并不是 Unity、iOS、Android，这种情况下可以用 `kind` 参数指定使用 `MultiLang` 的变体，比如云引擎文档使用 `<MultiLang kind="engine">`，顺序为 JavaScript、Python、PHP、Java、C#、Go。
