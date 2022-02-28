@@ -195,9 +195,13 @@ AfterUpdate 是在云引擎内执行的，执行 afetrUpdate 不算 API 请求�
 
 需要在控制台手动绑定一个 `stg-` 开头的域名。`stg-` 开头的自定义域名（例如 stg-web.example.com）会被自动地绑定到预备环境。
 
+<Conditional region='global'>
+
 ### 云引擎可以绑定裸域名吗？
 
-如果希望在国际版云引擎绑定裸域名，我们建议选择支持 ANAME 或 CNAME Flattening 记录的域名服务商。
+如果希望绑定裸域名，我们建议选择支持 ANAME 或 CNAME Flattening 记录的域名服务商。
+
+</Conditional>
 
 ## 疑难问题
 
