@@ -14,6 +14,7 @@ import CloudTimezone from '../_partials/cloud-timezone.mdx';
 import CloudLoadBalancer from '../_partials/cloud-load-balancer.mdx';
 import CloudCustomDomain from '../_partials/cloud-custom-domain.mdx';
 import CloudInternetAddress from '../_partials/cloud-internet-address.mdx';
+import {Conditional} from '/src/docComponents/conditional';
 
 :::info
 这篇文档是针对 Python 运行环境的深入介绍，如希望快速地开始使用云引擎，请查看 [快速开始部署云引擎应用](/sdk/engine/deploy/getting-started)。
@@ -62,7 +63,7 @@ run: python app.py
 云引擎目前仅支持 CPython 版本，暂时不支持 PyPy、Jython、IronPython 等其他 Python 实现。
 
 :::note
-对于新创建的应用，如未设置 Python 版本，云引擎会默认使用最新的稳定版本。在 2021-09-02 之前创建的分组因兼容考虑会默认使用 `2.7` 版本。
+<Conditional brand="leancloud">对于新创建的应用，</Conditional>如未设置 Python 版本，云引擎会默认使用最新的稳定版本。<Conditional brand="leancloud">在 2021-09-02 之前创建的分组因兼容考虑会默认使用 `2.7` 版本。</Conditional>
 :::
 
 :::note
