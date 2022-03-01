@@ -1,6 +1,7 @@
 ---
 title: 全文搜索指南
-sidebar_position: 8
+slug: /sdk/storage/guide/fulltext-search/
+sidebar_position: 1
 ---
 
 import MultiLang from '/src/docComponents/MultiLang';

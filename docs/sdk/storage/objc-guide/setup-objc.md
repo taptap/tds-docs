@@ -1,10 +1,12 @@
 ---
 title: 数据存储、即时通讯 Objective-C SDK 配置 
 sidebar_label: Objective-C SDK 配置
+slug: /sdk/storage/guide/setup-objc/
 sidebar_position: 5
 ---
 
-
+import DomainBinding from '../../_partials/setup-domain.mdx';
+import AppConfig from '../_partials/app-config.mdx'
 
 ## 获取 SDK
 
@@ -51,12 +53,7 @@ $ pod install --repo-update
 
 ### 手动安装
 
-#### 下载源码
-
-在 [SDK 下载页面][download-sdk]，下载最新版的源码。
-
-[download-sdk]: https://releases.leanapp.cn/#/leancloud/objc-sdk/releases
-#### 集成 SDK
+在 [SDK 下载页面](https://releases.leanapp.cn/#/leancloud/objc-sdk/releases) 下载最新版的源码。
 
 将 `AVOS`/`AVOS.xcodeproj` 项目文件拖入示例项目，作为 subproject：
 
@@ -68,32 +65,7 @@ $ pod install --repo-update
 
 这样就集成完毕了。
 
-## 快速开始
-
-### 绑定域名
-
-你需要绑定 API 自定义域名，以便和其他厂商的应用隔离入口，避免其他应用受到 DDoS 攻击时相互牵连。
-如果使用了文件服务，也需要绑定文件自定义域名。
-
-进入 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 服务设置 > 自定义域名** 点击「绑定新域名」按钮，根据控制台提示完成绑定步骤。
-注意，DNS 解析记录和证书申请（如果选择了自动管理 SSL 证书）都需要一定时间，请耐心等待。
-
-绑定成功后，初始化 SDK 时，请传入绑定的自定义域名（`https://please-replace-with-your-customized.domain.com`）。
-
-如果你使用了文件服务（包括即时通讯的多媒体消息（图像、音频、视频等）），同样需要前往 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 文件 > 设置 > 文件访问域名** 绑定域名，步骤和 API 自定义域名基本相同，但有两点不一样：
-
-1. API 域名解析使用 A 记录，文件域名解析使用 CNAME 记录，也因此文件域名不支持绑定裸域名（例如 `example.com`），需要绑定子域名（例如 `files.example.com`）。
-2. 绑定成功后，还需在 **文件 > 设置 > 文件访问地址** 点击「修改」按钮进行切换。
-
-### 应用凭证
-
-在 **开发者中心 > 你的游戏 > 游戏服务 > 应用配置** 可以查看应用凭证：
-
-- **Client ID**，又称 `App ID`，在 SDK 初始化时用到。提交工单联系技术支持时，提供 `Client ID` 可以方便我们更快定位到你的应用。
-- **Client Token**，又称 `App Key`，在 SDK 初始化时用到。
-- **Server Secret**，又称 `Master Key`，用于在自有服务器、云引擎等**受信任环境**调用管理接口，具备跳过一切权限验证的超级权限。所以**一定注意保密，千万不要在客户端代码中使用该凭证**。
-
-### 初始化
+## 初始化
 
 打开 `AppDelegate` 文件，导入基础模块头文件：
 
@@ -101,17 +73,23 @@ $ pod install --repo-update
 #import <LeanCloudObjc/Foundation.h>
 ```
 
-
 然后在 `application:didFinishLaunchingWithOptions:` 方法中设置 `App ID`，`App Key` 以及服务器地址：
 
 ```objc
 [LCApplication setApplicationId:@"your-client-id"
                       clientKey:@"your-client-token"
-                serverURLString:@"https://please-replace-with-your-customized.domain.com"];
+                serverURLString:@"https://your_server_url"];
 ```
 
 在使用 SDK 的 API 时，请确保进行了 Application 的 ID、Key 以及 Server URL 的初始化。
 
+### 应用凭证
+
+<AppConfig />
+
+## 域名
+
+<DomainBinding />
 
 ## 开启调试日志
 
@@ -126,7 +104,9 @@ $ pod install --repo-update
 
 [objc-debug-guide]: https://forum.leancloud.cn/t/leancloud-sdk-objective-c-sdk/21851
 
-注意，在应用发布之前，请关闭调试日志，以免暴露敏感数据。
+:::caution
+在应用发布之前，请关闭调试日志，以免暴露敏感数据。
+:::
 
 ## 验证
 

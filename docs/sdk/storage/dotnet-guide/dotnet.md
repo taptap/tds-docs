@@ -1,6 +1,7 @@
 ---
 title: 数据存储指南 · .NET
-sidebar_label: .NET 指南
+sidebar_label: .NET 开发指南
+slug: /sdk/storage/guide/dotnet/
 sidebar_position: 2
 ---
 

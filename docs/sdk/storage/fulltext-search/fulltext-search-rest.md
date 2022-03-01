@@ -1,6 +1,7 @@
 ---
 title: 全文搜索 REST API
-sidebar_position: 9
+slug: /sdk/storage/guide/fulltext-search-rest/
+sidebar_position: 2
 ---
 
 

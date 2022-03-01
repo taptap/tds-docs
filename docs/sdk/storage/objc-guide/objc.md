@@ -1,6 +1,7 @@
 ---
 title: 数据存储开发指南 · Objective-C
-sidebar_label: Objective-C 指南
+sidebar_label: Objective-C 开发指南
+slug: /sdk/storage/guide/objc/
 sidebar_position: 6
 ---
 

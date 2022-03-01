@@ -1,6 +1,7 @@
 ---
 title: 数据存储开发指南 · Java 
-sidebar_label: Java 指南
+sidebar_label: Java 开发指南
+slug: /sdk/storage/guide/java/
 sidebar_position: 4
 ---
 

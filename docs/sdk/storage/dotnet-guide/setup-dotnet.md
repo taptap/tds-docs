@@ -1,11 +1,18 @@
 ---
 title: 数据存储、即时通讯 .NET SDK 配置指南
 sidebar_label: .NET SDK 配置
+slug: /sdk/storage/guide/setup-dotnet/
 sidebar_position: 1
 ---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';
+import DomainBinding from '../../_partials/setup-domain.mdx';
+import AppConfig from '../_partials/app-config.mdx'
 
+:::info
 .Net SDK 基于 .Net Standard 2.0 接口标准实现，支持框架如下：
 
 - Unity 2018.1+
@@ -13,13 +20,25 @@ import sdkVersions from '/src/docComponents/sdkVersions';
 - .NET Framework 4.6.1+
 - Mono 5.4+
 
-更多支持框架可参考：https://docs.microsoft.com/en-us/dotnet/standard/net-standard
+更多支持框架可参考 [.NET Standard](https://docs.microsoft.com/en-us/dotnet/standard/net-standard) 文档。
+
+:::
+
+## 获取 SDK
 
 通过 GitHub 仓库 [Releases](https://github.com/leancloud/csharp-sdk/releases) 下载最新版本 SDK。
 
-### 安装
+各模块及依赖关系如下：
 
-#### Unity 项目
+名称 | 模块描述
+--|---
+`LeanCloud-SDK-Storage`| 存储服务。
+`LeanCloud-SDK-Realtime`| 即时通信、LiveQuery 服务，依赖于存储服务。
+`LeanCloud-SDK-Engine`| 云引擎服务，依赖于存储，适用于云引擎服务端环境。
+
+如只需使用某种服务，可下载最小依赖包，减小程序体积。
+
+### Unity 项目安装
 
 - 直接导入：请下载 LeanCloud-SDK-XXX-Unity.zip，解压后为 Plugins 文件夹，拖拽至 Unity 即可。
 
@@ -33,47 +52,13 @@ import sdkVersions from '/src/docComponents/sdkVersions';
 
 注意：仅支持 Unity 2018+，即 Unity Api Compatibility Level 支持 .NET Standard 2.0 的版本。
 
-#### 非 Unity 项目
+### 非 Unity 项目安装
 
-.NET Core 或其他支持 .NET Standard 2.0 的项目请下载 LeanCloud-SDK-XXX-Standard.zip，解压后设置依赖即可。
-（XXX 指云服务，包括存储 Storage，即时通讯（含 LiveQuery） Realtime，云引擎 Engine）
+.NET Core 或其他支持 .NET Standard 2.0 的项目请下载 LeanCloud-SDK-XXX-Standard.zip，解压后设置依赖即可。（XXX 指云服务，包括存储 Storage，即时通讯（含 LiveQuery） Realtime，云引擎 Engine）。
 
-### 模块及依赖关系
+## 初始化
 
-名称 | 模块描述
---|---
-`LeanCloud-SDK-Storage`| 存储服务。
-`LeanCloud-SDK-Realtime`| 即时通信、LiveQuery 服务，依赖于存储服务。
-`LeanCloud-SDK-Engine`| 云引擎服务，依赖于存储，适用于云引擎服务端环境。
-
-如只需使用某种服务，可下载最小依赖包，减小程序体积。
-
-## 快速开始
-
-### 绑定域名
-
-你需要绑定 API 自定义域名，以便和其他厂商的应用隔离入口，避免其他应用受到 DDoS 攻击时相互牵连。
-如果使用了文件服务，也需要绑定文件自定义域名。
-
-进入 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 服务设置 > 自定义域名** 点击「绑定新域名」按钮，根据控制台提示完成绑定步骤。
-注意，DNS 解析记录和证书申请（如果选择了自动管理 SSL 证书）都需要一定时间，请耐心等待。
-
-绑定成功后，初始化 SDK 时，请传入绑定的自定义域名（`https://please-replace-with-your-customized.domain.com`）。
-
-如果你使用了文件服务（包括即时通讯的多媒体消息（图像、音频、视频等）），同样需要前往 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 文件 > 设置 > 文件访问域名** 绑定域名，步骤和 API 自定义域名基本相同，但有两点不一样：
-
-1. API 域名解析使用 A 记录，文件域名解析使用 CNAME 记录，也因此文件域名不支持绑定裸域名（例如 `example.com`），需要绑定子域名（例如 `files.example.com`）。
-2. 绑定成功后，还需在 **文件 > 设置 > 文件访问地址** 点击「修改」按钮进行切换。
-
-### 应用凭证
-
-在 **开发者中心 > 你的游戏 > 游戏服务 > 应用配置** 可以查看应用凭证：
-
-- **Client ID**，又称 `App ID`，在 SDK 初始化时用到。提交工单联系技术支持时，提供 `Client ID` 可以方便我们更快定位到你的应用。
-- **Client Token**，又称 ``App Key``，在 SDK 初始化时用到。
-- **Server Secret**，又称 `Master Key`，用于在自有服务器、云引擎等**受信任环境**调用管理接口，具备跳过一切权限验证的超级权限。所以**一定注意保密，千万不要在客户端代码中使用该凭证**。
-
-### 导入模块
+导入模块：
 
 ```cs
 // 导入基础模块
@@ -84,17 +69,49 @@ using LeanCloud.Storage;
 using LeanCloud.Realtime;
 ```
 
-### 初始化 SDK
-
-在使用服务前，先调用如下代码：
+在使用服务前，先调用如下代码初始化 SDK：
 
 ```cs
-LCApplication.Initialize("your-client-id", "your-client-token", "https://please-replace-with-your-customized.domain.com");
+LCApplication.Initialize("your-client-id", "your-client-token", "https://your_server_url");
 ```
+
+### 应用凭证
+
+<AppConfig />
+
+## 域名
+
+<DomainBinding />
 
 ## 开启调试日志
 
 在应用开发阶段，你可以选择开启 SDK 的调试日志（debug log）来方便追踪问题。调试日志开启后，SDK 会把网络请求、错误消息等信息输出到 IDE 的日志窗口，或是浏览器 Console 或是云引擎日志（如果在云引擎下运行 SDK）。
+
+<Tabs>
+<TabItem value="debug-unity" label="Unity" default>
+
+```cs
+LCLogger.LogDelegate = (LCLogLevel level, string info) => {
+    switch (level) {
+        case LCLogLevel.Debug:
+            Debug.Log($"[DEBUG] {DateTime.Now} {info}\n");
+            break;
+        case LCLogLevel.Warn:
+            Debug.Log($"[WARNING] {DateTime.Now} {info}\n");
+            break;
+        case LCLogLevel.Error:
+            Debug.Log($"[ERROR] {DateTime.Now} {info}\n");
+            break;
+        default:
+            Debug.Log(info);
+            break;
+    }
+}
+```
+
+</TabItem>
+
+<TabItem value="debug-dotnet" label=".NET">
 
 ```cs
 LCLogger.LogDelegate = (LCLogLevel level, string info) => {
@@ -115,9 +132,12 @@ LCLogger.LogDelegate = (LCLogLevel level, string info) => {
 }
 ```
 
-Unity 平台可重定向到 Debug.
+</TabItem>
+</Tabs>
 
+:::caution
 在应用发布之前，请关闭调试日志，以免暴露敏感数据。
+:::
 
 ## 验证
 
