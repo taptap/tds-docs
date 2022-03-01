@@ -109,10 +109,6 @@ LCLogger.LogDelegate = (LCLogLevel level, string info) => {
 }
 ```
 
-:::caution
-在应用发布之前，请关闭调试日志，以免暴露敏感数据。
-:::
-
 </TabItem>
 
 <TabItem value="debug-dotnet" label=".NET">
@@ -138,6 +134,10 @@ LCLogger.LogDelegate = (LCLogLevel level, string info) => {
 
 </TabItem>
 </Tabs>
+
+:::caution
+在应用发布之前，请关闭调试日志，以免暴露敏感数据。
+:::
 
 ## 验证
 
