@@ -23,8 +23,6 @@ import {Conditional} from '/src/docComponents/conditional';
 }`}
 </CodeBlock>
 
-## DLC 查询和购买
-
 ### DLC 回调设置
 
 <MultiLang>
