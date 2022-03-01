@@ -5,6 +5,7 @@ sidebar_position: 8
 ---
 
 import {BRAND} from '/src/constants/env.ts';
+import {Conditional} from '/src/docComponents/conditional';
 
 ## 云引擎功能
 
@@ -148,7 +149,7 @@ after 类 Hook 超时时间为 3 秒，如果你的体验实例已经休眠，�
 
 ### 流量如何计费？
 
-每个云引擎实例每天有 1 G 免费额度，超出部分价格可以在当前节点的价格页面查看。
+每个云引擎实例每天有 1 G 免费额度，超出部分价格可以在<Conditional brand='leancloud'>当前节点的</Conditional>价格页面查看。
 
 一个应用下的流量额度会合并计算，即每天的免费额度为 `max(n, 1)` GB，其中 `n` 为该应用所有云引擎分组下的标准实例总数。
 
@@ -196,7 +197,17 @@ AfterUpdate 是在云引擎内执行的，执行 afetrUpdate 不算 API 请求�
 
 ### 云引擎可以绑定裸域名吗？
 
-如果希望在国际版云引擎绑定裸域名，我们建议选择支持 ANAME 或 CNAME Flattening 记录的域名服务商。
+<Conditional region='cn'>
+
+如果希望绑定裸域名，请添加直接指向独立 IP 的 A 记录。
+
+</Conditional>
+
+<Conditional region='global'>
+
+如果希望绑定裸域名，我们建议选择支持 ANAME 或 CNAME Flattening 记录的域名服务商。
+
+</Conditional>
 
 ## 疑难问题
 

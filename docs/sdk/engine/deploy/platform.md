@@ -11,6 +11,7 @@ import EngineRuntimes from '/src/docComponents/MultiLang/engine';
 import {BRAND, CLI_BINARY} from '/src/constants/env.ts';
 import TabItem from '@theme/TabItem';
 import CodeBlock from '@theme/CodeBlock';
+import {Conditional} from '/src/docComponents/conditional';
 
 <PlatformIntroduction />
 
@@ -105,7 +106,7 @@ Switching to my-engine-app (group: web)`}
 
 ### Git 部署
 
-云引擎还支持从 Git 仓库拉取代码进行部署，包括 [GitHub](https://github.com/) 或 [Gitee](https://gitee.com/) 这样的第三方托管平台，和 [GitLab](https://about.gitlab.com/install/) 这样自己搭建的 Git 托管服务。你可以在 **开发者中心 » 你的游戏 » 游戏服务 » 云服务 » 云引擎 » 你的分组 » 部署 » Git 部署** 中设置 Git 仓库的地址。
+云引擎还支持从 Git 仓库拉取代码进行部署，包括 [GitHub](https://github.com/)<Conditional region='cn'> 或 [Gitee](https://gitee.com/)</Conditional> 这样的第三方托管平台，和 [GitLab](https://about.gitlab.com/install/) 这样自己搭建的 Git 托管服务。你可以在 **开发者中心 » 你的游戏 » 游戏服务 » 云服务 » 云引擎 » 你的分组 » 部署 » Git 部署** 中设置 Git 仓库的地址。
 
 云引擎支持 SSH 协议的私有仓库（如 `git@github.com:leancloud/node-js-getting-started.git`），你需要在设置 Git 仓库地址后在 Git 托管服务处为云引擎配置 deploy key。如果你的仓库是公开的，则推荐使用 HTTPS 形式的仓库地址。
 
@@ -176,7 +177,11 @@ Switching to my-engine-app (group: web)`}
 
 ### 标准版云引擎
 
+<Conditional brand='leancloud'>
+
 云引擎的计费独立于开发版、商用版方案，开通或取消商用版不影响云引擎的实例和计费。
+
+</Conditional>
 
 :::tip
 对于商业项目和正式上线的产品，我们建议开发者升级到标准版云引擎，并使用至少两个实例，来保证业务的可用性。
@@ -238,7 +243,7 @@ Switching to my-engine-app (group: web)`}
 </details>
 
 ### 实例计费规则
-标准版云引擎按照所选择的规格乘以数量来进行计费，每天会按照前一天最大的实例数量来扣除前一天的费用。各规格的价格可以在当前节点的价格页面查看，扣费记录可在云服务控制台的消费明细中查看。
+标准版云引擎按照所选择的规格乘以数量来进行计费，每天会按照前一天最大的实例数量来扣除前一天的费用。各规格的价格可以在<Conditional brand='leancloud'>当前节点的</Conditional>价格页面查看，扣费记录可在<Conditional brand='leancloud'>云服务控制台的消费明细</Conditional><Conditional brand='tds'>开发者中心的账单</Conditional>中查看。
 
 如果不想继续付费，可以在所有分组中将实例规格修改为「免费版」，标准实例会被删除，并在最后一个分组下赠送一个体验实例。在次日会进行最后一次扣费，之后便不会再产生费用。
 

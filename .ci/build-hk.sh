@@ -2,7 +2,7 @@
 
 set -e
 
-rm -rf docs/community docs/sdk/achievement docs/sdk/anti-addiction docs/sdk/tap-canary docs/sdk/tap-play docs/sdk/taptap-login/guide/upgrade1.x.md docs/sdk/taptap-login/guide/upgrade2.x.md docs/store
+rm -rf docs/community docs/sdk/achievement docs/sdk/anti-addiction docs/sdk/engine/dedicated-IP.md docs/sdk/tap-canary docs/sdk/tap-play docs/sdk/taptap-login/guide/upgrade1.x.md docs/sdk/taptap-login/guide/upgrade2.x.md docs/store
 rm -rf i18n/en/docusaurus-plugin-content-docs/current/store
 cp -r .ci/hk/zh-Hans/store docs/store
 cp -r .ci/hk/en/store i18n/en/docusaurus-plugin-content-docs/current/store

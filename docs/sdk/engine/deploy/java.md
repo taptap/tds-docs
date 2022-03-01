@@ -17,6 +17,7 @@ import CloudCustomDomain from '../_partials/cloud-custom-domain.mdx';
 import CloudHealthCheck from '../_partials/cloud-health-check.mdx';
 import BuildingSystemDependencies from '../_partials/building-system-dependencies.mdx';
 import CodeBlock from '@theme/CodeBlock';
+import {Conditional} from '/src/docComponents/conditional';
 
 :::info
 这篇文档是针对 Java 运行环境的深入介绍，如希望快速地开始使用云引擎，请查看 [快速开始部署云引擎应用](/sdk/engine/deploy/getting-started)。
@@ -57,7 +58,7 @@ java.runtime.version=11
 目前云引擎支持的版本有 AdoptOpenJDK `8`、`11`、`12`、`13`、`14`。
 
 :::note
-对于新创建的应用，如未设置 Java 版本，云引擎会默认使用支持的版本中最新的稳定版本（LTS）。在 2021-09-02 之前创建的分组因兼容考虑会默认使用 Java `8`。
+<Conditional brand="leancloud">对于新创建的应用，</Conditional>如未设置 Java 版本，云引擎会默认使用支持的版本中最新的稳定版本（LTS）。<Conditional brand="leancloud">在 2021-09-02 之前创建的分组因兼容考虑会默认使用 Java `8`。</Conditional>
 :::
 
 ## 直接上传 WAR 包

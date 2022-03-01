@@ -15,6 +15,7 @@ import BuildingBuildLogs from '../_partials/building-build-logs.mdx';
 import CloudCustomDomain from '../_partials/cloud-custom-domain.mdx';
 import CloudHealthCheck from '../_partials/cloud-health-check.mdx';
 import BuildingSystemDependencies from '../_partials/building-system-dependencies.mdx';
+import {Conditional} from '/src/docComponents/conditional';
 
 :::info
 这篇文档是针对 PHP 运行环境的深入介绍，如希望快速地开始使用云引擎，请查看 [快速开始部署云引擎应用](/sdk/engine/deploy/getting-started)。
@@ -43,7 +44,7 @@ import BuildingSystemDependencies from '../_partials/building-system-dependencie
 目前云引擎支持的版本有：`5.6`、`7.0`、`7.1`、`7.2`、`7.3`、`7.4`、`8.0`。
 
 :::note
-对于新创建的应用，如未设置 PHP 版本，云引擎会默认使用最新的稳定版本。在 2021-09-02 之前创建的分组因兼容考虑会默认使用 `5.6` 版本。
+<Conditional brand="leancloud">对于新创建的应用，</Conditional>如未设置 PHP 版本，云引擎会默认使用最新的稳定版本。<Conditional brand="leancloud">在 2021-09-02 之前创建的分组因兼容考虑会默认使用 `5.6` 版本。</Conditional>
 :::
 
 ## 安装依赖（`composer.json`）
