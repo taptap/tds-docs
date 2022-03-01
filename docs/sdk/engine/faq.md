@@ -199,7 +199,7 @@ AfterUpdate 是在云引擎内执行的，执行 afetrUpdate 不算 API 请求�
 
 <Conditional region='cn'>
 
-目前仅<Conditional brand='leancloud'>国际版</Conditional><Conditional brand='tds'>海外版</Conditional>支持绑定裸域名。
+如果希望绑定裸域名，请添加直接指向独立 IP 的 A 记录。
 
 </Conditional>
 
