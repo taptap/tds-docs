@@ -161,29 +161,6 @@ TapLicenseHelper.check(Activity activity);
 
 ## 常见问题
 
-### Android 11 无法拉起 TapTap 客户端
+### Android 11 或更高版本无法拉起 TapTap 客户端
 
-Android 11 加强了隐私保护策略，引入了大量变更和限制，其中一个重要变更——[软件包可见性](https://developer.android.com/about/versions/11/privacy/package-visibility) ，将会导致第三方应用无法拉起 TapTap 客户端，从而影响 TapTap 相关功能的正常使用 ，包括但不限于更新唤起 TapTap 、购买验证等功能。
-特别需要注意的是，Android 11 的该变更只会影响到升级 ` targetSdkVersion=30 ` 的应用，未升级的应用暂不受影响。
-
-**方案一：**
-
-编译时将 `targetSdkVersion` 改为 29（目前设置成 30 会触发该问题）。
-
-**方案二：**
-
-1. 将 gradle build tools 改为 4.1.0+：
-
-    ```java
-    classpath 'com.android.tools.build:gradle:4.1.0'
-    ```
-
-2. 在 AndroidManifest.xml 里添加如下内容：
-
-    ```xml
-    <queries>
-        <package android:name="com.taptap" />
-        <package android:name="com.taptap.pad" />
-        <package android:name="com.taptap.global" />
-    </queries>
-    ```
+<AndroidFaq />
