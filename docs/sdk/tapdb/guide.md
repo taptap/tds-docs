@@ -7,6 +7,7 @@ sidebar_position: 2
 import MultiLang from '/src/docComponents/MultiLang';
 import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';
+import {Conditional} from '/src/docComponents/conditional';
 
 ## 介绍
 
@@ -81,8 +82,8 @@ using TapTap.Bootstrap; // 命名空间
 var config = new TapConfig.Builder()
     .ClientID("your_client_id")  // 必须，开发者中心对应 Client ID
     .ClientToken("your_client_token")  // 必须，开发者中心对应 Client Token
-    .ServerURL("https://your_server_url")  // 必须，开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 服务设置 > 自定义域名 绑定域名
-    .RegionType(RegionType.CN)  // 非必须，默认 CN
+    .ServerURL("https://your_server_url")  // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
+    .RegionType(RegionType.CN)  // 非必须，CN 表示中国大陆，IO 表示其他国家或地区
     .TapDBConfig(true, "gameChannel", "gameVersion", true)  // TapDB 会根据 TapConfig 的配置进行自动初始化
     .ConfigBuilder();
 
@@ -98,8 +99,8 @@ TapConfig tapConfig = new TapConfig.Builder()
         .withAppContext(getApplicationContext())
         .withClientId("your_client_id")  // 开发者中心对应 Client ID
         .withClientToken("your_client_token")  // 开发者中心对应 Client Token
-        .withServerUrl("https://your_server_url")  // 开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 服务设置 > 自定义域名 绑定域名
-        .withRegionType(TapRegionType.CN)  // TapRegionType.CN: 国内  TapRegionType.IO: 国外
+        .withServerUrl("https://your_server_url")  // 开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
+        .withRegionType(TapRegionType.CN)  // TapRegionType.CN: 中国大陆  TapRegionType.IO: 其他国家或地区
         .withTapDBConfig(tapDBConfig)
         .build();
 TapBootstrap.init(MainActivity.this, tapConfig);
@@ -110,8 +111,8 @@ TapBootstrap.init(MainActivity.this, tapConfig);
     TapConfig *config = [TapConfig new];
     config.clientId = @"your_client_id";  // 开发者中心对应 Client ID
     config.clientToken = @"your_client_token";  // 开发者中心对应 Client Token
-    config.region = TapSDKRegionTypeCN;  // TapSDKRegionTypeCN: 国内  TapSDKRegionTypeIO: 国外
-    config.serverURL = @"https://your_server_url";  // 开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 服务设置 > 自定义域名 绑定域名
+    config.region = TapSDKRegionTypeCN;  // TapSDKRegionTypeCN: 中国大陆  TapSDKRegionTypeIO: 其他国家或地区
+    config.serverURL = @"https://your_server_url";  // 开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
 
     TapDBConfig * dbConfig = [[TapDBConfig alloc]init];
     dbConfig.enable = YES;
@@ -150,6 +151,10 @@ TapDB.init(getApplicationContext(), "clientId", "taptap", "gameVersion", true);
 分包渠道和游戏版本号的长度不大于 256，可以为 `null`。
 分包渠道为 `null` 时，就无法根据渠道筛选收集到的数据了。
 游戏版本号为 `null` 时，TapSDK 会自动获取游戏安装包的版本。
+
+<Conditional region='global'>
+国际版应用初始化时，最后一个参数传入 `false`，表示中国大陆以外的国家或地区。
+</Conditional>
 
 ## 设置获取 IDFA
 
@@ -300,7 +305,17 @@ TapDB.onCharge("0xueiEns", "轩辕剑", "100", "CNY", "wechat", info);
 
 由于客户端推送可能会不太准确，因此推荐通过服务端推送。
 
+<Conditional region='cn'>
+
 请求地址：`https://e.tapdb.net/event`
+
+</Conditional>
+
+<Conditional region='global'>
+
+请求地址：`https://e.tapdb.ap-sg.tapapis.com/event`
+
+</Conditional>
 
 POST 数据（实际发送请求时需去除注释、空格、换行符并 urlencode）：
 
@@ -602,7 +617,21 @@ TapDB.userAdd(properties);
 
 ## 服务端在线人数推送
 
-游戏服务端自行统计在线人数，每隔 5 分钟向 `https://se.tapdb.net/tapdb/online` 发送 POST 请求，请求内容为 json 格式的数据，包含以下信息：
+游戏服务端自行统计在线人数，每隔 5 分钟向
+
+<Conditional region='cn'>
+
+`https://se.tapdb.net/tapdb/online`
+
+</Conditional>
+
+<Conditional region='global'>
+
+`https://se.tapdb.ap-sg.tapapis.com/tapdb/online`
+
+</Conditional>
+
+发送 POST 请求，请求内容为 json 格式的数据，包含以下信息：
 
 参数名 | 参数类型 | 参数说明
 | ------ | ------ | ------ |
