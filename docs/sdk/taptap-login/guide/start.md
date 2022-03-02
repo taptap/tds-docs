@@ -28,13 +28,6 @@ import {Conditional} from '/src/docComponents/conditional';
 
 相反，如果你的游戏自己实现了账户系统，也不打算使用好友、成就等 TapSDK 提供的其他功能，仅仅需要接入「TapTap 用户登录」功能，那么可以考虑使用第二种方式。
 
-<Conditional region='cn'>
-
-注意，第一种方式基于内建账户系统，使用量超出免费额度后需要[付费](https://developer.taptap.com/product-intro/price)。
-因此，使用第一种方式时请确保余额充足，以免因为欠费导致服务停用，玩家无法登录。
-
-</Conditional>
-
 我们首先介绍第一种方式，然后介绍[第二种方式](/sdk/taptap-login/guide/tap-login/)。
 
 无论使用哪种方式，首先都需要在 **开发者中心 > 游戏服务 > 功能接入** 开启「TapTap 登录」。
