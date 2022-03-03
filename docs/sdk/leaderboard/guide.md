@@ -5,35 +5,21 @@ sidebar_position: 2
 ---
 
 import MultiLang from '/src/docComponents/MultiLang';
+import {Conditional} from '/src/docComponents/conditional';
 
+:::info
 阅读此文档前请先阅读：
-
 - [排行榜功能介绍](/sdk/leaderboard/features/)，了解排行榜的核心概念及功能。
 - [内建账户指南](/sdk/authentication/guide/)，排行榜成员类型有 user、object、entity 三种，这里的 user 指内建账户系统中的用户。另外，本文中的 `currentUser` 指内建账户系统的当前登录用户。
+:::
 
 ## SDK 安装配置
 
-排行榜功能是数据存储 SDK 的一部分，请参考相应平台的数据存储 SDK 的配置指南：
+排行榜功能是数据存储 SDK 的一部分，请参考相应平台的数据存储 SDK 的配置指南。
 
-<MultiLang>
-
-<>
-
-[数据存储 .NET SDK 配置](/sdk/storage/guide/setup-dotnet)
-
-</>
-<>
-
-[数据存储 Java SDK 配置](/sdk/storage/guide/setup-java)
-
-</>
-<>
-
-[数据存储 Objective-C SDK 配置](/sdk/storage/guide/setup-objc)
-
-</>
-
-</MultiLang>
+- [.NET SDK 配置](/sdk/storage/guide/setup-dotnet)
+- [Java SDK 配置](/sdk/storage/guide/setup-java)
+- [Objective-C SDK 配置](/sdk/storage/guide/setup-objc)
 
 ## 快速入门
 
@@ -41,11 +27,13 @@ import MultiLang from '/src/docComponents/MultiLang';
 
 创建排行榜有 3 种方式：
 
-- 在 TapTap 开发者中心的排行榜控制台创建。
-- 在**服务端等受信任的环境**下调用 REST API 创建。
-- 在**服务端等受信任的环境**下调用 SDK 的管理接口创建。
+- 在 TapTap 开发者中心的排行榜[控制台](#控制台)创建。
+- 在**服务端等受信任的环境**下[调用 REST API](#创建排行榜-2) 创建。
+- 在**服务端等受信任的环境**下[调用 SDK 的管理接口](#创建排行榜-1)创建。
 
 比如，可以在控制台创建一个名称为 `world`，成员类型为「内建账户」，排序为 `descending`，更新策略为 `better`，重置周期为「每月」的世界排行榜。
+
+![create leaderboard](/img/create_leaderboard.png)
 
 ### 提交成绩
 
@@ -457,7 +445,7 @@ var leaderboard = LCLeaderboard.CreateWithoutData("world");
 public static LCLeaderboard CreateWithoutData(string statisticName, string memberType = LCLeaderboard.USER_MEMBER_TYPE)
 ```
 
-- `statisticName` 为排行榜名称，这里需要传入云端已经存在的排行榜名称。上例中是 `world`
+- `statisticName` 为排行榜名称，这里需要传入云端已经存在的排行榜名称。上例中是 `world`。
 - `memberType` 为排行榜成员类型，传入 `LCLeaderboard.USER_MEMBER_TYPE` 表示成员类型为用户，传入 `LCLeaderboard.ENTITY_MEMBER_TYPE` 表示成员类型为 entity，成员类型为 object 时请传入相应 Class 名称。上例中省略了这一参数，表示使用默认值，成员类型为用户。
 
 </>
@@ -867,19 +855,22 @@ leaderboard.limit = 3;
 
 ## 控制台
 
-在排行榜控制台，你可以：
+在排行榜控制台（游戏服务 > 云服务 > 排行榜），你可以：
 
-- 新建、重置、编辑、删除排行榜
-- 查看排行榜当前版本的数据、删除成绩、下载排行榜的历史数据归档文件
+- 新建、重置、编辑、删除排行榜。
+- 查看排行榜当前版本的数据、删除成绩、下载排行榜的历史数据归档文件。
 - 设置是否允许客户端查询前一版本，是否只允许使用 Master Key 更新分数。
 
 ## SDK 管理接口
 
 除了通过控制台管理排行榜外，C# SDK 和 Java SDK 也提供了管理接口，可以在**服务端等受信任的环境**下使用。
 另外，也可以直接调用 REST API 提供的管理接口。
+
 下面我们先介绍 SDK 提供的管理接口。
 
+:::caution
 请注意，调用管理接口 API 需要在 SDK 初始化时使用 masterKey，因此**只能在服务端等可信任的环境中调用，不得在客户端使用。**
+:::
 
 <MultiLang>
 
@@ -1254,8 +1245,7 @@ Key|Value|含义|来源
 
 ### Base URL
 
-REST API 请求的 Base URL（下文 curl 示例中用 `{{host}}` 表示）即应用绑定的 API 自定义域名，可以在控制台绑定、查看。
-详见文档关于[绑定域名](/sdk/storage/guide/setup-dotnet#绑定域名)的说明。
+REST API 请求的 Base URL（下文 curl 示例中用 `{{host}}` 表示）即应用的 API <Conditional region='cn'>自定义</Conditional>域名，可以在控制台<Conditional region='cn'>绑定、</Conditional>查看。详见文档关于[域名](/sdk/storage/guide/setup-dotnet#域名)的说明。
 
 ### 管理排行榜
 
