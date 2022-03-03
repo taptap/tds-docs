@@ -16,7 +16,7 @@ import {BRAND} from '/src/constants/env.ts';
 
 ## Base URL
 
-<p>REST API 请求的 Base URL（下文 curl 示例中用 <code>{"{{host}}"}</code> 表示）即应用绑定的 API 自定义域名，可以在控制台绑定、查看。详见文档关于<a href={BRAND==='leancloud'?'https://leancloud.cn/docs/custom-api-domain-guide.html':'/sdk/storage/guide/setup-dotnet#域名'}>绑定域名</a>的说明。</p>
+<p>REST API 请求的 Base URL（下文 curl 示例中用 <code>{"{{host}}"}</code> 表示）即应用绑定的 API 自定义域名，可以在控制台绑定、查看。详见文档关于<a href={BRAND==='leancloud'?'https://leancloud.cn/docs/custom-api-domain-guide.html':'/sdk/storage/guide/setup-dotnet#域名'}>域名</a>的说明。</p>
 
 ## 概览
 
