@@ -324,8 +324,8 @@ using TapTap.Bootstrap; // 命名空间
 var config =  new TapConfig.Builder()
     .ClientID("your_client_id")  // 必须，开发者中心对应 Client ID
     .ClientToken("your_client_token")  // 必须，开发者中心对应 Client Token
-    .ServerURL("https://your_server_url") // 必须，开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 服务设置 > 自定义域名 绑定域名
-    .RegionType(RegionType.CN)  // 非必须，默认 CN 表示中国大陆，IO 表示其他国家或地区
+    .ServerURL("https://your_server_url") // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
+    .RegionType(RegionType.CN)  // 非必须，CN 表示中国大陆，IO 表示其他国家或地区
     .ConfigBuilder();
 TapBootstrap.Init(config);
 ```
@@ -335,7 +335,7 @@ TapConfig tdsConfig = new TapConfig.Builder()
         .withAppContext(MainActivity.this)  // Context 上下文
         .withClientId("your_client_id")  // 开发者中心对应 Client ID
         .withClientToken("your_client_token")  // 开发者中心对应 Client Token
-        .withServerUrl("https://your_server_url")  // 开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 服务设置 > 自定义域名 绑定域名
+        .withServerUrl("https://your_server_url")  // 开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
         .withRegionType(TapRegionType.CN)  // TapRegionType.CN: 中国大陆  TapRegionType.IO: 其他国家或地区
         .build();
 TapBootstrap.init(MainActivity.this, tdsConfig);     
@@ -347,7 +347,7 @@ TapConfig *config = [TapConfig new];
 config.clientId = @"your_client_id";  // 开发者中心对应 Client ID
 config.clientToken = @"your_client_token";  // 开发者中心对应 Client Token
 config.region = TapSDKRegionTypeCN;  // TapSDKRegionTypeCN: 中国大陆  TapSDKRegionTypeIO: 其他国家或地区
-config.serverURL = @"https://your_server_url";  // 开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 服务设置 > 自定义域名 绑定域名
+config.serverURL = @"https://your_server_url";  // 开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
 [TapBootstrap initWithConfig:config];
 ```
 
