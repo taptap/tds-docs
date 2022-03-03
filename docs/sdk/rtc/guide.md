@@ -1469,7 +1469,7 @@ Key|Value|含义|来源
 #### Base URL
 
 REST API 请求的 Base URL（下文 curl 示例中用 `{{host}}` 表示）即应用的 API <Conditional region='cn'>自定义</Conditional>域名，可以在控制台<Conditional region='cn'>绑定、</Conditional>查看。
-详见文档关于[绑定域名](/sdk/storage/guide/setup-dotnet#绑定域名)的说明。
+详见文档关于[域名](/sdk/storage/guide/setup-dotnet#域名)的说明。
 
 #### REST API
 
