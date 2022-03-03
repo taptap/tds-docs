@@ -34,15 +34,8 @@ brew update && brew install lean-cli
 </Conditional>
 <Conditional brand='tds'>
 
-macOS 用户可以在 [GitHub releases 页面] 下载二进制文件 `tds-macos-x64`。然后在终端切换到文件所在目录，赋予可执行权限。
-
-```sh
-//赋予可执行权限
-chmod a+x tds-macos-x64
-```
-
-把 tds-macos-x64 文件重命名为 `tds`，然后将 `tds` 文件路径添加到`$PATH`环境变量，或移动文件到已有的 `$PATH` 下。可以使用 `echo $PATH` 打印当前的 `$PATH` 环境变量。
-最后需要重新赋予可执行权限:
+macOS 用户可以在 [GitHub releases 页面] 下载二进制文件 `tds-macos-x64`。下载完成后可以把 tds-macos-x64 文件重命名为 `tds`，然后将 `tds` 文件路径添加到`$PATH`环境变量，或移动文件到 PATH 中已有的目录下。可以使用 `echo $PATH` 打印当前的 `$PATH` 环境变量。
+最后需要赋予可执行权限:
 
 ```sh
 chmod a+x /新路径/.../tds
