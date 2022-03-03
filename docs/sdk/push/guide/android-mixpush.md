@@ -783,8 +783,6 @@ vivo 混合推送 demo：可参照 [这里](https://github.com/leancloud/mixpush
 <uses-permission android:name="android.permission.INTERNET" />
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
-<uses-permission android:name="com.coloros.mcs.permission.RECIEVE_MCS_MESSAGE" />
-<uses-permission android:name="com.heytap.mcs.permission.RECIEVE_MCS_MESSAGE" />
 ```
 
 最后在 AndroidManifest 中添加必须的 service 与 receiver（开发者要将其中的 `com.vivo.push.app_id` 和 `com.vivo.push.app_key` 替换为自己的应用的信息）：
