@@ -8,6 +8,7 @@ import MultiLang from '/src/docComponents/MultiLang';
 import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';
 import Mermaid from '/src/docComponents/Mermaid';
+import {Conditional} from '/src/docComponents/conditional';
 
 
 ## SDK 获取
@@ -1467,7 +1468,7 @@ Key|Value|含义|来源
 
 #### Base URL
 
-REST API 请求的 Base URL（下文 curl 示例中用 `{{host}}` 表示）即应用绑定的 API 自定义域名，可以在控制台绑定、查看。
+REST API 请求的 Base URL（下文 curl 示例中用 `{{host}}` 表示）即应用的 API <Conditional region='cn'>自定义</Conditional>域名，可以在控制台<Conditional region='cn'>绑定、</Conditional>查看。
 详见文档关于[域名](/sdk/storage/guide/setup-dotnet#域名)的说明。
 
 #### REST API
