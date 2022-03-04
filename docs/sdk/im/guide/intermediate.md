@@ -5,8 +5,7 @@ sidebar_position: 2
 ---
 
 import MultiLang from '/src/docComponents/MultiLang';
-
-
+import {Conditional} from '/src/docComponents/conditional';
 
 ## 本章导读
 
@@ -1278,7 +1277,7 @@ Will 消息有 **如下限制**：
 
 ### 消息内容过滤
 
-对于多人参与的聊天群组来说，内容的审核和实时过滤是产品运营上的基本要求。我们即时通讯服务默认提供了敏感词过滤的功能，具体可以参考[即时通讯开发指南第三篇](/sdk/im/guide/senior/)的《消息内容的实时过滤》一节。
+<Conditional region="cn">对于多人参与的聊天群组来说，内容的审核和实时过滤是产品运营上的基本要求。我们即时通讯服务默认提供了敏感词过滤的功能，具体</Conditional>请参考[即时通讯开发指南第三篇](/sdk/im/guide/senior/)的《消息内容的实时过滤》一节。
 
 ### 本地发送失败的消息
 
