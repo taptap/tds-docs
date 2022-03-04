@@ -4,6 +4,8 @@ sidebar_label: 功能介绍
 sidebar_position: 1
 ---
 
+import {Conditional} from '/src/docComponents/conditional';
+
 推送通知，使得开发者可以即时地向其应用程序的用户推送通知或者消息，与用户保持互动，从而有效地提高留存率，提升用户体验。平台提供整合了 Android 推送、iOS 推送的统一推送服务。
 
 除了通过 iOS、Android SDK 做推送服务之外，你还可以通过 REST API 来发送推送请求。
@@ -30,7 +32,10 @@ iOS / Android，统一的全平台推送解决方案，快速集成，轻松提�
 
 - 极简指令，自主二进制协议，省电省流量。
 
-- Android 混合推送。完美对接国内主流手机厂商的推送服务，提供可靠、统一的安卓推送解决方案。
+- Android 混合推送。完美对接<Conditional region="cn">国内主流手机厂商</Conditional><Conditional region="global"> FCM </Conditional>的推送服务，提供可靠、统一的安卓推送解决方案。
+
+<Conditional region="cn">
 
 - APNs 专线连接。提供跨区域专线直连苹果推送服务集群，通道稳定可靠，保证消息全天候可达。
 
+</Conditional>

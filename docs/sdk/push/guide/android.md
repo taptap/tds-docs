@@ -5,6 +5,7 @@ sidebar_position: 3
 ---
 import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';
+import {Conditional} from '/src/docComponents/conditional';
 
 请先阅读[推送通知总览](/sdk/push/guide/overview/)了解相关概念。
 
@@ -393,7 +394,7 @@ curl -X POST \
 
 ## 混合推送
 
-自 Android 8.0 之后，系统权限控制越来越严，第三方推送通道的生命周期受到较大限制，同时国内主流厂商也开始推出自己独立的推送服务。因此我们提供「混合推送」的方案来提升推送到达率，具体请参考[Android 混合推送指南](/sdk/push/guide/android-mixpush/)。
+自 Android 8.0 之后，系统权限控制越来越严，第三方推送通道的生命周期受到较大限制<Conditional global="region">，同时国内主流厂商也开始推出自己独立的推送服务</Conditional>。因此我们提供「混合推送」的方案来提升推送到达率，具体请参考[Android 混合推送指南](/sdk/push/guide/android-mixpush/)。
 
 ### 让 PushService 前台运行
 

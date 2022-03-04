@@ -4,10 +4,11 @@ sidebar_label: Unity 推送
 sidebar_position: 5
 ---
 
+import {Conditional} from '/src/docComponents/conditional';
 
 本文介绍了如何在 Unity 中使用推送通知功能。建议先阅读 [推送通知服务总览](/sdk/push/guide/overview/) 了解相关概念。
 
-由于 Android 系统对于第三方推送管控越来越严格，所以目前只支持 iOS 及 Android 厂商（华为、小米、VIVO、OPPO、魅族）推送。
+由于 Android 系统对于第三方推送管控越来越严格，所以目前只支持 iOS 及 <Conditional region="cn">Android 厂商（华为、小米、VIVO、OPPO、魅族）</Conditional><Conditional region="global">FCM </Conditional>推送。
 
 ## 准备工作
 
@@ -17,9 +18,9 @@ sidebar_position: 5
 
 ### Android
 
-请参考 [Android 混合推送开发指南](/sdk/push/guide/android-mixpush/)申请各厂商 Android 推送权限。
+请参考 [Android 混合推送开发指南](/sdk/push/guide/android-mixpush/)申请<Conditional region="cn">各厂商</Conditional><Conditional region="global"> FCM</Conditional> Android 推送权限。
 
-注意：这里只需要参考混合推送指南申请各厂商的推送权限，**不需要** 参考混合推送指南中 Android 相关配置的内容。
+注意：这里只需要参考混合推送指南申请<Conditional region="cn">各厂商</Conditional><Conditional region="global"> FCM </Conditional>的推送权限，**不需要** 参考混合推送指南中 Android 相关配置的内容。
 
 ## 接入推送服务
 
@@ -40,6 +41,8 @@ sidebar_position: 5
 只需要在初始化时传入 iOS 开发者的 TeamId，见[初始化](#初始化)。
 
 #### Android
+
+<Conditional region="cn">
 
 ##### 华为
 
@@ -79,6 +82,18 @@ if (Application.platform == RuntimePlatform.IPhonePlayer) {
     }
 }
 ```
+
+</Conditional>
+
+<Conditional region="global">
+
+初始化 FCM 进行推送：
+
+```cs
+LCFCMPushManager.RegisterFCMPush();
+```
+
+</Conditional>
 
 ## Installation
 
@@ -162,12 +177,20 @@ Dictionary<string, object> launchData = await LCPushBridge.Instance.GetLaunchDat
 这里可以根据 Installation 的 objectId 推送，iOS 设备也可以根据 deviceToken 推送，Android 设备可以根据 registrationId 推送。
 
 ## 其他
-
 ### 如何剔除某些厂商推送服务
 
+<Conditional region="cn">
+
 应用可能只计划支持部分手机厂商，或针对不同渠道分别打包，这时可以手动剔除不需要的厂商 SDK，以节省打包体积：
+
+</Conditional>
+
+<Conditional region="global">
+
+SDK 中包含了一些中国 Android 手机厂商的 SDK，国际版应用可以手动剔除以节省打包体积。
+
+</Conditional>
 
 - 删掉 `Assets/LeanCloud/Push/Android/xx`，`xx` 代表厂商，如 `HuaWei`、`XiaoMi` 等
 - 删除 `Assets/Plugins/Android/mainTemplate.gradle` 中的 `dependences` 部分
 - 删掉 `Assets/Plugins/Android/AndroidManifest.xml` 中厂商 SDK 组件部分（有厂商相关的注释）
-
