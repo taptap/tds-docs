@@ -12,16 +12,56 @@ import {Conditional} from '/src/docComponents/conditional';
 
 ## DLC 查询和购买
 
-在项目的 `Packages/manifest.json` 文件中添加以下依赖：
+
+可以在 [下载页](/tap-download) 获得 SDK，添加以下依赖：
+
+<MultiLang>
+
+<>
+
+SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选其一。
+
+1. 下载 SDK 后即可手动导入。
+2. 如果选择 UPM 导入，可以在项目的 `Packages/manifest.json` 文件中添加：
 
 <CodeBlock className="json">
 {`"dependencies":{
-// 公共库
-"com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
-// 付费购买
-"com.taptap.tds.dlc": "https://github.com/TapTap/TapLicense-Unity.git#${sdkVersions.taptap.unity}",
+    // 公共库
+    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+    // 付费购买
+    "com.taptap.tds.dlc": "https://github.com/TapTap/TapLicense-Unity.git#${sdkVersions.taptap.unity}",
 }`}
 </CodeBlock>
+
+</>
+
+<>
+
+将 SDK 包导入到项目 `project/app/libs` 目录下。打开项目的 `project/app/build.gradle` 文件，添加：
+
+<CodeBlock className="groovy">
+{`repositories{
+    flatDir {  
+        dirs 'libs'  
+    }  
+}  
+dependencies {
+    implementation name:'TapCommon_${sdkVersions.taptap.android}', ext:'aar'
+    implementation name:'TapLicense_${sdkVersions.taptap.android}', ext:'aar'
+}`}
+</CodeBlock>
+
+</>
+
+<>
+
+```objc
+// 暂不支持
+```
+
+</>
+
+</MultiLang>
 
 ### DLC 回调设置
 
@@ -57,6 +97,11 @@ TapLicenseHelper.setDLCCallback(new DLCManager.InventoryCallback() {
     }
 });
 ```
+    
+```objc
+// 暂不支持
+```
+    
 </MultiLang>
 
 
@@ -71,6 +116,11 @@ TapLicense.QueryDLC(string[] skuIds);
 ```java
 TapLicenseHelper.queryDLC(Activity activity, String[] skuIds);
 ```
+    
+```objc
+// 暂不支持
+```
+
 </MultiLang>
 
 ### DLC 购买
@@ -83,6 +133,10 @@ TapLicense.PurchaseDLC(string skuId);
 
 ```java
 TapLicenseHelper.purchaseDLC(Activity activity, String skuIds);
+```
+    
+```objc
+// 暂不支持
 ```
 </MultiLang>
 
