@@ -68,6 +68,20 @@ const config = {
             position: "right",
           },
           {
+            label: "下载",
+            position: "right",
+            items: [
+              {
+                label: "设计资源",
+                to: "/design",
+              },
+              {
+                label: "SDK 工具包",
+                to: "/tap-download",
+              },
+            ],
+          },
+          {
             type: "localeDropdown",
             position: "right",
           },

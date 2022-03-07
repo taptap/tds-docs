@@ -60,24 +60,16 @@ export const getEntries = (brand: string, region: string): Entry[] => {
     {
       title: "资源下载",
       description: "TapTap 相关品牌元素及开发工具包下载",
-      links:
-        region === "cn"
-          ? [
-              {
-                label: "设计资源",
-                to: "/design",
-              },
-              {
-                label: "SDK",
-                to: "/tap-download",
-              },
-            ]
-          : [
-              {
-                label: "设计资源",
-                href: "https://www.taptap.io/about-us/brand-resources",
-              },
-            ],
+      links: [
+        {
+          label: "设计资源",
+          to: "/design",
+        },
+        {
+          label: "SDK",
+          to: "/tap-download",
+        },
+      ],
     },
     {
       title: "平台功能申请",
