@@ -219,7 +219,7 @@ await gameSave.Delete();
 ```
 
 ```java
-gameSave..deleteInBackground().subscribe(new Observer<LCNull>() {
+gameSave.deleteInBackground().subscribe(new Observer<LCNull>() {
     @Override
     public void onSubscribe(@NonNull Disposable d) {}
 
