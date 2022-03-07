@@ -219,7 +219,23 @@ await gameSave.Delete();
 ```
 
 ```java
-gameSave.delete();
+gameSave..deleteInBackground().subscribe(new Observer<LCNull>() {
+    @Override
+    public void onSubscribe(@NonNull Disposable d) {}
+
+    @Override
+    public void onNext(LCNull response) {
+        // Deleted.
+    }
+
+    @Override
+    public void onError(@NonNull Throwable e) {
+        System.out.println("Failed to delete:" + e.getMessage());
+    }
+
+    @Override
+    public void onComplete() {}
+});
 ```
 
 ```objc
