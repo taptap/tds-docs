@@ -4,9 +4,11 @@ sidebar_label: 功能介绍
 sidebar_position: 1
 ---
 
+import {Conditional} from '/src/docComponents/conditional';
+
 ## 业务介绍
 
-TDS 内建账户服务致力于帮助开发者快速低成本地构建一个安全可靠的玩家登录系统。支持玩家采用包括游客账号、第三方账号（TapTap、微信、QQ、Apple 等）在内的多种账号来登录你的游戏。你无需关心云端的搭建与实现，只需在工程中调用相关能力提供的 API，通过 TDS User 对象来快速实现它们。
+TDS 内建账户服务致力于帮助开发者快速低成本地构建一个安全可靠的玩家登录系统。支持玩家采用包括游客账号、第三方账号（TapTap、Apple、<Conditional region='cn'>微信、QQ</Conditional><Conditional region='global'>Facebook</Conditional> 等）在内的多种账号来登录你的游戏。你无需关心云端的搭建与实现，只需在工程中调用相关能力提供的 API，通过 TDS User 对象来快速实现它们。
 
 ## 适用场景
 
@@ -34,7 +36,7 @@ TDS 内建账户服务致力于帮助开发者快速低成本地构建一个安�
 
 ### 提供第三方账号登录
 
-向玩家提供第三方账号登录（TapTap、微信、QQ、Apple 等），你需要先完成与第三方的对接，拿到第三方服务颁发的 OAuth 令牌。TapTap 登录，请先按照 TapTap 登录接入流程，完成 OAuth 协议流程。接着使用OAuth 的结果访问 TDS 内建账户系统进行上报与验证，完成与 TDS 内建账户的关联绑定。
+向玩家提供第三方账号登录（TapTap、Apple、<Conditional region='cn'>微信、QQ</Conditional><Conditional region='global'>Facebook</Conditional> 等），你需要先完成与第三方的对接，拿到第三方服务颁发的 OAuth 令牌。TapTap 登录，请先按照 TapTap 登录接入流程，完成 OAuth 协议流程。接着使用OAuth 的结果访问 TDS 内建账户系统进行上报与验证，完成与 TDS 内建账户的关联绑定。
 
 ## 服务端校验
 
