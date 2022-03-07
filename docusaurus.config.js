@@ -81,7 +81,7 @@ const config = {
                 to: "/design",
               },
               {
-                label: "SDK工具包",
+                label: "SDK 工具包",
                 to: "/tap-download",
               },
               {
