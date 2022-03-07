@@ -4,6 +4,8 @@ sidebar_label: 总览
 sidebar_position: 0
 ---
 
+import {Conditional} from '/src/docComponents/conditional';
+
 
 推送通知，使得开发者可以即时地向其应用程序的用户推送通知或者消息，与用户保持互动，从而有效地提高留存率，提升用户体验。平台提供整合了 Android 推送、iOS 推送的统一推送服务。
 
@@ -64,11 +66,11 @@ push-time| | 定时推送的发送时间
 
 ## Android 推送
 
-由于 Android 系统权限控制越来越严，LeanCloud 自有通道的推送到达率受到影响。
-因此，建议商用版应用使用我们的「混合推送」方案，该方案对接了国内主流厂商的不同接口，让开发者通过统一的 API 完成推送任务。
-详见[Android 混合推送指南](/sdk/push/guide/android-mixpush/)。
+由于 Android 系统权限控制越来越严，推送服务自有通道的推送到达率受到影响。
+因此，建议商用版应用使用我们的「混合推送」方案，该方案对接了<Conditional region="cn">国内主流厂商</Conditional><Conditional region="global"> FCM </Conditional>的接口，让开发者通过统一的 API 完成推送任务。
+详见 [Android 混合推送指南](/sdk/push/guide/android-mixpush/)。
 
-如果想要使用 LeanCloud 自有通道推送，请阅读[Android 推送指南](/sdk/push/guide/android/)。
+如果想要使用推送服务自有通道推送，请阅读[Android 推送指南](/sdk/push/guide/android/)。
 
 ## 使用 REST API 推送消息
 

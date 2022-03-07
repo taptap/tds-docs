@@ -5,24 +5,32 @@ sidebar_position: 4
 ---
 import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';
+import {Conditional} from '/src/docComponents/conditional';
 
 ## 混合推送概述
 
-自 Android 8.0 之后，系统权限控制越来越严，第三方推送通道的生命周期受到较大限制；同时，国内主流厂商也开始推出自己独立的推送服务，而厂商间千差万别的繁杂接口徒增了开发和代码维护的难度。为此，我们推出了混合推送的方案。我们逐一对接国内主流厂商，将它们不同的接口隐藏起来，让开发者通过统一的 API 完成推送任务。这不仅大幅降低了开发复杂度，还保障了主流 Android 系统上的推送到达率。
+自 Android 8.0 之后，系统权限控制越来越严，第三方推送通道的生命周期受到较大限制<Conditional region="cn">；同时，国内主流厂商也开始推出自己独立的推送服务，而厂商间千差万别的繁杂接口徒增了开发和代码维护的难度</Conditional>。为此，我们推出混合推送方案。<Conditional region="cn">我们逐一对接国内主流厂商，将它们不同的接口隐藏起来，让开发者通过统一的 API 完成推送任务。</Conditional>这保障了主流 Android 系统上的推送到达率<Conditional region="cn">，也大幅降低了开发复杂度</Conditional>。
 
-在混合推送方案里，消息下发时使用的通道不再是我们自己维持的 WebSocket 长连接，而是借用厂商和 OS 层的系统通道进行通信。一条推送消息下发的步骤如下：
+在混合推送方案里，消息下发时使用的通道不再是我们自己维持的 WebSocket 长连接，而是借用<Conditional region="cn">厂商和 OS 层的系统通道</Conditional><Conditional region="global"> FCM </Conditional>进行通信。
+一条推送消息下发的步骤如下：
+
 1. 开发者调用云服务 Push API 请求对全部或特定设备进行推送；
-2. 云推送服务端将请求转发给厂商的推送接口；
-3. 厂商通过手机端的系统通道下发推送消息，同时手机端系统消息接收器将推送消息展示到通知栏；
+2. 云推送服务端将请求转发给<Conditional region="cn">厂商的推送接口</Conditional><Conditional region="global"> FCM</Conditional>；
+3. <Conditional region="cn">厂商</Conditional><Conditional region="global">FCM </Conditional>通过手机端的系统通道下发推送消息，同时手机端系统消息接收器将推送消息展示到通知栏；
 4. 终端用户点击消息之后唤起目标应用或者页面。
 
-整个流程与苹果的 APNs 推送类似，SDK 在客户端基本不会得到调用（具体依赖于厂商的实现方案），消息的下发和展示都依赖厂商客户端的行为。所以**如果部分厂商在某些推送中夹带了其他非开发者提交的消息，或者在服务启用的时候，有额外营销性质的弹窗，这都是厂商自己的行为，与我们完全无关**，还请大家了解。另外，如果开发者碰到厂商 SDK 的问题，我们也无法深入调查，还请大家自行到厂商的论坛或技术支持渠道咨询解决。
+整个流程与苹果的 APNs 推送类似，SDK 在客户端基本不会得到调用<Conditional region="cn">（具体依赖于厂商的实现方案），消息的下发和展示都依赖厂商客户端的行为。所以**如果部分厂商在某些推送中夹带了其他非开发者提交的消息，或者在服务启用的时候，有额外营销性质的弹窗，这都是厂商自己的行为，与我们完全无关**，还请大家了解。另外，如果开发者碰到厂商 SDK 的问题，我们也无法深入调查，还请大家自行到厂商的论坛或技术支持渠道咨询解决</Conditional>。
 
 Android 混合推送功能仅对商用版应用开放，如果希望使用该功能，请进入 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置 > 混合推送**，打开混合推送的开关。
 
 注意，混合推送可以随时按需开关。当该选项关闭后，下一次 Android 推送会与普通推送一样自动选择自有通道送达客户端，除了会再次遇到上面提到的自有通道在部分 ROM 上会受到限制的问题之外，不会有别的影响。而当该选项再次开启后，Android 推送又会去选择厂商推送渠道。
 
-开启了混合推送之后，Installation 表中每一个设备对应的记录，会增加 `registrationId` 字段，用于记录厂商分配的注册 id（类似于 APNs 的 device token），同时还会增加一个 `vendor` 字段（如果没有这一字段，则说明客户端集成有问题），其值分别为：
+开启了混合推送之后，Installation 表中每一个设备对应的记录，会增加 `registrationId` 字段，用于记录厂商分配的注册 id（类似于 APNs 的 device token），同时还会增加一个 `vendor` 字段（如果没有这一字段，则说明客户端集成有问题），其值为
+<Conditional region="global">
+<code>fcm</code>
+</Conditional>
+
+<Conditional region="cn">
 
 vendor | 厂商
 ---|---
@@ -31,13 +39,22 @@ vendor | 厂商
 `mz`  | 魅族推送
 `oppo`| OPPO 推送
 `vivo`| vivo 推送
-`fcm` | FCM 推送（仅限国际版）
 
 注意，混合推送对接的是厂商各自的推送服务，需要单独配置，不支持混用。
 通常情况下，需要提交不同的版本（分别对接厂商的推送服务）到相应厂商的应用商店。
 如果希望使用统一版本，那么需要自行判断手机型号，在手机上开启对应的推送。
 
+</Conditional>
+
 ### 推送提醒的红点或角标展示
+
+<Conditional region="global">
+
+Android 系统默认支持根据 FCM 推送数量展示红点（桌面应用图标上显示）和角标（应用图标的长按菜单中显示）。
+
+</Conditional>
+
+<Conditional region="cn">
 
 很多开发者都希望可以在应用桌面开启角标或者小红点，以达到更好的提醒效果。国内厂商对此功能的开放程度不一，详见下表：
 
@@ -49,7 +66,17 @@ OPPO | 支持红点 | 否 | 圆点展示需由用户在通知设置中手动开�
 vivo | 支持角标 | 是 | 参考下文[vivo 手机角标适配说明](#vivo-手机角标适配说明)
 魅族 | 支持红点 | 否 | 遵从系统默认逻辑，仅支持红点展示，有通知则展示，无则不展示
 
+</Conditional>
+
 ### 通知栏消息与透传消息
+
+<Conditional region="global">
+
+当应用在前台时，FCM 支持透传消息给应用。
+
+</Conditional>
+
+<Conditional region="cn">
 
 很多开发者会关心通知栏消息和透传消息是否支持，因为应用状态不同，可能接收到消息的途径不一样，产品层面希望的处理方式也有差异。不同厂商对透传消息的支持不一样，详见下表：
 
@@ -61,9 +88,11 @@ OPPO | 否
 vivo | 否（老版本有透传接口，新版本已不建议使用）
 魅族 | 否
 
+</Conditional>
+
 ### 即时通讯的离线推送
 
-在即时通讯服务中，在 iOS 平台上如果用户下线，是可以启动离线消息推送机制的，对于 Android 用户来说，如果只是使用云推送自有通道，那么是不存在离线推送的，因为聊天和推送共享同一条 WebSocket 长链接，在即时通讯服务中用户下线了的话，那么推送也必然是不可达的。但是如果启用了混合推送，因为推送消息走的是厂商通道，这一点和 iOS 基本一致，所以这时候 Android 用户就存在离线推送的通知路径了。
+在即时通讯服务中，在 iOS 平台上如果用户下线，是可以启动离线消息推送机制的，对于 Android 用户来说，如果只是使用云推送自有通道，那么是不存在离线推送的，因为聊天和推送共享同一条 WebSocket 长链接，在即时通讯服务中用户下线了的话，那么推送也必然是不可达的。但是如果启用了混合推送，因为推送消息走的是<Conditional region="cn">厂商通道</Conditional><Conditional region="global"> FCM </Conditional>，这一点和 iOS 基本一致，所以这时候 Android 用户就存在离线推送的通知路径了。
 也就是说，如果开启了混合推送，那么即时通讯里面的离线推送和静音机制，对使用了混合推送的 Android 用户也是有效的。
 
 ### 受限说明
@@ -74,12 +103,21 @@ vivo | 否（老版本有透传接口，新版本已不建议使用）
 
 最低 Android 版本要求：
 
+<Conditional region="global">
+
+- FCM 推送支持 Android 4.1 或以上版本的手机系统（minSdkVersion：16）。
+
+</Conditional>
+
+<Conditional region="cn">
+
 - 华为推送需要用户手机上安装 HMS Core（APK）4.0.0.300 及以上版本，最低 Android 版本为 4.4（minSdkVersion 19）。
 - 小米推送服务 SDK 支持的最低安卓版本为 2.3（minSdkVersion：9）。
 - vivo 推送服务支持的最低 Android 版本为 6.0（minSdkVersion：23）。
 - OPPO 推送只支持 Android 4.4 或以上版本的手机系统（minSdkVersion：19）。
-- FCM 推送支持 Android 4.1 或以上版本的手机系统（minSdkVersion：16）。
 - 魅族（flyme）推送只支持 Android 4.2 或以上版本的手机系统（minSdkVersion：17）。
+
+</Conditional>
 
 影响送达率的因素说明：
 
@@ -89,13 +127,19 @@ vivo | 否（老版本有透传接口，新版本已不建议使用）
 - 终端设备的安全控制策略。
 - 透传消息的送达受 Android 系统和应用是否驻留在后台影响。
 
-下面我们逐一看看如何对接华为、小米、魅族等厂商的推送服务，文档的最后也提及了在海外市场如何对接 Firebase Cloud Messaging。
+<Conditional region="cn">
+
+下面我们逐一看看如何对接华为、小米、魅族等厂商的推送服务。
+
+</Conditional>
 
 ## 推荐的接入方式
 
-混合推送本质上还是依赖于各厂商的 SDK 和服务端能力，我们的客户端 SDK 只是对厂商 SDK 的包装，而实际的推送请求也是通过 LeanCloud 中转之后发送到厂商后台。因为是一对多的关系，我们的客户端 SDK 更新速度可能跟不上所有厂商的迭代速度，因此建议大家直接对接厂商 SDK，然后在客户端把厂商分配的「注册 id」与厂商标识（见上一章 vendor 的说明）保存到设备信息（`Installation`）中，这样之后一样可以通过我们的推送 API 来给所有设备正确发送推送信息。
+混合推送本质上还是依赖于<Conditional region="cn">各厂商</Conditional><Conditional region="global"> FCM </Conditional> 的 SDK 和服务端能力，我们的客户端 SDK 只是对<Conditional region="cn">厂商</Conditional><Conditional region="global"> FCM</Conditional> SDK 的包装，而实际的推送请求也是通过 LeanCloud 中转之后发送到<Conditional region="cn">厂商</Conditional><Conditional region="global"> FCM </Conditional>后台。<Conditional region="cn">因为是一对多的关系，</Conditional>我们的客户端 SDK 更新速度可能跟不上<Conditional region="cn">厂商</Conditional><Conditional region="global"> FCM </Conditional>的迭代速度，因此建议大家直接对接<Conditional region="cn">厂商</Conditional><Conditional region="global"> FCM</Conditional> SDK，然后在客户端把<Conditional region="cn">厂商</Conditional><Conditional region="global"> FCM </Conditional>分配的「注册 id」与<Conditional region="cn">厂商</Conditional><Conditional region="global"> FCM </Conditional>标识（见上一章 vendor 的说明）保存到设备信息（`Installation`）中，这样之后一样可以通过我们的推送 API 来给所有设备正确发送推送信息。
 
 ### 客户端接入方法
+
+<Conditional region="cn">
 
 不同厂商获取「注册 id」的流程和接口会有不同，可以参考厂商平台的开发指南，这里我们说一下集成厂商 SDK 获取到「注册 id」之后如何按照规范来保存设备信息。
 
@@ -146,17 +190,23 @@ vivo | 否（老版本有透传接口，新版本已不建议使用）
 
 开发者从 `MzPushMessageReceiver` 继承自己的实现类，然后在 `onRegisterStatus` 回调函数中调用如上例代码进行保存（记得将 `vendor` 换成 `mz`）。示例代码可以参考[LCFlymePushMessageReceiver](https://github.com/leancloud/java-unified-sdk/blob/master/android-sdk/mixpush-meizu/src/main/java/cn/leancloud/LCFlymePushMessageReceiver.java#L101)。
 
-#### FCM 推送
+</Conditional>
+
+<Conditional region="global">
 
 开发者从 `FirebaseMessagingService` 继承自己的实现类，然后在 `onNewToken` 回调函数中调用如上例代码进行保存（记得将 `vendor` 换成 `fcm`）。示例代码可以参考[LCFirebaseMessagingService](https://github.com/leancloud/java-unified-sdk/blob/master/android-sdk/leancloud-fcm/src/main/java/cn/leancloud/LCFirebaseMessagingService.java#L69)。
+
+</Conditional>
 
 ### 发送混合推送的服务端 API
 
 可以参考这里的说明来发送推送请求：[推送 REST API 使用指南](/sdk/push/guide/rest/)。
 
-> 如果开发者要集成我们封装的混合推送 SDK，可以继续往下阅读，如果自行接入厂商 SDK，则可以忽略下文。
+如果开发者要集成我们封装的混合推送 SDK，可以继续往下阅读，如果自行接入<Conditional region="cn">厂商</Conditional><Conditional region="global"> FCM</Conditional> SDK，则可以忽略下文。
 
 ## 混合推送 library 的构成
+
+<Conditional region="cn">
 
 我们提供了一个 all-in-one 的混合推送模块，统一支持华为（HMS）、小米、OPPO、vivo、魅族推送，开发者依赖如下：
 <code>cn.leancloud:mixpush-android:{sdkVersions.leancloud.java}@aar</code>
@@ -1106,9 +1156,8 @@ public class MyApp extends Application {
 
 客户端响应用户点击的过程不需要 SDK 参与，全部都是由系统通过消息里面附带的信息来自行处理。混合推送现在可支持所有动作方式，具体可参考我们的 demo。
 
-## FCM 推送（仅国际版可用）
-
-**FCM 推送仅支持部署在国际版上的应用使用。**
+</Conditional>
+<Conditional region="global">
 
 [FCM](https://firebase.google.com/docs/cloud-messaging)（Firebase Cloud Messaging）是 Google/Firebase 提供的一项将推送通知消息发送到手机的服务。接入时后台需要配置连接 FCM 服务器需要的推送 key 和证书，FCM 相关的 token 由 LeanCloud SDK 来申请。
 
@@ -1234,6 +1283,8 @@ android {
 
 在 [Firebase 控制台](https://console.firebase.google.com/) > **项目设置** > **服务账号** > **Firebase Admin SDK** > **生成新的秘钥** 可以获得服务端发送推送请求的私钥文件。将此 文件 及 ProjectId 通过 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置 > 混合推送**，与云服务应用关联。
 
+</Conditional>
+
 ## 取消混合推送注册
 
 对于已经注册了混合推送的用户，如果想取消混合推送的注册而改走云服务自有的 WebSocket 的话，可以调用如下函数：
@@ -1247,5 +1298,11 @@ LCMixPushManager.unRegisterMixPush();
 ## 错误排查建议
 
 - 只要注册时有条件不符合，SDK 会在日志中输出导致注册失败的原因，例如 `register error, mainifest is incomplete` 代表 manifest 未正确填写。如果注册成功，`_Installation` 表中的相关记录应该具有 **vendor** 这个字段并且不为空值。
-- 查看魅族机型的设置，并打开「信任此应用」、「开机自启动」、「自启动管理」和「权限管理」等相关选项。
+
 - 如果注册一直失败的话，请提交工单或去论坛发帖，提供相关日志、具体机型以及系统版本号，我们会跟进协助来排查。
+
+<Conditional region="cn">
+
+- 查看魅族机型的设置，并打开「信任此应用」、「开机自启动」、「自启动管理」和「权限管理」等相关选项。
+
+</Conditional>
