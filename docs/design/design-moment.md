@@ -7,8 +7,6 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 ## 导航描述字符规则
 
-**TapTap 动态 - 主题规范设计规则（基于内嵌动态 V1.30）**
-
 ### 导航描述字符的类型与应用区域
 
 导航描述字符分为深色和浅色两种类型，适用于叠加在页面背景上的导航类或注释类字符。
@@ -129,7 +127,7 @@ Tap 动态同时支持横屏和竖屏，因此每个接入游戏需要分别提�
 
 <Figure caption="规则参数" imgSrc={useBaseUrl('/img/design-moment/2.3.3.1.1.png')} imgAlt="" />
 
-<Figure content="示例" imgSrc={useBaseUrl('/img/design-moment/2.3.3.1.2.png')} imgAlt="" />
+<Figure caption="示例" imgSrc={useBaseUrl('/img/design-moment/2.3.3.1.2.png')} imgAlt="" />
 
 </Background>
 
@@ -137,7 +135,7 @@ Tap 动态同时支持横屏和竖屏，因此每个接入游戏需要分别提�
 
 <Figure caption="规则参数" imgSrc={useBaseUrl('/img/design-moment/2.3.3.2.1.png')} imgAlt="" />
 
-<Figure content="示例" imgSrc={useBaseUrl('/img/design-moment/2.3.3.2.2.png')} imgAlt="" />
+<Figure caption="示例" imgSrc={useBaseUrl('/img/design-moment/2.3.3.2.2.png')} imgAlt="" />
 
 </Background>
 
@@ -145,7 +143,7 @@ Tap 动态同时支持横屏和竖屏，因此每个接入游戏需要分别提�
 
 <Figure caption="规则参数" imgSrc={useBaseUrl('/img/design-moment/2.3.3.3.1.png')} imgAlt="" />
 
-<Figure content="示例" imgSrc={useBaseUrl('/img/design-moment/2.3.3.3.2.png')} imgAlt="" />
+<Figure caption="示例" imgSrc={useBaseUrl('/img/design-moment/2.3.3.3.2.png')} imgAlt="" />
 
 </Background>
 
@@ -157,6 +155,6 @@ Tap 动态同时支持横屏和竖屏，因此每个接入游戏需要分别提�
 
 <Figure caption="规则参数" imgSrc={useBaseUrl('/img/design-moment/2.3.4.1.png')} imgAlt="" />
 
-<Figure content="示例" imgSrc={useBaseUrl('/img/design-moment/2.3.4.2.png')} imgAlt="" />
+<Figure caption="示例" imgSrc={useBaseUrl('/img/design-moment/2.3.4.2.png')} imgAlt="" />
 
 </Background>
