@@ -710,6 +710,18 @@ context.getContentResolver().call(Uri.parse("content://com.huawei.android.launch
 
 当小米通知栏消息被点击后，如果已经设置了自定义 Receiver，则 SDK 会发送一个 action 为 `com.avos.avoscloud.mi_notification_action` 的 broadcast。如有需要，开发者可以通过订阅此消息获取点击事件，否则 SDK 会默认打开启动推送服务时设置的 Activity。
 
+<!--
+
+小米推送国际版目前存在以下问题：
+
+- 没有充分测试
+- 小米的文档后来改了
+- 控制台没有添加小米推送国际版配置的入口
+
+所以先在文档隐藏小米推送国际版的内容。
+
+相关内部讨论链接：https://xindong.slack.com/archives/C01UQQ2HPRS/p1646622355326479
+
 ### 小米推送国际版的使用
 
 MIUI 国际版也可以使用小米推送，混合推送也进行了支持。与国内版不同的是，国际版的开发者，在 `LeanCloud.initialize` 时需要调用以下函数：
@@ -720,6 +732,7 @@ LCMixPushManager.registerXiaomiPush(context, miAppId, miAppKey, profile, true);
 
 之后的使用就和国内版本一样了。
 
+-->
 
 ## 魅族推送
 
