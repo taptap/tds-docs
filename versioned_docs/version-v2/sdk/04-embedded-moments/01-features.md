@@ -7,7 +7,7 @@ import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 :::info
-如需配置[主题](#内嵌动态主题配置)，可参考[动态设计规范](/v2/design/design-moment)
+如需配置[主题](#内嵌动态主题配置)，可参考[动态设计规范](/design/design-moment)
 :::
 
 内嵌动态能让玩家在游戏内访问 TapTap 社区，同时也可以查看好友的游戏动态，参与其他玩家、官方和大神之间的互动。

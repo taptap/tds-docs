@@ -16,7 +16,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 ### 绘制易识别易操作的登录界面
 
-为用户提供一个 TapTap 登录 Button，Button 的最佳显示方式为：依照提供的 [UI 规范](/v2/design)，完整展示 TapTap 品牌名称与 LOGO；可参考 [功能介绍](/v2/sdk/taptap-login/guide/start) 中单个登录与多个登录的展现方式
+为用户提供一个 TapTap 登录 Button，Button 的最佳显示方式为：依照提供的 [UI 规范](/design)，完整展示 TapTap 品牌名称与 LOGO；可参考 [功能介绍](/v2/sdk/taptap-login/guide/start) 中单个登录与多个登录的展现方式
 
 
 
