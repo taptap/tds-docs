@@ -16,7 +16,7 @@ TDS 提供以下服务，开发者可以通过在游戏中集成 TapSDK 来开�
 
 - **[内嵌动态](/sdk/embedded-moments/features/)**：玩家可以在游戏内访问 TapTap 的社区论坛（官方公告、游戏攻略、问题反馈、热门话题等），同时也可以看到 TapTap 好友的游戏动态，并参与其他玩家、官方和大神之间的互动。
 
-- **[内建账户](/sdk/authentication/features/)**：帮助开发者快速低成本地构建一个安全可靠的玩家登录系统，支持玩家采用包括游客账号、第三方账号（TapTap、微信、QQ、Apple 等）在内的多种账号来登录你的游戏。
+- **[内建账户](/sdk/authentication/features/)**：帮助开发者快速低成本地构建一个安全可靠的玩家登录系统，支持玩家采用包括游客账号、第三方账号（TapTap、Apple、<Conditional region='cn'>微信、QQ</Conditional><Conditional region='global'>Facebook</Conditional> 等）在内的多种账号来登录你的游戏。
 
 - **[游戏好友](/sdk/friends/features/)**：为游戏开发者提供完整的添加、删除、查找好友的功能接口，帮助游戏快速形成社交网络。
 

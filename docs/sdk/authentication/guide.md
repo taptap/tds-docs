@@ -5,6 +5,7 @@ sidebar_position: 2
 ---
 
 import MultiLang from '/src/docComponents/MultiLang';
+import {Conditional} from '/src/docComponents/conditional';
 
 从 TapSDK 3.0 开始，我们提供了一个内建账户系统供游戏使用：开发者可以直接用 TapTap OAuth 授权的结果生成一个游戏内的账号（TDSUser），同时我们也支持将更多第三方认证登录的结果绑定到该账号上来。
 TapSDK 提供的游戏内好友、成就等服务和功能，也都基于这一账户系统。
@@ -504,7 +505,8 @@ TDSUser.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
 
 我们在登录功能的开发指南中已经介绍了如何[使用 TapTap OAuth 授权结果直接登录账户系统](/sdk/taptap-login/guide/start#用-taptap-oauth-授权结果直接登录账户系统)。
 
-其实除了 TapTap 外，我们也支持直接使用第三方社交平台（例如微信、微博、QQ 等）的账户信息来创建自己的账户体系并完成登录，也允许将既有账户与第三方账户绑定起来，这样终端用户后续可以直接用第三方账户信息来便捷登录。
+其实除了 TapTap 外，我们也支持直接使用第三方社交平台（例如 Apple、<Conditional region='cn'>微信、QQ</Conditional><Conditional region='global'>Facebook</Conditional> 等）的账户信息来创建自己的账户体系并完成登录，也允许将既有账户与第三方账户绑定起来，这样终端用户后续可以直接用第三方账户信息来便捷登录。
+
 事实上，TapSDK 采用了开放的接口设计，平台标识和唯一授权信息都由开发者指定，所以是可以兼容所有的第三方账户登录需求的。例如，海外开发者拿到 Facebook 授权信息之后，一样可以调用 `TDSUser#loginWithAuthData` 接口完成玩家账户的登录（平台名字可指定为 `facebook`）。
 
 例如以下的代码展示了终端用户使用微信登录的处理流程：
@@ -601,6 +603,7 @@ option.platform = LeanCloudSocialPlatformWeiXin;
 }
 ```
 
+
 这时候我们会看到 `_User` 表中出现了一条新的账户记录，账户中有一个名为 `authData` 的列，保存了第三方平台的授权信息。出于安全考虑，`authData` 不会被返回给客户端，除非它属于当前用户。
 
 开发者需要自己完成第三方平台的鉴权流程（一般通过 OAuth 1.0 或 2.0），以获取鉴权信息，继而到云端来登录。
@@ -685,6 +688,8 @@ TDSUser *user = [TDSUser user];
 
 `_User` class 中的 `authData` 是一个以平台名为键名，鉴权信息为键值的 JSON 对象。
 
+<Conditional region='cn'>
+
 一个关联了微信账户的用户应该会有下列对象作为 `authData`：
 
 ```json
@@ -732,10 +737,12 @@ TDSUser *user = [TDSUser user];
 }
 ```
 
+</Conditional>
+
 理解 `authData` 的数据结构至关重要。一个终端用户通过如下的鉴权信息来登录的时候，
 
 ```json
-"weixin": {
+"platform": {
   "openid":        "OPENID",
   "access_token":  "ACCESS_TOKEN",
   "expires_in":    7200,
@@ -744,10 +751,10 @@ TDSUser *user = [TDSUser user];
 }
 ```
 
-云端首先会查找账户系统（_User 表），看看是否存在 authData.weixin.openid = 「OPENID」的账户，如果存在，则返回现有账户，如果不存在那么就创建一个新账户，同时将上面的鉴权信息写入新账户的 `authData` 属性中，并将新账户的数据当成结果返回。
+云端首先会查找账户系统（_User 表），看看是否存在 authData.platform.openid = 「OPENID」的账户，如果存在，则返回现有账户，如果不存在那么就创建一个新账户，同时将上面的鉴权信息写入新账户的 `authData` 属性中，并将新账户的数据当成结果返回。
 
 云端会自动为 `_User` class 中每个用户的 `authData.<PLATFORM>.<uid>` 创建唯一索引，从而避免重复数据。
-`<uid>` 在微信等部分云服务内建支持的第三方平台上为 `openid` 字段，在其他第三方平台（包括部分云服务专门支持的第三方平台和所有云服务没有专门支持的第三方平台）上为 `uid` 字段。
+`<uid>` 在<Conditional region='cn'>微信等</Conditional>部分云服务内建支持的第三方平台上为 `openid` 字段，在其他第三方平台（包括部分云服务专门支持的第三方平台和所有云服务没有专门支持的第三方平台）上为 `uid` 字段。
 
 ### 自动验证第三方平台授权信息
 
@@ -762,7 +769,8 @@ TDSUser *user = [TDSUser user];
 
 ### 绑定第三方账户
 
-如果用户已经登录，也可以在当前账户上绑定或解绑更多第三方平台信息。例如，先用游客身份登录，再绑定 TapTap 和微信账号，那么以后通过 TapTap/微信授权登录，都可以得到完全相同的账号。
+如果用户已经登录，也可以在当前账户上绑定或解绑更多第三方平台信息。例如，先用游客身份登录，再绑定 TapTap 或其他第三方账号，那么以后通过 TapTap 或其他第三方授权登录，都可以得到完全相同的账号。
+
 绑定成功后，新的第三方账户信息会被添加到 TDSUser 的 authData 字段里。
 
 例如，下面的代码可以关联微信账户：
@@ -804,7 +812,7 @@ user.associateWithAuthData(weixinData, "weixin").subscribe(new Observer<TDSUser>
 
 </MultiLang>
 
-为节省篇幅，上面的代码示例中没有给出具体的微信平台授权信息，相关内容请参考上面的[「第三方账户登录」](#第三方账户登录)一节。
+为节省篇幅，上面的代码示例中没有给出具体的平台授权信息，相关内容请参考上面的[「第三方账户登录」](#第三方账户登录)一节。
 
 ### 解除与第三方账户的关联
 
@@ -851,7 +859,11 @@ user.dissociateWithAuthData("weixin").subscribe(new Observer<TDSUser>() {
 
 </MultiLang>
 
-### 扩展：接入 UnionID 体系，打通不同子产品的账号系统
+<Conditional region='cn'>
+
+<details>
+
+<summary>扩展：接入 UnionID 体系，打通不同子产品的账号系统</summary>
 
 随着第三方平台的账户体系变得日渐复杂，它们的第三方鉴权信息出现了一些较大的变化。下面我们以最典型的微信开放平台为例来进行说明。
 
@@ -1213,3 +1225,7 @@ objectId | 微信用户 | authData.{platform} | authData._{platform}_unionid
 4 | UserC | openid4（对应产品 2） | N/A
 5 | UserB | openid5（对应产品 1）/openid2（对应产品 2）/openid11（对应产品 3） | unionId_user_B
 6 | UserD | openid7（对应产品 1）/openid8（对应产品 2）/openid12（对应产品 3） | unionId_user_D
+
+</details>
+
+</Conditional>
