@@ -14,6 +14,8 @@ TapDB 是一套专注于解决游戏项目数据需求的分析工具，致力�
 
 ## 实用功能
 
+你可以访问 [DEMO](https://www.tapdb.com/dm/m/g/outline#code=w3ZWJYALTp4VA0zU&external=true "_blank") 直接体验。
+
 TapDB 服务提供的主要功能有：
 
 ### 基础 BI
