@@ -8,6 +8,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 import {Conditional} from '/src/docComponents/conditional';
 
 ## 业务介绍
+
 TapTap 的正版验证服务适用于付费下载的游戏，当玩家在使用付费游戏时，校验玩家是否已经成功购买付费游戏。
 
 ## 开启正版验证
