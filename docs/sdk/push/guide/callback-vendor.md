@@ -32,7 +32,7 @@ sidebar_position: 7
 
     -   回执名称：请输入一个自定义回执名称
     -   回调地址：请输入 <https://callback.tds1.tapapis.cn/push/v1/callback/hms>
-    -   HTTPS 证书：通过命令 “openssl s\_client -connect callback.tds1.tapapis.cn:443” 获取。以 Linux 平台命令为例，运行命令：
+    -   HTTPS 证书：通过命令 `openssl s_client -connect callback.tds1.tapapis.cn:443` 获取。以 Linux 平台命令为例，运行命令：
 
         openssl s_client -connect callback.tds1.tapapis.cn:443 -showcerts </dev/null | sed -n -e '/-.BEGIN/,/-.END/ p' > certifs.pem
 
