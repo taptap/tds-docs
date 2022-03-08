@@ -14,7 +14,6 @@ import {Conditional} from '/src/docComponents/conditional';
 [basic]: https://nextfe.com/domain-introduction/
 
 本指南面向国内版应用的开发者。
-国际版不支持绑定文件域名和 API 域名，只支持绑定云引擎自定义域名，参见 [云引擎常见问题和解答](/sdk/engine/guide/faq/#国际版云引擎必须绑定自定义域名吗)。
 
 ## 自定义域名的种类
 
