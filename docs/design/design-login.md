@@ -37,7 +37,7 @@ import useBaseUrl from '@docusaurus/useBaseUrl';
 
 <Background>
 
-<Figure isRecommended={true} quote="正确的按钮底板样式" content='允许替换底板风格允许根据游戏按钮的整体风格，对按钮底板进行任意造型的改造，但必须与其他登录形式的造型保持统一' imgSrc={useBaseUrl('/img/design/2.2.1.png')} imgAlt="" />
+<Figure isRecommended={true} quote="正确的按钮底板样式" content={<>允许替换底板风格<br/>允许根据游戏按钮的整体风格，对按钮底板进行任意造型的改造，但必须与其他登录形式的造型保持统一</>} imgSrc={useBaseUrl('/img/design/2.2.1.png')} imgAlt="" />
 
 <Figure isRecommended={false} quote="错误的按钮底板样式" content='不允许与其他登录方式的底板造型产生差别' imgSrc={useBaseUrl('/img/design/2.2.2.png')} imgAlt="" />
 

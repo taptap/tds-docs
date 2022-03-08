@@ -47,7 +47,7 @@ export default function DocItem(props: Props): JSX.Element {
   const renderTocDesktop =
     canRenderTOC && (windowSize === 'desktop' || windowSize === 'ssr');
 
-  const docsRequiringVersionBadge = ['sdk', 'design', 'tap-download', 'sdk-api'];
+  const docsRequiringVersionBadge = ['sdk', 'tap-download', 'sdk-api'];
   const shouldDisplayVersionBadge = docsRequiringVersionBadge.includes(slug.split('/')[1]);
 
   return (

@@ -36,8 +36,7 @@ yarn start -- --locale en
 │   ├── styles                               一些共享样式
 │   └── theme                                自定义组件（用于文档内容以外的地方，如文档搜索）
 ├── static
-│   ├── img                                  文档配图
-│   └── res                                  下载资源
+│   └── img                                  文档配图
 ├── versioned_docs                           旧版文档内容
 ├── versioned_sidebars                       旧版文档菜单配置
 └── versions.json                            历史版本配置
@@ -47,7 +46,7 @@ yarn start -- --locale en
 
 - `docs`（中文文档）
 - `i18n/en/docusaurus-plugin-content-docs/current`（英文文档）
-- `static`（文档配图和下载资源）
+- `static/img`（文档配图）
 
 ## 文档编写
 
