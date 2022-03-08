@@ -12,25 +12,25 @@ TDS 提供以下服务，开发者可以通过在游戏中集成 TapSDK 来开�
 
 - **[TapTap 登录](/sdk/taptap-login/features/)**：提供 TapTap 登录方式，玩家可以通过 TapTap 授权快速开始游戏。
 
-<Conditional region='cn'>
-
 - **[数据分析](/sdk/tapdb/features/)**：提供了一套专注于解决游戏项目数据需求的分析工具，通过简单的接入就可以获得丰富实用的数据看板和广告追踪能力，让数据分析和广告投放变得轻松易操作，同时也可以用于分析人群画像，帮助开发者更好地理解用户。
-
-</Conditional>
 
 - **[内嵌动态](/sdk/embedded-moments/features/)**：玩家可以在游戏内访问 TapTap 的社区论坛（官方公告、游戏攻略、问题反馈、热门话题等），同时也可以看到 TapTap 好友的游戏动态，并参与其他玩家、官方和大神之间的互动。
 
 - **[内建账户](/sdk/authentication/features/)**：帮助开发者快速低成本地构建一个安全可靠的玩家登录系统，支持玩家采用包括游客账号、第三方账号（TapTap、微信、QQ、Apple 等）在内的多种账号来登录你的游戏。
 
-<Conditional region='cn'>
-
 - **[游戏好友](/sdk/friends/features/)**：为游戏开发者提供完整的添加、删除、查找好友的功能接口，帮助游戏快速形成社交网络。
 
+<Conditional region='cn'>
+
 - **[成就系统](/sdk/achievement/features/)**：可以在游戏中设置「普通成就」和「白金成就」，增加玩家在游戏中的参与度，鼓励玩家以不同的玩法来玩游戏。
+
+</Conditional>
 
 - **[排行榜](/sdk/leaderboard/features/)**：基于内建账户系统在游戏中设立排行榜功能，可以推动玩家之间的趣味性竞争，从而帮助提升游戏的玩家活跃度。
 
 - **[云存档](/sdk/gamesaves/features/)**：将玩家的游戏进程保存到 TDS 服务器，游戏可以检索已保存的游戏数据，允许玩家从任何设备上的任意一个保存点继续游戏。
+
+<Conditional region='cn'>
 
 - **[防沉迷](/sdk/anti-addiction/features/)**：基于 TapTap 账号的快速实名认证功能，对使用 TapTap 账号登录游戏的玩家，在经过玩家同意授权之后，允许玩家使用在 TapTap 里已经通过国家认证的实名信息快速完成游戏中的认证流程。
 
@@ -38,13 +38,15 @@ TDS 提供以下服务，开发者可以通过在游戏中集成 TapSDK 来开�
 
 - **[正版验证](/sdk/lisence/features/)**：帮助开发者验证玩家设备中的付费游戏是否通过 TapTap 商店付费购买下载，有效地控制了未付费玩家从其他途径获得游戏的场景。
 
-<Conditional region='cn'>
-
 - **[DLC](/sdk/dlc/features/)**：为开发者提供一个在游戏内销售商品的渠道，其间玩家无需离开游戏即可完成购买流程。
 
 - **[唤起更新](/sdk/update/guide/)**：当游戏 apk 有更新时，支持玩家从游戏内直接跳转至 TapTap 进行游戏 apk 更新。
 
+<Conditional region='cn'>
+
 - **[TapCanary](/sdk/tap-canary/features/)**：将游戏应用的早期版本，发布给内部测试人员或受信任的用户进行封闭式测试，支持云玩模式和沙盒模式。
+
+</Conditional>
 
 - **[数据存储](/sdk/storage/features/)**：数据存储服务能够高效存取海量级 JSON 对象、二进制文件、地理位置等数据。其内置的行级 ACL 权限控制，以及通用的用户及角色管理体系，可以帮助你快速实现安全而灵活的数据访问。
 
@@ -55,7 +57,5 @@ TDS 提供以下服务，开发者可以通过在游戏中集成 TapSDK 来开�
 - **[即时通讯](/sdk/im/features/)**：解决产品内即时通信、实时数据同步等需求。
 
 - **[推送通知](/sdk/push/features/)**：整合了 Android 推送、iOS 推送的统一推送服务。
-
-</Conditional>
 
 使用对应的服务请先完成[开发者注册](/store/store-register/)，之后登录开发者中心开启「游戏服务」。
