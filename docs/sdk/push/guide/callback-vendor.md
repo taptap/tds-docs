@@ -14,7 +14,7 @@ sidebar_position: 7
 
 ## 华为
 
-1.  登录华为终端开发者控制台：<https://developer.huawei.com/consumer/cn/console，进入> PUSH 服务模块后选择要配置的项目。
+1.  登录[华为终端开发者控制台](https://developer.huawei.com/consumer/cn/console)，进入 PUSH 服务模块后选择要配置的项目。
 
     <p align="center" width="50%"><img src="/img/push/hms1.png" /></p>
 
