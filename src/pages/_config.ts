@@ -33,15 +33,12 @@ export const getEntries = (brand: string, region: string): Entry[] => {
     {
       title: "游戏服务",
       description: "TDS 为游戏开发提供的全套 SDK 服务",
-      links:
-        region === "cn"
-          ? [
-              {
-                label: "查看更多",
-                to: "/sdk",
-              },
-            ]
-          : [],
+      links: [
+        {
+          label: "查看更多",
+          to: "/sdk",
+        },
+      ]
     },
     ...(region === "cn"
       ? [
