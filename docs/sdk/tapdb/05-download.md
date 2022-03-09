@@ -2,6 +2,8 @@
 title: 下载 SDK
 ---
 
+<!--
+
 import { usePluginData } from "@docusaurus/useGlobalData";
 import { DownloadCard } from "/src/components/DownloadCard";
 
@@ -12,3 +14,5 @@ export const DownLoadCards = ({}) => {
 };
 
 <DownLoadCards />
+
+-->
