@@ -32,7 +32,7 @@ TapDB 中与推送消息效果统计相关的事件类型有两个，在推送�
 
     2.  推送点击时间：表示一次推送点击事件发生的事件，属性名是 `push_clicked_at`。
 
-    3.  推送服务的 installationId：顾名思义就是在推送服务中设备记录的的 installationId，属性名是「push_installation_id」。
+    3.  推送服务的 installationId：顾名思义就是在推送服务中设备记录的的 installationId，属性名是`push_installation_id`。
 
     4.  推送通知 ID：表示使用推送服务发送推送时的 notificationId，属性名是「push_notification_id」。
 
