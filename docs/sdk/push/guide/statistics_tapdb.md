@@ -34,7 +34,7 @@ TapDB 中与推送消息效果统计相关的事件类型有两个，在推送�
 
     3.  推送服务的 installationId：顾名思义就是在推送服务中设备记录的的 installationId，属性名是`push_installation_id`。
 
-    4.  推送通知 ID：表示使用推送服务发送推送时的 notificationId，属性名是「push_notification_id」。
+    4.  推送通知 ID：表示使用推送服务发送推送时的 notificationId，属性名是 `push_notification_id`。
 
     5.  推送第三方厂商类型：表示该 Android 设备使用的是第三方厂商平台，比如华为、小米等，其值对应于推送设备记录中的 vendor 字段的小写形式，属性名是「push_vendor」。
 
