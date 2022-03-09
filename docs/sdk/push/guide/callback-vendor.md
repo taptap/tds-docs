@@ -49,7 +49,7 @@ sidebar_position: 7
 
 ## 魅族
 
-1.  登录魅族推送平台控制台：<http://push.meizu.com/> ，选择正确的应用点击 [打开应用] 进入应用配置界面。
+1.  登录[魅族推送平台控制台](http://push.meizu.com/) ，选择正确的应用点击 **打开应用** 进入应用配置界面。
 
     <p align="center" width="50%"><img src="/img/push/mz1.png" /></p>
 
