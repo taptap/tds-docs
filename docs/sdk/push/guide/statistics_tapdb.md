@@ -1,5 +1,5 @@
 ---
-btitle: 推送消息效果统计 TapDB 使用指引
+title: 推送消息效果统计 TapDB 使用指引
 sidebar_label: 推送效果统计 TapDB
 sidebar_position: 8
 ---
