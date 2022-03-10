@@ -29,14 +29,13 @@ yarn start -- --locale en
 │       │   └── current.json                 侧栏菜单项翻译
 │       └── docusaurus-theme-classic
 │           └── navbar.json                  顶栏菜单项翻译
+├── img                                      文档配图
 ├── sidebars.js                              菜单配置
 ├── src
 │   ├── docComponents                        自定义组件（用于文档内容，如多编程语言）
 │   ├── pages                                文档以外的页面（目前只包含首页）
 │   ├── styles                               一些共享样式
 │   └── theme                                自定义组件（用于文档内容以外的地方，如文档搜索）
-├── static
-│   └── img                                  文档配图
 ├── versioned_docs                           旧版文档内容
 ├── versioned_sidebars                       旧版文档菜单配置
 └── versions.json                            历史版本配置
@@ -46,7 +45,7 @@ yarn start -- --locale en
 
 - `docs`（中文文档）
 - `i18n/en/docusaurus-plugin-content-docs/current`（英文文档）
-- `static/img`（文档配图）
+- `img`（文档配图）
 
 ## 文档编写
 
@@ -295,7 +294,7 @@ import CodeBlock from "@theme/CodeBlock";
 
 ##### 在文档中插入图片
 
-- 要插入位于 `static/img/design-1.1.png` 的图片，在 md 文件中引用需写作 `![图片说明](/img/design-1.1.png)`
+- 要插入位于 `img/design-1.1.png` 的图片，在 md 文件中引用需写作 `![图片说明](/img/design-1.1.png)`
 - 要插入位于 `https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png` 的图片，在 md 文件中引用需写作 `![图片说明](https://img.tapimg.com/market/images/c53d78b9b120276b53f82aebb0d01537.png)`
 
 ##### 如何用 Figma 为截图添加标注
@@ -307,7 +306,7 @@ import CodeBlock from "@theme/CodeBlock";
 5. 如果调整好大小之后发现标注组件的边框太细或者里面的文本/箭头太小，可以适当缩小原始截图的大小（注意缩放截图时要按住 <kbd>shift</kbd> 以保持原始长宽比），然后重复第 4 步。
 6. 如果截图需要多个标注，请重复第 2 至 5 步。注意更新标注组件里面用作序号的文本。
 7. 选中所有元素（<kbd>command</kbd> <kbd>A</kbd>），然后按下 <kbd>option</kbd> <kbd>command</kbd> <kbd>G</kbd>（或者右击选中的内容，点击「Frame selection」）。此时包括截图和标注在内的所有元素会被包裹进一个 Frame（可以理解为其他平面设计软件中「画板」和「编组」的结合体）。
-8. 点击右侧面板最下方的「Export」，保持默认设置，点击「Export {Frame 名称}」（如果没有改过 Frame 名称，那么这里默认会显示为「Export Frame 1」）。
+8. 点击右侧面板最下方的「Export」，保持默认设置，点击「Export _Frame 名称_」（如果没有改过 Frame 名称，那么这里默认会显示为「Export Frame 1」）。
 
 ##### Tips
 
@@ -370,7 +369,7 @@ import CodeBlock from "@theme/CodeBlock";
 
 ## 优化图片
 
-运行 `yarn optimg` 任务可以优化 `static/img` 下的 JPEG（有损压缩）和 PNG 图片（无损压缩）。这一任务运行时间较长，所以未加入构建环节，需要手动运行。建议过一段时间（比如一两个月）跑一下。
+运行 `yarn optimg` 任务可以优化 `img` 下的 JPEG（有损压缩）和 PNG 图片（无损压缩）。这一任务运行时间较长，所以未加入构建环节，需要手动运行。建议过一段时间（比如一两个月）跑一下。
 
 ## 多版本
 
