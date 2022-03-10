@@ -9,7 +9,7 @@ import EngineRuntimes from '/src/docComponents/MultiLang/engine';
 import FunctionsIntroduction from '../_partials/functions-introduction.mdx';
 import Mermaid from '/src/docComponents/Mermaid';
 import TabItem from '@theme/TabItem';
-import {BRAND} from '/src/constants/env.ts';
+import {Conditional} from '/src/docComponents/conditional';
 
 :::info
 这篇文档专注在「云函数和 Hook」这种云引擎上的特殊的应用场景，如需部署通用的后端应用，或需要了解云引擎平台提供的更多功能，请看 [云引擎平台功能](/sdk/engine/deploy/platform)。
@@ -1914,7 +1914,7 @@ Before 类 Hook 函数的超时时间为 10 秒，其他类 Hook 函数的超时
 
 ## 即时通讯 Hook
 
-<p>参见<a href={BRAND==='leancloud'?'https://leancloud.cn/docs/realtime-guide-systemconv.html':'/sdk/im/guide/systemconv/'}>即时通讯指南第四篇</a>的《万能的 Hook 机制》章节。</p>
+参见<Conditional brand="tds">[即时通讯指南第四篇](/sdk/im/guide/systemconv/)</Conditional><Conditional brand="leancloud">[即时通讯指南第四篇](https://leancloud.cn/docs/realtime-guide-systemconv.html)</Conditional>的《万能的 Hook 机制》章节。
 
 ## 在线编写云函数
 

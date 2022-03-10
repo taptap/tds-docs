@@ -565,7 +565,7 @@ curl --resolve 'engine.example.com:443:YOUR-ENGINE-IP' https://engine.example.co
 
 绑定 API 自定义域名，并在客户端 SDK 初始化时指定 API 自定义域名，即可使用独立 IP。
 
-[云引擎独立 IP](/sdk/engine/dedicated-ip/) 可按需购买。
+[云引擎独立 IP](/sdk/engine/dedicated-IP/) 可按需购买。
 </Conditional>
 
 ## 域名解析

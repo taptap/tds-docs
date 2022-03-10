@@ -6,14 +6,13 @@ sidebar_position: 3
 
 import EngineRuntimes from '/src/docComponents/MultiLang/engine';
 import TabItem from '@theme/TabItem';
-import {BRAND} from '/src/constants/env.ts';
 import {Conditional} from '/src/docComponents/conditional';
 
 :::info
 这篇文档是关于云引擎 SDK 的深入介绍，如需了解云函数和 Hook 的用法请看 [云函数和 Hook 开发指南](/sdk/engine/functions/guides)。
 :::
 
-<p>云引擎 SDK 通常基于 <a href={BRAND==='leancloud'?'https://leancloud.cn/docs/storage_overview.html':'/sdk/storage/features'}>数据存储</a> 服务的 SDK，并提供了云函数和 Hook 等额外能力，供开发者在云引擎上更方便地开发后端应用。</p>
+云引擎 SDK 通常基于 <Conditional brand="tds">[数据存储](/sdk/storage/features)</Conditional><Conditional brand="leancloud">[数据存储](https://leancloud.cn/docs/storage_overview.html)</Conditional> 服务的 SDK，并提供了云函数和 Hook 等额外能力，供开发者在云引擎上更方便地开发后端应用。
 
 ## 接入云引擎 SDK
 
@@ -256,13 +255,13 @@ func setResponseContentType(next echo.HandlerFunc) echo.HandlerFunc {
 
 ## 使用数据存储服务
 
-<p>接入 SDK 后，在云引擎中你就可以调用 <a href={BRAND==='leancloud'?'https://leancloud.cn/docs/storage_overview.html':'/sdk/storage/features'}>数据存储</a> 服务作为数据库来存储数据，或者使用文件、短信、推送等功能。可以查看数据存储服务对应语言的文档了解详情。</p>
+接入 SDK 后，在云引擎中你就可以调用 <Conditional brand="tds">[数据存储](/sdk/storage/features)</Conditional><Conditional brand="leancloud">[数据存储](https://leancloud.cn/docs/storage_overview.html)</Conditional> 服务作为数据库来存储数据，或者使用文件、短信、推送等功能。可以查看数据存储服务对应语言的文档了解详情。
 
 数据存储相关功能可以在云函数和 Hook 中使用，也可以在程序的其他部分（如自行选用的 Web 框架）中使用。
 
 ## 使用超级权限
 
-<p>因为云引擎运行在可信的服务器端环境中，所以可以使用 Master Key（超级权限）跳过 ACL 和 Class 权限的检查，没有限制地修改数据存储中的数据；还可以使用一些仅限 Master Key 调用的管理员接口，如 <a href={BRAND==='leancloud'?'https://leancloud.cn/docs/rest_api.html#hash-1876900988':'/sdk/storage/guide/rest/#遍历-class'}>遍历 Class（scan）</a>。</p>
+因为云引擎运行在可信的服务器端环境中，所以可以使用 Master Key（超级权限）跳过 ACL 和 Class 权限的检查，没有限制地修改数据存储中的数据；还可以使用一些仅限 Master Key 调用的管理员接口，如 <Conditional brand="tds">[遍历 Class（scan）](/sdk/storage/guide/rest/#遍历-class)</Conditional><Conditional brand="leancloud">[遍历 Class（scan）](https://leancloud.cn/docs/rest_api.html#hash-1876900988)</Conditional>。
 
 所以你可以全局开启超级权限（`Master Key`），这样会跳过包括 ACL 和 Class 权限在内的检查，让你自由地操作所有云存储中的数据，也允许调用一些仅供 `Master Key` 使用的 API。
 

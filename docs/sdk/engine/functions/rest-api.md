@@ -4,7 +4,7 @@ sidebar_label: REST API
 sidebar_position: 5
 ---
 
-import {BRAND} from '/src/constants/env.ts';
+import {Conditional} from '/src/docComponents/conditional';
 
 :::info
 这篇文档会是关于 REST API 的深入介绍，如需了解云函数和 Hook 的用法请看 [云函数和 Hook 开发指南](/sdk/engine/functions/guides)。
@@ -16,7 +16,7 @@ import {BRAND} from '/src/constants/env.ts';
 
 ## Base URL
 
-<p>REST API 请求的 Base URL（下文 curl 示例中用 <code>{"{{host}}"}</code> 表示）即应用绑定的 API 自定义域名，可以在控制台绑定、查看。详见文档关于<a href={BRAND==='leancloud'?'https://leancloud.cn/docs/custom-api-domain-guide.html':'/sdk/storage/guide/setup-dotnet#域名'}>域名</a>的说明。</p>
+REST API 请求的 Base URL（下文 curl 示例中用 `{{host}}` 表示）即应用绑定的 API 自定义域名，可以在控制台绑定、查看。详见文档关于<Conditional brand="tds">[域名](/sdk/storage/guide/setup-dotnet#域名)</Conditional><Conditional brand="leancloud">[域名](https://leancloud.cn/docs/custom-api-domain-guide.html)</Conditional>的说明。
 
 ## 概览
 
