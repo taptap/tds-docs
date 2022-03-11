@@ -549,8 +549,6 @@ REST API 请求的主体为 JSON 格式，HTTP header 的 `Content-Type` 需要�
 
 API Base 为 `https://tds-tapsdk.cn.tapapis.com`.
 
-**注意，参数错误、内部错误时响应的状态码均为 200。**
-
 #### 获取鉴权 Token
 
 <MultiLang>
@@ -753,6 +751,74 @@ POST /addict/api/v1/playcheck
     }
 }
 ```
+
+### 检验实名信息
+
+这个接口可以验证玩家的姓名和身份证号码是否真实有效。
+
+注意，该接口为管理接口，鉴权方式和其他接口不同。
+请求的鉴权是通过 HTTP Header 里面包含的键值对来进行的，参数如下表：
+
+Key|Value|含义
+---|----|---
+`X-TDS-Id`|`{{clientId}}`|游戏的 `Client Id`，可在控制台查看
+`X-TDS-Server-Secret`|`{{serverSecret}}`|游戏的 `Server Secret`，可在控制台查看
+
+```sh
+curl -X GET \
+  -H "X-TDS-Id: {{clientId}}" \
+  -H "X-TDS-Server-Secret: {{serverSecret}}" \
+  https://tds-tapsdk.cn.tapapis.com/real-name/v1/clients/{{clientId}}/users/USER-ID/check?name=USER-NAME&idCard=ID-CARD-NUMBER
+```
+
+其中：
+
+- `USER-ID` 需替换为游戏使用的玩家唯一标识。
+- `USER-NAME` 需替换为 urlencode 后的玩家姓名。
+- `ID-CARD-NUMBER` 需替换为玩家的身份证号码。
+
+检验通过时返回 200：
+
+```json
+{
+  "success": true,
+  "data": {
+    "result": true
+  }
+}
+```
+
+检验失败时，返回结果中的 `success` 为 `false`，同时会返回具体的错误原因。
+
+例如，身份证号码非法时会返回 401 错误：
+
+```json
+{
+  "success": false,
+  "data": {
+    "code": 3,
+    "error": "5101",
+    "error_description": "身份证号码非法",
+    "msg": "INVALID_ARGUMENT"
+  }
+}
+```
+
+参数错误时会返回 400 错误，比如 `X-TDS-Id` 有误时会返回：
+
+```json
+{
+  "success": false,
+  "data": {
+    "code": 400,
+    "error": "invalid_variable",
+    "error_description": "invalid appId.",
+    "msg": null
+  }
+}
+```
+
+服务繁忙时会返回 500 错误，可稍后重试。
 
 ## 常见问题
 
