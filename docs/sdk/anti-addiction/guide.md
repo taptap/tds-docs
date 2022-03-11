@@ -55,7 +55,6 @@ iOS 平台配置：
 <ul>
 <li>将 <code>AntiAddiction_{sdkVersions.taptap.anti_addiction}.aar</code> 拷贝到游戏目录下的 <code>src/main/libs</code> 目录中</li>
 <li>将 <code>AntiAddictionUI_{sdkVersions.taptap.anti_addiction}.aar</code> 拷贝到游戏目录下的 <code>src/main/libs</code> 目录中</li>
-<li>将 <code>gson-2.8.6.jar</code> 拷贝到游戏目录下的 <code>src/main/libs</code> 目录中</li>
 </ul>
 
 在游戏目录下 `build.gradle` 文件中添加代码
