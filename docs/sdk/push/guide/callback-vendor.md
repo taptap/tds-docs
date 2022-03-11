@@ -38,7 +38,7 @@ sidebar_position: 7
     https://callback.tds1.tapapis.cn/push/v1/callback/hms
     ```
 
-    - **HTTPS 证书**：通过命令 `openssl s_client -connect callback.tds1.tapapis.cn:443` 获取。以 Linux 平台命令为例，运行命令：
+    **HTTPS 证书**：通过命令 `openssl s_client -connect callback.tds1.tapapis.cn:443` 获取。以 Linux 平台命令为例，运行命令：
 
     ```
     openssl s_client -connect callback.tds1.tapapis.cn:443 -showcerts </dev/null | sed -n -e '/-.BEGIN/,/-.END/ p' > certifs.pem
@@ -60,7 +60,7 @@ sidebar_position: 7
 
 1. 登录[魅族推送平台控制台](http://push.meizu.com/) ，选择正确的应用点击 **打开应用** 进入应用配置界面。
 
-![mz push](/img/push/mz1.png)
+    ![mz push](/img/push/mz1.png)
 
 2. 在应用配置界面上，依次点击 **配置管理 > 回执管理** 进入回执配置界面，在 **回执地址** 文本框中输入回调地址：
 
