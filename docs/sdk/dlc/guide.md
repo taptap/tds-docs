@@ -141,7 +141,9 @@ TapLicenseHelper.purchaseDLC(Activity activity, String skuIds);
 </MultiLang>
 
 ### 参数说明
+
 #### TapLicenseQueryCode
+
 回调          | 回调值 | 说明       |
 ----------- | --- | -------- |
 QUERY_RESULT_OK       | 0   | 查询成功     |
@@ -149,20 +151,9 @@ QUERY_RESULT_NOT_INSTALL_TAPTAP       | 1   | 检查测试机未安装 TapTap �
 QUERY_RESULT_ERR       | 2   | 查询失败     |
 ERROR_CODE_UNDEFINED       | 80000   | 未知错误     |
 
-
-#### skuId:
-
-<Conditional region='cn'>
+#### skuId
 
 内购商品 id，需要提交工单联系 TapTap 运营同学进行配置；
-
-</Conditional>
-
-<Conditional region='global'>
-
-内购商品 id，需要发邮件到 [international_operation@taptap.com](mailto:international_operation@taptap.com) 联系 TapTap 运营同学进行配置；
-
-</Conditional>
 
 ## 测试
 

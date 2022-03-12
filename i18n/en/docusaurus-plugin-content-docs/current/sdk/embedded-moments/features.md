@@ -189,6 +189,6 @@ To help you better assess the value of Embedded Moments and get feedback about t
 
 You can set up recommendations in “Group Management Center” > “Recommendation”. **A title, image, and link** are required for each recommendation. Adding and editing recommendations are subject to review.
 
-### Sub-groups
+### Sub-Groups
 
 You can set up sub-groups in “Group Management Center” > “Sub-group”. **A name (in multiple languages)** is required for each sub-group. Adding and editing sub-groups are subject to review.
