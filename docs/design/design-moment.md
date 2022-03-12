@@ -2,7 +2,7 @@
 title: 内嵌动态设计指南
 ---
 
-import {Red, Blue, Black, Gray, Background, Figure} from '/src/docComponents/doc';
+import {Background, Figure} from '/src/docComponents/doc';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 ## 导航描述字符规则

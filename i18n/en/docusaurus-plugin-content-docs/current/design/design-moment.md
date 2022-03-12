@@ -2,7 +2,7 @@
 title: Embedded Moments Design Guideline
 ---
 
-import {Red, Blue, Black, Gray, Background, Figure} from '/src/docComponents/doc';
+import {Background, Figure} from '/src/docComponents/doc';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 
 ## Navbar Labels
@@ -19,7 +19,7 @@ Navbar labels are the textual elements used for menu items. They can be in both 
 
 </Background>
 
-<Background title='Navbar labels appearing in the tab list as tabs and the "sort" icon'>
+<Background title="Navbar labels appearing in the tab list as tabs and the “sort” icon">
 
 <Figure caption="Dark navbar labels" imgSrc={useBaseUrl('/img/io/design-moment/1.1.2.1.png')} imgAlt="" />
 
@@ -27,7 +27,7 @@ Navbar labels are the textual elements used for menu items. They can be in both 
 
 </Background>
 
-<Background title='Navbar labels appearing in the tab list as tabs and the "sort" icon'>
+<Background title="Navbar labels appearing in the tab list as tabs and the “sort” icon">
 
 <Figure caption="Dark navbar labels" imgSrc={useBaseUrl('/img/io/design-moment/1.1.3.1.png')} imgAlt="" />
 
@@ -43,7 +43,7 @@ The more contrast you set between the text and the background, the more legible 
 
 <Figure caption="Dark navbar labels" isRecommended={true} quote="Do" imgSrc={useBaseUrl('/img/io/design-moment/1.2.1.1.png')} imgAlt="" />
 
-<Figure isRecommended={false} quote="Don't" imgSrc={useBaseUrl('/img/io/design-moment/1.2.1.2.png')} imgAlt="" />
+<Figure isRecommended={false} quote="Don’t" imgSrc={useBaseUrl('/img/io/design-moment/1.2.1.2.png')} imgAlt="" />
 
 </Background>
 
@@ -51,7 +51,7 @@ The more contrast you set between the text and the background, the more legible 
 
 <Figure caption="Light navbar labels" isRecommended={true} quote="Do" imgSrc={useBaseUrl('/img/io/design-moment/1.2.2.1.png')} imgAlt="" />
 
-<Figure isRecommended={false} quote="Don't" imgSrc={useBaseUrl('/img/io/design-moment/1.2.2.2.png')} imgAlt="" />
+<Figure isRecommended={false} quote="Don’t" imgSrc={useBaseUrl('/img/io/design-moment/1.2.2.2.png')} imgAlt="" />
 
 </Background>
 
@@ -81,25 +81,25 @@ When Embedded Moments is opened on a device with a short screen, the background 
 
 #### Style
 
-The background image shall not be too prominent that it takes the user's attention away from the main content. Therefore, we suggest that you add simple patterns on the background and keep the contrast within the background to a minimum.
+The background image shall not be too prominent that it takes the user’s attention away from the main content. Therefore, we suggest that you add simple patterns on the background and keep the contrast within the background to a minimum.
 
 <Background>
 
-<Figure isRecommended={true} quote="Do" content={<>A background that doesn't catch the user's attention<br/>- Fewer colors<br/>- Low contrast between the foreground and the background</>} imgSrc={useBaseUrl('/img/io/design-moment/2.3.1.1.png')} imgAlt="" />
+<Figure isRecommended={true} quote="Do" content={<>A background that doesn’t catch the user’s attention<br/>- Fewer colors<br/>- Low contrast between the foreground and the background</>} imgSrc={useBaseUrl('/img/io/design-moment/2.3.1.1.png')} imgAlt="" />
 
-<Figure isRecommended={false} quote="Don't" content={<>A background that catches the user's attention<br/>- Too many colors<br/>- Too much contrast between the foreground and the background</>} imgSrc={useBaseUrl('/img/io/design-moment/2.3.1.2.png')} imgAlt="" />
+<Figure isRecommended={false} quote="Don’t" content={<>A background that catches the user’s attention<br/>- Too many colors<br/>- Too much contrast between the foreground and the background</>} imgSrc={useBaseUrl('/img/io/design-moment/2.3.1.2.png')} imgAlt="" />
 
 </Background>
 
 #### What to Place in the Background
 
-You may add patterns or illustrations to the background as long as they don't get too much attention from the user.
+You may add patterns or illustrations to the background as long as they don’t get too much attention from the user.
 
 <Background content="Patterns with low saturation">
 
 <Figure isRecommended={true} quote="Do" content="- Simple patterns with low contrast against the background" imgSrc={useBaseUrl('/img/io/design-moment/2.3.2.1.1.png')} imgAlt="" />
 
-<Figure isRecommended={false} quote="Don't" content="- The contrast is too strong" imgSrc={useBaseUrl('/img/io/design-moment/2.3.2.1.2.png')} imgAlt="" />
+<Figure isRecommended={false} quote="Don’t" content="- The contrast is too strong" imgSrc={useBaseUrl('/img/io/design-moment/2.3.2.1.2.png')} imgAlt="" />
 
 </Background>
 
@@ -107,7 +107,7 @@ You may add patterns or illustrations to the background as long as they don't ge
 
 <Figure isRecommended={true} quote="Do" content="- Illustrations with low saturation give the user a feeling of tranquility" imgSrc={useBaseUrl('/img/io/design-moment/2.3.2.2.1.png')} imgAlt="" />
 
-<Figure isRecommended={false} quote="Don't" content={<>- The contrast is too strong<br/>- The illustration is too complex</>} imgSrc={useBaseUrl('/img/io/design-moment/2.3.2.2.2.png')} imgAlt="" />
+<Figure isRecommended={false} quote="Don’t" content={<>- The contrast is too strong<br/>- The illustration is too complex</>} imgSrc={useBaseUrl('/img/io/design-moment/2.3.2.2.2.png')} imgAlt="" />
 
 </Background>
 
@@ -115,7 +115,7 @@ You may add patterns or illustrations to the background as long as they don't ge
 
 <Figure isRecommended={true} quote="Do" content="- Limited use of decorations" imgSrc={useBaseUrl('/img/io/design-moment/2.3.2.3.1.png')} imgAlt="" />
 
-<Figure isRecommended={false} quote="Don't" content={<>- Cluttered decorations<br/>- Decorations occupy too much space</>} imgSrc={useBaseUrl('/img/io/design-moment/2.3.2.3.2.png')} imgAlt="" />
+<Figure isRecommended={false} quote="Don’t" content={<>- Cluttered decorations<br/>- Decorations occupy too much space</>} imgSrc={useBaseUrl('/img/io/design-moment/2.3.2.3.2.png')} imgAlt="" />
 
 </Background>
 

@@ -4,8 +4,6 @@ sidebar_label: 功能介绍
 sidebar_position: 1
 ---
 
-import {Conditional} from '/src/docComponents/conditional';
-
 ## 产品介绍
 
 玩家可以在游戏内进入 TapTap 的社区论坛，查看攻略资讯，分享自己的游戏精彩瞬间，也可以参与其他玩家、官方和大神之间的互动。
@@ -13,11 +11,13 @@ import {Conditional} from '/src/docComponents/conditional';
 ## 核心优势
 
 **对于游戏开发者：**
+
 - 内容生产：可以通过一键分享，引导玩家分享自己在游戏内的内容
 - 内容触达：官方发布的内容会进入玩家的关注流，可在内嵌动态为玩家精准分发内容
 - 内容反馈：对玩家发布的内容可以及时反馈和给予帮助解答
 
 **对于游戏玩家：**
+
 - 社交需求：在游戏过程中，能与其他玩家进行延时性的交流和互动
 - 帮助决策：在游戏场景中，遇到困难，能快速查到游戏攻略和大神解说
 
@@ -39,11 +39,11 @@ import {Conditional} from '/src/docComponents/conditional';
 
 ![](/img/embedded-moments/game-detail.png)
 
-1. **子版块**：子版块可以帮助用户分类筛选信息流，在 TapTap论坛和内嵌动态内是互通的，该模块可在「论坛管理者中心-子版块管理」中编辑，过审后即可展示。
+1. **子版块**：子版块可以帮助用户分类筛选信息流，在 TapTap 论坛和内嵌动态内是互通的，该模块可在「论坛管理者中心-子版块管理」中编辑，过审后即可展示。
 
 2. **运营位**：运营位可以帮助开发者展示重要的信息和活动，是内嵌动态独有的模块，该模块可在「游戏服务-内嵌动态-运营位配置」中编辑，过审后即可在内嵌动态中展示。
 
-3. **推荐位**：推荐位可以帮助开发者配置快捷导航，此处可以关联「帖子」「子版块」「索引页」，在 TapTap论坛和内嵌动态内是互通的，该模块可在「论坛管理者中心-推荐位管理」中编辑，过审后即可展示。
+3. **推荐位**：推荐位可以帮助开发者配置快捷导航，此处可以关联「帖子」「子版块」「索引页」，在 TapTap 论坛和内嵌动态内是互通的，该模块可在「论坛管理者中心-推荐位管理」中编辑，过审后即可展示。
 
 4. **信息流**：玩家进入论坛时默认查看热门推荐的信息流，右上角可以根据回复时间和发布时间筛选信息流排序。
 
@@ -57,8 +57,6 @@ import {Conditional} from '/src/docComponents/conditional';
 
 ![](/img/embedded-moments/repost.png)
 
-<Conditional region='cn'>
-
 ### 攻略站
 
 - **攻略标签**：玩家可以在右侧快捷导航栏里查找相应的攻略「标签」，查看三条攻略：
@@ -68,7 +66,6 @@ import {Conditional} from '/src/docComponents/conditional';
 点击上方「查看全部」，可以阅读该「标签」下的所有攻略：
 
 ![](/img/embedded-moments/all-tips.png)
-
 
 - **攻略索引**：可以根据攻略的数量和类型，在「全部攻略」处进行配置攻略「索引」，便于内容管理。
 
@@ -87,8 +84,6 @@ import {Conditional} from '/src/docComponents/conditional';
 #### 提交工单方式
 
 进入 TapTap 开发者中心后台，点击右上角「工单」，创建工单时请选择「TDS 游戏服务」-「内嵌动态」-「其他问题」，提交你的诉求，我们会尽快给你答复。
-
-</Conditional>
 
 ### 关注流
 
@@ -113,8 +108,10 @@ import {Conditional} from '/src/docComponents/conditional';
 开发者可以在游戏内某一场景处绘制入口，然后在[开发者中心后台配置](#场景化入口配置)玩家点击按钮后的落地页，帮助玩家在游戏内遇到困难和问题时给予决策辅助。
 
 :::tip
+
 1. 入口样式最好结合游戏场景去绘制，TDS 不提供样式规范，目的是为了让玩家进入时不会有违和感。
 2. 跳转的落地页可以配置成某一篇文章或者是某一个模块，根据开发者自身诉求自定义配置。
+
 :::
 
 ![](/img/embedded-moments/scenario-portal.png)
@@ -126,9 +123,11 @@ import {Conditional} from '/src/docComponents/conditional';
 ![](/img/embedded-moments/red-dot.png)
 
 :::tip
+
 1. 红点对提升使用率至关重要，建议将入口放在游戏内显眼的位置
 2. 入口红点和内嵌动态内「关注」的红点逻辑是一致的，玩家关注的用户发布了新内容将触发消息通知，获取新消息间隔为 1 分钟一次（1 分钟是最小单位，轮询时长开发者可自行调整为 3 分钟、5 分钟等）
 3. 当玩家打开内嵌动态后，游戏需要清除小红点展示，再继续下一次轮询请求来展示红点
+
 :::
 
 ### 一键发布
@@ -150,9 +149,11 @@ import {Conditional} from '/src/docComponents/conditional';
 为了更好地结合游戏场景，让玩家不会有割裂感，TDS 提供开发者自定义配置内嵌状态的样式主题，你可以在「游戏服务」-「内嵌动态」-「主题配置」中上传背景图片和设置字体配色。
 
 :::tip
+
 1. 可参考[内嵌动态设计指南](/design/design-moment/)。
 2. 如果游戏仅支持横屏或者竖屏，只需要上传一张即可，若是支持转屏则需要上传两张。
 3. 图片是需要进行人工审核的，一般会在 2 个工作日内完成。
+
 :::
 
 ![](/img/embedded-moments/tapmoment-theme-config.png)
@@ -162,8 +163,10 @@ import {Conditional} from '/src/docComponents/conditional';
 为了更好地帮助游戏进行活动运营，TDS 提供开发者自定义配置内嵌状态的运营位，你可以在「游戏服务」-「内嵌动态」-「运营位配置」中新增运营位，需要提供**标题、图片 Banner**和**链接**。
 
 :::tip
+
 1. 最多同时配置 5 个运营位，TDS 对跳转链接域名不做限制。
 2. 运营位是需要进行人工审核的，一般会在当天内审核完。
+
 :::
 
 ![](/img/embedded-moments/banner-config.png)

@@ -96,8 +96,8 @@ The `code` in the callback function refers to the type of the event. The followi
 | CALLBACK_CODE_GET_NOTICE_FAIL    | 20100 | Failed to retrieve notifications.                                                                          |
 | CALLBACK_CODE_MOMENT_APPEAR      | 30000 | Embedded Moments is opened.                                                                                |
 | CALLBACK_CODE_MOMENT_DISAPPEAR   | 30100 | Embedded Moments is closed.                                                                                |
-| CALLBACK_CODE_CLOSE_CANCEL       | 50000 | The user refused to close all the Embedded Moments pages (the "Cancel" button on the pop-up is tapped).    |
-| CALLBACK_CODE_CLOSE_CONFIRM      | 50100 | The user confirmed to close all the Embedded Moments pages (the "Confirm" button on the pop-up is tapped). |
+| CALLBACK_CODE_CLOSE_CANCEL       | 50000 | The user refused to close all the Embedded Moments pages (the “Cancel” button on the pop-up is tapped).    |
+| CALLBACK_CODE_CLOSE_CONFIRM      | 50100 | The user confirmed to close all the Embedded Moments pages (the “Confirm” button on the pop-up is tapped). |
 | CALLBACK_CODE_LOGIN_SUCCESS      | 60000 | Logged in successfully.                                                                                    |
 | CALLBACK_CODE_SCENE_EVENT        | 70000 | Callback for scenario-based portals.                                                                       |
 
@@ -159,7 +159,7 @@ Embedded Moments might contain videos that have sounds. Therefore, please mute t
 
 To make Embedded Moments rotate along with the device, your game has to support rotation as well.
 
-Don't forget to remove the badge after the player opens the Embedded Moments.
+Don’t forget to remove the badge after the player opens the Embedded Moments.
 
 :::
 
@@ -176,7 +176,7 @@ With [Scenario-Based Portals](/sdk/embedded-moments/features/#scenario-based-por
 
 ```cs
 var sceneDic = new Dictionary<string, object>() { { TapMomentConstants.TapMomentPageShortCutKey, sceneId } };
-// sceneId is the "portal ID" generated when you create a scenario-based portal in TapTap Developer Center
+// sceneId is the “portal ID” generated when you create a scenario-based portal in TapTap Developer Center
 TapMoment.DirectlyOpen(Orientation.ORIENTATION_DEFAULT, TapMomentConstants.TapMomentPageShortCut, sceneDic);
 ```
 
@@ -193,7 +193,7 @@ TapMoment.DirectlyOpen(Orientation.ORIENTATION_DEFAULT, TapMomentConstants.TapMo
 
 ```java
 Map<String, String> extras = new HashMap<>();
-// Note: The key is always "scene_id" and the second argument is the "portal ID" generated when you create a scenario-based portal in TapTap Developer Center
+// Note: The key is always "scene_id" and the second argument is the “portal ID” generated when you create a scenario-based portal in TapTap Developer Center
 extras.put("scene_id", "xxxx");
 // Note: The second argument is always "tap://moment/scene/"
 TapMoment.directlyOpen(TapMoment.ORIENTATION_DEFAULT,"tap://moment/scene/", extras);
@@ -271,10 +271,10 @@ TapMoment.closeWithConfirmWindow("Are you ready?", "The game is ready to start."
 
 </MultiLang>
 
-The player's selection will be returned with a callback:
+The player’s selection will be returned with a callback:
 
-- `CALLBACK_CODE_CLOSE_CANCEL` (50000) means the player selected "Cancel" and wants to stay in Embedded Moments.
-- `CALLBACK_CODE_CLOSE_CONFIRM` (50100) means the player selected "Confirm" and wants to return to the game.
+- `CALLBACK_CODE_CLOSE_CANCEL` (50000) means the player selected “Cancel” and wants to stay in Embedded Moments.
+- `CALLBACK_CODE_CLOSE_CONFIRM` (50100) means the player selected “Confirm” and wants to return to the game.
 
 To close the Embedded Moments without confirming:
 
@@ -302,7 +302,7 @@ This feature is optional. You can choose whether or not to enable this feature i
 
 :::
 
-In general, the play can post their moments on the Embedded Moments page. But if you'd like, you can also allow the player to post moments containing images and texts without leaving the game.
+In general, the play can post their moments on the Embedded Moments page. But if you’d like, you can also allow the player to post moments containing images and texts without leaving the game.
 
 <MultiLang>
 
