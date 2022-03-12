@@ -59,7 +59,7 @@ The more contrast you set between the text and the background, the more legible 
 
 ### Background Sizes
 
-Embedded Moments can be used in both landscape and portrait modes. This means that you need to provide two background images for your game, one for each orientation.
+Embedded Moments can be displayed in both landscape and portrait modes. This means that you need to provide two background images for your game, one for each orientation.
 
 <Background>
 
@@ -69,7 +69,7 @@ Embedded Moments can be used in both landscape and portrait modes. This means th
 
 ### Cropping Backgrounds
 
-When Embedded Moments is opened on a device with a small screen, the background image will be cropped to fit the size of the screen.
+When Embedded Moments is opened on a device with a short screen, the background image will be cropped to fit the size of the screen.
 
 <Background>
 
@@ -85,9 +85,9 @@ The background image shall not be too prominent that it takes the user's attenti
 
 <Background>
 
-<Figure isRecommended={true} quote="Do" content={<>*A background that doesn't catch the user's attention<br/>- Fewer colors<br/>- Low contrast between the foreground and the background</>} imgSrc={useBaseUrl('/img/io/design-moment/2.3.1.1.png')} imgAlt="" />
+<Figure isRecommended={true} quote="Do" content={<>A background that doesn't catch the user's attention<br/>- Fewer colors<br/>- Low contrast between the foreground and the background</>} imgSrc={useBaseUrl('/img/io/design-moment/2.3.1.1.png')} imgAlt="" />
 
-<Figure isRecommended={false} quote="Don't" content={<>*A background that catches the user's attention<br/>- Too many colors<br/>- Too much contrast between the foreground and the background</>} imgSrc={useBaseUrl('/img/io/design-moment/2.3.1.2.png')} imgAlt="" />
+<Figure isRecommended={false} quote="Don't" content={<>A background that catches the user's attention<br/>- Too many colors<br/>- Too much contrast between the foreground and the background</>} imgSrc={useBaseUrl('/img/io/design-moment/2.3.1.2.png')} imgAlt="" />
 
 </Background>
 
@@ -121,7 +121,7 @@ You may add patterns or illustrations to the background as long as they don't ge
 
 #### Safe Zones
 
-To ensure that the illustrations added into the background can be fully displayed, the following safe zones are defined.
+To ensure that the entirety of the illustrations in the background can be seen by the user, please keep the illustrations within the safe zones defined below.
 
 <Background content="Patterns with low saturation">
 
@@ -149,7 +149,7 @@ To ensure that the illustrations added into the background can be fully displaye
 
 #### Background Color of the Sticky Tab List
 
-You can set a background color for the sticky tab list. The tab list will fit well with the rest of the UI if you use a color from the top area of the background image.
+You can set a background color for the sticky tab list. The tab list will fit well with the rest of the UI if you pick the color from the top area of the background image.
 
 <Background>
 

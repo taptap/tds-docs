@@ -85,9 +85,9 @@ Tap 动态同时支持横屏和竖屏，因此每个接入游戏需要分别提�
 
 <Background>
 
-<Figure isRecommended={true} quote="正确的背景图配置方式" content={<>*不干扰内容信息和操作区域的显示<br/>- 色彩相对单一、简洁<br/>- 图形元素与背景的对比较弱</>} imgSrc={useBaseUrl('/img/design-moment/2.3.1.1.png')} imgAlt="" />
+<Figure isRecommended={true} quote="正确的背景图配置方式" content={<>不干扰内容信息和操作区域的显示<br/>- 色彩相对单一、简洁<br/>- 图形元素与背景的对比较弱</>} imgSrc={useBaseUrl('/img/design-moment/2.3.1.1.png')} imgAlt="" />
 
-<Figure isRecommended={false} quote="错误的背景图配置方式" content={<>*内容信息和操作区域明显被干扰<br/>- 色彩过于丰富、复杂<br/>- 图形元素与背景的对比很强</>} imgSrc={useBaseUrl('/img/design-moment/2.3.1.2.png')} imgAlt="" />
+<Figure isRecommended={false} quote="错误的背景图配置方式" content={<>内容信息和操作区域明显被干扰<br/>- 色彩过于丰富、复杂<br/>- 图形元素与背景的对比很强</>} imgSrc={useBaseUrl('/img/design-moment/2.3.1.2.png')} imgAlt="" />
 
 </Background>
 
