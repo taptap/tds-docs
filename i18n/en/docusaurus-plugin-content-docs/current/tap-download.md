@@ -1,5 +1,5 @@
 ---
-title: Download
+title: Downloads
 ---
 
 ## TapSDK
@@ -14,7 +14,7 @@ title: Download
 - [Android](https://github.com/taptap/TapSDKSuite-Android)
 - [iOS](https://github.com/taptap/TapSDKSuite-iOS)
 
-## Demo
+## Demos
 
 - [Unity](https://github.com/taptap/TapSDK-Unity-Demo)
 - [Android](https://github.com/taptap/TapSDK-Android)
@@ -22,4 +22,4 @@ title: Download
 
 ## Login Button
 
-Click [icon.zip](https://capacity-files.lcfile.com/z7xSKYDvAc1ff19cDfq3Vx01v50KNR6j/TapTapLoginButton.zip) to download TapTap Login Button.
+Click [icon.zip](https://capacity-files.lcfile.com/z7xSKYDvAc1ff19cDfq3Vx01v50KNR6j/TapTapLoginButton.zip) to download the TapTap Login Button.
