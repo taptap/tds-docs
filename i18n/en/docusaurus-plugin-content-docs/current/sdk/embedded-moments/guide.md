@@ -8,7 +8,7 @@ import MultiLang from '/src/docComponents/MultiLang';
 import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';
 
-In this article, we will explain how you can add [TapTap Embedded Moments](/sdk/embedded-moments/features/) to your game. Embedded Moments depends on TapTap Login, which requires the `TapMoment` module.
+In this article, we will introduce how you can add [TapTap Embedded Moments](/sdk/embedded-moments/features/) to your game. Embedded Moments depends on TapTap Login, which requires the `TapMoment` module.
 
 ## Installing SDK
 

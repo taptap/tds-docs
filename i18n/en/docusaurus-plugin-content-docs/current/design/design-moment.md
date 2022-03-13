@@ -69,7 +69,7 @@ Embedded Moments can be displayed in both landscape and portrait modes. This mea
 
 ### Cropping Backgrounds
 
-When Embedded Moments is opened on a device with a short screen, the background image will be cropped to fit the size of the screen.
+When Embedded Moments is opened on a device with a short screen, the background image will be cropped to fit the screen.
 
 <Background>
 

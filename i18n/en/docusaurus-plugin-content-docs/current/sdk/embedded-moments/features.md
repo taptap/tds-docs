@@ -59,7 +59,9 @@ The following functions are also available to you:
 
 ### Walkthroughs
 
-- **Walkthrough Labels**: The player can look for “labels” in the quick navigation bar on the right with each containing three pieces of walkthroughs:
+#### Walkthrough Labels
+
+The player can look for “labels” in the quick navigation bar on the right with each containing three pieces of walkthroughs:
 
 ![](/img/io/embedded-moments/tips.png)
 
@@ -67,21 +69,23 @@ The player can click on the “View all” button on the top to view all the wal
 
 ![](/img/io/embedded-moments/all-tips.png)
 
-- **Walkthrough indexes**: You can set up indexes that are displayed under “All walkthroughs” according to the number and types of walkthroughs.
+#### Walkthrough Indexes
+
+You can set up indexes that are displayed under “All walkthroughs” according to the number and types of walkthroughs.
 
 ![](/img/io/embedded-moments/all.png)
 
-- **Notes on walkthroughs**
+#### Notes on Walkthroughs
 
-#### Why can’t I see the “Walkthroughs” module in my game’s Embedded Moments? How do I enable it?
+##### Why can’t I see the “Walkthroughs” module in my game’s Embedded Moments? How do I enable it?
 
 If you want to add a “Walkthroughs” module, please reach out to us by submitting a **ticket** in the TapTap Developer Center.
 
-#### Can I set up walkthroughs in the TapTap Developer Center? How should I do it?
+##### Can I set up walkthroughs in the TapTap Developer Center? How should I do it?
 
 Unfortunately, you can’t set up walkthroughs yourself at this time. Please submit a **ticket** to us and we will have our professional editor team help you figure things out.
 
-#### Submitting Tickets
+##### Submitting Tickets
 
 To submit a ticket, go to the TapTap Developer Center and click on “Tickets” at the top-right corner.
 
@@ -124,9 +128,9 @@ You can place buttons that can display badges in your game so that the players c
 
 :::tip
 
-1. Using badges can help you increase the rate for players to open the Embedded Moments. We encourage you to place buttons with badges on prominent places in your game.
-2. The badges here share the same logic as the badges for the “Follow” module within the Embedded Moments. The new content posted by the users followed by the players will trigger a notification, and the interval of retrieving new notifications is one time per minute (here 1 minute is the minimum interval; you can change it to 3 minutes, 5 minutes, etc.).
-3. After the player opens the Embedded Moments, the game needs to clear the badge and continue inquiring for the next display of the badge.
+1. Using badges can help you increase the chance for players to open the Embedded Moments. We encourage you to place buttons with badges on prominent places in your game.
+2. The badges here share the same logic as the badges for the “Follow” module within the Embedded Moments. The new content posted by the users followed by the players will trigger a notification, and the interval of retrieving new notifications is once per minute (here 1 minute is the minimum interval; you can change it to 3 minutes, 5 minutes, etc.).
+3. Once the player opens the Embedded Moments, the game needs to clear the badge and continue inquiring for the next display of the badge.
 
 :::
 
@@ -146,7 +150,7 @@ While the player is browsing Embedded Moments, if there are events that demand t
 
 ### Theme Configuration
 
-To have Embedded Moments better fit in the scenes in the game and not make players feel cut off, TDS allows you to customize the theme of the Embedded Moments. You can upload a background image and specify the colors of texts in “Game Services” > “Embedded Moments” > “Theme”.
+To have Embedded Moments fit better with the game scenes and not make players feel cut off, TDS allows you to customize the theme of the Embedded Moments. You can upload a background image and specify the colors of texts in “Game Services” > “Embedded Moments” > “Theme”.
 
 :::tip
 
@@ -164,8 +168,8 @@ You can set up banners in Embedded Moments to help you broadcast your events to 
 
 :::tip
 
-1. You can set up at most 5 banners that link to any website.
-2. Banners are subject to review, which is usually done within the same day.
+1. You can add up to 5 banners that link to any website.
+2. Banners are subject to review, which usually takes less than one day.
 
 :::
 
