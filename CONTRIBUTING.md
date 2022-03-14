@@ -19,7 +19,7 @@
 
 完整的目录结构见 README 「目录结构」小节的说明。
 
-文档使用 [markdown] 语法（在标准 Markdown 语法之外，还支持[一些扩展][docusaurus-markdown]。
+文档使用 [markdown] 语法（在标准 Markdown 语法之外，还支持[一些扩展][docusaurus-markdown]）。
 文章开头的 front matter 通过 [YAML] 指定一些元数据，包括标题、侧边栏标签、URL 路径等。
 
 [markdown]: https://www.markdown-cheatsheet.com
@@ -30,7 +30,6 @@
 
 ```markdown
 ---
-id: features
 title: TapPlay 功能介绍
 sidebar_label: 功能介绍
 sidebar_position: 10
@@ -97,13 +96,31 @@ TODO: 自己 fork 上的内容可能不是最新的，需要到 GitHub 上去点
 
 还有一种方式是根据 URL 路径来查找文件。
 比如《学习社区模块》的 URL 是 `https://developer.taptap.com/docs/community/features/`.
-去掉网络协议（`https://`）、域名（`developer.taptap.com`）后，URL 路径为 `/docs/community/features/`，那么对应的文件路径即为 `/docs/community/features.md`。
+去掉网络协议（`https://`）、域名（`developer.taptap.com`）后，URL 路径为 `/docs/community/features/`，那么对应的文件路径即为 `/docs/community/features.mdx`。
 
-再比如，《开发者应对 DDoS 攻击问题的指引文档》的 URL 为 `https://developer.taptap.com/docs/ddos/`，所以对应的文件路径为 `/docs/ddos.md`。
+再比如，《开发者应对 DDoS 攻击问题的指引文档》的 URL 为 `https://developer.taptap.com/docs/ddos/`，所以对应的文件路径为 `/docs/ddos.mdx`。
 
 注意，有部分不在侧边栏显示的、隐藏入口的页面的 URL 和文件路径并不对应，这种情况请通过搜索查找。
 还有一些文件的命名没有遵循和 URL 路径保持一致的原则，这些属于历史遗留问题，会逐渐切换到标准的命名方式。
 如果受此问题困扰，可以在文档仓库提个 issue。
+
+### 添加图片
+
+如果需要添加图片，点击 `img` 左侧的箭头，展开文件夹后，直接把图片拖过去即可上传，可一次性拖拽多张图片。
+
+图片的命名请使用小写英文字母、数字、连字符（`-`），**不要包含空格**（URL 中空格需要转义，如果文件名包含空格，后续 markdown 里引用图片的时候还要转义空格，比较麻烦，而且万一忘了转义图片就无法显示。图片文件名不用空格就可以避免这些烦心事）。
+
+图片不要和已有的图片重名，除非你想更新现有的图片。
+
+上传图片后，在 markdown 文件中通过以下 markdown 语法引用图片：
+
+```markdown
+![图片的文字描述](/post-images/image-name.png)
+```
+
+注意，和其他 markdown 标记一样，这里的符号 ![] /  都是英文半角符号。
+
+方括号内「图片的文字描述」，用于盲人、在浏览器中选择不加载图片（网速极慢或流量极贵）等场景，因为这样的场景比较罕见，所以也可以偷懒不填。
 
 ### 预览和提交
 
@@ -113,7 +130,6 @@ TODO: 自己 fork 上的内容可能不是最新的，需要到 GitHub 上去点
 
 预览仅供参考：
 
-- 图片无法在 GitHub 在线编辑界面预览，在预览界面图片都显示为损坏图标。
 - 许多 docusaurus 的 markdown 语法扩展预览 GitHub 在线编辑界面都不支持。
 - 个别 markdown 的渲染实现细节，docusaurus 和 GitHub 在线编辑界面存在差异。
 - docusaurs 定制了 CSS 样式。
@@ -183,6 +199,53 @@ PR 标题 GitHub 会自动填写，如果不满意，可以修改一下。
 如认为所做修改没有问题，或者无法确定问题所在，可以在 PR 的评论中注明情况（比如怀疑可能是哪里有问题）。
 内部贡献者也可以在 slack 上询问。
 
+### 新增文档
+
+新增文档的步骤和编辑现有文档大致相同，只不过新增文档需要先新建相应的 `.mdx` 文件。
+
+点击「文件」图标，在左栏点击 `docs` 旁的箭头可展开文件夹，之后在鼠标悬浮到 EXPLORER 右侧的 `...` 的下方，会出现四个图标，点击最左侧的「New File」文件即可新增文件。
+
+默认配置下，文件名会成为 URL 的一部分，因此请使用小写英文字母、数字、连字符（`-`）。
+例如，在 `/docs/community/` 目录下新建 `features.mdx` 文件，那么发布后的 URL 会是 `https://developer.taptap.com/docs/community/features`。
+
+MDX 文件开头的 [YAML] front matter 指定元信息，注意 YAML 区域上下分别用三个短横 `---` 隔开，其中用到的短横、冒号、引号都是英文半角标点。
+
+例如：
+
+```yaml
+---
+title: TapPlay 功能介绍
+sidebar_label: 功能介绍
+sidebar_position: 10
+---
+```
+
+常用的字段包括：
+
+- `title` 文档标题
+- `sidebar_label` 侧边栏显示的短标题。`title` 一般是语义完整的、较长的标题，而 `sidebar_label` 由于侧边栏显示空间有限，需要尽可能简短。如果不指定此字段，那么侧边栏会直接显示 `title` 的值。
+- `sidebar_position` 一个目录下有多个 MDX 文件时，通过 `sidebar_position` 来指定在侧边栏的顺序，数字越小越靠前。
+
+如果是新模块，那么需要新增文件夹，Docusaurus 称之为 category。
+文件使用 YAML front matter 来指定元信息，文件夹则通过文件夹内的 `_category_.json` 文件来指定元信息。
+
+例如，成就模块对应的文件夹为 `/docs/sdk/achievement`。
+相应地，`/docs/sdk/achievement_category_.json` 的内容为：
+
+```json
+{
+  "label": "成就系统",
+  "collapsed": true,
+  "position": 7
+}
+```
+
+其中，
+
+- `label` 为侧边栏显示的标题。
+- `collapsed` 指定默认情况下是收起还是展开这一文件夹下的文档，一般都指定为 `true`。
+- `position` 指定文件夹在侧边栏的顺序，数字越小越靠前。
+
 ## Tips
 
 Confluence wiki、Notion 等网页上的富文本内容，可以复制到 [Mark Text]（开源，推荐使用）、[Typora]（收费）、[StackEdit] （开源，可以在浏览器中直接使用，但对一些复杂格式的支持不如 Mark Text 和 Typora 全）可以快速转换为 markdown 代码。
@@ -195,45 +258,3 @@ Confluence wiki、Notion 等网页上的富文本内容，可以复制到 [Mark 
 命令行工具 [pandoc] 支持转换多种文件为 markdown，同样，部分格式转换时会丢失或错误，需要手工修正。
 
 [pandoc]: https://pandoc.org/index.html
-
-
-TODO
-
-1. 点击「文件」图标，在左栏点击 `_posts` 旁的箭头可展开文件夹，之后在鼠标悬浮到 EXPLORER 右侧的 `...` 的下方，会出现四个图标，点击最左侧的「New File」文件即可新增文件。
-
-    ![new file](images/new-file.png)
-    
-2. 文件名会成为 URL 的一部分，因此请使用小写英文字母、数字、连字符（`-`），例如 `taptap-design-system.md`，发布后的 URL 是 https://blog.taptap.dev/posts/taptap-design-system
-
-3. markdown 文件开头是 [YAML] front matter，指定博客文章的元信息，注意 YAML 区域上下分别用三个短横 `---` 隔开，其中用到的短横、冒号、引号都是英文半角标点，`YYYY-MM-DD`是文章发布的日期，比如 `1970-01-01`。
-
-    ```markdown
-    ---
-    title: "这里写文章标题"
-    excerpt: "这里写一句话摘要。摘要会显示在首页。"
-    date: "YYYY-MM-DD"
-    author: "作者，可以写你的名字或昵称"
-    ---
-
-    markdown 内容
-    ```
-
-5. 如果需要添加图片，依次点击 public -> post-images 左侧的箭头，展开文件夹后，直接把图片拖过去即可上传。
-
-    - 图片的命名也请使用小写英文字母、数字、连字符（`-`），**不要包含空格**（URL 中空格需要转义，如果文件名包含空格，后续 markdown 里引用图片的时候还要转义空格，比较麻烦，而且万一忘了转义图片就无法显示。图片文件名不用空格就可以避免这些烦心事）。
-    - 图片不要和已有的图片重名，除非你想更新现有的图片。
-
-    
-    ![images](images/images.png)
-
-6. 上传图片后，在 markdown 文件中通过以下 markdown 语法引用图片：
-
-        ![图片的文字描述](/post-images/image-name.png)
-
-    注意，和其他 markdown 标记一样，这里的符号 ![] /  都是英文半角符号。
-    方框号内是「图片的文字描述」，用于盲人、在浏览器中选择不加载图片（网速极慢或流量极贵）等场景，因为这样的场景比较罕见，所以也可以偷懒不填。
-
-    **GitHub 在线编辑器的 markdown 预览不支持显示图片。**
-
-
-
