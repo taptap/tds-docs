@@ -17,10 +17,10 @@ yarn start -- --locale en
 ```
 .
 ├── docs                                     中文文档
-│   ├── ddos.md                              隐藏文档
+│   ├── ddos.mdx                             隐藏文档
 │   └── sdk                                  顶栏菜单项
 │       └── start                            侧栏菜单项
-│           └── overview.md                  文档内容
+│           └── overview.mdx                 文档内容
 ├── i18n
 │   └── en                                   英文文档
 │       ├── code.json                        UI 翻译（用于文档内容以外的地方，如文档搜索）
@@ -51,7 +51,7 @@ yarn start -- --locale en
 
 ### 名称风格
 
-文件路径和文件名请注意和 URL 路径保持一致，比如 URL 路径为 `/docs/community/features/` 的页面，文件路径请使用 `/docs/community/features.md`。
+文件路径和文件名请注意和 URL 路径保持一致，比如 URL 路径为 `/docs/community/features/` 的页面，文件路径请使用 `/docs/community/features.mdx`。
 
 ### 文档前言（元信息 metadata）
 
@@ -279,9 +279,9 @@ import CodeBlock from "@theme/CodeBlock";
 
 链接时使用基于对应语言文档根目录的绝对路径，**不要使用相对路径**。
 
-- `docs/sdk/taptap-login/features.md` 在其他 md 文件中跳转需写作 `[跳转标题](/sdk/taptap-login/features/)`
-- `docs/design/design-moment.md` 在其他 md 文件中跳转需写作 `[跳转标题](/design/design-moment/)`
-- `i18n/en/docusaurus-plugin-content-docs/current/sdk/taptap-login/features.md` 在其他 md 文件中跳转需写作 `[跳转标题](/sdk/taptap-login/features/)`
+- `docs/sdk/taptap-login/features.mdx` 在其他 md 文件中跳转需写作 `[跳转标题](/sdk/taptap-login/features/)`
+- `docs/design/design-moment.mdx` 在其他 md 文件中跳转需写作 `[跳转标题](/design/design-moment/)`
+- `i18n/en/docusaurus-plugin-content-docs/current/sdk/taptap-login/features.mdx` 在其他 md 文件中跳转需写作 `[跳转标题](/sdk/taptap-login/features/)`
 - 标题跳转需要去除标点、将空格换成 `-` 并将大写字母改为小写，比如 `[<FaqLink>1. 如何进行游戏认领？</FaqLink>](/store/store-creategame#我的游戏已经被 TapTap 收录，可以进行游戏认领吗？)` 应写作 `[<FaqLink>1. 如何进行游戏认领？</FaqLink>](/store/store-creategame#我的游戏已经被-taptap-收录可以进行游戏认领吗)`
 
 ##### 链接到外部网站
@@ -328,7 +328,7 @@ import CodeBlock from "@theme/CodeBlock";
 
 ### md 文档文件翻译
 
-请放在其他语言（如 `en`）文件夹「相同路径」下。如想翻译 `docs/tap-download.md` 文件，则需要把翻译文件放在 `i18n/en/docusaurus-plugin-content-docs/current/tap-download.md`。
+请放在其他语言（如 `en`）文件夹「相同路径」下。如想翻译 `docs/tap-download.mdx` 文件，则需要把翻译文件放在 `i18n/en/docusaurus-plugin-content-docs/current/tap-download.mdx`。
 
 ### 文件夹翻译（如有困难可直接联系技术支持）
 
