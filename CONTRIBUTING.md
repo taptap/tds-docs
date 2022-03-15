@@ -70,6 +70,8 @@ sidebar_position: 10
 
 意味着 fork 比主干落后 3 个提交。
 
+![fetch upstream](fetch-and-merge.png)
+
 点击 `Fetch upstream` 再点击 `Fetch and merge` 可同步主干上的内容。
 同步后，GitHub 会显示：
 
