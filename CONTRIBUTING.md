@@ -58,11 +58,11 @@ sidebar_position: 10
 
 在[TDS 文档的 GitHub 仓库页面][repo]点击右上角的「Fork」图标，fork 本仓库。
 
-![fork](github-fork.png)
+![fork](.contributing/img/github-fork.png)
 
 如果之前没有 fork 过，会 fork 一个新仓库；如果之前已经 fork 过，会提示你的 fork 的地址：
 
-![already forked](forked.png)
+![already forked](.contributing/img/forked.png)
 
 自己 fork 上的内容可能不是最新的，比如下面的截图中 GitHub 显示：
 
@@ -70,7 +70,7 @@ sidebar_position: 10
 
 意味着 fork 比主干落后 3 个提交。
 
-![fetch upstream](fetch-and-merge.png)
+![fetch upstream](.contributing/img/fetch-and-merge.png)
 
 点击 `Fetch upstream` 再点击 `Fetch and merge` 可同步主干上的内容。
 同步后，GitHub 会显示：
@@ -88,11 +88,11 @@ sidebar_position: 10
 
 初次使用时会提示授权 vscode 访问 GitHub，点击 `Continue` 进入授权页面：
 
-![vscode auth github](vscode-auth-github.png)
+![vscode auth github](.contributing/img/vscode-auth-github.png)
 
 授权页面会列出 GitHub for VSCode 需要的权限，点击 `Authorize github` 可以同意授权。
 
-![authorize github](authorize-github.png)
+![authorize github](.contributing/img/authorize-github.png)
 
 最左侧由上往下的图标依次是菜单、文件、查找、源码控制等功能。
 
@@ -101,14 +101,14 @@ sidebar_position: 10
 比如，《学习社区模块》中的「只有论坛主管理员可添加/删除版主权限」，我们想要把 `/` 改成顿号（`、`），这样更符合中文的行文习惯。
 那我们就可以直接点击最左侧的「查找」（放大镜图标），搜索这句话：
 
-![search text](github-dev-search.png)
+![search text](.contributing/img/github-dev-search.png)
 
 点击即可跳转到相应文件的相应位置。
 
 注意，初次搜索会自动启用索引，会把整个仓库的索引保存在本地浏览器中。
 由于 tds-docs 仓库较大，索引大小会超过默认的限制，需要点击 `Download Full Contents` 才能建立完整的索引，这样搜索时才能显示全部结果。
 
-![download full content](download-full-content.png)
+![download full content](.contributing/img/download-full-content.png)
 
 启用索引所以需要一些时间，请耐心等待。
 索引完成后即可搜索整个仓库。
@@ -137,7 +137,7 @@ sidebar_position: 10
 ![图片的文字描述](/post-images/image-name.png)
 ```
 
-注意，和其他 markdown 标记一样，这里的符号 ![] /  都是英文半角符号。
+注意，和其他 markdown 标记一样，这里的符号 ![] / 都是英文半角符号。
 
 方括号内「图片的文字描述」，用于盲人、在浏览器中选择不加载图片（网速极慢或流量极贵）等场景，因为这样的场景比较罕见，所以也可以偷懒不填。
 
@@ -145,7 +145,7 @@ sidebar_position: 10
 
 右上角有三个图标，最左侧的图标可以分栏显示预览，可以实时预览 markdown 的渲染效果。
 
-![preview icon](github-preview.png)
+![preview icon](.contributing/img/github-preview.png)
 
 预览仅供参考：
 
@@ -153,11 +153,11 @@ sidebar_position: 10
 - 个别 markdown 的渲染实现细节，docusaurus 和 GitHub 在线编辑界面存在差异。
 - docusaurs 定制了 CSS 样式。
 
-![preview UI](split-preview.png)
+![preview UI](.contributing/img/split-preview.png)
 
 最后在 Source Control 面板看一下变动情况，没问题的话就**点击 Changes 右侧的加号，让改动进入 Staged Changes**.
 
-![stage](git-stage.png)
+![stage](.contributing/img/git-stage.png)
 
 最后在上面的 Message 文本框写一下 Commit Message，简单说明下做了什么改动。
 大多数情况下，用一句话简短描述改动内容即可。
@@ -171,15 +171,15 @@ sidebar_position: 10
 
 按 Ctrl/Command + Enter 即可提交。
 
-![commit](git-commit.png)
+![commit](.contributing/img/git-commit.png)
 
 提交后访问 https://github.com/YOUR-GITHUB-USERNAME/tds-docs/pulls （请替换 URL 中的用户名）
 
-![new pull request](new-pull-request.png)
+![new pull request](.contributing/img/new-pull-request.png)
 
 在 Pull Requests 页面点击右上方绿色的 New pull request 按钮，会显示你所做的改动。
 
-![compare changes](compare-changes.png)
+![compare changes](.contributing/img/compare-changes.png)
 
 大致看一下有没有问题，如果有问题的话，就关闭页面，重新回到 https://github.com/YOUR-GITHUB-USERNAME/tds-docs/ 按 `.` 进入编辑模式再修改。
 
@@ -187,7 +187,7 @@ sidebar_position: 10
 PR 标题 GitHub 会自动填写，如果不满意，可以修改一下。
 右方 Reviewer 选择 weakish 或 fuchenshi 或 kylinbin 或其他相关的同事，然后再点绿色的 Create pull request 按钮提交。
 
-![open a pull request](open-a-pr.png)
+![open a pull request](.contributing/img/open-a-pr.png)
 
 如果你还不是文档仓库的协作者，那么右方 Reviewer 处有可能无法选择 reviewer。
 如果你是内部贡献者，可以在 slack 上找 fuchenshi 添加为协作者；
@@ -198,7 +198,7 @@ PR 标题 GitHub 会自动填写，如果不满意，可以修改一下。
 不同于 GitHub 编辑模式自动的预览，这个是真正的预览，未来发布后，线上显示的效果和预览一模一样，包括各种格式和图片。
 有两条机器人回复，第一个回复（URL 中的路径为 `tds-docs`）的是 TDS 文档国内版的预览，第二个回复（URL 中的路径为 `tds-docs-intl`）的是 TDS 文档国际版的预览。
 
-![ci preview](ci-preview.png)
+![ci preview](.contributing/img/ci-preview.png)
 
 上图中，「All checks have passed」标明预览构建成功。
 
@@ -210,7 +210,7 @@ PR 标题 GitHub 会自动填写，如果不满意，可以修改一下。
 
 如果预览构建失败，netlify 机器人的回复中会显示「❌ Deploy Preview for tds-docs-intl failed.」。
 
-![ci failed](ci-failed.png)
+![ci failed](.contributing/img/ci-failed.png)
 
 请点击 Netlify 机器人回复的「🔍 Inspect the deploy log」后的链接查看构建日志。
 结合构建日志检查构建失败的原因。
