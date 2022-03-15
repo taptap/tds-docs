@@ -230,7 +230,7 @@ sidebar_position: 10
 文件使用 YAML front matter 来指定元信息，文件夹则通过文件夹内的 `_category_.json` 文件来指定元信息。
 
 例如，成就模块对应的文件夹为 `/docs/sdk/achievement`。
-相应地，`/docs/sdk/achievement_category_.json` 的内容为：
+相应地，`/docs/sdk/achievement/_category_.json` 的内容为：
 
 ```json
 {
