@@ -75,6 +75,14 @@ TODO: 自己 fork 上的内容可能不是最新的，需要到 GitHub 上去点
 
 这个 GitHub 编辑模式其实是一个功能精（shòu）简（xiàn）的 vscode 编辑器，所以它的用法可以参考 [vscode 的官方文档](https://code.visualstudio.com/docs)。
 
+初次使用时会提示授权 vscode 访问 GitHub，点击 `Continue` 进入授权页面：
+
+![vscode auth github](vscode-auth-github.png)
+
+授权页面会列出 GitHub for VSCode 需要的权限，点击 `Authorize github` 可以同意授权。
+
+![authorize github](authorize-github.png)
+
 最左侧由上往下的图标依次是菜单、文件、查找、源码控制等功能。
 
 要编辑现有文档，首先需要找到对应的文件。
@@ -86,12 +94,12 @@ TODO: 自己 fork 上的内容可能不是最新的，需要到 GitHub 上去点
 
 点击即可跳转到相应文件的相应位置。
 
-注意，默认情况下搜索只会显示部分结果。
-如果找不到相应文件，**需要点击 `Enable indexing` 启用索引。**
+注意，初次搜索会自动启用索引，会把整个仓库的索引保存在本地浏览器中。
+由于 tds-docs 仓库较大，索引大小会超过默认的限制，需要点击 `Download Full Contents` 才能建立完整的索引，这样搜索时才能显示全部结果。
 
-![search index](enable-index.png)
+![download full content](download-full-content.png)
 
-启用索引会把整个仓库的索引保存在本地浏览器中，所以需要一些时间，请耐心等待。
+启用索引所以需要一些时间，请耐心等待。
 索引完成后即可搜索整个仓库。
 
 还有一种方式是根据 URL 路径来查找文件。
