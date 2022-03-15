@@ -64,7 +64,16 @@ sidebar_position: 10
 
 ![already forked](forked.png)
 
-TODO: 自己 fork 上的内容可能不是最新的，需要到 GitHub 上去点 Fetch upstream
+自己 fork 上的内容可能不是最新的，比如下面的截图中 GitHub 显示：
+
+> This branch is 3 commits behind taptap:master.
+
+意味着 fork 比主干落后 3 个提交。
+
+点击 `Fetch upstream` 再点击 `Fetch and merge` 可同步主干上的内容。
+同步后，GitHub 会显示：
+
+> This branch is up to date with taptap:master.
 
 **在你 fork 的仓库页面**， 按下 `.` （英文句号），即可进入 GitHub 的编辑模式。
 
@@ -191,10 +200,10 @@ PR 标题 GitHub 会自动填写，如果不满意，可以修改一下。
 
 上图中，「All checks have passed」标明预览构建成功。
 
-如果查看预览的过程中发现了问题，请重新回到 https://github.com/YOUR-GITHUB-USERNAME/tds-blog/ 按 `.` 进入编辑模式再修改。
+如果查看预览的过程中发现了问题，请重新回到 https://github.com/YOUR-GITHUB-USERNAME/tds-docs/ 按 `.` 进入编辑模式再修改。
 提交修改（Source Control 面板按 Ctrl/Command + Enter）后，PR 会自动更新，也会自动再次触发预览构建，请再次等待机器人 netlify bot 的回复中出现「😎 Browse the preview: 」,再次查看预览效果。
 
-一切就绪后，等 reviewer 通过 PR 并合并，文章就正式发布到线上了。
+一切就绪后，等 reviewer 通过 PR 并合并，文档就正式发布到线上了。
 正式发布之后，再进入编辑模式修改就不会自动更新 PR 了（因为相关 PR 已经合并了），需要开新的 PR.
 
 如果预览构建失败，netlify 机器人的回复中会显示「❌ Deploy Preview for tds-docs-intl failed.」。
