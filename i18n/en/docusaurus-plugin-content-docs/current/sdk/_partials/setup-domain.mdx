@@ -1,0 +1,52 @@
+import { Conditional } from "/src/docComponents/conditional";
+
+<Conditional region="global">
+
+To use TDS cloud services, you must set `server_url` with the API domain when initializing the SDK. You can obtain a **shared domain** provided by TDS by going to **Developer Center > Your Game > Game Services > Configuration > Domain**.
+
+</Conditional>
+
+<Conditional region="cn">
+
+To use TDS cloud services, you must bind a custom API domain to isolate your game’s gateway from other developers’. This will help your app avoid being affected by other apps in case of a DDoS attack.
+
+If you plan to use the file service provided by the Data Storage service, which includes the storage of the files carried by multimedia messages sent through the Instant Messaging service (such as images, audios, and videos), you must bind a **file access domain**.
+
+### Binding an API Domain
+
+To bind an API domain, you must first have **a domain that already got an ICP license**.
+
+<details>
+<summary>See how to bind an API domain</summary>
+
+Assuming your domain is `example.com`, the following steps show how you can bind it to your app as an API domain:
+
+![domain guide](/img/domain-guide.png)
+
+- Go to **Developer Center > Your Game > Game Services > Configuration > Domain**, then tap **Add domain**. API domains do not support the direct binding of bare domains. You must add a custom name before the primary domain. In other words, you must create a subdomain, such as `api.example.com`.
+- When the console displays **Verifying ICP**, please wait patiently.
+- If the domain does not have an ICP license, you will see **Failed**.
+- If the domain passes the verification, you will see **Configure DNS** below the domain.
+- Now proceed to the domain service provider’s console, open the domain’s DNS settings, and add an A record (this can direct the domain to an IP address). Copy the custom domain you entered in the Developer Center and the A record displayed under **Recommended DNS Configuration** into the corresponding fields.
+- It will take some time for your DNS records to take effect and for our server to apply for certificates for your domain (if you enabled automatic certificate management), so please wait patiently. Once the record is in effect, the console will display **Bound**.
+
+</details>
+
+When initializing the SDK, please set `server_url` to the custom domain (e.g. `https://api.example.com`). The domain shown here is just an example and you should replace `api.example.com` with your own domain. Please make sure to include `https://` in the value of `server_url`.
+
+It will take some time for you to finish setting up a custom domain. Therefore, TDS provides you with **shared domains** for testing. However, the viability of these domains cannot be guaranteed and the domains may be susceptible to DDoS attacks. Before a game goes online, be sure to confirm that the API access domain used for the game is your own domain. Do not use shared domains in a production environment.
+
+### Binding File Access URL
+
+Go to **Developer Center > Your Game > Game Services > Cloud Services > Data Storage > Files > Settings > File access domain** to bind file domains. The process is the same as that for binding custom API domains, except that:
+
+1. API domains use A records while file domains use CNAME records. File domains also do not support the binding of bare domains. For example, if your primary domain is `example.com`, you can bind `files.example.com` as a file domain.
+2. Once the binding is complete, you must go to **Files > Settings > File access URL** and click “Edit” to switch to your custom domain.
+
+:::info
+
+Each subdomain may only be bound to one game. Additionally, custom API domains and file domains cannot share the same subdomain. If you have already bound a subdomain with a game, you will see “This domain is already bound to an application in the console” when you try to bind it with another game. When this occurs, you may try a different subdomain under the same primary domain to proceed with the binding.
+
+:::
+
+</Conditional>
