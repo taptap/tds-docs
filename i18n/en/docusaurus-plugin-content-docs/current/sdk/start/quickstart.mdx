@@ -9,7 +9,7 @@ import CodeBlock from "@theme/CodeBlock";
 import sdkVersions from "/src/docComponents/sdkVersions";
 import { Conditional } from "/src/docComponents/conditional";
 
-This article will introduce how to quickly integrate TapSDK and use the **[TapTap Login](/sdk/taptap-login/guide/start/)** function.
+This article will introduce how to quickly integrate TapSDK into your app and use the **[TapTap Login](/sdk/taptap-login/guide/start/)** function.
 
 :::note
 
@@ -17,9 +17,9 @@ The [Downloads](/tap-download) page provides Unity, Android, and iOS demos for y
 
 :::
 
-## Creating Applications
+## Creating a Game
 
-Log into the <Conditional region="cn">[TapTap Developer Center](https://developer.taptap.com/)</Conditional><Conditional region="global">[TapTap Developer Center](https://developer.taptap.io/)</Conditional> to register as a developer and create an application.
+Log into the <Conditional region="cn">[TapTap Developer Center](https://developer.taptap.com/)</Conditional><Conditional region="global">[TapTap Developer Center](https://developer.taptap.io/)</Conditional> to register as a developer and create a game.
 
 ## Downloading the TapTap App
 
@@ -49,9 +49,9 @@ Download the <Conditional region="cn">[TapTap app](https://www.taptap.com/mobile
 
 :::caution
 
-- In the **Project Configurations** and **Initialization** sections below, it is assumed that you are using [TDS Authentication](/sdk/authentication/features/).
-- If the game already has a complete account system and only requires TapTap Login and Moments without needing additional TDS cloud services, there is no need to reference configurations and initializations below. You can jump to the [Basic TapTap Login Developer Guide](/sdk/taptap-login/guide/tap-login/) and/or the [Moments Developer Guide](/sdk/embedded-moments/guide/).
-- Please choose carefully. If other TDS services are needed later, it could be hard for you to make a switch.
+- In the **Project Configurations** and **Initialization** sections below, we assume that you will use [TDS Authentication](/sdk/authentication/features/).
+- If the game already has a complete account system and only needs TapTap Login and Moments without additional TDS cloud services, there is no need for you to complete the configurations and initializations below. You can jump to [Basic TapTap Login Developer Guide](/sdk/taptap-login/guide/tap-login/) and [Moments Developer Guide](/sdk/embedded-moments/guide/).
+- Please make your decision carefully. If you need other TDS services at a later time, it could be hard for you to make a switch.
 
 :::
 
@@ -60,11 +60,11 @@ Download the <Conditional region="cn">[TapTap app](https://www.taptap.com/mobile
 <MultiLang>
 <>
 
-The SDK can be imported **either through the Unity Package Manager or manually**.
+The SDK can be imported **either using the Unity Package Manager or manually**.
 
 ### Method 1: Use Unity Package Manager
 
-Add the following dependencies in the `Packages/manifest.json` file:
+Add the following dependencies into `Packages/manifest.json`:
 
 <CodeBlock className="json">
   {`"dependencies":{
@@ -76,13 +76,13 @@ Add the following dependencies in the `Packages/manifest.json` file:
 }`}
 </CodeBlock>
 
-In Unity’s top menu, select **Window > Package Manager** to view the packages already installed in the project.
+In Unity’s menu bar, select **Window > Package Manager** to view the packages already installed in the project.
 
 ### Method 2: Import Manually
 
 1. [Click here to download](/tap-download) `TapSDK-UnityPackage.zip` and `LeanCloud-SDK-Realtime-Unity.zip`.
 
-2. In the Unity project, navigate to **Assets > Import Packages > Custom Packages** and select the TapSDK packages you want to use from the unzipped `TapSDK-UnityPackage.zip` file. Of which:
+2. Go to your Unity project, navigate to **Assets > Import Packages > Custom Packages**, and select the TapSDK packages you want to use from the unzipped `TapSDK-UnityPackage.zip` file.
 
    - `TapTap_Bootstrap.unitypackage` is the TapSDK Launcher (required).
    - `TapTap_Common.unitypackage` is the TapSDK Basic Library (required).
@@ -92,11 +92,11 @@ In Unity’s top menu, select **Window > Package Manager** to view the packages 
 
 :::tip
 
-If you have manually downloaded the unitypackage to import the SDK, please configure `Assets/TapTap/Common/Plugins/iOS/TapTap.Common.dll` to support iOS only.
+If you have manually downloaded the `unitypackage` to import the SDK, please edit the configuration file `Assets/TapTap/Common/Plugins/iOS/TapTap.Common.dll` to support iOS only.
 
 :::
 
-After importing the SDK, please complete the following configurations for Android and iOS.
+After importing the SDK, please continue with the following instructions to get your project ready for Android and iOS.
 
 ### Android Configuration
 
@@ -104,7 +104,7 @@ After importing the SDK, please complete the following configurations for Androi
 
    ![](/img/tap_unity_amanifest.png)
 
-2. Edit the `Assets/Plugins/Android/AndroidManifest.xml` file to add the following lines into the Application Tag:
+2. Add the following lines into the Application Tag in `Assets/Plugins/Android/AndroidManifest.xml`:
 
    ```xml
    <activity
@@ -116,7 +116,7 @@ After importing the SDK, please complete the following configurations for Androi
 
 ### iOS Configuration
 
-Create a file named `TDS-Info.plist` under the `Assets/Plugins/iOS/Resource` directory and paste the following code into the file with `ClientId` replaced with your game’s Client ID. If you are using [Embedded Moments](/sdk/embedded-moments/features/) or [Data Analysis](/sdk/tapdb/features/), make sure to update permission configurations accordingly as well as the **text for the permission dialogue**:
+Create a file named `TDS-Info.plist` under the `Assets/Plugins/iOS/Resource` directory and paste the following code into the file with `ClientId` replaced with your game’s Client ID. If you plan to use [Embedded Moments](/sdk/embedded-moments/features/) or [Data Analysis](/sdk/tapdb/features/), make sure to update the permission configurations accordingly, as well as the **text for the permission dialogue**:
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -129,14 +129,14 @@ Create a file named `TDS-Info.plist` under the `Assets/Plugins/iOS/Resource` dir
         <string>ClientId</string>
     </dict>
 
-    <!--Embedded Moments requires the permissions of photo library, camera, and microphone-->
+    <!--Embedded Moments requires the access of photo library, camera, and microphone-->
     <key>NSPhotoLibraryUsageDescription</key>
     <string>Explain why your app requires this permission.</string>
     <key>NSCameraUsageDescription</key>
     <string>Explain why your app requires this permission.</string>
     <key>NSMicrophoneUsageDescription</key>
     <string>Explain why your app requires this permission.</string>
-    <!--TapDB requires the permission of IDFA. If you prefer not to show a pop-up, you can do: TapDB.AdvertiserIDCollectionEnabled(false)-->
+    <!--TapDB requires the access of IDFA. If you prefer not to show a pop-up, you can do: TapDB.AdvertiserIDCollectionEnabled(false)-->
     <key>NSUserTrackingUsageDescription</key>
     <string>Explain why your app requires this permission.</string>
 </dict>
@@ -146,9 +146,9 @@ Create a file named `TDS-Info.plist` under the `Assets/Plugins/iOS/Resource` dir
 </>
 <>
 
-1. [Download TapSDK_Android](/tap-download) and import it into the `project/app/libs` directory.
+1. [Download TapSDK_Android](/tap-download) and import it to `project/app/libs`.
 
-2. Open the project’s `project/app/build.gradle` file and add the following gradle configurations:
+2. Open the `project/app/build.gradle` file under your project and add the following gradle configurations:
 
 <CodeBlock className="java">
   {`repositories{
@@ -167,7 +167,7 @@ dependencies {
 }`}
 </CodeBlock>
 
-3. Add network permission to `AndroidManifest.xml`:
+3. Add the network permission to `AndroidManifest.xml`:
 
    ```java
    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
@@ -175,7 +175,7 @@ dependencies {
 
 4. Add additional configurations for older Android versions.
 
-   If `targetSdkVersion < 29`, please add the following configurations:
+   If `targetSdkVersion < 29`, make sure to:
 
    - Add `xmlns:tools="http://schemas.android.com/tools"` into `manifest`
    - Add `tools:remove="android:requestLegacyExternalStorage"` into `application`
@@ -185,7 +185,7 @@ dependencies {
 
 ### Import the SDK
 
-1. In Xcode, select the project and add `-ObjC` into **Build Setting > Other Linker Flags**.
+1. Select the project in Xcode and add `-ObjC` into **Build Setting > Other Linker Flags**.
 
 2. Drag the [downloaded TapSDK_iOS.zip](/tap-download) into the project directory.
 
@@ -220,7 +220,7 @@ dependencies {
    WebKit.framework
 
    // Data Analysis
-   // If you do not need to fetch IDFA, then don’t add the system libraries `AppTrackingTransparency` and `AdSupport`.
+   // If you do not need access to the IDFA, please don’t add the system libraries `AppTrackingTransparency` and `AdSupport`.
    AppTrackingTransparency.framework
    AdSupport.framework
    CoreMotion.framework
@@ -236,14 +236,14 @@ dependencies {
 If you plan to use TapTap Moments or Data Analysis in your game, please add the following configurations to `info.plist` and **update the text for the permission dialogue**:
 
 ```xml
- <!--Embedded Moments requires the permissions of photo library, camera, and microphone-->
+<!--Embedded Moments requires the access of photo library, camera, and microphone-->
 <key>NSPhotoLibraryUsageDescription</key>
 <string>Explain why your app requires this permission.</string>
 <key>NSCameraUsageDescription</key>
 <string>Explain why your app requires this permission.</string>
 <key>NSMicrophoneUsageDescription</key>
 <string>Explain why your app requires this permission.</string>
-<!--TapDB requires the permission of IDFA. If you prefer not to show a pop-up, you can do: TapDB.AdvertiserIDCollectionEnabled(false)-->
+<!--TapDB requires the access of IDFA. If you prefer not to show a pop-up, you can do: TapDB.AdvertiserIDCollectionEnabled(false)-->
 <key>NSUserTrackingUsageDescription</key>
 <string>Explain why your app requires this permission.</string>
 ```
@@ -252,7 +252,7 @@ If you plan to use TapTap Moments or Data Analysis in your game, please add the 
 
 If a user does not have the TapTap app on their device, a WebView will be displayed for them to log in.
 
-1.  Open `info.plist`, then add the following configurations (replace `clientID` with the Client ID you obtained from the Developer Center):
+1.  Open `info.plist` and add the following configurations (replace `clientID` with the Client ID you obtained from the Developer Center):
 
     ![](/img/tap_ios_info.png)
 
@@ -293,11 +293,11 @@ If a user does not have the TapTap app on their device, a WebView will be displa
         }
         ```
 
-    b) Delete the Application Scene Manifest in `info.plist`.
+    b) Delete the Application Scene Manifest from `info.plist`.
 
     ![](/img/tap_ios_appmanifest.png)
 
-    c) Delete the two lifecycle delegate methods for managing Scenedelegate in AppDelegate.m.
+    c) Delete the two lifecycle delegate methods for managing `Scenedelegate` from `AppDelegate.m`.
 
         ```objectivec
         #pragma mark - UISceneSession lifecycle
