@@ -196,7 +196,7 @@ PR 标题 GitHub 会自动填写，如果不满意，可以修改一下。
 提交后 CI 会自动构建博客预览，请稍候。
 预览构建完成后，机器人 netlify bot 的回复中会出现「😎 Browse the preview: 」，点击后面的 URL 即可查看效果。
 不同于 GitHub 编辑模式自动的预览，这个是真正的预览，未来发布后，线上显示的效果和预览一模一样，包括各种格式和图片。
-有两条机器人回复，第一个回复（URL 中的路径为 `tds-docs`）的是 TDS 文档国内版的预览，第二个回复（URL 中的路径为 `tds-docs-intl`）的是 TDS 文档国际版的预览。
+有两条机器人回复，其中一个回复（URL 中的路径为 `tds-docs`）是 TDS 文档国内版的预览，另一个回复（URL 中的路径为 `tds-docs-intl`）是 TDS 文档国际版的预览。
 
 ![ci preview](.contributing/img/ci-preview.png)
 
