@@ -723,10 +723,32 @@ option.limit = 100;
 ReadOnlyCollection<TDSFriendshipRequest> requests = await TDSFriends.QueryFriendRequestWithFriendStateList (
     LCFriendshipRequest.STATUS_PENDING, from, limit
 );
+foreach (TDSFriendshipRequest request in requests) {
+    // 好友申请（参见 QueryFriendRequestList）
+    LCFriendshipRequest req = request.FriendshipRequest;
+    // 申请发起人的富信息
+    TDSFriendInfo info = request.FriendInfo;
+}
 ```
 
 ```java
+TDSFriends.queryFriendRequestWithFriendStateList(LCFriendshipRequest.STATUS_PENDING,
+  from, limit, new ListCallback<TDSFriendshipRequest>() {
+    @Override
+    public void onSuccess(List<TDSFriendshipRequest> requests) {
+        for (TDSFriendshipRequest request : requests) {
+            // 好友申请（参见 queryFriendRequestList）
+            LCFriendshipRequest req = request.getLcFriendshipRequest();
+            // 申请发起人的富信息
+            TDSFriendInfo info = request.getFriendInfo();
+        }
+    }
 
+    @Override
+    public void onFail(TDSFriendError error) {
+        // 处理错误
+    }
+});
 ```
 
 ```objc
@@ -1065,7 +1087,11 @@ string inviteUrl = await TDSFriends.GenerateFriendInvitationLink("她姥姥", pa
 ```
 
 ```java
-
+Map<String, Object> parameters = new HashMap<String, Object>();
+parameters.put("ref", "taptap");
+TDSFriends.generateFriendInvitationLink("她姥姥", new Callback<String>() {
+    // 略
+});
 ```
 
 ```objc
@@ -1087,8 +1113,6 @@ NSString *inviteUrl = [TDSFriends generateFriendInvitationLinkWithError:option e
 
 <MultiLang>
 
-<>
-
 ```cs
 public class DeepLinkManager : MonoBehaviour
 {
@@ -1099,14 +1123,24 @@ public class DeepLinkManager : MonoBehaviour
 }
 ```
 
-</>
-<>
+```java
+public class FriendsActivity extends AppCompatActivity {
+// 略    
+    public void onHandleLink(View view) {
+        TDSFriends.handFriendInvitationLink(url, new Callback<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                // 略
+            }
 
-如果玩家通过好友邀请链接打开游戏，那么 Android SDK 会自动发送对应的好友申请。
-开发者只需确保玩家登录后调用了 `online()` 方法建立长连接，无需对打开邀请链接进行特别处理。
-
-</>
-<>
+            @Override
+            public void onFail(TDSFriendError error) {
+                // 略     
+            }
+        });
+    }
+}
+```
 
 ```objc
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
@@ -1118,8 +1152,6 @@ public class DeepLinkManager : MonoBehaviour
     }];
 }
 ```
-
-</>
 
 </MultiLang>
 
@@ -1142,7 +1174,10 @@ public class DeepLinkManager : MonoBehaviour
 ```
 
 ```java
-
+TDSFriendLinkInfo linkInfo = TDSFriends.parseFriendInvitationLink("url");
+String userObjectId = linkInfo.getIdentity();
+String name = linkInfo.getRoleName();
+Map<String, String> parameters = linkInfo.getQueries();
 ```
 
 ```objc
