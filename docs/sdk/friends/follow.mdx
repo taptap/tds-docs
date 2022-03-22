@@ -138,6 +138,30 @@ TDSFollows.offline();
 
 </MultiLang>
 
+## 根据 objectId 查询好友
+
+可以通过 objectId、昵称、好友码查找好友。
+
+查询 objectId 为 `5b0b97cf06f4fd0abc0abe35` 的好友：
+
+<MultiLang>
+
+```cs
+TDSFriendInfo friendInfo = await TDSFollows.SearchUserById("5b0b97cf06f4fd0abc0abe35");
+```
+
+```java
+
+```
+
+```objc
+
+```
+
+</MultiLang>
+
+
+
 ## 根据昵称查询好友
 
 在不知道玩家 objectId 的情况下，可以通过玩家昵称查询好友。
@@ -561,6 +585,69 @@ TDSFollows.unfollowByShortCode(shortIdOfTarara, new Callback<Boolean>() {
 
 </MultiLang>
 
+## 拉黑
+
+玩家可以拉黑其他玩家，使其他玩家无法关注自己。
+和关注、取关类似，可以通过 objectId 或好友码来指定想要拉黑的玩家。
+
+<MultiLang>
+
+```cs
+await TDSFollows.Block("5b0b97cf06f4fd0abc0abe35");
+
+await TDSFollows.BlockByShortCode(shortIdOfTarara);
+```
+
+```java
+
+```
+
+```objc
+
+```
+
+</MultiLang>
+
+玩家也可以取消拉黑之前拉黑的玩家：
+
+<MultiLang>
+
+```cs
+await TDSFollows.Unblock("5b0b97cf06f4fd0abc0abe35");
+
+await TDSFollows.UnblockByShortCode(shortIdOfTarara);
+```
+
+```java
+
+```
+
+```objc
+
+```
+
+</MultiLang>
+
+玩家可以查询自己拉黑了哪些人：
+
+<MultiLang>
+
+```cs
+FriendResult result = await TDSFollows.QueryBlockList(cursor, limit, sortCondition);
+```
+
+```java
+
+```
+
+```objc
+
+```
+
+传入的查询参数的含义参见[查询互关列表](#查询互关列表)一节。
+
+</MultiLang>
+
 ## 查询互关列表
 
 玩家可以查询哪些玩家和自己是「互相关注」关系。
@@ -769,19 +856,43 @@ TDSFollows.SetShareLink("https://please-replace-with-your-domain.example.com");
 string inviteUrl = await TDSFollows.GenerateFriendInvitationLink();
 ```
 
+分享链接中传递的用户名称默认为玩家昵称（`nickname`），如果希望使用其他名称，可以在调用上述接口时另行指定。
+另外，还可以传入其他信息，这些信息会作为 URL 查询参数拼接在好友邀请页网址后面。
+例如，昵称为 Tarara 的玩家，邀请好友时希望使用「她姥姥」这个名称，邀请链接希望附加 `ref=taptap` 这个参数，可以这样调用：
+
+```cs
+Dictionary<string, object> parameters = new Dictionary<string, object> {
+    { "ref", "taptap" }
+};
+string inviteUrl = await TDSFollows.GenerateFriendInvitationLink("她姥姥", parameters);
+```
+
 ### 处理链接
 
-玩家通过邀请链接打开游戏后，开发者需要调用 SDK 提供的接口解析链接，获取玩家的 userId，然后通过 userId 关注玩家。
-
+玩家通过邀请链接打开游戏后，需要调用 SDK 提供的接口关注邀请者。
 
 ```cs
 public class DeepLinkManager : MonoBehaviour
 {
     // 略
     private async void onDeepLinkActivated(string url) {
-        Dictionary<string, object> invitation = TDSFollows.ParseFriendInvitationLink(url);
-        string userId = invitation["identity"];
-        await TDSFollows.Follow(userId);
+        await TDSFollows.HandleFriendInvitationLink(url);
+    }
+}
+```
+
+开发者也可以通过 SDK 提供的接口解析链接，获取玩家的 objectId、名称、传入的其他参数，定制相应的逻辑。
+
+```cs
+public class DeepLinkManager : MonoBehaviour
+{
+    // 略
+    private async void onDeepLinkActivated(string url) {
+        TDSFriendLinkInfo invitation = TDSFollows.ParseFriendInvitationLink(url);
+        string userObjectId = invitation.Identity;
+        string name = invitation.RoleName;
+        Dictionary<string, string> parameters = invitation.Queries;
+        await TDSFollows.Follow(userObjectId);
     }
 }
 ```

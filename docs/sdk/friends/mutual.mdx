@@ -47,7 +47,7 @@ TDSFriends.registerFriendStatusChangedListener(new FriendStatusChangedListener()
 
     // 新增好友申请
     @Override
-    public void onNewRequestComing(LCFriendshipRequest request) {}
+    public void onNewRequestComing(TDSFriendshipRequest request) {}
 
     // 通过分享链接进入游戏 SDK 自动发送好友申请时触发
     @Override
@@ -55,11 +55,11 @@ TDSFriends.registerFriendStatusChangedListener(new FriendStatusChangedListener()
 
     // 已发送的好友申请被接受
     @Override
-    public void onRequestAccepted(LCFriendshipRequest request) {}
+    public void onRequestAccepted(TDSFriendshipRequest request) {}
 
     // 已发送的好友申请被拒绝
     @Override
-    public void onRequestDeclined(LCFriendshipRequest request) {}
+    public void onRequestDeclined(TDSFriendshipRequest request) {}
 
     // 好友上线
     @Override
@@ -201,6 +201,29 @@ TDSFriends.offline();
 
 ```objc
 [TDSFriends offline];
+```
+
+</MultiLang>
+
+
+## 根据 objectId 查询好友
+
+可以通过 objectId、昵称、好友码查找好友。
+
+查询 objectId 为 `5b0b97cf06f4fd0abc0abe35` 的好友：
+
+<MultiLang>
+
+```cs
+TDSFriendInfo friendInfo = await TDSFriends.SearchUserById("5b0b97cf06f4fd0abc0abe35");
+```
+
+```java
+
+```
+
+```objc
+
 ```
 
 </MultiLang>
@@ -692,6 +715,26 @@ option.limit = 100;
 
 </MultiLang>
 
+如果希望返回结果中携带好友申请发起人的富信息，那么可以使用以下接口：
+
+<MultiLang>
+
+```cs
+ReadOnlyCollection<TDSFriendshipRequest> requests = await TDSFriends.QueryFriendRequestWithFriendStateList (
+    LCFriendshipRequest.STATUS_PENDING, from, limit
+);
+```
+
+```java
+
+```
+
+```objc
+
+```
+
+</MultiLang>
+
 ## 处理好友申请
 
 对于新的好友请求，玩家可以同意或者拒绝，也可以什么都不做，无视这些请求，甚至直接删除。
@@ -996,6 +1039,29 @@ NSString *inviteUrl = [TDSFriends generateFriendInvitationLinkWithError:&error];
 
 </MultiLang>
 
+分享链接中传递的用户名称默认为玩家昵称（`nickname`），如果希望使用其他名称，可以在调用上述接口时另行指定。
+另外，还可以传入其他信息，这些信息会作为 URL 查询参数拼接在好友邀请页网址后面。
+例如，昵称为 Tarara 的玩家，邀请好友时希望使用「她姥姥」这个名称，邀请链接希望附加 `ref=taptap` 这个参数，可以这样调用：
+
+<MultiLang>
+
+```cs
+Dictionary<string, object> parameters = new Dictionary<string, object> {
+    { "ref", "taptap" }
+};
+string inviteUrl = await TDSFriends.GenerateFriendInvitationLink("她姥姥", parameters);
+```
+
+```java
+
+```
+
+```objc
+
+```
+
+</MultiLang>
+
 ### 处理链接
 
 玩家通过邀请链接打开游戏后，开发者需要调用该接口。
@@ -1010,9 +1076,6 @@ public class DeepLinkManager : MonoBehaviour
 {
     // 略
     private async void onDeepLinkActivated(string url) {
-        Dictionary<string, object> invitation = TDSFriends.ParseFriendInvitationLink(url);
-        string userId = invitation["identity"];
-        string nickname = invitation["role_name"];
         await TDSFriends.HandleFriendInvitationLink(url);
     }
 }
@@ -1041,3 +1104,19 @@ public class DeepLinkManager : MonoBehaviour
 </>
 
 </MultiLang>
+
+开发者也可以通过 SDK 提供的接口解析链接，获取玩家的 objectId、名称、传入的其他参数，定制相应的逻辑。
+
+```cs
+public class DeepLinkManager : MonoBehaviour
+{
+    // 略
+    private async void onDeepLinkActivated(string url) {
+        TDSFriendLinkInfo invitation = TDSFriends.ParseFriendInvitationLink(url);
+        string userObjectId = invitation.Identity;
+        string name = invitation.RoleName;
+        Dictionary<string, string> parameters = invitation.Queries;
+        await TDSFriends.Follow(userObjectId);
+    }
+}
+```
