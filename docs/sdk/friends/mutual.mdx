@@ -94,13 +94,13 @@ TDSFriends.registerFriendStatusChangedListener(new FriendStatusChangedListener()
 - (void)onFriendAdd:(TDSFriendInfo *)info {}
 
 // 新增好友申请
-- (void)onNewRequestComing:(LCFriendshipRequest *)request {}
+- (void)onNewRequestComing:(TDSFriendshipRequest *)request {}
 
 // 已发送的好友申请被接受
-- (void)onRequestAccepted:(LCFriendshipRequest *)request {}
+- (void)onRequestAccepted:(TDSFriendshipRequest *)request {}
 
 // 已发送的好友申请被拒绝
-- (void)onRequestDeclined:(LCFriendshipRequest *)request {}
+- (void)onRequestDeclined:(TDSFriendshipRequest *)request {}
 
 // 好友上线
 - (void)onFriendOnline:(NSString *)userId {}
@@ -201,29 +201,6 @@ TDSFriends.offline();
 
 ```objc
 [TDSFriends offline];
-```
-
-</MultiLang>
-
-
-## 根据 objectId 查询好友
-
-可以通过 objectId、昵称、好友码查找好友。
-
-查询 objectId 为 `5b0b97cf06f4fd0abc0abe35` 的好友：
-
-<MultiLang>
-
-```cs
-TDSFriendInfo friendInfo = await TDSFriends.SearchUserById("5b0b97cf06f4fd0abc0abe35");
-```
-
-```java
-
-```
-
-```objc
-
 ```
 
 </MultiLang>
@@ -344,7 +321,30 @@ callback:^(TDSFriendInfo * _Nullable friendInfo, NSError * _Nullable error) {
 
 </MultiLang>
 
+## 根据 objectId 查询好友
 
+除了昵称、好友码外，还可以根据 objectId 查找好友。
+
+查询 objectId 为 `5b0b97cf06f4fd0abc0abe35` 的好友：
+
+<MultiLang>
+
+```cs
+TDSFriendInfo friendInfo = await TDSFriends.SearchUserById("5b0b97cf06f4fd0abc0abe35");
+```
+
+```java
+
+```
+
+```objc
+[TDSFriends searchUserWithObjectId:@"5b0b97cf06f4fd0abc0abe35"
+callback:^(TDSFriendInfo * _Nullable friendInfo, NSError * _Nullable error) {
+    // 略（参见上节）
+}];
+```
+
+</MultiLang>
 
 ## 富信息
 
@@ -730,7 +730,19 @@ ReadOnlyCollection<TDSFriendshipRequest> requests = await TDSFriends.QueryFriend
 ```
 
 ```objc
-
+TDSFriendQueryOption *option = [TDSFriendQueryOption new];
+option.from = 0;
+option.limit = 100;
+[TDSFriends queryFriendRequestAndStateWithStatus:TDSUserFriendshipRequestStatusPending
+    option:option
+    callback:^(NSArray<TDSFriendQueryOption *> * _Nullable requests, NSError * _Nullable error) {
+    for (TDSFriendshipRequest *request in requests) {
+        // 好友申请（参见 queryFriendRequestWithStatus）
+        LCFriendshipRequest *req = request.lcFriendshipRequest;
+        // 申请发起人的富信息
+        TDSFriendInfo *info = request.friendInfo;
+    }        
+}];
 ```
 
 </MultiLang>
@@ -1057,7 +1069,13 @@ string inviteUrl = await TDSFriends.GenerateFriendInvitationLink("她姥姥", pa
 ```
 
 ```objc
-
+NSError *error;
+TDSFriendLinkOption *option = [TDSFriendLinkOption new];
+option.roleName = @"她姥姥";
+option.queries = @{
+    @"ref" : @"taptap",
+};
+NSString *inviteUrl = [TDSFriends generateFriendInvitationLinkWithError:option error:&error];
 ```
 
 </MultiLang>
@@ -1107,6 +1125,8 @@ public class DeepLinkManager : MonoBehaviour
 
 开发者也可以通过 SDK 提供的接口解析链接，获取玩家的 objectId、名称、传入的其他参数，定制相应的逻辑。
 
+<MultiLang>
+
 ```cs
 public class DeepLinkManager : MonoBehaviour
 {
@@ -1120,3 +1140,16 @@ public class DeepLinkManager : MonoBehaviour
     }
 }
 ```
+
+```java
+
+```
+
+```objc
+TDSFriendLinkInfo *linkInfo = [TDSFriends parseFriendInvitationLink:(NSURL *)url];
+NSString *userObjectId = linkInfo.identity;
+NSString *name = linkInfo.roleName;
+NSDictionary *parameters = linkInfo.queries;
+```
+
+</MultiLang>

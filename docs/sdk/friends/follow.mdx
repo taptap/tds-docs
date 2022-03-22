@@ -138,30 +138,6 @@ TDSFollows.offline();
 
 </MultiLang>
 
-## 根据 objectId 查询好友
-
-可以通过 objectId、昵称、好友码查找好友。
-
-查询 objectId 为 `5b0b97cf06f4fd0abc0abe35` 的好友：
-
-<MultiLang>
-
-```cs
-TDSFriendInfo friendInfo = await TDSFollows.SearchUserById("5b0b97cf06f4fd0abc0abe35");
-```
-
-```java
-
-```
-
-```objc
-
-```
-
-</MultiLang>
-
-
-
 ## 根据昵称查询好友
 
 在不知道玩家 objectId 的情况下，可以通过玩家昵称查询好友。
@@ -278,7 +254,30 @@ callback:^(TDSFriendInfo * _Nullable friendInfo, NSError * _Nullable error) {
 
 </MultiLang>
 
+## 根据 objectId 查询好友
 
+除了昵称、好友码外，还可以根据 objectId 查找好友。
+
+查询 objectId 为 `5b0b97cf06f4fd0abc0abe35` 的好友：
+
+<MultiLang>
+
+```cs
+TDSFriendInfo friendInfo = await TDSFollows.SearchUserById("5b0b97cf06f4fd0abc0abe35");
+```
+
+```java
+
+```
+
+```objc
+[TDSFollows searchUserWithObjectId:@"5b0b97cf06f4fd0abc0abe35"
+callback:^(TDSFriendInfo * _Nullable friendInfo, NSError * _Nullable error) {
+    // 略（参见上节）
+}];
+```
+
+</MultiLang>
 
 ## 富信息
 
@@ -439,11 +438,11 @@ TDSFollows.followByShortCode(shortId, new Callback<Boolean>() {
 ```
 
 ```objc
-[TDSFollows followWithShortCode:shortId callback:^(BOOL succeeded, NSError * _Nullable error) {
-  if (succeeded) {
-    // Followed.
-  } else if (error) {
-    // Failed to follow.
+[TDSFollows followWithShortCode:shortId callback:^(TDSFriendHandleResult * _Nullable result, NSError * _Nullable error) {
+  if (error) {
+    NSInteger errorCode = result.code;
+    NSString *errorMessage = result.message;
+    // 错误处理逻辑
   }
 }];
 ```
@@ -473,7 +472,7 @@ TDSFollows.followByShortCode(shortId, attrs, new Callback<Boolean>() {
 NSDictionary *attributes = @{
     @"group" : @"coworkers",
 };
-[TDSFollows followWithShortCode:shortId attributes:attributes callback:^(BOOL succeeded, NSError * _Nullable error) {
+[TDSFollows followWithShortCode:shortId attributes:attributes callback:^(TDSFriendHandleResult * _Nullable result, NSError * _Nullable error) {
     // 略
 }];
 ```
@@ -498,7 +497,7 @@ TDSFollows.follow("5b0b97cf06f4fd0abc0abe35", new Callback<Boolean>() {
 
 ```objc
 [TDSFollows followWithUserId:@"5b0b97cf06f4fd0abc0abe35"
-callback:^(BOOL succeeded, NSError * _Nullable error) {
+callback:^(TDSFriendHandleResult * _Nullable result, NSError * _Nullable error) {
     // 略
 }];
 ```
@@ -529,7 +528,7 @@ NSDictionary *attributes = @{
     @"group" : @"coworkers",
 };
 [TDSFollows followWithUserId:@"5b0b97cf06f4fd0abc0abe35" attributes:attributes
-callback:^(BOOL succeeded, NSError * _Nullable error) {
+callback:^(TDSFriendHandleResult * _Nullable result, NSError * _Nullable error) {
     // 略
 }];
 ```
@@ -570,15 +569,11 @@ TDSFollows.unfollowByShortCode(shortIdOfTarara, new Callback<Boolean>() {
 ```
 
 ```objc
-[TDSFollows unfollowWithUserId:@"5b0b97cf06f4fd0abc0abe35" callback:^(BOOL succeeded, NSError * _Nullable error) {
-  if (succeeded) {
-    // Unfollowed.
-  } else if (error) {
-    // Failed to unfollow.
-  }
+[TDSFollows unfollowWithUserId:@"5b0b97cf06f4fd0abc0abe35" callback:^(TDSFriendHandleResult * _Nullable result, NSError * _Nullable error) {
+    // 略
 }];
 
-[TDSFollows unfollowWithShortCode:shortIdOfTarara, callback:^(BOOL succeeded, NSError * _Nullable error) {
+[TDSFollows unfollowWithShortCode:shortIdOfTarara, callback:^(TDSFriendHandleResult * _Nullable result, NSError * _Nullable error) {
     // 略
 }];
 ```
@@ -590,6 +585,7 @@ TDSFollows.unfollowByShortCode(shortIdOfTarara, new Callback<Boolean>() {
 玩家可以拉黑其他玩家，使其他玩家无法关注自己。
 拉黑时会解除彼此之间的关注关系。
 和关注、取关类似，可以通过 objectId 或好友码来指定想要拉黑的玩家。
+例如，假设 Tarara 的 objectId 是 `5b0b97cf06f4fd0abc0abe35`，可以这样拉黑 Tarara：
 
 <MultiLang>
 
@@ -604,7 +600,13 @@ await TDSFollows.BlockByShortCode(shortIdOfTarara);
 ```
 
 ```objc
+[TDSFollows blockWithObjectId:@"5b0b97cf06f4fd0abc0abe35" callback:^(TDSFriendHandleResult * _Nullable result, NSError * _Nullable error) {
+    // 略
+}];
 
+[TDSFollows blockWithShortCode:shortIdOfTarara callback:^(TDSFriendHandleResult * _Nullable result, NSError * _Nullable error) {
+    // 略
+}];
 ```
 
 </MultiLang>
@@ -624,7 +626,13 @@ await TDSFollows.UnblockByShortCode(shortIdOfTarara);
 ```
 
 ```objc
+[TDSFollows unblockWithObjectId:@"5b0b97cf06f4fd0abc0abe35" callback:^(TDSFriendHandleResult * _Nullable result, NSError * _Nullable error) {
+    // 略
+}];
 
+[TDSFollows unblockWithShortCode:shortIdOfTarara callback:^(TDSFriendHandleResult * _Nullable result, NSError * _Nullable error) {
+    // 略
+}];
 ```
 
 </MultiLang>
@@ -644,7 +652,10 @@ FriendResult result = await TDSFollows.QueryBlockList(cursor, limit, sortConditi
 ```
 
 ```objc
-
+[TDSFollows queryBlockListWithOption:option
+callback:^(TDSFriendResult * _Nullable result, NSError * _Nullable error) {
+    // 略
+}];
 ```
 
 传入的查询参数的含义参见[查询互关列表](#查询互关列表)一节。
@@ -860,13 +871,28 @@ TDSFollows.SetShareLink("https://please-replace-with-your-domain.example.com");
 
 部署完落地页网站并在客户端配置好相应地址后，调用以下接口即可生成好友邀请页网址：
 
+<MultiLang>
+
 ```cs
 string inviteUrl = await TDSFollows.GenerateFriendInvitationLink();
 ```
 
+```java
+
+```
+
+```objc
+NSError *error;
+NSString *inviteUrl = [TDSFollows generateFriendInvitationLinkWithError:&error];
+```
+
+</MultiLang>
+
 分享链接中传递的用户名称默认为玩家昵称（`nickname`），如果希望使用其他名称，可以在调用上述接口时另行指定。
 另外，还可以传入其他信息，这些信息会作为 URL 查询参数拼接在好友邀请页网址后面。
 例如，昵称为 Tarara 的玩家，邀请好友时希望使用「她姥姥」这个名称，邀请链接希望附加 `ref=taptap` 这个参数，可以这样调用：
+
+<MultiLang>
 
 ```cs
 Dictionary<string, object> parameters = new Dictionary<string, object> {
@@ -875,9 +901,27 @@ Dictionary<string, object> parameters = new Dictionary<string, object> {
 string inviteUrl = await TDSFollows.GenerateFriendInvitationLink("她姥姥", parameters);
 ```
 
+```java
+
+```
+
+```objc
+NSError *error;
+TDSFriendLinkOption *option = [TDSFriendLinkOption new];
+option.roleName = @"她姥姥";
+option.queries = @{
+    @"ref" : @"taptap",
+};
+NSString *inviteUrl = [TDSFollows generateFriendInvitationLinkWithError:option error:&error];
+```
+
+</MultiLang>
+
 ### 处理链接
 
 玩家通过邀请链接打开游戏后，需要调用 SDK 提供的接口关注邀请者。
+
+<MultiLang>
 
 ```cs
 public class DeepLinkManager : MonoBehaviour
@@ -889,7 +933,24 @@ public class DeepLinkManager : MonoBehaviour
 }
 ```
 
+```java
+
+```
+
+```objc
+- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
+    return [TDSFollows handleFriendInvitationLink:url
+    callback:^(TDSFriendHandleResult * _Nullable result, TDSFriendsLinkInfo * _Nullable linkInfo, NSError * _Nullable error) {
+        // 略
+    }];
+}
+```
+
+</MultiLang>
+
 开发者也可以通过 SDK 提供的接口解析链接，获取玩家的 objectId、名称、传入的其他参数，定制相应的逻辑。
+
+<MultiLang>
 
 ```cs
 public class DeepLinkManager : MonoBehaviour
@@ -905,7 +966,19 @@ public class DeepLinkManager : MonoBehaviour
 }
 ```
 
+```java
+
+```
+
+```objc
+TDSFriendLinkInfo *linkInfo = [TDSFollows parseFriendInvitationLink:(NSURL *)url];
+NSString *userObjectId = linkInfo.identity;
+NSString *name = linkInfo.roleName;
+NSDictionary *parameters = linkInfo.queries;
+```
+
+</MultiLang>
+
 注意：
 
-- 目前关注模式下只有 C# SDK 支持分享链接功能，Java、Objective-C SDK 暂不支持。
-- 落地页示例项目默认使用好友模式，需要设置环境变量 `INVITE_TYPE` 为 `follow` 切换为关注模式。
+落地页示例项目默认使用好友模式，需要设置环境变量 `INVITE_TYPE` 为 `follow` 切换为关注模式。
