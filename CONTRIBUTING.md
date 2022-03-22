@@ -275,12 +275,11 @@ sidebar_position: 10
 
 注意：
 
-- 路径需用 `pathname:///files/xxx` ，而不是 `/files/xxx`，这是为了[绕开 docusaurus 的一个 bug][85].
+- 路径需用 `pathname:///files/xxx`，而不是 `/files/xxx`，这是为了[绕开 Docusaurus 的一个 bug][85]。
 - 文件名会成为 URL 的一部分，因此请使用小写英文字母、数字、连字符（`-`）。
 - 拖放文件的路径为 `/static/files`，而链接文件时不带 `static`。
 
 [85]: https://github.com/taptap/tds-docs/pull/85
-
 
 ## Tips
 
