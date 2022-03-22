@@ -265,6 +265,23 @@ sidebar_position: 10
 - `collapsed` 指定默认情况下是收起还是展开这一文件夹下的文档，一般都指定为 `true`。
 - `position` 指定文件夹在侧边栏的顺序，数字越小越靠前。
 
+### 添加附件
+
+添加附件的过程和添加图片类似，把文件拖放到 `/static/files` 目录下，然后在 Markdown 文件中通过 `pathname:///files/FILENAME.EXT` 链接到文件，例如：
+
+```markdown
+点击下载 [icon.zip](pathname:///files/taptap-login-button.zip)
+```
+
+注意：
+
+- 路径需用 `pathname:///files/xxx` ，而不是 `/files/xxx`，这是为了[绕开 docusaurus 的一个 bug][85].
+- 文件名会成为 URL 的一部分，因此请使用小写英文字母、数字、连字符（`-`）。
+- 拖放文件的路径为 `/static/files`，而链接文件时不带 `static`。
+
+[85]: https://github.com/taptap/tds-docs/pull/85
+
+
 ## Tips
 
 Confluence wiki、Notion 等网页上的富文本内容，可以复制到 [Mark Text]（开源，推荐使用）、[Typora]（收费）、[StackEdit] （开源，可以在浏览器中直接使用，但对一些复杂格式的支持不如 Mark Text 和 Typora 全）可以快速转换为 markdown 代码。
