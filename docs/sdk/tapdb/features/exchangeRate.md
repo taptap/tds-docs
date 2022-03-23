@@ -1,0 +1,10 @@
+---
+title: 汇率表
+sidebar_position: 6
+---
+
+<!--
+import { ExchangeTable } from "/src/components/ExchangeTable";
+
+<ExchangeTable />
+-->
