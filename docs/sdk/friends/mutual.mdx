@@ -49,9 +49,11 @@ TDSFriends.registerFriendStatusChangedListener(new FriendStatusChangedListener()
     @Override
     public void onNewRequestComing(TDSFriendshipRequest request) {}
 
-    // 通过分享链接进入游戏 SDK 自动发送好友申请时触发
+    // 通过分享链接进入游戏时触发此回调
+    // 开发者可以在此回调中直接调用 handFriendInvitationLink
+    // 或通过 parseFriendInvitationLink 解析链接，获取相关参数再执行自定义的逻辑 
     @Override
-    public void onSendFriendRequestToSharer(boolean isSuccess, String nickname, TDSFriendError error) {}
+    public void onReceivedInvitationLink(String url) {}
 
     // 已发送的好友申请被接受
     @Override
@@ -160,15 +162,15 @@ await TDSFriends.Online();
 <>
 
 ```java
-TDSFriends.online(new Callback<Boolean>() {
+TDSFriends.online(new Callback<Void>() {
     @Override
-    public void onSuccess(Boolean ok) {
-        toast("online success");
+    public void onSuccess(Void result) {
+        // 成功
     }
 
     @Override
     public void onFail(TDSFriendError error) {
-        toast("online failure: " + error.detailMessage);
+        // 处理异常
     }
 });
 ```
@@ -359,9 +361,9 @@ await TDSFriends.SetRichPresence("score", "60");
 ```
 
 ```java
-TDSFriends.setRichPresence("score", "60",  new Callback<Boolean>() {
+TDSFriends.setRichPresence("score", "60",  new Callback<Void>() {
     @Override
-    public void onSuccess(Boolean ok) {
+    public void onSuccess(Void result) {
         toast("Succeed to set rich presence.");
     }
 
@@ -407,7 +409,7 @@ await TDSFriends.SetRichPresences(info);
 Map<String,String> info = new HashMap<>();
 info.put("score", "60");
 info.put("display", "#matching");
-TDSFriends.setRichPresence(info, new Callback<Boolean>() {
+TDSFriends.setRichPresence(info, new Callback<Void>() {
     // 略
 });
 ```
@@ -434,7 +436,7 @@ TDSFriends.ClearRichPresence("score");
 ```
 
 ```java
-TDSFriends.clearRichPresence("score", new Callback<Boolean>() {
+TDSFriends.clearRichPresence("score", new Callback<Void>() {
     // 略
 });
 ```
@@ -461,7 +463,7 @@ await TDSFriends.ClearRichPresences(keys);
 List<String> keys = new ArrayList<>();
 keys.add("score");
 keys.add("display");
-TDSFriends.clearRichPresence(keys, new Callback<Boolean>() {
+TDSFriends.clearRichPresence(keys, new Callback<Void>() {
     // 略
 });
 ```
@@ -491,9 +493,9 @@ await TDSFriends.AddFriendByShortCode(shortId);
 ```
 
 ```java
-TDSFriends.addFriendByShortCode(shortId, null, new Callback<Boolean>() {
+TDSFriends.addFriendByShortCode(shortId, null, new Callback<Void>() {
     @Override
-    public void onSuccess(Boolean ok) {
+    public void onSuccess(Void result) {
         toast("Applied or added.");
     }
 
@@ -561,7 +563,7 @@ await TDSFriends.AddFriend("5b0b97cf06f4fd0abc0abe35");
 ```
 
 ```java
-TDSFriends.addFriend("5b0b97cf06f4fd0abc0abe35", new Callback<Boolean>() {
+TDSFriends.addFriend("5b0b97cf06f4fd0abc0abe35", new Callback<Void>() {
     // 略（参见上面的例子）
 });
 ```
@@ -589,7 +591,7 @@ await TDSFriends.AddFriend("5b0b97cf06f4fd0abc0abe35", attrs);
 ```java
 Map<String, Object> attrs = new HashMap<String, Object>();
 attrs.put("group", "coworkers");
-TDSFriends.addFriend("5b0b97cf06f4fd0abc0abe35", attrs, new Callback<Boolean>() {
+TDSFriends.addFriend("5b0b97cf06f4fd0abc0abe35", attrs, new Callback<Void>() {
     // 略（参见上面的例子）
 });
 ```
@@ -796,9 +798,9 @@ await request.Delete();
 // LCFriendshipRequest request
 
 // 接受
-TDSFriends.acceptFriendRequest(request, new Callback<Boolean>() {
+TDSFriends.acceptFriendRequest(request, new Callback<Void>() {
     @Override
-    public void onSuccess(Boolean ok) {
+    public void onSuccess(Void result) {
         toast("Accepted.");
     }
 
@@ -810,16 +812,16 @@ TDSFriends.acceptFriendRequest(request, new Callback<Boolean>() {
 // 接受并添加额外属性
 Map<String, Object> attrs = new HashMap<String, Object>();
 attrs.put("group", "coworkers");
-TDSFriends.acceptFriendRequest(request, attrs, new Callback<Boolean>() {
+TDSFriends.acceptFriendRequest(request, attrs, new Callback<Void>() {
     // 略
 });
 
 // 拒绝
-TDSFriends.declineFriendRequest(request, new Callback<Boolean>() {
+TDSFriends.declineFriendRequest(request, new Callback<Void>() {
     // 略
 });
 // 删除
-TDSFriends.deleteFriendRequest(request, new Callback<Boolean>() {
+TDSFriends.deleteFriendRequest(request, new Callback<Void>() {
     // 略
 });
 ```
