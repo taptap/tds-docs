@@ -16,7 +16,7 @@ iOS：<Data field="sdk.0.version"/><br/>
 Android：<Data field="sdk.1.version"/><br/>
 Unity 3D：<Data field="sdk.2.version"/><br/>
 
-[下载 SDK](../download)
+[下载 SDK](/sdk/tapdb/download.md)
 
 ## 2. 添加测试设备
 

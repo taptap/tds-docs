@@ -24,22 +24,22 @@ sidebar_position: 2
 
 目前 TapDB 支持 iOS 与 Andriod 平台的游戏。
 
-[下载 SDK](download)
+[下载 SDK](/sdk/tapdb/download)
 
 ### 集成 SDK：
 
-为了能更好的理解和使用 TapDB，建议你阅读 [埋点设计指南](/features/customEvent/dataModel) 后集成 SDK。
+为了能更好的理解和使用 TapDB，建议你阅读 [埋点设计指南](/sdk/tapdb/features/customEvent/dataModel) 后集成 SDK。
 
-[iOS 接入指南](/sdk/iOS)
+[iOS 接入指南](/sdk/tapdb/sdk/iOS)
 
-[Android 接入指南](/sdk/Android)
+[Android 接入指南](/sdk/tapdb/sdk/Android)
 
-[Unity 接入指南](/sdk/unity)
+[Unity 接入指南](/sdk/tapdb/sdk/unity)
 
-[服务端接入指南](/docs/sdk/server-side-integration)
+[服务端接入指南](/sdk/tapdb/sdk/server-side-integration)
 
 ## 第三步：校验数据
 
-App 集成 SDK 后，使用一台联网设备下载 App，在「配置」-「埋点管理」测试埋点上报情况。数据校验通过后项目才可正式上线。点击 [埋点管理](/features/customEvent/trackingManagement) 查看详细校验指导。
+App 集成 SDK 后，使用一台联网设备下载 App，在「配置」-「埋点管理」测试埋点上报情况。数据校验通过后项目才可正式上线。点击 [埋点管理](/sdk/tapdb/features/customEvent/trackingManagement) 查看详细校验指导。
 
 在操作过程中，如遇到任何问题，请先查阅说明文档和 FAQ 文档，若文档无法解决问题，请联系我们的技术支持 QQ：3171097571。

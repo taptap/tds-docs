@@ -132,7 +132,7 @@ public static void onCharge(String orderId, String product, long amount, String 
 | payment      | 是   | 支付方式，如：支付宝                    |
 | properties   | 是   | 充值（ `charge` ）的事件属性           |
 
-**注意:在条件允许的情况下推荐使用服务端充值统计接口，请参考 [服务端接入文档](/docs/sdk/server-side-integration)**
+**注意:在条件允许的情况下推荐使用服务端充值统计接口，请参考 [服务端接入文档](/sdk/tapdb/sdk/server-side-integration)**
 
 ## 4.上报事件
 
