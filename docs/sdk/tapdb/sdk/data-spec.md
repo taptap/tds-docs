@@ -82,7 +82,7 @@ TapDB 的 REST API 支持传入数据格式为 URLEncode 后的 JSON 对象，
 
 记录一个事件及其属性
 
-```
+```js
 {
     ["index" | "client_id"]: ["APPID" | "ClientID"],
     "device_id": "DeviceID",
@@ -154,7 +154,7 @@ properties 内的字段为属性字段，这些传入的字段会被当做事件
 
 账号属性操作
 
-```
+```js
 {
     ["index" | "client_id"]: ["APPID" | "ClientID"],
     "user_id": "UserID",
@@ -168,7 +168,7 @@ properties 内的字段为属性字段，这些传入的字段会被当做事件
 
 设备属性操作
 
-```
+```js
 {
     ["index" | "client_id"]: ["APPID" | "ClientID"],
     "device_id": "DeviceID",

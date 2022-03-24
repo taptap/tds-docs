@@ -170,8 +170,8 @@ sidebar_position: 1
 
 1. 新增「[关于我们](/sdk/tapdb/features.md)」，以便于大家更好的了解 TapDB
 2. 新增「[埋点设计指南](/sdk/tapdb/features/customEvent/dataModel.md)」，用于指导大家更好的设计自定义事件
-3. 新增「[服务端接入文档](/sdk/tapdb/sdk/服务端接入文档.md)」，介绍如何进行服务端接入
-4. 对「[快速接入](/sdk/tapdb/start.md)」、「[数据模型](/sdk/tapdb/sdk/数据规范.md)」和「[事件分析](/sdk/tapdb/features/customEvent/eventAnalyse.md)」的内容进行了修改，帮助大家更好的理解接入过程、基础概念和事件分析功能
+3. 新增「[服务端接入文档](/sdk/tapdb/sdk/server-side.md)」，介绍如何进行服务端接入
+4. 对「[快速接入](/sdk/tapdb/start.md)」、「[数据模型](/sdk/tapdb/sdk/data-spec.md)」和「[事件分析](/sdk/tapdb/features/customEvent/eventAnalyse.md)」的内容进行了修改，帮助大家更好的理解接入过程、基础概念和事件分析功能
 5. 调优了文档结构
 
 ---

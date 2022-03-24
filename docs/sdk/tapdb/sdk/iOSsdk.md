@@ -40,23 +40,22 @@ sidebar_position: 3
 
 **注意：SDK 默认不会收集广告标识符（IDFA），若需要对 IDFA 进行收集，请在初始化前调用以下接口并在 `info.plist` 中配置 `NSUserTrackingUsageDescription` 及描述文案，如「请允许 xxx 获取并使用你的 IDFA ，来为你提供更好的服务。」**
 
-```
+```objc
 [TapDB setAdvertiserIDCollectionEnabled:YES];
 ```
 
 初始化 TapDB SDK 并上报一个设备登录（ `device_login` ）事件，调用这个接口是使用其它接口的先决条件，需要尽早调用。
 一般建议在 AppDelegate的 `application:didFinishLaunchingWithOptions:` 中调用。
 
-```
+```objc
 + (void)onStart:(NSString *)appId channel:(nullable NSString *)channel version:(nullable NSString *)gameVersion;
-
 
 + (void)onStart:(NSString *)appId channel:(nullable NSString *)channel version:(nullable NSString *)gameVersion properties:(nullable NSDictionary *)properties;
 ```
 
 | 字段         | 可为空 | 说明                                                                 |
-| ---------- | --- | ------------------------------------------------------------------ |
-| appId      | 否   | 创建游戏时获得的APPID                                                      |
+| ---------- | --- |--------------------------------------------------------------------|
+| appId      | 否   | 创建游戏时获得的 APPID                                                     |
 | channel    | 是   | 分包渠道                                                               |
 | version    | 是   | 游戏版本，为空时，自动获取游戏安装包的版本（ Xcode 配置中的 Version ）                        |
 | properties | 是   | 设备登录（ `device_login` ）的事件属性，可以传入预置属性覆盖 SDK 的默认取值，也可以传入在后台配置过的自定义属性 |
@@ -67,22 +66,22 @@ sidebar_position: 3
 
 当用户进行账号登录时，可调用设置账号 ID （ `setUser` ）接口在记录该账号 ID。调用后会上报一个账号登录（ `user_login` ）事件，并将这个设备的是否有用户注册过 （ `has_user` ） 属性置为 `true`。在重启应用或调用清除账号 ID （ `clearUser` ） 前，上报的事件都会带有该账号 ID。
 
-```
+```objc
 + (void)setUser:(NSString *)userId;
 
 + (void)setUser:(NSString *)userId properties:(nullable NSDictionary *)properties;
 ```
 
-| 字段         | 可为空 | 说明                                                             |
-| ---------- | --- | -------------------------------------------------------------- |
-| userId     | 否   | 长度大于 0 并小于等于 256。只能包含数字、大小写字母、下划线(_)、横线(-)，用户ID。不同用户需要保证ID的唯一性 |
-| properties | 是   | 账号登录（ `user_login` ）的事件属性                                      |
+| 字段         | 可为空 | 说明                                                                   |
+| ---------- | --- |----------------------------------------------------------------------|
+| userId     | 否   | 长度大于 0 并小于等于 256。只能包含数字、大小写字母、下划线(`_`)、横线(`-`)，用户ID。不同用户需要保证 ID 的唯一性 |
+| properties | 是   | 账号登录（ `user_login` ）的事件属性                                            |
 
 ### 2.2.清除账号 ID
 
 当用户进行登出时，可调用 clearUser 清除当前 SDK 中保存的账号 ID，后续上报的事件将不会带有账号 ID，调用该接口不会上报任何事件。
 
-```
+```objc
 + (void)clearUser;
 ```
 
@@ -90,7 +89,7 @@ sidebar_position: 3
 
 在用户进行账号登录后，可调用该接口设置该账号的名称，调用后将更新账号的账号名称（ `user_name` ）属性。
 
-```
+```objc
 + (void)setName:(NSString *)name;
 ```
 
@@ -102,7 +101,7 @@ sidebar_position: 3
 
 在用户进行账号登录后，可调用该接口设置该账号的等级，调用将更新账号的账号等级（ `level` ）属性。
 
-```
+```objc
 + (void)setLevel:(NSInteger)level;
 ```
 
@@ -114,7 +113,7 @@ sidebar_position: 3
 
 在用户进行账号登录后，可调用该接口设置该账号的区服信息，调用将初始化账号的首次区服（ `first_server` ）属性、更新账号的当前区服（ `current_server` ）属性。
 
-```
+```objc
 + (void)setServer:(NSString *)server;
 ```
 
@@ -126,7 +125,7 @@ sidebar_position: 3
 
 在用户进行充值后，可调用该接口上报充值信息，调用后将上报 `charge` 事件，并将传入的参数作为事件的属性。
 
-```
+```objc
 + (void)onChargeSuccess:(NSString *)orderId product:(NSString *)product amount:(NSInteger)amount currencyType:(NSString *)currencyType payment:(NSString *)payment;
 
 + (void)onChargeSuccess:(NSString *)orderId product:(NSString *)product amount:(NSInteger)amount currencyType:(NSString *)currencyType payment:(NSString *)payment properties:(NSDictionary *)properties;
@@ -149,7 +148,7 @@ sidebar_position: 3
 
 在 SDK 初始化完成后可使用该接口上报事件
 
-```
+```objc
  + (void)trackEvent:(NSString *)eventName properties:(NSDictionary *)properties;
 ```
 
@@ -172,7 +171,7 @@ sidebar_position: 3
 
 **添加静态通用事件属性**
 
-```
+```objc
 + (void)registerStaticProperties:(NSDictionary *)staticProperties;
 ```
 
@@ -182,7 +181,7 @@ sidebar_position: 3
 
 示例：
 
-```
+```objc
 //当设置了静态通用事件属性 #current_channel，值固定为 TapDB 后
 [TapDB registerStaticProperties:@{@"#currentChannel":@"TapDB"}];
 
@@ -198,7 +197,7 @@ withProperties:@{@"#customPropertyName":@"customPropertyValue",
 
 **删除单个静态通用事件属性**
 
-```
+```objc
 + (void)unregisterStaticProperty:(NSString *)propertyName;
 ```
 
@@ -208,7 +207,7 @@ withProperties:@{@"#customPropertyName":@"customPropertyValue",
 
 **清空全部静态通用属性**
 
-```
+```objc
 + (void)clearStaticProperties;
 ```
 
@@ -216,7 +215,7 @@ withProperties:@{@"#customPropertyName":@"customPropertyValue",
 
 对于可能随时发生变化的通用事件属性，可以注册动态通用事件属性，`dynamicPropertiesCaculator` 将在每次调用时触发，将计算好的属性添加到本次上报事件属性中。
 
-```
+```objc
 + (void)registerDynamicProperties:(NSDictionary* (^)(void))dynamicPropertiesCaculator;
 ```
 
@@ -226,7 +225,7 @@ withProperties:@{@"#customPropertyName":@"customPropertyValue",
 
 示例:
 
-```
+```objc
 //后续上报的事件都将携带 #currentLevel 属性，值为变量 level 在事件上报时刻的值
 
 [TapDB registerDynamicProperties:^NSDictionary *_Nonnull {
@@ -248,7 +247,7 @@ TapDB 支持两种用户模型：设备和账号，你可以通过如下接口�
 
 对于常规的用设备属性，可使用改接口进行赋值操作，新的属性值将会直接覆盖旧的属性值
 
-```
+```objc
 + (void)deviceUpdate:(NSDictionary *)properties;
 ```
 
@@ -258,7 +257,7 @@ TapDB 支持两种用户模型：设备和账号，你可以通过如下接口�
 
 例如:
 
-```
+```objc
 [TapDB deviceUpdate:@{@"#currentPoints":@10}];
 // 此时设备表的 "currentPoints" 字段值为 10
 
@@ -270,7 +269,7 @@ TapDB 支持两种用户模型：设备和账号，你可以通过如下接口�
 
 对于需要保证只有首次设置时有效的属性，可以使用该接口进行赋值操作，仅当前值为空时赋值操作才会生效，如当前值不为空，则赋值操作会被忽略。
 
-```
+```objc
 + (void)deviceInitialize:(NSDictionary *)properties;
 ```
 
@@ -281,7 +280,7 @@ TapDB 支持两种用户模型：设备和账号，你可以通过如下接口�
 例如：
 记录用户首次登陆的区服，客户端无法得知该属性是否已经被设置过，使用该接口保证仅第一次的设置会生效。
 
-```
+```objc
 [TapDB deviceInitialize:@{@"#firstActiveServer":@"server1"}];
 // 此时设备表的 "#firstActiveServer" 字段值为 "server1"
 
@@ -293,7 +292,7 @@ TapDB 支持两种用户模型：设备和账号，你可以通过如下接口�
 
 对于数值类型的属性，可以使用该接口进行累加操作，调用后 TapDB 将对原属性值进行累加后保存结果值
 
-```
+```objc
 + (void)deviceAdd:(NSDictionary *)properties;
 ```
 
@@ -303,7 +302,7 @@ TapDB 支持两种用户模型：设备和账号，你可以通过如下接口�
 
 例如：
 
-```
+```objc
 [TapDB deviceAdd:@{@"totalPoints":@10}];
 // 此时设备表的 "totalPoints" 字段值为 10
 
@@ -315,13 +314,13 @@ TapDB 支持两种用户模型：设备和账号，你可以通过如下接口�
 
 使用方法同设备属性更新操作
 
-```
+```objc
 + (void)userUpdate:(NSDictionary *)properties;
 ```
 
 **账号属性初始化操作**
 
-```
+```objc
 + (void)userInitialize:(NSDictionary *)properties;
 ```
 
@@ -329,6 +328,6 @@ TapDB 支持两种用户模型：设备和账号，你可以通过如下接口�
 
 使用方法同设备属性累加操作
 
-```
+```objc
 + (void)userAdd:(NSDictionary *)properties;
 ```

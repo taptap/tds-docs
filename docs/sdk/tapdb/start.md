@@ -22,7 +22,7 @@ sidebar_position: 2
 
 ### 下载 SDK：
 
-目前 TapDB 支持 iOS 与 Andriod 平台的游戏。
+目前 TapDB 支持 iOS 与 Android 平台的游戏。
 
 [下载 SDK](/sdk/tapdb/download)
 
