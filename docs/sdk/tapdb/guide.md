@@ -75,7 +75,7 @@ TapDB.framework`}
 以下两种初始化方式结合使用场景任选其一即可。
 :::
 
-### TapSDK 初始化 
+### TapSDK 初始化
 
 在 TapSDK 初始化时，同步初始化 TapDB。
 
@@ -196,7 +196,6 @@ TapDB.SetUser("userId");
 TapDB.setUser("userId");
 ```
 
-
 ```objectivec
 [TapDB setUser:@"userId"];
 ```
@@ -242,7 +241,6 @@ TapDB.SetLevel(5);
 TapDB.setLevel(5);
 ```
 
-
 ```objectivec
 [TapDB setLevel:5];
 ```
@@ -272,7 +270,6 @@ TapDB.setServer("1 区");
 </MultiLang>
 
 服务器参数为非空字符串，长度不大于 256。
-
 
 ## 充值
 
@@ -352,7 +349,7 @@ POST 数据（实际发送请求时需去除注释、空格、换行符并 urlen
 
 需要发送自定义事件时调用，自定义事件的 eventName 和 properties 属性都必须在元数据管理预先配置，才可以使用 SDK 进行发送
 
-用户可以通过调用 trackEvent 方法上传需要跟踪的自定义事件。eventName 为自定义事件的事件名，需要保证以 '#' 开头，取值规则请参考自定义属性登记页面。properties 为自定义事件所包含的自定义属性（以 Key : Value 的形式保存），其中 Key 代表了自定义属性的属性名，Value 代表了该属性的值。这里需要注意的是 Key 的命名规则同 eventName 一致，也需要保证以 '#' 开头。目前所支持的 Value 类型为 String, Number, Boolean。String 类型支持最大长度为 256。Number 类型取值区间为 [-9E15, 9E15]。以战斗事件为例：
+用户可以通过调用 trackEvent 方法上传需要跟踪的自定义事件。eventName 为自定义事件的事件名，需要保证以 「#」 开头，取值规则请参考自定义属性登记页面。properties 为自定义事件所包含的自定义属性（以 Key : Value 的形式保存），其中 Key 代表了自定义属性的属性名，Value 代表了该属性的值。这里需要注意的是 Key 的命名规则同 eventName 一致，也需要保证以 「#」 开头。目前所支持的 Value 类型为 String, Number, Boolean。String 类型支持最大长度为 256。Number 类型取值区间为 [-9E15, 9E15]。以战斗事件为例：
 
 <MultiLang>
 
@@ -374,7 +371,6 @@ NSDictionary* dic = @{@"aaa":@"xxx",@"bbb":@"yyy"};
 ```
 
 </MultiLang>
-
 
 ## 设置通用事件属性
 
@@ -483,9 +479,6 @@ TapDB.registerDynamicProperties(
 
 </MultiLang>
 
-
-
-
 ## 事件主体操作
 
 TapDB 目前支持两个事件主体：设备，账号。相应支持主体属性的操作为初始化，更新和累加。累加操作只支持数值类型。需要注意的是，传入的自定义属性需要同预登记属性名保持一致。
@@ -590,6 +583,7 @@ TapDB.deviceAdd(properties);
 
 [TapDB deviceAdd:@{@"totalPoints":@(-2)}];
 ```
+
 </MultiLang>
 
 运行上述代码后，设备表的 `totalPoints` 字段值为 `8`。
@@ -618,6 +612,7 @@ TapDB.userAdd(properties);
 [TapDB userUpdate:@{@"currentPoints":@10}];
 [TapDB userAdd:@{@"totalPoints":@10}];
 ```
+
 </MultiLang>
 
 ## 服务端在线人数推送
@@ -638,18 +633,18 @@ TapDB.userAdd(properties);
 
 发送 POST 请求，请求内容为 json 格式的数据，包含以下信息：
 
-参数名 | 参数类型 | 参数说明
-| ------ | ------ | ------ |
-client_id | string | 游戏的 client id
-onlines | array | 多条在线数据（最多 100 条）
+| 参数名       | 参数类型   | 参数说明             |
+| --------- | ------ | ---------------- |
+| client_id | string | 游戏的 client id    |
+| onlines   | array  | 多条在线数据（最多 100 条） |
 
 其中 `onlines` 数组元素的结构为：
 
-参数名 | 参数类型 | 参数说明
-| ------ | ------ | ------ |
-server | string | 服务器。自然时间 5 分钟内，TapDB 对同一服务器仅接受一次数据。
-online | int | 在线人数
-timestamp | long | 当前统计数据的时间戳（秒）。TapDB 会按照自然时间 5 分钟对齐数据。
+| 参数名       | 参数类型   | 参数说明                                  |
+| --------- | ------ | ------------------------------------- |
+| server    | string | 服务器。自然时间 5 分钟内，TapDB 对同一服务器仅接受一次数据。   |
+| online    | int    | 在线人数                                  |
+| timestamp | long   | 当前统计数据的时间戳（秒）。TapDB 会按照自然时间 5 分钟对齐数据。 |
 
 示例：
 

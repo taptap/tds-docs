@@ -5,8 +5,7 @@ sidebar_position: 1
 
 **Q：游戏只有 AppID 没有 clientid，初始化时如何处理？**
 
-A：分别使用 [iOS SDK 文档](/03-sdk/03-iOSsdk.md "_blank")、[Android SDK 文档](/03-sdk/04-Androidsdk.md "_blank")、[Unity SDK 文档](/03-sdk/05-unity.md "_blank") 里提到的初始化方式即可。
-
+A：分别使用 [iOS SDK 文档](/sdk/tapdb/sdk/iOSsdk.md)、[Android SDK 文档](/sdk/tapdb/sdk/Androidsdk.md)、[Unity SDK 文档](/sdk/tapdb/sdk/unity.md) 里提到的初始化方式即可。
 
 **Q：SDK 初始化成功，为什么没有新增数据？**
 
@@ -26,13 +25,9 @@ A：在排查之前，你要粗略了解数据上报的流程：
 
 3、打开手机抓包工具，测试设备是否正常上报数据；
 
-
-
 **Q：SDK 初始化成功，为什么新增数据不正确？**
 
 A：你可以使用【上报明细】功能来验证埋点上报准确性。
-
-
 
 **Q：如何查看上报的数据？**
 
@@ -42,12 +37,9 @@ A：你可以通过【上报明细】和【埋点管理】来查看上报的数�
 
 【埋点管理】：可以查看最近 7 日项目内数据接收情况，快速了解埋点上报整体情况，以及错误上报详情与抽样示例；
 
-
 **Q：为什么 SDK 初始化失败？**
 
 可以尝试对 gameversion 字段调试，若无值，需填入值。
-
-
 
 **Q：单机游戏的 userId 如何储存？**
 

@@ -14,14 +14,11 @@ sidebar_position: 4
 
 ### 1.2.导入 SDK
 
-请 [下载最新的 SDK](/05-download.md "_blank")，将 TapDB.aar 导入到 Android Studio 工程中。
-
+请 [下载最新的 SDK](/sdk/tapdb/download.md)，将 TapDB.aar 导入到 Android Studio 工程中。
 
 **注意：TapDB SDK 支持获取 OAID (需要手动添加 OAID 的 SDK)，使归因更加精准**
 
 当前支持 OAID SDK 1.0.5~1.0.25 版本，当集成 OAID SDK 后，TapDB SDK 会自动获取 OAID 并进行上报。OAID SDK 可以自行从 OAID 官网下载，也可以从此处下载 [OAID 1.0.25](https://res.xdcdn.net/tapdb/Android/oaid/oaid_sdk_1.0.25.aar)。
-
-
 
 ### 1.3.工程配置
 
@@ -37,10 +34,7 @@ sidebar_position: 4
 <uses-permission android:name="android.permission.READ_PHONE_STATE" />
 ```
 
-
-
 ### 1.4.初始化
-
 
 初始化 TapDB SDK 并上报一个设备登录（ `device_login` ）事件，调用这个接口是使用其它接口的先决条件，需要尽早调用，建议在游戏的主 Activity 中调用。
 
@@ -50,14 +44,13 @@ public static void init(Context context, String appId, String channel, String ap
 public static void init(Context context, String appId, String channel, String appVersion, JSONObject properties)
 ```
 
-字段 | 可为空 | 说明
---- | --- | ---
-context | 否 | 当前 Application 或 Activity 的 Context 对象
-appId | 否 | 创建游戏时获得的APP ID
-channel | 是 | 分包渠道
-appVersion | 是 | 游戏版本，为空时，自动获取游戏安装包的版本
-properties | 是 | 设备登录（ `device_login` ）的事件属性，可以传入预置属性覆盖 SDK 的默认取值，也可以传入在后台配置过的自定义属性
-
+| 字段         | 可为空 | 说明                                                                 |
+| ---------- | --- | ------------------------------------------------------------------ |
+| context    | 否   | 当前 Application 或 Activity 的 Context 对象                             |
+| appId      | 否   | 创建游戏时获得的APP ID                                                     |
+| channel    | 是   | 分包渠道                                                               |
+| appVersion | 是   | 游戏版本，为空时，自动获取游戏安装包的版本                                              |
+| properties | 是   | 设备登录（ `device_login` ）的事件属性，可以传入预置属性覆盖 SDK 的默认取值，也可以传入在后台配置过的自定义属性 |
 
 ## 2.设置账号
 
@@ -71,12 +64,10 @@ public static void setUser(String userId)
 public static void setUser(String userId, JSONObject properties)
 ```
 
-字段 | 可为空 | 说明
---- | --- | ---
-userId | 否 | 长度大于 0 并小于等于 256。只能包含数字、大小写字母、下划线(_)、横线(-)，用户 ID。不同账号需要保证 ID 的唯一性
-properties | 是 | 账号登录（ `user_login` ）的事件属性
-
-
+| 字段         | 可为空 | 说明                                                                |
+| ---------- | --- | ----------------------------------------------------------------- |
+| userId     | 否   | 长度大于 0 并小于等于 256。只能包含数字、大小写字母、下划线(_)、横线(-)，用户 ID。不同账号需要保证 ID 的唯一性 |
+| properties | 是   | 账号登录（ `user_login` ）的事件属性                                         |
 
 ### 2.2.清除账号 ID
 
@@ -86,7 +77,6 @@ properties | 是 | 账号登录（ `user_login` ）的事件属性
 public static void clearUser()
 ```
 
-
 ### 2.3.设置账号名称
 
 在用户进行账号登录后，可调用该接口设置该账号的名称，调用后将更新账号的账号名称（ `user_name` ）属性。
@@ -95,10 +85,9 @@ public static void clearUser()
 public static void setName(String name)
 ```
 
-字段 | 可为空 | 说明
---- | --- | ---
-name | 否 | 长度大于 0 并小于等于 256，账号名
-
+| 字段   | 可为空 | 说明                   |
+| ---- | --- | -------------------- |
+| name | 否   | 长度大于 0 并小于等于 256，账号名 |
 
 ### 2.4.设置账号等级
 
@@ -108,10 +97,9 @@ name | 否 | 长度大于 0 并小于等于 256，账号名
 public static void setLevel(int level)
 ```
 
-字段 | 可为空 | 说明
---- | --- | ---
-level | 否 | 账号等级
-
+| 字段    | 可为空 | 说明   |
+| ----- | --- | ---- |
+| level | 否   | 账号等级 |
 
 ### 2.5.设置账号区服
 
@@ -121,10 +109,9 @@ level | 否 | 账号等级
 public static void setServer(String server)
 ```
 
-字段 | 可为空 | 说明
---- | --- | ---
-server | 否 | 账号服务器
-
+| 字段     | 可为空 | 说明    |
+| ------ | --- | ----- |
+| server | 否   | 账号服务器 |
 
 ## 3.上报充值
 
@@ -136,17 +123,16 @@ public static void onCharge(String orderId, String product, long amount, String 
 public static void onCharge(String orderId, String product, long amount, String currencyType, String payment, JSONObject properties)
 ```
 
-字段 | 可为空 | 说明
---- | --- | ---
-orderId | 否 | 订单 ID
-product | 是 | 产品名称
-amount | 否 | 充值金额（单位分，即无论什么币种，都需要乘以 100）
-currencyType | 是 | 货币类型，参考：人民币 CNY，美元 USD；欧元 EUR
-payment | 是 | 支付方式，如：支付宝
-properties | 是 | 充值（ `charge` ）的事件属性
+| 字段           | 可为空 | 说明                            |
+| ------------ | --- | ----------------------------- |
+| orderId      | 否   | 订单 ID                         |
+| product      | 是   | 产品名称                          |
+| amount       | 否   | 充值金额（单位分，即无论什么币种，都需要乘以 100）   |
+| currencyType | 是   | 货币类型，参考：人民币 CNY，美元 USD；欧元 EUR |
+| payment      | 是   | 支付方式，如：支付宝                    |
+| properties   | 是   | 充值（ `charge` ）的事件属性           |
 
-**注意:在条件允许的情况下推荐使用服务端充值统计接口，请参考 [服务端接入文档](/docs/sdk/server-side-integration "_blank")**
-
+**注意:在条件允许的情况下推荐使用服务端充值统计接口，请参考 [服务端接入文档](/docs/sdk/server-side-integration)**
 
 ## 4.上报事件
 
@@ -158,20 +144,18 @@ properties | 是 | 充值（ `charge` ）的事件属性
 public static void trackEvent(String eventName, JSONObject properties)
 ```
 
-字段 | 可为空 | 说明
---- | --- | ---
-eventName | 否 | 事件的名称
-properties | 是 | 事件的属性
-
+| 字段         | 可为空 | 说明    |
+| ---------- | --- | ----- |
+| eventName  | 否   | 事件的名称 |
+| properties | 是   | 事件的属性 |
 
 **注意:**
 
-* 事件名支持上报预置事件和自定义事件，其中自定义事件应以 `#` 开头
-* 事件属性的 key 值为属性的名称，支持 String 类型
-* 事件属性的 value 值为属性的名称，支持 String `256` ）、Long（取值区间为 `[-9E15, 9E15]` ）类型
-* 事件属性支持上报预置属性和自定属性，其中自定义属性应以 `#` 开头
-* 事件属性传入预置属性时，SDK 默认采集的预置属性将被覆盖
-
+- 事件名支持上报预置事件和自定义事件，其中自定义事件应以 `#` 开头
+- 事件属性的 key 值为属性的名称，支持 String 类型
+- 事件属性的 value 值为属性的名称，支持 String `256` ）、Long（取值区间为 `[-9E15, 9E15]` ）类型
+- 事件属性支持上报预置属性和自定属性，其中自定义属性应以 `#` 开头
+- 事件属性传入预置属性时，SDK 默认采集的预置属性将被覆盖
 
 ### 4.2.设置通用事件属性
 
@@ -183,9 +167,9 @@ properties | 是 | 事件的属性
 public static void registerStaticProperties(final JSONObject staticProperties)
 ```
 
-字段 | 可为空 | 说明
---- | --- | ---
-staticProperties | 否 | 静态通用事件属性字典
+| 字段               | 可为空 | 说明         |
+| ---------------- | --- | ---------- |
+| staticProperties | 否   | 静态通用事件属性字典 |
 
 示例：
 
@@ -214,9 +198,9 @@ TapDB.trackEvent("#customEvent", properties);
 public static void unregisterStaticProperty(String propertyName)
 ```
 
-字段 | 可为空 | 说明
---- | --- | ---
-propertyName | 否 | 静态通用属性名
+| 字段           | 可为空 | 说明      |
+| ------------ | --- | ------- |
+| propertyName | 否   | 静态通用属性名 |
 
 **清空全部静态通用属性**
 
@@ -232,9 +216,9 @@ public static void clearStaticProperties()
 public static void registerDynamicProperties(TapDBDataDynamicProperties dynamicProperties)
 ```
 
-字段 | 可为空 | 说明
---- | --- | ---
-dynamicProperties | 否 | 动态通用事件属性计算回调
+| 字段                | 可为空 | 说明           |
+| ----------------- | --- | ------------ |
+| dynamicProperties | 否   | 动态通用事件属性计算回调 |
 
 示例:
 
@@ -254,8 +238,7 @@ TapDB.registerDynamicProperties(
 
 **注意:**
 
-* 在上报事件或通用属性中使用相同属性名会出现属性覆盖的现象，属性覆盖的优先级从高到低依次为：事件属性、动态通用事件属性、静态通用事件属性、预置属性（例如 `trackEvent` 中设置的事件属性将覆盖动态通用事件属性、静态通用事件属性、预置属性中的同名属性）
-
+- 在上报事件或通用属性中使用相同属性名会出现属性覆盖的现象，属性覆盖的优先级从高到低依次为：事件属性、动态通用事件属性、静态通用事件属性、预置属性（例如 `trackEvent` 中设置的事件属性将覆盖动态通用事件属性、静态通用事件属性、预置属性中的同名属性）
 
 ## 5.修改用户属性
 
@@ -269,10 +252,9 @@ TapDB 支持两种用户模型：设备和账号，你可以通过如下接口�
 public static void deviceUpdate(final JSONObject properties)
 ```
 
-字段 | 可为空 | 说明
---- | --- | ---
-properties | 否 | 属性字典
-
+| 字段         | 可为空 | 说明   |
+| ---------- | --- | ---- |
+| properties | 否   | 属性字典 |
 
 例如:
 
@@ -296,10 +278,9 @@ TapDB.deviceUpdate(nextProperties);
 public static void deviceInitialize(final JSONObject properties)
 ```
 
-字段 | 可为空 | 说明
---- | --- | ---
-properties | 否 | 属性字典
-
+| 字段         | 可为空 | 说明   |
+| ---------- | --- | ---- |
+| properties | 否   | 属性字典 |
 
 例如：
 记录用户首次登陆的区服，客户端无法得知该属性是否已经被设置过，使用该接口保证仅第一次的设置会生效。
@@ -319,14 +300,14 @@ TapDB.deviceInitialize(nextProperties);
 **设备属性累加操作**
 
 对于数值类型的属性，可以使用该接口进行累加操作，调用后 TapDB 将对原属性值进行累加后保存结果值
+
 ```java
 public static void deviceAdd(final JSONObject properties)
 ```
 
-字段 | 可为空 | 说明
---- | --- | ---
-properties | 否 | 属性字典，value 仅支持 NSNumber 类型
-
+| 字段         | 可为空 | 说明                         |
+| ---------- | --- | -------------------------- |
+| properties | 否   | 属性字典，value 仅支持 NSNumber 类型 |
 
 例如：
 
@@ -345,6 +326,7 @@ deviceAdd(nextProperties);
 **账号属性更新操作**
 
 使用方法同设备属性更新操作
+
 ```java
 public static void userUpdate(final JSONObject properties)
 ```
@@ -358,6 +340,7 @@ public static void userInitialize(final JSONObject properties)
 **账号属性累加操作**
 
 使用方法同设备属性累加操作
+
 ```java
 public static void userAdd(final JSONObject properties)
 ```

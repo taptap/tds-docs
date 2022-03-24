@@ -14,8 +14,8 @@ title: Appsflyer
 
 3. media_source 配置
 
-   * 后台仅显示已创建过 media_source 的数据
-   * 未配置 media_source 的数据可能丢失*（如，已投放 unity 并产生数据，但未配置该 media_source，则 unity 的数据则不会被记录及显示，也不会被计算为自然量）*
+   - 后台仅显示已创建过 media_source 的数据
+   - 未配置 media_source 的数据可能丢失*（如，已投放 unity 并产生数据，但未配置该 media_source，则 unity 的数据则不会被记录及显示，也不会被计算为自然量）*
 
 4. 将生成的投放链接填入 Appsflyer 对接后台*（对接 → API 数据接口 → Push API 添加回传）*
 
