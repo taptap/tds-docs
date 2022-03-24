@@ -36,11 +36,11 @@ sidebar_position: 13
 
 系统支持 `UTF-8` 或 `UTF-8 with Bom` 编码格式的 `CSV` 文件，文件大小不超过 2G。
 
-可使用 Excel 在保存文档时选择「**CSV UTF-8(逗号分隔符)（.csv）**」格式；
+可使用 Excel 在保存文档时选择「**CSV UTF-8（逗号分隔符）（.csv）**」格式；
 
 ![Excel](/img/customEvent/dimension_table_7.png)
 
-或使用 WPS 在保存文档时选择「**CSV (逗号分隔符)（*.csv）**」格式；
+或使用 WPS 在保存文档时选择「**CSV （逗号分隔符）（*.csv）**」格式；
 
 ![WPS](/img/customEvent/dimension_table_8.png)
 

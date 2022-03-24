@@ -92,7 +92,7 @@ sidebar_position: 6
 | --------- | ------ | ------------------------------------ |
 | server    | string | 服务器。TapDB 对同一服务器每一个自然 5 分钟仅接受一次数据    |
 | online    | number | 在线人数                                 |
-| timestamp | number | 当前统计数据的时间戳(秒)。TapDB 会按照自然 5 分钟进行数据对齐 |
+| timestamp | number | 当前统计数据的时间戳（秒）。TapDB 会按照自然 5 分钟进行数据对齐 |
 
 示例：
 

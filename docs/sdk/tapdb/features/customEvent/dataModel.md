@@ -75,7 +75,7 @@ sidebar_position: 2
 
 ![](/img/customEvent/49e3e7c0d12cd20cdd4f4aed2c8d0044.png)
 
-「更新下载成功(步骤 3)」到「首页 - TapTap 登录按钮(步骤 4)」的转化率非常低，接下来就需要进行详细的数据分析。点击 [TapDB 使用指南](/sdk/tapdb/features/customEvent/eventAnalyse) 查看详细数据分析方法。
+「更新下载成功（步骤 3）」到「首页 - TapTap 登录按钮（步骤 4）」的转化率非常低，接下来就需要进行详细的数据分析。点击 [TapDB 使用指南](/sdk/tapdb/features/customEvent/eventAnalyse) 查看详细数据分析方法。
 
 ## 2.埋点设计思路
 

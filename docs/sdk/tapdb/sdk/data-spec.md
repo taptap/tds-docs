@@ -17,7 +17,7 @@ SDK 在初始化时，将为该终端生成唯一的 ID，我们称之为设备 
 | --------------------------- | ----------------------------------------------------------------------------------------- |
 | Android                     | 依次尝试获取本地存储保存过的设备 ID、Android ID、Google 广告 ID，如果都无法获取到正确结果则随机生成 UUID，最后获取或生成的设备 ID 会保存于本地存储 |
 | iOS                         | 依次尝试获取本地钥匙串保存过的设备 ID、IDFA，获取失败则随机生成 UUID，最后获取或生成的设备 ID 会保存于本地钥匙串                          |
-| Unity (运行于 Windows 和 MacOS) | 使用 Unity 提供的 deviceUniqueIdentifier                                                       |
+| Unity （运行于 Windows 和 MacOS） | 使用 Unity 提供的 deviceUniqueIdentifier                                                       |
 
 #### 设备属性
 
@@ -33,7 +33,7 @@ iOS：获取或生成好的设备 ID 保存于设备的钥匙串中，可以保�
 
 ## 账号
 
-### 账号 ID (user_id)
+### 账号 ID （user_id）
 
 通常情况下是你的注册用户 ID，当用户在你的系统中发生注册或登录行为后，你可以将该用户在你的系统中的唯一 ID 直接或加密后设置到 SDK 中，这个 ID 会被作为今后用户在各个平台使用你的产品的身份识别 ID。
 
@@ -139,7 +139,7 @@ properties 内的字段为属性字段，这些传入的字段会被当做事件
 | os           | string | 操作系统（支持传入 Android、iOS、Windows、Mac）              |
 | device_id1   | string | 预留设备 ID 槽位（iOS SDK 传入 IDFA，Android SDK 传入 IMEI） |
 | device_id2   | string | 预留设备 ID 槽位（Android SDK 传入 Google 广告 ID）         |
-| device_id3   | string | 预留设备 ID 槽位（Android SDK 传入 Android ID)           |
+| device_id3   | string | 预留设备 ID 槽位（Android SDK 传入 Android ID）           |
 | device_id4   | string | 预留设备 ID 槽位（Android SDK 传入 OAID）                 |
 | width        | number | 屏幕宽度                                            |
 | height       | number | 屏幕高度                                            |
