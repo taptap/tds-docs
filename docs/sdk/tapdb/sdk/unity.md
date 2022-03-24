@@ -70,7 +70,7 @@ public static void onStartWithProperties(string appId, string channel, string ga
 
 | 字段         | 可为空 | 说明                                                                 |
 | ---------- | --- | ------------------------------------------------------------------ |
-| appId      | 否   | 创建游戏时获得的APPID                                                      |
+| appId      | 否   | 创建游戏时获得的 APPID                                                     |
 | channel    | 是   | 分包渠道                                                               |
 | version    | 是   | 游戏版本，为空时，自动获取游戏安装包的版本                                              |
 | properties | 是   | 设备登录（ `device_login` ）的事件属性，可以传入预置属性覆盖 SDK 的默认取值，也可以传入在后台配置过的自定义属性 |
@@ -86,10 +86,10 @@ public static void setUser(string userId)
 public static void setUserWithProperties(string userId,Dictionary<string, object> properties)
 ```
 
-| 字段         | 可为空 | 说明                                                               |
-| ---------- | --- | ---------------------------------------------------------------- |
-| userId     | 否   | 长度大于 0 并小于等于 256。只能包含数字、大小写字母、下划线(_)、横线(-)，用户ID。不同用户需要保证 ID 的唯一性 |
-| properties | 是   | 账号登录（ `user_login` ）的事件属性                                        |
+| 字段         | 可为空 | 说明                                                                |
+| ---------- | --- | ----------------------------------------------------------------- |
+| userId     | 否   | 长度大于 0 并小于等于 256。只能包含数字、大小写字母、下划线(_)、横线(-)，用户 ID。不同用户需要保证 ID 的唯一性 |
+| properties | 是   | 账号登录（ `user_login` ）的事件属性                                         |
 
 ### 2.2.清除账号 ID
 
@@ -107,9 +107,9 @@ public static void clearUser()
 public static void setName(string name)
 ```
 
-| 字段   | 可为空 | 说明                |
-| ---- | --- | ----------------- |
-| name | 否   | 长度大于0并小于等于256，账号名 |
+| 字段   | 可为空 | 说明                   |
+| ---- | --- | -------------------- |
+| name | 否   | 长度大于 0 并小于等于 256，账号名 |
 
 ### 2.4.设置账号等级
 

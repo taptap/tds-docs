@@ -45,7 +45,7 @@ sidebar_position: 3
 ```
 
 初始化 TapDB SDK 并上报一个设备登录（ `device_login` ）事件，调用这个接口是使用其它接口的先决条件，需要尽早调用。
-一般建议在 AppDelegate的 `application:didFinishLaunchingWithOptions:` 中调用。
+一般建议在 AppDelegate 的 `application:didFinishLaunchingWithOptions:` 中调用。
 
 ```objc
 + (void)onStart:(NSString *)appId channel:(nullable NSString *)channel version:(nullable NSString *)gameVersion;
@@ -54,7 +54,7 @@ sidebar_position: 3
 ```
 
 | 字段         | 可为空 | 说明                                                                 |
-| ---------- | --- |--------------------------------------------------------------------|
+| ---------- | --- | ------------------------------------------------------------------ |
 | appId      | 否   | 创建游戏时获得的 APPID                                                     |
 | channel    | 是   | 分包渠道                                                               |
 | version    | 是   | 游戏版本，为空时，自动获取游戏安装包的版本（ Xcode 配置中的 Version ）                        |
@@ -72,10 +72,10 @@ sidebar_position: 3
 + (void)setUser:(NSString *)userId properties:(nullable NSDictionary *)properties;
 ```
 
-| 字段         | 可为空 | 说明                                                                   |
-| ---------- | --- |----------------------------------------------------------------------|
-| userId     | 否   | 长度大于 0 并小于等于 256。只能包含数字、大小写字母、下划线(`_`)、横线(`-`)，用户ID。不同用户需要保证 ID 的唯一性 |
-| properties | 是   | 账号登录（ `user_login` ）的事件属性                                            |
+| 字段         | 可为空 | 说明                                                                    |
+| ---------- | --- | --------------------------------------------------------------------- |
+| userId     | 否   | 长度大于 0 并小于等于 256。只能包含数字、大小写字母、下划线(`_`)、横线(`-`)，用户 ID。不同用户需要保证 ID 的唯一性 |
+| properties | 是   | 账号登录（ `user_login` ）的事件属性                                             |
 
 ### 2.2.清除账号 ID
 

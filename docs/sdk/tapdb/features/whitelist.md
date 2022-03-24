@@ -6,7 +6,7 @@ hide_table_of_contents: false
 sidebar_position: 5
 ---
 
-「测试设备」是应用SDK接入测试、渠道后台联调测试等场景下的白名单功能，可以帮助你更加便捷的进行激活联调测试，避免手动清除激活或者寻找新设备的不便。
+「测试设备」是应用 SDK 接入测试、渠道后台联调测试等场景下的白名单功能，可以帮助你更加便捷的进行激活联调测试，避免手动清除激活或者寻找新设备的不便。
 
 ## 1. 接入最新的 SDK
 
@@ -59,7 +59,7 @@ Unity 3D：<Data field="sdk.2.version"/><br/>
 5. Android 填写 Google ID 或 OAID（至少填写一个 ID）
    > **如何获取 Google ID 或 OAID？**
    >
-   > 1. 下载 TapDB 客户端，点击设备信息，获取OAID（详细步骤见安卓端处理方式）
+   > 1. 下载 TapDB 客户端，点击设备信息，获取 OAID（详细步骤见安卓端处理方式）
    > 2. 获取 Google ID : <https://support.google.com/googleplay/android-developer/answer/6048248?hl=en>
 
 **注意事项：**
@@ -67,7 +67,7 @@ Unity 3D：<Data field="sdk.2.version"/><br/>
 1. 不建议添加模拟器设备，部分品牌的模拟器添加后，会导致所有使用该模拟器的设备都会被加入白名单。
 2. 设备加入白名单后，仅对当前项目生效。
 3. 设备从白名单内移除后，后续数据将传递在首次激活的设备号上。
-4. 安卓端扫码添加设备时，暂时只支持扫描二维码后录入Android ID 和 Google ID。
+4. 安卓端扫码添加设备时，暂时只支持扫描二维码后录入 Android ID 和 Google ID。
 
 如果需要帮助，请联系我们的技术支持
 QQ：<Data field="tapdb.support.QQ"/>

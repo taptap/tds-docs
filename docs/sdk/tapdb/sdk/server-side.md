@@ -68,7 +68,7 @@ sidebar_position: 6
 
 ### 2.1.上报在线人数 {#report-online}
 
-由于SDK无法推送准确的在线数据，这里提供服务端在线数据推送接口。游戏服务端可以每隔5分钟自行统计在线人数，通过接口推送到TapDB。TapDB进行数据汇总展现。
+由于 SDK 无法推送准确的在线数据，这里提供服务端在线数据推送接口。游戏服务端可以每隔 5 分钟自行统计在线人数，通过接口推送到 TapDB。TapDB 进行数据汇总展现。
 
 *注意：在线人数使用 json 格式上报，这与其他通用事件上报的格式有差别，请注意区分。*
 
@@ -111,7 +111,7 @@ sidebar_position: 6
 }
 ```
 
-成功判断：返回的HTTP Code为200时认为发送成功，否则认为失败
+成功判断：返回的 HTTP Code 为 200 时认为发送成功，否则认为失败
 
 ### 2.2.上报充值记录
 
@@ -150,4 +150,4 @@ sidebar_position: 6
 
 `%7B%22module%22:%22GameAnalysis%22,%22name%22:%22charge%22,%22index%22:%22abcd1234%22,%22identify%22:%22user_id%22,%22properties%22:%7B%22order_id%22:%22100000%22,%22amount%22:100,%22virtual_currency_amount%22:100,%22currency_type%22:%22CNY%22,%22product%22:%22item1%22,%22payment%22:%22alipay%22%7D%7D`
 
-成功判断：返回的HTTP Code为200时认为发送成功，否则认为失败。
+成功判断：返回的 HTTP Code 为 200 时认为发送成功，否则认为失败。
