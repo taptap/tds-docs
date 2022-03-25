@@ -7,7 +7,7 @@ const config = {
   title: "TapTap 开发者文档",
   url: "https://developer.taptap.com",
   baseUrl: PREVIEW === "true" ? "/" : "/docs/",
-  onBrokenLinks: "throw",
+  onBrokenLinks: "warn",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
   organizationName: "taptap",
