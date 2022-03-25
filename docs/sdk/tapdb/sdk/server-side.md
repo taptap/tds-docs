@@ -18,9 +18,9 @@ sidebar_position: 6
 
 ### 1.2.上报内容
 
-首先请按照数据规则构造 json 字符串，例如
+首先请按照数据规则构造 json 字符串，例如：
 
-```
+```json
 {
     "index": "test_appid",
     "device_id": "test_device_id",
@@ -96,18 +96,18 @@ sidebar_position: 6
 
 示例：
 
-```
+```json
 {
-"appid":"gkjasd13bbsa1sdk",
-"onlines":[{
-  "server":"s1",
-  "online":123,
-  "timestamp":1489739590
-},{
-  "server":"s2",
-  "online":188,
-  "timestamp":1489739560
-}]
+    "appid":"gkjasd13bbsa1sdk",
+    "onlines":[{
+      "server":"s1",
+      "online":123,
+      "timestamp":1489739590
+    },{
+      "server":"s2",
+      "online":188,
+      "timestamp":1489739560
+    }]
 }
 ```
 
@@ -123,7 +123,7 @@ sidebar_position: 6
 
 内容（注意后面还需要处理一下）：
 
-```
+```js
 {
   "module": "GameAnalysis", // 固定参数
   "ip": "8.8.8.8", // 可选。充值用户的IP

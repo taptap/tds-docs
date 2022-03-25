@@ -57,13 +57,13 @@ sidebar_position: 5
 
 **注意：Unity TapDB SDK 中的 iOS SDK 默认不会收集广告标识符（IDFA），若需要对 IDFA 进行收集，请在初始化前调用以下接口并在 `info.plist` 中配置 `NSUserTrackingUsageDescription` 及描述文案，如「请允许 xxx 获取并使用你的 IDFA ，来为你提供更好的服务。」**
 
-```
+```objc
 TapDB.enableAdvertiserIDCollection(true);
 ```
 
 初始化 TapDB SDK 并上报一个设备登录（ `device_login` ）事件，调用这个接口是使用其它接口的先决条件，需要尽早调用。
 
-```
+```cs
 public static void onStart(string appId, string channel, string gameVersion);
 public static void onStartWithProperties(string appId, string channel, string gameVersion,Dictionary<string, object> properties)
 ```
@@ -81,21 +81,21 @@ public static void onStartWithProperties(string appId, string channel, string ga
 
 当用户进行账号登录时，可调用设置账号 ID （ `setUser` ）接口在记录该账号 ID。调用后会上报一个账号登录（ `user_login` ）事件，并将这个设备的是否有用户注册过 （ `has_user` ） 属性置为 `true`。在重启应用或调用清除账号 ID （ `clearUser` ） 前，上报的事件都会带有该账号 ID。
 
-```
+```cs
 public static void setUser(string userId)
 public static void setUserWithProperties(string userId,Dictionary<string, object> properties)
 ```
 
 | 字段         | 可为空 | 说明                                                                |
 | ---------- | --- | ----------------------------------------------------------------- |
-| userId     | 否   | 长度大于 0 并小于等于 256。只能包含数字、大小写字母、下划线（_）、横线（-），用户 ID。不同用户需要保证 ID 的唯一性 |
+| userId     | 否   | 长度大于 0 并小于等于 256。只能包含数字、大小写字母、下划线（`_`）、横线（`-`），用户 ID。不同用户需要保证 ID 的唯一性 |
 | properties | 是   | 账号登录（ `user_login` ）的事件属性                                         |
 
 ### 2.2.清除账号 ID
 
 当用户进行登出时，可调用 clearUser 清除当前 SDK 中保存账号 ID，后续上报的事件将不会带有账号 ID，调用该接口不会上报任何事件。
 
-```
+```cs
 public static void clearUser()
 ```
 
@@ -103,7 +103,7 @@ public static void clearUser()
 
 在用户进行账号登录后，可调用该接口设置该账号的名称，调用后将更新账号的账号名称（ `user_name` ）属性。
 
-```
+```cs
 public static void setName(string name)
 ```
 
@@ -115,7 +115,7 @@ public static void setName(string name)
 
 在用户进行账号登录后，可调用该接口设置该账号的等级，调用将更新账号的账号等级（ `level` ）属性。
 
-```
+```cs
 public static void setLevel(int level)
 ```
 
@@ -127,7 +127,7 @@ public static void setLevel(int level)
 
 在用户进行账号登录后，可调用该接口设置该账号的区服信息，调用将初始化账号的首次区服（ `first_server` ）属性、更新账号的当前区服（ `current_server` ）属性。
 
-```
+```cs
 public static void setServer(string server)
 ```
 
@@ -139,16 +139,16 @@ public static void setServer(string server)
 
 在用户进行充值后，可调用该接口上报充值信息，调用后将上报 `charge` 事件，并将传入的参数作为事件的属性。
 
-```
+```cs
 public static void onChargeSuccess(string orderId, string product, Int32 amount, string currencyType, string payment)
 ```
 
 | 字段           | 可为空 | 说明                            |
-| ------------ | --- | ----------------------------- |
+| ------------ | --- |-------------------------------|
 | orderId      | 否   | 订单 ID                         |
 | product      | 是   | 产品名称                          |
 | amount       | 否   | 充值金额（单位分，即无论什么币种，都需要乘以 100）   |
-| currencyType | 是   | 货币类型，参考：人民币 CNY，美元 USD；欧元 EUR |
+| currencyType | 是   | 货币类型，参考：人民币 CNY，美元 USD，欧元 EUR |
 | payment      | 是   | 支付方式，如：支付宝                    |
 | properties   | 是   | 充值（ `charge` ）的事件属性           |
 
@@ -160,7 +160,7 @@ public static void onChargeSuccess(string orderId, string product, Int32 amount,
 
 在 SDK 初始化完成后可使用该接口上报事件
 
-```
+```cs
 public static void trackEvent(string eventName, Dictionary<string, object> properties)
 ```
 
@@ -183,7 +183,7 @@ public static void trackEvent(string eventName, Dictionary<string, object> prope
 
 **添加静态通用事件属性**
 
-```
+```cs
 public static void registerStaticProperties(Dictionary<string, object> properties)
 ```
 
@@ -193,7 +193,7 @@ public static void registerStaticProperties(Dictionary<string, object> propertie
 
 示例：
 
-```
+```cs
 //当设置了静态通用事件属性 #current_channel，值固定为 TapDB 后
 Dictionary<string, object> properties = new Dictionary<string, object>();
 properties.Add("#current_channel", "TapDB");
@@ -212,7 +212,7 @@ TapDB.trackEvent("#customEventName", custom);
 
 **删除单个静态通用事件属性**
 
-```
+```cs
 public static void unregisterStaticProperty(string propertyName)
 ```
 
@@ -222,7 +222,7 @@ public static void unregisterStaticProperty(string propertyName)
 
 **清空全部静态通用属性**
 
-```
+```cs
 public static void clearStaticProperties()
 ```
 
@@ -242,7 +242,7 @@ TapDB 支持两种用户模型：设备和账号，你可以通过如下接口�
 
 对于常规的用设备属性，可使用改接口进行赋值操作，新的属性值将会直接覆盖旧的属性值
 
-```
+```cs
 public static void deviceUpdate(Dictionary<string, object> properties)
 ```
 
@@ -252,7 +252,7 @@ public static void deviceUpdate(Dictionary<string, object> properties)
 
 例如:
 
-```
+```cs
 Dictionary<string, object> properties = new Dictionary<string, object>();
 properties.Add("currentPoints", 10);
 TapDB.deviceUpdate(properties);
@@ -268,7 +268,7 @@ TapDB.deviceUpdate(properties);
 
 对于需要保证只有首次设置时有效的属性，可以使用该接口进行赋值操作，仅当前值为空时赋值操作才会生效，如当前值不为空，则赋值操作会被忽略。
 
-```
+```cs
 public static void deviceInitialize(Dictionary<string, object> properties)
 ```
 
@@ -279,7 +279,7 @@ public static void deviceInitialize(Dictionary<string, object> properties)
 例如：
 记录用户首次登录的区服，客户端无法得知该属性是否已经被设置过，使用该接口保证仅第一次的设置会生效。
 
-```
+```cs
 Dictionary<string, object> properties = new Dictionary<string, object>();
 properties.Add("firstActiveServer", "server1");
 TapDB.deviceInitialize(properties);
@@ -295,7 +295,7 @@ TapDB.deviceInitialize(properties);
 
 对于数值类型的属性，可以使用该接口进行累加操作，调用后 TapDB 将对原属性值进行累加后保存结果值
 
-```
+```cs
 public static void deviceAdd(Dictionary<string, object> properties)
 ```
 
@@ -305,7 +305,7 @@ public static void deviceAdd(Dictionary<string, object> properties)
 
 例如：
 
-```
+```cs
 Dictionary<string, object> properties = new Dictionary<string, object>();
 properties.Add("totalPoints", 10);
 TapDB.deviceInitialize(properties);
@@ -322,13 +322,13 @@ TapDB.deviceInitialize(properties);
 
 使用方法同设备属性更新操作
 
-```
+```cs
 public static void userUpdate(Dictionary<string, object> properties)
 ```
 
 **账号属性初始化操作**
 
-```
+```cs
 public static void userInitialize(Dictionary<string, object> properties)
 ```
 
@@ -336,6 +336,6 @@ public static void userInitialize(Dictionary<string, object> properties)
 
 使用方法同设备属性累加操作
 
-```
+```cs
 public static void userAdd(Dictionary<string, object> properties)
 ```

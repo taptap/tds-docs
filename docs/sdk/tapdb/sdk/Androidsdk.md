@@ -177,7 +177,7 @@ public static void registerStaticProperties(final JSONObject staticProperties)
 //当设置了静态通用事件属性 #current_channel，值固定为 TapDB 后
 JSONObject commonProperties = new JSONObject();
 commonProperties.put("#current_channel", "TapDB");
-TapDB.registerStaticProperties(properties);
+TapDB.registerStaticProperties(commonProperties);
 
 
 //使用事件上报时
@@ -246,7 +246,7 @@ TapDB 支持两种用户模型：设备和账号，你可以通过如下接口�
 
 **设备属性更新操作**
 
-对于常规的用设备属性，可使用改接口进行赋值操作，新的属性值将会直接覆盖旧的属性值
+对于常规的用设备属性，可使用该接口进行赋值操作，新的属性值将会直接覆盖旧的属性值
 
 ```java
 public static void deviceUpdate(final JSONObject properties)
