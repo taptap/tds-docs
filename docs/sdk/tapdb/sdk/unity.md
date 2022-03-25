@@ -277,7 +277,7 @@ public static void deviceInitialize(Dictionary<string, object> properties)
 | properties | 否   | 属性字典 |
 
 例如：
-记录用户首次登陆的区服，客户端无法得知该属性是否已经被设置过，使用该接口保证仅第一次的设置会生效。
+记录用户首次登录的区服，客户端无法得知该属性是否已经被设置过，使用该接口保证仅第一次的设置会生效。
 
 ```
 Dictionary<string, object> properties = new Dictionary<string, object>();

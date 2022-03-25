@@ -64,9 +64,9 @@ iOS：获取或生成好的设备 ID 保存于设备的钥匙串中，可以保�
 | dvau_device | App 当日首次启动（按版本） | App 的不同版本在每日首次上报 `device_login` 时触发，可用于快速查询分版本的设备 DAU |
 | wau_device  | App 当周首次启动      | App 在每周首次上报 `device_login` 时触发，可用于快速查询设备 WAU          |
 | mau_device  | App 当月首次启动      | App 在每月首次上报 `device_login` 时触发，可用于快速查询设备 MAU          |
-| dau_user    | 账号当日首次登陆        | 账号每日首次上报 `user_login` 时触发，可用于快速查询账号 DAU               |
-| wau_user    | 账号当周首次登陆        | 账号每周首次上报 `user_login` 时触发，可用于快速查询账号 WAU               |
-| mau_user    | 账号当月首次登陆        | 账号每月首次上报 `user_login` 时触发，可用于快速查询账号 MAU               |
+| dau_user    | 账号当日首次登录        | 账号每日首次上报 `user_login` 时触发，可用于快速查询账号 DAU               |
+| wau_user    | 账号当周首次登录        | 账号每周首次上报 `user_login` 时触发，可用于快速查询账号 WAU               |
+| mau_user    | 账号当月首次登录        | 账号每月首次上报 `user_login` 时触发，可用于快速查询账号 MAU               |
 
 ### 自定义事件
 
