@@ -45,7 +45,7 @@ sidebar_position: 14
 
 分群主体为账号的分群：
 
-```
+```sql
 select
     user_id
 from hive.tapdb.view_{{项目 ID}}_cluster
@@ -54,7 +54,7 @@ where cluster_name = ‘{{cluster_name}}’
 
 分群主体为设备的分群：
 
-```
+```sql
 select
     device_id
 from hive.tapdb.view_{{项目 ID}}_cluster
@@ -82,7 +82,7 @@ TapDB 采用 Presto 查询引擎，适用标准 SQL 语法，但仅可以使用 
 
 建议使用以下类型的分区限制条件：
 
-```
+```sql
 "$part_date" = '2021-11-01'
 "$part_date" in ('2021-11-01', '2021-11-02, '2021-11-03')
 "$part_date" between '2021-11-01' and '2021-11-11'
@@ -92,7 +92,7 @@ SQL 查询功能默认按照东 8 区对时间类型的字段进行转化展示�
 
 若项目不处于东 8 区，则可使用时间函数对其进行转化：
 
-```
+```sql
 format_datetime("time" at time zone 'America/Chicago', 'yyyy-MM-dd')
 ```
 
@@ -206,22 +206,22 @@ Ctrl + Y：恢复上一步操作
 
 导出用户表或事件表，如导出近 7 日用户的所有事件日志：
 
-```
+```sql
 select
     *
 from hive.tapdb.view_{{项目 ID}}_events
-where 「$part_date」 between ‘2021-11-05’ and ‘2021-11-11’
+where "$part_date" between '2021-11-05' and '2021-11-11'
 ```
 
 ### 6.2 数据清洗与提取
 
 提取复杂字段，如：url、json、map 中的关键信息，如提取 url 中后 10 位数字的商品 ID：
 
-```
+```sql
 select
     substring("#url", -10) as product_id
 from hive.tapdb.view_{{项目 ID}}_events
-where 「$part_date」 between ‘2021-11-05’ and ‘2021-11-11’
+where "$part_date" between '2021-11-05' and '2021-11-11'
 ```
 
 ### 6.3 个性化取数与分析
