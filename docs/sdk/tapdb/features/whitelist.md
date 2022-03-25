@@ -6,15 +6,19 @@ hide_table_of_contents: false
 sidebar_position: 5
 ---
 
+import sdkVersions from '/src/docComponents/sdkVersions';
+
 「测试设备」是应用 SDK 接入测试、渠道后台联调测试等场景下的白名单功能，可以帮助你更加便捷的进行激活联调测试，避免手动清除激活或者寻找新设备的不便。
 
 ## 1. 接入最新的 SDK
 
 白名单功能需要接入最新的 TapDB SDK，具体版本号如下：
 
-iOS：<Data field="sdk.0.version"/><br/>
-Android：<Data field="sdk.1.version"/><br/>
-Unity 3D：<Data field="sdk.2.version"/><br/>
+<>
+iOS：v{sdkVersions.tapdb.ios}<br />
+Android：v{sdkVersions.tapdb.android}<br />
+Unity 3D：v{sdkVersions.tapdb.unity}<br />
+</><br />
 
 [下载 SDK](/sdk/tapdb/download.md)
 
@@ -70,5 +74,5 @@ Unity 3D：<Data field="sdk.2.version"/><br/>
 4. 安卓端扫码添加设备时，暂时只支持扫描二维码后录入 Android ID 和 Google ID。
 
 如果需要帮助，请联系我们的技术支持
-QQ：<Data field="tapdb.support.QQ"/>
+QQ：3171097571
 邮件：support@tapdb.com
