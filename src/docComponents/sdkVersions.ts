@@ -3,7 +3,7 @@ const sdkVersions = {
     unity: "3.6.3",
     android: "3.6.3",
     ios: "3.6.3",
-    anti_addiction: "1.1.0",
+    anti_addiction: "1.2.0",
     rtc: "1.1.0",
   },
   tapdb: {
@@ -19,7 +19,7 @@ const sdkVersions = {
       realtime: "5.0.0-rc.7",
     },
     java: "8.2.5",
-    csharp: "0.10.2",
+    csharp: "0.10.6",
   },
 };
 

@@ -1,0 +1,168 @@
+---
+title: Copyright Verification
+sidebar_label: Guide
+sidebar_position: 2
+---
+
+import { Conditional } from "/src/docComponents/conditional";
+import MultiLang from "/src/docComponents/MultiLang";
+import CodeBlock from "@theme/CodeBlock";
+import sdkVersions from "/src/docComponents/sdkVersions";
+import AndroidFaq from "../_partials/android-package-visibility.mdx";
+
+If you ever thought about selling your game online, you probably have worried if the players could bypass the legitimate process of paying for your game and download copies of your game from unauthorized sources like piracy websites. Luckily, TapTap offers an easy-to-use Copyright Verification SDK that lets you perform a quick license check when a player opens your game for the first time. If the player opens your game without purchasing it beforehand, the SDK will guide the player to make a purchase. This ensures that a player who didn’t purchase your game won’t be able to enter the game even if they managed to obtain a copy of the game.
+
+## Installing SDK
+
+You can download the SDK from the [Downloads](/tap-download) page. Once you have the SDK on your computer, add them to your project:
+
+<MultiLang>
+
+<>
+
+You can add the SDK **either manually or with the Unity Package Manger**. If you choose to use the Unity Package Manger, you should add the following dependencies into `Packages/manifest.json`:
+
+<CodeBlock className="json">
+  {`"dependencies":{
+    // Common library
+    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+    // DLC
+    "com.taptap.tds.dlc": "https://github.com/TapTap/TapLicense-Unity.git#${sdkVersions.taptap.unity}",
+}`}
+</CodeBlock>
+
+</>
+
+<>
+
+Put the SDK into `project/app/libs` and then add the following lines into `project/app/build.gradle`:
+
+<CodeBlock className="groovy">
+  {`repositories{
+    flatDir {  
+        dirs 'libs'  
+    }  
+}  
+dependencies {
+    implementation name:'TapCommon_${sdkVersions.taptap.android}', ext:'aar'
+    implementation name:'TapLicense_${sdkVersions.taptap.android}', ext:'aar'
+}`}
+</CodeBlock>
+
+</>
+
+<>
+
+```objc
+// Not supported yet
+```
+
+</>
+
+</MultiLang>
+
+## Set Up Authorization Callback
+
+<MultiLang>
+
+```cs
+// The `License` library (required)
+using TapTap.License;
+
+// By default, the SDK will display a window
+// that can’t be closed manually by the player to avoid unauthorized players from entering the game.
+// If you want to use a callback to trigger a customized procedure,
+// please add the following code.
+TapLicense.SetLicencesCallback(ITapLicenseCallback callback);
+
+public interface ITapLicenseCallback
+{
+    // Authorization success callback
+    void OnLicenseSuccess();
+}
+```
+
+```java
+// By default, the SDK will display a window
+// that can’t be closed manually by the player to avoid unauthorized players from entering the game.
+// If you want to use a callback to trigger a customized procedure,
+// please add the following code.
+TapLicenseHelper.setLicenseCallback(new TapLicenseCallback() {
+    @Override
+    public void onLicenseSuccess() {
+        // Authorization success callback
+    }
+});
+```
+
+```objc
+// Not supported yet
+```
+
+</MultiLang>
+
+## Payment and Authorization Verification
+
+<MultiLang>
+
+```cs
+TapLicense.Check();
+```
+
+```java
+TapLicenseHelper.check(Activity activity);
+```
+
+```objc
+// Not supported yet
+```
+
+</MultiLang>
+
+## Testing
+
+To ensure that the game can determine whether a player has a valid purchase after it has been released, **please follow the instructions below to complete a self-testing.**
+
+### 1. Upload the APK
+
+Open your game in the Developer Center and go to **Game Services > Gaming Ecosystem > Copyright Verification > Package Name**.
+
+Here you can upload the APK to be tested. Once you upload the APK, please wait for the review process to be completed.
+
+### 2. Add Test Accounts
+
+Go to **Developer Center > Game Services > Gaming Ecosystem > Copyright Verification > Game Configuration > Manage testers** and enter the test accounts’ TapTap IDs.
+
+### 3. Price Settings
+
+You can set a price for your game by going to **Developer Center > Store > Price Settings**. For testing purposes, you can set the price to $0.01. Once you set the price, please wait for the review process to be completed.
+
+### 4. Begin the Test
+
+Now you can open the TapTap app on your device and log in with a test account. Start the testing process from the store page of the app.
+
+You can make a purchase of the game with the test account and then download and enter the game.
+
+If you install the game with the APK without having the test account purchase the game first, there will be a pop-up when you open the game. The pop-up will say that the game is not activated and you should purchase the game from TapTap.
+
+## Start Selling Your Game
+
+Once you finish the testing process, you’ll be ready to sell your game.
+
+### 1. Complete Information
+
+Go to the Developer Center, fill in the information according to the [Material Requirements](/store/store-material/), and submit your game for review.
+
+### 2. Set Up Pricing
+
+Go to **Developer Center > Store > Price Settings**, make your game a paid game, set a price for your game, and submit the information for review. Don’t forget to update the TapTap operation staff on your progress.
+
+### 3. Official Release
+
+After completing the steps above, your game will be ready for the <Conditional region="cn">[official release](/store/store-release/)</Conditional><Conditional region="global">[official release](/store/store-publish-game)</Conditional>.
+
+## FAQ
+
+### The TapTap app cannot be launched from the game on Android 11. Why?
+
+<AndroidFaq />

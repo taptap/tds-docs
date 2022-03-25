@@ -5,6 +5,7 @@ import Head from "@docusaurus/Head";
 import Translate from "@docusaurus/Translate";
 import { useHistory } from "@docusaurus/router";
 import axios from "axios";
+import { v4 as uuidv4 } from "uuid";
 
 import Input from "./components/Input";
 import Content from "./components/Content";
@@ -62,6 +63,10 @@ const getUpdatedRecentHits = (
 
 const useSearch = (url: string, locale: string) => {
   interface SearchRequestConfig {
+    headers: {
+      "X-TDS-Doc-Search-Session": string;
+      "X-TDS-Doc-Search-Sequence": number;
+    };
     params: {
       q: string;
       locale: string;
@@ -100,6 +105,7 @@ const useSearch = (url: string, locale: string) => {
     return groupedHits;
   };
 
+  const [session] = useState<string>(uuidv4);
   const [query, setQuery] = useState<string>("");
   const [groupedHits, setGroupedHits] = useState<null | HitGroupWithTitle[]>(
     null
@@ -113,7 +119,12 @@ const useSearch = (url: string, locale: string) => {
       query: string,
       locale: string
     ): Promise<HitItem[]> => {
+      const sequence: number = Date.now();
       const config: SearchRequestConfig = {
+        headers: {
+          "X-TDS-Doc-Search-Session": session,
+          "X-TDS-Doc-Search-Sequence": sequence,
+        },
         params: { q: query, locale },
       };
       const {
@@ -139,7 +150,7 @@ const useSearch = (url: string, locale: string) => {
     return () => {
       ignore = true;
     };
-  }, [query]);
+  }, [session, query]);
 
   return [query, setQuery, groupedHits] as const;
 };
