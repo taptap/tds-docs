@@ -86,10 +86,10 @@ public static void setUser(string userId)
 public static void setUserWithProperties(string userId,Dictionary<string, object> properties)
 ```
 
-| 字段         | 可为空 | 说明                                                                |
-| ---------- | --- | ----------------------------------------------------------------- |
+| 字段         | 可为空 | 说明                                                                    |
+| ---------- | --- | --------------------------------------------------------------------- |
 | userId     | 否   | 长度大于 0 并小于等于 256。只能包含数字、大小写字母、下划线（`_`）、横线（`-`），用户 ID。不同用户需要保证 ID 的唯一性 |
-| properties | 是   | 账号登录（ `user_login` ）的事件属性                                         |
+| properties | 是   | 账号登录（ `user_login` ）的事件属性                                             |
 
 ### 2.2.清除账号 ID
 
@@ -144,7 +144,7 @@ public static void onChargeSuccess(string orderId, string product, Int32 amount,
 ```
 
 | 字段           | 可为空 | 说明                            |
-| ------------ | --- |-------------------------------|
+| ------------ | --- | ----------------------------- |
 | orderId      | 否   | 订单 ID                         |
 | product      | 是   | 产品名称                          |
 | amount       | 否   | 充值金额（单位分，即无论什么币种，都需要乘以 100）   |
