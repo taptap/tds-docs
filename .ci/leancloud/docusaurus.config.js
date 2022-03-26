@@ -7,7 +7,7 @@ const config = {
   title: "LeanCloud 开发者文档",
   url: "https://docs.leancloud.cn",
   baseUrl: "/",
-  onBrokenLinks: "warn",
+  onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/lc-favicon.ico",
   organizationName: "taptap",

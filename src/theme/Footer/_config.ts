@@ -59,10 +59,6 @@ export const getNavLinks = (
       label: "隐私政策",
       url: "https://www.taptap.io/privacy-policy",
     },
-    {
-      label: "侵权投诉",
-      url: "https://www.taptap.com/doc/27",
-    },
   ];
 
   const NAV_LINKS_LEANCLOUD_CN: (NavLinkInternal | NavLinkExternal)[] = [
