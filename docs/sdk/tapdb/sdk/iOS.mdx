@@ -1,29 +1,21 @@
 ---
-title: Unity SDK 文档
-sidebar_position: 5
+title: iOS SDK 文档
+sidebar_position: 3
 ---
 
 ## 1.SDK 集成
 
 ### 1.1.系统要求
 
-适用于 Unity 开发的游戏，支持 .NET 3.x 及以上、Android 5.0 及以上的系统版本、iOS 9.0 及以上的系统版本。
-
-**Unity SDK 中包含的 Android SDK 目前没有使用到 API 19 以上的特性，可以在 AndroidManifest 中添加 `<uses-sdk tools:overrideLibrary="com.tds.tapdb"/>` 覆盖 minSdkVersion，但仍然建议尽快提高 minSdkVersion 到 20 以上。**
+适用于 iOS 9.0 及以上的系统版本。
 
 ### 1.2.导入 SDK
 
-请 [下载最新的 SDK](/sdk/tapdb/download.md)，将 TapDB.unitypackage 导入到 Unity 工程中。
+请 [下载最新的 SDK](/sdk/tapdb/download)，将 TapDB.framework 导入到 Xcode 工程中。
 
-**注意：Unity SDK 中的 Android TapDB SDK 支持获取 OAID （需要手动添加 OAID 的 SDK），使归因更加精准**
+### 1.3.添加依赖
 
-当前支持 OAID SDK 1.0.5 ~ 1.0.25 版本，当集成 OAID SDK 后，TapDB SDK 会自动获取 OAID 并进行上报。OAID SDK 可以自行从 OAID 官网下载，也可以从此处下载 [OAID 1.0.25](https://res.xdcdn.net/tapdb/Android/oaid/oaid_sdk_1.0.25.aar)。
-
-### 1.3.各平台配置
-
-**iOS 添加依赖**
-
-需要为导出的 Xcode 工程引入下列依赖的框架或库
+需要为 Xcode 工程引入下列依赖的框架或库
 
 | 名词                                | 含义                                                | 备注       |
 | --------------------------------- | ------------------------------------------------- | -------- |
@@ -39,40 +31,32 @@ sidebar_position: 5
 | libz.tbd                          |                                                   |          |
 | libsqlite3.0.tbd                  |                                                   |          |
 
+### 1.4.编译配置
+
 在 `Build Settings` 中的 `link` -> `Other Linker Flags` 中加入： `-ObjC`
-
-**Android 配置 AndroidManifest.xml 权限**
-
-```xml
-<!--必选权限-->
-<uses-permission android:name="android.permission.INTERNET" />
-<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
-<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-
-<!--强烈建议 sdk 获取 IMEI 时会需要此权限；获取不到不影响功能正常使用，IMEI 用于辅助数据分析、广告归因，使统计结果更加精确--> 
-<uses-permission android:name="android.permission.READ_PHONE_STATE" />
-```
 
 ### 1.4.初始化
 
-**注意：Unity TapDB SDK 中的 iOS SDK 默认不会收集广告标识符（IDFA），若需要对 IDFA 进行收集，请在初始化前调用以下接口并在 `info.plist` 中配置 `NSUserTrackingUsageDescription` 及描述文案，如「请允许 xxx 获取并使用你的 IDFA ，来为你提供更好的服务。」**
+**注意：SDK 默认不会收集广告标识符（IDFA），若需要对 IDFA 进行收集，请在初始化前调用以下接口并在 `info.plist` 中配置 `NSUserTrackingUsageDescription` 及描述文案，如「请允许 xxx 获取并使用你的 IDFA ，来为你提供更好的服务。」**
 
 ```objc
-TapDB.enableAdvertiserIDCollection(true);
+[TapDB setAdvertiserIDCollectionEnabled:YES];
 ```
 
 初始化 TapDB SDK 并上报一个设备登录（ `device_login` ）事件，调用这个接口是使用其它接口的先决条件，需要尽早调用。
+一般建议在 AppDelegate 的 `application:didFinishLaunchingWithOptions:` 中调用。
 
-```cs
-public static void onStart(string appId, string channel, string gameVersion);
-public static void onStartWithProperties(string appId, string channel, string gameVersion,Dictionary<string, object> properties)
+```objc
++ (void)onStart:(NSString *)appId channel:(nullable NSString *)channel version:(nullable NSString *)gameVersion;
+
++ (void)onStart:(NSString *)appId channel:(nullable NSString *)channel version:(nullable NSString *)gameVersion properties:(nullable NSDictionary *)properties;
 ```
 
 | 字段         | 可为空 | 说明                                                                 |
 | ---------- | --- | ------------------------------------------------------------------ |
 | appId      | 否   | 创建游戏时获得的 APPID                                                     |
 | channel    | 是   | 分包渠道                                                               |
-| version    | 是   | 游戏版本，为空时，自动获取游戏安装包的版本                                              |
+| version    | 是   | 游戏版本，为空时，自动获取游戏安装包的版本（ Xcode 配置中的 Version ）                        |
 | properties | 是   | 设备登录（ `device_login` ）的事件属性，可以传入预置属性覆盖 SDK 的默认取值，也可以传入在后台配置过的自定义属性 |
 
 ## 2.设置账号
@@ -81,9 +65,10 @@ public static void onStartWithProperties(string appId, string channel, string ga
 
 当用户进行账号登录时，可调用设置账号 ID （ `setUser` ）接口在记录该账号 ID。调用后会上报一个账号登录（ `user_login` ）事件，并将这个设备的是否有用户注册过 （ `has_user` ） 属性置为 `true`。在重启应用或调用清除账号 ID （ `clearUser` ） 前，上报的事件都会带有该账号 ID。
 
-```cs
-public static void setUser(string userId)
-public static void setUserWithProperties(string userId,Dictionary<string, object> properties)
+```objc
++ (void)setUser:(NSString *)userId;
+
++ (void)setUser:(NSString *)userId properties:(nullable NSDictionary *)properties;
 ```
 
 | 字段         | 可为空 | 说明                                                                    |
@@ -93,18 +78,18 @@ public static void setUserWithProperties(string userId,Dictionary<string, object
 
 ### 2.2.清除账号 ID
 
-当用户进行登出时，可调用 clearUser 清除当前 SDK 中保存账号 ID，后续上报的事件将不会带有账号 ID，调用该接口不会上报任何事件。
+当用户进行登出时，可调用 clearUser 清除当前 SDK 中保存的账号 ID，后续上报的事件将不会带有账号 ID，调用该接口不会上报任何事件。
 
-```cs
-public static void clearUser()
+```objc
++ (void)clearUser;
 ```
 
 ### 2.3.设置账号名称
 
 在用户进行账号登录后，可调用该接口设置该账号的名称，调用后将更新账号的账号名称（ `user_name` ）属性。
 
-```cs
-public static void setName(string name)
+```objc
++ (void)setName:(NSString *)name;
 ```
 
 | 字段   | 可为空 | 说明                   |
@@ -115,8 +100,8 @@ public static void setName(string name)
 
 在用户进行账号登录后，可调用该接口设置该账号的等级，调用将更新账号的账号等级（ `level` ）属性。
 
-```cs
-public static void setLevel(int level)
+```objc
++ (void)setLevel:(NSInteger)level;
 ```
 
 | 字段    | 可为空 | 说明   |
@@ -127,8 +112,8 @@ public static void setLevel(int level)
 
 在用户进行账号登录后，可调用该接口设置该账号的区服信息，调用将初始化账号的首次区服（ `first_server` ）属性、更新账号的当前区服（ `current_server` ）属性。
 
-```cs
-public static void setServer(string server)
+```objc
++ (void)setServer:(NSString *)server;
 ```
 
 | 字段     | 可为空 | 说明    |
@@ -139,8 +124,10 @@ public static void setServer(string server)
 
 在用户进行充值后，可调用该接口上报充值信息，调用后将上报 `charge` 事件，并将传入的参数作为事件的属性。
 
-```cs
-public static void onChargeSuccess(string orderId, string product, Int32 amount, string currencyType, string payment)
+```objc
++ (void)onChargeSuccess:(NSString *)orderId product:(NSString *)product amount:(NSInteger)amount currencyType:(NSString *)currencyType payment:(NSString *)payment;
+
++ (void)onChargeSuccess:(NSString *)orderId product:(NSString *)product amount:(NSInteger)amount currencyType:(NSString *)currencyType payment:(NSString *)payment properties:(NSDictionary *)properties;
 ```
 
 | 字段           | 可为空 | 说明                            |
@@ -148,7 +135,7 @@ public static void onChargeSuccess(string orderId, string product, Int32 amount,
 | orderId      | 否   | 订单 ID                         |
 | product      | 是   | 产品名称                          |
 | amount       | 否   | 充值金额（单位分，即无论什么币种，都需要乘以 100）   |
-| currencyType | 是   | 货币类型，参考：人民币 CNY，美元 USD，欧元 EUR |
+| currencyType | 是   | 货币类型，参考：人民币 CNY，美元 USD；欧元 EUR |
 | payment      | 是   | 支付方式，如：支付宝                    |
 | properties   | 是   | 充值（ `charge` ）的事件属性           |
 
@@ -160,8 +147,8 @@ public static void onChargeSuccess(string orderId, string product, Int32 amount,
 
 在 SDK 初始化完成后可使用该接口上报事件
 
-```cs
-public static void trackEvent(string eventName, Dictionary<string, object> properties)
+```objc
+ + (void)trackEvent:(NSString *)eventName properties:(NSDictionary *)properties;
 ```
 
 | 字段         | 可为空 | 说明    |
@@ -172,8 +159,8 @@ public static void trackEvent(string eventName, Dictionary<string, object> prope
 **注意:**
 
 - 事件名支持上报预置事件和自定义事件，其中自定义事件应以 `#` 开头
-- 事件属性的 key 值为属性的名称，支持 string 类型
-- 事件属性的 value 值为属性的名称，支持 string（ `256` ）、数值（取值区间为 `[-9E15, 9E15]` ）类型
+- 事件属性的 key 值为属性的名称，支持 NSString 类型
+- 事件属性的 value 值为属性的名称，支持 NSString（最大长度 `256` ）、NSNumber（取值区间为 `[-9E15, 9E15]` ）类型
 - 事件属性支持上报预置属性和自定属性，其中自定义属性应以 `#` 开头
 - 事件属性传入预置属性时，SDK 默认采集的预置属性将被覆盖
 
@@ -183,37 +170,34 @@ public static void trackEvent(string eventName, Dictionary<string, object> prope
 
 **添加静态通用事件属性**
 
-```cs
-public static void registerStaticProperties(Dictionary<string, object> properties)
+```objc
++ (void)registerStaticProperties:(NSDictionary *)staticProperties;
 ```
 
-| 字段         | 可为空 | 说明         |
-| ---------- | --- | ---------- |
-| properties | 否   | 静态通用事件属性字典 |
+| 字段               | 可为空 | 说明         |
+| ---------------- | --- | ---------- |
+| staticProperties | 否   | 静态通用事件属性字典 |
 
 示例：
 
-```cs
+```objc
 //当设置了静态通用事件属性 #current_channel，值固定为 TapDB 后
-Dictionary<string, object> properties = new Dictionary<string, object>();
-properties.Add("#current_channel", "TapDB");
-TapDB.registerStaticProperties(properties);
-
+[TapDB registerStaticProperties:@{@"#currentChannel":@"TapDB"}];
 
 //使用事件上报时
 [TapDB trackEvent:@"#customEventName"
                          withProperties:@{@"#customPropertyName":@"customPropertyValue")}];
 
 //等效于在事件属性中添加了 #current_channel，即
-Dictionary<string, object> properties = new Dictionary<string, object>();
-properties.Add("#customPropertyName", "customPropertyValue");
-TapDB.trackEvent("#customEventName", custom);
+[TapDB trackEvent:@"#customEventName"
+withProperties:@{@"#customPropertyName":@"customPropertyValue",
+@"#current_channel":@"TapDB")}];
 ```
 
 **删除单个静态通用事件属性**
 
-```cs
-public static void unregisterStaticProperty(string propertyName)
+```objc
++ (void)unregisterStaticProperty:(NSString *)propertyName;
 ```
 
 | 字段           | 可为空 | 说明      |
@@ -222,13 +206,33 @@ public static void unregisterStaticProperty(string propertyName)
 
 **清空全部静态通用属性**
 
-```cs
-public static void clearStaticProperties()
+```objc
++ (void)clearStaticProperties;
 ```
 
 **注册动态通用事件属性**
 
-Unity SDK 暂不支持
+对于可能随时发生变化的通用事件属性，可以注册动态通用事件属性，`dynamicPropertiesCaculator` 将在每次调用时触发，将计算好的属性添加到本次上报事件属性中。
+
+```objc
++ (void)registerDynamicProperties:(NSDictionary* (^)(void))dynamicPropertiesCaculator;
+```
+
+| 字段                         | 可为空 | 说明           |
+| -------------------------- | --- | ------------ |
+| dynamicPropertiesCaculator | 否   | 动态通用事件属性计算回调 |
+
+示例:
+
+```objc
+//后续上报的事件都将携带 #currentLevel 属性，值为变量 level 在事件上报时刻的值
+
+[TapDB registerDynamicProperties:^NSDictionary *_Nonnull {
+      return @{
+          @"#currentLevel": level
+      };
+  }];
+```
 
 **注意:**
 
@@ -242,8 +246,8 @@ TapDB 支持两种用户模型：设备和账号，你可以通过如下接口�
 
 对于常规的用设备属性，可使用改接口进行赋值操作，新的属性值将会直接覆盖旧的属性值
 
-```cs
-public static void deviceUpdate(Dictionary<string, object> properties)
+```objc
++ (void)deviceUpdate:(NSDictionary *)properties;
 ```
 
 | 字段         | 可为空 | 说明   |
@@ -252,15 +256,11 @@ public static void deviceUpdate(Dictionary<string, object> properties)
 
 例如:
 
-```cs
-Dictionary<string, object> properties = new Dictionary<string, object>();
-properties.Add("currentPoints", 10);
-TapDB.deviceUpdate(properties);
+```objc
+[TapDB deviceUpdate:@{@"#currentPoints":@10}];
 // 此时设备表的 "currentPoints" 字段值为 10
 
-Dictionary<string, object> properties = new Dictionary<string, object>();
-properties.Add("currentPoints", 42);
-TapDB.deviceUpdate(properties);
+[TapDB deviceUpdate:@{@"#currentPoints":@42}];
 // 此时设备表的 "currentPoints" 字段值为 42 
 ```
 
@@ -268,8 +268,8 @@ TapDB.deviceUpdate(properties);
 
 对于需要保证只有首次设置时有效的属性，可以使用该接口进行赋值操作，仅当前值为空时赋值操作才会生效，如当前值不为空，则赋值操作会被忽略。
 
-```cs
-public static void deviceInitialize(Dictionary<string, object> properties)
+```objc
++ (void)deviceInitialize:(NSDictionary *)properties;
 ```
 
 | 字段         | 可为空 | 说明   |
@@ -279,15 +279,11 @@ public static void deviceInitialize(Dictionary<string, object> properties)
 例如：
 记录用户首次登录的区服，客户端无法得知该属性是否已经被设置过，使用该接口保证仅第一次的设置会生效。
 
-```cs
-Dictionary<string, object> properties = new Dictionary<string, object>();
-properties.Add("firstActiveServer", "server1");
-TapDB.deviceInitialize(properties);
+```objc
+[TapDB deviceInitialize:@{@"#firstActiveServer":@"server1"}];
 // 此时设备表的 "#firstActiveServer" 字段值为 "server1"
 
-Dictionary<string, object> properties = new Dictionary<string, object>();
-properties.Add("firstActiveServer", "server2");
-TapDB.deviceInitialize(properties);
+[TapDB deviceInitialize:@{@"#firstActiveServer":@"server2"}];
 // 此时设备表的 "#firstActiveServer" 字段值还是为 "server1" 
 ```
 
@@ -295,47 +291,42 @@ TapDB.deviceInitialize(properties);
 
 对于数值类型的属性，可以使用该接口进行累加操作，调用后 TapDB 将对原属性值进行累加后保存结果值
 
-```cs
-public static void deviceAdd(Dictionary<string, object> properties)
+```objc
++ (void)deviceAdd:(NSDictionary *)properties;
 ```
 
-| 字段         | 可为空 | 说明                 |
-| ---------- | --- | ------------------ |
-| properties | 否   | 属性字典，value 仅支持数值类型 |
+| 字段         | 可为空 | 说明                         |
+| ---------- | --- | -------------------------- |
+| properties | 否   | 属性字典，value 仅支持 NSNumber 类型 |
 
 例如：
 
-```cs
-Dictionary<string, object> properties = new Dictionary<string, object>();
-properties.Add("totalPoints", 10);
-TapDB.deviceInitialize(properties);
+```objc
+[TapDB deviceAdd:@{@"totalPoints":@10}];
 // 此时设备表的 "totalPoints" 字段值为 10
 
-Dictionary<string, object> properties = new Dictionary<string, object>();
-properties.Add("totalPoints", -2);
-TapDB.deviceInitialize(properties);
+[TapDB deviceAdd:@{@"totalPoints":@(-2)}];
 // 此时设备表的 "totalPoints" 字段值为 8 
-
 ```
 
 **账号属性更新操作**
 
 使用方法同设备属性更新操作
 
-```cs
-public static void userUpdate(Dictionary<string, object> properties)
+```objc
++ (void)userUpdate:(NSDictionary *)properties;
 ```
 
 **账号属性初始化操作**
 
-```cs
-public static void userInitialize(Dictionary<string, object> properties)
+```objc
++ (void)userInitialize:(NSDictionary *)properties;
 ```
 
 **账号属性累加操作**
 
 使用方法同设备属性累加操作
 
-```cs
-public static void userAdd(Dictionary<string, object> properties)
+```objc
++ (void)userAdd:(NSDictionary *)properties;
 ```
