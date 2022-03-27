@@ -9,7 +9,7 @@ const sdkVersions = {
   tapdb: {
     ios: "3.0.8",
     android: "3.3.0",
-    unity: "3.1.3"
+    unity: "3.1.3",
   },
   leancloud: {
     objc: "13.6.1",
