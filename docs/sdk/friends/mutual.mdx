@@ -47,19 +47,21 @@ TDSFriends.registerFriendStatusChangedListener(new FriendStatusChangedListener()
 
     // 新增好友申请
     @Override
-    public void onNewRequestComing(LCFriendshipRequest request) {}
+    public void onNewRequestComing(TDSFriendshipRequest request) {}
 
-    // 通过分享链接进入游戏 SDK 自动发送好友申请时触发
+    // 通过分享链接进入游戏时触发此回调
+    // 开发者可以在此回调中直接调用 handFriendInvitationLink
+    // 或通过 parseFriendInvitationLink 解析链接，获取相关参数再执行自定义的逻辑 
     @Override
-    public void onSendFriendRequestToSharer(boolean isSuccess, String nickname, TDSFriendError error) {}
+    public void onReceivedInvitationLink(String url) {}
 
     // 已发送的好友申请被接受
     @Override
-    public void onRequestAccepted(LCFriendshipRequest request) {}
+    public void onRequestAccepted(TDSFriendshipRequest request) {}
 
     // 已发送的好友申请被拒绝
     @Override
-    public void onRequestDeclined(LCFriendshipRequest request) {}
+    public void onRequestDeclined(TDSFriendshipRequest request) {}
 
     // 好友上线
     @Override
@@ -94,13 +96,13 @@ TDSFriends.registerFriendStatusChangedListener(new FriendStatusChangedListener()
 - (void)onFriendAdd:(TDSFriendInfo *)info {}
 
 // 新增好友申请
-- (void)onNewRequestComing:(LCFriendshipRequest *)request {}
+- (void)onNewRequestComing:(TDSFriendshipRequest *)request {}
 
 // 已发送的好友申请被接受
-- (void)onRequestAccepted:(LCFriendshipRequest *)request {}
+- (void)onRequestAccepted:(TDSFriendshipRequest *)request {}
 
 // 已发送的好友申请被拒绝
-- (void)onRequestDeclined:(LCFriendshipRequest *)request {}
+- (void)onRequestDeclined:(TDSFriendshipRequest *)request {}
 
 // 好友上线
 - (void)onFriendOnline:(NSString *)userId {}
@@ -160,15 +162,15 @@ await TDSFriends.Online();
 <>
 
 ```java
-TDSFriends.online(new Callback<Boolean>() {
+TDSFriends.online(new Callback<Void>() {
     @Override
-    public void onSuccess(Boolean ok) {
-        toast("online success");
+    public void onSuccess(Void result) {
+        // 成功
     }
 
     @Override
     public void onFail(TDSFriendError error) {
-        toast("online failure: " + error.detailMessage);
+        // 处理异常
     }
 });
 ```
@@ -321,7 +323,30 @@ callback:^(TDSFriendInfo * _Nullable friendInfo, NSError * _Nullable error) {
 
 </MultiLang>
 
+## 根据 objectId 查询好友
 
+除了昵称、好友码外，还可以根据 objectId 查找好友。
+
+查询 objectId 为 `5b0b97cf06f4fd0abc0abe35` 的好友：
+
+<MultiLang>
+
+```cs
+TDSFriendInfo friendInfo = await TDSFriends.SearchUserById("5b0b97cf06f4fd0abc0abe35");
+```
+
+```java
+
+```
+
+```objc
+[TDSFriends searchUserWithObjectId:@"5b0b97cf06f4fd0abc0abe35"
+callback:^(TDSFriendInfo * _Nullable friendInfo, NSError * _Nullable error) {
+    // 略（参见上节）
+}];
+```
+
+</MultiLang>
 
 ## 富信息
 
@@ -336,9 +361,9 @@ await TDSFriends.SetRichPresence("score", "60");
 ```
 
 ```java
-TDSFriends.setRichPresence("score", "60",  new Callback<Boolean>() {
+TDSFriends.setRichPresence("score", "60",  new Callback<Void>() {
     @Override
-    public void onSuccess(Boolean ok) {
+    public void onSuccess(Void result) {
         toast("Succeed to set rich presence.");
     }
 
@@ -384,7 +409,7 @@ await TDSFriends.SetRichPresences(info);
 Map<String,String> info = new HashMap<>();
 info.put("score", "60");
 info.put("display", "#matching");
-TDSFriends.setRichPresence(info, new Callback<Boolean>() {
+TDSFriends.setRichPresence(info, new Callback<Void>() {
     // 略
 });
 ```
@@ -411,7 +436,7 @@ TDSFriends.ClearRichPresence("score");
 ```
 
 ```java
-TDSFriends.clearRichPresence("score", new Callback<Boolean>() {
+TDSFriends.clearRichPresence("score", new Callback<Void>() {
     // 略
 });
 ```
@@ -438,7 +463,7 @@ await TDSFriends.ClearRichPresences(keys);
 List<String> keys = new ArrayList<>();
 keys.add("score");
 keys.add("display");
-TDSFriends.clearRichPresence(keys, new Callback<Boolean>() {
+TDSFriends.clearRichPresence(keys, new Callback<Void>() {
     // 略
 });
 ```
@@ -468,9 +493,9 @@ await TDSFriends.AddFriendByShortCode(shortId);
 ```
 
 ```java
-TDSFriends.addFriendByShortCode(shortId, null, new Callback<Boolean>() {
+TDSFriends.addFriendByShortCode(shortId, null, new Callback<Void>() {
     @Override
-    public void onSuccess(Boolean ok) {
+    public void onSuccess(Void result) {
         toast("Applied or added.");
     }
 
@@ -538,7 +563,7 @@ await TDSFriends.AddFriend("5b0b97cf06f4fd0abc0abe35");
 ```
 
 ```java
-TDSFriends.addFriend("5b0b97cf06f4fd0abc0abe35", new Callback<Boolean>() {
+TDSFriends.addFriend("5b0b97cf06f4fd0abc0abe35", new Callback<Void>() {
     // 略（参见上面的例子）
 });
 ```
@@ -566,7 +591,7 @@ await TDSFriends.AddFriend("5b0b97cf06f4fd0abc0abe35", attrs);
 ```java
 Map<String, Object> attrs = new HashMap<String, Object>();
 attrs.put("group", "coworkers");
-TDSFriends.addFriend("5b0b97cf06f4fd0abc0abe35", attrs, new Callback<Boolean>() {
+TDSFriends.addFriend("5b0b97cf06f4fd0abc0abe35", attrs, new Callback<Void>() {
     // 略（参见上面的例子）
 });
 ```
@@ -692,6 +717,60 @@ option.limit = 100;
 
 </MultiLang>
 
+如果希望返回结果中携带好友申请发起人的富信息，那么可以使用以下接口：
+
+<MultiLang>
+
+```cs
+ReadOnlyCollection<TDSFriendshipRequest> requests = await TDSFriends.QueryFriendRequestWithFriendStateList (
+    LCFriendshipRequest.STATUS_PENDING, from, limit
+);
+foreach (TDSFriendshipRequest request in requests) {
+    // 好友申请（参见 QueryFriendRequestList）
+    LCFriendshipRequest req = request.FriendshipRequest;
+    // 申请发起人的富信息
+    TDSFriendInfo info = request.FriendInfo;
+}
+```
+
+```java
+TDSFriends.queryFriendRequestWithFriendStateList(LCFriendshipRequest.STATUS_PENDING,
+  from, limit, new ListCallback<TDSFriendshipRequest>() {
+    @Override
+    public void onSuccess(List<TDSFriendshipRequest> requests) {
+        for (TDSFriendshipRequest request : requests) {
+            // 好友申请（参见 queryFriendRequestList）
+            LCFriendshipRequest req = request.getLcFriendshipRequest();
+            // 申请发起人的富信息
+            TDSFriendInfo info = request.getFriendInfo();
+        }
+    }
+
+    @Override
+    public void onFail(TDSFriendError error) {
+        // 处理错误
+    }
+});
+```
+
+```objc
+TDSFriendQueryOption *option = [TDSFriendQueryOption new];
+option.from = 0;
+option.limit = 100;
+[TDSFriends queryFriendRequestAndStateWithStatus:TDSUserFriendshipRequestStatusPending
+    option:option
+    callback:^(NSArray<TDSFriendshipRequest *> * _Nullable requests, NSError * _Nullable error) {
+    for (TDSFriendshipRequest *request in requests) {
+        // 好友申请（参见 queryFriendRequestWithStatus）
+        LCFriendshipRequest *req = request.lcFriendshipRequest;
+        // 申请发起人的富信息
+        TDSFriendInfo *info = request.friendInfo;
+    }        
+}];
+```
+
+</MultiLang>
+
 ## 处理好友申请
 
 对于新的好友请求，玩家可以同意或者拒绝，也可以什么都不做，无视这些请求，甚至直接删除。
@@ -719,9 +798,9 @@ await request.Delete();
 // LCFriendshipRequest request
 
 // 接受
-TDSFriends.acceptFriendRequest(request, new Callback<Boolean>() {
+TDSFriends.acceptFriendRequest(request, new Callback<Void>() {
     @Override
-    public void onSuccess(Boolean ok) {
+    public void onSuccess(Void result) {
         toast("Accepted.");
     }
 
@@ -733,16 +812,16 @@ TDSFriends.acceptFriendRequest(request, new Callback<Boolean>() {
 // 接受并添加额外属性
 Map<String, Object> attrs = new HashMap<String, Object>();
 attrs.put("group", "coworkers");
-TDSFriends.acceptFriendRequest(request, attrs, new Callback<Boolean>() {
+TDSFriends.acceptFriendRequest(request, attrs, new Callback<Void>() {
     // 略
 });
 
 // 拒绝
-TDSFriends.declineFriendRequest(request, new Callback<Boolean>() {
+TDSFriends.declineFriendRequest(request, new Callback<Void>() {
     // 略
 });
 // 删除
-TDSFriends.deleteFriendRequest(request, new Callback<Boolean>() {
+TDSFriends.deleteFriendRequest(request, new Callback<Void>() {
     // 略
 });
 ```
@@ -901,10 +980,6 @@ TDSFriends.checkFriendship("5b0b97cf06f4fd0abc0abe35", new Callback<Boolean>() {
 </MultiLang>
 
 ## 分享链接
-
-注意，**使用这一功能的前提是内建账户系统中设置了 `nickname`（昵称）字段**。
-参见[内建账户系统文档](/sdk/authentication/guide/#设置其他用户属性)。
-
 ### 落地页
 
 使用分享链接功能需要首先部署落地页网站。
@@ -996,6 +1071,42 @@ NSString *inviteUrl = [TDSFriends generateFriendInvitationLinkWithError:&error];
 
 </MultiLang>
 
+分享链接中传递的用户名称默认为玩家昵称（`nickname`），
+因此，默认情况下，使用分享链接的前提是内建账户系统中设置了 `nickname`（昵称）字段。
+参见[内建账户系统文档](/sdk/authentication/guide/#设置其他用户属性)。
+如果希望使用其他名称，可以在调用上述接口时另行指定。
+另外，还可以传入其他信息，这些信息会作为 URL 查询参数拼接在好友邀请页网址后面。
+例如，昵称为 Tarara 的玩家，邀请好友时希望使用「她姥姥」这个名称，邀请链接希望附加 `ref=taptap` 这个参数，可以这样调用：
+
+<MultiLang>
+
+```cs
+Dictionary<string, object> parameters = new Dictionary<string, object> {
+    { "ref", "taptap" }
+};
+string inviteUrl = await TDSFriends.GenerateFriendInvitationLink("她姥姥", parameters);
+```
+
+```java
+Map<String, Object> parameters = new HashMap<String, Object>();
+parameters.put("ref", "taptap");
+TDSFriends.generateFriendInvitationLink("她姥姥", parameters, new Callback<String>() {
+    // 略
+});
+```
+
+```objc
+NSError *error;
+TDSFriendLinkOption *option = [TDSFriendLinkOption new];
+option.roleName = @"她姥姥";
+option.queries = @{
+    @"ref" : @"taptap",
+};
+NSString *inviteUrl = [TDSFriends generateFriendInvitationLinkWithOption:option error:&error];
+```
+
+</MultiLang>
+
 ### 处理链接
 
 玩家通过邀请链接打开游戏后，开发者需要调用该接口。
@@ -1003,29 +1114,34 @@ NSString *inviteUrl = [TDSFriends generateFriendInvitationLinkWithError:&error];
 
 <MultiLang>
 
-<>
-
 ```cs
 public class DeepLinkManager : MonoBehaviour
 {
     // 略
     private async void onDeepLinkActivated(string url) {
-        Dictionary<string, object> invitation = TDSFriends.ParseFriendInvitationLink(url);
-        string userId = invitation["identity"];
-        string nickname = invitation["role_name"];
         await TDSFriends.HandleFriendInvitationLink(url);
     }
 }
 ```
 
-</>
-<>
+```java
+public class FriendsActivity extends AppCompatActivity {
+// 略    
+    public void onHandleLink(View view) {
+        TDSFriends.handFriendInvitationLink(url, new Callback<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                // 略
+            }
 
-如果玩家通过好友邀请链接打开游戏，那么 Android SDK 会自动发送对应的好友申请。
-开发者只需确保玩家登录后调用了 `online()` 方法建立长连接，无需对打开邀请链接进行特别处理。
-
-</>
-<>
+            @Override
+            public void onFail(TDSFriendError error) {
+                // 略     
+            }
+        });
+    }
+}
+```
 
 ```objc
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
@@ -1038,6 +1154,38 @@ public class DeepLinkManager : MonoBehaviour
 }
 ```
 
-</>
+</MultiLang>
+
+开发者也可以通过 SDK 提供的接口解析链接，获取玩家的 objectId、名称、传入的其他参数，定制相应的逻辑。
+
+<MultiLang>
+
+```cs
+public class DeepLinkManager : MonoBehaviour
+{
+    // 略
+    private async void onDeepLinkActivated(string url) {
+        TDSFriendLinkInfo invitation = TDSFriends.ParseFriendInvitationLink(url);
+        string userObjectId = invitation.Identity;
+        string name = invitation.RoleName;
+        Dictionary<string, string> parameters = invitation.Queries;
+        await TDSFriends.Follow(userObjectId);
+    }
+}
+```
+
+```java
+TDSFriendLinkInfo linkInfo = TDSFriends.parseFriendInvitationLink("url");
+String userObjectId = linkInfo.getIdentity();
+String name = linkInfo.getRoleName();
+Map<String, String> parameters = linkInfo.getQueries();
+```
+
+```objc
+TDSFriendLinkInfo *linkInfo = [TDSFriends parseFriendInvitationLink:(NSURL *)url];
+NSString *userObjectId = linkInfo.identity;
+NSString *name = linkInfo.roleName;
+NSDictionary *parameters = linkInfo.queries;
+```
 
 </MultiLang>
