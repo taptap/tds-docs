@@ -6,10 +6,10 @@ sidebar_position: 5
 
 import CodeBlock from '@theme/CodeBlock';
 import LeandbCliAccess from './_partials/leandb-cli-access.mdx';
-import QuickStartInit from './_partials/quick-start-init.mdx';
+import QuickStartNew from './_partials/quick-start-new.mdx';
 import {Conditional} from '/src/docComponents/conditional';
 import {Command} from '/src/docComponents/engine';
-import {CLI_BINARY} from '/src/constants/env.ts';
+import {CLI_BINARY, BRAND} from '/src/constants/env.ts';
 
 命令行工具（<Command />）是用来部署云引擎应用和进行其他管理操作的客户端工具。
 
@@ -69,30 +69,72 @@ Windows 用户可以在 [GitHub releases 页面] 根据操作系统版本下载�
 <details>
 <summary>点击展开 <Command suffix=" help" /> 的输出</summary>
 
-<CodeBlock>
-{`NAME:
-   ${CLI_BINARY} - Command line to manage and deploy LeanCloud apps\n
+<Conditional brand='leancloud'>
+
+```
+NAME:
+   lean - Command line tool to manage and deploy LeanEngine apps
+
 USAGE:
-   ${CLI_BINARY} [global options] command [command options] [arguments...]\n
+   lean [global options] command [command options] [arguments...]
+
+VERSION:
+   1.0.0
+
 COMMANDS:
      login    Log in to LeanCloud
-     switch   Change the associated LeanCloud app
-     metric   Obtain LeanStorage performance metrics of current project
-     info     Show information about the current user and app
-     up       Start a development instance locally
-     init     Initialize a LeanEngine project
+     switch   Change the associated LeanEngine app
+     info     Show information about the associated user and app
+     up       Start a development instance locally with debug console
+     new      Create a new LeanEngine project from official examples
      deploy   Deploy the project to LeanEngine
-     publish  Publish code from staging to production
-     upload   Upload files to the current application (available in the '_File' class)
+     publish  Publish the version of staging to production
+     db       Access to to LeanDB instances
+     file     Manage files ('_File' class in Data Storage)
      logs     Show LeanEngine logs
      debug    Start the debug console without running the project
-     env      Output environment variables used by the current project
-     cache    LeanCache shell
-     cql      Start CQL interactive mode (warn: CQL is deprecated)
-     help, h  Show all commands or help info for one command\n
+     env      Print custom environment variables on LeanEngine (secret variables not included)
+     cql      Enter CQL interactive shell (warn: CQL is deprecated)
+     help     Show usages of all subcommands
+
 GLOBAL OPTIONS:
-   --version, -v  print the version`}
-</CodeBlock>
+   --version, -v  print the version
+```
+
+</Conditional>
+<Conditional brand='tds'>
+
+```
+NAME:
+   tds - Command line tool to manage and deploy Cloud Engine apps
+
+USAGE:
+   tds [global options] command [command options] [arguments...]
+
+VERSION:
+   1.0.0
+
+COMMANDS:
+     login    Log in to TapTap Developer Services
+     switch   Change the associated Cloud Engine app
+     info     Show information about the associated user and app
+     up       Start a development instance locally with debug console
+     new      Create a new Cloud Engine project from official examples
+     deploy   Deploy the project to Cloud Engine
+     publish  Publish the version of staging to production
+     db       Access to to Database instances
+     file     Manage files ('_File' class in Data Storage)
+     logs     Show Cloud Engine logs
+     debug    Start the debug console without running the project
+     env      Print custom environment variables on Cloud Engine (secret variables not included)
+     cql      Enter CQL interactive shell (warn: CQL is deprecated)
+     help     Show usages of all subcommands
+
+GLOBAL OPTIONS:
+   --version, -v  print the version
+```
+
+</Conditional>
 
 </details>
 
@@ -100,7 +142,7 @@ GLOBAL OPTIONS:
 
 <CodeBlock>
 {`$ ${CLI_BINARY} --version
-${CLI_BINARY} version 0.25.0`}
+${CLI_BINARY} version 1.0.0`}
 </CodeBlock>
 
 简单介绍下主要的子命令：
@@ -111,15 +153,14 @@ ${CLI_BINARY} version 0.25.0`}
 `switch` | 切换关联的云引擎应用和分组
 `info` | 显示当前应用和分组信息
 `up` | 启动本地开发调试
-`init` | 初始化云引擎项目
+`new` | 从项目模板创建新项目
 `deploy` | 部署项目至云引擎
 `publish` | 将预备环境的版本发布至生产环境
-`upload` | 上传文件至数据存储服务（可以在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 文件** 中查看）
+`db` | 访问云端的 LeanCache 或 LeanDB
+`file` | 上传文件至数据存储服务（可以在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 文件** 中查看）
 `logs` | 显示云引擎日志
 `debug` | 单独启动云函数调试控制台（不运行应用本身）
-`env` | 显示当前项目的环境变量
-`db` | 连接到云端的 LeanCache 或 LeanDB
-
+`env` | 显示或设置当前项目的环境变量
 
 用 <Command suffix=" <command> --help" /> 可以进一步了解每个子命令的用法，例如：
 
@@ -128,21 +169,23 @@ ${CLI_BINARY} version 0.25.0`}
 
 <CodeBlock>
 {`NAME:
-   ${CLI_BINARY} deploy - Deploy the project to LeanEngine\n
+   ${CLI_BINARY} deploy - Deploy the project to ${BRAND === 'leancloud' ? 'LeanEngine' : 'Cloud Engine'}\n
 USAGE:
-   ${CLI_BINARY} deploy [command options] [arguments...]\n
+   tds deploy [command options] (--prod | --staging) [--no-cache --build-logs --overwrite-functions]\n
 OPTIONS:
-   -g                                              Deploy from git repo
-   --war                                           Deploy .war file for Java project. The first .war file in target/ is used by default
-   --no-cache                                      Force download dependencies
-   --overwrite-functions                           Overwrite cloud functions with the same name in other groups
-   --leanignore value                              Rule file for ignored files in deployment (default: ".leanignore")
-   --message value, -m value                       Comment for this deployment, only applicable when deploying from local files
+   --prod                              Deploy to production environment
+   --staging                           Deploy to staging environment
+   --build-logs                        Print build logs
+   -g                                  Deploy from git repo
+   --war                               Deploy .war file for Java project. The first .war file in target/ is used by default
+   --no-cache                          Disable buliding cache
+   --overwrite-functions               Overwrite cloud functions with the same name in other groups
+   --leanignore value                  Rule file for ignored files in deployment (default: ".leanignore")
+   --message value, -m value           Comment for this version, only applicable when deploying from local files
    --keep-deploy-file
-   --revision value, -r value                      Git revision or branch. Only applicable when deploying from Git (default: "master")
-   --options --options build-root=app&atomic=true  Send additional deploy options to server, in urlencode format(like --options build-root=app&atomic=true)
-   --prod --prod 1                                 Deploy to production(--prod 1) or staging(\`--prod 0\`) environment, default to staging if it exists
-   --direct                                        Upload project's tarball to remote directly`}
+   --revision value, -r value          Git revision or branch. Only applicable when deploying from Git (default: "master")
+   --options --options build-root=app  Send additional deploy options to server, in urlencode format(like --options build-root=app)
+   --direct                            Upload project's tarball to remote directly`}
 </CodeBlock>
 
 </details>
@@ -156,9 +199,9 @@ OPTIONS:
 
 ## 初始化项目
 
-登录完成之后，可以使用 <Command suffix=" init" /> 命令来初始化一个项目，并且关联到已有的云服务应用上。
+登录完成之后，可以使用 <Command suffix=" new" /> 命令来初始化一个项目，并且关联到已有的云服务应用上。
 
-<QuickStartInit noCliSetup={true} />
+<QuickStartNew noCliSetup={true} />
 
 ## 关联应用和分组
 
@@ -191,7 +234,7 @@ OPTIONS:
 
 如果想变更启动端口号，可以使用 <Command suffix=" up --port <新端口号>" /> 命令来指定。
 
-旧版命令行工具可以在 <Command suffix=" up" /> 的过程中，监测项目文件的变更，实现自动重启开发服务进程。新版命令行工具移除了这一功能，转由项目代码本身来实现，以便更好地与项目使用的编程语言或框架集成。
+命令行工具并不负责自动重启或热加载，需要由项目代码本身来实现，我们部分的实例项目提供了自动重启的能力（如 Node.js）。
 
 除了使用命令行工具来启动项目之外，还可以**原生地**启动项目，比如直接使用 `node server.js` 或者 `python wsgi.py`。这样能够将云引擎开发流程更好地集成到开发者惯用的工作流程中，也可以直接和 IDE 集成。但是直接使用命令行工具创建的云引擎项目，默认会依赖一些环境变量，因此需要提前设置好这些环境变量。
 
@@ -211,51 +254,53 @@ OPTIONS:
 
 ## 部署
 
+从 1.0 开始，<Command suffix=' deploy' /> 必须提供一个参数明确指定部署的目标（如不指定需交互式地选择）：
+
+命令 | 体验版 | 标准版
+- | - | -
+<Command suffix=' deploy --prod' /> | 部署生产环境 | 部署生产环境
+<Command suffix=' deploy --staging' /> | 不支持 | 部署预备环境
+<Command suffix=' publish' /> | 不支持 | 将预备环境版本发布到生产环境
+
 ### 从本地代码部署
 
 当开发和本地测试云引擎项目通过后，你可以直接将本地源码推送到云引擎平台运行：
 
 <CodeBlock className="sh">
-{`${CLI_BINARY} deploy`}
+{`${CLI_BINARY} deploy --prod`}
 </CodeBlock>
 
-对于生产环境是**体验实例**的云引擎的应用，这个命令会将本地源码部署到线上的生产环境，无条件覆盖之前的代码（无论是从本地仓库部署、Git 部署还是在线定义）；而对于生产环境是**标准实例**的云引擎的应用，这个命令会先部署到**预备环境**，后续需要使用 <Command suffix=" publish" /> 来完成向生产环境的部署。如需直接部署到生产环境，可额外添加 `--prod 1` 选项：
-
-<CodeBlock className="sh">
-{`${CLI_BINARY} deploy --prod 1`}
-</CodeBlock>
+这个命令会将本地源码部署到线上的生产环境，覆盖之前的部署（无论是从本地仓库部署、Git 部署还是在线定义）。
 
 部署过程会实时打印进度：
 
 <CodeBlock>
-{`$ ${CLI_BINARY} deploy
-[INFO] Current CLI tool version:  0.21.0
-[INFO] Retrieving app info ...
-[INFO] Preparing to deploy AwesomeApp(xxxxxx) to region: cn group: web staging
-[INFO] Python runtime detected
-[INFO] pyenv detected. Please make sure pyenv is configured properly.
+{`$ ${CLI_BINARY} deploy --prod
+[INFO] lean (v1.0.0) running on darwin/arm64
+[INFO] Current app: my-engine-app (xxxxxxxxxxxxxxxxxxxxxxxx), group: web, region: cn-n1
+[INFO] Deploying new verison to production
+[INFO] Node.js runtime detected
 [INFO] Uploading file 6.40 KiB / 6.40 KiB [=========================] 100.00% 0s
-[REMOTE] 开始构建 20181207-115634
+[REMOTE] 开始构建 20220328-114036
 [REMOTE] 正在下载应用代码 ...
 [REMOTE] 正在解压缩应用代码 ...
-[REMOTE] 运行环境: python
+[REMOTE] 运行环境: nodejs
 [REMOTE] 正在下载和安装依赖项 ...
 [REMOTE] 存储镜像到仓库（0B）...
-[REMOTE] 镜像构建完成：20181207-115634
-[REMOTE] 开始部署 20181207-115634 到 web-staging
+[REMOTE] 镜像构建完成：20220328-114036
+[REMOTE] 开始部署 20181207-115634 到 web1
 [REMOTE] 正在创建新实例 ...
 [REMOTE] 正在启动新实例 ...
 [REMOTE] [Python] 使用 Python 3.7.1, Python SDK 2.1.8
 [REMOTE] 实例启动成功：{"version": "2.1.8", "runtime": "cpython-3.7.1"}
-[REMOTE] 正在更新云函数信息 ...
-[REMOTE] 部署完成：1 个实例部署成功
-[INFO] Deleting temporary files`}
+[REMOTE] 云函数和 Hook 信息已更新
+[REMOTE] 部署完成：1 个实例部署成功`}
 </CodeBlock>
 
 默认部署备注为「从命令行工具构建」，显示在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 云引擎 > 云引擎分组 > 日志** 中。你可以通过 `-m` 选项来自定义部署的备注信息：
 
 <CodeBlock className="sh">
-{`${CLI_BINARY} deploy -m 'fix #42'`}
+{`${CLI_BINARY} deploy --prod -m 'fix #42'`}
 </CodeBlock>
 
 部署之后需要绑定一个云引擎自定义域名，然后就可以通过 curl 命令来测试你的云引擎代码，或者通过浏览器访问相应的网址。
@@ -271,45 +316,44 @@ OPTIONS:
 
 </details>
 
-### 触发 Git 部署
+### 使用预备环境
 
-如果代码保存在某个 Git 仓库上，例如 [GitHub](https://github.com)，并且在控制台已经正确设置了 git repo 地址以及 deploy key，你也可以请求云引擎从 Git 仓库获取源码并自动部署。这个操作可以在云引擎的部署菜单里完成，也可以在本地执行：
+云引擎向标准版实例的用户提供了一个额外的预备环境，预备环境则提供了和生产环境几乎相同的环境、访问相同的数据，可以绑定单独的域名供开发者进行测试。在开发过程中，你可以先将改动部署到预备环境，使用线上数据测试通过后再发布到生产环境。
 
-<CodeBlock className="sh">
-{`${CLI_BINARY} deploy -g`}
-</CodeBlock>
-
-- `-g` 选项要求从 Git 仓库部署，Git 仓库地址必须已经在云引擎菜单中保存。
-- 默认部署使用 **master** 分支的最新代码，你可以通过 `-r <revision>` 来指定部署特定的 commit 或者 branch。
-- 设置 git repo 地址以及 deploy key 的方法可以参考 [云引擎平台功能 § Git 部署](/sdk/engine/deploy/platform/#git-部署)。
-
-### 发布到生产环境
-
-以下步骤仅适用于生产环境是标准实例的用户。
-
-如果预备环境测试没有问题，此时需要将预备环境的云引擎代码发布到生产环境，可以在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 云引擎 > 云引擎分组 > 部署** 中发布，也可以直接运行 `publish` 命令：
+部署至预备环境：
 
 <CodeBlock className="sh">
-{`${CLI_BINARY} publish`}
+{`${CLI_BINARY} deploy --staging`}
 </CodeBlock>
 
-这样预备环境的云引擎代码就发布到了生产环境：
+将预备环境的版本发布到生产环境：
 
 <CodeBlock>
 {`$ ${CLI_BINARY} publish
 [INFO] Current CLI tool version:  0.21.0
 [INFO] Retrieving app info ...
 [INFO] Deploying AwesomeApp(xxxxxx) to region: cn group: web production
-[REMOTE] 开始部署 20181207-115634 到 web1,web2
-[REMOTE] 正在创建新实例 ...
+[REMOTE] 开始部署 20181207-115634 到 web1
 [REMOTE] 正在创建新实例 ...
 [REMOTE] 正在启动新实例 ...
-[REMOTE] 正在启动新实例 ...
-[REMOTE] 实例启动成功：{"version": "2.1.8", "runtime": "cpython-3.7.1"}
 [REMOTE] 实例启动成功：{"version": "2.1.8", "runtime": "cpython-3.7.1"}
 [REMOTE] 正在更新云函数信息 ...
-[REMOTE] 部署完成：2 个实例部署成功`}
+[REMOTE] 部署完成：1 个实例部署成功`}
 </CodeBlock>
+
+相比于直接部署生产环境，<Command suffix=" publish" /> 可以保证将完全相同的版本（包括所有依赖和构建产物）发布到生产环境，最大限度避免不一致的情况。
+
+### 触发 Git 部署
+
+如果代码保存在某个 Git 仓库上，例如 [GitHub](https://github.com)，并且在控制台已经正确设置了 git repo 地址以及 deploy key，你也可以请求云引擎从 Git 仓库获取源码并自动部署。这个操作可以在云引擎的部署菜单里完成，也可以在本地执行：
+
+<CodeBlock className="sh">
+{`${CLI_BINARY} deploy --prod -g`}
+</CodeBlock>
+
+- `-g` 选项要求从 Git 仓库部署，Git 仓库地址必须已经在云引擎菜单中保存。
+- 默认部署使用 **master** 分支的最新代码，你可以通过 `-r <revision>` 来指定部署特定的 commit 或者 branch。
+- 设置 git repo 地址以及 deploy key 的方法可以参考 [云引擎平台功能 § Git 部署](/sdk/engine/deploy/platform/#git-部署)。
 
 ## 查看日志
 
@@ -326,7 +370,7 @@ web1  2019-11-20 17:17:22  > node server.js
 web1  2019-11-20 17:17:22
 web1  2019-11-20 17:17:23  Node app is running on port: 3000
       2019-11-20 17:17:23  Instance started: {"runtime":"nodejs-v12.13.1","version":"3.4.0"}
-      2019-11-20 17:17:23  Updating cloud functions metadata ...
+      2019-11-20 17:17:23  Cloud functions and hooks metadata updated
       2019-11-20 17:17:23  Deploy finished: 1 instances deployed`}
 </CodeBlock>
 
@@ -382,10 +426,6 @@ web1  2019-11-20 17:17:23  Node app is running on port: 3000
 部署失败有多种原因，请根据显示的报错信息耐心排查。
 一般来说，如果你使用命令行工具部署，首先建议你检查命令行工具是否是最新版，如果不是最新版，请先升级到最新版再重试。
 
-### 之前使用 `npm` 装过旧版的命令行工具，如何升级到新版？
-
-如果之前使用 `npm` 安装过旧版本的命令行工具，为了避免与新版本产生冲突，建议使用 `npm uninstall -g leancloud-cli` 卸载旧版本命令行工具。或者直接按照 Homebrew 的提示，执行 `brew link --overwrite lean-cli` 覆盖掉之前的 `lean` 命令来解决。
-
 ### 命令行工具在本地调试时提示 `Error: listen EADDRINUSE :::3000`，无法访问应用
 
 `listen EADDRINUSE :::3000` 表示你的程序默认使用的 3000 端口被其他应用占用了，可以按照下面的方法找到并关闭占用 3000 端口的程序：
@@ -403,7 +443,7 @@ web1  2019-11-20 17:17:23  Node app is running on port: 3000
 ### 如何通过命令行工具上传文件至文件服务？
 
 <CodeBlock className="sh">
-{`$ ${CLI_BINARY} upload public/index.html
+{`$ ${CLI_BINARY} file upload public/index.html
 Uploads /Users/dennis/programming/avos/new_app/public/index.html successfully at: http://ac-7104en0u.qiniudn.com/f9e13e69-10a2-1742-5e5a-8e71de75b9fc.html`}
 </CodeBlock>
 
@@ -412,20 +452,20 @@ Uploads /Users/dennis/programming/avos/new_app/public/index.html successfully at
 上传 images 目录下的所有文件：
 
 <CodeBlock className="sh">
-{`${CLI_BINARY} upload images/`}
+{`${CLI_BINARY} file upload images/`}
 </CodeBlock>
 
 ### 同一个项目如何批量部署到多个应用的云引擎？
 
-可以通过 <Command suffix=" switch" /> 切换项目所属应用，然后通过 <Command suffix=" deploy" /> 部署。<Command suffix=" switch" /> 支持通过参数以非交互的方式使用：
+可以通过 <Command suffix=" switch" /> 切换项目所属应用，然后通过 <Command suffix=" deploy --prod" /> 部署。<Command suffix=" switch" /> 支持通过参数以非交互的方式使用：
 
 <CodeBlock className="sh">
-{`${CLI_BINARY} switch --region REGION --group GROUP_NAME APP_ID
-${CLI_BINARY} deploy --prod 1`}
+{`${CLI_BINARY} switch --region <REGION> --group <GROUP_NAME> <APP_ID>
+${CLI_BINARY} deploy --prod`}
 </CodeBlock>
 
-上述命令中，`REGION` 代表应用所在区域<Conditional brand="leancloud">，目前支持的值为 `cn-n1`（华北节点）、`cn-e1`（华东节点）、`us-w1`（国际版）</Conditional>。
-`--prod 1` 表示部署到生产环境，如果希望部署到预备环境，换成 <Command suffix=" deploy" /> 即可。
+上述命令中，`<REGION>` 代表应用所在区域<Conditional brand="leancloud">，目前支持的值为 `cn-n1`（华北节点）、`cn-e1`（华东节点）、`us-w1`（国际版）</Conditional>。
+`--prod` 表示部署到生产环境，如果希望部署到预备环境，换成 <Command suffix=" deploy --staging" /> 即可。
 基于这两个命令可以自行编写 CI 脚本快速部署至多个应用的云引擎实例。
 
 ### 如何扩展命令行工具的功能？
@@ -451,3 +491,15 @@ print(leancloud.User.query.count())
 ```
 
 同时赋予这个脚本可执行权限 `$ chmod +x /usr/local/bin/lean-usercount`，然后执行 <Command suffix=" usercount" />，就可以看到当前应用对应的 `_User` 表中记录总数了。
+
+### 命令行工具的 1.0 版本有哪些主要的变化？
+
+在 2022 年 3 月我们发布了 1.0.0 版本的命令行工具，并在其中按计划进行了一些不兼容的改动：
+
+- <Command suffix=" deploy" /> 必须显式指定部署的目标（`--prod` 或 `--staging`），而之前版本则是体验版默认生产环境，标准版默认预备环境。
+- <Command suffix=" up" /> 默认不再自动拉取线上的环境变量，如果需要的话可以手动添加 `--fetch-env` 参数。
+- 删除了 <Command suffix=" cache" /> 命令，我们建议使用功能更强大的 <Command suffix=" db" /> 来访问 LeanCache 或 LeanDB。
+
+### 之前使用 `npm` 装过旧版的命令行工具，如何升级到新版？
+
+如果之前使用 `npm` 安装过旧版本的命令行工具，为了避免与新版本产生冲突，建议使用 `npm uninstall -g avoscloud-code leancloud-cli` 卸载旧版本命令行工具。或者直接按照 Homebrew 的提示，执行 `brew link --overwrite lean-cli` 覆盖掉之前的 `lean` 命令来解决。
