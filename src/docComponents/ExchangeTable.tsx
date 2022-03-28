@@ -42,7 +42,7 @@ export const ExchangeTable = ({}) => {
       },
     };
   const { i18n: { currentLocale } } = useDocusaurusContext();
-  const currentExchangeData = exchangeData[currentLocale] || exchangeData['zh-CN'];
+  const currentExchangeData = exchangeData[currentLocale] || exchangeData['zh-Hans'];
   const commonCurrencyList = Object.keys(currentExchangeData.common);
   let [exchangeMap, setExchangeMap] = useState({});
 
