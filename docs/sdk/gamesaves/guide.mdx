@@ -264,13 +264,12 @@ Key|Value|含义|来源
 `X-LC-Key`|`{{appkey}}`|当前应用的 `App Key`（即 `Client Token`）|可在控制台查看
 `X-LC-Session`|`<sessionToken>`|玩家的登录凭证
 
-云存档限制只有添加存档的玩家本人可读可写，因此调用云存档的 REST API 接口时均需在 `X-LC-Session` HTTP 头中携带玩家的 `sessionToken`，否则请求会因权限不足而失败。
-
-对于「获取存档」、「查询存档」、「删除存档」操作，开发者还可通过管理接口来完成。
 管理接口需要使用 `Master Key`：`X-LC-Key: {{masterkey}},master`。
 `Master Key` 即 `Server Secret`，同样可在控制台查看。使用管理接口时无需携带 `sessionToken`。
 
 详见文档关于[应用凭证](/sdk/storage/guide/setup-dotnet#应用凭证)的说明。
+
+云存档限制只有添加存档的玩家本人可读可写，因此调用云存档的 REST API 接口时均需在 `X-LC-Session` HTTP 头中携带玩家的 `sessionToken` 或使用 `Master Key`，否则请求会因权限不足而失败。
 
 ### Base URL
 
@@ -401,6 +400,26 @@ https://API_BASE_URL/1.1/gamesaves
 
 - `gameFile is required.`：遗漏了必填字段 `gameFile`。
 - `Forbidden to add new fields by class '_GameSave' permissions.`：提交了非法字段，云存档目前暂不支持添加自定义字段。
+
+开发者还可通过管理接口为用户添加存档。此时请求无需携带 sessionToken，但需要添加 `user` 字段来指定存档所关联的用户：
+
+```
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '{
+      "progressValue":123,
+      "playedTime":1283490343,
+      "name":"dennis",
+      "gameFile":{"id":"55a39634e4b0ed48f0c1845c", "__type":"File"},
+      "cover":{"id": "543cbaede4b07db196f50f3c", "__type": "File"},
+      "summary":"hello",
+      "modifiedAt":{"__type":"Date", "iso":"2015-06-21T18:02:52.249Z"},
+      "user":{"__type":"Pointer", "className": "_User", "objectId": "558e20cbe4b060308e3eb36c"}
+  }' \
+https://API_BASE_URL/1.1/gamesaves
+```
 
 ### 删除存档
 
