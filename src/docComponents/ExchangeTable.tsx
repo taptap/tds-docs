@@ -47,7 +47,7 @@ export const ExchangeTable = ({}) => {
   let [exchangeMap, setExchangeMap] = useState({});
 
   const getExchangeRates = () => {
-    fetch(`//tapdb.com/api/v1/ga-exchange/exchange-rates`, {mode: 'cors'})
+    fetch(`//www.tapdb.com/api/v1/ga-exchange/exchange-rates`, {mode: 'cors'})
       .then(res => res.json())
       .then(
         (result) => {
