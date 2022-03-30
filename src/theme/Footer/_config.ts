@@ -46,7 +46,11 @@ export const getNavLinks = (
     },
     {
       label: "侵权投诉",
-      url: "https://www.taptap.com/doc/27",
+      link: `/store/store-complaint/`,
+    },
+    {
+      label: "联系我们",
+      link: `/store/store-contact/`,
     },
   ];
 
@@ -58,6 +62,14 @@ export const getNavLinks = (
     {
       label: "隐私政策",
       url: "https://www.taptap.io/privacy-policy",
+    },
+    {
+      label: "侵权投诉",
+      link: "/store/store-complaint/",
+    },
+    {
+      label: "联系我们",
+      link: "/store/store-contact/",
     },
   ];
 
