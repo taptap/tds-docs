@@ -25,7 +25,7 @@ const HomePage = () => (
           </div>
 
           {BRAND === "tds" && (
-            <Link className={styles.cta} to="store">
+            <Link className={styles.cta} to="store/store-register">
               <Translate
                 id="tds-home-入门指南"
                 description="from HomePage Main Button"
