@@ -186,6 +186,10 @@ TapDB.AdvertiserIDCollectionEnabled(true);
 
 调用该 API 记录一个账号，当账号登录时调用。
 
+调用后会上报一个账号登录（ `user_login` ）事件，并将这个设备的是否有用户注册过（ `has_user` ）属性置为 `true`。
+
+在重启应用或调用清除账号 ID（ `clearUser` ）前，上报的事件都会带有该账号 ID。
+
 <MultiLang>
 
 ```cs
@@ -194,16 +198,50 @@ TapDB.SetUser("userId");
 
 ```java
 TapDB.setUser("userId");
+
+// 同时传递事件属性
+JSONObject properties = new JSONObject();
+properties.put("currentPoints", 10);
+TapDB.setUser("userId", properties);
 ```
 
 ```objectivec
 [TapDB setUser:@"userId"];
+
+// 同时传递事件属性
+[TapDB setUser:@"userId" properties:@{@"#currentPoints":@10}];
 ```
 
  </MultiLang>
 
-`userId` 是代表账号的唯一字符串，字符串长度不大于 256，只能包含数字、大小写字母、下划线（`_`）、短横（`-`）。
-开发者需要保证不同账号的 `userId` 均不相同。
+
+
+| 字段         | 可为空 | 说明    |
+| ---------- | --- | ----- |
+| userId  | 否   | 账号的唯一字符串，字符串长度不大于 256，只能包含数字、大小写字母、下划线（`_`）、短横（`-`）<br /> 开发者需要保证不同账号的 `userId` 均不相同。 |
+| properties | 是   | 事件的属性（Unity 暂不支持） |
+
+
+
+## 清除账号
+
+当用户进行登出时，可调用 `clearUser` 清除当前 SDK 中保存的账号 ID，后续上报的事件将不会带有账号 ID，调用该接口不会上报任何事件。
+
+<MultiLang>
+
+```cs
+TapDB.ClearUser()
+```
+
+```java
+TapDB.clearUser()
+```
+
+```objectivec
+[TapDB clearUser]
+```
+
+</MultiLang>
 
 ## 账号昵称
 
