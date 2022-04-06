@@ -11,7 +11,7 @@ function getCopyrightNotice(brand: string): string {
   const year = new Date().getFullYear();
   const company =
     brand === "leancloud" ? "美味书签（北京）信息技术有限公司" : "TapTap";
-  return `©${year} ${company}`;
+  return `© ${year} ${company}`;
 }
 
 function Footer() {
