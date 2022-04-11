@@ -28,9 +28,8 @@ Unity 模块是通过引入 iOS 和 Android 模块后增加桥接文件打包出
 
 Unity 接入：
 
-- Unity 开发环境：2019.4.28f1
+- Unity 开发环境：2018.4.36f1
 - 导入 `AntiAddictionForUnity.unitypackage`
-    <li> 导入 <code>TapTap_Common_{sdkVersions.taptap.unity}.unitypackage</code></li>
 
 支持版本：
 
@@ -54,9 +53,8 @@ iOS 平台配置：
 最低支持 Android 5.0（API level 21），编译环境为 Android Studio。
 
 <ul>
-<li>将 <code>AntiAddiction_{sdkVersions.taptap.android}.aar</code> 拷贝到游戏目录下的 <code>src/main/libs</code> 目录中</li>
-<li>将 <code>AntiAddictionUI_{sdkVersions.taptap.android}.aar</code> 拷贝到游戏目录下的 <code>src/main/libs</code> 目录中</li>
-<li>将 <code>TapCommon_{sdkVersions.taptap.android}.aar</code> 拷贝到游戏目录下的 <code>src/main/libs</code> 目录中</li>
+<li>将 <code>AntiAddiction_{sdkVersions.taptap.anti_addiction}.aar</code> 拷贝到游戏目录下的 <code>src/main/libs</code> 目录中</li>
+<li>将 <code>AntiAddictionUI_{sdkVersions.taptap.anti_addiction}.aar</code> 拷贝到游戏目录下的 <code>src/main/libs</code> 目录中</li>
 </ul>
 
 在游戏目录下 `build.gradle` 文件中添加代码
@@ -69,9 +67,8 @@ iOS 平台配置：
 }
 dependencies {
     // ...
-    implementation(name: "AntiAddiction_${sdkVersions.taptap.ios}", ext: "aar")
-    implementation(name: "AntiAddictionUI_${sdkVersions.taptap.ios}", ext: "aar")
-    implementation(name: "TapCommon_${sdkVersions.taptap.ios}", ext: "aar")
+    implementation(name: "AntiAddiction_${sdkVersions.taptap.anti_addiction}", ext: "aar")
+    implementation(name: "AntiAddictionUI_${sdkVersions.taptap.anti_addiction}", ext: "aar")
     // ...
 }`}
 </CodeBlock>
@@ -86,11 +83,10 @@ iOS 防沉迷 SDK 结构：
 - `AntiAddictionService` 防沉迷基础库，源码由 Swift 编写。
 - `AntiAddictionUI` 带 UI 的防沉迷库，依赖 `AntiAddictionService`，源码由  Objective-C 编写。
 - `AntiAdictionResources.bundle` 资源文件
-- `TapCommonSDK.framework` 基础库
 
 添加防沉迷库文件：
 
-- 添加 `AntiAddictionService.framework`、`AntiAddictionUI.framework` 和 `TapCommonSDK.framework` 静态库。注意添加时选择 Embed 方式为 **Do Not Embed**。
+- 添加 `AntiAddictionService.framework` 和 `AntiAddictionUI.framework` 静态库。注意添加时选择 Embed 方式为 **Do Not Embed**。
 
 - 引用代码：
 
@@ -270,13 +266,15 @@ SDK 支持两种防沉迷认证方式：
 
 ### TapTap 快速认证
 
+使用 TapTap 快速认证需要接入 [TapTap 登录](/sdk/taptap-login/features/)功能。
+
+游戏可以选择通过[TDS 内建账户系统](/sdk/taptap-login/guide/start/#用-taptap-oauth-授权结果直接登录账户系统)接入 TapTap 登录，或者以[单纯 TapTap 用户认证](/sdk/taptap-login/guide/tap-login/#taptap-登录并获取登录结果)的方式接入 TapTap 登录。
+
 传入玩家唯一标识 `userIdentifier`，即可开始 TapTap 快速认证。
 
 其中的**玩家唯一标识** `userIdentifier`，如果接入 [TDS 内建账户系统](/sdk/taptap-login/guide/start/#用-taptap-oauth-授权结果直接登录账户系统)，可以用玩家的 `objectId`；如果使用[单纯 TapTap 用户认证](/sdk/taptap-login/guide/tap-login/#taptap-登录并获取登录结果)则可以用 `openid` 或 `unionid`。
 
 <MultiLang>
-
-<>
 
 ```cs
 bool useTapLogin = true;
@@ -285,17 +283,11 @@ string userIdentifier = "玩家的唯一标识";
 AntiAddictionUIKit.Startup(useTapLogin, userIdentifier);
 ```
 
-</>
-<>
-
 ```java
 boolean useTapLogin = true;
 String userIdentifier = "玩家的唯一标识";
 AntiAddictionUIKit.startup(activity, useTapLogin, userIdentifier);
 ```
-
-</>
-<>
 
 ```objc
 BOOL useTapLogin = YES;
@@ -303,20 +295,11 @@ NSString *userIdentifier = @"玩家的唯一标识";
 [AntiAddiction startUpUseTapLogin:useTapLogin userIdentifier:userIdentifier];
 ```
 
-使用 **TapTap 快速认证** 需要需要在 `AppDelegate` 里嵌入回调。
-
-注意：如果已经在登录模块添加过，可以跳过此步。
-
-```objc
-// 新的回调
-- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
-    return [TDSHandleUrl handleOpenURL:url];
-} 
-```
-
-</>
-
 </MultiLang>
+
+快速认证基于 TapTap 的 `access token`，SDK 会自动获取 `access token`。
+如果自动获取失败，那么会显示手动输入实名信息的用户界面。
+
 
 ### 手动输入实名信息
 
