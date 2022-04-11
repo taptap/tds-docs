@@ -3,7 +3,6 @@ const sdkVersions = {
     unity: "3.7.1",
     android: "3.7.1",
     ios: "3.7.1",
-    anti_addiction: "3.7.1",
     rtc: "1.1.0",
   },
   leancloud: {
@@ -13,7 +12,7 @@ const sdkVersions = {
       storage: "4.12.0",
       realtime: "5.0.0-rc.7",
     },
-    java: "8.2.5",
+    java: "8.2.6",
     csharp: "0.10.7",
   },
 };
