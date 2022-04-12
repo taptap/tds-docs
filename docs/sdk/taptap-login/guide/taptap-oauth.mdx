@@ -104,7 +104,8 @@ MAC Token 包含以下字段：
 
 使用 Mac Token 签算一个接口：
 
-### 脚本请求示例
+<details>
+<summary>脚本请求示例</summary>
 
 可用此脚本验证直接替换参数，用来验证自己服务端签算的 mac token 是否正确。
 
@@ -143,6 +144,8 @@ curl -s -H"Authorization:${AUTHORIZATION}" "https://${REQUEST_HOST}${REQUEST_URI
 
 </Conditional>
 
+
+
 <Conditional region='global'>
 
 ```
@@ -176,7 +179,10 @@ curl -s -H"Authorization:${AUTHORIZATION}" "https://${REQUEST_HOST}${REQUEST_URI
 
 </Conditional>
 
-### nodejs 请求示例
+</details>
+
+<details>
+<summary>nodejs 请求示例</summary>
 
 <Conditional region='cn'>
 
@@ -274,6 +280,7 @@ urllib.request("https://openapi.tap.io/account/profile/v1?client_id=" + client_i
 
 </Conditional>
 
+
 ```javascript
 //utils
 var crypto = require('crypto');
@@ -294,7 +301,11 @@ exports.hmacSha1 = function (encodedFlags, secretKey) {
 };
 ```
 
-### java 请求示例
+</details>
+
+
+<details>
+<summary>java 请求示例</summary>
 
 <Conditional region='cn'>
 
@@ -525,6 +536,52 @@ public class Authorization {
 ```
 
 </Conditional>
+
+</details>
+
+<details>
+
+<summary>php 请求示例</summary>
+
+<Conditional region='cn'>
+```php
+<?php
+
+# 客户端 ID
+$client_id = "请替换为控制台的 Client ID";
+# 替换成移动端 SDK 获取的 access_token
+$access_token="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ";
+# 替换成移动端 SDK 获取的 mac_key
+$mac_key = "mSUQNYUGRBPXyRyW";
+# 接口请求地址
+$request_url = "https://openapi.taptap.com/account/profile/v1?client_id=".$client_id;
+$ts = time();
+$nonce = "== XinDong_Lee-JiEun ==";//随机数，正式上线请替换
+//方式一
+//$params = [$ts,$nonce,"GET","/account/profile/v1?client_id=".$client_id,"openapi.taptap.com", 443,"\n"];
+//$signStr = implode("\n",$params);
+//var_dump($signStr);
+//方式二
+$signStr = sprintf("%s\n%s\n%s\n%s\n%s\n443\n\n",$ts,$nonce,"GET","/account/profile/v1?client_id=".$client_id,"openapi.taptap.com");
+//MAC TOKEN 加密
+$mac = base64_encode(hash_hmac('sha1', $signStr, $mac_key,true));
+$auth = sprintf('MAC id="%s",ts="%s",nonce="%s",mac="%s"',$access_token,$ts,$nonce,$mac);
+$headers = array(
+    "Authorization:".$auth
+);
+echo "Authorization:".$auth.PHP_EOL.PHP_EOL;
+
+$curl = curl_init($request_url);
+// 设置请求方式
+curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
+// Header 头信息设置
+curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+$result = curl_exec($curl);
+curl_close($curl);
+```
+</Conditional>
+
+</details>
 
 
 ### 通用接口错误信息
