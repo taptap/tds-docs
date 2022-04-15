@@ -1,0 +1,185 @@
+---
+title: DLC Integration Guide
+sidebar_label: Guide
+sidebar_position: 2
+---
+
+import MultiLang from "/src/docComponents/MultiLang";
+import CodeBlock from "@theme/CodeBlock";
+import sdkVersions from "/src/docComponents/sdkVersions";
+import { Gray, Blue, Red, Black } from "/src/docComponents/doc";
+import { Conditional } from "/src/docComponents/conditional";
+
+## Querying and Purchasing DLC
+
+Please [download](/tap-download) the SDK and add the following dependencies to your game:
+
+<MultiLang>
+
+<>
+
+Import the SDK **either manually or with the Unity Package Manager**.
+
+1. You can manually import the SDK.
+2. If you choose to use the UPM, you can add the following lines to the `Packages/manifest.json` of your game project:
+
+<CodeBlock className="json">
+  {`"dependencies":{
+    // Common libraries
+    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+    // DLC
+    "com.taptap.tds.dlc": "https://github.com/TapTap/TapLicense-Unity.git#${sdkVersions.taptap.unity}",
+}`}
+</CodeBlock>
+
+</>
+
+<>
+
+Import the SDK to the `project/app/libs` of your game project. Then open `project/app/build.gradle` and add the following lines:
+
+<CodeBlock className="groovy">
+  {`repositories{
+    flatDir {  
+        dirs 'libs'  
+    }  
+}  
+dependencies {
+    implementation name:'TapCommon_${sdkVersions.taptap.android}', ext:'aar'
+    implementation name:'TapLicense_${sdkVersions.taptap.android}', ext:'aar'
+}`}
+</CodeBlock>
+
+</>
+
+<>
+
+```objc
+// Not supported yet
+```
+
+</>
+
+</MultiLang>
+
+### DLC Callback Settings
+
+<MultiLang>
+
+```cs
+public class MyTapDLCCallback:ITapDlcCallback
+{
+    public void OnQueryCallBack(TapLicenseQueryCode code, Dictionary<string, object> queryList)
+    {
+
+    }
+
+    public void OnOrderCallBack(string sku, TapLicensePurchasedCode status)
+    {
+
+    }
+}
+
+TapLicense.SetDLCCallback(new MyTapDLCCallback());
+```
+
+```java
+TapLicenseHelper.setDLCCallback(new DLCManager.InventoryCallback() {
+    @Override
+    public boolean onQueryCallBack(int i, HashMap<String, Integer> hashMap) {
+        return false;
+    }
+
+    @Override
+    public void onOrderCallBack(String s, int i) {
+
+    }
+});
+```
+
+```objc
+// Not supported yet
+```
+
+</MultiLang>
+
+### Querying DLC
+
+<MultiLang>
+
+```cs
+TapLicense.QueryDLC(string[] skuIds);
+```
+
+```java
+TapLicenseHelper.queryDLC(Activity activity, String[] skuIds);
+```
+
+```objc
+// Not supported yet
+```
+
+</MultiLang>
+
+### Purchasing DLC
+
+<MultiLang>
+
+```cs
+TapLicense.PurchaseDLC(string skuId);
+```
+
+```java
+TapLicenseHelper.purchaseDLC(Activity activity, String skuIds);
+```
+
+```objc
+// Not supported yet
+```
+
+</MultiLang>
+
+### Parameters
+
+#### TapLicenseQueryCode
+
+| Callback                        | Callback value | Description                           |
+| ------------------------------- | -------------- | ------------------------------------- |
+| QUERY_RESULT_OK                 | 0              | Query succeeded                       |
+| QUERY_RESULT_NOT_INSTALL_TAPTAP | 1              | TapTap is not installed on the device |
+| QUERY_RESULT_ERR                | 2              | Query failed                          |
+| ERROR_CODE_UNDEFINED            | 80000          | Unknown error                         |
+
+#### skuId
+
+This is a unique ID assigned to each product. Please reach out to TapTap to have them set up.
+
+## Testing
+
+To ensure that players are able to make purchases once you have released your game, **please follow the instructions below to test the payment procedure**
+
+### Upload APK
+
+Upload the APK of your game to the TapTap Developer Center and wait for it to go through the review process.
+
+### Add Test Users
+
+Go to TapTap Developer Center >> Click on <Blue>Game Services</Blue> >> Click on <Blue>Game Ecosystem</Blue> >> Click on<Blue>Copyright Verification</Blue> >> Enter the TapTap ID of the test user
+
+### Start Testing
+
+Log in to the TapTap app on your device with the test account.
+
+## Start Selling
+
+### Complete Application Information
+
+Go to TapTap Developer Center and fill in the application information according to [Material Requirements](/store/store-material/), then wait for the review.
+
+### Set Prices
+
+Go to TapTap Developer Center >> <Blue>Price Settings</Blue>, enable the feature, set up the prices, and submit everything for review.
+
+### Release Your Game
+
+If everything worked out well, you may <Conditional region="cn">[release your game](/store/store-release/)</Conditional><Conditional region="global">[release your game](/store/store-publish-game/)</Conditional>.
