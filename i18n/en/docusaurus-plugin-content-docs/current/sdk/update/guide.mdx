@@ -1,6 +1,6 @@
 ---
-title: 唤起更新开发指南
-sidebar_label: 开发指南
+title: Updates Integration Guide
+sidebar_label: Guide
 ---
 
 import MultiLang from "/src/docComponents/MultiLang";
@@ -9,11 +9,11 @@ import sdkVersions from "/src/docComponents/sdkVersions";
 import { Conditional } from "/src/docComponents/conditional";
 import AndroidFaq from "../_partials/android-package-visibility.mdx";
 
-TapTap 开发者服务为游戏和玩家提供唤起 TapTap 客户端进行游戏更新的功能。当游戏发布了新版本，且需要玩家进行更新才能体验新版本时，在游戏内绘制一个界面告知玩家，需要进行新版本更新，并且提供一个更新的按钮。玩家点击后，会跳转到 TapTap 客户端内的游戏详情页面，进行更新。
+When you release a new version of your game and wish the existing players to upgrade to the new version, you may want to display a notification in the game. With TapTap’s Updates function, a pop-up can be triggered when the SDK detects a new version released on the TapTap store. The player can tap a button within the pop-up to quickly jump to the Taptap app to update the game.
 
-## SDK 获取
+## Integrating the SDK
 
-在 [下载页](/tap-download) 获得 SDK，添加 `TapCommon` 模块：
+[Download](/tap-download) the SDK and add the `TapCommon` module to your game:
 
 <MultiLang>
 
@@ -40,25 +40,25 @@ dependencies {
 
 </MultiLang>
 
-## 唤起 TapTap 检查更新
+## Open the TapTap App to Check for Updates
 
 :::tip
-自 TapSDK 3.3.0 版本开始，针对更新功能做了逻辑优化，唤起 TapTap 客户端更新游戏失败时可以跳转到自定义网页。TapSDK 3.3.0 版本对之前的版本向下兼容。
-该版本一般情况下不需要在使用以下 API 前特别检查是否安装 TapTap 客户端，自 TapSDK 3.3.0 版本开始推荐使用新接口。
+Starting from TapSDK 3.3.0, the logic for updating the game has been optimized. You can have the game open a custom webpage if it fails to open the TapTap app. TapSDK 3.3.0 is still compatible with the APIs introduced in the earlier versions.
+With TapSDK 3.3.0, you won’t need to check if the TapTap app has been installed before you use the following APIs. We recommend you to use the new APIs if you are using TapSDK 3.3.0 and later.
 :::
 
 <MultiLang>
 <>
 
-在 TapTap 客户端更新游戏，失败时通过浏览器打开 TapTap 网站对应的游戏页面：
+Open the TapTap app to check for updates. If failed, open the game’s page on the web app:
 
 <Conditional region="cn">
 
 ```cs
-// 适用于中国大陆
+// For Mainland China
 bool isSuccess = await TapCommon.UpdateGameAndFailToWebInTapTap(string appId);
 
-// 适用于其他国家或地区
+// For other countries/regions
 bool isSuccess = await TapCommon.UpdateGameAndFailToWebInTapGlobal(string appId);
 ```
 
@@ -72,15 +72,15 @@ bool isSuccess = await TapCommon.UpdateGameAndFailToWebInTapGlobal(string appId)
 
 </Conditional>
 
-唤起 TapTap 客户端更新游戏失败，跳转到自定义网页：
+Open a custom webpage if failed to open the TapTap app:
 
 <Conditional region="cn">
 
 ```cs
-// 适用于中国大陆
+// For Mainland China
 bool isSuccess = await TapCommon.UpdateGameAndFailToWebInTapTap(string appId, string webUrl);
 
-// 适用于其他国家或地区
+// For other countries/regions
 bool isSuccess = await TapCommon.UpdateGameAndFailToWebInTapGlobal(string appId, string webUrl);
 ```
 
@@ -97,15 +97,15 @@ bool isSuccess = await TapCommon.UpdateGameAndFailToWebInTapGlobal(string appId,
 </>
 <>
 
-在 TapTap 客户端更新游戏，失败时通过浏览器打开 TapTap 网站对应的游戏页面：
+Open the TapTap app to check for updates. If failed, open the game’s page on the web app:
 
 <Conditional region="cn">
 
 ```java
-// 适用于中国大陆
+// For Mainland China
 TapGameUtil.updateGameAndFailToWebInTapTap(context, "your app id");
 
-// 适用于其他国家或地区
+// For other countries/regions
 TapGameUtil.updateGameAndFailToWebInTapGlobal(context, "your app id");
 ```
 
@@ -119,15 +119,15 @@ TapGameUtil.updateGameAndFailToWebInTapGlobal(context, "your app id");
 
 </Conditional>
 
-唤起 TapTap 客户端更新游戏失败，跳转到自定义网页：
+Open a custom webpage if failed to open the TapTap app:
 
 <Conditional region="cn">
 
 ```java
-// 适用于中国大陆
+// For Mainland China
 TapGameUtil.updateGameAndFailToWebInTapTap(context, "your app id", "your website url");
 
-// 适用于其他国家或地区
+// For other countries/regions
 TapGameUtil.updateGameAndFailToWebInTapGlobal(context, "your app id", "your website url");
 ```
 
@@ -145,7 +145,7 @@ TapGameUtil.updateGameAndFailToWebInTapGlobal(context, "your app id", "your webs
 <>
 
 ```objc
-// 受限于苹果政策，iOS 平台的 TapTap 客户端不提供游戏更新功能
+// Due to Apple’s restrictions, TapTap for iOS doesn’t offer the Updates function
 ```
 
 </>
@@ -154,30 +154,30 @@ TapGameUtil.updateGameAndFailToWebInTapGlobal(context, "your app id", "your webs
 <Conditional region="cn">
 
 <details>
-<summary>点击展开 TapSDK 3.3.0 之前的相关接口</summary>
+<summary>If you are not using TapSDK 3.3.0 or later</summary>
 
-**TapSDK 3.3.0 及之后版本不必参考这一节**，推荐使用上面「唤起 TapTap 检查更新」的 API。
+**This section is not applicable for TapSDK 3.3.0 and later**. If you are using TapSDK 3.3.0 and later, please use the APIs mentioned earlier on this page.
 
-**检查 TapTap 客户端是否安装**：
+**Check if TapTap is installed**:
 
 <MultiLang>
 
 <>
 
 ```cs
-// 适用于中国大陆
+// For Mainland China
 TapCommon.IsTapTapInstalled(installed =>
 {
     if (installed) {
-        Debug.Log("TapTap 已经安装");
+        Debug.Log("TapTap is installed");
     }
 });
 
-// 适用于其他国家或地区
+// For other countries/regions
 TapCommon.IsTapTapGlobalInstalled(installed =>
 {
     if (installed) {
-        Debug.Log("TapTap 已经安装");
+        Debug.Log("TapTap is installed");
     }
 });
 ```
@@ -185,31 +185,31 @@ TapCommon.IsTapTapGlobalInstalled(installed =>
 </>
 <>
 
-需要导入 `TapCommon.aar` 包，接口在 `TapGameUtil` 中。
+Import `TapCommon.aar` and access the interfaces from `TapGameUtil`.
 
 ```java
 import com.tds.common.utils.TapGameUtil;
 
-// 适用于中国大陆
+// For Mainland China
 if(TapGameUtil.isTapTapInstalled(this)){
-    Log.d(TAG, "已经安装 TapTap 客户端");
+    Log.d(TAG, "TapTap is installed");
 }
-// 适用于其他国家或地区
+// For other countries/regions
 if(TapGameUtil.isTapGlobalInstalled(this)){
-    Log.d(TAG, "已经安装 TapTap 客户端");
+    Log.d(TAG, "TapTap is installed");
 }
 ```
 
 </>
 <>
 
-需要导入 `TapCommon.framework` 库文件，在 `info.plist` 里配置 `LSApplicationQueriesSchemes` 增加 `tapsdk` 和 `tapiosdk`。
+Import `TapCommon.framework` and add `tapsdk` and `tapiosdk` under `LSApplicationQueriesSchemes` in `info.plist`.
 
 ```objc
 #import <TapCommonSDK/TapCommonSDK.h>
-// 适用于中国大陆
+// For Mainland China
 BOOL isInstalled = [TapGameUtil isTapTapInstalled];
-// 适用于其他国家或地区
+// For other countries/regions
 BOOL isInstalled = [TapGameUtil isTapGlobalInstalled];
 ```
 
@@ -217,7 +217,7 @@ BOOL isInstalled = [TapGameUtil isTapGlobalInstalled];
 
 </MultiLang>
 
-**唤起 TapTap 更新游戏**：
+**Open TapTap to update the game**：
 
 <MultiLang>
 
@@ -225,19 +225,19 @@ BOOL isInstalled = [TapGameUtil isTapGlobalInstalled];
 TapCommon.UpdateGameInTapTap("appid", callSuccess =>
 {
     if (callSuccess) {
-        Debug.Log("TapTap 唤起成功");
+        Debug.Log("TapTap opened");
     }
 });
 ```
 
 ```java
 if(TapGameUtil.updateGameInTapTap(this,"appid")){
-    Log.d(TAG, "唤起 TapTap 客户端成功");
+    Log.d(TAG, "TapTap opened");
 }
 ```
 
 ```objc
-// 受限于苹果政策，iOS 平台的 TapTap 客户端不提供游戏更新功能
+// Due to Apple’s restrictions, TapTap for iOS doesn’t offer the Updates function
 ```
 
 </MultiLang>
@@ -246,7 +246,7 @@ if(TapGameUtil.updateGameInTapTap(this,"appid")){
 
 </Conditional>
 
-## 打开游戏评论区
+## Open Game Reviews
 
 <MultiLang>
 
@@ -255,19 +255,19 @@ if(TapGameUtil.updateGameInTapTap(this,"appid")){
 <Conditional region="cn">
 
 ```cs
-// 适用于中国大陆
+// For Mainland China
 TapCommon.OpenReviewInTapTap(appId, openSuccess =>
 {
     if (openSuccess) {
-        Debug.Log("打开游戏评论区成功");
+        Debug.Log("Game reviews opened");
     }
 });
 
-// 适用于其他国家或地区
+// For other countries/regions
 TapCommon.OpenReviewInTapGlobal(appId, openSuccess =>
 {
     if (openSuccess) {
-        Debug.Log("打开游戏评论区成功");
+        Debug.Log("Game reviews opened");
     }
 });
 ```
@@ -280,7 +280,7 @@ TapCommon.OpenReviewInTapGlobal(appId, openSuccess =>
 TapCommon.OpenReviewInTapGlobal(appId, openSuccess =>
 {
     if (openSuccess) {
-        Debug.Log("打开游戏评论区成功");
+        Debug.Log("Game reviews opened");
     }
 });
 ```
@@ -294,14 +294,14 @@ TapCommon.OpenReviewInTapGlobal(appId, openSuccess =>
 <Conditional region="cn">
 
 ```java
-// 适用于中国大陆
+// For Mainland China
 if(TapGameUtil.openReviewInTapTap(this,"appid")){
-    Log.d(TAG, "打开评论区成功");
+    Log.d(TAG, "Game reviews opened");
 }
 
-// 适用于其他国家或地区
+// For other countries/regions
 if(TapGameUtil.openReviewInTapGlobal(this,"appid")){
-    Log.d(TAG, "打开评论区成功");
+    Log.d(TAG, "Game reviews opened");
 }
 ```
 
@@ -311,7 +311,7 @@ if(TapGameUtil.openReviewInTapGlobal(this,"appid")){
 
 ```java
 if(TapGameUtil.openReviewInTapGlobal(this,"appid")){
-    Log.d(TAG, "打开评论区成功");
+    Log.d(TAG, "Game reviews opened");
 }
 ```
 
@@ -322,39 +322,39 @@ if(TapGameUtil.openReviewInTapGlobal(this,"appid")){
 <>
 
 ```objc
-// 未支持
+// Not supported yet
 ```
 
 </>
 
 </MultiLang>
 
-appid：游戏在 TapTap 商店的唯一身份标识。
-例如：<Conditional region="cn">`https://www.taptap.com/app/187168`</Conditional><Conditional region="global">`https://www.taptap.io/app/187168`</Conditional>，其中 `187168` 是 `appid`。
+appid is a game’s unique identifier in the TapTap store.
+For example, in <Conditional region="cn">`https://www.taptap.com/app/187168`</Conditional><Conditional region="global">`https://www.taptap.io/app/187168`</Conditional>, `187168` is the `appid`.
 
-## 常见问题
+## FAQ
 
-### Android 11 或更高版本无法拉起 TapTap 客户端
+### The TapTap app cannot be launched from the game on Android 11. Why?
 
 <AndroidFaq />
 
-### 未接入 TapSDK，如何唤起 TapTap 客户端更新游戏
+### If I’m not using the TapSDK, how can I open the TapTap app to update the game?
 
-受限于苹果政策，iOS 平台的 TapTap 客户端不提供游戏更新功能，以下方案仅限于 Android 平台使用。
+Due to Apple’s restrictions, TapTap for iOS doesn’t support the Updates function. The following instructions are for Android only.
 
-未接入 TapSDK、使用旧版 TapSDK 难以升级的游戏，可以通过以下方案进行手动唤起 TapTap 客户端更新游戏：
+If you are not using the TapSDK or using older versions of the TapSDK, you can follow the instructions below to manually open the TapTap app to update the game.
 
-根据玩家设备是否安装 TapTap 客户端来对应打开 URL:
+Open the corresponding URL according to whether TapTap is installed on the device:
 
-- 如果玩家设备安装 TapTap 客户端则直接唤起 TapTap 客户端到游戏详情页进行更新；
-- 如果玩家设备没有安装 TapTap 客户端，则以 Web 形式打开游戏详情页，根据页面底部提示引导玩家下载 TapTap 客户端，安装成功后打开 TapTap 客户端，玩家根据提示选择在 TapTap 客户端里打开游戏详情页进行更新。
+- If TapTap is installed, open the TapTap app and jump to the game’s page.
+- If not, open the game’s page in a web browser. The player will follow the instructions on the page to install the TapTap app, open the app, and update the game within the app.
 
-未安装 TapTap 客户端对应的 URL：
+URL for devices without TapTap:
 
 <Conditional region="cn">
 
-- 适用于中国大陆：`https://l.taptap.com/5d1NGyET?subc1=AppID`
-- 适用于其他国家或地区：`https://l.taptap.io/GNYwFaZr?subc1=AppID`
+- For Mainland China: `https://l.taptap.com/5d1NGyET?subc1=AppID`
+- For other countries/regions: `https://l.taptap.io/GNYwFaZr?subc1=AppID`
 
 </Conditional>
 <Conditional region="global">
@@ -363,32 +363,32 @@ appid：游戏在 TapTap 商店的唯一身份标识。
 
 </Conditional>
 
-已安装 TapTap 客户端对应的 URL：
+URL for devices with TapTap:
 
 <Conditional region="cn">
 
-- 适用于中国大陆：`taptap://taptap.com/app?app_id=AppID&source=outer|update`
-- 适用于其他国家或地区：`tapglobal://taptap.tw/app?app_id=游戏商店id&source=outer|update`
+- For Mainland China: `taptap://taptap.com/app?app_id=AppID&source=outer|update`
+- For other countries/regions: `tapglobal://taptap.tw/app?app_id=AppID&source=outer|update`
 
 </Conditional>
 <Conditional region="global">
 
-- `tapglobal://taptap.tw/app?app_id=游戏商店id&source=outer|update`
+- `tapglobal://taptap.tw/app?app_id=AppID&source=outer|update`
 
 </Conditional>
 
-注意替换其中的 `AppID`。`AppID` 是游戏在 TapTap 商店的唯一身份标识，例如：<Conditional region="cn">`https://www.taptap.com/app/187168`</Conditional><Conditional region="global">`https://www.taptap.io/app/187168`</Conditional>，其中 `187168` 是 AppID。
+Make sure to replace the `AppID` in the URL. `AppID` is a game’s unique identifier in the TapTap store. For example, in <Conditional region="cn">`https://www.taptap.com/app/187168`</Conditional><Conditional region="global">`https://www.taptap.io/app/187168`</Conditional>, `187168` is the AppID.
 
-注意，除了打开 URL 外，还需要检测设备是否已经安装 TapTap 客户端，以及处理唤起失败的逻辑，这些代码都需要自行编写。
+Keep in mind that you have to write the logic not only to open the URL but also to check whether TapTap is installed, as well as handle errors.
 
-下面提供 TapSDK 唤起更新的代码供参考。
+Take a look at the code example below.
 
 <details>
-<summary>参考代码</summary>
+<summary>Code example</summary>
 
 <Conditional region="cn">
 
-适用于中国大陆：
+For Mainland China:
 
 ```java
 package com.tds.common.utils;
@@ -412,8 +412,6 @@ public class TapGameUtil {
 
   public static final String DEFAULT_CLIENT_DOWNLOAD_URL_TAPTAP = "https://l.taptap.com/5d1NGyET";
 
-  // 这里更新的时候不检查 Tap 客户端，一是因为特定 schema 没被应用注册的话大概率是直接返回 error 的，在这里被 try catch 后返回 false 可以近似等于客户端不存在
-  // 二是因为 Android 11 开始检查客户端需要游戏做特殊配置，这个配置无法在 SDK 内做好，因为和编译工具版本强绑定，无法做前后版本兼容。
   public static boolean updateGameAndFailToWebInTapTap(Activity activity, String appId) {
     return updateGameInTapTap(activity, appId) || openWebDownloadUrlOfTapTap(activity, appId);
   }
@@ -512,7 +510,7 @@ public class TapGameUtil {
 }
 ```
 
-适用于其他国家或地区：
+For other countries/regions:
 
 </Conditional>
 
@@ -537,9 +535,6 @@ public class TapGameUtil {
   public static final String CLIENT_URI_TAPTAP_GLOBAL = "tapglobal://taptap.tw";
 
   public static final String DEFAULT_CLIENT_DOWNLOAD_URL_TAPTAP_GLOBAL = "https://l.taptap.io/GNYwFaZr";
-
-  // 这里更新的时候不检查 Tap 客户端，一是因为特定 schema 没被应用注册的话大概率是直接返回 error 的，在这里被 try catch 后返回 false 可以近似等于客户端不存在
-  // 二是因为 Android 11 开始检查客户端需要游戏做特殊配置，这个配置无法在 SDK 内做好，因为和编译工具版本强绑定，无法做前后版本兼容。
 
   public static boolean updateGameAndFailToWebInTapGlobal(Activity activity, String appId) {
     return updateGameInTapGlobal(activity, appId) || openWebDownloadUrlOfTapGlobal(activity, appId);
