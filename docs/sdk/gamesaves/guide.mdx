@@ -265,7 +265,7 @@ Key|Value|含义|来源
 `X-LC-Session`|`<sessionToken>`|玩家的登录凭证
 
 管理接口需要使用 `Master Key`：`X-LC-Key: {{masterkey}},master`。
-`Master Key` 即 `Server Secret`，同样可在控制台查看。
+`Master Key` 即 `Server Secret`，同样可在控制台查看。使用管理接口时无需携带 `sessionToken`。
 
 详见文档关于[应用凭证](/sdk/storage/guide/setup-dotnet#应用凭证)的说明。
 
@@ -370,8 +370,8 @@ curl -X GET \
 ### 添加存档
 
 添加存档时的必填字段和可选字段请参考[云存档保存的游戏元数据](/sdk/gamesaves/features#云存档保存的游戏元数据)。
-注意，即使在 `X-LC-Session` HTTP 头中传递了用户的 `sessionToken`，云端也不会自动填充 `user` 字段，开发者仍然需要在调用接口时传入 `user` 字段。
-**请设置存档本身和存档指向的 `gameFile` 和 `cover` 的 ACL 为仅限当前用户读取。**
+
+在调用添加存档接口前，请先创建 `gameFile` 和 `cover` 指向的[文件](/sdk/storage/guide/rest/#创建文件)，并**确保文件的 ACL 为仅限当前用户读取。**
 
 ```
 curl -X POST \
@@ -386,9 +386,7 @@ curl -X POST \
       "gameFile":{"id":"55a39634e4b0ed48f0c1845c", "__type":"File"},
       "cover":{"id": "543cbaede4b07db196f50f3c", "__type": "File"},
       "summary":"hello",
-      "modifiedAt":{"__type":"Date", "iso":"2015-06-21T18:02:52.249Z"},
-      "user":{"__type":"Pointer", "className": "_User", "objectId": "558e20cbe4b060308e3eb36c"},
-      "ACL":{"558e20cbe4b060308e3eb36c":{"write":true,"read":true}}
+      "modifiedAt":{"__type":"Date", "iso":"2015-06-21T18:02:52.249Z"}
   }' \
 https://API_BASE_URL/1.1/gamesaves
 ```
@@ -411,7 +409,7 @@ curl -X DELETE \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{appkey}}" \
   -H "X-LC-Session: <sessionToken>" \
-  https://API_BASE_URL/1.1/gamesave/<objectId>
+  https://API_BASE_URL/1.1/gamesaves/<objectId>
 ```
 
 会返回
@@ -434,7 +432,7 @@ curl -X PUT \
   -H "X-LC-Session: <sessionToken>" \
   -H "Content-Type: application/json" \
   -d '{"progressValue": 114514}' \
-  https://API_BASE_URL/1.1/gamesave/<objectId>
+  https://API_BASE_URL/1.1/gamesaves/<objectId>
 ```
 
 成功时返回 objectId 和更新时间： 
