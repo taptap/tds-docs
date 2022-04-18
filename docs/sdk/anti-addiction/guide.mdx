@@ -564,7 +564,7 @@ REST API 请求的主体为 JSON 格式，HTTP header 的 `Content-Type` 需要�
 请求通过 `Authorization TOKEN` HTTP 头进行鉴权。
 开发者需要在客户端通过 SDK 接口获取 `TOKEN` 后传给服务端，然后在服务端凭借此 `TOKEN` 调用防沉迷服务的 REST API。
 
-API Base 为 `https://tds-tapsdk.cn.tapapis.com`.
+API Base 为 `https://tds-tapsdk.cn.tapapis.com`。
 
 #### 获取鉴权 Token
 
@@ -586,56 +586,104 @@ NSString *token = [AntiAddiction currentToken];
 
 鉴权 Token 永久有效。
 
-### 上报消费金额
+### 检查玩家当前能否游戏
 
-接口：
-
+```sh
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H 'Authorization: {{token}}' \
+  https://tds-tapsdk.cn.tapapis.com/anti-addiction/v1/clients/{{clientId}}/users/{{userIdentifier}}/playable
 ```
-POST /addict/api/v1/paymentsubmit
-```
 
-请求体：
+其中：
+
+* `{{token}}` 需替换为客户端获取的鉴权 token。
+* `{{clientId}}` 需替换为 **开发者中心后台游戏服务 > 应用配置** 中的 Client ID。
+* `{{userIdentifier}}` 需替换为游戏使用的 [玩家唯一标识](#防沉迷认证)。
+
+以下情况的响应状态码均为 200：
 
 ```json
-// 消费金额：100 分
-{ amount: 100 }
-```
+// 实名认证失败
+{
+    "success": true,
+    "data": {
+        "status": 2,
+        "anti_addiction_token": "",
+        "age_limit": 18,
+        "has_auth_record": false
+    }
+}
 
-上报成功时响应的状态码为 200，返回结果：
-
-```json
+// 成年玩家
 {
     "success":true,
-    "data":{"message":"上传金额成功"}
+    "data":{
+        "code":200,
+        "can_play":true,
+        "message":"游戏时间不受限制",
+        "remain_time":60,
+        "cost_time":0,
+        "restrict_type":0,
+        "title":"健康游戏提示",
+        "description":"当前为成年人账号"
+    }
+}
+
+// 未成年玩家，当前可以游戏
+{
+    "success":true,
+    "data":{
+        "code":200,
+        "can_play":true,
+        "message":"游戏允许时间",
+        "remain_time": {{remainTime}},
+        "cost_time": {{costtime}},
+        "restrict_type":1,
+        "title":"健康游戏提示","description":"你当前为未成年账号，已被纳入防沉迷系统。根据国家相关规定，周五、周六、周日及法定节假日 20 点 - 21 点之外为健康保护时段。你今日游戏时间还剩余${remainTime}分钟，请注意适当休息。"
+    }
+}
+
+// 未成年玩家，当前不可游戏
+{
+    "success":true,
+    "data":{
+        "code":200,
+        "can_play":false,
+        "message":"游戏时间耗尽",
+        "remain_time": 0,
+        "cost_time": 60,
+        "restrict_type":1,
+        "title":"健康游戏提示",
+        "description":"你当前为未成年账号，已被纳入防沉迷系统。根据国家相关规定，周五、周六、周日及法定节假日 20 点 - 21 点之外为健康保护时段。当前时间段无法游玩，请合理安排时间。"
+    }
 }
 ```
 
-金额格式异常时返回 400 错误：
+Token 解析错误会返回 401 错误：
 
 ```json
 {
     "success":false,
     "data":{
-        "code":3,
-        "error":"上传金额不正确",
-        "error_description":"金额大于等于0并小于100_000_000_000","msg":"请输入正确的金额格式"
+        "code":16,
+        "error":"实名认证失败",
+        "error_description":"未实名用户不能进入游戏",
+        "msg":"该账号没有通过实名认证"
     }
 }
 ```
 
 ### 检查玩家消费是否受限
 
-接口：
+充值金额以分为单位，比如检查玩家是否可以消费 1 元（100 分）：
 
-```
-POST /addict/api/v1/paymentcheck
-```
-
-请求体：
-
-```json
-// 消费金额：100 分
-{ amount: 100 }
+```sh
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H 'Authorization: {{token}}' \
+  -d '{"amount": 100}' \
+  https://tds-tapsdk.cn.tapapis.com/anti-addiction/v1/clients/{{clientId}}/users/{{userIdentifier}}/playable
 ```
 
 消费受限和不受限时响应的状态码都是 200：
@@ -693,78 +741,36 @@ POST /addict/api/v1/paymentcheck
 }
 ```
 
-### 检查玩家当前能否游戏
+### 上报消费金额
 
-接口：
+玩家充值 1 元（100 分），提交消费金额：
 
+```sh
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H 'Authorization: {{token}}' \
+  -d '{"amount": 100}' \
+  https://tds-tapsdk.cn.tapapis.com/anti-addiction/v1/clients/{{clientId}}/users/{userIdentifier}/payments
 ```
-POST /addict/api/v1/playcheck
-```
 
-请求体：
+上报成功时响应的状态码为 200，返回结果：
 
 ```json
-{}
-```
-
-无论能否游戏，已实名玩家的响应状态码均为 200：
-
-```json
-// 成年玩家
 {
     "success":true,
-    "data":{
-        "code":200,
-        "can_play":true,
-        "message":"游戏时间不受限制",
-        "remain_time":60,
-        "cost_time":0,
-        "restrict_type":0,
-        "title":"健康游戏提示",
-        "description":"当前为成年人账号"
-    }
-}
-
-// 未成年玩家，当前可以游戏
-{
-    "success":true,
-    "data":{
-        "code":200,
-        "can_play":true,
-        "message":"游戏允许时间",
-        "remain_time": {{remainTime}},
-        "cost_time": {{costtime}},
-        "restrict_type":1,
-        "title":"健康游戏提示","description":"你当前为未成年账号，已被纳入防沉迷系统。根据国家相关规定，周五、周六、周日及法定节假日 20 点 - 21 点之外为健康保护时段。你今日游戏时间还剩余${remainTime}分钟，请注意适当休息。"
-    }
-}
-
-// 未成年玩家，当前不可游戏
-{
-    "success":true,
-    "data":{
-        "code":200,
-        "can_play":false,
-        "message":"游戏时间耗尽",
-        "remain_time": 0,
-        "cost_time": 60,
-        "restrict_type":1,
-        "title":"健康游戏提示",
-        "description":"你当前为未成年账号，已被纳入防沉迷系统。根据国家相关规定，周五、周六、周日及法定节假日 20 点 - 21 点之外为健康保护时段。当前时间段无法游玩，请合理安排时间。"
-    }
+    "data":{"message":"上传金额成功"}
 }
 ```
 
-实名认证失败（包括 Token 解析错误）时返回 401 错误：
+金额格式异常时返回 400 错误：
 
 ```json
 {
     "success":false,
     "data":{
-        "code":16,
-        "error":"实名认证失败",
-        "error_description":"未实名用户不能进入游戏",
-        "msg":"该账号没有通过实名认证"}
+        "code":3,
+        "error":"上传金额不正确",
+        "error_description":"金额大于等于0并小于100_000_000_000","msg":"请输入正确的金额格式"
     }
 }
 ```
@@ -785,12 +791,12 @@ Key|Value|含义
 curl -X GET \
   -H "X-TDS-Id: {{clientId}}" \
   -H "X-TDS-Server-Secret: {{serverSecret}}" \
-  https://tds-tapsdk.cn.tapapis.com/real-name/v1/clients/{{clientId}}/users/USER-ID/check?name=USER-NAME&idCard=ID-CARD-NUMBER
+  https://tds-tapsdk.cn.tapapis.com/real-name/v1/clients/{{clientId}}/users/{{userIdentifier}}/check?name=USER-NAME&idCard=ID-CARD-NUMBER
 ```
 
 其中：
 
-- `USER-ID` 需替换为游戏使用的玩家唯一标识。
+- `userIdentifier` 需替换为游戏使用的玩家唯一标识。
 - `USER-NAME` 需替换为 urlencode 后的玩家姓名。
 - `ID-CARD-NUMBER` 需替换为玩家的身份证号码。
 
