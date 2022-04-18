@@ -8,17 +8,19 @@ import MultiLang from '/src/docComponents/MultiLang';
 import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';
 
-:::info
-使用 TDS 实名认证和防沉迷服务之前，需要完成[中宣部实名认证系统的注册和接口测试](/sdk/anti-addiction/features/#准备工作)工作，并在 TapTap 开发者中心后台完成[参数配置](/sdk/anti-addiction/features/#完成开发者中心配置)。
-:::
-
 :::tip
-推荐阅读博客：[实名认证和防沉迷功能接入](https://blog.taptap.dev/posts/tapsdk-tap-antiaddiction-practice)，加深对实名认证和防沉迷功能的理解。
+* 使用 TDS 实名认证和防沉迷服务之前，需要完成[中宣部实名认证系统的注册和接口测试](/sdk/anti-addiction/features/#准备工作)工作，并在 TapTap 开发者中心后台完成[参数配置](/sdk/anti-addiction/features/#完成开发者中心配置)。
+* 推荐阅读博客：[实名认证和防沉迷功能接入](https://blog.taptap.dev/posts/tapsdk-tap-antiaddiction-practice)，加深对实名认证和防沉迷功能的理解。
 :::
 
 ## SDK 配置
 
 可以在 [下载页](/tap-download) 获得 SDK，引入防沉迷模块。
+
+:::info
+* 防沉迷 v1.2.0 之后的版本并入了 TapSDK 的大版本，v1.2.0 之后的第一个版本为 v3.7.1。
+* 防沉迷 v1.2.0 及之前版本仅需要导入**防沉迷 SDK**，不依赖其他 SDK。
+:::
 
 <MultiLang>
 
@@ -28,8 +30,16 @@ Unity 模块是通过引入 iOS 和 Android 模块后增加桥接文件打包出
 
 Unity 接入：
 
-- Unity 开发环境：2018.4.36f1
-- 导入 `AntiAddictionForUnity.unitypackage`
+- Unity 开发环境要求：Unity 2019.4 或更高版本
+- 导入**防沉迷 SDK**：`AntiAddictionForUnity.unitypackage`
+    <li> 导入 <code>TapTap_Common_{sdkVersions.taptap.unity}.unitypackage</code></li>
+- 在项目的 `Packages/manifest.json` 文件中添加以下依赖：
+
+<CodeBlock className="json">
+{`"dependencies":{ 
+  "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
+}`}
+</CodeBlock>
 
 支持版本：
 
@@ -53,8 +63,9 @@ iOS 平台配置：
 最低支持 Android 5.0（API level 21），编译环境为 Android Studio。
 
 <ul>
-<li>将 <code>AntiAddiction_{sdkVersions.taptap.anti_addiction}.aar</code> 拷贝到游戏目录下的 <code>src/main/libs</code> 目录中</li>
-<li>将 <code>AntiAddictionUI_{sdkVersions.taptap.anti_addiction}.aar</code> 拷贝到游戏目录下的 <code>src/main/libs</code> 目录中</li>
+<li>将 <strong>防沉迷 SDK</strong> <code>AntiAddiction_{sdkVersions.taptap.android}.aar</code> 拷贝到游戏目录下的 <code>src/main/libs</code> 目录中</li>
+<li>将 <strong>防沉迷 SDK</strong> <code>AntiAddictionUI_{sdkVersions.taptap.android}.aar</code> 拷贝到游戏目录下的 <code>src/main/libs</code> 目录中</li>
+<li>将 <code>TapCommon_{sdkVersions.taptap.android}.aar</code> 拷贝到游戏目录下的 <code>src/main/libs</code> 目录中</li>
 </ul>
 
 在游戏目录下 `build.gradle` 文件中添加代码
@@ -67,8 +78,9 @@ iOS 平台配置：
 }
 dependencies {
     // ...
-    implementation(name: "AntiAddiction_${sdkVersions.taptap.anti_addiction}", ext: "aar")
-    implementation(name: "AntiAddictionUI_${sdkVersions.taptap.anti_addiction}", ext: "aar")
+    implementation(name: "AntiAddiction_${sdkVersions.taptap.ios}", ext: "aar") // 防沉迷 SDK
+    implementation(name: "AntiAddictionUI_${sdkVersions.taptap.ios}", ext: "aar") // 防沉迷 SDK
+    implementation(name: "TapCommon_${sdkVersions.taptap.ios}", ext: "aar")
     // ...
 }`}
 </CodeBlock>
@@ -78,15 +90,19 @@ dependencies {
 
 支持的 iOS 版本为最低为 iOS 10，SDK 编译环境为 Xcode 12。
 
-iOS 防沉迷 SDK 结构：
+iOS **防沉迷 SDK** 结构：
 
 - `AntiAddictionService` 防沉迷基础库，源码由 Swift 编写。
 - `AntiAddictionUI` 带 UI 的防沉迷库，依赖 `AntiAddictionService`，源码由  Objective-C 编写。
 - `AntiAdictionResources.bundle` 资源文件
 
+其他依赖：
+
+- `TapCommonSDK.framework` 基础库
+
 添加防沉迷库文件：
 
-- 添加 `AntiAddictionService.framework` 和 `AntiAddictionUI.framework` 静态库。注意添加时选择 Embed 方式为 **Do Not Embed**。
+- 添加 `AntiAddictionService.framework`、`AntiAddictionUI.framework` 和 `TapCommonSDK.framework` 静态库。注意添加时选择 Embed 方式为 **Do Not Embed**。
 
 - 引用代码：
 
@@ -266,15 +282,17 @@ SDK 支持两种防沉迷认证方式：
 
 ### TapTap 快速认证
 
-使用 TapTap 快速认证需要接入 [TapTap 登录](/sdk/taptap-login/features/)功能。
-
-游戏可以选择通过[TDS 内建账户系统](/sdk/taptap-login/guide/start/#用-taptap-oauth-授权结果直接登录账户系统)接入 TapTap 登录，或者以[单纯 TapTap 用户认证](/sdk/taptap-login/guide/tap-login/#taptap-登录并获取登录结果)的方式接入 TapTap 登录。
+:::info
+防沉迷 1.2.0 及之前版本 sdk 必须接入 TapTap 登录才能使用 TapTap 快速认证。
+:::
 
 传入玩家唯一标识 `userIdentifier`，即可开始 TapTap 快速认证。
 
 其中的**玩家唯一标识** `userIdentifier`，如果接入 [TDS 内建账户系统](/sdk/taptap-login/guide/start/#用-taptap-oauth-授权结果直接登录账户系统)，可以用玩家的 `objectId`；如果使用[单纯 TapTap 用户认证](/sdk/taptap-login/guide/tap-login/#taptap-登录并获取登录结果)则可以用 `openid` 或 `unionid`。
 
 <MultiLang>
+
+<>
 
 ```cs
 bool useTapLogin = true;
@@ -283,11 +301,17 @@ string userIdentifier = "玩家的唯一标识";
 AntiAddictionUIKit.Startup(useTapLogin, userIdentifier);
 ```
 
+</>
+<>
+
 ```java
 boolean useTapLogin = true;
 String userIdentifier = "玩家的唯一标识";
 AntiAddictionUIKit.startup(activity, useTapLogin, userIdentifier);
 ```
+
+</>
+<>
 
 ```objc
 BOOL useTapLogin = YES;
@@ -295,11 +319,20 @@ NSString *userIdentifier = @"玩家的唯一标识";
 [AntiAddiction startUpUseTapLogin:useTapLogin userIdentifier:userIdentifier];
 ```
 
+使用 **TapTap 快速认证** 需要需要在 `AppDelegate` 里嵌入回调。
+
+注意：如果已经在登录模块添加过，可以跳过此步。
+
+```objc
+// 新的回调
+- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
+    return [TDSHandleUrl handleOpenURL:url];
+} 
+```
+
+</>
+
 </MultiLang>
-
-快速认证基于 TapTap 的 `access token`，SDK 会自动获取 `access token`。
-如果自动获取失败，那么会显示手动输入实名信息的用户界面。
-
 
 ### 手动输入实名信息
 
@@ -547,7 +580,7 @@ REST API 请求的主体为 JSON 格式，HTTP header 的 `Content-Type` 需要�
 请求通过 `Authorization TOKEN` HTTP 头进行鉴权。
 开发者需要在客户端通过 SDK 接口获取 `TOKEN` 后传给服务端，然后在服务端凭借此 `TOKEN` 调用防沉迷服务的 REST API。
 
-API Base 为 `https://tds-tapsdk.cn.tapapis.com`.
+API Base 为 `https://tds-tapsdk.cn.tapapis.com`。
 
 #### 获取鉴权 Token
 
@@ -569,56 +602,104 @@ NSString *token = [AntiAddiction currentToken];
 
 鉴权 Token 永久有效。
 
-### 上报消费金额
+### 检查玩家当前能否游戏
 
-接口：
-
+```sh
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H 'Authorization: {{token}}' \
+  https://tds-tapsdk.cn.tapapis.com/anti-addiction/v1/clients/{{clientId}}/users/{{userIdentifier}}/playable
 ```
-POST /addict/api/v1/paymentsubmit
-```
 
-请求体：
+其中：
+
+* `{{token}}` 需替换为客户端获取的鉴权 token。
+* `{{clientId}}` 需替换为 **开发者中心后台游戏服务 > 应用配置** 中的 Client ID。
+* `{{userIdentifier}}` 需替换为游戏使用的 [玩家唯一标识](#防沉迷认证)。
+
+以下情况的响应状态码均为 200：
 
 ```json
-// 消费金额：100 分
-{ amount: 100 }
-```
+// 实名认证失败
+{
+    "success": true,
+    "data": {
+        "status": 2,
+        "anti_addiction_token": "",
+        "age_limit": 18,
+        "has_auth_record": false
+    }
+}
 
-上报成功时响应的状态码为 200，返回结果：
-
-```json
+// 成年玩家
 {
     "success":true,
-    "data":{"message":"上传金额成功"}
+    "data":{
+        "code":200,
+        "can_play":true,
+        "message":"游戏时间不受限制",
+        "remain_time":60,
+        "cost_time":0,
+        "restrict_type":0,
+        "title":"健康游戏提示",
+        "description":"当前为成年人账号"
+    }
+}
+
+// 未成年玩家，当前可以游戏
+{
+    "success":true,
+    "data":{
+        "code":200,
+        "can_play":true,
+        "message":"游戏允许时间",
+        "remain_time": {{remainTime}},
+        "cost_time": {{costtime}},
+        "restrict_type":1,
+        "title":"健康游戏提示","description":"你当前为未成年账号，已被纳入防沉迷系统。根据国家相关规定，周五、周六、周日及法定节假日 20 点 - 21 点之外为健康保护时段。你今日游戏时间还剩余${remainTime}分钟，请注意适当休息。"
+    }
+}
+
+// 未成年玩家，当前不可游戏
+{
+    "success":true,
+    "data":{
+        "code":200,
+        "can_play":false,
+        "message":"游戏时间耗尽",
+        "remain_time": 0,
+        "cost_time": 60,
+        "restrict_type":1,
+        "title":"健康游戏提示",
+        "description":"你当前为未成年账号，已被纳入防沉迷系统。根据国家相关规定，周五、周六、周日及法定节假日 20 点 - 21 点之外为健康保护时段。当前时间段无法游玩，请合理安排时间。"
+    }
 }
 ```
 
-金额格式异常时返回 400 错误：
+Token 解析错误会返回 401 错误：
 
 ```json
 {
     "success":false,
     "data":{
-        "code":3,
-        "error":"上传金额不正确",
-        "error_description":"金额大于等于0并小于100_000_000_000","msg":"请输入正确的金额格式"
+        "code":16,
+        "error":"实名认证失败",
+        "error_description":"未实名用户不能进入游戏",
+        "msg":"该账号没有通过实名认证"
     }
 }
 ```
 
 ### 检查玩家消费是否受限
 
-接口：
+充值金额以分为单位，比如检查玩家是否可以消费 1 元（100 分）：
 
-```
-POST /addict/api/v1/paymentcheck
-```
-
-请求体：
-
-```json
-// 消费金额：100 分
-{ amount: 100 }
+```sh
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H 'Authorization: {{token}}' \
+  -d '{"amount": 100}' \
+  https://tds-tapsdk.cn.tapapis.com/anti-addiction/v1/clients/{{clientId}}/users/{{userIdentifier}}/playable
 ```
 
 消费受限和不受限时响应的状态码都是 200：
@@ -676,78 +757,36 @@ POST /addict/api/v1/paymentcheck
 }
 ```
 
-### 检查玩家当前能否游戏
+### 上报消费金额
 
-接口：
+玩家充值 1 元（100 分），提交消费金额：
 
+```sh
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H 'Authorization: {{token}}' \
+  -d '{"amount": 100}' \
+  https://tds-tapsdk.cn.tapapis.com/anti-addiction/v1/clients/{{clientId}}/users/{userIdentifier}/payments
 ```
-POST /addict/api/v1/playcheck
-```
 
-请求体：
+上报成功时响应的状态码为 200，返回结果：
 
 ```json
-{}
-```
-
-无论能否游戏，已实名玩家的响应状态码均为 200：
-
-```json
-// 成年玩家
 {
     "success":true,
-    "data":{
-        "code":200,
-        "can_play":true,
-        "message":"游戏时间不受限制",
-        "remain_time":60,
-        "cost_time":0,
-        "restrict_type":0,
-        "title":"健康游戏提示",
-        "description":"当前为成年人账号"
-    }
-}
-
-// 未成年玩家，当前可以游戏
-{
-    "success":true,
-    "data":{
-        "code":200,
-        "can_play":true,
-        "message":"游戏允许时间",
-        "remain_time": {{remainTime}},
-        "cost_time": {{costtime}},
-        "restrict_type":1,
-        "title":"健康游戏提示","description":"你当前为未成年账号，已被纳入防沉迷系统。根据国家相关规定，周五、周六、周日及法定节假日 20 点 - 21 点之外为健康保护时段。你今日游戏时间还剩余${remainTime}分钟，请注意适当休息。"
-    }
-}
-
-// 未成年玩家，当前不可游戏
-{
-    "success":true,
-    "data":{
-        "code":200,
-        "can_play":false,
-        "message":"游戏时间耗尽",
-        "remain_time": 0,
-        "cost_time": 60,
-        "restrict_type":1,
-        "title":"健康游戏提示",
-        "description":"你当前为未成年账号，已被纳入防沉迷系统。根据国家相关规定，周五、周六、周日及法定节假日 20 点 - 21 点之外为健康保护时段。当前时间段无法游玩，请合理安排时间。"
-    }
+    "data":{"message":"上传金额成功"}
 }
 ```
 
-实名认证失败（包括 Token 解析错误）时返回 401 错误：
+金额格式异常时返回 400 错误：
 
 ```json
 {
     "success":false,
     "data":{
-        "code":16,
-        "error":"实名认证失败",
-        "error_description":"未实名用户不能进入游戏",
-        "msg":"该账号没有通过实名认证"}
+        "code":3,
+        "error":"上传金额不正确",
+        "error_description":"金额大于等于0并小于100_000_000_000","msg":"请输入正确的金额格式"
     }
 }
 ```
@@ -768,12 +807,12 @@ Key|Value|含义
 curl -X GET \
   -H "X-TDS-Id: {{clientId}}" \
   -H "X-TDS-Server-Secret: {{serverSecret}}" \
-  https://tds-tapsdk.cn.tapapis.com/real-name/v1/clients/{{clientId}}/users/USER-ID/check?name=USER-NAME&idCard=ID-CARD-NUMBER
+  https://tds-tapsdk.cn.tapapis.com/real-name/v1/clients/{{clientId}}/users/{{userIdentifier}}/check?name=USER-NAME&idCard=ID-CARD-NUMBER
 ```
 
 其中：
 
-- `USER-ID` 需替换为游戏使用的玩家唯一标识。
+- `userIdentifier` 需替换为游戏使用的玩家唯一标识。
 - `USER-NAME` 需替换为 urlencode 后的玩家姓名。
 - `ID-CARD-NUMBER` 需替换为玩家的身份证号码。
 

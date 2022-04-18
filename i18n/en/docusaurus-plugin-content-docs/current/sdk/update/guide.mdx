@@ -1,0 +1,637 @@
+---
+title: Updates Integration Guide
+sidebar_label: Guide
+---
+
+import MultiLang from "/src/docComponents/MultiLang";
+import CodeBlock from "@theme/CodeBlock";
+import sdkVersions from "/src/docComponents/sdkVersions";
+import { Conditional } from "/src/docComponents/conditional";
+import AndroidFaq from "../_partials/android-package-visibility.mdx";
+
+When you release a new version of your game and wish the existing players to upgrade to the new version, you may want to display a notification in the game. With TapTap’s Updates function, a pop-up can be triggered when the SDK detects a new version released on the TapTap store. The player can tap a button within the pop-up to quickly jump to the Taptap app to update the game.
+
+## Integrating the SDK
+
+[Download](/tap-download) the SDK and add the `TapCommon` module to your game:
+
+<MultiLang>
+
+<CodeBlock className="json">
+  {`"dependencies":{
+  ...
+  "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+}`}
+</CodeBlock>
+
+<CodeBlock className="groovy">
+  {`repositories{  
+    flatDir {  
+        dirs 'libs'  
+    }  
+}  
+dependencies {  
+    ... 
+    implementation (name:'TapCommon_${sdkVersions.taptap.android}', ext:'aar')
+}`}
+</CodeBlock>
+
+<CodeBlock className="objectivec">{`TapCommonSDK.framework`}</CodeBlock>
+
+</MultiLang>
+
+## Open the TapTap App to Check for Updates
+
+:::tip
+Starting from TapSDK 3.3.0, the logic for updating the game has been optimized. You can have the game open a custom webpage if it fails to open the TapTap app. TapSDK 3.3.0 is still compatible with the APIs introduced in the earlier versions.
+With TapSDK 3.3.0, you won’t need to check if the TapTap app has been installed before you use the following APIs. We recommend you to use the new APIs if you are using TapSDK 3.3.0 and later.
+:::
+
+<MultiLang>
+<>
+
+Open the TapTap app to check for updates. If failed, open the game’s page on the web app:
+
+<Conditional region="cn">
+
+```cs
+// For Mainland China
+bool isSuccess = await TapCommon.UpdateGameAndFailToWebInTapTap(string appId);
+
+// For other countries/regions
+bool isSuccess = await TapCommon.UpdateGameAndFailToWebInTapGlobal(string appId);
+```
+
+</Conditional>
+
+<Conditional region="global">
+
+```cs
+bool isSuccess = await TapCommon.UpdateGameAndFailToWebInTapGlobal(string appId);
+```
+
+</Conditional>
+
+Open a custom webpage if failed to open the TapTap app:
+
+<Conditional region="cn">
+
+```cs
+// For Mainland China
+bool isSuccess = await TapCommon.UpdateGameAndFailToWebInTapTap(string appId, string webUrl);
+
+// For other countries/regions
+bool isSuccess = await TapCommon.UpdateGameAndFailToWebInTapGlobal(string appId, string webUrl);
+```
+
+</Conditional>
+
+<Conditional region="global">
+
+```cs
+bool isSuccess = await TapCommon.UpdateGameAndFailToWebInTapGlobal(string appId, string webUrl);
+```
+
+</Conditional>
+
+</>
+<>
+
+Open the TapTap app to check for updates. If failed, open the game’s page on the web app:
+
+<Conditional region="cn">
+
+```java
+// For Mainland China
+TapGameUtil.updateGameAndFailToWebInTapTap(context, "your app id");
+
+// For other countries/regions
+TapGameUtil.updateGameAndFailToWebInTapGlobal(context, "your app id");
+```
+
+</Conditional>
+
+<Conditional region="global">
+
+```java
+TapGameUtil.updateGameAndFailToWebInTapGlobal(context, "your app id");
+```
+
+</Conditional>
+
+Open a custom webpage if failed to open the TapTap app:
+
+<Conditional region="cn">
+
+```java
+// For Mainland China
+TapGameUtil.updateGameAndFailToWebInTapTap(context, "your app id", "your website url");
+
+// For other countries/regions
+TapGameUtil.updateGameAndFailToWebInTapGlobal(context, "your app id", "your website url");
+```
+
+</Conditional>
+
+<Conditional region="global">
+
+```java
+TapGameUtil.updateGameAndFailToWebInTapGlobal(context, "your app id", "your website url");
+```
+
+</Conditional>
+
+</>
+<>
+
+```objc
+// Due to Apple’s restrictions, TapTap for iOS doesn’t offer the Updates function
+```
+
+</>
+</MultiLang>
+
+<Conditional region="cn">
+
+<details>
+<summary>If you are not using TapSDK 3.3.0 or later</summary>
+
+**This section is not applicable for TapSDK 3.3.0 and later**. If you are using TapSDK 3.3.0 and later, please use the APIs mentioned earlier on this page.
+
+**Check if TapTap is installed**:
+
+<MultiLang>
+
+<>
+
+```cs
+// For Mainland China
+TapCommon.IsTapTapInstalled(installed =>
+{
+    if (installed) {
+        Debug.Log("TapTap is installed");
+    }
+});
+
+// For other countries/regions
+TapCommon.IsTapTapGlobalInstalled(installed =>
+{
+    if (installed) {
+        Debug.Log("TapTap is installed");
+    }
+});
+```
+
+</>
+<>
+
+Import `TapCommon.aar` and access the interfaces from `TapGameUtil`.
+
+```java
+import com.tds.common.utils.TapGameUtil;
+
+// For Mainland China
+if(TapGameUtil.isTapTapInstalled(this)){
+    Log.d(TAG, "TapTap is installed");
+}
+// For other countries/regions
+if(TapGameUtil.isTapGlobalInstalled(this)){
+    Log.d(TAG, "TapTap is installed");
+}
+```
+
+</>
+<>
+
+Import `TapCommon.framework` and add `tapsdk` and `tapiosdk` under `LSApplicationQueriesSchemes` in `info.plist`.
+
+```objc
+#import <TapCommonSDK/TapCommonSDK.h>
+// For Mainland China
+BOOL isInstalled = [TapGameUtil isTapTapInstalled];
+// For other countries/regions
+BOOL isInstalled = [TapGameUtil isTapGlobalInstalled];
+```
+
+</>
+
+</MultiLang>
+
+**Open TapTap to update the game**：
+
+<MultiLang>
+
+```cs
+TapCommon.UpdateGameInTapTap("appid", callSuccess =>
+{
+    if (callSuccess) {
+        Debug.Log("TapTap opened");
+    }
+});
+```
+
+```java
+if(TapGameUtil.updateGameInTapTap(this,"appid")){
+    Log.d(TAG, "TapTap opened");
+}
+```
+
+```objc
+// Due to Apple’s restrictions, TapTap for iOS doesn’t offer the Updates function
+```
+
+</MultiLang>
+
+</details>
+
+</Conditional>
+
+## Open Game Reviews
+
+<MultiLang>
+
+<>
+
+<Conditional region="cn">
+
+```cs
+// For Mainland China
+TapCommon.OpenReviewInTapTap(appId, openSuccess =>
+{
+    if (openSuccess) {
+        Debug.Log("Game reviews opened");
+    }
+});
+
+// For other countries/regions
+TapCommon.OpenReviewInTapGlobal(appId, openSuccess =>
+{
+    if (openSuccess) {
+        Debug.Log("Game reviews opened");
+    }
+});
+```
+
+</Conditional>
+
+<Conditional region="global">
+
+```cs
+TapCommon.OpenReviewInTapGlobal(appId, openSuccess =>
+{
+    if (openSuccess) {
+        Debug.Log("Game reviews opened");
+    }
+});
+```
+
+</Conditional>
+
+</>
+
+<>
+
+<Conditional region="cn">
+
+```java
+// For Mainland China
+if(TapGameUtil.openReviewInTapTap(this,"appid")){
+    Log.d(TAG, "Game reviews opened");
+}
+
+// For other countries/regions
+if(TapGameUtil.openReviewInTapGlobal(this,"appid")){
+    Log.d(TAG, "Game reviews opened");
+}
+```
+
+</Conditional>
+
+<Conditional region="global">
+
+```java
+if(TapGameUtil.openReviewInTapGlobal(this,"appid")){
+    Log.d(TAG, "Game reviews opened");
+}
+```
+
+</Conditional>
+
+</>
+
+<>
+
+```objc
+// Not supported yet
+```
+
+</>
+
+</MultiLang>
+
+appid is a game’s unique identifier in the TapTap store.
+For example, in <Conditional region="cn">`https://www.taptap.com/app/187168`</Conditional><Conditional region="global">`https://www.taptap.io/app/187168`</Conditional>, `187168` is the `appid`.
+
+## FAQ
+
+### The TapTap app cannot be launched from the game on Android 11. Why?
+
+<AndroidFaq />
+
+### If I’m not using the TapSDK, how can I open the TapTap app to update the game?
+
+Due to Apple’s restrictions, TapTap for iOS doesn’t support the Updates function. The following instructions are for Android only.
+
+If you are not using the TapSDK or using older versions of the TapSDK, you can follow the instructions below to manually open the TapTap app to update the game.
+
+Open the corresponding URL according to whether TapTap is installed on the device:
+
+- If TapTap is installed, open the TapTap app and jump to the game’s page.
+- If not, open the game’s page in a web browser. The player will follow the instructions on the page to install the TapTap app, open the app, and update the game within the app.
+
+URL for devices without TapTap:
+
+<Conditional region="cn">
+
+- For Mainland China: `https://l.taptap.com/5d1NGyET?subc1=AppID`
+- For other countries/regions: `https://l.taptap.io/GNYwFaZr?subc1=AppID`
+
+</Conditional>
+<Conditional region="global">
+
+- `https://l.taptap.io/GNYwFaZr?subc1=AppID`
+
+</Conditional>
+
+URL for devices with TapTap:
+
+<Conditional region="cn">
+
+- For Mainland China: `taptap://taptap.com/app?app_id=AppID&source=outer|update`
+- For other countries/regions: `tapglobal://taptap.tw/app?app_id=AppID&source=outer|update`
+
+</Conditional>
+<Conditional region="global">
+
+- `tapglobal://taptap.tw/app?app_id=AppID&source=outer|update`
+
+</Conditional>
+
+Make sure to replace the `AppID` in the URL. `AppID` is a game’s unique identifier in the TapTap store. For example, in <Conditional region="cn">`https://www.taptap.com/app/187168`</Conditional><Conditional region="global">`https://www.taptap.io/app/187168`</Conditional>, `187168` is the AppID.
+
+Keep in mind that you have to write the logic not only to open the URL but also to check whether TapTap is installed, as well as handle errors.
+
+Take a look at the code example below.
+
+<details>
+<summary>Code example</summary>
+
+<Conditional region="cn">
+
+For Mainland China:
+
+```java
+package com.tds.common.utils;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.net.Uri;
+import android.text.TextUtils;
+import android.util.Log;
+import java.util.Locale;
+
+public class TapGameUtil {
+
+  private static final String TAG = TapGameUtil.class.getName();
+
+  public static final String PACKAGE_NAME_TAPTAP = "com.taptap";
+
+  public static final String CLIENT_URI_TAPTAP = "taptap://taptap.com";
+
+  public static final String DEFAULT_CLIENT_DOWNLOAD_URL_TAPTAP = "https://l.taptap.com/5d1NGyET";
+
+  public static boolean updateGameAndFailToWebInTapTap(Activity activity, String appId) {
+    return updateGameInTapTap(activity, appId) || openWebDownloadUrlOfTapTap(activity, appId);
+  }
+
+  public static boolean updateGameAndFailToWebInTapTap(Activity activity, String appId, String webUrl) {
+    if (TextUtils.isEmpty(webUrl)) {
+      return updateGameAndFailToWebInTapTap(activity, appId);
+    }
+    return updateGameInTapTap(activity, appId) || openWebDownloadUrl(activity, webUrl);
+  }
+
+  public static boolean isTapTapInstalled(Context context) {
+    return isTapClientInstalled(context, PACKAGE_NAME_TAPTAP);
+  }
+
+  public static boolean isTapClientInstalled(Context context, String clientPackageName) {
+    if (context != null && !TextUtils.isEmpty(clientPackageName)) {
+      boolean TapTapInstalled = false;
+      try {
+        PackageInfo packageInfo = context.getPackageManager().getPackageInfo(clientPackageName, 0);
+        if (null != packageInfo) {
+          TapTapInstalled = true;
+        }
+      } catch (Exception e) {
+        Log.e(TAG, clientPackageName + " isInstalled=false");
+      }
+      return TapTapInstalled;
+    }
+    return false;
+  }
+
+  public static boolean updateGameInTapTap(Activity activity, String appId) {
+    return updateGameInTapClient(activity, appId, CLIENT_URI_TAPTAP);
+  }
+
+  public static boolean updateGameInTapClient(Activity activity, String appId, String clientUri) {
+    if (activity != null && !TextUtils.isEmpty(appId) && !TextUtils.isEmpty(clientUri)) {
+      try {
+        Uri uri = Uri.parse(String.format(Locale.US,
+            "%s/app?app_id=%s&source=outer|update", clientUri, appId));
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        activity.startActivity(intent);
+      } catch (Exception e) {
+        Log.e(TAG, clientUri + "updateGameInTapTap failed");
+        return false;
+      }
+      return true;
+    }
+    Log.e(TAG, clientUri + "updateGameInTapTap failed");
+    return false;
+  }
+
+  public static boolean openReviewInTapTap(Activity activity, String appId) {
+    return openReviewInTapClient(activity, appId, CLIENT_URI_TAPTAP);
+  }
+
+  public static boolean openReviewInTapClient(Activity activity, String appId, String clientUri) {
+    if (activity != null && !TextUtils.isEmpty(appId) && !TextUtils.isEmpty(clientUri)) {
+      try {
+        Uri uri = Uri.parse(String.format(Locale.US,
+            "%s/app?tab_name=review&app_id=%s", clientUri, appId));
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        activity.startActivity(intent);
+      } catch (Exception e) {
+        Log.e(TAG, clientUri + "openTapTapReview failed");
+        return false;
+      }
+      return true;
+    }
+    Log.e(TAG, clientUri + "openTapTapReview failed");
+    return false;
+  }
+
+  public static boolean openWebDownloadUrlOfTapTap(Activity activity, String appId) {
+    return openWebDownloadUrl(activity, String.format(Locale.US, DEFAULT_CLIENT_DOWNLOAD_URL_TAPTAP + "?subc1=%s", appId));
+  }
+
+  public static boolean openWebDownloadUrl(Activity activity, String url) {
+    if (activity != null && !TextUtils.isEmpty(url)) {
+      try {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setData(Uri.parse(url));
+        activity.startActivity(intent);
+      } catch (Exception e) {
+        Log.e(TAG, "openWebUrl fail");
+        return false;
+      }
+      return true;
+    }
+    return false;
+  }
+
+}
+```
+
+For other countries/regions:
+
+</Conditional>
+
+```java
+package com.tds.common.utils;
+
+import android.app.Activity;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.net.Uri;
+import android.text.TextUtils;
+import android.util.Log;
+import java.util.Locale;
+
+public class TapGameUtil {
+
+  private static final String TAG = TapGameUtil.class.getName();
+
+  public static final String PACKAGE_NAME_TAPTAP_GLOBAL = "com.taptap.global";
+
+  public static final String CLIENT_URI_TAPTAP_GLOBAL = "tapglobal://taptap.tw";
+
+  public static final String DEFAULT_CLIENT_DOWNLOAD_URL_TAPTAP_GLOBAL = "https://l.taptap.io/GNYwFaZr";
+
+  public static boolean updateGameAndFailToWebInTapGlobal(Activity activity, String appId) {
+    return updateGameInTapGlobal(activity, appId) || openWebDownloadUrlOfTapGlobal(activity, appId);
+  }
+
+  public static boolean updateGameAndFailToWebInTapGlobal(Activity activity, String appId, String webUrl) {
+    if (TextUtils.isEmpty(webUrl)) {
+      return updateGameAndFailToWebInTapGlobal(activity, appId);
+    }
+    return updateGameInTapGlobal(activity, appId) || openWebDownloadUrl(activity, webUrl);
+  }
+
+  public static boolean isTapGlobalInstalled(Context context) {
+    return isTapClientInstalled(context, PACKAGE_NAME_TAPTAP_GLOBAL);
+  }
+
+  public static boolean isTapClientInstalled(Context context, String clientPackageName) {
+    if (context != null && !TextUtils.isEmpty(clientPackageName)) {
+      boolean TapTapInstalled = false;
+      try {
+        PackageInfo packageInfo = context.getPackageManager().getPackageInfo(clientPackageName, 0);
+        if (null != packageInfo) {
+          TapTapInstalled = true;
+        }
+      } catch (Exception e) {
+        Log.e(TAG, clientPackageName + " isInstalled=false");
+      }
+      return TapTapInstalled;
+    }
+    return false;
+  }
+
+  public static boolean updateGameInTapGlobal(Activity activity, String appId) {
+    return updateGameInTapClient(activity, appId, CLIENT_URI_TAPTAP_GLOBAL);
+  }
+
+  public static boolean updateGameInTapClient(Activity activity, String appId, String clientUri) {
+    if (activity != null && !TextUtils.isEmpty(appId) && !TextUtils.isEmpty(clientUri)) {
+      try {
+        Uri uri = Uri.parse(String.format(Locale.US,
+            "%s/app?app_id=%s&source=outer|update", clientUri, appId));
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        activity.startActivity(intent);
+      } catch (Exception e) {
+        Log.e(TAG, clientUri + "updateGameInTapTap failed");
+        return false;
+      }
+      return true;
+    }
+    Log.e(TAG, clientUri + "updateGameInTapTap failed");
+    return false;
+  }
+
+  public static boolean openReviewInTapGlobal(Activity activity, String appId) {
+    return openReviewInTapClient(activity, appId, CLIENT_URI_TAPTAP_GLOBAL);
+  }
+
+  public static boolean openReviewInTapClient(Activity activity, String appId, String clientUri) {
+    if (activity != null && !TextUtils.isEmpty(appId) && !TextUtils.isEmpty(clientUri)) {
+      try {
+        Uri uri = Uri.parse(String.format(Locale.US,
+            "%s/app?tab_name=review&app_id=%s", clientUri, appId));
+        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        activity.startActivity(intent);
+      } catch (Exception e) {
+        Log.e(TAG, clientUri + "openTapTapReview failed");
+        return false;
+      }
+      return true;
+    }
+    Log.e(TAG, clientUri + "openTapTapReview failed");
+    return false;
+  }
+
+  public static boolean openWebDownloadUrlOfTapGlobal(Activity activity, String appId) {
+    return openWebDownloadUrl(activity, String.format(Locale.US, DEFAULT_CLIENT_DOWNLOAD_URL_TAPTAP_GLOBAL + "?subc1=%s", appId));
+  }
+
+  public static boolean openWebDownloadUrl(Activity activity, String url) {
+    if (activity != null && !TextUtils.isEmpty(url)) {
+      try {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        intent.setData(Uri.parse(url));
+        activity.startActivity(intent);
+      } catch (Exception e) {
+        Log.e(TAG, "openWebUrl fail");
+        return false;
+      }
+      return true;
+    }
+    return false;
+  }
+
+}
+```
+
+</details>
