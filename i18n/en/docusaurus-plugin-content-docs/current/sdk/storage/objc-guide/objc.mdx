@@ -1,0 +1,1274 @@
+---
+title: Data Storage Guide for Objective-C
+sidebar_label: Objective-C Guide
+slug: /sdk/storage/guide/objc/
+sidebar_position: 6
+---
+
+With the Data Storage service, you can have your app persist data on the cloud and query them at any time. The code below shows how you can create an object and store it into the cloud:
+
+```objc
+// Create an object
+LCObject *todo = [LCObject objectWithClassName:@"Todo"];
+
+// Set values of fields
+[todo setObject:@"R&D Weekly Meeting"        forKey:@"title"];
+[todo setObject:@"All team members, Tue 2pm" forKey:@"content"];
+
+// Save the object to the cloud
+[todo saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        // Execute any logic that should take place after the object is saved
+        NSLog(@"Object saved. objectId: %@", todo.objectId);
+    } else {
+        // Execute any logic that should take place if the save fails
+    }
+}];
+```
+
+The SDK designed for each language interacts with the same REST API via HTTPS, offering fully functional interfaces for you to manipulate the data in the cloud.
+
+## Installing SDK
+
+See [Installing Objective-C SDK](/sdk/storage/guide/setup-objc/).
+
+## Objects
+
+### `LCObject`
+
+The objects on the cloud are built around `LCObject`. Each `LCObject` contains key-value pairs of JSON-compatible data. This data is schema-free, which means that you don't need to specify ahead of time what keys exist on each `LCObject`. Simply set whatever key-value pairs you want, and our backend will store them.
+
+For example, the `LCObject` storing a simple todo item may contain the following data:
+
+```json
+title:      "Email Linda to Confirm Appointment",
+isComplete: false,
+priority:   2,
+tags:       ["work", "sales"]
+```
+
+### Data Types
+
+`LCObject` supports a wide range of data types to be used for each field, including common ones like `String`, `Number`, `Boolean`, `Object`, `Array`, and `Date`. You can nest objects in JSON format to store more structured data within a single `Object` or `Array` field.
+
+Special data types supported by `LCObject` include `Pointer` and `File`, which are used to store a reference to another `LCObject` and binary data respectively.
+
+`LCObject` also supports `GeoPoint`, a special data type you can use to store location-based data. See [GeoPoints](#geopoints) for more details.
+
+Some examples:
+
+```objc
+// Basic types
+NSNumber     *boolean    = @(YES);
+NSNumber     *number     = [NSNumber numberWithInt:2018];
+NSString     *string     = [NSString stringWithFormat:@"%@ Top Hits", number];
+NSDate       *date       = [NSDate date];
+NSData       *data       = [@"Hello world!" dataUsingEncoding:NSUTF8StringEncoding];
+NSArray      *array      = [NSArray arrayWithObjects: string, number, nil];
+NSDictionary *dictionary = [NSDictionary dictionaryWithObjectsAndKeys: number, @"number", string, @"string", nil];
+
+// Create an object
+LCObject *testObject = [LCObject objectWithClassName:@"TestObject"];
+[testObject setObject:boolean    forKey:@"testBoolean"];
+[testObject setObject:number     forKey:@"testInteger"];
+[testObject setObject:string     forKey:@"testString"];
+[testObject setObject:date       forKey:@"testDate"];
+[testObject setObject:data       forKey:@"testData"];
+[testObject setObject:array      forKey:@"testArray"];
+[testObject setObject:dictionary forKey:@"testDictionary"];
+[testObject saveInBackground];
+```
+
+We do not recommend storing large pieces of binary data like images or documents with `LCObject` using `NSData`. The size of each `LCObject` should not exceed **128 KB**. We recommend using `LCFile` for storing images, documents, and other types of files. To do so, create `LCFile` objects and assign them to fields of `LCObject`. See [Files](#files) for details.
+
+Keep in mind that our backend stores dates in UTC format and the SDK will convert them to local times upon retrieval.
+
+The date values displayed on **Developer Center > Your game > Game Services > Cloud Services > Data Storage > Data** are also converted to match your operating system's time zone. The only exception is that when you retrieve these date values through our REST API, they will remain in UTC format. You can manually convert them using appropriate time zones when necessary.
+
+To learn about how you can protect the data stored on the cloud, see [Data Security](/sdk/storage/guide/security/).
+
+### Creating Objects
+
+The code below creates a new instance of `LCObject` with class `Todo`:
+
+```objc
+LCObject *todo = [LCObject objectWithClassName:@"Todo"];
+
+// You can also use this equivalent way
+LCObject *todo = [[LCObject alloc] initWithClassName:@"Todo"];
+```
+
+The constructor takes a class name as a parameter so that the cloud knows the class you are using to create the object. A class is comparable to a table in a relational database. A class name starts with a letter and can only contain numbers, letters, and underscores.
+
+### Saving Objects
+
+The following code saves a new object with class `Todo` to the cloud:
+
+```objc
+// Create an object
+LCObject *todo = [LCObject objectWithClassName:@"Todo"];
+
+// Set values of fields
+[todo setObject:@"Sign up for Marathon" forKey:@"title"];
+[todo setObject:@2 forKey:@"priority"];
+
+// Save the object to the cloud
+[todo saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        // Execute any logic that should take place after the object is saved
+        NSLog(@"Object saved. objectId: %@", todo.objectId);
+    } else {
+        // Execute any logic that should take place if the save fails
+    }
+}];
+```
+
+To make sure the object is successfully saved, take a look at **Developer Center > Your game > Game Services > Cloud Services > Data Storage > Data > `Todo`** in your app. You should see a new entry of data with something like this when you click on its `objectId`:
+
+```json
+{
+  "title": "Sign up for Marathon",
+  "priority": 2,
+  "ACL": {
+    "*": {
+      "read": true,
+      "write": true
+    }
+  },
+  "objectId": "582570f38ac247004f39c24b",
+  "createdAt": "2017-11-11T07:19:15.549Z",
+  "updatedAt": "2017-11-11T07:19:15.549Z"
+}
+```
+
+You don't have to create or set up a new class called `Todo` in **Developer Center > Your game > Game Services > Cloud Services > Data Storage > Data** before running the code above. If the class doesn't exist, it will be automatically created.
+
+Several built-in fields are provided by default which you don't need to specify in your code:
+
+| Built-in Field | Type       | Description                                                                                    |
+| -------------- | ---------- | ---------------------------------------------------------------------------------------------- |
+| `objectId`     | `NSString` | A unique identifier for each saved object.                                                     |
+| `ACL`          | `LCACL`    | Access Control List, a special object defining the read and write permissions of other people. |
+| `createdAt`    | `NSDate`   | The time the object was created.                                                               |
+| `updatedAt`    | `NSDate`   | The time the object was last modified.                                                         |
+
+Each of these fields is filled in by the cloud automatically and doesn't exist on the local `LCObject` until a save operation has been completed.
+
+Field names, or **keys**, can only contain letters, numbers, and underscores. A custom key can neither start with double underscores `__`, nor be identical to any system reserved words or built-in field names (`ACL`, `className`, `createdAt`, `objectId`, and `updatedAt`) regardless of letter cases.
+
+**Values** can be strings, numbers, booleans, or even arrays and dictionaries — anything that can be JSON-encoded. See [Data Types](#data-types) for more information.
+
+We recommend that you adopt CamelCase naming convention to `NameYourClassesLikeThis` and `nameYourKeysLikeThis`, which keeps your code more readable.
+
+### Retrieving Objects
+
+If an `LCObject` is already in the cloud, you can retrieve it using its `objectId` with the following code:
+
+```objc
+LCQuery *query = [LCQuery queryWithClassName:@"Todo"];
+[query getObjectInBackgroundWithId:@"582570f38ac247004f39c24b" block:^(LCObject *todo, NSError *error) {
+    // todo is the instance of the Todo object with objectId 582570f38ac247004f39c24b
+    NSString *title    = todo[@"title"];
+    int priority       = [[todo objectForKey:@"priority"] intValue];
+
+    // Get special properties
+    NSString *objectId = todo.objectId;
+    NSDate *updatedAt  = todo.updatedAt;
+    NSDate *createdAt  = todo.createdAt;
+}];
+```
+
+If you try to access a field or property that doesn't exist, the SDK will not raise an error. Instead, it will return `nil`.
+
+#### Refreshing Objects
+
+If you need to refresh a local object with the latest version of it in the cloud, call the `fetchInBackgroundWithBlock` method on it:
+
+```objc
+LCObject *todo = [LCObject objectWithClassName:@"Todo" objectId:@"582570f38ac247004f39c24b"];
+LCObjectFetchOption *option = [LCObjectFetchOption new];
+option.selectKeys = @[@"priority", @"location"];
+[todo fetchInBackgroundWithOption:option block:^(LCObject * _Nullable object, NSError * _Nullable error) {
+    // Only priority and location will be retrieved and refreshed
+}];
+```
+
+### Updating Objects
+
+To update an existing object, assign the new data to each field and call the `saveInBackground` method. For example:
+
+```objc
+LCObject *todo = [LCObject objectWithClassName:@"Todo" objectId:@"582570f38ac247004f39c24b"];
+[todo setObject:@"Weekly meeting has been rescheduled to Wed 3pm for this week." forKey:@"content"];
+[todo saveInBackground];
+```
+
+The cloud automatically figures out which data has changed and only the fields with changes will be sent to the cloud. The fields you didn't update will remain intact.
+
+#### Updating Data Conditionally
+
+By passing in a `query` option when saving, you can specify conditions on the save operation so that the object can be updated atomically only when those conditions are met. If no object matches the conditions, the cloud will return error `305` to indicate that there was no update taking place.
+
+For example, in the class `Account` there is a field called `balance`, and there are multiple incoming requests that want to modify this field. Since an account cannot have a negative balance, we can only allow a request to update the balance when the amount requested is lower than or equal to the balance:
+
+```objc
+LCObject *account = [LCObject objectWithClassName:@"Account" objectId:@"5745557f71cfe40068c6abe0"];
+// Atomically decrease balance by 100
+NSInteger amount = -100;
+[account incrementKey:@"balance" byAmount:@(amount)];
+// Add the condition
+LCQuery *query = [[LCQuery alloc] init];
+[query whereKey:@"balance" greaterThanOrEqualTo:@(-amount)];
+LCSaveOption *option = [[LCSaveOption alloc] init];
+option.query = query;
+// Return the latest data in the cloud upon completion.
+// All the fields will be returned if the object is new,
+// otherwise only fields with changes will be returned.
+option.fetchWhenSave = YES;
+[account saveInBackgroundWithOption:option block:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+        NSLog(@"Balance: %@", account[@"balance"]);
+    } else if (error.code == 305) {
+        NSLog(@"Insufficient balance. Operation failed!");
+    }
+}];
+```
+
+**The `query` option only works for existing objects.** In other words, it does not affect objects that haven't been saved to the cloud yet.
+
+The benefit of using the `query` option instead of combining `LCQuery` and `LCObject` shows up when you have multiple clients trying to update the same field at the same time. The latter way is more cumbersome and may lead to potential inconsistencies.
+
+#### Updating Counters
+
+Take Twitter as an example, we need to keep track of how many Likes and Retweets a tweet has gained so far. Since a Like or Retweet action can be triggered simultaneously by multiple clients, saving objects with updated values directly can lead to inaccurate results. To make sure that the total number is stored correctly, you can **atomically** increase (or decrease) the value of a number field:
+
+```objc
+[post incrementKey:@"likes" byAmount:@1];
+```
+
+You can specify the amount of increment (or decrement) by providing an additional argument. If the argument is not provided, `1` is used by default.
+
+#### Updating Arrays
+
+There are several operations that can be used to atomically update an array associated with a given key:
+
+- `addObject:forKey:` appends the given object to the end of an array.
+- `addObjectsFromArray:forKey:` appends the given array of objects to the end of an array.
+- `addUniqueObject:forKey:` appends the given object to the end of an array ensuring that the object only appears once within the array.
+- `addUniqueObjectsFromArray:forKey:` appends the given array of objects to the end of an array ensuring that each object only appears once within the array.
+- `removeObject:forKey:` removes all instances of the given object from an array.
+- `removeObjectsInArray:forKey:` removes all instances of the given array of objects from an array.
+
+For example, `Todo` has a field named `alarms` for keeping track of the times at which a user wants to be alerted. The following code adds the times to the alarms field:
+
+```objc
+-(NSDate*) getDateWithDateString:(NSString*) dateString{
+    NSDateFormatter *dateFormat = [[NSDateFormatter alloc] init];
+    [dateFormat setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+    NSDate *date = [dateFormat dateFromString:dateString];
+    return date;
+}
+
+NSDate *alarm1 = [self getDateWithDateString:@"2018-04-30 07:10:00"];
+NSDate *alarm2 = [self getDateWithDateString:@"2018-04-30 07:20:00"];
+NSDate *alarm3 = [self getDateWithDateString:@"2018-04-30 07:30:00"];
+
+NSArray *alarms = [NSArray arrayWithObjects:alarm1, alarm2, alarm3, nil];
+
+LCObject *todo = [LCObject objectWithClassName:@"Todo"];
+[todo addUniqueObjectsFromArray:alarms forKey:@"alarms"];
+[todo saveInBackground];
+```
+
+### Deleting Objects
+
+The following code deletes a `Todo` object from the cloud:
+
+```objc
+LCObject *todo = [LCObject objectWithClassName:@"Todo" objectId:@"582570f38ac247004f39c24b"];
+[todo deleteInBackground];
+```
+
+Removing data from the cloud should always be dealt with great caution as it may lead to non-recoverable data loss. We strongly advise that you read [ACL Guide](https://docs.leancloud.app/acl-guide.html) to understand the risks thoroughly. You should also consider implementing class-level, object-level, and field-level permissions for your classes in the cloud to guard against unauthorized data operations.
+
+### Batch Processing
+
+```objc
+// Batch create and update
++ (BOOL)saveAll:(NSArray *)objects error:(NSError **)error;
++ (void)saveAllInBackground:(NSArray *)objects
+                      block:(LCBooleanResultBlock)block;
+
+// Batch delete
++ (BOOL)deleteAll:(NSArray *)objects error:(NSError **)error;
++ (void)deleteAllInBackground:(NSArray *)objects
+                        block:(LCBooleanResultBlock)block;
+
+// Batch fetch
++ (BOOL)fetchAll:(NSArray *)objects error:(NSError **)error;
++ (void)fetchAllInBackground:(NSArray *)objects
+                       block:(LCArrayResultBlock)block;
+```
+
+The following code sets `isComplete` of all `Todo` objects to be `true`:
+
+```objc
+LCQuery *query = [LCQuery queryWithClassName:@"Todo"];
+[query findObjectsInBackgroundWithBlock:^(NSArray *todos, NSError *error) {
+    // Get a collection of todos to work on
+    for (LCObject *todo in todos) {
+        // Update value
+        todo[@"isComplete"] = @(YES);
+    }
+    // Save all at once
+    [LCObject saveAllInBackground:todos];
+}];
+```
+
+Although each function call sends multiple operations in one single network request, saving operations and fetching operations are billed as separate API calls for each object in the collection, while deleting operations are billed as a single API call.
+
+### Running in the Background
+
+You may have noticed from the examples above that we have been accessing the cloud asynchronously in our code. The methods with names like `xxxxInBackground` are provided for you to implement asynchronous calls so that your main thread will not be blocked.
+
+### Storing Data Locally
+
+Most of the operations for saving objects can be executed immediately and the program will be notified once the operation is done. However, if the program does not need to know when the operation is done, you can use `saveEventually` instead.
+
+The benefit of this function is that if the device is offline, `saveEventually` will cache the data locally and send them to the server once the device gets online again. If the app is closed before the device gets online, the SDK will try to send the data to the server when the app is opened again.
+
+It is safe to call `saveEventually` (or `deleteEventually`) multiple times since all the operations will be performed in the order they are initiated.
+
+### Data Models
+
+Objects may have relationships with other objects. For example, in a blogging application, a `Post` object may have relationships with many `Comment` objects. The Data Storage service supports three kinds of relationships, including one-to-one, one-to-many, and many-to-many.
+
+#### One-to-One and One-to-Many Relationships
+
+One-to-one and one-to-many relationships are modeled by saving `LCObject` as a value in the other object. For example, each `Comment` in a blogging app might correspond to one `Post`.
+
+The following code creates a new `Post` with a single `Comment`:
+
+```objc
+// Create a post
+LCObject *post = [[LCObject alloc] initWithClassName:@"Post"];
+[post setObject:@"I am starving!" forKey:@"title"];
+[post setObject:@"Hmmm, where should I go for lunch?" forKey:@"content"];
+
+// Create a comment
+LCObject *comment = [[LCObject alloc] initWithClassName:@"Comment"];
+[comment setObject:@"How about KFC?" forKey:@"content"];
+
+// Add the post as a property of the comment
+[comment setObject:post forKey:@"parent"];
+
+// This will save both post and comment
+[comment saveInBackground];
+```
+
+Internally, the backend will store the referred-to object with the `Pointer` type in just one place in order to maintain consistency. You can also link objects using their `objectId`s like this:
+
+```objc
+LCObject *post = [LCObject objectWithClassName:@"Post" objectId:@"57328ca079bc44005c2472d0"];
+[comment setObject:post forKey:@"post"];
+```
+
+See [Relational Queries](#relational-queries) for instructions on how to query relational data.
+
+#### Many-to-Many Relationships
+
+The easiest way to model many-to-many relationships is to use **arrays**. In most cases, using arrays helps you reduce the number of queries you need to make and leads to better performance. However, if additional properties need to be attached to the relationships between two classes, using **join tables** would be a better choice. Keep in mind that the additional properties are used to describe the relationships between classes rather than any single class.
+
+We recommend you to use join tables if the total number of objects of any class exceeds 100.
+
+### Serialization and Deserialization
+
+If you need to pass an `LCObject` to a method as an argument, you may want to first serialize the object to avoid certain problems. You can use the following ways to serialize and deserialize `LCObject`s.
+
+Serialization:
+
+```objc
+LCObject *todo = [[LCObject alloc] initWithClassName:@"Todo"]; // Create object
+[todo setObject:@"Sign up for Marathon" forKey:@"title"]; // Set title
+[todo setObject:@2 forKey:@"priority"]; // Set priority
+[todo setObject:[LCUser currentUser] forKey:@"owner"]; // A Pointer pointing to the current user
+
+NSMutableDictionary *serializedJSONDictionary = [todo dictionaryForObject]; // Get serialized object as a dictionary
+```
+
+Deserialization:
+
+```objc
+// Convert NSMutableDictionary to LCObject
+LCObject *todo = [LCObject objectWithDictionary:serializedJSONDictionary];
+```
+
+## Queries
+
+We've already seen how you can retrieve a single object from the cloud with `LCObject`, but it doesn't seem to be powerful enough when you need to retrieve multiple objects that match certain conditions at once. In such a situation, `LCQuery` would be a more efficient tool you can use.
+
+### Basic Queries
+
+The general steps of performing a basic query include:
+
+1. Creating `LCQuery`.
+2. Putting conditions on it.
+3. Retrieving an array of objects matching the conditions.
+
+The code below retrieves all `Student` objects whose `lastName` is `Smith`:
+
+```objc
+LCQuery *query = [LCQuery queryWithClassName:@"Student"];
+[query whereKey:@"lastName" equalTo:@"Smith"];
+[query findObjectsInBackgroundWithBlock:^(NSArray *students, NSError *error) {
+    // students is an array of Student objects satisfying conditions
+}];
+```
+
+### Query Constraints
+
+There are several ways to put constraints on the objects found by `LCObject`.
+
+The code below filters out objects with `Jack` as `firstName`:
+
+```objc
+[query whereKey:@"firstName" notEqualTo:@"Jack"];
+```
+
+For sortable types like numbers and strings, you can use comparisons in queries:
+
+```objc
+// Restricts to age < 18
+[query whereKey:@"age" lessThan:@18];
+
+// Restricts to age <= 18
+[query whereKey:@"age" lessThanOrEqualTo:@18];
+
+// Restricts to age > 18
+[query whereKey:@"age" greaterThan:@18];
+
+// Restricts to age >= 18
+[query whereKey:@"age" greaterThanOrEqualTo:@18];
+```
+
+You can apply multiple constraints to a single query, and objects will only be in the results if they match all of the constraints. In other words, it's like concatenating constraints with `AND`:
+
+```objc
+[query whereKey:@"firstName" equalTo:@"Jack"];
+[query whereKey:@"age" greaterThan:@18];
+```
+
+You can limit the number of results by setting `limit` (defaults to `100`):
+
+```objc
+// Get at most 10 results
+query.limit = 10;
+```
+
+For performance reasons, the maximum value allowed for `limit` is `1000`, meaning that the cloud would only return 1,000 results even if it is set to be greater than `1000`.
+
+If you need exactly one result, you may use `getFirstObject` for convenience:
+
+```objc
+LCQuery *query = [LCQuery queryWithClassName:@"Todo"];
+[query whereKey:@"priority" equalTo:@2];
+[query getFirstObjectInBackgroundWithBlock:^(LCObject *todo, NSError *error) {
+    // todo is the first Todo object satisfying conditions
+}];
+```
+
+You can skip a certain number of results by setting `skip`:
+
+```objc
+// Skip the first 20 results
+query.skip = 20;
+```
+
+You can implement pagination in your app by using `skip` together with `limit`:
+
+```objc
+LCQuery *query = [LCQuery queryWithClassName:@"Todo"];
+[query whereKey:@"priority" equalTo:@2];
+query.limit = 10;
+query.skip = 20;
+```
+
+Keep in mind that the higher the `skip` goes, the slower the query will run. You may consider using `createdAt` or `updatedAt` (which are indexed) to set range boundaries for large datasets to make queries more efficient.
+You may also use the last value returned from an auto-increment field along with `limit` for pagination.
+
+For sortable types, you can control the order in which results are returned:
+
+```objc
+// Sorts the results in ascending order by the createdAt property
+[query orderByAscending:@"createdAt"];
+
+// Sorts the results in descending order by the createdAt property
+[query orderByDescending:@"createdAt"];
+```
+
+You can even attach multiple sorting rules to a single query:
+
+```objc
+[query addAscendingOrder:@"priority"];
+[query addDescendingOrder:@"createdAt"];
+```
+
+To retrieve objects that have or do not have particular fields:
+
+```objc
+// Finds objects that have the "images" field
+[query whereKeyExists:@"images"];
+
+// Finds objects that don't have the "images" field
+[query whereKeyDoesNotExist:@"images"];
+```
+
+You can restrict the fields returned by providing a list of keys with `selectKeys`. The code below retrieves todos with only the `title` and `content` fields (and also special built-in fields including `objectId`, `createdAt`, and `updatedAt`):
+
+```objc
+LCQuery *query = [LCQuery queryWithClassName:@"Todo"];
+[query selectKeys:@[@"title", @"content"]];
+[query getFirstObjectInBackgroundWithBlock:^(LCObject *todo, NSError *error) {
+    NSString *title = todo[@"title"]; // √
+    NSString *content = todo[@"content"]; // √
+    NSString *notes = todo[@"notes"]; // An error will occur
+}];
+```
+
+You can add a minus prefix to the attribute name for inverted selection.
+For example, if you do not care about the post author, use `-author`.
+The inverted selection also applies to preserved attributes and can be used with dot notations, e.g., `-pubUser.createdAt`.
+
+The unselected fields can be fetched later with `fetchInBackgroundWithBlock`. See [Refreshing Objects](#refreshing-objects).
+
+### Queries on String Values
+
+Use `hasPrefix` to restrict to string values that start with a particular string. Similar to a `LIKE` operator in SQL, it is indexed so it is efficient for large datasets:
+
+```objc
+LCQuery *query = [LCQuery queryWithClassName:@"Todo"];
+// SQL equivalent: title LIKE 'lunch%'
+[query whereKey:@"title" hasPrefix:@"lunch"];
+```
+
+Use `containsString` to restrict to string values that contain a particular string:
+
+```objc
+LCQuery *query = [LCQuery queryWithClassName:@"Todo"];
+// SQL equivalent: title LIKE '%lunch%'
+[query whereKey:@"title" containsString:@"lunch"];
+```
+
+Unlike `hasPrefix`, `containsString` can't take advantage of indexes, so it is not encouraged to be used for large datasets.
+
+Please note that both `hasPrefix` and `containsString` perform **case-sensitive** matching, so the examples above will not look for string values containing `Lunch`, `LUNCH`, etc.
+
+If you are looking for string values that do not contain a particular string, use `matchesRegex` with regular expressions:
+
+```objc
+LCQuery *query = [LCQuery queryWithClassName:@"Todo"];
+// "title" without "ticket" (case-insensitive)
+[query whereKey:@"title" matchesRegex:@"^((?!ticket).)*$", modifiers:"i"];
+```
+
+However, performing queries with regular expressions as constraints can be very expensive, especially for classes with over 100,000 records. The reason behind this is that queries like this can't take advantage of indexes and will lead to exhaustive scanning of the whole dataset to find the matching objects. We recommend that you take a look at our In-App Searching feature, a full-text search solution we provide to improve your app's searching ability and user experience.
+
+If you are facing performance issues with queries, please refer to [Optimizing Performance](#optimizing-performance) for possible workarounds and best practices.
+
+### Queries on Array Values
+
+The code below looks for all the objects with `work` as an element of its array field `tags`:
+
+```objc
+[query whereKey:@"tags" equalTo:@"work"];
+```
+
+To look for objects whose array field `tags` contains three elements:
+
+```objc
+[query whereKey:@"tags" sizeEqualTo:3];
+```
+
+You can also look for objects whose array field `tags` contains `work`, `sales`, **and** `appointment`:
+
+```objc
+[query whereKey:@"tags" containsAllObjectsInArray:[NSArray arrayWithObjects:@"work", @"sales", @"appointment", nil]];
+```
+
+To retrieve objects whose field matches any one of the values in a given list, you can use `containedIn` instead of performing multiple queries. The code below constructs a query that retrieves todo items with `priority` to be `1` **or** `2`:
+
+```objc
+// Single query
+LCQuery *priorityOneOrTwo = [LCQuery queryWithClassName:@"Todo"];
+[priorityOneOrTwo whereKey:@"priority" containedIn:[NSArray arrayWithObjects:@1, @2, nil]];
+// Mission completed :)
+
+// ---------------
+//       vs.
+// ---------------
+
+// Multiple queries
+LCQuery *priorityOne = [LCQuery queryWithClassName:@"Todo"];
+[priorityOne whereKey:@"priority" equalTo:@1];
+
+LCQuery *priorityTwo = [LCQuery queryWithClassName:@"Todo"];
+[priorityTwo whereKey:@"priority" equalTo:@2];
+
+LCQuery *priorityOneOrTwo = [LCQuery orQueryWithSubqueries:[NSArray arrayWithObjects:priorityOne, priorityTwo, nil]];
+// Kind of verbose :(
+```
+
+Conversely, you can use `notContainedIn` if you want to retrieve objects that do not match any of the values in a list.
+
+### Relational Queries
+
+There are several ways to perform queries for relational data. To retrieve objects whose given field matches a particular `LCObject`, you can use `equalTo` just like how you use it for other data types. For example, if each `Comment` has a `Post` object in its `post` field, you can fetch all the comments for a particular `Post` with the following code:
+
+```objc
+LCObject *post = [LCObject objectWithClassName:@"Post" objectId:@"57328ca079bc44005c2472d0"];
+LCQuery *query = [LCQuery queryWithClassName:@"Comment"];
+[query whereKey:@"post" equalTo:post];
+[query findObjectsInBackgroundWithBlock:^(NSArray *comments, NSError *error) {
+    // comments contains the comments for the post
+}];
+```
+
+To retrieve objects whose given field contains an `LCObject` that matches a different query, you can use `matchesQuery`. The code below constructs a query that looks for all the comments for posts with images:
+
+```objc
+LCQuery *innerQuery = [LCQuery queryWithClassName:@"Post"];
+[innerQuery whereKeyExists:@"images"];
+
+LCQuery *query = [LCQuery queryWithClassName:@"Comment"];
+[query whereKey:@"post" matchesQuery:innerQuery];
+```
+
+To retrieve objects whose given field does not contain an `LCObject` that matches a different query, use `doesNotMatchQuery` instead.
+
+Sometimes you may need to look for related objects from different classes without extra queries. In such situations, you can use `includeKey` on the same query. The following code retrieves the last 10 comments together with the posts related to them:
+
+```objc
+LCQuery *query = [LCQuery queryWithClassName:@"Comment"];
+
+// Retrieve the most recent ones
+[query orderByDescending:@"createdAt"];
+
+// Only retrieve the last 10
+query.limit = 10;
+
+// Include the related post together with each comment
+[query includeKey:@"post"];
+
+[query findObjectsInBackgroundWithBlock:^(NSArray *comments, NSError *error) {
+    // comments contains the last 10 comments including the post associated with each
+    for (LCObject *comment in comments) {
+        // This does not require a network access
+        LCObject *post = comment[@"post"];
+    }
+}];
+```
+
+#### Caveats about Inner Queries
+
+The Data Storage service is not built on relational databases, which makes it impossible to join tables while querying. For the relational queries mentioned above, what we would do is to perform an inner query first (with `100` as the default `limit` and `1000` as the maximum) and then insert the result from this query into the outer query. If the number of records matching the inner query exceeds the `limit` and the outer query contains other constraints, the amount of the records returned in the end could be zero or less than your expectation since only the records within the `limit` would be inserted into the outer query.
+
+The following actions can be taken to solve the problem:
+
+- Make sure the number of records in the result of the inner query is no more than 100. If it is between 100 and 1,000, set `1000` as the `limit` of the inner query.
+- Create redundancy for the fields being queried by the inner query on the table for the outer query.
+- Repeat the same query with different `skip` values until all the records are gone through (performance issue could occur if the value of `skip` gets too big).
+
+### Counting Objects
+
+If you just need to count how many objects match a query but do not need to retrieve the actual objects, use `countObjectsInBackgroundWithBlock` instead of `findObjectsInBackgroundWithBlock`. For example, to count how many todos have been completed:
+
+```objc
+LCQuery *query = [LCQuery queryWithClassName:@"Todo"];
+[query whereKey:@"isComplete" equalTo:@(YES)];
+[query countObjectsInBackgroundWithBlock:^(NSInteger count, NSError *error) {
+    NSLog(@"%ld todos completed.", count);
+}];
+```
+
+### Compound Queries
+
+Compound queries can be used if complex query conditions need to be specified. A compound query is a logical combination (`OR` or `AND`) of subqueries.
+
+Note that we do not support `GeoPoint` or non-filtering constraints (e.g. `near`, `withinGeoBox`, `limit`, `skip`, `ascending`, `descending`, `include`) in the subqueries of a compound query.
+
+#### OR-ed Query Constraints
+
+An object will be returned as long as it fulfills any one of the subqueries. The code below constructs a query that looks for all the todos that either have priorities higher than or equal to `3`, or are already completed:
+
+```objc
+LCQuery *priorityQuery = [LCQuery queryWithClassName:@"Todo"];
+[priorityQuery whereKey:@"priority" greaterThanOrEqualTo:@3];
+
+LCQuery *isCompleteQuery = [LCQuery queryWithClassName:@"Todo"];
+[isCompleteQuery whereKey:@"isComplete" equalTo:@(YES)];
+
+LCQuery *query = [LCQuery orQueryWithSubqueries:[NSArray arrayWithObjects:priorityQuery, isCompleteQuery, nil]];
+```
+
+Queries regarding `GeoPoint` cannot be present among OR-ed queries.
+
+#### AND-ed Query Constraints
+
+The effect of using AND-ed query is the same as adding constraints to `LCQuery`. The code below constructs a query that looks for all the todos that are created between `2016-11-13` and `2016-12-02`:
+
+```objc
+NSDate *(^dateFromString)(NSString *string) = ^(NSString *string) {
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd"];
+    return [dateFormatter dateFromString:string];
+};
+
+LCQuery *startDateQuery = [LCQuery queryWithClassName:@"Todo"];
+[startDateQuery whereKey:@"createdAt" greaterThanOrEqualTo:dateFromString(@"2016-11-13")];
+
+LCQuery *endDateQuery = [LCQuery queryWithClassName:@"Todo"];
+[endDateQuery whereKey:@"createdAt" lessThan:dateFromString(@"2016-12-03")];
+
+LCQuery *query = [LCQuery andQueryWithSubqueries:[NSArray arrayWithObjects:startDateQuery, endDateQuery, nil]];
+```
+
+While using an AND-ed query by itself doesn't bring anything new compared to a basic query, to combine two or more OR-ed queries, you have to use AND-ed queries:
+
+```objc
+NSDate *(^dateFromString)(NSString *string) = ^(NSString *string) {
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd"];
+    return [dateFormatter dateFromString:string];
+};
+
+LCQuery *createdAtQuery = [LCQuery queryWithClassName:@"Todo"];
+[createdAtQuery whereKey:@"createdAt" greaterThanOrEqualTo:dateFromString(@"2018-04-30")];
+[createdAtQuery whereKey:@"createdAt" lessThan:dateFromString(@"2018-05-01")];
+
+LCQuery *locationQuery = [LCQuery queryWithClassName:@"Todo"];
+[locationQuery whereKeyDoesNotExist:@"location"];
+
+LCQuery *priority2Query = [LCQuery queryWithClassName:@"Todo"];
+[priority2Query whereKey:@"priority" equalTo:@2];
+
+LCQuery *priority3Query = [LCQuery queryWithClassName:@"Todo"];
+[priority3Query whereKey:@"priority" equalTo:@3];
+
+LCQuery *priorityQuery = [LCQuery orQueryWithSubqueries:[NSArray arrayWithObjects:priority2Query, priority3Query, nil]];
+LCQuery *timeLocationQuery = [LCQuery orQueryWithSubqueries:[NSArray arrayWithObjects:locationQuery, createdAtQuery, nil]];
+LCQuery *query = [LCQuery andQueryWithSubqueries:[NSArray arrayWithObjects:priorityQuery, timeLocationQuery, nil]];
+```
+
+### Caching
+
+You can cache the results of some queries on the device so the app could still display some data to the user even if the device is offline or the user just opened the app and queries for fetching the latest data have not been made yet. The SDK will automatically clear the cache if it is taking up too much space.
+
+Caching is not enabled by default. You need to specify that you want to enable the cache when you make a query. The following example shows how you can make a request to query some data but use the cache on the device if the device is offline:
+
+```objc
+LCQuery *query = [LCQuery queryWithClassName:@"Post"];
+query.cachePolicy = kLCCachePolicyNetworkElseCache;
+
+// Set cache age
+query.maxCacheAge = 24*3600;
+
+[query findObjectsInBackgroundWithBlock:^(NSArray *objects, NSError *error) {
+    if (!error) {
+        // Got the results from the server, or the cache if the device is offline
+    } else {
+        // The device is offline and there is not cache found
+    }
+}];
+```
+
+#### Cache Policy
+
+The following cache policies are provided to fulfill different needs:
+
+| Name                             | Description                                                                                                                                                                                                                                                                                                                                                            |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `kLCCachePolicyIgnoreCache`      | **(Default)** The query will not load the results from the cache or save the results into the cache.                                                                                                                                                                                                                                                                   |
+| `kLCCachePolicyCacheOnly`        | Only load the results from the cache. If the results do not exist in the cache, an `LCError` will occur.                                                                                                                                                                                                                                                               |
+| `kLCCachePolicyCacheElseNetwork` | Try to load the results from the cache. If the results do not exist, fetch the results from the server. If the SDK fails to connect to the server, an `LCError` will occur. Note that if you are running a query for the first time, the query will always try to load the results from the server.                                                                    |
+| `kLCCachePolicyNetworkElseCache` | Try to fetch the results from the server. If the SDK fails to connect to the server, load the results from the cache. If the results do not exist in the cache, an `LCError` will occur.                                                                                                                                                                               |
+| `kLCCachePolicyCacheThenNetwork` | Load the results from the cache and then load the results from the server. With this policy, the callback function will be called twice with the first time getting the results from the cache and the second time getting the results from the server. Since the callback function will get two different results, this policy should not be used with `findObjects`. |
+
+#### Cache-Related Operations
+
+- Check if the results exist in the cache:
+
+  ```objc
+  BOOL isInCache = [query hasCachedResult];
+  ```
+
+- Delete the cache for a query (only delete the cache from the non-volatile storage (the disk) and not the volatile storage (the memory); same for the next operation):
+
+  ```objc
+  [query clearCachedResult];
+  ```
+
+- Delete the cache for all queries:
+
+  ```objc
+  [LCQuery clearAllCachedResults];
+  ```
+
+- Set the maximum age for the cache:
+
+  ```objc
+  query.maxCacheAge = 60 * 60 * 24; // The number of seconds in a day
+  ```
+
+You can use cache when calling `getFirstObject` and `getObjectInBackground` too.
+
+### Optimizing Performance
+
+There are several factors that could lead to potential performance issues when you conduct a query, especially when more than 100,000 records are returned at a time. We are listing some common ones here so you can design your apps accordingly to avoid them:
+
+- Querying with "not equal to" or "not include" (index will not work)
+- Querying on strings with a wildcard at the beginning of the pattern (index will not work)
+- Using `count` with conditions (all the entries will be gone through)
+- Using `skip` for a large number of entries (all the entries that need to be skipped will be gone through)
+- Sorting without an index (querying and sorting cannot share a composite index unless the conditions used on them are both covered by the same one)
+- Querying without an index (the conditions used on the query cannot share a composite index unless all of them are covered by the same one; additional time will be consumed if excessive data falls under the uncovered conditions)
+
+## LiveQuery
+
+LiveQuery is, as its name implies, derived from [`LCQuery`](#queries) but has enhanced capability. It allows you to automatically synchronize data changes from one client to other clients without writing complex code, making it suitable for apps that need real-time data.
+
+Suppose you are building an app that allows multiple users to edit the same file at the same time. `LCQuery` would not be an ideal tool since it is based on a pull model and you cannot know when to query from the cloud to get the updates.
+
+To solve this problem, we introduced LiveQuery. This tool allows you to subscribe to the `LCQuery`s you are interested in. Once subscribed, the cloud will notify clients by generating event messages whenever `LCObject`s that match the `LCQuery` are created or updated, in real-time.
+
+Behind the scenes, we use WebSocket connections to have clients and the cloud communicate with each other and maintain the subscription status of clients. In most cases, it isn't necessary to deal with the WebSocket connections directly, so we developed a simple API to help you focus on your business logic rather than technical implementations.
+
+### Initializing LiveQuery
+
+To use LiveQuery in your app, go to **Developer Center > Your game > Game Services > Cloud Services > Data Storage > Settings** and check the **Enable LiveQuery** option under the **Security** section.
+
+If you have not integrated the `Realtime` module, make sure to integrate it first. To add the pod for it:
+
+```ruby
+pod 'LeanCloudObjc/Realtime'
+```
+
+See [Installing SDK](#installing-sdk) for more details.
+
+### Demo
+
+We’ve made a demo app called “LeanTodo” which shows the functionality of LiveQuery. If you’d like to try it:
+
+1. Go to <https://leancloud.github.io/leantodo-vue/>, enter a username and a password, and then hit “Signup”.
+2. Open the same URL on a different device, enter the same credentials, and hit “Login”.
+3. Create, edit, or delete some items on one device and watch what happens on the other one.
+
+### Creating a Subscription
+
+To make a query **live**, create an `LCQuery` object, put conditions on it if there are any, and then subscribe to events:
+
+```objc
+LCQuery *query = [LCQuery queryWithClassName:@"Todo"];
+self.liveQuery = [[LCLiveQuery alloc] initWithQuery:query];
+self.liveQuery.delegate = self;
+[self.liveQuery subscribeWithCallback:^(BOOL succeeded, NSError * _Nonnull error) {
+    // Subscribed
+}];
+```
+
+You can't use subqueries or restrict fields being returned when using LiveQuery.
+
+Now you will be able to receive updates related to `LCObject`. If a `Todo` object is created by another client with `Update Portfolio` as `title`, the following code can get the new `Todo` for you:
+
+```objc
+LCQuery *query = [LCQuery queryWithClassName:@"Todo"];
+self.liveQuery = [[LCLiveQuery alloc] initWithQuery:query];
+self.liveQuery.delegate = self;
+[self.liveQuery subscribeWithCallback:^(BOOL succeeded, NSError * _Nonnull error) {
+    // Subscribed
+}];
+- (void)liveQuery:(LCLiveQuery *)liveQuery objectDidCreate:(id)object {
+    if (liveQuery == self.liveQuery) {
+        NSLog(@"%@", object[@"title"]); // Update Portfolio
+    }
+}
+```
+
+If someone updates this `Todo` by changing its `content` to `Add my recent paintings`, the following code can get the updated version for you:
+
+```objc
+- (void)liveQuery:(LCLiveQuery *)liveQuery objectDidUpdate:(id)updatedTodo updatedKeys:(NSArray<NSString *> *)updatedKeys {
+    NSLog(@"%@", updatedTodo[@"content"]); // Add my recent paintings
+}
+```
+
+### Event Handling
+
+The following types of data changes can be monitored once a subscription is set up:
+
+- `create`
+- `update`
+- `enter`
+- `leave`
+- `delete`
+
+#### `create` Event
+
+A `create` event will be triggered when a new `LCObject` is created and fulfills the `LCQuery` you subscribed to. The `object` is the new `LCObject` being created:
+
+```objc
+- (void)liveQuery:(LCLiveQuery *)liveQuery objectDidCreate:(id)object {
+    if (liveQuery == self.liveQuery) {
+        NSLog(@"Object created.");
+    }
+}
+```
+
+#### `update` Event
+
+An `update` event will be triggered when an existing `LCObject` fulfilling the `LCQuery` you subscribed to is updated. The `object` is the `LCObject` being updated:
+
+```objc
+- (void)liveQuery:(LCLiveQuery *)liveQuery objectDidUpdate:(id)object updatedKeys:(NSArray<NSString *> *)updatedKeys {
+    if (liveQuery == self.liveQuery) {
+        NSLog(@"Object updated.");
+    }
+}
+```
+
+#### `enter` Event
+
+An `enter` event will be triggered when an existing `LCObject`'s old value does not fulfill the `LCQuery` you subscribed to but its new value does. The `object` is the `LCObject` entering the `LCQuery` and its content is the latest value of it:
+
+```objc
+- (void)liveQuery:(LCLiveQuery *)liveQuery objectDidEnter:(id)object updatedKeys:(nonnull NSArray<NSString *> *)updatedKeys {
+    if (liveQuery == self.liveQuery) {
+        NSLog(@"Object entered.");
+    }
+}
+```
+
+There is a difference between a `create` event and an `enter` event. If an object already exists and later matches the query's conditions, an `enter` event will be triggered. If an object didn't exist already and is later created, a `create` event will be triggered.
+
+#### `leave` Event
+
+A `leave` event will be triggered when an existing `LCObject`'s old value fulfills the `LCQuery` you subscribed to but its new value does not. The `object` is the `LCObject` leaving the `LCQuery` and its content is the latest value of it:
+
+```objc
+- (void)liveQuery:(LCLiveQuery *)liveQuery objectDidLeave:(id)object updatedKeys:(nonnull NSArray<NSString *> *)updatedKeys {
+    if (liveQuery == self.liveQuery) {
+        NSLog(@"Object left.");
+    }
+}
+```
+
+#### `delete` Event
+
+A `delete` event will be triggered when an existing `LCObject` fulfilling the `LCQuery` you subscribed to is deleted. The `object` is the `objectId` of the `LCObject` being deleted:
+
+```objc
+- (void)liveQuery:(LCLiveQuery *)liveQuery objectDidDelete:(id)object {
+    if (liveQuery == self.liveQuery) {
+        NSLog(@"Object deleted.");
+    }
+}
+```
+
+### Unsubscribing
+
+You can cancel a subscription to stop receiving events regarding `LCQuery`. After that, you won't get any events from the subscription.
+
+```objc
+[liveQuery unsubscribeWithCallback:^(BOOL succeeded, NSError * _Nonnull error) {
+    if (succeeded) {
+        // Successfully unsubscribed
+    } else {
+        // Error handling
+    }
+}];
+```
+
+### Losing Connections
+
+There are different scenarios regarding losing connections:
+
+1. The connection to the Internet is lost unexpectedly.
+2. The user performs certain operations outside of the app, like switching the app to the background, turning off the phone, or turning on the flight mode.
+
+For the scenarios above, you don't need to do any extra work. As long as the user switches back to the app, the SDK will automatically re-establish the connection.
+
+There is another scenario when **the user completely kills the app or closes the web page**. In this case, the SDK cannot automatically re-establish the connection. You will have to create subscriptions again by yourself.
+
+### Caveats about LiveQuery
+
+Given the real-time feature of LiveQuery, developers may find it tempting to use it for instant messaging. As LiveQuery is neither designed nor optimized for completing such tasks, we discourage such use of this tool, let alone there will be an additional cost for saving message history and rising challenges of code maintenance. We recommend using our Instant Messaging service for this scenario.
+
+## Files
+
+`LCFile` allows you to store application files in the cloud that would otherwise be too large or cumbersome to fit into a regular `LCObject`. The most common use case is storing images, but you can also use it for documents, videos, music, and any other binary data.
+
+### Creating Files
+
+You can create a file from a string:
+
+```objc
+NSData *data = [@"LeanCloud" dataUsingEncoding:NSUTF8StringEncoding];
+// resume.txt is the file name
+LCFile *file = [LCFile fileWithData:data name:@"resume.txt"];
+```
+
+You can also create a file from a URL:
+
+```objc
+LCFile *file = [LCFile fileWithRemoteURL:[NSURL URLWithString:@"https://leancloud.cn/assets/imgs/press/Logo%20-%20Blue%20Padding.a60eb2fa.png"]];
+```
+
+When creating files from URLs, the SDK will not upload the actual files into the cloud but will store the addresses of the files as strings. This will not lead to actual traffic for uploading files, as opposed to creating files in other ways by doing which the files will be actually stored into the cloud.
+
+But the most common method for creating files is to upload them from local paths:
+
+```objc
+NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+NSString *documentsDirectory = [paths objectAtIndex:0];
+NSString *imagePath = [documentsDirectory stringByAppendingPathComponent:@"avatar.jpg"];
+NSError *error;
+LCFile *file = [LCFile fileWithLocalPath:imagePath error:&error];
+```
+
+The file we uploaded here is named `avatar.jpg`. There are a couple of things to note here:
+
+- Each file uploaded will get its unique `objectId`, so it is allowed for multiple files to share the same name.
+- A correct extension needs to be assigned to each file which the cloud will use to infer the type of a file. For example, if you are storing a PNG image with `LCFile`, use `.png` as its extension.
+- If the file doesn't have an extension and the content type is not specified, the file will get the default type `application/octet-stream`.
+
+### Saving Files
+
+By saving a file, you store it into the cloud and get a permanent URL pointing to it:
+
+```objc
+[file uploadWithCompletionHandler:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        NSLog(@"File saved. URL: %@", file.url);
+    } else {
+        // The file either could not be read or could not be saved to the cloud
+    }
+}];
+```
+
+A file successfully uploaded can be found in **Developer Center > Your game > Game Services > Cloud Services > Data Storage > Files** and cannot be modified later. If you need to change the file, you have to upload the modified file again and a new `objectId` and URL will be generated.
+
+You can associate a file with `LCObject` after it has been saved:
+
+```objc
+LCObject *todo = [LCObject objectWithClassName:@"Todo"];
+[todo setObject:@"Buy Cakes" forKey:@"title"];
+// The type of attachments is Array
+[todo addObject:file forKey:@"attachments"];
+[todo saveInBackground];
+```
+
+You can also construct an `LCQuery` to query files:
+
+```objc
+LCQuery *query = [LCQuery queryWithClassName:@"_File"];
+```
+
+Note that the `url` field of internal files (files uploaded to the file service) is dynamically generated by the cloud, which will switch custom domain names automatically.
+Therefore, querying files by the `url` field is only applicable to external files (files created by saving the external URL directly to the `_File` table).
+Query internal files by the `key` field (path in URL) instead.
+
+On a related note, if the files are referenced in an array field of `LCObject` and you want to get them within the same query for `LCObject`, you need to use the `includeKey` method with `LCQuery`. For example, if you are retrieving all the todos with the same title `Buy Cakes` and you want to retrieve their related attachments at the same time:
+
+```objc
+// Get all todos with the same title and contain attachments
+LCQuery *query = [LCQuery queryWithClassName:@"Todo"];
+[query whereKey:@"title" equalTo:@"Buy Cakes"];
+[query whereKeyExists:@"attachments"];
+
+// Include attachments with each todo
+[query includeKey:@"attachments"];
+
+[query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable todos, NSError * _Nullable error) {
+    for (LCObject *todo in todos) {
+        // Get the attachments array for each todo
+    }
+}];
+```
+
+### Upload Progress
+
+You can monitor the upload progress and display that to the user:
+
+```objc
+[file uploadWithProgress:^(NSInteger percent) {
+    // percent is an integer between 0 and 100, indicating the progress
+} completionHandler:^(BOOL succeeded, NSError *error) {
+    // Things to do after saving
+}];
+```
+
+### File Metadata
+
+When uploading a file, you can attach additional properties to it with `metaData`. A file's `metaData` cannot be updated once the file is stored to the cloud.
+
+```objc
+// Set metadata
+[file.metaData setObject:@"LeanCloud" forKey:@"author"];
+[file uploadWithCompletionHandler:^(BOOL succeeded, NSError *error) {
+    // Get all metadata
+    NSDictionary *metadata = file.metaData;
+    // Get author
+    NSString *author = metadata[@"author"];
+    // Get file name
+    NSString *fileName = file.name;
+    // Get size (not available for files created from base64-encoded strings or URLs)
+    NSUInteger *size = file.size;
+}];
+```
+
+### Image Thumbnails
+
+After saving an image, you can get the URL of a thumbnail of the image beside that of the image itself. You can even specify the width and height of the thumbnail:
+
+```objc
+LCFile *file = [LCFile fileWithRemoteURL:[NSURL URLWithString:@"file-url"]];
+[file getThumbnail:YES width:100 height:100 withBlock:^(UIImage *image, NSError *error) {
+    // Other things to do
+}];
+```
+
+You can only get thumbnails for images smaller than **20 MB**.
+
+### Downloading Files
+
+You can download files with the SDK and cache them locally. As long as the URL of a file does not change, the file will not be downloaded for a second time。
+
+```objc
+[file downloadWithProgress:^(NSInteger number) {
+    // number is an integer between 0 and 100, indicating the progress
+} completionHandler:^(NSURL * _Nullable filePath, NSError * _Nullable error) {
+    // filePath is the path of the downloaded file
+}];
+```
+
+`filePath` is a relative path. The file will be either in the cache directory (if cache is enabled) or the temp directory (if cache is disabled).
+
+### Clearing Cache
+
+You can clear the cache for files at any time:
+
+```objc
+// Clear the current file from the cache
+- (void)clearPersistentCache;
+
+// Clear all files from the cache
++ (BOOL)clearAllPersistentCache;
+```
+
+### Deleting Files
+
+The code below deletes a file from the cloud:
+
+```objc
+LCFile *file = [LCFile getFileWithObjectId:@"552e0a27e4b0643b709e891e"];
+[file deleteInBackground];
+```
+
+By default, a file is not allowed to be deleted.
+We recommend you delete files by accessing our REST API with the Master Key.
+You can also allow certain users and roles to delete files by going to **Developer Center > Your game > Game Services > Cloud Services > Data Storage > Files > Permission**.
+
+### File Censorship
+
+The **censorship** feature allows you to censor **image** files stored on the cloud.
+
+You can **Enable automatic content censor for subsequent uploaded pictures** by going to **Data Storage > Files > Censorship**. You can also batch-censor all the images uploaded during a specific time scope. You can view the results of the censorship under the **Files** tab.
+
+You can manually **Pass** or **Block** images even if they have gone through automatic censorship.
+
+### HTTP Support for iOS 9 and Up
+
+Starting iOS 9, Apple requires HTTPS connections for iOS apps and denies HTTP connections by default. All the APIs support HTTPS except for the `getData` method of `LCFile`.
+
+If your app still needs to make HTTP requests, such as when accessing files in the Instant Messaging service that still reference insecure domains, you should add those insecure domains to your project's `Info.plist`:
+
+Right-click on `Info.plist`, choose **Opened As** > **Source Code**, append the following text to the node **plist** > **dict**:
+
+```xml
+<key>NSAppTransportSecurity</key>
+<dict>
+  <key>NSExceptionDomains</key>
+  <dict>
+    <key>clouddn.com</key>
+    <dict>
+      <key>NSIncludesSubdomains</key>
+      <true/>
+      <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+      <true/>
+    </dict>
+  </dict>
+</dict>
+```
+
+## GeoPoints
+
+You can associate real-world latitude and longitude coordinates with an object by adding an `LCGeoPoint` to the `LCObject`. By doing so, queries on the proximity of an object to a given point can be performed, allowing you to implement functions like looking for users or places nearby easily.
+
+To associate a point with an object, you need to create the point first. The code below creates an `LCGeoPoint` with `39.9` as `latitude` and `116.4` as `longitude`:
+
+```objc
+LCGeoPoint *point = [LCGeoPoint geoPointWithLatitude:39.9 longitude:116.4];
+```
+
+Now you can store the point into an object as a regular field:
+
+```objc
+[todo setObject:point forKey:@"location"];
+```
+
+### Geo Queries
+
+With a number of existing objects with spatial coordinates, you can find out which of them are closest to a given point, or are contained within a particular area. This can be done by adding another restriction to `LCQuery` using `nearGeoPoint`. The code below returns a list of `Todo` objects with `location` closest to a given point:
+
+```objc
+LCQuery *query = [LCQuery queryWithClassName:@"Todo"];
+LCGeoPoint *point = [LCGeoPoint geoPointWithLatitude:39.9 longitude:116.4];
+[query whereKey:@"location" nearGeoPoint:point];
+
+// Limit to 10 results
+query.limit = 10;
+[query findObjectsInBackgroundWithBlock:^(NSArray *todos, NSError *error) {
+    // todos is an array of Todo objects satisfying conditions
+}];
+```
+
+Additional sorting conditions like `orderByAscending` and `orderByDescending` will gain higher priorities than the default order by distance.
+
+To have the results limited within a certain distance, check out `withinKilometers`, `withinMiles`, and `withinRadians` in our API docs.
+
+You can also query for the set of objects that are contained within a rectangular bounding box with `withinGeoBoxFromSouthwest` and `toNortheast`:
+
+![withinGeoBox](/img/geopoint-withingeobox.svg)
+
+```objc
+LCQuery *query = [LCQuery queryWithClassName:@"Todo"];
+LCGeoPoint *southwest = [LCGeoPoint geoPointWithLatitude:30 longitude:115];
+LCGeoPoint *northeast = [LCGeoPoint geoPointWithLatitude:40 longitude:118];
+[query whereKey:@"location" withinGeoBoxFromSouthwest:southwest toNortheast:northeast];
+```
+
+### Caveats about GeoPoints
+
+Points should not exceed the extreme ends of the ranges. Latitude should be between `-90.0` and `90.0`. Longitude should be between `-180.0` and `180.0`. Attempting to set latitude or longitude out of bounds will cause an error.
+Also, each `LCObject` can only have one field for `LCGeoPoint`.
+
+## Users
+
+See [TDS Authentication Guide](/sdk/authentication/guide/).
+
+## Roles
+
+As your app grows in scope and user base, you may find yourself needing more coarse-grained control over access to pieces of your data than user-linked ACLs can provide. To address this requirement, we support a form of role-based access control. Check the detailed [ACL Guide](https://docs.leancloud.app/acl-guide.html) to learn how to set it up for your objects.
+
+## Full-Text Search
+
+Full-Text Search offers a better way to search through the information contained within your app. It's built with search engine capabilities that you can easily tap into your app. Effective and useful searching functionality in your app is crucial for helping users find what they need. For more details, see [Full-Text Search Guide](/sdk/storage/guide/fulltext-search/).

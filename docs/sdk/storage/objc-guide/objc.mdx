@@ -5,8 +5,6 @@ slug: /sdk/storage/guide/objc/
 sidebar_position: 6
 ---
 
-
-
 数据存储是云服务提供的核心功能之一，可用于存放和查询应用数据。下面的代码展示了如何创建一个对象并将其存入云端：
 
 ```objc
@@ -32,7 +30,7 @@ LCObject *todo = [LCObject objectWithClassName:@"Todo"];
 
 ## SDK 安装与初始化
 
-请阅读[数据存储、即时通讯 Objective C SDK 配置指南](/sdk/storage/guide/setup-objc/)。
+请阅读[数据存储、即时通讯 Objective-C SDK 配置指南](/sdk/storage/guide/setup-objc/)。
 
 ## 对象
 
@@ -48,7 +46,6 @@ isComplete: false,
 priority:   2,
 tags:       ["工作", "销售"]
 ```
-
 
 ### 数据类型
 
@@ -101,7 +98,6 @@ LCObject *todo = [LCObject objectWithClassName:@"Todo"];
 LCObject *todo = [[LCObject alloc] initWithClassName:@"Todo"];
 ```
 
-
 在构建对象时，为了使云端知道对象属于哪个 class，需要将 class 的名字作为参数传入。你可以将云服务里面的 class 比作关系型数据库里面的表。一个 class 的名字必须以字母开头，且只能包含数字、字母和下划线。
 
 ### 保存对象
@@ -131,15 +127,15 @@ LCObject *todo = [LCObject objectWithClassName:@"Todo"];
 
 ```json
 {
-  "title":     "马拉松报名",
-  "priority":  2,
+  "title": "马拉松报名",
+  "priority": 2,
   "ACL": {
     "*": {
-      "read":  true,
+      "read": true,
       "write": true
     }
   },
-  "objectId":  "582570f38ac247004f39c24b",
+  "objectId": "582570f38ac247004f39c24b",
   "createdAt": "2017-11-11T07:19:15.549Z",
   "updatedAt": "2017-11-11T07:19:15.549Z"
 }
@@ -149,13 +145,12 @@ LCObject *todo = [LCObject objectWithClassName:@"Todo"];
 
 以下是一些对象的内置属性，会在对象保存时自动创建，无需手动指定：
 
-内置属性 | 类型 | 描述
---- | --- | ---
-`objectId` | `NSString` | 该对象唯一的 ID 标识。
-`ACL` | `LCACL` | 该对象的权限控制，实际上是一个 JSON 对象，控制台做了展现优化。
-`createdAt` | `NSDate` | 该对象被创建的时间。
-`updatedAt` | `NSDate` | 该对象最后一次被修改的时间。
-
+| 内置属性    | 类型       | 描述                                                           |
+| ----------- | ---------- | -------------------------------------------------------------- |
+| `objectId`  | `NSString` | 该对象唯一的 ID 标识。                                         |
+| `ACL`       | `LCACL`    | 该对象的权限控制，实际上是一个 JSON 对象，控制台做了展现优化。 |
+| `createdAt` | `NSDate`   | 该对象被创建的时间。                                           |
+| `updatedAt` | `NSDate`   | 该对象最后一次被修改的时间。                                   |
 
 这些属性的值会在对象被存入云端时自动填入，代码中尚未保存的 `LCObject` 不存在这些属性。
 
@@ -183,9 +178,6 @@ LCQuery *query = [LCQuery queryWithClassName:@"Todo"];
 }];
 ```
 
-
-对象拿到之后，可以通过 `get` 方法来获取各个属性的值。注意 `objectId`、`updatedAt` 和 `createdAt` 这三个内置属性不能通过 `get` 获取或通过 `set` 修改，只能由云端自动进行填充。尚未保存的 `LCObject` 不存在这些属性。
-
 如果你试图获取一个不存在的属性，SDK 不会报错，而是会返回 `nil`。
 
 #### 同步对象
@@ -198,7 +190,6 @@ LCObject *todo = [LCObject objectWithClassName:@"Todo" objectId:@"582570f38ac247
     // todo 已刷新
 }];
 ```
-
 
 刷新操作会强行使用云端的属性值覆盖本地的属性。因此如果本地有属性修改，**`fetchInBackgroundWithBlock` 操作会丢弃这些修改**。为避免这种情况，你可以在刷新时指定 **需要刷新的属性**，这样只有指定的属性会被刷新（包括内置属性 `objectId`、`createdAt` 和 `updatedAt`），其他属性不受影响。
 
@@ -252,7 +243,6 @@ option.fetchWhenSave = YES;
 }];
 ```
 
-
 **`query` 选项只对已存在的对象有效**，不适用于尚未存入云端的对象。
 
 `query` 选项在有多个客户端需要更新同一属性的时候非常有用。相比于通过 `LCQuery` 查询 `LCObject` 再对其进行更新的方法，这样做更加简洁，并且能够避免出现差错。
@@ -264,7 +254,6 @@ option.fetchWhenSave = YES;
 ```objc
 [post incrementKey:@"likes" byAmount:@1];
 ```
-
 
 可以指定需要增加或减少的值。若未指定，则默认使用 `1`。
 
@@ -283,7 +272,6 @@ option.fetchWhenSave = YES;
 - `addUniqueObjectsFromArray:forKey:` 将指定对象数组附加到数组末尾，确保对象唯一。
 - `removeObject:forKey:` 从数组字段中删除指定对象的所有实例。
 - `removeObjectsInArray:forKey:` 从数组对象中删除指定数组中的所有对象。
-
 
 例如，`Todo` 用一个 `alarms` 属性保存所有闹钟的时间。下面的代码将多个时间加入这个属性：
 
@@ -351,8 +339,8 @@ LCQuery *query = [LCQuery queryWithClassName:@"Todo"];
 }];
 ```
 
-
 虽然上述方法可以在一次请求中包含多个操作，每一个分别的保存或同步操作在计费时依然会被算作一次请求，而所有的删除操作则会被合并为一次请求。
+
 ### 后台运行
 
 细心的开发者已经发现，在所有的示例代码中几乎都是用了异步来访问云端，形如 `xxxxInBackground` 的用法都是提供给开发者在主线程调用用以实现后台运行的方法，因此开发者在主线程可以放心地调用这种命名方式的函数。
@@ -399,7 +387,6 @@ LCObject *post = [LCObject objectWithClassName:@"Post" objectId:@"57328ca079bc44
 [comment setObject:post forKey:@"post"];
 ```
 
-
 请参阅 [关系查询](#关系查询) 来了解如何获取关联的对象。
 
 #### 多对多关系
@@ -422,7 +409,6 @@ LCObject *todo = [[LCObject alloc] initWithClassName:@"Todo"]; // 构建对象
 
 NSMutableDictionary *serializedJSONDictionary = [todo dictionaryForObject]; // 获取序列化后的字典
 ```
-
 
 反序列化：
 
@@ -543,6 +529,13 @@ query.skip = 20;
 
 下面的代码可用于查找包含或不包含某一属性的对象：
 
+```objc
+// 查找包含 "images" 的对象
+[query whereKeyExists:@"images"];
+
+// 查找不包含 "images" 的对象
+[query whereKeyDoesNotExist:@"images"];
+```
 
 可以通过 `selectKeys` 指定需要返回的属性。下面的代码只获取每个对象的 `title` 和 `content`（包括内置属性 `objectId`、`createdAt` 和 `updatedAt`）：
 
@@ -556,12 +549,12 @@ LCQuery *query = [LCQuery queryWithClassName:@"Todo"];
 }];
 ```
 
-`selectKeys`
-支持点号（`author.firstName`），详见[《点号使用指南》](https://leancloud.cn/docs/dot-notation.html)。
+`selectKeys` 支持点号（`author.firstName`），详见[《点号使用指南》](https://leancloud.cn/docs/dot-notation.html)。
 另外，字段名前添加减号前缀表示反向选择，例如 `-author` 表示不返回 `author` 字段。
 反向选择同样适用于内置字段，比如 `-objectId`，也可以和点号组合使用，比如 `-pubUser.createdAt`。
 
 对于未获取的属性，可以通过对结果中的对象进行 `fetchInBackgroundWithBlock` 操作来获取。参见 [同步对象](#同步对象)。
+
 ### 字符串查询
 
 可以用 `hasPrefix` 来查找某一属性值以特定字符串开头的对象。和 SQL 中的 `LIKE` 一样，你可以利用索引带来的优势：
@@ -572,7 +565,6 @@ LCQuery *query = [LCQuery queryWithClassName:@"Todo"];
 [query whereKey:@"title" hasPrefix:@"lunch"];
 ```
 
-
 可以用 `containsString` 来查找某一属性值包含特定字符串的对象：
 
 ```objc
@@ -580,7 +572,6 @@ LCQuery *query = [LCQuery queryWithClassName:@"Todo"];
 // 相当于 SQL 中的 title LIKE '%lunch%'
 [query whereKey:@"title" containsString:@"lunch"];
 ```
-
 
 和 `hasPrefix` 不同，`containsString` 无法利用索引，因此不建议用于大型数据集。
 
@@ -601,13 +592,13 @@ LCQuery *query = [LCQuery queryWithClassName:@"Todo"];
 
 ### 数组查询
 
-下面的代码查找所有数组属性 `tags` 包含 ` 工作 ` 的对象：
+下面的代码查找所有数组属性 `tags` 包含 `工作` 的对象：
 
 ```objc
 [query whereKey:@"tags" equalTo:@"工作"];
 ```
 
-下面的代码查询数组属性长度为 3 （正好包含 3 个标签）的对象：
+下面的代码查询数组属性长度为 3（正好包含 3 个标签）的对象：
 
 ```objc
 [query whereKey:@"tags" sizeEqualTo:3];
@@ -762,9 +753,7 @@ LCQuery *endDateQuery = [LCQuery queryWithClassName:@"Todo"];
 LCQuery *query = [LCQuery andQueryWithSubqueries:[NSArray arrayWithObjects:startDateQuery, endDateQuery, nil]];
 ```
 
-
 单独使用 AND 查询跟使用基础查询相比并没有什么不同，不过当查询条件中包含不止一个 OR 查询时，就必须使用 AND 查询：
-
 
 ```objc
 NSDate *(^dateFromString)(NSString *string) = ^(NSString *string) {
@@ -793,7 +782,7 @@ LCQuery *query = [LCQuery andQueryWithSubqueries:[NSArray arrayWithObjects:prior
 
 ### 缓存查询
 
-缓存一些查询的结果到磁盘上，这可以让你在离线的时候，或者应用刚启动，网络请求还没有足够时间完成的时候可以展现一些数据给用户。当缓存占用了太多空间的时候，LeanStorage 会自动清空缓存。
+缓存一些查询的结果到磁盘上，这可以让你在离线的时候，或者应用刚启动，网络请求还没有足够时间完成的时候可以展现一些数据给用户。当缓存占用了太多空间的时候，SDK 会自动清空缓存。
 
 默认情况下的查询不会使用缓存，除非你调用接口明确设置启用。例如，尝试从网络请求，如果网络不可用则从缓存数据中获取，可以这样设置：
 
@@ -817,13 +806,13 @@ query.maxCacheAge = 24*3600;
 
 为了满足多变的需求，SDK 默认提供了以下几种缓存策略：
 
-策略枚举 | 含义及解释
---- | ---
-`kLCCachePolicyIgnoreCache`| **（默认缓存策略）**查询行为不从缓存加载，也不会将结果保存到缓存中。
-`kLCCachePolicyCacheOnly` | 查询行为忽略网络状况，只从缓存加载。如果没有缓存结果，该策略会产生 `LCError`。
-`kLCCachePolicyCacheElseNetwork` | 查询行为首先尝试从缓存加载，若加载失败，则通过网络加载结果。如果缓存和网络获取行为均为失败，则产生 `LCError`。注意查询条件默认会从当前时间从新往旧查询，因此这种情况下第一次查询总需要访问网络。
-`kLCCachePolicyNetworkElseCache` | 查询行为先尝试从网络加载，若加载失败，则从缓存加载结果。如果缓存和网络获取行为均为失败，则产生 `LCError`。
-`kLCCachePolicyCacheThenNetwork` | 查询先从缓存加载，然后从网络加载。在这种情况下，回调函数会被调用两次，第一次是缓存中的结果，然后是从网络获取的结果。因为它会在不同的时间返回两个结果，所以该策略不能与 `findObjects` 同时使用。
+| 策略枚举                         | 含义及解释                                                                                                                                                                                       |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `kLCCachePolicyIgnoreCache`      | **（默认缓存策略）**查询行为不从缓存加载，也不会将结果保存到缓存中。                                                                                                                             |
+| `kLCCachePolicyCacheOnly`        | 查询行为忽略网络状况，只从缓存加载。如果没有缓存结果，该策略会产生 `LCError`。                                                                                                                   |
+| `kLCCachePolicyCacheElseNetwork` | 查询行为首先尝试从缓存加载，若加载失败，则通过网络加载结果。如果缓存和网络获取行为均为失败，则产生 `LCError`。注意查询条件默认会从当前时间从新往旧查询，因此这种情况下第一次查询总需要访问网络。 |
+| `kLCCachePolicyNetworkElseCache` | 查询行为先尝试从网络加载，若加载失败，则从缓存加载结果。如果缓存和网络获取行为均为失败，则产生 `LCError`。                                                                                       |
+| `kLCCachePolicyCacheThenNetwork` | 查询先从缓存加载，然后从网络加载。在这种情况下，回调函数会被调用两次，第一次是缓存中的结果，然后是从网络获取的结果。因为它会在不同的时间返回两个结果，所以该策略不能与 `findObjects` 同时使用。  |
 
 #### 缓存相关的操作
 
@@ -833,7 +822,7 @@ query.maxCacheAge = 24*3600;
   BOOL isInCache = [query hasCachedResult];
   ```
 
-- 删除某一查询的任何缓存结果：（删除缓存只影响持久化缓存（磁盘缓存），不影响内存缓存，下同）
+- 删除某一查询的任何缓存结果（删除缓存只影响持久化缓存（磁盘缓存），不影响内存缓存，下同）：
 
   ```objc
   [query clearCachedResult];
@@ -892,20 +881,27 @@ pod 'LeanCloudObjc/Realtime'
 #import <LeanCloudObjc/Realtime.h>
 ```
 
-
 ### Demo
 
 下面是在使用了 LiveQuery 的网页应用和手机应用中分别操作，数据保持同步的效果：
 
-<video src="/files/1496988080458.qt" controls autoPlay muted preload="auto" width="100%" height="100%" >
-HTML5 Video is required for this demo, which your browser doesn't support.
+<video
+  src="https://capacity-files.lcfile.com/1496988080458"
+  controls
+  autoPlay
+  muted
+  preload="auto"
+  width="100%"
+  height="100%"
+>
+  HTML5 Video is required for this demo, which your browser doesn't support.
 </video>
 
 使用我们的「LeanTodo」微信小程序和网页应用，可以实际体验以上视频所演示的效果，步骤如下：
 
 1. 微信扫码，添加小程序「LeanTodo」；
 
-    ![LeanTodo mini program](/img/leantodo-weapp-qr.jpg)
+   ![LeanTodo mini program](/img/leantodo-weapp-qr.jpg)
 
 2. 进入小程序，点击首页左下角 **设置** > **账户设置**，输入便于记忆的用户名和密码；
 
@@ -930,7 +926,6 @@ self.liveQuery.delegate = self;
 }];
 ```
 
-
 LiveQuery 不支持内嵌查询，也不支持返回指定属性。
 
 订阅成功后，就可以接收到和 `LCObject` 相关的更新了。假如在另一个客户端上创建了一个 `Todo` 对象，对象的 `title` 设为 `更新作品集`，那么下面的代码可以获取到这个新的 `Todo`：
@@ -949,7 +944,6 @@ self.liveQuery.delegate = self;
 }
 ```
 
-
 此时如果有人把 `Todo` 的 `content` 改为 `把我最近画的插画放上去`，那么下面的代码可以获取到本次更新：
 
 ```objc
@@ -957,7 +951,6 @@ self.liveQuery.delegate = self;
     NSLog(@"%@", updatedTodo[@"content"]); // 把我最近画的插画放上去
 }
 ```
-
 
 ### 事件处理
 
@@ -981,7 +974,6 @@ self.liveQuery.delegate = self;
 }
 ```
 
-
 #### `update` 事件
 
 当有满足 `LCQuery` 查询条件的 `LCObject` 被更新时，`update` 事件会被触发。下面的 `object` 就是有更新的 `LCObject`：
@@ -994,7 +986,6 @@ self.liveQuery.delegate = self;
 }
 ```
 
-
 #### `enter` 事件
 
 当一个已存在的、原本不符合 `LCQuery` 查询条件的 `LCObject` 发生更新，且更新后符合查询条件，`enter` 事件会被触发。下面的 `object` 就是进入 `LCQuery` 的 `LCObject`，其内容为该对象最新的值：
@@ -1006,7 +997,6 @@ self.liveQuery.delegate = self;
     }
 }
 ```
-
 
 注意区分 `create` 和 `enter` 的不同行为。如果一个对象已经存在，在更新之前不符合查询条件，而在更新之后符合查询条件，那么 `enter` 事件会被触发。如果一个对象原本不存在，后来被构建了出来，那么 `create` 事件会被触发。
 
@@ -1021,7 +1011,6 @@ self.liveQuery.delegate = self;
     }
 }
 ```
-
 
 #### `delete` 事件
 
@@ -1049,7 +1038,6 @@ self.liveQuery.delegate = self;
 }];
 ```
 
-
 ### 断开连接
 
 断开连接有几种情况：
@@ -1073,7 +1061,6 @@ LiveQuery 的核心还是提供一个针对查询的推拉结合的用法，脱�
 
 ### 构建文件
 
-
 可以通过字符串构建文件：
 
 ```objc
@@ -1090,10 +1077,7 @@ LCFile *file = [LCFile fileWithRemoteURL:[NSURL URLWithString:@"https://leanclou
 
 通过 URL 构建文件时，SDK 并不会将原本的文件转储到云端，而是会将文件的物理地址存储为字符串，这样也就不会产生任何文件上传流量。使用其他方式构建的文件会被保存在云端。
 
-云端会根据文件扩展名自动检测文件类型。如果需要的话，也可以手动指定 `Content-Type`（一般称为 MIME 类型）：
-
 与前面提到的方式相比，一个更常见的文件构建方式是从本地路径上传。
-
 
 ```objc
 NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
@@ -1116,15 +1100,14 @@ LCFile *file = [LCFile fileWithLocalPath:imagePath error:&error];
 ```objc
 [file uploadWithCompletionHandler:^(BOOL succeeded, NSError *error) {
     if (succeeded) {
-        NSLog(@"文件保存完成。URL: %@", file.url);
+        NSLog(@"文件保存完成。URL：%@", file.url);
     } else {
         // 保存失败，可能是文件无法被读取，或者上传过程中出现问题
     }
 }];
 ```
 
-文件上传后，可以在文件服务中找到。已上传的文件无法再被修改。如果需要修改文件，只能重新上传修改过的文件并取得新的 `objectId` 和 URL。
-
+文件上传后，可以在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 文件** 中找到。已上传的文件无法再被修改。如果需要修改文件，只能重新上传修改过的文件并取得新的 `objectId` 和 URL。
 
 已经保存到云端的文件可以关联到 `LCObject`：
 
@@ -1141,7 +1124,6 @@ LCObject *todo = [LCObject objectWithClassName:@"Todo"];
 ```objc
 LCQuery *query = [LCQuery queryWithClassName:@"_File"];
 ```
-
 
 需要注意的是，内部文件（上传到文件服务的文件）的 `url` 字段是由云端动态生成的，其中涉及切换自定义域名的相关处理逻辑。
 因此，通过 `url` 字段查询文件仅适用于外部文件（直接保存外部 URL 到文件服务创建的文件），内部文件请改用 key 字段（URL 中的路径）查询。
@@ -1160,11 +1142,9 @@ LCQuery *query = [LCQuery queryWithClassName:@"Todo"];
 [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable todos, NSError * _Nullable error) {
     for (LCObject *todo in todos) {
         // 获取每个 todo 的 attachments 数组
-        // {# TODO #}
     }
 }];
 ```
-
 
 ### 上传进度监听
 
@@ -1197,22 +1177,6 @@ LCQuery *query = [LCQuery queryWithClassName:@"Todo"];
 }];
 ```
 
-### 文件下载
-
-客户端 SDK 接口可以下载文件并把它缓存起来，只要文件的 URL 不变，那么一次下载成功之后，就不会再重复下载，目的是为了减少客户端的流量。
-
-```objc
-[file downloadWithProgress:^(NSInteger number) {
-    // 下载的进度数据，number 介于 0 和 100
-} completionHandler:^(NSURL * _Nullable filePath, NSError * _Nullable error) {
-    // filePath 是文件下载到本地的地址
-}];
-```
-
-`filePath` 是一个相对路径，文件存储在缓存目录（使用缓存功能）或系统临时目录（不使用缓存功能）中。
-
-请注意代码中 `下载进度` 数据的读取。
-
 ### 图像缩略图
 
 成功保存图像后，除了可以获取指向该文件的 URL 外，还可以获取图像的缩略图 URL，并且可以指定缩略图的宽度和高度：
@@ -1228,6 +1192,22 @@ LCFile *file = [LCFile fileWithRemoteURL:[NSURL URLWithString:@"文件-url"]];
 
 国际版不支持图片缩略图。
 
+### 下载文件
+
+客户端 SDK 接口可以下载文件并把它缓存起来，只要文件的 URL 不变，那么一次下载成功之后，就不会再重复下载，目的是为了减少客户端的流量。
+
+```objc
+[file downloadWithProgress:^(NSInteger number) {
+    // 下载的进度数据，number 介于 0 和 100
+} completionHandler:^(NSURL * _Nullable filePath, NSError * _Nullable error) {
+    // filePath 是文件下载到本地的地址
+}];
+```
+
+`filePath` 是一个相对路径，文件存储在缓存目录（使用缓存功能）或系统临时目录（不使用缓存功能）中。
+
+请注意代码中 `下载进度` 数据的读取。
+
 ### 清除缓存
 
 LCFile 也提供了清除缓存的方法：
@@ -1239,7 +1219,6 @@ LCFile 也提供了清除缓存的方法：
 // 类方法，清除所有缓存
 + (BOOL)clearAllPersistentCache;
 ```
-
 
 ### 删除文件
 
@@ -1254,7 +1233,7 @@ LCFile *file = [LCFile getFileWithObjectId:@"552e0a27e4b0643b709e891e"];
 如需删除文件，一般建议在服务端使用 Master Key 调用 REST API 删除。
 取决于游戏的具体需求，也可以考虑在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 文件 > 权限** 向特定用户或特定角色开启删除权限。
 
-#### 文件审核
+### 文件审核
 
 当前**文件审核**功能支持检测**图片**文件。
 
@@ -1262,7 +1241,7 @@ LCFile *file = [LCFile getFileWithObjectId:@"552e0a27e4b0643b709e891e"];
 
 如果你需要人工二次审核，可以点击每一行记录，在文件详情中选择「通过」或「封禁」。
 
-#### iOS 9 适配
+### iOS 9 适配
 
 从 iOS 9 开始，Apple 默认屏蔽 HTTP 访问，只支持 HTTPS 访问。云服务除了 `LCFile` 的 `getData` 之外的 API 都支持通过 HTTPS 访问。
 
@@ -1292,7 +1271,6 @@ LCFile *file = [LCFile getFileWithObjectId:@"552e0a27e4b0643b709e891e"];
 
 你也可以根据项目需要，允许所有的 HTTP 访问，更多可参考 [iOS 9 适配系列教程](https://github.com/ChenYilong/iOS9AdaptationTips)。
 
-
 ## GeoPoint
 
 云服务允许你通过将 `LCGeoPoint` 关联到 `LCObject` 的方式存储折射真实世界地理位置的经纬坐标，这样做可以让你查询包含一个点附近的坐标的对象。常见的使用场景有「查找附近的用户」和「查找附近的地点」。
@@ -1302,7 +1280,6 @@ LCFile *file = [LCFile getFileWithObjectId:@"552e0a27e4b0643b709e891e"];
 ```objc
 LCGeoPoint *point = [LCGeoPoint geoPointWithLatitude:39.9 longitude:116.4];
 ```
-
 
 现在可以将这个地理位置存储为一个对象的属性：
 
@@ -1355,6 +1332,7 @@ iOS 8.0 之后，使用定位服务之前，需要调用 `[locationManager reque
 ## 角色
 
 随着用户量的增长，你可能会发现相比于为每一名用户单独设置权限，将预先设定好的权限直接分配给一部分用户是更好的选择。为了迎合这种需求，云服务支持基于角色的权限管理。请参阅[《ACL 权限管理开发指南》](https://leancloud.cn/docs/acl-guide.html)。
+
 ## 子类化
 
 子类化推荐给进阶的开发者在进行代码重构的时候做参考。你可以用 `LCObject` 访问到所有的数据，用 `objectForKey:` 获取任意字段。在成熟的代码中，子类化有很多优势，包括降低代码量，具有更好的扩展性，和支持自动补全。
@@ -1553,4 +1531,3 @@ student.name = @"小明";
 ## 全文搜索
 
 全文搜索是一个针对应用数据进行全局搜索的接口，它基于搜索引擎构建，提供更强大的搜索功能。要深入了解其用法和阅读示例代码，请阅读[全文搜索指南](/sdk/storage/guide/fulltext-search/)。
-

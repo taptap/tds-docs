@@ -1,11 +1,9 @@
 ---
-title: 数据存储开发指南 · Java 
+title: 数据存储开发指南 · Java
 sidebar_label: Java 开发指南
 slug: /sdk/storage/guide/java/
 sidebar_position: 4
 ---
-
-
 
 数据存储是云服务提供的核心功能之一，可用于存放和查询应用数据。下面的代码展示了如何创建一个对象并将其存入云端：
 
@@ -37,10 +35,6 @@ todo.saveInBackground().subscribe(new Observer<LCObject>() {
 
 请阅读[数据存储、即时通讯 Java SDK 配置指南](/sdk/storage/guide/setup-java/)。
 
-> Android SDK 老版本迁移
->
-> 如果你还在在使用我们老版本 Android SDK（所有版本号低于 `5.0.0`，`groupId` 为 `cn.leancloud.android` 的 libraries），要迁移到新版的 Unified SDK，具体迁移方法见 [Java SDK 的 README](https://github.com/leancloud/java-unified-sdk#migration-to-8x)。
-
 ## 对象
 
 ### `LCObject`
@@ -56,7 +50,6 @@ priority:   2,
 tags:       ["工作", "销售"]
 ```
 
-
 ### 数据类型
 
 `LCObject` 支持的数据类型包括 `String`、`Number`、`Boolean`、`Object`、`Array`、`Date` 等等。你可以通过嵌套的方式在 `Object` 或 `Array` 里面存储更加结构化的数据。
@@ -66,7 +59,6 @@ tags:       ["工作", "销售"]
 `LCObject` 同时支持 `GeoPoint`，可以用来存储地理位置信息。参见 [GeoPoint](#geopoint)。
 
 以下是一些示例：
-
 
 ```java
 // 基本类型
@@ -93,7 +85,6 @@ testObject.put("testHashMap",   hashMap);
 testObject.save();
 ```
 
-
 我们不推荐通过 `byte[]` 在 `LCObject` 里面存储图片、文档等大型二进制数据。每个 `LCObject` 的大小不应超过 **128 KB**。如需存储大型文件，可创建 `LCFile` 实例并将将其关联到 `LCObject` 的某个属性上。参见 [文件](#文件)。
 
 注意：时间类型在云端将会以 UTC 时间格式存储，但是客户端在读取之后会转化成本地时间。
@@ -110,13 +101,11 @@ testObject.save();
 LCObject todo = new LCObject("Todo");
 ```
 
-
 在构建对象时，为了使云端知道对象属于哪个 class，需要将 class 的名字作为参数传入。你可以将云服务里面的 class 比作关系型数据库里面的表。一个 class 的名字必须以字母开头，且只能包含数字、字母和下划线。
 
 ### 保存对象
 
 下面的代码将一个 class 为 `Todo` 的对象存入云端：
-
 
 ```java
 // 构建对象
@@ -140,20 +129,19 @@ todo.saveInBackground().subscribe(new Observer<LCObject>() {
 });
 ```
 
-
 为了确认对象已经保存成功，我们可以到 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 结构化数据 > `Todo`** 里面看一下，应该会有一行新的数据产生。点一下这个数据的 `objectId`，应该能看到类似这样的内容：
 
 ```json
 {
-  "title":     "马拉松报名",
-  "priority":  2,
+  "title": "马拉松报名",
+  "priority": 2,
   "ACL": {
     "*": {
-      "read":  true,
+      "read": true,
       "write": true
     }
   },
-  "objectId":  "582570f38ac247004f39c24b",
+  "objectId": "582570f38ac247004f39c24b",
   "createdAt": "2017-11-11T07:19:15.549Z",
   "updatedAt": "2017-11-11T07:19:15.549Z"
 }
@@ -163,13 +151,12 @@ todo.saveInBackground().subscribe(new Observer<LCObject>() {
 
 以下是一些对象的内置属性，会在对象保存时自动创建，无需手动指定：
 
-内置属性 | 类型 | 描述
---- | --- | ---
-`objectId` | `String` | 该对象唯一的 ID 标识。
-`ACL` | `LCACL` | 该对象的权限控制，实际上是一个 JSON 对象，控制台做了展现优化。
-`createdAt` | `Date` | 该对象被创建的时间。
-`updatedAt` | `Date` | 该对象最后一次被修改的时间。
-
+| 内置属性    | 类型     | 描述                                                           |
+| ----------- | -------- | -------------------------------------------------------------- |
+| `objectId`  | `String` | 该对象唯一的 ID 标识。                                         |
+| `ACL`       | `LCACL`  | 该对象的权限控制，实际上是一个 JSON 对象，控制台做了展现优化。 |
+| `createdAt` | `Date`   | 该对象被创建的时间。                                           |
+| `updatedAt` | `Date`   | 该对象最后一次被修改的时间。                                   |
 
 这些属性的值会在对象被存入云端时自动填入，代码中尚未保存的 `LCObject` 不存在这些属性。
 
@@ -182,7 +169,6 @@ todo.saveInBackground().subscribe(new Observer<LCObject>() {
 ### 获取对象
 
 对于已经保存到云端的 `LCObject`，可以通过它的 `objectId` 将其取回：
-
 
 ```java
 LCQuery<LCObject> query = new LCQuery<>("Todo");
@@ -203,14 +189,11 @@ query.getInBackground("582570f38ac247004f39c24b").subscribe(new Observer<LCObjec
 });
 ```
 
-对象拿到之后，可以通过 `get` 方法来获取各个属性的值。注意 `objectId`、`updatedAt` 和 `createdAt` 这三个内置属性不能通过 `get` 获取或通过 `set` 修改，只能由云端自动进行填充。尚未保存的 `LCObject` 不存在这些属性。
-
 如果你试图获取一个不存在的属性，SDK 不会报错，而是会返回 `null`。
 
 #### 同步对象
 
 当云端数据发生更改时，你可以调用 `fetchInBackground` 方法来刷新对象，使之与云端数据同步：
-
 
 ```java
 LCObject todo = LCObject.createWithoutData("Todo", "582570f38ac247004f39c24b");
@@ -293,7 +276,6 @@ account.saveInBackground(option).subscribe(new Observer<LCObject>() {
 });
 ```
 
-
 **`query` 选项只对已存在的对象有效**，不适用于尚未存入云端的对象。
 
 `query` 选项在有多个客户端需要更新同一属性的时候非常有用。相比于通过 `LCQuery` 查询 `LCObject` 再对其进行更新的方法，这样做更加简洁，并且能够避免出现差错。
@@ -301,7 +283,6 @@ account.saveInBackground(option).subscribe(new Observer<LCObject>() {
 #### 更新计数器
 
 设想我们正在开发一个微博，需要统计一条微博有多少个赞和多少次转发。由于赞和转发的操作可能由多个客户端同时进行，直接在本地更新数字并保存到云端的做法极有可能导致差错。为保证计数的准确性，可以通过 **原子操作** 来增加或减少一个属性内保存的数字：
-
 
 ```java
 post.increment("likes", 1);
@@ -318,13 +299,11 @@ post.increment("likes", 1);
 
 更新数组也是原子操作。使用以下方法可以方便地维护数组类型的数据：
 
-
 - `add()` 将指定对象附加到数组末尾。
 - `addUnique()` 如果数组中不包含指定对象，则将该对象加入数组。对象的插入位置是随机的。
 - `removeAll()` 从数组对象中删除指定数组中的所有对象。
 
 例如，`Todo` 用一个 `alarms` 属性保存所有闹钟的时间。下面的代码将多个时间加入这个属性：
-
 
 ```java
 Date getDateWithDateString(String dateString) {
@@ -371,7 +350,6 @@ todo.deleteInBackground().subscribe(new Observer<LCNull>() {
 
 ### 批量操作
 
-
 ```java
 // 批量构建和更新
 saveAll()
@@ -386,9 +364,7 @@ fetchAll()
 fetchAllInBackground()
 ```
 
-
 下面的代码将所有 `Todo` 的 `isComplete` 设为 `true`：
-
 
 ```java
 LCQuery<LCObject> query = new LCQuery<>("Todo");
@@ -409,9 +385,11 @@ query.findInBackground().subscribe(new Observer<List<LCObject>>() {
 ```
 
 虽然上述方法可以在一次请求中包含多个操作，每一个分别的保存或同步操作在计费时依然会被算作一次请求，而所有的删除操作则会被合并为一次请求。
+
 ### 后台运行
 
 细心的开发者已经发现，在所有的示例代码中几乎都是用了异步来访问云端，形如 `xxxxInBackground` 的用法都是提供给开发者在主线程调用用以实现后台运行的方法，因此开发者在主线程可以放心地调用这种命名方式的函数。
+
 ### 离线存储对象
 
 大多数保存功能可以立刻执行，并通知应用「保存完毕」。不过若不需要知道保存完成的时间，则可使用 `saveEventually` 来代替。
@@ -430,7 +408,6 @@ query.findInBackground().subscribe(new Observer<List<LCObject>>() {
 
 下面的代码会创建一个含有单个 `Comment` 的 `Post`：
 
-
 ```java
 // 创建 post
 LCObject post = new LCObject("Post");
@@ -448,9 +425,7 @@ comment.put("parent", post);
 comment.save();
 ```
 
-
 云端存储时，会将被指向的对象用 `Pointer` 的形式存起来。你也可以用 `objectId` 来指向一个对象：
-
 
 ```java
 LCObject post = LCObject.createWithoutData("Post", "57328ca079bc44005c2472d0");
@@ -471,7 +446,6 @@ comment.put("post", post);
 
 序列化：
 
-
 ```java
 LCObject todo = new LCObject("Todo"); // 构建对象
 todo.put("title", "马拉松报名"); // 设置名称
@@ -481,7 +455,6 @@ String serializedString = todo.toString();
 ```
 
 反序列化：
-
 
 ```java
 LCObject deserializedObject = LCObject.parseLCObject(serializedString);
@@ -635,12 +608,12 @@ query.getFirstInBackground().subscribe(new Observer<LCObject>() {
 });
 ```
 
-`selectKeys`
-支持点号（`author.firstName`），详见[《点号使用指南》](https://leancloud.cn/docs/dot-notation.html)。
+`selectKeys` 支持点号（`author.firstName`），详见[《点号使用指南》](https://leancloud.cn/docs/dot-notation.html)。
 另外，字段名前添加减号前缀表示反向选择，例如 `-author` 表示不返回 `author` 字段。
 反向选择同样适用于内置字段，比如 `-objectId`，也可以和点号组合使用，比如 `-pubUser.createdAt`。
 
 对于未获取的属性，可以通过对结果中的对象进行 `fetchInBackground` 操作来获取。参见 [同步对象](#同步对象)。
+
 ### 字符串查询
 
 可以用 `whereStartsWith` 来查找某一属性值以特定字符串开头的对象。和 SQL 中的 `LIKE` 一样，你可以利用索引带来的优势：
@@ -651,7 +624,6 @@ LCQuery<LCObject> query = new LCQuery<>("Todo");
 query.whereStartsWith("title", "lunch");
 ```
 
-
 可以用 `whereContains` 来查找某一属性值包含特定字符串的对象：
 
 ```java
@@ -659,7 +631,6 @@ LCQuery<LCObject> query = new LCQuery<>("Todo");
 // 相当于 SQL 中的 title LIKE '%lunch%'
 query.whereContains("title", "lunch");
 ```
-
 
 和 `whereStartsWith` 不同，`whereContains` 无法利用索引，因此不建议用于大型数据集。
 
@@ -686,7 +657,7 @@ query.whereMatches("title", "^((?!ticket).)*$", "i");
 query.whereEqualTo("tags", "工作");
 ```
 
-下面的代码查询数组属性长度为 3 （正好包含 3 个标签）的对象：
+下面的代码查询数组属性长度为 3（正好包含 3 个标签）的对象：
 
 ```java
 query.whereSizeEqual("tags", 3);
@@ -799,7 +770,7 @@ query.findInBackground().subscribe(new Observer<List<LCObject>>() {
 
 ### 统计总数量
 
-如果只需知道有多少对象匹配查询条件而无需获取对象本身，可使用 `count` 来代替 `findInBackground`。比如说，查询有多少个已完成的 todo：
+如果只需知道有多少对象匹配查询条件而无需获取对象本身，可使用 `countInBackground` 来代替 `findInBackground`。比如说，查询有多少个已完成的 todo：
 
 ```java
 LCQuery<LCObject> query = new LCQuery<>("Todo");
@@ -856,9 +827,7 @@ endDateQuery.whereLessThan("createdAt", getDateWithDateString("2016-12-03"));
 LCQuery<LCObject> query = LCQuery.and(Arrays.asList(startDateQuery, endDateQuery));
 ```
 
-
 单独使用 AND 查询跟使用基础查询相比并没有什么不同，不过当查询条件中包含不止一个 OR 查询时，就必须使用 AND 查询：
-
 
 ```java
 Date getDateWithDateString(String dateString) {
@@ -885,7 +854,6 @@ LCQuery<LCObject> timeLocationQuery = LCQuery.or(Arrays.asList(locationQuery, cr
 LCQuery<LCObject> query = LCQuery.and(Arrays.asList(priorityQuery, timeLocationQuery));
 ```
 
-
 ### 查询性能优化
 
 影响查询性能的因素很多。特别是当查询结果的数量超过 10 万，查询性能可能会显著下降或出现瓶颈。以下列举一些容易降低性能的查询方式，开发者可以据此进行有针对性的调整和优化，或尽量避免使用。
@@ -911,7 +879,6 @@ LiveQuery 使用 WebSocket 在客户端和云端之间建立连接。WebSocket �
 
 进入 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 服务设置**，在 **安全设置** 里面勾选 **启用 LiveQuery** 即可。确保即时通信模块已被添加到 `AndroidManifest.xml`：
 
-
 ```xml
 <service android:name="cn.leancloud.push.PushService"/>
 <receiver android:name="cn.leancloud.push.LCBroadcastReceiver">
@@ -929,15 +896,23 @@ LiveQuery 使用 WebSocket 在客户端和云端之间建立连接。WebSocket �
 
 下面是在使用了 LiveQuery 的网页应用和手机应用中分别操作，数据保持同步的效果：
 
-<video src="/files/1496988080458.qt" controls autoPlay muted preload="auto" width="100%" height="100%" >
-HTML5 Video is required for this demo, which your browser doesn't support.
+<video
+  src="https://capacity-files.lcfile.com/1496988080458"
+  controls
+  autoPlay
+  muted
+  preload="auto"
+  width="100%"
+  height="100%"
+>
+  HTML5 Video is required for this demo, which your browser doesn't support.
 </video>
 
 使用我们的「LeanTodo」微信小程序和网页应用，可以实际体验以上视频所演示的效果，步骤如下：
 
 1. 微信扫码，添加小程序「LeanTodo」；
 
-    ![LeanTodo mini program](/img/leantodo-weapp-qr.jpg)
+   ![LeanTodo mini program](/img/leantodo-weapp-qr.jpg)
 
 2. 进入小程序，点击首页左下角 **设置** > **账户设置**，输入便于记忆的用户名和密码；
 
@@ -952,7 +927,6 @@ HTML5 Video is required for this demo, which your browser doesn't support.
 ### 构建订阅
 
 首先创建一个普通的 `LCQuery` 对象，添加查询条件（如有），然后进行订阅操作：
-
 
 ```java
 LCQuery<LCObject> query = new LCQuery<>("Todo");
@@ -971,7 +945,6 @@ liveQuery.subscribeInBackground(new LCLiveQuerySubscribeCallback() {
 LiveQuery 不支持内嵌查询，也不支持返回指定属性。
 
 订阅成功后，就可以接收到和 `LCObject` 相关的更新了。假如在另一个客户端上创建了一个 `Todo` 对象，对象的 `title` 设为 `更新作品集`，那么下面的代码可以获取到这个新的 `Todo`：
-
 
 ```java
 LCQuery<LCObject> query = new LCQuery<>("Todo");
@@ -994,7 +967,6 @@ liveQuery.subscribeInBackground(new LCLiveQuerySubscribeCallback() {
 ```
 
 此时如果有人把 `Todo` 的 `content` 改为 `把我最近画的插画放上去`，那么下面的代码可以获取到本次更新：
-
 
 ```java
 liveQuery.setEventHandler(new LCLiveQueryEventHandler() {
@@ -1019,7 +991,6 @@ liveQuery.setEventHandler(new LCLiveQueryEventHandler() {
 
 当有新的满足 `LCQuery` 查询条件的 `LCObject` 被创建时，`create` 事件会被触发。下面的 `object` 就是新建的 `LCObject`：
 
-
 ```java
 liveQuery.setEventHandler(new LCLiveQueryEventHandler() {
     @Override
@@ -1033,7 +1004,6 @@ liveQuery.setEventHandler(new LCLiveQueryEventHandler() {
 
 当有满足 `LCQuery` 查询条件的 `LCObject` 被更新时，`update` 事件会被触发。下面的 `object` 就是有更新的 `LCObject`：
 
-
 ```java
 liveQuery.setEventHandler(new LCLiveQueryEventHandler() {
     @Override
@@ -1046,7 +1016,6 @@ liveQuery.setEventHandler(new LCLiveQueryEventHandler() {
 #### `enter` 事件
 
 当一个已存在的、原本不符合 `LCQuery` 查询条件的 `LCObject` 发生更新，且更新后符合查询条件，`enter` 事件会被触发。下面的 `object` 就是进入 `LCQuery` 的 `LCObject`，其内容为该对象最新的值：
-
 
 ```java
 liveQuery.setEventHandler(new LCLiveQueryEventHandler() {
@@ -1063,7 +1032,6 @@ liveQuery.setEventHandler(new LCLiveQueryEventHandler() {
 
 当一个已存在的、原本符合 `LCQuery` 查询条件的 `LCObject` 发生更新，且更新后不符合查询条件，`leave` 事件会被触发。下面的 `object` 就是离开 `LCQuery` 的 `LCObject`，其内容为该对象最新的值：
 
-
 ```java
 liveQuery.setEventHandler(new LCLiveQueryEventHandler() {
     @Override
@@ -1077,7 +1045,6 @@ liveQuery.setEventHandler(new LCLiveQueryEventHandler() {
 
 当一个已存在的、原本符合 `LCQuery` 查询条件的 `LCObject` 被删除，`delete` 事件会被触发。下面的 `object` 就是被删除的 `LCObject` 的 `objectId`：
 
-
 ```java
 liveQuery.setEventHandler(new LCLiveQueryEventHandler() {
     @Override
@@ -1087,11 +1054,9 @@ liveQuery.setEventHandler(new LCLiveQueryEventHandler() {
 });
 ```
 
-
 ### 取消订阅
 
 如果不再需要接收有关 `LCQuery` 的更新，可以取消订阅。
-
 
 ```java
 liveQuery.unsubscribeInBackground(new LCLiveQuerySubscribeCallback() {
@@ -1145,8 +1110,7 @@ LCLiveQuery.setConnectionHandler(new LCLiveQueryConnectionHandler() {
 我们不建议这样做，因为使用 LiveQuery 构建聊天服务会承担额外的存储成本，产生的费用会增加，后期维护的难度非常大（聊天记录、对话维护之类的代码会很混乱），并且云服务已经提供了即时通讯的服务。
 LiveQuery 的核心还是提供一个针对查询的推拉结合的用法，脱离设计初衷容易造成前端的模块混乱。
 
-
-如果你的应用只使用 LiveQuery （不使用即时通讯和其他推送服务），那么可以在初始化 SDK 时使用 `PushService` 的静态方法 `startIfRequired` 来创建 WebSocket 连接：
+如果你的应用只使用 LiveQuery（不使用即时通讯和其他推送服务），那么可以在初始化 SDK 时使用 `PushService` 的静态方法 `startIfRequired` 来创建 WebSocket 连接：
 
 ```java
 PushService.startIfRequired(android.content.Context context);
@@ -1157,7 +1121,6 @@ PushService.startIfRequired(android.content.Context context);
 有时候应用需要存储尺寸较大或结构较为复杂的数据，这类数据不适合用 `LCObject` 保存，此时文件对象 `LCFile` 便成为了更好的选择。文件对象最常见的用途是保存图片，不过也可以用来保存文档、视频、音乐等其他二进制数据。
 
 ### 构建文件
-
 
 可以通过字符串构建文件：
 
@@ -1180,7 +1143,6 @@ LCFile file = new LCFile(
 
 云端会根据文件扩展名自动检测文件类型。如果需要的话，也可以手动指定 `Content-Type`（一般称为 MIME 类型）：
 
-
 ```java
 Map<String, Object> meta = new HashMap<String, Object>();
 meta.put("mime_type", "application/json");
@@ -1188,7 +1150,6 @@ LCFile file = new LCFile("resume.txt", "LeanCloud".getBytes(), meta);
 ```
 
 与前面提到的方式相比，一个更常见的文件构建方式是从本地路径上传。
-
 
 ```java
 LCFile file = LCFile.withAbsoluteLocalPath("avatar.jpg", "/tmp/avatar.jpg");
@@ -1208,7 +1169,7 @@ LCFile file = LCFile.withAbsoluteLocalPath("avatar.jpg", "/tmp/avatar.jpg");
 file.saveInBackground().subscribe(new Observer<LCFile>() {
     public void onSubscribe(Disposable disposable) {}
     public void onNext(LCFile file) {
-        System.out.println("文件保存完成。URL: " + file.getUrl());
+        System.out.println("文件保存完成。URL：" + file.getUrl());
     }
     public void onError(Throwable throwable) {
         // 保存失败，可能是文件无法被读取，或者上传过程中出现问题
@@ -1217,22 +1178,7 @@ file.saveInBackground().subscribe(new Observer<LCFile>() {
 });
 ```
 
-文件上传后，可以在文件服务中找到。已上传的文件无法再被修改。如果需要修改文件，只能重新上传修改过的文件并取得新的 `objectId` 和 URL。
-
-
-
-```java
-file.saveInBackground(true).subscribe(new Observer<LCFile>() {
-    public void onSubscribe(Disposable disposable) {}
-    public void onNext(LCFile file) {
-        System.out.println("文件保存完成。objectId：" + file.getObjectId());
-    }
-    public void onError(Throwable throwable) {
-        // 保存失败，可能是文件无法被读取，或者上传过程中出现问题
-    }
-    public void onComplete() {}
-});
-```
+文件上传后，可以在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 文件** 中找到。已上传的文件无法再被修改。如果需要修改文件，只能重新上传修改过的文件并取得新的 `objectId` 和 URL。
 
 已经保存到云端的文件可以关联到 `LCObject`：
 
@@ -1249,7 +1195,6 @@ todo.save();
 ```java
 LCQuery<LCObject> query = new LCQuery<>("_File");
 ```
-
 
 需要注意的是，内部文件（上传到文件服务的文件）的 `url` 字段是由云端动态生成的，其中涉及切换自定义域名的相关处理逻辑。
 因此，通过 `url` 字段查询文件仅适用于外部文件（直接保存外部 URL 到文件服务创建的文件），内部文件请改用 key 字段（URL 中的路径）查询。
@@ -1270,14 +1215,12 @@ query.findInBackground().subscribe(new Observer<List<LCObject>>() {
     public void onNext(List<LCObject> todos) {
         for (LCObject todo : todos) {
             // 获取每个 todo 的 attachments 数组
-            // {# TODO #}
         }
     }
     public void onError(Throwable throwable) {}
     public void onComplete() {}
 });
 ```
-
 
 ### 上传进度监听
 
@@ -1323,12 +1266,10 @@ file.saveInBackground().subscribe(new Observer<LCFile>() {
 
 成功保存图像后，除了可以获取指向该文件的 URL 外，还可以获取图像的缩略图 URL，并且可以指定缩略图的宽度和高度：
 
-
 ```java
 LCFile file = new LCFile("test.jpg", "文件-url", new HashMap<String, Object>());
 file.getThumbnailUrl(true, 100, 100);
 ```
-
 
 图片最大不超过 **20 MB** 才可以获取缩略图。
 
@@ -1385,7 +1326,6 @@ avFile.getDataStreamInBackground().subscribe(new Observer<InputStream>() {
 
 除了使用 SDK 提供的方法外，也可以获取 LCFile 的 url 后调用标准库和第三方库下载文件。
 
-
 ### 删除文件
 
 下面的代码从云端删除一个文件：
@@ -1415,7 +1355,7 @@ file.deleteInBackground().subscribe(new Observer<LCNull>() {
 如需删除文件，一般建议在服务端使用 Master Key 调用 REST API 删除。
 取决于游戏的具体需求，也可以考虑在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 文件 > 权限** 向特定用户或特定角色开启删除权限。
 
-#### 文件审核
+### 文件审核
 
 当前**文件审核**功能支持检测**图片**文件。
 
@@ -1432,7 +1372,6 @@ file.deleteInBackground().subscribe(new Observer<LCNull>() {
 ```java
 LCGeoPoint point = new LCGeoPoint(39.9, 116.4);
 ```
-
 
 现在可以将这个地理位置存储为一个对象的属性：
 
@@ -1505,7 +1444,7 @@ GeoPoint 的经纬度的类型是数字，且经度需在 -180.0 到 180.0 之�
 
 下面是实现 `Student` 子类化的例子:
 
-``` java
+```java
 // Student.java
 import cn.leancloud.LCClassName;
 import cn.leancloud.LCObject;
@@ -1557,6 +1496,7 @@ Student postReference = LCObject.createWithoutData(Student.class, student.getObj
 ### 子类的序列化与反序列化
 
 如果希望 LCObject 子类也支持 Parcelable，则需要至少满足以下几个要求：
+
 1. 确保子类有一个 public 并且参数为 Parcel 的构造函数，并且在内部调用父类的该构造函数。
 2. 内部需要有一个静态变量 CREATOR 实现 `Parcelable.Creator`。
 

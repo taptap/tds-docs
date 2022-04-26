@@ -5,10 +5,7 @@ slug: /sdk/storage/guide/dotnet/
 sidebar_position: 2
 ---
 
-
-
 数据存储是云服务提供的核心功能之一，可用于存放和查询应用数据。下面的代码展示了如何创建一个对象并将其存入云端：
-
 
 ```cs
 // 构建对象
@@ -25,12 +22,6 @@ await todo.Save();
 ## SDK 安装与初始化
 
 请阅读 [数据存储、即时通讯 .NET SDK 配置指南](/sdk/storage/guide/setup-dotnet/)。
-
-> C#/.Net/Unity SDK 老版本迁移
->
-> 如果你还在在使用我们老版本的 C#/.Net/Unity SDK（版本号为 `YYYYMMDD.N` 格式，类名以 `AV` 开头），请参考 [.Net SDK 迁移指南] 迁移到新版 SDK。
-
-[.Net SDK 迁移指南]: https://github.com/leancloud/csharp-sdk/wiki/.Net-Standard-SDK-%E8%BF%81%E7%A7%BB%E6%8C%87%E5%8D%97
 
 ## 对象
 
@@ -56,7 +47,6 @@ tags:       ["工作", "销售"]
 `LCObject` 同时支持 `GeoPoint`，可以用来存储地理位置信息。参见 [GeoPoint](#geopoint)。
 
 以下是一些示例：
-
 
 ```cs
 // 基本类型
@@ -104,7 +94,6 @@ LCObject object = new LCObject("Todo");
 
 下面的代码将一个 class 为 `Todo` 的对象存入云端：
 
-
 ```cs
 // 构建对象
 LCObject todo = new LCObject("Todo");
@@ -119,15 +108,15 @@ await todo.Save();
 
 ```json
 {
-  "title":     "马拉松报名",
-  "priority":  2,
+  "title": "马拉松报名",
+  "priority": 2,
   "ACL": {
     "*": {
-      "read":  true,
+      "read": true,
       "write": true
     }
   },
-  "objectId":  "582570f38ac247004f39c24b",
+  "objectId": "582570f38ac247004f39c24b",
   "createdAt": "2017-11-11T07:19:15.549Z",
   "updatedAt": "2017-11-11T07:19:15.549Z"
 }
@@ -137,12 +126,12 @@ await todo.Save();
 
 以下是一些对象的内置属性，会在对象保存时自动创建，无需手动指定：
 
-内置属性 | 类型 | 描述
---- | --- | ---
-`objectId` | string | 该对象唯一的 ID 标识。
-`ACL` | LCACL | 该对象的权限控制，实际上是一个 JSON 对象，控制台做了展现优化。
-`createdAt` | DateTime | 该对象被创建的时间。
-`updatedAt` | DateTime | 该对象最后一次被修改的时间。
+| 内置属性    | 类型       | 描述                                                           |
+| ----------- | ---------- | -------------------------------------------------------------- |
+| `objectId`  | `string`   | 该对象唯一的 ID 标识。                                         |
+| `ACL`       | `LCACL`    | 该对象的权限控制，实际上是一个 JSON 对象，控制台做了展现优化。 |
+| `createdAt` | `DateTime` | 该对象被创建的时间。                                           |
+| `updatedAt` | `DateTime` | 该对象最后一次被修改的时间。                                   |
 
 这些属性的值会在对象被存入云端时自动填入，代码中尚未保存的 `LCObject` 不存在这些属性。
 
@@ -169,9 +158,8 @@ DateTime updatedAt = todo.UpdatedAt;
 DateTime createdAt = todo.CreatedAt;
 ```
 
-对象拿到之后，可以通过 `get` 方法来获取各个属性的值。注意 `objectId`、`updatedAt` 和 `createdAt` 这三个内置属性不能通过 `get` 获取或通过 `set` 修改，只能由云端自动进行填充。尚未保存的 `LCObject` 不存在这些属性。
+如果你试图获取一个不存在的属性，SDK 不会报错，而是会返回 `null`。
 
-如果你试图获取一个不存在的属性，SDK 不会报错，而是会返回 null。
 #### 同步对象
 
 当云端数据发生更改时，你可以调用 `Fetch` 方法来刷新对象，使之与云端数据同步：
@@ -189,6 +177,7 @@ LCObject todo = LCObject.CreateWithoutData("Todo", "582570f38ac247004f39c24b");
 await todo.Fetch(includes: new string[] { "priority", "location" });
 // 只有 priority 和 location 会被获取和刷新
 ```
+
 ### 更新对象
 
 要更新一个对象，只需指定需要更新的属性名和属性值，然后调用 `Save` 方法。例如：
@@ -258,7 +247,6 @@ post.Increment("likes", 1);
 - `Remove(key, value)` 从数组字段中删除指定对象的所有实例。
 - `RemoveAll(key, values)` 从数组对象中删除指定数组中的所有对象。
 
-
 例如，`Todo` 用一个 `alarms` 属性保存所有闹钟的时间。下面的代码将多个时间加入这个属性：
 
 ```cs
@@ -321,9 +309,6 @@ await LCObject.SaveAll(results);
 ```
 
 虽然上述方法可以在一次请求中包含多个操作，每一个分别的保存或同步操作在计费时依然会被算作一次请求，而所有的删除操作则会被合并为一次请求。
-### 后台运行
-
-细心的开发者已经发现，在所有的示例代码中几乎都是用了异步来访问云端，形如的用法都是提供给开发者在主线程调用用以实现后台运行的方法，因此开发者在主线程可以放心地调用这种命名方式的函数。
 
 ### 数据模型
 
@@ -339,11 +324,11 @@ await LCObject.SaveAll(results);
 // 创建 post
 LCObject post = new LCObject("Post");
 post["title"] = "饿了……";
-post["content"] = "中午去哪吃呢 ?";
+post["content"] = "中午去哪吃呢？";
 
 // 创建 comment
 LCObject comment = new LCObject("Comment");
-comment["content"] = "当然是肯德基啦 !";
+comment["content"] = "当然是肯德基啦！";
 
 // 将 post 设为 comment 的一个属性值
 comment["parent"] = post;
@@ -374,7 +359,7 @@ comment["post"] = post;
 序列化：
 
 ```cs
-LCObject object = new LCObject("Hello");
+LCObject object = new LCObject("Todo");
 object["title"] = "马拉松报名";
 object["priority"] = 2;
 object["owner"] = await LCUser.GetCurrent();
@@ -408,19 +393,18 @@ query.WhereEqualTo("lastName", "Smith");
 // students 是包含满足条件的 Student 对象的数组
 ReadOnlyCollection<LCObject> students = await query.Find();
 ```
+
 ### 查询条件
 
 可以给 `LCObject` 添加不同的条件来改变获取到的结果。
 
 下面的代码查询所有 `firstName` 不为 `Jack` 的对象：
 
-
 ```cs
 query.WhereNotEqualTo("firstName", "Jack");
 ```
 
 对于能够排序的属性（比如数字、字符串），可以进行比较查询：
-
 
 ```cs
 // 限制 age < 18
@@ -438,21 +422,17 @@ query.WhereGreaterThanOrEqualTo("age", 18);
 
 可以在同一个查询中设置多个条件，这样可以获取满足所有条件的结果。可以理解为所有的条件是 `AND` 的关系：
 
-
 ```cs
 query.WhereEqualTo("firstName", "Jack");
 query.WhereGreaterThan("age", 18);
 ```
 
-
 可以通过指定 `limit` 限制返回结果的数量（默认为 `100`）：
-
 
 ```cs
 // 最多获取 10 条结果
 query.Limit(10);
 ```
-
 
 由于性能原因，`limit` 最大只能设为 `1000`。即使将其设为大于 `1000` 的数，云端也只会返回 1,000 条结果。
 
@@ -500,11 +480,7 @@ query.AddAscendingOrder("priority");
 query.AddDescendingOrder("createdAt");
 ```
 
-下面的代码可用于查找包含或不包含某一属性的对象：
-
-
 可以通过 `Select` 指定需要返回的属性。下面的代码只获取每个对象的 `title` 和 `content`（包括内置属性 `objectId`、`createdAt` 和 `updatedAt`）：
-
 
 ```cs
 LCQuery<LCObject> query = new LCQuery<LCObject>("Todo");
@@ -523,6 +499,7 @@ string notes = todo["notes"] as string; // null
 反向选择同样适用于内置字段，比如 `-objectId`，也可以和点号组合使用，比如 `-pubUser.createdAt`。
 
 对于未获取的属性，可以通过对结果中的对象进行 `Fetch` 操作来获取。参见 [同步对象](#同步对象)。
+
 ### 字符串查询
 
 可以用 `WhereStartsWith` 来查找某一属性值以特定字符串开头的对象。和 SQL 中的 `LIKE` 一样，你可以利用索引带来的优势：
@@ -549,41 +526,36 @@ query.WhereContains("title", "lunch");
 
 ```cs
 LCQuery<LCObject> query = new LCQuery<LCObject>("Todo");
-// 'title' 不包含 "ticket"（不区分大小写）
+// "title" 不包含 "ticket"（不区分大小写）
 query.WhereMatches("title", "^((?!ticket).)*\$", modifiers: "i");
 ```
 
-不过我们并不推荐大量使用这类查询，尤其是对于包含超过 100,000 个对象的 class，因为这类查询无法利用索引，实际操作中云端会遍历所有对象来获取结果。如果有进行全文搜索的需求，可以使用全文搜索服务。
+不过我们并不推荐大量使用这类查询，尤其是对于包含超过 100,000 个对象的 class，
+因为这类查询无法利用索引，实际操作中云端会遍历所有对象来获取结果。如果有进行全文搜索的需求，可以使用全文搜索服务。
 
 使用查询时如果遇到性能问题，可参阅 [查询性能优化](#查询性能优化)。
 
 ### 数组查询
 
-下面的代码查找所有数组属性 `tags` 包含 ` 工作 ` 的对象：
+下面的代码查找所有数组属性 `tags` 包含 `工作` 的对象：
 
 ```cs
 query.WhereEqualTo("tags", "工作");
 ```
 
-
-下面的代码查询数组属性长度为 3 （正好包含 3 个标签）的对象：
-
+下面的代码查询数组属性长度为 3（正好包含 3 个标签）的对象：
 
 ```cs
 query.WhereSizeEqualTo("tags", 3);
 ```
 
-
-下面的代码查找所有数组属性 `tags` **同时包含** ` 工作 `、` 销售 ` 和 ` 会议 ` 的对象：
-
+下面的代码查找所有数组属性 `tags` **同时包含** `工作`、`销售` 和 `会议` 的对象：
 
 ```cs
 query.WhereContainsAll("tags", new string[] { "工作", "销售", "会议" });
 ```
 
-
 如需获取某一属性值包含一列值中任意一个值的对象，可以直接用 `WhereContainedIn` 而无需执行多次查询。下面的代码构建的查询会查找所有 `priority` 为 `1` **或** `2` 的 todo 对象：
-
 
 ```cs
 // 单个查询
@@ -606,7 +578,6 @@ LCQuery<LCObject> priorityOneOrTwo = LCQuery.Or(new LCQuery<LCObject>[] { priori
 ReadOnlyCollection<LCObject> results = await priorityOneOrTwo.Find();
 // 好像有些繁琐 :(
 ```
-
 
 反过来，还可以用 `WhereNotContainedIn` 来获取某一属性值不包含一列值中任何一个的对象。
 
@@ -656,7 +627,6 @@ foreach (LCObject comment in comments) {
 }
 ```
 
-
 可以用 dot 符号（`.`）来获取多级关系，例如 `post.author`，详见[《点号使用指南》](https://leancloud.cn/docs/dot-notation.html)的《在查询对象时使用点号》一节。
 
 可以在同一查询上应用多次 `Include` 以包含多个属性。
@@ -694,7 +664,6 @@ print($"{count} 个 todo 已完成");
 
 OR 操作表示多个查询条件符合其中任意一个即可。 例如，查询优先级大于等于 `3` 或者已经完成了的 todo：
 
-
 ```cs
 LCQuery<LCObject> priorityQuery = new LCQuery<LCObject>("Todo");
 priorityQuery.WhereGreaterThanOrEqualTo("priority", 3);
@@ -724,7 +693,6 @@ ReadOnlyCollection<LCObject> results = await query.Find();
 ```
 
 单独使用 AND 查询跟使用基础查询相比并没有什么不同，不过当查询条件中包含不止一个 OR 查询时，就必须使用 AND 查询：
-
 
 ```cs
 LCQuery<LCObject> createdAtQuery = new LCQuery<LCObject>("Todo");
@@ -778,15 +746,23 @@ using LeanCloud.LiveQuery;
 
 下面是在使用了 LiveQuery 的网页应用和手机应用中分别操作，数据保持同步的效果：
 
-<video src="/files/1496988080458.qt" controls autoPlay muted preload="auto" width="100%" height="100%" >
-HTML5 Video is required for this demo, which your browser doesn't support.
+<video
+  src="https://capacity-files.lcfile.com/1496988080458"
+  controls
+  autoPlay
+  muted
+  preload="auto"
+  width="100%"
+  height="100%"
+>
+  HTML5 Video is required for this demo, which your browser doesn't support.
 </video>
 
 使用我们的「LeanTodo」微信小程序和网页应用，可以实际体验以上视频所演示的效果，步骤如下：
 
 1. 微信扫码，添加小程序「LeanTodo」；
 
-    ![LeanTodo mini program](/img/leantodo-weapp-qr.jpg)
+   ![LeanTodo mini program](/img/leantodo-weapp-qr.jpg)
 
 2. 进入小程序，点击首页左下角 **设置** > **账户设置**，输入便于记忆的用户名和密码；
 
@@ -802,7 +778,6 @@ HTML5 Video is required for this demo, which your browser doesn't support.
 
 首先创建一个普通的 `LCQuery` 对象，添加查询条件（如有），然后进行订阅操作：
 
-
 ```cs
 LCQuery<LCObject> query = new LCQuery<LCObject>("Todo");
 query.WhereEqualTo("isComplete", true);
@@ -810,10 +785,9 @@ await query.Subscribe();
 // 订阅成功
 ```
 
-
 LiveQuery 不支持内嵌查询，也不支持返回指定属性。
 
-订阅成功后，就可以接收到和 `LCObject` 相关的更新了。假如在另一个客户端上创建了一个 `Todo` 对象，对象的 `title` 设为 ` 更新作品集 `，那么下面的代码可以获取到这个新的 `Todo`：
+订阅成功后，就可以接收到和 `LCObject` 相关的更新了。假如在另一个客户端上创建了一个 `Todo` 对象，对象的 `title` 设为 `更新作品集`，那么下面的代码可以获取到这个新的 `Todo`：
 
 ```cs
 LCQuery<LCObject> query = new LCQuery<LCObject>("Todo");
@@ -823,8 +797,7 @@ liveQuery.OnCreate = (obj) => {
 };
 ```
 
-
-此时如果有人把 `Todo` 的 `content` 改为 ` 把我最近画的插画放上去 `，那么下面的代码可以获取到本次更新：
+此时如果有人把 `Todo` 的 `content` 改为 `把我最近画的插画放上去`，那么下面的代码可以获取到本次更新：
 
 ```cs
 liveQuery.OnUpdate = (updatedTodo, updatedKeys) => {
@@ -927,6 +900,7 @@ LiveQuery 的核心还是提供一个针对查询的推拉结合的用法，脱�
 ### 构建文件
 
 可以通过字符串构建文件：
+
 ```cs
 LCFile file = new LCFile("resume.txt", UTF8.GetBytes("LeanCloud"));
 ```
@@ -967,8 +941,7 @@ await file.Save();
 print(file.Url);
 ```
 
-文件上传后，可以在「开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 文件」中找到。已上传的文件无法再被修改。如果需要修改文件，只能重新上传修改过的文件并取得新的 `objectId` 和 URL。
-
+文件上传后，可以在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 文件** 中找到。已上传的文件无法再被修改。如果需要修改文件，只能重新上传修改过的文件并取得新的 `objectId` 和 URL。
 
 已经保存到云端的文件可以关联到 `LCObject`：
 
@@ -989,9 +962,7 @@ LCQuery<LCObject> query = LCFile.GetQuery();
 需要注意的是，内部文件（上传到文件服务的文件）的 `url` 字段是由云端动态生成的，其中涉及切换自定义域名的相关处理逻辑。
 因此，通过 `url` 字段查询文件仅适用于外部文件（直接保存外部 URL 到文件服务创建的文件），内部文件请改用 key 字段（URL 中的路径）查询。
 
-
-
-注意，如果文件被保存到了 `LCObject` 的一个数组属性中，那么在查询 `LCObject` 时如果需要包含文件，则要用到 `LCQuery` 的 `Include` 方法。比如说，在获取所有标题为 ` 买蛋糕 ` 的 todo 的同时获取附件中的文件：
+注意，如果文件被保存到了 `LCObject` 的一个数组属性中，那么在查询 `LCObject` 时如果需要包含文件，则要用到 `LCQuery` 的 `Include` 方法。比如说，在获取所有标题为 `买蛋糕` 的 todo 的同时获取附件中的文件：
 
 ```cs
 // 获取同一标题且包含附件的 todo
@@ -1062,7 +1033,7 @@ await file.Delete();
 如需删除文件，一般建议在服务端使用 Master Key 调用 REST API 删除。
 取决于游戏的具体需求，也可以考虑在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 文件 > 权限** 向特定用户或特定角色开启删除权限。
 
-#### 文件审核
+### 文件审核
 
 当前**文件审核**功能支持检测**图片**文件。
 
@@ -1103,7 +1074,7 @@ ReadOnlyCollection<LCObject> todos = await query.Find();
 
 像 `OrderByAscending` 和 `OrderByDescending` 这样额外的排序条件会获得比默认的距离排序更高的优先级。
 
-若要限制结果和给定地点之间的距离，可以参考 API 文档中的  参数。
+若要限制结果和给定地点之间的距离，可以参考 API 文档中的参数。
 
 若要查询在某一矩形范围内的对象，可以用 `WhereWithinGeoBox`：
 
