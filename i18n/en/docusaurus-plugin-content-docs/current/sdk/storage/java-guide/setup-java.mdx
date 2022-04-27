@@ -1,0 +1,411 @@
+---
+title: Installing Java SDK for Data Storage and Instant Messaging
+sidebar_label: Installing Java SDK
+slug: /sdk/storage/guide/setup-java/
+sidebar_position: 3
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import CodeBlock from "@theme/CodeBlock";
+import sdkVersions from "/src/docComponents/sdkVersions";
+import DomainBinding from "../../_partials/setup-domain.mdx";
+import AppConfig from "../_partials/app-config.mdx";
+
+## The Relationships Between the SDK and Different Platforms
+
+The following content shows the libraries included in the Java SDK as well as their relationships with different platforms:
+
+### Basic Libraries (Can Be Used in Pure Java Environment)
+
+- `storage-core`: Provides features for the Data Storage service, which include:
+  - Data Storage (LCObject)
+  - TDS Authentication (LCUser)
+  - Queries (LCQuery)
+  - File Storage (LCFile)
+  - Friends (LCFriendship; not available in the current version yet)
+  - Moments (LCStatus; not available in the current version yet)
+  - SMS (LCSMS)
+  - And more
+- `realtime-core`: Partially depending on the `storage-core` library, provides features like LiveQuery and Instant Messaging, which include:
+  - LiveQuery
+  - LCIMClient
+  - LCIMConversation and different types of conversations
+  - LCIMMessage and multimedia messages
+  - And more
+
+### Libraries for Android Only
+
+- `storage-android`: Essentially the `storage-core` library customized for Android. Offers exactly the same interfaces as `storage-core`.
+- `realtime-android`: Essentially the `realtime-core` library customized for Android.
+- `leancloud-fcm`: An encapsulation of Firebase Cloud Messaging for Push Notification services.
+
+### Dependencies
+
+The Java SDK contains the following modules:
+
+| Directory                      | Module name                                            | Platform | Dependency                     |
+| ------------------------------ | ------------------------------------------------------ | -------- | ------------------------------ |
+| ./core                         | storage-core (for Data Storage)                        | Java     | None                           |
+| ./realtime                     | realtime-core (for LiveQuery and Instant Messaging)    | Java     | storage-core                   |
+| ./android-sdk/storage-android  | storage-android (Data Storage for Android)             | Android  | storage-core                   |
+| ./android-sdk/realtime-android | realtime-android (for LiveQuery and Instant Messaging) | Android  | storage-android, realtime-core |
+
+## Installing SDK
+
+There are several ways for you to install our SDK and the most convenient one is to use a package manager.
+
+We have published all the libraries to Maven. You can use any package manager to install the SDK.
+
+### Data Storage
+
+<Tabs groupId="java-sdk-installation">
+<TabItem value="android" label="Android" default>
+
+Use the following packages if you are building an Android app:
+
+<CodeBlock className="groovy">
+{`implementation 'cn.leancloud:storage-android:${sdkVersions.leancloud.java}'
+implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'`}
+</CodeBlock>
+</TabItem>
+
+<TabItem value="maven" label="Maven">
+
+<CodeBlock className="xml">
+  {`<dependency>
+    <groupId>cn.leancloud</groupId>
+    <artifactId>storage-core</artifactId>
+    <version>${sdkVersions.leancloud.java}</version>
+</dependency>`}
+</CodeBlock>
+
+</TabItem>
+
+<TabItem value="ivy" label="Ivy">
+
+<CodeBlock className="xml">
+  {`<dependency org="cn.leancloud" name="storage-core" rev="${sdkVersions.leancloud.java}" />`}
+</CodeBlock>
+
+</TabItem>
+
+<TabItem value="sbt" label="SBT">
+
+<CodeBlock className="scala">
+  {`libraryDependencies += "cn.leancloud" %% "storage-core" % "${sdkVersions.leancloud.java}"`}
+</CodeBlock>
+
+</TabItem>
+
+<TabItem value="gradle" label="Gradle">
+
+<CodeBlock className="groovy">
+  {`implementation 'cn.leancloud:storage-core:${sdkVersions.leancloud.java}'`}
+</CodeBlock>
+
+</TabItem>
+
+</Tabs>
+
+### Instant Messaging
+
+<Tabs groupId="java-sdk-installation">
+<TabItem value="android" label="Android" default>
+
+Use the following packages if you are building an Android app:
+
+<CodeBlock className="groovy">
+  {`implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
+implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'`}
+</CodeBlock>
+
+</TabItem>
+
+<TabItem value="maven" label="Maven">
+
+<CodeBlock className="xml">
+  {`<dependency>
+    <groupId>cn.leancloud</groupId>
+    <artifactId>realtime-core</artifactId>
+    <version>${sdkVersions.leancloud.java}</version>
+</dependency>`}
+</CodeBlock>
+
+</TabItem>
+
+<TabItem value="ivy" label="Ivy">
+
+<CodeBlock className="xml">
+  {`<dependency org="cn.leancloud" name="realtime-core" rev="${sdkVersions.leancloud.java}" />`}
+</CodeBlock>
+
+</TabItem>
+
+<TabItem value="sbt" label="SBT">
+
+<CodeBlock className="scala">
+  {`libraryDependencies += "cn.leancloud" %% "realtime-core" % "${sdkVersions.leancloud.java}"`}
+</CodeBlock>
+
+</TabItem>
+
+<TabItem value="gradle" label="Gradle">
+
+<CodeBlock className="groovy">
+  {`implementation 'cn.leancloud:realtime-core:${sdkVersions.leancloud.java}'`}
+</CodeBlock>
+
+</TabItem>
+
+</Tabs>
+
+<details>
+<summary>Special notes about Maven</summary>
+
+We noticed that sometimes the cache policy of the CDN provided by Maven may not work properly, which makes it unable for certain versions (or certain formats of a version) of our library to be downloaded. If this happens to you, you can try to specify a Sonatype repository in your configuration.
+
+To do so, update pom.xml for Maven:
+
+```xml
+<repositories>
+    <repository>
+        <id>oss-sonatype</id>
+        <name>oss-sonatype</name>
+        <url>https://oss.sonatype.org/content/groups/public/</url>
+    </repository>
+</repositories>
+```
+
+Update build.gradle for Gradle:
+
+```groovy
+buildscript {
+    repositories {
+        google()
+        jcenter()
+        // Add the following configuration
+        maven {
+            url "https://oss.sonatype.org/content/groups/public/"
+        }
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+        // Add the following configuration
+        maven {
+            url "https://oss.sonatype.org/content/groups/public/"
+        }
+    }
+}
+```
+
+</details>
+
+### Installing Manually
+
+Run the following command to download and install the Java SDK:
+
+```sh
+$ git clone https://github.com/leancloud/java-unified-sdk.git
+$ cd java-unified-sdk/
+$ mvn clean install
+```
+
+Download and install the Android SDK:
+
+```sh
+$ cd java-unified-sdk/
+$ cd android-sdk/
+$ gradle clean assemble
+```
+
+## Initializing Your Project
+
+### Credentials
+
+<AppConfig />
+
+### Initializing for Android
+
+If you are working on an Android project, add the following lines to the `onCreate` method of the `Application` class:
+
+```java
+import cn.leancloud.LeanCloud;
+
+public class MyLeanCloudApp extends Application {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        // Do not call the initialize method of cn.leancloud.core.LeanCloud, or you will see errors like NetworkOnMainThread.
+        LeanCloud.initialize(this, "your-client-id", "your-client-token", "https://your_server_url");
+    }
+}
+```
+
+Then specify the permissions needed by the SDK and declare the `MyLeanCloudApp` class in `AndroidManifest.xml`:
+
+```xml
+<!-- Basic modules (required) START -->
+<uses-permission android:name="android.permission.INTERNET"/>
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+<!--  Basic modules END -->
+```
+
+#### A Safer Way to Initialize the SDK for the Client
+
+For Android developers, starting from version 6.1.0 of our SDK, you can initialize the SDK with a safer method besides using the appId and the appKey. With this method, you can initialize the SDK with the appId only:
+
+```java
+import cn.leancloud.LeanCloud;
+
+public class MyLeanCloudApp extends Application {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        // Provide `this`, App ID, and the custom API domain as arguments
+        LeanCloud.initializeSecurely(this, "{{appid}}", "https://your_server_url");
+    }
+}
+```
+
+### Initializing for Java
+
+If you are working on a Java project, add the following lines to the beginning of your code;
+
+```java
+import cn.leancloud.core.LeanCloud;
+
+LeanCloud.initialize("your-client-id", "your-client-token", "https://your_server_url");
+```
+
+Keep in mind that if you are using the SDK within LeanEngine, you do not need to set the `serverUrl`.
+If you are initializing your project with our boilerplate, you will see that the `serverUrl` is not provided.
+Please do not call the `setServer` method as it will make the APIs go through the internet rather than the intranet, which increases the time each request needs to take.
+
+The `realtime-core` library can be used in Java apps as well, but the way it is used is different than that for Android apps. You will have to explicitly establish a persistent connection (which is handled automatically by PushService in Android). The following code shows how you can establish a persistent connection:
+
+```java
+LCConnectionManager.getInstance().startConnection(new LCCallback() {
+  @Override
+  protected void internalDone0(Object o, LCException e) {
+    if (e == null) {
+      System.out.println("WebSocket connection established");
+    } else {
+      System.out.println("Failed to establish WebSocket connection: " + e.getMessage());
+    }
+  }
+});
+```
+
+The messaging functions can be used with the persistent connection established.
+
+## Domain
+
+<DomainBinding />
+
+## Enabling Debug Logs
+
+You can easily trace the problems in your project by turning debug logs on during the development phase. Once enabled, details of every request made by the SDK along with errors will be output to your IDE, your browser console, or your LeanEngine instances’ logs.
+
+```java
+// Call before LeanCloud.initialize()
+LeanCloud.setLogLevel(LCLogger.Level.DEBUG);
+```
+
+:::caution
+Make sure debug logs are turned off before your app is published. Failure to do so may lead to the exposure of sensitive data.
+:::
+
+## Verifying
+
+First of all, make sure you are able to connect to the server from your computer. You can test it by running the following command:
+
+```sh
+curl "https://{{host}}/1.1/date"
+```
+
+`{{host}}` is the custom API domain.
+
+If everything goes well, it will return the current date:
+
+```json
+{ "__type": "Date", "iso": "2020-10-12T06:46:56.000Z" }
+```
+
+Now add the following code to your project:
+
+```java
+LCObject testObject = new LCObject("TestObject");
+testObject.put("words", "Hello world!");
+testObject.saveInBackground().blockingSubscribe();
+```
+
+Save and run your program.
+
+Then go to **Developer Center > Your game > Game Services > Cloud Services > Data Storage > Data > `TestObject`**. If you see a row with its `words` column being `Hello world!`, it means that you have correctly installed the SDK.
+
+See [Debugging](#Debugging) if you’re not seeing the content.
+
+## Debugging
+
+This guide is written for the latest version of our SDK. If you encounter any errors, please first make sure you have the latest version installed.
+
+### `401 Unauthorized`
+
+If you get a `401` error or see the following content in network logs:
+
+```json
+{
+  "code": 401,
+  "error": "Unauthorized."
+}
+```
+
+It means that the App ID or App Key might be incorrect or don’t match. If you have multiple apps, you might have used the App ID of one app with the App Key of another one, which will lead to such an error.
+
+### The Client Cannot Access the Internet
+
+Make sure you have granted the required permissions to your mobile app.
+
+## Android Code Obfuscation
+
+To make sure the SDK still works after you obfuscate your code, certain classes and third-party libraries should not be obfuscated:
+
+```
+# proguard.cfg
+-keepattributes Signature
+-dontwarn com.jcraft.jzlib.**
+-keep class com.jcraft.jzlib.**  { *;}
+-dontwarn sun.misc.**
+-keep class sun.misc.** { *;}
+-dontwarn retrofit2.**
+-keep class retrofit2.** { *;}
+-dontwarn io.reactivex.**
+-keep class io.reactivex.** { *;}
+-dontwarn sun.security.**
+-keep class sun.security.** { *; }
+-dontwarn com.google.**
+-keep class com.google.** { *;}
+-dontwarn cn.leancloud.**
+-keep class cn.leancloud.** { *;}
+-keep public class android.net.http.SslError
+-keep public class android.webkit.WebViewClient
+-dontwarn android.webkit.WebView
+-dontwarn android.net.http.SslError
+-dontwarn android.webkit.WebViewClient
+-dontwarn android.support.**
+-dontwarn org.apache.**
+-keep class org.apache.** { *;}
+-dontwarn okhttp3.**
+-keep class okhttp3.** { *;}
+-keep interface okhttp3.** { *; }
+-dontwarn okio.**
+-keep class okio.** { *;}
+-keepattributes *Annotation*
+```

@@ -1,0 +1,191 @@
+---
+title: Installing .Net SDK for Data Storage and Instant Messaging
+sidebar_label: Installing .NET SDK
+slug: /sdk/storage/guide/setup-dotnet/
+sidebar_position: 1
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import CodeBlock from "@theme/CodeBlock";
+import sdkVersions from "/src/docComponents/sdkVersions";
+import DomainBinding from "../../_partials/setup-domain.mdx";
+import AppConfig from "../_partials/app-config.mdx";
+
+:::info
+The .Net SDK is based on .Net Standard 2.0. It supports the following frameworks:
+
+- Unity 2018.1+
+- .NET Core 2.0+
+- .NET Framework 4.6.1+
+- Mono 5.4+
+
+See [.NET Standard](https://docs.microsoft.com/en-us/dotnet/standard/net-standard) for more frameworks supported.
+
+:::
+
+## Installing SDK
+
+First of all, download the latest SDK from our [GitHub Releases](https://github.com/leancloud/csharp-sdk/releases).
+
+The table below shows the modules included in the SDK as well as their dependencies:
+
+| Name                     | Description                                                                                                 |
+| ------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| `LeanCloud-SDK-Storage`  | For the Data Storage service.                                                                               |
+| `LeanCloud-SDK-Realtime` | For Instant Messaging and LiveQuery. Depends on the Data Storage service.                                   |
+| `LeanCloud-SDK-Engine`   | For LeanEngine. Depends on the Data Storage service and works on the server side environment of LeanEngine. |
+
+You can download only what you need to reduce the size of your app.
+
+### For Unity Projects
+
+- Direct import: Download LeanCloud-SDK-XXX-Unity.zip, unzip it as a `Plugins` folder, and drag and drop the folder into Unity.
+
+- UPM: Add the following dependencies into `Packages/manifest.json` in your project:
+  <CodeBlock className="json">
+    {`"dependencies": {
+"com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
+"com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}"
+}`}
+  </CodeBlock>
+
+Note: Only Unity 2018+ is supported (Unity Api Compatibility Level being .NET Standard 2.0).
+
+### For Other Projects
+
+For .NET Core and other projects supporting .NET Standard 2.0, please download LeanCloud-SDK-XXX-Standard.zip, unzip it, and set dependencies accordingly (XXX means the cloud services you are using, like Storage, Realtime (which includes LiveQuery), and Engine).
+
+## Initializing Your Project
+
+Import the modules:
+
+```cs
+// The basics
+using LeanCloud;
+// Data Storage
+using LeanCloud.Storage;
+// Instant Messaging (optional)
+using LeanCloud.Realtime;
+```
+
+Before using the service, initialize the SDK with the following code:
+
+```cs
+LCApplication.Initialize("your-client-id", "your-client-token", "https://your_server_url");
+```
+
+### Credentials
+
+<AppConfig />
+
+## Domain
+
+<DomainBinding />
+
+## Enabling Debug Logs
+
+You can easily trace the problems in your project by turning debug logs on during the development phase. Once enabled, details of every request made by the SDK along with errors will be output to your IDE, your browser console, or your LeanEngine instances’ logs.
+
+<Tabs>
+<TabItem value="debug-unity" label="Unity" default>
+
+```cs
+LCLogger.LogDelegate = (LCLogLevel level, string info) => {
+    switch (level) {
+        case LCLogLevel.Debug:
+            Debug.Log($"[DEBUG] {DateTime.Now} {info}\n");
+            break;
+        case LCLogLevel.Warn:
+            Debug.Log($"[WARNING] {DateTime.Now} {info}\n");
+            break;
+        case LCLogLevel.Error:
+            Debug.Log($"[ERROR] {DateTime.Now} {info}\n");
+            break;
+        default:
+            Debug.Log(info);
+            break;
+    }
+}
+```
+
+</TabItem>
+
+<TabItem value="debug-dotnet" label=".NET">
+
+```cs
+LCLogger.LogDelegate = (LCLogLevel level, string info) => {
+    switch (level) {
+        case LCLogLevel.Debug:
+            TestContext.Out.WriteLine($"[DEBUG] {DateTime.Now} {info}\n");
+            break;
+        case LCLogLevel.Warn:
+            TestContext.Out.WriteLine($"[WARNING] {DateTime.Now} {info}\n");
+            break;
+        case LCLogLevel.Error:
+            TestContext.Out.WriteLine($"[ERROR] {DateTime.Now} {info}\n");
+            break;
+        default:
+            TestContext.Out.WriteLine(info);
+            break;
+    }
+}
+```
+
+</TabItem>
+</Tabs>
+
+:::caution
+Make sure debug logs are turned off before your app is published. Failure to do so may lead to the exposure of sensitive data.
+:::
+
+## Verifying
+
+First of all, make sure you are able to connect to the server from your computer. You can test it by running the following command:
+
+```sh
+curl "https://{{host}}/1.1/date"
+```
+
+`{{host}}` is the custom API domain.
+
+If everything goes well, it will return the current date:
+
+```json
+{ "__type": "Date", "iso": "2020-10-12T06:46:56.000Z" }
+```
+
+Now add the following code to your project:
+
+```cs
+LCObject testObject = new LCObject("TestObject");
+testObject["words"] = "Hello world!";
+await testObject.Save();
+```
+
+Save and run your program.
+
+Then go to **Developer Center > Your game > Game Services > Cloud Services > Data Storage > Data > `TestObject`**. If you see a row with its `words` column being `Hello world!`, it means that you have correctly installed the SDK.
+
+See [Debugging](#Debugging) if you’re not seeing the content.
+
+## Debugging
+
+This guide is written for the latest version of our SDK. If you encounter any errors, please first make sure you have the latest version installed.
+
+### `401 Unauthorized`
+
+If you get a `401` error or see the following content in network logs:
+
+```json
+{
+  "code": 401,
+  "error": "Unauthorized."
+}
+```
+
+It means that the App ID or App Key might be incorrect or don’t match. If you have multiple apps, you might have used the App ID of one app with the App Key of another one, which will lead to such an error.
+
+### The Client Cannot Access the Internet
+
+Make sure you have granted the required permissions to your mobile app.
