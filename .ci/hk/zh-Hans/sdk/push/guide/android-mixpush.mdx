@@ -1,0 +1,214 @@
+---
+title: FCM 推送指南
+sidebar_label: FCM 推送
+sidebar_position: 4
+---
+import CodeBlock from '@theme/CodeBlock';
+import sdkVersions from '/src/docComponents/sdkVersions';
+
+## FCM 推送概述
+
+自 Android 8.0 之后，系统权限控制越来越严，第三方推送通道的生命周期受到较大限制。为此，我们推出 FCM 推送方案。这保障了主流 Android 系统上的推送到达率。
+
+在 FCM 推送方案里，消息下发时使用的通道不再是我们自己维持的 WebSocket 长连接，而是借用 FCM 进行通信。
+一条推送消息下发的步骤如下：
+
+1. 开发者调用云服务 Push API 请求对全部或特定设备进行推送；
+2. 云推送服务端将请求转发给 FCM；
+3. FCM 通过手机端的系统通道下发推送消息，同时手机端系统消息接收器将推送消息展示到通知栏；
+4. 终端用户点击消息之后唤起目标应用或者页面。
+
+整个流程与苹果的 APNs 推送类似，SDK 在客户端基本不会得到调用。
+
+Android FCM 推送功能仅对商用版应用开放，如果希望使用该功能，请进入 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置 > FCM**，打开 FCM 推送的开关。
+
+注意，FCM 推送可以随时按需开关。当该选项关闭后，下一次 Android 推送会与普通推送一样自动选择自有通道送达客户端，除了会再次遇到上面提到的自有通道在部分 ROM 上会受到限制的问题之外，不会有别的影响。而当该选项再次开启后，Android 推送又会去选择厂商推送渠道。
+
+开启了 FCM 推送之后，Installation 表中每一个设备对应的记录，会增加 `registrationId` 字段，用于记录厂商分配的注册 id（类似于 APNs 的 device token），同时还会增加一个 `vendor` 字段（如果没有这一字段，则说明客户端集成有问题），其值为 `fcm`。
+
+### 推送提醒的红点或角标展示
+
+Android 系统默认支持根据 FCM 推送数量展示红点（桌面应用图标上显示）和角标（应用图标的长按菜单中显示）。
+
+### 通知栏消息与透传消息
+
+当应用在前台时，FCM 支持透传消息给应用。
+
+### 即时通讯的离线推送
+
+在即时通讯服务中，在 iOS 平台上如果用户下线，是可以启动离线消息推送机制的，对于 Android 用户来说，如果只是使用云推送自有通道，那么是不存在离线推送的，因为聊天和推送共享同一条 WebSocket 长链接，在即时通讯服务中用户下线了的话，那么推送也必然是不可达的。但是如果启用了 FCM 推送，因为推送消息走的是 FCM，这一点和 iOS 基本一致，所以这时候 Android 用户就存在离线推送的通知路径了。
+也就是说，如果开启了 FCM 推送，那么即时通讯里面的离线推送和静音机制，对使用了 FCM 推送的 Android 用户也是有效的。
+
+### 受限说明
+
+推送消息长度限制：
+
+- 消息中的应用包名最大支持 128 字节，消息内容最大支持 4KB 字节。
+
+最低 Android 版本要求：
+
+- FCM 推送支持 Android 4.1 或以上版本的手机系统（minSdkVersion：16）。
+
+影响送达率的因素说明：
+
+- 终端设备是否在线。如果设备离线，推送服务会缓存消息，待设备上线后，再将消息推送给设备。
+- 终端设备上集成推送服务 SDK 的应用是否被卸载。
+- 终端设备的网络状况是否稳定。
+- 终端设备的安全控制策略。
+- 透传消息的送达受 Android 系统和应用是否驻留在后台影响。
+
+## 推荐的接入方式
+
+FCM 推送本质上还是依赖于 FCM 的 SDK 和服务端能力，我们的客户端 SDK 只是对 FCM SDK 的包装，而实际的推送请求也是通过 LeanCloud 中转之后发送到 FCM 后台。我们的客户端 SDK 更新速度可能跟不上 FCM 的迭代速度，因此建议大家直接对接 FCM SDK，然后在客户端把 FCM 分配的「注册 id」与 FCM 标识（见上一章 vendor 的说明）保存到设备信息（`Installation`）中，这样之后一样可以通过我们的推送 API 来给所有设备正确发送推送信息。
+
+### 客户端接入方法
+
+开发者从 `FirebaseMessagingService` 继承自己的实现类，然后在 `onNewToken` 回调函数中调用如上例代码进行保存（记得将 `vendor` 换成 `fcm`）。示例代码可以参考[LCFirebaseMessagingService](https://github.com/leancloud/java-unified-sdk/blob/master/android-sdk/leancloud-fcm/src/main/java/cn/leancloud/LCFirebaseMessagingService.java#L69)。
+
+### 发送 FCM 推送的服务端 API
+
+可以参考这里的说明来发送推送请求：[推送 REST API 使用指南](/sdk/push/guide/rest/)。
+
+如果开发者要集成我们封装的 FCM 推送 SDK，可以继续往下阅读，如果自行接入 FCM SDK，则可以忽略下文。
+
+## FCM 推送 library 的构成
+
+[FCM](https://firebase.google.com/docs/cloud-messaging)（Firebase Cloud Messaging）是 Google/Firebase 提供的一项将推送通知消息发送到手机的服务。接入时后台需要配置连接 FCM 服务器需要的推送 key 和证书，FCM 相关的 token 由 LeanCloud SDK 来申请。
+
+### 环境要求
+
+FCM 客户端需要在运行 Android 4.1 或更高版本且安装了 Google Play 商店应用的设备上运行，或者在运行 Android 4.1 且支持 Google API 的模拟器中运行。具体要求参见 [在 Android 上设置 Firebase 云消息传递客户端应用](https://firebase.google.com/docs/cloud-messaging/android/client)。
+
+### 接入 SDK
+#### 添加 Firebase 配置文件
+
+从 Firebase 控制台下载最新的配置文件（google-services.json），加入到应用的模块（应用级）目录中。
+
+#### 将 Google 服务插件添加到 Gradle 文件中
+
+首先，在根级（项目级）Gradle 文件 (build.gradle) 中添加规则，以纳入 Google 服务 Gradle 插件：
+
+```groovy
+buildscript {
+
+  repositories {
+    // Check that you have the following line (if not, add it):
+    google()  // Google's Maven repository
+  }
+
+  dependencies {
+    // ...
+
+    // Add the following line:
+    classpath 'com.google.gms:google-services:4.3.5'  // Google Services plugin
+  }
+}
+
+allprojects {
+  // ...
+
+  repositories {
+    // Check that you have the following line (if not, add it):
+    google()  // Google's Maven repository
+    // ...
+  }
+}
+```
+
+然后，在模块（应用级）Gradle 文件（通常是 app/build.gradle）中，应用 Google 服务 Gradle 插件：
+
+```groovy
+apply plugin: 'com.android.application'
+// Add the following line:
+apply plugin: 'com.google.gms.google-services'  // Google Services plugin
+
+android {
+  // ...
+}
+```
+
+#### 导入 SDK FCM 包
+
+在模块（应用级）Gradle 文件（通常是 app/build.gradle）中，在 dependencies 中添加依赖：
+
+<CodeBlock className="xml">
+{`dependencies {
+    implementation 'cn.leancloud:leancloud-fcm:${sdkVersions.leancloud.java}@aar'
+    //即时通信与推送需要的包
+    implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'\n
+    // Import the BoM for the Firebase platform
+    implementation platform('com.google.firebase:firebase-bom:27.0.0')
+    // Declare the dependencies for the Firebase Cloud Messaging and Analytics libraries
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation 'com.google.firebase:firebase-messaging'
+    implementation 'com.google.firebase:firebase-analytics'
+}`}
+</CodeBlock>
+
+#### 修改应用清单
+
+将以下内容添加至应用的 `AndroidManifest`文件中：
+
+- PushService 服务。
+    
+    ```xml
+    <service android:name="cn.leancloud.push.PushService"/>
+    ```
+
+- `LCFirebaseMessagingService` 服务。如果你希望在后台进行除接收应用通知之外的消息处理，则必须添加此服务。要接收前台应用中的通知、接收数据有效负载以及发送上行消息等，必须继承此服务。
+
+    ```xml
+    <service
+      android:name="cn.leancloud.LCFirebaseMessagingService"
+      android:exported="false">
+    <intent-filter>
+      <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+    </intent-filter>
+    </service>
+    ```
+
+- （可选）应用组件中用于设置默认通知图标和颜色的元数据元素。如果传入的消息未明确设置图标和颜色，Android 就会使用这些值。
+
+    ```xml
+    <meta-data
+      android:name="com.google.firebase.messaging.default_notification_icon"
+      android:resource="@drawable/ic_launcher_background" />
+    <meta-data
+      android:name="com.google.firebase.messaging.default_notification_color"
+      android:resource="@color/colorAccent" />
+    ```
+
+- （可选）从 Android 8.0（API 级别 26）和更高版本开始，Android 系统支持并推荐使用[通知渠道](https://developer.android.com/guide/topics/ui/notifiers/notifications.html?hl=zh-cn#ManageChannels)。FCM 提供具有基本设置的默认通知渠道。如果你希望[创建](https://developer.android.com/training/notify-user/channels?hl=zh-cn)和使用你自己的默认渠道，请将 `default_notification_channel_id` 设为你的通知渠道对象的 ID（如下所示）；如果传入的消息未明确设置通知渠道，FCM 就会使用此值。
+
+    ```xml
+    <meta-data
+      android:name="com.google.firebase.messaging.default_notification_channel_id"
+      android:value="@string/default_notification_channel_id"/>
+    ```
+
+- 如果 FCM 对于 Android 应用的功能至关重要，请务必在应用的 `build.gradle` 中设置 `minSdkVersion 16` 或更高版本。这可确保 Android 应用无法安装在不能让其正常运行的环境中。
+
+### 程序初始化
+
+使用 FCM 推送，客户端程序无需做特别的初始化。如果注册成功，`_Installation` 表中应该出现 **vendor** 这个字段为 `fcm` 的新记录。
+
+### 配置控制台（设置 FCM 的 ProjectId 及 私钥文件）
+
+在 [Firebase 控制台](https://console.firebase.google.com/) > **项目设置** > **服务账号** > **Firebase Admin SDK** > **生成新的秘钥** 可以获得服务端发送推送请求的私钥文件。将此 文件 及 ProjectId 通过 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置 > FCM**，与云服务应用关联。
+
+## 取消 FCM 推送注册
+
+对于已经注册了 FCM 推送的用户，如果想取消 FCM 推送的注册而改走云服务自有的 WebSocket 的话，可以调用如下函数：
+
+```java
+LCMixPushManager.unRegisterMixPush();
+```
+
+此函数为异步函数，如果取消成功会有 `Registration canceled successfully` 的日志输出，万一取消注册失败的话会有类似 `unRegisterMixPush error` 的日志输出。
+
+## 错误排查建议
+
+- 只要注册时有条件不符合，SDK 会在日志中输出导致注册失败的原因，例如 `register error, mainifest is incomplete` 代表 manifest 未正确填写。如果注册成功，`_Installation` 表中的相关记录应该具有 **vendor** 这个字段并且不为空值。
+
+- 如果注册一直失败的话，请提交工单或去论坛发帖，提供相关日志、具体机型以及系统版本号，我们会跟进协助来排查。
