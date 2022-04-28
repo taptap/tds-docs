@@ -1,0 +1,338 @@
+---
+title: Full-Text Search REST API
+slug: /sdk/storage/guide/fulltext-search-rest/
+sidebar_position: 2
+---
+
+The Full-Text Search service offers the following REST API interfaces:
+
+| URL                 | HTTP | Function                |
+| ------------------- | ---- | ----------------------- |
+| /1.1/search/select  | GET  | Search by conditions    |
+| /1.1/search/mlt     | GET  | moreLikeThis query      |
+| /1.1/search/analyze | GET  | Analyze a piece of text |
+
+Before using the REST API, make sure you have enabled search for the classes you want to search on.
+Please also see [Data Storage REST API](/sdk/storage/guide/rest/) for more information about API Base URL, request format, and response format, as well as the _Custom Word List_ section in [Full-Text Search Guide](/sdk/storage/guide/fulltext-search/).
+
+## Search by Conditions
+
+Use `GET /1.1/search/select` to conduct a full-text search with conditions:
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  "https://{{host}}/1.1/search/select?q=dennis&limit=200&clazz=GameScore&order=-score"
+```
+
+The response looks like this:
+
+```json
+{
+  "hits": 1,
+  "results": [
+    {
+      "_app_url": "http://stg.pass.com//1/go/com.leancloud/classes/GameScore/51e3a334e4b0b3eb44adbe1a",
+      "_deeplink": "com.leancloud.appSearchTest://leancloud/classes/GameScore/51e3a334e4b0b3eb44adbe1a",
+      "_highlight": null,
+      "updatedAt": "2011-08-20T02:06:57.931Z",
+      "playerName": "Sean Plott",
+      "objectId": "51e3a334e4b0b3eb44adbe1a",
+      "createdAt": "2011-08-20T02:06:57.931Z",
+      "cheatMode": false,
+      "score": 1337
+    }
+  ],
+  "sid": "cXVlcnlUaGVuRmV0Y2g7Mzs0NDpWX0NFUmFjY1JtMnpaRDFrNUlBcTNnOzQzOlZfQ0VSYWNjUm0yelpEMWs1SUFxM2c7NDU6Vl9DRVJhY2NSbTJ6WkQxazVJQXEzZzswOw=="
+}
+```
+
+The following query parameters are available:
+
+| Parameter    | Required | Description                                                                                                            |
+| ------------ | -------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `q`          | Required | [Elasticsearch query string]                                                                                           |
+| `skip`       | Optional | The number of results skipped. Defaults to 0.                                                                          |
+| `limit`      | Optional | The number of returned objects. The default value is 100 and the maximum value is 1000.                                |
+| `sid`        | Optional | Elasticsearch [scroll id]. Returned by a previous search. Used for pagination.                                         |
+| `fields`     | Optional | Comma-separated field names.                                                                                           |
+| `highlights` | Optional | Highlighted keywords. It can be a comma-separated string or wildcard `*`.                                              |
+| `clazz`      | Optional | Class name. If not specified, all search-enabled classes will be searched.                                             |
+| `include`    | Optional | Include objects referenced by Pointers. Example: `user,comment`.                                                       |
+| `order`      | Optional | Order by. Prefix `-` for descending. Example: `-score,createdAt`.                                                      |
+| `sort`       | Optional | Refer to [Elasticsearch sort] documentation and the [GeoPoints sorting](#geopoints-sorting) section below for details. |
+
+[elasticsearch query string]: https://www.elastic.co/guide/en/elasticsearch/reference/6.5/query-dsl-query-string-query.html#query-string-syntax
+[scroll id]: https://www.elastic.co/guide/en/elasticsearch/reference/6.5/search-request-scroll.html
+[elasticsearch sort]: https://www.elastic.co/guide/en/elasticsearch/reference/6.5/search-request-sort.html
+
+The response contains the following fields:
+
+- `results`: The documents matching the search criteria.
+- `hits`: The number of documents matching the search criteria.
+- `sid`: Used to mark the current search result. You can provide it to the next search to implement pagination.
+
+`results` is a list of objects with each of them containing the fields you enabled for search. There are three special fields:
+
+- `_app_url`: The URL for the results on your website.
+- `_deeplink`: The URL for opening the app.
+- `_highlight`: The search result with highlighted keywords enclosed with `em` tags. If the `highlights` parameter is not provided in the request, this field will be `null`.
+
+`sid` is used to mark the current search result. You can get the next 200 results by providing it to the next search:
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  "https://{{host}}/1.1/search/select?q=dennis&limit=200&clazz=GameScore&order=-score&sid=cXVlcnlUaGVuRmV0Y2g7Mzs0NDpWX0NFUmFjY1JtMnpaRDFrNUlBcTNnOzQzOlZfQ0VSYWNjUm0yelpEMWs1SUFxM2c7NDU6Vl9DRVJhY2NSbTJ6WkQxazVJQXEzZzswOw"
+```
+
+…until all results have been returned.
+
+### Syntax for `q`
+
+The `q` parameter follows the [query string syntax](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/query-dsl-query-string-query.html#query-string-syntax) of Elasticsearch.
+
+If you are already familiar with the query string syntax of Elasticsearch, you can skip this section and jump right into the [GeoPoint Queries](#geopoint-queries) section.
+
+Reserved characters for querying include `+ - = && || > < ! ( ) { } [ ] ^ " ~ * ? : \ /`. Please make sure to use URL escape codes for them.
+
+#### Basic Syntax
+
+- Search for a single keyword, like `coke`.
+- Search for **multiple keywords**, like `coke no ice`. Keywords should be split with a space. The returned results will be sorted by relevance. For other sorting rules, see [`order`](#search-by-conditions) and [`sort`](#complex-sorting).
+- Search for a **phrase**, like `"lady gaga"`. Make sure the phrase is double-quoted.
+- Search by a **field**, like `nickname:Passenger`.
+- Search by a field with a phrase, like `nickname:"lady gaga"`. Make sure the phrase is double-quoted.
+- **Compound query** with `AND` or `OR`, like `nickname:(Passenger OR Holes)`.
+- Assuming `book` is an `Object`, you can search by **nested fields**, like `book.name:clojure OR book.content:clojure` and `book.*:clojure`.
+- Search for objects without a `title`: `_missing_:title`.
+- Search for objects with a `title` field that is not `null`: `_exists_:title`.
+
+**If you are querying on fields, please make sure they are enabled for search.**
+
+#### Wildcards and Regular Expressions
+
+`qu?ck bro*` is an example query string with wildcard characters. `?` means a single character and `*` means any number of characters (including zero).
+
+Wildcards are a simple form of regular expressions. You can use regular expressions in queries as well:
+
+```
+name:/joh?n(ath[oa]n)/
+```
+
+See [Regexp query](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/query-dsl-regexp-query.html#regexp-syntax) for more details.
+
+#### Fuzziness
+
+Search for terms similar to the given one with `~`, like `quikc~`. The [Damerau-Levenshtein algorithm](http://en.wikipedia.org/wiki/Damerau-Levenshtein_distance) is used to find all terms with a maximum of two changes.
+
+The example query above allows you to find terms like `quick`, `qukic`, and `qukci`.
+
+#### Ranges
+
+```
+// 1 to 5:
+count:[1 TO 5]
+
+// In 2012
+date:[2012-01-01 TO 2012-12-31]
+
+// Before 2012
+{* TO 2012-01-01}
+```
+
+Use `[]` for inclusive ranges and `{}` for exclusive ranges.
+
+You can also use comparison operators:
+
+```
+age:>10
+age:>=10
+age:<10
+age:<=10
+```
+
+#### Grouping
+
+You can group queries with parentheses:
+
+```
+(quick OR brown) AND fox
+```
+
+#### Notes for Special Fields
+
+- The type of `objectId` is `string`, which means you can query them like this: `objectId: 558e20cbe4b060308e3eb36c`. However, this is unnecessary because you could simply use the Data Storage SDK for such a type of query.
+- `createdAt` and `updatedAt` are mapped as `date`s, like `createdAt:["2015-07-30T00:00:00.000Z" TO "2015-08-15T00:00:00.000Z"]` and `updatedAt: [2012-01-01 TO 2012-12-31]`.
+- For `Date` fields except `createdAt` and `updatedAt`, add `.iso` after the field name: `birthday.iso: [2012-01-01 TO 2012-12-31]`.
+- For `Pointer` fields, you can query them with `field.objectId`, like `player.objectId: 558e20cbe4b060308e3eb36c and player.className: Player`. Each pointer only has these two properties. No other properties will be included in full-text search.
+- `Relation` fields are not supported yet.
+- For `File` fields, you can query them by `url` or `id`, like `avatar.url: "https://developer.taptap.io/docs/sdk/storage/guide/fulltext-search-rest/"`. You cannot query files by the content in them.
+
+### Complex Sorting
+
+Assuming you want to sort results by an array field named `scores`. To sort results in descending order of the average score, and put those who do not have scores to the last:
+
+```sh
+--data-urlencode 'sort=[{"scores":{"order":"desc","mode":"avg","missing":"_last"}}]'
+```
+
+The value of `sort` can be an array in JSON with each element being a JSON object:
+
+```json
+{ "scores": { "order": "desc", "mode": "avg", "missing": "_last" } }
+```
+
+With the field used for sorting as the key, the field can have the following fields:
+
+- `order`: `asc` for ascending order and `desc` for descending order.
+- `mode`: If the field has multiple values or is an array, you can choose to sort objects by the field’s minimum value `min`, maximum value `max`, sum `sum`, or average `avg`.
+- `missing`: Specify where to place the objects that have this field missing. You can set it to be `_last` or `_first`, or give it a default value.
+
+To sort results by multiple fields:
+
+```json
+[
+  {
+    "scores": { "order": "desc", "mode": "avg", "missing": "_last" }
+  },
+  {
+    "updatedAt": { "order": "asc" }
+  }
+]
+```
+
+### GeoPoint Queries
+
+If a field of a class has `GeoPoint` as its type, you can sort the results from this class by their distances to a given point. For example, to find players closest to `[39.9, 116.4]`, you can set `sort` to be:
+
+```json
+{
+  "_geo_distance": {
+    "location": [39.9, 116.4],
+    "order": "asc",
+    "unit": "km",
+    "mode": "min"
+  }
+}
+```
+
+`order` and `mode` have the same meanings as those described in the last section. Use `unit` to specify the unit of distances: `km` for kilometer, `m` for meter, and `cm` for centimeter.
+
+## moreLikeThis Queries
+
+Beside `/1.1/search/select`, we also provide the `/1.1/search/mlt` interface for you to query similar documents. You can use it to implement recommendations and so on.
+
+Assuming we have a class named `Post` for storing blog articles and we want to use its `tags` field to give users recommendations:
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  "https://{{host}}/1.1/search/mlt?like=clojure&clazz=Post&fields=tags"
+```
+
+Here we set `like` to be `clojure` and `fields` to be `tags`, which means to search for `Post` objects with `tags` similar to `clojure`. The response will look like this:
+
+```json
+{
+  "results": [
+    {
+      "tags": ["clojure", "data structure and algorithm"],
+      "updatedAt": "2016-07-07T08:54:50.268Z",
+      "_deeplink": "cn.leancloud.qfo17qmvr8w2y6g5gtk5zitcqg7fyv4l612qiqxv8uqyo61n://leancloud/classes/Article/577e18b50a2b580057469a5e",
+      "_app_url": "https://leancloud.cn/1/go/cn.leancloud.qfo17qmvr8w2y6g5gtk5zitcqg7fyv4l612qiqxv8uqyo61n/classes/Article/577e18b50a2b580057469a5e",
+      "objectId": "577e18b50a2b580057469a5e",
+      "_highlight": null,
+      "createdAt": "2016-07-07T08:54:13.250Z",
+      "className": "Article",
+      "title": "clojure persistent vector"
+    }
+    // …
+  ],
+  "sid": null
+}
+```
+
+You can also use the `likeObjectIds` parameter instead of `like` to search for similar objects:
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  "https://{{host}}/1.1/search/mlt?likeObjectIds=577e18b50a2b580057469a5e&clazz=Post&fields=tags"
+```
+
+The code above searches for objects similar to the one with `577e18b50a2b580057469a5e` as its `objectId`.
+
+Below are all the query parameters available:
+
+| Parameter       | Required | Description                                                                                                                                                                           |
+| --------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `clazz`         | Required | Class name.                                                                                                                                                                           |
+| `like`          | Optional | Keywords. **You need to specify either this parameter or the `likeObjectIds` parameter.**                                                                                             |
+| `likeObjectIds` | Optional | Comma-separated objectId list. **You need to specify either this parameter or the `like` parameter.**                                                                                 |
+| `min_term_freq` | Optional | The minimum term frequency below which the terms will be ignored from the input document. Defaults to 2.                                                                              |
+| `min_doc_freq`  | Optional | The minimum document frequency below which the terms will be ignored from the input document. Defaults to 5.                                                                          |
+| `max_doc_freq`  | Optional | The maximum document frequency above which the terms will be ignored from the input document. This could be useful to ignore highly frequent words such as stop words. Defaults to 0. |
+| `skip`          | Optional | The number of skipped results. Defaults to 0.                                                                                                                                         |
+| `limit`         | Optional | The number of returned objects. The default value is 100 and the maximum value is 1000.                                                                                               |
+| `fields`        | Optional | Comma-separated column list. Defaults to `_all`.                                                                                                                                      |
+| `include`       | Optional | Include objects referenced by Pointers. Example: `user,comment`.                                                                                                                      |
+
+You can also refer to the [Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/query-dsl-mlt-query.html) for more information.
+
+## Analyzing Strings
+
+The Full-Text Search service will automatically analyze all `String` fields.
+If the outcome doesn’t fit your expectation, you can test how a string will be analyzed with the `analyze` API (requires the Master Key).
+You can also use this API to check if a custom word list has taken effect.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  "https://{{host}}/1.1/search/analyze?clazz=GameScore&text=Responsive+design"
+```
+
+Provide `clazz` and `text` as parameters. Here `text` is the text being tested. The result looks like this:
+
+```json
+{
+  "tokens": [
+    {
+      "token": "Responsive",
+      "start_offset": 0,
+      "end_offset": 10,
+      "type": "word",
+      "position": 0
+    },
+    {
+      "token": "design",
+      "start_offset": 11,
+      "end_offset": 17,
+      "type": "word",
+      "position": 1
+    }
+  ]
+}
+```
+
+We can see that the term `Responsive design` is divided into two words.
+If the analyzer recognizes it as a whole word, the result will be:
+
+```json
+{
+  "tokens": [
+    {
+      "token": "Responsive design",
+      "start_offset": 0,
+      "end_offset": 17,
+      "type": "word",
+      "position": 0
+    }
+  ]
+}
+```
