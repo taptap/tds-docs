@@ -1,0 +1,240 @@
+---
+title: Full-Text Search Guide
+slug: /sdk/storage/guide/fulltext-search/
+sidebar_position: 1
+---
+
+import MultiLang from "/src/docComponents/MultiLang";
+
+Full-text search is a common feature used by a lot of modern applications.
+You might already know that it is possible to implement full-text search by using regular expressions in queries,
+but this approach will not work efficiently when there are massive objects or fields in a class.
+To solve the problem, we provide a dedicated full-text search service that you can use in your app.
+
+## Enabling Search for Classes
+
+Before using full-text search, you must first enable it for at least one class. For each class you enable the service on, an index will be created for it, and you will be able to use our search component or use the [API](#search-api) to search for the objects in it.
+
+**The ACLs of the objects in a class still take effect when you use full-text search.**
+
+You can enable search for a class by going to **Developer Center > Your game > Game Services > Cloud Services > Data Storage > Full-text Search** and clicking on **Enable search for class**:
+
+- **Class**: The class you want to enable search on. You can enable search on at most 10 classes.
+- **Enabled columns**: The fields you want to enable search on. By default, `objectId`, `createdAt`, and `updatedAt` are always enabled. Besides them, you can enable at most 10 custom fields.
+
+**If the cloud has not received any full-text search API requests within two weeks after you enabled search for a class, the search service for the class will be disabled.**
+
+## Search API
+
+We offer a [REST API](/sdk/storage/guide/fulltext-search-rest/) with all the interfaces you need to use the service,
+and our SDKs encapsulate those interfaces for you to use.
+
+Assuming you have [enabled full-text search](#enabling-search-for-classes) for a class named `GameScore`, you can search for objects in this class with keywords:
+
+<MultiLang>
+
+```cs
+LCSearchQuery<GameScore> query = new LCSearchQuery<GameScore>("GameScore");
+query.QueryString("dennis")
+    .OrderByDescending("score")
+    .Limit(10);
+LCSearchResponse<GameScore> response = await query.Find();
+// The number of documents matching the condition
+Debug.Log(response.Hits);
+// The documents matching the condition
+foreach (GameScore score in response.Results) {
+
+}
+// Mark the result of this query so you can use the sid to paginate
+Debug.Log(response.Sid);
+```
+
+```java
+LCSearchQuery searchQuery = new LCSearchQuery("dennis");
+searchQuery.setClassName("GameScore");
+searchQuery.setLimit(10);
+searchQuery.orderByAscending("score"); // Sort in ascending order of score
+searchQuery.findInBackground().subscribe(new Observer<List<LCObject>>() {
+  @Override
+  public void onSubscribe(Disposable disposable) {}
+
+  @Override
+  public void onNext(List<LCObject> results) {
+    for (LCObject o:results) {
+      System.out.println(o);
+    }
+    testSucceed = true;
+    latch.countDown();
+  }
+
+  @Override
+  public void onError(Throwable throwable) {
+    throwable.printStackTrace();
+    testSucceed = true;
+    latch.countDown();
+  }
+
+  @Override
+  public void onComplete() {}
+});
+```
+
+```objc
+LCSearchQuery *searchQuery = [LCSearchQuery searchWithQueryString:@"test-query"];
+searchQuery.className = @"GameScore";
+searchQuery.highlights = @"field1,field2";
+searchQuery.limit = 10;
+searchQuery.cachePolicy = kLCCachePolicyCacheElseNetwork;
+searchQuery.maxCacheAge = 60;
+searchQuery.fields = @[@"field1", @"field2"];
+[searchQuery findInBackground:^(NSArray *objects, NSError *error) {
+  for (LCObject *object in objects) {
+        NSString *appUrl = [object objectForKey:@"_app_url"];
+        NSString *deeplink = [object objectForKey:@"_deeplink"];
+        NSString *highlight = [object objectForKey:@"_highlight"];
+        // other fields
+        // code is here
+    }
+}];
+```
+
+```dart
+LCSearchQuery<GameScore> query = new LCSearchQuery<GameScore>('GameScore');
+query.queryString('dennis');
+query.orderByDescending('score');
+query.limit(10);
+LCSearchResponse<GameScore> response = await query.find();
+// The number of documents matching the condition
+print(response.hits);
+// The documents matching the condition
+for (GameScore score in response.results) {
+
+}
+// Mark the result of this query so you can use the sid to paginate
+print(response.sid);
+```
+
+```js
+const query = new AV.SearchQuery("GameScore");
+query.queryString("dennis");
+// Highlight all the matched `dennis` string in the `player` field; provide an array to match multiple fields
+query.highlights("player");
+query.highlights("player");
+query
+  .find()
+  .then(function (results) {
+    console.log("Find " + query.hits() + " docs.");
+    // Output: Find 4 docs.
+    // Print the first matched result with highlight
+    console.log(results[0].get("_highlight").player);
+    // Output: [ '<em>dennis</em> ZX' ]
+  })
+  .catch(function (err) {
+    // Handle err
+  });
+```
+
+</MultiLang>
+
+For the syntax of the query string, see [Syntax for q](/sdk/storage/guide/fulltext-search-rest#syntax-for-q).
+
+Since there is a `limit` for each query, you may not get all the records that match the query conditions at once.
+You can call `hits()` on `SearchQuery` to get the number of records that match the conditions,
+and then call `find()` multiple times on `SearchQuery` to get the remaining records.
+
+If you cannot preserve the same `query` object used for querying across different requests, you can use `sid` for pagination instead. Each query is uniquely marked with the `_sid` property on `SearchQuery`.
+You can reconstruct a `query` object by calling `sid()` on `SearchQuery` to continue the pagination.
+Each `sid` is valid for 5 minutes.
+
+You can use `SearchSortBuilder` to build complex rules for sorting. For example, assuming `scores` is an array of scores, if you need to sort results in descending order of the average score, and put those who do not have scores at the last:
+
+<MultiLang>
+
+```cs
+LCSearchSortBuilder sortBuilder = new LCSearchSortBuilder();
+sortBuilder.OrderByAscending("balance", "avg", "last");
+searchQuery.SortBy(sortBuilder);
+```
+
+```java
+LCSearchSortBuilder builder = LCSearchSortBuilder.newBuilder();
+builder.orderByDescending("scores","avg","last");
+searchQuery.setSortBuilder(builder);
+```
+
+```objc
+LCSearchSortBuilder *builder = [LCSearchSortBuilder newBuilder];
+[builder orderByDescending:@"scores" withMode:@"max" andMissing:@"last"];
+searchQuery.sortBuilder = builder;
+```
+
+```dart
+LCSearchSortBuilder sortBuilder = new LCSearchSortBuilder();
+sortBuilder.orderByAscending('scores', mode: 'avg', missing: 'last');
+searchQuery.sortBy(sortBuilder);
+```
+
+```js
+searchQuery.sortBy(
+  new AV.SearchSortBuilder().descending("scores", "avg", "last")
+);
+```
+
+</MultiLang>
+
+To learn more about the APIs you can use, check out the API docs of our SDKs:
+
+<MultiLang>
+
+<>
+
+- [LCSearchQuery](https://leancloud.github.io/csharp-sdk/html/classLeanCloud_1_1Storage_1_1LCSearchQuery.html)
+- [LCSearchSortBuilder](https://leancloud.github.io/csharp-sdk/html/classLeanCloud_1_1Storage_1_1LCSearchSortBuilder.html)
+- [LCSearchResponse](https://leancloud.github.io/csharp-sdk/html/classLeanCloud_1_1Storage_1_1LCSearchResponse.html)
+
+</>
+<>
+
+- [LCSearchQuery](https://leancloud.cn/api-docs/android/index.html)
+- [LCSearchSortBuilder](https://leancloud.cn/api-docs/android/index.html)
+
+</>
+<>
+
+- [LCSearchQuery](https://leancloud.cn/api-docs/iOS/Classes/LCSearchQuery.html)
+- [LCSearchSortBuilder](https://leancloud.cn/api-docs/iOS/Classes/LCSearchSortBuilder.html)
+
+</>
+<>
+
+- [LCSearchQuery](https://pub.dev/documentation/leancloud_storage/latest/leancloud_storage/LCSearchQuery-class.html)
+- [LCSearchSortBuilder](https://pub.dev/documentation/leancloud_storage/latest/leancloud_storage/LCSearchSortBuilder-class.html)
+- [LCSearchResponse](https://pub.dev/documentation/leancloud_storage/latest/leancloud_storage/LCSearchResponse-class.html)
+
+</>
+<>
+
+- [AV.SearchQuery](https://leancloud.github.io/javascript-sdk/docs/AV.SearchQuery.html)
+- [AV.SearchSortBuilder](https://leancloud.github.io/javascript-sdk/docs/AV.SearchSortBuilder.html)
+
+</>
+
+</MultiLang>
+
+## Custom Word List
+
+By default, all `String` fields will be automatically analyzed through [mmseg](https://github.com/medcl/elasticsearch-analysis-mmseg). You can upload your custom word list as a file by going to **Developer Center > Your game > Game Services > Cloud Services > Data Storage > Full-text Search > Custom word list**.
+
+The file should be UTF-8-encoded with each word taking up a line. The maximum size of the file is 512 K. Here is an example:
+
+```
+Object-oriented programming
+Functional programming
+Higher-order function
+Responsive design
+```
+
+The word list will take effect in 3 minutes since you upload it. You can check if your word list is in effect with the [`analyze` API](/sdk/storage/guide/fulltext-search-rest#performing-analysis) (requires Master Key).
+
+Your custom word list will only be applied to **new and updated documents/records**. To apply it to your existing documents, go to **Data Storage** > **Full-text Search** and click on **Rebuild index**.
+You should rebuild the index when you update or delete your custom word list, too.
