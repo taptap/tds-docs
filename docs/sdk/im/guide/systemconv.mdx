@@ -4,10 +4,8 @@ sidebar_label: Hook 与系统对话
 sidebar_position: 4
 ---
 
-import MultiLang from '/src/docComponents/MultiLang';
-import Mermaid from '/src/docComponents/Mermaid';
-
-
+import MultiLang from "/src/docComponents/MultiLang";
+import Mermaid from "/src/docComponents/Mermaid";
 
 ## 本章导读
 
@@ -24,7 +22,7 @@ import Mermaid from '/src/docComponents/Mermaid';
 
 Hook 也可以称为「钩子」，是一种特殊的消息处理机制，与 Windows 平台下的中断机制类似，允许应用方拦截并处理即时通讯过程中的多种事件和消息，从而达到实现自定义业务逻辑的目的。
 
-以 **_messageRecieved** Hook 为例，它在消息送达服务器后会被调用，在 Hook 内可以捕获消息内容、消息发送者、消息接收者等信息，这些信息均能在 Hook 内做修改并将修改后的值转交回服务器，服务器会使用修改后的消息继续完成消息投递工作。最终收消息用户收到的会是被 Hook 修改过后的消息，而不再是最初送达服务器的原始消息。Hook 也可以选择拒绝消息发送，服务器会在给客户端回复消息被 Hook 拒绝后丢弃消息不再完成后续消息处理及转发流程。
+以 **\_messageRecieved** Hook 为例，它在消息送达服务器后会被调用，在 Hook 内可以捕获消息内容、消息发送者、消息接收者等信息，这些信息均能在 Hook 内做修改并将修改后的值转交回服务器，服务器会使用修改后的消息继续完成消息投递工作。最终收消息用户收到的会是被 Hook 修改过后的消息，而不再是最初送达服务器的原始消息。Hook 也可以选择拒绝消息发送，服务器会在给客户端回复消息被 Hook 拒绝后丢弃消息不再完成后续消息处理及转发流程。
 
 **需要注意的是，默认情况下如果 Hook 调用失败，例如超时、返回状态码非 200 的结果等，服务器会忽略 Hook 的错误继续处理原始请求**。如果你需要改变这个行为，可以在**开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 即时通讯 > 设置 > 即时通讯设置** 内开启「Hook 调用失败时返回错误给客户端并放弃继续处理请求」。开启后如果 Hook 调用失败，服务器会返回错误信息给客户端告知 Hook 调用错误，并拒绝继续处理请求。
 
@@ -32,41 +30,41 @@ Hook 也可以称为「钩子」，是一种特殊的消息处理机制，与 Wi
 
 一条消息，在即时通讯的流程中，从终端用户 A 发送开始，到其他用户接收到为止，考虑到存在接收方在线／不在线的可能，会经历多个不同阶段，这里每一个阶段都会触发 Hook 函数：
 
-* **_messageReceived**<br/>
+- **\_messageReceived**<br/>
   消息达到服务器，群组成员已解析完成之后，发送给收件人之前调用。开发者在这里还可以修改消息内容，实时改变消息接收者的列表，以及其他类似操作。
-* **_messageSent**<br/>
+- **\_messageSent**<br/>
   消息发送完成后调用。开发者在这里可以完成业务统计，或将消息中转备份到己方服务器，以及其他类似操作。
-* **_receiversOffline**<br/>
+- **\_receiversOffline**<br/>
   消息发送完成，存在离线的收件人，在发推送给收件人之前调用。开发者在这里可以动态修改离线推送的通知内容，或通知目的设备的列表，以及其他类似操作。
-* **_messageUpdate**<br/>
+- **\_messageUpdate**<br/>
   收到消息修改请求，发送修改后的消息给收件人之前调用。与新发消息一样，开发者在这里可以再次修改消息内容，实时改变消息接收者的列表，以及其他类似操作。
 
 ### 对话类 Hook
 
 在对话创建和成员变动等更改性操作前后，都可以触发 Hook 函数，进行额外的处理：
 
-* **_conversationStart**<br/>
+- **\_conversationStart**<br/>
   创建对话，在签名校验（如果开启）之后，实际创建之前调用。开发者在这里可以为新的「对话」添加其他内部属性，或完成操作鉴权，以及其他类似操作。
-* **_conversationStarted**<br/>
+- **\_conversationStarted**<br/>
   创建对话完成后调用。开发者在这里可以完成业务统计，或将对话数据中转备份到己方服务器，以及其他类似操作。
-* **_conversationAdd**<br/>
+- **\_conversationAdd**<br/>
   向对话添加成员，在签名校验（如果开启）之后，实际加入之前调用，包括主动加入和被其他用户加入两种情况。开发者可以在这里根据内部权限设置批准或驳回这一请求，以及其他类似操作。
-* **_conversationRemove**<br/>
+- **\_conversationRemove**<br/>
   从对话中踢出成员，在签名校验（如果开启）之后，实际踢出之前调用，用户自己退出对话不会调用。开发者可以在这里根据内部权限设置批准或驳回这一请求，以及其他类似操作。
-* **_conversationAdded**<br/>
+- **\_conversationAdded**<br/>
   用户加入对话，在加入成功后调用。
-* **_conversationRemoved**<br/>
+- **\_conversationRemoved**<br/>
   用户离开对话，在离开成功后调用。
-* **_conversationUpdate**<br/>
+- **\_conversationUpdate**<br/>
   修改对话名称、自定义属性，设置或取消对话消息提醒，在实际修改之前调用。开发者在这里可以为新的「对话」添加其他内部属性，或完成操作鉴权，以及其他类似操作。
 
 ### 客户端上下线 Hook
 
 在客户端上线和下线的时候，可以触发 Hook 函数：
 
-* **_clientOnline**<br/>
+- **\_clientOnline**<br/>
   客户端上线，客户端登录成功后调用。
-* **_clientOffline**<br/>
+- **\_clientOffline**<br/>
   客户端下线，客户端登出成功或意外下线后调用。
 
 开发者可以利用这两个 Hook 函数，结合 LeanCache 来完成一组客户端实时状态查询的 endpoint，具体可以参考文档[《即时通讯中的在线状态查询》](https://leancloud.cn/docs/realtime-guide-onoff-status.html)。
@@ -93,18 +91,18 @@ Hook 也可以称为「钩子」，是一种特殊的消息处理机制，与 Wi
 
 参数：
 
-参数 | 说明
---- | ---
-`fromPeer` | 消息发送者的 ID。
-`convId` | 消息所属对话的 ID。
-`toPeers` | 解析出的对话相关的 `clientId`。
-`transient` | 是否是 transient 消息。
-`bin` | 原始消息内容是否为二进制消息。
-`content` | 消息体字符串。如果 `bin` 为 `true`，则该字段为原始消息内容做 Base64 转码后的结果。
-`receipt` | 是否要求回执。
-`timestamp` | 服务器收到消息的时间戳（毫秒）。
-`system` | 是否属于系统对话消息。
-`sourceIP` | 消息发送者的 IP。
+| 参数        | 说明                                                                               |
+| ----------- | ---------------------------------------------------------------------------------- |
+| `fromPeer`  | 消息发送者的 ID。                                                                  |
+| `convId`    | 消息所属对话的 ID。                                                                |
+| `toPeers`   | 解析出的对话相关的 `clientId`。                                                    |
+| `transient` | 是否是 transient 消息。                                                            |
+| `bin`       | 原始消息内容是否为二进制消息。                                                     |
+| `content`   | 消息体字符串。如果 `bin` 为 `true`，则该字段为原始消息内容做 Base64 转码后的结果。 |
+| `receipt`   | 是否要求回执。                                                                     |
+| `timestamp` | 服务器收到消息的时间戳（毫秒）。                                                   |
+| `system`    | 是否属于系统对话消息。                                                             |
+| `sourceIP`  | 消息发送者的 IP。                                                                  |
 
 参数示例：
 
@@ -126,31 +124,30 @@ Hook 也可以称为「钩子」，是一种特殊的消息处理机制，与 Wi
 
 返回值：
 
-参数 | 约束 | 说明
---- | --- | ---
-`drop` | 可选 | 如果返回真值，消息将被丢弃。
-`code` | 可选 | 当 `drop` 为 `true` 时可以下发一个应用自定义的整型错误码。
-`detail` | 可选 | 当 `drop` 为 `true` 时可以下发一个应用自定义的错误说明字符串。
-`bin` | 可选 | 返回的 `content` 内是否为二进制消息，如果不提供则为请求中的 `bin` 值。
-`content` | 可选 | 修改后的 `content`，如果不提供则保留原消息。如果 `bin` 为 `true`，则 `content` 需要是二进制消息内容做 Base64 转码后的结果。
-`toPeers` | 可选 | 数组，修改后的收件人，如果不提供则保留原收件人。
+| 参数      | 约束 | 说明                                                                                                                        |
+| --------- | ---- | --------------------------------------------------------------------------------------------------------------------------- |
+| `drop`    | 可选 | 如果返回真值，消息将被丢弃。                                                                                                |
+| `code`    | 可选 | 当 `drop` 为 `true` 时可以下发一个应用自定义的整型错误码。                                                                  |
+| `detail`  | 可选 | 当 `drop` 为 `true` 时可以下发一个应用自定义的错误说明字符串。                                                              |
+| `bin`     | 可选 | 返回的 `content` 内是否为二进制消息，如果不提供则为请求中的 `bin` 值。                                                      |
+| `content` | 可选 | 修改后的 `content`，如果不提供则保留原消息。如果 `bin` 为 `true`，则 `content` 需要是二进制消息内容做 Base64 转码后的结果。 |
+| `toPeers` | 可选 | 数组，修改后的收件人，如果不提供则保留原收件人。                                                                            |
 
 示例代码：
-
-
 
 <MultiLang kind="engine">
 
 ```js
 AV.Cloud.onIMMessageReceived((request) => {
-    let content = request.params.content;
-    let processedContent = content.replace('XX 传奇', '**');
-    // 必须含有以下语句给服务端一个正确的返回，否则会引起异常
+  let content = request.params.content;
+  let processedContent = content.replace("XX 传奇", "**");
+  // 必须含有以下语句给服务端一个正确的返回，否则会引起异常
   return {
-    content: processedContent
+    content: processedContent,
   };
 });
 ```
+
 ```python
 import json
 
@@ -164,6 +161,7 @@ def _messageReceived(**params):
         'content': json.dumps(content)
     }
 ```
+
 ```php
 Cloud::define("_messageReceived", function($params, $user) {
     $content = json_decode($params["content"], true);
@@ -173,6 +171,7 @@ Cloud::define("_messageReceived", function($params, $user) {
     return array("content" => json_encode($content));
 });
 ```
+
 ```java
 @IMHook(type = IMHookType.messageReceived)
   public static Map<String, Object> onMessageReceived(Map<String, Object> params) {
@@ -184,6 +183,7 @@ Cloud::define("_messageReceived", function($params, $user) {
     return result;
   }
 ```
+
 ```cs
 [LCEngineRealtimeHook(LCEngineRealtimeHookType.MessageReceived)]
 public static object OnMessageReceived(Dictionary<string, object> parameters) {
@@ -194,22 +194,24 @@ public static object OnMessageReceived(Dictionary<string, object> parameters) {
   };
 }
 ```
+
 ```go
 // 暂不支持
 ```
 
 </MultiLang>
 
-
 而实际上启用上述代码之后，一条消息的时序图如下：
 
-<Mermaid diagram={`
+<Mermaid
+  diagram={`
 sequenceDiagram
 SDK->>RTM: 1. 发送消息
 RTM-->>Engine: 2. 触发 _messageReceived hook 调用
 Engine-->>RTM: 3. 返回 hook 函数处理结果
 RTM-->>SDK: 4. 将 hook 函数处理结果发送给接收方
-`} />
+`}
+/>
 
 - 上图假设的是对话所有成员都在线，而如果有成员不在线，流程有些不一样，下一节会做介绍。
 - RTM 表示即时通讯服务集群，Engine 表示云引擎服务集群，它们基于内网通讯。
@@ -220,24 +222,24 @@ RTM-->>SDK: 4. 将 hook 函数处理结果发送给接收方
 
 参数：
 
-参数 | 说明
---- | ---
-`fromPeer` | 消息发送者 ID。
-`convId` | 消息所属对话的 ID。
-`offlinePeers` | 数组，离线的收件人列表。
-`content` | 消息内容。
-`timestamp` | 服务器收到消息的时间戳（毫秒）。
-`mentionAll` | 布尔类型，表示本消息是否 @ 了所有成员。
-`mentionOfflinePeers` | 被本消息 @ 且离线的成员 ID。如果 `mentionAll` 为 `true`，则该参数为空，表示所有 `offlinePeers` 参数内的成员全部被 @。
+| 参数                  | 说明                                                                                                                  |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `fromPeer`            | 消息发送者 ID。                                                                                                       |
+| `convId`              | 消息所属对话的 ID。                                                                                                   |
+| `offlinePeers`        | 数组，离线的收件人列表。                                                                                              |
+| `content`             | 消息内容。                                                                                                            |
+| `timestamp`           | 服务器收到消息的时间戳（毫秒）。                                                                                      |
+| `mentionAll`          | 布尔类型，表示本消息是否 @ 了所有成员。                                                                               |
+| `mentionOfflinePeers` | 被本消息 @ 且离线的成员 ID。如果 `mentionAll` 为 `true`，则该参数为空，表示所有 `offlinePeers` 参数内的成员全部被 @。 |
 
 返回值：
 
-参数 | 约束 | 说明
---- | --- | ---
-`skip` | 可选 | 如果为真将跳过推送（比如已经在云引擎里触发了推送或者其他通知）。
-`offlinePeers`| 可选 | 数组，筛选过的推送收件人。
-`pushMessage` | 可选 | 推送内容，支持自定义 JSON 结构。
-`force` | 可选 | 如果为真将强制推送给 `offlinePeers` 里 `mute` 的用户，默认 `false`。
+| 参数           | 约束 | 说明                                                                 |
+| -------------- | ---- | -------------------------------------------------------------------- |
+| `skip`         | 可选 | 如果为真将跳过推送（比如已经在云引擎里触发了推送或者其他通知）。     |
+| `offlinePeers` | 可选 | 数组，筛选过的推送收件人。                                           |
+| `pushMessage`  | 可选 | 推送内容，支持自定义 JSON 结构。                                     |
+| `force`        | 可选 | 如果为真将强制推送给 `offlinePeers` 里 `mute` 的用户，默认 `false`。 |
 
 示例代码：
 
@@ -245,30 +247,31 @@ RTM-->>SDK: 4. 将 hook 函数处理结果发送给接收方
 
 ```js
 AV.Cloud.onIMReceiversOffline((request) => {
-    let params = request.params;
-    let content = params.content;
+  let params = request.params;
+  let content = params.content;
 
   // params.content 为消息的内容
-    let shortContent = content;
+  let shortContent = content;
 
-    if (shortContent.length > 6) {
-        shortContent = content.slice(0, 6);
-    }
+  if (shortContent.length > 6) {
+    shortContent = content.slice(0, 6);
+  }
 
-    console.log('shortContent', shortContent);
+  console.log("shortContent", shortContent);
 
   return {
     pushMessage: JSON.stringify({
-          // 自增未读消息的数目，不想自增就设为数字
-          badge: "Increment",
-          sound: "default",
-          // 使用开发证书
-          _profile: "dev",
-          alert: shortContent
-      })
-  }
+      // 自增未读消息的数目，不想自增就设为数字
+      badge: "Increment",
+      sound: "default",
+      // 使用开发证书
+      _profile: "dev",
+      alert: shortContent,
+    }),
+  };
 });
 ```
+
 ```python
 @engine.define
 def _receiversOffline(**params):
@@ -290,6 +293,7 @@ def _receiversOffline(**params):
         'pushMessage': json.dumps(payloads),
     }
 ```
+
 ```php
 Cloud::define('_receiversOffline', function($params, $user) {
     error_log('_receiversOffline start');
@@ -314,6 +318,7 @@ Cloud::define('_receiversOffline', function($params, $user) {
     );
 });
 ```
+
 ```java
 @IMHook(type = IMHookType.receiversOffline)
   public static Map<String, Object> onReceiversOffline(Map<String, Object> params) {
@@ -336,6 +341,7 @@ Cloud::define('_receiversOffline', function($params, $user) {
     return result;
 }
 ```
+
 ```cs
 [LCEngineRealtimeHook(LCEngineRealtimeHookType.ReceiversOffline)]
 public static Dictionary<string, object> OnReceiversOffline(Dictionary<string, object> parameters) {
@@ -354,12 +360,12 @@ public static Dictionary<string, object> OnReceiversOffline(Dictionary<string, o
     };
 }
 ```
+
 ```go
 // 暂不支持
 ```
 
 </MultiLang>
-
 
 #### `_messageSent`
 
@@ -367,20 +373,20 @@ public static Dictionary<string, object> OnReceiversOffline(Dictionary<string, o
 
 参数：
 
-参数 | 说明
---- | ---
-`fromPeer` | 消息发送者的 ID。
-`convId` | 消息所属对话的 ID。
-`msgId` | 消息 ID。
-`onlinePeers`	| 当前在线发送的用户 ID。
-`offlinePeers` | 当前离线的用户 ID。
-`transient`	| 是否是 transient 消息。
-`system` | 是否是 system conversation。
-`bin` | 是否是二进制消息。
-`content`	| 消息体字符串。
-`receipt`	| 是否要求回执。
-`timestamp`	| 服务器收到消息的时间戳（毫秒）。
-`sourceIP` | 消息发送者的 IP。
+| 参数           | 说明                             |
+| -------------- | -------------------------------- |
+| `fromPeer`     | 消息发送者的 ID。                |
+| `convId`       | 消息所属对话的 ID。              |
+| `msgId`        | 消息 ID。                        |
+| `onlinePeers`  | 当前在线发送的用户 ID。          |
+| `offlinePeers` | 当前离线的用户 ID。              |
+| `transient`    | 是否是 transient 消息。          |
+| `system`       | 是否是 system conversation。     |
+| `bin`          | 是否是二进制消息。               |
+| `content`      | 消息体字符串。                   |
+| `receipt`      | 是否要求回执。                   |
+| `timestamp`    | 服务器收到消息的时间戳（毫秒）。 |
+| `sourceIP`     | 消息发送者的 IP。                |
 
 参数示例：
 
@@ -395,7 +401,7 @@ public static Dictionary<string, object> OnReceiversOffline(Dictionary<string, o
   "bin": false,
   "transient": false,
   "sourceIP": "114.219.127.186",
-  "offlinePeers": [ "Jerry" ],
+  "offlinePeers": ["Jerry"],
   "timestamp": 1472703266522
 }
 ```
@@ -412,9 +418,10 @@ public static Dictionary<string, object> OnReceiversOffline(Dictionary<string, o
 
 ```js
 AV.Cloud.onIMMessageSent((request) => {
-    console.log('params', request.params);
+  console.log("params", request.params);
 });
 ```
+
 ```python
 @engine.define
 def _messageSent(**params):
@@ -423,6 +430,7 @@ def _messageSent(**params):
     print('_messageSent end')
     return {}
 ```
+
 ```php
 Cloud::define('_messageSent', function($params, $user) {
     error_log('_messageSent start');
@@ -430,6 +438,7 @@ Cloud::define('_messageSent', function($params, $user) {
     return array();
 });
 ```
+
 ```java
 @IMHook(type = IMHookType.messageSent)
   public static Map<String, Object> onMessageSent(Map<String, Object> params) {
@@ -438,6 +447,7 @@ Cloud::define('_messageSent', function($params, $user) {
     return result;
 }
 ```
+
 ```cs
 [LCEngineRealtimeHook(LCEngineRealtimeHookType.MessageSent)]
 public static Dictionary<string, object> OnMessageSent(Dictionary<string, object> parameters) {
@@ -445,12 +455,12 @@ public static Dictionary<string, object> OnMessageSent(Dictionary<string, object
     return default;
 }
 ```
+
 ```go
 // 暂不支持
 ```
 
 </MultiLang>
-
 
 #### `_messageUpdate`
 
@@ -464,29 +474,29 @@ public static Dictionary<string, object> OnMessageSent(Dictionary<string, object
 
 参数：
 
-参数 | 说明
---- | ---
-`fromPeer` | 消息发送者的 ID。
-`convId` | 消息所属对话的 ID。
-`toPeers` | 解析出的对话相关的 `clientId`。
-`bin` | 原始消息内容是否为二进制消息。
-`content` | 消息体字符串。如果 `bin` 为 `true`，则该字段为原始消息内容做 Base64 转码后的结果。
-`timestamp` | 服务器收到消息的时间戳（毫秒）。
-`msgId` | 被修改的消息 ID。
-`sourceIP` | 消息发送者的 IP。
-`recall` | 是否撤回消息。
-`system` | 是否属于系统对话消息。
+| 参数        | 说明                                                                               |
+| ----------- | ---------------------------------------------------------------------------------- |
+| `fromPeer`  | 消息发送者的 ID。                                                                  |
+| `convId`    | 消息所属对话的 ID。                                                                |
+| `toPeers`   | 解析出的对话相关的 `clientId`。                                                    |
+| `bin`       | 原始消息内容是否为二进制消息。                                                     |
+| `content`   | 消息体字符串。如果 `bin` 为 `true`，则该字段为原始消息内容做 Base64 转码后的结果。 |
+| `timestamp` | 服务器收到消息的时间戳（毫秒）。                                                   |
+| `msgId`     | 被修改的消息 ID。                                                                  |
+| `sourceIP`  | 消息发送者的 IP。                                                                  |
+| `recall`    | 是否撤回消息。                                                                     |
+| `system`    | 是否属于系统对话消息。                                                             |
 
 返回值：
 
-参数 | 约束 | 说明
---- | --- | ---
-`drop` | 可选 | 如果返回真值，修改消息请求将被丢弃。
-`code` | 可选 | 当 `drop` 为 `true` 时可以下发一个应用自定义的整型错误码。
-`detail` | 可选 | 当 `drop` 为 `true` 时可以下发一个应用自定义的错误说明字符串。
-`bin` | 可选 | 返回的 `content` 内是否为二进制消息，如果不提供则为请求中的 `bin` 值。
-`content` | 可选 | 修改后的 `content`，如果不提供则保留原消息。如果 `bin` 为 `true`，则 `content` 需要是二进制消息内容做 Base64 转码后的结果。
-`toPeers` | 可选 | 数组，修改后的收件人，如果不提供则保留原收件人。
+| 参数      | 约束 | 说明                                                                                                                        |
+| --------- | ---- | --------------------------------------------------------------------------------------------------------------------------- |
+| `drop`    | 可选 | 如果返回真值，修改消息请求将被丢弃。                                                                                        |
+| `code`    | 可选 | 当 `drop` 为 `true` 时可以下发一个应用自定义的整型错误码。                                                                  |
+| `detail`  | 可选 | 当 `drop` 为 `true` 时可以下发一个应用自定义的错误说明字符串。                                                              |
+| `bin`     | 可选 | 返回的 `content` 内是否为二进制消息，如果不提供则为请求中的 `bin` 值。                                                      |
+| `content` | 可选 | 修改后的 `content`，如果不提供则保留原消息。如果 `bin` 为 `true`，则 `content` 需要是二进制消息内容做 Base64 转码后的结果。 |
+| `toPeers` | 可选 | 数组，修改后的收件人，如果不提供则保留原收件人。                                                                            |
 
 #### `_conversationStart`
 
@@ -494,11 +504,11 @@ public static Dictionary<string, object> OnMessageSent(Dictionary<string, object
 
 参数：
 
-参数 | 说明
---- | ---
-`initBy` | 由谁发起的 `clientId`。
-`members` | 初始成员数组，包含初始成员。
-`attr` | 创建对话时的额外属性。
+| 参数      | 说明                         |
+| --------- | ---------------------------- |
+| `initBy`  | 由谁发起的 `clientId`。      |
+| `members` | 初始成员数组，包含初始成员。 |
+| `attr`    | 创建对话时的额外属性。       |
 
 参数示例：
 
@@ -514,11 +524,11 @@ public static Dictionary<string, object> OnMessageSent(Dictionary<string, object
 
 返回值：
 
-参数 | 约束 | 说明
---- | --- | ---
-`reject` | 可选 | 是否拒绝，默认为 `false`。
-`code` | 可选 | 当 `reject` 为 `true` 时可以下发一个应用自定义的整型错误码。
-`detail` | 可选 | 当 `reject` 为 `true` 时可以下发一个应用自定义的错误说明字符串。
+| 参数     | 约束 | 说明                                                             |
+| -------- | ---- | ---------------------------------------------------------------- |
+| `reject` | 可选 | 是否拒绝，默认为 `false`。                                       |
+| `code`   | 可选 | 当 `reject` 为 `true` 时可以下发一个应用自定义的整型错误码。     |
+| `detail` | 可选 | 当 `reject` 为 `true` 时可以下发一个应用自定义的错误说明字符串。 |
 
 例如，初始成员不足四人，不允许创建对话：
 
@@ -528,15 +538,16 @@ public static Dictionary<string, object> OnMessageSent(Dictionary<string, object
 AV.Cloud.onIMConversationStart((request) => {
   if (request.params.members.length < 4) {
     return {
-      "reject": true,
-      "code": 1234,
-      "detail": "至少邀请 3 人开启对话",
+      reject: true,
+      code: 1234,
+      detail: "至少邀请 3 人开启对话",
     };
   } else {
     return {};
   }
 });
 ```
+
 ```python
 @engine.define
 def _conversationStart(**params):
@@ -544,24 +555,26 @@ def _conversationStart(**params):
       return {
         "reject": True,
         "code": 1234,
-        "detail": "至少邀请 3 人开启对话",      
+        "detail": "至少邀请 3 人开启对话",
       }
     else:
       return {}
 ```
+
 ```php
 Cloud::define('_conversationStart', function($params, $user) {
     if (count($params["members"]) < 4) {
       return [
         "reject" => true,
         "code" => 1234,
-        "detail" => "至少邀请 3 人开启对话", 
+        "detail" => "至少邀请 3 人开启对话",
       ];
     } else {
       return array();
     }
 });
 ```
+
 ```java
 @IMHook(type = IMHookType.conversationStart)
 public static Map<String, Object> onConversationStart(Map<String, Object> params) {
@@ -575,6 +588,7 @@ public static Map<String, Object> onConversationStart(Map<String, Object> params
   return result;
 }
 ```
+
 ```cs
 [LCEngineRealtimeHook(LCEngineRealtimeHookType.ConversationStart)]
 public static object OnConversationStart(Dictionary<string, object> parameters) {
@@ -589,12 +603,12 @@ public static object OnConversationStart(Dictionary<string, object> parameters) 
     return default;
 }
 ```
+
 ```go
 // 暂不支持
 ```
 
 </MultiLang>
-
 
 #### `_conversationStarted`
 
@@ -602,9 +616,9 @@ public static object OnConversationStart(Dictionary<string, object> parameters) 
 
 参数：
 
-参数 | 说明
---- | ---
-`convId` | 新生成的对话 ID。
+| 参数     | 说明              |
+| -------- | ----------------- |
+| `convId` | 新生成的对话 ID。 |
 
 返回值：
 
@@ -620,27 +634,31 @@ AV.Cloud.onIMConversationStarted((request) => {
   return {};
 });
 ```
+
 ```python
 @engine.define
 def _conversationStarted(**params):
     redis_client.lpush("recent_conversations", params["convId"])
     return {}
 ```
+
 ```php
 Cloud::define('_conversationStarted', function($params, $user) {
     $redis->lpush("recent_conversations", $params["convId"]);
     return array();
 });
 ```
+
 ```java
 @IMHook(type = IMHookType.conversationStarted)
 public static Map<String, Object> onConversationStarted(Map<String, Object> params) throws Exception {
   String convId = (String)params.get("convId");
   jedis.lpush("recent_conversations", params.get("convId"));
-  Map<String, Object> result = new HashMap<String, Object>(); 
+  Map<String, Object> result = new HashMap<String, Object>();
   return result;
 }
 ```
+
 ```cs
 [LCEngineRealtimeHook(LCEngineRealtimeHookType.ConversationStarted)]
 public static object OnConversationStarted(Dictionary<string, object> parameters) {
@@ -649,12 +667,12 @@ public static object OnConversationStarted(Dictionary<string, object> parameters
     return default;
 }
 ```
+
 ```go
 // 暂不支持
 ```
 
 </MultiLang>
-
 
 #### `_conversationAdd`
 
@@ -662,19 +680,19 @@ public static object OnConversationStarted(Dictionary<string, object> parameters
 
 参数：
 
-参数 | 说明
---- | ---
-`initBy` | 由谁发起的 `clientId`。
-`members` | 要加入的成员，数组。
-`convId` | 对话 ID。
+| 参数      | 说明                    |
+| --------- | ----------------------- |
+| `initBy`  | 由谁发起的 `clientId`。 |
+| `members` | 要加入的成员，数组。    |
+| `convId`  | 对话 ID。               |
 
 返回值：
 
-参数 | 约束 | 说明
---- | --- | ---
-`reject` | 可选 | 是否拒绝，默认为 `false`。
-`code` | 可选 | 当 `reject` 为 `true` 时可以下发一个应用自定义的整型错误码。
-`detail` | 可选 | 当 `reject` 为 `true` 时可以下发一个应用自定义的错误说明字符串。
+| 参数     | 约束 | 说明                                                             |
+| -------- | ---- | ---------------------------------------------------------------- |
+| `reject` | 可选 | 是否拒绝，默认为 `false`。                                       |
+| `code`   | 可选 | 当 `reject` 为 `true` 时可以下发一个应用自定义的整型错误码。     |
+| `detail` | 可选 | 当 `reject` 为 `true` 时可以下发一个应用自定义的错误说明字符串。 |
 
 例如，不允许某成员创建的对话新增成员：
 
@@ -684,15 +702,16 @@ public static object OnConversationStarted(Dictionary<string, object> parameters
 AV.Cloud.onIMConversationAdd((request) => {
   if (request.params.initBy === "Tom") {
     return {
-      "reject": true,
-      "code": 9890,
-      "detail": "会话已封闭，不允许新增成员。"
+      reject: true,
+      code: 9890,
+      detail: "会话已封闭，不允许新增成员。",
     };
   } else {
-    return {}
+    return {};
   }
 });
 ```
+
 ```python
 @engine.define
 def _conversationAdd(**params):
@@ -705,19 +724,21 @@ def _conversationAdd(**params):
   else:
     return {}
 ```
+
 ```php
 Cloud::define('_conversationAdd', function($params, $user) {
   if ($params["initBy"] === "Tom") {
     return [
       "reject" => true,
       "code" => 9890,
-      "detail" => "会话已封闭，不允许新增成员。", 
+      "detail" => "会话已封闭，不允许新增成员。",
     ];
   } else {
     return array();
   }
 });
 ```
+
 ```java
 @IMHook(type = IMHookType.conversationAdd)
 public static Map<String, Object> onConversationAdd(Map<String, Object> params) {
@@ -730,6 +751,7 @@ public static Map<String, Object> onConversationAdd(Map<String, Object> params) 
   return result;
 }
 ```
+
 ```cs
 [LCEngineRealtimeHook(LCEngineRealtimeHookType.ConversationAdd)]
 public static object OnConversationAdd(Dictionary<string, object> parameters) {
@@ -743,12 +765,12 @@ public static object OnConversationAdd(Dictionary<string, object> parameters) {
     return default;
 }
 ```
+
 ```go
 // 暂不支持
 ```
 
 </MultiLang>
-
 
 #### `_conversationRemove`
 
@@ -756,19 +778,19 @@ public static object OnConversationAdd(Dictionary<string, object> parameters) {
 
 参数：
 
-参数 | 说明
---- | ---
-`initBy` | 由谁发起。
-`members` | 要踢出的成员，数组。
-`convId` | 对话 iD。
+| 参数      | 说明                 |
+| --------- | -------------------- |
+| `initBy`  | 由谁发起。           |
+| `members` | 要踢出的成员，数组。 |
+| `convId`  | 对话 iD。            |
 
 返回值：
 
-参数 | 约束 | 说明
---- | --- | ---
-`reject` | 可选 | 是否拒绝，默认为 `false`。
-`code` | 可选 | 当 `reject` 为 `true` 时可以下发一个应用自定义的整型错误码。
-`detail` | 可选 | 当 `reject` 为 `true` 时可以下发一个应用自定义的错误说明字符串。
+| 参数     | 约束 | 说明                                                             |
+| -------- | ---- | ---------------------------------------------------------------- |
+| `reject` | 可选 | 是否拒绝，默认为 `false`。                                       |
+| `code`   | 可选 | 当 `reject` 为 `true` 时可以下发一个应用自定义的整型错误码。     |
+| `detail` | 可选 | 当 `reject` 为 `true` 时可以下发一个应用自定义的错误说明字符串。 |
 
 例如，某个应用会让官方运营人员加入每个聊天群，希望加上群主无法踢掉官方运营的限制：
 
@@ -790,6 +812,7 @@ AV.Cloud.onIMConversationRemove(async (request) => {
   return {};
 }
 ```
+
 ```python
 @engine.define
 def _conversationRemove(**params):
@@ -804,6 +827,7 @@ def _conversationRemove(**params):
             }
     return {}
 ```
+
 ```php
 Cloud::define('_conversationRemove', function($params, $user) {
   $supporters = array("Bast", "Hypnos", "Kthanid");
@@ -820,6 +844,7 @@ Cloud::define('_conversationRemove', function($params, $user) {
   return array();
 });
 ```
+
 ```java
 @IMHook(type = IMHookType.conversationRemove)
 public static Map<String, Object> onConversationRemove(Map<String, Object> params) {
@@ -836,6 +861,7 @@ public static Map<String, Object> onConversationRemove(Map<String, Object> param
   return result;
 }
 ```
+
 ```cs
 [LCEngineRealtimeHook(LCEngineRealtimeHookType.ConversationRemove)]
 public static object OnConversationRemove(Dictionary<string, object> parameters) {
@@ -853,12 +879,12 @@ public static object OnConversationRemove(Dictionary<string, object> parameters)
     return default;
 }
 ```
+
 ```go
 // 暂不支持
 ```
 
 </MultiLang>
-
 
 #### `_conversationAdded`
 
@@ -866,11 +892,11 @@ public static object OnConversationRemove(Dictionary<string, object> parameters)
 
 参数：
 
-参数 | 说明
---- | ---
-`initBy` | 由谁发起。
-`convId` | 对话 ID。
-`members` | 新加入的用户 ID 数组
+| 参数      | 说明                 |
+| --------- | -------------------- |
+| `initBy`  | 由谁发起。           |
+| `convId`  | 对话 ID。            |
+| `members` | 新加入的用户 ID 数组 |
 
 返回值：
 
@@ -889,12 +915,17 @@ AV.Cloud.onIMConversationAdded((request) => {
       sign: "sign_example",
       conv_id: request.params.convId,
     }).then(
-      function () { /* 调用成功 */ },
-      function (err) { /* 调用失败 */}
+      function () {
+        /* 调用成功 */
+      },
+      function (err) {
+        /* 调用失败 */
+      }
     );
   }
 });
 ```
+
 ```python
 @engine.define
 def _conversationAdded(**params):
@@ -905,6 +936,7 @@ def _conversationAdded(**params):
             params={"conv_id": params["convId"]}
         )
 ```
+
 ```php
 Cloud::define('_conversationAdded', function($params, $user) {
   if (count($params["members"]) > 10) {
@@ -917,6 +949,7 @@ Cloud::define('_conversationAdded', function($params, $user) {
   }
 });
 ```
+
 ```java
 @IMHook(type = IMHookType.conversationAdded)
 public static void onConversationAdded(Map<String, Object> params) {
@@ -926,7 +959,7 @@ public static void onConversationAdded(Map<String, Object> params) {
     option.setTemplateName("Group_Notice");
     option.setSignatureName("sign_example");
     Map<String, Object> parameters = new HashMap<String, Object>();
-    parameters.put("conv_id", params.get("convId")); 
+    parameters.put("conv_id", params.get("convId"));
     option.setEnvMap(parameters);
     LCSMS.requestSMSCodeInBackground("18200008888", option).subscribe(new Observer<LCNull>() {
       @Override
@@ -945,6 +978,7 @@ public static void onConversationAdded(Map<String, Object> params) {
   }
 }
 ```
+
 ```cs
 [LCEngineRealtimeHook(LCEngineRealtimeHookType.ConversationAdded)]
 public static async Task OnConversationAdded(Dictionary<string, object> parameters) {
@@ -964,12 +998,12 @@ public static async Task OnConversationAdded(Dictionary<string, object> paramete
     }
 }
 ```
+
 ```go
 // 暂不支持
 ```
 
 </MultiLang>
-
 
 #### `_conversationRemoved`
 
@@ -977,11 +1011,11 @@ public static async Task OnConversationAdded(Dictionary<string, object> paramete
 
 参数：
 
-参数 | 说明
---- | ---
-`initBy` | 由谁发起。
-`convId` | 对话 ID。
-`members` | 新加入的用户 ID 数组
+| 参数      | 说明                 |
+| --------- | -------------------- |
+| `initBy`  | 由谁发起。           |
+| `convId`  | 对话 ID。            |
+| `members` | 新加入的用户 ID 数组 |
 
 返回值：
 
@@ -1002,6 +1036,7 @@ AV.Cloud.onIMConversationRemoved((request) => {
   }
 });
 ```
+
 ```python
 @engine.define
 def _conversationRemoved(**params):
@@ -1011,6 +1046,7 @@ def _conversationRemoved(**params):
       if members[0] == init_by:
         redis_client.lpush(init_by, params["convId"])
 ```
+
 ```php
 Cloud::define('_conversationRemoved', function($params, $user) {
     $initBy = $params['initBy'];
@@ -1022,6 +1058,7 @@ Cloud::define('_conversationRemoved', function($params, $user) {
     }
 });
 ```
+
 ```java
 @IMHook(type = IMHookType.conversationRemoved)
 public static void onConversationRemoved(Map<String, Object> params) {
@@ -1034,6 +1071,7 @@ public static void onConversationRemoved(Map<String, Object> params) {
   }
 }
 ```
+
 ```cs
 [LCEngineRealtimeHook(LCEngineRealtimeHookType.ConversationRemoved)]
 public static void OnConversationRemoved(Dictionary<string, object> parameters) {
@@ -1046,12 +1084,12 @@ public static void OnConversationRemoved(Dictionary<string, object> parameters) 
     }
 }
 ```
+
 ```go
 // 暂不支持
 ```
 
 </MultiLang>
-
 
 #### `_conversationUpdate`
 
@@ -1059,24 +1097,24 @@ public static void OnConversationRemoved(Dictionary<string, object> parameters) 
 
 参数：
 
-参数 | 说明
---- | ---
-`initBy` | 由谁发起。
-`convId` | 对话 ID。
-`mute` | 是否关闭当前对话提醒。
-`attr` | 待设置的对话属性。
+| 参数     | 说明                   |
+| -------- | ---------------------- |
+| `initBy` | 由谁发起。             |
+| `convId` | 对话 ID。              |
+| `mute`   | 是否关闭当前对话提醒。 |
+| `attr`   | 待设置的对话属性。     |
 
 `mute` 和 `attr` 参数互斥，不会同时传递。
 
 返回值：
 
-参数 | 约束 | 说明
---- | --- | ---
-`reject` | 可选 | 是否拒绝，默认为 `false`。
-`code` | 可选 | 当 `reject` 为 `true` 时可以下发一个应用自定义的整型错误码。
-`detail` | 可选 | 当 `reject` 为 `true` 时可以下发一个应用自定义的错误说明字符串。
-`attr` | 可选 | 修改后的待设置对话属性，如果不提供则保持原参数中的对话属性。
-`mute` | 可选 | 修改后的关闭对话提醒设置，如果不提供则保持原参数中的关闭提醒设置。
+| 参数     | 约束 | 说明                                                               |
+| -------- | ---- | ------------------------------------------------------------------ |
+| `reject` | 可选 | 是否拒绝，默认为 `false`。                                         |
+| `code`   | 可选 | 当 `reject` 为 `true` 时可以下发一个应用自定义的整型错误码。       |
+| `detail` | 可选 | 当 `reject` 为 `true` 时可以下发一个应用自定义的错误说明字符串。   |
+| `attr`   | 可选 | 修改后的待设置对话属性，如果不提供则保持原参数中的对话属性。       |
+| `mute`   | 可选 | 修改后的关闭对话提醒设置，如果不提供则保持原参数中的关闭提醒设置。 |
 
 `mute` 和 `attr` 参数互斥，不能同时返回。并且返回值必须与请求对应，请求中如果带着 `attr`，则返回值中只有 `attr` 参数有效，返回 `mute` 会被丢弃。同理，请求中如果带着 `mute`，返回值中如果有 `attr` 则 `attr` 会被丢弃。
 
@@ -1086,15 +1124,16 @@ public static void OnConversationRemoved(Dictionary<string, object> parameters) 
 
 ```js
 AV.Cloud.onIMConversationUpdate((request) => {
-  if ('attr' in requst.params && 'name' in request.params.attr) {
+  if ("attr" in requst.params && "name" in request.params.attr) {
     return {
-      "reject": true,
-      "code": 1949,
-      "detail": "对话名称不可修改",
+      reject: true,
+      code: 1949,
+      detail: "对话名称不可修改",
     };
   }
 });
 ```
+
 ```python
 @engine.define
 def _conversationUpdate(**params):
@@ -1105,17 +1144,19 @@ def _conversationUpdate(**params):
         "detail": "对话名称不可修改"
       }
 ```
+
 ```php
 Cloud::define('_conversationUpdate', function($params, $user) {
   if (array_key_exists('attr', $params) && array_key_exists('name', $params["attr"])) {
     return [
         "reject" => true,
         "code" => 1949,
-        "detail" => "对话名称不可修改",   
+        "detail" => "对话名称不可修改",
     ];
   }
 });
 ```
+
 ```java
 @IMHook(type = IMHookType.conversationUpdate)
 public static Map<String, Object> onConversationUpdate(Map<String, Object> params) {
@@ -1129,6 +1170,7 @@ public static Map<String, Object> onConversationUpdate(Map<String, Object> param
   return result;
 }
 ```
+
 ```cs
 [LCEngineRealtimeHook(LCEngineRealtimeHookType.ConversationUpdate)]
 public static object OnConversationUpdate(Dictionary<string, object> parameters) {
@@ -1143,12 +1185,12 @@ public static object OnConversationUpdate(Dictionary<string, object> parameters)
     return default;
 }
 ```
+
 ```go
 // 暂不支持
 ```
 
 </MultiLang>
-
 
 #### `_clientOnline`
 
@@ -1158,12 +1200,12 @@ public static object OnConversationUpdate(Dictionary<string, object> parameters)
 
 参数：
 
-参数 | 说明
------ | ------
-peerId | 登录者的 ID
-sourceIP | 登录者的 IP
-tag | 无值或值为 "default" 表示主动登录时不会根据 tag 踢其它设备下线，其它情况下会踢当前登录的相同 tag 的设备下线
-reconnect | 标识客户端本次登录是否是自动重连，无值或值为 0 表示主动登录，值为 1 表示自动重连
+| 参数      | 说明                                                                                                        |
+| --------- | ----------------------------------------------------------------------------------------------------------- |
+| peerId    | 登录者的 ID                                                                                                 |
+| sourceIP  | 登录者的 IP                                                                                                 |
+| tag       | 无值或值为 "default" 表示主动登录时不会根据 tag 踢其它设备下线，其它情况下会踢当前登录的相同 tag 的设备下线 |
+| reconnect | 标识客户端本次登录是否是自动重连，无值或值为 0 表示主动登录，值为 1 表示自动重连                            |
 
 返回：
 
@@ -1171,34 +1213,37 @@ reconnect | 标识客户端本次登录是否是自动重连，无值或值为 0
 
 例如，客户端上线后更新 LeanCache，供查询客户端的实时在线状态：
 
-
 <MultiLang kind="engine">
 
 ```js
 AV.Cloud.onIMClientOnline((request) => {
   // 1 表示在线
-  redisClient.set(request.params.peerId, 1)
-})
+  redisClient.set(request.params.peerId, 1);
+});
 ```
+
 ```python
 @engine.define
 def _clientOnline(**params):
   # 1 表示在线
   redis_client.set(params["peerId"], 1)
 ```
+
 ```php
 Cloud::define('_clientOnline', function($params, $user) {
   // 1 表示在线
   $redis->set($params["peerId"], 1);
 }
 ```
+
 ```java
 @IMHook(type = IMHookType.clientOnline)
 public static void onClientOnline(Map<String, Object> params) {
   // 1 表示在线
-  jedis.set(params.get("peerId"), 1);  
+  jedis.set(params.get("peerId"), 1);
 }
 ```
+
 ```cs
 // 注意，C# 代码示例中没有更新 LeanCache，仅仅输出了用户状态
 [LCEngineRealtimeHook(LCEngineRealtimeHookType.ClientOnline)]
@@ -1206,12 +1251,12 @@ public static void OnClientOnline(Dictionary<string, object> parameters) {
     Console.WriteLine($"{parameters["peerId"]} online.");
 }
 ```
+
 ```go
 // 暂不支持
 ```
 
 </MultiLang>
-
 
 #### `_clientOffline`
 
@@ -1221,25 +1266,25 @@ public static void OnClientOnline(Dictionary<string, object> parameters) {
 
 参数：
 
-参数 | 说明
------ | ------
-peerId | 登出者的 ID
-closeCode | 登出的方式，1 代表用户主动登出，2 代表连接断开，3 代表用户由于 `tag` 冲突被踢下线，4 代表用户被 API 踢下线
-closeMsg | 对登出方式的描述信息
-sourceIP | 执行关闭会话操作的用户的 IP，连接断开时不传递此参数
-tag | 由用户在会话创建时传递而来，无值或值为 `default` 表示主动登录时不会根据 tag 踢其它设备下线，其它情况下会踢当前登录的相同 tag 的设备下线
-errorCode | 导致连接断开的错误码，可选
-errorMsg | 导致连接断开的错误信息，可选
+| 参数      | 说明                                                                                                                                    |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| peerId    | 登出者的 ID                                                                                                                             |
+| closeCode | 登出的方式，1 代表用户主动登出，2 代表连接断开，3 代表用户由于 `tag` 冲突被踢下线，4 代表用户被 API 踢下线                              |
+| closeMsg  | 对登出方式的描述信息                                                                                                                    |
+| sourceIP  | 执行关闭会话操作的用户的 IP，连接断开时不传递此参数                                                                                     |
+| tag       | 由用户在会话创建时传递而来，无值或值为 `default` 表示主动登录时不会根据 tag 踢其它设备下线，其它情况下会踢当前登录的相同 tag 的设备下线 |
+| errorCode | 导致连接断开的错误码，可选                                                                                                              |
+| errorMsg  | 导致连接断开的错误信息，可选                                                                                                            |
 
 可能出现的错误信息说明：
 
-错误码 | 错误信息 | 解释
------ | ------- | ---
-4107 | READ_TIMEOUT | 长时间未发送消息或心跳包导致连接超时
-4108 | LOGIN_TIMEOUT | 一定时间内未登录而导致超时
-4109 | FRAME_TOO_LONG | WebSocket 帧过长
-4114 | UNPARSEABLE_RAW_MSG | 消息格式错误无法解析
-4200 | INTERNAL_ERROR | 服务器内部错误
+| 错误码 | 错误信息            | 解释                                 |
+| ------ | ------------------- | ------------------------------------ |
+| 4107   | READ_TIMEOUT        | 长时间未发送消息或心跳包导致连接超时 |
+| 4108   | LOGIN_TIMEOUT       | 一定时间内未登录而导致超时           |
+| 4109   | FRAME_TOO_LONG      | WebSocket 帧过长                     |
+| 4114   | UNPARSEABLE_RAW_MSG | 消息格式错误无法解析                 |
+| 4200   | INTERNAL_ERROR      | 服务器内部错误                       |
 
 返回：
 
@@ -1252,28 +1297,32 @@ errorMsg | 导致连接断开的错误信息，可选
 ```js
 AV.Cloud.onIMClientOffline((request) => {
   // 0 表示下线
-  redisClient.set(request.params.peerId, 0)
-})
+  redisClient.set(request.params.peerId, 0);
+});
 ```
+
 ```python
 @engine.define
 def _clientOffline(**params):
   # 0 表示下线
   redis_client.set(params["peerId"], 0)
 ```
+
 ```php
 Cloud::define('_clientOffline', function($params, $user) {
-  // 0 表示下线 
+  // 0 表示下线
   $redis->set($params["peerId"], 0);
 }
 ```
+
 ```java
 @IMHook(type = IMHookType.clientOffline)
 public static void onClientOffline(Map<String, Object> params) {
-  // 0 表示下线 
-  jedis.set(params.get("peerId"), 0);  
+  // 0 表示下线
+  jedis.set(params.get("peerId"), 0);
 }
 ```
+
 ```cs
 // 注意，C# 代码示例中没有更新 LeanCache，仅仅输出了用户状态
 [LCEngineRealtimeHook(LCEngineRealtimeHookType.ClientOffline)]
@@ -1281,12 +1330,12 @@ public static void OnClientOffline(Dictionary<string, object> parameters) {
     Console.WriteLine($"{parameters["peerId"]} offline");
 }
 ```
+
 ```go
 // 暂不支持
 ```
 
 </MultiLang>
-
 
 [《即时通讯中的在线状态查询》](https://leancloud.cn/docs/realtime-guide-onoff-status.html)提供了完整的 Node.js 示例（包括 LeanCache 连接，久未上线的客户端清理，配套的返回在线状态的云函数，以及如何在客户端调用），可以参考。
 
@@ -1297,16 +1346,17 @@ public static void OnClientOffline(Dictionary<string, object> parameters) {
 ### 系统对话的创建
 
 系统对话也是对话的一种，创建后也是在 `_Conversation` 表中增加一条记录，只是该记录 `sys` 列的值为 `true`，从而与普通会话进行区别。具体创建方法请参考[即时通讯 REST API 使用指南](/sdk/im/guide/rest/)的《创建服务号》一节。
+
 ### 系统对话消息的发送
 
 系统对话给用户发消息请参考[即时通讯 REST API 使用指南](/sdk/im/guide/rest/)的《给任意用户单独发消息》一节。用户给系统对话发送消息跟用户给普通对话发消息方法一致。
 
 你还可以利用系统对话发送广播消息给全部用户。相比遍历所有用户 ID 逐个发送，广播消息只需要调用一次 REST API。广播消息具有以下特征：
 
-* 广播消息必须与系统对话关联，广播消息和一般的系统对话消息会混合在系统对话的记录中
-* 用户离线时发送的广播消息，上线后会作为离线消息收到
-* 广播消息具有实效性，可以设置过期时间；过期的消息不会作为离线消息发送给用户，不过仍然可以在历史消息中获取到
-* 新用户第一次登录后，会收到最近一条未过期的系统广播消息
+- 广播消息必须与系统对话关联，广播消息和一般的系统对话消息会混合在系统对话的记录中
+- 用户离线时发送的广播消息，上线后会作为离线消息收到
+- 广播消息具有实效性，可以设置过期时间；过期的消息不会作为离线消息发送给用户，不过仍然可以在历史消息中获取到
+- 新用户第一次登录后，会收到最近一条未过期的系统广播消息
 
 除此以外广播消息与普通消息的处理完全一致。广播消息的发送可以参考[即时通讯 REST API 使用指南](/sdk/im/guide/rest/)的《全局广播》一节。
 
@@ -1325,16 +1375,16 @@ public static void OnClientOffline(Dictionary<string, object> parameters) {
 
 存储用户发给系统对话的消息，各字段含义如下：
 
-字段 | 说明
---- | ---
-`ackAt` | 消息送达的时间。
-`bin` | 是否为二进制类型消息。
-`conv` | 消息关联的系统对话 `Pointer`。
-`data` | 消息内容。
-`from` | 发消息用户的 `clientId`。
-`fromIp` | 发消息用户的 IP。
-`msgId` | 消息的内部 ID。
-`timestamp` | 消息创建的时间。
+| 字段        | 说明                           |
+| ----------- | ------------------------------ |
+| `ackAt`     | 消息送达的时间。               |
+| `bin`       | 是否为二进制类型消息。         |
+| `conv`      | 消息关联的系统对话 `Pointer`。 |
+| `data`      | 消息内容。                     |
+| `from`      | 发消息用户的 `clientId`。      |
+| `fromIp`    | 发消息用户的 IP。              |
+| `msgId`     | 消息的内部 ID。                |
+| `timestamp` | 消息创建的时间。               |
 
 #### Web Hook
 
@@ -1349,23 +1399,23 @@ public static void OnClientOffline(Dictionary<string, object> parameters) {
 ```json
 [
   {
-    "fromIp":      "121.238.214.92",
+    "fromIp": "121.238.214.92",
     "conv": {
-      "__type":    "Pointer",
+      "__type": "Pointer",
       "className": "_Conversation",
-      "objectId":  "55b99ad700b0387b8a3d7bf0"
+      "objectId": "55b99ad700b0387b8a3d7bf0"
     },
-    "msgId":       "nYH9iBSBS_uogCEgvZwE7Q",
-    "from":        "A",
-    "bin":         false,
-    "data":        "你好，sys",
+    "msgId": "nYH9iBSBS_uogCEgvZwE7Q",
+    "from": "A",
+    "bin": false,
+    "data": "你好，sys",
     "createdAt": {
-      "__type":    "Date",
-      "iso":       "2015-07-30T14:37:42.584Z"
+      "__type": "Date",
+      "iso": "2015-07-30T14:37:42.584Z"
     },
-    "updatedAt":  {
-      "__type":   "Date",
-      "iso":      "2015-07-30T14:37:42.584Z"
+    "updatedAt": {
+      "__type": "Date",
+      "iso": "2015-07-30T14:37:42.584Z"
     }
   }
 ]

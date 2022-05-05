@@ -4,7 +4,8 @@ sidebar_label: 文本检测
 ---
 
 本文介绍了如何通过即时通讯 hook 接入第三方的文本检测服务。
-##  预备知识
+
+## 预备知识
 
 本文涉及到即时通讯服务 hook 以及云引擎在线编辑云函数功能，首先请阅读相关文档了解这些功能：
 
@@ -22,71 +23,70 @@ sidebar_label: 文本检测
 下面是一段 Node.js 版的云引擎 Hook 代码，供参考：
 
 ```javascript
-const https = require('https')
+const https = require("https");
 
 // 假设第三方文本检测服务通过 HTTP Header 鉴权
-const authToken = '第三方文本检测服务的鉴权 token'
+const authToken = "第三方文本检测服务的鉴权 token";
 
 const params = request.params;
 
 // 向第三方文本检测服务提交聊天内容和聊天用户的 ID
 // 不同服务接受的参数不同，请根据实际情况修改
 const postData = JSON.stringify({
-    'data': {
-        'text': params.content,
-        'user_id': params.fromPeer
-    }
+  data: {
+    text: params.content,
+    user_id: params.fromPeer,
+  },
 });
 
 const options = {
-    hostname: 'third-party-text-moderation.example.com',
-    port: 443,
-    path: '/path/to/text/moderation/interface',
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-        'X-Third-Party-Auth': authToken,
-    }
-}
+  hostname: "third-party-text-moderation.example.com",
+  port: 443,
+  path: "/path/to/text/moderation/interface",
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "X-Third-Party-Auth": authToken,
+  },
+};
 
-return new Promise((resolve, reject)=>{
+return new Promise((resolve, reject) => {
   const req = https.request(options, (res) => {
     if (res.statusCode != 200) {
       // or resolve(null)
-      reject(new Error(`BAD STATUS: ${res.statusCode}`))
-      return
+      reject(new Error(`BAD STATUS: ${res.statusCode}`));
+      return;
     }
-    let body = ''
-    res.setEncoding('utf8')
-    res.on('data', (chunk) => {
-      body += chunk
-    })
-    res.on('end', () => {
-      json = JSON.parse(body)
+    let body = "";
+    res.setEncoding("utf8");
+    res.on("data", (chunk) => {
+      body += chunk;
+    });
+    res.on("end", () => {
+      json = JSON.parse(body);
 
       if (json.result == 0) {
-        resolve(null)
+        resolve(null);
       } else {
         // 假设第三方文本检测服务会在 filtered_text 字段中返回过滤后的文本
         if (json.filtered_text) {
-          resolve({content: json.filtered_text})
+          resolve({ content: json.filtered_text });
         } else {
-          resolve({drop: true})
+          resolve({ drop: true });
         }
       }
-    })
-  })
+    });
+  });
 
-  req.on('error', (e) => {
+  req.on("error", (e) => {
     // or resolve(null)
-    reject(e)
-  })
+    reject(e);
+  });
 
-  req.write(postData)
-  req.end()
-})
+  req.write(postData);
+  req.end();
+});
 ```
 
 以上代码简单展示了如何在即时通讯服务中使用第三方文本检测服务，代码仅供参考，你需要根据实际业务场景来处理请求和响应结果。
-涉及到的即时通讯 hook 参数和文本检测服务请求与响应参数，请参考[即时通讯 _messageReceived Hook](/sdk/im/guide/systemconv/#_messagereceived)和第三方文本检测服务的 API 文档。
-
+涉及到的即时通讯 hook 参数和文本检测服务请求与响应参数，请参考[即时通讯 \_messageReceived Hook](/sdk/im/guide/systemconv/#_messagereceived)和第三方文本检测服务的 API 文档。

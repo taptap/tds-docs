@@ -4,8 +4,8 @@ sidebar_label: 离线消息
 sidebar_position: 2
 ---
 
-import MultiLang from '/src/docComponents/MultiLang';
-import {Conditional} from '/src/docComponents/conditional';
+import MultiLang from "/src/docComponents/MultiLang";
+import { Conditional } from "/src/docComponents/conditional";
 
 ## 本章导读
 
@@ -43,7 +43,6 @@ import {Conditional} from '/src/docComponents/conditional';
 
 带有提醒信息的消息，有可能既有提醒全部成员的标志，也还单独设置了 `mentionList`，这由应用层去控制。发送方在发送「@ 成员」提醒消息的时候，如何输入、选择成员名称，这是业务方 UI 层面需要解决的问题，即时通讯 SDK 不关心其实现逻辑，SDK 只要求开发者在发送一条「@ 成员」消息的时候，调用 `mentionList` 和 `mentionAll` 的 setter 方法，设置正确的成员列表即可。示例代码如下：
 
-
 <MultiLang>
 
 ```cs
@@ -52,6 +51,7 @@ LCIMTextMessage textMessage = new LCIMTextMessage("@Tom 早点回家") {
 };
 await conversation.Send(textMessage);
 ```
+
 ```java
 String content = "@Tom 早点回家";
 LCIMTextMessage  message = new LCIMTextMessage();
@@ -65,6 +65,7 @@ imConversation.sendMessage(message, new LCIMConversationCallback() {
    }
 });
 ```
+
 ```objc
 LCIMMessage *message = [LCIMTextMessage messageWithText:@"@Tom 早点回家" attributes:nil];
 message.mentionList = @[@"Tom"];
@@ -72,12 +73,17 @@ message.mentionList = @[@"Tom"];
     /* 一条提及 Tom 的消息已发出 */
 }];
 ```
+
 ```js
-const message = new TextMessage(`@Tom 早点回家`).setMentionList(['Tom']);
-conversation.send(message).then(function(message) {
-  console.log('发送成功！');
-}).catch(console.error);
+const message = new TextMessage(`@Tom 早点回家`).setMentionList(["Tom"]);
+conversation
+  .send(message)
+  .then(function (message) {
+    console.log("发送成功！");
+  })
+  .catch(console.error);
 ```
+
 ```swift
 do {
     let message = IMTextMessage(text: "@Tom 早点回家")
@@ -94,6 +100,7 @@ do {
     print(error)
 }
 ```
+
 ```dart
 try {
   TextMessage message = TextMessage();
@@ -107,7 +114,6 @@ try {
 
 </MultiLang>
 
-
 或者也可以通过设置 `mentionAll` 属性值提醒所有人：
 
 <MultiLang>
@@ -118,6 +124,7 @@ LCIMTextMessage textMessage = new LCIMTextMessage("@all") {
 };
 await conv.Send(textMessage);
 ```
+
 ```java
 String content = "@all";
 LCIMTextMessage  message = new LCIMTextMessage();
@@ -132,6 +139,7 @@ imConversation.sendMessage(message, new LCIMConversationCallback() {
    }
 });
 ```
+
 ```objc
 LCIMMessage *message = [LCIMTextMessage messageWithText:@"@all" attributes:nil];
 message.mentionAll = YES;
@@ -139,12 +147,17 @@ message.mentionAll = YES;
     /* 一条提及所有用户的消息已发出 */
 }];
 ```
+
 ```js
 const message = new TextMessage(`@all`).mentionAll();
-conversation.send(message).then(function(message) {
-  console.log('发送成功！');
-}).catch(console.error);
+conversation
+  .send(message)
+  .then(function (message) {
+    console.log("发送成功！");
+  })
+  .catch(console.error);
 ```
+
 ```swift
 do {
     let message = IMTextMessage(text: "@all")
@@ -161,6 +174,7 @@ do {
     print(error)
 }
 ```
+
 ```dart
 try {
   TextMessage message = TextMessage();
@@ -172,9 +186,7 @@ try {
 }
 ```
 
-
 </MultiLang>
-
 
 对于消息的接收方来说，可以通过调用 `mentionList` 和 `mentionAll` 的 getter 方法来获得提醒目标用户的信息，示例代码如下：
 
@@ -185,6 +197,7 @@ jerry.onMessage = (conv, msg) => {
     List<string> mentionIds = msg.MentionIdList;
 };
 ```
+
 ```java
 @Override
 public void onMessage(LCIMAudioMessage msg, LCIMConversation conv, LCIMClient client) {
@@ -192,6 +205,7 @@ public void onMessage(LCIMAudioMessage msg, LCIMConversation conv, LCIMClient cl
   List<String> currentMsgMentionUserList = message.getMentionList();
 }
 ```
+
 ```objc
 // 示例代码演示 LCIMTypedMessage 接收时，获取该条消息提醒的 clientId 列表，同理可以用类似的代码操作 LCIMMessage  的其他子类
 - (void)conversation:(LCIMConversation *)conversation didReceiveTypedMessage:(LCIMTypedMessage *)message {
@@ -199,11 +213,13 @@ public void onMessage(LCIMAudioMessage msg, LCIMConversation conv, LCIMClient cl
     NSArray *mentionList = message.mentionList;
 }
 ```
+
 ```js
 client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
   var mentionList = receivedMessage.getMentionList();
 });
 ```
+
 ```swift
 func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
     switch event {
@@ -224,6 +240,7 @@ func client(_ client: IMClient, conversation: IMConversation, event: IMConversat
     }
 }
 ```
+
 ```dart
 jerry.onMessage = ({
   Client client,
@@ -234,9 +251,7 @@ jerry.onMessage = ({
 };
 ```
 
-
 </MultiLang>
-
 
 此外，并且为了方便应用层 UI 展现，我们特意为 `LCIMMessage` 增加了两个标识位，用来显示被提醒的状态：
 
@@ -252,6 +267,7 @@ client.OnMessage = (conv, msg) => {
     bool mentioned = msg.MentionAll || msg.MentionList.Contains("Tom");
 };
 ```
+
 ```java
 @Override
 public void onMessage(LCIMAudioMessage msg, LCIMConversation conv, LCIMClient client) {
@@ -261,6 +277,7 @@ public void onMessage(LCIMAudioMessage msg, LCIMConversation conv, LCIMClient cl
   boolean currentMsgMentionedMe = message.mentioned();
 }
 ```
+
 ```objc
 // 示例代码演示 LCIMTypedMessage 接收时，获取该条消息是否 @ 了当前对话里的所有成员或当前用户，同理可以用类似的代码操作 LCIMMessage  的其他子类
 - (void)conversation:(LCIMConversation *)conversation didReceiveTypedMessage:(LCIMTypedMessage *)message {
@@ -270,12 +287,14 @@ public void onMessage(LCIMAudioMessage msg, LCIMConversation conv, LCIMClient cl
     BOOL mentionedMe = message.mentioned;
 }
 ```
+
 ```js
 client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
   var mentionedAll = receivedMessage.mentionedAll;
   var mentionedMe = receivedMessage.mentioned;
 });
 ```
+
 ```swift
 func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
     switch event {
@@ -291,13 +310,12 @@ func client(_ client: IMClient, conversation: IMConversation, event: IMConversat
     }
 }
 ```
+
 ```dart
 // 暂不支持
 ```
 
-
 </MultiLang>
-
 
 ### 修改消息
 
@@ -311,6 +329,7 @@ func client(_ client: IMClient, conversation: IMConversation, event: IMConversat
 LCIMTextMessage newMessage = new LCIMTextMessage("修改后的消息内容");
 await conversation.UpdateMessage(oldMessage, newMessage);
 ```
+
 ```java
 LCIMTextMessage textMessage = new LCIMTextMessage();
 textMessage.setContent("修改后的消息");
@@ -323,6 +342,7 @@ imConversation.updateMessage(oldMessage, textMessage, new LCIMMessageUpdatedCall
   }
 });
 ```
+
 ```objc
 LCIMMessage *oldMessage = <#MessageYouWantToUpdate#>;
 LCIMMessage *newMessage = [LCIMTextMessage messageWithText:@"Just a new message" attributes:nil];
@@ -335,14 +355,19 @@ LCIMMessage *newMessage = [LCIMTextMessage messageWithText:@"Just a new message"
                       }
 }];
 ```
+
 ```js
-var newMessage = new TextMessage('new message');
-conversation.update(oldMessage, newMessage).then(function() {
-  // 修改成功
-}).catch(function(error) {
-  // 异常处理
-});
+var newMessage = new TextMessage("new message");
+conversation
+  .update(oldMessage, newMessage)
+  .then(function () {
+    // 修改成功
+  })
+  .catch(function (error) {
+    // 异常处理
+  });
 ```
+
 ```swift
 do {
     let newMessage = IMTextMessage(text: "Just a new message")
@@ -358,6 +383,7 @@ do {
     print(error)
 }
 ```
+
 ```dart
 try {
   Message updatedMessage = await conversation.updateMessage(
@@ -368,7 +394,6 @@ try {
   print(e);
 }
 ```
-
 
 </MultiLang>
 
@@ -383,20 +408,23 @@ tom.OnMessageUpdated = (conv, msg) => {
     }
 };
 ```
+
 ```java
 void onMessageUpdated(LCIMClient client, LCIMConversation conversation, LCIMMessage message) {
   // message 即为被修改的消息
 }
 ```
+
 ```objc
 /* 实现 delegate 方法，以处理消息修改的事件 */
 - (void)conversation:(LCIMConversation *)conversation messageHasBeenUpdated:(LCIMMessage *)message reason:(LCIMMessagePatchedReason * _Nullable)reason {
     /* 有消息被修改 */
 }
 ```
+
 ```js
-var { Event } = require('leancloud-realtime');
-conversation.on(Event.MESSAGE_UPDATE, function(newMessage, reason) {
+var { Event } = require("leancloud-realtime");
+conversation.on(Event.MESSAGE_UPDATE, function (newMessage, reason) {
   // newMessage 为修改后的的消息
   // 在视图层可以通过消息的 ID 找到原来的消息并用 newMessage 替换
   // reason （可选）对象表示消息修改的原因，
@@ -408,6 +436,7 @@ conversation.on(Event.MESSAGE_UPDATE, function(newMessage, reason) {
   // reason 的 detail 属性是一个字符串，指明具体的修改原因。
 });
 ```
+
 ```swift
 func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
     switch event {
@@ -423,6 +452,7 @@ func client(_ client: IMClient, conversation: IMConversation, event: IMConversat
     }
 }
 ```
+
 ```dart
 tom.onMessageUpdated = ({
   Client client,
@@ -434,7 +464,6 @@ tom.onMessageUpdated = ({
   // updatedMessage 即为被修改的消息
 };
 ```
-
 
 </MultiLang>
 
@@ -455,6 +484,7 @@ tom.onMessageUpdated = ({
 ```cs
 await conversation.RecallMessage(message);
 ```
+
 ```java
 conversation.recallMessage(message, new LCIMMessageRecalledCallback() {
     @Override
@@ -465,6 +495,7 @@ conversation.recallMessage(message, new LCIMMessageRecalledCallback() {
     }
 });
 ```
+
 ```objc
 LCIMMessage *oldMessage = <#MessageYouWantToRecall#>;
 
@@ -474,14 +505,19 @@ LCIMMessage *oldMessage = <#MessageYouWantToRecall#>;
     }
 }];
 ```
+
 ```js
-conversation.recall(oldMessage).then(function(recalledMessage) {
-  // 撤回成功
-  // recalledMessage 是一个 RecalledMessage
-}).catch(function(error) {
-  // 异常处理
-});
+conversation
+  .recall(oldMessage)
+  .then(function (recalledMessage) {
+    // 撤回成功
+    // recalledMessage 是一个 RecalledMessage
+  })
+  .catch(function (error) {
+    // 异常处理
+  });
 ```
+
 ```swift
 do {
     try conversation.recall(message: oldMessage, completion: { (result) in
@@ -496,6 +532,7 @@ do {
     print(error)
 }
 ```
+
 ```dart
 try {
   RecalledMessage recalledMessage = await conversation.recallMessage(
@@ -506,9 +543,7 @@ try {
 }
 ```
 
-
 </MultiLang>
-
 
 成功撤回消息后，对话内的其他成员会接收到 `MESSAGE_RECALL` 的事件：
 
@@ -519,25 +554,29 @@ tom.OnMessageRecalled = (conv, recalledMsg) => {
     // recalledMsg 即为被撤回的消息
 };
 ```
+
 ```java
 void onMessageRecalled(LCIMClient client, LCIMConversation conversation, LCIMMessage message) {
   // message 即为被撤回的消息
 }
 ```
+
 ```objc
 /* 实现 delegate 方法，以处理消息撤回的事件 */
 - (void)conversation:(LCIMConversation *)conversation messageHasBeenRecalled:(LCIMRecalledMessage *)message reason:(LCIMMessagePatchedReason * _Nullable)reason {
     /* 有消息被撤回 */
 }
 ```
+
 ```js
-var { Event } = require('leancloud-realtime');
-conversation.on(Event.MESSAGE_RECALL, function(recalledMessage, reason) {
+var { Event } = require("leancloud-realtime");
+conversation.on(Event.MESSAGE_RECALL, function (recalledMessage, reason) {
   // recalledMessage 为已撤回的消息
   // 在视图层可以通过消息的 ID 找到原来的消息并用 recalledMessage 替换
   // reason (可选) 为撤回消息的原因，详见下文修改消息部分的说明。
 });
 ```
+
 ```swift
 func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
     switch event {
@@ -555,6 +594,7 @@ func client(_ client: IMClient, conversation: IMConversation, event: IMConversat
     }
 }
 ```
+
 ```dart
 tom.onMessageRecalled = ({
   Client client,
@@ -565,9 +605,7 @@ tom.onMessageRecalled = ({
 };
 ```
 
-
 </MultiLang>
-
 
 对于 Android 和 iOS SDK 来说，如果开启了消息缓存的选项的话（默认开启），SDK 内部需要保证数据的一致性，所以会先从缓存中删除这条消息记录，然后再通知应用层。对于开发者来说，收到这条通知之后刷新一下目标聊天页面，让消息列表更新即可（此时消息列表中的消息会直接变少，或者显示撤回提示）。
 
@@ -590,12 +628,14 @@ tom.onMessageRecalled = ({
 ```cs
 public async Task<LCIMMessage> Send(LCIMMessage message, LCIMMessageSendOptions options = null);
 ```
+
 ```java
 /**
  * 发送一条消息
  */
 public void sendMessage(LCIMMessage message, final LCIMConversationCallback callback)
 ```
+
 ```objc
 /*!
  往对话中发送消息。
@@ -603,6 +643,7 @@ public void sendMessage(LCIMMessage message, final LCIMConversationCallback call
 - (void)sendMessage:(LCIMMessage *)message
            callback:(void (^)(BOOL succeeded, NSError * _Nullable error))callback;
 ```
+
 ```js
 /**
  * 发送消息
@@ -611,6 +652,7 @@ public void sendMessage(LCIMMessage message, final LCIMConversationCallback call
  */
 async send(message)
 ```
+
 ```swift
 /// Send Message.
 ///
@@ -623,12 +665,12 @@ async send(message)
 ///   - completion: callback.
 public func send(message: IMMessage, options: MessageSendOptions = .default, priority: IMChatRoom.MessagePriority? = nil, pushData: [String : Any]? = nil, progress: ((Double) -> Void)? = nil, completion: @escaping (LCBooleanResult) -> Void) throws
 ```
+
 ```dart
 Future<Message> send({
   @required Message message,
 }) async {}
 ```
-
 
 </MultiLang>
 
@@ -644,6 +686,7 @@ Future<Message> send({
 /// <returns></returns>
 public async Task<LCIMMessage> Send(LCIMMessage message, LCIMMessageSendOptions options = null);
 ```
+
 ```java
 /**
  * 发送消息
@@ -653,6 +696,7 @@ public async Task<LCIMMessage> Send(LCIMMessage message, LCIMMessageSendOptions 
  */
 public void sendMessage(final LCIMMessage message, final LCIMMessageOption messageOption, final LCIMConversationCallback callback)；
 ```
+
 ```objc
 /*!
  往对话中发送消息。
@@ -664,6 +708,7 @@ public void sendMessage(final LCIMMessage message, final LCIMMessageOption messa
              option:(nullable LCIMMessageOption *)option
            callback:(void (^)(BOOL succeeded, NSError * _Nullable error))callback;
 ```
+
 ```js
 /**
  * 发送消息
@@ -680,6 +725,7 @@ public void sendMessage(final LCIMMessage message, final LCIMMessageOption messa
  */
 async send(message, options)
 ```
+
 ```swift
 /// Message Sending Option
 public struct MessageSendOptions: OptionSet {
@@ -704,6 +750,7 @@ public struct MessageSendOptions: OptionSet {
 ///   - completion: callback.
 public func send(message: IMMessage, options: MessageSendOptions = .default, priority: IMChatRoom.MessagePriority? = nil, pushData: [String : Any]? = nil, progress: ((Double) -> Void)? = nil, completion: @escaping (LCBooleanResult) -> Void) throws
 ```
+
 ```dart
 Future<Message> send({
   @required Message message,
@@ -714,7 +761,6 @@ Future<Message> send({
   Map pushData,
 }) async {}
 ```
-
 
 </MultiLang>
 
@@ -737,6 +783,7 @@ LCIMMessageSendOptions option = new LCIMMessageSendOptions() {
 };
 await conversation.Send(textMessage, option);
 ```
+
 ```java
 String content = "Tom 正在输入…";
 LCIMTextMessage  message = new LCIMTextMessage();
@@ -751,6 +798,7 @@ imConversation.sendMessage(message, option, new LCIMConversationCallback() {
    }
 });
 ```
+
 ```objc
 LCIMMessage *message = [LCIMTextMessage messageWithText:@"Tom 正在输入…" attributes:nil];
 LCIMMessageOption *option = [[LCIMMessageOption alloc] init];
@@ -759,10 +807,12 @@ option.transient = true;
     /* 一条暂态消息已发出 */
 }];
 ```
+
 ```js
-const message = new TextMessage('Tom 正在输入…');
-conversation.send(message, {transient: true});
+const message = new TextMessage("Tom 正在输入…");
+conversation.send(message, { transient: true });
 ```
+
 ```swift
 do {
     let message = IMTextMessage(text: "Tom 正在输入…")
@@ -778,6 +828,7 @@ do {
     print(error)
 }
 ```
+
 ```dart
 try {
   TextMessage message = TextMessage();
@@ -789,9 +840,7 @@ try {
 }
 ```
 
-
 </MultiLang>
-
 
 暂态消息的接收逻辑和普通消息一样，开发者可以按照消息类型进行判断和处理，这里不再赘述。上面使用了内建的文本消息只是一种示例，从展现端来说，我们如果使用特定的类型来表示「暂态消息」，是一种更好的方案。即时通讯 SDK 并没有提供固定的「暂态消息」类型，可以由开发者根据自己的业务需要来实现专门的自定义，具体可以参考后述章节：[扩展自己的消息类型](#扩展自己的消息类型)。
 
@@ -812,6 +861,7 @@ LCIMMessageSendOptions option = new LCIMMessageSendOptions {
 };
 await conversation.Send(textMessage, option);
 ```
+
 ```java
 LCIMMessageOption messageOption = new LCIMMessageOption();
 messageOption.setReceipt(true);
@@ -821,6 +871,7 @@ imConversation.sendMessage(message, messageOption, new LCIMConversationCallback(
    }
 });
 ```
+
 ```objc
 LCIMMessageOption *option = [[LCIMMessageOption alloc] init];
 option.receipt = true;
@@ -830,12 +881,14 @@ option.receipt = true;
     }
 }];
 ```
+
 ```js
-var message = new TextMessage('一条非常重要的消息。');
+var message = new TextMessage("一条非常重要的消息。");
 conversation.send(message, {
   receipt: true,
 });
 ```
+
 ```swift
 do {
     let message = IMTextMessage(text: "一条非常重要的消息。")
@@ -851,6 +904,7 @@ do {
     print(error)
 }
 ```
+
 ```dart
 try {
   TextMessage message = TextMessage();
@@ -860,7 +914,6 @@ try {
   print(e);
 }
 ```
-
 
 </MultiLang>
 
@@ -890,6 +943,7 @@ client.OnMessageDelivered = (conv, msgId) => {
 LCIMTextMessage textMessage = new LCIMTextMessage("夜访蛋糕店，约吗？");
 await conversaion.Send(textMessage);
 ```
+
 ```java
 public class CustomConversationEventHandler extends LCIMConversationEventHandler {
   /**
@@ -903,19 +957,22 @@ public class CustomConversationEventHandler extends LCIMConversationEventHandler
 // 设置全局的对话事件处理 handler
 LCIMMessageManager.setConversationEventHandler(new CustomConversationEventHandler());
 ```
+
 ```objc
 // 监听消息是否已送达实现 `conversation:messageDelivered` 即可。
 - (void)conversation:(LCIMConversation *)conversation messageDelivered:(LCIMMessage *)message {
     NSLog(@"%@", @"消息已送达。"); // 打印消息
 }
 ```
+
 ```js
-var { Event } = require('leancloud-realtime');
-conversation.on(Event.LAST_DELIVERED_AT_UPDATE, function() {
+var { Event } = require("leancloud-realtime");
+conversation.on(Event.LAST_DELIVERED_AT_UPDATE, function () {
   console.log(conversation.lastDeliveredAt);
   // 在 UI 中将早于 lastDeliveredAt 的消息都标记为「已送达」
 });
 ```
+
 ```swift
 func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
     switch event {
@@ -933,6 +990,7 @@ func client(_ client: IMClient, conversation: IMConversation, event: IMConversat
     }
 }
 ```
+
 ```dart
 tom.onMessageDelivered = ({
   Client client,
@@ -944,7 +1002,6 @@ tom.onMessageDelivered = ({
   // 消息已送达，在这里可以书写消息送达之后的业务逻辑代码
 };
 ```
-
 
 </MultiLang>
 
@@ -971,12 +1028,14 @@ tom.onMessageDelivered = ({
 /// <returns></returns>
 public Task Read();
 ```
+
 ```java
 /**
  * 清除未读消息
  */
 public void read();
 ```
+
 ```objc
 /*!
  将对话标记为已读。
@@ -984,6 +1043,7 @@ public void read();
  */
 - (void)readInBackground;
 ```
+
 ```js
 /**
  * 将该会话标记为已读
@@ -991,19 +1051,19 @@ public void read();
  */
 async read();
 ```
+
 ```swift
 /// Clear unread messages that its sent timestamp less than the sent timestamp of the parameter message.
 ///
 /// - Parameter message: The default is the last message.
 public func read(message: IMMessage? = nil)
 ```
+
 ```dart
 await conversation.read();
 ```
 
-
 </MultiLang>
-
 
 对方「阅读」了消息之后，云端会向发送方发出一个回执通知，表明消息已被阅读。
 
@@ -1011,171 +1071,187 @@ Tom 和 Jerry 聊天，Tom 想及时知道 Jerry 是否阅读了自己发去的�
 
 1. Tom 向 Jerry 发送一条消息，且标记为「需要回执」：
 
-    <MultiLang>
+   <MultiLang>
 
-    ```cs
-    LCIMTextMessage textMessage = new LCIMTextMessage("一条非常重要的消息。");
-    LCIMMessageSendOptions options = new LCIMMessageSendOptions {
-        Receipt = true
-    };
-    await conversation.Send(textMessage);
-    ```
-    ```java
-    LCIMClient tom = LCIMClient.getInstance("Tom");
-    LCIMConversation conv = client.getConversation("551260efe4b01608686c3e0f");
+   ```cs
+   LCIMTextMessage textMessage = new LCIMTextMessage("一条非常重要的消息。");
+   LCIMMessageSendOptions options = new LCIMMessageSendOptions {
+       Receipt = true
+   };
+   await conversation.Send(textMessage);
+   ```
 
-    LCIMTextMessage textMessage = new LCIMTextMessage();
-    textMessage.setText("Hello, Jerry!");
+   ```java
+   LCIMClient tom = LCIMClient.getInstance("Tom");
+   LCIMConversation conv = client.getConversation("551260efe4b01608686c3e0f");
 
-    LCIMMessageOption option = new LCIMMessageOption();
-    option.setReceipt(true); /* 将消息设置为需要回执。 */
+   LCIMTextMessage textMessage = new LCIMTextMessage();
+   textMessage.setText("Hello, Jerry!");
 
-    conv.sendMessage(textMessage, option, new LCIMConversationCallback() {
-      @Override
-      public void done(LCIMException e) {
-        if (e == null) {
-          /* 发送成功 */
-        }
-      }
-    });
-    ```
-    ```objc
-    LCIMMessageOption *option = [[LCIMMessageOption alloc] init];
-    option.receipt = YES; /* 将消息设置为需要回执。 */
+   LCIMMessageOption option = new LCIMMessageOption();
+   option.setReceipt(true); /* 将消息设置为需要回执。 */
 
-    LCIMTextMessage *message = [LCIMTextMessage messageWithText:@"Hello, Jerry!" attributes:nil];
+   conv.sendMessage(textMessage, option, new LCIMConversationCallback() {
+     @Override
+     public void done(LCIMException e) {
+       if (e == null) {
+         /* 发送成功 */
+       }
+     }
+   });
+   ```
 
-    [conversaiton sendMessage:message option:option callback:^(BOOL succeeded, NSError * _Nullable error) {
-        if (!error) {
-            /* 发送成功 */
-        }
-    }];
-    ```
-    ```js
-    var message = new TextMessage('一条非常重要的消息。');
-    conversation.send(message, {
-      receipt: true,
-    });
-    ```
-    ```swift
-    do {
-        let message = IMTextMessage(text: "Hello, Jerry!")
-        try conversation.send(message: message, options: [.needReceipt], completion: { (result) in
-            switch result {
-            case .success:
-                break
-            case .failure(error: let error):
-                print(error)
-            }
-        })
-    } catch {
-        print(error)
-    }
-    ```
-    ```dart
-    try {
-      TextMessage message = TextMessage();
-      message.text = '一条非常重要的消息。';
-      await conversation.send(message: message, receipt: true);
-    } catch (e) {
-      print(e);
-    }
-    ```
+   ```objc
+   LCIMMessageOption *option = [[LCIMMessageOption alloc] init];
+   option.receipt = YES; /* 将消息设置为需要回执。 */
 
-    </MultiLang>
+   LCIMTextMessage *message = [LCIMTextMessage messageWithText:@"Hello, Jerry!" attributes:nil];
+
+   [conversaiton sendMessage:message option:option callback:^(BOOL succeeded, NSError * _Nullable error) {
+       if (!error) {
+           /* 发送成功 */
+       }
+   }];
+   ```
+
+   ```js
+   var message = new TextMessage("一条非常重要的消息。");
+   conversation.send(message, {
+     receipt: true,
+   });
+   ```
+
+   ```swift
+   do {
+       let message = IMTextMessage(text: "Hello, Jerry!")
+       try conversation.send(message: message, options: [.needReceipt], completion: { (result) in
+           switch result {
+           case .success:
+               break
+           case .failure(error: let error):
+               print(error)
+           }
+       })
+   } catch {
+       print(error)
+   }
+   ```
+
+   ```dart
+   try {
+     TextMessage message = TextMessage();
+     message.text = '一条非常重要的消息。';
+     await conversation.send(message: message, receipt: true);
+   } catch (e) {
+     print(e);
+   }
+   ```
+
+   </MultiLang>
 
 2. Jerry 阅读 Tom 发的消息后，调用对话上的 `read` 方法把「对话中最近的消息」标记为已读：
 
-    <MultiLang>
+   <MultiLang>
 
-    ```cs
-    await conversation.Read();
-    ```
-    ```java
-    conversation.read();
-    ```
-    ```objc
-    [conversation readInBackground];
-    ```
-    ```js
-    conversation.read().then(function(conversation) {
-      ;
-    }).catch(console.error.bind(console));
-    ```
-    ```swift
-    conversation.read()
-    ```
-    ```dart
-    await conversation.read();
-    ```
+   ```cs
+   await conversation.Read();
+   ```
 
-    </MultiLang>
+   ```java
+   conversation.read();
+   ```
+
+   ```objc
+   [conversation readInBackground];
+   ```
+
+   ```js
+   conversation
+     .read()
+     .then(function (conversation) {})
+     .catch(console.error.bind(console));
+   ```
+
+   ```swift
+   conversation.read()
+   ```
+
+   ```dart
+   await conversation.read();
+   ```
+
+   </MultiLang>
 
 3. Tom 将收到一个已读回执，对话的 `lastReadAt` 属性会更新。此时可以更新 UI，把时间戳小于 `lastReadAt` 的消息都标记为已读：
 
-    <MultiLang>
+   <MultiLang>
 
-    ```cs
-    tom.OnLastReadAtUpdated = (conv) => {
-        // Jerry 阅读了你的消息。可以通过调用 conversation.LastReadAt 来获得对方已经读取到的时间
-    };
-    ```
-    ```java
-    public class CustomConversationEventHandler extends LCIMConversationEventHandler {
-      /**
-       * 实现本地方法来处理对方已经阅读消息的通知
-       */
-      public void onLastReadAtUpdated(LCIMClient client, LCIMConversation conversation) {
-        /* Jerry 阅读了你的消息。可以通过调用 conversation.getLastReadAt() 来获得对方已经读取到的时间点 */
-      }
-    }
+   ```cs
+   tom.OnLastReadAtUpdated = (conv) => {
+       // Jerry 阅读了你的消息。可以通过调用 conversation.LastReadAt 来获得对方已经读取到的时间
+   };
+   ```
 
-    // 设置全局的对话事件处理 handler
-    LCIMMessageManager.setConversationEventHandler(new CustomConversationEventHandler());
-    ```
-    ```objc
-    // Tom 可以在 client 的 delegate 方法中捕捉到 lastReadAt 的更新
-    - (void)conversation:(LCIMConversation *)conversation didUpdateForKey:(LCIMConversationUpdatedKey)key {
-        if ([key isEqualToString:LCIMConversationUpdatedKeyLastReadAt]) {
-            NSDate *lastReadAt = conversation.lastReadAt;
-            /* Jerry 阅读了你的消息。可以使用 lastReadAt 更新 UI，例如把时间戳小于 lastReadAt 的消息都标记为已读。 */
-        }
-    }
-    ```
-    ```js
-    var { Event } = require('leancloud-realtime');
-    conversation.on(Event.LAST_READ_AT_UPDATE, function() {
-      console.log(conversation.lastReadAt);
-      // 在 UI 中将早于 lastReadAt 的消息都标记为「已读」
-    });
-    ```
-    ```swift
-    func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
-        switch event {
-        case .message(event: let messageEvent):
-            switch messageEvent {
-            case let .read(byClientID: byClientID, messageID: messageID, readTimestamp: readTimestamp):
-                if messageID == message.ID {
-                    message.readTimestamp = readTimestamp
-                }
-            default:
-                break
-            }
-        default:
-            break
-        }
-    }
-    ```
-    ```dart
-    jerry.onLastReadAtUpdated = ({
-    Client client,
-    Conversation conversation,
-    }) {
+   ```java
+   public class CustomConversationEventHandler extends LCIMConversationEventHandler {
+     /**
+      * 实现本地方法来处理对方已经阅读消息的通知
+      */
+     public void onLastReadAtUpdated(LCIMClient client, LCIMConversation conversation) {
+       /* Jerry 阅读了你的消息。可以通过调用 conversation.getLastReadAt() 来获得对方已经读取到的时间点 */
+     }
+   }
+
+   // 设置全局的对话事件处理 handler
+   LCIMMessageManager.setConversationEventHandler(new CustomConversationEventHandler());
+   ```
+
+   ```objc
+   // Tom 可以在 client 的 delegate 方法中捕捉到 lastReadAt 的更新
+   - (void)conversation:(LCIMConversation *)conversation didUpdateForKey:(LCIMConversationUpdatedKey)key {
+       if ([key isEqualToString:LCIMConversationUpdatedKeyLastReadAt]) {
+           NSDate *lastReadAt = conversation.lastReadAt;
+           /* Jerry 阅读了你的消息。可以使用 lastReadAt 更新 UI，例如把时间戳小于 lastReadAt 的消息都标记为已读。 */
+       }
+   }
+   ```
+
+   ```js
+   var { Event } = require("leancloud-realtime");
+   conversation.on(Event.LAST_READ_AT_UPDATE, function () {
+     console.log(conversation.lastReadAt);
      // 在 UI 中将早于 lastReadAt 的消息都标记为「已读」
-    };
-    ```
+   });
+   ```
 
-    </MultiLang>
+   ```swift
+   func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
+       switch event {
+       case .message(event: let messageEvent):
+           switch messageEvent {
+           case let .read(byClientID: byClientID, messageID: messageID, readTimestamp: readTimestamp):
+               if messageID == message.ID {
+                   message.readTimestamp = readTimestamp
+               }
+           default:
+               break
+           }
+       default:
+           break
+       }
+   }
+   ```
+
+   ```dart
+   jerry.onLastReadAtUpdated = ({
+   Client client,
+   Conversation conversation,
+   }) {
+    // 在 UI 中将早于 lastReadAt 的消息都标记为「已读」
+   };
+   ```
+
+   </MultiLang>
 
 注意：
 
@@ -1202,6 +1278,7 @@ LCIMMessageSendOptions options = new LCIMMessageSendOptions {
 };
 await conversation.Send(message, options);
 ```
+
 ```java
 LCIMTextMessage message = new LCIMTextMessage();
 message.setText("我是一条遗愿消息，当发送者意外下线的时候，我会被下发给对话里面的其他成员。");
@@ -1218,6 +1295,7 @@ conversation.sendMessage(message, option, new LCIMConversationCallback() {
   }
 });
 ```
+
 ```objc
 LCIMMessageOption *option = [[LCIMMessageOption alloc] init];
 option.will = YES;
@@ -1230,14 +1308,21 @@ LCIMMessage *willMessage = [LCIMTextMessage messageWithText:@"我是一条遗愿
     }
 }];
 ```
+
 ```js
-var message = new TextMessage('我是一条遗愿消息，当发送者意外下线的时候，我会被下发给对话里面的其他成员。');
-conversation.send(message, { will: true }).then(function() {
-  // 发送成功，当前 client 掉线的时候，这条消息会被下发给对话里面的其他成员
-}).catch(function(error) {
-  // 异常处理
-});
+var message = new TextMessage(
+  "我是一条遗愿消息，当发送者意外下线的时候，我会被下发给对话里面的其他成员。"
+);
+conversation
+  .send(message, { will: true })
+  .then(function () {
+    // 发送成功，当前 client 掉线的时候，这条消息会被下发给对话里面的其他成员
+  })
+  .catch(function (error) {
+    // 异常处理
+  });
 ```
+
 ```swift
 do {
     let message = IMTextMessage(text: "我是一条遗愿消息，当发送者意外下线的时候，我会被下发给对话里面的其他成员。")
@@ -1253,6 +1338,7 @@ do {
     print(error)
 }
 ```
+
 ```dart
 try {
   TextMessage message = TextMessage();
@@ -1263,9 +1349,7 @@ try {
 }
 ```
 
-
 </MultiLang>
-
 
 客户端发送完毕之后就完全不用再关心这条消息了，云端会自动在发送方异常掉线后通知其他成员，接收端则根据自己的需求来做 UI 的展现。
 
@@ -1277,7 +1361,10 @@ Will 消息有 **如下限制**：
 
 ### 消息内容过滤
 
-<Conditional region="cn">对于多人参与的聊天群组来说，内容的审核和实时过滤是产品运营上的基本要求。我们即时通讯服务默认提供了敏感词过滤的功能，具体</Conditional>请参考[即时通讯开发指南第三篇](/sdk/im/guide/senior/)的《消息内容的实时过滤》一节。
+<Conditional region="cn">
+  对于多人参与的聊天群组来说，内容的审核和实时过滤是产品运营上的基本要求。我们即时通讯服务默认提供了敏感词过滤的功能，具体
+</Conditional>
+请参考[即时通讯开发指南第三篇](/sdk/im/guide/senior/)的《消息内容的实时过滤》一节。
 
 ### 本地发送失败的消息
 
@@ -1292,15 +1379,19 @@ Will 消息有 **如下限制**：
 ```cs
 // 暂不支持
 ```
+
 ```java
 conversation.addToLocalCache(message);
 ```
+
 ```objc
 [conversation addMessageToCache:message];
 ```
+
 ```js
 // 暂不支持
 ```
+
 ```swift
 do {
     try conversation.insertFailedMessageToCache(failedMessage) { (result) in
@@ -1315,10 +1406,10 @@ do {
     print(error)
 }
 ```
+
 ```dart
 // 暂不支持
 ```
-
 
 </MultiLang>
 
@@ -1329,15 +1420,19 @@ do {
 ```cs
 // 暂不支持
 ```
+
 ```java
 conversation.removeFromLocalCache(message);
 ```
+
 ```objc
 [conversation removeMessageFromCache:message];
 ```
+
 ```js
 // 暂不支持
 ```
+
 ```swift
 do {
     try conversation.removeFailedMessageFromCache(failedMessage) { (result) in
@@ -1352,16 +1447,14 @@ do {
     print(error)
 }
 ```
+
 ```dart
 // 暂不支持
 ```
 
-
 </MultiLang>
 
-
 从缓存中取出来的消息，在 UI 展示的时候可以根据 `message.status` 的属性值来做不同的处理，`status` 属性为 `LCIMMessageStatusFailed` 时即表示是发送失败了的本地消息，这时可以在消息旁边显示一个重新发送的按钮。通过将失败消息加入到 SDK 缓存中，还有一个好处就是，消息从缓存中取出来再次发送，不会造成服务端消息重复，因为 SDK 有做专门的去重处理。
-
 
 ## 离线消息同步
 
@@ -1375,6 +1468,7 @@ do {
 第一种方式实现简单，但是因为云端对一个对话只主动「推」20 条离线消息，更多未读消息对客户端来说是透明的，所以只能满足一些轻量级的应用需求，如果产品层要在一个对话内显示消息阅读的进度，或者用精确的未读消息数来提示用户，就无法做到了。因此我们现在都切换到了第二种客户端主动「拉」的方式。
 
 由于历史原因，不同平台的 SDK 对两种方式的支持度是不一样的：
+
 1. Android、iOS SDK 同时支持这两种方式，且默认是「拉」的方式
 2. JavaScript SDK 仅支持「拉」的方式
 3. .NET SDK 目前还不支持第二种方式。
@@ -1407,12 +1501,14 @@ tom.OnUnreadMessagesCountUpdated = (convs) => {
     }
 };
 ```
+
 ```java
 // 实现 LCIMConversationEventHandler 的代理方法 onUnreadMessagesCountUpdated 来得到未读消息的数量变更的通知
 onUnreadMessagesCountUpdated(LCIMClient client, LCIMConversation conversation) {
     // conversation.getUnreadMessagesCount() 即该 conversation 的未读消息数量
 }
 ```
+
 ```objc
 // 使用代理方法 conversation:didUpdateForKey: 来观察对话的 unreadMessagesCount 属性
 - (void)conversation:(LCIMConversation *)conversation didUpdateForKey:(LCIMConversationUpdatedKey)key {
@@ -1422,14 +1518,16 @@ onUnreadMessagesCountUpdated(LCIMClient client, LCIMConversation conversation) {
     }
 }
 ```
+
 ```js
-var { Event } = require('leancloud-realtime');
-client.on(Event.UNREAD_MESSAGES_COUNT_UPDATE, function(conversations) {
-  for(let conv of conversations) {
+var { Event } = require("leancloud-realtime");
+client.on(Event.UNREAD_MESSAGES_COUNT_UPDATE, function (conversations) {
+  for (let conv of conversations) {
     console.log(conv.id, conv.name, conv.unreadMessagesCount);
   }
 });
 ```
+
 ```swift
 func client(_ client: IMClient, conversation: IMConversation, event: IMConversationEvent) {
     switch event {
@@ -1440,6 +1538,7 @@ func client(_ client: IMClient, conversation: IMConversation, event: IMConversat
     }
 }
 ```
+
 ```dart
 tom.onUnreadMessageCountUpdated = ({
   Client client,
@@ -1449,9 +1548,7 @@ tom.onUnreadMessageCountUpdated = ({
 };
 ```
 
-
 </MultiLang>
-
 
 对开发者来说，在 `UNREAD_MESSAGES_COUNT_UPDATE` 事件响应的时候，SDK 传给应用层的 `Conversation` 对象，其 `lastMessage` 应该是当前时点当前用户在当前对话里面接收到的最后一条消息，开发者如果要展示更多的未读消息，就需要通过消息拉取的接口来主动获取了（参见[即时通讯开发指南第一篇](/sdk/im/guide/beginner/)的《聊天记录查询》一节。
 
@@ -1466,10 +1563,9 @@ iOS 和 Android 应用层需要持久化缓存未读计数的细节说明
 
 因此 Java SDK 的开发者需要在应用层缓存收到的未读数通知（同一个对话的未读数采用覆盖的方式来更新），而 iOS SDK 这里收到的**大量未读通知并不等于全量数据（云端追踪的有未读消息的对话数不超过 50 个）**，所以也是一样需要在应用层面缓存收到的未读计数结果，这样才能保证对话列表超过 50 个之后未读计数值的准确性。
 
-
 ## 多端登录与单设备登录
 
-一个用户可以使用相同的账号在不同的客户端上登录（例如 QQ 网页版和手机客户端可以同时接收到消息和回复消息，实现多端消息同步），而有一些场景下，需要禁止一个用户同时在不同客户端登录，例如我们不能用同一个微信账号在两个手机上同时登录。即时通讯服务提供了灵活的机制，来满足 ***多端登录*** 和 ***单设备登录*** 这两种完全相反的需求。
+一个用户可以使用相同的账号在不同的客户端上登录（例如 QQ 网页版和手机客户端可以同时接收到消息和回复消息，实现多端消息同步），而有一些场景下，需要禁止一个用户同时在不同客户端登录，例如我们不能用同一个微信账号在两个手机上同时登录。即时通讯服务提供了灵活的机制，来满足 **_多端登录_** 和 **_单设备登录_** 这两种完全相反的需求。
 
 即时通讯 SDK 在生成 `IMClient` 实例的时候，允许开发者在 `clientId` 之外，增加一个额外的 `tag` 标记。云端在用户主动登录的时候，会检查 `<ClientId, Tag>` 组合的唯一性。如果当前用户已经在其他设备上使用同样的 `tag` 登录了，那么云端会强制让之前登录的设备下线。如果多个 `tag` 不发生冲突，那么云端会把他们当成独立的设备进行处理，应该下发给该用户的消息会分别下发给所有设备，不同设备上的未读消息计数则是合并在一起的（各端之间消息状态是同步的）；该用户在单个设备上发出来的上行消息，云端也会默认同步到其他设备。
 
@@ -1488,6 +1584,7 @@ iOS 和 Android 应用层需要持久化缓存未读计数的细节说明
 ```cs
 LCIMClient client = new LCIMClient(clientId, "Mobile", "your-device-id");
 ```
+
 ```java
 // 第二个参数：登录标记 tag
 LCIMClient currentClient = LCIMClient.getInstance(clientId, "Mobile");
@@ -1500,6 +1597,7 @@ currentClient.open(new LCIMClientCallback() {
   }
 });
 ```
+
 ```objc
 NSError *error;
 LCIMClient *currentClient = [[LCIMClient alloc] initWithClientId:@"Tom" tag:@"Mobile" error:&error];
@@ -1511,11 +1609,13 @@ if (!error) {
    }];
 }
 ```
+
 ```js
-realtime.createIMClient('Tom', { tag: 'Mobile' }).then(function(tom) {
-  console.log('Tom 登录');
+realtime.createIMClient("Tom", { tag: "Mobile" }).then(function (tom) {
+  console.log("Tom 登录");
 });
 ```
+
 ```swift
 do {
     let client = try IMClient(ID: "CLIENT_ID", tag: "Mobile")
@@ -1531,6 +1631,7 @@ do {
     print(error)
 }
 ```
+
 ```dart
 try {
   Client tom = Client(id: 'Tom', tag: 'Mobile');
@@ -1539,7 +1640,6 @@ try {
   print(e);
 }
 ```
-
 
 </MultiLang>
 
@@ -1556,6 +1656,7 @@ tom.OnClose = (code, detail) => {
 
 };
 ```
+
 ```java
 public class AVImClientManager extends LCIMClientEventHandler {
   /**
@@ -1576,6 +1677,7 @@ public class AVImClientManager extends LCIMClientEventHandler {
 // 自定义实现的 LCIMClientEventHandler 需要注册到 SDK 后，SDK 才会通过回调 onClientOffline 来通知开发者
 LCIMClient.setClientEventHandler(new AVImClientManager());
 ```
+
 ```objc
 - (void)imClientClosed:(LCIMClient *)imClient error:(NSError * _Nullable)error
 {
@@ -1585,12 +1687,14 @@ LCIMClient.setClientEventHandler(new AVImClientManager());
     }
 }
 ```
+
 ```js
-var { Event } = require('leancloud-realtime');
-tom.on(Event.CONFLICT, function() {
+var { Event } = require("leancloud-realtime");
+tom.on(Event.CONFLICT, function () {
   // 弹出提示，告知当前用户的 clientId 在其他设备上登录了
 });
 ```
+
 ```swift
 func client(_ client: IMClient, event: IMClientEvent) {
     switch event {
@@ -1603,6 +1707,7 @@ func client(_ client: IMClient, event: IMClientEvent) {
     }
 }
 ```
+
 ```dart
 tom.onClosed = ({
   Client client,
@@ -1613,7 +1718,6 @@ tom.onClosed = ({
   }
 };
 ```
-
 
 </MultiLang>
 
@@ -1630,6 +1734,7 @@ tom.onClosed = ({
 ```cs
 await tom.Open(false);
 ```
+
 ```java
 LCIMClientOpenOption openOption = new LCIMClientOpenOption();
 openOption.setReconnect(true);
@@ -1643,6 +1748,7 @@ currentClient.open(openOption, new LCIMClientCallback() {
   }
 });
 ```
+
 ```objc
 NSError *err;
 LCIMClient *currentClient = [[LCIMClient alloc] initWithClientId:@"Tom" tag:@"Mobile" error:&err];
@@ -1657,11 +1763,15 @@ if (err) {
     }];
 }
 ```
+
 ```js
-realtime.createIMClient('Tom', { tag: 'Mobile', isReconnect: true }).then(function(tom) {
-  console.log('冲突时登录失败，不会踢掉较早登录的设备');
-});
+realtime
+  .createIMClient("Tom", { tag: "Mobile", isReconnect: true })
+  .then(function (tom) {
+    console.log("冲突时登录失败，不会踢掉较早登录的设备");
+  });
 ```
+
 ```swift
 do {
     let client = try IMClient(ID: "Tom", tag: "Mobile")
@@ -1679,6 +1789,7 @@ do {
     print(error)
 }
 ```
+
 ```dart
 try {
   Client tom = Client(id: 'Tom', tag: 'Mobile');
@@ -1689,9 +1800,7 @@ try {
 }
 ```
 
-
 </MultiLang>
-
 
 ## 扩展自己的消息类型
 
@@ -1716,6 +1825,7 @@ try {
 LCIMTextMessage messageWithCity = new LCIMTextMessage("天气太冷了");
 messageWithCity["city"] = "北京";
 ```
+
 ```java
 LCIMTextMessage messageWithCity = new LCIMTextMessage();
 messageWithCity.setText("天气太冷了");
@@ -1723,27 +1833,29 @@ HashMap<String,Object> attr = new HashMap<String,Object>();
 attr.put("city", "北京");
 messageWithCity.setAttrs(attr);
 ```
+
 ```objc
 NSDictionary *attributes = @{ @"city": @"北京" };
 LCIMTextMessage *messageWithCity = [LCIMTextMessage messageWithText:@"天气太冷了" attributes:attributes];
 ```
+
 ```js
 var messageWithCity = new TextMessage("天气太冷了");
 messageWithCity.setAttributes({ city: "北京" });
 ```
+
 ```swift
 let messageWithCity = IMTextMessage(text: "天气太冷了")
 messageWithCity.attributes = ["city": "北京"];
 ```
+
 ```dart
 TextMessage message = TextMessage();
 message.text = '天气太冷了';
 message.attributes = {'city': '北京'};
 ```
 
-
 </MultiLang>
-
 
 ### 自定义消息类型
 
@@ -1754,8 +1866,8 @@ message.attributes = {'city': '北京'};
 
 继承于 `LCIMTypedMessage`，开发者也可以扩展自己的富媒体消息。其要求和步骤是：
 
-* 首先定义一个自定义的子类继承自 `LCIMTypedMessage`。
-* 然后在初始化的时候注册这个子类。
+- 首先定义一个自定义的子类继承自 `LCIMTypedMessage`。
+- 然后在初始化的时候注册这个子类。
 
 ```cs
 class EmojiMessage : LCIMTypedMessage {
@@ -1781,12 +1893,12 @@ LCIMTypedMessage.Register(EmojiMessage.EmojiMessageType, () => new EmojiMessage(
 
 继承于 `LCIMTypedMessage`，开发者也可以扩展自己的富媒体消息。其要求和步骤是：
 
-* 实现新的消息类型，继承自 `LCIMTypedMessage`。这里需要注意：
-  * 在 class 上增加一个 `@LCIMMessageType(type=123)` 的 Annotation<br/>具体消息类型的值（这里是 `123`）由开发者自己决定。内建消息类型使用负数，所有正数都预留给开发者扩展使用。
-  * 在消息内部声明字段属性时，要增加 `@LCIMMessageField(name="")` 的 Annotation<br/>`name` 为可选字段，同时自定义的字段要有对应的 getter/setter 方法。
-  * **请不要遗漏空的构造方法**（参考下面的示例代码），否则会造成类型转换失败。
-* 调用 `LCIMMessageManager.registerLCIMMessageType()` 函数进行类型注册。
-* 调用 `LCIMMessageManager.registerMessageHandler()` 函数进行消息处理 handler 注册。
+- 实现新的消息类型，继承自 `LCIMTypedMessage`。这里需要注意：
+  - 在 class 上增加一个 `@LCIMMessageType(type=123)` 的 Annotation<br/>具体消息类型的值（这里是 `123`）由开发者自己决定。内建消息类型使用负数，所有正数都预留给开发者扩展使用。
+  - 在消息内部声明字段属性时，要增加 `@LCIMMessageField(name="")` 的 Annotation<br/>`name` 为可选字段，同时自定义的字段要有对应的 getter/setter 方法。
+  - **请不要遗漏空的构造方法**（参考下面的示例代码），否则会造成类型转换失败。
+- 调用 `LCIMMessageManager.registerLCIMMessageType()` 函数进行类型注册。
+- 调用 `LCIMMessageManager.registerMessageHandler()` 函数进行消息处理 handler 注册。
 
 注意：如果你是使用 Kotlin 来开发，由于 Kotlin 对反射的处理方式与 Java 有细微差异，导致 `LCIMMessageField` 注释不能产生作用，所以 SDK 实际发送的自定义消息数据不全。我们已经在 `6.4.4` 版本的 SDK 中对这一问题进行了优化，请 Kotlin 开发者升级到 6.4.4 及其后续版本来定制子类化消息。
 
@@ -1829,8 +1941,8 @@ LCIMMessageManager.registerLCIMMessageType(CustomMessage.class);
 
 继承于 `LCIMTypedMessage`，开发者也可以扩展自己的富媒体消息。其要求和步骤是：
 
-* 实现 `LCIMTypedMessageSubclassing` 协议；
-* 子类将自身类型进行注册，一般可在子类的 `+load` 方法或者 `UIApplication` 的 `-application:didFinishLaunchingWithOptions:` 方法里面调用 `[YourClass registerSubclass]`。
+- 实现 `LCIMTypedMessageSubclassing` 协议；
+- 子类将自身类型进行注册，一般可在子类的 `+load` 方法或者 `UIApplication` 的 `-application:didFinishLaunchingWithOptions:` 方法里面调用 `[YourClass registerSubclass]`。
 
 ```objc
 // 定义
@@ -1860,24 +1972,24 @@ LCIMMessageManager.registerLCIMMessageType(CustomMessage.class);
 
 通过继承 `TypedMessage`，开发者也可以扩展自己的富媒体消息。其要求和步骤是：
 
-* 申明新的消息类型，继承自 `TypedMessage` 或其子类，然后：
-  * 对 class 使用 `messageType(123)` 装饰器，具体消息类型的值（这里是 `123`）由开发者自己决定（内建消息类型使用负数，所有正数都预留给开发者扩展使用）。
-  * 对 class 使用 `messageField(['fieldName'])` 装饰器来声明需要发送的字段。
-* 调用 `Realtime#register()` 函数注册这个消息类型。
+- 申明新的消息类型，继承自 `TypedMessage` 或其子类，然后：
+  - 对 class 使用 `messageType(123)` 装饰器，具体消息类型的值（这里是 `123`）由开发者自己决定（内建消息类型使用负数，所有正数都预留给开发者扩展使用）。
+  - 对 class 使用 `messageField(['fieldName'])` 装饰器来声明需要发送的字段。
+- 调用 `Realtime#register()` 函数注册这个消息类型。
 
 举个例子，实现一个在 [暂态消息](#暂态消息) 中提出的 `OperationMessage`：
 
 ```js
 // TypedMessage, messageType, messageField 都是由 leancloud-realtime 这个包提供的
 // 在浏览器中则是 var { TypedMessage, messageType, messageField } = AV;
-var { TypedMessage, messageType, messageField } = require('leancloud-realtime');
-var inherit = require('inherit');
+var { TypedMessage, messageType, messageField } = require("leancloud-realtime");
+var inherit = require("inherit");
 // 定义 OperationMessage 类，用于发送和接收所有的用户操作消息
 export const OperationMessage = inherit(TypedMessage);
 // 指定 type 类型，可以根据实际换成其他正整数
 messageType(1)(OperationMessage);
 // 声明需要发送 op 字段
-messageField('op')(OperationMessage);
+messageField("op")(OperationMessage);
 // 注册消息类，否则收到消息时无法自动解析为 OperationMessage
 realtime.register(OperationMessage);
 ```
@@ -1887,8 +1999,8 @@ realtime.register(OperationMessage);
 
 继承于 `IMCategorizedMessage`，开发者也可以扩展自己的富媒体消息。其要求和步骤是：
 
-* 实现 `IMMessageCategorizing` 协议；
-* 子类将自身类型进行注册，一般可在 `AppDelegate` 的 `application(_:didFinishLaunchingWithOptions:)` 方法里面调用 `try CustomMessage.register()`。
+- 实现 `IMMessageCategorizing` 协议；
+- 子类将自身类型进行注册，一般可在 `AppDelegate` 的 `application(_:didFinishLaunchingWithOptions:)` 方法里面调用 `try CustomMessage.register()`。
 
 ```swift
 // 定义 CustomMessage 类
@@ -1938,7 +2050,6 @@ TypedMessage.register(() => CustomMessage());
 
 </>
 </MultiLang>
-
 
 自定义消息的接收，可以参看[即时通讯开发指南第一篇](/sdk/im/guide/beginner/)的《再谈接收消息》。
 
