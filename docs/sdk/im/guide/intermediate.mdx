@@ -207,7 +207,7 @@ public void onMessage(LCIMAudioMessage msg, LCIMConversation conv, LCIMClient cl
 ```
 
 ```objc
-// 示例代码演示 LCIMTypedMessage 接收时，获取该条消息提醒的 clientId 列表，同理可以用类似的代码操作 LCIMMessage  的其他子类
+// 示例代码演示 LCIMTypedMessage 接收时，获取该条消息提醒的 clientId 列表，同理可以用类似的代码操作 LCIMMessage 的其他子类
 - (void)conversation:(LCIMConversation *)conversation didReceiveTypedMessage:(LCIMTypedMessage *)message {
     // 读取消息 @ 的 clientId 列表
     NSArray *mentionList = message.mentionList;
@@ -253,7 +253,7 @@ jerry.onMessage = ({
 
 </MultiLang>
 
-此外，并且为了方便应用层 UI 展现，我们特意为 `LCIMMessage` 增加了两个标识位，用来显示被提醒的状态：
+此外，为了方便应用层 UI 展现，我们特意为 `LCIMMessage` 增加了两个标识位，用来显示被提醒的状态：
 
 - 一个是 `mentionedAll` 标识位，用来表示该消息是否提醒了当前对话的全体成员。只有 `mentionAll` 属性为 `true`，这个标识位才为 `true`，否则就为 `false`。
 - 另一个是 `mentioned` 标识位，用来快速判断该消息是否提醒了当前登录用户。如果 `mentionList` 属性列表中包含有当前登录用户的 `clientId`，或者 `mentionAll` 属性为 `true`，那么 `mentioned` 方法都会返回 `true`，否则返回 `false`。
@@ -279,7 +279,7 @@ public void onMessage(LCIMAudioMessage msg, LCIMConversation conv, LCIMClient cl
 ```
 
 ```objc
-// 示例代码演示 LCIMTypedMessage 接收时，获取该条消息是否 @ 了当前对话里的所有成员或当前用户，同理可以用类似的代码操作 LCIMMessage  的其他子类
+// 示例代码演示 LCIMTypedMessage 接收时，获取该条消息是否 @ 了当前对话里的所有成员或当前用户，同理可以用类似的代码操作 LCIMMessage 的其他子类
 - (void)conversation:(LCIMConversation *)conversation didReceiveTypedMessage:(LCIMTypedMessage *)message {
     // 读取消息是否 @ 了对话的所有成员
     BOOL mentionAll = message.mentionAll;
@@ -941,7 +941,7 @@ client.OnMessageDelivered = (conv, msgId) => {
 };
 // 发送消息
 LCIMTextMessage textMessage = new LCIMTextMessage("夜访蛋糕店，约吗？");
-await conversaion.Send(textMessage);
+await conversation.Send(textMessage);
 ```
 
 ```java
@@ -1107,7 +1107,7 @@ Tom 和 Jerry 聊天，Tom 想及时知道 Jerry 是否阅读了自己发去的�
 
    LCIMTextMessage *message = [LCIMTextMessage messageWithText:@"Hello, Jerry!" attributes:nil];
 
-   [conversaiton sendMessage:message option:option callback:^(BOOL succeeded, NSError * _Nullable error) {
+   [conversation sendMessage:message option:option callback:^(BOOL succeeded, NSError * _Nullable error) {
        if (!error) {
            /* 发送成功 */
        }
@@ -1302,7 +1302,7 @@ option.will = YES;
 
 LCIMMessage *willMessage = [LCIMTextMessage messageWithText:@"我是一条遗愿消息，当发送者意外下线的时候，我会被下发给对话里面的其他成员。" attributes:nil];
 
-[conversaiton sendMessage:willMessage option:option callback:^(BOOL succeeded, NSError * _Nullable error) {
+[conversation sendMessage:willMessage option:option callback:^(BOOL succeeded, NSError * _Nullable error) {
     if (succeeded) {
         NSLog(@"遗愿消息已发出。");
     }
@@ -1550,7 +1550,7 @@ tom.onUnreadMessageCountUpdated = ({
 
 </MultiLang>
 
-对开发者来说，在 `UNREAD_MESSAGES_COUNT_UPDATE` 事件响应的时候，SDK 传给应用层的 `Conversation` 对象，其 `lastMessage` 应该是当前时点当前用户在当前对话里面接收到的最后一条消息，开发者如果要展示更多的未读消息，就需要通过消息拉取的接口来主动获取了（参见[即时通讯开发指南第一篇](/sdk/im/guide/beginner/)的《聊天记录查询》一节。
+对开发者来说，在 `UNREAD_MESSAGES_COUNT_UPDATE` 事件响应的时候，SDK 传给应用层的 `Conversation` 对象，其 `lastMessage` 应该是当前时间点当前用户在当前对话里面接收到的最后一条消息，开发者如果要展示更多的未读消息，就需要通过消息拉取的接口来主动获取了（参见[即时通讯开发指南第一篇](/sdk/im/guide/beginner/)的《聊天记录查询》一节。
 
 清除对话未读消息数的唯一方式是调用 `Conversation#read` 方法将对话标记为已读，一般来说开发者至少需要在下面两种情况下将对话标记为已读：
 
@@ -1723,9 +1723,7 @@ tom.onClosed = ({
 
 如上述代码中，被动下线的时候，云端会告知原因，因此客户端在做展现的时候也可以做出类似于 QQ 一样友好的通知。
 
-以上提到的登录均指用户主动进行登录操作。
-已登录用户在应用启动、网络中断等场景下，SDK 会自动重新登录。
-这种情况下，如果触发登录冲突，云端并不会踢掉较早登录的设备，自动重新登录的设备则会收到登录冲突的报错，登录失败。
+以上提到的登录均指用户主动进行登录操作。已登录用户在应用启动、网络中断等场景下，SDK 会自动重新登录。这种情况下，如果触发登录冲突，云端并不会踢掉较早登录的设备，自动重新登录的设备则会收到登录冲突的报错，登录失败。
 
 相应地，应用开发者如果希望在用户主动登录触发冲突时，不踢掉较早登录的设备，而提示用户登录失败，可以在登录时传入参数指明这一点：
 
@@ -1814,7 +1812,7 @@ try {
 - `ImageMessage` 图像消息
 - `AudioMessage` 音频消息
 - `VideoMessage` 视频消息
-- `FileMessage` 普通文件消息(.txt/.doc/.md 等各种)
+- `FileMessage` 普通文件消息（.txt/.doc/.md 等各种）
 - `LocationMessage` 地理位置消息
 
 这些消息类型还支持应用层设置若干 key-value 自定义属性来实现扩展。譬如有一条文本消息需要附带城市信息，这时候开发者使用消息类中预留的 `attributes` 属性就可以保存额外信息了。
