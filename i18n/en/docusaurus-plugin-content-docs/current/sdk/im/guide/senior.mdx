@@ -1,6 +1,6 @@
 ---
-title: 三，安全与签名、黑名单和权限管理、玩转聊天室和临时对话
-sidebar_label: 权限与聊天室
+title: 3. Security, Permission Management, Chat Rooms, and Temporary Conversations
+sidebar_label: Permission and Chat Rooms
 sidebar_position: 3
 ---
 
@@ -8,139 +8,139 @@ import MultiLang from "/src/docComponents/MultiLang";
 import Mermaid from "/src/docComponents/Mermaid";
 import { Conditional } from "/src/docComponents/conditional";
 
-## 本章导读
+## Introduction
 
-在前一篇[消息收发的更多方式，离线推送与消息同步，多设备登录](/sdk/im/guide/intermediate/)中，我们演示了与消息相关的更多特殊需求的实现方法，现在，我们会更进一步，从系统安全和成员权限管理的角度，给大家详细说明：
+In the previous chapter [Advanced Messaging Features, Push Notifications, Synchronization, and Multi-Device Sign-on](/sdk/im/guide/intermediate/), we introduced a number of bonus features that you can implement beyond basic messaging. In this chapter, we will introduce more features from the perspectives of system security and permission management, including:
 
-- 如何通过第三方鉴权来控制客户端登录与操作
-- 如何对成员权限进行限制，以保证聊天流程能被运营人员很好管理起来
-- 如何实现一个不限人数的直播聊天室
-- 如何对大型群聊中的消息进行实时内容过滤
-- 如何使用临时对话
+- How to verify the requests made by clients with a third-party signing mechanism
+- How to control the permissions each user has
+- How to build a chat room with an unlimited number of people
+- How to filter out certain keywords from the messages sent by users
+- How to implement temporary conversations
 
-## 安全与签名
+## Signing Mechanism
 
-即时通讯服务有一大特色就是让应用账户系统和聊天服务解耦，终端用户只需要登录应用账户系统就可以直接使用即时通讯服务，同时从系统安全角度出发，我们还提供了第三方操作签名的机制来保证聊天通道的安全性。
+Instant Messaging is decoupled from the account system offered by Data Storage. This makes it possible for you to use Instant Messaging even though the account system of your app is not built with Data Storage. To ensure the security of your app, we offer a third-party signing mechanism that helps your app verify all the requests sent from clients.
 
-该机制的工作架构是，在客户端和即时通讯云端之间，增加应用自己的鉴权服务器（也就是即时通讯服务之外的「第三方」），在客户端开始一些有安全风险的操作命令（如登录聊天服务、建立对话、加入群组、邀请他人等）之前，先通过鉴权服务器获取签名，之后即时通讯云端会依据它和第三方鉴权服务之间的协议来验证该签名，只有附带有效签名的请求才会被执行，非法请求全部会被阻止下来。
+The mechanism comes with an authentication server (the so-called "third party") deployed between clients and the cloud. Each time a client wants to make a request involving sensitive operations (like logging in, creating conversations, joining conversations, or inviting users), it has to obtain a signature from the authentication server. The signature gets attached to the request and will be verified by the cloud according to a predefined protocol. Only those requests with valid signatures will be accepted by the cloud.
 
-使用操作签名可以保证聊天通道的安全，这一功能默认是关闭的，可以在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 即时通讯 > 设置 > 即时通讯设置** 中进行开启：
+The signing mechanism is turned off by default. You can turn it on by going to **Developer Center > Your game > Game Services > Cloud Services > Instant Messaging > Settings > Instant Messaging settings**:
 
-- **登录启用签名认证**，用于控制所有的用户登录
-- **对话操作启用签名认证**，用于控制新建或加入对话、邀请／踢出对话成员等操作
-- **聊天记录查询启用签名认证**，用于控制聊天记录查询操作
-- **黑名单操作启用签名认证**，用于控制修改对话的黑名单用户列表操作（关于黑名单，请参考下一节）
+- **Verify signatures for logging in**: Verify all the activities of logging in
+- **Verify signatures for conversation operations**: Verify all the activities of creating conversations, joining conversations, inviting users, and removing users
+- **Verify signatures for retrieving history messages**: Verify all the activities of retrieving history messages
+- **Verify signatures for blacklist operations**: Verify all the activities of changing blacklisted users of conversations (see the next section for more details regarding blacklists)
 
-开发者可根据实际需要进行选择。一般来说，**登录认证** 是最基本的安全机制，我们强烈建议开发者开启登录认证。
+You are free to change the settings here based on your app's actual needs, though we highly recommend that you at least keep **verifying signatures for logging in** on, which guarantees the basic security of your app.
 
 <Mermaid
   diagram={`
 sequenceDiagram
-终端->>应用鉴权服务器: 1. 携登录、新建会话、加入群组、邀请他人、踢出成员等行为请求签名
-应用鉴权服务器-->>终端: 2. 生成时间戳、随机字符串和签名返回给客户端
-终端->>即时通讯服务云端: 3. 将签名编码到请求中发给即时通讯服务器
-即时通讯服务云端-->>终端: 4. 对请求的内容和签名进行验证，执行后续操作
+Client->>Authentication Server: 1. Apply for signature with request
+Authentication Server-->>Client:  2. Return timestamp, nonce, and signature to the client
+Client->>Authentication Server: 3. Send the request to the cloud with the signature
+Authentication Server-->>Client: 4. Verify the signature along with the request
 `}
 />
 
-1. 客户端进行登录或新建对话等操作，SDK 会调用 `SignatureFactory` 的实现，并携带用户信息和用户行为（登录、新建对话或群组操作）请求签名；
-2. 应用自有的权限系统，或应用在云引擎上的签名程序收到请求，进行权限验证，如果通过则利用下文所述的 [签名算法](#用户登录签名) 生成时间戳、随机字符串和签名返回给客户端；
-3. 客户端获得签名后，编码到请求中，发给即时通讯服务器；
-4. 即时通讯服务器对请求的内容和签名做一遍验证，确认这个操作是被应用服务器允许的，进而执行后续的实际操作。
+1. When the client performs operations like logging in or creating conversations, the SDK applies for a signature by calling `SignatureFactory` with the user's information and a request containing the operations to be done.
+2. The authentication server checks if the operations are performed with enough permissions. If that's true, the server will follow the [signing algorithm](#signatures-for-logging-in) that will be mentioned later to generate the timestamp, nonce, and signature, and send them back to the client.
+3. The client attaches the signature to the request and sends them to the cloud.
+4. The cloud verifies the signature along with the request to ensure that the operations in the request are allowed. The request will be accepted only if the signature is valid.
 
-签名采用 **HMAC-SHA1** 算法，输出字节流的十六进制字符串（hex dump）。针对不同的请求，开发者需要拼装不同组合的字符串，加上 UTC timestamp 以及随机字符串作为签名的消息（参见后续格式说明）。总体上，签名就是使用特定的密钥（在这里我们使用应用的 `Master Key`），对输入的消息（即「签名的消息」）进行哈希计算，得到一串十六进制的字符串，这就是最终的「签名」。
+The algorithm used for the signing process is **HMAC-SHA1** and the output would be the hex dump of a byte stream. For different requests, different strings with different UTC timestamps and nonces need to be constructed.
 
-对于使用 `LCUser` 的应用，可使用 REST API 获取登录签名进行登录认证。
+If you are using `LCUser` in your app, you can get signatures for logging in through our REST API.
 
-### 签名格式说明
+### Formats of Signatures
 
-下面我们详细说明一下不同操作的签名消息格式。
+Below we will introduce the formats of strings used to obtain signatures for different types of operations.
 
-#### 用户登录签名
+#### Signatures for Logging in
 
-签名的消息格式如下，注意 `clientid` 与 `timestamp` 之间是<u>两个冒号</u>：
+Below is the format of strings for logging in. Notice that there are _two colons_ between `clientid` and `timestamp`:
 
 ```
 appid:clientid::timestamp:nonce
 ```
 
-| 参数        | 说明                                           |
-| ----------- | ---------------------------------------------- |
-| `appid`     | 应用的 ID。                                    |
-| `clientid`  | 登录时使用的 `clientId`。                      |
-| `timestamp` | 当前的 UTC 时间距离 Unix epoch 的 **毫秒数**。 |
-| `nonce`     | 随机字符串。                                   |
+| Parameter   | Description                                                              |
+| ----------- | ------------------------------------------------------------------------ |
+| `appid`     | Your App ID.                                                             |
+| `clientid`  | The `clientId` used for logging in.                                      |
+| `timestamp` | The number of **milliseconds** that have elapsed since Unix epoch (UTC). |
+| `nonce`     | A random string.                                                         |
 
-> 注意：签名的 key **必须** 是应用的 `Master Key`，你可以在 **开发者中心 > 你的游戏 > 游戏服务 > 应用配置** 里找到。**请保护好 Master Key，不要泄露给任何无关人员。**
+> Note: The key for signing has to be the **Master Key** of your app. You can find it from **Developer Center > Your game > Game Services > Configuration**. **Make sure your Master Key is well-protected and doesn't get leaked.**
 
-开发者可以实现自己的 `SignatureFactory`，调用远程服务器的签名接口获得签名。如果你没有自己的服务器，可以直接在云引擎上通过 **网站托管** 来实现自己的签名接口。在移动应用中直接进行签名的做法 **非常危险**，它可能导致你的 **Master Key** 泄漏。
+You may implement your own `SignatureFactory` to retrieve signatures from remote servers. If you don't have your own server, you may use the **web hosting** service provided by LeanEngine. Generating signatures within your mobile app is **extremely dangerous** since your **Master Key** can get exposed.
 
-签名的有效期是 6 个小时，强制下线后签名立即失效。
-签名失效不影响当前在线的 client。
+This signature expires in 6 hours, but it becomes invalid immediately once the client has been forced to log out.
+The signature invalidness does not affect the currently connected clients.
 
-#### 开启对话签名
+#### Signatures for Creating Conversations
 
-新建一个对话的时候，签名的消息格式为：
+Below is the format of strings for creating conversations:
 
 ```
 appid:clientid:sorted_member_ids:timestamp:nonce
 ```
 
-- `appid`、`clientid`、`timestamp` 和 `nonce` 的含义 [同上](#用户登录签名)。
-- `sorted_member_ids` 是以半角冒号（`:`）分隔、**升序排序** 的 `clientId`，即邀请参与该对话的成员列表。
+- `appid`, `clientid`, `timestamp`, and `nonce` are [the same as above](#signatures-for-logging-in).
+- `sorted_member_ids` is a list of `clientId`s (users being invited to the conversation) arranged in **ascending order** and divided by colon (`:`).
 
-#### 群组功能的签名
+#### Signatures for Group Operations
 
-在群组功能中，我们对 **加群**、**邀请** 和 **踢出群** 这三个动作也允许加入签名，签名的消息格式是：
+Below is the format of strings for **joining conversations**, **inviting users**, and **removing users**:
 
 ```
 appid:clientid:convid:sorted_member_ids:timestamp:nonce:action
 ```
 
-- `appid`、`clientid`、`sorted_member_ids`、`timestamp` 和 `nonce` 的含义同上。对创建群的情况，这里 `sorted_member_ids` 是空字符串。
-- `convid` 是此次行为关联的对话 ID。
-- `action` 是此次行为的动作，`invite` 表示加群和邀请，`kick` 表示踢出群。
+- `appid`, `clientid`, `sorted_member_ids`, `timestamp`, and `nonce` are the same as above. `sorted_member_ids` would be an empty string if you are creating a new conversation.
+- `convid` is the conversation ID.
+- `action` is the operation being performed: `invite` means joining a conversation or inviting users and `kick` means removing users.
 
-#### 查询聊天记录的签名
+#### Signatures for Retrieving Message Histories
 
 ```
 appid:client_id:convid:nonce:timestamp
 ```
 
-各参数的含义同上。
+The meanings of these parameters are the same as above.
 
-注意，此签名仅用于通过 REST API 查询历史消息，客户端 SDK 不适用。
+This signature is only used for REST API. It is not applicable to client-side SDKs.
 
-#### 黑名单的签名
+#### Signatures for Blacklist Operations
 
-由于黑名单有两种情况，所以签名的消息格式也有两种：
+There are two formats of strings for two types of blacklist operations:
 
-1. `client` 对 `conversation`
+1. `client` to `conversation`
 
 ```
 appid:clientid:convid::timestamp:nonce:action
 ```
 
-- `action` 是此次行为的动作，`client-block-conversations` 表示添加黑名单，`client-unblock-conversations` 表示取消黑名单。
+- `action` is the operation being performed: `client-block-conversations` means blocking the conversation and `client-unblock-conversations` means unblocking the conversation.
 
-2. `conversation` 对 `client`
+2. `conversation` to `client`
 
 ```
 appid:clientid:convid:sorted_member_ids:timestamp:nonce:action
 ```
 
-- `action` 是此次行为的动作，`conversation-block-clients` 表示添加黑名单，`conversation-unblock-clients` 表示取消黑名单。
-- `sorted_member_ids` 同上。
+- `action` is the operation being performed: `conversation-block-clients` means blocking the client and `conversation-unblock-clients` means unblocking the client.
+- `sorted_member_ids` is the same as above.
 
-### 云引擎签名范例
+### Demo for Generating Signatures on LeanEngine
 
-为了帮助开发者理解云端签名的算法，我们开源了一个用「Node.js + 云引擎」实现签名的云端，供开发者学习和使用：[即时通讯云引擎签名 Demo](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/functions/rtm-signature.js)。
+To help you better understand the signing algorithm, we made a server-side signing program based on Node.js and LeanEngine. It's available [here](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/functions/rtm-signature.js) for you to study and use.
 
-### 客户端如何支持操作签名
+### Supporting Signatures on the Client Side
 
-上面的签名算法，都是对第三方鉴权服务器如何进行签名的协议说明，在开启了操作签名的前提下，客户端这边的使用流程需要进行相应的改变，增加请求签名的环节，才能让整套机制顺利运行起来。
+So far we have been talking about the protocol used by the authentication server to generate signatures. Now let's see what we need to do with the client side to make the entire signing mechanism work.
 
-即时通讯 SDK 为每一个 `AVIMClient` 实例都预留了一个 `Signature` 工厂接口，这个接口默认不设置就表示不使用签名，启动签名的时候，只需要在客户端实现这一接口，调用远程服务器的签名接口获得签名，并把它绑定到 `AVIMClient` 实例上即可：
+The SDK reserves a factory interface `Signature` for each `AVIMClient` instance. To enable signing, implement the interface with a class that calls the signing method on the authentication server to get signatures, and then bind the class to the `AVIMClient` instance:
 
 <MultiLang>
 
@@ -232,12 +232,12 @@ public class LocalSignatureFactory : ILCIMSignatureFactory {
     }
 }
 
-// 设置签名工厂
+// Specify the signature factory
 LCIMClient tom = new LCIMClient("tom", signatureFactory: new LocalSignatureFactory());
 ```
 
 ```java
-// 这是一个依赖云引擎完成签名的示例
+// An example of performing signing with LeanEngine
 public class KeepAliveSignatureFactory implements SignatureFactory {
  @Override
  public Signature createSignature(String peerId, List<String> watchIds) throws SignatureException {
@@ -312,12 +312,12 @@ public class KeepAliveSignatureFactory implements SignatureFactory {
   }
 }
 
-// 将签名工厂类的实例绑定到 LCIMClient 上
+// Bind an instance of the signature factory class to LCIMClient
 LCIMOptions.getGlobalOptions().setSignatureFactory(new KeepAliveSignatureFactory());
 ```
 
 ```objc
-// 实现 LCIMSignatureDataSource 协议
+// Implement the LCIMSignatureDataSource protocol
 - (void)client:(LCIMClient *)client
         action:(LCIMSignatureAction)action
   conversation:(LCIMConversation * _Nullable)conversation
@@ -325,21 +325,21 @@ LCIMOptions.getGlobalOptions().setSignatureFactory(new KeepAliveSignatureFactory
 signatureHandler:(void (^)(LCIMSignature * _Nullable))handler
 {
     if ([action isEqualToString:LCIMSignatureActionOpen]) {
-        // 开启了签名认证的模块，需返回对应的签名
+        // For modules with signing enabled, return the corresponding signature
         LCIMSignature *signature;
         /*
          ...
          ...
-         具体实现可以参考章节「云引擎签名范例」
+         See "Demo for Generating Signatures on LeanEngine"
          */
         handler(signature);
     } else {
-        // 没有开启签名认证的模块，需返回 nil
+        // For modules with signing disabled, return nil
         handler(nil);
     }
 }
 
-// 设置协议代理者
+// Set the protocol delegator
 NSError *error;
 LCIMClient *imClient = [[LCIMClient alloc] initWithClientId:@"Tom" error:&error];
 if (!error) {
@@ -348,11 +348,11 @@ if (!error) {
 ```
 
 ```js
-// 基于云引擎进行登录签名的 signature 工厂方法
+// A LeanEngine-based signature factory for signing requests for logging in
 var signatureFactory = function (clientId) {
-  return AV.Cloud.rpc("sign", { clientId: clientId }); // AV.Cloud.rpc 返回一个 Promise
+  return AV.Cloud.rpc("sign", { clientId: clientId }); // AV.Cloud.rpc returns a Promise
 };
-// 基于云引擎进行对话创建／加入、邀请成员、踢出成员等操作签名的 signature 工厂方法
+// A LeanEngine-based signature factory for signing requests for creating conversations, joining conversations, inviting users, and removing users
 var conversationSignatureFactory = function (
   conversationId,
   clientId,
@@ -366,7 +366,7 @@ var conversationSignatureFactory = function (
     action: action,
   });
 };
-// 基于云引擎进行对话黑名单操作签名的 signature 工厂方法
+// A LeanEngine-based signature factory for signing requests for blacklist operations
 var blacklistSignatureFactory = function (
   conversationId,
   clientId,
@@ -388,30 +388,30 @@ realtime
     blacklistSignatureFactory: blacklistSignatureFactory,
   })
   .then(function (tom) {
-    console.log("Tom 登录");
+    console.log("Tom logged in.");
   })
   .catch(function (error) {
-    // 如果 signatureFactory 抛出了异常，或者签名没有验证通过，会在这里被捕获
+    // Errors thrown by signatureFactory or for invalid signatures will be caught here
   });
 ```
 
 ```swift
 class SignatureDelegator: IMSignatureDelegate {
 
-    // 基于云引擎的获取客户端登录签名的函数
+    // A LeanEngine-based function for getting signatures for logging in
     func getClientOpenSignature(completion: (IMSignature) -> Void) {
-        // 具体实现可以参考章节「云引擎签名范例」
+        // See "Demo for Generating Signatures on LeanEngine"
     }
 
     func client(_ client: IMClient, action: IMSignature.Action, signatureHandler: @escaping (IMClient, IMSignature?) -> Void) {
         switch action {
         case .open:
-            // 开启了签名认证的模块，需返回对应的签名
+            // For modules with signing enabled, return the corresponding signature
             self.getClientOpenSignature { (signature) in
                 signatureHandler(client, signature)
             }
         default:
-            // 没有开启签名认证的模块，需返回 nil
+            // For modules with signing disabled, return nil
             signatureHandler(client, nil)
         }
     }
@@ -431,11 +431,11 @@ do {
 
 </MultiLang>
 
-需要强调的是：开发者切勿在客户端直接使用 `Master Key` 进行签名操作，因为 `Master Key` 一旦泄露，会造成应用的数据处于高危状态，后果不容小视。因此，强烈建议开发者将签名的具体代码托管在安全性高稳定性好的云端服务器上（例如云引擎）。
+You should never perform signing using your Master Key on the client side. If your Master Key gets leaked, the data in your app would be accessible by anyone who has the key. Therefore, we highly recommend that you host the signing program on a server that is well-secured (like LeanEngine).
 
-### 内建账户系统（`User`）的签名机制
+### Signing Mechanism for `User`
 
-`User` 是存储服务提供的默认账户系统，对于使用了它来完成用户注册、登录的产品来说，终端用户通过 `User` 账户系统的登录认证之后，转到即时通讯服务上，是无需再进行登录签名操作的。使用 `User` 账号系统登录即时通讯服务的示例如下：
+`User` is the built-in account system coming with Data Storage. If your users have their accounts signed up or logged in with `User`, they can skip the signing process when logging in to Instant Messaging. The code below shows how a user can log in to Instant Messaging with `User`:
 
 <MultiLang>
 
@@ -446,20 +446,20 @@ await client.Open();
 ```
 
 ```java
-// 以 LCUser 的用户名和密码登录到内建账户系统
+// Log in to the account system with the username and password of an LCUser
 LCUser.logInInBackground("username", "password", new LogInCallback<LCUser>() {
     @Override
     public void done(LCUser user, LCException e) {
         if (null != e) {
           return;
         }
-        // 以 LCUser 实例创建了一个 client
+        // Create a client with the LCUser instance
         LCIMClient client = LCIMClient.getInstance(user);
-        // 登录即时通讯云端
+        // Log in to Instant Messaging
         client.open(new LCIMClientCallback() {
           @Override
           public void done(final LCIMClient avimClient, LCIMException e) {
-            // 执行其他逻辑
+            // Do something as you need
           }
        });
     }
@@ -467,15 +467,15 @@ LCUser.logInInBackground("username", "password", new LogInCallback<LCUser>() {
 ```
 
 ```objc
-// 以 LCUser 的用户名和密码登录到内建账户系统
+// Log in to the account system with the username and password of an LCUser
 [LCUser logInWithUsernameInBackground:username password:password block:^(LCUser * _Nullable user, NSError * _Nullable error) {
-    // 以 LCUser 实例创建了一个 client
+    // Create a client with the LCUser instance
     NSError *err;
     LCIMClient *client = [[LCIMClient alloc] initWithUser:user error:&err];
     if (!err) {
-        // 登录即时通讯云端
+        // Log in to Instant Messaging
         [client openWithCallback:^(BOOL succeeded, NSError * _Nullable error) {
-            // 执行其他逻辑
+            // Do something as you need
         }];
     }
 }];
@@ -483,10 +483,10 @@ LCUser.logInInBackground("username", "password", new LogInCallback<LCUser>() {
 
 ```js
 var AV = require("leancloud-storage");
-// 以用户名和密码登录内建账户系统
+// Log in to the account system with the username and password of an LCUser
 AV.User.logIn("username", "password")
   .then(function (user) {
-    // 直接使用 LCUser 实例登录即时通讯服务
+    // Log in to Instant Messaging with the LCUser instance
     return realtime.createIMClient(user);
   })
   .catch(console.error.bind(console));
@@ -499,7 +499,7 @@ _ = LCUser.logIn(username: "username", password: "password") { (result) in
         do {
             let client = try IMClient(user: user)
             client.open(completion: { (result) in
-                // 执行其他逻辑
+                // Do something as you need
             })
         } catch {
             print(error)
@@ -511,34 +511,34 @@ _ = LCUser.logIn(username: "username", password: "password") { (result) in
 ```
 
 ```dart
-// 暂不支持
+// Not supported yet
 ```
 
 </MultiLang>
 
-内置账户系统与即时通讯服务可以共享登录签名信息，这里我们直接用 `logIn` 成功之后的 `LCUser` 实例来创建 `IMClient`，在即时通讯服务的用户登录环节，云端会自动关联账户系统来确认用户身份的合法性，这样可以省掉 SDK 向第三方申请登录签名的操作，进一步简化开发流程。
+When creating `IMClient` with an `LCUser` instance that has completed the `logIn` process, the user's signature information can be directly accessed by Instant Messaging from the account system. This allows Instant Messaging to automatically verify the client being logged in and the process of applying for signatures from the third-party server can be skipped.
 
-`IMClient` 完成即时通讯系统登录之后，其他功能的使用就和之前的介绍没有任何区别了。
+Once `IMClient` is logged in, all the other features work in the same way as discussed earlier.
 
-## 权限管理与黑名单
+## Permission Management and Blacklisting
 
-第三方鉴权是一种服务端对全局进行控制的机制，具体到单个对话的群组，例如开放聊天室，出于产品运营的需求，我们还需要对成员权限进行区分，以及允许管理员来限时／永久屏蔽部分用户。下面我们详细说明一下这样的需求该如何实现。
+The third-party signing mechanism helps to maintain the general security of your app, but each conversation still needs to keep its own order. For example, a chat room may need managers that can temporarily or permanently mute users that are behaving improperly. In this section, we will talk about how permission management within conversations can be implemented.
 
-### 设置成员权限
+### Setting Member Permissions
 
-「成员权限」是指将对话内成员划分成不同角色，实现类似 QQ 群管理员的效果。使用这个功能需要在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 即时通讯 > 设置 > 即时通讯设置** 中开启「对话成员属性功能（成员角色管理功能）」。
+When permission management is enabled, members in each conversation will be divided into different roles with different permissions. To enable permission management, go to **Developer Center > Your game > Game Services > Cloud Services > Instant Messaging > Settings > Instant Messaging settings** and turn on **Enable permission management for conversations**.
 
-目前系统内的角色与管理功能的对应关系：
+Here is a table showing the permissions each role has:
 
-| 角色      | 功能列表                                   |
-| --------- | ------------------------------------------ |
-| `Owner`   | 永久性禁言、踢人、加人、拉黑、更新他人权限 |
-| `Manager` | 永久性禁言、踢人、加人、拉黑、更新他人权限 |
-| `Member`  | 加人                                       |
+| Role      | Permissions                                                                                            |
+| --------- | ------------------------------------------------------------------------------------------------------ |
+| `Owner`   | Mute members, remove members, invite members, blacklist members, and update other members' permissions |
+| `Manager` | Mute members, remove members, invite members, blacklist members, and update other members' permissions |
+| `Member`  | Join conversations                                                                                     |
 
-角色的操作权限大小是按照 `Owner` -> `Manager` -> `Member` 的顺序逐级递减的，高级别的角色可以修改低级别角色的权限，但反过来的修改是不允许的。同时，对于加人和踢人的操作，在前面文档中我们可以看到，是所有成员都可以执行的操作，在成员角色管理功能开启之后，就变成 `Owner` 和 `Manager` 专属的功能的，普通成员发起这两种请求都会报错。
+Among all these roles, `Owner` has the highest permissions and `Member` has the lowest. A member with higher permissions can change the role of a member with lower permissions, but not vice versa. In the previous chapters, we have seen that all the members in a conversation can invite or remove people, but once permission management is enabled, only `Owner` and `Manager` can perform these operations. Other members will get an error when attempting to do so.
 
-一个对话的 `Owner` 是不可变更的，我们 SDK 提供了 `Conversation#updateMemberRole` 方法，支持把一个终端用户在 `Manager` 和 `Member` 之间切换角色：
+The `Owner` of a conversation cannot be changed. For other members, their roles can be switched between `Manager` and `Member` with `Conversation#updateMemberRole`:
 
 <MultiLang>
 
@@ -554,21 +554,21 @@ public async Task UpdateMemberRole(string memberId, string role);
 
 ```java
 /**
- * 更新成员的角色信息
- * @param memberId  成员的 clientId
- * @param role      角色
- * @param callback  结果回调函数
+ * Update the role of a member
+ * @param memberId  The member's clientId
+ * @param role      The role
+ * @param callback  Callback function
  */
 public void updateMemberRole(final String memberId, final ConversationMemberRole role, final LCIMConversationCallback callback);
 ```
 
 ```objc
 /**
- 更新成员的角色信息
+ Update the role of a member
 
- @param memberId 成员的 clientId
- @param role 角色
- @param callback 结果回调函数
+ @param memberId The member's clientId
+ @param role The role
+ @param callback Callback function
  */
 - (void)updateMemberRoleWithMemberId:(NSString *)memberId
                                 role:(LCIMConversationMemberRole)role
@@ -577,10 +577,10 @@ public void updateMemberRole(final String memberId, final ConversationMemberRole
 
 ```js
 /**
- * 更新指定用户的角色
+ * Update the role of a member
  * @since 4.0.0
- * @param {String} memberId 成员 ID
- * @param {module:leancloud-realtime.ConversationMemberRole | String} role 角色
+ * @param {String} memberId The member's clientId
+ * @param {module:leancloud-realtime.ConversationMemberRole | String} role The role
  * @return {Promise.<this>} self
  */
 async updateMemberRole(memberId, role);
@@ -605,11 +605,11 @@ Future<void> updateMemberRole({String role, String memberId})
 
 </MultiLang>
 
-### 获取成员权限
+### Getting Member Permissions
 
-`Conversation` 对象提供了两种方法来获取成员权限信息：
+A `Conversation` object offers two ways for getting permission information of members:
 
-- `Conversation#getAllMemberInfo()` 可用来获取所有成员的权限信息
+- `Conversation#getAllMemberInfo()` can be used to get all members' permission information
 
   <MultiLang>
 
@@ -623,27 +623,27 @@ Future<void> updateMemberRole({String role, String memberId})
 
   ```java
   /**
-  * 获取当前对话的所有角色信息
-  * @param offset    查询结果的起始点
-  * @param limit     查询结果集上限
-  * @param callback  结果回调函数
+  * Get all members' permission information
+  * @param offset    The number of results skipped
+  * @param limit     The maximum number of results
+  * @param callback  Callback function
   */
   public void getAllMemberInfo(int offset, int limit, final LCIMConversationMemberQueryCallback callback);
   ```
 
   ```objc
   /**
-  获取当前对话的所有角色信息。默认使用缓存。
+  Get all members' permission information; cache is used by default
 
-  @param callback 结果回调函数
+  @param callback Callback function
   */
   - (void)getAllMemberInfoWithCallback:(void (^)(NSArray<LCIMConversationMemberInfo *> * _Nullable memberInfos, NSError * _Nullable error))callback;
 
   /**
-  获取当前对话的所有角色信息。
+  Get all members' permission information
 
-  @param ignoringCache 缓存选项
-  @param callback 结果回调函数
+  @param ignoringCache Whether to use cache
+  @param callback Callback function
   */
   - (void)getAllMemberInfoWithIgnoringCache:(BOOL)ignoringCache
                                   callback:(void (^)(NSArray<LCIMConversationMemberInfo *> * _Nullable memberInfos, NSError * _Nullable error))callback;
@@ -651,9 +651,9 @@ Future<void> updateMemberRole({String role, String memberId})
 
   ```js
   /**
-   * 获取所有成员的对话属性
+   * Get all members' permission information
    * @since 4.0.0
-   * @return {Promise.<ConversationMemberInfo[]>} 所有成员的对话属性列表
+   * @return {Promise.<ConversationMemberInfo[]>} A list containing all members' permission information
    */
   async getAllMemberInfo({ noCache = false } = {})
   ```
@@ -670,12 +670,12 @@ Future<void> updateMemberRole({String role, String memberId})
   ```
 
   ```dart
-  // 暂不支持
+  // Not supported yet
   ```
 
   </MultiLang>
 
-- `Conversation#getMemberInfo(memberId)` 可用来获取指定成员的权限信息
+- `Conversation#getMemberInfo(memberId)` can be used to get a specific member's permission information
 
   <MultiLang>
 
@@ -690,19 +690,19 @@ Future<void> updateMemberRole({String role, String memberId})
 
   ```java
   /**
-  * 获取对话内指定成员的角色信息
-  * @param memberId  成员的 clientid
-  * @param callback  结果回调函数
+  * Get a specific member's permission information
+  * @param memberId  The member's clientId
+  * @param callback  Callback function
   */
   public void getMemberInfo(final String memberId, final LCIMConversationMemberQueryCallback callback);
   ```
 
   ```objc
   /**
-  获取对话内指定成员的角色信息。默认使用缓存。
+  Get a specific member's permission information; cache is used by default
 
-  @param memberId 成员的 clientid
-  @param callback 结果回调函数
+  @param memberId The member's clientId
+  @param callback Callback function
   */
   - (void)getMemberInfoWithMemberId:(NSString *)memberId
                           callback:(void (^)(LCIMConversationMemberInfo * _Nullable memberInfo, NSError * _Nullable error))callback;
@@ -710,10 +710,10 @@ Future<void> updateMemberRole({String role, String memberId})
 
   ```js
   /**
-   * 获取指定成员的对话属性
+   * Get a specific member's permission information
    * @since 4.0.0
-   * @param {String} memberId 成员 ID
-   * @return {Promise.<ConversationMemberInfo>} 指定成员的对话属性
+   * @param {String} memberId The member's clientId
+   * @return {Promise.<ConversationMemberInfo>} The member's permission information
    */
   async getMemberInfo(memberId);
   ```
@@ -728,18 +728,18 @@ Future<void> updateMemberRole({String role, String memberId})
   ```
 
   ```dart
-  // 暂不支持
+  // Not supported yet
   ```
 
   </MultiLang>
 
-这两类函数的返回值都是包含 `<ConversationId, MemberId, ConversationMemberRole>` 信息的三元组（数组）。
+Each return value contains permission information of members in a triple or array `<ConversationId, MemberId, ConversationMemberRole>`.
 
-### 让部分用户禁言
+### Muting Members
 
-`Owner` 和 `Manager` 作为聊天群组管理员的权限之一，就是能够让部分用户禁言。被禁言的用户，只能接收群组里面的消息，而不能再往外发送消息，否则会报错。
+Members whose roles are `Owner` or `Manager` can mute other members so they can only receive messages from the conversation. They will get an error when they attempt to send a message.
 
-`LCIMConversation` 类提供了对成员进行禁言操作的相关方法：
+`LCIMConversation` offers the following methods related to muting members:
 
 <MultiLang>
 
@@ -767,49 +767,49 @@ public async Task<LCIMPageResult> QueryMutedMembers(int limit = 10, string next 
 
 ```java
 /**
- * 将部分成员禁言
- * @param memberIds  成员列表
- * @param callback   结果回调函数
+ * Mute certain members in the current conversation
+ * @param memberIds  The members' clientIds
+ * @param callback   Callback function
  */
 public void muteMembers(final List<String> memberIds, final LCIMOperationPartiallySucceededCallback callback);
 /**
- * 将部分成员解除禁言
- * @param memberIds  成员列表
- * @param callback   结果回调函数
+ * Unmute certain members in the current conversation
+ * @param memberIds  The members' clientIds
+ * @param callback   Callback function
  */
 public void unmuteMembers(final List<String> memberIds, final LCIMOperationPartiallySucceededCallback callback);
 /**
- * 查询被禁言的成员列表
- * @param offset    查询结果的起始点
- * @param limit     查询结果集上限
- * @param callback  结果回调函数
+ * Get a list of members being muted in the current conversation
+ * @param offset    The number of results skipped
+ * @param limit     The maximum number of results
+ * @param callback  Callback function
  */
 public void queryMutedMembers(int offset, int limit, final LCIMConversationSimpleResultCallback callback);
 ```
 
 ```objc
 /**
- 将部分成员禁言。
+ Mute certain members in the current conversation
 
- @param memberIds 成员列表
- @param callback 结果回调函数
+ @param memberIds The members' clientIds
+ @param callback Callback function
  */
 - (void)muteMembers:(NSArray<NSString *> *)memberIds
            callback:(void (^)(NSArray<NSString *> * _Nullable successfulIds, NSArray<LCIMOperationFailure *> * _Nullable failedIds, NSError * _Nullable error))callback;
 /**
- 将部分成员解除禁言。
+ Unmute certain members in the current conversation
 
- @param memberIds 成员列表
- @param callback 结果回调函数
+ @param memberIds The members' clientIds
+ @param callback Callback function
  */
 - (void)unmuteMembers:(NSArray<NSString *> *)memberIds
              callback:(void (^)(NSArray<NSString *> * _Nullable successfulIds, NSArray<LCIMOperationFailure *> * _Nullable failedIds, NSError * _Nullable error))callback;
 /**
- 查询被禁言的成员列表。
+ Get a list of members being muted in the current conversation
 
- @param limit 查询结果集上限
- @param next 查询结果的起始点；若 next 是 nil 或为空，则意味着没有更多被禁言的成员
- @param callback 结果回调函数
+ @param limit The maximum number of results
+ @param next The number of results skipped; next becomes nil or empty if there are no more muted members
+ @param callback Callback function
  */
 - (void)queryMutedMembersWithLimit:(NSInteger)limit
                               next:(NSString * _Nullable)next
@@ -818,25 +818,25 @@ public void queryMutedMembers(int offset, int limit, final LCIMConversationSimpl
 
 ```js
 /**
- * 在该对话中禁言成员
- * @param {String|String[]} clientIds 成员 clientId
- * @return {Promise.<PartiallySuccess>} 部分成功结果，包含了成功的 ID 列表、失败原因与对应的 ID 列表
+ * Mute certain members in the current conversation
+ * @param {String|String[]} clientIds The members' clientIds
+ * @return {Promise.<PartiallySuccess>} Result of the operation, including the clientIds that are operated successfully, plus the failures occurred and the clientIds associated with each of them
  */
 async muteMembers(clientIds);
 
 /**
- * 对话中解除禁言
- * @param {String|String[]} clientIds 成员 clientId
- * @return {Promise.<PartiallySuccess>} 部分成功结果，包含了成功的 ID 列表、失败原因与对应的 ID 列表
+ * Unmute certain members in the current conversation
+ * @param {String|String[]} clientIds The members' clientIds
+ * @return {Promise.<PartiallySuccess>} Result of the operation, including the clientIds that are operated successfully, plus the failures occurred and the clientIds associated with each of them
  */
 async unmuteMembers(clientIds);
 
 /**
- * 查询该对话禁言成员列表
+ * Get a list of members being muted in the current conversation
  * @param {Object} [options]
- * @param {Number} [options.limit] 返回的成员数量，服务器默认值 10
- * @param {String} [options.next] 从指定 next 开始查询，与 limit 一起使用可以完成翻页。
- * @return {PagedResults.<string>} 查询结果。其中的 cureser 存在表示还有更多结果。
+ * @param {Number} [options.limit] The maximum number of results; defaults to 10
+ * @param {String} [options.next] The number of results skipped; can be used with limit for pagination
+ * @return {PagedResults.<string>} Results; the existence of cureser indicates that there are more results
  */
 async queryMutedMembers({ limit, next } = {});
 ```
@@ -893,26 +893,26 @@ Future<QueryMemberResult> queryMutedMembers({int limit = 50, String next})
 
 </MultiLang>
 
-注意这里对用户禁言／解除禁言的结果与以往的操作结果不一样，这里是 **_部分成功结果_**，里面包含三部分数据：
+Note that the result of the operation contains three parts of data:
 
-- `error`/`exception`，表示整体是否成功。如果整体操作失败，这里会有异常信息返回，此时不必再看下面两部分结果。
-- `successfulClientIds`，表示操作成功了的成员 ID 列表。
-- `failedIds`，表示所有操作失败了的成员信息，以 `List<ReasonString, List<ClientId>>` 的形式列出了所有的失败原因以及对应的成员 ID 列表。
+- `error`/`exception`: Whether the operation is holistically successful. If false, you will get error messages from here and the following two parts can be ignored.
+- `successfulClientIds`: The clientIds that are operated successfully.
+- `failedIds`: The failures occurred and the clientIds associated with each of them; listed in the format of `List<ReasonString, List<ClientId>>`.
 
-#### 禁言的通知事件
+#### Events for Muting Members
 
-管理员把部分用户禁言之后，即时通讯服务端会把这一事件下发给该群组里面的所有成员。
+All the members in the conversation will receive notifications when someone gets muted.
 
-### 黑名单
+### Blacklisting
 
-「黑名单」功能可以实现类似微信「屏蔽」的效果，目前分为两大类
+There are two types of blacklists available:
 
-- 对话 --> 成员，是指为某个对话设置的黑名单，禁止名单中的用户加入该对话。
-- 成员 --> 对话，是指某个用户自己设置的对话黑名单，表示禁止其他人把自己拉入这些对话，实现类似于「永久退群」的效果。
+- Conversation to user: The list of users that are blocked by a conversation. Blocked users cannot join the conversation.
+- User to conversation: The list of conversations that are blocked by a user. The user cannot be invited to a blocked conversation.
 
-使用这个功能需要在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 即时通讯 > 设置 > 即时通讯设置** 中开启「黑名单功能」。
+To enable blacklists, go to **Developer Center > Your game > Game Services > Cloud Services > Instant Messaging > Settings > Instant Messaging settings** and turn on **Enable blacklists**.
 
-`LCIMConversation` 类提供了对对话黑名单进行操作的方法：
+The `LCIMConversation` class offers the following methods related to blacklisting:
 
 <MultiLang>
 
@@ -940,51 +940,51 @@ public async Task<LCIMPageResult> QueryBlockedMembers(int limit = 10, string nex
 
 ```java
 /**
- * 将部分成员加入黑名单
- * @param memberIds  成员列表
- * @param callback   结果回调函数
+ * Put certain users into the blacklist of the current conversation
+ * @param memberIds  The users' clientIds
+ * @param callback   Callback function
  */
 public void blockMembers(final List<String> memberIds, final LCIMOperationPartiallySucceededCallback callback);
 /**
- * 将部分成员从黑名单移出来
- * @param memberIds  成员列表
- * @param callback   结果回调函数
+ * Remove certain users from the blacklist of the current conversation
+ * @param memberIds  The users' clientIds
+ * @param callback   Callback function
  */
 public void unblockMembers(final List<String> memberIds, final LCIMOperationPartiallySucceededCallback callback);
 /**
- * 查询黑名单的成员列表
- * @param offset    查询结果的起始点
- * @param limit     查询结果集上限
- * @param callback  结果回调函数
+ * Get the blacklist of the current conversation
+ * @param offset    The number of results skipped
+ * @param limit     The maximum number of results
+ * @param callback  Callback function
  */
 public void queryBlockedMembers(int offset, int limit, final LCIMConversationSimpleResultCallback callback);
 ```
 
 ```objc
 /**
- 将部分成员加入黑名单
+ Put certain users into the blacklist of the current conversation
 
- @param memberIds 成员列表
- @param callback 结果回调函数
+ @param memberIds The users' clientIds
+ @param callback Callback function
  */
 - (void)blockMembers:(NSArray<NSString *> *)memberIds
             callback:(void (^)(NSArray<NSString *> * _Nullable successfulIds, NSArray<LCIMOperationFailure *> * _Nullable failedIds, NSError * _Nullable error))callback;
 
 /**
- 将部分成员从黑名单移出来
+ Remove certain users from the blacklist of the current conversation
 
- @param memberIds 成员列表
- @param callback 结果回调函数
+ @param memberIds The users' clientIds
+ @param callback Callback function
  */
 - (void)unblockMembers:(NSArray<NSString *> *)memberIds
               callback:(void (^)(NSArray<NSString *> * _Nullable successfulIds, NSArray<LCIMOperationFailure *> * _Nullable failedIds, NSError * _Nullable error))callback;
 
 /**
- 查询黑名单的成员列表
+ Get the blacklist of the current conversation
 
- @param limit 查询结果集上限
- @param next 查询结果的起始点；若 next 是 nil 或为空，则意味着没有更多黑名单成员
- @param callback 结果回调函数
+ @param limit The maximum number of results
+ @param next The number of results skipped; next becomes nil or empty if there are no more muted members
+ @param callback Callback function
  */
 - (void)queryBlockedMembersWithLimit:(NSInteger)limit
                                 next:(NSString * _Nullable)next
@@ -993,25 +993,25 @@ public void queryBlockedMembers(int offset, int limit, final LCIMConversationSim
 
 ```js
 /**
- * 将用户加入该对话黑名单
- * @param {String|String[]} clientIds 成员 clientId
- * @return {Promise.<PartiallySuccess>} 部分成功结果，包含了成功的 ID 列表、失败原因与对应的 ID 列表
+ * Put certain users into the blacklist of the current conversation
+ * @param {String|String[]} clientIds The users' clientIds
+ * @return {Promise.<PartiallySuccess>} Result of the operation, including the clientIds that are operated successfully, plus the failures occurred and the clientIds associated with each of them
  */
 async blockMembers(clientIds);
 
 /**
- * 将用户移出该对话黑名单
- * @param {String|String[]} clientIds 成员 clientId
- * @return {Promise.<PartiallySuccess>} 部分成功结果，包含了成功的 ID 列表、失败原因与对应的 ID 列表
+ * Remove certain users from the blacklist of the current conversation
+ * @param {String|String[]} clientIds The users' clientIds
+ * @return {Promise.<PartiallySuccess>} Result of the operation, including the clientIds that are operated successfully, plus the failures occurred and the clientIds associated with each of them
  */
 async unblockMembers(clientIds);
 
 /**
- * 查询该对话黑名单
+ * Get the blacklist of the current conversation
  * @param {Object} [options]
- * @param {Number} [options.limit] 返回的成员数量，服务器默认值 10
- * @param {String} [options.next] 从指定 next 开始查询，与 limit 一起使用可以完成翻页
- * @return {PagedResults.<string>} 查询结果。其中的 cureser 存在表示还有更多结果。
+ * @param {Number} [options.limit] The maximum number of results; defaults to 10
+ * @param {String} [options.next] The number of results skipped; can be used with limit for pagination
+ * @return {PagedResults.<string>} Results; the existence of cureser indicates that there are more results
  */
 async queryBlockedMembers({ limit, next } = {});
 ```
@@ -1068,40 +1068,40 @@ Future<QueryMemberResult> queryBlockedMembers({int limit = 50, String next})
 
 </MultiLang>
 
-> 注意这里对黑名单操作的结果与禁言操作一样，是 **_部分成功结果_**。
+> The result of the operation is similar to that for muting members. You get the clientIds that are operated successfully, plus the failures occurred and the clientIds associated with each of them.
 
-用户被加入黑名单之后，就被从对话的成员中移除出去了，以后都无法再接收到对话里面的新消息，并且除非解除黑名单，其他人都无法再把 ta 加为对话成员了。
+Once a user is added to the blacklist of a conversation, the user will be removed from the conversation and cannot receive messages from it anymore. Unless the user is removed from the blacklist, other members will not be able to add this user back to the conversation.
 
-#### 黑名单的通知事件
+#### Events for Blacklisting
 
-管理员把部分用户加入黑名单之后，即时通讯服务端会把这一事件下发给该群组里面的所有成员。
+All the members in the conversation will receive notifications when someone gets blacklisted.
 
-#### 屏蔽某用户发送的消息
+#### Blocking Messages from Specific Users
 
-还有一种场景是某个用户不希望收到特定用户发来的消息。这可以通过即时通讯 hook 函数实现，详见[即时通讯开发指南第四篇](/sdk/im/guide/systemconv/)。
+Another scenario is that a user doesn't want to receive messages from a specific user. This can be implemented with hooks. See [Hooks](/sdk/im/guide/systemconv/) for more details.
 
-## 玩转直播聊天室
+## Chat Rooms
 
-在即时通讯服务总览中，我们比较了不同的业务场景与对话类型，现在就来看看如何使用「聊天室」完成一个直播弹幕的需求。
+We have compared different types of scenarios and conversations in our service overview. Now let's learn how to build a chat room.
 
-### 创建聊天室
+### Creating Chat Rooms
 
-`IMClient` 提供了专门的 `createChatRoom` 方法来创建聊天室：
+`IMClient` has the `createChatRoom` method for creating chat rooms:
 
 <MultiLang>
 
 ```cs
-// 最直接的方式，传入 name 即可
-tom.CreateChatRoom("聊天室");
+// Pass in the name of the chat room
+tom.CreateChatRoom("Chat Room");
 ```
 
 ```java
-tom.createChatRoom("聊天室", null,
+tom.createChatRoom("Chat Room", null,
     new LCIMConversationCreatedCallback() {
         @Override
         public void done(LCIMConversation conv, LCIMException e) {
             if (e == null) {
-                // 创建成功
+                // Chat room created
             }
         }
 });
@@ -1110,7 +1110,7 @@ tom.createChatRoom("聊天室", null,
 ```objc
 [client createChatRoomWithCallback:^(LCIMChatRoom * _Nullable chatRoom, NSError * _Nullable error) {
     if (chatRoom && !error) {
-        LCIMTextMessage *textMessage = [LCIMTextMessage messageWithText:@"这是一条消息" attributes:nil];
+        LCIMTextMessage *textMessage = [LCIMTextMessage messageWithText:@"This is a message." attributes:nil];
         [chatRoom sendMessage:textMessage callback:^(BOOL success, NSError *error) {
             if (success && !error) {
 
@@ -1121,12 +1121,12 @@ tom.createChatRoom("聊天室", null,
 ```
 
 ```js
-tom.createChatRoom({ name: "聊天室" }).catch(console.error);
+tom.createChatRoom({ name: "Chat Room" }).catch(console.error);
 ```
 
 ```swift
 do {
-    try client.createChatRoom(name: "聊天室", attributes: nil) { (result) in
+    try client.createChatRoom(name: "Chat Room", attributes: nil) { (result) in
         switch result {
         case .success(value: let chatRoom):
             print(chatRoom)
@@ -1140,21 +1140,21 @@ do {
 ```
 
 ```dart
-ChatRoom chatRoom = await jerry.createChatRoom(name: '聊天室');
+ChatRoom chatRoom = await jerry.createChatRoom(name: 'Chat Room');
 ```
 
 </MultiLang>
 
-在创建聊天室的时候，开发者可以指定聊天室的名字和附加属性（非必须），与创建普通对话的接口相比，有如下差异：
+When creating a chat room, you can specify its name and optional attributes. The interface for creating chat rooms has the following differences compared to that for creating basic conversations:
 
-- 聊天室因为没有成员列表，所以创建的时候指定 `members` 是没有意义的
-- 同样的原因，创建聊天室的时候指定 `unique` 标志也是没有意义的（云端无需根据成员 ID 来去重）
+- A chat room doesn't have a member list, so there is no need to specify `members`.
+- For the same reason, there is no need to specify `unique` (the cloud doesn't need to merge conversations by member lists).
 
-> 尽管我们调用 `createConversation` 接口，通过传递合适的参数（`{ transient: true }`），也可以创建一个聊天室，但是还是建议大家直接使用 `createChatRoom` 方法。
+> Although it's possible to create a chat room by passing `{ transient: true }` into `createConversation`, we still recommend that you use `createChatRoom` directly.
 
-### 查找聊天室
+### Finding Chat Rooms
 
-在即时通讯开发指南第一篇中，我们已经了解了构造复杂条件来查询对话的方法，`ConversationsQuery` 依然适用于查询聊天室，只需要添加 `transient = true` 的限制条件即可。
+In the first chapter, we have discussed how you can use `ConversationsQuery` to look for conversations with your custom conditions. This works for chat rooms as well, as long as you add `transient = true` as a constraint.
 
 <MultiLang>
 
@@ -1169,9 +1169,9 @@ query.findInBackground(new LCIMConversationQueryCallback() {
     @Override
     public void done(List<LCIMConversation> conversations, LCIMException e) {
         if (null == e) {
-            // 获取成功
+            // Success
         } else {
-            // 获取失败
+            // Error handling
         }
     }
 });
@@ -1183,11 +1183,11 @@ LCIMConversationQuery *query = [tom conversationQuery];
 ```
 
 ```js
-var query = tom.getQuery().equalTo("tr", true); // 聊天室对象
+var query = tom.getQuery().equalTo("tr", true); // Restrict to chat rooms
 query
   .find()
   .then(function (conversations) {
-    // conversations 就是想要的结果
+    // conversations contains all the results
   })
   .catch(console.error);
 ```
@@ -1215,7 +1215,7 @@ do {
 try {
   ConversationQuery query = tom.conversationQuery();
   query.whereEqualTo('tr', true);
-  // conversations 就是想要的结果
+  // conversations contains all the results
   List<Conversation> conversations = await query.find();
 } catch (e) {
   print(e);
@@ -1224,24 +1224,24 @@ try {
 
 </MultiLang>
 
-> Java / Android / C# SDK 专门提供了 `LCIMClient#getChatRoomQuery` 方法来生成聊天室查询对象，屏蔽了 `transient` 属性的细节，建议开发者优先使用这些高层 API。
+> Java, Android, and C# SDKs offer their `LCIMClient#getChatRoomQuery` methods that are dedicated to querying chat rooms. By using them, you won't need to deal with the `transient` attribute of conversations.
 
-### 加入和离开聊天室
+### Joining and Leaving Chat Rooms
 
-查询到聊天室之后，加入和离开聊天室与普通对话的对应接口没有区别，详细请参考[即时通讯开发指南第一篇](/sdk/im/guide/beginner/)《多人群聊》。
+When coming to the interfaces for joining or leaving conversations, group chats are the same as basic conversations. See [Group Chats](/sdk/im/guide/beginner/) in the first chapter for more details.
 
-在成员管理与变更通知方面，聊天室与普通对话的最大区别就是：
+However, there are several differences in the ways members are managed and notifications are delivered:
 
-- 在聊天室内无法邀请或者踢出成员，只能由用户主动加入和退出；
-- 除了用户主动退出之外，客户端断线也会被认为是退出了聊天室。为了防止网络抖动，如果客户端临时异常断线，只要在半小时内重新上线，都会自动加入原聊天室（主动退出的除外）；
-- 云端不会下发成员加入、退出的变更通知；
-- 不支持查询成员列表，但提供专门的 API 来查询实时在线人数。
+- A user cannot be invited to or removed from a chat room. They are only able to join or leave on their own.
+- If a user logs out, this user will be automatically removed from the chat room they are already in. An exception is that if the user gets offline unexpectedly, they will be added back to the chat room they are previously in as long as they get back within 30 minutes.
+- The cloud will not deliver notifications for users joining or leaving chat rooms.
+- The list of members in a chat room cannot be retrieved. Only the count of members is available.
 
-另外，也请注意 **_聊天室也不支持离线推送通知、离线消息同步、消息回执等功能_**。
+As a side note, functions like **push notifications, message synchronization, and receipts are also not supported by chat rooms**.
 
-### 查询成员数量
+### Getting Member Counts
 
-`LCIMConversation#memberCount` 方法可以用来查询普通对话的成员总数，在聊天室中，它返回的就是实时在线的人数：
+The `LCIMConversation#memberCount` method lets you get the count of members in a conversation. When used on a chat room, you get the number of people in it at that moment:
 
 <MultiLang>
 
@@ -1257,23 +1257,23 @@ private void TomQueryWithLimit() {
     @Override
     public void done(LCIMClient client, LCIMException e) {
       if (e == null) {
-        // 登录成功
+        // Successfully logged in
         LCIMConversationsQuery query = tom.getConversationsQuery();
         query.setLimit(1);
-        // 获取第一个对话
+        // Get the first conversation
         query.findInBackground(new LCIMConversationQueryCallback() {
           @Override
           public void done(List<LCIMConversation> convs, LCIMException e) {
             if (e == null) {
               if (convs != null && !convs.isEmpty()) {
                 LCIMConversation conv = convs.get(0);
-                // 获取第一个对话的在线人数
+                // Get the count of people in the first conversation
                 conv.getMemberCount(new LCIMConversationMemberCountCallback() {
 
                   @Override
                   public void done(Integer count, LCIMException e) {
                     if (e == null) {
-                      Log.d("Tom & Jerry 对话的在线人数为 " + count);
+                      Log.d("Tom & Jerry has " + count + " people online");
                     }
                   }
                 });
@@ -1288,7 +1288,7 @@ private void TomQueryWithLimit() {
 ```
 
 ```objc
-// 查询在线人数
+// Get the count of people
 [conversation countMembersWithCallback:^(NSInteger number, NSError *error) {
     NSLog(@"%ld",number);
 }];
@@ -1298,7 +1298,7 @@ private void TomQueryWithLimit() {
 chatRoom
   .count()
   .then(function (count) {
-    console.log("在线人数：" + count);
+    console.log("Count: " + count);
   })
   .catch(console.error.bind(console));
 ```
@@ -1324,24 +1324,24 @@ int count = await chatRoom.countMembers();
 
 </MultiLang>
 
-### 消息等级
+### Message Priorities
 
-为了保证消息的时效性，当聊天室消息过多导致客户端连接堵塞时，服务器端会选择性地丢弃部分非高等级的消息。目前支持的消息等级有：
+To ensure that important messages get delivered promptly, the server would selectively discard a certain amount of messages with lower priorities when the network connection is bad. Below are the priorities supported:
 
-| 消息等级                 | 描述                                                               |
-| ------------------------ | ------------------------------------------------------------------ |
-| `MessagePriority.HIGH`   | 高等级，针对时效性要求较高的消息，比如直播聊天室中的礼物、打赏等。 |
-| `MessagePriority.NORMAL` | 中等级，比如普通非重复性的文本消息。                               |
-| `MessagePriority.LOW`    | 低等级，针对时效性要求较低的消息，比如直播聊天室中的弹幕。         |
+| Priority                 | Description                                                          |
+| ------------------------ | -------------------------------------------------------------------- |
+| `MessagePriority.HIGH`   | High priority. Used for messages that need to be delivered promptly. |
+| `MessagePriority.NORMAL` | Normal priority. Used for ordinary text messages.                    |
+| `MessagePriority.LOW`    | Low priority. Used for messages that are less important.             |
 
-消息等级默认为 `NORMAL`。
+The default priority is `NORMAL`.
 
-消息等级在发送接口的参数中设置。以下代码演示了如何发送一个高等级的消息：
+The priority of a message can be set when sending the message. The code below shows how you can send a message with high priority:
 
 <MultiLang>
 
 ```cs
-LCIMTextMessage message = new LCIMTextMessage("现在比分是 0:0，下半场中国队肯定要做出人员调整");
+LCIMTextMessage message = new LCIMTextMessage("The score is still 0:0. China definitely needs a substitution for the second half.");
 LCIMMessageSendOptions options = new LCIMMessageSendOptions {
     Priority = LCIMMessagePriority.High
 };
@@ -1354,14 +1354,14 @@ LCIMClient tom = LCIMClient.getInstance("Tom");
       @Override
       public void done(LCIMClient client, LCIMException e) {
         if (e == null) {
-          // 创建名为「猫和老鼠」的对话
-          client.createConversation(Arrays.asList("Jerry"), "猫和老鼠", null,
+          // Create a conversation named "Tom & Jerry"
+          client.createConversation(Arrays.asList("Jerry"), "Tom & Jerry", null,
             new LCIMConversationCreatedCallback() {
               @Override
               public void done(LCIMConversation conv, LCIMException e) {
                 if (e == null) {
                   LCIMTextMessage msg = new LCIMTextMessage();
-                  msg.setText("耗子，起床！");
+                  msg.setText("Get up, Jerry!");
 
                   LCIMMessageOption messageOption = new LCIMMessageOption();
                   messageOption.setPriority(LCIMMessageOption.MessagePriority.High);
@@ -1369,7 +1369,7 @@ LCIMClient tom = LCIMClient.getInstance("Tom");
                     @Override
                     public void done(LCIMException e) {
                       if (e == null) {
-                        // 发送成功
+                        // Sent
                       }
                     }
                   });
@@ -1384,8 +1384,8 @@ LCIMClient tom = LCIMClient.getInstance("Tom");
 ```objc
 LCIMMessageOption *option = [[LCIMMessageOption alloc] init];
 option.priority = LCIMMessagePriorityHigh;
-[chatRoom sendMessage:[LCIMTextMessage messageWithText:@"耗子，起床！" attributes:nil] option:option callback:^(BOOL succeeded, NSError * _Nullable error) {
-    // 在这里处理发送失败或者成功之后的逻辑
+[chatRoom sendMessage:[LCIMTextMessage messageWithText:@"Get up, Jerry!" attributes:nil] option:option callback:^(BOOL succeeded, NSError * _Nullable error) {
+    // Things to do after the message is sent
 }];
 ```
 
@@ -1400,14 +1400,16 @@ realtime
   .then(function (host) {
     return host.createConversation({
       members: ["broadcast"],
-      name: "2094 世界杯决赛梵蒂冈对阵中国比赛直播间",
+      name: "2094 FIFA World Cup - Vatican City vs China",
       transient: true,
     });
   })
   .then(function (conversation) {
     console.log(conversation.id);
     return conversation.send(
-      new TextMessage("现在比分是 0:0，下半场中国队肯定要做出人员调整"),
+      new TextMessage(
+        "The score is still 0:0. China definitely needs a substitution for the second half."
+      ),
       { priority: MessagePriority.HIGH }
     );
   })
@@ -1419,7 +1421,7 @@ realtime
 
 ```swift
 do {
-    let message = IMTextMessage(text: "现在比分是 0:0，下半场中国队肯定要做出人员调整")
+    let message = IMTextMessage(text: "The score is still 0:0. China definitely needs a substitution for the second half.")
     try chatRoom.send(message: message, priority: .high) { (result) in
         switch result {
         case .success:
@@ -1436,7 +1438,7 @@ do {
 ```dart
 try {
   TextMessage message = TextMessage();
-  message.text = '现在比分是 0:0，下半场中国队肯定要做出人员调整';
+  message.text = 'The score is still 0:0. China definitely needs a substitution for the second half.';
   await chatRoom.send(message: message, priority: MessagePriority.high);
 } catch (e) {
   print(e);
@@ -1445,15 +1447,15 @@ try {
 
 </MultiLang>
 
-> 注意：
+> Note:
 >
-> 此功能仅针对<u>聊天室消息</u>有效。普通对话的消息不需要设置等级，即使设置了也会被系统忽略，因为普通对话的消息不会被丢弃。
+> This feature is only available for _chat rooms_. There won't be an effect if you set priorities for messages in basic conversations, since these messages will never get discarded.
 
-### 消息免打扰
+### Muting Conversations
 
-假如某一用户不想再收到某对话的消息提醒，但又不想直接退出对话，可以使用静音操作，即开启「免打扰模式」。
+If a user doesn't want to get notifications for new messages in a conversation but still wants to stay in the conversation, they can mute the conversation.
 
-比如 Tom 工作繁忙，对某个对话设置了静音：
+For example, Tom is getting busy and wants to mute a conversation:
 
 <MultiLang>
 
@@ -1468,14 +1470,14 @@ tom.open(new LCIMClientCallback(){
     @Override
     public void done(LCIMClient client,LCIMException e){
       if(e==null){
-      // 登录成功
+      // Logged in
       LCIMConversation conv = client.getConversation("551260efe4b01608686c3e0f");
       conv.mute(new LCIMConversationCallback(){
 
         @Override
         public void done(LCIMException e){
           if(e==null){
-          // 设置成功
+          // Muted
           }
         }
       });
@@ -1485,10 +1487,10 @@ tom.open(new LCIMClientCallback(){
 ```
 
 ```objc
-// Tom 将会话设置为静音
+// Tom mutes the conversation
 [conversation muteWithCallback:^(BOOL succeeded, NSError *error) {
     if (succeeded) {
-        NSLog(@"修改成功！");
+        NSLog(@"Muted!");
     }
 }];
 ```
@@ -1500,7 +1502,7 @@ tom
     return conversation.mute();
   })
   .then(function (conversation) {
-    console.log("静音成功");
+    console.log("Muted!");
   })
   .catch(console.error.bind(console));
 ```
@@ -1522,58 +1524,58 @@ await chatRoom.mute();
 
 </MultiLang>
 
-设置静音之后，iOS 及启用混合推送的 Android 用户就不会收到推送消息了。与之对应的就是取消静音的操作（`Conversation#unmute` 方法），即取消免打扰模式。
+After a conversation is muted, the current user will not get push notifications from it anymore. To unmute a conversation, use `Conversation#unmute`.
 
-> 使用建议：
+> Tips:
 >
-> - 对话内消息的静音／取消静音操作不光对聊天室有效，普通的群聊对话也可以执行该操作。
-> - `mute` 和 `unmute` 操作会修改云端 `_Conversation` 里面的 `mu` 属性。**开发者切勿在控制台中对 `mu` 随意进行修改**，否则可能会引起即时通讯云端的离线推送功能失效。
+> - Both chat rooms and basic conversations can be muted.
+> - `mute` and `unmute` operations will change the `mu` field in the `_Conversation` class. **Do not change the `mu` field directly in your app's dashboard**, otherwise push notifications may not work properly.
 
-### 消息内容的实时过滤
+### Keyword Filtering
 
 <Conditional region="cn">
 
-对于开放聊天室来说，内容的审核和实时过滤是产品运营上的一个基本要求。即时通讯服务提供了敏感词过滤的功能，多人的普通对话、聊天室和系统对话里面的消息都会进行实时过滤。开发者可以在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 即时通讯 > 设置** 中对一对一单聊启用敏感词过滤。
+You might consider filtering cuss words out from the messages sent into group chats by users. Instant Messaging offers a built-in keyword filtering function that supports this need. It works for group chats, chat rooms, and system conversations by default. You can also enable it for one-on-one chats by going to **Developer Center > Your game > Game Services > Cloud Services > Instant Messaging > Settings**.
 
 </Conditional>
 
 <Conditional region="global">
 
-即时通讯服务提供了敏感词过滤的功能。开发者可以在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 即时通讯 > 设置** 中对一对一单聊启用敏感词过滤。
+Instant Messaging offers a built-in keyword filtering function that allows you to filter cuss words out from the messages sent by users. You can enable it for one-on-one chats by going to **Developer Center > Your game > Game Services > Cloud Services > Instant Messaging > Settings**.
 
 </Conditional>
 
-命中的敏感词将会被替换为 `***`。
+Matched keywords will be replaced with `***`.
 
-消息内容实时过滤属于系统层面的修改消息，发送者会收到 `MESSAGE_UPDATE` 事件。应用可以在客户端监听该事件，实现相应的业务逻辑，相关代码示例可以参考[即时通讯开发指南第二篇](/sdk/im/guide/intermediate/)的《修改消息》一节。
+Keyword filtering will lead to message modifications at the system level, so the message sender will receive a `MESSAGE_UPDATE` event, which the clients can listen to. Please refer to the "Modify a Message" section of the previous chapter for code samples.
 
 <Conditional region="cn">
 
-过滤的词库由即时通讯服务统一提供。商用版应用支持开发者使用自定义敏感词词库，只需在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 即时通讯 > 设置** 中上传敏感词文件。敏感词文件为 UTF-8 编码的纯文本文件，一行一个敏感词。开发者上传的自定义敏感词词库会替换默认提供的词库。
+Instant Messaging offers a set of keywords by default, but if you have upgraded to the Business Plan, you can customize the keywords. To do so, go to **Developer Center > Your game > Game Services > Cloud Services > Instant Messaging > Settings** and upload your keywords file to replace the default list. The uploaded file must be UTF-8 encoded with one keyword in each line. If you upload your custom word list, it will override the default one.
 
 </Conditional>
 
 <Conditional region="global">
 
-商用版应用支持开发者使用自定义敏感词词库，只需在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 即时通讯 > 设置** 中上传敏感词文件。敏感词文件为 UTF-8 编码的纯文本文件，一行一个敏感词。**开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 即时通讯 > 设置** 中，「群聊启用敏感词过滤」总是选中状态，目前暂不可取消，但国际版应用的内置敏感词词库为空。因此，如果国际版应用没有上传自定义敏感词词库，那么实际上聊天消息不会过滤。
+If you have upgraded to the Business Plan, you can customize the keywords. To do so, go to **Developer Center > Your game > Game Services > Cloud Services > Instant Messaging > Settings** and upload your keywords file. The uploaded file must be UTF-8 encoded with one keyword in each line. For now, the **Enable sensitive keyword filtering against group chats** option on **Developer Center > Your game > Game Services > Cloud Services > Instant Messaging > Settings** is always enabled, but if you don't upload a file of keywords, the keyword filtering function will not function in the end.
 
 </Conditional>
 
-如果开发者有较为复杂的过滤需求，可以使用云引擎 hook `_messageReceived` 来实现过滤，在 hook 中开发者对消息的内容有完全的控制力。
+If you have more complicated requirements regarding message filtering, we recommend that you make use of the `_messageReceived` hook of LeanEngine. You can define your own logic for controlling messages.
 
-## 使用临时对话
+## Temporary Conversations
 
-临时对话是一个全新的概念，它解决的是一种特殊的聊天场景：
+Temporary conversations can be used for special scenarios with:
 
-- 对话存续时间短
-- 聊天参与的人数较少（最多为 10 个 `clientId`）
-- 聊天记录的存储不是强需求
+- Short TTL
+- Fewer members (10 `clientId`s maximum)
+- No message history needed
 
-临时对话最大的特点是 **较短的有效期**，这个特点可以解决对话的持久化存储在服务端占用的存储资源越来越大、开发者需要支付的成本越来越高的问题，也可以应对一些临时聊天的场景。诸如电商售前和售后在线聊天的客服系统，我们推荐使用临时对话。
+What makes temporary conversations different from other conversations is that they **expire very quickly**. This helps you reduce the space needed for storing conversations and lower the cost of maintaining your app. Temporary conversations are best used for customer service systems.
 
-### 临时对话实例
+### Creating Temporary Conversations
 
-`IMConversation` 有专门的 `createTemporaryConversation` 方法用于创建临时对话：
+`IMConversation` has its `createTemporaryConversation` method for creating temporary conversations:
 
 <MultiLang>
 
@@ -1587,7 +1589,7 @@ tom.createTemporaryConversation(Arrays.asList(members), 3600, new LCIMConversati
     public void done(LCIMConversation conversation, LCIMException e) {
         if (null == e) {
         LCIMTextMessage msg = new LCIMTextMessage();
-        msg.setText("这里是临时对话");
+        msg.setText("This is a temporary conversation.");
         conversation.sendMessage(msg, new LCIMConversationCallback(){
             @Override
             public void done(LCIMException e) {
@@ -1615,7 +1617,9 @@ realtime
     });
   })
   .then(function (conversation) {
-    return conversation.send(new AV.TextMessage("这里是临时对话"));
+    return conversation.send(
+      new AV.TextMessage("This is a temporary conversation.")
+    );
   })
   .catch(console.error);
 ```
@@ -1647,7 +1651,7 @@ try {
 
 try {
   TextMessage message = TextMessage();
-  message.text = '这里是临时对话';
+  message.text = 'This is a temporary conversation.';
   await temporaryConversation.send(message: message);
 } catch (e) {
   print(e);
@@ -1656,7 +1660,7 @@ try {
 
 </MultiLang>
 
-与其他对话类型不同的是，临时对话有一个 **重要** 的属性：TTL。它标记着这个对话的有效期，系统默认是 1 天，但是在创建对话的时候是可以指定这个时间的，最高不超过 30 天。如果你的需求是一定要超过 30 天，请使用普通对话。传入 TTL 创建临时对话的代码如下：
+Temporary conversations have an **important** attribute that differentiates them from others: TTL. It is set to 1 day by default, but you can change it to any time no longer than 30 days. If you want a conversation to survive for more than 30 days, make it a basic conversation instead. The code below creates a temporary conversation with a custom TTL:
 
 <MultiLang>
 
@@ -1677,7 +1681,7 @@ client.open(new LCIMClientCallback() {
         public void done(LCIMConversation conversation, LCIMException e) {
             if (null == e) {
             LCIMTextMessage msg = new LCIMTextMessage();
-            msg.setText("这里是临时对话，一小时之后，这个对话就会消失");
+            msg.setText("This is a temporary conversation. It will expire in 1 hour.");
             conversation.sendMessage(msg, new LCIMConversationCallback(){
                 @Override
                 public void done(LCIMException e) {
@@ -1712,7 +1716,9 @@ realtime
   })
   .then(function (conversation) {
     return conversation.send(
-      new AV.TextMessage("这里是临时对话，一小时之后，这个对话就会消失")
+      new AV.TextMessage(
+        "This is a temporary conversation. It will expire in 1 hour."
+      )
     );
   })
   .catch(console.error);
@@ -1746,7 +1752,7 @@ try {
 
 try {
   TextMessage message = TextMessage();
-  message.text = '这里是临时对话，一小时之后，这个对话就会消失';
+  message.text = 'This is a temporary conversation. It will expire in 1 hour.';
   await temporaryConversation.send(message: message);
 } catch (e) {
   print(e);
@@ -1755,8 +1761,8 @@ try {
 
 </MultiLang>
 
-临时对话的其他操作与普通对话无异。
+Besides this, a temporary conversation shares the same functionality as a basic conversation.
 
-## 进一步阅读
+## Continue Reading
 
-- 《即时通讯开发指南》第四篇[详解消息 hook 与系统对话](/sdk/im/guide/systemconv/)
+- [4. Hooks and System Conversations](/sdk/im/guide/systemconv/)
