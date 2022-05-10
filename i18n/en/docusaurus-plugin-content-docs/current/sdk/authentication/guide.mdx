@@ -1,40 +1,40 @@
 ---
-title: 内建账户指南
-sidebar_label: 开发指南
+title: TDS Authentication Guide
+sidebar_label: Guide
 sidebar_position: 2
 ---
 
 import MultiLang from "/src/docComponents/MultiLang";
 import { Conditional } from "/src/docComponents/conditional";
 
-从 TapSDK 3.0 开始，我们提供了一个内建账户系统供游戏使用：开发者可以直接用 TapTap OAuth 授权的结果生成一个游戏内的账号（`TDSUser`），同时我们也支持将更多第三方认证登录的结果绑定到该账号上来。
-TapSDK 提供的游戏内好友、成就等服务和功能，也都基于这一账户系统。
+Starting from TapSDK 3.0, there will be a built-in account system for you to use in your game. You can generate user accounts (`TDSUser`) in your game with the results of TapTap OAuth. You can also link the authentication results of third-party platforms to this account.
+The Friendship and Achievement services provided by the TapSDK also depend on this account system.
 
-## 初始化
+## Initialization
 
-请参考[快速开始](/sdk/start/quickstart/)完成 SDK 初始化。
+See [TapSDK Quickstart](/sdk/start/quickstart/) for how to initialize the SDK.
 
-## `TDSUser` 和 `LCUser`
+## `TDSUser` and `LCUser`
 
-`TDSUser` 类继承自 `LCUser` 类。
-`LCUser` 是 LeanCloud 提供的账户系统，`TDSUser` 基本沿用了其功能和接口，并针对 TDS 的需求进行了细微调整，所以我们推荐大家使用 `TDSUser` 类来构建玩家账户系统。
+`TDSUser` is inherited from the `LCUser` class.
+`LCUser` is the account system provided by LeanCloud, and `TDSUser` basically inherited all the interfaces provided by `LCUser`. `TDSUser` includes some minor adjustments we made on functionalities and interfaces to fulfill the needs of TDS, so we recommend that you implement the account system in your game with `TDSUser`.
 
-## TapTap 登录
+## TapTap Login
 
-直接调用 `TDSUser#loginWithTapTap` 方法即可一键登录，详见[接入 TapTap 登录](/sdk/taptap-login/guide/start/)。
+You can call `TDSUser#loginWithTapTap` to log in with TapTap Login. See [Integrate TapTap Login](/sdk/taptap-login/guide/start/) for more details.
 
-## 游客登录
+## Guest Login
 
-内建账户系统支持玩家在游戏中创建一个游客账号，其调用示例如下：
+To create a guest account in the account system:
 
 <MultiLang>
 
 ```cs
 try{
-    // 通过 tdsUSer 给出用户唯一标识，如果有的话
+    // tdsUSer will hold a unique identifier of the user, if it exists
     var tdsUser = await TDSUser.LoginAnonymously();
 }catch(Exception e){
-    // 登录失败
+    // Failed to log in
     Debug.Log($"{e.code} : {e.message}");
 }
 ```
@@ -48,7 +48,7 @@ TDSUser.logInAnonymously().subscribe(new Observer<TDSUser>() {
 
   @Override
   public void onNext(TDSUser resultUser) {
-    // 登录成功，得到一个账户实例
+    // Successfully logged in and obtained an account instance
     String userId = resultUser.getObjectId();
   }
 
@@ -77,83 +77,83 @@ TDSUser.logInAnonymously().subscribe(new Observer<TDSUser>() {
 
 :::info
 
-这里的「游客账户」可以保证玩家在同一个设备上多次登录都得到同一个账户，但是如果玩家卸载游戏重装之后再以「游客」身份登录则无法保证账户的唯一性。
+The guest account ensures that the player will have access to the same account on different logins. However, if the player deletes the game and then reinstalls the game, it is not guaranteed that the player will still have access to the same account.
 
 :::
 
-## 当前用户
+## Current User
 
-用户登录后，SDK 会自动将会话信息存储到客户端，这样用户在下次打开客户端时无需再次登录。下面的代码检查是否有已经登录的用户：
+Once the user has logged in, the SDK will automatically save the session to the client so that the user won’t need to log in again the next time they open the client. The code below checks if there is a logged-in user:
 
 <MultiLang>
 
 ```cs
 TDSUser currentUser = await TDSUser.GetCurrent();
 if (currentUser != null) {
-  // 跳到首页
+  // Go to homepage
 } else {
-  // 显示注册或登录页面
+  // Show the sign-up or the log-in page
 }
 ```
 
 ```java
 TDSUser currentUser = TDSUser.getCurrentUser();
 if (currentUser != null) {
-    // 跳到首页
+    // Go to homepage
 } else {
-    // 显示注册或登录页面
+    // Show the sign-up or the log-in page
 }
 ```
 
 ```objc
 TDSUser *currentUser = [TDSUser currentUser];
 if (currentUser != nil) {
-    // 跳到首页
+    // Go to homepage
 } else {
-    // 显示注册或登录页面
+    // Show the sign-up or the log-in page
 }
 ```
 
 </MultiLang>
 
-会话信息会长期有效，直到用户主动登出：
+The session will remain valid until the user logs out:
 
 <MultiLang>
 
 ```cs
 await TDSUser.Logout();
 
-// currentUser 变为 null
+// currentUser becomes null
 TDSUser currentUser = await TDSUser.GetCurrent();
 ```
 
 ```java
 TDSUser.logOut();
 
-// currentUser 变为 null
+// currentUser becomes null
 TDSUser currentUser = TDSUser.getCurrentUser();
 ```
 
 ```objc
 [TDSUser logOut];
 
-// currentUser 变为 nil
+// currentUser becomes nil
 TDSUser *currentUser = [TDSUser currentUser];
 ```
 
 </MultiLang>
 
-## 设置当前用户
+## Setting the Current User
 
-用户登录后，云端会返回一个 **session token** 给客户端，它会由 SDK 缓存起来并用于日后同一 `TDSUser` 的鉴权请求。session token 会被包含在每个客户端发起的 HTTP 请求的 header 里面，这样云端就知道是哪个 `TDSUser` 发起的请求了。
+A **session token** will be returned to the client after a user is logged in. It will be cached by our SDK and will be used for authenticating requests made by the same `TDSUser` in the future. The session token will be included in the header of each HTTP request made by the client, which helps the cloud identify the `TDSUser` sending the request.
 
-以下是一些应用可能需要用到 session token 的场景：
+Below are the situations when you may need to log a user in with their session token:
 
-- 应用根据以前缓存的 session token 登录（可以通过 `sessionToken` 属性获取到当前用户的 session token；在服务端等受信任的环境下，可以通过 Master Key（即 Server Secret）读取任意用户的 `sessionToken` 字段以获取 session token）。
-- 应用内的某个 WebView 需要知道当前登录的用户。
-- 在服务端登录后，返回 session token 给客户端，客户端根据返回的 session token 登录。
+- A session token is already cached on the client which can be used to automatically log the user in (you can get the session token of the current user by accessing the `sessionToken` property; you can also get the `sessionToken` of any user on the server side with your Master Key (also called Server Secret)).
+- A WebView within the app needs to know the current user.
+- The user is logged in on the server side using your own authentication routines and the server is able to provide the session token to the client.
 
-下面的代码使用 session token 登录一个用户（云端会验证 session token 是否有效）：
+The code below logs a user in with a session token (the session token will be validated before proceeding):
 
 <MultiLang>
 
@@ -165,11 +165,11 @@ await TDSUser.BecomeWithSessionToken("anmlwi96s381m6ca7o7266pzf");
 TDSUser.becomeWithSessionTokenInBackground("anmlwi96s381m6ca7o7266pzf").subscribe(new Observer<TDSUser>() {
     public void onSubscribe(Disposable disposable) {}
     public void onNext(TDSUser user) {
-        // 修改 currentUser
+        // Update currentUser
         TDSUser.changeCurrentUser(user, true);
     }
     public void onError(Throwable throwable) {
-        // session token 无效
+        // session token is invalid
     }
     public void onComplete() {}
 });
@@ -178,20 +178,20 @@ TDSUser.becomeWithSessionTokenInBackground("anmlwi96s381m6ca7o7266pzf").subscrib
 ```objc
 [TDSUser becomeWithSessionTokenInBackground:@"anmlwi96s381m6ca7o7266pzf" block:^(TDSUser * _Nullable user, NSError * _Nullable error) {
     if (user != nil) {
-        // 登录成功
+        // Successfully logged in
     } else {
-        // session token 无效
+        // session token is invalid
     }
 }];
 ```
 
 </MultiLang>
 
-请避免在外部浏览器使用 URL 来传递 session token，以防范信息泄露风险。
+For security reasons, please avoid passing URLs containing session tokens in non-private environments. This increases the risk of your session tokens being captured by attackers.
 
-如果在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 内建账户 > 设置** 中勾选了 **密码修改后，强制客户端重新登录**，那么当一个用户修改密码后，该用户的 session token 会被重置。此时需要让用户重新登录，否则会遇到 `403 (Forbidden)` 错误。
+If **Log out the user when password is updated** is enabled on **Developer Center > Your game > Game Services > Cloud Services > TDS Authentication > Settings**, the session token of a user will be reset in the cloud after this user changes the password and the client needs to prompt the user to log in again. Otherwise, `403 (Forbidden)` will be returned as an error.
 
-下面的代码检查 session token 是否有效：
+The code below checks if a session token is valid:
 
 <MultiLang>
 
@@ -199,18 +199,18 @@ TDSUser.becomeWithSessionTokenInBackground("anmlwi96s381m6ca7o7266pzf").subscrib
 TDSUser currentUser = await TDSUser.GetCurrent();
 bool isAuthenticated = await currentUser.IsAuthenticated();
 if (isAuthenticated) {
-  // session token 有效
+  // session token is valid
 } else {
-  // session token 无效
+  // session token is invalid
 }
 ```
 
 ```java
 boolean authenticated = TDSUser.getCurrentUser().isAuthenticated();
 if (authenticated) {
-    // session token 有效
+    // session token is valid
 } else {
-    // session token 无效
+    // session token is invalid
 }
 ```
 
@@ -219,31 +219,31 @@ TDSUser *currentUser = [TDSUser currentUser];
 NSString *token = currentUser.sessionToken;
 [currentUser isAuthenticatedWithSessionToken:token callback:^(BOOL succeeded, NSError * _Nullable error) {
     if (succeeded) {
-        // session token 有效
+        // session token is valid
     } else {
-        // session token 无效
+        // session token is invalid
     }
 }];
 ```
 
 </MultiLang>
 
-## 设置其他用户属性
+## Setting Other User Properties
 
-开发者可以使用内建账户系统设置更多用户信息，比如通过设置 `nickname` 字段来添加昵称，
-再比如游戏可以记录玩家的生日，以便在生日当天给玩家发放生日礼包。
+The account system allows you to store additional data associated with users. For example, you can store users’ nicknames by adding a `nickname` field.
+You can also store users’ birthdays so you can send them gifts on their birthdays.
 
 <MultiLang>
 
 ```cs
-var currentUser = await TDSUser.GetCurrent();  // 获取当前登录的账户实例
+var currentUser = await TDSUser.GetCurrent();  // Get the instance of the current user
 currentUser["nickname"] = "Tarara";
 currentUser["birthday"] = "01-01";
 await currentUser.Save();
 ```
 
 ```java
-TDSUser currentUser = TDSUser.currentUser();  // 获取当前登录的账户实例
+TDSUser currentUser = TDSUser.currentUser();  // Get the instance of the current user
 currentUser.put("nickname");
 currentUser.put("birthday", "01-01");
 currentUser.saveInBackground().subscribe(new Observer<LCObject>() {
@@ -254,7 +254,7 @@ currentUser.saveInBackground().subscribe(new Observer<LCObject>() {
 
     @Override
     public void onNext(@NotNull LCObject lcObject) {
-        // 保存成功，currentUser 的属性得到更新
+        // Saved; the properties of currentUser are updated
         TDSUser tdsUser = (TDSUser) lcObject;
     }
 
@@ -276,7 +276,7 @@ currentUser[@"nickname"] = @"Tarara";
 currentUser[@"birthday"] = @"01-01";
 [currentUser saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
     if (succeeded) {
-        // 保存成功
+        // Saved
     } else {
         NSLog(@"%@", error);
     }
@@ -285,23 +285,23 @@ currentUser[@"birthday"] = @"01-01";
 
 </MultiLang>
 
-建议开发者使用 `nickname` 字段存储昵称信息，[TDS 游戏好友模块](/sdk/friends/guide/) 的**根据昵称查找好友、好友邀请链接功能都使用了 `nickname` 字段**。
-[通过 TapTap OAuth 授权结果直接登录](/sdk/taptap-login/guide/start/#用-taptap-oauth-授权结果直接登录账户系统)这一方式创建的玩家，SDK 会自动将 `nickname` 字段设置为 TapTap 账户的用户名。
+We recommend that you store users’ nicknames with the `nickname` field because [TDS’s Friendship module](/sdk/friends/guide/) **uses the data in this field when looking up friends with nicknames or generating invitation links**.
+If you log a user in [with the result of TapTap OAuth](/sdk/taptap-login/guide/start/#use-results-from-taptap-oauth-to-directly-log-into-the-account-system), the SDK will automatically set the `nickname` of the user to be the username of their TapTap account.
 
-一些开发者可能会利用这一机制将所有用户相关的信息都一股脑地存在内建账户系统，比如游戏可能将用户的等级、拥有的装备等信息都存在内建账户里，但我们并不推荐这么做。
-内建账户系统保存了用户的鉴权信息，也可能保存了邮箱、手机等敏感信息，因此默认会设置非常严格的权限，以防用户信息泄露。
-假设在内建账户系统中保存了游戏等级信息，由于很多游戏场景下需要展示玩家的等级，往往需要放宽内建账户系统的权限限制，以方便客户端查询这些信息，这就可能形成泄露用户敏感信息的安全隐患。
-另外，在内建账户系统中保存过多数据，也容易导致慢查询等性能问题。
-所以，我们建议仅在内建账户系统中保存和鉴权相关的信息。
-从实现上的简单性出发，少量仅用户本人可见的信息，一并保存在内建账户系统中，也未尝不可。
-但其他和鉴权无关的用户信息，建议另外创建专门的 Class（比如 `UserProfile`）保存。
+You might be tempted to store all the data related to users, like their game levels and the items they own, in the account system. However, this is not encouraged.
+The account system contains users’ authentication data as well as emails and phone numbers, so there will be strict permission settings imposed on it to prevent the leak of the data.
+Supposing that the users’ game levels are stored in the account system, since we often need to display the level of a player to other players, we will have to loosen the permission settings imposed on the account system so that the clients can query the relevant data. This will make the user data vulnerable to attacks.
+Besides the security concerns, having too much data in the account system can also lead to performance issues like the occurrence of slow queries.
+Therefore, we recommend that you only store authentication-related data in the account system.
+It’s totally fine to store a small amount of data that’s only accessible to its owners in the user account,
+but for other data unrelated to authentication, we suggest that you create a dedicated class (like `UserProfile`) to store it.
 
-`TDSUser` 是 `LCObject` 的子类，所以 `LCObject` 支持的数据增删改查方式，`TDSUser` 也都可用。感兴趣的读者可以参考[数据存储的开发文档](/sdk/storage/features/)了解更多信息。
+`TDSUser` is a subclass of `LCObject`. This means that you can create, read, update, and delete user objects in the same way as you do with `LCObject`s. See [Data Storage Overview](/sdk/storage/features/) for more details.
 
-## 用户的查询
+## Queries on Users
 
-可以直接构建一个针对 `_User` 的 [LCQuery](/sdk/storage/guide/dotnet/#查询) 来查询用户。
-例如，查询有多少玩家是 1 月 1 日生日的：
+To query for users, you can create a new `LCQuery` for `_User`.
+For example, to find all the users who were born on January 1st:
 
 <MultiLang>
 
@@ -317,7 +317,7 @@ userQuery.whereEqualTo("birthday", "01-01");
 userQuery.countInBackground().subscribe(new Observer<Integer>() {
   public void onSubscribe(Disposable disposable) {}
   public void onNext(Integer count) {
-    System.out.println(count + " 个玩家的生日是 1 月 1 日。");
+    System.out.println(count + " players were born on January 1st.");
   }
   public void onError(Throwable throwable) {}
   public void onComplete() {}
@@ -328,50 +328,50 @@ userQuery.countInBackground().subscribe(new Observer<Integer>() {
 LCQuery *userQuery = [TDSUser query];
 [userQuery whereKey:@"birthday" equalTo:@"01-01"];
 [query countObjectsInBackgroundWithBlock:^(NSInteger count, NSError *error) {
-  NSLog(@"%ld 个玩家的生日是 1 月 1 日。", count);
+  NSLog(@"%ld players were born on January 1st.", count);
 }];
 ```
 
 </MultiLang>
 
-为了安全起见，**内建账户系统（`_User` 表）默认关闭了 `find` 权限**，这样每位用户登录后只能查询到自己在 `_User` 表中的数据，无法查询其他用户的数据。如果需要让其查询其他用户的数据，建议单独创建一张表来保存这类数据，并开放这张表的 `find` 查询权限。除此之外，还可以在云引擎里封装用户查询相关的方法。
+For security reasons, **the account system (the `_User` table) has its `find` permission disabled by default**. Each user can only access their own data in the `_User` table and cannot access that of others. If you need to allow each user to view other users’ data, we recommend that you create a new table to store such data and enable the `find` permission of this table. You may also encapsulate queries on users within LeanEngine and avoid opening up `find` permissions of `_User` tables.
 
-可以参见 [用户对象的安全](#用户对象的安全) 来了解 `_User` 表的一些限制，还可以阅读[数据和安全](/sdk/storage/guide/security/)来了解更多 class 级权限设置的方法。
+See [Security of User Objects](#security-of-user-objects) for other restrictions applied to the `_User` table and [Data Security](/sdk/storage/guide/security/) for more information regarding class-level permission settings.
 
-## 关联用户对象
+## Associations
 
-关联 `TDSUser` 的方法和 `LCObject` 是一样的。下面的代码为一名作者保存了一本书，然后获取所有该作者写的书：
+Associations involving `TDSUser`s work in the same way as that of `LCObject`s. The code below saves a new book for an author and retrieves all the books written by that author:
 
 <MultiLang>
 
 ```cs
 LCObject book = new LCObject("Book");
 TDSUser author = await LCUser.GetCurrent();
-book["title"] = "我的第五本书";
+book["title"] = "My Fifth Book";
 book["author"] = author;
 await book.Save();
 
 LCQuery<LCObject> query = new LCQuery<LCObject>("Book");
 query.WhereEqualTo("author", author);
-// books 是包含同一作者所有 Book 对象的数组
+// books is an array of Book objects by the same author
 ReadOnlyCollection<LCObject> books = await query.Find();
 ```
 
 ```java
 LCObject book = new LCObject("Book");
 TDSUser author = TDSUser.getCurrentUser();
-book.put("title", "我的第五本书");
+book.put("title", "My Fifth Book");
 book.put("author", author);
 book.saveInBackground().subscribe(new Observer<LCObject>() {
     public void onSubscribe(Disposable disposable) {}
     public void onNext(LCObject book) {
-        // 获取所有该作者写的书
+        // Find all the books by the same author
         LCQuery<LCObject> query = new LCQuery<>("Book");
         query.whereEqualTo("author", author);
         query.findInBackground().subscribe(new Observer<List<LCObject>>() {
             public void onSubscribe(Disposable disposable) {}
             public void onNext(List<LCObject> books) {
-                // books 是包含同一作者所有 Book 对象的数组
+                // books is an array of Book objects by the same author
             }
             public void onError(Throwable throwable) {}
             public void onComplete() {}
@@ -385,44 +385,44 @@ book.saveInBackground().subscribe(new Observer<LCObject>() {
 ```objc
 LCObject *book = [LCObject objectWithClassName:@"Book"];
 TDSUser *author = [TDSUser currentUser];
-[book setObject:@"我的第五本书" forKey:@"title"];
+[book setObject:@"My Fifth Book" forKey:@"title"];
 [book setObject:author forKey:@"author"];
 [book saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
-    // 获取所有该作者写的书
+    // Find all the books by the same author
     LCQuery *query = [LCQuery queryWithClassName:@"Book"];
     [query whereKey:@"author" equalTo:author];
     [query findObjectsInBackgroundWithBlock:^(NSArray *books, NSError *error) {
-        // books 是包含同一作者所有 Book 对象的数组
+        // books is an array of Book objects by the same author
     }];
 }];
 ```
 
 </MultiLang>
 
-## 用户对象的安全
+## Security of User Objects
 
-`TDSUser` 类自带安全保障，只有通过登录等经过鉴权的方法获取到的 `TDSUser` 才能进行保存或删除相关的操作，保证每个用户只能修改自己的数据。
+The `TDSUser` class is secured by default. You are not able to invoke any save- or delete-related methods unless the `TDSUser` was obtained using an authenticated method like logging in. This ensures that each user can only update their own data.
 
-这样设计是因为 `TDSUser` 中存储的大多数数据都比较敏感，包括手机号、社交网络账号等等。为了用户的隐私安全，即使是应用的开发者也应避免直接接触这些数据。
+The reason behind this is that most data stored in `TDSUser` can be very personal and sensitive, such as mobile phone numbers, social network account IDs, etc. Even the app’s owner should avoid tampering with these data for the sake of users’ privacy.
 
-下面的代码展现了这种安全措施：
+The code below illustrates this security policy:
 
 <MultiLang>
 
 ```cs
 try {
   TDSUser tdsUser = await TDSUser.LoginWithTapTap();
-  // 试图修改用户名
+  // Attempt to change username
   user["username"] = "Jerry";
-  // 可以执行，因为用户已鉴权
+  // This will work since the user is authenticated
   await user.Save();
 
-  // 绕过鉴权直接获取用户
+  // Get the user with a non-authenticated method
   LCQuery<TDSUser> userQuery = TDSUser.GetQuery();
   TDSUser unauthenticatedUser = await userQuery.Get(user.ObjectId);
   unauthenticatedUser["username"] = "Toodle";
 
-  // 会出错，因为用户未鉴权
+  // This will cause an error since the user is unauthenticated
   unauthenticatedUser.Save();
 } catch (LCException e) {
   print($"{e.code} : {e.message}");
@@ -434,18 +434,18 @@ TDSUser.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
     @Override
     public void onSuccess(TDSUser resultUser) {
         Toast.makeText(MainActivity.this, "Logged in with TapTap.", Toast.LENGTH_SHORT).show();
-        // 可以修改，因为已经鉴权
+        // This will work since the user is authenticated
         resultUser.put("username", "Toodle");
-        // 仅为示意，实际项目中需使用异步方法以免阻塞
+        // For demonstration only; please use the asynchronous method in your project to avoid blocking the thread
         resultUser.save();
 
-        // 绕过鉴权直接获取用户
+        // Get the user with a non-authenticated method
         LCQuery<TDSUser> query = new LCQuery<>("_User");
         query.getInBackground(user.getObjectId()).subscribe(new Observer<TDSUser>() {
             public void onSubscribe(Disposable disposable) {}
             public void onNext(TDSUser unauthenticatedUser) {
                 unauthenticatedUser.put("username", "Toodle");
-                // 会出错，因为用户未鉴权
+                // This will cause an error since the user is unauthenticated
                 unauthenticatedUser.save();
             }
             public void onError(Throwable throwable) {}
@@ -463,65 +463,65 @@ TDSUser.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
 ```objc
 [TDSUser loginByTapTapWithPermissions:@[@"public_profile"] callback:^(TDSUser * _Nullable user, NSError * _Nullable error) {
     if (user) {
-        // 试图修改用户名
+        // Attempt to change username
         [user setObject:@"Jerry" forKey:@"username")];
-        // 保存更改
+        // Save changes
         [user saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
             if (succeeded) {
-                // 可以执行，因为用户已鉴权
+                // This will work since the user is authenticated
 
-                // 绕过鉴权直接获取用户
+                // Get the user with a non-authenticated method
                 LCQuery *query = [TDSUser query];
                 [query getObjectInBackgroundWithId:user.objectId block:^(LCObject *unauthenticatedUser, NSError *error) {
                     [unauthenticatedUser setObject:@"Toodle" forKey:@"username"];
                     [unauthenticatedUser saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
                         if (succeeded) {
-                            // 无法执行，因为用户未鉴权
+                            // This will not succeed since the user is unauthenticated
                         } else {
-                            // 操作失败
+                            // Failure is expected
                         }
                     }];
                 }];
             } else {
-                // 错误处理
+                // Error handling
             }
         }];
     } else {
-        // 错误处理
+        // Error handling
     }
 }];
 ```
 
 </MultiLang>
 
-通过 `TDSUser.GetCurrent()` 获取的 `LCUser` 总是经过鉴权的。
+The `LCUser` obtained from `TDSUser.GetCurrent()` will always be authenticated.
 
-要查看一个 `TDSUser` 是否经过鉴权，可以调用 `isAuthenticated` 方法。通过经过鉴权的方法获取到的 `TDSUser` 无需进行该检查。
+To check if a `TDSUser` is authenticated, you can invoke the `isAuthenticated` method. You do not need to check if `TDSUser` is authenticated if it is obtained via an authenticated method.
 
-## 其他对象的安全
+## Security of Other Objects
 
-对于给定的一个对象，可以指定哪些用户有权限读取或修改它。为实现该功能，每个对象都有一个由 `ACL` 对象组成的访问控制表。请参阅[《ACL 权限管理开发指南》](https://leancloud.cn/docs/acl-guide.html)。
+For each given object, you can specify which users are allowed to read it and which are allowed to modify it. To support this type of security, each object has an access control list implemented by an `ACL` object. More details can be found in [ACL Guide](https://docs.leancloud.app/acl-guide.html).
 
-## 第三方账户登录
+## Third-Party Sign-on
 
-我们在登录功能的开发指南中已经介绍了如何[使用 TapTap OAuth 授权结果直接登录账户系统](/sdk/taptap-login/guide/start#用-taptap-oauth-授权结果直接登录账户系统)。
+We have already introduced how to [use the results from TapTap OAuth to directly log into the account system](/sdk/taptap-login/guide/start#use-results-from-taptap-oauth-to-directly-log-into-the-account-system).
 
-其实除了 TapTap 外，我们也支持直接使用第三方社交平台（例如 Apple、<Conditional region="cn">微信、QQ</Conditional><Conditional region="global">Facebook</Conditional> 等）的账户信息来创建自己的账户体系并完成登录，也允许将既有账户与第三方账户绑定起来，这样终端用户后续可以直接用第三方账户信息来便捷登录。
+Besides TapTap, you can also use other services (like Apple<Conditional region="cn">, WeChat, and QQ</Conditional><Conditional region="global"> and Facebook</Conditional>) to implement your account system. You can also associate existing accounts with these services so that the users can quickly log in with their existing accounts on these services.
 
-事实上，TapSDK 采用了开放的接口设计，平台标识和唯一授权信息都由开发者指定，所以是可以兼容所有的第三方账户登录需求的。例如，海外开发者拿到 Facebook 授权信息之后，一样可以调用 `TDSUser#loginWithAuthData` 接口完成玩家账户的登录（平台名字可指定为 `facebook`）。
+Technically, we have implemented our interfaces in an open-ended manner. You can specify your own platform identifiers and authorization data, which means that our account system supports whatever third-party services you wish to connect to. For example, once you get the authorization data from Facebook, you can use `TDSUser#loginWithAuthData` to log the user in (you may set the platform name to be `facebook`).
 
-例如以下的代码展示了终端用户使用微信登录的处理流程：
+The code below shows how you can log a user in with WeChat:
 
 <MultiLang>
 
 ```cs
 Dictionary<string, object> thirdPartyData = new Dictionary<string, object> {
-  // 必须
+  // Required
   { "openid", "OPENID" },
   { "access_token", "ACCESS_TOKEN" },
   { "expires_in", 7200 },
 
-  // 可选
+  // Optional
   { "refresh_token", "REFRESH_TOKEN" },
   { "scope", "SCOPE" }
 };
@@ -530,21 +530,21 @@ TDSUser currentUser = await TDSUser.LoginWithAuthData(thirdPartyData, "weixin");
 
 ```java
 Map<String, Object> thirdPartyData = new HashMap<String, Object>();
-// 必须
+// Required
 thirdPartyData.put("expires_in", 7200);
 thirdPartyData.put("openid", "OPENID");
 thirdPartyData.put("access_token", "ACCESS_TOKEN");
-// 可选
+// Optional
 thirdPartyData.put("refresh_token", "REFRESH_TOKEN");
 thirdPartyData.put("scope", "SCOPE");
 TDSUser.loginWithAuthData(TDSUser.class, thirdPartyData, "weixin").subscribe(new Observer<TDSUser>() {
     public void onSubscribe(Disposable disposable) {
     }
     public void onNext(TDSUser user) {
-       System.out.println("成功登录");
+       System.out.println("Logged in.");
     }
     public void onError(Throwable throwable) {
-       System.out.println("尝试使用第三方账号登录，发生错误。");
+       System.out.println(An error occurred.");
     }
     public void onComplete() {
     }
@@ -553,12 +553,12 @@ TDSUser.loginWithAuthData(TDSUser.class, thirdPartyData, "weixin").subscribe(new
 
 ```objc
 NSDictionary *thirdPartyData = @{
-                            // 必须
+                            // Required
                             @"openid":@"OPENID",
                             @"access_token":@"ACCESS_TOKEN",
                             @"expires_in":@7200,
 
-                            // 可选
+                            // Optional
                             @"refresh_token":@"REFRESH_TOKEN",
                             @"scope":@"SCOPE",
                             };
@@ -567,21 +567,21 @@ LCUserAuthDataLoginOption *option = [LCUserAuthDataLoginOption new];
 option.platform = LeanCloudSocialPlatformWeiXin;
 [user loginWithAuthData:thirdPartyData platformId:LeanCloudSocialPlatformWeiXin options:option callback:^(BOOL succeeded, NSError * _Nullable error) {
     if (succeeded) {
-        NSLog(@"登录成功");
+        NSLog(@"Logged in.");
     } else {
-        NSLog(@"登录失败：%@",error.localizedFailureReason);
+        NSLog(@"An error occurred: %@",error.localizedFailureReason);
     }
 }];
 ```
 
 </MultiLang>
 
-`loginWithAuthData` 系列方法需要两个参数来唯一确定一个账户：
+`loginWithAuthData` requires two arguments to locate a unique account:
 
-- 第三方平台的名字，就是前例中的 `weixin`，该名字由应用层自己决定。
-- 第三方平台的授权信息，就是前例中的 `thirdPartyData`（一般包括 `uid`、`access_token`、`expires_in` 等信息，与具体的第三方平台有关）。
+- The name of the third-party platform, which is `weixin` in the example above. You can decide this name on your own.
+- The authorization data from the third-party platform, which is the `thirdPartyData` in the example above (depending on the platform, it usually includes `uid`, `access_token`, and `expires_in`).
 
-云端会使用第三方平台的鉴权信息来查询是否已经存在与之关联的账户。如果存在的话，则返回 `200 OK` 状态码，同时附上用户的信息（包括 [`sessionToken`](#设置当前用户)）。如果第三方平台的信息没有和任何账户关联，客户端会收到 `201 Created` 状态码，意味着新账户被创建，同时附上用户的 `objectId`、`createdAt`、`sessionToken` 和一个自动生成的 `username`，例如：
+The cloud will then verifies that the provided `authData` is valid and checks if a user is already associated with it. If so, it returns the status code `200 OK` along with the details (including a [`sessionToken`](#setting-the-current-user) of the user). If the `authData` is not linked to any accounts, you will instead receive the status code `201 Created`, indicating that a new user has been created. The body of the response contains `objectId`, `createdAt`, `sessionToken`, and an automatically-generated unique `username`. For example:
 
 ```json
 {
@@ -590,7 +590,7 @@ option.platform = LeanCloudSocialPlatformWeiXin;
   "createdAt": "2018-05-21T09:33:26.406Z",
   "updatedAt": "2018-05-21T09:33:26.575Z",
   "sessionToken": "…",
-  // authData 通常不会返回，继续阅读以了解其中原因
+  // authData won't be returned in most cases; see explanations below
   "authData": {
     "weixin": {
       "openid": "OPENID",
@@ -604,57 +604,57 @@ option.platform = LeanCloudSocialPlatformWeiXin;
 }
 ```
 
-这时候我们会看到 `_User` 表中出现了一条新的账户记录，账户中有一个名为 `authData` 的列，保存了第三方平台的授权信息。出于安全考虑，`authData` 不会被返回给客户端，除非它属于当前用户。
+Now we will see a new record showing up in the `_User` table that has an `authData` field. Within this field is the authorization data from the third-party platform. For security reasons, the `authData` field won’t be returned to the client unless the current user owns it.
 
-开发者需要自己完成第三方平台的鉴权流程（一般通过 OAuth 1.0 或 2.0），以获取鉴权信息，继而到云端来登录。
+You will need to implement the authentication process involving the third-party platform yourself (usually with OAuth 1.0 or 2.0) to obtain the authentication data, which will be used to log a user in.
 
 ### Sign in with Apple
 
-如果你需要开发 [Sign in with Apple](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api)，云服务可以帮你校验 `identityToken`，并获取 Apple 的 `access_token`。Apple Sign In 的 `authData` 结构如下：
+If you plan to implement [Sign in with Apple](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api), the cloud can help you verify `identityToken`s and obtain `access_token`s from Apple. Below is the structure of `authData` for Sign in with Apple:
 
 ```json
 {
   "lc_apple": {
-    "uid": "从 Apple 获取到的 User Identifier",
-    "identity_token": "从 Apple 获取到的 identityToken",
-    "code": "从 Apple 获取到的 Authorization Code"
+    "uid": "The User Identifier obtained from Apple",
+    "identity_token": "The identityToken obtained from Apple",
+    "code": "The Authorization Code obtained from Apple"
   }
 }
 ```
 
-`authData` 中的 key 的作用：
+Each `authData` has the following fields:
 
-- **`lc_apple`**：只有 platform 为 `lc_apple` 时，云服务才会执行 `identity_token` 和 `code` 的逻辑。
-- **`uid`**：必填。云服务通过 `uid` 判断是否存在用户。
-- **`identity_token`**：可选。`authData` 中有 `identity_token` 时云端会自动校验 `identity_token` 的有效性。开发者需要在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 内建账户 > 设置 > 第三方集成** 中填写 Apple 的相关信息。
-- **`code`**：可选。`authData` 中有 `code` 时云端会自动用该 `code` 向 Apple 换取 `access_token` 和 `refresh_token`。开发者需要在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 内建账户 > 设置 > 第三方集成** 中填写 Apple 的相关信息。
+- **`lc_apple`**: The cloud will run the logic related to `identity_token` and `code` only when the platform name is `lc_apple`.
+- **`uid`**: Required. The cloud tells if the user exists with `uid`.
+- **`identity_token`**: Optional. The cloud will automatically validate `identity_token` if this field exists. Please make sure you have provided relevant information on **Developer Center > Your game > Game Services > Cloud Services > TDS Authentication > Settings > Third-party accounts**.
+- **`code`**: Optional. The cloud will automatically obtain `access_token` and `refresh_token` from Apple if this field exists. Please make sure you have provided relevant information on **Developer Center > Your game > Game Services > Cloud Services > TDS Authentication > Settings > Third-party accounts**.
 
-#### 获取 Client ID
+#### Getting Client ID
 
-Client ID 用于校验 `identity_token` 及获取 `access_token`，指的是 Apple 应用的 identifier，也就是 `AppID` 或 `serviceID`。对于原生应用来说，指的是 Xcode 中的 Bundle Identifier，例如 `com.mytest.app`。详情请参考 [Apple 的文档](https://developer.apple.com/documentation/sign_in_with_apple/generate_and_validate_tokens)。
+Client ID is used to verify `identity_token` and to obtain `access_token`. It is the identifier of an Apple app (`AppID` or `serviceID`). For native apps, it is the Bundle Identifier in Xcode, which looks like `com.mytest.app`. See [Apple’s docs](https://developer.apple.com/documentation/sign_in_with_apple/generate_and_validate_tokens) for more details.
 
-#### 获取 Private Key 及 Private Key ID
+#### Getting Private Key and Private Key ID
 
-Private Key 用于获取 `access_token`。登录 Apple 开发者平台，在左侧的「Certificates, Identifiers & Profiles」中选择「Keys」，添加一个用于 Apple Sign In 的 Private Key，下载 `.p8` 文件，同时在下载 Key 的页面获得 Private Key ID。详情请参考 [Apple 的文档](https://help.apple.com/developer-account/#/dev77c875b7e)。
+Private Key is used to obtain `access_token`. You can go to Apple Developer, select “Keys” from “Certificates, Identifiers & Profiles”, add a Private Key for Sign in with Apple, and then download the `.p8` file. You will also obtain the Private Key ID from the page you download the key. See [Apple’s docs](https://help.apple.com/developer-account/#/dev77c875b7e) for more details.
 
-将 Key ID 填写到控制台，将下载下来的 Private Key 文件上传到控制台。控制台只能上传 Private Key 文件，无法查看及下载其内容。
+The last step is to fill in the Key ID on the Developer Center and upload the downloaded Private Key. You can only upload Private Keys, but cannot view or download them.
 
-#### 获取 Team ID
+#### Getting Team ID
 
-Team ID 用于获取 `access_token`。登录 Apple 开发者平台，在右上角或 Membership 页面即可看到自己所属开发团队的 Team ID。注意选择 Bundle ID 对应的 Team。
+Team ID is used to obtain `access_token`. You can view your team’s Team ID by going to Apple Developer and looking at the top-right corner or the Membership page. Make sure to select the team matching the selected Bundle ID.
 
-#### 使用 Apple Sign In 登录云服务
+#### Logging in to Cloud Services With Sign in with Apple
 
-在控制台填写完成所有信息后，使用以下代码登录。
+After you have filled in all the information on the Developer Center, you can log a user in with the following code:
 
 <MultiLang>
 
 ```cs
 Dictionary<string, object> appleAuthData = new Dictionary<string, object> {
-  // 必须
+  // Required
   { "uid", "USER IDENTIFIER" },
 
-  // 可选
+  // Optional
   { "identity_token", "IDENTITY TOKEN" },
   { "code", "AUTHORIZATION CODE" }
 };
@@ -662,36 +662,36 @@ TDSUser currentUser = await TDSUser.LoginWithAuthData(appleAuthData, "lc_apple")
 ```
 
 ```java
-// 不支持
+// Not supported yet
 ```
 
 ```objc
 NSDictionary *appleAuthData = @{
-                            // 必须
+                            // Required
                             @"uid":@"USER IDENTIFIER",
-                            // 可选
+                            // Optional
                             @"identity_token":@"IDENTITY TOKEN",
                             @"code":@"AUTHORIZATION CODE",
                             };
 TDSUser *user = [TDSUser user];
 [user loginWithAuthData:appleAuthData platformId:"lc_apple" options:nil callback:^(BOOL succeeded, NSError * _Nullable error) {
     if (succeeded) {
-        NSLog(@"登录成功");
+        NSLog(@"Logged in.");
     }else{
-        NSLog(@"登录失败：%@",error.localizedFailureReason);
+        NSLog(@"Failed to log in: %@",error.localizedFailureReason);
     }
 }];
 ```
 
 </MultiLang>
 
-### 鉴权数据的保存
+### Storing Authentication Data
 
-`_User` class 中的 `authData` 是一个以平台名为键名，鉴权信息为键值的 JSON 对象。
+The `authData` in the `_User` class is a JSON object with platform names as keys and authentication data as values.
 
 <Conditional region="cn">
 
-一个关联了微信账户的用户应该会有下列对象作为 `authData`：
+A user associated with a WeChat account will have the following object as its `authData`:
 
 ```json
 {
@@ -705,7 +705,7 @@ TDSUser *user = [TDSUser user];
 }
 ```
 
-而一个关联了微博账户的用户，则会有如下的 `authData`：
+A user associated with a Weibo account will have the following object as its `authData`:
 
 ```json
 {
@@ -718,7 +718,7 @@ TDSUser *user = [TDSUser user];
 }
 ```
 
-我们允许一个账户绑定多个第三方平台的鉴权数据，这样如果某个用户同时关联了微信和微博账户，则其 `authData` 可能会是这样的：
+A user can be associated with multiple third-party platforms. If a user is associated with both WeChat and Weibo, their `authData` may look like this:
 
 ```json
 {
@@ -740,7 +740,7 @@ TDSUser *user = [TDSUser user];
 
 </Conditional>
 
-理解 `authData` 的数据结构至关重要。一个终端用户通过如下的鉴权信息来登录的时候，
+It’s important to understand the data structure of `authData`. When a user logs in with the following authentication data:
 
 ```json
 "platform": {
@@ -752,29 +752,29 @@ TDSUser *user = [TDSUser user];
 }
 ```
 
-云端首先会查找账户系统（`_User` 表），看看是否存在 `authData.platform.openid` 等于 `OPENID` 的账户，如果存在，则返回现有账户，如果不存在那么就创建一个新账户，同时将上面的鉴权信息写入新账户的 `authData` 属性中，并将新账户的数据当成结果返回。
+The cloud will first look at the account system (the `_User` table) to see if there is an account that has its `authData.platform.openid` to be the `OPENID`. If there is, return the existing account. If not, create a new account and write the authentication data into the `authData` field of this new account, and then return the new account’s data as the result.
 
-云端会自动为 `_User` class 中每个用户的 `authData.<PLATFORM>.<uid>` 创建唯一索引，从而避免重复数据。
-`<uid>` 在<Conditional region="cn">微信等</Conditional>部分云服务内建支持的第三方平台上为 `openid` 字段，在其他第三方平台（包括部分云服务专门支持的第三方平台和所有云服务没有专门支持的第三方平台）上为 `uid` 字段。
+The cloud will automatically create a unique index for the `authData.<PLATFORM>.<uid>` of each user in the `_User` class, which prevents the formation of duplicate data.
+For some of the platforms specially supported by us, `<uid>` refers to the `openid` field. For others (the other platforms specially supported by us, and those not specially supported by us), it refers to the `uid` field.
 
-### 自动验证第三方平台授权信息
+### Automatically Validating Third-Party Authorization Data
 
-为了确保账户数据的有效性，云端还支持对部分平台的 Access Token 的有效性进行自动验证，以防止伪造账户数据。如果有效性验证不通过，云端会返回 `invalid authData` 错误，关联不会被建立。对于云端无法识别的服务，开发者需要自己去验证 Access Token 的有效性。
-比如，注册、登录时分别通过云引擎的 `beforeSave` hook、`beforeUpdate` hook 来验证 Access Token 有效性。
+The cloud can automatically validate access tokens for certain platforms, which prevents counterfeit account data from entering your app’s account system. If the validation fails, the cloud will return the `invalid authData` error, and the association will not be created. For those services that are not recognized by the cloud, you need to validate the access tokens yourself.
+You can validate access tokens when a user signs up or logs in by using LeanEngine’s `beforeSave` hook and `beforeUpdate` hook.
 
-如果希望使用这一功能，则在开始使用前，需要在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 内建账户 > 设置** 配置相应平台的 **应用 ID** 和 **应用 Secret Key**。
+To enable the feature, please configure the platforms’ **App IDs** and **Secret Keys** on **Developer Center > Your game > Game Services > Cloud Services > TDS Authentication > Settings**.
 
-如果不希望云端自动验证 Access Token，可以在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 内建账户 > 设置** 里面取消勾选 **第三方登录时，验证用户 AccessToken 合法性**。
+To disable the feature, please uncheck **Validate access tokens when logging in with third-party accounts** on **Developer Center > Your game > Game Services > Cloud Services > TDS Authentication > Settings**.
 
-配置平台账号的目的在于创建 `TDSUser` 时，云端会使用相关信息去校验请求参数 `thirdPartyData` 的合法性，确保 `TDSUser` 实际对应着一个合法真实的用户，确保平台安全性。
+The reason for configuring the platforms is that when a `TDSUser` is created, the cloud will use the relevant data to validate the `thirdPartyData` to ensure that the `TDSUser` matches a real user, which ensures the security of your app.
 
-### 绑定第三方账户
+### Linking Third-Party Accounts
 
-如果用户已经登录，也可以在当前账户上绑定或解绑更多第三方平台信息。例如，先用游客身份登录，再绑定 TapTap 或其他第三方账号，那么以后通过 TapTap 或其他第三方授权登录，都可以得到完全相同的账号。
+If a user is already logged in, you can link third-party accounts to this user. For example, if a user first logs in as a guest and then links their TapTap or other third-party accounts, the user will be able to access the same account when they log in with the same TapTap or third-party accounts in the future.
 
-绑定成功后，新的第三方账户信息会被添加到 `TDSUser` 的 `authData` 字段里。
+After a user links their third-party account, the account information will be added to the `authData` field of the corresponding `TDSUser`.
 
-例如，下面的代码可以关联微信账户：
+The following code links a WeChat account to a user:
 
 <MultiLang>
 
@@ -789,11 +789,11 @@ user.associateWithAuthData(weixinData, "weixin").subscribe(new Observer<TDSUser>
     }
     @Override
     public void onNext(TDSUser user) {
-        System.out.println("绑定成功");
+        System.out.println("Account linked.");
     }
     @Override
     public void onError(Throwable e) {
-        System.out.println("绑定失败：" + e.getMessage());
+        System.out.println("Failed to link the account: " + e.getMessage());
     }
     @Override
     public void onComplete() {
@@ -804,22 +804,23 @@ user.associateWithAuthData(weixinData, "weixin").subscribe(new Observer<TDSUser>
 ```objc
 [user associateWithAuthData:weixinData platformId:LeanCloudSocialPlatformWeiXin options:nil callback:^(BOOL succeeded, NSError * _Nullable error) {
     if (succeeded) {
-        NSLog(@"成功");
+        NSLog(@"Account linked.");
     } else{
-        NSLog(@"失败：%@",error.localizedFailureReason);
+        NSLog(@"Failed to link the account: %@",error.localizedFailureReason);
     }
 }];
 ```
 
 </MultiLang>
 
-为节省篇幅，上面的代码示例中没有给出具体的平台授权信息，相关内容请参考上面的[「第三方账户登录」](#第三方账户登录)一节。
+The code above omitted the authorization data of the platform. See [Third-Party Sign-on
+](#third-party-sign-on) for more details.
 
-### 解除与第三方账户的关联
+### Unlinking
 
-类似地，可以解绑第三方账户。
+Similarly, a third-party account can be unlinked.
 
-例如，下面的代码可以解除用户和微信账户的关联：
+For example, the code below unlinks a user’s WeChat account:
 
 <MultiLang>
 
@@ -836,11 +837,11 @@ user.dissociateWithAuthData("weixin").subscribe(new Observer<TDSUser>() {
     }
     @Override
     public void onNext(TDSUser user) {
-        System.out.println("解绑成功");
+        System.out.println("Unlinked.");
     }
     @Override
     public void onError(Throwable e) {
-        System.out.println("解绑失败：" + e.getMessage());
+        System.out.println("Failed to unlink: " + e.getMessage());
     }
     @Override
     public void onComplete() {
@@ -851,9 +852,9 @@ user.dissociateWithAuthData("weixin").subscribe(new Observer<TDSUser>() {
 ```objc
 [user disassociateWithPlatform:LeanCloudSocialPlatformWeiXin callback:^(BOOL succeeded, NSError * _Nullable error) {
     if (succeeded) {
-        NSLog(@"成功");
+        NSLog(@"Unlinked.");
     } else{
-        NSLog(@"失败：%@",error.localizedFailureReason);
+        NSLog(@"Failed to unlink: %@",error.localizedFailureReason);
     }
 }];
 ```
