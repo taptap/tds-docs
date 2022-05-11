@@ -1,0 +1,453 @@
+---
+title: Cloud Save Guide
+sidebar_label: Guide
+sidebar_position: 2
+---
+
+import MultiLang from "/src/docComponents/MultiLang";
+
+Before continuing, make sure you have read [Cloud Save Introduction](/sdk/gamesaves/features/) to learn about the basic concepts and features of Cloud Save.
+
+## Prerequisites
+
+Please complete the following steps before using Cloud Save:
+
+1. Add your [domains](/sdk/start/get-ready/#domains), including API domains and file domains, on the Developer Center.
+
+2. Enable **TDS Authentication** since the checkpoints will be associated with `TDSUser`s. Make sure you have completed [project configuration](/sdk/start/quickstart/#project-configuration), [SDK initialization](/sdk/start/quickstart/#initialization), and the implementation of [TDS Authentication](/sdk/authentication/guide/).
+
+## Creating Checkpoints
+
+The SDK will automatically get the information of the currently logged-in player (`TDSUser`) and associate it with the checkpoint.
+Therefore, a user can only create a checkpoint if they are logged in.
+
+<MultiLang>
+
+```cs
+var gameSave = new TapGameSave
+{
+    Name = "internal name",
+    Summary = "description",
+    ModifiedAt = DateTime.Now.ToLocalTime(),
+    PlayedTime = 60000L, // ms
+    ProgressValue = 100,
+    CoverFilePath = image_local_path, // jpg/png
+    GameFilePath = dll_local_path
+};
+await gameSave.Save();
+```
+
+```java
+TapGameSave snapshot = new TapGameSave();
+snapshot.setName("internal name");
+snapshot.setSummary("description");
+snapshot.setPlayedTime(60000); // ms
+snapshot.setProgressValue(100);
+snapshot.setCover(image_local_path); // jpg/png
+snapshot.setGameFile(dll_local_path);
+snapshot.setModifiedAt(new Date());
+snapshot.saveInBackground().subscribe(new Observer<TapGameSave>() {
+    @Override
+    public void onSubscribe(@NotNull Disposable d) {}
+
+    @Override
+    public void onNext(@NotNull TapGameSave gameSave) {
+        System.out.println("Checkpoint saved: " + gameSave.toJSONString());
+    }
+
+    @Override
+    public void onError(@NotNull Throwable e) {
+        e.printStackTrace();
+    }
+
+    @Override
+    public void onComplete() {}
+});
+```
+
+```objc
+TapGameSave *gameSave = [TapGameSave new];
+gameSave.name = @"internal name";
+gameSave.summary = @"description";
+gameSave.modifiedAt = [NSDate date];
+gameSave.playedTime = 60000; // ms
+gameSave.progressValue = 100;
+[gameSave setCoverWithLocalPath:@"image_local_path" error:&error]; // jpg/png
+[gameSave setGameFileWithLocalPath:@"dll_local_path" error:&error];
+[gameSave saveInBackgroundWithBlock:^(BOOL succeeded, NSError *_Nullable error) {
+    if (succeeded) {
+        NSLog(@"Checkpoint saved. objectId: %@", gameSave.objectId);
+    } else {
+        // Error handling
+    }
+}];
+```
+
+</MultiLang>
+
+See [Metadata](/sdk/gamesaves/features#metadata) to learn more about the fields of metadata appearing in the example above.
+When you save a checkpoint, the SDK will ensure that only the current user can read and write into the checkpoint as well as the associated file and the cover image.
+
+## Retrieving Checkpoints
+
+The most common scenario is to retrieve all the checkpoints belonging to the current player:
+
+<MultiLang>
+
+```cs
+var collection = await TapGameSave.GetCurrentUserGameSaves();
+
+foreach(var gameSave in collection){
+    var summary = gameSave.Summary;
+    var modifiedAt = gameSave.ModifiedAt;
+    var playedTime = gameSave.PlayedTime;
+    var progressValue = gameSave.ProgressValue;
+    var coverFile = gameSave.CoverFile;
+    var gameFile = gameSave.GameFile;
+    var gameFileUrl = gameFile.Url;
+}
+```
+
+```java
+TapGameSave.getCurrentUserGameSaves()
+        .subscribe(new Observer<List<TapGameSave>>() {
+    @Override
+    public void onSubscribe(@NotNull Disposable d) {}
+
+    @Override
+    public void onNext(@NotNull List<TapGameSave> tapGameSaves) {
+        for (TapGameSave gameSave : tapGameSaves) {
+            String summary = gameSave.getSummary();
+            Date modifiedAt = gameSave.getModifiedAt();
+            double playedTime = gameSave.getPlayedTime();
+            int progressValue = gameSave.getProgressValue();
+            LCFile cover = gameSave.getCover();
+            LCFile gameFile = gameSave.getGameFile();
+        }
+    }
+
+    @Override
+    public void onError(@NotNull Throwable e) {
+        e.printStackTrace();
+    }
+
+    @Override
+    public void onComplete() {}
+});
+```
+
+```objc
+LCQuery *query = [TapGameSave queryWithCurrentUser];
+[query findObjectsInBackgroundWithBlock:^(NSArray *_Nullable gameSaves, NSError *_Nullable error) {
+    if (error) {
+        NSLog(@"test fail because %@", error);
+    } else {
+        for (TapGameSave *gameSave in gameSaves) {
+            NSString *summary = gameSave.summary;
+            NSDate *modifiedAt = gameSave.modifiedAt;
+            double playedTime = gameSave.playedTime;
+            int progressValue = gameSave.progressValue;
+            LCFile* cover = gameSave.cover;
+            LCFile* gameFile = gameSave.gameFile;
+        }
+    }
+}];
+```
+
+</MultiLang>
+
+You can also retrieve checkpoints that meet certain criteria. For example, to retrieve all the current player’s checkpoints with progress larger than 3:
+
+<MultiLang>
+
+<>
+
+```cs
+TDSUser user = await TDSUser.GetCurrent();
+LCQuery<TapGameSave> gameSaveQuery = TapGameSave.GetQueryWithUser(user);
+gameSaveQuery.WhereGreaterThan("progressValue", 3);
+var collections = await gameSaveQuery.Find();
+```
+
+See [Data Storage Guide](/sdk/storage/guide/dotnet/) for how to add constraints to queries.
+
+</>
+<>
+
+```java
+LCQuery<TapGameSave> gameSaveQuery = TapGameSave.getQueryWithUser();
+gameSaveQuery.whereGreaterThan("progressValue", 3);
+gameSaveQuery.findInBackground().subscribe(new Observer<List<LCObject>>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(List<TapGameSave> gamesaves) {
+        // gamesaves is an array containing checkpoint objects meeting the criteria
+    }
+    public void onError(Throwable throwable) {}
+    public void onComplete() {}
+});
+```
+
+See [Data Storage Guide](/sdk/storage/guide/java/) for how to add constraints to queries.
+
+</>
+<>
+
+```objc
+LCQuery *query = [TapGameSave queryWithCurrentUser];
+[query whereKey:@"progressValue" greaterThan:@3];
+[query findObjectsInBackgroundWithBlock:^(NSArray *_Nullable gameSaves, NSError *_Nullable error) {
+    // Things to do with the retrieved checkpoint objects
+}];
+```
+
+</>
+
+</MultiLang>
+
+Notice that **if none of the players of your game have ever created a checkpoint, you will get an error when retrieving checkpoints that says** `Class or object doesn't exists.`.
+This is because the table (class) for storing checkpoint objects in our database only gets created when the first checkpoint object gets created.
+
+## Deleting Checkpoints
+
+A player can only delete their own checkpoints.
+
+To delete a checkpoint:
+
+<MultiLang>
+
+```cs
+await gameSave.Delete();
+```
+
+```java
+gameSave.deleteInBackground().subscribe(new Observer<LCNull>() {
+    @Override
+    public void onSubscribe(@NonNull Disposable d) {}
+
+    @Override
+    public void onNext(LCNull response) {
+        // Deleted.
+    }
+
+    @Override
+    public void onError(@NonNull Throwable e) {
+        System.out.println("Failed to delete:" + e.getMessage());
+    }
+
+    @Override
+    public void onComplete() {}
+});
+```
+
+```objc
+[gameSave deleteInBackground];
+```
+
+</MultiLang>
+
+When a checkpoint gets deleted, the associated cover image and the original file will also be deleted.
+
+## REST API
+
+Below are the REST API interfaces available for Cloud Save.
+You can write your own programs to access these interfaces and perform administrative operations on the server side.
+
+### Request Format
+
+For POST and PUT requests, the request body must be in JSON and the Content-Type of the HTTP Header must be `application/json`.
+
+Requests are authenticated by the key-value pairs in the HTTP Header shown in the following table:
+
+| Key            | Value            | Description                                       | Source                               |
+| -------------- | ---------------- | ------------------------------------------------- | ------------------------------------ |
+| `X-LC-Id`      | `{{appid}}`      | The `App Id` (`Client Id`) of the current app     | Can be found on the Developer Center |
+| `X-LC-Key`     | `{{appkey}}`     | The `App Key` (`Client Token`) of the current app | Can be found on the Developer Center |
+| `X-LC-Session` | `<sessionToken>` | The player’s credential for logging in            |                                      |
+
+The `Master Key` is required for you to access the administration interface. Use `X-LC-Key: {{masterkey}},master` to have the server treat the given key as a master key.
+`Master Key` is also called `Server Secret`, which can be found on the Developer Center. When accessing the administration interface, `sessionToken` can be omitted.
+
+See [Credentials](/sdk/storage/guide/setup-dotnet#credentials) for more details.
+
+The cloud imposes restrictions on each checkpoint so that it can only be accessed by the player who created it. Therefore, when accessing the REST API, you have to either include a player’s `sessionToken` in the `X-LC-Session` HTTP header or use the `Master Key`, otherwise the request will fail due to a lack of permission.
+
+### Base URL
+
+The Base URL for REST API requests (the `{{host}}` in the curl examples) is the custom API domain of your app. You can update or find it on the Developer Center.
+See [Domain](/sdk/storage/guide/setup-dotnet#domain) for more details.
+
+### Interfaces
+
+| Name                  | Method | Address          | Description                                      |
+| --------------------- | ------ | ---------------- | ------------------------------------------------ |
+| Retrieve a checkpoint | GET    | `/gamesaves/:id` | Retrieve a checkpoint by its ID.                 |
+| Retrieve checkpoints  | GET    | `/gamesaves`     | Retrieve checkpoints that meet certain criteria. |
+| Add a checkpoint      | POST   | `/gamesaves`     | Add a new checkpoint.                            |
+| Update a checkpoint   | PUT    | `/gamesaves/:id` | Update a checkpoint by its ID.                   |
+| Delete a checkpoint   | DELETE | `/gamesaves/:id` | Delete a checkpoint by its ID.                   |
+
+### Retrieving a Checkpoint
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Session: <sessionToken>" \
+  https://API_BASE_URL/1.1/gamesaves/<objectId>
+```
+
+Response:
+
+```json
+{
+  "updatedAt": "2021-08-16T09:18:30.093Z",
+  "progressValue": 123,
+  "name": "dennis",
+  "objectId": "611a2d65bcf94a3222b6d5f3",
+  "createdAt": "2021-08-16T09:18:29.761Z",
+  "gameFile": {
+    "__type": "Pointer",
+    "className": "_File",
+    "objectId": "60d1af149be3180684000002"
+  },
+  "summary": "hello",
+  "modifiedAt": {
+    "__type": "Date",
+    "iso": "2015-06-21T18:02:52.249Z"
+  },
+  "user": {
+    "__type": "Pointer",
+    "className": "_User",
+    "objectId": "5b62c15a9f54540062427acc"
+  }
+}
+```
+
+See [Metadata](/sdk/gamesaves/features#metadata) to learn more about the fields of metadata.
+
+### Retrieving Checkpoints
+
+Use `where` to specify the criteria:
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Session: <sessionToken>" \
+  -H "Content-Type: application/json" \
+  -G \
+  --data-urlencode 'where={"progressValue":123}' \
+  https://API_BASE_URL/1.1/gamesaves
+```
+
+Response:
+
+```json
+{
+  "results": [
+    {
+      "updatedAt": "2021-08-16T09:30:20.643Z",
+      "name": "dennis",
+      "createdAt": "2021-08-16T09:30:20.643Z",
+      "gameFile": {
+        "__type": "Pointer",
+        "className": "_File",
+        "objectId": "60d1af149be3180684000002"
+      },
+      "summary": "hello",
+      "modifiedAt": {
+        "__type": "Date",
+        "iso": "2015-06-21T18:02:52.249Z"
+      },
+      "objectId": "611a302cbcf94a3222b6d687"
+    }
+  ]
+}
+```
+
+See [Data Storage REST API](/sdk/storage/guide/rest#query-constraints) for more details about the usage of `where`.
+
+### Adding a Checkpoint
+
+See [Metadata](/sdk/gamesaves/features#metadata) to learn more about the required and optional fields of metadata.
+
+Before accessing this interface, please first create the [files](/sdk/storage/guide/rest/#creating-files) referenced by the `gameFile` and `cover` fields of the checkpoint. Make sure **the ACLs of the files are set to be accessible by the current user only**.
+
+```
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Session: <sessionToken>" \
+  -H "Content-Type: application/json" \
+  -d '{
+      "progressValue":123,
+      "playedTime":1283490343,
+      "name":"dennis",
+      "gameFile":{"id":"55a39634e4b0ed48f0c1845c", "__type":"File"},
+      "cover":{"id": "543cbaede4b07db196f50f3c", "__type": "File"},
+      "summary":"hello",
+      "modifiedAt":{"__type":"Date", "iso":"2015-06-21T18:02:52.249Z"}
+  }' \
+https://API_BASE_URL/1.1/gamesaves
+```
+
+If the operation succeeded, the `objectId` and creation time of the checkpoint will be returned:
+
+```
+{"objectId":"611a3407bcf94a3222b6d789", "createdAt":"2021-08-16T09:46:47.290Z"}
+```
+
+If the operation failed, there will be an error, like:
+
+- `gameFile is required.`: The required field `gameFile` is not provided.
+- `Forbidden to add new fields by class '_GameSave' permissions.`: Custom fields are included in the request, which is not allowed yet.
+
+### Deleting a Checkpoint
+
+```
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Session: <sessionToken>" \
+  https://API_BASE_URL/1.1/gamesaves/<objectId>
+```
+
+Response:
+
+```json
+{}
+```
+
+You can add a `where` condition when deleting a checkpoint so you won’t accidentally delete the wrong checkpoints.
+See [Conditional Deletions](/sdk/storage/guide/rest#conditional-deletions).
+
+When a checkpoint gets deleted, the associated cover image and the original file will also be deleted.
+
+### Updating a Checkpoint
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Session: <sessionToken>" \
+  -H "Content-Type: application/json" \
+  -d '{"progressValue": 114514}' \
+  https://API_BASE_URL/1.1/gamesaves/<objectId>
+```
+
+If the operation succeeded, the `objectId` and creation time of the checkpoint will be returned:
+
+```json
+{
+  "updatedAt": "2021-08-16T09:49:49.579Z",
+  "objectId": "611a34bdbcf94a3222b6d7af"
+}
+```
+
+If the operation failed, there will be an error:
+
+- `Forbidden to add new fields by class '_GameSave' permissions.`: Custom fields are included in the request, which is not allowed yet.
+
+Notice that if you update the cover image or the original file of a checkpoint, the old files used as them will not be automatically deleted.
+You will need to manually [delete](/sdk/storage/guide/rest/#deleting-files) them.
+Therefore, we recommend that you update a checkpoint by deleting and recreating it instead of directly updating it. The interface for updating checkpoints is mainly used to serve administrative scenarios.
