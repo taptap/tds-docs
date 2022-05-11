@@ -37,9 +37,11 @@ import Languages from '../../_partials/languages.mdx';
 
 参考 [快速开始](/sdk/start/quickstart/) 创建应用、完成项目配置和 [初始化](/sdk/start/quickstart/#初始化)。
 
-## 用 TapTap OAuth 授权结果直接登录账户系统
+## 一键完成 TapTap 登录
 
-对于「TapTap 用户登录」，TapSDK 提供了特别的支持，以帮助开发者以最便捷的方式和最少的时间完成接入。你可以直接调用 `TDSUser#loginWithTapTap` 方法来一键登录，例如：
+对于「TapTap 用户登录」，TapSDK 提供了特别的支持，以帮助开发者以最便捷的方式和最少的时间完成接入。
+
+你可以直接调用 `TDSUser#loginWithTapTap` 方法来一键登录，例如：
 
 <MultiLang>
 
@@ -101,28 +103,28 @@ TDSUser.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
 
 </MultiLang>
 
-`TDSUser` 即是当前玩家的账户系统，登录成功之后开发者可以：
+以上接口调用后会拉起 TapTap 客户端或以 WebView 方式开始登录流程，用户授权之后 SDK 使用 TapTap OAuth 授权结果完成 TDS 内建账户系统的登录。
 
-- 通过访问 `nickname` 属性来获得 TapTap 账户的用户名；
-- 通过访问 `avatar` 属性来获得 TapTap 账户的头像；
-- 通过访问 `objectId` 来得到该账户系统的 id，可用于游戏服务器内玩家与 TDS 内建账户的绑定或匹配。
+`TDSUser` 即是当前玩家的账户，登录成功之后开发者可以：
 
-在 TapTap 登录完成之后，开发者就可以使用其他 TapTap 生态能力，例如：
+- 通过访问 `objectId` 得到玩家在账户系统的 id（用户唯一标识），可用于游戏服务端内玩家与 TDS 内建账户的绑定或匹配。
+- 通过访问 `nickname` 属性来获得 TapTap 账号的用户名。
+- 通过访问 `avatar` 属性来获得 TapTap 账号的头像。
 
-### 获取 TapTap 平台用户详细信息
+开发者还可以在 TapTap 开发者中心后台 [查看或管理账户系统](/sdk/authentication/features/#管理账户)。
+
+### 获取用户信息
 
 TapTap 用户登录成功之后，开发者可以通过如下方式获取到 TapTap 授权结果的详细信息：
 
 <MultiLang>
 
 ```cs
-// 获取 TapTap Profile  可以获得当前用户的一些基本信息，例如名称、头像。
 var profile = await TapLogin.FetchProfile();
 Debug.Log($"profile: {profile.ToJson()}");
 ```
 
 ```java
-// 开发者调用 TapLoginHelper.getCurrentProfile() 可以获得当前用户的一些基本信息，例如名称、头像。
 Profile profile = TapLoginHelper.getCurrentProfile();
 ```
 
@@ -132,12 +134,22 @@ Profile profile = TapLoginHelper.getCurrentProfile();
 
 </MultiLang>
 
-这里的 `Profile` 类会包含如下信息：
+这里获取的 `Profile` 类会包含如下信息：
 
-- TapTap 平台 openId，每个玩家在每个游戏中的 openId 都是不一样的；
-- TapTap 平台的 unionId，一个玩家在一个厂商的所有游戏中 unionId 都是一样的，不同厂商 unionId 不同；
-- username，玩家在 TapTap 平台的用户名；
-- avatar，玩家在 TapTap 平台的头像；
+参数 | 说明
+--- | ---
+`name` | 玩家在 TapTap 平台的昵称
+`avatar` | 玩家在 TapTap 平台的头像 url
+`openid` | 通过用户信息和游戏信息生成的**用户唯一标识**，每个玩家在每个游戏中的 `openid` 都是不一样的
+`unionid` | 通过用户信息加上厂商信息生成的用户唯一标识，一个玩家在同一个厂商的所有游戏中 `unionid` 都是一样的，不同厂商下 `unionid` 不同
+
+`openid` 和 `unionid` 使用标准的 Base64 （带 Padding）编码，包含的字符有 `A-Za-z0-9+/=`。
+
+:::info
+由于 `unionid` 与游戏所属厂商有强关联性，一个游戏在[厂商转移](/store/store-creategame/#4-游戏主体可以进行转移吗)后同一个用户的 `unionid` 会发生改变。
+
+如果游戏使用了 `unionid`，TDS 技术支持会在转移前通过工单和游戏开发者确认相关数据的处理方案，保证迁移前后用户数据不错乱。
+:::
 
 ### 测试资格校验
 
