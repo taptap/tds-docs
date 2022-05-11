@@ -73,7 +73,7 @@ appid:clientid::timestamp:nonce
 
 > Note: The key for signing has to be the **Master Key** of your app. You can find it from **Developer Center > Your game > Game Services > Configuration**. **Make sure your Master Key is well-protected and doesn't get leaked.**
 
-You may implement your own `SignatureFactory` to retrieve signatures from remote servers. If you don't have your own server, you may use the **web hosting** service provided by LeanEngine. Generating signatures within your mobile app is **extremely dangerous** since your **Master Key** can get exposed.
+You may implement your own `SignatureFactory` to retrieve signatures from remote servers. If you don't have your own server, you may use the **web hosting** service provided by Cloud Engine. Generating signatures within your mobile app is **extremely dangerous** since your **Master Key** can get exposed.
 
 This signature expires in 6 hours, but it becomes invalid immediately once the client has been forced to log out.
 The signature invalidness does not affect the currently connected clients.
@@ -132,9 +132,9 @@ appid:clientid:convid:sorted_member_ids:timestamp:nonce:action
 - `action` is the operation being performed: `conversation-block-clients` means blocking the client and `conversation-unblock-clients` means unblocking the client.
 - `sorted_member_ids` is the same as above.
 
-### Demo for Generating Signatures on LeanEngine
+### Demo for Generating Signatures on Cloud Engine
 
-To help you better understand the signing algorithm, we made a server-side signing program based on Node.js and LeanEngine. It's available [here](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/functions/rtm-signature.js) for you to study and use.
+To help you better understand the signing algorithm, we made a server-side signing program based on Node.js and Cloud Engine. It's available [here](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/functions/rtm-signature.js) for you to study and use.
 
 ### Supporting Signatures on the Client Side
 
@@ -237,7 +237,7 @@ LCIMClient tom = new LCIMClient("tom", signatureFactory: new LocalSignatureFacto
 ```
 
 ```java
-// An example of performing signing with LeanEngine
+// An example of performing signing with Cloud Engine
 public class KeepAliveSignatureFactory implements SignatureFactory {
  @Override
  public Signature createSignature(String peerId, List<String> watchIds) throws SignatureException {
@@ -330,7 +330,7 @@ signatureHandler:(void (^)(LCIMSignature * _Nullable))handler
         /*
          ...
          ...
-         See "Demo for Generating Signatures on LeanEngine"
+         See "Demo for Generating Signatures on Cloud Engine"
          */
         handler(signature);
     } else {
@@ -348,11 +348,11 @@ if (!error) {
 ```
 
 ```js
-// A LeanEngine-based signature factory for signing requests for logging in
+// A Cloud Engine-based signature factory for signing requests for logging in
 var signatureFactory = function (clientId) {
   return AV.Cloud.rpc("sign", { clientId: clientId }); // AV.Cloud.rpc returns a Promise
 };
-// A LeanEngine-based signature factory for signing requests for creating conversations, joining conversations, inviting users, and removing users
+// A Cloud Engine-based signature factory for signing requests for creating conversations, joining conversations, inviting users, and removing users
 var conversationSignatureFactory = function (
   conversationId,
   clientId,
@@ -366,7 +366,7 @@ var conversationSignatureFactory = function (
     action: action,
   });
 };
-// A LeanEngine-based signature factory for signing requests for blacklist operations
+// A Cloud Engine-based signature factory for signing requests for blacklist operations
 var blacklistSignatureFactory = function (
   conversationId,
   clientId,
@@ -398,9 +398,9 @@ realtime
 ```swift
 class SignatureDelegator: IMSignatureDelegate {
 
-    // A LeanEngine-based function for getting signatures for logging in
+    // A Cloud Engine-based function for getting signatures for logging in
     func getClientOpenSignature(completion: (IMSignature) -> Void) {
-        // See "Demo for Generating Signatures on LeanEngine"
+        // See "Demo for Generating Signatures on Cloud Engine"
     }
 
     func client(_ client: IMClient, action: IMSignature.Action, signatureHandler: @escaping (IMClient, IMSignature?) -> Void) {
@@ -431,7 +431,7 @@ do {
 
 </MultiLang>
 
-You should never perform signing using your Master Key on the client side. If your Master Key gets leaked, the data in your app would be accessible by anyone who has the key. Therefore, we highly recommend that you host the signing program on a server that is well-secured (like LeanEngine).
+You should never perform signing using your Master Key on the client side. If your Master Key gets leaked, the data in your app would be accessible by anyone who has the key. Therefore, we highly recommend that you host the signing program on a server that is well-secured (like Cloud Engine).
 
 ### Signing Mechanism for `User`
 
@@ -1561,7 +1561,7 @@ If you have upgraded to the Business Plan, you can customize the keywords. To do
 
 </Conditional>
 
-If you have more complicated requirements regarding text moderation, we recommend that you make use of the `_messageReceived` hook of LeanEngine. You can define your own logic for controlling messages.
+If you have more complicated requirements regarding text moderation, we recommend that you make use of the `_messageReceived` hook of Cloud Engine. You can define your own logic for controlling messages.
 
 ## Temporary Conversations
 
