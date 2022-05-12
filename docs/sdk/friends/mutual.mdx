@@ -644,6 +644,260 @@ TDSFriends.deleteFriend("5b0b97cf06f4fd0abc0abe35", new Callback<Boolean>() {
 
 </MultiLang>
 
+## 拉黑
+
+### 添加黑名单用户
+
+将用户加入黑名单，无论双方是否是好友，都可以进行该操作。拉黑后，双方之间进行中的好友申请都会被删除，且双方无法再发起以及接受对方的好友申请。查询好友列表时也无法查到已在黑名单中的好友，黑名单用户最多100人。
+
+接口声明：
+
+<MultiLang>
+<>
+
+```cs
+public static Task BlockFriend(string userId)
+```
+
+</>
+<>
+
+```java
+public static void blockFriend(String userId, Callback<Void> callback)
+```
+
+</>
+<>
+
+```objc
++ (void)blockFriendWithUserId:(NSString *)userId callback:(void (^)(BOOL, NSError * _Nullable))callback
+```
+
+</>
+
+</MultiLang>
+
+参数 `userId` 为好友的 objectId, `callback` 为异步处理回调。
+
+调用示例：
+
+<MultiLang>
+<>
+
+```cs
+await TDSFriends.BlockFriend(userId);
+```
+
+</>
+<>
+
+```java
+  TDSFriends.blockFriend(tomId, new Callback<Void>(){
+            @Override
+            public void onSuccess(Void result) {
+                System.out.println(" block tom success " );
+              }
+
+            @Override
+            public void onFail(TDSFriendError error) {
+                System.out.println(" block tom fail error = " + error );            }
+        });
+```
+
+</>
+<>
+
+```objc
+[TDSFriends blockFriendWithUserId:userId callback:^(BOOL succeeded, NSError * _Nullable error) {
+  if (succeeded) {
+    // block user succeed.
+  } else if (error) {
+    // Failed to block.
+  }
+}];
+```
+
+</>
+
+</MultiLang>
+
+### 移除黑名单用户
+
+从黑名单移除用户，如果目标用户曾经是当前用户的好友，则恢复进入当前用户好友列表。
+
+接口声明：
+
+<MultiLang>
+<>
+
+```cs
+public static Task UnblockFriend(string userId)
+```
+
+</>
+<>
+
+```java
+public static void unblockFriend(String userId, Callback<Void> callback)
+```
+
+</>
+<>
+
+```objc
++ (void)unblockFriendWithUserId:(NSString *)userId callback:(void (^)(BOOL, NSError * _Nullable))callback
+```
+
+</>
+
+</MultiLang>
+
+参数 `userId` 为用户的`objectId`, `callback` 为异步处理回调。
+
+调用示例：
+
+<MultiLang>
+<>
+
+```cs
+await TDSFriends.UnblockFriend(userId);
+```
+
+</>
+<>
+
+```java
+ TDSFriends.unblockFriend(id, new Callback<Void>() {
+                @Override
+                public void onSuccess(Void result) {
+                    toast("unblock success");
+                }
+
+                @Override
+                public void onFail(TDSFriendError error) {
+                    toast("unblock fail error = " + error);
+                }
+            });
+```
+
+</>
+<>
+
+```objc
+[TDSFriends unblockFriendWithUserId:userId callback:^(BOOL succeeded, NSError * _Nullable error) {
+  if (succeeded) {
+    // unblock succeed.
+  } else if (error) {
+    // Failed to unblock.
+  }
+}];
+```
+
+</>
+
+</MultiLang>
+
+### 查询黑名单列表
+
+分页查询黑名单用户列表。
+
+接口声明：
+
+<MultiLang>
+<>
+
+```cs
+public static async Task<ReadOnlyCollection<TDSFriendInfo>> QueryBlockList(int from, int limit)
+```
+
+参数 `from` 为获取列表的起始位置，第一页为 0，下一页为上一次获取数据的总数量； 参数 `limit` 为每页获取数据的数量。
+
+</>
+<>
+
+```java
+public static void queryBlockList(int from, int limit, ListCallback<TDSFriendInfo> callback)
+```
+
+参数 `from` 为获取列表的起始位置，第一页为 0，下一页为上一次获取数据的总数量； 参数 `limit` 为每页获取数据的数量；参数`callback` 为异步处理回调，包含黑名单用户列表的数据信息。
+
+</>
+<>
+
+```objc
++ (void)queryBlockListWithOption:(TDSFriendQueryOption *)option callback:(void (^)(NSArray<TDSFriendInfo *> * _Nullable, NSError * _Nullable))callback
+```
+
+参数 `option` 为查询时的条件配置，包括 `from` 每页的开始位置和 `limit` 查询数据数量等信息，callback 为异步处理结果回调。
+
+</>
+
+</MultiLang>
+
+调用示例：
+
+<MultiLang>
+<>
+
+```cs
+var from = 0;
+var limit = 100;
+ReadOnlyCollection<TDSFriendInfo> friendInfos = await TDSFriends.QueryBlockList(from, limit);
+foreach (TDSFriendInfo info in friendInfos) {
+    // 玩家信息
+    TDSUser user = info.User;
+    // 富信息数据
+    Dictionary<string, string> richPresence = info.RichPresence;
+    // 好友是否在线
+    bool online = info.Online;
+}
+```
+
+</>
+<>
+
+```java
+ TDSFriends.queryBlockList(0, 10, new ListCallback<TDSFriendInfo>() {
+             @Override
+             public void onSuccess(List<TDSFriendInfo> result) {
+                System.out.println(" query blockList data, data = " + result );
+             }
+
+            @Override
+            public void onFail(TDSFriendError error) {
+                System.out.println(" block tom fail error = " + error );
+            }
+        });
+```
+
+</>
+<>
+
+```objc
+TDSFriendQueryOption *option = [TDSFriendQueryOption new];
+option.from = 0;
+option.limit = 100;
+[TDSFriends queryBlockListWithOption:option
+    callback:^(NSArray<TDSFriendInfo *> * _Nullable friendInfos, NSError * _Nullable error) {
+        if (friendInfos) {
+            for (TDSFriendInfo *info in friendInfos) {
+                // 玩家信息
+                TDSUser *user = info.user;
+                // 富信息数据，详见后文
+                NSDictionary *richPresence = info.richPresence;
+                // 好友是否在线
+                BOOL online = info.online;
+            }
+        } else if (error) {
+            // 处理错误
+        }
+}];
+```
+
+</>
+
+</MultiLang>
+
 ## 查询好友申请列表
 
 好友申请有三种状态：
