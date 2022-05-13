@@ -1,6 +1,6 @@
 ---
-title: 排行榜指南
-sidebar_label: 开发指南
+title: LeaderBoard Guide
+sidebar_label: Guide
 sidebar_position: 2
 ---
 
@@ -9,38 +9,38 @@ import { Conditional } from "/src/docComponents/conditional";
 
 :::info
 
-阅读此文档前请先阅读：
+Before continuing, make sure you have read:
 
-- [排行榜功能介绍](/sdk/leaderboard/features/)，了解排行榜的核心概念及功能。
-- [内建账户指南](/sdk/authentication/guide/)，排行榜成员类型有 user、object、entity 三种，这里的 user 指内建账户系统中的用户。另外，本文中的 `currentUser` 指内建账户系统的当前登录用户。
+- [LeaderBoard Introduction](/sdk/leaderboard/features/). It introduces the core concepts and functions of LeaderBoard.
+- [TDS Authentication Guide](/sdk/authentication/guide/). There are three types of members: user, object, and entity. Here “user” refers to the users in the built-in account system. Besides, the `currentUser` mentioned later in this page refers to the currently logged-in user.
 
 :::
 
-## SDK 安装配置
+## Installing and Setting up SDK
 
-排行榜功能是数据存储 SDK 的一部分，请参考相应平台的数据存储 SDK 的配置指南。
+LeaderBoard comes as a part of the Data Storage SDK. Check the following pages if you haven’t set up the Data Storage SDK.
 
-- [.NET SDK 配置](/sdk/storage/guide/setup-dotnet)
-- [Java SDK 配置](/sdk/storage/guide/setup-java)
-- [Objective-C SDK 配置](/sdk/storage/guide/setup-objc)
+- [Installing .Net SDK](/sdk/storage/guide/setup-dotnet)
+- [Installing Java SDK](/sdk/storage/guide/setup-java)
+- [Installing Objective-C SDK](/sdk/storage/guide/setup-objc)
 
-## 快速入门
+## Quick Start
 
-### 创建排行榜
+### Creating Leaderboards
 
-创建排行榜有 3 种方式：
+There are 3 ways to create a leaderboard:
 
-- 在 TapTap 开发者中心的排行榜[控制台](#控制台)创建。
-- 在**服务端等受信任的环境**下[调用 REST API](#创建排行榜-2) 创建。
-- 在**服务端等受信任的环境**下[调用 SDK 的管理接口](#创建排行榜-1)创建。
+- Go to the Developer Center’s [dashboard](#dashboard).
+- [Access the REST API](#creating-leaderboards-2) under **trusted environments like the server side**.
+- [Access the management interface of the SDK](#creating-leaderboards-1) under **trusted environments like the server side**.
 
-比如，可以在控制台创建一个名称为 `world`，成员类型为「内建账户」，排序为 `descending`，更新策略为 `better`，重置周期为「每月」的世界排行榜。
+For example, you can create a leaderboard named `world` with “built-in account system” as the type of members, `descending` as the order, `better` as the update strategy, and “every month” as the reset interval.
 
 ![create leaderboard](/img/create_leaderboard.png)
 
-### 提交成绩
+### Submitting Scores
 
-假设玩家已登录（`currentUser`），通过如下代码即可更新成绩：
+If the player is logged in (accessible with `currentUser`), you can update their score with the following code:
 
 <MultiLang>
 
@@ -78,18 +78,18 @@ NSDictionary *statistic = @{
 };
 [LCLeaderboard updateCurrentUserStatistics:statistic, callback:^(NSArray *statistics, NSError *error) {
   if (statistics) {
-    // statistics 是更新后你的最好/最新成绩
+    // statistics is the best or latest score after the update
   } else if (error) {
-    // 处理错误
+    // Handle error
   }
 }];
 ```
 
 </MultiLang>
 
-### 获取名次
+### Getting Results
 
-接下来我们获取排行榜中的前十，由于之前我们只提交了一个玩家（当前玩家）的成绩，所以结果中只包含一个成绩。
+The code below retrieves the top 10 players from the leaderboard. Since we’ve only submitted one player’s score so far, the leaderboard will only have this one score.
 
 <MultiLang>
 
@@ -124,20 +124,20 @@ leaderboard.getResults(0, 10, null, null).subscribe(new Observer<LCLeaderboardRe
 LCLeaderboard leaderboard = [[LCLeaderboard alloc] initWithStatisticName:@"world"];
 leaderboard.limit = 10;
 [leaderboard getUserResultsWithOption:nil, callback:^(NSArray *rankings, NSInteger count, NSError *error) {
-  // rankings 是排行榜前十的排名信息
+  // rankings contains the top 10 players’ data
 }];
 ```
 
 </MultiLang>
 
-看过上面这个最简单的接入排行榜的例子后，下面就详细介绍排行榜的各个接口。
+We’ve just introduced the most basic usage of LeaderBoard. Now let’s look at all the interfaces provided by LeaderBoard.
 
-## 成绩管理
+## Managing Scores
 
-### 更新用户成绩
+### Updating the Current Player’s Scores
 
-当用户完成了一局游戏后，你可以在客户端使用 SDK 的 `updateStatistic` 方法更新该用户的成绩。
-不过，**从反作弊的角度出发，我们建议在控制台勾选「只允许使用 Master Key 更新分数」，然后在服务端更新成绩。**
+Once a player finishes a game, you can use the `updateStatistic` method provided by the client SDK to update this player’s score.
+However, **to effectively prevent cheating from happening, we suggest that you enable “Only Master Key is allowed to update the score” on the dashboard and update scores on the server side only.**
 
 <MultiLang>
 
@@ -186,15 +186,15 @@ NSDictionary *statistic = @{
 
 </MultiLang>
 
-更新用户成绩需要玩家登录，玩家只能更新自己的成绩。
-你可以一次性更新多个排行榜的成绩，比如上面的示例中同时更新了得分（`score`）和击杀（`kills`）两个排行榜的成绩。
+Updating a player’s score requires this player to be logged in. A player can only update their own scores.
+You can update multiple leaderboards at once. The example above updates the scores in both `score` and `kills`.
 
-客户端无法更新 object 和 entity 的成绩。
-如需更新其他用户、object、entity 的成绩，需要使用 [REST API](#更新成绩) 或 [SDK 提供的管理接口](#更新排行榜成员成绩)。
+You cannot update an object or entity’s scores with the client SDK.
+To update other players’, an object’s, or an entity’s scores, you have to use the [REST API](#updating-scores) or the [management interface provided by the SDK](#updating-leaderboard-members-scores).
 
-### 删除用户成绩
+### Deleting the Current Player’s Scores
 
-玩家也可以删除自己的成绩：
+A player can delete their own scores:
 
 <MultiLang>
 
@@ -203,27 +203,27 @@ await LCLeaderboard.DeleteStatistics(currentUser, new List<string> { "world" });
 ```
 
 ```java
-// 暂未支持
+// Not supported yet
 ```
 
 ```objc
 [LCLeaderboard deleteCurrentUserStatistics:@[@"world"], callback:^(BOOL succeeded, NSError * _Nullable error) {
   if (succeeded) {
-    // 删除成功
+    // Score deleted
   } else if (error) {
-    // 处理错误
+    // Handle error
   }
 }];
 ```
 
 </MultiLang>
 
-和更新成绩一样，玩家只能删除自己的成绩。
-如需删除其他用户、object、entity 的成绩，需要使用 [REST API](#删除成绩) 或 [SDK 提供的管理接口](#删除排行榜成员成绩)。
+Same as updating scores, a player can only delete their own scores.
+To delete other players’, an object’s, or an entity’s scores, you have to use the [REST API](#deleting-scores) or the [management interface provided by the SDK](#deleting-leaderboard-members-scores).
 
-### 查询排行榜成员成绩
+### Getting Leaderboard Members’ Scores
 
-**已登录用户**可以通过 `GetStatistics` 方法查询其他用户在所有排行榜中的成绩：
+A **logged-in player** can retrieve the scores of other players in all leaderboards with `GetStatistics`:
 
 <MultiLang>
 
@@ -237,7 +237,7 @@ foreach(var statistic in statistics) {
 ```
 
 ```java
-// 查询排行榜成员成绩
+// Retrieve leaderboard members’ scores
 LCUser otherUser = null;
 try {
     otherUser = LCUser.createWithoutData(LCUser.class, "5c76107144d90400536fc88b");
@@ -260,7 +260,7 @@ LCLeaderboard.getUserStatistics(otherUser).subscribe(new Observer<LCStatisticRes
     @Override
     public void onError(@NotNull Throwable throwable) {
         // handle error
-        Toast.makeText(MainActivity.this, "查询失败： " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+        Toast.makeText(MainActivity.this, "Failed: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -273,19 +273,19 @@ NSString *otherUserObjectId = @"5c76107144d90400536fc88b";
 [LCLeaderboard getStatisticsWithUserId:otherUserObjectId, statisticNames:nil, callback:^(NSArray<LCLeaderboardStatistic *> * _Nullable *statistics, NSError _Nullable *error) {
   if (statistics) {
     for (LCLeaderboardStatistic *statistic in statistics) {
-      NSLog(@"排行榜名称：%@", statistic.name);
-      NSLog(@"成绩：%f", statistic.value);
+      NSLog(@"Leaderboard name: %@", statistic.name);
+      NSLog(@"Scores: %f", statistic.value);
     }
   } else if (error) {
-        // 处理错误
+        // Handle error
   }
 }];
 ```
 
 </MultiLang>
 
-更多的场景下，只关心用户在某个或某几个排行榜中的成绩。
-查询时指定相应排行榜的名称即可：
+In most cases, you may only need to retrieve the scores of a user from specific leaderboards.
+To do so, provide the names of the leaderboards when querying:
 
 <MultiLang>
 
@@ -294,30 +294,30 @@ var statistics = await LCLeaderboard.GetStatistics(otherUser, new List<string> {
 ```
 
 ```java
-LCLeaderboard.getUserStatistics(otherUser, Arrays.asList("world")).subscribe(/** 略 **/);
+LCLeaderboard.getUserStatistics(otherUser, Arrays.asList("world")).subscribe(/** Other logic **/);
 ```
 
 ```objc
 [LCLeaderboard getStatisticsWithUserId:otherUserObjectId, statisticNames:@[@"world"], callback:^(NSArray<LCLeaderboardStatistic *> * _Nullable statistics, NSError * _Nullable error) {
-  // 略
+  // Other logic
 }];
 ```
 
 </MultiLang>
 
-类似地，可以查询 object 和 entity 的成绩。
+Similarly, you can retrieve scores from leaderboards with member types being object or entity.
 
 <MultiLang>
 <>
 
-例如，假定武器排行榜是 object 排行榜：
+For example, if the weapon leaderboard has its member type to be object:
 
 ```cs
 var excalibur = LCObject.createWithoutData("Weapon", "582570f38ac247004f39c24b");
 var statistics = await LCLeaderboard.GetStatistics(excalibur, new List<string> { "weapons" });
 ```
 
-如果武器排行榜是 entity 排行榜：
+If the weapon leaderboard has its member type to be entity:
 
 ```cs
 var statistics = await LCLeaderboard.GetStatistics("excalibur", new List<string> { "weapons" });
@@ -326,62 +326,62 @@ var statistics = await LCLeaderboard.GetStatistics("excalibur", new List<string>
 </>
 <>
 
-例如，假定武器排行榜是 object 排行榜：
+For example, if the weapon leaderboard has its member type to be object:
 
 ```java
 String excaliburObjectId = "582570f38ac247004f39c24b";
 LCLeaderboard.getMemberStatistics("Weapon", excaliburObjectId,
-  Arrays.asList("weapons")).subscribe(/** 略 **/);
+  Arrays.asList("weapons")).subscribe(/** Other logic **/);
 ```
 
-如果武器排行榜是 entity 排行榜：
+If the weapon leaderboard has its member type to be entity:
 
 ```java
 LCLeaderboard.getMemberStatistics(LCLeaderboard.MEMBER_TYPE_ENTITY, "excalibur",
-  Arrays.asList("weapons")).subscribe(/** 略 **/);
+  Arrays.asList("weapons")).subscribe(/** Other logic **/);
 ```
 
-顺便提下，之前提到的 `getUserStatistics` 方法
+The `getUserStatistics` method mentioned earlier:
 
 ```java
-LCLeaderboard.getUserStatistics(otherUser, Arrays.asList("weapons")).subscribe(/** 略 **/);
+LCLeaderboard.getUserStatistics(otherUser, Arrays.asList("weapons")).subscribe(/** Other logic **/);
 ```
 
-等价于：
+Is equivalent to:
 
 ```java
 LCLeaderboard.getMemberStatistics(LCLeaderboard.LCLeaderboard.MEMBER_TYPE_USER,
   otherUser.getObjectId(),
-  Arrays.asList("weapons")).subscribe(/** 略 **/);
+  Arrays.asList("weapons")).subscribe(/** Other logic **/);
 ```
 
 </>
 <>
 
-例如，假定武器排行榜是 object 排行榜：
+For example, if the weapon leaderboard has its member type to be object:
 
 ```objc
 NSString *excaliburObjectId = @"582570f38ac247004f39c24b";
 [LCLeaderboard getStatisticsWithObjectId:excaliburObjectId, statisticNames:@[@"weapons"],
   option:nil
   callback:^(NSArray *statistics, NSError *error) {
-  // 略
+  // Other logic
 }];
 ```
 
-如果武器排行榜是 entity 排行榜：
+If the weapon leaderboard has its member type to be entity:
 
 ```objc
 [LCLeaderboard getStatisticsWithEntity:@"excalibur", statisticNames:@[@"weapons"],
   callback:^(NSArray<LCLeaderboardStatistic *> * _Nullable *statistics, NSError * _Nullable error) {
-  // 略
+  // Other logic
 }];
 ```
 
 </>
 </MultiLang>
 
-最后，还可以查询一组成员的成绩：
+You can also retrieve the scores of a group of members:
 
 <MultiLang>
 
@@ -398,7 +398,7 @@ var statistics = await LCLeaderboard.GetStatistics({"Sylgr", "Leiptr"}, new List
 ```
 
 ```java
-// 暂未支持
+// Not supported yet
 ```
 
 ```objc
@@ -406,7 +406,7 @@ NSString *otherUserObjectId = @"5c76107144d90400536fc88b";
 NSString *anotherUserObjectId = @"672a127144a90d00536f3456";
 [leaderboard getStatisticsWithUserIds:@[otherUserObjectId, anotherUserObjectId]
   callback:^(NSArray<LCLeaderboardStatistic *> * _Nullable statistics, NSError * _Nullable error) {
-// 略
+// Other logic
 }];
 
 NSString *oneObjectId = @"abccb27133a90ddd536ffffa";
@@ -414,23 +414,23 @@ NSString *anotherObjectId = @"672a1279345777005a2b2444";
 [leaderboard getStatisticsWithObjectIds:@[oneObjectId, anotherObjectId]
   option:nil
   callback:^(NSArray<LCLeaderboardStatistic *> * _Nullable statistics, NSError * _Nullable error) {
-// 略
+// Other logic
 }];
 
 [leaderboard getStatisticsWithEntities:@[@"Sylgr", "Leiptr"]
   callback:^(NSArray<LCLeaderboardStatistic *> * _Nullable statistics, NSError * _Nullable error) {
-// 略
+// Other logic
 }];
 ```
 
 </MultiLang>
 
-## 获取排行榜结果
+## Getting Leaderboard Results
 
-通过 `Leaderboard#getResults` 方法可以获取排行榜结果。
-最常见的使用场景是获取排名前 N 的用户成绩和获取当前登录用户附近的排名。
+You can get the result of a leaderboard with the `Leaderboard#getResults` method.
+The most common use case of it is to get the scores of the top players or to get the players with similar rankings as the current player.
 
-首先，我们构造一个排行榜实例：
+Let’s first construct a leaderboard instance:
 
 <MultiLang>
 
@@ -440,14 +440,14 @@ NSString *anotherObjectId = @"672a1279345777005a2b2444";
 var leaderboard = LCLeaderboard.CreateWithoutData("world");
 ```
 
-`LCLeaderboard.CreateWithoutData` 方法接受两个参数：
+`LCLeaderboard.CreateWithoutData` accepts two arguments:
 
 ```cs
 public static LCLeaderboard CreateWithoutData(string statisticName, string memberType = LCLeaderboard.USER_MEMBER_TYPE)
 ```
 
-- `statisticName` 为排行榜名称，这里需要传入云端已经存在的排行榜名称。上例中是 `world`。
-- `memberType` 为排行榜成员类型，传入 `LCLeaderboard.USER_MEMBER_TYPE` 表示成员类型为用户，传入 `LCLeaderboard.ENTITY_MEMBER_TYPE` 表示成员类型为 entity，成员类型为 object 时请传入相应 Class 名称。上例中省略了这一参数，表示使用默认值，成员类型为用户。
+- `statisticName` is the name of an existing leaderboard. It’s set to be `world` in the example above.
+- `memberType` is the type of members: `LCLeaderboard.USER_MEMBER_TYPE` for user and `LCLeaderboard.ENTITY_MEMBER_TYPE` for entity. For object, provide the corresponding class name. The example above omitted this argument, which means to default to user.
 
 </>
 <>
@@ -456,14 +456,14 @@ public static LCLeaderboard CreateWithoutData(string statisticName, string membe
 LCLeaderboard leaderboard = LCLeaderboard.createWithoutData("world");
 ```
 
-`LCLeaderboard.createWithoutData` 方法接受两个参数：
+`LCLeaderboard.createWithoutData` accepts two arguments:
 
 ```java
 public static LCLeaderboard createWithoutData(String name, String memberType)
 ```
 
-- `name` 为排行榜名称，这里需要传入云端已经存在的排行榜名称。上例中是 `world`。
-- `memberType` 为排行榜成员类型，传入 `LCLeaderboard.MEMBER_TYPE_USER` 表示成员类型为用户，传入 `LCLeaderboard.MEMBER_TYPE_ENTITY` 表示成员类型为 entity，成员类型为 object 时请传入相应 Class 名称。用户是最常用的排行榜类型，因此 `createWithoutData` 还提供了一个单参数的重载方法，上例中就只传入了排行榜名称，此时成员类型为用户。
+- `name` is the name of an existing leaderboard. It’s set to be `world` in the example above.
+- `memberType` is the type of members: `LCLeaderboard.MEMBER_TYPE_USER` for user and `LCLeaderboard.MEMBER_TYPE_ENTITY` for entity. For object, provide the corresponding class name. Since user is the most common type, `createWithoutData` provides an overload method with a single argument. The example above only passes the name of the leaderboard to the function, which indicates that the type is user.
 
 </>
 <>
@@ -476,11 +476,11 @@ LCLeaderboard leaderboard = [[LCLeaderboard alloc] initWithStatisticName:@"world
 
 </MultiLang>
 
-构造排行榜实例后，调用该实例上的相应方法即可获取排名。
+After the leaderboard instance is constructed, you can call the corresponding methods on the instance to get the rankings.
 
-### 获取指定区间的排名
+### Getting Rankings Within a Scope
 
-获取排行榜的 Top 10：
+To get the top 10 on the leaderboard:
 
 <MultiLang>
 
@@ -490,30 +490,30 @@ LCLeaderboard leaderboard = [[LCLeaderboard alloc] initWithStatisticName:@"world
 var rankings = await leaderboard.GetResults(limit: 10);
 ```
 
-`GetResults` 方法可以指定以下参数限制查询范围：
+`GetResults` accepts the following arguments for specifying constraints:
 
-|       参数名        |    类型    | 说明                                                                 |
-| :-----------------: | :--------: | -------------------------------------------------------------------- |
-|    `aroundUser`     |  `LCUser`  | 获取某用户附近的排名，详见下节。                                     |
-|   `aroundObject`    | `LCObject` | 获取某 object 附近的排名，详见下节                                   |
-|   `aroundEntity`    |  `string`  | 获取某 entity 附近的排名，详见下节。                                 |
-|       `limit`       |  `number`  | 限制返回的结果数量，默认 10。                                        |
-|       `skip`        |  `number`  | 指定从某个位置开始获取，与 `limit` 一起可以实现翻页，默认 0。        |
-|    `selectKeys`     | `string[]` | 指定返回的 `Ranking` 中的 `user` 需要包含的属性，详见下文。          |
-|    `includeKeys`    | `string[]` | 指定返回的 `Ranking` 中的 `user` 需要包含的 Pointer 属性，详见下文。 |
-| `includeStatistics` | `string[]` | 指定返回的 `Ranking` 中需要包含的其他成绩，详见下文。                |
-|      `version`      |  `number`  | 指定返回某个历史版本的成绩。                                         |
+|        Name         |    Type    | Description                                                                                                                                     |
+| :-----------------: | :--------: | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+|    `aroundUser`     |  `LCUser`  | Get the players with similar rankings as a given player. See the next section for more information.                                             |
+|   `aroundObject`    | `LCObject` | Get the objects with similar rankings as a given object. See the next section for more information.                                             |
+|   `aroundEntity`    |  `string`  | Get the entities with similar rankings as a given entity. See the next section for more information.                                            |
+|       `limit`       |  `number`  | Limit the number of results. Defaults to 10.                                                                                                    |
+|       `skip`        |  `number`  | Set the offset. Can be used with `limit` to implement pagination. Defaults to 10.                                                               |
+|    `selectKeys`     | `string[]` | Specify the properties that need to be included with the `user`s from the returned `Ranking`s. Continue reading for more information.           |
+|    `includeKeys`    | `string[]` | Specify the `Pointer` properties that need to be included with the `user`s from the returned `Ranking`s. Continue reading for more information. |
+| `includeStatistics` | `string[]` | Specify the scores in other leaderboards that need to be included in the `Ranking`s. Continue reading for more information.                     |
+|      `version`      |  `number`  | Specify the version of the leaderboard.                                                                                                         |
 
-返回的结果是一个排名数组（`Ranking[]`），`Ranking` 上有如下属性：
+The returned result is an array (`Ranking[]`) with each `Ranking` holding the following properties:
 
-|         属性         |       类型        | 说明                             |
-| :------------------: | :---------------: | -------------------------------- |
-|        `Rank`        |       `int`       | 排名，从 0 开始                  |
-|        `User`        |     `LCUser`      | 该成绩的用户（user 排行榜）      |
-|       `Object`       |    `LCObject`     | 该成绩的 object（object 排行榜） |
-|       `Entity`       |     `string`      | 该成绩的 entity（entity 排行榜） |
-|       `Value`        |     `double`      | 成绩                             |
-| `IncludedStatistics` | `List<Statistic>` | 该成员在其他排行榜的成绩         |
+|         Name         |       Type        | Description                                             |
+| :------------------: | :---------------: | ------------------------------------------------------- |
+|        `Rank`        |       `int`       | The ranking. Starts with 0.                             |
+|        `User`        |     `LCUser`      | The user who got the score (for user leaderboards).     |
+|       `Object`       |    `LCObject`     | The object who got the score (for object leaderboards). |
+|       `Entity`       |     `string`      | The entity who got the score (for entity leaderboards). |
+|       `Value`        |     `double`      | The score.                                              |
+| `IncludedStatistics` | `List<Statistic>` | The member’s scores in other leaderboards.              |
 
 </>
 <>
@@ -538,7 +538,7 @@ leaderboard.getResults(0, 10, null, null).subscribe(new Observer<LCLeaderboardRe
 });
 ```
 
-`Leaderboard#getResults` 方法可以指定以下参数限制查询范围：
+`Leaderboard#getResults` accepts the following arguments for specifying constraints:
 
 ```java
 Observable<LCLeaderboardResult> getResults(
@@ -546,32 +546,32 @@ Observable<LCLeaderboardResult> getResults(
   List<String> selectMemberKeys, List<String> includeStatistics)
 ```
 
-- `skip` 指定从某个位置开始获取，与 `limit` 一起可以实现翻页，默认 0
-- `limit` 限制返回的结果数量，默认 20
-- `selectMemberKeys` 指定返回的 LCRanking 中排行榜成员需要包含的属性，详见下文
-- `includeStatistics` 指定返回的 LCRanking 中需要包含的其他成绩，详见下文
+- `skip` Set the offset. Can be used with `limit` to implement pagination. Defaults to 10.
+- `limit` Limit the number of results. Defaults to 20.
+- `selectMemberKeys` Specify the properties that need to be included with the `user`s from the returned `LCRanking`s. Continue reading for more information.
+- `includeStatistics` Specify the scores in other leaderboards that need to be included in the `LCRanking`s. Continue reading for more information.
 
-如需获取历史版本的排行榜信息，可以在排行榜实例上设置版本号：
+By providing a version number, you can retrieve data from a previous version of the leaderboard:
 
 ```java
 int previousVersion = currentVersion - 1;
 leaderboard.setVersion(previousVersion);
 ```
 
-LCRanking 提供了以下方法供获取排名信息：
+`LCRanking` provides the following methods for getting members’ information:
 
 ```java
-// 排名，从 0 开始
+// The ranking; starts with 0
 int getRank()
-// 该成绩的用户（user 排行榜）
+// The user who got the score (for user leaderboards)
 LCUser getUser()
-// 该成绩的 object（object 排行榜）
+// The object who got the score (for object leaderboards)
 LCObject getObject()
-// 该成绩的 entity（entity 排行榜）
+// The entity who got the score (for entity leaderboards)
 String getEntityId()
-// 成绩
+// The score
 double getStatisticValue()
-// 该成员在其他排行榜的成绩
+// The member’s scores in other leaderboards
 List<LCStatistic> getIncludedStatistics()
 ```
 
@@ -582,50 +582,50 @@ List<LCStatistic> getIncludedStatistics()
 leaderboard.limit = 10;
 [leaderboard getUserResultsWithOption:nil,
   callback:^(NSArray <LCLeaderboardRanking *> * _Nullable *rankings, NSInteger count, NSError * _Nullable error) {
-  // rankings 是排行榜前十的排名信息
+  // rankings contains the data of the top 10 members in the leaderboard
 }];
 ```
 
-Leaderboard 实例上可以设置如下属性限制查询范围：
+Leaderboard accepts the following properties for specifying constraints:
 
 ```objc
-/// 指定从某个位置开始获取，与 limit 一起可以实现翻页，默认 0
+/// Set the offset; can be used with `limit` to implement pagination; defaults to 10.
 @property (nonatomic) NSInteger skip;
-/// 限制返回的结果数量，默认 20
+/// Limit the number of results; defaults to 20.
 @property (nonatomic) NSInteger limit;
-/// 指定返回的 LCLeaderboardRanking 中需要包含的其他成绩
+/// Specify the scores in other leaderboards that need to be included in the `LCLeaderboardRanking`s
 @property (nonatomic, nullable) NSArray<NSString *> *includeStatistics;
-/// 指定排行榜版本号，默认 0
+/// Specify the version of the leaderboard; defaults to 0
 @property (nonatomic) NSInteger version;
 ```
 
-`getUserResultsWithOption` 的第一个参数是 `LCLeaderboardQueryOption`，可以指定返回的 `LCLeaderboardRanking` 中排行榜成员需要包含的属性，详见下文。
+The first option of `getUserResultsWithOption` is `LCLeaderboardQueryOption`, in which you can specify the properties you want the members of the returned `LCLeaderboardRanking` to include. Continue reading for more information.
 
-回调中的 `rankings` 是一个 LCLeaderboardRanking 数组。
-LCLeaderboardRanking 包含如下属性：
+The `rankings` in the callback is an `LCLeaderboardRanking` array.
+`LCLeaderboardRanking` contains the following properties:
 
 ```objc
-// 排行榜名称
+// The name of the leaderboard
 @property (nonatomic, readonly, nullable) NSString *statisticName;
-/// 排名，从 0 开始
+/// The ranking; starts with 0
 @property (nonatomic, readonly) NSInteger rank;
-/// 成绩
+/// The score
 @property (nonatomic, readonly) double value;
-/// 该成员在其他排行榜的成绩
+/// The member’s scores in other leaderboards
 @property (nonatomic, readonly, nullable) NSArray<LCLeaderboardStatistic *> *includedStatistics;
-/// 该成绩的用户（user 排行榜）
+/// The user who got the score (for user leaderboards)
 @property (nonatomic, readonly, nullable) LCUser *user;
-/// 该成绩的 object（object 排行榜）
+/// The object who got the score (for object leaderboards)
 @property (nonatomic, readonly, nullable) LCObject *object;
-/// 该成绩的 entity（entity 排行榜）
+/// The entity who got the score (for entity leaderboards)
 @property (nonatomic, readonly, nullable) NSString *entity;
 ```
 
-上例我们调用的是 `getUserResultsWithOption` 方法，所以 `user` 属性不为空，`object`、`entity` 属性均为空。
+Since the `getUserResultsWithOption` method is called in the previous example, the `user` property is not empty and the `object` and `entity` properties are empty.
 
-如果排行榜是 object 排行榜或 entity 排行榜，那么相应地需要调用 `getObjectResultsWithOption` 及 `getEntityResultsWithCallback` 方法。
-`getObjectResultsWithOption` 的参数和 `getUserResultsWithOption` 相同。
-因为 entity 排行榜的成员为字符串，所以 `getEntityResultsWithCallback` 不支持 `LCLeaderboardQueryOption`，第一个参数就是回调，回调的参数和 `getUserResultsWithOption`、`getObjectResultsWithOption` 相同：
+For an object or entity leaderboard, the `getObjectResultsWithOption` and `getEntityResultsWithCallback` methods need to be called correspondingly.
+The option for `getObjectResultsWithOption` is the same as that for `getUserResultsWithOption`.
+Since the members of entity leaderboards are strings, `getEntityResultsWithCallback` doesn’t support `LCLeaderboardQueryOption` and its first option is the callback. The callback has the same options as `getUserResultsWithOption` and `getObjectResultsWithOption`:
 
 ```objc
 - (void)getEntityResultsWithCallback:(void (^)(NSArray<LCLeaderboardRanking *> * _Nullable rankings, NSInteger count, NSError * _Nullable error))callback;
@@ -635,14 +635,14 @@ LCLeaderboardRanking 包含如下属性：
 
 </MultiLang>
 
-默认情况下返回的排行榜结果中的 `user` 是一个指向 `LCUser` 的 Pointer。
-如果想要像下面这个例子一样，在排行榜结果中显示用户名或者其他的用户属性（对应 `_User` 表中的属性），那么需要使用 `selectKeys` 指定需要包含的属性。
+By default, the `user`s in the results are `LCUser` `Pointer`s.
+To include the usernames or other properties (in the `_User` class) of the users so that they can be displayed like the table below, specify them with `selectKeys`.
 
-| 排名 | Username | Score↓ |
-| :--: | -------- | :----: |
-|  0   | Genji    |  3458  |
-|  1   | Lúcio    |  3252  |
-|  2   | D.Va     |  3140  |
+| Ranking | Username | Score↓ |
+| :-----: | -------- | :----: |
+|    0    | Genji    |  3458  |
+|    1    | Lúcio    |  3252  |
+|    2    | D.Va     |  3140  |
 
 <MultiLang>
 
@@ -654,7 +654,7 @@ var rankings = await leaderboard.GetResults(limit: 10,
 ```java
 List<String> selectKeys = new ArrayList<>();
 selectKeys.add("username");
-leaderboard.getResults(0, 10, selectKeys, null).subscribe(/* 略 */);
+leaderboard.getResults(0, 10, selectKeys, null).subscribe(/* Other logic */);
 ```
 
 ```objc
@@ -663,20 +663,20 @@ LCLeaderboardQueryOption *option = [[LCLeaderboardQueryOption alloc] init];
 option.selectKeys = @[@"username"];
 [leaderboard getUserResultsWithOption:option,
   callback:^(NSArray<LCLeaderboardRanking *> * _Nullable rankings, NSInteger count, NSError * _Nullable error) {
-  // 略
+  // Other logic
 }];
 ```
 
 </MultiLang>
 
-如果想要在排行榜结果中包含用户的其他成绩，可以使用 `includeStatistics`。
-例如，查询得分排行榜时同时返回相应用户的击杀数：
+To include the players’ scores in other leaderboards, use `includeStatistics`.
+For example, to include the kills when retrieving the leaderboard for scores:
 
-| 排名 | Username | Score↓ | Kills |
-| :--: | -------- | :----: | :---: |
-|  0   | Genji    |  3458  |  28   |
-|  1   | Lúcio    |  3252  |   2   |
-|  2   | D.Va     |  3140  |  31   |
+| Ranking | Username | Score↓ | Kills |
+| :-----: | -------- | :----: | :---: |
+|    0    | Genji    |  3458  |  28   |
+|    1    | Lúcio    |  3252  |   2   |
+|    2    | D.Va     |  3140  |  31   |
 
 <MultiLang>
 
@@ -690,7 +690,7 @@ List<String> selectKeys = new ArrayList<>();
 selectKeys.add("username");
 List<String> includeStatistics = new ArrayList<>();
 includeStatistics.add("kills");
-leaderboard.getResults(0, 10, selectKeys, includeStatistics).subscribe(/* 略 */);
+leaderboard.getResults(0, 10, selectKeys, includeStatistics).subscribe(/* Other logic */);
 ```
 
 ```objc
@@ -700,15 +700,15 @@ LCLeaderboardQueryOption *option = [[LCLeaderboardQueryOption alloc] init];
 option.selectKeys = @[@"username"];
 [leaderboard getUserResultsWithOption:option,
   callback:^(NSArray<LCLeaderboardRanking *> * _Nullable rankings, NSInteger count, NSError * _Nullable error) {
-  // 略
+  // Other logic
 }];
 ```
 
 </MultiLang>
 
-如果想要包含的属性是 Pointer 类型或文件类型，那么 `selectKeys` 只会返回 Pointer 本身。
-想要一并获取 Pointer 指向的另一个 class 的数据的话，需要额外使用 `includeKeys` 指定。
-例如，假设 `club` 是一个指向 `Club` 类的 Pointer：
+If a `Pointer` or file property is included using `selectKeys`, you will only get the `Pointer`s themselves.
+To include the objects referenced by the `Pointer`s, you need to use `includeKeys` as well.
+For example, assuming `club` is a `Club` `Pointer`:
 
 <MultiLang>
 
@@ -720,7 +720,7 @@ var rankings = await leaderboard.GetResults(limit: 10,
 ```
 
 ```java
-// 暂未支持，如有此类需求可在 onNext 方法中额外发起一次查询
+// Not supported yet; you can invoke an additional query within the onNext method instead
 ```
 
 ```objc
@@ -731,18 +731,18 @@ option.selectKeys = @[@"name", @"club"];
 option.includeKeys = @[@"club"];
 [leaderboard getUserResultsWithOption:option,
   callback:^(NSArray<LCLeaderboardRanking *> * _Nullable rankings, NSInteger count, NSError * _Nullable error) {
-  // 略
+  // Other logic
 }];
 ```
 
 </MultiLang>
 
-注意，排行榜 **不保证成绩并列的成员之间的先后顺序**。
-例如，假设 A、B、C 的成绩为 42、32、32，且排行榜的排序策略为降序，那么查询排行榜的返回结果可能是 A、B、C，也可能是 A、C、B。
+Keep in mind that the order of the members with the same score in the returned result is not guaranteed.
+For example, if A, B, and C got 42, 32, and 32, and the leaderboard has a descending order, the result might list the three members in the order of either “A, B, C” or “A, C, B”.
 
-### 获取当前用户附近的排名
+### Getting the Players With Similar Rankings as the Current Player
 
-|   排名   | Username   | Score↓ |
+| Ranking  | Username   | Score↓ |
 | :------: | ---------- | :----: |
 |    …     |            |        |
 |    24    | Bastion    |  716   |
@@ -754,7 +754,7 @@ option.includeKeys = @[@"club"];
 
 <>
 
-如果想达到类似上表的效果，在调用 `GetResults` 方法时额外传入当前用户即可：
+To implement something like the table above in your game, provide the current user when calling `GetResults`:
 
 ```cs
 var rankings = await leaderboard.GetResults(aroundUser: currentUser, limit: 3, selectKeys: new List<string> { "username" });
@@ -763,27 +763,27 @@ var rankings = await leaderboard.GetResults(aroundUser: currentUser, limit: 3, s
 </>
 <>
 
-如果想达到类似上表的效果，可以调用 `getAroundResults` 方法：
+To implement something like the table above in your game, call the `getAroundResults` method:
 
 ```java
 List<String> selectKeys = new ArrayList<>();
 selectKeys.add("username");
-leaderboard.getAroundResults(currentUser.getObjectId(), 0, 3, selectKeys, null).subscribe(/* 略 */);
+leaderboard.getAroundResults(currentUser.getObjectId(), 0, 3, selectKeys, null).subscribe(/* Other logic */);
 ```
 
-`getAroundResults` 方法的第一个参数为排行榜成员的 ID（user 或 object 为 `objectId`、entity 为字符串），其他参数和 `getResults` 相同。
+The first argument of `getAroundResults` is the ID of the member (`objectId` for user and object; string for entity). Other arguments are the same as those for `getResults`.
 
 </>
 <>
 
-如果想达到类似上表的效果，可以调用 `getUserResultsAroundUser` 方法：
+To implement something like the table above in your game, call the `getUserResultsAroundUser` method:
 
 ```objc
 leaderboard.limit = 3;
 [leaderboard getUserResultsAroundUser:currentUser.objectId,
   option:nil,
   callback:^(NSArray<LCLeaderboardRanking *> * _Nullable rankings, NSInteger count, NSError * _Nullable error) {
-  // 略
+  // Other logic
 }];
 ```
 
@@ -791,11 +791,10 @@ leaderboard.limit = 3;
 
 </MultiLang>
 
-上面的代码示例中，`limit` 的值为 3，表示获取与当前玩家相邻的前后两个玩家的排名，当前玩家会在结果的中间位置。
-如仅需获取当前玩家排名，可指定 `limit` 为 1。
+In the example above, the `limit` is set to 3, which means to get two players with similar rankings as the current player together with the current player placed between them. You can set `limit` to 1 to get the current player’s ranking only.
 
-类似地，可以获取某个 object 或 entity 附近的排名。
-例如，获取武器榜上和某件武器排名相近的武器，同时获取这些武器的名称、攻击力、等级：
+Similarly, you can retrieve objects or entities with similar rankings as a given object or entity.
+For example, to get the weapons with similar rankings as a given weapon from the weapon leaderboard, including their names, attacks, and levels:
 
 <MultiLang>
 
@@ -812,7 +811,7 @@ List<String> selectKeys = new ArrayList<>();
 selectKeys.add("name");
 selectKeys.add("attack");
 selectKeys.add("level");
-leaderboard.getAroundResults(excaliburObjectId, 0, 3, selectKeys, null).subscribe(/* 略 */);
+leaderboard.getAroundResults(excaliburObjectId, 0, 3, selectKeys, null).subscribe(/* Other logic */);
 ```
 
 ```objc
@@ -824,14 +823,14 @@ NSString *excaliburObjectId = @"582570f38ac247004f39c24b";
 [leaderboard getObjectResultsAroundObject:excaliburObjectId,
   option:option,
   callback:^(NSArray<LCLeaderboardRanking *> * _Nullable rankings, NSInteger count, NSError * _Nullable error) {
-  // 略
+  // Other logic
 }];
 ```
 
 </MultiLang>
 
-上面的例子中假定武器排行榜是通过 object 排行榜实现的，存储武器信息的 Class 为 `Weapon`。
-如果武器排行榜是通过 entity 排行榜实现的，且只需获取武器的名称，那么相应的代码为：
+The example above assumes that the weapon leaderboard is an object leaderboard and the class for storing weapons is named `Weapon`.
+If the weapon leaderboard has entity as its type, and you only need to retrieve the names of the weapons, the following code would apply:
 
 <MultiLang>
 
@@ -842,7 +841,7 @@ var rankings = await leaderboard.GetResults(aroundEntity: "excalibur", limit: 3)
 
 ```java
 LCLeaderboard leaderboard = LCLeaderboard.createWithoutData("world", LCLeaderboard.ENTITY_MEMBER_TYPE);
-leaderboard.getAroundResults("excalibur", 0, 3, null, null).subscribe(/* 略 */);
+leaderboard.getAroundResults("excalibur", 0, 3, null, null).subscribe(/* Other logic */);
 ```
 
 ```objc
@@ -850,30 +849,30 @@ LCLeaderboard leaderboard = [[LCLeaderboard alloc] initWithStatisticName:@"weapo
 leaderboard.limit = 3;
 [leaderboard getEntityResultsAroundEntity:@"excalibur",
   callback:^(NSArray^(NSArray<LCLeaderboardRanking *> * _Nullable rankings, NSInteger count, NSError * _Nullable error) {
-  // 略
+  // Other logic
 }];
 ```
 
 </MultiLang>
 
-## 控制台
+## Dashboard
 
-在排行榜控制台（游戏服务 > 云服务 > 排行榜），你可以：
+On **Game Services > Cloud Services > LeaderBoard**, you can:
 
-- 新建、重置、编辑、删除排行榜。
-- 查看排行榜当前版本的数据、删除成绩、下载排行榜的历史数据归档文件。
-- 设置是否允许客户端查询前一版本，是否只允许使用 Master Key 更新分数。
+- Create, reset, edit, and delete leaderboards.
+- View the current versions of the leaderboards, delete scores, and download the archives of the earlier versions of the leaderboards.
+- Configure whether the client can retrieve the previous version of each leaderboard, and whether scores can be updated with the Master Key only.
 
-## SDK 管理接口
+## SDK Management Interface
 
-除了通过控制台管理排行榜外，C# SDK 和 Java SDK 也提供了管理接口，可以在**服务端等受信任的环境**下使用。
-另外，也可以直接调用 REST API 提供的管理接口。
+Besides using the dashboard, you can also manage leaderboards with the management interfaces provided by the C# SDK and the Java SDK. Those interfaces can be used **in trusted environments including the server side**.
+Another way to access the management interface is to use the REST API.
 
-下面我们先介绍 SDK 提供的管理接口。
+Let’s first take a look at the management interfaces provided by the SDKs.
 
 :::caution
 
-请注意，调用管理接口 API 需要在 SDK 初始化时使用 masterKey，因此**只能在服务端等可信任的环境中调用，不得在客户端使用。**
+To use the management interface, the SDK needs to be initialized with the `masterKey`. Therefore, **you should only use the management interface in trusted environments like the server side, and not the client side.**
 
 :::
 
@@ -889,12 +888,12 @@ LeanCloud.setMasterKey({{masterkey}});
 ```
 
 ```objc
-// 不支持
+// Not supported yet
 ```
 
 </MultiLang>
 
-### 创建排行榜
+### Creating Leaderboards
 
 <MultiLang>
 
@@ -904,7 +903,7 @@ LeanCloud.setMasterKey({{masterkey}});
 var leaderboard = await LCLeaderboard.CreateLeaderboard("time", order: LCLeaderboardOrder.ASCENDING);
 ```
 
-可以指定的参数类型和默认值如下：
+Below are the available options and their default values:
 
 ```cs
 public static async Task<LCLeaderboard> CreateLeaderboard(string statisticName,
@@ -914,11 +913,11 @@ public static async Task<LCLeaderboard> CreateLeaderboard(string statisticName,
     string memberType = LCLeaderboard.USER_MEMBER_TYPE)
 ```
 
-- `statisticName` 所排名的成绩名字。
-- `order` 排序，可以传入 `LCLeaderboardOrder.Descending` 或 `LCLeaderboardOrder.Ascending`。
-- `updateStrategy` 成绩更新策略，可以传入 `LCLeaderboardUpdateStrategy.Better`、`LCLeaderboardUpdateStrategy.Last`、`LCLeaderboardUpdateStrategy.Sum`。
-- `versionChangeInterval` 自动重置周期，可以传入 `LCLeaderboardVersionChangeInterval.Never`、`LCLeaderboardVersionChangeInterval.Day`、`LCLeaderboardVersionChangeInterval.Week`、`LCLeaderboardVersionChangeInterval.Month`。
-- `memberType` 成员类型，传入 `LCLeaderboard.USER_MEMBER_TYPE` 表示成员类型为用户，传入 `LCLeaderboard.ENTITY_MEMBER_TYPE` 表示成员类型为 entity，成员类型为 object 时请传入相应 Class 名称。
+- `statisticName` The name of the leaderboard.
+- `order` The order. Can be `LCLeaderboardOrder.Descending` or `LCLeaderboardOrder.Ascending`.
+- `updateStrategy` The strategy for updating scores. Can be `LCLeaderboardUpdateStrategy.Better`, `LCLeaderboardUpdateStrategy.Last`, or `LCLeaderboardUpdateStrategy.Sum`.
+- `versionChangeInterval` The interval for resetting the leaderboard. Can be `LCLeaderboardVersionChangeInterval.Never`, `LCLeaderboardVersionChangeInterval.Day`, `LCLeaderboardVersionChangeInterval.Week`, or `LCLeaderboardVersionChangeInterval.Month`.
+- `memberType` The type of the members. Use `LCLeaderboard.USER_MEMBER_TYPE` for user and `LCLeaderboard.ENTITY_MEMBER_TYPE` for entity. For object, use the name of the class.
 
 </>
 <>
@@ -946,7 +945,7 @@ LCLeaderboard.createWithMemberType(LCLeaderboard.MEMBER_TYPE_USER, "time",
 });
 ```
 
-你可以指定以下参数：
+Below are the available options:
 
 ```java
 public static Observable<LCLeaderboard> createWithMemberType(String memberType, String name,
@@ -955,25 +954,25 @@ public static Observable<LCLeaderboard> createWithMemberType(String memberType, 
   LCLeaderboardVersionChangeInterval versionChangeInterval)
 ```
 
-- `memberType` 成员类型，传入 `LCLeaderboard.MEMBER_TYPE_USER` 表示成员类型为用户，传入 `LCLeaderboard.MEMBER_TYPE_ENTITY` 表示成员类型为 entity，成员类型为 object 时请传入相应 Class 名称。
-- `name` 所排名的成绩名字。
-- `order` 排序，可以传入 `LCLeaderboard.LCLeaderboardOrder.Descending`（默认值）或 `LCLeaderboard.LCLeaderboardOrder.Ascending`。
-- `updateStrategy` 成绩更新策略，可以传入 `LCLeaderboard.LCLeaderboardUpdateStrategy.Better`（默认值）、`LCLeaderboard.LCLeaderboardUpdateStrategy.Last`、`LCLeaderboard.LCLeaderboardUpdateStrategy.Sum`。
-- `versionChangeInterval` 自动重置周期，可以传入 `LCLeaderboard.LCLeaderboardVersionChangeInterval.Never`、`LCLeaderboard.LCLeaderboardVersionChangeInterval.Day`、`LCLeaderboard.LCLeaderboardVersionChangeInterval.Week`（默认值）、`LCLeaderboard.LCLeaderboardVersionChangeInterval.Month`。
+- `memberType` The type of the members. Use `LCLeaderboard.MEMBER_TYPE_USER` for user and `LCLeaderboard.MEMBER_TYPE_ENTITY` for entity. For object, use the name of the class.
+- `name` The name of the leaderboard.
+- `order` The order. Can be `LCLeaderboard.LCLeaderboardOrder.Descending` (default) or `LCLeaderboard.LCLeaderboardOrder.Ascending`.
+- `updateStrategy` The strategy for updating scores. Can be `LCLeaderboard.LCLeaderboardUpdateStrategy.Better` (default), `LCLeaderboard.LCLeaderboardUpdateStrategy.Last`, or `LCLeaderboard.LCLeaderboardUpdateStrategy.Sum`.
+- `versionChangeInterval` The interval for resetting the leaderboard. Can be `LCLeaderboard.LCLeaderboardVersionChangeInterval.Never`, `LCLeaderboard.LCLeaderboardVersionChangeInterval.Day`, `LCLeaderboard.LCLeaderboardVersionChangeInterval.Week` (default), or `LCLeaderboard.LCLeaderboardVersionChangeInterval.Month`.
 
-默认值指相应参数传入 `null` 时对应的取值。
+“Default” indicates the value used when `null` is provided.
 
 </>
 
 <>
 
-不支持
+Not supported yet.
 
 </>
 
 </MultiLang>
 
-### 手动重置排行榜
+### Manually Resetting the Leaderboard
 
 <MultiLang>
 
@@ -1007,14 +1006,14 @@ leaderboard.reset().subscribe(new Observer<Boolean>() {
 ```
 
 ```objc
-// 不支持
+// Not supported yet
 ```
 
 </MultiLang>
 
-### 获取排行榜属性
+### Retrieving Leaderboard Properties
 
-通过以下接口可以获取当前排行榜的属性，例如：重置周期、版本号、更新策略等。
+Use the following interface to get the properties of a leaderboard, including its reset interval, version, and update strategy.
 
 <MultiLang>
 
@@ -1027,14 +1026,14 @@ LCLeaderboard leaderboard = LCLeaderboard.fetchByName("world").blockingFirst();
 ```
 
 ```objc
-// 不支持
+// Not supported yet
 ```
 
 </MultiLang>
 
-### 修改排行榜属性
+### Updating Leaderboard Properties
 
-排行榜创建后，仅可修改自动重置周期和成绩更新策略，其他属性无法修改。
+Once a leaderboard is created, only its reset interval and update strategy can be updated. Other properties cannot be modified.
 
 <MultiLang>
 
@@ -1091,12 +1090,12 @@ leaderboard.updateUpdateStrategy(LCLeaderboard.LCLeaderboardUpdateStrategy.Last)
 ```
 
 ```objc
-// 不支持
+// Not supported yet
 ```
 
 </MultiLang>
 
-### 删除排行榜
+### Deleting Leaderboards
 
 <MultiLang>
 
@@ -1130,16 +1129,16 @@ leaderboard.destroy().subscribe(new Observer<Boolean>() {
 ```
 
 ```objc
-// 不支持
+// Not supported yet
 ```
 
 </MultiLang>
 
-**删除排行榜会删除该排行榜的所有数据，包括当前数据及所有历史版本归档。**
+**Deleting a leaderboard will delete all the data within it, including the current version and the archives of the past versions.**
 
-### 更新排行榜成员成绩
+### Updating Leaderboard Members’ Scores
 
-有些情况下，你会想要绕过排行榜的更新策略强制更新用户的成绩，你可以使用 `overwrite` 参数实现这一需求：
+You can use the `overwrite` option to bypass the update strategy and force update a member’s score:
 
 <MultiLang>
 
@@ -1153,16 +1152,16 @@ await LCLeaderboard.UpdateStatistics(user, statistic, overwrite: true);
 ```java
 Map<String, Double> statistic  = new HashMap<>();
 statistic.put("world", 0.0);
-LCLeaderboard.updateStatistic(currentUser, statistic, true).subscribe(/** 略 **/);
+LCLeaderboard.updateStatistic(currentUser, statistic, true).subscribe(/** Other logic **/);
 ```
 
 ```objc
-// 不支持
+// Not supported yet
 ```
 
 </MultiLang>
 
-object 和 entity 排行榜只支持在服务端使用 Master Key 更新，但仍会遵循排行榜的更新策略：
+Object and entity leaderboards can only be updated on the server side with the Master Key. The update strategy of the leaderboard will still be followed, though:
 
 <MultiLang>
 
@@ -1172,16 +1171,16 @@ await LCLeaderboard.UpdateStatistics(excalibur, statistic);
 ```
 
 ```java
-// 暂不支持，如有需求可以调用 REST API 接口更新
+// Not supported yet; consider using the REST API
 ```
 
 ```objc
-不支持
+Not supported yet.
 ```
 
 </MultiLang>
 
-如果需要强制更新，同样需要指定 `overwrite` 为真：
+To force update the data, set `overwrite` to `true`:
 
 <MultiLang>
 
@@ -1190,18 +1189,18 @@ await LCLeaderboard.UpdateStatistics("Vimur", statistic, overwrite: true);
 ```
 
 ```java
-// 暂不支持，如有需求可以调用 REST API 接口更新
+// Not supported yet; consider using the REST API
 ```
 
 ```objc
-// 不支持
+// Not supported yet
 ```
 
 </MultiLang>
 
-### 删除排行榜成员成绩
+### Deleting Leaderboard Members’ Scores
 
-在服务端使用 Master Key 可以删除任意用户、object、entity 的成绩：
+Use the Master Key on the server side to delete the score of any user, object, or entity:
 
 <MultiLang>
 
@@ -1216,43 +1215,43 @@ await LCLeaderboard.DeleteStatistics("Vimur", new List<string> { "rivers" });
 ```
 
 ```java
-// 暂不支持，如有需求可以调用 REST API 接口更新
+// Not supported yet; consider using the REST API
 ```
 
 ```objc
-// 不支持
+// Not supported yet
 ```
 
 </MultiLang>
 
 ## REST API
 
-下面我们介绍排行榜相关的 REST API 接口。
-开发者可以自行编写程序或脚本调用这些接口在服务端进行管理性质的操作。
+Now we will introduce the LeaderBoard-related REST API interfaces.
+You can write your own programs or scripts to access these interfaces to perform administrative operations on the server side.
 
-### 请求格式
+### Request Format
 
-对于 POST 和 PUT 请求，请求的主体必须是 JSON 格式，而且 HTTP Header 的 Content-Type 需要设置为 `application/json`。
+For POST and PUT requests, the body of the request must be in JSON, and the `Content-Type` of the HTTP Header should be `application/json`.
 
-请求的鉴权是通过 HTTP Header 里面包含的键值对来进行的，参数如下表：
+Requests are authenticated by the following key-value pairs in the HTTP Header:
 
-| Key        | Value        | 含义                                      | 来源           |
-| ---------- | ------------ | ----------------------------------------- | -------------- |
-| `X-LC-Id`  | `{{appid}}`  | 当前应用的 `App Id`（即 `Client Id`）     | 可在控制台查看 |
-| `X-LC-Key` | `{{appkey}}` | 当前应用的 `App Key`（即 `Client Token`） | 可在控制台查看 |
+| Key        | Value        | Meaning                                           | Source                               |
+| ---------- | ------------ | ------------------------------------------------- | ------------------------------------ |
+| `X-LC-Id`  | `{{appid}}`  | The `App Id` (`Client Id`) of the current app     | Can be found on the Developer Center |
+| `X-LC-Key` | `{{appkey}}` | The `App Key` (`Client Token`) of the current app | Can be found on the Developer Center |
 
-管理接口需要使用 `Master Key`：`X-LC-Key: {{masterkey}},master`。
-`Master Key` 即 `Server Secret`，同样可在控制台查看。
+To access the management interface, the `Master Key` is required: `X-LC-Key: {{masterkey}},master`.
+`Master Key` is also named `Server Secret`, which can be found on the Developer Center as well.
 
-详见文档关于[应用凭证](/sdk/storage/guide/setup-dotnet#应用凭证)的说明。
+See [Credentials](/sdk/storage/guide/setup-dotnet#credentials) for more information.
 
 ### Base URL
 
-REST API 请求的 Base URL（下文 curl 示例中用 `{{host}}` 表示）即应用的 API <Conditional region='cn'>自定义</Conditional>域名，可以在控制台<Conditional region='cn'>绑定、</Conditional>查看。详见文档关于[域名](/sdk/storage/guide/setup-dotnet#域名)的说明。
+The Base URL for the REST API (`{{host}}` in curl examples) is the app’s <Conditional region='cn'>custom</Conditional> API domain, which can be <Conditional region='cn'>added and</Conditional> viewed on the Developer Center. See [Domain](/sdk/storage/guide/setup-dotnet#domain) for more information.
 
-### 管理排行榜
+### Managing Leaderboards
 
-#### 创建排行榜
+#### Creating Leaderboards
 
 ```sh
 curl -X POST \
@@ -1263,19 +1262,19 @@ curl -X POST \
   https://{{host}}/1.1/leaderboard/leaderboards
 ```
 
-| 参数                    | 约束 | 说明                                                                                          |
-| ----------------------- | ---- | --------------------------------------------------------------------------------------------- |
-| `statisticName`         | 必须 | 排行榜的名称，创建后不可修改。                                                                |
-| `memberType`            | 必须 | 排行榜的成员类型，创建后不可修改。可填写 `_Entity`、`_User` 及其他已有的 class 名称。         |
-| `order`                 | 可选 | 排行榜的排序策略，创建后不可修改。可选项有 `ascending` 或 `descending`，默认为 `descending`。 |
-| `updateStrategy`        | 可选 | 可选项有 `better`、`last`、`sum`，默认为 `better`。                                           |
-| `versionChangeInterval` | 可选 | 可选项有 `day`、`week`、`month`、`never`，默认为 `week`。                                     |
+| Parameter               | Required | Description                                                                                                                                |
+| ----------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `statisticName`         | Required | The name of the leaderboard. Cannot be edited once the leaderboard is created.                                                             |
+| `memberType`            | Required | The type of the members. Cannot be edited once the leaderboard is created. Can be `_Entity`, `_User`, or the name of an existing class.    |
+| `order`                 | Optional | The strategy for ordering. Cannot be edited once the leaderboard is created. Can be `ascending` or `descending`. Defaults to `descending`. |
+| `updateStrategy`        | Optional | Can be `better`, `last`, or `sum`. Defaults to `better`.                                                                                   |
+| `versionChangeInterval` | Optional | Can be `day`, `week`, `month`, or `never`. Defaults to `week`.                                                                             |
 
-返回的主体是一个 JSON 对象，包含创建排行榜时传入的所有参数，同时包括以下信息：
+The response body will be a JSON object containing all the parameters provided when creating the leaderboard, as well as the following fields:
 
-- `version` 为排行榜当前版本号。
-- `expiredAt` 为下次过期（重置）时间。
-- `activatedAt` 当前版本的开始时间。
+- `version` The version of the leaderboard.
+- `expiredAt` The time the leaderboard will be reset for the next time.
+- `activatedAt` The time the current version started.
 
 ```json
 {
@@ -1299,9 +1298,9 @@ curl -X POST \
 }
 ```
 
-#### 获取排行榜属性
+#### Retrieving Leaderboard Properties
 
-通过这个接口来查看当前排行榜的属性，例如更新策略、当前版本号等。
+The following interface allows you to retrieve the properties of a leaderboard, including its update strategy and version number.
 
 ```sh
 curl -X GET \
@@ -1310,7 +1309,7 @@ curl -X GET \
   https://{{host}}/1.1/leaderboard/leaderboards/<statisticName>
 ```
 
-返回的 JSON 对象包含该排行榜的所有信息：
+The returned JSON object contains all the information related to the leaderboard:
 
 ```json
 {
@@ -1328,9 +1327,9 @@ curl -X GET \
 }
 ```
 
-#### 修改排行榜属性
+#### Updating Leaderboard Properties
 
-这个接口可以用来修改排行榜的 `updateStrategy` 和 `versionChangeInterval` 属性，其他属性不可修改。可以只更新某一个属性，例如只修改 versionChangeInterval：
+The following interface allows you to update the `updateStrategy` and `versionChangeInterval` of a leaderboard. Properties other than these cannot be updated. You can update only one of the two properties. For example, to update `versionChangeInterval` only:
 
 ```sh
 curl -X PUT \
@@ -1341,7 +1340,7 @@ curl -X PUT \
   https://{{host}}/1.1/leaderboard/leaderboards/<statisticName>
 ```
 
-返回的 JSON 对象包含更新的属性信息及 `updatedAt` 字段。
+The returned JSON object contains all the updated fields as well as an `updatedAt` field.
 
 ```json
 {
@@ -1351,9 +1350,9 @@ curl -X PUT \
 }
 ```
 
-#### 重置排行榜
+#### Resetting Leaderboards
 
-无论排行榜的重置策略是什么，你都可以通过这个方法重置排行榜。重置时当前版本的数据清空，同时会归档到 csv 文件以供下载，排行榜的 `version` 会自动加一。
+The following interface allows you to reset a leaderboard regardless of its reset strategy. Once you reset a leaderboard, the current version of it will be cleared and the cleared data will be archived as a CSV file for you to download. The `version` of the leaderboard will automatically increment by 1.
 
 ```sh
 curl -X PUT \
@@ -1362,7 +1361,7 @@ curl -X PUT \
   https://{{host}}/1.1/leaderboard/leaderboards/<statisticName>/incrementVersion
 ```
 
-返回的 JSON 会显示重置后的当前版本号，下一次过期时间 `expiredAt`，当前版本的开始时间 `activatedAt`：
+The returned JSON object will contain the new version number, the time the leaderboard will be reset for the next time (`expiredAt`), and the time the current version started (`activatedAt`):
 
 ```json
 {
@@ -1374,9 +1373,9 @@ curl -X PUT \
 }
 ```
 
-#### 获取历史数据归档文件
+#### Retrieving Archives
 
-因为每个排行榜最多保存 60 个归档文件，我们建议定期使用这个接口获取归档文件后另行备份保存。
+Since each leaderboard can hold at most 60 archive files, we recommend that you retrieve the archived files regularly and back them up in your own places with the following interface.
 
 ```sh
 curl -X GET \
@@ -1387,12 +1386,12 @@ curl -X GET \
   https://{{host}}/1.1/leaderboard/leaderboards/<statisticName>/archives
 ```
 
-返回的对象会按照 `createdAt` 降序排列。其中 `file_key` 是文件的名称，`url` 是文件的下载地址，`status` 包含以下状态：
+The returned objects will be in decreasing order by `createdAt`. For each object, it has the file name (`file_key`), the URL for downloading (`url`), and a `status` property being one of the following statuses:
 
-- `scheduled`：进入归档任务队列，还未归档，这个状态通常极短。
-- `inProgress`：正在归档中。
-- `failed`：归档失败，出现这种情况请提交工单联系技术支持。
-- `completed`：归档已完成。
+- `scheduled`: The archiving process is queued. This usually won’t last very long.
+- `inProgress`: Archiving in progress.
+- `failed`: Failed to archive. Please reach out to our technical support.
+- `completed`: Successfully archived.
 
 ```json
 {
@@ -1413,11 +1412,11 @@ curl -X GET \
 }
 ```
 
-#### 删除排行榜
+#### Deleting Leaderboards
 
-**这个接口将删除排行榜的所有数据**，包括当前版本的数据及所有归档文件，删除后无法恢复，请谨慎操作。
+**This will delete everything within the leaderboard**, including the current version and all the archives. You won’t be able to undo this operation.
 
-删除时只需要指定排行榜的名称 statisticName。
+Provide the `statisticName` of the leaderboard to delete it.
 
 ```sh
 curl -X DELETE \
@@ -1426,19 +1425,19 @@ curl -X DELETE \
   https://{{host}}/1.1/leaderboard/leaderboards/<statisticName>
 ```
 
-删除成功时返回空 JSON 对象：
+Once done, an empty JSON object will be returned:
 
 ```json
 {}
 ```
 
-### 管理成绩
+### Managing Scores
 
-#### 更新成绩
+#### Updating Scores
 
-使用 Master Key 可以更新任意成绩，但更新成绩时仍然遵循排行榜的 `updateStrategy` 属性。
+Use the Master Key to update any score while still following the `updateStrategy`.
 
-更新用户成绩时需指定相应用户的 `objectId`：
+Provide the corresponding user’s `objectId` when you update their score:
 
 ```sh
 curl -X POST \
@@ -1449,7 +1448,7 @@ curl -X POST \
   https://{{host}}/1.1/leaderboard/users/<objectId>/statistics
 ```
 
-返回的数据是服务端当前使用的分数：
+The returned data will be the current score:
 
 ```sh
 {
@@ -1468,7 +1467,7 @@ curl -X POST \
 }
 ```
 
-类似地，更新 object 成绩时需指定相应 object 的 `objectId`：
+Similarly, you can provide the `objectId` of an object when updating its score:
 
 ```sh
 curl -X POST \
@@ -1479,7 +1478,7 @@ curl -X POST \
   https://{{host}}/1.1/leaderboard/objects/<objectId>/statistics
 ```
 
-更新 entity 成绩时则需指定相应的字符串：
+For entity, provide the string for it:
 
 ```sh
 curl -X POST \
@@ -1490,7 +1489,7 @@ curl -X POST \
   https://{{host}}/1.1/leaderboard/entities/<entityString>/statistics
 ```
 
-当前用户可以更新自己的成绩，这个不属于管理接口，不需要 `Master Key`，但需要传入当前用户的 `sessionToken`（客户端 SDK 更新当前用户的成绩封装了这一接口）：
+The current user can update their own score, though this won’t require the `Master Key` for the management interface. However, the `sessionToken` of the current user needs to be provided (the SDK has already encapsulated this interface):
 
 ```sh
 curl -X POST \
@@ -1502,10 +1501,10 @@ curl -X POST \
   https://{{host}}/1.1/leaderboard/users/self/statistics
 ```
 
-#### 强制更新成绩
+#### Force Updating Scores
 
-附加 `overwrite=1` 会无视更新策略 better 及 sum，强制使用 last 策略更新用户的成绩。
-比如，发现某个用户存在作弊行为时，可以使用这个接口强制更新用户的成绩。
+Add `overwrite=1` to ignore the `better` and `sum` update strategies and use `last` instead.
+For example, if cheating is detected on a user, you can force update the user’s score with this interface.
 
 ```sh
 curl -X POST \
@@ -1516,17 +1515,17 @@ curl -X POST \
   https://{{host}}/1.1/leaderboard/users/<uid>/statistics?overwrite=1
 ```
 
-返回的数据是当前服务端使用的分数：
+The returned data is the current score:
 
 ```json
 { "results": [{ "statisticName": "wins", "version": 0, "statisticValue": 10 }] }
 ```
 
-类似地，附加 `overwrite=1` 可以强制更新 object 成绩和 entity 成绩。
+`overwrite=1` can be used for object scores and entity scores as well.
 
-#### 删除成绩
+#### Deleting Scores
 
-如果不希望某个用户出现在榜单中，可以使用该接口删除用户的成绩以及在榜单中的排名（仅删除当前排行榜的成绩，不能删除历史版本的成绩）。
+Use this interface to remove the score and ranking of a user from the leaderboard. Note that only the score on the current version of the leaderboard can be removed.
 
 ```sh
 curl -X DELETE \
@@ -1536,13 +1535,13 @@ curl -X DELETE \
   https://{{host}}/1.1/leaderboard/users/<uid>/statistics?statistics=wins,world
 ```
 
-成功删除时返回空对象：
+Once done, an empty object will be returned:
 
 ```
 {}
 ```
 
-类似地，可以删除 object 的成绩：
+Similarly, you can delete the score of an object:
 
 ```sh
 curl -X DELETE \
@@ -1552,7 +1551,7 @@ curl -X DELETE \
   https://{{host}}/1.1/leaderboard/objects/<objectId>/statistics
 ```
 
-以及 entity 的成绩：
+And the score of an entity:
 
 ```sh
 curl -X DELETE \
@@ -1562,7 +1561,7 @@ curl -X DELETE \
   https://{{host}}/1.1/leaderboard/entities/<entityString>/statistics
 ```
 
-同样，当前用户可以删除自己的成绩，这个不属于管理接口，不需要 `Master Key`，但需要传入当前用户的 `sessionToken`（客户端 SDK 删除当前用户的成绩封装了这一接口）：
+The current user can delete their own score, though this won’t require the `Master Key` for the management interface. However, the `sessionToken` of the current user needs to be provided (the SDK has already encapsulated this interface):
 
 ```sh
 curl -X DELETE \
@@ -1573,14 +1572,14 @@ curl -X DELETE \
   https://{{host}}/1.1/leaderboard/users/self/statistics?statistics=wins,world
 ```
 
-### 查询成绩
+### Retrieving Scores
 
-通过 REST API 可以查询成绩，这些接口不属于管理接口，不需要 `Master Key`：
+The REST API interfaces for retrieving scores are not management interfaces and the `Master Key` is not required:
 
-#### 查询某个成绩
+#### Retrieving a Single Score
 
-指定用户的 objectId 即可获取该用户的成绩。
-你可以在请求 url 中指定多个 `statistics` 来获得多个排行榜中的成绩，排行榜名称用英文逗号 `,` 隔开，如果不指定将会返回该用户参与的所有排行榜中的成绩。
+Retrieve a score by providing the `objectId` of a user.
+You can specify multiple leaderboards within the `statistics` property (separated by `,`) to get the scores of the user in all the given leaderboards. If this option is not provided, the user’s scores in all leaderboards will be returned.
 
 ```sh
 curl -X GET \
@@ -1590,7 +1589,7 @@ curl -X GET \
   https://{{host}}/1.1/leaderboard/users/<objectId>/statistics
 ```
 
-返回结果：
+Response:
 
 ```json
 {
@@ -1615,7 +1614,7 @@ curl -X GET \
 }
 ```
 
-类似地，指定 object 的 objectId 可以查询该 object 参与的排行榜的成绩：
+Similarly, you can get an object’s scores by providing its `objectId`:
 
 ```sh
 curl -X GET \
@@ -1625,7 +1624,7 @@ curl -X GET \
   https://{{host}}/1.1/leaderboard/objects/<objectId>/statistics
 ```
 
-返回示例：
+Response:
 
 ```json
 {
@@ -1654,7 +1653,7 @@ curl -X GET \
 }
 ```
 
-获取某个 entity 成绩时则需指定该 entity 的字符串：
+To get an entity’s scores, provide the string for the entity:
 
 ```sh
 curl -X GET \
@@ -1664,7 +1663,7 @@ curl -X GET \
   https://{{host}}/1.1/leaderboard/entities/<entityString>/statistics
 ```
 
-返回示例：
+Response:
 
 ```json
 {
@@ -1685,9 +1684,9 @@ curl -X GET \
 }
 ```
 
-#### 查询一组成绩
+#### Retrieving a Group of Scores
 
-通过这个接口可以一次性拉取多个 user 的成绩，最多不超过 200 个。在请求中，需要在 body 中传入 user 的 `objectId` 数组。
+With this interface, you can get the scores of no more than 200 users at once. To use this interface, provide an array of `objectId`s of the users in the body.
 
 ```sh
 curl -X POST \
@@ -1698,7 +1697,7 @@ curl -X POST \
   https://{{host}}/1.1/leaderboard/users/statistics/<statisticName>
 ```
 
-查询一组成绩的的返回结果与[查询单个成绩](#查询某个成绩)类似：
+The response is similar to that of [retrieving a single score](#retrieving-a-single-score):
 
 ```json
 {
@@ -1727,7 +1726,7 @@ curl -X POST \
 }
 ```
 
-类似地，传入 object 的 `objectId` 数组可以一次性获取多个 object 的成绩（最多不超过 200 个）：
+Similarly, provide a list of `objectId`s of objects (no more than 200) to get these objects’ scores:
 
 ```sh
 curl -X POST \
@@ -1738,7 +1737,7 @@ curl -X POST \
   https://{{host}}/1.1/leaderboard/objects/statistics/<statisticName>
 ```
 
-传入 entity 的字符串数组则可以一次性获取多个 entity 的成绩（最多不超过 200 个）：
+Provide a list of strings of entities (no more than 200) to get these entities’ scores:
 
 ```sh
 curl -X POST \
@@ -1749,11 +1748,11 @@ curl -X POST \
   https://{{host}}/1.1/leaderboard/entities/statistics/<statisticName>
 ```
 
-### 查询排行榜
+### Queries on Leaderboards
 
-#### 获取区间排名
+#### Retrieving Scores Within a Scope
 
-你可以使用这个接口来获取 Top 排名。
+Use this interface to retrieve the top players.
 
 ```sh
 curl -X GET \
@@ -1768,17 +1767,17 @@ curl -X GET \
   https://{{host}}/1.1/leaderboard/leaderboards/user/<statisticName>/ranks
 ```
 
-| 参数              | 约束 | 说明                                                                                                                                                                |
-| ----------------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| startPosition     | 可选 | 排行头部起始位置，默认为 0。                                                                                                                                        |
-| maxResultsCount   | 可选 | 最大返回数量，默认为 20。                                                                                                                                           |
-| selectKeys        | 可选 | 返回用户在 `_User` 表的其他字段，支持多个字段，用英文逗号 `,` 隔开。出于安全性考虑，在非 masterKey 请求下不返回敏感字段 `email` 及 `mobilePhoneNumber`。            |
-| includeKeys       | 可选 | 返回用户在 `_User` 表的 pointer 字段的详细信息，支持多个字段，用英文逗号 `,` 隔开。为确保安全，在非 masterKey 请求下不返回敏感字段 `email` 及 `mobilePhoneNumber`。 |
-| includeStatistics | 可选 | 返回该用户在其他排行榜中的成绩，如果传入了不存在的排行榜名称，将会返回错误。                                                                                        |
-| version           | 可选 | 返回指定 version 的排行结果，默认返回当前版本的数据。                                                                                                               |
-| count             | 可选 | 值为 1 时返回该排行榜中的成员数量，默认为 0。                                                                                                                       |
+| Parameter         | Required | Description                                                                                                                                                                                                                                                       |
+| ----------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| startPosition     | Optional | The offset of the query. Defaults to 0.                                                                                                                                                                                                                           |
+| maxResultsCount   | Optional | The maximum number of results. Defaults to 20.                                                                                                                                                                                                                    |
+| selectKeys        | Optional | Return the other fields of the user in the `_User` class. You can provide multiple fields separated by `,`. For security reasons, the `email` and `mobilePhoneNumber` fields will not be returned if you are not using the `masterKey`.                           |
+| includeKeys       | Optional | Return the referenced objects of the other fields of the user in the `_User` class. You can provide multiple fields separated by `,`. For security reasons, the `email` and `mobilePhoneNumber` fields will not be returned if you are not using the `masterKey`. |
+| includeStatistics | Optional | Return the user’s scores in other leaderboards. If a non-existant leaderboard is provided, an error will be returned.                                                                                                                                             |
+| version           | Optional | Return the results from a specific version. By default, the results from the current version will be returned.                                                                                                                                                    |
+| count             | Optional | If set to 1, the number of members in the leaderboard will be returned. Defaults to 0.                                                                                                                                                                            |
 
-返回 JSON 对象：
+The response will be a JSON object:
 
 ```json
 {
@@ -1808,7 +1807,7 @@ curl -X GET \
 }
 ```
 
-查询 object 排行榜的 Top 排名的接口与之类似，只是将 `user` 替换为 `object`：
+Querying on object leaderboards shares a similar interface. The only difference is that `user` will be replaced by `object`:
 
 ```sh
 curl -X GET \
@@ -1823,7 +1822,7 @@ curl -X GET \
   https://{{host}}/1.1/leaderboard/leaderboards/object/<statisticName>/ranks
 ```
 
-返回结果：
+Response:
 
 ```json
 {
@@ -1858,7 +1857,7 @@ curl -X GET \
 }
 ```
 
-同理，URL 中的 `user` 替换为 `entity` 可查询 entity 排行榜的 Top 排名：
+Change `user` to `entity` to query on entity leaderboards:
 
 ```sh
 curl -X GET \
@@ -1871,7 +1870,7 @@ curl -X GET \
   https://{{host}}/1.1/leaderboard/leaderboards/entity/<statisticName>/ranks
 ```
 
-返回结果：
+Response:
 
 ```json
 {
@@ -1893,11 +1892,11 @@ curl -X GET \
 }
 ```
 
-#### 获取附近排名
+#### Retrieving Members With Similar Rankings as the Given Member
 
-在 URL 末端附加相应的 objectId 可获取某用户或 object 附近的排名。
+Add the corresponding `objectId` to the end of the URL to retrieve the users and objects with similar rankings as the given one.
 
-获取某用户附近的排名：
+To get the users with similar rankings as the given user:
 
 ```sh
 curl -X GET \
@@ -1911,8 +1910,8 @@ curl -X GET \
   https://{{host}}/1.1/leaderboard/leaderboards/user/<statisticName>/ranks/<objectId>
 ```
 
-参数含义参见上面[获取区间排名](#获取区间排名)一节。
-获取附近排名的返回结果与[获取区间排名](#获取区间排名)类似。
+See [Retrieving Scores Within a Scope](#retrieving-scores-within-a-scope) for the meanings of the parameters.
+The response is similar to that for [retrieving-scores-within-a-scope](#retrieving-scores-within-a-scope).
 
 ```json
 {
@@ -1951,7 +1950,7 @@ curl -X GET \
 }
 ```
 
-获取某 object 附近的排名：
+To get the objects with similar rankings as the given object:
 
 ```sh
 curl -X GET \
@@ -1966,7 +1965,7 @@ curl -X GET \
   https://{{host}}/1.1/leaderboard/leaderboards/object/<statisticName>/ranks/<objectId>
 ```
 
-同理，在 URL 末端附加 entity 字符串即可获取该 entity 附近的排名：
+To get the entities with similar rankings as the given entity:
 
 ```sh
 curl -X GET \
