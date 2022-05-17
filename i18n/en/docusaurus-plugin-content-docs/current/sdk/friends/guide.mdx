@@ -1,0 +1,311 @@
+---
+title: Friends Guide
+sidebar_label: Guide
+sidebar_position: 2
+---
+
+import MultiLang from "/src/docComponents/MultiLang";
+import CodeBlock from "@theme/CodeBlock";
+import sdkVersions from "/src/docComponents/sdkVersions";
+
+The Friends service comes with two models:
+
+- [Friend Mode](/sdk/friends/mutual/)
+- [Follow Mode](/sdk/friends/follow/)
+
+Depending on the requirements of your game, you can pick one of the two models for your game.
+Keep in mind that:
+
+- You can only choose one of the two models for your game, **but not both**.
+- Once you have picked one model, **you cannot switch to the other one later**.
+
+Your game can also obtain players’ connections [from third-party platforms](/sdk/friends/third-party/). To use this feature, please submit a ticket to us to enable it.
+
+Here is a recommended path for you to learn how to use Friends in your game:
+
+- Learn about [TDS Authentication](/sdk/authentication/features/), the built-in TDS account system, which the Friends service depends on. The “players” and “users” mentioned later in this guide all refer to `TDSUser`s.
+
+- Follow this guide to learn about how to initialize the SDK.
+
+- Pick a model for your game depending on your requirements and read the corresponding guide:
+
+  - [Friend Mode](/sdk/friends/mutual/)
+  - [Follow Mode](/sdk/friends/follow/)
+
+## Initializing the SDK
+
+With the initialization process mentioned in [Quickstart](/sdk/start/quickstart/#initialization) completed, proceed to the [Downloads](/tap-download) page and download the TapSDK, then add the `TapFriends` module:
+
+<MultiLang>
+
+<CodeBlock className="json">
+  {`"dependencies":{
+  ...
+  "com.taptap.tds.friends": "https://github.com/TapTap/TapFriends-Unity.git#${sdkVersions.taptap.unity}",
+}`}
+</CodeBlock>
+
+<CodeBlock className="groovy">
+  {`repositories{
+    flatDir {
+        dirs 'libs'
+    }
+}
+dependencies {
+    ...
+    implementation (name:'TapFriend_${sdkVersions.taptap.android}', ext:'aar')
+}`}
+</CodeBlock>
+
+<CodeBlock className="objectivec">
+  {`TapFriendResource.bundle
+TapFriendSDK.framework
+TapFriendUISDK.framework`}
+</CodeBlock>
+
+</MultiLang>
+
+To use rich presence in your game, please first enable **Real-time synchronization of rich information interface data** on **Developer Center > Game Services > Cloud Services > Friends > Settings**,
+then set the rick presence fields needed through the REST API for [configuring rich presence fields](#configuring-rich-presence-fields).
+
+## Rich Presence REST API
+
+Below are the REST API interfaces related to rich presence.
+You can write your own scripts to perform administrative operations by interacting with these interfaces.
+
+### Request Format
+
+For POST and PUT requests, the request body must be in JSON, and the Content-Type of the HTTP Header should be `application/json`.
+
+Requests are authenticated by the following key-value pairs in the HTTP Header:
+
+| Key        | Value        | Meaning                                     | Source                                    |
+| ---------- | ------------ | ------------------------------------------- | ----------------------------------------- |
+| `X-LC-Id`  | `{{appid}}`  | The `App Id` (`Client Id`) of your game     | Can be obtained from the Developer Center |
+| `X-LC-Key` | `{{appkey}}` | The `App Key` (`Client Token`) of your game | Can be obtained from the Developer Center |
+
+Using the management interface requires you to provide the `Master Key`: `X-LC-Key: {{masterkey}},master`.
+`Master Key`, also called `Server Secret`, can be obtained from the Developer Center as well.
+
+See [Credentials](/sdk/storage/guide/setup-dotnet#credentials) for more information.
+
+### Base URL
+
+The Base URL for REST API requests (the `{{host}}` in the curl examples) is the custom API domain of your app. You can update or find it on the Developer Center.
+See [Domain](/sdk/storage/guide/setup-dotnet#domain) for more details.
+
+### Retrieving Rich Presence Configurations
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Session: {{sessionToken}}" \
+  https://{{host}}/friend/v1/rich-presence/config
+```
+
+Response:
+
+```json
+{
+  "clientId": "YOUR CLIENT ID",
+  "enabled": 1,
+  "richMsgEnabled": true,
+  "onlineMsgEnabled": true,
+  "webSocketUrl": "wss://XXX.ws.tds1.tapapis.cn/ws/leancloud/v1",
+  "richPresenceFields": [
+    {
+      "key": "display",
+      "type": "token"
+    },
+    {
+      "key": "leadboard",
+      "type": "token"
+    },
+    {
+      "key": "inviteable",
+      "type": "variable"
+    },
+    {
+      "key": "score",
+      "type": "variable"
+    },
+    {
+      "key": "rank",
+      "type": "variable"
+    }
+  ],
+  "richPresenceMultiLang": [
+    {
+      "key": "display",
+      "lang": "en_US",
+      "content": {
+        "#playing": "Playing",
+        "#idle": "Idle",
+        "#room": "Room",
+        "#matching": "Matching"
+      }
+    },
+    {
+      "key": "display",
+      "lang": "zh_CN",
+      "content": {
+        "#playing": "游戏中",
+        "#idle": "在线",
+        "#room": "准备中",
+        "#matching": "组队中"
+      }
+    },
+    {
+      "key": "leadboard",
+      "lang": "en_US",
+      "content": {
+        "#score": "%score% score",
+        "#rank": "%rank% rank"
+      }
+    },
+    {
+      "key": "leadboard",
+      "lang": "zh_CN",
+      "content": {
+        "#score": "%score% 分,排名为 %rank%",
+        "#rank": "%rank% 名"
+      }
+    }
+  ]
+}
+```
+
+### Configuring Rich Presence Fields
+
+Rich presence fields can be set through the REST API. The names and types of each field needs to be provided.
+This is a management interface, so the `Master Key` is required for authentication:
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "enableRichMsg":true,
+    "enableOnlineMsg":true,
+    "richPresenceFields":[
+        {"key":"display","type":"token"},
+        {"key":"leadboard","type":"token"},
+        {"key":"inviteable","type":"variable"},
+        {"key":"score","type":"variable"},
+        {"key":"rank","type":"variable"}
+    ]
+  }' \
+  https://{{host}}/friend/v2/rich-presence/config/base-info
+```
+
+`enableRichMsg` and `enableOnlineMsg` are used to configure whether to enable notifications for rich presence updates and whether to enable notifications for friends’ online status updates. We recommend that you set both to be `true`.
+Notice that **the version in the URL for this interface is `v2`**, which is different from other interfaces that use `v1`.
+
+Response:
+
+```json
+{
+  "appId": "YOUR CLIENT ID"
+}
+```
+
+Response when there is an error:
+
+```json
+{
+  "code": 400,
+  "error": "Missing request header"
+}
+```
+
+### Configuring Multi-Language Contents
+
+The following interface can be used to configure multi-language contents of rich presence fields.
+This is a management interface, so the `Master Key` is required for authentication:
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "action":"save",
+    "config":[
+        {
+            "key": "display",
+            "lang": "en_US",
+            "content": {
+                "#playing": "Playing",
+                "#idle": "Idle",
+                "#room": "Room",
+                "#matching": "Matching"
+            }
+        },
+        {
+            "key": "display",
+            "lang": "zh_CN",
+            "content": {
+                "#playing": "游戏中",
+                "#idle": "在线",
+                "#room": "准备中",
+                "#matching": "组队中"
+            }
+        },
+        {
+            "key": "leadboard",
+            "lang": "en_US",
+            "content": {
+                "#score": "%score% score",
+                "#rank": "%rank% rank best"
+            }
+        },
+        {
+            "key": "leadboard",
+            "lang": "zh_CN",
+            "content": {
+                "#score": "%score% 分,竞技排名为 %rank%",
+                "#rank": "%rank% 名"
+            }
+        }
+    ]
+  }'
+  https://{{host}}/friend/v1/rich-presence/config/lang-info
+```
+
+The response will be the same as the one for [configuring rich presence fields](#configuring-rich-presence-fields).
+
+### Retrieving Players’ Rich Presence Information
+
+You can retrieve the rich presence information of multiple players at once (provide a comma-separated `objectId` list):
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Session: {{sessionToken}}" \
+  --data-urlencode 'ids={userObjectId,anotherUserObjectId}'
+  https://{{host}}/friend/v1/rich-presence/users
+```
+
+Response
+
+```json
+{
+  "results": [
+    {
+      "online": false,
+      "richPresence": {
+        "score": "15",
+        "leadboard": "15 points; ranked 150th",
+        "rank": "150"
+      }
+    },
+    {
+      "online": false,
+      "richPresence": {}
+    }
+  ]
+}
+```
