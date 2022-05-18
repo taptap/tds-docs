@@ -1,0 +1,1375 @@
+---
+title: Friend Mode
+sidebar_position: 3
+---
+
+import MultiLang from "/src/docComponents/MultiLang";
+
+Before continuing, make sure you have [finished initializing the SDK](/sdk/friends/guide/).
+
+## Responding to Friend Status Changes
+
+With the Friends module, the client can listen to the status changes of the player’s friends and display them to the player in real-time.
+You’ll need to register an instance for listening to friend status changes before calling the interface for getting the player online. By doing this, the player will be able to receive notifications after they get online:
+
+<MultiLang>
+
+```cs
+TDSFriends.FriendStatusChangedDelegate = new TDSFriendStatusChangedDelegate {
+    // New friend added (triggered together with “Sent friend request accepted”)
+    OnFriendAdd = friendInfo => {},
+    // New friend request received
+    OnNewRequestComing = req => {},
+    // Sent friend request accepted
+    OnRequestAccepted = req => {},
+    // Sent friend request declined
+    OnRequestDeclined = req => {},
+    // Friend got online
+    OnFriendOnline = userId => {},
+    // Friend got offline
+    OnFriendOffline = userId => {},
+    // Friend’s rich presence information changed
+    OnRichPresenceChanged = (userId, richPresence) => {},
+    // The current player got online (connection established)
+    OnConnected = () => {},
+    // Connection lost; the SDK will try to reconnect automatically
+    OnDisconnected = () => {},
+    // Connection error
+    OnConnectionError = (code, message) => {},
+};
+```
+
+```java
+TDSFriends.registerFriendStatusChangedListener(new FriendStatusChangedListener() {
+    // New friend added (triggered together with “Sent friend request accepted”)
+    @Override
+    public void onFriendAdd(TDSFriendInfo friendInfo) {}
+
+    // New friend request received
+    @Override
+    public void onNewRequestComing(TDSFriendshipRequest request) {}
+
+    // This callback will be triggered if the player entered the game with an invitation link
+    // You can call handFriendInvitationLink within this callback
+    // You can also parse the link with parseFriendInvitationLink, get the relevant parameters, and then perform your custom logic
+    @Override
+    public void onReceivedInvitationLink(String url) {}
+
+    // Sent friend request accepted
+    @Override
+    public void onRequestAccepted(TDSFriendshipRequest request) {}
+
+    // Sent friend request declined
+    @Override
+    public void onRequestDeclined(TDSFriendshipRequest request) {}
+
+    // Friend got online
+    @Override
+    public void onFriendOnline(String userId) {}
+
+    // Friend got offline
+    @Override
+    public void onFriendOffline(String userId) {}
+
+    // Friend’s rich presence information changed
+    @Override
+    public void onRichPresenceChanged(String userId, TDSRichPresence richPresence) {}
+
+    // The current player got online (connection established)
+    @Override
+    public void onConnected() {}
+
+    // Connection lost; the SDK will try to reconnect automatically
+    @Override
+    public void onDisconnected() {}
+
+    // Connection error
+    @Override
+    public void onConnectError(int code, String msg){});
+}
+```
+
+```objc
+[TDSFriends registerNotificationDelegate:self];
+
+// New friend added (triggered together with “Sent friend request accepted”)
+- (void)onFriendAdd:(TDSFriendInfo *)info {}
+
+// New friend request received
+- (void)onNewRequestComing:(TDSFriendshipRequest *)request {}
+
+// Sent friend request accepted
+- (void)onRequestAccepted:(TDSFriendshipRequest *)request {}
+
+// Sent friend request declined
+- (void)onRequestDeclined:(TDSFriendshipRequest *)request {}
+
+// Friend got online
+- (void)onFriendOnline:(NSString *)userId {}
+
+// Friend got offline
+- (void)onFriendOffline:(NSString *)userId {}
+
+// Friend’s rich presence information changed
+- (void)onRichPresenceChanged:(NSString *)userId dictionary:(NSDictionary * _Nullable)dictionary {}
+
+// The current player got online (connection established)
+- (void)onConnected {}
+
+// Connection lost; the SDK will try to reconnect automatically
+- (void)onDisconnected {}
+
+// Connection error
+- (void)onDisconnectedWithError:(NSError * _Nullable)error {}
+```
+
+</MultiLang>
+
+The “friends” appearing in the events above refer to the friends under the Friend mode.
+The SDK doesn’t support listening to the events under the Follow mode.
+
+To stop listening:
+
+<MultiLang>
+
+```cs
+TDSFriends.FriendStatusChangedDelegate = null;
+```
+
+```java
+TDSFriends.removeFriendStatusChangedListener();
+```
+
+```objc
+[TDSFriends unregisterNotificationDelegate];
+```
+
+</MultiLang>
+
+## Getting the Player Online
+
+After the player logs in, you need to call this interface to establish a persistent connection between the client and the cloud.
+Once the persistent connection is established, if there is an interruption to the internet connection, the SDK will automatically reconnect once the connection is restored.
+
+<MultiLang>
+<>
+
+```cs
+await TDSFriends.Online();
+```
+
+</>
+<>
+
+```java
+TDSFriends.online(new Callback<Void>() {
+    @Override
+    public void onSuccess(Void result) {
+        // Success
+    }
+
+    @Override
+    public void onFail(TDSFriendError error) {
+        // Handle error
+    }
+});
+```
+
+With the persistent connection established, if the player opens an invitation link, the Android SDK will automatically send a friend request to the corresponding player.
+
+</>
+<>
+
+```objc
+[TDSFriends online];
+```
+
+</>
+</MultiLang>
+
+## Getting the Player Offline
+
+After the player logs out, you need to call this interface to disconnect the client from the cloud.
+
+<MultiLang>
+
+```cs
+await TDSFriends.Offline();
+```
+
+```java
+TDSFriends.offline();
+```
+
+```objc
+[TDSFriends offline];
+```
+
+</MultiLang>
+
+## Searching for Friends by Nickname
+
+A player can search for friends by nickname without knowing their `objectId`s.
+For example, to search for friends with `Tarara` as their nickname:
+
+<MultiLang>
+
+```cs
+ReadOnlyCollection<TDSFriendInfo> friendInfos = await TDSFriends.SearchUserByName("Tarara");
+foreach (TDSFriendInfo info in friendInfos) {
+    // Player data
+    TDSUser user = info.User;
+    // Rich presence data; continue reading for more information
+    Dictionary<string, string> richPresence = RichPresence;
+    // Whether the friend is online
+    bool online = info.Online;
+}
+```
+
+```java
+TDSFriends.searchUserByName("Tarara", new ListCallback<TDSFriendInfo>() {
+    @Override
+    public void onSuccess(List<TDSFriendInfo> friendInfoList) {
+        for (TDSFriendInfo info : friendInfoList) {
+            // Player data
+            TDSUser user = info.getUser();
+            // Rich presence data; continue reading for more information
+            TDSRichPresence richPresence = info.getRichPresence();
+            // Whether the friend is online
+            boolean online = info.isOnline();
+        }
+    }
+
+    @Override
+    public void onFail(TDSFriendError error) {
+        toast("Failed search friend by nickname" + error.detailMessage);
+    }
+});
+```
+
+```objc
+TDSFriendQueryOption *option = [TDSFriendQueryOption new];
+option.from = 0;
+option.limit = 100;
+[TDSFriends searchUserWithNickname:@"Tarara" option:option
+callback:^(NSArray<TDSFriendInfo *> * _Nullable friendInfos, NSError * _Nullable error) {
+    if (friendInfos) {
+        for (TDSFriendInfo *info in friendInfos) {
+            // Player data
+            TDSUser *user = info.user;
+            // Rich presence data; continue reading for more information
+            NSDictionary *richPresence = info.richPresence;
+            // Whether the friend is online
+            BOOL online = info.online;
+        }
+    } else if (error) {
+        // Handle error
+    }
+}];
+```
+
+</MultiLang>
+
+Notice that **in order to use this function, the `nickname` field has to be set on the built-in account system**.
+See [TDS Authentication Guide](/sdk/authentication/guide/#setting-other-user-properties) for more information.
+
+## Friend Code
+
+Each logged-in player has a friend code that can be shared with other players so these players can quickly add the current player as their friend.
+
+You can get the friend code of a `TDSUser` from its `shortId` field:
+
+<MultiLang>
+
+```cs
+// currentUser is a logged in TDSUser
+string shortId = currentUser["shortId"];
+```
+
+```java
+String shortId = currentUser.getString("shortId");
+```
+
+```objc
+NSString *shortId = currentUser[@"shortId"];
+```
+
+</MultiLang>
+
+To search for a player with their friend code:
+
+<MultiLang>
+
+```cs
+TDSFriendInfo friendInfo = await TDSFriends.SearchUserByShortCode(shortId);
+```
+
+```java
+TDSFriends.searchUserByShortCode(shortId, new Callback<TDSFriendInfo>() {
+    @Override
+    public void onSuccess(TDSFriendInfo friendInfo) { /* See the previous section */ }
+
+    @Override
+    public void onFail(TDSFriendError error) { /* See the previous section */ }
+});
+```
+
+```objc
+[TDSFriends searchUserWithShortCode:shortId
+callback:^(TDSFriendInfo * _Nullable friendInfo, NSError * _Nullable error) {
+    // See the previous section
+}];
+```
+
+</MultiLang>
+
+## Searching for Friends With `objectId`
+
+Besides using nicknames and friend codes, a player can also search for friends with their `objectId`s.
+
+For example, to search for the friend with `5b0b97cf06f4fd0abc0abe35` as their `objectId`:
+
+<MultiLang>
+
+```cs
+TDSFriendInfo friendInfo = await TDSFriends.SearchUserById("5b0b97cf06f4fd0abc0abe35");
+```
+
+```java
+TDSFriends.searchUserById("5b0b97cf06f4fd0abc0abe35", new Callback<TDSFriendInfo>() {
+    @Override
+    public void onSuccess(TDSFriendInfo tdsFriendInfo) {
+        /* See the previous section */
+    }
+    @Override
+    public void onFail(TDSFriendError tdsFriendError) {
+        /* See the previous section */
+    }
+});
+```
+
+```objc
+[TDSFriends searchUserWithObjectId:@"5b0b97cf06f4fd0abc0abe35"
+callback:^(TDSFriendInfo * _Nullable friendInfo, NSError * _Nullable error) {
+    // See the previous section
+}];
+```
+
+</MultiLang>
+
+## Rich Presence
+
+Rich presence can be used to display the player’s status information like their online status, current hero, and current game mode.
+
+After adding configurations for rich presence on the Developer Center, you can set the content of a player’s rich presence according to the configured fields for rich presence:
+
+<MultiLang>
+
+```cs
+await TDSFriends.SetRichPresence("score", "60");
+```
+
+```java
+TDSFriends.setRichPresence("score", "60",  new Callback<Void>() {
+    @Override
+    public void onSuccess(Void result) {
+        toast("Succeed to set rich presence.");
+    }
+
+    @Override
+    public void onFail(TDSFriendError error) {
+        toast("Failed to set rich presence: " + error.detailMessage);
+    }
+});
+```
+
+```objc
+[TDSFriends setRichPresenceWithKey:@"score" value:@"60"
+    callback:^(BOOL succeeded, NSError * _Nullable error) {
+  if (succeeded) {
+    // Succeed to set rich presence.
+  } else if (error) {
+    // Failed to set rich presence.
+  }
+}];
+```
+
+</MultiLang>
+
+Here `score` is a rich presence field configured on the Developer Center.
+There are two types available for each rich presence field:
+
+- `variable`: The value is a string. In the code example above, with `score` configured to be a `variable` on the Developer Center, the client sets the value of this field to be `60` when updating the rich presence data. The cloud will accordingly return `"score": "60"` to the client as the rich presence data. You need to handle the localization-related logic yourself so that the player can eventually see something like “Score: 60”.
+
+- `token`: The value is a string starting with `#`. In the example below, the type of `display` is `token`, and the client sets the value of this field to be `#matching` when updating the rich presence data. The cloud will handle the conversion of this value to a localized string and return the result like `"display": "Matching"` to the client. Notice that if the cloud fails to convert the value, an empty string like `"display": " "` will be returned.
+
+To set multiple fields at once:
+
+<MultiLang>
+
+```cs
+Dictionary<string, string> info = new Dictionary<string, string>();
+info.Add("score", "60");
+info.Add("display", "#matching");
+await TDSFriends.SetRichPresences(info);
+```
+
+```java
+Map<String,String> info = new HashMap<>();
+info.put("score", "60");
+info.put("display", "#matching");
+TDSFriends.setRichPresence(info, new Callback<Void>() {
+    // Other things to do
+});
+```
+
+```objc
+[TDSFriends setRichPresencesWithDictionary:@{
+    @"score" : @"60",
+    @"display" : @"#matching",
+} callback:^(BOOL succeeded, NSError * _Nullable error) {
+    // Other things to do
+}];
+```
+
+</MultiLang>
+
+You can **configure at most 20 rich presence fields on the Developer Center**. The key of each field should be no longer than 128 bytes and the value of each field should be no longer than 256 bytes.
+
+You can use the following interface to clear a rich presence field for the current player:
+
+<MultiLang>
+
+```cs
+TDSFriends.ClearRichPresence("score");
+```
+
+```java
+TDSFriends.clearRichPresence("score", new Callback<Void>() {
+    // Other things to do
+});
+```
+
+```objc
+[TDSFriends clearRichPresenceWithKey:@"score"
+callback:^(BOOL succeeded, NSError * _Nullable error) {
+    // Other things to do
+}];
+```
+
+</MultiLang>
+
+You can also clear multiple rich presence fields at once:
+
+<MultiLang>
+
+```cs
+IEnumerable<string> keys = new string[] {"score", "display"}
+await TDSFriends.ClearRichPresences(keys);
+```
+
+```java
+List<String> keys = new ArrayList<>();
+keys.add("score");
+keys.add("display");
+TDSFriends.clearRichPresence(keys, new Callback<Void>() {
+    // Other things to do
+});
+```
+
+```objc
+[TDSFriends clearRichPresencesWithKeys:@[@"score", @"display"]
+callback:^(BOOL succeeded, NSError * _Nullable error) {
+    // Other things to do
+});
+```
+
+</MultiLang>
+
+The interfaces for setting and clearing rich presence data can each be called at most once every 30 seconds.
+
+There are some [REST API interfaces](/sdk/friends/guide/#rich-presence-rest-api) related to rich presence.
+You can write your own scripts to perform administrative operations on the server side by interacting with these interfaces.
+
+## Adding Friends
+
+A player can add friends by entering their [friend codes](/sdk/friends/mutual/#friend-code).
+
+<MultiLang>
+
+```cs
+await TDSFriends.AddFriendByShortCode(shortId);
+```
+
+```java
+TDSFriends.addFriendByShortCode(shortId, null, new Callback<Void>() {
+    @Override
+    public void onSuccess(Void result) {
+        toast("Applied or added.");
+    }
+
+    @Override
+    public void onFail(TDSFriendError error) {
+        toast("Failed to add a friend: " + error.detailMessage);
+    }
+});
+```
+
+```objc
+[TDSFriends addFriendWithShortCode:shortId callback:^(BOOL succeeded, NSError * _Nullable error) {
+  if (succeeded) {
+    // Applied or added.
+  } else if (error) {
+    // Failed to add a friend.
+  }
+}];
+```
+
+</MultiLang>
+
+If the current player is already on the friend list of the other player, they will immediately become friends.
+Otherwise, a friend request will be sent to the other player.
+
+Additional properties can be specified when adding friends. For example, to put the other player into the `coworkers` group:
+
+<MultiLang>
+
+```cs
+Dictionary<string, object> attrs = new Dictionary<string, object> {
+    { "group", "coworkers" }
+};
+await TDSFriends.AddFriendByShortCode(shortId, attrs);
+```
+
+```java
+Map<String, Object> attrs = new HashMap<String, Object>();
+attrs.put("group", "coworkers");
+TDSFriends.addFriendByShortCode(shortId, attrs, new Callback<Boolean>() {
+    // See the example above
+});
+```
+
+```objc
+NSDictionary *attributes = @{
+    @"group" : @"coworkers",
+};
+[TDSFriends addFriendWithShortCode:shortId attributes:attributes
+callback:^(BOOL succeeded, NSError * _Nullable error) {
+    // See the example above
+}];
+```
+
+</MultiLang>
+
+A player can also add a `TDSUser` as their friend with its `objectId`.
+For example, assuming Tarara’s `objectId` is `5b0b97cf06f4fd0abc0abe35`, the current player can add Tarara as their friend with the following code:
+
+<MultiLang>
+
+```cs
+await TDSFriends.AddFriend("5b0b97cf06f4fd0abc0abe35");
+```
+
+```java
+TDSFriends.addFriend("5b0b97cf06f4fd0abc0abe35", new Callback<Void>() {
+    // See the example above
+});
+```
+
+```objc
+[TDSFriends addFriendWithUserId:@"5b0b97cf06f4fd0abc0abe35"
+callback:^(BOOL succeeded, NSError * _Nullable error) {
+    // See the example above
+}];
+```
+
+</MultiLang>
+
+Additional properties can be specified as well when adding friends with `objectId`:
+
+<MultiLang>
+
+```cs
+Dictionary<string, object> attrs = new Dictionary<string, object> {
+    { "group", "coworkers" }
+};
+await TDSFriends.AddFriend("5b0b97cf06f4fd0abc0abe35", attrs);
+```
+
+```java
+Map<String, Object> attrs = new HashMap<String, Object>();
+attrs.put("group", "coworkers");
+TDSFriends.addFriend("5b0b97cf06f4fd0abc0abe35", attrs, new Callback<Void>() {
+    // See the example above
+});
+```
+
+```objc
+NSDictionary *attributes = @{
+    @"group" : @"coworkers",
+};
+[TDSFriends addFriendWithUserId:@"5b0b97cf06f4fd0abc0abe35" attributes:attributes callback:^(BOOL succeeded, NSError * _Nullable error) {
+    // See the example above
+}];
+```
+
+</MultiLang>
+
+## Deleting Friends
+
+A player can delete their existing friends.
+For example, after becoming friends with Tarara, the current player changes their mind and doesn’t want to be friends with Tarara anymore:
+
+<MultiLang>
+
+```cs
+await TDSFriends.DeleteFriend("5b0b97cf06f4fd0abc0abe35");
+```
+
+```java
+TDSFriends.deleteFriend("5b0b97cf06f4fd0abc0abe35", new Callback<Boolean>() {
+    @Override
+    public void onSuccess(Boolean ok) {
+        toast("Deleted.");
+    }
+
+    @Override
+    public void onFail(TDSFriendError error) {
+        toast("Failed to delete a friend: " + error.detailMessage);
+    }
+});
+```
+
+```objc
+[TDSFriends deleteFriendWithUserId:@"5b0b97cf06f4fd0abc0abe35" callback:^(BOOL succeeded, NSError * _Nullable error) {
+  if (succeeded) {
+    // Deleted.
+  } else if (error) {
+    // Failed to delete a friend.
+  }
+}];
+```
+
+</MultiLang>
+
+## Blocklist
+
+### Blocking Users
+
+A player can block a user no matter if they’re friends or not. Once a player blocks a user, the ongoing friend requests between them will be deleted, and they won’t be able to send friend requests to each other anymore. Blocked users won’t appear in search results when the player searches for friends. A player can have at most 100 users in their blocklist.
+
+Assuming Tarara’s `objectId` is `5b0b97cf06f4fd0abc0abe35`, to block Tarara:
+
+<MultiLang>
+<>
+
+```cs
+await TDSFriends.BlockFriend("5b0b97cf06f4fd0abc0abe35");
+```
+
+</>
+<>
+
+```java
+TDSFriends.blockFriend("5b0b97cf06f4fd0abc0abe35", new Callback<Void>(){
+    @Override
+    public void onSuccess(Void result) {
+        // block user succeed.
+    }
+    @Override
+    public void onFail(TDSFriendError error) {
+        // Failed to block.
+    }
+});
+```
+
+</>
+<>
+
+```objc
+[TDSFriends blockFriendWithUserId:@"5b0b97cf06f4fd0abc0abe35" callback:^(BOOL succeeded, NSError * _Nullable error) {
+  if (succeeded) {
+    // block user succeed.
+  } else if (error) {
+    // Failed to block.
+  }
+}];
+```
+
+</>
+
+</MultiLang>
+
+### Unblocking Users
+
+A player can remove a user from their blocklist at any time. If the user used to be a friend of the current player, the user will be added back to the friend list of the current player.
+
+<MultiLang>
+<>
+
+```cs
+await TDSFriends.UnblockFriend("5b0b97cf06f4fd0abc0abe35");
+```
+
+</>
+<>
+
+```java
+TDSFriends.unblockFriend("5b0b97cf06f4fd0abc0abe35", new Callback<Void>() {
+    @Override
+    public void onSuccess(Void result) {
+        // unblock succeed.
+    }
+
+    @Override
+    public void onFail(TDSFriendError error) {
+        // Failed to unblock.
+    }
+});
+```
+
+</>
+<>
+
+```objc
+[TDSFriends unblockFriendWithUserId:@"5b0b97cf06f4fd0abc0abe35" callback:^(BOOL succeeded, NSError * _Nullable error) {
+  if (succeeded) {
+    // unblock succeed.
+  } else if (error) {
+    // Failed to unblock.
+  }
+}];
+```
+
+</>
+
+</MultiLang>
+
+### Retrieving the Blocklist
+
+Use the code below to retrieve the current player’s blocklist with pagination.
+
+<MultiLang>
+<>
+
+```cs
+var from = 0;
+var limit = 100;
+ReadOnlyCollection<TDSFriendInfo> friendInfos = await TDSFriends.QueryBlockList(from, limit);
+foreach (TDSFriendInfo info in friendInfos) {
+    // Player data
+    TDSUser user = info.User;
+    // Rich presence data
+    Dictionary<string, string> richPresence = info.RichPresence;
+    // Whether the friend is online
+    bool online = info.Online;
+}
+```
+
+In the code above:
+
+- `from` is the query’s offset. It will be `0` for the first page. For the next page, it will be the number of items retrieved from the last query.
+- `limit` is the number of items in each page.
+
+</>
+<>
+
+```java
+TDSFriends.queryBlockList(0, 10, new ListCallback<TDSFriendInfo>() {
+    @Override
+    public void onSuccess(List<TDSFriendInfo> result) {
+        System.out.println("query blockList data, data = " + result);
+    }
+
+    @Override
+    public void onFail(TDSFriendError error) {
+        System.out.println("query blockList failed, error = " + error);
+    }
+});
+```
+
+In the code above:
+
+- `from` is the query’s offset. It will be `0` for the first page. For the next page, it will be the number of items retrieved from the last query.
+- `limit` is the number of items in each page.
+- `callback` is the callback for handling the result asynchronously. The result contains the users in the blocklist.
+
+</>
+<>
+
+```objc
+TDSFriendQueryOption *option = [TDSFriendQueryOption new];
+option.from = 0;
+option.limit = 100;
+[TDSFriends queryBlockListWithOption:option
+    callback:^(NSArray<TDSFriendInfo *> * _Nullable friendInfos, NSError * _Nullable error) {
+        if (friendInfos) {
+            for (TDSFriendInfo *info in friendInfos) {
+                // Player data
+                TDSUser *user = info.user;
+                // Rich presence data
+                NSDictionary *richPresence = info.richPresence;
+                // Whether the friend is online
+                BOOL online = info.online;
+            }
+        } else if (error) {
+            // Handle error
+        }
+}];
+```
+
+In the code above:
+
+- `option` is the conditions for the query, including `from` for the offset and `limit` for the number of items.
+- `callback` is the callback for handling the result asynchronously.
+
+</>
+
+</MultiLang>
+
+## Retrieving Friend Requests
+
+There are three possible statuses for each friend request:
+
+- `pending`: The target user hasn’t responded yet. This is the default status once a friend request has been created.
+- `accepted`: The target user accepted the request and they are already friends with the current player.
+- `declined`: The target user declined the request.
+
+The SDK offers an interface for retrieving friend requests.
+For example, to retrieve the first 20 requests with their status being `pending`:
+
+<MultiLang>
+<>
+
+```cs
+var from = 0;
+var limit = 100;
+ReadOnlyCollection<LCFriendshipRequest> requests = await TDSFriends.QueryFriendRequestList (
+    LCFriendshipRequest.STATUS_PENDING, from, limit
+);
+```
+
+`LCFriendshipRequest.STATUS_PENDING` means the status of the friend request is `pending`.
+Similarly, `LCFriendshipRequest.STATUS_ACCEPTED` means `accepted` and `LCFriendshipRequest.STATUS_DECLINED` means `declined`.
+`LCFriendshipRequest.STATUS_ANY` means any status.
+
+</>
+<>
+
+```java
+int from = 0;
+int limit = 100;
+TDSFriends.queryFriendRequestList(LCFriendshipRequest.STATUS_PENDING, from, limit,
+    new ListCallback<LCFriendshipRequest>(){
+
+        @Override
+        public void onSuccess(List<LCFriendshipRequest> requests) {
+            // requests is the list of pending friend requests
+        }
+
+        @Override
+        public void onFail(TDSFriendError error) {
+            toast("Failed to query friendship requests: " + error.detailMessage);
+        }
+});
+```
+
+In the example above, `LCFriendshipRequest.STATUS_PENDING` means the status of the friend request is `pending`.
+Similarly, `LCFriendshipRequest.STATUS_ACCEPTED` means `accepted` and `LCFriendshipRequest.STATUS_DECLINED` means `declined`.
+`LCFriendshipRequest.STATUS_ANY` means any status.
+
+</>
+<>
+
+```objc
+TDSFriendQueryOption *option = [TDSFriendQueryOption new];
+option.from = 0;
+option.limit = 100;
+[TDSFriends queryFriendRequestWithStatus:TDSUserFriendshipRequestStatusPending
+    option:option
+    callback:^(NSArray<LCFriendshipRequest *> * _Nullable requests, NSError * _Nullable error) {
+        // requests is the list of pending friend requests
+}];
+```
+
+In the example above, `TDSUserFriendshipRequestStatusPending` means the status of the friend request is `pending`.
+Similarly, `TDSUserFriendshipRequestStatusAccepted` means `accepted` and `TDSUserFriendshipRequestStatusDeclined` means `declined`.
+`TDSUserFriendshipRequestStatusAny` means any status.
+
+</>
+
+</MultiLang>
+
+Use the following interface to include the rich presence data of the initiator of each request in the result:
+
+<MultiLang>
+
+```cs
+ReadOnlyCollection<TDSFriendshipRequest> requests = await TDSFriends.QueryFriendRequestWithFriendStateList (
+    LCFriendshipRequest.STATUS_PENDING, from, limit
+);
+foreach (TDSFriendshipRequest request in requests) {
+    // Friend request (see QueryFriendRequestList)
+    LCFriendshipRequest req = request.FriendshipRequest;
+    // The rich presence data of the initiator
+    TDSFriendInfo info = request.FriendInfo;
+}
+```
+
+```java
+TDSFriends.queryFriendRequestWithFriendStateList(LCFriendshipRequest.STATUS_PENDING,
+  from, limit, new ListCallback<TDSFriendshipRequest>() {
+    @Override
+    public void onSuccess(List<TDSFriendshipRequest> requests) {
+        for (TDSFriendshipRequest request : requests) {
+            // Friend request (see queryFriendRequestList)
+            LCFriendshipRequest req = request.getLcFriendshipRequest();
+            // The rich presence data of the initiator
+            TDSFriendInfo info = request.getFriendInfo();
+        }
+    }
+
+    @Override
+    public void onFail(TDSFriendError error) {
+        // Handle error
+    }
+});
+```
+
+```objc
+TDSFriendQueryOption *option = [TDSFriendQueryOption new];
+option.from = 0;
+option.limit = 100;
+[TDSFriends queryFriendRequestAndStateWithStatus:TDSUserFriendshipRequestStatusPending
+    option:option
+    callback:^(NSArray<TDSFriendshipRequest *> * _Nullable requests, NSError * _Nullable error) {
+    for (TDSFriendshipRequest *request in requests) {
+        // Friend request (see queryFriendRequestWithStatus)
+        LCFriendshipRequest *req = request.lcFriendshipRequest;
+        // The rich presence data of the initiator
+        TDSFriendInfo *info = request.friendInfo;
+    }
+}];
+```
+
+</MultiLang>
+
+## Handling Friend Requests
+
+For each new friend request, the player can accept or decline it. They can also ignore the request or even delete it.
+
+<MultiLang>
+
+```cs
+// LCFriendshipRequest request
+
+// Accept
+await TDSFriends.AcceptFriendshipRequest(request);
+// Accept and add additional attributes
+Dictionary<string, object> attrs = new Dictionary<string, object> {
+    { "group", "coworkers" }
+};
+await TDSFriends.AcceptFriendshipRequest(request, attrs);
+
+// Decline
+await TDSFriends.DeclineFriendshipRequest(request);
+// Delete
+await request.Delete();
+```
+
+```java
+// LCFriendshipRequest request
+
+// Accept
+TDSFriends.acceptFriendRequest(request, new Callback<Void>() {
+    @Override
+    public void onSuccess(Void result) {
+        toast("Accepted.");
+    }
+
+    @Override
+    public void onFail(TDSFriendError error) {
+        toast("Failed to delete a friend: " + error.detailMessage);
+    }
+});
+// Accept and add additional attributes
+Map<String, Object> attrs = new HashMap<String, Object>();
+attrs.put("group", "coworkers");
+TDSFriends.acceptFriendRequest(request, attrs, new Callback<Void>() {
+    // Other things to do
+});
+
+// Decline
+TDSFriends.declineFriendRequest(request, new Callback<Void>() {
+    // Other things to do
+});
+// Delete
+TDSFriends.deleteFriendRequest(request, new Callback<Void>() {
+    // Other things to do
+});
+```
+
+```objc
+// LCFriendshipRequest request
+
+// Accept
+[TDSFriends acceptFriendRequest:request attributes:nil
+callback:^(BOOL succeeded, NSError * _Nullable error) {
+  if (succeeded) {
+    // Accepted.
+  } else if (error) {
+    // Failed to accept a friend request.
+  }
+}];
+// Accept and add additional attributes
+NSDictionary *attributes = @{
+    @"group" : @"coworkers",
+};
+[TDSFriends acceptFriendRequest:request attributes:attributes
+callback:^(BOOL succeeded, NSError * _Nullable error) {
+    // Other things to do
+}];
+
+// Decline
+[TDSFriends declineFriendRequest:request
+callback:^(BOOL succeeded, NSError * _Nullable error) {
+    // Other things to do
+}];
+
+[TDSFriends deleteFriendRequest:request
+callback:^(BOOL succeeded, NSError * _Nullable error) {
+    // Other things to do
+}];
+```
+
+</MultiLang>
+
+Note:
+
+1. If a user declines a friend request from the current player, the player will get an error when they try to send another request to the same user.
+2. If a user deletes a friend request from the current user, the player will be able to send another request to the same user.
+
+## Retrieving Friend List
+
+A player can retrieve their own friend list. When performing this operation, a limit and offset can be provided:
+
+<MultiLang>
+
+```cs
+var from = 0;
+var limit = 100;
+ReadOnlyCollection<TDSFriendInfo> friendInfos = await TDSFriends.QueryFriendList(from, limit);
+foreach (TDSFriendInfo info in friendInfos) {
+    // Player data
+    TDSUser user = info.User;
+    // Rich presence data
+    Dictionary<string, string> richPresence = info.RichPresence;
+    // Whether the friend is online
+    bool online = info.Online;
+}
+```
+
+```java
+int from = 0;
+int limit = 100;
+TDSFriends.queryFriendList(from, limit,
+    new ListCallback<TDSFriendInfo>(){
+
+        @Override
+        public void onSuccess(List<TDSFriendInfo> friendInfoList) {
+           for (TDSFriendInfo info : friendInfoList) {
+               // Player data
+               TDSUser user = info.getUser();
+               // Rich presence data
+               TDSRichPresence richPresence = info.getRichPresence();
+               // Whether the friend is online
+               boolean online = info.isOnline();
+           }
+        }
+
+        @Override
+        public void onFail(TDSFriendError error) {
+            toast("Failed to query friend list" + error.detailMessage);
+        }
+});
+```
+
+```objc
+TDSFriendQueryOption *option = [TDSFriendQueryOption new];
+option.from = 0;
+option.limit = 100;
+[TDSFriends queryFriendWithOption:option
+    callback:^(NSArray<TDSFriendInfo *> * _Nullable friendInfos, NSError * _Nullable error) {
+        if (friendInfos) {
+            for (TDSFriendInfo *info in friendInfos) {
+                // Player data
+                TDSUser *user = info.user;
+                // Rich presence data
+                NSDictionary *richPresence = info.richPresence;
+                // Whether the friend is online
+                BOOL online = info.online;
+            }
+        } else if (error) {
+            // Handle error
+        }
+}];
+```
+
+</MultiLang>
+
+## Check if a User Is a Friend
+
+You can check if a `TDSUser` is a friend of the current player with its `objectId`.
+For example, assuming Tarara’s `objectId` is `5b0b97cf06f4fd0abc0abe35`:
+
+<MultiLang>
+
+```cs
+bool isFriend = await TDSFriends.CheckFriendship("5b0b97cf06f4fd0abc0abe35");
+```
+
+```java
+TDSFriends.checkFriendship("5b0b97cf06f4fd0abc0abe35", new Callback<Boolean>() {
+    @Override
+    public void onSuccess(Boolean isFriend) {
+        if (isFriend) {
+            toast("Tarara is my friend.");
+        } else {
+            toast("Tarara is not my friend.");
+        }
+    }
+
+    @Override
+    public void onFail(TDSFriendError error) {
+        toast("Failed to query friendship: " + error.detailMessage);
+    }
+});
+```
+
+```objc
+[TDSFriends checkFriendshipWithUserId:@"5b0b97cf06f4fd0abc0abe35"
+    callback:^(NSNumber * _Nullable isFriend, NSError * _Nullable error) {
+        if (error) {
+            // Handle error
+        }
+        if (isFriend.boolValue) {
+            NSLog(@"Tarara is my friend.");
+        } else {
+            NSLog(@"Tarara is not my friend.");
+        }
+}];
+```
+
+</MultiLang>
+
+## Link Sharing
+
+### Landing Page
+
+A landing page has to be deployed before you use link sharing.
+The landing page can be deployed on [Cloud Engine](/sdk/engine/overview/) or any other server that can host a static page.
+If you plan to use Cloud Engine, keep in mind that the free instances provided by Cloud Engine come with auto-hibernation. Please consider purchasing standard instances.
+
+We provide an [open-source demo landing page] for you to use. You can build, deploy, and use it with your own configurations.
+Notice that the format of the `VITE_ANDROID_LINK` environment variable of the demo is `scheme://host/path`.
+The values of `host` and `path` should be consistent with those written in the `AndroidManifest.xml` of your Android project.
+
+[repo]: https://github.com/taptap/TapFriends-landing-page
+
+For example, if the `AndroidManifest.xml` of your project contains the following configurations:
+
+```xml
+<activity
+    android:name="com.tapsdk.friends.TDSFriendsRouterPageActivity"
+    android:allowTaskReparenting="true"
+    android:configChanges="keyboardHidden|orientation"
+    android:exported="true"
+    android:launchMode="singleTask"
+    android:screenOrientation="nosensor"
+    android:theme="@android:style/Theme.Translucent.NoTitleBar">
+    <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+
+        <data
+            android:host="APP_ID"
+            android:path="/friends"
+            android:scheme="tapsdk" />
+            <!-- The scheme cannot contain capital letters or underscores <a href="[scheme]://[host]/[path]?[query]">Launch the App</a> -->
+        </intent-filter>
+</activity>
+```
+
+The value of `VITE_ANDROID_LINK` in your landing page should be `tapsdk://APP_ID/friends`.
+
+The address of the landing page should be configured in the client:
+
+<MultiLang>
+
+```cs
+TDSFriends.SetShareLink("https://please-replace-with-your-domain.example.com");
+```
+
+```java
+TDSFriends.setShareLink("https://please-replace-with-your-domain.example.com");
+```
+
+```objc
+[TDSFriends setShareLink:@"https://please-replace-with-your-domain.example.com"];
+```
+
+</MultiLang>
+
+If the landing page is hosted on Cloud Engine, the address will be `https://YOUR_CLOUD_ENGINE_CUSTOM_DOMAIN`.
+
+### Generating Invitation Links
+
+After the landing page has been deployed and the address has been configured in the client, you can call the following interface to generate invitation links:
+
+<MultiLang>
+
+```cs
+string inviteUrl = await TDSFriends.GenerateFriendInvitationLink();
+```
+
+```java
+TDSFriends.generateFriendInvitationLink(new Callback<String>() {
+    @Override
+    public void onSuccess(String inviteUrl) {
+        System.out.println("share this link to invite your friends: " + inviteUrl);
+    }
+
+    @Override
+    public void onFail(TDSFriendError error) {
+        System.out.println("Failed to generate invite link: " + error.detailMessage);
+    }
+});
+```
+
+```objc
+NSError *error;
+NSString *inviteUrl = [TDSFriends generateFriendInvitationLinkWithError:&error];
+```
+
+</MultiLang>
+
+The default username in the link will be the `nickname` of the player.
+Therefore, you might want to make sure that you have set the `nickname`s of the users with the built-in account system.
+See [TDS Authentication Guide](/sdk/authentication/guide/#setting-other-user-properties) for more information.
+To use other names, specify them when calling the above interface.
+You can also provide other parameters that can be attached to the URL of the invitation link as query parameters.
+For example, if the player named Tarara wants to use “Taro” as their name and attach a `ref=taptap` parameter, you can do this:
+
+<MultiLang>
+
+```cs
+Dictionary<string, object> parameters = new Dictionary<string, object> {
+    { "ref", "taptap" }
+};
+string inviteUrl = await TDSFriends.GenerateFriendInvitationLink("Taro", parameters);
+```
+
+```java
+Map<String, Object> parameters = new HashMap<String, Object>();
+parameters.put("ref", "taptap");
+TDSFriends.generateFriendInvitationLink("Taro", parameters, new Callback<String>() {
+    // Other things to do
+});
+```
+
+```objc
+NSError *error;
+TDSFriendLinkOption *option = [TDSFriendLinkOption new];
+option.roleName = @"Taro";
+option.queries = @{
+    @"ref" : @"taptap",
+};
+NSString *inviteUrl = [TDSFriends generateFriendInvitationLinkWithOption:option error:&error];
+```
+
+</MultiLang>
+
+### Handling Invitation Links
+
+After the player opens the game with an invitation link, you need to call the following interface.
+The SDK will automatically send a friend request to the corresponding player.
+
+<MultiLang>
+
+```cs
+public class DeepLinkManager : MonoBehaviour
+{
+    // Other logic
+    private async void onDeepLinkActivated(string url) {
+        await TDSFriends.HandleFriendInvitationLink(url);
+    }
+}
+```
+
+```java
+public class FriendsActivity extends AppCompatActivity {
+// Other logic
+    public void onHandleLink(View view) {
+        TDSFriends.handFriendInvitationLink(url, new Callback<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                // Other things to do
+            }
+
+            @Override
+            public void onFail(TDSFriendError error) {
+                // Other things to do
+            }
+        });
+    }
+}
+```
+
+```objc
+- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
+    return [TDSFriends handleFriendInvitationLink:url
+    callback:^(BOOL succeeded, TDSFriendsLinkInfo * _Nullable linkInfo, NSError * _Nullable error) {
+        if (error) {
+            // handle error
+        }
+    }];
+}
+```
+
+</MultiLang>
+
+You can also parse the link with the following interface provided by the SDK and get the player’s `objectId` and name as well as other parameters. You can perform your custom logic with them.
+
+<MultiLang>
+
+```cs
+public class DeepLinkManager : MonoBehaviour
+{
+    // Other logic
+    private async void onDeepLinkActivated(string url) {
+        TDSFriendLinkInfo invitation = TDSFriends.ParseFriendInvitationLink(url);
+        string userObjectId = invitation.Identity;
+        string name = invitation.RoleName;
+        Dictionary<string, string> parameters = invitation.Queries;
+        await TDSFriends.Follow(userObjectId);
+    }
+}
+```
+
+```java
+TDSFriendLinkInfo linkInfo = TDSFriends.parseFriendInvitationLink("url");
+String userObjectId = linkInfo.getIdentity();
+String name = linkInfo.getRoleName();
+Map<String, String> parameters = linkInfo.getQueries();
+```
+
+```objc
+TDSFriendLinkInfo *linkInfo = [TDSFriends parseFriendInvitationLink:(NSURL *)url];
+NSString *userObjectId = linkInfo.identity;
+NSString *name = linkInfo.roleName;
+NSDictionary *parameters = linkInfo.queries;
+```
+
+</MultiLang>
