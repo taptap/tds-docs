@@ -38,7 +38,7 @@ export const getEntries = (brand: string, region: string): Entry[] => {
           label: "查看更多",
           to: "/sdk",
         },
-      ]
+      ],
     },
     ...(region === "cn"
       ? [
@@ -79,12 +79,7 @@ export const getEntries = (brand: string, region: string): Entry[] => {
                 to: "/ad-apply",
               },
             ]
-          : [
-              {
-                label: "查看更多",
-                href: "https://www.taptap.io/doc/19",
-              },
-            ],
+          : [],
     },
   ];
 
