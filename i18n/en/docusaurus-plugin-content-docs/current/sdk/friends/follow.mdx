@@ -1,41 +1,41 @@
 ---
-title: 关注模式
+title: Follow Mode
 sidebar_position: 4
 ---
 
 import MultiLang from "/src/docComponents/MultiLang";
 
-阅读本文前请先[完成 SDK 初始化](/sdk/friends/guide/)。
+Before continuing, make sure you have [finished initializing the SDK](/sdk/friends/guide/).
 
-## 响应好友变化通知
+## Responding to Friend Status Changes
 
-好友模块支持客户端监听好友状态变化，在游戏中实时给玩家提示。
-你需要在调用上线接口前注册好友状态变更监听实例，这样，玩家上线后就能收到相应通知：
+With the Friends module, the client can listen to the status changes of the player’s friends and display them to the player in real-time.
+You’ll need to register an instance for listening to friend status changes before calling the interface for getting the player online. By doing this, the player will be able to receive notifications after they get online:
 
 <MultiLang>
 
 ```cs
 TDSFollows.FriendStatusChangedDelegate = new TDSFriendStatusChangedDelegate {
-    // 当前玩家成功上线（长连接建立成功）
+    // The current player got online (connection established)
     OnConnected = () => {},
-    // 当前玩家长连接断开，SDK 会自动重试，开发者通常无需额外处理
+    // Connection lost; the SDK will try to reconnect automatically
     OnDisconnected = () => {},
-    // 当前连接异常
+    // Connection error
     OnConnectionError = (code, message) => {},
 };
 ```
 
 ```java
 TDSFollows.registerFriendStatusChangedListener(new FriendStatusChangedListener() {
-    // 当前玩家成功上线（长连接建立成功）
+    // The current player got online (connection established)
     @Override
     public void onConnected() {}
 
-    // 当前玩家长连接断开，SDK 会自动重试，开发者通常无需额外处理
+    // Connection lost; the SDK will try to reconnect automatically
     @Override
     public void onDisconnected() {}
 
-    // 当前连接异常
+    // Connection error
     @Override
     public void onConnectError(int code, String msg){});
 }
@@ -44,19 +44,19 @@ TDSFollows.registerFriendStatusChangedListener(new FriendStatusChangedListener()
 ```objc
 [TDSFollows registerNotificationDelegate:self];
 
-// 当前玩家成功上线（长连接建立成功）
+// The current player got online (connection established)
 - (void)onConnected {}
 
-// 当前玩家长连接断开，SDK 会自动重试，开发者通常无需额外处理
+// Connection lost; the SDK will try to reconnect automatically
 - (void)onDisconnected {}
 
-// 当前连接异常
+// Connection error
 - (void)onDisconnectedWithError:(NSError * _Nullable)error {}
 ```
 
 </MultiLang>
 
-如果想要停止监听：
+To stop listening:
 
 <MultiLang>
 
@@ -74,10 +74,10 @@ TDSFollows.removeFriendStatusChangedListener();
 
 </MultiLang>
 
-## 玩家上线
+## Getting the Player Online
 
-玩家成功登录后，需要调用该接口建立和好友服务云端的长连接。
-长连接建立后，如果网络临时中断，SDK 会在网络恢复后自动重连。
+After the player logs in, you need to call this interface to establish a persistent connection between the client and the cloud.
+Once the persistent connection is established, if there is an interruption to the internet connection, the SDK will automatically reconnect once the connection is restored.
 
 <MultiLang>
 <>
@@ -93,18 +93,18 @@ await TDSFollows.Online();
 TDSFollows.online(new Callback<Void>() {
     @Override
     public void onSuccess(Void result) {
-        // 成功
+        // Success
     }
 
     @Override
     public void onFail(TDSFriendError error) {
-        // 处理异常
+        // Handle error
     }
 });
 
 ```
 
-建立长连接后，如果玩家通过好友邀请链接打开游戏，那么 Android SDK 也会自动发送对应的好友申请。
+With the persistent connection established, if the player opens an invitation link, the Android SDK will automatically send a friend request to the corresponding player.
 
 </>
 <>
@@ -116,9 +116,9 @@ TDSFollows.online(new Callback<Void>() {
 </>
 </MultiLang>
 
-## 玩家下线
+## Getting the Player Offline
 
-玩家登出后，需要调用此接口断开和云端的长连接。
+After the player logs out, you need to call this interface to disconnect the client from the cloud.
 
 <MultiLang>
 
@@ -136,21 +136,21 @@ TDSFollows.offline();
 
 </MultiLang>
 
-## 根据昵称查询好友
+## Searching for Friends by Nickname
 
-在不知道玩家 objectId 的情况下，可以通过玩家昵称查询好友。
-例如，搜索昵称为 `Tarara` 的好友：
+A player can search for friends by nickname without knowing their `objectId`s.
+For example, to search for friends with `Tarara` as their nickname:
 
 <MultiLang>
 
 ```cs
 ReadOnlyCollection<TDSFriendInfo> friendInfos = await TDSFollows.SearchUserByName("Tarara");
 foreach (TDSFriendInfo info in friendInfos) {
-    // 玩家信息
+    // Player data
     TDSUser user = info.User;
-    // 富信息数据，详见后文
+    // Rich presence data; continue reading for more information
     Dictionary<string, string> richPresence = RichPresence;
-    // 好友是否在线
+    // Whether the friend is online
     bool online = info.Online;
 }
 ```
@@ -160,11 +160,11 @@ TDSFollows.searchUserByName("Tarara", new ListCallback<TDSFriendInfo>() {
     @Override
     public void onSuccess(List<TDSFriendInfo> friendInfoList) {
         for (TDSFriendInfo info : friendInfoList) {
-            // 玩家信息
+            // Player data
             TDSUser user = info.getUser();
-            // 富信息数据，详见后文
+            // Rich presence data; continue reading for more information
             TDSRichPresence richPresence = info.getRichPresence();
-            // 好友是否在线
+            // Whether the friend is online
             boolean online = info.isOnline();
         }
     }
@@ -184,34 +184,34 @@ option.limit = 100;
 callback:^(NSArray<TDSFriendInfo *> * _Nullable friendInfos, NSError * _Nullable error) {
     if (friendInfos) {
         for (TDSFriendInfo *info in friendInfos) {
-            // 玩家信息
+            // Player data
             TDSUser *user = info.user;
-            // 富信息数据，详见后文
+            // Rich presence data; continue reading for more information
             NSDictionary *richPresence = info.richPresence;
-            // 好友是否在线
+            // Whether the friend is online
             BOOL online = info.online;
         }
     } else if (error) {
-        // 处理错误
+        // Handle error
     }
 }];
 ```
 
 </MultiLang>
 
-注意，**使用这一功能的前提是内建账户系统中设置了 `nickname`（昵称）字段**。
-参见[内建账户系统文档](/sdk/authentication/guide/#设置其他用户属性)。
+Notice that **in order to use this function, the `nickname` field has to be set on the built-in account system**.
+See [TDS Authentication Guide](/sdk/authentication/guide/#setting-other-user-properties) for more information.
 
-## 好友码
+## Friend Code
 
-每个已登录玩家都有一个好友码，可以分享给其他玩家用于添加好友。
+Each logged-in player has a friend code that can be shared with other players so these players can quickly add the current player as their friend.
 
-访问 `TDSUser` 的 `shortId` 属性可获取好友码：
+You can get the friend code of a `TDSUser` from its `shortId` field:
 
 <MultiLang>
 
 ```cs
-// currentUser 是已登录的 TDSUser
+// currentUser is a logged in TDSUser
 string shortId = currentUser["shortId"];
 ```
 
@@ -225,7 +225,7 @@ NSString *shortId = currentUser[@"shortId"];
 
 </MultiLang>
 
-可以通过好友码查询玩家：
+To search for a player with their friend code:
 
 <MultiLang>
 
@@ -236,27 +236,27 @@ TDSFriendInfo friendInfo = await TDSFollows.SearchUserByShortCode(shortId);
 ```java
 TDSFollows.searchUserByShortCode(shortId, new Callback<TDSFriendInfo>() {
     @Override
-    public void onSuccess(TDSFriendInfo friendInfo) { /* 略（参见上节） */ }
+    public void onSuccess(TDSFriendInfo friendInfo) { /* See the previous section */ }
 
     @Override
-    public void onFail(TDSFriendError error) { /* 略（参见上节） */ }
+    public void onFail(TDSFriendError error) { /* See the previous section */ }
 });
 ```
 
 ```objc
 [TDSFollows searchUserWithShortCode:shortId
 callback:^(TDSFriendInfo * _Nullable friendInfo, NSError * _Nullable error) {
-    // 略（参见上节）
+    // See the previous section
 }];
 ```
 
 </MultiLang>
 
-## 根据 objectId 查询好友
+## Searching for Friends With `objectId`
 
-除了昵称、好友码外，还可以根据 objectId 查找好友。
+Besides using nicknames and friend codes, a player can also search for friends with their `objectId`s.
 
-查询 objectId 为 `5b0b97cf06f4fd0abc0abe35` 的好友：
+For example, to search for the friend with `5b0b97cf06f4fd0abc0abe35` as their `objectId`:
 
 <MultiLang>
 
@@ -267,27 +267,27 @@ TDSFriendInfo friendInfo = await TDSFollows.SearchUserById("5b0b97cf06f4fd0abc0a
 ```java
 TDSFollows.searchUserById("5b0b97cf06f4fd0abc0abe35", new Callback<TDSFriendInfo>() {
     @Override
-    public void onSuccess(TDSFriendInfo friendInfo) { /* 略 */ }
+    public void onSuccess(TDSFriendInfo friendInfo) { /* Other things to do */ }
 
     @Override
-    public void onFail(TDSFriendError error) { /* 略 */ }
+    public void onFail(TDSFriendError error) { /* Other things to do */ }
 });
 ```
 
 ```objc
 [TDSFollows searchUserWithObjectId:@"5b0b97cf06f4fd0abc0abe35"
 callback:^(TDSFriendInfo * _Nullable friendInfo, NSError * _Nullable error) {
-    // 略
+    // Other things to do
 }];
 ```
 
 </MultiLang>
 
-## 富信息
+## Rich Presence
 
-富信息用于呈现玩家状态等信息，如在线状态、正在使用哪个英雄、正处于哪个游戏模式等。
+Rich presence can be used to display the player’s status information like their online status, current hero, and current game mode.
 
-在控制台添加富信息相关配置后，可以根据已配置的富信息字段，设置对应的富信息内容：
+After adding configurations for rich presence on the Developer Center, you can set the content of a player’s rich presence according to the configured fields for rich presence:
 
 <MultiLang>
 
@@ -322,14 +322,14 @@ TDSFollows.setRichPresence("score", "60",  new Callback<Void>() {
 
 </MultiLang>
 
-这里 `score` 是在控制台配置的富信息字段。
-富信息的字段有两种类型：
+Here `score` is a rich presence field configured on the Developer Center.
+There are two types available for each rich presence field:
 
-- `variable` 类型，值是字符串。例如，之前的代码实例中，`score` 在控制台配置为 `variable` 类型，因此客户端设置富信息字段的值时填了 `60`，云端返回给客户端的富信息为 `"score": "60"`，在游戏界面该玩家的好友会看到当前玩家的富信息显示为「得分 60」之类。这里，开发者需要自行实现将 `score` 显示为「得分」等本地化内容的逻辑。
+- `variable`: The value is a string. In the code example above, with `score` configured to be a `variable` on the Developer Center, the client sets the value of this field to be `60` when updating the rich presence data. The cloud will accordingly return `"score": "60"` to the client as the rich presence data. You need to handle the localization-related logic yourself so that the player can eventually see something like “Score: 60”.
 
-- `token` 类型，值是以 `#` 开头的字符串。例如，下面的代码实例中 `display` 字段的类型是 `token`，客户端设置富信息字段的值时填了 `#matching`，这个值在云端会进行多语言匹配，返回给客户端的富信息会直接替换为本地化的内容：`"display": "匹配中"`。注意，如果多语言匹配失败则会返回空字符串（`"display": " "`）。
+- `token`: The value is a string starting with `#`. In the example below, the type of `display` is `token`, and the client sets the value of this field to be `#matching` when updating the rich presence data. The cloud will handle the conversion of this value to a localized string and return the result like `"display": "Matching"` to the client. Notice that if the cloud fails to convert the value, an empty string like `"display": " "` will be returned.
 
-需要一次性配置多个字段时，可以传入一组字段：
+To set multiple fields at once:
 
 <MultiLang>
 
@@ -345,7 +345,7 @@ Map<String,String> info = new HashMap<>();
 info.put("score", "60");
 info.put("display", "#matching");
 TDSFollows.setRichPresence(info, new Callback<Void>() {
-    // 略
+    // Other things to do
 });
 ```
 
@@ -354,15 +354,15 @@ TDSFollows.setRichPresence(info, new Callback<Void>() {
     @"score" : @"60",
     @"display" : @"#matching",
 } callback:^(BOOL succeeded, NSError * _Nullable error) {
-    // 略
+    // Other things to do
 }];
 ```
 
 </MultiLang>
 
-控制台**最多配置 20 个富信息字段**，字段名（key）长度不超过 128 bytes，字段值（value）长度不超过 256 bytes。
+You can **configure at most 20 rich presence fields on the Developer Center**. The key of each field should be no longer than 128 bytes and the value of each field should be no longer than 256 bytes.
 
-如需清除当前玩家的某项富信息，可以调用以下接口：
+You can use the following interface to clear a rich presence field for the current player:
 
 <MultiLang>
 
@@ -372,20 +372,20 @@ TDSFollows.ClearRichPresence("score");
 
 ```java
 TDSFollows.clearRichPresence("score", new Callback<Void>() {
-    // 略
+    // Other things to do
 });
 ```
 
 ```objc
 [TDSFollows clearRichPresenceWithKey:@"score"
 callback:^(BOOL succeeded, NSError * _Nullable error) {
-    // 略
+    // Other things to do
 }];
 ```
 
 </MultiLang>
 
-同样，可以批量清除一组富信息：
+You can also clear multiple rich presence fields at once:
 
 <MultiLang>
 
@@ -399,27 +399,27 @@ List<String> keys = new ArrayList<>();
 keys.add("score");
 keys.add("display");
 TDSFollows.clearRichPresence(keys, new Callback<Void>() {
-    // 略
+    // Other things to do
 });
 ```
 
 ```objc
 [TDSFollows clearRichPresencesWithKeys:@[@"score", @"display"]
 callback:^(BOOL succeeded, NSError * _Nullable error) {
-    // 略
+    // Other things to do
 });
 ```
 
 </MultiLang>
 
-设置和清除富信息接口有调用频率限制，每 30s 最多各触发一次。
+The interfaces for setting and clearing rich presence data can each be called at most once every 30 seconds.
 
-富信息提供了 [REST API 接口](/sdk/friends/guide/#富信息-rest-api)。
-开发者可以自行编写程序或脚本调用这些接口在服务端进行管理性质的操作。
+There are some [REST API interfaces](/sdk/friends/guide/#rich-presence-rest-api) related to rich presence.
+You can write your own scripts to perform administrative operations on the server side by interacting with these interfaces.
 
-## 关注
+## Following
 
-可以通过指定[好友码](/sdk/friends/guide/#好友码)关注相应玩家：
+A player can follow other players by entering their [friend codes](/sdk/friends/mutual/#friend-code).
 
 <MultiLang>
 
@@ -431,12 +431,12 @@ await TDSFollows.FollowByShortCode(shortId);
 TDSFollows.followByShortCode(shortId, new Callback<HandleResult>() {
     @Override
     public void onSuccess(HandleResult result) {
-        // 成功关注
+        // Followed
     }
 
     @Override
     public void onFail(TDSFriendError error) {
-        // 处理错误
+        // Handle error
     }
 });
 ```
@@ -453,7 +453,7 @@ TDSFollows.followByShortCode(shortId, new Callback<HandleResult>() {
 
 </MultiLang>
 
-关注玩家时可以指定额外的属性，例如，将对方放入 `coworkers`（同事）分组：
+Additional properties can be specified when following other players. For example, to put the other player into the `coworkers` group:
 
 <MultiLang>
 
@@ -468,7 +468,7 @@ await TDSFollows.FollowByShortCode(shortId);
 Map<String, Object> attrs = new HashMap<String, Object>();
 attrs.put("group", "coworkers");
 TDSFollows.followByShortCode(shortId, attrs, new Callback<HandleResult>() {
-    // 略
+    // Other things to do
 });
 ```
 
@@ -477,14 +477,14 @@ NSDictionary *attributes = @{
     @"group" : @"coworkers",
 };
 [TDSFollows followWithShortCode:shortId attributes:attributes callback:^(TDSFriendHandleResult * _Nullable result, NSError * _Nullable error) {
-    // 略
+    // Other things to do
 }];
 ```
 
 </MultiLang>
 
-此外，也可以通过指定某个 `TDSUser` 的 `objectId` 来关注他。
-比如，假设 Tarara 的 `objectId` 是 `5b0b97cf06f4fd0abc0abe35`，可以通过以下代码添加她：
+A player can also follow a `TDSUser` with its `objectId`.
+For example, assuming Tarara’s `objectId` is `5b0b97cf06f4fd0abc0abe35`, the current player can follow Tarara with the following code:
 
 <MultiLang>
 
@@ -494,20 +494,20 @@ await TDSFollows.Follow("5b0b97cf06f4fd0abc0abe35");
 
 ```java
 TDSFollows.follow("5b0b97cf06f4fd0abc0abe35", new Callback<HandleResult>() {
-    // 略
+    // Other things to do
 });
 ```
 
 ```objc
 [TDSFollows followWithUserId:@"5b0b97cf06f4fd0abc0abe35"
 callback:^(TDSFriendHandleResult * _Nullable result, NSError * _Nullable error) {
-    // 略
+    // Other things to do
 }];
 ```
 
 </MultiLang>
 
-通过 `objectId` 关注玩家同样可以指定额外属性：
+Additional properties can be specified as well when following other players with `objectId`:
 
 <MultiLang>
 
@@ -522,7 +522,7 @@ await TDSFollows.Follow("5b0b97cf06f4fd0abc0abe35");
 Map<String, Object> attrs = new HashMap<String, Object>();
 attrs.put("group", "coworkers");
 TDSFollows.follow("5b0b97cf06f4fd0abc0abe35", attrs, new Callback<HandleResult>() {
-    // 略
+    // Other things to do
 });
 ```
 
@@ -532,18 +532,18 @@ NSDictionary *attributes = @{
 };
 [TDSFollows followWithUserId:@"5b0b97cf06f4fd0abc0abe35" attributes:attributes
 callback:^(TDSFriendHandleResult * _Nullable result, NSError * _Nullable error) {
-    // 略
+    // Other things to do
 }];
 ```
 
 </MultiLang>
 
-注意，一个玩家 **最多关注 5000** 个玩家。
+Notice that a player can **follow at most 5000** other players.
 
-## 取关
+## Unfollowing
 
-可以通过指定 `objectId` 或好友码来取消关注之前关注的玩家。
-例如，之前关注了 Tarara，当前玩家后来改变主意，不想关注 Tarara 了：
+A player can unfollow other players with their `objectId`s or friend codes.
+For example, after following Tarara, the current player changes their mind and doesn’t want to follow Tarara anymore:
 
 <MultiLang>
 
@@ -557,38 +557,38 @@ await TDSFollows.UnFollowByShortCode(shortIdOfTarara);
 TDSFollows.unfollow("5b0b97cf06f4fd0abc0abe35", new Callback<HandleResult>() {
     @Override
     public void onSuccess(HandleResult result) {
-        // 成功取关
+        // Unfollowed
     }
 
     @Override
     public void onFail(TDSFriendError error) {
-        // 处理错误
+        // Handle error
     }
 });
 
 TDSFollows.unfollowByShortCode(shortIdOfTarara, new Callback<HandleResult>() {
-    // 略
+    // Other things to do
 });
 ```
 
 ```objc
 [TDSFollows unfollowWithUserId:@"5b0b97cf06f4fd0abc0abe35" callback:^(TDSFriendHandleResult * _Nullable result, NSError * _Nullable error) {
-    // 略
+    // Other things to do
 }];
 
 [TDSFollows unfollowWithShortCode:shortIdOfTarara, callback:^(TDSFriendHandleResult * _Nullable result, NSError * _Nullable error) {
-    // 略
+    // Other things to do
 }];
 ```
 
 </MultiLang>
 
-## 拉黑
+## Blocklist
 
-玩家可以拉黑其他玩家，使其他玩家无法关注自己。
-拉黑时会解除彼此之间的关注关系。
-和关注、取关类似，可以通过 objectId 或好友码来指定想要拉黑的玩家。
-例如，假设 Tarara 的 objectId 是 `5b0b97cf06f4fd0abc0abe35`，可以这样拉黑 Tarara：
+A player can block other players so they won’t be able to follow the current player anymore.
+By blocking a player, the existing connections between the current player and the target player will be removed.
+Similar to following and unfollowing, the player can block other players with their `objectId`s or friend codes.
+Assuming Tarara’s `objectId` is `5b0b97cf06f4fd0abc0abe35`, to block Tarara:
 
 <MultiLang>
 
@@ -602,33 +602,33 @@ await TDSFollows.BlockByShortCode(shortIdOfTarara);
 TDSFollows.block("5b0b97cf06f4fd0abc0abe35", new Callback<HandleResult>() {
     @Override
     public void onSuccess(HandleResult result) {
-        // 成功拉黑
+        // Blocked
     }
 
     @Override
     public void onFail(TDSFriendError error) {
-        // 处理错误
+        // Handle error
     }
 });
 
 TDSFollows.blockByShortCode(shortIdOfTarara, new Callback<HandleResult>() {
-    // 略
+    // Other things to do
 });
 ```
 
 ```objc
 [TDSFollows blockWithObjectId:@"5b0b97cf06f4fd0abc0abe35" callback:^(TDSFriendHandleResult * _Nullable result, NSError * _Nullable error) {
-    // 略
+    // Other things to do
 }];
 
 [TDSFollows blockWithShortCode:shortIdOfTarara callback:^(TDSFriendHandleResult * _Nullable result, NSError * _Nullable error) {
-    // 略
+    // Other things to do
 }];
 ```
 
 </MultiLang>
 
-玩家也可以取消拉黑之前拉黑的玩家：
+A player can remove a user from their blocklist at any time:
 
 <MultiLang>
 
@@ -640,29 +640,29 @@ await TDSFollows.UnblockByShortCode(shortIdOfTarara);
 
 ```java
 TDSFollows.unblock("5b0b97cf06f4fd0abc0abe35", new Callback<HandleResult>() {
-    // 略
+    // Other things to do
 });
 
 TDSFollows.unblockByShortCode(shortIdOfTarara, new Callback<HandleResult>() {
-    // 略
+    // Other things to do
 });
 ```
 
 ```objc
 [TDSFollows unblockWithObjectId:@"5b0b97cf06f4fd0abc0abe35" callback:^(TDSFriendHandleResult * _Nullable result, NSError * _Nullable error) {
-    // 略
+    // Other things to do
 }];
 
 [TDSFollows unblockWithShortCode:shortIdOfTarara callback:^(TDSFriendHandleResult * _Nullable result, NSError * _Nullable error) {
-    // 略
+    // Other things to do
 }];
 ```
 
 </MultiLang>
 
-如果玩家之前存在关注关系，**取消拉黑后不会自动恢复关注**。
+If there have been any connections between the current player and a target player before the current player blocks the target player, **these connections will not be re-established automatically if the current player unblocks the target player**.
 
-玩家可以查询自己拉黑了哪些人：
+To retrieve the current player’s blocklist:
 
 <MultiLang>
 
@@ -672,82 +672,82 @@ FriendResult result = await TDSFollows.QueryBlockList(cursor, limit, sortConditi
 
 ```java
 TDSFollows.queryBlockList(config, cursor, new Callback<FriendResult>() {
-    // 略
+    // Other things to do
 }
 ```
 
 ```objc
 [TDSFollows queryBlockListWithOption:option
 callback:^(TDSFriendResult * _Nullable result, NSError * _Nullable error) {
-    // 略
+    // Other things to do
 }];
 ```
 
-传入的查询参数的含义参见[查询互关列表](#查询互关列表)一节。
+See [Retrieving Mutual Follower List](#retrieving-mutual-follower-list) for the meanings of the query parameters.
 
 </MultiLang>
 
-注意：
+Notice that:
 
-- 黑名单上限 100 人。也就是说，一个玩家最多拉黑 100 个玩家。
-- 玩家甲拉黑玩家乙后，不仅玩家乙无法关注玩家甲，玩家甲也无法关注玩家乙。如果玩家甲之前已经关注了玩家乙，或玩家乙之前已经关注了玩家甲，在玩家甲拉黑玩家乙时都会取消关注。
+- A player can block at most 100 other players.
+- Once Player A blocks Player B, not only Player B cannot follow Player A, Player A cannot follow Player B as well. If Player A has followed Player B or Player B has followed Player A, once Player A blocks Player B, they won’t be following each other anymore.
 
-## 查询互关列表
+## Retrieving Mutual Follower List
 
-玩家可以查询哪些玩家和自己是「互相关注」关系。
-该接口除了会返回好友列表外，还会返回游标。
-指定游标和返回数量，可以实现翻页功能。
-同时，支持根据在线状态获取排序后的结果（当前在线的玩家在前）：
+There is an interface for players to retrieve their mutual followers.
+This interface returns not only the mutual follower list but also a cursor.
+You can implement pagination by specifying the cursor and the number of players returned.
+The players in the result can be sorted according to their online status (those who are online will show up at the beginning).
 
 <MultiLang>
 
 ```cs
-// 首次查询
+// First query
 string cursor = null;
-// 默认 50，最大 500
+// Defaults to 50; no larger than 500
 int limit = 50;
-// 根据在线状态排序
+// Sort by online status
 SortCondition sortCondition = SortCondition.OnlineCondition
 FriendResult result = await TDSFollows.QueryMutualList(cursor, limit, sortCondition);
 
 ReadOnlyCollection<TDSFriendInfo> friendInfos = result.FriendList;
 foreach (TDSFriendInfo info in friendInfos) {
-    // 玩家信息
+    // Player data
     TDSUser user = info.User;
-    // 富信息数据
+    // Rich presence data
     Dictionary<string, string> richPresence = info.RichPresence;
-    // 玩家是否在线
+    // Whether the player is online
     bool online = info.Online;
 }
 
-// 翻页
+// Pagination
 string cursor = result.Cursor;
 FriendResult more = await TDSFollows.QueryMutualList(cursor, limit, sortCondition);
 ```
 
 ```java
 FriendRequestConfig config = new FriendRequestConfig.Builder()
-    .pageSize(50)  /* 默认 50，最大 500 */
-    .sortCondition(SortCondition.getOnlineCondition()) /* 根据在线状态排序 */
+    .pageSize(50)  /* Defaults to 50; no larger than 500 */
+    .sortCondition(SortCondition.getOnlineCondition()) /* Sort by online status */
     .build();
-// 首次查询
+// First query
 TDSFollows.queryMutualList(config, null, new Callback<FriendResult>() {
     @Override
     public void onSuccess(FriendResult result) {
         List<TDSFriendInfo> friendInfoList = result.getFriendList();
         for (TDSFriendInfo info : friendInfoList) {
-            // 玩家信息
+            // Player data
             TDSUser user = info.getUser();
-            // 富信息数据
+            // Rich presence data
             TDSRichPresence richPresence = info.getRichPresence();
-            // 玩家是否在线
+            // Whether the player is online
             boolean online = info.isOnline();
         }
 
-        // 翻页
+        // Pagination
         String cursor = result.getCursor();
         TDSFollows.queryMutualList(config, cursor, new Callback<FriendResult>() {
-            /* 略 */
+            /* Other things to do */
         }
     }
     @Override
@@ -759,8 +759,8 @@ TDSFollows.queryMutualList(config, null, new Callback<FriendResult>() {
 
 ```objc
 TDSFriendQueryOption *option = [TDSFriendQueryOption new];
-option.limit = 50;// 默认 50，最大 500
-__block NSString *cursor; // 游标
+option.limit = 50;// Defaults to 50; no larger than 500
+__block NSString *cursor; // Cursor
 TDSFriendQuerySortCondition *sort = [TDSFriendQuerySortCondition new];
 [sort append:TDSFriendQuerySortTypeOnline error:nil];
 option.sortCondition = sort;
@@ -768,32 +768,32 @@ option.sortCondition = sort;
 [TDSFollows queryMutualListWithOption:option
 callback:^(TDSFriendResult * _Nullable result, NSError * _Nullable error) {
     for (TDSFriendInfo *info in result.friendList)
-        // 玩家信息
+        // Player data
         TDSUser *user = info.user;
-        // 富信息数据
+        // Rich presence data
         NSDictionary *richPresence = info.richPresence;
-        // 玩家是否在线
+        // Whether the player is online
         BOOL online = info.online;
     }
     cursor = result.cursor;
 }];
 
-// 翻页
+// Pagination
 option.from = cursor;
 [TDSFollows queryMutualListWithOption:option
 callback:^(TDSFriendResult * _Nullable result, NSError * _Nullable error) {
-    // 略
+    // Other things to do
 }];
 ```
 
 </MultiLang>
 
-注意，可以根据在线状态排序的前提是游戏正确地接入了好友服务，包括在玩家登录后调用[上线接口](#玩家上线)，玩家登出后调用[下线接口](#玩家下线)。
-否则，由于游戏未正确上报玩家的在线状态，好友服务无从得知玩家的在线状态，查询结果自然也无法支持根据在线状态排序。
+Notice that to make it possible for the server to sort players by online status, you have to call the corresponding interfaces when a player gets [online](#getting-the-player-online) and [offline](#getting-the-player-offline).
+Otherwise, the server won’t be able to know the online statuses of the players and won’t be able to sort them by online status.
 
-## 查询关注列表
+## Retrieving Followees
 
-类似地，玩家可以查询自己关注了哪些玩家，接口与查询互关列表类似，也同样支持根据在线状态排序：
+Similarly, a player can retrieve the list of players they are following. The interface for this function is similar to that for retrieving mutual followers and the players in the result can be sorted by online status as well:
 
 <MultiLang>
 
@@ -803,22 +803,22 @@ FriendResult result = await TDSFollows.QueryFolloweeList(cursor, limit, sortCond
 
 ```java
 TDSFollows.queryFolloweeList(config, cursor, new Callback<FriendResult>() {
-    // 略
+    // Other things to do
 }
 ```
 
 ```objc
 [TDSFollows queryFolloweeWithOption:option
 callback:^(TDSFriendResult * _Nullable result, NSError * _Nullable error) {
-    // 略
+    // Other things to do
 }];
 ```
 
 </MultiLang>
 
-## 查询粉丝列表
+## Retrieving Followers
 
-玩家还可以查询哪些玩家关注了自己，也就是自己的粉丝，接口与查询互关、关注列表类似，**但不支持根据在线状态排序**：
+A player can also retrieve the list of players who are following them. The interface for this function is similar to those for retrieving mutual followers and followees, but **it doesn’t support sorting the players in the result by online status**:
 
 <MultiLang>
 
@@ -828,36 +828,36 @@ FriendResult result = await TDSFollows.QueryFollowerList(cursor, limit, sortCond
 
 ```java
 TDSFollows.queryFollowerList(config, cursor, new Callback<FriendResult>() {
-    // 略
+    // Other things to do
 }
 ```
 
 ```objc
 [TDSFollows queryFollowerWithOption:option
 callback:^(TDSFriendResult * _Nullable result, NSError * _Nullable error) {
-    // 略
+    // Other things to do
 }];
 ```
 
 </MultiLang>
 
-如果查询时指定了根据在线状态排序，**云端会忽略这一条件**，仍然返回未排序的查询结果。
+If you specified to sort the result by online status, **the cloud will ignore this condition** and return the unsorted result.
 
-## 分享链接
+## Link Sharing
 
-### 落地页
+### Landing Page
 
-使用分享链接功能需要首先部署落地页网站。
-落地页网站可以部署在[云引擎](/sdk/engine/overview/)或其他支持部署纯静态网站的服务器上。
-如果计划部署在云引擎上，需注意云引擎的免费实例会自动休眠，请购买标准实例使用。
+A landing page has to be deployed before you use link sharing.
+The landing page can be deployed on [Cloud Engine](/sdk/engine/overview/) or any other server that can host a static page.
+If you plan to use Cloud Engine, keep in mind that the free instances provided by Cloud Engine come with auto-hibernation. Please consider purchasing standard instances.
 
-我们提供了[开源的落地页示例项目][repo]，修改相应配置后可直接构建、部署、使用。
-注意，示例项目中的 `VITE_ANDROID_LINK` 环境变量格式为 `scheme://host/path`。
-`host` 和 `path` 的值需和 Android 的 `AndroidManifest.xml` 中的值保持一致。
+We provide an [open-source demo landing page] for you to use. You can build, deploy, and use it with your own configurations.
+Notice that the format of the `VITE_ANDROID_LINK` environment variable of the demo is `scheme://host/path`.
+The values of `host` and `path` should be consistent with those written in the `AndroidManifest.xml` of your Android project.
 
 [repo]: https://github.com/taptap/TapFriends-landing-page
 
-例如，假设 `AndroidManifest.xml` 中的相关配置如下：
+For example, if the `AndroidManifest.xml` of your project contains the following configurations:
 
 ```xml
 <activity
@@ -875,27 +875,27 @@ callback:^(TDSFriendResult * _Nullable result, NSError * _Nullable error) {
         <category android:name="android.intent.category.BROWSABLE" />
 
         <data
-            android:host="游戏应用ID"
+            android:host="APP_ID"
             android:path="/friends"
             android:scheme="tapsdk" />
-            <!-- scheme不能出现大写或者下划线，<a href="[scheme]://[host]/[path]?[query]">启动应用程序</a> -->
+            <!-- The scheme cannot contain capital letters or underscores <a href="[scheme]://[host]/[path]?[query]">Launch the App</a> -->
         </intent-filter>
 </activity>
 ```
 
-那么落地页项目中 `VITE_ANDROID_LINK` 的值为 `tapsdk://游戏应用ID/friends`。
+The value of `VITE_ANDROID_LINK` in your landing page should be `tapsdk://APP_ID/friends`.
 
-落地页网站的地址需要在客户端配置：
+The address of the landing page should be configured in the client:
 
 ```cs
 TDSFollows.SetShareLink("https://please-replace-with-your-domain.example.com");
 ```
 
-如果落地页部署在云引擎网站上，那么地址就是 `https://你的云引擎自定义域名`。
+If the landing page is hosted on Cloud Engine, the address will be `https://YOUR_CLOUD_ENGINE_CUSTOM_DOMAIN`.
 
-### 生成链接
+### Generating Invitation Links
 
-部署完落地页网站并在客户端配置好相应地址后，调用以下接口即可生成好友邀请页网址：
+After the landing page has been deployed and the address has been configured in the client, you can call the following interface to generate invitation links:
 
 <MultiLang>
 
@@ -924,11 +924,11 @@ NSString *inviteUrl = [TDSFollows generateFriendInvitationLinkWithError:&error];
 
 </MultiLang>
 
-分享链接中传递的用户名称默认为玩家昵称（`nickname`），因此，默认情况下，使用分享链接的前提是内建账户系统中设置了 `nickname`（昵称）字段。
-参见[内建账户系统文档](/sdk/authentication/guide/#设置其他用户属性)。
-如果希望使用其他名称，可以在调用上述接口时另行指定。
-另外，还可以传入其他信息，这些信息会作为 URL 查询参数拼接在好友邀请页网址后面。
-例如，昵称为 Tarara 的玩家，邀请好友时希望使用「她姥姥」这个名称，邀请链接希望附加 `ref=taptap` 这个参数，可以这样调用：
+The default username in the link will be the `nickname` of the player. Therefore, you might want to make sure that you have set the `nickname`s of the users in the built-in account system.
+See [TDS Authentication Guide](/sdk/authentication/guide/#setting-other-user-properties) for more information.
+To use other names, specify them when calling the above interface.
+You can also provide other parameters that can be attached to the URL of the invitation link as query parameters.
+For example, if the player named Tarara wants to use “Taro” as their name and attach a `ref=taptap` parameter, you can do this:
 
 <MultiLang>
 
@@ -936,21 +936,21 @@ NSString *inviteUrl = [TDSFollows generateFriendInvitationLinkWithError:&error];
 Dictionary<string, object> parameters = new Dictionary<string, object> {
     { "ref", "taptap" }
 };
-string inviteUrl = await TDSFollows.GenerateFriendInvitationLink("她姥姥", parameters);
+string inviteUrl = await TDSFollows.GenerateFriendInvitationLink("Taro", parameters);
 ```
 
 ```java
 Map<String, Object> parameters = new HashMap<String, Object>();
 parameters.put("ref", "taptap");
-TDSFollows.generateFriendInvitationLink("她姥姥", parameters, new Callback<String>() {
-    // 略
+TDSFollows.generateFriendInvitationLink("Taro", parameters, new Callback<String>() {
+    // Other things to do
 });
 ```
 
 ```objc
 NSError *error;
 TDSFriendLinkOption *option = [TDSFriendLinkOption new];
-option.roleName = @"她姥姥";
+option.roleName = @"Taro";
 option.queries = @{
     @"ref" : @"taptap",
 };
@@ -959,16 +959,16 @@ NSString *inviteUrl = [TDSFollows generateFriendInvitationLinkWithOption:option 
 
 </MultiLang>
 
-### 处理链接
+### Handling Invitation Links
 
-玩家通过邀请链接打开游戏后，需要调用 SDK 提供的接口关注邀请者。
+After the player opens the game with an invitation link, you need to call the following interface to have the player follow the target player.
 
 <MultiLang>
 
 ```cs
 public class DeepLinkManager : MonoBehaviour
 {
-    // 略
+    // Other things to do
     private async void onDeepLinkActivated(string url) {
         await TDSFollows.HandleFriendInvitationLink(url);
     }
@@ -980,12 +980,12 @@ public void onHandleLink(View view) {
     TDSFollows.handFriendInvitationLink(url, new Callback<HandleResult>() {
         @Override
         public void onSuccess(HandleResult result) {
-            // 略
+            // Other things to do
         }
 
         @Override
         public void onFail(TDSFriendError error) {
-            // 略
+            // Other things to do
         }
     });
 }
@@ -995,21 +995,21 @@ public void onHandleLink(View view) {
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey, id> *)options {
     return [TDSFollows handleFriendInvitationLink:url
     callback:^(TDSFriendHandleResult * _Nullable result, TDSFriendsLinkInfo * _Nullable linkInfo, NSError * _Nullable error) {
-        // 略
+        // Other things to do
     }];
 }
 ```
 
 </MultiLang>
 
-开发者也可以通过 SDK 提供的接口解析链接，获取玩家的 objectId、名称、传入的其他参数，定制相应的逻辑。
+You can also parse the link with the following interface provided by the SDK and get the player’s `objectId` and name as well as other parameters. You can perform your custom logic with them.
 
 <MultiLang>
 
 ```cs
 public class DeepLinkManager : MonoBehaviour
 {
-    // 略
+    // Other things to do
     private async void onDeepLinkActivated(string url) {
         TDSFriendLinkInfo invitation = TDSFollows.ParseFriendInvitationLink(url);
         string userObjectId = invitation.Identity;
@@ -1036,6 +1036,6 @@ NSDictionary *parameters = linkInfo.queries;
 
 </MultiLang>
 
-注意：
+Notice that:
 
-落地页示例项目默认使用好友模式，需要设置环境变量 `INVITE_TYPE` 为 `follow` 切换为关注模式。
+The demo project uses the Friend mode by default. Please change `INVITE_TYPE` to `follow` to switch to the Follow mode.
