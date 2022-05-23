@@ -1,37 +1,37 @@
 ---
-title: 第三方平台好友
-sidebar_label: 第三方好友
+title: Friends on Third-Party Platforms
+sidebar_label: Friends on Third-Party Platforms
 sidebar_position: 5
 ---
 
 import { Conditional } from "/src/docComponents/conditional";
 import MultiLang from "/src/docComponents/MultiLang";
 
-阅读本文前请先了解[好友模块的通用接口](/sdk/friends/guide/)。
+Before continuing, please familiarize yourself with [the general interfaces of the Friends module](/sdk/friends/guide/)
 
-## 查询第三方平台好友
+## Retrieving Friends on Third-Party Platforms
 
-调用以下接口可以查询当前玩家在第三方平台（比如 TapTap）上的同玩好友（互相关注的用户）。
-该接口除了会返回好友列表外，还会返回游标。
-指定游标和返回数量，可以实现翻页功能。
-同时，支持根据在线状态获取排序后的结果（当前游戏在线的玩家在前）。
+The following interface can be used to retrieve the current player’s friends (mutual followers) on third-party platforms (like TapTap) who have played the same game.
+Besides the friend list, the interface also returns a cursor.
+You can implement pagination by providing the cursor and a limit when performing the query.
+The players in the result can be sorted by online status (those who are online will be placed at the beginning).
 
-返回的第三方平台好友列表中会包括玩家在第三方平台的 ID、昵称、头像。
-如前所述，第三方平台的好友列表只会返回同玩好友，也就是已经使用第三方平台账号登录过该游戏的好友。
-通常情况下，同玩好友也是基于内建账户系统使用第三方平台账号登录游戏，因此第三方平台的好友列表还会返回相应的 `TDSFriendInfo`。
+The returned list of friends on the third-party platform will include each player’s ID, nickname, and profile picture on the platform.
+As mentioned above, only those who have played the same game (i.e., logged in to the game with their third-party account) will be included in the friend list.
+In general, those friends have logged in to the game with their third-party accounts that are based on the built-in account system, so the `TDSFriendInfo` of each player will be included in the friend list as well.
 
-特殊情况下，如果同玩好友通过其他方式，而非基于内建账户系统使用第三方平台账号登录游戏，那么第三方平台的好友列表仍会返回该玩家，但相应的 `TDSFriendInfo` 会是 `null`。
-例如，假设游戏有两个渠道包，其中一个渠道包 a 基于内建账户系统使用 F 平台账号登录游戏，同时支持了好友功能，渠道包 b 自行实现了 F 平台账号的登录，并未支持好友功能。玩家 d 和 e 在 F 平台上互为好友，玩家 d 安装了渠道包 a 并通过它使用 F 平台账号登录游戏，玩家 e 则安装了渠道包 b 并通过它使用 F 平台账号登录游戏，那么玩家 d 调用以下接口查询第三方平台 F 的好友，返回列表中会包含 e，但 e 的 `TDSFriendInfo` 会是 `null`。
+In special cases, if a friend is logged in with their third-party account without using the built-in account system, the friend will still be included in the friend list, but their `TDSFriendInfo` will be `null`.
+For example, assuming a game has two variations of APKs, variation A logs players in with F using the built-in account system and supports the Friends service while variation B also logs players in with F but without using the built-in account system and doesn’t support the Friends service. Player D and Player E are friends on F and they each use a different variation of the game (Player D uses the variation A) but both log in with F. Now if Player D retrieves their friends on F with the following interface, the returned list will include Player E, but the `TDSFriendInfo` of Player E will be `null`.
 
 <MultiLang>
 
 ```cs
-// 首次查询
+// First query
 string platform = "taptap";
 string cursor = null;
-// 默认 50，最大 500
+// Defaults to 50; no larger than 500
 int limit = 50;
-// 根据在线状态排序
+// Sort by online status
 SortCondition sortCondition = SortCondition.OnlineCondition
 ThirdPartyFriendResult result = await TDSFriends.QueryThirdPartyFriendList(platform, cursor, limit, condition: sortCondition);
 
@@ -43,7 +43,7 @@ foreach (ThirdPartyFriend friend in friends) {
     TDSFriendInfo info = friend.FriendInfo;
 }
 
-// 翻页
+// Pagination
 string cursor = result.Cursor;
 ThirdPartyFriendResult more = await TDSFriends.QueryThirdPartyFriendList(platform, cursor, limit, condition: sortCondition);
 ```
@@ -51,10 +51,10 @@ ThirdPartyFriendResult more = await TDSFriends.QueryThirdPartyFriendList(platfor
 ```java
 ThirdPartyFriendRequestConfig config = new ThirdPartyFriendRequestConfig.Builder()
     .platform(ThirdPartyFriendRequestConfig.PLATFORM_TAPTAP)
-    .pageSize(50)  /* 默认 50，最大 500 */
-    .sortCondition(SortCondition.getOnlineCondition()) /* 根据在线状态排序 */
+    .pageSize(50)  /* Defaults to 50; no larger than 500 */
+    .sortCondition(SortCondition.getOnlineCondition()) /* Sort by online status */
     .build();
-// 首次查询
+// First query
 TDSFollows.queryThirdPartyMutualList(config, null, new Callback<ThirdPartyFriendResult>() {
     @Override
     public void onSuccess(ThirdPartyFriendResult result) {
@@ -66,10 +66,10 @@ TDSFollows.queryThirdPartyMutualList(config, null, new Callback<ThirdPartyFriend
             TDSFriendInfo info = friend.getTdsFriendInfo();
         }
 
-        // 翻页
+        // Pagination
         String cursor = result.getCursor();
         TDSFollows.queryThirdPartyMutualList(config, cursor, new Callback<ThirdPartyFriendResult>() {
-            /* 略 */
+            /* Other things to do */
         }
     }
     @Override
@@ -82,8 +82,8 @@ TDSFollows.queryThirdPartyMutualList(config, null, new Callback<ThirdPartyFriend
 ```objc
 TDSThirdPartyFriendQueryOption *option = [TDSThirdPartyFriendQueryOption new];
 option.platform = TDSThirdPartyFriendPlatformTaptap;
-option.limit = 50;// 默认 50，最大 500
-__block NSString *cursor; // 游标
+option.limit = 50;// Defaults to 50; no larger than 500
+__block NSString *cursor; // Cursor
 
 [TDSFriends queryThirdPartyFriendListWithOption:option
 callback:^(TDSThirdPartyFriendResult * _Nullable result, NSError * _Nullable error) {
@@ -96,20 +96,20 @@ callback:^(TDSThirdPartyFriendResult * _Nullable result, NSError * _Nullable err
     cursor = result.cursor;
 }];
 
-// 翻页
+// Pagination
 option.from = cursor;
 [TDSThirdPartyFriend queryThirdPartyFriendListWithOption:option
 callback:^(TDSThirdPartyFriendResult * _Nullable result, NSError * _Nullable error) {
-    // 略
+    // Other things to do
 }];
 ```
 
 </MultiLang>
 
-默认情况下，SDK 优先从本地缓存中查询，以避免不必要的网络开销。
-游戏如果希望总是从网络获取查询结果，可以在查询时指定缓存策略。
-无论查询时是否指定缓存策略，SDK 总是会缓存查询的结果。
-换句话说，缓存策略只决定是否读缓存，不决定是否写缓存。
+By default, the SDK will fetch the result from the local cache.
+To always fetch the result from the cloud, you can specify the caching strategy when performing the query.
+The SDK will always cache the result regardless of the caching strategy you specify.
+In other words, the caching strategy only affects whether the cache will be read. It won’t affect whether the result will be cached.
 
 <MultiLang>
 
@@ -133,17 +133,17 @@ option.cachePolicy = TDSThirdPartyFriendCachePolicyOnlyNetwork;
 
 </MultiLang>
 
-目前支持的第三方平台（platform）如下：
+At this moment, the following third-party platforms are supported:
 
 <Conditional region="cn">
 
-- `taptap`（需要提交工单联系我们开通）
+- `taptap` (Please submit a ticket to us to enable it)
 
 </Conditional>
 
 <Conditional region="global">
 
-- `taptap`（需要提交工单联系我们开通）
-- `facebook`（游戏需要支持 Facebook 登录）
+- `taptap` (Please submit a ticket to us to enable it)
+- `facebook` (The game needs to support Facebook Login)
 
 </Conditional>
