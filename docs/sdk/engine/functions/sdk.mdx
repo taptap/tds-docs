@@ -4,9 +4,9 @@ sidebar_label: 云引擎 SDK
 sidebar_position: 3
 ---
 
-import EngineRuntimes from '/src/docComponents/MultiLang/engine';
-import TabItem from '@theme/TabItem';
-import {Conditional} from '/src/docComponents/conditional';
+import EngineRuntimes from "/src/docComponents/MultiLang/engine";
+import TabItem from "@theme/TabItem";
+import { Conditional } from "/src/docComponents/conditional";
 
 :::info
 这篇文档是关于云引擎 SDK 的深入介绍，如需了解云函数和 Hook 的用法请看 [云函数和 Hook 开发指南](/sdk/engine/functions/guides)。
@@ -28,13 +28,13 @@ npm install leanengine leancloud-storage
 然后在代码中将云引擎中间件挂载到 Express 框架上：
 
 ```js title='app.js'
-var express = require('express');
-var AV = require('leanengine');
+var express = require("express");
+var AV = require("leanengine");
 
 AV.init({
   appId: process.env.LEANCLOUD_APP_ID,
   appKey: process.env.LEANCLOUD_APP_KEY,
-  masterKey: process.env.LEANCLOUD_APP_MASTER_KEY
+  masterKey: process.env.LEANCLOUD_APP_MASTER_KEY,
 });
 
 var app = express();
@@ -53,13 +53,13 @@ app.listen(process.env.LEANCLOUD_APP_PORT);
 <summary>点击展开 Koa 框架接入方法</summary>
 
 ```js title='app.js'
-var koa = require('koa');
-var AV = require('leanengine');
+var koa = require("koa");
+var AV = require("leanengine");
 
 AV.init({
   appId: process.env.LEANCLOUD_APP_ID,
   appKey: process.env.LEANCLOUD_APP_KEY,
-  masterKey: process.env.LEANCLOUD_APP_MASTER_KEY
+  masterKey: process.env.LEANCLOUD_APP_MASTER_KEY,
 });
 
 var app = koa();
@@ -279,7 +279,7 @@ AV.Cloud.useMasterKey();
 ```js
 const post = new Post();
 post.save(
-  { author: user },
+  { author: user }
   // 或者使用 request.sessionToken（网站托管中需启用 `Cloud.CookieSession`）
   // {
   //  sessionToken: user.getSessionToken()
@@ -344,7 +344,7 @@ Go SDK 中每个请求都可以使用 `UseMasterKey()` 为请求带上 `Master K
 ## 用户状态管理
 
 :::caution
-因云引擎属于多主机、多进程的运行环境，因此内存型的 Session 是无法正确工作的（如 Node.js 的 [express-session](https://github.com/expressjs/express-session) 默认的 MemoryStore、PHP 内建的 `$_SESSION`）。
+因云引擎属于多主机、多进程的运行环境，因此内存型的 Session 是无法正确工作的（如 Node.js 的 [express-session](https://github.com/expressjs/session) 默认的 MemoryStore、PHP 内建的 `$_SESSION`）。
 :::
 
 ### 使用 HTTP Header
@@ -357,11 +357,11 @@ Go SDK 中每个请求都可以使用 `UseMasterKey()` 为请求带上 `Master K
 例如，在前端登录用户并通过 `user.getSessionToken()` 获取 Session Token 并发送给后端：
 
 ```js
-AV.User.login(user, pass).then(user => {
-  return fetch('/profile', {
+AV.User.login(user, pass).then((user) => {
+  return fetch("/profile", {
     headers: {
-      'X-LC-Session': user.getSessionToken()
-    }
+      "X-LC-Session": user.getSessionToken(),
+    },
   });
 });
 ```
@@ -369,21 +369,26 @@ AV.User.login(user, pass).then(user => {
 相应的后端 Node.js 代码：
 
 ```js
-app.get('/profile', function (req, res) {
-  AV.User.become(req.headers['x-lc-session']).then(user => {
-    res.send(user);
-  }).catch(err => {
-    res.send({ error: err.message });
-  });
+app.get("/profile", function (req, res) {
+  AV.User.become(req.headers["x-lc-session"])
+    .then((user) => {
+      res.send(user);
+    })
+    .catch((err) => {
+      res.send({ error: err.message });
+    });
 });
 
-app.post('/todos', function (req, res) {
+app.post("/todos", function (req, res) {
   var todo = new Todo();
-  todo.save(req.body, { sessionToken: req.headers['x-lc-session'] }).then(() => {
-    res.send(todo);
-  }).catch(err => {
-    res.send({ error: err.message });
-  });
+  todo
+    .save(req.body, { sessionToken: req.headers["x-lc-session"] })
+    .then(() => {
+      res.send(todo);
+    })
+    .catch((err) => {
+      res.send({ error: err.message });
+    });
 });
 ```
 
@@ -407,9 +412,22 @@ app.post('/todos', function (req, res) {
 
 ```js
 // Express
-app.use(AV.Cloud.CookieSession({ secret: 'my secret', maxAge: 3600000, fetchUser: true }));
+app.use(
+  AV.Cloud.CookieSession({
+    secret: "my secret",
+    maxAge: 3600000,
+    fetchUser: true,
+  })
+);
 // Koa
-app.use(AV.Cloud.CookieSession({ framework: 'koa', secret: 'my secret', maxAge: 3600000, fetchUser: true }));
+app.use(
+  AV.Cloud.CookieSession({
+    framework: "koa",
+    secret: "my secret",
+    maxAge: 3600000,
+    fetchUser: true,
+  })
+);
 ```
 
 你需要传入一个 `secret` 用于签名 Cookie（必须提供），这个中间件会将 `AV.User` 的登录状态信息记录到 Cookie 中，用户下次访问时自动检查用户是否已经登录，如果已经登录，可以通过 `req.currentUser` 获取当前登录用户。
@@ -429,41 +447,44 @@ app.use(AV.Cloud.CookieSession({ framework: 'koa', secret: 'my secret', maxAge: 
 <summary>点击展开一个具有登录功能的站点的例子</summary>
 
 ```js
-app.post('/login', function (req, res) {
-  AV.User.logIn(req.body.username, req.body.password).then(function (user) {
-    res.saveCurrentUser(user); // save cookie
-    res.redirect('/profile');
-  }, function (error) {
-    res.redirect('/login');
-  });
-})
+app.post("/login", function (req, res) {
+  AV.User.logIn(req.body.username, req.body.password).then(
+    function (user) {
+      res.saveCurrentUser(user); // save cookie
+      res.redirect("/profile");
+    },
+    function (error) {
+      res.redirect("/login");
+    }
+  );
+});
 
-app.get('/profile', function (req, res) {
+app.get("/profile", function (req, res) {
   if (req.currentUser) {
     res.send(req.currentUser);
   } else {
-    res.redirect('/login');
+    res.redirect("/login");
   }
 });
 
-app.get('/logout', function (req, res) {
+app.get("/logout", function (req, res) {
   req.currentUser.logOut();
   res.clearCurrentUser(); // clear cookie
-  res.redirect('/profile');
+  res.redirect("/profile");
 });
 ```
 
 </details>
 
 <details>
-<summary>点击展开浏览器对跨域 Cookie 的限制（`SameSite`）</summary>
+<summary>点击展开浏览器对跨域 Cookie 的限制（<code>SameSite</code>）</summary>
 
 Chrome 80 起 `SameSite` 的默认值为 `Lax`，如果你的应用的前端没部署在云引擎上，又需要向云引擎发送携带 Cookie 的 POST 请求，那么需要设置 `SameSite` 为 `none`。
 
 `AV.Cloud.CookieSession` 会将所有参数都传递给浏览器的 `cookies.set()`，所以你可以将 `sameSite` 传入：
 
 ```js
-AV.Cloud.CookieSession({sameSite: 'none'})
+AV.Cloud.CookieSession({ sameSite: "none" });
 ```
 
 注意：
@@ -495,8 +516,8 @@ application = leancloud.engine.CookieSessionMiddleware(engine, secret=YOUR_APP_S
 - **name**：在 cookie 中保存的 session token 的 key 的名称，默认为 `leancloud:session`。
 - **excluded_paths**：指定哪些 URL path 不处理 session token，比如在处理静态文件的 URL path 上不进行处理，防止无谓的性能浪费。接受参数类型 `list`。
 - **fetch_user**：处理请求时是否要从存储服务获取用户数据，如果为 `False` 的话，`leancloud.User.get_current()` 获取到的用户数据上除了 `session_token` 之外没有任何其他数据，需要自己调用 `fetch()` 来获取。为 `True` 的话，会自动在用户对象上调用 `fetch()`，这样将会产生一次数据存储的 API 调用。默认为 `False`。
-- **expires**：设置 cookie 的失效日期（参考 [Werkzeug Document](http://werkzeug.pocoo.org/docs/0.12/http/#werkzeug.http.dump_cookie)）。
-- **max_age**：设置 cookie 在多少秒后失效（参考 [Werkzeug Document](http://werkzeug.pocoo.org/docs/0.12/http/#werkzeug.http.dump_cookie)）。
+- **expires**：设置 cookie 的失效日期（参考 [Werkzeug Document](https://werkzeug.palletsprojects.com/en/2.1.x/http/#werkzeug.http.dump_cookie)）。
+- **max_age**：设置 cookie 在多少秒后失效（参考 [Werkzeug Document](https://werkzeug.palletsprojects.com/en/2.1.x/http/#werkzeug.http.dump_cookie)）。
 
 </TabItem>
 <TabItem value='php'>
@@ -550,10 +571,10 @@ $app->get('/logout', function($req, $res) {
   <body>
     <form method="post" action="/login">
       <label>Username</label>
-      <input name="username">
+      <input name="username" />
       <label>Password</label>
-      <input name="password" type="password">
-      <input class="button" type="submit" value="login">
+      <input name="password" type="password" />
+      <input class="button" type="submit" value="login" />
     </form>
   </body>
 </html>
@@ -570,9 +591,10 @@ $cookieStorage->set("key", "val");
 </EngineRuntimes>
 
 ## FAQ
+
 ### 如何使用 SDK 重定向到 HTTPS？
 
-我们目前推荐在绑定自定义域名时勾选「强制 HTTPS」（详见 [云引擎平台功能 § 重定向到 HTTPS](/sdk/engine/deploy/platform/#重定向到-https)）而不是使用 SDK 中的重定向中间件。
+我们目前推荐在绑定自定义域名时勾选「强制 HTTPS」而不是使用 SDK 中的重定向中间件。
 
 <Conditional region='cn'>
 
@@ -594,7 +616,7 @@ $cookieStorage->set("key", "val");
 Node.js（Express）：
 
 ```js
-app.enable('trust proxy');
+app.enable("trust proxy");
 app.use(AV.Cloud.HttpsRedirect());
 ```
 
@@ -602,7 +624,7 @@ Node.js（Koa）：
 
 ```js
 app.proxy = true;
-app.use(AV.Cloud.HttpsRedirect({framework: 'koa'}));
+app.use(AV.Cloud.HttpsRedirect({ framework: "koa" }));
 ```
 
 </TabItem>
@@ -677,18 +699,24 @@ leancloud:request response(0) +220ms 200 {"results":[{"content":"1","createdAt":
 如果暂时无法升级 SDK 版本，可以通过这样的方式绕过：
 
 ```javascript
-AV.Cloud.define('querySomething', function(req, res) {
-  var query = new AV.Query('Something');
+AV.Cloud.define("querySomething", function (req, res) {
+  var query = new AV.Query("Something");
   // user 是 Something 表的一个 Pointer 字段
-  query.include('user');
-  query.find().then(function(results) {
-    // 手动进行一次序列化
-    results.forEach(function(result){
-      result.set('user', result.get('user') ?  result.get('user').toJSON() : null);
-    });
-    // 再返回查询结果给客户端
-    res.success(results);
-  }).catch(res.error);
+  query.include("user");
+  query
+    .find()
+    .then(function (results) {
+      // 手动进行一次序列化
+      results.forEach(function (result) {
+        result.set(
+          "user",
+          result.get("user") ? result.get("user").toJSON() : null
+        );
+      });
+      // 再返回查询结果给客户端
+      res.success(results);
+    })
+    .catch(res.error);
 });
 ```
 

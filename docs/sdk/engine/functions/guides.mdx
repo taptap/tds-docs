@@ -4,12 +4,12 @@ sidebar_label: 开发指南
 sidebar_position: 2
 ---
 
-import MultiLang from '/src/docComponents/MultiLang';
-import EngineRuntimes from '/src/docComponents/MultiLang/engine';
-import FunctionsIntroduction from '../_partials/functions-introduction.mdx';
-import Mermaid from '/src/docComponents/Mermaid';
-import TabItem from '@theme/TabItem';
-import {Conditional} from '/src/docComponents/conditional';
+import MultiLang from "/src/docComponents/MultiLang";
+import EngineRuntimes from "/src/docComponents/MultiLang/engine";
+import FunctionsIntroduction from "../_partials/functions-introduction.mdx";
+import Mermaid from "/src/docComponents/Mermaid";
+import TabItem from "@theme/TabItem";
+import { Conditional } from "/src/docComponents/conditional";
 
 :::info
 这篇文档专注在「云函数和 Hook」这种云引擎上的特殊的应用场景，如需部署通用的后端应用，或需要了解云引擎平台提供的更多功能，请看 [云引擎平台功能](/sdk/engine/deploy/platform)。
@@ -37,29 +37,34 @@ import {Conditional} from '/src/docComponents/conditional';
 <TabItem value='nodejs'>
 
 ```js
-AV.Cloud.define('averageStars', function (request) {
-  var query = new AV.Query('Review');
-  query.equalTo('movie', request.params.movie);
+AV.Cloud.define("averageStars", function (request) {
+  var query = new AV.Query("Review");
+  query.equalTo("movie", request.params.movie);
   return query.find().then(function (results) {
     var sum = 0;
     for (var i = 0; i < results.length; i++) {
-      sum += results[i].get('stars');
+      sum += results[i].get("stars");
     }
     return sum / results.length;
   });
 });
 ```
+
 `AV.Cloud.define` 还接受一个可选参数 `options`（位置在函数名称和调用函数之间），这个 `options` 对象上的属性包括：
 
 - `fetchUser?: boolean`：是否自动抓取客户端的用户信息，默认为 `true`。设置为假时，`Request` 将不会有 `currentUser` 属性。
-- `internal?: boolean`：是否只允许在云引擎内（使用 `AV.Cloud.run` 且未开启 `remote` 选项）或使用 `Master Key` （使用 `AV.Cloud.run` 时传入 `useMasterKey`）调用，不允许客户端直接调用。默认为 `false`。
+- `internal?: boolean`：是否只允许在云引擎内（使用 `AV.Cloud.run` 且未开启 `remote` 选项）或使用 `Master Key`（使用 `AV.Cloud.run` 时传入 `useMasterKey`）调用，不允许客户端直接调用。默认为 `false`。
 
 例如，假设我们不希望客户端直接调用上述函数，也不关心客户端用户信息，那么上述函数的定义可以改写为：
 
 ```js
-AV.Cloud.define('averageStars', {fetchUser: false, internal: true}, function (request) {
-  // 内容同上
-});
+AV.Cloud.define(
+  "averageStars",
+  { fetchUser: false, internal: true },
+  function (request) {
+    // 内容同上
+  }
+);
 ```
 
 </TabItem>
@@ -199,7 +204,7 @@ leancloud.Engine.Define("averageStars", func(req *leancloud.FunctionRequest) (in
 </TabItem>
 <TabItem value='python'>
 
-调用云函数时的参数会直接传递给云函数，因此直接声明这些参数即可。另外调用云函数时可能会根据不同情况传递不同的参数，这时如果定义云函数时没有声明这些参数，会触发 Python 异常，因此建议声明一个额外的关键字参数（关于关键字参数，请参考 [此篇文档](http://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/001431752945034eb82ac80a3e64b9bb4929b16eeed1eb9000) 中「关键字参数」一节）来保存多余的参数。
+调用云函数时的参数会直接传递给云函数，因此直接声明这些参数即可。另外调用云函数时可能会根据不同情况传递不同的参数，这时如果定义云函数时没有声明这些参数，会触发 Python 异常，因此建议声明一个额外的关键字参数（关于关键字参数，请参考 [此篇文档](https://www.liaoxuefeng.com/wiki/1016959663602400/1017261630425888) 中「关键字参数」一节）来保存多余的参数。
 
 ```python
 @engine.define
@@ -319,6 +324,7 @@ NSDictionary *dicParameters = [NSDictionary dictionaryWithObject:@"夏洛特烦�
                    }
 }];
 ```
+
 ```swift
 LCEngine.run("averageStars", parameters: ["movie": "夏洛特烦恼"]) { (result) in
     switch result {
@@ -329,6 +335,7 @@ LCEngine.run("averageStars", parameters: ["movie": "夏洛特烦恼"]) { (result
     }
 }
 ```
+
 ```dart
 try {
   Map response = await LCCloud.run('averageStars', params: { 'movie': '夏洛特烦恼' });
@@ -337,21 +344,27 @@ try {
   // 处理异常
 }
 ```
+
 ```js
 var paramsJson = {
-  movie: "夏洛特烦恼"
+  movie: "夏洛特烦恼",
 };
-AV.Cloud.run('averageStars', paramsJson).then(function (data) {
-  // 处理结果
-}, function (err) {
-  // 处理报错
-});
+AV.Cloud.run("averageStars", paramsJson).then(
+  function (data) {
+    // 处理结果
+  },
+  function (err) {
+    // 处理报错
+  }
+);
 ```
+
 ```python
 from leancloud import cloud
 
 cloud.run('averageStars', movie='夏洛特烦恼')
 ```
+
 ```php
 use \LeanCloud\Engine\Cloud;
 $params = array(
@@ -359,6 +372,7 @@ $params = array(
 );
 Cloud::run("averageStars", $params);
 ```
+
 ```go
 // ...
 averageStars, err := leancloud.Run("averageStars", map[string]string{"movie": "夏洛特烦恼"})
@@ -434,6 +448,7 @@ NSDictionary *dicParameters = [NSDictionary dictionaryWithObject:@"夏洛特烦�
                   }
 }];
 ```
+
 ```swift
 LCEngine.call("averageStars", parameters: ["movie": "夏洛特烦恼"]) { (result) in
     switch result {
@@ -446,6 +461,7 @@ LCEngine.call("averageStars", parameters: ["movie": "夏洛特烦恼"]) { (resul
     }
 }
 ```
+
 ```dart
 try {
   LCObject response = await LCCloud.rpc('averageStars', params: { 'movie': '夏洛特烦恼' });
@@ -454,25 +470,32 @@ try {
   // 处理异常
 }
 ```
+
 ```js
 var paramsJson = {
-  movie: "夏洛特烦恼"
+  movie: "夏洛特烦恼",
 };
 
-AV.Cloud.rpc('averageStars', paramsJson).then(function (object) {
-  // 处理结果
-}, function (error) {
-  // 处理报错
-});
+AV.Cloud.rpc("averageStars", paramsJson).then(
+  function (object) {
+    // 处理结果
+  },
+  function (error) {
+    // 处理报错
+  }
+);
 ```
+
 ```python
 from leancloud import cloud
 
 cloud.rpc('averageStars', movie='夏洛特烦恼')
 ```
+
 ```php
 // 暂不支持
 ```
+
 ```go
 // ...
 averageStars := 0
@@ -500,23 +523,29 @@ RPC 会处理以下形式的请求和响应：
 云引擎 Node.js 环境下，默认会直接进行一次本地的函数调用，而不会像客户端一样发起一个 HTTP 请求。
 
 ```js
-AV.Cloud.run('averageStars', {
-  movie: '夏洛特烦恼'
-}).then(function (data) {
-  // 调用成功，得到成功的应答 data
-}, function (error) {
-  // 处理调用失败
-});
+AV.Cloud.run("averageStars", {
+  movie: "夏洛特烦恼",
+}).then(
+  function (data) {
+    // 调用成功，得到成功的应答 data
+  },
+  function (error) {
+    // 处理调用失败
+  }
+);
 ```
 
 如果你希望发起 HTTP 请求来调用云函数，可以传入一个 `remote: true` 的选项。当你在云引擎之外运行 Node.js SDK（包括调用位于其他分组上的云函数）时这个选项非常有用：
 
 ```js
-AV.Cloud.run('averageStars', { movie: '夏洛特烦恼' }, { remote: true }).then(function (data) {
-  // 成功
-}, function (error) {
-  // 处理调用失败
-});
+AV.Cloud.run("averageStars", { movie: "夏洛特烦恼" }, { remote: true }).then(
+  function (data) {
+    // 成功
+  },
+  function (error) {
+    // 处理调用失败
+  }
+);
 ```
 
 上面的 `remote` 选项实际上是作为 `AV.Cloud.run` 的可选参数 options 对象的属性传入的。这个 `options` 对象包括以下参数：
@@ -525,7 +554,6 @@ AV.Cloud.run('averageStars', { movie: '夏洛特烦恼' }, { remote: true }).the
 - `user?: AV.User`：以特定的用户运行云函数（建议在 `remote` 为假时使用）。
 - `sessionToken?: string`：以特定的 `sessionToken` 调用云函数（建议在 `remote` 为真时使用）。
 - `req?: http.ClientRequest | express.Request`：为被调用的云函数提供 `remoteAddress` 等属性。
-
 
 </TabItem>
 <TabItem value='python'>
@@ -607,8 +635,8 @@ if err != nil {
 <TabItem value='nodejs'>
 
 ```js
-AV.Cloud.define('customErrorCode', function (request) {
-  throw new AV.Cloud.Error('自定义错误信息。', { code: 123 });
+AV.Cloud.define("customErrorCode", function (request) {
+  throw new AV.Cloud.Error("自定义错误信息。", { code: 123 });
 });
 ```
 
@@ -701,7 +729,8 @@ Hook 函数本质上是云函数，但它有固定的名称，定义之后会 **
 
 对于 `before` 类的 Hook，如果返回了一个错误的话，这个操作就会被中断，因此你可以在这些 Hook 中主动抛出一个错误来拒绝掉某些操作。对于 `after` 类的 Hook，返回错误并不会影响操作的执行（因为其实操作已经执行完了）。
 
-<Mermaid diagram={`
+<Mermaid
+  diagram={`
 graph LR
 A((save)) -->D{object}
 D-->E(new)
@@ -717,9 +746,11 @@ I-->Y
 I-->V(No)
 V-->G[update existing object on the cloud]
 G-->|afterUpdate| C
-`} />
+`}
+/>
 
-<Mermaid diagram={`
+<Mermaid
+  diagram={`
 graph LR
 A((delete))-->|beforeDelete|H{error?}
 H-->Y(Yes)
@@ -727,7 +758,8 @@ Y-->Z((interrupted))
 H-->N(No)
 N-->B[delete object on the cloud]
 B -->|afterDelete|C((done))
-`} />
+`}
+/>
 
 为了认证 Hook 调用者的身份，我们的 SDK 内部会确认请求确实是从云引擎内网的云存储组件发出的，如果认证失败，可能会出现 `Hook key check failed` 的提示，如果在本地调试时出现这样的错误，请确保是通过命令行工具启动调试的。
 
@@ -739,16 +771,16 @@ B -->|afterDelete|C((done))
 <TabItem value='nodejs'>
 
 ```js
-AV.Cloud.beforeSave('Review', function (request) {
-  var comment = request.object.get('comment');
+AV.Cloud.beforeSave("Review", function (request) {
+  var comment = request.object.get("comment");
   if (comment) {
     if (comment.length > 140) {
       // 截断并添加 '…'
-      request.object.set('comment', comment.substring(0, 140) + '…');
+      request.object.set("comment", comment.substring(0, 140) + "…");
     }
   } else {
     // 不保存数据，并返回错误
-    throw new AV.Cloud.Error('No comment provided!');
+    throw new AV.Cloud.Error("No comment provided!");
   }
 });
 ```
@@ -851,10 +883,10 @@ leancloud.Engine.BeforeSave("Review", func(req *ClassHookRequest) (interface{}, 
 <TabItem value='nodejs'>
 
 ```js
-AV.Cloud.afterSave('Comment', function (request) {
-  var query = new AV.Query('Post');
-  return query.get(request.object.get('post').id).then(function (post) {
-    post.increment('comments');
+AV.Cloud.afterSave("Comment", function (request) {
+  var query = new AV.Query("Post");
+  return query.get(request.object.get("post").id).then(function (post) {
+    post.increment("comments");
     return post.save();
   });
 });
@@ -947,11 +979,11 @@ leancloud.Engine.AfterSave("Review", func(req *ClassHookRequest) error {
 <TabItem value='nodejs'>
 
 ```js
-AV.Cloud.afterSave('_User', function (request) {
+AV.Cloud.afterSave("_User", function (request) {
   console.log(request.object);
-  request.object.set('from', 'LeanCloud');
+  request.object.set("from", "LeanCloud");
   return request.object.save().then(function (user) {
-    console.log('Success!');
+    console.log("Success!");
   });
 });
 ```
@@ -1033,12 +1065,12 @@ leancloud.Engine.AfterSave("_User", func(req *ClassHookRequest) error{
 <TabItem value='nodejs'>
 
 ```js
-AV.Cloud.beforeUpdate('Review', function (request) {
+AV.Cloud.beforeUpdate("Review", function (request) {
   // 如果 comment 字段被修改了，检查该字段的长度
-  if (request.object.updatedKeys.indexOf('comment') != -1) {
-    if (request.object.get('comment').length > 140) {
+  if (request.object.updatedKeys.indexOf("comment") != -1) {
+    if (request.object.get("comment").length > 140) {
       // 拒绝过长的修改
-      throw new AV.Cloud.Error('comment 长度不得超过 140 字符。');
+      throw new AV.Cloud.Error("comment 长度不得超过 140 字符。");
     }
   }
 });
@@ -1143,10 +1175,10 @@ leancloud.Engine.BeforeUpdate("Review", func(req *ClassHookRequest) (interface{}
 <TabItem value='nodejs'>
 
 ```js
-AV.Cloud.afterUpdate('Review', function(request) {
-  if (request.object.updatedKeys.indexOf('comment') != -1) {
-    if (request.object.get('comment').length < 5) {
-      console.log(review.ObjectId + " 看起来像灌水评论：" + comment)
+AV.Cloud.afterUpdate("Review", function (request) {
+  if (request.object.updatedKeys.indexOf("comment") != -1) {
+    if (request.object.get("comment").length < 5) {
+      console.log(review.ObjectId + " 看起来像灌水评论：" + comment);
     }
   }
 });
@@ -1239,19 +1271,29 @@ leancloud.Engine.AfterUpdate("Review", func(req *ClassHookRequest) error {
 <TabItem value='nodejs'>
 
 ```js
-AV.Cloud.beforeDelete('Album', function (request) {
+AV.Cloud.beforeDelete("Album", function (request) {
   // 查询 Photo 中还有没有属于这个相册的照片
-  var query = new AV.Query('Photo');
-  var album = AV.Object.createWithoutData('Album', request.object.id);
-  query.equalTo('album', album);
-  return query.count().then(function (count) {
-    if (count > 0) {
-      // delete 操作会被丢弃
-      throw new AV.Cloud.Error('Cannot delete an album if it still has photos in it.');
+  var query = new AV.Query("Photo");
+  var album = AV.Object.createWithoutData("Album", request.object.id);
+  query.equalTo("album", album);
+  return query.count().then(
+    function (count) {
+      if (count > 0) {
+        // delete 操作会被丢弃
+        throw new AV.Cloud.Error(
+          "Cannot delete an album if it still has photos in it."
+        );
+      }
+    },
+    function (error) {
+      throw new AV.Cloud.Error(
+        "Error " +
+          error.code +
+          " occurred when finding photos: " +
+          error.message
+      );
     }
-  }, function (error) {
-    throw new AV.Cloud.Error('Error ' + error.code + ' occurred when finding photos: ' + error.message);
-  });
+  );
 });
 ```
 
@@ -1363,15 +1405,23 @@ leancloud.Engine.BeforeDelete("Album", func(req *ClassHookRequest) (interface{},
 <TabItem value='nodejs'>
 
 ```js
-AV.Cloud.afterDelete('Album', function (request) {
-  var query = new AV.Query('Photo');
-  var album = AV.Object.createWithoutData('Album', request.object.id);
-  query.equalTo('album', album);
-  return query.find().then(function (posts) {
-    return AV.Object.destroyAll(posts);
-  }).catch(function (error) {
-    console.error('Error ' + error.code + ' occurred when finding photos: ' + error.message);
-  });
+AV.Cloud.afterDelete("Album", function (request) {
+  var query = new AV.Query("Photo");
+  var album = AV.Object.createWithoutData("Album", request.object.id);
+  query.equalTo("album", album);
+  return query
+    .find()
+    .then(function (posts) {
+      return AV.Object.destroyAll(posts);
+    })
+    .catch(function (error) {
+      console.error(
+        "Error " +
+          error.code +
+          " occurred when finding photos: " +
+          error.message
+      );
+    });
 });
 ```
 
@@ -1473,8 +1523,8 @@ leancloud.Engine.AfterDelete("Album", func(req *ClassHookRequest) error {
 <TabItem value='nodejs'>
 
 ```js
-AV.Cloud.onVerified('sms', function (request) {
-  console.log('User ' + request.object + ' is verified by SMS.');
+AV.Cloud.onVerified("sms", function (request) {
+  console.log("User " + request.object + " is verified by SMS.");
 });
 ```
 
@@ -1559,10 +1609,10 @@ leancloud.Engine.OnVerified("email", func(req *ClassHookRequest) error {
 ```js
 AV.Cloud.onLogin(function (request) {
   // 因为此时用户还没有登录，所以用户信息是保存在 request.object 对象中
-  console.log('User ' + request.object + ' is trying to log in.');
-  if (request.object.get('username') === 'noLogin') {
+  console.log("User " + request.object + " is trying to log in.");
+  if (request.object.get("username") === "noLogin") {
     // 如果是 error 回调，则用户无法登录（收到 401 响应）
-    throw new AV.Cloud.Error('Forbidden');
+    throw new AV.Cloud.Error("Forbidden");
   }
 });
 ```
@@ -1645,17 +1695,17 @@ leancloud.Engine.OnLogin(func(req *ClassHookRequest) error {
 ```js
 AV.Cloud.onAuthData(function (request) {
   let authData = request.authData;
-  console.log(authData)
+  console.log(authData);
 
-  if (authData.weixin.code === '12345') {
-    authData.weixin.accessToken = '45678';
+  if (authData.weixin.code === "12345") {
+    authData.weixin.accessToken = "45678";
   } else {
     // 校验失败，抛出异常，则用户无法登录
-    throw new AV.Cloud.Error('invalid code');
+    throw new AV.Cloud.Error("invalid code");
   }
   // 校验成功，返回校验或转换之后的 authData，用户继续登录流程
   return authData;
-})
+});
 ```
 
 </TabItem>
@@ -1716,24 +1766,27 @@ public static Dictionary<string, object> OnAuthData(Dictionary<string, object> a
 
 ```js
 // 直接修改并保存对象不会再次触发 afterUpdate Hook 函数
-request.object.set('foo', 'bar');
+request.object.set("foo", "bar");
 request.object.save().then(function (obj) {
   // 你的业务逻辑
 });
 
 // 如果有 fetch 操作，则需要在新获得的对象上调用 disableAfterHook 来确保不会再次触发 Hook 函数
-request.object.fetch().then(function (obj) {
-  obj.disableAfterHook();
-  obj.set('foo', 'bar');
-  return obj.save();
-}).then(function (obj) {
-  // 你的业务逻辑
-});
+request.object
+  .fetch()
+  .then(function (obj) {
+    obj.disableAfterHook();
+    obj.set("foo", "bar");
+    return obj.save();
+  })
+  .then(function (obj) {
+    // 你的业务逻辑
+  });
 
 // 如果是其他方式构建对象，则需要在新构建的对象上调用 disableAfterHook 来确保不会再次触发 Hook 函数
-var obj = AV.Object.createWithoutData('Post', request.object.id);
+var obj = AV.Object.createWithoutData("Post", request.object.id);
 obj.disableAfterHook();
-obj.set('foo', 'bar');
+obj.set("foo", "bar");
 obj.save().then(function (obj) {
   // 你的业务逻辑
 });
@@ -1834,12 +1887,14 @@ await post.Save();
 <TabItem value='nodejs'>
 
 ```js
-AV.Cloud.beforeSave('Review', function (request) {
+AV.Cloud.beforeSave("Review", function (request) {
   // 使用 JSON.stringify() 将 object 变为字符串
-  throw new AV.Cloud.Error(JSON.stringify({
-    code: 123,
-    message: 'An error occurred.'
-  }));
+  throw new AV.Cloud.Error(
+    JSON.stringify({
+      code: 123,
+      message: "An error occurred.",
+    })
+  );
 });
 ```
 
@@ -1940,12 +1995,12 @@ Before 类 Hook 函数的超时时间为 10 秒，其他类 Hook 函数的超时
 <details>
 <summary>点击展开在线编辑 SDK 版本详情</summary>
 
-在线编辑版本 |Node.js SDK|JS SDK|Node.js| 备注 | 可用依赖
----|---|---|---|---|---
-v0|0.x|0.x|0.12| 已不推荐使用 |moment, request, underscore
-v1|1.x|1.x|4||async, bluebird, co, ejs, handlebars, joi, lodash, marked, moment, q, request, superagent, underscore
-v2|2.x|2.x|6| 需要使用 Promise 写法 |async, bluebird, crypto, debug, ejs, jade, lodash, moment, nodemailer, qiniu, redis, request, request-promise, superagent, underscore, uuid, wechat-api, xml2js
-v3|3.x|3.x|8| 需要使用 Promise 写法 |async, bluebird, crypto, debug, ejs, jade, lodash, moment, nodemailer, qiniu, redis, request, request-promise, superagent, underscore, uuid, wechat-api, xml2js
+| 在线编辑版本 | Node.js SDK | JS SDK | Node.js | 备注                  | 可用依赖                                                                                                                                                        |
+| ------------ | ----------- | ------ | ------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| v0           | 0.x         | 0.x    | 0.12    | 已不推荐使用          | moment, request, underscore                                                                                                                                     |
+| v1           | 1.x         | 1.x    | 4       |                       | async, bluebird, co, ejs, handlebars, joi, lodash, marked, moment, q, request, superagent, underscore                                                           |
+| v2           | 2.x         | 2.x    | 6       | 需要使用 Promise 写法 | async, bluebird, crypto, debug, ejs, jade, lodash, moment, nodemailer, qiniu, redis, request, request-promise, superagent, underscore, uuid, wechat-api, xml2js |
+| v3           | 3.x         | 3.x    | 8       | 需要使用 Promise 写法 | async, bluebird, crypto, debug, ejs, jade, lodash, moment, nodemailer, qiniu, redis, request, request-promise, superagent, underscore, uuid, wechat-api, xml2js |
 
 **从 v0 升级到 v1：**
 
@@ -2023,14 +2078,17 @@ v3|3.x|3.x|8| 需要使用 Promise 写法 |async, bluebird, crypto, debug, ejs, 
 LCCloud.IsProduction = true; // production (default)
 LCCloud.IsProduction = false; // stage
 ```
+
 ```java
 LCCloud.setProductionMode(true); // production
 LCCloud.setProductionMode(false); // stage
 ```
+
 ```objc
 [LCCloud setProductionMode:YES]; // production (default)
 [LCCloud setProductionMode:NO]; // stage
 ```
+
 ```swift
 // production by default
 
@@ -2047,23 +2105,28 @@ do {
     print(error)
 }
 ```
+
 ```dart
 LCCloud.setProduction(true); // production (default)
 LCCloud.setProduction(false); // stage
 ```
+
 ```js
 AV.setProduction(true); // production (default)
 AV.setProduction(false); // stage
 ```
+
 ```python
 leancloud.use_production(True) # production (default)
 leancloud.use_production(False) # stage
 # 需要在 SDK 初始化语句 `leancloud.init` 之前调用
 ```
+
 ```php
 LeanClient::useProduction(true); // production (default)
 LeanClient::useProduction(false); // stage
 ```
+
 ```go
 // 暂不支持（总是使用生产环境）
 ```
@@ -2086,8 +2149,8 @@ LeanClient::useProduction(false); // stage
 <TabItem value='nodejs'>
 
 ```js
-AV.Cloud.define('logTimer', function (request) {
-  console.log('This log is printed by logTimer.');
+AV.Cloud.define("logTimer", function (request) {
+  console.log("This log is printed by logTimer.");
 });
 ```
 
