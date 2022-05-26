@@ -11,6 +11,54 @@ TDS 默认提供了 2 Gbps 的防护带宽，可以防护小规模的攻击，�
 独占游戏在独占期间 TDS 免费提供高防服务，开发者只需事先和 TDS 方面沟通配置细节。
 其他游戏，TDS 可以协助接入 IaaS 服务商的高防，开发者需要承担相应的费用（IaaS 服务商会按高防带宽收费），详询商务。
 
+### Android 上 TapSDK 和 B 站 SDK 引用的 okhttp 版本冲突，怎么办？
+
+TapSDK 现在自动包含了 LeanCloud 核心 SDK，LeanCloud SDK 依赖如下几个基础库：
+- com.squareup.okhttp3:okhttp:4.7.2
+- com.squareup.retrofit2:retrofit:2.9.0
+- io.reactivex.rxjava2:rxjava:2.2.19
+
+有开发者给我们反馈，B 站游戏 SDK 是以 aar 形式提供，里面附带了 3.9.0 版本的 okhttp library（至少在 5.4.0 版之前是如此），与 TapSDK 的依赖产生了冲突，会导致程序启动时报如下错误：
+`Caused by: java.lang.NoSuchMethodError: No static method get(Ljava/lang/String;)Lokhttp3/HttpUrl; in class Lokhttp3/HttpUrl; or its super classes (declaration of 'okhttp3.HttpUrl' appears in /data/app/`
+
+由于 B 站游戏 SDK 固定死了 okhttp 网络库版本，解决这个问题则需要 TapSDK 这里对 okhttp/retrofit/rxjava 等基础库进行降级处理。
+开发者可以拷贝如下配置到应用的 build.gradle 的 `dependencies` section 中：
+
+```
+    // 请注意用 LeanCloud 核心 SDK 的最新版本号替换下面的 8.2.9。
+    implementation('cn.leancloud:realtime-android:8.2.9'){
+        exclude group: 'cn.leancloud', module: 'storage-android'
+        exclude group: 'cn.leancloud', module: 'realtime-core'
+        exclude group: 'cn.leancloud', module: 'storage-core'
+    }
+    implementation('cn.leancloud:storage-android:8.2.9'){
+        exclude group: 'cn.leancloud', module: 'storage-core'
+    }
+    implementation('cn.leancloud:realtime-core:8.2.9') {
+        exclude group: 'cn.leancloud', module: 'storage-core'
+    }
+    implementation('cn.leancloud:storage-core:8.2.9') {
+        exclude group: 'com.squareup.okhttp3', module: 'okhttp'
+        exclude group: 'com.squareup.retrofit2', module: 'retrofit'
+        exclude group: 'com.squareup.retrofit2', module: 'adapter-rxjava2'
+        exclude group: 'com.squareup.retrofit2', module: 'converter-gson'
+        exclude group: 'io.reactivex.rxjava2', module: 'rxjava'
+    }
+    implementation("com.squareup.retrofit2:retrofit:2.3.0")
+    implementation("com.squareup.retrofit2:adapter-rxjava2:2.3.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.3.0")
+    implementation("io.reactivex.rxjava2:rxjava:2.0.0")
+    implementation("com.google.code.gson:gson:2.8.6")
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+
+    implementation 'org.conscrypt:conscrypt-android:2.2.1'
+
+    configurations {
+        all*.exclude group: 'com.squareup.okhttp3'
+    }
+```
+
+
 ## 云引擎
 
 [云引擎 FAQ](/sdk/engine/faq/)
