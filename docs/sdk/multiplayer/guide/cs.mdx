@@ -1,0 +1,855 @@
+---
+title: 多人在线对战开发指南 · C#
+sidebar_label: C#
+sidebar_position: 2
+---
+
+## 前言
+
+多人在线对战是一款基于 C# 编写的游戏 SDK，它为有强联网需求的网络游戏提供了一整套的客户端 SDK 解决方案，因此开发团队不再需要自建服务端，从而节省大部分开发和运维成本。多人在线对战提供的主要功能如下：
+
+- 获取房间列表
+- 创建房间
+- 加入房间
+- 随机加入（符合条件的）房间
+- 获取房间玩家
+- 获取、设置、同步房间的属性
+- 获取、设置、同步玩家的属性
+- 发送和接收「自定义事件」
+- 离开房间
+
+## SDK 导入
+
+请阅读 [安装](/sdk/multiplayer/start/cs/#安装)，获取 dll 库文件。
+
+## 初始化
+
+导入需要的命名空间。
+
+```cs
+using LeanCloud.Play;
+```
+
+接着我们需要实例化一个在线对战 SDK 的客户端对象。
+
+```cs
+var client = new Client({{appid}}, {{appkey}}, userId, playServer: "https://xxx.example.com", gameVersion: "0.0.1");
+// 请将 xxx.example.com 替换为你的应用绑定的自定义 API 域名
+```
+
+其中，
+`userId` 作为客户端的唯一标识连接至服务器。
+需要注意，这个 `userId` 有如下限制：
+
+- 只允许英文、数字与下划线
+- 长度不能超过 32 个字符
+- 一个应用内全局唯一
+
+`gameVersion` 表示客户端的版本号，如果允许多个版本的游戏共存，则可以根据这个版本号路由到不同的游戏服务器。
+
+## 连接
+
+### 建立连接
+
+通过下面的代码将当前玩家连接到多人对战服务：
+
+```cs
+try {
+    await client.Connect();
+    // 连接成功
+} catch (PlayException e) {
+    // 连接失败
+    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
+}
+```
+
+## 大厅
+
+我们推荐您**「不要」将玩家加入大厅**，因为在大厅中，服务端会不停地下发最新的全量房间列表，由玩家自行选择其中一个房间进行游戏，这种方式不仅对玩家体验不友好，同时来会带来很大的带宽压力。
+我们推荐您像现在的绝大部分手游一样，**直接通过[房间匹配](#房间匹配)的方式，快速匹配开始游戏**。
+
+如果您有特殊的游戏场景需要获取房间列表，可以调用以下方法：
+
+```cs
+try {
+    await client.JoinLobby();
+    // 加入大厅成功
+} catch (PlayException e) {
+    // 加入大厅失败
+    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
+}
+```
+
+当玩家加入到大厅后，服务端会将当前大厅的房间列表推送给客户端，开发者可以根据需求显示房间列表，或加入房间参与游戏。
+
+```cs
+client.OnLobbyRoomListUpdated += () => {
+    var roomList = client.LobbyRoomList;
+    // TODO 可以做房间列表展示的逻辑
+};
+```
+
+更多关于 `LobbyRoom`，请参考 [API 文档](https://leancloud.github.io/Play-SDK-CSharp/html/classLeanCloud_1_1Play_1_1LobbyRoom.htm)。
+
+### 相关事件
+
+| 事件                   | 参数 | 描述             |
+| ---------------------- | ---- | ---------------- |
+| OnLobbyRoomListUpdated | 无   | 大厅房间列表更新 |
+
+## 房间匹配
+
+房间，是指产生玩家「战斗交互」的单位。比如斗地主的牌桌、MMO 的副本、微信游戏的对战等，广义上都属于房间的范畴。
+玩家之间的战斗交互都是在房间内完成的。所以，玩家「如何进入房间」就成了房间匹配的关键。下面我们将从「创建房间」和「加入房间」两方面来分析一下常用的「房间匹配」功能。
+
+### 创建房间
+
+我们可以这样简单地创建一个房间。创建房间的玩家为房主（[MasterClient](#masterclient)），房主在创建房间成功的同时也意味着成功加入了该房间。
+
+```cs
+try {
+    await client.CreateRoom();
+    // 创建房间成功也意味着自己已经成功加入了该房间
+} catch (PlayException e) {
+    // 创建房间失败
+    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
+}
+```
+
+我们也可以创建一个设定相关信息的房间。
+
+```cs
+// 房间的自定义属性
+var props = new PlayObject {
+    { "title", "room title" },
+    { "level", 2 }
+};
+var roomOptions = new RoomOptions {
+    Visible = false,
+    EmptyRoomTtl = 10000,
+    PlayerTtl = 600,
+    MaxPlayerCount = 2,
+    CustomRoomProperties = props,
+    CustoRoomPropertyKeysForLobby = new List<string> { "level" },
+    Flag = CreateRoomFlag.MasterSetMaster | CreateRoomFlag.MasterUpdateRoomProperties,
+};
+var expectedUserIds = new List<string> { "cr3_2" };
+try {
+    await client.CreateRoom(roomName, roomOptions, expectedUserIds);
+    // 创建房间成功也意味着自己已经成功加入了该房间
+} catch (PlayException e) {
+    // 创建房间失败
+    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
+}
+```
+
+其中 `roomName`、`roomOptions` 和 `expectedUserIds` 这些参数都是可选参数。
+
+#### roomName
+
+房间名称必须保证唯一；如果不设置，则由服务端生成唯一房间 Id 并返回。
+
+#### roomOptions
+
+创建房间时的指定参数，包括：
+
+- `Opened`：房间是否开放。如果设置为 false，则不允许其他玩家加入。
+- `Visible`：房间是否可见。如果设置为 false，则不会出现在大厅的房间列表中，但是其他玩家可以通过指定「房间名称」加入房间。
+- `EmptyRoomTtl`：当房间中没有玩家时，房间保留的时间（单位：秒）。默认为 0，即 房间中没有玩家时，立即销毁房间数据。最大值为 300，即 5 分钟。
+- `PlayerTtl`：当玩家掉线时，保留玩家在房间内的数据的时间（单位：秒）。默认为 0，即 玩家掉线后，立即销毁玩家数据。最大值为 300，即 5 分钟。
+- `MaxPlayerCount`：房间允许的最大玩家数量。
+- `CustomRoomProperties`：房间的自定义属性。
+- `CustomRoomPropertyKeysForLobby`：房间的自定义属性 `CustomRoomProperties` 中「键」的数组，包含在 `CustomRoomPropertyKeysForLobby` 中的属性将会出现在大厅的房间属性中（`client.LobbyRoomList`），而全部属性要在加入房间后的 `room.CustomProperties` 中查看。这些属性将会在匹配房间时用到。
+- `Flag`：创建房间标志位，详情请看下文中 [MasterClient 掉线不转移](#masterclient-掉线不转移)，[指定其他成员为 MasterClient](#指定其他成员为-masterclient)，[只允许 MasterClient 修改房间属性](#只允许-masterclient-修改房间属性)。
+
+#### expectedUserIds
+
+指定的玩家 ID 数组。这个参数主要用于为某些能加入到房间中的特定玩家「占位」。
+
+注意：这些「特定的玩家」并不会真地加入到房间里来，而只会在房间的「空位」上预留出位置，只允许「特定的玩家」加入。如果开发者要做「邀请加入」的功能，还需要通过其他途径，例如 IM、微信分享等将「房间名称」发送给好友，好友再通过 `JoinRoom(roomName)` 接口加入房间。
+
+更多关于 `CreateRoom`，请参考 [API 文档](https://leancloud.github.io/Play-SDK-CSharp/html/classLeanCloud_1_1Play_1_1Client.htm#a0478f278b300dd4ae4c4e1fe311d3c7c)。
+
+### 加入房间
+
+当房间创建好后，其他的玩家可以通过「加入房间」参与到游戏中。
+
+#### 加入指定房间
+
+通过指定「房间名称」加入房间。
+
+```cs
+try {
+    // 玩家在加入 'LiLeiRoom' 房间
+    await client.JoinRoom("LiLeiRoom");
+    // 加入房间成功
+} catch (PlayException e) {
+    // 加入房间失败
+    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
+}
+```
+
+在加入房间时，也可以为其他玩家占位，如果房间剩余空位小于占位数量，会加入房间失败。
+
+```cs
+var expectedUserIds = new List<string>() { "LiLei", "Jim" };
+try {
+    // 玩家在加入 "game" 房间，并为 LiLei 和 Jim 玩家占位
+    await client.JoinRoom("game", expectedUserIds);
+} catch (PlayException e) {
+    // 加入房间失败
+    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
+}
+
+```
+
+更多关于 `JoinRoom`，请参考 [API 文档](https://leancloud.github.io/Play-SDK-CSharp/html/classLeanCloud_1_1Play_1_1Client.htm#ab19049bfb2cf5e62c746f5e4a4ce79b2)。
+
+#### 随机加入房间
+
+有时候，我们不需要加入指定某个房间，而是随机加入「符合某些条件的房间」（甚至可以是没有条件），比如快速开始、快速匹配等，这时我们可以通过调用 `JoinRandomRoom` 方法随机加入房间。
+
+```cs
+try {
+    await client.JoinRandomRoom();
+    // 加入房间成功
+} catch (PlayException e) {
+    // 加入房间失败
+    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
+}
+```
+
+也可以为随机加入设置「条件」，例如随机加入到 level = 2 的房间。
+
+```cs
+// 设置匹配属性
+var matchProps = new PlayObject {
+    { "level", 2 }
+};
+try {
+    await client.JoinRandomRoom(matchProps);
+} catch (PlayException e) {
+    // 加入房间失败
+    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
+}
+```
+
+### 加入或创建指定房间
+
+很多游戏没有强制指定房主的场景，只要一部分玩家能进入到同一个房间游戏，谁作为房主都可以，这时我们可以用 `JoinOrCreateRoom()` 来实现。如果有相关房间，这个方法会将当前玩家直接加入房间，如果在房间不存在，则创建一个新房间。
+
+```cs
+try {
+    // 例如，有 4 个玩家同时加入一个房间名称为 「room1」 的房间，如果不存在，则创建并加入
+    await client.JoinOrCreateRoom("room1");
+} catch (PlayException e) {
+    // 加入房间失败，也没有成功创建房间
+    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
+}
+```
+
+更多关于 `JoinOrCreateRoom`，请参考 [API 文档](https://leancloud.github.io/Play-SDK-CSharp/html/classLeanCloud_1_1Play_1_1Client.htm#ad4a489ac7663ee9eee812cba2659a187)。
+
+### 新玩家加入事件
+
+对于已经在房间的玩家，当有新玩家加入到房间时，服务端会派发 `OnPlayerRoomJoined`（新玩家加入）事件通知客户端，客户端可以通过新玩家的属性，做一些显示逻辑。
+
+```cs
+// 注册新玩家加入事件
+client.OnPlayerRoomJoined += newPlayer => {
+    // TODO 新玩家加入逻辑
+};
+```
+
+可以通过 `client.Room.PlayerList` 获取房间内的所有玩家。
+
+### 判断本地玩家
+
+拿到房间内的所有玩家后，可以判断某一个 `Player` 是否是当前本地玩家。
+
+```cs
+var players = client.Room.PlayerList;
+var player = players[0];
+var isLocal = player.isLocal;
+```
+
+### 离开房间
+
+当玩家想要「主动」离开房间时，可以调用下面的接口。
+
+```cs
+try {
+    await client.LeaveRoom();
+    // 离开房间成功，可以执行跳转场景等逻辑
+} catch (PlayException e) {
+    // 离开房间失败
+    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
+}
+```
+
+房间里的其他玩家将会接收到 `OnPlayerRoomLeft`（有玩家离开房间）事件。
+
+```cs
+// 注册有玩家离开房间事件
+client.OnPlayerRoomLeft += leftPlayer => {
+    // TODO 可以执行玩家离开的销毁工作
+}
+```
+
+### 相关事件
+
+| 事件               | 参数       | 描述           |
+| ------------------ | ---------- | -------------- |
+| OnPlayerRoomJoined | newPlayer  | 新玩家加入房间 |
+| OnPlayerRoomLeft   | leftPlayer | 玩家离开房间   |
+
+## MasterClient
+
+多人对战服务默认房间的创建者房主为 MasterClient。在游戏中他可以关闭房间、设置房间不可见、踢人等，同时他所在的设备还承担了「逻辑运算功能」，例如它在游戏中可以负责以下场景：
+
+- 在卡牌游戏中为用户发牌；
+- 控制刷怪的时机及逻辑；
+- 游戏结束时判断胜负；
+- …等等。
+
+### MasterClient 位于玩家客户端
+
+您可以将 MasterClient 的逻辑写在客户端中，作为房间创建者的玩家终端会承担游戏运算。在这种情况下，多人对战为 MasterClient 提供了以下方便的功能：
+
+#### MasterClient 掉线转移
+
+当 MasterClient 掉线后，多人对战服务会指任一名新的玩家客户端为 MasterClient。即使当原 MasterClient 恢复上线之后，也不会成为新的 MasterClient。当 MasterClient 变化时，SDK 会派发 `OnMasterSwitched`（主机切换）事件通知客户端。
+
+```cs
+// 注册主机切换事件
+client.OnMasterSwitched += newMaster => {
+    // TODO 可以做主机切换的展示
+
+    // 可以根据判断当前客户端是否是 Master，来确定是否执行逻辑处理。
+    if (client.Player.IsMaster) {
+
+    }
+}
+```
+
+#### 相关事件
+
+| 事件             | 参数      | 描述        |
+| ---------------- | --------- | ----------- |
+| OnMasterSwitched | newMaster | Master 更换 |
+
+#### 指定其他成员为 MasterClient
+
+在游戏过程中，MasterClient 如果不想再承担运算功能，可以调用以下方法主动将自己的角色转移给其他玩家客户端：
+
+```cs
+try {
+    // 通过玩家的 Id 指定 MasterClient
+    await client.SetMaster(newMasterId);
+} catch (PlayException e) {
+    // 设置 Master 失败
+    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
+}
+```
+
+转移 MasterClient 身份后，房间内所有玩家都会收到 `OnMasterSwitched` 事件。
+
+### MasterClient 位于服务端
+
+为了确保游戏安全，防止用户作弊等，我们推荐您将 MasterClient 托管在 TDS 提供的服务端 Client Engine 中，同时做以下权限配置：
+
+#### MasterClient 掉线不转移
+
+将 MasterClient 放在服务端后，MasterClient 意外掉线时也不应当转移角色，此时需要在创建房间时指定 `FixedMaster` Flag：
+
+```cs
+var options = new RoomOptions {
+   Flag = CreateRoomFlag.FixedMaster
+};
+await client.CreateRoom(roomOptions: options);
+```
+
+### MasterClient 的操作
+
+#### 设置房间是否开放
+
+MasterClient 可以设置房间是否开放，当房间关闭时，不允许其他玩家加入。
+
+```cs
+try {
+    // 设置房间关闭
+    await client.SetRoomOpened(false);
+    Debug.Log(client.Room.Open);
+} catch (PlayException e) {
+    // 设置失败
+    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
+}
+```
+
+#### 设置房间是否可见
+
+MasterClient 可以设置房间是否可见，当房间不可见时，这个房间将不会出现在玩家的大厅房间列表中，但是**其他玩家可以通过指定 roomName 加入**。
+
+```cs
+try {
+    // 设置房间不可见
+    await client.SetRoomVisible(false);
+    Debug.Log(client.Room.Visible);
+} catch (PlayException e) {
+    // 设置失败
+    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
+}
+```
+
+#### 踢人
+
+MasterClient 可以把房间内的其他玩家踢出房间：
+
+```cs
+try {
+    // 可以传入踢人的 code 和 msg
+    await client.KickPlayer(otherPlayer.ActorId, 1, "你已被踢出房间");
+} catch (PlayException e) {
+    // 踢人失败
+    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
+}
+```
+
+踢出房间后，被踢的玩家会收到 `OnRoomKicked` 事件。
+
+```cs
+client.OnRoomKicked += (code, msg) => {
+    // code 和 msg 就是 MasterClient 在踢人时传递的信息
+};
+```
+
+同时 MasterClient 和其他还存在房间的玩家会收到 `OnPlayerRoomLeft` 事件：
+
+```cs
+client.OnPlayerRoomLeft += leftPlayer => {
+
+};
+```
+
+## 自定义属性及同步
+
+为了满足开发者不同的游戏需求，多人对战 SDK 允许开发者设置「自定义属性」。
+
+自定义属性同步的主要作用包括：
+
+- 使每个客户端的数据保持一致。
+- 自定义属性由服务端管理，当有玩家进入房间后，即可得到所有的自定义属性。
+
+自定义属性又分为「房间自定义属性」和「玩家自定义属性」。
+
+### 房间自定义属性
+
+可以给房间设置一个 `PlayObject` 类型的自定义属性，比如战斗的回合数、所有棋牌等。
+
+```cs
+// 设置想要修改的自定义属性
+var props = new PlayObject {
+    { "gold", 1000 }
+};
+try {
+    // 设置 gold 属性为 1000
+    await client.Room.SetCustomProperties(props);
+    var newProperties = client.Room.CustomProperties;
+} catch (PlayException e) {
+    // 设置属性错误
+    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
+}
+```
+
+注意：这个接口并不是直接设置「客户端中自定义属性的内存值」，而是发送修改自定义属性的消息，由服务端最终确定是否修改。
+
+当房间属性变化时，SDK 将派发 `OnRoomCustomPropertiesChanged`（房间自定义属性）事件通知所有玩家客户端（包括自己）。
+
+```cs
+// 注册房间属性变化事件
+client.OnRoomCustomPropertiesChanged += changedProps => {
+    var props = client.Room.CustomProperties;
+    var gold = props.GetInt("gold");
+};
+```
+
+注意：`changedProps` 参数只表示当前修改的参数，不是「全部属性」。如需获得全部属性，请通过 `client.Room.CustomProperties` 获得。
+
+#### 只允许 MasterClient 修改房间属性
+
+默认情况下房间内所有 Client 都可以修改房间的自定义属性，如果您希望只允许 MasterClient 修改，可以在创建房间时指定 `MasterUpdateRoomProperties` Flag：
+
+```cs
+var options = new RoomOptions {
+   Flag = MasterUpdateRoomProperties
+};
+await client.CreateRoom(roomOptions: options);
+```
+
+### 玩家自定义属性
+
+玩家自定义属性与 [房间自定义属性](#房间自定义属性) 基本一致。
+
+```cs
+// 扑克牌对象
+var poker = new PlayObject {
+    { "flower", 1 },
+    { "num", 13 }
+};
+var props = new PlayObject {
+    { "nickname", "Li Lei" },
+    { "gold", 1000 },
+    { "poker", poker }
+};
+try {
+    // 请求设置玩家属性
+    await client.Player.SetCustomProperties(props);
+} catch (PlayException e) {
+    // 设置属性错误
+    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
+}
+```
+
+房间内任意一玩家（包括自己）修改自己的自定义属性后，会触发玩家自定义属性变化事件：
+
+```cs
+// 注册玩家自定义属性变化事件
+client.OnPlayerCustomPropertiesChanged += (player, changedProps) => {
+    // 得到玩家所有自定义属性
+    var props = player.CustomProperties;
+    var title = props.GetString("title");
+    var gold = props.GetInt("gold");
+};
+```
+
+### CAS
+
+CAS 全称为 Compare And Swap，即「检测并更新」的意思，用于避免一些「并发问题」。
+
+当调用 `SetCustomProperties` 时，服务器会接收所有客户端提交的值，这无法满足某些场景下的需求。
+
+比如，一个属性保存着这个房间的某件物品的持有者，即属性的 key 是物品，value 是持有者。
+任何客户端都可以在任何时候设置这个属性，如果多个客户端同时调用，**服务端会将最后收到的调用作为最终的值**，这样通常是不符合逻辑的，一般来说，应该属于第一个获得的人。
+
+`SetCustomProperties` 有一个可选参数 `expectedValues` 可作为判断条件。服务器只会更新当前和 `expectedValues` 匹配的属性，使用过期的 `expectedValues` 的更新将会被忽略。
+
+假设一个房间里有 10 名玩家，但是只有 1 把屠龙刀，屠龙刀只能被第一个「抢到」的人获得。
+
+我们可以设置 `expectedValues` 中 `tulong` 值：
+
+```cs
+var props = new PlayObject {
+    // X 表示当前的客户端
+    { "tulong", X }
+};
+var expectedValues = new PlayObject {
+    // 屠龙刀当前拥有者
+    { "tulong", null }
+};
+await client.Room.SetCustomProperties(props, expectedValues);
+```
+
+这样，在「第一个玩家」获得屠龙刀之后，`tulong` 对应的值为「第一个玩家」，后续的请求 `expectedValues = { tulong: null }` 将会失败。
+
+### 相关事件
+
+| 事件                            | 参数                   | 描述               |
+| ------------------------------- | ---------------------- | ------------------ |
+| OnRoomCustomPropertiesChanged   | changedProps           | 房间自定义属性变化 |
+| OnPlayerCustomPropertiesChanged | (player, changedProps) | 玩家自定义属性变化 |
+
+## 自定义事件
+
+在[自定义属性](#自定义属性及同步)中，我们介绍了如何根据游戏需求来自定义游戏的数据结构和数据类型。
+但是，只有数据是不够的，开发者还需要通过自定义事件互相通信。
+
+### 发送自定义事件
+
+我们可以通过「自定义事件」发送各种事件，比如游戏开始、抓牌、释放 X 技能、游戏结束等等。
+
+```cs
+var options = new SendEventOptions {
+    // 设置事件的接收组为 Master
+    ReceiverGroup = ReceiverGroup.MasterClient
+    // 也可以指定接收者 actorId
+    // targetActorIds = new List<int>() { 1 },
+};
+// 设置技能 Id
+var eventData = new PlayObject {
+    { "skillId", 123 }
+};
+// 设置 skill 事件 id
+byte SKILL_EVENT_ID = 1;
+try {
+    // 发送自定义事件
+    await client.SendEvent(SKILL_EVENT_ID, eventData, options);
+} catch (PlayException e) {
+    // 发送事件错误
+    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
+}
+```
+
+其中 `options` 是指事件发送参数，包括「接收组」和「接收者 ID 数组」。
+
+- 接收组（ReceiverGroup）是接收事件的目标的枚举值，包括 Others（房间内除自己之外的所有人）、All（房间内的所有人）、MasterClient（主机）。
+- 接收者 ID 数组是指接收事件的目标的具体值，即玩家的 `ActorId` 数组。`ActorId` 可以通过 `player.ActorId` 获得。
+
+注意：如果同时设置「接收组」和「接收者 ID 数组」，则「接收者 ID 数组」将会覆盖「接收组」。
+
+### 接收自定义事件
+
+当事件发送成功后，事件接收者中的自定义事件 `OnCustomEvent` 会被触发，此时可以根据 `eventId`（事件 ID）来处理不同事件。
+
+```cs
+// 注册自定义事件
+client.OnCustomEvent += (eventId, eventData, senderId) => {
+    if (eventId == SKILL_EVENT_ID) {
+        // 如果是 skill 事件
+        var skillId = eventData.GetString("skillId");
+        // TODO 处理释放技能的表现
+
+    }
+};
+```
+
+### `event` 参数
+
+| 参数      | 类型       | 描述                            |
+| --------- | ---------- | ------------------------------- |
+| eventId   | byte       | 事件 Id，用于表示事件           |
+| eventData | PlayObject | 事件参数                        |
+| senderId  | int        | 事件发送者 Id（玩家的 actorId） |
+
+## 断线
+
+在网络不稳定的情况下，可能会被动断开连接，被动断开连接时 SDK 会向客户端派发 `OnDisconnected`（断开连接）事件，开发者可以在这里在 UI 上对玩家进行提示：
+
+```cs
+// 注册断开连接事件
+client.OnDisconnected += () => {
+    // TODO 如果需要，可以选择重连
+};
+```
+
+## 断线重连
+
+### 在房间内保留断线用户
+
+网路不稳定、玩家将游戏置于后台等情况可能导致玩家掉线，玩家掉线时，其他在线玩家的 `OnPlayerActivityChanged` 事件会被触发：
+
+```cs
+// 注册玩家掉线 / 上线事件
+client.OnPlayerActivityChanged += player => {
+    // 获得用户是否「活跃」状态
+    Debug.Log(player.IsActive);
+    // TODO 根据玩家的在线状态可以做显示和逻辑处理
+};
+```
+
+如果玩家长时间内没有回到游戏，服务器会将玩家移除房间并销毁玩家数据，房间里的其他玩家将会接收到 `OnPlayerRoomLeft`（有玩家离开房间）事件。
+在创建房间时，我们可以通过 `PlayerTtl` 来设置「玩家掉线后的保留时间」，这样当玩家掉线时，在 `PlayerTtl` 时间内服务端会保留掉线玩家在房间内的数据，并等待该玩家恢复上线。
+
+```cs
+var options = new RoomOptions {
+    // 将 PlayerTtl 设置为 300 秒
+    PlayerTtl = 300
+}
+await client.CreateRoom(roomOptions: options);
+```
+
+掉线玩家在 `PlayerTtl` 时间内回到房间时，其他玩家的 `OnPlayerActivityChanged` 事件会被再次触发，开发者可以在这个事件中判断玩家的当前状态。
+
+### 重新连接
+
+用户断线后，可以通过下面的接口重新连接至服务器。
+
+```cs
+client.OnDisconnected += async () => {
+    // 重连
+    await client.Reconnect();
+};
+```
+
+注意：这个接口只是重新连接至服务器，如果之前在「房间内游戏」，并不会直接回到房间。如需重连并回到断线前的房间，请参考[重连并回到房间](#重连并回到房间)。
+
+### 回到房间
+
+当玩家连接至服务器以后，可以通过 `Rejoin` 接口「再次回到某房间」。当该玩家在 `PlayerTtl` 时间内调用此接口，可以成功回到房间，如果超过 `PlayerTtl` 时间，则重回房间失败。
+
+```cs
+try {
+    // 重连
+    await client.Reconnect();
+    // 重连成功，回到之前的某房间
+    if (roomName) {
+        try {
+            await client.RejoinRoom(roomName);
+            // 回到房间成功，房间内其他玩家会收到 `OnPlayerActivityChanged` 事件。
+        } catch (PlayException e) {
+            // 返回房间失败
+            Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
+        }
+    }
+} catch (PlayException e) {
+    // 重连失败
+    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
+}
+```
+
+### 重连并回到房间
+
+这个接口相当于 `Reconnect()` 和 `RejoinRoom()` 的合并。通过这个接口，可以直接重新连接并回到「之前的房间」。
+
+```cs
+try {
+    await client.ReconnectAndRejoin();
+    // 回到房间成功，更新数据和界面
+} catch (PlayException e) {
+    // 重连或返回失败
+    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
+}
+```
+
+## 关闭
+
+开发者也可以通过下面的接口主动关闭 SDK。关闭后如果需要再次使用，需要重新实例化 Client。
+
+```cs
+client.Close();
+```
+
+## 错误处理
+
+在我们发起请求时，可以通过 try catch 具体的 exception 信息，例如创建房间时：
+
+```cs
+try {
+    await client.createRoom();
+    // 创建房间成功
+} catch (PlayException e) {
+    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
+}
+```
+
+## 重大错误事件
+
+如果当前发生重大错误，这个事件轻易不会被触发，一旦触发请联系技术支持来处理。
+
+```cs
+client.OnError += (code, detail) => {
+    // 联系技术支持
+
+};
+```
+
+## 序列化
+
+在新版 Play 中，我们提供了更丰富的同步数据的方式。主要包括容器类型（PlayObject/PlayArray）和自定义类型。
+
+### PlayObject
+
+`PlayObject` 是用来替换旧版本中的 `Dictionary<string, object>` 类型的。
+
+`PlayObject` 实现了 `IDictionary<object, object>` 接口，在满足 `IDictionary` 接口的基础上，还提供了更方便的获取接口。
+
+常用接口如下：
+
+```csharp
+// 基本类型
+public bool GetBool(object key);
+public int GetInt(object key);
+public float GetFloat(object key);
+...
+// 容器类型
+public PlayObject GetPlayObject(object key); // PlayObject 支持嵌套
+public PlayArray GetPlayArray(object key);
+public T Get<T>(object key);
+```
+
+[更多接口请参考](https://leancloud.github.io/Play-SDK-CSharp/html/classLeanCloud_1_1Play_1_1PlayObject.htm)
+
+### PlayArray
+
+`PlayArray` 实现了 `IList` 接口，主要用于数组对象的同步，与 `PlayObject` 类似。
+
+常用接口如下：
+
+```csharp
+// 基本类型
+public bool GetBool(int index);
+public int GetInt(int index);
+public float GetFloat(int index);
+...
+// 容器类型
+public PlayObject GetPlayObject(int index);
+public PlayArray GetPlayArray(int index);
+public T Get<T>(int index);
+// 转换接口
+public List<T> ToList<T>();
+```
+
+[更多接口请参考](https://leancloud.github.io/Play-SDK-CSharp/html/classLeanCloud_1_1Play_1_1PlayArray.htm)
+
+### 自定义类型
+
+`Play` 除了支持上述两种容器类型，还支持同步「自定义类型」的数据。
+
+假设我们有一个 Hero 类型，包含 id, name, hp，定义如下：
+
+```csharp
+class Hero {
+    int id;
+    string name;
+    int hp;
+}
+```
+
+要同步 Hero 类型的数据，需要以下两步：
+
+#### 实现序列化 / 反序列化方法
+
+序列化方法实现由开发者自由实现，可以使用 protobuf, thrift 等。只要满足 `Play` 支持的序列化和反序列化接口即可。
+
+```csharp
+public delegate byte[] SerializeMethod(object obj);
+public delegate object DeserializeMethod(byte[] bytes);
+```
+
+以下是通过 `Play` 提供的序列化 `PlayObject` 的方式的示例
+
+```csharp
+// 序列化方法
+public static byte[] Serialize(object obj) {
+    Hero hero = obj as Hero;
+    var playObject = new PlayObject {
+        { "id", hero.id },
+        { "name", hero.name },
+        { "hp", hero.hp },
+    };
+    return CodecUtils.SerializePlayObject(playObject);
+}
+// 反序列化方法
+public static object Deserialize(byte[] bytes) {
+    var playObject = CodecUtils.DeserializePlayObject(bytes);
+    Hero hero = new Hero {
+        id = playObject.GetInt("id"),
+        name = playObject.GetString("name"),
+        hp = playObject.GetInt("hp"),
+    };
+    return hero;
+}
+```
+
+#### 注册自定义类型
+
+当实现了序列化方法，记得在使用前要先进行自定义类型的注册。
+
+```csharp
+CodecUtils.RegisterType(typeof(Hero), typeCode, Hero.Serialize, Hero.Deserialize);
+```
+
+其中 `typeCode` 是表示自定义类型的数字编码，在反序列化时会根据这个编码确定自定义类型。
+
+## API 文档
+
+更多接口及详情，请参考 [API 接口](https://leancloud.github.io/Play-SDK-CSharp/html/)。

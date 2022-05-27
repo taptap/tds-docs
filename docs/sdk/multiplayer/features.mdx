@@ -1,0 +1,787 @@
+---
+title: 多人在线对战功能介绍
+sidebar_label: 功能介绍
+sidebar_position: 1
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+多人在线对战是 TDS 专门针对多人在线类型的游戏推出的后端服务。开发者不需要自己搭建后端系统，利用云服务就可以轻松实现游戏内玩家匹配、在线对战消息同步等功能。
+
+## 核心功能
+
+- **玩家匹配**：随机或按指定条件将玩家匹配到一起玩游戏。在线对战的匹配功能会将即将一起游戏的玩家匹配到同一个房间（Room）中。例如《第五人格》、《王者荣耀》、《吃鸡》等对战类手游，玩家只需点击「自由匹配」就可以迅速匹配到其他玩家，大家进入到同一个房间中准备开始游戏；玩家也可以自己新开房间邀请好友一起玩。
+- **对战消息快速同步**：客户端与服务端使用 WebSocket 通道进行实时双向通信，确保游戏内所有消息能够快速同步。
+- **游戏逻辑运算**：在线对战提供了 [MasterClient](/sdk/multiplayer/guide/js/#masterclient) 作为客户端主机控制游戏逻辑。游戏内的所有逻辑都交给 MasterClient 来判断运转，如果 MasterClient 意外掉线，我们会自动将网络状态最好的客户端切换为 MasterClient，确保游戏顺畅进行；开发者也可以选择在服务端编写游戏逻辑（服务端游戏逻辑支持尚在开发中）。
+- **多平台支持**：完美适配游戏引擎 Unity 及 Cocos Creator，支持多个平台。
+
+## 特性
+
+- 支持动态扩容，从容应对海量并发。
+- 在久经考验的底层架构上进行了深度优化与改进，可以稳定承接每秒亿级的消息下发量。
+
+## 核心概念
+
+### Client 和 UserId
+
+多人在线对战服务中的每一个终端称为一个「Client」，每一个 Client 在整个对战服务中都有一个唯一标识 `UserId`，这个 `UserId` 只允许英文、数字与下划线，长度不能超过 32 个字符，在一个应用内全局唯一。每一个游戏玩家都肯定是一个 Client，但并不是所有的 Client 都是真正的玩家，例如托管在 Client Engine 中管理房间的 MasterClient 或自己写的 AI 玩家。
+
+多人在线对战服务仅允许一个 Client 同时和服务器建立一条连接，如果已登录 `UserId` 再次尝试登录，第二次登录会把之前的登录踢掉。
+
+### 房间和 ActorId
+
+当玩家匹配成功后，会进入到同一个房间内进行游戏，对战的消息会在这个房间内快速同步。每一个玩家在该房间内有一个自己的专属 ActorId，房间内的通信全部通过 ActorId 来传递。玩家退出房间后，ActorId 失效，当玩家进入下一个房间后，会获得新的房间内的 ActorId。
+
+## 游戏核心流程
+
+这里给出简单的示例代码使您更快地了解到整体流程，详细的开发指南请参考：
+
+- [多人在线对战开发指南 · JavaScript](/sdk/multiplayer/guide/js/)
+- [多人在线对战开发指南 · C#](/sdk/multiplayer/guide/cs/)
+
+### 连接服务器
+
+<Tabs groupId='multiplayer'>
+<TabItem value='js' label='JavaScript' default>
+
+```js
+const client = new Client({
+    // 设置 APP ID
+    appId: {{appid}},
+    // 设置 APP Key
+    appKey: {{appkey}},
+    // 设置 Server (请将 xxx.example.com 替换为你的应用绑定的自定义 API 域名)
+    playServer: 'https://xxx.example.com',
+    // 设置用户 id
+    userId: 'tarara',
+    // 设置游戏版本号，选填，默认 0.0.1，不同版本的玩家不会匹配到同一个房间
+    gameVersion: '0.0.1'
+});
+
+client.connect().then(()=> {
+  // 连接成功
+}).catch(console.error);
+```
+
+</TabItem>
+<TabItem value='csharp' label='C#'>
+
+```cs
+Play.UserID = "Mario";
+// 连接服务器时可以声明游戏版本，不同版本的玩家不会匹配到同一个房间
+Play.Connect("0.0.1");
+```
+
+</TabItem>
+</Tabs>
+
+### 玩家匹配
+
+#### 随机匹配
+
+单人玩游戏时，最常见的场景是随机匹配其他玩家迅速开始。具体实现步骤如下：
+
+1、调用 `JoinRandomRoom` 开始匹配。
+
+<Tabs groupId='multiplayer'>
+<TabItem value='js' label='JavaScript' default>
+
+```js
+client
+  .joinRandomRoom()
+  .then(() => {
+    // 成功加入房间
+  })
+  .catch(console.error);
+```
+
+</TabItem>
+<TabItem value='csharp' label='C#'>
+
+```cs
+Play.JoinRandomRoom();
+```
+
+</TabItem>
+</Tabs>
+
+2、在顺利情况下，会进入某个有空位的房间开始游戏。
+
+<Tabs groupId='multiplayer'>
+<TabItem value='js' label='JavaScript' default>
+
+```js
+// JavaScript SDK 通过 joinRandomRoom 的 Promise 判断是否加入房间成功
+```
+
+</TabItem>
+<TabItem value='csharp' label='C#'>
+
+```cs
+play.On(Event.ROOM_JOINED, (evtData) => {
+  // 成功加入房间
+
+});
+```
+
+</TabItem>
+</Tabs>
+
+3、如果没有空房间，就会加入失败。此时在失败触发的回调中建立一个房间等待其他人加入，建立房间时：
+
+- 不需要关心房间名称。
+- 默认一个房间内最大人数是 10，可以通过设置 MaxPlayerCount 来限制最大人数。
+- 设置 [玩家掉线后的保留时间](/sdk/multiplayer/guide/cs/#在房间内保留断线用户)，在有效时间内如果该玩家加回房间，房间内依然保留该玩家的自定义属性。
+
+<Tabs groupId='multiplayer'>
+<TabItem value='js' label='JavaScript' default>
+
+```js
+client
+  .joinRandomRoom()
+  .then()
+  .catch((error) => {
+    if (error.code === 4301) {
+      const options = {
+        // 设置最大人数，当房间满员时，服务端不会再匹配新的玩家进来。
+        maxPlayerCount: 4,
+        // 设置玩家掉线后的保留时间为 120 秒
+        playerTtl: 120,
+      };
+      // 创建房间
+      client
+        .createRoom({
+          roomOptions: options,
+        })
+        .then(() => {
+          // 创建房间成功
+        });
+    }
+  });
+```
+
+</TabItem>
+<TabItem value='csharp' label='C#'>
+
+```cs
+// 加入失败时，这个回调会被触发
+play.On(Event.ROOM_JOIN_FAILED, (evtData) =>
+{
+  var options = new RoomOptions()
+  {
+    // 设置最大人数，当房间满员时，服务端不会再匹配新的玩家进来。
+    MaxPlayerCount = 4,
+    // 设置玩家掉线后的保留时间为 120 秒
+    PlayerTtl = 120,
+  };
+  play.CreateRoom(roomOptions: options);
+});
+```
+
+</TabItem>
+</Tabs>
+
+#### 自定义房间匹配规则
+
+有的时候我们希望将水平差不多的玩家匹配到一起。例如当前玩家 5 级，他只能和 0-10 级的玩家匹配，10 以上的玩家无法被匹配到。这个场景可以通过给房间设置属性来实现，具体实现逻辑如下：
+
+1、确定匹配属性，例如 0-10 级是 level-1，10 以上是 level-2。
+
+<Tabs groupId='multiplayer'>
+<TabItem value='js' label='JavaScript' default>
+
+```js
+var matchLevel = 0;
+if (level < 10) {
+  matchLevel = 1;
+} else {
+  matchLevel = 2;
+}
+```
+
+</TabItem>
+<TabItem value='csharp' label='C#'>
+
+```cs
+int matchLevel = 0;
+if (level < 10) {
+  matchLevel = 1;
+} else {
+  matchLevel = 2;
+}
+```
+
+</TabItem>
+</Tabs>
+
+2、根据匹配属性加入房间
+
+<Tabs groupId='multiplayer'>
+<TabItem value='js' label='JavaScript' default>
+
+```js
+const matchProps = {
+  level: matchLevel,
+};
+
+client
+  .joinRandomRoom({ matchProperties: matchProps })
+  .then(() => {
+    // 成功加入房间
+  })
+  .catch(console.error);
+```
+
+</TabItem>
+<TabItem value='csharp' label='C#'>
+
+```cs
+Hashtable matchProp = new Hashtable();
+matchProp.Add("matchLevel", matchLevel);
+Play.JoinRandomRoom(matchProp);
+```
+
+</TabItem>
+</Tabs>
+
+3、如果随机加入房间失败，则创建具有匹配属性的房间等待其他同水平的人加入。
+
+<Tabs groupId='multiplayer'>
+<TabItem value='js' label='JavaScript' default>
+
+```js
+const matchProps = {
+  level: matchLevel,
+};
+
+client
+  .joinRandomRoom({ matchProperties: matchProps })
+  .then()
+  .catch((error) => {
+    if (error.code === 4301) {
+      const options = {
+        // 设置最大人数，当房间满员时，服务端不会再匹配新的玩家进来。
+        maxPlayerCount: 4,
+        // 设置玩家掉线后的保留时间为 120 秒
+        playerTtl: 120,
+        // 房间的自定义属性
+        customRoomProperties: matchProps,
+        // 从房间的自定义属性中选择匹配用的 key
+        customRoomPropertyKeysForLobby: ["level"],
+      };
+
+      client
+        .createRoom({
+          roomOptions: options,
+        })
+        .then()
+        .catch(console.error);
+    }
+  });
+```
+
+</TabItem>
+<TabItem value='csharp' label='C#'>
+
+```cs
+play.On(Event.ROOM_JOIN_FAILED, (error) => {
+  if (error["code"] == 4301)
+  {
+    var props = new Dictionary<string, object>();
+    props.Add("level", 2);
+    var options = new RoomOptions()
+    {
+      // 设置最大人数，当房间满员时，服务端不会再匹配新的玩家进来。
+      MaxPlayerCount = 3,
+      // 设置玩家掉线后的保留时间为 120 秒
+      PlayerTtl = 120,
+      // 房间的自定义属性
+      CustomRoomProperties = props,
+      // 从房间的自定义属性中选择匹配用的 key
+      CustoRoomPropertyKeysForLobby = new List<string>() { "level" },
+    };
+    play.CreateRoom(roomOptions: options);
+  }
+});
+```
+
+</TabItem>
+</Tabs>
+
+#### 和好友一起玩
+
+假设 PlayerA 希望能和好基友 PlayerB 一起玩游戏，这时又分以下两种情况：
+
+- 只是两个人一起玩，不允许陌生人加入
+- 好友和陌生人一起玩
+
+##### 不允许陌生人加入
+
+1、PlayerA 创建房间，设置房间不可见，这样其他人就不会被随机匹配到 PlayerA 创建的房间中。
+
+<Tabs groupId='multiplayer'>
+<TabItem value='js' label='JavaScript' default>
+
+```js
+const options = {
+  // 房间不可见
+  visible: false,
+};
+client
+  .createRoom({
+    roomOptions: options,
+  })
+  .then()
+  .catch(console.error);
+```
+
+</TabItem>
+<TabItem value='csharp' label='C#'>
+
+```cs
+var options = new RoomOptions()
+{
+  Visible = false,
+};
+play.CreateRoom(roomOptions: options);
+```
+
+</TabItem>
+</Tabs>
+
+2、PlayerA 通过某种通信方式（例如 [即时通讯](/sdk/im/features/)）将房间名称告诉 PlayerB。
+
+3、PlayerB 根据房间名称加入到房间中。
+
+<Tabs groupId='multiplayer'>
+<TabItem value='js' label='JavaScript' default>
+
+```js
+client.joinRoom("LiLeiRoom").then().catch(console.error);
+```
+
+</TabItem>
+<TabItem value='csharp' label='C#'>
+
+```cs
+Play.JoinRoom(roomName);
+```
+
+</TabItem>
+</Tabs>
+
+##### 好友和陌生人一起玩
+
+PlayerA 通过某种通信方式（例如 [即时通讯](/sdk/im/features/)）邀请 PlayerB，PlayerB 接受邀请。
+
+1、PlayerA 设置和 PlayerB 一起匹配进入某个房间
+
+<Tabs groupId='multiplayer'>
+<TabItem value='js' label='JavaScript' default>
+
+```js
+client
+  .joinRandomRoom({ expectedUserIds: ["playerB"] })
+  .then(() => {
+    // 加入成功
+  })
+  .catch(console.error);
+```
+
+</TabItem>
+<TabItem value='csharp' label='C#'>
+
+```cs
+Play.JoinRandomRoom(expectedUserIds: new string[] {"playerB"});
+```
+
+</TabItem>
+</Tabs>
+
+2、如果有足够空位的房间，PlayerA 加入成功。
+
+<Tabs groupId='multiplayer'>
+<TabItem value='js' label='JavaScript' default>
+
+```js
+// JavaScript SDK 通过 joinRandomRoom 的 Promise 判断是否加入房间成功
+```
+
+</TabItem>
+<TabItem value='csharp' label='C#'>
+
+```cs
+play.On(Event.ROOM_JOINED, (evtData) => {
+  // TODO 可以做跳转场景之类的操作
+
+});
+```
+
+</TabItem>
+</Tabs>
+
+PlayerA 通过某种通信方式（例如 [即时通讯](/sdk/im/features/)）告诉 PlayerB 已经加入房间的 roomName，PlayerB 根据 roomName 加入房间。
+
+<Tabs groupId='multiplayer'>
+<TabItem value='js' label='JavaScript' default>
+
+```js
+client.joinRoom("LiLeiRoom").then().catch(console.error);
+```
+
+</TabItem>
+<TabItem value='csharp' label='C#'>
+
+```cs
+Play.JoinRoom(roomName);
+```
+
+</TabItem>
+</Tabs>
+
+3、如果没有合适的房间则创建并加入房间：
+
+<Tabs groupId='multiplayer'>
+<TabItem value='js' label='JavaScript' default>
+
+```js
+const expectedUserIds = ["playerB"];
+client
+  .joinRandomRoom({ expectedUserIds })
+  .then()
+  .catch((error) => {
+    // 没有空房间或房间位置不够
+    if (error.code === 4301 || error.code === 4302) {
+      client
+        .createRoom({
+          expectedUserIds: expectedUserIds,
+        })
+        .then()
+        .catch(console.error);
+    }
+  });
+```
+
+</TabItem>
+<TabItem value='csharp' label='C#'>
+
+```cs
+play.On(Event.ROOM_JOIN_FAILED, (error) => {
+  var expectedUserIds = new List<string>() { "cr3_2" };
+  Play.CreateRoom(expectedUserIds: expectedUserIds);
+});
+```
+
+</TabItem>
+</Tabs>
+
+PlayerA 创建房间后，通过某种通信方式（例如 [即时通讯](/sdk/im/features/)）告诉 PlayerB 已经加入房间的 roomName，PlayerB 根据 roomName 加入房间。
+
+<Tabs groupId='multiplayer'>
+<TabItem value='js' label='JavaScript' default>
+
+```js
+client.joinRoom("LiLeiRoom").then().catch(console.error);
+```
+
+</TabItem>
+<TabItem value='csharp' label='C#'>
+
+```cs
+Play.JoinRoom(roomName);
+```
+
+</TabItem>
+</Tabs>
+
+更多匹配接口请参考房间匹配文档：[JavaScript](/sdk/multiplayer/guide/js/#房间匹配)、[C#](/sdk/multiplayer/guide/cs/#房间匹配)。
+
+### 游戏中
+
+#### 相关概念
+
+- **MasterClient**：多人在线对战使用 [MasterClient](/sdk/multiplayer/guide/js/#masterclient) 在客户端担任运算主机，由 MasterClient 来控制游戏逻辑，例如判定游戏开始还是结束、下一轮由谁操作、扣除玩家多少金币等等。
+- **自定义属性**：自定义属性又分为 [房间自定义属性](/sdk/multiplayer/guide/js/#房间自定义属性) 和 [玩家自定义属性](/sdk/multiplayer/guide/js/#玩家自定义属性)。我们建议将游戏数据加入到自定义属性中，例如房间的当前地图、下注总金币、每个人的手牌等数据，这样当 MasterClient 转移时新的 MasterClient 可以拿到当前游戏的最新数据继续进行运算。
+
+#### 开始游戏
+
+游戏开始前，我们建议为每个玩家设立一个准备状态，当所有玩家准备完毕后，MasterClient 开始游戏。开始游戏前需要将房间设置为不可见，防止游戏期间有其他玩家被匹配进来。
+
+Player A 通过设置自定义属性的方式设置准备状态：
+
+<Tabs groupId='multiplayer'>
+<TabItem value='js' label='JavaScript' default>
+
+```js
+// 玩家设置准备状态
+const props = {
+  ready: true,
+};
+// 请求设置玩家属性
+play.player
+  .setCustomProperties(props)
+  .then(() => {
+    // 设置属性成功
+  })
+  .catch(console.error);
+```
+
+</TabItem>
+<TabItem value='csharp' label='C#'>
+
+```cs
+// 玩家设置准备状态
+Hashtable prop = new Hashtable();
+prop.Add("ready", true);
+play.Player.SetCustomProperties(props);
+```
+
+</TabItem>
+</Tabs>
+
+所有玩家（包括 PlayerA）都会收到事件回调通知：
+
+<Tabs groupId='multiplayer'>
+<TabItem value='js' label='JavaScript' default>
+
+```js
+play.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, (data) => {
+  // MasterClient 才会执行这个运算
+  if (play.player.isMaster) {
+    // 在自己写的方法中检查已经准备的玩家数量，可以通过 play.room.playerList 获取玩家列表。
+    const readyPlayerCount = getReadyPlayerCount();
+    // 如果都准备好了就开始游戏
+    if (
+      readyPlayersCount > 1 &&
+      readyPlayersCount == play.room.playerList.length()
+    ) {
+      // 设置房间不可见，避免其他玩家被匹配进来
+      play.setRoomVisible(false);
+      // 开始游戏
+      start();
+    }
+  }
+});
+```
+
+</TabItem>
+<TabItem value='csharp' label='C#'>
+
+```cs
+
+play.On(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, (evtData) => {
+  // MasterClient 才会执行这个运算
+  if (play.Player.IsMaster)
+  {
+    // 在自己写的方法中检查已经准备的玩家数量，可以通过 play.Room.playerList 获取玩家列表。
+    var readyPlayerCount = getReadyPlayerCount();
+    // 如果都准备好了就开始游戏
+    if (readyPlayersCount > 1 && readyPlayersCount == Play.Players.Count())
+    {
+      // 设置房间不可见，避免其他玩家被匹配进来
+      play.SetRoomVisible(false);
+      // 开始游戏
+      start();
+    }
+  }
+});
+```
+
+</TabItem>
+</Tabs>
+
+#### 游戏中发送消息
+
+游戏中的大部分消息都发给 [MasterClient](/sdk/multiplayer/guide/js/#masterclient)，由 MasterClient 运算后再判定下一步操作。假设有这样一个场景：玩家 A 跟牌完成后，告诉 MasterClient 跟牌完成，MasterClient 收到消息后通知所有人当前需要下一个玩家 B 操作。
+
+具体发消息流程如下：
+
+1、Player A 发送自定义事件 `follow` ，通知 MasterClient 自己跟牌完成。
+
+<Tabs groupId='multiplayer'>
+<TabItem value='js' label='JavaScript' default>
+
+```js
+// 设置事件的接收组为 Master
+const options = {
+  receiverGroup: ReceiverGroup.MasterClient,
+};
+
+// 设置要发送的信息
+const eventData = {
+  actorId: play.player.actorId,
+};
+
+// 设置事件 Id
+const FOLLOW_EVENT_ID = 1;
+
+// 发送事件
+play.sendEvent(FOLLOW_EVENT_ID, eventData, options);
+```
+
+</TabItem>
+<TabItem value='csharp' label='C#'>
+
+```cs
+// 设置事件的接收组为 Master
+var options = new SendEventOptions() {
+    ReceiverGroup = ReceiverGroup.MasterClient
+};
+// 设置要发送的信息
+var eventData = new Dictionary<string, object>();
+eventData.Add("actorId", play.player.actorId);
+
+// 设置事件 Id
+byte followEventId = 1;
+
+// 发送事件
+play.SendEvent(followEventId, eventData, options);
+```
+
+</TabItem>
+</Tabs>
+
+2、 MasterClient 中的相关方法会被触发。MasterClient 计算出下一位操作的玩家是 PlayerB，然后调用 `next` 方法，通知所有玩家当前需要 PlayerB 操作。
+
+<Tabs groupId='multiplayer'>
+<TabItem value='js' label='JavaScript' default>
+
+```js
+// Event.CUSTOM_EVENT 方法会被触发
+play.on(Event.CUSTOM_EVENT, event => {
+  const { eventId } = event;
+
+  if (eventId === FOLLOW_EVENT_ID) {
+    // follow 自定义事件
+    // 判断下一步需要 PlayerB 操作
+    int PlayerBId = getNextPlayerId();
+
+    // 通知所有玩家下一步需要 PlayerB 操作。
+    const options = {
+      receiverGroup: ReceiverGroup.All,
+    };
+    const eventData = {
+	    actorId: PlayerBId,
+    };
+    const NEXT_EVENT_ID = 2;
+    play.sendEvent(NEXT_EVENT_ID, eventData, options);
+  }
+});
+
+```
+
+</TabItem>
+<TabItem value='csharp' label='C#'>
+
+```cs
+// Event.CUSTOM_EVENT 方法会被触发
+play.On(Event.CUSTOM_EVENT, (evtData) => {
+  // 获取事件参数
+  var eventId = evtData["eventId"];
+  if (eventId == followEventId) {
+    byte nextEventId = 2;
+
+    // 事件内容
+    var eventData = new Dictionary<string, object>();
+    eventData.Add("actorId", PlayerBId);
+
+    // 发送给所有人
+    var options = new SendEventOptions()
+    {
+      ReceiverGroup = ReceiverGroup.All
+    };
+
+    play.SendEvent(nextEventId, eventData, options);
+  }
+});
+```
+
+</TabItem>
+</Tabs>
+
+3、所有玩家的相关方法被触发。
+
+<Tabs groupId='multiplayer'>
+<TabItem value='js' label='JavaScript' default>
+
+```js
+// Event.CUSTOM_EVENT 方法会被触发
+play.on(Event.CUSTOM_EVENT, event => {
+  const { eventId, eventData } = event;
+  if (eventId === FOLLOW_EVENT_ID) {
+    ......
+  };
+  if (eventId === NEXT_EVENT_ID) {
+    // next 事件逻辑
+    console.log('Next Player:'  + eventData.actorId);
+  }
+});
+
+```
+
+</TabItem>
+<TabItem value='csharp' label='C#'>
+
+```cs
+play.On(Event.CUSTOM_EVENT, (evtData) => {
+  if (eventId == followEventId)
+  {
+    ......
+  }
+
+  if (eventId == nextEventId)
+  {
+    // next 事件逻辑
+    var actorId = evtData["actorId"];
+  }
+});
+```
+
+</TabItem>
+</Tabs>
+
+更详细的用法及介绍，请参考 ：
+
+- [JavaScript - 自定义事件](/sdk/multiplayer/guide/js/#自定义事件)
+- [C# - 自定义事件](/sdk/multiplayer/guide/cs/#自定义事件)
+
+#### 游戏中断线重连
+
+如果 MasterClient 位于客户端，MasterClient 断线后，多人对战的服务会重新挑选其他成员成为新的 MasterClient，原来的 MasterClient 重新返回房间后会成为一名普通成员。具体请参考 [断线重连](/sdk/multiplayer/guide/js/#断线重连)。
+
+#### 退出房间
+
+<Tabs groupId='multiplayer'>
+<TabItem value='js' label='JavaScript' default>
+
+```js
+play
+  .leaveRoom()
+  .then(() => {
+    // 成功退出房间
+  })
+  .catch(console.error);
+```
+
+</TabItem>
+<TabItem value='csharp' label='C#'>
+
+```cs
+Play.LeaveRoom();
+```
+
+</TabItem>
+</Tabs>
+
+## 文档
+
+### JavaScript
+
+- [快速入门](/sdk/multiplayer/start/js/)：快速接入多人在线对战，并运行一个小 Demo
+- [多人在线对战开发指南 · JavaScript](/sdk/multiplayer/guide/js/)：对多人在线对战的所有功能及接口进行详细介绍。
+
+### C#
+
+- [快速入门](/sdk/multiplayer/start/cs/)：快速接入多人在线对战，并运行一个小 Demo
+- [多人在线对战开发指南 · C#](/sdk/multiplayer/guide/cs/)：对多人在线对战的所有功能及接口进行详细介绍。
