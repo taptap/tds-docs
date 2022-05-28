@@ -1,16 +1,9 @@
-/**
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-
 import React from 'react';
-import DropdownNavbarItem from '@theme/NavbarItem/DropdownNavbarItem';
-import type {Props} from '@theme/NavbarItem/LocaleDropdownNavbarItem';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import {useAlternatePageUtils} from '@docusaurus/theme-common';
+import DropdownNavbarItem from '@theme/NavbarItem/DropdownNavbarItem';
 import type {LinkLikeNavbarItemProps} from '@theme/NavbarItem';
+import type {Props} from '@theme/NavbarItem/LocaleDropdownNavbarItem';
 import IconIntl from './IconIntl';
 
 import styles from './styles.module.scss';
@@ -26,22 +19,26 @@ export default function LocaleDropdownNavbarItem({
   } = useDocusaurusContext();
   const alternatePageUtils = useAlternatePageUtils();
 
-  function getLocaleLabel(locale: string) {
-    return localeConfigs[locale]!.label;
-  }
-
   const localeItems = locales.map((locale): LinkLikeNavbarItemProps => {
     const to = `pathname://${alternatePageUtils.createUrl({
       locale,
       fullyQualified: false,
     })}`;
     return {
-      isNavLink: true,
-      label: getLocaleLabel(locale),
+      label: localeConfigs[locale]!.label,
       to,
       target: '_self',
       autoAddBaseUrl: false,
-      className: locale === currentLocale ? 'dropdown__link--active' : '',
+      className:
+        // eslint-disable-next-line no-nested-ternary
+        locale === currentLocale
+          ? // Similar idea as DefaultNavbarItem: select the right Infima active
+            // class name. This cannot be substituted with isActive, because the
+            // target URLs contain `pathname://` and therefore are not NavLinks!
+            mobile
+            ? 'menu__link--active'
+            : 'dropdown__link--active'
+          : '',
     };
   });
 

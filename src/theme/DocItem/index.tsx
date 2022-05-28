@@ -1,27 +1,22 @@
-/**
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- */
-
 import React from 'react';
 import clsx from 'clsx';
-import DocPaginator from '@theme/DocPaginator';
-import DocVersionBadge from '@theme/DocVersionBadge';
-import type {Props} from '@theme/DocItem';
-import DocItemFooter from '@theme/DocItemFooter';
-import TOC from '@theme/TOC';
-import TOCCollapsible from '@theme/TOCCollapsible';
-import Heading from '@theme/Heading';
-import styles from './styles.module.css';
 import {
   PageMetadata,
   HtmlClassNameProvider,
   ThemeClassNames,
   useWindowSize,
 } from '@docusaurus/theme-common';
+import DocPaginator from '@theme/DocPaginator';
+import DocVersionBadge from '@theme/DocVersionBadge';
+import DocItemFooter from '@theme/DocItemFooter';
+import TOC from '@theme/TOC';
+import TOCCollapsible from '@theme/TOCCollapsible';
+import Heading from '@theme/Heading';
+import DocBreadcrumbs from '@theme/DocBreadcrumbs';
 import MDXContent from '@theme/MDXContent';
+import type {Props} from '@theme/DocItem';
+
+import styles from './styles.module.css';
 import './override.scss';
 
 function DocItemMetadata(props: Props): JSX.Element {
@@ -46,14 +41,14 @@ function DocItemContent(props: Props): JSX.Element {
   const {title, slug} = metadata;
 
   // We only add a title if:
-  // - user asks to hide it with front matter
+  // - user doesn't ask to hide it with front matter
   // - the markdown content does not already contain a top-level h1 heading
   const shouldAddTitle =
     !hideTitle && typeof DocContent.contentTitle === 'undefined';
 
   const windowSize = useWindowSize();
 
-  const toc = DocContent.frontMatter["toc"] ?? DocContent.toc;
+  const toc = DocContent.frontMatter['toc'] ?? DocContent.toc;
   const canRenderTOC =
     !hideTableOfContents && toc && toc.length > 0;
 
@@ -68,6 +63,7 @@ function DocItemContent(props: Props): JSX.Element {
       <div className={clsx('col', !hideTableOfContents && styles.docItemCol)}>
         <div className={styles.docItemContainer}>
           <article>
+            <DocBreadcrumbs />
             {shouldDisplayVersionBadge && <DocVersionBadge />}
 
             {canRenderTOC && (

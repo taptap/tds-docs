@@ -10,13 +10,24 @@ const config = {
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/lc-favicon.ico",
-  organizationName: "taptap",
-  projectName: "tds-docs",
   trailingSlash: true,
   customFields: {
     searchUrl: "https://lc-doc-search-api.cn-e1.leanapp.cn/search",
     mainDomainHost: "https://www.leancloud.cn",
     dcDomainHost: "https://www.leancloud.cn",
+  },
+
+  i18n: {
+    localeConfigs: {
+      en: {
+        label: "English",
+      },
+      "zh-Hans": {
+        label: "简体中文",
+      },
+    },
+    defaultLocale: "zh-Hans",
+    locales: ["zh-Hans"],
   },
 
   presets: [
@@ -73,19 +84,6 @@ const config = {
         disableSwitch: true,
       },
     }),
-
-  i18n: {
-    localeConfigs: {
-      en: {
-        label: "English",
-      },
-      "zh-Hans": {
-        label: "简体中文",
-      },
-    },
-    defaultLocale: "zh-Hans",
-    locales: ["zh-Hans"],
-  },
 
   plugins: ["docusaurus-plugin-sass"],
 };

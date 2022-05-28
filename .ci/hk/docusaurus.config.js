@@ -10,13 +10,24 @@ const config = {
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
   favicon: "img/favicon.ico",
-  organizationName: "taptap",
-  projectName: "tds-docs",
   trailingSlash: true,
   customFields: {
     searchUrl: "https://tds-doc-search-api.avosapps.us/search",
     mainDomainHost: "https://www.taptap.io",
     dcDomainHost: "https://developer.taptap.io",
+  },
+
+  i18n: {
+    localeConfigs: {
+      en: {
+        label: "English",
+      },
+      "zh-Hans": {
+        label: "简体中文",
+      },
+    },
+    defaultLocale: "en",
+    locales: ["en", "zh-Hans"],
   },
 
   presets: [
@@ -103,19 +114,6 @@ const config = {
         disableSwitch: true,
       },
     }),
-
-  i18n: {
-    localeConfigs: {
-      en: {
-        label: "English",
-      },
-      "zh-Hans": {
-        label: "简体中文",
-      },
-    },
-    defaultLocale: "en",
-    locales: ["en", "zh-Hans"],
-  },
 
   plugins: ["docusaurus-plugin-sass"],
 };
