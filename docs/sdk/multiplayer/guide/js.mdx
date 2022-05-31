@@ -1,0 +1,886 @@
+---
+title: 多人在线对战开发指南 · JavaScript
+sidebar_label: JavaScript
+sidebar_position: 1
+---
+
+## 前言
+
+多人在线对战是一款基于 JavaScript 编写的游戏 SDK，它为有强联网需求的网络游戏提供了一整套的客户端 SDK 解决方案，因此开发团队不再需要自建服务端，从而节省大部分开发和运维成本。多人在线对战提供的主要功能如下：
+
+- 获取房间列表
+- 创建房间
+- 加入房间
+- 随机加入（符合条件的）房间
+- 获取房间玩家
+- 获取、设置、同步房间的属性
+- 获取、设置、同步玩家的属性
+- 发送和接收「自定义事件」
+- 离开房间
+
+## SDK 导入
+
+请阅读 [安装](/sdk/multiplayer/start/js/#安装)，获取 JS 库文件。
+
+## 初始化
+
+首先，需要引入 SDK 中常用的类型和常量。
+
+```javascript
+const {
+  // SDK
+  Client,
+  // Play SDK 事件常量
+  Event,
+  // 事件接收组
+  ReceiverGroup,
+  // 创建房间标志
+  CreateRoomFlag,
+} = Play;
+```
+
+注意：Cocos Creator 在构建「微信小游戏」项目时，无法将 `Play` 正常加载到全局变量中，因此需要先导入 `Play` 模块。
+
+```javascript
+const Play = require("./play");
+```
+
+接着我们需要实例化一个在线对战 SDK 的客户端对象。
+
+```javascript
+const client = new Client({
+	// 设置 APP ID
+	appId: {{appid}},
+	// 设置 APP Key
+	appKey: {{appkey}},
+    // 设置 Server （将 xxx.example.com 替换为你的应用绑定的自定义 API 域名）
+    playServer: 'https://xxx.example.com',
+	// 设置用户 id
+	userId: 'tarara',
+	// 设置游戏版本号（选填，默认 0.0.1）
+	gameVersion: '0.0.1'
+});
+```
+
+其中，
+`userId` 作为客户端的唯一标识连接至服务器。
+需要注意，这个 `userId` 有如下限制：
+
+- 只允许英文、数字与下划线
+- 长度不能超过 32 个字符
+- 一个应用内全局唯一
+
+`gameVersion` 表示客户端的版本号，如果允许多个版本的游戏共存，则可以根据这个版本号路由到不同的游戏服务器。
+
+## 连接
+
+### 建立连接
+
+通过下面的代码将当前玩家连接到多人对战服务：
+
+```javascript
+client
+  .connect()
+  .then(() => {
+    // 连接成功
+  })
+  .catch((error) => {
+    // 连接失败
+    console.error(error.code, error.detail);
+  });
+```
+
+## 大厅
+
+我们推荐您**「不要」将玩家加入大厅**，因为在大厅中，服务端会不停地下发最新的全量房间列表，由玩家自行选择其中一个房间进行游戏，这种方式不仅对玩家体验不友好，同时来会带来很大的带宽压力。
+我们推荐您像现在的绝大部分手游一样，**直接通过[房间匹配](#房间匹配)的方式，快速匹配开始游戏**。
+
+如果您有特殊的游戏场景需要获取房间列表，可以调用以下方法：
+
+```javascript
+client
+  .joinLobby()
+  .then(() => {
+    // 加入大厅成功
+  })
+  .catch((error) => {
+    // 加入大厅失败
+    console.error(error.code, error.detail);
+  });
+```
+
+当玩家加入到大厅后，服务端会将当前大厅的房间列表推送给客户端，开发者可以根据需求显示房间列表，或加入房间参与游戏。
+
+```javascript
+client.on(Event.LOBBY_ROOM_LIST_UPDATED, () => {
+  const roomList = client.lobbyRoomList;
+  // TODO 可以做房间列表展示的逻辑
+});
+```
+
+更多关于 `LobbyRoom`，请参考 [API 文档](https://leancloud.github.io/Play-SDK-JS/doc/LobbyRoom.html)。
+
+### 相关事件
+
+| 事件                    | 参数 | 描述             |
+| ----------------------- | ---- | ---------------- |
+| LOBBY_ROOM_LIST_UPDATED | 无   | 大厅房间列表更新 |
+
+## 房间匹配
+
+房间，是指产生玩家「战斗交互」的单位。比如斗地主的牌桌、MMO 的副本、微信游戏的对战等，广义上都属于房间的范畴。
+玩家之间的战斗交互都是在房间内完成的。所以，玩家「如何进入房间」就成了房间匹配的关键。下面我们将从「创建房间」和「加入房间」两方面来分析一下常用的「房间匹配」功能。
+
+### 创建房间
+
+我们可以这样简单地创建一个房间。创建房间的玩家为房主（[MasterClient](#masterclient)），房主在创建房间成功的同时也意味着成功加入了该房间。
+
+```javascript
+client
+  .createRoom()
+  .then(() => {
+    // 创建房间成功也意味着自己已经成功加入了该房间
+  })
+  .catch((error) => {
+    // 创建房间失败
+    console.error(error.code, error.detail);
+  });
+```
+
+我们也可以创建一个设定相关信息的房间。
+
+```javascript
+// 房间的自定义属性
+const props = {
+  title: "room title",
+  level: 2,
+};
+const options = {
+  // 房间不可见
+  visible: false,
+  // 房间空后保留的时间，单位：秒
+  emptyRoomTtl: 300,
+  // 允许的最大玩家数量
+  maxPlayerCount: 2,
+  // 玩家离线后，保留玩家数据的时间，单位：秒
+  playerTtl: 300,
+  customRoomProperties: props,
+  // 用于做房间匹配的自定义属性键，即房间匹配条件为 level = 2
+  customRoomPropertyKeysForLobby: ["level"],
+  // 给 MasterClient 设置权限
+  flag:
+    CreateRoomFlag.MasterSetMaster | CreateRoomFlag.MasterUpdateRoomProperties,
+};
+const expectedUserIds = ["world"];
+client
+  .createRoom({
+    roomName,
+    roomOptions: options,
+    expectedUserIds: expectedUserIds,
+  })
+  .then(() => {
+    // 创建房间成功也意味着自己已经成功加入了该房间
+  })
+  .catch((error) => {
+    console.error(error.code, error.detail);
+  });
+```
+
+其中 `roomName`、`roomOptions` 和 `expectedUserIds` 这些参数都是可选参数。
+
+#### roomName
+
+房间名称必须保证唯一；如果不设置，则由服务端生成唯一房间 Id 并返回。
+
+#### roomOptions
+
+创建房间时的指定参数，包括：
+
+- `opened`：房间是否开放。如果设置为 false，则不允许其他玩家加入。
+- `visible`：房间是否可见。如果设置为 false，则不会出现在大厅的房间列表中，但是其他玩家可以通过指定「房间名称」加入房间。
+- `emptyRoomTtl`：当房间中没有玩家时，房间保留的时间（单位：秒）。默认为 0，即 房间中没有玩家时，立即销毁房间数据。最大值为 300，即 5 分钟。
+- `playerTtl`：当玩家掉线时，保留玩家在房间内的数据的时间（单位：秒）。默认为 0，即 玩家掉线后，立即销毁玩家数据。最大值为 300，即 5 分钟。
+- `maxPlayerCount`：房间允许的最大玩家数量。
+- `customRoomProperties`：房间的自定义属性。
+- `customRoomPropertyKeysForLobby`：房间的自定义属性 `customRoomProperties` 中「键」的数组，包含在 `customRoomPropertyKeysForLobby` 中的属性将会出现在大厅的房间属性中（`client.lobbyRoomList`），而全部属性要在加入房间后的 `room.customProperties` 中查看。这些属性将会在匹配房间时用到。
+- `flag`：创建房间标志位，详情请看下文中 [MasterClient 掉线不转移](#masterclient-掉线不转移)，[指定其他成员为 MasterClient](#指定其他成员为-masterclient)，[只允许 MasterClient 修改房间属性](#只允许-masterclient-修改房间属性)。
+
+#### expectedUserIds
+
+指定的玩家 ID 数组。这个参数主要用于为某些能加入到房间中的特定玩家「占位」。
+
+注意：这些「特定的玩家」并不会真地加入到房间里来，而只会在房间的「空位」上预留出位置，只允许「特定的玩家」加入。如果开发者要做「邀请加入」的功能，还需要通过其他途径，例如 IM、微信分享等将「房间名称」发送给好友，好友再通过 `joinRoom(roomName)` 接口加入房间。
+
+更多关于 `createRoom`，请参考 [API 文档](https://leancloud.github.io/Play-SDK-JS/doc/Client.html#createRoom)。
+
+### 加入房间
+
+当房间创建好后，其他的玩家可以通过「加入房间」参与到游戏中。
+
+#### 加入指定房间
+
+通过指定「房间名称」加入房间。
+
+```javascript
+// 玩家在加入 'LiLeiRoom' 房间
+client
+  .joinRoom("LiLeiRoom")
+  .then(() => {
+    // 加入房间成功
+  })
+  .catch((error) => {
+    // 加入房间失败
+    console.error(error.code, error.detail);
+  });
+```
+
+在加入房间时，也可以为其他玩家占位，如果房间剩余空位小于占位数量，会加入房间失败。
+
+```javascript
+const expectedUserIds = ["LiLei", "Jim"];
+// 玩家在加入 'game' 房间，并为 hello 和 world 玩家占位
+client
+  .joinRoom("game", {
+    expectedUserIds,
+  })
+  .then(() => {
+    // 加入房间成功
+  })
+  .catch((error) => {
+    // 加入房间失败
+    console.error(error.code, error.detail);
+  });
+```
+
+更多关于 `joinRoom`，请参考 [API 文档](https://leancloud.github.io/Play-SDK-JS/doc/Client.html#joinRoom)。
+
+#### 随机加入房间
+
+有时候，我们不需要加入指定某个房间，而是随机加入「符合某些条件的房间」（甚至可以是没有条件），比如快速开始、快速匹配等，这时我们可以通过调用 `joinRandomRoom` 方法随机加入房间。
+
+```javascript
+client
+  .joinRandomRoom()
+  .then(() => {
+    // 加入房间成功
+  })
+  .catch((error) => {
+    // 加入房间失败
+    console.error(error.code, error.detail);
+  });
+```
+
+也可以为随机加入设置「条件」，例如随机加入到 level = 2 的房间。
+
+```javascript
+// 设置匹配属性
+const matchProps = {
+  level: 2,
+};
+client
+  .joinRandomRoom({
+    matchProperties: matchProps,
+  })
+  .then(() => {
+    // 加入房间成功
+  })
+  .catch((error) => {
+    // 加入房间失败
+    console.error(error.code, error.detail);
+  });
+```
+
+### 加入或创建指定房间
+
+很多游戏没有强制指定房主的场景，只要一部分玩家能进入到同一个房间游戏，谁作为房主都可以，这时我们可以用 `joinOrCreateRoom()` 来实现。如果有相关房间，这个方法会将当前玩家直接加入房间，如果在房间不存在，则创建一个新房间。
+
+```javascript
+// 例如，有 4 个玩家同时加入一个房间名称为 「room1」 的房间，如果不存在，则创建并加入
+client
+  .joinOrCreateRoom("room1")
+  .then(() => {
+    // 加入或创建房间成功
+  })
+  .catch((error) => {
+    // 加入房间失败，也没有成功创建房间
+    console.error(error.code, error.detail);
+  });
+```
+
+更多关于 `joinOrCreateRoom`，请参考 [API 文档](https://leancloud.github.io/Play-SDK-JS/doc/Client.html#joinOrCreateRoom)。
+
+### 新玩家加入事件
+
+对于已经在房间的玩家，当有新玩家加入到房间时，服务端会派发 `PLAYER_ROOM_JOINED`（新玩家加入）事件通知客户端，客户端可以通过新玩家的属性，做一些显示逻辑。
+
+```javascript
+// 注册新玩家加入事件
+client.on(Event.PLAYER_ROOM_JOINED, ({ newPlayer }) => {
+  // TODO 新玩家加入逻辑
+});
+```
+
+可以通过 `client.room.playerList` 获取房间内的所有玩家。
+
+### 判断本地玩家
+
+拿到房间内的所有玩家后，可以判断某一个 `Player` 是否是当前本地玩家。
+
+```javascript
+const players = client.room.playerList;
+const player = players[0];
+const isLocal = player.isLocal;
+```
+
+### 离开房间
+
+当玩家想要「主动」离开房间时，可以调用下面的接口。
+
+```javascript
+client
+  .leaveRoom()
+  .then(() => {
+    // 离开房间成功，可以执行跳转场景等逻辑
+  })
+  .catch((error) => {
+    console.error(error.code, error.detail);
+  });
+```
+
+房间里的其他玩家将会接收到 `PLAYER_ROOM_LEFT`（有玩家离开房间）事件。
+
+```javascript
+// 注册有玩家离开房间事件
+client.on(Event.PLAYER_ROOM_LEFT, ({ leftPlayer }) => {
+  // TODO 可以执行玩家离开的销毁工作
+});
+```
+
+### 相关事件
+
+| 事件               | 参数           | 描述           |
+| ------------------ | -------------- | -------------- |
+| PLAYER_ROOM_JOINED | { newPlayer }  | 新玩家加入房间 |
+| PLAYER_ROOM_LEFT   | { leftPlayer } | 玩家离开房间   |
+
+## MasterClient
+
+多人对战服务默认房间的创建者房主为 MasterClient。在游戏中他可以关闭房间、设置房间不可见、踢人等，同时他所在的设备还承担了「逻辑运算功能」，例如它在游戏中可以负责以下场景：
+
+- 在卡牌游戏中为用户发牌；
+- 控制刷怪的时机及逻辑；
+- 游戏结束时判断胜负；
+- …等等。
+
+### MasterClient 位于玩家客户端
+
+您可以将 MasterClient 的逻辑写在客户端中，作为房间创建者的玩家终端会承担游戏运算。在这种情况下，多人对战为 MasterClient 提供了以下方便的功能：
+
+#### MasterClient 掉线转移
+
+当 MasterClient 掉线后，多人对战服务会指任一名新的玩家客户端为 MasterClient。即使当原 MasterClient 恢复上线之后，也不会成为新的 MasterClient。当 MasterClient 变化时，SDK 会派发 `MASTER_SWITCHED`（主机切换）事件通知客户端。
+
+```javascript
+// 注册主机切换事件
+client.on(Event.MASTER_SWITCHED, ({ newMaster }) => {
+  // TODO 可以做主机切换的展示
+
+  // 可以根据判断当前客户端是否是 Master，来确定是否执行逻辑处理。
+  if (client.player.isMaster) {
+  }
+});
+```
+
+#### 相关事件
+
+| 事件            | 参数          | 描述        |
+| --------------- | ------------- | ----------- |
+| MASTER_SWITCHED | { newMaster } | Master 更换 |
+
+#### 指定其他成员为 MasterClient
+
+在游戏过程中，MasterClient 如果不想再承担运算功能，可以调用以下方法主动将自己的角色转移给其他玩家客户端：
+
+```javascript
+// 通过玩家的 Id 指定 MasterClient
+client
+  .setMaster(otherActorId)
+  .then(() => {
+    // 此时这里的值为 false
+    console.log(client.player.isMaster);
+  })
+  .catch(console.error);
+```
+
+转移 MasterClient 身份后，房间内所有玩家都会收到 `MASTER_SWITCHED` 事件。
+
+### MasterClient 位于服务端
+
+为了确保游戏安全，防止用户作弊等，我们推荐您将 MasterClient 托管在 TDS 提供的服务端 Client Engine 中，同时做以下权限配置：
+
+#### MasterClient 掉线不转移
+
+将 MasterClient 放在服务端后，MasterClient 意外掉线时也不应当转移角色，此时需要在创建房间时指定 `FixedMaster` Flag：
+
+```js
+client.createRoom({
+  roomOptions: {
+    flag: CreateRoomFlag.FixedMaster,
+  },
+});
+```
+
+### MasterClient 的操作
+
+#### 设置房间是否开放
+
+MasterClient 可以设置房间是否开放，当房间关闭时，不允许其他玩家加入。
+
+```javascript
+// 设置房间关闭
+client
+  .setRoomOpen(false)
+  .then(() => {
+    console.log(client.room.open);
+  })
+  .catch((error) => {
+    console.error(error.code, error.detail);
+  });
+```
+
+#### 设置房间是否可见
+
+MasterClient 可以设置房间是否可见，当房间不可见时，这个房间将不会出现在玩家的大厅房间列表中，但是**其他玩家可以通过指定 roomName 加入**。
+
+```javascript
+// 设置房间不可见
+client
+  .setRoomVisible(false)
+  .then(() => {
+    console.log(client.room.visible);
+  })
+  .catch((error) => {
+    console.error(error.code, error.detail);
+  });
+```
+
+#### 踢人
+
+MasterClient 可以把房间内的其他玩家踢出房间：
+
+```javascript
+// 可以传入一个 Object 对象传递信息，该对象仅支持 code 和 msg 两个 key。
+var info = { code: 1, msg: "你已被踢出房间" };
+client.kickPlayer(otherPlayer.actorId, info).then(() => {
+  console.log("成功踢出房间");
+});
+```
+
+踢出房间后，被踢的玩家会收到 `ROOM_KICKED` 事件。
+
+```javascript
+client.on(Event.ROOM_KICKED, ({ code, msg }) => {
+  // code 和 msg 就是 MasterClient 在踢人时传递的信息
+});
+```
+
+同时 MasterClient 和其他还存在房间的玩家会收到 `PLAYER_ROOM_LEFT` 事件：
+
+```javascript
+client.on(Event.PLAYER_ROOM_LEFT, ({ leftPlayer }) => {});
+```
+
+## 自定义属性及同步
+
+为了满足开发者不同的游戏需求，在线对战 SDK 允许开发者设置「自定义属性」。自定义属性接口参数定义为 JavaScript 的 `Object` 类型，支持的数据类型包括：
+
+- Boolean
+- Number
+- String
+- Object
+- Array
+
+自定义属性同步的主要作用包括：
+
+- 使每个客户端的数据保持一致。
+- 自定义属性由服务端管理，当有玩家进入房间后，即可得到所有的自定义属性。
+
+自定义属性又分为「房间自定义属性」和「玩家自定义属性」。
+
+### 房间自定义属性
+
+可以给房间设置一个 `Object` 类型的自定义属性，比如战斗的回合数、所有棋牌等。
+
+```javascript
+// 设置想要修改的自定义属性
+const props = {
+  gold: 1000,
+};
+// 设置 gold 属性为 1000
+client.room
+  .setCustomProperties(props)
+  .then(() => {
+    var newProperties = client.room.customProperties;
+  })
+  .catch(console.error);
+```
+
+注意：这个接口并不是直接设置「客户端中自定义属性的内存值」，而是发送修改自定义属性的消息，由服务端最终确定是否修改。
+
+当房间属性变化时，SDK 将派发 `ROOM_CUSTOM_PROPERTIES_CHANGED`（房间自定义属性）事件通知所有玩家客户端（包括自己）。
+
+```javascript
+// 注册房间属性变化事件
+client.on(Event.ROOM_CUSTOM_PROPERTIES_CHANGED, ({ changedProps }) => {
+  // 可以从这个方法中获得房间的全部属性
+  const properties = client.room.customProperties;
+  const gold = properties.gold;
+  // TODO 可以做属性变化的界面展示
+});
+```
+
+注意：`changedProps` 参数只表示增量修改的参数，不是「全部属性」。如需获得全部属性，请通过 `client.room.customProperties` 获得。
+
+#### 只允许 MasterClient 修改房间属性
+
+默认情况下房间内所有 Client 都可以修改房间的自定义属性，如果您希望只允许 MasterClient 修改，可以在创建房间时指定 `MasterUpdateRoomProperties` Flag：
+
+```js
+client
+  .createRoom({
+    roomOptions: {
+      flag: CreateRoomFlag.MasterUpdateRoomProperties,
+    },
+  })
+  .then(() => {
+    // 创建房间成功
+  })
+  .catch(console.error);
+```
+
+### 玩家自定义属性
+
+玩家自定义属性与 [房间自定义属性](#房间自定义属性) 基本一致。
+
+```javascript
+// 扑克牌对象
+const poker = {
+  // 花色
+  flower: 1,
+  // 数值
+  num: 13,
+};
+const props = {
+  nickname: "Li Lei",
+  gold: 1000,
+  poker: poker,
+};
+// 请求设置玩家属性
+client.player
+  .setCustomProperties(props)
+  .then(() => {
+    // 设置属性成功
+  })
+  .catch(console.error);
+```
+
+房间内任意一玩家（包括自己）修改自己的自定义属性后，会触发玩家自定义属性变化事件：
+
+```javascript
+// 注册玩家自定义属性变化事件
+client.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, ({ player }) => {
+  // 得到玩家所有自定义属性
+  const props = player.customProperties;
+  const { title, gold } = props;
+  // TODO 可以做属性变化的界面展示
+});
+```
+
+### CAS
+
+CAS 全称为 Compare And Swap，即「检测并更新」的意思，用于避免一些「并发问题」。
+
+当调用 `setCustomProperties` 时，服务器会接收所有客户端提交的值，这无法满足某些场景下的需求。
+
+比如，一个属性保存着这个房间的某件物品的持有者，即属性的 key 是物品，value 是持有者。
+任何客户端都可以在任何时候设置这个属性，如果多个客户端同时调用，**服务端会将最后收到的调用作为最终的值**，这样通常是不符合逻辑的，一般来说，应该属于第一个获得的人。
+
+`setCustomProperties` 有一个可选参数 `expectedValues` 可作为判断条件。服务器只会更新当前和 `expectedValues` 匹配的属性，使用过期的 `expectedValues` 的更新将会被忽略。
+
+假设一个房间里有 10 名玩家，但是只有 1 把屠龙刀，屠龙刀只能被第一个「抢到」的人获得。
+
+我们可以设置 `expectedValues` 中 `tulong` 值：
+
+```javascript
+const props = {
+  tulong: X, // X 分别表示当前的客户端
+};
+const expectedValues = {
+  tulong: null, // 屠龙刀当前拥有者
+};
+client.room
+  .setCustomProperties(props, { expectedValues })
+  .then(() => {})
+  .catch(console.error);
+```
+
+这样，在「第一个玩家」获得屠龙刀之后，`tulong` 对应的值为「第一个玩家」，后续的请求（`const expectedValues = { tulong: null }`）将会失败。
+
+### 相关事件
+
+| 事件                             | 参数                     | 描述               |
+| -------------------------------- | ------------------------ | ------------------ |
+| ROOM_CUSTOM_PROPERTIES_CHANGED   | { changedProps }         | 房间自定义属性变化 |
+| PLAYER_CUSTOM_PROPERTIES_CHANGED | { player, changedProps } | 玩家自定义属性变化 |
+
+## 自定义事件
+
+在[自定义属性](#自定义属性及同步)中，我们介绍了如何根据游戏需求来自定义游戏的数据结构和数据类型。
+但是，只有数据是不够的，开发者还需要通过自定义事件互相通信。
+
+### 发送自定义事件
+
+我们可以通过「自定义事件」发送各种事件，比如游戏开始、抓牌、释放 X 技能、游戏结束等等。
+
+```javascript
+const options = {
+  // 设置事件的接收组为 MasterClient
+  receiverGroup: ReceiverGroup.MasterClient,
+  // 也可以指定接收者 actorId
+  // options.targetActorIds: [1],
+};
+// 设置技能 Id
+const eventData = {
+  skillId: 123,
+};
+
+// 设置事件 Id
+const SKILL_EVENT_ID = 1;
+// 发送自定义事件
+client
+  .sendEvent(SKILL_EVENT_ID, eventData, options)
+  .then(() => {})
+  .catch(console.error);
+```
+
+其中 `options` 是指事件发送参数，包括「接收组」和「接收者 ID 数组」。
+
+- 接收组（ReceiverGroup）是接收事件的目标的枚举值，包括 Others（房间内除自己之外的所有人）、All（房间内的所有人）、MasterClient（房主）。
+- 接收者 ID 数组是指接收事件的目标的具体值，即玩家的 `actorId` 数组。`actorId` 可以通过 `player.actorId` 获得。
+
+注意：如果同时设置「接收组」和「接收者 ID 数组」，则「接收者 ID 数组」将会覆盖「接收组」。
+
+### 接收自定义事件
+
+当事件发送成功后，事件接收者中的自定义事件 `CUSTOM_EVENT` 会被触发，此时可以根据 `eventId`（事件 ID）来处理不同事件。
+
+```javascript
+// 注册自定义事件
+client.on(Event.CUSTOM_EVENT, ({ eventId, eventData }) => {
+  if (eventId === SKILL_EVENT_ID) {
+    // 如果是 skill 事件，则 解构事件数据
+    const { skillId, targetId } = eventData;
+    // TODO 处理释放技能的表现
+  }
+});
+```
+
+### `event` 参数
+
+| 参数      | 类型   | 描述                            |
+| --------- | ------ | ------------------------------- |
+| eventId   | Number | 事件 Id，用于表示事件           |
+| eventData | Object | 事件参数                        |
+| senderId  | Number | 事件发送者 Id（玩家的 actorId） |
+
+## 断线
+
+在网络不稳定的情况下，可能会被动断开连接，被动断开连接时 SDK 会向客户端派发 `DISCONNECTED`（断开连接）事件，开发者可以在这里在 UI 上对玩家进行提示：
+
+```javascript
+// 注册断开连接事件
+client.on(Event.DISCONNECTED, () => {
+  // TODO 如果需要，可以选择检测网络并重连
+});
+```
+
+## 断线重连
+
+### 在房间内保留断线用户
+
+网路不稳定、玩家将游戏置于后台等情况可能导致玩家掉线，玩家掉线时，其他在线玩家的 `PLAYER_ACTIVITY_CHANGED` 事件会被触发：
+
+```javascript
+// 注册玩家掉线 / 上线事件
+client.on(Event.PLAYER_ACTIVITY_CHANGED, ({ player }) => {
+  // 获得用户是否「活跃」状态
+  cc.log(player.isActive());
+  // TODO 根据玩家的在线状态可以做显示和逻辑处理
+});
+```
+
+如果玩家长时间内没有回到游戏，服务器会将玩家移除房间并销毁玩家数据，房间里的其他玩家将会接收到 `PLAYER_ROOM_LEFT`（有玩家离开房间）事件。
+在创建房间时，我们可以通过 `playerTtl` 来设置「玩家掉线后的保留时间」，这样当玩家掉线时，在 `playerTtl` 时间内服务端会保留掉线玩家在房间内的数据，并等待该玩家恢复上线。
+
+```javascript
+const options = {
+  // 将 playerTtl 设置为 300 秒
+  playerTtl: 300,
+};
+client
+  .createRoom({
+    roomOptions: options,
+  })
+  .then(() => {})
+  .catch(console.error);
+```
+
+掉线玩家在 `playerTtl` 时间内回到房间时，其他玩家的 `PLAYER_ACTIVITY_CHANGED` 事件会被再次触发，开发者可以在这个事件中判断玩家的当前状态。
+
+### 重新连接
+
+用户断线后，可以通过下面的接口重新连接至服务器。
+
+```javascript
+client
+  .reconnect()
+  .then(() => {
+    // 重连成功，此时可以选择是否回到房间
+  })
+  .catch(console.error);
+```
+
+注意：这个接口只是重新连接至服务器，如果之前在「房间内游戏」，并不会直接回到房间。如需重连并回到断线前的房间，请参考[重连并回到房间](#重连并回到房间)。
+
+### 回到房间
+
+当玩家连接至服务器以后，可以通过 `rejoin` 接口「再次回到某房间」。当该玩家在 `playerTtl` 时间内调用此接口，可以成功回到房间，如果超过 `playerTtl` 时间，则重回房间失败。
+
+```javascript
+client
+  .reconnect()
+  .then(() => {
+    // 重连成功，回到之前的某房间
+    return client.rejoinRoom(roomName); // 房间的 roomName 需要自己缓存到客户端
+  })
+  .then(() => {
+    // 回到房间成功，房间内其他玩家会收到 `PLAYER_ACTIVITY_CHANGED` 事件。
+  })
+  .catch(console.error);
+```
+
+### 重连并回到房间
+
+这个接口相当于 `reconnect()` 和 `rejoinRoom()` 的合并。通过这个接口，可以直接重新连接并回到「之前的房间」。
+
+```javascript
+client
+  .reconnectAndRejoin()
+  .then(() => {
+    // 回到房间成功，更新数据和界面
+  })
+  .catch(console.error);
+```
+
+## 关闭
+
+开发者也可以通过下面的接口主动关闭 SDK。关闭后如果需要再次使用，需要重新实例化 Client。
+
+```javascript
+client.close().then(() => {
+  // 断开连接成功
+});
+```
+
+## 错误处理
+
+在我们发起请求时，可以通过 Promise catch 具体的 error 信息，例如创建房间时：
+
+```javascript
+client
+  .createRoom()
+  .then(() => {
+    // 创建房间成功
+  })
+  .catch((error) => {
+    console.error(error.code, error.detail);
+  });
+```
+
+## 重大错误事件
+
+如果当前发生重大错误，这个事件轻易不会被触发，一旦触发请联系技术支持来处理。
+
+```javascript
+client.on(Event.Error, ({ code, detail }) => {
+  // 联系技术支持
+});
+```
+
+## 序列化
+
+JavaScript 是弱类型语言，所以只要是 `Object/Array` 类型的数据，都可进行数据同步。
+
+### 自定义类型
+
+假设我们有一个 Hero 类型，包含 id, name, hp，定义如下：
+
+```javascript
+class Hero {
+  constructor(id, name, hp) {
+    this._id = id;
+    this._name = name;
+    this._hp = hp;
+  }
+}
+```
+
+要同步 Hero 类型的数据，需要以下两步：
+
+#### 实现序列化 / 反序列化方法
+
+序列化方法实现由开发者自由实现，可以使用 protobuf, thrift 等。只要满足 `Play` 支持的序列化和反序列化接口即可。
+
+以下是通过 `Play` 提供的序列化 `Object` 的方式的示例：
+
+```javascript
+const {
+  serializeObject,
+  deserializeObject,
+} = Play;
+
+// 序列化
+static serialize(hero) {
+  // 可以筛选要序列化的字段
+  const obj = {
+    id: hero._id,
+    name: hero._name,
+    hp: hero._hp,
+  };
+  return serializeObject(obj);
+}
+
+// 反序列化
+static deserialize(bytes) {
+  const obj = deserializeObject(bytes);
+  const { id, name, hp } = obj;
+  const hero = new Hero(id, name, hp);
+  return hero;
+}
+```
+
+#### 注册自定义类型
+
+当实现了序列化方法，记得在使用前要先进行自定义类型的注册。
+
+```javascript
+const { registerType } = Play;
+
+registerType(Hero, typeCode, Hero.serialize, Hero.deserialize);
+```
+
+其中 `typeCode` 是表示自定义类型的数字编码，在反序列化时会根据这个编码确定自定义类型。
+
+## API 文档
+
+更多接口及详情，请参考 [API 接口](https://leancloud.github.io/Play-SDK-JS/doc/)。

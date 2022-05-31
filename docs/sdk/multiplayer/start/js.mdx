@@ -1,0 +1,309 @@
+---
+title: 多人在线对战入门教程 · JavaScript
+sidebar_label: JavaScript
+sidebar_position: 1
+---
+
+欢迎使用多人在线对战。本教程将通过模拟一个比较玩家分数大小的场景，来讲解 SDK 的核心使用方法。
+
+## 安装
+
+多人在线对战客户端 SDK 是开源的，您可以直接下载 [Release 版本](https://github.com/leancloud/Play-SDK-JS/releases)。源码请访问 [Play-SDK-JS](https://github.com/leancloud/Play-SDK-JS)。
+
+## 支持开发平台
+
+微信开发者工具：微信小程序 / 微信小游戏
+
+CocosCreator：Mac、Web、微信小游戏、Facebook Instant Game、iOS、Android。
+
+LayaAir：微信小游戏
+
+Egret：Web
+
+### Cocos Creator
+
+[下载 `play.js`](https://github.com/leancloud/Play-SDK-JS/releases) 并拖拽至 Cocos Creator 工程中，选择「插件」模式导入。可参考 [Cocos Creator 插件脚本](https://docs.cocos.com/creator/manual/zh/scripting/external-scripts.html)。
+
+在 Cocos Creator 中选中刚刚导入的 play.js 文件，在「属性检查器」选中以下所有选项：
+
+- 导入为插件
+- 允许 Web 平台加载
+- 允许编辑器加载
+- 允许 Native 平台加载
+
+如图所示：
+
+![image](/img/multiplayer/cocos-creator-multiplayer-install.png)
+
+### LayaAir
+
+[下载 `play-laya.js`](https://github.com/leancloud/Play-SDK-JS/releases) 至 Laya 工程的 bin/libs 目录下。
+
+在 bin/index.html 中项目「IDE 生成的 UI 文件」之前引入刚下载的 SDK 文件：
+
+```diff
+  <!--提供了制作 UI 的各种组件实现-->
+    <script type="text/javascript" src="libs/laya.ui.js"></script>
+  <!--用户自定义顺序文件添加到这里-->
+  <!--jsfile--Custom-->
++   <script src="libs/play-laya.js"></script>
+  <!--jsfile--Custom-->
+  <!--IDE 生成的 UI 文件-->
+  <script src="../src/ui/layaUI.max.all.js"></script>
+```
+
+### Egret
+
+[下载 `play-egret.zip`](https://github.com/leancloud/Play-SDK-JS/releases) 并解压至 Egret 工程的 libs 目录下。
+
+在 Egret 工程中的 egretProperties.json 文件中添加 SDK 配置：
+
+```diff
+{
+  "engineVersion": "5.2.13",
+  "compilerVersion": "5.2.13",
+  "template": {},
+  "target": {
+    "current": "web"
+  },
+  "modules": [
+    {
+      "name": "egret"
+    },
+    ...
++    {
++      "name": "Play",
++      "path": "./libs/play"
++    }
+  ]
+}
+```
+
+在 Egret 工程下，执行 `Egret build -e` 命令，如果在 manifest.json 中生成了 SDK 引用，说明 SDK 安装成功。
+
+```diff
+{
+  "initial": [
+    "libs/modules/egret/egret.js",
+    ...
++    "libs/play/Play.js"
+  ],
+  "game": [
+    ...
+  ]
+}
+```
+
+可参考 [Egret 第三方库使用方法](https://docs.egret.com/engine/docs/extension/threes/instructions)。
+
+### 微信小程序
+
+[下载 `play-weapp.js`](https://github.com/leancloud/Play-SDK-JS/releases) 并拖拽至微信小程序的工程目录下即可。
+
+### Node.js 安装
+
+安装与引用 SDK：
+
+```sh
+npm install @leancloud/play --save
+```
+
+## 日志
+
+日志可以方便我们追踪问题，SDK 支持在浏览器和 Node.js 环境下打开日志调试。调试日志开启后，SDK 会把网络请求、错误消息等信息输出到 console 中。
+
+### 浏览器
+
+浏览器环境下，请打开浏览器的控制台，运行以下命令：
+
+```shell
+localStorage.debug = 'Play'
+```
+
+### Node.js
+
+Node.js 环境下，需要将环境变量 DEBUG 设置为 `Play`，你可以在启动某个命令之前设置环境变量。
+下面以本地启动云引擎调试的命令 `lean up` 为例：
+
+```sh
+# Unix
+DEBUG='Play' lean up
+# Windows cmd
+set DEBUG=Play lean up
+```
+
+## 初始化
+
+导入 SDK
+
+```javascript
+const {
+  Client,
+  Region,
+  Event,
+  ReceiverGroup,
+  setAdapters,
+  LogLevel,
+  setLogger,
+} = Play;
+```
+
+```javascript
+const client = new Client({
+    // 设置 APP ID
+    appId: {{appid}},
+    // 设置 APP Key
+    appKey: {{appkey}},
+    // 设置 Server （请将 xxx.example.com 替换为你的应用绑定的自定义 API 域名）
+    playServer: 'https://xxx.example.com',
+    // 设置用户 id
+    userId: 'tarara',
+    // 设置游戏版本号（选填，默认 0.0.1）
+    gameVersion: '0.0.1'
+});
+```
+
+## 连接多人对战服务器
+
+```javascript
+client
+  .connect()
+  .then(() => {
+    // 连接成功
+  })
+  .catch((error) => {
+    // 连接失败
+    console.error(error.code, error.detail);
+  });
+```
+
+## 创建或加入房间
+
+默认情况下 Play SDK 不需要加入「大厅」，即可创建 / 加入指定房间。
+
+```javascript
+// 例如，有 4 个玩家同时加入一个房间名称为「room1」的房间，如果不存在，则创建并加入
+client
+  .joinOrCreateRoom("room1")
+  .then(() => {
+    // 加入或创建房间成功
+  })
+  .catch((error) => {
+    // 加入房间失败，也没有成功创建房间
+    console.error(error.code, error.detail);
+  });
+```
+
+`joinOrCreateRoom` 通过相同的 roomName 保证两个客户端玩家可以进入到相同的房间。请参考 [开发指南](/sdk/multiplayer/guide/js/#加入或创建指定房间) 获取更多关于 `joinOrCreateRoom` 的用法。
+
+## 通过 CustomPlayerProperties 同步玩家属性
+
+当有新玩家加入房间时，Master 为每个玩家分配一个分数，这个分数通过「玩家自定义属性」同步给玩家。
+（这里没有做更复杂的算法，只是为 Master 分配了 10 分，其他玩家分配了 5 分）。
+
+```javascript
+// 注册新玩家加入房间事件
+client.on(Event.PLAYER_ROOM_JOINED, (data) => {
+  const { newPlayer } = data;
+  console.log(`new player: ${newPlayer.userId}`);
+  if (client.player.isMaster) {
+    // 获取房间内玩家列表
+    const playerList = client.room.playerList;
+    for (let i = 0; i < playerList.length; i++) {
+      const player = playerList[i];
+      // 判断如果是房主，则设置 10 分，否则设置 5 分
+      if (player.isMaster) {
+        player.setCustomProperties({
+          point: 10,
+        });
+      } else {
+        player.setCustomProperties({
+          point: 5,
+        });
+      }
+    }
+    // ...
+  }
+});
+```
+
+玩家得到分数后，显示自己的分数。
+
+```javascript
+// 注册「玩家属性变更」事件
+client.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, (data) => {
+  const { player } = data;
+  // 解构得到玩家的分数
+  const { point } = player.customProperties;
+  console.log(`${player.userId}: ${point}`);
+  if (player.isLocal) {
+    // 判断如果玩家是自己，则做 UI 显示
+    this.scoreLabel.string = `score:${point}`;
+  }
+});
+```
+
+## 通过「自定义事件」通信
+
+当分配完分数后，将获胜者（Master）的 ID 作为参数，通过自定义事件发送给所有玩家。
+
+```javascript
+if (client.player.isMaster) {
+  const WIN_EVENT_ID = 2;
+  client.sendEvent(
+    WIN_EVENT_ID,
+    { winnerId: client.room.masterId },
+    { receiverGroup: ReceiverGroup.All }
+  );
+}
+```
+
+根据判断胜利者是不是自己，做不同的 UI 显示。
+
+```javascript
+// 注册自定义事件
+client.on(Event.CUSTOM_EVENT, (event) => {
+  // 解构事件参数
+  const { eventId, eventData } = event;
+  if (eventId === "win") {
+    // 解构得到胜利者 Id
+    const { winnerId } = eventData;
+    console.log(`winnerId: ${winnerId}`);
+    // 如果胜利者是自己，则显示胜利 UI；否则显示失败 UI
+    if (client.player.actorId === winnerId) {
+      this.resultLabel.string = "win";
+    } else {
+      this.resultLabel.string = "lose";
+    }
+    client.close().then(() => {
+      // 断开连接成功
+    });
+  }
+});
+```
+
+## Demo
+
+我们在 Cocos Creator、LayaAir、Egret Wing 中都完成了这个 Demo，供大家运行和参考。
+
+[QuickStart 工程](https://github.com/leancloud/Play-Quick-Start-JS)。
+
+## 构建注意事项
+
+你可以通过 Cocos Creator 构建出其支持的工程。
+
+其中仅在构建 Android 工程时需要做一点额外的配置，需要在初始化 `play` 之前添加如下代码：
+
+```js
+onLoad() {
+  const { setAdapters } = Play;
+  if (cc.sys.platform === cc.sys.ANDROID) {
+    const caPath = cc.url.raw('resources/cacert.pem');
+    setAdapters({
+      WebSocket: (url) => new WebSocket(url, 'protobuf.1', caPath)
+    });
+  }
+}
+```
+
+这样做的原因是 SDK 使用了基于 WebSocket 的 wss 进行安全通信，需要通过以上代码适配 Android 平台的 CA 证书机制。

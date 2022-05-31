@@ -1,0 +1,163 @@
+---
+title: 多人在线对战入门教程 · C#
+sidebar_label: C#
+sidebar_position: 2
+---
+
+欢迎使用多人在线对战。本教程将通过模拟一个比较玩家分数大小的场景，来讲解 SDK 的核心使用方法。
+
+## 安装
+
+Play 客户端 SDK 是开源的，源码地址请访问 [Play-SDK-CSharp](https://github.com/leancloud/Play-SDK-CSharp)。也可以直接下载 [Release 版本](https://github.com/leancloud/Play-SDK-CSharp/releases)。
+
+### Unity
+
+解压下载的 SDK.zip，将 `Plugins` 目录拖拽至 Unity 工程。如果项目中已有 `Plugins` 目录，则合并至项目中的 `Plugins` 目录。
+
+为方便调试，你可以通过注册回调获取日志。在 Unity 中，可以参考如下设置：
+
+```cs
+// 设置 SDK 日志委托
+LeanCloud.Play.Logger.LogDelegate = (level, log) =>
+{
+    if (level == LogLevel.Debug) {
+        Debug.LogFormat("[DEBUG] {0}", log);
+    } else if (level == LogLevel.Warn) {
+        Debug.LogWarningFormat("[WARN] {0}", log);
+    } else if (level == LogLevel.Error) {
+        Debug.LogErrorFormat("[ERROR] {0}", log);
+    }
+};
+```
+
+## 初始化
+
+导入需要的命名空间
+
+```cs
+using LeanCloud.Play;
+```
+
+```cs
+var client = new Client({{appid}}, {{appkey}}, "leancloud", playServer: "https://xxx.example.com");
+// 请将 xxx.example.com 替换为你的应用绑定的自定义 API 域名
+```
+
+## 连接多人对战服务器
+
+```cs
+try {
+    await client.Connect();
+} catch (PlayException e) {
+    // 连接失败
+    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
+}
+```
+
+## 创建或加入房间
+
+默认情况下 Play SDK 不需要加入「大厅」，即可创建 / 加入指定房间。
+
+```cs
+try {
+    await client.JoinOrCreateRoom(roomName);
+} catch (PlayException e) {
+    // 创建或加入房间失败
+    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
+}
+```
+
+`JoinOrCreateRoom` 通过相同的 roomName 保证两个客户端玩家可以进入到相同的房间。请参考 [开发指南](/sdk/multiplayer/guide/cs/#加入或创建指定房间) 获取更多关于 `JoinOrCreateRoom` 的用法。
+
+## 通过 CustomPlayerProperties 同步玩家属性
+
+当有新玩家加入房间时，Master 为每个玩家分配一个分数，这个分数通过「玩家自定义属性」同步给玩家。
+（这里没有做更复杂的算法，只是为 Master 分配了 10 分，其他玩家分配了 5 分）。
+
+```cs
+// 注册新玩家加入房间事件
+client.OnPlayerRoomJoined += (newPlayer) => {
+    Debug.LogFormat("new player: {0}", newPlayer.UserId);
+    if (client.Player.IsMaster) {
+        // 获取房间内玩家列表
+        var playerList = client.Room.PlayerList;
+        for (int i = 0; i < playerList.Count; i++) {
+            var player = playerList[i];
+            var props = new PlayObject();
+            // 判断如果是房主，则设置 10 分，否则设置 5 分
+            if (player.IsMaster) {
+                props.Add("point", 10);
+            } else {
+                props.Add("point", 5);
+            }
+            player.SetCustomProperties(props);
+        }
+        var data = new PlayObject {
+            { "winnerId", client.Room.Master.ActorId }
+        };
+        var opts = new SendEventOptions {
+            ReceiverGroup = ReceiverGroup.All
+        };
+        client.SendEvent(GAME_OVER_EVENT, data, opts);
+    }
+};
+```
+
+玩家得到分数后，显示自己的分数。
+
+```cs
+// 注册「玩家属性变更」事件
+client.OnPlayerCustomPropertiesChanged += (player, changedProps) => {
+    // 判断如果玩家是自己，则做 UI 显示
+    if (player.IsLocal) {
+        // 得到玩家的分数
+        long point = player.CustomProperties.GetInt("point");
+        Debug.LogFormat("{0} : {1}", player.UserId, point);
+        scoreText.text = string.Format("Score: {0}", point);
+    }
+};
+```
+
+## 通过「自定义事件」通信
+
+当分配完分数后，将获胜者（Master）的 ID 作为参数，通过自定义事件发送给所有玩家。
+
+```cs
+if (client.Player.IsMaster) {
+    // ...
+    var data = new PlayObject {
+        { "winnerId", client.Room.Master.ActorId }
+    };
+    var opts = new SendEventOptions {
+        ReceiverGroup = ReceiverGroup.All
+    };
+    client.SendEvent(GAME_OVER_EVENT, data, opts);
+}
+```
+
+根据判断胜利者是不是自己，做不同的 UI 显示。
+
+```cs
+// 注册自定义事件
+client.OnCustomEvent += (eventId, eventData, senderId) => {
+    if (eventId == GAME_OVER_EVENT) {
+        // 得到胜利者 Id
+        int winnerId = eventData.GetInt("winnerId");
+        // 如果胜利者是自己，则显示胜利 UI；否则显示失败 UI
+        if (client.Player.ActorId == winnerId) {
+            Debug.Log("win");
+            resultText.text = "Win";
+        } else {
+            Debug.Log("lose");
+            resultText.text = "Lose";
+        }
+        client.Close();
+    }
+};
+```
+
+## Demo
+
+我们通过 Unity 完成了这个 Demo，供大家运行参考。
+
+[QuickStart 工程](https://github.com/leancloud/Play-CSharp-Quick-Start)。
