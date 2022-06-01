@@ -64,6 +64,7 @@ const getUpdatedRecentHits = (
 const useSearch = (url: string, locale: string) => {
   interface SearchRequestConfig {
     headers: {
+      "X-TDS-Doc-Search-Source": string;
       "X-TDS-Doc-Search-Session": string;
       "X-TDS-Doc-Search-Sequence": number;
     };
@@ -122,6 +123,7 @@ const useSearch = (url: string, locale: string) => {
       const sequence: number = Date.now();
       const config: SearchRequestConfig = {
         headers: {
+          "X-TDS-Doc-Search-Source": "docs",
           "X-TDS-Doc-Search-Session": session,
           "X-TDS-Doc-Search-Sequence": sequence,
         },
