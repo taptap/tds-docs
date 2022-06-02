@@ -1,23 +1,40 @@
 import { Conditional } from "/src/docComponents/conditional";
+import { HAS_ENGINE_CDN_DOMAIN } from "/src/constants/env.ts";
 import EngineRuntimes from "/src/docComponents/MultiLang/engine";
 import TabItem from "@theme/TabItem";
 
-所有对云引擎的 HTTP 请求都会经过负载均衡，负载均衡组件会处理 HTTPS 加密、重定向到 HTTPS、对响应进行压缩等一般性工作，因此云引擎上的程序不需要自己实现这些功能。同时负载均衡带来的一些限制，在云引擎程序内进行修改也无法越过（如请求头大小等）。
+所有对云引擎的 HTTP 或 HTTPS 请求都会经过负载均衡，负载均衡组件会处理 HTTPS 加密、重定向到 HTTPS、对响应进行压缩等一般性工作，因此云引擎上的程序不需要自己实现这些功能。同时负载均衡带来的一些限制，在云引擎程序内进行修改也无法越过，如：
 
-<details>
-<summary>点击展开负载均衡的一些限制</summary>
-
+- `/.well-known/acme-challenge/` 开头的路径被用于自动管理证书，不会转发到云引擎程序。
 - 请求头（URL 和 header）每行最大 8K，总计最大 64K。
 - 请求体积（上传文件体积）最大 100M。
 - 连接或等待响应的超时时间为 60 秒。
 
-</details>
+<Conditional if={!props.noClientInfo}>
 
-<Conditional if={!props.noClientIp}>
+#### 获取客户端 IP 等信息
 
-#### 客户端 IP
+云引擎的负载均衡会在 HTTP header 中传递一些有关原始请求的信息：
 
-云引擎的负载均衡会在 HTTP 的 `X-Real-IP` 头部中传递客户端 IP:
+- `X-Real-IP`: 请求的来源 IP。
+- `X-Forwarded-Proto`: 请求的来源协议（`http` 或 `https`）。
+- `Forwarded`: RFC 7239 规定的用于传递代理信息的头，包含 IP 和 协议。
+
+<Conditional if={HAS_ENGINE_CDN_DOMAIN}>
+
+:::caution
+在使用加速节点的情况下，以上的 HTTP header 中给出的实际上是加速节点的信息，而非原始请求信息。
+:::
+
+在使用加速节点的情况下，还会有这些 HTTP header:
+
+- `X-Forwarded-For`: 逗号隔开的多个 IP，其中第一个是原始请求 IP。
+
+:::caution
+以上 HTTP 头中给出的信息并不可靠，云引擎无法确认其真实性，存在被伪造的可能。
+:::
+
+</Conditional>
 
 <EngineRuntimes only={props.only}>
 <TabItem value='nodejs'>
@@ -25,14 +42,10 @@ import TabItem from "@theme/TabItem";
 在 Express 中：
 
 ```js
-app.get("/", function (req, res) {
-  var ipAddress =
-    req.headers["x-real-ip"] ||
-    req.headers["x-forwarded-for"] ||
-    req.connection.remoteAddress;
-  console.log(ipAddress);
-  res.send(ipAddress);
-});
+app.get("/", function (req, res) {;
+  console.log(req.headers["x-real-ip"])
+  res.send(req.headers["x-real-ip"])
+})
 ```
 
 </TabItem>
@@ -95,7 +108,7 @@ func fetchRealIP(c echo.Context) error {
 <Conditional region='cn'>
 
 :::info
-中国大陆节点的云引擎应用会默认启用加速节点，取决于底层的供应商，可能无法获取到正确的客户端 IP。如果确实需要客户端 IP，可以开通独立 IP。
+中国大陆节点的云引擎应用会默认启用加速节点，如果确实需要准确的原始请求 IP，可以开通独立 IP 来绕过加速节点，更多关于加速节点与独立 IP 的区别见 [域名绑定指南 § 云引擎域名](/sdk/domain/guide/#云引擎域名)。
 :::
 
 </Conditional>
@@ -105,33 +118,37 @@ func fetchRealIP(c echo.Context) error {
 
 在绑定云引擎自定义域名时，可以选择「强制 HTTPS」，勾选后负载均衡组件会将 HTTP 的请求重定向到 HTTPS 的同一路径。
 
-<Conditional region='cn'>
+<Conditional if={HAS_ENGINE_CDN_DOMAIN}>
 
-:::info
-「强制 HTTPS」选项目前只支持独立 IP。
-如果使用加速节点，仍需[在项目代码层面实现重定向](/sdk/engine/functions/sdk/#如何使用-sdk-重定向到-https)。
+:::caution
+在使用加速节点的情况下，「强制 HTTPS」选项无法正确工作，仍需 [在项目代码层面实现重定向](/sdk/engine/functions/sdk/#如何使用-sdk-重定向到-https)。
 :::
 
 </Conditional>
 
-<details>
-<summary>点击展开如何判断请求是否通过 HTTPS 访问</summary>
+<Conditional if={HAS_ENGINE_CDN_DOMAIN}>
 
-因为 HTTPS 加密是在负载均衡层面处理的，所以部署在云引擎上的程序收到的请求总是 HTTP 协议，这时可以通过 `X-Forwarded-Proto` HTTP 头来判断原请求是通过 HTTP 还是 HTTPS 访问的。
+#### 加速节点缓存
 
-<Conditional region='cn'>
+如果你将自定义域名解析到加速节点（也包括云引擎的共享域名），那么加速节点会对请求进行缓存，加速节点会有一些默认的缓存规则。
+
+默认会缓存的情况：
+
+- 响应头中有 `Last-Modified`（通常是静态资源，其中 HTML 最多缓存 60 秒）。
+
+不会缓存的情况：
+
+- 出错的响应（非 2xx）。
+- 非幂等请求（如 `POST`）。
+- 响应头中没有 `Last-Modified`（通常是动态接口）。
+
+默认的缓存时长取决于文件类型和 `Last-Modified`（越不常修改的文件缓存越久），你可以通过自行设置 `Cache-Control` 来覆盖默认的行为，边缘节点会尽可能遵守其中的要求，比如：
+
+- 设置 `Cache-Control: no-cache` 来避免响应被缓存。
+- 设置 `Cache-Control: max-age=3600` 来设置缓存时长（一小时）。
 
 :::info
-中国大陆节点的云引擎应用会默认启用加速节点，取决于底层的供应商，可能无法获取到正确的客户端 `X-Forwarded-Proto`。
+如果希望完全避免被缓存机制影响，可以开通独立 IP 来绕过加速节点，更多关于加速节点与独立 IP 的区别见 [域名绑定指南 § 云引擎域名](/sdk/domain/guide/#云引擎域名)。
 :::
-
-</Conditional>
-</details>
-
-<Conditional region='cn'>
-
-#### 加速缓存
-
-如果你将自定义域名解析到加速节点（也包括云引擎的共享域名），那么边缘节点会对请求进行缓存，边缘节点会有一些默认的缓存规则，如不希望请求被缓存，可以在 HTTP 的响应头中添加 `Control-Cache` 来控制缓存的行为。
 
 </Conditional>
