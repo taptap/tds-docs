@@ -244,7 +244,36 @@ completionHandler:^(BOOL success) {
 }];
 ```
 
-`antiAddictionCallbackDelegate` 参数中传入接受回调的对象，其中需实现如下回调：
+用户无 TapTap 应用时，默认会通过 WebView 登录。
+
+1. 打开 `info.plist`，添加如下配置（请替换 `clientID` 为你在控制台获取的 Client ID）：
+
+   ![](/img/tap_ios_info.png)
+
+   ```xml
+   <key>CFBundleURLTypes</key>
+   <array>
+       <dict>
+           <key>CFBundleTypeRole</key>
+           <string>Editor</string>
+           <key>CFBundleURLName</key>
+           <string>taptap</string>
+           <key>CFBundleURLSchemes</key>
+           <array>
+               <!-- 这里注意下，中括号需要去掉，最终是 Client ID 前拼接上 `tt` 的形式，例如：ttFwFdCxxxxxxxQDQwQN -->
+               <string>tt[clientID]</string>
+           </array>
+       </dict>
+   </array>
+
+   <key>LSApplicationQueriesSchemes</key>
+   <array>
+     <string>tapiosdk</string>
+     <string>tapsdk</string>
+   </array>
+   ```
+
+2. `antiAddictionCallbackDelegate` 参数中传入接受回调的对象，其中需实现如下回调：
 
 ```objc
 - (void)antiAddictionCallbackWithCode:(AntiAddictionResultHandlerCode)code extra:(NSString *)extra {}
