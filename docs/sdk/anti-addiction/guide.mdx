@@ -244,7 +244,7 @@ completionHandler:^(BOOL success) {
 }];
 ```
 
-`antiAddictionCallbackDelegate` 参数中传入接受回调的对象，其中需实现如下回调：
+  `antiAddictionCallbackDelegate` 参数中传入接受回调的对象，其中需实现如下回调：
 
 ```objc
 - (void)antiAddictionCallbackWithCode:(AntiAddictionResultHandlerCode)code extra:(NSString *)extra {}
@@ -345,7 +345,7 @@ NSString *userIdentifier = @"玩家的唯一标识";
 [AntiAddiction startUpUseTapLogin:useTapLogin userIdentifier:userIdentifier];
 ```
 
-使用 **TapTap 快速认证** 需要需要在 `AppDelegate` 里嵌入回调。
+使用 **TapTap 快速认证** 需要在 `AppDelegate` 里嵌入回调。
 
 注意：如果已经在登录模块添加过，可以跳过此步。
 
@@ -355,7 +355,36 @@ NSString *userIdentifier = @"玩家的唯一标识";
     return [TDSHandleUrl handleOpenURL:url];
 } 
 ```
+  
+此外，如果没有接入登录模块，还需要配置 `URLSchema` 。用户无 TapTap 应用时，默认会通过 WebView 登录申请使用用户的年龄段信息来完成游戏内的实名流程。
 
+打开 `info.plist`，添加如下配置（请替换 `clientID` 为你在控制台获取的 Client ID）：
+
+![](/img/tap_ios_info.png)
+
+   ```xml
+   <key>CFBundleURLTypes</key>
+   <array>
+       <dict>
+           <key>CFBundleTypeRole</key>
+           <string>Editor</string>
+           <key>CFBundleURLName</key>
+           <string>taptap</string>
+           <key>CFBundleURLSchemes</key>
+           <array>
+               <!-- 这里注意下，中括号需要去掉，最终是 Client ID 前拼接上 `tt` 的形式，例如：ttFwFdCxxxxxxxQDQwQN -->
+               <string>tt[clientID]</string>
+           </array>
+       </dict>
+   </array>
+
+   <key>LSApplicationQueriesSchemes</key>
+   <array>
+     <string>tapiosdk</string>
+     <string>tapsdk</string>
+   </array>
+   ```
+  
 </>
 
 </MultiLang>
