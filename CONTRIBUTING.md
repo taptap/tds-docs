@@ -147,6 +147,13 @@ sidebar_position: 10
 
 ![preview icon](.contributing/img/github-preview.png)
 
+`.mdx` 文件如果看不到预览按钮，需要额外配置：
+
+![configure file association for .mdx](.contributing/img/mdx-config.png)
+
+- 编辑器右下角点击「Plain Text」
+- 选择「Configure File Association for '.mdx'」，输入 Markdown
+
 预览仅供参考：
 
 - 许多 docusaurus 的 markdown 语法扩展预览 GitHub 在线编辑界面都不支持。
