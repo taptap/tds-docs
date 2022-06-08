@@ -17,26 +17,24 @@ import sdkVersions from '/src/docComponents/sdkVersions';
 
 可以在 [下载页](/tap-download) 获得 TapSDK，引入防沉迷模块。
 
-:::info
-* 防沉迷 v1.2.0 之后的版本并入了 TapSDK 的大版本，v1.2.0 之后的第一个版本为 v3.7.1。
-* 防沉迷 v1.2.0 及之前版本仅需要导入**防沉迷 SDK**，不依赖其他 SDK。
-:::
-
 <MultiLang>
 
 <>
 
 Unity 模块是通过引入 iOS 和 Android 模块后增加桥接文件打包出的 `.unitypackage`，方便以 Unity 开发的游戏直接引入。其他引擎/平台的游戏可以通过 iOS/Android 原生的方式接入，详见 iOS/Android 接入文档。
 
-Unity 接入：
+**Unity 开发环境要求**：Unity 2019.4 或更高版本
 
-- Unity 开发环境要求：Unity 2019.4 或更高版本
+支持版本：
+
+- Android：最低支持 5.0
+- iOS：最低支持 iOS 10.0
 
 SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选其一。请根据项目需要选择。
 
 #### 方法一：使用 Unity Package Manager
 
-3.x.x 版本使用示例，在项目的 `Packages/manifest.json` 文件中添加以下依赖：
+在项目的 `Packages/manifest.json` 文件中添加以下依赖：
 
 <CodeBlock className="json">
   {`"dependencies":{
@@ -46,31 +44,16 @@ SDK 可以**通过 Unity Package Manger 导入或手动导入**，二者任选�
 }`}
 </CodeBlock>
 
-1.2.0 版本使用示例，在项目的 `Packages/manifest.json` 文件中添加以下依赖：
-
-<CodeBlock className="json">
-  {`"dependencies":{
-    "com.tapsdk.antiaddiction":"https://github.com/taptap/TapAntiAddiction-Unity.git#1.2.0",
-}`}
-</CodeBlock>
-
-**注意**：导入 SDK 时请注意选择集成的版本，3.x.x 版本和 1.2.0 版本需要引入的依赖库文件数是不同的。
-
 在 Unity 顶部菜单中选择 **Window > Package Manager** 可查看已经安装在项目中的包。
 
 #### 方法二：手动导入
 
-手动导入方式需要导入：`Common` 模块和 `storage` 模块
+在[下载页](/tap-download) 找到 TapSDK Unity 和 LeanCloud C# SDK 下载地址，分别下载 TapSDK-UnityPackage.zip、AntiAddictionForUnity.unitypackage 和 LeanCloud-SDK-Storage-Unity.zip。
 
 - 导入**防沉迷 SDK**：`AntiAddictionForUnity.unitypackage`
-    <li> 导入 <code>TapTap_Common_{sdkVersions.taptap.unity}.unitypackage</code></li>
+    <li> TapSDK-UnityPackage.zip 解压后，导入其中的 <code>TapTap_Common_{sdkVersions.taptap.unity}.unitypackage</code></li>
   
-- 请下载 [LeanCloud-SDK-Storage-Unity.zip](https://github.com/leancloud/csharp-sdk/releases)，解压后为 Plugins 文件夹，拖拽至 Unity 即可。  
-
-支持版本：
-
-- Android：最低支持 5.0
-- iOS：最低支持 iOS 10.0
+- [LeanCloud-SDK-Storage-Unity.zip](https://github.com/leancloud/csharp-sdk/releases)，解压后为 Plugins 文件夹，拖拽至 Unity 即可。  
 
 iOS 平台配置：
 
@@ -303,16 +286,23 @@ iOS SDK 回调中的 `extras` 是字符串（`NSString`）。
 
 SDK 支持两种防沉迷认证方式：
 
-1. 使用 TapTap 快速认证，传入玩家的唯一标识和 TapTap 的鉴权信息，TDS 云端会根据相应玩家在 TapTap 的实名信息判断玩家是否可以进行游戏。
-2. 不使用 TapTap 快速认证，玩家在 SDK 提供的界面中手动输入身份证号等实名信息，TDS 云端会将相应信息上报至中宣部防沉迷实名认证系统。
+1. 使用 TapTap 快速认证，可令玩家授权游戏使用 TapTap 上的年龄段信息完成实名。
+2. 不使用 TapTap 快速认证，玩家在 SDK 提供的界面中手动输入身份证号等实名信息。
+
+TDS 云端会根据实名信息判断玩家是否可以进行游戏，并将相关信息上报至中宣部防沉迷实名认证系统。
+
+我们推荐使用第一种方式，对于玩家而言，不需要手动输入信息，可以快速完成认证、进入游戏，体验更佳。
 
 ### TapTap 快速认证
 
 :::info
-防沉迷 1.2.0 及之前版本 sdk 必须接入 TapTap 登录才能使用 TapTap 快速认证。
+防沉迷 v3.7.1 开始，使用快速认证不再依赖 TapTap 登录 SDK，但快速认证需要玩家在已登录状态下授权游戏使用其在 TapTap 上的年龄段信息完成实名，**请确保完成了以下工作**：
+
+- **开通 TapTap 登录功能**。若此项未完成，快速认证时玩家会遇到「应用未开通 TapTap 登录服务」提醒。
+- **后台[配置签名证书](/sdk/start/quickstart/#配置签名证书)**。若此项未完成，快速认证拉起 TapTap 客户端会提示「授权失败」。
 :::
 
-传入玩家唯一标识 `userIdentifier`，即可开始 TapTap 快速认证。
+传入玩家唯一标识 `userIdentifier`，即可开始 TapTap 快速认证。SDK 会拉起 TapTap 开始快速认证，如果 SDK 检测到玩家设备中未安装 TapTap 客户端，则会打开 WebView，玩家可授权游戏使用其在 TapTap 上的年龄段信息来完成游戏内的实名流程。
 
 其中的**玩家唯一标识** `userIdentifier`，如果接入 [TDS 内建账户系统](/sdk/taptap-login/guide/start/#一键完成-taptap-登录)，可以用玩家的 `objectId`；如果使用[单纯 TapTap 用户认证](/sdk/taptap-login/guide/tap-login/#taptap-登录并获取登录结果)则可以用 `openid` 或 `unionid`。
 
@@ -420,8 +410,6 @@ NSString *userIdentifier = @"玩家的唯一标识";
 </>
 
 </MultiLang>
-
-如果 SDK 检测到玩家设备中未安装 TapTap 客户端，则会打开 WebView，玩家可授权游戏使用其在 TapTap 上的年龄段信息来完成游戏内的实名流程。
 
 ### 手动输入实名信息
 
