@@ -85,6 +85,24 @@ export const getEntries = (brand: string, region: string): Entry[] => {
 
   const ENTRIES_LEANCLOUD: Entry[] = [
     {
+      title: "域名",
+      description: "",
+      links: [
+        {
+          label: "绑定指南",
+          to: "/sdk/domain/guide",
+        },
+        {
+          label: "备案",
+          to: "/sdk/domain/icp",
+        },
+        {
+          label: "常见问题",
+          to: "/sdk/domain/faq",
+        },
+      ],
+    },
+    {
       title: "云引擎",
       description: "",
       links: [
