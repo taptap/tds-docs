@@ -13,6 +13,9 @@ const config = {
   trailingSlash: true,
   customFields: {
     searchUrl: "https://tds-doc-search-api.avosapps.us/search",
+    searchProviderName: "LeanDB Elasticsearch",
+    searchProviderWebsite:
+      "https://developer.taptap.io/docs/sdk/engine/database/es/",
     mainDomainHost: "https://www.taptap.io",
     dcDomainHost: "https://developer.taptap.io",
   },

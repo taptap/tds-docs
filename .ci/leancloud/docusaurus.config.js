@@ -13,6 +13,8 @@ const config = {
   trailingSlash: true,
   customFields: {
     searchUrl: "https://lc-doc-search-api.cn-e1.leanapp.cn/search",
+    searchProviderName: "LeanDB Elasticsearch",
+    searchProviderWebsite: "https://docs.leancloud.cn/sdk/engine/database/es/",
     mainDomainHost: "https://www.leancloud.cn",
     dcDomainHost: "https://www.leancloud.cn",
   },
