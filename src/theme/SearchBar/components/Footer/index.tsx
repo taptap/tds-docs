@@ -5,7 +5,7 @@ import styles from "./index.module.scss";
 const Footer = () => (
   <footer className={styles.footer}>
     <p>
-      Search by <span>TapTap Developer Services</span>
+      Powered by <span>LeanDB Elasticsearch</span>
     </p>
   </footer>
 );
