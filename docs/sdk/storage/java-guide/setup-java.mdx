@@ -11,6 +11,8 @@ import CodeBlock from "@theme/CodeBlock";
 import sdkVersions from "/src/docComponents/sdkVersions";
 import DomainBinding from "../../_partials/setup-domain.mdx";
 import AppConfig from "../_partials/app-config.mdx";
+import { Conditional } from "/src/docComponents/conditional";
+import Path from "/src/docComponents/path";
 
 ## 平台与 SDK 对应关系
 
@@ -37,19 +39,22 @@ Java SDK 主要包含以下几个 library，其层次结构以及平台对应关
 ### Android 特有的包
 
 - `storage-android`：是 storage-core 在 Android 平台的定制化实现，接口与 storage-core 完全相同。
-- `realtime-android`：是 realtime-core 在 Android 平台的定制化实现。
+- `realtime-android`：是 realtime-core 在 Android 平台的定制化实现，并且增加 Android 推送相关接口。
+- `mixpush-android`：是混合推送的 library，支持华为、小米、魅族、vivo 以及 oppo 的官方推送。
 - `leancloud-fcm`：是 Firebase Cloud Messaging 的封装 library，供美国节点的 app 使用推送服务。
 
 ### 模块依赖关系
 
 Java SDK 一共包含如下几个模块：
 
-| 目录                           | 模块名                                          | 适用平台 | 依赖关系                       |
-| ------------------------------ | ----------------------------------------------- | -------- | ------------------------------ |
-| ./core                         | storage-core，存储核心 library                  | Java     | 无，它是最核心的 library       |
-| ./realtime                     | realtime-core，LiveQuery 与实时通讯核心 library | Java     | storage-core                   |
-| ./android-sdk/storage-android  | storage-android，Android 存储 library           | Android  | storage-core                   |
-| ./android-sdk/realtime-android | realtime-android，LiveQuery、即时通讯 library   | Android  | storage-android, realtime-core |
+| 目录                           | 模块名                                                      | 适用平台 | 依赖关系                       |
+| ------------------------------ | ----------------------------------------------------------- | -------- | ------------------------------ |
+| ./core                         | storage-core，存储核心 library                              | Java     | 无，它是最核心的 library       |
+| ./realtime                     | realtime-core，LiveQuery 与实时通讯核心 library             | Java     | storage-core                   |
+| ./android-sdk/storage-android  | storage-android，Android 存储 library                       | Android  | storage-core                   |
+| ./android-sdk/realtime-android | realtime-android，Android 推送、LiveQuery、即时通讯 library | Android  | storage-android, realtime-core |
+| ./android-sdk/mixpush-android  | Android 混合推送 library                                    | Android  | realtime-android               |
+| ./android-sdk/leancloud-fcm    | Firebase Cloud Messaging library                            | Android  | realtime-android               |
 
 ## 获取 SDK
 
@@ -108,7 +113,7 @@ implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'`}
 
 </Tabs>
 
-### 即时通讯服务
+### 即时通讯与推送服务
 
 <Tabs groupId="java-sdk-installation">
 <TabItem value="android" label="Android" default>
@@ -117,6 +122,13 @@ implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'`}
 
 <CodeBlock className="groovy">
   {`implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
+implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'`}
+</CodeBlock>
+
+使用混合推送服务：
+
+<CodeBlock className="groovy">
+  {`implementation 'cn.leancloud:mixpush-android:${sdkVersions.leancloud.java}'
 implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'`}
 </CodeBlock>
 
@@ -233,6 +245,8 @@ $ gradle clean assemble
 
 如果是一个 Android 项目，则向 `Application` 类的 `onCreate` 方法添加：
 
+<Conditional brand="tds">
+
 ```java
 import cn.leancloud.LeanCloud;
 
@@ -247,6 +261,26 @@ public class MyLeanCloudApp extends Application {
 }
 ```
 
+</Conditional>
+
+<Conditional brand="leancloud">
+
+```java
+import cn.leancloud.LeanCloud;
+
+public class MyLeanCloudApp extends Application {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        // 注意这里千万不要调用 cn.leancloud.core.LeanCloud 的 initialize 方法，否则会出现 NetworkOnMainThread 等错误。
+        LeanCloud.initialize(this, "your-app-id", "your-app-key", "https://your_server_url");
+    }
+}
+```
+
+</Conditional>
+
 然后指定 SDK 需要的权限并在 `AndroidManifest.xml` 里面声明 `MyLeanCloudApp` 类：
 
 ```xml
@@ -254,6 +288,30 @@ public class MyLeanCloudApp extends Application {
 <uses-permission android:name="android.permission.INTERNET"/>
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 <!-- 基本模块 END -->
+
+<application
+  …
+  android:name=".MyLeanCloudApp" >
+
+  <!-- 即时通讯和推送 START -->
+  <!-- 即时通讯和推送都需要 PushService -->
+  <service android:name="cn.leancloud.push.PushService"/>
+  <receiver android:name="cn.leancloud.push.LCBroadcastReceiver">
+    <intent-filter>
+      <action android:name="android.intent.action.BOOT_COMPLETED"/>
+      <action android:name="android.intent.action.USER_PRESENT"/>
+      <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+    </intent-filter>
+  </receiver>
+  <!-- 即时通讯和推送 END -->
+</application>
+```
+
+注意：对于**只使用即时通讯服务**，而**不使用推送服务**的应用来说，在初始化的时候设置 `LCIMOptions#disableAutoLogin4Push` 选项，可以加快即时通讯用户登录的过程。设置方法如下：
+
+```java
+// 在 LeanCloud#initialize 之后调用，禁止自动发送推送服务的 login 请求。
+LCIMOptions.getGlobalOptions().setDisableAutoLogin4Push(true);
 ```
 
 #### 更安全的客户端初始化方法
@@ -280,11 +338,25 @@ public class MyLeanCloudApp extends Application {
 
 如果是一个普通 Java 项目，则在代码开头添加：
 
+<Conditional brand="tds">
+
 ```java
 import cn.leancloud.core.LeanCloud;
 
 LeanCloud.initialize("your-client-id", "your-client-token", "https://your_server_url");
 ```
+
+</Conditional>
+
+<Conditional brand="leancloud">
+
+```java
+import cn.leancloud.core.LeanCloud;
+
+LeanCloud.initialize("your-app-id", "your-app-key", "https://your_server_url");
+```
+
+</Conditional>
 
 注意，云引擎内部访问 API 是通过内网，所以不需要也不应该配置 API 自定义域名（`serverUrl`）。
 模板项目和示例代码均未配置 API 自定义域名，
@@ -354,7 +426,7 @@ testObject.saveInBackground().blockingSubscribe();
 
 保存后运行程序。
 
-然后打开 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 结构化数据 > `TestObject`**，如果看到数据表中出现一行「words」列的值为「Hello world!」的数据，说明 SDK 已经正确地执行了上述代码，配置完毕。
+然后打开 **<Path to="storage" /> > 结构化数据 > `TestObject`**，如果看到数据表中出现一行「words」列的值为「Hello world!」的数据，说明 SDK 已经正确地执行了上述代码，配置完毕。
 
 如果控制台没有发现对应的数据，请参考 [问题排查](#问题排查)。
 
