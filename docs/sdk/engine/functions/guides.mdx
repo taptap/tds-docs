@@ -249,9 +249,9 @@ def my_cloud_func(foo, bar, baz, **params):
 
 `leancloud.FunctionRequest` 会作为参数传入到云函数中，`leancloud.FunctionRequest` 上的属性包括：
 
-- `Params` 包含客户端发送的参数
+- `Params` 包含客户端发送的参数。
 - `CurrentUser` 包含客户端所关联的用户（根据客户端发送的 `X-LC-Session` 头）。可以在 `Define` 定义云函数时，在最后传入可选参数 `WithoutFetchUser()` 禁止获取当前调用的用户。
-- `SessionToken` 包含客户端发来的 `sessionToken` 根据客户端发送的 `X-LC-Session` 头）。可以在 `Define` 定义云函数时，在最后传入可选参数 `WithoutFetchUser()` 禁止获取当前调用的 `sessionToken`。
+- `SessionToken` 包含客户端发来的 `sessionToken`（根据客户端发送的 `X-LC-Session` 头）。可以在 `Define` 定义云函数时，在最后传入可选参数 `WithoutFetchUser()` 禁止获取当前调用的 `sessionToken`。
 - `Meta` 包含有关客户端的更多信息，目前只有一个 `remoteAddress` 属性表示客户端的 IP。
 
 </TabItem>
@@ -717,7 +717,7 @@ leancloud.Engine.Define("customErrorCode", func(req *leancloud.FunctionRequest) 
 但是，只要 before 类 hook 函数不能及时抛出异常，就无法起到中断操作执行的作用。
 对于超时的 before 类 hook 函数，如果无法优化代码，压缩执行时间的话，那只能改为 after 类函数。
 例如，假设某个 beforeSave 函数需要调用耗时较久的第三方的自然语言处理接口判断用户提交的评论是否来自真实用户，导致超时，
-那么可以改为 afterSave 函数，在保存评论后再调用第三方接口，如果判断是水军评论，那么再行删除。
+那么可以改为 afterSave 函数，在保存评论后再调用第三方接口，如果判断是水军评论，那么再进行删除。
 
 ## 数据存储 Hook
 
@@ -1400,7 +1400,7 @@ leancloud.Engine.BeforeDelete("Album", func(req *ClassHookRequest) (interface{},
 
 ### AfterDelete
 
-在一个对象后被删执行操作，例如递减计数、删除关联对象等等。同样以相册为例，这次我们不在删除相册前检查是否还有照片，而是在删除后，同时删除相册中的照片：
+在一个对象被删除后执行操作，例如递减计数、删除关联对象等等。同样以相册为例，这次我们不在删除相册前检查是否还有照片，而是在删除后，同时删除相册中的照片：
 
 <EngineRuntimes>
 <TabItem value='nodejs'>
@@ -1598,7 +1598,7 @@ leancloud.Engine.OnVerified("email", func(req *ClassHookRequest) error {
 
 数据库中相关的验证字段，如 `emailVerified` 不需要修改，系统会自动更新。
 
-该 hook 属于 after 类 hook.
+该 hook 属于 after 类 hook。
 
 ### OnLogin
 
@@ -1684,7 +1684,7 @@ leancloud.Engine.OnLogin(func(req *ClassHookRequest) error {
 </TabItem>
 </EngineRuntimes>
 
-该 hook 属于 before 类 hook.
+该 hook 属于 before 类 hook。
 
 ### OnAuthData
 
@@ -1748,7 +1748,7 @@ public static Dictionary<string, object> OnAuthData(Dictionary<string, object> a
 </TabItem>
 </EngineRuntimes>
 
-该 hook 属于 before 类 hook.
+该 hook 属于 before 类 hook。
 
 ### 防止死循环调用
 
@@ -1964,7 +1964,7 @@ leancloud.Engine.BeforeSave("Review", func(req *ClassHookRequest) (interface{}, 
 
 ### Hook 超时
 
-Before 类 Hook 函数的超时时间为 10 秒，其他类 Hook 函数的超时时间为 3 秒。如果 Hook 函数被其他的云函数调用（比如因为保存对象而触发 `BeforeSave` 和 `AeforeSave`），那么它们的超时时间会进一步被其他云函数调用的剩余时间限制。
+Before 类 Hook 函数的超时时间为 10 秒，其他类 Hook 函数的超时时间为 3 秒。如果 Hook 函数被其他的云函数调用（比如因为保存对象而触发 `BeforeSave` 和 `AfterSave`），那么它们的超时时间会进一步被其他云函数调用的剩余时间限制。
 
 例如，如果一个 `BeforeSave` 函数是被一个已经运行了 13 秒的云函数触发，那么它就只剩下 2 秒的时间来运行。同时请参考 [云函数超时及处理方案](#云函数超时)。
 
@@ -1984,9 +1984,9 @@ Before 类 Hook 函数的超时时间为 10 秒，其他类 Hook 函数的超时
 
 在 **<Path to="engine" /> > 云引擎分组 > 部署 > 在线编辑** 标签页，可以：
 
-- **创建函数**：指定函数类型、函数名称、函数体的具体代码、注释等信息，点击「保存」即可创建一个云函数。函数类型包括 Function （普通云函数）、Hook、Global （这里可以定义多个云函数的公共逻辑）。
+- **创建函数**：指定函数类型、函数名称、函数体的具体代码、注释等信息，点击「保存」即可创建一个云函数。函数类型包括 Function（普通云函数）、Hook、Global（这里可以定义多个云函数的公共逻辑）。
 - **部署**：选择要部署的环境，点击「部署」即可看到部署过程和结果。
-- **预览**：会将所有函数汇总并生成一个完整的代码段，可以确认代码，或者将其保存为 `cloud.js` 覆盖项目模板的同名文件，即可快速的转换为使用项目部署。
+- **预览**：会将所有函数汇总并生成一个完整的代码段，可以确认代码，或者将其保存为 `cloud.js` 覆盖项目模板的同名文件，即可快速地转换为使用项目部署。
 - **维护云函数**：可以编辑已有云函数，查看保存历史，以及删除云函数。
 
 云函数编辑之后需要点击 **部署** 才能生效。
@@ -2026,21 +2026,21 @@ Before 类 Hook 函数的超时时间为 10 秒，其他类 Hook 函数的超时
 
 「在线编辑」的产生是为了方便大家初次体验云引擎，或者只是需要一些简单 hook 方法的应用使用。我们的实现方式就是把定义的函数拼接起来，生成一个云引擎项目然后部署。
 
-所以可以认为「在线编辑」和 「项目部署」最终是一样的，都是一个完整的项目。
+所以可以认为「在线编辑」和「项目部署」最终是一样的，都是一个完整的项目。
 
-定义函数是一个单独功能，可以不用使用基础包，git 等工具快速的生成和编辑云引擎。
+定义函数是一个单独功能，可以让你不用使用基础包、git 等工具就能快速生成和编辑云引擎项目。
 
 当然，你也可以使用基础包，自己写代码并部署项目。
 
-这两条路是分开的，任何一个部署，就会导致另一种方式失效掉。
+这两条路是分开的，使用任何一种方式部署都会导致另一种方式失效。
 
 </details>
 
 <details>
 <summary>点击展开如何从在线编辑迁移到项目部署</summary>
 
-1. 按照[云引擎命令行工具使用指南](/sdk/engine/cli/)安装命令行工具，使用 `lean init` 初始化项目，模板选择 `Node.js > Express`（我们的 Node.js 示例项目）。
-2. 在**<Path to="engine" /> > 云引擎分组 > 部署 > 在线编辑**点击 **预览**，将全部函数的代码拷贝到新建项目中的 `cloud.js`（替换掉原有内容）。
+1. 按照[云引擎命令行工具使用指南](/sdk/engine/cli/)安装命令行工具，使用 `lean new` 初始化项目，模板选择 `Node.js > Express`（我们的 Node.js 示例项目）。
+2. 在 **<Path to="engine" /> > 云引擎分组 > 部署 > 在线编辑** 点击 **预览**，将全部函数的代码拷贝到新建项目中的 `cloud.js`（替换掉原有内容）。
 3. 运行 `lean up`，在 <http://localhost:3001> 的调试界面中测试云函数和 Hook，然后运行 `lean deploy` 部署代码到云引擎（使用标准实例的用户还需要执行 `lean publish`）。
 4. 部署后请留意云引擎控制台上是否有错误产生。
 
@@ -2220,7 +2220,7 @@ Cron 表达式的语法可以参考 [云队列（Cloud Queue）开发指南 § C
 在配置定时任务时可以指定一些额外的非必填选项：
 
 - 运行参数：传递给云函数的参数（JSON 对象）。
-- 异常策略：任务因云函数超时失败后重试执行还是放弃执行，详见 [云队列指南 异常处理策略]。
+- 异常策略：任务因云函数超时失败后重试执行还是放弃执行，详见 [云队列指南 § 异常处理策略](/sdk/engine/functions/cloud-queue/#异常处理策略deliverymode具体影响哪些情况)。
 
 「最近一次执行」会显示最近一次执行的时间和详情，但目前这个数据仅保留 5 分钟，在查看详情中：
 
