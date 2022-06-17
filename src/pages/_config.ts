@@ -123,23 +123,24 @@ export const getEntries = (brand: string, region: string): Entry[] => {
   if (brand === "leancloud") {
     return ENTRIES_LEANCLOUD;
   } else {
-    return ENTRIES_TDS.map((entry, index) => ({
+    return ENTRIES_TDS.map((entry) => ({
       title: translate({
         message: entry.title,
         id: `tds-home-${entry.title}`,
-        description: `from HomePage Cell ${index + 1} Title`,
       }),
-      description: translate({
-        message: entry.description,
-        id: `tds-home-${entry.description}`,
-        description: `from HomePage Cell ${index + 1} Desc`,
-      }),
+      ...(entry.description
+        ? {
+            description: translate({
+              message: entry.description,
+              id: `tds-home-${entry.description}`,
+            }),
+          }
+        : {}),
       links: entry.links.map((link) => ({
         ...link,
         label: translate({
           message: link.label,
           id: `tds-home-link-${link.label}`,
-          description: `from HomePage Cell Link`,
         }),
       })),
     }));
