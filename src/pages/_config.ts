@@ -14,7 +14,7 @@ type ActionCellLinkExternal = {
 
 type Entry = {
   title: string;
-  description: string;
+  description?: string;
   links: (ActionCellLinkInternal | ActionCellLinkExternal)[];
 };
 
@@ -68,19 +68,33 @@ export const getEntries = (brand: string, region: string): Entry[] => {
         },
       ],
     },
-    {
-      title: "平台功能申请",
-      description: "TapTap 平台功能申请",
-      links:
-        region === "cn"
-          ? [
+    ...(region === "cn"
+      ? [
+          {
+            title: "平台功能申请",
+            description: "TapTap 平台功能申请",
+            links: [
               {
                 label: "查看更多",
                 to: "/ad-apply",
               },
-            ]
-          : [],
-    },
+            ],
+          },
+        ]
+      : []),
+    ...(region === "global"
+      ? [
+          {
+            title: "开发者运营手册",
+            links: [
+              {
+                label: "查看更多",
+                to: "/operations/manual",
+              },
+            ],
+          },
+        ]
+      : []),
   ];
 
   const ENTRIES_LEANCLOUD: Entry[] = [
