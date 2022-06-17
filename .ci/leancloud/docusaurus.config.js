@@ -29,7 +29,7 @@ const config = {
       },
     },
     defaultLocale: "zh-Hans",
-    locales: ["zh-Hans"],
+    locales: ["zh-Hans", "en"],
   },
 
   presets: [
