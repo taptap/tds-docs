@@ -11,6 +11,8 @@ import CodeBlock from "@theme/CodeBlock";
 import sdkVersions from "/src/docComponents/sdkVersions";
 import DomainBinding from "../../_partials/setup-domain.mdx";
 import AppConfig from "../_partials/app-config.mdx";
+import { Conditional } from "/src/docComponents/conditional";
+import Path from "/src/docComponents/path";
 
 ## The Relationships Between the SDK and Different Platforms
 
@@ -36,20 +38,23 @@ The following content shows the libraries included in the Java SDK as well as th
 
 ### Libraries for Android Only
 
-- `storage-android`: Essentially the `storage-core` library customized for Android. Offers exactly the same interfaces as `storage-core`.
-- `realtime-android`: Essentially the `realtime-core` library customized for Android.
+- `storage-android`: The `storage-core` library customized for Android. Offers exactly the same interfaces as `storage-core`.
+- `realtime-android`: The `realtime-core` library customized for Android. Contains interfaces for push notifications for Android.
+- `mixpush-android`: The mixpush library supporting the official push services of Huawei, Xiaomi, Meizu, vivo, and OPPO.
 - `leancloud-fcm`: An encapsulation of Firebase Cloud Messaging for Push Notification services.
 
 ### Dependencies
 
 The Java SDK contains the following modules:
 
-| Directory                      | Module name                                            | Platform | Dependency                     |
-| ------------------------------ | ------------------------------------------------------ | -------- | ------------------------------ |
-| ./core                         | storage-core (for Data Storage)                        | Java     | None                           |
-| ./realtime                     | realtime-core (for LiveQuery and Instant Messaging)    | Java     | storage-core                   |
-| ./android-sdk/storage-android  | storage-android (Data Storage for Android)             | Android  | storage-core                   |
-| ./android-sdk/realtime-android | realtime-android (for LiveQuery and Instant Messaging) | Android  | storage-android, realtime-core |
+| Directory                      | Module name                                                                         | Platform | Dependency                     |
+| ------------------------------ | ----------------------------------------------------------------------------------- | -------- | ------------------------------ |
+| ./core                         | storage-core (for Data Storage)                                                     | Java     | None                           |
+| ./realtime                     | realtime-core (for LiveQuery and Instant Messaging)                                 | Java     | storage-core                   |
+| ./android-sdk/storage-android  | storage-android (Data Storage for Android)                                          | Android  | storage-core                   |
+| ./android-sdk/realtime-android | realtime-android (for Android push notifications, LiveQuery, and Instant Messaging) | Android  | storage-android, realtime-core |
+| ./android-sdk/mixpush-android  | Android mixpush                                                                     | Android  | realtime-android               |
+| ./android-sdk/leancloud-fcm    | Firebase Cloud Messaging library                                                    | Android  | realtime-android               |
 
 ## Installing SDK
 
@@ -108,7 +113,7 @@ implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'`}
 
 </Tabs>
 
-### Instant Messaging
+### Instant Messaging and Push Notifications
 
 <Tabs groupId="java-sdk-installation">
 <TabItem value="android" label="Android" default>
@@ -117,6 +122,13 @@ Use the following packages if you are building an Android app:
 
 <CodeBlock className="groovy">
   {`implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
+implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'`}
+</CodeBlock>
+
+To use mixpush:
+
+<CodeBlock className="groovy">
+  {`implementation 'cn.leancloud:mixpush-android:${sdkVersions.leancloud.java}'
 implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'`}
 </CodeBlock>
 
@@ -233,6 +245,8 @@ $ gradle clean assemble
 
 If you are working on an Android project, add the following lines to the `onCreate` method of the `Application` class:
 
+<Conditional brand="tds">
+
 ```java
 import cn.leancloud.LeanCloud;
 
@@ -247,6 +261,26 @@ public class MyLeanCloudApp extends Application {
 }
 ```
 
+</Conditional>
+
+<Conditional brand="leancloud">
+
+```java
+import cn.leancloud.LeanCloud;
+
+public class MyLeanCloudApp extends Application {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        // Do not call the initialize method of cn.leancloud.core.LeanCloud, or you will see errors like NetworkOnMainThread.
+        LeanCloud.initialize(this, "your-app-id", "your-app-key", "https://your_server_url");
+    }
+}
+```
+
+</Conditional>
+
 Then specify the permissions needed by the SDK and declare the `MyLeanCloudApp` class in `AndroidManifest.xml`:
 
 ```xml
@@ -254,6 +288,30 @@ Then specify the permissions needed by the SDK and declare the `MyLeanCloudApp` 
 <uses-permission android:name="android.permission.INTERNET"/>
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 <!--  Basic modules END -->
+
+<application
+  …
+  android:name=".MyLeanCloudApp" >
+
+  <!-- Instant Messaging and Push Notifications START -->
+  <!-- Both Instant Messaging and Push Notifications require PushService -->
+  <service android:name="cn.leancloud.push.PushService"/>
+  <receiver android:name="cn.leancloud.push.LCBroadcastReceiver">
+    <intent-filter>
+      <action android:name="android.intent.action.BOOT_COMPLETED"/>
+      <action android:name="android.intent.action.USER_PRESENT"/>
+      <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+    </intent-filter>
+  </receiver>
+  <!-- Instant Messaging and Push Notifications END -->
+</application>
+```
+
+Note: If you’re using Instant Messaging without Push Notifications, you can set the `LCIMOptions#disableAutoLogin4Push` when initializing the SDK so that it will take less time for the users to log in:
+
+```java
+// Call after LeanCloud#initialize to disable the automatic login request for Push Notifications
+LCIMOptions.getGlobalOptions().setDisableAutoLogin4Push(true);
 ```
 
 #### A Safer Way to Initialize the SDK for the Client
@@ -278,11 +336,24 @@ public class MyLeanCloudApp extends Application {
 
 If you are working on a Java project, add the following lines to the beginning of your code;
 
+<Conditional brand="tds">
+
 ```java
 import cn.leancloud.core.LeanCloud;
 
 LeanCloud.initialize("your-client-id", "your-client-token", "https://your_server_url");
 ```
+
+</Conditional>
+
+<Conditional brand="leancloud">
+
+```java
+import cn.leancloud.core.LeanCloud;
+LeanCloud.initialize("your-app-id", "your-app-key", "https://your_server_url");
+```
+
+</Conditional>
 
 Keep in mind that if you are using the SDK within Cloud Engine, you do not need to set the `serverUrl`.
 If you are initializing your project with our boilerplate, you will see that the `serverUrl` is not provided.
@@ -348,7 +419,7 @@ testObject.saveInBackground().blockingSubscribe();
 
 Save and run your program.
 
-Then go to **Developer Center > Your game > Game Services > Cloud Services > Data Storage > Data > `TestObject`**. If you see a row with its `words` column being `Hello world!`, it means that you have correctly installed the SDK.
+Then go to **<Path to="storage" /> > Data > `TestObject`**. If you see a row with its `words` column being `Hello world!`, it means that you have correctly installed the SDK.
 
 See [Debugging](#Debugging) if you’re not seeing the content.
 
