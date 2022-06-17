@@ -4,6 +4,9 @@ slug: /sdk/storage/guide/security/
 sidebar_position: 10
 ---
 
+import { Conditional } from "/src/docComponents/conditional";
+import Path from "/src/docComponents/path";
+
 As a secure serverless platform you can count on, TDS takes data security seriously.
 All API requests sent to TDS are encrypted by SSL and strictly verified for authentication and authorization.
 
@@ -61,12 +64,12 @@ You can assign each permission to different users:
 Here is an example: if we have an app that allows users to make posts anonymously, but only those reviewed by the admin can be publicly displayed, we can create two tables for the purpose. The first table stores all the unreviewed posts with its `create` permission given to all users. The second table stores reviewed posts with its `create` permission given to admins only.
 
 After a class has been created, you can still modify its permission settings.
-To do so, simply go to **Developer Center > Your Game > Game Services > Cloud Services > Data Storage > Data**, select the class, and click the **Permission** tab.
+To do so, simply go to **<Path to="storage" /> > Data**, select the class, and click the **Permission** tab.
 
 ### Field
 
 You can also configure the access permissions of each field.
-To do so, go to **Developer Center > Your Game > Game Services > Cloud Services > Data Storage > Data**, select a class, click the dropdown arrow of a field, and select **Edit**.
+To do so, go to **<Path to="storage" /> > Data**, select a class, click the dropdown arrow of a field, and select **Edit**.
 
 1. **Read only**: This option determines whether the client side is allowed to update this field.
 2. **Hide from clients**: This option determines whether this field is included in the result returned to the client side. For example, a pseudo-anonymous application may still store the author of each post, but it is invisible to the client side.
@@ -81,16 +84,59 @@ Please refer to [The ACL Guide](https://docs.leancloud.app/acl-guide.html) for d
 
 ## Security Settings
 
-You can turn on/off LiveQuery by going to **Developer Center > Your Game > Game Services > Cloud Services > Data Storage > Settings > Security**.
+<Conditional brand="leancloud">
 
-For security reasons, you man only want your app to send push notifications to users from the server side.
-There is an option under **Developer Center > Your Game > Game Services > Cloud Services > Push Notification > Settings** called **Prevent clients from sending push notifications**.
-When this option is enabled, you can only send push notifications by accessing the REST API with the MasterKey or by going to **Developer Center > Your Game > Game Services > Cloud Services > Push Notification > Send notifications**.
+You can configure security settings on **Dashboard > Settings > Security**. By turning off the services you don’t use, you can prevent the resources in your app from being abused by those who have stolen your AppId and AppKey.
 
-You can disallow clients to create classes by going to **Developer Center > Your Game > Game Services > Cloud Services > Data Storage > Settings > Security** and enabling **Disallow clients to create classes**. If you prefer to design the data structure of your application beforehand, it is recommended that you tick this option and create all the classes needed on the dashboard. If you prefer to dive in directly and refine the data structure during the development of your application’s prototype, it is recommended that you do not tick this option during the initial development stage, and tick this option before deploying your application to production.
+You can find the switches of some sub-services on the corresponding settings pages. For example:
 
-There is an option under **Developer Center > Your Game > Game Services > Cloud Services > Data Storage > Settings > Queries** called **Check ACL when querying included Pointer data**. This option is enabled by default. It is recommended that all applications keep this option enabled.
+</Conditional>
 
-There are some user-related security settings under **Developer Center > Your Game > Game Services > Cloud Services > TDS Authentication > Settings**. Here you can choose whether to require a user to provide their old password when setting a new password, whether to log out a user when their password is updated, and whether to validate the access token when a user logs in with a third-party account.
+You can turn on/off LiveQuery by going to **<Path to="storage" /> > Settings > Security**.
 
-You can specify the types of files users can upload by going to **Developer Center > Your Game > Game Services > Cloud Services > Data Storage > Files > Settings**.
+For security reasons, you man only want your app to send push notifications to users from the server side. There is an option under **<Path to="push" /> > Settings** called **Prevent clients from sending push notifications**. When this option is enabled, you can only send push notifications by accessing the REST API with the MasterKey or by going to **<Path to="push" /> > Send notifications**.
+
+<Conditional brand="leancloud">
+
+**Dashboard > SMS > Settings > Enable SMS verification code**: When this option is disabled, you can only invoke `requestSmsCode` with MasterKey. Be aware that user-related short messages are not controlled by this option. When this option is disabled, the client-side can still invoke SMS interfaces related to users.
+
+</Conditional>
+
+You can disallow clients to create classes by going to **<Path to="storage" /> > Settings > Security** and enabling **Disallow clients to create classes**. If you prefer to design the data structure of your application beforehand, it is recommended that you tick this option and create all the classes needed on the dashboard. If you prefer to dive in directly and refine the data structure during the development of your application’s prototype, it is recommended that you do not tick this option during the initial development stage, and tick this option before deploying your application to production.
+
+There is an option under **<Path to="storage" /> > Settings > Queries** called **Check ACL when querying included Pointer data**. This option is enabled by default. It is recommended that all applications keep this option enabled.
+
+There are some user-related security settings under **<Path to="auth" /> > Settings**. Here you can choose whether to require a user to provide their old password when setting a new password, whether to log out a user when their password is updated, and whether to validate the access token when a user logs in with a third-party account.
+
+You can specify the types of files users can upload by going to **<Path to="storage" /> > Files > Settings**.
+
+<Conditional brand="leancloud">
+
+#### Web Secure Domains
+
+Web secure domains can be used to restrict request origins, preventing others from abusing the resources of your servers.
+
+The web secure domains should be configured following the domain security policies of the browsers. Subdomains need to be listed explicitly and wildcards are not supported. Protocols and port numbers must match exactly (you can omit the port number if the default one is used; for example, `https://example.com` is equivalent to `https://example.com:443`).
+
+Note that Cloud Functions are not restricted by web secure domains. Also, for the convenience of debugging, requests from localhost are always permitted.
+
+Web secure domains setting is meant to prevent attackers from deploying client-side code to abuse the resources of your application. It cannot prevent attackers from forging data since attackers can still access your application by manipulating their host configuration file.
+
+#### Operation Logs
+
+**Dashboard > Settings > Logs** displays important operations by the creator and collaborators of the application, like data deletions (including the operator, IP, and time). You can use these logs to audit operations.
+
+#### Automatic Backup and Restore
+
+The data of applications with Business Plans will be backed up daily and retained for 7 days. You can restore the data on **Dashboard > Data Storage > Import/export > Data recovery**, where you can refine the scope of restoration to classes or objects specified. This feature is only available to apps with Business Plans.
+
+Notice that:
+
+- You cannot restore data for applications with Developer Plans.
+- Files cannot be restored once they are deleted.
+- The restoration process will only restore the objects that have been deleted. To restore the objects that have been modified, please make a backup of the existing objects, delete them from the cloud, and then start the restoration process.
+- To restore a deleted class, please first create an empty class with the same name and add the corresponding columns to it.
+
+You can also [export your application data yourself](https://docs.leancloud.app/rest_api.html#hash-909860443) and make a copy of them to your servers (or upload them to third-party services). This feature is available to all applications.
+
+</Conditional>
