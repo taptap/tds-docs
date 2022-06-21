@@ -5,6 +5,8 @@ sidebar_position: 1
 ---
 
 import MultiLang from "/src/docComponents/MultiLang";
+import { Conditional } from "/src/docComponents/conditional";
+import Path from "/src/docComponents/path";
 
 在应用内使用全文搜索是一个很常见的需求。例如一个阅读类的应用，里面有很多有价值的文章，开发者会提供一个搜索框，让用户键入关键字后就能查找到应用内相关的文章，并按照相关度排序，就好像我们打开浏览器用 Google 搜索关键字一样。
 虽然使用正则查询也可以实现全文搜索功能，但数据量较大的时候正则查询会有性能问题，因此我们提供了专门的全文搜索功能。
@@ -15,10 +17,10 @@ import MultiLang from "/src/docComponents/MultiLang";
 
 **请注意，启用了搜索的 Class 数据，其搜索结果仍然遵循 ACL。如果你为 Class 里的 Object 设定了合理的 ACL，那么搜索结果也将遵循这些 ACL 值，保护你的数据安全。**
 
-你可以在**开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 全文搜索**为 Class 启用搜索，点击「添加搜索 Class」：
+你可以在 **<Path to="storage" /> > 全文搜索** 为 Class 启用搜索，点击「添加搜索 Class」：
 
-- **Class**：选择需要启用搜索的 Class。最多允许 10 个 Class 启用全文搜索。
-- **开放的列**：你可以选择将哪些字段加入搜索索引。默认情况下，`objectId`、`createdAt`、`updatedAt` 三个字段将无条件加入开放字段列表。除了这三个字段外，每个 Class 最多允许索引 10 个字段。请仔细挑选要索引的字段。
+- **Class**：选择需要启用搜索的 Class。<Conditional brand="leancloud">开发版应用最多允许 5 个 Class 启用全文搜索，商用版应用</Conditional>最多允许 10 个 Class 启用全文搜索。
+- **开放的列**：你可以选择将哪些字段加入搜索索引。默认情况下，`objectId`、`createdAt`、`updatedAt` 三个字段将无条件加入开放字段列表。除了这三个字段外，<Conditional brand="leancloud">开发版应用每个 Class 最多允许索引 5 个字段，商用版应用</Conditional>每个 Class 最多允许索引 10 个字段。请仔细挑选要索引的字段。
 
 **如果一个 Class 启用了全文搜索，但是超过两周没有任何搜索调用，我们将自动禁用该 Class 的搜索功能。**
 
@@ -27,9 +29,9 @@ import MultiLang from "/src/docComponents/MultiLang";
 我们提供了 [全文搜索的 REST API 接口](/sdk/storage/guide/fulltext-search-rest/)。
 SDK 封装了这一接口。
 
-假设你对 GameScore 类[启用了全文搜索](#为-class-启用搜索)，你就可以尝试传入关键字来搜索：
+假设你对 `GameScore` 类 [启用了全文搜索](#为-class-启用搜索)，你就可以尝试传入关键字来搜索：
 
-<MultiLang>
+<MultiLang kind="fulltext">
 
 ```cs
 LCSearchQuery<GameScore> query = new LCSearchQuery<GameScore>("GameScore");
@@ -146,7 +148,7 @@ sid 在 5 分钟内有效。
 
 复杂排序可以使用 `SearchSortBuilder`，例如，假设 `scores` 是由分数组成的数组，现在需要根据分数的平均分倒序排序，并且没有分数的排在最后：
 
-<MultiLang>
+<MultiLang kind="fulltext">
 
 ```cs
 LCSearchSortBuilder sortBuilder = new LCSearchSortBuilder();
@@ -182,7 +184,7 @@ searchQuery.sortBy(
 
 更多 API 请参考 SDK API 文档：
 
-<MultiLang>
+<MultiLang kind="fulltext">
 
 <>
 
@@ -221,7 +223,7 @@ searchQuery.sortBy(
 
 ## 自定义分词
 
-默认情况下， String 类型的字段都将被自动执行分词处理，我们使用的分词组件是 [mmseg](https://github.com/medcl/elasticsearch-analysis-mmseg)，词库来自搜狗。但是很多用户由于行业或者专业的特殊性，一般都有自定义词库的需求，因此我们提供了自定义词库的功能。应用创建者可以通过 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 全文搜索 > 自定义词库** 上传词库文件。
+默认情况下， String 类型的字段都将被自动执行分词处理，我们使用的分词组件是 [mmseg](https://github.com/medcl/elasticsearch-analysis-mmseg)，词库来自搜狗。但是很多用户由于行业或者专业的特殊性，一般都有自定义词库的需求，因此我们提供了自定义词库的功能。应用创建者可以通过 **<Path to="storage" /> > 全文搜索 > 自定义词库** 上传词库文件。
 
 词库文件要求为 UTF-8 编码，每个词单独一行，文件大小不能超过 512 K，例如：
 

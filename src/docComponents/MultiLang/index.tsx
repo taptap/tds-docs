@@ -31,6 +31,20 @@ const CONFIGS: {
       { label: "Go", value: "go" },
     ],
   },
+  fulltext: {
+    leancloud: [
+      { label: ".NET", value: "dotnet" },
+      { label: "Java", value: "java" },
+      { label: "Objective-C", value: "objc" },
+      { label: "Flutter", value: "flutter" },
+      { label: "JavaScript", value: "js" },
+    ],
+    tds: [
+      { label: "Unity", value: "unity" },
+      { label: "Android", value: "android" },
+      { label: "iOS", value: "ios" },
+    ],
+  },
   default: {
     leancloud: [
       { label: ".NET", value: "dotnet" },

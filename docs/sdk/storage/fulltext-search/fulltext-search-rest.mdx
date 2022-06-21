@@ -13,7 +13,7 @@ sidebar_position: 2
 | /1.1/search/analyze | GET  | 分词结果查询            |
 
 在调用全文搜索的 REST API 接口前，需要首先为相应的 Class 启用搜索。
-另外也请参考[数据存储 REST API 使用详解](/sdk/storage/guide/rest/)中关于 API Base URL、请求格式、响应格式的说明，以及[全文搜索指南](/sdk/storage/guide/fulltext-search/)的《自定义分词》章节。
+另外也请参考[数据存储 REST API 使用详解](/sdk/storage/guide/rest/)中关于 API Base URL、请求格式、响应格式的说明，以及《全文搜索指南》的[《自定义分词》](/sdk/storage/guide/fulltext-search/#自定义分词)章节。
 
 ## 条件查询
 
@@ -52,11 +52,11 @@ curl -X GET \
 
 | 参数         | 约束 | 说明                                                                                                       |
 | ------------ | ---- | ---------------------------------------------------------------------------------------------------------- |
-| `q`          | 必须 | 查询文本，支持 elasticsearch 的 query string 语法。参见 [q 查询语法](#q-查询语法)。                        |
-| `skip`       | 可选 | 跳过的文档数目，默认为 0                                                                                   |
-| `limit`      | 可选 | 返回集合大小，默认 100，最大 1000                                                                          |
-| `sid`        | 可选 | 之前查询结果中返回的 sid 值，用于分页，对应于 elasticsearch 中的 [scroll id]。                             |
-| `fields`     | 可选 | 逗号隔开的字段列表，查询的字段列表                                                                         |
+| `q`          | 必须 | 查询文本，支持 Elasticsearch 的 query string 语法。参见 [q 查询语法](#q-查询语法)。                        |
+| `skip`       | 可选 | 跳过的文档数目，默认为 0。                                                                                 |
+| `limit`      | 可选 | 返回集合大小，默认 100，最大 1000。                                                                        |
+| `sid`        | 可选 | 之前查询结果中返回的 sid 值，用于分页，对应于 Elasticsearch 中的 [scroll id]。                             |
+| `fields`     | 可选 | 逗号隔开的字段列表，查询的字段列表。                                                                       |
 | `highlights` | 可选 | 高亮字段，可以是通配符 `*`，也可以是字段列表（逗号隔开的字符串）。                                         |
 | `clazz`      | 可选 | 类名，如果没有指定或者为空字符串，则搜索所有启用了全文搜索的 class。                                       |
 | `include`    | 可选 | 关联查询内联的 Pointer 字段列表，逗号隔开，形如 `user,comment` 的字符串。**仅支持 include Pointer 类型**。 |
@@ -71,7 +71,7 @@ curl -X GET \
 - `hits`：符合查询条件的文档总数
 - `sid`：标记本次查询结果，下次查询继续传入这个 sid 用于查找后续的数据，用来支持翻页查询。
 
-返回结果 results 列表里是一个一个的对象，字段是你在全文搜索设置里启用的字段列表，并且有三个特殊字段：
+返回结果 `results` 列表里是一个一个的对象，字段是你在全文搜索设置里启用的字段列表，并且有三个特殊字段：
 
 - `_app_url`：全文搜索结果在网站上的链接。
 - `_deeplink`：全文搜索的程序调用 URL，也就是 deeplink。
@@ -90,9 +90,9 @@ curl -X GET \
 
 ### q 查询语法
 
-q 参数遵循 elasticsearch 的 [query string 语法](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/query-dsl-query-string-query.html#query-string-syntax)。建议详细阅读这个文档。这里简单做个举例说明。
+q 参数遵循 Elasticsearch 的 [query string 语法](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/query-dsl-query-string-query.html#query-string-syntax)。建议详细阅读这个文档。这里简单做个举例说明。
 
-如果你非常熟悉 elasticsearch 的 query string 语法，那么可以跳至[地理位置信息查询](#地理位置信息查询)一节（地理位置查询是我们在 elasticsearch 上添加的扩展功能）。
+如果你非常熟悉 Elasticsearch 的 query string 语法，那么可以跳至[地理位置信息查询](#地理位置信息查询)一节（地理位置查询是我们在 Elasticsearch 上添加的扩展功能）。
 
 查询的关键字保留字符包括：`+ - = && || > < ! ( ) { } [ ] ^ " ~ * ? : \ /`，当出现这些字符的时候，请对这些保留字符做 URL Escape 转义。
 
@@ -275,9 +275,9 @@ curl -X GET \
 | `min_term_freq` | 可选 | **文档中一个词语至少出现次数，小于这个值的词将被忽略，默认是 2**，如果返回文档数目过少，可以尝试调低此值。     |
 | `min_doc_freq`  | 可选 | **词语至少出现的文档个数，少于这个值的词将被忽略，默认值为 5**，同样，如果返回文档数目过少，可以尝试调低此值。 |
 | `max_doc_freq`  | 可选 | 词语最多出现的文档个数，超过这个值的词将被忽略，防止一些无意义的热频词干扰结果，默认无限制。                   |
-| `skip`          | 可选 | 跳过的文档数目，默认为 0                                                                                       |
-| `limit`         | 可选 | 返回集合大小，默认 100，最大 1000                                                                              |
-| `fields`        | 可选 | 相似搜索匹配的字段列表，用逗号隔开，默认为所有索引字段 `_all`                                                  |
+| `skip`          | 可选 | 跳过的文档数目，默认为 0。                                                                                     |
+| `limit`         | 可选 | 返回集合大小，默认 100，最大 1000。                                                                            |
+| `fields`        | 可选 | 相似搜索匹配的字段列表，用逗号隔开，默认为所有索引字段 `_all`。                                                |
 | `include`       | 可选 | 关联查询内联的 Pointer 字段列表，逗号隔开，形如 `user,comment` 的字符串。**仅支持 include Pointer 类型**。     |
 
 更多内容参考 [Elasticsearch 文档](https://www.elastic.co/guide/en/elasticsearch/reference/7.4/query-dsl-mlt-query.html)。
