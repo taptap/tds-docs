@@ -136,29 +136,27 @@ export const getEntries = (brand: string, region: string): Entry[] => {
     },
   ];
 
-  if (brand === "leancloud") {
-    return ENTRIES_LEANCLOUD;
-  } else {
-    return ENTRIES_TDS.map((entry) => ({
-      title: translate({
-        message: entry.title,
-        id: `tds-home-${entry.title}`,
+  const entries = brand === "leancloud" ? ENTRIES_LEANCLOUD : ENTRIES_TDS;
+
+  return entries.map((entry) => ({
+    title: translate({
+      message: entry.title,
+      id: `tds-home-${entry.title}`,
+    }),
+    ...(entry.description
+      ? {
+          description: translate({
+            message: entry.description,
+            id: `tds-home-${entry.description}`,
+          }),
+        }
+      : {}),
+    links: entry.links.map((link) => ({
+      ...link,
+      label: translate({
+        message: link.label,
+        id: `tds-home-link-${link.label}`,
       }),
-      ...(entry.description
-        ? {
-            description: translate({
-              message: entry.description,
-              id: `tds-home-${entry.description}`,
-            }),
-          }
-        : {}),
-      links: entry.links.map((link) => ({
-        ...link,
-        label: translate({
-          message: link.label,
-          id: `tds-home-link-${link.label}`,
-        }),
-      })),
-    }));
-  }
+    })),
+  }));
 };
