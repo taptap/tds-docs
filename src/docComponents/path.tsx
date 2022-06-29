@@ -47,6 +47,7 @@ const PATH_TO_CLOUD_SERVICES: {
   },
   leancloud: {
     "zh-Hans": ["云服务控制台"],
+    en: ["Dashboard"],
   },
 };
 
