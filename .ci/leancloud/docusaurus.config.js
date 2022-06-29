@@ -68,6 +68,10 @@ const config = {
             position: "right",
             activeBaseRegex: "^/(?!.+)",
           },
+          {
+            type: "localeDropdown",
+            position: "right",
+          },
         ],
       },
       prism: {

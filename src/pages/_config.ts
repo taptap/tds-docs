@@ -100,7 +100,6 @@ export const getEntries = (brand: string, region: string): Entry[] => {
   const ENTRIES_LEANCLOUD: Entry[] = [
     {
       title: "域名",
-      description: "域名绑定与备案",
       links: [
         {
           label: "查看更多",
@@ -109,8 +108,25 @@ export const getEntries = (brand: string, region: string): Entry[] => {
       ],
     },
     {
+      title: "内建账户",
+      links: [
+        {
+          label: "查看更多",
+          to: "/sdk/authentication/guide",
+        },
+      ],
+    },
+    {
+      title: "数据存储",
+      links: [
+        {
+          label: "查看更多",
+          to: "/sdk/storage/guide/setup-dotnet",
+        },
+      ],
+    },
+    {
       title: "云引擎",
-      description: "托管 Web 应用或后端程序",
       links: [
         {
           label: "查看更多",
