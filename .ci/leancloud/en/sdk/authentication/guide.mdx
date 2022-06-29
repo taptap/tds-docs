@@ -1,0 +1,3041 @@
+---
+title: Authentication Guide
+sidebar_label: Guide
+sidebar_position: 2
+---
+
+import MultiLang from "/src/docComponents/MultiLang";
+import { Conditional } from "/src/docComponents/conditional";
+
+At the core of many apps, there is a notion of user accounts that allows users to access their information in a secure manner. We provide a specialized user class called `LCUser` which automatically handles much of the functionality required for user account management in your app.
+
+`LCUser` is a subclass of `LCObject`. Therefore, all the methods that work for `LCObject` also work for `LCUser`. The only difference is that `LCUser` has some additional features specific to user accounts.
+
+## User Properties
+
+`LCUser` offers the following fields that `LCObject` does not have:
+
+- `username`: The username of the user.
+- `password`: The password of the user.
+- `email`: The email address of the user.
+- `emailVerified`: Whether the user has verified the email address or not.
+- `mobilePhoneNumber`: The mobile phone number of the user.
+- `mobilePhoneVerified`: Whether the user has verified the mobile phone number or not.
+
+We'll go through each of these in detail as we run through the various use cases for users.
+
+## Signing up
+
+When a user first opens your app, you may want them to sign up for an account. The following code shows a typical sign-up process with username and password:
+
+<MultiLang>
+
+<>
+
+```cs
+// Create an instance
+LCUser user = new LCUser();
+
+// Same as user["username"] = "Tom";
+user.Username = "Tom";
+user.Password = "cat!@#123";
+
+// Optional
+user.Email = "tom@xd.com";
+user.Mobile = "+15559463664";
+
+// Other fields can be set in the same way as LCObject
+user["gender"] = "secret";
+await user.SignUp();
+```
+
+A new `LCUser` should always be created using `SignUp` rather than `Save`. Subsequent updates to a user can be done with `Save`.
+
+</>
+
+<>
+
+```java
+// Create an instance
+LCUser user = new LCUser();
+
+// Same as user.put("username", "Tom")
+user.setUsername("Tom");
+user.setPassword("cat!@#123");
+
+// Optional
+user.setEmail("tom@xd.com");
+user.setMobilePhoneNumber("+15559463664");
+
+// Other fields can be set in the same way as LCObject
+user.put("gender", "secret");
+
+user.signUpInBackground().subscribe(new Observer<LCUser>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCUser user) {
+        // Sign-up completed
+        System.out.println("User created. objectId: " + user.getObjectId());
+    }
+    public void onError(Throwable throwable) {
+        // Sign-up failed (often because the username is already taken)
+    }
+    public void onComplete() {}
+});
+```
+
+A new `LCUser` should always be created using `signUpInBackground` rather than `saveInBackground`. Subsequent updates to a user can be done with `saveInBackground`.
+
+</>
+
+<>
+
+```objc
+// Create an instance
+LCUser *user = [LCUser user];
+
+// Same as [user setObject:@"Tom" forKey:@"username"]
+user.username = @"Tom";
+user.password = @"cat!@#123";
+
+// Optional
+user.email = @"tom@xd.com";
+user.mobilePhoneNumber = @"+15559463664";
+
+// Other fields can be set in the same way as LCObject
+[user setObject:@"secret" forKey:@"gender"];
+
+[user signUpInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        // Sign-up completed
+        NSLog(@"User created. objectId: %@", user.objectId);
+    } else {
+        // Sign-up failed (often because the username is already taken)
+    }
+}];
+```
+
+A new `LCUser` should always be created using `signUpInBackground` rather than `saveInBackground`. Subsequent updates to a user can be done with `saveInBackground`.
+
+</>
+
+<>
+
+```swift
+do {
+    // Create an instance
+    let user = LCUser()
+
+    // Same as user.set("username", value: "Tom")
+    user.username = LCString("Tom")
+    user.password = LCString("cat!@#123")
+
+    // Optional
+    user.email = LCString("tom@xd.com")
+    user.mobilePhoneNumber = LCString("+15559463664")
+
+    // Other fields can be set in the same way as LCObject
+    try user.set("gender", value: "secret")
+
+    _ = user.signUp { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
+
+A new `LCUser` should always be created using `signUp` rather than `save`. Subsequent updates to a user can be done with `save`.
+
+</>
+
+<>
+
+```dart
+// Create an instance
+LCUser user = LCUser();
+
+// Same as user['username'] = 'Tom';
+user.username = 'Tom';
+user.password = 'cat!@#123';
+
+// Optional
+user.email = 'tom@xd.com';
+user.mobile = '+15559463664';
+
+// Other fields can be set in the same way as LCObject
+user['gender'] = 'secret';
+await user.signUp();
+```
+
+A new `LCUser` should always be created using `signUp` rather than `save`. Subsequent updates to a user can be done with `save`.
+
+</>
+
+<>
+
+```js
+// Create an instance
+const user = new AV.User();
+
+// Same as user.set('username', 'Tom')
+user.setUsername("Tom");
+user.setPassword("cat!@#123");
+
+// Optional
+user.setEmail("tom@xd.com");
+user.setMobilePhoneNumber("+15559463664");
+
+// Other fields can be set in the same way as AV.Object
+user.set("gender", "secret");
+
+user.signUp().then(
+  (user) => {
+    // Sign-up completed
+    console.log(`User created. objectId: ${user.id}`);
+  },
+  (error) => {
+    // Sign-up failed (often because the username is already taken)
+  }
+);
+```
+
+A new `AV.User` should always be created using `signUp` rather than `save`. Subsequent updates to a user can be done with `save`.
+
+</>
+
+<>
+
+```python
+# Create an instance
+user = leancloud.User()
+
+# Same as user.set('username', 'Tom')
+user.set_username('Tom')
+user.set_password('cat!@#123')
+
+# Optional
+user.set_email('tom@xd.com')
+user.set_mobile_phone_number('+15559463664')
+
+# Other fields can be set in the same way as leancloud.Object
+user.set('gender', 'secret')
+
+user.sign_up()
+```
+
+A new `leancloud.User` should always be created using `sign_up` rather than `save`. Subsequent updates to a user can be done with `save`.
+
+</>
+
+<>
+
+```php
+// Create an instance
+$user = new User();
+
+// Same as $user->set("username", "Tom")
+$user->setUsername("Tom");
+$user->setPassword("cat!@#123");
+
+// Optional
+$user->setEmail("tom@xd.com");
+$user->setMobilePhoneNumber("+15559463664");
+
+// Other fields can be set in the same way as LeanObject
+$user->set("gender", "secret");
+
+$user->signUp();
+```
+
+A new `User` should always be created using `signUp` rather than `save`. Subsequent updates to a user can be done with `save`.
+
+</>
+
+```go
+// Create a user
+user, err := client.Users.SignUp("Tom", "cat!@#123")
+if err != nil {
+  panic(err)
+}
+
+// Set other properties
+if err := client.Users.ID(user.ID).Set("email", "tom@xd.com", leancloud.UseUser(user)); err != nil {
+  panic(err)
+}
+```
+
+</MultiLang>
+
+If the code returns the error `202`, it means that a user with the same `username` already exists and the client should prompt the user to try a different username. It is also required that each `email` or `mobilePhoneNumber` appears only once in the corresponding column. Otherwise, error `203` or `214` will occur. You may ask a user to sign up with an email address and make the `username` to be the same as the `email`. By doing so, the user can directly [reset their password with email](#resetting-passwords).
+
+When creating a user with username and password, the SDK sends the password to the cloud in plaintext through HTTPS and the password will be hashed once it arrives the cloud. The cloud has no restrictions on password length and complexity. We never store passwords in plaintext, nor will we ever transmit passwords back to the client in plaintext. Our hashing algorithm guarantees that the original password cannot be retrieved by [rainbow table](https://en.wikipedia.org/wiki/Rainbow_table) attack and even app developers themselves will not be able to see the password. Keep in mind that **the password should not be hashed by the client, or the [password reset function](#resetting-passwords) will not work**.
+
+### Signing up with Phones
+
+For a mobile app, it's also common to ask users to sign up with their phone numbers instead of usernames and passwords. There are two basic steps in it. First, ask the user to enter a phone number that can receive text messages. When the user clicks on the "Get Verification Code" button, call the following method to have a 6-digit verification code sent to the phone number the user just entered:
+
+<MultiLang>
+
+```cs
+await LCSMSClient.RequestSMSCode("+15559463664");
+```
+
+```java
+LCSMSOption option = new LCSMSOption();
+option.setSignatureName("sign_name"); // Set the signature name
+LCSMS.requestSMSCodeInBackground("+15559463664", option).subscribe(new Observer<LCNull>() {
+    @Override
+    public void onSubscribe(Disposable disposable) {
+    }
+    @Override
+    public void onNext(LCNull avNull) {
+        Log.d("TAG","Result: succeed to request SMSCode.");
+    }
+    @Override
+    public void onError(Throwable throwable) {
+        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage()）;
+    }
+    @Override
+    public void onComplete() {
+    }
+});
+```
+
+```objc
+LCShortMessageRequestOptions *options = [[LCShortMessageRequestOptions alloc] init];
+options.templateName = @"template_name"; // The template name configured on the dashboard
+options.signatureName = @"sign_name"; // The signature name configured on the dashboard
+[LCSMS requestShortMessageForPhoneNumber:@"+15559463664" options:options callback:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+        /* Succeeded */
+    } else {
+        /* Failed */
+    }
+}];
+```
+
+```swift
+// templateName is the template name and signatureName is the signature name. You can find them on Dashboard > SMS > Settings.
+_ = LCSMSClient.requestShortMessage(mobilePhoneNumber: "+15559463664", templateName: "template_name", signatureName: "sign_name") { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+```dart
+await LCSMSClient.requestSMSCode('+15559463664');
+```
+
+```js
+AV.Cloud.requestSmsCode("+15559463664");
+```
+
+```python
+leancloud.cloud.request_sms_code('+15559463664')
+```
+
+```php
+SMS::requestSmsCode("+15559463664");
+```
+
+```go
+// Not supported yet
+```
+
+</MultiLang>
+
+After the user enters the verification code, call the following method to finish signing up:
+
+<MultiLang>
+
+```cs
+await LCUser.SignUpOrLoginByMobilePhone("+15559463664", "123456");
+```
+
+```java
+LCUser.signUpOrLoginByMobilePhoneInBackground("+15559463664", "123456").subscribe(new Observer<LCUser>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCUser user) {
+        // Sign-up completed
+        System.out.println("User created. objectId: " + user.getObjectId());
+    }
+    public void onError(Throwable throwable) {
+        // The verification code is incorrect
+    }
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser signUpOrLoginWithMobilePhoneNumberInBackground:@"+15559463664" smsCode:@"123456" block:^(LCUser *user, NSError *error) {
+    if (user != nil) {
+        // Sign-up completed
+        NSLog(@"User created. objectId: %@", user.objectId);
+    } else {
+        // The verification code is incorrect
+    }
+}];
+```
+
+```swift
+_ = LCUser.signUpOrLogIn(mobilePhoneNumber: "+15559463664", verificationCode: "123456", completion: { (result) in
+    switch result {
+    case .success(object: let user):
+        print(user)
+    case .failure(error: let error):
+        print(error)
+    }
+})
+```
+
+```dart
+ await LCUser.signUpOrLoginByMobilePhone('+15559463664', '123456');
+```
+
+```js
+AV.User.signUpOrlogInWithMobilePhone("+15559463664", "123456").then(
+  (user) => {
+    // Sign-up completed
+    console.log(`User created. objectId: ${user.id}`);
+  },
+  (error) => {
+    // The verification code is incorrect
+  }
+);
+```
+
+```python
+user = leancloud.User.signup_or_login_with_mobile_phone('+15559463664', '123456')
+```
+
+```php
+User::signUpOrLoginByMobilePhone("+15559463664", "123456");
+```
+
+```go
+user, err := client.Users.SignUpByMobilePhone("+15559463664", "123456")
+if err != nil {
+  panic(err)
+}
+```
+
+</MultiLang>
+
+The `username` will be the same as `mobilePhoneNumber` and a `password` will be generated by the cloud automatically. If you wish to let the user set their own password, you can let them fill in a password together with their mobile phone number, and then follow the process of registering with username and password described in the previous section, submitting the user's mobile phone number as the value of both the `username` and the `mobilePhoneNumber` fields. If you wish, you can also check the following options on "Dashboard > Authentication > Settings": "Do not allow users with unverified phone numbers to log in" and/or "Allow users with verified phone numbers to login with SMS".
+
+### Phone Number Format
+
+A phone number should have a leading plus sign (`+`) immediately followed by the country code and the phone number without any dashes, spaces, or other non-numeric characters. For instance, `+8619201680101` is a valid China number (`86` is the country code) and `+15559463664` is a valid U.S. or Canada number (`1` is the country code).
+
+For a list of supported countries and regions, please refer to the [Pricing](https://leancloud.app/pricing/) page on our website.
+
+## Logging in
+
+The code below logs a user in with their username and password:
+
+<MultiLang>
+
+```cs
+try {
+  // Logged in successfully
+  LCUser user = await LCUser.Login("Tom", "cat!@#123");
+} catch (LCException e) {
+  // Failed to log in (the password may be incorrect)
+  print($"{e.code} : {e.message}");
+}
+```
+
+```java
+LCUser.logIn("Tom", "cat!@#123").subscribe(new Observer<LCUser>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCUser user) {
+        // Logged in successfully
+    }
+    public void onError(Throwable throwable) {
+        // Failed to log in (the password may be incorrect)
+    }
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser logInWithUsernameInBackground:@"Tom" password:@"cat!@#123" block:^(LCUser *user, NSError *error) {
+    if (user != nil) {
+        // Logged in successfully
+    } else {
+        // Failed to log in (the password may be incorrect)
+    }
+}];
+```
+
+```swift
+_ = LCUser.logIn(username: "Tom", password: "cat!@#123") { result in
+    switch result {
+    case .success(object: let user):
+        print(user)
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+```dart
+try {
+  // Logged in successfully
+  LCUser user = await LCUser.login('Tom', 'cat!@#123');
+} on LCException catch (e) {
+  // Failed to log in (the password may be incorrect)
+  print('${e.code} : ${e.message}');
+}
+```
+
+```js
+AV.User.logIn("Tom", "cat!@#123").then(
+  (user) => {
+    // Logged in successfully
+  },
+  (error) => {
+    // Failed to log in (the password may be incorrect)
+  }
+);
+```
+
+```python
+user = leancloud.User()
+user.login(username='Tom', password='cat!@#123')
+```
+
+```php
+User::logIn("Tom", "cat!@#123");
+```
+
+```go
+user, err := client.Users.LogIn("Tom", "cat!@#123")
+if err != nil {
+  panic(err)
+}
+```
+
+</MultiLang>
+
+### Logging in with Emails
+
+The code below logs a user in with their email and password:
+
+<MultiLang>
+
+```cs
+try {
+  // Logged in successfully
+  LCUser user = await LCUser.LoginByEmail("tom@xd.com", "cat!@#123");
+} catch (LCException e) {
+  // Failed to log in (the password may be incorrect)
+  print($"{e.code} : {e.message}");
+}
+```
+
+```java
+LCUser.loginByEmail("tom@xd.com", "cat!@#123").subscribe(new Observer<LCUser>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCUser user) {
+        // Logged in successfully
+    }
+    public void onError(Throwable throwable) {
+        // Failed to log in (the password may be incorrect)
+    }
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser loginWithEmail:@"tom@xd.com" password:@"cat!@#123" block:^(LCUser *user, NSError *error) {
+    if (user != nil) {
+        // Logged in successfully
+    } else {
+        // Failed to log in (the password may be incorrect)
+    }
+}];
+```
+
+```swift
+_ = LCUser.logIn(email: "tom@xd.com", password: "cat!@#123") { result in
+    switch result {
+    case .success(object: let user):
+        print(user)
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+```dart
+try {
+  // Logged in successfully
+  LCUser user = await LCUser.loginByEmail('tom@xd.com', 'cat!@#123');
+} on LCException catch (e) {
+  // Failed to log in (the password may be incorrect)
+  print('${e.code} : ${e.message}');
+}
+```
+
+```js
+AV.User.loginWithEmail("tom@xd.com", "cat!@#123").then(
+  (user) => {
+    // Logged in successfully
+  },
+  (error) => {
+    // Failed to log in (the password may be incorrect)
+  }
+);
+```
+
+```python
+user = leancloud.User()
+user.login(email='tom@xd.com', password='cat!@#123')
+```
+
+```php
+User::logInWithEmail("tom@xd.com", "cat!@#123");
+```
+
+```go
+user, err := client.LoginByEmail("tom@xd.com", "cat!@#123")
+if err != nil {
+  panic(err)
+}
+
+fmt.Println(user)
+```
+
+</MultiLang>
+
+### Logging in with Phones
+
+If you are allowing users to sign up with their phone numbers, you can also let them log in with either a password or a verification code sent via text message. The code below logs a user in with their phone number and password:
+
+<MultiLang>
+
+```cs
+try {
+  // Logged in successfully
+  LCUser user = await LCUser.LoginByMobilePhoneNumber("+15559463664", "cat!@#123");
+} catch (LCException e) {
+  // Failed to log in (the password may be incorrect)
+  print($"{e.code} : {e.message}");
+}
+```
+
+```java
+LCUser.loginByMobilePhoneNumber("+15559463664", "cat!@#123").subscribe(new Observer<LCUser>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCUser user) {
+        // Logged in successfully
+    }
+    public void onError(Throwable throwable) {
+        // Failed to log in (the password may be incorrect)
+    }
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser logInWithMobilePhoneNumberInBackground:@"+15559463664" password:@"cat!@#123" block:^(LCUser *user, NSError *error) {
+    if (user != nil) {
+        // Logged in successfully
+    } else {
+        // Failed to log in (the password may be incorrect)
+    }
+}];
+```
+
+```swift
+_ = LCUser.logIn(mobilePhoneNumber: "+15559463664", password: "cat!@#123") { result in
+    switch result {
+    case .success(object: let user):
+        print(user)
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+```dart
+try {
+  // Logged in successfully
+  LCUser user = await LCUser.loginByMobilePhoneNumber('+15559463664', 'cat!@#123');
+} on LCException catch (e) {
+  // Failed to log in (the password may be incorrect)
+  print('${e.code} : ${e.message}');
+}
+```
+
+```js
+AV.User.logInWithMobilePhone("+15559463664", "cat!@#123").then(
+  (user) => {
+    // Logged in successfully
+  },
+  (error) => {
+    // Failed to log in (the password may be incorrect)
+  }
+);
+```
+
+```python
+user = leancloud.User.login_with_mobile_phone('+15559463664', 'cat!@#123')
+```
+
+```php
+User::logInWithMobilePhoneNumber("+15559463664", "cat!@#123");
+```
+
+```go
+user, err := client.LogInByMobilePhoneNumber("+15559463664", "cat!@#123")
+if err != nil {
+  panic(err)
+}
+
+fmt.Println(user)
+```
+
+</MultiLang>
+
+By default, a user can log in to their account as long as the phone number and the password they provided are correct even when the ownership of the phone hasn't been [verified](#verifying-phone-numbers). To make your app more secure, you can choose to allow only those who have their phones verified to log in. The option can be found on **Dashboard > Authentication > Settings**.
+
+You may also let a user in with a verification code sent to their phone, which is useful when the user forgets the password and does not want to reset it at the moment. Similar to the steps of [signing a user up with phone numbers](#signing-up-with-phones), ask the user to enter the phone number associated with the account, and call the following method once the user clicks on the "Get Verification Code" button:
+
+<MultiLang>
+
+```cs
+await LCUser.RequestLoginSMSCode("+15559463664");
+```
+
+```java
+LCUser.requestLoginSmsCodeInBackground("+15559463664").subscribe(new Observer<LCNull>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCNull null) {
+        // Succeeded
+    }
+    public void onError(Throwable throwable) {
+        // Failed
+    }
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser requestLoginSmsCode:@"+15559463664"];
+```
+
+```swift
+_ = LCUser.requestLoginVerificationCode(mobilePhoneNumber: "+15559463664") { result in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+```dart
+await LCUser.requestLoginSMSCode('+15559463664');
+```
+
+```js
+AV.User.requestLoginSmsCode("+15559463664");
+```
+
+```python
+leancloud.User.request_login_sms_code('+15559463664')
+```
+
+```php
+SMS::requestSmsCode("+15559463664");
+```
+
+```go
+if err := client.Users.RequestLoginSMSCode("+15559463664"); err != nil {
+    panic(err)
+}
+```
+
+</MultiLang>
+
+After the user enters the verification code, call the following method to finish logging in:
+
+<MultiLang>
+
+```cs
+try {
+  // Logged in successfully
+  await LCUser.SignUpOrLoginByMobilePhone("+15559463664", "123456");
+} catch (LCException e) {
+  // The verification code is incorrect
+  print($"{e.code} : {e.message}");
+}
+```
+
+```java
+LCUser.signUpOrLoginByMobilePhoneInBackground("+15559463664", "123456").subscribe(new Observer<LCUser>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCUser user) {
+        // Logged in successfully
+    }
+    public void onError(Throwable throwable) {
+        // The verification code is incorrect
+    }
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser logInWithMobilePhoneNumberInBackground:@"+15559463664" smsCode:@"123456" block:^(LCUser *user, NSError *error) {
+    if (user != nil) {
+        // Logged in successfully
+    } else {
+        // The verification code is incorrect
+    }
+}];
+```
+
+```swift
+_ = LCUser.logIn(mobilePhoneNumber: "+15559463664", verificationCode: "123456") { result in
+    switch result {
+    case .success(object: let user):
+        print(user)
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+```dart
+try {
+  // Logged in successfully
+  await LCUser.signUpOrLoginByMobilePhone('+15559463664', '123456');
+} on LCException catch (e) {
+  // The verification code is incorrect
+  print('${e.code} : ${e.message}');
+}
+```
+
+```js
+AV.User.logInWithMobilePhoneSmsCode("+15559463664", "123456").then(
+  (user) => {
+    // Logged in successfully
+  },
+  (error) => {
+    // The verification code is incorrect
+  }
+);
+```
+
+```python
+user = leancloud.User.signup_or_login_with_mobile_phone('+15559463664', '123456')
+```
+
+```php
+User::signUpOrLoginByMobilePhone("+15559463664", "123456");
+```
+
+```go
+user, err := client.Users.LogInByMobilePhoneNumber("+15559463664", "123456")
+if err != nil {
+    panic(err)
+}
+```
+
+</MultiLang>
+
+### Sandbox Phone Number
+
+During the development of your application, you may need to test the sign-up– or log-in–related APIs intensively with your phone. As there are, however, limits to how quickly messages can be sent into the carrier networks, your testing pace can be significantly affected.
+
+To work around it, you can set up a sandbox phone number on **Dashboard > SMS > Settings**. The cloud will issue a fixed verification code to go with that sandbox phone number. Whenever the cloud detects such a combination of data, the user will be let right in authenticated without any connections to the carrier networks being made.
+
+On a related note, a sandbox phone number also comes in handy for iOS apps that allow users to log in with SMS code. This is because Apple may ask developers to provide a fixed combination of phone number and verification code for them to review the app as a normal user. Failure to do so may result in their app being rejected by the App Store.
+
+For more details regarding the limitations of sending and receiving SMS messages, see [SMS Guide](https://docs.leancloud.app/sms-guide.html).
+
+### Single Device Sign-on
+
+In some scenarios you may want to restrict a user's account to be logged on by no more than one device at a time. That is, when a user logs in to the app on a new device, all the previous sessions on other devices will become invalid. Here's the instruction about how you can implement this feature:
+
+1. Create a new class that keeps track of each user's credentials and device information.
+2. Each time when a user logs in on a device, update the device information of this user to be the current device.
+3. When the app running on another device is opened, check if the device matches the one stored in the cloud. If it does not, [log the user out](#current-user).
+
+### User Account Lockout
+
+If the wrong password or verification code is entered for an account for more than 6 times within 15 minutes, the account will be disabled temporarily and the error `{ "code": 1, "error": "You have exceeded the maximum number of login attempts, please try again later, or consider resetting your password." }` will be returned.
+
+The account will be automatically recovered 15 minutes after the last attempt and the process cannot be expedited through SDK or REST API. While the account is disabled, the user cannot be logged in even though the correct credentials are provided. The restriction applies to both client-side SDKs and LeanEngine.
+
+## Verifying Emails
+
+You can request that your users have their email addresses verified before they can log in or access certain functions in your app. This makes it harder for spam users to abuse your app. By default, each user has an `emailVerified` field which becomes `false` when the user first signs up or has their email address changed. In your app's **Dashboard > Authentication > Settings**, you can enable **Send verification emails when users register or change email addresses from clients** so that when a user signs up or changes their email address, an email containing a verification link will be sent out automatically. You can find the option to prevent users with unverified email addresses from logging in on the same page.
+
+If a user forgets to click on the link and needs to have their account verified later, the following code can be used to send a new email:
+
+<MultiLang>
+
+```cs
+await LCUser.RequestEmailVerify("tom@xd.com");
+```
+
+```java
+LCUser.requestEmailVerifyInBackground("tom@xd.com").subscribe(new Observer<LCNull>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCNull null) {
+        // Succeeded
+    }
+    public void onError(Throwable throwable) {
+        // Failed
+    }
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser requestEmailVerify:@"tom@xd.com"];
+```
+
+```swift
+_ = LCUser.requestVerificationMail(email: "tom@xd.com") { result in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+```dart
+await LCUser.requestEmailVerify('tom@xd.com');
+```
+
+```js
+AV.User.requestEmailVerify("tom@xd.com");
+```
+
+```python
+leancloud.User.request_email_verify('tom@xd.com')
+```
+
+```php
+User::requestEmailVerify("tom@xd.com");
+```
+
+```go
+if err := client.Users.RequestEmailVerify("tom@xd.com"); err != nil {
+    panic(err)
+}
+```
+
+</MultiLang>
+
+The `emailVerified` will become `true` after the link is clicked on. This field can never be `true` when the `email` field is empty.
+
+## Verifying Phone Numbers
+
+Similar to [Verifying Emails](#verifying-emails), you can also request that your users have their phone numbers verified before they can log in or access certain functions in your app. By default, each user has a `mobilePhoneVerified` field which becomes `false` when the user first signs up or has their phone number changed. In your app's **Dashboard > Authentication > Setting**, you can find the option to prevent users with unverified phone numbers from logging in on the same page.
+
+You can also initiate a verification request at anytime with the following code (if the user's `mobilePhoneVerified` is already `true`, the verification code will not be sent):
+
+<MultiLang>
+
+```cs
+await LCUser.RequestMobilePhoneVerify("+15559463664");
+```
+
+```java
+LCUser.requestMobilePhoneVerifyInBackground("+15559463664").subscribe(new Observer<LCNull>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCNull null) {
+        // Succeeded
+    }
+    public void onError(Throwable throwable) {
+        // Failed
+    }
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser requestMobilePhoneVerify:@"+15559463664" withBlock:^(BOOL succeeded, NSError * _Nullable error) {
+    if(succeeded){
+        // Succeeded
+    }else{
+        // Failed
+    }
+}];
+```
+
+```swift
+_ = LCUser.requestVerificationCode(mobilePhoneNumber: "+15559463664") { result in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+```dart
+await LCUser.requestMobilePhoneVerify('+15559463664');
+```
+
+```js
+AV.User.requestMobilePhoneVerify("+15559463664");
+```
+
+```python
+leancloud.User.request_mobile_phone_verify('+15559463664')
+```
+
+```php
+User::requestMobilePhoneVerify("+15559463664");
+```
+
+```go
+if err := client.Users.RequestMobilePhoneVerify("+15559463664"); err != nil {
+    panic(err)
+}
+```
+
+</MultiLang>
+
+After the verification code is entered by the user, call the following method and the user's `mobilePhoneVerified` will become `true`:
+
+<MultiLang>
+
+```cs
+await LCUser.VerifyMobilePhone("+15559463664", "123456");
+```
+
+```java
+LCUser.verifyMobilePhoneInBackground("123456").subscribe(new Observer<LCNull>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCNull null) {
+        // mobilePhoneVerified is set to true
+    }
+    public void onError(Throwable throwable) {
+        // The verification code is incorrect
+    }
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser verifyMobilePhone:@"123456" withBlock:^(BOOL succeeded, NSError * _Nullable error) {
+    if(succeeded){
+        // mobilePhoneVerified is set to true
+    }else{
+        // The verification code is incorrect
+    }
+}];
+```
+
+```swift
+_ = LCUser.verifyMobilePhoneNumber(mobilePhoneNumber: "+15559463664", verificationCode: "123456") { result in
+    switch result {
+    case .success:
+        // mobilePhoneVerified is set to true
+        break
+    case .failure(error: let error):
+        // The verification code is incorrect
+        print(error)
+    }
+}
+```
+
+```dart
+await LCUser.verifyMobilePhone('+15559463664','123456');
+```
+
+```js
+AV.User.verifyMobilePhone("123456").then(
+  () => {
+    // mobilePhoneVerified is set to true
+  },
+  (error) => {
+    // The verification code is incorrect
+  }
+);
+```
+
+```python
+leancloud.User.verify_mobile_phone_number('123456')
+```
+
+```php
+User::verifyMobilePhone("123456");
+```
+
+```go
+// Not supported yet
+```
+
+</MultiLang>
+
+### Verify Phone Numbers Before Updating and Binding
+
+The cloud also supports verifying the number _before_ a user binds or updates their number. This means that when a user binds or updates their number, they need to first request for a verification code (while they are logged in) and then complete the process with the verification code they received.
+
+<MultiLang>
+
+```cs
+await LCUser.RequestSMSCodeForUpdatingPhoneNumber("+15559463664");
+
+await LCUser.VerifyCodeForUpdatingPhoneNumber("+15559463664", "123456");
+// Update local data
+LCUser currentUser = await LCUser.GetCurrent();
+user.Mobile = "+15559463664";
+```
+
+```java
+LCUser.requestSMSCodeForUpdatingPhoneNumberInBackground("+15559463664").subscribe(new Observer<LCNull>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCNull null) {
+        // Succeeded
+    }
+    public void onError(Throwable throwable) {
+        // Failed
+    }
+    public void onComplete() {}
+});
+
+LCUser.verifySMSCodeForUpdatingPhoneNumberInBackground("123456", "+15559463664").subscribe(new Observer<LCNull>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCNull null) {
+        // Update local data
+        LCUser currentUser = LCUser.getCurrentUser();
+        currentUser.setMobilePhoneNumber("+15559463664");
+    }
+    public void onError(Throwable throwable) {
+        // Verification code is incorrect
+    }
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser requestVerificationCodeForUpdatingPhoneNumber:@"+15559463664" withBlock:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+        // Succeeded
+    } else {
+        // Failed
+    }
+}];
+
+[LCUser verifyCodeToUpdatePhoneNumber:@"+15559463664" code:@"123456" withBlock:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+        // mobilePhoneNumber becomes +15559463664
+        // mobilePhoneVerified becomes true
+    } else {
+        // Verification code is incorrect
+    }
+}];
+```
+
+```swift
+_ = LCUser.requestVerificationCode(forUpdatingMobilePhoneNumber: "+15559463664") { result in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+
+_ = LCUser.verifyVerificationCode("123456", toUpdateMobilePhoneNumber:"+15559463664") { result in
+    switch result {
+    case .success:
+        // mobilePhoneNumber becomes +15559463664
+        // mobilePhoneVerified becomes true
+        break
+    case .failure(error: let error):
+        // Verification code is incorrect
+        print(error)
+    }
+}
+```
+
+```dart
+await LCUser.requestSMSCodeForUpdatingPhoneNumber('+15559463664');
+
+await LCUser.verifyCodeForUpdatingPhoneNumber('+15559463664', '123456');
+// Update local data
+LCUser currentUser = await LCUser.getCurrent();
+user.mobile = '+15559463664';
+```
+
+```js
+AV.User.requestChangePhoneNumber("+15559463664");
+
+AV.User.changePhoneNumber("+15559463664", "123456").then(
+  () => {
+    // Update local data
+    const currentUser = AV.User.current();
+    currentUser.setMobilePhoneNumber("+15559463664");
+  },
+  (error) => {
+    // Verification code is incorrect
+  }
+);
+```
+
+```python
+User.request_change_phone_number("+15559463664")
+
+User.change_phone_number("123456", "+15559463664")
+# Update local data
+current_user = leancloud.User.get_current()
+current_user.set_mobile_phone_number("+15559463664")
+```
+
+```php
+User::requestChangePhoneNumber("+15559463664");
+
+User::changePhoneNumber("123456", "+15559463664");
+// Update local data
+$currentUser = User::getCurrentUser();
+$user->setMobilePhoneNumber("+15559463664");
+```
+
+```go
+if err := client.Users.requestChangePhoneNumber("+15559463664"); err != nil {
+  panic(err)
+}
+
+if err := client.Users.ChangePhoneNumber("123456", "+15559463664"); err != nil {
+  panic(err)
+}
+```
+
+</MultiLang>
+
+## Current User
+
+Once a user logs in, the SDK will automatically store the session information of this user on the client so that the user does not need to log in each time they open the client. The following code checks if there exists a logged-in user:
+
+<MultiLang>
+
+```cs
+LCUser currentUser = await LCUser.GetCurrent();
+if (currentUser != null) {
+  // Redirect to the home page
+} else {
+  // Show the sign-up or log-in page
+}
+```
+
+```java
+LCUser currentUser = LCUser.getCurrentUser();
+if (currentUser != null) {
+    // Redirect to the home page
+} else {
+    // Show the sign-up or log-in page
+}
+```
+
+```objc
+LCUser *currentUser = [LCUser currentUser];
+if (currentUser != nil) {
+    // Redirect to the home page
+} else {
+    // Show the sign-up or log-in page
+}
+```
+
+```swift
+if let user = LCApplication.default.currentUser {
+    // Redirect to the home page
+} else {
+    // Show the sign-up or log-in page
+}
+```
+
+```dart
+LCUser currentUser = await LCUser.getCurrent();
+if (currentUser != null) {
+  // Redirect to the home page
+} else {
+  // Show the sign-up or log-in page
+}
+```
+
+```js
+const currentUser = AV.User.current();
+if (currentUser) {
+  // Redirect to the home page
+} else {
+  // Show the sign-up or log-in page
+}
+```
+
+```python
+current_user = leancloud.User.get_current()
+if current_user is not None:
+    # Redirect to the home page
+    pass
+else:
+    # Show the sign-up or log-in page
+    pass
+```
+
+```php
+$currentUser = User::getCurrentUser();
+if ($currentUser != null) {
+    // Redirect to the home page
+} else {
+    // Show the sign-up or log-in page
+}
+```
+
+```go
+// Not supported yet
+```
+
+</MultiLang>
+
+The session information of a user will remain on the client until the user is logged out:
+
+<MultiLang>
+
+```cs
+await LCUser.Logout();
+
+// currentUser becomes null
+LCUser currentUser = await LCUser.GetCurrent();
+```
+
+```java
+LCUser.logOut();
+
+// currentUser becomes null
+LCUser currentUser = LCUser.getCurrentUser();
+```
+
+```objc
+[LCUser logOut];
+
+// currentUser becomes nil
+LCUser *currentUser = [LCUser currentUser];
+```
+
+```swift
+LCUser.logOut()
+
+// currentUser becomes nil
+let currentUser = LCApplication.default.currentUser
+```
+
+```dart
+await LCUser.logout();
+
+// currentUser becomes null
+LCUser currentUser = await LCUser.getCurrent();
+```
+
+```js
+AV.User.logOut();
+
+// currentUser becomes null
+const currentUser = AV.User.current();
+```
+
+```python
+user.logout()
+
+current_user = leancloud.User.get_current()  # None
+```
+
+```php
+User::logOut();
+
+// currentUser becomes null
+$currentUser = User::getCurrentUser();
+```
+
+```go
+// Not supported yet
+```
+
+</MultiLang>
+
+## Setting The Current User
+
+A **session token** will be returned to the client once a user logs in. It will be cached by the SDK and will be used for authenticating requests made by the same user in the future. The session token will be included in the header of each HTTP request made by the client, allowing the cloud to tell which user is sending the request.
+
+Below are the situations when you may need to log a user in with their session token:
+
+- A session token is already cached on the client which can be used to automatically log the user in.
+- A WebView within the app needs to know the current user.
+- The user is logged in on the server side using your own authentication routines. The server can then send the session token to the client so the client can get logged in with the session token.
+
+The code below logs a user in with their session token (the cloud will check if the session token is valid):
+
+<MultiLang>
+
+```cs
+await LCUser.BecomeWithSessionToken("anmlwi96s381m6ca7o7266pzf");
+```
+
+```java
+LCUser.becomeWithSessionTokenInBackground("anmlwi96s381m6ca7o7266pzf").subscribe(new Observer<LCUser>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCUser user) {
+        // Update the currentUser
+        LCUser.changeCurrentUser(user, true);
+    }
+    public void onError(Throwable throwable) {
+        // The session token is invalid
+    }
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser becomeWithSessionTokenInBackground:@"anmlwi96s381m6ca7o7266pzf" block:^(LCUser * _Nullable user, NSError * _Nullable error) {
+    if (user != nil) {
+        // Logged in successfully
+    } else {
+        // The session token is invalid
+    }
+}];
+```
+
+```swift
+_ = LCUser.logIn(sessionToken: "anmlwi96s381m6ca7o7266pzf") { (result) in
+    switch result {
+    case .success(object: let user):
+        // Logged in successfully
+        print(user)
+    case .failure(error: let error):
+        // The session token is invalid
+        print(error)
+    }
+}
+```
+
+```dart
+await LCUser.becomeWithSessionToken('anmlwi96s381m6ca7o7266pzf');
+```
+
+```js
+AV.User.become("anmlwi96s381m6ca7o7266pzf").then(
+  (user) => {
+    // Logged in successfully
+  },
+  (error) => {
+    // The session token is invalid
+  }
+);
+```
+
+```python
+user = leancloud.User.become('anmlwi96s381m6ca7o7266pzf')
+```
+
+```php
+User::become("anmlwi96s381m6ca7o7266pzf");
+```
+
+```go
+user, err := client.Users.Become("anmlwi96s381m6ca7o7266pzf")
+if err != nil {
+    panic(err)
+}
+```
+
+</MultiLang>
+
+For security reasons, please avoid including session tokens as a part of URLs in non-private environments. This could increase the risk that they will be captured by attackers.
+
+If **Log out the user when password is updated** is enabled on **Dashboard > Authentication > Settings**, the session token of a user will be reset if this user changes their password. The client will have to prompt the user to log in again, or the client will get the `403 (Forbidden)` error.
+
+The code below checks if a session token is valid:
+
+<MultiLang>
+
+```cs
+LCUser currentUser = await LCUser.GetCurrent();
+bool isAuthenticated = await currentUser.IsAuthenticated();
+if (isAuthenticated) {
+  // The session token is valid
+} else {
+  // The session token is invalid
+}
+```
+
+```java
+boolean authenticated = LCUser.getCurrentUser().isAuthenticated();
+if (authenticated) {
+    // The session token is valid
+} else {
+    // The session token is invalid
+}
+```
+
+```objc
+LCUser *currentUser = [LCUser currentUser];
+NSString *token = currentUser.sessionToken;
+[currentUser isAuthenticatedWithSessionToken:token callback:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+        // The session token is valid
+    } else {
+        // The session token is invalid
+    }
+}];
+```
+
+```swift
+if let sessionToken = LCApplication.default.currentUser?.sessionToken?.value {
+    _ = LCUser.logIn(sessionToken: sessionToken) { (result) in
+        if result.isSuccess {
+            // The session token is valid
+        } else {
+            // The session token is invalid
+        }
+    }
+}
+```
+
+```dart
+LCUser currentUser = await LCUser.getCurrent();
+bool isAuthenticated = await currentUser.isAuthenticated();
+if (isAuthenticated) {
+  // The session token is valid
+} else {
+  // The session token is invalid
+}
+```
+
+```js
+const currentUser = AV.User.current();
+currentUser.isAuthenticated().then((authenticated) => {
+  if (authenticated) {
+    // The session token is valid
+  } else {
+    // The session token is invalid
+  }
+});
+```
+
+```python
+authenticated = leancloud.User.get_current().is_authenticated()
+if authenticated:
+    # The session token is valid
+    pass
+else:
+    # The session token is invalid
+    pass
+```
+
+```php
+$authenticated = User::isAuthenticated();
+if ($authenticated) {
+    // The session token is valid
+} else {
+    // The session token is invalid
+}
+```
+
+```go
+// Not supported yet
+```
+
+</MultiLang>
+
+## Resetting Passwords
+
+It's quite common for the users of an app to forget their passwords. There are a couple of ways for the users to reset their passwords.
+
+Here is the procedure of resetting the password with email:
+
+1. The user enters the email address used for their account.
+2. The cloud sends an email to the address including a link for resetting the password.
+3. The user opens the link and provides a new password.
+4. The password will be reset once the user submits the new password.
+
+To begin with, ask the user to enter the email used for the account and then call the function below:
+
+<MultiLang>
+
+```cs
+await LCUser.RequestPasswordReset("tom@xd.com");
+```
+
+```java
+LCUser.requestPasswordResetInBackground("tom@xd.com").subscribe(new Observer<LCNull>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCNull null) {
+        // Succeeded
+    }
+    public void onError(Throwable throwable) {
+        // Failed
+    }
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser requestPasswordResetForEmailInBackground:@"tom@xd.com"];
+```
+
+```swift
+_ = LCUser.requestPasswordReset(email: "tom@xd.com") { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+```dart
+await LCUser.requestPasswordReset('tom@xd.com');
+```
+
+```js
+AV.User.requestPasswordReset("tom@xd.com");
+```
+
+```python
+leancloud.User.request_password_reset('tom@xd.com')
+```
+
+```php
+User::requestPasswordReset("tom@xd.com");
+```
+
+```go
+if err := client.Users.RequestPasswordReset("tom@xd.com"); err != nil {
+    panic(err)
+}
+```
+
+</MultiLang>
+
+The code above will check if there is a user whose `email` is the same as the one provided and send them a password reset email if so. As mentioned earlier, you can make the `username` of each user to be the same as their `email`, or collect the email separately and store it in the `email` field.
+
+The content of the password reset email is fully customizable. You can edit the template by going to your app's **Dashboard > Authentication > Email templates**.
+
+Alternatively, a user can reset their password with their mobile phone number:
+
+1. The user enters the mobile phone number used for the account.
+2. The cloud sends a text message containing a verification code to the number.
+3. The user provides the verification code and a new password.
+
+The code below sends a verification code to a number:
+
+<MultiLang>
+
+```cs
+await LCUser.RequestPasswordRestBySmsCode("+15559463664");
+```
+
+```java
+LCUser.requestPasswordResetBySmsCodeInBackground("+15559463664").subscribe(new Observer<LCNull>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCNull null) {
+        // 成功调用
+    }
+    public void onError(Throwable throwable) {
+        // 调用出错
+    }
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser requestPasswordResetWithPhoneNumber:@"+15559463664"];
+```
+
+```swift
+_ = LCUser.requestPasswordReset(mobilePhoneNumber: "+15559463664") { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+```dart
+await LCUser.requestPasswordRestBySmsCode('+15559463664');
+```
+
+```js
+AV.User.requestPasswordResetBySmsCode("+15559463664");
+```
+
+```python
+leancloud.User.request_password_reset_by_sms_code('+15559463664')
+```
+
+```php
+User::requestPasswordResetBySmsCode("+15559463664");
+```
+
+```go
+if err := client.Users.RequestPasswordResetBySmsCode("+15559463664"); err != nil {
+    panic(err)
+}
+```
+
+</MultiLang>
+
+The code above will check if there is a user whose `mobilePhoneNumber` is the same as the one provided and will send them a verification code if so.
+
+On **Dashboard > Authentication > Settings**, you can decide if a user can reset their password only if their `mobilePhoneVerified` is `true`.
+
+Once a user provides their verification code and a new password, use the code below to finish resetting the password:
+
+<MultiLang>
+
+```cs
+await LCUser.ResetPasswordBySmsCode("+15559463664", "123456", "cat!@#123");
+```
+
+```java
+LCUser.resetPasswordBySmsCodeInBackground("123456", "cat!@#123").subscribe(new Observer<LCNull>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCNull null) {
+        // Password is updated
+    }
+    public void onError(Throwable throwable) {
+        // The verification code is incorrect
+    }
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser resetPasswordWithSmsCode:@"123456" newPassword:@"cat!@#123" block:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        // Password is updated
+    } else {
+        // The verification code is incorrect
+    }
+}];
+```
+
+```swift
+_ = LCUser.resetPassword(mobilePhoneNumber: "+15559463664", verificationCode: "123456", newPassword: "cat!@#123") { result in
+    switch result {
+    case .success:
+        // Password is updated
+        break
+    case .failure(error: let error):
+        // The verification code is incorrect
+        print(error)
+    }
+}
+```
+
+```dart
+await LCUser.resetPasswordBySmsCode('+15559463664', '123456', 'cat!@#123');
+```
+
+```js
+AV.User.resetPasswordBySmsCode("123456", "cat!@#123").then(
+  () => {
+    // Password is updated
+  },
+  (error) => {
+    // The verification code is incorrect
+  }
+);
+```
+
+```python
+leancloud.User.reset_password_by_sms_code('123456', 'cat!@#123')
+```
+
+```php
+User::resetPasswordBySmsCode("123456", "cat!@#123");
+```
+
+```go
+if err := client.Users.ResetPasswordBySmsCode("+15559463664", "123456", "cat!@#123"); err != nil {
+    panic(err)
+}
+```
+
+</MultiLang>
+
+## Queries on Users
+
+Use the code below to retrieve the users from the cloud:
+
+<MultiLang>
+
+```cs
+LCQuery<LCUser> userQuery = LCUser.GetQuery();
+```
+
+```java
+LCQuery<LCUser> userQuery = LCUser.getQuery();
+```
+
+```objc
+LCQuery *userQuery = [LCUser query];
+```
+
+```swift
+let userQuery = LCQuery(className: "_User")
+```
+
+```dart
+LCQuery<LCUser> userQuery = LCUser.getQuery();
+```
+
+```js
+const userQuery = new AV.Query("_User");
+```
+
+```python
+user_query = leancloud.Query('_leancloud.User')
+```
+
+```php
+$userQuery = new Query("_User");
+```
+
+```go
+userQuery := client.Users.NewUserQuery()
+```
+
+</MultiLang>
+
+For security reasons, **the `_User` table of each new app has its `find` permission disabled by default**. Each user can only access their own data in the `_User` table and cannot access that of others. If you need to allow each user to view other users' data, we recommend that you create a new table to store such data and enable the `find` permission of this table. You may also encapsulate queries on users within [LeanEngine](/sdk/engine/overview) and avoid opening up the `find` permission of the `_User` table.
+
+See [Security of User Objects](#security-of-user-objects) for other restrictions applied to the `_User` table and [Data Security](/sdk/storage/security) for more information regarding class-level permission settings.
+
+## Associations
+
+Associations involving users work in the same way as those involving basic objects. The code below saves a new book for an author and retrieves all the books written by this author:
+
+<MultiLang>
+
+```cs
+LCObject book = new LCObject("Book");
+LCUser author = await LCUser.GetCurrent();
+book["title"] = "My Fifth Book";
+book["author"] = author;
+await book.Save();
+
+LCQuery<LCObject> query = new LCQuery<LCObject>("Book");
+query.WhereEqualTo("author", author);
+// books is an array of Book objects by the same author
+ReadOnlyCollection<LCObject> books = await query.Find();
+```
+
+```java
+LCObject book = new LCObject("Book");
+LCUser author = LCUser.getCurrentUser();
+book.put("title", "My Fifth Book");
+book.put("author", author);
+book.saveInBackground().subscribe(new Observer<LCObject>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCObject book) {
+        // Find all the books by the same author
+        LCQuery<LCObject> query = new LCQuery<>("Book");
+        query.whereEqualTo("author", author);
+        query.findInBackground().subscribe(new Observer<List<LCObject>>() {
+            public void onSubscribe(Disposable disposable) {}
+            public void onNext(List<LCObject> books) {
+                // books is an array of Book objects by the same author
+            }
+            public void onError(Throwable throwable) {}
+            public void onComplete() {}
+        });
+    }
+    public void onError(Throwable throwable) {}
+    public void onComplete() {}
+});
+```
+
+```objc
+LCObject *book = [LCObject objectWithClassName:@"Book"];
+LCUser *author = [LCUser currentUser];
+[book setObject:@"My Fifth Book" forKey:@"title"];
+[book setObject:author forKey:@"author"];
+[book saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+    // Find all the books by the same author
+    LCQuery *query = [LCQuery queryWithClassName:@"Book"];
+    [query whereKey:@"author" equalTo:author];
+    [query findObjectsInBackgroundWithBlock:^(NSArray *books, NSError *error) {
+        // books is an array of Book objects by the same author
+    }];
+}];
+```
+
+```swift
+do {
+    guard let author = LCApplication.default.currentUser else {
+        return
+    }
+    let book = LCObject(className: "Book")
+    try book.set("title", value: "My Fifth Book")
+    try book.set("author", value: author)
+    _ = book.save { result in
+        switch result {
+        case .success:
+            // Find all the books by the same author
+            let query = LCQuery(className: "Book")
+            query.whereKey("author", .equalTo(author))
+            _ = query.find { result in
+                switch result {
+                case .success(objects: let books):
+                    // books is an array of Book objects by the same author
+                    break
+                case .failure(error: let error):
+                    print(error)
+                }
+            }
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
+
+```dart
+LCObject book = LCObject('Book');
+LCUser author = await LCUser.getCurrent();
+book['title'] = 'My Fifth Book';
+book['author'] = author;
+await book.save();
+
+LCQuery<LCObject> query = LCQuery('Book');
+query.whereEqualTo('author', author);
+// books is an array of Book objects by the same author
+List<LCObject> books = await query.find();
+```
+
+```js
+const Book = AV.Object.extend("Book");
+const book = new Book();
+const author = AV.User.current();
+book.set("title", "My Fifth Book");
+book.set("author", author);
+book.save().then((book) => {
+  // Find all the books by the same author
+  const query = new AV.Query("Book");
+  query.equalTo("author", author);
+  query.find().then((books) => {
+    // books is an array of Book objects by the same author
+  });
+});
+```
+
+```python
+Book = leancloud.Object.extend('Book')
+book = Book()
+author = leancloud.User.get_current()
+book.set('title', 'My Fifth Book')
+book.set('author', author)
+book.save()
+
+# Find all the books by the same author
+query = Book.query
+query.equal_to('author', author)
+book_list = query.find()
+```
+
+```php
+$book = new LeanObject("Book");
+$author = User::getCurrentUser();
+$book->set("title", "My Fifth Book");
+$book->set("author", $author);
+$book->save();
+
+// Find all the books by the same author
+$query = new Query("Book");
+$query->equalTo("author", $author);
+$books = $query->find();
+```
+
+```go
+// Not supported yet
+```
+
+</MultiLang>
+
+## Security of User Objects
+
+User objects are secured by default. You are not able to update or delete a user object unless this object is obtained using a method that gets it authenticated. This ensures that each user can only update their own data.
+
+The consideration of this design is that most data stored in an user object can be very personal and sensitive, such as mobile phone number, social media ID, etc. Even the app's owner should avoid tampering with these data for the sake of user's privacy.
+
+The code below demonstrates this security measure:
+
+<MultiLang>
+
+```cs
+try {
+  LCUser user = await LCUser.Login("Tom", "cat!@#123");
+  // Attempt to change the username
+  user["username"] = "Jerry";
+  // The password is encrypted and an empty string will be obtained
+  string password = user["password"];
+  // This will work because the user is authenticated
+  await user.Save();
+
+  // Getting a user without authenticating
+  LCQuery<LCUser> userQuery = LCUser.GetQuery();
+  LCUser unauthenticatedUser = await userQuery.Get(user.ObjectId);
+  unauthenticatedUser["username"] = "Toodle";
+
+  // This will not work because the user is not authenticated
+  unauthenticatedUser.Save();
+} catch (LCException e) {
+  print($"{e.code} : {e.message}");
+}
+```
+
+```java
+LCUser.logIn("Tom", "cat!@#123").subscribe(new Observer<LCUser>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCUser user) {
+        // Attempt to change the username
+        user.put("username", "Jerry");
+        // The password is encrypted and an empty string will be obtained
+        String password = user.getString("password");
+        // This will work because the user is authenticated
+        user.save();
+
+        // Getting a user without authenticating
+        LCQuery<LCUser> query = new LCQuery<>("_User");
+        query.getInBackground(user.getObjectId()).subscribe(new Observer<LCUser>() {
+            public void onSubscribe(Disposable disposable) {}
+            public void onNext(LCUser unauthenticatedUser) {
+                unauthenticatedUser.put("username", "Toodle");
+                // This will not work because the user is not authenticated
+                unauthenticatedUser.save();
+            }
+            public void onError(Throwable throwable) {}
+            public void onComplete() {}
+        });
+    }
+    public void onError(Throwable throwable) {}
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser logInWithUsernameInBackground:@"Tom" password:@"cat!@#123" block:^(LCUser *user, NSError *error) {
+    if (user != nil) {
+        // Attempt to change the username
+        [user setObject:@"Jerry" forKey:@"username")];
+        // The password is encrypted and an empty string will be obtained
+        NSString *password = user[@"password"];
+        // Save the changes
+        [user saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+            if (succeeded) {
+                // This will work because the user is authenticated
+
+                // Getting a user without authenticating
+                LCQuery *query = [LCQuery queryWithClassName:@"_User"];
+                [query getObjectInBackgroundWithId:user.objectId block:^(LCObject *unauthenticatedUser, NSError *error) {
+                    [unauthenticatedUser setObject:@"Toodle" forKey:@"username"];
+                    [unauthenticatedUser saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+                        if (succeeded) {
+                            // This will not work because the user is not authenticated
+                        } else {
+                            // Failed
+                        }
+                    }];
+                }];
+            } else {
+                // Handle error
+            }
+        }];
+    } else {
+        // Handle error
+    }
+}];
+```
+
+```swift
+_ = LCUser.logIn(username: "Tom", password: "cat!@#123") { result in
+    switch result {
+    case .success(object: let user):
+        // Attempt to change the username
+        try! user.set("username", "Jerry")
+        // The password is encrypted and an empty string will be obtained
+        let password = user.get("password")
+        // This will work because the user is authenticated
+        user.save()
+
+        // Getting a user without authenticating
+        let query = LCQuery(className: "_User")
+        _ = query.get(user.objectId) { result in
+            switch result {
+                case .success(object: let unauthenticatedUser):
+                    try! unauthenticatedUser.set("username", "Toodle")
+                    _ = unauthenticatedUser.save { result in
+                        switch result {
+                            .success:
+                                // This will not work because the user is not authenticated
+                            .failure:
+                                // Failed
+                        }
+                    }
+                case .failure(error: let error):
+                    print(error)
+            }
+        }
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+```dart
+try {
+  LCUser user = await LCUser.login('Tom', 'cat!@#123');
+  // Attempt to change the username
+  user['username'] = 'Jerry';
+  // The password is encrypted and an empty string will be obtained
+  String password = user['password'];
+  // This will work because the user is authenticated
+  await user.save();
+
+  // Getting a user without authenticating
+  LCQuery<LCUser> userQuery = LCQuery('_User');
+  LCUser unauthenticatedUser = await userQuery.get(user.objectId);
+  unauthenticatedUser['username'] = 'Toodle';
+
+  // This will not work because the user is not authenticated
+  unauthenticatedUser.save();
+} on LCException catch (e) {
+  print('${e.code} : ${e.message}');
+}
+```
+
+```js
+const user = AV.User.logIn("Tom", "cat!@#123").then((user) => {
+  // Attempt to change the username
+  user.set("username", "Jerry");
+  // The password is encrypted and an empty string will be obtained
+  const password = user.get("password");
+  // Save the changes
+  user.save().then((user) => {
+    // This will work because the user is authenticated
+
+    // Getting a user without authenticating
+    const query = new AV.Query("_User");
+    query.get(user.objectId).then((unauthenticatedUser) => {
+      unauthenticatedUser.set("username", "Toodle");
+      unauthenticatedUser.save().then(
+        (unauthenticatedUser) => {},
+        (error) => {
+          // This will not work because the user is not authenticated
+        }
+      );
+    });
+  });
+});
+```
+
+```python
+leancloud.User.login('Tom', 'cat!@#123')
+current_user = leancloud.User.get_current()
+
+# Attempt to change the username
+current_user.set('username', 'Jerry')
+# The password is encrypted and an empty string will be obtained
+password = current_user.get('password')
+# This will work because the user is authenticated
+current_user.save()
+
+# Getting a user without authenticating
+query = leancloud.Query('_User')
+unauthenticated_user = query.get(current_user.id)
+unauthenticated_user.set('username', 'Toodle')
+# This will not work because the user is not authenticated
+unauthenticated_user.save()
+```
+
+```php
+User::logIn("Tom", "cat!@#123");
+$currentUser = User::getCurrentUser();
+
+// Attempt to change the username
+$currentUser->set("username", "Jerry");
+// The password is encrypted and an empty string will be obtained
+$password = $currentUser->get("password");
+// This will work because the user is authenticated
+$currentUser->save();
+
+// Getting a user without authenticating
+$query = new Query("_User");
+$unauthenticatedUser = $query->get($currentUser->getObjectId())
+$unauthenticatedUser->set("username", "Toodle");
+// This will not work because the user is not authenticated
+$unauthenticatedUser->save()
+```
+
+```go
+user, err := client.Users.LogIn("Tom", "cat!@#123")
+if err != nil {
+    panic(err)
+}
+
+// Attempt to change the username; this will fail if the user is not authenticated
+if err := client.User(user).Set("username", "Jerry"); err != nil {
+    panic(err)
+}
+
+// The password is encrypted and an empty string will be obtained
+password := user.String("password")
+
+// This will work because the user is authenticated
+if err := client.User(user).Set("username", "Jerry", leancloud.UseUser(user)); err != nil {
+    panic(err)
+}
+
+// Getting a user without authenticating
+unauthenticatedUser := User{}
+if err := client.Users.NewUserQuery().EqualTo("objectId", user.ID).First(&unauthenticatedUser); err != nil {
+    panic(err)
+}
+
+// This will not work because the user is not authenticated
+if err := client.User(unauthenticatedUser).Set("username", "Toodle"); err != nil {
+    panic(err)
+}
+```
+
+</MultiLang>
+
+When you obtain a user object with the method for obtaining the [current user](#current-user), the object will always be authenticated.
+
+To check if a user object is authenticated, you can invoke the method shown below. You do not need to check if a user object is authenticated if it is obtained via an authenticated method.
+
+<MultiLang>
+
+```cs
+IsAuthenticated
+```
+
+```java
+isAuthenticated
+```
+
+```objc
+isAuthenticatedWithSessionToken
+```
+
+```swift
+// Not supported yet
+```
+
+```dart
+isAuthenticated
+```
+
+```js
+isAuthenticated;
+```
+
+```python
+is_authenticated
+```
+
+```php
+isAuthenticated
+```
+
+```go
+// Not supported yet
+```
+
+</MultiLang>
+
+As a reminder, the user's password can be set when signing up but cannot be modified and saved to the cloud afterward unless the user requests it to be [reset](#resetting-passwords). It will not be cached on the client and will show as `null` when being retrieved from the cloud after the user is logged in.
+
+## Security of Other Objects
+
+For each given object, you can specify which users are allowed to read it and which are allowed to modify it. To support this type of security, each object has an access control list implemented by an `ACL` object. More details can be found in [ACL Guide](https://docs.leancloud.app/acl-guide.html).
+
+## Third-Party Sign-on
+
+You can let your users sign up and log in with their existing accounts on services like WeChat, Weibo, and QQ. You can also let them link their existing accounts with those services so that they will be able to log in with their accounts on those services in the future.
+
+The code below shows how you can log a user in with WeChat:
+
+<MultiLang>
+
+```cs
+Dictionary<string, object> thirdPartyData = new Dictionary<string, object> {
+  // Required
+  { "openid", "OPENID" },
+  { "access_token", "ACCESS_TOKEN" },
+  { "expires_in", 7200 },
+
+  // Optional
+  { "refresh_token", "REFRESH_TOKEN" },
+  { "scope", "SCOPE" }
+};
+LCUser currentUser = await LCUser.LoginWithAuthData(thirdPartyData, "weixin");
+```
+
+```java
+Map<String, Object> thirdPartyData = new HashMap<String, Object>();
+// Required
+thirdPartyData.put("expires_in", 7200);
+thirdPartyData.put("openid", "OPENID");
+thirdPartyData.put("access_token", "ACCESS_TOKEN");
+// Optional
+thirdPartyData.put("refresh_token", "REFRESH_TOKEN");
+thirdPartyData.put("scope", "SCOPE");
+LCUser.loginWithAuthData(thirdPartyData, "weixin").subscribe(new Observer<LCUser>() {
+    public void onSubscribe(Disposable disposable) {
+    }
+    public void onNext(LCUser user) {
+       System.out.println("Logged in.");
+    }
+    public void onError(Throwable throwable) {
+       System.out.println("An error occurred.");
+    }
+    public void onComplete() {
+    }
+});
+```
+
+```objc
+NSDictionary *thirdPartyData = @{
+                            // Required
+                            @"openid":@"OPENID",
+                            @"access_token":@"ACCESS_TOKEN",
+                            @"expires_in":@7200,
+
+                            // Optional
+                            @"refresh_token":@"REFRESH_TOKEN",
+                            @"scope":@"SCOPE",
+                            };
+LCUser *user = [LCUser user];
+LCUserAuthDataLoginOption *option = [LCUserAuthDataLoginOption new];
+option.platform = LeanCloudSocialPlatformWeiXin;
+[user loginWithAuthData:thirdPartyData platformId:LeanCloudSocialPlatformWeiXin options:option callback:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+        NSLog(@"Logged in.");
+    }else{
+        NSLog(@"An error occurred: %@",error.localizedFailureReason);
+    }
+}];
+```
+
+```swift
+let thirdPartyData: [String: Any] = [
+    // Required
+    "openid":        "OPENID",
+    "access_token":  "ACCESS_TOKEN",
+    "expires_in":    7200,
+
+    // Optional
+    "refresh_token": "REFRESH_TOKEN",
+    "scope":         "SCOPE"
+]
+let user = LCUser()
+user.logIn(authData: thirdPartyData, platform: .weixin) { (result) in
+    switch result {
+    case .success:
+        assert(user.objectId != nil)
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+```dart
+var thirdPartyData = {
+  // Required
+  'openid':        'OPENID',
+  'access_token':  'ACCESS_TOKEN',
+  'expires_in':    7200,
+
+  // Optional
+  'refresh_token': 'REFRESH_TOKEN',
+  'scope':         'SCOPE'
+};
+LCUser currentUser = await LCUser.loginWithAuthData(thirdPartyData, 'weixin');
+```
+
+```js
+const thirdPartyData = {
+  // Required
+  openid: "OPENID",
+  access_token: "ACCESS_TOKEN",
+  expires_in: 7200,
+
+  // Optional
+  refresh_token: "REFRESH_TOKEN",
+  scope: "SCOPE",
+};
+AV.User.loginWithAuthData(thirdPartyData, "weixin").then(
+  (user) => {
+    // Logged in
+  },
+  (error) => {
+    // An error occurred
+  }
+);
+```
+
+```python
+# Not supported yet
+```
+
+```php
+// Not supported yet
+```
+
+```go
+// Not supported yet
+```
+
+</MultiLang>
+
+`loginWithAuthData` requires two arguments to locate a unique account:
+
+- The name of the third-party platform, which is `weixin` in the example above. You can decide this name on your own.
+- The authorization data from the third-party platform, which is the `thirdPartyData` in the example above (depending on the platform, it usually includes `uid`, `access_token`, and `expires_in`).
+
+The cloud will then verifies that the provided `authData` is valid and checks if a user is already associated with it. If so, it returns the status code `200 OK` along with the details (including a [`sessionToken`](#setting-the-current-user) of the user). If the `authData` is not linked to any accounts, you will instead receive the status code `201 Created`, indicating that a new user has been created. The body of the response contains `objectId`, `createdAt`, `sessionToken`, and an automatically-generated unique `username`. For example:
+
+```json
+{
+  "username": "k9mjnl7zq9mjbc7expspsxlls",
+  "objectId": "5b029266fb4ffe005d6c7c2e",
+  "createdAt": "2018-05-21T09:33:26.406Z",
+  "updatedAt": "2018-05-21T09:33:26.575Z",
+  "sessionToken": "…",
+  // authData won't be returned in most cases; see explanations below
+  "authData": {
+    "weixin": {
+      "openid": "OPENID",
+      "access_token": "ACCESS_TOKEN",
+      "expires_in": 7200,
+      "refresh_token": "REFRESH_TOKEN",
+      "scope": "SCOPE"
+    }
+  }
+  // …
+}
+```
+
+Now we will see a new record showing up in the `_User` table that has an `authData` field. Within this field is the authorization data from the third-party platform. For security reasons, the `authData` field won’t be returned to the client unless the current user owns it.
+
+You will need to implement the authentication process involving the third-party platform yourself (usually with OAuth 1.0 or 2.0) to obtain the authentication data, which will be used to log a user in.
+
+### Sign in with Apple
+
+If you plan to implement [Sign in with Apple](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api), the cloud can help you verify `identityToken`s and obtain `access_token`s from Apple. Below is the structure of `authData` for Sign in with Apple:
+
+```json
+{
+  "lc_apple": {
+    "uid": "The User Identifier obtained from Apple",
+    "identity_token": "The identityToken obtained from Apple",
+    "code": "The Authorization Code obtained from Apple"
+  }
+}
+```
+
+Each `authData` has the following fields:
+
+- **`lc_apple`**: The cloud will run the logic related to `identity_token` and `code` only when the platform name is `lc_apple`.
+- **`uid`**: Required. The cloud tells if the user exists with `uid`.
+- **`identity_token`**: Optional. The cloud will automatically validate `identity_token` if this field exists. Please make sure you have provided relevant information on **Dashboard > Authentication > Settings > Third-party accounts**.
+- **`code`**: Optional. The cloud will automatically obtain `access_token` and `refresh_token` from Apple if this field exists. Please make sure you have provided relevant information on **Dashboard > Authentication > Settings > Third-party accounts**.
+
+#### Getting Client ID
+
+Client ID is used to verify `identity_token` and to obtain `access_token`. It is the identifier of an Apple app (`AppID` or `serviceID`). For native apps, it is the Bundle Identifier in Xcode, which looks like `com.mytest.app`. See [Apple’s docs](https://developer.apple.com/documentation/sign_in_with_apple/generate_and_validate_tokens) for more details.
+
+#### Getting Private Key and Private Key ID
+
+Private Key is used to obtain `access_token`. You can go to Apple Developer, select “Keys” from “Certificates, Identifiers & Profiles”, add a Private Key for Sign in with Apple, and then download the `.p8` file. You will also obtain the Private Key ID from the page you download the key. See [Apple’s docs](https://help.apple.com/developer-account/#/dev77c875b7e) for more details.
+
+The last step is to fill in the Key ID on the dashboard and upload the downloaded Private Key. You can only upload Private Keys, but cannot view or download them.
+
+#### Getting Team ID
+
+Team ID is used to obtain `access_token`. You can view your team’s Team ID by going to Apple Developer and looking at the top-right corner or the Membership page. Make sure to select the team matching the selected Bundle ID.
+
+#### Logging in to Cloud Services With Sign in with Apple
+
+After you have filled in all the information on the dashboard, you can log a user in with the following code:
+
+<MultiLang>
+
+```cs
+Dictionary<string, object> appleAuthData = new Dictionary<string, object> {
+  // Required
+  { "uid", "USER IDENTIFIER" },
+
+  // Optional
+  { "identity_token", "IDENTITY TOKEN" },
+  { "code", "AUTHORIZATION CODE" }
+};
+LCUser currentUser = await LCUser.LoginWithAuthData(appleAuthData, "lc_apple");
+```
+
+```java
+// Not supported yet
+```
+
+```objc
+NSDictionary *appleAuthData = @{
+                            // Required
+                            @"uid":@"USER IDENTIFIER",
+                            // Optional
+                            @"identity_token":@"IDENTITY TOKEN",
+                            @"code":@"AUTHORIZATION CODE",
+                            };
+LCUser *user = [LCUser user];
+[user loginWithAuthData:appleAuthData platformId:"lc_apple" options:nil callback:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+        NSLog(@"Logged in.");
+    }else{
+        NSLog(@"Failed to log in: %@",error.localizedFailureReason);
+    }
+}];
+```
+
+```swift
+let appleData: [String: Any] = [
+    // Required
+    "uid":             "USER IDENTIFIER",
+    // Optional
+    "identity_token":  "IDENTITY TOKEN",
+    "code":            "AUTHORIZATION CODE"
+]
+let user = LCUser()
+user.logIn(authData: appleData, platform: .apple) { (result) in
+    switch result {
+    case .success:
+        assert(user.objectId != nil)
+    case .failure(error: let error):
+        print(error)
+    }
+}
+
+```
+
+```dart
+var appleData = {
+    // Required
+    "uid":             "USER IDENTIFIER",
+    // Optional
+    "identity_token":  "IDENTITY TOKEN",
+    "code":            "AUTHORIZATION CODE"
+};
+LCUser currentUser = await LCUser.loginWithAuthData(appleData, 'lc_apple');
+```
+
+```js
+// Not supported yet
+```
+
+```python
+# Not supported yet
+```
+
+```php
+// Not supported yet
+```
+
+```go
+// Not supported yet
+```
+
+</MultiLang>
+
+### Storing Authentication Data
+
+The `authData` of each user is a JSON object with platform names as keys and authentication data as values.
+
+A user associated with a WeChat account will have the following object as its `authData`:
+
+```json
+{
+  "weixin": {
+    "openid": "…",
+    "access_token": "…",
+    "expires_in": 7200,
+    "refresh_token": "…",
+    "scope": "…"
+  }
+}
+```
+
+A user associated with a Weibo account will have the following object as its `authData`:
+
+```json
+{
+  "weibo": {
+    "refresh_token": "2.0xxx",
+    "uid": "271XFEFEW273",
+    "expires_in": 115057,
+    "access_token": "2.00xxx"
+  }
+}
+```
+
+A user can be associated with multiple third-party platforms. If a user is associated with both WeChat and Weibo, their `authData` may look like this:
+
+```json
+{
+  "weixin": {
+    "openid": "…",
+    "access_token": "…",
+    "expires_in": 7200,
+    "refresh_token": "…",
+    "scope": "…"
+  },
+  "weibo": {
+    "refresh_token": "2.0xxx",
+    "uid": "271XFEFEW273",
+    "expires_in": 115057,
+    "access_token": "2.00xxx"
+  }
+}
+```
+
+It’s important to understand the data structure of `authData`. When a user logs in with the following authentication data:
+
+```json
+"platform": {
+  "openid":        "OPENID",
+  "access_token":  "ACCESS_TOKEN",
+  "expires_in":    7200,
+  "refresh_token": "REFRESH_TOKEN",
+  "scope":         "SCOPE"
+}
+```
+
+The cloud will first look at the account system to see if there is an account that has its `authData.platform.openid` to be the `OPENID`. If there is, return the existing account. If not, create a new account and write the authentication data into the `authData` field of this new account, and then return the new account’s data as the result.
+
+The cloud will automatically create a unique index for the `authData.<PLATFORM>.<uid>` of each user, which prevents the formation of duplicate data.
+For some of the platforms specially supported by us, `<uid>` refers to the `openid` field. For others (the other platforms specially supported by us, and those not specially supported by us), it refers to the `uid` field.
+
+### Automatically Validating Third-Party Authorization Data
+
+The cloud can automatically validate access tokens for certain platforms, which prevents counterfeit account data from entering your app’s account system. If the validation fails, the cloud will return the `invalid authData` error, and the association will not be created. For those services that are not recognized by the cloud, you need to validate the access tokens yourself.
+You can validate access tokens when a user signs up or logs in by using LeanEngine’s `beforeSave` hook and `beforeUpdate` hook.
+
+To enable the feature, please configure the platforms’ **App IDs** and **Secret Keys** on **Dashboard > Authentication > Settings**.
+
+To disable the feature, please uncheck **Validate access tokens when logging in with third-party accounts** on **Dashboard > Authentication > Settings**.
+
+The reason for configuring the platforms is that when a user object is created, the cloud will use the relevant data to validate the `thirdPartyData` to ensure that the user object matches a real user, which ensures the security of your app.
+
+### Linking Third-Party Accounts
+
+If a user is already logged in, you can link third-party accounts to this user.
+
+After a user links their third-party account, the account information will be added to the `authData` field of the corresponding user object.
+
+The following code links a WeChat account to a user:
+
+<MultiLang>
+
+```cs
+await currentUser.AssociateAuthData(weixinData, "weixin");
+```
+
+```java
+user.associateWithAuthData(weixinData, "weixin").subscribe(new Observer<LCUser>() {
+    @Override
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(LCUser user) {
+        System.out.println("Account linked.");
+    }
+    @Override
+    public void onError(Throwable e) {
+        System.out.println("Failed to link the account: " + e.getMessage());
+    }
+    @Override
+    public void onComplete() {
+    }
+});
+```
+
+```objc
+[user associateWithAuthData:weixinData platformId:LeanCloudSocialPlatformWeiXin options:nil callback:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+        NSLog(@"Account linked.");
+    } else{
+        NSLog(@"Failed to link the account: %@",error.localizedFailureReason);
+    }
+}];
+```
+
+```swift
+currentUser.associate(authData: weixinData, platform: .weixin) { (result) in
+    switch result {
+    case .success:
+        // Account linked
+    case .failure(error: let error):
+        // Failed to link the account
+    }
+}
+```
+
+```dart
+await currentUser.associateAuthData(weixinData, 'weixin');
+```
+
+```js
+user
+  .associateWithAuthData(weixinData, "weixin")
+  .then(function (user) {
+    // Account linked
+  })
+  .catch(function (error) {
+    console.error("error: ", error);
+  });
+```
+
+```python
+user.link_with("weixin", weixin_data)
+```
+
+```php
+$user->linkWith("weixin", $weixinData);
+```
+
+```go
+// Not supported yet
+```
+
+</MultiLang>
+
+The code above omitted the authorization data of the platform. See [Third-Party Sign-on](#third-party-sign-on) for more details.
+
+### Unlinking
+
+Similarly, a third-party account can be unlinked.
+
+For example, the code below unlinks a user’s WeChat account:
+
+<MultiLang>
+
+```cs
+LCUser currentUser = await LCUser.GetCurrent();
+await currentUser.DisassociateWithAuthData("weixin");
+```
+
+```java
+LCUser user = LCUser.currentUser();
+user.dissociateWithAuthData("weixin").subscribe(new Observer<LCUser>() {
+    @Override
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(LCUser user) {
+        System.out.println("Unlinked.");
+    }
+    @Override
+    public void onError(Throwable e) {
+        System.out.println("Failed to unlink: " + e.getMessage());
+    }
+    @Override
+    public void onComplete() {
+    }
+});
+```
+
+```objc
+[user disassociateWithPlatform:LeanCloudSocialPlatformWeiXin callback:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+        NSLog(@"Unlinked.");
+    } else{
+        NSLog(@"Failed to unlink: %@",error.localizedFailureReason);
+    }
+}];
+```
+
+```swift
+currentUser.disassociate(authData: .weixin) { (result) in
+    switch result {
+    case .success:
+        // Unlinked
+    case .failure(error: let error):
+        // Failed to unlink
+    }
+}
+```
+
+```dart
+LCUser currentUser = await LCUser.getCurrent();
+await currentUser.disassociateWithAuthData('weixin');
+```
+
+```js
+user.dissociateAuthData("weixin").then(
+  (s) => {
+    // Unlinked
+  },
+  (error) => {
+    // Failed to unlink
+  }
+);
+```
+
+```python
+user.unlink_from("weixin")
+```
+
+```php
+$user->unlinkWith("weixin");
+```
+
+```go
+// Not supported yet
+```
+
+</MultiLang>
+
+## Anonymous Users
+
+With the support of anonymous users, you can have your users try the application without signing up or logging in. The code below creates an anonymous user:
+
+<MultiLang>
+
+```cs
+await LCUser.LoginAnonymously();
+```
+
+```java
+LCUser.logInAnonymously().subscribe(new Observer<LCUser>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCUser user) {
+        // user is the new anonymous user
+    }
+    public void onError(Throwable throwable) {}
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser loginAnonymouslyWithCallback:^(LCUser *user, NSError *error) {
+    // user is the new anonymous user
+}];
+```
+
+```swift
+// Not supported yet
+```
+
+```dart
+await LCUser.loginAnonymously();
+```
+
+```js
+AV.User.loginAnonymously().then((user) => {
+  // user is the new anonymous user
+});
+```
+
+```python
+# Not supported yet
+```
+
+```php
+// Not supported yet
+```
+
+```go
+// Not supported yet
+```
+
+</MultiLang>
+
+You can add new properties or fields to an anonymous user just like with a normal user, such as `username`, `password`, `email`, etc. You can also convert an anonymous user to a normal user by going through the same sign-up process as you do with a normal user. An anonymous user can:
+
+- [Sign up with username and password](#signing-up).
+- [Link to a third-party service or platform](#third-party-sign-on), such as WeChat.
+
+The code below sets a username and password for an anonymous user:
+
+<MultiLang>
+
+```cs
+LCUser currentUser = await LCUser.LoginAnonymously();
+currentUser.Username = "Tom";
+currentUser.Password = "cat!@#123";
+
+await currentUser.SignUp();
+```
+
+```java
+// currentUser is an anonymous user
+LCUser currentUser = LCUser.getCurrentUser();
+
+currentUser.setUsername("Tom");
+currentUser.setPassword("cat!@#123");
+
+currentUser.signUpInBackground().subscribe(new Observer<LCUser>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCUser user) {
+        // currentUser has become an ordinary user
+    }
+    public void onError(Throwable throwable) {
+        // Sign-up failed (often because the username is already taken)
+    }
+    public void onComplete() {}
+});
+```
+
+```objc
+// currentUser is an anonymous user
+LCUser *currentUser = [LCUser currentUser];
+
+user.username = @"Tom";
+user.password = @"cat!@#123";
+
+[user signUpInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        // currentUser has become an ordinary user
+    } else {
+        // Sign-up failed (often because the username is already taken)
+    }
+}];
+```
+
+```swift
+// Not supported yet
+```
+
+```dart
+LCUser currentUser = await LCUser.loginAnonymously();
+currentUser.username = 'Tom';
+currentUser.password = 'cat!@#123';
+
+await currentUser.signUp();
+```
+
+```js
+// currentUser is an anonymous user
+const currentUser = AV.User.current();
+
+user.setUsername("Tom");
+user.setPassword("cat!@#123");
+
+user.signUp().then(
+  (user) => {
+    // currentUser has become an ordinary user
+  },
+  (error) => {
+    // Sign-up failed (often because the username is already taken)
+  }
+);
+```
+
+```python
+# Not supported yet
+```
+
+```php
+// Not supported yet
+```
+
+```go
+// Not supported yet
+```
+
+</MultiLang>
+
+The code below checks if the current user is anonymous:
+
+<MultiLang>
+
+```cs
+LCUser currentUser = await LCUser.GetCurrent();
+if (currentUser.IsAnonymous) {
+  // currentUser is anonymous
+} else {
+  // currentUser is not anonymous
+}
+```
+
+```java
+LCUser currentUser = LCUser.getCurrentUser();
+if (currentUser.isAnonymous()) {
+  // currentUser is anonymous
+} else {
+  // currentUser is not anonymous
+}
+```
+
+```objc
+LCUser *currentUser = [LCUser currentUser];
+if (currentUser.isAnonymous) {
+    // currentUser is anonymous
+} else {
+    // currentUser is not anonymous
+}
+```
+
+```swift
+// Not supported yet
+```
+
+```dart
+LCUser currentUser = await LCUser.getCurrent();
+if (currentUser.isAnonymous) {
+  // currentUser is anonymous
+} else {
+  // currentUser is not anonymous
+}
+```
+
+```js
+const currentUser = AV.User.current();
+if (currentUser.isAnonymous()) {
+  // currentUser is anonymous
+} else {
+  // currentUser is not anonymous
+}
+```
+
+```python
+# Not supported yet
+```
+
+```php
+// Not supported yet
+```
+
+```go
+// Not supported yet
+```
+
+</MultiLang>
+
+If an anonymous user is not converted to a normal user before they log out, they will not be able to log in to the same account later and the data stored in that account cannot be retrieved anymore.
