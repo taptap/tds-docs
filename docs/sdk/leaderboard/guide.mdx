@@ -856,6 +856,96 @@ leaderboard.limit = 3;
 
 </MultiLang>
 
+## Tap 好友排行榜列表
+获取 Tap 互关好友在游戏中的排行榜成绩列表（包括自己）。接口声明如下：
+
+<MultiLang>
+
+<>
+
+```cs
+static async Task<ReadOnlyCollection<TDSLeaderBoardRanking>> QueryTapFriendsLeaderBoard(string name,
+            int from, int limit)
+```
+
+​
+调用示例：
+​
+```cs
+ ReadOnlyCollection<TDSLeaderBoardRanking> leaderBoards = await TDSLeaderBoardRanking.QueryTapFriendsLeaderBoard("world",0,10);
+ string printData = "";
+ foreach(TDSLeaderBoardRanking leaderBoard in leaderBoards){
+      printData = printData + $"name = {leaderBoard.StatisticName} value = {leaderBoard.StatisticValue} rank = {leaderBoard.Rank} user = [ id = {leaderBoard.User.ObjectId} name = {leaderBoard.User["nickname"]} \n";
+  }
+ Console.WriteLine(printData);
+```
+
+</>
+<>
+
+```java
+// callback 为查询结果的异步回调
+ static void queryTapFriendsLeaderBoard(String name, int from, int limit, Callback<List<TDSLeaderBoardRanking>> callback) 
+```
+
+​
+调用示例：
+​
+```java
+TDSLeaderBoardRanking.queryTapFriendsLeaderBoard("world", 0, 10, new Callback<List<TDSLeaderBoardRanking>>() {
+    @Override
+    public void onSuccess(List<TDSLeaderBoardRanking> result) {
+        System.out.println("query success data = " + result);
+    }
+​
+    @Override
+    public void onFail(TapError error) {
+        System.out.println("query fail error = " + error);
+    }
+});
+```
+
+</>
+<>
+
+```objc
++ (void) queryTapFriendsLeaderBoardWithName: (NSString *) name
+                      from:(int) from
+                      limit: (int) limit
+                  callback:(void (^)(NSArray<TDSLeaderBoardRanking *> * _Nullable leaderboards, NSError * _Nullable error)) callback
+```
+​
+调用示例:
+​
+```objc
+ [TDSLeaderBoardRanking queryTapFriendsLeaderBoardWithName:@"world" from:0 limit:10 callback:^(NSArray<TapFriendLeaderBoard *> * _Nullable leaderboards, NSError * _Nullable error) {
+        if(error){
+        	NSLog(@" query fail error = %@",error.description);
+        	return;
+        }
+        for(TDSLeaderBoardRanking *board in leaderboards){
+           NSString *b = [NSString stringWithFormat:@" name = %@ value = %d rank=%d  user = [ id = %@ name = %@  \n", [board statisticName], [board statisticValue],
+                           [board rank], [[board user] objectId], [[board user] valueForKey:@"nickname"]];
+            print = [ print stringByAppendingString:b];
+        }
+        NSLog(@" detail = %@", print);
+  }];
+```
+
+</>
+
+</MultiLang>
+
+参数 `name` 为排行榜的名称， `from` 和 `limit` 为分页获取数据时指定的起始位置和数据长度，返回为查询的结果数据，数据结构如下：
+
+字段名称 | 字段内容 | 字段类型
+--- | --- | ---
+statisticName | 排行榜名称 | String
+statisticValue | 排行榜中的成绩 | int
+rank | 排行榜中的名次, 0 表示第一名，以此类推 | int
+user | 排行榜数据对应的用户 | TDSUser
+
+
 ## 控制台
 
 在排行榜控制台（游戏服务 > 云服务 > 排行榜），你可以：
