@@ -25,16 +25,51 @@ We recommend the first method for the following scenarios:
 
 Otherwise, if you already have an account system and do not plan on using TapSDK functions such as Friends or Achievements, you can integrate TapTap User Login via the second method.
 
-<Conditional region='cn'>
-
-Note: The first method is based on the built-in user system. If you exceed the free quota provided by the service when using this method, you must [make a payment](https://developer.taptap.com/product-intro/price) to continue using the service.
-Therefore, ensure that your account has enough balance to cover the potential fee incurred by the first method, or the players of your game may not be able to log in.
-
-</Conditional>
-
 We will introduce the first method and then the [second method](/sdk/taptap-login/guide/tap-login/).
 
 Both methods require visiting **Developer Center > Game Services > Integrate Functions** to activate TapTap Login.
+
+## Check Login Status
+
+`TDSUser` will save user login data in the local cache. When a player logs into the game, the next login will retrieve login data via `TDSUser#currentUser`. This will allow the player to enter the game without having to log in.
+Cache will not automatically be cleared.
+
+If the player logs out of the game or clears the game's cache, then the login info will also be deleted. Next time the player logs in, `TDSUser#currentUser` will return null.
+
+<MultiLang>
+
+```cs
+var currentUser = await TDSUser.GetCurrent();
+if (null == currentUser)
+{
+    Debug.Log("Not logged in");
+    // Start logging in
+}
+else
+{
+    Debug.Log("Logged in");
+    // Enter the game
+}
+```
+
+```java
+if (null == TDSUser.currentUser()) {
+    // Not logged in
+} else {
+    // Logged in; enter the game
+}
+```
+
+```objectivec
+TDSUser *currentUser = [TDSUser currentUser]
+if (currentUser == nil) {
+    // Not logged in
+} else {
+    // Logged in; enter the game
+}
+```
+
+</MultiLang>
 
 ## Quick Log-in With TapTap
 
@@ -204,45 +239,6 @@ TapLoginHelper.getTestQualification(new Api.ApiCallback<Boolean>() {
 </MultiLang>
 
 ** Error: Network anomaly or this game has not activated Bonfire Test. **
-
-## Check Login Status
-
-`TDSUser` will save user login data in the local cache. When a player logs into the game, the next login will retrieve login data via `TDSUser#currentUser`. This will allow the player to enter the game without having to log in.
-Cache will not automatically be cleared.
-If the player logs out of the game or clears the game's cache, then the login info will also be deleted. Next time the player logs in, `TDSUser#currentUser` will return a null target.
-
-<MultiLang>
-
-```cs
-var currentUser = await TDSUser.GetCurrent();
-if (null == currentUser)
-{
-    Debug.Log("Not logged in");
-}
-else
-{
-    Debug.Log("Logged in");
-}
-```
-
-```java
-if (null == TDSUser.currentUser()) {
-    // Not logged in
-} else {
-    // Logged in
-}
-```
-
-```objectivec
-TDSUser *currentUser = [TDSUser currentUser]
-if (currentUser == nil) {
-    // Not logged in
-} else {
-    // Logged in
-}
-```
-
-</MultiLang>
 
 ## User Logout
 
