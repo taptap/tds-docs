@@ -38,6 +38,49 @@ import Profiles from "../../_partials/tap-login-profile.mdx";
 
 参考 [快速开始](/sdk/start/quickstart/) 创建应用、完成项目配置和 [初始化](/sdk/start/quickstart/#初始化)。
 
+## 检查登录状态
+
+`TDSUser` 会在本地缓存当前用户的登录信息，所以如果一个玩家在游戏内登录之后，下次启动用户通过调用 `TDSUser#currentUser` 可以得到之前登录的账户实例。
+缓存不会自动清除。此时玩家无需再次登录，可以直接进入游戏，实现静默登录。
+
+如果玩家在游戏内进行了登出或者玩家手动清除了游戏的存储数据，则本地缓存的登录信息也会被删除，下次进入游戏时 `TDSUser#currentUser` 会返回一个 null 对象，玩家需要[登录](#一键完成-taptap-登录)之后再进入游戏。
+
+<MultiLang>
+
+```cs
+var currentUser = await TDSUser.GetCurrent();
+if (null == currentUser)
+{
+    Debug.Log("当前未登录");
+    // 开始登录
+}
+else
+{
+    Debug.Log("已登录");
+    // 进入游戏
+}
+```
+
+```java
+if (null == TDSUser.currentUser()) {
+    // 未登录
+} else {
+    // 已登录，进入游戏
+}
+```
+
+```objectivec
+TDSUser *currentUser = [TDSUser currentUser]
+if (currentUser == nil) {
+    // 未登录
+} else {
+    // 已登录，进入游戏
+}
+```
+
+</MultiLang>
+
+
 ## 一键完成 TapTap 登录
 
 对于「TapTap 用户登录」，TapSDK 提供了特别的支持，以帮助开发者以最便捷的方式和最少的时间完成接入。
@@ -206,45 +249,6 @@ TapLoginHelper.getTestQualification(new Api.ApiCallback<Boolean>() {
 </MultiLang>
 
 ** Error 信息为网络错误，或者该游戏未开通篝火测试服。 **
-
-## 检查登录状态
-
-`TDSUser` 会在本地缓存当前用户的登录信息，所以如果一个玩家在游戏内登录之后，下次启动用户通过调用 `TDSUser#currentUser` 可以得到之前登录的账户实例，此时玩家无需再次登录即可使用。
-缓存不会自动清除。
-如果玩家在游戏内进行了登出或者玩家手动清除了游戏的存储数据，则本地缓存的登录信息也会被删除，下次进入游戏时 `TDSUser#currentUser` 会返回一个 null 对象。
-
-<MultiLang>
-
-```cs
-var currentUser = await TDSUser.GetCurrent();
-if (null == currentUser)
-{
-    Debug.Log("当前未登录");
-}
-else
-{
-    Debug.Log("已登录");
-}
-```
-
-```java
-if (null == TDSUser.currentUser()) {
-    // 未登录
-} else {
-    // 已登录
-}
-```
-
-```objectivec
-TDSUser *currentUser = [TDSUser currentUser]
-if (currentUser == nil) {
-    // 未登录
-} else {
-    // 已登录
-}
-```
-
-</MultiLang>
 
 ## 登出当前账户
 
