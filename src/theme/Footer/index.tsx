@@ -66,10 +66,10 @@ function Footer() {
                   </div>
                   <div>
                     <Translate
-                      id="tds-footer-公司地址: 上海市静安区万荣路 700 号 A3 202"
+                      id="tds-footer-公司地址: 上海市静安区灵石路 718 号 B1 北楼"
                       description="from Footer"
                     >
-                      公司地址: 上海市静安区万荣路 700 号 A3 202
+                      公司地址: 上海市静安区灵石路 718 号 B1 北楼
                     </Translate>
                   </div>
                   <div>
