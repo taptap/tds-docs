@@ -66,18 +66,18 @@ function Footer() {
                   </div>
                   <div>
                     <Translate
-                      id="tds-footer-公司地址: 上海市静安区灵石路 718 号 B1 北楼"
+                      id="tds-footer-公司地址：上海市静安区灵石路 718 号 B1 北楼"
                       description="from Footer"
                     >
-                      公司地址: 上海市静安区灵石路 718 号 B1 北楼
+                      公司地址：上海市静安区灵石路 718 号 B1 北楼
                     </Translate>
                   </div>
                   <div>
                     <Translate
-                      id="tds-footer-注册地址: 上海市闵行区紫星路 588 号 2 幢 2122 室"
+                      id="tds-footer-注册地址：上海市闵行区紫星路 588 号 2 幢 2122 室"
                       description="from Footer"
                     >
-                      注册地址: 上海市闵行区紫星路 588 号 2 幢 2122 室
+                      注册地址：上海市闵行区紫星路 588 号 2 幢 2122 室
                     </Translate>
                   </div>
                 </>

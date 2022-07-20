@@ -128,7 +128,7 @@ export const getLicenceLinks = (
       link: "https://www.taptap.com/license/www.html",
     },
     {
-      label: "经营许可证编号: 沪B2-20170322",
+      label: "经营许可证编号：沪B2-20170322",
       link: "https://www.taptap.com/license/www.html",
     },
     {
