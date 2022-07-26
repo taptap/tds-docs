@@ -1,0 +1,25 @@
+云引擎会自动安装 `package.json` 中的依赖：
+
+```json title='package.json'
+{
+  "dependencies": {
+    "leancloud-storage": "^3.11.0",
+    "leanengine": "^3.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.7"
+  }
+}
+```
+
+在安装依赖的过程中，云引擎会正常触发 NPM 的生命周期脚本（[Life Cycle Scripts](https://docs.npmjs.com/cli/v8/using-npm/scripts#life-cycle-scripts)），如 `postinstall`、`prepare` 等。
+
+:::note
+如果存在 `package-lock.json`，云引擎会优先使用 `npm ci` 安装依赖（需要 Node.js 10 以上）。否则云引擎会使用 `npm install --production` 安装依赖（这意味着 `devDependencies` 中的依赖不会被安装）。
+:::
+
+:::note
+如果存在 `yarn.lock`，云引擎会优先使用 `yarn` 安装依赖（需要 Node.js 4.8 以上）。如果不希望在云端使用 Yarn，请将它们加入 `.gitignore`（Git 部署时）或 `.leanignore`（命令行工具部署时）。请注意 `yarn.lock` 中包含了下载依赖的 URL，请选择合适的源，否则可能会增加构建时间。
+:::
+
+因为云引擎会在云端安装依赖，所以命令行工具默认也不会上传 `node_modules` 目录；如果使用 Git 部署，也建议将 `node_modules` 目录添加到 `.gitignore` 中，使其不加入版本控制。
