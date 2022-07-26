@@ -1,0 +1,118 @@
+---
+title: 快速开始部署云引擎应用
+sidebar_label: 快速开始
+sidebar_position: 1
+---
+
+import QuickStartNew from "../_partials/quick-start-new.mdx";
+import QuickStartDeploy from "../_partials/quick-start-deploy.mdx";
+import PlatformIntroduction from "../_partials/platform-introduction.mdx";
+import CloudCustomDomain from "../_partials/cloud-custom-domain.mdx";
+import PlatformRuntimes from "../_partials/platform-runtimes.mdx";
+import { CLI_BINARY } from "/src/constants/env.ts";
+import EngineRuntimes from "/src/docComponents/MultiLang/engine";
+import TabItem from "@theme/TabItem";
+import CodeBlock from "@theme/CodeBlock";
+
+:::info
+如果仅希望使用云函数和 Hook 而不是部署通用的后端程序，请看 [快速开始部署云函数和 Hook](/sdk/engine/functions/getting-started)。
+
+如希望部署 Web 前端应用，请看 [Web 前端运行环境 § 快速开始](/sdk/engine/deploy/webapp/#快速开始)。
+:::
+
+<PlatformIntroduction />
+
+## 创建项目
+
+如果你想要快速开始新项目，推荐基于我们的示例项目来开始部署第一个应用。
+
+<QuickStartNew />
+
+## 本地运行和调试
+
+你可以使用这个语言的 Web 框架来定义路由，处理某一路径下的请求，在示例项目中可以看到一些例子：
+
+<EngineRuntimes>
+<TabItem value='nodejs'>
+
+```javascript title='app.js'
+app.get("/", function (req, res) {
+  res.render("index", { currentTime: new Date() });
+});
+```
+
+</TabItem>
+<TabItem value='python'>
+
+```python title='app.py'
+@app.route('/')
+def index():
+    return render_template('index.html')
+```
+
+</TabItem>
+<TabItem value='php'>
+
+```php title='src/app.php'
+$app->get('/', function (Request $request, Response $response) {
+    return $this->view->render($response, "index.phtml", array(
+        "currentTime" => new \DateTime(),
+    ));
+});
+```
+
+</TabItem>
+<TabItem value='java'>
+
+```java title='src/main/webapp/WEB-INF/web.xml'
+<welcome-file-list>
+  <welcome-file>index.html</welcome-file>
+</welcome-file-list>
+```
+
+</TabItem>
+<TabItem value='dotnet'>
+
+```cs title='web/Startup.cs'
+app.UseEndpoints(endpoints => {
+    endpoints.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
+})
+```
+
+</TabItem>
+<TabItem value='go'>
+
+```go title='main.go'
+e.GET("/", routes.Index)
+```
+
+```go title='routes/index.go'
+func Index(c echo.Context) error {
+  return c.Render(http.StatusOK, "index", time.Now().String())
+}
+```
+
+</TabItem>
+</EngineRuntimes>
+
+在确保所有的依赖都正确安装之后，就可以在项目根目录用我们的命令行工具来启动本地运行了：
+
+<CodeBlock className="sh">{`$ ${CLI_BINARY} up`}</CodeBlock>
+
+更多有关命令行工具和本地调试的内容请看 [云引擎命令行工具使用指南](/sdk/engine/cli/)。
+
+## 部署到云引擎
+
+<QuickStartDeploy />
+
+<CloudCustomDomain noStaging={true} />
+
+例如你在控制台绑定了 `web.example.com` 这个域名，即可通过 `https://web.example.com` 访问你的应用（生产环境）。
+
+## 更多
+
+接下来可以查看 [云引擎平台功能](/sdk/engine/deploy/platform) 来了解云引擎提供的更多功能，或查看专门的页面来了解具体运行环境的详情：
+
+<PlatformRuntimes />
