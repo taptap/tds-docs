@@ -3,6 +3,9 @@ title: TapTap 打包规范
 sidebar_position: 12
 ---
 
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
 ## 支持 64 位架构
 
 自 **2022 年 7 月 27 日**起，您在 TapTap 上发布的应用必须支持 ARM 64 位架构。 64 位 CPU 能够为您的用户提供更快、更丰富的体验。添加 64 位的应用版本不仅可以提升性能、为未来创新创造条件，还能针对仅支持 64 位架构的设备做好准备。
@@ -75,8 +78,8 @@ APK 文件的结构类似于 ZIP 文件，可以像 ZIP 文件一样解压缩。
 
 大多数 Android Studio 项目都使用 Gradle 作为底层构建系统，因此本部分适用于使用这两种工具进行构建的情况。针对原生代码进行构建很简单，只需将 **arm64-v8a** 和/或 **x86_64**（视您要支持的架构而定）添加到应用的“build.gradle”文件中的 [ndk.abiFilters](https://google.github.io/android-gradle-dsl/current/com.android.build.gradle.internal.dsl.NdkOptions.html) 设置中即可：
 
-- [Groovy](https://developer.android.com/distribute/best-practices/develop/64-bit?hl=zh-cn#groovy)
-- [Kotlin](https://developer.android.com/distribute/best-practices/develop/64-bit?hl=zh-cn#kotlin)
+<Tabs>
+<TabItem value='groovy' label='Groovy' default>
 
 ```
 // Your app's build.gradle
@@ -95,6 +98,32 @@ android {
        ndk.abiFilters 'armeabi-v7a','arm64-v8a','x86','x86_64'
 // ...
 ```
+
+</TabItem>
+<TabItem value='kotlin' label='Kotlin'>
+
+```
+// Your app's build.gradle
+plugins {
+    id("com.android.app")
+}
+
+android {
+    compileSdkVersion(27)
+    defaultConfig {
+        appId = "com.google.example.64bit"
+        minSdkVersion(15)
+        targetSdkVersion(28)
+        versionCode = 1
+        versionName = "1.0"
+        ndk {
+            abiFilters += listOf("armeabi-v7a","arm64-v8a","x86","x86_64")
+        }
+// ...
+```
+
+</TabItem>
+</Tabs>
 
 ### 使用 CMake 进行构建
 
@@ -130,7 +159,7 @@ APP_ABI := armeabi-v7a arm64-v8a x86 x86_64
 
 具有 `int` 字段（包含指向 C/C++ 对象的指针）的 Java 类也有同样的问题。在 JNI 源代码中搜索 `jint`，并确保切换到 `long`（Java 端）和 `jlong`（C++ 端）。
 
-**注意**：因指针被截断而引起的崩溃将表现为 `SIGSEGV`，其中错误地址的前 32 位全部为零。
+**注意**：因指针被截断而引起的崩溃将表现为 SIGSEGV，其中错误地址的前 32 位全部为零。
 
 对于 64 位代码而言，隐式函数声明的危险性要高得多。C/C++ 假定隐式声明的函数（即编译器未检测到声明的函数）的返回值类型为 `int`。如果函数的实际返回值类型是指针，那么在 32 位系统上是可行的，因为在 32 位系统中指针的类型为 `int`，但在 64 位系统中，编译器会丢弃指针的前半部分。例如：
 
@@ -213,7 +242,7 @@ Unity 自版本 [2018.2](https://blogs.unity3d.com/2018/07/10/2018-2-is-now-avai
 
 1. 转到 **Build Settings**，然后确认 Unity 标志是否显示在 **Platform** 下的 **Android** 旁边，以确保您是在针对 Android 进行构建。
    - 如果 Unity 标志未显示在 Android 平台旁边，请选择 **Android**，然后点击 **Switch Platform**。
-2. 点击 Player Settings。
+2. 点击 **Player Settings**。
 3. 依次转到 **Player Settings Panel > Settings for Android > Other Settings > Configuration**
 4. 将 **Scripting Backend** 设为 **IL2CPP**。
 5. 依次选择 **Target Architecture > ARM64** 复选框。
