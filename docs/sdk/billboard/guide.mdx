@@ -1,0 +1,285 @@
+---
+title: 公告指南
+sidebar_label: 开发指南
+sidebar_position: 2
+---
+
+import MultiLang from '/src/docComponents/MultiLang';
+import CodeBlock from '@theme/CodeBlock';
+import sdkVersions from '/src/docComponents/sdkVersions';
+
+
+## 富信息 REST API
+
+下面我们介绍公告系统相关的 REST API 接口。
+开发者可以自行编写程序或脚本调用这些接口在服务端进行管理性质的操作。
+
+### 请求格式
+
+对于 POST 和 PUT 请求，请求的主体必须是 JSON 格式，而且 HTTP Header 的 Content-Type 需要设置为 `application/json`。
+
+请求的鉴权是通过 HTTP Header 里面包含的键值对来进行的，参数如下表：
+
+| Key        | Value        | 含义                                      | 来源           |
+| ---------- | ------------ | ----------------------------------------- | -------------- |
+| `X-LC-Id`  | `{{appid}}`  | 当前应用的 `App Id`（即 `Client Id`）     | 可在控制台查看 |
+| `X-LC-Sign` | `{{appSign}}` | 将 timestamp 加上 `App Key`（即当前应用的 `Client Token`）组成的字符串，再对它做 MD5 签名后的结果。| 可在控制台查看 |
+
+使用 App Key 来计算 `appSign`:
+
+```sh
+md5( timestamp + App Key )
+= md5(1453014943466UtOCzqb67d3sN12Kts4URwy8)
+= d5bcbb897e19b2f6633c716dfdfaf9be
+
+-H "X-LC-Sign: d5bcbb897e19b2f6633c716dfdfaf9be,1453014943466"
+```
+
+详见文档关于[应用凭证](/sdk/storage/guide/setup-dotnet#应用凭证)的说明。
+
+除了在 `X-LC-Id` 这个 HTTP Header 中传入 `Client Id` 外，还需要在 URL 中指定 `Client Id`，两者的值需要一致。
+
+
+异常时返回 400 （HTTP 状态码）错误，例如：
+
+```json
+{
+    "success": false,
+    "data": {
+        "code": 0,
+        "error": "invalid_request",
+        "msg": "invalid params",
+        "error_description": ""
+    },
+    "now": 1659084246
+}
+```
+
+### Base URL
+
+REST API 请求的 Base URL（下文 curl 示例中用 `{{host}}` 表示）即应用绑定的 API 自定义域名，可以在控制台绑定、查看。
+详见文档关于[域名](/sdk/storage/guide/setup-dotnet#域名)的说明。
+
+### 获取模版
+
+| 参数                    | 约束 | 说明                                                                                          |
+| ----------------------- | ---- | --------------------------------------------------------------------------------------------- |
+| `client_id`         | 必须 | **开发者中心后台游戏服务 > 应用配置** 中的 Client ID。                                                                |
+| `type`            | 必须 | 公告模版类型，目前仅支持导航模版。可填写：导航模版-`navigate`、图片模版-`image`。         ｜
+
+```sh
+curl -X GET
+  -H 'X-LC-Id: {{appid}}' \
+  -H 'X-LC-Sign: {{appSign}}' \
+  https://{{host}}/billboard/rest-api/v1/pattern/detail?client_id={{appid}}&type={{type}}
+```
+
+返回的主体是一个 JSON 对象，包含创建模版时传入的所有参数：
+
+```json
+{
+    "success": true,
+    "data": {
+        "empty_img": {
+            "url": "https://tds-billboard.tds1.tapfiles.cn/20220727/aWkG63mpT2WeFrtT0Dxojj4QLfabWHh3.png"
+        },
+        "highlight_text_color": "#15C5CE",
+        ...
+    },
+    "now": 1659085552
+}
+```
+
+### 获取公告列表
+
+| 参数                    | 约束 | 说明                                                                                          |
+| ----------------------- | ---- | --------------------------------------------------------------------------------------------- |
+| `client_id`         | 必须 | **开发者中心后台游戏服务 > 应用配置** 中的 Client ID。  |
+| `lang`            | 必须 | 详见[语言代码列表](#语言代码列表)｜
+| `template`            | 必须 | 公告模版类型，目前仅支持导航模版。可填写：导航模版-`navigate`、图片模版-`image`。｜
+| `dimension_list`  | 必须 | [{"维度参数"："维度字段参数"},...] ，示例：[{"platform":"ios"},{"location":"CN"}]｜
+
+```sh
+curl -X POST
+  -H 'X-LC-Id: {{appid}}' \
+  -H 'X-LC-Sign: {{appSign}}' \
+  -H 'Content-Type: application/json' \
+  -d '{
+        "lang":{{lang}},
+        "template":{{template}},
+        "type":{{type}},
+        "dimension_list":{{dimension_list}}
+     }' \
+  https://{{host}}/billboard/rest-api/v1/announcement/list?client_id={{appid}}
+```
+
+返回的 JSON 对象
+
+| 参数                    | 说明                                                                                          |
+| --------------| --------------------------------------------------------------------------------------------- |
+| `id`          | 公告id  |
+| `type`        | 公告类型：更新公告-update、维护公告-maintenance、上新公告-new、活动公告-activity、玩法公告-play_method、测试公告-test、停服公告-discontinued｜
+| `expire_time`  | 过期时间：秒级时间戳，0-表示不过期｜
+| `short_title`  | 短标题｜
+| `jump_location`  | 跳转位置：content-正文、link-跳转链接、game｜
+| `jump_link`  | 跳转位置选择「跳转链接」时为对应的链接，选择「游戏内模块」时为对应的模块参数｜
+| `publish_time`    | 发布时间：秒级时间戳｜
+
+```json
+{
+    "success": true,
+    "data": {
+        "list": [
+            {
+                "id": 2,
+                "type": "activity",
+                "expire_time": 0,
+                "short_title": "公告跳转链接地址",
+                "jump_location": "link",
+                "jump_link": "https://www.baidu.com",
+                "publish_time": 1659077524
+            }
+        ],
+        "lastest": {
+            "id": 19,
+            "content": "[{\"type\":\"image\",\"info\":{\"img_url\":\"https://tds-billboard.tds1.tapfiles.cn/20220722/28IdyXLZUMkrqcUsH6NVLf5RQzBSLrfZ.png\"}},{\"type\":\"paragraph\",\"children\":[{\"text\":\"看到标题，肯定有团长会问了：\"},{\"text\":\"说好的三月底四月初测试呢？\",\"highlight\":true},{\"text\":\"怎么那么晚才开测！\"}]},{\"type\":\"block-link\",\"info\":{\"url\":\"https://www.baidu.com/\",\"type\":\"link\",\"noLinkTitle\":false},\"children\":[{\"text\":\"点击前往测试报名\"}]},{\"type\":\"paragraph\",\"children\":[{\"text\":\"看到标题，肯定有团长会问了：说好的三月底四月z初测试呢？怎么那么晚才开测！\"}]},{\"type\":\"horizontal-rule\"},{\"type\":\"paragraph\",\"children\":[{\"text\":\"〓资格发放时间〓\"}]},{\"type\":\"paragraph\",\"children\":[{\"text\":\"·2022年4月9日 \"}]},{\"type\":\"paragraph\",\"children\":[{\"text\":\"\"}]},{\"type\":\"paragraph\",\"children\":[{\"text\":\"〓注意事项〓\"}]},{\"type\":\"paragraph\",\"children\":[{\"text\":\"·团长们填写招募问卷的TapTap ID即测试授权的登录账号；\"}]},{\"type\":\"paragraph\",\"children\":[{\"text\":\"·4月14日开测当天官方还会再次给拥有测试资格的团长发送通知，届时请留意手机短信、站内信。官方资讯将有详细开测指引；\"}]}]",
+            "short_title": "公告跳转链接地址",
+            "long_title": "测试情报｜「起着测试」4月14日开启"
+        }
+    },
+    "now": 1659085756
+}
+```
+
+### 获取公告详情
+
+| 参数                    | 约束 | 说明                                                                                   |
+| ----------------------- | ---- | -------------------------------------------------------------------------------------|
+| `client_id`         | 必须 | **开发者中心后台游戏服务 > 应用配置** 中的 Client ID。  |
+| `lang`            | 必须 | 详见[语言代码列表](#语言代码列表)｜
+| `id`            | 必须 | 公告Id｜
+
+```sh
+curl -X GET
+  -H 'X-LC-Id: {{appid}}' \
+  -H 'X-LC-Sign: {{appSign}}' \
+  https://{{host}}/billboard/rest-api/v1/announcement/detail?client_id={{appid}}&type={{type}}
+```
+
+返回的 JSON 对象
+| 参数                    | 说明                                                                                        |
+| --------------| --------------------------------------------------------------------------------------------- |
+| `id`          | 公告id  |
+| `content`        | 正文｜
+| `long_title`  | 长标题｜
+| `short_title`  | 短标题｜
+
+```json
+{
+    "success": true,
+    "data": {
+        "id": 82,
+        "content": "正文",
+        "short_title": "短标题",
+        "long_title": "长标题"
+    },
+    "now": 1659087990
+}
+```
+
+### 获取小红点
+
+| 参数                    | 约束 | 说明                                                                                          |
+| ----------------------- | ---- | --------------------------------------------------------------------------------------------- |
+| `client_id`         | 必须 | **开发者中心后台游戏服务 > 应用配置** 中的 Client ID。  |
+| `uuid`            | 必须 | 设备唯一id字符串，示例："4e4105c7-781e-45c0-92ea-d595c75a3c2c"｜
+| `template`            | 必须 | 公告模版类型，目前仅支持导航模版。可填写：导航模版-`navigate`、图片模版-`image`。｜
+| `dimension_list`  | 必须 | [{"维度参数"："维度字段参数"},...] ，示例：[{"platform":"ios"},{"location":"CN"}]｜
+
+```sh
+curl -X POST \
+  -H 'X-LC-Id: {{appid}}' \
+  -H 'X-LC-Sign: {{appSign}}' \
+  -H 'Content-Type: application/json' \
+  -d '{
+        "uuid": {{uuid}},
+        "template":{{template}},
+        "dimension_list":{{dimension_list}}
+      }' \
+  'https://{{host}}/billboard/rest-api/v1/dot/read?client_id={{client_id}}'
+```
+
+返回的 JSON 对象
+| 参数                    | 说明                                                                                        |
+| --------------| --------------------------------------------------------------------------------------------- |
+| `show_red_dot`| 是否展示小红点：0-不展示 1-展示  |
+| `close_button_img`  | 在导航接口中获取关闭按钮url｜
+
+```json
+{
+    "success": true,
+    "data": {
+        "show_red_dot": 0,
+        "close_button_img": "https://tds-billboard.tds1.tapfiles.cn/20220727/aMHoqDTHT4zrXYPNprkZjXkdLK6vFg8E.png"
+    },
+    "now": 1658896487
+}
+```
+
+### 语言代码列表
+
+使用 ISO 639-1 中定义的双小写字母语言代码（例如，`en` 表示英语，`jp` 表示日语），但：
+
+1. ISO 639-1 中未包括的语言，使用 ISO 632-2 中定义的三小写字母语言代码（例如，`fil` 表示菲律宾语）
+2. 仅使用语言代码无法表示所需语言时，附加 ISO 3166-1 中定义的地区代码（例如，`zh_CN` 表示简体中文）
+
+当前 REST API 支持的语言代码如下：
+
+| 代码 | 语言         |
+| ------- | ----------- |
+| zh_CN    | 简体中文     |
+| zh_TW    | 繁体中文     |
+| en_US    | 英语（美国） |
+| ja_JP    | 日文         |
+| ko_KR    | 韩文         |
+| pt_PT    | 葡萄牙语     |
+| vi_VN    | 越南语       |
+| hi_IN    | 印度语       |
+| id_ID    | 印尼语       |
+| ms_MY    | 马来语       |
+| th_TH    | 泰语         |
+| es_ES    | 西班牙       |
+| af       | 南非荷兰语   |
+| am       | 阿姆哈拉语   |
+| bg       | 保加利亚语   |
+| ca       | 加泰罗尼亚语 |
+| hr       | 克罗地亚语   |
+| cs       | 捷克语       |
+| da       | 丹麦语       |
+| nl       | 荷兰语       |
+| et       | 爱沙尼亚语   |
+| fil      | 菲律宾语     |
+| fi       | 芬兰语       |
+| fr       | 法语         |
+| de       | 德语         |
+| el       | 希腊语       |
+| he       | 希伯来语     |
+| hu       | 匈牙利语     |
+| is       | 冰岛语       |
+| it       | 意大利语     |
+| lv       | 拉脱维亚语   |
+| lt       | 立陶宛语     |
+| no       | 挪威语       |
+| pl       | 波兰语       |
+| ro       | 罗马尼亚语   |
+| ru       | 俄语         |
+| sr       | 塞尔维亚语   |
+| sk       | 斯洛伐克语   |
+| sl       | 斯洛文尼亚语 |
+| sw       | 斯瓦希里语   |
+| sv       | 瑞典语       |
+| tr       | 土耳其语     |
+| uk       | 乌克兰语     |
+| zu       | 祖鲁语       |
+
+注意，上表中的部分语言虽然 REST API 支持，但[客户端 SDK 并没有支持](#国际化)。
