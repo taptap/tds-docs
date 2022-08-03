@@ -1,8 +1,8 @@
 const sdkVersions = {
   taptap: {
-    unity: "3.11.0",
-    android: "3.11.0",
-    ios: "3.11.0",
+    unity: "3.12.0",
+    android: "3.12.0",
+    ios: "3.12.0",
     rtc: "1.1.0",
   },
   tapdb: {
@@ -17,7 +17,7 @@ const sdkVersions = {
       storage: "4.13.1",
       realtime: "5.0.0-rc.7",
     },
-    java: "8.2.10",
+    java: "8.2.12",
     csharp: "0.10.14",
   },
 };

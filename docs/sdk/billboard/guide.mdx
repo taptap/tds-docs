@@ -1,0 +1,716 @@
+---
+title: 公告指南
+sidebar_label: 开发指南
+sidebar_position: 2
+---
+
+import MultiLang from '/src/docComponents/MultiLang';
+import CodeBlock from '@theme/CodeBlock';
+import sdkVersions from '/src/docComponents/sdkVersions';
+import Languages from '../_partials/languages.mdx';
+import { Conditional } from "/src/docComponents/conditional";
+
+:::tip
+接入 TDS 公告服务 SDK 之前，请参考[《功能介绍》文档](/sdk/billboard/features/#功能介绍)完成**服务开通<Conditional region="cn">、域名配置</Conditional>**。
+:::
+
+## SDK 配置
+
+可以在 [下载页](/tap-download) 获得 TapSDK，引入公告模块。
+
+<MultiLang>
+
+<>
+
+Unity 模块是通过引入 iOS 和 Android 模块后增加桥接文件打包出的 `.unitypackage`，方便以 Unity 开发的游戏直接引入。其他引擎/平台的游戏可以通过 iOS/Android 原生的方式接入，详见 iOS/Android 接入文档。
+
+**Unity 开发环境要求**：Unity 2019.4 或更高版本
+
+支持版本：
+
+- Android：最低支持 5.0
+- iOS：最低支持 iOS 10.0
+
+<CodeBlock className="json">
+{`"dependencies":{
+  "com.taptap.tds.billboard": "https://github.com/TapTap/TapBillboard-Unity.git#${sdkVersions.taptap.unity}",
+  "com.taptap.tds.common": "https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+  "com.taptap.tds.bootstrap": "https://github.com/TapTap/TapBootstrap-Unity.git#${sdkVersions.taptap.unity},
+  "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
+}`}
+</CodeBlock>
+
+</>
+
+<>
+
+<CodeBlock className="groovy">
+{`repositories{  
+    flatDir {  
+        dirs 'libs'  
+    }  
+}  
+dependencies {  
+ 
+    implementation (name:'TapBillboard_${sdkVersions.taptap.android}', ext:'aar') // TapTap 公告系统
+    implementation (name:'TapCommon_${sdkVersions.taptap.android}', ext:'aar')
+    implementation (name:'TapBootstrap_${sdkVersions.taptap.android}', ext:'aar')
+}`}
+</CodeBlock>
+
+</>
+
+<>
+
+<CodeBlock className="objectivec">
+{`// 公告系统
+TapBillboardResource.bundle
+TapCommonResource.bundle
+TapBillboardSDK.framework
+TapCommonSDK.framework
+TapBootstrapSDK.framework
+`}
+</CodeBlock>
+
+</>
+
+</MultiLang>
+
+
+## 初始化
+
+如果你已经参考[快速开始](/sdk/start/quickstart/#初始化)完成了初始化，这里只需要引入公告模块，然后添加下面初始化代码中高亮的部分到项目中即可。
+
+<MultiLang>
+
+<>
+
+```cs
+// highlight-start
+var dimensionSet = new HashSet<Pair<string, string>>();
+Pair<string, string> pair = new Pair<string, string>("platform", "ios");
+Pair<string, string> location = new Pair<string, string>("location", "CN");
+dimensionSet.Add(pair);
+dimensionSet.Add(location);
+var templateType = "navigate"; // 可选
+var billboardServerUrl = "https://your-billboard-server-url"; // 开发者中心 > 你的游戏 > 游戏服务 > 应用配置 > 域名配置 > 公告
+// highlight-end
+
+var config = new TapConfig.Builder()
+    .ClientID("your_client_id") // 必须，开发者中心对应 Client ID
+    .ClientToken("your_client_token") // 必须，开发者中心对应 Client Token
+    .ServerURL("https://your_server_url") // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
+    .RegionType(RegionType.CN) // 可选项，CN 表示中国大陆，IO 表示其他国家或地区
+    // highlight-next-line
+    .TapBillboardConfig(dimensionSet, templateType, billboardServerUrl)
+    .ConfigBuilder();
+TapBootstrap.Init(config);
+```
+
+</>
+
+<>
+
+**注意： Android SDK 初始化需要放在 Android 主线程中进行**。
+
+<Conditional region="cn">
+
+国内版初始化：
+
+```java
+// highlight-start
+Set<Pair<String, String>> dimensionSet = new HashSet<>();
+dimensionSet.addAll(Arrays.asList(Pair.create("location", "CN"), Pair.create("platform", "android")));
+String billboardServerUrl = "https://your-billboard-server-url"; // 开发者中心 > 你的游戏 > 游戏服务 > 应用配置 > 域名配置 > 公告
+
+TapBillboardConfig billboardCnConfig = new TapBillboardConfig.Builder()
+        .withDimensionSet(dimensionSet)    // 可选
+        .withServerUrl(billboardServerUrl) // 必须, 公告的自定义域名
+        .withTemplate("navigate") // 可选, 默认是 navigate
+        .build();
+// highlight-end
+
+TapConfig tapConfig = new TapConfig.Builder()
+        .withAppContext(gameMainActivity) //必须, 传入游戏主 Activity
+        .withClientId("your_client_id") // 必须, 开发者中心应用配置里的 Client ID
+        .withClientToken("your_client_token") // 必须, 开发者中心应用配置里的 Client Token
+        .withServerUrl("https://your_server_url") // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > 云服务 API
+        // highlight-next-line
+        .withBillboardConfig(billboardCnConfig) // 必须
+        .withRegionType(TapRegionType.CN)
+        .build();
+TapBootstrap.init(gameMainActivity, tapConfig);                
+```
+
+海外版初始化：
+
+</Conditional>
+
+```java
+// highlight-start
+Set<Pair<String, String>> dimensionSet = new HashSet<>()
+dimensionSet.addAll(Arrays.asList(Pair.create("location", "XX"), Pair.create("platform", "android")));
+String billboardServerUrl = "https://your-billboard-server-url"; // 开发者中心 > 你的游戏 > 游戏服务 > 应用配置 > 域名配置 > 公告
+
+TapBillboardConfig billboardIntlConfig = new TapBillboardConfig.Builder()
+        .withDimensionSet(dimensionSet) // 可选
+        .withTemplate("navigate") // 可选, 默认是navigate
+        .build();
+// highlight-end
+
+TapConfig tapConfig = new TapConfig.Builder()
+        .withAppContext(gameMainActivity) //必须, 传入游戏主 Activity
+        .withClientId("your_client_id") // 必须, 开发者中心应用配置里的 Client ID
+        .withClientToken("your_client_token") // 必须, 开发者中心应用配置里的 Client Token
+        .withServerUrl("https://your_server_url") // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > 云服务 API
+        // highlight-next-line
+        .withBillboardConfig(billboardIntlConfig) // 必须
+        .withRegionType(TapRegionType.IO)
+        .build();
+TapBootstrap.init(gameMainActivity, tapConfig);
+```
+
+</>
+
+<>
+
+<Conditional region="cn">
+
+国内版初始化：
+
+```objectivec
+// highlight-start
+NSMutableSet <NSArray *> *dimensionSet = [[NSMutableSet alloc] init];
+[dimensionSet addObject:[NSArray arrayWithObjects:@"platform", @"ios", nil]];
+[dimensionSet addObject:[NSArray arrayWithObjects:@"location", @"CN", nil]];
+
+TapBillboardConfig *billboardCnConfig = [TapBillboardConfig new];
+billboardCnConfig.templateType = @"navigate"; // 可选项
+billboardCnConfig.diemensionSet = dimensionSet; // 可选项
+billboardCnConfig.serverUrl = @"https://your-billboard-server-url"; // 开发者中心 > 你的游戏 > 游戏服务 > 应用配置 > 域名配置 > 公告
+// highlight-end
+
+TapConfig *config = [TapConfig new];
+config.clientId = @"your_client_id"; // 必须，开发者中心对应 Client ID
+config.clientToken = @"your_client_token"; // 必须，开发者中心对应 Client Token
+config.region = TapSDKRegionTypeCN; // TapSDKRegionTypeCN：中国大陆，TapSDKRegionTypeIO：其他国家或地区
+config.serverURL = "https://your_server_url"; // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
+// highlight-next-line
+config.tapBillboardConfig = billboardCnConfig;
+[TapBootstrap initWithConfig:config];
+```
+
+海外版初始化：
+
+</Conditional>
+
+```objectivec
+// highlight-start
+NSMutableSet <NSArray *> *dimensionSet = [[NSMutableSet alloc] init];
+[dimensionSet addObject:[NSArray arrayWithObjects:@"platform", @"ios", nil]];
+[dimensionSet addObject:[NSArray arrayWithObjects:@"location", @"XX", nil]];
+
+TapBillboardConfig *billboardIntlConfig = [TapBillboardConfig new];
+billboardIntlConfig.templateType = @"navigate"; // 可选项
+billboardIntlConfig.diemensionSet = dimensionSet; // 可选项
+// highlight-end
+
+TapConfig *config = [TapConfig new];
+config.clientId = @"your_client_id"; // 必须，开发者中心对应 Client ID
+config.clientToken = @"your_client_token"; // 必须，开发者中心对应 Client Token
+config.region = TapSDKRegionTypeIO; // TapSDKRegionTypeCN：中国大陆，TapSDKRegionTypeIO：其他国家或地区
+config.serverURL = "https://your_server_url"; // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
+// highlight-next-line
+config.tapBillboardConfig = billboardIntlConfig;
+[TapBootstrap initWithConfig:config];
+```
+
+</>
+
+</MultiLang>
+
+### 参数说明
+
+<Conditional region="cn">
+
+* 初始化需要两个域名，分别是 API 域名和公告域名。参考文档关于[域名](/sdk/domain/guide/)的说明，在 开发者中心 > 你的游戏 > 游戏服务 > 应用配置 > 域名配置 处完成配置之后填入。
+
+</Conditional>
+
+* `dimensionSet` 参考[公告系统维度配置](/sdk/billboard/features/#维度配置)，这里使用了两个预设维度：渠道（platform）和地区（location）。
+
+* `client_id`、`client_token`、`RegionType` 信息可在 开发者中心 > 你的游戏 > 游戏服务 > 应用配置 查看。
+
+## 打开公告
+
+<MultiLang>
+
+```cs
+TapBillboard.OpenPanel((any, error) =>
+{
+    if (error != null)
+    {
+        // 打开公告失败  可以根据 error.code 和 error.errorDescription 来判断错误原因
+    } else
+    {
+        // 打开公告成功
+    }
+});
+```
+
+```java
+TapBillboard.openPanel(BillboardActivity.this, new Callback<Void>() {
+    @Override
+    public void onError(TapBillboardException tapBillboardException) {
+        // 打开公告失败，可以根据 tapBillboardException.code 和 tapBillboardException.message 来判断错误原因
+    }
+
+    @Override
+    public void onSuccess(Void result) {
+        // 打开公告成功
+    }
+});             
+```
+
+```objectivec
+[TapBillboard openPanel:^(_, NSError *_Nullable error) {
+    if (error) {
+        // 打开公告失败  可以根据 error.code 和 error.errorDescription 判断错误原因
+    } else {
+        // 打开公告成功
+    }
+}];
+```
+
+</MultiLang>
+
+## 获取小红点
+
+可以用来获取是否有新的公告信息。SDK 内部对小红点信息进行了缓存，如果两次请求间隔小于 5 分钟，会直接返回上一次成功结果。
+
+<MultiLang>
+
+```cs
+TapBillboard.QueryBadgeDetails((badgeDetails, error) =>
+{
+    if (error != null)
+    {
+        // 获取小红点信息失败 可以根据 error.code 和 error.errorDescription 来判断错误原因
+    }
+    else
+    {
+        // 获取小红点信息成功
+        if (badgeDetails.showRedDot == 1) {
+            // 有新的公告信息
+        } else {
+            // 没有新的公告信息
+        }
+    }
+});
+```
+
+```java
+TapBillboard.getBadgeDetails(new Callback<BadgeDetails>() {
+    @Override
+    public void onError(TapBillboardException tapBillboardException) {
+        // 获取小红点信息失败 可以根据 tapBillboardException.code 和 tapBillboardException.message 来判断错误原因
+    }
+
+    @Override
+    public void onSuccess(BadgeDetails badgeDetails) {
+        if (badgeDetails.showRedDot == 1) {
+            // 有新的公告信息
+        } else {
+            // 没有新的公告信息
+        }
+    }
+});          
+```
+
+```objectivec
+[TapBillboard getBadgeDetails:^(BadgeDetails * _Nullable result, NSError *_Nullable error) {
+    if (error) {
+        // 获取小红点信息失败 可以根据 error.code 和 error.errorDescription 来判断错误原因
+    } else {
+        if (result.showRedDot == 1) {
+            // 有新的公告信息
+        } else {
+            // 没有新的公告信息
+        }
+    }
+}];
+```
+
+</MultiLang>
+
+## 注册自定义事件监听
+
+当[游戏发布的公告配置的跳转链接为「游戏内模块」](/sdk/billboard/features/#发布公告)，或者游戏正文添加了链接并且链接类型为「游戏内模块」的时候，可以通过监听自定义事件来获取消息，并做相应处理。
+
+<MultiLang>
+
+```cs
+TapBillboard.RegisterCustomLinkListener(url =>
+{
+    // 这里返回的 url 地址和游戏在公告系统内配置的地址是一致的
+});
+```
+
+```java
+TapBillboard.registerCustomLinkListener(new CustomLinkListener() {
+    @Override
+    public void onCustomUrlClick(String url) {
+        // 这里返回的 url 地址和游戏在公告系统内配置的地址是一致的
+        // 注意如果有 UI 操作需要切换到 Android 主线程处理
+    }
+});        
+```
+
+```objectivec
+[TapBillboard registerCustomLinkListener:^(NSString * _Nullable customUrl) {
+    // 这里返回的 url 地址和游戏在公告系统内配置的地址是一致的
+}];
+```
+
+</MultiLang>
+
+## 解除已注册的自定义事件监听
+
+如果不想再接收公告的自定义事件监听可以调用下面的接口：
+
+<MultiLang>
+
+```cs
+// 已注册的回调对象需要游戏保存，取消注册的时候要把对象传给 SDK
+TapBillboard.UnRegisterCustomLinkListener(registerdListener);
+```
+
+```java
+// 已注册的回调对象需要游戏保存，取消注册的时候要把对象传给 SDK
+TapBillboard.unRegisterCustomLinkListener(registerdListener);    
+```
+
+```objectivec
+// 已注册的回调对象需要游戏保存，取消注册的时候要把对象传给 SDK
+[TapBillboard unRegisterCustomLinkListener:registerdListener];
+```
+
+</MultiLang>
+
+## 国际化
+
+公告支持设置语言：
+
+<Languages />
+
+## 错误码
+
+| `code` | 场景 |
+|---|---|
+| 400 | 初始化参数错误 |
+| 403 | 用户无权限访问该服务，需检查开发者中心是否开通了公告服务 |
+| 50x | 服务端内部错误，错误内容可以参考 description |
+| 19999 | 其它错误，内容可以参考 description |
+
+## REST API
+
+下面我们介绍公告系统相关的 REST API 接口。
+
+### 请求格式
+
+对于 POST 和 PUT 请求，请求的主体必须是 JSON 格式，而且 HTTP Header 的 Content-Type 需要设置为 `application/json`。
+
+请求的鉴权是通过 HTTP Header 里面包含的键值对来进行的，参数如下表：
+
+| Key        | Value        | 含义                                      | 来源           |
+| ---------- | ------------ | ----------------------------------------- | -------------- |
+| `X-LC-Id`  | `{{appid}}`  | 当前应用的 `App Id`（即 `Client Id`）  | 可在控制台查看 |
+| `X-LC-Sign` | `{{appSign}}` | 将 timestamp 加上 `App Key`（即 `Client Token`）组成的字符串，再对它做 MD5 签名后的结果。| 可在控制台查看 |
+
+使用 App Key 来计算 `appSign`:
+
+```sh
+md5( timestamp + App Key )
+= md5(1453014943466UtOCzqb67d3sN12Kts4URwy8)
+= d5bcbb897e19b2f6633c716dfdfaf9be
+
+-H "X-LC-Sign: d5bcbb897e19b2f6633c716dfdfaf9be,1453014943466"
+```
+
+除了在 `X-LC-Id` 这个 HTTP Header 中传入 `Client Id` 外，还需要在 URL 中指定 `Client Id`，两者的值需要一致。
+
+异常时返回 400 （HTTP 状态码）错误，例如：
+
+```json
+{
+    "success": false,
+    "data": {
+        "code": 0,
+        "error": "invalid_request",
+        "msg": "invalid params",
+        "error_description": ""
+    },
+    "now": 1659084246
+}
+```
+
+### Base URL
+
+REST API 请求的 Base URL（下文 curl 示例中用 `{{host}}` 表示）即应用的 API <Conditional region='cn'>自定义</Conditional>域名，可以在控制台<Conditional region='cn'>绑定、</Conditional>查看。<Conditional region='cn'>详见文档关于[域名](/sdk/domain/guide/)的说明。</Conditional>
+
+### 获取模版
+
+| 参数 | 约束 | 说明 |
+|---|---|---|
+| `client_id` | 必须 | **开发者中心后台游戏服务 > 应用配置** 中的 `Client ID` |
+| `type` | 必须 | 公告模版类型，目前仅支持导航模版。可填写：导航模版-`navigate`、图片模版-`image`。 |
+
+```sh
+curl -X GET
+  -H 'X-LC-Id: {{appid}}' \
+  -H 'X-LC-Sign: {{appSign}}' \
+  https://{{host}}/billboard/rest-api/v1/pattern/detail?client_id={{appid}}&type={{type}}
+```
+
+返回的主体是一个 JSON 对象，包含创建模版时传入的所有参数：
+
+```json
+{
+    "success": true,
+    "data": {
+        "empty_img": {
+            "url": "https://tds-billboard.tds1.tapfiles.cn/20220727/aWkG63mpT2WeFrtT0Dxojj4QLfabWHh3.png"
+        },
+        "highlight_text_color": "#15C5CE",
+        ...
+    },
+    "now": 1659085552
+}
+```
+
+### 获取公告列表
+
+| 参数 | 约束 | 说明 |
+|---|---|---|
+| `client_id` | 必须 | **开发者中心后台游戏服务 > 应用配置** 中的 `Client ID` |
+| `lang` | 必须 | 详见[语言代码列表](#语言代码列表) |
+| `template` | 必须 | 公告模版类型，目前仅支持导航模版。可填写：导航模版-`navigate`、图片模版-`image`。 |
+| `dimension_list` | 可选 | `[{"维度参数"："维度字段参数"},...]` ，示例：`[{"platform":"ios"},{"location":"CN"}]` |
+
+```sh
+curl -X POST
+  -H 'X-LC-Id: {{appid}}' \
+  -H 'X-LC-Sign: {{appSign}}' \
+  -H 'Content-Type: application/json' \
+  -d '{
+        "lang":{{lang}},
+        "template":{{template}},
+        "type":{{type}},
+        "dimension_list":{{dimension_list}}
+     }' \
+  https://{{host}}/billboard/rest-api/v1/announcement/list?client_id={{appid}}
+```
+
+返回的 JSON 对象
+
+| 参数 | 说明 |
+|---|---|
+| `id` | 公告 id |
+| `type` | 公告类型：更新公告-update、维护公告-maintenance、上新公告-new、活动公告-activity、玩法公告-play_method、测试公告-test、停服公告-discontinued |
+| `expire_time` | 过期时间：秒级时间戳，0-表示不过期 |
+| `short_title` | 短标题 |
+| `jump_location` | 跳转位置：content-正文、link-跳转链接、game-游戏内模块 |
+| `jump_link` | 跳转位置选择「跳转链接」时为对应的链接，选择「游戏内模块」时为对应的模块参数 |
+| `publish_time` | 发布时间：秒级时间戳 |
+
+```json
+{
+    "success": true,
+    "data": {
+        "list": [
+            {
+                "id": 2,
+                "type": "activity",
+                "expire_time": 0,
+                "short_title": "公告跳转链接地址",
+                "jump_location": "link",
+                "jump_link": "https://www.taptap.com",
+                "publish_time": 1659077524
+            }
+        ],
+        "lastest": {
+            "id": 19,
+            "content": "正文",
+            "short_title": "公告跳转链接地址",
+            "long_title": "测试情报｜「起着测试」4月14日开启"
+        }
+    },
+    "now": 1659085756
+}
+```
+
+### 获取公告详情
+
+| 参数 | 约束 | 说明 |
+|---|---|---|
+| `client_id` | 必须 | **开发者中心后台游戏服务 > 应用配置** 中的 `Client ID` |
+| `lang` | 必须 | 详见[语言代码列表](#语言代码列表) |
+| `id` | 必须 | 公告 id |
+
+```sh
+curl -X GET
+  -H 'X-LC-Id: {{appid}}' \
+  -H 'X-LC-Sign: {{appSign}}' \
+  https://{{host}}/billboard/rest-api/v1/announcement/detail?client_id={{appid}}&type={{type}}
+```
+
+返回的 JSON 对象
+
+| 参数 | 说明 |
+|---|---|
+| `id` | 公告 id |
+| `content` | 正文 |
+| `long_title` | 长标题 |
+| `short_title` | 短标题 |
+
+```json
+{
+    "success": true,
+    "data": {
+        "id": 82,
+        "content": "正文",
+        "short_title": "短标题",
+        "long_title": "长标题"
+    },
+    "now": 1659087990
+}
+```
+
+### 获取小红点
+
+| 参数 | 约束 | 说明 |
+|---|---|---|
+| `client_id` | 必须 | **开发者中心后台游戏服务 > 应用配置** 中的 `Client ID` |
+| `uuid` | 必须 | 设备唯一 id 字符串，示例："4e4105c7-781e-45c0-92ea-d595c75a3c2c" |
+| `template` | 必须 | 公告模版类型，目前仅支持导航模版。可填写：导航模版-`navigate`、图片模版-`image`。 |
+| `dimension_list` | 可选 | `[{"维度参数"："维度字段参数"},...]` ，示例：`[{"platform":"ios"},{"location":"CN"}]` |
+
+```sh
+curl -X POST \
+  -H 'X-LC-Id: {{appid}}' \
+  -H 'X-LC-Sign: {{appSign}}' \
+  -H 'Content-Type: application/json' \
+  -d '{
+        "uuid": {{uuid}},
+        "template":{{template}},
+        "dimension_list":{{dimension_list}}
+      }' \
+  'https://{{host}}/billboard/rest-api/v1/dot/read?client_id={{client_id}}'
+```
+
+返回的 JSON 对象
+
+| 参数 | 说明 |
+|---|---|
+| `show_red_dot` | 是否展示小红点：0-不展示 1-展示 |
+| `close_button_img` | 从导航接口中得到的关闭按钮 URL |
+
+```json
+{
+    "success": true,
+    "data": {
+        "show_red_dot": 0,
+        "close_button_img": "https://tds-billboard.tds1.tapfiles.cn/20220727/aMHoqDTHT4zrXYPNprkZjXkdLK6vFg8E.png"
+    },
+    "now": 1658896487
+}
+```
+
+### 提交小红点
+
+| 参数 | 约束 | 说明 |
+|---|---|---|
+| `client_id` | 必须 | **开发者中心后台游戏服务 > 应用配置** 中的 `Client ID` |
+| `uuid` | 必须 | 设备唯一id字符串，示例："4e4105c7-781e-45c0-92ea-d595c75a3c2c" |
+| `read_all` | 必须 | 标记公告全部已读：true-是,false-否 |
+
+```sh
+curl -X POST \
+  -H 'X-LC-Id: {{appid}}' \
+  -H 'X-LC-Sign: {{appSign}}' \
+  -H 'Content-Type: application/json' \
+  -d '{
+      "uuid": {{uuid}},
+      "read_all":{{read_all}}
+  }' \
+  'https://{{host}}/billboard/rest-api/v1/dot/submit?client_id={{client_id}}'
+```
+
+返回的 JSON 对象
+```json
+{
+    "success": true,
+    "data": {
+        "msg": "ok"
+    },
+    "now": 1658895192
+}
+```
+
+### 语言代码列表
+
+使用 ISO 639-1 中定义的双小写字母语言代码（例如，`en` 表示英语，`jp` 表示日语），但：
+
+1. ISO 639-1 中未包括的语言，使用 ISO 632-2 中定义的三小写字母语言代码（例如，`fil` 表示菲律宾语）
+2. 仅使用语言代码无法表示所需语言时，附加 ISO 3166-1 中定义的地区代码（例如，`zh_CN` 表示简体中文）
+
+当前 REST API 支持的语言代码如下：
+
+| 代码 | 语言         |
+| ------- | ----------- |
+| zh_CN    | 简体中文     |
+| zh_TW    | 繁体中文     |
+| en_US    | 英语（美国） |
+| ja_JP    | 日文         |
+| ko_KR    | 韩文         |
+| pt_PT    | 葡萄牙语     |
+| vi_VN    | 越南语       |
+| hi_IN    | 印度语       |
+| id_ID    | 印尼语       |
+| ms_MY    | 马来语       |
+| th_TH    | 泰语         |
+| es_ES    | 西班牙       |
+| af       | 南非荷兰语   |
+| am       | 阿姆哈拉语   |
+| bg       | 保加利亚语   |
+| ca       | 加泰罗尼亚语 |
+| hr       | 克罗地亚语   |
+| cs       | 捷克语       |
+| da       | 丹麦语       |
+| nl       | 荷兰语       |
+| et       | 爱沙尼亚语   |
+| fil      | 菲律宾语     |
+| fi       | 芬兰语       |
+| fr       | 法语         |
+| de       | 德语         |
+| el       | 希腊语       |
+| he       | 希伯来语     |
+| hu       | 匈牙利语     |
+| is       | 冰岛语       |
+| it       | 意大利语     |
+| lv       | 拉脱维亚语   |
+| lt       | 立陶宛语     |
+| no       | 挪威语       |
+| pl       | 波兰语       |
+| ro       | 罗马尼亚语   |
+| ru       | 俄语         |
+| sr       | 塞尔维亚语   |
+| sk       | 斯洛伐克语   |
+| sl       | 斯洛文尼亚语 |
+| sw       | 斯瓦希里语   |
+| sv       | 瑞典语       |
+| tr       | 土耳其语     |
+| uk       | 乌克兰语     |
+| zu       | 祖鲁语       |
+
+注意，上表中的部分语言虽然 REST API 支持，但[客户端 SDK 并没有支持](#国际化)。
