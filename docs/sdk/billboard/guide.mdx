@@ -463,13 +463,13 @@ REST API 请求的 Base URL（下文 curl 示例中用 `{{host}}` 表示）即�
 | 参数 | 约束 | 说明 |
 |---|---|---|
 | `client_id` | 必须 | **开发者中心后台游戏服务 > 应用配置** 中的 `Client ID` |
-| `type` | 必须 | 公告模版类型，目前仅支持导航模版。可填写：导航模版-`navigate`、图片模版-`image`。 |
+| `template` | 必须 | 公告模版类型，目前仅支持导航模版。可填写：导航模版-`navigate`、图片模版-`image`。 |
 
 ```sh
 curl -X GET
   -H 'X-LC-Id: {{appid}}' \
   -H 'X-LC-Sign: {{appSign}}' \
-  https://{{host}}/billboard/rest-api/v1/pattern/detail?client_id={{appid}}&type={{type}}
+  https://{{host}}/billboard/rest-api/v1/pattern/detail?client_id={{appid}}&template={{template}}
 ```
 
 返回的主体是一个 JSON 对象，包含创建模版时传入的所有参数：
@@ -496,6 +496,7 @@ curl -X GET
 | `lang` | 必须 | 详见[语言代码列表](#语言代码列表) |
 | `template` | 必须 | 公告模版类型，目前仅支持导航模版。可填写：导航模版-`navigate`、图片模版-`image`。 |
 | `dimension_list` | 可选 | `[{"维度参数"："维度字段参数"},...]` ，示例：`[{"platform":"ios"},{"location":"CN"}]` |
+| `type` | 必须 | 公告类型。可填写：活动公告-`activity`、其他统称游戏公告-`game`。|
 
 ```sh
 curl -X POST
@@ -511,7 +512,7 @@ curl -X POST
   https://{{host}}/billboard/rest-api/v1/announcement/list?client_id={{appid}}
 ```
 
-返回的 JSON 对象
+返回的 JSON 对象包含公告列表 `list` 和最新发布的一条公告详情 `lastest`。
 
 | 参数 | 说明 |
 |---|---|
@@ -536,10 +537,11 @@ curl -X POST
                 "jump_location": "link",
                 "jump_link": "https://www.taptap.com",
                 "publish_time": 1659077524
-            }
+            },
+            ...
         ],
         "lastest": {
-            "id": 19,
+            "id": 2,
             "content": "正文",
             "short_title": "公告跳转链接地址",
             "long_title": "测试情报｜「起着测试」4月14日开启"
@@ -561,7 +563,7 @@ curl -X POST
 curl -X GET
   -H 'X-LC-Id: {{appid}}' \
   -H 'X-LC-Sign: {{appSign}}' \
-  https://{{host}}/billboard/rest-api/v1/announcement/detail?client_id={{appid}}&type={{type}}
+  https://{{host}}/billboard/rest-api/v1/announcement/detail?client_id={{appid}}&lang={{lang}}&id={{id}}
 ```
 
 返回的 JSON 对象
