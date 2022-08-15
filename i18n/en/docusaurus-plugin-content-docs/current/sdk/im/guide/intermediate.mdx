@@ -1469,65 +1469,59 @@ When reading messages from the cache, you can make messages look different on th
 
 If your users are using your app on mobile devices, they might close the app at anytime, which prevents you from delivering new messages to them in the ordinary way. At this time, using push notifications becomes a good alternative to get users notified when new messages are coming in.
 
-If you are building an iOS or Android app, you can utilize the built-in push notification services offered by these operating systems, as long as you have your certificates configured for iOS or have the function enabled for Android. Check the following documentation for more details:
+If you are building an iOS or Android app, you can utilize the built-in push notification services offered by these operating systems, as long as you have your certificates configured for iOS or have the function enabled for Android. Check the following pages for more details:
 
-1. [Push Notification Overview](/sdk/im/guide/overview/)
+1. [Instant Messaging Overview](/sdk/im/guide/overview/)
 2. [Android Push Notification Guide](/sdk/push/guide/android-mixpush/) / [iOS Push Notification Guide](/sdk/push/guide/ios/)
 
-LeanCloud offers a complete set of push notification services that works perfectly with LeanMessage. When being implemented, it links the `clientId`s of users with the `_Installation` table of your app that keeps track of the device information. When a user sends a message to a conversation, the cloud will automatically convert the message to a push notification and send it to those who are offline but are using iOS devices or using Android devices with push notification services enabled. We also allow you to connect third-party push notification services to your app.
+The cloud will associate the `clientId`s of users with the data in the `_Installation` table that keeps track of the devices. When a user sends a message to a conversation, the cloud will automatically convert the message to a push notification and send it to those who are offline but are using iOS devices or using Android devices with push notification services enabled. We also allow you to connect third-party push notification services to your app.
 
 The highlight of this feature is that you can **customize the contents of push notifications**. You have the following three ways to specify the contents:
 
 1. Setting up a static message
 
-  You can fill in a global static JSON string in your app's Dashboard > Game Services > Cloud Services > Instant Massaging > Settings > Push notification settings for delivering push notifications with a static message. For example, if you put:
+   You can fill in a global static JSON string on **Developer Center > Your game > Game Services > Cloud Services > Instant Messaging > Settings > Push notifications** for delivering push notifications with a static message. For example, if you put:
 
-  ```json
-  { "alert": "New message received", "badge": "Increment" }
-  ```
+   ```json
+   { "alert": "New message received", "badge": "Increment" }
+   ```
 
-  Then whenever there is a new message going to an offline user, the user will receive a push notification saying "New message received".
+   Then whenever there is a new message going to an offline user, the user will receive a push notification saying "New message received".
 
-  Keep in mind that `badge` is for iOS devices only which means to increase the number displayed on the badge of the app.
-  Its value `Increment` is case-sensitive.
-  Typically, when an end user opens or closes the application, you need to set the value of the badge field of the `_Installation` class to zero, which clears the badge number.
-  Besides, you can also customize the sounds of push notifications for iOS devices.
-  
+   Keep in mind that `badge` is for iOS devices only which means to increase the number displayed on the badge of the app. Its value, `Increment`, is case-sensitive.
+   Typically, when an end user opens or closes the application, you need to set the value of the badge field of the `_Installation` class to zero, which clears the badge number.
+
+   Besides, you can also customize the sounds of push notifications for iOS devices.
+
 2. Specifying contents when sending messages from a client
 
-  When using the first way introduced above, the content included in each push notification is the same regardless of the message being sent out. Is it possible to dynamically generate these contents to make them relevant to the actual messages?
+   When using the first way introduced above, the content included in each push notification is the same regardless of the message being sent out. Is it possible to dynamically generate these contents to make them relevant to the actual messages?
 
-  Remember how we specified the `AVIMMessageOption` parameter when sending transient messages? The same parameter takes in a `pushData` property which allows you to specify the contents of push notifications. Here is a code example:
+   Remember how we specified `LCIMMessageOption` when sending transient messages? The same parameter takes in a `pushData` property which allows you to specify the contents of push notifications. Here is a code example:
 
 <MultiLang>
 
 ```cs
-LCIMTextMessage message = new LCIMTextMessage("ey Jerry, me and Kate are going to a bar to watch a game tonight. Do you wanna come?");
+LCIMTextMessage message = new LCIMTextMessage("Hey Jerry, me and Kate are gonna watch a game at a bar tonight. Wanna come with us?");
 LCIMMessageSendOptions sendOptions = new LCIMMessageSendOptions {
     PushData = new Dictionary<string, object> {
         { "alert", "New message received"},
         { "category", "Message"},
         { "badge", 1},
-        { "sound", "message.mp3"}, // The name of the sound file; has to be present in the app
-        { "custom-key", "This is a custom attribute. custom-key is just an example. You can use your own names for keys."}
+        { "sound", "message.mp3"}, // The name of the file for the sound; has to be present in the app
+        { "custom-key", "This is a custom attribute with custom-key being the name of the key. You can use your own names for keys."}
     }
 };
 ```
-```objc
-LCIMMessageOption *option = [[LCIMMessageOption alloc] init];
-option.pushData = @{@"alert" : @"New message received", @"sound" : @"message.mp3", @"badge" : @1, @"custom-key" : @"This is a custom attribute. custom-key is just an example. You can use your own names for keys."};
-[conversation sendMessage:[LCIMTextMessage messageWithText:@"Hey Jerry, me and Kate are going to a bar to watch a game tonight. Do you wanna come?" attributes:nil] option:option callback:^(BOOL succeeded, NSError * _Nullable error) {
-    //  Handle result and error
-}];
-```
+
 ```java
 LCIMTextMessage msg = new LCIMTextMessage();
-msg.setText("Hey Jerry, me and Kate are going to a bar to watch a game tonight. Do you wanna come?");
+msg.setText("Hey Jerry, me and Kate are gonna watch a game at a bar tonight. Wanna come with us?");
 
 LCIMMessageOption messageOption = new LCIMMessageOption();
 String pushMessage = "{\"alert\":\"New message received\", \"category\":\"Message\","
                     + "\"badge\":1,\"sound\":\"message.mp3\","
-                    + "\"custom-key\":\"This is a custom attribute."}";
+                    + "\"custom-key\":\"This is a custom attribute with custom-key being the name of the key. You can use your own names for keys.\"}";
 messageOption.setPushData(pushMessage);
 conv.sendMessage(msg, messageOption, new LCIMConversationCallback() {
     @Override
@@ -1537,52 +1531,112 @@ conv.sendMessage(msg, messageOption, new LCIMConversationCallback() {
         }
     }
 });
-  
+```
+
+```objc
+LCIMMessageOption *option = [[LCIMMessageOption alloc] init];
+option.pushData = @{@"alert" : @"New message received", @"sound" : @"message.mp3", @"badge" : @1, @"custom-key" : @"This is a custom attribute with custom-key being the name of the key. You can use your own names for keys."};
+[conversation sendMessage:[LCIMTextMessage messageWithText:@"Hey Jerry, me and Kate are gonna watch a game at a bar tonight. Wanna come with us?" attributes:nil] option:option callback:^(BOOL succeeded, NSError * _Nullable error) {
+    // Handle result and error
+}];
+```
+
+```js
+const message = new TextMessage('Hey Jerry, me and Kate are gonna watch a game at a bar tonight. Wanna come with us?');
+conversation.send(message), {
+    pushData: {
+        "alert": "New message received",
+        "category": "Message",
+        "badge": 1,
+        "sound": "message.mp3", // The name of the file for the sound; has to be present in the app
+        "custom-key": "This is a custom attribute with custom-key being the name of the key. You can use your own names for keys."
+    }
+});
+```
+
+```swift
+do {
+    let message = IMTextMessage(text: "Hey Jerry, me and Kate are gonna watch a game at a bar tonight. Wanna come with us?")
+    let pushData: [String: Any] = [
+        "alert": "New message received",
+        "category": "Message",
+        "badge": 1,
+        "sound": "message.mp3",
+        "custom-key": "This is a custom attribute with custom-key being the name of the key. You can use your own names for keys."
+    ]
+    try conversation.send(message: message, pushData: pushData, completion: { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
+```
+
+```dart
+try {
+    TextMessage message = TextMessage();
+    message.text = 'Hey Jerry, me and Kate are gonna watch a game at a bar tonight. Wanna come with us?';
+    await conversation.send(message: message, pushData: {
+    "alert": "New message received",
+    "category": "Message",
+    "badge": 1,
+    "sound": "message.mp3", // The name of the file for the sound; has to be present in the app
+    "custom-key": "This is a custom attribute with custom-key being the name of the key. You can use your own names for keys."
+    });
+} catch (e) {
+    print(e);
+}
 ```
 
 </MultiLang>
 
 3. Generating contents dynamically on the server side
 
-  The second way introduced above allows you to compose the contents of push notifications based on the messages being sent out, but the logic needs to be predefined on the client side, which makes things less flexible.
+   The second way introduced above allows you to compose the contents of push notifications based on the messages being sent, but the logic needs to be predefined on the client side, which makes things less flexible.
 
-  So we offer a third way that allows you to define the logic of push notifications on the server side with the help of [hooks](/sdk/im/guide/systemconv/). Check the following documentation for more details:
+   So we offer a third way that allows you to define the logic of push notifications on the server side with the help of hooks. Check [this page](/sdk/im/guide/systemconv/) for more details.
 
 Here is a comparison of the priorities of the three methods mentioned above: **Generating contents dynamically on the server side > Specifying contents when sending messages from a client > Setting up a static message**.
 
-If more than one of these methods are implemented at the same time, the push notifications generated on the server side will always get the highest priority. Those sent from clients will get the secondary priority, and the static message set up on the dashboard will get the lowest priority.
+If more than one of these methods are implemented at the same time, the push notifications generated on the server side will always get the highest priority. Those sent from clients will get a lower priority, and the static message set up on the dashboard will get the lowest priority.
 
 ### Implementations and Restrictions
 
-If your app is using push notification services together with LeanMessage, when a client is logging in, the SDK will automatically associate the `clientId` with the device information (stored in the `Installation` table) by having the device **subscribe** to the channel with `clientId` as its name. Such association can be seen in the `channels` field of the `_Installation` table. By doing so, when the cloud wants to send a push notification to a client, the client's device can be targeted with the `clientId` associated with it.
+If your app is using push notification services together with Instant Messaging, whenever a client logs in, the SDK will automatically associate the `clientId` with the device information (stored in the `Installation` table) by having the device **subscribe** to the channel with `clientId` as its name. The association can be found in the `channels` field of the `_Installation` table. By doing so, when the cloud wants to send a push notification to a client, the client's device can be targeted by the `clientId` associated with it.
 
-Since LeanMessage generates way more push notifications than other sources, the cloud will not keep any records for it, nor can you find them in your app's **Dashboard** > **Messaging** > **Push notifications** > **History**.
+Since Instant Messaging generates way more push notifications than other sources, the cloud will not keep any records of them, nor can you find them on **Developer Center** > **Your game** > **Game Services** > **Cloud Services** > **Push Notification** > **Push records**.
 
-Each push notification is only valid for 7 days. This means that if a device doesn't connect to the service for more than 7 days, it will not receive the push notification anymore.
+Each push notification is only valid for 7 days. This means that if a device doesn't connect to the cloud for more than 7 days, it will not receive this push notification anymore.
 
-### Advanced Settings for Push Notifications
+### Other Settings for Push Notifications
 
-When push notifications are sent via certificates, **production certificate** will be used by default.
-You can specify the certificate you want to use by adding a `_profile` property into the JSON string:
+By default, push notifications are sent to the production environment of APNs for iOS devices.
+Use `"_profile": "dev"` if you want to switch to the development environment of APNs (the development certificate will be used if certificate-based authentication is selected):
 
 ```json
 {
-  "alert":    "New message received",
+  "alert": "New message received",
   "_profile": "dev"
 }
 ```
-When push notifications are sent via iOS Token Authentication, if your app has private keys for multiple Team IDs, please confirm the one that should be used for your target devices and fill it into the `_apns_team_id` parameter, since Apple doesn't allow a single request to include push notifications sent to devices belonging to different Team IDs.
+
+When push notifications are sent via Token Authentication, if your app has private keys for multiple Team IDs, please confirm the one that should be used for your target devices and fill it into the `_apns_team_id` parameter, since Apple doesn't allow a single request to include push notifications sent to devices belonging to different Team IDs.
 
 ```json
 {
-  "alert":         "New message received",
+  "alert": "New message received",
   "_apns_team_id": "my_fancy_team_id"
 }
 ```
-The `_profile` and `_apns_team_id` attributes are used internally by the push service and neither will actually be pushed.
 
-When specifying additional push messages, different push messages are supported for different kinds of devices (e.g. `ios`, `android`). It is important to note that the internal attributes `_profile` and `_apns_team_id` should not be specified inside the `ios` object, otherwise they will not take effect.
-For example, such an additional push message being pushed to APNs' production environments:
+The `_profile` and `_apns_team_id` attributes are used internally by the push service and neither will actually be used.
+When specifying additional push messages, different push messages are supported for different kinds of devices (e.g. `ios`, `android`). Keep in mind that the internal attributes, `_profile` and `_apns_team_id`, should not be specified inside the `ios` object, otherwise they will not take effect.
+As an example, a push message like this will cause the message to be pushed to APNs’ production environment:
 
 ```json
 {
@@ -1593,7 +1647,7 @@ For example, such an additional push message being pushed to APNs' production en
     "thread-id": "chat",
     "alert": {
       "title": "New message received",
-      "body": "This message will still be pushed to the APNs production environment because of the incorrect location of the _profile internal property."
+      "body": "This message will still be pushed to the APNs production environment because of the incorrect location of the internal property _profile."
     },
     "_profile": "dev"
   },
@@ -1603,27 +1657,32 @@ For example, such an additional push message being pushed to APNs' production en
   }
 }
 ```
-Pushed to the development environment:
+
+To push to the development environment:
 
 ```json
 {
   "_profile": "dev",
-  "ios": { /* … */ },
-  "android": { /* … */ }
+  "ios": {
+    /* … */
+  },
+  "android": {
+    /* … */
+  }
 }
 ```
 
-For the message set up in your app's, you can include the following variables:
+You can insert certain built-in variables into the content you enter on **Developer Center > Your game > Game Services > Cloud Services > Instant Messaging > Settings > Push notifications**. By doing this, you can embed certain context into the content of push notifications:
 
-* `${convId}` The ID of the conversation
-* `${timestamp}` The Unix timestamp when the push notification is triggered
-* `${fromClientId}` The `clientId` of the sender
+- `${convId}` The ID of the conversation
+- `${timestamp}` The Unix timestamp when the push notification is triggered
+- `${fromClientId}` The `clientId` of the sender
 
 ## Message Synchronization
 
-Push notification seems to be a good way to remind users of new messages, but the actual messages won't get delivered until the user goes online. If a user hasn't been online for an extremely long time, there will be tons of messages piled up on the cloud. How can we make sure that all these messages will be perfectly delivered once the user goes online?
+Push notification seems to be a good way to remind users of new messages, but the actual messages won't get delivered until the user goes online. If a user hasn't been online for an extremely long time, there will be tons of messages piled up on the cloud. How can we make sure that all these messages will be properly delivered once the user goes online?
 
-Instant messaging services provide a way for clients to pull messages from the cloud. The cloud keeps track of the last message each user receives from each conversation. When a user goes online, the conversations containing new messages as well as the number of unread messages in each of them will be computed and the client will receive a notification indicating that there is an update on the total number of unread messages. The client can then proactively fetch these messages.
+Instant Messaging provides a way for clients to pull messages from the cloud. The cloud keeps track of the last message each user receives from each conversation. When a user goes online, the conversations containing new messages as well as the number of unread messages in each of them will be computed and the client will receive a notification indicating that there is an update on the total number of unread messages. The client can then proactively fetch these messages.
 
 ### Notifications on Updates of Unread Message Count
 
