@@ -1,6 +1,6 @@
 ---
-title: 云引擎平台功能
-sidebar_label: 平台功能
+title: Cloud Engine Platform Features
+sidebar_label: Platform Features
 sidebar_position: 2
 ---
 
@@ -18,24 +18,25 @@ import Path from "/src/docComponents/path";
 
 :::info
 
-这篇文档会帮助了解云引擎平台提供的功能，有关具体运行环境的详情请查看专门的文档页面：
+This article will guide you through the features provided by the Cloud Engine platform. For details about specific runtime environments, check out the following pages:
 
 <PlatformRuntimes />
 
 :::
 
-## 什么可以被部署到云引擎
+## What Can Be Deployed to Cloud Engine
 
-云引擎是一个进程级别的运行环境，开发者只需关注应用的进程本身（如 `node` 进程或 Go 项目编译出的可执行文件）、专注于实现业务逻辑，而不需要关注操作系统级别的环境。
+Cloud Engine offers runtime environments on the process level. This means that you no longer need to think about OS environments when developing your application. Instead, you only need to take care of the processes created by your application (like `node` processes or executables compiled from Go projects), leaving you more time to work on the business logic of your application.
 
-部署到云引擎的应用只需遵循业界通常的项目结构（例如 Node.js 项目需要有 `package.json`），云引擎就可以自动地为其准备运行环境，可以在 [总览](/sdk/engine/overview) 中查看特定运行环境的文档来了解详情。
+Cloud Engine automatically prepares runtime environments for the applications deployed to it as long as these applications follow conventional project structures. For example, if you plan to deploy a Node.js application, the project has to have a `package.json` file. The [Overview](/sdk/engine/overview) page contains links to the dedicated pages for specific runtime environments, from which you can learn more about this.
 
-云引擎对应用进程内部几乎没有干预，你可以选用你喜欢的开发框架和第三方组件库、自行组织项目的目录结构。云引擎的负载均衡会转发绑定域名下的所有 HTTP 请求，你可以在应用内使用 Web 框架来自行设计 HTTP API 中的路径、请求和响应的格式。
+Cloud Engine barely interferes in the processes of your application. You are free to use your preferred frameworks and libraries in your project and organize files and directories in your way. Cloud Engine’s load balancer forwards all the HTTP requests sent to the domains bound to your application. It’s up to you to design the HTTP API’s paths as well as requests’ and responses’ formats under the web framework used by your application.
 
-目前云引擎主要为无状态的 HTTP 服务而优化，不支持在文件系统上持久地存储数据，应用可以将数据存储到 <Conditional brand="tds">[数据存储](/sdk/storage/features)</Conditional><Conditional brand="leancloud">[数据存储](https://leancloud.cn/docs/storage_overview.html)</Conditional> 或 LeanDB 提供的 [Redis](/sdk/engine/database/redis/)、[MongoDB](/sdk/engine/database/mongo/) 和 [Elasticsearch](/sdk/engine/database/es/) 中。
+Cloud Engine is primarily optimized for hosting stateless HTTP services. Although your application has access to the disk, there’s no guarantee that the disk will keep the files created by your application persistently. For long-term data storage, use the <Conditional brand="tds">[Data Storage](/sdk/storage/features)</Conditional><Conditional brand="leancloud">[Data Storage](https://docs.leancloud.app/storage_overview.html)</Conditional> service or LeanDB’s hosted [Redis](/sdk/engine/database/redis/), [MongoDB](/sdk/engine/database/mongo/), and [Elasticsearch](/sdk/engine/database/es/).
 
 <p>
-  要将一个已有的项目关联到云引擎应用，可以使用 <code>{CLI_BINARY} switch</code>：
+  To associate an existing project to a Cloud Engine application, run{" "}
+  <code>{CLI_BINARY} switch</code>:
 </p>
 
 <CodeBlock>
@@ -46,221 +47,219 @@ import Path from "/src/docComponents/path";
 Switching to my-engine-app (group: web)`}
 </CodeBlock>
 
-## 查看日志
+## Viewing Logs
 
-### 运行日志
+### Logs
 
-在 **<Path to="engine" /> > 云引擎分组 > 日志** 中可以查看云引擎的部署和运行日志，还可以通过环境（预备环境、生产环境）、类型（标准输出、标准错误）、实例、日期时间进行筛选。
+You can view deploy logs and program output on **<Path to="engine" /> > Your group > Logs**. Logs can be filtered by environment (staging/production), type (standard output / standard error), instance, and time.
 
-![云引擎日志](/img/cloud-engine/engine-logs.png)
+![Cloud Engine logs](/img/cloud-engine/engine-logs.png)
 
-可以使用命令行工具将运行日志导出至本地，详见 [命令行工具使用指南 § 查看日志](/sdk/engine/cli/#查看日志)。
+You can export logs to your local computer with the CLI. See [CLI Guide § Viewing Logs](/sdk/engine/cli/#viewing-logs) for more information.
 
-### 访问日志
+### Access Logs
 
-云引擎的访问日志（Access Log）可以在 **<Path to="engine" /> > 访问日志** 处导出。
+You can export access logs on **<Path to="engine" /> > Access logs**.
 
-## 查看统计数据
+## Viewing Metrics
 
-**<Path to="engine" /> > 云引擎分组 > 统计** 页面显示出当前应用下所有实例资源的使用情况，开发者由此可以判断实例资源是否即将或已经超限。
+**<Path to="engine" /> > Your group > Statistics** shows the usage data of all the instances under the current application. You can tell if the instances’ consumption of resources is approaching or exceeding the limit.
 
-![云引擎统计](/img/cloud-engine/engine-metrics.png)
+![Cloud Engine statistics](/img/cloud-engine/engine-metrics.png)
 
-#### 每分钟请求数
+#### Requests per Minute
 
-一段时间内云引擎每分钟处理的请求数。可以通过左上角的下拉菜单选择按不同请求类型（网站托管、云函数）和不同 HTTP 状态码分别查看。
+This graph shows the number of requests handled by Cloud Engine per minute during a given time. You can filter the data by request type (web hosting / Cloud Functions) and HTTP status code using the dropdown menu on the top-left corner of the page.
 
-#### 响应时间
+#### Response Time
 
-若曲线图升高，说明 CPU 使用量达到或超过限制，实例的 CPU 资源紧张。同样可以按不同请求类型（网站托管、云函数）和不同 HTTP 状态码分别查看。
+If the line in this graph goes up, it indicates that the instances’ consumption of CPU resources is reaching or exceeding the limit. Again, you can filter the data by request type (web hosting / Cloud Functions) and HTTP status code.
 
 #### CPU
 
-曲线图展现出在一段时间内应用实际 CPU 的使用量。如果 CPU 接近或达到限制，应用表现为请求响应时间延长。
+This graph shows the actual CPU usage of the application during a given time. If the usage approaches or reaches the limit, the response time of the application might be prolonged.
 
-#### 内存
+#### RAM
 
-曲线图展现出在一段时间内应用内存的实际使用量。如果内存使用量达到限制，则相关的业务进程（比如 Node.js 进程或者 Python 进程）会因为内存溢出（OOM）而重启，从而导致业务处理中断，并且该实例在启动期间服务不可用。如果内存曲线图<u>频繁地接近限制然后忽然下降</u>，就说明内存使用超限导致了进程重启。
+This graph shows the actual RAM usage of the application during a given time. If the usage reaches the limit, the processes of your application (like Node.js processes or Python processes) will be restarted due to OOM. While restarting, the instance will become unavailable and your application won’t be able to handle requests. If the graph <u>frequently goes up to the limit and then goes down</u>, it means that the processes have been restarted due to OOM.
 
-**显示各实例详情（勾选框）** 勾选后会在 CPU、内存图表中为每个实例单独绘制一条线（不勾选默认显示所有实例合计的数值）。
+If **Show details for each instance** is checked, a separate line will be displayed for each instance in the graph for CPU and RAM. Otherwise, the data for all the instances will be combined into a single line.
 
-图表右上角可以切换时间范围：今天、昨天、过去 7 天。
+You can change the time period for the graphs on the top-right corner of the page. Options include Today, Yesterday, and Last 7 days.
 
-## 部署与发布
+## Deploying and Publishing
 
-### 预备环境和生产环境
+### Staging Environments vs Production Environments
 
-标准版云引擎对每个分组提供了「生产环境」和「预备环境」，生产环境设计用来接收和处理线上请求；预备环境则提供了和生产环境几乎相同的环境、访问相同的数据，可以绑定单独的域名供开发者进行测试。<Conditional brand="tds">TDS</Conditional><Conditional brand="leancloud">LeanCloud</Conditional> 的客户端 SDK 在调用云函数或进行可能触发 Hook 的数据存储操作时，可以设置请求的环境（`X-LC-Prod`）。
+With the standard mode of Cloud Engine, you get a production environment and a staging environment for each group. The production environment is designed to take in and handle requests from actual users of your application. The staging environment provides almost the same environment as the production environment for you to test your application. They both have access to the same data from the Data Storage service, though a separate domain can be assigned to each environment. When invoking Cloud Functions or updating objects that may trigger hooks with <Conditional brand="tds">TDS</Conditional><Conditional brand="leancloud">LeanCloud</Conditional>’s client-side SDKs, you can specify the environment to which the requests should be sent (`X-LC-Prod`).
 
-在开发过程中，你可以先将改动部署到预备环境，使用线上数据测试通过后再发布到生产环境。如果你希望有一个独立数据源的测试环境，建议单独创建一个应用。
+While working on your application, you can first deploy your changes to the staging environment, test the changes with the data from the Data Storage service, and publish the changes to the production environment only if everything goes well. If you wish to have a testing environment with a separate data source, consider creating another application.
 
-体验版云引擎没有预备环境。
+The trial mode doesn’t come with a staging environment.
 
-### 命令行部署
+### Deploying With CLI
 
-在你的项目根目录运行：
+Run the following command under the root directory of your project to deploy your project:
 
 <CodeBlock className="sh">{`${CLI_BINARY} deploy`}</CodeBlock>
 
-就会开始上传本地的代码，会交互式地询问要部署到生产环境还是预备环境，如需直接部署生产环境可以加上 `--prod` 参数，更多命令行工具的用法请查看 [命令行工具使用指南 § 从本地代码部署](/sdk/engine/cli/#从本地代码部署)。
+The CLI will display an interactive interface that asks you if you want to deploy your project to the production environment or the staging environment. To deploy the project directly to the production environment, add `--prod` to the end of the command. For more information about the usage of the CLI, see [CLI Guide § Deploying a Local Project](/sdk/engine/cli/#deploying-a-local-project).
 
-### Git 部署
+### Deploying With Git
 
-云引擎还支持从 Git 仓库拉取代码进行部署，包括 [GitHub](https://github.com/)<Conditional region='cn'> 或 [Gitee](https://gitee.com/)</Conditional> 这样的第三方托管平台，和 [GitLab](https://about.gitlab.com/install/) 这样自己搭建的 Git 托管服务。你可以在 **<Path to="engine" /> > 你的分组 > 部署 > Git 部署** 中设置 Git 仓库的地址。
+You can also deploy your project from a Git repository either hosted on platforms like [GitHub](https://github.com/)<Conditional region='cn'> and [Gitee](https://gitee.com/)</Conditional> or self-hosted with services like [GitLab](https://about.gitlab.com/install/). You can configure the address of your project’s Git repository on **<Path to="engine" /> > Your group > Deploy > Deploy from Git**.
 
-云引擎支持 SSH 协议的私有仓库（如 `git@github.com:leancloud/node-js-getting-started.git`），你需要在设置 Git 仓库地址后在 Git 托管服务处为云引擎配置 deploy key。如果你的仓库是公开的，则推荐使用 HTTPS 形式的仓库地址。
+If you have a private repository, you can provide the address with the SSH protocol (like `git@github.com:leancloud/node-js-getting-started.git`). Make sure to set up a deploy key for Cloud Engine with the service hosting the repository. If you have a public repository, we recommend that you provide the address with the HTTPS protocol.
 
-设置好 Git 仓库后，就可以在部署界面点击「部署」了，默认使用 `master` 分支，你也可以手动填写分支、标签或 commit hash。
+Once you have configured the address of your Git repository, you’ll be able to deploy your project to Cloud Engine by hitting “Deploy”. Cloud Engine will use the code on the `master` branch by default, but you can also specify a version by entering a branch name, tag name, or commit hash.
 
-如果希望 push 到项目的 Git 仓库的特定分支后自动触发云引擎部署，可以在应用的 **<Path to="engine" /> > 你的分组 > 部署 > Git 部署 > 自动部署** 中生成一个 deploy token，然后查看页面上显示的 Webhook 地址。当该地址收到任意 POST 请求后，会部署指定分支的代码到指定的环境，通过 GitHub Action 配置自动部署的具体方法请参考控制台上的指引。
+To trigger automatic deployment each time a commit gets pushed to a specific branch of the Git repository, generate a deploy token on **<Path to="engine" /> > Your group > Deploy > Deploy from Git > Auto deploy** and use it with the webhook URL shown on the page. Cloud Engine will deploy the code on the specified branch to the specified environment each time the webhook URL receives a POST request. See the guidance on the console for more information on how to set up automatic deployment with GitHub Actions.
 
-### 部署历史与回滚
+### Deployment History
 
-在 **<Path to="engine" /> > 云引擎分组 > 部署** 页面可以分别查看预备环境和生产环境的历史部署。
-每个历史部署版本会显示简短描述（基于 git 提交日志等信息）、部署版本号、部署时间。
-历史部署按部署时间倒序排列，当前部署排在最前。
-点击 **回滚至该版本** 按钮，可以回滚至相应的部署版本。
-点击 **查看更多历史部署** 可以查看最近部署的 10 个版本。
-除了按预备环境和生产环境分别查看历史部署外，点击右上角的 **查看部署时间线** 则可以按照时间顺序（最新部署在前）查看部署到云引擎的各个版本。
+You can view the past deployments of the staging environment and the production environment on **<Path to="engine" /> > Your group > Deploy**.
+Each deployment has its description (based on information like Git commit message), version number, and timestamp displayed on the page.
+The deployments are ordered chronologically with the current deployment on the top.
+You can roll back to a previous deployment by hitting “Rollback to this version”.
+You can also view the most recent 10 deployments by hitting “Show more”.
+Besides viewing deployments by the environment, you can also hit “View deploy timeline” to view all deployments chronologically (with the latest on the top).
 
-除了查看部署历史外，这里还会显示预备环境或生产环境的部署状态（「休眠中」、「部署中」、「运行中」）。
-通过右上角的按钮还可以 **重启**（重新部署当前版本）或 **清除部署**（移除部署，注销相应的云函数和 Hook）。
-预备环境还可以点击右上角的 **部署到生产环境** 按钮将最近部署到预备环境的版本发布到生产环境。
-当部署状态为「部署中」时，控制台会显示部署进行中的一些信息，也会显示一个 **取消部署** 按钮，点击可以取消部署。
+In addition to the deployment history, the page also shows the deployment status (_hibernating_, _deploying_, or _running_) of the two environments.
+You can **restart** an environment (redeploy the current version) or **clear the deployment** (remove the deployment and cancel the Cloud Functions and hooks) with the buttons on the top-right corner of the page.
+For the staging environment, you can hit **Deploy to production** to publish the latest deployment on the staging environment to the production environment.
+If the deployment status of an environment is _deploying_, the page will show the details of the deployment process as well as a **Cancel deployment** button. You can hit this button to cancel the deployment.
 
-### 分组管理
+### Groups
 
-云引擎支持在同一个应用下创建多个「分组」，运行不同的后端程序，在访问同一数据源的情况下，部署多套不同的服务器端业务代码，并对每个分组绑定不同的自定义域名，实现更复杂的业务需求：
+You can create multiple _groups_ under the same application for hosting different backend programs that have access to the same data from the Data Storage service. Each group can be bound to a different custom domain, making the following scenarios possible:
 
-- 将用户界面和管理后台拆分为不同的项目，使用不同的域名。
-- 单独部署主系统之外的边缘支持系统，以免边缘系统出现问题时影响主系统。
-- 使用不同的服务器端语言来编写云函数和网站，例如你可以使用 Node.js 编写云函数，而用 PHP 来实现网站。
+- Create different projects for the client-side interface and the admin console. Assign different domains to them.
+- Deploy non-essential systems separately from the main system so the main system could keep working if problems occur to any non-essential system.
+- Use different server-side languages for Cloud Functions and the website. For example, you can use Node.js for Cloud Functions and PHP for the website.
 
-每个分组都有独立的预备环境用于测试代码、独立的域名供外部访问，每个分组的环境变量、代码仓库等设置也是独立的，你可以单独对一个组部署代码。
+Each group comes with a separate staging environment for you to test your code, as well as a separate domain for users to access it. It also has its own environment variables and repository configurations. When deploying your code, you get to choose the group you want to deploy to.
 
-每个分组都可以部署云函数、Hook 和定时任务。但如果当前部署的代码中有和其他组同名的云函数，会中断部署，需勾选[「强制覆盖同名云函数」选项](#部署选项) 强制部署。
+You can deploy Cloud Functions, hooks, and scheduled tasks to any group. One thing to keep in mind is that when you deploy your code to a group, if the code contains a cloud function that has the same name as one in a different group, the deployment will be aborted. To force the deployment to continue, enable [`--overwrite-functions`](#deployment-options).
 
-每个应用默认有一个 `web` 分组，你可以在 **<Path to="engine" /> > 组管理** 中创建额外的分组。新建的分组默认不包含任何实例（无法响应请求），你需要 [调整实例规格和数量](#调整实例规格和数量)。
+Each application has a default group named `web`. You can create additional groups on **<Path to="engine" /> > Groups**. A new group doesn’t contain any instances and cannot respond to users’ requests until you [adjust the quota and number of instances](#adjusting-quota-and-number-of-instances).
 
-### 部署选项
+### Deployment Options
 
-云引擎在进行部署时提供了一些选项：
+You can add the following options when deploying your project:
 
-#### 不使用缓存（`--no-cache`）
+#### `--no-cache`
 
-在遇到与依赖安装有关的问题时，可以尝试开启该选项，禁用加速构建的 [缓存机制](/sdk/engine/deep-dive/#构建)。
+If you encounter problems with installing dependencies, you can try adding this option to disable the [caching mechanism](/sdk/engine/deep-dive/#build-process) used to accelerate the build process.
 
-#### 打印构建日志（`--options 'printBuildLogs=true'`）
+#### `--options 'printBuildLogs=true'`
 
-在遇到与构建有关的问题时，可以尝试开启该选项来在日志中打印构建过程的详细日志。
+If you encounter problems with the build process, you can try adding this option to have the build log printed to the console.
 
-#### 强制覆盖同名云函数（`--overwrite-functions`）
+#### `--overwrite-functions`
 
-在多个分组的云函数或 Hook 重复时，可以开启该选项强制进行部署（以最后一次部署的分组中的云函数或 Hook 为准），通常用于在分组之间移动云函数或 Hook。
+When your project contains cloud functions and hooks with duplicate names among different groups, you can add this option to force the cloud functions and hooks in your current deployment to take effect. You can use this option to move cloud functions and hooks across different groups.
 
-## 管理资源和容量
+## Managing Resources and Capacities
 
-### 体验版云引擎
+### Trial Mode
 
-云引擎对于每个应用都默认赠送一个 0.5 CPU、256 MB 的体验实例，可以免费使用，供开发者学习和测试云引擎。
+Each application comes with a free trial instance with 0.5 CPU and 256 MB RAM. You can use this instance for learning and trying out Cloud Engine.
 
-**体验实例会执行休眠策略**，没有请求时会休眠，有请求时启动（首次启动可能需要十几秒的时间），每天最多运行 18 个小时。
+**A trial instance hibernates** if it doesn’t receive any requests in a while and restarts once it receives a request. It might take a few seconds for an instance to restart. A trial instance can run for a maximum of 18 hours per day.
 
 <details>
-<summary>点击展开体验实例休眠详情</summary>
+<summary>More about hibernation</summary>
 
-- 如果应用最近一段时间（半小时）没有任何外部请求，则休眠。
-- 休眠后如果有新的外部请求实例则马上启动。访问者的体验是第一个请求响应时间是 5 ~ 30 秒（视实例启动时间而定），后续访问响应速度恢复正常。
-- 强制休眠：如果最近 24 小时内累计运行超过 18 小时，则强制休眠。此时新的请求会收到 503 的错误响应码，该错误可在 **<Path to="engine" /> > 云引擎分组 > 统计** 中查看。
+- A trial instance will hibernate if it receives no requests in 30 minutes.
+- While hibernating, the instance will restart if it receives a request. The first visitor might find that they’ll have to wait for 5 to 30 seconds before they can get a response.
+- If a trial instance has run for more than 18 hours within the past 24 hours, it will be forced to hibernate and won’t restart even if there are requests coming in. The requests will get the 503 error. You can view the errors received by requests on **<Path to="engine" /> > Your group > Statistics**.
 
 </details>
 
-### 标准版云引擎
+### Standard Mode
 
 <Conditional brand='leancloud'>
 
-云引擎的计费独立于开发版、商用版方案，开通或取消商用版不影响云引擎的实例和计费。
+The billing of Cloud Engine doesn’t get affected by the plan (Developer/Business) you are using. Upgrading to or downgrading from the Business Plan won’t affect the charges incurred by your Cloud Engine instances.
 
 </Conditional>
 
 :::tip
-对于商业项目和正式上线的产品，我们建议开发者升级到标准版云引擎，并使用至少两个实例，来保证业务的可用性。
+If you’re hosting business projects and already-launched products on Cloud Engine, we recommend that you upgrade to the standard mode and use at least two instances to enhance the availability of your application.
 :::
 
-标准实例不会像体验实例一样在没有请求时休眠，会一直保持运行；标准实例配有预备环境方便测试；如果购买了两个或更多的实例，还能进行负载均衡和故障切换，充分保障服务的可用性。
+A standard instance won’t hibernate as a trial instance does. It also comes with a staging environment for you to test your code. If you purchase two or more instances, you can also utilize load balancing and automatic failover to maximize the availability of your application.
 
-标准版的功能包括：
+The standard mode comes with the following features:
 
-#### 负载均衡（高可用）
+#### Load Balancing (High Availability)
 
-云引擎的网关会将客户端的请求轮流分配给每个实例，随着业务请求量的增加，开发者可以简单地通过增加实例数量来提升处理能力。
+Cloud Engine’s gateway will evenly distribute the requests from users to all the instances in your application. You can enhance your application’s capability of handling requests by simply increasing the number of instances in your application.
 
-在同一分组的同一环境中有两个或更多的实例时，便可实现故障切换。当其中一个实例出现故障无法工作时，云引擎的网关会自动将接下来的请求转发到其他可以正常工作的实例上，等待故障的实例恢复后复原。
+When there are two or more instances in the same group’s same environment, automatic failover becomes possible. When one of the instances stops working, Cloud Engine’s gateway will forward requests to other working instances until the corrupted instance is restored.
 
-#### 预备环境
+#### Staging Environment
 
-云引擎会为每个标准版分组赠送一个预备环境，它有着和生产环境几乎完全一样的运行环境。在正式上线前，开发者可以先将代码发布到预备环境，使用线上的环境和数据进行模拟测试。
+Each group with the standard mode comes with a free staging environment. It has almost the same runtime environment as the production environment. Before you launch your code, you can deploy it to the staging environment and test it with the environment and data on the server side.
 
-预备环境规格与生产环境相同，与体验实例一样执行休眠策略。
+The staging environment shares the same quota with the production environment and hibernates like a trial instance as well.
 
-#### 平滑部署
+#### Zero Downtime Deployment
 
-在部署新版本或其他运维操作时，系统会让新旧版本的实例同时运行一段时间，再关闭旧版本的实例，让服务保持零中断。
+When you’re deploying a new version of your project, or when maintenance operations are going on, the system will have both the older and newer versions of your project run for a while and gradually shut down the older version. This ensures that there will be no downtime in your application.
 
-#### 多分组
+#### Multiple Groups
 
-多实例分组可以实现在访问同一数据源的情况下，部署多份云引擎代码，满足不同的业务需求。每个组可以绑定独立域名。详见 [分组管理](#分组管理)。
+With multiple groups, you can deploy different backend programs that have access to the same data from the Data Storage service. Each group can also have its own domain. See [Groups](#groups) for more information.
 
-### 调整实例规格和数量
+### Adjusting Quota and Number of Instances
 
-我们为标准版实例提供了几种不同的规格，差别主要体现在可供使用的内存上：
+The following quotas are available for standard instances. The difference mainly lies in the size of RAM:
 
-| 规格          | 内存    | CPU    |
+| Quota         | RAM     | CPU    |
 | ------------- | ------- | ------ |
 | standard-512  | 512 MB  | 1 Core |
 | standard-1024 | 1024 MB | 1 Core |
 | standard-2048 | 2048 MB | 1 Core |
 | standard-4096 | 4096 MB | 1 Core |
 
-在 **<Path to="engine" /> > 你的分组 > 资源** 页面下，可以修改实例的规格和数量。
+You can adjust the quota and number of instances on **<Path to="engine" /> > Your group > Resources**.
 
 :::tip
-我们建议根据自己的程序运行时所需要的最大内存来选择实例规格，然后通过调整实例数量来应对请求量的增加。对于商业项目和正式上线的产品，我们建议使用至少两个实例，来保证业务的可用性。
+We recommend that you pick a quota according to the maximum RAM needed by your program and later adjust the number of instances to cater to the growth of the number of requests. For business projects and already-launched products, we recommend that you use at least two instances to enhance the availability of your application.
 :::
 
-为了防止实例因为资源使用超限而受到影响，我们建议开发者经常 [查看统计数据](#查看统计数据)：
+To ensure your instances’ consumption of resources doesn’t exceed the limit, we recommend that you [check the metrics](#viewing-metrics) regularly:
 
-- 一天内平均 **内存** 使用超过可用资源的 **70%**（例如对于 1 个 standard-1024 来说就是 717 MB）就建议提高实例规格。
-- 一天内平均 **CPU** 使用超过可用资源的 **30%**（例如对于 1 个 standard-1024 来说就是 30% CPU）就建议增加实例数量。
+- If the average **RAM** usage during a day goes beyond **70%** of the available resources (717 MB for a standard-1024 instance), you should consider increasing the quota.
+- If the average **CPU** usage during a day goes beyond **30%** of the available resources (30% CPU for a standard-1024 instance), you should consider increasing the number of instances.
 
 <details>
-<summary>点击展开多实例运行详情</summary>
-当一个分组中的一个环境里有多个实例时，我们称之为「多实例运行」。在部署或者运维操作（如重启）期间，也会有多个实例短暂地同时运行。
+<summary>Multiple instances</summary>
+Your program will be running on multiple instances concurrently if you have created multiple instances in the same group’s same environment. This also happens when deployment or maintenance operations (like restarting instances) are going on.
 
-多个实例的内存和文件系统是独立的，这意味着在一个实例中写入全局变量或文件，其他实例无法读取，建议在首次切换到多实例运行时进行充分的测试。
+Each instance has its own RAM and file system. This means that if a global variable or a file is created in one of the instances, it won’t be accessible from other instances. We recommend that you test your program thoroughly when you first switch from using a single instance to using multiple instances.
 
-如果需要在多个实例间低延迟地共享数据，可以使用 LeanCache。
+To share data among multiple instances with low latency, consider using LeanCache.
 
 </details>
 
-### 实例计费规则
+### Billing
 
-标准版云引擎按照所选择的规格乘以数量来进行计费，每天会按照前一天最大的实例数量来扣除前一天的费用。各规格的价格可以在<Conditional brand='leancloud'>当前节点的</Conditional>价格页面查看，扣费记录可在<Conditional brand='leancloud'>云服务控制台的消费明细</Conditional><Conditional brand='tds'>开发者中心的账单</Conditional>中查看。
+The amount charged for your usage will be based on the multiplication of the selected quota and the number of instances. For each given day, the amount for the maximum number of instances that existed on this day will be charged on the next day. You can view the prices of the available quotas on the pricing page<Conditional brand='leancloud'> of the current region</Conditional>. The billing history can be found under <Conditional brand='leancloud'>_Consumption details_ on the dashboard</Conditional><Conditional brand='tds'>_Transactions_ on the Developer Center</Conditional>.
 
-如果不想继续付费，可以在所有分组中将实例规格修改为「免费版」，标准实例会被删除，并在最后一个分组下赠送一个体验实例。在次日会进行最后一次扣费，之后便不会再产生费用。
+If you want to stop being charged, you can downgrade the quota of all the groups in your application to the _trial mode_. This will remove all the standard instances and only leave a free trial instance in one group. The final bill will be produced on the next day and you won’t be charged after that.
 
-## 调整设置
+## Adjusting Settings
 
-### 环境变量
+### Environment Variables
 
-我们推荐使用环境变量向运行在云引擎上的应用注入配置，你可以在 **<Path to="engine" /> > 你的分组 > 设置 > 自定义环境变量** 中添加自定义环境变量，修改环境变量后会在下一次部署时生效。
+To inject configurations into your application, you can set up custom environment variables on **<Path to="engine" /> > Your group > Settings > Custom environment variables**. Your updates to the custom environment variables will take effect upon the next deployment.
 
-勾选了 **Secret** 的环境变量在保存后便不会在控制台显示，可以用在类似密钥、密码的字段上减少意外泄漏的可能。
+You can check **Secret** to prevent an environment variable from being displayed on the page. This reduces the chance for sensitive information like keys and passwords to be accidentally leaked.
 
-云引擎运行环境默认提供的环境变量无法被自定义环境变量覆盖。
+The default environment variables provided by Cloud Engine runtime environments cannot be overwritten by your custom environment variables.
 
-你也可以在 **<Path to="engine" /> > 云引擎分组 > 设置 > 自定义环境变量** 页面中添加自定义的环境变量。其中名字必须是字母、数字、下划线且以字母开头，值必须是字符串，修改环境变量后会在下一次部署时生效。
-
-### 绑定自定义域名
+### Binding Custom Domains
 
 <CloudCustomDomain />
