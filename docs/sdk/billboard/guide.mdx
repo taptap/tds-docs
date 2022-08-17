@@ -243,140 +243,24 @@ config.tapBillboardConfig = billboardIntlConfig;
 
 ### 公告系统单独初始化
 
+如果游戏不通过上面提供的 `TapBootstrap` 方法初始化 TapSDK，仅希望初始化公告系统。可以这么做：
+
+- **复制上面提供的代码**。
+- **修改复制之后，初始化代码最后一行**为：
+
 <MultiLang>
 
-<>
-
 ```cs
-using TapTap.Common;
-using TapTap.Bootstrap;
-using TapTap.Billboard;
-
-var dimensionSet = new HashSet<KeyValuePair<string, string>>();
-KeyValuePair<string, string> platformPair = new KeyValuePair<string, string>("platform", "ios");
-KeyValuePair<string, string> locationPair = new KeyValuePair<string, string>("location", "CN");
-dimensionSet.Add(platformPair);
-dimensionSet.Add(locationPair);
-var templateType = "navigate"; // 可选
-var billboardServerUrl = "https://your-billboard-server-url"; // 开发者中心 > 你的游戏 > 游戏服务 > 应用配置 > 域名配置 > 公告
-
-var config = new TapConfig.Builder()
-    .ClientID("your_client_id") // 必须，开发者中心对应 Client ID
-    .ClientToken("your_client_token") // 必须，开发者中心对应 Client Token
-    .ServerURL("https://your_server_url") // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
-    .RegionType(RegionType.CN) // 可选项，CN 表示中国大陆，IO 表示其他国家或地区
-    .TapBillboardConfig(dimensionSet, templateType, billboardServerUrl)
-    .ConfigBuilder();
-
 TapBillboard.Init(config);
 ```
 
-</>
-<>
-
-**注意： Android SDK 初始化需要放在 Android 主线程中进行**。
-
-<Conditional region="cn">
-
-国内版初始化：
-
 ```java
-Set<Pair<String, String>> dimensionSet = new HashSet<>();
-dimensionSet.addAll(Arrays.asList(Pair.create("location", "CN"), Pair.create("platform", "android")));
-String billboardServerUrl = "https://your-billboard-server-url"; // 开发者中心 > 你的游戏 > 游戏服务 > 应用配置 > 域名配置 > 公告
-
-TapBillboardConfig billboardCnConfig = new TapBillboardConfig.Builder()
-        .withDimensionSet(dimensionSet)    // 可选
-        .withServerUrl(billboardServerUrl) // 必须, 公告的自定义域名
-        .withTemplate("navigate") // 可选, 默认是 navigate
-        .build();
-
-TapConfig tapConfig = new TapConfig.Builder()
-        .withAppContext(gameMainActivity) //必须, 传入游戏主 Activity
-        .withClientId("your_client_id") // 必须, 开发者中心应用配置里的 Client ID
-        .withClientToken("your_client_token") // 必须, 开发者中心应用配置里的 Client Token
-        .withServerUrl("https://your_server_url") // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > 云服务 API
-        .withBillboardConfig(billboardCnConfig) // 必须
-        .withRegionType(TapRegionType.CN) // CN 表示中国大陆，IO 表示其他国家或地区
-        .build();
-
-TapBillboard.init(gameMainActivity, tapConfig);              
-```
-
-海外版初始化：
-
-</Conditional>
-
-```java
-Set<Pair<String, String>> dimensionSet = new HashSet<>()
-dimensionSet.addAll(Arrays.asList(Pair.create("location", "XX"), Pair.create("platform", "android")));
-
-TapBillboardConfig billboardIntlConfig = new TapBillboardConfig.Builder()
-        .withDimensionSet(dimensionSet) // 可选
-        .withTemplate("navigate") // 可选, 默认是navigate
-        .build();
-
-TapConfig tapConfig = new TapConfig.Builder()
-        .withAppContext(gameMainActivity) //必须, 传入游戏主 Activity
-        .withClientId("your_client_id") // 必须, 开发者中心应用配置里的 Client ID
-        .withClientToken("your_client_token") // 必须, 开发者中心应用配置里的 Client Token
-        .withServerUrl("https://your_server_url") // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > 云服务 API
-        .withBillboardConfig(billboardIntlConfig) // 必须
-        .withRegionType(TapRegionType.IO)
-        .build();
-
 TapBillboard.init(gameMainActivity, tapConfig);
 ```
 
-</>
-<>
-
-<Conditional region="cn">
-
-国内版初始化：
-
 ```objectivec
-NSMutableSet <NSArray *> *dimensionSet = [[NSMutableSet alloc] init];
-[dimensionSet addObject:[NSArray arrayWithObjects:@"platform", @"ios", nil]];
-[dimensionSet addObject:[NSArray arrayWithObjects:@"location", @"CN", nil]];
-
-TapBillboardConfig *billboardCnConfig = [TapBillboardConfig new];
-billboardCnConfig.templateType = @"navigate"; // 可选项
-billboardCnConfig.diemensionSet = dimensionSet; // 可选项
-billboardCnConfig.serverUrl = @"https://your-billboard-server-url"; // 开发者中心 > 你的游戏 > 游戏服务 > 应用配置 > 域名配置 > 公告
-
-TapConfig *config = [TapConfig new];
-config.clientId = @"your_client_id"; // 必须，开发者中心对应 Client ID
-config.clientToken = @"your_client_token"; // 必须，开发者中心对应 Client Token
-config.region = TapSDKRegionTypeCN; // TapSDKRegionTypeCN：中国大陆，TapSDKRegionTypeIO：其他国家或地区
-config.serverURL = "https://your_server_url"; // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
-config.tapBillboardConfig = billboardCnConfig;
 [TapBillboard initWithConfig:config];
 ```
-
-海外版初始化：
-
-</Conditional>
-
-```objectivec
-NSMutableSet <NSArray *> *dimensionSet = [[NSMutableSet alloc] init];
-[dimensionSet addObject:[NSArray arrayWithObjects:@"platform", @"ios", nil]];
-[dimensionSet addObject:[NSArray arrayWithObjects:@"location", @"XX", nil]];
-
-TapBillboardConfig *billboardIntlConfig = [TapBillboardConfig new];
-billboardIntlConfig.templateType = @"navigate"; // 可选项
-billboardIntlConfig.diemensionSet = dimensionSet; // 可选项
-
-TapConfig *config = [TapConfig new];
-config.clientId = @"your_client_id"; // 必须，开发者中心对应 Client ID
-config.clientToken = @"your_client_token"; // 必须，开发者中心对应 Client Token
-config.region = TapSDKRegionTypeIO; // TapSDKRegionTypeCN：中国大陆，TapSDKRegionTypeIO：其他国家或地区
-config.serverURL = "https://your_server_url"; // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
-config.tapBillboardConfig = billboardIntlConfig;
-[TapBillboard initWithConfig:config];
-```
-
-</>
 
 </MultiLang>
 
