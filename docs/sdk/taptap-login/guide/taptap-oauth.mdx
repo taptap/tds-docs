@@ -30,8 +30,7 @@ Mac Token 算法细节见文档中的 [MAC Token 算法](#mac-token-算法) 部�
     public String token_type;
     public String mac_key;
     public String mac_algorithm;
-    public String expire_in;
-    private String json = null;
+    public Set<String> scopeSet;
     ```
 
 2. 再把移动端获取的参数发到游戏服务器，服务端签算 mac token。
@@ -40,6 +39,49 @@ Mac Token 算法细节见文档中的 [MAC Token 算法](#mac-token-算法) 部�
 注意：当前实际返回的 `kid` 和 `access_token` 值相等，建议使用 `access_token`。
 
 ## API
+当 SDK 只请求 basic_info 的权限时，请使用基础信息接口，请求 public_profile 时，请使用详细信息接口。
+
+### 获取当前账户基础信息
+
+>  <Red> GET </Red> <Conditional region='cn'>https://openapi.taptap.com/account/basic-info/v1?client_id=xxx</Conditional><Conditional region='global'>https://openapi.tap.io/account/basic-info/v1?client_id=xxx</Conditional> <br/><Blue> Authorization </Blue> mac token
+
+#### 请求参数
+
+| 字段      | 类型   | 说明   |
+| --------- | ------ | ------ |
+| client_id | string | 该应用的 `Client ID`，应与约定相同 |
+
+#### 响应参数
+
+字段             | 类型           | 说明
+--------------- | ------------- | ------------
+openid          | string        | 授权用户唯一标识，每个玩家在每个游戏中的 openid 都是不一样的，同一游戏获取同一玩家的 openid 总是相同
+unionid         | string        | 授权用户唯一标识，一个玩家在一个厂商的所有游戏中 unionid 都是一样的，不同厂商 unionid 不同
+
+#### 请求示例
+
+替换其中的 `MAC id` 和 `Client ID` 为自己签算的 mac token 和控制台的 `Client ID`。
+
+<Conditional region='cn'>
+
+```
+curl -s -H 'Authorization:MAC id="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJa
+gCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTs
+KQ",ts="1618221750",nonce="adssd",mac="XWTPmq6A6LzgK8BbNDwj+kE4gzs="' "https://openapi.taptap.com/account/basic-info/v1?client_id=<Client ID>"
+```
+
+</Conditional>
+
+<Conditional region='global'>
+
+```
+curl -s -H 'Authorization:MAC id="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJa
+gCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTs
+KQ",ts="1618221750",nonce="adssd",mac="XWTPmq6A6LzgK8BbNDwj+kE4gzs="' "https://openapi.tap.io/account/basic-info/v1?client_id=<Client ID>"
+```
+
+</Conditional>
+
 
 ### 获取当前账户详细信息
 
@@ -60,7 +102,6 @@ Mac Token 算法细节见文档中的 [MAC Token 算法](#mac-token-算法) 部�
 --------------- | ------------- | ------------
 name            | string        | 用户名
 avatar          | string        | 用户头像图片地址
-gender          | string        | "female"，"male"或空字符串
 openid          | string        | 授权用户唯一标识，每个玩家在每个游戏中的 openid 都是不一样的，同一游戏获取同一玩家的 openid 总是相同
 unionid         | string        | 授权用户唯一标识，一个玩家在一个厂商的所有游戏中 unionid 都是一样的，不同厂商 unionid 不同
 
