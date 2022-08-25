@@ -9,7 +9,7 @@ sidebar_position: 3
 
 ## 2.如何使用「诊断」？
 
-「诊断」功能面向开放 TapPlay 的游戏及接入了 TapSDK 并启用了 Themis 功能的游戏，如何在接入过程中调整配置，请参考：[接入指南 - 诊断模块](/docs/sdk/tapdb/sdk/client-side-integration/#themis)
+「诊断」功能面向开放 TapPlay 的游戏及接入了 TapSDK 并启用了 Themis 功能的游戏，如何在接入过程中调整配置，请参考：[接入指南 - 诊断模块](/sdk/tapdb/sdk/client-side-integration/#themis)
 
 ## 3.「诊断」能够覆盖什么场景？
 
