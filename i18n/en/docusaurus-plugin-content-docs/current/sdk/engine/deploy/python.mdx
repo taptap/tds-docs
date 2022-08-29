@@ -20,9 +20,9 @@ import { Conditional } from "/src/docComponents/conditional";
 This article serves as a thorough introduction to Cloud Engine’s Python runtime environment. To quickly get started with Cloud Engine, see [Getting Started With Cloud Engine](/sdk/engine/deploy/getting-started).
 :::
 
-所有 Python 项目都必须在根目录下包含有 `wsgi.py` 和 `requirements.txt` 文件才会被云引擎正确识别。
+A Python project has to have a `wsgi.py` and `requirements.txt` under its root directory for Cloud Engine to correctly identify it as a Python project.
 
-云引擎默认使用 WSGI 来运行 Python 项目，运行时会首先加载 `wsgi.py` 这个模块，并将此模块的全局变量 `application` 作为 WSGI 函数进行调用。因此请保证 `wsgi.py` 文件中包含一个 `application` 的全局变量／函数／类，并且符合 [WSGI 规范](https://peps.python.org/pep-0333/)：
+By default, Cloud Engine runs Python projects with WSGI. It will load the module `wsgi.py` and call the global variable `application` in it as a WSGI function. Therefore, please ensure that `wsgi.py` contains a global variable/function/class named `application` that complies with the [WSGI specification](https://peps.python.org/pep-0333/):
 
 ```python title='app.py'
 from flask import Flask
@@ -37,32 +37,32 @@ from app import app
 application = app
 ```
 
-流行的 Python Web 框架对 WSGI 都有支持，比如 [Flask](https://flask.palletsprojects.com/en/2.1.x/)、[Django](https://www.djangoproject.com)、[Tornado](https://www.tornadoweb.org/en/stable/)。我们提供了 Flask 和 Django 两个框架的示例项目作为参考，你也可以直接把它们当作一个应用项目的初始化模版：
+Most popular Python-based web frameworks come with support for WSGI, including [Flask](https://flask.palletsprojects.com/en/2.1.x/), [Django](https://www.djangoproject.com), and [Tornado](https://www.tornadoweb.org/en/stable/). We provide the following Flask- and Django-based boilerplates for you to reference and start your project with:
 
 - [Flask](https://github.com/leancloud/python-getting-started)
 - [Django](https://github.com/leancloud/django-getting-started)
 
-## 非 WSGI 运行
+## Run Without WSGI
 
-云引擎也支持直接运行 Python 程序而不使用 WSGI（或者自行来运行 WSGI Server），你可以创建一个 `leanengine.yaml` 文件，在其中设置：
+You can run Python programs on Cloud Engine without using WSGI, or you can host your own WSGI server as well. To do so, create a file named `leanengine.yaml` and add the following configuration:
 
 ```yaml title='leanengine.yaml'
 run: python app.py
 ```
 
-这种情况下你的应用需要自行监听环境变量 `LEANCLOUD_APP_PORT` 中的端口来提供 HTTP 服务。
+Make sure that your app listens on the port specified by the environment variable `LEANCLOUD_APP_PORT` to provide HTTP services.
 
 ## Configure Python Version
 
-云引擎兼容 [pyenv](https://github.com/pyenv/pyenv) 的 `.python-version` 文件，你可以将它放在项目根目录来指定版本：
+Cloud Engine is compatible with [pyenv](https://github.com/pyenv/pyenv)’s `.python-version`. You can place this file under the root directory of your project to specify the Python version you want to use:
 
 ```plain title='.python-version'
 3.10
 ```
 
-这样将代码部署到云端时，云引擎就会自动安装对应的 Python 版本。
+Cloud Engine will install Python with the version specified in this file.
 
-云引擎目前仅支持 CPython 版本，暂时不支持 PyPy、Jython、IronPython 等其他 Python 实现。
+At this time, Cloud Engine only supports CPython. It doesn’t support other Python implementations including PyPy, Jython, and IronPython.
 
 :::note
 
@@ -77,12 +77,12 @@ the latest stable version will be used.
 :::
 
 :::note
-如果在本地开发时已使用了 `pyenv`，`pyenv` 也会根据此文件来自动使用对应的 Python 运行项目。我们建议本地开发使用 `pyenv`，以保证本地环境与线上相同。`pyenv` 的安装方法请参考 [pyenv 的 GitHub 仓库](https://github.com/pyenv/pyenv)。
+If you are using `pyenv` on your local computer, `pyenv` will follow this file to run your project with the specified Python version. We recommend that you use `pyenv` on your local computer so that the environment on your local computer will be the same as that on the server. See [pyenv’s GitHub repository](https://github.com/pyenv/pyenv) for more information on how to install `pyenv`.
 :::
 
 ## Install Dependencies (`requirements.txt`)
 
-云引擎会使用 `pip` 来安装 [requirements.txt](https://pip.pypa.io/en/stable/user_guide/#requirements-files) 中的包：
+Cloud Engine will install the packages specified in [requirements.txt](https://pip.pypa.io/en/stable/user_guide/#requirements-files) with `pip`:
 
 ```plain title='requirements.txt'
 leancloud>=2.9.1,<3.0.0
@@ -90,7 +90,7 @@ Flask>=1.0.0
 ```
 
 :::note
-建议将依赖的包的版本都按照 `leancloud>=2.9.1,<3.0.0` 这种格式来明确包的大版本，防止因为包的大版本中的不兼容改动导致再次部署应用时出现问题。
+We recommend that you specify the major version of your packages using a format like `leancloud>=2.9.1,<3.0.0`. This prevents incompatible changes introduced by major version bumps from causing problems during the deployments of your application.
 :::
 
 ## Customize Build Process
