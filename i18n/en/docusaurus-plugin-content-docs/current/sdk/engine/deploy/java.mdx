@@ -23,39 +23,39 @@ import { Conditional } from "/src/docComponents/conditional";
 This article serves as a thorough introduction to Cloud Engine’s Java runtime environment. To quickly get started with Cloud Engine, see [Getting Started With Cloud Engine](/sdk/engine/deploy/getting-started).
 :::
 
-云引擎目前支持使用 Maven 构建出的 WAR 或 JAR 项目。也支持直接上传 WAR 包。
+You can deploy WAR and JAR projects built with Maven to Cloud Engine, or upload WAR files directly to Cloud Engine.
 
-如果要开始一个新的项目，建议从我们的示例项目开始：
+If you are looking to start a new project, we recommend that you use one of our sample projects as a boilerplate:
 
-- [Servlet 示例项目](https://github.com/leancloud/servlet-getting-started)
-- [Spring Boot 示例项目](https://github.com/leancloud/spring-boot-getting-started)
+- [Servlet sample project](https://github.com/leancloud/servlet-getting-started)
+- [Spring Boot sample project](https://github.com/leancloud/spring-boot-getting-started)
 
 :::caution
-Java 对内存的需求较高，体验版实例的 256M 内存可能会导致 Java 进程启动时内存不足而崩溃（OOM）导致部署失败，或运行时内存不足而频繁重启。
+Running a Java program usually costs a large amount of memory. If you are using a trial instance with 256M of memory, Cloud Engine might encounter an OOM error when starting your Java program, causing your deployment to fail. Even if Cloud Engine is able to start your program, the program might frequently get restarted due to low memory.
 
-我们建议 Java 项目至少选用 512 MB 以上的内存，Spring Boot 项目至少选用 1024 MB 以上的内存，并在之后的运行过程中根据内存用量统计随时调整。调整内存规格的方法详见 [云引擎平台功能 § 调整实例规格和数量](/sdk/engine/deploy/platform/#调整实例规格和数量)。
+We recommend that you pick an instance with at least 512 MB of memory. If your project is built with Spring Boot, a minimum of 1024 MB of memory is recommended. You can adjust the memory size at any time even if you've already deployed your project. See [Cloud Engine Platform Features § Adjusting Quota and Number of Instances](/sdk/engine/deploy/platform/#adjusting-quota-and-number-of-instances) for more information on how to adjust the memory size of your instances.
 :::
 
 ## Startup Command
 
-在完成构建后，云引擎会在 `target` 目录下查找 `.war` 或者 `.jar` 文件：
+Once the build is finished, Cloud Engine will look for a `.war` or `.jar` file under `target`:
 
-- 如果找到 `.war` 会将其放入 Servlet 容器（Jetty 9.x）来运行
-- 如果找到 `.jar` 会通过 `java -jar` 来运行
+- If it finds a `.war` file, it will place the file into a Servlet container (Jetty 9.x).
+- If it finds a `.jar` file, it will run the file with `java -jar`.
 
-### 配置 JVM 参数
+### Configure JVM Parameters
 
-云引擎运行 Java 应用时，会自动将 `-Xmx` 参数设置为实例规格的 70%，剩下的 30% 留给堆外内存和其他开销。如果你的应用比较特殊（比如大量使用堆外内存）可以自己定制 `-Xmx` 参数。假设使用 2 GB 内存规格的实例运行，则可以在云引擎的设置页面增加「自定义环境变量」，名称为 `JAVA_OPTS`，值为 `-Xmx1500m`，这样会限制 JVM 堆最大为 1.5 GB，剩下 500 MB 留给持久代、堆外内存或者其他一些杂项使用。**注意：`-Xmx` 参数如果设置得过小可能会导致大量 CPU 消耗在反复的 GC 任务上**。
+When Cloud Engine runs a Java application, it will give `-Xmx` a value equivalent to 70% of the size of the instance. The remaining 30% will be reserved for off-heap memory and other consumptions. You may customize the value of `-Xmx` if your application has special needs (like using a large amount of off-heap memory). For example, if your instance has a memory of 2 GB, you can add a _custom environment variable_ on the _Settings_ page with `JAVA_OPTS` as its name and `-Xmx1500m` as its value. This will limit the size of the JVM heap to 1.5 GB and leave 500 MB for PermGen, off-heap memory, and other stuff. **Keep in mind that if the value of `-Xmx` is too small, a large amount of CPU might be wasted on repetitive garbage collection tasks.**
 
 ## Configure Java Version
 
-在项目根目录创建一个 `system.properties` 即可配置 Java 的版本：
+To specify the Java version you want to use, create a file named `system.properties` under the root directory of your project:
 
 ```plain title='system.properties'
 java.runtime.version=11
 ```
 
-目前云引擎支持的版本有 AdoptOpenJDK `8`、`11`、`12`、`13`、`14`。
+At this time, Cloud Engine supports AdoptOpenJDK `8`, `11`, `12`, `13`, and `14`.
 
 :::note
 
@@ -68,17 +68,17 @@ latest stable (LTS) version will be used.
 </Conditional>
 :::
 
-## 直接上传 WAR 包
+## Upload WAR File
 
-在本地构建（如使用 `mvn package`）出 WAR 包后，可以在使用命令行工具部署时添加 `--war` 选项表示上传 WAR 包而不是源代码：
+If you’ve already built the WAR file on your local computer (with commands like `mvn package`), you can add the `--war` option when you deploy your project with the CLI. This tells the CLI to upload the WAR file rather than the source code.
 
 <CodeBlock className="sh">{`${CLI_BINARY} deploy --war`}</CodeBlock>
 
-这种情况下在云端不会有安装依赖和构建的过程，WAR 包会被直接放入 Servlet 容器运行。
+In this case, Cloud Engine won’t install dependencies or build your project on the server side. Instead, it will run the WAR file by placing it into a Servlet container.
 
-## 安装依赖和构建
+## Install Dependencies and Build
 
-如果上传了源代码，云引擎会使用 Maven 来安装 `pom.xml` 中列出的依赖，然后使用 `mvn package` 来进行构建。
+If you’ve uploaded the source code, Cloud Engine will install the dependencies listed in `pom.xml` with Maven and build your project by running `mvn package`.
 
 ## Customize Build Process
 
@@ -126,46 +126,46 @@ latest stable (LTS) version will be used.
 
 <CloudInternetAddress />
 
-## 疑难问题
+## Troubleshooting
 
-### 如何脱离命令行工具本地启动云引擎 Java 项目？
+### Can I run my Cloud Engine Java project locally without using the CLI?
 
-设置云引擎运行需要的环境变量后，可以通过脱离命令行工具，直接运行相应命令或使用 IDE 本地启动 Java 项目。
+Once you have configured the environment variables required for running your project on Cloud Engine, you can run your Java project locally with certain commands or using an IDE without using the CLI.
 
-通过命令行启动 Jetty 项目或 JAR 项目，先设置环境变量：
+To run a Jetty or JAR project from the command line, first configure the environment variables:
 
 ```sh
 eval "$(lean env)"
 ```
 
-提示：命令 `lean env` 可以输出当前应用所需环境变量的设置语句，外层的 `eval` 是直接执行这些语句。
-Windows 系统下需要手动设置 `lean env` 输出的环境变量。
+Notice that `lean env` outputs the commands used to configure the environment variables required for the current application. You can use `eval` to execute these commands.
+If you’re using Windows, you need to manually configure the environment variables returned by `lean env`.
 
-如果是 Jetty 项目，运行：
+If you have a Jetty project, run the following command:
 
 ```
 mvn jetty:run
 ```
 
-如果是 JAR 项目，使用 Maven 打包项目并运行：
+If you have a JAR project, package it with Maven and run the following command:
 
 ```sh
 mvn package
 java -jar target/{zipped jar file}
 ```
 
-使用 Eclipse 启动应用：
+To run the application with Eclipse:
 
-首先确保 Eclipse 已经安装 Maven 插件，并将项目以 **Maven Project** 方式导入 Eclipse 中。
+Please first make sure that you have installed the Maven plugin with Eclipse, then import the project into Eclipse as a **Maven Project**.
 
-在 **Package Explorer** 视图右键点击项目：
+After this, right-click on the project under the **Package Explorer** view:
 
-- 如果是 Jetty 项目，选择 **Run As** > **Maven build…**，将 **Main** 标签页的 **Goals** 设置为 `jetty:run`。
-- 如果是 JAR 项目，选择 **Run As** > **Run Configurations…**，选择 `Application`，设置 `Main class:`（示例项目为 `cn.leancloud.demo.todo.Application`）。
+- For a Jetty project, select **Run As** > **Maven build…** and set **Goals** under the **Main** tab to be `jetty:run`.
+- For a JAR project, select **Run As** > **Run Configurations…**, select `Application`, and set `Main class:` (`cn.leancloud.demo.todo.Application` for the sample project).
 
-最后在 **Environment** 标签页增加以下环境变量和相应的值：
+Then add the following environment variables under the **Environment** tab:
 
-| 名称                       | 值              |
+| Name                       | Value           |
 | -------------------------- | --------------- |
 | `LEANCLOUD_APP_ENV`        | `development`   |
 | `LEANCLOUD_APP_ID`         | `{{appid}}`     |
@@ -173,17 +173,17 @@ java -jar target/{zipped jar file}
 | `LEANCLOUD_APP_MASTER_KEY` | `{{masterkey}}` |
 | `LEANCLOUD_APP_PORT`       | `3000`          |
 
-配置完成后，以后只需点击 run 按钮即可启动应用。
+Once you’ve finished the configuration above, you will be able to run your project by hitting _run_.
 
-### 如何在云引擎中依赖内部 library（也称为「二方库」）？
+### If my project depends on private libraries, can I use them on Cloud Engine?
 
-云引擎构建环境只能访问公开的程序库（library），如果你项目中使用了一些公司内部的依赖库，可以按照如下方式进行引用：
+You can follow the instructions below to use private libraries on Cloud Engine:
 
-1. 首先在项目根目录下新建 libs 目录，把所有依赖的 jar 文件拷贝进来；
-2. 然后在项目根目录下新建 leanengine.yaml 文件，并自定义 install 环节（详见下文示例）；
-3. 最后修改 pom.xml 中依赖项和 `spring-boot-maven-plugin` 配置，增加 `includeSystemScope` 设置项（详见下文示例）；
+1. Create a directory named `libs` under the root directory of your project, then copy all the jar files your project depends on into it.
+2. Create a file named `leanengine.yaml` under the root directory of your project, then customize the `install` stage (see the example below).
+3. Edit the dependencies in `pom.xml` and add `includeSystemScope` into `spring-boot-maven-plugin` in the same file (see the example below).
 
-最终的工程目录结构如下：
+Your project structure will look like this:
 
 ```
 {root}
@@ -193,7 +193,7 @@ java -jar target/{zipped jar file}
 \---pom.xml
 ```
 
-leanengine.yaml 内容如下：
+`leanengine.yaml` will look like this:
 
 ```yaml
 install:
@@ -202,7 +202,7 @@ install:
   - { use: "default" }
 ```
 
-pom.xml 中增加依赖项目：
+To add dependencies into `pom.xml`:
 
 ```xml
 <dependency>
@@ -214,7 +214,7 @@ pom.xml 中增加依赖项目：
 </dependency>
 ```
 
-pom.xml 中对 `spring-boot-maven-plugin` 改动如下：
+Edit `spring-boot-maven-plugin` in `pom.xml` so it looks like this:
 
 ```xml
 <plugin>
