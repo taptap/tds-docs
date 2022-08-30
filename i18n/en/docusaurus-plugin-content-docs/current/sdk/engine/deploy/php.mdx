@@ -25,15 +25,15 @@ A PHP project has to have a `composer.json` and `public/index.php` under its roo
 
 If you are looking to start a new project, we recommend that you use our [PHP sample project](https://github.com/leancloud/slim-getting-started) as a boilerplate.
 
-## 运行机制
+## How It Works
 
-云引擎会使用 Nginx 和 PHP-FPM 来运行你的应用，项目中的 `public` 目录会被映射为网站的根目录（document root），其中 `.php` 文件由 PHP-FPM 处理，其他静态文件由 Nginx 处理。如果被请求的路径不存在则会由 `public/index.php` 处理，这一点可以满足绝大部分框架对应用入口点的需求。
+Cloud Engine runs your application with Nginx and PHP-FPM. The `public` directory will be mapped as the document root of your website. The `.php` files in this directory will be handled by PHP-FPM while other static files will be handled by Nginx. If a user requests a path that does not exist, the request will be handled by `public/index.php`, which can serve as the entry point for most frameworks.
 
-云引擎默认每 64 MB 内存分配一个 PHP-FPM Worker，如果希望自定义 Worker 数量，可以在云引擎设置页面的「自定义环境变量」中添加名为 `PHP_WORKERS` 的环境变量，值是一个数字。设置过低会导致收到新请求时无可用的 Worker；过高会导致内存不足、请求处理失败，建议谨慎调整。
+Cloud Engine assigns a PHP-FPM worker for every 64 MB of memory. To customize the number of workers, you can add a _custom environment variable_ on Cloud Engine’s _Settings_ page with `PHP_WORKERS` as its name and the number of workers you want as its value. Keep in mind that if you set the number too low, there might not be enough workers for handling new requests; if you set the number too high, there might not be enough memory for handling requests.
 
 ## Configure PHP Version
 
-在 `composer.json` 中可以指定 PHP 的版本：
+You can specify the PHP version you want to use in `composer.json`:
 
 ```json
 "require": {
@@ -41,7 +41,7 @@ If you are looking to start a new project, we recommend that you use our [PHP sa
 }
 ```
 
-目前云引擎支持的版本有：`5.6`、`7.0`、`7.1`、`7.2`、`7.3`、`7.4`、`8.0`。
+At this time, Cloud Engine supports PHP `5.6`, `7.0`, `7.1`, `7.2`, `7.3`, `7.4`, and `8.0`.
 
 :::note
 
@@ -56,15 +56,15 @@ latest stable version will be used.
 
 ## Install Dependencies (`composer.json`)
 
-云引擎会自动安装 `composer.json` 中的依赖，目前云引擎云端使用的是 Composer 1.x 版本。
+Cloud Engine will automatically install the dependencies listed in `composer.json`. At this time, the version of Composer used by Cloud Engine is 1.x.
 
-## PHP 扩展
+## PHP Extensions
 
-所有版本的 PHP 默认开启 `fpm`、`curl`、`mysql`、`zip`、`xml`、`mbstring`、`gd`、`soap`、`sqlite3`。
+Regardless of what PHP version you are using, the following extensions will be enabled by default: `fpm`, `curl`, `mysql`, `zip`, `xml`, `mbstring`, `gd`, `soap`, and `sqlite3`.
 
-7.0 以上版本默认开启 `mongodb`。
+For PHP 7.0 and above, `mongodb` will be enabled by default.
 
-在 PHP 7.2 中官方从核心中移除了 `mcrypt` 这个拓展，云引擎以选装的方式继续提供支持，在 `composer.json` 的 `require` 中加入 `ext-mcrypt: *` 即可，使用 `mcrypt` 会增加部署耗时，如果没有用到请不要加。
+Starting from PHP 7.2, the `mcrypt` extension is not provided by default anymore. To use this extension in your project, you can add `ext-mcrypt: *` into `require` in `composer.json`. Adding `mcrypt` will increase the time needed for deployment. If your project doesn’t need this extension, you don’t have to add it.
 
 ## Customize Build Process
 
@@ -112,17 +112,17 @@ latest stable version will be used.
 
 <CloudInternetAddress />
 
-## 疑难问题
+## Troubleshooting
 
-### 是否支持 `path` 类型的 composer 本地仓库？
+### Can I specify local Composer repositories with the `path` type?
 
-由于构建时会复制 `composer.json` 和 `composer.lock` 到专门的目录安装依赖，因此不支持 `path` 类型的 composer 本地仓库。
-如果你的项目使用了 `path` 类型的本地仓库，我们建议改为 `vcs` 类型。
+Because Cloud Engine will copy `composer.json` and `composer.lock` to dedicated directories for installing dependencies, local Composer repositories with the `path` type are not supported.
+If your project uses local Composer repositories with the `path` type, we recommend that you change them to the `vcs` type.
 
-### PHP 项目从 files.phpcomposer.com 下载文件失败，部署失败怎么办？
+### When I deploy my project, it fails to fetch files from files.phpcomposer.com.
 
-phpcomposer.com 镜像已经停止服务，PHP 项目的 `composer.lock` 文件如果包含了这个地址的 url，会导致依赖安装失败。
-解决方法有两种：
+phpcomposer.com has already stopped its service, so if the `composer.lock` in your PHP project contains URLs under this domain, you won’t be able to install dependencies for your project.
+There are two solutions:
 
-1. 移除 `composer.lock` 后再部署（云引擎会直接根据 `coposer.json` 安装依赖）。
-2. 在本地正确配置仓库地址后，运行 `composer update --lock` 更新 `composer.lock` 文件中的下载链接（不改变具体的版本）。
+1. Remove `composer.lock` before you deploy your project so that Cloud Engine will install dependencies according to `composer.json`.
+2. After you have correctly configured the repository address on your local computer, run `composer update --lock` to update the download links in `composer.lock`. This won’t affect the versions specified for the dependencies.
