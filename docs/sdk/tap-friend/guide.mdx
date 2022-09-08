@@ -1,0 +1,135 @@
+---
+title: TapTap 好友指南
+sidebar_label: 开发指南
+sidebar_position: 2
+---
+
+import MultiLang from '/src/docComponents/MultiLang';
+import CodeBlock from '@theme/CodeBlock';
+import sdkVersions from '/src/docComponents/sdkVersions';
+import Languages from '../_partials/languages.mdx';
+import { Conditional } from "/src/docComponents/conditional";
+
+
+## SDK 配置
+
+可以在 [下载页](/tap-download) 获得 TapSDK，引入的 TapTap 登录模块。
+
+<MultiLang>
+
+<>
+
+**Unity 开发环境要求**：Unity 2019.4 或更高版本
+
+支持版本：
+
+- Android：最低支持 5.0
+- iOS：最低支持 iOS 10.0
+
+<CodeBlock className="json">
+{`"dependencies":{
+    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.common": "https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+    "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-0.10.14"
+}`}
+</CodeBlock>
+
+</>
+
+<>
+
+<CodeBlock className="groovy">
+{`repositories{  
+    flatDir {  
+        dirs 'libs'  
+    }  
+}  
+dependencies {  
+ 
+    implementation (name:'TapLogin_${sdkVersions.taptap.android}', ext:'aar') 
+    implementation (name:'TapCommon_${sdkVersions.taptap.android}', ext:'aar')
+}`}
+</CodeBlock>
+
+</>
+
+<>
+
+<CodeBlock className="objectivec">
+{`
+TapCommonResource.bundle
+TapLoginSDK.framework
+TapCommonSDK.framework
+`}
+</CodeBlock>
+
+</>
+
+</MultiLang>
+
+
+
+## 获取好友列表
+调用前请确保登录时已申请好友权限，即使用 TapTap 登录接口时 `permissions` 参数添加 `user_friends`。
+
+<MultiLang>
+
+```cs
+TapFriendResult result = await TapFriends.QueryMutualList(cursor, size);
+        if (result?.FriendList?.Count > 0) {
+            foreach (TapFriendInfo friendInfo in result.FriendList) {
+                Debug.Log($"{friendInfo.Name}, {friendInfo.OpenId}, {friendInfo.Avatar}");
+            }
+        }
+Debug.Log($"下一游标：{result.Cursor}");
+```
+
+```java
+TapFriends.queryMutualList(cursor, size, new TapFriendsCallback<TapFriendResult>() {
+            @Override
+            public void onSuccess(TapFriendResult tapFriendResult) {
+                toast(" queryMutualList success = " + tapFriendResult);
+            }
+
+            @Override
+            public void onFail(Throwable throwable) {
+                toast("queryMutualList fail error = " + throwable);
+            }
+        });
+```
+
+```objectivec
+TapFriendQueryOption *option = [TapFriendQueryOption new];
+option.size = 20;
+option.cursor = nil;
+[TapFriends queryMutualListWithOption:option
+                                 callback:^(TapFriendResult *_Nullable result, NSError *_Nullable error) {
+                                     if (error) {
+                                         NSLog(@"失败 error = %@",error);
+                                     } else {
+                                         NSMutableArray<NSString *> *userInfos = [NSMutableArray array];
+                                         for (TapFriendInfo *friendInfo in result.data) {
+                                             [userInfos addObject:[NSString stringWithFormat:@"openid = %@ name = %@ avatar = %@",
+                                                                                             friendInfo.openid,
+                                                                                             friendInfo.name,
+                                                                                             friendInfo.avatar]];
+                                         }
+                                         NSLog(@"成功 result = %@ cursor = %@",  userInfos, result.cursor);
+                                     }
+                                 }];
+```
+
+</MultiLang>
+
+上述参数中 `cursor` 为每页游标，第一页为 null， 后续页游标从上一次返回结果中获取； `size` 为结果数量。
+
+该接口返回结果 Result 包括 好友信息集合和下一页游标 `cursor` , 好友信息集合中每条信息包含的字段说明如下表：
+
+| 字段名 | 描述 | 
+| ---- | ---- | 
+| name | Tap 昵称 |
+| avatar | Tap 头像 | 
+| openid | Tap 用户 openid |
+
+当游标 `cursor` 为 null 时，表示为最后一页数据。
+
