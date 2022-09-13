@@ -1,5 +1,5 @@
 ---
-title: FAQ
+title: 常见问题
 sidebar_position: 6
 ---
 
@@ -13,6 +13,41 @@ import sdkVersions from "/src/docComponents/sdkVersions";
 TDS 默认提供了 2 Gbps 的防护带宽，可以防护小规模的攻击，开发者无需为此承担额外的费用。
 独占游戏在独占期间 TDS 免费提供高防服务，开发者只需事先和 TDS 方面沟通配置细节。
 其他游戏，TDS 可以协助接入 IaaS 服务商的高防，开发者需要承担相应的费用（IaaS 服务商会按高防带宽收费），详询商务。
+
+### 如何获取 Android 应用的 MD5 值？
+
+#### 一、通过 APP 工具获取
+
+当只有 APK 文件包时，为了正确填写签名 MD5 值，可以使用如下的工具进行获取：[**GenSignatureMD5**](https://blog.taptap.dev/tools/get-signature-md5.apk)，工具使用方式：使用正式的签名证书对游戏应用进行签名打包，然后将 APK 包安装到手机上。与此同时，将 GenSignatureMD5 工具也安装到同一部手机上，然后打开该工具输入游戏包名就可以得到签名 MD5 值。
+
+#### 二、通过 Android Studio 获取
+
+**JDK 10 以下的版本**，对应用正确签名以后，在 jks 签名文件目录下打开终端，输入命令：
+
+```sh
+keytool -list -v -keystore xxx.jks
+```
+就可以在命令窗口看到签名文件的信息，包括了 SHA1 值和 MD5 值。**注意这种方式适用于 JDK 10 以下的版本**。
+
+**JDK 10 以上的版本**上述方式获取不到 MD5 的值，可以使用 Android Studio 自带的 Gradle Tasks 查看，双击下图中的 signingReport 后调试窗口会输出 MD5 值。
+
+![](https://capacity-files.lcfile.com/y7fcVDW6cUFKfG4ATDXj8KKE9L2jWprB/%E8%8E%B7%E5%8F%96MD5%E7%A4%BA%E4%BE%8B1.jpeg)
+
+:::caution
+
+注意，运行 signingReport 调试窗口输出的 MD5 值带冒号分隔符，绑定到开发者中心时需要手动删除冒号。
+> TapTap开发者中心绑定 MD5 格式举例：
+> 
+> 正确格式：6EB4347CF9C098BE1C8D965D539C42E2
+>
+>  错误格式: 6E:B4:34:7C:F9:C0:98:BE:1C:8D:96:5D:53:9C:42:E2
+
+:::
+
+如果右侧 Gradle 面板没有 Gradle Tasks 选项卡，在设置中关掉下图所示选项，重新 Sync Gradle，即可看到 Gradle Tasks 选项卡。
+
+![](https://capacity-files.lcfile.com/8dEVF81X34JFtUE50tnqj6OIoxxDdXsU/%E8%8E%B7%E5%8F%96MD5%E7%A4%BA%E4%BE%8B2.jpeg)
+
 
 ### Android 上 TapSDK 和 B 站 SDK 引用的 okhttp 版本冲突，怎么办？
 
