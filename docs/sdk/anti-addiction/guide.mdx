@@ -120,7 +120,7 @@ iOS **防沉迷 SDK** 结构：
 
     ``` objc
     // AntiAddictionUI
-    #import <AntiAddictionUI/AntiAddiction.h>
+    #import <AntiAddictionUI/AntiAddictionUI.h>
     ```
 
 添加系统依赖库：
@@ -203,28 +203,20 @@ AntiAddictionUIKit.init(activity, config, new AntiAddictionCallback() {
 <>
 
 ```objc
-NSString *gameIdentifier = @"your_client_id";  // TapTap 开发者中心对应 Client ID
-AntiAddictionConfiguration *config = AntiAddictionService.configuration;
-// 是否启用消费限制功能
-config.useSdkPaymentLimit = YES;
-// 是否启用时长限制功能
-config.useSdkOnlineTimeLimit = YES;
-// 是否显示切换账号按钮
+AntiAddictionConfig *config = [[AntiAddictionConfig alloc] init];
+config.clientID = @"your_client_id";  // TapTap 开发者中心对应 Client ID
+config.useTapLogin = YES;
 config.showSwitchAccount = YES;
-
-[AntiAddiction initGameIdentifier:gameIdentifier antiAddictionConfig:config
-antiAddictionCallbackDelegate:self
-completionHandler:^(BOOL success) {
-    if (success) {
-        // 初始化成功
-    }
-}];
+// self需要实现AntiAddictionDelegate协议，self用其他遵守AntiAddictionDelegate协议的对象替换
+[AntiAddiction initWithConfig:config delegate:self];
 ```
 
-  `antiAddictionCallbackDelegate` 参数中传入接受回调的对象，其中需实现如下回调：
+ `+[AntiAddiction initWithConfig:delegate:]` 中的 `delegate` 对象需要实现以下协议方法来接收回调：
 
 ```objc
-- (void)antiAddictionCallbackWithCode:(AntiAddictionResultHandlerCode)code extra:(NSString *)extra {}
+- (void)antiAddictionCallbackWithCode:(AntiAddictionResultHandlerCode)code extra:(NSString * _Nullable)extra {
+    // 防沉迷回调
+}
 ```
 
 
@@ -261,8 +253,22 @@ completionHandler:^(BOOL success) {
 
 </>
 
+- `config` 是防沉迷功能的配置，包括如下参数:
+  - `clientID` 游戏的 `Client ID`，可以在控制台查看（**开发者中心 > 你的游戏 > 游戏服务 > 应用配置**）。
+
+  - `useTapLogin` 是否使用 [TapTap 快速认证](#taptap-快速认证)。建议使用这个功能，方便已经在 TapTap 上实名认证过的玩家快速完成防沉迷认证步骤。
+
+  - `showSwitchAccount` 是否显示切换账号按钮。如果游戏没有切换账号功能，可以在初始化阶段配置隐藏切换账号按钮；如果游戏选择显示切换账号按钮(如下图所示)，玩家点击之后会触发 `1001` 回调，游戏可根据这个回调 code 做相应处理。
+  
+- `delegate` 对象需要实现 `-[AntiAddictionDelegate antiAddictionCallbackWithCode:extra:]` 协议方法来接收回调
+  - `code` 不同情况下的回调类型，详情可以参考下面的[回调类型](#回调类型)。
+
+  - `extra` 在执行不同业务时，会带上一些详细信息。
+
 <>
-// TODO
+
+
+
 </>
 
 </MultiLang>
@@ -360,9 +366,8 @@ AntiAddictionUIKit.startup(activity, userIdentifier);
 <>
 
 ```objc
-BOOL useTapLogin = YES;
 NSString *userIdentifier = @"玩家的唯一标识";
-[AntiAddiction startUpUseTapLogin:useTapLogin userIdentifier:userIdentifier];
+[AntiAddiction startupWithUserID:userIdentifier];
 ```
 
 使用 **TapTap 快速认证** 需要在 `AppDelegate` 里嵌入回调。
@@ -370,6 +375,8 @@ NSString *userIdentifier = @"玩家的唯一标识";
 注意：如果已经在登录模块添加过，可以跳过此步。
 
 ```objc
+#import <TapCommonSDK/TapCommonSDK.h>
+
 // 新的回调
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
     return [TDSHandleUrl handleOpenURL:url];
@@ -430,7 +437,7 @@ AntiAddictionUIKit.exit();
 ```
 
 ```objc
-[AntiAddiction logout];
+[AntiAddiction exit];
 ```
 
 </MultiLang>
@@ -450,7 +457,7 @@ int ageRange = AntiAddictionKit.currentUserAgeLimit();
 ```
 
 ```objc
-NSInteger ageRange = [AntiAddiction getCurrentUserAgeLimit];
+NSInteger ageRange = [AntiAddiction getAgeRange];
 ```
 
 </MultiLang>
@@ -519,16 +526,15 @@ AntiAddictionUIKit.checkPayLimit(activity, amount,
 
 ```objc
 NSInteger amount = 100;
-[AntiAddiction checkPayLimit:amount
-callBack:^(BOOL status, NSString * _Nonnull title, NSString * _Nonnull description) {
+[AntiAddiction checkPayLimit:amount resultBlock:^(BOOL status) {
     if (status) {
         // 无限制
     } else {
         // title 限制消费提示标题
         // description 限制消费提示描述（例如法规说明）
     }
-failureHandler:^(NSString * _Nonnull msg) {
-    // 处理异常    
+} failureHandler:^(NSString * _Nonnull error) {
+    // 处理异常
 }];
 ```
 
@@ -572,14 +578,12 @@ AntiAddictionUIKit.submitPayResult(amount,
 
 ```objc
 NSInteger amount = 100;
-[AntiAddiction submitPayResult:amount
-callBack:^(BOOL success) {
+[AntiAddiction submitPayResult:amount callBack:^(BOOL success) {
     if (success) {
         // 提交成功
     }
-}
-failureHandler:^(NSString * _Nonnull msg) {
-    // 处理异常       
+} failureHandler:^(NSString * _Nonnull error) {
+    // 处理异常
 }];
 ```
 
