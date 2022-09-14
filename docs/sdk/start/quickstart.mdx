@@ -150,27 +150,23 @@ SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选�
 
 2. 打开项目的 `project/app/build.gradle` 文件，添加 gradle 配置如下：
 
-<CodeBlock className="java">
- {`repositories{
-    flatDir {
-        dirs 'libs'
-    }
-}\n
+<CodeBlock className="java"> {`
 dependencies {
     ...
-    // TapTap 启动器
-    implementation name:'TapBootstrap_${sdkVersions.taptap.android}', ext:'aar'
-    // TapTap 基础库
-    implementation name:'TapCommon_${sdkVersions.taptap.android}', ext:'aar'
-    // TapTap 登录
-    implementation name:'TapLogin_${sdkVersions.taptap.android}', ext:'aar'
+    // 导入 libs 目录下所有 aar 的包：
+    implementation fileTree(dir: 'libs', include: ['*.aar'])
+    // 如果需要单独导入 libs 目录下的指定包，请按照如下方式：
+    //implementation files('libs/TapBootstrap_${sdkVersions.taptap.android}.aar') // TapTap 启动器
+    //implementation files('libs/TapCommon_${sdkVersions.taptap.android}.aar') // TapTap 基础库
+    //implementation files('libs/TapLogin_${sdkVersions.taptap.android}.aar') // TapTap 登录
+    ...
     // 数据存储
     implementation 'cn.leancloud:storage-android:${sdkVersions.leancloud.java}'
     // 即时通讯
     implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-}`}
-</CodeBlock>
+}
+`}</CodeBlock>
 
 3. 在 `AndroidManifest.xml` 添加网络权限：
 
@@ -397,11 +393,13 @@ TapSDK 提供了众多功能。请在初始化 SDK 后，根据项目需要，�
 
 ### 接入 TapTap 登录
 
-请根据开发者指南：[快速上手，接入 TapTap 一键登录](/sdk/taptap-login/guide/start) 完成操作，可以选择单纯的 TapTap 登录，或者基于内建账户系统接入 TapTap 登录。
+请根据开发者指南：[快速上手，接入 TapTap 一键登录](/sdk/taptap-login/guide/start) 完成操作。
 
 ### 配置签名证书
 
 Android 和 iOS 应用需要在 TapTap 开发者中心进入你的游戏，依次选择 **游戏服务 > 生态服务 > TapTap 登录** 配置应用的相关信息（如下图所示），否则测试登录功能时会返回 `signature not match` 报错信息，无法正常使用 TapTap 登录功能。
+
+Android 签名处填写 MD5 值，详情可参考：[如何获取 MD5 值](/sdk/start/faq/#如何获取-android-应用的-md5-值)。
 
 <Conditional region="cn">
 
@@ -414,8 +412,6 @@ Android 和 iOS 应用需要在 TapTap 开发者中心进入你的游戏，依�
 ![](/img/io/login-config.png)
 
 </Conditional>
-
-为了正确填写签名 MD5 值，可以使用如下的工具进行获取：[**GenSignatureMD5**](https://blog.taptap.dev/tools/get-signature-md5.apk)。
 
 ### 添加测试用户
 
