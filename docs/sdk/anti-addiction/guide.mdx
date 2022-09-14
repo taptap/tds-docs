@@ -9,9 +9,12 @@ import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';
 
 :::tip
-* 使用 TDS 实名认证和防沉迷服务之前，需要在开发者中心后台 > 游戏服务 > 生态服务 > 合规认证 处开通服务。
-* 推荐阅读博客：[实名认证和防沉迷功能接入](https://blog.taptap.dev/posts/tapsdk-tap-antiaddiction-practice)，加深对实名认证和防沉迷功能的理解。
+使用 TDS 实名认证和防沉迷服务之前，需要在**开发者中心后台 > 游戏服务 > 生态服务 > 合规认证** 处开通服务，可选择「已有版号」或「暂无版号」方案。
 :::
+
+<!--
+推荐阅读博客：[实名认证和防沉迷功能接入](https://blog.taptap.dev/posts/tapsdk-tap-antiaddiction-practice)，加深对实名认证和防沉迷功能的理解。
+-->
 
 ## SDK 配置
 
@@ -117,7 +120,7 @@ iOS **防沉迷 SDK** 结构：
 
     ``` objc
     // AntiAddictionUI
-    #import <AntiAddictionUI/AntiAddiction.h>
+    #import <AntiAddictionUI/AntiAddictionUI.h>
     ```
 
 添加系统依赖库：
@@ -156,9 +159,8 @@ using TapTap.AntiAddiction;
 AntiAddictionConfig config = new AntiAddictionConfig()
 {
     gameId = "your_client_id",      // TapTap 开发者中心对应 Client ID
-    useTapLogin = true,             // 是否启动 Tap 快速登录
+    useTapLogin = true,             // 是否启动 TapTap 快速认证
     showSwitchAccount = false,      // 是否显示切换账号按钮
-    region = Region.China,          // 设置国家,国内设置 Region.China 即可
 };         
 
 Action<int, string> callback = (code, errorMsg) => {
@@ -180,53 +182,41 @@ AntiAddictionUIKit.Init(config, callback);
 
 ```java
 // Android SDK 的各接口第一个参数是当前 Activity，以下不再说明
-String gameIdentifier = "your_client_id";  // TapTap 开发者中心对应 Client ID
-AntiAddictionFunctionConfig config = new AntiAddictionFunctionConfig.Builder()
-    .enablePaymentLimit(true) // 是否启用消费限制功能
-    .enableOnLineTimeLimit(true) // 是否启用时长限制功能
-    .showSwitchAccount(true)    // 是否显示切换账号按钮
-    .build();
-AntiAddictionUIKit.init(activity, gameIdentifier, config,
-    new AntiAddictionUICallback() {
-        @Override
-        public void onCallback(int code, Map<String, Object> extras) {
-            // 根据 code 不同提示玩家不同信息，详见下面的说明
-            if (code == Constants.ANTI_ADDICTION_CALLBACK_CODE.LOGIN_SUCCESS){
-                // 开始计时
-                AntiAddictionUIKit.enterGame();
-                Log.d("TapTap-AntiAddiction", "玩家登录后判断当前玩家可以进行游戏");
-            }
-        }       
-    }
-);
+
+Config config = new Config.Builder()
+  .withClientId("your_client_id") // TapTap 开发者中心对应 Client ID
+  .enableTapLogin(true)           // 是否启动 TapTap 快速认证
+  .showSwitchAccount(false)       // 是否显示切换账号按钮
+  .build();
+
+AntiAddictionUIKit.init(activity, config, new AntiAddictionCallback() {
+    @Override
+    public void onCallback(int code, Map<String, Object> extras) {
+        if (code == Constants.ANTI_ADDICTION_CALLBACK_CODE.LOGIN_SUCCESS){
+            Log.d("TapTap-AntiAddiction", "玩家登录后判断当前玩家可以进行游戏");
+        }
+  }
+});
 ```
 
 </>
 <>
 
 ```objc
-NSString *gameIdentifier = @"your_client_id";  // TapTap 开发者中心对应 Client ID
-AntiAddictionConfiguration *config = AntiAddictionService.configuration;
-// 是否启用消费限制功能
-config.useSdkPaymentLimit = YES;
-// 是否启用时长限制功能
-config.useSdkOnlineTimeLimit = YES;
-// 是否显示切换账号按钮
+AntiAddictionConfig *config = [[AntiAddictionConfig alloc] init];
+config.clientID = @"your_client_id";  // TapTap 开发者中心对应 Client ID
+config.useTapLogin = YES;
 config.showSwitchAccount = YES;
-
-[AntiAddiction initGameIdentifier:gameIdentifier antiAddictionConfig:config
-antiAddictionCallbackDelegate:self
-completionHandler:^(BOOL success) {
-    if (success) {
-        // 初始化成功
-    }
-}];
+// self需要实现AntiAddictionDelegate协议，self用其他遵守AntiAddictionDelegate协议的对象替换
+[AntiAddiction initWithConfig:config delegate:self];
 ```
 
-  `antiAddictionCallbackDelegate` 参数中传入接受回调的对象，其中需实现如下回调：
+ `+[AntiAddiction initWithConfig:delegate:]` 中的 `delegate` 对象需要实现以下协议方法来接收回调：
 
 ```objc
-- (void)antiAddictionCallbackWithCode:(AntiAddictionResultHandlerCode)code extra:(NSString *)extra {}
+- (void)antiAddictionCallbackWithCode:(AntiAddictionResultHandlerCode)code extra:(NSString * _Nullable)extra {
+    // 防沉迷回调
+}
 ```
 
 
@@ -235,20 +225,51 @@ completionHandler:^(BOOL success) {
 
 ### 参数说明
 
+<MultiLang>
+
+<>
+
 - `config` 是防沉迷功能的配置，包括如下参数:
   - `gameId` 游戏的 `Client ID`，可以在控制台查看（**开发者中心 > 你的游戏 > 游戏服务 > 应用配置**）。
 
-  - `useTapLogin` 是否使用 [TapTap 快速认证](#taptap-快速认证)。建议使用这个功能，方便已经在 TapTap 上实名认证过的玩家快速完成防沉迷认证步骤。。
+  - `useTapLogin` 是否使用 [TapTap 快速认证](#taptap-快速认证)。建议使用这个功能，方便已经在 TapTap 上实名认证过的玩家快速完成防沉迷认证步骤。
 
   - `showSwitchAccount` 是否显示切换账号按钮。如果游戏没有切换账号功能，可以在初始化阶段配置隐藏切换账号按钮；如果游戏选择显示切换账号按钮(如下图所示)，玩家点击之后会触发 `1001` 回调，游戏可根据这个回调 code 做相应处理。
-  
-  - `region` 设置游戏处于哪个地区，如果是国内的用户设置为 `Region.China` 即可。
   
 - `callback` 是防沉迷的在各种情况下，通知用户的回调接口,包含参数如下:
   - `code` 不同情况下的回调类型，详情可以参考下面的[回调类型](#回调类型)。
 
   - `errorMsg` 在执行不同业务时，发生错误时的错误消息。
 
+</>
+
+<>
+
+防沉迷初始化参数包括：
+
+- 游戏的 `Client ID`，可以在控制台查看（**开发者中心 > 你的游戏 > 游戏服务 > 应用配置**）。
+- 是否使用 [TapTap 快速认证](#taptap-快速认证)。建议使用这个功能，方便已经在 TapTap 上实名认证过的玩家快速完成防沉迷认证步骤。
+- 是否显示切换账号按钮。如果游戏没有切换账号功能，可以在初始化阶段配置隐藏切换账号按钮；如果游戏选择显示切换账号按钮(如下图所示)，玩家点击之后会触发 `1001` 回调，游戏可根据这个回调 code 做相应处理。
+
+</>
+
+<>
+
+- `config` 是防沉迷功能的配置，包括如下参数:
+  - `clientID` 游戏的 `Client ID`，可以在控制台查看（**开发者中心 > 你的游戏 > 游戏服务 > 应用配置**）。
+
+  - `useTapLogin` 是否使用 [TapTap 快速认证](#taptap-快速认证)。建议使用这个功能，方便已经在 TapTap 上实名认证过的玩家快速完成防沉迷认证步骤。
+
+  - `showSwitchAccount` 是否显示切换账号按钮。如果游戏没有切换账号功能，可以在初始化阶段配置隐藏切换账号按钮；如果游戏选择显示切换账号按钮(如下图所示)，玩家点击之后会触发 `1001` 回调，游戏可根据这个回调 code 做相应处理。
+  
+- `delegate` 对象需要实现 `-[AntiAddictionDelegate antiAddictionCallbackWithCode:extra:]` 协议方法来接收回调
+  - `code` 不同情况下的回调类型，详情可以参考下面的[回调类型](#回调类型)。
+
+  - `extra` 在执行不同业务时，会带上一些详细信息。
+
+</>
+
+</MultiLang>
 
 ![切换账号界面](/img/anti-addiction/switch-account.png)
 
@@ -282,6 +303,8 @@ TDS 云端会根据实名信息判断玩家是否可以进行游戏，并将相�
 - **后台[配置签名证书](/sdk/start/quickstart/#配置签名证书)**。若此项未完成，快速认证拉起 TapTap 客户端会提示「授权失败」。
 :::
 
+初始化 SDK 时将是否使用 TapTap 快速认证参数设置为 `true`。
+
 传入玩家唯一标识 `userIdentifier`，即可开始 TapTap 快速认证。SDK 会拉起 TapTap 开始快速认证，如果 SDK 检测到玩家设备中未安装 TapTap 客户端，则会打开 WebView，玩家可授权游戏使用其在 TapTap 上的年龄段信息来完成游戏内的实名流程。
 
 其中的**玩家唯一标识** `userIdentifier`，如果接入 [TDS 内建账户系统](/sdk/taptap-login/guide/start/#一键完成-taptap-登录)，可以用玩家的 `objectId`；如果使用[单纯 TapTap 用户认证](/sdk/taptap-login/guide/tap-login/#taptap-登录并获取登录结果)则可以用 `openid` 或 `unionid`。
@@ -291,14 +314,12 @@ TDS 云端会根据实名信息判断玩家是否可以进行游戏，并将相�
 <>
 
 ```cs
-bool useTapLogin = true;
 string userIdentifier = "玩家的唯一标识";
-
-AntiAddictionUIKit.Startup(useTapLogin, userIdentifier);
+AntiAddictionUIKit.Startup(userIdentifier);
 ```
-  
+
 **注意**：Unity 项目如果没有接入登录模块，则项目导出的 Xcode 工程打包 iOS 时需要配置 `URLSchema`。
-  
+
 <details>
 <summary>查看 Xcode 工程如何配置 URLSchema</summary>
 
@@ -333,18 +354,16 @@ AntiAddictionUIKit.Startup(useTapLogin, userIdentifier);
 <>
 
 ```java
-boolean useTapLogin = true;
 String userIdentifier = "玩家的唯一标识";
-AntiAddictionUIKit.startup(activity, useTapLogin, userIdentifier);
+AntiAddictionUIKit.startup(activity, userIdentifier);
 ```
 
 </>
 <>
 
 ```objc
-BOOL useTapLogin = YES;
 NSString *userIdentifier = @"玩家的唯一标识";
-[AntiAddiction startUpUseTapLogin:useTapLogin userIdentifier:userIdentifier];
+[AntiAddiction startupWithUserID:userIdentifier];
 ```
 
 使用 **TapTap 快速认证** 需要在 `AppDelegate` 里嵌入回调。
@@ -352,6 +371,8 @@ NSString *userIdentifier = @"玩家的唯一标识";
 注意：如果已经在登录模块添加过，可以跳过此步。
 
 ```objc
+#import <TapCommonSDK/TapCommonSDK.h>
+
 // 新的回调
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
     return [TDSHandleUrl handleOpenURL:url];
@@ -393,28 +414,9 @@ NSString *userIdentifier = @"玩家的唯一标识";
 
 ### 手动输入实名信息
 
-如果不使用 TapTap 快速认证，可以通过下面的接口开始防沉迷授权。需要传入的**玩家唯一标识** `userIdentifier`，由游戏自己定义。
+如果不使用 TapTap 快速认证，初始化 SDK 时将是否使用 TapTap 快速认证参数设置为 `false`，调用认证接口。
 
-<MultiLang>
-
-```cs
-string userIdentifier = "玩家的唯一标识";
-AntiAddictionUIKit.Startup(false, userIdentifier);
-```
-
-```java
-String userIdentifier = "玩家的唯一标识";
-AntiAddictionUIKit.startup(activity, false, userIdentifier);
-```
-
-```objc
-NSString *userIdentifier = @"玩家的唯一标识";
-[AntiAddiction startUpUseTapLogin:NO
-userIdentifier:userIdentifier];
-```
-
-</MultiLang>
-
+需要传入的**玩家唯一标识** `userIdentifier`，由游戏自己定义。
 
 ## 登出
 
@@ -427,11 +429,11 @@ AntiAddictionUIKit.Exit();
 ```
 
 ```java
-AntiAddictionUIKit.logout();
+AntiAddictionUIKit.exit();
 ```
 
 ```objc
-[AntiAddiction logout];
+[AntiAddiction exit];
 ```
 
 </MultiLang>
@@ -447,25 +449,65 @@ int ageRange = AntiAddictionUIKit.AgeRange;
 ```
 
 ```java
-int ageRange = AntiAddictionKit.currentUserAgeLimit();
+int ageRange = AntiAddictionUIKit.getAgeRange();
 ```
 
 ```objc
-NSInteger ageRange = [AntiAddiction getCurrentUserAgeLimit];
+NSInteger ageRange = [AntiAddiction getAgeRange];
 ```
 
 </MultiLang>
 
 上例中的 `ageRange` 是一个整数，表示玩家所处年龄段的下限（最低年龄）。
-特别地，`-1` 表示「未实名」。
+特别地，`-1` 表示「未知」，说明该用户还未实名。
 
 | 类型数值 | 含义 |
 | - | - |
-| -1 | 未实名 |
+| -1 | 未知 |
 | 0 | 0 到 7 岁 |
 | 8 | 8 到 15 岁 |
 | 16 | 16 到 17 岁 |
 | 18 | 成年玩家 |
+
+## 获取剩余时长（单位:秒）
+
+获取玩家当前剩余时长：
+
+<MultiLang>
+
+```cs
+int remainingTimeInSeconds = AntiAddictionUIKit.RemainingTime;
+```
+
+```java
+int remainingTimeInSeconds = AntiAddictionUIKit.getRemainingTime();
+```
+
+```objc
+NSInteger remainingTimeInSeconds = [AntiAddiction getRemainingTime];
+```
+
+</MultiLang>
+
+## 获取剩余时长（单位:分钟）
+
+获取玩家当前剩余时长：
+
+<MultiLang>
+
+```cs
+int remainingTimeInMinutes = AntiAddictionUIKit.getRemainingTimeInMinutes();
+```
+
+```java
+int remainingTimeInMinutes = AntiAddictionUIKit.getRemainingTimeInMinutes();
+```
+
+```objc
+NSInteger remainingTimeInMinutes = [AntiAddiction getRemainingTimeInMinutes];
+```
+
+</MultiLang>
 
 ## 检查消费上限
 
@@ -482,11 +524,8 @@ AntiAddictionUIKit.CheckPayLimit(amount,
     (result) => {
         // status 为 1 时可以支付
         int status = result.status;
-        if (status != 1) {
-            // 限制消费提示标题
-            string title = result.title;
-            // 限制消费提示描述（例如法规说明）
-            string description = result.description; 
+        if (status == 1) {
+            // 可以进行支付
         }
     },
     (exception) => {
@@ -502,11 +541,7 @@ AntiAddictionUIKit.checkPayLimit(activity, amount,
         @Override
         public void onSuccess(CheckPayResult result) {
             // status 为 true 时可以支付，false 则限制消费
-            if (!result.status) {
-                // 限制消费提示标题
-                String title = result.title;
-                // 限制消费提示描述（例如法规说明）
-                String description = result.description;
+            if (result.status) {
             }
         }
         
@@ -520,16 +555,12 @@ AntiAddictionUIKit.checkPayLimit(activity, amount,
 
 ```objc
 NSInteger amount = 100;
-[AntiAddiction checkPayLimit:amount
-callBack:^(BOOL status, NSString * _Nonnull title, NSString * _Nonnull description) {
+[AntiAddiction checkPayLimit:amount resultBlock:^(BOOL status) {
     if (status) {
         // 无限制
-    } else {
-        // title 限制消费提示标题
-        // description 限制消费提示描述（例如法规说明）
     }
-failureHandler:^(NSString * _Nonnull msg) {
-    // 处理异常    
+} failureHandler:^(NSString * _Nonnull error) {
+    // 处理异常
 }];
 ```
 
@@ -573,14 +604,12 @@ AntiAddictionUIKit.submitPayResult(amount,
 
 ```objc
 NSInteger amount = 100;
-[AntiAddiction submitPayResult:amount
-callBack:^(BOOL success) {
+[AntiAddiction submitPayResult:amount callBack:^(BOOL success) {
     if (success) {
         // 提交成功
     }
-}
-failureHandler:^(NSString * _Nonnull msg) {
-    // 处理异常       
+} failureHandler:^(NSString * _Nonnull error) {
+    // 处理异常
 }];
 ```
 
@@ -589,8 +618,6 @@ failureHandler:^(NSString * _Nonnull msg) {
 上报消费金额时，传入的消费金额的单位同样为分。
 
 ## 上报游戏时长
-
-如果启用时长限制功能，需要上报游戏时长。
 
 已登录的玩家，开始游戏时调用此接口，之后 SDK 会自动轮询上报游戏时长。
 
@@ -957,10 +984,6 @@ curl -X POST \
 
 * 首先确认游戏使用的 [玩家唯一标识 userIdentifier](#玩家唯一标识-useridentifier-参数说明) 符合要求。如果同一个玩家用的 userIdentifier 会发生改变，在防沉迷服务中会被视为不同用户，导致重复认证。这个时候需要游戏传入合适的 userIdentifier，建议接入 [TDS 内建账户系统](/sdk/taptap-login/guide/start/#一键完成-taptap-登录)，用 `objectId` 作为玩家唯一标识；或者使用[单纯 TapTap 用户认证](/sdk/taptap-login/guide/tap-login/#taptap-登录并获取登录结果)，传入 `openid` 或 `unionid` 作为玩家唯一标识。
 * 如果是**有版号游戏**，请确认在开发者中心后台填写的参数无误，尤其需要注意游戏方是否在**中宣部配置 IP 白名单**，如果没有配置，请求中宣部接口会失败，导致重复认证。
-
-### 针对未成年用户开启时长限制功能
-
-首先 SDK 在初始化时需要将 `useTimeLimit` 参数设置成 `true`；其次已登录的玩家，开始游戏时调用此接口 `AntiAddictionUIKit#EnterGame`，相应的，停止游戏时调用此接口 `AntiAddictionUIKit#LeaveGame`。
 
 ## 注意事项
 
