@@ -1,6 +1,6 @@
 const sdkVersions = {
   taptap: {
-    unity: "3.15.0",
+    unity: "3.15.1",
     android: "3.15.0",
     ios: "3.15.0",
     rtc: "1.1.0",
