@@ -150,22 +150,23 @@ Create a file named `TDS-Info.plist` under the `Assets/Plugins/iOS/Resource` dir
 
 2. Open the `project/app/build.gradle` file under your project and add the following gradle configurations:
 
-<CodeBlock className="java">
-  {`repositories{
-    flatDir {
-        dirs 'libs'
-    }
-}\n
+<CodeBlock className="java"> {`
 dependencies {
     ...
-    implementation name:'TapBootstrap_${sdkVersions.taptap.android}', ext:'aar'
-    implementation name:'TapCommon_${sdkVersions.taptap.android}', ext:'aar'
-    implementation name:'TapLogin_${sdkVersions.taptap.android}', ext:'aar'
-    implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
+    // Import all aar packages in the libs directory：
+    implementation fileTree(dir: 'libs', include: ['*.aar'])
+    // Or import the specified packages in the libs directory：
+    //implementation files('libs/TapBootstrap_${sdkVersions.taptap.android}.aar') 
+    //implementation files('libs/TapCommon_${sdkVersions.taptap.android}.aar') 
+    //implementation files('libs/TapLogin_${sdkVersions.taptap.android}.aar')
+    ...
+    // Data Storage
     implementation 'cn.leancloud:storage-android:${sdkVersions.leancloud.java}'
+    // Instant Messaging
+    implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-}`}
-</CodeBlock>
+}
+`}</CodeBlock>
 
 3. Add the network permission to `AndroidManifest.xml`:
 
@@ -392,11 +393,13 @@ Important: You must [Configure Signature Certification](/sdk/start/quickstart/#c
 
 ### Integrate TapTap Login
 
-Follow the Developer Guide [Getting Started, Integrate TapTap Quick Login](/sdk/taptap-login/guide/start) to finish setting up. You can choose to use the Basic TapTap Login or use TDS Authentication to integrate the TapTap Login.
+Follow the Developer Guide [Getting Started, Integrate TapTap Quick Login](/sdk/taptap-login/guide/start) to finish setting up. 
 
 ### Configure Signature Certificate
 
 For Android and iOS applications, go to your game from the Developer Center, then go to **Game Services > Gaming Ecosystem > TapTap Login** to configure the corresponding app information (see below). Otherwise, the SDK will return a `signature not match` error, and the TapTap Login function will not work properly.
+
+Fill in the MD5 hash in the "Android Signature" field. See **[How to get MD5 hash](/sdk/start/faq/#如何获取-android-应用的-md5-值)** to learn more.
 
 <Conditional region="cn">
 
@@ -409,8 +412,6 @@ For Android and iOS applications, go to your game from the Developer Center, the
 ![](/img/io/login-config.png)
 
 </Conditional>
-
-You can use [**GenSignatureMD5**](https://blog.taptap.dev/tools/get-signature-md5.apk) to obtain the MD5 hash of your game.
 
 ### Add Testers
 
