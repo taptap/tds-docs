@@ -155,7 +155,7 @@ Ureal Engine 版本：4.26
 
 <details>
 
-<summary>iOS 打包`Objective-c`和`Swift`的混编解决方案</summary>
+<summary>iOS 打包 `Objective-c` 和 `Swift` 的混编解决方案</summary>
 
 目前有两种解决方案
 
@@ -166,41 +166,48 @@ Ureal Engine 版本：4.26
 * 优点：可以不用修改引擎的代码
 * 缺点：
     * 包体积略微增大
-    * 最低支持`iOS 13`，低于该系统版本会造成闪退
+    * 最低支持 `iOS 13`，低于该系统版本会造成闪退
 
 操作步骤：
 
-1. 下载TapSDK-iOS相同版本的[库文件](https://github.com/taptap/TapSDK-iOS/releases)
-2. 把`Plugins/AntiAddiction/Source/AntiAddiction/ios/framework/AntiAddictionService.zip`中的`AntiAddictionService.framework`替换成刚下载到的`Dylib/AntiAddictionService.framework`（解压缩 -> 替换 -> 压缩）
-3. 把`AntiAddiction.Build.cs`文件中
-```cs
-new Framework(
-    "AntiAddictionService",
-    "../AntiAddiction/ios/framework/AntiAddictionService.zip"
-)
-```
+1. 下载 TapSDK-iOS 相同版本的[库文件](https://github.com/taptap/TapSDK-iOS/releases)
+2. 把 `Plugins/AntiAddiction/Source/AntiAddiction/ios/framework/AntiAddictionService.zip` 中的 `AntiAddictionService.framework` 替换成刚下载到的 `Dylib/AntiAddictionService.framework`（解压缩 -> 替换 -> 压缩）
+3. 把 `AntiAddiction.Build.cs` 文件中
+
+    ```cs
+    new Framework(
+        "AntiAddictionService",
+        "../AntiAddiction/ios/framework/AntiAddictionService.zip"
+    )
+    ```
+
 替换成：
-```cs
-new Framework(
-    "AntiAddictionService",
-    "../AntiAddiction/ios/framework/AntiAddictionService.zip",
-    null,
-    true
-)
-```
+
+    ```cs
+    new Framework(
+        "AntiAddictionService",
+        "../AntiAddiction/ios/framework/AntiAddictionService.zip",
+        null,
+        true
+    )
+    ```
+
 4. 重新编译即可
 
-二、修改`UnrealBuildTool`
+二、修改 `UnrealBuildTool`
 
-1. 修改XcodeProject.cs文件
+1. 修改 `XcodeProject.cs` 文件
+
 路径：`Engine/Source/Programs/UnrealBuildTool/ProjectFiles/Xcode/XcodeProject.cs`
 
 在函数：
+
 ```cpp
 private void AppendProjectBuildConfiguration(StringBuilder Content, string ConfigName, string ConfigGuid)
 ```
 
 中添加如下代码：
+
 ```cpp
 // Enable Swift
 Content.Append("\t\t\t\tCLANG_ENABLE_MODULES = YES;" + ProjectFileGenerator.NewLine);
@@ -212,19 +219,20 @@ if (ConfigName == "Debug")
 }
 Content.Append("\t\t\t\tALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;" + ProjectFileGenerator.NewLine);
 Content.Append("\t\t\t\tEMBEDDED_CONTENT_CONTAINS_SWIFT = YES;" + ProjectFileGenerator.NewLine);
-
 ```
 
-2. 修改IOSToolChain.cs文件
+2. 修改 `IOSToolChain.cs` 文件
 
 路径：`Engine/Source/Programs/UnrealBuildTool/Platform/IOS/IOSToolChain.cs`
 
 在函数：
+
 ```cpp
 string GetLinkArguments_Global(LinkEnvironment LinkEnvironment)
 ```
 
 中添加如下代码：
+
 ```cpp
 // 该行代码需要前置（前置的代码位置见下面示例图片）
 // Added by uwellpeng: enable swift support, make sure '/usr/lib/swift' goes before '@executable_path/Frameworks'
@@ -249,17 +257,17 @@ Result += swiftLibPath;
 // XCode 12 多了swiftcompatabiliy51 的库，需要新增以下代码
 if (Settings.Value.IOSSDKVersionFloat >= 14.0f)
 {
-         Result += String.Format(" -lswiftCompatibility51");
+    Result += String.Format(" -lswiftCompatibility51");
 }
 ```
 
-需要注意的是`Result += " -rpath \"/usr/lib/swift\"";`这段代码需要加在`@executable_path/Frameworks`前面
+需要注意的是 `Result += " -rpath \"/usr/lib/swift\"";` 这段代码需要加在 `@executable_path/Frameworks` 前面
 
-3. 重新编译UBT
+3. 重新编译 UBT
 
-使用 `msbuild` 工具重新编译 `UnrealBuildTool` ，即在`Engine/Source/Programs/UnrealBuildTool` 目录运行 `Terminal` 指令 `msbuild` 来重新编译（如果引擎目录在一些不可编辑的目录下，可以加上`sudo`命令，即`sudo msbuild`）。
+使用 `msbuild` 工具重新编译 `UnrealBuildTool`，即在 `Engine/Source/Programs/UnrealBuildTool` 目录运行 `Terminal` 指令 `msbuild` 来重新编译（如果引擎目录在一些不可编辑的目录下，可以加上 `sudo` 命令，即 `sudo msbuild`）。
 
-完成上述三个步骤即可在解决UnrealEngine上swift的混编问题
+完成上述三个步骤即可在解决 UnrealEngine 上 swift 的混编问题
 
 </details>
 
@@ -354,10 +362,10 @@ Config.UseTapLogin = true; // taptap 快速实名不支持 PC 版
 AntiAddictionUE::Init(Config);
 ```
 
-防沉迷启动后，会有各种事件的回调，所以需要监听回调`AntiAddictionUE::OnCallBack`，具体的事件可以参考`AntiAddictionUE::ResultHandlerCode`值。
+防沉迷启动后，会有各种事件的回调，所以需要监听回调 `AntiAddictionUE::OnCallBack`，具体的事件可以参考 `AntiAddictionUE::ResultHandlerCode` 值。
 
 ```cpp
-// 绑定AntiAddictionUE::OnCallBack回调
+// 绑定 AntiAddictionUE::OnCallBack 回调
 AntiAddictionUE::OnCallBack.BindUObject(this, &UAntiAddictionWidget::OnCallBack);
 
 void UAntiAddictionWidget::OnCallBack(AntiAddictionUE::ResultHandlerCode Code, const FString& Message) {
@@ -382,7 +390,7 @@ void UAntiAddictionWidget::OnCallBack(AntiAddictionUE::ResultHandlerCode Code, c
 		TUDebuger::DisplayShow(TEXT("取消实名"));
 		break;
 	default:
-		TUDebuger::WarningLog(TEXT("未知回调的Code: ") + FString::FromInt(Code));
+		TUDebuger::WarningLog(TEXT("未知回调的 Code: ") + FString::FromInt(Code));
 		break;
 	}
 }
