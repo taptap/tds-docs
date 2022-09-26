@@ -142,6 +142,129 @@ iOS **防沉迷 SDK** 结构：
 
 </>
 
+<>
+
+Ureal Engine 版本：4.26
+
+支持平台：
+
+* iOS
+* Android
+* Windows
+* macOS
+
+<details>
+
+<summary>iOS 打包`Objective-c`和`Swift`的混编解决方案</summary>
+
+目前有两种解决方案
+
+一、防沉迷库替换成动态库
+
+优缺点：
+
+* 优点：可以不用修改引擎的代码
+* 缺点：
+    * 包体积略微增大
+    * 最低支持`iOS 13`，低于该系统版本会造成闪退
+
+操作步骤：
+
+1. 下载TapSDK-iOS相同版本的[库文件](https://github.com/taptap/TapSDK-iOS/releases)
+2. 把`Plugins/AntiAddiction/Source/AntiAddiction/ios/framework/AntiAddictionService.zip`中的`AntiAddictionService.framework`替换成刚下载到的`Dylib/AntiAddictionService.framework`（解压缩 -> 替换 -> 压缩）
+3. 把`AntiAddiction.Build.cs`文件中
+```cs
+new Framework(
+    "AntiAddictionService",
+    "../AntiAddiction/ios/framework/AntiAddictionService.zip"
+)
+```
+替换成：
+```cs
+new Framework(
+    "AntiAddictionService",
+    "../AntiAddiction/ios/framework/AntiAddictionService.zip",
+    null,
+    true
+)
+```
+4. 重新编译即可
+
+二、修改`UnrealBuildTool`
+
+1. 修改XcodeProject.cs文件
+路径：`Engine/Source/Programs/UnrealBuildTool/ProjectFiles/Xcode/XcodeProject.cs`
+
+在函数：
+```cpp
+private void AppendProjectBuildConfiguration(StringBuilder Content, string ConfigName, string ConfigGuid)
+```
+
+中添加如下代码：
+```cpp
+// Enable Swift
+Content.Append("\t\t\t\tCLANG_ENABLE_MODULES = YES;" + ProjectFileGenerator.NewLine);
+Content.Append("\t\t\t\tSWIFT_VERSION = 5.0;" + ProjectFileGenerator.NewLine);
+Content.Append("\t\t\t\tLIBRARY_SEARCH_PATHS = \"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\";" + ProjectFileGenerator.NewLine);
+if (ConfigName == "Debug")
+{
+     Content.Append("\t\t\t\tSWIFT_OPTIMIZATION_LEVEL = \"-Onone\";" + ProjectFileGenerator.NewLine);
+}
+Content.Append("\t\t\t\tALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;" + ProjectFileGenerator.NewLine);
+Content.Append("\t\t\t\tEMBEDDED_CONTENT_CONTAINS_SWIFT = YES;" + ProjectFileGenerator.NewLine);
+
+```
+
+2. 修改IOSToolChain.cs文件
+
+路径：`Engine/Source/Programs/UnrealBuildTool/Platform/IOS/IOSToolChain.cs`
+
+在函数：
+```cpp
+string GetLinkArguments_Global(LinkEnvironment LinkEnvironment)
+```
+
+中添加如下代码：
+```cpp
+// 该行代码需要前置（前置的代码位置见下面示例图片）
+// Added by uwellpeng: enable swift support, make sure '/usr/lib/swift' goes before '@executable_path/Frameworks'
+Result += " -rpath \"/usr/lib/swift\"";
+
+// enable swift support
+Result += " -rpath \"@executable_path/Frameworks\"";
+// /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/lib/swift/
+String swiftLibPath = String.Format(" -L {0}Platforms/{1}.platform/Developer/SDKs/{1}{2}.sdk/usr/lib/swift",
+                            Settings.Value.XcodeDeveloperDir, bIsDevice? Settings.Value.DevicePlatformName : Settings.Value.SimulatorPlatformName, Settings.Value.IOSSDKVersion);
+Result += swiftLibPath;
+Log.TraceInformation("Add swift lib path : {0}", swiftLibPath);
+///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos
+swiftLibPath = String.Format(" -L {0}Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/{1}",
+                            Settings.Value.XcodeDeveloperDir, bIsDevice? Settings.Value.DevicePlatformName.ToLower() : Settings.Value.SimulatorPlatformName.ToLower());
+Result += swiftLibPath;
+Log.TraceInformation("Add swift lib path : {0}", swiftLibPath);
+///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/iphoneos
+swiftLibPath = String.Format(" -L {0}Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/{1}",
+                            Settings.Value.XcodeDeveloperDir, bIsDevice? Settings.Value.DevicePlatformName.ToLower() : Settings.Value.SimulatorPlatformName.ToLower());
+Result += swiftLibPath;
+// XCode 12 多了swiftcompatabiliy51 的库，需要新增以下代码
+if (Settings.Value.IOSSDKVersionFloat >= 14.0f)
+{
+         Result += String.Format(" -lswiftCompatibility51");
+}
+```
+
+需要注意的是`Result += " -rpath \"/usr/lib/swift\"";`这段代码需要加在`@executable_path/Frameworks`前面
+
+3. 重新编译UBT
+
+使用 `msbuild` 工具重新编译 `UnrealBuildTool` ，即在`Engine/Source/Programs/UnrealBuildTool` 目录运行 `Terminal` 指令 `msbuild` 来重新编译（如果引擎目录在一些不可编辑的目录下，可以加上`sudo`命令，即`sudo msbuild`）。
+
+完成上述三个步骤即可在解决UnrealEngine上swift的混编问题
+
+</details>
+
+</>
+
 </MultiLang>
 
 防沉迷 SDK 需要联网和发送请求数据的权限，请开发者注意在项目中声明相应权限。
@@ -219,8 +342,54 @@ config.showSwitchAccount = YES;
 }
 ```
 
+</>
+
+<>
+
+```cpp
+FAAUConfig Config;
+Config.ClientID = TEXT("your clinet id");
+Config.ShowSwitchAccount = true;
+Config.UseTapLogin = true; // taptap 快速实名不支持 PC 版
+AntiAddictionUE::Init(Config);
+```
+
+防沉迷启动后，会有各种事件的回调，所以需要监听回调`AntiAddictionUE::OnCallBack`，具体的事件可以参考`AntiAddictionUE::ResultHandlerCode`值。
+
+```cpp
+// 绑定AntiAddictionUE::OnCallBack回调
+AntiAddictionUE::OnCallBack.BindUObject(this, &UAntiAddictionWidget::OnCallBack);
+
+void UAntiAddictionWidget::OnCallBack(AntiAddictionUE::ResultHandlerCode Code, const FString& Message) {
+	TUDebuger::DisplayShow(FString::Printf(TEXT("Code: %d, Message: %s"), Code, *Message));
+	switch (Code) {
+	case AntiAddictionUE::LoginSuccess:
+		TUDebuger::DisplayShow(TEXT("登录成功"));
+		break;
+	case AntiAddictionUE::Exited:
+		TUDebuger::DisplayShow(TEXT("用户登出"));
+		break;
+	case AntiAddictionUE::SwitchAccount:
+		TUDebuger::DisplayShow(TEXT("切换账号"));
+		break;
+	case AntiAddictionUE::DurationLimit:
+		TUDebuger::DisplayShow(TEXT("时长耗尽，用户当前无法进行游戏"));
+		break;
+	case AntiAddictionUE::PeriodRestrict:
+		TUDebuger::DisplayShow(TEXT("宵禁时间，用户当前无法进行游戏"));
+		break;
+	case AntiAddictionUE::RealNameStop:
+		TUDebuger::DisplayShow(TEXT("取消实名"));
+		break;
+	default:
+		TUDebuger::WarningLog(TEXT("未知回调的Code: ") + FString::FromInt(Code));
+		break;
+	}
+}
+```
 
 </>
+
 </MultiLang>
 
 ### 参数说明
@@ -266,6 +435,12 @@ config.showSwitchAccount = YES;
   - `code` 不同情况下的回调类型，详情可以参考下面的[回调类型](#回调类型)。
 
   - `extra` 在执行不同业务时，会带上一些详细信息。
+
+</>
+
+<>
+
+TODO
 
 </>
 
@@ -410,6 +585,14 @@ NSString *userIdentifier = @"玩家的唯一标识";
   
 </>
 
+<>
+
+```cpp
+AntiAddictionUE::Startup(TEXT("user id"));
+```
+
+</>
+
 </MultiLang>
 
 ### 手动输入实名信息
@@ -436,6 +619,10 @@ AntiAddictionUIKit.exit();
 [AntiAddiction exit];
 ```
 
+```cpp
+AntiAddictionUE::Exit();
+```
+
 </MultiLang>
 
 ## 获取玩家年龄段
@@ -454,6 +641,10 @@ int ageRange = AntiAddictionUIKit.getAgeRange();
 
 ```objc
 NSInteger ageRange = [AntiAddiction getAgeRange];
+```
+
+```cpp
+EAAUAgeLimit AgeLimit = AntiAddictionUE::GetAgeRange();
 ```
 
 </MultiLang>
@@ -487,6 +678,10 @@ int remainingTimeInSeconds = AntiAddictionUIKit.getRemainingTime();
 NSInteger remainingTimeInSeconds = [AntiAddiction getRemainingTime];
 ```
 
+```cpp
+int RemainingTime = AntiAddictionUE::GetRemainingTime();
+```
+
 </MultiLang>
 
 ## 获取剩余时长（单位:分钟）
@@ -505,6 +700,10 @@ int remainingTimeInMinutes = AntiAddictionUIKit.getRemainingTimeInMinutes();
 
 ```objc
 NSInteger remainingTimeInMinutes = [AntiAddiction getRemainingTimeInMinutes];
+```
+
+```cpp
+int RemainingTimeInMinutes = AntiAddictionUE::GetRemainingTimeInMinutes();
 ```
 
 </MultiLang>
@@ -564,6 +763,14 @@ NSInteger amount = 100;
 }];
 ```
 
+```cpp
+AntiAddictionUE::CheckPayLimit(FCString::Atoi(*AmountTF->Text.ToString()), [](bool Status) {
+    TUDebuger::DisplayShow(FString::Printf(TEXT("Status: %d"), Status));
+}, [](const FString& Msg) {
+    TUDebuger::ErrorShow(Msg);
+});
+```
+
 </MultiLang>
 
 消费金额的单位为分。
@@ -613,6 +820,14 @@ NSInteger amount = 100;
 }];
 ```
 
+```cpp
+AntiAddictionUE::SubmitPayResult(FCString::Atoi(*AmountTF->Text.ToString()), [](bool Success) {
+    TUDebuger::DisplayShow(FString::Printf(TEXT("Success: %d"), Success));
+}, [](const FString& Msg) {
+    TUDebuger::ErrorShow(Msg);
+});
+```
+
 </MultiLang>
 
 上报消费金额时，传入的消费金额的单位同样为分。
@@ -635,6 +850,10 @@ AntiAddictionUIKit.enterGame();
 [AntiAddiction enterGame];
 ```
 
+```cpp
+AntiAddictionUE::EnterGame();
+```
+
 </MultiLang>
 
 相应地，已登录的玩家，停止游戏时调用此接口，之后 SDK 停止轮询上报时长。
@@ -651,6 +870,10 @@ AntiAddictionUIKit.leaveGame();
 
 ```objc
 [AntiAddiction leaveGame];
+```
+
+```cpp
+AntiAddictionUE::LeaveGame();
 ```
 
 </MultiLang>
@@ -680,6 +903,10 @@ String token = AntiAddictionUIKit.currentToken();
 
 ```objc
 NSString *token = [AntiAddiction currentToken];
+```
+
+```cpp
+FString Token = AntiAddictionUE::CurrentToken();
 ```
 
 </MultiLang>
