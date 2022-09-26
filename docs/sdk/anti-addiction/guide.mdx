@@ -155,7 +155,7 @@ Ureal Engine 版本：4.26
 
 <details>
 
-<summary>iOS 打包 `Objective-c` 和 `Swift` 的混编解决方案</summary>
+<summary>iOS 打包 Objective-c 和 Swift 的混编解决方案</summary>
 
 目前有两种解决方案
 
@@ -166,7 +166,7 @@ Ureal Engine 版本：4.26
 * 优点：可以不用修改引擎的代码
 * 缺点：
     * 包体积略微增大
-    * 最低支持 `iOS 13`，低于该系统版本会造成闪退
+    * 最低支持 iOS 13，低于该系统版本会造成闪退
 
 操作步骤：
 
@@ -181,7 +181,7 @@ Ureal Engine 版本：4.26
     )
     ```
 
-替换成：
+    替换成：
 
     ```cs
     new Framework(
@@ -198,76 +198,83 @@ Ureal Engine 版本：4.26
 
 1. 修改 `XcodeProject.cs` 文件
 
-路径：`Engine/Source/Programs/UnrealBuildTool/ProjectFiles/Xcode/XcodeProject.cs`
+    路径：`Engine/Source/Programs/UnrealBuildTool/ProjectFiles/Xcode/XcodeProject.cs`
 
-在函数：
+    在函数：
 
-```cpp
-private void AppendProjectBuildConfiguration(StringBuilder Content, string ConfigName, string ConfigGuid)
-```
+    ```cpp
+    private void AppendProjectBuildConfiguration(StringBuilder Content, string ConfigName, string ConfigGuid)
+    ```
 
-中添加如下代码：
+    中添加如下代码：
 
-```cpp
-// Enable Swift
-Content.Append("\t\t\t\tCLANG_ENABLE_MODULES = YES;" + ProjectFileGenerator.NewLine);
-Content.Append("\t\t\t\tSWIFT_VERSION = 5.0;" + ProjectFileGenerator.NewLine);
-Content.Append("\t\t\t\tLIBRARY_SEARCH_PATHS = \"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\";" + ProjectFileGenerator.NewLine);
-if (ConfigName == "Debug")
-{
-     Content.Append("\t\t\t\tSWIFT_OPTIMIZATION_LEVEL = \"-Onone\";" + ProjectFileGenerator.NewLine);
-}
-Content.Append("\t\t\t\tALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;" + ProjectFileGenerator.NewLine);
-Content.Append("\t\t\t\tEMBEDDED_CONTENT_CONTAINS_SWIFT = YES;" + ProjectFileGenerator.NewLine);
-```
+    ```cpp
+    // Enable Swift
+    Content.Append("\t\t\t\tCLANG_ENABLE_MODULES = YES;" + ProjectFileGenerator.NewLine);
+    Content.Append("\t\t\t\tSWIFT_VERSION = 5.0;" + ProjectFileGenerator.NewLine);
+    Content.Append("\t\t\t\tLIBRARY_SEARCH_PATHS = \"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\";" + ProjectFileGenerator.NewLine);
+    if (ConfigName == "Debug")
+    {
+        Content.Append("\t\t\t\tSWIFT_OPTIMIZATION_LEVEL = \"-Onone\";" + ProjectFileGenerator.NewLine);
+    }
+    Content.Append("\t\t\t\tALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;" + ProjectFileGenerator.NewLine);
+    Content.Append("\t\t\t\tEMBEDDED_CONTENT_CONTAINS_SWIFT = YES;" + ProjectFileGenerator.NewLine);
+    ```
+
+    参考如下：
+    ![](/img/ue4/16638534428329.jpg)
 
 2. 修改 `IOSToolChain.cs` 文件
 
-路径：`Engine/Source/Programs/UnrealBuildTool/Platform/IOS/IOSToolChain.cs`
+    路径：`Engine/Source/Programs/UnrealBuildTool/Platform/IOS/IOSToolChain.cs`
 
-在函数：
+    在函数：
 
-```cpp
-string GetLinkArguments_Global(LinkEnvironment LinkEnvironment)
-```
+    ```cpp
+    string GetLinkArguments_Global(LinkEnvironment LinkEnvironment)
+    ```
 
-中添加如下代码：
+    中添加如下代码：
 
-```cpp
-// 该行代码需要前置（前置的代码位置见下面示例图片）
-// Added by uwellpeng: enable swift support, make sure '/usr/lib/swift' goes before '@executable_path/Frameworks'
-Result += " -rpath \"/usr/lib/swift\"";
+    ```cpp
+    // 该行代码需要前置（前置的代码位置见下面示例图片）
+    // Added by uwellpeng: enable swift support, make sure '/usr/lib/swift' goes before '@executable_path/Frameworks'
+    Result += " -rpath \"/usr/lib/swift\"";
 
-// enable swift support
-Result += " -rpath \"@executable_path/Frameworks\"";
-// /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/lib/swift/
-String swiftLibPath = String.Format(" -L {0}Platforms/{1}.platform/Developer/SDKs/{1}{2}.sdk/usr/lib/swift",
-                            Settings.Value.XcodeDeveloperDir, bIsDevice? Settings.Value.DevicePlatformName : Settings.Value.SimulatorPlatformName, Settings.Value.IOSSDKVersion);
-Result += swiftLibPath;
-Log.TraceInformation("Add swift lib path : {0}", swiftLibPath);
-///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos
-swiftLibPath = String.Format(" -L {0}Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/{1}",
-                            Settings.Value.XcodeDeveloperDir, bIsDevice? Settings.Value.DevicePlatformName.ToLower() : Settings.Value.SimulatorPlatformName.ToLower());
-Result += swiftLibPath;
-Log.TraceInformation("Add swift lib path : {0}", swiftLibPath);
-///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/iphoneos
-swiftLibPath = String.Format(" -L {0}Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/{1}",
-                            Settings.Value.XcodeDeveloperDir, bIsDevice? Settings.Value.DevicePlatformName.ToLower() : Settings.Value.SimulatorPlatformName.ToLower());
-Result += swiftLibPath;
-// XCode 12 多了swiftcompatabiliy51 的库，需要新增以下代码
-if (Settings.Value.IOSSDKVersionFloat >= 14.0f)
-{
-    Result += String.Format(" -lswiftCompatibility51");
-}
-```
+    // enable swift support
+    Result += " -rpath \"@executable_path/Frameworks\"";
+    // /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/lib/swift/
+    String swiftLibPath = String.Format(" -L {0}Platforms/{1}.platform/Developer/SDKs/{1}{2}.sdk/usr/lib/swift",
+                                Settings.Value.XcodeDeveloperDir, bIsDevice? Settings.Value.DevicePlatformName : Settings.Value.SimulatorPlatformName, Settings.Value.IOSSDKVersion);
+    Result += swiftLibPath;
+    Log.TraceInformation("Add swift lib path : {0}", swiftLibPath);
+    ///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos
+    swiftLibPath = String.Format(" -L {0}Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/{1}",
+                                Settings.Value.XcodeDeveloperDir, bIsDevice? Settings.Value.DevicePlatformName.ToLower() : Settings.Value.SimulatorPlatformName.ToLower());
+    Result += swiftLibPath;
+    Log.TraceInformation("Add swift lib path : {0}", swiftLibPath);
+    ///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/iphoneos
+    swiftLibPath = String.Format(" -L {0}Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/{1}",
+                                Settings.Value.XcodeDeveloperDir, bIsDevice? Settings.Value.DevicePlatformName.ToLower() : Settings.Value.SimulatorPlatformName.ToLower());
+    Result += swiftLibPath;
+    // XCode 12 多了swiftcompatabiliy51 的库，需要新增以下代码
+    if (Settings.Value.IOSSDKVersionFloat >= 14.0f)
+    {
+        Result += String.Format(" -lswiftCompatibility51");
+    }
+    ```
 
-需要注意的是 `Result += " -rpath \"/usr/lib/swift\"";` 这段代码需要加在 `@executable_path/Frameworks` 前面
+    需要注意的是 `Result += " -rpath \"/usr/lib/swift\"";` 这段代码需要加在 `@executable_path/Frameworks` 前面
+
+    参考：
+    ​
+    ![](/img/ue4/16638540076605.jpg)
 
 3. 重新编译 UBT
 
-使用 `msbuild` 工具重新编译 `UnrealBuildTool`，即在 `Engine/Source/Programs/UnrealBuildTool` 目录运行 `Terminal` 指令 `msbuild` 来重新编译（如果引擎目录在一些不可编辑的目录下，可以加上 `sudo` 命令，即 `sudo msbuild`）。
+    使用 `msbuild` 工具重新编译 `UnrealBuildTool`，即在 `Engine/Source/Programs/UnrealBuildTool` 目录运行 `Terminal` 指令 `msbuild` 来重新编译（如果引擎目录在一些不可编辑的目录下，可以加上 `sudo` 命令，即 `sudo msbuild`）。
 
-完成上述三个步骤即可在解决 UnrealEngine 上 swift 的混编问题
+    完成上述三个步骤即可在解决 UnrealEngine 上 swift 的混编问题
 
 </details>
 
