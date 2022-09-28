@@ -20,7 +20,7 @@ import sdkVersions from '/src/docComponents/sdkVersions';
 
 可以在 [下载页](/tap-download) 获得 TapSDK，引入防沉迷模块。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 <>
 
@@ -142,6 +142,174 @@ iOS **防沉迷 SDK** 结构：
 
 </>
 
+<>
+
+#### 环境要求
+
+* 安装 UE 4.26 及以上版本
+* iOS 12 或更高版本
+* Android 5.0（API level 21）或更高版本
+* macOS 10.14.0 或更高版本
+* Windows 7 或更高版本
+
+**支持平台**：iOS / Android / Windows / macOS
+
+#### 安装插件
+
+* 下载 [TapSDK UE4](/tap-download)，TapSDK-UE4-xxx.zip 解压后将 `AntiAddiction`、`TapCommon` 文件夹 Copy 到项目的 `Plugins` 目录中
+* 重启 Unreal Editor
+* 打开 编辑 > 插件 > 项目 > TapTap，开启 `AntiAddiction` 模块
+
+#### 添加依赖
+
+在 Project.Build.cs 中添加所需模块:
+
+```cs
+PublicDependencyModuleNames.AddRange(new string[] { "Core",
+	"CoreUObject",
+	"Engine",
+	"Json",
+	"InputCore",
+	"JsonUtilities",
+	"SlateCore",
+	"TapCommon",
+	"AntiAddiction"
+});
+```
+
+#### 导入头文件
+
+```cpp
+#include "TapUEBootstrap.h"
+```
+
+<details>
+
+<summary>iOS 打包 Objective-c 和 Swift 的混编解决方案</summary>
+
+目前有两种解决方案
+
+一、防沉迷库替换成动态库
+
+优缺点：
+
+* 优点：可以不用修改引擎的代码
+* 缺点：
+    * 包体积略微增大
+    * 最低支持 iOS 13，低于该系统版本会造成闪退
+
+操作步骤：
+
+1. 下载 TapSDK-iOS 相同版本的[库文件](https://github.com/taptap/TapSDK-iOS/releases)
+2. 把 `Plugins/AntiAddiction/Source/AntiAddiction/ios/framework/AntiAddictionService.zip` 中的 `AntiAddictionService.framework` 替换成刚下载到的 `Dylib/AntiAddictionService.framework`（解压缩 -> 替换 -> 压缩）
+3. 把 `AntiAddiction.Build.cs` 文件中
+
+    ```cs
+    new Framework(
+        "AntiAddictionService",
+        "../AntiAddiction/ios/framework/AntiAddictionService.zip"
+    )
+    ```
+
+    替换成：
+
+    ```cs
+    new Framework(
+        "AntiAddictionService",
+        "../AntiAddiction/ios/framework/AntiAddictionService.zip",
+        null,
+        true
+    )
+    ```
+
+4. 重新编译即可
+
+二、修改 `UnrealBuildTool`
+
+1. 修改 `XcodeProject.cs` 文件
+
+    路径：`Engine/Source/Programs/UnrealBuildTool/ProjectFiles/Xcode/XcodeProject.cs`
+
+    在函数：
+
+    ```cpp
+    private void AppendProjectBuildConfiguration(StringBuilder Content, string ConfigName, string ConfigGuid)
+    ```
+
+    中添加如下代码：
+
+    ```cpp
+    // Enable Swift
+    Content.Append("\t\t\t\tCLANG_ENABLE_MODULES = YES;" + ProjectFileGenerator.NewLine);
+    Content.Append("\t\t\t\tSWIFT_VERSION = 5.0;" + ProjectFileGenerator.NewLine);
+    Content.Append("\t\t\t\tLIBRARY_SEARCH_PATHS = \"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\";" + ProjectFileGenerator.NewLine);
+    if (ConfigName == "Debug")
+    {
+        Content.Append("\t\t\t\tSWIFT_OPTIMIZATION_LEVEL = \"-Onone\";" + ProjectFileGenerator.NewLine);
+    }
+    Content.Append("\t\t\t\tALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;" + ProjectFileGenerator.NewLine);
+    Content.Append("\t\t\t\tEMBEDDED_CONTENT_CONTAINS_SWIFT = YES;" + ProjectFileGenerator.NewLine);
+    ```
+
+    参考如下：
+    ![](/img/ue4/16638534428329.jpg)
+
+2. 修改 `IOSToolChain.cs` 文件
+
+    路径：`Engine/Source/Programs/UnrealBuildTool/Platform/IOS/IOSToolChain.cs`
+
+    在函数：
+
+    ```cpp
+    string GetLinkArguments_Global(LinkEnvironment LinkEnvironment)
+    ```
+
+    中添加如下代码：
+
+    ```cpp
+    // 该行代码需要前置（前置的代码位置见下面示例图片）
+    // Added by uwellpeng: enable swift support, make sure '/usr/lib/swift' goes before '@executable_path/Frameworks'
+    Result += " -rpath \"/usr/lib/swift\"";
+
+    // enable swift support
+    Result += " -rpath \"@executable_path/Frameworks\"";
+    // /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/lib/swift/
+    String swiftLibPath = String.Format(" -L {0}Platforms/{1}.platform/Developer/SDKs/{1}{2}.sdk/usr/lib/swift",
+                                Settings.Value.XcodeDeveloperDir, bIsDevice? Settings.Value.DevicePlatformName : Settings.Value.SimulatorPlatformName, Settings.Value.IOSSDKVersion);
+    Result += swiftLibPath;
+    Log.TraceInformation("Add swift lib path : {0}", swiftLibPath);
+    ///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos
+    swiftLibPath = String.Format(" -L {0}Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/{1}",
+                                Settings.Value.XcodeDeveloperDir, bIsDevice? Settings.Value.DevicePlatformName.ToLower() : Settings.Value.SimulatorPlatformName.ToLower());
+    Result += swiftLibPath;
+    Log.TraceInformation("Add swift lib path : {0}", swiftLibPath);
+    ///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/iphoneos
+    swiftLibPath = String.Format(" -L {0}Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/{1}",
+                                Settings.Value.XcodeDeveloperDir, bIsDevice? Settings.Value.DevicePlatformName.ToLower() : Settings.Value.SimulatorPlatformName.ToLower());
+    Result += swiftLibPath;
+    // XCode 12 多了swiftcompatabiliy51 的库，需要新增以下代码
+    if (Settings.Value.IOSSDKVersionFloat >= 14.0f)
+    {
+        Result += String.Format(" -lswiftCompatibility51");
+    }
+    ```
+
+    需要注意的是 `Result += " -rpath \"/usr/lib/swift\"";` 这段代码需要加在 `@executable_path/Frameworks` 前面
+
+    参考：
+    ​
+    ![](/img/ue4/16638540076605.jpg)
+
+3. 重新编译 UBT
+
+    使用 `msbuild` 工具重新编译 `UnrealBuildTool`，即在 `Engine/Source/Programs/UnrealBuildTool` 目录运行 `Terminal` 指令 `msbuild` 来重新编译（如果引擎目录在一些不可编辑的目录下，可以加上 `sudo` 命令，即 `sudo msbuild`）。
+
+    完成上述三个步骤即可在解决 UnrealEngine 上 swift 的混编问题
+
+</details>
+
+</>
+
 </MultiLang>
 
 防沉迷 SDK 需要联网和发送请求数据的权限，请开发者注意在项目中声明相应权限。
@@ -150,7 +318,7 @@ iOS **防沉迷 SDK** 结构：
 
 初始化防沉迷 UI 模块，设置启动防沉迷功能的配置，注册防沉迷的消息监听。请注意，**触发回调需要调用[防沉迷认证](#防沉迷认证)接口。**
 
-<MultiLang>
+<MultiLang kind="ue">
 <>
 
 ```cs
@@ -219,13 +387,59 @@ config.showSwitchAccount = YES;
 }
 ```
 
+</>
+
+<>
+
+```cpp
+FAAUConfig Config;
+Config.ClientID = TEXT("your_client_id"); // TapTap 开发者中心对应 Client ID
+Config.ShowSwitchAccount = false;
+Config.UseTapLogin = true;                // taptap 快速实名不支持 PC 版
+AntiAddictionUE::Init(Config);
+```
+
+防沉迷启动后，会有各种事件的回调，所以需要监听回调 `AntiAddictionUE::OnCallBack`，具体的事件可以参考 `AntiAddictionUE::ResultHandlerCode` 值。
+
+```cpp
+// 绑定 AntiAddictionUE::OnCallBack 回调
+AntiAddictionUE::OnCallBack.BindUObject(this, &UAntiAddictionWidget::OnCallBack);
+
+void UAntiAddictionWidget::OnCallBack(AntiAddictionUE::ResultHandlerCode Code, const FString& Message) {
+	TUDebuger::DisplayShow(FString::Printf(TEXT("Code: %d, Message: %s"), Code, *Message));
+	switch (Code) {
+	case AntiAddictionUE::LoginSuccess:
+		TUDebuger::DisplayShow(TEXT("登录成功"));
+		break;
+	case AntiAddictionUE::Exited:
+		TUDebuger::DisplayShow(TEXT("用户登出"));
+		break;
+	case AntiAddictionUE::SwitchAccount:
+		TUDebuger::DisplayShow(TEXT("切换账号"));
+		break;
+	case AntiAddictionUE::DurationLimit:
+		TUDebuger::DisplayShow(TEXT("时长耗尽，用户当前无法进行游戏"));
+		break;
+	case AntiAddictionUE::PeriodRestrict:
+		TUDebuger::DisplayShow(TEXT("宵禁时间，用户当前无法进行游戏"));
+		break;
+	case AntiAddictionUE::RealNameStop:
+		TUDebuger::DisplayShow(TEXT("取消实名"));
+		break;
+	default:
+		TUDebuger::WarningLog(TEXT("未知回调的 Code: ") + FString::FromInt(Code));
+		break;
+	}
+}
+```
 
 </>
+
 </MultiLang>
 
 ### 参数说明
 
-<MultiLang>
+<MultiLang kind="ue">
 
 <>
 
@@ -269,19 +483,32 @@ config.showSwitchAccount = YES;
 
 </>
 
+<>
+
+- `config` 是防沉迷功能的配置，包括如下参数:
+  - `ClientID` 游戏的 `Client ID`，可以在控制台查看（**开发者中心 > 你的游戏 > 游戏服务 > 应用配置**）。
+
+  - `UseTapLogin` 是否使用 [TapTap 快速认证](#taptap-快速认证)。建议使用这个功能，方便已经在 TapTap 上实名认证过的玩家快速完成防沉迷认证步骤。
+
+  - `ShowSwitchAccount` 是否显示切换账号按钮。如果游戏没有切换账号功能，可以在初始化阶段配置隐藏切换账号按钮；如果游戏选择显示切换账号按钮(如下图所示)，玩家点击之后会触发 `1001` 回调，游戏可根据这个回调 code 做相应处理。
+
+
+</>
+
 </MultiLang>
 
 ![切换账号界面](/img/anti-addiction/switch-account.png)
 
 ### 回调类型
 
-| 回调类型                          | code | 触发逻辑                                                     | 附带信息                     |
-| :-------------------------------- | :--- | :----------------------------------------------------------- | :------------------------- |
-| `CALLBACK_CODE_LOGIN_SUCCESS`      | 500  | 玩家登录后判断当前玩家可以进行游戏                           | 无 |
-| `CALLBACK_CODE_PERIOD_RESTRICT`          | 1030 | 未成年玩家当前无法进行游戏                                         | 有 |
-| `CALLBACK_CODE_LOGOUT` | 1000 | 退出账号 | 无                         |
-| `CALLBACK_CODE_REAL_NAME_STOP` | 9002 | 实名过程中点击了关闭实名窗 | 无 |          
-| `CALLBACK_CODE_SWITCH_ACCOUNT` | 1001 | 点击切换账号按钮（v1.0.2 新增） | 无 |         
+| 回调 code | 回调类型 | 触发逻辑 |
+|---|---|---|
+| 500 | `LOGIN_SUCCESS` | 玩家登录后判断当前玩家可以进行游戏 |
+| 1000 | `EXITED` | 退出账号 |
+| 1001 | `SWITCH_ACCOUNT` | 点击切换账号按钮 |
+| 1030 | `PERIOD_RESTRICT` | 未成年玩家当前无法进行游戏 |
+| 1050 | `DURATION_LIMIT` | 时长限制 |
+| 9002 | `REAL_NAME_STOP` | 实名过程中点击了关闭实名窗 |
 
 ## 防沉迷认证
 
@@ -309,7 +536,7 @@ TDS 云端会根据实名信息判断玩家是否可以进行游戏，并将相�
 
 其中的**玩家唯一标识** `userIdentifier`，如果接入 [TDS 内建账户系统](/sdk/taptap-login/guide/start/#一键完成-taptap-登录)，可以用玩家的 `objectId`；如果使用[单纯 TapTap 用户认证](/sdk/taptap-login/guide/tap-login/#taptap-登录并获取登录结果)则可以用 `openid` 或 `unionid`。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 <>
 
@@ -410,6 +637,14 @@ NSString *userIdentifier = @"玩家的唯一标识";
   
 </>
 
+<>
+
+```cpp
+AntiAddictionUE::Startup(TEXT("your_userIdentifier"));
+```
+
+</>
+
 </MultiLang>
 
 ### 手动输入实名信息
@@ -422,7 +657,7 @@ NSString *userIdentifier = @"玩家的唯一标识";
 
 玩家在游戏内退出账号时调用，重置防沉迷状态。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 AntiAddictionUIKit.Exit();
@@ -436,13 +671,17 @@ AntiAddictionUIKit.exit();
 [AntiAddiction exit];
 ```
 
+```cpp
+AntiAddictionUE::Exit();
+```
+
 </MultiLang>
 
 ## 获取玩家年龄段
 
 调用该接口可获取玩家所处年龄段：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 int ageRange = AntiAddictionUIKit.AgeRange;
@@ -454,6 +693,10 @@ int ageRange = AntiAddictionUIKit.getAgeRange();
 
 ```objc
 NSInteger ageRange = [AntiAddiction getAgeRange];
+```
+
+```cpp
+EAAUAgeLimit AgeLimit = AntiAddictionUE::GetAgeRange();
 ```
 
 </MultiLang>
@@ -473,7 +716,7 @@ NSInteger ageRange = [AntiAddiction getAgeRange];
 
 获取玩家当前剩余时长：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 int remainingTimeInSeconds = AntiAddictionUIKit.RemainingTime;
@@ -487,13 +730,17 @@ int remainingTimeInSeconds = AntiAddictionUIKit.getRemainingTime();
 NSInteger remainingTimeInSeconds = [AntiAddiction getRemainingTime];
 ```
 
+```cpp
+int RemainingTime = AntiAddictionUE::GetRemainingTime();
+```
+
 </MultiLang>
 
 ## 获取剩余时长（单位:分钟）
 
 获取玩家当前剩余时长：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 int remainingTimeInMinutes = AntiAddictionUIKit.getRemainingTimeInMinutes();
@@ -507,6 +754,10 @@ int remainingTimeInMinutes = AntiAddictionUIKit.getRemainingTimeInMinutes();
 NSInteger remainingTimeInMinutes = [AntiAddiction getRemainingTimeInMinutes];
 ```
 
+```cpp
+int RemainingTimeInMinutes = AntiAddictionUE::GetRemainingTimeInMinutes();
+```
+
 </MultiLang>
 
 ## 检查消费上限
@@ -516,7 +767,7 @@ NSInteger remainingTimeInMinutes = [AntiAddiction getRemainingTimeInMinutes];
 
 游戏在收到玩家的付费请求后，调用以下接口当前玩家的付费行为是否被限制：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 long amount = 100;
@@ -564,6 +815,14 @@ NSInteger amount = 100;
 }];
 ```
 
+```cpp
+AntiAddictionUE::CheckPayLimit(FCString::Atoi(*AmountTF->Text.ToString()), [](bool Status) {
+    TUDebuger::DisplayShow(FString::Printf(TEXT("Status: %d"), Status));
+}, [](const FString& Msg) {
+    TUDebuger::ErrorShow(Msg);
+});
+```
+
 </MultiLang>
 
 消费金额的单位为分。
@@ -572,7 +831,7 @@ NSInteger amount = 100;
 建议开发者在服务端上报，服务端上报方式参见 [相关 REST API 用法说明](#上报消费金额)。
 开发者也可以调用 SDK 提供的接口，当未成年玩家消费成功后，在客户端上报消费金额，在客户端上报的可靠性低于在服务端上报，主要适用于无服务端的单机游戏。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 long amount = 100;
@@ -613,6 +872,14 @@ NSInteger amount = 100;
 }];
 ```
 
+```cpp
+AntiAddictionUE::SubmitPayResult(FCString::Atoi(*AmountTF->Text.ToString()), [](bool Success) {
+    TUDebuger::DisplayShow(FString::Printf(TEXT("Success: %d"), Success));
+}, [](const FString& Msg) {
+    TUDebuger::ErrorShow(Msg);
+});
+```
+
 </MultiLang>
 
 上报消费金额时，传入的消费金额的单位同样为分。
@@ -621,7 +888,7 @@ NSInteger amount = 100;
 
 已登录的玩家，开始游戏时调用此接口，之后 SDK 会自动轮询上报游戏时长。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 AntiAddictionUIKit.EnterGame();
@@ -635,11 +902,15 @@ AntiAddictionUIKit.enterGame();
 [AntiAddiction enterGame];
 ```
 
+```cpp
+AntiAddictionUE::EnterGame();
+```
+
 </MultiLang>
 
 相应地，已登录的玩家，停止游戏时调用此接口，之后 SDK 停止轮询上报时长。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 AntiAddictionUIKit.LeaveGame();
@@ -651,6 +922,10 @@ AntiAddictionUIKit.leaveGame();
 
 ```objc
 [AntiAddiction leaveGame];
+```
+
+```cpp
+AntiAddictionUE::LeaveGame();
 ```
 
 </MultiLang>
@@ -668,7 +943,7 @@ API Base 为 `https://tds-tapsdk.cn.tapapis.com`。
 
 #### 获取鉴权 Token
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 string token = AntiAddictionUIKit.CurrentToken;
@@ -680,6 +955,10 @@ String token = AntiAddictionUIKit.currentToken();
 
 ```objc
 NSString *token = [AntiAddiction currentToken];
+```
+
+```cpp
+FString Token = AntiAddictionUE::CurrentToken();
 ```
 
 </MultiLang>
