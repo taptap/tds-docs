@@ -1,24 +1,24 @@
 import Path from "/src/docComponents/path";
 
-云引擎目前主要为 Web 应用优化，应用在启动后需要在环境变量 `LEANCLOUD_APP_PORT` 中指定的端口上提供 HTTP 服务，注意需要监听在 `0.0.0.0` 地址（所有接口）上，而不是一些框架默认的 `127.0.0.1`。
+Cloud Engine is primarily optimized for web applications. Your app is expected to provide HTTP services through the port specified by the environment variable named `LEANCLOUD_APP_PORT`. Keep in mind that the app should listen on `0.0.0.0` (all interfaces) instead of `127.0.0.1` which is the default host of many frameworks.
 
-在应用部署时，云引擎的管理程序会每隔一秒去检查应用是否启动成功，如果超过启动时间限制（默认 30 秒）仍未启动成功，即认为启动失败，部署会中止。在之后的运行过程中，也会有定期的健康检查来确保应用正常运行，如果健康检查失败，云引擎管理程序会自动重启你的应用。
+While your app is being deployed, Cloud Engine will check your app every second to see if it has been successfully started. If your app has not been started within the time limit (30 seconds by default), the deployment will be canceled. After your app has been deployed, Cloud Engine will run health checks for your app regularly and automatically restart it if the check fails.
 
-健康检查会通过 HTTP 检查应用的首页（`/`），如果返回 HTTP 2xx 的响应，就视作成功。
+The way the health check works is that Cloud Engine will send an HTTP request to the homepage (`/`) of your app. If it gets an HTTP 2xx response, your app will pass the health check.
 
 <details>
-<summary>点击展开健康检查与云引擎 SDK 的关联</summary>
+<summary>Health check and the Cloud Engine SDK</summary>
 
-云引擎还会尝试检查由 SDK 处理的 `/__engine/1/ping`，如果 SDK 接入正确，便不再要求首页（`/`）返回 HTTP 2xx。
+Cloud Engine will also check `/__engine/1/ping` which is handled by the SDK. If the SDK is integrated correctly, Cloud Engine will not check the homepage (`/`) anymore.
 
-如果 **<Path to="engine" /> > 你的分组 > 设置 > 云函数模式** 设置为「开启」或 `leanengine.yaml` 中 `functionsMode` 设置为 `strict`，云引擎会检查 SDK 是否被正确地接入，否则会视作启动失败。
+If **<Path to="engine" /> > Your group > Settings > Cloud functions mode** is set to _Enable_, or if `functionsMode` in `leanengine.yaml` is set to `strict`, Cloud Engine will check if the SDK is integrated correctly. If not, it will consider your app to have failed to start.
 
 </details>
 
 <details>
-<summary>点击展开自定义启动时长（<code>startupTimeout</code>）</summary>
+<summary>Customizing startup timeout (<code>startupTimeout</code>)</summary>
 
-启动时间限制默认为 30 秒，可设置范围为 15–120 秒，如需延长或缩短，可以在 `leanengine.yaml` 文件中设置：
+The default timeout for your app to start is 30 seconds. You can change it to any value between 15 and 120 seconds with `leanengine.yaml`:
 
 ```yaml title='leanengine.yaml'
 startupTimeout: 60

@@ -1,5 +1,5 @@
 ---
-title: 云引擎 Node.js 运行环境
+title: Node.js Runtime Environment
 sidebar_label: Node.js
 sidebar_position: 4
 ---
@@ -19,10 +19,10 @@ import CloudHealthCheck from "../_partials/cloud-health-check.mdx";
 import BuildingSystemDependencies from "../_partials/building-system-dependencies.mdx";
 
 :::info
-这篇文档是针对 Node.js 运行环境的深入介绍，如希望快速地开始使用云引擎，请查看 [快速开始部署云引擎应用](/sdk/engine/deploy/getting-started)。
+This article serves as a thorough introduction to Cloud Engine’s Node.js runtime environment. To quickly get started with Cloud Engine, see [Getting Started With Cloud Engine](/sdk/engine/deploy/getting-started).
 :::
 
-所有 Node.js 项目都必须在根目录包含一个 [package.json](https://docs.npmjs.com/cli/v8/configuring-npm/package-json) 才会被云引擎正确识别，云引擎也会从中读取项目对于环境的需求：
+A Node.js project has to have a [package.json](https://docs.npmjs.com/cli/v8/configuring-npm/package-json) under its root directory for Cloud Engine to correctly identify it as a Node.js project. This file also helps Cloud Engine understand the project’s requirements for the environment:
 
 ```json title='package.json'
 {
@@ -44,11 +44,11 @@ import BuildingSystemDependencies from "../_partials/building-system-dependencie
 }
 ```
 
-如果你希望创建一个新的项目，推荐从我们的 [Node.js 示例项目](https://github.com/leancloud/node-js-getting-started) 开始。
+If you are looking to start a new project, we recommend that you use our [Node.js sample project](https://github.com/leancloud/node-js-getting-started) as a boilerplate.
 
-## 启动命令
+## Startup Command
 
-云引擎默认使用 `npm start` 来启动项目，你可以在 `package.json` 中修改 `scripts.start` 来使用不同的程序入口或向 `node` 添加额外的参数。
+By default, Cloud Engine starts your project with `npm start`. You can change the entry point of your program or add additional options to `node` by editing `scripts.start` in `package.json`.
 
 ```json title='package.json'
 {
@@ -59,92 +59,92 @@ import BuildingSystemDependencies from "../_partials/building-system-dependencie
 ```
 
 :::note
-在使用 [命令行工具](/sdk/engine/cli) 本地调试时，`lean up` 会优先使用 `npm run dev` 来启动项目。
+When debugging locally by running `lean up` with the [CLI](/sdk/engine/cli), the CLI will start your project with `npm run dev`.
 :::
 
-## 配置 Node.js 版本
+## Configure Node.js Version
 
 <NodejsSetupRuntime />
 
-## 安装依赖（`package.json`）
+## Install Dependencies (`package.json`)
 
 <NodejsSetupDependencies />
 
-## 自定义构建过程
+## Customize Build Process
 
 <BuildingScripts />
 
-### 构建日志
+### Build Logs
 
 <BuildingBuildLogs />
 
-### 系统级依赖
+### System Dependencies
 
 <BuildingSystemDependencies />
 
-## 健康检查
+## Health Check
 
 <CloudHealthCheck />
 
-## 云端环境
+## Cloud Environment
 
-### 绑定自定义域名
+### Custom Domains
 
 <CloudCustomDomain />
 
-### 负载均衡和加速节点
+### Load Balancer and CDN
 
 <CloudLoadBalancer only="nodejs" />
 
-### 环境变量
+### Environment Variables
 
 <CloudEnvironments />
 
-### 日志
+### Logs
 
 <CloudLogs only="nodejs" />
 
-### 时区
+### Timezone
 
 <CloudTimezone />
 
-### 文件系统
+### File System
 
 <CloudFilesystem />
 
-### 出入口 IP 地址
+### IP Addresses
 
 <CloudInternetAddress />
 
-## 疑难问题
+## Troubleshooting
 
-### Node.js 项目的 `devDependencies` 没有安装？
+### Why are the dependencies listed under `devDependencies` not installed?
 
-云引擎会在部署时用 `npm ci` 为你安装项目依赖，包括 `devDependencies`。
-不过，如果项目的 Node.js 版本小于 10，则会使用 `npm install --production` 安装依赖，相应地，`devDependencies` 中列出的依赖**不会**安装。
-如需安装 `devDependencies`，请在项目的 `leanengine.yaml` 中指定 `installDevDependencies: true`。
+When you deploy your project, Cloud Engine will install dependencies (including those listed under `devDependencies`) for your project with `npm ci`.
+However, if the Node.js version you specified is below 10, Cloud Engine will use `npm install --production` instead. This means that the dependencies listed under `devDependencies` will **not** be installed.
+To have these dependencies installed as well, you can specify `installDevDependencies: true` in `leanengine.yaml`.
 
-### `npm ERR! peer dep missing` 错误怎么办？
+### What should I do if I see `npm ERR! peer dep missing`?
 
-部署时出现类似错误：
+If you see an error like this when deploying your project:
 
 ```
 npm ERR! peer dep missing: graphql@^0.10.0 || ^0.11.0, required by express-graphql@0.6.11
 ```
 
-说明有一部分 peer dependency 没有安装成功，因为 Node.js 版本小于 10 时，线上只会安装 dependencies 部分的依赖，所以请确保 dependencies 部分依赖所需要的所有依赖也都列在了 dependencies 部分（而不是 devDependencies）。
+This means that some of the peer dependencies are not successfully installed. The reason is that if the version of Node.js you specified is below 10, Cloud Engine will only install the dependencies listed under `dependencies`. Please make sure the required dependencies of the dependencies listed under `dependencies` are also listed under `dependencies`, not `devDependencies`.
 
-你可以在本地删除 node_modules，然后用 `npm install --production` 重新安装依赖来重现这个问题。
+You can reproduce the problem on your local computer by deleting `node_modules` and installing dependencies with `npm install --production`.
 
-或者，你也可以考虑将项目升级到 Node.js 10 以上的版本。
+You may also consider upgrading Node.js to 10 or higher to solve the problem.
 
-#### 路由超时设置
+#### Timeout Settings
 
-因为 Node.js 的异步调用容易因运行时错误或编码疏忽中断，为了减少在这种情况下对服务器内存的占用，也为了客户端能够更早地收到错误提示，所以需要添加这个设置，一旦发生超时，服务端会返回一个 HTTP 错误码给客户端。
+If a request triggers a function that doesn’t give a response due to an error, the server’s RAM will still be occupied for this request. To prevent the RAM from being occupied in this case and to have the client receive an error without delay, there needs to be a timeout set up on the server so that when a request doesn’t receive a response in a while, the server will return an HTTP error code to the client.
 
-使用 Express 框架实现自定义路由的时候，请求默认的超时时间为 15 秒，该值可以在 `app.js` 中进行调整：
+The default timeout for the custom routes defined with Express is 15 seconds. You can edit this value in `app.js`:
 
 ```js
-// 设置默认超时时间
+// Set the default timeout
 app.use(timeout("15s"));
 ```

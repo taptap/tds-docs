@@ -1,6 +1,6 @@
 ---
-title: 云引擎 Web 前端运行环境
-sidebar_label: Web 前端
+title: Frontend Runtime Environment
+sidebar_label: Frontend
 sidebar_position: 3
 ---
 
@@ -15,28 +15,28 @@ import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import QuickStartDeploy from "../_partials/quick-start-deploy.mdx";
 
-云引擎同样对托管 Web 前端应用（例如一个网站）提供了支持，对于使用了 React、Vue 等框架的应用，云引擎可以在线上完成构建的过程，开发者不需要将构建产物提交进 Git 仓库也不需要额外的 CI 环境。云引擎还提供了自定义域名绑定、自动申请 SSL 证书、重定向到 HTTPS 等常用的功能，减轻前端开发者在部署和运维环节的工作量。
+You can deploy frontend apps (like websites) to Cloud Engine. For apps built with frameworks like React and Vue, their build processes can be run on Cloud Engine so you don’t have to clutter your Git repositories with production builds or set up additional CI environments. With Cloud Engine, you can easily bind custom domains to your app, set up auto-renewal for SSL certificates, and enable HTTPS redirects. These features help you reduce the time spent on deploying and maintaining your app.
 
 :::info
-这篇文档是针对 Web 前端运行环境的介绍，如需了解云引擎平台提供的功能，请看 [云引擎平台功能](/sdk/engine/deploy/platform)。
+This article serves as an introduction to Cloud Engine’s frontend runtime environment. For features provided by the Cloud Engine platform, see [Cloud Engine Platform Features](/sdk/engine/deploy/platform).
 :::
 
-如果项目根目录包含一个 `static.json` 或 `index.html`，云引擎就会将其识别为 Web 前端项目，使用 Node.js 运行环境进行构建，然后自动使用 [serve](https://www.npmjs.com/package/serve) 来启动一个 HTTP 服务器。
+If your project has a file named `static.json` or `index.html` under its root directory, Cloud Engine will identify it as a frontend project. When you deploy your project, Cloud Engine will build it with the Node.js runtime environment and automatically start an HTTP server with [serve](https://www.npmjs.com/package/serve).
 
-## 快速开始
+## Getting Started
 
-大多前端脚手架都可以通过简单地配置运行在云引擎上，推荐使用它们来创建新的项目。
+Most frontend scaffolds can be deployed to Cloud Engine with little to no configurations. Consider using them if you plan to create a new project.
 
 <Tabs>
 <TabItem value='react' label='React' default>
 
-[create-react-app](https://create-react-app.dev/) 提供了开箱即用的 React 工具链，会自动配置好 React 的构建工具链，让开发者能专注在核心功能上：
+[create-react-app](https://create-react-app.dev/) provides out-of-the-box toolchains that automatically set up build tools for your React project so you can focus on development:
 
 ```sh
 npx create-react-app react-for-engine --use-npm
 ```
 
-然后切换到项目目录（上面的例子中是 `react-for-engine`）创建一个配置文件 `static.json` 将不存在的 URL 都重写到 `index.html`，以便我们的单页应用可以使用自己的前端路由（如 `react-router`）：
+Then navigate to the project’s directory (`react-for-engine` in the example above) and create a configuration file named `static.json` that rewrites non-existing URLs to `index.html`. This allows your single-page application to use its own frontend router (like `react-router`):
 
 ```json title='static.json'
 {
@@ -45,7 +45,7 @@ npx create-react-app react-for-engine --use-npm
 }
 ```
 
-再创建一个 `leanengine.yaml` 来配置构建命令：
+Then create a file named `leanengine.yaml` and specify the build command in it:
 
 ```yaml title='leanengine.yaml'
 build: npm run build
@@ -54,14 +54,14 @@ build: npm run build
 </TabItem>
 <TabItem value='vue' label='Vue'>
 
-可以使用官方的 [Vue CLI](https://cli.vuejs.org/)：
+You can create a Vue project with [Vue CLI](https://cli.vuejs.org/):
 
 ```sh
 npm install -g @vue/cli
 vue create vue-for-engine
 ```
 
-然后切换到项目目录（上面的例子中是 `vue-for-engine`）创建一个配置文件 `static.json` 将不存在的 URL 都重写到 `index.html`，以便我们的单页应用可以使用自己的前端路由（如 `vue-router`）：
+Then navigate to the project’s directory (`vue-for-engine` in the example above) and create a configuration file named `static.json` that rewrites non-existing URLs to `index.html`. This allows your single-page application to use its own frontend router (like `vue-router`):
 
 ```json title='static.json'
 {
@@ -70,7 +70,7 @@ vue create vue-for-engine
 }
 ```
 
-再创建一个 `leanengine.yaml` 来配置构建命令：
+Then create a file named `leanengine.yaml` and specify the build command in it:
 
 ```yaml title='leanengine.yaml'
 build: npm run build
@@ -79,13 +79,13 @@ build: npm run build
 </TabItem>
 <TabItem value='nextjs' label='Next.js'>
 
-可以使用官方的 [create-next-app](https://nextjs.org/docs/api-reference/create-next-app) 创建项目：
+You can create a Next.js project with [create-next-app](https://nextjs.org/docs/api-reference/create-next-app):
 
 ```
 npx create-next-app next-for-engine --use-npm
 ```
 
-然后切换到项目目录（上面的例子中是 `next-for-engine`），创建一个 `leanengine.yaml` 来配置构建命令：
+Then navigate to the project’s directory (`next-for-engine` in the example above), create a file named `leanengine.yaml`, and specify the build command in it:
 
 ```yaml title='leanengine.yaml'
 build: npm run build
@@ -93,60 +93,60 @@ build: npm run build
 
 :::info
 
-为了能使用 Next.js 提供的 [API Routes](https://nextjs.org/docs/api-routes/introduction) 等功能，这里实际是运行在 [Node.js 运行环境](/sdk/engine/deploy/nodejs/)（使用 `npm start` 启动 [Next.js production server](https://nextjs.org/docs/api-reference/cli#production)），因此下文中关于配置 serve 的部分并不适用于 Next.js。
+In order for Next.js [API Routes](https://nextjs.org/docs/api-routes/introduction) to work, Cloud Engine will run the project in a [Node.js runtime environment](/sdk/engine/deploy/nodejs/) by starting a [Next.js production server](https://nextjs.org/docs/api-reference/cli#production) with `npm start`. The section below regarding configuring serve won’t be applicable to Next.js projects.
 
 :::
 
 </TabItem>
 </Tabs>
 
-云引擎可以在线上完成构建过程，开发者不需要将构建产物提交进 Git 仓库，也不需要额外的 CI 环境。
+The build process can be run on Cloud Engine so you don’t have to include a production build in your Git repository or set up additional CI environments.
 
-### 部署到云引擎
+### Deploy to Cloud Engine
 
 <QuickStartDeploy />
 
-## 配置 Node.js 版本
+## Configure Node.js Version
 
 <NodejsSetupRuntime />
 
-## 安装依赖（`package.json`）
+## Install Dependencies (`package.json`)
 
 <NodejsSetupDependencies />
 
-## 配置 serve
+## Configure serve
 
-你可以在项目根目录创建一个 `static.json` 来配置 serve 的行为。
+To customize the behavior of serve, create a file named `static.json` under the root directory of your project.
 
 ```json title='static.json'
 {
-  "public": "build", // 在 build 目录而不是项目根目录启动网站
+  "public": "build", // Start the website from the `build` directory rather than the root directory
   "rewrites": [
-    { "source": "**", "destination": "/index.html" } // 将所有不存在的文件的请求重定向到 index.html（适用大部分单页面应用）
+    { "source": "**", "destination": "/index.html" } // Redirect all non-existing URLs to `index.html` (applicable to most single-page applications)
   ]
 }
 ```
 
-更多 serve 的选项和用法见 [serve-handler · Options](https://github.com/vercel/serve-handler#options)。
+See [serve-handler · Options](https://github.com/vercel/serve-handler#options) for more options and usages of serve.
 
-## 自定义构建过程
+## Customize Build Process
 
 <BuildingScripts />
 
-### 构建日志
+### Build Logs
 
 <BuildingBuildLogs />
 
-## 云端环境
+## Cloud Environment
 
-### 绑定自定义域名
+### Custom Domains
 
 <CloudCustomDomain />
 
-### 负载均衡和加速节点
+### Load Balancer and CDN
 
 <CloudLoadBalancer only="nodejs" noClientInfo={true} />
 
-### 时区
+### Timezone
 
 <CloudTimezone />

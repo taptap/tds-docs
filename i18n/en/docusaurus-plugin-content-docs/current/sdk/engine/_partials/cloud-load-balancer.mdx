@@ -3,35 +3,35 @@ import { HAS_ENGINE_CDN_DOMAIN } from "/src/constants/env.ts";
 import EngineRuntimes from "/src/docComponents/MultiLang/engine";
 import TabItem from "@theme/TabItem";
 
-所有对云引擎的 HTTP 或 HTTPS 请求都会经过负载均衡，负载均衡组件会处理 HTTPS 加密、重定向到 HTTPS、对响应进行压缩等一般性工作，因此云引擎上的程序不需要自己实现这些功能。同时负载均衡带来的一些限制，在云引擎程序内进行修改也无法越过，如：
+All HTTP and HTTPS requests sent to Cloud Engine will go through a load balancer that deals with chores including HTTPS encryption, HTTPS redirection, and response compression. You won’t have to implement features for handling these tasks yourself for the programs hosted on Cloud Engine. Meanwhile, the load balancer brings the following restrictions that your program cannot bypass:
 
-- `/.well-known/acme-challenge/` 开头的路径被用于自动管理证书，不会转发到云引擎程序。
-- 请求头（URL 和 header）每行最大 8K，总计最大 64K。
-- 请求体积（上传文件体积）最大 100M。
-- 连接或等待响应的超时时间为 60 秒。
+- Paths starting with `/.well-known/acme-challenge/` are used by Cloud Engine to automatically renew certificates. Requests sent to these paths won’t be forwarded to your program.
+- The size of a request header (URL and headers) should be within 64K and each line of the request header should be within 8K.
+- The size of a request (for uploading files) should be within 100M.
+- The timeout for connecting or waiting for a response is 60 seconds.
 
 <Conditional if={!props.noClientInfo}>
 
-#### 获取客户端 IP 等信息
+#### Getting the Client IP Address
 
-云引擎的负载均衡会在 HTTP header 中传递一些有关原始请求的信息：
+Cloud Engine’s load balancer includes the following information depicting the original request in the HTTP header:
 
-- `X-Real-IP`: 请求的来源 IP。
-- `X-Forwarded-Proto`: 请求的来源协议（`http` 或 `https`）。
-- `Forwarded`: RFC 7239 规定的用于传递代理信息的头，包含 IP 和 协议。
+- `X-Real-IP`: The original IP address.
+- `X-Forwarded-Proto`: The original protocol (`http` or `https`).
+- `Forwarded`: Information about the proxy, defined by RFC 7239. It contains the IP address and the protocol.
 
 <Conditional if={HAS_ENGINE_CDN_DOMAIN}>
 
 :::caution
-在使用加速节点的情况下，以上的 HTTP header 中给出的实际上是加速节点的信息，而非原始请求信息。
+If CDN is enabled, the information included in the HTTP headers above will be those of the CDN rather than the original request.
 :::
 
-在使用加速节点的情况下，还会有这些 HTTP header:
+With CDN enabled, the following HTTP headers will also be present:
 
-- `X-Forwarded-For`: 逗号隔开的多个 IP，其中第一个是原始请求 IP。
+- `X-Forwarded-For`: IP addresses separated by a comma. The first one would be the IP address of the original request.
 
 :::caution
-以上 HTTP 头中给出的信息并不可靠，云引擎无法确认其真实性，存在被伪造的可能。
+It’s possible that the information included in the HTTP headers above gets counterfeited. Cloud Engine won’t be able to guarantee its authenticity.
 :::
 
 </Conditional>
@@ -39,7 +39,7 @@ import TabItem from "@theme/TabItem";
 <EngineRuntimes only={props.only}>
 <TabItem value='nodejs'>
 
-在 Express 中：
+In Express:
 
 ```js
 app.get("/", function (req, res) {
@@ -51,7 +51,7 @@ app.get("/", function (req, res) {
 </TabItem>
 <TabItem value='python'>
 
-Python（Flask）：
+Python (Flask):
 
 ```python
 from flask import Flask
@@ -65,7 +65,7 @@ def index():
     return 'ok'
 ```
 
-Python（Django）：
+Python (Django):
 
 ```python
 def index(request):
@@ -93,7 +93,7 @@ EngineRequestContext.getRemoteAddress();
 </TabItem>
 <TabItem value='go'>
 
-Go（Echo）：
+Go (Echo):
 
 ```go
 func fetchRealIP(c echo.Context) error {
@@ -108,47 +108,47 @@ func fetchRealIP(c echo.Context) error {
 <Conditional region='cn'>
 
 :::info
-中国大陆节点的云引擎应用会默认启用加速节点，如果确实需要准确的原始请求 IP，可以开通独立 IP 来绕过加速节点，更多关于加速节点与独立 IP 的区别见 [域名绑定指南 § 云引擎域名](/sdk/domain/guide/#云引擎域名)。
+For Cloud Engine applications deployed within Mainland China, CDN will be enabled by default. To ensure that your application always gets the accurate IP addresses of original requests, consider enabling dedicated IP. You can learn more about the differences between CDN and dedicated IP on [Binding Your Domains § Cloud Engine Domains](/sdk/domain/guide/#cloud-engine-domains).
 :::
 
 </Conditional>
 </Conditional>
 
-#### 重定向到 HTTPS
+#### HTTPS Redirect
 
-在绑定云引擎自定义域名时，可以选择「强制 HTTPS」，勾选后负载均衡组件会将 HTTP 的请求重定向到 HTTPS 的同一路径。
+When you bind a custom Cloud Engine domain, you can enable _Force HTTPS_ to have the load balancer redirect HTTP requests to HTTPS while keeping the paths.
 
 <Conditional if={HAS_ENGINE_CDN_DOMAIN}>
 
 :::caution
-在使用加速节点的情况下，「强制 HTTPS」选项无法正确工作，仍需 [在项目代码层面实现重定向](/sdk/engine/functions/sdk/#如何使用-sdk-重定向到-https)。
+_Force HTTPS_ won’t work properly if CDN is enabled. You’ll still need to [implement redirect in your project’s code](/sdk/engine/functions/sdk/#how-to-redirect-http-requests-to-https-with-the-sdk).
 :::
 
 </Conditional>
 
 <Conditional if={HAS_ENGINE_CDN_DOMAIN}>
 
-#### 加速节点缓存
+#### CDN Caching
 
-如果你将自定义域名解析到加速节点（也包括云引擎的共享域名），那么加速节点会对请求进行缓存，加速节点会有一些默认的缓存规则。
+If you resolve your custom domain to the CDN (including the shared domain provided by Cloud Engine), the CDN will cache the responses for the requests it has received. There are some default rules for caching followed by the CDN.
 
-默认会缓存的情况：
+The CDN will cache the response if:
 
-- 响应头中有 `Last-Modified`（通常是静态资源，其中 HTML 最多缓存 60 秒）。
+- The response header contains `Last-Modified` (this indicates that the resource requested is static; for HTML files, they will be cached for at most 60 seconds).
 
-不会缓存的情况：
+The CDN will not cache the response if:
 
-- 出错的响应（非 2xx）。
-- 非幂等请求（如 `POST`）。
-- 响应头中没有 `Last-Modified`（通常是动态接口）。
+- There is an error with the response (not 2xx).
+- The request is not idempotent (like a `POST` request).
+- The response header doesn’t contain `Last-Modified` (this often indicates that the resource requested is dynamic).
 
-默认的缓存时长取决于文件类型和 `Last-Modified`（越不常修改的文件缓存越久），你可以通过自行设置 `Cache-Control` 来覆盖默认的行为，边缘节点会尽可能遵守其中的要求，比如：
+The age of the cache for a given file will depend on the file type and the value of the `Last-Modified` header. The less frequently the file gets modified, the longer the file gets cached. You can override the default behavior by configuring `Cache-Control` and the CDN will try its best to follow your configurations. For example:
 
-- 设置 `Cache-Control: no-cache` 来避免响应被缓存。
-- 设置 `Cache-Control: max-age=3600` 来设置缓存时长（一小时）。
+- You can use `Cache-Control: no-cache` to prevent the response from being cached.
+- You can use `Cache-Control: max-age=3600` to specify the age of the cache (here we set it to be 1 hour).
 
 :::info
-如果希望完全避免被缓存机制影响，可以开通独立 IP 来绕过加速节点，更多关于加速节点与独立 IP 的区别见 [域名绑定指南 § 云引擎域名](/sdk/domain/guide/#云引擎域名)。
+To prevent your application from being affected by the caching mechanism, consider enabling dedicated IP. You can learn more about the differences between CDN and dedicated IP on [Binding Your Domains § Cloud Engine Domains](/sdk/domain/guide/#cloud-engine-domains).
 :::
 
 </Conditional>
