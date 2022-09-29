@@ -18,10 +18,14 @@ TapSDK 提供了一套可供游戏开发者收集账号数据的 API。
 
 请先[下载](/tap-download) TapSDK，并添加相关依赖。
 
-如果只需要单独使用 TapDB，可以只导入依赖 `common` 和 `tapdb`。其中 Unity v3.7.1 及更高版本，还需要导入 `com.leancloud.storage`（iOS SDK 及 Android SDK 不需要增加这一步）。
+<MultiLang kind="ue">
 
-<MultiLang>
 <>
+
+如果只需要单独使用 TapDB，可以只导入依赖 `common` 和 `tapdb`。
+
+Unity v3.7.1 及更高版本，还需要导入 `com.leancloud.storage`。
+
 <CodeBlock className="language-json">
 {`"dependencies":{
     "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}",
@@ -36,6 +40,9 @@ TapSDK 提供了一套可供游戏开发者收集账号数据的 API。
 </>
 
 <>
+
+如果只需要单独使用 TapDB，可以只导入依赖 `common` 和 `tapdb`。
+
 <CodeBlock className="language-groovy">
 {`repositories {
     flatDir {
@@ -56,6 +63,8 @@ dependencies {
 </>
 
 <>
+
+如果只需要单独使用 TapDB，可以只导入依赖 `common` 和 `tapdb`。
 
 <CodeBlock className="language-objc">
 {`// 登录
@@ -88,6 +97,43 @@ libsqlite3.0.tbd |
 
 </>
 
+<>
+
+#### 环境要求
+
+* 安装 UE 4.26 及以上版本
+* iOS 12 或更高版本
+* Android 5.0（API level 21）或更高版本
+* macOS 10.14.0 或更高版本
+* Windows 7 或更高版本
+
+**支持平台**：iOS / Android / Windows / macOS
+
+#### 安装插件
+
+* 下载 [TapSDK UE4](/tap-download)，TapSDK-UE4-xxx.zip 解压后将 `TapDB`、`TapCommon` 文件夹 Copy 到项目的 `Plugins` 目录中
+* 重启 Unreal Editor
+* 打开 编辑 > 插件 > 项目 > TapTap，开启 `TapDB` 模块
+
+#### 添加依赖
+
+在 Project.Build.cs 中添加所需模块:
+
+```cs
+PublicDependencyModuleNames.AddRange(new string[] { "Core",
+	"CoreUObject",
+	"Engine",
+	"Json",
+	"InputCore",
+	"JsonUtilities",
+	"SlateCore",
+	"TapCommon",
+	"TapDB"
+});
+```
+
+</>
+
 </MultiLang>
 
 :::info
@@ -110,7 +156,7 @@ libsqlite3.0.tbd |
 
 在 TapSDK 初始化时，同步初始化 TapDB。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 <>
 
@@ -165,6 +211,8 @@ advertiserIDCollectionEnabled | 否 | IDFA 开关，请参考 [收集设备指�
 
 </>
 
+<>
+
 <Conditional region='cn'>
 
 ```java
@@ -206,6 +254,8 @@ TapBootstrap.init(MainActivity.this, tapConfig);
 ```
 
 </Conditional>
+
+</>
 
 <>
 
@@ -257,14 +307,70 @@ config.region = TapSDKRegionTypeCN;
 
 </>
 
+<>
+
+使用这种方式初始化需要导入 `TapBootstrap` 包、开启 `TapBootstrap` 模块，并将 `TapBootstrap` 添加到 `Project.Build.cs` 文件中。
+
+导入头文件：
+
+```cpp
+#include "TapUEBootstrap.h"
+#include "TapUECommon.h"
+#include "TapUEDB.h"
+```
+
+<Conditional region='cn'>
+
+```cpp
+FTUConfig Config;
+Config.ClientID = ClientID;       // 开发者中心对应 Client ID
+Config.ClientToken = ClientToken; // 开发者中心对应 Client Token
+Config.ServerURL = ServerURL;     // 开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
+Config.RegionType = ERegionType::CN;
+Config.DBConfig.Enable = true;
+Config.DBConfig.Channel = Channel;
+Config.DBConfig.GameVersion = GameVersion;
+Config.DBConfig.AdvertiserIDCollectionEnabled = AdvertiserIDCollectionEnabled;
+TapUEBootstrap::Init(Config);
+```
+
+</Conditional>
+
+<Conditional region='global'>
+
+```cpp
+FTUConfig Config;
+Config.ClientID = ClientID;           // 必须，开发者中心对应 Client ID
+Config.ClientToken = ClientToken;     // 开发者中心对应 Client Token
+Config.ServerURL = ServerURL;         // 开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
+Config.RegionType = ERegionType::IO;
+Config.DBConfig.Enable = true;
+Config.DBConfig.Channel = Channel;
+Config.DBConfig.GameVersion = GameVersion;
+Config.DBConfig.AdvertiserIDCollectionEnabled = AdvertiserIDCollectionEnabled;
+TapUEBootstrap::Init(Config);
+```
+
+</Conditional>
+
+#### DBConfig 说明
+
+参数 | 可为空 | 说明
+--- | --- | ---
+Enable | 否 | 是否开启 TapDB
+Channel | 是 | 分包渠道，长度不大于 256
+Version | 是 | 游戏版本，为空时，自动获取游戏安装包的版本，长度不大于 256
+AdvertiserIDCollectionEnabled | 否 | IDFA 开关，请参考 [收集设备指纹](/sdk/tapdb/sdk/client-side-integration#idfaios)
+
+</>
+
 </MultiLang>
 
 ### TapDB 单独使用
 
-在单独使用 TapDB 功能时（即不接登录功能时，不导入 TapBootstrap 包时），可以通过以下方式初始化 TapDB。
+在单独使用 TapDB 功能时（即不接登录功能时，不导入 `TapBootstrap` 包时），可以通过以下方式初始化 TapDB。
 
-
-<MultiLang>
+<MultiLang kind="ue">
 
 <>
 
@@ -381,15 +487,55 @@ channel | 是 | 分包渠道，长度不大于 256
 version | 是 | 游戏版本，长度不大于 256，为空时，自动获取游戏安装包的版本（ Xcode 配置中的 Version ）
 isCN | 是 | YES 表示中国大陆，NO 表示中国大陆以外的国家或地区
 
+</>
 
+<>
+
+导入头文件：
+
+```cpp
+#include "TapUEDB.h"
+```
+
+初始化 TapDB：
+
+<Conditional region='cn'>
+
+```cpp
+FTUDBConfig Config;
+Config.ClientId = TEXT("your client id");
+Config.RegionType = ERegionType::CN;
+Config.Channel = TEXT("分包渠道名称，可为空");
+Config.GameVersion = TEXT("游戏版本");
+TapUEDB::Init(Config);
+```
+
+</Conditional>
+
+<Conditional region='global'>
+
+```cpp
+FTUDBConfig Config;
+Config.ClientId = TEXT("your client id");
+Config.RegionType = ERegionType::IO;
+Config.Channel = TEXT("分包渠道名称，可为空");
+Config.GameVersion = TEXT("游戏版本");
+TapUEDB::Init(Config);
+```
+
+</Conditional>
+
+#### DBConfig 说明
+
+参数 | 可为空 | 说明
+--- | --- | ---
+ClientId | 否 | 开发者中心对应 Client ID
+RegionType | 否 | 对应 开发者中心 > 应用配置 > 适用地区
+Channel | 是 | 分包渠道，长度不大于 256
+GameVersion | 是 | 游戏版本，为空时，自动获取游戏安装包的版本，长度不大于 256
 </>
 
 </MultiLang>
-
-<Conditional region='global'>
-国际版应用初始化时，isCN 参数传入 `false`，表示中国大陆以外的国家或地区。
-</Conditional>
-
 
 ## 设置账号
 
@@ -401,7 +547,7 @@ isCN | 是 | YES 表示中国大陆，NO 表示中国大陆以外的国家或地
 
 在重启应用或调用清除账号 ID（ `clearUser` ）前，上报的事件都会带有该账号 ID。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 <>
 
@@ -459,6 +605,21 @@ TapDB.setUser("userId", properties);
 
 </>
 
+<>
+
+```cpp
+FString UserId = TEXT("userId");
+FString LoginType = TUDBType::LoginType::TapTap;
+TapUEDB::SetUserWithLoginType(UserId, LoginType);
+```
+
+| 字段 | 可为空 | 说明 |
+| --- | --- | --- |
+| userId  | 否 | 账号的唯一字符串，字符串长度不大于 256，只能包含数字、大小写字母、下划线（`_`）、短横（`-`）<br /> 开发者需要保证不同账号的 `userId` 均不相同 |
+| LoginType | 是 | 账号登录方式，参考 `TUDBType::LoginType`
+
+</>
+
 </MultiLang>
 
 
@@ -466,7 +627,7 @@ TapDB.setUser("userId", properties);
 
 当用户进行登出时，可调用 `clearUser` 清除当前 SDK 中保存的账号 ID，后续上报的事件将不会带有账号 ID，调用该接口不会上报任何事件。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 public static void ClearUser()
@@ -486,13 +647,17 @@ TapDB.clearUser();
 [TapDB clearUser];
 ```
 
+```cpp
+TapUEDB::ClearUser();
+```
+
 </MultiLang>
 
 ### 设置账号名称
 
 在用户进行账号登录后，可调用该接口设置该账号的名称，调用后将更新账号的账号名称（ `user_name` ）属性。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 public static void SetName(string name)
@@ -512,6 +677,11 @@ TapDB.setName("Tarara");
 [TapDB setName:@"Tarara"];
 ```
 
+```cpp
+FString Name = TEXT("Tarara"); // 用户游戏昵称
+TapUEDB::SetName(Name);
+```
+
 </MultiLang>
 
 参数 | 可为空 | 说明
@@ -523,7 +693,7 @@ name | 否 | 长度大于 0 并小于等于 256，账号名
 
 在用户进行账号登录后，可调用该接口设置该账号的等级，调用将更新账号的账号等级（ `level` ）属性。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 public static void SetLevel(int level)
@@ -543,18 +713,22 @@ TapDB.setLevel(5);
 [TapDB setLevel:5];
 ```
 
+```cpp
+int32 Level = 5;
+TapUEDB::SetLevel(Level);
+```
+
+</MultiLang>
+
 参数 | 可为空 | 说明
 --- | --- | ---
 level | 否 | 账号等级
-
-
-</MultiLang>
 
 ### 设置账号区服
 
 在用户进行账号登录后，可调用该接口设置该账号的区服信息，调用将初始化账号的首次区服（ `first_server` ）属性、更新账号的当前区服（ `current_server` ）属性。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 public static void SetServer(string server)
@@ -574,6 +748,11 @@ TapDB.setServer("1 区");
 [TapDB setServer:@"1 区"];
 ```
 
+```cpp
+FString Server = TEXT("1 区");
+TapUEDB::SetServer(Server);
+```
+
 </MultiLang>
 
 参数 | 可为空 | 说明
@@ -585,7 +764,7 @@ server | 否 | 账号服务器
 
 在用户进行充值后，可调用该接口上报充值信息，调用后将上报 `charge` 事件，并将传入的参数作为事件的属性。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 public static void OnCharge(string orderId, string product, long amount, string currencyType, string payment)
@@ -616,6 +795,10 @@ TapDB.onCharge("0xueiEns", "轩辕剑", "100", "CNY", "wechat", info);
 [TapDB onChargeSuccess:@"0xueiEns" product:@"轩辕剑" amount:100 currencyType:@"CNY" payment:@"wechat", properties:@{@"on_sell":YES}];
 ```
 
+```cpp
+TapUEDB::OnCharge(OrderId, Product, Amount, CurrencyType, Payment, Properties);
+```
+
 </MultiLang>
 
 参数 | 可为空 | 说明
@@ -636,7 +819,7 @@ properties | 是 | 充值（ `charge` ）的事件属性
 
 在 SDK 初始化完成后可使用该接口上报事件
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 public static void TrackEvent(string eventName, string properties)
@@ -659,6 +842,10 @@ TapDB.trackEvent("#battle", properties);
 
 NSDictionary* dic = @{@"aaa":@"xxx",@"bbb":@"yyy"};
 [TapDB trackEvent:@"testEvent2" properties:dic];
+```
+
+```cpp
+TapUEDB::TrackEvent(EventName, Properties);
 ```
 
 </MultiLang>
@@ -684,7 +871,7 @@ properties | 是 | 事件的属性
 
 #### 添加静态通用事件属性
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 public static void RegisterStaticProperties(string staticProperties)
@@ -710,6 +897,10 @@ TapDB.registerStaticProperties(commonProperties);
 [TapDB registerStaticProperties:@{@"#current_channel":@"TapDB"}];
 ```
 
+```cpp
+TapUEDB::RegisterStaticProperties(Properties);
+```
+
 </MultiLang>
 
 字段 | 可为空 | 说明
@@ -719,7 +910,7 @@ staticProperties | 否 | 静态通用事件属性字典
 
 #### 删除单个静态通用事件属性
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 public static void UnregisterStaticProperty(string propertyName)
@@ -739,6 +930,10 @@ TapDB.unregisterStaticProperty("#current_channel");
 [TapDB unregisterStaticProperty:@"#current_channel"];
 ```
 
+```cpp
+TapUEDB::UnregisterStaticProperty(Key);
+```
+
 </MultiLang>
 
 参数 | 可为空 | 说明
@@ -748,7 +943,7 @@ propertyName | 否 | 静态通用属性名
 
 #### 清空全部静态通用属性
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 public static void ClearStaticProperties()
@@ -768,13 +963,17 @@ TapDB.clearStaticProperties();
 [TapDB clearStaticProperties];
 ```
 
+```cpp
+TapUEDB::ClearStaticProperties();
+```
+
 </MultiLang>
 
 #### 注册动态通用事件属性
 
 对于可能随时发生变化的通用事件属性，可以注册动态通用事件属性回调，该回调会在每次调用时被触发，将计算好的属性添加到本次上报事件属性中。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 public static void RegisterDynamicProperties(IDynamicProperties properties)
@@ -819,6 +1018,10 @@ TapDB.registerDynamicProperties(
   }];
 ```
 
+```cpp
+TapUEDB::RegisterDynamicProperties(PropertiesBlock);
+```
+
 </MultiLang>
 
 参数 | 可为空 | 说明
@@ -840,7 +1043,7 @@ TapDB 支持两种用户主体：设备和账号，你可以通过如下接口�
 
 对于需要保证只有首次设置时有效的属性，可以使用该接口进行赋值操作，仅当前值为空时赋值操作才会生效，如当前值不为空，则赋值操作会被忽略。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 public static void DeviceInitialize(string properties)
@@ -877,6 +1080,10 @@ TapDB.deviceInitialize(properties);
 // 此时设备表的 "#firstActiveServer" 字段值还是为 "server1"
 ```
 
+```cpp
+TapUEDB::DeviceInitialize(Properties);
+```
+
 </MultiLang>
 
 参数 | 可为空 | 说明
@@ -888,7 +1095,7 @@ properties | 否 | 属性字典
 
 对于常规的用设备属性，可使用改接口进行赋值操作，新的属性值将会直接覆盖旧的属性值
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 public static void DeviceUpdate(string properties)
@@ -925,6 +1132,10 @@ TapDB.deviceUpdate(properties);
 // 此时设备表的 "currentPoints" 字段值为 42
 ```
 
+```cpp
+TapUEDB::DeviceUpdate(Properties);
+```
+
 </MultiLang>
 
 参数 | 可为空 | 说明
@@ -935,7 +1146,7 @@ properties | 否 | 属性字典
 #### 设备属性累加
 
 对于数值类型的属性，可以使用该接口进行累加操作，调用后 TapDB 将对原属性值进行累加后保存结果值
-<MultiLang>
+<MultiLang kind="ue">
 
 <>
 
@@ -998,6 +1209,14 @@ properties | 否 | 属性字典，value 仅支持 NSNumber 类型
 
 </>
 
+<>
+
+```cpp
+TapUEDB::DeviceAdd(Properties);
+```
+
+</>
+
 </MultiLang>
 
 上述代码示例中，属性值为整数。
@@ -1009,7 +1228,7 @@ properties | 否 | 属性字典，value 仅支持 NSNumber 类型
 
 使用方法同设备属性初始化操作
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 public static void UserInitialize(string properties)
@@ -1029,6 +1248,10 @@ TapDB.userInitialize(properties);
 [TapDB userInitialize:@{@"firstActiveServer":@"server1"}];
 ```
 
+```cpp
+TapUEDB::UserInitialize(Properties);
+```
+
 </MultiLang>
 
 
@@ -1036,7 +1259,7 @@ TapDB.userInitialize(properties);
 
 使用方法同设备属性更新操作
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 public static void UserUpdate(string properties)
@@ -1056,13 +1279,17 @@ TapDB.userUpdate(properties);
 [TapDB userUpdate:@{@"currentPoints":@10}];
 ```
 
+```cpp
+TapUEDB::UserUpdate(Properties);
+```
+
 </MultiLang>
 
 #### 账号属性累加
 
 使用方法同设备属性累加操作
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 public static void UserAdd(string properties)
@@ -1080,6 +1307,10 @@ TapDB.userAdd(properties);
 + (void)userAdd:(NSDictionary *)properties;
 
 [TapDB userAdd:@{@"totalPoints":@10}];
+```
+
+```cpp
+TapUEDB::UserAdd(Properties);
 ```
 
 </MultiLang>
@@ -1149,7 +1380,7 @@ System.loadLibrary("msaoaidsec");
 
 在 `AndroidManifest.xml` 增加如下条目，且用户同意权限的申请后，SDK 将自动采集 Android IMEI。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 <>
 
@@ -1172,6 +1403,10 @@ System.loadLibrary("msaoaidsec");
 iOS 平台不适用
 ```
 
+```cpp
+// UE4 SDK 未提供此方法
+```
+
 </>
 
 </MultiLang>
@@ -1181,7 +1416,7 @@ iOS 平台不适用
 
 由于 `iOS14.5` 以上系统，获取 IDFA 需要弹出窗口有用户确认，故 SDK 默认不获取 IDFA，可以调用接口开启 IDFA 获取。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 <>
 
@@ -1228,10 +1463,26 @@ TapDB.AdvertiserIDCollectionEnabled(true);
 
 </>
 
+<>
+
+iOS 独占方法
+
+```cpp
+TapUEDB::AdvertiserIDCollectionEnabled(true);
+```
+
+</>
+
 </MultiLang>
 
 
-## 诊断接入 (TapSDK 3.14.0 及以上) {#themis}
+## 诊断接入 {#themis}
+
+:::info
+TapSDK 3.14.0 及以上可接入此功能。
+
+UE4 SDK 暂不支持诊断接入。
+:::
 
 ### 添加依赖
 
