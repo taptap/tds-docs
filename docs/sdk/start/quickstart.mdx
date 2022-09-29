@@ -27,7 +27,7 @@ import { Conditional } from "/src/docComponents/conditional";
 
 ## 环境要求
 
-<MultiLang>
+<MultiLang kind="ue">
 <>
 
 - Unity 2019.4 或更高版本
@@ -45,6 +45,17 @@ import { Conditional } from "/src/docComponents/conditional";
 - iOS 10 或更高版本
 
 </>
+
+<>
+
+* 安装 UE 4.26 及以上版本
+* iOS 12 或更高版本
+* Android 5.0（API level 21）或更高版本
+
+**支持平台**：Android / iOS
+
+</>
+
 </MultiLang>
 
 :::caution
@@ -57,7 +68,7 @@ import { Conditional } from "/src/docComponents/conditional";
 
 ## 项目配置
 
-<MultiLang>
+<MultiLang kind="ue">
 <>
 
 SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选其一。请根据项目需要选择。
@@ -300,13 +311,82 @@ dependencies {
    ```
 
 </>
+
+<>
+
+* 下载 [TapSDK UE4](/tap-download)，TapSDK-UE4-xxx.zip 解压后将 `TapBootstrap`、`TapCommon`、`TapLogin` 文件夹 Copy 到项目的 `Plugins` 目录中
+* 重启 Unreal Editor
+* 打开 编辑 > 插件 > 项目 > TapTap，开启 `TapBootstrap` 和 `TapLogin` 模块
+
+#### 添加依赖
+
+```cs
+PublicDependencyModuleNames.AddRange(new string[] { "Core",
+	"CoreUObject",
+	"Engine",
+	"Json",
+	"InputCore",
+	"JsonUtilities",
+	"SlateCore",
+	"TapCommon",
+	"TapBootstrap",
+	"TapLogin"
+});
+```
+
+#### 导入头文件
+
+```cpp
+#include "TapUEBootstrap.h"
+#include "TapUECommon.h"
+```
+
+<details>
+
+<summary>点击展开 iOS 配置</summary>
+
+在 项目设置 > Platform > iOS > Additional Plist data 中可以填入一个字符串，复制以下代码并且替换其中的 `ClientID` 以及授权文案。
+
+```xml
+<key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLName</key>
+            <string>taptap</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <!-- 这里注意下，花括号需要去掉，最终是 ClientID 前拼接上 `tt` 的形式，例如：ttFwFdCxxxxxxxQDQwQN -->
+                <string>tt{ClientID}</string>
+            </array>
+        </dict>
+    </array>
+<key>LSApplicationQueriesSchemes</key>
+<array>
+    <string>tapiosdk</string>
+    <string>tapsdk</string>
+</array>
+```
+
+如果接入 TapDB 模块，那么还需要加上：
+
+```xml
+<key>NSUserTrackingUsageDescription<key>
+<string>{数据追踪权限申请文案}</string>
+```
+
+</details>
+
+</>
+
 </MultiLang>
 
 ## 初始化
 
 初始化 TapSDK 时需传入 `Client ID`、区域等应用配置信息。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 <>
 
@@ -350,6 +430,27 @@ config.clientToken = @"your_client_token"; // 必须，开发者中心对应 Cli
 config.serverURL = @"https://your_server_url"; // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
 config.region = TapSDKRegionTypeCN; // TapSDKRegionTypeCN：中国大陆，TapSDKRegionTypeIO：其他国家或地区
 [TapBootstrap initWithConfig:config];
+```
+
+</>
+
+<>
+
+`TapBootstrap` 初始化方法会把直接初始化 TapLogin 模块，如果插件中包含 TapDB 并且 `DBConfig.Enable = true`，那么也会完成 [`TapDB` 初始化](/sdk/tapdb/sdk/client-side-integration/#tapsdk-init)。
+
+这两个模块无需再次初始化。
+
+```cpp
+FTUConfig Config;
+Config.ClientID = ClientID;
+Config.ClientToken = ClientToken;
+Config.ServerURL = ServerURL;
+Config.RegionType = RegionType;
+Config.DBConfig.Enable = true;  // TapDB 初始化
+Config.DBConfig.Channel = Channel;
+Config.DBConfig.GameVersion = GameVersion;
+Config.DBConfig.AdvertiserIDCollectionEnabled = AdvertiserIDCollectionEnabled;
+TapUEBootstrap::Init(Config);
 ```
 
 </>
