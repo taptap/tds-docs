@@ -27,7 +27,7 @@ import { Conditional } from "/src/docComponents/conditional";
 
 ## 环境要求
 
-<MultiLang>
+<MultiLang kind="ue">
 <>
 
 - Unity 2019.4 或更高版本
@@ -45,6 +45,17 @@ import { Conditional } from "/src/docComponents/conditional";
 - iOS 10 或更高版本
 
 </>
+
+<>
+
+* 安装 UE 4.26 及以上版本
+* iOS 12 或更高版本
+* Android 5.0（API level 21）或更高版本
+
+**支持平台**：Android / iOS
+
+</>
+
 </MultiLang>
 
 :::caution
@@ -57,7 +68,7 @@ import { Conditional } from "/src/docComponents/conditional";
 
 ## 项目配置
 
-<MultiLang>
+<MultiLang kind="ue">
 <>
 
 SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选其一。请根据项目需要选择。
@@ -96,24 +107,6 @@ SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选�
 
 :::
 
-导入 SDK 后还需进行 Android、iOS 平台的相关配置。
-
-#### Android 配置
-
-1. **File > Build Settings** 添加 Android 配置文件。
-
-   ![](/img/tap_unity_amanifest.png)
-
-2. 编辑 `Assets/Plugins/Android/AndroidManifest.xml` 文件，在 `application` 标签下添加以下代码。
-
-   ```xml
-   <activity
-       android:name="com.taptap.sdk.TapTapActivity"
-       android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-       android:exported="false"
-       android:theme="@android:style/Theme.Translucent.NoTitleBar.Fullscreen" />
-   ```
-
 #### iOS 配置
 
 在 `Assets/Plugins/iOS/Resource` 目录下创建 `TDS-Info.plist` 文件，复制以下代码并且**替换其中的 `ClientId`**。如果游戏使用了 TapTap [内嵌动态](/sdk/embedded-moments/features/)或[数据分析](/sdk/tapdb/features/)服务，需要配置相关权限并**替换授权文案**：
@@ -150,27 +143,23 @@ SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选�
 
 2. 打开项目的 `project/app/build.gradle` 文件，添加 gradle 配置如下：
 
-<CodeBlock className="java">
- {`repositories{
-    flatDir {
-        dirs 'libs'
-    }
-}\n
+<CodeBlock className="java"> {`
 dependencies {
     ...
-    // TapTap 启动器
-    implementation name:'TapBootstrap_${sdkVersions.taptap.android}', ext:'aar'
-    // TapTap 基础库
-    implementation name:'TapCommon_${sdkVersions.taptap.android}', ext:'aar'
-    // TapTap 登录
-    implementation name:'TapLogin_${sdkVersions.taptap.android}', ext:'aar'
+    // 导入 libs 目录下所有 aar 的包：
+    implementation fileTree(dir: 'libs', include: ['*.aar'])
+    // 如果需要单独导入 libs 目录下的指定包，请按照如下方式：
+    //implementation files('libs/TapBootstrap_${sdkVersions.taptap.android}.aar') // TapTap 启动器
+    //implementation files('libs/TapCommon_${sdkVersions.taptap.android}.aar') // TapTap 基础库
+    //implementation files('libs/TapLogin_${sdkVersions.taptap.android}.aar') // TapTap 登录
+    ...
     // 数据存储
     implementation 'cn.leancloud:storage-android:${sdkVersions.leancloud.java}'
     // 即时通讯
     implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-}`}
-</CodeBlock>
+}
+`}</CodeBlock>
 
 3. 在 `AndroidManifest.xml` 添加网络权限：
 
@@ -322,13 +311,82 @@ dependencies {
    ```
 
 </>
+
+<>
+
+* 下载 [TapSDK UE4](/tap-download)，TapSDK-UE4-xxx.zip 解压后将 `TapBootstrap`、`TapCommon`、`TapLogin` 文件夹 Copy 到项目的 `Plugins` 目录中
+* 重启 Unreal Editor
+* 打开 编辑 > 插件 > 项目 > TapTap，开启 `TapBootstrap` 和 `TapLogin` 模块
+
+#### 添加依赖
+
+```cs
+PublicDependencyModuleNames.AddRange(new string[] { "Core",
+	"CoreUObject",
+	"Engine",
+	"Json",
+	"InputCore",
+	"JsonUtilities",
+	"SlateCore",
+	"TapCommon",
+	"TapBootstrap",
+	"TapLogin"
+});
+```
+
+#### 导入头文件
+
+```cpp
+#include "TapUEBootstrap.h"
+#include "TapUECommon.h"
+```
+
+<details>
+
+<summary>点击展开 iOS 配置</summary>
+
+在 项目设置 > Platform > iOS > Additional Plist data 中可以填入一个字符串，复制以下代码并且替换其中的 `ClientID` 以及授权文案。
+
+```xml
+<key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLName</key>
+            <string>taptap</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <!-- 这里注意下，花括号需要去掉，最终是 ClientID 前拼接上 `tt` 的形式，例如：ttFwFdCxxxxxxxQDQwQN -->
+                <string>tt{ClientID}</string>
+            </array>
+        </dict>
+    </array>
+<key>LSApplicationQueriesSchemes</key>
+<array>
+    <string>tapiosdk</string>
+    <string>tapsdk</string>
+</array>
+```
+
+如果接入 TapDB 模块，那么还需要加上：
+
+```xml
+<key>NSUserTrackingUsageDescription<key>
+<string>{数据追踪权限申请文案}</string>
+```
+
+</details>
+
+</>
+
 </MultiLang>
 
 ## 初始化
 
 初始化 TapSDK 时需传入 `Client ID`、区域等应用配置信息。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 <>
 
@@ -376,6 +434,27 @@ config.region = TapSDKRegionTypeCN; // TapSDKRegionTypeCN：中国大陆，TapSD
 
 </>
 
+<>
+
+`TapBootstrap` 初始化方法会把直接初始化 TapLogin 模块，如果插件中包含 TapDB 并且 `DBConfig.Enable = true`，那么也会完成 [`TapDB` 初始化](/sdk/tapdb/sdk/client-side-integration/#tapsdk-init)。
+
+这两个模块无需再次初始化。
+
+```cpp
+FTUConfig Config;
+Config.ClientID = ClientID;
+Config.ClientToken = ClientToken;
+Config.ServerURL = ServerURL;
+Config.RegionType = RegionType;
+Config.DBConfig.Enable = true;  // TapDB 初始化
+Config.DBConfig.Channel = Channel;
+Config.DBConfig.GameVersion = GameVersion;
+Config.DBConfig.AdvertiserIDCollectionEnabled = AdvertiserIDCollectionEnabled;
+TapUEBootstrap::Init(Config);
+```
+
+</>
+
 </MultiLang>
 
 初始化的时候，**必须填入** `client_id`、`client_token` 和 `server_url`，其中：
@@ -397,11 +476,13 @@ TapSDK 提供了众多功能。请在初始化 SDK 后，根据项目需要，�
 
 ### 接入 TapTap 登录
 
-请根据开发者指南：[快速上手，接入 TapTap 一键登录](/sdk/taptap-login/guide/start) 完成操作，可以选择单纯的 TapTap 登录，或者基于内建账户系统接入 TapTap 登录。
+请根据开发者指南：[快速上手，接入 TapTap 一键登录](/sdk/taptap-login/guide/start) 完成操作。
 
 ### 配置签名证书
 
 Android 和 iOS 应用需要在 TapTap 开发者中心进入你的游戏，依次选择 **游戏服务 > 生态服务 > TapTap 登录** 配置应用的相关信息（如下图所示），否则测试登录功能时会返回 `signature not match` 报错信息，无法正常使用 TapTap 登录功能。
+
+Android 签名处填写 MD5 值，详情可参考：[如何获取 MD5 值](/sdk/start/faq/#如何获取-android-应用的-md5-值)。
 
 <Conditional region="cn">
 
@@ -414,8 +495,6 @@ Android 和 iOS 应用需要在 TapTap 开发者中心进入你的游戏，依�
 ![](/img/io/login-config.png)
 
 </Conditional>
-
-为了正确填写签名 MD5 值，可以使用如下的工具进行获取：[**GenSignatureMD5**](https://blog.taptap.dev/tools/get-signature-md5.apk)。
 
 ### 添加测试用户
 
