@@ -1,0 +1,123 @@
+---
+title: 云引擎游戏后端开发指南
+sidebar_label: 开发指南
+sidebar_position: 2
+---
+
+import Path from "/src/docComponents/path";
+
+## 游戏后端实例
+
+你需要先将云引擎分组调整到游戏后端实例，才能使用这个页面介绍的功能。
+
+我们为游戏后端提供了几种不同的实例规格：
+
+| 规格          | 内存    | CPU    |
+| ------------- | ------- | ------ |
+| game-1c4g  | 1024 MB  | 1 Core |
+| game-2c6g | 2048 MB | 2 Core |
+| game-4c8g | 4096 MB | 4 Core |
+
+在 **<Path to="engine" /> > 你的分组 > 资源** 页面下，可以修改实例的规格和数量。
+
+## 提供 TCP 或 UDP 服务
+
+在 leanengine.yaml 中可以配置额外的端口：
+
+```yaml title='leanengine.yaml'
+extraPorts:
+  - name: echo
+    protocol: udp
+    containerPort: 4000
+  - name: game
+    protocol: tcp
+    containerPort: 4000
+```
+
+最多可以配置 5 个端口。
+
+## 获取连接地址
+
+`GET /containers`
+
+这个接口可以通过 Access Token 访问，用于开发者获取所有容器的信息并自行实现路由接口。
+
+```
+$ curl -H 'X-LC-Id: SJjoXHWuhewHKV4Ojw' -H 'Authorization: Bearer 14d1c1ff-908b-4a2c-baec-427cbde3bf05' 'https://shared.cloud.tds1.tapapis.cn/1.1/engine/containers?groupName=udp&amp;prod=1'
+
+[
+  {
+    "name": "web3-219ebd3e",
+    "prod": 1,
+    "status": "running",
+    "extraPorts": [
+      {
+        "name": "game",
+        "protocol": "udp",
+        "publicPort": 19766,
+        "publicIp": "106.75.70.96"
+      }
+    ],
+    "groupName": "web",
+    "versionTag": "20220606-152341"
+  },
+  {
+    "createdAt": "2022-06-06T07:23:47.000Z",
+    "forceStopAfter": "2022-06-06T07:24:27.000Z",
+    "name": "web3-b102392b",
+    "prod": 1,
+    "status": "terminating",
+    "extraPorts": [
+      {
+        "name": "game",
+        "protocol": "udp",
+        "publicPort": 18288,
+        "publicIp": "106.75.70.96"
+      }
+    ],
+    "groupName": "web",
+    "versionTag": "20220606-144209"
+  }
+]
+```
+
+响应中会同时包含正常运行（running）和正在平滑关闭（terminating）的容器，其中 extraPorts 部分就是可供终端设备连接的外部 IP 和端口。
+
+`GET /gateway/route`
+
+这个接口不需要鉴权，会随机返回一个 running 状态的容器的连接信息，用于开发者不希望自行开发路由接口时使用。
+
+```
+$ curl -H 'X-LC-Id: SJjoXHWuhewHKV4Ojw' 'https://shared.cloud.tds1.tapapis.cn/1.1/engine/gateway/route?groupName=udp&amp;prod=1'
+
+[
+  {
+    "name": "game",
+    "protocol": "udp",
+    "publicPort": 19766,
+    "publicIp": "106.75.70.96"
+  }
+]
+```
+
+### 外网连接
+
+```
+$ nc -u 106.75.70.96 11348
+hello
+hello
+```
+
+如果结合一下前面的路由接口：
+
+```
+$ ROUTE_JSON=$(curl -H 'X-LC-Id: SJjoXHWuhewHKV4Ojw' 'https://shared.cloud.tds1.tapapis.cn/1.1/engine/gateway/route?groupName=udp&amp;prod=1' | jq '.[] | select(.name == "game")')
+$ PUBLIC_IP=$(echo $ROUTE_JSON | jq -r '.publicIp')
+$ PUBLIC_PORT=$(echo $ROUTE_JSON | jq '.publicPort')
+$ nc -u $PUBLIC_IP $PUBLIC_PORT
+hello
+hello
+```
+
+## 平滑关闭
+
