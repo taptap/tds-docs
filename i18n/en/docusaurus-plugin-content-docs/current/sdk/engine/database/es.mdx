@@ -1,5 +1,5 @@
 ---
-title: LeanDB Elasticsearch 使用指南
+title: LeanDB Elasticsearch Guide
 sidebar_label: LeanDB Elasticsearch
 sidebar_position: 4
 ---
@@ -10,55 +10,54 @@ import LeandbCreateInstance from "../_partials/leandb-create-instance.mdx";
 import TabItem from "@theme/TabItem";
 import Path from "/src/docComponents/path";
 
-LeanDB Elasticsearch 是云引擎提供的托管数据库，开发者可以在云引擎中使用 Elasticsearch 客户端类库或 HTTP API 连接，访问完整的 Elasticsearch 功能，更多其他托管数据库请查看 [云引擎服务总览](/sdk/engine/overview)。
+LeanDB Elasticsearch is the hosted database provided by Cloud Engine. You can have your project connect to the database using Elasticsearch libraries or HTTP APIs and have access to all the functions provided by Elasticsearch. See [Cloud Engine Overview](/sdk/engine/overview) to learn about the other hosted database services provided by Cloud Engine.
 
-Elasticsearch 的主要特性：
+Elasticsearch has the following features:
 
-- **高可用**：多节点集群方案，可以容忍单节点故障。
-- **在线扩容**：在线调整容量和规格，数据平滑迁移。
-- **多实例**：满足更大容量或更高性能的需求。
-- **中文分词**：内置中文分词插件并支持自定义词库。
+- **High availability**: With clusters containing multiple nodes, errors on a single node won’t affect the availability of the service.
+- **Resizing online**: Adjust the size of your instance at any time.
+- **Multiple instances**: Get larger storage and better performance as you need.
 
-## 创建和管理实例
+## Creating and Managing Instances
 
-开发者可以在 **<Path to="engine" /> > Elasticsearch** 页面创建和管理 LeanDB Elasticsearch 实例。
+You can create and manage LeanDB Elasticsearch instances on **<Path to="engine" /> > Elasticsearch**.
 
-### 创建实例
+### Creating Instances
 
 <LeandbCreateInstance>
 
-- **实例规格** 目前提供 `512M`、`1GB`、`2GB`、`4GB`、`8GB` 几种，代表不同的运算能力，是计费的基础。
+- **Specification** You can choose from `512M`, `1GB`, `2GB`, `4GB`, and `8GB`.
 
-每种规格有固定的存储空间限制，如需要更多存储空间需要升级到更高的规格。
+Each specification has its limit on the space. Upgrade to a higher specification to allow for more space.
 
 </LeandbCreateInstance>
 
-### Elasticsearch 版本
+### Elasticsearch Version
 
-目前 LeanDB 仅提供 Elasticsearch 7.9 版本。
+LeanDB only provides Elasticsearch 7.9 at this time.
 
-### 在线扩容
+### Resizing Online
 
-目前 LeanDB Elasticsearch 不提供自助扩容的能力，如需扩容请提交工单联系我们的技术支持。
+At this time, you can’t resize LeanDB Elasticsearch instances on your own. Please reach out to us if you need to have your instances resized.
 
-### 管理共享
+### Sharing Instances
 
-可以使用控制台上的「管理共享」功能将 LeanDB 实例共享给其他应用，被共享的应用的 LeanDB 页面可能看到这个实例，相关的环境变量也会出现在其他应用的云引擎中。
+You can use the “Manage sharing” function to share your LeanDB instances with other applications. When you share an instance with another application, the instance will appear in this application. The relevant environment variables will also be available in this application’s Cloud Engine instances.
 
-## 在云引擎中使用
+## Accessing From Cloud Engine
 
-LeanDB 所在的应用的云引擎在部署时，会被注入几个包含 Redis 连接信息的环境变量，包括：
+When you deploy a project to the Cloud Engine instances under an application, some environment variables containing information for connecting to Elasticsearch will be injected, including:
 
 - `ELASTICSEARCH_URL_<NAME>`
 
-其中 `<NAME>` 是你在创建 LeanDB 时为它指定的名字，如果你的 LeanDB 名为 `MYES` 的话，就会有名为 `ELASTICSEARCH_URL_MYES` 的环境变量。
+Here `<NAME>` is the name you provided when creating your LeanDB instance. If the name of your LeanDB instance is `MYES`, there will be an environment variable named `ELASTICSEARCH_URL_MYES`.
 
-该环境变量的格式是 `http://username:password@host:port`，其中包含了所有连接 Elasticsearch 所需的信息，包括认证信息。
+The environment variable has a format like `http://username:password@host:port`, containing everything you need to connect to the instance, including credentials.
 
 <EngineRuntimes>
 <TabItem value='nodejs'>
 
-在 Node.js 中你可以这样连接到 Elasticsearch：
+To connect to Elasticsearch from Node.js:
 
 ```javascript
 const { Client } = require("@elastic/elasticsearch");
@@ -92,43 +91,30 @@ client.search(
 );
 ```
 
-- 你需要运行 `npm install @elastic/elasticsearch` 来安装上面代码中用到的依赖
-- 更多的用法请参考 [Elasticsearch Node.js client](https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/index.html)
+- Make sure to install the dependencies used in the code above with `npm install @elastic/elasticsearch`
+- See [Elasticsearch Node.js client’s docs](https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/index.html) for more information
 
 </TabItem>
 </EngineRuntimes>
 
-## 中文分词
+### Custom Dictionary
 
-除了 elasticsearch 自带的分词器，我们还提供了
-[Elasticsearch ik plugin](https://github.com/medcl/elasticsearch-analysis-ik) 以支持中文分词。
-我们可以通过以下途径指定使用 IK 插件进行中文分词：
-
-1. 在搜索时，指定分词器
-2. 在创建索引时，为特定 `field` 指定搜索分词器
-3. 在创建索引时，指定索引的默认分词器
-4. 在创建索引时，为特定 `field` 指定分词器
-
-它们的优先级依次降低，当都未指定时，会使用默认的标准分词器（standard analyzer）。具体细节及参数见 [specify an analyzer](https://www.elastic.co/guide/en/elasticsearch/reference/7.x/specify-analyzer.html)。
-
-### 自定义词库
-
-除此之外，自定义词库也是支持的。用户可以在控制台上传自定义词库。
-词库文件要求为 UTF-8 编码，每个词单独一行，文件大小不能超过 10MB，例如：
+You can upload a custom dictionary on the dashboard.
+The dictionary should be encoded with UTF-8 with every line containing a word. The file should be no larger than 10 MB. For example:
 
 ```
-面向对象编程
-函数式编程
-高阶函数
-响应式设计
+Object-oriented programming
+Functional programming
+Higher-order function
+Responsive web design
 ```
 
-将其保存为文本文件，例如 `dict.txt`，上传即可。上传之后，分词将于 2 分钟后生效。开发者可以通过 [analyze API](https://www.elastic.co/guide/en/elasticsearch/reference/7.x/test-analyzer.html) 来测试。需要注意使用 analyze API 时要指定 index，使用 `curl -X POST "localhost:9200/my-index/_analyze?pretty"` 的形式。
+Save the content into a text file with its name being something like `dict.txt`. Once you upload the file, it should be effective in 2 minutes. You can test if the dictionary is working with the [analyze API](https://www.elastic.co/guide/en/elasticsearch/reference/7.x/test-analyzer.html). Keep in mind that when using the analyze API, an index has to be specified, so the request looks like `curl -X POST "localhost:9200/my-index/_analyze?pretty"`.
 
-## 管理数据
+## Managing Data
 
-除了在云引擎中通过编程的方式访问 LeanDB，我们还提供了用于进行管理、调试或一次性数据操作的方式。
+Besides accessing LeanDB with your code from Cloud Engine, you can also use the following ways to manage, debug, or perform operations on your instances.
 
-### 使用命令行工具连接
+### Connecting With the CLI
 
 <LeandbCliAccess />

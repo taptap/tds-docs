@@ -2,7 +2,7 @@
 
 set -e
 
-rm -rf docs/ad-apply docs/community docs/sdk/anti-addiction docs/sdk/domain docs/sdk/engine/dedicated-IP.mdx docs/sdk/multiplayer docs/sdk/push/guide/android-mixpush.mdx docs/sdk/start/agreement.mdx docs/sdk/tap-canary docs/sdk/tap-play docs/sdk/taptap-login/guide/upgrade1.x.mdx docs/sdk/taptap-login/guide/upgrade2.x.mdx docs/store
+rm -rf docs/ad-apply docs/community docs/sdk/anti-addiction docs/sdk/domain docs/sdk/engine/dedicated-IP.mdx docs/sdk/engine/deep-dive.mdx docs/sdk/multiplayer docs/sdk/push/guide/android-mixpush.mdx docs/sdk/start/agreement.mdx docs/sdk/tap-canary docs/sdk/tap-play docs/sdk/taptap-login/guide/upgrade1.x.mdx docs/sdk/taptap-login/guide/upgrade2.x.mdx docs/store
 rm -rf i18n/en/docusaurus-plugin-content-docs/current/store
 cp -r .ci/hk/zh-Hans/operations docs/operations
 cp -r .ci/hk/zh-Hans/store docs/store

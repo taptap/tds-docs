@@ -1,5 +1,5 @@
 ---
-title: LeanCache 使用指南
+title: LeanCache Guide
 sidebar_label: LeanCache
 sidebar_position: 1
 ---
@@ -10,12 +10,12 @@ import LeandbCreateInstance from "../_partials/leandb-create-instance.mdx";
 import TabItem from "@theme/TabItem";
 import Path from "/src/docComponents/path";
 
-LeanCache 是云引擎提供的托管 Redis，开发者可以在云引擎中使用 Redis 客户端类库连接，访问完整的 Redis 功能，更多其他托管数据库请查看 [云引擎服务总览](/sdk/engine/overview)。
+LeanCache is the hosted Redis provided by Cloud Engine. You can have your project connect to the database using Redis libraries and have access to all the functions provided by Redis. See [Cloud Engine Overview](/sdk/engine/overview) to learn about the other hosted database services provided by Cloud Engine.
 
-LeanCache 使用 [Redis](https://redis.io/) 提供了高性能、高可用的 Key-Value 内存存储，主要用作缓存数据的存储，也可以用作持久化数据的存储。LeanCache 采用主从架构的 **高可用** 配置，通过 AOF 和 RDB 进行数据的持久化，还提供了在不中断服务的情况下在线扩容的能力。
+Based on [Redis](https://redis.io/), LeanCache provides in-memory key-value storage with high performance and high availability, allowing you to use it as cache or persistent storage for your application. You can upgrade the space of your storage at any time without interrupting the service.
 
 <details>
-<summary>点击展开 LeanCache 的使用场景</summary>
+<summary>LeanCache’s use cases</summary>
 
 - 某些数据量少，但是读写比例很高，比如某些应用的菜单可以通过后台调整，所有用户会频繁读取该信息。
 - 需要同步锁或者队列处理，比如秒杀、抢红包等场景。
@@ -31,7 +31,7 @@ LeanCache 使用 [Redis](https://redis.io/) 提供了高性能、高可用的 Ke
 </details>
 
 <details>
-<summary>点击展开 LeanCache 高可用详情</summary>
+<summary>More about LeanCache’s high availability</summary>
 
 每个 LeanCache 实例使用 Redis Master-Slave 主从热备，其下的多个观察节点每隔 1 秒钟观察一次主节点的状态。如果「主节点」最后一次有效响应在 5 秒之前，则该观察节点认为主节点失效。如果超过总数一半的观察节点发现主节点失效，则自动将「从节点」切换为主节点，并会有新的从节点启动重新组成主从热备。这个过程对应用完全透明，不需要修改连接字符串或者重启，整个切换过程应用只有几秒钟会出现访问中断。
 
@@ -41,59 +41,59 @@ LeanCache 使用 [Redis](https://redis.io/) 提供了高性能、高可用的 Ke
 
 </details>
 
-## 创建和管理实例
+## Creating and Managing Instances
 
-开发者可以在 **<Path to="engine" /> > LeanCache (Redis)** 页面创建和管理 LeanCache 实例。
+You can create and manage LeanCache instances on **<Path to="engine" /> > LeanCache (Redis)**.
 
-### 创建实例
+### Creating Instances
 
 <LeandbCreateInstance instanceName='LeanCache'>
 
-- **实例名称** 用于在云引擎中通过环境变量引用到该 LeanDB 实例，在账户下需唯一。
-- **数据删除策略** 内存用满时的删除策略，默认为 `volatile-lru`，详见 [数据删除策略](#数据删除策略)。
-- **实例容量** 目前提供 `128M`、`256M`、`512M`、`1G`、`2G`、`4G`、`8G` 几种，代表不同的内存容量，是计费的基础。
+- **Name** Used to access this instance from Cloud Engine. Should be unique in the application.
+- **Cache eviction strategy** The strategy for deleting data when the memory gets full. Defaults to `volatile-lru`. See [Cache Eviction Strategy](#cache-eviction-strategy) for more information.
+- **Instance capacity** You can choose from `128M`, `256M`, `512M`, `1G`, `2G`, `4G`, and `8G`.
 
 </LeandbCreateInstance>
 
-### 数据删除策略
+### Cache Eviction Strategy
 
-详见 [官方文档](https://redis.io/docs/manual/eviction/#eviction-policies)，下面是一个简单的概括：
+See Redis’s [official docs](https://redis.io/docs/manual/eviction/#eviction-policies) for more information. Below is a quick summary:
 
-- `noeviction` 不删除，当内存满时，直接返回错误。
-- `allkeys-lru` 优先删除最近最少使用的 key，以释放内存。
-- `volatile-lru` 优先删除设定了过期时间的 key 中最近最少使用的 key，以释放内存。
-- `allkeys-random` 随机删除一个 key，以释放内存。
-- `volatile-random` 从设定了过期时间的 key 中随机删除一个，以释放内存。
-- `volatile-ttl` 从设定了过期时间的 key 中删除最老的 key，以释放内存。
+- `noeviction` Don’t delete any data and return an error when the memory is full.
+- `allkeys-lru` Delete the least recently used key first.
+- `volatile-lru` Delete the least recently used key that has an expiration date first.
+- `allkeys-random` Delete a random key.
+- `volatile-random` Delete a random key that has an expiration date.
+- `volatile-ttl` Delete the oldest key that has an expiration date.
 
-### Redis 版本
+### Redis Version
 
-目前 LeanCache 仅提供 Redis 6 版本。
+LeanCache only provides Redis 6 at this time.
 
-### 在线扩容
+### Resizing Online
 
-你可以在线扩大（或者缩小）LeanCache 实例的最大内存容量。整个过程可能会持续一段时间，在此期间 LeanCache 会中断几秒钟进行切换，其他时间都正常提供服务。如果你的应用访问量较大的话，LeanCache 中断的这几秒可能会对你的云引擎实例产生较为明显的影响（例如内存增加），可以考虑将扩容安排在低峰时刻。
+You can resize the maximum memory capacity of a LeanCache instance online. The operation may take a while and LeanCache may stop responding for a few seconds. If your application has a high traffic volume, this may impact your Cloud Engine instances (like increasing their memory usage). You can consider resizing your LeanCache instances when there is a low traffic volume.
 
 :::caution
-缩小容量之前，请务必确认现有数据体积小于目标容量，否则可能造成数据丢失。
+Make sure the size of data is smaller than the size you’re changing to, or the operation might cause data loss.
 :::
 
-### 管理共享
+### Sharing Instances
 
-可以使用控制台上的「管理共享」功能将 LeanCache 实例共享给其他应用，被共享的应用的 LeanCache 页面可能看到这个实例，相关的环境变量也会出现在其他应用的云引擎中。
+You can use the “Manage sharing” function to share your LeanCache instances with other applications. When you share an instance with another application, the instance will appear in this application. The relevant environment variables will also be available in this application’s Cloud Engine instances.
 
-## 在云引擎中使用
+## Accessing From Cloud Engine
 
-LeanDB 所在的应用的云引擎在部署时，会被注入几个包含 Redis 连接信息的环境变量，包括：
+When you deploy a project to the Cloud Engine instances under an application, some environment variables containing information for connecting to Redis will be injected, including:
 
 - `REDIS_URL_<NAME>`
 
-其中 `<NAME>` 是你在创建 LeanDB 时为它指定的名字，如果你的 LeanDB 名为 `MYRDB` 的话，就会有名为 `REDIS_URL_MYRDB` 的环境变量。
+Here `<NAME>` is the name you provided when creating your LeanDB instance. If the name of your LeanDB instance is `MYRDB`, there will be an environment variable named `REDIS_URL_MYRDB`.
 
 <EngineRuntimes>
 <TabItem value='nodejs'>
 
-首先添加相关依赖到云引擎应用中：
+Add dependencies to your project:
 
 ```json
 "dependencies": {
@@ -101,7 +101,7 @@ LeanDB 所在的应用的云引擎在部署时，会被注入几个包含 Redis 
 }
 ```
 
-然后可以使用下列代码获取 Redis 连接：（假定实例名称为 `MYCACHE`）
+Get the Redis connection with the code below: (assuming the instance name is `MYCACHE`)
 
 ```js
 const Redis = require("ioredis");
@@ -115,7 +115,7 @@ client.on("error", function (err) {
 </TabItem>
 <TabItem value='python'>
 
-首先添加相关依赖到云引擎应用的 `requirements.txt` 中：
+Add dependencies to the `requirements.txt` of your project:
 
 ```
 Flask>=0.10.1
@@ -124,7 +124,7 @@ leancloud-sdk>=1.0.9
 redis
 ```
 
-然后可以使用下列代码获取 Redis 连接：（假定实例名称为 `MYCACHE`）
+Get the Redis connection with the code below: (assuming the instance name is `MYCACHE`)
 
 ```python
 import os
@@ -136,13 +136,13 @@ r = redis.from_url(os.environ.get("REDIS_URL_MYCACHE"))
 </TabItem>
 <TabItem value='php'>
 
-首先添加 redis 库的依赖，比如 predis：
+Add a dependency for Redis, like `predis`;
 
 ```sh
 composer require 'predis/predis:1.1.*'
 ```
 
-然后在 PHP 应用中通过环境变量获取 Redis 地址并创建链接，如：（假定实例名称为 `MYCACHE`）
+Get the address for the Redis connection and create a connection with the code below: (assuming the instance name is `MYCACHE`)
 
 ```php
 use Predis;
@@ -153,7 +153,7 @@ $redis->ping();
 </TabItem>
 <TabItem value='java'>
 
-在 `pom.xml` 中添加 redis client 的依赖：
+Add a dependency for Redis client in `pom.xml`:
 
 ```xml
 <dependency>
@@ -163,13 +163,13 @@ $redis->ping();
 </dependency>
 ```
 
-并引入依赖：
+Import the dependency:
 
 ```java
 import redis.clients.jedis.Jedis;
 ```
 
-从环境变量中获取链接字符串，然后再创建 redis client 实例即可。（假定实例名称为 `MYCACHE`）
+Get the address for the Redis connection and create a Redis client instance. (assuming the instance name is `MYCACHE`)
 
 ```java
 String redisUrl = System.getenv("REDIS_URL_MYCACHE");
@@ -179,25 +179,25 @@ String value = jedis.get("foo");
 jedis.close();
 ```
 
-并发请求较高的情况下可以考虑使用连接池：
+Consider using a connection pool when there is high traffic:
 
 ```java
 public class RedisHelper {
     private final JedisPool jedisPool;
     public RedisHelper() {
-        // 创建应用时，先创建连接池；使用默认配置
+        // Create a connection pool first when creating the application; use the default configuration
         jedisPool = new JedisPool(System.getenv("REDIS_URL_jedis_128m"));
     }
 
-    // 使用；从连接池取出一个 jedis 连接使用
-    // 注意，使用完了之后，要调用返回的 jedis 对象的 close 方法返还连接。`jedis.close()`
+    // Get a jedis connection from the pool
+    // Make sure to return the connection by calling the `close` method of the jedis object returned: `jedis.close()`
     public Jedis getJedis() {
         Jedis jedis = jedisPool.getResource();
         return jedis;
     }
 
     public void closePool() {
-        // 关闭应用时关闭连接池
+        // Close the pool when closing the application
         jedisPool.close();
     }
 }
@@ -206,22 +206,22 @@ public class RedisHelper {
 </TabItem>
 <TabItem value='dotnet'>
 
-首先在项目里面安装 nuget 依赖：
+Install nuget into your project:
 
 ```sh
 dotnet add LeanCloud.Engine.Middleware.AspNetCore
 ```
 
-直接使用 [StackExchange.Redis](https://stackexchange.github.io/StackExchange.Redis/) 里面构建的方式。
+We will use the method mentioned in [StackExchange.Redis](https://stackexchange.github.io/StackExchange.Redis/).
 
-假设在控制台创建了一个名字叫做 `dev` LeanCache 实例，如下代码将演示如何连接这个实例，并且存储、读取数据：
+Assuming there’s a LeanCache instance named `dev`, the code below will show how you can have your application connect to this instance, store data, and read data:
 
 ```cs
-// 获取 dev 实例
+// Get the dev instance
 var leancache = new LeanCache("dev");
-// 获取 dev 的配置
+// Get dev’s configurations
 var redisConfiguration = leancache.CurrentConfigurations;
-// 构建 StackExchange.Redis.ConfigurationOptions
+// Construct StackExchange.Redis.ConfigurationOptions
 ConfigurationOptions config = new ConfigurationOptions
 {
     ServiceName = this.InstanceName,
@@ -238,49 +238,49 @@ ConfigurationOptions config = new ConfigurationOptions
     AbortOnConnectFail = false,
     ConnectRetry = 3,
 };
-// 直接连接
+// Connect
 var conn = ConnectionMultiplexer.Connect(config);
 IDatabase db = conn.GetDatabase();
 db.StringSet("foo", "bar");
 var bar = db.StringGet("foo");
 ```
 
-关于 `IConnectionMultiplexer` 的用法和相关文档请参阅：[StackExchange.Redis](https://stackexchange.github.io/StackExchange.Redis/)，这个库是 .NET Core 环境中比较推荐的 Redis Client。
+See [StackExchange.Redis](https://stackexchange.github.io/StackExchange.Redis/) for more information about the usage of `IConnectionMultiplexer`. This is a recommended library for .NET Core.
 
 </TabItem>
 </EngineRuntimes>
 
-## 管理数据
+## Managing Data
 
-除了在云引擎中通过编程的方式访问 LeanDB，我们还提供了用于进行管理、调试或一次性数据操作的方式。
+Besides accessing LeanDB with your code from Cloud Engine, you can also use the following ways to manage, debug, or perform operations on your instances.
 
-### 使用命令行工具连接
+### Connecting With the CLI
 
 <LeandbCliAccess />
 
-## 常见问题
+## FAQ
 
-### 在本地调试依赖 LeanCache 的应用
+### How to locally debug a project that depends on LeanCache?
 
-你可以 [使用命令行工具连接](#使用命令行工具连接) 云端的 LeanCache 进行调试，或在本地安装 Redis:
+You can connect to LeanCache [using the CLI](#connecting-with-the-cli) or install Redis locally:
 
-- Mac 上运行 `brew install redis` 来安装 Redis，然后使用 `redis-server` 启动服务。
-- Debian/Ubuntu 上运行 `apt-get install redis-server`
-- CentOS/RHEL 运行 `yum install redis`
-- Windows 尚无官方支持，可以下载 [微软的分支版本](https://github.com/microsoftarchive/redis/releases) 安装包。
+- For Mac, install Redis by running `brew install redis`, then start the service using `redis-server`
+- For Debian/Ubuntu, run `apt-get install redis-server`
+- For CentOS/RHEL, run `yum install redis`
+- There’s no official support for Windows yet, but you can download the installer for [Microsoft’s distribution](https://github.com/microsoftarchive/redis/releases).
 
-默认情况下，在本地运行时程序没有 LeanCache 的环境变量，因此会使用本地的 Redis 服务器地址。
+By default, environment variables relevant to LeanCache are not available when you run your project locally. The local Redis server’s address will be used.
 
 ```js
-// 在本地 process.env['REDIS_URL_<实例名称>'] 为 undefined，会连接默认的 127.0.0.1:6379
-const client = new Redis(process.env["REDIS_URL_MYCACHE"]); // 假定实例名称为 MYCACHE
+// process.env['REDIS_URL_<instance name>'] will be `undefined` when running locally; the default address, 127.0.0.1:6379, will be connected
+const client = new Redis(process.env["REDIS_URL_MYCACHE"]); // Assuming the instance name is `MYCACHE`
 ```
 
-如果部署到预备或生产环境时遇到类似 `redis err: Error: Redis connection to 127.0.0.1:6379 failed - connect ECONNREFUSED 127.0.0.1:6379` 错误，请核实以上代码中 `REDIS_URL_<实例名称>` 这个环境变量的值是否替换正确，也可参考 [在云引擎中使用（Node.js 环境）](#在云引擎中使用) 的示例。
+If you see an error like `redis err: Error: Redis connection to 127.0.0.1:6379 failed - connect ECONNREFUSED 127.0.0.1:6379`, please check if the value in the `REDIS_URL_<instance name>` in the example above is replaced correctly. Please also take a look at the examples under [Accessing From Cloud Engine (Node.js runtime environment)](#accessing-from-cloud-engine).
 
-更详细的 Redis 操作说明请参考 [Redis 官方文档](https://redis.io/docs/)。
+See [Redis’s docs](https://redis.io/docs/) for more information about how to use Redis.
 
-### 与自建的 HashTable 相比较，LeanCache 有什么优势？
+### Compared to a self-built HashTable, what’s the benefit of LeanCache?
 
 与自己在程序的全局作用域中维护一个 HashTable 相比，使用 LeanCache 的优势在于：
 
@@ -288,13 +288,13 @@ const client = new Redis(process.env["REDIS_URL_MYCACHE"]); // 假定实例名�
 - **数据持久化存储**：在程序重启或重新部署后数据不会丢失，Redis 会帮你完成数据持久化的工作。LeanCache 还会为你的 Redis 做热备，具有非常高的可靠性。
 - **原子操作和性能**：Redis 提供了常见的数据结构和大量原子操作，其文档中列出了每个操作符的时间复杂度，而自行实现的 HashTable 的性能则很大程度依赖于具体语言的实现。
 
-### 报错：Redis connection gone from end event
+### I’m seeing the error `Redis connection gone from end event`
 
 LeanCache 或者任何网络程序都有可能出现连接闪断的问题，可能是因为网络波动，或是服务器负载、容量调整等等。这时只需要重建连接即可使用。而 Redis Client 一般都有断开重连的机制，未连接期间指令会保存到队列，待连接成功后再发送队列中的指令（[Redis client library](https://www.npmjs.com/package/redis) 便是如此实现）。所以如果这个错误<u>偶尔发生</u>，一般不会有什么问题；同时建议在应用中 [增加 Redis 的 on error 事件处理](#在云引擎中使用)。
 
 如果这个错误**频繁出现**，那么很可能 LeanCache 节点处于非受控状态，请提交工单联系技术支持进行处理。
 
-### 多实例
+### Using Multiple Instances
 
 有些时候，你可能希望在一个应用里创建多个 LeanCache 实例：
 
