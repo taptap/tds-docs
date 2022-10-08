@@ -27,7 +27,6 @@ import AndroidFaq from "../_partials/android-package-visibility.mdx";
 | 游戏方校验Web | /api/v1.0/cdk/page/submit-check  | ✓                              | ✓                        |
 | 游戏方发送Web | /api/v1.0/cdk/page/submit-send   | ✗                              | ✓                        |
 
-
 ### 接入顺序
 - 完成应用配置获取 **Client ID 和 Server Secret** 信息。
 - 进入 **运营工具-礼包系统-服务器配置** 选择性填写游戏方服务器信息并在其中配置发送通知接收地址用来发送相应道具。
@@ -50,6 +49,11 @@ import AndroidFaq from "../_partials/android-package-visibility.mdx";
 | 游戏方校验   | 如果您将使用服务器对接兑换系统，可以安全的保存密钥信息，并希望每次兑换时能通过您的应用程序来校验是否允许兑换，调用您的接口来发送道具，请使用此流程。 |
 | 游戏方发送   | 如果您将使用服务器对接兑换系统，可以安全的保存密钥信息，并希望调用您的应用程序接口来发送每次兑换的道具，请使用此流程。 |
 | 无服务器兑换 | 如果您希望不开发接口完成兑换流程，调用兑换接口后根据返回值来判断是否兑换失败，请使用此流程。 |
+
+### 三种兑换泳道图
+![游戏方校验泳道图](/img/tds-gift/submit_check.png)
+![游戏方发送泳道图](/img/tds-gift/submit_send.png)
+![无服务器兑换泳道图](/img/tds-gift/submit_simple.png)
 
 ## 对接兑换接口
 ### 游戏方二次校验规范
@@ -77,6 +81,8 @@ curl --location -g --request POST <后台配置的游戏方二次校验接口地
 	"error_code": "字符串类型的错误code"
 }
 ```
+如果您并不要求兑换系统知晓兑换的错误信息可以直接返回** 非200 http code **表示兑换失败，或者返回 **http code 200** 表示兑换成功。
+这样就无需按兑换系统的格式来返回信息。
 
 | 请求参数          | 类型           | 含义                 |
 | ----------------- | -------------- | -------------------- |
@@ -115,6 +121,8 @@ curl --location -g --request POST <后台配置的游戏方发送道具接口地
     "errorCode": "字符串类型的错误code"
 }
 ```
+如果您并不要求兑换系统知晓兑换的错误信息可以直接返回** 非200 http code **表示兑换失败，或者返回 **http code 200** 表示兑换成功。
+这样就无需按兑换系统的格式来返回信息。
 
 | 请求参数       | 类型           | 含义                         |
 | -------------- | -------------- | ---------------------------- |
@@ -156,7 +164,6 @@ curl --location -g --request POST <后台配置的游戏方发送道具接口地
 | server_code  | 字符串 | 必传     | 后台配置的服务器 code                             |
 | character_id | 字符串 | 必传     | 游戏用户 ID                                       |
 | nonce_str    | 字符串 | 必传     | 随机字符串，建议五位随机字符串                    |
-| lang         | 字符串 | 非必传   | 用于部分报错时使用，默认 cn 中文也可以传en        |
 | sign         | 字符串 | 必传     | 签名                                              |
 | timestamp    | 数字   | 必传     | 时间戳，单位为秒，有效期为一分钟                  |
 | ext          | 字符串 | 非必传   | 该字段会原封不动出现在 ext 中传给游戏二次校验接口 |
@@ -165,7 +172,7 @@ curl --location -g --request POST <后台配置的游戏方发送道具接口地
 ```
 curl --location --request POST '<URL>/api/v1.0/cdk/game/submit-check' \
 --header 'Content-Type: application/json' \
---data-raw '{"client_id":<后台ClientId>,"gift_code":<这次使用的兑换码>,"server_code":<服务器code>,"character_id":<游戏用户ID>,"nonce_str":<随机字符串>,"sign":<签名>,"timestamp":<时间戳>,"ext": <透传字段>,"lang": <报错语言>}'
+--data-raw '{"client_id":<后台ClientId>,"gift_code":<这次使用的兑换码>,"server_code":<服务器code>,"character_id":<游戏用户ID>,"nonce_str":<随机字符串>,"sign":<签名>,"timestamp":<时间戳>,"ext": <透传字段>}'
 ```
 
 #### 无二次校验兑换接口
@@ -181,7 +188,6 @@ curl --location --request POST '<URL>/api/v1.0/cdk/game/submit-check' \
 | server_code  | 字符串 | 必传     | 后台配置的服务器 code                             |
 | character_id | 字符串 | 必传     | 游戏用户 ID                                       |
 | nonce_str    | 字符串 | 必传     | 随机字符串，建议五位随机字符串                    |
-| lang         | 字符串 | 非必传   | 用于部分报错时使用，默认 cn 中文也可以传en        |
 | sign         | 字符串 | 必传     | 签名                                              |
 | timestamp    | 数字   | 必传     | 时间戳，单位为秒，有效期为一分钟                  |
 
@@ -189,7 +195,7 @@ curl --location --request POST '<URL>/api/v1.0/cdk/game/submit-check' \
 ```
 curl --location --request POST '<URL>/api/v1.0/cdk/game/submit-send' \
 --header 'Content-Type: application/json' \
---data-raw '{"client_id":<后台ClientId>,"gift_code":<这次使用的兑换码>,"server_code":<服务器code>,"character_id":<游戏用户ID>,"nonce_str":<随机字符串>,"sign":<签名>,"timestamp":<时间戳>,"ext": <透传字段>,"lang": <报错语言>}'
+--data-raw '{"client_id":<后台ClientId>,"gift_code":<这次使用的兑换码>,"server_code":<服务器code>,"character_id":<游戏用户ID>,"nonce_str":<随机字符串>,"sign":<签名>,"timestamp":<时间戳>,"ext": <透传字段>}'
 ```
 
 #### 无服务器兑换接口
@@ -204,7 +210,6 @@ curl --location --request POST '<URL>/api/v1.0/cdk/game/submit-send' \
 | gift_code    | 字符串 | 必传     | 这次兑换的兑换码                           |
 | character_id | 字符串 | 必传     | 游戏用户 ID                                |
 | nonce_str    | 字符串 | 必传     | 随机字符串，建议五位随机字符串             |
-| lang         | 字符串 | 非必传   | 用于部分报错时使用，默认 cn 中文也可以传en |
 | sign         | 字符串 | 必传     | 签名，该签名用 ClientId 代替 Secret        |
 
 返回参数：
@@ -218,13 +223,14 @@ curl --location --request POST '<URL>/api/v1.0/cdk/game/submit-send' \
 | content.name   | 字符串         | 奖品名称                         |
 | content.number | 数字           | 奖品数量                         |
 | sign           | 字符串         | 返回签名，验证返回数据没有被修改 |
+| success        | 布尔          | 是否成功                     |
 
 请求示例：
 
 ```
 curl --location --request POST '<URL>/api/v1.0/cdk/game/submit-simple' \
 --header 'Content-Type: application/json' \
---data-raw '{"client_id":<后台ClientId>,"gift_code":<这次使用的兑换码>,"character_id":<游戏用户ID>,"nonce_str":<随机字符串>,"sign":<签名>,"timestamp":<时间戳>,"lang": <报错语言>}'
+--data-raw '{"client_id":<后台ClientId>,"gift_code":<这次使用的兑换码>,"character_id":<游戏用户ID>,"nonce_str":<随机字符串>,"sign":<签名>,"timestamp":<时间戳>}'
 ```
 
 返回示例：
@@ -234,7 +240,8 @@ curl --location --request POST '<URL>/api/v1.0/cdk/game/submit-simple' \
     "content": "[{\"name\": \"奖品\", \"number\": 2}]",
     "nonce_str": "0DD4B",
     "sign": "5895f87d3dfb5e0918c1b195c015d9284609d122",
-    "timestamp": 1664354023
+    "timestamp": 1664354023,
+    "success": true
 }
 ```
 #### 返回格式
@@ -341,7 +348,6 @@ sign == sha1(timestamp + nonce_str + client_id)
 | server_code         | 字符串 | 必传     | 后台配置的服务器 code                             |
 | character_id        | 字符串 | 必传     | 游戏用户 ID                                       |
 | nonce_str           | 字符串 | 必传     | 随机字符串，建议五位随机字符串                    |
-| lang                | 字符串 | 非必传   | 用于部分报错时使用，默认 cn 中文也可以传en        |
 | verify_captcha_key  | 字符串 | 必传     | 验证码 KEY                                        |
 | verify_captcha_code | 字符串 | 必传     | 用户提交的验证码答案                              |
 | ext                 | 字符串 | 非必传   | 该字段会原封不动出现在 ext 中传给游戏二次校验接口 |
@@ -361,7 +367,6 @@ sign == sha1(timestamp + nonce_str + client_id)
 | server_code         | 字符串 | 必传     | 后台配置的服务器 code                             |
 | character_id        | 字符串 | 必传     | 游戏用户 ID                                       |
 | nonce_str           | 字符串 | 必传     | 随机字符串，建议五位随机字符串                    |
-| lang                | 字符串 | 非必传   | 用于部分报错时使用，默认 cn 中文也可以传en        |
 | verify_captcha_key  | 字符串 | 必传     | 验证码 KEY                                        |
 | verify_captcha_code | 字符串 | 必传     | 用户提交的验证码答案                              |
 
