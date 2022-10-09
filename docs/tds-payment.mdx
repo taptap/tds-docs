@@ -31,7 +31,7 @@ TapPayment 是一项可让您在游戏中销售虚拟产品的服务。
 * TapTap.Bootstrap
 * TapTap.Common
 
-[入门指南 - 项目配置](/sdk/start/quickstart.mdx)
+接入方式参考 [入门指南 - 项目配置](/sdk/start/quickstart.mdx)。
 ## Unity SDK 开发指南
 
 ### 命名空间
@@ -105,7 +105,7 @@ TapPayment.QueryProduct(skuId, (skuDetail, error) =>
 
 | Parameters  | type  | Description |
 |------------- |---------------| -------------|
-| goodsOpenId | string | DC 后台配置的商品 ID |
+| goodsOpenId | string | 开发者中心后台定义的商品 ID |
 | goodsType | int | 1：消耗型；2：非消耗型 |
 | goodsConfig | object | 详见「商品配置」|
 | goodsPrice | object | 详见「价格配置」|
@@ -114,17 +114,17 @@ TapPayment.QueryProduct(skuId, (skuDetail, error) =>
 
 | Parameters  | type  | Description |
 |------------- |---------------| -------------|
-| languageId | string | DC 后台创建商品时配置的「语言 ID」，例如 "zh_CN" |
-| goodsName | string | DC 后台创建商品时配置的「商品名称」|
-| goodsDescription | string | DC 后台创建商品时配置的「商品名称」|
+| languageId | string | 开发者中心后台创建商品时配置的「语言 ID」，例如 "zh_CN" |
+| goodsName | string | 开发者中心后台创建商品时配置的「商品名称」|
+| goodsDescription | string | 开发者中心后台创建商品时配置的「商品名称」|
 
 价格配置定义：
 
 | Parameters  | type  | Description |
 |------------- |---------------| -------------|
-| regionId | string | 国内 DC 后台的地区 ID，默认是 "CN" |
-| goodsPriceAmount   | string  | DC 后台创建商品时配置的「商品价格」|
-| goodsPriceCurrency | string | 国内 DC 后台的默认货币「元」|
+| regionId | string | 国内开发者中心后台的地区 ID，默认是 "CN" |
+| goodsPriceAmount   | string  | 开发者中心后台创建商品时配置的「商品价格」|
+| goodsPriceCurrency | string | 国内开发者中心后台的默认货币「元」|
 
 错误码信息：
 
@@ -220,7 +220,7 @@ responseCode 的定义:
 
 ### Webhook 说明
 
-Webhook 用于支付到账后 TapPayment 通知游戏方发放商品，游戏方需要在游戏服务器上设置Webhook，并在 DC 后台上配置好 Webhook 的 URL。游戏收到 Webhook 通知后，即可认为支付成功到账，可以发放商品，同时返回 200 状态码，如果返回其它的状态的话，则认为支付失败，TapPayment 将会重复调用 Webhook 最多 10 次。
+Webhook 用于支付到账后 TapPayment 通知游戏方发放商品，游戏方需要在游戏服务器上设置Webhook，并在开发者中心后台配置好 Webhook 的 URL。游戏收到 Webhook 通知后，即可认为支付成功到账，可以发放商品，同时返回 200 状态码，如果返回其它的状态的话，则认为支付失败，TapPayment 将会重复调用 Webhook 最多 10 次。
 
 ### Webhook 内容
 
@@ -248,7 +248,8 @@ Webhook 的内容格式为 json，具体格式如下：
 游戏方成功处理 Webhook 调用后，需要给 TapPayment 返回 200 状态码，并且返回结果为 `success` 的字符串，否则 TapPayment 将认为调用失败而重试。
 
 ### Webhook 验签
-Webhook 使用 HmacSHA256 算法验签，使用的 secret 需要使用前在 DC 后台设置 token，如果没有设置，Webhook 不会被调用。Webhook 的签名验证过程中，需要先将 json 中所有 field 按照字母顺序排序，然后将排序后的 field 按照 `key=value` 的格式组合成字符串，类似 `a=v1&b=v2` 的形式，最后将组合后的字符串后使用 DC 设置好的 token 用 HmacSHA256 算法进行签名，最后将签名结果作为 Webhook 的 signature 字段返回，最后的 16 进制结果全部小写。
+
+Webhook 使用 HmacSHA256 算法验签，使用的 secret 使用前需在开发者中心后台设置 token，如果没有设置 Webhook 不会被调用。Webhook 的签名验证过程中，需要先将 json 中所有 field 按照字母顺序排序，然后将排序后的 field 按照 `key=value` 的格式组合成字符串，类似 `a=v1&b=v2` 的形式，最后将组合后的字符串后使用开发者中心后台设置好的 token 用 HmacSHA256 算法进行签名，最后将签名结果作为 Webhook 的 signature 字段返回，最后的 16 进制结果全部小写。
 
 <MultiLang>
 
