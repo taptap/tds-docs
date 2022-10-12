@@ -18,9 +18,52 @@ import Profiles from "../../_partials/tap-login-profile.mdx";
 
 </Conditional>
 
+## 环境要求
+
+<MultiLang kind="ue">
+
+<>
+
+- Unity 2019.4 或更高版本
+- iOS 10 或更高版本
+- Android 5.0（API level 21）或更高版本
+
+</>
+
+<>
+
+Android 5.0（API level 21）或更高版本
+
+</>
+
+<>
+
+iOS 10 或更高版本
+
+</>
+
+<>
+
+- 安装 UE 4.26 及以上版本
+- iOS 12 或更高版本
+- Android 5.0（API level 21）或更高版本
+- macOS 10.14.0 或更高版本
+- Windows 7 或更高版本
+
+**支持平台**：Android / iOS / Windows / macOS
+
+</>
+
+</MultiLang>
+
+
 ## SDK 获取
 
 单纯接入「TapTap 登录」，需要依赖 `TapLogin` 和 `TapCommon` 模块。请先 [下载](/tap-download) TapSDK，并添加相关依赖。
+
+<MultiLang kind="ue">
+
+<>
 
 如果使用 TapSDK Unity v3.7.1 及更高版本，还需要在项目的 `Packages/manifest.json` 文件中添加以下依赖：
 
@@ -30,7 +73,81 @@ import Profiles from "../../_partials/tap-login-profile.mdx";
 }`}
 </CodeBlock>
 
-iOS SDK 及 Android SDK 不需要额外增加依赖。
+</>
+
+<>
+Android SDK 不需要额外增加依赖。
+</>
+
+<>
+iOS SDK 不需要额外增加依赖。
+</>
+
+<>
+
+#### 安装插件
+
+* 下载 [TapSDK UE4](/tap-download)，TapSDK-UE4-xxx.zip 解压后将 `TapLogin`、`TapCommon` 文件夹 Copy 到项目的 `Plugins` 目录中
+* 重启 Unreal Editor
+* 打开 编辑 > 插件 > 项目 > TapTap，开启 `TapLogin` 模块
+
+#### 添加依赖
+
+在 Project.Build.cs 中添加所需模块:
+
+```cs
+PublicDependencyModuleNames.AddRange(new string[] { "Core",
+	"CoreUObject",
+	"Engine",
+	"Json",
+	"InputCore",
+	"JsonUtilities",
+	"SlateCore",
+	"TapCommon",
+	"TapLogin"
+});
+```
+
+#### 导入头文件
+
+```cpp
+#include "TapUELogin.h"
+#include "TapUECommon.h"
+```
+
+<details>
+
+<summary>点击展开 iOS 配置</summary>
+
+在 项目设置 > Platform > iOS > Additional Plist data 中可以填入一个字符串，复制以下代码并且替换其中的 `ClientID` 以及授权文案。
+
+```xml
+<key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+            <key>CFBundleURLName</key>
+            <string>taptap</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <!-- 这里注意下，花括号需要去掉，最终是 ClientID 前拼接上 `tt` 的形式，例如：ttFwFdCxxxxxxxQDQwQN -->
+                <string>tt{ClientID}</string>
+            </array>
+        </dict>
+    </array>
+<key>LSApplicationQueriesSchemes</key>
+<array>
+    <string>tapiosdk</string>
+    <string>tapsdk</string>
+</array>
+```
+
+</details>
+
+</>
+
+</MultiLang>
 
 ## 初始化
 
@@ -48,7 +165,7 @@ iOS SDK 及 Android SDK 不需要额外增加依赖。
 
 </Conditional>
 
-<MultiLang>
+<MultiLang kind="ue">
 <>
 
 <Conditional region='cn'>
@@ -201,6 +318,24 @@ roundCorner | 是否为圆角
 
 </>
 
+<>
+
+```cpp
+FTULoginConfig Config;
+Config.ClientID = ClientID;
+Config.RegionType = RegionType;
+TapUELogin::Init(Config);
+```
+
+**参数说明**
+
+参数  | 描述
+| ------ | ------ |
+clientID | TapTap 开发者中心对应应用的 Client ID
+RegionType | 适用地区。适用于中国大陆为 `ERegionType::CN`，适用于其他国家或地区为 `ERegionType::Global` 
+
+</>
+
 
 </MultiLang>
 
@@ -210,7 +345,7 @@ roundCorner | 是否为圆角
 当用户启动游戏时，可以先检查[用户登录状态](#检查登录状态和用户信息)，如果玩家已经登录，则不显示登录按钮，让玩家直接进入游戏。
 :::
 
-<MultiLang>
+<MultiLang kind="ue">
 
 
 ```cs
@@ -286,6 +421,22 @@ if ([TapLoginHelper currentProfile]) {
 }
 ```
 
+```cpp
+// 权限参考 TUType::PermissionScope
+TapUELogin::Login({TUType::PermissionScope::Profile}, [](const TUAuthResult& Result) {
+    if (Result.GetType() == TUAuthResult::Success) {
+        // 登录成功
+        TSharedPtr<FTULoginProfileModel> Profile = TapUELogin::GetProfile();
+    }
+    else if (Result.GetType() == TUAuthResult::Cancel) {
+        // 登录取消
+    }
+    else {
+        // 登录失败
+    }
+});
+```
+
 </MultiLang>
 
 <Profiles />
@@ -298,7 +449,7 @@ if ([TapLoginHelper currentProfile]) {
 
 登录状态和用户信息存在本地缓存中，重新登录将会重置，登出将会清除。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 // 获取登录状态
@@ -353,11 +504,49 @@ TapLoginHelper.fetchProfileForCurrentAccessToken(new ApiCallback<Profile>() {
 [TapLoginHelper fetchProfileForCurrentAccessToken:^(TTSDKProfile *_Nonnull profile, NSError *_Nonnull error) {}];
 ```
 
+```cpp
+// 获取登录状态
+TSharedPtr<FTUAccessToken> AccessToken = TapUELogin::GetAccessToken();
+if (AccessToken.IsValid())
+{
+	// 已登录，直接进入游戏
+}
+else
+{
+	// 未登录
+}
+
+// 获取用户信息
+// 注意：如果登录的权限没有 TUType::Profile，那么获取不到用户信息
+TSharedPtr<FTULoginProfileModel> Profile = TapUELogin::GetProfile();
+if (Profile.IsValid())
+{
+	// 获取成功
+}
+else
+{
+	// 获取失败
+}
+
+// 获取实时更新的用户信息
+// 注意：如果登录的权限没有 TUType::Profile，那么获取不到用户信息
+TapUELogin::FetchProfile([](TSharedPtr<FTULoginProfileModel> ModelPtr, const FTUError& Error) {
+if (ModelPtr.IsValid())
+{
+	// 请求成功
+}
+else
+{
+	// 请求失败
+}
+});
+```
+
 </MultiLang>
 
 ## 登出
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 TapLogin.Logout();
@@ -371,17 +560,21 @@ TapLoginHelper.logout();
 [TapLoginHelper logout];
 ```
 
+```cpp
+TapUELogin::Logout();
+```
+
 </MultiLang>
 
 :::tip
 重要提示：在**测试登录功能前**务必完成 [配置签名证书](/sdk/start/quickstart/#配置签名证书) 和 [添加测试用户](/sdk/start/test-accounts/)，否则无法正常使用 TapTap 登录功能。
 :::
 
-## PC 登录配置
+## Unity PC 登录配置
 
 Unity SDK 自 3.5.2 起支持在 Windows、macOS 下让玩家扫码或跳转网页浏览器完成 TapTap 登录。
 
-SDK **默认支持扫码登录**，跳转浏览器登录需要[额外配置](/sdk/taptap-login/guide/start/#pc-登录配置)。
+SDK **默认支持扫码登录**，跳转浏览器登录需要[额外配置](/sdk/taptap-login/guide/start/#unity-pc-登录配置)。
 
 ## 升级到内建账户系统
 
