@@ -4,6 +4,10 @@ sidebar_label: 快速开始
 sidebar_position: 1
 ---
 
+import {CLI_BINARY} from "/src/constants/env.ts";
+import CodeBlock from "@theme/CodeBlock";
+import PlatformRuntimes from "../_partials/platform-runtimes.mdx";
+
 你可以下载我们针对 C++ 和游戏的示例项目：
 
 ```sh
@@ -34,3 +38,48 @@ $ nc 127.0.0.1 4000
 在这个游戏中，你需要向服务端发送下一个数字，但要跳过 3 的倍数或包含数字 3 的数字，如果输入错误会被断开连接。
 
 ## 部署到云引擎
+
+选择应用和分组：
+
+<CodeBlock className="sh">{`${CLI_BINARY} switch`}</CodeBlock>
+
+部署到生产环境：
+
+<CodeBlock className="sh">{`${CLI_BINARY} deploy --prod`}</CodeBlock>
+
+更多有关命令行工具和本地调试的内容请看 [云引擎命令行工具使用指南](/sdk/engine/cli/)。
+
+## 连接到云端游戏
+
+发请求获取连接地址（需要替换其中的 appId、分组名、生产环境或预备环境）：
+
+```
+$ curl -H 'X-LC-Id: SJjoXHWuhewHKV4Ojw' 'https://shared.cloud.tds1.tapapis.cn/1.1/engine/gateway/route?groupName=udp&prod=1'
+
+[
+  {
+    "name": "game",
+    "protocol": "tcp",
+    "publicPort": 19766,
+    "publicIp": "106.75.70.96"
+  }
+]
+```
+
+然后用 `nc` 连接即可：
+
+```
+$ nc 106.75.70.96 19766
+```
+
+:::info
+每当云引擎实例部署、重启或被自动调度，IP 和端口都有可能发生变化，因此请在每次连接前都从服务器查询最新的 IP 和端口。
+:::
+
+## 更多
+
+接下来可以查看 [游戏后端参考架构](/sdk/engine/game/architecture) 来了解在云引擎上运行游戏后端的推荐架构，或者在 [游戏后端开发指南](/sdk/engine/game/guides) 中了解详细的接入方法。
+
+你还可以查看 [云引擎平台功能](/sdk/engine/deploy/platform) 来了解云引擎提供的更多功能，或查看专门的页面来了解具体运行环境的详情：
+
+<PlatformRuntimes />
