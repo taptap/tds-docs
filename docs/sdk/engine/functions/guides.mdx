@@ -234,7 +234,7 @@ def my_cloud_func(foo, bar, baz, **params):
 云函数中可以获取的参数和上下文信息有：
 
 - `@EngineFunctionParam`：客户端发送的参数。
-- `EngineRequestContext` 有关客户端的更多信息，其中 `EngineRequestContext.getSessionToken()` 会返回客户端所关联用户的 sessionToken（根据客户端发送的 `X-LC-Session` 头），`EngineRequestContext.getRemoteAddress()` 会返回客户端的实际地址。
+- `EngineRequestContext`：有关客户端的更多信息，其中 `EngineRequestContext.getSessionToken()` 会返回客户端所关联用户的 sessionToken（根据客户端发送的 `X-LC-Session` 头），`EngineRequestContext.getRemoteAddress()` 会返回客户端的实际地址。
 
 </TabItem>
 <TabItem value='dotnet'>
@@ -242,7 +242,7 @@ def my_cloud_func(foo, bar, baz, **params):
 云函数中可以获取的参数和上下文信息有：
 
 - `LCEngineFunctionParam`：客户端发送的参数。
-- `LCEngineRequestContext` 有关客户端的更多信息，其中 `LCEngineRequestContext.SessionToken` 会返回客户端所关联用户的 sessionToken（根据客户端发送的 `X-LC-Session` 头），`LCEngineRequestContext.RemoteAddress` 会返回客户端的实际地址。
+- `LCEngineRequestContext`：有关客户端的更多信息，其中 `LCEngineRequestContext.SessionToken` 会返回客户端所关联用户的 sessionToken（根据客户端发送的 `X-LC-Session` 头），`LCEngineRequestContext.RemoteAddress` 会返回客户端的实际地址。
 
 </TabItem>
 <TabItem value='go'>
@@ -1984,7 +1984,7 @@ Before 类 Hook 函数的超时时间为 10 秒，其他类 Hook 函数的超时
 
 在 **<Path to="engine" /> > 云引擎分组 > 部署 > 在线编辑** 标签页，可以：
 
-- **创建函数**：指定函数类型、函数名称、函数体的具体代码、注释等信息，点击「保存」即可创建一个云函数。函数类型包括 Function（普通云函数）、Hook、Global（这里可以定义多个云函数的公共逻辑）。
+- **创建函数**：指定函数类型、函数名称、函数体的具体代码、注释等信息，点击「创建」即可创建一个云函数。函数类型包括 Function（普通云函数）、Hook、Global（这里可以定义多个云函数的公共逻辑）。
 - **部署**：选择要部署的环境，点击「部署」即可看到部署过程和结果。
 - **预览**：会将所有函数汇总并生成一个完整的代码段，可以确认代码，或者将其保存为 `cloud.js` 覆盖项目模板的同名文件，即可快速地转换为使用项目部署。
 - **维护云函数**：可以编辑已有云函数，查看保存历史，以及删除云函数。
@@ -2044,7 +2044,7 @@ Before 类 Hook 函数的超时时间为 10 秒，其他类 Hook 函数的超时
 3. 运行 `lean up`，在 <http://localhost:3001> 的调试界面中测试云函数和 Hook，然后运行 `lean deploy` 部署代码到云引擎（使用标准实例的用户还需要执行 `lean publish`）。
 4. 部署后请留意云引擎控制台上是否有错误产生。
 
-如果在线编辑使用的是 0.x 版本 的 Node.js SDK，那么还需要修改不兼容的代码。
+如果在线编辑使用的是 0.x 版本的 Node.js SDK，那么还需要修改不兼容的代码。
 比如将 `AV.User.current()` 改为 `request.currentUser`。
 详见 [升级到云引擎 Node.js SDK 1.0](https://leancloud.cn/docs/leanengine-node-sdk-upgrade-1.html)。
 
@@ -2077,23 +2077,23 @@ Before 类 Hook 函数的超时时间为 10 秒，其他类 Hook 函数的超时
 
 ```cs
 LCCloud.IsProduction = true; // production (default)
-LCCloud.IsProduction = false; // stage
+LCCloud.IsProduction = false; // staging
 ```
 
 ```java
 LCCloud.setProductionMode(true); // production
-LCCloud.setProductionMode(false); // stage
+LCCloud.setProductionMode(false); // staging
 ```
 
 ```objc
 [LCCloud setProductionMode:YES]; // production (default)
-[LCCloud setProductionMode:NO]; // stage
+[LCCloud setProductionMode:NO]; // staging
 ```
 
 ```swift
 // production by default
 
-// stage
+// staging
 do {
     let environment: LCApplication.Environment = [.cloudEngineDevelopment]
     let configuration = LCApplication.Configuration(environment: environment)
@@ -2109,23 +2109,23 @@ do {
 
 ```dart
 LCCloud.setProduction(true); // production (default)
-LCCloud.setProduction(false); // stage
+LCCloud.setProduction(false); // staging
 ```
 
 ```js
 AV.setProduction(true); // production (default)
-AV.setProduction(false); // stage
+AV.setProduction(false); // staging
 ```
 
 ```python
 leancloud.use_production(True) # production (default)
-leancloud.use_production(False) # stage
+leancloud.use_production(False) # staging
 # 需要在 SDK 初始化语句 `leancloud.init` 之前调用
 ```
 
 ```php
 LeanClient::useProduction(true); // production (default)
-LeanClient::useProduction(false); // stage
+LeanClient::useProduction(false); // staging
 ```
 
 ```go
@@ -2215,7 +2215,7 @@ leancloud.Engine.Define("logTimer", func(req *FunctionRequest) (interface{}, err
 
 以 Cron 表达式为例，比如每周一早上 8 点打印日志（运行之前定义的 `logTimer` 函数），创建定时任务的时候，选择 **Cron 表达式** 并填入 `0 0 8 ? * MON`。
 
-Cron 表达式的语法可以参考 [云队列（Cloud Queue）开发指南 § CRON 表达式](/sdk/engine/functions/cloud-queue/#cron-表达式) 。
+Cron 表达式的语法可以参考 [云队列（Cloud Queue）开发指南 § CRON 表达式](/sdk/engine/functions/cloud-queue/#cron-表达式)。
 
 在配置定时任务时可以指定一些额外的非必填选项：
 

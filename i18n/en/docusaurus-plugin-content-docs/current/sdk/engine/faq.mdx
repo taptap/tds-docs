@@ -1,5 +1,5 @@
 ---
-title: 云引擎 FAQ
+title: Cloud Engine FAQ
 sidebar_label: FAQ
 sidebar_position: 8
 ---
@@ -7,229 +7,229 @@ sidebar_position: 8
 import { Conditional } from "/src/docComponents/conditional";
 import Path from "/src/docComponents/path";
 
-## 云引擎功能
+## Cloud Engine Features
 
-### 云引擎都支持哪些语言？
+### What are the languages supported by Cloud Engine?
 
-目前支持 Node.js、Python、Java、PHP、.NET、Go 运行环境，也支持基于 Node.js 的 Web 前端项目，详见 [云引擎服务总览](/sdk/engine/overview/)。
+The runtime environments supported by Cloud Engine include Node.js, Python, Java, PHP, .NET, and Go. Frontend projects based on Node.js can also be hosted on Cloud Engine. See [Cloud Engine Overview](/sdk/engine/overview/) for more information.
 
-如果你还需要其他运行环境的支持，欢迎向我们反馈。
+You can let us know if you wish other runtime environments to be supported.
 
-### 云引擎支持托管纯静态网站吗？
+### Can I host static websites on Cloud Engine?
 
-支持，请看 [云引擎 Web 前端应用运行环境](/sdk/engine/deploy/webapp/)。
+Yes. See [Frontend Runtime Environment](/sdk/engine/deploy/webapp/) for more information.
 
-### 云引擎支持 HTTPS 吗？
+### Does Cloud Engine support HTTPS?
 
-支持，在绑定自定义域名时可以上传 SSL 证书或自动管理证书。
+Yes. When binding a custom domain, you can choose to either upload your own SSL certificate or have Cloud Engine automatically manage certificates for your project.
 
-绑定自定义域名时还可以配置「强制 HTTPS」来实现自动跳转。
+You can also enable _Force HTTPS_ to have HTTP requests automatically redirected to HTTPS.
 
-### 部署更新云引擎会导致服务中断吗？
+### Would my application still be able to provide services while I’m deploying a new version of my project?
 
-服务不会中断。在代码部署时，系统会优先启动使用新版本代码的实例，待新实例通过了健康检查，系统修改路由将请求转发至新实例后，再关闭旧版本的实例，让服务保持零中断。
+Yes. When you deploy a new version of your project, Cloud Engine will first start new instances running the new version. After the new version passes the health check, Cloud Engine will update the router to redirect incoming requests to the new instances and then shut down the old ones. With this mechanism, your application can keep providing services while you deploy a new version.
 
-### 云引擎和云函数是什么关系？
+### What’s the relationship between Cloud Engine and Cloud Functions?
 
-云引擎是一个托管后端服务的平台，适用于所有的 Web 后端应用，对于程序内部的逻辑没有侵入。
+Cloud Engine is a platform for hosting backend services. It can be used to host all kinds of backend programs and it won’t interfere with the internal logic of the programs.
 
-在此基础上，开发者可以选择在程序内接入云引擎的 SDK，来使用云函数和 Hook 等功能，云函数与 <Conditional brand="tds">[数据存储](/sdk/storage/features)</Conditional><Conditional brand="leancloud">[数据存储](https://leancloud.cn/docs/storage_overview.html)</Conditional> 服务有深度的整合，对于已经在使用数据存储服务的开发会非常方便。
+On top of this, you can choose to integrate the Cloud Engine SDK into your program, which gives your program access to functions like Cloud Functions and hooks. Cloud Functions is designed to work perfectly with our <Conditional brand="tds">[Data Storage](/sdk/storage/features)</Conditional><Conditional brand="leancloud">[Data Storage](https://docs.leancloud.app/storage_overview.html)</Conditional> service. If you’re already using the Data Storage service, you’ll find it easy to get started with Cloud Functions.
 
-不接入云引擎 SDK 也可以使用云函数以外的所有功能，云引擎也提供了业界广泛使用的 [Redis](/sdk/engine/database/redis/)、[MongoDB](/sdk/engine/database/mongo/) 和 [Elasticsearch](/sdk/engine/database/es/) 供开发者存储数据。
+You can still use the other features besides Cloud Functions without integrating the Cloud Engine SDK into your program. In addition to the features mentioned above, Cloud Engine also provides hosted [Redis](/sdk/engine/database/redis/), [MongoDB](/sdk/engine/database/mongo/), and [Elasticsearch](/sdk/engine/database/es/) for you to store the data of your application.
 
-## 云函数
+## Cloud Functions
 
-### 云函数有哪些限制？
+### What are some restrictions with Cloud Functions?
 
-云函数是 <Conditional brand="tds">TDS</Conditional><Conditional brand="leancloud">LeanCloud</Conditional> 提供的一个 **相对受限** 的自定义服务器端逻辑的功能，和我们的 SDK 有比较 **深度的集成**。我们将云函数设计为一种类似 **RPC** 的机制，在云函数中你只能关注参数和结果，而不能自定义超时时间、HTTP method、URL，不能读取和设置 Header。
+Cloud Functions is a **relatively constrained** function that allows you to define server-side logics for your application. It is **highly integrated** into our SDK. Cloud Functions is designed as an **RPC**-like mechanism. When invoking a Cloud Function, you can only pass in arguments and receive a result from the function. You can’t customize timeouts, HTTP methods, or URLs for it, nor can you read and set the header.
 
-如果希望更加自由地使用这些 HTTP 的语义化功能，或者希望使用第三方的框架提供标准的 RESTful API，请在你的应用中自行来处理 HTTP 请求而不是使用云函数。
+To use the semantic functions of HTTP freely or to use the standard RESTful API provided by third-party frameworks, you can choose to have your application handle HTTP requests without using Cloud Functions.
 
-### 云函数可以同时存在于多个分组么？
+### Can I use Cloud Functions with multiple groups?
 
-云引擎会自动将一个应用下的云函数请求转发到正确的分组，因此你可以同时在多个分组下使用云函数。
+Cloud Engine will automatically redirect requests for invoking Cloud Functions to the correct groups. This means that you can use Cloud Functions with multiple groups.
 
-### 项目部署成功了，但云函数和 Hook 不可用？
+### I’ve finished deploying my project, but Cloud Functions and hooks still don’t work.
 
-为了支持云引擎的云函数和 Hook 功能，云引擎的管理程序会使用 `/1.1/functions/_ops/metadatas` 这个 URL 和 SDK 交互，请确保将这个 URL 交给 SDK 处理。
-默认情况下，云引擎会尝试从 `/1.1/functions/_ops/metadatas` 获取云函数和 Hook 的元信息，如果失败，则云函数和 Hook 功能不可用，但不会中断部署。
-如果希望在获取元信息失败后中断部署，可以在 `leanengine.yaml` 文件中指定 `functionsMode` 为 `strict`。
-如果应用不使用云函数和 Hook 功能，那么你可以：
+In order to support Cloud Functions and hooks, Cloud Engine’s management program will interact with the Cloud Engine SDK through `/1.1/functions/_ops/metadatas`. Please make sure to have the SDK take care of this URL.
+By default, Cloud Engine will try to get the metadata of Cloud Functions and hooks by accessing `/1.1/functions/_ops/metadatas`. If Cloud Engine fails to access this URL, your project’s Cloud Functions and hooks will not work, but the deployment won’t be interrupted.
+To interrupt the deployment if Cloud Engine fails to access the metadata, set `functionsMode` to `strict` in `leanengine.yaml`.
+If your project doesn’t need Cloud Functions or hooks, you can choose:
 
-- 在 `leanengine.yaml` 中不指定 `functionsMode`，同时 `/1.1/functions/_ops/metadatas` **返回一个 HTTP `404`** 表示不使用云函数和 Hook 相关的功能；
-- 或者在 `leanengine.yaml` 中指定 `functionsMode` 为 `disabled`。注意，这种情况下，即使应用代码中定义了云函数和 Hook，Hook 也不会生效，云函数调用（通过 SDK 发起远程调用或通过 REST API 向 API 域名发起云函数调用）有可能因为被转发到错误的云引擎分组而失败。
+- Not to specify `functionsMode` in `leanengine.yaml`. At the same time, let `/1.1/functions/_ops/metadatas` **return an HTTP status code of `404`**, which indicates that Cloud Functions and hooks are not used by the project.
+- Or, to set `functionsMode` to `disabled` in `leanengine.yaml`. Keep in mind that if you do this, hooks will not take effect even though you define them in your program. Invocations to Cloud Functions (including the remote ones triggered by the SDK and those triggered through the REST API) may fail for being redirected to the wrong groups.
 
-### 部署中断，提示有同名云函数怎么办？
+### The deployment is interrupted, saying that there’s a Cloud Function with the same name.
 
-云引擎支持多个分组。
-如果当前部署代码中部分云函数与其他组的同名，默认情况会提示错误并中断部署，防止意外重复定义云函数。
-我们建议你移除不需要的云函数，毕竟重复定义的云函数并不易于理解和维护。
-不过，你也可以通过在每次部署时额外指定 `--overwrite-functions` 参数强制替换其他组云函数的实现。
+You can use Cloud Functions with multiple groups.
+However, if the code you’re deploying contains a Cloud Function that shares the same name as one that already exists in a different group, the deployment will be interrupted by default, and you’ll see an error message. This helps you avoid accidentally redefining a Cloud Functions.
+We recommend that you remove the Cloud Functions you don’t need from your project since it would be hard for you to comprehend and maintain duplicate Cloud Functions.
+Though you can choose to specify the `--overwrite-functions` option to have the Cloud Functions in the code you’re deploying override those in the other groups.
 
-### 为什么 Class Hook 没有被运行？
+### What could be the possible reason for hooks not being triggered as expected?
 
-首先确认一下 Hook 被调用的时机是否与你的理解一致：
+Please first make sure that you’ve understood when each hook gets triggered:
 
-- `beforeSave`：对象保存或创建之前
-- `afterSave`：对象保存或创建之后
-- `beforeUpdate`：对象更新之前
-- `afterUpdate`：对象更新之后
-- `beforeDelete`：对象删除之前
-- `afterDelete`：对象删除之后
-- `onVerified`：用户通过邮箱或手机验证后
-- `onLogin`：用户在进行登录操作时（`become(sessionToken)` 不是登录操作，因此不会调用 `onLogin`）
+- `beforeSave`: Before an object gets saved
+- `afterSave`: After an object has been saved
+- `beforeUpdate`: Before an object gets updated
+- `afterUpdate`: After an object has been updated
+- `beforeDelete`: Before an object gets deleted
+- `afterDelete`: After an object has been deleted
+- `onVerified`: After a user has verified their email or phone number
+- `onLogin`: When a user logs in (this doesn’t include `become(sessionToken)`)
 
-还需注意在本地进行云引擎调试时，运行的会是线上预备环境的 Hook，如果没有预备环境则不会运行。
+If you’re debugging locally, the hooks in the staging environment will be triggered. If your application doesn’t have a staging environment, no hooks will be triggered.
 
-然后检查 Hook 函数是否被执行过：
+You can check if a hook has been triggered using the following method:
 
-可以先在 Hook 函数的入口打印一行日志，然后进行操作，再到云引擎日志中检查该行日志是否被打印出来，如果没有看到日志原因可能包括：
+Print a log at the beginning of the function defined for a hook, then trigger the hook. Now you can check the logs on the dashboard to see if the log shows up. If it doesn’t show up, possible reasons include:
 
-- 代码没有被部署到正确的应用
-- 代码没有被部署到生产环境（或没有部署成功）
-- Hook 的类名不正确
+- Your code is not deployed to the correct application
+- Your code is not (successfully) deployed to the production environment
+- You entered an incorrect class name for the hook
 
-如果日志已打出，则继续检查函数是否成功，检查控制台上是否有错误信息被打印出。如果是 before 类 Hook，需要保证 Hook 函数在 15 秒内结束，否则会被系统认为超时。
+If the log shows up, you can check if there are error messages on the dashboard. For `before` hooks, please ensure that they return within 15 seconds, or a timeout will be caused.
 
-after 类 Hook 超时时间为 3 秒，如果你的体验实例已经休眠，很可能因为启动时间过长无法收到 after 类 Hook，建议升级到云引擎的标准实例避免休眠。
+For `after` hooks, the timeout is 3 seconds. If your trial instance has already hibernated, it might not be able to receive `after` hooks due to its long startup time. We recommend that you upgrade to a standard instance to prevent hibernation.
 
-### 可以在云函数中未登录的情况下查询 \_User 表吗？
+### Can I have my program in a Cloud Function retrieve data from the \_User table without logging in?
 
-在云函数里可以用 masterKey 跳过权限检查，未登录也可直接查询 \_User 表。
+Yes. By skipping permission checks with the `masterKey`, you can have your program in a Cloud Function retrieve data from the \_User table without logging in.
 
-因为云引擎运行在可信的服务器端环境中，所以你可以全局开启超级权限（`Master Key`），这样云端会跳过包括 ACL 和 Class 权限在内的检查，让你自由地操作所有云存储中的数据。具体细节可以参考 [云引擎 SDK 使用指南 § 使用超级权限](/sdk/engine/functions/sdk/#使用超级权限)。
+Since Cloud Engine runs within the trusted server-side environment, you can enable `Master Key` globally to skip permission checks enforced by ACL and class permission settings. See [Cloud Engine SDK Guide § Using MasterKey](/sdk/engine/functions/sdk/#using-masterkey) for more information.
 
-## 部署
+## Deployment
 
-### 多次部署同一个项目时镜像大小为什么差别那么大？
+### When I deploy my project for a second time, there’s a huge discrepancy between the mirror size of this deployment and that of the previous deployment. Why?
 
-云引擎底层有一套缓存机制以加速构建过程，所以部署时显示的「存储镜像到仓库」后面的大小表示本次构建新产生的数据，可用于评估是否利用到了缓存，不代表整个项目的大小。
+Cloud Engine uses a caching mechanism to accelerate the build process of deployments. The mirror size displayed for a deployment shows the size of the data generated for this deployment. You can deduce if a deployment has made use of the cache according to this size. This size doesn’t necessarily indicate the size of the entire project.
 
-### 部署时长时间卡在「正在下载和安装依赖」怎么办？
+### What should I do if a deployment is stuck in the stage of downloading and installing dependencies?
 
-这个步骤对应在云端调用各个语言的包管理器（`npm`、`pip`、`composer`、`maven`）安装依赖的过程，我们有一个依赖缓存机制来加速这个安装过程，但缓存可能会因为很多原因失效（比如修改了依赖列表），在缓存失效时会比平时慢很多，请耐心等待。如果你在 `leanengine.yaml` 中指定了系统依赖也会在这个步骤中安装，因此请不要添加未用到的依赖。
+During this stage, Cloud Engine would be using the package manager of the language of your choice (`npm`, `pip`, `composer`, or `maven`) to install dependencies for your project. We have a caching mechanism that helps accelerate this process, but the cache might not work due to various reasons (like if the dependency list is modified). When this happens, it might take us longer to finish installing the dependencies, so please wait patiently. If you have specified system dependencies with `leanengine.yaml`, these dependencies will also be installed during this stage, so please don’t add unused dependencies to this file.
 
-对于 Node.js 建议检查是否在 `package-lock.json` 或 `yarn.lock` 中指定了较慢的源。
+For Node.js projects, please check if you have specified a slow mirror in `package-lock.json` or `yarn.lock`.
 
-### 部署到多个实例时，部分实例失败需要重新部署吗？
+### I’m deploying my project to multiple instances. Do I need to redeploy my project if the deployment fails on some of the instances?
 
-同一环境（预备／生产）下有多个实例时，云引擎会同时在所有实例上部署项目。如因偶然因素部分实例部署不成功，会在几分钟后自动尝试再次部署，无需手动重新部署。
+When you have multiple instances under any of the environments (staging environment or production environment), Cloud Engine will deploy your project to all of the instances under this environment. If the deployment fails on some of the instances, Cloud Engine will try to redeploy your project automatically in a few minutes. You don’t have to manually redeploy your project.
 
-### 云引擎实例部署后控制台多次显示「部署中」是怎么回事？
+### I’m seeing “Deploying” on the dashboard even after the deployment has finished. Why?
 
-控制台显示的「部署中」状态泛指所有运维操作，例如唤醒休眠实例、服务器偶发故障引起的重新部署，不只是用户主动进行的部署。
+When the dashboard says “Deploying”, it could mean that maintenance is going on. This may be triggered by starting hibernated instances or server errors and doesn’t necessarily mean that you’ve triggered a deployment.
 
-### 云引擎的健康检查是什么？
+### What is a health check?
 
-云引擎的管理系统会每隔几分钟检查所有实例的工作状态（通过 HTTP 检查，详见具体运行环境文档的「健康检查」小节），
-如果实例无法正确响应的话，管理系统会触发一次重新部署，并在控制台上打印类似下面的日志：
+Cloud Engine checks the statuses of all the instances every few minutes (through HTTP requests; see the _Health Check_ section in the respective runtime environment’s docs for more information).
+If any of the instances cannot provide a valid response, Cloud Engine will trigger a redeployment and print the following log on the console:
 
 > 健康检查失败：web1 检测到 Error connect ECONNREFUSED 10.19.30.220:51797
 
-如果一周内发生一两次属正常现象（有可能是我们的服务器出现偶发的故障，因为会立刻重新部署，对服务影响很小），如果频繁发生可能是你的程序资源不足，或存在其他问题（运行一段时间后不再响应 HTTP 请求），需结合具体情况来分析。
+This could happen once or twice a week and that would be totally fine. If it happens frequently, chances are that your program is not having enough resources for it to respond correctly. There could be other reasons causing this problem as well.
 
-## 限制和费用
+## Restrictions and Pricing
 
-### 云引擎的请求有哪些限制？
+### What are the restrictions imposed by Cloud Engine?
 
-云引擎的负载均衡组件限制了请求不能超过 100 MB（包括直接上传文件到云引擎）、请求处理不得超过 60 秒，WebSocket 60 秒无数据会被断开连接。
+A request cannot be larger than 100 MB (including uploading files to Cloud Engine).
 
-国内节点未绑定独立 IP 的云引擎默认为纯静态站点优化。请求会先经过边缘节点，再视缓存命中情况回源到负载均衡组件，最后到达你的应用。
-边缘节点额外限制了请求不能超过 60 MB、请求处理不得超过 10 秒，另外边缘节点不支持 WebSocket 请求和 HTTP PATCH 方法，也不支持获取客户端 IP。
-因此，如果你在国内节点云引擎托管动态网站，我们建议你绑定独立 IP，使用独立入口，不经过边缘节点，自然也就没有上述限制。
+A request has to get a response within 60 seconds.
 
-### 每个应用最多有几个实例？
+A WebSocket connection will be stopped if no data is transmitted within the past 60 seconds.
 
-每个应用最多拥有 12 个实例，如果需要更多资源请通过工单联系我们的技术支持。
+### What’s the maximum number of instances an application can have?
 
-### 云引擎如何收费？
+Each application can have at most 12 instances. Please reach out to us if you need more instances for your application.
 
-云引擎中如果有云服务的存储等 API 调用，按数据存储收费策略照常收费。
+### How will I be billed?
 
-云引擎的标准实例、LeanDB 实例、回源流量、加速流量都会产生费用，详见官网的价格方案页面。
+If your application makes requests to the Data Storage API, those requests will be billed according to the Data Storage service’s pricing.
 
-### 流量如何计费？
+Standard instances, LeanDB instances, back-to-origin traffic, and CDN traffic will all lead to charges. See the pricing page for more information.
 
-每个云引擎实例每天有 1 G 免费额度，超出部分价格可以在<Conditional brand='leancloud'>当前节点的</Conditional>价格页面查看。
+### How will the traffic be billed?
 
-一个应用下的流量额度会合并计算，即每天的免费额度为 `max(n, 1)` GB，其中 `n` 为该应用所有云引擎分组下的标准实例总数。
+Each instance has a free quota of 1 GB every day. For the price of the exceeding part, see the pricing page<Conditional brand='leancloud'> of the current region</Conditional>.
 
-**云引擎不适合分发大文件之类的场景**，有此需求的开发者可以使用文件服务。
+The traffic of all the instances under an application will be summed up. If the total number of standard instances under all the groups of an application is `n`, the free quota every day will be `max(n, 1)` GB.
 
-在**<Path to="engine" /> > 云引擎分组 > 统计 > 流量**可以查看最近流量统计。
+**Cloud Engine is not designed to distribute large files**. Please use the file service if you have this type of requirement.
 
-### 如果更改了实例规格或数量，当天的云引擎费用如何收取？
+You can see the traffic of your instances on **<Path to="engine" /> > Your group > Statistics > Traffic**.
 
-云引擎资源使用量按 **当天最大的实例数量** 计算，次日凌晨从账户余额中扣费，假设某天从 0 点至 24 点之间：
+### If I’ve changed the quota or number of instances on a day, how will I be billed for this day?
 
-- 应用本来有 4 个 standard-512 的实例；
-- 发现资源数量不足，将实例规格调整到了 standard-1024；
-- 发现资源过多，减少到 2 个实例。
+You will be billed for **the maximum number of instances you have had for the day** on the next day. For example, if you have done the following activities during a day:
 
-则当天费用按照 standard-1024 的价格乘上 4 个实例计算。
+- Your application has 4 standard-512 instances;
+- You changed the quota to standard-1024;
+- You changed the number of instances to 2.
 
-### Hook 函数算 API 请求次数吗，afterUpdate 执行一次算 1 次请求次数吗？
+You will be billed for the price of standard-1024 multiplied by 4 instances.
 
-AfterUpdate 是在云引擎内执行的，执行 afetrUpdate 不算 API 请求，自然也不计入 API 请求数。如果 afterUpdate 里发起了 API 请求，那么照常计算 API 请求数（和客户端请求 API 一样）。
+### Will hooks lead to API calls? Will `afterUpdate` lead to an API call?
 
-## 最佳实践
+`afterUpdate` is executed within Cloud Engine, so `afterUpdate` won’t lead to API calls. If `afterUpdate` leads to API requests, the API requests will be billed.
 
-### 云引擎如何上传文件？
+## Best Practices
 
-托管在云引擎的网站可以使用相应 SDK 提供的接口上传文件。
-不过，一般情况下建议在客户端 SDK 上传文件，而不是通过云引擎中转，以免增加不必要的云引擎流量。
+### How do I upload files to Cloud Engine?
 
-### 定时任务应该在预备环境还是生产环境执行？
+You can use the interface for uploading files provided by the SDK,
+though we generally recommend that you upload files with client SDKs without having the files go through Cloud Engine. This helps you reduce the unnecessary traffic generated.
 
-系统赠送的预备环境体验实例会自动休眠，可能干扰定时任务的执行，因此一般建议在预备环境测试定时任务，在生产环境正式执行定时任务。
-如果定时任务 CPU、内存占用非常高，担心影响生产环境的网站托管功能或其他云函数访问，那么可以在预备环境购买标准实例，并在预备环境执行定时任务。
+### Should scheduled tasks be executed in the staging environment or the production environment?
 
-### 如何判断当前云引擎是预备环境还是生产环境？
+The free trial instances provided by the staging environment may hibernate automatically, which could impact the execution of the scheduled tasks. Therefore, we recommend that you test scheduled tasks in the staging environment and run them in the production environment.
+If your scheduled tasks take up a lot of CPU and memory and you don’t want them to interfere with the production environment, consider buying standard instances in the staging environment and running your scheduled tasks in the staging environment.
 
-默认情况，云引擎只有一个「生产环境」，对应的域名是 web.example.com。在生产环境中有一个「体验实例」来运行应用。
+### How do I tell if I’m using the staging environment or the production environment?
 
-当生产环境的体验实例升级到「标准实例」后会有一个额外的「预备环境」，对应域名 stg-web.example.com，两个环境所访问的都是同样的数据，你可以用预备环境测试你的云引擎代码，每次修改先部署到预备环境，测试通过后再发布到生产环境；如果你希望有一个独立数据源的测试环境，建议单独创建一个应用。
+By default, there’s only a production environment provided by Cloud Engine. The domain of it would be web.example.com. There will only be a trial instance in the production environment for you to run your program.
 
-另外，stg-web.example.com 域名是需要在控制台自行绑定的。
+When you upgrade the trial instance in the production environment to a standard instance, you will get a staging environment with its domain being stg-web.example.com. Both two environments have access to the same data in the Data Storage service. You can test your code with the staging environment by deploying your updated code to this environment and only publish your code to the production environment after testing your code. If you want an environment that has access to a different set of data in the Data Storage service, we recommend that you create a separate application.
 
-### 如何访问云引擎预备环境中托管的网站？
+Keep in mind that the stg-web.example.com domain needs to be bound on the dashboard on your own.
 
-需要在控制台手动绑定一个 `stg-` 开头的域名。`stg-` 开头的自定义域名（例如 stg-web.example.com）会被自动地绑定到预备环境。
+### How can I access the website hosted in the staging environment?
 
-### 云引擎可以绑定裸域名吗？
+Please bind a domain starting with `stg-` on the dashboard. Domains starting with `stg-` (like stg-web.example.com) will be automatically bound to the staging environment.
+
+### Can I bind a bare domain to Cloud Engine?
 
 <Conditional region='cn'>
 
-如果希望绑定裸域名，请添加直接指向独立 IP 的 A 记录。
+Yes. You can add an A record pointing to the dedicated IP address.
 
 </Conditional>
 
 <Conditional region='global'>
 
-如果希望绑定裸域名，我们建议选择支持 ANAME 或 CNAME Flattening 记录的域名服务商。
+To bind bare domains, we recommend that you choose a domain registry that supports ANAME or CNAME flattening.
 
 </Conditional>
 
-## 疑难问题
+## Other Problems
 
-### Application not found 错误
+### I’m seeing the _Application not found_ error.
 
-访问云引擎服务时，服务端返回错误「Application not found」或在云引擎日志中出现这个错误，可能有以下原因：
+There could be different reasons that lead to this error:
 
-- 调用错了环境。最常见的情况是，免费的体验实例是没有预备环境，开发者却主动设置去调用预备环境。
-- 云引擎自定义域名填错了，比如微信回调地址。
-- 因为免费版（体验版）的云引擎是有休眠的，休眠期间被调用会出现这个错误。建议升级到标准实例以保证实例一直运行。
+- You’re accessing the incorrect environment. There might not be a staging environment in your application, but you’re trying to access this environment.
+- You’re entering the wrong domain for Cloud Engine.
+- You’re using the trial version and your instances have gone hibernated. You can upgrade to the standard version to prevent your instances from hibernating.
 
-### 云引擎响应时间增加怎么办
+### What can I do if the response time of my instances increases?
 
-响应时间的增加有很多种原因：可能因为只是单纯的请求处理的数据更加复杂导致耗时变长；也有可能是因为请求量过高实例的处理能力不足从而导致响应时间增加。
-建议分析当前的代码并参考 CPU、内存占用量找出瓶颈，确定是否需要调高实例规格或增加实例数量。
-如果需要定位具体是哪些 API 或云函数响应较慢，可以下载访问日志分析。
+There could be different reasons that cause the response time of your instances to increase.
+We recommend that you scrutinize your code and the usage of CPU and memory to spot the bottleneck, then consider if you need to increase the quota or the number of instances.
+It might be helpful to download the access logs so you can see which APIs or Cloud Functions are responding slowly.
 
-### 在线上无法读取到项目中的文件怎么办？
+### What if I can’t access the files hosted on my project?
 
-建议先检查文件大小写是否正确，线上的文件系统是区分大小写的，而 Windows 和 macOS 通常不区分大小写。
+Please first check if the capitalizations of the letters in the file names are correct. The file system used by Cloud Engine is case-sensitive, while Windows and macOS are often configured to be case-insensitive.
 
-### 云引擎会重复提交请求吗？
+### Will Cloud Engine retry any requests?
 
-云引擎的负载均衡对于幂等的请求（GET、PUT），在 HTTP 层面出错或超时的情况下是会重试的，建议使用正确的谓词（例如 POST）避免此类重试。
+For idempotent requests (GET and PUT), Cloud Engine will retry them when there’s an error or timeout with HTTP. To avoid retries from happening, use the correct verb (like POST) for your requests.

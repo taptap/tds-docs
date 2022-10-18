@@ -45,6 +45,14 @@ const CONFIGS: {
       { label: "iOS", value: "ios" },
     ],
   },
+  ue: {
+    tds: [
+      { label: "Unity", value: "unity" },
+      { label: "Android", value: "android" },
+      { label: "iOS", value: "ios" },
+      { label: "UE4", value: "ue4"}
+    ]
+  },
   default: {
     leancloud: [
       { label: ".NET", value: "dotnet" },
