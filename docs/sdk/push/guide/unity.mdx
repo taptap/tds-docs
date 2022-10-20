@@ -5,6 +5,9 @@ sidebar_position: 5
 ---
 
 import {Conditional} from '/src/docComponents/conditional';
+import CodeBlock from "@theme/CodeBlock";
+import sdkVersions from "/src/docComponents/sdkVersions";
+
 
 本文介绍了如何在 Unity 中使用推送通知功能。建议先阅读 [推送通知服务总览](/sdk/push/guide/overview/) 了解相关概念。
 
@@ -33,6 +36,28 @@ import {Conditional} from '/src/docComponents/conditional';
 如果项目中**有**其他 Android Gradle 配置，则需要下载 `unity-push-without-gradle.unitypackage`，这个包中不包含推送相关的 Android Gradle 配置，需要开发者自行补充。
 
 因为涉及到 Android Gradle 配置，目前不提供 UPM 方式安装。
+
+### 导入 `LeanCloud-SDK-Realtime-Unity` 包：
+
+#### 方法一：使用 Unity Package Manager
+
+在项目的 `Packages/manifest.json` 文件中添加以下依赖：
+
+<CodeBlock className="json">
+{
+    `"dependencies":{
+        "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}"
+    }`
+}
+</CodeBlock>
+
+在 Unity 顶部菜单中选择 **Window > Package Manager** 可查看已经安装在项目中的包。
+
+#### 方法二：手动导入
+
+1. 在 [下载页](/tap-download) 找到  **LeanCloud C# SDK** 下载地址，下载 `LeanCloud-SDK-Realtime-Unity.zip`。
+
+2. 解压后的 `LeanCloud-SDK-Realtime-Unity.zip` 为 Plugins 文件夹，拖拽至 Unity 即可。
 
 ### 配置
 
@@ -64,6 +89,14 @@ import {Conditional} from '/src/docComponents/conditional';
 小米推送有能力在其他厂商下建立推送连接，可以作为缺省厂商使用。
 
 ```cs
+using LeanCloud.Storage;
+using LeanCloud;
+using LeanCloud.Push;
+using System.Threading.Tasks;
+using LC.Newtonsoft.Json;
+
+LCApplication.Initialize("{{appid}}", "{{appkey}}", "https://please-replace-with-your-customized.domain.com");
+
 if (Application.platform == RuntimePlatform.IPhonePlayer) {
     LCIOSPushManager.RegisterIOSPush(IOS_TEAM_ID);
 } else if (Application.platform == RuntimePlatform.Android) {
