@@ -43,7 +43,7 @@ So we cannot mention people by simply adding "@ + name" into a message. To walk 
 
 Depending on the logic of your app, it's possible for you to have both `mentionAll` to be set and `mentionList` to contain a list of members. Your app shall provide the UI that allows users to type in and select the members they want to mention. The only thing you need to do with the SDK is to call the setters of `mentionList` and `mentionAll` to set the members being mentioned. Here is a code example:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 LCIMTextMessage textMessage = new LCIMTextMessage("@Tom Come back early.") {
@@ -118,7 +118,7 @@ try {
 
 You can also mention everyone by setting `mentionAll`:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 LCIMTextMessage textMessage = new LCIMTextMessage("@all") {
@@ -192,7 +192,7 @@ try {
 
 The receiver of the message can call the getters of `mentionList` and `mentionAll` to see the members being mentioned:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 jerry.onMessage = (conv, msg) => {
@@ -262,7 +262,7 @@ To make it easier to display things on the UI, the following two flags are offer
 
 Here is a code example:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 client.OnMessage = (conv, msg) => {
@@ -325,7 +325,7 @@ To allow users to edit the messages they sent, you need to enable **Allow editin
 
 To modify a message, what you would do is not update the original message instance, but create a new one and call `Conversation#updateMessage(oldMessage, newMessage)` to submit the request to the cloud. Here is a code example:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 LCIMTextMessage newMessage = new LCIMTextMessage("The new message.");
@@ -401,7 +401,7 @@ try {
 
 If the modification succeeded, other members in the conversation will receive a `MESSAGE_UPDATE` event:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 tom.OnMessageUpdated = (conv, msg) => {
@@ -481,7 +481,7 @@ Also, there are no limits on the time within which users can perform this operat
 
 To recall a message, invoke the `Conversation#recallMessage` method:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 await conversation.RecallMessage(message);
@@ -549,7 +549,7 @@ try {
 
 Once a message is recalled, other members in the conversation will receive the `MESSAGE_RECALL` event:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 tom.OnMessageRecalled = (conv, recalledMsg) => {
@@ -625,7 +625,7 @@ Therefore, transient messages are best for communicating real-time updates of st
 
 The way to construct a transient message is the same as that for a basic message. The only difference is the way it is being sent. So far we have shown the following way of sending messages with `LCIMConversation`:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 public async Task<LCIMMessage> Send(LCIMMessage message, LCIMMessageSendOptions options = null);
@@ -678,7 +678,7 @@ Future<Message> send({
 
 In fact, an additional parameter `LCIMMessageOption` can be provided when sending a message. Here is a complete list of interfaces offered by `LCIMConversation`:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 /// <summary>
@@ -776,7 +776,7 @@ With `LCIMMessageOption`, we can specify:
 
 The code below sends a transient message saying "Tom is typing…" to the conversation when Tom's input box gets focused:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 LCIMTextMessage textMessage = new LCIMTextMessage("Tom is typing…");
@@ -854,7 +854,7 @@ However, in certain scenarios, functionality beyond the one mentioned above is d
 
 Similar to the way of sending transient messages, if you want receipts to be given back, you need to specify an option in `LCIMMessageOption`:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 LCIMTextMessage textMessage = new LCIMTextMessage("A very important message.");
@@ -929,7 +929,7 @@ So how do senders handle the receipts they get?
 
 When a message is delivered to the receiver, the cloud will give a delivery receipt to the sender. **Keep in mind that this is not the same as a read receipt.**
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 // Tom creates an LCIMClient with his name as clientId
@@ -1021,7 +1021,7 @@ Again, since messages are delivered in time order, we don't have to check if eve
 
 When a user opens a conversation, we can say that the user has read all the messages in it. You can use the following interface of `Conversation` to mark all the messages in it as read:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 /// <summary>
@@ -1073,7 +1073,7 @@ So if Tom is chatting with Jerry and wants to know if Jerry has read the message
 
 1. Tom sends a message to Jerry and requests receipts on it:
 
-   <MultiLang>
+   <MultiLang kind="im">
 
    ```cs
    LCIMTextMessage textMessage = new LCIMTextMessage("A very important message.");
@@ -1153,7 +1153,7 @@ So if Tom is chatting with Jerry and wants to know if Jerry has read the message
 
 2. Jerry reads Tom's message and calls `read` on the conversation to mark the latest messages as read:
 
-   <MultiLang>
+   <MultiLang kind="im">
 
    ```cs
    await conversation.Read();
@@ -1186,7 +1186,7 @@ So if Tom is chatting with Jerry and wants to know if Jerry has read the message
 
 3. Tom gets a read receipt with the conversation's `lastReadAt` updated. The UI can be updated to mark all messages sent before `lastReadAt` to be read:
 
-   <MultiLang>
+   <MultiLang kind="im">
 
    ```cs
    tom.OnLastReadAtUpdated = (conv) => {
@@ -1271,7 +1271,7 @@ Will message can be used to automatically notify other members in a conversation
 
 A will message needs to be composed ahead of time and cached on the cloud. The cloud doesn't send it out immediately after receiving it. Instead, it waits until the sender of it goes offline unexpectedly. You can implement your own logic to handle such an event.
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 LCIMTextMessage message = new LCIMTextMessage("I am a will message. I will be sent out to other members in the conversation when the sender goes offline unexpectedly.");
@@ -1383,7 +1383,7 @@ By default, both Android and iOS SDKs enable a local cache for storing messages.
 
 The code below adds a message to the cache:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 // Not supported yet
@@ -1424,7 +1424,7 @@ do {
 
 The code below removes a message from the cache:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 // Not supported yet
@@ -1499,7 +1499,7 @@ The highlight of this feature is that you can **customize the contents of push n
 
    Remember how we specified `LCIMMessageOption` when sending transient messages? The same parameter takes in a `pushData` property which allows you to specify the contents of push notifications. Here is a code example:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 LCIMTextMessage message = new LCIMTextMessage("Hey Jerry, me and Kate are gonna watch a game at a bar tonight. Wanna come with us?");
@@ -1701,7 +1701,7 @@ When the client goes online, the cloud will drop in a series of `<Conversation, 
 
 When the number of `<Conversation, UnreadMessageCount>` changes, the SDK will send an `UNREAD_MESSAGES_COUNT_UPDATE` event to the app through `IMClient`. You can listen to this event and make corresponding changes to the number of unread messages on the UI. We recommend you cache unread counts at the application level, and whenever there are two different counts available for the same conversation, replace the older data with the newer one.
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 tom.OnUnreadMessagesCountUpdated = (convs) => {
@@ -1788,7 +1788,7 @@ Based on the above mechanism, a variety of requirements can be met with Instant 
 
 The code below sets a `tag` called `Mobile` when creating `IMClient`, which can be used for the mobile client of your app:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 LCIMClient client = new LCIMClient(clientId, "Mobile", "your-device-id");
@@ -1858,7 +1858,7 @@ With the code above, if a user logs in on one mobile device and then logs in on 
 
 When the cloud encounters the same `<ClientId, Tag>` for a second time, the device used for the earlier one will be logged out and receive a `CONFLICT` event:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 tom.OnClose = (code, detail) => {
@@ -1936,7 +1936,7 @@ All the "logins" mentioned above refer to users' explicit logins. If the user ha
 
 Similarly, if you want an explicit login to receive an error when encountering a conflict, you can pass a special parameter on login:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 await tom.Open(false);
@@ -2028,7 +2028,7 @@ The following message types are offered by default:
 
 When composing messages with these types, you can include additional information by attaching custom attributes in the format of key-value pairs. For example, if you are sending a message and need to include city information, you can put it into `attributes` of the message rather than create your own message type.
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 LCIMTextMessage messageWithCity = new LCIMTextMessage("It is getting cold.");
@@ -2070,7 +2070,7 @@ message.attributes = {'city': 'Montreal'};
 
 If the built-in types cannot fulfill your requirements at all, you can implement your custom message types.
 
-<MultiLang>
+<MultiLang kind="im">
 <>
 
 By inheriting from `LCIMTypedMessage`, you can define your own types of messages. The basic steps include:
