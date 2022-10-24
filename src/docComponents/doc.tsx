@@ -181,7 +181,7 @@ export const CardGrid = ({ children }) => (
   <div
     style={{
       display: "grid",
-      gridTemplateColumns: "repeat(auto-fill, minmax(16em, 1fr))",
+      gridTemplateColumns: "repeat(auto-fill, minmax(18em, 1fr))",
       gridAutoRows: "1fr",
       gap: "0.5em",
     }}

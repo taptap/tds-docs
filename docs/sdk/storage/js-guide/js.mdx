@@ -1,0 +1,1540 @@
+---
+title: 数据存储开发指南 · JavaScript
+sidebar_label: JavaScript 开发指南
+slug: /sdk/storage/guide/js/
+sidebar_position: 2
+---
+
+import CodeBlock from "@theme/CodeBlock";
+import sdkVersions from "/src/docComponents/sdkVersions";
+import Path from "/src/docComponents/path";
+
+数据存储是云服务提供的核心功能之一，可用于存放和查询应用数据。下面的代码展示了如何创建一个对象并将其存入云端：
+
+```js
+// 声明 class
+const Todo = AV.Object.extend("Todo");
+
+// 构建对象
+const todo = new Todo();
+
+// 为属性赋值
+todo.set("title", "工程师周会");
+todo.set("content", "周二两点，全体成员");
+
+// 将对象保存到云端
+todo.save().then(
+  (todo) => {
+    // 成功保存之后，执行其他逻辑
+    console.log(`保存成功。objectId：${todo.id}`);
+  },
+  (error) => {
+    // 异常处理
+  }
+);
+```
+
+我们为各个平台或者语言开发的 SDK 在底层都是通过 HTTPS 协议调用统一的 REST API，提供完整的接口对数据进行各类操作。
+
+## SDK 安装与初始化
+
+请阅读 [数据存储、即时通讯 JavaScript SDK 配置指南](/sdk/storage/guide/setup-js/)。
+
+## 对象
+
+### `AV.Object`
+
+`AV.Object` 是云服务对复杂对象的封装，每个 `AV.Object` 包含若干与 JSON 格式兼容的属性值对（也称键值对，key-value pairs）。这个数据是无模式化的（schema free），意味着你不需要提前标注每个 `AV.Object` 上有哪些 key，你只需要随意设置键值对就可以，云端会保存它。
+
+比如说，一个保存着单个 Todo 的 `AV.Object` 可能包含如下数据：
+
+```json
+title:      "给小林发邮件确认会议时间",
+isComplete: false,
+priority:   2,
+tags:       ["工作", "销售"]
+```
+
+### 数据类型
+
+`AV.Object` 支持的数据类型包括 `String`、`Number`、`Boolean`、`Object`、`Array`、`Date` 等等。你可以通过嵌套的方式在 `Object` 或 `Array` 里面存储更加结构化的数据。
+
+`AV.Object` 还支持两种特殊的数据类型 `Pointer` 和 `File`，可以分别用来存储指向其他 `AV.Object` 的指针以及二进制数据。
+
+`AV.Object` 同时支持 `GeoPoint`，可以用来存储地理位置信息。参见 [GeoPoint](#geopoint)。
+
+以下是一些示例：
+
+```js
+// 基本类型
+const bool = true;
+const number = 2018;
+const string = `${number} 流行音乐榜单`;
+const date = new Date();
+const array = [string, number];
+const object = {
+  number: number,
+  string: string,
+};
+
+// 构建对象
+const TestObject = AV.Object.extend("TestObject");
+const testObject = new TestObject();
+testObject.set("testNumber", number);
+testObject.set("testString", string);
+testObject.set("testDate", date);
+testObject.set("testArray", array);
+testObject.set("testObject", object);
+testObject.save();
+```
+
+我们不推荐在 `AV.Object` 里面存储图片、文档等大型二进制数据。每个 `AV.Object` 的大小不应超过 **128 KB**。如需存储大型文件，可创建 `AV.File` 实例并将其关联到 `AV.Object` 的某个属性上。参见 [文件](#文件)。
+
+注意：时间类型在云端将会以 UTC 时间格式存储，但是客户端在读取之后会转化成本地时间。
+
+**<Path to="storage" /> > 结构化数据** 中展示的日期数据也会依据操作系统的时区进行转换。一个例外是当你通过 REST API 获得数据时，这些数据将以 UTC 呈现。你可以手动对它们进行转换。
+
+若想了解云服务是如何保护应用数据的，请阅读[数据和安全](/sdk/storage/guide/security/)。
+
+### 构建对象
+
+下面的代码构建了一个 class 为 `Todo` 的 `AV.Object`：
+
+```js
+// 为 AV.Object 创建子类
+const Todo = AV.Object.extend("Todo");
+
+// 为该类创建一个新实例
+const todo = new Todo();
+
+// 你还可以直接使用 AV.Object 的构造器
+const todo = new AV.Object("Todo");
+```
+
+在构建对象时，为了使云端知道对象属于哪个 class，需要将 class 的名字作为参数传入。你可以将云服务里面的 class 比作关系型数据库里面的表。一个 class 的名字必须以字母开头，且只能包含数字、字母和下划线。
+
+如果你使用的是 ES6，还可以通过 `extends` 关键字来创建 `AV.Object` 的子类，然而 SDK 无法自动识别你创建的子类。你需要通过这种方式手动注册一下：
+
+```js
+class Todo extends AV.Object {
+  // 自定义属性和方法
+}
+
+// 注册子类
+AV.Object.register(Todo);
+```
+
+这样你就能在 `AV.Object` 的子类中添加额外的方法和属性了。
+
+### 保存对象
+
+下面的代码将一个 class 为 `Todo` 的对象存入云端：
+
+```js
+// 声明 class
+const Todo = AV.Object.extend("Todo");
+
+// 构建对象
+const todo = new Todo();
+
+// 为属性赋值
+todo.set("title", "马拉松报名");
+todo.set("priority", 2);
+
+// 将对象保存到云端
+todo.save().then(
+  (todo) => {
+    // 成功保存之后，执行其他逻辑
+    console.log(`保存成功。objectId：${todo.id}`);
+  },
+  (error) => {
+    // 异常处理
+  }
+);
+```
+
+为了确认对象已经保存成功，我们可以到 **<Path to="storage" /> > 结构化数据 > `Todo`** 里面看一下，应该会有一行新的数据产生。点一下这个数据的 `objectId`，应该能看到类似这样的内容：
+
+```json
+{
+  "title": "马拉松报名",
+  "priority": 2,
+  "ACL": {
+    "*": {
+      "read": true,
+      "write": true
+    }
+  },
+  "objectId": "582570f38ac247004f39c24b",
+  "createdAt": "2017-11-11T07:19:15.549Z",
+  "updatedAt": "2017-11-11T07:19:15.549Z"
+}
+```
+
+注意，无需在 **<Path to="storage" /> > 结构化数据** 里面创建新的 `Todo` class 即可运行前面的代码。如果 class 不存在，它将自动创建。
+
+以下是一些对象的内置属性，会在对象保存时自动创建，无需手动指定：
+
+| 内置属性    | 类型     | 描述                                                           |
+| ----------- | -------- | -------------------------------------------------------------- |
+| `objectId`  | `String` | 该对象唯一的 ID 标识。                                         |
+| `ACL`       | `AV.ACL` | 该对象的权限控制，实际上是一个 JSON 对象，控制台做了展现优化。 |
+| `createdAt` | `Date`   | 该对象被创建的时间。                                           |
+| `updatedAt` | `Date`   | 该对象最后一次被修改的时间。                                   |
+
+这些属性的值会在对象被存入云端时自动填入，代码中尚未保存的 `AV.Object` 不存在这些属性。
+
+属性名（**keys**）只能包含字母、数字和下划线。自定义属性不得以双下划线（`__`）开头或与任何系统保留字段和内置属性（`ACL`、`className`、`createdAt`、`objectId` 和 `updatedAt`）重名，无论大小写。
+
+属性值（**values**）可以是字符串、数字、布尔值、数组或字典（任何能以 JSON 编码的数据）。参见 [数据类型](#数据类型)。
+
+我们推荐使用驼峰式命名法（CamelCase）为类和属性来取名。类，采用大驼峰法，如 `CustomData`。属性，采用小驼峰法，如 `imageUrl`。
+
+### 获取对象
+
+对于已经保存到云端的 `AV.Object`，可以通过它的 `objectId` 将其取回：
+
+```js
+const query = new AV.Query("Todo");
+query.get("582570f38ac247004f39c24b").then((todo) => {
+  // todo 就是 objectId 为 582570f38ac247004f39c24b 的 Todo 实例
+  const title = todo.get("title");
+  const priority = todo.get("priority");
+
+  // 获取内置属性
+  const objectId = todo.id;
+  const updatedAt = todo.updatedAt;
+  const createdAt = todo.createdAt;
+});
+```
+
+如果你试图获取一个不存在的属性，SDK 不会报错，而是会返回 `undefined`。
+
+如果需要一次性获取返回对象的所有属性（比如进行数据绑定）而非显式地调用 `get`，可以利用 `AV.Object` 实例的 `toJSON` 方法：
+
+```js
+const query = new AV.Query("Todo");
+query.get("582570f38ac247004f39c24b").then((todo) => {
+  console.log(todo.toJSON());
+  // {
+  //   createdAt: "2017-03-08T11:25:07.804Z",
+  //   objectId: "582570f38ac247004f39c24b",
+  //   priority: 2,
+  //   title: "工程师周会",
+  //   updatedAt: "2017-03-08T11:25:07.804Z"
+  // }
+});
+```
+
+#### 同步对象
+
+当云端数据发生更改时，你可以调用 `fetch` 方法来刷新对象，使之与云端数据同步：
+
+```js
+const todo = AV.Object.createWithoutData("Todo", "582570f38ac247004f39c24b");
+todo.fetch().then((todo) => {
+  // todo 已刷新
+});
+```
+
+刷新操作会强行使用云端的属性值覆盖本地的属性。因此如果本地有属性修改，**`fetch` 操作会丢弃这些修改**。为避免这种情况，你可以在刷新时指定 **需要刷新的属性**，这样只有指定的属性会被刷新（包括内置属性 `objectId`、`createdAt` 和 `updatedAt`），其他属性不受影响。
+
+```js
+const todo = AV.Object.createWithoutData("Todo", "582570f38ac247004f39c24b");
+todo
+  .fetch({
+    keys: "priority, location",
+  })
+  .then((todo) => {
+    // 只有 priority 和 location 会被获取和刷新
+  });
+```
+
+### 更新对象
+
+要更新一个对象，只需指定需要更新的属性名和属性值，然后调用 `save` 方法。例如：
+
+```js
+const todo = AV.Object.createWithoutData("Todo", "582570f38ac247004f39c24b");
+todo.set("content", "这周周会改到周三下午三点。");
+todo.save();
+```
+
+云服务会自动识别需要更新的属性并将对应的数据发往云端，未更新的属性会保持原样。
+
+如果想要查看哪些属性有尚未保存的修改，可以调用 `dirtyKeys` 方法：
+
+```js
+todo.dirtyKeys(); // ['content']
+```
+
+如果希望撤销尚未保存的修改，可以调用 `revert` 方法。直接调用 `revert()` 将撤销所有尚未保存的修改。还可以额外传入 `keys` 数组作为参数，指定需要撤销的属性，例如：
+
+```js
+todo.revert(["content"]);
+```
+
+#### 有条件更新对象
+
+通过传入 `query` 选项，可以按照指定条件去更新对象——当条件满足时，执行更新；条件不满足时，不执行更新并返回 `305` 错误。
+
+例如，用户的账户表 `Account` 有一个余额字段 `balance`，同时有多个请求要修改该字段值。为避免余额出现负值，只有当金额小于或等于余额的时候才能接受请求：
+
+```js
+const account = AV.Object.createWithoutData(
+  "Account",
+  "5745557f71cfe40068c6abe0"
+);
+// 对 balance 原子减少 100
+const amount = -100;
+account.increment("balance", amount);
+account
+  .save(null, {
+    // 设置条件
+    query: new AV.Query("Account").greaterThanOrEqualTo("balance", -amount),
+    // 操作结束后，返回最新数据。
+    // 如果是新对象，则所有属性都会被返回，
+    // 否则只有更新的属性会被返回。
+    fetchWhenSave: true,
+  })
+  .then(
+    (account) => {
+      console.log(`当前余额为：${account.get("balance")}`);
+    },
+    (error) => {
+      if (error.code === 305) {
+        console.error("余额不足，操作失败！");
+      }
+    }
+  );
+```
+
+**`query` 选项只对已存在的对象有效**，不适用于尚未存入云端的对象。
+
+`query` 选项在有多个客户端需要更新同一属性的时候非常有用。相比于通过 `AV.Query` 查询 `AV.Object` 再对其进行更新的方法，这样做更加简洁，并且能够避免出现差错。
+
+#### 更新计数器
+
+设想我们正在开发一个微博，需要统计一条微博有多少个赞和多少次转发。由于赞和转发的操作可能由多个客户端同时进行，直接在本地更新数字并保存到云端的做法极有可能导致差错。为保证计数的准确性，可以通过 **原子操作** 来增加或减少一个属性内保存的数字：
+
+```js
+post.increment("likes", 1);
+```
+
+可以指定需要增加或减少的值。若未指定，则默认使用 `1`。
+
+注意，虽然原子增减支持浮点数，但因为底层数据库的浮点数存储格式限制，会有舍入误差。
+因此，需要原子增减的字段建议使用整数以避免误差，例如 `3.14` 可以存储为 `314`，然后在客户端进行相应的转换。
+否则，以比较大小为条件查询对象的时候，需要特殊处理，
+`< a` 需改查 `< a + e`，`> a` 需改查 `> a - e`，`== a` 需改查 `> a - e` 且 `< a + e`，其中 `e` 为误差范围，据所需精度取值，比如 `0.0001`。
+
+#### 更新数组
+
+更新数组也是原子操作。使用以下方法可以方便地维护数组类型的数据：
+
+- `AV.Object.add('arrayKey', value)` 将指定对象附加到数组末尾。
+- `AV.Object.addUnique('arrayKey', value)` 如果数组中不包含指定对象，则将该对象加入数组。对象的插入位置是随机的。
+- `AV.Object.remove('arrayKey', value)` 从数组字段中删除指定对象的所有实例。
+
+例如，`Todo` 用一个 `alarms` 属性保存所有闹钟的时间。下面的代码将多个时间加入这个属性：
+
+```js
+const alarm1 = new Date("2018-04-30T07:10:00");
+const alarm2 = new Date("2018-04-30T07:20:00");
+const alarm3 = new Date("2018-04-30T07:30:00");
+
+const alarms = [alarm1, alarm2, alarm3];
+
+const todo = new AV.Object("Todo");
+todo.addUnique("alarms", alarms);
+todo.save();
+```
+
+### 删除对象
+
+下面的代码从云端删除一个 `Todo` 对象：
+
+```js
+const todo = AV.Object.createWithoutData("Todo", "582570f38ac247004f39c24b");
+todo.destroy();
+```
+
+如果只需删除对象的一个属性，可以用 `unset`：
+
+```js
+const todo = AV.Object.createWithoutData("Todo", "582570f38ac247004f39c24b");
+
+// priority 属性会被删除
+todo.unset("priority");
+
+// 保存对象
+todo.save();
+```
+
+注意，删除对象是一个较为敏感的操作，我们建议你阅读[《ACL 权限管理开发指南》](https://leancloud.cn/docs/acl-guide.html) 来了解潜在的风险。熟悉 class 级别、对象级别和字段级别的权限可以帮助你有效阻止未经授权的操作。
+
+### 批量操作
+
+```js
+// 创建一个保存所有 AV.Object 的数组
+const object1 = new AV.Object("Todo");
+object1.set("content", "更新文档");
+const object2 = new AV.Object("Todo");
+object2.set("content", "回复论坛帖子");
+const objects = [object1, object2];
+
+// 批量构建和更新
+AV.Object.saveAll(objects).then(
+  function (savedObjects) {
+    // 成功保存所有对象时进入此 resolve 函数，savedObjects 是包含所有 AV.Object 的数组
+  },
+  function (error) {
+    // 只要有一个对象保存错误就会进入此 reject 函数
+  }
+);
+
+// 批量删除
+AV.Object.destroyAll(objects).then(
+  function (deletedObjects) {
+    // 成功删除所有对象时进入此 resolve 函数，deletedObjects 是包含所有的 AV.Object 的数组
+  },
+  function (error) {
+    // 只要有一个对象删除错误就会进入此 reject 函数
+  }
+);
+
+// 批量同步
+AV.Object.fetchAll(objects).then(
+  function (fetchedObjects) {
+    // 成功同步所有对象时进入此 resolve 函数，fetchedObjects 是包含所有的 AV.Object 的数组
+  },
+  function (error) {
+    // 只要有一个对象同步错误就会进入此 reject 函数
+  }
+);
+```
+
+下面的代码将所有 `Todo` 的 `isComplete` 设为 `true`：
+
+```js
+const query = new AV.Query("Todo");
+query.find().then((todos) => {
+  // 获取需要更新的 todo
+  todos.forEach((todo) => {
+    // 更新属性值
+    todo.set("isComplete", true);
+  });
+  // 批量更新
+  AV.Object.saveAll(todos);
+});
+```
+
+虽然上述方法可以在一次请求中包含多个操作，每一个分别的保存或同步操作在计费时依然会被算作一次请求，而所有的删除操作则会被合并为一次请求。
+
+### 数据模型
+
+对象之间可以产生关联。拿一个博客应用来说，一个 `Post` 对象可以与许多个 `Comment` 对象产生关联。云服务支持三种关系：一对一、一对多、多对多。
+
+#### 一对一、一对多关系
+
+一对一、一对多关系可以通过将 `AV.Object` 保存为另一个对象的属性值的方式产生。比如说，让博客应用中的一个 `Comment` 指向一个 `Post`。
+
+下面的代码会创建一个含有单个 `Comment` 的 `Post`：
+
+```js
+// 创建 post
+const post = new AV.Object("Post");
+post.set("title", "饿了……");
+post.set("content", "中午去哪吃呢？");
+
+// 创建 comment
+const comment = new AV.Object("Comment");
+comment.set("content", "当然是肯德基啦！");
+
+// 将 post 设为 comment 的一个属性值
+comment.set("parent", post);
+
+// 保存 comment 会同时保存 post
+comment.save();
+```
+
+云端存储时，会将被指向的对象用 `Pointer` 的形式存起来。你也可以用 `objectId` 来指向一个对象：
+
+```js
+const post = AV.Object.createWithoutData("Post", "57328ca079bc44005c2472d0");
+comment.set("post", post);
+```
+
+请参阅 [关系查询](#关系查询) 来了解如何获取关联的对象。
+
+#### 多对多关系
+
+想要建立多对多关系，最简单的办法就是使用 **数组**。在大多数情况下，使用数组可以有效减少查询的次数，提升程序的运行效率。但如果有额外的属性需要附着于两个 class 之间的关联，那么使用 **中间表** 可能是更好的方式。注意这里说到的额外的属性是用来描述 class 之间的关系的，而不是任何单一的 class 的。
+
+我们建议你在任何一个 class 的对象数量超出 100 的时候考虑使用中间表。
+
+### 序列化和反序列化
+
+在实际的开发中，把 `AV.Object` 当作参数传递的时候，会涉及到复杂对象的拷贝的问题，因此 `AV.Object` 也提供了序列化和反序列化的方法。
+
+序列化：
+
+```js
+const todo = new AV.Object("Todo"); // 构建对象
+todo.set("title", "马拉松报名"); // 设置名称
+todo.set("priority", 2); // 设置优先级
+todo.set("owner", AV.User.current()); // 这里就是一个 Pointer 类型，指向当前登录的用户
+
+// 将 AV.Object 对象序列化成 JSON 对象
+const json = todo.toFullJSON();
+// 将 JSON 对象序列化为字符串
+const serializedString = JSON.stringify(json);
+```
+
+`AV.Object` 还提供了另一个方法 `toJSON()`。它们的区别是 `toJSON()` 得到的对象仅包含对象的 payload，一般用于展示，而 `toFullJSON()` 得到的对象包含了元数据，一般用于传输。在使用时请注意区分。
+
+反序列化：
+
+```js
+// 将字符串反序列化为 JSON 对象
+const json = JSON.parse(serializedString);
+// 将 JSON 对象反序列化成 AV.Object 对象
+const todo = AV.parseJSON(json);
+```
+
+## 查询
+
+我们已经了解到如何从云端获取单个 `AV.Object`，但你可能还会有一次性获取多个符合特定条件的 `AV.Object` 的需求，这时候就需要用到 `AV.Query` 了。
+
+### 基础查询
+
+执行一次基础查询通常包括这些步骤：
+
+1. 构建 `AV.Query`；
+2. 向其添加查询条件；
+3. 执行查询并获取包含满足条件的对象的数组。
+
+下面的代码获取所有 `lastName` 为 `Smith` 的 `Student`：
+
+```js
+const query = new AV.Query("Student");
+query.equalTo("lastName", "Smith");
+query.find().then((students) => {
+  // students 是包含满足条件的 Student 对象的数组
+});
+```
+
+### 查询条件
+
+可以给 `AV.Object` 添加不同的条件来改变获取到的结果。
+
+下面的代码查询所有 `firstName` 不为 `Jack` 的对象：
+
+```js
+query.notEqualTo("firstName", "Jack");
+```
+
+对于能够排序的属性（比如数字、字符串），可以进行比较查询：
+
+```js
+// 限制 age < 18
+query.lessThan("age", 18);
+
+// 限制 age <= 18
+query.lessThanOrEqualTo("age", 18);
+
+// 限制 age > 18
+query.greaterThan("age", 18);
+
+// 限制 age >= 18
+query.greaterThanOrEqualTo("age", 18);
+```
+
+可以在同一个查询中设置多个条件，这样可以获取满足所有条件的结果。可以理解为所有的条件是 `AND` 的关系：
+
+```js
+query.equalTo("firstName", "Jack");
+query.greaterThan("age", 18);
+```
+
+可以通过指定 `limit` 限制返回结果的数量（默认为 `100`）：
+
+```js
+// 最多获取 10 条结果
+query.limit(10);
+```
+
+由于性能原因，`limit` 最大只能设为 `1000`。即使将其设为大于 `1000` 的数，云端也只会返回 1,000 条结果。
+
+如果只需要一条结果，可以直接用 `first`：
+
+```js
+const query = new AV.Query("Todo");
+query.equalTo("priority", 2);
+query.first().then((todo) => {
+  // todo 是第一个满足条件的 Todo 对象
+});
+```
+
+可以通过设置 `skip` 来跳过一定数量的结果：
+
+```js
+// 跳过前 20 条结果
+query.skip(20);
+```
+
+把 `skip` 和 `limit` 结合起来，就能实现翻页功能：
+
+```js
+const query = new AV.Query("Todo");
+query.equalTo("priority", 2);
+query.limit(10);
+query.skip(20);
+```
+
+需要注意的是，`skip` 的值越高，查询所需的时间就越长。作为替代方案，可以通过设置 `createdAt` 或 `updatedAt` 的范围来实现更高效的翻页，因为它们都自带索引。
+同理，也可以通过设置自增字段的范围来实现翻页。
+
+对于能够排序的属性，可以指定结果的排序规则：
+
+```js
+// 按 createdAt 升序排列
+query.ascending("createdAt");
+
+// 按 createdAt 降序排列
+query.descending("createdAt");
+```
+
+还可以为同一个查询添加多个排序规则：
+
+```js
+query.addAscending("priority");
+query.addDescending("createdAt");
+```
+
+下面的代码可用于查找包含或不包含某一属性的对象：
+
+```js
+// 查找包含 'images' 的对象
+query.exists("images");
+
+// 查找不包含 'images' 的对象
+query.doesNotExist("images");
+```
+
+可以用 `matchesKeyInQuery` 查找某一属性值为另一查询返回结果的对象。
+
+比如说，你有一个用于存储国家和语言对应关系的 `Country` class，还有一个用于存储学生国籍的 `Student` class：
+
+| name  | language |
+| ----- | -------- |
+| US    | English  |
+| UK    | English  |
+| China | Chinese  |
+
+| fullName   | nationality |
+| ---------- | ----------- |
+| John Doe   | US          |
+| Tom Sawyer | UK          |
+| Ming Li    | China       |
+
+下面的代码可以找到所有来自英语国家的学生：
+
+```js
+const studentQuery = new AV.Query("Student");
+const countryQuery = new AV.Query("Country");
+// 获取所有的英语国家
+countryQuery.equalTo("language", "English");
+// 把 Student 的 nationality 和 Country 的 name 关联起来
+studentQuery.matchesKeyInQuery("nationality", "name", countryQuery);
+studentQuery.find().then((students) => {
+  // students 包含 John Doe 和 Tom Sawyer
+});
+```
+
+可以通过 `select` 指定需要返回的属性。下面的代码只获取每个对象的 `title` 和 `content`（包括内置属性 `objectId`、`createdAt` 和 `updatedAt`）：
+
+```js
+const query = new AV.Query("Todo");
+query.select(["title", "content"]);
+query.first().then((todo) => {
+  const title = todo.get("title"); // √
+  const content = todo.get("content"); // √
+  const notes = todo.get("notes"); // undefined
+});
+```
+
+`select` 支持点号（`author.firstName`），详见[《点号使用指南》](https://leancloud.cn/docs/dot-notation.html)。
+
+另外，字段名前添加减号前缀表示反向选择，例如 `-author` 表示不返回 `author` 字段。
+反向选择同样适用于内置字段，比如 `-objectId`，也可以和点号组合使用，比如 `-pubUser.createdAt`。
+
+对于未获取的属性，可以通过对结果中的对象进行 `fetch` 操作来获取。参见 [同步对象](#同步对象)。
+
+### 字符串查询
+
+可以用 `startsWith` 来查找某一属性值以特定字符串开头的对象。和 SQL 中的 `LIKE` 一样，你可以利用索引带来的优势：
+
+```js
+const query = new AV.Query("Todo");
+// 相当于 SQL 中的 title LIKE 'lunch%'
+query.startsWith("title", "lunch");
+```
+
+可以用 `contains` 来查找某一属性值包含特定字符串的对象：
+
+```js
+const query = new AV.Query("Todo");
+// 相当于 SQL 中的 title LIKE '%lunch%'
+query.contains("title", "lunch");
+```
+
+和 `startsWith` 不同，`contains` 无法利用索引，因此不建议用于大型数据集。
+
+注意 `startsWith` 和 `contains` 都是 **区分大小写** 的，所以上述查询会忽略 `Lunch`、`LUNCH` 等字符串。
+
+如果想查找某一属性值不包含特定字符串的对象，可以使用 `matches` 进行基于正则表达式的查询：
+
+```js
+const query = new AV.Query("Todo");
+// 'title' 不包含 'ticket'（不区分大小写）
+const regExp = new RegExp("^((?!ticket).)*$", "i");
+query.matches("title", regExp);
+```
+
+不过我们并不推荐大量使用这类查询，尤其是对于包含超过 100,000 个对象的 class，
+因为这类查询无法利用索引，实际操作中云端会遍历所有对象来获取结果。如果有进行全文搜索的需求，可以使用全文搜索服务。
+
+使用查询时如果遇到性能问题，可参阅 [查询性能优化](#查询性能优化)。
+
+### 数组查询
+
+下面的代码查找所有数组属性 `tags` 包含 `工作` 的对象：
+
+```js
+query.equalTo("tags", "工作");
+```
+
+下面的代码查询数组属性长度为 3（正好包含 3 个标签）的对象：
+
+```js
+query.sizeEqualTo("tags", 3);
+```
+
+下面的代码查找所有数组属性 `tags` **同时包含** `工作`、`销售` 和 `会议` 的对象：
+
+```js
+query.containsAll("tags", ["工作", "销售", "会议"]);
+```
+
+如需获取某一属性值包含一列值中任意一个值的对象，可以直接用 `containedIn` 而无需执行多次查询。下面的代码构建的查询会查找所有 `priority` 为 `1` **或** `2` 的 todo 对象：
+
+```js
+// 单个查询
+const priorityOneOrTwo = new AV.Query("Todo");
+priorityOneOrTwo.containedIn("priority", [1, 2]);
+// 这样就可以了 :)
+
+// ---------------
+//       vs.
+// ---------------
+
+// 多个查询
+const priorityOne = new AV.Query("Todo");
+priorityOne.equalTo("priority", 1);
+
+const priorityTwo = new AV.Query("Todo");
+priorityTwo.equalTo("priority", 2);
+
+const priorityOneOrTwo = AV.Query.or(priorityOne, priorityTwo);
+// 好像有些繁琐 :(
+```
+
+反过来，还可以用 `notContainedIn` 来获取某一属性值不包含一列值中任何一个的对象。
+
+### 关系查询
+
+查询关联数据有很多种方式，常见的一种是查询某一属性值为特定 `AV.Object` 的对象，这时可以像其他查询一样直接用 `equalTo`。比如说，如果每一条博客评论 `Comment` 都有一个 `post` 属性用来存放原文 `Post`，则可以用下面的方法获取所有与某一 `Post` 相关联的评论：
+
+```js
+const post = AV.Object.createWithoutData("Post", "57328ca079bc44005c2472d0");
+const query = new AV.Query("Comment");
+query.equalTo("post", post);
+query.find().then((comments) => {
+  // comments 包含与 post 相关联的评论
+});
+```
+
+如需获取某一属性值为另一查询结果中任一 `AV.Object` 的对象，可以用 `matchesQuery`。下面的代码构建的查询可以找到所有包含图片的博客文章的评论：
+
+```js
+const innerQuery = new AV.Query("Post");
+innerQuery.exists("image");
+
+const query = new AV.Query("Comment");
+query.matchesQuery("post", innerQuery);
+```
+
+如需获取某一属性值不是另一查询结果中任一 `AV.Object` 的对象，则使用 `doesNotMatchQuery`。
+
+有时候可能需要获取来自另一个 class 的数据而不想进行额外的查询，此时可以在同一个查询上使用 `include`。下面的代码查找最新发布的 10 条评论，并包含各自对应的博客文章：
+
+```js
+const query = new AV.Query("Comment");
+
+// 获取最新发布的
+query.descending("createdAt");
+
+// 只获取 10 条
+query.limit(10);
+
+// 同时包含博客文章
+query.include("post");
+
+query.find().then((comments) => {
+  // comments 包含最新发布的 10 条评论，包含各自对应的博客文章
+  comments.forEach((comment) => {
+    // 该操作无需网络连接
+    const post = comment.get("post");
+  });
+});
+```
+
+可以用 dot 符号（`.`）来获取多级关系，例如 `post.author`，详见[《点号使用指南》](https://leancloud.cn/docs/dot-notation.html)的《在查询对象时使用点号》一节。
+
+可以在同一查询上应用多次 `include` 以包含多个属性。
+
+通过 `include` 进行多级查询的方式不适用于数组属性内部的 `AV.Object`，只能包含到数组本身。
+
+#### 关系查询的注意事项
+
+云端使用的并非关系型数据库，无法做到真正的联表查询，所以实际的处理方式是：先执行内嵌 / 子查询（和普通查询一样，`limit` 默认为 `100`，最大 `1000`），然后将子查询的结果填入主查询的对应位置，再执行主查询。如果子查询匹配到的记录数量超出 `limit`，且主查询有其他查询条件，那么可能会出现没有结果或结果不全的情况，因为只有 `limit` 数量以内的结果会被填入主查询。
+
+我们建议采用以下方案进行改进：
+
+- 确保子查询的结果在 100 条以下，如果在 100 至 1,000 条之间的话请将子查询的 `limit` 设为 `1000`。
+- 将需要查询的字段冗余到主查询所在的表上。
+- 进行多次查询，每次在子查询上设置不同的 `skip` 值来遍历所有记录（注意 `skip` 的值较大时可能会引发性能问题，因此不是很推荐）。
+
+### 统计总数量
+
+如果只需知道有多少对象匹配查询条件而无需获取对象本身，可使用 `count` 来代替 `find`。比如说，查询有多少个已完成的 todo：
+
+```js
+const query = new AV.Query("Todo");
+query.equalTo("isComplete", true);
+query.count().then((count) => {
+  console.log(`${count} 个 todo 已完成。`);
+});
+```
+
+### 组合查询
+
+组合查询就是把诸多查询条件用一定逻辑合并到一起（`OR` 或 `AND`）再交给云端去查询。
+
+组合查询不支持在子查询中包含 `GeoPoint` 或其他非过滤性的限制（例如 `near`、`withinGeoBox`、`limit`、`skip`、`ascending`、`descending`、`include`）。
+
+#### OR 查询
+
+OR 操作表示多个查询条件符合其中任意一个即可。 例如，查询优先级大于等于 `3` 或者已经完成了的 todo：
+
+```js
+const priorityQuery = new AV.Query("Todo");
+priorityQuery.greaterThanOrEqualTo("priority", 3);
+
+const isCompleteQuery = new AV.Query("Todo");
+isCompleteQuery.equalTo("isComplete", true);
+
+const query = AV.Query.or(priorityQuery, isCompleteQuery);
+```
+
+使用 OR 查询时，子查询中不能包含 `GeoPoint` 相关的查询。
+
+#### AND 查询
+
+使用 AND 查询的效果等同于往 `AV.Query` 添加多个条件。下面的代码构建的查询会查找创建时间在 `2016-11-13` 和 `2016-12-02` 之间的 todo：
+
+```js
+const startDateQuery = new AV.Query("Todo");
+startDateQuery.greaterThanOrEqualTo(
+  "createdAt",
+  new Date("2016-11-13 00:00:00")
+);
+
+const endDateQuery = new AV.Query("Todo");
+endDateQuery.lessThan("createdAt", new Date("2016-12-03 00:00:00"));
+
+const query = AV.Query.and(startDateQuery, endDateQuery);
+```
+
+单独使用 AND 查询跟使用基础查询相比并没有什么不同，不过当查询条件中包含不止一个 OR 查询时，就必须使用 AND 查询：
+
+```js
+const createdAtQuery = new AV.Query("Todo");
+createdAtQuery.greaterThanOrEqualTo("createdAt", new Date("2018-04-30"));
+createdAtQuery.lessThan("createdAt", new Date("2018-05-01"));
+
+const locationQuery = new AV.Query("Todo");
+locationQuery.doesNotExist("location");
+
+const priority2Query = new AV.Query("Todo");
+priority2Query.equalTo("priority", 2);
+
+const priority3Query = new AV.Query("Todo");
+priority3Query.equalTo("priority", 3);
+
+const priorityQuery = AV.Query.or(priority2Query, priority3Query);
+const timeLocationQuery = AV.Query.or(locationQuery, createdAtQuery);
+const query = AV.Query.and(priorityQuery, timeLocationQuery);
+```
+
+### 查询性能优化
+
+影响查询性能的因素很多。特别是当查询结果的数量超过 10 万，查询性能可能会显著下降或出现瓶颈。以下列举一些容易降低性能的查询方式，开发者可以据此进行有针对性的调整和优化，或尽量避免使用。
+
+- 不等于和不包含查询（无法使用索引）
+- 通配符在前面的字符串查询（无法使用索引）
+- 有条件的 `count`（需要扫描所有数据）
+- `skip` 跳过较多的行数（相当于需要先查出被跳过的那些行）
+- 无索引的排序（另外除非复合索引同时覆盖了查询和排序，否则只有其中一个能使用索引）
+- 无索引的查询（另外除非复合索引同时覆盖了所有条件，否则未覆盖到的条件无法使用索引，如果未覆盖的条件区分度较低将会扫描较多的数据）
+
+## LiveQuery
+
+LiveQuery 衍生于 [`AV.Query`](#查询)，并为其带来了更强大的功能。它可以让你无需编写复杂的逻辑便可在客户端之间同步数据，这对于有实时数据同步需求的应用来说很有帮助。
+
+设想你正在开发一个多人协作同时编辑一份文档的应用，单纯地使用 `AV.Query` 并不是最好的做法，因为它只具备主动拉取的功能，而应用并不知道什么时候该去拉取。
+
+想要解决这个问题，就要用到 LiveQuery 了。借助 LiveQuery，你可以订阅所有需要保持同步的 `AV.Query`。订阅成功后，一旦有符合 `AV.Query` 的 `AV.Object` 发生变化，云端就会主动、实时地将信息通知到客户端。
+
+LiveQuery 使用 WebSocket 在客户端和云端之间建立连接。WebSocket 的处理会比较复杂，而我们将其封装成了一个简单的 API 供你直接使用，无需关注背后的原理。
+
+### 启用 LiveQuery
+
+进入 **<Path to="storage" /> > 服务设置**，在 **安全设置** 里面勾选 **启用 LiveQuery**，然后将下面的 npm 模块添加到项目中即可：
+
+```js
+// 无需加载 leancloud-storage
+const AV = require("leancloud-storage/live-query");
+```
+
+或者使用 `script` 标签：
+
+<CodeBlock>
+{`<!-- 无需加载 av-min.js -->
+<script src="//code.bdstatic.com/npm/leancloud-storage@${sdkVersions.leancloud.js.storage}/dist/av-live-query-min.js"></script>`}
+</CodeBlock>
+
+### Demo
+
+下面是在使用了 LiveQuery 的网页应用和手机应用中分别操作，数据保持同步的效果：
+
+<video
+  src="https://capacity-files.lcfile.com/1496988080458"
+  controls
+  autoPlay
+  muted
+  preload="auto"
+  width="100%"
+  height="100%"
+>
+  HTML5 Video is required for this demo, which your browser doesn't support.
+</video>
+
+使用我们的「LeanTodo」微信小程序和网页应用，可以实际体验以上视频所演示的效果，步骤如下：
+
+1. 微信扫码，添加小程序「LeanTodo」；
+
+   ![LeanTodo mini program](/img/leantodo-weapp-qr.jpg)
+
+2. 进入小程序，点击首页左下角 **设置** > **账户设置**，输入便于记忆的用户名和密码；
+
+3. 使用浏览器访问 <https://leancloud.github.io/leantodo-vue/>，输入刚刚在小程序中更新好的账户信息，点击 **Login**；
+
+4. 随意添加更改数据，查看两端的同步状态。
+
+注意按以上顺序操作。在网页应用中使用 **Signup** 注册的账户无法与小程序创建的账户相关联，所以如果颠倒以上操作顺序，则无法观测到数据同步效果。
+
+[LiveQuery 公开课](http://www.bilibili.com/video/av11291992/) 涵盖了许多开发者关心的问题和解答。
+
+### 构建订阅
+
+首先创建一个普通的 `AV.Query` 对象，添加查询条件（如有），然后进行订阅操作：
+
+```js
+const query = new AV.Query("Todo");
+query.subscribe().then((liveQuery) => {
+  // 订阅成功
+});
+```
+
+LiveQuery 不支持内嵌查询，也不支持返回指定属性。
+
+订阅成功后，就可以接收到和 `AV.Object` 相关的更新了。假如在另一个客户端上创建了一个 `Todo` 对象，对象的 `title` 设为 `更新作品集`，那么下面的代码可以获取到这个新的 `Todo`：
+
+```js
+const query = new AV.Query("Todo");
+query.subscribe().then((liveQuery) => {
+  liveQuery.on("create", (newTodo) => {
+    console.log(newTodo.get("title")); // 更新作品集
+  });
+});
+```
+
+此时如果有人把 `Todo` 的 `content` 改为 `把我最近画的插画放上去`，那么下面的代码可以获取到本次更新：
+
+```js
+liveQuery.on("update", (updatedTodo, updatedKeys) => {
+  console.log(updatedTodo.get("content")); // 把我最近画的插画放上去
+});
+```
+
+### 事件处理
+
+订阅成功后，可以选择监听如下几种数据变化：
+
+- `create`
+- `update`
+- `enter`
+- `leave`
+- `delete`
+
+#### `create` 事件
+
+当有新的满足 `AV.Query` 查询条件的 `AV.Object` 被创建时，`create` 事件会被触发。下面的 `object` 就是新建的 `AV.Object`：
+
+```js
+liveQuery.on("create", (object) => {
+  console.log("对象被创建。");
+});
+```
+
+#### `update` 事件
+
+当有满足 `AV.Query` 查询条件的 `AV.Object` 被更新时，`update` 事件会被触发。下面的 `object` 就是有更新的 `AV.Object`：
+
+```js
+liveQuery.on("update", (object, updatedKeys) => {
+  console.log("对象被更新。");
+});
+```
+
+#### `enter` 事件
+
+当一个已存在的、原本不符合 `AV.Query` 查询条件的 `AV.Object` 发生更新，且更新后符合查询条件，`enter` 事件会被触发。下面的 `object` 就是进入 `AV.Query` 的 `AV.Object`，其内容为该对象最新的值：
+
+```js
+liveQuery.on("enter", (object, updatedKeys) => {
+  console.log("对象进入。");
+});
+```
+
+注意区分 `create` 和 `enter` 的不同行为。如果一个对象已经存在，在更新之前不符合查询条件，而在更新之后符合查询条件，那么 `enter` 事件会被触发。如果一个对象原本不存在，后来被构建了出来，那么 `create` 事件会被触发。
+
+#### `leave` 事件
+
+当一个已存在的、原本符合 `AV.Query` 查询条件的 `AV.Object` 发生更新，且更新后不符合查询条件，`leave` 事件会被触发。下面的 `object` 就是离开 `AV.Query` 的 `AV.Object`，其内容为该对象最新的值：
+
+```js
+liveQuery.on("leave", (object, updatedKeys) => {
+  console.log("对象离开。");
+});
+```
+
+#### `delete` 事件
+
+当一个已存在的、原本符合 `AV.Query` 查询条件的 `AV.Object` 被删除，`delete` 事件会被触发。下面的 `object` 就是被删除的 `AV.Object` 的 `objectId`：
+
+```js
+liveQuery.on("delete", (object) => {
+  console.log("对象被删除。");
+});
+```
+
+### 取消订阅
+
+如果不再需要接收有关 `AV.Query` 的更新，可以取消订阅。
+
+```js
+liveQuery.unsubscribe().then(() => {
+  // 成功取消订阅
+});
+```
+
+### 断开连接
+
+断开连接有几种情况：
+
+1. 网络异常或者网络切换，非预期性断开。
+2. 退出应用、关机或者打开飞行模式等，用户在应用外的操作导致断开。
+
+如上几种情况开发者无需做额外的操作，只要切回应用，SDK 会自动重新订阅，数据变更会继续推送到客户端。
+
+而另外一种极端情况——**当用户在移动端使用手机的进程管理工具，杀死了进程或者直接关闭了网页的情况下**，SDK 无法自动重新订阅，此时需要开发者根据实际情况实现重新订阅。
+
+### LiveQuery 的注意事项
+
+因为 LiveQuery 的实时性，很多用户会陷入一个误区，试着用 LiveQuery 来实现一个简单的聊天功能。
+我们不建议这样做，因为使用 LiveQuery 构建聊天服务会承担额外的存储成本，产生的费用会增加，后期维护的难度非常大（聊天记录、对话维护之类的代码会很混乱），并且云服务已经提供了即时通讯的服务。
+LiveQuery 的核心还是提供一个针对查询的推拉结合的用法，脱离设计初衷容易造成前端的模块混乱。
+
+## 文件
+
+有时候应用需要存储尺寸较大或结构较为复杂的数据，这类数据不适合用 `AV.Object` 保存，此时文件对象 `AV.File` 便成为了更好的选择。文件对象最常见的用途是保存图片，不过也可以用来保存文档、视频、音乐等其他二进制数据。
+
+### 构建文件
+
+可以通过 base64 编码的字符串构建文件：
+
+```js
+const data = { base64: "TGVhbkNsb3Vk" };
+// resume.txt 是文件名
+const file = new AV.File("resume.txt", data);
+```
+
+还可以通过字节数组构建文件：
+
+```js
+const data = [0x4c, 0x65, 0x61, 0x6e, 0x43, 0x6c, 0x6f, 0x75, 0x64];
+const file = new AV.File("resume.txt", data);
+```
+
+此外，浏览器环境下还可以通过 Blob 构建文件，Node.js 环境下还可以通过 Buffer、Stream 构建文件。
+
+React Native 环境下，可以通过本地路径构建文件：
+
+```js
+const data = { blob: { uri: localFileUri } };
+const file = new AV.File("resume.txt", data);
+```
+
+除此之外，还可以通过 URL 构建文件：
+
+```js
+const file = AV.File.withURL(
+  "logo.png",
+  "https://leancloud.cn/assets/imgs/press/Logo%20-%20Blue%20Padding.a60eb2fa.png"
+);
+```
+
+通过 URL 构建文件时，SDK 并不会将原本的文件转储到云端，而是会将文件的物理地址存储为字符串，这样也就不会产生任何文件上传流量。使用其他方式构建的文件会被保存在云端。
+
+云端会根据文件扩展名自动检测文件类型。如果需要的话，也可以手动指定 `Content-Type`（一般称为 MIME 类型）：
+
+```js
+const file = new AV.File("resume.txt", data, "application/json");
+```
+
+注意：目前微信小程序环境下不支持指定文件类型。
+
+与前面提到的方式相比，一个更常见的文件构建方式是从本地路径上传。
+
+```html
+<input type="file" id="avatar-upload" />
+```
+
+然后在一个点击事件处理函数中获取这个文件：
+
+```js
+const avatarUpload = document.getElementById("avatar-upload");
+if (avatarUpload.files.length) {
+  const localFile = avatarUpload.files[0];
+  const file = new AV.File("avatar.jpg", localFile);
+}
+```
+
+这里上传的文件名字叫做 `avatar.jpg`。需要注意：
+
+- 每个文件会被分配到一个独一无二的 `objectId`，所以在一个应用内是允许多个文件重名的。
+- 文件必须有扩展名才能被云端正确地识别出类型。比如说要用 `AV.File` 保存一个 PNG 格式的图像，那么扩展名应为 `.png`。
+- 如果文件没有扩展名，且没有手动指定类型，那么云服务将默认使用 `application/octet-stream`。
+
+如果希望指定文件上传后在云端的路径，可以设置文件的 `key` 属性。
+例如，上传 robots.txt 文件，限制搜索引擎抓取自定义文件域名下的 URL：
+
+```js
+file.save({ key: "robots.txt" });
+```
+
+### 保存文件
+
+将文件保存到云端后，便可获得一个永久指向该文件的 URL：
+
+```js
+file.save().then(
+  (file) => {
+    console.log(`文件保存完成。URL：${file.url}`);
+  },
+  (error) => {
+    // 保存失败，可能是文件无法被读取，或者上传过程中出现问题
+  }
+);
+```
+
+```js
+const data = [0x4c, 0x65, 0x61, 0x6e, 0x43, 0x6c, 0x6f, 0x75, 0x64];
+const file = new AV.File("resume.txt", data);
+file.save({ keepFileName: true }).then(
+  (file) => {
+    console.log(file.url); // https://your-file-domain/5112b94e0536e995741c/resume.txt
+  },
+  (error) => {
+    // 保存失败，可能是文件无法被读取，或者上传过程中出现问题
+  }
+);
+```
+
+文件上传后，可以在 **<Path to="storage" /> > 文件** 中找到。已上传的文件无法再被修改。如果需要修改文件，只能重新上传修改过的文件并取得新的 `objectId` 和 URL。
+
+已经保存到云端的文件可以关联到 `AV.Object`：
+
+```js
+const Todo = AV.Object.extend("Todo");
+const todo = new Todo();
+todo.set("title", "买蛋糕");
+// attachments 是一个 Array 属性
+todo.add("attachments", file);
+todo.save();
+```
+
+也可以通过构建 `AV.Query` 进行[查询](#查询)：
+
+```js
+const query = new AV.Query("_File");
+```
+
+需要注意的是，内部文件（上传到文件服务的文件）的 `url` 字段是由云端动态生成的，其中涉及切换自定义域名的相关处理逻辑。
+因此，通过 `url` 字段查询文件仅适用于外部文件（直接保存外部 URL 到文件服务创建的文件），内部文件请改用 key 字段（URL 中的路径）查询。
+
+注意，如果文件被保存到了 `AV.Object` 的一个数组属性中，那么在查询 `AV.Object` 时如果需要包含文件，则要用到 `AV.Query` 的 `include` 方法。比如说，在获取所有标题为 `买蛋糕` 的 todo 的同时获取附件中的文件：
+
+```js
+// 获取同一标题且包含附件的 todo
+const query = new AV.Query("Todo");
+query.equalTo("title", "买蛋糕");
+query.exists("attachments");
+
+// 同时获取附件中的文件
+query.include("attachments");
+
+query.find().then((todos) => {
+  todos.forEach((todo) => {
+    // 获取每个 todo 的 attachments 数组
+    const attachments = todo.get("attachments");
+    attachments.forEach((attachment) => {
+      // 每个附件都是一个 AV.File 实例
+      console.log(`附件 URL：${attachment.get("url")}`);
+    });
+  });
+});
+```
+
+### 上传进度监听
+
+上传过程中可以实时向用户展示进度：
+
+```js
+file
+  .save({
+    onprogress: (progress) => {
+      console.log(progress);
+      // {
+      //   loaded:  1024,
+      //   total:   2048,
+      //   percent: 50
+      // }
+    },
+  })
+  .then((file) => {
+    // 保存后的操作
+  });
+```
+
+### 文件元数据
+
+上传文件时，可以用 `metaData` 添加额外的属性。文件一旦保存，`metaData` 便不可再修改。
+
+```js
+// 设置元数据
+file.metaData("author", "LeanCloud");
+file.save().then((file) => {
+  // 获取全部元数据
+  const metadata = file.metaData();
+  // 获取 author 属性
+  const author = file.metaData("author");
+  // 获取文件名
+  const fileName = file.get("name");
+  // 获取大小（不适用于通过 base64 编码的字符串或者 URL 保存的文件）
+  const size = file.size();
+});
+```
+
+### 图像缩略图
+
+成功保存图像后，除了可以获取指向该文件的 URL 外，还可以获取图像的缩略图 URL，并且可以指定缩略图的宽度和高度：
+
+```js
+// 获得宽度为 100 像素，高度 200 像素的缩略图
+const url = file.thumbnailURL(100, 200);
+```
+
+图片最大不超过 **20 MB** 才可以获取缩略图。
+
+国际版不支持图片缩略图。
+
+### 删除文件
+
+下面的代码从云端删除一个文件：
+
+```js
+const file = AV.File.createWithoutData("552e0a27e4b0643b709e891e");
+file.destroy();
+```
+
+默认情况下，文件的删除权限是关闭的。
+如需删除文件，一般建议在服务端使用 Master Key 调用 REST API 删除。
+取决于产品的具体需求，也可以考虑在 **<Path to="storage" /> > 文件 > 权限** 向特定用户或特定角色开启删除权限。
+
+### 文件审核
+
+当前**文件审核**功能支持检测**图片**文件。
+
+你可以在 **数据存储 > 文件 > 文件审核** 标签下勾选「自动审核新上传图片」，还可以批量审核指定时间范围内的图片，图片审核结果将在 **文件管理** 标签页展示。
+
+如果你需要人工二次审核，可以点击每一行记录，在文件详情中选择「通过」或「封禁」。
+
+## Promise
+
+每一个在 JavaScript SDK 中的异步方法都会返回一个 `Promise`，可以用于处理该异步方法的完成与异常。下面的示例代码在查询到一个 `AV.Object` 后对其进行更新：
+
+```js
+const query = new AV.Query("Todo");
+query.equalTo("priority", 1);
+// find 方法是一个异步方法，会返回一个 Promise，之后可以使用 then 方法
+query
+  .find()
+  .then((todos) => {
+    // 返回符合条件的对象组成的数组
+    const todo = todos[0];
+    todo.set("notes", "今天需要完成。");
+    // save 方法也是一个异步方法，会返回一个 Promise，所以在此处，你可以直接 return 出去，后续操作就可以支持链式 Promise 调用
+    return todo.save();
+  })
+  .then(() => {
+    // 这里是 save 方法返回的 Promise
+    console.log("成功更新 todo。");
+  })
+  .catch((error) => {
+    // catch 方法写在 Promise 链式的最后，可以捕捉到全部 error
+    console.error(error);
+  });
+```
+
+### `then` 方法
+
+每一个 `Promise` 都有一个叫 `then` 的方法，这个方法接受一对 callback。第一个 callback 在 `Promise` 被解决（`resolved`，也就是正常运行）的时候调用，第二个会在 `Promise` 被拒绝（`rejected`，也就是遇到错误）的时候调用：
+
+```js
+todo.save().then(
+  (todo) => {
+    console.log("成功更新 todo。");
+  },
+  (error) => {
+    console.error(error);
+  }
+);
+```
+
+其中第二个参数是可选的。
+
+你还可以使用 `catch` 方法，将逻辑写成：
+
+```js
+todo
+  .save()
+  .then((todo) => {
+    console.log("成功更新 todo。");
+  })
+  .catch((error) => {
+    console.error(error);
+  });
+```
+
+### 将 `Promise` 组织在一起
+
+Promise 比较神奇，可以代替多层嵌套方式来解决发送异步请求代码的调用顺序问题。如果一个 `Promise` 的回调会返回一个 `Promise`，那么第二个 `then` 里的 callback 在第一个 `then` 的 callback 没有解决前是不会解决的，也就是所谓 **Promise Chain**。
+
+```js
+// 将内容按章节顺序添加到页面上
+const chapterIds = [
+  "584e1c408e450a006c676162", // 第一章
+  "584e1c43128fe10058b01cf5", // 第二章
+  "581aff915bbb500059ca8d0b", // 第三章
+];
+
+new AV.Query("Chapter")
+  .get(chapterIds[0])
+  .then((chapterOne) => {
+    // 向页面添加内容
+    addHtmlToPage(chapterOne.get("content"));
+    // 返回新的 Promise
+    return new AV.Query("Chapter").get(chapterIds[1]);
+  })
+  .then((chapterTwo) => {
+    addHtmlToPage(chapterTwo.get("content"));
+    return new AV.Query("Chapter").get(chapterIds[2]);
+  })
+  .then((chapterThree) => {
+    addHtmlToPage(chapterThree.get("content"));
+    // 完成
+  });
+```
+
+### 错误处理
+
+如果任意一个在链中的 `Promise` 抛出一个异常的话，所有接下来可能成功的 callback 都会被跳过直到遇到一个处理错误的 callback。
+
+通常来说，在正常情况的回调函数链的末尾，加一个错误处理的回调函数，是一种很常见的做法。
+
+利用 `catch` 方法可以将上述代码改写为：
+
+```js
+new AV.Query("Chapter")
+  .get(chapterIds[0])
+  .then((chapterOne) => {
+    addHtmlToPage(chapterOne.get("content"));
+    // 强制失败
+    throw new Error("出错啦");
+    return new AV.Query("Chapter").get(chapterIds[1]);
+  })
+  .then((chapterTwo) => {
+    // 这里的代码将被忽略
+    addHtmlToPage(chapterTwo.get("content"));
+    return new AV.Query("Chapter").get(chapterIds[2]);
+  })
+  .then((chapterThree) => {
+    // 这里的代码将被忽略
+    addHtmlToPage(chapterThree.get("content"));
+  })
+  .catch((error) => {
+    // 这个错误处理函数将被调用，错误信息是 '出错啦'
+    console.error(error.message);
+  });
+```
+
+### `async` 和 `await`
+
+`async` 和 `await` 能让你以更接近同步代码的方式使用 Promise：
+
+```js
+async function example() {
+  try {
+    const query = new AV.Query("Todo");
+    query.equalTo("priority", 1);
+    const todos = await query.find();
+    const todo = todos[0];
+    todo.set("notes", "今天需要完成。");
+    return await todo.save();
+  } catch (error) {
+    console.error(error);
+  }
+}
+```
+
+如果你想更深入地了解和学习 Promise，包括如何对并行的异步操作进行控制，我们推荐阅读 [JavaScript Promise 迷你书（中文版）](http://liubin.github.io/promises-book/)这本书。
+
+## GeoPoint
+
+云服务允许你通过将 `AV.GeoPoint` 关联到 `AV.Object` 的方式存储折射真实世界地理位置的经纬坐标，这样做可以让你查询包含一个点附近的坐标的对象。常见的使用场景有「查找附近的用户」和「查找附近的地点」。
+
+要构建一个包含地理位置的对象，首先要构建一个地理位置。下面的代码构建了一个 `AV.GeoPoint` 并将其纬度（`latitude`）设为 `39.9`，经度（`longitude`）设为 `116.4`：
+
+```js
+const point = new AV.GeoPoint(39.9, 116.4);
+
+// 其他构建 AV.GeoPoint 的方式
+const point = new AV.GeoPoint([39.9, 116.4]);
+const point = new AV.GeoPoint({ latitude: 39.9, longitude: 116.4 });
+```
+
+现在可以将这个地理位置存储为一个对象的属性：
+
+```js
+todo.set("location", point);
+```
+
+### 地理位置查询
+
+给定一些含有地理位置的对象，可以从中找出离某一点最近的几个，或者处于某一范围内的几个。要执行这样的查询，可以向普通的 `AV.Query` 添加 `near` 条件。下面的代码查找 `location` 属性值离某一点最近的 `Todo` 对象：
+
+```js
+const query = new AV.Query("Todo");
+const point = new AV.GeoPoint(39.9, 116.4);
+query.near("location", point);
+
+// 限制为 10 条结果
+query.limit(10);
+query.find().then((todos) => {
+  // todos 是包含满足条件的 Todo 对象的数组
+});
+```
+
+像 `ascending` 和 `descending` 这样额外的排序条件会获得比默认的距离排序更高的优先级。
+
+若要限制结果和给定地点之间的距离，可以参考 API 文档中的 `withinKilometers`、`withinMiles` 和 `withinRadians` 参数。
+
+若要查询在某一矩形范围内的对象，可以用 `withinGeoBox`：
+
+![withinGeoBox](/img/geopoint-withingeobox.svg)
+
+```js
+const query = new AV.Query("Todo");
+const southwest = new AV.GeoPoint(30, 115);
+const northeast = new AV.GeoPoint(40, 118);
+query.withinGeoBox("location", southwest, northeast);
+```
+
+### GeoPoint 的注意事项
+
+GeoPoint 的经纬度的类型是数字，且经度需在 -180.0 到 180.0 之间，纬度需在 -90.0 到 90.0 之间。
+另外，每个对象最多只能有一个类型为 GeoPoint 的属性。
+
+## 用户
+
+请参阅[内建账户指南](/sdk/authentication/guide/)。
+
+## 角色
+
+随着用户量的增长，你可能会发现相比于为每一名用户单独设置权限，将预先设定好的权限直接分配给一部分用户是更好的选择。为了迎合这种需求，云服务支持基于角色的权限管理。请参阅[《ACL 权限管理开发指南》](https://leancloud.cn/docs/acl-guide.html)。
+
+## 全文搜索
+
+全文搜索是一个针对应用数据进行全局搜索的接口，它基于搜索引擎构建，提供更强大的搜索功能。要深入了解其用法和阅读示例代码，请阅读[全文搜索指南](/sdk/storage/guide/fulltext-search/)。
+
+## WebView
+
+JS SDK 支持在各种 WebView 中使用，包括 PhoneGap、Cordova、微信 WebView 等。
+
+### Android WebView
+
+如果是 Android WebView，在 Native 代码创建 WebView 的时候你需要打开几个选项，这些选项生成 WebView 的时候默认并不会被打开，需要配置：
+
+1. 因为我们 JS SDK 目前使用了 `window.localStorage`，所以你需要开启 WebView 的 `localStorage`：
+
+   ```java
+   yourWebView.getSettings().setDomStorageEnabled(true);
+   ```
+
+2. 如果你希望直接调试手机中的 WebView，也同样需要在生成 WebView 的时候设置远程调试，具体使用方式请参考 [Google 官方文档](https://developer.chrome.com/devtools/docs/remote-debugging)。
+
+   ```java
+   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+     yourWebView.setWebContentsDebuggingEnabled(true);
+   }
+   ```
+
+   注意：这种调试方式仅支持 Android 4.4 以上版本（含 4.4）。
+
+3. 如果你是通过 WebView 来开发界面，Native 调用本地特性的 Hybrid 方式开发你的 App。比较推荐的开发方式是：通过 Chrome 的开发者工具开发界面部分，当界面部分完成，与 Native 再来做数据连调，这种时候才需要用 Remote debugger 方式在手机上直接调试 WebView。这样做会大大节省你开发调试的时间，不然如果界面都通过 Remote debugger 方式开发，可能效率较低。
+
+4. 为了防止通过 JavaScript 反射调用 Java 代码访问 Android 文件系统的安全漏洞，在 Android 4.2 以后的系统中，WebView 中间只能访问通过 [`@JavascriptInterface`](http://developer.android.com/reference/android/webkit/JavascriptInterface.html) 标记过的方法。如果你的目标用户覆盖 4.2 以上的机型，请注意加上这个标记，以避免出现 `Uncaught TypeError`。
