@@ -18,7 +18,6 @@ import sdkVersions from "/src/docComponents/sdkVersions";
 在 [下载页](/tap-download) 获得 TapSDK，引入 `TapSupport` 模块：
 
 <MultiLang kind="ue">
-
 <>
 
 TapSupport SDK 可独立运行：
@@ -64,11 +63,30 @@ TapCommonSDK.framework
 TapSupportSDK.framework
 ```
 
-```ue
-// TODO
+</>
+
+<>
+
+TapSupport SDK 依赖 TapCommon 模块：
+
+```csharp
+PublicDependencyModuleNames.AddRange(
+            new string[]
+            {
+                "Core",
+                "Json",
+                "JsonUtilities",
+                "UMG",
+                "Http",
+                "TapCommon"
+                // ... add other public dependencies that you statically link with here ...
+            }
+            );
 ```
 
 </>
+
+
 </MultiLang>
 
 在初始化 SDK 之前，有一些准备工作需要完成：
@@ -79,7 +97,7 @@ TapSupportSDK.framework
 
 然后使用以下代码初始化 TapSupport 模块：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 using TapTap.Support;
@@ -111,6 +129,15 @@ config.callback = self;
 [TapSupport shareInstance].config = config;
 ```
 
+```cpp
+#include "TapUESupport.h"
+
+FTapSupportConfig Config;
+Config.ServerUrl = TEXT("https://please-replace-with-your-customized.domain.com");
+Config.ProductID = TEXT("产品 ID");
+TapUESupport::Init(Config);
+```
+
 </MultiLang>
 
 上述代码示例中，`please-replace-with-your-customized.domain.com` 就是准备工作 2 中获取或绑定的域名。`产品 ID` 是在准备工作 3 中新建的分类的 ID。
@@ -135,7 +162,7 @@ config.callback = self;
 
 匿名登录是指游戏使用一个只有当前玩家能拿到的字符串作为匿名身份标识（ID）登录客服系统。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 TapSupport.AnonymousLogin("uuid");
@@ -147,6 +174,10 @@ TapSupport.loginAnonymously("uuid");
 
 ```objc
 [TapSupport loginAnonymously:@"uuid"];
+```
+
+```cpp
+TapUESupport::LoginAnonymously("uuid");
 ```
 
 </MultiLang>
@@ -193,7 +224,7 @@ TapSupport.loginAnonymously("uuid");
 
 ### 清除登录状态
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 TapSupport.Logout();
@@ -207,11 +238,15 @@ TapSupport.logout();
 [TapSupport logout];
 ```
 
+```cpp
+TapUESupport::Logout();
+```
+
 </MultiLang>
 
 ## 打开客服页面
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 TapSupport.OpenSupportView("/");
@@ -225,6 +260,10 @@ TapSupport.openSupportView("/", null, null);
 [TapSupport openSupportViewWithPath:@"/" metaData:nil fieldsData:nil];
 ```
 
+```cpp
+TapUESupport::OpenSupportView("/", nullptr, nullptr);
+```
+
 </MultiLang>
 
 :::info
@@ -235,7 +274,7 @@ TapSupport.openSupportView("/", null, null);
 
 除了落地页，SDK 也支持在特定的场景下直接打开具体的页面。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 TapSupport.OpenSupportView("/path");
@@ -247,6 +286,10 @@ TapSupport.openSupportView("/path", null, null);
 
 ```objc
 [TapSupport openSupportViewWithPath:@"/path" metaData:nil fieldsData:nil];
+```
+
+```cpp
+TapUESupport::OpenSupportView("/path", nullptr, nullptr);
 ```
 
 </MultiLang>
@@ -267,7 +310,7 @@ TapSupport.openSupportView("/path", null, null);
 
 <!-- fields 与 meta 现在合并成了一个，in-app 两个参数都支持。为了更好理解下面的示例代码中变量名用了 fields。 -->
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 Dictionary<string, object> fields = new Dictionary<string, object>();
@@ -290,11 +333,18 @@ NSDictionary *fields = @{@"243":@"iOS 15.1", @"244":@"WiFi"}; // 243 是在后�
 [TapSupport openSupportViewWithPath:@"/" metaData:nil fieldsData:fields];
 ```
 
+```cpp
+TSharedPtr<FJsonObject> Fields = MakeShareable(new FJsonObject);
+Fields->SetStringField("243", "iOS 15.1");
+Fields->SetStringField("244", "Dash");
+TapUESupport::OpenSupportView("/", nullptr, Fields);
+```
+
 </MultiLang>
 
 除了在打开客服页面时设置，开发者也可以通过以下接口设置全局默认的字段信息：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 TapSupport.SetDefaultFieldsData(fields);
@@ -308,6 +358,10 @@ TapSupport.setDefaultFieldsData(fields);
 [TapSupport shareInstance].defaultFieldsData = fields;
 ```
 
+```cpp
+TapUESupport::SetDefaultFieldsData(Fields);
+```
+
 </MultiLang>
 
 需要注意的是，如果调用 `OpenSupportView` 方法时传入了非空的 `fields` 参数，那么设置的默认 `fields` 信息不会生效。
@@ -316,7 +370,7 @@ TapSupport.setDefaultFieldsData(fields);
 
 玩家可以在客服页面内点击关闭按钮退出。但在特定场景下，游戏可能需要主动关闭客服页面：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 TapSupport.CloseSupportView();
@@ -330,13 +384,17 @@ TapSupport.closeSupportView();
 [TapSupport closeSupportView];
 ```
 
+```cpp
+TapUESupport::CloseSupportView();
+```
+
 </MultiLang>
 
 ## 未读消息通知
 
 当提交的工单有了新的进展（例如有了新的客服回复）时，玩家会产生未读消息。通常在游戏内会在客服入口使用小红点等形式提示玩家有未读消息。SDK 会自动通过轮询获取是否有维度消息，当未读消息状态发生变化时——从无到有或从有到无—— SDK 会通过回调通知开发者：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 using TapTap.Support;
@@ -376,6 +434,11 @@ config.callback = self;
 [TapSupport shareInstance].config = config;
 ```
 
+```cpp
+TapUESupport::OnUnreadStatusChanged.BindUObject(this, &YourUObject::OnUnreadStatusChanged);
+TapUESupport::OnErrorCallBack.BindUObject(this, &YourUObject::OnErrorCallBack);
+```
+
 </MultiLang>
 
 :::info
@@ -389,7 +452,7 @@ SDK 内建的轮询机制会智能的调整频率获取未读消息状态。但�
 - `Pause`：暂停轮询
 - `Resume`：恢复轮询
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 TapSupport.Resume();
@@ -404,6 +467,11 @@ TapSupport.pause();
 ```objc
 [TapSupport resume];
 [TapSupport pause];
+```
+
+```cpp
+TapUESupport::Resume();
+TapUESupport::Pause();
 ```
 
 </MultiLang>
