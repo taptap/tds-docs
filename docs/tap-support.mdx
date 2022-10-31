@@ -71,7 +71,7 @@ TapSupportSDK.framework
 
 1. 在开发者中心厂商页面启用客服系统。客服系统是厂商维度的，一个厂商下如果有多个游戏启用一次即可。
 2. 每个厂商会被分配一个专属域名，需要记下待用。如果你想要使用厂商自己的域名，也可以在开发者中心客服系统模块中绑定。
-3. 前往客服后台，为当前游戏创建一个分类（**设置 > 管理 > 工单分类**），记下这个分类的 ID（配置分类需要客服角色，客服需要先在开发者中心邀请）。
+3. 前往客服后台，为当前游戏创建一个分类（**设置 > 管理 > 工单分类**），记下这个分类的 ID，我们称其为产品 ID（配置分类需要客服角色，客服需要先在开发者中心邀请）。
 
 然后使用以下代码初始化 TapSupport 模块：
 
@@ -80,7 +80,7 @@ TapSupportSDK.framework
 ```cs
 using TapTap.Support;
 
-TapSupport.Init("https://please-replace-with-your-customized.domain.com", "分类 ID");
+TapSupport.Init("https://please-replace-with-your-customized.domain.com", "产品 ID");
 ```
 
 ```java
@@ -88,7 +88,12 @@ import com.tds.tapsupport.TapSupport;
 import com.tds.tapsupport.TapSupportCallback;
 import com.tds.tapsupport.TapSupportConfig;
 
-TapSupportConfig config = new TapSupportConfig("https://please-replace-with-your-customized.domain.com", "分类 ID")
+TapSupportConfig config = new TapSupportConfig("https://please-replace-with-your-customized.domain.com", "产品 ID", new TapSupportCallback() {
+    @Override
+    public void onUnreadStatusChanged(boolean hasUnread) {
+      // 我们会在 §未读消息通知 讨论 callback 的用法
+    }
+})
 TapSupport.setConfig(this, config);
 ```
 
@@ -97,14 +102,14 @@ TapSupport.setConfig(this, config);
 
 TapSupportConfig *config = [TapSupportConfig new];
 config.server = @"https://please-replace-with-your-customized.domain.com";
-config.productID = @"分类 ID";
+config.productID = @"产品 ID";
 config.callback = self;
 [TapSupport shareInstance].config = config;
 ```
 
 </MultiLang>
 
-上述代码示例中，`please-replace-with-your-customized.domain.com` 就是准备工作 2 中获取或绑定的域名。`分类 ID` 是在准备工作 3 中新建分类得到的 ID。
+上述代码示例中，`please-replace-with-your-customized.domain.com` 就是准备工作 2 中获取或绑定的域名。`产品 ID` 是在准备工作 3 中新建的分类的 ID。
 
 ## 登录
 
@@ -209,7 +214,7 @@ TapSupport.OpenSupportView("/");
 ```
 
 ```java
-TapSupport.openSupportView("/");
+TapSupport.openSupportView("/", null, null);
 ```
 
 ```objc
@@ -233,7 +238,7 @@ TapSupport.OpenSupportView("/path");
 ```
 
 ```java
-TapSupport.openSupportView("/path");
+TapSupport.openSupportView("/path", null, null);
 ```
 
 ```objc
@@ -273,11 +278,11 @@ Map<String, Object> fields = new HashMap<>();
 fields.put("243", "iOS 15.1"); // 243 是在后台创建的「OS」字段的 ID
 fields.put("244", "Dash"); // 244 是在后台创建的「角色名」字段的 ID
 
-TapSupport.openSupportView("/", fields);
+TapSupport.openSupportView("/", fields, null);
 ```
 
 ```objc
-NSDictionary *meta = @{@"243":@"iOS 15.1", @"244":@"WiFi"}; // 243 是在后台创建的「OS」字段的 ID，244 是在「角色名」字段的 ID
+NSDictionary *fields = @{@"243":@"iOS 15.1", @"244":@"WiFi"}; // 243 是在后台创建的「OS」字段的 ID，244 是在「角色名」字段的 ID
 [TapSupport openSupportViewWithPath:@"/" metaData:nil fieldsData:fields];
 ```
 
