@@ -1,5 +1,5 @@
 ---
-title: 支付系统
+title: 支付系统 TapPayment
 ---
 
 <head>
@@ -11,7 +11,6 @@ import CodeBlock from "@theme/CodeBlock";
 import sdkVersions from "../src/docComponents/sdkVersions";
 import { Conditional } from "../src/docComponents/conditional";
 
-## TapPayment 简介
 
 TapPayment 是一项可让您在游戏中销售虚拟产品的服务。
 
@@ -53,15 +52,34 @@ TapPayment 是一项可让您在游戏中销售虚拟产品的服务。
 
 接入方式参考 [入门指南 - 项目配置](/sdk/start/quickstart.mdx)。
 
-## SDK 开发指南
+## 初始化
 
-### 命名空间
+:::info
+以下两种初始化方式任选其一。
+:::
+
+### TapSDK 初始化
+
+如果你已经参考快速开始完成了初始化，这里只需要引入公告模块即可。
 
 <MultiLang>
 <>
 
 ```cs
 using TapTap.Payment;
+
+var config = new TapConfig.Builder()
+    .ClientID(clientId) // 必须，开发者中心对应 Client ID
+    .ClientToken(clientToken) // 必须，开发者中心对应 Client Token
+    .ServerURL(serverUrl) // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
+    .RegionType(RegionType.CN) // 必须，CN 表示中国大陆，IO 表示其他国家或地区
+    .TapPaymentConfig(
+        "CN"                   // 地区选项如果国内填写「CN」，如果是海外填写「US」  
+        , "zh_CN"              // 语言请参考 「语言代码列表」
+        , "https://${domain}" // 国内需要填写微信商户申请 H5 时提交的授权域名，详见 https://pay.weixin.qq.com/wiki/doc/api/H5.php?chapter=15_4 里 Referer 设置相关部分，海外这里填空字符串。
+    )
+    .ConfigBuilder();
+TapBootstrap.Init(config);
 ``` 
 
 </>
@@ -77,24 +95,18 @@ using TapTap.Payment;
 </>
 </MultiLang>
 
-### 初始化
+### 支付系统单独初始化
+如果游戏不通过上面提供的 `TapBootstrap` 方法初始化 TapSDK，仅希望初始化公告系统。可以这么做：
+
+- **复制上面提供的第一种初始化方式代码**。
+- **修改最后一行**为：
+
 <MultiLang>
 <>
 
 ```cs
-var config = new TapConfig.Builder()
-    .ClientID(clientId) // 必须，开发者中心对应 Client ID
-    .ClientToken(clientToken) // 必须，开发者中心对应 Client Token
-    .ServerURL(serverUrl) // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
-    .RegionType(RegionType.CN) // 必须，CN 表示中国大陆，IO 表示其他国家或地区
-    .TapPaymentConfig(
-        "CN"                   // 地区选项如果国内填写「CN」，如果是海外填写「US」  
-        , "zh_CN"              // 语言请参考 「语言代码列表」
-        , "https://${domain}" // 国内需要填写微信商户申请 H5 时提交的授权域名，详见 https://pay.weixin.qq.com/wiki/doc/api/H5.php?chapter=15_4 里 Referer 设置相关部分，海外这里填空字符串。
-    )
-    .ConfigBuilder();
-TapBootstrap.Init(config);
-``` 
+TapPayment.Init(config);
+```
 
 </>
 <>
@@ -130,6 +142,8 @@ var result = TapBootstrap.IsReady();
 
 </>
 </MultiLang>
+
+## SDK 开发指南
 
 ### 查询单个商品
 
@@ -399,7 +413,7 @@ TapPayment.SwitchLanguage("en_US");
 </>
 </MultiLang>
 
-### 语言代码列表
+## 语言代码列表
 
 使用 ISO 639-1 中定义的双小写字母语言代码（例如，`en` 表示英语，`jp` 表示日语），但：
 
