@@ -469,7 +469,7 @@ TapBillboard.unRegisterCustomLinkListener(registerdListener);
 | Key        | Value        | 含义                                      | 来源           |
 | ---------- | ------------ | ----------------------------------------- | -------------- |
 | `X-LC-Id`  | `{{appid}}`  | 当前应用的 `App Id`（即 `Client Id`）  | 可在控制台查看 |
-| `X-LC-Sign` | `{{appSign}}`,{{timestamp}} | 将 timestamp 加上 `App Key`（即 `Client Token`）组成的字符串，再对它做 MD5 签名后的结果。| 可在控制台查看 |
+| `X-LC-Sign` | `{{appSign}}` | 由 `sign,timestamp` 组成的字符串。其中 timestamp 为客户端产生本次请求的 unix 时间戳（UTC），精确到毫秒。`sign` 是 timestamp 拼接 `App Key`（即 `Client Token`）组成的字符串，再对它做 MD5 签名后的结果。| 参考下方的计算方式 |
 
 使用 App Key 来计算 `appSign`:
 
@@ -512,7 +512,7 @@ REST API 请求的 Base URL（下文 curl 示例中用 `{{host}}` 表示）即�
 ```sh
 curl -X GET
   -H 'X-LC-Id: {{appid}}' \
-  -H 'X-LC-Sign: {{appSign}},{{timestamp}}' \
+  -H 'X-LC-Sign: {{appSign}}' \
   https://{{host}}/billboard/rest-api/v1/pattern/detail?client_id={{appid}}&template={{template}}
 ```
 
@@ -546,7 +546,7 @@ curl -X GET
 ```sh
 curl -X POST
   -H 'X-LC-Id: {{appid}}' \
-  -H 'X-LC-Sign: {{appSign}},{{timestamp}}' \
+  -H 'X-LC-Sign: {{appSign}}' \
   -H 'Content-Type: application/json' \
   -d '{
         "lang":{{lang}},
@@ -608,7 +608,7 @@ curl -X POST
 ```sh
 curl -X GET
   -H 'X-LC-Id: {{appid}}' \
-  -H 'X-LC-Sign: {{appSign}},{{timestamp}}' \
+  -H 'X-LC-Sign: {{appSign}}' \
   https://{{host}}/billboard/rest-api/v1/announcement/detail?client_id={{appid}}&lang={{lang}}&id={{id}}&uuid={{uuid}}
 ```
 
@@ -646,7 +646,7 @@ curl -X GET
 ```sh
 curl -X POST \
   -H 'X-LC-Id: {{appid}}' \
-  -H 'X-LC-Sign: {{appSign}},{{timestamp}}' \
+  -H 'X-LC-Sign: {{appSign}}' \
   -H 'Content-Type: application/json' \
   -d '{
         "uuid": {{uuid}},
@@ -685,7 +685,7 @@ curl -X POST \
 ```sh
 curl -X POST \
   -H 'X-LC-Id: {{appid}}' \
-  -H 'X-LC-Sign: {{appSign}},{{timestamp}}' \
+  -H 'X-LC-Sign: {{appSign}}' \
   -H 'Content-Type: application/json' \
   -d '{
       "uuid": {{uuid}},
