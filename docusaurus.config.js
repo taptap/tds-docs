@@ -1,6 +1,5 @@
 // @ts-check
 
-const path = require("path");
 const PREVIEW = process.env.PREVIEW ?? "false";
 
 /** @type {import('@docusaurus/types').Config} */
@@ -132,10 +131,7 @@ const config = {
       },
     }),
 
-  plugins: [
-    "docusaurus-plugin-sass",
-    path.resolve(__dirname, "./plugins/npsmeter"),
-  ],
+  plugins: ["docusaurus-plugin-sass"],
 };
 
 module.exports = config;
