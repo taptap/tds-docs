@@ -144,7 +144,9 @@ public interface ICustomController
     /// 是否允许SDK主动获取ANDROID_ID
     /// </summary>
     bool CanUseAndroidId { get; }
-    // TODO@luran
+    /// <summary>
+    /// 用户信息（为了提高广告的推送效率，开发者可以帮助传入一些用户的画像信息）
+    /// </summary>
     CustomUser ProvideCustomer();
 }
 ```
@@ -204,16 +206,40 @@ var jan1st1970 = new DateTime
     (1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
 for (int i = 0 ; i < 3; i ++) {
-    UserAction tmp = new UserAction.Builder()
-        .ActionType(i)          // 自定义类型
-        .ActionTime((long) (DateTime.UtcNow - jan1st1970).TotalMilliseconds)    // 上报时间
-        .Amount(i * 1000)   // 数量
-        .WinStatus(i % 2)   // TODO
-        .Build();
+    var tmp = new UserAction(actionType: i, actionTime: (long)(DateTime.UtcNow - jan1st1970).TotalMilliseconds,
+                amount: i * 1000, winStatus: i % 2);
     userActions[i] = tmp;
 }
 // CustomUserAction 为实现了 IUserAction 的类
 TapAdSdk.UploadUserAction(userActions, new CustomUserAction(this));
+
+public class UserAction
+{
+    /// <summary>
+    /// 行为动作类型,可自定义
+    /// </summary>
+    public int ActionType { get; }
+    /// <summary>
+    /// 行为发生时间（单位：秒）
+    /// </summary>
+    public long ActionTime { get; }
+    /// <summary>
+    /// 付费金额
+    /// </summary>
+    public int Amount{ get; }
+    /// <summary>
+    /// 是否胜利.0-失败;1-胜利
+    /// </summary>
+    public int WinStatus{ get; }
+
+    public UserAction(int actionType, long actionTime, int amount, int winStatus) 
+    {
+        this.ActionType = actionType;
+        this.ActionTime = actionTime;
+        this.Amount = amount;
+        this.WinStatus = winStatus;
+    }
+}
 
 public interface IUserAction
 {
