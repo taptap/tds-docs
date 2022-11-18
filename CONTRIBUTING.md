@@ -24,7 +24,7 @@
 
 [markdown]: https://www.markdown-cheatsheet.com
 [docusaurus-markdown]: https://docusaurus.io/docs/markdown-features
-[YAML]: https://quickref.me/yaml
+[yaml]: https://quickref.me/yaml
 
 下面是一个例子：
 
@@ -45,7 +45,7 @@ sidebar_position: 10
 如果你了解 markdown 和 github 协作的一般流程，那么现在就可以开始给 TDS 文档贡献内容了。
 期待你的第一个 [PR]！
 
-[PR]: https://docs.github.com/en/get-started/quickstart/github-flow
+[pr]: https://docs.github.com/en/get-started/quickstart/github-flow
 
 如果你不了解这些，也没关系，可以继续阅读下面的指南。
 
@@ -293,9 +293,9 @@ sidebar_position: 10
 Confluence wiki、Notion 等网页上的富文本内容，可以复制到 [Mark Text]（开源，推荐使用）、[Typora]（收费）、[StackEdit] （开源，可以在浏览器中直接使用，但对一些复杂格式的支持不如 Mark Text 和 Typora 全）可以快速转换为 markdown 代码。
 注意，部分格式转换时会丢失或错误，需要手工修正。
 
-[Mark Text]: https://marktext.app
-[StackEdit]: https://stackedit.io/app
-[Typora]: https://typora.io
+[mark text]: https://marktext.app
+[stackedit]: https://stackedit.io/app
+[typora]: https://typora.io
 
 命令行工具 [pandoc] 支持转换多种文件为 markdown，同样，部分格式转换时会丢失或错误，需要手工修正。
 

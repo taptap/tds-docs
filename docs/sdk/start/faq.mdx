@@ -28,6 +28,7 @@ TDS 默认提供了 2 Gbps 的防护带宽，可以防护小规模的攻击，�
 ```sh
 keytool -list -v -keystore xxx.jks
 ```
+
 就可以在命令窗口看到签名文件的信息，包括了 SHA1 值和 MD5 值。**注意这种方式适用于 JDK 10 以下的版本**。
 
 **JDK 10 以上的版本**使用上述方式获取不到 MD5 的值，可以使用 Android Studio 自带的 Gradle Tasks 查看，双击下图中的 signingReport 后调试窗口会输出 MD5 值。
@@ -37,8 +38,9 @@ keytool -list -v -keystore xxx.jks
 :::caution
 
 注意，运行 signingReport 调试窗口输出的 MD5 值带冒号分隔符，绑定到开发者中心时需要手动删除冒号。
-> TapTap开发者中心绑定 MD5 格式举例：
-> 
+
+> TapTap 开发者中心绑定 MD5 格式举例：
+>
 > 正确格式：6EB4347CF9C098BE1C8D965D539C42E2
 >
 > 错误格式：6E:B4:34:7C:F9:C0:98:BE:1C:8D:96:5D:53:9C:42:E2
@@ -49,10 +51,10 @@ keytool -list -v -keystore xxx.jks
 
 ![](https://capacity-files.lcfile.com/8dEVF81X34JFtUE50tnqj6OIoxxDdXsU/%E8%8E%B7%E5%8F%96MD5%E7%A4%BA%E4%BE%8B2.jpeg)
 
-
 ### Android 上 TapSDK 和 B 站 SDK 引用的 okhttp 版本冲突，怎么办？
 
 TapSDK 现在自动包含了 LeanCloud 核心 SDK，LeanCloud SDK 依赖如下几个基础库：
+
 - com.squareup.okhttp3:okhttp:4.7.2
 - com.squareup.retrofit2:retrofit:2.9.0
 - io.reactivex.rxjava2:rxjava:2.2.19
@@ -67,7 +69,9 @@ TapSDK 现在自动包含了 LeanCloud 核心 SDK，LeanCloud SDK 依赖如下�
 
 <summary>build.gradle 的配置</summary>
 
-<CodeBlock className="java"> {`
+<CodeBlock className="java">
+  {" "}
+  {`
     // 请注意以下使用 LeanCloud 核心 SDK 的最新版本号，如果你用的不是 ${sdkVersions.leancloud.java}，请替换
     implementation('cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'){
         exclude group: 'cn.leancloud', module: 'storage-android'
@@ -96,19 +100,23 @@ TapSDK 现在自动包含了 LeanCloud 核心 SDK，LeanCloud SDK 依赖如下�
     configurations {
         all*.exclude group: 'com.squareup.okhttp3'
     }
-`}</CodeBlock>
+`}
+</CodeBlock>
 
 </details>
 
 ## TapTap 登录
 
 ### TapTap 登录报 signature not match 异常
+
 接入了 TapTap 登录但没有在开发者中心后台配置签名或者配置错了都会提示该异常。有的开发者可能没有调试出异常信息，可以通过这种方式进行验证：如果将 TapTap 客户端卸载，测试登录功能时会弹出 WebView 授权，而测试设备安装了 TapTap 客户端则无法拉起客户端授权，这种情况基本上就是因为签名配置问题导致的，请参考[文档](/sdk/start/quickstart/#配置签名证书)完成配置。
 
 ### TapTap 登录报 state not equal 异常
+
 检查当前设备系统时间是否已经开启联网同步、检查当前设备的 TapTap 客户端版本是否过低。
 
 ### TapTap 登录报 java.lang.NoSuchFieldException: CACHE_ELSE_NETWORK 异常
+
 由于 Android 项目开启了混淆操作，TapSDK 已经做了混淆处理，需要跳过对 TapSDK 的混淆操作。具体请参考 [Android 代码混淆](/sdk/start/quickstart/#android-代码混淆)。针对 Android 原生目前暂不支持开启资源混淆操作，如果项目开启了资源混淆操作请关闭掉，`shrinkResources false`。
 
 ### 提示「抱歉，该游戏/应用暂未开放」
@@ -117,14 +125,16 @@ TapSDK 现在自动包含了 LeanCloud 核心 SDK，LeanCloud SDK 依赖如下�
 
 解决方案：
 
-* 游戏在**测试**阶段，可以选择「测试用户管理」，进入页面，点击「添加用户」按钮。根据用户 ID 或昵称搜索，将其添加进测试用户名单。
-* 游戏在**上线**阶段，点击「开放全量用户」。
+- 游戏在**测试**阶段，可以选择「测试用户管理」，进入页面，点击「添加用户」按钮。根据用户 ID 或昵称搜索，将其添加进测试用户名单。
+- 游戏在**上线**阶段，点击「开放全量用户」。
 
 ### 单纯 TapTap 用户认证 For Unity 集成报如下异常：
+
 ```
 Assembly 'Assets/TapTap/Common/Plugins/TapTap.Common.dll' will not be loaded due to errors:
 Unable to resolve reference 'LC.Newtonsoft.Json'. Is the assembly missing or incompatible with the current platform?
 ```
+
 报错原因是因为使用 TapSDK Unity v3.7.1 及更高版本时并没有在项目的 `Packages/manifest.json` 文件中添加 `com.leancloud.storage` 模块导致的，参考[文档](/sdk/taptap-login/guide/tap-login/#sdk-获取)添加即可。
 
 ## 云引擎

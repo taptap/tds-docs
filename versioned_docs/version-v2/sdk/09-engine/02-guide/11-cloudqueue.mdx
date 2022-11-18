@@ -1,10 +1,8 @@
 ---
 id: cloudqueue
-title: 云队列指南 
+title: 云队列指南
 sidebar_label: 云队列
 ---
-
-
 
 云队列提供了一种在云引擎之外调度云函数的能力，它基于云引擎已有的「云函数」这个概念实现了重试、去重、结果查询、延时任务、定时任务等功能，是对云函数功能的一个补充。尚未运行的任务会以一种可靠的方式暂存在云队列，即使你的云引擎因部署、过载、崩溃而重启，任务也不会丢失，云队列会等待你的云引擎实例恢复正常后继续运行它们。
 
@@ -33,37 +31,37 @@ sidebar_label: 云队列
 ## 简单使用
 
 ```javascript
-const {Cloud} = require('leanengine')
+const { Cloud } = require("leanengine");
 
 // 被执行的云函数，这里只是一个例子，实际业务中注意鉴权
-Cloud.define('closeOrder', async function({params}) {
+Cloud.define("closeOrder", async function ({ params }) {
   try {
-    const order = await new Query('Order').get(params.id)
+    const order = await new Query("Order").get(params.id);
     // 返回值可用于后续的结果查询，也会被记录到日志中
-    return await order.save({status: 'closed'})
+    return await order.save({ status: "closed" });
   } catch (err) {
     // 抛出异常使云函数执行失败（JavaScript 自身或依赖库的异常也会使云函数执行失败）
-    throw new Cloud.Error(`Some error happened: ${err.message}`)
+    throw new Cloud.Error(`Some error happened: ${err.message}`);
   }
-})
+});
 
 // 添加任务，enqueue 本身在添加队列成功就返回一个 uniqueId（不等待任务实际被执行）
 // 你可以在所有云引擎代码（包括云函数也包括网站托管中的自定义路由）使用 Cloud.enqueue
-const {uniqueId} = await Cloud.enqueue('closeOrder', {id: 1234})
+const { uniqueId } = await Cloud.enqueue("closeOrder", { id: 1234 });
 
 // 查询任务结果，可将 uniqueId 发给客户端，由客户端进行查询
 // 只有存在于队列中的任务才能查询，可以用 keepResult 来调整已完成任务的保留时间
-console.log(await Cloud.getTaskInfo(uniqueId))
+console.log(await Cloud.getTaskInfo(uniqueId));
 
 // 调整默认选项，增加重试次数，减少重试间隔
-Cloud.enqueue('closeOrder', {id: 1234}, {attempts: 10, backoff: 10000})
+Cloud.enqueue("closeOrder", { id: 1234 }, { attempts: 10, backoff: 10000 });
 
 // 添加延时任务，closeOrder 会在一分钟之后执行
-Cloud.enqueue('closeOrder', {id: 1234}, {delay: 600000})
+Cloud.enqueue("closeOrder", { id: 1234 }, { delay: 600000 });
 
 // 指定 uniqueId，如果已有相同 uniqueId 的任务会抛出异常
 // 只有存在于队列中的任务会参与去重，可以用 keepResult 来调整已完成任务的保留时间
-Cloud.enqueue('closeOrder', {id: 1234}, {uniqueId: '1234'})
+Cloud.enqueue("closeOrder", { id: 1234 }, { uniqueId: "1234" });
 ```
 
 如果你希望某个云函数仅限被云队列调用（而不允许客户端直接调用）的话，可以为 `Cloud.define` 加上 [`internal` 选项](https://github.com/leancloud/leanengine-node-sdk/blob/master/API.md#avclouddefine)，通过这种方式定义的云函数只能被 Cloud Queue 或其他具有 masterKey 权限的代码调用。
@@ -80,16 +78,16 @@ Cloud.getTaskInfo(uniqueId): Promise<TaskInfo>
 用法：
 
 ```javascript
-const {Cloud} = require('leanengine')
+const { Cloud } = require("leanengine");
 
 // 添加任务，enqueue 本身在添加队列成功就返回一个 uniqueId（不等待任务实际被执行）
-const {uniqueId} = await Cloud.enqueue('sendMail', {userId: 1234})
+const { uniqueId } = await Cloud.enqueue("sendMail", { userId: 1234 });
 
 // 延时任务
-Cloud.enqueue('closeOrder', {id: 1234}, {delay: 600000})
+Cloud.enqueue("closeOrder", { id: 1234 }, { delay: 600000 });
 
 // 查询任务结果
-console.log(await Cloud.getTaskInfo(uniqueId))
+console.log(await Cloud.getTaskInfo(uniqueId));
 ```
 
 `options` 的属性包括：
@@ -139,35 +137,35 @@ CRON 表达式的基本语法为：
 秒 分钟 小时 日期 day-of-month 月份 星期 day-of-week
 ```
 
-位置 | 字段 | 约束 | 取值 | 可使用的特殊符号
----|---|---|---|---
-1| 秒 | 必须 |0-59|`, - * /`
-2| 分钟 | 必须 |0-59|`, - * /`
-3| 小时 | 必须 |0-23（0 为午夜）|`, - * /`
-4| 日期 | 必须 |1-31|`, - * ? /`
-5| 月份 | 必须 |1-12、JAN-DEC|`, - * /`
-6| 星期 | 必须 |1-7、SUN-SAT|`, - ? /`
+| 位置 | 字段 | 约束 | 取值             | 可使用的特殊符号 |
+| ---- | ---- | ---- | ---------------- | ---------------- |
+| 1    | 秒   | 必须 | 0-59             | `, - * /`        |
+| 2    | 分钟 | 必须 | 0-59             | `, - * /`        |
+| 3    | 小时 | 必须 | 0-23（0 为午夜） | `, - * /`        |
+| 4    | 日期 | 必须 | 1-31             | `, - * ? /`      |
+| 5    | 月份 | 必须 | 1-12、JAN-DEC    | `, - * /`        |
+| 6    | 星期 | 必须 | 1-7、SUN-SAT     | `, - ? /`        |
 
 特殊符号的用法：
 
-符号 | 含义 | 用法
----|---|---
-`*`| 所有值 | 代表一个字段的所有可能取值。如将 `分钟` 设为 **\***，表示每一分钟。
-`?`| 不指定值 | 用于可以使用该符号的两个字段中的一个，在一个表达式中只能出现一次。如任务执行时间为每月 10 号，星期几无所谓，那么表达式中 `日期` 设为 **10**，`星期` 设为 **?**。
-`-`| 范围 | 如 `小时` 为 **10-12**，即 10 点、11 点、12 点。
-`,`| 分隔多个值 | 如 `星期` 为 **MON,WED,FRI**，即周一、周三、周五。
-`/`| 间隔 | 如 `秒` 设为 **\*/15**，即表示每隔 15 秒执行一次，包括 0、15、30、45 秒。
+| 符号 | 含义       | 用法                                                                                                                                                             |
+| ---- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `*`  | 所有值     | 代表一个字段的所有可能取值。如将 `分钟` 设为 **\***，表示每一分钟。                                                                                              |
+| `?`  | 不指定值   | 用于可以使用该符号的两个字段中的一个，在一个表达式中只能出现一次。如任务执行时间为每月 10 号，星期几无所谓，那么表达式中 `日期` 设为 **10**，`星期` 设为 **?**。 |
+| `-`  | 范围       | 如 `小时` 为 **10-12**，即 10 点、11 点、12 点。                                                                                                                 |
+| `,`  | 分隔多个值 | 如 `星期` 为 **MON,WED,FRI**，即周一、周三、周五。                                                                                                               |
+| `/`  | 间隔       | 如 `秒` 设为 **\*/15**，即表示每隔 15 秒执行一次，包括 0、15、30、45 秒。                                                                                        |
 
 各字段以空格或空白隔开。`JAN-DEC`、`SUN-SAT` 这些值不区分大小写，比如 `MON` 和 `mon` 效果一样。
 
 举例如下：
 
-表达式 | 说明
----|---
-`0  */5 * * * ?`| 每隔 5 分钟执行一次
-`10 */5 * * * ?`| 每隔 5 分钟执行一次，每次执行都在分钟开始的 10 秒，例如 10:00:10、10:05:10 等等。
-`0 30 10-13 ? * WED,FRI`| 每周三和每周五的 10:30、11:30、12:30、13:30 执行。
-`0 */30 8-9 5,20 * ?`| 每个月的 5 号和 20 号的 8 点和 10 点之间每隔 30 分钟执行一次，也就是 8:00、8:30、9:00 和 9:30。
+| 表达式                   | 说明                                                                                            |
+| ------------------------ | ----------------------------------------------------------------------------------------------- |
+| `0 */5 * * * ?`          | 每隔 5 分钟执行一次                                                                             |
+| `10 */5 * * * ?`         | 每隔 5 分钟执行一次，每次执行都在分钟开始的 10 秒，例如 10:00:10、10:05:10 等等。               |
+| `0 30 10-13 ? * WED,FRI` | 每周三和每周五的 10:30、11:30、12:30、13:30 执行。                                              |
+| `0 */30 8-9 5,20 * ?`    | 每个月的 5 号和 20 号的 8 点和 10 点之间每隔 30 分钟执行一次，也就是 8:00、8:30、9:00 和 9:30。 |
 
 Cron 表达式的时区为东八区（国内版）、UTC 零时区（国际版）。
 

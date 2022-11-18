@@ -1,5 +1,5 @@
-declare module '*.scss';
-declare module '*.sass';
+declare module "*.scss";
+declare module "*.sass";
 
 // alias
 declare type MayUndefined<T> = T | undefined;

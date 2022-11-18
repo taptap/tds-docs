@@ -3,8 +3,9 @@ title: FCM 推送指南
 sidebar_label: FCM 推送
 sidebar_position: 4
 ---
-import CodeBlock from '@theme/CodeBlock';
-import sdkVersions from '/src/docComponents/sdkVersions';
+
+import CodeBlock from "@theme/CodeBlock";
+import sdkVersions from "/src/docComponents/sdkVersions";
 
 ## FCM 推送概述
 
@@ -80,6 +81,7 @@ FCM 推送本质上还是依赖于 FCM 的 SDK 和服务端能力，我们的客
 FCM 客户端需要在运行 Android 4.1 或更高版本且安装了 Google Play 商店应用的设备上运行，或者在运行 Android 4.1 且支持 Google API 的模拟器中运行。具体要求参见 [在 Android 上设置 Firebase 云消息传递客户端应用](https://firebase.google.com/docs/cloud-messaging/android/client)。
 
 ### 接入 SDK
+
 #### 添加 Firebase 配置文件
 
 从 Firebase 控制台下载最新的配置文件（google-services.json），加入到应用的模块（应用级）目录中。
@@ -132,7 +134,7 @@ android {
 在模块（应用级）Gradle 文件（通常是 app/build.gradle）中，在 dependencies 中添加依赖：
 
 <CodeBlock className="xml">
-{`dependencies {
+  {`dependencies {
     implementation 'cn.leancloud:leancloud-fcm:${sdkVersions.leancloud.java}@aar'
     //即时通信与推送需要的包
     implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
@@ -151,41 +153,41 @@ android {
 将以下内容添加至应用的 `AndroidManifest`文件中：
 
 - PushService 服务。
-    
-    ```xml
-    <service android:name="cn.leancloud.push.PushService"/>
-    ```
+
+  ```xml
+  <service android:name="cn.leancloud.push.PushService"/>
+  ```
 
 - `LCFirebaseMessagingService` 服务。如果你希望在后台进行除接收应用通知之外的消息处理，则必须添加此服务。要接收前台应用中的通知、接收数据有效负载以及发送上行消息等，必须继承此服务。
 
-    ```xml
-    <service
-      android:name="cn.leancloud.LCFirebaseMessagingService"
-      android:exported="false">
-    <intent-filter>
-      <action android:name="com.google.firebase.MESSAGING_EVENT"/>
-    </intent-filter>
-    </service>
-    ```
+  ```xml
+  <service
+    android:name="cn.leancloud.LCFirebaseMessagingService"
+    android:exported="false">
+  <intent-filter>
+    <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+  </intent-filter>
+  </service>
+  ```
 
 - （可选）应用组件中用于设置默认通知图标和颜色的元数据元素。如果传入的消息未明确设置图标和颜色，Android 就会使用这些值。
 
-    ```xml
-    <meta-data
-      android:name="com.google.firebase.messaging.default_notification_icon"
-      android:resource="@drawable/ic_launcher_background" />
-    <meta-data
-      android:name="com.google.firebase.messaging.default_notification_color"
-      android:resource="@color/colorAccent" />
-    ```
+  ```xml
+  <meta-data
+    android:name="com.google.firebase.messaging.default_notification_icon"
+    android:resource="@drawable/ic_launcher_background" />
+  <meta-data
+    android:name="com.google.firebase.messaging.default_notification_color"
+    android:resource="@color/colorAccent" />
+  ```
 
 - （可选）从 Android 8.0（API 级别 26）和更高版本开始，Android 系统支持并推荐使用[通知渠道](https://developer.android.com/guide/topics/ui/notifiers/notifications.html?hl=zh-cn#ManageChannels)。FCM 提供具有基本设置的默认通知渠道。如果你希望[创建](https://developer.android.com/training/notify-user/channels?hl=zh-cn)和使用你自己的默认渠道，请将 `default_notification_channel_id` 设为你的通知渠道对象的 ID（如下所示）；如果传入的消息未明确设置通知渠道，FCM 就会使用此值。
 
-    ```xml
-    <meta-data
-      android:name="com.google.firebase.messaging.default_notification_channel_id"
-      android:value="@string/default_notification_channel_id"/>
-    ```
+  ```xml
+  <meta-data
+    android:name="com.google.firebase.messaging.default_notification_channel_id"
+    android:value="@string/default_notification_channel_id"/>
+  ```
 
 - 如果 FCM 对于 Android 应用的功能至关重要，请务必在应用的 `build.gradle` 中设置 `minSdkVersion 16` 或更高版本。这可确保 Android 应用无法安装在不能让其正常运行的环境中。
 

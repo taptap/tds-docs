@@ -4,10 +4,8 @@ title: 云函数指南
 sidebar_label: 云函数
 ---
 
-import MultiLang from '/src/docComponents/MultiLang';
-import Mermaid from '/src/docComponents/Mermaid';
-
-
+import MultiLang from "/src/docComponents/MultiLang";
+import Mermaid from "/src/docComponents/Mermaid";
 
 当你开发移动端应用时，可能会有下列需求：
 
@@ -22,7 +20,6 @@ import Mermaid from '/src/docComponents/Mermaid';
 云函数是一段部署在服务端的 JavaScript、Python、PHP、C#、Go 代码，可以很好地完成上述需求。
 
 如果还不知道如何创建云引擎项目、本地调试并部署到云端，请阅读[云引擎快速入门](/v2/sdk/engine/guide/quickstart)。
-
 
 ## 云函数
 
@@ -51,13 +48,13 @@ import Mermaid from '/src/docComponents/Mermaid';
 <>
 
 ```js
-AV.Cloud.define('averageStars', function (request) {
-  var query = new AV.Query('Review');
-  query.equalTo('movie', request.params.movie);
+AV.Cloud.define("averageStars", function (request) {
+  var query = new AV.Query("Review");
+  query.equalTo("movie", request.params.movie);
   return query.find().then(function (results) {
     var sum = 0;
     for (var i = 0; i < results.length; i++) {
-      sum += results[i].get('stars');
+      sum += results[i].get("stars");
     }
     return sum / results.length;
   });
@@ -231,9 +228,13 @@ leancloud.Define("averageStars", func(req *leancloud.FunctionRequest) (interface
 例如，假设我们不希望客户端直接调用上述函数，也不关心客户端用户信息，那么上述函数的定义可以改写为：
 
 ```js
-AV.Cloud.define('averageStars', { fetchUser: false, internal: true }, function (request) {
-  // 定义同上
-});
+AV.Cloud.define(
+  "averageStars",
+  { fetchUser: false, internal: true },
+  function (request) {
+    // 定义同上
+  }
+);
 ```
 
 如果云函数返回了一个 Promise，那么云函数会使用 Promise 成功结束后的结果作为成功响应；如果 Promise 中发生了错误，云函数会使用这个错误作为错误响应，对于使用 `AV.Cloud.Error` 构造的异常对象，我们认为是客户端错误，不会在标准输出打印消息，对于其他异常则会在标准输出打印调用栈，以便排查错误。
@@ -313,6 +314,7 @@ try {
   // 处理异常
 }
 ```
+
 ```java
 // 构建传递给服务端的参数字典
 Map<String, String> dicParameters = new HashMap<String, String>();
@@ -367,6 +369,7 @@ LCCloud.callFunctionWithCacheInBackground("averageStars", dicParameters, LCQuery
   }
 });
 ```
+
 ```objc
 // 构建传递给服务端的参数字典
 NSDictionary *dicParameters = [NSDictionary dictionaryWithObject:@"夏洛特烦恼"
@@ -383,6 +386,7 @@ NSDictionary *dicParameters = [NSDictionary dictionaryWithObject:@"夏洛特烦�
                    }
 }];
 ```
+
 ```swift
 LCEngine.run("averageStars", parameters: ["movie": "夏洛特烦恼"]) { (result) in
     switch result {
@@ -393,6 +397,7 @@ LCEngine.run("averageStars", parameters: ["movie": "夏洛特烦恼"]) { (result
     }
 }
 ```
+
 ```dart
 try {
   Map response = await LCCloud.run('averageStars', params: { 'movie': '夏洛特烦恼' });
@@ -401,21 +406,27 @@ try {
   // 处理异常
 }
 ```
+
 ```js
 var paramsJson = {
-  movie: "夏洛特烦恼"
+  movie: "夏洛特烦恼",
 };
-AV.Cloud.run('averageStars', paramsJson).then(function (data) {
-  // 处理结果
-}, function (err) {
-  // 处理报错
-});
+AV.Cloud.run("averageStars", paramsJson).then(
+  function (data) {
+    // 处理结果
+  },
+  function (err) {
+    // 处理报错
+  }
+);
 ```
+
 ```python
 from leancloud import cloud
 
 cloud.run('averageStars', movie='夏洛特烦恼')
 ```
+
 ```php
 use \LeanCloud\Engine\Cloud;
 $params = array(
@@ -423,6 +434,7 @@ $params = array(
 );
 Cloud::run("averageStars", $params);
 ```
+
 ```go
 // ...
 averageStars, err := leancloud.Run("averageStars", map[string]string{"movie": "夏洛特烦恼"})
@@ -451,6 +463,7 @@ try {
   // 处理异常
 }
 ```
+
 ```java
 // 构建参数
 Map<String, Object> dicParameters = new HashMap<>();
@@ -504,6 +517,7 @@ LCCloud.<LCObject>callRPCWithCacheInBackground("averageStars", dicParameters, LC
   }
 });
 ```
+
 ```objc
 NSDictionary *dicParameters = [NSDictionary dictionaryWithObject:@"夏洛特烦恼"
                                                           forKey:@"movie"];
@@ -519,6 +533,7 @@ NSDictionary *dicParameters = [NSDictionary dictionaryWithObject:@"夏洛特烦�
                   }
 }];
 ```
+
 ```swift
 LCEngine.call("averageStars", parameters: ["movie": "夏洛特烦恼"]) { (result) in
     switch result {
@@ -531,6 +546,7 @@ LCEngine.call("averageStars", parameters: ["movie": "夏洛特烦恼"]) { (resul
     }
 }
 ```
+
 ```dart
 try {
   LCObject response = await LCCloud.rpc('averageStars', params: { 'movie': '夏洛特烦恼' });
@@ -539,25 +555,32 @@ try {
   // 处理异常
 }
 ```
+
 ```js
 var paramsJson = {
-  movie: "夏洛特烦恼"
+  movie: "夏洛特烦恼",
 };
 
-AV.Cloud.rpc('averageStars', paramsJson).then(function (object) {
-  // 处理结果
-}, function (error) {
-  // 处理报错
-});
+AV.Cloud.rpc("averageStars", paramsJson).then(
+  function (object) {
+    // 处理结果
+  },
+  function (error) {
+    // 处理报错
+  }
+);
 ```
+
 ```python
 from leancloud import cloud
 
 cloud.rpc('averageStars', movie='夏洛特烦恼')
 ```
+
 ```php
 // 暂不支持
 ```
+
 ```go
 // ...
 averageStars := 0
@@ -576,10 +599,11 @@ if err := leancloud.RPC("averageStars", Review{Movie: "夏洛特烦恼"}, &avera
 <MultiLang kind="engine">
 
 ```js
-AV.Cloud.define('customErrorCode', function (request) {
-  throw new AV.Cloud.Error('自定义错误信息。', { code: 123 });
+AV.Cloud.define("customErrorCode", function (request) {
+  throw new AV.Cloud.Error("自定义错误信息。", { code: 123 });
 });
 ```
+
 ```python
 from leancloud import LeanEngineError
 
@@ -587,23 +611,27 @@ from leancloud import LeanEngineError
 def custom_error_code(**params):
     raise LeanEngineError(123, '自定义错误信息。')
 ```
+
 ```php
 Cloud::define("customErrorCode", function($params, $user) {
     throw new FunctionError("自定义错误信息。", 123);
 });
 ```
+
 ```java
 @EngineFunction()
 public static void customErrorCode() throws Exception {
   throw new LCException(123, "自定义错误信息。");
 }
 ```
+
 ```cs
 [LCEngineFunction("throwLCException")]
 public static void ThrowLCException() {
     throw new LCException(123, "自定义错误信息。");
 }
 ```
+
 ```go
 leancloud.Define("customErrorCode", func(req *leancloud.FunctionRequest) (interface{}, error) {
   return nil, leancloud.CloudError{123, "自定义错误信息。"}
@@ -635,7 +663,7 @@ leancloud.Define("customErrorCode", func(req *leancloud.FunctionRequest) (interf
 虽然改为异步后能保证 before 类函数能够运行完成，不会因超时而报错。
 但是，只要 before 类 hook 函数不能及时抛出异常，就无法起到中断操作执行的作用。
 对于超时的 before 类 hook 函数，如果无法优化代码，压缩执行时间的话，那只能改为 after 类函数。
-例如，假设某个 beforeSave 函数需要调用耗时较久的第三方的自然语言处理接口判断用户提交的评论是否来自真实用户，导致超时，
+例如，假设某个 beforeSave 函数需要调用耗时较久的第三方的自然语言处理接口判断用户提交的评论是否来自真实用户， 导致超时，
 那么可以改为 afterSave 函数，在保存评论后再调用第三方接口，如果判断是水军评论，那么再行删除。
 
 ## Hook 函数
@@ -649,7 +677,8 @@ Hook 函数本质上是云函数，但它有固定的名称，定义之后会 **
 
 对于 `before` 类的 Hook，如果返回了一个错误的话，这个操作就会被中断，因此你可以在这些 Hook 中主动抛出一个错误来拒绝掉某些操作。对于 `after` 类的 Hook，返回错误并不会影响操作的执行（因为其实操作已经执行完了）。
 
-<Mermaid diagram={`
+<Mermaid
+  diagram={`
 graph LR
 A((save)) -->D{object}
 D-->E(new)
@@ -665,10 +694,11 @@ I-->Y
 I-->V(No)
 V-->G[update existing object on the cloud]
 G-->|afterUpdate| C
-`} />
+`}
+/>
 
-
-<Mermaid diagram={`
+<Mermaid
+  diagram={`
 graph LR
 A((delete))-->|beforeDelete|H{error?}
 H-->Y(Yes)
@@ -676,7 +706,8 @@ Y-->Z((interrupted))
 H-->N(No)
 N-->B[delete object on the cloud]
 B -->|afterDelete|C((done))
-`} />
+`}
+/>
 
 为了认证 Hook 调用者的身份，我们的 SDK 内部会确认请求确实是从云引擎内网的云存储组件发出的，如果认证失败，可能会出现 `Hook key check failed` 的提示，如果在本地调试时出现这样的错误，请确保是通过命令行工具启动调试的。
 
@@ -688,16 +719,16 @@ B -->|afterDelete|C((done))
 <>
 
 ```js
-AV.Cloud.beforeSave('Review', function (request) {
-  var comment = request.object.get('comment');
+AV.Cloud.beforeSave("Review", function (request) {
+  var comment = request.object.get("comment");
   if (comment) {
     if (comment.length > 140) {
       // 截断并添加 '…'
-      request.object.set('comment', comment.substring(0, 140) + '…');
+      request.object.set("comment", comment.substring(0, 140) + "…");
     }
   } else {
     // 不保存数据，并返回错误
-    throw new AV.Cloud.Error('No comment provided!');
+    throw new AV.Cloud.Error("No comment provided!");
   }
 });
 ```
@@ -799,14 +830,15 @@ leancloud.BeforeSave("Review", func(req *ClassHookRequest) (interface{}, error) 
 <MultiLang kind="engine">
 
 ```js
-AV.Cloud.afterSave('Comment', function (request) {
-  var query = new AV.Query('Post');
-  return query.get(request.object.get('post').id).then(function (post) {
-    post.increment('comments');
+AV.Cloud.afterSave("Comment", function (request) {
+  var query = new AV.Query("Post");
+  return query.get(request.object.get("post").id).then(function (post) {
+    post.increment("comments");
     return post.save();
   });
 });
 ```
+
 ```python
 import leancloud
 
@@ -819,6 +851,7 @@ def after_comment_save(comment):
     except leancloud.LeanCloudError:
         raise leancloud.LeanEngineError(message='An error occurred while trying to save the post.')
 ```
+
 ```php
 Cloud::afterSave("Comment", function($comment, $user) {
     $query = new Query("Post");
@@ -831,6 +864,7 @@ Cloud::afterSave("Comment", function($comment, $user) {
     }
 });
 ```
+
 ```java
 @EngineHook(className = "Review", type = EngineHookType.afterSave)
 public static void reviewAfterSaveHook(LCObject review) throws Exception {
@@ -840,6 +874,7 @@ public static void reviewAfterSaveHook(LCObject review) throws Exception {
   post.save();
 }
 ```
+
 ```cs
 [LCEngineClassHook("Review", LCEngineObjectHookType.AfterSave)]
 public static async Task ReviewAfterSave(LCObject review) {
@@ -849,13 +884,14 @@ public static async Task ReviewAfterSave(LCObject review) {
     await post.Save();
 }
 ```
+
 ```go
 leancloud.AfterSave("Review", func(req *ClassHookRequest) error {
   review := new(Review)
   if err := req.Object.Clone(review); err != nil {
     return err
   }
-  
+
   if err := client.Object(review.Post).Update(map[string]interface{}{
     "comment": leancloud.OpIncrement(1),
   }); err != nil {
@@ -874,11 +910,11 @@ leancloud.AfterSave("Review", func(req *ClassHookRequest) error {
 <>
 
 ```js
-AV.Cloud.afterSave('_User', function (request) {
+AV.Cloud.afterSave("_User", function (request) {
   console.log(request.object);
-  request.object.set('from', 'LeanCloud');
+  request.object.set("from", "LeanCloud");
   return request.object.save().then(function (user) {
-    console.log('Success!');
+    console.log("Success!");
   });
 });
 ```
@@ -959,16 +995,17 @@ leancloud.AfterSave("_User", func(req *ClassHookRequest) error{
 <MultiLang kind="engine">
 
 ```js
-AV.Cloud.beforeUpdate('Review', function (request) {
+AV.Cloud.beforeUpdate("Review", function (request) {
   // 如果 comment 字段被修改了，检查该字段的长度
-  if (request.object.updatedKeys.indexOf('comment') != -1) {
-    if (request.object.get('comment').length > 140) {
+  if (request.object.updatedKeys.indexOf("comment") != -1) {
+    if (request.object.get("comment").length > 140) {
       // 拒绝过长的修改
-      throw new AV.Cloud.Error('comment 长度不得超过 140 字符。');
+      throw new AV.Cloud.Error("comment 长度不得超过 140 字符。");
     }
   }
 });
 ```
+
 ```python
 @engine.before_update('Review')
 def before_hook_object_update(obj):
@@ -977,6 +1014,7 @@ def before_hook_object_update(obj):
         # 拒绝过长的修改
         raise leancloud.LeanEngineError(message='comment 长度不得超过 140 字符。')
 ```
+
 ```php
 Cloud::beforeUpdate("Review", function($review, $user) {
     // 如果 comment 字段被修改了，检查该字段的长度
@@ -986,6 +1024,7 @@ Cloud::beforeUpdate("Review", function($review, $user) {
     }
 });
 ```
+
 ```java
 @EngineHook(className = "Review", type = EngineHookType.beforeUpdate)
 public static LCObject reviewBeforeUpdateHook(LCObject review) throws Exception {
@@ -999,6 +1038,7 @@ public static LCObject reviewBeforeUpdateHook(LCObject review) throws Exception 
   return review;
 }
 ```
+
 ```cs
 [LCEngineClassHook("Review", LCEngineObjectHookType.BeforeUpdate)]
 public static LCObject ReviewBeforeUpdate(LCObject review) {
@@ -1012,6 +1052,7 @@ public static LCObject ReviewBeforeUpdate(LCObject review) {
     return review;
 }
 ```
+
 ```go
 leancloud.BeforeUpdate("Review", func(req *ClassHookRequest) (interface{}, error) {
   updatedKeys = req.UpdatedKeys()
@@ -1027,7 +1068,7 @@ leancloud.BeforeUpdate("Review", func(req *ClassHookRequest) (interface{}, error
       }
     }
   }
-  
+
   return nil, nil
 })
 ```
@@ -1040,29 +1081,29 @@ leancloud.BeforeUpdate("Review", func(req *ClassHookRequest) (interface{}, error
 
 ### AfterUpdate
 
-
 本 Hook 使用不当可能会造成死循环，导致数据存储 API 的调用次数暴涨，甚至产生更多的费用。因此请仔细阅读 [防止死循环调用](#防止死循环调用) 部分，做出必要的调整和预防措施。
-
 
 在更新已存在的对象后执行特定的动作。和 BeforeUpdate 一样，你可以知道哪些字段已被修改。
 
 <MultiLang kind="engine">
 
 ```js
-AV.Cloud.afterUpdate('Review', function(request) {
-  if (request.object.updatedKeys.indexOf('comment') != -1) {
-    if (request.object.get('comment').length < 5) {
-      console.log(review.ObjectId + " 看起来像灌水评论：" + comment)
+AV.Cloud.afterUpdate("Review", function (request) {
+  if (request.object.updatedKeys.indexOf("comment") != -1) {
+    if (request.object.get("comment").length < 5) {
+      console.log(review.ObjectId + " 看起来像灌水评论：" + comment);
     }
   }
 });
 ```
+
 ```python
 @engine.after_update('Review')
 def after_review_update(article):
     if 'comment' in obj.updated_keys and len(obj.get('comment')) < 5:
         print(review.ObjectId + " 看起来像灌水评论：" + comment)
 ```
+
 ```php
 Cloud::afterUpdate("Review", function($review, $user) {
     if (in_array("comment", $review->updatedKeys) &&
@@ -1071,6 +1112,7 @@ Cloud::afterUpdate("Review", function($review, $user) {
     }
 });
 ```
+
 ```java
 @EngineHook(className = "Review", type = EngineHookType.afterUpdate)
 public static void reviewAfterUpdateHook(LCObject review) throws Exception {
@@ -1082,6 +1124,7 @@ public static void reviewAfterUpdateHook(LCObject review) throws Exception {
   }
 }
 ```
+
 ```cs
 [LCEngineClassHook("Review", LCEngineObjectHookType.AfterUpdate)]
 public static void ReviewAfterUpdate(LCObject review) {
@@ -1094,6 +1137,7 @@ public static void ReviewAfterUpdate(LCObject review) {
     }
 }
 ```
+
 ```go
 leancloud.AfterUpdate("Review", func(req *ClassHookRequest) error {
   updatedKeys := req.UpdatedKeys()
@@ -1132,28 +1176,32 @@ leancloud.AfterUpdate("Review", func(req *ClassHookRequest) error {
 
 ```js
 // 直接修改并保存对象不会再次触发 afterUpdate Hook 函数
-request.object.set('foo', 'bar');
+request.object.set("foo", "bar");
 request.object.save().then(function (obj) {
   // 你的业务逻辑
 });
 
 // 如果有 fetch 操作，则需要在新获得的对象上调用 disableAfterHook 来确保不会再次触发 Hook 函数
-request.object.fetch().then(function (obj) {
-  obj.disableAfterHook();
-  obj.set('foo', 'bar');
-  return obj.save();
-}).then(function (obj) {
-  // 你的业务逻辑
-});
+request.object
+  .fetch()
+  .then(function (obj) {
+    obj.disableAfterHook();
+    obj.set("foo", "bar");
+    return obj.save();
+  })
+  .then(function (obj) {
+    // 你的业务逻辑
+  });
 
 // 如果是其他方式构建对象，则需要在新构建的对象上调用 disableAfterHook 来确保不会再次触发 Hook 函数
-var obj = AV.Object.createWithoutData('Post', request.object.id);
+var obj = AV.Object.createWithoutData("Post", request.object.id);
 obj.disableAfterHook();
-obj.set('foo', 'bar');
+obj.set("foo", "bar");
 obj.save().then(function (obj) {
   // 你的业务逻辑
 });
 ```
+
 ```python
 @engine.after_update('Post')
 def after_post_update(post):
@@ -1171,6 +1219,7 @@ def after_post_update(post):
     post.disable_after_hook()
     post.save()
 ```
+
 ```php
 Cloud::afterUpdate("Post", function($post, $user) {
     // 直接修改并保存对象不会再次触发 afterUpdate Hook 函数
@@ -1189,6 +1238,7 @@ Cloud::afterUpdate("Post", function($post, $user) {
     $post->save();
 });
 ```
+
 ```java
 @EngineHook(className="Post", type = EngineHookType.afterUpdate)
 public static void afterUpdatePost(LCObject post) throws LCException {
@@ -1207,6 +1257,7 @@ public static void afterUpdatePost(LCObject post) throws LCException {
   post.save();
 }
 ```
+
 ```cs
 // 直接修改并保存对象不会再次触发 afterUpdate Hook 函数
 post["foo"] = "bar";
@@ -1222,8 +1273,9 @@ post = LCObject.CreateWithoutData("Post", post.ObjectId);
 post.DisableAfterHook();
 await post.Save();
 ```
+
 ```go
-// Go SDK 目前尚未提供 DisableAfterHook 接口。 
+// Go SDK 目前尚未提供 DisableAfterHook 接口。
 ```
 
 </MultiLang>
@@ -1235,21 +1287,32 @@ await post.Save();
 <MultiLang kind="engine">
 
 ```js
-AV.Cloud.beforeDelete('Album', function (request) {
+AV.Cloud.beforeDelete("Album", function (request) {
   // 查询 Photo 中还有没有属于这个相册的照片
-  var query = new AV.Query('Photo');
-  var album = AV.Object.createWithoutData('Album', request.object.id);
-  query.equalTo('album', album);
-  return query.count().then(function (count) {
-    if (count > 0) {
-      // delete 操作会被丢弃
-      throw new AV.Cloud.Error('Cannot delete an album if it still has photos in it.');
+  var query = new AV.Query("Photo");
+  var album = AV.Object.createWithoutData("Album", request.object.id);
+  query.equalTo("album", album);
+  return query.count().then(
+    function (count) {
+      if (count > 0) {
+        // delete 操作会被丢弃
+        throw new AV.Cloud.Error(
+          "Cannot delete an album if it still has photos in it."
+        );
+      }
+    },
+    function (error) {
+      throw new AV.Cloud.Error(
+        "Error " +
+          error.code +
+          " occurred when finding photos: " +
+          error.message
+      );
     }
-  }, function (error) {
-    throw new AV.Cloud.Error('Error ' + error.code + ' occurred when finding photos: ' + error.message);
-  });
+  );
 });
 ```
+
 ```python
 import leancloud
 
@@ -1265,6 +1328,7 @@ def before_album_delete(album):
         # delete 操作会被丢弃
         raise engine.LeanEngineError(message='Cannot delete an album if it still has photos in it.')
 ```
+
 ```php
 Cloud::beforeDelete("Album", function($album, $user) {
     $query = new Query("Photo");
@@ -1280,6 +1344,7 @@ Cloud::beforeDelete("Album", function($album, $user) {
     }
 });
 ```
+
 ```java
 @EngineHook(className = "Album", type = EngineHookType.beforeDelete)
 public static LCObject albumBeforeDeleteHook(LCObject album) throws Exception {
@@ -1294,6 +1359,7 @@ public static LCObject albumBeforeDeleteHook(LCObject album) throws Exception {
   }
 }
 ```
+
 ```cs
 [LCEngineClassHook("Album", LCEngineObjectHookType.BeforeDelete)]
 public static async Task<LCObject> AlbumBeforeDelete(LCObject album) {
@@ -1306,6 +1372,7 @@ public static async Task<LCObject> AlbumBeforeDelete(LCObject album) {
     return album;
 }
 ```
+
 ```go
 leancloud.BeforeDelete("Album", func(req *ClassHookRequest) (interface{}, error) {
   photo := new(Photo)
@@ -1325,7 +1392,7 @@ leancloud.BeforeDelete("Album", func(req *ClassHookRequest) (interface{}, error)
   fmt.Println("Deleted.")
 
   return nil, nil
-})  
+})
 ```
 
 </MultiLang>
@@ -1337,17 +1404,26 @@ leancloud.BeforeDelete("Album", func(req *ClassHookRequest) (interface{}, error)
 <MultiLang kind="engine">
 
 ```js
-AV.Cloud.afterDelete('Album', function (request) {
-  var query = new AV.Query('Photo');
-  var album = AV.Object.createWithoutData('Album', request.object.id);
-  query.equalTo('album', album);
-  return query.find().then(function (posts) {
-    return AV.Object.destroyAll(posts);
-  }).catch(function (error) {
-    console.error('Error ' + error.code + ' occurred when finding photos: ' + error.message);
-  });
+AV.Cloud.afterDelete("Album", function (request) {
+  var query = new AV.Query("Photo");
+  var album = AV.Object.createWithoutData("Album", request.object.id);
+  query.equalTo("album", album);
+  return query
+    .find()
+    .then(function (posts) {
+      return AV.Object.destroyAll(posts);
+    })
+    .catch(function (error) {
+      console.error(
+        "Error " +
+          error.code +
+          " occurred when finding photos: " +
+          error.message
+      );
+    });
 });
 ```
+
 ```python
 import leancloud
 
@@ -1360,6 +1436,7 @@ def after_album_delete(album):
     except leancloud.LeanCloudError:
         raise leancloud.LeanEngineError(message='An error occurred with LeanEngine.')
 ```
+
 ```php
 Cloud::afterDelete("Album", function($album, $user) {
     $query = new Query("Photo");
@@ -1372,6 +1449,7 @@ Cloud::afterDelete("Album", function($album, $user) {
     }
 });
 ```
+
 ```java
 @EngineHook(className = "Album", type = EngineHookType.afterDelete)
 public static void albumAfterDeleteHook(LCObject album) throws Exception {
@@ -1383,6 +1461,7 @@ public static void albumAfterDeleteHook(LCObject album) throws Exception {
   }
 }
 ```
+
 ```cs
 [LCEngineClassHook("Album", LCEngineObjectHookType.AfterDelete)]
 public static async Task AlbumAfterDelete(LCObject album) {
@@ -1394,6 +1473,7 @@ public static async Task AlbumAfterDelete(LCObject album) {
     }
 }
 ```
+
 ```go
 leancloud.AfterDelete("Album", func(req *ClassHookRequest) error {
   photo := new(Photo)
@@ -1411,9 +1491,9 @@ leancloud.AfterDelete("Album", func(req *ClassHookRequest) error {
   }
 
   fmt.Println("Deleted.")
-  
+
   return nil, nil
-})  
+})
 })
 ```
 
@@ -1427,8 +1507,8 @@ leancloud.AfterDelete("Album", func(req *ClassHookRequest) error {
 <>
 
 ```js
-AV.Cloud.onVerified('sms', function (request) {
-  console.log('User ' + request.object + ' is verified by SMS.');
+AV.Cloud.onVerified("sms", function (request) {
+  console.log("User " + request.object + " is verified by SMS.");
 });
 ```
 
@@ -1514,13 +1594,14 @@ leancloud.OnVerified("email", func(req *ClassHookRequest) error {
 ```js
 AV.Cloud.onLogin(function (request) {
   // 因为此时用户还没有登录，所以用户信息是保存在 request.object 对象中
-  console.log('User ' + request.object + ' is trying to log in.');
-  if (request.object.get('username') === 'noLogin') {
+  console.log("User " + request.object + " is trying to log in.");
+  if (request.object.get("username") === "noLogin") {
     // 如果是 error 回调，则用户无法登录（收到 401 响应）
-    throw new AV.Cloud.Error('Forbidden');
+    throw new AV.Cloud.Error("Forbidden");
   }
 });
 ```
+
 ```python
 @engine.on_login
 def on_login(user):
@@ -1530,6 +1611,7 @@ def on_login(user):
       raise LeanEngineError('Forbidden')
     # 没有抛出异常，函数正常执行完毕的话，用户可以登录
 ```
+
 ```php
 Cloud::onLogin(function($user) {
     error_log("User {$user->getUsername()} is trying to log in.");
@@ -1540,6 +1622,7 @@ Cloud::onLogin(function($user) {
     // 没有抛出异常，函数正常执行完毕的话，用户可以登录
 });
 ```
+
 ```java
 @EngineHook(className = "_User", type = EngineHookType.onLogin)
 public static LCUser userOnLoginHook(LCUser user) throws Exception {
@@ -1550,6 +1633,7 @@ public static LCUser userOnLoginHook(LCUser user) throws Exception {
   }
 }
 ```
+
 ```cs
 [LCEngineUserHook(LCEngineUserHookType.OnLogin)]
 public static LCUser OnLogin(LCUser user) {
@@ -1559,6 +1643,7 @@ public static LCUser OnLogin(LCUser user) {
     return user;
 }
 ```
+
 ```go
 leancloud.OnLogin(func(req *ClassHookRequest) error {
   fmt.Println("用户 ", req.User.ID, " 已登录。")
@@ -1580,14 +1665,17 @@ leancloud.OnLogin(func(req *ClassHookRequest) error {
 <MultiLang kind="engine">
 
 ```js
-AV.Cloud.beforeSave('Review', function (request) {
+AV.Cloud.beforeSave("Review", function (request) {
   // 使用 JSON.stringify() 将 object 变为字符串
-  throw new AV.Cloud.Error(JSON.stringify({
-    code: 123,
-    message: 'An error occurred.'
-  }));
+  throw new AV.Cloud.Error(
+    JSON.stringify({
+      code: 123,
+      message: "An error occurred.",
+    })
+  );
 });
 ```
+
 ```python
 @engine.before_save('Review') # Review 为需要 hook 的 class 的名称
 def before_review_save(review):
@@ -1598,6 +1686,7 @@ def before_review_save(review):
         message='An error occurred.'
       )
 ```
+
 ```php
 Cloud::beforeSave("Review", function($review, $user) {
    $comment = $review->get("comment");
@@ -1609,18 +1698,21 @@ Cloud::beforeSave("Review", function($review, $user) {
    }
 });
 ```
+
 ```java
 @EngineHook(className = "Review", type = EngineHookType.beforeSave)
 public static LCObject reviewBeforeSaveHook(LCObject review) throws Exception {
   throw new LCException(123, "An error occurred.");
 }
 ```
+
 ```cs
 [LCEngineClassHook("Review", LCEngineObjectHookType.BeforeDelete)]
 public static void ReviewBeforeDelete(LCObject review) {
     throw new LCException(123, "An error occurred.");
 }
 ```
+
 ```go
 leancloud.BeforeSave("Review", func(req *ClassHookRequest) (interface{}, error) {
   return nil, leancloud.CloudError{Code: 123, Message: "An error occurred."}
@@ -1636,7 +1728,6 @@ leancloud.BeforeSave("Review", func(req *ClassHookRequest) (interface{}, error) 
 Before 类 Hook 函数的超时时间为 10 秒，其他类 Hook 函数的超时时间为 3 秒。如果 Hook 函数被其他的云函数调用（比如因为保存对象而触发 `BeforeSave` 和 `AfterSave`），那么它们的超时时间会进一步被其他云函数调用的剩余时间限制。
 
 例如，如果一个 `BeforeSave` 函数是被一个已经运行了 13 秒的云函数触发，那么它就只剩下 2 秒的时间来运行。同时请参考 [云函数超时及处理方案](#云函数超时)。
-
 
 ## 在线编写云函数
 
@@ -1659,12 +1750,12 @@ Before 类 Hook 函数的超时时间为 10 秒，其他类 Hook 函数的超时
 
 目前在线编辑仅支持 Node.js，提供了 4 种 SDK 版本：
 
-在线编辑版本 |Node.js SDK|JS SDK|Node.js| 备注 | 可用依赖
----|---|---|---|---|---
-v0|0.x|0.x|0.12| 已不推荐使用 |moment, request, underscore
-v1|1.x|1.x|4||async, bluebird, co, ejs, handlebars, joi, lodash, marked, moment, q, request, superagent, underscore
-v2|2.x|2.x|6| 需要使用 Promise 写法 |async, bluebird, crypto, debug, ejs, jade, lodash, moment, nodemailer, qiniu, redis, request, request-promise, superagent, underscore, uuid, wechat-api, xml2js
-v3|3.x|3.x|8| 需要使用 Promise 写法 |async, bluebird, crypto, debug, ejs, jade, lodash, moment, nodemailer, qiniu, redis, request, request-promise, superagent, underscore, uuid, wechat-api, xml2js
+| 在线编辑版本 | Node.js SDK | JS SDK | Node.js | 备注                  | 可用依赖                                                                                                                                                        |
+| ------------ | ----------- | ------ | ------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| v0           | 0.x         | 0.x    | 0.12    | 已不推荐使用          | moment, request, underscore                                                                                                                                     |
+| v1           | 1.x         | 1.x    | 4       |                       | async, bluebird, co, ejs, handlebars, joi, lodash, marked, moment, q, request, superagent, underscore                                                           |
+| v2           | 2.x         | 2.x    | 6       | 需要使用 Promise 写法 | async, bluebird, crypto, debug, ejs, jade, lodash, moment, nodemailer, qiniu, redis, request, request-promise, superagent, underscore, uuid, wechat-api, xml2js |
+| v3           | 3.x         | 3.x    | 8       | 需要使用 Promise 写法 | async, bluebird, crypto, debug, ejs, jade, lodash, moment, nodemailer, qiniu, redis, request, request-promise, superagent, underscore, uuid, wechat-api, xml2js |
 
 **从 v0 升级到 v1：**
 
@@ -1701,32 +1792,37 @@ v3|3.x|3.x|8| 需要使用 Promise 写法 |async, bluebird, crypto, debug, ejs, 
 <MultiLang kind="engine">
 
 ```js
-AV.Cloud.define('logTimer', function (request) {
-  console.log('This log is printed by logTimer.');
+AV.Cloud.define("logTimer", function (request) {
+  console.log("This log is printed by logTimer.");
 });
 ```
+
 ```python
 @engine.define
 def logTimer(movie, **params):
     print('This log is printed by logTimer.')
 ```
+
 ```php
 Cloud::define("logTimer", function($params, $user) {
     error_log("This log is printed by logTimer.");
 });
 ```
+
 ```java
 @EngineFunction("logTimer")
 public static float logTimer throws Exception {
   LogUtil.avlog.d("This log is printed by logTimer.");
 }
 ```
+
 ```cs
 [LCEngineFunction("logTimer")]
 public static void LogTimer() {
     Console.WriteLine("This log is printed by logTimer.");
 }
 ```
+
 ```go
 leancloud.Define("logTimer", func(req *FunctionRequest) (interface{}, error) {
   fmt.Println("This log is printed by logTimer.")
@@ -1789,7 +1885,7 @@ AV.Cloud.useMasterKey();
 ```js
 const post = new Post();
 post.save(
-  { author: user },
+  { author: user }
   // 或者使用 request.sessionToken（网站托管中需启用 `Cloud.CookieSession`）
   // {
   //  sessionToken: user.getSessionToken()

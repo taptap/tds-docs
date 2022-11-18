@@ -4,8 +4,7 @@ title: 开发指南
 sidebar_label: 开发指南
 ---
 
-
-import MultiLang from '/src/docComponents/MultiLang';
+import MultiLang from "/src/docComponents/MultiLang";
 
 ## 介绍
 
@@ -31,19 +30,19 @@ TapSDK 提供了一套可供游戏开发者收集账号数据的 API。
 ```
 
 ```java
-repositories{  
-    flatDir {  
-        dirs 'libs'  
-    }  
-}  
+repositories{
+    flatDir {
+        dirs 'libs'
+    }
+}
 
-dependencies {  
-...  
-    implementation (name:'TapBootstrap_2.1.8', ext:'aar')  // 必选： TapSDK 启动器 
-    implementation (name:'TapCommon_2.1.8', ext:'aar') // 必选：TapSDK 基础库 
-    implementation (name:'TapLogin_2.1.8', ext:'aar') // 必选：TapTap 登录 
+dependencies {
+...
+    implementation (name:'TapBootstrap_2.1.8', ext:'aar')  // 必选： TapSDK 启动器
+    implementation (name:'TapCommon_2.1.8', ext:'aar') // 必选：TapSDK 基础库
+    implementation (name:'TapLogin_2.1.8', ext:'aar') // 必选：TapTap 登录
     implementation (name:'TapDB_2.1.8', ext:'aar') // 数据统计
-}  
+}
 ```
 
 ```objectivec
@@ -65,7 +64,7 @@ TapDB.framework
 以下两种初始化方式结合使用场景任选其一即可。
 :::
 
-### TapSDK 初始化 
+### TapSDK 初始化
 
 在 TapSDK 初始化时，同步初始化 TapDB。
 
@@ -86,7 +85,7 @@ TapBootstrap.Init(tapConfig);
 TapDBConfig tapDBConfig = new TapDBConfig();
         tapDBConfig.setEnable(true);
         tapDBConfig.setChannel("gameChannel");
-        
+
 TapConfig tapConfig = new TapConfig.Builder()
         .withAppContext(getApplicationContext())
         .withRegionType(TapRegionType.CN) // TapRegionType.CN: 国内  TapRegionType.IO: 国外
@@ -176,7 +175,6 @@ TapDB.SetUser("userId");
 TapDB.setUser("userId");
 ```
 
-
 ```objectivec
 [TapDB setUser:@"userId"];
 ```
@@ -222,7 +220,6 @@ TapDB.SetLevel(5);
 TapDB.setLevel(5);
 ```
 
-
 ```objectivec
 [TapDB setLevel:5];
 ```
@@ -252,7 +249,6 @@ TapDB.setServer("1 区");
 </MultiLang>
 
 服务器参数为非空字符串，长度不大于 256。
-
 
 ## 充值
 
@@ -327,7 +323,7 @@ POST 数据（实际发送请求时需去除注释、空格、换行符并 urlen
 <MultiLang>
 
 ```cs
-TapDB.TrackEvent("eventName", "{\"weapon\":\"axe\"}");	
+TapDB.TrackEvent("eventName", "{\"weapon\":\"axe\"}");
 ```
 
 ```java
@@ -335,16 +331,15 @@ JSONObject properties = new JSONObject();
 properties.put("#weapon", "axe");
 properties.put("#level", 10);
 properties.put("#map", "atrium");
-TapDB.trackEvent("#battle", properties); 
+TapDB.trackEvent("#battle", properties);
 ```
 
 ```objectivec
- NSDictionary* dic = @{@"aaa":@"xxx",@"bbb":@"yyy"};    
+ NSDictionary* dic = @{@"aaa":@"xxx",@"bbb":@"yyy"};
 [TapDB trackEvent:@"testEvent2" properties:dic];
 ```
 
 </MultiLang>
-
 
 ## 设置通用事件属性
 
@@ -438,7 +433,7 @@ TapDB.registerDynamicProperties(
         // getCurrentLevel 在这里仅作为案例，表示用户任何的自有逻辑实现
         long level = getCurrentLevel();
         properties.put("#currentLevel", level);
-        return properties; 
+        return properties;
     }
 );
 ```
@@ -452,9 +447,6 @@ TapDB.registerDynamicProperties(
 ```
 
 </MultiLang>
-
-
-
 
 ## 事件主体操作
 
@@ -560,6 +552,7 @@ TapDB.deviceAdd(properties);
 
 [TapDB deviceAdd:@{@"totalPoints":@(-2)}];
 ```
+
 </MultiLang>
 
 运行上述代码后，设备表的 `totalPoints` 字段值为 `8`。
@@ -588,39 +581,43 @@ TapDB.userAdd(properties);
 [TapDB userUpdate:@{@"currentPoints":@10}];
 [TapDB userAdd:@{@"totalPoints":@10}];
 ```
+
 </MultiLang>
 
 ## 服务端在线人数推送
 
 游戏服务端自行统计在线人数，每隔 5 分钟向 `https://se.tapdb.net/tapdb/online` 发送 POST 请求，请求内容为 json 格式的数据，包含以下信息：
 
-参数名 | 参数类型 | 参数说明
-| ------ | ------ | ------ |
-client_id | string | 游戏的 client id
-onlines | array | 多条在线数据（最多 100 条）
+| 参数名    | 参数类型 | 参数说明                    |
+| --------- | -------- | --------------------------- |
+| client_id | string   | 游戏的 client id            |
+| onlines   | array    | 多条在线数据（最多 100 条） |
 
 其中 `onlines` 数组元素的结构为：
 
-参数名 | 参数类型 | 参数说明
-| ------ | ------ | ------ |
-server | string | 服务器。自然时间 5 分钟内，TapDB 对同一服务器仅接受一次数据。
-online | int | 在线人数
-timestamp | long | 当前统计数据的时间戳（秒）。TapDB 会按照自然时间 5 分钟对齐数据。
+| 参数名    | 参数类型 | 参数说明                                                          |
+| --------- | -------- | ----------------------------------------------------------------- |
+| server    | string   | 服务器。自然时间 5 分钟内，TapDB 对同一服务器仅接受一次数据。     |
+| online    | int      | 在线人数                                                          |
+| timestamp | long     | 当前统计数据的时间戳（秒）。TapDB 会按照自然时间 5 分钟对齐数据。 |
 
 示例：
 
 ```json
 {
-  "client_id":"gkjasd13bbsa1sdk",
-  "onlines":[{
-    "server":"s1",
-    "online":123,
-    "timestamp":1489739590
-  },{
-    "server":"s2",
-    "online":188,
-    "timestamp":1489739560
-  }]
+  "client_id": "gkjasd13bbsa1sdk",
+  "onlines": [
+    {
+      "server": "s1",
+      "online": 123,
+      "timestamp": 1489739590
+    },
+    {
+      "server": "s2",
+      "online": 188,
+      "timestamp": 1489739560
+    }
+  ]
 }
 ```
 

@@ -72,7 +72,15 @@ var theme = {
       },
     },
     {
-      types: ["attr-value", "keyword", "control", "directive", "unit", "symbol", "deleted"],
+      types: [
+        "attr-value",
+        "keyword",
+        "control",
+        "directive",
+        "unit",
+        "symbol",
+        "deleted",
+      ],
       style: {
         color: "#E98585",
       },

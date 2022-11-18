@@ -1,16 +1,14 @@
 ---
 id: redis
-title: LeanCache 指南 
+title: LeanCache 指南
 sidebar_label: LeanCache
 ---
 
-
-
 LeanCache 使用 [Redis](http://redis.io/) （3.0.x）来提供高性能、高可用的 Key-Value 内存存储，主要用作缓存数据的存储，也可以用作持久化数据的存储。它非常适合用于以下场景：
 
-* 某些数据量少，但是读写比例很高，比如某些应用的菜单可以通过后台调整，所有用户会频繁读取该信息。
-* 需要同步锁或者队列处理，比如秒杀、抢红包等场景。
-* 多个云引擎节点的协同和通信。
+- 某些数据量少，但是读写比例很高，比如某些应用的菜单可以通过后台调整，所有用户会频繁读取该信息。
+- 需要同步锁或者队列处理，比如秒杀、抢红包等场景。
+- 多个云引擎节点的协同和通信。
 
 下图为 LeanCache 和云引擎配合使用的架构：
 
@@ -23,13 +21,12 @@ LeanCache 使用 [Redis](http://redis.io/) （3.0.x）来提供高性能、高�
 - [limited-stock-rush](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/functions/limited-stock-rush.js) 实现秒杀抢购
 - [redlock](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/functions/redlock.js) 实现分布式锁
 
-
 ## 主要特性
 
-* **高性能**：接近 7 万的 QPS
-* **高可用**：基于 [AOF 持久化](http://www.redis.cn/topics/persistence.html) 的 Master-Slave 主从热备份。
-* **在线扩容**：在线调整容量，数据平滑迁移。
-* **多实例**：满足更大容量或更高性能的需求。
+- **高性能**：接近 7 万的 QPS
+- **高可用**：基于 [AOF 持久化](http://www.redis.cn/topics/persistence.html) 的 Master-Slave 主从热备份。
+- **在线扩容**：在线调整容量，数据平滑迁移。
+- **多实例**：满足更大容量或更高性能的需求。
 
 ## 创建实例
 
@@ -39,25 +36,26 @@ LeanCache 使用 [Redis](http://redis.io/) （3.0.x）来提供高性能、高�
 
 创建实例时可设置的参数有：
 
-* **实例名称**：最大长度不超过 32 个字符，限英文、数字、下划线，只能以字母开头。每个开发者账户下 LeanCache 实例名称<u>必须唯一</u>。
-* **实例容量**：可选 128 MB、256 MB、512 MB、1 GB、2 GB、4 GB、8 GB。
-* **删除策略**：内存满时对 key 的删除策略，默认为 `volatile-lru`，更多选择请参考 [数据删除策略](#数据删除策略)。
+- **实例名称**：最大长度不超过 32 个字符，限英文、数字、下划线，只能以字母开头。每个开发者账户下 LeanCache 实例名称<u>必须唯一</u>。
+- **实例容量**：可选 128 MB、256 MB、512 MB、1 GB、2 GB、4 GB、8 GB。
+- **删除策略**：内存满时对 key 的删除策略，默认为 `volatile-lru`，更多选择请参考 [数据删除策略](#数据删除策略)。
 
 创建好的实例会在控制台显示基本信息，包括实例名称、创建时间、运行状态、当前连接数、已用容量、访问地址、数据删除策略、Redis 版本。
 点击**调整容量**按钮可以扩容或缩容。
 点击**管理共享**按钮可以查看可以访问该 LeanCache 实例的应用，
+
 ### 数据删除策略
 
 目前我们支持如下几种策略：
 
-| 策略                                       | 说明                                   |
-| ---------------------------------------- | ------------------------------------ |
-| `noeviction`                             | 不删除，当内存满时，直接返回错误。                    |
-| `allkeys-lru`                            | 优先删除最近最少使用的 key，以释放内存。               |
-| `volatile-lru`                           | 优先删除设定了过期时间的 key 中最近最少使用的 key，以释放内存。 |
-| `allkeys-random`                         | 随机删除一个 key，以释放内存。                    |
-| `volatile-random`                        | 从设定了过期时间的 key 中随机删除一个，以释放内存。         |
-| `volatile-ttl`                           | 从设定了过期时间的 key 中删除最老的 key，以释放内存。      |
+| 策略              | 说明                                                            |
+| ----------------- | --------------------------------------------------------------- |
+| `noeviction`      | 不删除，当内存满时，直接返回错误。                              |
+| `allkeys-lru`     | 优先删除最近最少使用的 key，以释放内存。                        |
+| `volatile-lru`    | 优先删除设定了过期时间的 key 中最近最少使用的 key，以释放内存。 |
+| `allkeys-random`  | 随机删除一个 key，以释放内存。                                  |
+| `volatile-random` | 从设定了过期时间的 key 中随机删除一个，以释放内存。             |
+| `volatile-ttl`    | 从设定了过期时间的 key 中删除最老的 key，以释放内存。           |
 
 请注意，如果所有的 key 都不设置过期时间，那么 `volatile-lru`、`volatile-random`、`volatile-ttl` 这三种策略会等同于 `noeviction`（不删除）。更详细的内容请参考 [Using Redis as an LRU cache](http://redis.io/topics/lru-cache)。
 
@@ -115,11 +113,11 @@ $ lean cache list
 然后可以使用下列代码获取 Redis 连接：（假定实例名称为 `MYCACHE`）
 
 ```js
-const Redis = require('ioredis')
+const Redis = require("ioredis");
 
-const client = new Redis(process.env['REDIS_URL_MYCACHE']);
-client.on('error', function(err) {
-  return console.error('redis err: ', err);
+const client = new Redis(process.env["REDIS_URL_MYCACHE"]);
+client.on("error", function (err) {
+  return console.error("redis err: ", err);
 });
 ```
 
@@ -258,22 +256,21 @@ var bar = db.StringGet("foo");
 
 目前不支持直接连接线上的 LeanCache 进行调试，所以需要先在本地安装好 Redis。
 
-* Mac 上运行 `brew install redis` 来安装 Redis，然后使用 `redis-server` 启动服务。
-* Debian/Ubuntu 上运行 `apt-get install redis-server`
-* CentOS/RHEL 运行 `yum install redis`
-* Windows 尚无官方支持，可以下载 [微软的分支版本](https://github.com/MSOpenTech/redis/releases) 安装包。
+- Mac 上运行 `brew install redis` 来安装 Redis，然后使用 `redis-server` 启动服务。
+- Debian/Ubuntu 上运行 `apt-get install redis-server`
+- CentOS/RHEL 运行 `yum install redis`
+- Windows 尚无官方支持，可以下载 [微软的分支版本](https://github.com/MSOpenTech/redis/releases) 安装包。
 
 默认情况下，在本地运行时程序没有 LeanCache 的环境变量，因此会使用本地的 Redis 服务器地址。
 
 ```js
 // 在本地 process.env['REDIS_URL_<实例名称>'] 为 undefined，会连接默认的 127.0.0.1:6379
-const client = new Redis(process.env['REDIS_URL_MYCACHE']); // 假定实例名称为 MYCACHE
+const client = new Redis(process.env["REDIS_URL_MYCACHE"]); // 假定实例名称为 MYCACHE
 ```
 
 如果部署到预备或生产环境时遇到类似 `redis err: Error: Redis connection to 127.0.0.1:6379 failed - connect ECONNREFUSED 127.0.0.1:6379` 错误，请核实以上代码中 `REDIS_URL_<实例名称>` 这个环境变量的值是否替换正确，也可参考 [在云引擎中使用（Node.js 环境）](#在云引擎中使用_Node_js_环境_) 的示例。
 
 更详细的 Redis 操作说明请参考 [Redis 官方文档](http://redis.io/documentation)。
-
 
 ### 多应用间共享使用
 
@@ -326,8 +323,8 @@ MSET (10 keys): 60096.15 requests per second
 
 有些时候，你可能希望在一个应用里创建多个 LeanCache 实例：
 
-* **需要存储的数据大于 8 GB**：目前我们提供的实例最大容量为 8 GB。如果有大于此容量的数据，建议你创建多个实例，然后根据功能来划分，比如一个用来做持久化，另一个用来做缓存。
-* **需要更高的性能**：如果单实例的性能已经成为应用的瓶颈，你可以创建多个实例，然后在云引擎中同时连接，并自己决定 key 的分片策略，使请求分散到不同的实例来获得更高的性能。
+- **需要存储的数据大于 8 GB**：目前我们提供的实例最大容量为 8 GB。如果有大于此容量的数据，建议你创建多个实例，然后根据功能来划分，比如一个用来做持久化，另一个用来做缓存。
+- **需要更高的性能**：如果单实例的性能已经成为应用的瓶颈，你可以创建多个实例，然后在云引擎中同时连接，并自己决定 key 的分片策略，使请求分散到不同的实例来获得更高的性能。
 
 添加实例的方式请参考 [创建实例](#创建实例)。
 

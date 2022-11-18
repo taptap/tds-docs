@@ -1,13 +1,10 @@
 ---
 id: dotnet
-title: 数据存储指南 · .NET 
+title: 数据存储指南 · .NET
 sidebar_label: .NET 指南
 ---
 
-
-
 数据存储是云服务提供的核心功能之一，可用于存放和查询应用数据。下面的代码展示了如何创建一个对象并将其存入云端：
-
 
 ```cs
 // 构建对象
@@ -29,7 +26,7 @@ await todo.Save();
 >
 > 如果你还在在使用我们老版本的 C#/.NET/Unity SDK（版本号为 `YYYYMMDD.N` 格式，类名以 `AV` 开头），请参考 [.NET SDK 迁移指南] 迁移到新版 SDK。
 
-[.NET SDK 迁移指南]: https://github.com/leancloud/csharp-sdk/wiki/.Net-Standard-SDK-%E8%BF%81%E7%A7%BB%E6%8C%87%E5%8D%97
+[.net sdk 迁移指南]: https://github.com/leancloud/csharp-sdk/wiki/.Net-Standard-SDK-%E8%BF%81%E7%A7%BB%E6%8C%87%E5%8D%97
 
 ## 对象
 
@@ -55,7 +52,6 @@ tags:       ["工作", "销售"]
 `LCObject` 同时支持 `GeoPoint`，可以用来存储地理位置信息。参见 [GeoPoint](#geopoint)。
 
 以下是一些示例：
-
 
 ```cs
 // 基本类型
@@ -103,7 +99,6 @@ LCObject object = new LCObject("Todo");
 
 下面的代码将一个 class 为 `Todo` 的对象存入云端：
 
-
 ```cs
 // 构建对象
 LCObject todo = new LCObject("Todo");
@@ -118,15 +113,15 @@ await todo.Save();
 
 ```json
 {
-  "title":     "马拉松报名",
-  "priority":  2,
+  "title": "马拉松报名",
+  "priority": 2,
   "ACL": {
     "*": {
-      "read":  true,
+      "read": true,
       "write": true
     }
   },
-  "objectId":  "582570f38ac247004f39c24b",
+  "objectId": "582570f38ac247004f39c24b",
   "createdAt": "2017-11-11T07:19:15.549Z",
   "updatedAt": "2017-11-11T07:19:15.549Z"
 }
@@ -136,12 +131,12 @@ await todo.Save();
 
 以下是一些对象的内置属性，会在对象保存时自动创建，无需手动指定：
 
-内置属性 | 类型 | 描述
---- | --- | ---
-`objectId` | string | 该对象唯一的 ID 标识。
-`ACL` | LCACL | 该对象的权限控制，实际上是一个 JSON 对象，控制台做了展现优化。
-`createdAt` | DateTime | 该对象被创建的时间。
-`updatedAt` | DateTime | 该对象最后一次被修改的时间。
+| 内置属性    | 类型     | 描述                                                           |
+| ----------- | -------- | -------------------------------------------------------------- |
+| `objectId`  | string   | 该对象唯一的 ID 标识。                                         |
+| `ACL`       | LCACL    | 该对象的权限控制，实际上是一个 JSON 对象，控制台做了展现优化。 |
+| `createdAt` | DateTime | 该对象被创建的时间。                                           |
+| `updatedAt` | DateTime | 该对象最后一次被修改的时间。                                   |
 
 这些属性的值会在对象被存入云端时自动填入，代码中尚未保存的 `LCObject` 不存在这些属性。
 
@@ -171,6 +166,7 @@ DateTime createdAt = todo.CreatedAt;
 对象拿到之后，可以通过 `get` 方法来获取各个属性的值。注意 `objectId`、`updatedAt` 和 `createdAt` 这三个内置属性不能通过 `get` 获取或通过 `set` 修改，只能由云端自动进行填充。尚未保存的 `LCObject` 不存在这些属性。
 
 如果你试图获取一个不存在的属性，SDK 不会报错，而是会返回 null。
+
 #### 同步对象
 
 当云端数据发生更改时，你可以调用 `Fetch` 方法来刷新对象，使之与云端数据同步：
@@ -188,6 +184,7 @@ LCObject todo = LCObject.CreateWithoutData("Todo", "582570f38ac247004f39c24b");
 await todo.Fetch(includes: new string[] { "priority", "location" });
 // 只有 priority 和 location 会被获取和刷新
 ```
+
 ### 更新对象
 
 要更新一个对象，只需指定需要更新的属性名和属性值，然后调用 `Save` 方法。例如：
@@ -257,7 +254,6 @@ post.Increment("likes", 1);
 - `Remove(key, value)` 从数组字段中删除指定对象的所有实例。
 - `RemoveAll(key, values)` 从数组字段中删除指定的对象数组。
 
-
 例如，`Todo` 用一个 `alarms` 属性保存所有闹钟的时间。下面的代码将多个时间加入这个属性：
 
 ```cs
@@ -320,6 +316,7 @@ await LCObject.SaveAll(results);
 ```
 
 虽然上述方法可以在一次请求中包含多个操作，每一个分别的保存或同步操作在计费时依然会被算作一次请求，而所有的删除操作则会被合并为一次请求。
+
 ### 后台运行
 
 细心的开发者已经发现，在所有的示例代码中几乎都是用了异步来访问云端，形如的用法都是提供给开发者在主线程调用用以实现后台运行的方法，因此开发者在主线程可以放心地调用这种命名方式的函数。
@@ -407,19 +404,18 @@ query.WhereEqualTo("lastName", "Smith");
 // students 是包含满足条件的 Student 对象的数组
 ReadOnlyCollection<LCObject> students = await query.Find();
 ```
+
 ### 查询条件
 
 可以给 `LCObject` 添加不同的条件来改变获取到的结果。
 
 下面的代码查询所有 `firstName` 不为 `Jack` 的对象：
 
-
 ```cs
 query.WhereNotEqualTo("firstName", "Jack");
 ```
 
 对于能够排序的属性（比如数字、字符串），可以进行比较查询：
-
 
 ```cs
 // 限制 age < 18
@@ -437,21 +433,17 @@ query.WhereGreaterThanOrEqualTo("age", 18);
 
 可以在同一个查询中设置多个条件，这样可以获取满足所有条件的结果。可以理解为所有的条件是 `AND` 的关系：
 
-
 ```cs
 query.WhereEqualTo("firstName", "Jack");
 query.WhereGreaterThan("age", 18);
 ```
 
-
 可以通过指定 `limit` 限制返回结果的数量（默认为 `100`）：
-
 
 ```cs
 // 最多获取 10 条结果
 query.Limit(10);
 ```
-
 
 由于性能原因，`limit` 最大只能设为 `1000`。即使将其设为大于 `1000` 的数，云端也只会返回 1,000 条结果。
 
@@ -501,9 +493,7 @@ query.AddDescendingOrder("createdAt");
 
 下面的代码可用于查找包含或不包含某一属性的对象：
 
-
 可以通过 `Select` 指定需要返回的属性。下面的代码只获取每个对象的 `title` 和 `content`（包括内置属性 `objectId`、`createdAt` 和 `updatedAt`）：
-
 
 ```cs
 LCQuery<LCObject> query = new LCQuery<LCObject>("Todo");
@@ -522,6 +512,7 @@ string notes = todo["notes"] as string; // null
 反向选择同样适用于内置字段，比如 `-objectId`，也可以和点号组合使用，比如 `-pubUser.createdAt`。
 
 对于未获取的属性，可以通过对结果中的对象进行 `Fetch` 操作来获取。参见 [同步对象](#同步对象)。
+
 ### 字符串查询
 
 可以用 `WhereStartsWith` 来查找某一属性值以特定字符串开头的对象。和 SQL 中的 `LIKE` 一样，你可以利用索引带来的优势：
@@ -558,31 +549,25 @@ query.WhereMatches("title", "^((?!ticket).)*\$", modifiers: "i");
 
 ### 数组查询
 
-下面的代码查找所有数组属性 `tags` 包含 ` 工作 ` 的对象：
+下面的代码查找所有数组属性 `tags` 包含 `工作` 的对象：
 
 ```cs
 query.WhereEqualTo("tags", "工作");
 ```
 
-
 下面的代码查询数组属性长度为 3 （正好包含 3 个标签）的对象：
-
 
 ```cs
 query.WhereSizeEqualTo("tags", 3);
 ```
 
-
-下面的代码查找所有数组属性 `tags` **同时包含** ` 工作 `、` 销售 ` 和 ` 会议 ` 的对象：
-
+下面的代码查找所有数组属性 `tags` **同时包含** `工作`、`销售` 和 `会议` 的对象：
 
 ```cs
 query.WhereContainsAll("tags", new string[] { "工作", "销售", "会议" });
 ```
 
-
 如需获取某一属性值包含一列值中任意一个值的对象，可以直接用 `WhereContainedIn` 而无需执行多次查询。下面的代码构建的查询会查找所有 `priority` 为 `1` **或** `2` 的 todo 对象：
-
 
 ```cs
 // 单个查询
@@ -605,7 +590,6 @@ LCQuery<LCObject> priorityOneOrTwo = LCQuery.Or(new LCQuery<LCObject>[] { priori
 ReadOnlyCollection<LCObject> results = await priorityOneOrTwo.Find();
 // 好像有些繁琐 :(
 ```
-
 
 反过来，还可以用 `WhereNotContainedIn` 来获取某一属性值不包含一列值中任何一个的对象。
 
@@ -655,7 +639,6 @@ foreach (LCObject comment in comments) {
 }
 ```
 
-
 可以用 dot 符号（`.`）来获取多级关系，例如 `post.author`，详见[《点号使用指南》](https://leancloud.cn/docs/dot-notation.html)的《在查询对象时使用点号》一节。
 
 可以在同一查询上应用多次 `Include` 以包含多个属性。
@@ -693,7 +676,6 @@ print($"{count} 个 todo 已完成");
 
 OR 操作表示多个查询条件符合其中任意一个即可。 例如，查询优先级大于等于 `3` 或者已经完成了的 todo：
 
-
 ```cs
 LCQuery<LCObject> priorityQuery = new LCQuery<LCObject>("Todo");
 priorityQuery.WhereGreaterThanOrEqualTo("priority", 3);
@@ -723,7 +705,6 @@ ReadOnlyCollection<LCObject> results = await query.Find();
 ```
 
 单独使用 AND 查询跟使用基础查询相比并没有什么不同，不过当查询条件中包含不止一个 OR 查询时，就必须使用 AND 查询：
-
 
 ```cs
 LCQuery<LCObject> createdAtQuery = new LCQuery<LCObject>("Todo");
@@ -777,15 +758,23 @@ using LeanCloud.LiveQuery;
 
 下面是在使用了 LiveQuery 的网页应用和手机应用中分别操作，数据保持同步的效果：
 
-<video src="https://capacity-files.lcfile.com/1496988080458" controls autoPlay muted preload="auto" width="100%" height="100%" >
-HTML5 Video is required for this demo, which your browser doesn't support.
+<video
+  src="https://capacity-files.lcfile.com/1496988080458"
+  controls
+  autoPlay
+  muted
+  preload="auto"
+  width="100%"
+  height="100%"
+>
+  HTML5 Video is required for this demo, which your browser doesn't support.
 </video>
 
 使用我们的「LeanTodo」微信小程序和网页应用，可以实际体验以上视频所演示的效果，步骤如下：
 
 1. 微信扫码，添加小程序「LeanTodo」；
 
-    ![LeanTodo mini program](/img/leantodo-weapp-qr.jpg)
+   ![LeanTodo mini program](/img/leantodo-weapp-qr.jpg)
 
 2. 进入小程序，点击首页左下角 **设置** > **账户设置**，输入便于记忆的用户名和密码；
 
@@ -801,7 +790,6 @@ HTML5 Video is required for this demo, which your browser doesn't support.
 
 首先创建一个普通的 `LCQuery` 对象，添加查询条件（如有），然后进行订阅操作：
 
-
 ```cs
 LCQuery<LCObject> query = new LCQuery<LCObject>("Todo");
 query.WhereEqualTo("isComplete", true);
@@ -809,10 +797,9 @@ await query.Subscribe();
 // 订阅成功
 ```
 
-
 LiveQuery 不支持内嵌查询，也不支持返回指定属性。
 
-订阅成功后，就可以接收到和 `LCObject` 相关的更新了。假如在另一个客户端上创建了一个 `Todo` 对象，对象的 `title` 设为 ` 更新作品集 `，那么下面的代码可以获取到这个新的 `Todo`：
+订阅成功后，就可以接收到和 `LCObject` 相关的更新了。假如在另一个客户端上创建了一个 `Todo` 对象，对象的 `title` 设为 `更新作品集`，那么下面的代码可以获取到这个新的 `Todo`：
 
 ```cs
 LCQuery<LCObject> query = new LCQuery<LCObject>("Todo");
@@ -822,8 +809,7 @@ liveQuery.OnCreate = (obj) => {
 };
 ```
 
-
-此时如果有人把 `Todo` 的 `content` 改为 ` 把我最近画的插画放上去 `，那么下面的代码可以获取到本次更新：
+此时如果有人把 `Todo` 的 `content` 改为 `把我最近画的插画放上去`，那么下面的代码可以获取到本次更新：
 
 ```cs
 liveQuery.OnUpdate = (updatedTodo, updatedKeys) => {
@@ -926,6 +912,7 @@ LiveQuery 的核心还是提供一个针对查询的推拉结合的用法，脱�
 ### 构建文件
 
 可以通过字符串构建文件：
+
 ```cs
 LCFile file = new LCFile("resume.txt", UTF8.GetBytes("LeanCloud"));
 ```
@@ -968,7 +955,6 @@ print(file.Url);
 
 文件上传后，可以在 `_File` class 中找到。已上传的文件无法再被修改。如果需要修改文件，只能重新上传修改过的文件并取得新的 `objectId` 和 URL。
 
-
 已经保存到云端的文件可以关联到 `LCObject`：
 
 ```cs
@@ -988,7 +974,7 @@ LCQuery<LCObject> query = LCFile.GetQuery();
 需要注意的是，内部文件（上传到文件服务的文件）的 `url` 字段是由云端动态生成的，其中涉及切换自定义域名的相关处理逻辑。
 因此，通过 url 字段查询文件仅适用于外部文件（直接保存外部 URL 到 `_File` 表创建的文件），内部文件请改用 key 字段（URL 中的路径）查询。
 
-注意，如果文件被保存到了 `LCObject` 的一个数组属性中，那么在查询 `LCObject` 时如果需要包含文件，则要用到 `LCQuery` 的 `Include` 方法。比如说，在获取所有标题为 ` 买蛋糕 ` 的 todo 的同时获取附件中的文件：
+注意，如果文件被保存到了 `LCObject` 的一个数组属性中，那么在查询 `LCObject` 时如果需要包含文件，则要用到 `LCQuery` 的 `Include` 方法。比如说，在获取所有标题为 `买蛋糕` 的 todo 的同时获取附件中的文件：
 
 ```cs
 // 获取同一标题且包含附件的 todo
@@ -1087,7 +1073,7 @@ ReadOnlyCollection<LCObject> todos = await query.Find();
 
 像 `OrderByAscending` 和 `OrderByDescending` 这样额外的排序条件会获得比默认的距离排序更高的优先级。
 
-若要限制结果和给定地点之间的距离，可以参考 API 文档中的  参数。
+若要限制结果和给定地点之间的距离，可以参考 API 文档中的 参数。
 
 若要查询在某一矩形范围内的对象，可以用 `WhereWithinGeoBox`：
 
@@ -1128,7 +1114,6 @@ GeoPoint 的经纬度的类型是数字，且经度需在 -180.0 到 180.0 之�
 
 用户第一次打开应用的时候，可以让用户注册一个账户。下面的代码展示了一个典型的使用用户名和密码注册的流程：
 
-
 ```cs
 // 创建实例
 LCUser user = new LCUser();
@@ -1146,14 +1131,12 @@ user["gender"] = "secret";
 await user.SignUp();
 ```
 
-
 新建 `LCUser` 的操作应使用 `SignUp` 而不是 `Save`，但以后的更新操作就可以用 `Save` 了。
 
 如果收到 `202` 错误码，意味着 `_User` 表里已经存在使用同一 `username` 的账号，此时应提示用户换一个用户名。除此之外，每个用户的 `email` 和 `mobilePhoneNumber` 也需要保持唯一性，否则会收到 `203` 或 `214` 错误。
 可以考虑在注册时把用户的 `username` 设为与 `email` 相同，这样用户可以直接 [用邮箱重置密码](#重置密码)。
 
 采用「用户名 + 密码」注册时需要注意：密码是以明文方式通过 HTTPS 加密传输给云端，云端会以密文存储密码（云端对密码的长度、复杂度不作限制），并且我们的加密算法是无法通过所谓「彩虹表撞库」获取的，这一点请开发者放心。换言之，用户的密码只可能用户本人知道，开发者不论是通过控制台还是 API 都是无法获取。另外我们需要强调 **在客户端，应用切勿再次对密码加密，这会导致 [重置密码](#重置密码) 等功能失效**。
-
 
 ### 登录
 
@@ -1182,7 +1165,6 @@ try {
   print($"{e.code} : {e.message}");
 }
 ```
-
 
 #### 单设备登录
 
@@ -1285,7 +1267,6 @@ await LCUser.RequestPasswordReset("tom@leancloud.rocks");
 
 密码重置邮件的内容可在应用的 **云服务控制台 > 数据存储 > 用户 > 邮件模版** 中自定义。更多关于自定义邮件模板和验证链接的内容，请参考[《自定义邮件验证和重设密码页面》](https://leancloud.cn/docs/custom-reset-verify-page.html)。
 
-
 ### 用户的查询
 
 可以直接构建一个针对 `_User` 的 `LCQuery` 来查询用户：
@@ -1384,19 +1365,19 @@ LCUser currentUser = await LCUser.LoginWithAuthData(thirdPartyData, "weixin");
 
 ```json
 {
-  "username":     "k9mjnl7zq9mjbc7expspsxlls",
-  "objectId":     "5b029266fb4ffe005d6c7c2e",
-  "createdAt":    "2018-05-21T09:33:26.406Z",
-  "updatedAt":    "2018-05-21T09:33:26.575Z",
+  "username": "k9mjnl7zq9mjbc7expspsxlls",
+  "objectId": "5b029266fb4ffe005d6c7c2e",
+  "createdAt": "2018-05-21T09:33:26.406Z",
+  "updatedAt": "2018-05-21T09:33:26.575Z",
   "sessionToken": "…",
   // authData 通常不会返回，继续阅读以了解其中原因
   "authData": {
     "weixin": {
-      "openid":        "OPENID",
-      "access_token":  "ACCESS_TOKEN",
-      "expires_in":    7200,
+      "openid": "OPENID",
+      "access_token": "ACCESS_TOKEN",
+      "expires_in": 7200,
       "refresh_token": "REFRESH_TOKEN",
-      "scope":         "SCOPE"
+      "scope": "SCOPE"
     }
   }
   // …
@@ -1408,6 +1389,7 @@ LCUser currentUser = await LCUser.LoginWithAuthData(thirdPartyData, "weixin");
 开发者需要自己完成第三方平台的鉴权流程（一般通过 OAuth 1.0 或 2.0），以获取鉴权信息，继而到云端来登录。
 
 #### Signin With Apple
+
 如果你需要开发 [Sigin With Apple](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api)，云服务可以帮你校验 `identityToken`，并获取 Apple 的 `access_token`。Apple Sign In 的 `authData` 结构如下：
 
 ```
@@ -1419,12 +1401,13 @@ LCUser currentUser = await LCUser.LoginWithAuthData(thirdPartyData, "weixin");
   }
 }
 ```
+
 `authData` 中的 key 的作用：
 
-* **`lc_apple`**：只有 platform 为 `lc_apple` 时，云服务才会执行 `identity_token` 和 `code` 的逻辑。
-* **`uid`**：必填。云服务通过 `uid` 判断是否存在用户。
-* **`identity_token`**：可选。`authData` 中有 `identity_token` 时云端会自动校验 `identity_token` 的有效性。开发者需要在云服务控制台「存储」-「用户」-「设置」-「第三方集成」中填写 Apple 的相关信息。
-* **`code`**：可选。`authData` 中有 `code` 时云端会自动用该 `code` 向 Apple 换取 `access_token` 和 `refresh_token`。开发者需要在云服务控制台「存储」-「用户」-「设置」-「第三方集成」中填写 Apple 的相关信息。
+- **`lc_apple`**：只有 platform 为 `lc_apple` 时，云服务才会执行 `identity_token` 和 `code` 的逻辑。
+- **`uid`**：必填。云服务通过 `uid` 判断是否存在用户。
+- **`identity_token`**：可选。`authData` 中有 `identity_token` 时云端会自动校验 `identity_token` 的有效性。开发者需要在云服务控制台「存储」-「用户」-「设置」-「第三方集成」中填写 Apple 的相关信息。
+- **`code`**：可选。`authData` 中有 `code` 时云端会自动用该 `code` 向 Apple 换取 `access_token` 和 `refresh_token`。开发者需要在云服务控制台「存储」-「用户」-「设置」-「第三方集成」中填写 Apple 的相关信息。
 
 ##### 获取 Client ID
 
@@ -1453,11 +1436,11 @@ Team ID 用于获取 `access_token`。登录 Apple 开发者平台，在右上�
 ```json
 {
   "weixin": {
-    "openid":        "…",
-    "access_token":  "…",
-    "expires_in":    7200,
+    "openid": "…",
+    "access_token": "…",
+    "expires_in": 7200,
     "refresh_token": "…",
-    "scope":         "…"
+    "scope": "…"
   }
 }
 ```
@@ -1466,12 +1449,12 @@ Team ID 用于获取 `access_token`。登录 Apple 开发者平台，在右上�
 
 ```json
 {
-    "weibo": {
-      "refresh_token": "2.0xxx",
-      "uid": "271XFEFEW273",
-      "expires_in": 115057,
-      "access_token": "2.00xxx",
-    }
+  "weibo": {
+    "refresh_token": "2.0xxx",
+    "uid": "271XFEFEW273",
+    "expires_in": 115057,
+    "access_token": "2.00xxx"
+  }
 }
 ```
 
@@ -1507,7 +1490,7 @@ Team ID 用于获取 `access_token`。登录 Apple 开发者平台，在右上�
 }
 ```
 
-云端首先会查找账户系统（_User 表），看看是否存在 authData.weixin.openid = “ OPENID ” 的账户，如果存在，则返回现有账户，如果不存在那么就创建一个新账户，同时将上面的鉴权信息写入新账户的 `authData` 属性中，并将新账户的数据当成结果返回。
+云端首先会查找账户系统（\_User 表），看看是否存在 authData.weixin.openid = “ OPENID ” 的账户，如果存在，则返回现有账户，如果不存在那么就创建一个新账户，同时将上面的鉴权信息写入新账户的 `authData` 属性中，并将新账户的数据当成结果返回。
 
 云端会自动为 `_User` class 中每个用户的 `authData.<PLATFORM>.<uid>` 创建唯一索引，从而避免重复数据。
 `<uid>` 在微信等部分云服务内建支持的第三方平台上为 `openid` 字段，在其他第三方平台（包括部分云服务专门支持的第三方平台和所有云服务没有专门支持的第三方平台）上为 `uid` 字段。
@@ -1612,7 +1595,7 @@ try {
 
 下面让我们通过一个例子来说明如何使用这些参数完成 UnionID 登录。
 
-假设云服务在微信开放平台上有两个应用，一个是「云服务通讯」，一个是「云服务技术支持」，这两个应用在接入第三方鉴权的时候，分别使用了 `wxleanoffice` 和 `wxleansupport` 作为 platform 来进行登录。现在我们开启 UnionID 的用户体系，希望同一个微信用户在这两个应用中都能对应到同一个账户系统（_User 表中的同一条记录），同时我们决定将 `wxleanoffice` 平台作为主账号平台。
+假设云服务在微信开放平台上有两个应用，一个是「云服务通讯」，一个是「云服务技术支持」，这两个应用在接入第三方鉴权的时候，分别使用了 `wxleanoffice` 和 `wxleansupport` 作为 platform 来进行登录。现在我们开启 UnionID 的用户体系，希望同一个微信用户在这两个应用中都能对应到同一个账户系统（\_User 表中的同一条记录），同时我们决定将 `wxleanoffice` 平台作为主账号平台。
 
 假设对于用户 A，微信给 ta 为 云服务分配的 UnionId 为 `unionid4a`，而对两个应用的授权信息分别为：
 
@@ -1653,7 +1636,7 @@ LCUser currentUser = await LCUser.LoginWithAuthDataAndUnionId(
 
 > 注意代码中将微信传回来的 openid 属性改为了 uid，这是因为云端要求对于自定义的 platform，只能使用 uid 这样的属性名，才能保证自动建立 `authData.<PLATFORM>.uid` 的唯一索引，具体可以参考[数据存储 REST API 使用详解](/v2/sdk/storage/guide/rest)的《连接用户账户和第三方平台》一节。
 
-如果用户 A 是第一次在「云服务通讯」中通过微信登录，那么 _User 表中会增加一个新用户（假设其 objectId 为 `ThisIsUserA`），其 `authData` 的结果如下：
+如果用户 A 是第一次在「云服务通讯」中通过微信登录，那么 \_User 表中会增加一个新用户（假设其 objectId 为 `ThisIsUserA`），其 `authData` 的结果如下：
 
 ```json
 {
@@ -1665,7 +1648,8 @@ LCUser currentUser = await LCUser.LoginWithAuthDataAndUnionId(
     "access_token": "officetoken",
     "unionid": "unionid4a"
   },
-  "_weixin_unionid": {   // 新增键值对
+  "_weixin_unionid": {
+    // 新增键值对
     "uid": "unionid4a"
   }
 }
@@ -1674,7 +1658,7 @@ LCUser currentUser = await LCUser.LoginWithAuthDataAndUnionId(
 可以看到，与之前的第三方登录 API 相比，这里由于登录时指定了 `asMainAccount` 为 true，所以 authData 的第一级子目录中增加了 `_weixin_unionid` 的键值对，这里的 `weixin` 就是我们指定的 `unionIdPlatform` 的值。`_weixin_unionid` 这个增加的键值对非常重要，以后我们判断是否存在同样 UnionID 的账户就是依靠它来查找的，而是否增加这个键值对，则是由登录时指定的 `asMainAccount` 的值决定的：
 
 - 当 `asMainAccount` 为 true 时，云端会在 `authData` 下面增加名为 `_{unionIdPlatform}_unionid` 的键值对，当前账号就会作为这一个 UnionID 对应的主账号被唯一确定。
-- 当 `asMainAccount` 为 false 时，云端不会在 `authData` 下面增加名为 `_{unionIdPlatform}_unionid` 的键值对，此时如果通过提供的 UnionID 可以找到主账号，则会将当前的鉴权信息合并进主账号的 `authData` 属性里，同时返回主账号对应的 _User 表记录；如果通过提供的 UnionID 找不到主账号，则会根据平台的 `openid` 去查找账户，找到匹配的账户就返回匹配的，找不到就新建一个账户，此时的处理逻辑与不使用 UnionID 时的逻辑完全一致。
+- 当 `asMainAccount` 为 false 时，云端不会在 `authData` 下面增加名为 `_{unionIdPlatform}_unionid` 的键值对，此时如果通过提供的 UnionID 可以找到主账号，则会将当前的鉴权信息合并进主账号的 `authData` 属性里，同时返回主账号对应的 \_User 表记录；如果通过提供的 UnionID 找不到主账号，则会根据平台的 `openid` 去查找账户，找到匹配的账户就返回匹配的，找不到就新建一个账户，此时的处理逻辑与不使用 UnionID 时的逻辑完全一致。
 
 接下来，用户 A 继续在「云服务技术支持」中进行微信登录，其登录逻辑为：
 
@@ -1698,7 +1682,7 @@ LCUser currentUser = await LCUser.LoginWithAuthDataAndUnionId(
     option: option);
 ```
 
-与「云服务通讯」中的登录过程相比，在「云服务技术支持」这个应用中，我们在登录时只是将 `asMainAccount` 设为了 false。 这时我们看到，本次登录得到的还是 objectId 为 `ThisIsUserA` 的 _User 表记录（同一个账户），同时该账户的 `authData` 属性中发生了变化，多了 `wxleansupport` 的数据，如下：
+与「云服务通讯」中的登录过程相比，在「云服务技术支持」这个应用中，我们在登录时只是将 `asMainAccount` 设为了 false。 这时我们看到，本次登录得到的还是 objectId 为 `ThisIsUserA` 的 \_User 表记录（同一个账户），同时该账户的 `authData` 属性中发生了变化，多了 `wxleansupport` 的数据，如下：
 
 ```json
 {
@@ -1803,12 +1787,12 @@ LCUser currentUser = await LCUser.LoginWithAuthDataAndUnionId(
 
 此时的存量账户表如下所示：
 
-objectId | 微信用户 | authData.{platform} | authData._{platform}_unionid
------- | ------ | ------ | ------
-1 | UserA | openid1（对应产品 1） | N/A
-2 | UserB | openid2（对应产品 2） | N/A
-3 | UserC | openid3（对应产品 1） | N/A
-4 | UserC | openid4（对应产品 2） | N/A
+| objectId | 微信用户 | authData.{platform}   | authData.\_{platform}\_unionid |
+| -------- | -------- | --------------------- | ------------------------------ |
+| 1        | UserA    | openid1（对应产品 1） | N/A                            |
+| 2        | UserB    | openid2（对应产品 2） | N/A                            |
+| 3        | UserC    | openid3（对应产品 1） | N/A                            |
+| 4        | UserC    | openid4（对应产品 2） | N/A                            |
 
 现在我们对两个子产品进行升级，接入 UnionID 体系。这时因为已经有同一个微信用户在不同子产品中创建了不同的账户（例如 objectId 为 3 和 4 的账户），我们需要确定以哪个平台的账号为主。比如决定使用「云服务通讯」上生成的账号为主账号，则在该应用程序更新版本时，使用 `asMainAccount=true` 参数。这个应用带着 UnionID 登录匹配或创建的账号将作为主账号，之后所有这个 UnionID 的登录都会匹配到这个账号。请注意这时 `_User` 表里会剩下一些用户数据，也就是没有被选为主账号的、其他平台的同一个用户的旧账号数据（例如 objectId 为 2 和 4 的账户）。这部分数据会继续服务于已经发布的但仍然使用 OpenID 登录的旧版应用。
 
@@ -1820,35 +1804,35 @@ objectId | 微信用户 | authData.{platform} | authData._{platform}_unionid
 
 以上面的三个用户为例，他们分别升级到两个产品的最新版，且最终都会启用两个产品，则账户表的最终结果如下：
 
-objectId | 微信用户 | authData.{platform} | authData._{platform}_unionid
------- | ------ | ------ | ------
-1 | UserA | openid1（对应产品 1）/openid6（对应产品 2） | unionId_user_A
-2 | UserB | openid2（对应产品 2） | N/A
-3 | UserC | openid3（对应产品 1）/openid4（对应产品 2） | unionId_user_C
-4 | UserC | openid4（对应产品 2） | N/A
-5 | UserB | openid5（对应产品 1）/openid2（对应产品 2） | unionId_user_B
+| objectId | 微信用户 | authData.{platform}                         | authData.\_{platform}\_unionid |
+| -------- | -------- | ------------------------------------------- | ------------------------------ |
+| 1        | UserA    | openid1（对应产品 1）/openid6（对应产品 2） | unionId_user_A                 |
+| 2        | UserB    | openid2（对应产品 2）                       | N/A                            |
+| 3        | UserC    | openid3（对应产品 1）/openid4（对应产品 2） | unionId_user_C                 |
+| 4        | UserC    | openid4（对应产品 2）                       | N/A                            |
+| 5        | UserB    | openid5（对应产品 1）/openid2（对应产品 2） | unionId_user_B                 |
 
 之后有新的用户 D，分别在两个产品的新版本中登录，则账户表中会增加一条新的 objectId=6 的记录，结果如下：
 
-objectId | 微信用户 | authData.{platform} | authData._{platform}_unionid
------- | ------ | ------ | ------
-1 | UserA | openid1（对应产品 1）/openid6（对应产品 2） | unionId_user_A
-2 | UserB | openid2（对应产品 2） | N/A
-3 | UserC | openid3（对应产品 1）/openid4（对应产品 2） | unionId_user_C
-4 | UserC | openid4（对应产品 2） | N/A
-5 | UserB | openid5（对应产品 1）/openid2（对应产品 2） | unionId_user_B
-6 | UserD | openid7（对应产品 1）/openid8（对应产品 2） | unionId_user_D
+| objectId | 微信用户 | authData.{platform}                         | authData.\_{platform}\_unionid |
+| -------- | -------- | ------------------------------------------- | ------------------------------ |
+| 1        | UserA    | openid1（对应产品 1）/openid6（对应产品 2） | unionId_user_A                 |
+| 2        | UserB    | openid2（对应产品 2）                       | N/A                            |
+| 3        | UserC    | openid3（对应产品 1）/openid4（对应产品 2） | unionId_user_C                 |
+| 4        | UserC    | openid4（对应产品 2）                       | N/A                            |
+| 5        | UserB    | openid5（对应产品 1）/openid2（对应产品 2） | unionId_user_B                 |
+| 6        | UserD    | openid7（对应产品 1）/openid8（对应产品 2） | unionId_user_D                 |
 
 如果之后我们增加了新的子产品 3，这些用户在子产品 3 中也进行微信登录的话，那么四个用户还是会继续绑定到 objectId 为 1/3/5/6 的主账户。此时账户表的结果会变为：
 
-objectId | 微信用户 | authData.{platform} | authData._{platform}_unionid
------- | ------ | ------ | ------
-1 | UserA | openid1（对应产品 1）/openid6（对应产品 2）/openid9（对应产品 3） | unionId_user_A
-2 | UserB | openid2（对应产品 2） | N/A
-3 | UserC | openid3（对应产品 1）/openid4（对应产品 2）/openid10（对应产品 3） | unionId_user_C
-4 | UserC | openid4（对应产品 2） | N/A
-5 | UserB | openid5（对应产品 1）/openid2（对应产品 2）/openid11（对应产品 3） | unionId_user_B
-6 | UserD | openid7（对应产品 1）/openid8（对应产品 2）/openid12（对应产品 3） | unionId_user_D
+| objectId | 微信用户 | authData.{platform}                                                | authData.\_{platform}\_unionid |
+| -------- | -------- | ------------------------------------------------------------------ | ------------------------------ |
+| 1        | UserA    | openid1（对应产品 1）/openid6（对应产品 2）/openid9（对应产品 3）  | unionId_user_A                 |
+| 2        | UserB    | openid2（对应产品 2）                                              | N/A                            |
+| 3        | UserC    | openid3（对应产品 1）/openid4（对应产品 2）/openid10（对应产品 3） | unionId_user_C                 |
+| 4        | UserC    | openid4（对应产品 2）                                              | N/A                            |
+| 5        | UserB    | openid5（对应产品 1）/openid2（对应产品 2）/openid11（对应产品 3） | unionId_user_B                 |
+| 6        | UserD    | openid7（对应产品 1）/openid8（对应产品 2）/openid12（对应产品 3） | unionId_user_D                 |
 
 ### 匿名用户
 

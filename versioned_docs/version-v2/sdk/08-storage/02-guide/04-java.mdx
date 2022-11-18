@@ -1,10 +1,8 @@
 ---
 id: java
-title: 数据存储开发指南 · Java 
+title: 数据存储开发指南 · Java
 sidebar_label: Java 指南
 ---
-
-
 
 数据存储是云服务提供的核心功能之一，可用于存放和查询应用数据。下面的代码展示了如何创建一个对象并将其存入云端：
 
@@ -55,7 +53,6 @@ priority:   2,
 tags:       ["工作", "销售"]
 ```
 
-
 ### 数据类型
 
 `LCObject` 支持的数据类型包括 `String`、`Number`、`Boolean`、`Object`、`Array`、`Date` 等等。你可以通过嵌套的方式在 `Object` 或 `Array` 里面存储更加结构化的数据。
@@ -65,7 +62,6 @@ tags:       ["工作", "销售"]
 `LCObject` 同时支持 `GeoPoint`，可以用来存储地理位置信息。参见 [GeoPoint](#geopoint)。
 
 以下是一些示例：
-
 
 ```java
 // 基本类型
@@ -92,7 +88,6 @@ testObject.put("testHashMap",   hashMap);
 testObject.save();
 ```
 
-
 我们不推荐通过 `byte[]` 在 `LCObject` 里面存储图片、文档等大型二进制数据。每个 `LCObject` 的大小不应超过 **128 KB**。如需存储大型文件，可创建 `LCFile` 实例并将其关联到 `LCObject` 的某个属性上。参见 [文件](#文件)。
 
 注意：时间类型在云端将会以 UTC 时间格式存储，但是客户端在读取之后会转化成本地时间。
@@ -109,13 +104,11 @@ testObject.save();
 LCObject todo = new LCObject("Todo");
 ```
 
-
 在构建对象时，为了使云端知道对象属于哪个 class，需要将 class 的名字作为参数传入。你可以将云服务里面的 class 比作关系型数据库里面的表。一个 class 的名字必须以字母开头，且只能包含数字、字母和下划线。
 
 ### 保存对象
 
 下面的代码将一个 class 为 `Todo` 的对象存入云端：
-
 
 ```java
 // 构建对象
@@ -139,20 +132,19 @@ todo.saveInBackground().subscribe(new Observer<LCObject>() {
 });
 ```
 
-
 为了确认对象已经保存成功，我们可以到 **云服务控制台 > 数据存储 > 结构化数据 > `Todo`** 里面看一下，应该会有一行新的数据产生。点一下这个数据的 `objectId`，应该能看到类似这样的内容：
 
 ```json
 {
-  "title":     "马拉松报名",
-  "priority":  2,
+  "title": "马拉松报名",
+  "priority": 2,
   "ACL": {
     "*": {
-      "read":  true,
+      "read": true,
       "write": true
     }
   },
-  "objectId":  "582570f38ac247004f39c24b",
+  "objectId": "582570f38ac247004f39c24b",
   "createdAt": "2017-11-11T07:19:15.549Z",
   "updatedAt": "2017-11-11T07:19:15.549Z"
 }
@@ -162,13 +154,12 @@ todo.saveInBackground().subscribe(new Observer<LCObject>() {
 
 以下是一些对象的内置属性，会在对象保存时自动创建，无需手动指定：
 
-内置属性 | 类型 | 描述
---- | --- | ---
-`objectId` | `String` | 该对象唯一的 ID 标识。
-`ACL` | `LCACL` | 该对象的权限控制，实际上是一个 JSON 对象，控制台做了展现优化。
-`createdAt` | `Date` | 该对象被创建的时间。
-`updatedAt` | `Date` | 该对象最后一次被修改的时间。
-
+| 内置属性    | 类型     | 描述                                                           |
+| ----------- | -------- | -------------------------------------------------------------- |
+| `objectId`  | `String` | 该对象唯一的 ID 标识。                                         |
+| `ACL`       | `LCACL`  | 该对象的权限控制，实际上是一个 JSON 对象，控制台做了展现优化。 |
+| `createdAt` | `Date`   | 该对象被创建的时间。                                           |
+| `updatedAt` | `Date`   | 该对象最后一次被修改的时间。                                   |
 
 这些属性的值会在对象被存入云端时自动填入，代码中尚未保存的 `LCObject` 不存在这些属性。
 
@@ -181,7 +172,6 @@ todo.saveInBackground().subscribe(new Observer<LCObject>() {
 ### 获取对象
 
 对于已经保存到云端的 `LCObject`，可以通过它的 `objectId` 将其取回：
-
 
 ```java
 LCQuery<LCObject> query = new LCQuery<>("Todo");
@@ -209,7 +199,6 @@ query.getInBackground("582570f38ac247004f39c24b").subscribe(new Observer<LCObjec
 #### 同步对象
 
 当云端数据发生更改时，你可以调用 `fetchInBackground` 方法来刷新对象，使之与云端数据同步：
-
 
 ```java
 LCObject todo = LCObject.createWithoutData("Todo", "582570f38ac247004f39c24b");
@@ -285,7 +274,6 @@ account.saveInBackground(option).subscribe(new Observer<LCObject>() {
 });
 ```
 
-
 **`query` 选项只对已存在的对象有效**，不适用于尚未存入云端的对象。
 
 `query` 选项在有多个客户端需要更新同一属性的时候非常有用。相比于通过 `LCQuery` 查询 `LCObject` 再对其进行更新的方法，这样做更加简洁，并且能够避免出现差错。
@@ -293,7 +281,6 @@ account.saveInBackground(option).subscribe(new Observer<LCObject>() {
 #### 更新计数器
 
 设想我们正在开发一个微博，需要统计一条微博有多少个赞和多少次转发。由于赞和转发的操作可能由多个客户端同时进行，直接在本地更新数字并保存到云端的做法极有可能导致差错。为保证计数的准确性，可以通过 **原子操作** 来增加或减少一个属性内保存的数字：
-
 
 ```java
 post.increment("likes", 1);
@@ -310,13 +297,11 @@ post.increment("likes", 1);
 
 更新数组也是原子操作。使用以下方法可以方便地维护数组类型的数据：
 
-
 - `add()` 将指定对象附加到数组末尾。
 - `addUnique()` 如果数组中不包含指定对象，则将该对象加入数组。对象的插入位置是随机的。
 - `removeAll()` 从数组字段中删除指定对象的所有实例。
 
 例如，`Todo` 用一个 `alarms` 属性保存所有闹钟的时间。下面的代码将多个时间加入这个属性：
-
 
 ```java
 Date getDateWithDateString(String dateString) {
@@ -347,7 +332,6 @@ todo.delete();
 
 ### 批量操作
 
-
 ```java
 // 批量构建和更新
 saveAll()
@@ -362,9 +346,7 @@ fetchAll()
 fetchAllInBackground()
 ```
 
-
 下面的代码将所有 `Todo` 的 `isComplete` 设为 `true`：
-
 
 ```java
 LCQuery<LCObject> query = new LCQuery<>("Todo");
@@ -385,9 +367,11 @@ query.findInBackground().subscribe(new Observer<List<LCObject>>() {
 ```
 
 虽然上述方法可以在一次请求中包含多个操作，每一个分别的保存或同步操作在计费时依然会被算作一次请求，而所有的删除操作则会被合并为一次请求。
+
 ### 后台运行
 
 细心的开发者已经发现，在所有的示例代码中几乎都是用了异步来访问云端，形如 `xxxxInBackground` 的用法都是提供给开发者在主线程调用用以实现后台运行的方法，因此开发者在主线程可以放心地调用这种命名方式的函数。
+
 ### 离线存储对象
 
 大多数保存功能可以立刻执行，并通知应用「保存完毕」。不过若不需要知道保存完成的时间，则可使用 `saveEventually` 来代替。
@@ -406,7 +390,6 @@ query.findInBackground().subscribe(new Observer<List<LCObject>>() {
 
 下面的代码会创建一个含有单个 `Comment` 的 `Post`：
 
-
 ```java
 // 创建 post
 LCObject post = new LCObject("Post");
@@ -424,9 +407,7 @@ comment.put("parent", post);
 comment.save();
 ```
 
-
 云端存储时，会将被指向的对象用 `Pointer` 的形式存起来。你也可以用 `objectId` 来指向一个对象：
-
 
 ```java
 LCObject post = LCObject.createWithoutData("Post", "57328ca079bc44005c2472d0");
@@ -447,7 +428,6 @@ comment.put("post", post);
 
 序列化：
 
-
 ```java
 LCObject todo = new LCObject("Todo"); // 构建对象
 todo.put("title", "马拉松报名"); // 设置名称
@@ -457,7 +437,6 @@ String serializedString = todo.toString();
 ```
 
 反序列化：
-
 
 ```java
 LCObject deserializedObject = LCObject.parseLCObject(serializedString);
@@ -617,6 +596,7 @@ query.getFirstInBackground().subscribe(new Observer<LCObject>() {
 反向选择同样适用于内置字段，比如 `-objectId`，也可以和点号组合使用，比如 `-pubUser.createdAt`。
 
 对于未获取的属性，可以通过对结果中的对象进行 `fetchInBackground` 操作来获取。参见 [同步对象](#同步对象)。
+
 ### 字符串查询
 
 可以用 `whereStartsWith` 来查找某一属性值以特定字符串开头的对象。和 SQL 中的 `LIKE` 一样，你可以利用索引带来的优势：
@@ -627,7 +607,6 @@ LCQuery<LCObject> query = new LCQuery<>("Todo");
 query.whereStartsWith("title", "lunch");
 ```
 
-
 可以用 `whereContains` 来查找某一属性值包含特定字符串的对象：
 
 ```java
@@ -635,7 +614,6 @@ LCQuery<LCObject> query = new LCQuery<>("Todo");
 // 相当于 SQL 中的 title LIKE '%lunch%'
 query.whereContains("title", "lunch");
 ```
-
 
 和 `whereStartsWith` 不同，`whereContains` 无法利用索引，因此不建议用于大型数据集。
 
@@ -832,9 +810,7 @@ endDateQuery.whereLessThan("createdAt", getDateWithDateString("2016-12-03"));
 LCQuery<LCObject> query = LCQuery.and(Arrays.asList(startDateQuery, endDateQuery));
 ```
 
-
 单独使用 AND 查询跟使用基础查询相比并没有什么不同，不过当查询条件中包含不止一个 OR 查询时，就必须使用 AND 查询：
-
 
 ```java
 Date getDateWithDateString(String dateString) {
@@ -861,7 +837,6 @@ LCQuery<LCObject> timeLocationQuery = LCQuery.or(Arrays.asList(locationQuery, cr
 LCQuery<LCObject> query = LCQuery.and(Arrays.asList(priorityQuery, timeLocationQuery));
 ```
 
-
 ### 查询性能优化
 
 影响查询性能的因素很多。特别是当查询结果的数量超过 10 万，查询性能可能会显著下降或出现瓶颈。以下列举一些容易降低性能的查询方式，开发者可以据此进行有针对性的调整和优化，或尽量避免使用。
@@ -887,7 +862,6 @@ LiveQuery 使用 WebSocket 在客户端和云端之间建立连接。WebSocket �
 
 进入 **控制台 > 存储 > 设置**，在 **其他** 里面勾选 **启用 LiveQuery**即可。确保即时通信模块已被添加到 `AndroidManifest.xml`：
 
-
 ```xml
 <service android:name="cn.leancloud.push.PushService"/>
 <receiver android:name="cn.leancloud.push.LCBroadcastReceiver">
@@ -905,15 +879,23 @@ LiveQuery 使用 WebSocket 在客户端和云端之间建立连接。WebSocket �
 
 下面是在使用了 LiveQuery 的网页应用和手机应用中分别操作，数据保持同步的效果：
 
-<video src="https://capacity-files.lcfile.com/1496988080458" controls autoPlay muted preload="auto" width="100%" height="100%" >
-HTML5 Video is required for this demo, which your browser doesn't support.
+<video
+  src="https://capacity-files.lcfile.com/1496988080458"
+  controls
+  autoPlay
+  muted
+  preload="auto"
+  width="100%"
+  height="100%"
+>
+  HTML5 Video is required for this demo, which your browser doesn't support.
 </video>
 
 使用我们的「LeanTodo」微信小程序和网页应用，可以实际体验以上视频所演示的效果，步骤如下：
 
 1. 微信扫码，添加小程序「LeanTodo」；
 
-    ![LeanTodo mini program](/img/leantodo-weapp-qr.jpg)
+   ![LeanTodo mini program](/img/leantodo-weapp-qr.jpg)
 
 2. 进入小程序，点击首页左下角 **设置** > **账户设置**，输入便于记忆的用户名和密码；
 
@@ -928,7 +910,6 @@ HTML5 Video is required for this demo, which your browser doesn't support.
 ### 构建订阅
 
 首先创建一个普通的 `LCQuery` 对象，添加查询条件（如有），然后进行订阅操作：
-
 
 ```java
 LCQuery<LCObject> query = new LCQuery<>("Todo");
@@ -947,7 +928,6 @@ liveQuery.subscribeInBackground(new LCLiveQuerySubscribeCallback() {
 LiveQuery 不支持内嵌查询，也不支持返回指定属性。
 
 订阅成功后，就可以接收到和 `LCObject` 相关的更新了。假如在另一个客户端上创建了一个 `Todo` 对象，对象的 `title` 设为 `更新作品集`，那么下面的代码可以获取到这个新的 `Todo`：
-
 
 ```java
 LCQuery<LCObject> query = new LCQuery<>("Todo");
@@ -970,7 +950,6 @@ liveQuery.subscribeInBackground(new LCLiveQuerySubscribeCallback() {
 ```
 
 此时如果有人把 `Todo` 的 `content` 改为 `把我最近画的插画放上去`，那么下面的代码可以获取到本次更新：
-
 
 ```java
 liveQuery.setEventHandler(new LCLiveQueryEventHandler() {
@@ -995,7 +974,6 @@ liveQuery.setEventHandler(new LCLiveQueryEventHandler() {
 
 当有新的满足 `LCQuery` 查询条件的 `LCObject` 被创建时，`create` 事件会被触发。下面的 `object` 就是新建的 `LCObject`：
 
-
 ```java
 liveQuery.setEventHandler(new LCLiveQueryEventHandler() {
     @Override
@@ -1009,7 +987,6 @@ liveQuery.setEventHandler(new LCLiveQueryEventHandler() {
 
 当有满足 `LCQuery` 查询条件的 `LCObject` 被更新时，`update` 事件会被触发。下面的 `object` 就是有更新的 `LCObject`：
 
-
 ```java
 liveQuery.setEventHandler(new LCLiveQueryEventHandler() {
     @Override
@@ -1022,7 +999,6 @@ liveQuery.setEventHandler(new LCLiveQueryEventHandler() {
 #### `enter` 事件
 
 当一个已存在的、原本不符合 `LCQuery` 查询条件的 `LCObject` 发生更新，且更新后符合查询条件，`enter` 事件会被触发。下面的 `object` 就是进入 `LCQuery` 的 `LCObject`，其内容为该对象最新的值：
-
 
 ```java
 liveQuery.setEventHandler(new LCLiveQueryEventHandler() {
@@ -1039,7 +1015,6 @@ liveQuery.setEventHandler(new LCLiveQueryEventHandler() {
 
 当一个已存在的、原本符合 `LCQuery` 查询条件的 `LCObject` 发生更新，且更新后不符合查询条件，`leave` 事件会被触发。下面的 `object` 就是离开 `LCQuery` 的 `LCObject`，其内容为该对象最新的值：
 
-
 ```java
 liveQuery.setEventHandler(new LCLiveQueryEventHandler() {
     @Override
@@ -1053,7 +1028,6 @@ liveQuery.setEventHandler(new LCLiveQueryEventHandler() {
 
 当一个已存在的、原本符合 `LCQuery` 查询条件的 `LCObject` 被删除，`delete` 事件会被触发。下面的 `object` 就是被删除的 `LCObject` 的 `objectId`：
 
-
 ```java
 liveQuery.setEventHandler(new LCLiveQueryEventHandler() {
     @Override
@@ -1063,11 +1037,9 @@ liveQuery.setEventHandler(new LCLiveQueryEventHandler() {
 });
 ```
 
-
 ### 取消订阅
 
 如果不再需要接收有关 `LCQuery` 的更新，可以取消订阅。
-
 
 ```java
 liveQuery.unsubscribeInBackground(new LCLiveQuerySubscribeCallback() {
@@ -1097,7 +1069,6 @@ liveQuery.unsubscribeInBackground(new LCLiveQuerySubscribeCallback() {
 我们不建议这样做，因为使用 LiveQuery 构建聊天服务会承担额外的存储成本，产生的费用会增加，后期维护的难度非常大（聊天记录、对话维护之类的代码会很混乱），并且云服务已经提供了即时通讯的服务。
 LiveQuery 的核心还是提供一个针对查询的推拉结合的用法，脱离设计初衷容易造成前端的模块混乱。
 
-
 如果你的应用只使用 LiveQuery （不使用即时通讯和其他推送服务），那么可以在初始化 SDK 时使用 `PushService` 的静态方法 `startIfRequired` 来创建 WebSocket 连接：
 
 ```java
@@ -1109,7 +1080,6 @@ PushService.startIfRequired(android.content.Context context);
 有时候应用需要存储尺寸较大或结构较为复杂的数据，这类数据不适合用 `LCObject` 保存，此时文件对象 `LCFile` 便成为了更好的选择。文件对象最常见的用途是保存图片，不过也可以用来保存文档、视频、音乐等其他二进制数据。
 
 ### 构建文件
-
 
 可以通过字符串构建文件：
 
@@ -1132,7 +1102,6 @@ LCFile file = new LCFile(
 
 云端会根据文件扩展名自动检测文件类型。如果需要的话，也可以手动指定 `Content-Type`（一般称为 MIME 类型）：
 
-
 ```java
 Map<String, Object> meta = new HashMap<String, Object>();
 meta.put("mime_type", "application/json");
@@ -1140,7 +1109,6 @@ LCFile file = new LCFile("resume.txt", "LeanCloud".getBytes(), meta);
 ```
 
 与前面提到的方式相比，一个更常见的文件构建方式是从本地路径上传。
-
 
 ```java
 LCFile file = LCFile.withAbsoluteLocalPath("avatar.jpg", "/tmp/avatar.jpg");
@@ -1171,8 +1139,6 @@ file.saveInBackground().subscribe(new Observer<LCFile>() {
 
 文件上传后，可以在 `_File` class 中找到。已上传的文件无法再被修改。如果需要修改文件，只能重新上传修改过的文件并取得新的 `objectId` 和 URL。
 
-
-
 ```java
 file.saveInBackground(true).subscribe(new Observer<LCFile>() {
     public void onSubscribe(Disposable disposable) {}
@@ -1202,7 +1168,6 @@ todo.save();
 LCQuery<LCObject> query = new LCQuery<>("_File");
 ```
 
-
 需要注意的是，内部文件（上传到文件服务的文件）的 `url` 字段是由云端动态生成的，其中涉及切换自定义域名的相关处理逻辑。
 因此，通过 url 字段查询文件仅适用于外部文件（直接保存外部 URL 到 `_File` 表创建的文件），内部文件请改用 key 字段（URL 中的路径）查询。
 
@@ -1229,7 +1194,6 @@ query.findInBackground().subscribe(new Observer<List<LCObject>>() {
     public void onComplete() {}
 });
 ```
-
 
 ### 上传进度监听
 
@@ -1270,12 +1234,10 @@ file.saveInBackground().subscribe(new Observer<LCFile>() {
 
 成功保存图像后，除了可以获取指向该文件的 URL 外，还可以获取图像的缩略图 URL，并且可以指定缩略图的宽度和高度：
 
-
 ```java
 LCFile file = new LCFile("test.jpg", "文件-url", new HashMap<String, Object>());
 file.getThumbnailUrl(true, 100, 100);
 ```
-
 
 图片最大不超过 **20 MB** 才可以获取缩略图。
 
@@ -1332,7 +1294,6 @@ file.getDataStreamInBackground().subscribe(new Observer<InputStream>() {
 
 除了使用 SDK 提供的方法外，也可以获取 LCFile 的 url 后调用标准库和第三方库下载文件。
 
-
 ### 删除文件
 
 下面的代码从云端删除一个文件：
@@ -1353,7 +1314,6 @@ file.delete()
 ```java
 LCGeoPoint point = new LCGeoPoint(39.9, 116.4);
 ```
-
 
 现在可以将这个地理位置存储为一个对象的属性：
 
@@ -1533,7 +1493,6 @@ LCUser.requestEmailVerifyInBackground("tom@leancloud.rocks").subscribe(new Obser
 
 用户登录后，SDK 会自动将会话信息存储到客户端，这样用户在下次打开客户端时无需再次登录。下面的代码检查是否有已经登录的用户：
 
-
 ```java
 LCUser currentUser = LCUser.getCurrentUser();
 if (currentUser != null) {
@@ -1543,9 +1502,7 @@ if (currentUser != null) {
 }
 ```
 
-
 会话信息会长期有效，直到用户主动登出：
-
 
 ```java
 LCUser.logOut();
@@ -1553,7 +1510,6 @@ LCUser.logOut();
 // currentUser 变为 null
 LCUser currentUser = LCUser.getCurrentUser();
 ```
-
 
 ### 设置当前用户
 
@@ -1566,7 +1522,6 @@ LCUser currentUser = LCUser.getCurrentUser();
 - 在服务端登录后，返回 session token 给客户端，客户端根据返回的 session token 登录。
 
 下面的代码使用 session token 登录一个用户（云端会验证 session token 是否有效）：
-
 
 ```java
 LCUser.becomeWithSessionTokenInBackground("anmlwi96s381m6ca7o7266pzf").subscribe(new Observer<LCUser>() {
@@ -1582,13 +1537,11 @@ LCUser.becomeWithSessionTokenInBackground("anmlwi96s381m6ca7o7266pzf").subscribe
 });
 ```
 
-
 请避免在外部浏览器使用 URL 来传递 session token，以防范信息泄露风险。
 
 如果在 **控制台 > 存储 > 设置** 中勾选了 **密码修改后，强制客户端重新登录**，那么当一个用户修改密码后，该用户的 session token 会被重置。此时需要让用户重新登录，否则会遇到 `403 (Forbidden)` 错误。
 
 下面的代码检查 session token 是否有效：
-
 
 ```java
 boolean authenticated = LCUser.getCurrentUser().isAuthenticated();
@@ -1598,7 +1551,6 @@ if (authenticated) {
     // session token 无效
 }
 ```
-
 
 ### 重置密码
 
@@ -1630,7 +1582,6 @@ LCUser.requestPasswordResetInBackground("tom@leancloud.rocks").subscribe(new Obs
 
 密码重置邮件的内容可在应用的 **云服务云服务控制台 > 数据存储 > 用户 > 邮件模版** 中自定义。更多关于自定义邮件模板和验证链接的内容，请参考[《自定义邮件验证和重设密码页面》](https://leancloud.cn/docs/custom-reset-verify-page.html)。
 
-
 ### 用户的查询
 
 可以直接构建一个针对 `_User` 的 `LCQuery` 来查询用户：
@@ -1638,7 +1589,6 @@ LCUser.requestPasswordResetInBackground("tom@leancloud.rocks").subscribe(new Obs
 ```java
 LCQuery<LCUser> userQuery = LCUser.getQuery();
 ```
-
 
 为了安全起见，**新创建的应用的 `_User` 表默认关闭了 `find` 权限**，这样每位用户登录后只能查询到自己在 `_User` 表中的数据，无法查询其他用户的数据。如果需要让其查询其他用户的数据，建议单独创建一张表来保存这类数据，并开放这张表的 `find` 查询权限。除此之外，还可以在云引擎里封装用户查询相关的方法。
 
@@ -1758,19 +1708,19 @@ LCUser.loginWithAuthData(thirdPartyData, "weixin").subscribe(new Observer<LCUser
 
 ```json
 {
-  "username":     "k9mjnl7zq9mjbc7expspsxlls",
-  "objectId":     "5b029266fb4ffe005d6c7c2e",
-  "createdAt":    "2018-05-21T09:33:26.406Z",
-  "updatedAt":    "2018-05-21T09:33:26.575Z",
+  "username": "k9mjnl7zq9mjbc7expspsxlls",
+  "objectId": "5b029266fb4ffe005d6c7c2e",
+  "createdAt": "2018-05-21T09:33:26.406Z",
+  "updatedAt": "2018-05-21T09:33:26.575Z",
   "sessionToken": "…",
   // authData 通常不会返回，继续阅读以了解其中原因
   "authData": {
     "weixin": {
-      "openid":        "OPENID",
-      "access_token":  "ACCESS_TOKEN",
-      "expires_in":    7200,
+      "openid": "OPENID",
+      "access_token": "ACCESS_TOKEN",
+      "expires_in": 7200,
       "refresh_token": "REFRESH_TOKEN",
-      "scope":         "SCOPE"
+      "scope": "SCOPE"
     }
   }
   // …
@@ -1781,7 +1731,6 @@ LCUser.loginWithAuthData(thirdPartyData, "weixin").subscribe(new Observer<LCUser
 
 开发者需要自己完成第三方平台的鉴权流程（一般通过 OAuth 1.0 或 2.0），以获取鉴权信息，继而到云端来登录。
 
-
 #### 鉴权数据的保存
 
 `_User` class 中的 `authData` 是一个以平台名为键名，鉴权信息为键值的 JSON 对象。
@@ -1791,11 +1740,11 @@ LCUser.loginWithAuthData(thirdPartyData, "weixin").subscribe(new Observer<LCUser
 ```json
 {
   "weixin": {
-    "openid":        "…",
-    "access_token":  "…",
-    "expires_in":    7200,
+    "openid": "…",
+    "access_token": "…",
+    "expires_in": 7200,
     "refresh_token": "…",
-    "scope":         "…"
+    "scope": "…"
   }
 }
 ```
@@ -1804,12 +1753,12 @@ LCUser.loginWithAuthData(thirdPartyData, "weixin").subscribe(new Observer<LCUser
 
 ```json
 {
-    "weibo": {
-      "refresh_token": "2.0xxx",
-      "uid": "271XFEFEW273",
-      "expires_in": 115057,
-      "access_token": "2.00xxx",
-    }
+  "weibo": {
+    "refresh_token": "2.0xxx",
+    "uid": "271XFEFEW273",
+    "expires_in": 115057,
+    "access_token": "2.00xxx"
+  }
 }
 ```
 
@@ -1845,7 +1794,7 @@ LCUser.loginWithAuthData(thirdPartyData, "weixin").subscribe(new Observer<LCUser
 }
 ```
 
-云端首先会查找账户系统（_User 表），看看是否存在 `authData.weixin.openid = "OPENID"` 的账户，如果存在，则返回现有账户，如果不存在那么就创建一个新账户，同时将上面的鉴权信息写入新账户的 `authData` 属性中，并将新账户的数据当成结果返回。
+云端首先会查找账户系统（\_User 表），看看是否存在 `authData.weixin.openid = "OPENID"` 的账户，如果存在，则返回现有账户，如果不存在那么就创建一个新账户，同时将上面的鉴权信息写入新账户的 `authData` 属性中，并将新账户的数据当成结果返回。
 
 云端会自动为 `_User` class 中每个用户的 `authData.<PLATFORM>.<uid>` 创建唯一索引，从而避免重复数据。
 `<uid>` 在微信等部分云服务内建支持的第三方平台上为 `openid` 字段，在其他第三方平台（包括部分云服务专门支持的第三方平台和所有云服务没有专门支持的第三方平台）上为 `uid` 字段。
@@ -1887,7 +1836,6 @@ avUser.associateWithAuthData(weixinData, "weixin").subscribe(new Observer<LCUser
 });
 ```
 
-
 为节省篇幅，上面的代码示例中没有给出具体的微信平台授权信息，相关内容请参考上面的[「第三方账户登录」](#第三方账户登录)一节。
 
 #### 解除与第三方账户的关联
@@ -1915,7 +1863,6 @@ avUser.dissociateWithAuthData("weixin").subscribe(new Observer<LCUser>() {
     }
 });
 ```
-
 
 #### 扩展：第三方登录时补充完整的用户信息
 
@@ -1977,7 +1924,6 @@ avUser.loginWithAuthData(thirdPartyData, "weixin").subscribe(new Observer<LCUser
 });
 ```
 
-
 #### 扩展：接入 UnionID 体系，打通不同子产品的账号系统
 
 随着第三方平台的账户体系变得日渐复杂，它们的第三方鉴权信息出现了一些较大的变化。下面我们以最典型的微信开放平台为例来进行说明。
@@ -1998,7 +1944,7 @@ avUser.loginWithAuthData(thirdPartyData, "weixin").subscribe(new Observer<LCUser
 
 下面让我们通过一个例子来说明如何使用这些参数完成 UnionID 登录。
 
-假设云服务在微信开放平台上有两个应用，一个是「云服务通讯」，一个是「云服务技术支持」，这两个应用在接入第三方鉴权的时候，分别使用了 `wxleanoffice` 和 `wxleansupport` 作为 platform 来进行登录。现在我们开启 UnionID 的用户体系，希望同一个微信用户在这两个应用中都能对应到同一个账户系统（_User 表中的同一条记录），同时我们决定将 `wxleanoffice` 平台作为主账号平台。
+假设云服务在微信开放平台上有两个应用，一个是「云服务通讯」，一个是「云服务技术支持」，这两个应用在接入第三方鉴权的时候，分别使用了 `wxleanoffice` 和 `wxleansupport` 作为 platform 来进行登录。现在我们开启 UnionID 的用户体系，希望同一个微信用户在这两个应用中都能对应到同一个账户系统（\_User 表中的同一条记录），同时我们决定将 `wxleanoffice` 平台作为主账号平台。
 
 假设对于用户 A，微信给 ta 为 云服务分配的 UnionId 为 `unionid4a`，而对两个应用的授权信息分别为：
 
@@ -2044,10 +1990,9 @@ LCUser.loginWithAuthData(thirdPartyData, "wxleanoffice",
 });
 ```
 
-
 > 注意代码中将微信传回来的 openid 属性改为了 uid，这是因为云端要求对于自定义的 platform，只能使用 uid 这样的属性名，才能保证自动建立 `authData.<PLATFORM>.uid` 的唯一索引，具体可以参考[数据存储 REST API 使用详解](/v2/sdk/storage/guide/rest)的《连接用户账户和第三方平台》。
 
-如果用户 A 是第一次在「云服务通讯」中通过微信登录，那么 _User 表中会增加一个新用户（假设其 objectId 为 `ThisIsUserA`），其 `authData` 的结果如下：
+如果用户 A 是第一次在「云服务通讯」中通过微信登录，那么 \_User 表中会增加一个新用户（假设其 objectId 为 `ThisIsUserA`），其 `authData` 的结果如下：
 
 ```json
 {
@@ -2059,7 +2004,8 @@ LCUser.loginWithAuthData(thirdPartyData, "wxleanoffice",
     "access_token": "officetoken",
     "unionid": "unionid4a"
   },
-  "_weixin_unionid": {   // 新增键值对
+  "_weixin_unionid": {
+    // 新增键值对
     "uid": "unionid4a"
   }
 }
@@ -2068,8 +2014,7 @@ LCUser.loginWithAuthData(thirdPartyData, "wxleanoffice",
 可以看到，与之前的第三方登录 API 相比，这里由于登录时指定了 `asMainAccount` 为 true，所以 authData 的第一级子目录中增加了 `_weixin_unionid` 的键值对，这里的 `weixin` 就是我们指定的 `unionIdPlatform` 的值。`_weixin_unionid` 这个增加的键值对非常重要，以后我们判断是否存在同样 UnionID 的账户就是依靠它来查找的，而是否增加这个键值对，则是由登录时指定的 `asMainAccount` 的值决定的：
 
 - 当 `asMainAccount` 为 true 时，云端会在 `authData` 下面增加名为 `_{unionIdPlatform}_unionid` 的键值对，当前账号就会作为这一个 UnionID 对应的主账号被唯一确定。
-- 当 `asMainAccount` 为 false 时，云端不会在 `authData` 下面增加名为 `_{unionIdPlatform}_unionid` 的键值对，此时如果通过提供的 UnionID 可以找到主账号，则会将当前的鉴权信息合并进主账号的 `authData` 属性里，同时返回主账号对应的 _User 表记录；如果通过提供的 UnionID 找不到主账号，则会根据平台的 `openid` 去查找账户，找到匹配的账户就返回匹配的，找不到就新建一个账户，此时的处理逻辑与不使用 UnionID 时的逻辑完全一致。
-
+- 当 `asMainAccount` 为 false 时，云端不会在 `authData` 下面增加名为 `_{unionIdPlatform}_unionid` 的键值对，此时如果通过提供的 UnionID 可以找到主账号，则会将当前的鉴权信息合并进主账号的 `authData` 属性里，同时返回主账号对应的 \_User 表记录；如果通过提供的 UnionID 找不到主账号，则会根据平台的 `openid` 去查找账户，找到匹配的账户就返回匹配的，找不到就新建一个账户，此时的处理逻辑与不使用 UnionID 时的逻辑完全一致。
 
 接下来，用户 A 继续在「云服务技术支持」中进行微信登录，其登录逻辑为：
 
@@ -2099,8 +2044,7 @@ LCUser.loginWithAuthData(thirdPartyData, "wxleansupport", "unionid4a",
 });
 ```
 
-
-与「云服务通讯」中的登录过程相比，在「云服务技术支持」这个应用中，我们在登录时只是将 `asMainAccount` 设为了 false。 这时我们看到，本次登录得到的还是 objectId 为 `ThisIsUserA` 的 _User 表记录（同一个账户），同时该账户的 `authData` 属性中发生了变化，多了 `wxleansupport` 的数据，如下：
+与「云服务通讯」中的登录过程相比，在「云服务技术支持」这个应用中，我们在登录时只是将 `asMainAccount` 设为了 false。 这时我们看到，本次登录得到的还是 objectId 为 `ThisIsUserA` 的 \_User 表记录（同一个账户），同时该账户的 `authData` 属性中发生了变化，多了 `wxleansupport` 的数据，如下：
 
 ```json
 {
@@ -2156,7 +2100,6 @@ LCUser.loginWithAuthData(thirdPartyData, "wxleansupport", "unionid4a",
 - 微博平台的多个应用，统一使用 `weibo` 作为 `unionIdPlatform`；
 - 除此之外的其他平台，开发者可以自行定义 `unionIdPlatform` 的名字，只要自己保证多个应用间统一即可。
 
-
 ##### 主副应用不同登录顺序出现的不同结果
 
 上面的流程是用户先登录了「云服务通讯」这个主应用，然后再登录「云服务技术支持」这个副应用，所以账号都被通过 UnionID 有效关联起来了。可能有人会想到另外一个问题，如果用户 B 先登录副应用，后登录主应用，这时候会发生什么事情呢？
@@ -2206,12 +2149,12 @@ LCUser.loginWithAuthData(thirdPartyData, "wxleansupport", "unionid4a",
 
 此时的存量账户表如下所示：
 
-objectId | 微信用户 | authData.{platform} | authData._{platform}_unionid
------- | ------ | ------ | ------
-1 | UserA | openid1（对应产品 1） | N/A
-2 | UserB | openid2（对应产品 2） | N/A
-3 | UserC | openid3（对应产品 1） | N/A
-4 | UserC | openid4（对应产品 2） | N/A
+| objectId | 微信用户 | authData.{platform}   | authData.\_{platform}\_unionid |
+| -------- | -------- | --------------------- | ------------------------------ |
+| 1        | UserA    | openid1（对应产品 1） | N/A                            |
+| 2        | UserB    | openid2（对应产品 2） | N/A                            |
+| 3        | UserC    | openid3（对应产品 1） | N/A                            |
+| 4        | UserC    | openid4（对应产品 2） | N/A                            |
 
 现在我们对两个子产品进行升级，接入 UnionID 体系。这时因为已经有同一个微信用户在不同子产品中创建了不同的账户（例如 objectId 为 3 和 4 的账户），我们需要确定以哪个平台的账号为主。比如决定使用「云服务通讯」上生成的账号为主账号，则在该应用程序更新版本时，使用 `asMainAccount=true` 参数。这个应用带着 UnionID 登录匹配或创建的账号将作为主账号，之后所有这个 UnionID 的登录都会匹配到这个账号。请注意这时 `_User` 表里会剩下一些用户数据，也就是没有被选为主账号的、其他平台的同一个用户的旧账号数据（例如 objectId 为 2 和 4 的账户）。这部分数据会继续服务于已经发布的但仍然使用 OpenID 登录的旧版应用。
 
@@ -2223,35 +2166,35 @@ objectId | 微信用户 | authData.{platform} | authData._{platform}_unionid
 
 以上面的三个用户为例，他们分别升级到两个产品的最新版，且最终都会启用两个产品，则账户表的最终结果如下：
 
-objectId | 微信用户 | authData.{platform} | authData._{platform}_unionid
------- | ------ | ------ | ------
-1 | UserA | openid1（对应产品 1）/openid6（对应产品 2） | unionId_user_A
-2 | UserB | openid2（对应产品 2） | N/A
-3 | UserC | openid3（对应产品 1）/openid4（对应产品 2） | unionId_user_C
-4 | UserC | openid4（对应产品 2） | N/A
-5 | UserB | openid5（对应产品 1）/openid2（对应产品 2） | unionId_user_B
+| objectId | 微信用户 | authData.{platform}                         | authData.\_{platform}\_unionid |
+| -------- | -------- | ------------------------------------------- | ------------------------------ |
+| 1        | UserA    | openid1（对应产品 1）/openid6（对应产品 2） | unionId_user_A                 |
+| 2        | UserB    | openid2（对应产品 2）                       | N/A                            |
+| 3        | UserC    | openid3（对应产品 1）/openid4（对应产品 2） | unionId_user_C                 |
+| 4        | UserC    | openid4（对应产品 2）                       | N/A                            |
+| 5        | UserB    | openid5（对应产品 1）/openid2（对应产品 2） | unionId_user_B                 |
 
 之后有新的用户 D，分别在两个产品的新版本中登录，则账户表中会增加一条新的 objectId=6 的记录，结果如下：
 
-objectId | 微信用户 | authData.{platform} | authData._{platform}_unionid
------- | ------ | ------ | ------
-1 | UserA | openid1（对应产品 1）/openid6（对应产品 2） | unionId_user_A
-2 | UserB | openid2（对应产品 2） | N/A
-3 | UserC | openid3（对应产品 1）/openid4（对应产品 2） | unionId_user_C
-4 | UserC | openid4（对应产品 2） | N/A
-5 | UserB | openid5（对应产品 1）/openid2（对应产品 2） | unionId_user_B
-6 | UserD | openid7（对应产品 1）/openid8（对应产品 2） | unionId_user_D
+| objectId | 微信用户 | authData.{platform}                         | authData.\_{platform}\_unionid |
+| -------- | -------- | ------------------------------------------- | ------------------------------ |
+| 1        | UserA    | openid1（对应产品 1）/openid6（对应产品 2） | unionId_user_A                 |
+| 2        | UserB    | openid2（对应产品 2）                       | N/A                            |
+| 3        | UserC    | openid3（对应产品 1）/openid4（对应产品 2） | unionId_user_C                 |
+| 4        | UserC    | openid4（对应产品 2）                       | N/A                            |
+| 5        | UserB    | openid5（对应产品 1）/openid2（对应产品 2） | unionId_user_B                 |
+| 6        | UserD    | openid7（对应产品 1）/openid8（对应产品 2） | unionId_user_D                 |
 
 如果之后我们增加了新的子产品 3，这些用户在子产品 3 中也进行微信登录的话，那么四个用户还是会继续绑定到 objectId 为 1/3/5/6 的主账户。此时账户表的结果会变为：
 
-objectId | 微信用户 | authData.{platform} | authData._{platform}_unionid
------- | ------ | ------ | ------
-1 | UserA | openid1（对应产品 1）/openid6（对应产品 2）/openid9（对应产品 3） | unionId_user_A
-2 | UserB | openid2（对应产品 2） | N/A
-3 | UserC | openid3（对应产品 1）/openid4（对应产品 2）/openid10（对应产品 3） | unionId_user_C
-4 | UserC | openid4（对应产品 2） | N/A
-5 | UserB | openid5（对应产品 1）/openid2（对应产品 2）/openid11（对应产品 3） | unionId_user_B
-6 | UserD | openid7（对应产品 1）/openid8（对应产品 2）/openid12（对应产品 3） | unionId_user_D
+| objectId | 微信用户 | authData.{platform}                                                | authData.\_{platform}\_unionid |
+| -------- | -------- | ------------------------------------------------------------------ | ------------------------------ |
+| 1        | UserA    | openid1（对应产品 1）/openid6（对应产品 2）/openid9（对应产品 3）  | unionId_user_A                 |
+| 2        | UserB    | openid2（对应产品 2）                                              | N/A                            |
+| 3        | UserC    | openid3（对应产品 1）/openid4（对应产品 2）/openid10（对应产品 3） | unionId_user_C                 |
+| 4        | UserC    | openid4（对应产品 2）                                              | N/A                            |
+| 5        | UserB    | openid5（对应产品 1）/openid2（对应产品 2）/openid11（对应产品 3） | unionId_user_B                 |
+| 6        | UserD    | openid7（对应产品 1）/openid8（对应产品 2）/openid12（对应产品 3） | unionId_user_D                 |
 
 ### 匿名用户
 
@@ -2267,7 +2210,6 @@ LCUser.logInAnonymously().subscribe(new Observer<LCUser>() {
     public void onComplete() {}
 });
 ```
-
 
 可以像给普通用户设置属性那样给匿名用户设置 `username`、`password`、`email` 等属性，还可以通过走正常的注册流程来将匿名用户转化为普通用户。匿名用户能够：
 
@@ -2295,7 +2237,6 @@ currentUser.signUpInBackground().subscribe(new Observer<LCUser>() {
 });
 ```
 
-
 下面的代码检查当前用户是否为匿名用户：
 
 ```java
@@ -2307,14 +2248,11 @@ if (currentUser.isAnonymous()) {
 }
 ```
 
-
 如果匿名用户未能在登出前转化为普通用户，那么该用户将无法再次登录同一账户，且之前产生的数据也无法被取回。
-
 
 ## 角色
 
 随着用户量的增长，你可能会发现相比于为每一名用户单独设置权限，将预先设定好的权限直接分配给一部分用户是更好的选择。为了迎合这种需求，云服务支持基于角色的权限管理。请参阅[《ACL 权限管理开发指南》](https://leancloud.cn/docs/acl-guide.html)。
-
 
 ## 全文搜索
 

@@ -4,8 +4,7 @@ sidebar_label: iOS 推送
 sidebar_position: 2
 ---
 
-import MultiLang from '/src/docComponents/MultiLang';
-
+import MultiLang from "/src/docComponents/MultiLang";
 
 本文介绍了如何在 iOS 设备中使用推送通知功能。建议先阅读[推送通知总览](/sdk/push/guide/overview/)了解相关概念。
 
@@ -48,6 +47,7 @@ LCInstallation *installation = [LCInstallation defaultInstallation];
 ```swift
 let installation = LCInstallation()
 ```
+
 ```objc
 LCInstallation *installation = [[LCInstallation alloc] init];
 ```
@@ -58,16 +58,16 @@ LCInstallation *installation = [[LCInstallation alloc] init];
 
 Installation 对象的默认字段如下所示：
 
-字段|类型|说明
----|---|---
-deviceToken|String|推送所需的 Token
-apnsTeamId|String|推送所需的 Team ID
-badge|Number|对应应用通知的标记，主要用于通知标记清零
-channels|Array|订阅频道数组
-deviceProfile|String|自定义证书名称，主要用于多证书推送
-deviceType|String|设备类型，SDK 会自动设置该属性，一般情况下不要随意更改
-apnsTopic|String|应用的 Bundle Identifier，SDK 会自动设置该属性，一般情况下不要随意更改
-timeZone|String|设备所处时区，SDK 会自动设置该属性，一般情况下不要随意更改
+| 字段          | 类型   | 说明                                                                   |
+| ------------- | ------ | ---------------------------------------------------------------------- |
+| deviceToken   | String | 推送所需的 Token                                                       |
+| apnsTeamId    | String | 推送所需的 Team ID                                                     |
+| badge         | Number | 对应应用通知的标记，主要用于通知标记清零                               |
+| channels      | Array  | 订阅频道数组                                                           |
+| deviceProfile | String | 自定义证书名称，主要用于多证书推送                                     |
+| deviceType    | String | 设备类型，SDK 会自动设置该属性，一般情况下不要随意更改                 |
+| apnsTopic     | String | 应用的 Bundle Identifier，SDK 会自动设置该属性，一般情况下不要随意更改 |
+| timeZone      | String | 设备所处时区，SDK 会自动设置该属性，一般情况下不要随意更改             |
 
 ### 注册 APNs 获取 Token
 
@@ -92,7 +92,7 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
         print(error)
         return false
     }
-    
+
     UNUserNotificationCenter.current().getNotificationSettings { (settings) in
         switch settings.authorizationStatus {
         case .authorized:
@@ -111,16 +111,17 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
             break
         }
     }
-    
+
     return true
 }
 ```
+
 ```objc
 #import <LeanCloudObjc/Foundation.h>
 #import <UserNotifications/UserNotifications.h>
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    
+
     // 首先需要初始化应用
     [LCApplication setApplicationId:{{appid}}
                           clientKey:{{appkey}}
@@ -146,7 +147,7 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
                 break;
         }
     }];
-    
+
     return YES;
 }
 ```
@@ -161,7 +162,7 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 
 ```swift
 func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-    
+
     LCApplication.default.currentInstallation.set(
         deviceToken: deviceToken,
         apnsTeamId: "YOUR_APNS_TEAM_ID")
@@ -175,6 +176,7 @@ func application(_ application: UIApplication, didRegisterForRemoteNotifications
     }
 }
 ```
+
 ```objc
 - (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
 
@@ -215,7 +217,7 @@ iOS 系统重装、从备份恢复应用、在新设备上安装应用都会导�
 ### 推送环境
 
 iOS 应用的推送环境有**测试**和**生产**两种。
-通过 Xcode 安装的 App 处于测试环境，通过 App Store、Ad-Hoc、TestFlight 发布的正式版 App 处于生产环境。 
+通过 Xcode 安装的 App 处于测试环境，通过 App Store、Ad-Hoc、TestFlight 发布的正式版 App 处于生产环境。
 
 通过 REST API 和控制台推送消息时可以通过 `prod` 参数指定推送到处于哪个环境的 iOS 应用。
 通过 SDK 使用 `Push` 发起推送，默认发往生产环境的 iOS 应用。
@@ -237,6 +239,7 @@ do {
     print(error)
 }
 ```
+
 ```objc
 [LCPush setProductionMode:false];
 ```
@@ -275,6 +278,7 @@ do {
     print(error)
 }
 ```
+
 ```objc
 LCInstallation *currentInstallation = [LCInstallation defaultInstallation];
 [currentInstallation addUniqueObject:@"Giants" forKey:@"channels"];
@@ -304,6 +308,7 @@ do {
     print(error)
 }
 ```
+
 ```objc
 LCInstallation *currentInstallation = [LCInstallation defaultInstallation];
 [currentInstallation removeObject:@"Giants" forKey:@"channels"];
@@ -319,6 +324,7 @@ LCInstallation *currentInstallation = [LCInstallation defaultInstallation];
 ```swift
 let subscribedChannels: LCArray? = LCApplication.default.currentInstallation.channels
 ```
+
 ```objc
 NSArray *subscribedChannels = [LCInstallation defaultInstallation].channels;
 ```
@@ -347,6 +353,7 @@ LCPush.send(data: messageData, channels: channels) { (result) in
     }
 }
 ```
+
 ```objc
 // Send a notification to all devices subscribed to the "Giants" channel.
 LCPush *push = [[LCPush alloc] init];
@@ -377,6 +384,7 @@ LCPush.send(data: messageData, channels: channels) { (result) in
     }
 }
 ```
+
 ```objc
 NSArray *channels = [NSArray arrayWithObjects:@"Giants", @"Mets", nil];
 LCPush *push = [[LCPush alloc] init];
@@ -404,11 +412,11 @@ LCPush *push = [[LCPush alloc] init];
 ```swift
 do {
     let currentInstallation = LCApplication.default.currentInstallation
-    
+
     try currentInstallation.set("scores", value: true)
     try currentInstallation.set("gameResults", value: true)
     try currentInstallation.set("injuryReports", value: true)
-        
+
     _ = currentInstallation.save({ (result) in
         switch result {
         case .success:
@@ -421,6 +429,7 @@ do {
     print(error)
 }
 ```
+
 ```objc
 // Store app language and version
 LCInstallation *installation = [LCInstallation defaultInstallation];
@@ -440,11 +449,11 @@ LCInstallation *installation = [LCInstallation defaultInstallation];
 ```swift
 do {
     let currentInstallation = LCApplication.default.currentInstallation
-    
+
     if let currentUser = LCApplication.default.currentUser {
         try currentInstallation.set("owner", value: currentUser)
     }
-        
+
     _ = currentInstallation.save({ (result) in
         switch result {
         case .success:
@@ -457,6 +466,7 @@ do {
     print(error)
 }
 ```
+
 ```objc
 // Saving the device's owner
 LCInstallation *installation = [LCInstallation defaultInstallation];
@@ -475,7 +485,7 @@ LCInstallation *installation = [LCInstallation defaultInstallation];
 ```swift
 let query = LCQuery(className: "_Installation")
 query.whereKey("injuryReports", .equalTo(true))
-    
+
 let messageData: [String: Any] = [
     "alert": "Willie Hayes injured by own pop fly."
 ]
@@ -489,6 +499,7 @@ LCPush.send(data: messageData, query: query) { (result) in
     }
 }
 ```
+
 ```objc
 // Create our Installation query
 LCQuery *pushQuery = [LCInstallation query];
@@ -511,7 +522,7 @@ LCPush *push = [[LCPush alloc] init];
 let query = LCQuery(className: "_Installation")
 query.whereKey("channels", .equalTo("Giants"))
 query.whereKey("scores", .equalTo(true))
-    
+
 let messageData: [String: Any] = [
     "alert": "Giants scored against the A's! It's now 2-2."
 ]
@@ -525,6 +536,7 @@ LCPush.send(data: messageData, query: query) { (result) in
     }
 }
 ```
+
 ```objc
 // Create our Installation query
 LCQuery *pushQuery = [LCInstallation query];
@@ -546,13 +558,13 @@ LCPush *push = [[LCPush alloc] init];
 
 ```swift
 let beijingUniversityLocation = LCGeoPoint(latitude: 39.9869, longitude: 116.3059)
-    
+
 let userQuery = LCQuery(className: "_User")
 userQuery.whereKey("location", .locatedNear(beijingUniversityLocation, minimal: nil, maximal: nil))
 
 let pushQuery = LCQuery(className: "_Installation")
 pushQuery.whereKey("user", .matchedQuery(userQuery))
-    
+
 let messageData: [String: Any] = [
     "alert": "Free hotdogs at the Tarara concession stand!"
 ]
@@ -566,6 +578,7 @@ LCPush.send(data: messageData, query: pushQuery) { (result) in
     }
 }
 ```
+
 ```objc
 // Find users near a given location
 LCQuery *userQuery = [LCUser query];
@@ -594,12 +607,12 @@ LCPush *push = [[LCPush alloc] init];
 
 如果你不仅想发送一条文本消息，你可以构建自定义的推送数据。这里有一些保留字段具有特殊含义：
 
-保留字段|说明
----|---
-`alert`|推送消息的文本内容
-`badge`|应用图标右上角的数字。可以设置一个值或者递增当前值。
-`sound`|应用 bundle 里的声音文件名称。
-`content-available`|如果使用了 Newsstand，设置为 1 来开始一次后台下载。
+| 保留字段            | 说明                                                 |
+| ------------------- | ---------------------------------------------------- |
+| `alert`             | 推送消息的文本内容                                   |
+| `badge`             | 应用图标右上角的数字。可以设置一个值或者递增当前值。 |
+| `sound`             | 应用 bundle 里的声音文件名称。                       |
+| `content-available` | 如果使用了 Newsstand，设置为 1 来开始一次后台下载。  |
 
 更多可用的保留字段，请参考[推送 REST API 使用指南](/sdk/push/guide/rest/)的《消息内容参数》一节。
 
@@ -625,6 +638,7 @@ LCPush.send(data: messageData, channels: channels) { (result) in
     }
 }
 ```
+
 ```objc
 NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:
     @"The Mets scored! The game is now tied 1-1!", @"alert",
@@ -661,6 +675,7 @@ LCPush.send(data: messageData, channels: channels) { (result) in
     }
 }
 ```
+
 ```objc
 NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:
     @"Ricky Vaughn was injured in last night's game!", @"alert",
@@ -699,6 +714,7 @@ LCPush.send(data: messageData, expirationDate: expirationDate) { (result) in
     }
 }
 ```
+
 ```objc
 NSDateComponents *comps = [[NSDateComponents alloc] init];
 [comps setYear:2013];
@@ -737,6 +753,7 @@ LCPush.send(data: messageData, expirationInterval: expirationInterval) { (result
     }
 }
 ```
+
 ```objc
 NSTimeInterval interval = 60*60*24*7; // 1 week
 
@@ -770,6 +787,7 @@ LCPush.send(data: messageData, pushDate: pushDate) { (result) in
     }
 }
 ```
+
 ```objc
 NSDateComponents *comps = [[NSDateComponents alloc] init];
 [comps setYear:2013];
@@ -794,6 +812,7 @@ LCPush *push = [[LCPush alloc] init];
 ```swift
 LCPush.send(data: messageData, pushDate: pushDate, expirationInterval: expirationInterval) { /* 略 */ }
 ```
+
 ```objc
 LCPush *push = [[LCPush alloc] init];
 [push setPushDate:date];
@@ -841,6 +860,7 @@ LCPush.send(data: messageData, query: query) { (result) in
     }
 }
 ```
+
 ```objc
 LCQuery *query = [LCInstallation query];
 [query whereKey:@"channels" equalTo:@"suitcaseOwners"];
@@ -886,6 +906,7 @@ LCPush.send(data: messageData) { (result) in
     }
 }
 ```
+
 ```objc
 NSDictionary *data = @{
   @"alert": @"James commented on your photo!",
@@ -906,14 +927,15 @@ LCPush *push = [[LCPush alloc] init];
 
 ```swift
 func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-    
+
     if let notification = launchOptions?[.remoteNotification] as? [AnyHashable: Any] {
         print(notification)
     }
-    
+
     return true
 }
 ```
+
 ```objc
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // ...
@@ -922,12 +944,12 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
         @try {
             notificationPayload = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];
         } @catch (NSException *exception) {}
-        
+
         // Create a pointer to the Photo object
         NSString *photoId = [notificationPayload objectForKey:@"p"];
         LCObject *targetPhoto = [LCObject objectWithoutDataWithClassName:@"Photo"
                                                                 objectId:photoId];
-        
+
         // Fetch photo object
         [targetPhoto fetchIfNeededInBackgroundWithBlock:^(LCObject *object, NSError *error) {
             // Show photo view controller
@@ -951,6 +973,7 @@ func application(_ application: UIApplication, didReceiveRemoteNotification user
     // handle notification
 }
 ```
+
 ```objc
 /*!
  * Required for iOS 7+
@@ -993,6 +1016,7 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
     // handle notification
 }
 ```
+
 ```objc
 /**
  * Required for iOS10+
@@ -1050,6 +1074,7 @@ override func applicationDidBecomeActive(_ application: UIApplication) {
     }
  }
 ```
+
 ```objc
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     //本地清空角标
@@ -1067,6 +1092,5 @@ override func applicationDidBecomeActive(_ application: UIApplication) {
 ```
 
 </MultiLang>
-
 
 你可以阅读 [Apple 本地化和推送的文档](https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/Introduction.html#//apple_ref/doc/uid/TP40008194-CH1-SW1) 来更多地了解推送通知。
