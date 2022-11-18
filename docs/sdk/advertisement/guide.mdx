@@ -37,7 +37,7 @@ dependencies {
 }
 ```
 
-同时，为了将 [Gradle 版本和 Android Gradle Plugin 版本对应](https://developer.android.com/studio/releases/gradle-plugin#expandable-1)，需要更新 Gradle 版本，下载 [6.1.1 版本的 Gradle](https://services.gradle.org/distributions/gradle-6.1.1-bin.zip)，解压后放到自定义的文件夹中，同时**不**勾选 Unity 中的 `Preferences` -> `External Tools`-> `Gradle Installed with Unity(recommend)`，改为选择解压后 Gradle 文件夹的位置，如 XXXX/gradle-6.1.1
+同时，为了将 [Gradle 版本和 Android Gradle Plugin 版本对应](https://developer.android.com/studio/releases/gradle-plugin#expandable-1)，需要更新 Gradle 版本，下载 [6.1.1 版本的 Gradle](https://services.gradle.org/distributions/gradle-6.1.1-bin.zip)，解压后放到自定义的文件夹中，同时**不**勾选 Unity 中的 `Preferences` -> `External Tools`-> `Gradle Installed with Unity(recommend)`，改为选择解压后 Gradle 文件夹的位置，如 <some path\>/gradle-6.1.1
 
 接下来，添加一些原生依赖库：在 `Project Settings` -> `Player` -> `Android Tab` -> `Publish Settings` -> 勾选`Custom Main Gradle Template`，之后修改 `Assets/Plugins/baseProjectTemplate.gradle`，之后修改 `Assets/Plugins/mainTemplate.gradle`
 
@@ -93,16 +93,21 @@ using TapTap.TapAd
 
 // highlight-start
 TapAdConfig config = new TapAdConfig.Builder()
-                .AppId("1000007")               // 后台获得 AppId
-                .AppName("联盟测试-Android")     // 后台 AppName
-                .Key("1AjDOjD0F3SDDmgTuBQHbCRULSizYPHV17viZObHvhDjf7Pq1rlarueOX1cYBucn") // 后台获得 App 加密 key
-                .Version("1")       // 版本
-                .Channel("taptap2") // 渠道
+                .AppId("1000007")               // 必选参数，后台获得 AppId
+                .AppName("联盟测试-Android")     // 必选参数，后台 AppName
+                .Key("1AjDOjD0F3SDDmgTuBQHbCRULSizYPHV17viZObHvhDjf7Pq1rlarueOX1cYBucn") // 必须参数，后台获得 App 加密 key
+                .IsDebug(false)                 // 可选参数，是否打开debug调试信息输出：true打开、false关闭。默认false关闭
+                .Version("1")       // 必须参数，版本
+                .Channel("taptap2") // 必须参数，渠道
                 .Build();
 // highlight-end
+
+// highlight-start
 // CustomControllerWrapper 为实现了 TapTap.TapAd.ICustomController 的类
+// highlight-end
 TapAdSdk.Init(config, new CustomControllerWrapper(this));
 
+// ICustomController 接口说明
 public interface ICustomController
 {
     /// <summary>
@@ -148,6 +153,58 @@ public interface ICustomController
     /// 用户信息（为了提高广告的推送效率，开发者可以帮助传入一些用户的画像信息）
     /// </summary>
     CustomUser ProvideCustomer();
+}
+
+/// <summary>
+/// 地理位置说明
+/// </summary>
+public sealed class TapAdLocation 
+{
+    /// <summary>
+    /// 纬度
+    /// </summary>
+    public double latitude;
+    /// <summary>
+    /// 经度
+    /// </summary>
+    public double longitude;
+    /// <summary>
+    /// 精度
+    /// </summary>
+    public double accuracy;
+    
+    /// <summary>
+    /// 设置经纬度
+    /// </summary>
+    /// <param name="latitude">纬度</param>
+    /// <param name="longitude">经度</param>
+    /// <param name="accuracy">精度</param>
+    public TapAdLocation(double latitude, double longitude, double accuracy)
+    {
+        ...
+    }
+}
+
+/// <summary>
+/// 用户信息
+/// </summary>
+public sealed class CustomUser
+{
+    public int realAge;
+    // 0.男;1.女
+    public int realSex;
+    // 角色性别 0.男;1.女
+    public int avatarSex;
+    // 角色等级
+    public int avatarLevel;
+    // 是否新玩家 0.否;1.是
+    public int newUserStatus;
+    // 是否为付费用户 0.否;1.是
+    public int payedUserStatus;
+    // 是否通过新手教程 0.否;1.是
+    public int beginMissionFinished;
+    // 角色当前付费道具数量
+    public int avatarPayedToolCnt;
 }
 ```
 
@@ -210,9 +267,12 @@ for (int i = 0 ; i < 3; i ++) {
                 amount: i * 1000, winStatus: i % 2);
     userActions[i] = tmp;
 }
+// highlight-start
 // CustomUserAction 为实现了 IUserAction 的类
+// highlight-end
 TapAdSdk.UploadUserAction(userActions, new CustomUserAction(this));
 
+// 用户行为数据类说明
 public class UserAction
 {
     /// <summary>
@@ -234,13 +294,10 @@ public class UserAction
 
     public UserAction(int actionType, long actionTime, int amount, int winStatus) 
     {
-        this.ActionType = actionType;
-        this.ActionTime = actionTime;
-        this.Amount = amount;
-        this.WinStatus = winStatus;
+        ...
     }
 }
-
+// 上报接口说明
 public interface IUserAction
 {
     /// <summary>
@@ -313,10 +370,13 @@ var request = new TapAdRequest.Builder()
     .UserId("123")
     .Build();
 _tapSplashAd = new TapSplashAd(request);
+// highlight-start
 // SplashAdLoadListener 为实现了 ISplashAdLoadListener 的类
+// highlight-end
 _tapSplashAd.SetLoadListener(new SplashAdLoadListener(this));
 _tapSplashAd.Load();
 
+// Splash 加载接口说明
 public interface ISplashAdLoadListener : ICommonLoadListener
 {
     /// <summary>
@@ -326,6 +386,7 @@ public interface ISplashAdLoadListener : ICommonLoadListener
     void OnSplashAdLoad(TapSplashAd ad);
 }
 
+// 通用加载接口说明
 public interface ICommonLoadListener
 {
     /// <summary>
@@ -365,7 +426,9 @@ if (TapAdSdk.IsInited == false)
 }
 if (_tapSplashAd != null)
 {
+    // highlight-start
     // SplashInteractionListener 为实现了 ISplashAdInteractionListener 的类
+    // highlight-end
     _tapSplashAd.SetInteractionListener(new SplashInteractionListener(this));
     _tapSplashAd.Show();
 }
@@ -374,6 +437,7 @@ else
     Debug.LogErrorFormat($"[Unity::AD] 未加载好视频,无法播放!");
 }
 
+// Splash 播放回调接口说明
 public interface ISplashAdInteractionListener : ICommonInteractionListener
 {
     /// <summary>
@@ -388,6 +452,7 @@ public interface ISplashAdInteractionListener : ICommonInteractionListener
     void OnAdTimeOver(TapSplashAd ad);
 }
 
+// 通用播放回调接口说明
 public interface ICommonInteractionListener
 {
     
@@ -449,10 +514,13 @@ var request = new TapAdRequest.Builder()
     .UserId("123")
     .Build();
 _tapRewardAd = new TapRewardVideoAd(request);
+// highlight-start
 // RewardVideoAdLoadListener 为实现了 IRewardVideoAdLoadListener 的类
+// highlight-end
 _tapRewardAd.SetLoadListener(new RewardVideoAdLoadListener(this));
 _tapRewardAd.Load();
 
+// 激励视频广告加载回调接口说明
 public interface IRewardVideoAdLoadListener : ICommonLoadListener
 {
     /// <summary>
@@ -467,6 +535,7 @@ public interface IRewardVideoAdLoadListener : ICommonLoadListener
     void OnRewardVideoAdLoad(TapRewardVideoAd ad);
 }
 
+// 通用广告加载回调接口说明
 public interface ICommonLoadListener
 {
     /// <summary>
@@ -506,7 +575,9 @@ if (TapAdSdk.IsInited == false)
 }
 if (_tapRewardAd != null)
 {
+    // highlight-start
     // RewardVideoInteractionListener 为实现了 IRewardVideoInteractionListener 的类
+    // highlight-end
     _tapRewardAd.SetInteractionListener(new RewardVideoInteractionListener(this));
     _tapRewardAd.Show();
 }
@@ -515,6 +586,7 @@ else
     Debug.LogErrorFormat($"[Unity::AD] 未加载好视频,无法播放!");
 }
 
+// 激励视频广告播放回调接口说明
 public interface IRewardVideoInteractionListener : ICommonInteractionListener
 {
     /// <summary>
@@ -542,7 +614,7 @@ public interface IRewardVideoInteractionListener : ICommonInteractionListener
     void OnVideoError(TapRewardVideoAd ad);
 
     /// <summary>
-    /// 奖励确认可以发放
+    /// 视频播放完毕，奖励确认可以发放
     /// </summary>
     /// <param name="ad"></param>
     /// <param name="rewardVerify"></param>
@@ -559,6 +631,7 @@ public interface IRewardVideoInteractionListener : ICommonInteractionListener
     void OnSkippedVideo(TapRewardVideoAd ad);
 }
 
+// 通用广告播放回调接口说明
 public interface ICommonInteractionListener
 {
     
@@ -617,10 +690,13 @@ var request = new TapAdRequest.Builder()
     .UserId("userID")
     .Build();
 _tapBannerAd = new TapBannerAd(request);
+// highlight-start
 // BannerAdLoadListener 为实现了 IBannerAdLoadListener 的类
+// highlight-end
 _tapBannerAd.SetLoadListener(new BannerAdLoadListener(this));
 _tapBannerAd.Load();
 
+// banner 广告加载回调接口说明
 public interface IBannerAdLoadListener : ICommonLoadListener
 {
     /// <summary>
@@ -630,6 +706,7 @@ public interface IBannerAdLoadListener : ICommonLoadListener
     void OnBannerAdLoad(TapBannerAd ad);
 }
 
+// 通用广告加载回调接口说明
 public interface ICommonLoadListener
 {
     /// <summary>
@@ -667,7 +744,9 @@ if (TapAdSdk.IsInited == false)
     Debug.Log("TapAd 需要先初始化!");
     return;
 }
+// highlight-start
 // BannerInteractionListener 为实现了 IBannerAdInteractionListener 的类
+// highlight-end
 if (_tapBannerAd != null)
 {
     _tapBannerAd.SetInteractionListener(new BannerInteractionListener(this));
@@ -678,6 +757,7 @@ else
     Debug.LogErrorFormat($"[Unity::AD] 未加载好视频,无法播放!");
 }
 
+// banner 广告播放回调接口说明
 public interface IBannerAdInteractionListener : ICommonInteractionListener
 {
     /// <summary>
@@ -697,6 +777,7 @@ public interface IBannerAdInteractionListener : ICommonInteractionListener
     void OnDownloadClick(TapBannerAd ad);
 }
 
+// 通用广告播放回调接口说明
 public interface ICommonInteractionListener
 {
     
