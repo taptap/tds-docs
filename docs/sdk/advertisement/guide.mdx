@@ -97,9 +97,33 @@ dependencies {
 
 Unity 工程可在 `TapTap/TapAD/Demo` 工程中，找到示例工程来了解其实现过程，注意** Demo 工程需要到真机中才能看到效果，Editor 环境并不会实际生效**。
 
-## 通用接口
+## 获取广告权限
 
-### 初始化
+在获取 imei、地理位置时，需要用户授予权限。建议先询问权限，再进行初始化工作。
+
+<MultiLang>
+
+<>
+
+```cs
+using TapTap.TapAd
+
+TapAdSdk.RequestPermissionIfNecessary();
+```
+
+</>
+
+<>
+
+</>
+
+<>
+
+</>
+
+</MultiLang>
+
+## 初始化
 
 如果你已经参考[快速开始](/sdk/start/quickstart/#初始化)完成了初始化，这里只需要引入公告模块，然后添加下面初始化代码中高亮的部分到项目中即可。
 
@@ -112,12 +136,12 @@ using TapTap.TapAd
 
 // highlight-start
 TapAdConfig config = new TapAdConfig.Builder()
-                .AppId("1000007")               // 必选参数，后台获得 AppId
-                .AppName("联盟测试-Android")     // 必选参数，后台 AppName
-                .Key("1AjDOjD0F3SDDmgTuBQHbCRULSizYPHV17viZObHvhDjf7Pq1rlarueOX1cYBucn") // 必须参数，后台获得 App 加密 key
+                .AppId(your_app_id)               // 必选参数，后台获得 AppId
+                .AppName(your_app_name)     // 必选参数，后台 AppName
+                .Key(your_app_key) // 必须参数，后台获得 App 加密 key
                 .IsDebug(false)                 // 可选参数，是否打开debug调试信息输出：true打开、false关闭。默认false关闭
-                .Version("1")       // 必须参数，版本
-                .Channel("taptap2") // 必须参数，渠道
+                .Version(your_app_version)       // 必须参数，版本
+                .Channel(your_app_channel) // 必须参数，渠道
                 .Build();
 // highlight-end
 
@@ -129,72 +153,41 @@ TapAdSdk.Init(config, new CustomControllerWrapper(this));
 // ICustomController 接口说明
 public interface ICustomController
 {
-    /// <summary>
     /// 是否允许SDK主动使用地理位置信息
-    /// </summary>
     bool CanUseLocation { get; }
-    /// <summary>
     /// 当isCanUseLocation=false时，可传入地理位置信息，TapAd使用您传入的地理位置信息
-    /// </summary>
     TapAdLocation GetTapAdLocation { get; }
-    /// <summary>
     /// 是否允许SDK主动使用手机硬件参数，如：imei
-    /// </summary>
     bool CanUsePhoneState { get; }
-    /// <summary>
     /// 当isCanUsePhoneState=false时，可传入imei信息，TapAd使用您传入的imei信息
-    /// </summary>
     string GetDevImei { get; }
-    /// <summary>
     /// 是否允许SDK主动使用ACCESS_WIFI_STATE权限
-    /// </summary>
     bool CanUseWifiState { get; }
-    /// <summary>
     /// 是否允许SDK主动使用WRITE_EXTERNAL_STORAGE权限
-    /// </summary>
     bool CanUseWriteExternal { get; }
-    /// <summary>
     /// 开发者可以传入oaid
     /// 信通院OAID的相关采集——如何获取OAID：
     /// 1. 移动安全联盟官网http://www.msa-alliance.cn/
     /// 2. 信通院统一SDK下载http://msa-alliance.cn/col.jsp?id=120
-    /// </summary>
     string GetDevOaid { get; }
-    /// <summary>
     /// 是否允许SDK主动获取设备上应用安装列表的采集权限
-    /// </summary>
     bool Alist { get; }
-    /// <summary>
     /// 是否允许SDK主动获取ANDROID_ID
-    /// </summary>
     bool CanUseAndroidId { get; }
-    /// <summary>
     /// 用户信息（为了提高广告的推送效率，开发者可以帮助传入一些用户的画像信息）
-    /// </summary>
     CustomUser ProvideCustomer();
 }
-
-/// <summary>
-/// 地理位置说明
-/// </summary>
+/// 地理位置说
 public sealed class TapAdLocation 
 {
-    /// <summary>
     /// 纬度
-    /// </summary>
     public double latitude;
-    /// <summary>
     /// 经度
-    /// </summary>
     public double longitude;
-    /// <summary>
     /// 精度
-    /// </summary>
     public double accuracy;
     
-    /// <summary>
     /// 设置经纬度
-    /// </summary>
     /// <param name="latitude">纬度</param>
     /// <param name="longitude">经度</param>
     /// <param name="accuracy">精度</param>
@@ -203,10 +196,7 @@ public sealed class TapAdLocation
         ...
     }
 }
-
-/// <summary>
-/// 用户信息
-/// </summary>
+/// 用户信
 public sealed class CustomUser
 {
     public int realAge;
@@ -239,33 +229,7 @@ public sealed class CustomUser
 
 </MultiLang>
 
-### 获取广告权限
-
-在获取 imei，地理位置时，需要用户授予权限。建议在先询问权限，再进行初始化工作。
-
-<MultiLang>
-
-<>
-
-```cs
-using TapTap.TapAd
-
-TapAdSdk.RequestPermissionIfNecessary();
-```
-
-</>
-
-<>
-
-</>
-
-<>
-
-</>
-
-</MultiLang>
-
-### 上报用户行为
+## 上报用户行为
 
 TODO: 填入关于`上报用户行为`背景的描述
 
@@ -294,21 +258,13 @@ TapAdSdk.UploadUserAction(userActions, new CustomUserAction(this));
 // 用户行为数据类说明
 public class UserAction
 {
-    /// <summary>
     /// 行为动作类型,可自定义
-    /// </summary>
     public int ActionType { get; }
-    /// <summary>
     /// 行为发生时间（单位：秒）
-    /// </summary>
     public long ActionTime { get; }
-    /// <summary>
     /// 付费金额
-    /// </summary>
     public int Amount{ get; }
-    /// <summary>
     /// 是否胜利.0-失败;1-胜利
-    /// </summary>
     public int WinStatus{ get; }
 
     public UserAction(int actionType, long actionTime, int amount, int winStatus) 
@@ -319,13 +275,9 @@ public class UserAction
 // 上报接口说明
 public interface IUserAction
 {
-    /// <summary>
     /// 上报成功
-    /// </summary>
     void OnSuccess();
-    /// <summary>
     /// 上报失败
-    /// </summary>
     /// <param name="code">错误码</param>
     /// <param name="message">信息</param>
     void OnError(int code, string message);
@@ -344,11 +296,9 @@ public interface IUserAction
 
 </MultiLang>
 
-## 各个类型广告
+## 开屏广告(TapSplashAd)
 
-### 开屏广告(TapSplashAd)
-
-#### 简介
+### 简介
 
 开屏广告为用户在进入App时展示的全屏广告。开屏广告为一个View，宽高默认为match_parent。注意： 开屏广告view：width =屏幕宽；height需要>=75%屏幕高 ，否则会影响计费。
 
@@ -358,7 +308,7 @@ public interface IUserAction
     2. 当次打开APP，先请求服务端，由服务端筛选出哪一个。如果出于离线状态，按照默认顺序出第一个。
 
 
-#### 获取广告
+### 获取广告
 <MultiLang>
 
 <>
@@ -398,9 +348,7 @@ _tapSplashAd.Load();
 // Splash 加载接口说明
 public interface ISplashAdLoadListener : ICommonLoadListener
 {
-    /// <summary>
     /// 当 Splash 加载完毕
-    /// </summary>
     /// <param name="ad"></param>
     void OnSplashAdLoad(TapSplashAd ad);
 }
@@ -408,9 +356,7 @@ public interface ISplashAdLoadListener : ICommonLoadListener
 // 通用加载接口说明
 public interface ICommonLoadListener
 {
-    /// <summary>
     /// 加载出错回调
-    /// </summary>
     /// <param name="code">错误码</param>
     /// <param name="message">错误信息</param>
     void OnError(int code, string message);
@@ -429,7 +375,7 @@ public interface ICommonLoadListener
 
 </MultiLang>
 
-#### 播放
+### 播放
 
 <MultiLang>
 
@@ -459,14 +405,10 @@ else
 // Splash 播放回调接口说明
 public interface ISplashAdInteractionListener : ICommonInteractionListener
 {
-    /// <summary>
     /// 点击跳过
-    /// </summary>
     /// <param name="ad"></param>
     void OnAdSkip(TapSplashAd ad);
-    /// <summary>
     /// 广告时间到
-    /// </summary>
     /// <param name="ad"></param>
     void OnAdTimeOver(TapSplashAd ad);
 }
@@ -490,9 +432,9 @@ public interface ICommonInteractionListener
 
 </MultiLang>
 
-### 激励视频广告(TapRewardVideoAd)
+## 激励视频广告(TapRewardVideoAd)
 
-#### 简介
+### 简介
 
 激励视频是一种全屏播放的视频广告，用户可以在观看完整的视频后获取奖励,视频广告播放结束后会显示结束页面，引导用户进行后续动作。目前激励视频广告的表现形式为：视频播放完展示Endcard页面。
 
@@ -503,7 +445,7 @@ public interface ICommonInteractionListener
 支持的广告尺寸： 全屏横屏(宽高比16:9)、全屏竖屏(宽高比9:16)。Android端暂不支持重力旋转
 
 
-#### 获取广告
+### 获取广告
 <MultiLang>
 
 <>
@@ -542,14 +484,10 @@ _tapRewardAd.Load();
 // 激励视频广告加载回调接口说明
 public interface IRewardVideoAdLoadListener : ICommonLoadListener
 {
-    /// <summary>
     /// 当激励视频被Cache完毕
-    /// </summary>
     /// <param name="ad"></param>
     void OnRewardVideoAdCached(TapRewardVideoAd ad);
-    /// <summary>
     /// 当激励视频被Load完毕
-    /// </summary>
     /// <param name="ad"></param>
     void OnRewardVideoAdLoad(TapRewardVideoAd ad);
 }
@@ -557,9 +495,7 @@ public interface IRewardVideoAdLoadListener : ICommonLoadListener
 // 通用广告加载回调接口说明
 public interface ICommonLoadListener
 {
-    /// <summary>
     /// 加载出错回调
-    /// </summary>
     /// <param name="code">错误码</param>
     /// <param name="message">错误信息</param>
     void OnError(int code, string message);
@@ -578,7 +514,7 @@ public interface ICommonLoadListener
 
 </MultiLang>
 
-#### 播放
+### 播放
 
 <MultiLang>
 
@@ -608,33 +544,23 @@ else
 // 激励视频广告播放回调接口说明
 public interface IRewardVideoInteractionListener : ICommonInteractionListener
 {
-    /// <summary>
     /// 当广告出现
-    /// </summary>
     /// <param name="ad"></param>
     void OnAdShow(TapRewardVideoAd ad);
     
-    /// <summary>
     /// 当广告关闭
-    /// </summary>
     /// <param name="ad"></param>
     void OnAdClose(TapRewardVideoAd ad);
 
-    /// <summary>
     /// 当视频完成
-    /// </summary>
     /// <param name="ad"></param>
     void OnVideoComplete(TapRewardVideoAd ad);
 
-    /// <summary>
     /// 视频出错
-    /// </summary>
     /// <param name="ad"></param>
     void OnVideoError(TapRewardVideoAd ad);
 
-    /// <summary>
     /// 视频播放完毕，奖励确认可以发放
-    /// </summary>
     /// <param name="ad"></param>
     /// <param name="rewardVerify"></param>
     /// <param name="rewardAmount"></param>
@@ -643,9 +569,7 @@ public interface IRewardVideoInteractionListener : ICommonInteractionListener
     /// <param name="msg"></param>
     void OnRewardVerify(TapRewardVideoAd ad, bool rewardVerify, int rewardAmount, string rewardName, int code, string msg);
     
-    /// <summary>
     /// 当跳过视频
-    /// </summary>
     /// <param name="ad"></param>
     void OnSkippedVideo(TapRewardVideoAd ad);
 }
@@ -669,9 +593,9 @@ public interface ICommonInteractionListener
 
 </MultiLang>
 
-### Banner广告 （TapBannerAd）
+## Banner广告 （TapBannerAd）
 
-#### 简介
+### 简介
 
 模版渲染Banner：开发者不用自行对广告样式进行编辑和渲染，可直接调用相关接口进行广告展示。
 
@@ -679,7 +603,7 @@ public interface ICommonInteractionListener
 注意：不支持开发者在view添加按钮及对广告拦截处理
 :::
 
-#### 获取广告
+### 获取广告
 <MultiLang>
 
 <>
@@ -718,9 +642,7 @@ _tapBannerAd.Load();
 // banner 广告加载回调接口说明
 public interface IBannerAdLoadListener : ICommonLoadListener
 {
-    /// <summary>
     /// 当 Banner 加载完毕
-    /// </summary>
     /// <param name="ad"></param>
     void OnBannerAdLoad(TapBannerAd ad);
 }
@@ -728,9 +650,7 @@ public interface IBannerAdLoadListener : ICommonLoadListener
 // 通用广告加载回调接口说明
 public interface ICommonLoadListener
 {
-    /// <summary>
     /// 加载出错回调
-    /// </summary>
     /// <param name="code">错误码</param>
     /// <param name="message">错误信息</param>
     void OnError(int code, string message);
@@ -749,7 +669,7 @@ public interface ICommonLoadListener
 
 </MultiLang>
 
-#### 播放
+### 播放
 
 <MultiLang>
 
@@ -779,19 +699,13 @@ else
 // banner 广告播放回调接口说明
 public interface IBannerAdInteractionListener : ICommonInteractionListener
 {
-    /// <summary>
     /// 当广告关闭
-    /// </summary>
     /// <param name="ad"></param>
     void OnAdClose(TapBannerAd ad);
-    /// <summary>
     /// 当点击广告
-    /// </summary>
     /// <param name="ad"></param>
     void OnAdClick(TapBannerAd ad);
-    /// <summary>
     /// 当点击下载
-    /// </summary>
     /// <param name="ad"></param>
     void OnDownloadClick(TapBannerAd ad);
 }
