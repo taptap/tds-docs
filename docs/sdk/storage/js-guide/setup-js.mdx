@@ -1,0 +1,1438 @@
+---
+title: 数据存储、即时通讯 JavaScript SDK 配置指南
+sidebar_label: JavaScript SDK 配置
+slug: /sdk/storage/guide/setup-js/
+sidebar_position: 1
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import CodeBlock from "@theme/CodeBlock";
+import sdkVersions from "/src/docComponents/sdkVersions";
+import DomainBinding from "../../_partials/setup-domain.mdx";
+import AppConfig from "../_partials/app-config.mdx";
+import { Conditional } from "/src/docComponents/conditional";
+import Path from "/src/docComponents/path";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+import { CardGrid, Card } from "/src/docComponents/doc";
+
+## 获取 SDK
+
+本指南按照应用的适用平台来介绍各自的安装与集成方式。
+
+<CardGrid>
+  <Card
+    imgSrc={useBaseUrl("/img/platforms/html5.svg")}
+    imgScale={0.85}
+    label="Web"
+    to="#web"
+  />
+  <Card
+    imgSrc={useBaseUrl("/img/platforms/node-js.svg")}
+    imgScale={0.9}
+    label="Node.js"
+    to="#nodejs"
+  />
+  <Card
+    imgSrc={useBaseUrl("/img/platforms/weapp.svg")}
+    imgScale={1}
+    label="微信 / QQ 小程序"
+    to="#微信--qq-小程序"
+  />
+  <Card
+    imgSrc={useBaseUrl("/img/platforms/weapp-game.svg")}
+    imgScale={0.9}
+    label="微信 / QQ 小游戏"
+    to="#微信--qq-小游戏"
+  />
+  <Card
+    imgSrc={useBaseUrl("/img/platforms/alipay-mini-app.png")}
+    imgScale={0.7}
+    label="支付宝小程序"
+    to="#支付宝小程序"
+  />
+  <Card
+    imgSrc={useBaseUrl("/img/platforms/baidu-mini-app.png")}
+    imgScale={0.7}
+    label="百度小程序"
+    to="#百度小程序"
+  />
+  <Card
+    imgSrc={useBaseUrl("/img/platforms/toutiao-mini-app.png")}
+    imgScale={0.7}
+    label="字节跳动小程序"
+    to="#字节跳动小程序"
+  />
+  <Card
+    imgSrc={useBaseUrl("/img/platforms/cocos.png")}
+    imgScale={0.9}
+    label="CocosCreator"
+    to="#cocoscreator"
+  />
+  <Card
+    imgSrc={useBaseUrl("/img/platforms/laya.png")}
+    imgScale={0.9}
+    label="LayaAir"
+    to="#layaair"
+  />
+  <Card
+    imgSrc={useBaseUrl("/img/platforms/quickapp.png")}
+    imgScale={0.8}
+    label="快应用"
+    to="#快应用"
+  />
+  <Card
+    imgSrc={useBaseUrl("/img/platforms/react-native.svg")}
+    imgScale={0.75}
+    label="React Native"
+    to="#react-native"
+  />
+  <Card
+    imgSrc={useBaseUrl("/img/platforms/electron.svg")}
+    imgScale={0.75}
+    label="Electron"
+    to="#electron"
+  />
+  <Card
+    imgSrc={useBaseUrl("/img/platforms/other.svg")}
+    imgScale={0.8}
+    label="其他"
+    to="#其他平台"
+  />
+</CardGrid>
+
+### Web
+
+适用于运行在浏览器、WebView 或其他应用内 HTML 平台上的应用。
+
+#### 安装与引用 SDK
+
+##### npm
+
+如果你的 Web 应用使用了 webpack 等前端打包工具，我们推荐使用包管理工具 npm 安装 SDK：
+
+<Tabs groupId="js-sdk">
+<TabItem value="存储服务" label="存储服务" default>
+
+```
+$ npm install leancloud-storage --save
+```
+
+</TabItem>
+<TabItem value="存储服务（LiveQuery）" label="存储服务（LiveQuery）">
+
+```
+$ npm install leancloud-storage --save
+```
+
+</TabItem>
+<TabItem value="即时通讯" label="即时通讯">
+
+```
+$ npm install leancloud-realtime --save
+```
+
+</TabItem>
+<TabItem value="即时通讯（含富媒体消息）" label="即时通讯（含富媒体消息）">
+
+```
+$ npm install leancloud-realtime leancloud-realtime-plugin-typed-messages leancloud-storage --save
+```
+
+</TabItem>
+</Tabs>
+
+如果因为网络原因无法通过官方的 npm 站点下载，推荐通过 taobao 镜像来下载（在 `npm install` 后添加 `--registry=https://registry.npm.taobao.org` 参数）。
+
+安装完成后，在代码中通过 `require` 获得 SDK 的引用：
+
+<Tabs groupId="js-sdk">
+<TabItem value="存储服务" label="存储服务" default>
+
+```js
+const AV = require("leancloud-storage");
+const { Query, User } = AV;
+```
+
+</TabItem>
+<TabItem value="存储服务（LiveQuery）" label="存储服务（LiveQuery）">
+
+```js
+const AV = require("leancloud-storage/live-query");
+const { Query, User } = AV;
+```
+
+</TabItem>
+<TabItem value="即时通讯" label="即时通讯">
+
+```js
+const { Realtime, TextMessage } = require("leancloud-realtime");
+```
+
+为了保证兼容性，SDK 一直以来分发的都是 ECMAScript 5 版本的代码，并打包了所有需要的 Polyfills（比如 Promise）。
+即时通讯 SDK v5.0.0-rc.2 起同时提供以最新版本 ECMAScript 为编译目标的版本，该版本拥有更小的体积与更好的运行时优化，适用于只需要兼容最新版本浏览器的使用场景。
+如果应用使用了 `@babel/preset-env` 或类似方案，也可以在转译时 include 最新 ECMAScript 版本的 SDK，由应用来决定要兼容的目标运行环境。
+需要注意最新版本 ECMAScript 每年都会变，而该版本的目标即是提供与最新标准对齐的代码，因此由于引入了新版本 ECMASCript 特性导致不再支持某些非最新版本的运行环境将不被视为破坏兼容性的改动。
+当前 ECMAScript 的版本为 2020。
+
+如果想要试用这一功能，可以通过以下方式引入即时通讯 SDK：
+
+```js
+const { Realtime } = require("leancloud-realtime/es-latest");
+```
+
+</TabItem>
+<TabItem value="即时通讯（含富媒体消息）" label="即时通讯（含富媒体消息）">
+
+```js
+const AV = require("leancloud-storage");
+const IM = require("leancloud-realtime");
+
+const initPlugin = require("leancloud-realtime-plugin-typed-messages");
+
+const { Realtime, TextMessage } = IM;
+const { TypedMessagesPlugin, ImageMessage } = initPlugin(AV, IM);
+```
+
+富媒体消息插件包含的消息类型可以参考 [富媒体消息插件 API 文档](https://leancloud.github.io/js-realtime-sdk/plugins/typed-messages/docs/module-leancloud-realtime-plugin-typed-messages.html)。
+
+为了保证兼容性，SDK 一直以来分发的都是 ECMAScript 5 版本的代码，并打包了所有需要的 Polyfills（比如 Promise）。
+即时通讯 SDK v5.0.0-rc.2 起同时提供以最新版本 ECMAScript 为编译目标的版本，该版本拥有更小的体积与更好的运行时优化，适用于只需要兼容最新版本浏览器的使用场景。
+如果应用使用了 `@babel/preset-env` 或类似方案，也可以在转译时 include 最新 ECMAScript 版本的 SDK，由应用来决定要兼容的目标运行环境。
+需要注意最新版本 ECMAScript 每年都会变，而该版本的目标即是提供与最新标准对齐的代码，因此由于引入了新版本 ECMASCript 特性导致不再支持某些非最新版本的运行环境将不被视为破坏兼容性的改动。
+当前 ECMAScript 的版本为 2020。
+
+如果想要试用这一功能，可以通过以下方式引入即时通讯 SDK：
+
+```js
+const { Realtime } = require("leancloud-realtime/es-latest");
+```
+
+</TabItem>
+</Tabs>
+
+##### CDN
+
+:::caution
+
+以下 CDN 资源为第三方服务商提供的免费服务，无可用性保证，**不推荐在生产环境中使用**。
+
+:::
+
+你也可以直接在页面中通过 `script` 标签引入我们的 SDK：
+
+<Tabs groupId="js-sdk">
+<TabItem value="存储服务" label="存储服务" default>
+
+<CodeBlock>
+  {`<script src="//code.bdstatic.com/npm/leancloud-storage@${sdkVersions.leancloud.js.storage}/dist/av-min.js"></script>`}
+</CodeBlock>
+
+</TabItem>
+<TabItem value="存储服务（LiveQuery）" label="存储服务（LiveQuery）">
+
+<CodeBlock>
+  {`<script src="//code.bdstatic.com/npm/leancloud-storage@${sdkVersions.leancloud.js.storage}/dist/av-live-query-min.js"></script>`}
+</CodeBlock>
+
+</TabItem>
+<TabItem value="即时通讯" label="即时通讯">
+
+<CodeBlock>
+  {`<script src="//code.bdstatic.com/npm/leancloud-realtime@${sdkVersions.leancloud.js.realtime}/dist/im-browser.min.js"></script>`}
+</CodeBlock>
+
+</TabItem>
+<TabItem value="即时通讯（含富媒体消息）" label="即时通讯（含富媒体消息）">
+
+<CodeBlock>
+  {`<script src="//code.bdstatic.com/npm/leancloud-storage@${sdkVersions.leancloud.js.storage}/dist/av-min.js"></script>
+<script src="//code.bdstatic.com/npm/leancloud-realtime@${sdkVersions.leancloud.js.realtime}/dist/im-browser.min.js"></script>
+<script src="//code.bdstatic.com/npm/leancloud-realtime-plugin-typed-messages@4.0.2/dist/typed-messages.min.js"></script>`}
+</CodeBlock>
+
+</TabItem>
+</Tabs>
+
+通过这种方式引入的 SDK 可以通过全局变量 `AV` 获得引用：
+
+<Tabs groupId="js-sdk">
+<TabItem value="存储服务" label="存储服务" default>
+
+```js
+const { Query, User } = AV;
+```
+
+</TabItem>
+<TabItem value="存储服务（LiveQuery）" label="存储服务（LiveQuery）">
+
+```js
+const { Query, User } = AV;
+```
+
+</TabItem>
+<TabItem value="即时通讯" label="即时通讯">
+
+```js
+const { Realtime, TextMessage } = AV;
+```
+
+如果想要试用以最新版本 ECMAScript 为编译目标的即时通讯 SDK 版本（参见 [npm](#npm) 章节的说明），可以这样加载文件：
+
+<CodeBlock>
+  {`<script src="//code.bdstatic.com/npm/leancloud-realtime@${sdkVersions.leancloud.js.realtime}/dist/es-latest/im.js"></script>`}
+</CodeBlock>
+
+</TabItem>
+<TabItem value="即时通讯（含富媒体消息）" label="即时通讯（含富媒体消息）">
+
+```js
+const { Realtime, TextMessage, TypedMessagesPlugin, ImageMessage } = AV;
+```
+
+</TabItem>
+</Tabs>
+
+### Node.js
+
+JavaScript SDK 也可以运行在 Node.js 运行环境中。如果希望在云引擎中访问我们的存储服务，请参照 [云引擎 Node.js 运行环境](/sdk/engine/deploy/nodejs/)，使用模板项目中提供的 `leanengine` 包接入存储服务。
+
+注意，云引擎内部访问 API 是通过内网，所以不需要也不应该配置 API 自定义域名。
+模板项目和[云引擎 SDK 使用指南](/sdk/engine/functions/sdk/)中的示例代码均未配置 API 自定义域名，
+请勿设置 serverURL，以免变成公网访问，影响性能。
+在使用命令行工具（`lean up`）本地调试云引擎托管项目时，虽然是公网访问，但命令行工具会自动设置相应的环境变量，供 SDK 访问 API，所以也不需要设置 serverURL。
+
+#### 安装与引用 SDK
+
+Node.js 中 SDK 的安装与引用也是通过包管理工具 npm，请参考 [npm](#npm)。
+
+### 微信 / QQ 小程序
+
+:::note
+
+QQ 小程序兼容微信小程序的 API，因此两者使用同一个 SDK，安装与使用方法也是一样的。不过 QQ 小程序使用的 Adapters 与微信小程序不同，请前往 [QQ 小程序 Adapters 下载页](https://unpkg.com/browse/@leancloud/platform-adapters-qqapp/lib/) 下载。
+
+:::
+
+#### 手动导入文件
+
+<Tabs groupId="js-sdk">
+<TabItem value="存储服务" label="存储服务" default>
+
+前往 [存储 SDK 下载页](https://releases.leanapp.cn/#/leancloud/javascript-sdk/releases)，下载最新版本的 `av-core-min.js`，移动到 `libs` 目录。
+
+</TabItem>
+<TabItem value="存储服务（LiveQuery）" label="存储服务（LiveQuery）">
+
+前往 [存储 SDK 下载页](https://releases.leanapp.cn/#/leancloud/javascript-sdk/releases)，下载最新版本的 `av-live-query-core-min.js`，移动到 `libs` 目录。
+
+</TabItem>
+<TabItem value="即时通讯" label="即时通讯">
+
+前往 [即时通讯 SDK 下载页](https://releases.leanapp.cn/#/leancloud/js-realtime-sdk/releases)，下载最新版本的 `im.min.js`，移动到 `libs` 目录。
+
+</TabItem>
+<TabItem value="即时通讯（含富媒体消息）" label="即时通讯（含富媒体消息）">
+
+前往 [存储 SDK 下载页](https://releases.leanapp.cn/#/leancloud/javascript-sdk/releases)，下载最新版本的 `av-core-min.js`，移动到 `libs` 目录，并将文件重命名为 `leancloud-storage.js`。
+
+前往 [即时通讯 SDK 下载页](https://releases.leanapp.cn/#/leancloud/js-realtime-sdk/releases)，下载最新版本的 `im.min.js`，移动到 `libs` 目录，并将文件重命名为 `leancloud-realtime.js`。
+
+下载 [`typed-messages.min.js`](https://code.bdstatic.com/npm/leancloud-realtime-plugin-typed-messages@4.0.2/dist/typed-messages.min.js)，移动到 `libs` 目录。
+
+</TabItem>
+</Tabs>
+
+前往 [微信小程序 Adapters 下载页](https://unpkg.com/browse/@leancloud/platform-adapters-weapp/lib/)，下载最新版本的 `index.js`，移动到 `libs` 目录，并将文件重命名为 `leancloud-adapters-weapp.js`。
+
+在 `app.js` 中引用 SDK，并设置 Adapters ：
+
+:::note
+
+在其他文件中引用 SDK 时请将路径替换成对应的相对路径，Adapters 仅需在 app.js 中设置。
+
+:::
+
+<Tabs groupId="js-sdk">
+<TabItem value="存储服务" label="存储服务" default>
+
+```js
+const AV = require("./libs/av-core-min.js");
+const adapters = require("./libs/leancloud-adapters-weapp.js");
+
+AV.setAdapters(adapters);
+```
+
+</TabItem>
+<TabItem value="存储服务（LiveQuery）" label="存储服务（LiveQuery）">
+
+```js
+const AV = require("./libs/av-live-query-core-min.js");
+const adapters = require("./libs/leancloud-adapters-weapp.js");
+
+AV.setAdapters(adapters);
+```
+
+</TabItem>
+<TabItem value="即时通讯" label="即时通讯">
+
+```js
+const { Realtime, TextMessage, setAdapters } = require("./libs/im.min.js");
+const adapters = require("./libs/leancloud-adapters-weapp.js");
+
+setAdapters(adapters);
+```
+
+</TabItem>
+<TabItem value="即时通讯（含富媒体消息）" label="即时通讯（含富媒体消息）">
+
+```js
+// 需要保证依次加载三个文件
+const AV = require("./libs/leancloud-storage.js");
+const {
+  Realtime,
+  TextMessage,
+  setAdapters,
+} = require("./libs/leancloud-realtime.js");
+const {
+  TypedMessagesPlugin,
+  ImageMessage,
+} = require("./libs/typed-messages.min.js");
+const adapters = require("./libs/leancloud-adapters-weapp.js");
+
+AV.setAdapters(adapters); // 为存储 SDK 设置 adapters
+setAdapters(adapters); // 为即时通讯 SDK 设置 adapters
+```
+
+</TabItem>
+</Tabs>
+
+#### WePY
+
+如果使用 [WePY](https://wepyjs.gitee.io/wepy-docs/) 来开发小程序，可以直接通过 npm 安装和引用 SDK，具体操作步骤请参考 [npm](#npm)。
+
+#### mpvue
+
+如果使用 [mpvue](http://mpvue.com/) 来开发小程序，可以直接通过 npm 安装和引用 SDK，具体操作步骤请参考 [npm](#npm)。
+
+#### Taro
+
+如果使用 [Taro](https://taro.jd.com/) 来开发小程序，通过 npm 安装 SDK 后，需要从指定路径引入小程序 SDK：
+
+```js
+import AV from "leancloud-storage/dist/av-weapp.js";
+```
+
+如果使用 TypeScript 开发，可以手动把 `leancloud-storage/storage.d.ts` 复制到 `leancloud-storage/dist/av-live-query-weapp.d.ts`。
+
+#### 小程序插件
+
+小程序插件引入 SDK 的方法与微信小程序一致。
+
+### 微信 / QQ 小游戏
+
+小游戏手动导入 SDK 的步骤与小程序一致，请参考 [微信 / QQ 小程序 · 手动导入文件](#手动导入文件)。
+
+如果使用游戏引擎提供的开发工具开发小游戏，请参照对应的游戏引擎章节。
+
+### 支付宝小程序
+
+支付宝小程序通过 npm 安装与引用 SDK，同时由独立的 Adapters 库（`@leancloud/platform-adapters-alipay`）提供支持。
+
+安装：
+
+<Tabs groupId="js-sdk">
+<TabItem value="存储服务" label="存储服务" default>
+
+```
+$ npm install leancloud-storage @leancloud/platform-adapters-alipay
+```
+
+</TabItem>
+<TabItem value="存储服务（LiveQuery）" label="存储服务（LiveQuery）">
+
+```
+$ npm install leancloud-storage @leancloud/platform-adapters-alipay
+```
+
+</TabItem>
+<TabItem value="即时通讯" label="即时通讯">
+
+```
+$ npm install leancloud-realtime @leancloud/platform-adapters-alipay
+```
+
+</TabItem>
+<TabItem value="即时通讯（含富媒体消息）" label="即时通讯（含富媒体消息）">
+
+```
+$ npm install leancloud-realtime leancloud-realtime-plugin-typed-messages leancloud-storage @leancloud/platform-adapters-alipay
+```
+
+</TabItem>
+</Tabs>
+
+获得引用：
+
+<Tabs groupId="js-sdk">
+<TabItem value="存储服务" label="存储服务" default>
+
+```js
+const AV = require("leancloud-storage/core");
+const adapters = require("@leancloud/platform-adapters-alipay");
+
+AV.setAdapters(adapters);
+```
+
+</TabItem>
+<TabItem value="存储服务（LiveQuery）" label="存储服务（LiveQuery）">
+
+```js
+const AV = require("leancloud-storage/live-query-core");
+const adapters = require("@leancloud/platform-adapters-alipay");
+
+AV.setAdapters(adapters);
+```
+
+</TabItem>
+<TabItem value="即时通讯" label="即时通讯">
+
+```js
+const { Realtime, setAdapters } = require("leancloud-realtime/im");
+const adapters = require("@leancloud/platform-adapters-alipay");
+
+setAdapters(adapters);
+```
+
+</TabItem>
+<TabItem value="即时通讯（含富媒体消息）" label="即时通讯（含富媒体消息）">
+
+```js
+const AV = require("leancloud-storage/core");
+const IM = require("leancloud-realtime/im");
+const initPlugin = require("leancloud-realtime-plugin-typed-messages");
+const adapters = require("@leancloud/platform-adapters-alipay");
+
+const { Realtime, setAdapters } = IM;
+const { TypedMessagesPlugin, ImageMessage } = initPlugin(AV, IM);
+
+AV.setAdapters(adapters); // 为存储 SDK 设置 adapters
+setAdapters(adapters); // 为即时通讯 SDK 设置 adapters
+```
+
+</TabItem>
+</Tabs>
+
+### 百度小程序
+
+百度小程序通过 npm 安装与引用 SDK，同时由独立的 Adapters 库（`@leancloud/platform-adapters-baidu`）提供支持。
+
+安装：
+
+<Tabs groupId="js-sdk">
+<TabItem value="存储服务" label="存储服务" default>
+
+```
+$ npm install leancloud-storage @leancloud/platform-adapters-baidu
+```
+
+</TabItem>
+<TabItem value="存储服务（LiveQuery）" label="存储服务（LiveQuery）">
+
+```
+$ npm install leancloud-storage @leancloud/platform-adapters-baidu
+```
+
+</TabItem>
+<TabItem value="即时通讯" label="即时通讯">
+
+```
+$ npm install leancloud-realtime @leancloud/platform-adapters-baidu
+```
+
+</TabItem>
+<TabItem value="即时通讯（含富媒体消息）" label="即时通讯（含富媒体消息）">
+
+```
+$ npm install leancloud-realtime leancloud-realtime-plugin-typed-messages leancloud-storage @leancloud/platform-adapters-baidu
+```
+
+</TabItem>
+</Tabs>
+
+获得引用：
+
+<Tabs groupId="js-sdk">
+<TabItem value="存储服务" label="存储服务" default>
+
+```js
+const AV = require("leancloud-storage/core");
+const adapters = require("@leancloud/platform-adapters-baidu");
+
+AV.setAdapters(adapters);
+```
+
+</TabItem>
+<TabItem value="存储服务（LiveQuery）" label="存储服务（LiveQuery）">
+
+```js
+const AV = require("leancloud-storage/live-query-core");
+const adapters = require("@leancloud/platform-adapters-baidu");
+
+AV.setAdapters(adapters);
+```
+
+</TabItem>
+<TabItem value="即时通讯" label="即时通讯">
+
+```js
+const { Realtime, setAdapters } = require("leancloud-realtime/im");
+const adapters = require("@leancloud/platform-adapters-baidu");
+
+setAdapters(adapters);
+```
+
+</TabItem>
+<TabItem value="即时通讯（含富媒体消息）" label="即时通讯（含富媒体消息）">
+
+```js
+const AV = require("leancloud-storage/core");
+const IM = require("leancloud-realtime/im");
+const initPlugin = require("leancloud-realtime-plugin-typed-messages");
+const adapters = require("@leancloud/platform-adapters-baidu");
+
+const { Realtime, setAdapters } = IM;
+const { TypedMessagesPlugin, ImageMessage } = initPlugin(AV, IM);
+
+AV.setAdapters(adapters); // 为存储 SDK 设置 adapters
+setAdapters(adapters); // 为即时通讯 SDK 设置 adapters
+```
+
+</TabItem>
+</Tabs>
+
+### 字节跳动小程序
+
+<Tabs groupId="js-sdk">
+<TabItem value="存储服务" label="存储服务" default>
+
+前往 [存储 SDK 下载页](https://releases.leanapp.cn/#/leancloud/javascript-sdk/releases)，下载最新版本的 `av-core-min.js`，移动到 `libs` 目录。
+
+</TabItem>
+<TabItem value="存储服务（LiveQuery）" label="存储服务（LiveQuery）">
+
+前往 [存储 SDK 下载页](https://releases.leanapp.cn/#/leancloud/javascript-sdk/releases)，下载最新版本的 `av-live-query-core-min.js`，移动到 `libs` 目录。
+
+</TabItem>
+<TabItem value="即时通讯" label="即时通讯">
+
+前往 [即时通讯 SDK 下载页](https://releases.leanapp.cn/#/leancloud/js-realtime-sdk/releases)，下载最新版本的 `im.min.js`，移动到 `libs` 目录。
+
+</TabItem>
+<TabItem value="即时通讯（含富媒体消息）" label="即时通讯（含富媒体消息）">
+
+前往 [存储 SDK 下载页](https://releases.leanapp.cn/#/leancloud/javascript-sdk/releases)，下载最新版本的 `av-core-min.js`，移动到 `libs` 目录，并将文件重命名为 `leancloud-storage.js`。
+
+前往 [即时通讯 SDK 下载页](https://releases.leanapp.cn/#/leancloud/js-realtime-sdk/releases)，下载最新版本的 `im.min.js`，移动到 `libs` 目录，并将文件重命名为 `leancloud-realtime.js`。
+
+下载 [`typed-messages.min.js`](https://code.bdstatic.com/npm/leancloud-realtime-plugin-typed-messages@4.0.2/dist/typed-messages.min.js)，移动到 `libs` 目录。
+
+</TabItem>
+</Tabs>
+
+前往 [字节跳动小程序 Adapters 下载页](https://code.bdstatic.com/npm/@leancloud/platform-adapters-toutiao@1.4.1/lib/index.js)，下载最新版本的 `index.js`，移动到 `libs` 目录，并将文件重命名为 `leancloud-adapters-toutiao.js`。
+
+在 `app.js` 中引用 SDK，并设置 Adapters ：
+
+:::note
+
+在其他文件中引用 SDK 时请将路径替换成对应的相对路径，Adapters 仅需在 app.js 中设置。
+
+:::
+
+<Tabs groupId="js-sdk">
+<TabItem value="存储服务" label="存储服务" default>
+
+```js
+const AV = require("./libs/av-core-min.js");
+const adapters = require("./libs/leancloud-adapters-toutiao.js");
+
+AV.setAdapters(adapters);
+```
+
+</TabItem>
+<TabItem value="存储服务（LiveQuery）" label="存储服务（LiveQuery）">
+
+```js
+const AV = require("./libs/av-live-query-core-min.js");
+const adapters = require("./libs/leancloud-adapters-toutiao.js");
+
+AV.setAdapters(adapters);
+```
+
+</TabItem>
+<TabItem value="即时通讯" label="即时通讯">
+
+```js
+const { Realtime, TextMessage, setAdapters } = require("./libs/im.min.js");
+const adapters = require("./libs/leancloud-adapters-toutiao.js");
+
+setAdapters(adapters);
+```
+
+</TabItem>
+<TabItem value="即时通讯（含富媒体消息）" label="即时通讯（含富媒体消息）">
+
+```js
+// 需要保证依次加载三个文件
+const AV = require("./libs/leancloud-storage.js");
+const {
+  Realtime,
+  TextMessage,
+  setAdapters,
+} = require("./libs/leancloud-realtime.js");
+const {
+  TypedMessagesPlugin,
+  ImageMessage,
+} = require("./libs/typed-messages.min.js");
+const adapters = require("./libs/leancloud-adapters-toutiao.js");
+
+AV.setAdapters(adapters); // 为存储 SDK 设置 adapters
+setAdapters(adapters); // 为即时通讯 SDK 设置 adapters
+```
+
+</TabItem>
+</Tabs>
+
+### CocosCreator
+
+CocosCreator 支持直接通过 npm 安装与引用 SDK，具体操作步骤请参考 [npm](#npm)。
+
+:::note
+
+CocosCreator 项目默认没有 `package.json` 文件，可以在安装 SDK 前通过 `npm init -y` 命令创建。
+
+:::
+
+如果你的 CocosCreator 项目需要发布为微信或 QQ 小游戏，需要在构建发布到小游戏之前修改 SDK 的引用路径：
+
+<Tabs groupId="js-sdk">
+<TabItem value="存储服务" label="存储服务" default>
+
+```diff
+// SDK 应用路径变更为
+- const AV = require('leancloud-storage');
++ const AV = require('leancloud-storage/dist/av-weapp-min.js');
+```
+
+</TabItem>
+<TabItem value="存储服务（LiveQuery）" label="存储服务（LiveQuery）">
+
+```diff
+// SDK 应用路径变更为
+- const AV = require('leancloud-storage/live-query');
++ const AV = require('leancloud-storage/dist/av-live-query-weapp-min.js');
+```
+
+</TabItem>
+<TabItem value="即时通讯" label="即时通讯">
+
+```diff
+// SDK 应用路径变更为
+- const { Realtime } = require('leancloud-realtime');
++ const { Realtime } = require('leancloud-realtime/dist/im-weapp.js');
+```
+
+</TabItem>
+<TabItem value="即时通讯（含富媒体消息）" label="即时通讯（含富媒体消息）">
+
+```diff
+// 暂不支持
+```
+
+</TabItem>
+</Tabs>
+
+请注意，此改动会导致其他平台的产出（包括浏览器与模拟器的预览功能）不能正常工作，因此应该只在构建发布到小游戏之前临时修改，并在发布之后修改回来。
+
+在改动之后，CocosCreator 的控制台可能会出现 load script error，但不影响构建发布小游戏，并且构建产出在小游戏开发工具中运行也不会有异常。
+
+### LayaAir
+
+LayaAir 支持直接通过 npm 安装与引用 SDK，具体操作步骤请参考 [npm](#npm)。
+
+:::note
+
+LayaAir 项目默认没有 `package.json` 文件，可以在安装 SDK 前通过 `npm init -y` 命令创建。
+
+:::
+
+如果你的 LayaAir 项目需要发布为微信或 QQ 小游戏，需要在构建发布到小游戏之前修改 SDK 的引用路径，具体替换方法请参考 [CocosCreator](#cocoscreator) 章节。
+
+同样，此改动会导致其他平台的产出（包括浏览器与模拟器的预览功能）不能正常工作，因此应该只在构建发布到小游戏之前临时修改，并在发布之后修改回来。
+
+### 快应用
+
+快应用通过 npm 安装与引用 SDK，同时由独立的 Adapters 库（`@leancloud/platform-adapters-quickapp`）提供支持。
+
+安装：
+
+<Tabs groupId="js-sdk">
+<TabItem value="存储服务" label="存储服务" default>
+
+```
+$ npm install leancloud-storage @leancloud/platform-adapters-quickapp --save
+```
+
+</TabItem>
+<TabItem value="存储服务（LiveQuery）" label="存储服务（LiveQuery）">
+
+```
+$ npm install leancloud-storage @leancloud/platform-adapters-quickapp --save
+```
+
+</TabItem>
+<TabItem value="即时通讯" label="即时通讯">
+
+```
+$ npm install leancloud-realtime @leancloud/platform-adapters-quickapp --save
+```
+
+</TabItem>
+<TabItem value="即时通讯（含富媒体消息）" label="即时通讯（含富媒体消息）">
+
+```
+$ npm install leancloud-realtime leancloud-realtime-plugin-typed-messages leancloud-storage @leancloud/platform-adapters-quickapp --save
+```
+
+</TabItem>
+</Tabs>
+
+获得引用：
+
+<Tabs groupId="js-sdk">
+<TabItem value="存储服务" label="存储服务" default>
+
+```js
+const AV = require("leancloud-storage/core");
+const adapters = require("@leancloud/platform-adapters-quickapp");
+AV.setAdapters(adapters);
+```
+
+</TabItem>
+<TabItem value="存储服务（LiveQuery）" label="存储服务（LiveQuery）">
+
+```js
+const AV = require("leancloud-storage/live-query-core");
+const adapters = require("@leancloud/platform-adapters-quickapp");
+AV.setAdapters(adapters);
+```
+
+</TabItem>
+<TabItem value="即时通讯" label="即时通讯">
+
+```js
+const { Realtime, setAdapters } = require("leancloud-realtime/im");
+const adapters = require("@leancloud/platform-adapters-quickapp");
+setAdapters(adapters);
+```
+
+</TabItem>
+<TabItem value="即时通讯（含富媒体消息）" label="即时通讯（含富媒体消息）">
+
+```js
+const AV = require("leancloud-storage/core");
+const IM = require("leancloud-realtime/im");
+const initPlugin = require("leancloud-realtime-plugin-typed-messages");
+
+const { Realtime, setAdapters } = IM;
+const { TypedMessagesPlugin, ImageMessage } = initPlugin(AV, IM);
+
+const adapters = require("@leancloud/platform-adapters-quickapp");
+AV.setAdapters(adapters);
+setAdapters(adapters);
+```
+
+</TabItem>
+</Tabs>
+
+### React Native
+
+React Native 通过 npm 安装与引用 SDK，同时由独立的 Adapters 库（`@leancloud/platform-adapters-react-native`）提供支持。
+
+安装：
+
+<Tabs groupId="js-sdk">
+<TabItem value="存储服务" label="存储服务" default>
+
+```
+# Step 1: Install
+$ yarn add leancloud-storage @leancloud/platform-adapters-react-native @react-native-community/async-storage@1
+
+# Step 2: Link
+# For React Native 0.60+
+$ npx pod-install
+# For React Native <= 0.59
+# npx react-native link @react-native-community/async-storage
+# For Expo (SDK >= 38) 无需 link
+```
+
+</TabItem>
+<TabItem value="存储服务（LiveQuery）" label="存储服务（LiveQuery）">
+
+```
+# Step 1: Install
+$ yarn add leancloud-storage @leancloud/platform-adapters-react-native @react-native-community/async-storage@1
+
+# Step 2: Link
+# For React Native 0.60+
+$ npx pod-install
+# For React Native <= 0.59
+# npx react-native link @react-native-community/async-storage
+# For Expo (SDK >= 38) 无需 link
+```
+
+</TabItem>
+<TabItem value="即时通讯" label="即时通讯">
+
+```
+$ yarn add leancloud-realtime @leancloud/platform-adapters-react-native
+```
+
+</TabItem>
+<TabItem value="即时通讯（含富媒体消息）" label="即时通讯（含富媒体消息）">
+
+```
+# Step 1: Install
+$ yarn add leancloud-realtime leancloud-realtime-plugin-typed-messages leancloud-storage @leancloud/platform-adapters-react-native @react-native-community/async-storage@1
+
+# Step 2: Link
+# For React Native 0.60+
+$ npx pod-install
+# For React Native <= 0.59
+# npx react-native link @react-native-community/async-storage
+# For Expo (SDK >= 38) 无需 link
+```
+
+</TabItem>
+</Tabs>
+
+获得引用：
+
+<Tabs groupId="js-sdk">
+<TabItem value="存储服务" label="存储服务" default>
+
+```js
+import AV from "leancloud-storage/core";
+import * as adapters from "@leancloud/platform-adapters-react-native";
+AV.setAdapters(adapters);
+```
+
+</TabItem>
+<TabItem value="存储服务（LiveQuery）" label="存储服务（LiveQuery）">
+
+```js
+import AV from "leancloud-storage/live-query-core";
+import * as adapters from "@leancloud/platform-adapters-react-native";
+AV.setAdapters(adapters);
+```
+
+</TabItem>
+<TabItem value="即时通讯" label="即时通讯">
+
+```js
+import { Realtime, setAdapters } from "leancloud-realtime/im";
+import * as adapters from "@leancloud/platform-adapters-react-native";
+setAdapters(adapters);
+```
+
+</TabItem>
+<TabItem value="即时通讯（含富媒体消息）" label="即时通讯（含富媒体消息）">
+
+```js
+import AV from "leancloud-storage/core";
+import IM from "leancloud-realtime/im";
+import initPlugin from "leancloud-realtime-plugin-typed-messages";
+import * as adapters from "@leancloud/platform-adapters-react-native";
+
+const { Realtime, setAdapters } = IM;
+const { TypedMessagesPlugin, ImageMessage } = initPlugin(AV, IM);
+
+AV.setAdapters(adapters);
+setAdapters(adapters);
+```
+
+</TabItem>
+</Tabs>
+
+### Electron
+
+Electron 使用包管理工具 npm 管理依赖，你可以通过以下命令安装 SDK：
+
+<Tabs groupId="js-sdk">
+<TabItem value="存储服务" label="存储服务" default>
+
+```
+$ npm install leancloud-storage --save
+```
+
+</TabItem>
+<TabItem value="存储服务（LiveQuery）" label="存储服务（LiveQuery）">
+
+```
+$ npm install leancloud-storage --save
+```
+
+</TabItem>
+<TabItem value="即时通讯" label="即时通讯">
+
+```
+$ npm install leancloud-realtime --save
+```
+
+</TabItem>
+<TabItem value="即时通讯（含富媒体消息）" label="即时通讯（含富媒体消息）">
+
+```
+$ npm install leancloud-realtime leancloud-realtime-plugin-typed-messages leancloud-storage --save
+```
+
+</TabItem>
+</Tabs>
+
+#### 作为浏览器脚本引入
+
+在 index.html 中可以通过 `script` 标签引入 SDK：
+
+<Tabs groupId="js-sdk">
+<TabItem value="存储服务" label="存储服务" default>
+
+```html
+<script src="./node_modules/leancloud-storage/dist/av-min.js"></script>
+```
+
+</TabItem>
+<TabItem value="存储服务（LiveQuery）" label="存储服务（LiveQuery）">
+
+```html
+<script src="./node_modules/leancloud-storage/dist/av-live-query-min.js"></script>
+```
+
+</TabItem>
+<TabItem value="即时通讯" label="即时通讯">
+
+```html
+<script src="./node_modules/leancloud-realtime/dist/im-browser.min.js"></script>
+```
+
+</TabItem>
+<TabItem value="即时通讯（含富媒体消息）" label="即时通讯（含富媒体消息）">
+
+```html
+<script src="./node_modules/leancloud-storage/dist/av-min.js"></script>
+<script src="./node_modules/leancloud-realtime/dist/im-browser.min.js"></script>
+<script src="./node_modules/leancloud-realtime-plugin-typed-messages/dist/typed-messages.js"></script>
+```
+
+</TabItem>
+</Tabs>
+
+#### 作为 Node.js 模块引入
+
+我们推荐使用 `script` 标签引入 SDK，该方式能满足绝大部分的需求。但是如果有以下的需求，SDK 也支持通过 `require('leancloud-storage')` 方法作为 Node.js 模块引入。
+
+- 需要在 main process 中使用 SDK
+- 需要使用 Node.js 的 `Buffer` 或 `Stream` 构造 `AV.File`
+
+:::note
+
+通过 Node.js `require` 方法引入的 SDK 与通过浏览器 `script` 标签引入的 SDK 是两个不同的 SDK，需要各自分别初始化，并且不能混用。
+
+:::
+
+### 其他平台
+
+SDK 提供了平台无关的的版本以支持其他平台。所有平台相关的 API 被抽象成了可配置的 Adapters，在目标平台引入 SDK 后还需要配置目标平台的 Adapters。假设在 npm 上存在某平台（xyz）的 adapters package（`platform-adapters-xyz`），需要通过以下方式配置 SDK：
+
+<Tabs groupId="js-sdk">
+<TabItem value="存储服务" label="存储服务" default>
+
+```js
+const AV = require("leancloud-storage/core");
+const adapters = require("platform-adapters-xyz");
+AV.setAdapters(adapters);
+```
+
+</TabItem>
+<TabItem value="存储服务（LiveQuery）" label="存储服务（LiveQuery）">
+
+```js
+const AV = require("leancloud-storage/live-query-core");
+const adapters = require("platform-adapters-xyz");
+AV.setAdapters(adapters);
+```
+
+</TabItem>
+<TabItem value="即时通讯" label="即时通讯">
+
+```js
+const { Realtime, setAdapters } = require("leancloud-realtime/im");
+const adapters = require("platform-adapters-xyz");
+setAdapters(adapters);
+```
+
+</TabItem>
+<TabItem value="即时通讯（含富媒体消息）" label="即时通讯（含富媒体消息）">
+
+```js
+const AV = require("leancloud-storage/core");
+const { Realtime, setAdapters } = require("leancloud-realtime/im");
+const {
+  TypedMessagesPlugin,
+  ImageMessage,
+} = require("leancloud-realtime-plugin-typed-messages");
+const adapters = require("platform-adapters-xyz");
+AV.setAdapters(adapters);
+setAdapters(adapters);
+```
+
+</TabItem>
+</Tabs>
+
+对于不支持使用 npm 管理依赖的运行环境，SDK 同时也提供了预编译好的 UMD 类型文件：
+
+<Tabs groupId="js-sdk">
+<TabItem value="存储服务" label="存储服务" default>
+
+<CodeBlock>
+  {`https://code.bdstatic.com/npm/leancloud-storage@${sdkVersions.leancloud.js.storage}/dist/av-core-min.js`}
+</CodeBlock>
+
+</TabItem>
+<TabItem value="存储服务（LiveQuery）" label="存储服务（LiveQuery）">
+
+<CodeBlock>
+  {`https://code.bdstatic.com/npm/leancloud-storage@${sdkVersions.leancloud.js.storage}/dist/av-live-query-core-min.js`}
+</CodeBlock>
+
+</TabItem>
+<TabItem value="即时通讯" label="即时通讯">
+
+<CodeBlock>
+  {`https://code.bdstatic.com/npm/leancloud-realtime@${sdkVersions.leancloud.js.realtime}/dist/im.min.js`}
+</CodeBlock>
+
+</TabItem>
+<TabItem value="即时通讯（含富媒体消息）" label="即时通讯（含富媒体消息）">
+
+```
+// 不支持该方式
+```
+
+</TabItem>
+</Tabs>
+
+开发者可以自行实现目标平台的 Adapters 来适配该平台。Adapters 的接口定义可以在 package [`@leancloud/adapter-types`](https://unpkg.com/browse/@leancloud/adapter-types/types.d.ts) 中找到。你也可以通过关键字 [`platform-adapters`](https://www.npmjs.com/search?q=keywords:platform-adapters) 查找社区中其他开发者贡献的 Adapters。
+
+## 初始化
+
+无论是通过 npm 安装还是直接通过 CDN 加载，初始化的方法都是一样的。
+
+<Conditional brand="tds">
+
+<Tabs groupId="js-sdk">
+<TabItem value="存储服务" label="存储服务" default>
+
+```js
+AV.init({
+  appId: "your-client-id",
+  appKey: "your-client-token",
+  serverURL: "https://your_server_url",
+});
+```
+
+</TabItem>
+<TabItem value="存储服务（LiveQuery）" label="存储服务（LiveQuery）">
+
+```js
+AV.init({
+  appId: "your-client-id",
+  appKey: "your-client-token",
+  serverURL: "https://your_server_url",
+});
+```
+
+</TabItem>
+<TabItem value="即时通讯" label="即时通讯">
+
+```js
+const realtime = new Realtime({
+  appId: "your-client-id",
+  appKey: "your-client-token",
+  server: "https://your_server_url",
+});
+```
+
+</TabItem>
+<TabItem value="即时通讯（含富媒体消息）" label="即时通讯（含富媒体消息）">
+
+```js
+const realtime = new Realtime({
+  appId: "your-client-id",
+  appKey: "your-client-token",
+  server: "https://your_server_url",
+  // 初始化即时通讯服务时需要指定富媒体消息插件
+  plugins: [TypedMessagesPlugin],
+});
+// 需要同时初始化存储服务
+AV.init({
+  appId: "your-client-id",
+  appKey: "your-client-token",
+  serverURL: "https://your_server_url",
+});
+```
+
+</TabItem>
+</Tabs>
+
+</Conditional>
+
+<Conditional brand="leancloud">
+
+<Tabs groupId="js-sdk">
+<TabItem value="存储服务" label="存储服务" default>
+
+```js
+AV.init({
+  appId: "your-app-id",
+  appKey: "your-app-key",
+  serverURL: "https://your_server_url",
+});
+```
+
+</TabItem>
+<TabItem value="存储服务（LiveQuery）" label="存储服务（LiveQuery）">
+
+```js
+AV.init({
+  appId: "your-app-id",
+  appKey: "your-app-key",
+  serverURL: "https://your_server_url",
+});
+```
+
+</TabItem>
+<TabItem value="即时通讯" label="即时通讯">
+
+```js
+const realtime = new Realtime({
+  appId: "your-app-id",
+  appKey: "your-app-key",
+  server: "https://your_server_url",
+});
+```
+
+</TabItem>
+<TabItem value="即时通讯（含富媒体消息）" label="即时通讯（含富媒体消息）">
+
+```js
+const realtime = new Realtime({
+  appId: "your-app-id",
+  appKey: "your-app-key",
+  server: "https://your_server_url",
+  // 初始化即时通讯服务时需要指定富媒体消息插件
+  plugins: [TypedMessagesPlugin],
+});
+// 需要同时初始化存储服务
+AV.init({
+  appId: "your-app-id",
+  appKey: "your-app-key",
+  serverURL: "https://your_server_url",
+});
+```
+
+</TabItem>
+</Tabs>
+
+</Conditional>
+
+### 应用凭证
+
+<AppConfig />
+
+## 域名
+
+<DomainBinding />
+
+## 开启调试日志
+
+在应用开发阶段，你可以选择开启 SDK 的调试日志（debug log）来方便追踪问题。调试日志开启后，SDK 会把网络请求、错误消息等信息输出到 IDE 的日志窗口，或是浏览器 Console 或是云引擎日志（如果在云引擎下运行 SDK）。
+
+如果是在 Node.js 中运行，可以通过在启动应用时设置环境变量来打印调试日志（下面假设启动应用的命令是 `npm start`）：
+
+<Tabs groupId="js-sdk">
+<TabItem value="存储服务" label="存储服务" default>
+
+```
+DEBUG=leancloud* npm start
+```
+
+</TabItem>
+<TabItem value="存储服务（LiveQuery）" label="存储服务（LiveQuery）">
+
+```
+DEBUG=leancloud*,LC* npm start
+```
+
+</TabItem>
+<TabItem value="即时通讯" label="即时通讯">
+
+```
+DEBUG=LC* npm start
+```
+
+</TabItem>
+<TabItem value="即时通讯（含富媒体消息）" label="即时通讯（含富媒体消息）">
+
+```
+DEBUG=LC* npm start
+```
+
+</TabItem>
+</Tabs>
+
+如果是在浏览器中运行，可以通过设置 `localStorage` 来让日志打印到浏览器控制台：
+
+<Tabs groupId="js-sdk">
+<TabItem value="存储服务" label="存储服务" default>
+
+```
+localStorage.setItem('debug', 'leancloud*');
+```
+
+</TabItem>
+<TabItem value="存储服务（LiveQuery）" label="存储服务（LiveQuery）">
+
+```
+localStorage.setItem('debug', 'leancloud*,LC*');
+```
+
+</TabItem>
+<TabItem value="即时通讯" label="即时通讯">
+
+```
+localStorage.setItem('debug', 'LC*');
+```
+
+</TabItem>
+<TabItem value="即时通讯（含富媒体消息）" label="即时通讯（含富媒体消息）">
+
+```
+localStorage.setItem('debug', 'LC*');
+```
+
+</TabItem>
+</Tabs>
+
+除了在 Node.js 中使用环境变量，在浏览器中使用 localStorage 启用调试模式外，新版本的 SDK 还支持在代码中启用、停用调试模式。
+
+<Tabs groupId="js-sdk">
+<TabItem value="存储服务" label="存储服务" default>
+
+```js
+// 需要 SDK 版本 >= v3.14.0
+const AV = require("leancloud-storage");
+AV.debug.enable(); // 启用
+AV.debug.disable(); // 停用
+```
+
+</TabItem>
+<TabItem value="存储服务（LiveQuery）" label="存储服务（LiveQuery）">
+
+```js
+// 需要 SDK 版本 >= v3.14.0
+const AV = require("leancloud-storage");
+AV.debug.enable(); // 启用
+AV.debug.disable(); // 停用
+```
+
+</TabItem>
+<TabItem value="即时通讯" label="即时通讯">
+
+```js
+// 需要 SDK 版本 >= v5.0.0-alpha.1
+const { debug } = require("leancloud-realtime");
+debug.enable(); // 启用
+debug.disable(); // 停用
+```
+
+</TabItem>
+<TabItem value="即时通讯（含富媒体消息）" label="即时通讯（含富媒体消息）">
+
+```js
+// 需要 SDK 版本 >= v5.0.0-alpha.1
+const { debug } = require("leancloud-realtime");
+debug.enable(); // 启用
+debug.disable(); // 停用
+```
+
+</TabItem>
+</Tabs>
+
+:::caution
+在应用发布之前，请关闭调试日志，以免暴露敏感数据。
+:::
+
+## 验证
+
+首先，确认本地网络环境是可以访问云端服务器的，可以执行以下命令：
+
+```sh
+curl "https://{{host}}/1.1/date"
+```
+
+`{{host}}` 为绑定的 API 自定义域名。
+
+如果当前网络正常会返回当前时间：
+
+```json
+{ "__type": "Date", "iso": "2020-10-12T06:46:56.000Z" }
+```
+
+然后在项目中编写如下测试代码：
+
+```js
+const TestObject = AV.Object.extend("TestObject");
+const testObject = new TestObject();
+testObject.set("words", "Hello world!");
+testObject.save().then((testObject) => {
+  console.log("保存成功。");
+});
+```
+
+保存后运行程序。
+
+然后打开 **<Path to="storage" /> > 结构化数据 > `TestObject`**，如果看到数据表中出现一行「words」列的值为「Hello world!」的数据，说明 SDK 已经正确地执行了上述代码，配置完毕。
+
+如果控制台没有发现对应的数据，请参考 [问题排查](#问题排查)。
+
+## 问题排查
+
+SDK 安装指南基于当前最新版本的 SDK 编写，所以排查问题前，请先检查下安装的 SDK 是不是最新版本。
+
+### `401 Unauthorized`
+
+如果 SDK 抛出 `401` 异常或者查看本地网络访问日志存在：
+
+```json
+{
+  "code": 401,
+  "error": "Unauthorized."
+}
+```
+
+则可认定为 App ID 或者 `App Key` 输入有误，或者是不匹配，很多开发者同时注册了多个应用，导致拷贝粘贴的时候，用 A 应用的 App ID 匹配 B 应用的 `App Key`，这样就会出现服务端鉴权失败的错误。
+
+### 客户端无法访问网络
+
+客户端尤其是手机端，应用在访问网络的时候需要申请一定的权限。

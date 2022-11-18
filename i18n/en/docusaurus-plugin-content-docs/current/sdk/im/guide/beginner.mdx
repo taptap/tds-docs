@@ -46,7 +46,7 @@ See [Instant Messaging Overview](/sdk/im/guide/overview/) for more details.
 
 Assuming that there is a user named "Tom". Now let's create an `IMClient` instance for him (make sure you have already initialized the SDK):
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 LCIMClient tom = new LCIMClient("Tom");
@@ -107,7 +107,7 @@ Only clients that are logged in can chat with other users and receive notificati
 
 For some SDKs (like the C# SDK), the client will be automatically logged in when the `IMClient` instance is created; for others (like iOS and Android SDKs), the client needs to be logged in manually with the `open` method:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 await tom.Open();
@@ -186,7 +186,7 @@ await tom.open();
 
 Besides specifying a `clientId` on the application layer, you can also log in directly by creating an `IMClient` with a `_User` object. By doing so, the signing process for logging in can be skipped which helps you easily integrate Data Storage with Instant Messaging:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var user = await LCUser.Login("USER_NAME", "PASSWORD");
@@ -280,7 +280,7 @@ A `Conversation` needs to be created before a user can chat with others.
 
 Since Tom is already logged in, he can start chatting with other users now. If he wants to chat with Jerry, he can create a `Conversation` containing Jerry and himself:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var conversation = await tom.CreateConversation(new string[] { "Jerry" }, name: "Tom & Jerry", unique: true);
@@ -348,7 +348,7 @@ try {
 
 `createConversation` creates a new conversation and stores it into the `_Conversation` table which can be found on **Developer Center > Your game > Game Services > Cloud Services > Data Storage > Data**. Below are the interfaces offered by different SDKs for creating conversations:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 /// <summary>
@@ -595,7 +595,7 @@ The built-in properties of a conversation can be retrieved once the conversation
 
 Now that the conversation is created, Tom can start sending messages to it:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var textMessage = new LCIMTextMessage("Get up, Jerry!");
@@ -671,7 +671,7 @@ So how would Jerry see the message on his device?
 
 On another device, we create an `IMClient` with `Jerry` as `clientId` and log in to the server (just as how we did for Tom):
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var jerry = new LCIMClient("Jerry");
@@ -741,7 +741,7 @@ By setting up callbacks, clients will be able to handle notifications sent from 
 
 Now let's see how clients should handle such notifications. The code below handles both "joining conversation" and "getting new message" events for Jerry:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 jerry.OnInvited = (conv, initBy) => {
@@ -896,7 +896,7 @@ There aren't many differences between the two types of conversations and a major
 
 In the previous conversation between Tom and Jerry (assuming conversation ID to be `CONVERSATION_ID`), if Tom wants to add Mary into the conversation, the following code can be used:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 // Get the conversation with ID
@@ -1005,7 +1005,7 @@ try {
 
 On Jerry's side, he can add a listener for handling events regarding "new members being added". With the code below, he will be notified once Tom invites Mary to the conversation:
 
-<MultiLang>
+<MultiLang kind="im">
 <>
 
 ```cs
@@ -1139,7 +1139,7 @@ On Mary's side, to know that she is added to the conversation between Tom and Je
 
 If Tom wants to **create a new conversation with all the members included**, the following code can be used:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var conversation = await tom.CreateConversation(new string[] { "Jerry","Mary" }, name: "Tom & Jerry & friends", unique: true);
@@ -1212,7 +1212,7 @@ In a group chat, if a member sends a message, the message will be delivered to a
 
 For example, if Tom sends a welcome message to the group:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var textMessage = new LCIMTextMessage("Welcome everyone!");
@@ -1279,7 +1279,7 @@ Both Jerry and Mary will have the `Event.MESSAGE` event triggered which can be u
 
 One day Mary said something that made Tom angry and Tom wants to kick her out of the group chat. How should Tom do that?
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 await conversation.RemoveMembers(new string[] { "Mary" });
@@ -1357,7 +1357,7 @@ Cloud-->>Tom: 2. Send notification: Mary is removed
 
 Here we see that Mary receives `KICKED` which indicates that she (the current user) is removed. Other members (Jerry and Tom) will receive `MEMBERS_LEFT` which indicates that someone else in the conversation is removed. Such events can be handled with the following code:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 jerry.OnMembersLeft = (conv, leftIds, kickedBy) => {
@@ -1492,7 +1492,7 @@ jerry.onKicked = ({
 
 Tom is feeling bored after removing Mary. He goes to William and tells him that there is a group chat that Jerry and himself are in. He gives the ID (or name) of the group chat to William which makes him curious about what's going on in it. William then adds himself to the group:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var conv = await william.GetConversation("CONVERSATION_ID");
@@ -1596,7 +1596,7 @@ Cloud-->>Jerry: 2. Sends notification: William joined the conversation
 
 Other members can listen to `MEMBERS_JOINED` to know that William joined the conversation:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 jerry.OnMembersJoined = (conv, memberList, initBy) => {
@@ -1663,7 +1663,7 @@ jerry.onMembersJoined = ({
 
 With more and more people being invited by Tom, Jerry feels that he doesn't like most of them and wants to leave the conversation. He can do that with the following code:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 await conversation.Quit();
@@ -1736,7 +1736,7 @@ Cloud-->>Tom: 2. Sends notification: Jerry left the conversation
 
 Other members can listen to `MEMBERS_LEFT` to know that Jerry left the conversation:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 mary.OnMembersLeft = (conv, members, initBy) => {
@@ -1803,7 +1803,7 @@ The sequence diagrams displayed earlier already described what would happen when
 
 Assuming that Tom and Jerry are already in the conversation:
 
-<MultiLang>
+<MultiLang kind="im">
 <>
 
 | Operation        | Tom               | Jerry             | Mary        | William           |
@@ -1861,7 +1861,7 @@ The following message types are offered by default:
 
 All of them are derived from `LCIMMessage`, with the following properties available for each:
 
-<MultiLang>
+<MultiLang kind="im">
 <>
 
 | Name               | Type                            | Description                                                                                                                                                                                                                                          |
@@ -1977,7 +1977,7 @@ Notes:
 
 The diagram above may look complicated, but the code itself is quite simple since the image gets automatically uploaded when being sent with the `send` method:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var image = new LCFile("screenshot.png", new Uri("http://example.com/screenshot.png"));
@@ -2077,7 +2077,7 @@ try {
 
 Besides sending an image directly, a user may also copy the URL of an image from somewhere else and send it to a conversation:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var image = new LCFile("girl.gif", new Uri("http://example.com/girl.gif"));
@@ -2170,7 +2170,7 @@ try {
 
 The way to receive image messages is similar to that of basic messages. The only thing that needs to be added is to have the callback function retrieve the image and render it on the UI. For example:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 client.OnMessage = (conv, msg) => {
@@ -2292,7 +2292,7 @@ When **constructing a file with an external URL**:
 
 For example, when sending an audio message, the basic workflow would be: read the audio file (or record a new one) > construct an audio message > send the message.
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var audio = new LCFile("never-gonna-give-you-up.mp3", Path.Combine(Application.persistentDataPath, "never-gonna-give-you-up.mp3"));
@@ -2391,7 +2391,7 @@ try {
 
 Similar to image messages, you can construct audio messages from URLs as well:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var audio = new LCFile("apple.aac", new Uri("https://some.website.com/apple.aac"));
@@ -2482,7 +2482,7 @@ try {
 
 The code below sends a message containing a location:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var location = new LCGeoPoint(31.3753285, 120.9664658);
@@ -2563,7 +2563,7 @@ try {
 
 ### Back to Receiving Messages
 
-<MultiLang>
+<MultiLang kind="im">
 <>
 
 The C# SDK handles new messages with `OnMessage` event callbacks:
@@ -2924,7 +2924,7 @@ We will cover more about it in [the second chapter](/sdk/im/guide/intermediate/)
 
 A `Conversation` object holds some built-in properties which match the fields in the `_Conversation` table. The table below shows these **built-in** properties:
 
-<MultiLang>
+<MultiLang kind="im">
 
 | Property of `AVIMConversation` | Field in `_Conversation` | Description                                                                                                                                                |
 | ------------------------------ | ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -3064,7 +3064,7 @@ When introducing [one-on-one conversations](#creating-conversations), we mention
 
 Assume that we need to add two properties `{ "type": "private", "pinned": true }` to a conversation we are creating. We can do so by passing in the properties when calling `IMClient#createConversation`:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var properties = new Dictionary<string, object> {
@@ -3159,7 +3159,7 @@ try {
 
 The built-in properties (like `name`) of a `Conversation` object can be updated by all the members unless you set restrictions in your app:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 await conversation.UpdateInfo(new Dictionary<string, object> {
@@ -3223,7 +3223,7 @@ try {
 
 Custom attributes can also be retrieved or updated by all the members:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 // Retrieve custom attribute
@@ -3313,7 +3313,7 @@ The properties of a conversation (like name) are shared by everyone in it. If so
 
 Instant Messaging offers the mechanism that automatically delivers the change made by a user to a conversation to all the members in it (for those who are offline, they will receive updates once they get online):
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 jerry.OnConversationInfoUpdated = (conv, attrs, initBy) => {
@@ -3394,7 +3394,7 @@ You can either retrieve the properties being updated from the callback function 
 
 To get the list of members in a conversation, we can call the method for fetching on a `Conversation` object and then get the result from it:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 await conversation.Fetch();
@@ -3463,7 +3463,7 @@ There are more ways to get a `Conversation` besides listening to incoming events
 
 Here ID refers to the `objectId` in the `_Conversation` table. Since IDs are indexed, querying by ID is the easiest and most efficient way to look for a conversation:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var query = tom.GetQuery();
@@ -3543,7 +3543,7 @@ There are a variety of ways for you to look for conversations that satisfy certa
 
 Let's start with `equalTo` which is the simplest method for querying conversations. The code below looks for all the conversations that have `type` (a string field) to be `private`:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var query = tom.GetQuery()
@@ -3624,7 +3624,7 @@ The interface for querying conversations is very similar to that for querying ob
 
 You can also apply conditions like "greater than", "greater than or equal to", "less than", and "less than or equal to" to `Number` and `Date` fields:
 
-<MultiLang>
+<MultiLang kind="im">
 
 | Logic                    | `AVIMConversationQuery` Method |
 | ------------------------ | ------------------------------ |
@@ -3681,7 +3681,7 @@ When querying conversations, if there isn't any `where` condition specified, `Co
 
 You can use regular expressions as conditions when querying with `ConversationsQuery`. For example, to look for all the conversations that have `language` to be a Chinese character:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 query.WhereMatches("language", "[\\u4e00-\\u9fa5]"); // language is a Chinese character
@@ -3713,7 +3713,7 @@ try conversationQuery.where("language", .matchedRegularExpression("[\\u4e00-\\u9
 
 You can look for conversations with string values that **start with** a particular string, which is similar to `LIKE 'keyword%'` in SQL. For example, to look for all the conversations with names starting with `education`:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 query.WhereStartsWith("name", "education");
@@ -3743,7 +3743,7 @@ try conversationQuery.where("name", .prefixedBy("education"))
 
 You can also look for conversations with string values that **include** a particular string, which is similar to `LIKE '%keyword%'` in SQL. For example, to look for all the conversations with names including `education`:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 query.WhereContains("name", "education");
@@ -3773,7 +3773,7 @@ try conversationQuery.where("name", .matchedSubstring("education"))
 
 If you want to look for conversations with string values that **exclude** a particular string, you can use [regular expressions](#using-regular-expressions). For example, to look for all the conversations with names excluding `education`:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 query.WhereMatches("name", "^((?!education).)* $ ");
@@ -3806,7 +3806,7 @@ try conversationQuery.where("name", .matchedRegularExpression("^((?!education).)
 
 You can use `containsAll`, `containedIn`, and `notContainedIn` to perform queries on array values. For example, to look for all the conversations containing `Tom`:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var members = new List<string> { "Tom" };
@@ -3839,7 +3839,7 @@ try conversationQuery.where("m", .containedIn(["Tom"]))
 
 You can look for conversations with or without certain fields to be empty. For example, to look for all the conversations with `lm` to be empty:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 query.WhereDoesNotExist("lm");
@@ -3869,7 +3869,7 @@ try conversationQuery.where("lm", .notExisted)
 
 Or, to look for all the conversations with `lm` not to be empty:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 query.WhereExists("lm");
@@ -3901,7 +3901,7 @@ try conversationQuery.where("lm", .existed)
 
 To look for all the conversations with `age` to be less than `18` and `keywords` containing `education`:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 query.WhereContains("keywords", "education")
@@ -3937,7 +3937,7 @@ You can also combine two queries with `and` or `or` to form a new query.
 
 For example, to look for all the conversations that either have `age` to be less than `18` or have `keywords` containing `education`:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 // Not supported yet
@@ -3991,7 +3991,7 @@ do {
 
 You can sort the results of a query by ascending or descending order on certain fields. For example:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 query.OrderByDescending("createdAt");
@@ -4024,7 +4024,7 @@ try conversationQuery.where("createdAt", .descending)
 
 When searching conversations, you can exclude the lists of members from query results if you don't need them. By doing so, their `members` fields will become empty arrays. This helps you improve the speed of your app and reduces the network traffic needed.
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 query.Compact = true;
@@ -4056,7 +4056,7 @@ query.excludeMembers = true;
 
 Many chatting apps show the latest message of each conversation in the conversation list. If you want a similar function in your app, you can turn on the option when querying conversations:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 query.WithLastMessageRefreshed = true;
@@ -4089,7 +4089,7 @@ Keep in mind that what this option really does is to refresh the latest messages
 
 ### Caching Results
 
-<MultiLang>
+<MultiLang kind="im">
 <>
 
 Not supported yet.
@@ -4270,7 +4270,7 @@ Our SDKs offer various ways for you to retrieve message histories. iOS and Andro
 
 The most common way to retrieve messages is to fetch them from new to old with the help of pagination:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 // limit could be any number from 1 to 100 (defaults to 20)
@@ -4343,7 +4343,7 @@ try {
 
 Here `queryMessage` supports pagination. Given the fact that you can locate a single message with its `messageId` and timestamp, this means that you can retrieve the next few messages after a given message by providing the `messageId` and timestamp of that message:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 // limit could be any number from 1 to 1000 (defaults to 100)
@@ -4474,7 +4474,7 @@ Besides retrieving messages in time orders, you can also do that based on the ty
 
 `queryMessage` can take in the type of messages:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 // Pass in a generic type parameter and the SDK will automatically read the type and send it to the server for searching messages
@@ -4538,7 +4538,7 @@ To retrieve more images, follow the way introduced in the previous section to go
 
 Besides the two ways mentioned above, you can also retrieve messages from old to new. The code below shows how you can retrieve messages starting from the time the conversation is created:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var earliestMessages = await conversation.QueryMessages(direction: LCIMMessageQueryDirection.OldToNew);
@@ -4611,7 +4611,7 @@ You can retrieve messages starting from a given message (determined by ID and ti
 
 Now we can implement pagination in different directions.
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var earliestMessages = await conversation.QueryMessages(direction: LCIMMessageQueryDirection.OldToNew, limit: 1);
@@ -4700,7 +4700,7 @@ Besides retrieving messages chronologically, you can also retrieve messages with
 
 Note: **The limit of 100 messages per query still applies here. To fetch more messages, keep changing the starting point or the ending point until all the messages are retrieved.**
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var earliestMessage = await conversation.QueryMessages(direction: LCIMMessageQueryDirection.OldToNew, limit: 1);
@@ -4804,7 +4804,7 @@ iOS and Android SDKs come with a mechanism that automatically caches all the mes
 
 Caching is enabled by default. You can turn it off with the following interface:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 // Not supported yet
@@ -4872,7 +4872,7 @@ do {
 
 If your app allows users to log out, you can use the `close` method provided by `LCIMClient` to properly close the connection to the cloud:
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 await tom.Close();
@@ -4931,7 +4931,7 @@ The availability of the messaging service is highly dependent on the Internet co
 
 Our SDKs maintain a heartbeat mechanism with the cloud which detects the change of network status and have your app notified if certain events occur. To be specific, if the connection status changes (becomes lost or recovered), the following events will be populated:
 
-<MultiLang>
+<MultiLang kind="im">
 <>
 
 The following events will be populated on `LCIMClient`:
