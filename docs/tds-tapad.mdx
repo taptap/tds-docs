@@ -1,5 +1,5 @@
 ---
-title: 广告开发指南
+title: TapADN SDK 接入指南
 ---
 
 <head>
@@ -13,13 +13,13 @@ import { Conditional } from "/src/docComponents/conditional";
 
 ## SDK 配置
 
-可以在 [下载页](/tap-download) 获得 TapSDK，引入广告模块。
+<!--可以在 [下载页](/tap-download) 获得 TapSDK，引入广告模块。-->
 
 <MultiLang>
 
 <>
 
-Unity 模块是通过引入Android 模块后增加桥接文件打包出的 `.unitypackage`，方便以 Unity 开发的游戏直接引入。其他引擎/平台的游戏可以通过 Android 原生的方式接入，详见 Android 接入文档。
+Unity 模块是通过引入 Android 模块后增加桥接文件打包出的 `.unitypackage`，方便以 Unity 开发的游戏直接引入。其他引擎/平台的游戏可以通过 Android 原生的方式接入，详见 Android 接入文档。
 
 **开发环境要求**：
 
@@ -95,11 +95,11 @@ dependencies {
 
 最低支持 Android 5.0（API level 21），编译环境为 Android Studio。
 
-<ul>
-<li>将 <strong>防沉迷 SDK</strong> <code>TapAD_{sdkVersions.taptap.android}.aar</code> 拷贝到游戏目录下的 <code>src/main/libs</code> 目录中</li>
-</ul>
+<p>
+将 <code>TapAD_{sdkVersions.taptap.android}.aar</code> 拷贝到游戏目录下的 `src/main/libs` 目录中。
+</p>
 
-在游戏目录下 `build.gradle` 文件中添加代码
+在游戏目录下 `build.gradle` 文件中添加代码：
 
 <CodeBlock className="groovy">
 {`repositories{
@@ -109,7 +109,7 @@ dependencies {
 }
 dependencies {
     // ...
-    implementation(name: "TapAD_${sdkVersions.taptap.ios}", ext: "aar") // 广告 sdkVersions
+    implementation(name: "TapAD_${sdkVersions.taptap.ios}", ext: "aar") // 广告 SDK
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
     implementation 'io.reactivex.rxjava2:rxjava:2.0.1'
     implementation 'com.squareup.okhttp3:okhttp:3.12.1'
@@ -452,14 +452,15 @@ TapAdManager.get().uploadUserAction(userActions, new Callback() {
 开屏广告为用户在进入 App 时展示的全屏广告。开屏广告为一个 `View`，宽高默认为 `match_parent`。
 
 :::info
-竖屏开屏广告 `view` 要求 width = 屏幕宽，height 需要 >= 75% 屏幕高 ，否则会影响计费。
-横屏开屏广告 `view` 要求 width = 屏幕宽，height 需要 = 屏幕高
+竖屏开屏广告 `view` 要求 width = 屏幕宽，height 需要 >= 75% 屏幕高，否则会影响计费。
+
+横屏开屏广告 `view` 要求 width = 屏幕宽，height 需要 = 屏幕高，否则会影响计费。
 :::
 
-建议业务逻辑
+建议业务逻辑：
 
-1. 每次启动应用的时候调用sdk接口请求开屏广告
-2. SDK 会根据一定规则从候选队列里选取一个返回给游戏，获取成功就可以展示，获取失败的话本次不展示广告
+1. 每次启动应用的时候调用 SDK 接口请求开屏广告。
+2. SDK 会根据一定规则从候选队列里选取一个返回给游戏，获取成功就可以展示，获取失败的话本次不展示广告。
 
 ### 获取广告
 
@@ -611,11 +612,11 @@ splashAd.show(this);
 
 ## 激励视频广告 {#TapRewardVideoAd}
 
-激励视频是一种全屏播放的视频广告，用户可以在观看完整的视频后获取奖励,视频广告播放结束后会显示结束页面，引导用户进行后续动作。目前激励视频广告的表现形式为：视频播放完展示Endcard页面。
+激励视频是一种全屏播放的视频广告，用户可以在观看完整的视频后获取奖励,视频广告播放结束后会显示结束页面，引导用户进行后续动作。目前激励视频广告的表现形式为：视频播放完展示 Endcard 页面。
 
 使用场景包括但不限于：
 
-1. 游戏等应用内观看视频广告获得游戏内金币等；
+1. 游戏等应用内观看视频广告获得游戏内金币等。
 2. 积分类应用接入。
 
 :::info 支持的广告尺寸
@@ -680,7 +681,7 @@ public interface ICommonLoadListener
 <>
 
 ```java
-// 注意，一个Activity中只需要创建一个 TapAdNative对象
+// 注意，一个 Activity 中只需要创建一个 TapAdNative 对象
 TapAdNative tapAdNative = TapAdManager.get().createAdNative(activity);
 
 AdRequest adRequest = new AdRequest.Builder()
@@ -704,7 +705,7 @@ tapAdNative.loadRewardVideoAd(adRequest, new TapAdNative.RewardVideoAdListener()
 
     @Override
     public void onRewardVideoCached(TapRewardVideoAd rewardVideoAd) {
-        // 获取广告素材成功，可以展示广告，如果没有选择在 `RewardVideoAdLoad` 时展示广告。（更建议在这个回调中展示广告，体验更好）
+        // 获取广告素材成功，可以展示广告，如果没有选择在 RewardVideoAdLoad 时展示广告。（更建议在这个回调中展示广告，体验更好）
     }
 });
 ```
@@ -799,7 +800,7 @@ rewardAd.setRewardAdInteractionListener(new TapRewardVideoAd.RewardAdInteraction
 
     @Override
     public void onRewardVerify(boolean rewardVerify, int rewardAmount, String rewardName, int code, String msg) {
-        // 激励任务已完成，游戏可以选择在此时进行玩家奖励，或者进一步通过s2s的流程来确认是否可以对当前玩家发放奖励
+        // 激励任务已完成，游戏可以选择在此时进行玩家奖励，或者进一步通过 s2s 的流程来确认是否可以对当前玩家发放奖励
     }
 
     @Override
@@ -877,9 +878,9 @@ public interface ICommonLoadListener
 <>
 
 ```java
-// 注意，一个Activity中只需要创建一个 TapAdNative对象
+// 注意，一个 Activity 中只需要创建一个 TapAdNative 对象
 TapAdNative tapAdNative = TapAdManager.get().createAdNative(activity);
-// 广告后台获取广告位id
+// 广告后台获取广告位 id
 int spaceId = "your_space_id";
 tapAdNative.loadBannerAd(new AdRequest.Builder().withSpaceId(spaceId).build(), new TapAdNative.BannerAdListener() {
     @Override
@@ -889,7 +890,7 @@ tapAdNative.loadBannerAd(new AdRequest.Builder().withSpaceId(spaceId).build(), n
 
     @Override
     public void onBannerAdLoad(TapBannerAd bannerAd) {
-        // 获取广告成功，可以调用播放广告接口进行播放（**注意** banner 广告的获取和播放需要在同一个activity中）
+        // 获取广告成功，可以调用播放广告接口进行播放（**注意** banner 广告的获取和播放需要在同一个 activity 中）
     }
 });
 ```
@@ -954,12 +955,12 @@ public interface ICommonInteractionListener
 bannerAd.setBannerInteractionListener(new TapBannerAd.BannerInteractionListener() {
     @Override
     public void onAdClose() {
-        // 广告已关闭（玩家可以手动点击关闭banner广告）
+        // 广告已关闭（玩家可以手动点击关闭 banner 广告）
     }
 
     @Override
     public void onAdClick() {
-        // 玩家点击了banner广告
+        // 玩家点击了 banner 广告
     }
 
     @Override
