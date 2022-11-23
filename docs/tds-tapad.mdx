@@ -92,7 +92,36 @@ dependencies {
 </>
 
 <>
+<>
 
+最低支持 Android 5.0（API level 21），编译环境为 Android Studio。
+
+<ul>
+<li>将 <strong>防沉迷 SDK</strong> <code>TapAD_{sdkVersions.taptap.android}.aar</code> 拷贝到游戏目录下的 <code>src/main/libs</code> 目录中</li>
+</ul>
+
+在游戏目录下 `build.gradle` 文件中添加代码
+
+<CodeBlock className="groovy">
+{`repositories{
+    flatDir{   
+        dirs 'src/main/libs'
+    }
+}
+dependencies {
+    // ...
+    implementation(name: "TapAD_${sdkVersions.taptap.ios}", ext: "aar") // 广告 sdkVersions
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    implementation 'io.reactivex.rxjava2:rxjava:2.0.1'
+    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
+    implementation "com.android.support:appcompat-v7:28.0.0"
+    implementation "com.android.support:support-annotations:28.0.0"
+    implementation "com.android.support:support-v4:28.0.0"
+    implementation "com.github.bumptech.glide:glide:4.0.0"
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    // ...
+}`}
+</CodeBlock>
 
 </>
 
@@ -123,7 +152,9 @@ TapAdSdk.RequestPermissionIfNecessary();
 </>
 
 <>
-
+```java
+TapAdManager.get().requestPermissionIfNecessary(activity);
+```
 </>
 
 <>
@@ -233,7 +264,90 @@ public sealed class CustomUser
 </>
 
 <>
+```java
+TapAdConfig config = new TapAdConfig.Builder()
+                .withAppId(appId)              // 必选参数，后台获得 appId 
+                .withAppName(appName)          // 必选参数，后台获得 appName  
+                .withKey(key)                  // 必须参数，后台获得 App 加密 key
+                .enableDebug(true)             // 可选参数，是否打开 debug 调试信息输出：true 打开、false 关闭。默认 false 关闭
+                .withVersion(version)          // 必须参数，版本
+                .withGameChannel(channelName)  // 必须参数，渠道
+                .withCustomController(new TapAdCustomController() {
 
+                    // 是否允许 SDK 主动使用地理位置信息
+                    @Override
+                    public boolean isCanUseLocation() {
+                        return enableGetLocation;
+                    }
+
+                    // 当 isCanUseLocation=false 时，可传入地理位置信息，TapAd 使用您传入的地理位置信息
+                    @Override
+                    public TapAdLocation getTapAdLocation() {
+                        return new TapAdLocation(longitude, latitude, accuracy);
+                    }
+
+                    // 是否允许SDK主动使用手机硬件参数，如 imei
+                    @Override
+                    public boolean isCanUsePhoneState() {
+                        return enableGetPhoneState;
+                    }
+
+                    // 当 isCanUsePhoneState=false 时，可传入 imei 信息，TapAd 使用您传入的 imei 信息
+                    @Override
+                    public String getDevImei() {
+                        return imei;
+                    }
+
+                    // 是否允许 SDK 主动使用 ACCESS_WIFI_STATE 权限
+                    @Override
+                    public boolean isCanUseWifiState() {
+                        return enableGetWifiState;
+                    }
+
+                    // 是否允许 SDK 主动使用 WRITE_EXTERNAL_STORAGE 权限
+                    @Override
+                    public boolean isCanUseWriteExternal() {
+                        return enableWriteExternal;
+                    }
+
+                    // 开发者可以传入 oaid
+                    // 信通院 OAID 的相关采集——如何获取 OAID：
+                    // 1. 移动安全联盟官网 http://www.msa-alliance.cn/
+                    // 2. 信通院统一 SDK 下载 http://msa-alliance.cn/col.jsp?id=120
+                    @Override
+                    public String getDevOaid() {
+                        return oaid;
+                    }
+
+                    // 是否允许 SDK 主动获取设备上应用安装列表的采集权限
+                    @Override
+                    public boolean alist() {
+                        return enableGetAppList;
+                    }
+
+                    // 是否允许 SDK 主动获取 ANDROID_ID
+                    @Override
+                    public boolean isCanUseAndroidId() {
+                        return enableGetAndroidId;
+                    }
+
+                    @Override
+                    public CustomUser provideCustomUser() {
+                        return new CustomUser.Builder()
+                                .withRealAge(age)                   // 年龄
+                                .withRealSex(sex)                   // 性别 0:男 1：女
+                                .withAvatarSex(avatarSex)           // 角色性别 0:男 1：女
+                                .withNewUserStatus(status)          // 是否新玩家 0:否；1:是
+                                .withPayedUserStatus(status)        // 是否付费用户 0:否；1:是
+                                .withBeginMissionFinished(finished) // 是否通过新手教程 0:否 1:是
+                                .withAvatarPayedToolCnt(cnt)        // 角色当前付费道具数量
+                                .build();
+                    }
+                })
+                .build();
+
+TapAdSdk.init(this, config);
+```
 </>
 
 <>
@@ -298,6 +412,29 @@ public interface IUserAction
 
 <>
 
+```java
+UserAction[] userActions = new UserAction[3];
+
+for (int i = 0 ; i < 3; i ++) {
+    UserAction tmp = new UserAction.Builder()
+            .withActionType(i)
+            .withActionTime(System.currentTimeMillis())
+            .withAmount(i * 1000)
+            .withWinStatus(i % 2)
+            .build();
+    userActions[i] = tmp;
+}
+TapAdManager.get().uploadUserAction(userActions, new Callback() {
+    @Override
+    public void onSuccess() {
+        // 上报成功
+    }
+
+    @Override
+    public void onError(AdException exception) {
+        // 上报失败
+    }
+});
 </>
 
 <>
@@ -311,13 +448,14 @@ public interface IUserAction
 开屏广告为用户在进入 App 时展示的全屏广告。开屏广告为一个 `View`，宽高默认为 `match_parent`。
 
 :::info
-开屏广告 `view` 要求 width = 屏幕宽，height 需要 >= 75% 屏幕高 ，否则会影响计费。
+竖屏开屏广告 `view` 要求 width = 屏幕宽，height 需要 >= 75% 屏幕高 ，否则会影响计费。
+横屏开屏广告 `view` 要求 width = 屏幕宽，height 需要 = 屏幕高
 :::
 
 建议业务逻辑
 
-1. 上一次打开 APP，缓存 5 个开屏广告（有顺序）。
-2. 当次打开 APP，先请求服务端，由服务端筛选出哪一个。如果出于离线状态，按照默认顺序出第一个。
+1. 每次启动应用的时候调用sdk接口请求开屏广告
+2. SDK 会根据一定规则从候选队列里选取一个返回给游戏，获取成功就可以展示，获取失败的话本次不展示广告
 
 ### 获取广告
 
@@ -369,7 +507,24 @@ public interface ICommonLoadListener
 </>
 
 <>
+```java
+TapAdNative tapAdNative = TapAdManager.get().createAdNative(activity);
+// 广告后台获取广告位id
+int spaceId = "your_space_id";
+tapAdNative.loadSplashAd(new AdRequest.Builder().withSpaceId(spaceId).build(), new TapAdNative.SplashAdListener() {
 
+    @Override
+    public void onError(int code, String message) {
+        // 获取失败
+    }
+
+    @Override
+    public void onSplashAdLoad(TapSplashAd splashAd) {
+        // 获取成功，可以在这时候播放广告
+
+    }
+});
+```
 </>
 
 <>
@@ -422,7 +577,22 @@ public interface ICommonInteractionListener
 </>
 
 <>
+```java
+// 注册开屏广告交互事件监听
+splashAd.setSplashInteractionListener(new TapSplashAd.AdInteractionListener() {
+    @Override
+    public void onAdSkip() {
+        // 点击了跳过，可以进入游戏
+    }
 
+    @Override
+    public void onAdTimeOver() {
+        // 开屏时间到（开屏页已关闭），可以进入游戏
+    }
+});
+// 展示开屏页
+splashAd.show(this);
+```
 </>
 
 <>
@@ -500,7 +670,35 @@ public interface ICommonLoadListener
 </>
 
 <>
+```java
+// 注意，一个Activity中只需要创建一个 TapAdNative对象
+TapAdNative tapAdNative = TapAdManager.get().createAdNative(activity);
 
+AdRequest adRequest = new AdRequest.Builder()
+                            .withSpaceId("your_space_id")         // 广告后台获取广告位id
+                            .withRewordName("your_reward_name")   // 奖品名称
+                            .rewardAmount("your_reward_amount")   // 奖品数量
+                            .withExtra1("your_extra_info")。      // 游戏如果要通过 s2s 验证激励广告有效性的时候需要传入一些辅助信息来验证本次激励活动是否有效
+                            .withUserId("game_user_id")           // 游戏如果要通过 s2s 验证激励广告有效性的时候需要传入游戏中的玩家id，来验证是否可以对当前用户发放奖励
+                            .build();
+
+tapAdNative.loadRewardVideoAd(adRequest, new TapAdNative.RewardVideoAdListener() {
+    @Override
+    public void onError(int code, String message) {
+        // 获取失败
+    }
+
+    @Override
+    public void onRewardVideoAdLoad(TapRewardVideoAd rewardVideoAd) {
+        // 获取广告成功，可以展示广告
+    }
+
+    @Override
+    public void onRewardVideoCached(TapRewardVideoAd rewardVideoAd) {
+        // 获取广告素材成功，可以展示广告，如果没有选择在 `RewardVideoAdLoad` 时展示广告。（更建议在这个回调中展示广告，体验更好）
+    }
+});
+```
 </>
 
 <>
@@ -565,7 +763,41 @@ public interface ICommonInteractionListener
 </>
 
 <>
+```java
+// 注册激励广告交互事件监听
+rewardAd.setRewardAdInteractionListener(new TapRewardVideoAd.RewardAdInteractionListener() {
+    @Override
+    public void onAdShow() {
+        // 激励广告已显示
+    }
 
+    @Override
+    public void onAdClose() {
+        // 激励广告已经关闭
+    }
+
+    @Override
+    public void onVideoComplete() {
+        // 视频播放结束
+    }
+
+    @Override
+    public void onVideoError() {
+        // 视频出错
+    }
+
+    @Override
+    public void onRewardVerify(boolean rewardVerify, int rewardAmount, String rewardName, int code, String msg) {
+        // 激励任务已完成，游戏可以选择在此时进行玩家奖励，或者进一步通过s2s的流程来确认是否可以对当前玩家发放奖励
+    }
+
+    @Override
+    public void onSkippedVideo() {
+        // 激励广告中玩家点击了跳过视频的按钮
+    }
+});
+rewardAd.showRewardVideoAd(activity);
+```
 </>
 
 <>
@@ -631,7 +863,23 @@ public interface ICommonLoadListener
 </>
 
 <>
+```java
+// 注意，一个Activity中只需要创建一个 TapAdNative对象
+TapAdNative tapAdNative = TapAdManager.get().createAdNative(activity);
+// 广告后台获取广告位id
+int spaceId = "your_space_id";
+tapAdNative.loadBannerAd(new AdRequest.Builder().withSpaceId(spaceId).build(), new TapAdNative.BannerAdListener() {
+    @Override
+    public void onError(int code, String message) {
+        // 获取广告失败
+    }
 
+    @Override
+    public void onBannerAdLoad(TapBannerAd bannerAd) {
+        // 获取广告成功，可以调用播放广告接口进行播放（**注意** banner 广告的获取和播放需要在同一个activity中）
+    }
+});
+```
 </>
 
 <>
@@ -687,7 +935,27 @@ public interface ICommonInteractionListener
 </>
 
 <>
+```java
+bannerAd.setBannerInteractionListener(new TapBannerAd.BannerInteractionListener() {
+    @Override
+    public void onAdClose() {
+        // 广告已关闭（玩家可以手动点击关闭banner广告）
+    }
 
+    @Override
+    public void onAdClick() {
+        // 玩家点击了banner广告
+    }
+
+    @Override
+    public void onDownloadClick() {
+        // 玩家点击了下载按钮
+    }
+});
+
+FrameLayout parentLayout = "your_layout";
+parentLayout.addView(bannerAd.getBannerView());
+```
 </>
 
 <>
