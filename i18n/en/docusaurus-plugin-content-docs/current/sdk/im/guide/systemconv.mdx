@@ -1,0 +1,1428 @@
+---
+title: 4. Hooks and System Conversations
+sidebar_label: Hooks and System Conversations
+sidebar_position: 4
+---
+
+import MultiLang from "/src/docComponents/MultiLang";
+import Mermaid from "/src/docComponents/Mermaid";
+
+## Introduction
+
+In the previous chapter, [Security, Permission Management, Chat Rooms, and Temporary Conversations](/sdk/im/guide/senior/), we introduced our third-party signing mechanism as well as how you can allow owners and managers of a conversation to edit other members’ permissions. In this chapter, we will cover the following functionalities offered by the Instant Messaging service:
+
+- Hooks
+- System conversations
+
+## Hooks
+
+Instant Messaging is built with an open architecture that has strong extensibility, allowing you to do more than implement basic chatting features. Instant Messaging provides a collection of hooks that make it handy for you to utilize such extensibility. We’ll delve into them later in this section.
+
+### The Connection Between Hooks and Instant Messaging
+
+Hooks are a special message-handling mechanism for your app to intercept and process the various types of events and messages sent through it. They allow you to trigger custom logics when these events and messages are sent, enabling you to extend the existing features provided by the Instant Messaging service.
+
+Take **\_messageRecieved** as an example. This hook gets triggered when a message arrives at the server. Within the hook, you can obtain the properties of the message including its content, sender, and receivers. All these properties can be modified within the hook before they get taken over by the server. The server will then complete the delivery of the message with the modified properties and the message seen by the receivers will be the one with the modified properties instead of the original message. The hook can also reject the message so that the message won’t be seen by the receivers anymore.
+
+**Keep in mind that by default, if a hook fails due to timing out or returning a non-200 status code, the server will disregard the failure and continue processing the original request.** You can change this behavior by enabling **Return error and stop processing request when hook failed** under **Developer Center > Your game > Game Services > Cloud Services > Instant Messaging > Settings > Instant Messaging settings**. With this option enabled, if a hook fails, the server will return the error message to the client and abort the request.
+
+### Hooks for Messages
+
+After being sent out from the sender and before being received by the receivers, a message would go through a series of stages determined by the online statuses of the receivers. You can set up a hook that gets triggered for each of the stages:
+
+- **\_messageReceived**<br/>
+  This hook gets triggered after the server receives a message and parses the members in the group, but before the message gets delivered to the receivers. Here you can perform operations like modifying the message’s content and receivers.
+- **\_messageSent**<br/>
+  This hook gets triggered after a message gets delivered. Here you can perform operations like logging and making a copy of the message on your backup server.
+- **\_receiversOffline**<br/>
+  This hook gets triggered after a message gets delivered with some of the receivers offline, but before push notifications get sent to the offline receivers. Here you can perform operations like dynamically updating the content and device list of the push notifications.
+- **\_messageUpdate**<br/>
+  This hook gets triggered after the server receives a request for updating a message, but before the updated message gets delivered to the receivers. Similar to the situation when a new message is sent, here you can perform operations like modifying the message’s content and receivers.
+
+### Hooks for Conversations
+
+A hook can be triggered before or after a conversation-related operation takes place, like when a conversation gets created or when the member list of a conversation gets updated:
+
+- **\_conversationStart**<br/>
+  When a conversation is being created, this hook gets triggered after the signature validation (if enabled) has been completed but before the conversation actually gets created. Here you can perform operations like adding additional internal attributes to the conversation and performing authentication.
+- **\_conversationStarted**<br/>
+  This hook gets triggered after a conversation gets created. Here you can perform operations like logging and making a copy of the conversation on your backup server.
+- **\_conversationAdd**<br/>
+  When a member is joining or being added to a conversation, this hook gets triggered after the signature validation (if enabled) has been completed but before the member actually joins or gets added to the conversation. Here you can perform operations like determining whether the request shall be accepted or declined.
+- **\_conversationRemove**<br/>
+  When a member is being removed from a conversation, this hook gets triggered after the signature validation (if enabled) has been completed but before the member actually gets removed from the conversation. This hook doesn’t get triggered when a member is leaving a conversation. Here you can perform operations like determining whether the request shall be accepted or declined.
+- **\_conversationAdded**<br/>
+  This hook gets triggered after a user successfully joins a conversation.
+- **\_conversationRemoved**<br/>
+  This hook gets triggered after a user successfully leaves a conversation.
+- **\_conversationUpdate**<br/>
+  When a conversation’s name, custom attributes, or notification settings are being updated, this hook gets triggered before the update actually takes place. Here you can perform operations like adding additional internal attributes to the conversation and performing authentication.
+
+### Hooks for Client Status Changes
+
+A hook can be triggered when a client logs in or logs out:
+
+- **\_clientOnline**<br/>
+  This hook gets triggered when a client logs in successfully.
+- **\_clientOffline**<br/>
+  This hook gets triggered when a client logs out successfully or loses connection unexpectedly.
+
+You can use these hooks together with LeanCache to implement an endpoint for looking up the online statuses of clients.
+
+### Hooks and Cloud Engine
+
+To maintain the necessary performance for handling an abundance of messages, the Instant Messaging service itself doesn’t provide the computing resources for running hooks. In order to use hooks, you will have to set up Cloud Engine instances for your application and deploy hooks onto these instances.
+
+The hooks for Instant Messaging will only take effect when deployed to the **production environment** of Cloud Engine. The staging environment shall be used for testing hooks but the hooks deployed there can only be triggered manually. Due to the existence of the cache, it may take up to 3 minutes for hooks to take effect if you’re deploying hooks to Cloud Engine for the first time. After that, the hooks deployed will take effect immediately.
+
+### Hooks API
+
+Conversation-related hooks can be used to perform additional permission checks besides those taken care of by the signing mechanism, controlling whether a conversation can be created or whether a user can be allowed into a conversation. One thing you can do with this hook is to implement a blocklist for your application.
+
+#### `_messageReceived`
+
+This hook gets triggered after a message arrives at the server. If the message is sent to a group, the server will parse all the receivers of the message.
+
+You can have the hook return a value to control whether the message should be discarded, which receivers should be removed, and what the updated message should be if the message is to be updated. If the hook returns an empty object (`response.success({})`), the message will go through the default workflow.
+
+If the hook contains conditionals, please be careful to **make sure the hook will always invoke `response.success` in the end to return a result** so that the message can be delivered without delay. The hook will **block the process of message delivery**, which means that you should keep the hook efficient by eliminating unnecessary invocations within the hook.
+
+For a rich media message, the `content` parameter will be a string containing a JSON object. See [Instant Messaging REST API Guide](/sdk/im/guide/rest/) for more information about the structure of this object.
+
+Parameters:
+
+| Parameter        | Description                                                                               |
+| ----------- | ---------------------------------------------------------------------------------- |
+| `fromPeer`  | The ID of the sender.                                                                  |
+| `convId`    | The ID of the conversation the message belongs to.                                                                |
+| `toPeers`   | The `clientId`s of the members in the conversation.                                                    |
+| `transient` | Whether this is a transient message.                                                            |
+| `bin`       | Whether the content of the original message is binary.                                                     |
+| `content`   | The string representing the content of the message. If `bin` is `true`, this string will be the original message encoded in Base64 format. |
+| `receipt`   | Whether a receipt is requested.                                                                     |
+| `timestamp` | The timestamp the server received the message (in milliseconds).                                                   |
+| `system`    | Whether the message belongs to a system conversation.                                                             |
+| `sourceIP`  | The IP address of the sender.                                                                 |
+
+Example arguments:
+
+```json
+{
+  "fromPeer": "Tom",
+  "receipt": false,
+  "groupId": null,
+  "system": null,
+  "content": "{\"_lctext\":\"Holy crap!\",\"_lctype\":-1}",
+  "convId": "5789a33a1b8694ad267d8040",
+  "toPeers": ["Jerry"],
+  "bin": false,
+  "transient": false,
+  "sourceIP": "121.239.62.103",
+  "timestamp": 1472200796764
+}
+```
+
+Return values:
+
+| Parameter      | Constraint | Description                                                                                                                        |
+| --------- | ---- | --------------------------------------------------------------------------------------------------------------------------- |
+| `drop`    | Optional | The message will be discarded if this value is `true`.                                                                                                |
+| `code`    | Optional | A custom error code (integer) to be returned when `drop` is `true`.                                                                  |
+| `detail`  | Optional | A custom error message (string) to be returned when `drop` is `true`.                                                              |
+| `bin`     | Optional | Whether the returned `content` is binary. If omitted, this will be the same as the value of `bin` in the request.                                                      |
+| `content` | Optional | The updated `content`. If omitted, the original message content will be used. If `bin` is `true`, this should be the message encoded in Base64 format. |
+| `toPeers` | Optional | An array containing the updated receivers. If omitted, the original receivers will be used.                                                                            |
+
+Code example:
+
+<MultiLang kind="engine">
+
+```js
+AV.Cloud.onIMMessageReceived((request) => {
+  let content = request.params.content;
+  let processedContent = content.replace("crap", "**");
+  // Must provide a return value, or an error will occur
+  return {
+    content: processedContent,
+  };
+});
+```
+
+```python
+import json
+
+@engine.define
+def _messageReceived(**params):
+    content = json.loads(params['content'])
+    text = content['_lctext']
+    content['_lctext'] = text.replace('crap', '**')
+    # Must provide a return value, or an error will occur
+    return {
+        'content': json.dumps(content)
+    }
+```
+
+```php
+Cloud::define("_messageReceived", function($params, $user) {
+    $content = json_decode($params["content"], true);
+    $text = $content["_lctext"];
+    $content["_lctext"] = preg_replace("crap", "**", $text);
+    // Must provide a return value, or an error will occur
+    return array("content" => json_encode($content));
+});
+```
+
+```java
+@IMHook(type = IMHookType.messageReceived)
+  public static Map<String, Object> onMessageReceived(Map<String, Object> params) {
+    Map<String, Object> result = new HashMap<String, Object>();
+    String content = (String)params.get("content");
+    String processedContent = content.replace("crap", "**");
+    result.put("content", processedContent);
+    // Must provide a return value, or an error will occur
+    return result;
+  }
+```
+
+```cs
+[LCEngineRealtimeHook(LCEngineRealtimeHookType.MessageReceived)]
+public static object OnMessageReceived(Dictionary<string, object> parameters) {
+  string content = parameters["content"] as string;
+  string processedContent = content.Replace("crap", "**");
+  return new Dictionary<string, object> {
+    { "content", processedContent }
+  };
+}
+```
+
+```go
+// Not supported yet
+```
+
+</MultiLang>
+
+With the code above enabled, the sequence diagram of a message will be:
+
+<Mermaid
+  diagram={`
+sequenceDiagram
+SDK->>RTM: 1. Send a message
+RTM-->>Engine: 2. Trigger the _messageReceived hook
+Engine-->>RTM: 3. Return the result of the hook
+RTM-->>SDK: 4. Send the result of the hook to the receiver
+`}
+/>
+
+- The diagram above assumes that all the members in the conversation are online. The sequence will be slightly different if some of the members are offline. We will talk about this in the next section.
+- _RTM_ refers to the cluster for the Instant Messaging service and _Engine_ refers to that for the Cloud Engine service. These two clusters communicate through our internal network.
+
+#### `_receiversOffline`
+
+This hook gets triggered when some of the receivers are offline. A common use case of this hook is to customize the content and receivers of push notifications. You can even trigger custom push notifications with this hook. Keep in mind that messages sent to chat rooms won’t trigger this hook.
+
+Parameters:
+
+| Parameter                  | Description                                                                                                                  |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `fromPeer`            | The ID of the sender.                                                                                                       |
+| `convId`              | The ID of the conversation the message belongs to.                                                                                                   |
+| `offlinePeers`        | An array containing the receivers that are offline.                                                                                              |
+| `content`             | The content of the message.                                                                                                            |
+| `timestamp`           | The timestamp the server received the message (in milliseconds).                                                                                      |
+| `mentionAll`          | A boolean indicating whether all the members are mentioned.                                                                               |
+| `mentionOfflinePeers` | Members who are offline but got mentioned by this message. If `mentionAll` is `true`, this parameter will be empty, indicating that all the members in `offlinePeers` are mentioned. |
+
+Return values:
+
+| Parameter           | Constraint | Description                                                                 |
+| -------------- | ---- | -------------------------------------------------------------------- |
+| `skip`         | Optional | If set to `true`, push notifications will be skipped. This could be useful if you have already triggered push notifications in a different manner.     |
+| `offlinePeers` | Optional | An array containing the updated receivers.                                          |
+| `pushMessage`  | Optional | The content of the push notifications. You can provide a JSON object with a custom structure.                                     |
+| `force`        | Optional | If set to `true`, push notifications will be sent to the users in `offlinePeers` who `mute`d the conversation. Defaults to `false`. |
+
+Code example:
+
+<MultiLang kind="engine">
+
+```js
+AV.Cloud.onIMReceiversOffline((request) => {
+  let params = request.params;
+  let content = params.content;
+
+  // params.content is the content of the message
+  let shortContent = content;
+
+  if (shortContent.length > 6) {
+    shortContent = content.slice(0, 6);
+  }
+
+  console.log("shortContent", shortContent);
+
+  return {
+    pushMessage: JSON.stringify({
+      // Increment the number of unread messages; you can provide a number as well
+      badge: "Increment",
+      sound: "default",
+      // Use the dev certificate
+      _profile: "dev",
+      alert: shortContent,
+    }),
+  };
+});
+```
+
+```python
+@engine.define
+def _receiversOffline(**params):
+    print('_receiversOffline start')
+    # params['content'] is the content of the message
+    content = params['content']
+    short_content = content[:6]
+    print('short_content:', short_content)
+    payloads = {
+        # Increment the number of unread messages; you can provide a number as well
+        'badge': 'Increment',
+        'sound': 'default',
+        # Use the dev certificate
+        '_profile': 'dev',
+        'alert': short_content,
+    }
+    print('_receiversOffline end')
+    return {
+        'pushMessage': json.dumps(payloads),
+    }
+```
+
+```php
+Cloud::define('_receiversOffline', function($params, $user) {
+    error_log('_receiversOffline start');
+    // content is the content of the message
+    $shortContent = $params["content"];
+    if (strlen($shortContent) > 6) {
+        $shortContent = substr($shortContent, 0, 6);
+    }
+
+    $json = array(
+        // Increment the number of unread messages; you can provide a number as well
+        "badge" => "Increment",
+        "sound" => "default",
+        // Use the dev certificate
+        "_profile" => "dev",
+        "alert" => shortContent
+    );
+
+    $pushMessage = json_encode($json);
+    return array(
+        "pushMessage" => $pushMessage,
+    );
+});
+```
+
+```java
+@IMHook(type = IMHookType.receiversOffline)
+  public static Map<String, Object> onReceiversOffline(Map<String, Object> params) {
+    // content is the content of the message
+    String alert = (String)params.get("content");
+    if(alert.length() > 6){
+      alert = alert.substring(0, 6);
+    }
+    System.out.println(alert);
+    Map<String, Object> result = new HashMap<String, Object>();
+    JSONObject object = new JSONObject();
+    // Increment the number of unread messages
+    // You can provide a number as well
+    object.put("badge", "Increment");
+    object.put("sound", "default");
+    // Use the dev certificate
+    object.put("_profile", "dev");
+    object.put("alert", alert);
+    result.put("pushMessage", object.toString());
+    return result;
+}
+```
+
+```cs
+[LCEngineRealtimeHook(LCEngineRealtimeHookType.ReceiversOffline)]
+public static Dictionary<string, object> OnReceiversOffline(Dictionary<string, object> parameters) {
+    string alert = parameters["content"] as string;
+    if (alert.Length > 6) {
+        alert = alert.Substring(0, 6);
+    }
+    Dictionary<string, object> pushMessage = new Dictionary<string, object> {
+        { "badge", "Increment" },
+        { "sound", "default" },
+        { "_profile", "dev" },
+        { "alert", alert },
+    };
+    return new Dictionary<string, object> {
+        { "pushMessage", JsonSerializer.Serialize(pushMessage) }
+    };
+}
+```
+
+```go
+// Not supported yet
+```
+
+</MultiLang>
+
+#### `_messageSent`
+
+This hook gets triggered after a message gets delivered. It won’t impact the performance of the message-delivery process, so you can leave time-consuming operations here.
+
+Parameters:
+
+| Parameter           | Description                             |
+| -------------- | -------------------------------- |
+| `fromPeer`     | The ID of the sender.                 |
+| `convId`       | The ID of the conversation the message belongs to.              |
+| `msgId`        | The ID of the message.                        |
+| `onlinePeers`  | The list of the online users’ IDs.          |
+| `offlinePeers` | The list of the offline users’ IDs.              |
+| `transient`    | Whether this is a transient message.          |
+| `system`       | Whether the message belongs to a system conversation.     |
+| `bin`          | Whether this is a binary message.               |
+| `content`      | The string representing the content of the message.                   |
+| `receipt`      | Whether a receipt is requested.                   |
+| `timestamp`    | The timestamp the server received the message (in milliseconds). |
+| `sourceIP`     | The IP address of the sender.                  |
+
+Example arguments:
+
+```json
+{
+  "fromPeer": "Tom",
+  "receipt": false,
+  "onlinePeers": [],
+  "content": "12345678",
+  "convId": "5789a33a1b8694ad267d8040",
+  "msgId": "fptKnuYYQMGdiSt_Zs7zDA",
+  "bin": false,
+  "transient": false,
+  "sourceIP": "114.219.127.186",
+  "offlinePeers": ["Jerry"],
+  "timestamp": 1472703266522
+}
+```
+
+Return values:
+
+The return value of this hook won’t be checked. You can just have the hook return `{}`.
+
+Code example:
+
+The code below shows how you can have a log printed to Cloud Engine when a message gets delivered:
+
+<MultiLang kind="engine">
+
+```js
+AV.Cloud.onIMMessageSent((request) => {
+  console.log("params", request.params);
+});
+```
+
+```python
+@engine.define
+def _messageSent(**params):
+    print('_messageSent start')
+    print('params:', params)
+    print('_messageSent end')
+    return {}
+```
+
+```php
+Cloud::define('_messageSent', function($params, $user) {
+    error_log('_messageSent start');
+    error_log('params' . json_encode($params));
+    return array();
+});
+```
+
+```java
+@IMHook(type = IMHookType.messageSent)
+  public static Map<String, Object> onMessageSent(Map<String, Object> params) {
+    System.out.println(params);
+    Map<String, Object> result = new HashMap<String, Object>();
+    return result;
+}
+```
+
+```cs
+[LCEngineRealtimeHook(LCEngineRealtimeHookType.MessageSent)]
+public static Dictionary<string, object> OnMessageSent(Dictionary<string, object> parameters) {
+    Console.WriteLine(JsonSerializer.Serialize(parameters));
+    return default;
+}
+```
+
+```go
+// Not supported yet
+```
+
+</MultiLang>
+
+#### `_messageUpdate`
+
+This hook gets triggered after the server receives a request for updating a message, but before the updated message gets delivered to the receivers.
+
+You can have the hook return a value to control whether the request for updating the message should be discarded, which receivers should be removed, and what the updated message should be if the message is to be updated again.
+
+If the hook contains conditionals, please be careful to **make sure the hook will always invoke `response.success` in the end to return a result** so that the updated message can be delivered without delay. The hook will **block the process of message delivery**, which means that you should keep the hook efficient by eliminating unnecessary invocations within the hook.
+
+For a rich media message, the `content` parameter will be a string containing a JSON object. See [Instant Messaging REST API Guide](/sdk/im/guide/rest/) for more information about the structure of this object.
+
+Parameters:
+
+| Parameter        | Description                                                                               |
+| ----------- | ---------------------------------------------------------------------------------- |
+| `fromPeer`  | The ID of the sender.                                                                   |
+| `convId`    |  The ID of the conversation the message belongs to.                                                                 |
+| `toPeers`   |The `clientId`s of the members in the conversation.                                                      |
+| `bin`       | Whether the content of the original message is binary.                                                      |
+| `content`   |  The string representing the content of the message. If `bin` is `true`, this string will be the original message encoded in Base64 format. |
+| `timestamp` | The timestamp the server received the message (in milliseconds).                                                    |
+| `msgId`     | The ID of the message being updated.                                                                  |
+| `sourceIP`  | The IP address of the sender.                                                                    |
+| `recall`    | Whether the message is recalled.                                                                     |
+| `system`    | Whether the message belongs to a system conversation.                                                              |
+
+Return values:
+
+| Parameter      | Constraint | Description                                                                                                                        |
+| --------- | ---- | --------------------------------------------------------------------------------------------------------------------------- |
+| `drop`    | Optional |  The request for updating the message will be discarded if this value is `true`.                                                                                        |
+| `code`    | Optional |  A custom error code (integer) to be returned when `drop` is `true`.                                                                |
+| `detail`  | Optional | A custom error message (string) to be returned when `drop` is `true`.                                                                |
+| `bin`     | Optional | Whether the returned `content` is binary. If omitted, this will be the same as the value of `bin` in the request.                                                        |
+| `content` | Optional | The updated `content`. If omitted, the original message content will be used. If `bin` is `true`, this should be the message encoded in Base64 format. |
+| `toPeers` | Optional | An array containing the updated receivers. If omitted, the original receivers will be used.                                                                             |
+
+#### `_conversationStart`
+
+When a conversation is being created, this hook gets triggered after the signature validation (if enabled) has been completed but before the conversation actually gets created.
+
+Parameters:
+
+| Parameter      | Description                         |
+| --------- | ---------------------------- |
+| `initBy`  | The `clientId` of the initiator of the conversation.      |
+| `members` | An array containing the initial members of the conversation. |
+| `attr`    | Additional attributes assigned to the conversation.       |
+
+Example arguments:
+
+```
+{
+  "initBy": "Tom",
+  "members": ["Tom", "Jerry"],
+  "attr": {
+    "name": "Tom & Jerry"
+  }
+}
+```
+
+Return values:
+
+| Parameter     | Constraint | Description                                                             |
+| -------- | ---- | ---------------------------------------------------------------- |
+| `reject` | Optional | Whether to reject the request. Defaults to `false`.                                       |
+| `code`   | Optional | A custom error code (integer) to be returned when `reject` is `true`.      |
+| `detail` | Optional | A custom error message (string) to be returned when `reject` is `true`. |
+
+For example, to refuse a conversation to be created if it contains less than 4 initial members:
+
+<MultiLang kind="engine">
+
+```js
+AV.Cloud.onIMConversationStart((request) => {
+  if (request.params.members.length < 4) {
+    return {
+      reject: true,
+      code: 1234,
+      detail: "Please invite at least 3 people to the conversation",
+    };
+  } else {
+    return {};
+  }
+});
+```
+
+```python
+@engine.define
+def _conversationStart(**params):
+    if len(params["members"]) < 4:
+      return {
+        "reject": True,
+        "code": 1234,
+        "detail": "Please invite at least 3 people to the conversation",
+      }
+    else:
+      return {}
+```
+
+```php
+Cloud::define('_conversationStart', function($params, $user) {
+    if (count($params["members"]) < 4) {
+      return [
+        "reject" => true,
+        "code" => 1234,
+        "detail" => "Please invite at least 3 people to the conversation",
+      ];
+    } else {
+      return array();
+    }
+});
+```
+
+```java
+@IMHook(type = IMHookType.conversationStart)
+public static Map<String, Object> onConversationStart(Map<String, Object> params) {
+  String[] members = (String[])params.get("members");
+  Map<String, Object> result = new HashMap<String, Object>();
+  if (members.length < 4) {
+    result.put("reject", true);
+    result.put("code", 1234);
+    result.put("detail", "Please invite at least 3 people to the conversation");
+  }
+  return result;
+}
+```
+
+```cs
+[LCEngineRealtimeHook(LCEngineRealtimeHookType.ConversationStart)]
+public static object OnConversationStart(Dictionary<string, object> parameters) {
+    List<object> members = parameters["members"] as List<object>;
+    if (members.Count < 4) {
+        return new Dictionary<string, object> {
+            { "reject", true },
+            { "code", 1234 },
+            { "detail", "Please invite at least 3 people to the conversation" }
+        };
+    }
+    return default;
+}
+```
+
+```go
+// Not supported yet
+```
+
+</MultiLang>
+
+#### `_conversationStarted`
+
+This hook gets triggered after a conversation gets created.
+
+Parameters:
+
+| Parameter     | Description              |
+| -------- | ----------------- |
+| `convId` | The ID of the conversation being created. |
+
+Return values:
+
+The return value of this hook won’t be checked. You can just have the hook return `{}`.
+
+For example, to save the ID of the conversation to a list of recently created conversations on LeanCache after a conversation gets created:
+
+<MultiLang kind="engine">
+
+```js
+AV.Cloud.onIMConversationStarted((request) => {
+  redisClient.lpush("recent_conversations", request.params.convId);
+  return {};
+});
+```
+
+```python
+@engine.define
+def _conversationStarted(**params):
+    redis_client.lpush("recent_conversations", params["convId"])
+    return {}
+```
+
+```php
+Cloud::define('_conversationStarted', function($params, $user) {
+    $redis->lpush("recent_conversations", $params["convId"]);
+    return array();
+});
+```
+
+```java
+@IMHook(type = IMHookType.conversationStarted)
+public static Map<String, Object> onConversationStarted(Map<String, Object> params) throws Exception {
+  String convId = (String)params.get("convId");
+  jedis.lpush("recent_conversations", params.get("convId"));
+  Map<String, Object> result = new HashMap<String, Object>();
+  return result;
+}
+```
+
+```cs
+[LCEngineRealtimeHook(LCEngineRealtimeHookType.ConversationStarted)]
+public static object OnConversationStarted(Dictionary<string, object> parameters) {
+    string convId = parameters["convId"] as string;
+    Console.WriteLine($"{convId} started");
+    return default;
+}
+```
+
+```go
+// Not supported yet
+```
+
+</MultiLang>
+
+#### `_conversationAdd`
+
+When a member is joining or being added to a conversation, this hook gets triggered after the signature validation (if enabled) has been completed but before the member actually joins or gets added to the conversation. **Keep in mind that this hook won’t be triggered in the situation when a conversation is being created with other users’ `clientId`s as members.** If a member is joining a conversation, initBy` will be the same as the only element of `members`.
+
+Parameters:
+
+| Parameter      | Description                    |
+| --------- | ----------------------- |
+| `initBy`  | The `clientId` of the initiator.  |
+| `members` | An array containing the members joining the conversation.    |
+| `convId`  | The ID of the conversation.             |
+
+Return values:
+
+| Parameter     | Constraint | Description                                                             |
+| -------- | ---- | ---------------------------------------------------------------- |
+| `reject` | Optional | Whether to reject the request. Defaults to `false`.                                       |
+| `code`   | Optional | A custom error code (integer) to be returned when `reject` is `true`.      |
+| `detail` | Optional | A custom error message (string) to be returned when `reject` is `true`. |
+
+For example, to refuse new members to be added to the conversation created by a specific member:
+
+<MultiLang kind="engine">
+
+```js
+AV.Cloud.onIMConversationAdd((request) => {
+  if (request.params.initBy === "Tom") {
+    return {
+      reject: true,
+      code: 9890,
+      detail: "This is a private conversation. You cannot add anyone else to it.",
+    };
+  } else {
+    return {};
+  }
+});
+```
+
+```python
+@engine.define
+def _conversationAdd(**params):
+  if params["initBy"] == "Tom":
+    return {
+      "reject": True,
+      "code": 9890,
+      "detail": "This is a private conversation. You cannot add anyone else to it."
+    }
+  else:
+    return {}
+```
+
+```php
+Cloud::define('_conversationAdd', function($params, $user) {
+  if ($params["initBy"] === "Tom") {
+    return [
+      "reject" => true,
+      "code" => 9890,
+      "detail" => "This is a private conversation. You cannot add anyone else to it.",
+    ];
+  } else {
+    return array();
+  }
+});
+```
+
+```java
+@IMHook(type = IMHookType.conversationAdd)
+public static Map<String, Object> onConversationAdd(Map<String, Object> params) {
+  Map<String, Object> result = new HashMap<String, Object>();
+  if ("Tom".equals(params.get("initBy"))) {
+    result.put("reject", true);
+    result.put("code", 9890);
+    result.put("detail", "This is a private conversation. You cannot add anyone else to it.")
+  }
+  return result;
+}
+```
+
+```cs
+[LCEngineRealtimeHook(LCEngineRealtimeHookType.ConversationAdd)]
+public static object OnConversationAdd(Dictionary<string, object> parameters) {
+    if ("Tom".Equals(parameters["initBy"])) {
+        return new Dictionary<string, object> {
+            { "reject", true },
+            { "code", 9890 },
+            { "detail", "This is a private conversation. You cannot add anyone else to it." }
+        };
+    }
+    return default;
+}
+```
+
+```go
+// Not supported yet
+```
+
+</MultiLang>
+
+#### `_conversationRemove`
+
+When a member is being removed from a conversation, this hook gets triggered after the signature validation (if enabled) has been completed but before the member actually gets removed from the conversation. This hook doesn’t get triggered when a member is leaving a conversation.
+
+Parameters:
+
+| Parameter      | Description                 |
+| --------- | -------------------- |
+| `initBy`  | The initiator of the operation.           |
+| `members` | An array containing the members to be removed. |
+| `convId`  | The ID of the conversation.            |
+
+Return values:
+
+| Parameter     | Constraint | Description                                                             |
+| -------- | ---- | ---------------------------------------------------------------- |
+| `reject` | Optional | Whether to reject the request. Defaults to `false`.                                       |
+| `code`   | Optional | A custom error code (integer) to be returned when `reject` is `true`.      |
+| `detail` | Optional | A custom error message (string) to be returned when `reject` is `true`. |
+
+For example, to have some staff members in each of the conversations of an application that cannot be removed even by the owner of the conversation:
+
+<MultiLang kind="engine">
+
+```js
+AV.Cloud.onIMConversationRemove(async (request) => {
+  const supporters = ["Bast", "Hypnos", "Kthanid"];
+  const members = request.params.members;
+  for (const member of members) {
+    if (supporters.includes(member)) {
+      return {
+        "reject": true,
+        "code": 1928,
+        "detail": `You cannot remove the staff member ${member}`,
+      };
+    }
+  }
+  return {};
+}
+```
+
+```python
+@engine.define
+def _conversationRemove(**params):
+    supporters = ["Bast", "Hypnos", "Kthanid"]
+    members = params["members"]
+    for member in members:
+        if member in supporters:
+            return {
+              "reject": True,
+              "code": 1928,
+              "detail": f"You cannot remove the staff member {member}"
+            }
+    return {}
+```
+
+```php
+Cloud::define('_conversationRemove', function($params, $user) {
+  $supporters = array("Bast", "Hypnos", "Kthanid");
+  $members = $params["members"];
+  foreach ($members as $member) {
+    if (in_array($member, $supporters)) {
+      return [
+        "reject" => true,
+        "code" => 1928,
+        "detail" => "You cannot remove the staff member $member",
+      ];
+    }
+  }
+  return array();
+});
+```
+
+```java
+@IMHook(type = IMHookType.conversationRemove)
+public static Map<String, Object> onConversationRemove(Map<String, Object> params) {
+  String[] supporters = {"Bast", "Hypnos", "Kthanid"};
+  String[] members = (String[])params.get("members");
+  Map<String, Object> result = new HashMap<String, Object>();
+  for (String member : members) {
+    if (Arrays.asList(supporters).contains(member)) {
+      result.put("reject", true);
+      result.put("code", 1928);
+      result.put("detail", "You cannot remove the staff member " + member);
+    }
+  }
+  return result;
+}
+```
+
+```cs
+[LCEngineRealtimeHook(LCEngineRealtimeHookType.ConversationRemove)]
+public static object OnConversationRemove(Dictionary<string, object> parameters) {
+    List<string> supporters = new List<string> { "Bast", "Hypnos", "Kthanid" };
+    List<object> members = parameters["members"] as List<object>;
+    foreach (object member in members) {
+        if (supporters.Contains(member as string)) {
+            return new Dictionary<string, object> {
+                { "reject", true },
+                { "code", 1928 },
+                { "detail", $"You cannot remove the staff member {member}" }
+            };
+        }
+    }
+    return default;
+}
+```
+
+```go
+// Not supported yet
+```
+
+</MultiLang>
+
+#### `_conversationAdded`
+
+This hook gets triggered after a user successfully joins a conversation.
+
+Parameters:
+
+| Parameter      | Description                 |
+| --------- | -------------------- |
+| `initBy`  | The initiator of the operation.           |
+| `convId`  | The ID of the conversation.            |
+| `members` | An array containing the IDs of the new members. |
+
+Return values:
+
+The return value of this hook won’t be checked.
+
+For example, to send a text message to a staff member if more than 10 members are added to a conversation at once:
+
+<MultiLang kind="engine">
+
+```js
+AV.Cloud.onIMConversationAdded((request) => {
+  if (request.params.members.length > 10) {
+    AV.Cloud.requestSmsCode({
+      mobilePhoneNumber: "+15559463664",
+      template: "Group_Notice",
+      sign: "sign_example",
+      conv_id: request.params.convId,
+    }).then(
+      function () {
+        /* Succeeded */
+      },
+      function (err) {
+        /* Failed */
+      }
+    );
+  }
+});
+```
+
+```python
+@engine.define
+def _conversationAdded(**params):
+    if len(params["members"]) > 10:
+        cloud.request_sms_code(
+            "+15559463664",
+            template="Group_Notice", sign: "sign_example",
+            params={"conv_id": params["convId"]}
+        )
+```
+
+```php
+Cloud::define('_conversationAdded', function($params, $user) {
+  if (count($params["members"]) > 10) {
+    $options = [
+      "template" => "Group_Notice",
+      "name" => "sign_example",
+      "conv_id" => $params["convId"],
+    ];
+    SMS::requestSmsCode("+15559463664", $options);
+  }
+});
+```
+
+```java
+@IMHook(type = IMHookType.conversationAdded)
+public static void onConversationAdded(Map<String, Object> params) {
+  String[] members = (String[])params.get("members");
+  if (members.length > 10) {
+    LCSMSOption option = new LCSMSOption();
+    option.setTemplateName("Group_Notice");
+    option.setSignatureName("sign_example");
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("conv_id", params.get("convId"));
+    option.setEnvMap(parameters);
+    LCSMS.requestSMSCodeInBackground("+15559463664", option).subscribe(new Observer<LCNull>() {
+      @Override
+      public void onSubscribe(Disposable disposable) {}
+      @Override
+      public void onNext(LCNull avNull) {
+        Log.d("TAG","Result: Successfully sent text message.");
+      }
+      @Override
+      public void onError(Throwable throwable) {
+        Log.d("TAG","Result: Failed to send text message. Reason: " + throwable.getMessage());
+      }
+      @Override
+      public void onComplete() {}
+    });
+  }
+}
+```
+
+```cs
+[LCEngineRealtimeHook(LCEngineRealtimeHookType.ConversationAdded)]
+public static async Task OnConversationAdded(Dictionary<string, object> parameters) {
+    List<string> members = (parameters["members"] as List<object>)
+        .Cast<string>()
+        .ToList();
+    if (members.Count > 10) {
+        Dictionary<string, object> variables = new Dictionary<string, object> {
+            { "conv_id", request.Params["convId"] }
+        };
+        try {
+            await LCSMSClient.RequestSMSCode("+15559463664", "Group_Notice", "sign_example", variables: variables);
+            Console.WriteLine("Successfully sent text message.");
+        } catch (Exception e) {
+            Console.WriteLine($"Failed to send text message. Reason: {e.Message}");
+        }
+    }
+}
+```
+
+```go
+// Not supported yet
+```
+
+</MultiLang>
+
+#### `_conversationRemoved`
+
+This hook gets triggered after a user successfully leaves a conversation.
+
+Parameters:
+
+| Parameter      | Description                 |
+| --------- | -------------------- |
+| `initBy`  | The initiator of the operation.           |
+| `convId`  | The ID of the conversation.           |
+| `members` | An array of the IDs of the users removed from the conversation. |
+
+Return values:
+
+The return value of this hook won’t be checked.
+
+For example, to save the ID of the conversation to a list of recently left conversations on LeanCache after a user leaves a conversation:
+
+<MultiLang kind="engine">
+
+```js
+AV.Cloud.onIMConversationRemoved((request) => {
+  const initBy = request.params.initBy;
+  const members = request.params.members;
+  if (members.length === 1) {
+    if (members[0] === initBy) {
+      redisClient.lpush(initBy, request.params.convId);
+    }
+  }
+});
+```
+
+```python
+@engine.define
+def _conversationRemoved(**params):
+    init_by = params["initBy"]
+    members = params["members"]
+    if len(members) == 1:
+      if members[0] == init_by:
+        redis_client.lpush(init_by, params["convId"])
+```
+
+```php
+Cloud::define('_conversationRemoved', function($params, $user) {
+    $initBy = $params['initBy'];
+    $members = $params['members'];
+    if (count($members) === 1) {
+      if (members[0] === $initBy) {
+        $redis->lpush($initBy, $params["convId"]);
+      }
+    }
+});
+```
+
+```java
+@IMHook(type = IMHookType.conversationRemoved)
+public static void onConversationRemoved(Map<String, Object> params) {
+  String[] members = (String[])params.get("members");
+  String initBy = (String)params.get("initBy");
+  if (members.length == 1) {
+    if (initBy.equals(members[0])) {
+      jedis.lpush(initBy, params.get("convId"));
+    }
+  }
+}
+```
+
+```cs
+[LCEngineRealtimeHook(LCEngineRealtimeHookType.ConversationRemoved)]
+public static void OnConversationRemoved(Dictionary<string, object> parameters) {
+    List<string> members = (parameters["members"] as List<object>)
+        .Cast<string>()
+        .ToList();
+    string initBy = parameters["initBy"] as string;
+    if (members.Count == 1 && members[0].Equals(initBy)) {
+        Console.WriteLine($"{parameters["convId"]} removed.");
+    }
+}
+```
+
+```go
+// Not supported yet
+```
+
+</MultiLang>
+
+#### `_conversationUpdate`
+
+When a conversation’s name, custom attributes, or notification settings are being updated, this hook gets triggered before the update actually takes place.
+
+Parameters:
+
+| Parameter     | Description                   |
+| -------- | ---------------------- |
+| `initBy` | The initiator of the operation.             |
+| `convId` | The ID of the conversation.              |
+| `mute`   | Whether to disable notifications for the current conversation. |
+| `attr`   | Attributes to be set to the conversation.     |
+
+`mute` and `attr` are mutually exclusive and won’t show up together.
+
+Return values:
+
+| Parameter     | Constraint | Description                                                               |
+| -------- | ---- | ------------------------------------------------------------------ |
+| `reject` | Optional | Whether to reject the request. Defaults to `false`.                                       |
+| `code`   | Optional | A custom error code (integer) to be returned when `reject` is `true`.      |
+| `detail` | Optional | A custom error message (string) to be returned when `reject` is `true`. |
+| `attr`   | Optional | The updated attributes to be set to the conversation. If omitted, the `attr` in the request will be used.       |
+| `mute`   | Optional | The updated setting for disabling notifications. If omitted, the `mute` in the request will be used. |
+
+`mute` and `attr` are mutually exclusive and can’t be returned together. The return value should also match what’s in the request. If the request contains `attr`, only the `attr` in the return value will take effect. If the request contains `mute`, the `attr` in the return value will be discarded if it exists.
+
+For example, to prevent the names of conversations from being updated:
+
+<MultiLang kind="engine">
+
+```js
+AV.Cloud.onIMConversationUpdate((request) => {
+  if ("attr" in request.params && "name" in request.params.attr) {
+    return {
+      reject: true,
+      code: 1949,
+      detail: "The name of the conversation cannot be updated.",
+    };
+  }
+});
+```
+
+```python
+@engine.define
+def _conversationUpdate(**params):
+    if ('attr' in params) and ('name' in params['attr']):
+      return {
+        "reject": True,
+        "code": 1949,
+        "detail": "The name of the conversation cannot be updated."
+      }
+```
+
+```php
+Cloud::define('_conversationUpdate', function($params, $user) {
+  if (array_key_exists('attr', $params) && array_key_exists('name', $params["attr"])) {
+    return [
+        "reject" => true,
+        "code" => 1949,
+        "detail" => "The name of the conversation cannot be updated.",
+    ];
+  }
+});
+```
+
+```java
+@IMHook(type = IMHookType.conversationUpdate)
+public static Map<String, Object> onConversationUpdate(Map<String, Object> params) {
+  Map<String, Object> result = new HashMap<String, Object>();
+  Map<String,Object> attr = (Map<String,Object>)params.get("attr");
+  if (attr != null && attr.containsKey("name")) {
+    result.put("reject", true);
+    result.put("code", 1949);
+    result.put("detail", "The name of the conversation cannot be updated.");
+  }
+  return result;
+}
+```
+
+```cs
+[LCEngineRealtimeHook(LCEngineRealtimeHookType.ConversationUpdate)]
+public static object OnConversationUpdate(Dictionary<string, object> parameters) {
+    Dictionary<string, object> attr = parameters["attr"] as Dictionary<string, object>;
+    if (attr != null && attr.ContainsKey("name")) {
+        return new Dictionary<string, object> {
+            { "reject", true },
+            { "code", 1949 },
+            { "detail", "The name of the conversation cannot be updated." }
+        };
+    }
+    return default;
+}
+```
+
+```go
+// Not supported yet
+```
+
+</MultiLang>
+
+#### `_clientOnline`
+
+This hook gets triggered when a client logs in successfully.
+
+Keep in mind that this hook only serves as a notification indicating that a user has gone online. If a user quickly goes online and offline (maybe with multiple devices), the sequence the `_clientOnline` and `_clientOffline` hooks get triggered can’t be guaranteed. This means that the `_clientOffline` hook may be triggered for a user before the `_clientOnline` hook gets triggered.
+
+Parameters:
+
+| Parameter      | Description                                                                                                        |
+| --------- | ----------------------------------------------------------------------------------------------------------- |
+| peerId    | The ID of the client logging in.                                                                                                |
+| sourceIP  | The IP address of the client logging in.                                                                                                 |
+| tag       | If left empty or set to "default", other devices with the same `tag` won’t be logged out. Otherwise, other devices with the same `tag` will be logged out. |
+| reconnect | Whether to automatically reconnect for this log-in attempt. If left empty or set to 0, auto-reconnect will be disabled. If set to 1, auto-reconnect will be enabled.                           |
+
+Return values:
+
+The return value of this hook won’t be checked.
+
+For example, to update the data stored in LeanCache for looking up the online statuses of users:
+
+<MultiLang kind="engine">
+
+```js
+AV.Cloud.onIMClientOnline((request) => {
+  // 1 means online
+  redisClient.set(request.params.peerId, 1);
+});
+```
+
+```python
+@engine.define
+def _clientOnline(**params):
+  # 1 means online
+  redis_client.set(params["peerId"], 1)
+```
+
+```php
+Cloud::define('_clientOnline', function($params, $user) {
+  // 1 means online
+  $redis->set($params["peerId"], 1);
+}
+```
+
+```java
+@IMHook(type = IMHookType.clientOnline)
+public static void onClientOnline(Map<String, Object> params) {
+  // 1 means online
+  jedis.set(params.get("peerId"), 1);
+}
+```
+
+```cs
+// The code below doesn’t update the data stored in LeanCache but only outputs the online status of the user
+[LCEngineRealtimeHook(LCEngineRealtimeHookType.ClientOnline)]
+public static void OnClientOnline(Dictionary<string, object> parameters) {
+    Console.WriteLine($"{parameters["peerId"]} online.");
+}
+```
+
+```go
+// Not supported yet
+```
+
+</MultiLang>
+
+#### `_clientOffline`
+
+This hook gets triggered when a client logs out successfully or loses connection unexpectedly.
+
+Keep in mind that this hook only serves as a notification indicating that a user has gone online. If a user quickly goes online and offline (maybe with multiple devices), the sequence the `_clientOnline` and `_clientOffline` hooks get triggered can’t be guaranteed. This means that the `_clientOffline` hook may be triggered for a user before the `_clientOnline` hook gets triggered.
+
+Parameters:
+
+| Parameter      | Description                                                                                                                                    |
+| --------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| peerId    | The ID of the client getting offline.                                                                                                                             |
+| closeCode | How the client got offline. 1 means the client logged out proactively. 2 means the connection was lost. 3 means the client was logged out due to a duplicate `tag`. 4 means the client was logged out by a request sent to the API.                              |
+| closeMsg  | A message describing how the client got offline.                                                                                                                    |
+| sourceIP  | The IP address of the client closing the session. Will be omitted if the hook is triggered by a loss of connection.                                                                                     |
+| tag       | Provided when the session got created. If left empty or set to "default", other devices with the same `tag` won’t be logged out. Otherwise, other devices with the same `tag` will be logged out. |
+| errorCode | The code of the error causing the loss of the connection; optional.                                                                                                              |
+| errorMsg  | The message of the error causing the loss of the connection; optional.                                                                                                            |
+
+Possible errors:
+
+| Error code | Error message            | Description                                 |
+| ------ | ------------------- | ------------------------------------ |
+| 4107   | READ_TIMEOUT        | The connection timed out due to a lack of new messages or heartbeats for a while. |
+| 4108   | LOGIN_TIMEOUT       | The connection timed out due to not logging in for a while.           |
+| 4109   | FRAME_TOO_LONG      | The WebSocket frame is too long.                     |
+| 4114   | UNPARSEABLE_RAW_MSG | The message is malformatted and cannot be parsed.                 |
+| 4200   | INTERNAL_ERROR      | There is an internal error in our server.                       |
+
+Return values:
+
+The return value of this hook won’t be checked.
+
+For example, to update the data stored in LeanCache for looking up the online statuses of users:
+
+<MultiLang kind="engine">
+
+```js
+AV.Cloud.onIMClientOffline((request) => {
+  // 0 means offline
+  redisClient.set(request.params.peerId, 0);
+});
+```
+
+```python
+@engine.define
+def _clientOffline(**params):
+  # 0 means offline
+  redis_client.set(params["peerId"], 0)
+```
+
+```php
+Cloud::define('_clientOffline', function($params, $user) {
+  // 0 means offline
+  $redis->set($params["peerId"], 0);
+}
+```
+
+```java
+@IMHook(type = IMHookType.clientOffline)
+public static void onClientOffline(Map<String, Object> params) {
+  // 0 means offline
+  jedis.set(params.get("peerId"), 0);
+}
+```
+
+```cs
+// The code below doesn’t update the data stored in LeanCache but only outputs the online status of the user
+[LCEngineRealtimeHook(LCEngineRealtimeHookType.ClientOffline)]
+public static void OnClientOffline(Dictionary<string, object> parameters) {
+    Console.WriteLine($"{parameters["peerId"]} offline");
+}
+```
+
+```go
+// Not supported yet
+```
+
+</MultiLang>
+
+## System Conversations
+
+With system conversations, you can easily add functions like auto-reply, official accounts, and service accounts to your application. We have a [demo](https://leancloud.github.io/leanmessage-demo/) that contains a MathBot that can calculate the mathematical expressions sent from users and respond with the results, which is implemented using hooks for system conversations. You can find the server-side program of this bot on [GitHub](https://github.com/leancloud/leanmessage-demo/tree/master/server).
+
+### Creating System Conversations
+
+A system conversation is also a kind of conversation. When a system conversation is created, an entry will be added to the `_Conversation` table with `sys` being `true`. See [Instant Messaging REST API Guide](/sdk/im/guide/rest/) for more information on how to create a system conversation.
+
+### Sending Messages to System Conversations
+
+[Instant Messaging REST API Guide](/sdk/im/guide/rest/) contains detailed instructions on how to send messages to users through system conversations. Besides this, users can send messages to system conversations in the same way they send messages to basic conversations.
+
+System conversations can also be used to send broadcast messages to all the users of your application so you don’t have to manually obtain the IDs of these users before sending messages. All you need to do is to invoke the REST API for sending broadcast messages. A broadcast message has the following traits:
+
+- A broadcast message has to be associated with a conversation. The broadcast message will show up together with other messages in the history of the system conversation.
+- When a user gets online, they will be notified of any broadcast messages sent to them when they are offline.
+- You can set a TTL for a broadcast message so that users won’t be notified of it when getting online if the message has expired. Users will still be able to find the message in the history.
+- When a new user logs in for the first time, they will receive the last broadcast message that’s not expired.
+
+Besides what’s mentioned above, a broadcast message will be treated in the same way as a basic message. See [Instant Messaging REST API Guide](/sdk/im/guide/rest/) for more information on how to send broadcast messages.
+
+### Getting History Messages of System Conversations
+
+To obtain the messages sent to users through system conversations, see [Instant Messaging REST API Guide](/sdk/im/guide/rest/).
+
+To obtain the messages sent from users to system conversations, you can use one of the following ways:
+
+- Look up the `_SysMessage` table. This table gets created the first time a user of your application sends a message to a system conversation. All the messages sent from users to system conversations will be stored in this table.
+- Set up a [Web Hook](#web-hook). You will have to define your [Web Hook](#web-hook) for receiving messages sent from users to system conversations.
+
+### Messages in System Conversations
+
+#### `_SysMessage`
+
+This table contains the messages sent from users to system conversations. It contains the following attributes:
+
+| Attribute        | Description                           |
+| ----------- | ------------------------------ |
+| `ackAt`     | The time the message got delivered.              |
+| `bin`       | Whether this is a binary message.         |
+| `conv`      | A `Pointer` to the associated system conversation. |
+| `data`      | The content of the message.                     |
+| `from`      | The `clientId` of the sender.      |
+| `fromIp`    | The IP address of the sender.              |
+| `msgId`     | An internal ID for the message.                |
+| `timestamp` | The time the message got created.              |
+
+#### Web Hook
+
+To set up a Web Hook for receiving the messages sent from users to system conversations, go to **Developer Center > Your game > Game Services > Cloud Services > Instant Messaging > Settings > Service conversation callback**. The data structure of the messages conforms to the schema of the `_SysMessage` table mentioned earlier.
+
+When users send messages to system conversations, our system will send an HTTP POST request containing data in JSON to the Web Hook you provided. Keep in mind that our system won’t generate a request for each message, but will combine multiple messages into a single request. You’ll notice that the outermost layer of the JSON in a request is an `Array` from the example below.
+
+The timeout for each request will be 5 seconds. If your hook doesn’t respond to a request within the time limit, our system will retry up to 3 times.
+
+The format of a request will look like this:
+
+```json
+[
+  {
+    "fromIp": "121.238.214.92",
+    "conv": {
+      "__type": "Pointer",
+      "className": "_Conversation",
+      "objectId": "55b99ad700b0387b8a3d7bf0"
+    },
+    "msgId": "nYH9iBSBS_uogCEgvZwE7Q",
+    "from": "A",
+    "bin": false,
+    "data": "Hello sys",
+    "createdAt": {
+      "__type": "Date",
+      "iso": "2015-07-30T14:37:42.584Z"
+    },
+    "updatedAt": {
+      "__type": "Date",
+      "iso": "2015-07-30T14:37:42.584Z"
+    }
+  }
+]
+```
+
+## Previous Chapters
+
+- [Overview](/sdk/im/guide/overview/)
+- Chapter 1: [Basic Conversations and Messages](/sdk/im/guide/beginner/)
+- Chapter 2: [Advanced Messaging Features, Push Notifications, Synchronization, and Multi-Device Sign-on](/sdk/im/guide/intermediate/)
+- Chapter 3: [Security, Permission Management, Chat Rooms, and Temporary Conversations](/sdk/im/guide/senior/)
+

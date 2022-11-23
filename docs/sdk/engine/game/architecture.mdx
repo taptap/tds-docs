@@ -1,0 +1,69 @@
+---
+title: 云引擎游戏后端参考架构
+sidebar_label: 参考架构
+sidebar_position: 2
+---
+
+import Mermaid from "/src/docComponents/Mermaid";
+import { Conditional } from "/src/docComponents/conditional";
+
+:::info
+
+这篇文档会介绍运行于云引擎上的游戏后端的整体架构，你还可以在 [游戏后端开发指南](/sdk/engine/game/guides) 中了解详细的接入方法，或者直接 [快速开始部署游戏后端](/sdk/engine/game/getting-started)。
+
+:::
+
+云引擎是一个进程级别的运行环境，开发者只需关注游戏后端的进程本身，专注于实现游戏，而不需要关注操作系统级别的环境。
+
+云引擎为游戏后端提供了 TCP 或 UDP 协议的支持、最长 60 分钟的平滑关闭、允许客户端连接到指定实例等功能，你可以使用云引擎支持的所有语言来使用这些能力（可以在 [总览](/sdk/engine/overview) 中看到所有支持的语言）。
+
+对于既有的游戏后端项目，通常也只需稍做修改就可以运行在云引擎上，获得云引擎提供的日志、统计、平滑部署和回滚、自动扩容等能力（可以在 [平台功能](/sdk/engine/platform) 中了解这些能力）。
+
+<Conditional region="cn">
+
+:::info
+
+云引擎提供的是托管游戏后端的能力，但如果你希望开发一个无后端的游戏项目，可以考虑 [多人在线对战服务](/sdk/multiplayer/features/)。
+
+:::
+
+</Conditional>
+
+## 长链接服务器
+
+对于实时多人对战游戏（如 MoBA、FPS、RTS 等强对抗游戏）来说，往往对局的状态更新非常频繁（如每秒几十次），业界大多使用 TCP 或 UDP 协议，在服务器的内存中维护对局状态。
+
+将这样的程序运行在云引擎的容器架构时，需要关心一些额外的问题：
+
+- 因为每个长链接实例内存中的状态各不相同，客户端需要明确知道自己希望连接到哪个实例
+- 在实例需要被关闭时，需要等待所有客户端连接关闭、内存中的状态不再有意义时再退出
+
+云引擎对 TCP 或 UDP 之上的载荷没有干预，你可以使用任何协议（如 KCP）或格式。但 TCP 或 UDP 包在经过云引擎的网关组件时，头部中的来源或目标地址、端口会被修改，在长链接实例中无法获取到客户端的真实 IP。
+
+## 客户端连接
+
+下面的图表描述了从客户端视角的网络活动：
+
+<Mermaid
+  diagram={`
+sequenceDiagram
+    autonumber
+    Note over Client,Router: 客户端向 Router 查询长链接地址
+    Client->>Router: GET /join (HTTP)
+    Note over Client,Router: Router 根据匹配逻辑返回长链接地址
+    Router->>Client: ip:port (HTTP)
+    Note over Client,Game Server: 客户端连接到游戏服务器
+    Client->>Game Server: connect ip:port (TCP)
+    loop
+        Note over Client,Game Server: 进行游戏数据的收发
+        Client->>Game Server: send game action
+        Game Server->>Client: broadcast game events
+    end
+`}
+/>
+
+其中：
+
+- **Client** 是指游戏的终端用户的设备。
+- **Router** 是开发者自行实现的一个 HTTP 服务（当然也可以部署在云引擎上），客户端通过一个固定的域名访问它，获取长链接的地址。
+- **Game Server** 是开发者部署在云引擎的长链接服务器，其拥有内部状态，客户端可以通过不同的地址（IP 和端口的组合）连接到不同的实例。

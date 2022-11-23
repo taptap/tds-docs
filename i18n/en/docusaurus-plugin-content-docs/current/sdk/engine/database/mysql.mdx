@@ -1,5 +1,5 @@
 ---
-title: LeanDB MySQL 使用指南
+title: LeanDB MySQL Guide
 sidebar_label: LeanDB MySQL
 sidebar_position: 2
 ---
@@ -10,49 +10,49 @@ import LeandbCreateInstance from "../_partials/leandb-create-instance.mdx";
 import TabItem from "@theme/TabItem";
 import Path from "/src/docComponents/path";
 
-LeanDB MySQL 是云引擎提供的托管数据库，开发者可以在云引擎中使用 MySQL 客户端类库连接，访问完整的 MySQL 功能，更多其他托管数据库请查看 [云引擎服务总览](/sdk/engine/overview)。
+LeanDB MySQL is the hosted database provided by Cloud Engine. You can have your project connect to the database using MySQL libraries and have access to all the functions provided by MySQL. See [Cloud Engine Overview](/sdk/engine/overview) to learn about the other hosted database services provided by Cloud Engine.
 
-## 创建和管理实例
+## Creating and Managing Instances
 
-开发者可以在 **<Path to="engine" /> > MySQL** 页面创建和管理 LeanDB MySQL 实例。
+You can create and manage LeanDB MySQL instances on **<Path to="engine" /> > MySQL**.
 
-### 创建实例
+### Creating Instances
 
 <LeandbCreateInstance>
 
-- **实例名称** 用于在云引擎中通过环境变量引用到该 LeanDB 实例，在账户下需唯一。
-- **内存规格** 目前提供 `0.5GB`、`1GB`、`2GB`、`4GB` 几种，代表不同的运算能力，是计费的基础。
-- **存储空间** 每个实例默认有 20G 的存储空间，可以选配 100G 或者 500G 的存储空间。
+- **Name** Used to access this instance from Cloud Engine. Should be unique in the application.
+- **Memory** You can choose from `0.5GB`, `1GB`, `2GB`, and `4GB`.
+- **Storage** You can choose from `20G`, `100G`, and `500G`.
 
 </LeandbCreateInstance>
 
-### MySQL 版本
+### MySQL Version
 
-目前 LeanDB 仅提供 MySQL 5.6 版本。
+LeanDB only provides MySQL 5.6 at this time.
 
-### 在线扩容
+### Resizing Online
 
-目前 LeanDB MySQL 不提供自助扩容的能力，如需扩容请提交工单联系我们的技术支持。
+At this time, you can’t resize LeanDB MySQL instances on your own. Please reach out to us if you need to have your instances resized.
 
-### 管理共享
+### Sharing Instances
 
-可以使用控制台上的「管理共享」功能将 LeanDB 实例共享给其他应用，被共享的应用的 LeanDB 页面可能看到这个实例，相关的环境变量也会出现在其他应用的云引擎中。
+You can use the “Manage sharing” function to share your LeanDB instances with other applications. When you share an instance with another application, the instance will appear in this application. The relevant environment variables will also be available in this application’s Cloud Engine instances.
 
-## 在云引擎中使用
+## Accessing From Cloud Engine
 
-LeanDB 所在的应用的云引擎在部署时，会被注入几个包含 MySQL 连接信息的环境变量，包括：
+When you deploy a project to the Cloud Engine instances under an application, some environment variables containing information for connecting to MySQL will be injected, including:
 
 - `MYSQL_HOST_<NAME>`
 - `MYSQL_PORT_<NAME>`
 - `MYSQL_ADMIN_USER_<NAME>`
 - `MYSQL_ADMIN_PASSWORD_<NAME>`
 
-其中 `<NAME>` 是你在创建 LeanDB 时为它指定的名字，如果你的 LeanDB 名为 `MYRDB` 的话，就会有名为 `MYSQL_HOST_MYRDB` 的环境变量（以及其他三个）。
+Here `<NAME>` is the name you provided when creating your LeanDB instance. If the name of your LeanDB instance is `MYRDB`, there will be an environment variable named `MYSQL_HOST_MYRDB` (together with the other three).
 
 <EngineRuntimes>
 <TabItem value='nodejs'>
 
-在 Node.js 中你可以这样连接到 MySQL:
+To connect to MySQL from Node.js:
 
 ```javascript
 const mysql = require("mysql");
@@ -79,13 +79,13 @@ mysqlPool
   });
 ```
 
-- 你需要运行 `npm install --save mysql bluebird` 来安装上面代码中用到的依赖
-- 更多的用法请参考 [mysqljs/mysql 的文档](https://github.com/mysqljs/mysql)
+- Make sure to install the dependencies needed by running `npm install --save mysql bluebird`
+- See [mysqljs/mysql](https://github.com/mysqljs/mysql) for more information
 
 </TabItem>
 <TabItem value='python'>
 
-在 Python 中你可以这样连接到 MySQL:
+To connect to MySQL from Python:
 
 ```python
 import os
@@ -117,13 +117,13 @@ except mysql.connector.Error as err:
     cnx.close()
 ```
 
-- 上面用的是 MySQL 官方的 python driver，你需要在 `requirements.txt` 中列出这一依赖，例如：`mysql-connector-python>=8.0.16,<9.0.0`
-- 更多的用法请参考 [MySQL Connector/Python 文档](https://dev.mysql.com/doc/connector-python/en/)
+- We’re using MySQL’s official Python driver; make sure to list the dependency in `requirements.txt` like this: `mysql-connector-python>=8.0.16,<9.0.0`
+- See [MySQL Connector/Python](https://dev.mysql.com/doc/connector-python/en/) for more information.
 
 </TabItem>
 <TabItem value='php'>
 
-在 PHP 中你可以这样连接到 MySQL:
+To connect to MySQL from PHP:
 
 ```php
 try {
@@ -139,12 +139,12 @@ try {
 }
 ```
 
-- 更多的用法请参考 [PDO 的文档](https://www.php.net/manual/zh/class.pdo.php)
+- See [PDO’s docs](https://www.php.net/manual/zh/class.pdo.php) for more information
 
 </TabItem>
 <TabItem value='java'>
 
-在 Java 中你可以这样连接到 MySQL:
+To connect to MySQL from Java:
 
 ```java
 import java.sql.Connection;
@@ -160,7 +160,7 @@ String password = System.getenv("MYSQL_ADMIN_PASSWORD_MYRDB");
 try {
   Class.forName("com.mysql.jdbc.Driver").newInstance();
 } catch (Exception ex) {
-  // 处理异常
+  // Handle error
 }
 try {
   Connection connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/test?" +
@@ -170,11 +170,11 @@ try {
   resultSet.first();
   System.out.format("The solution is %d", resultSet.getInt("solution"));
 } catch (SQLException ex) {
-  // 处理异常
+  // Handle error
 }
 ```
 
-- 需要在 `pom.xml` 中加入 mysql connector 依赖：
+- Make sure to add the dependency for MySQL connector to `pom.xml`:
 
 ```xml
 <dependency>
@@ -184,21 +184,21 @@ try {
 </dependency>
 ```
 
-- 更多的用法请参考 [MySQL Connector/J 文档](https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-usagenotes-connect-drivermanager.html)
+- See [MySQL Connector/J](https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-usagenotes-connect-drivermanager.html) for more information
 
 </TabItem>
 </EngineRuntimes>
 
-## 管理数据
+## Managing Data
 
-除了在云引擎中通过编程的方式访问 LeanDB，我们还提供了用于进行管理、调试或一次性数据操作的方式。
+Besides accessing LeanDB with your code from Cloud Engine, you can also use the following ways to manage, debug, or perform operations on your instances.
 
-### 在线管理面板
+### Admin Panel
 
-为方便开发和调试，我们为开发者提供了一个 Web 界面来对 MySQL 进行管理，你可以在控制台上点击「管理员面板」链接来访问这个 Web 界面。
+To make it easy for you to develop and debug, we provide a web interface for you to manage your MySQL instance. You can access the web interface by clicking “Admin panel” on the dashboard.
 
-开发者可以在这个页面上进行 SQL 查询和更新，创建和管理数据库，创建和管理索引等操作。
+You can run SQL to query and update your data, create and manage databases, and create and manage indices.
 
-### 使用命令行工具连接
+### Connecting With the CLI
 
 <LeandbCliAccess />

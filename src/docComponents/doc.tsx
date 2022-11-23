@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "@docusaurus/Link";
 
 export const [Red, Blue, Black, Gray, Green, BlueBlack] = [
   "#F64C4C",
@@ -174,4 +175,45 @@ export const Figure = ({
       )}
     </div>
   </div>
+);
+
+export const CardGrid = ({ children }) => (
+  <div
+    style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fill, minmax(18em, 1fr))",
+      gridAutoRows: "1fr",
+      gap: "0.5em",
+    }}
+  >
+    {children}
+  </div>
+);
+
+export const Card = ({ imgSrc, imgScale = 1, label, to }) => (
+  <Link
+    to={to}
+    style={{
+      color: "var(--tap-grey6)",
+      display: "flex",
+    }}
+  >
+    <div
+      style={{
+        padding: "0.5em",
+        border: "1px solid var(--ifm-table-border-color)",
+        borderRadius: "var(--ifm-alert-border-radius)",
+        display: "flex",
+        alignItems: "center",
+        gap: "0.5em",
+        flexGrow: "1",
+      }}
+    >
+      <img
+        src={imgSrc}
+        style={{ width: "4em", transform: `scale(${imgScale})` }}
+      />
+      <span>{label}</span>
+    </div>
+  </Link>
 );

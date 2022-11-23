@@ -1,73 +1,73 @@
 ---
-title: 深入了解云引擎
-sidebar_label: 深入了解
-sidebar_position: 6
+title: Deep Dive Into Cloud Engine
+sidebar_label: Deep Dive
+sidebar_position: 8
 ---
 
 :::note
-这篇文档希望向有经验的开发者介绍云引擎背后的更多细节，如希望快速地开始使用云引擎，请查看 [快速开始部署云引擎应用](/sdk/engine/deploy/getting-started)。
+This article is intended to introduce the technical specifications of Cloud Engine to experienced developers. For instructions on how to get started with Cloud Engine, see [Getting Started With Cloud Engine](/sdk/engine/deploy/getting-started).
 :::
 
-## 云引擎适合什么样的应用
+## What kinds of applications does Cloud Engine work well with?
 
-云引擎是一个基于容器技术实现的、进程级别的运行环境，开发者只需关注应用的进程本身，而不需要关注操作系统级别的环境。
+Cloud Engine provides container-based process-level runtime environments for your application. When using Cloud Engine, you can focus on your application’s process without caring about the environment provided by the operating system.
 
-在云引擎上，应用的进程可以专注在实现业务逻辑，通过标准化的接口来和云引擎交互：
+With Cloud Engine, your application’s process can focus on the business logic of your project. Your application can interact with Cloud Engine through standardized interfaces:
 
-- 应用可以使用 Git 来托管代码，云引擎会从指定的仓库拉取代码
-- 应用通过依赖清单（如 `pacakge.json`）来描述应用对环境的需求，云引擎会自动地准备好这些环境
-- 应用从环境变量中读取配置，云引擎提供了管理环境变量的能力
-- 应用本身不包含数据或共享状态无状态、通过网络来访问数据，云引擎提供了托管的数据库和缓存服务
-- 应用可以在云引擎上完成构建过程，云引擎提供了可自定义的构建机制
-- 应用可以以多进程的方式运行，以便横向扩展
-- 应用本身是完整的、可运行的（而不需要嵌入一个宿主环境），通过网络对外提供 HTTP 服务
-- 应用只需将日志写入到标准输出，云引擎会将日志收集起来以便查看
+- You can host your project’s code with Git and have Cloud Engine fetch the code from the corresponding repository
+- You can describe the environment required by your application with a dependency list (like `package.json`) and have Cloud Engine automatically prepare the environment for your application
+- You can manage environment variables with Cloud Engine and have your application load environment variables from Cloud Engine
+- Your application is expected to contain no data or states and is expected to access data through network requests; Cloud Engine provides hosted databases and cache services for your application
+- Your application can be built on Cloud Engine; Cloud Engine provides customizable build mechanisms for your application
+- Your application can run in multiple processes
+- Your application should be complete and runnable without containing a host environment; your application is expected to provide HTTP services through the network
+- Your application can simply print logs to the standard output and Cloud Engine will collect these logs for you to review
 
 :::note
-云引擎很大程度上受到了 [12-Factor](https://12factor.net/zh_cn/) 的影响，你可以在它的官网上了解到更多构建现代化、可移植、易于扩展和维护的后端服务的方法论。
+The design of Cloud Engine is greatly inspired by [The Twelve-Factor App](https://12factor.net/). You can learn more about the methodologies for building modernized, migratable, extensible, and maintainable backend services from its website.
 :::
 
-## 构建
+## Build
 
-云引擎针对多种语言提供了构建支持，我们称之为「运行环境（Runtime）」，云引擎会根据项目代码的结构去判断项目的类型，例如根目录包含 `package.json` 就会被认为是 Node.js 项目。
+Cloud Engine can be used to build projects in different languages (runtime environments). When you deploy a project to Cloud Engine, Cloud Engine will be able to tell the type of the project according to the project’s code. For example, if the project contains `package.json`, it will be considered a Node.js project.
 
-在开发者使用 Git 或命令行工具将代码上传到云引擎后，云引擎就会开始一个「构建」的过程，云引擎会根据项目的运行环境安装依赖（如 `npm install`）、构建可执行文件（如 `go build`）、执行用户自定义的命令（可在 `leanengine.yaml` 中配置）。
+Once you upload your project’s code to Cloud Engine with Git or the CLI, Cloud Engine will start a _build process_ during which the dependencies of your project will be installed (`npm install`), executable files will be created (`go build`), and your custom commands will be executed (can be configured in `leanengine.yaml`).
 
-构建过程最后会生成一个「版本」用于后续的部署，其中包含了应用的源代码、下载的依赖和构建出的可执行文件（部分运行环境），版本有一个类似 20210913-150821 的编号，在应用内是唯一的。
+A _version_ will be created by the end of the build process. It contains the source code of your project, the dependencies downloaded, and the executable files generated (for certain runtime environments). Each version has an ID like `20210913-150821`, which is unique in the application.
 
-为了加速构建的过程，云引擎采用了「分层缓存（Layered Cache）」的缓存机制，即如果一个步骤需要执行的操作没有变化，那么就不实际执行，直接采用前一次执行的结果（缓存）；但如果某个步骤需要执行的操作发生了变化，那么从此之后的所有步骤都需要重新执行。举例来说如果项目的依赖清单（如 `package.json`）没有发生变化，那么就不会重新执行依赖安装，而是采用前一次安装好的结果，整个构建过程就会快很多。
+Cloud Engine uses layered cache to accelerate the build process. This means that if the operation needed for a step is not changed, the operation will not be executed and the result (cache) from the previous execution will be used. If the operation is changed, all the steps since this step will be executed again. For example, if the dependency list (like `package.json`) is not changed, Cloud Engine will not reinstall dependencies for your project but will use the result from the previous installation, which reduces the time spent on the build process.
 
 :::caution
-构建缓存只是一种加速构建的机制，云引擎并不保证依赖没有变化就一定能使用缓存。
+The caching mechanism for the build process doesn’t guarantee that the cache will be used if the dependency list of your project doesn’t change.
 :::
 
 :::caution
-如果在项目依赖的版本指定为某个范围，且两次部署之间依赖声明文件无改动，但该依赖发布了新版本（新版本仍在指定的范围之内），那么，由于缓存机制的存在，在缓存过期前，仍会安装之前的依赖版本，而非指定范围内的最新版本。
-如果希望这种情况下，始终安装指定范围内的最新版本依赖，那么需要使用 `--no-cache` 禁用缓存。
+If you specify a scope for the versions of the dependencies of your application and you use the same dependency list when you deploy your application for a second time, the dependencies installed for the previous version will be reused even if there are new versions released for the dependencies (and these versions are still within the scope).
+To force Cloud Engine to install the latest versions of the dependencies within the scope, you can disable the cache with the `--no-cache` option.
 :::
 
-## 实例和部署
+## Instances and Deployment
 
-构建好的版本可以被部署到「实例」上，实例对应着服务器上的一个容器（一组进程），实际提供计算能力，对外提供服务。
+A version can be deployed to _instances_. Each instance corresponds to a container (process) on the server, which provides the computing power for your application and allows your application to provide services to users.
 
-### 平滑部署
+### Zero Downtime Deployment
 
-标准版云引擎在进行部署、重启或自动的实例迁移时，会逐个启动新的容器，在新的容器工作正常后，旧的容器仍会保持运行至少 30 秒的时间，以便将正在处理的请求执行完。通过这样的平滑部署机制，在云引擎上部署新版本或重启时，几乎不会有请求失败，应用的处理能力也不会有明显下降。
+If you’re using the standard version of Cloud Engine, when you deploy your project, restart your instances, or when we’re migrating instances, new containers will be started first. With new containers running normally, each old container will still keep running for at least 30 seconds to fulfill the ongoing requests. With this mechanism, when you deploy new versions or restart your instances, there probably won’t be requests that would fail, nor will the ability of your application to handle requests get impaired.
 
-应用可以接收 `SIGTERM` 信号来在退出前进行自定义的清理操作，默认情况下在收到 `SIGTERM` 信号后会有至少 10 秒的时间可以用作退出前的清理操作。
+Your application can listen to the `SIGTERM` signal to perform cleanups before it exits. By default, your application has 10 seconds to perform cleanups once it receives a `SIGTERM` signal.
 
-### 休眠和唤醒
+### Hibernation
 
-云引擎的体验版实例（包括赠送的生产环境或赠送的预备环境实例）在一段时间没有外部请求后会休眠（停止运行），在有外部请求时再启动，从休眠中启动可能需要十几秒的时间，同时体验版实例每天最多保持运行 18 个小时，超过 18 小时会被强制休眠，即使有外部请求也不会启动。
+A trial instance (including the free one in the production environment or the staging environment) will hibernate if it receives no requests within a while. While hibernating, the instance will restart if it receives a request. It may take 10 to 20 seconds for an instance to start from hibernation. If a trial instance has run for more than 18 hours within the past 24 hours, it will be forced to hibernate and won’t restart even if there are requests coming in.
 
-### 自动的实例迁移
+### Automatic Instance Migration
 
-除了开发者进行的部署或重启，因均衡宿主机负载或宿主机需下线维护等原因，系统有时也会自动地触发实例迁移操作，这时也会使用平滑部署机制，因此对应用的影响很小，但在日志中会打印实例重启的信息、CPU 和内存图表也可能会有波动，属正常现象。
+Sometimes the system will automatically trigger instance migrations even if you don’t start a deployment or restart your instances. When this happens, the zero-downtime-deployment mechanism will also be used. You may see logs saying that instances have been restarted, but there’s no need to worry about it.
 
-## 云函数
+## Cloud Functions
 
-云函数是一种经过高度封装的函数计算功能，实际功能由云引擎 SDK 提供，本质上是与用户程序运行在同一个进程、同一个 HTTP 端口上的 HTTP 服务。
+Cloud Functions lets you run backend code on the cloud in response to various types of events. The core functionality of Cloud Functions is provided by the Cloud Engine SDK, which shares the same process and HTTP port as your own project.
 
-Hook 的实现方式和云函数非常相似，区别在于使用了特殊的命名、调用者是内网的数据存储或即时通讯服务，同时 SDK 会对调用者的来源 IP 进行检查，确保来自内网。
+Hooks are implemented in a similar manner as Cloud Functions. The difference is that hooks use a special set of names and can only be invoked by the Data Storage service or the Instant Messaging service through our private network. The Cloud Engine SDK will check the IP address of the request sender to ensure that it comes from our private network.
 
-一个应用下不同分组中的云函数和 Hook 都属于同一命名空间，这意味着不同的云函数可以由不同的分组提供、使用不同的语言进行开发。在部署应用到云引擎时，云引擎会和 SDK 通讯获取云函数的列表，得出云函数名字和分组的映射关系，后续负载均衡会根据这个映射关系将请求转发到正确的分组。
+The Cloud Functions and hooks in the different groups of the same application share the same namespace. This means that different Cloud Functions can be provided by different groups and built with different languages. When you deploy your application to Cloud Engine, Cloud Engine will communicate with the SDK to get a list of Cloud Functions and know which Cloud Functions belong to which groups. Our load balancer will then be able to redirect requests to the correct groups.
