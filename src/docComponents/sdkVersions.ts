@@ -15,6 +15,10 @@ const sdkVersions = {
     java: "8.2.12",
     csharp: "0.10.18",
   },
+  tapadn: {
+    unity: "3.16.3.2",
+    android: "3.16.3.2",
+  }
 };
 
 export default sdkVersions;
