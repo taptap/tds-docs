@@ -28,9 +28,9 @@ import { Conditional } from "/src/docComponents/conditional";
 
 在控制台「数据存储」页面，点击创建 Class ，勾选「日志表」选项即可创建日志表。比如我们可以创建一个名为 `EventLog` 的日志表。
 
-在 SDK 层面，日志表对象的创建与普通对象的创建一致，
+在 SDK 层面，日志表对象的创建与普通对象的创建一致：
 
-```
+```java
 // for Android
 AVObject event = new AVObject("EventLog");
 event.put("eventType", "buttonClick");
@@ -41,7 +41,6 @@ event.saveInBackground();
 
 日志提交后会直接入库数据仓库，并且实时可查。
 
-
 ### 普通 Class 的同步
 
 普通 Class 对象，由于支持更新，同步到数据仓库的流程要稍微复杂一些。
@@ -50,7 +49,7 @@ event.saveInBackground();
 
 开启同步的 Class ，我们会在次日凌晨同步前一日更新过的数据。因此更新的对象需要在次日才可见。我们还会持续优化该流程，以期实现更实时的同步。
 
-#### 数据类型的转换
+### 数据类型的转换
  
 数据仓库中的字段类型与存储有着显著的差异，在数据入库的过程中我们会进行数据转换。其中需要特别注意的是，
 
@@ -59,7 +58,7 @@ event.saveInBackground();
 1. 不支持嵌套的 `Object` 类型，实际会以 JSON 字符串的形式存储，使用时需要使用 JSON 函数来提取。
 1. 对于数组类型，要求元素是同一类型。在入库的过程中会转换成 `Array(String)`，使用时需要用类型转换函数转换回原类型。 
 
-具体的类型转换说明见下表，
+具体的类型转换说明见下表：
 
 <table>
   <thead>
@@ -75,13 +74,13 @@ event.saveInBackground();
       <td>Array</td>
       <td>Array(String)</td>
       <td>元素类型会以字符存储，在提取元素后需要使用类型转换回原始类型</td>
-      <td>`toInt64(xs[1])`</td>
+      <td><code>toInt64(xs[1])</code></td>
     </tr>
     <tr>
       <td>Boolean</td>
       <td>UInt8</td>
       <td>0 表示 false, 1 表示 true</td>
-      <td>`emailVerified = 1`</td>
+      <td><code>emailVerified = 1</code></td>
     </tr>
     <tr>
       <td>Bytes</td>
@@ -98,8 +97,8 @@ event.saveInBackground();
     <tr>
       <td>File</td>
       <td>
-            `*.className String` <br/>
-            `*.objectId  String`
+            <code>*.className String</code><br/>
+            <code>*.objectId  String</code>
       </td>
       <td>会被展开为 className 和 objectId 两个字段</td>
       <td></td>
@@ -120,13 +119,13 @@ event.saveInBackground();
       <td>Object</td>
       <td>String</td>
       <td>以 JSON 字符串的形式存储，需要用相关函数提取其中的字段</td>
-      <td>`visitParamExtractInt64(object, 'id')`</td>
+      <td><code>visitParamExtractInt64(object, 'id')</code></td>
     </tr>
     <tr>
       <td>Pointer</td>
       <td>
-            `*.className String` <br/>
-            `*.objectId  String`
+            <code>*.className String</code> <br/>
+            <code>*.objectId  String</code>
       </td>
       <td>会被展开为 className 和 objectId 两个字段</td>
       <td></td>
