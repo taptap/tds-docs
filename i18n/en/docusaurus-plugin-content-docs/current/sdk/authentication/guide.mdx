@@ -230,22 +230,19 @@ NSString *token = currentUser.sessionToken;
 
 ## Setting Other User Properties
 
-The account system allows you to store additional data associated with users. For example, you can store users’ nicknames by adding a `nickname` field.
-You can also store users’ birthdays so you can send them gifts on their birthdays.
+The account system allows you to store `nickname` and `avatar` data associated with users. For example, you can store users’ nicknames by using `nickname` field.
 
 <MultiLang>
 
 ```cs
 var currentUser = await TDSUser.GetCurrent();  // Get the instance of the current user
 currentUser["nickname"] = "Tarara";
-currentUser["birthday"] = "01-01";
 await currentUser.Save();
 ```
 
 ```java
 TDSUser currentUser = TDSUser.currentUser();  // Get the instance of the current user
-currentUser.put("nickname");
-currentUser.put("birthday", "01-01");
+currentUser.put("nickname", "Tarara");
 currentUser.saveInBackground().subscribe(new Observer<LCObject>() {
     @Override
     public void onSubscribe(@NotNull Disposable d) {
@@ -273,7 +270,6 @@ currentUser.saveInBackground().subscribe(new Observer<LCObject>() {
 ```objectivec
 TDSUser *currentUser = [TDSUser currentUser];
 currentUser[@"nickname"] = @"Tarara";
-currentUser[@"birthday"] = @"01-01";
 [currentUser saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
     if (succeeded) {
         // Saved
@@ -285,54 +281,23 @@ currentUser[@"birthday"] = @"01-01";
 
 </MultiLang>
 
-We recommend that you store users’ nicknames with the `nickname` field because [TDS’s Friends module](/sdk/friends/guide/) **uses the data in this field when looking up friends with nicknames or generating invitation links**.
-If you log a user in [with the result of TapTap OAuth](/sdk/taptap-login/guide/start/#quick-log-in-with-taptap), the SDK will automatically set the `nickname` of the user to be the username of their TapTap account.
+The account system supports only two extra fields besides the built-in ones: `nickname` and `avatar`. Adding other new fields will cause an error.
 
-You might be tempted to store all the data related to users, like their game levels and the items they own, in the account system. However, this is not encouraged.
 The account system contains users’ authentication data as well as emails and phone numbers, so there will be strict permission settings imposed on it to prevent the leak of the data.
-Supposing that the users’ game levels are stored in the account system, since we often need to display the level of a player to other players, we will have to loosen the permission settings imposed on the account system so that the clients can query the relevant data. This will make the user data vulnerable to attacks.
-Besides the security concerns, having too much data in the account system can also lead to performance issues like the occurrence of slow queries.
-Therefore, we recommend that you only store authentication-related data in the account system.
-It’s totally fine to store a small amount of data that’s only accessible to its owners in the user account,
-but for other data unrelated to authentication, we suggest that you create a dedicated class (like `UserProfile`) to store it.
 
-`TDSUser` is a subclass of `LCObject`. This means that you can create, read, update, and delete user objects in the same way as you do with `LCObject`s. See [Data Storage Overview](/sdk/storage/features/) for more details.
+Besides the security concerns, having too much data in the account system can also lead to performance issues like the occurrence of slow queries.
+
+Therefore, we restrict the use of fields. If you want to store other user information, we suggest that you create a dedicated class (like `UserProfile`) to store it.
+
+:::tip
+We recommend that you store users’ nicknames with the `nickname` field because [TDS’s Friends module](/sdk/friends/guide/) **uses the data in this field when looking up friends with nicknames or generating invitation links**.
+
+If you log a user in [with the result of TapTap OAuth](/sdk/taptap-login/guide/start/#quick-log-in-with-taptap), the SDK will automatically set the `nickname` of the user to be the username of their TapTap account.
+:::
 
 ## Queries on Users
 
-To query for users, you can create a new `LCQuery` for `_User`.
-For example, to find all the users who were born on January 1st:
-
-<MultiLang>
-
-```cs
-LCQuery<TDSUser> userQuery = TDSUser.GetQuery();
-userQuery.WhereEqualTo("birthday", "01-01");
-int count = await userQuery.Count();
-```
-
-```java
-LCQuery<TDSUser> userQuery = TDSUser.getQuery(TDSUser.class);
-userQuery.whereEqualTo("birthday", "01-01");
-userQuery.countInBackground().subscribe(new Observer<Integer>() {
-  public void onSubscribe(Disposable disposable) {}
-  public void onNext(Integer count) {
-    System.out.println(count + " players were born on January 1st.");
-  }
-  public void onError(Throwable throwable) {}
-  public void onComplete() {}
-});
-```
-
-```objc
-LCQuery *userQuery = [TDSUser query];
-[userQuery whereKey:@"birthday" equalTo:@"01-01"];
-[query countObjectsInBackgroundWithBlock:^(NSInteger count, NSError *error) {
-  NSLog(@"%ld players were born on January 1st.", count);
-}];
-```
-
-</MultiLang>
+`TDSUser` is a subclass of `LCObject`. This means that you can create, read, update, and delete user objects in the same way as you do with `LCObject`s. See [Data Storage Overview](/sdk/storage/features/) for more details.
 
 For security reasons, **the account system (the `_User` table) has its `find` permission disabled by default**. Each user can only access their own data in the `_User` table and cannot access that of others. If you need to allow each user to view other users’ data, we recommend that you create a new table to store such data and enable the `find` permission of this table. You may also encapsulate queries on users within Cloud Engine and avoid opening up `find` permissions of `_User` tables.
 
