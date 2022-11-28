@@ -1,0 +1,471 @@
+---
+title: 礼包系统开发指南
+sidebar_label: 开发指南
+sidebar_position: 2
+---
+
+:::tip
+接入礼包系统之前，需完成应用配置。在 **游戏服务 - 应用配置** 中可获取 **Client ID 和 Server Secret**。请妥善保管这些信息，勿传给他人。
+:::
+
+## 开始
+
+礼包系统接入适用于有请求接口能力的游戏，目前尚未提供完全离线的兑换码服务。
+
+根据您的使用场景，您可以灵活对接以下不同兑换接口完成兑换流程。
+
+| 方式           | 接口名                           | 需游戏方校验后台设置的兑换条件 | 需游戏方提供发送道具接口 |
+| -------------- | -------------------------------- | :----------------------------- | :----------------------- |
+| 游戏方校验     | /api/v1.0/cdk/game/submit-check  | ✓                              | ✓                        |
+| 游戏方发送     | /api/v1.0/cdk/game/submit-send   | ✗                              | ✓                        |
+| 无服务器兑换   | /api/v1.0/cdk/game/submit-simple | ✗                              | ✗                        |
+| 游戏方校验 Web | /api/v1.0/cdk/page/submit-check  | ✓                              | ✓                        |
+| 游戏方发送 Web | /api/v1.0/cdk/page/submit-send   | ✗                              | ✓                        |
+
+### 接入顺序
+
+- 完成应用配置获取 **Client ID 和 Server Secret** 信息。
+- 进入 **运营工具-礼包系统-服务器配置** 选择性填写游戏方服务器信息并在其中配置发送通知接收地址用来发送相应道具。
+- 创建礼包活动导出兑换码，礼包配置完成准备测试。
+- 根据实际业务场景使用对应兑换接口完成兑换。
+
+### 兑换流程
+
+兑换流程大致是：
+
+1. 根据接口文档提交 **兑换码** 与 **配置信息等参数** 给兑换接口。
+2. 兑换接口校验数据合法性。
+3. 兑换系统根据业务场景选择是否调用 **游戏方提供的二次校验接口**。
+4. 校验全部通过后根据不同接口判断是否调用 **游戏方提供的发送道具接口** 完成兑换。
+
+有三种不同的兑换接口可以进行兑换，整体对接流程只要对接其一接口即可完成：
+
+| 名称         | 描述                                                                                                                                                 |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 游戏方校验   | 如果您将使用服务器对接兑换系统，可以安全地保存密钥信息，并希望每次兑换时能通过您的应用程序来校验是否允许兑换，调用您的接口来发送道具，请使用此流程。 |
+| 游戏方发送   | 如果您将使用服务器对接兑换系统，可以安全地保存密钥信息，并希望调用您的应用程序接口来发送每次兑换的道具，请使用此流程。                               |
+| 无服务器兑换 | 如果您希望不开发接口完成兑换流程，调用兑换接口后根据返回值来判断是否兑换失败，请使用此流程。                                                         |
+
+### 三种兑换场景
+
+#### 游戏方校验
+
+当您请求兑换码 submit-check 接口进行兑换时，兑换系统会核对库存以及提交数据是否正确，兑换系统核对通过后会调用您在后台配置的二次校验接口并将后台设置的条件作为参数传给您来校验。
+当您的接口校验通过后会继续将后台配置的奖品内容作为参数调用您的发送道具接口，当发送道具成功完成后本次兑换完成。
+![游戏方校验泳道图](/img/tds-gift/submit_check.png)
+
+#### 游戏方发送
+
+当您请求兑换码 submit-send 接口进行兑换时，兑换系统会核对库存以及提交数据是否正确，核对完成后会继续将后台配置的奖品内容作为参数调用您的发送道具接口，当发送道具成功完成后本次兑换完成。
+![游戏方发送泳道图](/img/tds-gift/submit_send.png)
+
+#### 无服务器兑换
+
+当您请求兑换码 submit-simple 接口进行兑换时，兑换系统会核对库存以及提交数据是否正确，兑换信息验证通过后本次兑换完成并将后台配置的道具信息返回给您。
+![无服务器兑换泳道图](/img/tds-gift/submit_simple.png)
+
+## 对接兑换接口
+
+### 游戏方二次校验规范
+
+礼包活动在后台配置了自定义兑换条件后，使用带二次校验能力的接口进行兑换时，兑换系统会将此礼包活动的自定义兑换条件发送给游戏方进行二次校验，下图配置会对您在后台配置的接口发起如下请求：
+
+![自定义兑换条件](/img/tds-gift/custom_redemption.png)
+
+```
+curl --location -g --request POST <后台配置的游戏方二次校验接口地址> \
+--header 'Content-Type: application/json' \
+--data-raw '{"activity_id":<后台活动ID>,"character_id":<用户ID>,"content":"[{\"condition\":\"level\",\"operate":\"gt\",\"value\":10}]","ext":<兑换提交的ext参数>,"gift_code":<礼包码>,"nonce_str":"abcdc","server_code": <后台配置的code>,"sign":"42d2b58a8cd58b5e63d90524aaf63ef97e04f223","timestamp":1658825322}'
+```
+
+请在校验完成后返回带有特定字段的 JSON 返回值告诉兑换系统校验结果。
+
+```json
+{
+  "status": true,
+  "errorCode": "字符串类型的错误code"
+}
+```
+
+如果您希望返回字段命名风格保持一致也可以使用下划线命名风格返回信息。
+
+```json
+{
+  "status": true,
+  "error_code": "字符串类型的错误code"
+}
+```
+
+如果您并不要求兑换系统知晓兑换的错误信息可以直接返回 **非 200 HTTP code** 表示兑换失败，或者返回 **HTTP code 200** 表示兑换成功。
+这样就无需按兑换系统的格式来返回信息。
+
+| 请求参数          | 类型           | 含义                 |
+| ----------------- | -------------- | -------------------- |
+| activity_id       | 字符串         | 礼包活动 ID          |
+| character_id      | 字符串         | 兑换的用户 ID        |
+| content           | 字符串（JSON） | 后台配置的自定义条件 |
+| content.condition | 字符串         | 自定义条件-key       |
+| content.operate   | 字符串         | 关系-详情见其它      |
+| content.value     | 字符串         | 自定义条件-value     |
+| ext               | 字符串         | 请求接口时传递的数值 |
+| gift_code         | 字符串         | 用户此次兑换的礼包码 |
+| nonce_str         | 字符串         | 此次请求的随机字符串 |
+| server_code       | 字符串         | 服务器 code          |
+| sign              | 字符串         | 签名                 |
+| timestamp         | 数字           | 秒级时间戳           |
+
+| 返回参数  | 类型           | 含义                                            |
+| --------- | -------------- | ----------------------------------------------- |
+| errorCode | 字符串         | 错误类型，error_code 含义相同，优先取 errorCode |
+| ext       | 字符串（可选） | 需要透传给发送道具接口的字符串                  |
+| status    | 布尔值         | 是否校验成功，true 为成功，false 为失败         |
+
+### 游戏方发送道具规范
+
+后台设置的物品信息，在兑换系统完成兑换校验后会带上配置的参数请求 **游戏方的发送道具接口**。下图配置会对您在后台配置的接口发起如下请求：
+![自定义兑换条件](/img/tds-gift/custom_prizes.png)
+
+```
+curl --location -g --request POST <后台配置的游戏方发送道具接口地址> \
+--header 'Content-Type: application/json' \
+--data-raw '{"activity_id": <后台活动ID>,"character_id":"uid","content":"[{\"name\": \"奖品名称\", \"number\": 2}]","ext":<兑换提交的ext>,"gift_code":"gift_code","nonce_str":"abcdc","server_code":<后台配置的code>,"sign":"fbe23e6f6f5193355b29e9ea2913b1992af56346","check_ext":<二次兑换接口返回的ext>,"timestamp":1658827492}'
+```
+
+同样请在发送完成后返回带有特定字段的 JSON 返回值告诉兑换系统发送道具结果，也可以使用下划线命名返回字段。
+
+```json
+{
+  "status": true,
+  "errorCode": "字符串类型的错误code"
+}
+```
+
+如果您并不要求兑换系统知晓兑换的错误信息可以直接返回 **非 200 HTTP code** 表示兑换失败，或者返回 **HTTP code 200** 表示兑换成功。
+这样就无需按兑换系统的格式来返回信息。
+
+| 请求参数       | 类型           | 含义                         |
+| -------------- | -------------- | ---------------------------- |
+| activity_id    | 字符串         | 礼包活动 ID                  |
+| character_id   | 字符串         | 兑换的用户 ID                |
+| server_code    | 字符串         | 服务器 code                  |
+| content        | 字符串（JSON） | 后台配置的自定义奖品         |
+| content.name   | 字符串         | 奖品名称                     |
+| content.number | 数字           | 奖品数量                     |
+| ext            | 字符串         | 请求接口时传递的数值         |
+| gift_code      | 字符串         | 用户此次兑换的礼包码         |
+| nonce_str      | 字符串         | 此次请求的随机字符串         |
+| sign           | 字符串         | 签名                         |
+| check_ext      | 字符串         | 二次校验透传过来的字符串参数 |
+| timestamp      | 数字           | 秒级时间戳                   |
+
+| 返回参数  | 类型   | 含义                                            |
+| --------- | ------ | ----------------------------------------------- |
+| errorCode | 字符串 | 错误类型，error_code 含义相同，优先取 errorCode |
+| status    | 布尔值 | 是否校验成功，true 为成功，false 为失败         |
+
+### 无服务器兑换
+
+使用无服务器兑换接口进行兑换时无需游戏方开发校验与发送接口。
+
+但要注意在 **后台配置礼包时需创建无服务器礼包**。
+
+兑换系统在接收到兑换请求后直接将兑换结果返回，游戏根据返回结果判断是否发放道具。
+
+### 三种兑换接口
+
+#### 二次校验兑换接口
+
+POST /api/v1.0/cdk/game/submit-check
+
+Header Content-Type:application/json
+
+请求参数：
+
+| 请求参数     | 类型   | 是否必选 | 含义                                              |
+| ------------ | ------ | -------- | ------------------------------------------------- |
+| client_id    | 字符串 | 必传     | 开发者后台 ClientId 信息                          |
+| gift_code    | 字符串 | 必传     | 这次兑换的兑换码                                  |
+| server_code  | 字符串 | 必传     | 后台配置的服务器 code                             |
+| character_id | 字符串 | 必传     | 游戏用户 ID                                       |
+| nonce_str    | 字符串 | 必传     | 随机字符串，建议五位随机字符串                    |
+| sign         | 字符串 | 必传     | 签名                                              |
+| timestamp    | 数字   | 必传     | 时间戳，单位为秒，有效期为一分钟                  |
+| ext          | 字符串 | 非必传   | 该字段会原封不动出现在 ext 中传给游戏二次校验接口 |
+
+请求示例：
+
+```
+curl --location --request POST '<URL>/api/v1.0/cdk/game/submit-check' \
+--header 'Content-Type: application/json' \
+--data-raw '{"client_id":<后台ClientId>,"gift_code":<这次使用的兑换码>,"server_code":<服务器code>,"character_id":<游戏用户ID>,"nonce_str":<随机字符串>,"sign":<签名>,"timestamp":<时间戳>,"ext": <透传字段>}'
+```
+
+#### 无二次校验兑换接口
+
+POST /api/v1.0/cdk/game/submit-send
+
+Header Content-Type:application/json
+
+请求参数：
+
+| 请求参数     | 类型   | 是否必选 | 含义                             |
+| ------------ | ------ | -------- | -------------------------------- |
+| client_id    | 字符串 | 必传     | 开发者后台 ClientId 信息         |
+| gift_code    | 字符串 | 必传     | 这次兑换的兑换码                 |
+| server_code  | 字符串 | 必传     | 后台配置的服务器 code            |
+| character_id | 字符串 | 必传     | 游戏用户 ID                      |
+| nonce_str    | 字符串 | 必传     | 随机字符串，建议五位随机字符串   |
+| sign         | 字符串 | 必传     | 签名                             |
+| timestamp    | 数字   | 必传     | 时间戳，单位为秒，有效期为一分钟 |
+
+请求示例：
+
+```
+curl --location --request POST '<URL>/api/v1.0/cdk/game/submit-send' \
+--header 'Content-Type: application/json' \
+--data-raw '{"client_id":<后台ClientId>,"gift_code":<这次使用的兑换码>,"server_code":<服务器code>,"character_id":<游戏用户ID>,"nonce_str":<随机字符串>,"sign":<签名>,"timestamp":<时间戳>,"ext": <透传字段>}'
+```
+
+#### 无服务器兑换接口
+
+POST /api/v1.0/cdk/game/submit-simple
+
+Header Content-Type:application/json
+
+请求参数：
+
+| 请求参数     | 类型   | 是否必选 | 含义                                |
+| ------------ | ------ | -------- | ----------------------------------- |
+| client_id    | 字符串 | 必传     | 开发者后台 ClientId 信息            |
+| gift_code    | 字符串 | 必传     | 这次兑换的兑换码                    |
+| character_id | 字符串 | 必传     | 游戏用户 ID                         |
+| nonce_str    | 字符串 | 必传     | 随机字符串，建议五位随机字符串      |
+| sign         | 字符串 | 必传     | 签名，该签名用 ClientId 代替 Secret |
+
+返回参数：
+
+| 返回参数       | 类型           | 含义                             |
+| -------------- | -------------- | -------------------------------- |
+| activity_id    | 字符串         | 礼包活动 ID                      |
+| nonce_str      | 字符串         | 随机字符串                       |
+| timestamp      | 字符串         | 时间戳                           |
+| content        | 字符串（JSON） | 后台配置的自定义奖品             |
+| content.name   | 字符串         | 奖品名称                         |
+| content.number | 数字           | 奖品数量                         |
+| sign           | 字符串         | 返回签名，验证返回数据没有被修改 |
+| success        | 布尔           | 是否成功                         |
+
+请求示例：
+
+```
+curl --location --request POST '<URL>/api/v1.0/cdk/game/submit-simple' \
+--header 'Content-Type: application/json' \
+--data-raw '{"client_id":<后台ClientId>,"gift_code":<这次使用的兑换码>,"character_id":<游戏用户ID>,"nonce_str":<随机字符串>,"sign":<签名>,"timestamp":<时间戳>}'
+```
+
+返回示例：
+
+```json
+{
+  "activity_id": "TDS20220928151122U9H",
+  "content": "[{\"name\": \"奖品\", \"number\": 2}]",
+  "nonce_str": "0DD4B",
+  "sign": "5895f87d3dfb5e0918c1b195c015d9284609d122",
+  "timestamp": 1664354023,
+  "success": true
+}
+```
+
+#### 返回格式
+
+成功返回
+
+```json
+{
+  "success": true,
+  "messages": "成功"
+}
+```
+
+错误返回
+
+| 返回参数         | 含义         |
+| ---------------- | ------------ |
+| error            | 错误码       |
+| message          | 错误大致信息 |
+| info             | 详细信息     |
+| info.dev_message | 开发提示     |
+| info.hint        | 详细提示     |
+
+```json
+{
+  "error": 100001,
+  "message": "输入有误",
+  "info": {
+    "dev_message": "",
+    "hint": "test error"
+  }
+}
+```
+
+### 请求域名
+
+| TapTap 版本     | 域名                      |
+| --------------- | ------------------------- |
+| 国内 taptap.com | https://poster-api.xd.cn  |
+| 海外 taptap.io  | https://poster-api.xd.com |
+
+### 签名
+
+游戏方与兑换系统的接口通讯时将使用签名参数作为基础的安全验证，其中 **Secret 为后台 游戏服务 - 应用配置 中 Server Secret**。
+
+:::tip
+为了保证安全性，请勿将 Server Secret 信息放在客户端中使用以防敏感信息泄漏。
+:::
+
+计算签名伪代码如下：
+
+```
+sign == sha1(timestamp + nonce_str + secret)
+```
+
+您也可以通过单元测试验证签名计算过程正确与否，如下是 golang 示例：
+
+```go
+func TestMakeSign(t *testing.T) {
+    timestamp := 1655724586
+    nonceStr := "abcde"
+    secret := "abc"
+    sign := MakeSign(int64(timestamp), nonceStr, secret)
+    assert.Equal(t, sign, "3cb8c38833fa742e7873378faddcbe5b56088482")
+    //output: 3cb8c38833fa742e7873378faddcbe5b56088482
+}
+```
+
+为了 Secret 不存放在客户端中，无服务器兑换返回的签名通过 **Client ID 代替 Secret 进行验签**。
+
+```
+sign == sha1(timestamp + nonce_str + client_id)
+```
+
+### Web 嵌入兑换接口
+
+兑换系统提供了一套支持简易图形验证码的兑换接口，用来支持类似 Web 活动页的接入，与上述兑换接口流程相同但区别在于部分请求参数的改变。
+
+#### 获取验证码
+
+:::tip
+验证码有效期为五分钟，失效后请重新获取新的验证码。
+:::
+
+GET /api/v1.0/cdk/page/captcha-img
+
+Header Content-Type:application/json
+
+| 返回参数 | 含义                             |
+| -------- | -------------------------------- |
+| img      | base64 格式的图片信息            |
+| key      | 验证码 key，提交兑换时会需要带上 |
+
+返回示例：
+
+```json
+{
+  "img": "data:image/png;base64,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",
+  "key": "XfNTN1gQyvA2AcNOu1UN"
+}
+```
+
+#### 二次校验网页版
+
+POST /api/v1.0/cdk/page/submit-check
+
+Header Content-Type:application/json
+
+请求参数：
+
+| 请求参数            | 类型   | 是否必选 | 含义                                              |
+| ------------------- | ------ | -------- | ------------------------------------------------- |
+| client_id           | 字符串 | 必传     | 开发者后台 ClientId 信息                          |
+| gift_code           | 字符串 | 必传     | 这次兑换的兑换码                                  |
+| server_code         | 字符串 | 必传     | 后台配置的服务器 code                             |
+| character_id        | 字符串 | 必传     | 游戏用户 ID                                       |
+| nonce_str           | 字符串 | 必传     | 随机字符串，建议五位随机字符串                    |
+| verify_captcha_key  | 字符串 | 必传     | 验证码 KEY                                        |
+| verify_captcha_code | 字符串 | 必传     | 用户提交的验证码答案                              |
+| ext                 | 字符串 | 非必传   | 该字段会原封不动出现在 ext 中传给游戏二次校验接口 |
+
+#### 无二次校验网页版
+
+POST /api/v1.0/cdk/page/submit-send
+
+Header Content-Type:application/json
+
+请求参数：
+
+| 请求参数            | 类型   | 是否必选 | 含义                           |
+| ------------------- | ------ | -------- | ------------------------------ |
+| client_id           | 字符串 | 必传     | 开发者后台 ClientId 信息       |
+| gift_code           | 字符串 | 必传     | 这次兑换的兑换码               |
+| server_code         | 字符串 | 必传     | 后台配置的服务器 code          |
+| character_id        | 字符串 | 必传     | 游戏用户 ID                    |
+| nonce_str           | 字符串 | 必传     | 随机字符串，建议五位随机字符串 |
+| verify_captcha_key  | 字符串 | 必传     | 验证码 KEY                     |
+| verify_captcha_code | 字符串 | 必传     | 用户提交的验证码答案           |
+
+## 其它
+
+### 错误码
+
+| 自定义状态码 | 含义                                           |
+| ------------ | ---------------------------------------------- |
+| 100001       | 输入有误                                       |
+| 100002       | 账号验证失败                                   |
+| 100003       | 其它错误                                       |
+| 100004       | 验证码输入错误，请重试                         |
+| 100005       | 参数错误                                       |
+| 100006       | 超过使用限额                                   |
+| 100007       | 超过批次使用限额                               |
+| 100008       | 不在礼包活动时间范围之内                       |
+| 100009       | 暂未开放                                       |
+| 100010       | 超出服使用范围                                 |
+| 100011       | 点击太快了，手速慢点                           |
+| 100012       | 超出礼包最大兑换次数                           |
+| 100013       | 校验 cdkey 未通过                              |
+| 100014       | 操作的人太多了，服务器正在拼命处理中（限流中） |
+| 100015       | 发送道具失败                                   |
+| 100016       | 该礼包码无效                                   |
+| 100017       | 该礼包码活动无效                               |
+| 100018       | 该活动无法使用此兑换接口                       |
+| 500001       | 服务器故障                                     |
+| 500002       | 外部接口校验错误                               |
+
+### 自定义条件关系表
+
+| 关系 code | 含义     |
+| --------- | -------- |
+| lt        | 小于     |
+| le        | 小于等于 |
+| eq        | 等于     |
+| ne        | 不等于   |
+| ge        | 大于等于 |
+| gt        | 大于     |
+
+### 兑换系统出口 IP
+
+如果您配置的接口对请求 IP 有安全限制，请根据需要允许兑换系统的 IP 访问。
+
+| TapTap 版本     | IP            |
+| --------------- | ------------- |
+| 国内 taptap.com | 59.110.228.98 |
+| 海外 taptap.io  | 8.214.95.148  |
+
+### 常见 FAQ
+
+Q: 兑换参数完备，但请求兑换时返回 403。
+
+A: 请检查您的请求中 header 信息，是否有带上特殊的 User Agent。
+
+Q: 二次校验是需要游戏方请求两次兑换接口吗？
+
+A: 二次校验是您按照规范开发校验接口并将地址配置后台中，由兑换系统去请求。

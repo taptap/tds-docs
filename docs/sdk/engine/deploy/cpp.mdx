@@ -1,0 +1,102 @@
+---
+title: 云引擎 C++ 运行环境
+sidebar_label: C++
+sidebar_position: 10
+---
+
+import CloudEnvironments from "../_partials/cloud-environments.mdx";
+import CloudTimezone from "../_partials/cloud-timezone.mdx";
+import CloudLogs from "../_partials/cloud-logs.mdx";
+import CloudInternetAddress from "../_partials/cloud-internet-address.mdx";
+import CloudLoadBalancer from "../_partials/cloud-load-balancer.mdx";
+import CloudFilesystem from "../_partials/cloud-filesystem.mdx";
+import BuildingScripts from "../_partials/building-scripts.mdx";
+import BuildingBuildLogs from "../_partials/building-build-logs.mdx";
+import CloudCustomDomain from "../_partials/cloud-custom-domain.mdx";
+import CloudHealthCheck from "../_partials/cloud-health-check.mdx";
+import BuildingSystemDependencies from "../_partials/building-system-dependencies.mdx";
+
+:::info
+这篇文档是针对 C++ 运行环境的深入介绍，如希望快速地开始使用云引擎，请查看 [快速开始部署云引擎应用](/sdk/engine/deploy/getting-started)。
+:::
+
+云引擎目前支持构建使用 Bazel 或 Makefile（CMake）的项目。
+
+C++ 运行环境提供的编译器是 GCC 9.4。
+
+## Bazel 项目
+
+如果项目根目录存在 `WORKSPACE`，云引擎会默认使用 `bazel build -c opt //:all` 构建，`bazel run -c opt //:all` 来运行。
+
+## Makefile（CMake）项目
+
+如果项目根目录存在 `Makefile`，云引擎会使用 `make` 构建。
+
+如果项目根目录存在 `CMakeLists.txt`，云引擎会先使用 `cmake .` 来生成 Makefile。
+
+Makefile 项目没有默认的运行命令，需要在 `leanengine.yaml` 中自行设置运行命令：
+
+```yaml title='leanengine.yaml'
+run: ./myapp
+```
+
+## 上传预编译的程序
+
+你也可以选择预先编译好 binary 再上传到云引擎，我们建议在 Ubuntu 20.04 的环境下编译静态链接。
+
+然后在 `leanengine.yaml` 中自行设置运行命令：
+
+```yaml title='leanengine.yaml'
+runtime: cpp
+run: ./myapp
+```
+
+:::info
+云引擎的构建环境（如发行版版本）可能会发生变化，届时可能需要调整编译参数，但已在云引擎构建好的版本会将所有运行环境固化下来，可供持续运行或随时回滚。
+:::
+
+## 自定义构建过程
+
+<BuildingScripts />
+
+### 构建日志
+
+<BuildingBuildLogs />
+
+### 系统级依赖
+
+<BuildingSystemDependencies />
+
+## 健康检查
+
+<CloudHealthCheck />
+
+## 云端环境
+
+### 绑定自定义域名
+
+<CloudCustomDomain />
+
+### 负载均衡和加速节点
+
+<CloudLoadBalancer only="cpp" />
+
+### 环境变量
+
+<CloudEnvironments />
+
+### 日志
+
+<CloudLogs only="cpp" />
+
+### 时区
+
+<CloudTimezone />
+
+### 文件系统
+
+<CloudFilesystem />
+
+### 出入口 IP 地址
+
+<CloudInternetAddress />

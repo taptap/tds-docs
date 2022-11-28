@@ -47,7 +47,7 @@ import Mermaid from "/src/docComponents/Mermaid";
 
 假设我们产品中有一个叫「Tom」的用户，首先我们在 SDK 中创建出一个与之对应的 `IMClient` 实例（创建实例前请确保已经成功初始化了 SDK）：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 LCIMClient tom = new LCIMClient("Tom");
@@ -108,7 +108,7 @@ Client tom = Client(id: 'Tom');
 
 这里需要说明一点，有些 SDK（比如 C# SDK）在创建 `IMClient` 实例的同时会自动进行登录，另一些 SDK（比如 iOS 和 Android SDK）则需要调用开发者手动执行 `open` 方法进行登录：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 await tom.Open();
@@ -187,7 +187,7 @@ await tom.open();
 
 除了应用层指定 `clientId` 登录之外，我们也支持直接使用 `_User` 对象来创建 `IMClient` 并登录。这种方式能直接利用云端内置的用户鉴权系统而省掉登录签名操作，更方便地将存储和即时通讯这两个模块结合起来使用。示例代码如下：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var user = await LCUser.Login("USER_NAME", "PASSWORD");
@@ -281,7 +281,7 @@ LCUser.logIn(username: USER_NAME, password: PASSWORD) { (result) in
 
 Tom 完成了登录之后，就可以选择用户聊天了。现在他要给 Jerry 发送消息，所以需要先创建一个只有他们两个成员的 `Conversation`：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var conversation = await tom.CreateConversation(new string[] { "Jerry" }, name: "Tom & Jerry", unique: true);
@@ -349,7 +349,7 @@ try {
 
 `createConversation` 这个接口会直接创建一个对话，并且该对话会被存储在 `_Conversation` 表内，可以打开 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 结构化数据** 查看数据。不同 SDK 提供的创建对话接口如下：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 /// <summary>
@@ -596,7 +596,7 @@ Future<TemporaryConversation> createTemporaryConversation({
 
 对话已经创建成功了，接下来 Tom 可以在这个对话中发出第一条文本消息了：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var textMessage = new LCIMTextMessage("Jerry，起床了！");
@@ -664,7 +664,7 @@ try {
 
 </MultiLang>
 
-`Conversation#send` 接口实现的功能就是向对话中发送一条消息，同一对话中其他在线成员会立刻收到此消息。
+上面接口实现的功能就是向对话中发送一条消息，同一对话中其他在线成员会立刻收到此消息。
 
 现在 Tom 发出了消息，那么接收者 Jerry 他要在界面上展示出来这一条新消息，该怎么来处理呢？
 
@@ -672,7 +672,7 @@ try {
 
 在另一个设备上，我们用 `Jerry` 作为 `clientId` 来创建一个 `IMClient` 并登录即时通讯服务（与前两节 Tom 的处理流程一样）：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var jerry = new LCIMClient("Jerry");
@@ -742,7 +742,7 @@ Jerry 作为消息的被动接收方，他不需要主动创建与 Tom 的对话
 
 现在，我们看看具体应该如何响应服务端发过来的通知。Jerry 端会分别处理「加入对话」的事件通知和「新消息到达」的事件通知：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 jerry.OnInvited = (conv, initBy) => {
@@ -897,7 +897,7 @@ Jerry-->>UI: 6. 显示收到的消息内容
 
 在 Tom 和 Jerry 的对话中（假设对话 ID 为 `CONVERSATION_ID`，这只是一个示例，并不代表实际数据），后来 Tom 又希望把 Mary 也拉进来，他可以使用如下的办法：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 // 首先根据 ID 获取 Conversation 实例
@@ -1006,7 +1006,7 @@ try {
 
 而 Jerry 端增加「新成员加入」的事件通知处理函数，就可以及时获知 Mary 被 Tom 邀请加入当前对话了：
 
-<MultiLang>
+<MultiLang kind="im">
 <>
 
 ```cs
@@ -1140,7 +1140,7 @@ Cloud-->>Jerry: 2. 下发通知：Mary 被 Tom 邀请加入了对话
 
 而 **重新创建一个对话，并在创建的时候指定全部成员** 的方式如下：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var conversation = await tom.CreateConversation(new string[] { "Jerry","Mary" }, name: "Tom & Jerry & friends", unique: true);
@@ -1213,7 +1213,7 @@ try {
 
 例如，Tom 向好友群发送了一条欢迎消息：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var textMessage = new LCIMTextMessage("大家好，欢迎来到我们的群聊对话！");
@@ -1280,7 +1280,7 @@ try {
 
 三个好友的群其乐融融不久，后来 Mary 出言不逊，惹恼了群主 Tom，Tom 直接把 Mary 踢出了对话群。Tom 端想要踢人，该怎么实现呢？
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 await conversation.RemoveMembers(new string[] { "Mary" });
@@ -1358,7 +1358,7 @@ Cloud-->>Tom: 2. 下发通知：Mary 被移除了对话
 
 这里出现了两个新的事件：当前用户被踢出对话 `KICKED`（Mary 收到的），成员 XX 被踢出对话 `MEMBERS_LEFT`（Jerry 和 Tom 收到的）。其处理方式与邀请人的流程类似：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 jerry.OnMembersLeft = (conv, leftIds, kickedBy) => {
@@ -1493,7 +1493,7 @@ jerry.onKicked = ({
 
 把 Mary 踢走之后，Tom 嫌人少不好玩，所以他找到了 William，说他和 Jerry 有一个很好玩的聊天群，并且把群的 ID（或名称）告知给了 William。William 也很想进入这个群看看他们究竟在聊什么，他自己主动加入了对话：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var conv = await william.GetConversation("CONVERSATION_ID");
@@ -1597,7 +1597,7 @@ Cloud-->>Jerry: 2. 下发通知：William 加入对话
 
 其他人则通过订阅 `MEMBERS_JOINED` 来接收 William 加入对话的通知 :
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 jerry.OnMembersJoined = (conv, memberList, initBy) => {
@@ -1662,9 +1662,9 @@ jerry.onMembersJoined = ({
 
 ### 用户主动退出对话
 
-随着 Tom 邀请进来的人越来越多，Jerry 觉得跟这些人都说不到一块去，他不想继续呆在这个对话里面了，所以选择自己主动退出对话，这时候可以调用 `Conversation#quit` 方法完成退群的操作：
+随着 Tom 邀请进来的人越来越多，Jerry 觉得跟这些人都说不到一块去，他不想继续呆在这个对话里面了，所以选择自己主动退出对话，这时候可以调用下面的方法完成退群的操作：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 await conversation.Quit();
@@ -1737,7 +1737,7 @@ Cloud-->>Tom: 2. 下发通知：Jerry 已离开对话
 
 而其他人需要通过订阅 `MEMBERS_LEFT` 来接收 Jerry 离开对话的事件通知：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 mary.OnMembersLeft = (conv, members, initBy) => {
@@ -1804,7 +1804,7 @@ mary.onMembersLeft = ({
 
 假设 Tom 和 Jerry 已经在对话内了：
 
-<MultiLang>
+<MultiLang kind="im">
 <>
 
 | 操作           | Tom               | Jerry             | Mary        | William           |
@@ -1862,7 +1862,7 @@ mary.onMembersLeft = ({
 
 所有消息均派生自 `LCIMMessage`，每种消息实例都具备如下属性：
 
-<MultiLang>
+<MultiLang kind="im">
 <>
 
 | 属性               | 类型                     | 描述                                                                                                                                                                                                                            |
@@ -1978,7 +1978,7 @@ Cloud->>Jerry: 5. 收到图像消息，在对话框里面做 UI 展现
 
 对应的代码并没有时序图那样复杂，因为调用 `send` 接口的时候，SDK 会自动上传图像，不需要开发者再去关心这一步：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var image = new LCFile("screenshot.png", new Uri("http://example.com/screenshot.png"));
@@ -2078,7 +2078,7 @@ try {
 
 除了上述这种从本地直接发送图片文件的消息之外，在很多时候，用户可能从网络上或者别的应用中拷贝了一个图像的网络连接地址，当做一条图像消息发送到对话中，这种需求可以用如下代码来实现：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var image = new LCFile("girl.gif", new Uri("http://example.com/girl.gif"));
@@ -2171,7 +2171,7 @@ try {
 
 图像消息的接收机制和之前是一样的，只需要修改一下接收消息的事件回调逻辑，根据消息类型来做不同的 UI 展现即可，例如：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 client.OnMessage = (conv, msg) => {
@@ -2293,7 +2293,7 @@ lient.onMessage = ({
 
 以发送音频消息为例，基本流程是：读取音频文件（或者录制音频）> 构建音频消息 > 消息发送。
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var audio = new LCFile("tante.mp3", Path.Combine(Application.persistentDataPath, "tante.mp3"));
@@ -2389,7 +2389,7 @@ try {
 
 与图像消息类似，音频消息也支持从 URL 构建：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var audio = new LCFile("apple.aac", new Uri("https://some.website.com/apple.aac"));
@@ -2480,7 +2480,7 @@ try {
 
 地理位置消息构建方式如下：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var location = new LCGeoPoint(31.3753285, 120.9664658);
@@ -2561,7 +2561,7 @@ try {
 
 ### 再谈接收消息
 
-<MultiLang>
+<MultiLang kind="im">
 <>
 
 C# SDK 通过 `OnMessage` 事件回调来通知新消息：
@@ -2587,7 +2587,7 @@ jerry.OnMessage = (conv, msg) => {
 </>
 <>
 
-Java/Android SDK 中定义了 `LCIMMessageHandler` 接口来通知应用层新消息到达事件发生，开发者通过调用 `LCIMMessageManager#registerDefaultMessageHandler` 方法来注册自己的消息处理函数。`LCIMMessageManager` 提供了两个不同的方法来注册默认的消息处理函数，或特定类型的消息处理函数：
+Java/Android SDK 中定义了 `LCIMMessageHandler` 接口来通知应用层新消息到达事件发生，开发者通过调用 `LCIMMessageManager.registerDefaultMessageHandler` 方法来注册自己的消息处理函数。`LCIMMessageManager` 提供了两个不同的方法来注册默认的消息处理函数，或特定类型的消息处理函数：
 
 ```java
 /**
@@ -2621,7 +2621,7 @@ public static void unregisterMessageHandler(Class<? extends LCIMMessage> clazz, 
 - 首先解析消息的类型，然后找到开发者为这一类型所注册的处理响应 handler chain，再逐一调用这些 handler 的 `onMessage` 函数。
 - 如果没有找到专门处理这一类型消息的 handler，就会转交给 `defaultHandler` 处理。
 
-这样一来，在开发者为 `AVIMTypedMessage`（及其子类）指定了专门的 handler，也指定了全局的 `defaultHandler` 了的时候，如果发送端发送的是通用的 `LCIMMessage` 消息，那么接收端就是 `LCIMMessageManager#registerDefaultMessageHandler()` 中指定的 handler 被调用；如果发送的是 `LCIMTypedMessage`（及其子类）的消息，那么接收端就是 `LCIMMessageManager#registerMessageHandler()` 中指定的 handler 被调用。
+这样一来，在开发者为 `AVIMTypedMessage`（及其子类）指定了专门的 handler，也指定了全局的 `defaultHandler` 了的时候，如果发送端发送的是通用的 `LCIMMessage` 消息，那么接收端就是 `LCIMMessageManager.registerDefaultMessageHandler()` 中指定的 handler 被调用；如果发送的是 `LCIMTypedMessage`（及其子类）的消息，那么接收端就是 `LCIMMessageManager.registerMessageHandler()` 中指定的 handler 被调用。
 
 ```java
 // 1. 注册默认 handler，只有其他 handle 都没有被调用到时才会调用
@@ -2913,7 +2913,7 @@ conversation.on(Event.MESSAGE, function messageEventHandler(message) {
 
 「对话（`Conversation`）」是即时通讯的核心逻辑对象，它有一些内置的常用的属性，与控制台中 `_Conversation` 表是一一对应的。默认提供的 **内置** 属性的对应关系如下：
 
-<MultiLang>
+<MultiLang kind="im">
 
 | `AVIMConversation` 属性名 | `_Conversation` 字段 | 含义                                                         |
 | ------------------------- | -------------------- | ------------------------------------------------------------ |
@@ -3049,11 +3049,11 @@ conversation.on(Event.MESSAGE, function messageEventHandler(message) {
 
 ### 创建自定义属性
 
-在最开始介绍 [创建单聊对话](#创建对话-Conversation) 的时候，我们提到过 `IMClient#createConversation` 接口支持附加自定义属性，现在我们就来演示一下如何使用自定义属性。
+在最开始介绍 [创建单聊对话](#创建对话-conversation) 的时候，我们提到过 `IMClient#createConversation` 接口支持附加自定义属性，现在我们就来演示一下如何使用自定义属性。
 
 假如在创建对话的时候，我们需要添加两个额外的属性值对 `{ "type": "private", "pinned": true }`，那么在调用 `IMClient#createConversation` 方法时可以把附加属性传进去：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var properties = new Dictionary<string, object> {
@@ -3148,7 +3148,7 @@ try {
 
 在 `Conversation` 对象中，系统默认提供的属性，例如对话的名字（`name`），如果业务层没有限制的话，所有成员都是可以修改的，示例代码如下：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 await conversation.UpdateInfo(new Dictionary<string, object> {
@@ -3212,7 +3212,7 @@ try {
 
 而 `Conversation` 对象中自定义的属性，即时通讯服务也是允许对话内其他成员来读取、使用和修改的，示例代码如下：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 // 获取自定义属性
@@ -3302,7 +3302,7 @@ try {
 
 即时通讯云端提供了实时同步的通知机制，会把单个用户对「对话」的修改同步下发到所有在线成员（对于非在线的成员，他们下次登录上线之后，自然会拉取到最新的完整的对话数据）。对话属性更新的通知事件声明如下：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 jerry.OnConversationInfoUpdated = (conv, attrs, initBy) => {
@@ -3383,7 +3383,7 @@ jerry.onInfoUpdated = ({
 
 群内成员列表是作为对话的属性持久化保存在云端的，所以要获取一个 `Conversation` 对象的成员列表，我们可以在调用这个对象的更新方法之后，直接获取成员属性即可。
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 await conversation.Fetch();
@@ -3452,7 +3452,7 @@ do {
 
 ID 对应就是 `_Conversation` 表中的 `objectId` 的字段值，这是一种最简单也最高效的查询（因为云端会对 ID 建立索引）：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var query = tom.GetQuery();
@@ -3532,7 +3532,7 @@ if (conversation == null) {
 
 我们首先从最简单的 `equalTo` 开始。例如查询所有自定义属性 `type`（字符串类型）为 `private` 的对话，需要如下代码：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var query = tom.GetQuery()
@@ -3613,7 +3613,7 @@ try {
 
 与 `equalTo` 类似，针对 `Number` 和 `Date` 类型的属性还可以使用大于、大于等于、小于、小于等于等，详见下表：
 
-<MultiLang>
+<MultiLang kind="im">
 
 | 逻辑比较 | `AVIMConversationQuery` 方法 |
 | -------- | ---------------------------- |
@@ -3670,7 +3670,7 @@ try {
 
 `ConversationsQuery` 也支持在查询条件中使用正则表达式来匹配数据。比如要查询所有 `language` 是中文的对话：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 query.WhereMatches("language", "[\\u4e00-\\u9fa5]"); // language 是中文字符
@@ -3702,7 +3702,7 @@ try conversationQuery.where("language", .matchedRegularExpression("[\\u4e00-\\u9
 
 **前缀查询** 类似于 SQL 的 `LIKE 'keyword%'` 条件。例如查询名字以「教育」开头的对话：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 query.WhereStartsWith("name", "教育");
@@ -3732,7 +3732,7 @@ try conversationQuery.where("name", .prefixedBy("教育"))
 
 **包含查询** 类似于 SQL 的 `LIKE '%keyword%'` 条件。例如查询名字中包含「教育」的对话：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 query.WhereContains("name", "教育");
@@ -3762,7 +3762,7 @@ try conversationQuery.where("name", .matchedSubstring("教育"))
 
 **不包含查询** 则可以使用 [正则匹配查询](#正则匹配查询) 来实现。例如查询名字中不包含「教育」的对话：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 query.WhereMatches("name", "^((?!教育).)* $ ");
@@ -3795,7 +3795,7 @@ try conversationQuery.where("name", .matchedRegularExpression("^((?!教育).)* $
 
 可以使用 `containsAll`、`containedIn`、`notContainedIn` 来对数组进行查询。例如查询成员中包含「Tom」的对话：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var members = new List<string> { "Tom" };
@@ -3828,7 +3828,7 @@ try conversationQuery.where("m", .containedIn(["Tom"]))
 
 空值查询是指查询相关列是否为空值的方法，例如要查询 `lm` 列为空值的对话：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 query.WhereDoesNotExist("lm");
@@ -3858,7 +3858,7 @@ try conversationQuery.where("lm", .notExisted)
 
 反过来，如果要查询 `lm` 列不为空的对话，则替换为如下条件即可：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 query.WhereExists("lm");
@@ -3890,7 +3890,7 @@ try conversationQuery.where("lm", .existed)
 
 查询年龄小于 18 岁，并且关键字包含「教育」的对话：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 query.WhereContains("keywords", "教育")
@@ -3926,7 +3926,7 @@ try conversationQuery.where("age", .lessThan(18))
 
 查询年龄小于 18 或者关键字包含「教育」的对话：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 // 暂不支持
@@ -3980,7 +3980,7 @@ do {
 
 可以指定查询结果按照部分属性值的升序或降序来返回。例如：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 query.OrderByDescending("createdAt");
@@ -4013,7 +4013,7 @@ try conversationQuery.where("createdAt", .descending)
 
 普通对话最多可以容纳 500 个成员，在有些业务逻辑不需要对话的成员列表的情况下，可以使用「精简模式」进行查询，这样返回结果中不会包含成员列表（`members` 字段为空数组），有助于提升应用的性能同时减少流量消耗。
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 query.Compact = true;
@@ -4045,7 +4045,7 @@ query.excludeMembers = true;
 
 对于一个聊天应用，一个典型的需求是在对话的列表界面显示最后一条消息，默认情况下，针对对话的查询结果是不带最后一条消息的，需要单独打开相关选项：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 query.WithLastMessageRefreshed = true;
@@ -4078,7 +4078,7 @@ query.includeLastMessage = true;
 
 ### 查询缓存
 
-<MultiLang>
+<MultiLang kind="im">
 <>
 
 .NET SDK 暂不支持缓存功能。
@@ -4259,7 +4259,7 @@ SDK 提供了多种方式来拉取历史记录，iOS 和 Android SDK 还提供�
 
 在终端用户进入一个对话的时候，最常见的需求就是由新到旧、以翻页的方式拉取并展示历史消息，这可以通过如下代码实现：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 // limit 取值范围 1~100，默认 20
@@ -4332,7 +4332,7 @@ try {
 
 `queryMessage` 接口也是支持翻页的。即时通讯云端通过消息的 `messageId` 和发送时间戳来唯一定位一条消息，因此要从某条消息起拉取后续的 N 条记录，只需要指定起始消息的 `messageId` 和发送时间戳作为锚定就可以了，示例代码如下：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 // limit 取值范围 1~1000，默认 100
@@ -4463,7 +4463,7 @@ try {
 
 `queryMessage` 接口还支持指定特殊的消息类型，其示例代码如下：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 // 传入泛型参数，SDK 会自动读取类型的信息发送给服务端，用作筛选目标类型的消息
@@ -4527,7 +4527,7 @@ try {
 
 即时通讯云端支持的历史消息查询方式是非常多的，除了上面列举的两个最常见需求之外，还可以支持按照由旧到新的方向进行查询。如下代码演示从对话创建的时间点开始，从前往后查询消息记录：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var earliestMessages = await conversation.QueryMessages(direction: LCIMMessageQueryDirection.OldToNew);
@@ -4600,7 +4600,7 @@ try {
 
 这样我们就可以在不同方向上实现消息翻页了。
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var earliestMessages = await conversation.QueryMessages(direction: LCIMMessageQueryDirection.OldToNew, limit: 1);
@@ -4689,7 +4689,7 @@ try {
 
 注意：**每次查询也有 100 条限制，如果想要查询区间内所有产生的消息，替换区间起始点的参数即可。**
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 var earliestMessage = await conversation.QueryMessages(direction: LCIMMessageQueryDirection.OldToNew, limit: 1);
@@ -4793,7 +4793,7 @@ iOS 和 Android SDK 针对移动设备的特殊性，实现了客户端消息的
 
 客户端缓存是默认开启的，如果开发者有特殊的需求，SDK 也支持关闭缓存功能。例如有些产品在应用层进行了统一的消息缓存，无需 SDK 层再进行冗余存储，可以通过如下接口来关闭消息缓存：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 // 暂不支持
@@ -4861,7 +4861,7 @@ do {
 
 如果产品层面设计了用户退出登录或者切换账号的接口，对于即时通讯服务来说，也是需要完全注销当前用户的登录状态的。在 SDK 中，开发者可以通过调用 `LCIMClient` 的 `close` 系列方法完成即时通讯服务的「退出」：
 
-<MultiLang>
+<MultiLang kind="im">
 
 ```cs
 await tom.Close();
@@ -4920,7 +4920,7 @@ await tom.close();
 
 我们的 SDK 内部和即时通讯云端会维持一个「心跳」机制，能够及时感知到客户端的网络变化，同时将底层网络变化事件通知到应用层。具体来讲，当网络连接出现中断、恢复等状态变化时，SDK 会派发以下事件：
 
-<MultiLang>
+<MultiLang kind="im">
 <>
 
 `LCIMClient` 上会有如下事件通知：

@@ -1,6 +1,6 @@
 ---
-title: 云函数和 Hook 开发指南
-sidebar_label: 开发指南
+title: Cloud Functions and Hooks Guide
+sidebar_label: Guide
 sidebar_position: 2
 ---
 
@@ -13,26 +13,26 @@ import { Conditional } from "/src/docComponents/conditional";
 import Path from "/src/docComponents/path";
 
 :::info
-这篇文档专注在「云函数和 Hook」这种云引擎上的特殊的应用场景，如需部署通用的后端应用，或需要了解云引擎平台提供的更多功能，请看 [云引擎平台功能](/sdk/engine/deploy/platform)。
+This article focuses on a special use case of Cloud Engine that involves Cloud Functions and Hooks. To deploy general-purpose backend applications or learn more about the features provided by Cloud Engine, see [Cloud Engine Platform Features](/sdk/engine/platform).
 :::
 
 <FunctionsIntroduction />
 
-## 云函数
+## Cloud Functions
 
-现在让我们看一个更复杂的例子，在一个应用中我们允许用户对电影进行评分，一个评分对象（`Review`）大概是这样：
+Now let’s look at a more complex example. Assuming that we have an app for users to leave their reviews for movies. A `Review` object would look like this:
 
 ```json
 {
-  "movie": "夏洛特烦恼",
+  "movie": "A Quiet Place",
   "stars": 5,
-  "comment": "夏洛一梦，笑成麻花"
+  "comment": "I almost forgot breathing when watching this movie"
 }
 ```
 
-`stars` 表示评分，是 1 至 5 的数字。通过云引擎，我们可以简单地传入电影名称，然后返回电影的平均分。
+Here `stars` is a number between 1 and 5 that represents the score given by the reviewer. Let’s see how we can define a Cloud Function that helps us calculate the average score of a movie.
 
-云函数接收 JSON 格式的请求对象，我们可以用它来传入电影名称。云函数中可以直接使用对应语言的数据存储 SDK，所以我们可以使用它来查询所有的评分。结合在一起，我们可以实现一个 `averageStars` 函数：
+Cloud Functions accept requests in the form of JSON objects, which allows us to pass a movie’s name into a function when we invoke the function. Within the Cloud Function, we can use the Data Storage SDK to retrieve all the scores given to a movie. Now we have everything we need to implement our `averageStars` function:
 
 <EngineRuntimes>
 <TabItem value='nodejs'>
@@ -51,19 +51,19 @@ AV.Cloud.define("averageStars", function (request) {
 });
 ```
 
-`AV.Cloud.define` 还接受一个可选参数 `options`（位置在函数名称和调用函数之间），这个 `options` 对象上的属性包括：
+`AV.Cloud.define` accepts an optional parameter, `options` (placed between the function name and the function), which contains the following properties:
 
-- `fetchUser?: boolean`：是否自动抓取客户端的用户信息，默认为 `true`。设置为假时，`Request` 将不会有 `currentUser` 属性。
-- `internal?: boolean`：是否只允许在云引擎内（使用 `AV.Cloud.run` 且未开启 `remote` 选项）或使用 `Master Key`（使用 `AV.Cloud.run` 时传入 `useMasterKey`）调用，不允许客户端直接调用。默认为 `false`。
+- `fetchUser?: boolean`: Whether to automatically fetch the user logged in on the client side. Defaults to `true`. When set to `false`, `Request` will not contain the `currentUser` property.
+- `internal?: boolean`: Whether to only allow the function to be invoked within Cloud Engine (with `AV.Cloud.run` without enabling `remote`) or with the `Master Key` (by providing `useMasterKey` when calling `AV.Cloud.run`). When set to `true`, the function cannot be invoked directly by the client. Defaults to `false`.
 
-例如，假设我们不希望客户端直接调用上述函数，也不关心客户端用户信息，那么上述函数的定义可以改写为：
+For example, if we don’t want to allow clients to invoke the function defined above and we don’t care about the user logged in on the client side, the function above can be rewritten in the following way:
 
 ```js
 AV.Cloud.define(
   "averageStars",
   { fetchUser: false, internal: true },
   function (request) {
-    // 内容同上
+    // Same as above
   }
 );
 ```
@@ -79,7 +79,7 @@ def averageStars(movie, **params):
     return result
 ```
 
-客户端 SDK 调用时，云函数的名称默认为 Python 代码中函数的名称。有时需要设置云函数的名称与 Python 代码中的函数名称不相同，可以在 `engine.define` 后面指定云函数名称，比如：
+The Python function’s name will be used as the default name of the Cloud Function, which you can use to invoke the function with the client SDK. To give the Cloud Function a different name, attach the name after `engine.define`:
 
 ```python
 @engine.define('averageStars')
@@ -121,7 +121,7 @@ Cloud::define("averageStars", function($params, $user) {
     try {
         $reviews = $query->find();
     } catch (CloudException $ex) {
-        // 查询失败，将错误输出到日志
+        // Failed to query; output the error to the log
         error_log($ex->getMessage());
         return 0;
     }
@@ -143,7 +143,7 @@ Cloud::define("averageStars", function($params, $user) {
 ```cs
 [LCEngineFunction("averageStars")]
 public static float AverageStars([LCEngineFunctionParam("movie")] string movie) {
-    if (movie == "夏洛特烦恼") {
+    if (movie == "A Quiet Place") {
         return 3.8f;
     }
     return 0;
@@ -162,7 +162,7 @@ type Review struct {
 }
 
 leancloud.Engine.Define("averageStars", func(req *leancloud.FunctionRequest) (interface{}, error) {
-  reviews := make([]Review, 10) // 预留一小部分空间
+  reviews := make([]Review, 10) // Reserve some space
   if err := client.Class("Review").NewQuery().EqualTo("movie", req.Params["movie"].(string)).Find(&reviews); err != nil {
     return nil, err
   }
@@ -179,33 +179,33 @@ leancloud.Engine.Define("averageStars", func(req *leancloud.FunctionRequest) (in
 </TabItem>
 </EngineRuntimes>
 
-### 参数和返回值
+### Parameters and Return Values
 
 <EngineRuntimes>
 <TabItem value='nodejs'>
 
-`Request` 会作为参数传入到云函数中，`Request` 上的属性包括：
+`Request` will be passed into the Cloud Function as a parameter. It contains the following properties:
 
-- `params: object`：客户端发送的参数对象，当使用 `rpc` 调用时，也可能是 `AV.Object`。
-- `currentUser?: AV.User`：客户端所关联的用户（根据客户端发送的 `X-LC-Session` 头）。
-- `sessionToken?: string`：客户端发来的 `sessionToken`（`X-LC-Session` 头）。
-- `meta: object`：有关客户端的更多信息，目前只有一个 `remoteAddress` 属性表示客户端的 IP。
+- `params: object`: The parameters sent from the client. When the Cloud Function is invoked with `rpc`, this could be an `AV.Object`.
+- `currentUser?: AV.User`: The user logged in on the client (according to the `X-LC-Session` header sent from the client).
+- `sessionToken?: string`: The `sessionToken` sent from the client (from the `X-LC-Session` header).
+- `meta: object`: More information about the client. For now, it only contains a `remoteAddress` property, which contains the IP address of the client.
 
-如果云函数返回了一个 Promise，那么云函数会使用 Promise 成功结束后的结果作为成功响应；如果 Promise 中发生了错误，云函数会使用这个错误作为错误响应，对于使用 `AV.Cloud.Error` 构造的异常对象，我们认为是客户端错误，不会在标准输出打印消息，对于其他异常则会在标准输出打印调用栈，以便排查错误。
+If the Cloud Function returns a Promise, the resolved value of the Promise will be used as the response. When the Promise gives an error, the error will be used as the response instead. Error objects constructed with `AV.Cloud.Error` are considered client errors and will not be printed to the standard output. For other errors, call stacks will be printed to the standard output to help you debug your program.
 
-我们推荐大家使用链式的 Promise 写法来完成业务逻辑，这样会极大地方便异步任务的处理和异常处理，**请注意一定要将 Promise 串联起来并在云函数中 return** 以保证上述逻辑正确工作，推荐阅读 [JavaScript Promise 迷你书](http://liubin.org/promises-book/) 来深入地了解 Promise。
+We recommend that you build your program with Promise chains, which makes it easy for you to organize asynchronous tasks and handle errors. **Please be sure to chain the Promises and return the chain within the Cloud Function.**
 
 <details>
-<summary>点击展开 Node.js SDK 早期版本详情</summary>
+<summary>Details about the early versions of the Node.js SDK</summary>
 
-在 2.0 之前的 Node.js 中，云函数接受 `request` 和 `response` 两个参数，我们会继续兼容这种用法到下一个大版本，希望开发者尽快迁移到 Promise 风格的云函数上。之前版本的文档见 [Node SDK v1 API 文档](https://github.com/leancloud/leanengine-node-sdk/blob/v1/API.md)。
+For Node.js SDK 2.0 and earlier, Cloud Function accepts two parameters: `request` and `response`. We will continue supporting this usage until the next major version, though it’s encouraged that you adopt Promise-style Cloud Functions for your project as soon as possible.
 
 </details>
 
 </TabItem>
 <TabItem value='python'>
 
-调用云函数时的参数会直接传递给云函数，因此直接声明这些参数即可。另外调用云函数时可能会根据不同情况传递不同的参数，这时如果定义云函数时没有声明这些参数，会触发 Python 异常，因此建议声明一个额外的关键字参数（关于关键字参数，请参考 [此篇文档](https://www.liaoxuefeng.com/wiki/1016959663602400/1017261630425888) 中「关键字参数」一节）来保存多余的参数。
+The arguments provided when invoking the Cloud Function will be passed directly into the Cloud Function. The parameters of your Cloud Function will mirror those of the Python function defined for it. If you plan to provide different sets of arguments to your Cloud Function for different cases, make sure to update your Python function to treat additional arguments as keyword arguments, or your program may cause Python errors.
 
 ```python
 @engine.define
@@ -213,75 +213,75 @@ def my_cloud_func(foo, bar, baz, **params):
     pass
 ```
 
-除了调用云函数的参数之外，还可以通过 `engine.current` 对象，来获取到调用此云函数的客户端的其他信息。`engine.current` 对象上的属性包括：
+Besides accessing the arguments passed into the function, your program can obtain additional information about the client by accessing the `engine.current` object. This object contains the following parameters:
 
-- `engine.current.user: leancloud.User`：客户端所关联的用户（根据客户端发送的 `X-LC-Session` 头）。
-- `engine.current.session_token: str`：客户端发来的 `sessionToken`（`X-LC-Session` 头）。
-- `engine.current.meta: dict`：有关客户端的更多信息，目前只有一个 `remote_address` 属性表示客户端的 IP。
+- `engine.current.user: leancloud.User`: The user logged in on the client (according to the `X-LC-Session` header sent from the client).
+- `engine.current.session_token: str`: The `sessionToken` sent from the client (from the `X-LC-Session` header).
+- `engine.current.meta: dict`: More information about the client. For now, it only contains a `remote_address` property, which contains the IP address of the client.
 
 </TabItem>
 <TabItem value='php'>
 
-传递给云函数的参数依次为：
+Each Cloud Function has the following parameters:
 
-- `$params: array`：客户端发送的参数。
-- `$user: User`：客户端所关联的用户（根据客户端发送的 `X-LC-Session` 头）。
-- `$meta: array`：有关客户端的更多信息，目前只有一个 `$meta['remoteAddress']` 属性表示客户端的 IP。
+- `$params: array`: The arguments sent from the client.
+- `$user: User`: The user logged in on the client (according to the `X-LC-Session` header sent from the client).
+- `$meta: array`: More information about the client. For now, it only contains a `$meta['remoteAddress']` property, which contains the IP address of the client.
 
 </TabItem>
 <TabItem value='java'>
 
-云函数中可以获取的参数和上下文信息有：
+Your program can access the following data from within the Cloud Function:
 
-- `@EngineFunctionParam`：客户端发送的参数。
-- `EngineRequestContext` 有关客户端的更多信息，其中 `EngineRequestContext.getSessionToken()` 会返回客户端所关联用户的 sessionToken（根据客户端发送的 `X-LC-Session` 头），`EngineRequestContext.getRemoteAddress()` 会返回客户端的实际地址。
+- `@EngineFunctionParam`: The arguments sent from the client.
+- `EngineRequestContext`: More information about the client. You can get the sessionToken of the user logged in on the client from `EngineRequestContext.getSessionToken()` (according to the `X-LC-Session` header sent from the client) and the IP address of the client from `EngineRequestContext.getRemoteAddress()`.
 
 </TabItem>
 <TabItem value='dotnet'>
 
-云函数中可以获取的参数和上下文信息有：
+Your program can access the following data from within the Cloud Function:
 
-- `LCEngineFunctionParam`：客户端发送的参数。
-- `LCEngineRequestContext` 有关客户端的更多信息，其中 `LCEngineRequestContext.SessionToken` 会返回客户端所关联用户的 sessionToken（根据客户端发送的 `X-LC-Session` 头），`LCEngineRequestContext.RemoteAddress` 会返回客户端的实际地址。
+- `LCEngineFunctionParam`: The arguments sent from the client.
+- `LCEngineRequestContext`: More information about the client. You can get the sessionToken of the user logged in on the client from `LCEngineRequestContext.SessionToken` (according to the `X-LC-Session` header sent from the client) and the IP address of the client from `LCEngineRequestContext.RemoteAddress`.
 
 </TabItem>
 <TabItem value='go'>
 
-`leancloud.FunctionRequest` 会作为参数传入到云函数中，`leancloud.FunctionRequest` 上的属性包括：
+`leancloud.FunctionRequest` will be passed into the Cloud Function as an argument. It contains the following properties:
 
-- `Params` 包含客户端发送的参数。
-- `CurrentUser` 包含客户端所关联的用户（根据客户端发送的 `X-LC-Session` 头）。可以在 `Define` 定义云函数时，在最后传入可选参数 `WithoutFetchUser()` 禁止获取当前调用的用户。
-- `SessionToken` 包含客户端发来的 `sessionToken`（根据客户端发送的 `X-LC-Session` 头）。可以在 `Define` 定义云函数时，在最后传入可选参数 `WithoutFetchUser()` 禁止获取当前调用的 `sessionToken`。
-- `Meta` 包含有关客户端的更多信息，目前只有一个 `remoteAddress` 属性表示客户端的 IP。
+- `Params` contains the arguments sent from the client.
+- `CurrentUser` contains the user logged in on the client (according to the `X-LC-Session` header sent from the client). When defining your Cloud Function with `Define`, you can provide `WithoutFetchUser()` as an optional argument to prevent the Cloud Function from obtaining the logged in user form the client.
+- `SessionToken` contains the `sessionToken` sent from the client (from the `X-LC-Session` header). When defining your Cloud Function with `Define`, you can provide `WithoutFetchUser()` as an optional argument to prevent the Cloud Function from obtaining the `sessionToken` from the client.
+- `Meta` contains more information about the client. For now, it only contains a `remoteAddress` property, which contains the IP address of the client.
 
 </TabItem>
 </EngineRuntimes>
 
-### 客户端 SDK 调用云函数
+### Invoking Cloud Functions With Client SDKs
 
-各个客户端 SDK 都提供了调用云函数的功能：
+You can invoke Cloud Functions with client SDKs:
 
 <MultiLang>
 
 ```cs
 try {
   Dictionary<string, object> response = await LCCloud.Run("averageStars", parameters: new Dictionary<string, object> {
-    { "movie", "夏洛特烦恼" }
+    { "movie", "A Quiet Place" }
   });
-  // 处理结果
+  // Handle result
 } catch (LCException e) {
-  // 处理异常
+  // Handle error
 }
 ```
 
 <>
 
 ```java
-// 构建传递给服务端的参数字典
+// Construct a dictionary containing the arguments to be passed to the server
 Map<String, String> dicParameters = new HashMap<String, String>();
-dicParameters.put("movie", "夏洛特烦恼");
+dicParameters.put("movie", "A Quiet Place");
 
-// 调用指定名称的云函数 averageStars，并且传递参数
+// Invoke the Cloud Function named averageStars with arguments
 LCCloud.callFunctionInBackground("averageStars", dicParameters).subscribe(new Observer<Object>() {
   @Override
   public void onSubscribe(Disposable disposable) {
@@ -305,29 +305,29 @@ LCCloud.callFunctionInBackground("averageStars", dicParameters).subscribe(new Ob
 });
 ```
 
-Java SDK 还提供了一个支持缓存的 `callFunctionWithCacheInBackground`，和 `LCQuery` 一样，开发者在请求的时候，可以指定 `CachePolicy` 以及缓存的最长期限，这样可以避免短时间一直直接请求云端服务器。
+Similar to how you use `LCQuery`, the Java SDK provides a `callFunctionWithCacheInBackground` method that allows your program to cache the results fetched from the server. You can specify the `CachePolicy` as well as the maximum age of the cache.
 
 </>
 
 ```objc
-// 构建传递给服务端的参数字典
-NSDictionary *dicParameters = [NSDictionary dictionaryWithObject:@"夏洛特烦恼"
+// Construct a dictionary containing the arguments to be passed to the server
+NSDictionary *dicParameters = [NSDictionary dictionaryWithObject:@"A Quiet Place"
                                                           forKey:@"movie"];
 
-// 调用指定名称的云函数 averageStars，并且传递参数
+// Invoke the Cloud Function named averageStars with arguments
 [LCCloud callFunctionInBackground:@"averageStars"
                    withParameters:dicParameters
                    block:^(id object, NSError *error) {
                    if(error == nil){
-                     // 处理结果
+                     // Handle result
                    } else {
-                     // 处理报错
+                     // Handle error
                    }
 }];
 ```
 
 ```swift
-LCEngine.run("averageStars", parameters: ["movie": "夏洛特烦恼"]) { (result) in
+LCEngine.run("averageStars", parameters: ["movie": "A Quiet Place"]) { (result) in
     switch result {
     case .success(value: let resultValue):
         print(resultValue)
@@ -339,23 +339,23 @@ LCEngine.run("averageStars", parameters: ["movie": "夏洛特烦恼"]) { (result
 
 ```dart
 try {
-  Map response = await LCCloud.run('averageStars', params: { 'movie': '夏洛特烦恼' });
-  // 处理结果
+  Map response = await LCCloud.run('averageStars', params: { 'movie': 'A Quiet Place' });
+  // Handle result
 } on LCException catch (e) {
-  // 处理异常
+  // Handle error
 }
 ```
 
 ```js
 var paramsJson = {
-  movie: "夏洛特烦恼",
+  movie: "A Quiet Place",
 };
 AV.Cloud.run("averageStars", paramsJson).then(
   function (data) {
-    // 处理结果
+    // Handle result
   },
   function (err) {
-    // 处理报错
+    // Handle error
   }
 );
 ```
@@ -363,20 +363,20 @@ AV.Cloud.run("averageStars", paramsJson).then(
 ```python
 from leancloud import cloud
 
-cloud.run('averageStars', movie='夏洛特烦恼')
+cloud.run('averageStars', movie='A Quiet Place')
 ```
 
 ```php
 use \LeanCloud\Engine\Cloud;
 $params = array(
-    "movie" => "夏洛特烦恼"
+    "movie" => "A Quiet Place"
 );
 Cloud::run("averageStars", $params);
 ```
 
 ```go
 // ...
-averageStars, err := leancloud.Run("averageStars", map[string]string{"movie": "夏洛特烦恼"})
+averageStars, err := leancloud.Run("averageStars", map[string]string{"movie": "A Quiet Place"})
 if err != nil {
   panic(err)
 }
@@ -385,27 +385,27 @@ if err != nil {
 
 </MultiLang>
 
-云函数调用（Run）默认将请求参数和响应结果作为 JSON 对象来处理，如果需要在请求或响应中传递 LCObject 对象，则可以使用 RPC 方式来调用云函数，SDK 将会完成 LCObject 类型的序列化和反序列化，在云函数和客户端代码中都可以直接获取到 LCObject 对象：
+When running a Cloud Function, the arguments and responses will be treated as JSON objects. To pass LCObjects through requests and responses, you can invoke the Cloud Function with RPC, which makes the SDK serialize and deserialize LCObjects. This allows your program within the Cloud Function and on the client side to have access to the LCObjects directly:
 
 <MultiLang>
 
 ```cs
 try {
   LCObject response = await LCCloud.RPC("averageStars", parameters: new Dictionary<string, object> {
-    { "movie", "夏洛特烦恼" }
+    { "movie", "A Quiet Place" }
   });
-  // 处理结果
+  // Handle result
 } catch (LCException e) {
-  // 处理异常
+  // Handle error
 }
 ```
 
 <>
 
 ```java
-// 构建参数
+// Construct arguments
 Map<String, Object> dicParameters = new HashMap<>();
-dicParameters.put("movie", "夏洛特烦恼");
+dicParameters.put("movie", "A Quiet Place");
 
 LCCloud.<LCObject>callRPCInBackground("averageStars", dicParameters).subscribe(new Observer<LCObject>() {
   @Override
@@ -430,28 +430,28 @@ LCCloud.<LCObject>callRPCInBackground("averageStars", dicParameters).subscribe(n
 });
 ```
 
-Java SDK 还提供了一个支持缓存的 `callRPCWithCacheInBackground`，和 `LCQuery` 一样，开发者在请求的时候，可以指定 `CachePolicy` 以及缓存的最长期限，这样可以避免短时间一直直接请求云端服务器。
+Similar to how you use `LCQuery`, the Java SDK provides a `callRPCWithCacheInBackground` method that allows your program to cache the results fetched from the server. You can specify the `CachePolicy` as well as the maximum age of the cache.
 
 </>
 
 ```objc
-NSDictionary *dicParameters = [NSDictionary dictionaryWithObject:@"夏洛特烦恼"
+NSDictionary *dicParameters = [NSDictionary dictionaryWithObject:@"A Quiet Place"
                                                           forKey:@"movie"];
 
 [LCCloud rpcFunctionInBackground:@"averageStars"
                   withParameters:parameters
                   block:^(id object, NSError *error) {
                   if(error == nil){
-                    // 处理结果
+                    // Handle result
                   }
                   else {
-                    // 处理报错
+                    // Handle error
                   }
 }];
 ```
 
 ```swift
-LCEngine.call("averageStars", parameters: ["movie": "夏洛特烦恼"]) { (result) in
+LCEngine.call("averageStars", parameters: ["movie": "A Quiet Place"]) { (result) in
     switch result {
     case .success(object: let object):
         if let object = object {
@@ -465,24 +465,24 @@ LCEngine.call("averageStars", parameters: ["movie": "夏洛特烦恼"]) { (resul
 
 ```dart
 try {
-  LCObject response = await LCCloud.rpc('averageStars', params: { 'movie': '夏洛特烦恼' });
-  // 处理结果
+  LCObject response = await LCCloud.rpc('averageStars', params: { 'movie': 'A Quiet Place' });
+  // Handle result
 } on LCException catch (e) {
-  // 处理异常
+  // Handle error
 }
 ```
 
 ```js
 var paramsJson = {
-  movie: "夏洛特烦恼",
+  movie: "A Quiet Place",
 };
 
 AV.Cloud.rpc("averageStars", paramsJson).then(
   function (object) {
-    // 处理结果
+    // Handle result
   },
   function (error) {
-    // 处理报错
+    // Handle error
   }
 );
 ```
@@ -490,17 +490,17 @@ AV.Cloud.rpc("averageStars", paramsJson).then(
 ```python
 from leancloud import cloud
 
-cloud.rpc('averageStars', movie='夏洛特烦恼')
+cloud.rpc('averageStars', movie='A Quiet Place')
 ```
 
 ```php
-// 暂不支持
+// Not supported yet
 ```
 
 ```go
 // ...
 averageStars := 0
-if err := leancloud.RPC("averageStars", Review{Movie: "夏洛特烦恼"}, &averageStars); err != nil {
+if err := leancloud.RPC("averageStars", Review{Movie: "A Quiet Place"}, &averageStars); err != nil {
   panic(err)
 }
 // ..
@@ -508,136 +508,136 @@ if err := leancloud.RPC("averageStars", Review{Movie: "夏洛特烦恼"}, &avera
 
 </MultiLang>
 
-RPC 会处理以下形式的请求和响应：
+When using RPC, the SDK will process the objects in the following forms that exist in the requests and responses:
 
-- 单个 LCObject
-- 包含 LCObject 的散列表（HashMap）
-- 包含 LCObject 的数组（Array）
+- Single LCObject
+- A HashMap containing LCObjects
+- An array containing LCObjects
 
-其他形式的数据 SDK 会保持原样，不进行处理。
+Everything else in the requests and responses will remain in their original forms.
 
-### 云函数内部调用云函数
+### Invoking Other Cloud Functions Within a Cloud Function
 
 <EngineRuntimes>
 <TabItem value='nodejs'>
 
-云引擎 Node.js 环境下，默认会直接进行一次本地的函数调用，而不会像客户端一样发起一个 HTTP 请求。
+When invoking a Cloud Function under the Node.js runtime environment, a local invocation will be triggered by default, which means that the invocation won’t make an HTTP request like what the client SDK would do.
 
 ```js
 AV.Cloud.run("averageStars", {
-  movie: "夏洛特烦恼",
+  movie: "A Quiet Place",
 }).then(
   function (data) {
-    // 调用成功，得到成功的应答 data
+    // Succeeded; data is the response
   },
   function (error) {
-    // 处理调用失败
+    // Handle error
   }
 );
 ```
 
-如果你希望发起 HTTP 请求来调用云函数，可以传入一个 `remote: true` 的选项。当你在云引擎之外运行 Node.js SDK（包括调用位于其他分组上的云函数）时这个选项非常有用：
+To force the invocation to make an HTTP request, provide the `remote: true` option. This is useful when you run the Node.js SDK in a different group or outside Cloud Engine:
 
 ```js
-AV.Cloud.run("averageStars", { movie: "夏洛特烦恼" }, { remote: true }).then(
+AV.Cloud.run("averageStars", { movie: "A Quiet Place" }, { remote: true }).then(
   function (data) {
-    // 成功
+    // Succeeded
   },
   function (error) {
-    // 处理调用失败
+    // Handle error
   }
 );
 ```
 
-上面的 `remote` 选项实际上是作为 `AV.Cloud.run` 的可选参数 options 对象的属性传入的。这个 `options` 对象包括以下参数：
+Here `remote` constitutes a part of the `options` object, which is an optional parameter of `AV.Cloud.run`. `options` contains the following parameters:
 
-- `remote?: boolean`：上面的例子用到的 `remote` 选项，默认为假。
-- `user?: AV.User`：以特定的用户运行云函数（建议在 `remote` 为假时使用）。
-- `sessionToken?: string`：以特定的 `sessionToken` 调用云函数（建议在 `remote` 为真时使用）。
-- `req?: http.ClientRequest | express.Request`：为被调用的云函数提供 `remoteAddress` 等属性。
+- `remote?: boolean`: The `remote` option used in the example above. Defaults to `false`.
+- `user?: AV.User`: The user used to invoke the Cloud Function. Often used when `remote` is `false`.
+- `sessionToken?: string`: The `sessionToken` used to invoke the Cloud Function. Often used when `remote` is `true`.
+- `req?: http.ClientRequest | express.Request`: Used to provide properties like `remoteAddress` for the Cloud Function being invoked.
 
 </TabItem>
 <TabItem value='python'>
 
-云引擎 Python 环境下，默认会进行远程调用。
-例如，以下代码会发起一次 HTTP 请求，去请求部署在云引擎上的云函数。
+When invoking a Cloud Function under the Python runtime environment, a remote invocation will be triggered by default.
+The code below will make an HTTP request to invoke a Cloud Function on Cloud Engine.
 
 ```python
 from leancloud import cloud
 
-cloud.run('averageStars', movie='夏洛特烦恼')
+cloud.run('averageStars', movie='A Quiet Place')
 ```
 
-如果想要直接调用本地（当前进程）中的云函数，或者发起调用就是在云引擎中，想要省去一次 HTTP 调用的开销，可以使用 `leancloud.cloud.run.local` 来取代 `leanengine.cloud.run`，这样会直接在当前进程中执行一个函数调用，而不会发起 HTTP 请求来调用此云函数。
+To invoke a local Cloud Function (i.e., a Cloud Function that exists in the current process) or to save an HTTP request when invoking a Cloud Function from within Cloud Engine, use `leancloud.cloud.run.local` instead of `leanengine.cloud.run`. This will let your program invoke the Cloud Function in the current process without making an HTTP request.
 
 </TabItem>
 <TabItem value='java'>
 
-Java SDK 不支持本地调用云函数。
-如有代码复用需求，建议将公共逻辑提取成普通函数（Java 方法），在多个云函数中调用。
+Local invocations of Cloud Functions are not supported by the Java SDK.
+To reuse the same set of code, we recommend that you put them into basic Java functions and invoke them from different Cloud Functions.
 
 </TabItem>
 <TabItem value='php'>
 
-云引擎中默认会直接进行一次本地的函数调用，而不是像客户端一样发起一个 HTTP 请求。
+When you invoke a Cloud Function from Cloud Engine, a local invocation will be made instead of a remote invocation that relies on an HTTP request.
 
 ```php
 try {
-    $result = Cloud::run("averageStars", array("movie" => "夏洛特烦恼"));
+    $result = Cloud::run("averageStars", array("movie" => "A Quiet Place"));
 } catch (\Exception $ex) {
-    // 云函数错误
+    // Cloud Function error
 }
 ```
 
-如果想要通过 HTTP 调用，可以使用 `runRemote` 方法：
+To make an invocation using an HTTP request, use the `runRemote` method:
 
 ```php
 try {
-    $token = User::getCurrentSessionToken(); // 以特定的 `sessionToken` 调用云函数，可选
-    $result = Cloud::runRemote("averageStars", array("movie" => "夏洛特烦恼"), $token);
+    $token = User::getCurrentSessionToken(); // Invoke the Cloud Function with a specific `sessionToken`; optional
+    $result = Cloud::runRemote("averageStars", array("movie" => "A Quiet Place"), $token);
 } catch (\Exception $ex) {
-    // 云函数错误
+    // Cloud Function error
 }
 ```
 
 </TabItem>
 <TabItem value='dotnet'>
 
-.NET SDK 不支持本地调用云函数。
-如有代码复用需求，建议将公共逻辑提取成普通函数，在多个云函数中调用。
+Local invocations of Cloud Functions are not supported by the .NET SDK.
+To reuse the same set of code, we recommend that you put them into basic functions and invoke them from different Cloud Functions.
 
 </TabItem>
 <TabItem value='go'>
 
-使用 `Engine.Run` 即是本地调用：
+To trigger a local invocation, use `Engine.Run`:
 
 ```go
-averageStars, err := leancloud.Engine.Run("averageStars", Review{Movie: "夏洛特烦恼"})
+averageStars, err := leancloud.Engine.Run("averageStars", Review{Movie: "A Quiet Place"})
 if err != nil {
   panic(err)
 }
 ```
 
-如果希望发起 HTTP 请求来调用云函数，请使用 `Client.Run`。
+To make an invocation using an HTTP request, use `Client.Run`.
 
-`Run` 的可选参数如下：
+`Run` has the following optional parameters:
 
-- `WithSessionToken(token)` 为当前的调用请求传入 `sessionToken`
-- `WithUser(user)` 为当前的调用请求传入对应的用户对象
+- `WithSessionToken(token)` can be used to provide a `sessionToken` for the current invocation
+- `WithUser(user)` can be used to provide a user for the current invocation
 
 </TabItem>
 </EngineRuntimes>
 
-### 云函数错误响应码
+### Error Codes for Cloud Functions
 
-可以根据 [HTTP status codes](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes) 自定义错误响应码。
+You can define custom error codes according to [HTTP status codes](https://en.wikipedia.org/wiki/List_of_HTTP_status_codes).
 
 <EngineRuntimes>
 <TabItem value='nodejs'>
 
 ```js
 AV.Cloud.define("customErrorCode", function (request) {
-  throw new AV.Cloud.Error("自定义错误信息。", { code: 123 });
+  throw new AV.Cloud.Error("Custom error message.", { code: 123 });
 });
 ```
 
@@ -649,7 +649,7 @@ from leancloud import LeanEngineError
 
 @engine.define
 def custom_error_code(**params):
-    raise LeanEngineError(123, '自定义错误信息。')
+    raise LeanEngineError(123, 'Custom error message.')
 ```
 
 </TabItem>
@@ -658,7 +658,7 @@ def custom_error_code(**params):
 ```java
 @EngineFunction()
 public static void customErrorCode() throws Exception {
-  throw new LCException(123, "自定义错误信息。");
+  throw new LCException(123, "Custom error message.");
 }
 ```
 
@@ -667,7 +667,7 @@ public static void customErrorCode() throws Exception {
 
 ```php
 Cloud::define("customErrorCode", function($params, $user) {
-    throw new FunctionError("自定义错误信息。", 123);
+    throw new FunctionError("Custom error message.", 123);
 });
 ```
 
@@ -677,7 +677,7 @@ Cloud::define("customErrorCode", function($params, $user) {
 ```cs
 [LCEngineFunction("throwLCException")]
 public static void ThrowLCException() {
-    throw new LCException(123, "自定义错误信息。");
+    throw new LCException(123, "Custom error message.");
 }
 ```
 
@@ -686,49 +686,49 @@ public static void ThrowLCException() {
 
 ```go
 leancloud.Engine.Define("customErrorCode", func(req *leancloud.FunctionRequest) (interface{}, error) {
-  return nil, leancloud.CloudError{123, "自定义错误信息。"}
+  return nil, leancloud.CloudError{123, "Custom error message."}
 })
 ```
 
 </TabItem>
 </EngineRuntimes>
 
-客户端收到的响应：`{ "code": 123, "error": "自定义错误信息。" }`。
+The response gotten by the client would look like `{ "code": 123, "error": "Custom error message." }`.
 
-### 云函数超时
+### Timeouts for Cloud Functions
 
-云函数超时时间为 15 秒，如果超过阈值，客户端将收到 HTTP status code 为 `503` 的响应，body 为 `The request timed out on the server`。
-注意即使已经响应，此时云函数可能仍在执行，但执行完毕后的响应是无意义的（不会发给客户端，会在日志中打印一个 `Can't set headers after they are sent` 的异常）。
-除了 `503` 错误外，有些情况下客户端也可能收到其他报错，如 `524` 或 `141`。
+The default timeout for invoking a Cloud Function is 15 seconds. If the timeout is exceeded, the client will get a response with the HTTP status code `503` and the body being `The request timed out on the server`.
+Keep in mind that even though the client has already gotten a response, the Cloud Function might still be running, although its response will not be received by the client anymore (the error message `Can't set headers after they are sent` will be printed to the log).
+In certain cases, the client will receive the `524` or `141` error instead of the `503` error.
 
-#### 超时的处理方案
+#### Avoiding Timeouts
 
-我们建议将代码中的任务转化为异步队列处理，以优化运行时间，避免云函数或定时任务发生超时。
+To prevent Cloud Functions and scheduled tasks from causing timeouts, we recommend that you convert time-consuming tasks in your code to queued tasks that can be executed asynchronously.
 
-例如：
+For example, you can:
 
-1. 在存储服务中创建一个队列表，包含 `status` 列；
-2. 接到任务后，向队列表保存一条记录，`status` 值设置为 `处理中`，然后将请求结束掉，将队列对象的 `id` 发给客户端。
-3. 当业务处理完毕，根据处理结果更新刚才的队列对象状态，将 `status` 字段设置为 `完成` 或者 `失败`；
-4. 在任何时候，在控制台通过队列 `id` 可以获取某个任务的执行结果，判断任务状态。
+1. Create a table in the Data Storage service with a column named `status`;
+2. When a task is received, create an object in the table with `status` being `PROCESSING`, then respond to the client with the object’s `id`.
+3. When a task is completed, update the `status` of the corresponding object to `COMPLETED` or `FAILED`;
+4. You can look up the status of a task with its `id` on the dashboard at any time.
 
-不过，对于 before 类 hook 函数，改为异步处理通常没有意义。
-虽然改为异步后能保证 before 类函数能够运行完成，不会因超时而报错。
-但是，只要 before 类 hook 函数不能及时抛出异常，就无法起到中断操作执行的作用。
-对于超时的 before 类 hook 函数，如果无法优化代码，压缩执行时间的话，那只能改为 after 类函数。
-例如，假设某个 beforeSave 函数需要调用耗时较久的第三方的自然语言处理接口判断用户提交的评论是否来自真实用户，导致超时，
-那么可以改为 afterSave 函数，在保存评论后再调用第三方接口，如果判断是水军评论，那么再进行删除。
+The method introduced above might not apply to `before` hooks.
+Although you can ensure a `before` hook to complete within the timeout using the method above,
+its ability to abort an action when an error occurs will not work anymore.
+If you have a `before` hook that keeps exceeding the timeout, consider changing it to an `after` hook.
+For example, if a `beforeSave` hook needs to invoke a time-consuming API to tell if a user’s comment is spam,
+you can change it to an `afterSave` hook that invokes the API after the comment has been saved and deletes the comment if it is spam.
 
-## 数据存储 Hook
+## Hooks for Data Storage
 
-Hook 函数本质上是云函数，但它有固定的名称，定义之后会 **由系统** 在特定事件或操作（如数据保存前、保存后，数据更新前、更新后等等）发生时 **自动触发**，而不是由开发者来控制其触发时机。需要注意：
+Hooks are a special type of Cloud Functions that **get triggered automatically by the system** when certain events take place. Keep in mind that:
 
-- 通过控制台进行数据导入时不会触发任何 hook 函数。
-- 使用 Hook 函数需要 [防止死循环调用](#防止死循环调用)。
-- `_Installation` 表暂不支持 Hook 函数。
-- Hook 函数只对当前应用的 Class 生效，对绑定后的目标 Class 无效。
+- Importing data on the dashboard will not trigger any hooks.
+- Be careful not to form [infinite loops](#avoiding-infinite-loops) with your hooks.
+- Hooks don’t work with the `_Installation` table.
+- Hooks only work with the classes that belong to the current application, which don’t include those bound to the current application.
 
-对于 `before` 类的 Hook，如果返回了一个错误的话，这个操作就会被中断，因此你可以在这些 Hook 中主动抛出一个错误来拒绝掉某些操作。对于 `after` 类的 Hook，返回错误并不会影响操作的执行（因为其实操作已经执行完了）。
+For `before` hooks, if an error is returned by the function, the original operation will be aborted. This means that you can reject an operation by having the function throw an error. This does not apply to `after` hooks since the operation would’ve been completed when the function starts running.
 
 <Mermaid
   diagram={`
@@ -762,11 +762,11 @@ B -->|afterDelete|C((done))
 `}
 />
 
-为了认证 Hook 调用者的身份，我们的 SDK 内部会确认请求确实是从云引擎内网的云存储组件发出的，如果认证失败，可能会出现 `Hook key check failed` 的提示，如果在本地调试时出现这样的错误，请确保是通过命令行工具启动调试的。
+Our SDK will run authentication to ensure that the hook requests received by it are the legitimate ones sent from the Data Storage service. If the authentication fails, you may see a message saying `Hook key check failed`. If you see this message when debugging your project locally, please ensure that you have started your project with the CLI.
 
 ### BeforeSave
 
-在创建新对象之前，可以对数据做一些清理或验证。例如，一条电影评论不能过长，否则界面上显示不开，需要将其截断至 140 个字符：
+This hook can be used to perform operations like cleanups and verifications before a new object gets created. For example, if we need to truncate each comment to 140 characters:
 
 <EngineRuntimes>
 <TabItem value='nodejs'>
@@ -776,27 +776,27 @@ AV.Cloud.beforeSave("Review", function (request) {
   var comment = request.object.get("comment");
   if (comment) {
     if (comment.length > 140) {
-      // 截断并添加 '…'
+      // Truncate the comment and add '…'
       request.object.set("comment", comment.substring(0, 140) + "…");
     }
   } else {
-    // 不保存数据，并返回错误
+    // Don’t save the object and return an error
     throw new AV.Cloud.Error("No comment provided!");
   }
 });
 ```
 
-上面的代码示例中，`request.object` 是被操作的 `AV.Object`。除了 `object` 之外，`request` 上还有一个属性：
+In the example above, `request.object` is the `AV.Object` we are performing our operation on. `request` has another property besides `object`:
 
-- `currentUser?: AV.User`：发起操作的用户。
+- `currentUser?: AV.User`: The user who triggered the operation.
 
-类似地，其他 hook 的 `request` 参数上也包括 `object` 和 `currentUser` 这两个属性。
+The `request` parameter (and its properties) are available in other hooks as well.
 
 </TabItem>
 <TabItem value='python'>
 
 ```python
-@engine.before_save('Review') # Review 为需要 hook 的 class 的名称
+@engine.before_save('Review') # `Review` is the name of the class that the hook will be applied to
 def before_review_save(review):
     comment = review.get('comment')
     if not comment:
@@ -828,11 +828,11 @@ Cloud::beforeSave("Review", function($review, $user) {
     $comment = $review->get("comment");
     if ($comment) {
         if (strlen($comment) > 140) {
-            // 截断并添加 '…'
+            // Truncate the comment and add '…'
             $review->set("comment", substr($comment, 0, 140) . "…");
         }
     } else {
-        // 不保存数据，并返回错误
+        // Don’t save the object and return an error
         throw new FunctionError("No comment provided!", 101);
     }
 });
@@ -878,7 +878,7 @@ leancloud.Engine.BeforeSave("Review", func(req *ClassHookRequest) (interface{}, 
 
 ### AfterSave
 
-在创建新对象后触发指定操作，比如当一条留言创建后再更新一下所属帖子的评论总数：
+This hook can be used to perform operations after a new object has been created. For example, if we need to update the total number of comments after a comment has been created:
 
 <EngineRuntimes>
 <TabItem value='nodejs'>
@@ -899,7 +899,7 @@ AV.Cloud.afterSave("Comment", function (request) {
 ```python
 import leancloud
 
-@engine.after_save('Comment') # Comment 为需要 hook 的 class 的名称
+@engine.after_save('Comment') # `Comment` is the name of the class that the hook will be applied to
 def after_comment_save(comment):
     post = leancloud.Query('Post').get(comment.id)
     post.increment('commentCount')
@@ -974,7 +974,7 @@ leancloud.Engine.AfterSave("Review", func(req *ClassHookRequest) error {
 </TabItem>
 </EngineRuntimes>
 
-再如，在用户注册成功之后，给用户增加一个新的属性 `from` 并保存：
+In the following example, we are adding a `from` property to each new user:
 
 <EngineRuntimes>
 <TabItem value='nodejs'>
@@ -989,7 +989,7 @@ AV.Cloud.afterSave("_User", function (request) {
 });
 ```
 
-虽然对于 `after` 类的 Hook 我们并不关心返回值，但我们仍建议你返回一个 Promise，这样如果发生了非预期的错误，会自动在标准输出中打印异常信息和调用栈。
+Although we don’t care about the return value of an `after` hook, we still recommend that you have your function return a Promise. This ensures that you can see error messages and call stacks in the standard output when unexpected errors occur.
 
 </TabItem>
 <TabItem value='python'>
@@ -1060,18 +1060,20 @@ leancloud.Engine.AfterSave("_User", func(req *ClassHookRequest) error{
 
 ### BeforeUpdate
 
-在更新已存在的对象前执行操作，这时你可以知道哪些字段已被修改，还可以在特定情况下拒绝本次修改：
+This hook can be used to perform operations before an existing object gets updated. You will be able to know which fields have been updated and reject the operation if necessary:
 
 <EngineRuntimes>
 <TabItem value='nodejs'>
 
 ```js
 AV.Cloud.beforeUpdate("Review", function (request) {
-  // 如果 comment 字段被修改了，检查该字段的长度
+  // If `comment` has been updated, check its length
   if (request.object.updatedKeys.indexOf("comment") != -1) {
     if (request.object.get("comment").length > 140) {
-      // 拒绝过长的修改
-      throw new AV.Cloud.Error("comment 长度不得超过 140 字符。");
+      // Reject the update if the comment is too long
+      throw new AV.Cloud.Error(
+        "The comment should be no longer than 140 characters."
+      );
     }
   }
 });
@@ -1083,10 +1085,10 @@ AV.Cloud.beforeUpdate("Review", function (request) {
 ```python
 @engine.before_update('Review')
 def before_hook_object_update(obj):
-    # 如果 comment 字段被修改了，检查该字段的长度
+    # If `comment` has been updated, check its length
     if 'comment' in obj.updated_keys and len(obj.get('comment')) > 140:
-        # 拒绝过长的修改
-        raise leancloud.LeanEngineError(message='comment 长度不得超过 140 字符。')
+        # Reject the update if the comment is too long
+        raise leancloud.LeanEngineError(message='The comment should be no longer than 140 characters.')
 ```
 
 </TabItem>
@@ -1097,9 +1099,9 @@ def before_hook_object_update(obj):
 public static LCObject reviewBeforeUpdateHook(LCObject review) throws Exception {
   List<String> updateKeys = EngineRequestContext.getUpdateKeys();
   for (String key : updateKeys) {
-    // 如果 comment 字段被修改了，检查该字段的长度
+    // If `comment` has been updated, check its length
     if ("comment".equals(key) && review.getString("comment").length()>140) {
-      throw new Exception("comment 长度不得超过 140 字符。");
+      throw new Exception("The comment should be no longer than 140 characters.");
     }
   }
   return review;
@@ -1111,10 +1113,10 @@ public static LCObject reviewBeforeUpdateHook(LCObject review) throws Exception 
 
 ```php
 Cloud::beforeUpdate("Review", function($review, $user) {
-    // 如果 comment 字段被修改了，检查该字段的长度
+    // If `comment` has been updated, check its length
     if (in_array("comment", $review->updatedKeys) &&
         strlen($review->get("comment")) > 140) {
-        throw new FunctionError("comment 长度不得超过 140 字符。");
+        throw new FunctionError("The comment should be no longer than 140 characters.");
     }
 });
 ```
@@ -1129,7 +1131,7 @@ public static LCObject ReviewBeforeUpdate(LCObject review) {
     if (updatedKeys.Contains("comment")) {
         string comment = review["comment"] as string;
         if (comment.Length > 140) {
-            throw new Exception("comment 长度不得超过 140 字符。");
+            throw new Exception("The comment should be no longer than 140 characters.");
         }
     }
     return review;
@@ -1162,15 +1164,15 @@ leancloud.Engine.BeforeUpdate("Review", func(req *ClassHookRequest) (interface{}
 </TabItem>
 </EngineRuntimes>
 
-对传入对象直接进行的修改不会被保存。如需拒绝修改，可以让函数返回一个错误。
+Modifications done directly to the object passed in will not be saved. To reject the update, you can have the function return an error.
 
-传入的对象是一个尚未保存到数据库的临时对象，并不保证与最终储存到数据库的对象完全相同，这是因为修改中可能包含自增、数组增改、关系增改等原子操作。
+The object passed in is a temporary object not saved to the database yet. The object might not be the same as the one saved to the database in the end because there might be atomic operations like self-increments, array operations, and adding or updating relations that will happen later.
 
 ### AfterUpdate
 
-本 Hook 使用不当可能会造成死循环，导致数据存储 API 的调用次数暴涨，甚至产生更多的费用。因此请仔细阅读 [防止死循环调用](#防止死循环调用) 部分，做出必要的调整和预防措施。
+This hook might lead to infinite loops if you use it improperly, causing additional API calls and even extra charges. Please make sure to read [Avoiding Infinite Loops](#avoiding-infinite-loops) carefully.
 
-在更新已存在的对象后执行特定的动作。和 BeforeUpdate 一样，你可以知道哪些字段已被修改。
+This hook can be used to perform operations after an existing object has been updated. Similar to BeforeUpdate, you will be able to know which fields have been updated.
 
 <EngineRuntimes>
 <TabItem value='nodejs'>
@@ -1179,7 +1181,7 @@ leancloud.Engine.BeforeUpdate("Review", func(req *ClassHookRequest) (interface{}
 AV.Cloud.afterUpdate("Review", function (request) {
   if (request.object.updatedKeys.indexOf("comment") != -1) {
     if (request.object.get("comment").length < 5) {
-      console.log(review.ObjectId + " 看起来像灌水评论：" + comment);
+      console.log(review.ObjectId + " looks like spam: " + comment);
     }
   }
 });
@@ -1192,7 +1194,7 @@ AV.Cloud.afterUpdate("Review", function (request) {
 @engine.after_update('Review')
 def after_review_update(article):
     if 'comment' in obj.updated_keys and len(obj.get('comment')) < 5:
-        print(review.ObjectId + " 看起来像灌水评论：" + comment)
+        print(review.ObjectId + " looks like spam: " + comment)
 ```
 
 </TabItem>
@@ -1204,7 +1206,7 @@ public static void reviewAfterUpdateHook(LCObject review) throws Exception {
   List<String> updateKeys = EngineRequestContext.getUpdateKeys();
   for (String key : updateKeys) {
     if ("comment".equals(key) && review.getString("comment").length()<5) {
-      LOGGER.d(review.ObjectId + " 看起来像灌水评论：" + comment);
+      LOGGER.d(review.ObjectId + " looks like spam: " + comment);
     }
   }
 }
@@ -1217,7 +1219,7 @@ public static void reviewAfterUpdateHook(LCObject review) throws Exception {
 Cloud::afterUpdate("Review", function($review, $user) {
     if (in_array("comment", $review->updatedKeys) &&
         strlen($review->get("comment")) < 5) {
-        error_log(review.ObjectId . " 看起来像灌水评论：" . comment);
+        error_log(review.ObjectId . " looks like spam: " . comment);
     }
 });
 ```
@@ -1232,7 +1234,7 @@ public static void ReviewAfterUpdate(LCObject review) {
     if (updatedKeys.Contains("comment")) {
         string comment = review["comment"] as string;
         if (comment.Length < 5) {
-            Console.WriteLine($"{review.ObjectId} 看起来像灌水评论：{comment}");
+            Console.WriteLine($"{review.ObjectId} looks like spam: {comment}");
         }
     }
 }
@@ -1252,7 +1254,7 @@ leancloud.Engine.AfterUpdate("Review", func(req *ClassHookRequest) error {
       }
 
       if len(comment) < 5 {
-        fmt.Println(req.Object.ID, " 看起来像灌水评论：", comment))
+        fmt.Println(req.Object.ID, " looks like spam: ", comment))
       }
     }
   }
@@ -1266,21 +1268,21 @@ leancloud.Engine.AfterUpdate("Review", func(req *ClassHookRequest) error {
 
 ### BeforeDelete
 
-在删除一个对象之前做一些检查工作，比如在删除一个相册 `Album` 前，先检查一下该相册中还有没有照片 `Photo`：
+This hook can be used to perform operations before an object gets deleted. For example, to check if an `Album` contains any `Photo`s before it gets deleted:
 
 <EngineRuntimes>
 <TabItem value='nodejs'>
 
 ```js
 AV.Cloud.beforeDelete("Album", function (request) {
-  // 查询 Photo 中还有没有属于这个相册的照片
+  // See if any `Photo` belongs to this album
   var query = new AV.Query("Photo");
   var album = AV.Object.createWithoutData("Album", request.object.id);
   query.equalTo("album", album);
   return query.count().then(
     function (count) {
       if (count > 0) {
-        // delete 操作会被丢弃
+        // The `delete` operation will be aborted
         throw new AV.Cloud.Error(
           "Cannot delete an album if it still has photos in it."
         );
@@ -1304,7 +1306,7 @@ AV.Cloud.beforeDelete("Album", function (request) {
 ```python
 import leancloud
 
-@engine.before_delete('Album') # Album 为需要 hook 的 class 的名称
+@engine.before_delete('Album') # `Album` is the name of the class that the hook will be applied to
 def before_album_delete(album):
     query = leancloud.Query('Photo')
     query.equal_to('album', album)
@@ -1313,7 +1315,7 @@ def before_album_delete(album):
     except leancloud.LeanCloudError:
         raise engine.LeanEngineError(message='An error occurred with LeanEngine.')
     if count > 0:
-        # delete 操作会被丢弃
+        # The `delete` operation will be aborted
         raise engine.LeanEngineError(message='Cannot delete an album if it still has photos in it.')
 ```
 
@@ -1327,7 +1329,7 @@ public static LCObject albumBeforeDeleteHook(LCObject album) throws Exception {
   query.whereEqualTo("album", album);
   int count = query.count();
   if (count > 0) {
-    // delete 操作会被丢弃
+    // The `delete` operation will be aborted
     throw new Exception("Cannot delete an album if it still has photos in it.");
   } else {
     return album;
@@ -1348,7 +1350,7 @@ Cloud::beforeDelete("Album", function($album, $user) {
         throw new FunctionError("An error occurred when getting photo count: {$ex->getMessage()}");
     }
     if ($count > 0) {
-        // delete 操作会被丢弃
+        // The `delete` operation will be aborted
         throw new FunctionError("Cannot delete an album if it still has photos in it.");
     }
 });
@@ -1400,7 +1402,7 @@ leancloud.Engine.BeforeDelete("Album", func(req *ClassHookRequest) (interface{},
 
 ### AfterDelete
 
-在一个对象被删除后执行操作，例如递减计数、删除关联对象等等。同样以相册为例，这次我们不在删除相册前检查是否还有照片，而是在删除后，同时删除相册中的照片：
+This hook can be used to perform operations like decrementing counters and removing associated objects after an object has been deleted. For example, to delete the photos in an album after the album has been deleted:
 
 <EngineRuntimes>
 <TabItem value='nodejs'>
@@ -1432,7 +1434,7 @@ AV.Cloud.afterDelete("Album", function (request) {
 ```python
 import leancloud
 
-@engine.after_delete('Album') # Album 为需要 hook 的 class 的名称
+@engine.after_delete('Album') # `Album` is the name of the class that the hook will be applied to
 def after_album_delete(album):
     query = leancloud.Query('Photo')
     query.equal_to('album', album)
@@ -1518,7 +1520,7 @@ leancloud.Engine.AfterDelete("Album", func(req *ClassHookRequest) error {
 
 ### OnVerified
 
-当用户通过邮箱或者短信验证时，对该用户执行特定操作。比如：
+This hook can be used to perform operations after a user has verified their email or phone number. For example:
 
 <EngineRuntimes>
 <TabItem value='nodejs'>
@@ -1529,8 +1531,8 @@ AV.Cloud.onVerified("sms", function (request) {
 });
 ```
 
-上面的代码示例中的 `object` 换成 `currentUser` 也可以。因为这里被操作的对象正好是发起操作的用户。
-下面的 `onLogin` 函数同理。
+The `object` in the example above can be replaced by `currentUser` since the user who triggered the operation is also the one that we want to perform operations on.
+This also applies to the `onLogin` hook, which we’ll introduce later.
 
 </TabItem>
 <TabItem value='python'>
@@ -1547,12 +1549,12 @@ def on_sms_verified(user):
 ```java
 @EngineHook(className = "_User", type = EngineHookType.onVerifiedSMS)
 public static void userOnVerifiedHook(LCUser user) throws Exception {
-  LOGGER.d("用户 " + user.getObjectId() + " 已通过短信验证。");
+  LOGGER.d("User " + user.getObjectId() + " has verified their phone number.");
 }
 
 @EngineHook(className = "_User", type = EngineHookType.onVerifiedEmail)
 public static void userOnVerifiedHook(LCUser user) throws Exception {
-  LOGGER.d("用户 " + user.getObjectId() + " 已通过邮箱验证。");
+  LOGGER.d("User " + user.getObjectId() + " has verified their email.");
 }
 ```
 
@@ -1571,12 +1573,12 @@ Cloud::onVerifed("sms", function($user, $meta) {
 ```cs
 [LCEngineUserHook(LCEngineUserHookType.OnSMSVerified)]
 public static void OnVerifiedSMS(LCUser user) {
-    Console.WriteLine($"用户 {user.ObjectId} 已通过短信验证。");
+    Console.WriteLine($"User {user.ObjectId} has verified their phone number.");
 }
 
 [LCEngineUserHook(LCEngineUserHookType.OnEmailVerified)]
 public static void OnVerifiedEmail(LCUser user) {
-    Console.WriteLine($"用户 {user.ObjectId} 已通过邮箱验证。");
+    Console.WriteLine($"User {user.ObjectId} has verified their email.");
 }
 ```
 
@@ -1585,34 +1587,34 @@ public static void OnVerifiedEmail(LCUser user) {
 
 ```go
 leancloud.Engine.OnVerified("sms", func(req *ClassHookRequest) error {
-  fmt.Println("用户 ", req.User.ID, " 已通过短信验证。")
+  fmt.Println("User ", req.User.ID, " has verified their phone number.")
 })
 
 leancloud.Engine.OnVerified("email", func(req *ClassHookRequest) error {
-  fmt.Println("用户 ", req.User.ID, " 已通过邮箱验证。")
+  fmt.Println("User ", req.User.ID, " has verified their email.")
 })
 ```
 
 </TabItem>
 </EngineRuntimes>
 
-数据库中相关的验证字段，如 `emailVerified` 不需要修改，系统会自动更新。
+Fields like `emailVerified` should not be updated here since the system will update them automatically.
 
-该 hook 属于 after 类 hook。
+This hook is an `after` hook.
 
 ### OnLogin
 
-在用户登录之时执行指定操作，比如禁止在黑名单上的用户登录：
+This hook can be used to perform operations before a user gets logged in. For example, to prevent users on the blocklist from logging in:
 
 <EngineRuntimes>
 <TabItem value='nodejs'>
 
 ```js
 AV.Cloud.onLogin(function (request) {
-  // 因为此时用户还没有登录，所以用户信息是保存在 request.object 对象中
+  // The user has not logged in yet, so the user data is in `request.object`
   console.log("User " + request.object + " is trying to log in.");
   if (request.object.get("username") === "noLogin") {
-    // 如果是 error 回调，则用户无法登录（收到 401 响应）
+    // If the program throws an error, the user won’t be able to log in (the client will receive a 401 error)
     throw new AV.Cloud.Error("Forbidden");
   }
 });
@@ -1626,9 +1628,9 @@ AV.Cloud.onLogin(function (request) {
 def on_login(user):
     print(user)
     if user.get('username') == 'noLogin':
-      # 如果抛出 LeanEngineError，则用户无法登录（收到 401 响应）
+      # If the program throws a `LeanEngineError`, the user won’t be able to log in (the client will receive a 401 error)
       raise LeanEngineError('Forbidden')
-    # 没有抛出异常，函数正常执行完毕的话，用户可以登录
+    # If the program doesn’t throw an error, the user will be able to log in
 ```
 
 </TabItem>
@@ -1652,10 +1654,10 @@ public static LCUser userOnLoginHook(LCUser user) throws Exception {
 Cloud::onLogin(function($user) {
     error_log("User {$user->getUsername()} is trying to log in.");
     if ($user->get("blocked")) {
-        // 如果抛出异常，则用户无法登录（收到 401 响应）
+        // If the program throws an error, the user won’t be able to log in (the client will receive a 401 error)
         throw new FunctionError("Forbidden");
     }
-    // 没有抛出异常，函数正常执行完毕的话，用户可以登录
+    // If the program doesn’t throw an error, the user will be able to log in
 });
 ```
 
@@ -1677,18 +1679,18 @@ public static LCUser OnLogin(LCUser user) {
 
 ```go
 leancloud.Engine.OnLogin(func(req *ClassHookRequest) error {
-  fmt.Println("用户 ", req.User.ID, " 已登录。")
+  fmt.Println("User ", req.User.ID, " has logged in.")
 })
 ```
 
 </TabItem>
 </EngineRuntimes>
 
-该 hook 属于 before 类 hook。
+This hook is a `before` hook.
 
 ### OnAuthData
 
-在云存储处理第三方登录的 `authData` 时触发，开发者可以在这个 Hook 中进行对 `authData` 的校验或转换。比如：
+This hook gets triggered when a user’s `authData` gets updated. You can perform verifications and modifications to users’ `authData` with this hook. For example:
 
 <EngineRuntimes>
 <TabItem value='nodejs'>
@@ -1701,10 +1703,10 @@ AV.Cloud.onAuthData(function (request) {
   if (authData.weixin.code === "12345") {
     authData.weixin.accessToken = "45678";
   } else {
-    // 校验失败，抛出异常，则用户无法登录
+    // Verification failed; an error will be thrown and the user won’t be able to log in
     throw new AV.Cloud.Error("invalid code");
   }
-  // 校验成功，返回校验或转换之后的 authData，用户继续登录流程
+  // Verification succeeded; the verified or modified `authData` will be returned and the user will be able to log in
   return authData;
 });
 ```
@@ -1716,11 +1718,11 @@ AV.Cloud.onAuthData(function (request) {
 @engine.on_auth_data
 def on_auth_data(auth_data):
     if auth_data['weixin']['code'] == '12345':
-        # 校验成功，返回校验或转换之后的 auth_data，用户继续登录流程
+        # Verification succeeded; the verified or modified `auth_data` will be returned and the user will be able to log in
         auth_data['weixin']['code'] = '45678'
         return auth_data
     else:
-        # 校验失败，抛出异常，则用户无法登录
+        # Verification failed; an error will be thrown and the user won’t be able to log in
         raise LeanEngineError('invalid code')
 ```
 
@@ -1732,7 +1734,7 @@ def on_auth_data(auth_data):
 public static Dictionary<string, object> OnAuthData(Dictionary<string, object> authData) {
   if (authData.TryGetValue("fake_platform", out object tokenObj)) {
     if (tokenObj is Dictionary<string, object> token) {
-      // 模拟校验
+      // Emulating the verification process
       if (token["openid"] as string == "123" && token["access_token"] as string == "haha") {
         LCLogger.Debug("Auth data Verified OK.");
       } else {
@@ -1748,31 +1750,31 @@ public static Dictionary<string, object> OnAuthData(Dictionary<string, object> a
 </TabItem>
 </EngineRuntimes>
 
-该 hook 属于 before 类 hook。
+This hook is a `before` hook.
 
-### 防止死循环调用
+### Avoiding Infinite Loops
 
-你也许会好奇为什么可以在 AfterUpdate 中保存 `post` 而不会再次触发该 hook。
-这是因为云引擎对所有传入对象做了处理，以阻止死循环调用的产生。
+You might be curious about why saving `post` in `AfterUpdate` won’t trigger the same hook again.
+This is because Cloud Engine has processed the object being passed in to prevent infinite loops.
 
-不过请注意，以下情况还需要开发者自行处理：
+However, this mechanism won’t work when one of the following situations happens:
 
-- 对传入对象进行 `fetch` 操作。
-- 重新构造传入的对象。
+- Calling `fetch` on the object being passed in.
+- Reconstructing the object being passed in.
 
-对于使用上述方式产生的对象，请根据需要自行调用禁用 hook 的接口：
+In these cases, you might want to call the method for disabling hooks yourself:
 
 <EngineRuntimes>
 <TabItem value='nodejs'>
 
 ```js
-// 直接修改并保存对象不会再次触发 afterUpdate Hook 函数
+// Directly editing and saving an object won’t trigger the `afterUpdate` hook
 request.object.set("foo", "bar");
 request.object.save().then(function (obj) {
-  // 你的业务逻辑
+  // Your code
 });
 
-// 如果有 fetch 操作，则需要在新获得的对象上调用 disableAfterHook 来确保不会再次触发 Hook 函数
+// If `fetch` has been called on the object, call `disableAfterHook` on the new object to prevent the object from triggering the hook
 request.object
   .fetch()
   .then(function (obj) {
@@ -1781,15 +1783,15 @@ request.object
     return obj.save();
   })
   .then(function (obj) {
-    // 你的业务逻辑
+    // Your code
   });
 
-// 如果是其他方式构建对象，则需要在新构建的对象上调用 disableAfterHook 来确保不会再次触发 Hook 函数
+// If the object has been reconstructed, call `disableAfterHook` on the new object to prevent the object from triggering the hook
 var obj = AV.Object.createWithoutData("Post", request.object.id);
 obj.disableAfterHook();
 obj.set("foo", "bar");
 obj.save().then(function (obj) {
-  // 你的业务逻辑
+  // Your code
 });
 ```
 
@@ -1799,16 +1801,17 @@ obj.save().then(function (obj) {
 ```python
 @engine.after_update('Post')
 def after_post_update(post):
-    # 直接修改并保存对象不会再次触发 after_update Hook 函数
+    # Directly editing and saving an object won’t trigger the `after_update` hook
     post.set('foo', 'bar')
     post.save()
 
-    # 如果有 fetch 操作，则需要在新获得的对象上调用 disable_after_hook 来确保不会再次触发 Hook 函数
+    # If `fetch` has been called on the object, call `disable_after_hook` on the new object to prevent the object from triggering the hook
+request.object
     post.fetch()
     post.disable_after_hook()
     post.set('foo', 'bar')
 
-    # 如果是其他方式构建对象，则需要在新构建的对象上调用 disable_after_hook 来确保不会再次触发 Hook 函数
+    # If the object has been reconstructed, call `disable_after_hook` on the new object to prevent the object from triggering the hook
     post = leancloud.Object.extend('Post').create_without_data(post.id)
     post.disable_after_hook()
     post.save()
@@ -1820,16 +1823,16 @@ def after_post_update(post):
 ```java
 @EngineHook(className="Post", type = EngineHookType.afterUpdate)
 public static void afterUpdatePost(LCObject post) throws LCException {
-  // 直接修改并保存对象不会再次触发 afterUpdate Hook 函数
+  // Directly editing and saving an object won’t trigger the `afterUpdate` hook
   post.put("foo", "bar");
   post.save();
 
-  // 如果有 fetch 操作，则需要在新获得的对象上调用 disableAfterHook 来确保不会再次触发 Hook 函数
+  // If `fetch` has been called on the object, call `disableAfterHook` on the new object to prevent the object from triggering the hook
   post.fetch();
   post.disableAfterHook();
   post.put("foo", "bar");
 
-  // 如果是其他方式构建对象，则需要在新构建的对象上调用 disableAfterHook 来确保不会再次触发 Hook 函数
+  // If the object has been reconstructed, call `disableAfterHook` on the new object to prevent the object from triggering the hook
   post = LCObject.createWithoutData("Post", post.getObjectId());
   post.disableAfterHook();
   post.save();
@@ -1841,17 +1844,17 @@ public static void afterUpdatePost(LCObject post) throws LCException {
 
 ```php
 Cloud::afterUpdate("Post", function($post, $user) {
-    // 直接修改并保存对象不会再次触发 afterUpdate Hook 函数
+    // Directly editing and saving an object won’t trigger the `afterUpdate` hook
     $post->set('foo', 'bar');
     $post->save();
 
-    // 如果有 fetch 操作，则需要在新获得的对象上调用 disableAfterHook 来确保不会再次触发 Hook 函数
+    // If `fetch` has been called on the object, call `disableAfterHook` on the new object to prevent the object from triggering the hook
     $post->fetch();
     $post->disableAfterHook();
     $post->set('foo', 'bar');
     $post->save();
 
-    // 如果是其他方式构建对象，则需要在新构建的对象上调用 disableAfterHook 来确保不会再次触发 Hook 函数
+    // If the object has been reconstructed, call `disableAfterHook` on the new object to prevent the object from triggering the hook
     $post = LeanObject::create("Post", $post->getObjectId());
     $post->disableAfterHook();
     $post->save();
@@ -1862,16 +1865,16 @@ Cloud::afterUpdate("Post", function($post, $user) {
 <TabItem value='dotnet'>
 
 ```cs
-// 直接修改并保存对象不会再次触发 afterUpdate Hook 函数
+// Directly editing and saving an object won’t trigger the `afterUpdate` hook
 post["foo"] = "bar";
 await post.Save();
 
-// 如果有 fetch 操作，则需要在新获得的对象上调用 DisableAfterHook 来确保不会再次触发 Hook 函数
+// If `fetch` has been called on the object, call `DisableAfterHook` on the new object to prevent the object from triggering the hook
 await post.Fetch();
 post.DisableAfterHook();
 post["foo"] = "bar";
 
-// 如果是其他方式构建对象，则需要在新构建的对象上调用 DisableAfterHook 来确保不会再次触发 Hook 函数
+// If the object has been reconstructed, call `DisableAfterHook` on the new object to prevent the object from triggering the hook
 post = LCObject.CreateWithoutData("Post", post.ObjectId);
 post.DisableAfterHook();
 await post.Save();
@@ -1880,16 +1883,16 @@ await post.Save();
 </TabItem>
 </EngineRuntimes>
 
-### Hook 错误响应码
+### Error Codes for Hooks
 
-为 `BeforeSave` 这类的 hook 函数定义错误码，需要这样：
+Use the following way to define error codes for hooks like `BeforeSave`:
 
 <EngineRuntimes>
 <TabItem value='nodejs'>
 
 ```js
 AV.Cloud.beforeSave("Review", function (request) {
-  // 使用 JSON.stringify() 将 object 变为字符串
+  // Convert the object to a string with JSON.stringify()
   throw new AV.Cloud.Error(
     JSON.stringify({
       code: 123,
@@ -1903,7 +1906,7 @@ AV.Cloud.beforeSave("Review", function (request) {
 <TabItem value='python'>
 
 ```python
-@engine.before_save('Review') # Review 为需要 hook 的 class 的名称
+@engine.before_save('Review') # `Review` is the name of the class that the hook will be applied to
 def before_review_save(review):
     comment = review.get('comment')
     if not comment:
@@ -1960,140 +1963,139 @@ leancloud.Engine.BeforeSave("Review", func(req *ClassHookRequest) (interface{}, 
 </TabItem>
 </EngineRuntimes>
 
-客户端收到的响应为 `Cloud Code validation failed. Error detail: { "code": 123, "message": "An error occurred." }`。可通过 **截取字符串** 的方式取出错误信息，再转换成需要的对象。
+The response gotten by the client would look like `Cloud Code validation failed. Error detail: { "code": 123, "message": "An error occurred." }`. The client can then **slice the string** to get the error message.
 
-### Hook 超时
+### Timeouts for Hooks
 
-Before 类 Hook 函数的超时时间为 10 秒，其他类 Hook 函数的超时时间为 3 秒。如果 Hook 函数被其他的云函数调用（比如因为保存对象而触发 `BeforeSave` 和 `AfterSave`），那么它们的超时时间会进一步被其他云函数调用的剩余时间限制。
+The timeout for `before` hooks is 10 seconds while that for other hooks is 3 seconds. If a hook is triggered by another Cloud Function (like when a `BeforeSave` or `AfterSave` hook gets triggered when a new object gets created), its timeout will be cut down to the remaining timeout of the triggering Cloud Function.
 
-例如，如果一个 `BeforeSave` 函数是被一个已经运行了 13 秒的云函数触发，那么它就只剩下 2 秒的时间来运行。同时请参考 [云函数超时及处理方案](#云函数超时)。
+For example, if a `BeforeSave` hook is triggered by a Cloud Function that has already been executed for 13 seconds, the hook will only have 2 seconds left. See [Timeouts for Cloud Functions](#timeouts-for-cloud-functions) for more information.
 
-## 即时通讯 Hook
+## Hooks for Instant Messaging
 
-参见<Conditional brand="tds">[即时通讯指南第四篇](/sdk/im/guide/systemconv/)</Conditional><Conditional brand="leancloud">[即时通讯指南第四篇](https://leancloud.cn/docs/realtime-guide-systemconv.html)</Conditional>的《万能的 Hook 机制》章节。
+See <Conditional brand="tds">[Hooks and System Conversations](/sdk/im/guide/systemconv/)</Conditional><Conditional brand="leancloud">[Hooks and System Conversations](https://leancloud.cn/docs/realtime-guide-systemconv.html)</Conditional> for more information.
 
-## 在线编写云函数
+## Writing Cloud Functions Online
 
-很多人使用云引擎是为了在服务端提供一些个性化的方法供各终端调用，而不希望关心诸如代码托管、npm 依赖管理等问题。为此我们提供了在线维护云函数的功能。使用此功能需要注意：
+You can write Cloud Functions online using the dashboard instead of creating and deploying a project. Keep in mind that:
 
-- 在线定义的函数会覆盖你之前用 Git 或命令行部署的项目。
-- 目前只能在线编写云函数和 Hook，不支持托管静态网页、编写动态路由。
-- 只能使用 JavaScript SDK 和一些内置的 Node.js 模块（详见下节表格），无法引入其他模块作为依赖。
+- Deploying the Cloud Functions you write online will override the project deployed with Git or the CLI.
+- You can only write Cloud Functions and hooks online. You can’t upload static web pages or write dynamic routes with the web interface.
+- You can only use the JavaScript SDK together with some built-in Node.js modules (listed in the table below). You can’t import other modules as dependencies.
 
-![在线编写云函数](/img/cloud-engine/engine-snippets-list.png)
+![Writing Cloud Functions online](/img/cloud-engine/engine-snippets-list.png)
 
-在 **<Path to="engine" /> > 云引擎分组 > 部署 > 在线编辑** 标签页，可以：
+On **<Path to="engine" /> > Your group > Deploy > Edit online**, you can:
 
-- **创建函数**：指定函数类型、函数名称、函数体的具体代码、注释等信息，点击「保存」即可创建一个云函数。函数类型包括 Function（普通云函数）、Hook、Global（这里可以定义多个云函数的公共逻辑）。
-- **部署**：选择要部署的环境，点击「部署」即可看到部署过程和结果。
-- **预览**：会将所有函数汇总并生成一个完整的代码段，可以确认代码，或者将其保存为 `cloud.js` 覆盖项目模板的同名文件，即可快速地转换为使用项目部署。
-- **维护云函数**：可以编辑已有云函数，查看保存历史，以及删除云函数。
+- **Create function**: When creating a Cloud Function, you can specify its type, name, code, and comments. Click _Create_ to save the Cloud Function. Types of Cloud Functions include _Function_ (basic Cloud Function), _Hook_, and _Global_ (shared logic used by multiple Cloud Functions).
+- **Deploy**: You can select the environment to deploy your Cloud Functions to and click _Deploy_ to proceed.
+- **Preview**: This will combine all the Cloud Functions into a single code snippet. You can verify the code in your Cloud Functions or override the file named `cloud.js` in a project created from the demo project with the code shown here.
+- **Maintain Cloud Functions**: You can edit existing Cloud Functions, view histories, and delete Cloud Functions.
 
-云函数编辑之后需要点击 **部署** 才能生效。
+After you edit your Cloud Functions, make sure to click **Deploy** to have the edits take effect.
 
-目前在线编辑仅支持 Node.js，最新的 `v3` 版本使用 Node.js 8.x 和 3.x 的 Node.js SDK，使用 Promise 写法，默认提供的依赖包有：async, bluebird, crypto, debug, ejs, jade, lodash, moment, nodemailer, qiniu, redis, request, request-promise, superagent, underscore, uuid, wechat-api, xml2js。
+The online editor only supports Node.js at this time. The latest version, `v3`, uses Node.js 8.x and the Node.js SDK 3.x. With this version selected, you’ll need to write your functions using Promise. Packages provided by default include async, bluebird, crypto, debug, ejs, jade, lodash, moment, nodemailer, qiniu, redis, request, request-promise, superagent, underscore, uuid, wechat-api, and xml2js.
 
 <details>
-<summary>点击展开在线编辑 SDK 版本详情</summary>
+<summary>More about the SDK versions used by the online editor</summary>
 
-| 在线编辑版本 | Node.js SDK | JS SDK | Node.js | 备注                  | 可用依赖                                                                                                                                                        |
-| ------------ | ----------- | ------ | ------- | --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| v0           | 0.x         | 0.x    | 0.12    | 已不推荐使用          | moment, request, underscore                                                                                                                                     |
-| v1           | 1.x         | 1.x    | 4       |                       | async, bluebird, co, ejs, handlebars, joi, lodash, marked, moment, q, request, superagent, underscore                                                           |
-| v2           | 2.x         | 2.x    | 6       | 需要使用 Promise 写法 | async, bluebird, crypto, debug, ejs, jade, lodash, moment, nodemailer, qiniu, redis, request, request-promise, superagent, underscore, uuid, wechat-api, xml2js |
-| v3           | 3.x         | 3.x    | 8       | 需要使用 Promise 写法 | async, bluebird, crypto, debug, ejs, jade, lodash, moment, nodemailer, qiniu, redis, request, request-promise, superagent, underscore, uuid, wechat-api, xml2js |
+| Version | Node.js SDK | JS SDK | Node.js | Notes                                     | Dependencies available                                                                                                                                          |
+| ------- | ----------- | ------ | ------- | ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| v0      | 0.x         | 0.x    | 0.12    | Not recommended anymore                   | moment, request, underscore                                                                                                                                     |
+| v1      | 1.x         | 1.x    | 4       |                                           | async, bluebird, co, ejs, handlebars, joi, lodash, marked, moment, q, request, superagent, underscore                                                           |
+| v2      | 2.x         | 2.x    | 6       | Please write your functions using Promise | async, bluebird, crypto, debug, ejs, jade, lodash, moment, nodemailer, qiniu, redis, request, request-promise, superagent, underscore, uuid, wechat-api, xml2js |
+| v3      | 3.x         | 3.x    | 8       | Please write your functions using Promise | async, bluebird, crypto, debug, ejs, jade, lodash, moment, nodemailer, qiniu, redis, request, request-promise, superagent, underscore, uuid, wechat-api, xml2js |
 
-**从 v0 升级到 v1：**
+**Upgrading from v0 to v1:**
 
-- JS SDK 升级到了 [1.0](https://github.com/leancloud/javascript-sdk/releases/tag/v1.0.0)。
-- 需要从 `request.currentUser` 获取用户，而不是 `AV.User.current`。
-- 在调用 `AV.Cloud.run` 时需要手动传递 user 对象。
+- Upgraded the JS SDK to [1.0](https://github.com/leancloud/javascript-sdk/releases/tag/v1.0.0).
+- Requires you to obtain the user from `request.currentUser` instead of `AV.User.current`.
+- Requires you to manually provide the `user` object when calling `AV.Cloud.run`.
 
-**从 v1 升级到 v2：**
+**Upgrading from v1 to v2:**
 
-- JS SDK 升级到 [2.0](https://github.com/leancloud/javascript-sdk/releases/tag/v2.0.0)（必须使用 Promise，不再支持 callback 风格）。
-- 删除了 `AV.Cloud.httpRequest`。
-- 在云函数中 **必须** 返回 Promise 作为云函数的值，抛出 `AV.Cloud.Error` 来表示错误。
+- Upgraded the JS SDK to [2.0](https://github.com/leancloud/javascript-sdk/releases/tag/v2.0.0) (Promise must be used instead of callback).
+- Removed `AV.Cloud.httpRequest`.
+- **Requires** you to return a Promise from each Cloud Function and throw an `AV.Cloud.Error` for each error.
 
-**从 v2 升级到 v3：**
+**Upgrading from v2 to v3:**
 
-- JS SDK 升级到了 [3.0](https://github.com/leancloud/javascript-sdk/releases/tag/v3.0.0)（`AV.Object.toJSON` 的行为变化等）。
+- Upgraded the JS SDK to [3.0](https://github.com/leancloud/javascript-sdk/releases/tag/v3.0.0) (includes changes to the behavior of `AV.Object.toJSON`).
 
 </details>
 
 <details>
-<summary>点击展开在线编辑和项目部署的关系</summary>
+<summary>Difference between writing Cloud Functions online and deploying a project</summary>
 
-「在线编辑」的产生是为了方便大家初次体验云引擎，或者只是需要一些简单 hook 方法的应用使用。我们的实现方式就是把定义的函数拼接起来，生成一个云引擎项目然后部署。
+When you write Cloud Functions online, the way our system deals with your functions is to join them together, generate a Cloud Engine project, and deploy this project.
 
-所以可以认为「在线编辑」和「项目部署」最终是一样的，都是一个完整的项目。
+You can consider writing Cloud Functions online to be the same as deploying a project: they both form a complete project in the end.
 
-定义函数是一个单独功能，可以让你不用使用基础包、git 等工具就能快速生成和编辑云引擎项目。
+When you define functions online, you can quickly generate a Cloud Engine project without using our SDK or Git.
 
-当然，你也可以使用基础包，自己写代码并部署项目。
+You may also choose to create and deploy a project written based on our SDK.
 
-这两条路是分开的，使用任何一种方式部署都会导致另一种方式失效。
+The two options are mutually exclusive: when you deploy with one option, the deployment using the other option will be overridden.
 
 </details>
 
 <details>
-<summary>点击展开如何从在线编辑迁移到项目部署</summary>
+<summary>Migrating from writing Cloud Functions online to deploying a project</summary>
 
-1. 按照[云引擎命令行工具使用指南](/sdk/engine/cli/)安装命令行工具，使用 `lean new` 初始化项目，模板选择 `Node.js > Express`（我们的 Node.js 示例项目）。
-2. 在 **<Path to="engine" /> > 云引擎分组 > 部署 > 在线编辑** 点击 **预览**，将全部函数的代码拷贝到新建项目中的 `cloud.js`（替换掉原有内容）。
-3. 运行 `lean up`，在 <http://localhost:3001> 的调试界面中测试云函数和 Hook，然后运行 `lean deploy` 部署代码到云引擎（使用标准实例的用户还需要执行 `lean publish`）。
-4. 部署后请留意云引擎控制台上是否有错误产生。
+1. Install the CLI according to the [CLI Guide](/sdk/engine/cli/) and create a new project by running `lean new`. Select `Node.js > Express` as the template (this is our demo project for Node.js).
+2. Navigate to **<Path to="engine" /> > Your group > Deploy > Edit online** and click **Preview**. Copy the code shown here and replace the code in `cloud.js` with it.
+3. Run `lean up`. Now you can test your Cloud Functions and hooks on <http://localhost:3001>. Once you’re done, run `lean deploy` to deploy your code to Cloud Engine. If you have standard instances, make sure to run `lean publish` as well.
+4. After deploying your project, watch the dashboard to see if there are any errors.
 
-如果在线编辑使用的是 0.x 版本 的 Node.js SDK，那么还需要修改不兼容的代码。
-比如将 `AV.User.current()` 改为 `request.currentUser`。
-详见 [升级到云引擎 Node.js SDK 1.0](https://leancloud.cn/docs/leanengine-node-sdk-upgrade-1.html)。
+If you have been using the Node.js SDK 0.x, you’ll have to update your code to avoid compatibility issues.
+For example, `AV.User.current()` should be changed to `request.currentUser`.
 
 </details>
 
-## 查看和运行云函数
+## Viewing and Running Cloud Functions
 
-**<Path to="engine" /> > 云函数** 页面以表格的形式展示了应用各分组上定义的云函数（包括 Hook）的信息，包括云函数名称、所属分组、QPM（每分钟请求数）。在云函数表格中，点击 **运行** 按钮可以通过控制台调用云函数。通过左上角的控制按钮可以切换预备环境和生产环境。
+**<Path to="engine" /> > Cloud functions** shows all the Cloud Functions and hooks defined within each group, including their names, groups, and QPM (requests per minute). You can click **Run** to run a Cloud Function from the dashboard. You can switch between the staging environment and the production environment at the top of the page.
 
-这里显示的是应用下所有分组中的云函数，包括在线编辑也包括项目部署。
+Cloud Functions from all the groups in your application will be displayed here regardless of the way they’re deployed (writing Cloud Functions online or deploying a project).
 
-![云函数列表](/img/cloud-engine/engine-functions-list.png)
+![List of Cloud Functions](/img/cloud-engine/engine-functions-list.png)
 
-## 生产环境和预备环境
+## Production Environment vs. Staging Environment
 
-云引擎应用有「生产环境」和「预备环境」之分。在云引擎通过 SDK 调用云函数时，包括显式调用以及隐式调用（由于触发 hook 条件导致 hook 函数被调用），SDK 会根据云引擎所属环境（预备、生产）调用相应环境的云函数。例如，假定定义了 `beforeDelete` 云函数，在预备环境通过 SDK 删除一个对象，会触发预备环境的 `beforeDelete` hook 函数。
+Your app comes with a production environment and a staging environment. When triggering a Cloud Function from within a Cloud Engine instance using the SDK, no matter explicitly or implicitly (by triggering hooks), the SDK will trigger the function defined in the same environment as the instance. For example, with `beforeDelete` defined, if an object is deleted with the SDK in the staging environment, the `beforeDelete` hook in the staging environment will be triggered.
 
-在云引擎以外的环境通过 SDK 显式或隐式调用云函数时，`X-LC-Prod` 的默认值一般为 `1`，也就是调用生产环境。但由于历史原因，各 SDK 的具体行为有一些差异：
+When triggering Cloud Functions outside of a Cloud Engine instance using the SDK, no matter explicitly or implicitly, `X-LC-Prod` will be set to `1` by default, which means that the Cloud Functions in the production environment will be triggered. For historical reasons, there are some differences among the SDKs:
 
-- 在 Node.js、PHP、Java、C# 这四个 SDK 下，默认总是调用生产环境的云函数。
-- 在 Python SDK 下，配合 lean-cli 本地调试时，且应用存在预备环境时，默认调用预备环境的云函数，其他情况默认调用生产环境的云函数。
-- 云引擎 Java 环境的模板项目 [java-war-getting-started] 和 [spring-boot-getting-started] 做了处理，配合 lean-cli 本地调试时，且应用存在预备环境时，默认调用预备环境的云函数，其他情况默认调用生产环境的云函数（与 Python SDK 的行为一致）。
+- For Node.js, PHP, Java, and C# SDKs, the production environment will be used by default.
+- For the Python SDK, when debugging locally with lean-cli, the staging environment will be used if it exists. Otherwise, the production environment will be used.
+- For Java example projects, [java-war-getting-started] and [spring-boot-getting-started], when debugging locally with lean-cli, the staging environment will be used if it exists. Otherwise, the production environment will be used (same as the Python SDK).
 
 [java-war-getting-started]: https://github.com/leancloud/java-war-getting-started/
 [spring-boot-getting-started]: https://github.com/leancloud/spring-boot-getting-started/
 
-你还可以在 SDK 中指定客户端将请求所发往的环境：
+You can specify the environment being used with the SDK:
 
 <MultiLang>
 
 ```cs
 LCCloud.IsProduction = true; // production (default)
-LCCloud.IsProduction = false; // stage
+LCCloud.IsProduction = false; // staging
 ```
 
 ```java
 LCCloud.setProductionMode(true); // production
-LCCloud.setProductionMode(false); // stage
+LCCloud.setProductionMode(false); // staging
 ```
 
 ```objc
 [LCCloud setProductionMode:YES]; // production (default)
-[LCCloud setProductionMode:NO]; // stage
+[LCCloud setProductionMode:NO]; // staging
 ```
 
 ```swift
 // production by default
 
-// stage
+// staging
 do {
     let environment: LCApplication.Environment = [.cloudEngineDevelopment]
     let configuration = LCApplication.Configuration(environment: environment)
@@ -2109,42 +2111,42 @@ do {
 
 ```dart
 LCCloud.setProduction(true); // production (default)
-LCCloud.setProduction(false); // stage
+LCCloud.setProduction(false); // staging
 ```
 
 ```js
 AV.setProduction(true); // production (default)
-AV.setProduction(false); // stage
+AV.setProduction(false); // staging
 ```
 
 ```python
 leancloud.use_production(True) # production (default)
-leancloud.use_production(False) # stage
-# 需要在 SDK 初始化语句 `leancloud.init` 之前调用
+leancloud.use_production(False) # staging
+# Needs to be called before `leancloud.init`
 ```
 
 ```php
 LeanClient::useProduction(true); // production (default)
-LeanClient::useProduction(false); // stage
+LeanClient::useProduction(false); // staging
 ```
 
 ```go
-// 暂不支持（总是使用生产环境）
+// Not supported yet (will always use the production environment)
 ```
 
 </MultiLang>
 
-体验版云引擎应用只有「生产环境」，因此请不要切换到预备环境。
+If you’re using the trial mode, there will only be a production environment and you won’t be able to switch to the staging environment.
 
-## 定时任务
+## Scheduled Tasks
 
-定时任务可以按照设定，以一定间隔自动完成指定动作，比如半夜清理过期数据，每周一向所有用户发送推送消息等等。定时任务的最小时间单位是 **秒**，正常情况下时间误差都可以控制在秒级别。
+You can set up scheduled tasks to run your Cloud Functions periodically. For example, you can have your app clean up temporary data every night, send push notifications to users every Monday, etc. The time set for a scheduled task can be accurate to a **second**.
 
-定时任务是普通的云函数，也会遇到 [超时问题](#云函数超时)，具体请参考 [超时处理方案](#超时的处理方案)。
+The timeout applied to ordinary Cloud Functions also applies to scheduled tasks. See [Avoiding Timeouts](#avoiding-timeouts) for more information.
 
-一个定时任务如果在 24 小时内收到了超过 30 次的 `400`（Bad Request）或 `502`（Bad Gateway）的应答，它将会被云引擎禁用，同时系统会向开发者发出相关的禁用通知邮件。在控制台的日志中，对应的错误信息为 `timerAction short-circuited and no fallback available`。
+If a scheduled task triggers more than 30 `400` (Bad Request) or `502` (Bad Gateway) errors within 24 hours, the task will be disabled and you will get an email regarding the issue. The error `timerAction short-circuited and no fallback available` will also be printed to the log.
 
-部署云引擎之后，进入 **<Path to="engine" /> > 定时任务**，点击 **创建定时任务**，然后设定执行的函数名称、执行环境等等。例如定义一个打印循环打印日志的任务 `logTimer`：
+After deploying your program to Cloud Engine, go to **<Path to="engine" /> > Scheduled tasks** and click **Create scheduled task** to create a scheduled task for a Cloud Function. For example, if we have a function named `logTimer`:
 
 <EngineRuntimes>
 <TabItem value='nodejs'>
@@ -2206,30 +2208,30 @@ leancloud.Engine.Define("logTimer", func(req *FunctionRequest) (interface{}, err
 </TabItem>
 </EngineRuntimes>
 
-![定时任务列表](/img/cloud-engine/engine-cronjobs-list.png)
+![List of scheduled tasks](/img/cloud-engine/engine-cronjobs-list.png)
 
-云引擎支持两种定时任务：
+You can specify the times a scheduled task gets triggered using one of the following expressions:
 
-- 使用 Cron 表达式安排调度
-- 以分钟为单位的简单循环调度
+- CRON expression
+- Interval in seconds
 
-以 Cron 表达式为例，比如每周一早上 8 点打印日志（运行之前定义的 `logTimer` 函数），创建定时任务的时候，选择 **Cron 表达式** 并填入 `0 0 8 ? * MON`。
+Take the CRON expression as an example. To print logs at 8am every Monday, create a scheduled task for the function `logTimer` using a **CRON expression** and enter `0 0 8 ? * MON` for it.
 
-Cron 表达式的语法可以参考 [云队列（Cloud Queue）开发指南 § CRON 表达式](/sdk/engine/functions/cloud-queue/#cron-表达式) 。
+See [Cloud Queue Guide § CRON Expressions](/sdk/engine/functions/cloud-queue/#cron-expressions) for more information about CRON expressions.
 
-在配置定时任务时可以指定一些额外的非必填选项：
+When creating a scheduled task, you can optionally fill in the following two fields:
 
-- 运行参数：传递给云函数的参数（JSON 对象）。
-- 异常策略：任务因云函数超时失败后重试执行还是放弃执行，详见 [云队列指南 § 异常处理策略](/sdk/engine/functions/cloud-queue/#异常处理策略deliverymode具体影响哪些情况)。
+- Params: The arguments passed to the Cloud Function as a JSON object.
+- Error-handling policy: Whether to retry or cancel the task when it fails due to a Cloud Function timeout. See [Cloud Queue Guide § Error-Handling Policy](/sdk/engine/functions/cloud-queue/#what-situations-will-be-affected-by-the-error-handling-policy-deliverymode) for more information.
 
-「最近一次执行」会显示最近一次执行的时间和详情，但目前这个数据仅保留 5 分钟，在查看详情中：
+**Last execution** is the time and result of the last execution. This information will only be retained for 5 minutes. Under the details of the execution:
 
-- `status` 任务的状态，包括 `success`（成功）、`failed`（失败）
-- `uniqueId` 任务的唯一 ID
-- `finishedAt` 执行完成的精确时间（仅限成功任务）
-- `statusCode` 云函数响应的 HTTP 状态码（仅限成功任务）
-- `result` 来自云函数的响应（仅限成功任务）
-- `error` 错误提示（仅限失败任务）
-- `retryAt` 下次重试时间（仅限失败任务）
+- `status`: The status of the task; could be `success` or `failed`
+- `uniqueId`: A unique ID for the task
+- `finishedAt`: The exact time when the task finished (for succeeded tasks only)
+- `statusCode`: The HTTP status returned by the Cloud Function (for succeeded tasks only)
+- `result`: The response body returned by the Cloud Function (for succeeded tasks only)
+- `error`: Error message (for failed tasks only)
+- `retryAt`: The time the task will be rerun (for failed tasks only)
 
-定时任务的结果（执行日志）可以在 **<Path to="engine" /> > 云引擎分组 > 日志** 中查看。
+You can view the logs of all the scheduled tasks on **<Path to="engine" /> > Your group > Logs**.

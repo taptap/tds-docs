@@ -290,6 +290,8 @@ TapBillboard.OpenPanel((any, error) =>
     {
         // 打开公告成功
     }
+}, () => {
+        // 公告已关闭
 });
 ```
 
@@ -304,7 +306,12 @@ TapBillboard.openPanel(BillboardActivity.this, new Callback<Void>() {
     public void onSuccess(Void result) {
         // 打开公告成功
     }
-});             
+},new UserInteraction() {
+    @Override
+    public void onClose() {
+        // 公告已关闭，如果有 UI 更新，请切换到 Android 主线程
+    }
+});
 ```
 
 ```objectivec
@@ -314,6 +321,8 @@ TapBillboard.openPanel(BillboardActivity.this, new Callback<Void>() {
     } else {
         // 打开公告成功
     }
+} closeCallback:^(void){
+    // 公告已关闭
 }];
 ```
 
@@ -359,7 +368,7 @@ TapBillboard.getBadgeDetails(new Callback<BadgeDetails>() {
             // 没有新的公告信息
         }
     }
-});          
+});
 ```
 
 ```objectivec
@@ -398,7 +407,7 @@ TapBillboard.registerCustomLinkListener(new CustomLinkListener() {
         // 这里返回的 url 地址和游戏在公告系统内配置的地址是一致的
         // 注意如果有 UI 操作需要切换到 Android 主线程处理
     }
-});        
+});
 ```
 
 ```objectivec
@@ -422,7 +431,7 @@ TapBillboard.UnRegisterCustomLinkListener(registerdListener);
 
 ```java
 // 已注册的回调对象需要游戏保存，取消注册的时候要把对象传给 SDK
-TapBillboard.unRegisterCustomLinkListener(registerdListener);    
+TapBillboard.unRegisterCustomLinkListener(registerdListener);
 ```
 
 ```objectivec
@@ -460,7 +469,7 @@ TapBillboard.unRegisterCustomLinkListener(registerdListener);
 | Key        | Value        | 含义                                      | 来源           |
 | ---------- | ------------ | ----------------------------------------- | -------------- |
 | `X-LC-Id`  | `{{appid}}`  | 当前应用的 `App Id`（即 `Client Id`）  | 可在控制台查看 |
-| `X-LC-Sign` | `{{appSign}}` | 将 timestamp 加上 `App Key`（即 `Client Token`）组成的字符串，再对它做 MD5 签名后的结果。| 可在控制台查看 |
+| `X-LC-Sign` | `{{appSign}}` | 由 `sign,timestamp` 组成的字符串。其中 timestamp 为客户端产生本次请求的 unix 时间戳（UTC），精确到毫秒。`sign` 是 timestamp 拼接 `App Key`（即 `Client Token`）组成的字符串，再对它做 MD5 签名后的结果。| 参考下方的计算方式 |
 
 使用 App Key 来计算 `appSign`:
 
@@ -532,6 +541,7 @@ curl -X GET
 | `template` | 必须 | 公告模版类型，目前仅支持导航模版。可填写：导航模版-`navigate`、图片模版-`image`。 |
 | `dimension_list` | 可选 | `[{"维度参数"："维度字段参数"},...]` ，示例：`[{"platform":"ios"},{"location":"CN"}]` |
 | `type` | 必须 | 公告类型。可填写：活动公告-`activity`、其他统称游戏公告-`game`。|
+| `uuid` | 选填 | 设备唯一 id 字符串，用于支持数据分析。示例："4e4105c7-781e-45c0-92ea-d595c75a3c2c" |
 
 ```sh
 curl -X POST
@@ -544,7 +554,7 @@ curl -X POST
         "type":{{type}},
         "dimension_list":{{dimension_list}}
      }' \
-  https://{{host}}/billboard/rest-api/v1/announcement/list?client_id={{appid}}
+  https://{{host}}/billboard/rest-api/v1/announcement/list?client_id={{appid}}&uuid={{uuid}}
 ```
 
 返回的 JSON 对象包含公告列表 `list` 和最新发布的一条公告详情 `lastest`。
@@ -593,12 +603,13 @@ curl -X POST
 | `client_id` | 必须 | **开发者中心后台游戏服务 > 应用配置** 中的 `Client ID` |
 | `lang` | 必须 | 详见[语言代码列表](#语言代码列表) |
 | `id` | 必须 | 公告 id |
+| `uuid` | 选填 | 设备唯一 id 字符串，用于支持数据分析。示例："4e4105c7-781e-45c0-92ea-d595c75a3c2c" |
 
 ```sh
 curl -X GET
   -H 'X-LC-Id: {{appid}}' \
   -H 'X-LC-Sign: {{appSign}}' \
-  https://{{host}}/billboard/rest-api/v1/announcement/detail?client_id={{appid}}&lang={{lang}}&id={{id}}
+  https://{{host}}/billboard/rest-api/v1/announcement/detail?client_id={{appid}}&lang={{lang}}&id={{id}}&uuid={{uuid}}
 ```
 
 返回的 JSON 对象

@@ -50,8 +50,22 @@ const CONFIGS: {
       { label: "Unity", value: "unity" },
       { label: "Android", value: "android" },
       { label: "iOS", value: "ios" },
-      { label: "UE4", value: "ue4"}
-    ]
+      { label: "UE4", value: "ue4" },
+    ],
+  },
+  adn: {
+    tds: [
+      { label: "Unity", value: "unity" },
+      { label: "Android", value: "android" },
+    ],
+  },
+  im: {
+    tds: [
+      { label: "Unity", value: "unity" },
+      { label: "Android", value: "android" },
+      { label: "iOS", value: "ios" },
+      { label: "JavaScript", value: "js" },
+    ],
   },
   default: {
     leancloud: [

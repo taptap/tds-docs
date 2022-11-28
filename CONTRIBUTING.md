@@ -277,7 +277,7 @@ sidebar_position: 10
 添加附件的过程和添加图片类似，把文件拖放到 `/static/files` 目录下，然后在 Markdown 文件中通过 `pathname:///files/FILENAME.EXT` 链接到文件，例如：
 
 ```markdown
-点击下载 [icon.zip](pathname:///files/taptap-login-button.zip)
+推荐位的 icon 设计：尺寸为**200*200**，设计上建议简洁明了，可以用游戏内的 UI/ 角色头像，如没有合适素材，可[点击这里](pathname:///files/recommends-icons.zip)获取 TapTap 默认素材包。
 ```
 
 注意：

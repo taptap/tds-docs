@@ -40,10 +40,10 @@ import Profiles from "../../_partials/tap-login-profile.mdx";
 
 ## 检查登录状态
 
-`TDSUser` 会在本地缓存当前用户的登录信息，所以如果一个玩家在游戏内登录之后，下次启动用户通过调用 `TDSUser#currentUser` 可以得到之前登录的账户实例。
+SDK 会在本地缓存当前用户的登录信息，所以如果一个玩家在游戏内登录之后，下次启动用户通过调用如下方法可以得到之前登录的账户实例。
 缓存不会自动清除。此时玩家无需再次登录，可以直接进入游戏，实现静默登录。
 
-如果玩家在游戏内进行了登出或者玩家手动清除了游戏的存储数据，则本地缓存的登录信息也会被删除，下次进入游戏时 `TDSUser#currentUser` 会返回一个 null 对象，玩家需要[登录](#一键完成-taptap-登录)之后再进入游戏。
+如果玩家在游戏内进行了登出或者玩家手动清除了游戏的存储数据，则本地缓存的登录信息也会被删除，下次进入游戏时调用如下方法会返回一个 null 对象，玩家需要[登录](#一键完成-taptap-登录)之后再进入游戏。
 
 <MultiLang kind="ue">
 
@@ -94,7 +94,7 @@ if (UserPtr.IsValid()) {
 
 对于「TapTap 用户登录」，TapSDK 提供了特别的支持，以帮助开发者以最便捷的方式和最少的时间完成接入。
 
-你可以直接调用 `TDSUser#loginWithTapTap` 方法来一键登录，例如：
+你可以直接调用 `TDSUser.loginWithTapTap` 方法来一键登录，例如：
 
 <MultiLang kind="ue">
 
@@ -160,6 +160,7 @@ TapUEBootstrap::Login({TUType::PermissionScope::Profile}, [](const FTDSUser& Use
 }, [](const FTUError& Error) {
 	// 登录失败
 });
+// 授权可选项：Profile、Friend、BasicInfo
 ```
 
 </MultiLang>
@@ -176,7 +177,7 @@ TapUEBootstrap::Login({TUType::PermissionScope::Profile}, [](const FTDSUser& Use
 
 ### 不同的授权范围
 
-TapTap 授权登录接口支持选择不同的授权范围且支持任意组合，但必须包含 `public_profile` 和 `basic_info` 中的一个，不然无法获得 openid 和 unionid。
+TapTap 授权登录接口支持选择不同的授权范围且支持任意组合，但必须包含 `public_profile` 和 `basic_info` 中的一个，不然无法获得 openid 和 unionid。TapTap 授权登录接口可以传递 String 类型的数组作为参数，开发者可以根据自己业务需求添加不同的权限为数组的元素。
 
 <Conditional region='cn'>
 
@@ -243,7 +244,8 @@ else
 ### 测试资格校验
 
 :::tip
-该功能仅用于需要上线「篝火测试服」的游戏，对有登录白名单的用户进行资格校验，防止测试阶段开发包外传被利用
+该功能仅用于需要上线「篝火测试服」的游戏，对有登录白名单的用户进行资格校验，防止测试阶段开发包外传被利用。
+此外，**游戏在篝火测试完毕后正常开放全量上线时移动端需要去除该接口**。
 :::
 
 请在登录成功的回调里调用相关 API 进行资格校验。
@@ -348,7 +350,7 @@ TapUEBootstrap::Logout();
 
 </MultiLang>
 
-## PC 登录配置
+## Unity PC 登录配置
 
 :::tip
 
