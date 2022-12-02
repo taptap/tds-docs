@@ -51,11 +51,11 @@ invalidTokens 的数量由以下两部分组成：
 
 可以。请参考 [消息推送开发指南](/sdk/push/guide/rest/#消息内容参数)。
 
-如果要自定义 receiver，必须在消息的 data 里带上自定义的 action。LeanCloud 在接收到消息后，将广播 action 为您定义的值的 intent 事件，您的 receiver 里也必须带上 `intent-filter` 来捕获该 action 值的 intent 事件。
+如果要自定义 receiver，必须在消息的 data 里带上自定义的 action。客户端在接收到消息后，将广播 action 为您定义的值的 intent 事件，您的 receiver 里也必须带上 `intent-filter` 来捕获该 action 值的 intent 事件。
 
 ### Android 应用进程被杀掉后无法收到推送消息
 
-iOS 能做到这点，是因为当应用进程关闭后，Apple 和设备的系统之间还会存在连接，这条连接跟应用无关，所以无论应用是否被杀掉，消息都能发送到 APNs 再通过这条连接发送到设备。但对 Android 来说，如果是国内用户，因为众所周知的原因，Google 和设备之间的这条连接是无法使用的，所以应用只能自己去保持连接并在后台持续运行，一旦后台进程被杀掉，就无法收到推送消息了。虽然 LeanCloud SDK 已经采取了各种办法保持应用在后台运行，但随着 Android 系统版本的升级，权限控制越来越严，第三方推送通道的生命周期受到较大限制。因此 LeanCloud SDK 推出了混合推送的方案，对接国内主流厂商，保障了主流 Android 系统上的推送到达率。详见 [Android 混合推送开发指南](/sdk/push/guide/android-mixpush/)。
+iOS 能做到这点，是因为当应用进程关闭后，Apple 和设备的系统之间还会存在连接，这条连接跟应用无关，所以无论应用是否被杀掉，消息都能发送到 APNs 再通过这条连接发送到设备。但对 Android 来说，如果是国内用户，因为众所周知的原因，Google 和设备之间的这条连接是无法使用的，所以应用只能自己去保持连接并在后台持续运行，一旦后台进程被杀掉，就无法收到推送消息了。虽然 Android SDK 已经采取了各种办法保持应用在后台运行，但随着 Android 系统版本的升级，权限控制越来越严，第三方推送通道的生命周期受到较大限制。因此 Android SDK 推出了混合推送的方案，对接国内主流厂商，保障了主流 Android 系统上的推送到达率。详见 [Android 混合推送开发指南](/sdk/push/guide/android-mixpush/)。
 
 ### 推送记录会保留多久？
 
@@ -108,7 +108,7 @@ if (dataLength > 0) {
 
 ### iOS 推送如何正确保存 deviceToken？
 
-iOS 系统重装、从备份恢复应用、在新设备上安装应用都会导致 device token 变化，因此 Apple 推荐 在应用每次启动时都去请求 APNs 的 device token，获取 token 后进行设置并保存 token。 除此以外，LeanCloud 后端会统计 installation 的更新时间（updatedAt），据此清理长期未更新的 installation 数据。 所以我们建议开发者遵循 Apple 的推荐方式开发应用，以免有效 installation 数据被意外清理，以及因为 device token 过期无效而推送失败。
+iOS 系统重装、从备份恢复应用、在新设备上安装应用都会导致 device token 变化，因此 Apple 推荐 在应用每次启动时都去请求 APNs 的 device token，获取 token 后进行设置并保存 token。 除此以外，后端会统计 installation 的更新时间（updatedAt），据此清理长期未更新的 installation 数据。 所以我们建议开发者遵循 Apple 的推荐方式开发应用，以免有效 installation 数据被意外清理，以及因为 device token 过期无效而推送失败。
 示例代码可以参考：[iOS 消息推送开发指南](/sdk/push/guide/ios/#保存-token)。
 
 ### iOS 推送，APP 在前台时收不到推送如何处理？
@@ -155,7 +155,7 @@ _Installation 表记录了设备上生成的安装信息。可以在 _Installati
 
 ### _Installation 中的 valid 字段指的是什么，valid 为什么是 false？
 
-valid 表示当前这条设备记录是否有效，是 false 表示这条记录失效了，比如长时间未使用或者使用 LeanCloud 平台推送但是推送设备并未登录。
+valid 表示当前这条设备记录是否有效，是 false 表示这条记录失效了，比如长时间未使用推送或者推送设备并未登录。
 
 比如 Android 设备未执行以下代码打开[启动推送服务](/sdk/push/guide/android/#启动推送服务)，valid 的值就会一直是 false。
 
