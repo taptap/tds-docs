@@ -45,6 +45,16 @@ const CONFIGS: {
       { label: "iOS", value: "ios" },
     ],
   },
+  play: {
+    leancloud: [
+      { label: "JavaScript", value: "js" },
+      { label: "C#", value: "charp" },
+    ],
+    tds: [
+      { label: "JavaScript", value: "js" },
+      { label: "C#", value: "charp" },
+    ],
+  },
   ue: {
     tds: [
       { label: "Unity", value: "unity" },
