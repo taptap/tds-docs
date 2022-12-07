@@ -4,8 +4,8 @@ sidebar_label: 功能介绍
 sidebar_position: 1
 ---
 
-import Tabs from "@theme/Tabs";
-import TabItem from "@theme/TabItem";
+import MultiLang from "/src/docComponents/MultiLang";
+import { Conditional } from "/src/docComponents/conditional";
 
 多人在线对战是 TDS 专门针对多人在线类型的游戏推出的后端服务。开发者不需要自己搭建后端系统，利用云服务就可以轻松实现游戏内玩家匹配、在线对战消息同步等功能。
 
@@ -44,8 +44,10 @@ import TabItem from "@theme/TabItem";
 
 ### 连接服务器
 
-<Tabs groupId='multiplayer'>
-<TabItem value='js' label='JavaScript' default>
+<MultiLang kind="play">
+<>
+
+<Conditional brand="leancloud">
 
 ```js
 const client = new Client({
@@ -66,17 +68,40 @@ client.connect().then(()=> {
 }).catch(console.error);
 ```
 
-</TabItem>
-<TabItem value='csharp' label='C#'>
+</Conditional>
+
+<Conditional brand="tds">
+
+```js
+const client = new Client({
+  appId: 'your-client-id',                // 游戏的 Client ID
+  appKey: 'your-client-token',            // 游戏的 Client Token
+  playServer: 'https://your_server_url',  // 游戏的 API 域名
+  userId: 'tarara',                       // 设置用户 id
+  gameVersion: '0.0.1' // 设置游戏版本号，选填，默认 0.0.1，不同版本的玩家不会匹配到同一个房间
+});
+
+client.connect().then(()=> {
+  // 连接成功
+}).catch(console.error);
+```
+
+- 在 **开发者中心 > 你的游戏 > 游戏服务 > 应用配置** 可以查看游戏的 `Client ID` 和 `Client Token`。
+- API 域名在 **应用配置 > 域名配置 > API** 处查看，参考文档关于[域名](/sdk/domain/guide/)的说明。
+
+</Conditional>
+
+</>
+<>
 
 ```cs
-Play.UserID = "Mario";
+Play.UserID = "tarara";
 // 连接服务器时可以声明游戏版本，不同版本的玩家不会匹配到同一个房间
 Play.Connect("0.0.1");
 ```
 
-</TabItem>
-</Tabs>
+</>
+</MultiLang>
 
 ### 玩家匹配
 
@@ -86,8 +111,8 @@ Play.Connect("0.0.1");
 
 1、调用 `JoinRandomRoom` 开始匹配。
 
-<Tabs groupId='multiplayer'>
-<TabItem value='js' label='JavaScript' default>
+<MultiLang kind="play">
+<>
 
 ```js
 client
@@ -98,27 +123,27 @@ client
   .catch(console.error);
 ```
 
-</TabItem>
-<TabItem value='csharp' label='C#'>
+</>
+<>
 
 ```cs
 Play.JoinRandomRoom();
 ```
 
-</TabItem>
-</Tabs>
+</>
+</MultiLang>
 
 2、在顺利情况下，会进入某个有空位的房间开始游戏。
 
-<Tabs groupId='multiplayer'>
-<TabItem value='js' label='JavaScript' default>
+<MultiLang kind="play">
+<>
 
 ```js
 // JavaScript SDK 通过 joinRandomRoom 的 Promise 判断是否加入房间成功
 ```
 
-</TabItem>
-<TabItem value='csharp' label='C#'>
+</>
+<>
 
 ```cs
 play.On(Event.ROOM_JOINED, (evtData) => {
@@ -127,8 +152,8 @@ play.On(Event.ROOM_JOINED, (evtData) => {
 });
 ```
 
-</TabItem>
-</Tabs>
+</>
+</MultiLang>
 
 3、如果没有空房间，就会加入失败。此时在失败触发的回调中建立一个房间等待其他人加入，建立房间时：
 
@@ -136,8 +161,8 @@ play.On(Event.ROOM_JOINED, (evtData) => {
 - 默认一个房间内最大人数是 10，可以通过设置 MaxPlayerCount 来限制最大人数。
 - 设置 [玩家掉线后的保留时间](/sdk/multiplayer/guide/cs/#在房间内保留断线用户)，在有效时间内如果该玩家加回房间，房间内依然保留该玩家的自定义属性。
 
-<Tabs groupId='multiplayer'>
-<TabItem value='js' label='JavaScript' default>
+<MultiLang kind="play">
+<>
 
 ```js
 client
@@ -163,8 +188,8 @@ client
   });
 ```
 
-</TabItem>
-<TabItem value='csharp' label='C#'>
+</>
+<>
 
 ```cs
 // 加入失败时，这个回调会被触发
@@ -181,8 +206,8 @@ play.On(Event.ROOM_JOIN_FAILED, (evtData) =>
 });
 ```
 
-</TabItem>
-</Tabs>
+</>
+</MultiLang>
 
 #### 自定义房间匹配规则
 
@@ -190,8 +215,8 @@ play.On(Event.ROOM_JOIN_FAILED, (evtData) =>
 
 1、确定匹配属性，例如 0-10 级是 level-1，10 以上是 level-2。
 
-<Tabs groupId='multiplayer'>
-<TabItem value='js' label='JavaScript' default>
+<MultiLang kind="play">
+<>
 
 ```js
 var matchLevel = 0;
@@ -202,8 +227,8 @@ if (level < 10) {
 }
 ```
 
-</TabItem>
-<TabItem value='csharp' label='C#'>
+</>
+<>
 
 ```cs
 int matchLevel = 0;
@@ -214,13 +239,13 @@ if (level < 10) {
 }
 ```
 
-</TabItem>
-</Tabs>
+</>
+</MultiLang>
 
 2、根据匹配属性加入房间
 
-<Tabs groupId='multiplayer'>
-<TabItem value='js' label='JavaScript' default>
+<MultiLang kind="play">
+<>
 
 ```js
 const matchProps = {
@@ -235,8 +260,8 @@ client
   .catch(console.error);
 ```
 
-</TabItem>
-<TabItem value='csharp' label='C#'>
+</>
+<>
 
 ```cs
 Hashtable matchProp = new Hashtable();
@@ -244,13 +269,13 @@ matchProp.Add("matchLevel", matchLevel);
 Play.JoinRandomRoom(matchProp);
 ```
 
-</TabItem>
-</Tabs>
+</>
+</MultiLang>
 
 3、如果随机加入房间失败，则创建具有匹配属性的房间等待其他同水平的人加入。
 
-<Tabs groupId='multiplayer'>
-<TabItem value='js' label='JavaScript' default>
+<MultiLang kind="play">
+<>
 
 ```js
 const matchProps = {
@@ -283,8 +308,8 @@ client
   });
 ```
 
-</TabItem>
-<TabItem value='csharp' label='C#'>
+</>
+<>
 
 ```cs
 play.On(Event.ROOM_JOIN_FAILED, (error) => {
@@ -308,8 +333,8 @@ play.On(Event.ROOM_JOIN_FAILED, (error) => {
 });
 ```
 
-</TabItem>
-</Tabs>
+</>
+</MultiLang>
 
 #### 和好友一起玩
 
@@ -322,8 +347,8 @@ play.On(Event.ROOM_JOIN_FAILED, (error) => {
 
 1、PlayerA 创建房间，设置房间不可见，这样其他人就不会被随机匹配到 PlayerA 创建的房间中。
 
-<Tabs groupId='multiplayer'>
-<TabItem value='js' label='JavaScript' default>
+<MultiLang kind="play">
+<>
 
 ```js
 const options = {
@@ -338,8 +363,8 @@ client
   .catch(console.error);
 ```
 
-</TabItem>
-<TabItem value='csharp' label='C#'>
+</>
+<>
 
 ```cs
 var options = new RoomOptions()
@@ -349,29 +374,30 @@ var options = new RoomOptions()
 play.CreateRoom(roomOptions: options);
 ```
 
-</TabItem>
-</Tabs>
+</>
+</MultiLang>
 
 2、PlayerA 通过某种通信方式（例如 [即时通讯](/sdk/im/features/)）将房间名称告诉 PlayerB。
 
 3、PlayerB 根据房间名称加入到房间中。
 
-<Tabs groupId='multiplayer'>
-<TabItem value='js' label='JavaScript' default>
+<MultiLang kind="play">
+
+<>
 
 ```js
 client.joinRoom("LiLeiRoom").then().catch(console.error);
 ```
 
-</TabItem>
-<TabItem value='csharp' label='C#'>
+</>
+<>
 
 ```cs
 Play.JoinRoom(roomName);
 ```
 
-</TabItem>
-</Tabs>
+</>
+</MultiLang>
 
 ##### 好友和陌生人一起玩
 
@@ -379,8 +405,8 @@ PlayerA 通过某种通信方式（例如 [即时通讯](/sdk/im/features/)）�
 
 1、PlayerA 设置和 PlayerB 一起匹配进入某个房间
 
-<Tabs groupId='multiplayer'>
-<TabItem value='js' label='JavaScript' default>
+<MultiLang kind="play">
+<>
 
 ```js
 client
@@ -391,27 +417,27 @@ client
   .catch(console.error);
 ```
 
-</TabItem>
-<TabItem value='csharp' label='C#'>
+</>
+<>
 
 ```cs
 Play.JoinRandomRoom(expectedUserIds: new string[] {"playerB"});
 ```
 
-</TabItem>
-</Tabs>
+</>
+</MultiLang>
 
 2、如果有足够空位的房间，PlayerA 加入成功。
 
-<Tabs groupId='multiplayer'>
-<TabItem value='js' label='JavaScript' default>
+<MultiLang kind="play">
+<>
 
 ```js
 // JavaScript SDK 通过 joinRandomRoom 的 Promise 判断是否加入房间成功
 ```
 
-</TabItem>
-<TabItem value='csharp' label='C#'>
+</>
+<>
 
 ```cs
 play.On(Event.ROOM_JOINED, (evtData) => {
@@ -420,32 +446,32 @@ play.On(Event.ROOM_JOINED, (evtData) => {
 });
 ```
 
-</TabItem>
-</Tabs>
+</>
+</MultiLang>
 
 PlayerA 通过某种通信方式（例如 [即时通讯](/sdk/im/features/)）告诉 PlayerB 已经加入房间的 roomName，PlayerB 根据 roomName 加入房间。
 
-<Tabs groupId='multiplayer'>
-<TabItem value='js' label='JavaScript' default>
+<MultiLang kind="play">
+<>
 
 ```js
 client.joinRoom("LiLeiRoom").then().catch(console.error);
 ```
 
-</TabItem>
-<TabItem value='csharp' label='C#'>
+</>
+<>
 
 ```cs
 Play.JoinRoom(roomName);
 ```
 
-</TabItem>
-</Tabs>
+</>
+</MultiLang>
 
 3、如果没有合适的房间则创建并加入房间：
 
-<Tabs groupId='multiplayer'>
-<TabItem value='js' label='JavaScript' default>
+<MultiLang kind="play">
+<>
 
 ```js
 const expectedUserIds = ["playerB"];
@@ -465,8 +491,8 @@ client
   });
 ```
 
-</TabItem>
-<TabItem value='csharp' label='C#'>
+</>
+<>
 
 ```cs
 play.On(Event.ROOM_JOIN_FAILED, (error) => {
@@ -475,27 +501,27 @@ play.On(Event.ROOM_JOIN_FAILED, (error) => {
 });
 ```
 
-</TabItem>
-</Tabs>
+</>
+</MultiLang>
 
 PlayerA 创建房间后，通过某种通信方式（例如 [即时通讯](/sdk/im/features/)）告诉 PlayerB 已经加入房间的 roomName，PlayerB 根据 roomName 加入房间。
 
-<Tabs groupId='multiplayer'>
-<TabItem value='js' label='JavaScript' default>
+<MultiLang kind="play">
+<>
 
 ```js
 client.joinRoom("LiLeiRoom").then().catch(console.error);
 ```
 
-</TabItem>
-<TabItem value='csharp' label='C#'>
+</>
+<>
 
 ```cs
 Play.JoinRoom(roomName);
 ```
 
-</TabItem>
-</Tabs>
+</>
+</MultiLang>
 
 更多匹配接口请参考房间匹配文档：[JavaScript](/sdk/multiplayer/guide/js/#房间匹配)、[C#](/sdk/multiplayer/guide/cs/#房间匹配)。
 
@@ -512,8 +538,8 @@ Play.JoinRoom(roomName);
 
 Player A 通过设置自定义属性的方式设置准备状态：
 
-<Tabs groupId='multiplayer'>
-<TabItem value='js' label='JavaScript' default>
+<MultiLang kind="play">
+<>
 
 ```js
 // 玩家设置准备状态
@@ -529,8 +555,8 @@ play.player
   .catch(console.error);
 ```
 
-</TabItem>
-<TabItem value='csharp' label='C#'>
+</>
+<>
 
 ```cs
 // 玩家设置准备状态
@@ -539,13 +565,13 @@ prop.Add("ready", true);
 play.Player.SetCustomProperties(props);
 ```
 
-</TabItem>
-</Tabs>
+</>
+</MultiLang>
 
 所有玩家（包括 PlayerA）都会收到事件回调通知：
 
-<Tabs groupId='multiplayer'>
-<TabItem value='js' label='JavaScript' default>
+<MultiLang kind="play">
+<>
 
 ```js
 play.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, (data) => {
@@ -567,8 +593,8 @@ play.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, (data) => {
 });
 ```
 
-</TabItem>
-<TabItem value='csharp' label='C#'>
+</>
+<>
 
 ```cs
 
@@ -590,8 +616,8 @@ play.On(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, (evtData) => {
 });
 ```
 
-</TabItem>
-</Tabs>
+</>
+</MultiLang>
 
 #### 游戏中发送消息
 
@@ -601,8 +627,8 @@ play.On(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, (evtData) => {
 
 1、Player A 发送自定义事件 `follow` ，通知 MasterClient 自己跟牌完成。
 
-<Tabs groupId='multiplayer'>
-<TabItem value='js' label='JavaScript' default>
+<MultiLang kind="play">
+<>
 
 ```js
 // 设置事件的接收组为 Master
@@ -622,8 +648,8 @@ const FOLLOW_EVENT_ID = 1;
 play.sendEvent(FOLLOW_EVENT_ID, eventData, options);
 ```
 
-</TabItem>
-<TabItem value='csharp' label='C#'>
+</>
+<>
 
 ```cs
 // 设置事件的接收组为 Master
@@ -641,13 +667,13 @@ byte followEventId = 1;
 play.SendEvent(followEventId, eventData, options);
 ```
 
-</TabItem>
-</Tabs>
+</>
+</MultiLang>
 
 2、 MasterClient 中的相关方法会被触发。MasterClient 计算出下一位操作的玩家是 PlayerB，然后调用 `next` 方法，通知所有玩家当前需要 PlayerB 操作。
 
-<Tabs groupId='multiplayer'>
-<TabItem value='js' label='JavaScript' default>
+<MultiLang kind="play">
+<>
 
 ```js
 // Event.CUSTOM_EVENT 方法会被触发
@@ -673,8 +699,8 @@ play.on(Event.CUSTOM_EVENT, event => {
 
 ```
 
-</TabItem>
-<TabItem value='csharp' label='C#'>
+</>
+<>
 
 ```cs
 // Event.CUSTOM_EVENT 方法会被触发
@@ -699,13 +725,13 @@ play.On(Event.CUSTOM_EVENT, (evtData) => {
 });
 ```
 
-</TabItem>
-</Tabs>
+</>
+</MultiLang>
 
 3、所有玩家的相关方法被触发。
 
-<Tabs groupId='multiplayer'>
-<TabItem value='js' label='JavaScript' default>
+<MultiLang kind="play">
+<>
 
 ```js
 // Event.CUSTOM_EVENT 方法会被触发
@@ -722,8 +748,8 @@ play.on(Event.CUSTOM_EVENT, event => {
 
 ```
 
-</TabItem>
-<TabItem value='csharp' label='C#'>
+</>
+<>
 
 ```cs
 play.On(Event.CUSTOM_EVENT, (evtData) => {
@@ -740,8 +766,8 @@ play.On(Event.CUSTOM_EVENT, (evtData) => {
 });
 ```
 
-</TabItem>
-</Tabs>
+</>
+</MultiLang>
 
 更详细的用法及介绍，请参考 ：
 
@@ -754,8 +780,8 @@ play.On(Event.CUSTOM_EVENT, (evtData) => {
 
 #### 退出房间
 
-<Tabs groupId='multiplayer'>
-<TabItem value='js' label='JavaScript' default>
+<MultiLang kind="play">
+<>
 
 ```js
 play
@@ -766,15 +792,15 @@ play
   .catch(console.error);
 ```
 
-</TabItem>
-<TabItem value='csharp' label='C#'>
+</>
+<>
 
 ```cs
 Play.LeaveRoom();
 ```
 
-</TabItem>
-</Tabs>
+</>
+</MultiLang>
 
 ## 文档
 
