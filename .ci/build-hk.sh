@@ -7,6 +7,7 @@ rm -rf i18n/en/docusaurus-plugin-content-docs/current/sdk/embedded-moments/featu
 cp -r .ci/hk/zh-Hans/operations docs/operations
 cp -r .ci/hk/zh-Hans/store docs/store
 cp .ci/hk/zh-Hans/sdk/embedded-moments/features.mdx docs/sdk/embedded-moments/features.mdx
+cp .ci/hk/en/sdk/embedded-moments/features.mdx i18n/en/docusaurus-plugin-content-docs/current/sdk/embedded-moments/features.mdx
 cp .ci/hk/zh-Hans/sdk/push/guide/android-mixpush.mdx docs/sdk/push/guide/android-mixpush.mdx
 cp -r .ci/hk/en/operations i18n/en/docusaurus-plugin-content-docs/current/operations
 cp -r .ci/hk/en/store i18n/en/docusaurus-plugin-content-docs/current/store
