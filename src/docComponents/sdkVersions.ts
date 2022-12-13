@@ -1,8 +1,8 @@
 const sdkVersions = {
   taptap: {
-    unity: "3.16.1",
-    android: "3.16.1",
-    ios: "3.16.1",
+    unity: "3.16.5",
+    android: "3.16.5",
+    ios: "3.16.5",
     rtc: "1.1.0",
   },
   leancloud: {
