@@ -16,7 +16,7 @@ const sdkVersions = {
     csharp: "1.0.2",
   },
   tapadn: {
-    unity: "3.16.3.6",
+    unity: "3.16.3.7",
     android: "3.16.3.6",
   }
 };
