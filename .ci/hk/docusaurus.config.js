@@ -17,7 +17,7 @@ const config = {
     searchProviderWebsite:
       "https://developer.taptap.io/docs/sdk/engine/database/es/",
     mainDomainHost: "https://www.taptap.io",
-    dcDomainHost: "https://developer.taptap.io",
+    dcDomainHost: "https://developer.taptap.io?from=tds-docs",
   },
 
   i18n: {
