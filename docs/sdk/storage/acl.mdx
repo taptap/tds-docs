@@ -38,7 +38,7 @@ ACL 是 Access Control List 的缩写，称为访问控制列表，包含了对�
 - 角色为 admin（包含子角色）的用户可读可写。
 - ID 为 `58113fbda0bb9f0061ddc869` 的用户可读可写。
 
-使用内建数据表 `_User` 来维护 [用户/账户系统](/sdk/authentication/guide/)，以及内建数据表 `_Role` 来维护**角色**。
+我们使用内建数据表 `_User` 来维护 [用户/账户系统](/sdk/authentication/guide/)，以及内建数据表 `_Role` 来维护**角色**。
 角色既可以包含用户，也可以包含其他角色，也就是说角色有层次关系，将权限授予一个角色代表该角色所包含的其他角色也会得到相应的权限。
 
 云端对客户端发过来的每一个请求都要进行用户身份鉴别和 ACL 访问授权的严格检查。因此，使用 ACL 可以灵活且最大程度地保护应用数据，提升访问安全。
@@ -60,21 +60,23 @@ ACL 是 Access Control List 的缩写，称为访问控制列表，包含了对�
 
 ![创建 Class 对话框](/img/security/class-acl.png)
 
-你可以设置 read 和 write 权限开放给哪些用户，其中「所有用户」、「指定用户」可以参考数据安全指南的 [Class 层面的访问权限](/sdk/storage/guide/security/#class-权限)一节的说明。
-「数据创建者（Owner）」指创建数据的用户。
-也就是说，新增对象（create）时附带的 `X-LC-Session` HTTP 头对应的用户。
-除了分别设置 read 和 write 权限开放给哪些用户外，对话框中还提供了一些常用设定的快捷方式：
+你可以设置 read 和 write 权限开放给哪些用户，其中：
+
+- 「所有用户」、「指定用户」可以参考数据安全指南的 [Class 层面的访问权限](/sdk/storage/guide/security/#class-权限)一节的说明。
+- 「数据创建者（Owner）」指创建数据的用户。也就是说，新增对象（create）时附带的 `X-LC-Session` HTTP 头对应的用户。
+
+除了分别设置 read 和 write 权限开放给哪些用户外，对话框中还提供了一些**常用设定的快捷方式**：
 
 - **限制写入**：数据创建者可读、可写，其他用户可读、不可写。
 - **限制读取**：数据创建者可读、可写，其他用户不可读、不可写。
 - **限制所有**：数据创建者可读、不可写，其他用户不可读、不可写。
 - **无限制**：所有人可读、可写。
 
-对于已经存在的 Class，你可以更新默认 ACL 和访问权限。
+对于已经存在的 Class，你可以**更新默认 ACL 和访问权限**。
 进入**<Path to="storage" /> > 结构化数据**，选择一个 Class，再点击**权限**标签页。
 不过，修改默认 ACL 只作用于新增的对象，现存对象的 ACL 值保持不变。
 
-除了设置默认 ACL 外，在控制台也可以设置单个对象的 ACL。
+除了设置默认 ACL 外，在控制台也可以**设置单个对象的 ACL**。
 不过在控制台手工为每个对象设置 ACL 过于繁琐，并不现实。
 所以通常我们在控制台设置**默认 ACL**，确保所有新创建的对象都有合适的初始 ACL 值。
 为单个对象设置更复杂、更精细的 ACL，则通过代码设置其 `ACL` 字段。
@@ -93,6 +95,64 @@ ACL 是 Access Control List 的缩写，称为访问控制列表，包含了对�
 继续上面的例子，假设某个帖子的发布人允许另一个特定的用户（比如两个人合作编写一篇文章）修改帖子，除此之外的其他人不可修改，那么我们可以这样设置 ACL：
 
 <MultiLang>
+
+```cs
+try {
+  LCQuery<LCUser> userQuery = LCUser.GetQuery();
+  LCUser otherUser = await userQuery.Get("55f1572460b2ce30e8b7afde");
+  // 新建一个帖子对象
+  LCObject post = LCObject("Post");
+  post["title"] = "这是我的第二条发言，谢谢大家！";
+  post["content"] = "我最近喜欢看足球和篮球了。";
+
+  //新建一个 ACL 实例
+  LCACL acl = new LCACL();
+  acl.PublicReadAccess = true; // 设置公开的「读」权限，任何人都可阅读
+  LCUser currentUser = await LCUser.GetCurrent();
+  acl.SetUserWriteAccess(currentUser, true); // 为当前用户赋予「写」权限，有且仅有当前用户可以修改这条 Post
+  acl.SetUserWriteAccess(otherUser, true);
+  post.ACL = acl;
+
+  await post.Save();
+} catch (LCException e) {
+  print($"{e.Code} : {e.Message}");
+}
+```
+
+```java
+LCQuery<LCUser> query = LCUser.getQuery();
+query.getInBackground("55f1572460b2ce30e8b7afde").subscribe(new Observer<LCUser>() {
+    @Override
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(LCUser anotherUser) {
+        // 新建一个帖子对象
+        LCObject post= new LCObject("Post");
+        post.put("title","这是我的第二条发言，谢谢大家！");
+        post.put("content","我最近喜欢看足球和篮球了。");
+
+        //新建一个 ACL 实例
+        LCACL acl = new LCACL();
+        acl.setPublicReadAccess(true);// 设置公开的「读」权限，任何人都可阅读
+        acl.setWriteAccess(LCUser.getCurrentUser(), true);//为当前用户赋予「写」权限
+        acl.setWriteAccess(anotherUser, true);
+
+        // 将 ACL 实例赋予 Post对象
+        post.setACL(acl);
+
+        //保存到云端
+        post.saveInBackground();
+    }
+    @Override
+    public void onError(Throwable e) {
+        System.out.println("errorMessage:" + e.getMessage());
+    }
+    @Override
+    public void onComplete() {
+    }
+}
+```
 
 ```objc
 LCQuery *query = [LCUser query];
@@ -152,38 +212,26 @@ _ = query.get("55f1572460b2ce30e8b7afde") { result in
 }
 ```
 
-```java
-LCQuery<LCUser> query = LCUser.getQuery();
-query.getInBackground("55f1572460b2ce30e8b7afde").subscribe(new Observer<LCUser>() {
-    @Override
-    public void onSubscribe(Disposable d) {
-    }
-    @Override
-    public void onNext(LCUser anotherUser) {
-        // 新建一个帖子对象
-        LCObject post= new LCObject("Post");
-        post.put("title","这是我的第二条发言，谢谢大家！");
-        post.put("content","我最近喜欢看足球和篮球了。");
+```dart
+try {
+  LCQuery<LCUser> userQuery = LCUser.getQuery();
+  LCUser otherUser = await userQuery.get('55f1572460b2ce30e8b7afde');
+  // 新建一个帖子对象
+  LCObject post = LCObject("Post");
+  post['title'] = '这是我的第二条发言，谢谢大家！';
+  post['content'] = '我最近喜欢看足球和篮球了。';
 
-        //新建一个 ACL 实例
-        LCACL acl = new LCACL();
-        acl.setPublicReadAccess(true);// 设置公开的「读」权限，任何人都可阅读
-        acl.setWriteAccess(LCUser.getCurrentUser(), true);//为当前用户赋予「写」权限
-        acl.setWriteAccess(anotherUser, true);
+  //新建一个 ACL 实例
+  LCACL acl = LCACL();
+  acl.setPublicReadAccess(true); // 设置公开的「读」权限，任何人都可阅读
+  LCUser currentUser = await LCUser.getCurrent();
+  acl.setUserWriteAccess(currentUser, true); // 为当前用户赋予「写」权限，有且仅有当前用户可以修改这条 Post
+  acl.setUserWriteAccess(otherUser, true);
+  post.acl = acl; //将 ACL 实例赋予 Post对象
 
-        // 将 ACL 实例赋予 Post对象
-        post.setACL(acl);
-
-        //保存到云端
-        post.saveInBackground();
-    }
-    @Override
-    public void onError(Throwable e) {
-        System.out.println("errorMessage:" + e.getMessage());
-    }
-    @Override
-    public void onComplete() {
-    }
+  await post.save();
+} on LCException catch (e) {
+  print('${e.code} : ${e.message}');
 }
 ```
 
@@ -259,52 +307,6 @@ $post->setACL($acl);
 $post->save();
 ```
 
-```dart
-try {
-  LCQuery<LCUser> userQuery = LCUser.getQuery();
-  LCUser otherUser = await userQuery.get('55f1572460b2ce30e8b7afde');
-  // 新建一个帖子对象
-  LCObject post = LCObject("Post");
-  post['title'] = '这是我的第二条发言，谢谢大家！';
-  post['content'] = '我最近喜欢看足球和篮球了。';
-
-  //新建一个 ACL 实例
-  LCACL acl = LCACL();
-  acl.setPublicReadAccess(true); // 设置公开的「读」权限，任何人都可阅读
-  LCUser currentUser = await LCUser.getCurrent();
-  acl.setUserWriteAccess(currentUser, true); // 为当前用户赋予「写」权限，有且仅有当前用户可以修改这条 Post
-  acl.setUserWriteAccess(otherUser, true);
-  post.acl = acl; //将 ACL 实例赋予 Post对象
-
-  await post.save();
-} on LCException catch (e) {
-  print('${e.code} : ${e.message}');
-}
-```
-
-```cs
-try {
-  LCQuery<LCUser> userQuery = LCUser.GetQuery();
-  LCUser otherUser = await userQuery.Get("55f1572460b2ce30e8b7afde");
-  // 新建一个帖子对象
-  LCObject post = LCObject("Post");
-  post["title"] = "这是我的第二条发言，谢谢大家！";
-  post["content"] = "我最近喜欢看足球和篮球了。";
-
-  //新建一个 ACL 实例
-  LCACL acl = new LCACL();
-  acl.PublicReadAccess = true; // 设置公开的「读」权限，任何人都可阅读
-  LCUser currentUser = await LCUser.GetCurrent();
-  acl.SetUserWriteAccess(currentUser, true); // 为当前用户赋予「写」权限，有且仅有当前用户可以修改这条 Post
-  acl.SetUserWriteAccess(otherUser, true);
-  post.ACL = acl;
-
-  await post.Save();
-} catch (LCException e) {
-  print($"{e.Code} : {e.Message}");
-}
-```
-
 </MultiLang>
 
 执行完毕上面的代码，回到控制台，可以看到，该条 Post 记录里面的 ACL 列的内容如下：
@@ -325,9 +327,21 @@ try {
 
 从结果可以看出，该条 Post 已经允许 `objectId` 为 `55b9df0400b0f6d7efaa8801` 以及 `55f1572460b2ce30e8b7afde` 的两个用户（User）修改，他们拥有写权限 `"write": ture`。
 
-假设论坛有一个管理员，可以编辑、删除所有帖子，那么我们可以用类似的方法给每个帖子加上相应的权限：（注意，为了避免示例过于冗长，重点不突出，从下面的示例开始，都不再给出可以直接执行的完整代码，只保留关键部分）
+:::tip 注意
+为了避免示例过于冗长，重点不突出，从下面的示例开始，都不再给出可以直接执行的完整代码，只保留关键部分。
+:::
+
+假设论坛有一个管理员，可以编辑、删除所有帖子，那么我们可以用类似的方法给每个帖子加上相应的权限：
 
 <MultiLang>
+
+```cs
+acl.SetUserWriteAccess(anAdministrator, true);
+```
+
+```java
+acl.setWriteAccess(anAdministrator, true);
+```
 
 ```objc
 [acl setWriteAccess:YES forUser:anAdministrator];
@@ -337,8 +351,8 @@ try {
 acl.setAccess([.write], allowed: true, forUserID: anAdministratorID)
 ```
 
-```java
-acl.setWriteAccess(anAdministrator, true);
+```dart
+acl.setUserWriteAccess(anAdministrator, true);
 ```
 
 ```js
@@ -351,14 +365,6 @@ acl.set_write_access(an_administrator_id, True)
 
 ```php
 $acl->setReadAccess($anAdministrator, true);
-```
-
-```dart
-acl.setUserWriteAccess(anAdministrator, true);
-```
-
-```cs
-acl.SetUserWriteAccess(anAdministrator, true);
 ```
 
 </MultiLang>
@@ -378,6 +384,15 @@ acl.SetUserWriteAccess(anAdministrator, true);
 
 <MultiLang>
 
+```cs
+LCRole admin = LCRole.CreateWithoutData("_Role", "55fc0eb700b039e44440016c");
+acl.SetRoleReadAccess(admin, true);
+```
+
+```java
+acl.setRoleWriteAccess("admin", true);
+```
+
 ```objc
 LCRole *admin = [LCRole objectWithClassName:@"_Role" objectId:@"55fc0eb700b039e44440016c"];
 [acl setWriteAccess:YES  forRole:admin];
@@ -387,8 +402,9 @@ LCRole *admin = [LCRole objectWithClassName:@"_Role" objectId:@"55fc0eb700b039e4
 acl.setAccess([.write], allowed: true, forRoleName:"admin")
 ```
 
-```java
-acl.setRoleWriteAccess("admin", true);
+```dart
+LCRole admin = LCRole.createWithoutData('_Role', '55fc0eb700b039e44440016c');
+acl.setRoleWriteAccess(admin, true);
 ```
 
 ```js
@@ -404,16 +420,6 @@ acl.set_role_write_access(admin, True)
 $acl->setRoleWriteAccess("admin", true);
 ```
 
-```dart
-LCRole admin = LCRole.createWithoutData('_Role', '55fc0eb700b039e44440016c');
-acl.setRoleWriteAccess(admin, true);
-```
-
-```cs
-LCRole admin = LCRole.CreateWithoutData("_Role", "55fc0eb700b039e44440016c");
-acl.SetRoleReadAccess(admin, true);
-```
-
 </MultiLang>
 
 ### 角色的创建
@@ -424,9 +430,34 @@ acl.SetRoleReadAccess(admin, true);
 所以通常我们在创建角色的时候会显式地设定该角色的 ACL。
 如果不指定，那么 SDK 会默认设定角色的 ACL 为所有人可读、所有人不可写。
 换言之，在不显式指定 ACL 的情况下，SDK 的默认设定会导致角色一经创建，未来无法在客户端修改，以后添加成员等操作都需要在控制台进行或在服务端使用 masterKey 进行。
-为了便于测试，我们在下面的示例代码中暂且将角色的写权限赋予了创建该角色的用户（当前用户），实际项目中请根据具体需求设定合适的 ACL。
+为了便于测试，我们在下面的示例代码中暂且将角色的写权限赋予了创建该角色的用户（当前用户），**实际项目中请根据具体需求设定合适的 ACL**。
 
 <MultiLang>
+
+```cs
+try {
+  // 角色本身的 ACL
+  LCACL acl = new LCACL();
+  acl.PublicReadAccess = true;
+  LCUser currentUser = await LCUser.GetCurrent();
+  acl.SetUserWriteAccess(currentUser, true);
+
+  LCRole admin = LCRole.Create(name, acl);
+  await admin.Save();
+} catch (LCException e) {
+  print($"{e.Code} : {e.Message}");
+}
+```
+
+```java
+// 角色本身的 ACL
+LCACL roleACL = new LCACL();
+roleACL.setPublicReadAccess(true);
+roleACL.setWriteAccess(LCUser.getCurrentUser(),true);
+
+LCRole admin = new LCRole("admin", roleACL);
+admin.saveInBackground().blockingSubscribe();
+```
 
 ```objc
 // 角色本身的 ACL
@@ -455,14 +486,19 @@ do {
 }
 ```
 
-```java
-// 角色本身的 ACL
-LCACL roleACL = new LCACL();
-roleACL.setPublicReadAccess(true);
-roleACL.setWriteAccess(LCUser.getCurrentUser(),true);
+```dart
+try {
+  // 角色本身的 ACL 
+  LCACL acl = LCACL();
+  acl.setPublicReadAccess(true);
+  LCUser currentUser = await LCUser.getCurrent();
+  acl.setUserWriteAccess(currentUser, true);
 
-LCRole admin = new LCRole("admin", roleACL);
-admin.saveInBackground().blockingSubscribe();
+  LCRole admin = LCRole.create('admin', acl);
+  await admin.save();
+} on LCException catch (e) {
+  print('${e.code} : ${e.message}');
+}
 ```
 
 ```js
@@ -498,41 +534,20 @@ $admin->setACL($roleACL)
 $admin->save();
 ```
 
-```dart
-try {
-  // 角色本身的 ACL 
-  LCACL acl = LCACL();
-  acl.setPublicReadAccess(true);
-  LCUser currentUser = await LCUser.getCurrent();
-  acl.setUserWriteAccess(currentUser, true);
-
-  LCRole admin = LCRole.create('admin', acl);
-  await admin.save();
-} on LCException catch (e) {
-  print('${e.code} : ${e.message}');
-}
-```
-
-```cs
-try {
-  // 角色本身的 ACL
-  LCACL acl = new LCACL();
-  acl.PublicReadAccess = true;
-  LCUser currentUser = await LCUser.GetCurrent();
-  acl.SetUserWriteAccess(currentUser, true);
-
-  LCRole admin = LCRole.Create(name, acl);
-  await admin.Save();
-} catch (LCException e) {
-  print($"{e.Code} : {e.Message}");
-}
-```
-
 </MultiLang>
 
-现在这个 `admin` 角色是空的，我们接下来把当前用户添加到这个角色：
+现在这个 `admin` 角色是空的，我们接下来把当前用户**添加**到这个角色：
 
 <MultiLang>
+
+```cs
+LCUser currentUser = await LCUser.GetCurrent();
+admin.AddRelation("users", currentUser);
+```
+
+```java
+admin.getUsers().add(LCUser.getCurrentUser());
+```
 
 ```objc
 [[admin users] addObject: [LCUser currentUser]];
@@ -551,8 +566,9 @@ if let currentUser = LCApplication.default.currentUser {
 }
 ```
 
-```java
-admin.getUsers().add(LCUser.getCurrentUser());
+```dart
+LCUser currentUser = await LCUser.getCurrent();
+admin.addRelation('users', currentUser);
 ```
 
 ```js
@@ -567,21 +583,20 @@ admin.get_users().add(leancloud.User.get_current())
 $admin->getUsers().add(User::getCurrentUser());
 ```
 
-```dart
-LCUser currentUser = await LCUser.getCurrent();
-admin.addRelation('users', currentUser);
-```
+</MultiLang>
+
+如果我们又想从角色中**移除**用户：
+
+<MultiLang>
 
 ```cs
 LCUser currentUser = await LCUser.GetCurrent();
-admin.AddRelation("users", currentUser);
+admin.RemoveRelation("users", currentUser);
 ```
 
-</MultiLang>
-
-如果我们又想从角色中移除用户：
-
-<MultiLang>
+```java
+admin.getUsers().remove(LCUser.getCurrentUser());
+```
 
 ```objc
 [[admin users] removeObject:[LCUser currentUser]];
@@ -593,8 +608,9 @@ if let currentUser = LCApplication.default.currentUser {
 }
 ```
 
-```java
-admin.getUsers().remove(LCUser.getCurrentUser());
+```dart
+LCUser currentUser = await LCUser.getCurrent();
+admin.removeRelation('users', currentUser);
 ```
 
 ```js
@@ -609,22 +625,20 @@ admin.get_users().remove(leancloud.User.get_current())
 $admin->getUsers().remove(User::getCurrentUser());
 ```
 
-```dart
-LCUser currentUser = await LCUser.getCurrent();
-admin.removeRelation('users', currentUser);
-```
-
-```cs
-LCUser currentUser = await LCUser.GetCurrent();
-admin.RemoveRelation("users", currentUser);
-```
-
 </MultiLang>
 
 如前所述，角色的成员可以是另一个角色。
 假定有两个角色，一个「管理员」（`admin`），一个「版主」（`moderator`），我们想让 `admin` 成为 `moderator` 的子角色，因为管理员同时拥有版主的全部权限。
 
 <MultiLang>
+
+```cs
+moderator.AddRelation("roles", admin);
+```
+
+```java
+moderator.getRoles().add(admin);
+```
 
 ```objc
 [[moderator roles] addObject:admin];
@@ -641,8 +655,8 @@ if let subroles = moderator.roles {
 }
 ```
 
-```java
-moderator.getRoles().add(admin);
+```dart
+moderator.addRelation('roles', admin);
 ```
 
 ```js
@@ -657,19 +671,19 @@ moderator.get_roles().add(admin)
 $moderator->getRoles().add(admin);
 ```
 
-```dart
-moderator.addRelation('roles', admin);
-```
-
-```cs
-moderator.AddRelation("roles", admin);
-```
-
 </MultiLang>
 
 偶尔可能想要移除子角色，比如后来我们改变了主意，管理员应该专注于全局性的管理任务，帖子编辑、删除之类的任务全部由版主负责。
 
 <MultiLang>
+
+```cs
+moderator.RemoveRelation("roles", admin);
+```
+
+```java
+moderator.getRoles().remove(admin);
+```
 
 ```objc
 [[moderator roles] removeObject:admin];
@@ -679,8 +693,8 @@ moderator.AddRelation("roles", admin);
 try? moderator.roles?.remove(admin)
 ```
 
-```java
-moderator.getRoles().remove(admin);
+```dart
+moderator.removeRelation('roles', admin);
 ```
 
 ```js
@@ -695,14 +709,6 @@ moderator.get_roles().remove(admin)
 $moderator->getRoles().remove(admin);
 ```
 
-```dart
-moderator.removeRelation('roles', admin);
-```
-
-```cs
-moderator.RemoveRelation("roles", admin);
-```
-
 </MultiLang>
 
 ### 角色的查询
@@ -710,6 +716,29 @@ moderator.RemoveRelation("roles", admin);
 查询某个用户有哪些角色：
 
 <MultiLang>
+
+```cs
+try {
+  LCUser currentUser = await LCUser.GetCurrent();
+  LCQuery roleQuery = LCRole.GetQuery();
+  roleQuery.WhereEqualTo("users", currentUser);
+  ReadOnlyCollection<LCRole> roles = await roleQuery.Find();
+} catch (LCException e) {
+  print($"{e.Code} : {e.Message}");
+}
+```
+
+```java
+LCUser user = LCUser.getCurrentUser();
+user.getRolesInBackground().subscribe(new Observer<List<LCRole>>() {
+    @Override public void onSubscribe(Disposable d) {}
+    @Override public void onNext(List<LCRole> avRoles) {
+        // avRoles 是查询结果
+    }
+    @Override public void onError(Throwable e) {}
+    @Override public void onComplete() {}
+});
+```
 
 ```objc
 LCUser *user = [LCUser currentUser];
@@ -733,16 +762,15 @@ if let user = LCApplication.default.currentUser {
 }
 ```
 
-```java
-LCUser user = LCUser.getCurrentUser();
-user.getRolesInBackground().subscribe(new Observer<List<LCRole>>() {
-    @Override public void onSubscribe(Disposable d) {}
-    @Override public void onNext(List<LCRole> avRoles) {
-        // avRoles 是查询结果
-    }
-    @Override public void onError(Throwable e) {}
-    @Override public void onComplete() {}
-});
+```dart
+try {
+  LCUser currentUser = await LCUser.getCurrent();
+  LCQuery roleQuery = LCRole.getQuery();
+  roleQuery.whereEqualTo('users', currentUser);
+  List<LCRole> roles = await roleQuery.find();
+} on LCException catch (e) {
+  print('${e.code} : ${e.message}');
+}
 ```
 
 ```js
@@ -757,33 +785,19 @@ roles = leancloud.User.get_current().get_roles()
 $roles = User::getCurrentUser().getRoles();
 ```
 
-```dart
-try {
-  LCUser currentUser = await LCUser.getCurrent();
-  LCQuery roleQuery = LCRole.getQuery();
-  roleQuery.whereEqualTo('users', currentUser);
-  List<LCRole> roles = await roleQuery.find();
-} on LCException catch (e) {
-  print('${e.code} : ${e.message}');
-}
-```
-
-```cs
-try {
-  LCUser currentUser = await LCUser.GetCurrent();
-  LCQuery roleQuery = LCRole.GetQuery();
-  roleQuery.WhereEqualTo("users", currentUser);
-  ReadOnlyCollection<LCRole> roles = await roleQuery.Find();
-} catch (LCException e) {
-  print($"{e.Code} : {e.Message}");
-}
-```
-
 </MultiLang>
 
 查询某个角色包含的用户（这里只给出构建查询的代码）：
 
 <MultiLang>
+
+```cs
+LCQuery<LCUser> userQuery = moderator.Users.Query;
+```
+
+```java
+LCQuery<LCUser> userQuery = moderator.getUsers().getQuery();
+```
 
 ```objc
 LCUser *userQuery = [[moderator users] query];
@@ -793,8 +807,8 @@ LCUser *userQuery = [[moderator users] query];
 let *userQuery = moderator.users?.query
 ```
 
-```java
-LCQuery<LCUser> userQuery = moderator.getUsers().getQuery();
+```dart
+LCQuery userQuery = moderator.users.query();
 ```
 
 ```js
@@ -809,14 +823,6 @@ user_query = moderator.get_users().query
 $userQuery = $moderator->getUsers().getQuery();
 ```
 
-```dart
-LCQuery userQuery = moderator.users.query();
-```
-
-```cs
-LCQuery<LCUser> userQuery = moderator.Users.Query;
-```
-
 </MultiLang>
 
 当然，上面的代码没有考虑子角色中包含的用户。
@@ -824,6 +830,14 @@ LCQuery<LCUser> userQuery = moderator.Users.Query;
 限于篇幅，就不在这里列出完整的代码了，只列出如何构建子角色查询的代码：
 
 <MultiLang>
+
+```cs
+LCQuery<LCRole> subroleQuery = moderator.Roles.Query;
+```
+
+```java
+LCQuery<LCRole> subroleQuery = moderator.getRoles().getQuery();
+```
 
 ```objc
 LCRole *subroleQuery = [[moderator roles] query];
@@ -833,8 +847,8 @@ LCRole *subroleQuery = [[moderator roles] query];
 let *subRoleQuery = moderator.roles?.query
 ```
 
-```java
-LCQuery<LCRole> subroleQuery = moderator.getRoles().getQuery();
+```dart
+LCQuery subroleQuery = moderator.roles.query();
 ```
 
 ```js
@@ -847,14 +861,6 @@ subrole_query = moderator.get_roles().query
 
 ```php
 $subRoleQuery = $moderator->getRoles().getQuery();
-```
-
-```dart
-LCQuery subroleQuery = moderator.roles.query();
-```
-
-```cs
-LCQuery<LCRole> subroleQuery = moderator.Roles.Query;
 ```
 
 </MultiLang>
@@ -879,6 +885,16 @@ LCQuery<LCRole> subroleQuery = moderator.Roles.Query;
 
 <MultiLang>
 
+```cs
+LCQuery<LCObject> query = new LCQuery<LCObject>("Todo");
+query.IncludeACL = true;
+```
+
+```java
+LCQuery<LCObject> query = new LCQuery<>("Todo");
+query.includeACL(true);
+```
+
 ```objc
 LCQuery *query = [LCQuery queryWithClassName:@"Todo"];
 query.includeACL = YES;
@@ -889,8 +905,8 @@ let query = LCQuery(className: "Todo")
 query.includeACL = true
 ```
 
-```java
-LCQuery<LCObject> query = new LCQuery<>("Todo");
+```dart
+LCQuery<LCObject> query = LCQuery('Todo');
 query.includeACL(true);
 ```
 
@@ -905,16 +921,6 @@ query = leancloud.Object.extend('Todo').query.include_acl(True)
 
 ```php
 // 暂不支持
-```
-
-```dart
-LCQuery<LCObject> query = LCQuery('Todo');
-query.includeACL(true);
-```
-
-```cs
-LCQuery<LCObject> query = new LCQuery<LCObject>("Todo");
-query.IncludeACL = true;
 ```
 
 </MultiLang>
