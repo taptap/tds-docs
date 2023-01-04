@@ -1,0 +1,937 @@
+---
+title: ACL 权限管理开发指南
+sidebar_label: ACL 权限管理
+slug: /sdk/storage/guide/acl/
+sidebar_position: 10
+---
+
+import MultiLang from "/src/docComponents/MultiLang";
+import { Conditional } from "/src/docComponents/conditional";
+import Path from "/src/docComponents/path";
+
+:::info
+ACL 是 Access Control List 的缩写，称为访问控制列表，包含了对一个对象或一条记录可进行何种操作的权限定义。
+:::
+
+<p><Conditional brand="tds">TDS </Conditional><Conditional brand="leancloud">LeanCloud</Conditional> 云端使用的 ACL 机制是将每个操作授权给特定的 User 用户或者 Role 角色，只允许这些用户或角色对一个对象执行这些操作。</p>
+
+例如如下 ACL 定义：
+
+```json
+{
+  "*":{
+    "read":true,
+    "write":false
+  },
+  "role:admin":{
+    "read":true,
+    "write":true
+  },
+  "58113fbda0bb9f0061ddc869":{
+    "read":true,
+    "write":true
+  }
+}
+```
+
+- 所有人可读，但不能写（`*` 代表所有人）。
+- 角色为 admin（包含子角色）的用户可读可写。
+- ID 为 `58113fbda0bb9f0061ddc869` 的用户可读可写。
+
+我们使用内建数据表 `_User` 来维护 [用户/账户系统](/sdk/authentication/guide/)，以及内建数据表 `_Role` 来维护**角色**。
+角色既可以包含用户，也可以包含其他角色，也就是说角色有层次关系，将权限授予一个角色代表该角色所包含的其他角色也会得到相应的权限。
+
+云端对客户端发过来的每一个请求都要进行用户身份鉴别和 ACL 访问授权的严格检查。因此，使用 ACL 可以灵活且最大程度地保护应用数据，提升访问安全。
+
+## 默认 ACL
+
+每个 Class 的初始默认 ACL 为所有人可读可写：
+
+```json
+{
+  "*":{
+    "read":true,
+    "write":true
+  }
+}
+```
+
+在创建 Class 对话框可以设置 Class 的默认 ACL：
+
+![创建 Class 对话框](/img/security/class-acl.png)
+
+你可以设置 read 和 write 权限开放给哪些用户，其中：
+
+- 「所有用户」、「指定用户」可以参考数据安全指南的 [Class 层面的访问权限](/sdk/storage/guide/security/#class-权限)一节的说明。
+- 「数据创建者（Owner）」指创建数据的用户。也就是说，新增对象（create）时附带的 `X-LC-Session` HTTP 头对应的用户。
+
+除了分别设置 read 和 write 权限开放给哪些用户外，对话框中还提供了一些**常用设定的快捷方式**：
+
+- **限制写入**：数据创建者可读、可写，其他用户可读、不可写。
+- **限制读取**：数据创建者可读、可写，其他用户不可读、不可写。
+- **限制所有**：数据创建者可读、不可写，其他用户不可读、不可写。
+- **无限制**：所有人可读、可写。
+
+对于已经存在的 Class，你可以**更新默认 ACL 和访问权限**。
+进入**<Path to="storage" /> > 结构化数据**，选择一个 Class，再点击**权限**标签页。
+不过，修改默认 ACL 只作用于新增的对象，现存对象的 ACL 值保持不变。
+
+除了设置默认 ACL 外，在控制台也可以**设置单个对象的 ACL**。
+不过在控制台手工为每个对象设置 ACL 过于繁琐，并不现实。
+所以通常我们在控制台设置**默认 ACL**，确保所有新创建的对象都有合适的初始 ACL 值。
+为单个对象设置更复杂、更精细的 ACL，则通过代码设置其 `ACL` 字段。
+
+例如，`Post` Class 的默认 ACL 可能是这样的：
+
+- read：所有用户
+- write：数据创建者（Owner）
+
+也就是说，所有用户都可以查看帖子，用户只能修改或者删除自己发的帖子。
+
+这里数据创建者指创建对象的请求的 HTTP 头中携带的 session token 对应的用户，在我们的例子中是帖子的作者。
+
+## 基于用户的权限管理
+
+继续上面的例子，假设某个帖子的发布人允许另一个特定的用户（比如两个人合作编写一篇文章）修改帖子，除此之外的其他人不可修改，那么我们可以这样设置 ACL：
+
+<MultiLang>
+
+```cs
+try {
+  LCQuery<LCUser> userQuery = LCUser.GetQuery();
+  LCUser otherUser = await userQuery.Get("55f1572460b2ce30e8b7afde");
+  // 新建一个帖子对象
+  LCObject post = LCObject("Post");
+  post["title"] = "这是我的第二条发言，谢谢大家！";
+  post["content"] = "我最近喜欢看足球和篮球了。";
+
+  //新建一个 ACL 实例
+  LCACL acl = new LCACL();
+  acl.PublicReadAccess = true; // 设置公开的「读」权限，任何人都可阅读
+  LCUser currentUser = await LCUser.GetCurrent();
+  acl.SetUserWriteAccess(currentUser, true); // 为当前用户赋予「写」权限，有且仅有当前用户可以修改这条 Post
+  acl.SetUserWriteAccess(otherUser, true);
+  post.ACL = acl;
+
+  await post.Save();
+} catch (LCException e) {
+  print($"{e.Code} : {e.Message}");
+}
+```
+
+```java
+LCQuery<LCUser> query = LCUser.getQuery();
+query.getInBackground("55f1572460b2ce30e8b7afde").subscribe(new Observer<LCUser>() {
+    @Override
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(LCUser anotherUser) {
+        // 新建一个帖子对象
+        LCObject post= new LCObject("Post");
+        post.put("title","这是我的第二条发言，谢谢大家！");
+        post.put("content","我最近喜欢看足球和篮球了。");
+
+        //新建一个 ACL 实例
+        LCACL acl = new LCACL();
+        acl.setPublicReadAccess(true);// 设置公开的「读」权限，任何人都可阅读
+        acl.setWriteAccess(LCUser.getCurrentUser(), true);//为当前用户赋予「写」权限
+        acl.setWriteAccess(anotherUser, true);
+
+        // 将 ACL 实例赋予 Post对象
+        post.setACL(acl);
+
+        //保存到云端
+        post.saveInBackground();
+    }
+    @Override
+    public void onError(Throwable e) {
+        System.out.println("errorMessage:" + e.getMessage());
+    }
+    @Override
+    public void onComplete() {
+    }
+}
+```
+
+```objc
+LCQuery *query = [LCUser query];
+[query getObjectInBackgroundWithId:@"55f1572460b2ce30e8b7afde" block:^(LCObject * _Nullable object, NSError * _Nullable error) {
+    if (error == nil) {
+        // 新建一个帖子对象
+        LCObject *post = [LCObject objectWithClassName:@"Post"];
+        [post setObject:@"这是我的第二条发言，谢谢大家！" forKey:@"title"];
+        [post setObject:@"我最近喜欢看足球和篮球了。" forKey:@"content"];
+
+        //新建一个 ACL 实例
+        LCACL *acl = [LCACL ACL];
+        [acl setPublicReadAccess:YES];// 设置公开的「读」权限，任何人都可阅读
+        [acl setWriteAccess:YES forUser:[LCUser currentUser]];// 为当前用户赋予「写」权限
+        [acl setWriteAccess:YES forUser:otherUser];
+        
+        post.ACL = acl;// 将 ACL 实例赋予 Post 对象
+        
+        [post save];
+    } else {
+        NSLog(@"error");
+    }
+}];
+```
+
+```swift
+let query = LCQuery(className: LCUser.objectClassName())
+
+_ = query.get("55f1572460b2ce30e8b7afde") { result in
+    switch result {
+    case .success(object: let object):
+        do {
+            let post = LCObject(className: "Post")
+            
+            try post.set("title", value: "这是我的第二条发言，谢谢大家！")
+            try post.set("content", value: "我最近喜欢看足球和篮球了。")
+            
+            let acl = LCACL()
+            
+            acl.setAccess([.read], allowed: true)
+            if let currentUserID = LCApplication.default.currentUser?.objectId?.value {
+                acl.setAccess([.write], allowed: true, forUserID: currentUserID)
+            }
+            if let anotherUserID = (object as? LCUser)?.objectId?.value {
+                acl.setAccess([.write], allowed: true, forUserID: anotherUserID)
+            }
+            
+            post.ACL = acl
+            
+            assert(post.save().isSuccess)
+        } catch {
+            print(error)
+        }
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+```dart
+try {
+  LCQuery<LCUser> userQuery = LCUser.getQuery();
+  LCUser otherUser = await userQuery.get('55f1572460b2ce30e8b7afde');
+  // 新建一个帖子对象
+  LCObject post = LCObject("Post");
+  post['title'] = '这是我的第二条发言，谢谢大家！';
+  post['content'] = '我最近喜欢看足球和篮球了。';
+
+  //新建一个 ACL 实例
+  LCACL acl = LCACL();
+  acl.setPublicReadAccess(true); // 设置公开的「读」权限，任何人都可阅读
+  LCUser currentUser = await LCUser.getCurrent();
+  acl.setUserWriteAccess(currentUser, true); // 为当前用户赋予「写」权限，有且仅有当前用户可以修改这条 Post
+  acl.setUserWriteAccess(otherUser, true);
+  post.acl = acl; //将 ACL 实例赋予 Post对象
+
+  await post.save();
+} on LCException catch (e) {
+  print('${e.code} : ${e.message}');
+}
+```
+
+```js
+  // 创建一个针对 User 的查询
+  var query = new AV.Query(AV.User);
+  query.get('55f1572460b2ce30e8b7afde').then(function(otherUser) {
+    var post = new AV.Object('Post');
+    post.set('title', '这是我的第二条发言，谢谢大家！');
+    post.set('content','我最近喜欢看足球和篮球了。');
+
+    // 新建一个 ACL 实例
+    var acl = new AV.ACL();
+    acl.setPublicReadAccess(true);
+    acl.setWriteAccess(AV.User.current(), true);
+    acl.setWriteAccess(otherUser, true);
+
+    // 将 ACL 实例赋予 Post 对象
+    post.setACL(acl);
+
+    // 保存到云端
+    return post.save();
+  }).then(function() {
+    // 保存成功
+  }).catch(function(error) {
+    // 错误信息
+    console.log(error);
+  });
+```
+
+```python
+import leancloud
+
+# 登录一个用户
+user = leancloud.User()
+user.login('my_user_name', 'my_password')
+
+# 新建一个 Post 对象
+Post = leancloud.Object.extend('Post')
+post = Post()
+post.set('title', '这是我的第二条发言，谢谢大家！')
+post.set('content', '我最近喜欢看足球和篮球了。')
+
+# 新建一个 leancloud.ACL 实例
+acl = leancloud.ACL()
+acl.set_public_read_access(True)
+# 设置当前登录用户的的可写权限
+acl.set_write_access(leancloud.User.get_current().id, True)
+# 设定指定 objectId 用户的可写权限
+acl.set_write_access('55f1572460b2ce30e8b7afde', True)
+post.set_acl(acl)
+post.save()
+```
+
+```php
+// 登录一个用户
+User::logIn("Tom", "cat!@#123");
+
+// 新建一个帖子
+$post = new LeanObject("Post");
+$post->set("title", "这是我的第二条发言，谢谢大家！");
+$post->set("content", "我最近喜欢看足球和篮球了。");
+
+// 新建一个 ACL 实例
+$acl = new ACL();
+// 设置公开的「读」权限，任何人都可阅读
+$acl->setPublicReadAccess(true);
+// 为当前用户赋予「写」权限，有且仅有当前用户可以修改这条 Post
+$acl->setWriteAccess(User::getCurrentUser(), true);
+$otherUser = LeanObject::create("_User", "55f1572460b2ce30e8b7afde");
+$acl->setWriteAccess($otherUser, true);
+$post->setACL($acl);
+$post->save();
+```
+
+</MultiLang>
+
+执行完毕上面的代码，回到控制台，可以看到，该条 Post 记录里面的 ACL 列的内容如下：
+
+```json
+{
+  "*":{
+    "read":true
+  },
+  "55b9df0400b0f6d7efaa8801":{
+    "write":true
+  },
+  "55f1572460b2ce30e8b7afde":{
+    "write":true
+  }
+}
+```
+
+从结果可以看出，该条 Post 已经允许 `objectId` 为 `55b9df0400b0f6d7efaa8801` 以及 `55f1572460b2ce30e8b7afde` 的两个用户（User）修改，他们拥有写权限 `"write": ture`。
+
+:::tip 注意
+为了避免示例过于冗长，重点不突出，从下面的示例开始，都不再给出可以直接执行的完整代码，只保留关键部分。
+:::
+
+假设论坛有一个管理员，可以编辑、删除所有帖子，那么我们可以用类似的方法给每个帖子加上相应的权限：
+
+<MultiLang>
+
+```cs
+acl.SetUserWriteAccess(anAdministrator, true);
+```
+
+```java
+acl.setWriteAccess(anAdministrator, true);
+```
+
+```objc
+[acl setWriteAccess:YES forUser:anAdministrator];
+```
+
+```swift
+acl.setAccess([.write], allowed: true, forUserID: anAdministratorID)
+```
+
+```dart
+acl.setUserWriteAccess(anAdministrator, true);
+```
+
+```js
+acl.setWriteAccess(anAdministrator, true);
+```
+
+```python
+acl.set_write_access(an_administrator_id, True)
+```
+
+```php
+$acl->setReadAccess($anAdministrator, true);
+```
+
+</MultiLang>
+
+但是，未来可能会有新的管理员加入，老的管理员也可能卸任，所以单纯基于用户进行权限管理，任何人员变动都需要批量订正数据（修改 ACL 字段），太不灵活了。
+
+因此，我们需要引入角色这一概念。
+
+## 基于角色的权限管理
+
+「角色」相当于用户组，并且可以嵌套。
+换言之，一个角色的成员要么是用户，要么是另一个角色。
+
+角色的名字由字母、数字、下划线组成，不可变更，在应用内唯一。
+
+继续上面的例子，让我们看看如何赋予管理员角色写权限（假定已经存在一个名为 `admin` 的角色）：
+
+<MultiLang>
+
+```cs
+LCRole admin = LCRole.CreateWithoutData("_Role", "55fc0eb700b039e44440016c");
+acl.SetRoleReadAccess(admin, true);
+```
+
+```java
+acl.setRoleWriteAccess("admin", true);
+```
+
+```objc
+LCRole *admin = [LCRole objectWithClassName:@"_Role" objectId:@"55fc0eb700b039e44440016c"];
+[acl setWriteAccess:YES  forRole:admin];
+```
+
+```swift
+acl.setAccess([.write], allowed: true, forRoleName:"admin")
+```
+
+```dart
+LCRole admin = LCRole.createWithoutData('_Role', '55fc0eb700b039e44440016c');
+acl.setRoleWriteAccess(admin, true);
+```
+
+```js
+acl.setRoleWriteAccess('admin', true);
+```
+
+```python
+admin = leancloud.Role('admin')
+acl.set_role_write_access(admin, True)
+```
+
+```php
+$acl->setRoleWriteAccess("admin", true);
+```
+
+</MultiLang>
+
+### 角色的创建
+
+下面让我们看看如何创建一个角色。
+
+这里有一个需要特别注意的地方，因为 `Role` 本身也是一个 `Object`，它自身也有 ACL 控制，并且它的权限控制应该更严谨。
+所以通常我们在创建角色的时候会显式地设定该角色的 ACL。
+如果不指定，那么 SDK 会默认设定角色的 ACL 为所有人可读、所有人不可写。
+换言之，在不显式指定 ACL 的情况下，SDK 的默认设定会导致角色一经创建，未来无法在客户端修改，以后添加成员等操作都需要在控制台进行或在服务端使用 masterKey 进行。
+为了便于测试，我们在下面的示例代码中暂且将角色的写权限赋予了创建该角色的用户（当前用户），**实际项目中请根据具体需求设定合适的 ACL**。
+
+<MultiLang>
+
+```cs
+try {
+  // 角色本身的 ACL
+  LCACL acl = new LCACL();
+  acl.PublicReadAccess = true;
+  LCUser currentUser = await LCUser.GetCurrent();
+  acl.SetUserWriteAccess(currentUser, true);
+
+  LCRole admin = LCRole.Create(name, acl);
+  await admin.Save();
+} catch (LCException e) {
+  print($"{e.Code} : {e.Message}");
+}
+```
+
+```java
+// 角色本身的 ACL
+LCACL roleACL = new LCACL();
+roleACL.setPublicReadAccess(true);
+roleACL.setWriteAccess(LCUser.getCurrentUser(),true);
+
+LCRole admin = new LCRole("admin", roleACL);
+admin.saveInBackground().blockingSubscribe();
+```
+
+```objc
+// 角色本身的 ACL
+LCACL *roleACL = [LCACL ACL];
+[roleACL setPublicReadAccess:YES];
+[roleACL setWriteAccess:YES forUser:[LCUser currentUser]];
+
+LCRole *admin = [LCRole roleWithName:@"admin" acl:roleACL];
+[admin save];
+```
+
+```swift
+do {
+  // 角色本身的 ACL 
+  let roleACL = LCACL()
+  roleACL.setAccess([.read], allowed: true)
+  if let currentUserID = LCApplication.default.currentUser?.objectId?.value {
+    roleACL.setAccess([.write], allowed: true, forUserID: currentUserID)
+  }
+
+  let admin = LCRole(name: "admin")
+  admin.ACL = roleACL
+  assert(admin.save().isSuccess)
+} catch {
+  print(error)
+}
+```
+
+```dart
+try {
+  // 角色本身的 ACL 
+  LCACL acl = LCACL();
+  acl.setPublicReadAccess(true);
+  LCUser currentUser = await LCUser.getCurrent();
+  acl.setUserWriteAccess(currentUser, true);
+
+  LCRole admin = LCRole.create('admin', acl);
+  await admin.save();
+} on LCException catch (e) {
+  print('${e.code} : ${e.message}');
+}
+```
+
+```js
+// 角色本身的 ACL
+const roleAcl = new AV.ACL();
+roleAcl.setPublicReadAccess(true);
+roleAcl.setWriteAccess(AV.User.current(), true);
+
+const admin = new AV.Role('admin', roleAcl);
+await admin.save();
+```
+
+```python
+# 角色本身的 ACL
+role_acl = leancloud.ACL()
+role_acl.set_public_read_access(True)
+current_user_id = leancloud.User.get_current().id
+role_acl.set_write_access(current_user_id)
+
+admin = leancloud.Role('admin', role_acl)
+admin.save()
+```
+
+```php
+// 角色本身的 ACL 
+$roleACL = new ACL();
+$roleACL->setPublicReadAccess(true);
+$roleACL->setWriteAccess(User::getCurrentUser(), true);
+
+$admin = new Role();
+$admin->setName("admin");
+$admin->setACL($roleACL)
+$admin->save();
+```
+
+</MultiLang>
+
+现在这个 `admin` 角色是空的，我们接下来把当前用户**添加**到这个角色：
+
+<MultiLang>
+
+```cs
+LCUser currentUser = await LCUser.GetCurrent();
+admin.AddRelation("users", currentUser);
+```
+
+```java
+admin.getUsers().add(LCUser.getCurrentUser());
+```
+
+```objc
+[[admin users] addObject: [LCUser currentUser]];
+```
+
+```swift
+if let currentUser = LCApplication.default.currentUser {
+    if let users = admin.users {
+        try? users.insert(currentUser)
+    } else {
+        let users = admin.relationForKey("users")
+        if (try? users.insert(currentUser)) != nil {
+          admin.users = users
+        }   
+    }
+}
+```
+
+```dart
+LCUser currentUser = await LCUser.getCurrent();
+admin.addRelation('users', currentUser);
+```
+
+```js
+admin.getUsers().add(AV.User.current());
+```
+
+```python
+admin.get_users().add(leancloud.User.get_current())
+```
+
+```php
+$admin->getUsers().add(User::getCurrentUser());
+```
+
+</MultiLang>
+
+如果我们又想从角色中**移除**用户：
+
+<MultiLang>
+
+```cs
+LCUser currentUser = await LCUser.GetCurrent();
+admin.RemoveRelation("users", currentUser);
+```
+
+```java
+admin.getUsers().remove(LCUser.getCurrentUser());
+```
+
+```objc
+[[admin users] removeObject:[LCUser currentUser]];
+```
+
+```swift
+if let currentUser = LCApplication.default.currentUser {
+  try? admin.users?.remove(currentUser)
+}
+```
+
+```dart
+LCUser currentUser = await LCUser.getCurrent();
+admin.removeRelation('users', currentUser);
+```
+
+```js
+admin.getUsers().remove(AV.User.current());
+```
+
+```python
+admin.get_users().remove(leancloud.User.get_current())
+```
+
+```php
+$admin->getUsers().remove(User::getCurrentUser());
+```
+
+</MultiLang>
+
+如前所述，角色的成员可以是另一个角色。
+假定有两个角色，一个「管理员」（`admin`），一个「版主」（`moderator`），我们想让 `admin` 成为 `moderator` 的子角色，因为管理员同时拥有版主的全部权限。
+
+<MultiLang>
+
+```cs
+moderator.AddRelation("roles", admin);
+```
+
+```java
+moderator.getRoles().add(admin);
+```
+
+```objc
+[[moderator roles] addObject:admin];
+```
+
+```swift
+if let subroles = moderator.roles {
+  try? subroles.insert(admin)
+} else {
+  let subroles = moderator.relationForKey("roles")
+  if (try? subroles.insert(currentUser)) != nil {
+    admin.roles = subroles
+  }
+}
+```
+
+```dart
+moderator.addRelation('roles', admin);
+```
+
+```js
+moderator.getRoles().add(admin);
+```
+
+```python
+moderator.get_roles().add(admin)
+```
+
+```php
+$moderator->getRoles().add(admin);
+```
+
+</MultiLang>
+
+偶尔可能想要移除子角色，比如后来我们改变了主意，管理员应该专注于全局性的管理任务，帖子编辑、删除之类的任务全部由版主负责。
+
+<MultiLang>
+
+```cs
+moderator.RemoveRelation("roles", admin);
+```
+
+```java
+moderator.getRoles().remove(admin);
+```
+
+```objc
+[[moderator roles] removeObject:admin];
+```
+
+```swift
+try? moderator.roles?.remove(admin)
+```
+
+```dart
+moderator.removeRelation('roles', admin);
+```
+
+```js
+moderator.getRoles().remove(admin);
+```
+
+```python
+moderator.get_roles().remove(admin)
+```
+
+```php
+$moderator->getRoles().remove(admin);
+```
+
+</MultiLang>
+
+### 角色的查询
+
+查询某个用户有哪些角色：
+
+<MultiLang>
+
+```cs
+try {
+  LCUser currentUser = await LCUser.GetCurrent();
+  LCQuery roleQuery = LCRole.GetQuery();
+  roleQuery.WhereEqualTo("users", currentUser);
+  ReadOnlyCollection<LCRole> roles = await roleQuery.Find();
+} catch (LCException e) {
+  print($"{e.Code} : {e.Message}");
+}
+```
+
+```java
+LCUser user = LCUser.getCurrentUser();
+user.getRolesInBackground().subscribe(new Observer<List<LCRole>>() {
+    @Override public void onSubscribe(Disposable d) {}
+    @Override public void onNext(List<LCRole> avRoles) {
+        // avRoles 是查询结果
+    }
+    @Override public void onError(Throwable e) {}
+    @Override public void onComplete() {}
+});
+```
+
+```objc
+LCUser *user = [LCUser currentUser];
+[user getRolesInBackgroundWithBlock:^(NSArray<LCRole *> * _Nullable avRoles, NSError * _Nullable error) {
+  // avRoles 是查询结果
+}];
+```
+
+```swift
+if let user = LCApplication.default.currentUser {  
+    let roleQuery = LCQuery(className: LCRole.objectClassName())   
+    roleQuery.whereKey("users", .equalTo(user))   
+    _ = roleQuery.find { result in
+        switch result {
+        case .success(objects: let roles):
+            print(roles)
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+}
+```
+
+```dart
+try {
+  LCUser currentUser = await LCUser.getCurrent();
+  LCQuery roleQuery = LCRole.getQuery();
+  roleQuery.whereEqualTo('users', currentUser);
+  List<LCRole> roles = await roleQuery.find();
+} on LCException catch (e) {
+  print('${e.code} : ${e.message}');
+}
+```
+
+```js
+const roles = await AV.User.current().getRoles();
+```
+
+```python
+roles = leancloud.User.get_current().get_roles()
+```
+
+```php
+$roles = User::getCurrentUser().getRoles();
+```
+
+</MultiLang>
+
+查询某个角色包含的用户（这里只给出构建查询的代码）：
+
+<MultiLang>
+
+```cs
+LCQuery<LCUser> userQuery = moderator.Users.Query;
+```
+
+```java
+LCQuery<LCUser> userQuery = moderator.getUsers().getQuery();
+```
+
+```objc
+LCUser *userQuery = [[moderator users] query];
+```
+
+```swift
+let *userQuery = moderator.users?.query
+```
+
+```dart
+LCQuery userQuery = moderator.users.query();
+```
+
+```js
+const userQuery = moderator.getUsers().query();
+```
+
+```python
+user_query = moderator.get_users().query
+```
+
+```php
+$userQuery = $moderator->getUsers().getQuery();
+```
+
+</MultiLang>
+
+当然，上面的代码没有考虑子角色中包含的用户。
+如果想要查询角色中包含的所有用户（直接包含和间接包含），需要递归地查出角色的所有子角色（包括子角色的子角色，以此类推），接着查询所有这些角色包含的用户。
+限于篇幅，就不在这里列出完整的代码了，只列出如何构建子角色查询的代码：
+
+<MultiLang>
+
+```cs
+LCQuery<LCRole> subroleQuery = moderator.Roles.Query;
+```
+
+```java
+LCQuery<LCRole> subroleQuery = moderator.getRoles().getQuery();
+```
+
+```objc
+LCRole *subroleQuery = [[moderator roles] query];
+```
+
+```swift
+let *subRoleQuery = moderator.roles?.query
+```
+
+```dart
+LCQuery subroleQuery = moderator.roles.query();
+```
+
+```js
+const subroleQuery = moderator.getRoles().query();
+```
+
+```python
+subrole_query = moderator.get_roles().query
+```
+
+```php
+$subRoleQuery = $moderator->getRoles().getQuery();
+```
+
+</MultiLang>
+
+由于角色继承自结构化存储的对象，你也可以根据角色的其他属性执行各种查询，方式和一般的对象查询是一样的。
+
+## 特殊规则
+
+因为用户相关信息比较敏感，所以 `_User` 表会忽略 ACL 的设置，任何用户都无法修改其他用户的属性，比如当前登录的用户是 A，而他想通过请求去修改 B 用户的用户名、密码或者其他自定义属性，是不会生效的，即使 B 用户的 ACL 中赋予了 A 写权限也不行。
+
+因为 LiveQuery 设计的使用场景是客户端，而客户端不应使用 MasterKey，否则会有极大的安全隐患。
+所以，LiveQuery 订阅事件时会忽略 MasterKey。换言之，LiveQuery 订阅事件时不应使用 MasterKey，即使使用也不会跳过 ACL 等权限检查。
+
+## 获取对象的 ACL 值
+
+查询数据时，SDK 默认不会返回对象的 ACL 值。如果想在获取对象的同时返回对象的 ACL 值，需要同时满足下面两个条件：
+
+1. 进入 **<Path to="storage" /> > 服务设置 > 查询设置**，勾选「查询时返回值包括 ACL」。
+2. 客户端查询对象时指定返回 ACL。
+
+代码如下：
+
+<MultiLang>
+
+```cs
+LCQuery<LCObject> query = new LCQuery<LCObject>("Todo");
+query.IncludeACL = true;
+```
+
+```java
+LCQuery<LCObject> query = new LCQuery<>("Todo");
+query.includeACL(true);
+```
+
+```objc
+LCQuery *query = [LCQuery queryWithClassName:@"Todo"];
+query.includeACL = YES;
+```
+
+```swift
+let query = LCQuery(className: "Todo")
+query.includeACL = true
+```
+
+```dart
+LCQuery<LCObject> query = LCQuery('Todo');
+query.includeACL(true);
+```
+
+```js
+var query = new AV.Query('Todo');
+query.includeACL(true);
+```
+
+```python
+query = leancloud.Object.extend('Todo').query.include_acl(True)
+```
+
+```php
+// 暂不支持
+```
+
+</MultiLang>
+
+## 最佳实践
+
+如果应用的权限控制需求比较简单，我们推荐在控制台恰当设置 [Class 权限](/sdk/storage/guide/security/#class-权限)、[字段权限](/sdk/storage/guide/security/#字段权限)、[默认 ACL](#默认-acl)，然后通过客户端代码设置个别需要精细权限控制的 ACL。
+
+对于权限控制需求复杂的应用，我们推荐在控制台设置 Class 权限、字段权限、默认 ACL 后，在云引擎统一处理 ACL 相关的逻辑。
+一方面，这样免去了在 iOS、Android、Web 等各处不断升级和维护逻辑十分类似的客户端代码。
+另一方面，云引擎除了处理 ACL 外，还可以通过 hook 基于更复杂的条件进行权限控制，比如不允许发布超过一定字数的帖子。
+详见 [在云引擎中使用 ACL](https://leancloud.cn/docs/acl_guide_leanengine.html)。
+
+对于储存敏感数据、安全性要求非常严苛的 Class，开发者也可以考虑将对应的 [Class 权限](/sdk/storage/guide/security/#class-权限)的写权限乃至读权限完全关闭，客户端所有请求都通过云引擎中转，这样与自己搭建后端具有同样的数据安全性保障。
