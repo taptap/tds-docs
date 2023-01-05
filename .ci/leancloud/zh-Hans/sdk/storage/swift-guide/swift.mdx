@@ -1,4 +1,9 @@
-# 数据存储开发指南 · Swift
+---
+title: 数据存储开发指南 · Swift
+sidebar_label: Swift 开发指南
+slug: /sdk/storage/guide/swift/
+sidebar_position: 2
+---
 
 数据存储是云服务提供的核心功能之一，可用于存放和查询应用数据。下面的代码展示了如何创建一个对象并将其存入云端：
 
@@ -31,7 +36,7 @@ do {
 
 ## SDK 安装与初始化
 
-请阅读 [Swift 安装指南](sdk_setup-swift.html)。
+请阅读 [Swift 安装指南](/sdk/storage/guide/setup-swift/)。
 
 ## 对象
 
@@ -115,13 +120,14 @@ let getNumber2: LCNumber? = object["number"] as? LCNumber
 
 注意：时间类型在云端将会以 UTC 时间格式存储，但是客户端在读取之后会转化成本地时间。
 
-**云服务控制台 > 数据存储 > 结构化数据** 中展示的日期数据也会依据操作系统的时区进行转换。一个例外是当你通过 REST API 获得数据时，这些数据将以 UTC 呈现。你可以手动对它们进行转换。
+**<Path to="storage" /> > 结构化数据** 中展示的日期数据也会依据操作系统的时区进行转换。一个例外是当你通过 REST API 获得数据时，这些数据将以 UTC 呈现。你可以手动对它们进行转换。
 
-若想了解云服务是如何保护应用数据的，请阅读《数据和安全》。
+若想了解云服务是如何保护应用数据的，请阅读[数据和安全](/sdk/storage/guide/security/)。
 
 #### 基础类型数据的构建与转换
 
-`LCObject` 无法直接支持 Swift 语言的基础数据类型，例如 `Int`、`Double`、`String`、`Bool`、`Array`、`Dictionary` 等等。相对的，SDK 提供了 `LCNumber`、`LCString`、`LCBool`、`LCArray`、`LCDictionary` 等类型，来支持 `LCObject` 与 Swift 语言的交互。
+`LCObject` 无法直接支持 Swift 语言的基础数据类型，例如 `Int`、`Double`、`String`、`Bool`、`Array`、`Dictionary` 等等。
+相对的，SDK 提供了 `LCNumber`、`LCString`、`LCBool`、`LCArray`、`LCDictionary` 等类型，来支持 `LCObject` 与 Swift 语言的交互。
 
 ##### LCNumber
 
@@ -358,7 +364,7 @@ do {
 }
 ```
 
-为了确认对象已经保存成功，我们可以到 **云服务控制台 > 数据存储 > 结构化数据 > `Todo`** 里面看一下，应该会有一行新的数据产生。点一下这个数据的 `objectId`，应该能看到类似这样的内容：
+为了确认对象已经保存成功，我们可以到 **<Path to="storage" /> > 结构化数据 > `Todo`** 里面看一下，应该会有一行新的数据产生。点一下这个数据的 `objectId`，应该能看到类似这样的内容：
 
 ```json
 {
@@ -376,7 +382,7 @@ do {
 }
 ```
 
-注意，无需在 **云服务控制台 > 数据存储 > 结构化数据** 里面创建新的 `Todo` class 即可运行前面的代码。如果 class 不存在，它将自动创建。
+注意，无需在 **<Path to="storage" /> > 结构化数据** 里面创建新的 `Todo` class 即可运行前面的代码。如果 class 不存在，它将自动创建。
 
 以下是一些对象的内置属性，会在对象保存时自动创建，无需手动指定：
 
@@ -606,7 +612,7 @@ _ = todo.delete { result in
 }
 ```
 
-注意，删除对象是一个较为敏感的操作，我们建议你阅读《ACL 权限管理开发指南》来了解潜在的风险。熟悉 class 级别、对象级别和字段级别的权限可以帮助你有效阻止未经授权的操作。
+注意，删除对象是一个较为敏感的操作，我们建议你阅读[ACL 权限管理开发指南](/sdk/storage/guide/acl/)来了解潜在的风险。熟悉 class 级别、对象级别和字段级别的权限可以帮助你有效阻止未经授权的操作。
 
 ### 批量操作
 
@@ -739,7 +745,9 @@ try comment.set("post", value: post)
 
 #### 多对多关系
 
-想要建立多对多关系，最简单的办法就是使用 **数组**。在大多数情况下，使用数组可以有效减少查询的次数，提升程序的运行效率。但如果有额外的属性需要附着于两个 class 之间的关联，那么使用 **中间表** 可能是更好的方式。注意这里说到的额外的属性是用来描述 class 之间的关系的，而不是任何单一的 class 的。
+想要建立多对多关系，最简单的办法就是使用 **数组**。在大多数情况下，使用数组可以有效减少查询的次数，提升程序的运行效率。
+但如果有额外的属性需要附着于两个 class 之间的关联，那么使用 **中间表** 可能是更好的方式。
+注意这里说到的额外的属性是用来描述 class 之间的关系的，而不是任何单一的 class 的。
 
 我们建议你在任何一个 class 的对象数量超出 100 的时候考虑使用中间表。
 
@@ -892,7 +900,8 @@ query.limit = 10
 query.skip = 20
 ```
 
-需要注意的是，`skip` 的值越高，查询所需的时间就越长。作为替代方案，可以通过设置 `createdAt` 或 `updatedAt` 的范围来实现更高效的翻页，因为它们都自带索引。
+需要注意的是，`skip` 的值越高，查询所需的时间就越长。
+作为替代方案，可以通过设置 `createdAt` 或 `updatedAt` 的范围来实现更高效的翻页，因为它们都自带索引。
 同理，也可以通过设置自增字段的范围来实现翻页。
 
 对于能够排序的属性，可以指定结果的排序规则：
@@ -941,7 +950,7 @@ _ = query.getFirst { result in
 ```
 
 `.selected`
-支持点号（`author.firstName`），详见《点号使用指南》。
+支持点号（`author.firstName`），详见[点号使用指南]((https://leancloud.cn/docs/dot-notation.html))。
 另外，字段名前添加减号前缀表示反向选择，例如 `-author` 表示不返回 `author` 字段。
 反向选择同样适用于内置字段，比如 `-objectId`，也可以和点号组合使用，比如 `-pubUser.createdAt`。
 
@@ -971,10 +980,11 @@ query.whereKey("title", .matchedSubstring("lunch"))
 
 如果想查找某一属性值不包含特定字符串的对象，可以使用 `.matchedPattern` 进行基于正则表达式的查询：
 
-<pre><code class="lang-swift">let query = LCQuery(className: "Todo")
+```
+let query = LCQuery(className: "Todo")
 // "title" 不包含 "ticket"（不区分大小写）
-query.whereKey("title", .matchedRegularExpression("^((?!ticket).)*&dollar;&quot;, option: "i"))
-</code></pre>
+query.whereKey("title", .matchedRegularExpression("^((?!ticket).)*$", option: "i"))
+```
 
 不过我们并不推荐大量使用这类查询，尤其是对于包含超过 100,000 个对象的 class，
 因为这类查询无法利用索引，实际操作中云端会遍历所有对象来获取结果。如果有进行全文搜索的需求，可以使用全文搜索服务。
@@ -1001,7 +1011,8 @@ query.whereKey("tags", .equalToSize(3))
 query.whereKey("tags", .containedAllIn(["工作", "销售", "会议"]))
 ```
 
-如需获取某一属性值包含一列值中任意一个值的对象，可以直接用 `.containedIn` 而无需执行多次查询。下面的代码构建的查询会查找所有 `priority` 为 `1` **或** `2` 的 todo 对象：
+如需获取某一属性值包含一列值中任意一个值的对象，可以直接用 `.containedIn` 而无需执行多次查询。
+下面的代码构建的查询会查找所有 `priority` 为 `1` **或** `2` 的 todo 对象：
 
 ```swift
 // 单个查询
@@ -1028,7 +1039,8 @@ let priorityOneOrTwo = priorityOne.or(priorityTwo)
 
 ### 关系查询
 
-查询关联数据有很多种方式，常见的一种是查询某一属性值为特定 `LCObject` 的对象，这时可以像其他查询一样直接用 `.equalTo`。比如说，如果每一条博客评论 `Comment` 都有一个 `post` 属性用来存放原文 `Post`，则可以用下面的方法获取所有与某一 `Post` 相关联的评论：
+查询关联数据有很多种方式，常见的一种是查询某一属性值为特定 `LCObject` 的对象，这时可以像其他查询一样直接用 `.equalTo`。
+比如说，如果每一条博客评论 `Comment` 都有一个 `post` 属性用来存放原文 `Post`，则可以用下面的方法获取所有与某一 `Post` 相关联的评论：
 
 ```swift
 let post = LCObject(className: "Post", objectId: "57328ca079bc44005c2472d0")
@@ -1045,7 +1057,8 @@ _ = query.find { result in
 }
 ```
 
-如需获取某一属性值为另一查询结果中任一 `LCObject` 的对象，可以用 `.matchedQuery`。下面的代码构建的查询可以找到所有包含图片的博客文章的评论：
+如需获取某一属性值为另一查询结果中任一 `LCObject` 的对象，可以用 `.matchedQuery`。
+下面的代码构建的查询可以找到所有包含图片的博客文章的评论：
 
 ```swift
 let innerQuery = LCQuery(className: "Post")
@@ -1085,7 +1098,7 @@ _ = query.find { result in
 }
 ```
 
-可以用 dot 符号（`.`）来获取多级关系，例如 `post.author`，详见《点号使用指南》的《在查询对象时使用点号》一节。
+可以用 dot 符号（`.`）来获取多级关系，例如 `post.author`，详见[点号使用指南]((https://leancloud.cn/docs/dot-notation.html))的《在查询对象时使用点号》一节。
 
 可以在同一查询上应用多次 `.included` 以包含多个属性。通过这种方法获取到的对象同样接受 `getFirst`、`get` 等 `LCQuery` 辅助方法。
 
@@ -1093,7 +1106,9 @@ _ = query.find { result in
 
 #### 关系查询的注意事项
 
-云端使用的并非关系型数据库，无法做到真正的联表查询，所以实际的处理方式是：先执行内嵌/子查询（和普通查询一样，`limit` 默认为 `100`，最大 `1000`），然后将子查询的结果填入主查询的对应位置，再执行主查询。如果子查询匹配到的记录数量超出 `limit`，且主查询有其他查询条件，那么可能会出现没有结果或结果不全的情况，因为只有 `limit` 数量以内的结果会被填入主查询。
+云端使用的并非关系型数据库，无法做到真正的联表查询，所以实际的处理方式是：
+先执行内嵌/子查询（和普通查询一样，`limit` 默认为 `100`，最大 `1000`），然后将子查询的结果填入主查询的对应位置，再执行主查询。
+如果子查询匹配到的记录数量超出 `limit`，且主查询有其他查询条件，那么可能会出现没有结果或结果不全的情况，因为只有 `limit` 数量以内的结果会被填入主查询。
 
 我们建议采用以下方案进行改进：
 
@@ -1135,7 +1150,8 @@ let query = priorityQuery.or(isCompleteQuery)
 
 #### AND 查询
 
-使用 AND 查询的效果等同于往 `LCQuery` 添加多个条件。下面的代码构建的查询会查找创建时间在 `2016-11-13` 和 `2016-12-02` 之间的 todo：
+使用 AND 查询的效果等同于往 `LCQuery` 添加多个条件。
+下面的代码构建的查询会查找创建时间在 `2016-11-13` 和 `2016-12-02` 之间的 todo：
 
 ```swift
 let dateFromString: (String) -> Date? = { string in
@@ -1186,6 +1202,8 @@ let query = priorityQuery.and(timeLocationQuery)
 
 默认情况下 SDK 不会缓存查询结果，可以在 SDK 初始化时配置 `HTTPURLCache` 来开启查询结果缓存：
 
+<Conditional brand="leancloud">
+
 ```swift
 do {
     const configuration = LCApplication.Configuration.default
@@ -1197,15 +1215,42 @@ do {
         // `nil` 表示使用系统默认的缓存路径，你也可以自定义路径
         diskPath: nil)
     try LCApplication.default.set(
-        id: {{appid}},
-        key: {{appkey}},
-        // 请将 xxx.example.com 替换为你的应用绑定的自定义 API 域名
-        serverURL: "https://xxx.example.com",
+        id: your-app-id,
+        key: your-app-key,
+        // 请将 your_server_url 替换为你的应用绑定的自定义 API 域名
+        serverURL: "https://your_server_url",
         configuration: configuration)
 } catch {
     print(error)
 }
 ```
+
+</Conditional>
+
+<Conditional brand="tds">
+
+```swift
+do {
+    const configuration = LCApplication.Configuration.default
+    configuration.HTTPURLCache = URLCache(
+        // 内存缓存容量，100 MB
+        memoryCapacity: 100 * 1024 * 1024,
+        // 磁盘缓存容量，100 MB
+        diskCapacity: 100 * 1024 * 1024,
+        // `nil` 表示使用系统默认的缓存路径，你也可以自定义路径
+        diskPath: nil)
+    try LCApplication.default.set(
+        id: your-client-id,
+        key: your-client-token,
+        // 请将 your_server_url 替换为你的应用绑定的自定义 API 域名
+        serverURL: "https://your_server_url",
+        configuration: configuration)
+} catch {
+    print(error)
+}
+```
+
+</Conditional>
 
 默认情况下，SDK 的查询接口不会查询缓存，可以通过设置接口的 `cachePolicy` 来改变查询行为：
 
@@ -1257,13 +1302,15 @@ LiveQuery 衍生于 [`LCQuery`](#查询)，并为其带来了更强大的功能�
 
 设想你正在开发一个多人协作同时编辑一份文档的应用，单纯地使用 `LCQuery` 并不是最好的做法，因为它只具备主动拉取的功能，而应用并不知道什么时候该去拉取。
 
-想要解决这个问题，就要用到 LiveQuery 了。借助 LiveQuery，你可以订阅所有需要保持同步的 `LCQuery`。订阅成功后，一旦有符合 `LCQuery` 的 `LCObject` 发生变化，云端就会主动、实时地将信息通知到客户端。
+想要解决这个问题，就要用到 LiveQuery 了。借助 LiveQuery，你可以订阅所有需要保持同步的 `LCQuery`。
+订阅成功后，一旦有符合 `LCQuery` 的 `LCObject` 发生变化，云端就会主动、实时地将信息通知到客户端。
 
 LiveQuery 使用 WebSocket 在客户端和云端之间建立连接。WebSocket 的处理会比较复杂，而我们将其封装成了一个简单的 API 供你直接使用，无需关注背后的原理。
 
 ### 启用 LiveQuery
 
-进入 **控制台 > 数据存储 > 服务设置**，在 **安全设置** 里面勾选 **启用 LiveQuery**，然后导入云服务Swift SDK：
+进入 **<Path to="storage" /> > 服务设置**，在 **安全设置** 里面勾选 **启用 LiveQuery**。
+然后导入云服务 Swift SDK：
 
 ```swift
 import LeanCloud
@@ -1273,17 +1320,23 @@ import LeanCloud
 
 下面是在使用了 LiveQuery 的网页应用和手机应用中分别操作，数据保持同步的效果：
 
-<div style="border:2px solid #ccc; margin-bottom:1em;">
-  <video src="https://capacity-files.lcfile.com/1496988080458" controls autoplay muted preload="auto" width="100%" height="100%" >
-    HTML5 Video is required for this demo, which your browser doesn't support.
-  </video>
-</div>
+<video
+  src="https://capacity-files.lcfile.com/1496988080458"
+  controls
+  autoPlay
+  muted
+  preload="auto"
+  width="100%"
+  height="100%"
+>
+  HTML5 Video is required for this demo, which your browser doesn't support.
+</video>
 
 使用我们的「LeanTodo」微信小程序和网页应用，可以实际体验以上视频所演示的效果，步骤如下：
 
 1. 微信扫码，添加小程序「LeanTodo」；
 
-    ![LeanTodo mini program](images/leantodo-weapp-qr.jpg)
+   ![LeanTodo mini program](/img/leantodo-weapp-qr.jpg)
 
 2. 进入小程序，点击首页左下角 **设置** > **账户设置**，输入便于记忆的用户名和密码；
 
@@ -1318,7 +1371,8 @@ do {
 
 LiveQuery 不支持内嵌查询，也不支持返回指定属性。
 
-订阅成功后，就可以接收到和 `LCObject` 相关的更新了。假如在另一个客户端上创建了一个 `Todo` 对象，对象的 `title` 设为 `更新作品集`，那么下面的代码可以获取到这个新的 `Todo`：
+订阅成功后，就可以接收到和 `LCObject` 相关的更新了。
+假如在另一个客户端上创建了一个 `Todo` 对象，对象的 `title` 设为 `更新作品集`，那么下面的代码可以获取到这个新的 `Todo`：
 
 ```swift
 do {
@@ -1411,11 +1465,14 @@ self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) 
 })
 ```
 
-注意区分 `create` 和 `enter` 的不同行为。如果一个对象已经存在，在更新之前不符合查询条件，而在更新之后符合查询条件，那么 `enter` 事件会被触发。如果一个对象原本不存在，后来被构建了出来，那么 `create` 事件会被触发。
+注意区分 `create` 和 `enter` 的不同行为。
+如果一个对象已经存在，在更新之前不符合查询条件，而在更新之后符合查询条件，那么 `enter` 事件会被触发。
+如果一个对象原本不存在，后来被构建了出来，那么 `create` 事件会被触发。
 
 #### `leave` 事件
 
-当一个已存在的、原本符合 `LCQuery` 查询条件的 `LCObject` 发生更新，且更新后不符合查询条件，`leave` 事件会被触发。下面的 `object` 就是离开 `LCQuery` 的 `LCObject`，其内容为该对象最新的值：
+当一个已存在的、原本符合 `LCQuery` 查询条件的 `LCObject` 发生更新，且更新后不符合查询条件，`leave` 事件会被触发。
+下面的 `object` 就是离开 `LCQuery` 的 `LCObject`，其内容为该对象最新的值：
 
 ```swift
 self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) in
@@ -1430,7 +1487,8 @@ self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) 
 
 #### `delete` 事件
 
-当一个已存在的、原本符合 `LCQuery` 查询条件的 `LCObject` 被删除，`delete` 事件会被触发。下面的 `object` 就是被删除的 `LCObject` 的 `objectId`：
+当一个已存在的、原本符合 `LCQuery` 查询条件的 `LCObject` 被删除，`delete` 事件会被触发。
+下面的 `object` 就是被删除的 `LCObject` 的 `objectId`：
 
 ```swift
 self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) in
@@ -1637,7 +1695,9 @@ let file = LCObject(className: "_File", objectId: "552e0a27e4b0643b709e891e")
 file.delete()
 ```
 
-默认情况下，文件的删除权限是关闭的，需要进入 **云服务控制台 > 数据存储 > 结构化数据 > `_File`**，选择 **权限** > **`delete`** 来开启。
+默认情况下，文件的删除权限是关闭的。
+如需删除文件，一般建议在服务端使用 Master Key 调用 REST API 删除。
+取决于产品的具体需求，也可以考虑在 **<Path to="storage" /> > 文件 > 权限** 向特定用户或特定角色开启删除权限。
 
 ## GeoPoint
 
@@ -1657,7 +1717,9 @@ try todo.set("location", value: point)
 
 ### 地理位置查询
 
-给定一些含有地理位置的对象，可以从中找出离某一点最近的几个，或者处于某一范围内的几个。要执行这样的查询，可以向普通的 `LCQuery` 添加 `.locatedNear` 条件。下面的代码查找 `location` 属性值离某一点最近的 `Todo` 对象：
+给定一些含有地理位置的对象，可以从中找出离某一点最近的几个，或者处于某一范围内的几个。
+要执行这样的查询，可以向普通的 `LCQuery` 添加 `.locatedNear` 条件。
+下面的代码查找 `location` 属性值离某一点最近的 `Todo` 对象：
 
 ```swift
 let query = LCQuery(className: "Todo")
@@ -1683,7 +1745,7 @@ _ = query.find { result in
 
 若要查询在某一矩形范围内的对象，可以用 `.locatedWithin`：
 
-![withinGeoBox](images/geopoint-withingeobox.svg)
+![withinGeoBox](/img/geopoint-withingeobox.svg)
 
 ```swift
 let query = LCQuery(className: "Todo")
@@ -1699,1067 +1761,7 @@ GeoPoint 的经纬度的类型是数字，且经度需在 -180.0 到 180.0 之�
 
 ## 用户
 
-用户系统几乎是每款应用都要加入的功能，我们为此专门提供了一个 `LCUser` 类来方便应用使用各项用户管理的功能。
-
-`LCUser` 是 `LCObject` 的子类，这意味着任何 `LCObject` 提供的方法也适用于 `LCUser`，唯一的区别就是 `LCUser` 提供一些额外的用户管理相关的功能。每个应用都有一个专门的 `_User` class 用于存放所有的 `LCUser`。
-
-### 用户的属性
-
-`LCUser` 相比一个普通的 `LCObject` 多出了以下属性：
-
-- `username`：用户的用户名。
-- `password`：用户的密码。
-- `email`：用户的电子邮箱。
-- `emailVerified`：用户的电子邮箱是否已验证。
-- `mobilePhoneNumber`：用户的手机号。
-- `mobilePhoneVerified`用户的手机号是否已验证。
-
-在接下来对用户功能的介绍中我们会逐一了解到这些属性。
-
-### 注册
-
-用户第一次打开应用的时候，可以让用户注册一个账户。下面的代码展示了一个典型的使用用户名和密码注册的流程：
-
-```swift
-do {
-    // 创建实例
-    let user = LCUser()
-
-    // 等同于 user.set("username", value: "Tom")
-    user.username = LCString("Tom")
-    user.password = LCString("cat!@#123")
-
-    // 可选
-    user.email = LCString("tom@leancloud.rocks")
-    user.mobilePhoneNumber = LCString("+8618200008888")
-
-    // 设置其他属性的方法跟 LCObject 一样
-    try user.set("gender", value: "secret")
-
-    _ = user.signUp { (result) in
-        switch result {
-        case .success:
-            break
-        case .failure(error: let error):
-            print(error)
-        }
-    }
-} catch {
-    print(error)
-}
-```
-
-新建 `LCUser` 的操作应使用 `signUp` 而不是 `save`，但以后的更新操作就可以用 `save` 了。
-
-如果收到 `202` 错误码，意味着 `_User` 表里已经存在使用同一 `username` 的账号，此时应提示用户换一个用户名。除此之外，每个用户的 `email` 和 `mobilePhoneNumber` 也需要保持唯一性，否则会收到 `203` 或 `214` 错误。
-可以考虑在注册时把用户的 `username` 设为与 `email` 相同，这样用户可以直接 [用邮箱重置密码](#重置密码)。
-
-采用「用户名 + 密码」注册时需要注意：密码是以明文方式通过 HTTPS 加密传输给云端，云端会以密文存储密码（云端对密码的长度、复杂度不作限制），并且我们的加密算法是无法通过所谓「彩虹表撞库」获取的，这一点请开发者放心。换言之，用户的密码只可能用户本人知道，开发者不论是通过控制台还是 API 都是无法获取。另外我们需要强调 **在客户端，应用切勿再次对密码加密，这会导致 [重置密码](#重置密码) 等功能失效**。
-
-#### 手机号注册
-
-对于移动应用来说，允许用户以手机号注册是个很常见的需求。实现该功能大致分两步，第一步是让用户提供手机号，点击「获取验证码」按钮后，该号码会收到一个六位数的验证码：
-
-```swift
-//templateName 是短信模版名称，signatureName 是短信签名名称。可以在控制台 > 短信 > 设置中查看。
-_ = LCSMSClient.requestShortMessage(mobilePhoneNumber: "+8618200008888", templateName: "template_name", signatureName: "sign_name") { (result) in
-    switch result {
-    case .success:
-        break
-    case .failure(error: let error):
-        print(error)
-    }
-}
-```
-
-用户填入验证码后，用下面的方法完成注册：
-
-```swift
-_ = LCUser.signUpOrLogIn(mobilePhoneNumber: "+8618200008888", verificationCode: "123456", completion: { (result) in
-    switch result {
-    case .success(object: let user):
-        print(user)
-    case .failure(error: let error):
-        print(error)
-    }
-})
-```
-
-`username` 将与 `mobilePhoneNumber` 相同，`password` 会由云端随机生成。
-如果希望让用户指定密码，可以在客户端让用户填写手机号和密码，然后按照上一小节使用用户名和密码注册的流程，将用户填写的手机号作为 `username` 和 `mobilePhoneNumber` 的值同时提交。
-同时根据业务需求，在**云服务控制台 > 内建账户 > 设置**勾选**未验证手机号码的用户，禁止登录**、**已验证手机号码的用户，允许以短信验证码登录**。
-
-#### 手机号格式
-
-`LCUser` 接受的手机号以 `+` 和国家代码开头，后面紧跟着剩余的部分。手机号中不应含有任何划线、空格等非数字字符。例如，`+19490008888` 是一个合法的美国或加拿大手机号（`1` 是国家代码），`+8618200008888` 是一个合法的中国手机号（`86` 是国家代码）。
-
-请参阅官网的价格页面以了解支持的国家和地区。
-
-### 登录
-
-下面的代码用用户名和密码登录一个账户：
-
-```swift
-_ = LCUser.logIn(username: "Tom", password: "cat!@#123") { result in
-    switch result {
-    case .success(object: let user):
-        print(user)
-    case .failure(error: let error):
-        print(error)
-    }
-}
-```
-
-#### 邮箱登录
-
-下面的代码用邮箱和密码登录一个账户：
-
-```swift
-_ = LCUser.logIn(email: "tom@leancloud.rocks", password: "cat!@#123") { result in
-    switch result {
-    case .success(object: let user):
-        print(user)
-    case .failure(error: let error):
-        print(error)
-    }
-}
-```
-
-#### 手机号登录
-
-如果应用允许用户以手机号注册，那么也可以让用户以手机号配合密码或短信验证码登录。下面的代码用手机号和密码登录一个账户：
-
-```swift
-_ = LCUser.logIn(mobilePhoneNumber: "+8618200008888", password: "cat!@#123") { result in
-    switch result {
-    case .success(object: let user):
-        print(user)
-    case .failure(error: let error):
-        print(error)
-    }
-}
-```
-
-默认情况下，云服务允许所有关联了手机号的用户直接以手机号登录，无论手机号是否 [通过验证](#验证手机号)。为了让应用更加安全，你可以选择只允许验证过手机号的用户通过手机号登录。可以在 **控制台 > 内建账户 > 设置** 里面开启该功能。
-
-除此之外，还可以让用户通过短信验证码登录，适用于用户忘记密码且不愿重置密码的情况。和 [通过手机号注册](#手机号注册) 的步骤类似，首先让用户填写与账户关联的手机号码，然后在用户点击「获取验证码」后调用下面的方法：
-
-```swift
-_ = LCUser.requestLoginVerificationCode(mobilePhoneNumber: "+8618200008888") { result in
-    switch result {
-    case .success:
-        break
-    case .failure(error: let error):
-        print(error)
-    }
-}
-```
-
-用户填写收到的验证码后，用下面的方法完成登录：
-
-```swift
-_ = LCUser.logIn(mobilePhoneNumber: "+8618200008888", verificationCode: "123456") { result in
-    switch result {
-    case .success(object: let user):
-        print(user)
-    case .failure(error: let error):
-        print(error)
-    }
-}
-```
-
-#### 测试手机号和固定验证码
-
-在开发过程中，可能会因测试目的而需要频繁地用手机号注册登录，然而运营商的发送频率限制往往会导致测试过程耗费较多的时间。
-
-为了解决这个问题，可以在 **控制台 > 短信 > 设置** 里面设置一个测试手机号，而云端会为该号码生成一个固定验证码。以后进行登录操作时，只要使用的是这个号码，云端就会直接放行，无需经过运营商网络。
-
-测试手机号还可用于将 iOS 应用提交到 App Store 进行审核的场景，因为审核人员可能因没有有效的手机号码而无法登录应用来进行评估审核。如果不提供一个测试手机号，应用有可能被拒绝。
-
-可参阅 [短信 SMS 服务使用指南](sms-guide.html) 来了解更多有关短信发送和接收的限制。
-
-#### 单设备登录
-
-某些场景下需要确保用户的账户在同一时间只在一台设备上登录，也就是说当用户在一台设备上登录后，其他设备上的会话全部失效。可以按照以下方案来实现：
-
-1. 新建一个专门用于记录用户登录信息和当前设备信息的 class。
-2. 每当用户在新设备上登录时，将该 class 中该用户对应的设备更新为该设备。
-3. 在另一台设备上打开客户端时，检查该设备是否与云端保存的一致。若不一致，则将用户 [登出](#当前用户)。
-
-#### 账户锁定
-
-输入错误的密码或验证码会导致用户登录失败。如果在 15 分钟内，同一个用户登录失败的次数大于 6 次，该用户账户即被云端暂时锁定，此时云端会返回错误码 `{ "code": 1, "error": "You have exceeded the maximum number of login attempts, please try again later, or consider resetting your password." }`，开发者可在客户端进行必要提示。
-
-锁定将在最后一次错误登录的 15 分钟之后由云端自动解除，开发者无法通过 SDK 或 REST API 进行干预。在锁定期间，即使用户输入了正确的验证信息也不允许登录。这个限制在 SDK 和云引擎中都有效。
-
-### 验证邮箱
-
-可以通过要求用户在登录或使用特定功能之前验证邮箱的方式防止恶意注册。默认情况下，当用户注册或变更邮箱后，`emailVerified` 会被设为 `false`。在应用的 **云服务控制台 > 内建账户 > 设置** 中，可以开启 **启用邮箱验证功能** 选项，这样当用户注册或变更邮箱时，会收到一封含有验证链接的邮件。在同一设置页面还可找到阻止未验证邮箱的用户登录的选项。
-
-如果用户忘记点击链接并且在未来某一时刻需要进行验证，可以用下面的代码发送一封新的邮件：
-
-```swift
-_ = LCUser.requestVerificationMail(email: "tom@leancloud.rocks") { result in
-    switch result {
-    case .success:
-        break
-    case .failure(error: let error):
-        print(error)
-    }
-}
-```
-
-用户点击邮件内的链接后，`emailVerified` 会变为 `true`。如果用户的 `email` 属性为空，则该属性永远不会为 `true`。
-
-### 验证手机号
-
-和 [验证邮箱](#验证邮箱) 类似，应用还可以要求用户在登录或使用特定功能之前验证手机号。默认情况下，当用户注册或变更手机号后，`mobilePhoneVerified` 会被设为 `false`。
-在应用的「控制台 > 内建账户 > 设置」中，可以开启阻止未验证手机号的用户登录的选项。
-
-可以用下面的代码发送一条新的验证码：（如果相应用户的 `mobilePhoneVerified` 已经为 `true`，那么验证短信不会发送）
-
-```swift
-_ = LCUser.requestVerificationCode(mobilePhoneNumber: "+8618200008888") { result in
-    switch result {
-    case .success:
-        break
-    case .failure(error: let error):
-        print(error)
-    }
-}
-```
-
-用户填写验证码后，调用下面的方法来完成验证。`mobilePhoneVerified` 将变为 `true`：
-
-```swift
-_ = LCUser.verifyMobilePhoneNumber(mobilePhoneNumber: "+8618200008888", verificationCode: "123456") { result in
-    switch result {
-    case .success:
-        // mobilePhoneVerified 将变为 true
-        break
-    case .failure(error: let error):
-        // 验证码不正确
-        print(error)
-    }
-}
-```
-
-#### 绑定、修改手机号之前先验证
-
-除了在用户绑定、修改手机号**之后**进行验证，云服务也支持在用户绑定或修改手机号**之前**先通过短信验证。
-也就是说，绑定手机号或修改手机号时先请求发送验证码（用户需处于登录状态），再凭短信验证码完成绑定或修改操作。
-
-```swift
-_ = LCUser.requestVerificationCode(forUpdatingMobilePhoneNumber: "+8618200008888") { result in
-    switch result {
-    case .success:
-        break
-    case .failure(error: let error):
-        print(error)
-    }
-}
-
-_ = LCUser.verifyVerificationCode("123456", toUpdateMobilePhoneNumber:"+8618200008888") { result in
-    switch result {
-    case .success:
-        // mobilePhoneNumber 变为 +8618200008888
-        // mobilePhoneVerified 变为 true
-        break
-    case .failure(error: let error):
-        // 验证码不正确
-        print(error)
-    }
-}
-```
-
-### 当前用户
-
-用户登录后，SDK 会自动将会话信息存储到客户端，这样用户在下次打开客户端时无需再次登录。下面的代码检查是否有已经登录的用户：
-
-```swift
-if let user = LCApplication.default.currentUser {
-    // 跳到首页
-} else {
-    // 显示注册或登录页面
-}
-```
-
-会话信息会长期有效，直到用户主动登出：
-
-```swift
-LCUser.logOut()
-
-// currentUser 变为 nil
-let currentUser = LCApplication.default.currentUser
-```
-
-### 设置当前用户
-
-用户登录后，云端会返回一个 **session token** 给客户端，它会由 SDK 缓存起来并用于日后同一 `LCUser` 的鉴权请求。session token 会被包含在每个客户端发起的 HTTP 请求的 header 里面，这样云端就知道是哪个 `LCUser` 发起的请求了。
-
-以下是一些应用可能需要用到 session token 的场景：
-
-- 应用根据以前缓存的 session token 登录（可以用 `LCApplication.default.currentUser?.sessionToken?.value` 获取到当前用户的 session token，在服务端等受信任的环境下，可以通过 Master Key 读取任意用户的 `sessionToken` 字段以获取 session token）。
-- 应用内的某个 WebView 需要知道当前登录的用户。
-- 在服务端登录后，返回 session token 给客户端，客户端根据返回的 session token 登录。
-
-下面的代码使用 session token 登录一个用户（云端会验证 session token 是否有效）：
-
-```swift
-_ = LCUser.logIn(sessionToken: "anmlwi96s381m6ca7o7266pzf") { (result) in
-    switch result {
-    case .success(object: let user):
-        // 登录成功
-        print(user)
-    case .failure(error: let error):
-        // session token 无效
-        print(error)
-    }
-}
-```
-
-请避免在外部浏览器使用 URL 来传递 session token，以防范信息泄露风险。
-
-如果在 **控制台 > 内建账户 > 设置** 中勾选了 **密码修改后，强制客户端重新登录**，那么当一个用户修改密码后，该用户的 session token 会被重置。此时需要让用户重新登录，否则会遇到 [`403 (Forbidden)`](error_code.html#_403) 错误。
-
-下面的代码检查 session token 是否有效：
-
-```swift
-if let sessionToken = LCApplication.default.currentUser?.sessionToken?.value {
-    _ = LCUser.logIn(sessionToken: sessionToken) { (result) in
-        if result.isSuccess {
-            // session token 有效
-        } else {
-            // session token 无效
-        }
-    }
-}
-```
-
-### 重置密码
-
-我们都知道，应用一旦加入账户密码系统，那么肯定会有用户忘记密码的情况发生。对于这种情况，我们为用户提供了多种重置密码的方法。
-
-邮箱重置密码的流程如下：
-
-1. 用户输入注册的电子邮箱，请求重置密码；
-2. 云端向该邮箱发送一封包含重置密码的特殊链接的电子邮件；
-3. 用户点击重置密码链接后，一个特殊的页面会打开，让他们输入新密码；
-4. 用户的密码已被重置为新输入的密码。
-
-首先让用户填写注册账户时使用的邮箱，然后调用下面的方法：
-
-```swift
-_ = LCUser.requestPasswordReset(email: "tom@leancloud.rocks") { (result) in
-    switch result {
-    case .success:
-        break
-    case .failure(error: let error):
-        print(error)
-    }
-}
-```
-
-上面的代码会查询 `_User` 表中是否有对象的 `email` 属性与前面提供的邮箱匹配。如果有的话，则向该邮箱发送一封密码重置邮件。之前提到过，应用可以让 `username` 与 `email` 保持一致，也可以单独收集用户的邮箱并将其存为 `email`。
-
-密码重置邮件的内容可在应用的 **云服务控制台 > 内建账户 > 邮件模版** 中自定义。更多关于自定义邮件模板和验证链接的内容，请参考《自定义邮件验证和重设密码页面》。
-
-除此之外，还可以用手机号重置密码：
-
-1. 用户输入注册的手机号，请求重置密码；
-2.云端向该号码发送一条包含验证码的短信；
-3. 用户输入验证码和新密码。
-
-下面的代码向用户发送含有验证码的短信：
-
-```swift
-_ = LCUser.requestPasswordReset(mobilePhoneNumber: "+8618200008888") { (result) in
-    switch result {
-    case .success:
-        break
-    case .failure(error: let error):
-        print(error)
-    }
-}
-```
-
-上面的代码会查询 `_User` 表中是否有对象的 `mobilePhoneNumber` 属性与前面提供的手机号匹配。如果有的话，则向该号码发送验证码短信。
-
-可以在 **云服务控制台 > 内建账户 > 设置** 中设置只有在 `mobilePhoneVerified` 为 `true` 的情况下才能用手机号重置密码。
-
-用户输入验证码和新密码后，用下面的代码完成密码重置：
-
-```swift
-_ = LCUser.resetPassword(mobilePhoneNumber: "+8618200008888", verificationCode: "123456", newPassword: "cat!@#123") { result in
-    switch result {
-    case .success:
-        // 密码重置成功
-        break
-    case .failure(error: let error):
-        // 验证码不正确
-        print(error)
-    }
-}
-```
-
-### 用户的查询
-
-可以直接构建一个针对 `_User` 的 `LCQuery` 来查询用户：
-
-```swift
-let userQuery = LCQuery(className: "_User")
-```
-
-为了安全起见，**新创建的应用的 `_User` 表默认关闭了 `find` 权限**，这样每位用户登录后只能查询到自己在 `_User` 表中的数据，无法查询其他用户的数据。如果需要让其查询其他用户的数据，建议单独创建一张表来保存这类数据，并开放这张表的 `find` 查询权限。除此之外，还可以在云引擎里封装用户查询相关的方法。
-
-可以参见 [用户对象的安全](#用户对象的安全) 来了解 `_User` 表的一些限制，还可以阅读《数据和安全》来了解更多 class 级权限设置的方法。
-
-### 关联用户对象
-
-关联 `LCUser` 的方法和 `LCObject` 是一样的。下面的代码为一名作者保存了一本书，然后获取所有该作者写的书：
-
-```swift
-do {
-    guard let author = LCApplication.default.currentUser else {
-        return
-    }
-    let book = LCObject(className: "Book")
-    try book.set("title", value: "我的第五本书")
-    try book.set("author", value: author)
-    _ = book.save { result in
-        switch result {
-        case .success:
-            // 获取所有该作者写的书
-            let query = LCQuery(className: "Book")
-            query.whereKey("author", .equalTo(author))
-            _ = query.find { result in
-                switch result {
-                case .success(objects: let books):
-                    // books 是包含同一作者所有 Book 对象的数组
-                    break
-                case .failure(error: let error):
-                    print(error)
-                }
-            }
-        case .failure(error: let error):
-            print(error)
-        }
-    }
-} catch {
-    print(error)
-}
-```
-
-### 用户对象的安全
-
-`LCUser` 类自带安全保障，只有通过 `logIn` 或者 `signUp` 这种经过鉴权的方法获取到的 `LCUser` 才能进行保存或删除相关的操作，保证每个用户只能修改自己的数据。
-
-这样设计是因为 `LCUser` 中存储的大多数数据都比较敏感，包括手机号、社交网络账号等等。为了用户的隐私安全，即使是应用的开发者也应避免直接接触这些数据。
-
-下面的代码展现了这种安全措施：
-
-```swift
-_ = LCUser.logIn(username: "Tom", password: "cat!@#123") { result in
-    switch result {
-    case .success(object: let user):
-        // 试图修改用户名
-        try! user.set("username", "Jerry")
-        // 密码已被加密，这样做会获取到空字符串
-        let password = user.get("password")
-        // 可以执行，因为用户已鉴权
-        user.save()
-
-        // 绕过鉴权直接获取用户
-        let query = LCQuery(className: "_User")
-        _ = query.get(user.objectId) { result in
-            switch result {
-                case .success(object: let unauthenticatedUser):
-                    try! unauthenticatedUser.set("username", "Toodle")
-                    _ = unauthenticatedUser.save { result in
-                        switch result {
-                            .success:
-                                // 无法执行，因为用户未鉴权
-                            .failure:
-                                // 操作失败
-                        }
-                    }
-                case .failure(error: let error):
-                    print(error)
-            }
-        }
-    case .failure(error: let error):
-        print(error)
-    }
-}
-```
-
-通过 `LCApplication.default.currentUser` 获取的 `LCUser` 总是经过鉴权的。
-
-要查看一个 `LCUser` 是否经过鉴权，可以调用 `` 方法。通过经过鉴权的方法获取到的 `LCUser` 无需进行该检查。
-
-注意，用户的密码只能在注册的时候进行设置，日后如需修改，只能通过 [重置密码](#重置密码) 的方式进行。密码不会被缓存在本地。如果尝试直接获取已登录用户的密码，会得到 `null`。
-
-### 其他对象的安全
-
-对于给定的一个对象，可以指定哪些用户有权限读取或修改它。为实现该功能，每个对象都有一个由 `LCACL` 对象组成的访问控制表。请参阅《ACL 权限管理开发指南》。
-
-### 第三方账户登录
-
-云服务支持应用层直接使用第三方社交平台（例如微信、微博、QQ 等）的账户信息来创建自己的账户体系并完成登录，也允许将既有账户与第三方账户绑定起来，这样终端用户后续可以直接用第三方账户信息来便捷登录。
-
-例如以下的代码展示了终端用户使用微信登录的处理流程：
-
-```swift
-let thirdPartyData: [String: Any] = [
-    // 必须
-    "openid":        "OPENID",
-    "access_token":  "ACCESS_TOKEN",
-    "expires_in":    7200,
-
-    // 可选
-    "refresh_token": "REFRESH_TOKEN",
-    "scope":         "SCOPE"
-]
-let user = LCUser()
-user.logIn(authData: thirdPartyData, platform: .weixin) { (result) in
-    switch result {
-    case .success:
-        assert(user.objectId != nil)
-    case .failure(error: let error):
-        print(error)
-    }
-}
-```
-
-`LCUser#loginWithAuthData` 系列方法需要两个参数来唯一确定一个账户：
-
-- 第三方平台的名字，就是前例中的 `weixin`，该名字由应用层自己决定。
-- 第三方平台的授权信息，就是前例中的 `thirdPartyData`（一般包括 `uid`、`token`、`expires` 等信息，与具体的第三方平台有关）。
-
-云端会使用第三方平台的鉴权信息来查询是否已经存在与之关联的账户。如果存在的话，则返回 `200 OK` 状态码，同时附上用户的信息（包括 [`sessionToken`](#设置当前用户)）。如果第三方平台的信息没有和任何账户关联，客户端会收到 `201 Created` 状态码，意味着新账户被创建，同时附上用户的 `objectId`、`createdAt`、`sessionToken` 和一个自动生成的 `username`，例如：
-
-```json
-{
-  "username":     "k9mjnl7zq9mjbc7expspsxlls",
-  "objectId":     "5b029266fb4ffe005d6c7c2e",
-  "createdAt":    "2018-05-21T09:33:26.406Z",
-  "updatedAt":    "2018-05-21T09:33:26.575Z",
-  "sessionToken": "…",
-  // authData 通常不会返回，继续阅读以了解其中原因
-  "authData": {
-    "weixin": {
-      "openid":        "OPENID",
-      "access_token":  "ACCESS_TOKEN",
-      "expires_in":    7200,
-      "refresh_token": "REFRESH_TOKEN",
-      "scope":         "SCOPE"
-    }
-  }
-  // …
-}
-```
-
-这时候我们会看到 `_User` 表中出现了一条新的账户记录，账户中有一个名为 `authData` 的列，保存了第三方平台的授权信息。出于安全考虑，`authData` 不会被返回给客户端，除非它属于当前用户。
-
-开发者需要自己完成第三方平台的鉴权流程（一般通过 OAuth 1.0 或 2.0），以获取鉴权信息，继而到云端来登录。
-
-#### Sign in with Apple
-
-如果你需要开发 [Sign in with Apple](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api)，云服务可以帮你校验 `identityToken`，并获取 Apple 的 `access_token`。Apple Sign In 的 `authData` 结构如下：
-
-```json
-{
-  "lc_apple": {
-    "uid": "从 Apple 获取到的 User Identifier",
-    "identity_token": "从苹果获取到的 identityToken",
-    "code": "从苹果获取到的 Authorization Code"
-  }
-}
-```
-
-`authData` 中的 key 的作用：
-
-- **`lc_apple`**：只有 platform 为 `lc_apple` 时，云服务才会执行 `identity_token` 和 `code` 的逻辑。
-- **`uid`**：必填。云服务通过 `uid` 判断是否存在用户。
-- **`identity_token`**：可选。`authData` 中有 `identity_token` 时云端会自动校验 `identity_token` 的有效性。开发者需要在云服务控制台「存储」-「用户」-「设置」-「第三方集成」中填写 Apple 的相关信息。
-- **`code`**：可选。`authData` 中有 `code` 时云端会自动用该 `code` 向 Apple 换取 `access_token` 和 `refresh_token`。开发者需要在云服务控制台「存储」-「用户」-「设置」-「第三方集成」中填写 Apple 的相关信息。
-
-##### 获取 Client ID
-
-Client ID 用于校验 `identity_token` 及获取 `access_token`，指的是 Apple 应用的 identifier，也就是 AppID 或 serviceID。对于原生应用来说，指的是 Xcode 中的 Bundle Identifier，例如 `com.mytest.app`。详情请参考 [Apple 的文档](https://developer.apple.com/documentation/sign_in_with_apple/generate_and_validate_tokens)。
-
-##### 获取 Private Key 及 Private Key ID
-
-Private Key 用于获取 `access_token`。登录 Apple 开发者平台，在左侧的 「Certificates, Identifiers & Profiles」 中选择 「Keys」，添加一个用于 Apple Sign In 的 Private Key，下载 XXXXX.p8 文件，同时在下载 Key 的页面获得 Private Key ID。详情请参考[Apple 的文档](https://help.apple.com/developer-account/#/dev77c875b7e)。
-
-将 Key ID 填写到控制台，将下载下来的 Private Key 文件上传到控制台。控制台只能上传 Private Key 文件，无法查看及下载其内容。
-
-##### 获取 Team ID
-
-Team ID 用于获取 `access_token`。登录 Apple 开发者平台，在右上角或 Membership 页面即可看到自己所属开发团队的 Team ID。注意选择 Bundle ID 对应的 Team。
-
-##### 使用 Apple Sign In 登录云服务
-
-在控制台填写完成所有信息后，使用以下代码登录
-
-```swift
-let appleData: [String: Any] = [
-    // 必须
-    "uid":             "USER IDENTIFIER",
-    // 可选
-    "identity_token":  "IDENTITY TOKEN",
-    "code":            "AUTHORIZATION CODE"
-]
-let user = LCUser()
-user.logIn(authData: appleData, platform: .apple) { (result) in
-    switch result {
-    case .success:
-        assert(user.objectId != nil)
-    case .failure(error: let error):
-        print(error)
-    }
-}
-
-```
-
-#### 鉴权数据的保存
-
-`_User` class 中的 `authData` 是一个以平台名为键名，鉴权信息为键值的 JSON 对象。
-
-一个关联了微信账户的用户应该会有下列对象作为 `authData`：
-
-```json
-{
-  "weixin": {
-    "openid":        "…",
-    "access_token":  "…",
-    "expires_in":    7200,
-    "refresh_token": "…",
-    "scope":         "…"
-  }
-}
-```
-
-而一个关联了微博账户的用户，则会有如下的 `authData`：
-
-```json
-{
-    "weibo": {
-      "refresh_token": "2.0xxx",
-      "uid": "271XFEFEW273",
-      "expires_in": 115057,
-      "access_token": "2.00xxx",
-    }
-}
-```
-
-我们允许一个账户绑定多个第三方平台的鉴权数据，这样如果某个用户同时关联了微信和微博账户，则其 `authData` 可能会是这样的：
-
-```json
-{
-  "weixin": {
-    "openid":        "…",
-    "access_token":  "…",
-    "expires_in":    7200,
-    "refresh_token": "…",
-    "scope":         "…"
-  },
-  "weibo": {
-    "refresh_token": "2.0xxx",
-    "uid": "271XFEFEW273",
-    "expires_in": 115057,
-    "access_token": "2.00xxx",
-  }
-}
-```
-
-理解 `authData` 的数据结构至关重要。一个终端用户通过如下的鉴权信息来登录的时候，
-
-```json
-"weixin": {
-  "openid":        "OPENID",
-  "access_token":  "ACCESS_TOKEN",
-  "expires_in":    7200,
-  "refresh_token": "REFRESH_TOKEN",
-  "scope":         "SCOPE"
-}
-```
-
-云端首先会查找账户系统（_User 表），看看是否存在 authData.weixin.openid = “OPENID” 的账户，如果存在，则返回现有账户，如果不存在那么就创建一个新账户，同时将上面的鉴权信息写入新账户的 `authData` 属性中，并将新账户的数据当成结果返回。
-
-云端会自动为 `_User` class 中每个用户的 `authData.<PLATFORM>.<uid>` 创建唯一索引，从而避免重复数据。
-`<uid>` 在微信等部分云服务内建支持的第三方平台上为 `openid` 字段，在其他第三方平台（包括部分云服务专门支持的第三方平台和所有云服务没有专门支持的第三方平台）上为 `uid` 字段。
-
-#### 自动验证第三方平台授权信息
-
-为了确保账户数据的有效性，云端还支持对部分平台的 access token 的有效性进行自动验证，以防止伪造账户数据。如果有效性验证不通过，云端会返回 `invalid authData` 错误，关联不会被建立。对于云端无法识别的服务，开发者需要自己去验证 access token 的有效性。
-比如，注册、登录时分别通过云引擎的 `beforeSave hook`、`beforeUpdate hook` 来验证 access token 有效性。
-
-如果希望使用这一功能，则在开始使用前，需要在 **控制台 > 内建账户 > 设置** 配置相应平台的 **应用 ID** 和 **应用 Secret Key**。
-
-如果不希望云端自动验证 access token，可以在 **控制台 > 内建账户 > 设置** 里面取消勾选 **第三方登录时，验证用户 AccessToken 合法性**。
-
-配置平台账号的目的在于创建 `LCUser` 时，云端会使用相关信息去校验请求参数 `thirdPartyData` 的合法性，确保 `LCUser` 实际对应着一个合法真实的用户，确保平台安全性。
-
-#### 绑定第三方账户
-
-用户已经有了 LCUser 并登录成功后，可以绑定新的第三方账号信息。
-绑定成功后，新的第三方账户信息会被添加到 LCUser 的 authData 字段里。
-
-例如，下面的代码可以关联微信账户：
-
-```swift
-currentUser.associate(authData: weixinData, platform: .weixin) { (result) in
-    switch result {
-    case .success:
-        // 关联成功
-    case .failure(error: let error):
-        // 关联失败
-    }
-}
-```
-
-为节省篇幅，上面的代码示例中没有给出具体的微信平台授权信息，相关内容请参考上面的[「第三方账户登录」](#第三方账户登录)一节。
-
-#### 解除与第三方账户的关联
-
-类似地，可以解绑第三方账户。
-
-例如，下面的代码可以解除用户和微信账户的关联：
-
-```swift
-currentUser.disassociate(authData: .weixin) { (result) in
-    switch result {
-    case .success:
-        // 解除关联成功
-    case .failure(error: let error):
-        // 解除关联失败
-    }
-}
-```
-
-#### 扩展：第三方登录时补充完整的用户信息
-
-有些产品，新用户在使用第三方账号授权拿到相关信息后，仍然需要补充设置用户名、手机号、密码等重要信息后，才被允许登录成功。
-
-这时要使用 `loginWithauthData` 登录接口的 `failOnNotExist` 参数并将其设置为 `true`。服务端会判断是否已存在能匹配上的 `authData`，如果不存在则会返回 `211` 错误码和 `Could not find user` 报错信息。开发者根据这个 `211` 错误码，跳转到要求输入用户名、密码、手机号等信息的页面，实例化一个 `LCUser` 对象，保存上述补充数据，再次调用 `loginWithauthData` 接口进行登录，并 **不再传入 `failOnNotExist` 参数**。示例代码如下：
-
-```swift
-let thirdPartyData: [String: Any] = [
-    "access_token": "ACCESS_TOKEN",
-    "expires_in": 7200,
-    "refresh_token": "REFRESH_TOKEN",
-    "openid": "OPENID",
-    "scope": "SCOPE"
-]
-let user = LCUser()
-user.logIn(authData: thirdPartyData, platform: .weixin, options: [.failOnNotExist]) { (result) in
-    switch result {
-    case .success:
-        assert(user.objectId != nil)
-    case .failure(error: let error):
-        if error.code == 211 {
-            // 不存在绑定了当前 authData 的 User 的实例
-            // 跳转到输入用户名、密码、手机号等业务页面
-            let user = LCUser()
-            user.username = "Tom"
-            user.password = "cat!@#123"
-            user.mobilePhoneNumber = "+8618200008888"
-            user.logIn(authData: thirdPartyData, platform: .weixin, completion: { (result) in
-                switch result {
-                case .success:
-                    assert(user.objectId != nil)
-                case .failure(error: let error):
-                    print(error)
-                }
-            })
-        }
-    }
-}
-```
-
-#### 扩展：接入 UnionID 体系，打通不同子产品的账号系统
-
-随着第三方平台的账户体系变得日渐复杂，它们的第三方鉴权信息出现了一些较大的变化。下面我们以最典型的微信开放平台为例来进行说明。
-
-当一个用户在移动应用内登录微信账号时，会被分配一个 OpenID；在微信小程序内登录账号时，又会被分配另一个不同的 OpenID。这样的架构会导致的问题是，使用同一个微信号的用户，也无法在微信开发平台下的移动应用和小程序之间互通。
-
-微信官方为了解决这个问题，引入了 `UnionID` 的体系，以下为其官方说明：
-
-> 通过获取用户基本信息接口，开发者可通过 OpenID 来获取用户基本信息，而如果开发者拥有多个公众号，可使用以下办法通过 UnionID 机制来在多公众号之间进行用户帐号互通。只要是同一个微信开放平台帐号下的公众号，用户的 UnionID 是唯一的。换句话说，同一用户，对同一个微信开放平台帐号下的不同应用，UnionID 是相同的。
-
-其他平台，如 QQ 和微博，与微信的设计也基本一致。
-
-云服务支持 `UnionID` 体系。你只需要给 `loginWithauthData` 和 `associateWithauthData` 接口传入更多的第三方鉴权信息，即可完成新 UnionID 体系的集成。新增加的第三方鉴权登录选项包括：
-
-- unionId，指第三方平台返回的 UnionId 字符串。
-- unionId platform，指 unionId 对应的 platform 字符串，由应用层自己指定，[后面](#该如何指定-unionIdPlatform)会详述。
-- asMainAccount，指示是否把当前平台的鉴权信息作为主账号来使用。如果作为主账号，那么就由当前用户唯一占有该 unionId，以后其他平台使用同样的 unionId 登录的话，会绑定到当前的用户记录上来；否则，当前应用的鉴权信息会被绑定到其他账号上去。
-
-下面让我们通过一个例子来说明如何使用这些参数完成 UnionID 登录。
-
-假设云服务在微信开放平台上有两个应用，一个是「云服务通讯」，一个是「云服务技术支持」，这两个应用在接入第三方鉴权的时候，分别使用了 `wxleanoffice` 和 `wxleansupport` 作为 platform 来进行登录。现在我们开启 UnionID 的用户体系，希望同一个微信用户在这两个应用中都能对应到同一个账户系统（_User 表中的同一条记录），同时我们决定将 `wxleanoffice` 平台作为主账号平台。
-
-假设对于用户 A，微信给 ta 为 云服务分配的 UnionId 为 `unionid4a`，而对两个应用的授权信息分别为：
-
-```json
-"wxleanoffice": {
-  "access_token": "officetoken",
-  "openid": "officeopenid",
-  "expires_in": 1384686496
-},
-"wxleansupport": {
-  "openid": "supportopenid",
-  "access_token": "supporttoken",
-  "expires_in": 1384686496
-}
-```
-
-现在，用户 A 在「云服务通讯」中通过微信登录，其调用请求为：
-
-```swift
-let thirdPartyData: [String: Any] = [
-    "access_token": "officetoken",
-    "expires_in": 1384686496,
-    "uid": "officeopenid",
-    "scope": "SCOPE",
-    "unionid": "unionid4a" // 新增属性
-]
-let user = LCUser()
-user.logIn(
-    authData: thirdPartyData,
-    platform: .custom("wxleanoffice"),
-    unionID: thirdPartyData["unionid"] as? String,
-    unionIDPlatform: .weixin,   // 这里指定 UnionIdPlatform，使用「weixin」来指代微信平台。
-    options: [.mainAccount])
-{ (result) in
-    switch result {
-    case .success:
-        assert(user.objectId != nil)
-    case .failure(error: let error):
-        print(error)
-    }
-}
-```
-
-> 注意代码中将微信传回来的 openid 属性改为了 uid，这是因为云端要求对于自定义的 platform，只能使用 uid 这样的属性名，才能保证自动建立 `authData.<PLATFORM>.uid` 的唯一索引，具体可以参考《数据存储 REST API 使用详解》的《连接用户账户和第三方平台》。
-
-如果用户 A 是第一次在「云服务通讯」中通过微信登录，那么 _User 表中会增加一个新用户（假设其 objectId 为 `ThisIsUserA`），其 `authData` 的结果如下：
-
-```json
-{
-  "wxleanoffice": {
-    "platform": "weixin",
-    "uid": "officeopenid",
-    "expires_in": 1384686496,
-    "main_account": true,
-    "access_token": "officetoken",
-    "unionid": "unionid4a"
-  },
-  "_weixin_unionid": {   // 新增键值对
-    "uid": "unionid4a"
-  }
-}
-```
-
-可以看到，与之前的第三方登录 API 相比，这里由于登录时指定了 `asMainAccount` 为 true，所以 authData 的第一级子目录中增加了 `_weixin_unionid` 的键值对，这里的 `weixin` 就是我们指定的 `unionIdPlatform` 的值。`_weixin_unionid` 这个增加的键值对非常重要，以后我们判断是否存在同样 UnionID 的账户就是依靠它来查找的，而是否增加这个键值对，则是由登录时指定的 `asMainAccount` 的值决定的：
-
-- 当 `asMainAccount` 为 true 时，云端会在 `authData` 下面增加名为 `_{unionIdPlatform}_unionid` 的键值对，当前账号就会作为这一个 UnionID 对应的主账号被唯一确定。
-- 当 `asMainAccount` 为 false 时，云端不会在 `authData` 下面增加名为 `_{unionIdPlatform}_unionid` 的键值对，此时如果通过提供的 UnionID 可以找到主账号，则会将当前的鉴权信息合并进主账号的 `authData` 属性里，同时返回主账号对应的 _User 表记录；如果通过提供的 UnionID 找不到主账号，则会根据平台的 `openid` 去查找账户，找到匹配的账户就返回匹配的，找不到就新建一个账户，此时的处理逻辑与不使用 UnionID 时的逻辑完全一致。
-
-接下来，用户 A 继续在「云服务技术支持」中进行微信登录，其登录逻辑为：
-
-```swift
-let thirdPartyData: [String: Any] = [
-    "access_token": "supporttoken",
-    "expires_in": 1384686496,
-    "uid": "supportopenid",
-    "scope": "SCOPE",
-    "unionid": "unionid4a"
-]
-let user = LCUser()
-user.logIn(
-    authData: thirdPartyData,
-    platform: .custom("wxleansupport"),
-    unionID: thirdPartyData["unionid"] as? String,
-    unionIDPlatform: .weixin,  // 这里指定 unionIdPlatform，使用「weixin」来指代微信平台。
-    options: [.mainAccount])
-{ (result) in
-    switch result {
-    case .success:
-        assert(user.objectId != nil)
-    case .failure(error: let error):
-        print(error)
-    }
-}
-```
-
-与「云服务通讯」中的登录过程相比，在「云服务技术支持」这个应用中，我们在登录时只是将 `asMainAccount` 设为了 false。 这时我们看到，本次登录得到的还是 objectId 为 `ThisIsUserA` 的 _User 表记录（同一个账户），同时该账户的 `authData` 属性中发生了变化，多了 `wxleansupport` 的数据，如下：
-
-```json
-{
-  "wxleanoffice": {
-    "platform": "weixin",
-    "uid": "officeopenid",
-    "expires_in": 1384686496,
-    "main_account": true,
-    "access_token": "officetoken",
-    "unionid": "unionid4a"
-  },
-  "_weixin_unionid": {
-    "uid": "unionid4a"
-  },
-  "wxleansupport": {
-    "platform": "weixin",
-    "uid": "supportopenid",
-    "expires_in": 1384686496,
-    "main_account": false,
-    "access_token": "supporttoken",
-    "unionid": "unionid4a"
-  }
-}
-```
-
-在新的登录方式中，当一个用户以「平台名为 `wxleanoffice`、uid 为 `officeopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息登录得到新的 `LCUser` 后，接下来这个用户以「平台名为 `wxleansupport`、uid 为 `supportopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息登录时，云端判定是同样的 UnionID，就直接把来自 `wxleansupport` 的新用户数据加入到已有账户的 `authData` 里了，不会再创建新的账户。
-
-这样一来，云端通过识别平台性的用户唯一标识 UnionID，让来自同一个 UnionID 体系内的应用程序、小程序等不同平台的用户都绑定到了一个 `LCUser` 上，实现互通。
-
-##### 为 UnionID 建立索引
-
-云端会为 UnionID 自动建立索引，不过因为自动创建基于请求的抽样统计，可能会滞后。
-因此，我们推荐自行创建相关索引，特别是用户量（`_User`　表记录数）很大的应用，更需要预先创建索引，否则用户使用 UnionID 账号登录时可能超时失败。
-以上面的微信 UnionID 为例，建议在控制台预先创建下列唯一索引（允许缺失值）：
-
-- `authData.wxleanoffice.uid`
-- `authData.wxleansupport.uid`
-- `authData._weixin_unionid.uid`
-
-##### 该如何指定 unionIdPlatform
-
-从上面的例子可以看出，使用 UnionID 登录的时候，需要指定 `unionIdPlatform` 的主要目的，就是为了便于查找已经存在的唯一主账号。云端会在主账号对应账户的 `authData` 属性中增加一个 `_{unionIdPlatform}_unionid` 键值对来标记唯一性，终端用户在其他应用中登录的时候，云端会根据参数中提供的 `uniondId` + `unionIdPlatform` 的组合，在 `_User` 表中进行查找，这样来确定唯一的既存主账号。
-
-本来 `unionIdPlatform` 的取值，应该是开发者可以自行决定的，但是 JavaScript SDK 基于易用性的目的，在 `loginWithAuthDataAndUnionId` 之外，还额外提供了两个接口：
-
-- `AV.User.loginWithQQAppWithUnionId`，这里默认使用 `qq` 作为 `unionIdPlatform`。
-- `AV.User.loginWithWeappWithUnionId`，这里默认使用 `weixin` 作为 `unionIdPlatform`。
-
-从我们的统计来看，这两个接口已经被很多开发者接受，在大量线上产品中产生着实际数据。所以为了避免数据在不同平台（例如 Android 和 iOS 应用）间发生冲突，建议大家统一按照 JavaScript SDK 的默认值来设置 `unionIdPlatform`，即：
-
-- 微信平台的多个应用，统一使用 `weixin` 作为 `unionIdPlatform`；
-- QQ 平台的多个应用，统一使用 `qq` 作为 `unionIdPlatform`；
-- 微博平台的多个应用，统一使用 `weibo` 作为 `unionIdPlatform`；
-- 除此之外的其他平台，开发者可以自行定义 `unionIdPlatform` 的名字，只要自己保证多个应用间统一即可。
-
-##### 主副应用不同登录顺序出现的不同结果
-
-上面的流程是用户先登录了「云服务通讯」这个主应用，然后再登录「云服务技术支持」这个副应用，所以账号都被通过 UnionID 有效关联起来了。可能有人会想到另外一个问题，如果用户 B 先登录副应用，后登录主应用，这时候会发生什么事情呢？
-
-用户 B 首先登录副应用的时候，提供了「平台名为 `wxleansupport`、uid 为 `supportopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息，并且指定「UnionIDPlatform 为 `weixin`、`asMainAccount` 为 false」（与上面的调用完全一致），此时云端由于找不到存在的 UnionID，会新建一个 `LCUser` 对象，该账户 `authData` 结果为：
-
-```json
-{
-  "wxleansupport": {
-    "platform": "weixin",
-    "uid": "supportopenid",
-    "expires_in": 1384686496,
-    "main_account": false,
-    "access_token": "supporttoken",
-    "unionid": "unionid4a"
-  }
-}
-```
-
-用户 B 接着又使用了主应用，ta 再次通过微信登录，此时以「平台名为 `wxleanoffice`、uid 为 `officeopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息，以及「UnionIDPlatform 为 `weixin`、`asMainAccount` 为 true」的参数进行登录，此时云端由于找不到存在的 UnionID，会再次新建一个 `LCUser` 对象，该账户 `authData` 结果为：
-
-```json
-{
-  "wxleanoffice": {
-    "platform": "weixin",
-    "uid": "officeopenid",
-    "expires_in": 1384686496,
-    "main_account": true,
-    "access_token": "officetoken",
-    "unionid": "unionid4a"
-  },
-  "_weixin_unionid": {
-    "uid": "unionid4a"
-  }
-}
-```
-
-还有更复杂的情况。如果某公司的产品之前就接入了微信登录，产生了很多存量用户，并且分散在不同的子产品中，这时候怎么办？我们接下来专门讨论此时的解决方案。
-
-##### 存量账户如何通过 UnionID 实现关联
-
-还是以我们的两个子产品「云服务通讯」（后续以「产品 1」指代）和「云服务技术支持为例」（后续以「产品 2」指代），在接入 UnionID 之前，我们就接入了之前版本的微信平台登录，这时候账户系统内可能存在多种账户：
-
-- 只使用产品 1 的微信用户 A
-- 只使用产品 2 的微信用户 B
-- 同时使用两个产品的微信用户 C
-
-此时的存量账户表如下所示：
-
-objectId | 微信用户 | authData.{platform} | authData._{platform}_unionid
------- | ------ | ------ | ------
-1 | UserA | openid1（对应产品 1） | N/A
-2 | UserB | openid2（对应产品 2） | N/A
-3 | UserC | openid3（对应产品 1） | N/A
-4 | UserC | openid4（对应产品 2） | N/A
-
-现在我们对两个子产品进行升级，接入 UnionID 体系。这时因为已经有同一个微信用户在不同子产品中创建了不同的账户（例如 objectId 为 3 和 4 的账户），我们需要确定以哪个平台的账号为主。比如决定使用「云服务通讯」上生成的账号为主账号，则在该应用程序更新版本时，使用 `asMainAccount=true` 参数。这个应用带着 UnionID 登录匹配或创建的账号将作为主账号，之后所有这个 UnionID 的登录都会匹配到这个账号。请注意这时 `_User` 表里会剩下一些用户数据，也就是没有被选为主账号的、其他平台的同一个用户的旧账号数据（例如 objectId 为 2 和 4 的账户）。这部分数据会继续服务于已经发布的但仍然使用 OpenID 登录的旧版应用。
-
-接下来我们看一下，如果以产品 1 的账户作为「主账户」，按照前述的方式同时提供 openid/unionid 完成登录，则最后达到的结果是：
-
-1. 使用老版本的用户，不管在哪个产品里面，都可以和往常一样通过 openid 登录到正确的账户；
-2. 使用产品 1 的新版本的老用户，通过 openid/unionid 组合，还是绑定到原来的账户。例如 UserC 在产品 1 中通过 openid3/unionId3 还是会绑定到 objectId=3 的账户（会增加 uniondId 记录）；而 UserC 在产品 2 的新版本中，通过 openid4/unionId3 的组合则会绑定到 objectId=3 的账户，而不再是原来的 objectId=4 的账户。
-3. 使用产品 1 的新版本的新用户，通过 openid/unionid 组合，会创建新的账户；之后该用户再使用产品 2 的新版本，也会绑定到刚才创建的新账户上。
-
-以上面的三个用户为例，他们分别升级到两个产品的最新版，且最终都会启用两个产品，则账户表的最终结果如下：
-
-objectId | 微信用户 | authData.{platform} | authData._{platform}_unionid
------- | ------ | ------ | ------
-1 | UserA | openid1（对应产品 1）/openid6（对应产品 2） | unionId_user_A
-2 | UserB | openid2（对应产品 2） | N/A
-3 | UserC | openid3（对应产品 1）/openid4（对应产品 2） | unionId_user_C
-4 | UserC | openid4（对应产品 2） | N/A
-5 | UserB | openid5（对应产品 1）/openid2（对应产品 2） | unionId_user_B
-
-之后有新的用户 D，分别在两个产品的新版本中登录，则账户表中会增加一条新的 objectId=6 的记录，结果如下：
-
-objectId | 微信用户 | authData.{platform} | authData._{platform}_unionid
------- | ------ | ------ | ------
-1 | UserA | openid1（对应产品 1）/openid6（对应产品 2） | unionId_user_A
-2 | UserB | openid2（对应产品 2） | N/A
-3 | UserC | openid3（对应产品 1）/openid4（对应产品 2） | unionId_user_C
-4 | UserC | openid4（对应产品 2） | N/A
-5 | UserB | openid5（对应产品 1）/openid2（对应产品 2） | unionId_user_B
-6 | UserD | openid7（对应产品 1）/openid8（对应产品 2） | unionId_user_D
-
-如果之后我们增加了新的子产品 3，这些用户在子产品 3 中也进行微信登录的话，那么四个用户还是会继续绑定到 objectId 为 1/3/5/6 的主账户。此时账户表的结果会变为：
-
-objectId | 微信用户 | authData.{platform} | authData._{platform}_unionid
------- | ------ | ------ | ------
-1 | UserA | openid1（对应产品 1）/openid6（对应产品 2）/openid9（对应产品 3） | unionId_user_A
-2 | UserB | openid2（对应产品 2） | N/A
-3 | UserC | openid3（对应产品 1）/openid4（对应产品 2）/openid10（对应产品 3） | unionId_user_C
-4 | UserC | openid4（对应产品 2） | N/A
-5 | UserB | openid5（对应产品 1）/openid2（对应产品 2）/openid11（对应产品 3） | unionId_user_B
-6 | UserD | openid7（对应产品 1）/openid8（对应产品 2）/openid12（对应产品 3） | unionId_user_D
-
-### 匿名用户
-
-将数据与用户关联需要首先创建一个用户，但有时你不希望强制用户在一开始就进行注册。使用匿名用户，可以让应用不提供注册步骤也能创建用户。下面的代码创建一个新的匿名用户：
-
-可以像给普通用户设置属性那样给匿名用户设置 `username`、`password`、`email` 等属性，还可以通过走正常的注册流程来将匿名用户转化为普通用户。匿名用户能够：
-
-- [使用用户名和密码注册](#注册)
-- [关联第三方平台](#第三方账户登录)，比如微信
-
-下面的代码为一名匿名用户设置用户名和密码：
-
-下面的代码检查当前用户是否为匿名用户：
-
-如果匿名用户未能在登出前转化为普通用户，那么该用户将无法再次登录同一账户，且之前产生的数据也无法被取回。
+请参阅[内建账户指南](/sdk/authentication/guide/)。
 
 ## 角色
 
@@ -2825,19 +1827,41 @@ assert(student.save().isSuccess)
 
 SDK 提供了一个便利的选项，可以确保 `LCObject` 的属性的存取操作在多线程环境中是安全的，该选项默认为关闭，开启示例如下：
 
+<Conditional brand="leancloud">
+
 ```swift
 var config = LCApplication.Configuration()
 config.isObjectRawDataAtomic = true
 do {
     try LCApplication.default.set(
-        id: {{appid}},
-        key: {{appkey}},
-        serverURL: "https://please-replace-with-your-customized.domain.com"
+        id: your-app-id,
+        key: your-app-key,
+        serverURL: "https://your_server_url",
         configuration: config)
 } catch {
     print(error)
 }
 ```
+
+</Conditional>
+
+<Conditional brand="tds">
+
+```swift
+var config = LCApplication.Configuration()
+config.isObjectRawDataAtomic = true
+do {
+    try LCApplication.default.set(
+        id: your-client-id,
+        key: your-client-token,
+        serverURL: "https://your_server_url",
+        configuration: config)
+} catch {
+    print(error)
+}
+```
+
+</Conditional>  
 
 开启该选项后，每个 `LCObject` 实例对象的属性的存取操作都会被加锁。通常来说，锁以及加锁、解锁操作会有一定的开销，是否开启该选项需要开发者根据实际情况衡权利弊后决定。
 
@@ -2847,15 +1871,4 @@ do {
 
 ## 全文搜索
 
-全文搜索是一个针对应用数据进行全局搜索的接口，它基于搜索引擎构建，提供更强大的搜索功能。要深入了解其用法和阅读示例代码，请阅读 [全文搜索指南](app_search_guide.html)。
-
-## 应用内社交
-
-应用内社交包含「好友关系」及「信息流」，例如陌生人的关注、好友申请、朋友圈、状态等，请参考[好友关系开发指南](leanstorage_friendship_guide.html)及[社交信息流开发指南](status_system.html)。
-
-<!-- This code is for Google Ads -->
-<!-- Event snippet for conversion page of google Ads -->
-<!-- This code is not for Google Analytics but ads. Connect ycui if you have any questions. -->
-<script>
-  gtag('event', 'conversion', {'send_to': 'AW-1030743864/TDDfCJ_C8K8BELjOv-sD'});
-</script>
+全文搜索是一个针对应用数据进行全局搜索的接口，它基于搜索引擎构建，提供更强大的搜索功能。要深入了解其用法和阅读示例代码，请阅读 [全文搜索指南](/sdk/storage/guide/fulltext-search/)。
