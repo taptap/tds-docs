@@ -1,0 +1,1874 @@
+---
+title: 数据存储开发指南 · Swift
+sidebar_label: Swift 开发指南
+slug: /sdk/storage/guide/swift/
+sidebar_position: 2
+---
+
+数据存储是云服务提供的核心功能之一，可用于存放和查询应用数据。下面的代码展示了如何创建一个对象并将其存入云端：
+
+```swift
+do {
+    // 构建对象
+    let todo = LCObject(className: "Todo")
+
+    // 为属性赋值
+    try todo.set("title",   value: "工程师周会")
+    try todo.set("content", value: "周二两点，全体成员")
+
+    // 将对象保存到云端
+    _ = todo.save { result in
+        switch result {
+        case .success:
+            // 成功保存之后，执行其他逻辑
+            break
+        case .failure(error: let error):
+            // 异常处理
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
+
+我们为各个平台或者语言开发的 SDK 在底层都是通过 HTTPS 协议调用统一的 REST API，提供完整的接口对数据进行各类操作。
+
+## SDK 安装与初始化
+
+请阅读 [Swift 安装指南](/sdk/storage/guide/setup-swift/)。
+
+## 对象
+
+### `LCObject`
+
+`LCObject` 是云服务对复杂对象的封装，每个 `LCObject` 包含若干与 JSON 格式兼容的属性值对（也称键值对，key-value pairs）。这个数据是无模式化的（schema free），意味着你不需要提前标注每个 `LCObject` 上有哪些 key，你只需要随意设置键值对就可以，云端会保存它。
+
+比如说，一个保存着单个 Todo 的 `LCObject` 可能包含如下数据：
+
+```json
+title:      "给小林发邮件确认会议时间",
+isComplete: false,
+priority:   2,
+tags:       ["工作", "销售"]
+```
+
+### 数据类型
+
+`LCObject` 支持的数据类型包括 `String`、`Number`、`Boolean`、`Object`、`Array`、`Date` 等等。你可以通过嵌套的方式在 `Object` 或 `Array` 里面存储更加结构化的数据。
+
+`LCObject` 还支持两种特殊的数据类型 `Pointer` 和 `File`，可以分别用来存储指向其他 `LCObject` 的指针以及二进制数据。
+
+`LCObject` 同时支持 `GeoPoint`，可以用来存储地理位置信息。参见 [GeoPoint](#geopoint)。
+
+以下是一些示例：
+
+```swift
+/* 所有的 LC 数据类型都遵循 LCValue 协议，即它们也都是 LCValue 类型 */
+
+// 构建 LC 基础类型
+let number       : LCNumber       = LCNumber(42)
+let bool         : LCBool         = LCBool(true)
+let string       : LCString       = LCString("foo")
+let dictionary   : LCDictionary   = LCDictionary(["name": string, "count": number])
+let array        : LCArray        = LCArray([number, bool, string])
+let emptyData    : LCData         = LCData(Data())
+let currentDate  : LCDate         = LCDate(Date())
+let null         : LCNull         = LCNull()
+let geoPoint     : LCGeoPoint     = LCGeoPoint(latitude: 45, longitude: -45)
+let acl          : LCACL          = LCACL()
+
+// LC 基础类型转换为 Swift 标准数据类型
+let swiftInt:        Int?              = number.intValue
+let swiftDouble:     Double            = number.value
+let swiftBool:       Bool              = bool.value
+let swiftString:     String            = string.value
+let swiftDictionary: [String: LCValue] = dictionary.value
+let swiftArray:      [LCValue]         = array.value
+
+// 构建 LC 对象类型
+let object       : LCObject       = LCObject()
+let relation     : LCRelation     = object.relationForKey("elements") // LCRelation 没有继承 LCObject
+let user         : LCUser         = LCUser()
+let file         : LCFile         = LCFile()
+let installation : LCInstallation = LCInstallation()
+
+/* LC 对象类型的 Setter 方法 */
+
+// 1. 调用 set(_:value:) 函数，此方式会检查 value 是否有效
+do {
+    try object.set("number", value: 42)
+    try object.set("number", value: LCNumber(42))
+} catch {
+    print(error)
+}
+
+// 2. subscript 方式，此方式不会检查 value 是否有效
+object["number"] = 42.lcValue
+object["number"] = LCNumber(42)
+
+/* LC 对象类型的 Getter 方法 */
+
+// 1. 调用 get(_:) 函数
+let getNumber1: LCNumber? = object.get("number") as? LCNumber
+
+// 2. subscript 方式
+let getNumber2: LCNumber? = object["number"] as? LCNumber
+```
+
+我们不推荐通过 `LCData` 在 `LCObject` 里面存储图片、文档等大型二进制数据。每个 `LCObject` 的大小不应超过 **128 KB**。如需存储大型文件，可创建 `LCFile` 实例并将将其关联到 `LCObject` 的某个属性上。参见 [文件](#文件)。
+
+注意：时间类型在云端将会以 UTC 时间格式存储，但是客户端在读取之后会转化成本地时间。
+
+**<Path to="storage" /> > 结构化数据** 中展示的日期数据也会依据操作系统的时区进行转换。一个例外是当你通过 REST API 获得数据时，这些数据将以 UTC 呈现。你可以手动对它们进行转换。
+
+若想了解云服务是如何保护应用数据的，请阅读[数据和安全](/sdk/storage/guide/security/)。
+
+#### 基础类型数据的构建与转换
+
+`LCObject` 无法直接支持 Swift 语言的基础数据类型，例如 `Int`、`Double`、`String`、`Bool`、`Array`、`Dictionary` 等等。
+相对的，SDK 提供了 `LCNumber`、`LCString`、`LCBool`、`LCArray`、`LCDictionary` 等类型，来支持 `LCObject` 与 Swift 语言的交互。
+
+##### LCNumber
+
+`LCObject` 对象中的数字均为 `LCNumber` 类型。`LCNumber` 的构建方法如下：
+
+```swift
+let intNum: LCNumber = LCNumber(1)
+let doubleNum: LCNumber = LCNumber(0.1)
+```
+
+Swift 语言的数字类型也可以与 `LCNumber` 进行相互转换：
+
+```swift
+let intNum: LCNumber = 1.lcNumber
+let int: Int? = intNum.intValue
+let doubleNum: LCNumber = 0.1.lcNumber
+let double: Double? = doubleNum.doubleValue
+```
+
+另外，`LCObject` 也支持隐式的将 Swift 语言的数字类型自动转换为 `LCNumber`：
+
+```swift
+let object = LCObject()
+// set 方法会自动将 1 以及 0.1 转换为 LCNumber
+try object.set("int", value: 1)
+try object.set("double", value: 0.1)
+```
+
+##### LCBool
+
+`LCObject` 对象中的布尔值为 `LCBool` 类型。`LCBool` 的构建方法如下：
+
+```swift
+let lcBool: LCBool = LCBool(true)
+```
+
+Swift 语言的布尔值也可以与 `LCBool` 进行相互转换：
+
+```swift
+let lcBool: LCBool = LCBool(true)
+let bool: Bool? = lcBool.boolValue
+```
+
+另外，`LCObject` 也支持隐式的将 Swift 语言的布尔值自动转换为 `LCBool`：
+
+```swift
+let object = LCObject()
+// set 方法会自动将 true 转换为 LCBool
+try object.set("bool", value: true)
+```
+
+##### LCString
+
+`LCObject` 对象中的字符串为 `LCString` 类型。`LCString` 的构建方法如下：
+
+```swift
+let lcString: LCString = LCString("string")
+```
+
+Swift 语言的字符串也可以与 `LCString` 进行相互转换：
+
+```swift
+let lcString: LCString = LCString("string")
+let string: String? = lcString.stringValue
+```
+
+另外，`LCObject` 也支持隐式的将 Swift 语言的字符串自动转换为 `LCString`：
+
+```swift
+let object = LCObject()
+// set 方法会自动将 "stringValue" 转换为 LCString
+try object.set("string", value: "stringValue")
+```
+
+##### LCArray
+
+`LCObject` 对象中的数组为 `LCArray` 类型。`LCArray` 的构建方法如下：
+
+```swift
+let lcArray: LCArray = LCArray([1, "string"])
+```
+
+Swift 语言的数组也可以与 `LCArray` 进行相互转换：
+
+```swift
+let lcArray: LCArray = LCArray([1, "string"])
+let array: Array? = lcArray.arrayValue
+```
+
+**注意**，`LCObject` 不支持隐式的将 Swift 语言的数组自动转换为 `LCArray`，所以需要显式的设置：
+
+```swift
+let object = LCObject()
+// value 需显式的指定为 LCArray 类型
+try object.set("array", value: LCArray([1, "string"]))
+```
+
+##### LCDictionary
+
+`LCObject` 对象中的字典为 `LCDictionary` 类型。`LCDictionary` 的构建方法如下：
+
+```swift
+let lcDictionary: LCDictionary = LCDictionary([
+    "key1" : 1,
+    "key2" : true,
+    "key3" : "string",
+])
+```
+
+Swift 语言的字典也可以与 `LCDictionary` 进行相互转换：
+
+```swift
+let lcDictionary: LCDictionary = LCDictionary([
+    "key1" : 1,
+    "key2" : true,
+    "key3" : "string",
+])
+let dictionary: Dictionary? = lcDictionary.dictionaryValue
+```
+
+**注意**，`LCObject` 不支持隐式的将 Swift 语言的字典自动转换为 `LCDictionary`，所以需要显式的设置：
+
+```swift
+let object = LCObject()
+// value 需显式的指定为 LCDictionary 类型
+try object.set("dictionary", value: LCDictionary([
+    "key1" : 1,
+    "key2" : true,
+    "key3" : "string",
+]))
+```
+
+另外，`LCDictionary` 类型自身也支持更新操作：
+
+```swift
+let lcDictionary: LCDictionary = LCDictionary([
+    "key1" : 1,
+    "key2" : true,
+    "key3" : "string",
+])
+// value 需为 LCValue 类型
+lcDictionary.set("key1", LCNumber(2))
+lcDictionary.set("key2", false.lcBool)
+```
+
+##### LCData
+
+`LCObject` 对象中的二进制数据为 `LCData` 类型。`LCData` 的构建方法如下：
+
+```swift
+let emptyData = Data()
+let lcData: LCData = LCData(emptyData)
+```
+
+Swift 语言的二进制数据也可以与 `LCData` 进行相互转换：
+
+```swift
+let emptyData = Data()
+let lcData: LCData = LCData(emptyData)
+let data: Data? = lcData.dataValue
+```
+
+另外，`LCObject` 也支持隐式的将 Swift 语言的二进制数据自动转换为 `LCData`：
+
+```swift
+let emptyData = Data()
+let object = LCObject()
+// set 方法会自动将 emptyData 转换为 LCData
+try object.set("data", value: emptyData)
+```
+
+##### LCDate
+
+`LCObject` 对象中的时间数据为 `LCDate` 类型。`LCDate` 的构建方法如下：
+
+```swift
+let currentDate = Date()
+let lcDate = LCDate(currentDate)
+```
+
+Swift 语言的时间数据也可以与 `LCDate` 进行相互转换：
+
+```swift
+let currentDate = Date()
+let lcDate = LCDate(currentDate)
+let date: Date? = lcDate.dateValue
+```
+
+另外，`LCObject` 也支持隐式的将 Swift 语言的时间数据自动转换为 `LCDate`：
+
+```swift
+let currentDate = Date()
+let object = LCObject()
+// set 方法会自动将 currentDate 转换为 LCDate
+try object.set("date", value: currentDate)
+```
+
+### 构建对象
+
+下面的代码构建了一个 class 为 `Todo` 的 `LCObject`：
+
+```swift
+let todo = LCObject(className: "Todo")
+```
+
+在构建对象时，为了使云端知道对象属于哪个 class，需要将 class 的名字作为参数传入。你可以将云服务里面的 class 比作关系型数据库里面的表。一个 class 的名字必须以字母开头，且只能包含数字、字母和下划线。
+
+### 保存对象
+
+下面的代码将一个 class 为 `Todo` 的对象存入云端：
+
+```swift
+do {
+    // 构建对象
+    let todo = LCObject(className: "Todo")
+
+    // 为属性赋值
+    try todo.set("title", value: "马拉松报名")
+    try todo.set("priority", value: 2)
+
+    // 将对象保存到云端
+    _ = todo.save { result in
+        switch result {
+        case .success:
+            // 成功保存之后，执行其他逻辑
+            break
+        case .failure(error: let error):
+            // 异常处理
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
+
+为了确认对象已经保存成功，我们可以到 **<Path to="storage" /> > 结构化数据 > `Todo`** 里面看一下，应该会有一行新的数据产生。点一下这个数据的 `objectId`，应该能看到类似这样的内容：
+
+```json
+{
+  "title":     "马拉松报名",
+  "priority":  2,
+  "ACL": {
+    "*": {
+      "read":  true,
+      "write": true
+    }
+  },
+  "objectId":  "582570f38ac247004f39c24b",
+  "createdAt": "2017-11-11T07:19:15.549Z",
+  "updatedAt": "2017-11-11T07:19:15.549Z"
+}
+```
+
+注意，无需在 **<Path to="storage" /> > 结构化数据** 里面创建新的 `Todo` class 即可运行前面的代码。如果 class 不存在，它将自动创建。
+
+以下是一些对象的内置属性，会在对象保存时自动创建，无需手动指定：
+
+内置属性 | 类型 | 描述
+--- | --- | ---
+`objectId` | `LCString` | 该对象唯一的 ID 标识。
+`ACL` | `LCACL` | 该对象的权限控制，实际上是一个 JSON 对象，控制台做了展现优化。
+`createdAt` | `LCDate` | 该对象被创建的时间。
+`updatedAt` | `LCDate` | 该对象最后一次被修改的时间。
+
+这些属性的值会在对象被存入云端时自动填入，代码中尚未保存的 `LCObject` 不存在这些属性。
+
+属性名（**keys**）只能包含字母、数字和下划线。自定义属性不得以双下划线（`__`）开头或与任何系统保留字段和内置属性（`ACL`、`className`、`createdAt`、`objectId` 和 `updatedAt`）重名，无论大小写。
+
+属性值（**values**）可以是字符串、数字、布尔值、数组或字典（任何能以 JSON 编码的数据）。参见 [数据类型](#数据类型)。
+
+我们推荐使用驼峰式命名法（CamelCase）为类和属性来取名。类，采用大驼峰法，如 `CustomData`。属性，采用小驼峰法，如 `imageUrl`。
+
+### 获取对象
+
+对于已经保存到云端的 `LCObject`，可以通过它的 `objectId` 将其取回：
+
+```swift
+let query = LCQuery(className: "Todo")
+let _ = query.get("582570f38ac247004f39c24b") { (result) in
+    switch result {
+    case .success(object: let todo):
+        // todo 就是 objectId 为 582570f38ac247004f39c24b 的 Todo 实例
+        let title     = todo.get("title")
+        let priority  = todo.get("priority")
+
+        // 获取内置属性
+        let objectId  = todo.objectId
+        let updatedAt = todo.updatedAt
+        let createdAt = todo.createdAt
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+对象拿到之后，可以通过 `get` 方法来获取各个属性的值。注意 `objectId`、`updatedAt`和`createdAt` 这三个内置属性不能通过 `get` 获取或通过 `set` 修改，只能由云端自动进行填充。尚未保存的 `LCObject` 不存在这些属性。
+
+如果你试图获取一个不存在的属性，SDK 不会报错，而是会返回 `nil`。
+
+#### 同步对象
+
+当云端数据发生更改时，你可以调用 `fetch` 方法来刷新对象，使之与云端数据同步：
+
+```swift
+let todo = LCObject(className: "Todo", objectId: "582570f38ac247004f39c24b")
+_ = todo.fetch { result in
+    switch result {
+    case .success:
+        // todo 已刷新
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+刷新操作会强行使用云端的属性值覆盖本地的属性。因此如果本地有属性修改，**`fetch` 操作会丢弃这些修改**。为避免这种情况，你可以在刷新时指定 **需要刷新的属性**，这样只有指定的属性会被刷新（包括内置属性 `objectId`、`createdAt` 和 `updatedAt`），其他属性不受影响。
+
+```swift
+let todo = LCObject(className: "Todo", objectId: "582570f38ac247004f39c24b")
+todo.fetch(keys: ["priority", "location"]) { (result) in
+    switch result {
+    case .success:
+        // 只有 priority 和 location 会被获取和刷新
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+### 更新对象
+
+要更新一个对象，只需指定需要更新的属性名和属性值，然后调用 `save` 方法。例如：
+
+```swift
+do {
+    let todo = LCObject(className: "Todo", objectId: "582570f38ac247004f39c24b")
+    try todo.set("content", value: "这周周会改到周三下午三点。")
+    todo.save { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
+
+云服务会自动识别需要更新的属性并将对应的数据发往云端，未更新的属性会保持原样。
+
+#### 有条件更新对象
+
+通过传入 `query` 选项，可以按照指定条件去更新对象——当条件满足时，执行更新；条件不满足时，不执行更新并返回 `305` 错误。
+
+例如，用户的账户表 `Account` 有一个余额字段 `balance`，同时有多个请求要修改该字段值。为避免余额出现负值，只有当金额小于或等于余额的时候才能接受请求：
+
+```swift
+do {
+    let account = LCObject(className: "Account", objectId: "5745557f71cfe40068c6abe0")
+    // 对 balance 原子减少 100
+    let amount = -100
+    try account.increase("balance", by: amount)
+    // 设置条件
+    let query = LCQuery(className: "Account")
+    query.whereKey("balance", .greaterThanOrEqualTo(-amount))
+    let options: [LCObject.SaveOption] = [
+        .query(query),
+        // 操作结束后，返回最新数据。
+        // 如果是新对象，则所有属性都会被返回，
+        // 否则只有更新的属性会被返回。
+        .fetchWhenSave
+    ]
+    account.save(options: options) { (result) in
+        switch result {
+        case .success:
+            if let balance = account["balance"] {
+                print("当前余额为：\(balance)")
+            }
+        case .failure(error: let error):
+            if error.code == 305 {
+                print("余额不足，操作失败！")
+            }
+        }
+    }
+} catch {
+    print(error)
+}
+```
+
+**`query` 选项只对已存在的对象有效**，不适用于尚未存入云端的对象。
+
+`query` 选项在有多个客户端需要更新同一属性的时候非常有用。相比于通过 `LCQuery` 查询 `LCObject` 再对其进行更新的方法，这样做更加简洁，并且能够避免出现差错。
+
+#### 更新计数器
+
+设想我们正在开发一个微博，需要统计一条微博有多少个赞和多少次转发。由于赞和转发的操作可能由多个客户端同时进行，直接在本地更新数字并保存到云端的做法极有可能导致差错。为保证计数的准确性，可以通过 **原子操作** 来增加或减少一个属性内保存的数字：
+
+```swift
+try post.increase("likes", by: 1)
+```
+
+可以指定需要增加或减少的值。若未指定，则默认使用 `1`。
+
+注意，虽然原子增减支持浮点数，但因为底层数据库的浮点数存储格式限制，会有舍入误差。
+因此，需要原子增减的字段建议使用整数以避免误差，例如 `3.14` 可以存储为 `314`，然后在客户端进行相应的转换。
+否则，以比较大小为条件查询对象的时候，需要特殊处理，
+`< a` 需改查 `< a + e`，`> a` 需改查 `> a - e`，`== a` 需改查 `> a - e` 且 `< a + e`，其中 `e` 为误差范围，据所需精度取值，比如 `0.0001`。
+
+#### 更新数组
+
+更新数组也是原子操作。使用以下方法可以方便地维护数组类型的数据：
+
+- `append(String, element: LCValue)`<br/>将指定对象附加到数组末尾。
+- `append(String, element: LCValue, unique: Bool)`<br/>将指定对象附加到数组末尾，并且可以设置一个 `unique` 的 `bool` 值表示只是确保唯一，不会重复添加。
+- `append(String, elements: [LCValue])`<br/>将指定对象数组附加到数组末尾。
+- `append(String, elements: [LCValue], unique: Bool)`<br/>将指定对象数组附加到数组末尾，并且可以设置一个 `unique` 的 `bool` 值表示只是确保唯一，不会重复添加。
+- `remove(String, element: LCValue)`<br/>从数组字段中删除指定对象的所有实例。
+- `remove(String, elements: [LCValue])`<br/>从数组对象中删除指定数组中的所有对象。
+
+例如，`Todo` 用一个 `alarms` 属性保存所有闹钟的时间。下面的代码将多个时间加入这个属性：
+
+```swift
+func dateWithString(_ string: String) -> LCDate {
+    let dateFormatter = DateFormatter()
+
+    dateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+    dateFormatter.locale = Locale(identifier: "en_US_POSIX")
+
+    let date = LCDate(dateFormatter.date(from: string)!)
+
+    return date
+}
+
+func testSetArray() {
+    do {
+        let todo = LCObject(className: "Todo")
+
+        let reminder1 = dateWithString("2018-04-30 07:10:00")
+        let reminder2 = dateWithString("2018-04-30 07:20:00")
+
+        try todo.set("reminders", value: [reminder1, reminder2])
+
+        let result = todo.save()
+        assert(result.isSuccess)
+
+        let reminder3 = dateWithString("2018-04-30 07:30:00")
+
+        try todo.append("reminders", element: reminder3, unique: true)
+
+        _ = todo.save { result in
+            switch result {
+            case .success:
+                break
+            case .failure(error: let error):
+                print(error)
+            }
+        }
+    } catch {
+        print(error)
+    }
+}
+```
+
+### 删除对象
+
+下面的代码从云端删除一个 `Todo` 对象；
+
+```swift
+let todo = LCObject(className: "Todo", objectId: "582570f38ac247004f39c24b")
+_ = todo.delete { result in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+注意，删除对象是一个较为敏感的操作，我们建议你阅读[ACL 权限管理开发指南](/sdk/storage/guide/acl/)来了解潜在的风险。熟悉 class 级别、对象级别和字段级别的权限可以帮助你有效阻止未经授权的操作。
+
+### 批量操作
+
+可以在一次请求中包含多个构建、保存、删除和同步对象的操作：
+
+```swift
+// 创建一个保存所有 LCObject 的数组
+let objects: [LCObject] = []
+
+// 批量构建和更新
+_ = LCObject.save(objects, completion: { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+})
+
+// 批量删除
+_ = LCObject.delete(objects, completion: { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+})
+
+// 批量同步
+_ = LCObject.fetch(objects, completion: { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+})
+```
+
+下面的代码将所有 `Todo` 的 `isComplete` 设为 `true`：
+
+```swift
+let query = LCQuery(className: "Todo")
+_ = query.find { (result) in
+    switch result {
+    case .success(objects: let todos):
+        // 获取需要更新的 todo
+        for todo in todos {
+            do {
+                // 更新属性值
+                try todo.set("isComplete", value: true)
+            } catch {
+                print(error)
+            }
+        }
+        // 批量更新
+        let _ = LCObject.save(todos, completion: { (result) in
+            switch result {
+            case .success:
+                break
+            case .failure(error: let error):
+                print(error)
+            }
+        })
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+虽然上述方法可以在一次请求中包含多个操作，每一个分别的保存或同步操作在计费时依然会被算作一次请求，而所有的删除操作则会被合并为一次请求。
+
+### 后台运行
+
+细心的开发者已经发现，在所有的示例代码中几乎都是用了异步来访问云端，形如下面的用法都是提供给开发者在主线程调用用以实现后台运行的方法，因此开发者在主线程可以放心地调用这种命名方式的函数。
+
+```swift
+let todo = LCObject(className: "Todo")
+
+_ = todo.save { result in
+    switch result {
+    case .success:
+        break
+    case .failure(let error):
+        print(error)
+    }
+}
+```
+
+### 数据模型
+
+对象之间可以产生关联。拿一个博客应用来说，一个 `Post` 对象可以与许多个 `Comment` 对象产生关联。云服务支持三种关系：一对一、一对多、多对多。
+
+#### 一对一、一对多关系
+
+一对一、一对多关系可以通过将 `LCObject` 保存为另一个对象的属性值的方式产生。比如说，让博客应用中的一个 `Comment` 指向一个 `Post`。
+
+下面的代码会创建一个含有单个 `Comment` 的 `Post`：
+
+```swift
+do {
+    // 创建 post
+    let post = LCObject(className: "Post")
+    try post.set("title", value: "饿了……")
+    try post.set("content", value: "中午去哪吃呢？")
+
+    // 创建 comment
+    let comment = LCObject(className: "Comment")
+    try comment.set("content", value: "当然是肯德基啦！")
+
+    // 将 post 设为 comment 的一个属性值
+    try comment.set("parent", value: post)
+
+    // 保存 comment 会同时保存 post
+    assert(comment.save().isSuccess)
+} catch {
+    print(error)
+}
+```
+
+云端存储时，会将被指向的对象用 `Pointer` 的形式存起来。你也可以用 `objectId` 来指向一个对象：
+
+```swift
+let post = LCObject(className: "Post", objectId: "57328ca079bc44005c2472d0")
+try comment.set("post", value: post)
+```
+
+请参阅 [关系查询](#关系查询) 来了解如何获取关联的对象。
+
+#### 多对多关系
+
+想要建立多对多关系，最简单的办法就是使用 **数组**。在大多数情况下，使用数组可以有效减少查询的次数，提升程序的运行效率。
+但如果有额外的属性需要附着于两个 class 之间的关联，那么使用 **中间表** 可能是更好的方式。
+注意这里说到的额外的属性是用来描述 class 之间的关系的，而不是任何单一的 class 的。
+
+我们建议你在任何一个 class 的对象数量超出 100 的时候考虑使用中间表。
+
+### 序列化和反序列化
+
+在实际的开发中，把 `LCObject` 当作参数传递的时候，会涉及到复杂对象的拷贝的问题，因此 `LCObject` 也提供了序列化和反序列化的方法。
+
+序列化：
+
+```swift
+do {
+    let todo = LCObject(className: "Todo")
+
+    try todo.set("title", value: "马拉松报名")
+    try todo.set("priority", value: 2)
+    try todo.set("owner", value: LCApplication.default.currentUser)
+
+    let data: Data
+    if #available(iOS 11.0, *) {
+        data = try NSKeyedArchiver.archivedData(withRootObject: todo, requiringSecureCoding: false)
+    } else {
+        data = NSKeyedArchiver.archivedData(withRootObject: todo)
+    }
+} catch {
+    print(error)
+}
+```
+
+反序列化：
+
+```swift
+do {
+    let todo = LCObject(className: "Todo")
+
+    try todo.set("title", value: "马拉松报名")
+    try todo.set("priority", value: 2)
+    try todo.set("owner", value: LCApplication.default.currentUser)
+
+    let data: Data
+    if #available(iOS 11.0, *) {
+        data = try NSKeyedArchiver.archivedData(withRootObject: todo, requiringSecureCoding: false)
+    } else {
+        data = NSKeyedArchiver.archivedData(withRootObject: todo)
+    }
+
+    let newTodo: LCObject? = try NSKeyedUnarchiver.unarchiveTopLevelObjectWithData(data) as? LCObject
+} catch {
+    print(error)
+}
+```
+
+## 查询
+
+我们已经了解到如何从云端获取单个 `LCObject`，但你可能还会有一次性获取多个符合特定条件的 `LCObject` 的需求，这时候就需要用到 `LCQuery` 了。
+
+### 基础查询
+
+执行一次基础查询通常包括这些步骤：
+
+1. 构建 `LCQuery`；
+2. 向其添加查询条件；
+3. 执行查询并获取包含满足条件的对象的数组。
+
+下面的代码获取所有 `lastName` 为 `Smith` 的 `Student`：
+
+```swift
+let query = LCQuery(className: "Student")
+query.whereKey("lastName", .equalTo("Smith"))
+_ = query.find { result in
+    switch result {
+    case .success(objects: let students):
+        // students 是包含满足条件的 Student 对象的数组
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+### 查询条件
+
+可以给 `LCObject` 添加不同的条件来改变获取到的结果。
+
+下面的代码查询所有 `firstName` 不为 `Jack` 的对象：
+
+```swift
+query.whereKey("firstName", .notEqualTo("Jack"))
+```
+
+对于能够排序的属性（比如数字、字符串），可以进行比较查询：
+
+```swift
+// 限制 age < 18
+query.whereKey("age", .lessThan(18));
+
+// 限制 age <= 18
+query.whereKey("age", .lessThanOrEqualTo(18));
+
+// 限制 age > 18
+query.whereKey("age", .greaterThan(18));
+
+// 限制 age >= 18
+query.whereKey("age", .greaterThanOrEqualTo(18));
+```
+
+可以在同一个查询中设置多个条件，这样可以获取满足所有条件的结果。可以理解为所有的条件是 `AND` 的关系：
+
+```swift
+query.whereKey("firstName", .equalTo("Jack"))
+query.whereKey("age", .greaterThan(18))
+```
+
+可以通过指定 `limit` 限制返回结果的数量（默认为 `100`）：
+
+```swift
+// 最多获取 10 条结果
+query.limit = 10
+```
+
+由于性能原因，`limit` 最大只能设为 `1000`。即使将其设为大于 `1000` 的数，云端也只会返回 1,000 条结果。
+
+如果只需要一条结果，可以直接用 `getFirst`：
+
+```swift
+let query = LCQuery(className: "Todo")
+query.whereKey("priority", .equalTo(2))
+_ = query.getFirst { result in
+    switch result {
+    case .success(object: let todo):
+        print(todo)
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+可以通过设置 `skip` 来跳过一定数量的结果：
+
+```swift
+// 跳过前 20 条结果
+query.skip = 20
+```
+
+把 `skip` 和 `limit` 结合起来，就能实现翻页功能：
+
+```swift
+let query = LCQuery(className: "Todo")
+query.whereKey("priority", .equalTo(2))
+query.limit = 10
+query.skip = 20
+```
+
+需要注意的是，`skip` 的值越高，查询所需的时间就越长。
+作为替代方案，可以通过设置 `createdAt` 或 `updatedAt` 的范围来实现更高效的翻页，因为它们都自带索引。
+同理，也可以通过设置自增字段的范围来实现翻页。
+
+对于能够排序的属性，可以指定结果的排序规则：
+
+```swift
+// 按 createdAt 升序排列
+query.whereKey("createdAt", .ascending)
+
+// 按 createdAt 降序排列
+query.whereKey("createdAt", .descending)
+```
+
+还可以为同一个查询添加多个排序规则；
+
+```swift
+query.whereKey("priority", .ascending)
+query.whereKey("createdAt", .descending)
+```
+
+下面的代码可用于查找包含或不包含某一属性的对象：
+
+```swift
+// 查找包含 "images" 的对象
+query.whereKey("images", .existed)
+
+// 查找不包含 "images" 的对象
+query.whereKey("images", .notExisted)
+```
+
+可以通过 `.selected` 指定需要返回的属性。下面的代码只获取每个对象的 `title` 和 `content`（包括内置属性 `objectId`、`createdAt` 和 `updatedAt`）：
+
+```swift
+let query = LCQuery(className: "Todo")
+query.whereKey("title", .selected)
+query.whereKey("content", .selected)
+_ = query.getFirst { result in
+    switch result {
+    case .success(object: let todo):
+        let title = todo.get("title") // √
+        let content = todo.get("content") // √
+        let notes = todo.get("notes") // nil
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+`.selected`
+支持点号（`author.firstName`），详见[点号使用指南]((https://leancloud.cn/docs/dot-notation.html))。
+另外，字段名前添加减号前缀表示反向选择，例如 `-author` 表示不返回 `author` 字段。
+反向选择同样适用于内置字段，比如 `-objectId`，也可以和点号组合使用，比如 `-pubUser.createdAt`。
+
+对于未获取的属性，可以通过对结果中的对象进行 `fetch` 操作来获取。参见 [同步对象](#同步对象)。
+
+### 字符串查询
+
+可以用 `.prefixedBy` 来查找某一属性值以特定字符串开头的对象。和 SQL 中的 `LIKE` 一样，你可以利用索引带来的优势：
+
+```swift
+let query = LCQuery(className: "Todo")
+// 相当于 SQL 中的 title LIKE 'lunch%'
+query.whereKey("title", .prefixedBy("lunch"))
+```
+
+可以用 `.matchedSubstring` 来查找某一属性值包含特定字符串的对象：
+
+```swift
+let query = LCQuery(className: "Todo")
+// 相当于 SQL 中的 title LIKE '%lunch%'
+query.whereKey("title", .matchedSubstring("lunch"))
+```
+
+和 `.prefixedBy` 不同，`.matchedSubstring` 无法利用索引，因此不建议用于大型数据集。
+
+注意 `.prefixedBy` 和 `.matchedSubstring` 都是 **区分大小写** 的，所以上述查询会忽略 `Lunch`、`LUNCH` 等字符串。
+
+如果想查找某一属性值不包含特定字符串的对象，可以使用 `.matchedPattern` 进行基于正则表达式的查询：
+
+```
+let query = LCQuery(className: "Todo")
+// "title" 不包含 "ticket"（不区分大小写）
+query.whereKey("title", .matchedRegularExpression("^((?!ticket).)*$", option: "i"))
+```
+
+不过我们并不推荐大量使用这类查询，尤其是对于包含超过 100,000 个对象的 class，
+因为这类查询无法利用索引，实际操作中云端会遍历所有对象来获取结果。如果有进行全文搜索的需求，可以使用全文搜索服务。
+
+使用查询时如果遇到性能问题，可参阅 [查询性能优化](#查询性能优化)。
+
+### 数组查询
+
+下面的代码查找所有数组属性 `tags` 包含 `工作` 的对象：
+
+```swift
+query.whereKey("tags", .equalTo("工作"))
+```
+
+下面的代码查询数组属性长度为 3 （正好包含 3 个标签）的对象：
+
+```swift
+query.whereKey("tags", .equalToSize(3))
+```
+
+下面的代码查找所有数组属性 `tags` **同时包含** `工作`、`销售` 和 `会议` 的对象：
+
+```swift
+query.whereKey("tags", .containedAllIn(["工作", "销售", "会议"]))
+```
+
+如需获取某一属性值包含一列值中任意一个值的对象，可以直接用 `.containedIn` 而无需执行多次查询。
+下面的代码构建的查询会查找所有 `priority` 为 `1` **或** `2` 的 todo 对象：
+
+```swift
+// 单个查询
+let priorityOneOrTwo = LCQuery(className: "Todo")
+priorityOneOrTwo.whereKey("priority", .containedIn([1, 2]))
+// 这样就可以了 :)
+
+// ---------------
+//       vs.
+// ---------------
+
+// 多个查询
+let priorityOne = LCQuery(className: "Todo")
+priorityOne.whereKey("priority", .equalTo(1))
+
+let priorityTwo = LCQuery(className: "Todo")
+priorityTwo.whereKey("priority", .equalTo(2))
+
+let priorityOneOrTwo = priorityOne.or(priorityTwo)
+// 好像有些繁琐 :(
+```
+
+反过来，还可以用 `.notContainedIn` 来获取某一属性值不包含一列值中任何一个的对象。
+
+### 关系查询
+
+查询关联数据有很多种方式，常见的一种是查询某一属性值为特定 `LCObject` 的对象，这时可以像其他查询一样直接用 `.equalTo`。
+比如说，如果每一条博客评论 `Comment` 都有一个 `post` 属性用来存放原文 `Post`，则可以用下面的方法获取所有与某一 `Post` 相关联的评论：
+
+```swift
+let post = LCObject(className: "Post", objectId: "57328ca079bc44005c2472d0")
+let query = LCQuery(className: "Comment")
+query.whereKey("post", .equalTo(post))
+_ = query.find { result in
+    switch result {
+    case .success(objects: let comments):
+        // comments 包含与 post 相关联的评论
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+如需获取某一属性值为另一查询结果中任一 `LCObject` 的对象，可以用 `.matchedQuery`。
+下面的代码构建的查询可以找到所有包含图片的博客文章的评论：
+
+```swift
+let innerQuery = LCQuery(className: "Post")
+innerQuery.whereKey("image", .existed)
+
+let query = LCQuery(className: "Comment")
+query.whereKey("post", .matchedQuery(innerQuery))
+```
+
+如需获取某一属性值不是另一查询结果中任一 `LCObject` 的对象，则使用 `.notMatchedQuery`。
+
+有时候可能需要获取来自另一个 class 的数据而不想进行额外的查询，此时可以在同一个查询上使用 `.included`。下面的代码查找最新发布的 10 条评论，并包含各自对应的博客文章：
+
+```swift
+let query = LCQuery(className: "Comment")
+
+// 获取最新发布的
+query.whereKey("createdAt", .descending)
+
+// 只获取 10 条
+query.limit = 10
+
+// 同时包含博客文章
+query.whereKey("post", .included)
+
+_ = query.find { result in
+    switch result {
+    case .success(objects: let comments):
+        // comments 包含最新发布的 10 条评论，包含各自对应的博客文章
+        for comment in comments {
+            // 该操作无需网络连接
+            let post = comment.get("post") as? LCObject
+        }
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+可以用 dot 符号（`.`）来获取多级关系，例如 `post.author`，详见[点号使用指南]((https://leancloud.cn/docs/dot-notation.html))的《在查询对象时使用点号》一节。
+
+可以在同一查询上应用多次 `.included` 以包含多个属性。通过这种方法获取到的对象同样接受 `getFirst`、`get` 等 `LCQuery` 辅助方法。
+
+通过 `.included` 进行多级查询的方式不适用于数组属性内部的 `LCObject`，只能包含到数组本身。
+
+#### 关系查询的注意事项
+
+云端使用的并非关系型数据库，无法做到真正的联表查询，所以实际的处理方式是：
+先执行内嵌/子查询（和普通查询一样，`limit` 默认为 `100`，最大 `1000`），然后将子查询的结果填入主查询的对应位置，再执行主查询。
+如果子查询匹配到的记录数量超出 `limit`，且主查询有其他查询条件，那么可能会出现没有结果或结果不全的情况，因为只有 `limit` 数量以内的结果会被填入主查询。
+
+我们建议采用以下方案进行改进：
+
+- 确保子查询的结果在 100 条以下，如果在 100 至 1,000 条之间的话请将子查询的 `limit` 设为 `1000`。
+- 将需要查询的字段冗余到主查询所在的表上。
+- 进行多次查询，每次在子查询上设置不同的 `skip` 值来遍历所有记录（注意 `skip` 的值较大时可能会引发性能问题，因此不是很推荐）。
+
+### 统计总数量
+
+如果只需知道有多少对象匹配查询条件而无需获取对象本身，可使用 `count` 来代替 `find`。比如说，查询有多少个已完成的 todo：
+
+```swift
+let query = LCQuery(className: "Todo")
+query.whereKey("isComplete", .equalTo(true))
+let count = query.count()
+```
+
+### 组合查询
+
+组合查询就是把诸多查询条件用一定逻辑合并到一起（`OR` 或 `AND`）再交给云端去查询。
+
+组合查询不支持在子查询中包含 `GeoPoint` 或其他非过滤性的限制（例如 `near`、`withinGeoBox`、`limit`、`skip`、`ascending`、`descending`、`include`）。
+
+#### OR 查询
+
+OR 操作表示多个查询条件符合其中任意一个即可。 例如，查询优先级大于等于 `3` 或者已经完成了的 todo：
+
+```swift
+let priorityQuery = LCQuery(className: "Todo")
+priorityQuery.whereKey("priority", .greaterThanOrEqualTo(3))
+
+let isCompleteQuery = LCQuery(className: "Todo")
+isCompleteQuery.whereKey("isComplete", .equalTo(true))
+
+let query = priorityQuery.or(isCompleteQuery)
+```
+
+使用 OR 查询时，子查询中不能包含 `GeoPoint` 相关的查询。
+
+#### AND 查询
+
+使用 AND 查询的效果等同于往 `LCQuery` 添加多个条件。
+下面的代码构建的查询会查找创建时间在 `2016-11-13` 和 `2016-12-02` 之间的 todo：
+
+```swift
+let dateFromString: (String) -> Date? = { string in
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "yyyy-MM-dd"
+    return dateFormatter.date(from: string)
+}
+
+let startDateQuery = LCQuery(className: "Todo")
+startDateQuery.whereKey("createdAt", .greaterThanOrEqualTo(dateFromString("2016-11-13")))
+
+let endDateQuery = LCQuery(className: "Todo")
+endDateQuery.whereKey("createdAt", .lessThan(dateFromString("2016-12-03")))
+
+let query = startDateQuery.and(endDateQuery)
+```
+
+单独使用 AND 查询跟使用基础查询相比并没有什么不同，不过当查询条件中包含不止一个 OR 查询时，就必须使用 AND 查询：
+
+```swift
+let dateFromString: (String) -> Date? = { string in
+    let dateFormatter = DateFormatter()
+    dateFormatter.dateFormat = "yyyy-MM-dd"
+    return dateFormatter.date(from: string)
+}
+
+let createdAtQuery = LCQuery(className: "Todo")
+createdAtQuery.whereKey("createdAt", .greaterThanOrEqualTo(dateFromString("2018-04-30")))
+createdAtQuery.whereKey("createdAt", .lessThan(dateFromString("2018-05-01")))
+
+let locationQuery = LCQuery(className: "Todo")
+locationQuery.whereKey("location", .notExisted)
+
+let priority2Query = LCQuery(className: "Todo")
+priority2Query.whereKey("priority", .equalTo(2))
+
+let priority3Query = LCQuery(className: "Todo")
+priority3Query.whereKey("priority", .equalTo(3))
+
+let priorityQuery = priority2Query.or(priority3Query)
+let timeLocationQuery = locationQuery.or(createdAtQuery)
+let query = priorityQuery.and(timeLocationQuery)
+```
+
+### 缓存查询
+
+缓存一些查询的结果到本地，这可以让你在无网络的时候展现一些数据给用户。
+
+默认情况下 SDK 不会缓存查询结果，可以在 SDK 初始化时配置 `HTTPURLCache` 来开启查询结果缓存：
+
+<Conditional brand="leancloud">
+
+```swift
+do {
+    const configuration = LCApplication.Configuration.default
+    configuration.HTTPURLCache = URLCache(
+        // 内存缓存容量，100 MB
+        memoryCapacity: 100 * 1024 * 1024,
+        // 磁盘缓存容量，100 MB
+        diskCapacity: 100 * 1024 * 1024,
+        // `nil` 表示使用系统默认的缓存路径，你也可以自定义路径
+        diskPath: nil)
+    try LCApplication.default.set(
+        id: your-app-id,
+        key: your-app-key,
+        // 请将 your_server_url 替换为你的应用绑定的自定义 API 域名
+        serverURL: "https://your_server_url",
+        configuration: configuration)
+} catch {
+    print(error)
+}
+```
+
+</Conditional>
+
+<Conditional brand="tds">
+
+```swift
+do {
+    const configuration = LCApplication.Configuration.default
+    configuration.HTTPURLCache = URLCache(
+        // 内存缓存容量，100 MB
+        memoryCapacity: 100 * 1024 * 1024,
+        // 磁盘缓存容量，100 MB
+        diskCapacity: 100 * 1024 * 1024,
+        // `nil` 表示使用系统默认的缓存路径，你也可以自定义路径
+        diskPath: nil)
+    try LCApplication.default.set(
+        id: your-client-id,
+        key: your-client-token,
+        // 请将 your_server_url 替换为你的应用绑定的自定义 API 域名
+        serverURL: "https://your_server_url",
+        configuration: configuration)
+} catch {
+    print(error)
+}
+```
+
+</Conditional>
+
+默认情况下，SDK 的查询接口不会查询缓存，可以通过设置接口的 `cachePolicy` 来改变查询行为：
+
+```swift
+query.find(cachePolicy: .onlyCache) { (result) in
+    switch result {
+    case .success(objects: let objects):
+        print(objects)
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+#### 缓存策略
+
+为了满足多变的需求，SDK 提供了以下几种缓存策略：
+
+策略枚举 | 含义及解释
+--- | ---
+`onlyNetwork`| **（默认缓存策略）**只从网络加载查询结果。
+`onlyCache` | 只从本地缓存加载查询结果。
+`networkElseCache` | 先从网络加载查询结果，如果失败，再从本地缓存加载查询结果。
+
+#### 缓存相关的操作
+
+可以参考 Apple 官方文档中[关于 URLCache 的描述](https://developer.apple.com/documentation/foundation/urlcache)。
+
+例如，清除所有本地缓存：
+
+```swift
+LCApplication.default.configuration.HTTPURLCache?.removeAllCachedResponses()
+```
+
+### 查询性能优化
+
+影响查询性能的因素很多。特别是当查询结果的数量超过 10 万，查询性能可能会显著下降或出现瓶颈。以下列举一些容易降低性能的查询方式，开发者可以据此进行有针对性的调整和优化，或尽量避免使用。
+
+- 不等于和不包含查询（无法使用索引）
+- 通配符在前面的字符串查询（无法使用索引）
+- 有条件的 `count`（需要扫描所有数据）
+- `skip` 跳过较多的行数（相当于需要先查出被跳过的那些行）
+- 无索引的排序（另外除非复合索引同时覆盖了查询和排序，否则只有其中一个能使用索引）
+- 无索引的查询（另外除非复合索引同时覆盖了所有条件，否则未覆盖到的条件无法使用索引，如果未覆盖的条件区分度较低将会扫描较多的数据）
+
+## LiveQuery
+
+LiveQuery 衍生于 [`LCQuery`](#查询)，并为其带来了更强大的功能。它可以让你无需编写复杂的逻辑便可在客户端之间同步数据，这对于有实时数据同步需求的应用来说很有帮助。
+
+设想你正在开发一个多人协作同时编辑一份文档的应用，单纯地使用 `LCQuery` 并不是最好的做法，因为它只具备主动拉取的功能，而应用并不知道什么时候该去拉取。
+
+想要解决这个问题，就要用到 LiveQuery 了。借助 LiveQuery，你可以订阅所有需要保持同步的 `LCQuery`。
+订阅成功后，一旦有符合 `LCQuery` 的 `LCObject` 发生变化，云端就会主动、实时地将信息通知到客户端。
+
+LiveQuery 使用 WebSocket 在客户端和云端之间建立连接。WebSocket 的处理会比较复杂，而我们将其封装成了一个简单的 API 供你直接使用，无需关注背后的原理。
+
+### 启用 LiveQuery
+
+进入 **<Path to="storage" /> > 服务设置**，在 **安全设置** 里面勾选 **启用 LiveQuery**。
+然后导入云服务 Swift SDK：
+
+```swift
+import LeanCloud
+```
+
+### Demo
+
+下面是在使用了 LiveQuery 的网页应用和手机应用中分别操作，数据保持同步的效果：
+
+<video
+  src="https://capacity-files.lcfile.com/1496988080458"
+  controls
+  autoPlay
+  muted
+  preload="auto"
+  width="100%"
+  height="100%"
+>
+  HTML5 Video is required for this demo, which your browser doesn't support.
+</video>
+
+使用我们的「LeanTodo」微信小程序和网页应用，可以实际体验以上视频所演示的效果，步骤如下：
+
+1. 微信扫码，添加小程序「LeanTodo」；
+
+   ![LeanTodo mini program](/img/leantodo-weapp-qr.jpg)
+
+2. 进入小程序，点击首页左下角 **设置** > **账户设置**，输入便于记忆的用户名和密码；
+
+3. 使用浏览器访问 <https://leancloud.github.io/leantodo-vue/>，输入刚刚在小程序中更新好的账户信息，点击 **Login**；
+
+4. 随意添加更改数据，查看两端的同步状态。
+
+注意按以上顺序操作。在网页应用中使用 **Signup** 注册的账户无法与小程序创建的账户相关联，所以如果颠倒以上操作顺序，则无法观测到数据同步效果。
+
+[LiveQuery 公开课](http://www.bilibili.com/video/av11291992/) 涵盖了许多开发者关心的问题和解答。
+
+### 构建订阅
+
+首先创建一个普通的 `LCQuery` 对象，添加查询条件（如有），然后进行订阅操作：
+
+```swift
+do {
+    let query = LCQuery(className: "Todo")
+    self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) in })
+    self.liveQuery.subscribe { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
+
+LiveQuery 不支持内嵌查询，也不支持返回指定属性。
+
+订阅成功后，就可以接收到和 `LCObject` 相关的更新了。
+假如在另一个客户端上创建了一个 `Todo` 对象，对象的 `title` 设为 `更新作品集`，那么下面的代码可以获取到这个新的 `Todo`：
+
+```swift
+do {
+    let query = LCQuery(className: "Todo")
+    self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) in
+        switch event {
+        case .create(object: let object):
+            print(object["title"] as Any) // 更新作品集
+        default:
+            break
+        }
+    })
+} catch {
+    print(error)
+}
+```
+
+此时如果有人把 `Todo` 的 `content` 改为 `把我最近画的插画放上去`，那么下面的代码可以获取到本次更新：
+
+```swift
+do {
+    let query = LCQuery(className: "Todo")
+    self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) in
+        switch event {
+        case let .update(object: object, updatedKeys: updatedKeys):
+            if let key = updatedKeys.first {
+                print(object[key] as Any) // 把我最近画的插画放上去
+            }
+        default:
+            break
+        }
+    })
+} catch {
+    print(error)
+}
+```
+
+### 事件处理
+
+订阅成功后，可以选择监听如下几种数据变化：
+
+- `create`
+- `update`
+- `enter`
+- `leave`
+- `delete`
+
+#### `create` 事件
+
+当有新的满足 `LCQuery` 查询条件的 `LCObject` 被创建时，`create` 事件会被触发。下面的 `object` 就是新建的 `LCObject`：
+
+```swift
+self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) in
+    switch event {
+    case .create(object: let object):
+        print("对象被创建。")
+    default:
+        break
+    }
+})
+```
+
+#### `update` 事件
+
+当有满足 `LCQuery` 查询条件的 `LCObject` 被更新时，`update` 事件会被触发。下面的 `object` 就是有更新的 `LCObject`：
+
+```swift
+self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) in
+    switch event {
+    case let .update(object: object, updatedKeys: updatedKeys):
+        print("对象被更新。")
+    default:
+        break
+    }
+})
+```
+
+#### `enter` 事件
+
+当一个已存在的、原本不符合 `LCQuery` 查询条件的 `LCObject` 发生更新，且更新后符合查询条件，`enter` 事件会被触发。下面的 `object` 就是进入 `LCQuery` 的 `LCObject`，其内容为该对象最新的值：
+
+```swift
+self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) in
+    switch event {
+    case let .enter(object: object, updatedKeys: updatedKeys):
+        print("对象进入。")
+    default:
+        break
+    }
+})
+```
+
+注意区分 `create` 和 `enter` 的不同行为。
+如果一个对象已经存在，在更新之前不符合查询条件，而在更新之后符合查询条件，那么 `enter` 事件会被触发。
+如果一个对象原本不存在，后来被构建了出来，那么 `create` 事件会被触发。
+
+#### `leave` 事件
+
+当一个已存在的、原本符合 `LCQuery` 查询条件的 `LCObject` 发生更新，且更新后不符合查询条件，`leave` 事件会被触发。
+下面的 `object` 就是离开 `LCQuery` 的 `LCObject`，其内容为该对象最新的值：
+
+```swift
+self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) in
+    switch event {
+    case let .leave(object: object, updatedKeys: updatedKeys):
+        print("对象离开。")
+    default:
+        break
+    }
+})
+```
+
+#### `delete` 事件
+
+当一个已存在的、原本符合 `LCQuery` 查询条件的 `LCObject` 被删除，`delete` 事件会被触发。
+下面的 `object` 就是被删除的 `LCObject` 的 `objectId`：
+
+```swift
+self.liveQuery = try LiveQuery(query: query, eventHandler: { (liveQuery, event) in
+    switch event {
+    case .delete(object: let object):
+        print("对象被删除。")
+    default:
+        break
+    }
+})
+```
+
+### 取消订阅
+
+如果不再需要接收有关 `LCQuery` 的更新，可以取消订阅。
+
+```swift
+self.liveQuery.unsubscribe { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+### 断开连接
+
+断开连接有几种情况：
+
+1. 网络异常或者网络切换，非预期性断开。
+2. 退出应用、关机或者打开飞行模式等，用户在应用外的操作导致断开。
+
+如上几种情况开发者无需做额外的操作，只要切回应用，SDK 会自动重新订阅，数据变更会继续推送到客户端。
+
+而另外一种极端情况——**当用户在移动端使用手机的进程管理工具，杀死了进程或者直接关闭了网页的情况下**，SDK 无法自动重新订阅，此时需要开发者根据实际情况实现重新订阅。
+
+### LiveQuery 的注意事项
+
+因为 LiveQuery 的实时性，很多用户会陷入一个误区，试着用 LiveQuery 来实现一个简单的聊天功能。
+我们不建议这样做，因为使用 LiveQuery 构建聊天服务会承担额外的存储成本，产生的费用会增加，后期维护的难度非常大（聊天记录、对话维护之类的代码会很混乱），并且云服务已经提供了即时通讯的服务。
+LiveQuery 的核心还是提供一个针对查询的推拉结合的用法，脱离设计初衷容易造成前端的模块混乱。
+
+## 文件
+
+有时候应用需要存储尺寸较大或结构较为复杂的数据，这类数据不适合用 `LCObject` 保存，此时文件对象 `LCFile` 便成为了更好的选择。文件对象最常见的用途是保存图片，不过也可以用来保存文档、视频、音乐等其他二进制数据。
+
+### 构建文件
+
+可以通过字符串构建文件：
+
+```swift
+if let data = "LeanCloud".data(using: .utf8) {
+    let file = LCFile(payload: .data(data: data))
+}
+```
+
+除此之外，还可以通过 URL 构建文件：
+
+```swift
+if let url = URL(string: "https://leancloud.cn/assets/imgs/press/Logo%20-%20Blue%20Padding.a60eb2fa.png") {
+    let file = LCFile(url: url)
+}
+```
+
+通过 URL 构建文件时，SDK 并不会将原本的文件转储到云端，而是会将文件的物理地址存储为字符串，这样也就不会产生任何文件上传流量。使用其他方式构建的文件会被保存在云端。
+
+云端会根据文件扩展名自动检测文件类型。如果需要的话，也可以手动指定 `Content-Type`（一般称为 MIME 类型）：
+
+```swift
+if let data = "{\"company\":\"LeanCloud\"}".data(using: .utf8) {
+    let file = LCFile(payload: .data(data: data))
+    file.mimeType = "application/json"
+}
+```
+
+与前面提到的方式相比，一个更常见的文件构建方式是从本地路径上传。
+
+```swift
+if let url = Bundle.main.url(forResource: "avatar", withExtension: "jpg") {
+    let file = LCFile(payload: .fileURL(fileURL: url))
+}
+```
+
+这里上传的文件名字叫做 `avatar.jpg`。需要注意：
+
+- 每个文件会被分配到一个独一无二的 `objectId`，所以在一个应用内是允许多个文件重名的。
+- 文件必须有扩展名才能被云端正确地识别出类型。比如说要用 `LCFile` 保存一个 PNG 格式的图像，那么扩展名应为 `.png`。
+- 如果文件没有扩展名，且没有手动指定类型，那么云服务将默认使用 `application/octet-stream`。
+
+### 保存文件
+
+将文件保存到云端后，便可获得一个永久指向该文件的 URL：
+
+```swift
+_ = file.save { result in
+    switch result {
+    case .success:
+        if let value = file.url?.value {
+            print("文件保存完成。URL: \(value)")
+        }
+    case .failure(error: let error):
+        // 保存失败，可能是文件无法被读取，或者上传过程中出现问题
+        print(error)
+    }
+}
+```
+
+文件上传后，可以在 `_File` class 中找到。已上传的文件无法再被修改。如果需要修改文件，只能重新上传修改过的文件并取得新的 `objectId` 和 URL。
+
+已经保存到云端的文件可以关联到 `LCObject`：
+
+```swift
+do {
+    if let _ = file.objectId?.value {
+        let todo = LCObject(className: "Todo")
+        try todo.set("attachments", value: file)
+        todo.save { (result) in
+            switch result {
+            case .success:
+                break
+            case .failure(error: let error):
+                print(error)
+            }
+        }
+    }
+} catch {
+    print(error)
+}
+```
+
+也可以通过构建 `LCQuery` 进行[查询](#查询)：
+
+```swift
+let query = LCQuery(className: "_File")
+
+```
+
+需要注意的是，内部文件（上传到文件服务的文件）的 `url` 字段是由云端动态生成的，其中涉及切换自定义域名的相关处理逻辑。
+因此，通过 url 字段查询文件仅适用于外部文件（直接保存外部 URL 到 `_File` 表创建的文件），内部文件请改用 key 字段（URL 中的路径）查询。
+
+### 上传进度监听
+
+上传过程中可以实时向用户展示进度：
+
+```swift
+_ = file.save(progress: { (progress) in
+    print(progress)
+}) { (result) in
+    switch result {
+    case .success:
+        // 保存后的操作
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+### 文件元数据
+
+上传文件时，可以用 `metaData` 添加额外的属性。文件一旦保存，`metaData` 便不可再修改。
+
+```swift
+// 设置元数据
+file.metaData["author"] = "LeanCloud"
+_ = file.save { result in
+    switch result {
+    case .success:
+        // 获取 author 属性
+        String? author = file.metaData["author"]
+        // 获取文件名
+        String? fileName = file.name
+        // 获取大小（不适用于通过 base64 编码的字符串或者 URL 保存的文件）
+        UInt64? size = file.metaData["size"]
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+### 图像缩略图
+
+成功保存图像后，除了可以获取指向该文件的 URL 外，还可以获取图像的缩略图 URL，并且可以指定缩略图的宽度和高度：
+
+```swift
+// 基于原图大小，按指定百分比缩放到 25%
+let scaledURL = file.thumbnailURL(.scale(0.25))
+// 按指定宽高值强行缩略，获得宽度为 100 像素，高度 200 像素的缩略图
+let sizedURL = file.thumbnailURL(.size(width: 100, height: 200))
+```
+
+图片最大不超过 **20 MB** 才可以获取缩略图。
+
+国际版不支持图片缩略图。
+
+### 删除文件
+
+下面的代码从云端删除一个文件：
+
+```swift
+let file = LCObject(className: "_File", objectId: "552e0a27e4b0643b709e891e")
+file.delete()
+```
+
+默认情况下，文件的删除权限是关闭的。
+如需删除文件，一般建议在服务端使用 Master Key 调用 REST API 删除。
+取决于产品的具体需求，也可以考虑在 **<Path to="storage" /> > 文件 > 权限** 向特定用户或特定角色开启删除权限。
+
+## GeoPoint
+
+云服务允许你通过将 `LCGeoPoint` 关联到 `LCObject` 的方式存储折射真实世界地理位置的经纬坐标，这样做可以让你查询包含一个点附近的坐标的对象。常见的使用场景有「查找附近的用户」和「查找附近的地点」。
+
+要构建一个包含地理位置的对象，首先要构建一个地理位置。下面的代码构建了一个 `LCGeoPoint` 并将其纬度（`latitude`）设为 `39.9`，经度（`longitude`）设为 `116.4`：
+
+```swift
+let point = LCGeoPoint(latitude: 39.9, longitude: 116.4)
+```
+
+现在可以将这个地理位置存储为一个对象的属性：
+
+```swift
+try todo.set("location", value: point)
+```
+
+### 地理位置查询
+
+给定一些含有地理位置的对象，可以从中找出离某一点最近的几个，或者处于某一范围内的几个。
+要执行这样的查询，可以向普通的 `LCQuery` 添加 `.locatedNear` 条件。
+下面的代码查找 `location` 属性值离某一点最近的 `Todo` 对象：
+
+```swift
+let query = LCQuery(className: "Todo")
+let point = LCGeoPoint(latitude: 39.9, longitude: 116.4)
+query.whereKey("location", .locatedNear(point))
+
+// 限制为 10 条结果
+query.limit = 10
+_ = query.find { result in
+    switch result {
+    case .success(objects: let todos):
+        // todos 是包含满足条件的 Todo 对象的数组
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+像 `.ascending` 和 `.descending` 这样额外的排序条件会获得比默认的距离排序更高的优先级。
+
+若要限制结果和给定地点之间的距离，可以参考 API 文档中的  `kilometersTo`、`milesTo` 和 `radiansTo` 参数。
+
+若要查询在某一矩形范围内的对象，可以用 `.locatedWithin`：
+
+![withinGeoBox](/img/geopoint-withingeobox.svg)
+
+```swift
+let query = LCQuery(className: "Todo")
+let southwest = LCGeoPoint(latitude: 30, longitude: 115)
+let northeast = LCGeoPoint(latitude: 40, longitude: 118)
+query.whereKey("location", .locatedWithin(southwest: southwest, northeast: northeast))
+```
+
+### GeoPoint 的注意事项
+
+GeoPoint 的经纬度的类型是数字，且经度需在 -180.0 到 180.0 之间，纬度需在 -90.0 到 90.0 之间。
+另外，每个对象最多只能有一个类型为 GeoPoint 的属性。
+
+## 用户
+
+请参阅[内建账户指南](/sdk/authentication/guide/)。
+
+## 角色
+
+随着用户量的增长，你可能会发现相比于为每一名用户单独设置权限，将预先设定好的权限直接分配给一部分用户是更好的选择。为了迎合这种需求，云服务支持基于角色的权限管理。请参阅 [ACL 权限管理开发指南](acl-guide.html)。
+
+## 子类化
+
+子类化推荐给进阶的开发者在进行代码重构的时候做参考。你可以用 `LCObject` 访问到所有的数据，用 `get` 方法获取任意字段，用 `set` 方法给任意字段赋值；你也可以使用子类化来封装 `get` 以及 `set` 方法，增强编码体验。子类化有很多优势，包括减少代码的编写量，具有更好的扩展性，和支持自动补全等等。
+
+### 子类化的实现
+
+要实现子类化，需要下面两个步骤：
+
+1. 继承 `LCObject`；
+2. 重载静态方法 `objectClassName`，返回的字符串是原先要传递给 `LCObject(className:)` 初始化方法的参数。如果不实现，默认返回的是类的名字。**请注意：`LCUser` 子类化后必须返回 `_User`**；
+3. 注册子类。一般在 `application(_:didFinishLaunchingWithOptions:)` 方法中调用 `static func register()` 方法。
+
+下面是实现 `Student` 子类化的例子：
+
+```swift
+class Student: LCObject {
+
+    @objc dynamic const name: LCString?
+
+    override static func objectClassName() -> String {
+        return "Student"
+    }
+}
+
+func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+
+    Student.register()
+
+    return true
+}
+```
+
+### 将 Setter 以及 Getter 方法封装成属性
+
+可以将 `LCObject` 的 Setter 和 Getter 方法封装成属性，需使用 `@objc dynamic var` 来声明一个变量，**且该变量的类型为 [`LCValue`](#数据类型)**。
+
+如下所示，两段代码对 `name` 字段的赋值方式等价。
+
+```swift
+// Set name for LCObject
+do {
+    let student = LCObject(className: "Student")
+    try student.set("name", value: "小明")
+    assert(student.save().isSuccess)
+} catch {
+    print(error)
+}
+```
+
+```swift
+// Set name for Student
+let student = Student()
+student.name = LCString("小明")
+assert(student.save().isSuccess)
+```
+
+## 多线程安全
+
+SDK 提供了一个便利的选项，可以确保 `LCObject` 的属性的存取操作在多线程环境中是安全的，该选项默认为关闭，开启示例如下：
+
+<Conditional brand="leancloud">
+
+```swift
+var config = LCApplication.Configuration()
+config.isObjectRawDataAtomic = true
+do {
+    try LCApplication.default.set(
+        id: your-app-id,
+        key: your-app-key,
+        serverURL: "https://your_server_url",
+        configuration: config)
+} catch {
+    print(error)
+}
+```
+
+</Conditional>
+
+<Conditional brand="tds">
+
+```swift
+var config = LCApplication.Configuration()
+config.isObjectRawDataAtomic = true
+do {
+    try LCApplication.default.set(
+        id: your-client-id,
+        key: your-client-token,
+        serverURL: "https://your_server_url",
+        configuration: config)
+} catch {
+    print(error)
+}
+```
+
+</Conditional>  
+
+开启该选项后，每个 `LCObject` 实例对象的属性的存取操作都会被加锁。通常来说，锁以及加锁、解锁操作会有一定的开销，是否开启该选项需要开发者根据实际情况衡权利弊后决定。
+
+如果对性能不敏感，同时又不想额外处理数据竞争的情况，可以选择开启该选项。
+
+如果对性能非常敏感，或者程序中不可能出现数据竞争的情况，那么不用开启该选项。
+
+## 全文搜索
+
+全文搜索是一个针对应用数据进行全局搜索的接口，它基于搜索引擎构建，提供更强大的搜索功能。要深入了解其用法和阅读示例代码，请阅读 [全文搜索指南](/sdk/storage/guide/fulltext-search/)。
