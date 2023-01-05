@@ -5,6 +5,11 @@ slug: /sdk/storage/guide/setup-swift/
 sidebar_position: 1
 ---
 
+import { Conditional } from "/src/docComponents/conditional";
+import DomainBinding from "../../_partials/setup-domain.mdx";
+import AppConfig from "../_partials/app-config.mdx";
+import Path from "/src/docComponents/path";
+
 ## 获取 SDK
 
 获取 SDK 有多种方式，较为推荐的方式是通过包依赖管理工具下载最新版本。
@@ -36,7 +41,9 @@ pod 'LeanCloud/Foundation' # 数据存储、短信、推送、云引擎等基础
 pod 'LeanCloud/RTM'        # 即时通讯、LiveQuery 模块，可选
 ```
 
-> **注意**，`LeanCloud/RTM` 依赖了 `LeanCloud/Foundation`，所以不同模块的版本号必需保持一致。
+:::tip 注意
+`LeanCloud/RTM` 依赖了 `LeanCloud/Foundation`，所以不同模块的版本号必需保持一致。
+:::
 
 最后，在项目根目录下执行下列任意命令，集成最新的 SDK：
 
@@ -58,11 +65,11 @@ pod install --repo-update
 
 ### 手动安装
 
-> 下载 Swift SDK 源码后，也需要等待 Swift Package Manager 下载并集成其它依赖，所以推荐直接使用 Swift Package Manager。
+:::note
+下载 Swift SDK 源码后，也需要等待 Swift Package Manager 下载并集成其它依赖，所以**推荐直接使用 Swift Package Manager**。
+:::
 
 ## 初始化
-
-首先进入 **云服务控制台 > 设置 > 应用凭证** 来获取 **App ID**，**App Key** 以及**服务器地址**。
 
 打开 `AppDelegate.swift` 文件，添加下列导入语句到头部：
 
@@ -70,39 +77,68 @@ pod install --repo-update
 import LeanCloud
 ```
 
-然后在 `application(_:didFinishLaunchingWithOptions:)` 函数内设置 App ID，App Key 以及服务器地址：
+然后在 `application(_:didFinishLaunchingWithOptions:)` 函数内设置初始化参数：
+
+<Conditional brand="leancloud">
 
 ```swift
 do {
     try LCApplication.default.set(
-        id: {{appid}},
-        key: {{appkey}},
-        serverURL: "https://please-replace-with-your-customized.domain.com")
+        id: your-app-id,
+        key: your-app-key,
+        serverURL: "https://your_server_url")
 } catch {
     print(error)
 }
 ```
 
-  <div class="callout callout-danger">
-  <p>在使用 SDK 的 API 时，请确保进行了 Application 的 ID、Key 以及 Server URL 的初始化。</p>
-</div>
+</Conditional>
 
-请将 `https://please-replace-with-your-customized.domain.com` 替换为你的应用[绑定的 API 域名](custom-api-domain-guide.html#API_域名)。
+<Conditional brand="tds">
+
+```swift
+do {
+    try LCApplication.default.set(
+        id: your-client-id,
+        key: your-client-token,
+        serverURL: "https://your_server_url")
+} catch {
+    print(error)
+}
+```
+
+</Conditional>
+
+:::info
+在使用 SDK 的 API 时，请确保进行了 Application 的 ID、Key 以及 Server URL（API 域名）的初始化。
+:::
+
+<Conditional brand="leancloud">
 
 国际版应用不要求绑定自定义域名。
 如果你的国际版应用（App ID 后缀为 `-MdYXbMMI`）没有绑定自定义域名，**初始化 SDK 时不用传入服务器地址参数**。
-极个别　App ID　后缀不为 `-MdYXbMMI` 的国际版应用，请参见[这里的说明](custom-api-domain-guide.html#App_ID_后缀不为_-MdYXbMMI_的国际版应用如何初始化_SDK)。
+极个别　App ID　后缀不为 `-MdYXbMMI` 的国际版应用，请参见[这里的说明](/sdk/domain/guide/#app-id-后缀不为--mdyxbmmi-的国际版应用如何初始化-sdk)。
 
 ```swift
 //国际版应用初始化：
 do {
     try LCApplication.default.set(
-        id: {{appid}},
-        key: {{appkey}})
+        id: your-app-id,
+        key: your-app-key)
 } catch {
     print(error)
 }
 ```
+
+</Conditional>
+
+### 应用凭证
+
+<AppConfig />
+
+## 域名
+
+<DomainBinding />
 
 ## 开启调试日志
 
@@ -120,18 +156,20 @@ LCApplication.logLevel = .all
 首先，确认本地网络环境是可以访问云端服务器的，可以执行以下命令：
 
 ```sh
-curl "https://API_BASE_URL/1.1/date"
+curl "https://{{host}}/1.1/date"
 ```
 
-`API_BASE_URL` 为绑定的 API 自定义域名。
+`{{host}}` 为绑定的 API 自定义域名。
 
-如果当前网路正常会返回当前时间：
+如果当前网络正常会返回当前时间：
 
 ```json
 {"__type":"Date","iso":"2020-10-12T06:46:56.000Z"}
 ```
 
-下面来试着向 LeanCloud 云端保存一条数据，将下面的代码拷贝到 `viewDidLoad` 函数或其它在应用运行时会被调用的函数中：
+<p>下面来试着向 <Conditional brand="tds">TDS </Conditional><Conditional brand="leancloud">LeanCloud</Conditional> 云端保存一条数据。</p>
+
+将下面的代码拷贝到 `viewDidLoad` 函数或其它在应用运行时会被调用的函数中：
 
 ```swift
 do {
@@ -148,7 +186,7 @@ do {
 
 然后，点击 `Run` 运行调试，真机和虚拟机均可。
 
-然后打开 **云服务控制台 > 数据存储 > 结构化数据 > `TestObject`**，如果看到数据表中出现一行「words」列的值为「Hello world!」的数据，说明 SDK 已经正确地执行了上述代码，配置完毕。
+然后打开 **<Path to="storage" /> > 结构化数据 > `TestObject`**，如果看到数据表中出现一行「words」列的值为「Hello world!」的数据，说明 SDK 已经正确地执行了上述代码，配置完毕。
 
 如果控制台没有发现对应的数据，请参考 [问题排查](#问题排查)。
 
