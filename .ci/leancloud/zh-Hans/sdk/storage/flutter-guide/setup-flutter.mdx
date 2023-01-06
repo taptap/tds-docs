@@ -1,55 +1,67 @@
-# Flutter SDK 安装指南
+---
+title: Flutter SDK 配置指南
+sidebar_label: Flutter SDK 配置
+slug: /sdk/storage/guide/setup-flutter/
+sidebar_position: 1
+---
+
+import sdkVersions from "/src/docComponents/sdkVersions";
+import CodeBlock from '@theme/CodeBlock';
+import { Conditional } from "/src/docComponents/conditional";
+import DomainBinding from "../../_partials/setup-domain.mdx";
+import AppConfig from "../_partials/app-config.mdx";
+import Path from "/src/docComponents/path";
 
 ## 获取 SDK
 
-获取 SDK 有多种方式，较为推荐的方式是通过包依赖管理工具下载最新版本。
-
-### 包依赖管理工具安装
+:::tip
+获取 SDK 有多种方式，较为推荐的方式是通过**包依赖管理工具**下载最新版本。
+:::
 
 SDK 发布在 pub.dev:
 
 * [数据存储 SDK](https://pub.dev/packages/leancloud_storage)
-* [即时通信 SDK](https://pub.dev/packages/leancloud_official_plugin)
+* [即时通讯 SDK](https://pub.dev/packages/leancloud_official_plugin)
 
-#### 使用数据存储
+### 使用数据存储
 
-在 pubspec.yaml 中，将 SDK 添加到依赖项列表:
+在 `pubspec.yaml` 中，将 SDK 添加到依赖项列表:
 
-```yaml
-dependencies:
+<CodeBlock className="yaml">
+{`dependencies:
   flutter:
     sdk: flutter
   ...
-  leancloud_storage: ^0.7.10
-```
+  leancloud_storage: ^${sdkVersions.leancloud.flutter.storage}`}
+</CodeBlock>
 
-#### 使用即时通信
+### 使用即时通讯
 
-即时通信的 Flutter 插件 SDK 基于 [Swift SDK](https://github.com/leancloud/swift-sdk) 以及 [Java Unified SDK](https://github.com/leancloud/java-unified-sdk) 开发。
+即时通讯的 Flutter 插件 SDK 基于 [Swift SDK](https://github.com/leancloud/swift-sdk) 以及 [Java Unified SDK](https://github.com/leancloud/java-unified-sdk) 开发。
 
-##### 第一步
+#### 第一步
 
-在 pubspec.yaml 中，将 SDK 添加到依赖项列表:
+在 `pubspec.yaml` 中，将 SDK 添加到依赖项列表:
 
-```yaml
-dependencies:
+<CodeBlock className="yaml">
+{`dependencies:
   flutter:
     sdk: flutter
   ...
-  leancloud_official_plugin: ^1.0.1
-```
+  leancloud_official_plugin: ^${sdkVersions.leancloud.flutter.realtime}`}
+</CodeBlock>
 
-##### 第二步
+#### 第二步
 
-**Android 开发者**要配置 Gradle 安装 Java Unified SDK，打开工程目录 android/app/build.gradle，添加如下依赖：
+**Android 开发者**要配置 Gradle 安装 Java Unified SDK，打开工程目录 `android/app/build.gradle`，添加如下依赖：
 
-```yaml
-dependencies {
-  implementation 'cn.leancloud:storage-android:8.2.12'
-  implementation 'cn.leancloud:realtime-android:8.2.12'
+<CodeBlock className="groovy">
+{`dependencies {
+  implementation 'cn.leancloud:storage-android:${sdkVersions.leancloud.java}'
+  implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
-}
-```
+}`}
+</CodeBlock>
 
 **iOS 开发者**需要通过 CocoaPods 安装 Swift SDK：
 
@@ -60,9 +72,11 @@ pod update # 或者 $ pod install --repo-update
 
 ## 初始化
 
-首先进入 **云服务控制台 > 设置 > 应用凭证** 来获取 **App ID**，**App Key** 以及**服务器地址**。
+### 应用凭证
 
-#### 数据存储
+<AppConfig />
+
+### 数据存储
 
 使用 SDK 时添加下列导入语句到头部：
 
@@ -70,22 +84,35 @@ pod update # 或者 $ pod install --repo-update
 import 'package:leancloud_storage/leancloud.dart';
 ```
 
-然后在 lib/main.dart 设置 App ID，App Key 以及服务器地址：
+然后在 lib/main.dart 设置：
+
+<Conditional brand="tds">
 
 ```dart
 LeanCloud.initialize(
-    '{{appid}}', '{{appkey}}',
-    server: 'https://please-replace-with-your-customized.domain.com',
+    'your-client-id', 'your-client-token',
+    server: 'https://your_server_url',
     queryCache: new LCQueryCache());
 ```
 
-请将 `https://please-replace-with-your-customized.domain.com` 替换为你的应用[绑定的 API 域名](custom-api-domain-guide.html#API_域名)。
+</Conditional>
+
+<Conditional brand="leancloud">
+
+```dart
+LeanCloud.initialize(
+    'your-app-id', 'your-app-key',
+    server: 'https://your_server_url',
+    queryCache: new LCQueryCache());
+```
 
 国际版应用不要求绑定自定义域名。
 如果你的国际版应用（App ID 后缀为 `-MdYXbMMI`）没有绑定自定义域名，**初始化 SDK 时不用传入服务器地址参数**。
-极个别　App ID　后缀不为 `-MdYXbMMI` 的国际版应用，请参见[这里的说明](custom-api-domain-guide.html#App_ID_后缀不为_-MdYXbMMI_的国际版应用如何初始化_SDK)。
+极个别　App ID　后缀不为 `-MdYXbMMI` 的国际版应用，请参见[这里的说明](/sdk/domain/guide/#app-id-后缀不为--mdyxbmmi-的国际版应用如何初始化-sdk)。
 
-##### Android 权限设置
+</Conditional>
+
+#### Android 权限设置
 
 别忘了在 `AndroidManifest.xml` 里声明所需的 Android 权限：
 
@@ -94,7 +121,7 @@ LeanCloud.initialize(
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 ```
 
-#### 即时通信
+### 即时通讯
 
 使用 SDK 时添加下列导入语句到头部：
 
@@ -102,11 +129,13 @@ LeanCloud.initialize(
 import 'package:leancloud_official_plugin/leancloud_plugin.dart';
 ```
 
-**使用 Flutter 即时通信插件需要在 Android 和 iOS 平台分别初始化。**
+**使用 Flutter 即时通讯插件需要在 Android 和 iOS 平台分别初始化。**
 
-##### Android 平台初始化
+#### Android 平台初始化
 
 首先向 Application 类的 onCreate 方法添加：
+
+<Conditional brand="leancloud">
 
 ```java
 import cn.leancloud.LeanCloud;
@@ -122,12 +151,39 @@ public class MyLeanCloudApp extends FlutterApplication {
         LCIMOptions.getGlobalOptions().setUnreadNotificationEnabled(true);
         //开启调试日志
         LeanCloud.setLogLevel(LCLogger.Level.DEBUG);
-        // 提供 this、App ID、App Key、Server Host 作为参数
-        // 请将 xxx.example.com 替换为你的应用绑定的 API 域名
-        LeanCloud.initialize(this, "{{appid}}", "{{appkey}}", "https://please-replace-with-your-customized.domain.com");
+        // 提供 this、App ID、App Key、Server URL 作为参数
+        // 请将 your_server_url 替换为你的应用绑定的 API 域名
+        LeanCloud.initialize(this, "your-app-id", "your-app-key", "https://your_server_url");
     }
 }
 ```
+
+</Conditional>
+
+<Conditional brand="tds">
+
+```java
+import cn.leancloud.LeanCloud;
+import cn.leancloud.LCLogger;
+import cn.leancloud.im.LCIMOptions;
+import io.flutter.app.FlutterApplication;
+
+public class MyLeanCloudApp extends FlutterApplication {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        //开启未读消息数更新通知
+        LCIMOptions.getGlobalOptions().setUnreadNotificationEnabled(true);
+        //开启调试日志
+        LeanCloud.setLogLevel(LCLogger.Level.DEBUG);
+        // 提供 this、Client ID、Client Token、Server URL 作为参数
+        // 请将 your_server_url 替换为你的应用绑定的 API 域名
+        LeanCloud.initialize(this, "your-client-id", "your-client-token", "https://your_server_url");
+    }
+}
+```
+
+</Conditional>
 
 然后指定 SDK 需要的权限并在 AndroidManifest.xml 里面声明 MyLeanCloudApp 类：
 
@@ -155,9 +211,11 @@ public class MyLeanCloudApp extends FlutterApplication {
 </application>
 ```
 
-##### iOS 平台初始化
+#### iOS 平台初始化
 
 在 AppDelegate.swift 中加入如下初始化代码：
+
+<Conditional brand="leancloud">
 
 ```swift
 import Flutter
@@ -172,9 +230,9 @@ import LeanCloud
         do {
             LCApplication.logLevel = .all
             try LCApplication.default.set(
-                id: "{{appid}}",
-                key: "{{appkey}}",
-                serverURL: "https://xxx.example.com")
+                id: "your-app-id",
+                key: "your-app-key",
+                serverURL: "https://your_server_url")
             GeneratedPluginRegistrant.register(with: self)
             return super.application(application, didFinishLaunchingWithOptions: launchOptions)
         } catch {
@@ -183,6 +241,41 @@ import LeanCloud
     }
 }
 ```
+
+</Conditional>
+
+<Conditional brand="tds">
+
+```swift
+import Flutter
+import LeanCloud
+
+@UIApplicationMain
+@objc class AppDelegate: FlutterAppDelegate {
+    override func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    ) -> Bool {
+        do {
+            LCApplication.logLevel = .all
+            try LCApplication.default.set(
+                id: "your-client-id",
+                key: "your-client-token",
+                serverURL: "https://your_server_url")
+            GeneratedPluginRegistrant.register(with: self)
+            return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+        } catch {
+            fatalError("\(error)")
+        }
+    }
+}
+```
+
+</Conditional>
+
+## 域名
+
+<DomainBinding />
 
 ## 开启调试日志
 
@@ -195,7 +288,7 @@ import LeanCloud
 LCLogger.setLevel(LCLogger.DebugLevel);
 ```
 
-即时通信服务开启调试日志方式同 Swift SDK 与 Java Unified SDK。
+即时通讯服务开启调试日志方式同 Swift SDK 与 Java Unified SDK。
 
 注意，在应用发布之前，请关闭调试日志，以免暴露敏感数据。
 
@@ -204,10 +297,10 @@ LCLogger.setLevel(LCLogger.DebugLevel);
 首先，确认本地网络环境是可以访问云端服务器的，可以执行以下命令：
 
 ```sh
-curl "https://API_BASE_URL/1.1/date"
+curl "https://{{host}}/1.1/date"
 ```
 
-`API_BASE_URL` 为绑定的 API 自定义域名。
+`{{host}}` 为绑定的 API 自定义域名。
 
 如果当前网络正常会返回当前时间：
 
@@ -225,7 +318,7 @@ await object.save();
 
 保存后运行程序。
 
-然后打开 **云服务控制台 > 数据存储 > 结构化数据 > `TestObject`**，如果看到数据表中出现一行「words」列的值为「Hello world!」的数据，说明 SDK 已经正确地执行了上述代码，配置完毕。
+然后打开 **<Path to="storage" /> > 结构化数据 > `TestObject`**，如果看到数据表中出现一行「words」列的值为「Hello world!」的数据，说明 SDK 已经正确地执行了上述代码，配置完毕。
 
 如果控制台没有发现对应的数据，请参考 [问题排查](#问题排查)。
 
