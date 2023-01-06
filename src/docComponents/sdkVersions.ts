@@ -14,6 +14,10 @@ const sdkVersions = {
     },
     java: "8.2.12",
     csharp: "1.0.2",
+    flutter: {
+      storage: "0.7.10",
+      realtime: "1.0.1",
+    }
   },
   tapadn: {
     unity: "3.16.3.7",
