@@ -162,7 +162,7 @@ DateTime createdAt = todo.createdAt;
 
 对象拿到之后，可以通过 `get` 方法来获取各个属性的值。注意 `objectId`、`updatedAt`和`createdAt` 这三个内置属性不能通过 `get` 获取或通过 `set` 修改，只能由云端自动进行填充。尚未保存的 `LCObject` 不存在这些属性。
 
-如果你试图获取一个不存在的属性，SDK 不会报错，而是会返回 ``。
+如果你试图获取一个不存在的属性，SDK 不会报错，而是会返回 `null`。
 
 ```dart
 LCObject todo = LCObject.createWithoutData('Todo', '582570f38ac247004f39c24b');
@@ -480,7 +480,7 @@ query.whereExists('images');
 query.whereDoesNotExist('images');
 ```
 
-可以通过 `` 指定需要返回的属性。下面的代码只获取每个对象的 `title` 和 `content`（包括内置属性 `objectId`、`createdAt` 和 `updatedAt`）：
+可以通过 `.select` 指定需要返回的属性。下面的代码只获取每个对象的 `title` 和 `content`（包括内置属性 `objectId`、`createdAt` 和 `updatedAt`）：
 
 ```dart
 LCQuery<LCObject> query = LCQuery('Todo');
@@ -493,13 +493,13 @@ String content = todo['content']; // √
 String notes = todo['notes']; // null
 ```
 
-`.select` 支持点号（`author.firstName`），详见[点号使用指南]((https://leancloud.cn/docs/dot-notation.html))。
+`.select` 支持点号（`author.firstName`），详见[点号使用指南](https://leancloud.cn/docs/dot-notation.html)。
 另外，字段名前添加减号前缀表示反向选择，例如 `-author` 表示不返回 `author` 字段。
 反向选择同样适用于内置字段，比如 `-objectId`，也可以和点号组合使用，比如 `-pubUser.createdAt`。
 
 ### 字符串查询
 
-可以用 `` 来查找某一属性值以特定字符串开头的对象。和 SQL 中的 `LIKE` 一样，你可以利用索引带来的优势：
+可以用 `whereStartsWith` 来查找某一属性值以特定字符串开头的对象。和 SQL 中的 `LIKE` 一样，你可以利用索引带来的优势：
 
 ```dart
 LCQuery<LCObject> query = new LCQuery('Todo');
@@ -507,7 +507,7 @@ LCQuery<LCObject> query = new LCQuery('Todo');
 query.whereStartsWith('title', 'lunch');
 ```
 
-可以用 `` 来查找某一属性值包含特定字符串的对象：
+可以用 `whereContains` 来查找某一属性值包含特定字符串的对象：
 
 ```dart
 LCQuery<LCObject> query = LCQuery('Todo');
@@ -552,7 +552,7 @@ query.whereSizeEqualTo('tags', 3);
 query.whereContainsAll('tags', ['工作', '销售', '会议']);
 ```
 
-如需获取某一属性值包含一列值中任意一个值的对象，可以直接用 `` 而无需执行多次查询。下面的代码构建的查询会查找所有 `priority` 为 `1` **或** `2` 的 todo 对象：
+如需获取某一属性值包含一列值中任意一个值的对象，可以直接用 `whereContainedIn` 而无需执行多次查询。下面的代码构建的查询会查找所有 `priority` 为 `1` **或** `2` 的 todo 对象：
 
 ```dart
 // 单个查询
@@ -580,7 +580,7 @@ List<LCObject> results = await priorityOneOrTwo.find();
 
 ### 关系查询
 
-查询关联数据有很多种方式，常见的一种是查询某一属性值为特定 `LCObject` 的对象，这时可以像其他查询一样直接用 ``。比如说，如果每一条博客评论 `Comment` 都有一个 `post` 属性用来存放原文 `Post`，则可以用下面的方法获取所有与某一 `Post` 相关联的评论：
+查询关联数据有很多种方式，常见的一种是查询某一属性值为特定 `LCObject` 的对象，这时可以像其他查询一样直接用 `whereEqualTo`。比如说，如果每一条博客评论 `Comment` 都有一个 `post` 属性用来存放原文 `Post`，则可以用下面的方法获取所有与某一 `Post` 相关联的评论：
 
 ```dart
 LCObject post = LCObject.createWithoutData('Post', '57328ca079bc44005c2472d0');
@@ -590,7 +590,7 @@ query.whereEqualTo('post', post);
 List<LCObject> comments = await query.find();
 ```
 
-如需获取某一属性值为另一查询结果中任一 `LCObject` 的对象，可以用 ``。下面的代码构建的查询可以找到所有包含图片的博客文章的评论：
+如需获取某一属性值为另一查询结果中任一 `LCObject` 的对象，可以用 `whereMatchesQuery`。下面的代码构建的查询可以找到所有包含图片的博客文章的评论：
 
 ```dart
 LCQuery innerQuery = LCQuery('Post');
@@ -624,9 +624,9 @@ for (LCObject comment in comments) {
 }
 ```
 
-可以用 dot 符号（`.`）来获取多级关系，例如 `post.author`，详见[点号使用指南]((https://leancloud.cn/docs/dot-notation.html))的《在查询对象时使用点号》一节。
+可以用 dot 符号（`.`）来获取多级关系，例如 `post.author`，详见[点号使用指南](https://leancloud.cn/docs/dot-notation.html)的《在查询对象时使用点号》一节。
 
-可以在同一查询上应用多次 `` 以包含多个属性。通过这种方法获取到的对象同样接受 `` 等 `LCQuery` 辅助方法。
+可以在同一查询上应用多次 `.include` 以包含多个属性。通过这种方法获取到的对象同样接受 `.first()` 等 `LCQuery` 辅助方法。
 
 通过 `.include` 进行多级查询的方式不适用于数组属性内部的 `LCObject`，只能包含到数组本身。
 
@@ -642,7 +642,7 @@ for (LCObject comment in comments) {
 
 ### 统计总数量
 
-如果只需知道有多少对象匹配查询条件而无需获取对象本身，可使用 `` 来代替 ``。比如说，查询有多少个已完成的 todo：
+如果只需知道有多少对象匹配查询条件而无需获取对象本身，可使用 `count` 来代替 `find`。比如说，查询有多少个已完成的 todo：
 
 ```dart
 LCQuery<LCObject> query = LCQuery('Todo');
@@ -790,7 +790,7 @@ LCQuery<LCObject> query = LCQuery('_File');
 需要注意的是，内部文件（上传到文件服务的文件）的 `url` 字段是由云端动态生成的，其中涉及切换自定义域名的相关处理逻辑。
 因此，通过 url 字段查询文件仅适用于外部文件（直接保存外部 URL 到 `_File` 表创建的文件），内部文件请改用 key 字段（URL 中的路径）查询。
 
-注意，如果文件被保存到了 `LCObject` 的一个数组属性中，那么在查询 `LCObject` 时如果需要包含文件，则要用到 `LCQuery` 的 `` 方法。比如说，在获取所有标题为 `买蛋糕` 的 todo 的同时获取附件中的文件：
+注意，如果文件被保存到了 `LCObject` 的一个数组属性中，那么在查询 `LCObject` 时如果需要包含文件，则要用到 `LCQuery` 的 `.include` 方法。比如说，在获取所有标题为 `买蛋糕` 的 todo 的同时获取附件中的文件：
 
 ```dart
 // 获取同一标题且包含附件的 todo
@@ -861,7 +861,7 @@ todo['location'] = point;
 
 ### 地理位置查询
 
-给定一些含有地理位置的对象，可以从中找出离某一点最近的几个，或者处于某一范围内的几个。要执行这样的查询，可以向普通的 `LCQuery` 添加 `` 条件。下面的代码查找 `location` 属性值离某一点最近的 `Todo` 对象：
+给定一些含有地理位置的对象，可以从中找出离某一点最近的几个，或者处于某一范围内的几个。要执行这样的查询，可以向普通的 `LCQuery` 添加 `whereNear` 条件。下面的代码查找 `location` 属性值离某一点最近的 `Todo` 对象：
 
 ```dart
 LCQuery<LCObject> query = LCQuery('Todo');
