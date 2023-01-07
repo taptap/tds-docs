@@ -37,7 +37,7 @@ cp -r .ci/leancloud/zh-Hans/sdk/authentication tmp/zh-Hans # 内建账户
 cp -r .ci/leancloud/zh-Hans/sdk/storage tmp/zh-Hans # 数据存储（LeanCloud 独有的语言）
 
 # 英文部分
-cp -r .ci/leancloud/en/sdk/authentication tmp/en
+cp -r .ci/leancloud/en/sdk/authentication tmp/en # 内建账户
 
 
 # 移除 TDS 文档
