@@ -1,5 +1,11 @@
+---
+title: 数据存储开发指南 · PHP
+sidebar_label: PHP 开发指南
+slug: /sdk/storage/guide/php/
+sidebar_position: 2
+---
 
-# 数据存储开发指南 · PHP
+import Path from "/src/docComponents/path";
 
 数据存储是云服务提供的核心功能之一，可用于存放和查询应用数据。下面的代码展示了如何创建一个对象并将其存入云端：
 
@@ -19,7 +25,7 @@ $todo->save();
 
 ## SDK 安装与初始化
 
-请阅读 [PHP 安装指南](sdk_setup-php.html)。
+请阅读 [PHP 安装指南](/sdk/storage/guide/setup-php/)。
 
 ## 对象
 
@@ -70,9 +76,9 @@ $testObject->save();
 
 注意：时间类型在云端将会以 UTC 时间格式存储，但是客户端在读取之后会转化成本地时间。
 
-**云服务控制台 > 数据存储 > 结构化数据** 中展示的日期数据也会依据操作系统的时区进行转换。一个例外是当你通过 REST API 获得数据时，这些数据将以 UTC 呈现。你可以手动对它们进行转换。
+**<Path to="storage" /> > 结构化数据** 中展示的日期数据也会依据操作系统的时区进行转换。一个例外是当你通过 REST API 获得数据时，这些数据将以 UTC 呈现。你可以手动对它们进行转换。
 
-若想了解云服务是如何保护应用数据的，请阅读《数据和安全》。
+若想了解云服务是如何保护应用数据的，请阅读[数据和安全](/sdk/storage/guide/security/)。
 
 ### 构建对象
 
@@ -103,7 +109,7 @@ $todo->set("priority", 2);
 $todo->save();
 ```
 
-为了确认对象已经保存成功，我们可以到 **云服务控制台 > 数据存储 > 结构化数据 > `Todo`** 里面看一下，应该会有一行新的数据产生。点一下这个数据的 `objectId`，应该能看到类似这样的内容：
+为了确认对象已经保存成功，我们可以到 **<Path to="storage" /> > 结构化数据 > `Todo`** 里面看一下，应该会有一行新的数据产生。点一下这个数据的 `objectId`，应该能看到类似这样的内容：
 
 ```json
 {
@@ -121,7 +127,7 @@ $todo->save();
 }
 ```
 
-注意，无需在 **云服务控制台 > 数据存储 > 结构化数据** 里面创建新的 `Todo` class 即可运行前面的代码。如果 class 不存在，它将自动创建。
+注意，无需在 **<Path to="storage" /> > 结构化数据** 里面创建新的 `Todo` class 即可运行前面的代码。如果 class 不存在，它将自动创建。
 
 以下是一些对象的内置属性，会在对象保存时自动创建，无需手动指定：
 
@@ -189,9 +195,9 @@ $post->increment("likes", 1);
 
 更新数组也是原子操作。使用以下方法可以方便地维护数组类型的数据：
 
-- `addIn()`<br/>将指定对象附加到数组末尾。
-- `addUniqueIn()`<br/>如果数组中不包含指定对象，则将该对象加入数组。对象的插入位置是随机的。
-- `removeIn()`<br/>从数组字段中删除指定对象的所有实例。
+- `addIn()` 将指定对象附加到数组末尾。
+- `addUniqueIn()` 如果数组中不包含指定对象，则将该对象加入数组。对象的插入位置是随机的。
+- `removeIn()` 从数组字段中删除指定对象的所有实例。
 
 例如，`Todo` 用一个 `alarms` 属性保存所有闹钟的时间。下面的代码将多个时间加入这个属性：
 
@@ -216,7 +222,7 @@ $todo = LeanObject::create("Todo", "582570f38ac247004f39c24b");
 $todo->destroy();
 ```
 
-注意，删除对象是一个较为敏感的操作，我们建议你阅读《ACL 权限管理开发指南》来了解潜在的风险。熟悉 class 级别、对象级别和字段级别的权限可以帮助你有效阻止未经授权的操作。
+注意，删除对象是一个较为敏感的操作，我们建议你阅读[ACL 权限管理开发指南](/sdk/storage/guide/acl/)来了解潜在的风险。熟悉 class 级别、对象级别和字段级别的权限可以帮助你有效阻止未经授权的操作。
 
 ### 批量操作
 
@@ -353,7 +359,7 @@ $query->limit(10);
 
 由于性能原因，`limit` 最大只能设为 `1000`。即使将其设为大于 `1000` 的数，云端也只会返回 1,000 条结果。
 
-如果只需要一条结果，可以直接用 ``：
+如果只需要一条结果，可以直接用 `first`：
 
 ```php
 $query = new Query("Todo");
@@ -420,7 +426,7 @@ $notes = $todo->get("notes"); // null
 ```
 
 `select`
-支持点号（`author.firstName`），详见《点号使用指南》。
+支持点号（`author.firstName`），详见[点号使用指南](https://leancloud.cn/docs/dot-notation.html)。
 另外，字段名前添加减号前缀表示反向选择，例如 `-author` 表示不返回 `author` 字段。
 反向选择同样适用于内置字段，比如 `-objectId`，也可以和点号组合使用，比如 `-pubUser.createdAt`。
 
@@ -448,10 +454,11 @@ $query->contains("title", "lunch");
 
 如果想查找某一属性值不包含特定字符串的对象，可以使用 `matches` 进行基于正则表达式的查询：
 
-<pre><code class="lang-php">$query = new Query("Todo");
+```php
+$query = new Query("Todo");
 // "title" 不包含 "ticket"（不区分大小写）
 $query->matches("title", "^((?!ticket).)*&dollar;&quot;, "i");
-</code></pre>
+```
 
 不过我们并不推荐大量使用这类查询，尤其是对于包含超过 100,000 个对象的 class，
 因为这类查询无法利用索引，实际操作中云端会遍历所有对象来获取结果。如果有进行全文搜索的需求，可以使用全文搜索服务。
@@ -547,9 +554,9 @@ forEach($comments as $comment) {
 }
 ```
 
-可以用 dot 符号（`.`）来获取多级关系，例如 `post.author`，详见《点号使用指南》的《在查询对象时使用点号》一节。
+可以用 dot 符号（`.`）来获取多级关系，例如 `post.author`，详见[点号使用指南](https://leancloud.cn/docs/dot-notation.html)的《在查询对象时使用点号》一节。
 
-可以在同一查询上应用多次 `_include` 以包含多个属性。通过这种方法获取到的对象同样接受 `` 等 `Query` 辅助方法。
+可以在同一查询上应用多次 `_include` 以包含多个属性。通过这种方法获取到的对象同样接受 `first` 等 `Query` 辅助方法。
 
 通过 `_include` 进行多级查询的方式不适用于数组属性内部的 `LeanObject`，只能包含到数组本身。
 
@@ -766,7 +773,7 @@ $file = File::fetch("552e0a27e4b0643b709e891e");
 $file->destroy();
 ```
 
-默认情况下，文件的删除权限是关闭的，需要进入 **云服务控制台 > 数据存储 > 结构化数据 > `_File`**，选择 **权限** > **`delete`** 来开启。
+默认情况下，文件的删除权限是关闭的，需要进入 **<Path to="storage" /> > 结构化数据 > `_File`**，选择 **权限** > **`delete`** 来开启。
 
 ## GeoPoint
 
@@ -804,7 +811,7 @@ $todos = $query->find();
 
 若要查询在某一矩形范围内的对象，可以用 `withinBox`：
 
-![withinGeoBox](images/geopoint-withingeobox.svg)
+![withinGeoBox](/img/geopoint-withingeobox.svg)
 
 ```php
 $query = new Query("Todo");
@@ -1538,7 +1545,7 @@ objectId | 微信用户 | authData.{platform} | authData._{platform}_unionid
 
 ## 角色
 
-随着用户量的增长，你可能会发现相比于为每一名用户单独设置权限，将预先设定好的权限直接分配给一部分用户是更好的选择。为了迎合这种需求，云服务支持基于角色的权限管理。请参阅 [ACL 权限管理开发指南](acl-guide.html)。
+随着用户量的增长，你可能会发现相比于为每一名用户单独设置权限，将预先设定好的权限直接分配给一部分用户是更好的选择。为了迎合这种需求，云服务支持基于角色的权限管理。请参阅 [ACL 权限管理开发指南](/sdk/storage/guide/acl/)。
 
 ## 子类化
 
@@ -1644,7 +1651,7 @@ $query->find();
 
 ## 全文搜索
 
-全文搜索是一个针对应用数据进行全局搜索的接口，它基于搜索引擎构建，提供更强大的搜索功能。要深入了解其用法和阅读示例代码，请阅读 [全文搜索指南](app_search_guide.html)。
+全文搜索是一个针对应用数据进行全局搜索的接口，它基于搜索引擎构建，提供更强大的搜索功能。要深入了解其用法和阅读示例代码，请阅读 [全文搜索指南](/sdk/storage/guide/fulltext-search/)。
 
 ## 应用内社交
 
