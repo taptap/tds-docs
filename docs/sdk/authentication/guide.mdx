@@ -27,7 +27,7 @@ TapSDK 提供的游戏内好友、成就等服务和功能，也都基于这一�
 
 内建账户系统支持玩家在游戏中创建一个游客账号，其调用示例如下：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 try{
@@ -73,6 +73,16 @@ TDSUser.logInAnonymously().subscribe(new Observer<TDSUser>() {
 }];
 ```
 
+```cpp
+FTDSUser::FDelegate OnSuccess = FTDSUser::FDelegate::CreateLambda([](const FTDSUser& User) {
+    FString UserID = User.GetObjectId();
+});
+FTUError::FDelegate OnError = FTUError::FDelegate::CreateLambda([](const FTUError& Error) {
+    // 登录失败 Error.msg;
+});
+FTDSUser::LoginAnonymously(OnSuccess, OnError);
+```
+
 </MultiLang>
 
 :::info
@@ -85,7 +95,7 @@ TDSUser.logInAnonymously().subscribe(new Observer<TDSUser>() {
 
 用户登录后，SDK 会自动将会话信息存储到客户端，这样用户在下次打开客户端时无需再次登录。下面的代码检查是否有已经登录的用户：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 TDSUser currentUser = await TDSUser.GetCurrent();
@@ -114,11 +124,20 @@ if (currentUser != nil) {
 }
 ```
 
+```cpp
+TSharedPtr<FTDSUser> CurrentUser = FTDSUser::GetCurrentUser();
+if (CurrentUser.IsValid()) {
+    // 跳到首页
+} else {
+    // 显示注册或登录页面
+}
+```
+
 </MultiLang>
 
 会话信息会长期有效，直到用户主动登出：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 await TDSUser.Logout();
@@ -141,6 +160,13 @@ TDSUser currentUser = TDSUser.getCurrentUser();
 TDSUser *currentUser = [TDSUser currentUser];
 ```
 
+```cpp
+FTDSUser::Logout();
+
+// CurrentUser 变为 nullptr
+TSharedPtr<FTDSUser> CurrentUser = FTDSUser::GetCurrentUser();
+```
+
 </MultiLang>
 
 ## 设置当前用户
@@ -155,7 +181,7 @@ TDSUser *currentUser = [TDSUser currentUser];
 
 下面的代码使用 session token 登录一个用户（云端会验证 session token 是否有效）：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 await TDSUser.BecomeWithSessionToken("anmlwi96s381m6ca7o7266pzf");
@@ -185,6 +211,16 @@ TDSUser.becomeWithSessionTokenInBackground("anmlwi96s381m6ca7o7266pzf").subscrib
 }];
 ```
 
+```cpp
+FTDSUser::FDelegate OnSuccess = FTDSUser::FDelegate::CreateLambda([](const FTDSUser& User) {
+    // 登录成功
+});
+FTUError::FDelegate OnError = FTUError::FDelegate::CreateLambda([](const FTUError& Error) {
+    // session token 无效
+});
+FTDSUser::BecomeWithSessionToken("anmlwi96s381m6ca7o7266pzf", OnSuccess, OnError);
+```
+
 </MultiLang>
 
 请避免在外部浏览器使用 URL 来传递 session token，以防范信息泄露风险。
@@ -193,7 +229,7 @@ TDSUser.becomeWithSessionTokenInBackground("anmlwi96s381m6ca7o7266pzf").subscrib
 
 下面的代码检查 session token 是否有效：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 TDSUser currentUser = await TDSUser.GetCurrent();
@@ -226,13 +262,22 @@ NSString *token = currentUser.sessionToken;
 }];
 ```
 
+```cpp
+TSharedPtr<FTDSUser> User = FTDSUser::GetCurrentUser();
+if (User.IsValid() && User->IsAuthenticated()) {
+    // session token 有效
+} else {
+    // session token 无效
+}
+```
+
 </MultiLang>
 
 ## 设置其他用户属性
 
 开发者可以使用内建账户系统设置 `nickname` 和 `avatar`，比如通过设置 `nickname` 字段来添加昵称：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 var currentUser = await TDSUser.GetCurrent();  // 获取当前登录的账户实例
@@ -279,6 +324,10 @@ currentUser[@"nickname"] = @"Tarara";
 }];
 ```
 
+```cpp
+暂不支持
+```
+
 </MultiLang>
 
 内建账户系统只支持内置字段和两个自定义字段： `nickname`（昵称） 以及 `avatar`（头像），添加其他新的字段会报错。
@@ -303,7 +352,7 @@ currentUser[@"nickname"] = @"Tarara";
 
 关联 `TDSUser` 的方法和 `LCObject` 是一样的。下面的代码为一名作者保存了一本书，然后获取所有该作者写的书：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 LCObject book = new LCObject("Book");
@@ -358,6 +407,10 @@ TDSUser *author = [TDSUser currentUser];
 }];
 ```
 
+```cpp
+暂不支持
+```
+
 </MultiLang>
 
 ## 用户对象的安全
@@ -368,7 +421,7 @@ TDSUser *author = [TDSUser currentUser];
 
 下面的代码展现了这种安全措施：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 try {
@@ -451,6 +504,10 @@ TDSUser.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
         // 错误处理
     }
 }];
+```
+
+```cpp
+暂不支持
 ```
 
 </MultiLang>
@@ -608,7 +665,7 @@ Team ID 用于获取 `access_token`。登录 Apple 开发者平台，在右上�
 
 在控制台填写完成所有信息后，使用以下代码登录。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 Dictionary<string, object> appleAuthData = new Dictionary<string, object> {
@@ -642,6 +699,20 @@ TDSUser *user = [TDSUser user];
         NSLog(@"登录失败：%@",error.localizedFailureReason);
     }
 }];
+```
+
+```cpp
+FTDSUser::FDelegate OnSuccess = FTDSUser::FDelegate::CreateLambda([](const FTDSUser& User) {
+    // 登录成功
+});
+FTUError::FDelegate OnError = FTUError::FDelegate::CreateLambda([](const FTUError& Error) {
+    // 登录失败 Error.msg;
+});
+TSharedPtr<FJsonObject> AppleAuthData = MakeShared<FJsonObject>();
+AppleAuthData->SetStringField("uid", "USER IDENTIFIER");
+AppleAuthData->SetStringField("identity_token", "IDENTITY TOKEN");
+AppleAuthData->SetStringField("code", "AUTHORIZATION CODE");
+FTDSUser::LoginWithAuthData("lc_apple", AppleAuthData, OnSuccess, OnError);
 ```
 
 </MultiLang>
@@ -737,7 +808,7 @@ TDSUser *user = [TDSUser user];
 
 例如，下面的代码可以关联微信账户：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 await currentUser.AssociateAuthData(weixinData, "weixin");
@@ -772,6 +843,16 @@ user.associateWithAuthData(weixinData, "weixin").subscribe(new Observer<LCUser>(
 }];
 ```
 
+```cpp
+FTDSUser::FDelegate OnSuccess = FTDSUser::FDelegate::CreateLambda([](const FTDSUser& User) {
+    // 绑定成功
+});
+FTUError::FDelegate OnError = FTUError::FDelegate::CreateLambda([](const FTUError& Error) {
+    // 绑定失败 Error.msg;
+});
+UserPtr->AssociateWithAuthData("weixin", AuthData, OnSuccess, OnError);
+```
+
 </MultiLang>
 
 为节省篇幅，上面的代码示例中没有给出具体的平台授权信息，相关内容请参考上面的[「第三方账户登录」](#第三方账户登录)一节。
@@ -782,8 +863,7 @@ user.associateWithAuthData(weixinData, "weixin").subscribe(new Observer<LCUser>(
 
 例如，下面的代码可以解除用户和微信账户的关联：
 
-<MultiLang>
-
+<MultiLang kind="ue">
 ```cs
 TDSUser currentUser = await TDSUser.GetCurrent();
 await currentUser.DisassociateWithAuthData("weixin");
@@ -817,6 +897,16 @@ user.dissociateWithAuthData("weixin").subscribe(new Observer<LCUser>() {
         NSLog(@"失败：%@",error.localizedFailureReason);
     }
 }];
+```
+
+```cpp
+FTDSUser::FDelegate OnSuccess = FTDSUser::FDelegate::CreateLambda([](const FTDSUser& User) {
+    // 成功
+});
+FTUError::FDelegate OnError = FTUError::FDelegate::CreateLambda([](const FTUError& Error) {
+    // 失败 Error.msg;
+});
+UserPtr->DisassociateAuthData("weixin", OnSuccess, OnError);
 ```
 
 </MultiLang>
