@@ -1,13 +1,25 @@
+---
+title: Go SDK 配置指南
+sidebar_label: Go SDK 配置
+slug: /sdk/storage/guide/setup-go/
+sidebar_position: 1
+---
 
-# Go SDK 安装指南
+import { Conditional } from "/src/docComponents/conditional";
+import DomainBinding from "../../_partials/setup-domain.mdx";
+import AppConfig from "../_partials/app-config.mdx";
+import Path from "/src/docComponents/path";
+
+:::info
+Go SDK 为服务端 SDK，主要用于在云引擎等受信任的服务器环境中调用管理接口、云函数等。
+如果你需要在自己的服务器上使用 Go SDK，请参考此篇文档完成配置。
+:::
 
 ## 获取 SDK
 
-获取 SDK 有多种方式，较为推荐的方式是通过包依赖管理工具下载最新版本。
+获取 SDK 有多种方式，较为推荐的方式是通过**包依赖管理工具**下载最新版本。
 
 ### 包依赖管理工具安装
-
-#### Go Modules
 
 Go SDK 支持使用官方推荐的 Go Modules 进行安装和管理，如果你的项目没有使用过 Go Modules 的话需要先用 `go mod init` 来进行初始化。
 
@@ -26,13 +38,15 @@ import "github.com/leancloud/go-sdk/leancloud"
 
 ### 手动安装
 
-<a class="btn btn-default" target="_blank" href="https://releases.leanapp.cn/#/leancloud/go-sdk/releases">下载 SDK</a>
+前往 [Go SDK 下载页](https://releases.leanapp.cn/#/leancloud/go-sdk/releases)获取 SDK 并安装。
 
 ## 初始化
 
-首先进入 **云服务控制台 > 设置 > 应用凭证** 来获取 **App ID**，**App Key** 以及**服务器地址**。
+### 应用凭证
 
-如果是部署到云引擎的项目，或在本地使用 `lean up` 启动项目时会自动注入环境变量，只需从环境变量创建客户端即可：
+<AppConfig />
+
+如果是部署到[云引擎](/sdk/engine/overview/)的项目，或在本地使用 `lean up` 启动项目时会自动注入环境变量，只需从环境变量创建客户端即可：
 
 ```go
 client := leancloud.NewEnvClient()
@@ -40,14 +54,35 @@ client := leancloud.NewEnvClient()
 
 在其他环境中，你也可以手动传入应用信息：
 
+<Conditional brand="leancloud">
+
 ```go
 client := leancloud.NewClient(&leancloud.ClientOptions{
-  AppID:     "{{appid}}",
-  AppKey:    "{{appkey}}",
-  MasterKey: "{{masterkey}}",
-  ServerURL: "https://please-replace-with-your-customized.domain.com",
+  AppID:     "your-app-id",
+  AppKey:    "your-app-key",
+  MasterKey: "your-master-key",
+  ServerURL: "https://your-server-url",
 })
 ```
+
+</Conditional>
+
+<Conditional brand="tds">
+
+```go
+client := leancloud.NewClient(&leancloud.ClientOptions{
+  AppID:     "your-client-id",
+  AppKey:    "your-client-token",
+  MasterKey: "your-server-secret",
+  ServerURL: "https://your-server-url",
+})
+```
+
+</Conditional>
+
+## 域名
+
+<DomainBinding />
 
 ## 开启调试日志
 
@@ -55,7 +90,7 @@ client := leancloud.NewClient(&leancloud.ClientOptions{
 
 在启动程序前设置环境变量 `LEANCLOUD_DEBUG`：
 
-```
+```sh
 LEANCLOUD_DEBUG=true lean up
 ```
 
@@ -66,10 +101,10 @@ LEANCLOUD_DEBUG=true lean up
 首先，确认本地网络环境是可以访问云端服务器的，可以执行以下命令：
 
 ```sh
-curl "https://API_BASE_URL/1.1/date"
+curl "https://{{host}}/1.1/date"
 ```
 
-`API_BASE_URL` 为绑定的 API 自定义域名。
+`{{host}}` 为绑定的 API 自定义域名。
 
 如果当前网络正常会返回当前时间：
 
@@ -100,7 +135,7 @@ if err != nil {
 
 保存后运行程序。
 
-然后打开 **云服务控制台 > 数据存储 > 结构化数据 > `TestObject`**，如果看到数据表中出现一行「words」列的值为「Hello world!」的数据，说明 SDK 已经正确地执行了上述代码，配置完毕。
+然后打开 **<Path to="storage" /> > 结构化数据 > `TestObject`**，如果看到数据表中出现一行「words」列的值为「Hello world!」的数据，说明 SDK 已经正确地执行了上述代码，配置完毕。
 
 如果控制台没有发现对应的数据，请参考 [问题排查](#问题排查)。
 
