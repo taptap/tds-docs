@@ -79,11 +79,11 @@ if (currentUser == nil) {
 ```
 
 ```cpp
-TSharedPtr<FTDSUser> UserPtr = TapUEBootstrap::GetUser();
+TSharedPtr<FTDSUser> UserPtr = FTDSUser::GetCurrentUser();
 if (UserPtr.IsValid()) {
-	// 已登录，进入游戏
+    // 已登录，进入游戏
 } else {
-	// 未登录
+    // 未登录
 }
 ```
 
@@ -155,11 +155,16 @@ TDSUser.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
 ```
 
 ```cpp
-TapUEBootstrap::Login({TUType::PermissionScope::Profile}, [](const FTDSUser& User) {
-	// 登录成功
-}, [](const FTUError& Error) {
-	// 登录失败
+FTDSUser::FDelegate OnSuccess = FTDSUser::FDelegate::CreateLambda([](const FTDSUser& User) {
+    FString UserID = User.GetObjectId();
+    FString UserName = User.GetUsername();
+    FString Avatar = User.GetAvatar();
 });
+FTUError::FDelegate OnError = FTUError::FDelegate::CreateLambda([](const FTUError& Error) {
+    // 登录失败 Error.msg;
+});
+FTDSUser::LoginWithTapTap({TUType::PermissionScope::Profile}, OnSuccess, OnError);
+
 // 授权可选项：Profile、Friend、BasicInfo
 ```
 
@@ -353,7 +358,7 @@ TDSUser.logOut();
 ```
 
 ```cpp
-TapUEBootstrap::Logout();
+FTDSUser::Logout();
 ```
 
 </MultiLang>
