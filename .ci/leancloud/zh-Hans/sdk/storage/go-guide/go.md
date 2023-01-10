@@ -1,5 +1,11 @@
+---
+title: 数据存储开发指南 · Go
+sidebar_label: Go 开发指南
+slug: /sdk/storage/guide/go/
+sidebar_position: 2
+---
 
-# 数据存储开发指南 · Go
+import Path from "/src/docComponents/path";
 
 数据存储是云服务提供的核心功能之一，可用于存放和查询应用数据。下面的代码展示了如何创建一个对象并将其存入云端：
 
@@ -26,7 +32,7 @@ if ref, err := client.Class("Todo").Create(&todo); err != nil {
 
 ## SDK 安装与初始化
 
-请阅读 [Go 安装指南](sdk_setup-go.html)
+请阅读 [Go 安装指南](/sdk/storage/guide/setup-go/)。
 
 ## 对象
 
@@ -105,9 +111,9 @@ meeting := Meeting{
 
 注意：时间类型在云端将会以 UTC 时间格式存储，但是客户端在读取之后会转化成本地时间。
 
-**云服务控制台 > 数据存储 > 结构化数据** 中展示的日期数据也会依据操作系统的时区进行转换。一个例外是当你通过 REST API 获得数据时，这些数据将以 UTC 呈现。你可以手动对它们进行转换。
+**<Path to="storage" /> > 结构化数据** 中展示的日期数据也会依据操作系统的时区进行转换。一个例外是当你通过 REST API 获得数据时，这些数据将以 UTC 呈现。你可以手动对它们进行转换。
 
-若想了解云服务是如何保护应用数据的，请阅读《数据和安全》。
+若想了解云服务是如何保护应用数据的，请阅读[数据和安全](/sdk/storage/guide/security/)。
 
 ### 保存对象
 
@@ -141,7 +147,7 @@ if ref, err := client.Class("Todo").Create(map[string]interface{}{
 }
 ```
 
-为了确认对象已经保存成功，我们可以到 **云服务控制台 > 数据存储 > 结构化数据 > `Todo`** 里面看一下，应该会有一行新的数据产生。点一下这个数据的 `objectId`，应该能看到类似这样的内容：
+为了确认对象已经保存成功，我们可以到 **<Path to="storage" /> > 结构化数据 > `Todo`** 里面看一下，应该会有一行新的数据产生。点一下这个数据的 `objectId`，应该能看到类似这样的内容：
 
 ```json
 {
@@ -159,7 +165,7 @@ if ref, err := client.Class("Todo").Create(map[string]interface{}{
 }
 ```
 
-注意，无需在 **云服务控制台 > 数据存储 > 结构化数据** 里面创建新的 `Todo` class 即可运行前面的代码。如果 class 不存在，它将自动创建。
+注意，无需在 **<Path to="storage" /> > 结构化数据** 里面创建新的 `Todo` class 即可运行前面的代码。如果 class 不存在，它将自动创建。
 
 以下是一些对象的内置属性，会在对象保存时自动创建，无需手动指定：
 
@@ -286,9 +292,9 @@ leancloud.OpIncrement(1)
 
 更新数组也是原子操作。使用以下方法可以方便地维护数组类型的数据：
 
-- `OpAdd(value)`<br/>将指定对象附加到数组末尾。
-- `OpAddUnique(value)`<br/>将指定对象附加到数组末尾，确保对象唯一。
-- `OpRemove(value)`<br/>从数组字段中删除指定对象的所有实例。
+- `OpAdd(value)` 将指定对象附加到数组末尾。
+- `OpAddUnique(value)` 将指定对象附加到数组末尾，确保对象唯一。
+- `OpRemove(value)` 从数组字段中删除指定对象的所有实例。
 
 例如，`Todo` 用一个 `alarms` 属性保存所有闹钟的时间。下面的代码将多个时间加入这个属性：
 
@@ -316,7 +322,7 @@ if err := client.Class("Todo").ID("582570f38ac247004f39c24b").Destroy(); err != 
 }
 ```
 
-注意，删除对象是一个较为敏感的操作，我们建议你阅读《ACL 权限管理开发指南》来了解潜在的风险。熟悉 class 级别、对象级别和字段级别的权限可以帮助你有效阻止未经授权的操作。
+注意，删除对象是一个较为敏感的操作，我们建议你阅读[ACL 权限管理开发指南](/sdk/storage/guide/acl/)来了解潜在的风险。熟悉 class 级别、对象级别和字段级别的权限可以帮助你有效阻止未经授权的操作。
 
 ### 数据模型
 
@@ -503,7 +509,7 @@ if err := client.Class("Todo").NewQuery().Select("title", "content").Find(&todo)
 ```
 
 `Select`
-支持点号（`author.firstName`），详见《点号使用指南》。
+支持点号（`author.firstName`），详见[点号使用指南](https://leancloud.cn/docs/dot-notation.html)。
 另外，字段名前添加减号前缀表示反向选择，例如 `-author` 表示不返回 `author` 字段。
 反向选择同样适用于内置字段，比如 `-objectId`，也可以和点号组合使用，比如 `-pubUser.createdAt`。
 
@@ -553,14 +559,6 @@ query := client.Class("Todo").NewQuery().EqualTo("tags", "工作")
 ```go
 query := client.Class("Todo").NewQuery().ContainsAll("tags", []string{"工作", "销售", "会议"})
 ```
-
-如需获取某一属性值包含一列值中任意一个值的对象，可以直接用 `` 而无需执行多次查询。下面的代码构建的查询会查找所有 `priority` 为 `1` **或** `2` 的 todo 对象：
-
-```go
-// 暂不支持
-```
-
-反过来，还可以用 `` 来获取某一属性值不包含一列值中任何一个的对象。
 
 ### 关系查询
 
@@ -798,7 +796,7 @@ if err := client.File("552e0a27e4b0643b709e891e").Destroy(); err != nil {
 }
 ```
 
-默认情况下，文件的删除权限是关闭的，需要进入 **云服务控制台 > 数据存储 > 结构化数据 > `_File`**，选择 **权限** > **`delete`** 来开启。
+默认情况下，文件的删除权限是关闭的，需要进入 **<Path to="storage" /> > 结构化数据 > `_File`**，选择 **权限** > **`delete`** 来开启。
 
 ## GeoPoint
 
@@ -844,7 +842,7 @@ if err := client.Class("Todo").NewQuery().Near("location", point).Limit(10).Find
 
 若要查询在某一矩形范围内的对象，可以用 `WithinGeoBox`：
 
-![withinGeoBox](images/geopoint-withingeobox.svg)
+![withinGeoBox](/img/geopoint-withingeobox.svg)
 
 ```go
 southwest := leancloud.GeoPoint{30, 115}
@@ -1576,11 +1574,11 @@ objectId | 微信用户 | authData.{platform} | authData._{platform}_unionid
 
 ## 角色
 
-随着用户量的增长，你可能会发现相比于为每一名用户单独设置权限，将预先设定好的权限直接分配给一部分用户是更好的选择。为了迎合这种需求，云服务支持基于角色的权限管理。请参阅 [ACL 权限管理开发指南](acl-guide.html)。
+随着用户量的增长，你可能会发现相比于为每一名用户单独设置权限，将预先设定好的权限直接分配给一部分用户是更好的选择。为了迎合这种需求，云服务支持基于角色的权限管理。请参阅 [ACL 权限管理开发指南](/sdk/storage/guide/acl/)
 
 ## 全文搜索
 
-全文搜索是一个针对应用数据进行全局搜索的接口，它基于搜索引擎构建，提供更强大的搜索功能。要深入了解其用法和阅读示例代码，请阅读 [全文搜索指南](app_search_guide.html)。
+全文搜索是一个针对应用数据进行全局搜索的接口，它基于搜索引擎构建，提供更强大的搜索功能。要深入了解其用法和阅读示例代码，请阅读 [全文搜索指南](/sdk/storage/guide/fulltext-search/)。
 
 ## 应用内社交
 
