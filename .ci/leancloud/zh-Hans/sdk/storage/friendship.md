@@ -1,6 +1,13 @@
-# 好友关系开发指南
+---
+title: 好友关系开发指南
+sidebar_label: 好友关系
+slug: /sdk/storage/guide/friendship/
+sidebar_position: 17
+---
 
-阅读此文档前请先阅读[数据存储开发指南](leanstorage_guide-js.html)，了解数据存储的基础。
+import MultiLang from "/src/docComponents/MultiLang";
+
+阅读此文档前请先阅读[数据存储开发指南](/sdk/storage/guide/js/)，了解数据存储的基础。
 
 LeanCloud 将好友关系分为两种。一种是单向关注，例如微博里面被关注者及粉丝，这种方式不需要好友申请，每一个人都可以随时关注另一个人。另一种是互为好友，例如微信好友，需要双方互相认为对方是自己的朋友后才能确立好友关系，在这种方式下 A 需要向 B 申请成为好友，B 同意后双方互为好友。
 
@@ -22,20 +29,16 @@ LeanCloud 将好友关系分为两种。一种是单向关注，例如微博里�
 
 #### 关注某个用户
 
-```javascript
-AV.User.current().follow('user_object_id').then(function(){
-  //关注成功
-}, function(err){
-  //关注失败
-  console.dir(err);
-});
-```
+<MultiLang kind="fulltext">
 
-```objc
-NSString *userObjectId = @"XXXXXX";
-//关注
-[[LCUser currentUser] follow:userObjectId andCallback:^(BOOL succeeded, NSError *error) {
-}];
+```cs
+// 关注
+try {
+  await currentUser.Follow("user_object_id");
+  // 关注成功
+} catch (Exception e) {
+  // 关注失败
+}
 ```
 
 ```java
@@ -61,14 +64,11 @@ AVUser.getCurrentUser().followInBackground(userObjectId).subscribe(new Observer<
 });
 ```
 
-```cs
-// 关注
-try {
-  await currentUser.Follow("user_object_id");
-  // 关注成功
-} catch (Exception e) {
-  // 关注失败
-}
+```objc
+NSString *userObjectId = @"XXXXXX";
+//关注
+[[LCUser currentUser] follow:userObjectId andCallback:^(BOOL succeeded, NSError *error) {
+}];
 ```
 
 ```dart
@@ -81,22 +81,32 @@ try {
 }
 ```
 
-我们允许在 follow 的时候同时传入一个 attributes 字典，用于设置关系的属性，这些属性都将在 `_Follower` 和 `_Followee` 表同时存在：
-
 ```javascript
-AV.User.current().follow({
-  user: 'user_object_id',
-  attributes: {
-    group: ['music'],
-  },
+AV.User.current().follow('user_object_id').then(function(){
+  //关注成功
+}, function(err){
+  //关注失败
+  console.dir(err);
 });
 ```
 
-```objc
-   NSDictionary * attrs = ……
-   [[LCUser currentUser] follow:userObjectId userDictionary:attrs andCallback:^(BOOL succeeded, NSError *error) {
-     //处理结果
-    }];
+</MultiLang>
+
+我们允许在 follow 的时候同时传入一个 attributes 字典，用于设置关系的属性，这些属性都将在 `_Follower` 和 `_Followee` 表同时存在：
+
+<MultiLang kind="fulltext">
+
+```cs
+// 关注
+try {
+  Dictionary<string, object> attrs = new Dictionary<string, object> {
+    { "score", 100 }
+  };
+  await currentUser.Follow("user_object_id", attrs);
+  // 关注成功
+} catch (Exception e) {
+  // 关注失败
+}
 ```
 
 ```java
@@ -123,17 +133,11 @@ AVUser.getCurrentUser().followInBackground(userObjectId, attributes).subscribe(n
 });
 ```
 
-```cs
-// 关注
-try {
-  Dictionary<string, object> attrs = new Dictionary<string, object> {
-    { "score", 100 }
-  };
-  await currentUser.Follow("user_object_id", attrs);
-  // 关注成功
-} catch (Exception e) {
-  // 关注失败
-}
+```objc
+   NSDictionary * attrs = ……
+   [[LCUser currentUser] follow:userObjectId userDictionary:attrs andCallback:^(BOOL succeeded, NSError *error) {
+     //处理结果
+    }];
 ```
 
 ```dart
@@ -147,22 +151,28 @@ try {
 }
 ```
 
-#### 取消关注某个用户
-
 ```javascript
-AV.User.current().unfollow('user_object_id').then(function(){
-  //取消关注成功
-}, function(err){
-  //取消关注失败
-  console.dir(err);
+AV.User.current().follow({
+  user: 'user_object_id',
+  attributes: {
+    group: ['music'],
+  },
 });
 ```
 
-```objc
-NSString *userObjectId = @"XXXXXX";
-//取消关注
-[[LCUser currentUser] unfollow:userObjectId andCallback:^(BOOL succeeded, NSError *error) {
-}];
+</MultiLang>
+
+#### 取消关注某个用户
+
+<MultiLang kind="fulltext">
+
+```cs
+try {
+  await currentUser.Unfollow("user_object_id");
+  // 取关成功
+} catch (Exception e) {
+  // 取关失败
+}
 ```
 
 ```java
@@ -188,13 +198,11 @@ AVUser.getCurrentUser().unfollowInBackground(userObjectId).subscribe(new Observe
 });
 ```
 
-```cs
-try {
-  await currentUser.Unfollow("user_object_id");
-  // 取关成功
-} catch (Exception e) {
-  // 取关失败
-}
+```objc
+NSString *userObjectId = @"XXXXXX";
+//取消关注
+[[LCUser currentUser] unfollow:userObjectId andCallback:^(BOOL succeeded, NSError *error) {
+}];
 ```
 
 ```dart
@@ -206,23 +214,26 @@ try {
 }
 ```
 
+```javascript
+AV.User.current().unfollow('user_object_id').then(function(){
+  //取消关注成功
+}, function(err){
+  //取消关注失败
+  console.dir(err);
+});
+```
+
+</MultiLang>
+
 #### 查询我关注的人
 
 我们使用 `FollowerQuery` 和 `FolloweeQuery` 对关注关系进行查询。`FollowerQuery` 和 `FolloweeQuery` 返回的 `Query` 对象可以像普通的 `Query` 对象那样使用，它们本质上都是查询数据管理平台中的 `_Follower` 和 `_Followee`表，你可以添加 order、skip、limit 以及其他 where 条件等信息。
 
-```javascript
-var query = AV.User.current().followeeQuery();
-// 通过 `include` 将 followee 的所有信息查询包括进来
-query.include('followee');
-query.find().then(function(followees){
-  //关注的用户列表 followees
-});
-```
+<MultiLang kind="fulltext">
 
-```objc
-LCQuery *query= [LCUser followeeQuery:@"USER_OBJECT_ID"];
-// 通过 `include` 将 followee 的所有信息查询包括进来
-[query includeKey:@"followee"];
+```cs
+LCQuery<LCObject> query = currentUser.FolloweeQuery();
+ReadOnlyCollection<LCObject> followees = await query.Find();
 ```
 
 ```java
@@ -254,9 +265,10 @@ followeeQuery.findInBackground().subscribe(new Observer<List<AVObject>>() {
 });
 ```
 
-```cs
-LCQuery<LCObject> query = currentUser.FolloweeQuery();
-ReadOnlyCollection<LCObject> followees = await query.Find();
+```objc
+LCQuery *query= [LCUser followeeQuery:@"USER_OBJECT_ID"];
+// 通过 `include` 将 followee 的所有信息查询包括进来
+[query includeKey:@"followee"];
 ```
 
 ```dart
@@ -264,22 +276,33 @@ LCQuery<LCObject> query = currentUser.followeeQuery();
 List<LCObject> followees = await query.find();
 ```
 
+```javascript
+var query = AV.User.current().followeeQuery();
+// 通过 `include` 将 followee 的所有信息查询包括进来
+query.include('followee');
+query.find().then(function(followees){
+  //关注的用户列表 followees
+});
+```
+
+</MultiLang>
+
 #### 查询我的粉丝
 
 他人关注了我，他人就是我的粉丝，查询粉丝的方法如下：
 
-```javascript
-var query = AV.User.current().followerQuery();
-query.include('follower');
-query.find().then(function(followers){
-  //粉丝列表 followers
-});
+<MultiLang kind="fulltext">
+
+<>
+
+```cs
+LCQuery<LCObject> query = currentUser.FollowerQuery();
+ReadOnlyCollection<LCObject> followers = await query.Find();
 ```
 
-```objc
-LCQuery *query= [LCUser followerQuery:@"USER_OBJECT_ID"];
-[query includeKey:@"follower"];
-```
+</>
+
+<>
 
 ```java
 // 其中 userA 是 AVUser 对象，你也可以使用 AVUser 的子类化对象进行查询
@@ -310,18 +333,6 @@ followerQuery.findInBackground().subscribe(new Observer<List<AVObject>>() {
   }
 });
 ```
-
-```cs
-LCQuery<LCObject> query = currentUser.FollowerQuery();
-ReadOnlyCollection<LCObject> followers = await query.Find();
-```
-
-```dart
-LCQuery<LCObject> query = currentUser.followerQuery();
-List<LCObject> followers = await query.find();
-```
-
-<p class="lang-spec-start java"></p>
 
 通过 AVQuery，你也可以增加 `skip` 或者 `limit` 操作来分页查询，比如：
 
@@ -369,24 +380,45 @@ followerNameQuery.findInBackground(new FindCallback<AVUser>() {
 
 总之 `followerQuery` 和 `followeeQuery` 返回的 AVQuery 可以增加其他查询条件，只要在 `_Followee` 和 `_Follower` 表里存在的属性都可以作为查询或者排序条件。
 
-<p class="lang-spec-end java"></p>
+</>
+<>
+
+```objc
+LCQuery *query= [LCUser followerQuery:@"USER_OBJECT_ID"];
+[query includeKey:@"follower"];
+```
+
+</>
+<>
+
+```dart
+LCQuery<LCObject> query = currentUser.followerQuery();
+List<LCObject> followers = await query.find();
+```
+
+</>
+<>
+
+```javascript
+var query = AV.User.current().followerQuery();
+query.include('follower');
+query.find().then(function(followers){
+  //粉丝列表 followers
+});
+```
+
+</>
+
+</MultiLang>
 
 #### 一次性获取粉丝和关注列表
 
 下面的方法实现了一次获取粉丝和关注用户列表的功能，当然，你也可以用上面的方法通过两次调用来获取这些数据，特别是用户列表很长需要翻页的时候，下面的方法就失效了。
 
-```javascript
-user.getFollowersAndFollowees().then(function(followers, followees) {
-  // 粉丝列表 followers
-  // 关注列表 followees
-}).catch(console.error);
-```
+<MultiLang kind="fulltext">
 
-```objc
-[[LCUser currentUser] getFollowersAndFollowees:^(NSDictionary *dict, NSError *error) {
-    NSArray *followers=dict[@"followers"];
-    NSArray *followees=dict[@"followees"];
-}];
+```cs
+LCFollowersAndFollowees followersAndFollowees = await currentUser.GetFollowersAndFollowees();
 ```
 
 ```java
@@ -414,17 +446,29 @@ AVUser.currentUser().getFollowersAndFolloweesInBackground(new FollowersAndFollow
 });
 ```
 
-```cs
-LCFollowersAndFollowees followersAndFollowees = await currentUser.GetFollowersAndFollowees();
+```objc
+[[LCUser currentUser] getFollowersAndFollowees:^(NSDictionary *dict, NSError *error) {
+    NSArray *followers=dict[@"followers"];
+    NSArray *followees=dict[@"followees"];
+}];
 ```
 
 ```dart
 LCFollowersAndFollowees followersAndFollowees = await currentUser.getFollowersAndFollowees();
 ```
 
+```javascript
+user.getFollowersAndFollowees().then(function(followers, followees) {
+  // 粉丝列表 followers
+  // 关注列表 followees
+}).catch(console.error);
+```
+
+</MultiLang>
+
 #### 向粉丝展示动态
 
-如果希望像微博那样向自己的粉丝发布状态，请继续阅读[社交信息流组件](status_system.html)。
+如果希望像微博那样向自己的粉丝发布状态，请继续阅读[社交信息流组件](https://leancloud.cn/docs/status_system.html)。
 
 ### REST API
 
@@ -641,14 +685,15 @@ curl -X GET \
 
 申请加某人为好友之前，需要当前用户先登录。登录后申请好友的代码如下：
 
-```javascript
-AV.Friendship.request('user_object_id')
-  .then(() => {
-    console.log('好友请求发送成功');
-  })
-  .catch((error) => {
-    console.error('好友请求发送失败', error);
-  });
+<MultiLang kind="fulltext">
+
+```cs
+try {
+  await LCFriendship.Request("user_object_id");
+  // 好友请求发送成功
+} catch (Exception e) {
+  // 好友请求发送失败
+}
 ```
 
 ```java
@@ -670,24 +715,6 @@ user.applyFriendshipInBackground(friend, null).subscribe(new Observer<AVFriendsh
 });
 ```
 
-```cs
-try {
-  await LCFriendship.Request("user_object_id");
-  // 好友请求发送成功
-} catch (Exception e) {
-  // 好友请求发送失败
-}
-```
-
-```dart
-try {
-  await LCFriendship.request('user_object_id');
-  // 好友请求发送成功
-} on Exception catch (e) {
-  // 好友请求发送失败
-}
-```
-
 ```objc
 [LCFriendship requestWithUserId:@"user_object_id" callback:^(BOOL succeeded, NSError * _Nullable error) {
     if (succeeded) {
@@ -699,17 +726,38 @@ try {
 }];
 ```
 
+```dart
+try {
+  await LCFriendship.request('user_object_id');
+  // 好友请求发送成功
+} on Exception catch (e) {
+  // 好友请求发送失败
+}
+```
+
+```javascript
+AV.Friendship.request('user_object_id')
+  .then(() => {
+    console.log('好友请求发送成功');
+  })
+  .catch((error) => {
+    console.error('好友请求发送失败', error);
+  });
+```
+
+</MultiLang>
+
 发送申请成功后，我们可以发现 `_FriendshipRequest` 新增了一条数据，并且其 `status` 字段的值为 `pending`，表示这是一个正在进行中的好友申请。
 
 在发起好友请求时，可以提前为朋友设置一些属性。属性字段可以任意指定自己需要的 key 和 value，例如分组为「sport」：
 
-```javascript
-AV.Friendship.request({
-  friend: 'user_object_id',
-  attributes: {
-    group: 'sport',
-  },
-});
+<MultiLang kind="fulltext">
+
+```cs
+Dictionary<string, object> attrs = new Dictionary<string, object> {
+  { "group", "sport" }
+};
+await LCFriendship.Request("user_object_id", attrs);
 ```
 
 ```java
@@ -733,18 +781,6 @@ user.applyFriendshipInBackground(friend, attributes).subscribe(new Observer<AVFr
 });
 ```
 
-```cs
-Dictionary<string, object> attrs = new Dictionary<string, object> {
-  { "group", "sport" }
-};
-await LCFriendship.Request("user_object_id", attrs);
-```
-
-```dart
-Map<String, dynamic> attrs = {'group': 'sport'};
-await LCFriendship.request('user_object_id', attributes: attrs);
-```
-
 ```objc
 NSDictionary *attributes = @{
     @"group" : @"sport",
@@ -759,20 +795,35 @@ NSDictionary *attributes = @{
 }];
 ```
 
+```dart
+Map<String, dynamic> attrs = {'group': 'sport'};
+await LCFriendship.request('user_object_id', attributes: attrs);
+```
+
+```javascript
+AV.Friendship.request({
+  friend: 'user_object_id',
+  attributes: {
+    group: 'sport',
+  },
+});
+```
+
+</MultiLang>
+
 如果在申请好友时增加了属性，在申请发送成功后，`_Followee` 表中也会增加一条数据，代表着发起申请的 A 的好友为 B，其 `user` 列为用户 A，`followee` 列为用户 B， `friendStatus` 列的值为 `false`，代表着 B 没有接受过 A 的好友申请。属性值会被存储到相应的列中，例如上方的代码会在 `_Followee` 表中新增 `group` 列，其值为 `sport`。
 
 #### 查询好友申请
 
 用户上线登录后，可以立刻查询有谁向自己发起了好友申请：
 
-```javascript
-const query = new AV.Query('_FriendshipRequest');
-query.equalTo('friend', AV.User.current());
-// 未处理的申请，其在 _FriendshipRequest 表的 status 的值为 pending
-query.equalTo('status', 'pending');
-query.find().then((requests) => {
-  // requests 是所有申请添加当前用户为好友的请求
-});
+<MultiLang kind="fulltext">
+
+```cs
+LCQuery<LCFriendshipRequest> query = new LCQuery<LCFriendshipRequest>("_FriendshipRequest")
+  .WhereEqualTo("friend", currentUser)
+  .WhereEqualTo("status", "pending");
+ReadOnlyCollection<LCFriendshipRequest> requests = await query.Find();
 ```
 
 ```java
@@ -796,11 +847,11 @@ currentUser.friendshipRequestQuery(AVFriendshipRequest.STATUS_PENDING, true, tru
   });
 ```
 
-```cs
-LCQuery<LCFriendshipRequest> query = new LCQuery<LCFriendshipRequest>("_FriendshipRequest")
-  .WhereEqualTo("friend", currentUser)
-  .WhereEqualTo("status", "pending");
-ReadOnlyCollection<LCFriendshipRequest> requests = await query.Find();
+```objc
+LCQuery *query = [LCFriendshipRequest query];
+[query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
+    // handle result
+}];
 ```
 
 ```dart
@@ -810,12 +861,17 @@ LCQuery<LCFriendshipRequest> query = new LCQuery<LCFriendshipRequest>('_Friendsh
 List<LCFriendshipRequest> requests = await query.find();
 ```
 
-```objc
-LCQuery *query = [LCFriendshipRequest query];
-[query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
-    // handle result
-}];
+```javascript
+const query = new AV.Query('_FriendshipRequest');
+query.equalTo('friend', AV.User.current());
+// 未处理的申请，其在 _FriendshipRequest 表的 status 的值为 pending
+query.equalTo('status', 'pending');
+query.find().then((requests) => {
+  // requests 是所有申请添加当前用户为好友的请求
+});
 ```
+
+</MultiLang>
 
 #### 接受好友申请
 
@@ -825,15 +881,17 @@ LCQuery *query = [LCFriendshipRequest query];
 * `_Followee` 表中已有的 `user` 为用户 A 及 `followee` 为用户 B 的数据，其 `friendStatus` 的值会被更新为 `true`，代表着 B 是 A 的好友。
 * `_Followee` 表中新增 `user` 为用户 B 的数据，其 `followee` 值为用户 A，`friendStatus` 的值为 `true`，代表着 A 是 B 的好友。
 
-```javascript
-const query = new AV.Query('_FriendshipRequest');
-query.equalTo('friend', AV.User.current());
-query.equalTo('status', 'pending');
-query.find().then((requests) => {
-  requests.forEach(request => {
-    AV.Friendship.acceptRequest(request).then(() => console.log("接受好友请求成功"));
-  });
-});
+<MultiLang kind="fulltext">
+
+```cs
+LCQuery<LCFriendshipRequest> query = new LCQuery<LCFriendshipRequest>("_FriendshipRequest")
+  .WhereEqualTo("friend", currentUser)
+  .WhereEqualTo("status", "pending");
+ReadOnlyCollection<LCFriendshipRequest> requests = await query.Find();
+foreach (LCFriendshipRequest request in requests) {
+  // 接受
+  await LCFriendship.AcceptRequest(request);
+}
 ```
 
 ```java
@@ -867,28 +925,6 @@ currentUser.friendshipRequestQuery(AVFriendshipRequest.STATUS_PENDING, false, tr
   });
 ```
 
-```cs
-LCQuery<LCFriendshipRequest> query = new LCQuery<LCFriendshipRequest>("_FriendshipRequest")
-  .WhereEqualTo("friend", currentUser)
-  .WhereEqualTo("status", "pending");
-ReadOnlyCollection<LCFriendshipRequest> requests = await query.Find();
-foreach (LCFriendshipRequest request in requests) {
-  // 接受
-  await LCFriendship.AcceptRequest(request);
-}
-```
-
-```dart
-LCQuery<LCFriendshipRequest> query = new LCQuery<LCFriendshipRequest>('_FriendshipRequest')
-  .WhereEqualTo('friend', currentUser)
-  .WhereEqualTo('status', 'pending');
-List<LCFriendshipRequest> requests = await query.find();
-for (LCFriendshipRequest request in requests) {
-  // 接受
-  await LCFriendship.acceptRequest(request);
-}
-```
-
 ```objc
 LCQuery *query = [LCFriendshipRequest query];
 [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
@@ -903,7 +939,16 @@ LCQuery *query = [LCFriendshipRequest query];
 }];
 ```
 
-B 在接受 A 的好友请求时，同样可以添加属性，这些属性会被存储到 `_Followee` 表的相应的列中，例如下方的代码会向 B 的数据中的 `group` 列中存入值 `music`。
+```dart
+LCQuery<LCFriendshipRequest> query = new LCQuery<LCFriendshipRequest>('_FriendshipRequest')
+  .WhereEqualTo('friend', currentUser)
+  .WhereEqualTo('status', 'pending');
+List<LCFriendshipRequest> requests = await query.find();
+for (LCFriendshipRequest request in requests) {
+  // 接受
+  await LCFriendship.acceptRequest(request);
+}
+```
 
 ```javascript
 const query = new AV.Query('_FriendshipRequest');
@@ -911,14 +956,29 @@ query.equalTo('friend', AV.User.current());
 query.equalTo('status', 'pending');
 query.find().then((requests) => {
   requests.forEach(request => {
-    AV.Friendship.acceptRequest({
-      request,
-      attributes: {
-        group: 'music',
-      },
-    }).then(() => console.log("接受好友请求成功"));;
+    AV.Friendship.acceptRequest(request).then(() => console.log("接受好友请求成功"));
   });
 });
+```
+
+</MultiLang>
+
+B 在接受 A 的好友请求时，同样可以添加属性，这些属性会被存储到 `_Followee` 表的相应的列中，例如下方的代码会向 B 的数据中的 `group` 列中存入值 `music`。
+
+<MultiLang kind="fulltext">
+
+```cs
+LCQuery<LCFriendshipRequest> query = new LCQuery<LCFriendshipRequest>("_FriendshipRequest")
+  .WhereEqualTo("friend", currentUser)
+  .WhereEqualTo("status", "pending");
+ReadOnlyCollection<LCFriendshipRequest> requests = await query.Find();
+foreach (LCFriendshipRequest request in requests) {
+  // 接受
+  Dictionary<string, object> attrs = new Dictionary<string, object> {
+    { "group", "sport" }
+  };
+  await LCFriendship.AcceptRequest(request, attrs);
+}
 ```
 
 ```java
@@ -951,32 +1011,6 @@ currentUser.friendshipRequestQuery(AVFriendshipRequest.STATUS_PENDING, false, tr
   });
 ```
 
-```cs
-LCQuery<LCFriendshipRequest> query = new LCQuery<LCFriendshipRequest>("_FriendshipRequest")
-  .WhereEqualTo("friend", currentUser)
-  .WhereEqualTo("status", "pending");
-ReadOnlyCollection<LCFriendshipRequest> requests = await query.Find();
-foreach (LCFriendshipRequest request in requests) {
-  // 接受
-  Dictionary<string, object> attrs = new Dictionary<string, object> {
-    { "group", "sport" }
-  };
-  await LCFriendship.AcceptRequest(request, attrs);
-}
-```
-
-```dart
-LCQuery<LCFriendshipRequest> query = new LCQuery<LCFriendshipRequest>('_FriendshipRequest')
-  .WhereEqualTo('friend', currentUser)
-  .WhereEqualTo('status', 'pending');
-List<LCFriendshipRequest> requests = await query.find();
-for (LCFriendshipRequest request in requests) {
-  // 接受
-  Map<String, dynamic> attrs = {'group': 'sport'};
-  await LCFriendship.acceptRequest(request, attributes: attrs);
-}
-```
-
 ```objc
 LCQuery *query = [LCFriendshipRequest query];
 [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
@@ -994,9 +1028,17 @@ LCQuery *query = [LCFriendshipRequest query];
 }];
 ```
 
-#### 拒绝好友申请
-
-拒绝好友请求后，`_FriendshipRequest` 表中该条申请数据的 `status` 的值会被更新为 `declined`。
+```dart
+LCQuery<LCFriendshipRequest> query = new LCQuery<LCFriendshipRequest>('_FriendshipRequest')
+  .WhereEqualTo('friend', currentUser)
+  .WhereEqualTo('status', 'pending');
+List<LCFriendshipRequest> requests = await query.find();
+for (LCFriendshipRequest request in requests) {
+  // 接受
+  Map<String, dynamic> attrs = {'group': 'sport'};
+  await LCFriendship.acceptRequest(request, attributes: attrs);
+}
+```
 
 ```javascript
 const query = new AV.Query('_FriendshipRequest');
@@ -1004,9 +1046,33 @@ query.equalTo('friend', AV.User.current());
 query.equalTo('status', 'pending');
 query.find().then((requests) => {
   requests.forEach(request => {
-    AV.Friendship.declineRequest(request).then(() => console.log('拒绝好友请求成功'));
+    AV.Friendship.acceptRequest({
+      request,
+      attributes: {
+        group: 'music',
+      },
+    }).then(() => console.log("接受好友请求成功"));;
   });
 });
+```
+
+</MultiLang>
+
+#### 拒绝好友申请
+
+拒绝好友请求后，`_FriendshipRequest` 表中该条申请数据的 `status` 的值会被更新为 `declined`。
+
+<MultiLang kind="fulltext">
+
+```cs
+LCQuery<LCFriendshipRequest> query = new LCQuery<LCFriendshipRequest>("_FriendshipRequest")
+  .WhereEqualTo("friend", currentUser)
+  .WhereEqualTo("status", "pending");
+ReadOnlyCollection<LCFriendshipRequest> requests = await query.Find();
+foreach (LCFriendshipRequest request in requests) {
+  // 拒绝
+  await LCFriendship.DeclineRequest(request);
+}
 ```
 
 ```java
@@ -1039,28 +1105,6 @@ currentUser.friendshipRequestQuery(AVFriendshipRequest.STATUS_PENDING, false, tr
   });
 ```
 
-```cs
-LCQuery<LCFriendshipRequest> query = new LCQuery<LCFriendshipRequest>("_FriendshipRequest")
-  .WhereEqualTo("friend", currentUser)
-  .WhereEqualTo("status", "pending");
-ReadOnlyCollection<LCFriendshipRequest> requests = await query.Find();
-foreach (LCFriendshipRequest request in requests) {
-  // 拒绝
-  await LCFriendship.DeclineRequest(request);
-}
-```
-
-```dart
-LCQuery<LCFriendshipRequest> query = new LCQuery<LCFriendshipRequest>('_FriendshipRequest')
-  .WhereEqualTo('friend', currentUser)
-  .WhereEqualTo('status', 'pending');
-List<LCFriendshipRequest> requests = await query.find();
-for (LCFriendshipRequest request in requests) {
-  // 拒绝
-  await LCFriendship.declineRequest(request);
-}
-```
-
 ```objc
 LCQuery *query = [LCFriendshipRequest query];
 [query findObjectsInBackgroundWithBlock:^(NSArray * _Nullable objects, NSError * _Nullable error) {
@@ -1075,17 +1119,43 @@ LCQuery *query = [LCFriendshipRequest query];
 }];
 ```
 
-注意，当用户 B 拒绝 A 的好友申请后，**用户 A 无法再次发起好友申请**。如果两人重新希望成为好友，用户 B 需要找到之前被拒绝的好友申请，改为接受：
+```dart
+LCQuery<LCFriendshipRequest> query = new LCQuery<LCFriendshipRequest>('_FriendshipRequest')
+  .WhereEqualTo('friend', currentUser)
+  .WhereEqualTo('status', 'pending');
+List<LCFriendshipRequest> requests = await query.find();
+for (LCFriendshipRequest request in requests) {
+  // 拒绝
+  await LCFriendship.declineRequest(request);
+}
+```
 
 ```javascript
 const query = new AV.Query('_FriendshipRequest');
 query.equalTo('friend', AV.User.current());
-query.equalTo('status', 'declined');
+query.equalTo('status', 'pending');
 query.find().then((requests) => {
   requests.forEach(request => {
-    AV.Friendship.acceptRequest(request).then(() => console.log("接受好友请求成功"));
+    AV.Friendship.declineRequest(request).then(() => console.log('拒绝好友请求成功'));
   });
 });
+```
+
+</MultiLang>
+
+注意，当用户 B 拒绝 A 的好友申请后，**用户 A 无法再次发起好友申请**。如果两人重新希望成为好友，用户 B 需要找到之前被拒绝的好友申请，改为接受：
+
+<MultiLang kind="fulltext">
+
+```cs
+LCQuery<LCFriendshipRequest> query = new LCQuery<LCFriendshipRequest>("_FriendshipRequest")
+  .WhereEqualTo("friend", currentUser)
+  .WhereEqualTo("status", "declined");
+ReadOnlyCollection<LCFriendshipRequest> requests = await query.Find();
+foreach (LCFriendshipRequest request in requests) {
+  // 接受
+  await LCFriendship.AcceptRequest(request);
+}
 ```
 
 ```java
@@ -1116,28 +1186,6 @@ currentUser.friendshipRequestQuery(AVFriendshipRequest.STATUS_DECLINED, true, tr
   });
 ```
 
-```cs
-LCQuery<LCFriendshipRequest> query = new LCQuery<LCFriendshipRequest>("_FriendshipRequest")
-  .WhereEqualTo("friend", currentUser)
-  .WhereEqualTo("status", "declined");
-ReadOnlyCollection<LCFriendshipRequest> requests = await query.Find();
-foreach (LCFriendshipRequest request in requests) {
-  // 接受
-  await LCFriendship.AcceptRequest(request);
-}
-```
-
-```dart
-LCQuery<LCFriendshipRequest> query = new LCQuery<LCFriendshipRequest>('_FriendshipRequest')
-  .WhereEqualTo('friend', currentUser)
-  .WhereEqualTo('status', 'declined');
-List<LCFriendshipRequest> requests = await query.find();
-for (LCFriendshipRequest request in requests) {
-  // 接受
-  await LCFriendship.acceptRequest(request);
-}
-```
-
 ```objc
 LCQuery *query = [LCFriendshipRequest query];
 [query whereKey:@"status" equalTo:@"declined"];
@@ -1153,17 +1201,40 @@ LCQuery *query = [LCFriendshipRequest query];
 }];
 ```
 
+```dart
+LCQuery<LCFriendshipRequest> query = new LCQuery<LCFriendshipRequest>('_FriendshipRequest')
+  .WhereEqualTo('friend', currentUser)
+  .WhereEqualTo('status', 'declined');
+List<LCFriendshipRequest> requests = await query.find();
+for (LCFriendshipRequest request in requests) {
+  // 接受
+  await LCFriendship.acceptRequest(request);
+}
+```
+
+```javascript
+const query = new AV.Query('_FriendshipRequest');
+query.equalTo('friend', AV.User.current());
+query.equalTo('status', 'declined');
+query.find().then((requests) => {
+  requests.forEach(request => {
+    AV.Friendship.acceptRequest(request).then(() => console.log("接受好友请求成功"));
+  });
+});
+```
+
+</MultiLang>
+
 #### 查询好友列表
 
 直接使用 `Query` 查询好友列表，设定 `friendStatus=true` 即可以查询双向好友。同时还可以使用 skip、limit、include 等，非常方便。
 
-```javascript
-const query = new AV.Query('_Followee');
-query.equalTo('user', AV.User.current());
-query.equalTo('friendStatus', true);
-query.find().then((results) => {
-  const friends = results.map(result => result.get('followee'));
-});
+<MultiLang kind="fulltext">
+
+```cs
+LCQuery<LCObject> query = currentUser.FolloweeQuery()
+  .WhereEqualTo("friendStatus", true);
+ReadOnlyCollection<LCObject> friends = await query.Find();
 ```
 
 ```java
@@ -1183,18 +1254,6 @@ query.findInBackground().subscribe(new Observer<List<AVFriendship>>() {
 });
 ```
 
-```cs
-LCQuery<LCObject> query = currentUser.FolloweeQuery()
-  .WhereEqualTo("friendStatus", true);
-ReadOnlyCollection<LCObject> friends = await query.Find();
-```
-
-```dart
-LCQuery<LCObject> query = currentUser.followeeQuery()
-  .WhereEqualTo('friendStatus', true);
-List<LCObject> friends = await query.find();
-```
-
 ```objc
 LCQuery *query = [[LCUser currentUser] followeeObjectsQuery];
 [query whereKey:@"friendStatus" equalTo:@YES];
@@ -1203,21 +1262,38 @@ LCQuery *query = [[LCUser currentUser] followeeObjectsQuery];
 }];
 ```
 
+```dart
+LCQuery<LCObject> query = currentUser.followeeQuery()
+  .WhereEqualTo('friendStatus', true);
+List<LCObject> friends = await query.find();
+```
+
+```javascript
+const query = new AV.Query('_Followee');
+query.equalTo('user', AV.User.current());
+query.equalTo('friendStatus', true);
+query.find().then((results) => {
+  const friends = results.map(result => result.get('followee'));
+});
+```
+
+</MultiLang>
+
 #### 修改好友属性
 
 在申请好友的过程中，可以随时修改好友属性：
 
-```javascript
-const followee = AV.Object.createWithoutData('_Followee', 'followee objectId');
+<MultiLang kind="fulltext">
+
+```cs
+LCObject followee = LCObject.CreateWithoutData("_Followee", "followee objectId");
 // 添加新属性
-followee.set('remark', '丐帮帮主');
+followee["remark"] = "丐帮帮主";
 // 更新已有属性
-followee.set('group', 'friend');
+followee["group"] = "friend";
 // 删除已有属性
-followee.unset('nickname');
-followee.save().then((followee) => {
-  console.log("更新属性成功")
-})
+followee.Unset("nickname");
+await followee.Save();
 ```
 
 ```java
@@ -1235,28 +1311,6 @@ currentUser.updateFriendship(friendship).subscribe(new Observer<AVFriendship>() 
 });
 ```
 
-```cs
-LCObject followee = LCObject.CreateWithoutData("_Followee", "followee objectId");
-// 添加新属性
-followee["remark"] = "丐帮帮主";
-// 更新已有属性
-followee["group"] = "friend";
-// 删除已有属性
-followee.Unset("nickname");
-await followee.Save();
-```
-
-```dart
-LCObject followee = LCObject.createWithoutData('_Followee', 'followee objectId');
-// 添加新属性
-followee['remark'] = '丐帮帮主';
-// 更新已有属性
-followee['group'] = 'friend';
-// 删除已有属性
-followee.unset('nickname');
-await followee.save();
-```
-
 ```objc
 LCObject *followee = [LCObject objectWithClassName:@"_Followee" objectId:@"followee objectId"];
 // 添加新属性
@@ -1270,14 +1324,40 @@ followee[@"group"] = @"friend";
 }];
 ```
 
+```dart
+LCObject followee = LCObject.createWithoutData('_Followee', 'followee objectId');
+// 添加新属性
+followee['remark'] = '丐帮帮主';
+// 更新已有属性
+followee['group'] = 'friend';
+// 删除已有属性
+followee.unset('nickname');
+await followee.save();
+```
+
+```javascript
+const followee = AV.Object.createWithoutData('_Followee', 'followee objectId');
+// 添加新属性
+followee.set('remark', '丐帮帮主');
+// 更新已有属性
+followee.set('group', 'friend');
+// 删除已有属性
+followee.unset('nickname');
+followee.save().then((followee) => {
+  console.log("更新属性成功")
+})
+```
+
+</MultiLang>
+
 #### 删除好友
 
 当 A 不再希望和 B 是朋友，可以删除好友。注意：删除好友只会删掉 `_Followee` 表中用户 A 的好友数据，而用户 B 的好友数据依然保留。也就是说 A 不再视 B 为好友，而在 B 的好友列表中依然有 A。
 
-```javascript
-AV.User.current().unfollow("Tom's objectId").then(() => {
-  console.log('删除好友成功');
-});;
+<MultiLang kind="fulltext">
+
+```cs
+await currentUser.Unfollow("Tom's objectId");
 ```
 
 ```java
@@ -1292,19 +1372,23 @@ currentUser.unfollowInBackground(targetUserObjectId).subscribe(new Observer<JSON
 });
 ```
 
-```cs
-await currentUser.Unfollow("Tom's objectId");
+```objc
+[[LCUser currentUser] unfollow:@"Tom's objectId" andCallback:^(BOOL succeeded, NSError * _Nullable error) {
+    // handle result
+}];
 ```
 
 ```dart
 await currentUser.unfollow("Tom's objectId");
 ```
 
-```objc
-[[LCUser currentUser] unfollow:@"Tom's objectId" andCallback:^(BOOL succeeded, NSError * _Nullable error) {
-    // handle result
-}];
+```javascript
+AV.User.current().unfollow("Tom's objectId").then(() => {
+  console.log('删除好友成功');
+});;
 ```
+
+</MultiLang>
 
 ### REST API
 
@@ -1338,7 +1422,7 @@ curl -X POST \
 
 #### 查询好友申请
 
-查询好友申请和普通表的查询相同，详细请参考[查询约束](rest_api.html#查询约束)。
+查询好友申请和普通表的查询相同，详细请参考[查询约束](https://leancloud.cn/docs/rest_api.html#hash827796182)。
 
 ```sh
 curl -X GET \
@@ -1412,7 +1496,7 @@ curl -X DELETE \
 
 #### 查询好友列表
 
-好友列表存于 `_Followee` 表，查询方式和普通表的查询相同，详细请参考[查询约束](rest_api.html#查询约束)。
+好友列表存于 `_Followee` 表，查询方式和普通表的查询相同，详细请参考[查询约束](https://leancloud.cn/docs/rest_api.html#hash827796182)。
 
 ```sh
 curl -X GET \
@@ -1452,7 +1536,7 @@ curl -X DELETE \
 
 ## 订阅好友通知
 
-如果有需求，可以通过 LiveQuery 来订阅 `_Followee` 表和 `_FriendshipRequest` 表的数据变动。订阅数据下发的事件通知尊重数据的 ACL。这里仅给出简单的示例代码，详细内容请阅读 [LiveQuery 开发指南](leanstorage_guide-js.html#LiveQuery)
+如果有需求，可以通过 LiveQuery 来订阅 `_Followee` 表和 `_FriendshipRequest` 表的数据变动。订阅数据下发的事件通知尊重数据的 ACL。这里仅给出简单的示例代码，详细内容请阅读 [LiveQuery 开发指南](/sdk/storage/guide/js/#livequery)
 
 例如当用户在线时，希望能立刻受到好友申请的通知：
 
@@ -1483,5 +1567,4 @@ query.subscribe().then((subscription) => {
     }
   });
 });
-
 ```
