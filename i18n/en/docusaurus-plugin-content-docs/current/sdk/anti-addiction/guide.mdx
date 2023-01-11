@@ -1,6 +1,6 @@
 ---
-title: 实名认证和防沉迷开发指南
-sidebar_label: 开发指南
+title: Real-Name Verification and Anti-addiction Guide
+sidebar_label: Guide
 sidebar_position: 2
 ---
 
@@ -9,35 +9,31 @@ import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';
 
 :::tip
-使用 TDS 实名认证和防沉迷服务之前，需要在**开发者中心后台 > 游戏服务 > 生态服务 > 合规认证** 处开通服务，可选择「已有版号」或「暂无版号」方案。
+Before using the TDS’ Real-Name Verification and Anti-addiction service, please first enable the service on **开发者中心后台 > 游戏服务 > 生态服务 > 合规认证**. When enabling the service, you can select whether your game has gotten an ISBN.
 :::
 
-:::info
-推荐阅读博客：[实名认证和防沉迷功能接入](https://blog.taptap.dev/posts/tapsdk-tap-antiaddiction-practice)，加深对实名认证和防沉迷功能的理解。
-:::
+## Configure the SDK
 
-## SDK 配置
-
-可以在 [下载页](/tap-download) 获得 TapSDK，引入防沉迷模块。
+You can download the TapSDK from the [Downloads page](/tap-download) and import the anti-addiction module into your game.
 
 <MultiLang kind="ue">
 
 <>
 
-Unity 模块是通过引入 iOS 和 Android 模块后增加桥接文件打包出的 `.unitypackage`，方便以 Unity 开发的游戏直接引入。其他引擎/平台的游戏可以通过 iOS/Android 原生的方式接入，详见 iOS/Android 接入文档。
+If you are building your game with Unity, you can import a `.unitypackage` file to your game, which includes the iOS module and the Android module. If you are building with other engines or for other platforms, you can import the iOS or Android module natively. Please refer to the documentation for iOS or Android for more information.
 
-**Unity 开发环境要求**：Unity 2019.4 或更高版本
+**Unity requirement**: You will need Unity 2019.4 or higher to use the SDK.
 
-支持版本：
+Supported OS versions:
 
-- Android：最低支持 5.0
-- iOS：最低支持 iOS 10.0
+- Android: 5.0 and higher
+- iOS: 10.0 and higher
 
-SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选其一。请根据项目需要选择。
+The SDK can be imported **either using the Unity Package Manager or manually**.
 
-#### 方法一：使用 Unity Package Manager
+#### Method 1: Use Unity Package Manager
 
-在项目的 `Packages/manifest.json` 文件中添加以下依赖：
+Add the following dependencies into `Packages/manifest.json`:
 
 <CodeBlock className="json">
   {`"dependencies":{
@@ -47,41 +43,41 @@ SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选�
 }`}
 </CodeBlock>
 
-在 Unity 顶部菜单中选择 **Window > Package Manager** 可查看已经安装在项目中的包。
+In Unity’s menu bar, select **Window > Package Manager** to view the packages already installed in the project.
 
-#### 方法二：手动导入
+#### Method 2: Import Manually
 
-在 [下载页](/tap-download) 找到 TapSDK Unity 和 LeanCloud C# SDK 下载地址，分别下载 TapSDK-UnityPackage.zip 和 LeanCloud-SDK-Storage-Unity.zip。
+Open the download pages of **TapSDK Unity** and **LeanCloud C# SDK** from the [Downloads](/tap-download) page and download `TapSDK-UnityPackage.zip` and `LeanCloud-SDK-Realtime-Unity.zip` from these pages.
 
 <ul>
-    <li> TapSDK-UnityPackage.zip 解压后，导入其中的 <code>TapTap_Common_{sdkVersions.taptap.unity}.unitypackage</code> 和 <code>TapTap_AntiAddiction_{sdkVersions.taptap.unity}.unitypackage</code>。</li>
+    <li>Import the <code>TapTap_Common_{sdkVersions.taptap.unity}.unitypackage</code> and <code>TapTap_AntiAddiction_{sdkVersions.taptap.unity}.unitypackage</code> unzipped from <code>TapSDK-UnityPackage.zip</code>.</li>
 </ul>
 
-- [LeanCloud-SDK-Storage-Unity.zip](https://github.com/leancloud/csharp-sdk/releases)，解压后为 Plugins 文件夹，拖拽至 Unity 即可。  
+- Drag the `Plugins` folder unzipped from [`LeanCloud-SDK-Realtime-Unity.zip`](https://github.com/leancloud/csharp-sdk/releases) into Unity.
 
-iOS 平台配置：
+Configuring for iOS:
 
-使用 Xcode 13.0 beta 5 编译，检查 Unity 输出的 Xcode 工程：
+Using Xcode 13.0 beta 5 for compiling the project, please follow the steps below to make sure the Xcode project produced by Unity is correctly configured:
 
-1. 请确保设置 `Xcode` - `General` - `Frameworks, Libraries, and Embedded Content` 中的 `AntiAddictionService.framework`  和 `AntiAddictionUI.framework` 为 `Do Not Embed`。
-2. 如果编译报错找不到头文件或者模块，请确保 `Xcode`-`Build Settings` - `Framework Search Paths` 中的路径以保证 Xcode 正常编译。
-3. 确保 Xcode 工程的 `Build Settings` 的 `Swift Compile Language/Swfit Language Version` 为 `Swift5`。
-4. 添加依赖库 `libz.tbd` `libc++.tdb`
-5. 开始代码接入
-6. 将 `AntiAddiction-Unity/Assets/Plugins/iOS/Resource/AntiAdictionResources.bundle` 拷贝到游戏项目下 (如果 unity 项目没有正确导入 `AntiAddictionResources.bundle`)
+1. Go to `Xcode` - `General` - `Frameworks, Libraries, and Embedded Content` and ensure that `AntiAddictionService.framework` and `AntiAddictionUI.framework` are set to `Do Not Embed`.
+2. If the compilation fails due to missing header files or modules, please make sure the path set in `Xcode` - `Build Settings` - `Framework Search Paths` is correct.
+3. Make sure the `Swift Compile Language` / `Swift Language Version` under `Build Settings` of the Xcode project is `Swift5`.
+4. Add `libz.tbd` and `libc++.tbd` as dependencies.
+5. Write your code to integrate the service.
+6. Copy `AntiAddiction-Unity/Assets/Plugins/iOS/Resource/AntiAdictionResources.bundle` to your game project (if `AntiAddictionResources.bundle` is not correctly imported to the Unity project).
 
 </>
 <>
 
-最低支持 Android 5.0（API level 21），编译环境为 Android Studio。
+The SDK supports Android 5.0 (API level 21) and higher. The SDK is compiled with Android Studio.
 
 <ul>
-<li>将 <strong>防沉迷 SDK</strong> <code>AntiAddiction_{sdkVersions.taptap.android}.aar</code> 拷贝到游戏目录下的 <code>src/main/libs</code> 目录中</li>
-<li>将 <strong>防沉迷 SDK</strong> <code>AntiAddictionUI_{sdkVersions.taptap.android}.aar</code> 拷贝到游戏目录下的 <code>src/main/libs</code> 目录中</li>
-<li>将 <code>TapCommon_{sdkVersions.taptap.android}.aar</code> 拷贝到游戏目录下的 <code>src/main/libs</code> 目录中</li>
+<li>Copy the <strong>Anti-addiction SDK</strong> <code>AntiAddiction_{sdkVersions.taptap.android}.aar</code> to the <code>src/main/libs</code> directory under your project</li>
+<li>Copy the <strong>Anti-addiction SDK</strong> <code>AntiAddictionUI_{sdkVersions.taptap.android}.aar</code> to the <code>src/main/libs</code> directory under your project</li>
+<li>Copy <code>TapCommon_{sdkVersions.taptap.android}.aar</code> to the <code>src/main/libs</code> directory under your project</li>
 </ul>
 
-在游戏目录下 `build.gradle` 文件中添加代码
+Add the following code to `build.gradle` under your project
 
 <CodeBlock className="groovy">
 {`repositories{
@@ -91,8 +87,8 @@ iOS 平台配置：
 }
 dependencies {
     // ...
-    implementation(name: "AntiAddiction_${sdkVersions.taptap.ios}", ext: "aar") // 防沉迷 SDK
-    implementation(name: "AntiAddictionUI_${sdkVersions.taptap.ios}", ext: "aar") // 防沉迷 SDK
+    implementation(name: "AntiAddiction_${sdkVersions.taptap.ios}", ext: "aar") // Anti-addiction SDK
+    implementation(name: "AntiAddictionUI_${sdkVersions.taptap.ios}", ext: "aar") // Anti-addiction SDK
     implementation(name: "TapCommon_${sdkVersions.taptap.ios}", ext: "aar")
     // ...
 }`}
@@ -101,69 +97,69 @@ dependencies {
 </>
 <>
 
-支持的 iOS 版本为最低为 iOS 10，SDK 编译环境为 Xcode 12。
+The SDK supports iOS 10 and higher. The SDK is compiled with Xcode 12.
 
-iOS **防沉迷 SDK** 结构：
+Below is the structure of the **Anti-addiction SDK** for iOS:
 
-- `AntiAddictionService` 防沉迷基础库，源码由 Swift 编写。
-- `AntiAddictionUI` 带 UI 的防沉迷库，依赖 `AntiAddictionService`，源码由  Objective-C 编写。
-- `AntiAdictionResources.bundle` 资源文件
+- `AntiAddictionService`: The base library for the Anti-addiction service written with Swift.
+- `AntiAddictionUI`: The Anti-addiction library with UI, which depends on `AntiAddictionService`. It is written with Objective-C.
+- `AntiAddictionResources.bundle`: Resource files.
 
-其他依赖：
+Other dependencies:
 
-- `TapCommonSDK.framework` 基础库
+- `TapCommonSDK.framework`: The base library.
 
-添加防沉迷库文件：
+To add the libraries for the Anti-addiction service:
 
-- 添加 `AntiAddictionService.framework`、`AntiAddictionUI.framework` 和 `TapCommonSDK.framework` 静态库。注意添加时选择 Embed 方式为 **Do Not Embed**。
+- Add `AntiAddictionService.framework`, `AntiAddictionUI.framework`, and `TapCommonSDK.framework`. Make sure to choose **Do Not Embed** as the embed method when adding these libraries.
 
-- 引用代码：
+- Import the code:
 
     ``` objc
     // AntiAddictionUI
     #import <AntiAddictionUI/AntiAddictionUI.h>
     ```
 
-添加系统依赖库：
+Add system dependencies:
 
-请检查项目中是否已自动添加以下依赖项：
+Check if the following dependencies have been automatically added to your project:
 
 - `libc++.tdb`
 - `libz.tdb`
-    
-若运行时遇到相关依赖库加载报错，可改为 Optional 尝试。
 
-配置编译选项：
+If the dependencies cannot be correctly loaded when you try to run your project, you can set the dependencies to be optional and try again.
 
-- 在 Build Setting 中的 Other Link Flag 中添加 `-ObjC`
+Configure options for compiling:
 
-- 在 Build Setting 中的 Always Embed Swift Standard Libraried 设置为 YES，即始终引入 Swift 标准库，避免 App 启动时报错「无法找到 Swift 标准库之类」。如果项目中找不到，可以建立一个空 Swift 文件，Xcode 会自动建立桥接关系。
+- Under *Build Setting*, add `-ObjC` to *Other Link Flag*.
 
-- 在 Build Setting 中的 Swift Compiler - Language/Swift Language Version 选择 Swift 5。
+- Under *Build Setting*, set *Always Embed Swift Standard Libraries* to *YES* so that the Swift standard library will always be imported. This prevents exceptions from happening when you run your app due to missing the Swift standard library. If the library cannot be found in your project, you can create an empty Swift file and Xcode will automatically set up the bridging relationship.
+
+- Under *Build Setting*, select *Swift 5* for *Swift Compiler - Language / Swift Language Version*.
 
 </>
 
 <>
 
-#### 环境要求
+#### Environment Requirements
 
-* 安装 UE 4.26 及以上版本
-* iOS 12 或更高版本
-* Android 5.0（API level 21）或更高版本
-* macOS 10.14.0 或更高版本
-* Windows 7 或更高版本
+* UE 4.26 or higher
+* iOS 12 or higher
+* Android 5.0 (API level 21) or higher
+* macOS 10.14.0 or higher
+* Windows 7 or higher
 
-**支持平台**：iOS / Android / Windows / macOS
+**Platforms supported**: iOS / Android / Windows / macOS
 
-#### 安装插件
+#### Install Plugins
 
-* 下载 [TapSDK UE4](/tap-download)，TapSDK-UE4-xxx.zip 解压后将 `AntiAddiction`、`TapCommon` 文件夹 Copy 到项目的 `Plugins` 目录中
-* 重启 Unreal Editor
-* 打开 编辑 > 插件 > 项目 > TapTap，开启 `AntiAddiction` 模块
+* Download [TapSDK UE4](/tap-download), unzip `TapSDK-UE4-xxx.zip`, and copy `AntiAddiction` and `TapCommon` to the `Plugins` directory of your project
+* Restart Unreal Editor
+* Go to Edit > Plugins > Project > TapTap and enable the `AntiAddiction` module
 
-#### 添加依赖
+#### Add Dependencies
 
-在 Project.Build.cs 中添加所需模块:
+Add the required dependencies to `Project.Build.cs`:
 
 ```cs
 PublicDependencyModuleNames.AddRange(new string[] { "Core",
@@ -178,7 +174,7 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core",
 });
 ```
 
-#### 导入头文件
+#### Import the Header File
 
 ```cpp
 #include "TapUEBootstrap.h"
@@ -186,24 +182,24 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core",
 
 <details>
 
-<summary>iOS 打包 Objective-c 和 Swift 的混编解决方案</summary>
+<summary>Compiling a project with a mixture of Objective-C and Swift code</summary>
 
-目前有两种解决方案
+You can take either of the following two methods.
 
-一、防沉迷库替换成动态库
+Method one: Replace the Anti-addiction library with the dynamic library
 
-优缺点：
+Pros can cons:
 
-* 优点：可以不用修改引擎的代码
-* 缺点：
-    * 包体积略微增大
-    * 最低支持 iOS 13，低于该系统版本会造成闪退
+* Pros: You don’t have to edit the code of the engine
+* Cons:
+    * The size of the package will increase a little bit
+    * Only iOS 13 and higher is supported; the project will crash on iOS 12 and below
 
-操作步骤：
+Steps:
 
-1. 下载 TapSDK-iOS 相同版本的[库文件](https://github.com/taptap/TapSDK-iOS/releases)
-2. 把 `Plugins/AntiAddiction/Source/AntiAddiction/ios/framework/AntiAddictionService.zip` 中的 `AntiAddictionService.framework` 替换成刚下载到的 `Dylib/AntiAddictionService.framework`（解压缩 -> 替换 -> 压缩）
-3. 把 `AntiAddiction.Build.cs` 文件中
+1. Download the [library file](https://github.com/taptap/TapSDK-iOS/releases) that has the same version as the `TapSDK-iOS` you’re using
+2. Replace the `AntiAddictionService.framework` in `Plugins/AntiAddiction/Source/AntiAddiction/ios/framework/AntiAddictionService.zip` with the `Dylib/AntiAddictionService.framework` you just downloaded (unzip -> replace -> zip)
+3. Replace the following part in `AntiAddiction.Build.cs`
 
     ```cs
     new Framework(
@@ -212,7 +208,7 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core",
     )
     ```
 
-    替换成：
+    with:
 
     ```cs
     new Framework(
@@ -223,21 +219,21 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core",
     )
     ```
 
-4. 重新编译即可
+4. Compile the project again
 
-二、修改 `UnrealBuildTool`
+Method two: Edit `UnrealBuildTool`
 
-1. 修改 `XcodeProject.cs` 文件
+1. Edit `XcodeProject.cs`
 
-    路径：`Engine/Source/Programs/UnrealBuildTool/ProjectFiles/Xcode/XcodeProject.cs`
+    Path: `Engine/Source/Programs/UnrealBuildTool/ProjectFiles/Xcode/XcodeProject.cs`
 
-    在函数：
+    Find the function:
 
     ```cpp
     private void AppendProjectBuildConfiguration(StringBuilder Content, string ConfigName, string ConfigGuid)
     ```
 
-    中添加如下代码：
+    And add the following code to the function:
 
     ```cpp
     // Enable Swift
@@ -252,23 +248,23 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core",
     Content.Append("\t\t\t\tEMBEDDED_CONTENT_CONTAINS_SWIFT = YES;" + ProjectFileGenerator.NewLine);
     ```
 
-    参考如下：
+    Your code should look like this:
     ![](/img/ue4/16638534428329.jpg)
 
-2. 修改 `IOSToolChain.cs` 文件
+2. Edit `IOSToolChain.cs`
 
-    路径：`Engine/Source/Programs/UnrealBuildTool/Platform/IOS/IOSToolChain.cs`
+    Path: `Engine/Source/Programs/UnrealBuildTool/Platform/IOS/IOSToolChain.cs`
 
-    在函数：
+    Find the function:
 
     ```cpp
     string GetLinkArguments_Global(LinkEnvironment LinkEnvironment)
     ```
 
-    中添加如下代码：
+    And add the following code to the function:
 
     ```cpp
-    // 该行代码需要前置（前置的代码位置见下面示例图片）
+    // This line shall be placed at the beginning (see the screenshot below)
     // Added by uwellpeng: enable swift support, make sure '/usr/lib/swift' goes before '@executable_path/Frameworks'
     Result += " -rpath \"/usr/lib/swift\"";
 
@@ -288,24 +284,24 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core",
     swiftLibPath = String.Format(" -L {0}Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/{1}",
                                 Settings.Value.XcodeDeveloperDir, bIsDevice? Settings.Value.DevicePlatformName.ToLower() : Settings.Value.SimulatorPlatformName.ToLower());
     Result += swiftLibPath;
-    // XCode 12 多了swiftcompatabiliy51 的库，需要新增以下代码
+    // Xcode 12 has an additional `swiftcompatabiliy51` library and the following code needs to be added
     if (Settings.Value.IOSSDKVersionFloat >= 14.0f)
     {
         Result += String.Format(" -lswiftCompatibility51");
     }
     ```
 
-    需要注意的是 `Result += " -rpath \"/usr/lib/swift\"";` 这段代码需要加在 `@executable_path/Frameworks` 前面
+    Keep in mind that `Result += " -rpath \"/usr/lib/swift\"";` should be placed above `@executable_path/Frameworks`
 
-    参考：
-    ​
+    Your code should look like this:
+    
     ![](/img/ue4/16638540076605.jpg)
 
-3. 重新编译 UBT
+3. Recompile UBT
 
-    使用 `msbuild` 工具重新编译 `UnrealBuildTool`，即在 `Engine/Source/Programs/UnrealBuildTool` 目录运行 `Terminal` 指令 `msbuild` 来重新编译（如果引擎目录在一些不可编辑的目录下，可以加上 `sudo` 命令，即 `sudo msbuild`）。
+    Recompile `UnrealBuildTool` with `msbuild`. You can run the `Terminal` command `msbuild` under the `Engine/Source/Programs/UnrealBuildTool` directory. If the engine directory is under a directory that you cannot edit, you can prepend the command with `sudo`, like `sudo msbuild`.
 
-    完成上述三个步骤即可在解决 UnrealEngine 上 swift 的混编问题
+    Once you finish the three steps above, you will be able to compile a project with a mixture of Objective-C and Swift code.
 
 </details>
 
@@ -313,11 +309,11 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core",
 
 </MultiLang>
 
-防沉迷 SDK 需要联网和发送请求数据的权限，请开发者注意在项目中声明相应权限。
+The Anti-addiction SDK needs the permissions for connecting to the internet and sending request data. Please make sure to declare those permissions in your project.
 
-## 初始化
+## Initialize the SDK
 
-初始化防沉迷 UI 模块，设置启动防沉迷功能的配置，注册防沉迷的消息监听。请注意，**触发回调需要调用[防沉迷认证](#防沉迷认证)接口。**
+During this step, you will be initializing the Anti-addiction UI module, providing configurations for starting the anti-addiction function, and setting up listeners for events related to anti-addiction. Keep in mind that **the [Identity Verification](#identity-verification) interface needs to be invoked when the callback is triggered**.
 
 <MultiLang kind="ue">
 <>
@@ -328,18 +324,18 @@ using TapTap.AntiAddiction.Model;
 
 AntiAddictionConfig config = new AntiAddictionConfig()
 {
-    gameId = "your_client_id",      // TapTap 开发者中心对应 Client ID
-    useTapLogin = true,             // 是否启动 TapTap 快速认证
-    showSwitchAccount = false,      // 是否显示切换账号按钮
+    gameId = "your_client_id",      // The Client ID obtained from the TapTap Developer Center
+    useTapLogin = true,             // Whether to use TapTap Quick Verification
+    showSwitchAccount = false,      // Whether to display the button for switching account
 };         
 
 Action<int, string> callback = (code, errorMsg) => {
-    //code == 500;   //登录成功
-    //code = 1000;   //用户登出
-    //code = 1001;   //切换账号
-    //code = 1030;   //用户当前无法进行游戏
-    //code = 1050;   //时长限制
-    //code = 9002;   //实名过程中点击了关闭实名窗
+    // code == 500;   // Logged in
+    // code == 1000;  // Logged out
+    // code == 1001;  // The user tapped the button for switching account
+    // code == 1030;  // The user is not allowed to play games at this time
+    // code == 1050;  // The time limit is reached
+    // code == 9002;  // The user closed the window for real-name verification
     UnityEngine.Debug.LogFormat($"code: {code} error Message: {errorMsg}");
 };
 
@@ -351,19 +347,19 @@ AntiAddictionUIKit.Init(config, callback);
 
 
 ```java
-// Android SDK 的各接口第一个参数是当前 Activity，以下不再说明
+// The first argument passed into the interfaces of the Android SDK is always the current `Activity`
 
 Config config = new Config.Builder()
-  .withClientId("your_client_id") // TapTap 开发者中心对应 Client ID
-  .enableTapLogin(true)           // 是否启动 TapTap 快速认证
-  .showSwitchAccount(false)       // 是否显示切换账号按钮
+  .withClientId("your_client_id") // The Client ID obtained from the TapTap Developer Center
+  .enableTapLogin(true)           // Whether to use TapTap Quick Verification
+  .showSwitchAccount(false)       // Whether to display the button for switching account
   .build();
 
 AntiAddictionUIKit.init(activity, config, new AntiAddictionUICallback() {
     @Override
     public void onCallback(int code, Map<String, Object> extras) {
         if (code == Constants.ANTI_ADDICTION_CALLBACK_CODE.LOGIN_SUCCESS){
-            Log.d("TapTap-AntiAddiction", "玩家登录后判断当前玩家可以进行游戏");
+            Log.d("TapTap-AntiAddiction", "The player is qualified to play the game");
         }
   }
 });
@@ -374,18 +370,18 @@ AntiAddictionUIKit.init(activity, config, new AntiAddictionUICallback() {
 
 ```objc
 AntiAddictionConfig *config = [[AntiAddictionConfig alloc] init];
-config.clientID = @"your_client_id";  // TapTap 开发者中心对应 Client ID
+config.clientID = @"your_client_id";  // The Client ID obtained from the TapTap Developer Center
 config.useTapLogin = YES;
 config.showSwitchAccount = YES;
-// self需要实现AntiAddictionDelegate协议，self用其他遵守AntiAddictionDelegate协议的对象替换
+// `self` needs to implement the `AntiAddictionDelegate` protocol; `self` can be replaced by another object that follows the `AntiAddictionDelegate` protocol
 [AntiAddiction initWithConfig:config delegate:self];
 ```
 
- `+[AntiAddiction initWithConfig:delegate:]` 中的 `delegate` 对象需要实现以下协议方法来接收回调：
+The `delegate` object of `+[AntiAddiction initWithConfig:delegate:]` needs to implement the following protocol to receive callbacks:
 
 ```objc
 - (void)antiAddictionCallbackWithCode:(AntiAddictionResultHandlerCode)code extra:(NSString * _Nullable)extra {
-    // 防沉迷回调
+    // Anti-addiction callback
 }
 ```
 
@@ -395,41 +391,41 @@ config.showSwitchAccount = YES;
 
 ```cpp
 FAAUConfig Config;
-Config.ClientID = TEXT("your_client_id"); // TapTap 开发者中心对应 Client ID
+Config.ClientID = TEXT("your_client_id"); // The Client ID obtained from the TapTap Developer Center
 Config.ShowSwitchAccount = false;
-Config.UseTapLogin = true;                // taptap 快速实名不支持 PC 版
+Config.UseTapLogin = true;                // TapTap Quick Verification doesn’t support PC
 AntiAddictionUE::Init(Config);
 ```
 
-防沉迷启动后，会有各种事件的回调，所以需要监听回调 `AntiAddictionUE::OnCallBack`，具体的事件可以参考 `AntiAddictionUE::ResultHandlerCode` 值。
+Once the Anti-addiction service is started, there will be callbacks for different events being triggered, so the `AntiAddictionUE::OnCallBack` callback needs to be listened on. See the values of `AntiAddictionUE::ResultHandlerCode` for a list of possible events.
 
 ```cpp
-// 绑定 AntiAddictionUE::OnCallBack 回调
+// Bind the `AntiAddictionUE::OnCallBack` callback
 AntiAddictionUE::OnCallBack.BindUObject(this, &UAntiAddictionWidget::OnCallBack);
 
 void UAntiAddictionWidget::OnCallBack(AntiAddictionUE::ResultHandlerCode Code, const FString& Message) {
 	TUDebuger::DisplayShow(FString::Printf(TEXT("Code: %d, Message: %s"), Code, *Message));
 	switch (Code) {
 	case AntiAddictionUE::LoginSuccess:
-		TUDebuger::DisplayShow(TEXT("登录成功"));
+		TUDebuger::DisplayShow(TEXT("Logged in"));
 		break;
 	case AntiAddictionUE::Exited:
-		TUDebuger::DisplayShow(TEXT("用户登出"));
+		TUDebuger::DisplayShow(TEXT("Logged out"));
 		break;
 	case AntiAddictionUE::SwitchAccount:
-		TUDebuger::DisplayShow(TEXT("切换账号"));
+		TUDebuger::DisplayShow(TEXT("The user tapped the button for switching account"));
 		break;
 	case AntiAddictionUE::DurationLimit:
-		TUDebuger::DisplayShow(TEXT("时长耗尽，用户当前无法进行游戏"));
+		TUDebuger::DisplayShow(TEXT("The time limit is reached"));
 		break;
 	case AntiAddictionUE::PeriodRestrict:
-		TUDebuger::DisplayShow(TEXT("宵禁时间，用户当前无法进行游戏"));
+		TUDebuger::DisplayShow(TEXT("The user is not allowed to play games at this time"));
 		break;
 	case AntiAddictionUE::RealNameStop:
-		TUDebuger::DisplayShow(TEXT("取消实名"));
+		TUDebuger::DisplayShow(TEXT("The user closed the window for real-name verification"));
 		break;
 	default:
-		TUDebuger::WarningLog(TEXT("未知回调的 Code: ") + FString::FromInt(Code));
+		TUDebuger::WarningLog(TEXT("Unknown Code: ") + FString::FromInt(Code));
 		break;
 	}
 }
@@ -439,122 +435,122 @@ void UAntiAddictionWidget::OnCallBack(AntiAddictionUE::ResultHandlerCode Code, c
 
 </MultiLang>
 
-### 参数说明
+### Parameters
 
 <MultiLang kind="ue">
 
 <>
 
-- `config` 是防沉迷功能的配置，包括如下参数:
-  - `gameId` 游戏的 `Client ID`，可以在控制台查看（**开发者中心 > 你的游戏 > 游戏服务 > 应用配置**）。
+- `config` is the configuration for the Anti-addiction service. It contains the following parameters:
+  - `gameId`: The `Client ID` of the game, which can be found on the Developer Center (**开发者中心 > 你的游戏 > 游戏服务 > 应用配置**).
 
-  - `useTapLogin` 是否使用 [TapTap 快速认证](#taptap-快速认证)。建议使用这个功能，方便已经在 TapTap 上实名认证过的玩家快速完成防沉迷认证步骤。
+  - `useTapLogin`: Whether to use [TapTap Quick Verification](#taptap-quick-verification). We recommend that you enable this feature so that players who have already confirmed their identities on TapTap can quickly complete the verification process for anti-addiction.
 
-  - `showSwitchAccount` 是否显示切换账号按钮。如果游戏没有切换账号功能，可以在初始化阶段配置隐藏切换账号按钮；如果游戏选择显示切换账号按钮(如下图所示)，玩家点击之后会触发 `1001` 回调，游戏可根据这个回调 code 做相应处理。
+  - `showSwitchAccount`: Whether to display the button for switching accounts. If your game doesn’t provide the function for players to switch accounts, you can make this button hidden from the user interface. If you choose to have the button displayed (as shown in the image below), the `1001` callback will be triggered when the player hits the button. Your game can handle the player’s request for switching accounts upon receiving this code.
   
-- `callback` 是防沉迷的在各种情况下，通知用户的回调接口,包含参数如下:
-  - `code` 不同情况下的回调类型，详情可以参考下面的[回调类型](#回调类型)。
+- `callback` is the callback interface provided by the SDK to notify users of events. It contains the following parameters:
+  - `code`: The callback type for the event. See [Callback Types](#callback-types) for more information.
 
-  - `errorMsg` 在执行不同业务时，发生错误时的错误消息。
-
-</>
-
-<>
-
-防沉迷初始化参数包括：
-
-- 游戏的 `Client ID`，可以在控制台查看（**开发者中心 > 你的游戏 > 游戏服务 > 应用配置**）。
-- 是否使用 [TapTap 快速认证](#taptap-快速认证)。建议使用这个功能，方便已经在 TapTap 上实名认证过的玩家快速完成防沉迷认证步骤。
-- 是否显示切换账号按钮。如果游戏没有切换账号功能，可以在初始化阶段配置隐藏切换账号按钮；如果游戏选择显示切换账号按钮(如下图所示)，玩家点击之后会触发 `1001` 回调，游戏可根据这个回调 code 做相应处理。
+  - `errorMsg`: If an error occurs, this will be the error message.
 
 </>
 
 <>
 
-- `config` 是防沉迷功能的配置，包括如下参数:
-  - `clientID` 游戏的 `Client ID`，可以在控制台查看（**开发者中心 > 你的游戏 > 游戏服务 > 应用配置**）。
+The following parameters need to be provided when you initialize the Anti-addiction service:
 
-  - `useTapLogin` 是否使用 [TapTap 快速认证](#taptap-快速认证)。建议使用这个功能，方便已经在 TapTap 上实名认证过的玩家快速完成防沉迷认证步骤。
+- The `Client ID` of the game, which can be found on the Developer Center (**开发者中心 > 你的游戏 > 游戏服务 > 应用配置**).
+- Whether to use [TapTap Quick Verification](#taptap-quick-verification). We recommend that you enable this feature so that players who have already confirmed their identities on TapTap can quickly complete the verification process for anti-addiction.
+- Whether to display the button for switching accounts. If your game doesn’t provide the function for players to switch accounts, you can make this button hidden from the user interface. If you choose to have the button displayed (as shown in the image below), the `1001` callback will be triggered when the player hits the button. Your game can handle the player’s request for switching accounts upon receiving this code.
 
-  - `showSwitchAccount` 是否显示切换账号按钮。如果游戏没有切换账号功能，可以在初始化阶段配置隐藏切换账号按钮；如果游戏选择显示切换账号按钮(如下图所示)，玩家点击之后会触发 `1001` 回调，游戏可根据这个回调 code 做相应处理。
+</>
+
+<>
+
+- `config` is the configuration for the Anti-addiction service. It contains the following parameters:
+  - `clientID`: The `Client ID` of the game, which can be found on the Developer Center (**开发者中心 > 你的游戏 > 游戏服务 > 应用配置**).
+
+  - `useTapLogin`: Whether to use [TapTap Quick Verification](#taptap-quick-verification). We recommend that you enable this feature so that players who have already confirmed their identities on TapTap can quickly complete the verification process for anti-addiction.
+
+  - `showSwitchAccount`: Whether to display the button for switching accounts. If your game doesn’t provide the function for players to switch accounts, you can make this button hidden from the user interface. If you choose to have the button displayed (as shown in the image below), the `1001` callback will be triggered when the player hits the button. Your game can handle the player’s request for switching accounts upon receiving this code.
   
-- `delegate` 对象需要实现 `-[AntiAddictionDelegate antiAddictionCallbackWithCode:extra:]` 协议方法来接收回调
-  - `code` 不同情况下的回调类型，详情可以参考下面的[回调类型](#回调类型)。
+- The `delegate` object needs to implement the `-[AntiAddictionDelegate antiAddictionCallbackWithCode:extra:]` protocol to receive callbacks
+  - `code`: The callback type for the event. See [Callback Types](#callback-types) for more information.
 
-  - `extra` 在执行不同业务时，会带上一些详细信息。
+  - `extra`: Additional information for the current event.
 
 </>
 
 <>
 
-- `config` 是防沉迷功能的配置，包括如下参数:
-  - `ClientID` 游戏的 `Client ID`，可以在控制台查看（**开发者中心 > 你的游戏 > 游戏服务 > 应用配置**）。
+- `config` is the configuration for the Anti-addiction service. It contains the following parameters:
+  - `ClientID`: The `Client ID` of the game, which can be found on the Developer Center (**开发者中心 > 你的游戏 > 游戏服务 > 应用配置**).
 
-  - `UseTapLogin` 是否使用 [TapTap 快速认证](#taptap-快速认证)。建议使用这个功能，方便已经在 TapTap 上实名认证过的玩家快速完成防沉迷认证步骤。
+  - `UseTapLogin`: Whether to use [TapTap Quick Verification](#taptap-quick-verification). We recommend that you enable this feature so that players who have already confirmed their identities on TapTap can quickly complete the verification process for anti-addiction.
 
-  - `ShowSwitchAccount` 是否显示切换账号按钮。如果游戏没有切换账号功能，可以在初始化阶段配置隐藏切换账号按钮；如果游戏选择显示切换账号按钮(如下图所示)，玩家点击之后会触发 `1001` 回调，游戏可根据这个回调 code 做相应处理。
+  - `ShowSwitchAccount`: Whether to display the button for switching accounts. If your game doesn’t provide the function for players to switch accounts, you can make this button hidden from the user interface. If you choose to have the button displayed (as shown in the image below), the `1001` callback will be triggered when the player hits the button. Your game can handle the player’s request for switching accounts upon receiving this code.
 
 
 </>
 
 </MultiLang>
 
-![切换账号界面](/img/anti-addiction/switch-account.png)
+![The user interface for switching account](/img/anti-addiction/switch-account.png)
 
-### 回调类型
+### Callback Types
 
-| 回调 code | 回调类型 | 触发逻辑 |
+| Callback code | Callback type | When does it get triggered |
 |---|---|---|
-| 500 | `LOGIN_SUCCESS` | 玩家登录后判断当前玩家可以进行游戏 |
-| 1000 | `EXITED` | 退出账号 |
-| 1001 | `SWITCH_ACCOUNT` | 点击切换账号按钮 |
-| 1030 | `PERIOD_RESTRICT` | 未成年玩家当前无法进行游戏 |
-| 1050 | `DURATION_LIMIT` | 时长限制 |
-| 9002 | `REAL_NAME_STOP` | 实名过程中点击了关闭实名窗 |
+| 500 | `LOGIN_SUCCESS` | Logged in |
+| 1000 | `EXITED` | Logged out |
+| 1001 | `SWITCH_ACCOUNT` | The user tapped the button for switching account |
+| 1030 | `PERIOD_RESTRICT` | The user is not allowed to play games at this time |
+| 1050 | `DURATION_LIMIT` | The time limit is reached |
+| 9002 | `REAL_NAME_STOP` | The user closed the window for real-name verification |
 
-## 防沉迷认证
+## Identity Verification
 
-SDK 支持两种防沉迷认证方式：
+The SDK provides two methods for you to verify the identities of players:
 
-1. 使用 TapTap 快速认证，可令玩家授权游戏使用 TapTap 上的年龄段信息完成实名。
-2. 不使用 TapTap 快速认证，玩家在 SDK 提供的界面中手动输入身份证号等实名信息。
+1. TapTap Quick Verification: This allows players to authorize your game to use their age range information from TapTap to quickly complete the real-name verification process.
+2. Manual entry: This lets players enter their identity information with the user interface provided by the SDK.
 
-TDS 云端会根据实名信息判断玩家是否可以进行游戏，并将相关信息上报至中宣部防沉迷实名认证系统。
+TDS’ server will tell if a player can play your game based on their identity information. The player’s information will be automatically sent to Zhongxuanbu’s system.
 
-我们推荐使用第一种方式，对于玩家而言，不需要手动输入信息，可以快速完成认证、进入游戏，体验更佳。
+We recommend that you adopt the first method so that players won’t have to manually enter their identity information and can start playing your game more quickly.
 
-### TapTap 快速认证
+### TapTap Quick Verification
 
 :::info
-防沉迷 v3.7.1 开始，使用快速认证不再依赖 TapTap 登录 SDK，但快速认证需要玩家在已登录状态下授权游戏使用其在 TapTap 上的年龄段信息完成实名，**请确保完成了以下工作**：
+Starting from v3.7.1, TapTap Quick Verification doesn’t depend on the TapTap Login SDK anymore, although a player has to be logged in to authorize the game to use their age range information from TapTap. **Please make sure you have completed the following steps**:
 
-- **开通 TapTap 登录功能**。若此项未完成，快速认证时玩家会遇到「应用未开通 TapTap 登录服务」提醒。
-- **后台[配置签名证书](/sdk/start/quickstart/#配置签名证书)**。若此项未完成，快速认证拉起 TapTap 客户端会提示「授权失败」。
-- **后台[添加测试用户](/sdk/start/test-accounts/)**，或者点击「开放全量用户」按钮。若此项未完成，快速认证时玩家会遇到「抱歉，该游戏 / 应用暂未开放」提醒。
+- **Enable TapTap Login**. If this step is not completed, the player will see “应用未开通 TapTap 登录服务” when using TapTap Quick Verification.
+- **[Configure the signature certificate](/sdk/start/quickstart/#configure-signature-certificate) on the Developer Center**. If this step is not completed, the player will see “授权失败” when using TapTap Quick Verification.
+- **[Add testers](/sdk/start/test-accounts/) on the Developer Center** or open up the game to everyone. If this step is not completed, the player will see “抱歉，该游戏 / 应用暂未开放” when using TapTap Quick Verification.
 :::
 
-初始化 SDK 时将是否使用 TapTap 快速认证参数设置为 `true`。
+To enable TapTap Quick Verification, set the parameter for TapTap Quick Verification to `true` when initializing the SDK.
 
-传入玩家唯一标识 `userIdentifier`，即可开始 TapTap 快速认证。SDK 会拉起 TapTap 开始快速认证，如果 SDK 检测到玩家设备中未安装 TapTap 客户端，则会打开 WebView，玩家可授权游戏使用其在 TapTap 上的年龄段信息来完成游戏内的实名流程。
+To start the verification process, you need to provide `userIdentifier`, the unique identifier of the player. The SDK will then open the TapTap app. If the TapTap app is not installed on the device, a WebView will be opened. The player can then authorize the game to use their age range information from TapTap to complete the real-name verification process in the game.
 
-其中的**玩家唯一标识** `userIdentifier`，如果接入 [TDS 内建账户系统](/sdk/taptap-login/guide/start/#一键完成-taptap-登录)，可以用玩家的 `objectId`；如果使用[单纯 TapTap 用户认证](/sdk/taptap-login/guide/tap-login/#taptap-登录并获取登录结果)则可以用 `openid` 或 `unionid`。
+For `userIdentifier`, the **unique identifier of the player**, if your game is using [TDS’ built-in account system](/sdk/taptap-login/guide/start/#quick-log-in-with-taptap), you can use the player’s `objectId` as it; if your game is using the [basic TapTap user verification](/sdk/taptap-login/guide/tap-login/#check-login-status-and-user-info), you can use the player’s `openid` or `unionid`.
 
 <MultiLang kind="ue">
 
 <>
 
 ```cs
-// 注意唯一标识参数值长度不能超过 64 字符
-string userIdentifier = "玩家的唯一标识";
+// The unique identifier cannot be longer than 64 characters
+string userIdentifier = "THE_UNIQUE_IDENTIFIER_OF_THE_PLAYER";
 AntiAddictionUIKit.Startup(userIdentifier);
 ```
 
-**注意**：Unity 项目如果没有接入登录模块，则项目导出的 Xcode 工程打包 iOS 时需要配置 `URLSchema`。
+**Attention**: If your Unity project hasn’t integrated the TapTap Login module, you’ll need to configure the `URLSchema` when creating a package for iOS from the exported Xcode project.
 
 <details>
-<summary>查看 Xcode 工程如何配置 URLSchema</summary>
+<summary>How to configure the `URLSchema` for an Xcode project</summary>
 
-打开 `info.plist`，添加如下配置（请替换 `clientID` 为你在控制台获取的 Client ID）：
+Open `info.plist` and add the following configurations (replace the `clientID` with the Client ID you obtained from the Developer Center):
 
 ![](/img/tap_ios_info.png)
 
@@ -568,7 +564,7 @@ AntiAddictionUIKit.Startup(userIdentifier);
            <string>taptap</string>
            <key>CFBundleURLSchemes</key>
            <array>
-               <!-- 这里注意下，中括号需要去掉，最终是 Client ID 前拼接上 `tt` 的形式，例如：ttFwFdCxxxxxxxQDQwQN -->
+               <!-- Note: The final string should be `tt` concatenated with the Client ID (without brackets). For example: ttFwFdCxxxxxxxQDQwQN -->
                <string>tt[clientID]</string>
            </array>
        </dict>
@@ -585,8 +581,8 @@ AntiAddictionUIKit.Startup(userIdentifier);
 <>
 
 ```java
-// 注意唯一标识参数值长度不能超过 64 字符
-String userIdentifier = "玩家的唯一标识";
+// The unique identifier cannot be longer than 64 characters
+String userIdentifier = "THE_UNIQUE_IDENTIFIER_OF_THE_PLAYER";
 AntiAddictionUIKit.startup(activity, userIdentifier);
 ```
 
@@ -594,27 +590,27 @@ AntiAddictionUIKit.startup(activity, userIdentifier);
 <>
 
 ```objc
-// 注意唯一标识参数值长度不能超过 64 字符
-NSString *userIdentifier = @"玩家的唯一标识";
+// The unique identifier cannot be longer than 64 characters
+NSString *userIdentifier = @"THE_UNIQUE_IDENTIFIER_OF_THE_PLAYER";
 [AntiAddiction startupWithUserID:userIdentifier];
 ```
 
-使用 **TapTap 快速认证** 需要在 `AppDelegate` 里嵌入回调。
+To use **TapTap Quick Verification**, the callback needs to be embedded into `AppDelegate`.
 
-注意：如果已经在登录模块添加过，可以跳过此步。
+Attention: If you have already added this for the TapTap Login module, you can skip this step.
 
 ```objc
 #import <TapCommonSDK/TapCommonSDK.h>
 
-// 新的回调
+// The new callback
 - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
     return [TDSHandleUrl handleOpenURL:url];
 } 
 ```
-  
-此外，如果没有接入登录模块，还需要配置 `URLSchema` 。
 
-打开 `info.plist`，添加如下配置（请替换 `clientID` 为你在控制台获取的 Client ID）：
+If you haven’t integrated the TapTap Login module, you will need to configure the `URLSchema` as well.
+
+Open `info.plist` and add the following configurations (replace the `clientID` with the Client ID you obtained from the Developer Center):
 
 ![](/img/tap_ios_info.png)
 
@@ -628,7 +624,7 @@ NSString *userIdentifier = @"玩家的唯一标识";
            <string>taptap</string>
            <key>CFBundleURLSchemes</key>
            <array>
-               <!-- 这里注意下，中括号需要去掉，最终是 Client ID 前拼接上 `tt` 的形式，例如：ttFwFdCxxxxxxxQDQwQN -->
+               <!-- Note: The final string should be `tt` concatenated with the Client ID (without brackets). For example: ttFwFdCxxxxxxxQDQwQN -->
                <string>tt[clientID]</string>
            </array>
        </dict>
@@ -653,15 +649,15 @@ AntiAddictionUE::Startup(TEXT("your_userIdentifier"));
 
 </MultiLang>
 
-### 手动输入实名信息
+### Manual Entry
 
-如果不使用 TapTap 快速认证，初始化 SDK 时将是否使用 TapTap 快速认证参数设置为 `false`，调用认证接口。
+If you prefer not to enable TapTap Quick Verification, set the parameter for TapTap Quick Verification to `false` when initializing the SDK.
 
-需要传入的**玩家唯一标识** `userIdentifier`，由游戏自己定义，字符串长度最大限定为 64 个字符。
+The format of the `userIdentifier`, the **unique identifier of the player**, will be defined by your game. It should be no longer than 64 characters.
 
-## 登出
+## Log Out
 
-玩家在游戏内退出账号时调用，重置防沉迷状态。
+When a user logs out of your game, you can invoke this method to reset the states of the Anti-addiction service.
 
 <MultiLang kind="ue">
 
@@ -683,9 +679,9 @@ AntiAddictionUE::Exit();
 
 </MultiLang>
 
-## 获取玩家年龄段
+## Obtain Player’s Age Range
 
-调用该接口可获取玩家所处年龄段：
+Invoke the following interface to get the player’s age range:
 
 <MultiLang kind="ue">
 
@@ -707,20 +703,20 @@ EAAUAgeLimit AgeLimit = AntiAddictionUE::GetAgeRange();
 
 </MultiLang>
 
-上例中的 `ageRange` 是一个整数，表示玩家所处年龄段的下限（最低年龄）。
-特别地，`-1` 表示「未知」，说明该用户还未实名。
+The `ageRange` in the example above is an integer indicating the minimum age among the age range of the player.
+If its value is `-1`, it means that the age range of the user is unknown. This indicates that the user hasn’t verified their identity yet.
 
-| 类型数值 | 含义 |
+| Value | Meaning |
 | - | - |
-| -1 | 未知 |
-| 0 | 0 到 7 岁 |
-| 8 | 8 到 15 岁 |
-| 16 | 16 到 17 岁 |
-| 18 | 成年玩家 |
+| -1 | Unknown |
+| 0 | 0 to 7 years old |
+| 8 | 8 to 15 years old |
+| 16 | 16 to 17 years old |
+| 18 | Adult |
 
-## 获取剩余时长（单位:秒）
+## Get Remaining Time (In Seconds)
 
-获取玩家当前剩余时长：
+To get the time remaining for the player:
 
 <MultiLang kind="ue">
 
@@ -742,9 +738,9 @@ int RemainingTime = AntiAddictionUE::GetRemainingTime();
 
 </MultiLang>
 
-## 获取剩余时长（单位:分钟）
+## Get Remaining Time (In Minutes)
 
-获取玩家当前剩余时长：
+To get the time remaining for the player:
 
 <MultiLang kind="ue">
 
@@ -766,12 +762,12 @@ int RemainingTimeInMinutes = AntiAddictionUE::GetRemainingTimeInMinutes();
 
 </MultiLang>
 
-## 检查消费上限
+## Check Payment Restrictions
 
-根据年龄段的不同，未成年玩家的消费金额有不同的上限。
-如果启用消费限制功能，开发者需要在未成年玩家消费前检查是否受限，并在成功消费后上报消费金额。
+Different payment restrictions are imposed on minors that fall under different age ranges.
+To enable payment restrictions, you will be checking if restrictions exist before a minor attempts to make a payment. When a payment goes through, you will also be reporting the amount paid to our service.
 
-游戏在收到玩家的付费请求后，调用以下接口当前玩家的付费行为是否被限制：
+To check if the current player is allowed to make a payment when your game receives a request from the player to make a payment:
 
 <MultiLang kind="ue">
 
@@ -779,14 +775,14 @@ int RemainingTimeInMinutes = AntiAddictionUE::GetRemainingTimeInMinutes();
 long amount = 100;
 AntiAddictionUIKit.CheckPayLimit(amount,
     (result) => {
-        // status 为 1 时可以支付
+        // If `status` is `1`, the player is allowed to make a payment
         int status = result.status;
         if (status == 1) {
-            // 可以进行支付
+            // The player is allowed to make a payment
         }
     },
     (exception) => {
-        // 处理异常
+        // Handle exception
     }
 );
 ```
@@ -797,14 +793,14 @@ AntiAddictionUIKit.checkPayLimit(activity, amount,
     new Callback<CheckPayResult>() {
         @Override
         public void onSuccess(CheckPayResult result) {
-            // status 为 true 时可以支付，false 则限制消费
+            // If `status` is `true`, the player is allowed to make a payment; otherwise, the player cannot make a payment
             if (result.status) {
             }
         }
         
         @Override
         public void onError(Throwable throwable) {
-            // 处理异常                     
+            // Handle exception
         }
     }
 );
@@ -814,10 +810,10 @@ AntiAddictionUIKit.checkPayLimit(activity, amount,
 NSInteger amount = 100;
 [AntiAddiction checkPayLimit:amount resultBlock:^(BOOL status) {
     if (status) {
-        // 无限制
+        // Not restricted
     }
 } failureHandler:^(NSString * _Nonnull error) {
-    // 处理异常
+    // Handle exception
 }];
 ```
 
@@ -831,11 +827,11 @@ AntiAddictionUE::CheckPayLimit(FCString::Atoi(*AmountTF->Text.ToString()), [](bo
 
 </MultiLang>
 
-消费金额的单位为分。
+The unit of the amount is *cent*.
 
-检查消费上限需要游戏事先上报未成年玩家的消费金额。
-建议开发者在服务端上报，服务端上报方式参见 [相关 REST API 用法说明](#上报消费金额)。
-开发者也可以调用 SDK 提供的接口，当未成年玩家消费成功后，在客户端上报消费金额，在客户端上报的可靠性低于在服务端上报，主要适用于无服务端的单机游戏。
+To make the function for checking payment restrictions work, your game should be reporting all the payments made by minor players.
+We recommend that you report payments on the server side. Refer to [the description of the relative REST API](#report-payment-amounts) for more information on how you can report payments on the server side.
+You can also report payments using the interface provided by the SDK when a minor player successfully makes a payment. However, this is a less reliable method compared to the former one and is often used by games that don’t require connecting to servers.
 
 <MultiLang kind="ue">
 
@@ -843,9 +839,9 @@ AntiAddictionUE::CheckPayLimit(FCString::Atoi(*AmountTF->Text.ToString()), [](bo
 long amount = 100;
 AntiAddictionUIKit.SubmitPayResult(amount,
     () => {
-        // 成功
+        // Succeeded
     }, (exception) => {
-        // 处理异常
+        // Handle exception
     }
 );
 ```
@@ -856,12 +852,12 @@ AntiAddictionUIKit.submitPayResult(amount,
     new Callback<SubmitPayResult>() {
         @Override
         public void onSuccess(SubmitPayResult result) {
-            // 提交成功
+            // Succeeded
         }
 
         @Override
         public void onError(Throwable throwable) {
-            // 处理异常
+            // Handle exception
         }
     }
 );
@@ -871,10 +867,10 @@ AntiAddictionUIKit.submitPayResult(amount,
 NSInteger amount = 100;
 [AntiAddiction submitPayResult:amount callBack:^(BOOL success) {
     if (success) {
-        // 提交成功
+        // Succeeded
     }
 } failureHandler:^(NSString * _Nonnull error) {
-    // 处理异常
+    // Handle exception
 }];
 ```
 
@@ -888,11 +884,11 @@ AntiAddictionUE::SubmitPayResult(FCString::Atoi(*AmountTF->Text.ToString()), [](
 
 </MultiLang>
 
-上报消费金额时，传入的消费金额的单位同样为分。
+When reporting payment amount, the unit of the amount is also *cent*.
 
-## 上报游戏时长
+## Report Play Time
 
-已登录的玩家，开始游戏时调用此接口，之后 SDK 会自动轮询上报游戏时长。
+Invoke the following interface once the player successfully logs in to your game. After that, the SDK will automatically and continuously report the game time of the player.
 
 <MultiLang kind="ue">
 
@@ -914,7 +910,7 @@ AntiAddictionUE::EnterGame();
 
 </MultiLang>
 
-相应地，已登录的玩家，停止游戏时调用此接口，之后 SDK 停止轮询上报时长。
+Invoke the following interface once the player leaves your game. The SDK will stop reporting the game time of the player.
 
 <MultiLang kind="ue">
 
@@ -938,16 +934,16 @@ AntiAddictionUE::LeaveGame();
 
 ## REST API
 
-### 请求格式
+### Request Format
 
-REST API 请求的主体为 JSON 格式，HTTP header 的 `Content-Type` 需要设置为 `application/json`。
+The body of each request sent to the REST API shall be a JSON object. The `Content-Type` in the HTTP header should be `application/json`.
 
-请求通过 `Authorization TOKEN` HTTP 头进行鉴权。
-开发者需要在客户端通过 SDK 接口获取 `TOKEN` 后传给服务端，然后在服务端凭借此 `TOKEN` 调用防沉迷服务的 REST API。
+The `Authorization TOKEN` HTTP header is used by the server to authenticate requests.
+To invoke the Anti-addiction REST API, you will first need to obtain a `TOKEN` on the client using the SDK, then give this `TOKEN` to the server. The server will then be able to invoke the REST API with this `TOKEN`.
 
-API Base 为 `https://tds-tapsdk.cn.tapapis.com`。
+The API Base is `https://tds-tapsdk.cn.tapapis.com`.
 
-### 获取鉴权 Token
+### Obtain the Authentication Token
 
 <MultiLang kind="ue">
 
@@ -969,9 +965,9 @@ FString Token = AntiAddictionUE::CurrentToken();
 
 </MultiLang>
 
-鉴权 Token 永久有效。
+The token obtained here won’t expire.
 
-### 检查玩家当前能否游戏
+### Check if the Player Can Game
 
 ```sh
 curl -X POST \
@@ -980,16 +976,16 @@ curl -X POST \
   https://tds-tapsdk.cn.tapapis.com/anti-addiction/v1/clients/{{clientId}}/users/{{userIdentifier}}/playable
 ```
 
-其中：
+Among the request above:
 
-* `{{token}}` 需替换为客户端获取的[鉴权 token](#获取鉴权-token)。
-* `{{clientId}}` 需替换为 **开发者中心后台游戏服务 > 应用配置** 中的 Client ID。
-* `{{userIdentifier}}` 需替换为游戏在调用 [防沉迷认证](/sdk/anti-addiction/guide/#防沉迷认证) 时使用的**玩家唯一标识**。
+* `{{token}}` needs to be replaced with the [authentication token](#obtain-the-authentication-token) obtained by the client.
+* `{{clientId}}` needs to be replaced with the Client ID obtained from **开发者中心后台游戏服务 > 应用配置**.
+* `{{userIdentifier}}` needs to be replaced with the **unique identifier of the player** used for [identity verification](/sdk/anti-addiction/guide/#identity-verification).
 
-以下情况的响应状态码均为 200：
+The response’s status code will be `200` for the following situations:
 
 ```json
-// 实名认证失败
+// Failed to complete real-name verification
 {
     "success": true,
     "data": {
@@ -1000,7 +996,7 @@ curl -X POST \
     }
 }
 
-// 成年玩家
+// The player is an adult
 {
     "success":true,
     "data":{
@@ -1015,7 +1011,7 @@ curl -X POST \
     }
 }
 
-// 未成年玩家，当前可以游戏
+// The player is a minor and is allowed to game
 {
     "success":true,
     "data":{
@@ -1029,7 +1025,7 @@ curl -X POST \
     }
 }
 
-// 未成年玩家，当前不可游戏
+// The player is a minor and is not allowed to game
 {
     "success":true,
     "data":{
@@ -1045,7 +1041,7 @@ curl -X POST \
 }
 ```
 
-Token 解析错误会返回 401 错误：
+A `401` error will be returned if the token cannot be parsed:
 
 ```json
 {
@@ -1059,9 +1055,9 @@ Token 解析错误会返回 401 错误：
 }
 ```
 
-### 检查玩家消费是否受限
+### Check if the Player Can Make Payments
 
-充值金额以分为单位，比如检查玩家是否可以消费 1 元（100 分）：
+The unit of the payment amount is *cent*. For example, to check if the player can spend 1 Yuan (100 cents):
 
 ```sh
 curl -X POST \
@@ -1071,10 +1067,10 @@ curl -X POST \
   https://tds-tapsdk.cn.tapapis.com/anti-addiction/v1/clients/{{clientId}}/users/{{userIdentifier}}/payable
 ```
 
-消费受限和不受限时响应的状态码都是 200：
+The status code of the response will be `200` no matter if the player is allowed to make the payment:
 
 ```json
-// 受限
+// Restricted
 {
     "success":true,
     "data":{
@@ -1086,7 +1082,7 @@ curl -X POST \
     }
 }
 
-// 允许
+// Allowed
 {
     "success":true,
     "data":{
@@ -1099,7 +1095,7 @@ curl -X POST \
 }
 ```
 
-金额格式异常时返回 400 错误：
+A `400` error will be returned if the amount is malformatted:
 
 ```json
 {
@@ -1112,7 +1108,7 @@ curl -X POST \
 }
 ```
 
-实名认证失败（包括 Token 解析错误）时返回 401 错误：
+A `401` error will be returned if real-name verification fails (including if the token cannot be parsed):
 
 ```json
 {
@@ -1121,14 +1117,14 @@ curl -X POST \
         "code":16,
         "error":"实名认证失败",
         "error_description":"未实名用户不能进入游戏",
-        "msg":"该账号没有通过实名认证"}
+        "msg":"该账号没有通过实名认证"
     }
 }
 ```
 
-### 上报消费金额
+### Report Payment Amounts
 
-玩家充值 1 元（100 分），提交消费金额：
+To report that the player has spent 1 Yuan (100 cents):
 
 ```sh
 curl -X POST \
@@ -1138,7 +1134,7 @@ curl -X POST \
   https://tds-tapsdk.cn.tapapis.com/anti-addiction/v1/clients/{{clientId}}/users/{userIdentifier}/payments
 ```
 
-上报成功时响应的状态码为 200，返回结果：
+The status code of the response will be `200` if the amount is successfully reported:
 
 ```json
 {
@@ -1147,7 +1143,7 @@ curl -X POST \
 }
 ```
 
-金额格式异常时返回 400 错误：
+A `400` error will be returned if the amount is malformatted:
 
 ```json
 {
@@ -1160,59 +1156,59 @@ curl -X POST \
 }
 ```
 
-## 常见问题
+## FAQ
 
-### 如何开通实名认证与防沉迷服务
+### How do I enable the Real-Name Verification and Anti-addiction service?
 
-可以在 **开发者中心后台 > 游戏服务 > 生态服务 > 合规认证** 处自助开通服务。目前提供两种方案，游戏开通时选择其中一种：
+You can enable the service on **开发者中心后台 > 游戏服务 > 生态服务 > 合规认证**. You can choose one of the following two options for your game:
 
-* **有版号**。完成控制台提示的前置条件，点击开通，然后配置好[中宣部参数](/sdk/anti-addiction/features/#注册中宣部实名认证系统)：
-    * 将中宣部系统后台的**游戏备案识别码、应用标识、应用密钥**填写到 TapTap 开发者中心后台对应处。
-    * 将 TapTap 开发者中心后台显示的 **IP 白名单地址**复制、填写到中宣部系统后台。
-* **暂无版号**。无版号游戏无法配置中宣部参数，可直接选择开通，等游戏有了版号，可以配置[中宣部参数](/sdk/anti-addiction/features/#注册中宣部实名认证系统)并切换到有版号方案。切换后客户端代码不受影响，不需要修改。
+* **The game has an ISBN**. Once you have completed the prerequisites listed on the page, turn on the service by providing the [parameters obtained from Zhongxuanbu’s system](/sdk/anti-addiction/features/#sign-up-for-zhongxuanbus-real-name-verification-system)：
+    * Fill in the **bizId, APPID, and Secret Key** obtained from Zhongxuanbu’s system.
+    * Then provide the **IP addresses** displayed on the Developer Center to Zhongxuanbu’s system.
+* **The game doesn’t have an ISBN**. You can turn on the service without providing an ISBN. Once your game has obtained an ISBN, you can make a switch by providing the [parameters obtained from Zhongxuanbu’s system](/sdk/anti-addiction/features/#sign-up-for-zhongxuanbus-real-name-verification-system). You won’t need to update the client after you do this.
 
-### SDK 自带哪些用户界面（UI）
+### What user interfaces does the SDK include?
 
-实名认证和防沉迷 SDK 提供的用户界面主要在防沉迷授权阶段，可参考[功能介绍文档](/sdk/anti-addiction/features/#接入-tds-实名认证和防沉迷服务)中的界面预览。
+Most of the interfaces provided by the SDK are used for identity verification. You can take a look at them [here](/sdk/anti-addiction/features/#integrating-tds-real-name-verification-and-anti-addiction-service).
 
 ### 授权失败
 
-在实名认证时使用 TapTap 快速认证服务提示「授权失败」，请至后台[配置签名证书](/sdk/start/quickstart/#配置签名证书)。
+If you see the “授权失败” error when using TapTap Quick Verification, please [configure the signature certificate](/sdk/start/quickstart/#configure-signature-certificate) on the Developer Center.
 
 ### 未查询到实名认证配置 
 
-实名认证时使用手动输入实名信息服务提示「未查询到实名认证配置」，原因是未开启实名认证服务，需要在 开发者中心后台 > 游戏服务 > 生态服务 > 合规认证 处自助开通服务。
+If you see the “未查询到实名认证配置” error, it is because the Real-Name Verification service is not enabled. Please enable it on 开发者中心后台 > 游戏服务 > 生态服务 > 合规认证.
 
 ### userIdentifier is empty
 
-调用认证接口时需要传入的玩家唯一标识 userIdentifier 参数值为空，建议开发者对此做非空判断。
+If you see this error, it means that the value you provided for `userIdentifier` is empty. We recommend that your program checks whether this value is empty before submitting it to the server.
 
-### 未弹出实名认证窗口/未收到回调
+### The pop-up for real-name verification is not displayed, and the game is not receiving any callbacks from the SDK.
 
-这种情况一般是仅调用了初始化防沉迷 UI 模块代码，也就是说只完成了 SDK 的初始化，同时注册防沉迷的消息监听。
+This often indicates that you have only invoked the code for initializing the UI of the Anti-addiction module and setting up event listeners.
 
-触发实名认证弹窗**必须调用** [认证接口](/sdk/anti-addiction/guide/#防沉迷认证)，之后才会收到回调。
+To pull up the pop-up for real-name verification, you’ll **need to invoke** the [interface for identity verification](/sdk/anti-addiction/guide/#identity-verification). After this, you will be able to receive callbacks.
 
-### 重复认证
+### Verifying Identity Repetitively
 
-我们预期同一个玩家认证过一次之后不再触发弹窗，防沉迷服务直接使用第一次认证的结果，这样用户体验更好。
+We expect that each player only gets verified once and no further pop-ups should show up once the player is already verified. This ensures a better user experience, as the Anti-addiction service can use the result from the previous verification.
 
-如果出现重复认证，可以按照以下思路排查：
+If you notice that a player that has already been verified is being verified for a second time, you can try to solve the problem by following the instructions below:
 
-* 首先确认游戏使用的 [玩家唯一标识 userIdentifier](#玩家唯一标识-useridentifier-参数说明) 符合要求。如果同一个玩家用的 userIdentifier 会发生改变，在防沉迷服务中会被视为不同用户，导致重复认证。这个时候需要游戏传入合适的 userIdentifier，建议接入 [TDS 内建账户系统](/sdk/taptap-login/guide/start/#一键完成-taptap-登录)，用 `objectId` 作为玩家唯一标识；或者使用[单纯 TapTap 用户认证](/sdk/taptap-login/guide/tap-login/#taptap-登录并获取登录结果)，传入 `openid` 或 `unionid` 作为玩家唯一标识。
-* 如果是**有版号游戏**，请确认在开发者中心后台游戏服务 > 生态服务 > 合规认证 处填写的参数无误。如果参数有问题，请求中宣部接口会失败，导致重复认证。请检查以下参数配置：
-	* **IP 白名单地址**全部填入中宣部系统后台。
-	* **游戏备案识别码、应用标识**和中宣部后台保持一致。
-	* **应用密钥**在有效期内（有效期为半年，注意在失效前更新）。
+* First of all, make sure that the [`userIdentifier`](#regarding-useridentifier) provided meets the requirements. If the `userIdentifier` of the same player may get changed, the player will be seen as different users and may be asked to verify their identity repetitively. Please make sure that you use the proper value for the `userIdentifier`. We recommend that you use [TDS’ built-in account system](/sdk/taptap-login/guide/start/#quick-log-in-with-taptap) and use each player’s `objectId` as the unique identifier of the player. You can also use the [basic TapTap user verification](/sdk/taptap-login/guide/tap-login/#check-login-status-and-user-info) and use each player’s `openid` or `unionid` as the unique identifier.
+* If your game **already has an ISBN**, please make sure the parameters entered on 开发者中心后台游戏服务 > 生态服务 > 合规认证 are correct. If the parameters are incorrect, the service will be unable to make requests to Zhongxuanbu’s interface and players may be asked to verify their identity repetitively. Please check the following parameters:
+	* All **IP addresses** should be provided to Zhongxuanbu’s system.
+	* The **bizId and APPID** should be the ones obtained from Zhongxuanbu’s system.
+	* The **Secret Key** should be valid (it is only valid for half a year, so make sure to update it before it expires).
 
-## 注意事项
+## Caveats
 
-### 玩家唯一标识 userIdentifier 参数说明
+### Regarding `userIdentifier`
 
-第一次认证会触发实名认证弹窗，让玩家授权游戏获取 TapTap 实名信息或输入身份信息，认证通过后，后面每一次以同样的 userIdentifier 调用认证接口都会直接拿到第一次认证的结果，不再触发弹窗。
+When a player opens your game for the first time, the pop-up for identity verification will be displayed, allowing the player to either authorize the game to obtain the identity information from TapTap or manually enter their identity information. Once the verification is done, whenever your game invokes the interface for identity verification with the same `userIdentifier`, the result from the previous verification will be returned and no further pop-ups will be triggered.
 
-因此，同一个用户的唯一标识应该要保证唯一性。
+Therefore, please make sure that the unique identifier of each user stays unique.
 
-### 测试实名认证环境
+### Environments for Testing Real-Name Verification
 
-无论是 Android 还是 iOS 项目，不支持在 Unity Editor 环境里调试，请对应打包到真实设备或者移动端的模拟器中进行测试实名认证防沉迷的相关功能。
+No matter if you are building an Android or iOS project, you cannot test the service in Unity Editor’s environment. Please test the service by running packages on real devices or emulators.
