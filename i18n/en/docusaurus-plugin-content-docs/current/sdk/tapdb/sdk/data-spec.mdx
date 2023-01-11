@@ -1,0 +1,204 @@
+---
+title: Data Specification
+sidebar_position: 2
+---
+
+## Device
+
+### Device ID
+
+When the SDK is initialized, it generates a unique ID for the terminal, which we call the device ID.
+
+#### ID Generation Rules
+
+| SDK  | ID generation rules |
+| --- | --- |
+| Android | Try to get the locally saved device ID, Android ID in turn, if neither of them can get the correct result, then randomly generate UUID, the last obtained or generated device ID will be saved in local storage. |
+| iOS | Try to get the local keychain saved device ID, if it fails, random UUID will be generated, and the last obtained or generated device ID will be saved in local storage.|
+
+#### Device Property
+
+Device properties are constant values and up-to-date states. The behavior of these users can be analyzed by correlating a characteristic of the device with an event.
+
+#### FAQ
+
+**Will the device ID change?**
+
+Android：The device ID is constant when the Android ID can be obtained. (Refer to [Google documentation](https://developer.android.com/training/articles/user-data-ids)). If the Android ID is not available, the device ID may change as you reinstall the app or reset the Google Ads ID.
+
+
+iOS：The generated device ID is stored in the device's keychain, which ensures that the device ID is kept stable without resetting the system.
+
+## User
+
+### User ID 
+
+User ID is a registered user ID. When a user registers or logs in, you can set the user's unique ID in your system directly or encrypted into the SDK, and this ID is the user's unique ID across platforms.
+
+#### User property
+
+User properties is constant values and up-to-date status. propertys or characteristics can be associated with events to analyze the behavior of these users.
+
+## Event
+
+[What is the event](/sdk/tapdb/sdk/user-event-model)
+
+### Preset Events
+
+| Event Name | Event | Description |
+| --- | --- | --- |
+| device_login | App Launching | This event is reported when the SDK initialization interface is called, and the first time a device ID is reported, a record is generated in the device table. |
+| user_login | Login | This event is reported when the SDK SetUser interface is called. The first time an account ID is reported, a new record is added to the account table. |
+| play_game | Game time | The SDK will start with the app entering the foreground as the timing point, and will end when the app enters the background. |
+| charge | User charge | This event is reported when the SDK charge interface is called, and it is usually recommended to use the server-side REST API for reporting. |
+
+### Derivative Events
+
+In addition to reporting preset events, TapDB also records special events, which are called derivative events. Derivative events cannot be reported directly through API, and will only be triggered by preset events. 
+
+| Event Name | Event | Description |
+| --- | --- | --- |
+| dau_device | App first launch of the day | This event is triggered when the App first reports `device_login` each day and can be used to quickly query the device DAU. |
+| dvau_device | App first launch of the day (by version)| This event is triggered when the different versions of App first reports `device_login` each day and can be used to quickly query the device DAU. |
+| wau_device | App First launch of the week | App triggered when `device_login` is first reported each week, can be used to quickly query device WAU. |
+| mau_device | App First launch of the month | App triggered when `device_login` is first reported each month, can be used to quickly query device MAU.|
+| dau_user | Account first login of the day | Triggered when the account reports `user_login` for the first time every day, can be used to quickly check the account DAU. |
+| wau_user | Account first login of the week | Triggered when the account first reports `user_login` each week, can be used to quickly query the account WAU. |
+| mau_user | Account first login of the month  | Triggered when the account reports `user_login` each month, can be used to quickly query the account MAU. |
+
+### Custom Events
+
+In addition to preset events and derivative events, more custom events can also be created in the event management.
+
+## Data Format
+
+TapDB's REST API supports the JSON object format after URLEncode. If you use SDK to access, the data will also be converted into this format for reporting.
+
+### Event Data
+
+Record an event and its propertys:
+
+```js
+{
+    ["index" | "client_id"]: ["APPID" | "ClientID"],
+    "device_id": "DeviceID",
+    "user_id": "UserID",
+    "type": "track",
+    "name": "EventName",
+    "properties": {
+        "os": "Android",             
+        "device_id1": "000",             
+        "device_id2": "000",             
+        "device_id3": "000",             
+        "device_id4": "000",     
+        "width": 256,                    
+        "height": 768,                   
+        "device_model": "pixel",         
+        "os_version": "Android 10.0",
+        "provider": "O2",                
+        "network": "1",                  
+        "channel": "Google Play",        
+        "app_version": "1.0",
+        "sdk_version": "2.8.0",
+        "#custem_event_property_name": "CustomEventPropertyValue"
+    }
+}
+```
+
+#### System Fields
+
+Fields at the same level as properties are system fields.
+
+| Name | Type | Description |
+| --- | --- | --- |
+| index | string | The APPID of the project, you can view the ID in TapDB backend. |
+| client_id | string | TapTap Client ID can be viewed in the TapTap Developer Center.|
+| type | string | Data type, the value of "track" when reporting events. |
+| device_id | string | The device ID at the time of the event. |
+| user_id | string | User ID at the time of the event. |
+| name | string | Event name，can be a preset event or a custom event. |
+
+Tips：
+
+- Preset events `device_login`,must also have `device_id`.
+- Preset events `user_login`, `play_game` must have  `device_id` and `user_id`.
+- Preset events `charge`, must be a valid `user_id` (`user_id`  was reported as `user_login`).
+ 
+#### Property Fields
+
+The fields inside properties are property fields, which will be the properties of the event, and you can extend them with custom properties.
+
+SDK preset event property：
+
+| Name | Type | Description |
+| --- | --- | --- |
+| os | string | Operating System（Support Android、iOS、Windows、Mac）|
+| device_id1 | string | Reserved device ID (iOS SDK uses IDFA, Android SDK uses IMEI)|
+| device_id2 | string | Reserved device ID（Android SDK uses Google ads ID）|
+| device_id3 | string | Reserved device ID（Android SDK uses Android ID）|
+| device_id4 | string | Reserved device ID（Android SDK uses OAID）|
+| width | number | Screen width |
+| height | number | Screen height |
+| device_model | string | Equipment model (equipment manufacturer + equipment model) |
+| os_version | string | OS Version |
+| network | string | Network type (WiFi is 2, unknown is 3, 2G is 4, 3G is 5, 4G is 6)|
+| channel | string | APP Packaging channels |
+| app_version | string | App version |
+| sdk_version | string | SDK version |
+
+### Property Action
+
+User property action:
+
+```js
+{
+    ["index" | "client_id"]: ["APPID" | "ClientID"],
+    "user_id": "UserID",
+    "type": ["initialise" | "update" | "add"], 
+    "properties": {
+        "level": 15,
+        "#custom": "custom"
+    }
+}
+```
+
+Device property action:
+
+```js
+{
+    ["index" | "client_id"]: ["APPID" | "ClientID"],
+    "device_id": "DeviceID",
+    "type": ["initialise" | "update" | "add"],
+    "properties": {
+        "level": 15,
+        "#custom": "custom"
+    }
+}
+```
+
+#### System Fields
+
+At the same level as properties are the system fields.
+
+| Name | Type | Description |
+| --- | --- | --- |
+| client_id | string | TapTap Client ID can be viewed in the TapTap Developer Center. |
+| type | string | Data type, property operations support `initialise`, `update`, `add`. |
+| device_id | string | Device ID of the property operation |
+| user_id | string | User ID of the property operation |
+
+Meaning of the type field.
+
+| Name | Description |
+| --- | --- |
+| initialise | Use initialise to make only the first value valid. Only if the current value is null, the assignment will take effect, if the current value is not null, the assignment will be ignored. |
+| update | For regular device properties, you can use `update` assignment, the new property value will directly overwrite the old property value. |
+| add | For numeric properties, you can use this interface to perform accumulation operation, TapDB will accumulate the original property value and save the result value. |
+
+Tips：
+
+- Only one of `device_id` and `user_id` can be selected for property operations. Select `device_id` for the device ID attribute and `user_id` for the account ID attribute.
+
+#### Property Fields
+
+The fields inside 'properties' are property fields. These fields will be treated as fields to be manipulated and treated as' type' values.

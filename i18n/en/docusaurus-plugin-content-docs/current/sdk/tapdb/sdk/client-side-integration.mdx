@@ -1,0 +1,1643 @@
+---
+title: Client Integration Guides
+sidebar_label: Client Integration Guides
+sidebar_position: 3
+---
+
+import MultiLang from '/src/docComponents/MultiLang';
+import CodeBlock from '@theme/CodeBlock';
+import sdkVersions from '/src/docComponents/sdkVersions';
+import {Conditional} from '/src/docComponents/conditional';
+
+## Introduction
+
+TapSDK provides an API for game developers to collect account data. The system will collect and analyze the account data, and eventually form a data report to help game developers analyze account behavior and optimize the game.
+
+## 
+
+Please [download TapSDK](/tap-download) and add the relevant dependencies.
+
+<MultiLang kind="ue">
+
+<>
+
+If you only need to use TapDB alone, you can import only the dependencies `common` and `tapdb`.
+
+For Unity v3.7.1 and higher, you also need to import `com.leancloud.storage`.
+
+
+<CodeBlock className="language-json">
+{`"dependencies":{
+    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#${sdkVersions.taptap.unity}",
+    "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}",
+    "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
+    // Data analysis
+    "com.taptap.tds.tapdb": "https://github.com/TapTap/TapDB-Unity.git#${sdkVersions.taptap.unity}",
+}`}
+</CodeBlock>
+</>
+
+<>
+
+If you only need to use TapDB alone, you can import only the dependencies `common` and `tapdb`.
+
+<CodeBlock className="language-groovy">
+{`repositories {
+    flatDir {
+        dirs 'libs'
+    }
+}
+dependencies {
+    // ...
+    implementation (name:'TapBootstrap_${sdkVersions.taptap.android}', ext:'aar')  // Required: TapSDK Launcher
+    implementation (name:'TapCommon_${sdkVersions.taptap.android}', ext:'aar') // Required: TapSDK base library
+    implementation (name:'TapLogin_${sdkVersions.taptap.android}', ext:'aar') // Required: TapTap Login
+    implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
+    implementation 'cn.leancloud:storage-android:${sdkVersions.leancloud.java}'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+    implementation (name:'TapDB_${sdkVersions.taptap.android}', ext:'aar') //Statistics
+}`}
+</CodeBlock>
+</>
+
+<>
+
+If you only need to use TapDB alone, you can import only the dependencies `common` and `tapdb`.
+
+<CodeBlock className="language-objc">
+{`// Login
+TapBootstrapSDK.framework
+TapCommonSDK.framework
+TapLoginSDK.framework
+LeanCloudObjc.framework
+//TapDB
+TapDB.framework`}
+</CodeBlock>
+
+Add: '-ObjC' to 'Build Settings' >' link '>' Other Linker Flags'.
+The following dependent frameworks or libraries need to be imported for your Xcode project.
+
+Package | Description | Notes
+--- | --- | ---
+AdSupport.framework | Used to obtain device advertising logos and track devices
+AdService.framework | Advertising frame | Set to optional
+AppTrackingTransparency.framework | App tracking framework added in iOS 14 (not required if IDFA tracking is not required beyond iOS 14) | Set to optional
+SystemConfiguration.framework |
+CoreMotion.framework |
+CoreTelephony.framework |
+Security.framework | Used to persist the storage device ID
+libc++.tdb |
+libresolv.tbd |
+libz.tbd |
+libsqlite3.0.tbd |
+
+
+</>
+
+<>
+
+#### Environmental Requirements
+
+* UE 4.26 or higher
+* iOS 12 or higher
+* Android 5.0 (API level 21) or higher
+* macOS 10.14.0 or higher
+* Windows 7 or higher
+
+**Support Platforms**：iOS / Android / Windows / macOS
+
+#### Install Plugins
+
+* Download [TapSDK UE4](/tap-download), unzip TapSDK-UE4-xxx.zip, and copy the `TapDB` and `TapCommon` folders to the `Plugins` directory.
+* Restart Unreal Editor.
+* Open Edit > Plugins > Projects > TapTap, open the `TapDB` module.
+
+#### Add dependencies
+
+Add the required modules to `Project.Build.cs`:
+
+```cs
+PublicDependencyModuleNames.AddRange(new string[] { "Core",
+	"CoreUObject",
+	"Engine",
+	"Json",
+	"InputCore",
+	"JsonUtilities",
+	"SlateCore",
+	"TapCommon",
+	"TapDB"
+});
+```
+
+</>
+
+</MultiLang>
+
+:::info
+If you were using a version of TapDB lower than `3.6.3` and the region selected for initialization was International (`IO`), then upgrading the SDK to `3.6.3` and higher will require migrating the data first.Please submit a ticket to contact us to migrate the data.
+:::
+
+
+## Initialize SDK
+
+
+Initialize the SDK and report a device login (`device_login`) event, access to this interface is a pre-requisite for using other interfaces and needs to be called early.
+
+:::info
+Depending on your use case, either of the following initialization options is acceptable.
+:::
+
+### Initialize TapSDK {#tapsdk-init}
+
+Synchronize the initialization of TapDB during TapSDK initialization.
+
+<MultiLang kind="ue">
+
+<>
+
+<Conditional region='cn'>
+
+```cs
+using TapTap.Bootstrap; 
+
+var config = new TapConfig.Builder()
+    .ClientID("your_client_id")  // (Required) Client ID in the Developer Center.
+    .ClientToken("your_client_token")  // (Required) Client Token in the Developer Center.
+    .ServerURL("https://your_server_url")  //  (Required) Developer Center > Your Game > Game Services > Configuration > Domain > API
+    .RegionType(RegionType.CN)  // (Optional) CN for Mainland China; IO for international.
+    .TapDBConfig(true, "gameChannel", "gameVersion", true)  // TapDB is automatically initialized based on the configuration of TapConfig.
+    .ConfigBuilder();
+
+TapBootstrap.Init(config);
+```
+
+</Conditional>
+
+<Conditional region='global'>
+
+```cs
+using TapTap.Bootstrap; 
+
+var config = new TapConfig.Builder()
+    .ClientID("your_client_id")  // (Required) Client ID in the Developer Center.
+    .ClientToken("your_client_token")  // (Required) Client Token in the Developer Center.
+    .ServerURL("https://your_server_url")  // (Required) Developer Center > Your Game > Game Services > Configuration > Domain > API
+    .RegionType(RegionType.IO)  // (Optional) CN for Mainland China; IO for international.
+    .TapDBConfig(true, "gameChannel", "gameVersion", true)  // TapDB is automatically initialized based on the configuration of TapConfig.
+
+    .ConfigBuilder();
+
+TapBootstrap.Init(config);
+```
+
+</Conditional>
+
+TapDBConfig descriptions：
+
+```cs
+public Builder TapDBConfig(bool enable, string channel, string gameVersion, bool advertiserIDCollectionEnabled)
+```
+
+Parameter | Can be null | Descriptions
+--- | --- | ---
+enable | No | Whether to open TapDB service.
+channel | Yes | Subcontracting channels, length not greater than 256.
+version | Yes | Game version, when empty, automatically obtains the version of the game installation package. The length is not greater than 256.
+advertiserIDCollectionEnabled | No | IDFA switch, please refer to the [Collect Device Fingerprint](/sdk/tapdb/sdk/client-side-integration#idfaios) documentation.
+
+</>
+
+<>
+
+<Conditional region='cn'>
+
+```java
+TapDBConfig tapDBConfig = new TapDBConfig();
+tapDBConfig.setEnable(true); // Whether to open TapDB service.
+tapDBConfig.setChannel("gameChannel"); // Subcontracting channels, length not greater than 256.
+tapDBConfig.setGameVersion("1.0.0"); // Game version, when empty, automatically obtains the version of the game installation package. The length is not greater than 256.
+
+TapConfig tapConfig = new TapConfig.Builder()
+        .withAppContext(getApplicationContext())
+        .withClientId("your_client_id")  // (Required) Client ID in the Developer Center.
+        .withClientToken("your_client_token")  // (Required) Client Token in the Developer Center.
+        .withServerUrl("https://your_server_url")  // (Required) Developer Center > Your Game > Game Services > Configuration > Domain > API
+        .withRegionType(TapRegionType.CN)  // TapRegionType.CN: China;  TapRegionType.IO: Other countries or regions。
+        .withTapDBConfig(tapDBConfig)
+        .build();
+TapBootstrap.init(MainActivity.this, tapConfig);
+```
+
+</Conditional>
+
+<Conditional region='global'>
+
+
+```java
+TapDBConfig tapDBConfig = new TapDBConfig();
+tapDBConfig.setEnable(true); // Whether to open TapDB service.
+tapDBConfig.setChannel("gameChannel"); // Subcontracting channels, length not greater than 256.
+tapDBConfig.setGameVersion("1.0.0"); // Game version, when empty, automatically obtains the version of the game installation package. The length is not greater than 256.
+
+TapConfig tapConfig = new TapConfig.Builder()
+        .withAppContext(getApplicationContext())
+        .withClientId("your_client_id")  // (Required) Client ID in the Developer Center.
+        .withClientToken("your_client_token")  // (Required) Client Token in the Developer Center.
+        .withServerUrl("https://your_server_url")  // (Required) Developer Center > Your Game > Game Services > Configuration > Domain > API
+        .withRegionType(TapRegionType.IO)  // TapRegionType.CN: China;  TapRegionType.IO: Other countries or regions.
+        .withTapDBConfig(tapDBConfig)
+        .build();
+TapBootstrap.init(MainActivity.this, tapConfig);
+```
+
+</Conditional>
+
+</>
+
+<>
+
+<Conditional region='cn'>
+
+```objectivec
+
+TapConfig *config = [TapConfig new];
+config.clientId = @"your_client_id";  // (Required) Client ID in the Developer Center.
+config.clientToken = @"your_client_token";  // (Required) Client Token in the Developer Center.
+config.region = TapSDKRegionTypeCN;  // TapRegionType.CN: China;  TapRegionType.IO: Other countries or regions.
+config.serverURL = @"https://your_server_url";  // // (Required) Developer Center > Your Game > Game Services > Configuration > Domain > API.
+
+TapDBConfig * dbConfig = [[TapDBConfig alloc]init];
+dbConfig.enable = YES; // Whether to open TapDB service.
+dbConfig.channel=@"taptap"; // Subcontracting channels, length not greater than 256.
+dbConfig.gameVersion=@"1.0.0"; // Game version, when empty, automatically obtains the version of the game installation package. The length is not greater than 256.
+dbConfig.advertiserIDCollectionEnabled=YES; // IDFA switch, please refer to the [Collect Device Fingerprint](/sdk/tapdb/sdk/client-side-integration#idfaios) documentation.
+config.dbConfig = dbConfig;
+
+config.region = TapSDKRegionTypeCN;
+[TapBootstrap initWithConfig:config];
+```
+
+</Conditional>
+
+<Conditional region='global'>
+
+```objectivec
+
+TapConfig *config = [TapConfig new];
+config.clientId = @"your_client_id";  // (Required) Client ID in the Developer Center.
+config.clientToken = @"your_client_token";  // (Required) Client Token in the Developer Center.
+config.region = TapSDKRegionTypeIO;  // TapRegionType.CN: China;  TapRegionType.IO: Other countries or regions.
+config.serverURL = @"https://your_server_url";  // (Required) Developer Center > Your Game > Game Services > Configuration > Domain > API.
+
+TapDBConfig * dbConfig = [[TapDBConfig alloc]init];
+dbConfig.enable = YES; // Whether to open TapDB service.
+dbConfig.channel=@"taptap"; // Subcontracting channels, length not greater than 256.
+dbConfig.gameVersion=@"1.0.0"; // Automatically get the game version When the value is null. The length is not greater than 256.
+dbConfig.advertiserIDCollectionEnabled=YES; // IDFA switch, please refer to the [Collect Device Fingerprint](/sdk/tapdb/sdk/client-side-integration#idfaios) documentation.
+config.dbConfig = dbConfig;
+
+[TapBootstrap initWithConfig:config];
+```
+
+</Conditional>
+
+</>
+
+<>
+
+Initializing in this way requires importing the `TapBootstrap`, opening the `TapBootstrap`, and adding `TapBootstrap` to the `Project.Build.cs` file.
+
+Import the header file.
+
+```cpp
+#include "TapUEBootstrap.h"
+#include "TapUECommon.h"
+#include "TapUEDB.h"
+```
+
+<Conditional region='cn'>
+
+```cpp
+FTUConfig Config;
+Config.ClientID = ClientID;           // (Required) Client ID in the Developer Center.
+Config.ClientToken = ClientToken;     //  (Required) Client Token in the Developer. 
+Center.Config.ServerURL = ServerURL;  //  (Required) Developer Center > Your Game > Game Services > Configuration > Domain > API.
+Config.RegionType = ERegionType::CN;
+Config.DBConfig.Enable = true;
+Config.DBConfig.Channel = Channel;
+Config.DBConfig.GameVersion = GameVersion;
+Config.DBConfig.AdvertiserIDCollectionEnabled = AdvertiserIDCollectionEnabled;
+TapUEBootstrap::Init(Config);
+```
+
+</Conditional>
+
+<Conditional region='global'>
+
+```cpp
+FTUConfig Config;
+Config.ClientID = ClientID;           // (Required) Client ID in the Developer Center.
+Config.ClientToken = ClientToken;     //  (Required) Client Token in the Developer. 
+Center.Config.ServerURL = ServerURL;  //  (Required) Developer Center > Your Game > Game Services > Configuration > Domain > API.
+Config.RegionType = ERegionType::IO;
+Config.DBConfig.Enable = true;
+Config.DBConfig.Channel = Channel;
+Config.DBConfig.GameVersion = GameVersion;
+Config.DBConfig.AdvertiserIDCollectionEnabled = AdvertiserIDCollectionEnabled;
+TapUEBootstrap::Init(Config);
+```
+
+</Conditional>
+
+#### DBConfig Descriptions
+
+Parameter | Can be null | Descriptions
+--- | --- | ---
+Enable | No | Whether to open TapDB service.
+Channel | Yes | Subcontracting channels, length not greater than 256.
+Version | Yes | Automatically get the game version When the value is null. The length is not greater than 256.
+AdvertiserIDCollectionEnabled | No | IDFA switch, please refer to the [Collect Device Fingerprint](/sdk/tapdb/sdk/client-side-integration#idfaios) documentation.
+
+</>
+
+</MultiLang>
+
+### TapDB Only
+
+When only using the TapDB without using the login functionality and without importing the `TapBootstrap` package, TapDB can be initialized as follows:
+
+<MultiLang kind="ue">
+
+<>
+
+<Conditional region='cn'>
+
+```cs
+public static void Init(string clientId, string channel, string gameVersion, bool isCN)
+
+TapDB.Init("clientId", "taptap", "gameVersion", true);
+```
+
+</Conditional>
+
+<Conditional region='global'>
+
+```cs
+public static void Init(string clientId, string channel, string gameVersion, bool isCN)
+
+TapDB.Init("clientId", "taptap", "gameVersion", false);
+```
+
+</Conditional>
+
+Parameter | Can be null | Descriptions
+--- | --- | ---
+clientId | No |  Client ID in the Developer Center.
+channel | Yes |  Subcontracting channels.
+version | Yes |  Game version, when empty, automatically obtains the version of the game installation package.
+isCN | Yes | true: Chaina，false: Other countries or regions.
+
+</>
+
+<>
+
+<Conditional region='cn'>
+
+```java
+public synchronized static void init(final Context context,
+                                        final String clientId,
+                                        final String channel,
+                                        final String gameVersion,
+                                        final boolean isCN)
+
+public synchronized static void init(final Context context,
+                                        final String clientId,
+                                        final String channel,
+                                        final String gameVersion,
+                                        final boolean isCN,
+                                        final JSONObject properties)
+
+TapDB.init(getApplicationContext(), "clientId", "taptap", "gameVersion", true);
+```
+
+</Conditional>
+
+<Conditional region='global'>
+
+```java
+public synchronized static void init(final Context context,
+                                        final String clientId,
+                                        final String channel,
+                                        final String gameVersion,
+                                        final boolean isCN)
+
+public synchronized static void init(final Context context,
+                                        final String clientId,
+                                        final String channel,
+                                        final String gameVersion,
+                                        final boolean isCN,
+                                        final JSONObject properties)
+
+TapDB.init(getApplicationContext(), "clientId", "taptap", "gameVersion", false);
+```
+
+</Conditional>
+
+Parameter |  Can be null | Descriptions
+--- | --- | ---
+context | No | The Context object of the current Application or Activity.
+clientId | No | Client ID in the Developer Center.
+channel | Yes | Subcontracting channels, length not greater than 256.
+version | Yes | Game version, when empty, automatically obtains the version of the game installation package.
+isCN | Yes | true: Chaina，false: Other countries or regions.
+properties | Yes | The event property of device login (device_login). It can be passed in with preset attributes to override the default values of the SDK, and it can also be passed in with custom attributes that have been configured in the background.
+
+</>
+
+<>
+
+<Conditional region='cn'>
+
+```objectivec
++ (void)onStartWithClientId:(NSString *)clientId channel:(nullable NSString *)channel version:(nullable NSString *)gameVersion isCN:(BOOL)isCN;
+
+[TapDB onStartWithClientId:@"clientid" channel:@"taptap" version:@"gameVersion" isCN:YES];
+```
+
+</Conditional>
+
+<Conditional region='global'>
+
+```objectivec
++ (void)onStartWithClientId:(NSString *)clientId channel:(nullable NSString *)channel version:(nullable NSString *)gameVersion isCN:(BOOL)isCN;
+
+[TapDB onStartWithClientId:@"clientid" channel:@"taptap" version:@"gameVersion" isCN:NO];
+```
+
+</Conditional>
+
+Parameter | Can be null | Descriptions
+--- | --- | ---
+clientId | No |  Client ID in the Developer Center.
+channel | Yes |  Subcontracting channels. Length not greater than 256.
+version | Yes |  Game version. When empty, automatically obtains the version of the game installation package (Version in Xcode configuration).
+isCN | Yes | true: Chaina，false: Other countries or regions.
+
+</>
+
+<>
+
+Import：
+
+```cpp
+#include "TapUEDB.h"
+```
+
+Initialize TapDB：
+
+<Conditional region='cn'>
+
+```cpp
+FTUDBConfig Config;
+Config.ClientId = TEXT("your client id");
+Config.RegionType = ERegionType::CN;
+Config.Channel = TEXT("your Channel");
+Config.GameVersion = TEXT("GameVersion");
+TapUEDB::Init(Config);
+```
+
+</Conditional>
+
+<Conditional region='global'>
+
+```cpp
+FTUDBConfig Config;
+Config.ClientId = TEXT("your client id");
+Config.RegionType = ERegionType::IO;
+Config.Channel = TEXT("your Channel");
+Config.GameVersion = TEXT("GameVersion");
+TapUEDB::Init(Config);
+```
+
+</Conditional>
+
+#### DBConfig 
+
+Parameter | Can be null | Descriptions
+--- | --- | ---
+ClientId | No | Client ID in the Developer Center.
+RegionType | No | Developer Center > Application Configuration > Applicable Region.
+Channel | Yes | Subcontracting channels. Length not greater than 256.
+GameVersion | Yes | Game version, when empty, automatically obtains the version of the game installation package.
+
+</>
+
+</MultiLang>
+
+## User Setting
+
+### Set User ID
+
+This API records an account when it is called to log in an account. After calling, a user login (user_login) event will be reported, and the "has_user" attribute of the device will be set to true. Before restarting the app or calling clear User, the reported events will all have the account ID.
+
+<MultiLang kind="ue">
+
+<>
+
+```cs
+public static void SetUser(string userId)
+
+TapDB.SetUser("userId");
+```
+
+Parameter | Can be null | Descriptions
+| --- | --- | --- |
+| userId  | No | The unique string of the account, the string length is not greater than 256, and can only contain numbers, capital and lower case letters, underscores (_), and dashes (-). Developers need to ensure that the userId of different accounts are not the same. |
+
+</>
+
+<>
+
+```java
+public static void setUser(final String userId)
+
+public static void setUser(final String userId, final JSONObject properties)
+
+TapDB.setUser("userId");
+
+// Passing event properties simultaneously
+JSONObject properties = new JSONObject();
+properties.put("currentPoints", 10);
+TapDB.setUser("userId", properties);
+```
+
+Parameter | Can be null | Descriptions
+| --- | --- | --- |
+| userId  | No | The unique string of the account, the string length is not greater than 256, and can only contain numbers, capital and lower case letters, underscores (_), and dashes (-). Developers need to ensure that the userId of different accounts are not the same. |
+| properties | Yes | Event properties for user login (`user_login`).|
+
+</>
+
+<>
+
+```objectivec
++ (void)setUser:(NSString *)userId;
+
++ (void)setUser:(NSString *)userId properties:(nullable NSDictionary *)properties;
+
+[TapDB setUser:@"userId"];
+
+// Passing event properties simultaneously
+[TapDB setUser:@"userId" properties:@{@"#currentPoints":@10}];
+```
+
+Parameter | Can be null | Descriptions
+| --- | --- | --- |
+| userId  | No | The unique string of the account, the string length is not greater than 256, and can only contain numbers, capital and lower case letters, underscores (_), and dashes (-). Developers need to ensure that the userId of different accounts are not the same. |
+| properties | Yes | Event properties for user login (`user_login`).|
+
+</>
+
+<>
+
+```cpp
+FString UserId = TEXT("userId");
+FString LoginType = TUDBType::LoginType::TapTap;
+TapUEDB::SetUserWithLoginType(UserId, LoginType);
+```
+
+Parameter | Can be null | Descriptions
+| --- | --- | --- |
+| userId  | No | The unique string of the account, the string length is not greater than 256, and can only contain numbers, capital and lower case letters, underscores (_), and dashes (-). Developers need to ensure that the userId of different accounts are not the same. |
+| LoginType | Yes | User login method, refer to `TUDBType::LoginType`. |
+
+</>
+
+</MultiLang>
+
+
+### Clear User ID
+
+Once the user logout, you can call `clearUser` to clear the account ID saved in the current SDK, subsequent events reported will not have the account ID, and no events will be reported by calling this interface.
+
+<MultiLang kind="ue">
+
+```cs
+public static void ClearUser()
+
+TapDB.ClearUser();
+```
+
+```java
+public static void clearUser()
+
+TapDB.clearUser();
+```
+
+```objectivec
++ (void)clearUser;
+
+[TapDB clearUser];
+```
+
+```cpp
+TapUEDB::ClearUser();
+```
+
+</MultiLang>
+
+### Set User Name
+
+Once the user logs in, this interface can be called to set the user name, which will update the user name property (`user_name`).
+
+<MultiLang kind="ue">
+
+```cs
+public static void SetName(string name)
+
+TapDB.SetName("Tarara");
+```
+
+```java
+public static void setName(final String name)
+
+TapDB.setName("Tarara");
+```
+
+```objectivec
++ (void)setName:(NSString *)name;
+
+[TapDB setName:@"Tarara"];
+```
+
+```cpp
+FString Name = TEXT("Tarara"); // 用户游戏昵称
+TapUEDB::SetName(Name);
+```
+
+</MultiLang>
+
+Parameter | Can be null | Descriptions
+--- | --- | ---
+name | No | User name. Length greater than 0 and less than or equal to 256.
+
+
+### Set User Level
+
+Once the user logs in, this interface can be called to set the user level, which will update the user level property ( `user_name` ).
+
+<MultiLang kind="ue">
+
+```cs
+public static void SetLevel(int level)
+
+TapDB.SetLevel(5);
+```
+
+```java
+public static void setLevel(final int level)
+
+TapDB.setLevel(5);
+```
+
+```objectivec
++ (void)setLevel:(NSInteger)level;
+
+[TapDB setLevel:5];
+```
+
+```cpp
+int32 Level = 5;
+TapUEDB::SetLevel(Level);
+```
+
+</MultiLang>
+
+Parameter | Can be null | Descriptions
+--- | --- | ---
+level | No | User level.
+
+### Set User Server
+
+Once the user logs in, this interface can be called to set the user server, which will update the user server properties (`first_server` and `current_server`).
+
+<MultiLang kind="ue">
+
+```cs
+public static void SetServer(string server)
+
+TapDB.SetServer("1 Server");
+```
+
+```java
+public static void setServer(final String server)
+
+TapDB.setServer("Server 1");
+```
+
+```objectivec
++ (void)setServer:(NSString *)server;
+
+[TapDB setServer:@"Server 1"];
+```
+
+```cpp
+FString Server = TEXT("Server 1");
+TapUEDB::SetServer(Server);
+```
+
+</MultiLang>
+
+Parameter | Can be null | Descriptions
+--- | --- | ---
+server | No | User server.
+
+
+## Report Charge
+
+This interface can be called to report charge information after a user has made a charge.
+After the call, the `charge` event will be reported and the incoming parameters will be used as properties of the event.
+
+<MultiLang kind="ue">
+
+```cs
+public static void OnCharge(string orderId, string product, long amount, string currencyType, string payment)
+
+public static void OnCharge(string orderId, string product, long amount, string currencyType, string payment,
+            string properties)
+
+TapDB.OnCharge("0xueiEns", "game name", "100", "CNY", "wechat", "{\"on_sell\":true}");
+```
+
+```java
+public static void onCharge(final String orderId, final String product, final long amount,
+                                final String currencyType, final String payment)
+
+public static void onCharge(final String orderId, final String product, final long amount,
+                                final String currencyType, final String payment, final JSONObject properties)
+
+JSONObject info = new JSONObject();
+info.put("on_sell": true);
+TapDB.onCharge("0xueiEns", "game name", "100", "CNY", "wechat", info);
+```
+
+```objectivec
++ (void)onChargeSuccess:(nullable NSString *)orderId product:(nullable NSString *)product amount:(NSInteger)amount currencyType:(nullable NSString *)currencyType payment:(nullable NSString *)payment;
+
++ (void)onChargeSuccess:(nullable NSString *)orderId product:(nullable NSString *)product amount:(NSInteger)amount currencyType:(nullable NSString *)currencyType payment:(nullable NSString *)payment properties:(nullable NSDictionary *)properties;
+
+[TapDB onChargeSuccess:@"0xueiEns" product:@"game name" amount:100 currencyType:@"CNY" payment:@"wechat", properties:@{@"on_sell":YES}];
+```
+
+```cpp
+TapUEDB::OnCharge(OrderId, Product, Amount, CurrencyType, Payment, Properties);
+```
+
+</MultiLang>
+
+Parameter | Can be null | Descriptions
+--- | --- | ---
+orderId | No | Order ID
+product | Yes | Product name
+amount | No | Charge amount
+currencyType | Yes | Currency type, following ISO 4217 standard. Reference: CNY; USD; EUR
+payment | Yes | Payment method
+properties | Yes | The `charge` event properties
+
+
+**Tips:It is recommended to use the server-side recharge statistics interface under conditions that permit it. Please refer to the [server-side integration documentation](/sdk/tapdb/sdk/server-side-integration#充值记录).**
+
+## Custom Events
+
+### Report Events
+
+This interface can be used to report events after the SDK has been initialized:
+
+<MultiLang kind="ue">
+
+```cs
+public static void TrackEvent(string eventName, string properties)
+
+TapDB.TrackEvent("eventName", "{\"weapon\":\"axe\"}");
+```
+
+```java
+public static void trackEvent(final String eventName, final JSONObject properties)
+
+JSONObject properties = new JSONObject();
+properties.put("#weapon", "axe");
+properties.put("#level", 10);
+properties.put("#map", "atrium");
+TapDB.trackEvent("#battle", properties);
+```
+
+```objectivec
++ (void)trackEvent:(NSString *)eventName properties:(NSDictionary *)properties;
+
+NSDictionary* dic = @{@"aaa":@"xxx",@"bbb":@"yyy"};
+[TapDB trackEvent:@"testEvent2" properties:dic];
+```
+
+```cpp
+TapUEDB::TrackEvent(EventName, Properties);
+```
+
+</MultiLang>
+
+
+Parameter | Can be null | Descriptions
+--- | --- | ---
+eventName | No | Event name
+properties | Yes | Event properties
+
+
+**Tips:**
+
+* The eventName supports reporting of preset events and custom events, where custom events should start with `#`.
+* The key of the event property supports NSString type.
+* The value of the event property supports NSString (maximum length 256) and NSNumber (range of values [-9E15, 9E15]) types.
+* The event property supports reporting of preset properties and custom properties, where custom properties should start with `#`.
+* When passing in preset properties for the event properties, the preset properties collected by default by the SDK will be overwritten.
+
+
+### Sets Generic Event Properties
+
+For properties that need to be carried for all events, it is recommended to use a generic event property implementation.
+
+#### Add Static Generic Event Properties
+
+<MultiLang kind="ue">
+
+```cs
+public static void RegisterStaticProperties(string staticProperties)
+
+//When the static generic event property `#current_channel` is set to `TapDB`, using event reporting is equivalent to adding a `#current_channel` to the event property.
+string properties = "{\"#current_channel\":\"TapDB\"}";
+TapDB.RegisterStaticProperties(properties);
+```
+
+```java
+public static void registerStaticProperties(final JSONObject staticProperties)
+
+//When the static generic event property `#current_channel` is set to `TapDB`, using event reporting is equivalent to adding a `#current_channel` to the event property.
+JSONObject commonProperties = new JSONObject();
+commonProperties.put("#current_channel", "TapDB");
+TapDB.registerStaticProperties(commonProperties);
+```
+
+```objectivec
++ (void)registerStaticProperties:(NSDictionary *)staticProperties;
+
+// When the static generic event property `#current_channel` is set to `TapDB`, using event reporting is equivalent to adding a `#current_channel` to the event property.
+[TapDB registerStaticProperties:@{@"#current_channel":@"TapDB"}];
+```
+
+```cpp
+TapUEDB::RegisterStaticProperties(Properties);
+```
+
+</MultiLang>
+
+Parameter | Can be null | Descriptions
+--- | --- | ---
+staticProperties | No | Static generic event property dictionary
+
+
+#### Delete A Single Static Generic Event Property
+
+<MultiLang kind="ue">
+
+```cs
+public static void UnregisterStaticProperty(string propertyName)
+
+TapDB.UnregisterStaticProperty("#current_channel");
+```
+
+```java
+public static void unregisterStaticProperty(string propertyName)
+
+TapDB.unregisterStaticProperty("#current_channel");
+```
+
+```objectivec
++ (void)unregisterStaticProperty:(NSString *)propertyName;
+
+[TapDB unregisterStaticProperty:@"#current_channel"];
+```
+
+```cpp
+TapUEDB::UnregisterStaticProperty(Key);
+```
+
+</MultiLang>
+
+Parameter | Can be null | Descriptions
+--- | --- | ---
+propertyName | No | Static generic event property name
+
+
+#### Delete All Static Generic Event Properties
+
+<MultiLang kind="ue">
+
+```cs
+public static void ClearStaticProperties()
+
+TapDB.ClearStaticProperties();
+```
+
+```java
+public static void clearStaticProperties()
+
+TapDB.clearStaticProperties();
+```
+
+```objectivec
++ (void)clearStaticProperties;
+
+[TapDB clearStaticProperties];
+```
+
+```cpp
+TapUEDB::ClearStaticProperties();
+```
+
+</MultiLang>
+
+#### Register Dynamic Generic Event Properties
+
+For generic event properties that may change at any time. You can register a dynamic generic event property callback to add the calculated property to this reported event property.
+
+<MultiLang kind="ue">
+
+```cs
+public static void RegisterDynamicProperties(IDynamicProperties properties)
+
+// All subsequent events will carry the #currentLevel property, which contains the value of level at the time the event was reported.
+public class TapDBDynamicPropertiesImpl : IDynamicProperties
+{
+        public Dictionary<string, object> GetDynamicProperties()
+        {
+                Dictionary<string, object> dic = new Dictionary<string, object>();
+                dic["#currentLevel"] = level;
+                return dic;
+        }
+}
+TapDB.RegisterDynamicProperties(new TapDBDynamicPropertiesImpl());
+```
+
+```java
+public static void registerDynamicProperties(
+            final TapDBDataDynamicProperties dynamicProperties)
+
+// All subsequent events will carry the #currentLevel property, which contains the value of level at the time the event was reported.
+TapDB.registerDynamicProperties(
+    () -> {
+        JSONObject properties = new JSONObject();
+        // getCurrentLevel 在这里仅作为案例，表示用户任何的自有逻辑实现
+        long level = getCurrentLevel();
+        properties.put("#currentLevel", level);
+        return properties;
+    }
+);
+```
+
+```objectivec
++ (void)registerDynamicProperties:(NSDictionary* (^)(void))dynamicPropertiesCaculator;
+
+// All subsequent events will carry the #currentLevel property, which contains the value of level at the time the event was reported.
+[TapDB registerDynamicProperties:^NSDictionary *_Nonnull {
+      return @{
+          @"#currentLevel": level
+      };
+  }];
+```
+
+```cpp
+TapUEDB::RegisterDynamicProperties(PropertiesBlock);
+```
+
+</MultiLang>
+
+Parameter | Can be null | Descriptions
+--- | --- | ---
+dynamicProperties | No | Dynamic generic event properties compute callbacks
+
+**Tips:**
+
+* Using the same property name in the reported event or generic property will result in property overwriting. The priority overwriting is from highest to lowest: event property, dynamic generic event property, static generic event property, and preset property. For example, an event property set in `trackEvent` will override a dynamic generic event property, a static generic event property, or a preconfigured property with the same name.
+
+
+## Modify User Attributes
+
+TapDB supports two kinds of objects: devices and accounts, and you can manipulate the properties of these two users through the following interfaces.
+
+### Modify Device Properties
+
+#### Device Property Initialization
+
+This interface can be used to make only the first value valid. Only if the current value is null, the assignment will take effect, if the current value is not null, the assignment will be ignored.
+
+<MultiLang kind="ue">
+
+```cs
+public static void DeviceInitialize(string properties)
+
+string properties = "{\"firstActiveServer\":\"server1\"}";
+TapDB.DeviceInitialize(properties);
+// The value of "#firstActiveServer" in the device table is "server1".
+
+string properties = "{\"firstActiveServer\":\"server2\"}";
+TapDB.DeviceInitialize(properties);
+// The value of "#firstActiveServer" in the device table is still "server1".
+```
+
+```java
+public static void deviceInitialize(final JSONObject properties)
+
+JSONObject properties = new JSONObject();
+properties.put("firstActiveServer", "server1");
+TapDB.deviceInitialize(properties);
+// The value of "#firstActiveServer" in the device table is "server1".
+
+properties.put("firstActiveServer", "server2");
+TapDB.deviceInitialize(properties);
+// The value of "#firstActiveServer" in the device table is still "server1".
+```
+
+```objectivec
++ (void)deviceInitialize:(NSDictionary *)properties;
+
+[TapDB deviceInitialize:@{@"firstActiveServer":@"server1"}];
+// The value of "#firstActiveServer" in the device table is "server1".
+
+[TapDB deviceInitialize:@{@"firstActiveServer":@"server2"}];
+// The value of "#firstActiveServer" in the device table is still "server1".
+```
+
+```cpp
+TapUEDB::DeviceInitialize(Properties);
+```
+
+</MultiLang>
+
+Parameter | Can be null | Descriptions
+--- | --- | ---
+properties | No | Properties Dictionary
+
+
+#### Device Property Updates
+
+For regular device properties, this interface can be used to assign values, and the new property values will directly overwrite the old ones.
+
+<MultiLang kind="ue">
+
+```cs
+public static void DeviceUpdate(string properties)
+
+string properties = "{\"currentPoints\":10}";
+TapDB.DeviceUpdate(properties);
+// "currentPoints" in the device table is 10.
+
+properties = "{\"currentPoints\":42}";
+TapDB.DeviceUpdate(properties);
+// "currentPoints" in the device table is 42.
+```
+
+```java
+public static void deviceUpdate(final JSONObject properties)
+
+JSONObject properties = new JSONObject();
+properties.put("currentPoints", 10);
+TapDB.deviceUpdate(properties);
+// "currentPoints" in the device table is 10.
+
+properties.put("currentPoints", 42);
+TapDB.deviceUpdate(properties);
+// "currentPoints" in the device table is 42.
+```
+
+```objectivec
++ (void)deviceUpdate:(NSDictionary *)properties;
+
+[TapDB deviceUpdate:@{@"currentPoints":@10}];
+// "currentPoints" in the device table is 10.
+
+[TapDB deviceUpdate:@{@"currentPoints":@42}];
+// "currentPoints" in the device table is 42.
+```
+
+```cpp
+TapUEDB::DeviceUpdate(Properties);
+```
+
+</MultiLang>
+
+Parameter | Can be null | Descriptions
+--- | --- | ---
+properties | No | Properties dictionary
+
+
+#### Device Property Accumulation
+
+Properties of numeric type can use this interface for accumulation operation, after calling TapDB will accumulate the original property value and save the result value.
+
+<MultiLang kind="ue">
+
+<>
+
+```cs
+public static void DeviceAdd(string properties)
+
+string properties = "{\"totalPoints\":10}";
+TapDB.DeviceAdd(properties);
+// "totalPoints" in the device table is 10.
+
+
+properties = "{\"totalPoints\":-2}";
+TapDB.DeviceAdd(properties);
+// "totalPoints" in the device table is 8.
+```
+
+</>
+
+<>
+
+```java
+public static void deviceAdd(final JSONObject properties)
+
+JSONObject properties = new JSONObject();
+properties.put("totalPoints", 10);
+TapDB.deviceAdd(properties);
+// "totalPoints" in the device table is 10.
+
+properties.put("totalPoints", -2);
+TapDB.deviceAdd(properties);
+// "totalPoints" in the device table is 8.
+```
+
+</>
+
+<>
+
+```objectivec
++ (void)deviceAdd:(NSDictionary *)properties;
+
+[TapDB deviceAdd:@{@"totalPoints":@10}];
+// "totalPoints" in the device table is 10.
+
+[TapDB deviceAdd:@{@"totalPoints":@(-2)}];
+// 此时设备表的 "totalPoints" 字段值为 8
+```
+
+</>
+
+<>
+
+```cpp
+TapUEDB::DeviceAdd(Properties);
+```
+
+</>
+
+</MultiLang>
+
+Parameter | Can be null | Descriptions
+--- | --- | ---
+properties | No | Property dictionary, only supports numeric types
+
+In the above code example, the property value is an integer.
+The accumulation operation also supports floating point numbers, but there is a precision problem with floating point summation, so developers need to pay attention to it.
+
+### Modify User Properties
+
+#### User Property Initialization
+
+Use the same method as "Device Property Initialization" operations.
+
+<MultiLang kind="ue">
+
+```cs
+public static void UserInitialize(string properties)
+
+TapDB.UserInitialize(properties);
+```
+
+```java
+public static void userInitialize(final JSONObject properties)
+
+TapDB.userInitialize(properties);
+```
+
+```objectivec
++ (void)userInitialize:(NSDictionary *)properties;
+
+[TapDB userInitialize:@{@"firstActiveServer":@"server1"}];
+```
+
+```cpp
+TapUEDB::UserInitialize(Properties);
+```
+
+</MultiLang>
+
+
+#### User Property Updates
+
+Use the same method as "Device Property Updates" operations.
+
+<MultiLang kind="ue">
+
+```cs
+public static void UserUpdate(string properties)
+
+TapDB.UserUpdate(properties);
+```
+
+```java
+public static void userUpdate(final JSONObject properties)
+
+TapDB.userUpdate(properties);
+```
+
+```objectivec
++ (void)userUpdate:(NSDictionary *)properties;
+
+[TapDB userUpdate:@{@"currentPoints":@10}];
+```
+
+```cpp
+TapUEDB::UserUpdate(Properties);
+```
+
+</MultiLang>
+
+#### User Property Accumulation
+
+Use the same method as "Device Property Accumulation" operations.
+
+<MultiLang kind="ue">
+
+```cs
+public static void UserAdd(string properties)
+
+TapDB.UserAdd(properties);
+```
+
+```java
+public static void userAdd(final JSONObject properties)
+
+TapDB.userAdd(properties);
+```
+
+```objectivec
++ (void)userAdd:(NSDictionary *)properties;
+
+[TapDB userAdd:@{@"totalPoints":@10}];
+```
+
+```cpp
+TapUEDB::UserAdd(Properties);
+```
+
+</MultiLang>
+
+
+## Collecting Device Fingerprints
+
+Allows the SDK to capture device fingerprints to aid in data analysis, ad attribution and make statistical results more accurate.
+
+:::info
+Please initialize the SDK after the operation such as permission application and setting IDFA switch to ensure the device fingerprint can be reported properly.
+:::
+
+### OAID（Android）
+
+> Note: SDK version 3.15.0 and above support OAID version 1.0.5 ~ 1.2.1; 3.14.0 and below support OAID version 1.0.5 ~ 1.0.25.
+
+
+TapDB SDK will carry this parameter (key is `device_id4`) in sending related events when the application accesses OAID third-party library. The supported versions of this third-party library are 1.0.5 ~ 1.2.1, because different versions change a lot, so the instructions for accessing different versions are as follows.
+
+For 1.0.5 ~ 1.0.25 no additional configuration is needed, just add the dependency of the corresponding third-party library to the application.
+
+
+For 1.0.26 ~ 1.2.1, in addition to adding the corresponding third-party libraries, you need to add the following processing.
+
+#### 1. Set certificate information and profile
+
+The certificate is a "cert.pem" file applied through the Mobile Security Alliance mailbox <msa@caict.ac.cn>, which corresponds to the package name. Two types of settings are supported.
+
+1. Copy the `cert.pem` file to the application `assets` directory, and note that the file name should be set to `packageName.cert.pem`, `packageName` is the current application package name.
+2. Set the contents of the certificate file via the SDK interface `setOAIDCert`.
+
+One of the two options is sufficient, and when both are used, the certificate information set through the interface is preferred.
+
+The configuration file is' supplierconfig.json '. The application needs to change the contents corresponding to the internal appid to the application ID of the app market, and the other parts do not need to be modified.
+
+#### 2. Load the corresponding library file in the application project
+
+The library file names for different versions of OAID third-party libraries are as follows：
+
+| Versions | Libraries Name|
+| ---- | ---- |
+| 1.0.30 ~ 1.2.1 | msaoaidsec |
+| 1.0.29 | nllvm1632808251147706677 |
+| 1.0.27 | nllvm1630571663641560568 |
+| 1.0.26 | nllvm1623827671 |
+
+In the 'onCreate' method of the custom 'Application' class in the Android project, add the code to load third-party libraries, for example, when the application integrates OAID version 1.2.1 as follows: The library file names of different versions of OAID third-party libraries are as follows.
+
+```java
+System.loadLibrary("msaoaidsec");
+```
+
+#### FAQ
+
+When the OAID library has been integrated in the project but the device OAID information is still not found when reporting, check the following items:
+
+1. Whether the device time is normal.
+2. For version 1.0.26 and above, does the package name of the certificate correspond to the current package name.
+3. For version 1.0.26 and above, whether the library file is loaded and whether the library file name is the same as the version.
+4. The application in Android 12 reports an error as: `java.lang.UnsatisfiedLinkError`, and the application minSdkVersion is greater than or equal to 23, it is recommended to add in the application tag of AndroidManifest.xml: `android:extractNativeLibs="true"`.
+
+### IMEI（Android）
+
+After adding the following item in 'AndroidManifest.xml' and the user agrees to the permission application, the SDK will automatically collect the Android IMEI.
+
+<MultiLang kind="ue">
+
+<>
+
+```xml
+<uses-permission android:name="android.permission.READ_PHONE_STATE" />
+```
+
+</>
+
+<>
+
+```xml
+<uses-permission android:name="android.permission.READ_PHONE_STATE" />
+```
+</>
+
+<>
+
+```xml
+Not available for iOS platform
+```
+
+```cpp
+//UE4 SDK does not provide this method
+```
+
+</>
+
+</MultiLang>
+
+### IDFA（iOS）
+
+
+ For `iOS14.5` and above, getting IDFA requires a popup window with user confirmation. SDK does not get IDFA by default, you can call the interface to enable IDFA fetching.
+
+<MultiLang kind="ue">
+
+<>
+
+Please make sure the permission request description text is added to `info.plist`, the SDK will automatically pop up the permission request window during initialization. 
+
+```
+<key>NSUserTrackingUsageDescription</key>
+<string>This item will be used to suggest personalized ads (or other descriptions) to you</string>
+```
+
+If you are using TapSDK initialization, please pass `true` to `advertiserIDCollectionEnabled` in `TapDBConfig` to turn on the IDFA collection switch.
+
+If you are using TapDB SDK alone, please call the following interface to enable the IDFA acquisition switch:
+
+```cs
+TapDB.AdvertiserIDCollectionEnabled(true);
+```
+
+</>
+
+<>
+
+```java
+// Not available for Android platform
+```
+
+</>
+
+<>
+
+Please make sure the permission request description text is added to `info.plist`, the SDK will automatically pop up the permission request window during initialization. 
+
+```
+<key>NSUserTrackingUsageDescription</key>
+<string>This item will be used to suggest personalized ads (or other descriptions) to you</string>
+```
+
+If you are using TapSDK initialization, please pass `YES` in `advertiserIDCollectionEnabled` in `TapDBConfig` to turn on the IDFA collection switch.
+
+If you are using TapDB SDK alone, please call the following interface to enable the IDFA acquisition switch:
+
+```objective-c
+[TapDB setAdvertiserIDCollectionEnabled:YES];
+```
+
+</>
+
+<>
+
+iOS exclusive method
+
+```cpp
+TapUEDB::AdvertiserIDCollectionEnabled(true);
+```
+
+</>
+
+</MultiLang>
+
+
+## Diagnosis {#themis}
+
+:::info
+TapSDK 3.14.0 and above can access this feature.
+
+The UE4 SDK does not support diagnostic access at this time.
+:::
+
+### Add Dependencies
+
+<MultiLang>
+
+<>
+
+The SDK can be **imported via Unity Package Manager or imported manually**, either way.
+
+If you choose UPM import, you can add to the project's `Packages/manifest.json` file.
+
+```json
+"dependencies": {
+  "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#3.14.0",
+  "com.taptap.tds.tapdb": "https://github.com/TapTap/TapDB-Unity.git#3.14.0",
+  "com.taptap.tds.themis": "https://github.com/TapTap/TapThemis-Unity.git#3.14.0"
+}
+```
+
+If you choose to import manually：
+
+* Find the TapSDK Unity download address on the [download page](/tap-download), download TapSDK-UnityPackage.zip and unzip it, then import the `TapTap_Common`, `TapTap_TapDB` and `TapTap_Themis` modules.
+
+</>
+
+<>
+
+```cs
+repositories {
+  flatDir {
+    dirs 'libs'
+  }
+}
+dependencies {
+  ...
+  implementation (name:'THEMIS-release2.6.7', ext:'aar')
+}
+```
+
+</>
+
+<>
+
+```cs
+// TapDB SDK is called automatically, no additional integration required.
+```
+
+</>
+
+</MultiLang>
+
+### Namespace
+
+<MultiLang>
+
+```cs
+using TapTap.TapDB;
+```
+
+```cs
+// TapDB SDK is called automatically, no additional integration required.
+```
+
+```cs
+// TapDB SDK is called automatically, no additional integration required.
+```
+
+</MultiLang>
+
+### Interface Description
+
+#### Set the log reporting level
+
+<MultiLang>
+
+```cs
+TapDB.ConfigAutoReportLogLevel(LogSeverity.LogError);
+```
+
+```cs
+// not supported
+```
+
+```cs
+// not supported
+```
+
+</MultiLang>
+
+The default level is `LogError`, which will be reported automatically when the application log level is higher than the set level.
+
+#### Set whether to exit on exception
+
+<MultiLang>
+
+```cs
+TapDB.ConfigAutoQuitApplication(true);
+```
+
+```cs
+// not supported
+```
+
+```cs
+// not supported
+```
+
+</MultiLang>
+
+Set whether to exit automatically when an uncaught exception occurs.
+
+#### Register Log Callback
+
+<MultiLang>
+
+```cs
+TapDB.RegisterLogCallback(logcallback);
+public void logcallback(string condition, string statckTrace, LogType type ){
+
+}
+```
+
+```cs
+// not supported
+```
+
+```cs
+// not supported
+```
+
+</MultiLang>
+
+Register the application log Callback. Callback processing is invoked when the application outputs logs.
+
+#### Remove Log Listening
+
+<MultiLang>
+
+```cs
+TapDB.UnRegisterLogCallback(logcallback);
+```
+
+```cs
+// not supported
+```
+
+```cs
+// not supported
+```
+
+</MultiLang>
+
+#### Reporting Exception
+
+<MultiLang>
+
+```cs
+TapDB.ReportException(new Exception("crash test from unity"),"crashMessage desc");
+```
+
+```cs
+// not supported
+```
+
+```cs
+// not supported
+```
+
+</MultiLang>
+
+Proactive reporting an exception.
