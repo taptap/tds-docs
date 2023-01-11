@@ -1,0 +1,114 @@
+---
+title: Burial Point Design Guide
+sidebar_position: 2
+---
+
+## 1. Case Introduction
+
+Have you ever had the problem that a user has opened the game page, but before the user logs in to the account, some technical issue causes the user to churn.
+
+Here's a real-world example of how we used custom event analysis to complete the "user churn" process from opening the App to creating a role. 
+We designed our analysis as follows:
+
+**1. Be clear about the goal of analytics** : understand user churn before personas are created;
+
+**2. Clarify the process** : Break down the process from the user opening the App to creating a role:
+
+- Click on the game icon
+- Unity initialization
+- The Android Storage Permissions Allow screen appears
+- SDK initialization (record point of "Add Device")
+- The privacy agreement confirmation box pops up [select "No" to exit, SDK initialization fails].
+- Check version
+- Confirm download button (in 4G environment) / Automatic download in WIFI environment
+- Start downloading resources
+- Resource downloading in progress
+- When the resource download is complete, enter the login screen
+- Click TapTap login button
+- A pop-up window will appear, you can choose Tap to open or Tap Accelerator to open
+- When the selection is complete, a pop-up will appear to recall the login authorization
+- Click Agree and return to the game
+- TapTap login completed (the record point of "Convert Device")
+- Game server side to authenticate users
+- Login to the game server
+- Enter a nickname to create a character
+- Create successfully and enter the game
+
+**3. Define the analysis indicators**: According to the above process, with funnel thinking, we designed several key indicators as:
+
+- Resource confirmation download rate (users who confirmed the download / users who updated the pop-up window).
+- Resource download success rate (users who downloaded successfully / users who started downloading the resource).
+- TapTap login rate (users who logged in successfully / users who clicked to log in).
+- Character creation rate (users who successfully created a character / users who logged in successfully).
+
+**4. Explicit Event ** : In general, there are three types of event:
+
+| Event Type | Description |
+| ---- | ----------------- |
+| Exposure events  | Exposure of XX pages, exposure of XX pop-ups |
+| Click events | XX button clicks |
+| System events | Initialization, version checking, resource download, etc. |
+
+In the previous step, we identified the analysis metrics. Next we determine the event name and event type:
+
+- Exposure: [Update Alert Pop-up Window]
+- Click: [Update prompt pop-up window - Confirm download button]
+- System Event: [Update Download Success]
+- Click: [Home - TapTap Login Button]
+- System Event: [Login Success]
+- System Event: [Successful Character Creation]
+
+**5. Define event properties**.
+Based on the event names and event types, we have compiled a more complete buried document as follows.
+
+| Event Name | Event Display Name | Property Name | Property Display Name | Property Value  | Event Trigger Timing |
+| ---------------- | ---------------- | ----------- | ----- | ---------------- | --------- |
+| pv_download      | Update alert pop-ups | #ts         | Timestamp   |                  | Triggered when pop-up window is displayed   |
+| click_download   | Update prompt pop-up window, confirm download button  | #networtype | Network Type  | WiFi、4g、5g、3g、2g | Triggered when button is clicked   |
+| download_success | Update downloaded successfully  | #ts |  Timestamp  |                  | System background trigger    |
+| login_start      | Home - TapTap Login Button | #ts   |  Timestamp  |                  | Triggered when button is clicked   |
+| login_success    | Login successful  | #ts   |  Timestamp  |                  | System background trigger    |
+| create_role      | Create Character  | #ts   |  Timestamp  |                  | Triggered when character creation is successful |
+
+With the above steps, we have completed the design of the buried point.  
+
+Then we fill the buried point information (event name, event display name, attribute name, attribute display name) into TapDB's "Configuration" - "Event Management".  
+
+Then develop according to the buried point document, and then verify the data. 
+
+After the buried point is put on line, we use "Event" and "Dashboard" functions to analyze the process of "users losing users from opening the app to actually creating roles", as shown in the following figure.
+
+![](/img/customEvent/49e3e7c0d12cd20cdd4f4aed2c8d0044.png)
+
+The conversion rate of "Update Download Successfully (Step 3)" to "Home - TapTap Login Button (Step 4)" is very low, so we need to perform detailed data analysis. Click [TapDB User's Guide](/sdk/tapdb/features/custom-event/event-analyse) to see the detailed data analysis method.
+
+## 2. buried design ideas
+
+It is recommended to refer to the following steps for buried point design.  
+**1. Determine the analysis scenario**.  
+**2. Clarify the process**.  
+**3、Define analytics metrics**.  
+**4. Define the event: design the Event, determine its type, name and other details**.  
+**5. Define Event properties: specify the required information and use event properties for reporting**.
+
+## 3. Other design tips
+
+### 3.1 Similar abstraction of Event
+
+When designing events, you may encounter the following problems.  
+
+1. To count the passing of three levels A, B and C, should we design a passing event for each level?  
+2. When designing the buried point of "apply for verification code" event, there is an event of "apply for verification code" in user registration, user login, password change and other scenarios. Do I need to design an event for each scenario?  
+
+We can determine whether the same Event is set for different scenarios based on the same kind of abstraction principle：
+
+- Important events or events of special interest can be treated as separate Events.
+- Events of general importance, such as those that only require analysis of the number of participants and counts, can be set up as a single event with multiple similar behaviors, and specific behaviors can be identified through properties.
+
+1. Events for different levels: if we count the passages of three levels A, B and C, instead of counting them three times, we only need to design a "level pass" event, and then use the attributes to distinguish the three levels A, B and C. 2.
+
+2. Buried function of "apply for verification code": you can define a "apply for verification code" event, and use the attribute value to distinguish the "scenes".
+
+### 3.2 Event naming convention
+
+When designing event display names, ensure that there is no ambiguity about the event. Naming the events in the form of "page name - module name - specific event name" can help analysts understand the events accurately. It is important to avoid incorrect analysis conclusions triggered by inaccurate descriptions. Maintaining uniformity in App page naming makes sense and helps us ensure that everyone's understanding is consistent.
