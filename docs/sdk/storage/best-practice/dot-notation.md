@@ -1,12 +1,19 @@
-# 点号使用指南
+---
+title: 点号使用指南
+slug: /sdk/storage/guide/dot-notation/
+sidebar_position: 2
+---
+
+import { Conditional } from "/src/docComponents/conditional";
 
 许多编程语言中都可以通过点号（`.`）访问对象的属性。
-LeanCloud 的 SDK 和 REST API 也支持类似的功能。
+<Conditional brand="tds">TDS</Conditional><Conditional brand="leancloud">LeanCloud</Conditional> 的数据存储 SDK 和 REST API 也支持类似的功能。
 善用点号常常可以让代码看上去更简短，降低网络通讯的开销。
 
 ## 在查询对象时使用点号
 
-AVObject 字段允许的类型包括对象（`Object`），如果我们想要根据对象的属性发起查询，那么可以使用 `字段名.属性名` 的格式进行查询。
+AVObject / LCObject 字段允许的类型包括对象（`Object`），如果我们想要根据对象的属性发起查询，那么可以使用 `字段名.属性名` 的格式进行查询。
+
 例如，假设有一个 `Member` 类，其 `occupation` 字段的结构如下：
 
 ```ts
@@ -27,6 +34,7 @@ query.equalTo("occupation.profession", "Other")
 
 在获取对象时，我们可以通过 `select` 指定需要返回的属性。
 当指定的属性的类型是对象时，我们可以在 `select` 条件中使用点号，指定只获取该属性的某个属性。
+
 例如，假设包含 `query.select(["occupation"])` 语句的某个查询返回如下对象：
 
 ```js
@@ -49,6 +57,7 @@ query.equalTo("occupation.profession", "Other")
     // objectId、createdAt、updatedAt
 }
 ```
+
 ## 在设置对象属性时使用点号
 
 同理，我们也可以使用点号直接设置某个对象的属性。例如：
@@ -89,4 +98,4 @@ query.include('post.author')
 Pointer 中的点号看起来和前面提到的对象中的点号很相似，但两者是独立的功能。例如：
 
 - `include` 语句中的点号只是在查询到结果后，「展开」指定的 Pointer 字段，而不是在查询前就「展开」Pointer 字段。因此，无法像查询对象属性一样，通过点号对 Pointer 的属性发起查询。
-- 假设 `Comment` 类的 `post` 字段是一个指向 `Post` 类的 Pointer，而 `Post` 类又有一个指向 `Author` 类的 Pointer 字段 `author`， 然后 `Author` 类还有一个指向 `Group` 类的 Pointer 字段 `group`，那么 `query.include('post.author.group')` 可以同时获取评论所属文章的作者所属的群组。但如果 `post` 字段是一个 Pointer，它指向的 `Post` 类的 `author` 字段是一个**对象**，其中包含一个指向 `Group` 类的 `group` 字段，那么无法使用 `query.include('post.author.group')`。 
+- 假设 `Comment` 类的 `post` 字段是一个指向 `Post` 类的 Pointer，而 `Post` 类又有一个指向 `Author` 类的 Pointer 字段 `author`， 然后 `Author` 类还有一个指向 `Group` 类的 Pointer 字段 `group`，那么 `query.include('post.author.group')` 可以同时获取评论所属文章的作者所属的群组。但如果 `post` 字段是一个 Pointer，它指向的 `Post` 类的 `author` 字段是一个**对象**，其中包含一个指向 `Group` 类的 `group` 字段，那么无法使用 `query.include('post.author.group')`。
