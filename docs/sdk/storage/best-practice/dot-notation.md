@@ -66,16 +66,12 @@ query.equalTo("occupation.profession", "Other")
 member.set("occupation.profession", "Software Developer")
 ```
 
-注意，使用点号的前提是点号左侧的字段已经存在。
-也就是说，在上面的例子中，`member` 对象上必须已经存在 `occupation` 字段，否则直接使用 `occupation.profession` 会报错。
-这种情况下，可以使用以下方式设置属性：
+**更新对象**时，无论 `member` 对象上是否存在 `occupation` 字段，均可直接使用 `occupation.profession`。
+
+注意，使用点号**创建对象**会报错。这种情况下，可以使用以下方式设置属性：
 
 ```js
 member.set("occupation", { "profession": "Software Developer" })
-
-// 下面这样也行，但是不如上一种方式简洁，因此不推荐使用。
-member.set("occupation", {})
-member.set("occupation.profession", "Software Developer")
 ```
 
 更新数组的操作（`add`、`addUnique`、`remove`）同样适用于内嵌于字段的数组，可以搭配点号使用。
