@@ -5,20 +5,28 @@ slug: /sdk/storage/faq/
 sidebar_position: 18
 ---
 
+import { Conditional } from "/src/docComponents/conditional";
+import Path from "/src/docComponents/path";
+
 ## API
 
 ### API 调用次数有什么限制吗
 
-开发版提供每天三万次的免费额度。
+<Conditional brand="leancloud">开发版</Conditional><Conditional brand="tds">[标准版](https://developer.taptap.com/product-intro/price)</Conditional>提供每天 API 读写请求**三万次**的免费额度。
+
 推送服务免费使用，并不占用免费额度，推送消息接口的调用受频率限制，具体参考：[推送消息接口的限制](https://leancloud.cn/docs/push-rest-api.html#hash788199390) 文档。
 
+<Conditional brand="leancloud">
+
 默认情况下，商用版应用同一时刻最多可使用的工作线程数为 60，即同一时刻最多可以同时处理 60 个数据请求。**我们会根据应用运行状况以及运维需要调整该值**。如果需要提高这一上限，请 [提交工单](https://www.leanticket.cn) 进行申请。
+
+</Conditional>
 
 ### API 调用次数的计算
 
 对于数据存储来说，每次 `create` 和 `update` 一个对象的数据算 1 次请求，如调用 1 次 `object.saveInBackground` 算 1 次 API 请求。在 API 调用失败的情况下，如果是由于**应用流控超限**（错误码 429）而被云端拒绝，则**不会**算成 1 次请求；如果是其他原因，例如**权限不够**（错误码 430），那么仍会算为 1 次请求。
 
-**一次请求**<br/>
+#### 一次请求
 
 - `create`
 - `save`
@@ -29,24 +37,40 @@ sidebar_position: 18
 
 调用一次 `fetch` 或 `find` 通过 `include` 返回了 100 个关联对象，算 1 次 API 请求。调用一次 `find` 或 `deleteAll` 来查找或删除 500 条记录，只算 1 次 API 请求。
 
-**多次请求**<br/>
+#### 多次请求
 
 - `saveAll`
 - `fetchAll`
 
 调用一次 `saveAll` 或 `fetchAll` 来保存或获取 array 里面 100 个 对象，算 100 次 API 请求。
 
+<Conditional brand="leancloud">
+
 对于 [社交信息流](https://leancloud.cn/docs/status_system.html)，`create` 和 `update` 按照 Status 和 Follower/Followee 的对象数量来计费。
+
+</Conditional>
 
 对于 query 则是按照请求数来计费，与结果的大小无关。`query.count` 算 1 次 API 请求。collection fetch 也是按照请求次数来计费。
 
 ### 如何获取 API 的访问日志
 
-进入 **控制台 > 数据存储 > API 访问日志**，开启日志服务，稍后刷新页面，就可以看到从开启到当前时间产生的日志了。
+<Conditional brand="leancloud">
+
+进入 **<Path to="storage" /> > API 访问日志**，开启日志服务，稍后刷新页面，就可以看到从开启到当前时间产生的日志了。
+
+</Conditional>
+
+<Conditional brand="tds">
+
+开发者中心后台暂不支持查看 API 访问日志。
+
+</Conditional>
 
 ### 其他语言调用 REST API 如何对参数进行编码
 
-REST API 文档使用 curl 作为示范，其中 `--data-urlencode` 表示要对参数进行 URL encode 编码。如果是 GET 请求，直接将经过 URL encode 的参数通过 `&` 连接起来，放到 URL 的问号后。如 `https://API_BASE_URL/1.1/login?username=xxxx&password=xxxxx`。
+REST API 文档使用 curl 作为示范，其中 `--data-urlencode` 表示要对参数进行 URL encode 编码。
+
+如果是 GET 请求，直接将经过 URL encode 的参数通过 `&` 连接起来，放到 URL 的问号后。如 `https://API_BASE_URL/1.1/login?username=xxxx&password=xxxxx`。
 
 ## 查询
 
@@ -70,42 +94,18 @@ REST API 文档使用 curl 作为示范，其中 `--data-urlencode` 表示要对
 
 以此类推。
 
-### 使用 CQL 子查询时查不到记录或查到的记录不全
-
-使用子查询可能会遇到查不到记录或查到的记录不全的情况。例如：
-
-```sql
--- 找出积分高于 80、region 为 cn 的玩家记录
-SELECT *
-FROM   player
-WHERE  NAME IN (SELECT NAME
-                FROM   gamescore
-                WHERE  score > 80)
-       AND region = 'cn'
-```
-
-LeanCloud 云端使用的并非关系型数据库，无法做到真正的联表查询，所以实际的处理方式是：先执行内嵌/子查询（和普通查询一样，limit 默认为 100，最大  1000），然后将子查询的结果填入主查询的对应位置，再执行主查询。
-
-如果子查询匹配到了 100 条以上的记录（性别等区分度低的字段重复值往往较多），且主查询有其他查询条件（`region = 'cn'`），那么可能会出现没有结果或结果不全的情况，其本质上是子查询查出的 100 条记录没有满足主查询的其他条件。
-
-我们建议采用以下方案进行改进：
-
-- 确保子查询的结果在 100 条以下，如果在 100 - 1000 条的话请在子查询末尾添加 limit 1000。
-- 将需要查询的字段冗余到主查询所在的表上；例如将 score 冗余到 Player 表上，或者将 region 添加到 GameScore 上然后只查 GameScore 表。
-- 进行多次查询，每次在子查询上添加 skip 来遍历所有记录（注意 skip 的值较大时可能会引发性能问题，因此不是很推荐）。
-
 ### 可以通过指定 objectId 范围来实现分页吗？
 
-当前 LeanCloud 系统自动生成 `objectId` 的算法是基于时间的，因此确实可以通过指定 `objectId` 范围来实现分页。
-但是，从代码可读性及严谨性出发（比如导入数据时可以指定不同格式的 objectId），推荐通过指定 `createdAt` 范围来实现分页。
+当前数据存储服务自动生成 `objectId` 的算法是基于时间的，因此确实可以通过指定 `objectId` 范围来实现分页。
+但是，从代码可读性及严谨性出发（比如导入数据时可以指定不同格式的 `objectId`），推荐通过指定 `createdAt` 范围来实现分页。
 
 ### 当数据量越来越大时，怎么加快查询速度？
 
-与使用传统的数据库一样，查询优化主要靠索引实现。索引就像字典里的目录，能帮助你在海量的文字中更快速地查词。
+与使用传统的数据库一样，查询优化主要靠**索引**实现。索引就像字典里的目录，能帮助你在海量的文字中更快速地查词。
 
 原则：数据量少时，不建索引。多的时候请记住，建立索引后，写入时还需要更新索引，以此来换取更少的查询时间。所以，一般来说，写少读多就多建索引，写多读少就少建索引。
 
-索引可以在控制台自助创建，详见[控制台使用指南](https://leancloud.cn/docs/dashboard_guide.html#hash-1591736448)。
+索引可以在 **<Path to="storage" />** 中选择对应 Class 后进入「性能与索引」自助创建<Conditional brand="leancloud">，详见[控制台使用指南](https://leancloud.cn/docs/dashboard_guide.html#hash-1591736448)</Conditional>。
 
 ### LeanCloud 查询支持 `Sum`、`Group By`、`Distinct` 这种函数吗？
 
@@ -151,7 +151,7 @@ LeanCloud 云端使用的并非关系型数据库，无法做到真正的联表�
 
 ### 应用内搜索的关键字查询， 查出来的结果是两月前的数据，最新数据查询不到怎么办？
 
-这种情况可以在控制台尝试重建索引，索引创建完后会有邮件提醒。
+这种情况可以在 **<Path to="storage" /> > 全文搜索** 尝试重建索引<Conditional brand="leancloud">，索引创建完后会有邮件提醒</Conditional>。
 
 一般来说当用户上传了新的词典，或者有批量删除过数据等情况都需要执行一次「重建索引」操作。当发现搜索与存储数据不一致时，也可以尝试重建索引来解决。
 
@@ -159,10 +159,10 @@ LeanCloud 云端使用的并非关系型数据库，无法做到真正的联表�
 
 单个对象的数据过大，需要在业务层去优化代码，比如 data 是大数据字段：
 
-- 在查询的时候，通过 AVQuery.Select 去选取需要的字段（不要 select data 字段）
+- 在查询的时候，通过 AVQuery.Select 去选取需要的字段（不要 select data 字段）。
 - 在 GET 对象的时候，才把 data 字段获取到客户端。
 - 或者考虑将 data 字段的数据做为「文件」保存，然后在表中通过 Pointer 关联起来。
-- 如果 data 是一个巨大的对象且只需要获取其中某个或某几个属性的话，可以考虑在 select 时用点号指定相应的属性，文档参考：[在查询对象时使用点号](/sdk/storage/guide/dot-notation/#在查询对象时使用点号)。
+- 如果 data 是一个巨大的对象且只需要获取其中某个或某几个属性的话，可以考虑在 select 时用点号指定相应的属性，参考 [在查询对象时使用点号](/sdk/storage/guide/dot-notation/#在查询对象时使用点号)。
 
 ## 内建账户
 
@@ -188,23 +188,24 @@ LeanCloud 云端使用的并非关系型数据库，无法做到真正的联表�
 
 ### 文件存储有 CDN 加速吗？
 
-<div id="accordion-cdn">
-  <p>中国节点的文件存储服务自带 CDN 加速访问，但不包括海外 CDN 加速。商用版应用可发工单申请开启海外 CDN 加速（开启后海外访问文件 http/https 流量费用分别上调为 0.40 元/GB、0.60 元/GB。
-国际版没有现成的 CDN 加速访问服务，需要用户自行配置。</p>
-  <div id="collapse-cdn" class="panel-collapse collapse in">
-    <p>以 CloudFront 加速服务为例，配置过程如下：</p>
-    <ol>
-    <li>阅读官方指南 <a href="http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/GettingStarted.html">Getting Started with CloudFront</a>。</li>
-    <li>创建一个 AWS 账户，开始使用 CloudFront 服务和付费。</li>
-    <li>S3 的公共访问权限（read permission）已经被配置好，可以跳过指南中有关 S3 配置的部分（<a href="http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/GettingStarted.html#GettingStartedUploadContent">Step 2: Upload your content to Amazon S3 and grant object permissions</a>。</li>
-    <li>CloudFront 配置中的 <strong>Origin Domain Name</strong> 请从 AVFile 的 URL 中获取，其他均可保持默认。</li>
-    </ol>
-  </div>
-</div>
+中国节点的文件存储服务自带 CDN 加速访问，但不包括海外 CDN 加速。
+
+<Conditional brand="leancloud">商用版应用</Conditional>可发工单申请开启海外 CDN 加速（开启后海外访问文件 http/https 流量费用分别上调为 0.40 元/GB、0.60 元/GB。
+
+国际版没有现成的 CDN 加速访问服务，需要用户自行配置。
+
+以 CloudFront 加速服务为例，配置过程如下：
+
+- 阅读官方指南 [Getting Started with CloudFront](http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/GettingStarted.html)。
+- 创建一个 AWS 账户，开始使用 CloudFront 服务和付费。
+- S3 的公共访问权限（read permission）已经被配置好，可以跳过指南中[有关 S3 配置的部分](http://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/GettingStarted.html#GettingStartedUploadContent)。
+- CloudFront 配置中的 **Origin Domain Name** 请从 AVFile 的 URL 中获取，其他均可保持默认。
 
 ### 文件存储有大小限制吗？
 
-没有。除了在浏览器里通过 JavaScript SDK 上传文件，或者通过我们网站直接上传文件，有 10 MB 的大小限制之外，其他 SDK 都没有限制。 JavaScript SDK 在 Node.js 环境中也没有大小限制。
+没有。
+
+除了在浏览器里通过 JavaScript SDK 上传文件，或者通过我们网站直接上传文件，有 10 MB 的大小限制之外，其他 SDK 都没有限制。 JavaScript SDK 在 Node.js 环境中也没有大小限制。
 
 ### 存储图片可以做缩略图等处理吗？
 
@@ -236,17 +237,19 @@ LeanCloud 云端使用的并非关系型数据库，无法做到真正的联表�
 
 创建一个全新的空白项目，使用 CocoaPod 安装了 AVOSCloud 和 AVOSCloudIM 模块，此时项目大小超过了 80 MB。打包之后体积会不会缩小？大概会有多大呢？
 
-LeanCloud iOS SDK 二进制中包含了 i386、armv7、arm64 等 5 个 CPU slices。发布过程中，non-ARM 的符号和没有参与连接的符号会被 strip 掉。因此，最终应用体积不会增加超过 10 MB，请放心使用。
+数据存储 iOS SDK 二进制中包含了 i386、armv7、arm64 等 5 个 CPU slices。发布过程中，non-ARM 的符号和没有参与连接的符号会被 strip 掉。因此，最终应用体积不会增加超过 10 MB，请放心使用。
 
 ### Java SDK 对 AVObject 对象使用 getDate("createdAt") 方法读取创建时间为什么会返回 null
 
 请用 `AVObject` 的 `getCreatedAt` 方法；获取 `updatedAt` 用 `getUpdatedAt`。
 这两个方法会返回 Date 类型。
+
 如果希望返回字符串类型，可以使用 `getUpdatedAtString()` 和 `getCreatedAtString()`。
 
 ### Android 设备每次启动时，installationId 为什么总会改变？如何才能不改变？
 
 可能有以下两种原因导致这种情况：
+
 - SDK 版本过旧，installationId 的生成逻辑在版本更迭中有修改。请更新至最新版本。
 - 代码混淆引起的，注意在 proguard 文件中添加 [SDK 的混淆排除](/sdk/storage/guide/setup-java/#android-代码混淆)。
 
@@ -256,7 +259,7 @@ LeanCloud iOS SDK 二进制中包含了 i386、armv7、arm64 等 5 个 CPU slice
 
 ### Java SDK 出现 already has one request sending 错误是什么原因
 
-日志中出现了 `com.avos.avoscloud.AVException: already has one request sending` 的错误信息，这说明存在对同一个 `AVObject` 实例对象同时进行了 2 次异步的 `save` 操作。为防止数据错乱，LeanCloud SDK 对于这种同一数据的并发写入做了限制，所以抛出了这个异常。
+日志中出现了 `com.avos.avoscloud.AVException: already has one request sending` 的错误信息，这说明存在对同一个 `AVObject` 实例对象同时进行了 2 次异步的 `save` 操作。为防止数据错乱，数据存储 SDK 对于这种同一数据的并发写入做了限制，所以抛出了这个异常。
 
 需要检查代码，通过打印 log 和断点的方式来定位究竟是由哪一行 `save` 所引发的。
 
@@ -270,18 +273,21 @@ JavaScript SDK 由于平台的特殊性（运行在单线程运行的浏览器�
 
 如果你的应用的确是内部应用（做好了相关的安全措施，外部访问不到），可以在 `AV.init`之后增加下面的代码来让 JavaScript SDK 发送 Master Key：
 
-```
+```js
 AV.Cloud.useMasterKey(true);
 ```
 
 ### JavaScript SDK 会暴露 App Key 和 App Id，怎么保证安全性？
 
-首先请阅读「[安全总览](/sdk/storage/guide/security/)」来了解 LeanCloud 完整的安全体系。其中提到，可以使用「安全域名」，在没有域名的情况下，可以使用「[ACL](/sdk/storage/guide/acl/)」。
-理论上所有客户端都是不可信任的，所以需要在服务端对安全性进行设计。如果需要高级安全，可以使用 ACL 方式来管理，如果需要更高级的自定义方式，可以使用 [云引擎](/sdk/engine/overview/)。
+首先请阅读 [**安全总览**](/sdk/storage/guide/security/) 来了解数据存储服务完整的安全体系。<Conditional brand="leancloud">其中提到，可以使用「安全域名」，在没有域名的情况下，可以使用 [ACL](/sdk/storage/guide/acl/)。</Conditional>
+
+理论上所有客户端都是不可信任的，所以需要在服务端对安全性进行设计。如果需要高级安全，可以使用 [ACL](/sdk/storage/guide/acl/) 方式来管理，如果需要更高级的自定义方式，可以使用 [云引擎](/sdk/engine/overview/)。
 
 ## 其他
 
 ### 如何防止 DDoS 攻击，或者高频次的 CC 攻击？
+
+<Conditional brand="leancloud">
 
 无论是 DDoS 攻击，还是高频次的 CC 攻击，均需要在业务所请求的独立 IP 前架设高防资源。
 具体步骤如下：
@@ -292,13 +298,21 @@ AV.Cloud.useMasterKey(true);
 
 由于很多网络攻击的目的地都是特定 IP，如果独立 IP 已随业务公开，可以另外购买一个独立 IP 来做为高防资源的回源 IP，以避免高防资源因源 IP 不可用而失效。
 
+</Conditional>
+
+<Conditional brand="tds">
+
+详见 [TDS 云服务带高防吗](/sdk/start/faq/#tds-云服务带高防吗)。
+
+</Conditional>
+
 ### 保存数据时报错 The key is too long，是什么问题？
 
 可以检查要保存或更新的字段是否设置了索引，有索引的字段长度限制不能超过 1 KB。
 
 ### 如何解决数据一致性或事务需求？
 
-LeanCloud 目前并不提供完整的事务功能，但提供了一些保证数据一致性的特性，可以解决大部分的一致性需求：
+数据存储服务目前并不提供完整的事务功能，但提供了一些保证数据一致性的特性，可以解决大部分的一致性需求：
 
 - 在单个对象的一次 save 操作中，对多个字段的更新操作是原子地完成的。
 - 使用 [increment](/sdk/storage/guide/js/#更新计数器)（原子计数器）可以原子地更新数字字段。
@@ -306,4 +320,4 @@ LeanCloud 目前并不提供完整的事务功能，但提供了一些保证数�
 - [有条件更新对象](/sdk/storage/guide/js/#有条件更新对象) 可以仅在满足某个查询条件时进行更新操作；在这个特性的基础上，你可以自己实现更加复杂的 [两阶段提交](http://www.howardliu.cn/translation-perform-two-phase-commits-in-mongodb/)。
 - 在云引擎上还可以借助 [LeanCache](/sdk/engine/database/redis/) 来实现自定义的 [排他锁](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/functions/redlock.js)。
 
-关于这个话题我们还录制了一期公开课视频：[在 LeanCloud 上解决数据一致性问题](https://www.bilibili.com/video/av12823801/)，其中有对上面这些特性的详细介绍，和解决常见场景的实例教程（包括实现两阶段提交）。
+关于这个话题我们还录制了一期[公开课视频](https://www.bilibili.com/video/av12823801/)，其中有对上面这些特性的详细介绍，和解决常见场景的实例教程（包括实现两阶段提交）。
