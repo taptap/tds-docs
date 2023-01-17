@@ -71,10 +71,10 @@ member.set("occupation.profession", "Software Developer")
 这种情况下，可以使用以下方式设置属性：
 
 ```js
-member.set("occupation": '{ "profession": "Software Developer" }')
+member.set("occupation", { "profession": "Software Developer" })
 
 // 下面这样也行，但是不如上一种方式简洁，因此不推荐使用。
-member.set("occupation": "{}")
+member.set("occupation", {})
 member.set("occupation.profession", "Software Developer")
 ```
 
