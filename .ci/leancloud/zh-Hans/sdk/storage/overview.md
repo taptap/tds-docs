@@ -177,45 +177,23 @@ LeanCloud 平台保证 99.9% 的高可用性，并且数据访问方面保证了
 
 如果你是某个特定平台的开发者，想查看我们原生的 SDK 开发指南，请移步到具体页面：
 
-### Android 开发指南
+* [.NET](/sdk/storage/guide/dotnet/)。
 
-详细请参看 [数据存储开发指南 · Java](leanstorage_guide-java.html)。
+* [Java](/sdk/storage/guide/java/)
 
-### Objective-C 开发指南
+* [Objective-C](/sdk/storage/guide/objc/)。
 
-详细请参看 [数据存储开发指南 · Objective-C](leanstorage_guide-objc.html)。
+* [JavaScript](/sdk/storage/guide/js/)。
 
-### JavaScript 开发指南
+* [Python](/sdk/storage/guide/python/)。
 
-详细请参看 [数据存储开发指南 · JavaScript](leanstorage_guide-js.html)。
+* [Swift](/sdk/storage/guide/swift/)。
 
-### Python 开发指南
+* [Flutter](/sdk/storage/guide/flutter/)。
 
-详细请参看 [数据存储开发指南 · Python](leanstorage_guide-python.html)。
+* [PHP](/sdk/storage/guide/php/)。
 
-### PHP 开发指南
-
-详细请参看 [数据存储开发指南 · PHP](leanstorage_guide-php.html)。
-
-### .NET 开发指南
-
-详细请参看 [数据存储开发指南 · .NET](dotnet_guide.html)。
-
-### Unity 开发指南
-
-详细请参看 [数据存储开发指南 · Unity](unity_guide.html)。
-
-### Java 开发指南
-
-详细请参看 [数据存储开发指南 · Java](leanstorage_guide-java.html)。
-
-### Swift 开发指南
-
-详细请参看 [数据存储开发指南 · Swift](leanstorage_guide-swift.html)。
-
-### REST API 说明
-
-详细请参看 [REST API 使用详解](rest_api.html)。
+另外还可以参考 [REST API 使用详解](https://leancloud.cn/docs/rest_api.html)。
 
 ## 常见问题
 
