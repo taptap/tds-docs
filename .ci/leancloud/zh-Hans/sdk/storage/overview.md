@@ -60,7 +60,7 @@ LeanCloud 提供的数据操作 API 能覆盖大部分业务的需求，但是�
 
 你可以把这两条记录都保存到一种 LCObject 里面，这在 LeanCloud 云端是被允许的。
 
-:::tips
+:::tip
 我们**强烈建议开发者将不同类型的数据根据用途进行分类，形成不同种类的 「LCObject」**。
 
 譬如上面的例子，我们可以抽象出 `User` 这种对象来保存账户信息，抽象出 `GameScore` 这种对象来保存得分信息。
@@ -177,21 +177,21 @@ LeanCloud 平台保证 99.9% 的高可用性，并且数据访问方面保证了
 
 如果你是某个特定平台的开发者，想查看我们原生的 SDK 开发指南，请移步到具体页面：
 
-* [.NET](/sdk/storage/guide/dotnet/)。
+* [.NET](/sdk/storage/guide/dotnet/)
 
 * [Java](/sdk/storage/guide/java/)
 
-* [Objective-C](/sdk/storage/guide/objc/)。
+* [Objective-C](/sdk/storage/guide/objc/)
 
-* [JavaScript](/sdk/storage/guide/js/)。
+* [JavaScript](/sdk/storage/guide/js/)
 
-* [Python](/sdk/storage/guide/python/)。
+* [Python](/sdk/storage/guide/python/)
 
-* [Swift](/sdk/storage/guide/swift/)。
+* [Swift](/sdk/storage/guide/swift/)
 
-* [Flutter](/sdk/storage/guide/flutter/)。
+* [Flutter](/sdk/storage/guide/flutter/)
 
-* [PHP](/sdk/storage/guide/php/)。
+* [PHP](/sdk/storage/guide/php/)
 
 另外还可以参考 [REST API 使用详解](https://leancloud.cn/docs/rest_api.html)。
 
