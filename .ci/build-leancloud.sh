@@ -35,6 +35,7 @@ rm tmp/en/storage/rest.mdx # 数据存储/REST API
 # 中文部分
 cp -r .ci/leancloud/zh-Hans/sdk/authentication tmp/zh-Hans # 内建账户
 cp -r .ci/leancloud/zh-Hans/sdk/storage tmp/zh-Hans # 数据存储（LeanCloud 独有的语言）
+cp -r .ci/leancloud/zh-Hans/sdk/error-code.mdx tmp/zh-Hans # 错误码
 
 # 英文部分
 cp -r .ci/leancloud/en/sdk/authentication tmp/en # 内建账户
