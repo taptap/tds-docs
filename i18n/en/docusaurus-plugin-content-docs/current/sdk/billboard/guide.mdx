@@ -1,0 +1,766 @@
+---
+title: Billboard Guide
+sidebar_label: Guide
+sidebar_position: 2
+---
+
+import MultiLang from '/src/docComponents/MultiLang';
+import CodeBlock from '@theme/CodeBlock';
+import sdkVersions from '/src/docComponents/sdkVersions';
+import Languages from '../_partials/languages.mdx';
+import { Conditional } from "/src/docComponents/conditional";
+
+:::tip
+Before integrating Billboard’s SDK into your game, please first **enable the service<Conditional region="cn"> and configure your domains</Conditional>** according to [Feature Introduction](/sdk/billboard/features/#feature-introduction).
+:::
+
+## SDK Setup
+
+Please download the TapSDK from the [Download page](/tap-download) and follow the instructions below to import the Billboard module to your project.
+
+<MultiLang>
+
+<>
+
+If you are building your game with Unity, you can import a `.unitypackage` file to your game, which includes the iOS module and the Android module. If you are building with other engines or for other platforms, you can import the iOS or Android module natively. Please refer to the documentation for iOS or Android for more information.
+
+**Unity requirement**: You will need Unity 2019.4 or higher to use the SDK.
+
+Supported OS versions:
+
+- Android: 5.0 and higher
+- iOS: 10.0 and higher
+
+<CodeBlock className="json">
+{`"dependencies":{
+    "com.taptap.tds.billboard": "https://github.com/TapTap/TapBillboard-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.common": "https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.bootstrap": "https://github.com/TapTap/TapBootstrap-Unity.git#${sdkVersions.taptap.unity}",
+    "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}",
+    "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
+}`}
+</CodeBlock>
+
+</>
+
+<>
+
+<CodeBlock className="groovy">
+{`repositories{  
+    flatDir {  
+        dirs 'libs'  
+    }  
+}  
+dependencies {  
+ 
+    implementation (name:'TapBillboard_${sdkVersions.taptap.android}', ext:'aar') // The Billboard service
+    implementation (name:'TapCommon_${sdkVersions.taptap.android}', ext:'aar')
+    implementation (name:'TapBootstrap_${sdkVersions.taptap.android}', ext:'aar')
+}`}
+</CodeBlock>
+
+</>
+
+<>
+
+<CodeBlock className="objectivec">
+{`// The Billboard service
+TapBillboardResource.bundle
+TapCommonResource.bundle
+TapBillboardSDK.framework
+TapCommonSDK.framework
+TapBootstrapSDK.framework
+`}
+</CodeBlock>
+
+</>
+
+</MultiLang>
+
+
+## Initializing the SDK
+
+:::info
+You can initialize the SDK using one of the following two methods.
+:::
+
+### Initializing With the TapSDK
+
+If you have already initialized the TapSDK according to [Quickstart](/sdk/start/quickstart/#initialization), you will only need to import the Billboard module here and add the highlighted portions of the code below to your project.
+
+<MultiLang>
+
+<>
+
+```cs
+using TapTap.Common;
+using TapTap.Bootstrap;
+// highlight-next-line
+using TapTap.Billboard;
+
+// highlight-start
+var dimensionSet = new HashSet<KeyValuePair<string, string>>();
+KeyValuePair<string, string> platformPair = new KeyValuePair<string, string>("platform", "TapTap");
+KeyValuePair<string, string> locationPair = new KeyValuePair<string, string>("location", "CN");
+dimensionSet.Add(platformPair);
+dimensionSet.Add(locationPair);
+var templateType = "navigate"; // Optional
+var billboardServerUrl = "https://your-billboard-server-url"; // Developer Center > Your game > Game Services > Configuration > Domain > Billboard
+// highlight-end
+
+var config = new TapConfig.Builder()
+    .ClientID("your_client_id") // Required; the Client ID obtained from the Developer Center
+    .ClientToken("your_client_token") // Required; the Client Token obtained from the Developer Center
+    .ServerURL("https://your_server_url") // Required; can be found on Developer Center > Your game > Game Services > Basic Information > Domain > Cloud Services API
+    .RegionType(RegionType.CN) // Optional; CN means China mainland and IO means other countries and regions
+    // highlight-next-line
+    .TapBillboardConfig(dimensionSet, templateType, billboardServerUrl)
+    .ConfigBuilder();
+TapBootstrap.Init(config);
+```
+
+</>
+
+<>
+
+**Attention: The Android SDK has to be initialized in the main thread.**
+
+<Conditional region="cn">
+
+To initialize for China mainland:
+
+```java
+// highlight-start
+Set<Pair<String, String>> dimensionSet = new HashSet<>();
+dimensionSet.addAll(Arrays.asList(Pair.create("location", "CN"), Pair.create("platform", "TapTap")));
+String billboardServerUrl = "https://your-billboard-server-url"; // Developer Center > Your game > Game Services > Configuration > Domain > Billboard
+
+TapBillboardConfig billboardCnConfig = new TapBillboardConfig.Builder()
+        .withDimensionSet(dimensionSet)    // Optional
+        .withServerUrl(billboardServerUrl) // Required; the custom domain for Billboard
+        .withTemplate("navigate") // Optional; defaults to `navigate`
+        .build();
+// highlight-end
+
+TapConfig tapConfig = new TapConfig.Builder()
+        .withAppContext(gameMainActivity) // Required; provide the main `Activity` of the game
+        .withClientId("your_client_id") // Required; the Client ID obtained from the Developer Center
+        .withClientToken("your_client_token") // Required; the Client Token obtained from the Developer Center
+        .withServerUrl("https://your_server_url") // Required; can be found on Developer Center > Your game > Game Services > Basic Information > Domain > Cloud Services API
+        // highlight-next-line
+        .withBillboardConfig(billboardCnConfig) // Required
+        .withRegionType(TapRegionType.CN)
+        .build();
+TapBootstrap.init(gameMainActivity, tapConfig);
+```
+
+To initialize for other countries and regions:
+
+</Conditional>
+
+```java
+// highlight-start
+Set<Pair<String, String>> dimensionSet = new HashSet<>()
+dimensionSet.addAll(Arrays.asList(Pair.create("location", "XX"), Pair.create("platform", "TapTap")));
+
+TapBillboardConfig billboardIntlConfig = new TapBillboardConfig.Builder()
+        .withDimensionSet(dimensionSet) // Optional
+        .withTemplate("navigate") // Optional; defaults to `navigate`
+        .build();
+// highlight-end
+
+TapConfig tapConfig = new TapConfig.Builder()
+        .withAppContext(gameMainActivity) // Required; provide the main `Activity` of the game
+        .withClientId("your_client_id") // Required; the Client ID obtained from the Developer Center
+        .withClientToken("your_client_token") // Required; the Client Token obtained from the Developer Center
+        .withServerUrl("https://your_server_url") // Required; can be found on Developer Center > Your game > Game Services > Basic Information > Domain > Cloud Services API
+        // highlight-next-line
+        .withBillboardConfig(billboardIntlConfig) // Required
+        .withRegionType(TapRegionType.IO)
+        .build();
+TapBootstrap.init(gameMainActivity, tapConfig);
+```
+
+</>
+
+<>
+
+<Conditional region="cn">
+
+To initialize for China mainland:
+
+```objectivec
+// highlight-start
+NSMutableSet <NSArray *> *dimensionSet = [[NSMutableSet alloc] init];
+[dimensionSet addObject:[NSArray arrayWithObjects:@"platform", @"ios", nil]];
+[dimensionSet addObject:[NSArray arrayWithObjects:@"location", @"CN", nil]];
+
+TapBillboardConfig *billboardCnConfig = [TapBillboardConfig new];
+billboardCnConfig.templateType = @"navigate"; // Optional
+billboardCnConfig.diemensionSet = dimensionSet; // Optional
+billboardCnConfig.serverUrl = @"https://your-billboard-server-url"; // Developer Center > Your game > Game Services > Configuration > Domain > Billboard
+// highlight-end
+
+TapConfig *config = [TapConfig new];
+config.clientId = @"your_client_id"; // Required; the Client ID obtained from the Developer Center
+config.clientToken = @"your_client_token"; // Required; the Client Token obtained from the Developer Center
+config.region = TapSDKRegionTypeCN; // `TapSDKRegionTypeCN` means China mainland; `TapSDKRegionTypeIO` means other countries and regions
+config.serverURL = "https://your_server_url"; // Required; can be found on Developer Center > Your game > Game Services > Basic Information > Domain > Cloud Services API
+// highlight-next-line
+config.tapBillboardConfig = billboardCnConfig;
+[TapBootstrap initWithConfig:config];
+```
+
+To initialize for other countries and regions:
+
+</Conditional>
+
+```objectivec
+// highlight-start
+NSMutableSet <NSArray *> *dimensionSet = [[NSMutableSet alloc] init];
+[dimensionSet addObject:[NSArray arrayWithObjects:@"platform", @"ios", nil]];
+[dimensionSet addObject:[NSArray arrayWithObjects:@"location", @"XX", nil]];
+
+TapBillboardConfig *billboardIntlConfig = [TapBillboardConfig new];
+billboardIntlConfig.templateType = @"navigate"; // Optional
+billboardIntlConfig.diemensionSet = dimensionSet; // Optional
+// highlight-end
+
+TapConfig *config = [TapConfig new];
+config.clientId = @"your_client_id"; // Required; the Client ID obtained from the Developer Center
+config.clientToken = @"your_client_token"; // Required; the Client Token obtained from the Developer Center
+config.region = TapSDKRegionTypeIO; // `TapSDKRegionTypeCN` means China mainland; `TapSDKRegionTypeIO` means other countries and regions
+config.serverURL = "https://your_server_url"; // Required; can be found on Developer Center > Your game > Game Services > Basic Information > Domain > Cloud Services API
+// highlight-next-line
+config.tapBillboardConfig = billboardIntlConfig;
+[TapBootstrap initWithConfig:config];
+```
+
+</>
+
+</MultiLang>
+
+### Initializing the Billboard Service Independently
+
+If you prefer not to initialize the TapSDK with the `TapBootstrap` method mentioned above and would like to only initialize the Billboard service, you can:
+
+- **Copy the above code for initializing the TapSDK**.
+- **Change the last line** to:
+
+<MultiLang>
+
+```cs
+TapBillboard.Init(config);
+```
+
+```java
+TapBillboard.init(tapConfig);
+```
+
+```objectivec
+[TapBillboard initWithConfig:config];
+```
+
+</MultiLang>
+
+### Parameters
+
+<Conditional region="cn">
+
+* You will be providing both the API domain and the Billboard domain when initializing the SDK. See [Domain](/sdk/domain/guide/) for more information. Please make sure you have added your domain on **Developer Center > Your game > Game Services > Configuration > Domain**.
+
+</Conditional>
+
+* See [Configure Properties](/sdk/billboard/features/#configure-properties) for more information about `dimensionSet`. Here we are using the two default properties: Platform and Region.
+
+* `client_id`, `client_token`, and `RegionType` can be found on **Developer Center > Your game > Game Services > Configuration**.
+
+## Opening the Billboard
+
+<MultiLang>
+
+```cs
+TapBillboard.OpenPanel((any, error) =>
+{
+    if (error != null)
+    {
+        // Failed to open the billboard; see `error.code` and `error.errorDescription` for the reason
+    } else
+    {
+        // Billboard is now open
+    }
+}, () => {
+        // Billboard is now closed
+});
+```
+
+```java
+TapBillboard.openPanel(BillboardActivity.this, new Callback<Void>() {
+    @Override
+    public void onError(TapBillboardException tapBillboardException) {
+        // Failed to open the billboard; see `tapBillboardException.code` and `tapBillboardException.message` for the reason
+    }
+
+    @Override
+    public void onSuccess(Void result) {
+        // Billboard is now open
+    }
+},new UserInteraction() {
+    @Override
+    public void onClose() {
+        // Billboard is now closed; please switch to the main thread if you need to update the UI
+    }
+});
+```
+
+```objectivec
+[TapBillboard openPanel:^(bool _, NSError *_Nullable error) {
+    if (error) {
+        // Failed to open the billboard; see `error.code` and `error.errorDescription` for the reason
+    } else {
+        // Billboard is now open
+    }
+} closeCallback:^(void){
+    // Billboard is now closed
+}];
+```
+
+</MultiLang>
+
+## Obtaining Badge Statuses
+
+Badges can be used to tell whether there are new messages. Inside the SDK, the statuses of the badges are cached. If a request is made within 5 minutes after the last request is made, the result of the last successful request will be returned.
+
+<MultiLang>
+
+```cs
+TapBillboard.QueryBadgeDetails((badgeDetails, error) =>
+{
+    if (error != null)
+    {
+        // Failed to obtain badge statuses; see `error.code` and `error.errorDescription` for the reason
+    }
+    else
+    {
+        // Badge statuses obtained
+        if (badgeDetails.showRedDot == 1) {
+            // New messages found
+        } else {
+            // No new messages
+        }
+    }
+});
+```
+
+```java
+TapBillboard.getBadgeDetails(new Callback<BadgeDetails>() {
+    @Override
+    public void onError(TapBillboardException tapBillboardException) {
+        // Failed to obtain badge statuses; see `tapBillboardException.code` and `tapBillboardException.message` for the reason
+    }
+
+    @Override
+    public void onSuccess(BadgeDetails badgeDetails) {
+        if (badgeDetails.showRedDot == 1) {
+            // New messages found
+        } else {
+            // No new messages
+        }
+    }
+});
+```
+
+```objectivec
+[TapBillboard getBadgeDetails:^(BadgeDetails * _Nullable result, NSError *_Nullable error) {
+    if (error) {
+        // Failed to obtain badge statuses; see `error.code` and `error.errorDescription` for the reason
+    } else {
+        if ([result.showRedDot intValue] == 1) {
+            // New messages found
+        } else {
+            // No new messages
+        }
+    }
+}];
+```
+
+</MultiLang>
+
+## Registering Custom Event Listeners
+
+If [an announcement is configured to jump to *a module in the game*](/sdk/billboard/features/#create-announcements), or if you have added links in the content of an announcement that jumps to *a module in the game*, you can obtain the message with a custom event listener you set up and handle the message accordingly.
+
+<MultiLang>
+
+```cs
+TapBillboard.RegisterCustomLinkListener(url =>
+{
+    // The URL returned here is the same as the one configured on the Developer Center
+});
+```
+
+```java
+TapBillboard.registerCustomLinkListener(new CustomLinkListener() {
+    @Override
+    public void onCustomUrlClick(String url) {
+        // The URL returned here is the same as the one configured on the Developer Center
+        // Please switch to the main thread if you need to update the UI
+    }
+});
+```
+
+```objectivec
+[TapBillboard registerCustomLinkListener:^(NSString * _Nullable customUrl) {
+    // The URL returned here is the same as the one configured on the Developer Center
+}];
+```
+
+</MultiLang>
+
+## Unregistering Custom Event Listeners
+
+Use the following interface to stop listening to the custom events related to announcements:
+
+<MultiLang>
+
+```cs
+// Registered listeners should be stored and provided here to have them unregistered
+TapBillboard.UnRegisterCustomLinkListener(registerdListener);
+```
+
+```java
+// Registered listeners should be stored and provided here to have them unregistered
+TapBillboard.unRegisterCustomLinkListener(registerdListener);
+```
+
+```objectivec
+// Registered listeners should be stored and provided here to have them unregistered
+[TapBillboard unRegisterCustomLinkListener:registerdListener];
+```
+
+</MultiLang>
+
+## Internationalization
+
+You can set different languages for the Billboard service:
+
+<Languages />
+
+## Error Codes
+
+| `code` | Scenario |
+|---|---|
+| 400 | An error exists in the parameters used for initializing the SDK. |
+| 403 | The user is not authorized to access this service. Please make sure the Billboard service has been enabled on the Developer Center. |
+| 50x | There is an internal error in our server. See `description` for more information. |
+| 19999 | An unknown error occurred. See `description` for more information. |
+
+## REST API
+
+Below are the REST APIs provided by the Billboard services.
+
+### Request Format
+
+For POST
+
+For POST and PUT requests, the request body must be in JSON and the Content-Type of the HTTP Header must be `application/json`.
+
+Requests are authenticated by the key-value pairs in the HTTP Header shown in the following table:
+
+| Key        | Value        | Description                                      | Source           |
+| ---------- | ------------ | ----------------------------------------- | -------------- |
+| `X-LC-Id`  | `{{appid}}`  | The `App Id` (`Client Id`) of the current app  | Can be found on the Developer Center |
+| `X-LC-Sign` | `{{appSign}}` | A string in the form of `sign,timestamp`. `timestamp` is the unix timestamp (UTC) of the client in milliseconds. `sign` is a string formed by concatenating the `timestamp` with the `App Key` (`Client Token`) and running it through the MD5 algorithm.| See the algorithm below. |
+
+To calculate the `appSign` with the `App Key`:
+
+```sh
+md5( timestamp + App Key )
+= md5(1453014943466UtOCzqb67d3sN12Kts4URwy8)
+= d5bcbb897e19b2f6633c716dfdfaf9be
+
+-H "X-LC-Sign: d5bcbb897e19b2f6633c716dfdfaf9be,1453014943466"
+```
+
+Besides setting the value of `X-LC-Id` to the `Client Id` in the HTTP Header, you will also need to provide the `Client Id` in the URL, and their values have to be the same.
+
+You will get an HTTP 400 error if something goes wrong, like:
+
+```json
+{
+    "success": false,
+    "data": {
+        "code": 0,
+        "error": "invalid_request",
+        "msg": "invalid params",
+        "error_description": ""
+    },
+    "now": 1659084246
+}
+```
+
+### Base URL
+
+The Base URL for REST API requests (the `{{host}}` in the curl examples) is the<Conditional region='cn'> custom</Conditional> API domain of your app. You can update<Conditional region='cn'> or find</Conditional> it on the Developer Center.<Conditional region='cn'> See [Domain](/sdk/storage/guide/setup-dotnet#domain) for more details.</Conditional>
+
+### Obtaining the Template
+
+| Parameter | Constraint | Description |
+|---|---|---|
+| `client_id` | Required | The `Client ID` found on **Developer Center > Game Services > Configuration**. |
+| `template` | Required | The type of the template. For now, only Navigation Bar is supported. Use `navigate` for Navigation Bar and `image` for Poster. |
+
+```sh
+curl -X GET
+  -H 'X-LC-Id: {{appid}}' \
+  -H 'X-LC-Sign: {{appSign}}' \
+  https://{{host}}/billboard/rest-api/v1/pattern/detail?client_id={{appid}}&template={{template}}
+```
+
+The response body is a JSON object containing all the parameters provided when the template is created:
+
+```json
+{
+    "success": true,
+    "data": {
+        "empty_img": {
+            "url": "https://tds-billboard.tds1.tapfiles.cn/20220727/aWkG63mpT2WeFrtT0Dxojj4QLfabWHh3.png"
+        },
+        "highlight_text_color": "#15C5CE",
+        ...
+    },
+    "now": 1659085552
+}
+```
+
+### Obtaining Announcements
+
+| Parameter | Constraint | Description |
+|---|---|---|
+| `client_id` | Required | The `Client ID` found on **Developer Center > Game Services > Configuration**. |
+| `lang` | Required | See [Language Codes](#language-codes). |
+| `template` | Required | The type of the template. For now, only Navigation Bar is supported. Use `navigate` for Navigation Bar and `image` for Poster. |
+| `dimension_list` | Optional | `[{"PROPERTY_PARAMETER":"FIELD_PARAMETER"},...]`. Example: `[{"platform":"ios"},{"location":"CN"}]`. |
+| `type` | Required | The type of the announcement. Use `activity` for Events and `game` for Announcements.|
+| `uuid` | Optional | A unique ID identifying the device. Used for analytical purposes only. Example: `4e4105c7-781e-45c0-92ea-d595c75a3c2c`. |
+
+```sh
+curl -X POST
+  -H 'X-LC-Id: {{appid}}' \
+  -H 'X-LC-Sign: {{appSign}}' \
+  -H 'Content-Type: application/json' \
+  -d '{
+        "lang":{{lang}},
+        "template":{{template}},
+        "type":{{type}},
+        "dimension_list":{{dimension_list}}
+     }' \
+  https://{{host}}/billboard/rest-api/v1/announcement/list?client_id={{appid}}&uuid={{uuid}}
+```
+
+The returned JSON object contains the announcement list, `list`, as well as the details of the latest announcement, `lastest`.
+
+| Parameter | Description |
+|---|---|
+| `id` | The ID of the announcement. |
+| `type` | The type of the announcement. Could be `update`, `maintenance`, `new`, `activity`, `play_method`, `test`, or `discontinued`. |
+| `expire_time` | The timestamp of the expiration time in seconds. `0` means the announcement will not expire. |
+| `short_title` | The short title. |
+| `jump_location` | The place to jump to. Could be `content`, `link`, or `game`. |
+| `jump_link` | The link for redirection or the parameter indicating the module in the game to jump to. |
+| `publish_time` | The timestamp of the publication time in seconds. |
+
+```json
+{
+    "success": true,
+    "data": {
+        "list": [
+            {
+                "id": 2,
+                "type": "activity",
+                "expire_time": 0,
+                "short_title": "Hello",
+                "jump_location": "link",
+                "jump_link": "https://www.taptap.com",
+                "publish_time": 1659077524
+            },
+            ...
+        ],
+        "lastest": {
+            "id": 2,
+            "content": "This is the content.",
+            "short_title": "Hello",
+            "long_title": "Hello world!"
+        }
+    },
+    "now": 1659085756
+}
+```
+
+### Obtaining Announcement Details
+
+| Parameter | Constraint | Description |
+|---|---|---|
+| `client_id` | Required | The `Client ID` found on **Developer Center > Game Services > Configuration**. |
+| `lang` | Required | See [Language Codes](#language-codes). |
+| `id` | Required | The ID of the announcement. |
+| `uuid` | Optional | A unique ID identifying the device. Used for analytical purposes only. Example: `4e4105c7-781e-45c0-92ea-d595c75a3c2c`. |
+
+```sh
+curl -X GET
+  -H 'X-LC-Id: {{appid}}' \
+  -H 'X-LC-Sign: {{appSign}}' \
+  https://{{host}}/billboard/rest-api/v1/announcement/detail?client_id={{appid}}&lang={{lang}}&id={{id}}&uuid={{uuid}}
+```
+
+Returned JSON object
+
+| Parameter | Description |
+|---|---|
+| `id` | The ID of the announcement. |
+| `content` | The content of the announcement. |
+| `long_title` | The long title of the announcement. |
+| `short_title` | The short title of the announcement. |
+
+```json
+{
+    "success": true,
+    "data": {
+        "id": 82,
+        "content": "This is the content.",
+        "short_title": "This is the short title.",
+        "long_title": "This is the long title."
+    },
+    "now": 1659087990
+}
+```
+
+### Obtaining Badge Statuses
+
+| Parameter | Constraint | Description |
+|---|---|---|
+| `client_id` | Required | The `Client ID` found on **Developer Center > Game Services > Configuration**. |
+| `uuid` | Required | A unique ID identifying the device. Example: `4e4105c7-781e-45c0-92ea-d595c75a3c2c`. |
+| `template` | Required | The type of the template. For now, only Navigation Bar is supported. Use `navigate` for Navigation Bar and `image` for Poster. |
+| `dimension_list` | Optional | `[{"PROPERTY_PARAMETER":"FIELD_PARAMETER"},...]`. Example: `[{"platform":"ios"},{"location":"CN"}]`. |
+
+```sh
+curl -X POST \
+  -H 'X-LC-Id: {{appid}}' \
+  -H 'X-LC-Sign: {{appSign}}' \
+  -H 'Content-Type: application/json' \
+  -d '{
+        "uuid": {{uuid}},
+        "template":{{template}},
+        "dimension_list":{{dimension_list}}
+      }' \
+  'https://{{host}}/billboard/rest-api/v1/dot/read?client_id={{client_id}}'
+```
+
+Returned JSON object
+
+| Parameter | Description |
+|---|---|
+| `show_red_dot` | Whether to show the badge. `0` means no and `1` means yes. |
+| `close_button_img` | The URL of the image for the close button. |
+
+```json
+{
+    "success": true,
+    "data": {
+        "show_red_dot": 0,
+        "close_button_img": "https://tds-billboard.tds1.tapfiles.cn/20220727/aMHoqDTHT4zrXYPNprkZjXkdLK6vFg8E.png"
+    },
+    "now": 1658896487
+}
+```
+
+### Updating Badge Statuses
+
+| Parameter | Constraint | Description |
+|---|---|---|
+| `client_id` | Required | The `Client ID` found on **Developer Center > Game Services > Configuration**. |
+| `uuid` | Required | A unique ID identifying the device. Example: `4e4105c7-781e-45c0-92ea-d595c75a3c2c`. |
+| `read_all` | Required | Whether to mark all announcements as read. `true` for yes and `false` for no. |
+
+```sh
+curl -X POST \
+  -H 'X-LC-Id: {{appid}}' \
+  -H 'X-LC-Sign: {{appSign}}' \
+  -H 'Content-Type: application/json' \
+  -d '{
+      "uuid": {{uuid}},
+      "read_all":{{read_all}}
+  }' \
+  'https://{{host}}/billboard/rest-api/v1/dot/submit?client_id={{client_id}}'
+```
+
+Returned JSON object
+```json
+{
+    "success": true,
+    "data": {
+        "msg": "ok"
+    },
+    "now": 1658895192
+}
+```
+
+### Language Codes
+
+The REST API accepts language codes defined by ISO 639-1. For example, `en` means English and `jp` means Japanese. There are a couple of exceptions:
+
+1. For languages not included in ISO 639-1, the language codes defined in ISO 632-2 are used. For example, `fil` means Filipino.
+2. When a language cannot be represented by a language code, the location code defined in ISO 3166-1 will be attached. For example, `zh_CN` means Simplified Chinese.
+
+The following language codes are supported by the REST API:
+
+| Code | Language         |
+| ------- | ----------- |
+| zh_CN    | Simplified Chinese     |
+| zh_TW    | Traditional Chinese     |
+| en_US    | English (US) |
+| ja_JP    | Japanese         |
+| ko_KR    | Korean         |
+| pt_PT    | Portuguese     |
+| vi_VN    | Vietnamese       |
+| hi_IN    | Hindi       |
+| id_ID    | Indonesian       |
+| ms_MY    | Malay       |
+| th_TH    | Thai         |
+| es_ES    | Spanish       |
+| af       | Afrikaans   |
+| am       | Amharic   |
+| bg       | Bulgarian   |
+| ca       | Catalan |
+| hr       | Croatian   |
+| cs       | Czech       |
+| da       | Danish       |
+| nl       | Dutch       |
+| et       | Estonian   |
+| fil      | Filipino     |
+| fi       | Finnish       |
+| fr       | French         |
+| de       | German         |
+| el       | Greek       |
+| he       | Hebrew     |
+| hu       | Hungarian     |
+| is       | Icelandic       |
+| it       | Italian     |
+| lv       | Latvian   |
+| lt       | Lithuanian     |
+| no       | Norwegian       |
+| pl       | Polish       |
+| ro       | Romanian   |
+| ru       | Russian         |
+| sr       | Serbian   |
+| sk       | Slovak   |
+| sl       | Slovenian |
+| sw       | Swahili   |
+| sv       | Swedish       |
+| tr       | Turkish     |
+| uk       | Ukrainian     |
+| zu       | Zulu       |
+
+Keep in mind that some of the languages listed above are only supported by the REST API but [not the client SDK](#internationalization).

@@ -18,7 +18,7 @@ const config = {
     searchProviderWebsite:
       "https://developer.taptap.com/docs/sdk/engine/database/es/",
     mainDomainHost: "https://www.taptap.com",
-    dcDomainHost: "https://developer.taptap.com",
+    dcDomainHost: "https://developer.taptap.com?from=tds-docs",
   },
 
   i18n: {
@@ -117,7 +117,7 @@ const config = {
       },
       prism: {
         theme: require("./src/theme/prism-taptap"),
-        additionalLanguages: ["csharp", "java", "php", "groovy"],
+        additionalLanguages: ["csharp", "java", "php", "groovy", "swift", "dart"],
       },
       image: "/img/logo.svg",
       metadata: [

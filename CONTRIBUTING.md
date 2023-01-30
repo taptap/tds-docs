@@ -37,12 +37,12 @@ sidebar_position: 10
 
 ## TapPlay 是什么？
 
-​TapPlay 是利用沙盒技术实现的可以让用户直接通过 TapTap 玩游戏的功能服务，旨在帮助开发者实现低成本、高效率的游戏开发，并提高游戏分发的转化率
+TapPlay 是利用沙盒技术实现的可以让用户直接通过 TapTap 玩游戏的功能服务，旨在帮助开发者实现低成本、高效率的游戏开发，并提高游戏分发的转化率
 
 （以下省略）
 ```
 
-如果你了解 markdown 和 github 协作的一般流程，那么现在就可以开始给 TDS 文档贡献内容了。
+如果你了解 markdown 和 GitHub 协作的一般流程，那么现在就可以开始给 TDS 文档贡献内容了。
 期待你的第一个 [PR]！
 
 [PR]: https://docs.github.com/en/get-started/quickstart/github-flow
@@ -192,7 +192,7 @@ sidebar_position: 10
 
 没问题的话，点绿色的 Create pull request 按钮进入 PR 表单。
 PR 标题 GitHub 会自动填写，如果不满意，可以修改一下。
-右方 Reviewer 选择 weakish 或 fuchenshi 或 kylinbin 或其他相关的同事，然后再点绿色的 Create pull request 按钮提交。
+右方 Reviewer 选择 fuchenshi 或 kylinbin 或其他相关的同事，然后再点绿色的 Create pull request 按钮提交。
 
 ![open a pull request](.contributing/img/open-a-pr.png)
 

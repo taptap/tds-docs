@@ -1,0 +1,230 @@
+---
+title: Server Integration Guides
+sidebar_label: Server Integration Guides
+sidebar_position: 4
+---
+
+import {Conditional} from '/src/docComponents/conditional';
+
+Using the REST API, you can report data directly to TapDB without relying on the SDK.
+
+## Report Events and Properties
+
+Please refer to [Data Rules](/sdk/tapdb/sdk/data-spec#数据规则) for the format and meaning of data transfer.
+
+If the Response Code is 200, it means the data was reported successfully, please check the event writing status further in the burial site management.
+
+### Single Report
+
+<Conditional region='cn'>
+
+`POST` `https://e.tapdb.net/v2/event`
+
+</Conditional>
+
+
+<Conditional region='global'>
+
+`POST` `https://e.tapdb.ap-sg.tapapis.com/v2/event`
+
+</Conditional>
+
+`Content-Type: application/json`
+
+Request content example:
+
+```json
+{
+    "client_id": "test_appid",
+    "device_id": "test_device_id",
+    "user_id": "test_user_id",
+    "type": "track",
+    "name": "#EventName",
+    "properties": {
+        "os": "Android",
+        "device_id1": "000",
+        "device_id2": "000",
+        "device_id3": "000",
+        "device_id4": "000",
+        "width": 256,
+        "height": 768,
+        "device_model": "pixel",
+        "os_version": "Android 10.0",
+        "provider": "O2",
+        "network": "1",
+        "channel": "Google Play",
+        "app_version": "1.0",
+        "sdk_version": "2.8.0",
+        "#custem_event_property_name": "CustomEventPropertyValue"
+    }
+}
+```
+
+### Batch Report
+
+<Conditional region='cn'>
+
+`POST` `https://e.tapdb.net/v2/batch`
+
+</Conditional>
+
+<Conditional region='global'>
+
+`POST` `https://e.tapdb.ap-sg.tapapis.com/v2/batch`
+
+</Conditional>
+
+`Content-Type: application/json`
+
+Request content example:
+
+```json
+{
+  "data": [
+    {
+      "client_id": "test_appid",
+      "device_id": "test_device_id",
+      "user_id": "test_user_id",
+      "type": "track",
+      "name": "#EventName",
+      "properties": {
+        "os": "Android",
+        "device_id1": "000",
+        "device_id2": "000",
+        "device_id3": "000",
+        "device_id4": "000",
+        "width": 256,
+        "height": 768,
+        "device_model": "pixel",
+        "os_version": "Android 10.0",
+        "provider": "O2",
+        "network": "1",
+        "channel": "Google Play",
+        "app_version": "1.0",
+        "sdk_version": "2.8.0",
+        "#custem_event_property_name": "CustomEventPropertyValue"
+      }
+    },
+    {
+      "client_id": "test_appid",
+      "device_id": "test_device_id",
+      "user_id": "test_user_id",
+      "type": "track",
+      "name": "#EventName",
+      "properties": {
+          "os": "Android",
+          "device_id1": "000",
+          "device_id2": "000",
+          "device_id3": "000",
+          "device_id4": "000",
+          "width": 256,
+          "height": 768,
+          "device_model": "pixel",
+          "os_version": "Android 10.0",
+          "provider": "O2",
+          "network": "1",
+          "channel": "Google Play",
+          "app_version": "1.0",
+          "sdk_version": "2.8.0",
+          "#custem_event_property_name": "CustomEventPropertyValue"
+      }
+    }
+  ]
+}
+
+```
+
+### FAQ
+
+- If the subject of the current event is not a device or a user, device_id and user_id can be passed any fixed value.
+
+- To ensure that events reported on the server side can also be analyzed using the device dimension, it is recommended to call the SDK's `GetDeviceID` interface on the client side to obtain a unique ID and report it to the App's server side.
+
+## Special Type Report
+
+### Online Number
+
+Since the SDK can't push accurate online data, we provide a server-side online data push interface here. The game server can count the number of people online every 5 minutes and push it to TapDB through the interface, TapDB will summarize the data.
+
+**Note: The online count is reported in json format, which is different from other common event reporting formats, please pay attention to the difference.**
+
+<Conditional region='cn'>
+
+`POST` `https://se.tapdb.net/tapdb/online`
+
+</Conditional>
+
+<Conditional region='global'>
+
+`POST` `https://se.tapdb.ap-sg.tapapis.com/tapdb/online`
+
+</Conditional>
+
+`Content-Type: application/json`
+
+Request Content：
+
+| Parameter | Type | Descriptions |
+| --- | --- | --- |
+| client_id | string | The game ClientID. |
+| onlines | array | Multiple online data (up to 100) |
+ 
+The structure of the onlines array is:
+
+| Parameter | Type | Descriptions |
+| --- | --- | --- |
+| server | string | TapDB accepts data only once per natural 5 minutes for the same server. |
+| online | number | Online number |
+| timestamp | number | Timestamp (in seconds) of the current statistics. TapDB will perform data alignment according to the natural 5 min. |
+
+Example：
+
+```json
+{
+    "client_id":"ClientID",
+    "onlines":[{
+      "server":"s1",
+      "online":123,
+      "timestamp":1489739590
+    },{
+      "server":"s2",
+      "online":188,
+      "timestamp":1489739560
+    }]
+}
+```
+
+### Recharge Record
+
+Since the SDK push may be inaccurate, it is recommended to use the server-side recharge push interface directly. Note that you need to stop the reporting of recharge information in the client SDK to prevent duplicate statistics.
+
+<Conditional region='cn'>
+
+`POST` `https://e.tapdb.net/v2/event`
+
+</Conditional>
+
+<Conditional region='global'>
+
+`POST` `https://e.tapdb.ap-sg.tapapis.com/v2/event`
+
+</Conditional>
+
+`Content-Type: application/json`
+
+```json
+{
+  "name": "charge", // Event name, fixed to "charge"
+  "client_id": "ClientID", // Required. Note that the ClientID needs to be replaced with the game's ClientID.
+  "user_id": "userId", // Required. The userId must be the same as the userId passed by the SDK's setUser interface, and the user must have been pushed through the SDK interface.
+  "properties": {
+    "ip": "8.8.8.8", // Optional. IP of the rechargeable user.
+    "order_id": "100000", // Optional. The order ID is greater than 0 and less than or equal to 256.
+    "amount": 100, // Required. Greater than 0 and less than or equal to 100000000000. recharge amount. Unit cents, i.e. whatever the currency, needs to be multiplied by 100.
+    "virtual_currency_amount": 100, // Required, Number of virtual coins received, can be 0.
+    "currency_type": "CNY", // Optional. Currency type. Internationally accepted three-letter expression, default CNY when empty.
+    "product": "item1", // Optional. Length greater than 0 and less than or equal to 256. Product name.
+    "payment": "alipay" // Optional. Length greater than 0 and less than or equal to 256. Recharge channel.
+  }
+}
+```

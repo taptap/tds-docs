@@ -171,6 +171,46 @@ curl --location -g --request POST <后台配置的游戏方发送道具接口地
 
 兑换系统在接收到兑换请求后直接将兑换结果返回，游戏根据返回结果判断是否发放道具。
 
+### 请求域名
+
+| TapTap 版本     | 域名                      |
+| --------------- | ------------------------- |
+| 国内 taptap.com | https://poster-api.xd.cn  |
+| 海外 taptap.io  | https://poster-api.xd.com |
+
+### 签名
+
+游戏方与兑换系统的接口通讯时将使用签名参数作为基础的安全验证，其中 **Secret 为后台 游戏服务 - 应用配置 中 Server Secret**。
+
+:::tip
+为了保证安全性，请勿将 Server Secret 信息放在客户端中使用以防敏感信息泄漏。
+:::
+
+计算签名伪代码如下：
+
+```
+sign == sha1(timestamp + nonce_str + secret)
+```
+
+您也可以通过单元测试验证签名计算过程正确与否，如下是 golang 示例：
+
+```go
+func TestMakeSign(t *testing.T) {
+    timestamp := 1655724586
+    nonceStr := "abcde"
+    secret := "abc"
+    sign := MakeSign(int64(timestamp), nonceStr, secret)
+    assert.Equal(t, sign, "3cb8c38833fa742e7873378faddcbe5b56088482")
+    //output: 3cb8c38833fa742e7873378faddcbe5b56088482
+}
+```
+
+为了 Secret 不存放在客户端中，无服务器兑换返回的签名通过 **Client ID 代替 Secret 进行验签**。
+
+```
+sign == sha1(timestamp + nonce_str + client_id)
+```
+
 ### 三种兑换接口
 
 #### 二次校验兑换接口
@@ -263,6 +303,32 @@ curl --location --request POST '<URL>/api/v1.0/cdk/game/submit-simple' \
 --data-raw '{"client_id":<后台ClientId>,"gift_code":<这次使用的兑换码>,"character_id":<游戏用户ID>,"nonce_str":<随机字符串>,"sign":<签名>,"timestamp":<时间戳>}'
 ```
 
+<details>
+<summary>Shell 请求示例：</summary>
+
+```
+#! /usr/bin/env bash
+
+# TapDC 后台应用的 Client ID
+client_id="请替换为控制台的 `Client ID`"
+# 本次兑换的兑换码 在“礼包活动面板-数据-导出” 然后导出的文件里面可以看到格式如 S0LLC8ICB2MP2 的兑换码
+gift_code="请替换为礼包面板中的兑换码"
+
+# 随机字符串，建议五位随机字符串
+nonce_str="A2B3Z"
+# 游戏用户 ID
+character_id="6347de128b****3ee825e029"
+# 签名，该签名用 ClientId 代替 Secret
+signed=$(echo -n $(date +%s)$nonce_str$client_id |openssl sha1)
+RESULT_REQUEST=`curl --location --request POST 'https://poster-api.xd.cn/api/v1.0/cdk/game/submit-simple' \
+--header 'Content-Type: application/json' \
+--data-raw "{\"client_id\":\"$client_id\",\"gift_code\":\"$gift_code\",\"character_id\":\"$character_id\",\"nonce_str\":\"$nonce_str\",\"sign\":\"$signed\",\"timestamp\":$(date +%s)}"`
+
+echo $RESULT_REQUEST
+```
+
+</details>
+
 返回示例：
 
 ```json
@@ -306,46 +372,6 @@ curl --location --request POST '<URL>/api/v1.0/cdk/game/submit-simple' \
     "hint": "test error"
   }
 }
-```
-
-### 请求域名
-
-| TapTap 版本     | 域名                      |
-| --------------- | ------------------------- |
-| 国内 taptap.com | https://poster-api.xd.cn  |
-| 海外 taptap.io  | https://poster-api.xd.com |
-
-### 签名
-
-游戏方与兑换系统的接口通讯时将使用签名参数作为基础的安全验证，其中 **Secret 为后台 游戏服务 - 应用配置 中 Server Secret**。
-
-:::tip
-为了保证安全性，请勿将 Server Secret 信息放在客户端中使用以防敏感信息泄漏。
-:::
-
-计算签名伪代码如下：
-
-```
-sign == sha1(timestamp + nonce_str + secret)
-```
-
-您也可以通过单元测试验证签名计算过程正确与否，如下是 golang 示例：
-
-```go
-func TestMakeSign(t *testing.T) {
-    timestamp := 1655724586
-    nonceStr := "abcde"
-    secret := "abc"
-    sign := MakeSign(int64(timestamp), nonceStr, secret)
-    assert.Equal(t, sign, "3cb8c38833fa742e7873378faddcbe5b56088482")
-    //output: 3cb8c38833fa742e7873378faddcbe5b56088482
-}
-```
-
-为了 Secret 不存放在客户端中，无服务器兑换返回的签名通过 **Client ID 代替 Secret 进行验签**。
-
-```
-sign == sha1(timestamp + nonce_str + client_id)
 ```
 
 ### Web 嵌入兑换接口
