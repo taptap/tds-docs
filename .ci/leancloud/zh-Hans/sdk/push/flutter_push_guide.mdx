@@ -1,0 +1,225 @@
+---
+title: Flutter 推送开发指南
+sidebar_label: Flutter 推送
+slug: /sdk/push/guide/flutter/
+sidebar_position: 6
+---
+
+import Path from "/src/docComponents/path";
+import sdkVersions from '/src/docComponents/sdkVersions';
+import CodeBlock from '@theme/CodeBlock';
+
+本文介绍了如何在 Flutter 环境中使用 LeanCloud 的推送功能。建议先阅读 [推送通知总览](/sdk/push/guide/overview/) 了解相关概念。
+
+Flutter 即时通信 SDK 的推送服务依赖于 [LeanCloud-Swift-SDK](https://github.com/leancloud/swift-sdk) 和 [LeanCloud-Java-SDK](https://github.com/leancloud/java-unified-sdk)。所以下面分别讨论在 iOS 与 Android 设备中的配置。
+
+## iOS 设备推送
+
+### 配置证书
+
+首先配置 iOS 推送证书，请参考 [iOS 推送设置指南](/sdk/push/guide/ios-cert/)。
+
+### 安装 SDK
+
+使用推送服务，需集成 Flutter 即时通信 SDK：`leancloud_official_plugin`，安装指南可以参考：[Flutter SDK 安装指南](/sdk/push/guide/sdk_setup-flutter/#即时通信)。
+
+安装 SDK 分为两步，首先在 pubspec.yaml 中，将 SDK 添加到依赖项列表:
+
+<CodeBlock className="yaml">
+{`dependencies:
+  flutter:
+    sdk: flutter
+  ...
+  leancloud_official_plugin: ^${sdkVersions.leancloud.flutter.realtime}`}
+</CodeBlock>
+
+然后通过 CocoaPods 安装 Swift SDK，打开 Flutter 工程下的 ios 目录，执行 `pod update`:
+
+```yaml
+$ cd ios/
+$ pod update # 或者 $ pod install --repo-update
+```
+
+### 推送设置
+
+使用 SDK 时添加下列导入语句到头部：
+
+```
+import 'package:leancloud_official_plugin/leancloud_plugin.dart';
+```
+然后使用 Xcode 打开 ios 目录下的工程代码，在 AppDelegate.swift 中设置推送信息，示例代码如下：
+
+```
+import Flutter
+import LeanCloud
+import UserNotifications
+
+@UIApplicationMain
+@objc class AppDelegate: FlutterAppDelegate {
+    override func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    ) -> Bool {
+        do {
+            LCApplication.logLevel = .all
+            try LCApplication.default.set(
+                id: "{{appid}}",
+                key: "{{appkey}}",
+                serverURL: "https://please-replace-with-your-customized.domain.com")
+            GeneratedPluginRegistrant.register(with: self)
+            /*
+            register APNs to access token, like this:
+            */ 
+            UNUserNotificationCenter.current().getNotificationSettings { (settings) in
+                switch settings.authorizationStatus {
+                case .authorized:
+                    DispatchQueue.main.async {
+                        UIApplication.shared.registerForRemoteNotifications()
+                    }
+                case .notDetermined:
+                    UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .alert, .sound]) { (granted, error) in
+                        if granted {
+                            DispatchQueue.main.async {
+                                UIApplication.shared.registerForRemoteNotifications()
+                            }
+                        }
+                    }
+                default:
+                    break
+                }
+            }
+            return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+        } catch {
+            fatalError("\(error)")
+        }
+    }
+    
+    override func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        /*
+        set APNs deviceToken and Team ID.
+        */
+        LCApplication.default.currentInstallation.set(
+            deviceToken: deviceToken,
+            apnsTeamId: YOUR_APNS_TEAM_ID)
+        /*
+        save to LeanCloud.
+        */
+        LCApplication.default.currentInstallation.save { (result) in
+            switch result {
+            case .success:
+                break
+            case .failure(error: let error):
+                print(error)
+            }
+        }
+    }
+
+    override func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
+        print(error)
+    }
+}
+```
+
+
+## Android 设备推送
+
+### 安装 SDK
+
+使用推送服务，需集成 Flutter 即时通信 SDK：`leancloud_official_plugin`，安装指南可以参考：[Flutter SDK 安装指南](/sdk/push/guide/sdk_setup-flutter/#即时通信)。
+
+安装 SDK 分为两步，首先在 pubspec.yaml 中，将 SDK 添加到依赖项列表:
+
+<CodeBlock className="yaml">
+{`dependencies:
+  flutter:
+    sdk: flutter
+  ...
+  leancloud_official_plugin: ^${sdkVersions.leancloud.flutter.realtime}`}
+</CodeBlock>
+
+然后配置 Gradle 安装 Java Unified SDK，打开工程目录 android/app/build.gradle，添加如下依赖：
+
+<CodeBlock className="yaml">
+{`dependencies {
+    implementation 'cn.leancloud:storage-android:${sdkVersions.leancloud.java}'
+    implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+}`}
+</CodeBlock>
+
+### 推送设置
+
+使用 SDK 时添加下列导入语句到头部：
+
+```
+import 'package:leancloud_official_plugin/leancloud_plugin.dart';
+```
+
+然后使用 Android Studio 打开 android 目录下的工程代码，创建 Application 类，并添加如下初始化代码：
+
+```java
+import cn.leancloud.AVOSCloud;
+import cn.leancloud.AVLogger;
+import io.flutter.app.FlutterApplication;
+
+public class MyLeanCloudApp extends FlutterApplication {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        //开启未读消息数更新通知(可选)
+        AVIMOptions.getGlobalOptions().setUnreadNotificationEnabled(true);
+        //开启调试日志（可选）
+        AVOSCloud.setLogLevel(AVLogger.Level.DEBUG);
+        // 提供 this、App ID、App Key、Server Host 作为参数
+        // 请将 xxx.example.com 替换为你的应用绑定的 API 域名
+        AVOSCloud.initialize(this, "{{appid}}", "{{appkey}}", "https://please-replace-with-your-customized.domain.com");
+    }
+}
+```
+
+然后指定 SDK 需要的权限并在 AndroidManifest.xml 里面声明 MyLeanCloudApp 类：
+
+```xml
+<!-- 基本模块（必须）START -->
+<uses-permission android:name="android.permission.INTERNET"/>
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+<!-- 基本模块 END -->
+
+<application
+  …
+  android:name=".MyLeanCloudApp" >
+
+  <!-- 即时通讯和推送 START -->
+  <!-- 即时通讯和推送都需要 PushService -->
+  <service android:name="cn.leancloud.push.PushService"/>
+  <receiver android:name="cn.leancloud.push.AVBroadcastReceiver">
+    <intent-filter>
+      <action android:name="android.intent.action.BOOT_COMPLETED"/>
+      <action android:name="android.intent.action.USER_PRESENT"/>
+      <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+    </intent-filter>
+  </receiver>
+  <!-- 即时通讯和推送 END -->
+</application>
+```
+
+之后需要在 LeanCloud 云端注册设备（保存 Installation 信息）并启动推送服务，这样设备才能收到推送，详见 Android 推送指南的[保存 Installation](/sdk/push/guide/android/#保存-installation)、[启动推送服务](/sdk/push/guide/android/#启动推送服务) 。
+
+另外，还需要设置通知展示的默认 channel，否则 Android 8.0 以上设备无法展示推送。详见 [Android 推送指南 > Android 8.0 推送适配](/sdk/push/guide/android/#android-80-推送适配)。
+
+### 集成混合推送
+
+如果想在用户离线的状态下，收到离线的消息推送，需要使用混合推送。混合推送的使用请参考： [Android 混合推送开发指南](/sdk/push/guide/android-mixpush/)。
+
+**建议 Android 设备全部集成混合推送，来保证推送的到达率。**
+
+## 推送验证
+
+初始化 SDK 后，运行 Flutter 项目，`_Installation` 表会生成一条设备信息的数据。
+
+在控制台 > 推送 > 在线发送可以自定义推送条件发送一条推送，测试当前设备能否正常收到推送。
+
+可以根据 objectId 推送，iOS 设备也可以根据 deviceToken 推送，Android 设备可以根据 installationID 推送。
+
+
+
