@@ -1,0 +1,145 @@
+---
+title: APNs（苹果推送通知服务）设置指南
+sidebar_label: APNs 设置
+sidebar_position: 1
+---
+
+APNs 是 Apple 的推送通知服务，它使第三方应用程序开发人员能够向安装在 Apple 设备上的应用程序发送通知数据。
+
+此文主要介绍如何让 Apple 设备上的应用程序支持 APNs 以及如何在开发者中心设置相关的配置。
+
+## 启用推送功能
+
+应用要启用推送功能，分为两步：
+
+1. 开发项目开启推送的权限。
+2. 在苹果开发者网站为对应的 App ID 启用推送功能。
+
+### 开启开发项目的推送权限
+
+要在应用程序中添加所需的权限，请在 Xcode 项目中启用推送通知功能。
+
+打开 Xcode 项目，在 **Project > Target > Capabilities** 页面中点击红框中的加号按钮，然后选择并添加 `Push Notifications`，添加后的结果如图中黄框所示：
+
+![Project Add Capability](/img/apns_setup/project_add_capability.png)
+
+### 启用苹果 App ID 的推送功能
+
+登录苹果开发者网站，进入 **Certificates, Identifiers & Profiles** 页面，点击侧边栏中的 **Identifiers**，然后在列表中找到项目对应的 App ID（即 Xcode 项目中的 Bundle Identifier），点击并进入配置编辑页面，然后选择 `Push Notifications` 旁边的复选框，最后点击右上的 Save（保存）按钮，结果如下图所示：
+
+![App ID Add Capability](/img/apns_setup/app_id_add_capability.png)
+
+## 选择推送方式
+
+苹果提供了两种方式来发送通知，这两种方式各有优点和缺点，云服务对这两种方式都支持，可以根据需要选择其中一种推送方式。
+
+1. 基于 Token 的推送方式（推荐）。
+   - 理论上它比基于证书的方式更快。
+   - 支持多个云服务应用使用同一个 Key。
+   - 支持用同一个 Key 给苹果开发者账号下的多个应用推送通知。
+   - 支持用同一个 Key 给苹果开发者账号下的测试、正式应用推送通知。
+   - 生成的 Key 不再有过期时间，无需像证书方式那样需要定期重新生成证书。
+2. 基于证书的推送方式。
+   - 证书和苹果的 App ID 绑定，一个证书只能向其绑定的苹果应用推送通知。
+   - APNs 有开发、生产两个环境，可能需要为不同环境下的苹果应用配置对应的证书。
+   - 证书有过期时间，需要定期重新生成并配置。
+
+总的来说，基于 Token 的推送方式在配置步骤、易用性以及功能性上，都要优于基于证书的推送方式，因此我们推荐使用基于 Token 的推送方式。
+
+> **注意**，这两种方式在云服务平台上是互斥的，且基于 Token 的方式优先级高于基于证书的方式，即如果设置了 Token 方式的配置，则该云服务应用下的所有推送都会使用基于 Token 的方式。
+
+### 基于 Token 的推送方式（推荐）
+
+要使用基于 Token 的推送方式，首先需从苹果开发者网站上生成并下载密钥（**Auth Key**），之后在开发者中心上传该密钥并设置对应信息，成功后即可使用该方式推送通知。
+
+#### 生成密钥
+
+登录苹果开发者网站，进入 **Certificates, Identifiers & Profiles** 页面，点击侧边栏中的 **Keys**，然后点击左上方的添加按钮（+）。在密钥名称下，为密钥输入一个独特的名称，接着选择 **Apple Push Notifications service (APNs)** 旁边的复选框，如下图所示：
+
+> **注意**，如果侧边栏中没有 **Keys** 这一项，则可能是**苹果开发者账号无对应的权限**。
+
+![Generate Push Key](/img/apns_setup/generate_push_key.png)
+
+接着点击继续，在下一个页面审查密钥配置，确认无误后点击确认。最后点击下载密钥，成功下载的密钥将被保存为一个文本文件，文件扩展名为 `.p8`。
+
+> **注意**，请把这个文件（扩展名为 `.p8`）保存在一个安全的地方，因为密钥不会保存在你的苹果开发者账户中，你将无法再次下载它。如果下载按钮被禁用，说明你之前下载了密钥。
+
+#### 设置密钥
+
+下载了密钥（`.p8` 文件）后，需要在开发者中心将其上传，并配置相关信息。具体步骤如下：
+
+1. 在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置 > iOS 推送 Token Authentication** 点击 **新增 Token Authentication** 按钮。
+2. 在弹出的对话框内填入 `Team ID`、`Key ID`、`Topics`，并将之前下载的密钥文件（`.p8` 文件）上传。
+   - `Team ID` 是苹果开发者账号所属团队的 ID，在苹果开发者账号网站的 **Membership** 中可查看到。
+   - `Key ID` 是之前生成的推送密钥（`.p8` 文件）的 ID，在苹果开发者账号网站的 **Certificates, Identifiers & Profiles > Keys** 中点击对应的密钥，进入详细页面后可查看到。
+   - `Topics` topic 指苹果应用的 ID（即 Xcode 项目中的 Bundle Identifier），此栏支持填入多个 topic，每个 topic 用**英文半角逗号**分隔，且**所有 topic 必须从属于同一个 Team ID**。
+3. 点击**添加**，完成上传以及设置密钥的工作。
+
+完成以上操作后，可以通过 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 在线发送** 测试推送的发送功能。
+
+### 基于证书的推送方式
+
+要使用基于证书的推送方式，需要从苹果开发者网站上为每个苹果应用生成单独的推送证书，每个苹果应用的推送证书又可分为**开发环境推送证书**和**开发&生产环境推送证书**，之后在开发者中心上传对应的推送证书，成功后即可使用该方式推送通知。
+
+#### 生成证书
+
+登录苹果开发者网站，进入 **Certificates, Identifiers & Profiles** 页面，点击侧边栏中的 **Certificates**，然后点击左上方的添加按钮（+），接着按以下步骤操作：
+
+1. 选择对应的证书类型。一般选择 `Apple Push Notification service SSL` 类型的推送证书，这类证书又分为 `Sandbox` 和 `Sandbox & Production` 两种，其中 `Sandbox` 证书只能用于开发环境的苹果应用，而 `Sandbox & Production` 证书既可用于开发环境，也可用于生产环境的苹果应用。具体区别可以看选项下的描述，如下图所示：
+
+   ![Select Cert Type](/img/apns_setup/select_cert_type.png)
+
+2. 选择完证书后，点击继续，接着选择 App ID（即 Xcode 项目中的 Bundle Identifier），选完后点击继续进入下一页面，会要求上传一个 CSR 文件。
+3. 在你的 Mac 上生成一个 CSR（Certificate Signing Request）文件，生成步骤如下：
+
+   - 启动位于 `/Applications/Utilities` 的 `Keychain Access`（钥匙串访问）。
+   - 选择 **Keychain Access > Certificate Assistant > Request a Certificate from a Certificate Authority**（钥匙串访问 > 证书助理 > 从证书颁发机构请求证书…）。
+   - 证书助理对话框中，在 `User Email Address`（用户电子邮件地址）栏中输入一个电子邮件地址；在 `Common Name`（通用名称）字段中，输入密钥的名称（例如，Gita Kumar Dev Key）。
+   - 将 CA Email Address（CA 电子邮件地址）字段留空。
+   - 选择 `Saved to disk`（保存到磁盘），然后点击继续。
+
+     ![Generate CSR](/img/apns_setup/generate_csr.png)
+
+4. 上传你的 CSR 文件（上一步中保存到本地的 `.certSigningRequest` 文件）并点击继续，最后下载生成的证书。
+
+#### 设置证书
+
+证书生成后，需要将下载的证书和私钥上传到开发者中心。请按以下步骤操作：
+
+1. 在生成 CSR 文件的 Mac 上，双击下载的证书，macOS 会将其导入到 `Keychain` 中并和之前创建的 CSR 的密钥归为一组，如下图所示：
+
+   ![Cert With Key](/img/apns_setup/cert_with_key.png)
+
+2. 在 **Keychain Access > login > My Certificates** 中**右键点击**导入的证书（点击证书，不要点击对应的密钥），选择 **Export（导出）**，将证书以 `.p12` 格式保存到磁盘，这时会有弹窗提示输入密码来保护导出的证书，**请不要设置密码，将两个输入框留空**，点击 OK；之后可能还有一个弹窗，要求输入 macOS 的 login（登录）密码以允许让证书导出，请输入密码并点击 Allow。
+3. 在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置 > iOS 推送证书** 上传对应的证书（上一步导出的 `.p12` 文件）。
+   - 如果证书的类型为 `Sandbox`，则只能上传到开发环境；如果证书的类型为 `Sandbox & Production`，则开发、生产环境都可上传。
+
+完成以上操作后，可以通过 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 在线发送** 测试推送的发送功能。
+
+#### 上传证书失败
+
+如果上传推送证书失败，通常是因为证书有问题，一般由下列原因导致：
+
+1. 证书不是推送证书。可以通过证书的 Common Name（常用名称）来判断（在 `Keychain Access` 中双击证书可查看到），推送证书的 Common Name 中会包含 `Push Service` 或者 `Pass Type ID`，如下图所示：
+
+   ![Cert Common Name](/img/apns_setup/cert_common_name.png)
+
+   上传程序会检查证书的 Common Name（常用名称）是否包含以下前缀：
+
+   - `Apple Push Services`
+   - `Apple Sandbox Push Services`
+   - `Apple Development IOS Push Services`
+   - `Apple Production IOS Push Services`
+   - `Pass Type ID`
+
+   > Apple 未来可能会修改推送证书的 Common Name（常用名称）前缀，我们会及时更新前缀列表，同时也欢迎大家来反馈。
+
+2. 证书导出格式有误。目前开发者中心只接受 `.p12` 格式的证书，因此在导出证书时，必须选择 `.p12` 作为导出格式。
+
+#### 证书过期
+
+开发者如果使用过期证书进行推送，会遇到 `The iOS certificate file is expired or disabled.` 的错误提示。
+
+云服务后端在收到推送请求时都会去检查 `prod` 参数指明的证书是否过期，没有 `prod` 则默认检查生产环境证书，如果发现过期并且 query 条件查出的目标设备可能存在 iOS 设备，就直接拒绝本次推送。
+
+一种解决方法是替换过期的证书，另一种方法是在 query 条件中通过 `deviceType` 字段明确指定设备类型为非 iOS 设备来推送，方法参见《推送 REST API 使用指南》的《通过查询条件发推送》一节。
