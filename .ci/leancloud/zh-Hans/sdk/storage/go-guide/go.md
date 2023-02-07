@@ -565,19 +565,41 @@ query := client.Class("Todo").NewQuery().ContainsAll("tags", []string{"工作", 
 查询关联数据有很多种方式，常见的一种是查询某一属性值为特定 `leancloud.Object` 的对象，这时可以像其他查询一样直接用 `EqualTo`。比如说，如果每一条博客评论 `Comment` 都有一个 `post` 属性用来存放原文 `Post`，则可以用下面的方法获取所有与某一 `Post` 相关联的评论：
 
 ```go
+post := new(Post)
+if err := client.Class("Post").ID("57328ca079bc44005c2472d0").Get(post); err != nil {
+  panic(err)
+}
 
+comments := make([]Comment, 0)
+
+query := client.Class("Comment").NewQuery().EqualTo("post", post)
+if err := query.Find(&comments); err != nil {
+  panic(err)
+}
 ```
 
 如需获取某一属性值为另一查询结果中任一 `leancloud.Object` 的对象，可以用 `MatchesQuery`。下面的代码构建的查询可以找到所有包含图片的博客文章的评论：
 
 ```go
+innerQuery := client.Class("Post").NewQuery().Exists("image")
 
+query := client.Class("Comment").NewQuery().MatchesQuery("post", innerQuery)
 ```
 
 有时候可能需要获取来自另一个 class 的数据而不想进行额外的查询，此时可以在同一个查询上使用 `Include`。下面的代码查找最新发布的 10 条评论，并包含各自对应的博客文章：
 
 ```go
+comments := make([]Comment, 0)
 
+query := client.Class("Comment").NewQuery().Order("-createdAt").Limit(10).Include("post")
+if err := query.Find(&comments); err != nil {
+  panic(err)
+}
+
+for _, c := range comments {
+  // 该操作无需网络连接
+  post := c.Post
+}
 ```
 
 可以用 dot 符号（`.`）来获取多级关系，例如 `post.author`，详见《点号使用指南》的《在查询对象时使用点号》一节。
