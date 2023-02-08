@@ -531,7 +531,7 @@ query := client.Class("Todo").NewQuery().Contains("title", "lunch")
 
 和 `Query.StartsWith` 不同，`Query.Contains` 无法利用索引，因此不建议用于大型数据集。
 
-注意 `Query.StartsWith` 和 `` 都是 **区分大小写** 的，所以上述查询会忽略 `Lunch`、`LUNCH` 等字符串。
+注意 `Query.StartsWith` 和 `Query.Contains` 都是 **区分大小写** 的，所以上述查询会忽略 `Lunch`、`LUNCH` 等字符串。
 
 如果想查找某一属性值不包含特定字符串的对象，可以使用 `Query.Regexp` 进行基于正则表达式的查询：
 
