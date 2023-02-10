@@ -331,6 +331,94 @@ OPTIONS:
 
 相比于直接部署生产环境，<Command suffix=" publish" /> 可以保证将完全相同的版本（包括所有依赖和构建产物）发布到生产环境，最大限度避免不一致的情况。
 
+### 使用预览环境
+
+云引擎可以自动将 Pull request 部署到预览环境，每个预览环境有单独的域名，允许你在接近生产的环境中测试通过后再合并 PR。
+
+预览环境目前只支持在 CI 中使用命令行工具部署，后续会支持不用配置 CI 自动同步的功能。
+
+使用命令 <Command suffix=" preview deploy" /> 来部署预览环境，在 GitLab CI 和 GitHub Actions 中会自动读取 PR 号、分支名等信息，若使用其他 CI 或在本地部署，需要手动指定。
+
+我们提供了 GitLab CI 和 GitHub Actions 的模版：
+
+<details>
+<summary>点击展开 GitLab CI (<code>.gitlab-ci.yml</code>) 模版</summary>
+
+在 GitLab 左侧点击 **CI/CD > Editor** 新建一个 `.gitlab-ci.yml` 文件并添加以下内容。注意替换 `YOUR_REGION` 和 `YOUR_APP_ID` 为相应的区域和 App ID，并在 GitLab 的 **Settings > CI/CD > Variables** 中添加你的 ACCESS_TOKEN。
+
+<CodeBlock className="yaml">
+{`before_script:
+  - apt-get update && apt-get install -y curl
+  - curl -L -o /bin/${CLI_BINARY} http://releases.leanapp.cn/leancloud/lean-cli/releases/download/v1.1.0/${CLI_BINARY}-linux-x64
+  - chmod +x /bin/${CLI_BINARY}\n
+deploy_preview:
+  stage: deploy
+  script:
+    - ${CLI_BINARY} login --region YOUR_REGION --token $ACCESS_TOKEN
+    - ${CLI_BINARY} switch --region YOUR_REGION --group web YOUR_APP_ID
+    - ${CLI_BINARY} preview deploy
+  environment:
+    name: preview/$CI_COMMIT_REF_NAME
+    url: TODO_FILL_THIS_URL
+    on_stop: delete_preview
+    auto_stop_in: 1 week
+  only:
+    - merge_request\n
+delete_preview:
+  stage: deploy
+  script: ${CLI_BINARY} preview delete
+  environment:
+    name: preview/$CI_COMMIT_REF_NAME
+    action: stop
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+      when: manual`}
+</CodeBlock>
+
+</details>
+
+<details>
+<summary>点击展开 GitHub Actions (<code>.github/workflows/main.yml</code>) 模版</summary>
+
+在 GitHub 点击 **Actions > set up a workflow yourself** 新建一个 `.github/workflows/main.yml` 文件并添加以下内容。 注意替换 `YOUR_REGION` 和 `YOUR_APP_ID` 为相应的区域和 App ID，并在 GitHub 的 **Settings > Secrets and variables > Actions** 中添加你的 ACCESS_TOKEN。
+
+<CodeBlock className="yaml">
+{`name: Deploy Preview\n
+on:
+  pull_request:
+    types: [opened, synchronize, closed]\n
+jobs:
+  deploy:
+    if: github.event.action != 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3\n
+      - name: Install lean-cli
+        run: |
+          sudo curl -L -o /bin/${CLI_BINARY} http://releases.leanapp.cn/leancloud/lean-cli/releases/download/v1.1.0/${CLI_BINARY}-linux-x64
+          sudo chmod +x /bin/${CLI_BINARY}\n
+      - name: Deploy Preview
+        run: |
+          ${CLI_BINARY} login --region YOUR_REGION --token \${{ secrets.ACCESS_TOKEN }}
+          ${CLI_BINARY} switch --region YOUR_REGION --group web YOUR_APP_ID
+          ${CLI_BINARY} preview deploy\n
+  delete:
+    if: github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install lean-cli
+        run: |
+          sudo curl -L -o /bin/${CLI_BINARY} http://releases.leanapp.cn/leancloud/lean-cli/releases/download/v1.1.0/${CLI_BINARY}-linux-x64
+          sudo chmod +x /bin/${CLI_BINARY}\n
+      - name: Delete Preview
+        run: |
+          ${CLI_BINARY} login --region YOUR_REGION --token \${{ secrets.ACCESS_TOKEN }}
+          ${CLI_BINARY} switch --region YOUR_REGION --group web YOUR_APP_ID
+          ${CLI_BINARY} preview delete`}
+</CodeBlock>
+
+</details>
+
 ### 触发 Git 部署
 
 如果代码保存在某个 Git 仓库上，例如 [GitHub](https://github.com)，并且在控制台已经正确设置了 git repo 地址以及 deploy key，你也可以请求云引擎从 Git 仓库获取源码并自动部署。这个操作可以在云引擎的部署菜单里完成，也可以在本地执行：
