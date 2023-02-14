@@ -18,7 +18,6 @@ cp -r docs/sdk/push tmp/zh-Hans # 推送通知
 
 # 减去
 rm tmp/zh-Hans/storage/features.mdx # 数据存储/功能介绍
-rm tmp/zh-Hans/storage/rest.mdx # 数据存储/REST API
 rm -r tmp/zh-Hans/engine/game # 云引擎/游戏后端
 
 # 英文部分
