@@ -83,13 +83,8 @@ TapCommonSDK.framework
 在 Project.Build.cs 中添加所需模块:
 
 ```cs
-PublicDependencyModuleNames.AddRange(new string[] { "Core",
-	"CoreUObject",
-	"Engine",
-	"Json",
-	"InputCore",
-	"JsonUtilities",
-	"SlateCore",
+PublicDependencyModuleNames.AddRange(new string[] {
+	// ... ... 添加你依赖的其它模块
 	"TapCommon",
 	"TapBillboard"
 });
@@ -98,8 +93,7 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core",
 #### 导入头文件
 
 ```cpp
-#include "TapUECommon.h"
-#include "ServiceWidgetBillboard.h"
+#include "TapBillboardModule.h"
 #include "TapBillboardCommon.h"
 
 ```
@@ -274,14 +268,16 @@ config.tapBillboardConfig = billboardIntlConfig;
 #include "TapBillboardCommon.h"
 #include "TapUECommon.h"
 
+FTapBillboardPtr TapBillboard = FTapBillboardModule::GetTapBillboardInterface();
+
 FTUConfig Config;
 Config.ClientID = "your_client_id"; //开发者中心应用 ID
 Config.ClientToken = "your_client_token"; //开发者中心对应 Client Token
-Config.RegionType = static_cast<ERegionType>(StaticEnum<ERegionType>()->GetValueByNameString(CB_Init_RegionType->GetSelectedOption()));
+Config.RegionType = ERegionType::CN; //区域：国内或者海外
 Config.ServerURL = ""; // 开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > 云服务 API
 Config.BillboardConfig = MakeShared<FBillboardConfig>();
 Config.BillboardConfig->BillboardUrl = "";// 开发者中心 > 你的游戏 > 游戏服务 > 应用配置 > 域名配置 > 公告
-Config.BillboardConfig->Dimensions = ETB_Init_Dimensions->MakeStringMap();    	
+Config.BillboardConfig->Dimensions = {{TEXT("location"), TEXT("CN")}} // 开发者中心 > 你的游戏 > 游戏服务 > 运营工具 > 公告 > 维度配置	
 TapBillboard->Init(Config);
 
 ```
@@ -312,7 +308,7 @@ TapBillboard.init(tapConfig);
 ```
 
 ```cpp
-TapBillboard->Init(Config);
+FTapBootstrap::Init(Config);
 ```
 
 </MultiLang>
@@ -380,21 +376,9 @@ TapBillboard.openPanel(BillboardActivity.this, new Callback<Void>() {
 ```
 ```cpp
 TapBillboard->OpenPanel(
-		FSimpleDelegate::CreateUObject(this, &UServiceWidgetBillboard::OnOpenPanelSuccess),
-		FTapFailed::CreateUObject(this, &UServiceWidgetBillboard::OnTapFailed),
-		FSimpleDelegate::CreateUObject(this, &UServiceWidgetBillboard::OnBillboardClosed));
-		
-void UServiceWidgetBillboard::OnOpenPanelSuccess()
-{
-	TUDebuger::DisplayShow(TEXT("打开公告面板"));
-}
-
-void UServiceWidgetBillboard::OnTapFailed(const FTUError& Error)
-{
-	FString ErrorJsonString;
-	FJsonObjectConverter::UStructToJsonObjectString(Error, ErrorJsonString);
-	TUDebuger::ErrorShow(ErrorJsonString);
-}
+		FSimpleDelegate::CreateLambda([](){ /** 打开成功 */}),
+		FTapFailed::CreateLambda([](const FTUError& Error){ /** 打开失败 */}),
+		FSimpleDelegate::CreateLambda([](){ /** 公告关闭 */}));
 
 ```
 
@@ -451,26 +435,9 @@ void UServiceWidgetBillboard::OnTapFailed(const FTUError& Error)
 
 ```cpp
 TapBillboard->OpenSplashPanel(
-		FSimpleDelegate::CreateUObject(this, &UServiceWidgetBillboard::OnOpenSplashPanelSuccess),
-		FTapFailed::CreateUObject(this, &UServiceWidgetBillboard::OnTapFailed),
-		FSimpleDelegate::CreateUObject(this, &UServiceWidgetBillboard::OnSplashPanelClosed));
-
-void UServiceWidgetBillboard::OnOpenSplashPanelSuccess()
-{
-	TUDebuger::DisplayShow(TEXT("Open splash panel success!"));
-}
-
-void UServiceWidgetBillboard::OnTapFailed(const FTUError& Error)
-{
-	FString ErrorJsonString;
-	FJsonObjectConverter::UStructToJsonObjectString(Error, ErrorJsonString);
-	TUDebuger::ErrorShow(ErrorJsonString);
-}
-
-void UServiceWidgetBillboard::OnSplashPanelClosed()
-{
-	TUDebuger::DisplayShow(TEXT("Splash panel closed!"));
-}
+		FSimpleDelegate::CreateLambda([](){ /** 打开成功 */}),
+        FTapFailed::CreateLambda([](const FTUError& Error){ /** 打开失败 */}),
+        FSimpleDelegate::CreateLambda([](){ /** 公告关闭 */}));
 
 ```
 
@@ -558,21 +525,8 @@ TapBillboard.getBadgeDetails(new Callback<BadgeDetails>() {
 
 ```cpp
 TapBillboard->GetBadgeDetails(
-		FTapBadgeDetailsResult::CreateUObject(this, &UServiceWidgetBillboard::GetBadgeDetailSuccess),
-		FTapFailed::CreateUObject(this, &UServiceWidgetBillboard::OnTapFailed));
-		
-void UServiceWidgetBillboard::GetBadgeDetailSuccess(const FBadgeDetails& BadgeDetails)
-{
-	const FString DebugStr = FString::Printf(TEXT("GetBadgeDetail: { ShowRedDot: %d }, { CloseButtonImg: %s }"), BadgeDetails.show_red_dot, *BadgeDetails.close_button_img);
-	TUDebuger::DisplayShow(DebugStr);
-}
-
-void UServiceWidgetBillboard::OnTapFailed(const FTUError& Error)
-{
-	FString ErrorJsonString;
-	FJsonObjectConverter::UStructToJsonObjectString(Error, ErrorJsonString);
-	TUDebuger::ErrorShow(ErrorJsonString);
-}
+		FTapBadgeDetailsResult::CreateLambda([](const FBadgeDetails& BadgeDetails){ /** 获取成功 */}),
+		FTapFailed::CreateLambda([](const FTUError& Error){ /** 获取失败 */}));
 
 ```
 
@@ -608,12 +562,8 @@ TapBillboard.registerCustomLinkListener(new CustomLinkListener() {
 ```
 
 ```cpp
-TapBillboard->RegisterCustomLinkListener(FOnCustomLinkClicked::FDelegate::CreateUObject(this, &UServiceWidgetBillboard::OnCustomUrlClicked));
+FDelegateHandle CustomUrlClickedHandle = TapBillboard->RegisterCustomLinkListener(FOnCustomLinkClicked::FDelegate::CreateLambda([](const FString& Url){ /** 自定义Url点击 */}));
 
-void UServiceWidgetBillboard::OnCustomUrlClicked(const FString& Url)
-{
-	TUDebuger::DisplayShow(FString::Printf(TEXT("Custom url clicked: %s"), *Url));
-}
 
 ```
 
@@ -742,12 +692,7 @@ TapBillboard.RegisterOutputStateListener(new OutputStateListener {
 ```
 
 ```cpp
-OutputStateChangedHandle = TapBillboard->RegisterOutputStateListener(FAudioOutputStateChanged::FDelegate::CreateUObject(this, &UServiceWidgetBillboard::OnOutputStateChanged));
-
-void UServiceWidgetBillboard::OnOutputStateChanged(bool bPlaying)
-{
-	TUDebuger::DisplayShow(bPlaying ? TEXT("Audio Play") : TEXT("Audio Stop"));
-}
+TapBillboard->RegisterOutputStateListener(FAudioOutputStateChanged::FDelegate::CreateLambda([](bool bPlaying){ /** 公告音频输出状态改变 */}));
 
 ```
 
@@ -781,7 +726,7 @@ TapBillboard->UnregisterOutputStateListener();
 
 公告支持设置语言：
 
-<Languages />
+<Languages kind="ue" />
 
 ## 错误码
 
