@@ -6,6 +6,7 @@ sidebar_position: 15
 ---
 
 import { Conditional } from "/src/docComponents/conditional";
+import Path from "/src/docComponents/path";
 
 REST API 可以让你用任何支持发送 HTTP 请求的设备来与云服务进行交互，你可以使用 REST API 做很多事情，比如：
 
@@ -315,8 +316,10 @@ curl -X POST \
   https://{{host}}/1.1/classes/Post?fetchWhenSave=true
 ```
 
+:::info
 Class 名称只能包含字母、数字、下划线。
 **每个应用最多可以创建 500 个 class，每个 class 最多包含 300 个字段，**但每个 class 中的记录数量没有限制。
+:::
 
 ### 获取对象
 
@@ -390,7 +393,7 @@ curl -X GET \
 ```
 
 顺带提一下，获取用户推荐使用 `GET /users/<objectId>`，而不是直接查询 `_User` 类。
-参见后文[获取用户](#获取用户)一节。
+参见后文[获取用户](/sdk/authentication/rest/#获取用户)一节。
 
 ### 更新对象
 
@@ -413,7 +416,7 @@ curl -X PUT \
 }
 ```
 
-fetchWhenSave 选项对更新对象也同样有效。
+`fetchWhenSave` 选项对更新对象也同样有效。
 但和创建对象不同，用于更新对象时仅返回更新的字段，而非全部字段。
 
 #### 计数器
@@ -434,10 +437,12 @@ curl -X PUT \
 
 除了 Increment，我们也提供了 Decrement 用于递减，等价于 Increment 一个负数。
 
+:::info
 注意，虽然原子增减支持浮点数，但因为底层数据库的浮点数存储格式限制，会有舍入误差。
-因此，需要原子增减的字段建议使用整数以避免误差，例如 `3.14` 可以存储为 `314`，然后在客户端进行相应的转换。
+因此，**需要原子增减的字段建议使用整数**以避免误差，例如 `3.14` 可以存储为 `314`，然后在客户端进行相应的转换。
 否则，以比较大小为条件查询对象的时候，需要特殊处理，
 `< a` 需改查 `< a + e`，`> a` 需改查 `> a - e`，`== a` 需改查 `> a - e` 且 `< a + e`，其中 `e` 为误差范围，据所需精度取值，比如 `0.0001`。
+:::
 
 #### 位运算
 
@@ -530,7 +535,7 @@ curl -X DELETE \
   https://{{host}}/1.1/classes/Post/<objectId>
 ```
 
-还可以使用 Delete 操作删除一个对象的一个字段（注意此时 **HTTP Method 还是 PUT**）：
+还可以使用 Delete 操作删除一个对象的一个字段（注意此时 **HTTP Method 是 PUT**）：
 
 ```sh
 curl -X PUT \
@@ -570,11 +575,13 @@ URL 中 where 参数的值是 `%7B%22clicks%22%3A%200%7D`，其实这是 `{"clic
 
 因为更新和删除都是基于单个对象的，都要求提供 objectId，但是有时候用户需要高效地遍历一个 Class，做一些批量的更新或者删除的操作。
 
-通常情况下，如果 Class 的数量规模不大，使用查询加上 `skip` 和 `limit` 分页配合排序 `order` 就可以遍历所有数据。
-但是当 Class 数量规模比较大的时候， `skip` 的效率就非常低了（这跟 MySQL 等关系数据库的原因一样，深度翻页比较慢）。
+通常情况下，如果 **Class 的数量规模不大**，使用查询加上 `skip` 和 `limit` 分页配合排序 `order` 就可以遍历所有数据。
+
+但是当 **Class 数量规模比较大**的时候， `skip` 的效率就非常低了（这跟 MySQL 等关系数据库的原因一样，深度翻页比较慢）。
 为了避免性能问题，这种情况下可以通过指定 `createdAt` 或 `updatedAt` 的范围来实现翻页。
 我们还额外提供了 `scan` 接口，可以按照特定字段排序来高效地遍历一张表，相比指定 `createdAt` 或 `updatedAt` 范围来翻页的写法也更加直截了当。
-默认情况下，按 `objectId` 升序，同时支持设置 `limit` 限定每一批次的返回数量，默认 limit 为 100，最大可设置为 1000：
+
+默认情况下，按 `objectId` 升序，同时支持设置 `limit` 限定每一批次的返回数量，**默认 limit 为 100，最大可设置为 1000**：
 
 ```sh
 curl -X GET \
@@ -684,7 +691,7 @@ curl -X POST \
   https://{{host}}/1.1/batch
 ```
 
-我们对每一批次中所包含的操作数量（requests 数组中的元素个数）暂不设限，但考虑到云端对每次请求的 body 内容大小有 20 MB 的限制，因此建议将每一批次的操作数量控制在 100 以内。
+我们对每一批次中所包含的操作数量（requests 数组中的元素个数）暂不设限，但考虑到**云端对每次请求的 body 内容大小有 20 MB 的限制，因此建议将每一批次的操作数量控制在 100 以内**。
 
 批量操作的响应 body 会是一个列表，列表的元素数量和顺序与给定的操作请求是一致的。每一个在列表中的元素都有一个字段是 success 或者 error。
 
@@ -705,8 +712,10 @@ curl -X POST \
 ]
 ```
 
+:::info
 需要注意，即使一个 batch 请求返回的响应码为 200，这仅代表服务端已收到并处理了这个请求，但并不说明该
 batch 中的所有操作都成功完成，只有当返回 body 的列表中**不存在 error 元素**，开发者才可以认为所有操作都已成功完成。
+:::
 
 在 batch 操作中 update 和 delete 同样是有效的：
 
@@ -843,7 +852,11 @@ curl -X GET \
 }
 ```
 
-控制台对 `createdAt` 和 `updatedAt` 的展示做了优化，它们会依据用户操作系统时区而显示为本地时间；客户端 SDK 获取到这些时间后也会将其转换为本地时间；而通过 REST API 获取到的则是原始的 UTC 时间，开发者可能需要根据情况做相应的时区转换。
+:::info
+* 控制台对 `createdAt` 和 `updatedAt` 的展示做了优化，它们会依据用户操作系统时区而显示为本地时间；
+* 客户端 SDK 获取到这些时间后也会将其转换为本地时间；
+* 通过 REST API 获取到的则是原始的 UTC 时间，开发者可能需要根据情况做相应的时区转换。
+:::
 
 ### 查询约束
 
@@ -1041,7 +1054,7 @@ curl -X GET \
 ### 返回 ACL 字段
 
 默认情况下不会返回 ACL 字段。
-**开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 数据存储 > 服务设置 > 查询设置** 中勾选 **查询时返回值包括 ACL**，且指定了 `returnACL=true` 时返回结果中才会包含 ACL 字段。
+**<Path to="storage" /> > 服务设置 > 查询设置** 中勾选 **查询时返回值包括 ACL**，且指定了 `returnACL=true` 时返回结果中才会包含 ACL 字段。
 
 所有以上这些参数都可以组合使用。
 
@@ -1363,6 +1376,10 @@ where={"$and":[{"$or":[{"pubUserCertificate":{"$gt":2}},{"pubUserCertificate":{"
 ```
 
 注意，**在组合查询的子查询中不支持使用 limit、skip、order、include 等非过滤型的约束。**
+
+## 用户
+
+参考 [内建账户 REST API](/sdk/authentication/rest/) 文档。
 
 ## 角色
 
@@ -1741,7 +1758,7 @@ curl -X GET \
 
 你可以通过请求 `/exportData` 来导出应用数据：
 
-```
+```sh
 curl -X POST \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{masterkey}},master" \
@@ -1754,7 +1771,7 @@ curl -X POST \
 
 你还可以指定导出数据的起始时间（`updatedAt`）：
 
-```
+```sh
 curl -X POST \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{masterkey}},master" \
@@ -1765,7 +1782,7 @@ curl -X POST \
 
 还可以指定具体的 class 列表，使用逗号隔开：
 
-```
+```sh
 curl -X POST \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{masterkey}},master" \
@@ -1776,7 +1793,7 @@ curl -X POST \
 
 增加 `only-schema` 选项就可以只导出 schema:
 
-```
+```sh
 curl -X POST \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{masterkey}},master" \
@@ -1789,7 +1806,7 @@ curl -X POST \
 
 默认导出的结果将发送到应用的创建者邮箱，你也可以指定接收邮箱：
 
-```
+```sh
 curl -X POST \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{masterkey}},master" \
@@ -1810,7 +1827,7 @@ curl -X POST \
 
 除了被动等待邮件之外，你还可以主动使用 id 去查询导出任务状态：
 
-```
+```sh
 curl -X GET \
   -H "X-LC-Id: {{appid}}" \
   -H "X-LC-Key: {{masterkey}},master" \
@@ -1838,7 +1855,7 @@ curl -X GET \
 
 获取服务端当前日期时间可以通过 `/date` API:
 
-```
+```sh
 curl -i -X GET \
     -H "X-LC-Id: {{appid}}" \
     -H "X-LC-Key: {{appkey}}" \
@@ -1862,7 +1879,7 @@ curl -i -X GET \
 
 ### GET
 
-```
+```sh
   curl -i -X POST \
   -H "Content-Type: text/plain" \
   -d \
@@ -1897,7 +1914,7 @@ Strict-Transport-Security: max-age=31536000
 
 ### PUT
 
-```
+```sh
 curl -i -X POST \
   -H "Content-Type: text/plain" \
   -d \
@@ -1926,7 +1943,7 @@ Strict-Transport-Security: max-age=31536000
 
 ### DELETE
 
-```
+```sh
 curl -i -X POST \
   -H "Content-Type: text/plain" \
   -d \
@@ -1938,7 +1955,7 @@ curl -i -X POST \
 
 对应的输出是：
 
-```
+```sh
 HTTP/1.1 200 OK
 Server: nginx
 Date: Thu, 04 Dec 2014 06:15:10 GMT
