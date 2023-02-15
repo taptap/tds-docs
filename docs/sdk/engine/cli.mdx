@@ -335,7 +335,7 @@ OPTIONS:
 
 云引擎可以自动将 Pull request 部署到预览环境，每个预览环境有单独的域名，允许你在接近生产的环境中测试通过后再合并 PR。
 
-预览环境目前只支持在 CI 中使用命令行工具部署，后续会支持不用配置 CI 自动同步的功能。
+预览环境目前只支持在 CI 中使用命令行工具部署。
 
 使用命令 <Command suffix=" preview deploy" /> 来部署预览环境，在 GitLab CI 和 GitHub Actions 中会自动读取 PR 号、分支名等信息，若使用其他 CI 或在本地部署，需要手动指定。
 
@@ -378,43 +378,73 @@ delete_preview:
 </details>
 
 <details>
-<summary>点击展开 GitHub Actions (<code>.github/workflows/main.yml</code>) 模版</summary>
+<summary>点击展开 GitHub Actions 模版</summary>
 
-在 GitHub 点击 **Actions > set up a workflow yourself** 新建一个 `.github/workflows/main.yml` 文件并添加以下内容。 注意替换 `YOUR_REGION` 和 `YOUR_APP_ID` 为相应的区域和 App ID，并在 GitHub 的 **Settings > Secrets and variables > Actions** 中添加你的 ACCESS_TOKEN。
+在 GitHub 打开 **Settings > Secrets and variables > Actions** 中创建一个 secret，添加你的 ACCESS_TOKEN。
+
+然后在 GitHub 点击 **Actions > set up a workflow yourself** 创建两个 Workflow 文件，注意修改 `env` 中的设置：
 
 <CodeBlock className="yaml">
-{`name: Deploy Preview\n
+{`# .github/workflows/preview-env-deploy.yml\n
+name: Deploy Preview Environment\n
 on:
   pull_request:
-    types: [opened, synchronize, closed]\n
+    types: [opened, synchronize]\n
+env:
+  REGION: MY_REGION # set this to your ${BRAND == 'tds' ? 'TDS' : 'LeanCloud'} region, e.g. ${BRAND == 'tds' ? 'cn-tds1' : 'cn-n1'}
+  APP_ID: MY_APP_ID # set this to your App ID on ${BRAND == 'tds' ? 'TDS' : 'LeanCloud'}
+  GROUP: MY_GROUP   # set this to your group, e.g. web\n
 jobs:
-  deploy:
-    if: github.event.action != 'closed'
+  deploy-preview-environment:
     runs-on: ubuntu-latest
+    environment:
+      name: preview/\${{ github.head_ref }}
+      url: \${{ env.PREVIEW_URL }}
     steps:
       - uses: actions/checkout@v3\n
       - name: Install lean-cli
         run: |
           sudo curl -L -o /bin/${CLI_BINARY} http://releases.leanapp.cn/leancloud/lean-cli/releases/download/v1.1.0/${CLI_BINARY}-linux-x64
           sudo chmod +x /bin/${CLI_BINARY}\n
-      - name: Deploy Preview
+      - name: Deploy
         run: |
-          ${CLI_BINARY} login --region YOUR_REGION --token \${{ secrets.ACCESS_TOKEN }}
-          ${CLI_BINARY} switch --region YOUR_REGION --group web YOUR_APP_ID
-          ${CLI_BINARY} preview deploy\n
-  delete:
-    if: github.event.action == 'closed'
+          ${CLI_BINARY} login --region \${{ env.REGION }} --token \${{ secrets.ACCESS_TOKEN }}
+          ${CLI_BINARY} switch --region \${{ env.REGION }} --group \${{ env.GROUP }} \${{ env.APP_ID }}
+          PREVIEW_URL=\$(${CLI_BINARY} preview deploy)
+          echo "PREVIEW_URL=$PREVIEW_URL" >> $GITHUB_ENV
+`}
+</CodeBlock>
+
+<CodeBlock className="yaml">
+{`# .github/workflows/preview-env-delete.yml\n
+name: Delete Preview Environment\n
+on:
+  pull_request:
+    types: [closed]\n
+env:
+  REGION: MY_REGION # set this to your ${BRAND == 'tds' ? 'TDS' : 'LeanCloud'} region, e.g. ${BRAND == 'tds' ? 'cn-tds1' : 'cn-n1'}
+  APP_ID: MY_APP_ID # set this to your App ID on ${BRAND == 'tds' ? 'TDS' : 'LeanCloud'}
+  GROUP: MY_GROUP   # set this to your group, e.g. web\n
+jobs:
+  delete-preview-environment:
     runs-on: ubuntu-latest
+    permissions:
+      deployments: write
     steps:
       - name: Install lean-cli
         run: |
           sudo curl -L -o /bin/${CLI_BINARY} http://releases.leanapp.cn/leancloud/lean-cli/releases/download/v1.1.0/${CLI_BINARY}-linux-x64
           sudo chmod +x /bin/${CLI_BINARY}\n
-      - name: Delete Preview
+      - name: Delete
         run: |
-          ${CLI_BINARY} login --region YOUR_REGION --token \${{ secrets.ACCESS_TOKEN }}
-          ${CLI_BINARY} switch --region YOUR_REGION --group web YOUR_APP_ID
-          ${CLI_BINARY} preview delete`}
+          ${CLI_BINARY} login --region \${{ env.REGION }} --token \${{ secrets.ACCESS_TOKEN }}
+          ${CLI_BINARY} switch --region \${{ env.REGION }} --group \${{ env.GROUP }} \${{ env.APP_ID }}
+          ${CLI_BINARY} preview delete\n
+      - uses: strumwolf/delete-deployment-environment@v2
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          environment: preview/\${{ github.head_ref }}
+          onlyDeactivateDeployments: true`}
 </CodeBlock>
 
 </details>
