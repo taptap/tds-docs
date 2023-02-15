@@ -12,7 +12,7 @@ sidebar_position: 2
 
 礼包系统接入适用于有请求接口能力的游戏，目前尚未提供完全离线的兑换码服务。
 
-根据您的使用场景，您可以灵活对接以下不同兑换接口完成兑换流程。
+根据您的使用场景，您可以灵活对接以下不同兑换接口之一完成兑换流程。
 
 | 方式           | 接口名                           | 需游戏方校验后台设置的兑换条件 | 需游戏方提供发送道具接口 |
 | -------------- | -------------------------------- | :----------------------------- | :----------------------- |
@@ -75,7 +75,7 @@ sidebar_position: 2
 ```
 curl --location -g --request POST <后台配置的游戏方二次校验接口地址> \
 --header 'Content-Type: application/json' \
---data-raw '{"activity_id":<后台活动ID>,"character_id":<用户ID>,"content":"[{\"condition\":\"level\",\"operate":\"gt\",\"value\":10}]","ext":<兑换提交的ext参数>,"gift_code":<礼包码>,"nonce_str":"abcdc","server_code": <后台配置的code>,"sign":"42d2b58a8cd58b5e63d90524aaf63ef97e04f223","timestamp":1658825322}'
+--data-raw '{"activity_id":<后台活动ID>,"character_id":<用户ID>,"content":"[{\"condition\":\"level\",\"operate":\"gt\",\"value\":\"10\"}]","content_obj": [{"condition":"level","operate":"gt","value":"10"}],"ext":<兑换提交的ext参数>,"gift_code":<礼包码>,"nonce_str":"abcdc","server_code": <后台配置的code>,"sign":"42d2b58a8cd58b5e63d90524aaf63ef97e04f223","timestamp":1658825322,"custom":{<自定义维度>:[<自定义维度字段1>,<自定义维度字段2>]}}'
 ```
 
 请在校验完成后返回带有特定字段的 JSON 返回值告诉兑换系统校验结果。
@@ -99,20 +99,26 @@ curl --location -g --request POST <后台配置的游戏方二次校验接口地
 如果您并不要求兑换系统知晓兑换的错误信息可以直接返回 **非 200 HTTP code** 表示兑换失败，或者返回 **HTTP code 200** 表示兑换成功。
 这样就无需按兑换系统的格式来返回信息。
 
-| 请求参数          | 类型           | 含义                 |
-| ----------------- | -------------- | -------------------- |
-| activity_id       | 字符串         | 礼包活动 ID          |
-| character_id      | 字符串         | 兑换的用户 ID        |
-| content           | 字符串（JSON） | 后台配置的自定义条件 |
-| content.condition | 字符串         | 自定义条件-key       |
-| content.operate   | 字符串         | 关系-详情见其它      |
-| content.value     | 字符串         | 自定义条件-value     |
-| ext               | 字符串         | 请求接口时传递的数值 |
-| gift_code         | 字符串         | 用户此次兑换的礼包码 |
-| nonce_str         | 字符串         | 此次请求的随机字符串 |
-| server_code       | 字符串         | 服务器 code          |
-| sign              | 字符串         | 签名                 |
-| timestamp         | 数字           | 秒级时间戳           |
+| 请求参数              | 类型                          | 含义                 |
+| --------------------- | ----------------------------- | -------------------- |
+| activity_id           | 字符串                        | 礼包活动 ID          |
+| character_id          | 字符串                        | 兑换的用户 ID        |
+| content               | 字符串（嵌套JSON字符串）      | 后台配置的自定义条件 |
+| content.condition     | 字符串                        | 自定义条件-key       |
+| content.operate       | 字符串                        | 关系-详情见其它      |
+| content.value         | 字符串                        | 自定义条件-value     |
+| content_obj           | 对象数组（和content含义相同） | 后台配置的自定义条件 |
+| content_obj.condition | 字符串                        | 自定义条件-key       |
+| content_obj.operate   | 字符串                        | 关系-详情见其它      |
+| content_obj.value     | 字符串                        | 自定义条件-value     |
+| ext                   | 字符串                        | 请求接口时传递的数值 |
+| gift_code             | 字符串                        | 用户此次兑换的礼包码 |
+| nonce_str             | 字符串                        | 此次请求的随机字符串 |
+| server_code           | 字符串                        | 服务器 code          |
+| sign                  | 字符串                        | 签名                 |
+| timestamp             | 数字                          | 秒级时间戳           |
+| custom                | 对象                          | 维度信息             |
+| custom.xxx            | 字符数组                      | 自定义维度           |
 
 | 返回参数  | 类型           | 含义                                            |
 | --------- | -------------- | ----------------------------------------------- |
@@ -128,7 +134,7 @@ curl --location -g --request POST <后台配置的游戏方二次校验接口地
 ```
 curl --location -g --request POST <后台配置的游戏方发送道具接口地址> \
 --header 'Content-Type: application/json' \
---data-raw '{"activity_id": <后台活动ID>,"character_id":"uid","content":"[{\"name\": \"奖品名称\", \"number\": 2}]","ext":<兑换提交的ext>,"gift_code":"gift_code","nonce_str":"abcdc","server_code":<后台配置的code>,"sign":"fbe23e6f6f5193355b29e9ea2913b1992af56346","check_ext":<二次兑换接口返回的ext>,"timestamp":1658827492}'
+--data-raw '{"activity_id": <后台活动ID>,"character_id":"uid","content":"[{\"name\": \"奖品名称\", \"number\": 2}]","content_obj": [{"name": "奖品名称", "number": 2}],"ext":<兑换提交的ext>,"gift_code":"gift_code","nonce_str":"abcdc","server_code":<后台配置的code>,"sign":"fbe23e6f6f5193355b29e9ea2913b1992af56346","check_ext":<二次兑换接口返回的ext>,"timestamp":1658827492,"custom":{<自定义维度>:[<自定义维度字段1>,<自定义维度字段2>]}}'
 ```
 
 同样请在发送完成后返回带有特定字段的 JSON 返回值告诉兑换系统发送道具结果，也可以使用下划线命名返回字段。
@@ -143,20 +149,25 @@ curl --location -g --request POST <后台配置的游戏方发送道具接口地
 如果您并不要求兑换系统知晓兑换的错误信息可以直接返回 **非 200 HTTP code** 表示兑换失败，或者返回 **HTTP code 200** 表示兑换成功。
 这样就无需按兑换系统的格式来返回信息。
 
-| 请求参数       | 类型           | 含义                         |
-| -------------- | -------------- | ---------------------------- |
-| activity_id    | 字符串         | 礼包活动 ID                  |
-| character_id   | 字符串         | 兑换的用户 ID                |
-| server_code    | 字符串         | 服务器 code                  |
-| content        | 字符串（JSON） | 后台配置的自定义奖品         |
-| content.name   | 字符串         | 奖品名称                     |
-| content.number | 数字           | 奖品数量                     |
-| ext            | 字符串         | 请求接口时传递的数值         |
-| gift_code      | 字符串         | 用户此次兑换的礼包码         |
-| nonce_str      | 字符串         | 此次请求的随机字符串         |
-| sign           | 字符串         | 签名                         |
-| check_ext      | 字符串         | 二次校验透传过来的字符串参数 |
-| timestamp      | 数字           | 秒级时间戳                   |
+| 请求参数           | 类型                          | 含义                         |
+| ------------------ | ----------------------------- | ---------------------------- |
+| activity_id        | 字符串                        | 礼包活动 ID                  |
+| character_id       | 字符串                        | 兑换的用户 ID                |
+| server_code        | 字符串                        | 服务器 code                  |
+| content            | 字符串（嵌套JSON字符串）      | 后台配置的自定义奖品         |
+| content.name       | 字符串                        | 奖品名称                     |
+| content.number     | 数字                          | 奖品数量                     |
+| content_obj        | 对象数组（和content含义相同） | 后台配置的自定义奖品         |
+| content_obj.name   | 字符串                        | 奖品名称                     |
+| content_obj.number | 浮点数                        | 奖品数量                     |
+| ext                | 字符串                        | 请求接口时传递的数值         |
+| gift_code          | 字符串                        | 用户此次兑换的礼包码         |
+| nonce_str          | 字符串                        | 此次请求的随机字符串         |
+| sign               | 字符串                        | 签名                         |
+| check_ext          | 字符串                        | 二次校验透传过来的字符串参数 |
+| timestamp          | 数字                          | 秒级时间戳                   |
+| custom             | 对象                          | 维度信息                     |
+| custom.xxx         | 字符数组                      | 自定义维度                   |
 
 | 返回参数  | 类型   | 含义                                            |
 | --------- | ------ | ----------------------------------------------- |
@@ -171,6 +182,12 @@ curl --location -g --request POST <后台配置的游戏方发送道具接口地
 
 兑换系统在接收到兑换请求后直接将兑换结果返回，游戏根据返回结果判断是否发放道具。
 
+接口参数的详细说明请看文档下面的 [**三种兑换接口 - 无服务器兑换接口**](#1)
+
+### 维度配置
+
+在礼包后台中可以配置自定义维度信息，配置完成后创建活动礼包时可以勾选上相应维度信息。这些勾选上维度的礼包在二次校验，发送道具，以及无服务器返回结果里会带上勾选的维度参数，方便您对礼包做进一步分类业务的处理。
+
 ### 请求域名
 
 | TapTap 版本     | 域名                      |
@@ -178,7 +195,7 @@ curl --location -g --request POST <后台配置的游戏方发送道具接口地
 | 国内 taptap.com | https://poster-api.xd.cn  |
 | 海外 taptap.io  | https://poster-api.xd.com |
 
-### 签名
+<h3 id="2">签名</h3>
 
 游戏方与兑换系统的接口通讯时将使用签名参数作为基础的安全验证，其中 **Secret 为后台 游戏服务 - 应用配置 中 Server Secret**。
 
@@ -209,6 +226,10 @@ func TestMakeSign(t *testing.T) {
 
 ```
 sign == sha1(timestamp + nonce_str + client_id)
+```
+
+```
+c_sign == sha1(timestamp + content + client_id)
 ```
 
 ### 三种兑换接口
@@ -266,7 +287,7 @@ curl --location --request POST '<URL>/api/v1.0/cdk/game/submit-send' \
 --data-raw '{"client_id":<后台ClientId>,"gift_code":<这次使用的兑换码>,"server_code":<服务器code>,"character_id":<游戏用户ID>,"nonce_str":<随机字符串>,"sign":<签名>,"timestamp":<时间戳>,"ext": <透传字段>}'
 ```
 
-#### 无服务器兑换接口
+<h3 id="1">无服务器兑换接口</h3>
 
 POST /api/v1.0/cdk/game/submit-simple
 
@@ -284,16 +305,23 @@ Header Content-Type:application/json
 
 返回参数：
 
-| 返回参数       | 类型           | 含义                             |
-| -------------- | -------------- | -------------------------------- |
-| activity_id    | 字符串         | 礼包活动 ID                      |
-| nonce_str      | 字符串         | 随机字符串                       |
-| timestamp      | 字符串         | 时间戳                           |
-| content        | 字符串（JSON） | 后台配置的自定义奖品             |
-| content.name   | 字符串         | 奖品名称                         |
-| content.number | 数字           | 奖品数量                         |
-| sign           | 字符串         | 返回签名，验证返回数据没有被修改 |
-| success        | 布尔           | 是否成功                         |
+| 返回参数           | 类型                          | 含义                             |
+| ------------------ | ----------------------------- | -------------------------------- |
+| activity_id        | 字符串                        | 礼包活动 ID                      |
+| nonce_str          | 字符串                        | 随机字符串                       |
+| timestamp          | 字符串                        | 时间戳                           |
+| content            | 字符串（嵌套JSON字符串）      | 后台配置的自定义奖品             |
+| content.name       | 字符串                        | 奖品名称                         |
+| content.number     | 数字                          | 奖品数量                         |
+| content_obj        | 数组对象（含义与content相同） | 后台配置的自定义奖品             |
+| content_obj.name   | 字符串                        | 奖品名称                         |
+| content_obj.number | 浮点数                        | 奖品数量                         |
+| sign               | 字符串                        | 返回签名，验证返回数据没有被修改 |
+| c_sign             | 字符串                        | 内容签名，验证返回数据没有被修改 |
+| error              | 整形                          | 0为成功，其它为失败码            |
+| success            | 布尔                          | 是否成功                         |
+| custom             | 对象                          | 维度信息                         |
+| custom.xxx         | 字符数组                      | 自定义维度                       |
 
 请求示例：
 
@@ -333,12 +361,26 @@ echo $RESULT_REQUEST
 
 ```json
 {
-  "activity_id": "TDS20220928151122U9H",
-  "content": "[{\"name\": \"奖品\", \"number\": 2}]",
-  "nonce_str": "0DD4B",
-  "sign": "5895f87d3dfb5e0918c1b195c015d9284609d122",
-  "timestamp": 1664354023,
-  "success": true
+    "activity_id":"TDS20220928151122U9H",
+    "content":"[{\"name\": \"奖品\", \"number\": 2}]",
+    "content_obj":[
+        {
+            "name":"奖品名称",
+            "number":2
+        }
+    ],
+    "nonce_str":"0DD4B",
+    "sign":"5895f87d3dfb5e0918c1b195c015d9284609d122",
+    "timestamp":1664354023,
+    "success":true,
+    "error":0,
+    "c_sign":"12c6fc06c99a462375eeb3f43dfd832b08ca9e17",
+    "custom":{
+        "seasons":[
+            "101",
+            "102"
+        ]
+    }
 }
 ```
 
@@ -349,7 +391,8 @@ echo $RESULT_REQUEST
 ```json
 {
   "success": true,
-  "messages": "成功"
+  "messages": "成功",
+  "error": 0
 }
 ```
 
@@ -443,28 +486,26 @@ Header Content-Type:application/json
 
 ### 错误码
 
-| 自定义状态码 | 含义                                           |
-| ------------ | ---------------------------------------------- |
-| 100001       | 输入有误                                       |
-| 100002       | 账号验证失败                                   |
-| 100003       | 其它错误                                       |
-| 100004       | 验证码输入错误，请重试                         |
-| 100005       | 参数错误                                       |
-| 100006       | 超过使用限额                                   |
-| 100007       | 超过批次使用限额                               |
-| 100008       | 不在礼包活动时间范围之内                       |
-| 100009       | 暂未开放                                       |
-| 100010       | 超出服使用范围                                 |
-| 100011       | 点击太快了，手速慢点                           |
-| 100012       | 超出礼包最大兑换次数                           |
-| 100013       | 校验 cdkey 未通过                              |
-| 100014       | 操作的人太多了，服务器正在拼命处理中（限流中） |
-| 100015       | 发送道具失败                                   |
-| 100016       | 该礼包码无效                                   |
-| 100017       | 该礼包码活动无效                               |
-| 100018       | 该活动无法使用此兑换接口                       |
-| 500001       | 服务器故障                                     |
-| 500002       | 外部接口校验错误                               |
+| 自定义状态码 | 含义                                           | 复现场景                                 |
+| ------------ | ---------------------------------------------- | ---------------------------------------- |
+| 100001       | 输入有误                                       | 发起请求的参数错误或者缺失部分必要参数   |
+| 100004       | 验证码输入错误，请重试                         | 校验图形验证码错误                       |
+| 100005       | 参数错误                                       | 提交的ClientId或者ServerCode错误         |
+| 100006       | 兑换码兑换次数已达上限                         | 兑换的兑换码没有库存了                   |
+| 100008       | 不在礼包活动时间范围之内                       | 礼包活动已过期                           |
+| 100009       | 暂未开放                                       | 礼包活动暂停兑换                         |
+| 100010       | 超出服使用范围                                 | 提交的ServerCode错误，不在礼包设置的范围 |
+| 100011       | 点击太快了，手速慢点                           | 唯一码连续提交                           |
+| 100012       | 超出礼包最大兑换次数                           | 通兑码库存不足（并发兑换时可能触发）     |
+| 100013       | 校验cdkey未通过                                | 二次校验游戏方返回了不通过结果           |
+| 100014       | 操作的人太多了，服务器正在拼命处理中（限流中） | 兑换系统已达流量极限                     |
+| 100015       | 发送道具失败                                   | 发送道具游戏方返回了失败结果             |
+| 100016       | 该礼包码无效                                   | 异常兑换码的提交                         |
+| 100017       | 该用户超出礼包最大兑换次数                     | 相同用户使用礼包中超过礼包设置的兑换数量 |
+| 100018       | 该活动无法使用此兑换接口                       | 礼包无服务器设置错误                     |
+| 100022       | 该区域不支持此兑换码                           | 非此ClientId的唯一兑换码                 |
+| 500001       | 服务器故障                                     | 礼包系统出现通用性错误                   |
+| 500002       | 外部接口校验错误                               | 与游戏方接口通讯发生了异常               |
 
 ### 自定义条件关系表
 
@@ -495,3 +536,15 @@ A: 请检查您的请求中 header 信息，是否有带上特殊的 User Agent�
 Q: 二次校验是需要游戏方请求两次兑换接口吗？
 
 A: 二次校验是您按照规范开发校验接口并将地址配置后台中，由兑换系统去请求。
+
+Q: 无服务器返回值的 content 参数无法解析？
+
+A: 返回值的 content 是一段嵌套的 json 字符串，可以先读出字符串再进行进一步 json 解析，除此之外还新增了 content_obj 字段，可以有选择的去使用。
+
+Q: 如何判断兑换是否成功？
+
+A: 可以根据返回值中的 error 字段是否为0来判断。
+
+Q: 无服务器兑换的 sign 字段如何使用？
+
+A: 可以参考文档中[**签名部分**](#2)。
