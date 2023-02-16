@@ -193,8 +193,7 @@ LeanCloud 平台保证 99.9% 的高可用性，并且数据访问方面保证了
 
 * [PHP](/sdk/storage/guide/php/)
 
-另外还可以参考 [REST API 使用详解](https://leancloud.cn/docs/rest_api.html)。
-
+另外还可以参考 [REST API 使用详解](/sdk/storage/guide/rest/)。
 ## 常见问题
 
 ### 数据安全有保障吗
