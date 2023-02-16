@@ -1422,7 +1422,7 @@ curl -X POST \
 
 #### 查询好友申请
 
-查询好友申请和普通表的查询相同，详细请参考[查询约束](https://leancloud.cn/docs/rest_api.html#hash827796182)。
+查询好友申请和普通表的查询相同，详细请参考[查询约束](/sdk/storage/guide/rest/#查询约束)。
 
 ```sh
 curl -X GET \
@@ -1496,7 +1496,7 @@ curl -X DELETE \
 
 #### 查询好友列表
 
-好友列表存于 `_Followee` 表，查询方式和普通表的查询相同，详细请参考[查询约束](https://leancloud.cn/docs/rest_api.html#hash827796182)。
+好友列表存于 `_Followee` 表，查询方式和普通表的查询相同，详细请参考[查询约束](/sdk/storage/guide/rest/#查询约束)。
 
 ```sh
 curl -X GET \

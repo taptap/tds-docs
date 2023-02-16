@@ -76,6 +76,14 @@ const CONFIGS: {
       { label: "iOS", value: "ios" },
       { label: "JavaScript", value: "js" },
     ],
+    leancloud: [
+      { label: "C#", value: "charp" },
+      { label: "Java", value: "java" },
+      { label: "Objective-C", value: "objc" },
+      { label: "JavaScript", value: "js" },
+      { label: "Swift", value: "swift" },
+      { label: "Flutter", value: "flutter" },
+    ]
   },
   default: {
     leancloud: [

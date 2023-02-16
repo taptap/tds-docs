@@ -56,6 +56,12 @@ const captionStyle = {
   fontWeight: 400,
   color: COLORS.grey04,
 };
+const captionStrongStyle = {
+  fontSize: "12px",
+  lineHeight: "18px",
+  fontWeight: 700,
+  color: COLORS.grey04,
+}
 
 const quoteStyle = (isRecommended: boolean) => ({
   margin: 0,
@@ -118,6 +124,7 @@ export const Background = ({ children, title, content }) => (
 export const Figure = ({
   subtitle,
   caption,
+  strong = false,
   imgSrc,
   imgAlt,
   isRecommended,
@@ -149,7 +156,7 @@ export const Figure = ({
           gap: "8px",
         }}
       >
-        {caption && <figcaption style={captionStyle}>{caption}</figcaption>}
+        {caption && <figcaption style={{ ...(strong ? captionStrongStyle : captionStyle) }}>{caption}</figcaption>}
 
         <img
           src={imgSrc}
