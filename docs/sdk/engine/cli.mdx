@@ -344,22 +344,32 @@ OPTIONS:
 <details>
 <summary>点击展开 GitLab CI (<code>.gitlab-ci.yml</code>) 模版</summary>
 
-在 GitLab 左侧点击 **CI/CD > Editor** 新建一个 `.gitlab-ci.yml` 文件并添加以下内容。注意替换 `YOUR_REGION` 和 `YOUR_APP_ID` 为相应的区域和 App ID，并在 GitLab 的 **Settings > CI/CD > Variables** 中添加你的 ACCESS_TOKEN。
+首先在 GitLab 点击 **Settings > CI/CD > Variables > Add variable** 添加你的 ACCESS_TOKEN，注意勾选 “Mask variable” 避免出现在日志中。
+
+然后在 GitLab 左侧点击 **CI/CD > Editor** 新建一个 `.gitlab-ci.yml` 文件并添加以下内容。注意修改 `variables` 中的设置。
 
 <CodeBlock className="yaml">
-{`before_script:
+{`variables:
+  REGION: MY_REGION # set this to your ${BRAND == 'tds' ? 'TDS' : 'LeanCloud'} region, e.g. ${BRAND == 'tds' ? 'cn-tds1' : 'cn-n1'}
+  APP_ID: MY_APP_ID # set this to your App ID on ${BRAND == 'tds' ? 'TDS' : 'LeanCloud'}
+  GROUP: MY_GROUP   # set this to your group, e.g. web\n
+before_script:
   - apt-get update && apt-get install -y curl
   - curl -L -o /bin/${CLI_BINARY} http://releases.leanapp.cn/leancloud/lean-cli/releases/download/v1.1.0/${CLI_BINARY}-linux-x64
-  - chmod +x /bin/${CLI_BINARY}\n
+  - chmod +x /bin/${CLI_BINARY}
+  - ${CLI_BINARY} login --region $REGION --token $ACCESS_TOKEN
+  - ${CLI_BINARY} switch --region $REGION --group $GROUP $APP_ID\n
 deploy_preview:
   stage: deploy
   script:
-    - ${CLI_BINARY} login --region YOUR_REGION --token $ACCESS_TOKEN
-    - ${CLI_BINARY} switch --region YOUR_REGION --group web YOUR_APP_ID
-    - ${CLI_BINARY} preview deploy
+    - PREVIEW_URL=\$(${CLI_BINARY} preview deploy)
+    - echo "PREVIEW_URL=$PREVIEW_URL" >> deploy.env
+  artifacts:
+    reports:
+      dotenv: deploy.env   
   environment:
     name: preview/$CI_COMMIT_REF_NAME
-    url: TODO_FILL_THIS_URL
+    url: $PREVIEW_URL
     on_stop: delete_preview
     auto_stop_in: 1 week
   only:
@@ -380,7 +390,7 @@ delete_preview:
 <details>
 <summary>点击展开 GitHub Actions 模版</summary>
 
-在 GitHub 打开 **Settings > Secrets and variables > Actions** 中创建一个 secret，添加你的 ACCESS_TOKEN。
+首先在 GitHub 点击 **Settings > Secrets and variables > Actions** 创建一个 secret，添加你的 ACCESS_TOKEN。
 
 然后在 GitHub 点击 **Actions > set up a workflow yourself** 创建两个 Workflow 文件，注意修改 `env` 中的设置：
 
