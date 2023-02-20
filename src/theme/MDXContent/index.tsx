@@ -107,9 +107,8 @@ const createFeedback = async (data) => {
       "Content-Type": "application/json",
       "X-DC-XSRF-TOKEN": await getXsrfToken(),
     },
-    data: JSON.stringify(data),
   };
-  await axios.post(url, config);
+  await axios.post(url, data, config);
 };
 
 interface SelectionFeedbackBtnProps {
