@@ -12,6 +12,7 @@ import IconClose from "./icons/close.svg";
 import IconEmpty from "./icons/empty.svg";
 import IconStar from "./icons/star.svg";
 import IconInfo from "./icons/info.svg";
+import IconSuccess from "./icons/success.svg";
 import tap from "./icons/tap.png";
 
 type Position = { top: number; left: number };
@@ -31,7 +32,7 @@ type FeedbackThread = {
 };
 
 type FeedbackContext = {
-  entryType: "selection" | "paragraph" | "page";
+  entryType: number;
   text?: string;
 };
 
@@ -40,6 +41,11 @@ const getValueFromCookie = (name: string): string | undefined =>
     .split("; ")
     .find((row) => row.startsWith(`${name}=`))
     ?.split("=")[1];
+
+const getPageId = (): string => window.location.pathname.substring(5);
+
+const getRegion = (): string =>
+  window.location.host === "developer.taptap.io" ? "io" : "cn";
 
 const getIsLoggedIn = (): boolean => {
   const userId: string | undefined = getValueFromCookie("user_id");
@@ -51,10 +57,10 @@ const fetchFeedbackCount = async (): Promise<number> => {
   const config = {
     headers: {
       accept: "application/json",
-      region: "cn",
+      region: getRegion(),
     },
     params: {
-      page_id: window.location.pathname.substring(5),
+      page_id: getPageId(),
     },
   };
   const {
@@ -68,10 +74,10 @@ const fetchFeedbackList = async (): Promise<FeedbackThread[]> => {
   const config = {
     headers: {
       accept: "application/json",
-      region: "cn",
+      region: getRegion(),
     },
     params: {
-      page_id: window.location.pathname.substring(5),
+      page_id: getPageId(),
     },
   };
   const {
@@ -89,6 +95,20 @@ const getXsrfToken = async (): Promise<string> => {
     token = getValueFromCookie("DC_XSRF_TOKEN") as string;
   }
   return token;
+};
+
+const createFeedback = async (data) => {
+  const url = "/api/config/v1/feedback/submit";
+  const config = {
+    headers: {
+      accept: "application/json",
+      region: getRegion(),
+      "Content-Type": "application/json",
+      "X-DC-XSRF-TOKEN": await getXsrfToken(),
+    },
+    data: JSON.stringify(data),
+  };
+  await axios.post(url, config);
 };
 
 interface SelectionFeedbackBtnProps {
@@ -149,7 +169,7 @@ function SelectionFeedbackBtn({
       className={styles.selectionFeedbackBtn}
       style={getBtnPositionFromRange(selection.range)}
       onClick={() => {
-        setContext({ entryType: "selection", text: selection.text });
+        setContext({ entryType: 1, text: selection.text });
       }}
     >
       <IconEdit className={styles.icon} />
@@ -175,7 +195,7 @@ function PageFeedbackBtn({
     <button
       className={styles.pageFeedbackBtn}
       onClick={() => {
-        setContext({ entryType: "page" });
+        setContext({ entryType: 3 });
       }}
     >
       <IconBook className={styles.icon} />
@@ -195,6 +215,7 @@ interface FeedbackModalProps {
   feedbackList: FeedbackThread[];
   context: FeedbackContext;
   setContext: (context: null) => void;
+  showToast: () => void;
 }
 
 function FeedbackModal({
@@ -202,6 +223,7 @@ function FeedbackModal({
   feedbackList,
   context,
   setContext,
+  showToast,
 }: FeedbackModalProps) {
   const TYPE_OPTIONS = [
     {
@@ -223,6 +245,7 @@ function FeedbackModal({
 
   const [type, setType] = useState<number | null>(null);
   const [content, setContent] = useState<string>("");
+  const [processing, setProcessing] = useState<boolean>(false);
 
   const handleTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setType(parseInt(e.target.value));
@@ -230,6 +253,25 @@ function FeedbackModal({
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setContent(e.target.value);
+  };
+
+  const submitFeedback = async () => {
+    setProcessing(true);
+    const data = {
+      pageId: getPageId(),
+      entryType: context.entryType,
+      type: type,
+      docStart: (context.text || "").slice(0, 10),
+      docUrl: window.location.href,
+      content: content,
+    };
+    try {
+      await createFeedback(data);
+      showToast();
+      setContext(null);
+    } catch (error) {
+      setProcessing(false);
+    }
   };
 
   return (
@@ -308,7 +350,7 @@ function FeedbackModal({
                   <section className={styles.loose}>
                     <span className={styles.subtitle}>
                       <IconStar className={styles.icon} />
-                      {context.entryType === "selection"
+                      {context.entryType === 1
                         ? "您对所选内容反馈的类型是："
                         : "您反馈的类型是："}
                     </span>
@@ -367,7 +409,10 @@ function FeedbackModal({
                 ) : (
                   <span>
                     为了可以更好的解决您的问题，请{" "}
-                    <a href="#">登录TapTap账号</a> 提出反馈意见
+                    <a href={`/auth/login?refer=${window.location.pathname}`}>
+                      登录TapTap账号
+                    </a>{" "}
+                    提出反馈意见
                   </span>
                 )}
               </span>
@@ -382,7 +427,8 @@ function FeedbackModal({
                 </button>
                 <button
                   className={styles.primary}
-                  disabled={type === null || content.length === 0}
+                  disabled={type === null || content.length === 0 || processing}
+                  onClick={submitFeedback}
                 >
                   提交
                 </button>
@@ -393,7 +439,10 @@ function FeedbackModal({
           <section className={styles.empty}>
             <IconEmpty className={styles.icon} />
             <p>
-              为了可以更好的解决您的问题，请 <a href="#">登录TapTap账号</a>{" "}
+              为了可以更好的解决您的问题，请{" "}
+              <a href={`/auth/login?refer=${window.location.pathname}`}>
+                登录TapTap账号
+              </a>{" "}
               提出反馈意见
             </p>
           </section>
@@ -408,6 +457,7 @@ function Feedback() {
   const [feedbackCount, setFeedbackCount] = useState<number>(0);
   const [feedbackList, setFeedbackList] = useState<FeedbackThread[]>([]);
   const [context, setContext] = useState<FeedbackContext | null>(null);
+  const [isToastOn, setIsToastOn] = useState<boolean>(false);
 
   const updateIsLoggedIn = () => {
     const isLoggedIn: boolean = getIsLoggedIn();
@@ -422,6 +472,14 @@ function Feedback() {
   const updateFeedbackList = async () => {
     const feedbackList: FeedbackThread[] = await fetchFeedbackList();
     setFeedbackList(feedbackList);
+  };
+
+  const showToast = () => {
+    setIsToastOn(true);
+
+    setTimeout(() => {
+      setIsToastOn(false);
+    }, 5000);
   };
 
   useEffect(() => {
@@ -462,7 +520,19 @@ function Feedback() {
           feedbackList={feedbackList}
           context={context}
           setContext={setContext}
+          showToast={showToast}
         />
+      ) : (
+        <></>
+      )}
+
+      {isToastOn ? (
+        <div className={styles.toastWrapper}>
+          <div className={styles.toast}>
+            <IconSuccess className={styles.icon} />
+            <span>反馈成功，经官方确认后将对外展示。</span>
+          </div>
+        </div>
       ) : (
         <></>
       )}
