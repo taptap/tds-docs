@@ -198,7 +198,7 @@ function ParagraphFeedbackBtn({
     if (
       !e.target.classList.contains("theme-doc-markdown") &&
       e.target.closest(".theme-doc-markdown") &&
-      !e.target.closest(".feedback_src-theme-MDXContent-index-module")
+      !e.target.closest(`.${styles.paragraphFeedbackBtn}`)
     ) {
       let target = e.target;
       while (!target.parentNode.classList.contains("theme-doc-markdown")) {
