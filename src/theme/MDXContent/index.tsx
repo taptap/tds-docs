@@ -383,7 +383,9 @@ function FeedbackModal({
                             <span>{thread.creatorSimpleUser.nickname}</span>
                             <span>|</span>
                             <span className={styles.muted}>
-                              {thread.createdTime}
+                              {new Date(thread.createdTime).toLocaleString(
+                                "zh-CN"
+                              )}
                             </span>
                           </div>
                           <p>{thread.content}</p>
@@ -396,7 +398,9 @@ function FeedbackModal({
                               <span>官方回复</span>
                               <span>|</span>
                               <span className={styles.muted}>
-                                {thread.updatedTime}
+                                {new Date(thread.updatedTime).toLocaleString(
+                                  "zh-CN"
+                                )}
                               </span>
                             </div>
                             <p>{thread.replyContent}</p>
