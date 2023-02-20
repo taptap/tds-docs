@@ -163,7 +163,16 @@ TDS 内建账户服务是 TDS 提供的支持多种登录方式的用户系统�
 <MultiLang kind="ue">
 
 ```cs
-// Todo 1
+try {
+try {
+    string token = await TDSUser.RetrieveShortToken();
+    await TapSupport.LoginWithTDSCredential(token);
+    Debug.Log("登录 TDSUser JWT 完成");
+} catch (TapException e) {
+    Debug.LogError($"{e.Code} : {e.Message}");
+} catch (Exception e) {
+    Debug.Log(e);
+}
 ```
 
 ```java
@@ -235,9 +244,10 @@ TDSUser.retrieveShortTokenInBackground(tdsUser.getSessionToken()).subscribe(new 
 <MultiLang kind="ue">
 
 ```cs
-// Todo 2
-// 处理 EXPIRED_CREDENTIAL 异常(9006)，重试登录流程
-// 提示开发者向用户展示其他异常
+if (e is TapException ex && ex.Code == 9006) {
+    // 登录过期
+
+}
 ```
 
 ```java
@@ -309,7 +319,7 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJVMTIzNDU2NyIsIm5hbWUiOiJEYXNoIn0
 <MultiLang kind="ue">
 
 ```cs
-// Todo 3
+TapSupport.LoginWithCustomCredential(jwt);
 ```
 
 ```java
@@ -349,9 +359,11 @@ TapSupport.loginWithCustomCredential("User JWT");
 <MultiLang kind="ue">
 
 ```cs
-// Todo 2
-// 处理 EXPIRED_CREDENTIAL 异常(9006)，重试登录流程
-// 提示开发者向用户展示其他异常
+if (e is TapException ex && ex.Code == 9006) {
+    // 登录过期
+} else {
+    // 其他异常
+}
 ```
 
 ```java
@@ -476,8 +488,7 @@ TapUESupport::Logout();
 <MultiLang kind="ue">
 
 ```cs
-// TODO 4: 确认是否可以省略参数
-TapSupport.OpenSupportView("/");
+TapSupport.OpenSupportView();
 ```
 
 ```java
@@ -506,8 +517,7 @@ TapUESupport::OpenSupportView("/", nullptr, nullptr);
 <MultiLang kind="ue">
 
 ```cs
-// TODO 5: 确认是否可以省略参数
-TapSupport.OpenSupportView("/path");
+TapSupport.OpenSupportView();
 ```
 
 ```java
@@ -579,7 +589,7 @@ TapUESupport::OpenSupportView("/", nullptr, Fields);
 <MultiLang kind="ue">
 
 ```cs
-TapSupport.SetDefaultFieldsData(fields);
+TapSupport.SetDefaultFieldsData(fields: fields);
 ```
 
 ```java
@@ -601,7 +611,9 @@ TapUESupport::SetDefaultFieldsData(Fields);
 <MultiLang kind="ue">
 
 ```cs
-// TODO 7
+TapSupport.DefaultFields = new Dictionary<string, object> {
+    { "key", "value" }
+};
 ```
 
 ```java
