@@ -70,12 +70,8 @@ TapSupport SDK 依赖 TapCommon 模块：
 PublicDependencyModuleNames.AddRange(
             new string[]
             {
-                "Core",
-                "Json",
-                "JsonUtilities",
-                "UMG",
-                "Http",
-                "TapCommon"
+                "TapCommon",
+                "TapSupport"
                 // ... add other public dependencies that you statically link with here ...
             }
             );
@@ -227,7 +223,28 @@ TDSUser.retrieveShortTokenInBackground(tdsUser.getSessionToken()).subscribe(new 
 ```
 
 ```cpp
-// Todo 1
+if (TSharedPtr<FTDSUser> User = FTDSUser::GetCurrentUser())
+{
+    User->RetrieveShortToken(
+        FStringSignature::CreateLambda([](const FString& Credential)
+        {
+            /** 获取Credential成功 */
+            TapUESupport::LoginWithTDSCredential(
+                Credential,
+                FSimpleDelegate::CreateLambda([]()
+                {
+                    /*** 登录成功 */
+                }),
+                FTUError::FDelegate::CreateLambda([](const FTUError& Error)
+                {
+                    /*** 登录失败 */
+                }));
+        }),
+        FLCError::FDelegate::CreateLambda([](const FLCError& Error)
+        {
+            /** 获取Credential失败 */
+        }));
+}
 ```
 
 </MultiLang>
@@ -274,9 +291,28 @@ if (error) {
 ```
 
 ```cpp
-// Todo 2
-// 处理 EXPIRED_CREDENTIAL 异常(9006)，重试登录流程
-// 提示开发者向用户展示其他异常
+/*** 上面登录失败 */
+if (Error.code == 9006)
+{
+    /**** 登录过期 */
+}
+else
+{
+    /**** 其它错误 */
+}
+    
+TapUESupport::OnErrorCallBack.BindLambda([](const FTUError& Error)
+{
+    /** 查询未读消息时异常 */
+    if (Error.code == 9006)
+    {
+        /*** 过期 */
+    }
+    else
+    {
+        /*** 其它错误 */
+    }
+});
 ```
 
 </MultiLang>
@@ -331,7 +367,7 @@ TapSupport.loginWithCustomCredential("User JWT");
 ```
 
 ```cpp
-// Todo 3
+TapUESupport::LoginWithCustomCredential(TEXT("User JWT"));
 ```
 
 </MultiLang>
@@ -390,9 +426,18 @@ if (error) {
 ```
 
 ```cpp
-// Todo 2
-// 处理 EXPIRED_CREDENTIAL 异常(9006)，重试登录流程
-// 提示开发者向用户展示其他异常
+TapUESupport::OnErrorCallBack.BindLambda([](const FTUError& Error)
+{
+    /** 查询未读消息时异常 */
+    if (Error.code == 9006)
+    {
+        /*** 过期 */
+    }
+    else
+    {
+        /*** 其它错误 */
+    }
+});
 ```
 
 </MultiLang>
@@ -500,8 +545,7 @@ TapSupport.openSupportView();
 ```
 
 ```cpp
-// TODO 4: 确认是否可以省略参数
-TapUESupport::OpenSupportView("/", nullptr, nullptr);
+TapUESupport::OpenSupportView();
 ```
 
 </MultiLang>
@@ -529,8 +573,7 @@ TapSupport.openSupportView("/path");
 ```
 
 ```cpp
-// TODO 5: 确认是否可以省略参数
-TapUESupport::OpenSupportView("/path", nullptr, nullptr);
+TapUESupport::OpenSupportView(TEXT("/path"));
 ```
 
 </MultiLang>
@@ -575,11 +618,10 @@ NSDictionary *fields = @{@"243":@"iOS 15.1", @"244":@"WiFi"}; // 243 是在后�
 ```
 
 ```cpp
-// TODO 6: 确认是否可以省略参数
 TSharedPtr<FJsonObject> Fields = MakeShareable(new FJsonObject);
 Fields->SetStringField("243", "iOS 15.1");
 Fields->SetStringField("244", "Dash");
-TapUESupport::OpenSupportView("/", nullptr, Fields);
+TapUESupport::OpenSupportView("/", Fields);
 ```
 
 </MultiLang>
@@ -625,7 +667,8 @@ TapSupport.updateDefaultField("key", "value");
 ```
 
 ```cpp
-// TODO 7
+TSharedPtr<FJsonValue> Value = MakeShared<FJsonValueString>(TEXT("Value"));
+TapUESupport::UpdateDefaultField(TEXT("key"), Value);
 ```
 
 </MultiLang>
