@@ -260,53 +260,63 @@ if (TSharedPtr<FTDSUser> User = FTDSUser::GetCurrentUser())
 <MultiLang kind="ue">
 
 ```cs
-if (e is TapException ex && ex.Code == 9006) {
-    // 登录过期
-  } else {
-    // 其他异常
-}
+using TapTap.Support;
+
+TapSupport.Init("https://please-replace-with-your-customized.domain.com", "分类 ID", new TapSupportCallback
+{
+   OnGetUnreadStatusError = (exception) => {
+        if (e is TapException ex && ex.Code == 9006) {
+            // 登录过期，重新执行 TDSUser.RetrieveShortToken 以及 TapSupport.LoginWithTDSCredential
+        } else {
+            // 其他异常
+        }
+    }
+});
 ```
 
 ```java
-if (e instanceof ServerException) {
-    try {
-        org.json.JSONObject errorResponse = new org.json.JSONObject(((ServerException) e).responseBody);
-        if(errorResponse.getInt("numCode")==9006){
-            // 登录过期
-        }
-    } catch (JSONException ex) {
-        // ignore
+import com.tds.tapsupport.TapSupport;
+import com.tds.tapsupport.TapSupportCallback;
+import com.tds.tapsupport.TapSupportConfig;
+
+TapSupportConfig config = new TapSupportConfig("https://please-replace-with-your-customized.domain.com", "分类 ID", new TapSupportCallback() {
+    @Override
+    public void onGetUnreadStatusError(Throwable e) {
+      if (e instanceof ServerException) {
+          try {
+              org.json.JSONObject errorResponse = new org.json.JSONObject(((ServerException) e).responseBody);
+              if(errorResponse.getInt("numCode")==9006){
+                  // 登录过期，重新执行 TDSUser.retrieveShortTokenInBackground 以及 TapSupport.loginWithTDSCredential
+              } else {
+                  // 其他异常
+              }
+          } catch (JSONException ex) {
+              // ignore
+          }
+      }
     }
-}
+});
+TapSupport.setConfig(this, config);
 ```
 
 ```objc
-if (error) {
-  if (error.code == 9006) {
-    // 重新登录
-  } else {
-    // 其他异常
+- (void)onGetUnreadStatusError:(nonnull NSError *)error {
+  if (error) {
+    if (error.code == 9006) {
+      // 登录过期，重新执行 TDSUser retrieveShortTokenWithCallback 以及 TapSupport loginWithTDSCredential
+    } else {
+      // 其他异常
+    }
   }
 }
 ```
 
 ```cpp
-/*** 上面登录失败 */
-if (Error.code == 9006)
-{
-    /**** 登录过期 */
-}
-else
-{
-    /**** 其它错误 */
-}
-    
 TapUESupport::OnErrorCallBack.BindLambda([](const FTUError& Error)
 {
-    /** 查询未读消息时异常 */
     if (Error.code == 9006)
     {
-        /*** 过期 */
+        /*** 登录过期，重新执行 User->RetrieveShortToken 以及 TapUESupport::LoginWithTDSCredential */
     }
     else
     {
@@ -395,32 +405,53 @@ TapUESupport::LoginWithCustomCredential(TEXT("User JWT"));
 <MultiLang kind="ue">
 
 ```cs
-if (e is TapException ex && ex.Code == 9006) {
-    // 登录过期
-} else {
-    // 其他异常
-}
+using TapTap.Support;
+
+TapSupport.Init("https://please-replace-with-your-customized.domain.com", "分类 ID", new TapSupportCallback
+{
+   OnGetUnreadStatusError = (exception) => {
+        if (e is TapException ex && ex.Code == 9006) {
+            // 登录过期，重新获取新的 JWT 并执行 TapSupport.LoginWithCustomCredential(jwt)
+        } else {
+            // 其他异常
+        }
+    }
+});
 ```
 
 ```java
-if (e instanceof ServerException) {
-    try {
-        org.json.JSONObject errorResponse = new org.json.JSONObject(((ServerException) e).responseBody);
-        if(errorResponse.getInt("numCode")==9006){
-            // 登录过期
-        }
-    } catch (JSONException ex) {
-        // ignore
+import com.tds.tapsupport.TapSupport;
+import com.tds.tapsupport.TapSupportCallback;
+import com.tds.tapsupport.TapSupportConfig;
+
+TapSupportConfig config = new TapSupportConfig("https://please-replace-with-your-customized.domain.com", "分类 ID", new TapSupportCallback() {
+    @Override
+    public void onGetUnreadStatusError(Throwable e) {
+      if (e instanceof ServerException) {
+          try {
+              org.json.JSONObject errorResponse = new org.json.JSONObject(((ServerException) e).responseBody);
+              if(errorResponse.getInt("numCode")==9006){
+                  // 登录过期，重新获取新的 JWT 并执行 TapSupport.loginWithCustomCredential("new JWT");
+              } else {
+                  // 其他异常
+              }
+          } catch (JSONException ex) {
+              // ignore
+          }
+      }
     }
-}
+});
+TapSupport.setConfig(this, config);
 ```
 
 ```objc
-if (error) {
-  if (error.code == 9006) {
-    // 重新登录
-  } else {
-    // 其他异常
+- (void)onGetUnreadStatusError:(nonnull NSError *)error {
+  if (error) {
+    if (error.code == 9006) {
+      // 登录过期，重新获取新的 JWT 并执行 [TapSupport loginWithCustomeCredential:@"new JWT"];
+    } else {
+      // 其他异常
+    }
   }
 }
 ```
@@ -428,10 +459,9 @@ if (error) {
 ```cpp
 TapUESupport::OnErrorCallBack.BindLambda([](const FTUError& Error)
 {
-    /** 查询未读消息时异常 */
     if (Error.code == 9006)
     {
-        /*** 过期 */
+        /*** 登录过期，重新获取新的 JWT 并执行 TapUESupport::LoginWithCustomCredential(TEXT("new JWT")); */
     }
     else
     {
@@ -561,7 +591,7 @@ TapUESupport::OpenSupportView();
 <MultiLang kind="ue">
 
 ```cs
-TapSupport.OpenSupportView();
+TapSupport.OpenSupportView("/path");
 ```
 
 ```java
@@ -724,9 +754,6 @@ import com.tds.tapsupport.TapSupportConfig;
 
 TapSupportConfig config = new TapSupportConfig("https://please-replace-with-your-customized.domain.com", "分类 ID", new TapSupportCallback() {
     @Override
-    public void onGetUnreadStatusError(Throwable e) {}
-
-    @Override
     public void onUnreadStatusChanged(boolean hasUnread) {}
 });
 TapSupport.setConfig(this, config);
@@ -745,7 +772,6 @@ config.callback = self;
 
 ```cpp
 TapUESupport::OnUnreadStatusChanged.BindUObject(this, &YourUObject::OnUnreadStatusChanged);
-TapUESupport::OnErrorCallBack.BindUObject(this, &YourUObject::OnErrorCallBack);
 ```
 
 </MultiLang>
