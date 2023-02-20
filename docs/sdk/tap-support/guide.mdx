@@ -167,11 +167,55 @@ TDS 内建账户服务是 TDS 提供的支持多种登录方式的用户系统�
 ```
 
 ```java
-// Todo 1
+TDSUser.retrieveShortTokenInBackground(tdsUser.getSessionToken()).subscribe(new Observer<JSONObject>() {
+    @Override
+    public void onSubscribe(Disposable d) {
+
+    }
+
+    @Override
+    public void onNext(JSONObject jsonObject) {
+        String credential = jsonObject.getString("identityToken");
+        TapSupport.loginWithTDSCredential(credential, new TapSupport.LoginCallback() {
+            @Override
+            public void onComplete(boolean success, Throwable error) {
+                if (success) {
+                    // 登陆成功
+                } else {
+                    // 登录失败
+                    Log.e("TapSupportActivity", "login:error:" + error.toString());
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onError(Throwable error) {
+        // 请求授权 token 失败
+    }
+
+    @Override
+    public void onComplete() {
+
+    }
+});
 ```
 
 ```objc
-// Todo 1
+[TDSUser retrieveShortTokenWithCallback:^(NSString *_Nullable token, NSError *_Nullable error) {
+        if (error) {
+            // 请求授权 token 失败
+        } else {
+            [TapSupport loginWithTDSCredential:token
+                                       handler:^(BOOL succcess, NSError *_Nullable error) {
+                                           if (succcess) {
+                                               // 登陆成功
+                                           } else {
+                                               // 登录失败
+                                           }
+                                       }];
+        }
+    }];
 ```
 
 ```cpp
@@ -197,15 +241,26 @@ TDS 内建账户服务是 TDS 提供的支持多种登录方式的用户系统�
 ```
 
 ```java
-// Todo 2
-// 处理 EXPIRED_CREDENTIAL 异常(9006)，重试登录流程
-// 提示开发者向用户展示其他异常
+if (e instanceof ServerException) {
+    try {
+        org.json.JSONObject errorResponse = new org.json.JSONObject(((ServerException) e).responseBody);
+        if(errorResponse.getInt("numCode")==9006){
+            // 登录过期
+        }
+    } catch (JSONException ex) {
+        // ignore
+    }
+}
 ```
 
 ```objc
-// Todo 2
-// 处理 EXPIRED_CREDENTIAL 异常(9006)，重试登录流程
-// 提示开发者向用户展示其他异常
+if (error) {
+  if (error.code == 9006) {
+    // 重新登录
+  } else {
+    // 其他异常
+  }
+}
 ```
 
 ```cpp
@@ -258,11 +313,11 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJVMTIzNDU2NyIsIm5hbWUiOiJEYXNoIn0
 ```
 
 ```java
-// Todo 3
+TapSupport.loginWithCustomCredential("User JWT");
 ```
 
 ```objc
-// Todo 3
+[TapSupport loginWithCustomeCredential:@"User JWT"];
 ```
 
 ```cpp
@@ -300,15 +355,26 @@ eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJVMTIzNDU2NyIsIm5hbWUiOiJEYXNoIn0
 ```
 
 ```java
-// Todo 2
-// 处理 EXPIRED_CREDENTIAL 异常(9006)，重试登录流程
-// 提示开发者向用户展示其他异常
+if (e instanceof ServerException) {
+    try {
+        org.json.JSONObject errorResponse = new org.json.JSONObject(((ServerException) e).responseBody);
+        if(errorResponse.getInt("numCode")==9006){
+            // 登录过期
+        }
+    } catch (JSONException ex) {
+        // ignore
+    }
+}
 ```
 
 ```objc
-// Todo 2
-// 处理 EXPIRED_CREDENTIAL 异常(9006)，重试登录流程
-// 提示开发者向用户展示其他异常
+if (error) {
+  if (error.code == 9006) {
+    // 重新登录
+  } else {
+    // 其他异常
+  }
+}
 ```
 
 ```cpp
@@ -415,13 +481,11 @@ TapSupport.OpenSupportView("/");
 ```
 
 ```java
-// TODO 4: 确认是否可以省略参数
-TapSupport.openSupportView("/", null, null);
+TapSupport.openSupportView();
 ```
 
 ```objc
-// TODO 4: 确认是否可以省略参数
-[TapSupport openSupportViewWithPath:@"/" metaData:nil fieldsData:nil];
+[TapSupport openSupportView];
 ```
 
 ```cpp
@@ -447,13 +511,11 @@ TapSupport.OpenSupportView("/path");
 ```
 
 ```java
-// TODO 5: 确认是否可以省略参数
-TapSupport.openSupportView("/path", null, null);
+TapSupport.openSupportView("/path");
 ```
 
 ```objc
-// TODO 5: 确认是否可以省略参数
-[TapSupport openSupportViewWithPath:@"/path" metaData:nil fieldsData:nil];
+[TapSupport openSupportViewWithPath:@"/path"];
 ```
 
 ```cpp
@@ -490,18 +552,16 @@ TapSupport.OpenSupportView("/", fields);
 ```
 
 ```java
-// TODO 6: 确认是否可以省略参数
 Map<String, Object> fields = new HashMap<>();
 fields.put("243", "iOS 15.1"); // 243 是在后台创建的「OS」字段的 ID
 fields.put("244", "Dash"); // 244 是在后台创建的「角色名」字段的 ID
 
-TapSupport.openSupportView("/", fields, null);
+TapSupport.openSupportView("/", fields);
 ```
 
 ```objc
-// TODO 6: 确认是否可以省略参数
 NSDictionary *fields = @{@"243":@"iOS 15.1", @"244":@"WiFi"}; // 243 是在后台创建的「OS」字段的 ID，244 是在「角色名」字段的 ID
-[TapSupport openSupportViewWithPath:@"/" metaData:nil fieldsData:fields];
+[TapSupport openSupportViewWithPath:@"/" fieldsData:fields];
 ```
 
 ```cpp
@@ -534,18 +594,22 @@ TapSupport.setDefaultFieldsData(fields);
 TapUESupport::SetDefaultFieldsData(Fields);
 ```
 
+</MultiLang>
+
 全局字段可以在设置后更新：
+
+<MultiLang kind="ue">
 
 ```cs
 // TODO 7
 ```
 
 ```java
-// TODO 7
+TapSupport.updateDefaultField("key", "value");
 ```
 
 ```objc
-// TODO 7
+[TapSupport updateDefaultFieldWithValue:@"value" forKey:@"key"];
 ```
 
 ```cpp
