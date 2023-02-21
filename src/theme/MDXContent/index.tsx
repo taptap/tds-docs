@@ -125,7 +125,11 @@ function SelectionFeedbackBtn({
   const updateSelection = () => {
     const selection = document.getSelection();
 
-    if (selection === null || selection.isCollapsed) {
+    if (
+      selection === null ||
+      selection.isCollapsed ||
+      selection.getRangeAt(0).getClientRects().length === 0
+    ) {
       setSelection(null);
     } else {
       setSelection({
@@ -206,7 +210,6 @@ function ParagraphFeedbackBtn({
       setParagraph(target);
     } else {
       timer.current = setTimeout(() => {
-        console.log(1);
         setParagraph(null);
       }, 3000);
     }
@@ -340,6 +343,14 @@ function FeedbackModal({
       setProcessing(false);
     }
   };
+
+  useEffect(() => {
+    document.body.classList.add(styles.noScroll);
+
+    return () => {
+      document.body.classList.remove(styles.noScroll);
+    };
+  }, []);
 
   return (
     <div className={styles.feedbackModal}>
@@ -488,7 +499,11 @@ function FeedbackModal({
                 )}
               </span>
 
-              <span className={styles.buttons}>
+              <span
+                className={`${styles.buttons} ${
+                  isLoggedIn ? "" : styles.hidden
+                }`}
+              >
                 <button
                   onClick={() => {
                     setContext(null);
