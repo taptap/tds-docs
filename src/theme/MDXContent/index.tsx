@@ -47,7 +47,11 @@ const getValueFromCookie = (name: string): string | undefined =>
 const getPageId = (): string => window.location.pathname.substring(5);
 
 const getRegion = (): string =>
-  window.location.host === "developer.taptap.io" ? "io" : "cn";
+  ["developer.taptap.io", "developer-intl.xdrnd.com"].includes(
+    window.location.host
+  )
+    ? "intl"
+    : "cn";
 
 const getIsLoggedIn = (): boolean => {
   const userId: string | undefined = getValueFromCookie("user_id");
