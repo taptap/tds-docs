@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import MDXContent from "@theme-original/MDXContent";
 import type MDXContentType from "@theme/MDXContent";
 import type { WrapperProps } from "@docusaurus/types";
+import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import axios from "axios";
 
 import styles from "./index.module.scss";
@@ -539,6 +540,10 @@ function FeedbackModal({
 }
 
 function Feedback() {
+  const {
+    i18n: { currentLocale },
+  } = useDocusaurusContext();
+
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [feedbackCount, setFeedbackCount] = useState<number>(0);
   const [feedbackList, setFeedbackList] = useState<FeedbackThread[]>([]);
@@ -574,12 +579,10 @@ function Feedback() {
     updateFeedbackList();
   }, []);
 
-  /* Development */
-
   const [enabled, setEnabled] = useState<boolean>(false);
 
   useEffect(() => {
-    if (window.location.host === "developer.xdrnd.com") {
+    if (currentLocale === "zh-Hans") {
       setEnabled(true);
     }
   }, []);
