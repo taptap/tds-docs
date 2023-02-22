@@ -274,6 +274,10 @@ function PageFeedbackBtn({
       }}
     >
       <IconBook className={styles.icon} />
+      <div className={styles.tooltip}>
+        <span>文档反馈</span>
+        <IconTip className={styles.tip} />
+      </div>
       {feedbackCount > 0 ? (
         <span className={styles.badge}>{feedbackCount}</span>
       ) : (
