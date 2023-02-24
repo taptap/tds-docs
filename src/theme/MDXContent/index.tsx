@@ -46,12 +46,10 @@ const getValueFromCookie = (name: string): string | undefined =>
 
 const getPageId = (): string => window.location.pathname.substring(5);
 
-const getRegion = (): string =>
-  ["developer.taptap.io", "developer-intl.xdrnd.com"].includes(
-    window.location.host
-  )
-    ? "intl"
-    : "cn";
+const getRegion = (): string => {
+  const INTL_DOMAINS = ["developer.taptap.io", "developer-intl.xdrnd.com"];
+  return INTL_DOMAINS.includes(window.location.host) ? "intl" : "cn";
+};
 
 const getIsLoggedIn = (): boolean => {
   const userId: string | undefined = getValueFromCookie("user_id");
@@ -587,10 +585,21 @@ function Feedback() {
     updateFeedbackList();
   }, []);
 
+  const ENABLED_DOMAINS = [
+    "developer.taptap.com",
+    "developer.taptap.io",
+    "developer.xdrnd.com",
+    "developer-intl.xdrnd.com",
+  ];
+  const ENABLED_LOCALES = ["zh-Hans"];
+
   const [enabled, setEnabled] = useState<boolean>(false);
 
   useEffect(() => {
-    if (currentLocale === "zh-Hans") {
+    if (
+      ENABLED_DOMAINS.includes(window.location.host) &&
+      ENABLED_LOCALES.includes(currentLocale)
+    ) {
       setEnabled(true);
     }
   }, []);
