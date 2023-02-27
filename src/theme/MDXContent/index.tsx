@@ -9,7 +9,7 @@ import styles from "./index.module.scss";
 
 import IconTip from "./icons/tip.svg";
 import IconEdit from "./icons/edit.svg";
-import IconBook from "./icons/book.svg";
+import IconFeedback from "./icons/feedback.svg";
 import IconClose from "./icons/close.svg";
 import IconEmpty from "./icons/empty.svg";
 import IconStar from "./icons/star.svg";
@@ -271,7 +271,7 @@ function PageFeedbackBtn({
         setContext({ entryType: 3 });
       }}
     >
-      <IconBook className={styles.icon} />
+      <IconFeedback className={styles.icon} />
       <div className={styles.tooltip}>
         <span>文档反馈</span>
         <IconTip className={styles.tip} />
