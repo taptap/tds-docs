@@ -588,7 +588,7 @@ function Feedback() {
   const ENABLED_DOMAINS = [
     "developer.taptap.com",
     "developer.taptap.io",
-    "developer.xdrnd.com",
+    "developer.xdrnd.cn",
     "developer-intl.xdrnd.com",
   ];
   const ENABLED_LOCALES = ["zh-Hans"];
