@@ -33,6 +33,7 @@ vendor | 厂商
 `mz`  | 魅族推送
 `oppo`| OPPO 推送
 `vivo`| vivo 推送
+`honor`| 荣耀推送
 
 注意，混合推送对接的是厂商各自的推送服务，需要单独配置，不支持混用。
 通常情况下，需要提交不同的版本（分别对接厂商的推送服务）到相应厂商的应用商店。
@@ -49,6 +50,7 @@ vendor | 厂商
 OPPO | 支持红点 | 否 | 圆点展示需由用户在通知设置中手动开启，遵从系统默认逻辑，有通知则展示，无则不展示；数值展示只对指定应用开启，例如 QQ、微信，需向官方进行权限申请，暂无明确适配说明。
 vivo | 支持角标 | 是 | 参考下文[vivo 手机角标适配说明](#vivo-手机角标适配说明)
 魅族 | 支持红点 | 否 | 遵从系统默认逻辑，仅支持红点展示，有通知则展示，无则不展示
+荣耀 | 支持角标 | 否 | 客户端无需配置，服务端推送时通过 badge 参数进行设置，详情可参考：[荣耀服务端推送](https://developer.hihonor.com/cn/kitdoc?category=%E5%9F%BA%E7%A1%80%E6%9C%8D%E5%8A%A1&kitId=11002&navigation=guides&docId=cloud-base-api.md&token=#%E6%A1%8C%E9%9D%A2%E8%A7%92%E6%A0%87).
 
 ### 通知栏消息与透传消息
 
@@ -61,6 +63,7 @@ vivo | 支持角标 | 是 | 参考下文[vivo 手机角标适配说明](#vivo-�
 OPPO | 否  
 vivo | 否（老版本有透传接口，新版本已不建议使用）
 魅族 | 否
+荣耀 | 是
 
 注意，如果指定了 `silent` 为真，但厂商不支持透传，那么这条消息会被丢弃，推送记录中会记录相应的报错信息。
 
@@ -82,6 +85,8 @@ vivo | 否（老版本有透传接口，新版本已不建议使用）
 - vivo 推送服务支持的最低 Android 版本为 6.0（minSdkVersion：23）。
 - OPPO 推送只支持 Android 4.4 或以上版本的手机系统（minSdkVersion：19）。
 - 魅族（flyme）推送只支持 Android 4.2 或以上版本的手机系统（minSdkVersion：17）。
+- 荣耀 推送支持国内Magic UI 4.0及以上，海外Magic UI 4.2及以上（minSdkVersion 19）。
+
 
 影响送达率的因素说明：
 
@@ -148,6 +153,11 @@ vivo | 否（老版本有透传接口，新版本已不建议使用）
 
 开发者从 `MzPushMessageReceiver` 继承自己的实现类，然后在 `onRegisterStatus` 回调函数中调用如上例代码进行保存（记得将 `vendor` 换成 `mz`）。示例代码可以参考[LCFlymePushMessageReceiver](https://github.com/leancloud/java-unified-sdk/blob/master/android-sdk/mixpush-meizu/src/main/java/cn/leancloud/LCFlymePushMessageReceiver.java#L101)。
 
+#### 荣耀推送
+
+开发者从 `HonorMessageService` 继承自己的实现类，然后在 `onNewToken` 回调函数中调用如上例代码进行保存（记得将 `vendor` 换成 `honor`）。示例代码可以参考[LCHonorMessageService](https://github.com/leancloud/java-unified-sdk/blob/master/android-sdk/mixpush-honor/src/main/java/cn/leancloud/LCHonorMessageService.java#L20)。
+
+
 ### 发送混合推送的服务端 API
 
 可以参考这里的说明来发送推送请求：[推送 REST API 使用指南](/sdk/push/guide/rest/)。
@@ -156,7 +166,7 @@ vivo | 否（老版本有透传接口，新版本已不建议使用）
 
 ## 混合推送 library 的构成
 
-我们提供了一个 all-in-one 的混合推送模块，统一支持华为（HMS）、小米、OPPO、vivo、魅族推送，开发者依赖如下：
+我们提供了一个 all-in-one 的混合推送模块，统一支持华为（HMS）、小米、OPPO、vivo、魅族、荣耀推送，开发者依赖如下：
 <code>cn.leancloud:mixpush-android:{sdkVersions.leancloud.java}@aar</code>
 
 从 6.5.1 版本开始，我们额外提供了单一厂商的推送 library，以支持不希望全部集成的产品之需求，新 library 与厂商的对应关系如下：
@@ -167,9 +177,10 @@ vivo | 否（老版本有透传接口，新版本已不建议使用）
   <li>魅族 <code>cn.leancloud:mixpush-meizu:{sdkVersions.leancloud.java}</code></li>
   <li>OPPO <code>cn.leancloud:mixpush-oppo:{sdkVersions.leancloud.java}</code></li>
   <li>vivo <code>cn.leancloud:mixpush-vivo:{sdkVersions.leancloud.java}</code></li>
+  <li>荣耀 <code>cn.leancloud:mixpush-honor:{sdkVersions.leancloud.java}</code></li>
 </ul>
 
-两组 library 的使用方法基本相同，开发者可以根据自己的需要选取合适的 library。有一点需要注意的是，在 6.5.1 及后续版本的 library 中，由于小米、OPPO、vivo 并没有将他们的 SDK 包发布到公开源供开发者引用，所以如果是使用这几个厂商的推送，需要开发者将厂商的 SDK 包手动加入工程中。
+两组 library 的使用方法基本相同，开发者可以根据自己的需要选取合适的 library。有一点需要注意的是，在 6.5.1 及后续版本的 library 中，由于小米、OPPO、vivo 、荣耀并没有将他们的 SDK 包发布到公开源供开发者引用，所以如果是使用这几个厂商的推送，需要开发者将厂商的 SDK 包手动加入工程中。
 
 ### 混合推送 SDK 的获取方法
 
@@ -1128,6 +1139,159 @@ public class MyApp extends Application {
     4. Intent scheme URL
 
 客户端响应用户点击的过程不需要 SDK 参与，全部都是由系统通过消息里面附带的信息来自行处理。混合推送现在可支持所有动作方式，具体可参考我们的 demo。
+
+
+## 荣耀推送
+
+### 环境配置
+
+1. **注册荣耀账号**：在 [荣耀开发者平台](https://developer.hihonor.com/cn/) 注册荣耀开发者账号。
+2. **开发前准备**：接入荣耀 PUSH 之前，需要申请开通推送服务，开通流程可以参考 [推送服务开通流程](https://developer.hihonor.com/cn/kitdoc?category=%E5%9F%BA%E7%A1%80%E6%9C%8D%E5%8A%A1&kitId=11002&navigation=guides&docId=app-registration.md&token=) ，其中配置 SHA256 证书指纹 可以参考 [指纹证书生成](https://developer.hihonor.com/cn/kitdoc?category=%E5%9F%BA%E7%A1%80%E6%9C%8D%E5%8A%A1&kitId=11002&navigation=guides&docId=android-generate-appsign.md&token=)。
+3. 配置消息回执，设置步骤可参考 [消息回执](https://developer.hihonor.com/cn/kitdoc?category=%E5%9F%BA%E7%A1%80%E6%9C%8D%E5%8A%A1&kitId=11002&navigation=guides&docId=cloud-meassage-return.md&token=), 回调地址请设置为：**`https://callback.tds1.tapapis.cn/push/v1/callback/honor`**
+4. **将荣耀 App 信息保存到 开发者中心 控制台**：将上面创建的荣耀 App 信息（主要有 APP ID、APP Secret、Client ID、Client Secret），通过 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置 > 混合推送** 与应用关联。
+
+
+### 接入 SDK
+
+#### 获取荣耀推送 SDK 
+
+开发者可以参考[荣耀推送官方文档](https://developer.hihonor.com/cn/kitdoc?category=%E5%9F%BA%E7%A1%80%E6%9C%8D%E5%8A%A1&kitId=11002&navigation=guides&docId=intergrate.md&token=),完成荣耀推送 SDK 的接入。 其主要步骤有：
+
+- 配置 荣耀 SDK 的 maven 仓库地址。
+
+    - 在项目级 build.gradle 文件的 `allprojects/repositories` 和 `buildscript/repositories` 中增加仓库地址：
+
+        ```
+        maven { url 'https://developer.hihonor.com/repo/' }
+        ```
+
+- 打开应用级的“build.gradle”文件，在“dependencies”中添加如下编译依赖。
+
+        ```
+        dependencies {
+           implementation 'com.hihonor.mcs:push:7.0.41.300'
+        }
+        ```
+
+- 在 android 中配置签名
+
+    将生成签名证书指纹步骤中生成的签名文件拷贝到工程的 app 目录下，在 build.gradle 文件中配置签名：
+
+    ```groovy
+    android {
+        signingConfigs {
+            config {
+                keyAlias 'pushdemo'
+                keyPassword '123456789'
+                storeFile file('demo.keystore')
+                storePassword '123456789'
+            }
+        }
+    
+        buildTypes {
+            debug {
+                signingConfig signingConfigs.config
+            }
+            release {
+                signingConfig signingConfigs.config
+                minifyEnabled false
+                proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            }
+        }
+    }
+    ```
+
+做完这些修改后，Android Studio 右上方出现 Sync Now 链接。点击 Sync Now 等待同步完成。
+
+#### 修改应用 manifest 配置
+
+首先导入 `mixpush-honor` 包，修改 `build.gradle` 文件，在 `dependencies` 中添加依赖：
+
+<CodeBlock className="groovy">
+{`dependencies {
+  //混合推送需要的包
+  implementation 'cn.leancloud:mixpush-honor:${sdkVersions.leancloud.java}'
+  //即时通信与推送需要的包
+  implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
+  implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'\n
+  implementation 'com.hihonor.mcs:push:7.0.41.300'
+}`}
+</CodeBlock>
+
+> 如果希望一次性接入所有厂商推送，可以将 `mixpush-honor` 替换为 `mixpush-android`。
+
+然后配置相关 AndroidManifest，添加 Permission（开发者要将其中的 `<包名>` 替换为自己的应用的 package）：
+
+```xml
+<!-- HMS-SDK引导升级HMS功能，访问OTA服务器需要网络权限 -->
+<uses-permission android:name="android.permission.INTERNET"/>
+<!-- 检测网络状态 -->
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+```
+
+集成最新的荣耀 Push SDK 版本后要在 AndroidManifest.xml 文件的 application 节点下参照以下步骤注册 Service，用于接收荣耀推送的消息与令牌。
+
+```xml
+<application
+    <service
+        android:name="cn.leancloud.LCHonorMessageService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.hihonor.push.action.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+</application>
+```
+
+配置 AppId 信息：需要同样在“AndroidManifest.xml”文件下，添加meta-data标签，并在”com.hihonor.push.app_id”下添加您的AppId（AppId在注册完成后获取），用于配置您的设备。
+
+```xml
+<manifest>
+    <application>
+        <meta-data
+            android:name="com.hihonor.push.app_id"
+            android:value="您的AppId" />
+    </application>
+</manifest>
+```
+
+
+### 初始化
+
+与其他推送的初始化方法一样，我们在 `Application#onCreate` 方法中进行荣耀推送的初始化：
+
+```java
+import cn.leancloud.LeanCloud;
+import cn.leancloud.honor.LCMixPushManager;    // 使用 mixpush-honor 的场合
+import cn.leancloud.LCMixPushManager;        // 使用 mixpush-android 的场合
+
+// Customized Application.
+public class MyApp extends Application {
+  // 请替换成你自己的 appId 和 appKey
+  private static final String LC_APP_ID = "xxx";
+  private static final String LC_APP_KEY = "xxx";
+
+  
+  @Override
+  public void onCreate() {
+    super.onCreate();
+
+    //开启调试日志
+    LeanCloud.setLogLevel(LCLogger.Level.DEBUG);
+
+    // LeanCloud SDK 初始化
+    LeanCloud.initialize(this, "{{appid}}", "{{appkey}}", "https://please-replace-with-your-customized.domain.com");
+
+    // 荣耀推送初始化
+    // 使用 mixpush-android 的场合，引用 cn.leancloud.LCMixPushManager
+    // 使用 mixpush-honor 的场合，引用 cn.leancloud.honor.LCMixPushManager
+    LCMixPushManager.registerHonorPush(this);
+  }
+}
+```
+
+
+
 
 ## 取消混合推送注册
 
