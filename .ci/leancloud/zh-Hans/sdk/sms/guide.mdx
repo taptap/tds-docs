@@ -6,6 +6,7 @@ sidebar_position: 1
 
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import Mermaid from "/src/docComponents/Mermaid";
+import MultiLang from "/src/docComponents/MultiLang";
 
 短信服务适用的场景很多：
 
@@ -30,6 +31,40 @@ import Mermaid from "/src/docComponents/Mermaid";
 不同类型的短信遵循不同的内容规范，不符合规定的短信将无法发送。
 
 开发者在 LeanCloud 应用控制台开启与短信相关的服务后（参见 [开通短信服务](#开通短信服务)），即可通过 SDK 向用户发送短信：
+
+<MultiLang kind="sms">
+
+```cs
+// 往 18200008888 这个手机号码发送短信，使用预先配置的模板（「Register_Notice」参数）和签名（「LeanCloud」参数）
+LCCloud.RequestSMSCodeAsync("18200008888","Register_Notice",null,"LeanCloud").ContinueWith(t =>
+{
+    var result = t.Result;
+    // result 为 True 则表示调用成功
+});
+```
+
+```java
+LCSMSOption option = new LCSMSOption();
+option.setTemplateName("Register_Notice"); // 控制台配置好的模板名称
+option.setSignatureName("LeanCloud");      // 控制台配置好的短信签名名称
+// 往 18200008888 这个手机号码发送短信，使用预先配置的模板和签名
+LCSMS.requestSMSCodeInBackground("18200008888", option).subscribe(new Observer<LCNull>() {
+    @Override
+    public void onSubscribe(Disposable disposable) {
+    }
+    @Override
+    public void onNext(LCNull avNull) {
+        Log.d("TAG","Result: Successfully sent text message.");
+    }
+    @Override
+    public void onError(Throwable throwable) {
+        Log.d("TAG","Result: Failed to send text message. Reason: " + throwable.getMessage());
+    }
+    @Override
+    public void onComplete() {
+    }
+});
+```
 
 ```objc
 LCShortMessageRequestOptions *options = [[LCShortMessageRequestOptions alloc] init];
@@ -62,27 +97,15 @@ _ = LCSMSClient.requestShortMessage(
 }
 ```
 
-```java
-LCSMSOption option = new LCSMSOption();
-option.setTemplateName("Register_Notice"); // 控制台配置好的模板名称
-option.setSignatureName("LeanCloud");      // 控制台配置好的短信签名名称
+```dart
+try {
 // 往 18200008888 这个手机号码发送短信，使用预先配置的模板和签名
-LCSMS.requestSMSCodeInBackground("18200008888", option).subscribe(new Observer<LCNull>() {
-    @Override
-    public void onSubscribe(Disposable disposable) {
-    }
-    @Override
-    public void onNext(LCNull avNull) {
-        Log.d("TAG","Result: Successfully sent text message.");
-    }
-    @Override
-    public void onError(Throwable throwable) {
-        Log.d("TAG","Result: Failed to send text message. Reason: " + throwable.getMessage());
-    }
-    @Override
-    public void onComplete() {
-    }
-});
+  await LCSMSClient.requestSMSCode('18200008888',
+      template: 'Register_Notice', // 控制台配置好的模板名称
+      signature: 'LeanCloud'); // 控制台配置好的短信签名名称
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 
 ```javascript
@@ -98,13 +121,9 @@ AV.Cloud.requestSmsCode({
 });
 ```
 
-```cs
-// 往 18200008888 这个手机号码发送短信，使用预先配置的模板（「Register_Notice」参数）和签名（「LeanCloud」参数）
-LCCloud.RequestSMSCodeAsync("18200008888","Register_Notice",null,"LeanCloud").ContinueWith(t =>
-{
-    var result = t.Result;
-    // result 为 True 则表示调用成功
-});
+```python
+from leancloud import cloud
+cloud.request_sms_code("18200008888", template="Register_Notice", sign="LeanCloud")
 ```
 
 ```php
@@ -116,21 +135,7 @@ $options = [
 SMS::requestSMSCode("18200008888", $options);
 ```
 
-```python
-from leancloud import cloud
-cloud.request_sms_code("18200008888", template="Register_Notice", sign="LeanCloud")
-```
-
-```dart
-try {
-// 往 18200008888 这个手机号码发送短信，使用预先配置的模板和签名
-  await LCSMSClient.requestSMSCode('18200008888',
-      template: 'Register_Notice', // 控制台配置好的模板名称
-      signature: 'LeanCloud'); // 控制台配置好的短信签名名称
-} on LCException catch (e) {
-  print(e.message);
-}
-```
+</MultiLang>
 
 用户收到的短信内容如下：
 
@@ -175,7 +180,43 @@ try {
 2. **调用接口发送验证短信**  
   注意，在这一步之前，我们假设开发者已经完成了前面章节提及的所有短信服务设置。
 
-    ```objc
+  <MultiLang kind="sms">
+  
+    ```cs
+    // 下面参数中的 10 表示验证码有效时间为 10 分钟
+    LCCloud.RequestSMSCodeAsync("18200008888","应用名称","某种操作",10).ContinueWith(t =>
+    {
+        if(!t.Result)
+        {
+            // 调用成功
+        }
+    });
+    ```
+
+    ```java
+    LCSMSOption option = new LCSMSOption();
+    option.setTtl(10);
+    option.setApplicationName("应用名称");
+    option.setOperation("某种操作");
+    LCSMS.requestSMSCodeInBackground("18200008888", option).subscribe(new Observer<LCNull>() {
+        @Override
+        public void onSubscribe(Disposable disposable) {
+        }
+        @Override
+        public void onNext(LCNull avNull) {
+            Log.d("TAG","Result: Successfully sent verification code.");
+        }
+        @Override
+        public void onError(Throwable throwable) {
+            Log.d("TAG","Result: Failed to send verification code. Reason: " + throwable.getMessage());
+        }
+        @Override
+        public void onComplete() {
+        }
+    });
+    ```
+  
+  ```objc
     LCShortMessageRequestOptions *options = [[LCShortMessageRequestOptions alloc] init];
     options.TTL = 10;                     // 验证码有效时间为 10 分钟
     options.applicationName = @"应用名称"; // 应用名称
@@ -208,27 +249,14 @@ try {
     }
     ```
 
-    ```java
-    LCSMSOption option = new LCSMSOption();
-    option.setTtl(10);
-    option.setApplicationName("应用名称");
-    option.setOperation("某种操作");
-    LCSMS.requestSMSCodeInBackground("18200008888", option).subscribe(new Observer<LCNull>() {
-        @Override
-        public void onSubscribe(Disposable disposable) {
-        }
-        @Override
-        public void onNext(LCNull avNull) {
-            Log.d("TAG","Result: Successfully sent verification code.");
-        }
-        @Override
-        public void onError(Throwable throwable) {
-            Log.d("TAG","Result: Failed to send verification code. Reason: " + throwable.getMessage());
-        }
-        @Override
-        public void onComplete() {
-        }
-    });
+    ```dart
+    try {
+    //验证码有效时间为 10 分钟
+    await LCSMSClient.requestSMSCode('18200008888',
+        variables: {'name': '应用名称', 'ttl': 10, 'op': '某种操作'});
+    } on LCException catch (e) {
+    print(e.message);
+    }
     ```
 
     ```javascript
@@ -244,15 +272,13 @@ try {
     });
     ```
 
-    ```cs
-    // 下面参数中的 10 表示验证码有效时间为 10 分钟
-    LCCloud.RequestSMSCodeAsync("18200008888","应用名称","某种操作",10).ContinueWith(t =>
-    {
-        if(!t.Result)
-        {
-            // 调用成功
-        }
-    });
+    ```python
+    from leancloud import cloud
+    options = {
+    "op": "某种操作",
+    "ttl": 10  # 验证码有效时间为 10 分钟
+    }
+    cloud.request_sms_code("18200008888", sign="应用名称", params=options)
     ```
 
     ```php
@@ -264,24 +290,7 @@ try {
     SMS::requestSMSCode("18200008888", $options);
     ```
 
-    ```python
-    from leancloud import cloud
-    options = {
-    "op": "某种操作",
-    "ttl": 10  # 验证码有效时间为 10 分钟
-    }
-    cloud.request_sms_code("18200008888", sign="应用名称", params=options)
-    ```
-
-    ```dart
-    try {
-    //验证码有效时间为 10 分钟
-    await LCSMSClient.requestSMSCode('18200008888',
-        variables: {'name': '应用名称', 'ttl': 10, 'op': '某种操作'});
-    } on LCException catch (e) {
-    print(e.message);
-    }
-    ```
+    </MultiLang>
 
 3. **用户收到短信，并且输入了验证码**  
   在进行下一步之前，我们建议先进行客户端验证（对有效性进行基本验证，例如长度、特殊字符等），这样就避免了错误的验证码被服务端驳回而产生的流量，以及与服务端沟通的时间，有助于提升用户体验。
@@ -289,23 +298,15 @@ try {
 4. **调用接口验证用户输入的验证码是否有效**  
   注意，调用时需要确保验证码和手机号的参数顺序，我们假设验证码数字是「123456」：
 
-  ```objc
-  [AVOSCloud verifySmsCode:@"123456" mobilePhoneNumber:@"18200008888" callback:^(BOOL succeeded, NSError *error) {
-      if(succeeded){
+  <MultiLang kind="sms">
+
+  ```cs
+  AVCloud.VerifySmsCodeAsync("123456","18200008888").ContinueWith(t =>{
+      if(t.Result) 
+      {
           // 验证成功
       }
-  }];
-  ```
-
-  ```swift
-  _ = LCSMSClient.verifyMobilePhoneNumber("18200008888", verificationCode: "123456") { (result) in
-      switch result {
-      case .success:
-          break
-      case .failure(error: let error):
-          print(error)
-      }
-  }
+  });
   ```
 
   ```java
@@ -327,32 +328,23 @@ try {
   });
   ```
 
-  ```javascript
-  AV.Cloud.verifySmsCode('123456', '18200008888').then(function(){
-      // 验证成功
-  }, function(err){
-      // 验证失败
-  });
-  ```
-
-  ```cs
-  AVCloud.VerifySmsCodeAsync("123456","18200008888").ContinueWith(t =>{
-      if(t.Result) 
-      {
+  ```objc
+  [AVOSCloud verifySmsCode:@"123456" mobilePhoneNumber:@"18200008888" callback:^(BOOL succeeded, NSError *error) {
+      if(succeeded){
           // 验证成功
       }
-  });
+  }];
   ```
 
-  ```php
-  // 注意，PHP SDK 的参数顺序与大多数 SDK 不同，手机号码在前，验证码在后。
-  SMS::verifySmsCode('18200008888', '123456');
-  ```
-
-  ```python
-  from leancloud import cloud
-  # 注意，Python SDK 的参数顺序与大多数 SDK 不同，手机号码在前，验证码在后。
-  cloud.verify_sms_code('18200008888', '123456')
+  ```swift
+  _ = LCSMSClient.verifyMobilePhoneNumber("18200008888", verificationCode: "123456") { (result) in
+      switch result {
+      case .success:
+          break
+      case .failure(error: let error):
+          print(error)
+      }
+  }
   ```
 
   ```dart
@@ -363,11 +355,61 @@ try {
   }
   ```
 
+  ```javascript
+  AV.Cloud.verifySmsCode('123456', '18200008888').then(function(){
+      // 验证成功
+  }, function(err){
+      // 验证失败
+  });
+  ```
+
+  ```python
+  from leancloud import cloud
+  # 注意，Python SDK 的参数顺序与大多数 SDK 不同，手机号码在前，验证码在后。
+  cloud.verify_sms_code('18200008888', '123456')
+  ```
+
+  ```php
+  // 注意，PHP SDK 的参数顺序与大多数 SDK 不同，手机号码在前，验证码在后。
+  SMS::verifySmsCode('18200008888', '123456');
+  ```
+
+  </MultiLang>
+
 针对上述的需求，可以把场景换成异地登录验证、修改个人敏感信息验证等一些常见的场景，步骤是类似的，调用的接口也是一样的，仅仅是在做 UI 展现的时候需要开发者自己去优化验证过程。
 
 ### 语音短信验证码
 
 文本短信验证码在到达率上有一定的风险。尽管根据我们长期得到的用户反馈，到达率已接近 100%，但是有些应用对时效性的要求极高，并且需要更好的安全性，所以我们也推出了语音短信验证码的服务，调用的方式如下：
+
+<MultiLang kind="sms">
+
+```cs
+LCCloud.RequestVoiceCodeAsync ("18200008888").ContinueWith(t =>{
+    // 发送成功
+});
+```
+
+```java
+LCSMSOption option = new LCSMSOption();
+option.setType(LCSMS.TYPE.VOICE_SMS);
+LCSMS.requestSMSCodeInBackground("18200008888", option).subscribe(new Observer<LCNull>() {
+    @Override
+    public void onSubscribe(Disposable disposable) {
+    }
+    @Override
+    public void onNext(LCNull avNull) {
+        Log.d("TAG","Result: Successfully made a call.");
+    }
+    @Override
+    public void onError(Throwable throwable) {
+        Log.d("TAG","Result: Failed to make a call. Reason: " + throwable.getMessage());
+    }
+    @Override
+    public void onComplete() {
+    }
+});
+```
 
 ```objc
 LCShortMessageRequestOptions *options = [[LCShortMessageRequestOptions alloc] init];
@@ -392,25 +434,12 @@ _ = LCSMSClient.requestVoiceVerificationCode(mobilePhoneNumber: "18200008888") {
 }
 ```
 
-```java
-LCSMSOption option = new LCSMSOption();
-option.setType(LCSMS.TYPE.VOICE_SMS);
-LCSMS.requestSMSCodeInBackground("18200008888", option).subscribe(new Observer<LCNull>() {
-    @Override
-    public void onSubscribe(Disposable disposable) {
-    }
-    @Override
-    public void onNext(LCNull avNull) {
-        Log.d("TAG","Result: Successfully made a call.");
-    }
-    @Override
-    public void onError(Throwable throwable) {
-        Log.d("TAG","Result: Failed to make a call. Reason: " + throwable.getMessage());
-    }
-    @Override
-    public void onComplete() {
-    }
-});
+```dart
+try {
+  await LCSMSClient.requestVoiceCode('18200008888');
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 
 ```js
@@ -424,10 +453,9 @@ AV.Cloud.requestSmsCode({
 });
 ```
 
-```cs
-LCCloud.RequestVoiceCodeAsync ("18200008888").ContinueWith(t =>{
-    // 发送成功
-});
+```python
+from leancloud import cloud
+cloud.request_sms_code("18200008888", sms_type="voice")
 ```
 
 ```php
@@ -437,38 +465,19 @@ $options = [
 SMS::requestSMSCode("18200008888", $options);
 ```
 
-```python
-from leancloud import cloud
-cloud.request_sms_code("18200008888", sms_type="voice")
-```
-
-```dart
-try {
-  await LCSMSClient.requestVoiceCode('18200008888');
-} on LCException catch (e) {
-  print(e.message);
-}
-```
+</MultiLang>
 
 发送成功之后，用户的手机就会收到一段语音通话，它会播报 6 位数的验证码，然后开发者需要再次调用：
 
-```objc
-[LCApplication verifySmsCode:@"123456" mobilePhoneNumber:@"18200008888" callback:^(BOOL succeeded, NSError *error) {
-    if(succeeded){
+<MultiLang kind="sms">
+
+```cs
+LCCloud.VerifySmsCodeAsync("123456","18200008888").ContinueWith(t =>{
+    if(t.Result) 
+    {
         // 验证成功
     }
-}];
-```
-
-```swift
-_ = LCSMSClient.verifyMobilePhoneNumber("18200008888", verificationCode: "123456") { (result) in
-    switch result {
-    case .success:
-        break
-    case .failure(error: let error):
-        print(error)
-    }
-}
+});
 ```
 
 ```java
@@ -490,30 +499,23 @@ LCSMS.verifySMSCodeInBackground("123456","18200008888").subscribe(new Observer<L
 });
 ```
 
-```js
-AV.Cloud.verifySmsCode('123456', '18200008888').then(function(){
-    // 验证成功
-}, function(err){
-    // 验证失败
-});
-```
-
-```cs
-LCCloud.VerifySmsCodeAsync("123456","18200008888").ContinueWith(t =>{
-    if(t.Result) 
-    {
+```objc
+[LCApplication verifySmsCode:@"123456" mobilePhoneNumber:@"18200008888" callback:^(BOOL succeeded, NSError *error) {
+    if(succeeded){
         // 验证成功
     }
-});
+}];
 ```
 
-```php
-SMS::verifySmsCode('18200008888', '123456');
-```
-
-```python
-from leancloud import cloud
-cloud.verify_sms_code('18200008888', '123456')
+```swift
+_ = LCSMSClient.verifyMobilePhoneNumber("18200008888", verificationCode: "123456") { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
 ```
 
 ```dart
@@ -523,6 +525,25 @@ try {
   print(e.message);
 }
 ```
+
+```js
+AV.Cloud.verifySmsCode('123456', '18200008888').then(function(){
+    // 验证成功
+}, function(err){
+    // 验证失败
+});
+```
+
+```python
+from leancloud import cloud
+cloud.verify_sms_code('18200008888', '123456')
+```
+
+```php
+SMS::verifySmsCode('18200008888', '123456');
+```
+
+</MultiLang>
 
 再次验证用户输入的验证码是否正确。
 
@@ -745,6 +766,45 @@ X牌新款春装已经上市，明星夫妻同款你值得拥有！详情请咨�
 
 并且模板名称为 `Order_Notice`，并且为已经拥有了一个审核通过的签名叫做「天天商城」，签名的名称叫做 `sign_BuyBuyBuy`，当模板通过审批后就可以调用如下代码发送这条通知类的短信：
 
+<MultiLang kind="sms">
+
+```cs
+var env = new Dictionary<string,object>()
+{
+    {"order_id","7623432424540"} // 使用实际的值来替换模板中的变量
+};
+AVCloud.RequestSMSCodeAsync("18200008888","Order_Notice",env,"sign_BuyBuyBuy").ContinueWith(t =>
+{
+    var result = t.Result;
+    // result 为 True 则表示调用成功
+});
+```
+
+```java
+LCSMSOption option = new LCSMSOption();
+option.setTemplateName("Order_Notice");
+option.setSignatureName("sign_BuyBuyBuy");
+Map<String, Object> parameters = new HashMap<String, Object>();
+parameters.put("order_id", "7623432424540"); // 使用实际的值来替换模板中的变量
+option.setEnvMap(parameters);
+LCSMS.requestSMSCodeInBackground("18200008888", option).subscribe(new Observer<LCNull>() {
+    @Override
+    public void onSubscribe(Disposable disposable) {
+    }
+    @Override
+    public void onNext(LCNull avNull) {
+        Log.d("TAG","Result: Successfully sent text message.");
+    }
+    @Override
+    public void onError(Throwable throwable) {
+        Log.d("TAG","Result: Failed to send text message. Reason: " + throwable.getMessage());
+    }
+    @Override
+    public void onComplete() {
+    }
+});
+```
+
 ```objc
 LCShortMessageRequestOptions *options = [[LCShortMessageRequestOptions alloc] init];
 
@@ -783,29 +843,15 @@ _ = LCSMSClient.requestShortMessage(
 }
 ```
 
-```java
-LCSMSOption option = new LCSMSOption();
-option.setTemplateName("Order_Notice");
-option.setSignatureName("sign_BuyBuyBuy");
-Map<String, Object> parameters = new HashMap<String, Object>();
-parameters.put("order_id", "7623432424540"); // 使用实际的值来替换模板中的变量
-option.setEnvMap(parameters);
-LCSMS.requestSMSCodeInBackground("18200008888", option).subscribe(new Observer<LCNull>() {
-    @Override
-    public void onSubscribe(Disposable disposable) {
-    }
-    @Override
-    public void onNext(LCNull avNull) {
-        Log.d("TAG","Result: Successfully sent text message.");
-    }
-    @Override
-    public void onError(Throwable throwable) {
-        Log.d("TAG","Result: Failed to send text message. Reason: " + throwable.getMessage());
-    }
-    @Override
-    public void onComplete() {
-    }
-});
+```dart
+try {
+  await LCSMSClient.requestSMSCode('18200008888',
+      template: 'Order_Notice',
+      signature: 'sign_BuyBuyBuy',
+      variables: {'order_id': '7623432424540'}); // 使用实际的值来替换模板中的变量
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 
 ```javascript
@@ -820,16 +866,13 @@ order_id: '7623432424540'}).then(function(){
 });
 ```
 
-```cs
-var env = new Dictionary<string,object>()
-{
-    {"order_id","7623432424540"} // 使用实际的值来替换模板中的变量
-};
-AVCloud.RequestSMSCodeAsync("18200008888","Order_Notice",env,"sign_BuyBuyBuy").ContinueWith(t =>
-{
-    var result = t.Result;
-    // result 为 True 则表示调用成功
-});
+```python
+from leancloud import cloud
+options = {
+  "order_id": "7623432424540" # 使用实际的值来替换模板中的变量
+}
+cloud.request_sms_code("18200008888",
+  template="Order_Notice", sign="sign_BuyBuyBuy", params=options)
 ```
 
 ```php
@@ -841,25 +884,7 @@ $options = [
 SMS::requestSmsCode("18200008888", $options);
 ```
 
-```python
-from leancloud import cloud
-options = {
-  "order_id": "7623432424540" # 使用实际的值来替换模板中的变量
-}
-cloud.request_sms_code("18200008888",
-  template="Order_Notice", sign="sign_BuyBuyBuy", params=options)
-```
-
-```dart
-try {
-  await LCSMSClient.requestSMSCode('18200008888',
-      template: 'Order_Notice',
-      signature: 'sign_BuyBuyBuy',
-      variables: {'order_id': '7623432424540'}); // 使用实际的值来替换模板中的变量
-} on LCException catch (e) {
-  print(e.message);
-}
-```
+</MultiLang>
 
 用户收到的内容如下：
 
@@ -1034,6 +1059,38 @@ AV.Captcha.request({ width: 80, height: 30 });
 
 #### 获取图形验证码
 
+<MultiLang kind="sms">
+
+```cs
+AVCloud.RequestCaptchaAsync(width:85, height:30).ContinueWith(t =>{
+  var captchaData = t.Result;
+  var url = captchaData.Url; // 图片的 URL，客户端用来展现
+  var captchaToken = captchaData.captchaToken; // 用来对应后面的验证接口，服务端用这个参数来匹配具体是哪一个图形验证码
+});
+```
+
+```java
+LCCaptchaOption option = new LCCaptchaOption();
+option.setWidth(85);
+option.setHeight(30);
+LCCaptcha.requestCaptchaInBackground(option).subscribe(new Observer<LCCaptchaDigest>() {
+    @Override
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(LCCaptchaDigest avCaptchaDigest) {
+        Log.d("TAG","图片的 URL 是：" + avCaptchaDigest.getCaptchaUrl());
+    }
+    @Override
+    public void onError(Throwable throwable) {
+        Log.d("TAG","Result: Failed to request CAPTCHA. Reason: " + throwable.getMessage());
+    }
+    @Override
+    public void onComplete() {
+    }
+});
+```
+
 ```objc
 LCCaptchaRequestOptions *options = [[LCCaptchaRequestOptions alloc] init];
 
@@ -1063,54 +1120,6 @@ LCCaptchaClient.requestCaptcha(width: 100, height: 50) { (result) in
 }
 ```
 
-```java
-LCCaptchaOption option = new LCCaptchaOption();
-option.setWidth(85);
-option.setHeight(30);
-LCCaptcha.requestCaptchaInBackground(option).subscribe(new Observer<LCCaptchaDigest>() {
-    @Override
-    public void onSubscribe(Disposable d) {
-    }
-    @Override
-    public void onNext(LCCaptchaDigest avCaptchaDigest) {
-        Log.d("TAG","图片的 URL 是：" + avCaptchaDigest.getCaptchaUrl());
-    }
-    @Override
-    public void onError(Throwable throwable) {
-        Log.d("TAG","Result: Failed to request CAPTCHA. Reason: " + throwable.getMessage());
-    }
-    @Override
-    public void onComplete() {
-    }
-});
-```
-
-```javascript
-AV.Captcha.request({
-  width:100, // 图片的宽度
-  height:50, // 图片的高度
-}).then(function(captcha) {
-  console.log(captcha.url); // 图片的 URL，客户端用来展现
-});
-```
-
-```cs
-AVCloud.RequestCaptchaAsync(width:85, height:30).ContinueWith(t =>{
-  var captchaData = t.Result;
-  var url = captchaData.Url; // 图片的 URL，客户端用来展现
-  var captchaToken = captchaData.captchaToken; // 用来对应后面的验证接口，服务端用这个参数来匹配具体是哪一个图形验证码
-});
-```
-
-```php
-// PHP SDK 暂不支持图形验证码
-```
-
-```python
-from leancloud import cloud
-captcha = cloud.request_captcha(width=100, height=50)
-```
-
 ```dart
 try {
   LCCaptcha captcha = await LCCaptchaClient.requestCaptcha();
@@ -1123,9 +1132,56 @@ try {
 }
 ```
 
+```javascript
+AV.Captcha.request({
+  width:100, // 图片的宽度
+  height:50, // 图片的高度
+}).then(function(captcha) {
+  console.log(captcha.url); // 图片的 URL，客户端用来展现
+});
+```
+
+```python
+from leancloud import cloud
+captcha = cloud.request_captcha(width=100, height=50)
+```
+
+```php
+// PHP SDK 暂不支持图形验证码
+```
+
+</MultiLang>
+
 #### 校验图形验证码
 
 获取图形验证码之后，将图形验证码的图像显示在客户端（iOS 和 Android 或者其他平台可以调用基础的图像控件展示该图片），等到用户输入完成之后，继续调用下一步的接口校验用户输入的是否合法。
+
+<MultiLang kind="sms">
+
+```cs
+AVCloud.VerifyCaptchaAsync("这里填写用户输入的图形验证码，例如 AM8N",'这里填写上一步返回的 captchaToken').CotinuteWith(t =>{
+    var validate_token = result;
+});
+```
+
+```java
+LCCaptcha.verifyCaptchaCodeInBackground("123456",avCaptchaDigest).subscribe(new Observer<LCCaptchaValidateResult>() {
+    @Override
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(LCCaptchaValidateResult avCaptchaValidateResult) {
+        Log.d("TAG","Result: Verification completed.");
+    }
+    @Override
+    public void onError(Throwable throwable) {
+        Log.d("TAG","Result: Verification failed. Reason: " + throwable.getMessage());
+    }
+    @Override
+    public void onComplete() {
+    }
+});
+```
 
 ```objc
 [AVCaptcha verifyCaptchaCode:<#用户识别的符号#>
@@ -1148,45 +1204,6 @@ LCCaptchaClient.verifyCaptcha(code: "code", captchaToken: "captcha.token") { (re
 }
 ```
 
-```java
-LCCaptcha.verifyCaptchaCodeInBackground("123456",avCaptchaDigest).subscribe(new Observer<LCCaptchaValidateResult>() {
-    @Override
-    public void onSubscribe(Disposable d) {
-    }
-    @Override
-    public void onNext(LCCaptchaValidateResult avCaptchaValidateResult) {
-        Log.d("TAG","Result: Verification completed.");
-    }
-    @Override
-    public void onError(Throwable throwable) {
-        Log.d("TAG","Result: Verification failed. Reason: " + throwable.getMessage());
-    }
-    @Override
-    public void onComplete() {
-    }
-});
-```
-
-```javascript
-// captcha 是上一步得到的验证码实例对象
-captcha.verify('这里填写用户输入的图形验证码，例如 AM8N').then(function(validateToken) {});
-```
-
-```cs
-AVCloud.VerifyCaptchaAsync("这里填写用户输入的图形验证码，例如 AM8N",'这里填写上一步返回的 captchaToken').CotinuteWith(t =>{
-    var validate_token = result;
-});
-```
-
-```php
-// PHP SDK 暂不支持图形验证码
-```
-
-```python
-# captcha 是上一步得到的验证码实例对象
-validate_token = captcha.verify("这里填写用户输入的图形验证码，例如 AM8N")
-```
-
 ```dart
 try {
   LCCaptcha verifyCaptcha = await LCCaptchaClient.verifyCaptcha('这里填写用户输入的图形验证码，例如 AM8N', captcha.token);
@@ -1196,9 +1213,61 @@ try {
 }
 ```
 
+```javascript
+// captcha 是上一步得到的验证码实例对象
+captcha.verify('这里填写用户输入的图形验证码，例如 AM8N').then(function(validateToken) {});
+```
+
+```python
+# captcha 是上一步得到的验证码实例对象
+validate_token = captcha.verify("这里填写用户输入的图形验证码，例如 AM8N")
+```
+
+```php
+// PHP SDK 暂不支持图形验证码
+```
+
+</MultiLang>
+
 #### 使用 `validate_token` 发送短信
 
 如果校验成功，拿到返回的 `validate_token`，继续调用发送短信的接口：
+
+<MultiLang kind="sms">
+
+```cs
+// 18200008888：手机号
+// New_Series：模板名称
+// sign_BuyBuyBuy：签名名称
+AVCloud.RequestSMSCodeAsync("18200008888","New_Series",null,"sign_BuyBuyBuy","上一步返回的 validate_token").ContinueWith(t =>
+{
+    var result = t.Result;
+    // result 为 True 则表示调用成功
+});
+```
+
+```java
+LCSMSOption option = new LCSMSOption();
+option.setTemplateName("Order_Notice"); // 模板名称
+option.setSignatureName("sign_BuyBuyBuy"); // 签名名称
+option.setCaptchaValidateToken("validateToken");
+LCSMS.requestSMSCodeInBackground("18200008888", option).subscribe(new Observer<LCNull>() {
+    @Override
+    public void onSubscribe(Disposable disposable) {
+    }
+    @Override
+    public void onNext(LCNull avNull) {
+        Log.d("TAG","Result: Successfully sent verification code.");
+    }
+    @Override
+    public void onError(Throwable throwable) {
+        Log.d("TAG","Result: Failed to send verification code. Reason: " + throwable.getMessage());
+    }
+    @Override
+    public void onComplete() {
+    }
+});
+```
 
 ```objc
 LCShortMessageRequestOptions *options = [[LCShortMessageRequestOptions alloc] init];
@@ -1233,27 +1302,15 @@ _ = LCSMSClient.requestShortMessage(
 }
 ```
 
-```java
-LCSMSOption option = new LCSMSOption();
-option.setTemplateName("Order_Notice"); // 模板名称
-option.setSignatureName("sign_BuyBuyBuy"); // 签名名称
-option.setCaptchaValidateToken("validateToken");
-LCSMS.requestSMSCodeInBackground("18200008888", option).subscribe(new Observer<LCNull>() {
-    @Override
-    public void onSubscribe(Disposable disposable) {
-    }
-    @Override
-    public void onNext(LCNull avNull) {
-        Log.d("TAG","Result: Successfully sent verification code.");
-    }
-    @Override
-    public void onError(Throwable throwable) {
-        Log.d("TAG","Result: Failed to send verification code. Reason: " + throwable.getMessage());
-    }
-    @Override
-    public void onComplete() {
-    }
-});
+```dart
+try {
+  await LCSMSClient.requestSMSCode('18200008888',
+      template: 'Order_Notice',  // 模板名称
+      signature: 'sign_BuyBuyBuy', // 签名名称
+      variables: {'validate_token': validate_token}); //上一步返回的 validate_token
+} on LCException catch (e) {
+  print(e.message);
+}
 ```
 
 ```javascript
@@ -1273,21 +1330,6 @@ AV.Cloud.requestSmsCode({
 });
 ```
 
-```cs
-// 18200008888：手机号
-// New_Series：模板名称
-// sign_BuyBuyBuy：签名名称
-AVCloud.RequestSMSCodeAsync("18200008888","New_Series",null,"sign_BuyBuyBuy","上一步返回的 validate_token").ContinueWith(t =>
-{
-    var result = t.Result;
-    // result 为 True 则表示调用成功
-});
-```
-
-```php
-// PHP SDK 暂不支持图形验证码
-```
-
 ```python
 from leancloud import cloud
 options = { "validate_token": validate_token }
@@ -1297,16 +1339,11 @@ cloud.request_sms_code("18200008888",
   params=options)
 ```
 
-```dart
-try {
-  await LCSMSClient.requestSMSCode('18200008888',
-      template: 'Order_Notice',  // 模板名称
-      signature: 'sign_BuyBuyBuy', // 签名名称
-      variables: {'validate_token': validate_token}); //上一步返回的 validate_token
-} on LCException catch (e) {
-  print(e.message);
-}
+```php
+// PHP SDK 暂不支持图形验证码
 ```
+
+</MultiLang>
 
 ## 国际短信
 
