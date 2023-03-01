@@ -1290,6 +1290,40 @@ public class MyApp extends Application {
 }
 ```
 
+### 点击通知打开自定义页面
+
+您可以自定义处理点击通知栏消息通知的动作，包括：打开应用首页、打开特定URL和打开自定义页面。
+
+打开应用自定义页面有两种方式，一种是通过服务端 API 指定 intent 参数，另一种是指定 action 参数，我们混合推送 SDK 选择使用 intent 参数（具体可参考荣耀文档 [服务端发送 push 消息 ](https://developer.hihonor.com/cn/kitdoc?category=%E5%9F%BA%E7%A1%80%E6%9C%8D%E5%8A%A1&kitId=11002&navigation=ref&docId=downlink-message.md&token=)），开发者也可以在发送请求时自行指定 action 参数（按照荣耀的 REST API 规范指定即可）。
+
+对于目标 activity，开发者需要在 manifest 文件的 application 中增加 intent-filter 的定义，例如：
+
+```xml
+<!-- (可选)开发者自定义的打开推送消息的目的 activity。-->
+<activity
+    android:name="您的自定义 Activity 路径"
+    android:exported="false">
+
+    <!-- intent 参数配置示例 -->
+
+    <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <data
+            android:scheme="lcpushscheme"
+            android:host="cn.leancloud.push"
+            android:path="/notify_detail"/>
+    </intent-filter>
+
+    <!-- action 参数配置示例 -->
+
+    <intent-filter>
+        <action android:name="com.tds.android.demo.activity.second.action" />
+        <category android:name="android.intent.category.DEFAULT" />
+    </intent-filter>
+</activity>
+```
 
 
 
