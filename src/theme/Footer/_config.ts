@@ -22,7 +22,7 @@ export const getNavLinks = (
   const NAV_LINKS_TDS_CN: (NavLinkInternal | NavLinkExternal)[] = [
     {
       label: "推广",
-      url: `https://biz.taptap.cn/${localePath}`,
+      url: `https://biz.taptap.com/${localePath}`,
     },
     ...(locale === "zh-Hans"
       ? [

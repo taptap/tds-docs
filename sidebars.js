@@ -20,7 +20,7 @@ const sidebars = {
     {
       type: "link",
       label: "推广投放",
-      href: "https://biz.taptap.cn/",
+      href: "https://biz.taptap.com/",
     },
   ],
   sdk: [
