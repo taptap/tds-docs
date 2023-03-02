@@ -1,0 +1,110 @@
+---
+title: 短信 REST API
+sidebar_position: 1
+---
+
+import { Conditional } from "/src/docComponents/conditional";
+
+本文介绍短信相关的 REST API 接口。
+
+## 请求格式
+
+POST 请求的主体必须是 JSON 格式，而且 HTTP Header 的 Content-Type 需要设置为 `application/json`。
+
+请求的鉴权是通过 HTTP Header 里面包含的键值对来进行的，参数如下表：
+
+| Key        | Value        | 含义                                      | 来源           |
+| ---------- | ------------ | ----------------------------------------- | -------------- |
+| `X-LC-Id`  | `{{appid}}`  | 当前应用的 `App Id`（即 `Client Id`）  | 可在控制台查看 |
+| `X-LC-Sign` | `{{appSign}}` | 由 `sign,timestamp` 组成的字符串。其中 timestamp 为客户端产生本次请求的 unix 时间戳（UTC），精确到毫秒。`sign` 是 timestamp 拼接 `App Key`（即 `Client Token`）组成的字符串，再对它做 MD5 签名后的结果。| 参考下方的计算方式 |
+
+使用 App Key 来计算 `appSign`：
+
+```sh
+md5( timestamp + App Key )
+= md5(1453014943466UtOCzqb67d3sN12Kts4URwy8)
+= d5bcbb897e19b2f6633c716dfdfaf9be
+
+-H "X-LC-Sign: d5bcbb897e19b2f6633c716dfdfaf9be,1453014943466"
+```
+
+除了在 `X-LC-Id` 这个 HTTP Header 中传入 `Client Id` 外，还需要在 URL 中指定 `Client Id`，两者的值需要一致。
+
+在短信验证码发送过程中，一共有三方参与：客户端、TDS 和电信运营商（比如移动、联通、电信），发送、验证短信验证码的过程如下图所示：
+
+```seq
+客户端->TDS: 1. 请求向特定手机号码发送验证码
+TDS->运营商: 2. 生成验证码，将手机号码、短信内容发送到运营商通道
+运营商->客户端: 3. 下发短信
+客户端->TDS: 4. 提交手机号和收到的验证码
+```
+
+## Base URL
+
+REST API 请求的 Base URL（下文 curl 示例中用 `{{host}}` 表示）即应用的 API <Conditional region='cn'>自定义</Conditional>域名，可以在控制台<Conditional region='cn'>绑定、</Conditional>查看。<Conditional region='cn'>详见文档关于[域名](/sdk/domain/guide/)的说明。</Conditional>
+
+## 短信验证 API
+
+给某个手机号码发送验证短信：
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Sign: {{appSign}}" \
+  -H "Content-Type: application/json" \
+  -d '{"mobilePhoneNumber": "+86186xxxxxxxx"}' \
+  https://{{host}}/TODO/requestSmsCode
+```
+
+这里必须使用 POST 方式来发送请求，请求体里支持的参数有：
+
+| 参数                |  约束  | 描述                             |
+| :---------------- | :--: | :----------------------------- |
+| mobilePhoneNumber |  必填  | 目标手机号码                         |
+| ttl               |      | 验证码有效时间，单位分钟（默认为 **10 分钟**）    |
+| name              |      | 游戏名称（默认为开发者中心填写的游戏名称） |
+| op                |      | 操作类型                           |
+
+如果成功，将返回：
+
+```json
+{}
+```
+
+假设有如下调用：
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Sign: {{appSign}}" \
+  -H "Content-Type: application/json" \
+  -d '{"mobilePhoneNumber": "+86186xxxxxxxx","ttl":"5","name":"香肠派对","op":"付款"}' \
+  https://{{host}}/TODO/requestSmsCode
+```
+
+接收到的短信内容如下：
+
+```
+您正在使用香肠派对服务进行付款操作，您的验证码是：123456，请在5分钟内完成验证。
+```
+
+用户收到验证码后，可以在应用中填写验证码。
+然后你可以向 `verifySmsCode` 发送 `POST` 请求检查验证码是否正确：
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Sign: {{appSign}}" \
+  -H "Content-Type: application/json" \
+  -d '{"mobilePhoneNumber":"+86186xxxxxxxx"}' \
+  "https://{{host}}/TODO/verifySmsCode/123456"
+```
+
+`123456` 是手机收到的 6 位数字验证码。
+
+如果成功，将返回：
+
+```json
+{}
+```
+
