@@ -362,7 +362,7 @@ import CodeBlock from "@theme/CodeBlock";
 
 本项目为三个服务的文档提供了支持：
 
-- [TapTap 国内版](https://developer.taptap.com/docs/)
+- [TapTap 国内版](https://developer.taptap.cn/docs/)
 - [TapTap 海外版](https://developer.taptap.io/docs/)
 - [LeanCloud](https://docs.leancloud.cn/)
 

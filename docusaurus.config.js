@@ -6,7 +6,7 @@ const PREVIEW = process.env.PREVIEW ?? "false";
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: "TapTap 开发者文档",
-  url: "https://developer.taptap.com",
+  url: "https://developer.taptap.cn",
   baseUrl: PREVIEW === "true" ? "/" : "/docs/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
@@ -16,9 +16,9 @@ const config = {
     searchUrl: "https://tds-doc-search-api.cn-e1.leanapp.cn/search",
     searchProviderName: "LeanDB Elasticsearch",
     searchProviderWebsite:
-      "https://developer.taptap.com/docs/sdk/engine/database/es/",
-    mainDomainHost: "https://www.taptap.com",
-    dcDomainHost: "https://developer.taptap.com?from=tds-docs",
+      "https://developer.taptap.cn/docs/sdk/engine/database/es/",
+    mainDomainHost: "https://www.taptap.cn",
+    dcDomainHost: "https://developer.taptap.cn?from=tds-docs",
   },
 
   i18n: {

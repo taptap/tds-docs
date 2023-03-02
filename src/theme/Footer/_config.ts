@@ -22,31 +22,31 @@ export const getNavLinks = (
   const NAV_LINKS_TDS_CN: (NavLinkInternal | NavLinkExternal)[] = [
     {
       label: "推广",
-      url: `https://biz.taptap.com/${localePath}`,
+      url: `https://biz.taptap.cn/${localePath}`,
     },
     ...(locale === "zh-Hans"
       ? [
           {
             label: "工作",
-            url: "https://www.taptap.com/hr",
+            url: "https://www.taptap.cn/hr",
           },
         ]
       : []),
     {
       label: "认证",
-      url: "https://www.taptap.com/verify",
+      url: "https://www.taptap.cn/verify",
     },
     {
       label: "服务协议",
-      url: "https://www.taptap.com/terms",
+      url: "https://www.taptap.cn/terms",
     },
     {
       label: "隐私政策",
-      url: "https://www.taptap.com/privacy-policy",
+      url: "https://www.taptap.cn/privacy-policy",
     },
     {
       label: "侵权投诉",
-      url: "https://www.taptap.com/doc/27",
+      url: "https://www.taptap.cn/doc/27",
     },
   ];
 
@@ -125,11 +125,11 @@ export const getLicenceLinks = (
     },
     {
       label: "沪网文(2019)3544-255号",
-      link: "https://www.taptap.com/license/www.html",
+      link: "https://www.taptap.cn/license/www.html",
     },
     {
       label: "经营许可证编号：沪B2-20170322",
-      link: "https://www.taptap.com/license/www.html",
+      link: "https://www.taptap.cn/license/www.html",
     },
     {
       label: "沪公网安备 31010402003255号",

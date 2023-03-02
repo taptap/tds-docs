@@ -586,7 +586,7 @@ function Feedback() {
   }, []);
 
   const ENABLED_DOMAINS = [
-    "developer.taptap.com",
+    "developer.taptap.cn",
     "developer.taptap.io",
     "developer.xdrnd.cn",
     "developer-intl.xdrnd.com",

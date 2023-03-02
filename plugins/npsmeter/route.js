@@ -27,8 +27,6 @@ const clientModule = {
     // 仅在下列环境展示
     const CNHostname = [
       "developer.taptap.cn",
-      "developer.taptap.com",
-      "developer.xdrnd.com",
       "developer.xdrnd.cn",
       "localhost",
     ];
