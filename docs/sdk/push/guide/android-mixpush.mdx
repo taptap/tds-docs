@@ -1147,7 +1147,7 @@ public class MyApp extends Application {
 
 1. **注册荣耀账号**：在 [荣耀开发者平台](https://developer.hihonor.com/cn/) 注册荣耀开发者账号。
 2. **开发前准备**：接入荣耀 PUSH 之前，需要申请开通推送服务，开通流程可以参考 [推送服务开通流程](https://developer.hihonor.com/cn/kitdoc?category=%E5%9F%BA%E7%A1%80%E6%9C%8D%E5%8A%A1&kitId=11002&navigation=guides&docId=app-registration.md&token=) ，其中配置 SHA256 证书指纹 可以参考 [指纹证书生成](https://developer.hihonor.com/cn/kitdoc?category=%E5%9F%BA%E7%A1%80%E6%9C%8D%E5%8A%A1&kitId=11002&navigation=guides&docId=android-generate-appsign.md&token=)。
-3. 配置消息回执，设置步骤可参考 [消息回执](https://developer.hihonor.com/cn/kitdoc?category=%E5%9F%BA%E7%A1%80%E6%9C%8D%E5%8A%A1&kitId=11002&navigation=guides&docId=cloud-meassage-return.md&token=), 回调地址请设置为：**`https://callback.tds1.tapapis.cn/push/v1/callback/honor`**
+3. 配置消息回执，设置步骤可参考 [消息回执](https://developer.hihonor.com/cn/kitdoc?category=%E5%9F%BA%E7%A1%80%E6%9C%8D%E5%8A%A1&kitId=11002&navigation=guides&docId=cloud-meassage-return.md&token=)，回调地址请设置为：**`https://callback.tds1.tapapis.cn/push/v1/callback/honor`**。
 4. **将荣耀 App 信息保存到 开发者中心 控制台**：将上面创建的荣耀 App 信息（主要有 APP ID、APP Secret、Client ID、Client Secret），通过 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置 > 混合推送** 与应用关联。
 
 
@@ -1155,28 +1155,23 @@ public class MyApp extends Application {
 
 #### 获取荣耀推送 SDK 
 
-开发者可以参考[荣耀推送官方文档](https://developer.hihonor.com/cn/kitdoc?category=%E5%9F%BA%E7%A1%80%E6%9C%8D%E5%8A%A1&kitId=11002&navigation=guides&docId=intergrate.md&token=),完成荣耀推送 SDK 的接入。 其主要步骤有：
+开发者可以参考[荣耀推送官方文档](https://developer.hihonor.com/cn/kitdoc?category=%E5%9F%BA%E7%A1%80%E6%9C%8D%E5%8A%A1&kitId=11002&navigation=guides&docId=intergrate.md&token=)，完成荣耀推送 SDK 的接入。其主要步骤有：
 
-- 配置 荣耀 SDK 的 maven 仓库地址。
+- 配置荣耀 SDK 的 maven 仓库地址。在项目级 build.gradle 文件的 `allprojects/repositories` 和 `buildscript/repositories` 中增加仓库地址：
 
-    - 在项目级 build.gradle 文件的 `allprojects/repositories` 和 `buildscript/repositories` 中增加仓库地址：
+	```
+	maven { url 'https://developer.hihonor.com/repo/' }
+	```
 
-        ```
-        maven { url 'https://developer.hihonor.com/repo/' }
-        ```
+- 打开应用级的 build.gradle 文件，在 dependencies 中添加如下编译依赖。
 
-- 打开应用级的“build.gradle”文件，在“dependencies”中添加如下编译依赖。
+	```groovy
+	dependencies {
+  	implementation 'com.hihonor.mcs:push:7.0.41.300'
+	}
+	```
 
-        ```
-        dependencies {
-           implementation 'com.hihonor.mcs:push:7.0.41.300'
-        }
-        ```
-
-- 在 android 中配置签名
-
-    将生成签名证书指纹步骤中生成的签名文件拷贝到工程的 app 目录下，在 build.gradle 文件中配置签名：
-
+- 在 android 中配置签名。将生成签名证书指纹步骤中生成的签名文件拷贝到工程的 app 目录下，在 build.gradle 文件中配置签名：
     ```groovy
     android {
         signingConfigs {
@@ -1187,7 +1182,7 @@ public class MyApp extends Application {
                 storePassword '123456789'
             }
         }
-    
+
         buildTypes {
             debug {
                 signingConfig signingConfigs.config
@@ -1205,7 +1200,7 @@ public class MyApp extends Application {
 
 #### 修改应用 manifest 配置
 
-首先导入 `mixpush-honor` 包，修改 `build.gradle` 文件，在 `dependencies` 中添加依赖：
+首先导入 `mixpush-honor` 包，修改 build.gradle 文件，在 dependencies 中添加依赖：
 
 <CodeBlock className="groovy">
 {`dependencies {
@@ -1220,16 +1215,16 @@ public class MyApp extends Application {
 
 > 如果希望一次性接入所有厂商推送，可以将 `mixpush-honor` 替换为 `mixpush-android`。
 
-然后配置相关 AndroidManifest，添加 Permission（开发者要将其中的 `<包名>` 替换为自己的应用的 package）：
+然后配置相关 AndroidManifest，添加 Permission（开发者要将其中的 `<包名>` 替换为自己的应用的包名）：
 
 ```xml
-<!-- HMS-SDK引导升级HMS功能，访问OTA服务器需要网络权限 -->
+<!-- 需要网络权限 -->
 <uses-permission android:name="android.permission.INTERNET"/>
 <!-- 检测网络状态 -->
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 ```
 
-集成最新的荣耀 Push SDK 版本后要在 AndroidManifest.xml 文件的 application 节点下参照以下步骤注册 Service，用于接收荣耀推送的消息与令牌。
+集成最新的荣耀 Push SDK 版本后要在 AndroidManifest.xml 文件的 application 节点下参照以下步骤注册 service，用于接收荣耀推送的消息与令牌。
 
 ```xml
 <application
@@ -1243,22 +1238,21 @@ public class MyApp extends Application {
 </application>
 ```
 
-配置 AppId 信息：需要同样在“AndroidManifest.xml”文件下，添加meta-data标签，并在”com.hihonor.push.app_id”下添加您的AppId（AppId在注册完成后获取），用于配置您的设备。
+配置 AppId 信息：需要同样在 AndroidManifest.xml 文件下，添加 `meta-data` 标签，并在 `com.hihonor.push.app_id` 下添加 AppId（AppId 在注册完成后获取）。
 
 ```xml
 <manifest>
     <application>
         <meta-data
             android:name="com.hihonor.push.app_id"
-            android:value="您的AppId" />
+            android:value="您的 AppId" />
     </application>
 </manifest>
 ```
 
-
 ### 初始化
 
-与其他推送的初始化方法一样，我们在 `Application#onCreate` 方法中进行荣耀推送的初始化：
+与其他推送的初始化方法一样，在 `Application#onCreate` 方法中进行荣耀推送的初始化：
 
 ```java
 import cn.leancloud.LeanCloud;
@@ -1292,9 +1286,9 @@ public class MyApp extends Application {
 
 ### 点击通知打开自定义页面
 
-您可以自定义处理点击通知栏消息通知的动作，包括：打开应用首页、打开特定URL和打开自定义页面。
+您可以自定义处理点击通知栏消息通知的动作，包括：打开应用首页、打开特定 URL 和打开自定义页面。
 
-打开应用自定义页面有两种方式，一种是通过服务端 API 指定 intent 参数，另一种是指定 action 参数，我们混合推送 SDK 选择使用 intent 参数（具体可参考荣耀文档 [服务端发送 push 消息 ](https://developer.hihonor.com/cn/kitdoc?category=%E5%9F%BA%E7%A1%80%E6%9C%8D%E5%8A%A1&kitId=11002&navigation=ref&docId=downlink-message.md&token=)），开发者也可以在发送请求时自行指定 action 参数（按照荣耀的 REST API 规范指定即可）。
+打开应用自定义页面有两种方式，一种是通过服务端 API 指定 intent 参数，另一种是指定 action 参数，混合推送 SDK 选择使用 intent 参数（具体可参考荣耀文档 [服务端发送 push 消息 ](https://developer.hihonor.com/cn/kitdoc?category=%E5%9F%BA%E7%A1%80%E6%9C%8D%E5%8A%A1&kitId=11002&navigation=ref&docId=downlink-message.md&token=)），开发者也可以在发送请求时自行指定 action 参数（按照荣耀的 REST API 规范指定即可）。
 
 对于目标 activity，开发者需要在 manifest 文件的 application 中增加 intent-filter 的定义，例如：
 
@@ -1324,8 +1318,6 @@ public class MyApp extends Application {
     </intent-filter>
 </activity>
 ```
-
-
 
 ## 取消混合推送注册
 
