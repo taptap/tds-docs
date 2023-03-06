@@ -1,0 +1,706 @@
+---
+title: Achievements Guide
+sidebar_label: Guide
+sidebar_position: 2
+---
+
+import MultiLang from '/src/docComponents/MultiLang';
+import CodeBlock from '@theme/CodeBlock';
+import sdkVersions from '/src/docComponents/sdkVersions';
+import Languages from '../_partials/languages.mdx';
+
+This page shows you how to integrate the Achievements service into your game. The Achievements service is based on TDS Authentication (TDSUser). You can read more about this in **[TDS Authentication > Guide](/sdk/authentication/guide/)**.
+
+## Install the SDK
+
+Please make sure that you have already [created the game](/sdk/start/quickstart/#creating-a-game), [configured the project](/sdk/start/quickstart/#project-configuration), and [initialized the project](/sdk/start/quickstart/#initialization) according to the [TapSDK Quickstart](/sdk/start/quickstart/). Once you have completed these steps, you can proceed to add the `TapAchievement` module from the TapSDK downloaded from the [Downloads](/tap-download) page:
+
+<MultiLang>
+
+<CodeBlock className="json">
+{`"dependencies":{
+  ...
+  // Achievements service
+  "com.taptap.tds.achievement": "https://github.com/TapTap/TapAchievement-Unity.git#${sdkVersions.taptap.unity}",
+}`}
+</CodeBlock>
+
+<CodeBlock className="groovy">
+{`repositories{  
+    flatDir {  
+        dirs 'libs'  
+    }  
+}  
+dependencies {  
+    ... 
+    implementation (name:'TapAchievement_${sdkVersions.taptap.android}', ext:'aar') // TapTap Achievements service
+}`}
+</CodeBlock>
+
+<CodeBlock className="objectivec">
+{`// Achievements service
+TapAchievementResource.bundle
+TapAchievementSDK.framework`}
+</CodeBlock>
+
+</MultiLang>
+
+## Register Callbacks
+The Achievements SDK has several callbacks that are triggered when the data is initialized, when the data cannot be initialized, and when there is a progress update. The data initialization callback is particularly important as it is required for the SDK to work properly. If the data cannot be initialized, please either prompt the user or try to initialize the data again at another time.
+
+<MultiLang>
+
+<>
+
+**Prerequisite**
+
+TapTap.Achievement depends on the `TapTap.Bootstrap` library.
+
+**Namespace**
+
+```cs
+using TapTap.Achievement;
+```
+
+To register callbacks:
+
+```cs
+TapAchievement.RegisterCallback(IAchievementCallback callback);
+
+private class AchievementCallback:IAchievementCallback
+{
+    public void OnAchievementSDKInitSuccess()
+    {
+        // The Achievement SDK is initialized
+    }
+
+    public void OnAchievementSDKInitFail(TapError errorCode)
+    {
+        if (errorCode != null)
+        {
+            // Failed to initialize the SDK
+        }
+    }
+
+    public void OnAchievementStatusUpdate(TapAchievementBean bean, TapError errorCode)
+    {
+        if (errorCode != null)
+        {
+            // Failed to update achievements
+            return;
+        }
+
+        if (bean != null)
+        {
+            // Achievements updated
+        }
+    }
+}
+```
+
+</>
+<>
+
+```java
+TapAchievement.registerCallback(new AchievementCallback() {
+  @Override
+  public void onAchievementSDKInitSuccess() {
+    // Data loaded
+  }
+
+  @Override
+  public void onAchievementSDKInitFail(AchievementException exception) {
+    // Failed to load data; please try again
+  }
+
+  @Override
+  public void onAchievementStatusUpdate(TapAchievementBean item, AchievementException exception) {
+    if (exception != null) {
+      // Failed to update achievements
+      return;
+    }
+    if (item != null) {
+      // item updated
+    }
+  }
+});
+```
+
+</>
+<>
+
+
+```objectivec
+[TapAchievement registerCallBack:self];
+
+- (void)onAchievementSDKInitSuccess {
+  // Data loaded
+}
+
+// Failed to initialize the SDK
+- (void)onAchievementSDKInitFail:(nullable NSError *)error {
+    // Failed to load data; please try again
+}
+
+// Achievements updated
+- (void)onAchievementStatusUpdate:(nullable TapAchievementModel *)achievement failure:(nullable NSError *)error {
+    if (error) {
+       // Failed to update achievements
+    } else {
+      // achievement updated
+    }
+}
+```
+
+</>
+
+</MultiLang>
+
+## Initialize the Data
+Since the Achievements service keeps track of the user’s achievement data locally, please make sure to **initialize the data when the user is logged in**. If the user switches to a different account, be sure to call the interface for initializing the data again. Failure to do so may result in the achievement data for different accounts being mixed up.
+
+This step is asynchronous, which means that you should not proceed until you have received a successful callback.
+
+<MultiLang>
+
+```cs
+TapAchievement.InitData();
+```
+
+```java
+TapAchievement.initData();
+```
+
+```objectivec
+[TapAchievement initData];
+```
+
+</MultiLang>
+
+## Get All Achievements
+You can get all achievements from either the local cache or the server. The local cache is refreshed when you successfully invoke the data initialization interface. It is also refreshed when you proactively invoke the data fetching interface.
+
+If you need to fetch the latest data from the server while the player is playing, you can use the data fetching interface. Most of the time you just need to load the data from the local cache.
+
+<MultiLang>
+
+```cs
+// Get local data
+TapAchievement.GetLocalAllAchievementList((list, code) =>
+{
+     if (code != null)
+     {
+        // Failed to get all achievements
+     }
+     else
+     {
+        // Got all achievements successfully
+     });
+}
+// Fetch data from the server
+TapAchievement.FetchAllAchievementList((list, code) =>
+{
+     if (code != null)
+     {
+        // Failed to fetch all achievements
+     }
+     else
+     {
+        // Fetched all achievements successfully
+     });
+}
+```
+
+```java
+// Local data
+List<TapAchievementBean> allList = TapAchievement.getLocalAllAchievementList();
+
+// Server data
+TapAchievement.fetchAllAchievementList(new GetAchievementListCallBack() {
+  @Override
+  public void onGetAchievementList(List<TapAchievementBean> achievementList, AchievementException exception) {
+    if (exception != null) {
+      switch (exception.errorCode) {
+        case AchievementException.SDK_NOT_INIT:
+          // The SDK has not initialized the data yet
+          break;
+        default:
+          // Failed to fetch data
+      }
+    } else {
+      // Fetched data successfully
+    }
+  }
+});
+```
+
+```objectivec
+// Local data
+ NSArray<TapAchievementModel *> *allList = [TapAchievement getLocalAllAchievementList];
+
+ // Server data
+ [TapAchievement fetchAllAchievementList:^(NSArray<TapAchievementModel *> *_Nullable result, NSError *_Nullable error) {
+        if (error) {
+            switch (error.code) {
+                case 9001:
+                    // The SDK has not initialized the data yet
+                    break;
+                default:
+                    // Failed to fetch data
+                    break;
+            }
+        } else {
+            // Fetched data successfully
+        }
+    }];
+```
+
+</MultiLang>
+
+## Get Current User’s Achievements
+You can get the current user’s achievements from either the local cache or the server. The local cache is merged with the server data when you successfully invoke the data initialization interface (if different steps are tracked for the same achievement in the server and the local cache, the larger one is kept). They are also merged when you proactively invoke the data fetching interface.
+
+The local data is often more accurate than the server data because the server data may be out of date due to previous synchronization failures.
+<MultiLang>
+
+```cs
+// Get local data
+TapAchievement.GetLocalUserAchievementList((list, code) =>
+{
+     if (code != null)
+     {
+        // Failed to get user’s achievements
+     }
+     else
+     {
+        // Got user’s achievements successfully
+     });
+}
+// Fetch data from the server
+TapAchievement.FetchUserAchievementList((list, code) =>
+{
+     if (code != null)
+     {
+        // Failed to fetch user’s achievements
+     }
+     else
+     {
+        // Fetched user’s achievements successfully
+     });
+}
+```
+
+```java
+// Local data
+List<TapAchievementBean> userList = TapAchievement.getLocalUserAchievementList();
+
+// Server data
+TapAchievement.fetchUserAchievementList(new GetAchievementListCallBack() {
+  @Override
+  public void onGetAchievementList(List<TapAchievementBean> achievementList, AchievementException exception) {
+    if (exception != null) {
+      switch (exception.errorCode) {
+        case AchievementException.SDK_NOT_INIT:
+          // The SDK has not initialized the data yet
+          break;
+        default:
+          // Failed to fetch data
+      }
+    } else {
+      // Fetched data successfully
+    }
+  }
+});
+```
+
+```objectivec
+// Local data
+ NSArray<TapAchievementModel *> *userList = [TapAchievement getLocalUserAchievementList];
+
+// Server data
+[TapAchievement fetchUserAchievementList:^(NSArray<TapAchievementModel *> *_Nullable result, NSError *_Nullable error) {
+        if (error) {
+            switch (error.code) {
+                case 9001:
+                    // The SDK has not initialized the data yet
+                    break;
+                default:
+                    // Failed to fetch data
+                    break;
+            }
+        } else {
+            // Fetched data successfully
+        }
+    }];
+```
+
+</MultiLang>
+
+## Get an Achievement (Directly)
+
+<MultiLang>
+
+```cs
+// displayID is the Achievement ID you configured on the Developer Center
+TapAchievement.Reach("displayID");
+```
+
+```java
+// displayID is the Achievement ID you configured on the Developer Center
+TapAchievement.reach("displayID");
+```
+
+```objectivec
+// displayID is the Achievement ID you configured on the Developer Center
+[TapAchievement reach:@"displayId"];
+```
+
+</MultiLang>
+
+## Add Steps to an Accumulation Achievement
+There are two ways to add steps to an accumulation achievement. The first is to call `growSteps` with the number of steps to add (for example, enter `5` to add `5` steps). The second is to use `makeSteps` with the total number of steps (for example, enter `100` to set the total number of steps to `100`). Internally, the SDK would calculate the total number of steps when you call `growSteps`.
+
+<MultiLang>
+
+```cs
+// displayID is the Achievement ID you configured on the Developer Center
+TapAchievement.GrowSteps("displayID", step);
+TapAchievement.MakeSteps("displayID", step);
+```
+
+```java
+// displayID is the Achievement ID you configured on the Developer Center
+TapAchievement.growSteps("displayID", 5);
+TapAchievement.makeSteps("displayID", 100);
+```
+
+```objectivec
+// displayID is the Achievement ID you configured on the Developer Center
+[TapAchievement growSteps:@"displayID" numSteps:5];
+[TapAchievement makeSteps:@"displayID" numSteps:100];
+```
+
+</MultiLang>
+
+## Set Toasts
+By default, the SDK automatically displays a toast when the player gets an achievement. You can turn off toasts using the following interface:
+
+<MultiLang>
+
+```cs
+TapAchievement.SetShowToast(bool isShow);
+```
+
+```java
+TapAchievement.setShowToast(false);
+```
+
+```objectivec
+[TapAchievement setShowToast:NO];
+```
+
+</MultiLang>
+
+## Show Achievements
+The SDK comes with a page that shows all the achievements the player has gotten:
+
+<MultiLang>
+
+```cs
+TapAchievement.ShowAchievementPage();
+```
+
+```java
+TapAchievement.showAchievementPage();
+```
+
+```objectivec
+[TapAchievement showAchievementPage];
+```
+
+</MultiLang>
+
+## Interpreting Achievement Data
+
+<MultiLang>
+
+```cs
+public string displayId;              // Achievement ID
+public int visible = VisibleFalse;    // Whether the achievement is hidden
+public string title;                  // Name
+public string subTitle;               // Description
+public string achieveIcon;            // Icon
+public int step;                      // Total steps
+public bool fullReached;              // Whether the player has gotten the achievement
+public int reachedStep;               // Current steps
+public long reachedTime;              // When the player has gotten the achievement
+public AchievementStats stats;        // Rarity
+```
+
+```java
+  /*base*/
+  private String displayId;             // Achievement ID
+  private int visible = VISIBLE_TRUE;   // Whether the achievement is hidden
+  private String title;                 // Name
+  private String subTitle;              // Description
+  private String achieveIcon;           // Icon
+  private int step;                     // Total steps
+  private AchievementStats stats;       // Rarity
+  private int type;                     // Type; 1 means basic achievement; 99 means Platinum Achievement
+  /*user*/
+  private boolean fullReached;          // Whether the player has gotten the achievement
+  private int reachedStep;              // Current steps
+  private long reachedTime;             // When the player has gotten the achievement
+```
+
+```objectivec
+@property (nonatomic, copy, readonly) NSString *displayId;      // Achievement ID
+@property (nonatomic, copy, readonly) NSString *achieveIcon;    // Icon
+@property (nonatomic, copy) NSString *title;                    // Name
+@property (nonatomic, copy, readonly) NSString *subTitle;       // Description
+@property (nonatomic, assign, readonly) NSNumber *step;         // Total steps
+@property (nonatomic, strong) TDSAchievementStatus *stats;      // Rarity
+@property (nonatomic, assign) NSInteger type;                   // Type; 1 means basic achievement; 99 means Platinum Achievement
+
+// User data
+@property (nonatomic, assign) BOOL fullReached;                 // Whether the player has gotten the achievement
+@property (nonatomic, assign) long reachedTime;                 // When the player has gotten the achievement
+@property (nonatomic, assign) NSInteger reachedStep;            // Current steps
+```
+
+</MultiLang>
+
+## Internationalization
+
+The Achievements service supports multiple languages:
+
+:::tip
+When the data is initialized, only the achievement data for the current language is synchronized from the server. To switch to another language after initialization, call `fetchAllAchievementList` and `fetchUserAchievementList`.
+:::
+
+<Languages />
+
+## REST API
+
+Now let’s look at the REST API provided by the Achievements service.
+You can write your own programs or scripts to invoke these interfaces to perform server-side administrative operations.
+
+### Request Format
+
+The body of any request sent to the REST API must be a JSON object. The `Content-Type` in the HTTP header should be `application/json`.
+
+Requests sent to the server are authenticated using the key-value pairs in the HTTP Header:
+
+Key|Value|Description
+---|----|---
+`X-TDS-Id`|`{{clientId}}`|The game’s `Client Id`, which can be found on the Developer Center.
+`X-TDS-Server-Secret`|`{{serverSecret}}`|The game’s `Server Secret`, which can be found on the Developer Center.
+
+Find out more about application credentials [here](/sdk/storage/guide/setup-dotnet#credentials).
+
+In addition to providing the `Client Id` through the `X-TDS-Id` HTTP Header, you must also provide the same `Client Id` in the URL.
+
+When obtaining achievements, you must specify the language in the URL. See [Language Codes](#language-codes) for more information.
+
+
+If there is an error, the HTTP status code 500 will be returned, like:
+
+```json
+{
+    "code": "500",
+    "msg": "成就服务忙，稍后请求",
+}
+```
+
+### Get All Achievements
+
+Below is the interface for retrieving all the game’s achievements. Make sure you include the language in the URL.
+
+```sh
+curl -X GET \
+  -H "X-TDS-Id: {{clientId}}" \
+  -H "X-TDS-Server-Secret: {{serverSecret}}" \
+  https://tds-tapsdk.cn.tapapis.com/achievement/open/v1/clients/{{clientId}}/achievements/languages/<lang>
+```
+
+The response body looks like this:
+
+```json
+{
+  "success": true,
+  "data": {
+    "list": [
+      {
+        "achievement_id": "Achievement ID",
+        "client_id": "Client ID",
+        "achievement_open_id": "Achievement open ID (an ID assigned to the achievement when it is added on the Developer Center)",
+        "achievement_type": "Achievement type; 1 means basic achievement; 99 means Platinum Achievement",
+        "is_hide": "Whether the achievement is hidden; 0 means not hidden; 1 means hidden",
+        "count_step": "Total steps; if the achievement is not an accumulation achievement, this will be 1",
+        "show_order": "The order of the achievement; if the achievement is a Platinum Achievement, this will be 0",
+        "achievement_config_out_dto": {
+          "achievement_config_id": "The achievement’s configuration ID",
+          "achievement_id": "Achievement ID",
+          "language_id": "Language ID",
+          "achievement_icon": "Link to the achievement’s icon",
+          "achievement_title": "Achievement name",
+          "achievement_sub_title": "Achievement description"
+        },
+        "achievement_rarity": {
+          "rarity": "Rarity rate",
+          "level": "Rarity; 1 means Common; 2 means Uncommon; 3 means Rare; 4 means Ultra Rare"
+        }
+      }
+    ]
+  }
+}
+```
+
+### Get a User’s Achievements
+
+Below is the interface for retrieving a user’s achievements. Make sure you include the player’s account objectId and language in the URL.
+
+```sh
+curl -X GET \
+  -H "X-TDS-Id: {{clientId}}" \
+  -H "X-TDS-Server-Secret: {{serverSecret}}" \
+  https://tds-tapsdk.cn.tapapis.com/achievement/open/v1/clients/{{clientId}}/users/<objectId>/achievements/languages/<lang>
+```
+
+The response body looks like this:
+
+```json
+{
+  "success": true,
+  "data": {
+    "list": [
+      {
+        "achievement_id": "Achievement ID",
+        "client_id": "Client ID",
+        "achievement_open_id": "Achievement open ID (an ID assigned to the achievement when it is added on the Developer Center)",
+        "achievement_type": "Achievement type; 1 means basic achievement; 99 means Platinum Achievement",
+        "is_hide": "Whether the achievement is hidden; 0 means not hidden; 1 means hidden",
+        "count_step": "Total steps; if the achievement is not an accumulation achievement, this will be 1",
+        "show_order": "The order of the achievement; if the achievement is a Platinum Achievement, this will be 0",
+        "achievement_config_out_dto": {
+          "achievement_config_id": "The achievement’s configuration ID",
+          "achievement_id": "Achievement ID",
+          "language_id": "Language ID",
+          "achievement_icon": "Link to the achievement’s icon",
+          "achievement_title": "Achievement name",
+          "achievement_sub_title": "Achievement description"
+        },
+        "achievement_rarity": {
+          "rarity": "Rarity rate",
+          "level": "Rarity; 1 means Common; 2 means Uncommon; 3 means Rare; 4 means Ultra Rare"
+        },
+        "user_achievement_id": "User achievement ID",
+        "complete_time": "Time of completion",
+        "completed_step": "Steps completed",
+        "full_completed": "Whether completed; true means yes; false means no"
+      }
+    ]
+  }
+}
+```
+
+### Submit Achievements
+
+Below is the interface for submitting one or more achievements that a player has earned. The achievements submitted will be **added** to the list of achievements the player has already earned.
+
+```sh
+curl -X POST \
+  -H "X-TDS-Id: {{clientId}}" \
+  -H "X-TDS-Server-Secret: {{serverSecret}}" \
+  -H "Content-Type: application/json" \
+  -d '{"data": [{"userId": <objectId>, "list":
+        [{
+          "achievement_id": "Achievement ID",
+          "achievement_open_id": "Achievement open ID",
+          "complete_time": "Time of completion",
+          "completed_step": "Steps completed"
+        }]
+      }]
+    }' \
+  https://tds-tapsdk.cn.tapapis.com/achievement/open/v1/clients/{{clientId}}/achievements
+```
+
+The response body looks like this:
+
+```json
+{
+  "success": true,
+  "data": {
+    "list": [
+      {
+        "user_id": "TDSId",
+        "result_list": [
+          {
+            "result": "Whether this data has been successfully submitted; true means yes; false means no"
+            "code": "Is 0 if succeeded and the error code if not"
+            "msg": "Is not included if succeeded and the error message if not"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### Language Codes
+
+The REST API accepts language codes defined by ISO 639-1. For example, `en` means English and `jp` means Japanese. There are a couple of exceptions:
+
+1. For languages not included in ISO 639-1, the language codes defined in ISO 632-2 are used. For example, `fil` means Filipino.
+2. When a language cannot be represented by a language code, the location code defined in ISO 3166-1 will be attached. For example, `zh_CN` means Simplified Chinese.
+
+The following language codes are supported by the REST API:
+
+| Code | Language         |
+| ------- | ----------- |
+| zh_CN    | Simplified Chinese     |
+| zh_TW    | Traditional Chinese     |
+| en_US    | English (US) |
+| ja_JP    | Japanese         |
+| ko_KR    | Korean         |
+| pt_PT    | Portuguese     |
+| vi_VN    | Vietnamese       |
+| hi_IN    | Hindi       |
+| id_ID    | Indonesian       |
+| ms_MY    | Malay       |
+| th_TH    | Thai         |
+| es_ES    | Spanish       |
+| af       | Afrikaans   |
+| am       | Amharic   |
+| bg       | Bulgarian   |
+| ca       | Catalan |
+| hr       | Croatian   |
+| cs       | Czech       |
+| da       | Danish       |
+| nl       | Dutch       |
+| et       | Estonian   |
+| fil      | Filipino     |
+| fi       | Finnish       |
+| fr       | French         |
+| de       | German         |
+| el       | Greek       |
+| he       | Hebrew     |
+| hu       | Hungarian     |
+| is       | Icelandic       |
+| it       | Italian     |
+| lv       | Latvian   |
+| lt       | Lithuanian     |
+| no       | Norwegian       |
+| pl       | Polish       |
+| ro       | Romanian   |
+| ru       | Russian         |
+| sr       | Serbian   |
+| sk       | Slovak   |
+| sl       | Slovenian |
+| sw       | Swahili   |
+| sv       | Swedish       |
+| tr       | Turkish     |
+| uk       | Ukrainian     |
+| zu       | Zulu       |
+
+Keep in mind that some of the languages listed above are only supported by the REST API but [not the client SDK](#internationalization).

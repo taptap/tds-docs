@@ -7,7 +7,7 @@ yarn
 yarn start
 
 # 预览英文文档
-yarn start -- --locale en
+yarn start --locale en
 ```
 
 注意：`yarn start` 并不会检查坏链。如需检查坏链，需要运行 `yarn build`。坏链检查只会检查文档内部链接指向的页面是否存在，不会检查指向第三方网站的外部链接，也不会检查页内链接（hash link）。
@@ -16,6 +16,7 @@ yarn start -- --locale en
 
 ```
 .
+├── .ci                                      多品牌、多节点构建相关配置
 ├── docs                                     中文文档
 │   ├── ddos.mdx                             隐藏文档
 │   └── sdk                                  顶栏菜单项
@@ -356,6 +357,25 @@ import CodeBlock from "@theme/CodeBlock";
   }
 }
 ```
+
+## 多品牌、多节点
+
+本项目为三个服务的文档提供了支持：
+
+- [TapTap 国内版](https://developer.taptap.cn/docs/)
+- [TapTap 海外版](https://developer.taptap.io/docs/)
+- [LeanCloud](https://docs.leancloud.cn/)
+
+这三个服务的文档内容各不相同，每个服务的文档都有一些它独有的页面。不同文档的配置也存在差异，比如 TapTap 国内版文档的默认语言是简体中文，而 TapTap 海外版文档的默认语言则是英文。同一篇文档中不同内容的显示与否也会由配置来决定。此外，LeanCloud 文档需要使用和 TapTap 文档不一样的配色风格。
+
+Docusaurus 自身并没有提供「从一个项目构建出不同版本」的功能。为实现该功能，我们在 `.ci` 目录下放置了两个构建脚本（`build-hk.sh` 和 `build-leancloud.sh`），它们会分别在 TapTap 海外版文档和 LeanCloud 文档的构建阶段被执行，将当前项目中的文档文件（也就是 TapTap 国内版用到的文件）改造成目标版本的文档所需的文件。你可以通过浏览这两个构建脚本来了解不同版本的文档相对于 TapTap 国内版的文档存在哪些差异。
+
+对于文档维护者来说，可以借助这两个脚本来控制不同版本之间的内容差异：
+
+- 加入 `docs` 和 `i18n` 的文档默认会出现在 TapTap 国内版和 TapTap 海外版的文档中，但不会出现在 LeanCloud 文档中。
+- 如果想在 TapTap 海外版文档中隐藏这篇文档，需要在 `build-hk.sh` 中使用 `rm` 命令移除相关文件。
+- 如果想在 LeanCloud 文档中显示这篇文档，需要在 `build-leancloud.sh` 中使用 `cp` 命令将相关文件复制到临时目录中。
+- `.ci` 目录中提供了名为 `hk` 和 `leancloud` 的两个目录，分别用于存放仅适用于 TapTap 海外版的文档和仅适用于 LeanCloud 的文档。如需添加仅适用于某个版本的内容，请将文件放入对应目录，并在构建脚本中借助 `cp` 命令将文件复制到合适的位置。
 
 ## 文档发布注意事项
 

@@ -76,6 +76,26 @@ const CONFIGS: {
       { label: "iOS", value: "ios" },
       { label: "JavaScript", value: "js" },
     ],
+    leancloud: [
+      { label: "C#", value: "charp" },
+      { label: "Java", value: "java" },
+      { label: "Objective-C", value: "objc" },
+      { label: "JavaScript", value: "js" },
+      { label: "Swift", value: "swift" },
+      { label: "Flutter", value: "flutter" },
+    ]
+  },
+  sms: {
+    leancloud: [
+      { label: ".NET", value: "dotnet" },
+      { label: "Java", value: "java" },
+      { label: "Objective-C", value: "objc" },
+      { label: "Swift", value: "swift" },
+      { label: "Flutter", value: "flutter" },
+      { label: "JavaScript", value: "js" },
+      { label: "Python", value: "python" },
+      { label: "PHP", value: "php" },
+    ],
   },
   default: {
     leancloud: [

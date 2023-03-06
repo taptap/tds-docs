@@ -14,10 +14,11 @@ cp -r docs/sdk/_partials tmp/zh-Hans
 cp -r docs/sdk/domain tmp/zh-Hans # 域名
 cp -r docs/sdk/storage tmp/zh-Hans # 数据存储
 cp -r docs/sdk/engine tmp/zh-Hans # 云引擎
+cp -r docs/sdk/push tmp/zh-Hans # 推送通知
+cp -r docs/sdk/im tmp/zh-Hans # 即时通讯
 
 # 减去
 rm tmp/zh-Hans/storage/features.mdx # 数据存储/功能介绍
-rm tmp/zh-Hans/storage/rest.mdx # 数据存储/REST API
 rm -r tmp/zh-Hans/engine/game # 云引擎/游戏后端
 
 # 英文部分
@@ -33,8 +34,13 @@ rm tmp/en/storage/rest.mdx # 数据存储/REST API
 # 加入 LeanCloud 独有的文档
 
 # 中文部分
+cp -r .ci/leancloud/zh-Hans/sdk/start tmp/zh-Hans # 控制台和账户相关文档
 cp -r .ci/leancloud/zh-Hans/sdk/authentication tmp/zh-Hans # 内建账户
 cp -r .ci/leancloud/zh-Hans/sdk/storage tmp/zh-Hans # 数据存储（LeanCloud 独有的语言）
+cp -r .ci/leancloud/zh-Hans/sdk/sms tmp/zh-Hans # 短信
+cp -r .ci/leancloud/zh-Hans/sdk/error-code.mdx tmp/zh-Hans # 错误码
+cp -r .ci/leancloud/zh-Hans/sdk/push tmp/zh-Hans # Flutter 推送
+cp -r .ci/leancloud/zh-Hans/sdk/im tmp/zh-Hans # 即时通信
 
 # 英文部分
 cp -r .ci/leancloud/en/sdk/authentication tmp/en # 内建账户
