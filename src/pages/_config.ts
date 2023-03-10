@@ -165,6 +165,26 @@ export const getEntries = (brand: string, region: string): Entry[] => {
         },
       ],
     },
+    {
+      title: "短信",
+      description: "支持国内短信和国际短信，用途包括验证类、通知类、营销类，方便与 LeanCloud 账户系统集成",
+      links: [
+        {
+          label: "查看更多",
+          to: "/sdk/sms/guide",
+        },
+      ],
+    },
+    {
+      title: "多人在线对战",
+      description: "不需要自己搭建后端系统，轻松实现游戏内玩家匹配、在线对战消息同步等功能",
+      links: [
+        {
+          label: "查看更多",
+          to: "/sdk/multiplayer/features",
+        },
+      ],
+    },
   ];
 
   const entries = brand === "leancloud" ? ENTRIES_LEANCLOUD : ENTRIES_TDS;
