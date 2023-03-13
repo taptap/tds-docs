@@ -22,6 +22,7 @@ cp -r docs/sdk/leaderboard tmp/zh-Hans # 排行榜
 # 减去
 rm tmp/zh-Hans/storage/features.mdx # 数据存储/功能介绍
 rm -r tmp/zh-Hans/engine/game # 云引擎/游戏后端
+cp -r docs/sdk/leaderboard/guide.mdx tmp/zh-Hans # 排行榜-开发指南
 
 # 英文部分
 cp -r i18n/en/docusaurus-plugin-content-docs/current/sdk/_partials tmp/en
@@ -44,6 +45,7 @@ cp -r .ci/leancloud/zh-Hans/sdk/error-code.mdx tmp/zh-Hans # 错误码
 cp -r .ci/leancloud/zh-Hans/sdk/push tmp/zh-Hans # Flutter 推送
 cp -r .ci/leancloud/zh-Hans/sdk/im tmp/zh-Hans # 即时通信
 cp -r .ci/leancloud/zh-Hans/sdk/multiplayer tmp/zh-Hans # 对战
+cp -r .ci/leancloud/zh-Hans/sdk/leaderboard tmp/zh-Hans # 排行榜
 
 # 英文部分
 cp -r .ci/leancloud/en/sdk/authentication tmp/en # 内建账户
