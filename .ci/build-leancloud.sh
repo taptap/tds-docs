@@ -22,7 +22,7 @@ cp -r docs/sdk/leaderboard tmp/zh-Hans # 排行榜
 # 减去
 rm tmp/zh-Hans/storage/features.mdx # 数据存储/功能介绍
 rm -r tmp/zh-Hans/engine/game # 云引擎/游戏后端
-rm -r docs/sdk/leaderboard/guide.mdx # 排行榜-开发指南
+rm tmp/zh-Hans/leaderboard/guide.mdx # 排行榜-开发指南
 
 # 英文部分
 cp -r i18n/en/docusaurus-plugin-content-docs/current/sdk/_partials tmp/en
