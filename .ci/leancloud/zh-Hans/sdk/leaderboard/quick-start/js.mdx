@@ -1,0 +1,93 @@
+---
+title: 排行榜快速入门 &middot; JavaScript
+sidebar_label: JavaScript
+sidebar_position: 1
+---
+
+本文档展示了如何快速接入排行榜功能。
+
+## 创建排行榜
+
+首先通过控制台创建一个世界排行榜：
+
+* 排行榜名称 statisticName 设置为 `world`。
+* 玩家成绩降序排列。
+* 更新策略选择 better，即保留用户最好的成绩。
+* 每月自动重置。
+
+![image](/img/leaderboard/create-leaderboard.png)
+
+点击完成后，我们在控制台看到一个已经创建好的排行榜。
+
+## SDK 安装
+
+接下来我们在客户端调用相关接口来更新用户的分数。在客户端接入排行榜需要安装存储 SDK 模块，在这篇文档中，为了简单，我们使用 CDN 的方式引入存储 SDK。在同一目录下，创建两个文件 `index.html` 和 `leaderboard-quick-start.js`。
+
+`index.html` 中的代码如下：
+
+```html
+<html>
+  <head>
+    <title>LeanCloud Leaderboard Quick Start Demo</title>
+  </head>
+  <body>
+    <!-- 引入存储 SDK -->
+    <script src="//code.bdstatic.com/npm/leancloud-storage@/dist/av-min.js"></script>
+  </body>
+</html>
+```
+
+接下来在 `leaderboard-quick-start.js` 中初始化应用：
+
+```javascript
+AV.init({
+  appId: 'your-app-id',
+  appKey: 'your-app-key'
+});
+```
+
+:::info
+SDK 的其他安装方式，请参考 [JavaScript SDK 安装指南](/sdk/storage/guide/setup-js/)。
+:::
+
+## 更新成绩
+
+这里在客户端模拟注册两个玩家 A 和 B 并更新自己的成绩。首先运行以下代码注册玩家 A 并更新排行榜中的成绩：
+
+```javascript
+// 注册时输入玩家 A 的用户名及密码
+AV.User.signUp('playerA', 'passwordA')
+.then(function(user) {
+  // 更新当前用户在 world 排行榜中的成绩
+  var statisticValue = Math.random() * 100;
+  return AV.Leaderboard.updateStatistics(AV.User.current(), {
+    'world' : statisticValue
+  })
+})
+.then(function() {
+  // 成绩更新成功
+})
+.catch(console.error);
+```
+
+接下来换玩家 B 登录并更新成绩，将以上代码中 `AV.User.signUp` 的参数换成玩家 B 的用户名 `playerB` 和密码 `passwordB` 后再次运行代码，运行成功后排行榜中也就有了玩家 B 的成绩。
+
+## 获取名次
+
+接下来我们获取排行榜中前 10 的名次，由于当前排行榜中只有 2 个玩家，所以结果是这两个玩家的数据。
+
+```js
+const leaderboard = AV.Leaderboard.createWithoutData('world');
+leaderboard.getResults({
+  limit: 10,
+  includeUserKeys: ['username'], //展示结果时同时展示玩家的用户名，需要在云引擎中使用 masterKey 权限。
+})
+.then(function(results) {
+  console.log(results);
+})
+.catch(console.error)
+```
+
+## 使用指南
+
+更详细的使用方式，请参考[JavaScript 排行榜开发指南](/sdk/leaderboard/guide/js/)。
