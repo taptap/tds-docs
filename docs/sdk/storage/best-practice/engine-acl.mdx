@@ -1,21 +1,31 @@
-# 在云引擎中使用 ACL
+---
+title: 在云引擎中使用 ACL
+slug: /sdk/storage/guide/engine-acl/
+sidebar_position: 3
+---
 
-云引擎（LeanEngine）提供给开发者自定义云端逻辑的接口，例如开发者想记录每一个用户登录系统的时间，打印一下日志，以备之后的查询和分析，那么云引擎提供的接口就可以实现这一需求，详细的操作请查看：
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-* [云引擎 Node.js 环境](leanengine_cloudfunction_guide-node.html)
-* [云引擎 Python 环境](leanengine_cloudfunction_guide-python.html)
-* [云引擎 PHP 环境](leanengine_cloudfunction_guide-php.html)
-* [云引擎 Java 环境](leanengine_cloudfunction_guide-java.html)
+**[云引擎](https://developer.taptap.cn/docs/sdk/engine/overview/)** 提供给开发者自定义云端逻辑的接口，例如开发者想记录每一个用户登录系统的时间，打印一下日志，以备之后的查询和分析，那么云引擎提供的接口就可以实现这一需求，详细的操作请查看 **[云函数和 Hook](/sdk/engine/functions/getting-started/)** 文档。
+
+## 需求
 
 提到以上这个需求是为了让开发者更好地理解以下的需求描述：
 
 假如开发者的应用有 iOS、Android、Web（JavaScript）各种版本，针对权限管理的逻辑代码会遍布各个客户端，开发者会重复书写逻辑极其类似的代码，只不过是不同语言的版本而已。因此，假如有一个云端的接口，让开发者可以在创建对象或者更新对象的时候，为其添加 ACL 相关的代码，那么各个客户端就无需再重复编码。
 
+## 示例
+
 我们从一个简单的实例入手：
 
 我们希望每发一篇帖子，不管是从 iOS 还是 Android，还是任意客户端发出的，都希望管理员具备对它读写的权限。
 
-第一步，我们需要编写我们的云引擎 Hook 函数（关于云引擎 Hook 函数介绍请查看 [Save AVObject 前执行操作](leanengine_cloudfunction_guide-node.html#beforeSave)）：
+第一步，我们需要编写我们的云引擎 Hook 函数（关于云引擎 Hook 函数介绍请查看 [Save 前执行操作](/sdk/engine/functions/guides/#beforesave)）：
+
+<Tabs>
+
+<TabItem value="nodejs" label="Node.js" default>
 
 ```js
 AV.Cloud.beforeSave('Post', (request) => {
@@ -32,6 +42,10 @@ AV.Cloud.beforeSave('Post', (request) => {
 });
 ```
 
+</TabItem>
+
+<TabItem value="python" label="Python">
+
 ```python
 @engine.before_save('Post')
 def before_post_save(post):
@@ -43,6 +57,10 @@ def before_post_save(post):
     post.set_acl(acl)
 ```
 
+</TabItem>
+
+<TabItem value="php" label="PHP">
+
 ```php
 Cloud::beforeSave("Post", function($post, $user) {
   $acl = new ACL();
@@ -52,6 +70,10 @@ Cloud::beforeSave("Post", function($post, $user) {
   $post->setACL($acl);
 });
 ```
+
+</TabItem>
+
+<TabItem value="java" label="Java">
 
 ```java
 @EngineHook(className = "Post", type = EngineHookType.beforeSave)
@@ -65,7 +87,11 @@ public static AVObject postBeforeSaveHook(AVObject post) throws Exception {
 }
 ```
 
-部署代码到云端（[如何部署](leanengine_webhosting_guide-node.html#部署与发布)）后，每个在客户端创建的帖子，保存后会自动添加如下的 ACL：
+</TabItem>
+
+</Tabs>
+
+[部署代码到云端](/sdk/engine/functions/getting-started/#部署到云引擎)后，每个在客户端创建的帖子，保存后会自动添加如下的 ACL：
 
 ```json
 {"*":{"read":true},"role:admin":{"write":true}}
