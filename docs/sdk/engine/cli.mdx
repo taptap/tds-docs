@@ -331,6 +331,134 @@ OPTIONS:
 
 相比于直接部署生产环境，<Command suffix=" publish" /> 可以保证将完全相同的版本（包括所有依赖和构建产物）发布到生产环境，最大限度避免不一致的情况。
 
+### 使用预览环境
+
+云引擎可以自动将 Pull request 部署到预览环境，每个预览环境有单独的域名，允许你在接近生产的环境中测试通过后再合并 PR。
+
+预览环境目前只支持在 CI 中使用命令行工具部署。
+
+使用命令 <Command suffix=" preview deploy" /> 来部署预览环境，在 GitLab CI 和 GitHub Actions 中会自动读取 PR 号、分支名等信息，若使用其他 CI 或在本地部署，需要手动指定。
+
+我们提供了 GitLab CI 和 GitHub Actions 的模版：
+
+<details>
+<summary>点击展开 GitLab CI (<code>.gitlab-ci.yml</code>) 模版</summary>
+
+首先在 GitLab 点击 **Settings > CI/CD > Variables > Add variable** 添加你的 ACCESS_TOKEN，注意勾选 “Mask variable” 避免出现在日志中。
+
+然后在 GitLab 左侧点击 **CI/CD > Editor** 新建一个 `.gitlab-ci.yml` 文件并添加以下内容。注意修改 `variables` 中的设置。
+
+<CodeBlock className="yaml">
+{`variables:
+  REGION: MY_REGION # set this to your ${BRAND == 'tds' ? 'TDS' : 'LeanCloud'} region, e.g. ${BRAND == 'tds' ? 'cn-tds1' : 'cn-n1'}
+  APP_ID: MY_APP_ID # set this to your App ID on ${BRAND == 'tds' ? 'TDS' : 'LeanCloud'}
+  GROUP: MY_GROUP   # set this to your group, e.g. web\n
+before_script:
+  - apt-get update && apt-get install -y curl
+  - curl -L -o /bin/${CLI_BINARY} http://releases.leanapp.cn/leancloud/lean-cli/releases/download/v1.2.0/${CLI_BINARY}-linux-x64
+  - chmod +x /bin/${CLI_BINARY}
+  - ${CLI_BINARY} login --region $REGION --token $ACCESS_TOKEN
+  - ${CLI_BINARY} switch --region $REGION --group $GROUP $APP_ID\n
+deploy_preview:
+  stage: deploy
+  script:
+    - PREVIEW_URL=\$(${CLI_BINARY} preview deploy)
+    - echo "PREVIEW_URL=$PREVIEW_URL" >> deploy.env
+  artifacts:
+    reports:
+      dotenv: deploy.env   
+  environment:
+    name: preview/$CI_COMMIT_REF_NAME
+    url: $PREVIEW_URL
+    on_stop: delete_preview
+    auto_stop_in: 1 week
+  only:
+    - merge_request\n
+delete_preview:
+  stage: deploy
+  script: ${CLI_BINARY} preview delete
+  environment:
+    name: preview/$CI_COMMIT_REF_NAME
+    action: stop
+  rules:
+    - if: $CI_MERGE_REQUEST_ID
+      when: manual`}
+</CodeBlock>
+
+</details>
+
+<details>
+<summary>点击展开 GitHub Actions 模版</summary>
+
+首先在 GitHub 点击 **Settings > Secrets and variables > Actions** 创建一个 secret，添加你的 ACCESS_TOKEN。
+
+然后在 GitHub 点击 **Actions > set up a workflow yourself** 创建两个 Workflow 文件，注意修改 `env` 中的设置：
+
+<CodeBlock className="yaml">
+{`# .github/workflows/preview-env-deploy.yml\n
+name: Deploy Preview Environment\n
+on:
+  pull_request:
+    types: [opened, synchronize]\n
+env:
+  REGION: MY_REGION # set this to your ${BRAND == 'tds' ? 'TDS' : 'LeanCloud'} region, e.g. ${BRAND == 'tds' ? 'cn-tds1' : 'cn-n1'}
+  APP_ID: MY_APP_ID # set this to your App ID on ${BRAND == 'tds' ? 'TDS' : 'LeanCloud'}
+  GROUP: MY_GROUP   # set this to your group, e.g. web\n
+jobs:
+  deploy-preview-environment:
+    runs-on: ubuntu-latest
+    environment:
+      name: preview/\${{ github.head_ref }}
+      url: \${{ env.PREVIEW_URL }}
+    steps:
+      - uses: actions/checkout@v3\n
+      - name: Install lean-cli
+        run: |
+          sudo curl -L -o /bin/${CLI_BINARY} http://releases.leanapp.cn/leancloud/lean-cli/releases/download/v1.2.0/${CLI_BINARY}-linux-x64
+          sudo chmod +x /bin/${CLI_BINARY}\n
+      - name: Deploy
+        run: |
+          ${CLI_BINARY} login --region \${{ env.REGION }} --token \${{ secrets.ACCESS_TOKEN }}
+          ${CLI_BINARY} switch --region \${{ env.REGION }} --group \${{ env.GROUP }} \${{ env.APP_ID }}
+          PREVIEW_URL=\$(${CLI_BINARY} preview deploy)
+          echo "PREVIEW_URL=$PREVIEW_URL" >> $GITHUB_ENV
+`}
+</CodeBlock>
+
+<CodeBlock className="yaml">
+{`# .github/workflows/preview-env-delete.yml\n
+name: Delete Preview Environment\n
+on:
+  pull_request:
+    types: [closed]\n
+env:
+  REGION: MY_REGION # set this to your ${BRAND == 'tds' ? 'TDS' : 'LeanCloud'} region, e.g. ${BRAND == 'tds' ? 'cn-tds1' : 'cn-n1'}
+  APP_ID: MY_APP_ID # set this to your App ID on ${BRAND == 'tds' ? 'TDS' : 'LeanCloud'}
+  GROUP: MY_GROUP   # set this to your group, e.g. web\n
+jobs:
+  delete-preview-environment:
+    runs-on: ubuntu-latest
+    permissions:
+      deployments: write
+    steps:
+      - name: Install lean-cli
+        run: |
+          sudo curl -L -o /bin/${CLI_BINARY} http://releases.leanapp.cn/leancloud/lean-cli/releases/download/v1.2.0/${CLI_BINARY}-linux-x64
+          sudo chmod +x /bin/${CLI_BINARY}\n
+      - name: Delete
+        run: |
+          ${CLI_BINARY} login --region \${{ env.REGION }} --token \${{ secrets.ACCESS_TOKEN }}
+          ${CLI_BINARY} switch --region \${{ env.REGION }} --group \${{ env.GROUP }} \${{ env.APP_ID }}
+          ${CLI_BINARY} preview delete\n
+      - uses: strumwolf/delete-deployment-environment@v2
+        with:
+          token: \${{ secrets.GITHUB_TOKEN }}
+          environment: preview/\${{ github.head_ref }}
+          onlyDeactivateDeployments: true`}
+</CodeBlock>
+
+</details>
+
 ### 触发 Git 部署
 
 如果代码保存在某个 Git 仓库上，例如 [GitHub](https://github.com)，并且在控制台已经正确设置了 git repo 地址以及 deploy key，你也可以请求云引擎从 Git 仓库获取源码并自动部署。这个操作可以在云引擎的部署菜单里完成，也可以在本地执行：
