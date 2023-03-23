@@ -8,8 +8,8 @@ const CONFIGS: {
 } = {
   ios: {
     leancloud: [
-      { label: "Swift", value: "swift" },
       { label: "Objective-C", value: "objc" },
+      { label: "Swift", value: "swift" },
     ],
     tds: [{ label: "Objective-C", value: "objc" }],
   },
