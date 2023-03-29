@@ -5,6 +5,7 @@ sidebar_position: 2
 ---
 
 import MultiLang from '/src/docComponents/MultiLang';
+import Mermaid from "/src/docComponents/Mermaid";
 
 
 本文介绍了如何在 iOS 设备中使用推送通知功能。建议先阅读[推送通知总览](/sdk/push/guide/overview/)了解相关概念。
@@ -17,11 +18,25 @@ import MultiLang from '/src/docComponents/MultiLang';
 
 首先，注册 APNs 申请 Token，并将其保存到云端：
 
-![注册 APNs 申请 Token](/img/apns-registration.svg)
+<Mermaid
+  diagram={`
+sequenceDiagram
+iOS SDK->>APNs: 1. 调用官方 API，申请 deviceToken
+APNs-->>iOS SDK: 2. 下发 deviceToken
+iOS SDK-->>云端: 3. SDK 将 deviceToken 存储在云端 _Installation 表中
+`}
+/>
 
 然后，调用推送通知提供的接口发送推送消息：
 
-![调用推送通知接口发推送](/img/push-workflow-ios.svg)
+<Mermaid
+  diagram={`
+sequenceDiagram
+开发者->>云端: 1. HTTPS 请求推送 API
+云端-->>APNs: 2. 找出 _Installation 记录中对应的 deviceToken，调用 APNs API 发送推送
+APNs->>iOS 设备: 3. 发送推送
+`}
+/>
 
 ## Installation
 
