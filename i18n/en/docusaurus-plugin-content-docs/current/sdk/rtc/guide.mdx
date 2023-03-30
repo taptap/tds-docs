@@ -1,6 +1,6 @@
 ---
-title: 实时语音开发指南
-sidebar_label: 开发指南
+title: RTC Guide
+sidebar_label: Guide
 sidebar_position: 2
 ---
 
@@ -11,15 +11,15 @@ import Mermaid from '/src/docComponents/Mermaid';
 import {Conditional} from '/src/docComponents/conditional';
 
 
-## SDK 获取
+## Install the SDK
 
-可以在 [下载页](/tap-download) 获得 TapSDK，引入 `TapRTC` 模块：
+Download the SDK from the [Downloads](/tap-download) page and import the `TapRTC` module:
 
 <MultiLang>
 
 <>
 
-请先确保系统已安装 [git-lfs]，然后通过 UPM 方式添加依赖：
+Make sure [git-lfs] is installed on your system, then add the dependencies via UPM:
 
 [git-lfs]: https://git-lfs.github.com
 
@@ -47,11 +47,11 @@ dependencies {
 
 <>
 
-1. 在 Xcode 选择工程，到 Build Setting > Other Linker Flags 添加 `-ObjC`。
-2. 拖拽 `TapRTC_SDK` 目录到项目目录。
-3. `TapRTC.framework` 和 `GMESDK.framework` 文件拖进项目，选择 `Do Not Embed`。
-4. 将资源文件 TapRTC.bundle 拖进项目。
-5. 添加 SDK 依赖的系统库：libz、libresolv、libiconv、libc++、CoreMedia.framework、CoreAudio.framework、AVFoundation.framework、SystemConfiguration.framework、UIKit.framework、AudioToolbox.framework、OpenAL.framework、Security.framework。
+1. Select the project in Xcode, then go to Build Settings > Other Linker Flags and add `-ObjC`.
+2. Drag and drop the `TapRTC_SDK` directory into the project directory.
+3. Drag the `TapRTC.framework` and `GMESDK.framework` files into the project and select `Do Not Embed`.
+4. Drag the TapRTC.bundle resource file into the project.
+5. Add the system libraries that the SDK depends on: libz, libresolv, libiconv, libc++, CoreMedia.framework, CoreAudio.framework, AVFoundation.framework, SystemConfiguration.framework, UIKit.framework, AudioToolbox.framework, OpenAL.framework, Security.framework.
 
 <CodeBlock className="objectivec">
 TapRTC.framework
@@ -61,13 +61,13 @@ TapRTC.framework
 
 </MultiLang>
 
-## 注意事项
+## Caution
 
-* RTC 使用前需要在开发者中心进行相关配置。
-* 开发者需要在自己的服务器上实现[相应的签名鉴权服务](#服务端鉴权)。
-* C# SDK 需要周期性的调用 `TapRTC.Poll` 接口，才能触发相关的事件回调。
+* RTC must be configured in the Developer Center before use.
+* You need to implement [the appropriate signature authentication service](#server-side-authentication) on your own servers.
+* C# SDK must periodically call the `TapRTC.Poll` interface to trigger relevant event callbacks.
 
-Android 平台需要申请网络、音频相关权限：
+On Android, you need to apply for network and audio-related permissions:
 
 ```xml
 <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -79,20 +79,20 @@ Android 平台需要申请网络、音频相关权限：
 <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 ```
 
-iOS 平台需要申请麦克风权限（`Privacy - Microphone Usage Description`）。
+For iOS, you need to request microphone permission (`Privacy - Microphone Usage Description`).
 
-游戏通常没有后台通话的需求，玩家一般边玩游戏边语音，游戏保持在前台。
-如果游戏类型比较特殊，需要支持后台通话，那么还需申请后台播放权限：
-在 target 中配置 **Capability > Background Modes > Audio, AirPlay, and Picture in Picture**。
+Games usually have no need for background calls; players usually play the game while the voice is playing, and the game stays in the foreground.
+If the type of game is special and needs to support background calls, then you must also request background play permission:
+Configure **Capability > Background Modes > Audio, AirPlay, and Picture in Picture** in target.
 
-## 核心接口
+## Core Interfaces
 
-RTC 通过 `TapRTCConfig` 来进行初始化配置。初始化的过程是异步的，需要等待初始化结果返回之后，才能进行下一步的操作。
+The RTC is initialized and configured with `TapRTCConfig`. The initialization process is asynchronous and you must wait for the initialization result to be returned before proceeding to the next step.
 
-* `ClientId`、`ClientToken`、`ServerUrl`，参见关于[应用凭证](/sdk/storage/guide/setup-dotnet#应用凭证)的说明。
-* `UserId`: 开发者自定义的用户 Id，用于标记玩家
-* `DeviceId`: 开发者自定义的设备 Id，用于标记设备
-* `AudioPerfProfile`: 音频质量配置（`LOW`、`MID`、`HIGH`，默认为 `MID`）
+* For `ClientId`, `ClientToken`, and `ServerUrl`, see the note about [application credentials](/sdk/storage/guide/setup-dotnet/#credentials).
+* `UserId`: Developer-defined user ID for tagging players.
+* `DeviceId`: Developer-defined device ID used to tag the device.
+* `AudioPerfProfile`: Audio quality profile (`LOW`, `MID`, or `HIGH`; default is `MID`).
 
 <MultiLang>
 
@@ -111,11 +111,11 @@ var config = new TapRTCConfig.Builder()
 ResultCode code = await TapRTC.Init(config);
 
 if (code == ResultCode.OK) {
-    // 初始化成功
+    // Initialized successfully
 } else {
-    // 失败
+    // Failed
 }
-// SDK 的 RTC 模块中，返回 ResultCode 的接口均以 ResultCode.OK 表示操作成功。
+// In the RTC module of the SDK, interfaces that return ResultCode indicate success with ResultCode.OK.
 ```
 
 ```java
@@ -134,17 +134,17 @@ public class MyApp extends Application {
         Config config = new Config();
         config.appId = "AppId";
         config.appKey = "AppKey";
-        config.serverUrl = "ServerUrl"; // 请去掉 http/https 前缀，直接传入自定义域名或者形如「xxx.cloud.tds1.tapapis.cn」之类的域名即可。
+        config.serverUrl = "ServerUrl"; // Please remove the http/https prefix and specify a custom domain name or a domain name in the form of "xxx.cloud.tds1.tapapis.cn" or something similar.
         config.userId = new UserID("UserId");
         config.deviceId = new DeviceID("DeviceId");
-        // 如需使用范围语音功能，此项必须设为 LOW
+        // This must be set to LOW if you want to use the Range Audio feature
         config.profile = AudioPerfProfile.MID;
         try {
             TapRTCEngine.get().init(this, config, resultCode -> {
                 if (resultCode == ResultCode.OK) {
-                    // 初始化成功
+                    // Initialized successfully
                 } else {
-                    // 初始化失败
+                    // Failed
                 }
             });
         } catch (TapRTCException e) {
@@ -152,7 +152,7 @@ public class MyApp extends Application {
         }
     }
 }
-// SDK 的 RTC 模块中，返回 ResultCode 的接口均以 ResultCode.OK 表示操作成功。
+// In the RTC module of the SDK, interfaces that return ResultCode indicate success with ResultCode.OK.
 ```
 
 ```objc
@@ -170,34 +170,34 @@ TapRTCEngine *engine = [TapRTCEngine defaultEngine];
 
 </MultiLang>
 
-### 触发回调事件
+### Trigger Callback Events
 
-C# SDK 需要在 `Update` 方法中调用 `Poll` 方法触发事件回调。如果不调用该方法，会导致 SDK 运行异常。
+For the C# SDK, you must call the `Poll` method in the `Update` method to trigger the event callback. Failure to call this method will cause the SDK to throw exceptions.
 
 ```cs
 public void Update()
 {
     ResultCode code = TapRTC.Poll();
     if (code == ResultCode.OK) {
-        // 成功触发回调
+        // Triggered callback successfully
     } else {
-        // 失败
+        // Failed
     }
 }
 ```
 
-Java SDK、Objective-C SDK 无需定期调用 `Poll` 方法。
+For the Java SDK and the Objective-C SDK, you do not need to call the `Poll` method regularly.
 
-### 恢复系统
+### Resume
 
 <MultiLang>
 
 ```cs
 ResultCode code = TapRTC.Resume();
 if (code == ResultCode.OK) {
-    // 成功恢复
+    // Resumed
 } else {
-    // 失败
+    // Failed
 }
 ```
 
@@ -218,16 +218,16 @@ if (resultCode == TapRTCResultCode_Success) {
 
 </MultiLang>
 
-### 暂停系统
+### Pause
 
 <MultiLang>
 
 ```cs
 ResultCode code = TapRTC.Pause();
 if (code == ResultCode.OK) {
-    // 成功暂停
+    // Paused
 } else {
-    // 失败
+    // Failed
 }
 ```
 
@@ -248,13 +248,13 @@ if (resultCode == TapRTCResultCode_Success) {
 
 </MultiLang>
 
-## 房间相关接口
+## Room-Related Interfaces
 
-### 创建房间
+### Create Rooms
 
-初始化成功之后，SDK 在创建房间之后，才可以进行实时语音通话。
-创建房间时需指定房间号（`roomId`）。
-[是否启用范围语音](#范围语音)也需在创建房间时设置，C# SDK 默认不启用，Java SDK 创建时必须指定是否启用范围语音，Objective-C SDK 使用单独的接口创建范围语音房间。
+After successful initialization, the SDK can make live voice calls only after creating a room.
+The room number (`roomId`) must be specified when creating the room.
+[Whether to enable range audio](#range-audio) must also be set when creating the room. The C# SDK does not enable it by default. For the Java SDK, you must specify whether to enable range audio when creating the room. The Objective-C SDK uses a separate interface to create rooms with range audio.
 
 <MultiLang>
 
@@ -278,26 +278,26 @@ TapRTCRoom *room = [engine acquireRoomWithRoomId:@"roomID"];
 
 </MultiLang>
 
-### 注册房间相关的回调事件
+### Register Room-Related Callback Events
 
 <MultiLang>
 
 ```cs
 room.RegisterEventAction(new TapRTCEvent()
 {
-    OnDisconnect = (code, message) => { label.text += "\n" + $"断开连接 code:{code} msg:{e}"; },
-    OnEnterFailure = s => { label.text += "\n" + $"进入房间失败:{s}"; },
-    OnEnterSuccess = () => { label.text += "\n" + $"进入房间成功"; },
-    OnExit = () => { label.text += "\n" + $"退出房间成功"; },
-    OnUserEnter = userId => { label.text += "\n" + $"玩家{userId}进入房间"; },
-    OnUserExit = userId => { label.text += "\n" + $"玩家{userId}退出房间"; },
-    OnUserSpeaker = (userId, volume) => { label.text += "\n" + $"玩家{userId}在房间说话，音量{volume}"; },
-    OnUserSpeakEnd = userId => { label.text += "\n" + $"玩家{userId}在房间说话结束"; },
-    // 返回切换后的音质，参见下文「切换音频质量」一节
-    OnRoomTypeChanged = (i) => { label.text += "\n" + $"房间音质改为{i}"; },
+    OnDisconnect = (code, message) => { label.text += "\n" + $"Disconnected code:{code} msg:{e}"; },
+    OnEnterFailure = s => { label.text += "\n" + $"Failed to enter the room:{s}"; },
+    OnEnterSuccess = () => { label.text += "\n" + $"Entered the room"; },
+    OnExit = () => { label.text += "\n" + $"Left the room"; },
+    OnUserEnter = userId => { label.text += "\n" + $"{userId} entered the room"; },
+    OnUserExit = userId => { label.text += "\n" + $"{userId} left the room"; },
+    OnUserSpeaker = (userId, volume) => { label.text += "\n" + $"{userId} is speaking in the room; the volume is {volume}"; },
+    OnUserSpeakEnd = userId => { label.text += "\n" + $"{userId} stopped speaking"; },
+    // Returns the audio quality after the switch; see the section "Switch Audio Quality" below
+    OnRoomTypeChanged = (i) => { label.text += "\n" + $"The audio quality is now {i}"; },
     OnRoomQualityChanged = (weight, loss, delay) =>
     {
-       Debug.Log($"音频质量:{weight} 丢包率:{loss}% 延迟:{delay}ms");
+       Debug.Log($"Audio quality:{weight} Packet loss:{loss}% Delay:{delay}ms");
     },
 
 });
@@ -308,89 +308,89 @@ import com.taptap.taprtc.UserID;
 import com.taptap.taprtc.TapRTCRoom;
 
 room.registerCallback(new TapRTCRoom.Callback() {
-    // 进入房间成功
+    // Entered the room
     @Override public void onEnterSuccess() {}
 
-    // 进入房间失败
+    // Failed to enter the room
     @Override public void onEnterFailure(String msg) {}
 
-    // 连接断开
+    // Lost connection
     @Override public void onDisconnect() {}
 
-    // 重连成功
+    // Reconnected
     @Override public void onReConnected() {}
 
-    // 当前玩家退出房间
+    // Current player left the room
     @Override public void onExit() {}
 
-    // 其他玩家进入房间
+    // A player has entered the room
     @Override public void onUserEnter(UserID userId) {}
 
-    // 其他玩家退出房间
+    // A player has left the room
     @Override public void onUserExit(UserID userId) {}
 
-    // 玩家说话开始
+    // A player started talking
     @Override public void onUserSpeakStart(UserID userId, int volume) {}
 
-    // 玩家说话结束
+    // A player stopped talking
     @Override public void onUserSpeakEnd(UserID userId) {}
 
-    // 音频质量变化
+    // Audio quality changed
     @Override public void onRoomQualityChanged(int weight, double loss, int delay) {}
 });
 ```
 
 ```objc
-// 需实现 TapRTCRoomDelegate
+// Need to implement TapRTCRoomDelegate
 
-// 进入房间成功
+// Entered the room
 - (void)onEnterSuccess;
 
-// 进入房间失败
+// Failed to enter the room
 - (void)onEnterFailure:(NSError *)error;
 
-// 其他玩家进入房间
+// A player has entered the room
 - (void)onUsersEnter:(NSString *)userId;
 
-// 其他玩家退出房间
+// A player has left the room
 - (void)onUsersExit:(NSString *)userId;
 
-// 当前玩家退出房间
+// Current player left the room
 - (void)onExit;
 
-// 连接断开
+// Lost connection
 - (void)onDisconnect;
 
-// 重连成功
+// Reconnected
 - (void)onReconnected;
 
-// 玩家说话开始
+// player started talking
 - (void)onUsersSpeakStart:(NSString *)userId volume:(NSInteger)volume;
 
-// 玩家说话结束
+// A player stopped talking
 - (void)onUsersSpeakEnd:(NSString *)userId;
 
-// 音频质量变化（返回音频质量、丢包率、延迟）
+// Audio quality changed (returns audio quality, packet loss, and delay)
 - (void)onQualityCallBackWithWeight:(int)weight loss:(float)loss delay:(int)delay;
 ```
 
 </MultiLang>
 
-### 加入房间
+### Join a Room
 
-使用[服务端生成的鉴权信息](#服务端鉴权)进入房间。
+Enter a room using the [server-side generated authentication information](#server-side-authentication).
 
-进入房间成功之后，会通过 `TapRTCEvent` 中的 `OnEnterSuccess` 进行回调。
+After successfully entering a room, a callback is made via `OnEnterSuccess` in `TapRTCEvent`.
 
 <MultiLang>
 
 ```cs
 ResultCode code = await room.Join("authBuffer");
 if (code == ResultCode.OK) {
-    // 成功加入
+    // Successfully joined the room
 }
 if (code == ResultCode.ERROR_ALREADY_IN_ROOM) {
-    // 玩家已经在此房间内
+    // The player is already in the room
 }
 ```
 
@@ -400,10 +400,10 @@ import com.taptap.taprtc.Authority;
 Authority authBuffer = new Authority("authBuffer");
 ResultCode code = room.join(authBuffer);
 if (code == ResultCode.OK) {
-    // 成功加入
+    // Successfully joined the room
 }
 if (code == ResultCode.ERROR_ALREADY_IN_ROOM) {
-    // 玩家已经在此房间内
+    // The player is already in the room
 }
 ```
 
@@ -413,11 +413,11 @@ if (code == ResultCode.ERROR_ALREADY_IN_ROOM) {
 
 </MultiLang>
 
-`authBuffer` 是在服务端生成的鉴权信息，详见下文[服务端鉴权](#服务端鉴权)一节的说明。
+The `authBuffer' is the authentication information generated on the server side, as described in the [Server-Side Authentication](#server-side-authentication) section below.
 
-### 退出房间
+### Exit a Room
 
-退出房间之后，会通过 `TapRTCEvent` 中的 `OnExit` 进行回调。
+After leaving a room, a callback is made via `OnExit` in `TapRTCEvent`.
 
 <MultiLang>
 
@@ -440,17 +440,17 @@ if (resultCode == TapRTCResultCode_Success) {
 
 </MultiLang>
 
-### 收听某人语音（默认收听）
+### Listen to Someone's Voice (Enabled by Default)
 
 <MultiLang>
 
 ```cs
 ResultCode code = room.EnableUserAudio("userId");
 if (code == ResultCode.OK) {
-    // 成功
+    // Success
 }
 if (code == ResultCode.ERROR_USER_NOT_EXIST) {
-    // 玩家不存在
+    // The player does not exist
 }
 ```
 
@@ -460,10 +460,10 @@ import com.taptap.taprtc.UserID;
 UserId userId = new UserID("userId");
 ResultCode code = room.enableUserAudio(userId);
 if (code == ResultCode.OK) {
-    // 成功
+    // Success
 }
 if (code == ResultCode.ERROR_USER_NOT_EXIST) {
-    // 玩家不存在
+    // The player does not exist
 }
 ```
 
@@ -473,17 +473,17 @@ TapRTCResultCode resultCode = [room enableUserAudioWithUserId:@"userId"];
 
 </MultiLang>
 
-### 拒收某人语音
+### Disable Someone's Voice
 
 <MultiLang>
 
 ```cs
 ResultCode code = room.DisableUserAudio("userId");
 if (code == ResultCode.OK) {
-    // 成功
+    // Success
 }
 if (code == ResultCode.ERROR_USER_NOT_EXIST) {
-    // 玩家不存在
+    // The player does not exist
 }
 ```
 
@@ -493,10 +493,10 @@ import com.taptap.taprtc.UserID;
 UserId userId = new UserID("userId");
 ResultCode code = room.disableUserAudio(userId);
 if (code == ResultCode.OK) {
-    // 成功
+    // Success
 }
 if (code == ResultCode.ERROR_USER_NOT_EXIST) {
-    // 玩家不存在
+    // The player does not exist
 }
 ```
 
@@ -506,26 +506,26 @@ TapRTCResultCode resultCode = [room disableUserAudioWithUserId:@"userId"];
 
 </MultiLang>
 
-### 打开/关闭语音
+### Enable/Disable Voice
 
-这个接口设置音频下行的开关。
-一般来说，推荐游戏使用[打开/关闭扬声器的接口](#打开关闭扬声器)。
+This interface sets whether or not to receive audio.
+In general, it is recommended that games use the [interface to turn on/off speakers](#enabledisable-speaker).
 
 <MultiLang>
 
 ```cs
-// 开启
+// Enable
 ResultCode code = room.EnableAudioReceiver(true);
 
-// 关闭
+// Disable
 ResultCode code = room.EnableAudioReceiver(false);
 ```
 
 ```java
-// 开启
+// Enable
 ResultCode code = room.enableAudioReceiver(true);
 
-// 关闭
+// Disable
 ResultCode code = room.enableAudioReceiver(false);
 ```
 
@@ -535,11 +535,11 @@ TapRTCResultCode resultCode = [room enableAudioReceiver:YES];
 
 </MultiLang>
 
-### 切换音频质量
+### Switch Audio Quality
 
-音频质量分为 LOW、MID、HIGH 三档。
+There are three levels of audio quality: LOW, MID, and HIGH.
 
-进入房间后，可以切换音频质量。
+You can change the audio quality after you enter the room.
 
 <MultiLang>
 
@@ -550,18 +550,18 @@ room.ChangeRoomType(AudioPerfProfile.HIGH);
 ```
 
 ```java
-// 暂未支持
+// Not yet supported
 ```
 
 ```objc
-// 暂未支持
+// Not yet supported
 ```
 
 </MultiLang>
 
-切换音频质量会触发 `OnRoomTypeChanged` 回调。
+Changing the audio quality triggers the `OnRoomTypeChanged` callback.
 
-### 获取当前房间的用户
+### Get the Users in the Room
 
 <MultiLang>
 
@@ -576,191 +576,191 @@ List<UserID> userIdList = room.getUsers();
 ```objc
 [room getUsers:^(NSArray<NSString *>*userIDs, NSError * _Nullable error) {
     if (error) {
-        // 处理错误
+        // Handle the error
     } else {
-        // userIDs 是房间内的用户 ID 列表
+        // userIDs is the IDs of the users in the room
     }
 })];
 ```
 
 </MultiLang>
 
-## 音频控制相关接口
+## Audio-Related Interfaces
 
-### 打开/关闭麦克风
+### Enable/Disable Microphone
 
 <MultiLang>
 
 ```cs
-// 打开
+// Enable
 ResultCode code = TapRTC.GetAudioDevice().EnableMic(true);
 
-// 关闭
+// Disable
 ResultCode code = TapRTC.GetAudioDevice().EnableMic(false);
 ```
 
 ```java
-// 打开
+// Enable
 boolean ok = TapRTCEngine.get().getAudioDevice().enableMic(true);
 
-// 关闭
+// Disable
 boolean ok = TapRTCEngine.get().getAudioDevice().enableMic(false);
 ```
 
 ```objc
-// 打开
+// Enable
 TapRTCResultCode code = [engine.audioDevice enableMic:YES];
 
-// 关闭
+// Disable
 TapRTCResultCode code = [engine.audioDevice enableMic:NO];
 ```
 
 </MultiLang>
 
-### 打开/关闭扬声器
+### Enable/Disable Speaker
 
 <MultiLang>
 
 ```cs
-// 打开
+// Enable
 ResultCode code = TapRTC.GetAudioDevice().EnableSpeaker(true);
 
-// 关闭
+// Disable
 ResultCode code = TapRTC.GetAudioDevice().EnableSpeaker(false);
 ```
 
 ```java
-// 打开
+// Enable
 boolean ok = TapRTCEngine.get().getAudioDevice().enableSpeaker(true);
 
-// 关闭
+// Disable
 boolean ok = TapRTCEngine.get().getAudioDevice().enableSpeaker(false);
 ```
 
 ```objc
-// 打开
+// Enable
 TapRTCResultCode code = [engine.audioDevice enableSpeaker:YES];
 
-// 关闭
+// Disable
 TapRTCResultCode code = [engine.audioDevice enableSpeaker:NO];
 ```
 
 </MultiLang>
 
-### 设置/获取音量
+### Set/Get Volume
 
-音量是 0 到 100 之间的整数。
+Volume is an integer from 0 to 100.
 
 <MultiLang>
 
 ```cs
 int vol = 60;
 
-// 设置麦克风音量
+// Set microphone volume
 ResultCode code = TapRTC.GetAudioDevice().SetMicVolume(vol);
-// 设置扬声器音量
+// Set speaker volume
 ResultCode code = TapRTC.GetAudioDevice().SetSpeakerVolume(vol);
 
-// 获取麦克风音量
+// Get microphone volume
 int micVolume = TapRTC.GetAudioDevice().GetMicVolume();
-// 获取扬声器音量
+// Get speaker volume
 int speakerVolume = TapRTC.GetAudioDevice().GetSpeakerVolume();
 ```
 
 ```java
 int vol = 60;
 
-// 设置麦克风音量
+// Set microphone volume
 TapRTCEngine.get().getAudioDevice().setMicVolume(vol);
-// 设置扬声器音量
+// Set speaker volume
 boolean ok = TapRTCEngine.get().getAudioDevice().setSpeakerVolume(vol);
 
-// 获取麦克风音量
+// Get microphone volume
 int micVolume = TapRTCEngine.get().getAudioDevice().getMicVolume();
-// 获取扬声器音量
+// Get speaker volume
 int speakerVolume = TapRTCEngine.get().getAudioDevice().getSpeakerVolume();
 ```
 
 ```objc
 int vol = 60;
 
-// 设置麦克风音量
+// Set microphone volume
 TapRTCResultCode code = [engine.audioDevice setMicVolume:vol];
-// 设置扬声器音量
+// Set speaker volume
 TapRTCResultCode code = [engine.audioDevice setSpeakerVolume:vol];
 
-// 获取麦克风音量
+// Get microphone volume
 int micVolume = [engine.audioDevice getMicVolume];
-// 获取扬声器音量
+// Get speaker volume
 int speakerVolume = [engine.audioDevice getSpeakerVolume];
 ```
 
 </MultiLang>
 
-### 打开/关闭播放设备
+### Enable/Disable Audio Play
 
 <MultiLang>
 
 ```cs
-// 打开
+// Enable
 ResultCode code = TapRTC.GetAudioDevice().EnableAudioPlay(true);
-// 关闭
+// Disable
 ResultCode code = TapRTC.GetAudioDevice().EnableAudioPlay(false);
 ```
 
 ```java
-// 打开
+// Enable
 boolean ok = TapRTCEngine.get().getAudioDevice().enableAudioPlay(true);
-// 关闭
+// Disable
 boolean ok = TapRTCEngine.get().getAudioDevice().enableAudioPlay(false);
 ```
 
 ```objc
-// 打开
+// Enable
 TapRTCResultCode code = [engine.audioDevice enableAudioPlay:YES];
 
-// 关闭
+// Disable
 TapRTCResultCode code = [engine.audioDevice enableAudioPlay:NO];
 ```
 
 </MultiLang>
 
-### 打开/关闭耳返
+### Enable/Disable Loopback
 
 <MultiLang>
 
 ```cs
-// 打开
+// Enable
 ResultCode code = TapRTC.GetAudioDevice().EnableLoopback(true);
-// 关闭
+// Disable
 ResultCode code = TapRTC.GetAudioDevice().EnableLoopback(false);
 ```
 
 ```java
-// 打开
+// Enable
 boolean ok = TapRTCEngine.get().getAudioDevice().enableLoopback(true);
-// 关闭
+// Disable
 boolean ok = TapRTCEngine.get().getAudioDevice().enableLoopback(false);
 ```
 
 ```objc
-// 打开
+// Enable
 TapRTCResultCode code = [engine.audioDevice enableLoopback:YES];
 
-// 关闭
+// Disable
 TapRTCResultCode code = [engine.audioDevice enableLoopback:NO];
 ```
 
 </MultiLang>
 
-## 范围语音
+## Range Audio
 
-范围语音功能可以支持以下特性：
+The range audio feature can support the following functions:
 
-- 玩家附近一定范围内的其他小队玩家也能听到该玩家的语音；
-- 在同一房间内，支持大量用户同时打开麦克风进行语音通话。
+- Allowing other team members within a certain range of the player to hear the player's voice;
+- Support for a large number of users to turn on the microphone at the same time for voice calls in the same room.
 
-要使用范围语音功能，首先创建房间时需要指定启用范围语音功能：
+To use range audio, you must first specify that range audio is enabled when you create a room:
 
 <MultiLang>
 
@@ -784,7 +784,7 @@ TapRTCRoom *room = [engine acquireRangeAudioRoomWithRoomId:@"roomID"];
 
 </MultiLang>
 
-其次，玩家进入房间前，需要**切换音频质量为 LOW**：
+Also, before players enter the room, they must **change the audio quality to LOW**:
 
 <MultiLang>
 
@@ -793,22 +793,22 @@ room.ChangeRoomType(AudioPerfProfile.LOW);
 ```
 
 ```java
-// Java SDK 未提供切换音频质量的接口。
-// Java SDK 下，如需使用范围语音功能，**SDK 初始化时音频质量需设置为 LOW**。
+// The Java SDK does not provide an interface to switch the audio quality.
+// With the Java SDK, if you want to use the range audio feature, **set the audio quality to LOW when initializing the SDK**.
 ```
 
 ```objc
-// Objective-C SDK 在进入范围语音房间时会自动把音质设为 LOW
+// The Objective-C SDK automatically sets the audio quality to LOW when you enter a room with range audio
 ```
 
 </MultiLang>
 
-接着设定小队号，并指定语音模式：
+Next, set the team number and voice mode:
 
-- 世界模式：距离当前玩家[一定范围](#设置语音接收范围)内的其他小队成员也可以听到该玩家的语音；
-- 小队模式：仅小队成员之间可以互相通话。
+- World Mode: Other team members within [a certain range] (#set-audio-reception-range) of the current player can hear the player's voice;
+- Team Mode: Only team members can talk to each other.
 
-无论哪种模式下，小队成员之间都能互相通话，不论距离远近。
+In both modes, team members can talk to each other regardless of distance.
 
 <MultiLang>
 
@@ -816,27 +816,27 @@ room.ChangeRoomType(AudioPerfProfile.LOW);
 int teamId = 12345678;
 ResultCode code = room.GetRtcRangeAudioCtrl().SetRangeAudioTeam(teamId);
 if (code == ResultCode.OK) {
-    // 成功
+    // Success
 }
 if (code == ResultCode.ERROR_NOT_RANGE_ROOM) {
-    // 该房间未启用范围语音
+    // Range audio is not enabled for this room
 }
 
-// 世界模式 
+// World Mode 
 ResultCode resultCode = room.GetRtcRangeAudioCtrl().SetRangeAudioMode(RangeAudioMode.WORLD);
 if (resultCode == ResultCode.OK) {
-    // 成功
+    // Success
 }
 if (resultCode == ResultCode.ERROR_NOT_RANGE_ROOM) {
-    // 该房间未启用范围语音
+    // Range audio is not enabled for this room
 }
-// 小队模式
+// Team Mode
 ResultCode resultCode = room.GetRtcRangeAudioCtrl().SetRangeAudioMode(RangeAudioMode.TEAM);
 if (resultCode == ResultCode.OK) {
-    // 成功
+    // Success
 }
 if (resultCode == ResultCode.ERROR_NOT_RANGE_ROOM) {
-    // 该房间未启用范围语音
+    // Range audio is not enabled for this room
 }
 ```
 
@@ -846,28 +846,28 @@ import com.taptap.taprtc.TapRTCRangeAudioCtrl.RangeAudioMode;
 int teamId = 12345678;
 ResultCode code = room.rangeAudioCtrl().setRangeAudioTeam(new TeamID(teamId));
 if (code == ResultCode.OK) {
-    // 成功
+    // Success
 }
 if (code == ResultCode.ERROR_NOT_RANGE_ROOM) {
-    // 该房间未启用范围语音
+    // Range audio is not enabled for this room
 }
 
-// 世界模式
+// World Mode
 ResultCode resultCode = room.rangeAudioCtrl().setRangeAudioMode(RangeAudioMode.WORLD);
 if (resultCode == ResultCode.OK) {
-    // 成功
+    // Success
 }
 if (resultCode == ResultCode.ERROR_NOT_RANGE_ROOM) {
-    // 该房间未启用范围语音
+    // Range audio is not enabled for this room
 }
 
-// 小队模式
+// Team Mode
 ResultCode resultCode = room.rangeAudioCtrl().setRangeAudioMode(RangeAudioMode.TEAM);
 if (resultCode == ResultCode.OK) {
-    // 成功
+    // Success
 }
 if (resultCode == ResultCode.ERROR_NOT_RANGE_ROOM) {
-    // 该房间未启用范围语音
+    // Range audio is not enabled for this room
 }
 ```
 
@@ -875,20 +875,20 @@ if (resultCode == ResultCode.ERROR_NOT_RANGE_ROOM) {
 int teamId = 12345678;
 TapRTCResultCode resultCode = [room setRangeAudioTeamId:teamId];
 
-// 世界模式
+// World Mode
 TapRTCResultCode code = [room setRangeAudioMode:TapRTCRangeAudioModeWorld];
 TapRTCResultCode code = [room setRangeAudioMode:TapRTCRangeAudioModeTeam];
 ```
 
 </MultiLang>
 
-然后进入房间，并[设置语音接收范围](#设置语音接收范围)、[更新声源方位](#更新声源方位朝向)，范围语音即可生效。
+Then enter the room and [Set Audio Reception Range](#set-audio-reception-range) and [Update Source Orientation](#update-source-orientation) to make the range audio effective.
 
-进入房间后，如需切换语音模式，可再次调用 `SetRangeAudioMode`。
+If you want to change the voice mode after entering the room, you can call `SetRangeAudioMode` again.
 
-### 设置语音接收范围
+### Set Audio Reception Range
 
-语音接收范围控制世界模式下其他小队成员能否听到声音，在进房后调用，一般仅需设置一次。
+The audio reception range controls whether or not other team members can hear your voice in world mode, and is invoked after you enter the room and usually only needs to be set once.
 
 <MultiLang>
 
@@ -896,10 +896,10 @@ TapRTCResultCode code = [room setRangeAudioMode:TapRTCRangeAudioModeTeam];
 int range = 300;
 ResultCode code = room.GetRtcRangeAudioCtrl().UpdateAudioReceiverRange(range);
 if (code == ResultCode.OK) {
-    // 成功
+    // Success
 }
 if (code == ResultCode.ERROR_NOT_RANGE_ROOM) {
-    // 该房间未启用范围语音
+    // Range audio is not enabled for this room
 }
 ```
 
@@ -907,10 +907,10 @@ if (code == ResultCode.ERROR_NOT_RANGE_ROOM) {
 int range = 300;
 ResultCode code = room.rangeAudioCtrl().updateAudioReceiverRange(range);
 if (code == ResultCode.OK) {
-    // 成功
+    // Success
 }
 if (code == ResultCode.ERROR_NOT_RANGE_ROOM) {
-    // 该房间未启用范围语音
+    // Range audio is not enabled for this room
 }
 ```
 
@@ -921,19 +921,19 @@ TapRTCResultCode code = [room updateAudioReceiverRange:range];
 
 </MultiLang>
 
-范围（`range`）之外的其他小队成员无法听到。
+Other team members who are out of `range` will not be able to hear the player.
 
-如果同时[启用 3D 语音](#开关-3d-语音)，那么距离远近还会影响音量大小：
+If [3D voice](#3d-Voice) is also enabled, the distance will also affect the volume level:
 
-| 音源距离 | 音量衰减 |
+| Distance | Volume decay |
 | - | - |
-| `N < range/10` | 1.0（无衰减）|
+| `N < range/10` | 1.0 (No decay)|
 | `N >= range/10` | `range/10/N` |
 
-### 更新声源方位朝向
+### Update Source Orientation
 
-成功进入房间后，需要在 Unity 的 Update 方法中调用该接口更新声源方位、朝向，范围语音才能生效。
-方位通过世界坐标系的前、右、上三个坐标指定，朝向通过自身坐标系的前、右、上轴的单位向量指定。
+After successfully entering the room, you must call this interface in Unity's Update method to update the orientation and direction of the sound source for the range audio to take effect.
+The orientation is specified by the front, right, and top coordinates of the world coordinate system, and the direction is specified by the unit vector of the front, right, and top axes of its own coordinate system.
 
 <MultiLang>
 
@@ -949,10 +949,10 @@ float[] axisUp = new float[3] {0.0, 0.0, 1.0};
 Forward forward = new Forward(axisForward, axisRight, axisUp);
 ResultCode code = room.GetRtcRangeAudioCtrl().UpdateSelfPosition(position, forward);
 if (code == ResultCode.OK) {
-    // 成功
+    // Success
 }
 if (code == ResultCode.ERROR_NOT_RANGE_ROOM) {
-    // 该房间未启用范围语音
+    // Range audio is not enabled for this room
 }
 ```
 
@@ -972,10 +972,10 @@ Forward forward = new Forward(axisForward, axisRight, axisUp);
 
 ResultCode code = room.rangeAudioCtrl().updateSelfPosition(position, forward);
 if (code == ResultCode.OK) {
-    // 成功
+    // Success
 }
 if (code == ResultCode.ERROR_NOT_RANGE_ROOM) {
-    // 该房间未启用范围语音
+    // Range audio is not enabled for this room
 }
 ```
 
@@ -1007,13 +1007,13 @@ TapRTCResultCode code = [room updateSelfPosition:position forward:forward];
 
 </MultiLang>
 
-朝向不影响是否能听到语音，因此如未[启用 3D 语音](#开关-3d-语音)，更新声源方位朝向时，朝向参数可随意设置。
-但启用 3D 语音时，需正确设置朝向，这样才能得到准确的 3D 音效。
+The orientation has no effect on whether the voice is heard or not, so if you do not enable [3D Voice](#3d-voice), the orientation parameter can be set freely when updating the orientation of the sound source.
+However, when 3D Voice is enabled, the orientation must be set correctly to get accurate 3D sound effects.
 
-### 开关 3D 语音
+### 3D Voice
 
-开启 3D 语音，可以将无方位感的声音处理成带有声源方位感的声音，以增加玩家的沉浸感。
-这个接口接受两个参数，第一个参数指定当前玩家是否可以听到 3D 音效，第二个参数指定 3D 语音是否作用于[小队内部](#范围语音)。
+Enabling 3D Voice allows you to convert voices without orientation to voices with source orientation to increase player immersion.
+This interface takes two parameters, the first specifying whether the current player can hear the 3D sound effect, and the second specifying whether the 3D voice works [within the team] (#range-audio).
 
 <MultiLang>
 
@@ -1036,10 +1036,10 @@ TapRTCResultCode code = [engine.audioDevice EnableSpatializer:YES applyTeam:YES]
 </MultiLang>
 
 
-## 错误码
+## Error Codes
 
-上述文档中的部分操作会返回 ResultCode，代码示例中给出了部分常见的错误类型对应的错误码。
-完整的错误码列表如下：
+Some of the operations in the above document return ResultCode, and the code examples give the error codes corresponding to some common error types.
+The complete list of error codes is shown below:
 
 <MultiLang>
 
@@ -1128,72 +1128,72 @@ typedef NS_ENUM(NSInteger, TapRTCResultCode) {
 
 </MultiLang>
 
-## 服务端
+## Server Side
 
-为了保证聊天通道的安全性，实时语音服务需要搭配游戏自己的鉴权服务器使用。
-此外，游戏自己的服务器还用于响应合规回调和调用剔除玩家的接口。
+To secure the chat channel, the RTC service must be used with the game's own authentication server.
+In addition, the game's own server is used to respond to compliance callbacks and to invoke the player removal interface.
 
-### 服务端鉴权
+### Server-Side Authentication
 
-客户端加入房间前，需要先通过开发者自己的鉴权服务器获取签名，之后实时语音云端会验证该签名，只有附带有效签名的请求才会被执行，非法请求会被阻止。
+Before a client joins a room, it must obtain a signature from your own authentication server, after which the RTC cloud verifies the signature, and only requests with valid signatures are executed, and illegal requests are blocked.
 
 <Mermaid diagram={`
 sequenceDiagram
-客户端->>游戏鉴权服务器: 1. 加入房间前请求签名
-游戏鉴权服务器-->>客户端: 2. 生成签名返回给客户端
-客户端->>实时语音服务云端: 3. 将签名编码到请求中发给实时语音服务器
-实时语音服务云端-->>客户端: 4. 对请求的内容和签名进行验证，执行后续操作
+Client->>Authentication Server: 1. Require signature before entering room
+Authentication Server-->>Client: 2. Generate signature to return to client
+Client->>RTC Cloud: 3. Encode the signature in the request and send it to the real-time voice server
+RTC Cloud-->>Client: 4. Verify the content of the request and the signature and perform the subsequent operations
 `} />
 
-1. 客户端加入房间前，向游戏自己的鉴权服务器请求签名；
-2. 鉴权服务器根据下文所述的[鉴权密钥算法](#鉴权密钥算法)生成签名返回给客户端；
-3. 客户端获得签名后，编码到请求中，发给实时语音服务器；
-4. 实时语音服务器对请求的内容和签名做一遍验证，验证通过后执行后续的实际操作。
+1. The client requests a signature from the game's authentication server before entering the room;
+2. The authentication server generates a signature to return to the client based on the [authentication key algorithm](#authentication-key-algorithm) described below;
+3. The client receives the signature, encrypts it in the request, and sends it to the RTC server;
+4. The RTC server performs a verification of the request content and signature, and performs the subsequent actual operation after passing the verification.
 
-签名采用 **HMAC-SHA1** 算法和 Base64 结合。
-针对不同的请求，开发者生成不同的签名（参见后续格式说明），总体上，签名就是使用特定的密钥（在这里我们使用应用的 Master Key），对玩家和房间信息进行签名。
+Signatures use a combination of the **HMAC-SHA1** algorithm and Base64.
+For different requests, your app generates different signatures (see format descriptions below). Overall, signing is the process of signing player and room information using a specific key (in this case, we use the application's Master Key).
 
-#### 鉴权密钥算法
+#### Authentication Key Algorithm
 
-鉴权所用到的签名产生过程涉及到**明文**、**密钥**和**加密算法**。
+The signature generation process used for authentication involves **plaintext**, **key**, and **encryption algorithm**.
 
-##### 明文
+##### Plaintext
 
-明文为以下字段的 json 字符串（字段顺序无关）
+The plaintext is a json string consisting of the following fields (in any order)
 
 
 
-| 字段       | 类型/长度      | 说明                                                         |
+| Field       | Type/Length      | Description                                                         |
 | :--------- | :------------- | :----------------------------------------------------------- |
-| `userId`     | `string`         | 进入语音聊天房间的用户标识                                   |
-| `appId`      | `string`         | 游戏的 Client ID |
-| `expireAt` | `unsigned int/4` | 过期时间（当前时间+有效期（单位：秒, 建议值：300s））          |
-| `roomId`     | `string`         | 房间 ID                                                       |
+| `userId`     | `string`         | An identifier of the user entering the room                                   |
+| `appId`      | `string`         | The game's Client ID |
+| `expireAt` | `unsigned int/4` | Expiration time (current time + expiration date (in seconds, recommended value: 300s))          |
+| `roomId`     | `string`         | Room ID                                                       |
 
-##### 密钥
+##### Key
 
-游戏的 `Master Key`（即 `Server Secret`）。
-`Client ID` 和 `Server Secret` 都可在 **开发者中心 > 你的游戏 > 游戏服务 > 应用配置** 查看。
+The `Master Key` (i.e. `Server Secret`) of the game.
+Both the `Client ID` and `Server Secret` can be viewed in **Developer Center > Your game > Game Services > Configuration**.
 
-##### 加密算法
+##### Encryption Algorithm
 
-加密算法采用 **HMAC-SHA1** 算法和 Base64 结合，类似 JWT 的格式。
-生成的结果包含 payload（明文）和 sign（加密串）两部分。
+The encryption algorithm uses a combination of **HMAC-SHA1** algorithm and Base64, similar to the JWT format.
+The generated result contains two parts: payload (plaintext) and sign (encrypted string).
 
-1. 按照上面表格中字段构造 JSON 字符串。
+1. Construct the JSON string according to the fields in the table above.
 
-2. Base64 编码上一步的 JSON 字符串得到 payload。
+2. Base64-encode the JSON string from the previous step to obtain the payload.
 
-3. 通过 **HMAC-SHA1** 对 payload 用 **密钥** 生成 sign。
+3. Generate the sign using **HMAC-SHA1** on the payload with **key**.
 
-4. 使用 `.` （英文半角句号）拼接 payload 和 sign。
+4. Use `.` to join the payload and the token.
 
-注意：JSON 字符串本身是字段顺序无关的，但是**传递的 payload 和用于生成 sign 的 payload 的字段顺序必须相同**，否则无法通过实时语音服务云端的校验。
+Note: The JSON string itself is field-order independent, but the **spliced payload and the payload used to generate the sign must be in the same field order** or they will not pass the checksum in the RTC cloud.
 
-下面给出 Java 和 Go 的示例代码供参考：
+The following sample code in Java and Go is provided for reference:
 
 <details>
-<summary>Java 示例</summary>
+<summary>Java example</summary>
 
 ```java
 import com.google.gson.Gson;
@@ -1257,7 +1257,7 @@ public class JUnitTestSuite {
 </details>
 
 <details>
-<summary>Go 示例</summary>
+<summary>Go example</summary>
 
 ```go
 package configs
@@ -1321,38 +1321,38 @@ type Token struct {
 
 </details>
 
-#### 部署方式
+#### Deployment Method
 
-由于加密密钥使用了 `Server Secret`，加密算法的逻辑需在服务端实现，**切勿在客户端部署加密方案**。
+Since the encryption key uses `Server Secret`, the logic of the encryption algorithm must be implemented on the server side. **Do not implement the encryption logic on the client side**.
 
-#### 使用方法
+#### Usage
 
-游戏自己的鉴权服务器生成加密串后，下发给客户端，客户端调用[加入房间的接口](#加入房间)时传入相应的鉴权信息。
+The game's own authentication server generates the encryption string and sends it to the client. The client then passes the appropriate authentication information when calling the [join room interface](#join-a-room).
 
-C# SDK 还提供了一个 `GenToken` 工具方法，供客户端接入 SDK 测试开发时使用。
-比如，客户端开发人员可以在等待服务端开发人员实现、部署相应接口前先行在客户端测试加入房间的功能。
-再比如，客户端开发人员可以比较 SDK 自带的 `GenToken` 生成的加密串和服务端生成的加密串是否一致，以便验证服务端正确实现了加密算法。
+The C# SDK also provides a `GenToken` method for testing when integrating the SDK on the client side.
+For example, client-side developers can test the functionality of adding rooms on the client side before waiting for server-side developers to implement and deploy the appropriate interfaces.
+Another example is that the client developer can compare the encrypted string generated by the SDK's own `GenToken` with the encrypted string generated by the server to verify that the server has implemented the encryption algorithm correctly.
 
 ```cs
 var authBuffer = AuthBufferHelper.GenToken(appId, roomId, userId, masterKey);
 ```
 
-注意，由于这个方法需要传入 `Server Secret` 作为参数，**因此仅供内部测试开发时使用，切勿在对外提供的代码或安装包中使用**。
-如果担心因为人为失误导致对外提供的代码或安装包中泄漏 `Server Secret`，或者出于安全考虑希望尽可能少的内部开发人员接触到 `Server Secret`，建议不使用 SDK 提供的 `GenToken` 方法，内部测试开发时也同样通过游戏自己的鉴权服务器生成加密串。
+Note that since this method requires `Server Secret` to be passed as a parameter, **it is intended for internal testing and development only, and should not be used in published code or installation packages**.
+If you are concerned about `Server Secret` being leaked into external code or installation packages due to human error, or if you want to minimize the number of internal developers having access to `Server Secret` for security reasons, it is recommended that you do not use the `GenToken` method provided by the SDK, and that you generate the encrypted string using the game's own authentication server for internal testing as well.
 
-### 合规回调
+### Compliance Callback
 
 
-开发者在实时语音服务管理后台（**开发者中心 > 你的游戏 > 游戏服务 > 实时语音 > 设置**）设置回调地址后，语音内容有违规时会调用设置的回调地址。
+After you set the callback address in the RTC dashboard (**Developer Center > Your game > Game Services > RTC > Settings**), the set callback address will be called if the voice content is illegal.
 
-回调地址需要是一个 HTTP(S) 协议接口的 URL，需要支持 POST 方法，传输数据编码采用 UTF-8。
+The callback address should be a URL of the HTTP(S) protocol interface, support the POST method, and use UTF-8 for data encoding.
 
-回调的 POST body 示例：
+Example POST body for callback:
 
 ```json
 {
     "HitFlag":true,
-    "Msg":"不堪入目的消息内容",
+    "Msg":"Illegal message",
     "ScanFinishTime":1634893736,
     "ScanStartTime":1634893734,
     "Scenes":[
@@ -1362,7 +1362,7 @@ var authBuffer = AuthBufferHelper.GenToken(appId, roomId, userId, masterKey);
         {
             "Duration":14000,
             "HitFlag":true,
-            "Info":"不堪入目的消息内容",
+            "Info":"Illegal message",
             "MainType":"abuse",
             "Offset":0,
             "PieceStartTime":1634893734,
@@ -1371,7 +1371,7 @@ var authBuffer = AuthBufferHelper.GenToken(appId, roomId, userId, masterKey);
             "VoiceFilterDetail":[
                 {
                     "EndTime":0,
-                    "KeyWord":"不堪入目的关键词",
+                    "KeyWord":"Illegal keyword",
                     "Label":"abuse",
                     "Rate":"0.00",
                     "StartTime":0
@@ -1382,31 +1382,31 @@ var authBuffer = AuthBufferHelper.GenToken(appId, roomId, userId, masterKey);
 }
 ```
 
-开发者可以在回调的 Header 中拿到 `sign` 字段，以便校验请求是否来自实时语音服务云端。
+You can get the `sign` field in the callback header to verify that the request is coming from the RTC cloud.
 
-#### 合规回调校验算法
+#### Compliance Callback Verification Algorithm
 
-1. 在回调的 POST body 前附加 `POST` 前缀，得到 payload：
+1. Append the `POST` prefix to the POST body of the callback to get the payload:
 
     ```
-    POST{"HitFlag":true,"Msg":"不堪入目的消息内容",/* 略 */}
+    POST{"HitFlag":true,"Msg":"Illegal message",/* Other logic */}
     ```
 
-    注意：
+    Note:
 
-    - **请直接从 HTTP 请求体中读取 JSON 内容**，反序列化到程序语言的数据结构可能会改变字段顺序，导致校验失败。
-    - POST 和 body 直接连接，中间无空格。
+    - Please read the JSON content directly from the HTTP request body**. Deserializing to the programming language data structure may change the order of the fields, resulting in a validation failure.
+    - POST and body are directly connected without spaces in between.
 
-2. 对 payload 进行 HMAC-SHA1 加密，密钥为游戏应用的 `Server Secret`。
+2. Perform HMAC-SHA1 encryption on the payload. The key is the game's `Server Secret`.
 
-3. 对上一步的结果进行 BASE64 编码，得到 sign。
+3. BASE64-encode the result of the previous step to get the sign.
 
-4. 和回调的 HTTP 头中的 sign 字段的值进行比较，相同则表明请求来自实时语音服务云端。
+4. Compare it with the value of the sign field in the HTTP header of the callback. If it is the same, then the request is coming from the RTC cloud.
 
-下面给出 Go 的示例代码供参考：
+Here is a sample Go code for reference:
 
 <details>
-<summary>Go 示例</summary>
+<summary>Go example</summary>
 
 ```go
 package main
@@ -1449,25 +1449,25 @@ func hmacSHA1(key string, data string) []byte {
 
 </details>
 
-### 剔除玩家
+### Remove Players
 
-在一些场景下，游戏可能有从房间剔除玩家（踢人）的需求，比如涉及违规内容时。
-开发者可以在自己的服务端调用实时语音服务的 REST API 接口实现这一需求。
+In some scenarios, the game may need to kick players out of a room, such as when illegal content is involved.
+You can call the RTC service's REST API from your own server to fulfill this need.
 
-#### 请求格式
+#### Request Format
 
-对于 POST 和 PUT 请求，请求的主体必须是 JSON 格式，而且 HTTP Header 的 Content-Type 需要设置为 `application/json`。
+For POST and PUT requests, the request body must be in JSON format and the Content-Type of the HTTP header must be set to `application/json`.
 
-请求的鉴权是通过 HTTP Header 里面包含的键值对来进行的，参数如下表：
+The request is authenticated by the key/value pairs contained in the HTTP header, with the following parameters:
 
-Key|Value|含义|来源
+Key|Value|Meaning|Source
 ---|----|---|---
-`X-LC-Id`|`{{appid}}`|当前应用的 `App Id`（即 `Client Id`）|可在控制台查看
-`X-LC-Key`|`{{masterkey}},master`|当前应用的 `Master Key`（即 `Server Secret`）|可在控制台查看
+`X-LC-Id`|`{{appid}}`|The `App Id` (`Client Id`) of the current application|Can be viewed in the console
+`X-LC-Key`|`{{masterkey}},master`|The `Master Key` (`Server Secret`) of the current application|Can be viewed in the console
 
 #### Base URL
 
-REST API 请求的 Base URL（下文 curl 示例中用 `{{host}}` 表示）即应用的 API <Conditional region='cn'>自定义</Conditional>域名，可以在控制台<Conditional region='cn'>绑定、</Conditional>查看。<Conditional region='cn'>详见文档关于[域名](/sdk/storage/guide/setup-dotnet#域名)的说明。</Conditional>
+The Base URL for REST API requests (the `{{host}}` in the curl examples) is the<Conditional region='cn'> custom</Conditional> API domain of your app. You can <Conditional region='cn'>update or </Conditional>find it on the Developer Center.<Conditional region='cn'> See [Domain](/sdk/storage/guide/setup-dotnet#domain) for more details.</Conditional>
 
 #### REST API
 
@@ -1480,7 +1480,7 @@ curl -X DELETE \
 https://{{host}}/rtc/v1/room/member
 ```
 
-成功剔除时响应的 HTTP 状态码为 `200`，出错时响应的 HTTP 状态码为相应的错误码，例如没有权限时 HTTP 状态码为 401.
+The HTTP status code in response to a successful removal is `200`, and the HTTP status code in response to an error is the appropriate error code, e.g. 401 if you do not have permission.
 
-注意，**剔除玩家后，玩家可以重新加入房间，加入房间后又可以发言。**
-**游戏还需在自己的鉴权服务器上实现对应的封禁逻辑**，相应玩家重新加入房间时不下发签名，以阻止玩家通过重新加入房间的方式绕开限制。
+Note that **after a player has been removed, the player can rejoin the room and speak again after joining the room. **
+**The game must also implement the appropriate blocking logic on its own authentication server** so that no signature is issued when the player rejoins the room, preventing players from circumventing the restriction by rejoining the room.
