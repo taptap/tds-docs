@@ -25,7 +25,7 @@ import AndroidFaq from "../_partials/android-package-visibility.mdx";
 
 可以在 [下载页](/tap-download) 获得 TapSDK，添加以下依赖：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 <>
 
@@ -74,11 +74,28 @@ dependencies {
 
 </>
 
+
+<>
+
+将插件 ** TapLicense ** 、** TapCommon ** 拷贝到项目的插件目录，并在项目模块的 ** build.cs ** 文件中添加依赖：
+
+```csharp
+PublicDependencyModuleNames.AddRange(new string[] { 
+    "Json",
+    "JsonUtilities",
+    "SlateCore",           
+    "TapCommon",
+    "TapLicense",
+});
+```
+
+</>
+
 </MultiLang>
 
 ## 设置授权回调
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 // 需要引入 `License` 库
@@ -108,22 +125,41 @@ TapLicenseHelper.setLicenseCallback(new TapLicenseCallback() {
 // 暂不支持
 ```
 
+```cpp
+// 需要引入 `License` 库
+#include "TapLicense.h"
+
+// 默认情况下 SDK 会弹出不可由玩家手动取消的弹窗来避免未授权玩家进入游戏，如果需要回调来触发流程，请添加如下代码
+FTapLicense::SetLicenseCallback(FSimpleDelegate::CreateLambda([]() {
+    // 本体授权成功
+}));
+```
+
 </MultiLang>
 
 ## 检查是否购买游戏
 
-<MultiLang>
+Check 方法中参数默认值为 false，表示为 SDK 首次触发以及在距离首次触发的第 5 天之后再一次会通过 TapTap 客户端来确认当前登录用户是否购买游戏，如果使用 true 的话，则每次接口调用都会通过 TapTap 客户端来确认当前登录用户是否购买过游戏。
+
+<MultiLang kind="ue">
 
 ```cs
 TapLicense.Check();
+TapLicense.Check(true);
 ```
 
 ```java
 TapLicenseHelper.check(Activity activity);
+TapLicenseHelper.check(Activity activity, boolean forceCheck);
 ```
 
 ```objc
 // 暂不支持
+```
+
+```cpp
+FTapLicense::Check();
+FTapLicense::Check(true);
 ```
 
 </MultiLang>
