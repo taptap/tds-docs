@@ -217,6 +217,20 @@ B -->|afterDelete|C((done))
 />
 ```
 
+#### PowerPoint 幻灯片
+
+在文件开头引入 `OfficeDoc` 组件：
+
+```js
+import { OfficeDoc } from "/src/docComponents/doc";
+```
+
+然后在正文中插入组件：
+
+```js
+<OfficeDoc fileUrl="https://icepro.oss-cn-shanghai.aliyuncs.com/file/sample.ppt" />
+```
+
 #### SDK 版本号
 
 SDK 版本号统一维护在 `/src/docComponents/sdkVersions.ts`。当 SDK 版本有更新时，只需在这里更新对应 SDK 的版本号，文档中所有引用这个版本号的地方就会跟着更新。
