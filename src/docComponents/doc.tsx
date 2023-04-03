@@ -1,11 +1,23 @@
 import React from "react";
 import Link from "@docusaurus/Link";
 
-export const OfficeDoc = ({ url }) => {
-  const encodedUrl = encodeURI(url);
-  const fullUrl = `https://view.officeapps.live.com/op/embed.aspx?src=${encodedUrl}`;
-  return <iframe src={fullUrl} width="100%" height="600px" frameBorder="0">这是嵌入 <a target="_blank" href="https://office.com">Microsoft Office</a> 演示文稿，由 <a target="_blank" href="https://office.com/webapps">Office</a> 提供支持。</iframe>;
-}
+export const OfficeDoc = ({ fileUrl }) => {
+  const fileUrlEncoded = encodeURI(fileUrl);
+  const iframeSrc = `https://view.officeapps.live.com/op/embed.aspx?src=${fileUrlEncoded}`;
+  return (
+    <iframe src={iframeSrc} width="100%" height="600px">
+      这是嵌入{" "}
+      <a target="_blank" href="https://office.com">
+        Microsoft Office
+      </a>{" "}
+      演示文稿，由{" "}
+      <a target="_blank" href="https://office.com/webapps">
+        Office
+      </a>{" "}
+      提供支持。
+    </iframe>
+  );
+};
 
 export const [Red, Blue, Black, Gray, Green, BlueBlack] = [
   "#F64C4C",
@@ -67,12 +79,13 @@ const captionStrongStyle = {
   lineHeight: "18px",
   fontWeight: 700,
   color: COLORS.grey04,
-}
+};
 
 const quoteStyle = (isRecommended: boolean) => ({
   margin: 0,
-  borderTop: `8px solid ${isRecommended ? COLORS.sdkBlueExt : COLORS.sdkRedExt
-    }`,
+  borderTop: `8px solid ${
+    isRecommended ? COLORS.sdkBlueExt : COLORS.sdkRedExt
+  }`,
   padding: "16px 0 0",
   fontSize: "14px",
   lineHeight: "22px",
@@ -99,8 +112,8 @@ export const Background = ({ children, title, content }) => (
       flexDirection: "column",
       gap:
         children.props?.caption ||
-          children[0]?.props.caption ||
-          children[1]?.props.caption
+        children[0]?.props.caption ||
+        children[1]?.props.caption
           ? "32px"
           : "16px", // 当主标题与正文之一与下方图片的说明同时存在时，两组文字之间要有一个较大的间距
     }}
@@ -161,7 +174,13 @@ export const Figure = ({
           gap: "8px",
         }}
       >
-        {caption && <figcaption style={{ ...(strong ? captionStrongStyle : captionStyle) }}>{caption}</figcaption>}
+        {caption && (
+          <figcaption
+            style={{ ...(strong ? captionStrongStyle : captionStyle) }}
+          >
+            {caption}
+          </figcaption>
+        )}
 
         <img
           src={imgSrc}
