@@ -146,6 +146,8 @@ TapUESupport::Init(Config);
 这里的登录指的是游戏玩家在游戏内使用客服系统功能时认证身份的过程（authentication）。这一步主要是游戏侧与客服系统之间的交互，通常玩家是无感知的，和游戏本身的登录是两回事（比如这里的匿名登录与游戏的游客登录无关）。
 :::
 
+
+
 ### TDS 内建账户登录
 
 如果你的游戏使用了 TDS 内建账户服务，可以直接在客户端使用已登录的 TDSUser 授权登录客服系统。
@@ -223,6 +225,9 @@ TDSUser.retrieveShortTokenInBackground(tdsUser.getSessionToken()).subscribe(new 
 ```
 
 ```cpp
+
+// Todo 1
+
 if (TSharedPtr<FTDSUser> User = FTDSUser::GetCurrentUser())
 {
     User->RetrieveShortToken(
@@ -245,6 +250,7 @@ if (TSharedPtr<FTDSUser> User = FTDSUser::GetCurrentUser())
             /** 获取Credential失败 */
         }));
 }
+
 ```
 
 </MultiLang>
@@ -260,6 +266,34 @@ if (TSharedPtr<FTDSUser> User = FTDSUser::GetCurrentUser())
 <MultiLang kind="ue">
 
 ```cs
+
+if (e is TapException ex && ex.Code == 9006) {
+    // 登录过期
+  } else {
+    // 其他异常
+}
+```
+
+```java
+if (e instanceof ServerException) {
+    try {
+        org.json.JSONObject errorResponse = new org.json.JSONObject(((ServerException) e).responseBody);
+        if(errorResponse.getInt("numCode")==9006){
+            // 登录过期
+        }
+    } catch (JSONException ex) {
+        // ignore
+    }
+}
+```
+
+```objc
+if (error) {
+  if (error.code == 9006) {
+    // 重新登录
+  } else {
+    // 其他异常
+
 using TapTap.Support;
 
 TapSupport.Init("https://please-replace-with-your-customized.domain.com", "分类 ID", new TapSupportCallback
@@ -312,6 +346,11 @@ TapSupport.setConfig(this, config);
 ```
 
 ```cpp
+
+// Todo 2
+// 处理 EXPIRED_CREDENTIAL 异常(9006)，重试登录流程
+// 提示开发者向用户展示其他异常
+
 TapUESupport::OnErrorCallBack.BindLambda([](const FTUError& Error)
 {
     if (Error.code == 9006)
@@ -323,6 +362,7 @@ TapUESupport::OnErrorCallBack.BindLambda([](const FTUError& Error)
         /*** 其它错误 */
     }
 });
+
 ```
 
 </MultiLang>
@@ -377,6 +417,7 @@ TapSupport.loginWithCustomCredential("User JWT");
 ```
 
 ```cpp
+// Todo 3
 TapUESupport::LoginWithCustomCredential(TEXT("User JWT"));
 ```
 
@@ -405,6 +446,34 @@ TapUESupport::LoginWithCustomCredential(TEXT("User JWT"));
 <MultiLang kind="ue">
 
 ```cs
+
+if (e is TapException ex && ex.Code == 9006) {
+    // 登录过期
+} else {
+    // 其他异常
+}
+```
+
+```java
+if (e instanceof ServerException) {
+    try {
+        org.json.JSONObject errorResponse = new org.json.JSONObject(((ServerException) e).responseBody);
+        if(errorResponse.getInt("numCode")==9006){
+            // 登录过期
+        }
+    } catch (JSONException ex) {
+        // ignore
+    }
+}
+```
+
+```objc
+if (error) {
+  if (error.code == 9006) {
+    // 重新登录
+  } else {
+    // 其他异常
+
 using TapTap.Support;
 
 TapSupport.Init("https://please-replace-with-your-customized.domain.com", "分类 ID", new TapSupportCallback
@@ -457,6 +526,9 @@ TapSupport.setConfig(this, config);
 ```
 
 ```cpp
+// Todo 2
+// 处理 EXPIRED_CREDENTIAL 异常(9006)，重试登录流程
+// 提示开发者向用户展示其他异常
 TapUESupport::OnErrorCallBack.BindLambda([](const FTUError& Error)
 {
     if (Error.code == 9006)
@@ -575,6 +647,8 @@ TapSupport.openSupportView();
 ```
 
 ```cpp
+// TODO 4: 确认是否可以省略参数
+TapUESupport::OpenSupportView("/", nullptr, nullptr);
 TapUESupport::OpenSupportView();
 ```
 
@@ -591,7 +665,7 @@ TapUESupport::OpenSupportView();
 <MultiLang kind="ue">
 
 ```cs
-TapSupport.OpenSupportView("/path");
+TapSupport.OpenSupportView();
 ```
 
 ```java
@@ -603,6 +677,8 @@ TapSupport.openSupportView("/path");
 ```
 
 ```cpp
+// TODO 5: 确认是否可以省略参数
+TapUESupport::OpenSupportView("/path", nullptr, nullptr);
 TapUESupport::OpenSupportView(TEXT("/path"));
 ```
 
@@ -648,6 +724,7 @@ NSDictionary *fields = @{@"243":@"iOS 15.1", @"244":@"WiFi"}; // 243 是在后�
 ```
 
 ```cpp
+// TODO 6: 确认是否可以省略参数
 TSharedPtr<FJsonObject> Fields = MakeShareable(new FJsonObject);
 Fields->SetStringField("243", "iOS 15.1");
 Fields->SetStringField("244", "Dash");
@@ -697,6 +774,7 @@ TapSupport.updateDefaultField("key", "value");
 ```
 
 ```cpp
+// TODO 7
 TSharedPtr<FJsonValue> Value = MakeShared<FJsonValueString>(TEXT("Value"));
 TapUESupport::UpdateDefaultField(TEXT("key"), Value);
 ```
