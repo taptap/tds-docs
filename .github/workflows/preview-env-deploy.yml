@@ -1,0 +1,35 @@
+name: Deploy Preview Environment
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+env:
+  REGION: cn-e1
+  APP_ID: j1sU6A4GIEiCzwDu5l9Klk03-9Nh9j0Va
+
+jobs:
+  deploy-preview-environment:
+    runs-on: ubuntu-latest
+
+    strategy:
+      max-parallel: 1
+      matrix:
+        group: [web, tds, intl]
+
+    environment:
+      name: preview-${{ matrix.group }}/${{ github.head_ref }}
+      url: ${{ env.PREVIEW_URL }}
+
+    steps:
+      - name: Install lean-cli
+        run: |
+          sudo curl -L -o /bin/lean https://github.com/leancloud/lean-cli/releases/download/v1.2.3/lean-linux-x64
+          sudo chmod +x /bin/lean
+
+      - name: Deploy
+        run: |
+          lean login --region ${{ env.REGION }} --token ${{ secrets.ACCESS_TOKEN }}
+          lean switch --region ${{ env.REGION }} --group ${{ matrix.group }} ${{ env.APP_ID }}
+          PREVIEW_URL=$(lean preview deploy -g)
+          echo "PREVIEW_URL=$PREVIEW_URL" >> $GITHUB_ENV

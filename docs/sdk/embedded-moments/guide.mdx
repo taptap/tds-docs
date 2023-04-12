@@ -21,7 +21,7 @@ import Languages from "../_partials/languages.mdx";
 
 假设你已经在 [快速开始](/sdk/start/quickstart/#初始化) 部分完成了 SDK 初始化，可以通过 [下载](/tap-download) 获得 TapSDK，添加 `TapMoment` 模块：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 <CodeBlock className="json">
   {`"dependencies":{
@@ -50,13 +50,20 @@ TapMomentSDK.framework
 `}
 </CodeBlock>
 
+```cs
+PublicDependencyModuleNames.AddRange(new string[] { 
+  //...
+  "TapMoment"
+});
+```
+
 </MultiLang>
 
 ## 设置回调
 
 设置回调以获取动态的状态变化。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 TapMoment.SetCallback((code, msg) => {
@@ -84,6 +91,12 @@ TapMoment.setCallback(new TapMoment.TapMomentCallback() {
 }
 ```
 
+```cpp
+FTapMoment::SetCallback(FTapMoment::FDelegate::CreateLambda([](int Code, const FString& Msg) {
+  
+}));
+```
+
 </MultiLang>
 
 回调方法中 code 表示事件类型，现支持的回调类型如下：
@@ -106,7 +119,7 @@ TapMoment.setCallback(new TapMoment.TapMomentCallback() {
 
 定时调用获取消息通知的接口，有新信息时可以在 TapTap 动态入口显示小红点，提醒玩家查看新动态。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 TapMoment.FetchNotification();
@@ -118,6 +131,10 @@ TapMoment.fetchNotification();
 
 ```objectivec
 [TapMoment fetchNotification];
+```
+
+```cpp
+FTapMoment::FetchNotification();
 ```
 
 </MultiLang>
@@ -138,7 +155,7 @@ TapMoment.fetchNotification();
 
 在游戏中显示 TapTap 动态页面，在这个页面，玩家不仅可以查看动态，还能发布新动态。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 TapMoment.Open(Orientation.ORIENTATION_LANDSCAPE);
@@ -152,6 +169,10 @@ TapMoment.open(TapMoment.ORIENTATION_PORTRAIT);
 TapMomentConfig *mConfig = TapMomentConfig.new;
 mConfig.orientation = TapMomentOrientationDefault;
 [TapMoment open:mConfig];
+```
+
+```cpp
+FTapMoment::Open(ETapMomentOrientation::PORTRAIT);
 ```
 
 </MultiLang>
@@ -175,7 +196,7 @@ mConfig.orientation = TapMomentOrientationDefault;
 
 开发者可以[结合游戏场景绘制入口](/sdk/embedded-moments/features/#场景化入口)，玩家打开入口跳转到指定的页面。使用前需要在开发者中心后台完成[场景化入口配置](/sdk/embedded-moments/features/#场景化入口配置)。
 
-<MultiLang>
+<MultiLang kind="ue">
 <>
 
 ```cs
@@ -230,6 +251,25 @@ mConfig.orientation = TapMomentOrientationDefault;
 
 </>
 
+<>
+
+```cpp
+TSharedPtr<FJsonObject> JsonObject = MakeShared<FJsonObject>();
+// 注意：这里的 key 是固定的，FTapMomentPage::ShortCutKey；第二个参数是开发者中心后台创建场景化入口后生成的「入口 ID」
+JsonObject->SetStringField(FTapMomentPage::ShortCutKey, "xxxx");
+// 注意：第二个参数固定为 FTapMomentPage::ShortCut
+FTapMoment::DirectlyOpen(ETapMomentOrientation::DEFAULT, FTapMomentPage::ShortCut, JsonObject);
+```
+
+
+| 参数        | 说明                                                                                 |
+| ----------- | ------------------------------------------------------------------------------------ |
+| Orientation | 打开方向                                                                             |
+| Page        | 固定为 FTapMomentPage::ShortCut                                      |
+| Extras  | 其中 FTapMomentPage::ShortCutKey 固定，第三个参数为需要跳转的页面 id |
+
+</>
+
 </MultiLang>
 
 ### 场景化入口回调格式说明
@@ -260,7 +300,7 @@ mConfig.orientation = TapMomentOrientationDefault;
 
 比如，玩家排位等待结束，准备进入对局时提示玩家关闭动态页面，玩家确认后关闭。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 TapMoment.Close("提示", "匹配成功，进入游戏");
@@ -274,6 +314,11 @@ TapMoment.closeWithConfirmWindow("提示", "匹配成功，进入游戏");
 [TapMoment closeWithTitle:@"提示" content:@"匹配成功，进入游戏" showConfirm:YES];
 ```
 
+```cpp
+FTapMoment::Close(TEXT("提示"), TEXT("匹配成功，进入游戏"));
+```
+
+
 </MultiLang>
 
 用户的选择会通过回调返回：
@@ -283,7 +328,7 @@ TapMoment.closeWithConfirmWindow("提示", "匹配成功，进入游戏");
 
 如果需要直接关闭动态窗口，不弹出二次确认框：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 TapMoment.Close();
@@ -295,6 +340,10 @@ TapMoment.close();
 
 ```objectivec
 [TapMoment close];
+```
+
+```cpp
+FTapMoment::Close();
 ```
 
 </MultiLang>
@@ -311,7 +360,7 @@ TapMoment.close();
 不过，SDK 也提供了发布图文动态的 API，以支持「一键发动态」等需求。
 图文动态包括单张或多张图片及相应的文字内容。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 string content = "我是描述";
@@ -336,6 +385,11 @@ postData.content = @"我是图片描述";
 [TapMoment publish:tconfig content:(postData)];
 ```
 
+```cpp
+TArray<FString> ImagePaths = {"imgpath01", "imgpath02", "imgpath03"};
+FTapMoment::Publish(ETapMomentOrientation::PORTRAIT, ImagePaths, TEXT("我是描述"));
+```
+
 </MultiLang>
 
 :::info
@@ -349,7 +403,7 @@ postData.content = @"我是图片描述";
 
 内嵌动态支持设置语言：
 
-<Languages />
+<Languages kind="ue" />
 
 ## 单纯的内嵌动态初始化
 
@@ -359,7 +413,7 @@ postData.content = @"我是图片描述";
 
 TapSDK Unity v3.7.1 及更高版本还需要添加 `com.leancloud.storage` 模块。Android SDK 及 iOS SDK 不需要额外增加依赖。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 <CodeBlock className="json">
   {`"dependencies":{
@@ -394,13 +448,22 @@ TapMomentSDK.framework
 `}
 </CodeBlock>
 
+<CodeBlock className="cpp">
+  {`// 基础库
+TapCommon
+TapLogin
+// 内嵌动态
+TapMoment
+`}
+</CodeBlock>
+
 </MultiLang>
 
 2. 请确认完成了 [单纯 TapTap 登录的初始化](/sdk/taptap-login/guide/tap-login/#初始化)。
 
 3. 完成内嵌动态功能的**初始化**，示例如下：
 
-<MultiLang>
+<MultiLang kind="ue">
 <>
 
 ```cs
@@ -451,6 +514,23 @@ TapMoment.init(Context context, String clientID, boolean isCN);
 | 参数     | 描述                                  |
 | -------- | ------------------------------------- |
 | clientId | TapTap 开发者中心对应应用的 Client ID |
+
+</>
+
+<>
+
+```cpp
+FTapMomentConfig Config;
+Config.RegionType = ERegionType::Global;
+Config.ClientID = "your clientId";
+FTapMoment::Init(Config);
+```
+
+**参数说明**
+
+| 参数     | 描述                                    |
+| -------- | --------------------------------------- |
+| Config | 其中 ClientID 是 TapTap 开发者中心对应游戏的 Client ID。 |
 
 </>
 

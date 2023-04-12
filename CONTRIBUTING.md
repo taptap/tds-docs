@@ -114,10 +114,10 @@ TapPlay 是利用沙盒技术实现的可以让用户直接通过 TapTap 玩游�
 索引完成后即可搜索整个仓库。
 
 还有一种方式是根据 URL 路径来查找文件。
-比如《学习社区模块》的 URL 是 `https://developer.taptap.com/docs/community/features/`.
-去掉网络协议（`https://`）、域名（`developer.taptap.com`）后，URL 路径为 `/docs/community/features/`，那么对应的文件路径即为 `/docs/community/features.mdx`。
+比如《学习社区模块》的 URL 是 `https://developer.taptap.cn/docs/community/features/`.
+去掉网络协议（`https://`）、域名（`developer.taptap.cn`）后，URL 路径为 `/docs/community/features/`，那么对应的文件路径即为 `/docs/community/features.mdx`。
 
-再比如，《开发者应对 DDoS 攻击问题的指引文档》的 URL 为 `https://developer.taptap.com/docs/ddos/`，所以对应的文件路径为 `/docs/ddos.mdx`。
+再比如，《开发者应对 DDoS 攻击问题的指引文档》的 URL 为 `https://developer.taptap.cn/docs/ddos/`，所以对应的文件路径为 `/docs/ddos.mdx`。
 
 注意，有部分不在侧边栏显示的、隐藏入口的页面的 URL 和文件路径并不对应，这种情况请通过搜索查找。
 还有一些文件的命名没有遵循和 URL 路径保持一致的原则，这些属于历史遗留问题，会逐渐切换到标准的命名方式。
@@ -232,7 +232,7 @@ PR 标题 GitHub 会自动填写，如果不满意，可以修改一下。
 点击「文件」图标，在左栏点击 `docs` 旁的箭头可展开文件夹，之后在鼠标悬浮到 EXPLORER 右侧的 `...` 的下方，会出现四个图标，点击最左侧的「New File」文件即可新增文件。
 
 默认配置下，文件名会成为 URL 的一部分，因此请使用小写英文字母、数字、连字符（`-`）。
-例如，在 `/docs/community/` 目录下新建 `features.mdx` 文件，那么发布后的 URL 会是 `https://developer.taptap.com/docs/community/features`。
+例如，在 `/docs/community/` 目录下新建 `features.mdx` 文件，那么发布后的 URL 会是 `https://developer.taptap.cn/docs/community/features`。
 
 MDX 文件开头的 [YAML] front matter 指定元信息，注意 YAML 区域上下分别用三个短横 `---` 隔开，其中用到的短横、冒号、引号都是英文半角标点。
 

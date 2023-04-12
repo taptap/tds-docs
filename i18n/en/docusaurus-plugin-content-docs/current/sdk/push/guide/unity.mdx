@@ -1,6 +1,6 @@
 ---
-title: Unity 推送指南
-sidebar_label: Unity 推送
+title: Unity Push Guide
+sidebar_label: Unity Push
 sidebar_position: 5
 ---
 
@@ -9,41 +9,41 @@ import CodeBlock from "@theme/CodeBlock";
 import sdkVersions from "/src/docComponents/sdkVersions";
 
 
-本文介绍了如何在 Unity 中使用推送通知功能。建议先阅读 [推送通知服务总览](/sdk/push/guide/overview/) 了解相关概念。
+This article will show you how to use push notifications in your Unity project. We recommend that you take a look at [Push Notification Overview](/sdk/push/guide/overview/) if you haven’t already.
 
-由于 Android 系统对于第三方推送管控越来越严格，所以目前只支持 iOS 及 <Conditional region="cn">Android 厂商（华为、小米、VIVO、OPPO、魅族）</Conditional><Conditional region="global">FCM </Conditional>推送。
+Currently we only support iOS and <Conditional region="cn">some Android vendors (Huawei, Xiaomi, VIVO, OPPO, Meizu)</Conditional><Conditional region="global">FCM</Conditional>.
 
-## 准备工作
+## Getting Started
 
 ### iOS
 
-请参考 [iOS 推送设置指南](/sdk/push/guide/ios-cert/)申请 iOS 推送证书。
+Please first obtain an iOS push notification certificate by following [APNs Configuration Guide](/sdk/push/guide/ios-cert/).
 
 ### Android
 
-请参考 [Android 混合推送开发指南](/sdk/push/guide/android-mixpush/)申请<Conditional region="cn">各厂商</Conditional><Conditional region="global"> FCM</Conditional> Android 推送权限。
+Please first apply for push notification permissions from <Conditional region="cn">Android vendors</Conditional><Conditional region="global">FCM</Conditional> by following [Android Mixpush Guide](/sdk/push/guide/android-mixpush/).
 
-注意：这里只需要参考混合推送指南申请<Conditional region="cn">各厂商</Conditional><Conditional region="global"> FCM </Conditional>的推送权限，**不需要** 参考混合推送指南中 Android 相关配置的内容。
+Note that you only need to follow the guide to apply for push notification permissions from <Conditional region="cn">Android vendors</Conditional><Conditional region="global">FCM</Conditional>. You **don’t** need to follow the guide to set up push notifications for Android.
 
-## 接入推送服务
+## Integrate the Push Notification Service
 
-### 安装
+### Install the SDK
 
-在 [SDK Releases](https://github.com/leancloud/csharp-sdk/releases) 下载最新版本的 `unity-push.unitypackage` 或 `unity-push-without-gradle.unitypackage`。
+You can download the latest `unity-push.unitypackage` or `unity-push-without-gradle.unitypackage` from [SDK Releases](https://github.com/leancloud/csharp-sdk/releases).
 
-如果项目中**没有**使用其他 Android Gradle 配置，可以直接下载 `unity-push.unitypackage`，其中包括了完整的 iOS/Android 配置，开发者只需配置各厂商参数即可。
+If your project has “no” other Android Gradle configurations, you can download `unity-push.unitypackage`. This package includes all iOS and Android configurations. You will only need to configure the parameters for different vendors.
 
-如果项目中**有**其他 Android Gradle 配置，则需要下载 `unity-push-without-gradle.unitypackage`，这个包中不包含推送相关的 Android Gradle 配置，需要开发者自行补充。
+If your project “has” other Android Gradle configurations, you’ll need to download `unity-push-without-gradle.unitypackage`. This package doesn’t contain Android Gradle configurations related to push notifications. You will need to provide those configurations yourself.
 
-因为涉及到 Android Gradle 配置，目前不提供 UPM 方式安装。
+The SDK cannot be installed with UPM because it involves Android Gradle configurations.
 
 <Conditional brand="tds">
 
-### 导入 `LeanCloud-SDK-Realtime-Unity` 包：
+### Import the `LeanCloud-SDK-Realtime-Unity` Package:
 
-#### 方法一：使用 Unity Package Manager
+#### Method 1: Use Unity Package Manager
 
-在项目的 `Packages/manifest.json` 文件中添加以下依赖：
+Add the following dependency to the `Packages/manifest.json` file in your project:
 
 <CodeBlock className="json">
 {
@@ -53,44 +53,44 @@ import sdkVersions from "/src/docComponents/sdkVersions";
 }
 </CodeBlock>
 
-在 Unity 顶部菜单中选择 **Window > Package Manager** 可查看已经安装在项目中的包。
+You can view all installed packages by going to **Window > Package Manager**.
 
-#### 方法二：手动导入
+#### Method 2: Import Manually
 
-1. 在 [下载页](/tap-download) 找到  **LeanCloud C# SDK** 下载地址，下载 `LeanCloud-SDK-Realtime-Unity.zip`。
+1. Locate the **LeanCloud C# SDK** download URL on [Downloads](/tap-download) and download `LeanCloud-SDK-Realtime-Unity.zip`.
 
-2. 解压后的 `LeanCloud-SDK-Realtime-Unity.zip` 为 Plugins 文件夹，拖拽至 Unity 即可。
+2. Unzip `LeanCloud-SDK-Realtime-Unity.zip` and drag the Plugins directory to Unity.
 
 </Conditional>
 
-### 配置
+### Set Up
 
 #### iOS
 
-只需要在初始化时传入 iOS 开发者的 TeamId，见[初始化](#初始化)。
+Provide the iOS developer’s TeamId during initialization. See [Initialization](#initialization).
 
 #### Android
 
 <Conditional region="cn">
 
-##### 华为
+##### Huawei
 
-下载华为推送后台申请的 `agconnect-services.json`，放置在项目的 `Assets/LeanCloud/Push/Android/HuaWei/hms/` 下（在打包时会将其拷贝到华为要求的目录下）。
+Download the file named `agconnect-services.json` applied from Huawei Push Service and place it in `Assets/LeanCloud/Push/Android/HuaWei/hms/`. When bundling, this file will be copied to the directory specified by Huawei.
 
 ##### VIVO
 
-将 VIVO 推送后台申请的 `app_id` 和 `api_key` 填入 `Assets/Plugins/Android/AndroidMenifest.xml` 中的 `meta-data` 的 `com.vivo.push.app_id` 和 `com.vivo.push.api_key`。
+Provide the `app_id` and `api_key` applied from VIVO Push Service as the values of `com.vivo.push.app_id` and `com.vivo.push.api_key` under `meta-data` in `Assets/Plugins/Android/AndroidMenifest.xml`.
 
-##### 其他平台
+##### Other Platforms
 
-小米、OPPO、魅族的配置在初始化时传入。
+For Xiaomi, OPPO, and Meizu, provide the configurations when initializing the SDK.
 
-注意：`AndroidMenifest.xml` 中会用 `${applicationId}` 作为包名配置，如果 `applicationId` 需要划分渠道，则需要手动修改。
+Note that `${applicationId}` is used for the package name in `AndroidMenifest.xml`. If you need different `applicationId`s for different channels, please edit it manually.
 
-### 初始化
+### Initialization
 
-这里需要开发者根据平台及设备信息，进行不同厂商 SDK 的初始化。
-小米推送有能力在其他厂商下建立推送连接，可以作为缺省厂商使用。
+Here you need to initialize the SDK for different vendors according to the platform and device information.
+You can use Xiaomi Push Service as the default option as it is able to establish connections when used under other vendors.
 
 ```cs
 using LeanCloud.Storage;
@@ -114,7 +114,7 @@ if (Application.platform == RuntimePlatform.IPhonePlayer) {
     } else if (deviceModel.Contains("meizu")) {
         LCMeiZuPushManager.RegisterMeiZuPush(MEIZU_APP_ID, MEIZU_APP_KEY);
     } else /*if (deviceModel.Contains("xiaomi"))*/ {
-        // 其他的厂商可以尝试注册小米推送
+        // Try to register Xiaomi Push Service for other vendors
         LCXiaoMiPushManager.RegisterXiaoMiPush(XIAOMI_APP_ID, XIAOMI_APP_KEY);
     }
 }
@@ -124,7 +124,7 @@ if (Application.platform == RuntimePlatform.IPhonePlayer) {
 
 <Conditional region="global">
 
-初始化 FCM 进行推送：
+To initialize FCM:
 
 ```cs
 LCFCMPushManager.RegisterFCMPush();
@@ -134,20 +134,20 @@ LCFCMPushManager.RegisterFCMPush();
 
 ## Installation
 
-SDK 提供默认的 Installation 对象，用来保存推送所需的 token 以及其它数据。
+The SDK comes with Installation objects that can be used to hold tokens and other data needed for push notifications.
 
 ```cs
 LCInstallation lcInstallation = await LCInstallation.GetCurrent();
 ```
 
-## 推送消息
+## Send Push Notifications
 
-**开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置** 中默认选中了 **禁止从客户端进行消息推送**，避免客户端可以不经限制地给应用内任意目标设备推送消息。
-我们建议开发者都勾选此项，通过 REST API 或云服务控制台发送推送消息。
+By default, **Prevent clients from sending push notifications** is checked in **Developer Center > Your game > Game Services > Cloud Services > Push Notification > Settings** so clients won’t be able to send push notifications to other devices without restriction.
+We recommend leaving this option enabled and sending push notifications through the REST API or the dashboard.
 
-如果有从客户端发推送的需求，需要先取消勾选此项。
+If you need to send push notifications from clients, uncheck this option.
 
-### 推送给所有设备
+### Send Push Notifications to All Devices
 
 ```csharp
 try {
@@ -162,9 +162,9 @@ try {
 }
 ```
 
-### 发送给特定的用户
+### Send Push Notifications to Specific Users
 
-下面是一个从客户端推送的例子，给某一台测试环境的 iOS 设备发推送：
+Below is an example of how to send a push notification from a client to an iOS device in the test environment:
 
 ```cs
 try {
@@ -182,52 +182,52 @@ try {
 }
 ```
 
-## 深入阅读：如何响应推送消息
+## Respond to Push Notifications
 
-### 消息格式
+### Message Format
 
-具体的消息格式，可参考[推送 REST API 使用指南的推送消息](/sdk/push/guide/rest#推送消息)一节。 对于 Android 设备，默认的消息内容参数支持下列属性：
+For more information about the message format, see [Push Notification REST API Guide](/sdk/push/guide/rest#推送消息). For Android devices, the default message content parameter contains the following properties:
 
 ```json
 {
-  "alert":      "消息内容",
-  "title":      "显示在通知栏的标题",
-  "custom-key": "由用户添加的自定义属性，custom-key 仅是举例，可随意替换"
+  "alert":      "Message content",
+  "title":      "The title that appears in the notification center",
+  "custom-key": "Custom properties; custom-key is just an example and you can use any other keys"
 }
 ```
 
-### 通知栏消息如何响应用户点击事件
+### Perform an Action When a User Taps a Push Notification
 
-Unity 环境有别于 iOS/Android 环境，当点击通知时，Unity 场景不一定能初始化完成，所以从 Native 到 Unity 的通知可能无法到达。
+When a user taps a push notification to open your app, the Unity scene might not be initialized. This means that Unity may not know which notification was tapped.
 
-SDK 为了能够将**通知参数**顺利的发送到 Unity，会在通知时将参数缓存在 Native 层，提供一个统一获取启动参数的 C# 接口：
+To provide the **notification parameters** to Unity, the SDK will cache the parameters in the native layer when sending push notifications. It provides a C# interface for your program to retrieve the parameters:
 
 ```cs
 Dictionary<string, object> launchData = await LCPushBridge.Instance.GetLaunchData();
 ```
 
-## 推送验证
+## Verification
 
-初始化 SDK 后，在 iOS/Android 真机运行项目，`_Installation` 表会生成一条设备信息的数据。
+Once you have initialized the SDK in your project and run your project on a real iOS or Android device, an entry with the device information will be created in the `_Installation` table.
 
-在**开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 在线发送**可以自定义推送条件发送一条推送，测试当前设备能否正常收到推送。
-这里可以根据 Installation 的 objectId 推送，iOS 设备也可以根据 deviceToken 推送，Android 设备可以根据 registrationId 推送。
+You can send a test push notification with custom conditions on **Developer Center > Your game > Game Services > Cloud Services > Push Notification > Send notifications**. This will help you verify that your device can receive push notifications.
+You can send the push notification by providing the objectId of the Installation. For iOS you can also provide the deviceToken and for Android you can use the registrationId.
 
-## 其他
-### 如何剔除某些厂商推送服务
+## FAQ
+### How do I remove the push notification services provided by certain vendors?
 
 <Conditional region="cn">
 
-应用可能只计划支持部分手机厂商，或针对不同渠道分别打包，这时可以手动剔除不需要的厂商 SDK，以节省打包体积：
+You might want your app to support only certain vendors, or to release different packages for different channels. In this case, you can remove the vendor SDKs for unused vendors to reduce the size of the packages:
 
 </Conditional>
 
 <Conditional region="global">
 
-SDK 中包含了一些中国 Android 手机厂商的 SDK，国际版应用可以手动剔除以节省打包体积。
+The SDK includes vendor SDKs for some Chinese Android vendors. You can remove them to reduce the size of the package.
 
 </Conditional>
 
-- 删掉 `Assets/LeanCloud/Push/Android/xx`，`xx` 代表厂商，如 `HuaWei`、`XiaoMi` 等
-- 删除 `Assets/Plugins/Android/mainTemplate.gradle` 中的 `dependences` 部分
-- 删掉 `Assets/Plugins/Android/AndroidManifest.xml` 中厂商 SDK 组件部分（有厂商相关的注释）
+- Delete `Assets/LeanCloud/Push/Android/xx`. Here `xx` is the vendor name such as `HuaWei` and `XiaoMi`.
+- Delete `dependencies` from `Assets/Plugins/Android/mainTemplate.gradle`.
+- Delete vendor SDKs from `Assets/Plugins/Android/AndroidManifest.xml` (see to the comments in the file for more information).

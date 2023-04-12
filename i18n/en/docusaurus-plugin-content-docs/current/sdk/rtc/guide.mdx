@@ -1,0 +1,1486 @@
+---
+title: RTC Guide
+sidebar_label: Guide
+sidebar_position: 2
+---
+
+import MultiLang from '/src/docComponents/MultiLang';
+import CodeBlock from '@theme/CodeBlock';
+import sdkVersions from '/src/docComponents/sdkVersions';
+import Mermaid from '/src/docComponents/Mermaid';
+import {Conditional} from '/src/docComponents/conditional';
+
+
+## Install the SDK
+
+Download the SDK from the [Downloads](/tap-download) page and import the `TapRTC` module:
+
+<MultiLang>
+
+<>
+
+Make sure [git-lfs] is installed on your system, then add the dependencies via UPM:
+
+[git-lfs]: https://git-lfs.github.com
+
+<CodeBlock className="json">
+{`"dependencies":{
+  ...
+  "com.taptap.tds.rtc":"https://github.com/TapTap/TapRTC-Unity.git#${sdkVersions.taptap.unity}",
+}`}
+</CodeBlock>
+</>
+
+<>
+<CodeBlock className="groovy">
+{`repositories{  
+    flatDir {  
+        dirs 'libs'  
+    }  
+}  
+dependencies {  
+    ... 
+    implementation (name:'TapRTC_${sdkVersions.taptap.rtc}', ext:'aar')
+}`}
+</CodeBlock>
+</>
+
+<>
+
+1. Select the project in Xcode, then go to Build Settings > Other Linker Flags and add `-ObjC`.
+2. Drag and drop the `TapRTC_SDK` directory into the project directory.
+3. Drag the `TapRTC.framework` and `GMESDK.framework` files into the project and select `Do Not Embed`.
+4. Drag the TapRTC.bundle resource file into the project.
+5. Add the system libraries that the SDK depends on: libz, libresolv, libiconv, libc++, CoreMedia.framework, CoreAudio.framework, AVFoundation.framework, SystemConfiguration.framework, UIKit.framework, AudioToolbox.framework, OpenAL.framework, Security.framework.
+
+<CodeBlock className="objectivec">
+TapRTC.framework
+</CodeBlock>
+
+</>
+
+</MultiLang>
+
+## Caution
+
+* RTC must be configured in the Developer Center before use.
+* You need to implement [the appropriate signature authentication service](#server-side-authentication) on your own servers.
+* C# SDK must periodically call the `TapRTC.Poll` interface to trigger relevant event callbacks.
+
+On Android, you need to apply for network and audio-related permissions:
+
+```xml
+<uses-permission android:name="android.permission.RECORD_AUDIO" />
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+<uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+<uses-permission android:name="android.permission.BLUETOOTH"/>
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+```
+
+For iOS, you need to request microphone permission (`Privacy - Microphone Usage Description`).
+
+Games usually have no need for background calls; players usually play the game while the voice is playing, and the game stays in the foreground.
+If the type of game is special and needs to support background calls, then you must also request background play permission:
+Configure **Capability > Background Modes > Audio, AirPlay, and Picture in Picture** in target.
+
+## Core Interfaces
+
+The RTC is initialized and configured with `TapRTCConfig`. The initialization process is asynchronous and you must wait for the initialization result to be returned before proceeding to the next step.
+
+* For `ClientId`, `ClientToken`, and `ServerUrl`, see the note about [application credentials](/sdk/storage/guide/setup-dotnet/#credentials).
+* `UserId`: Developer-defined user ID for tagging players.
+* `DeviceId`: Developer-defined device ID used to tag the device.
+* `AudioPerfProfile`: Audio quality profile (`LOW`, `MID`, or `HIGH`; default is `MID`).
+
+<MultiLang>
+
+```cs
+using TapTap.RTC;
+
+var config = new TapRTCConfig.Builder()
+            .ClientID("ClientId")
+            .ClientToken("ClientToken")
+            .ServerUrl("ServerUrl")
+            .UserId("UserId")
+            .DeviceId("DeviceId")
+            .AudioProfile(AudioPerfProfile.MID)
+            .ConfigBuilder();
+            
+ResultCode code = await TapRTC.Init(config);
+
+if (code == ResultCode.OK) {
+    // Initialized successfully
+} else {
+    // Failed
+}
+// In the RTC module of the SDK, interfaces that return ResultCode indicate success with ResultCode.OK.
+```
+
+```java
+import android.app.Application;
+import com.taptap.taprtc.Config;
+import com.taptap.taprtc.Config.AudioPerfProfile;
+import com.taptap.taprtc.DeviceID;
+import com.taptap.taprtc.UserID;
+import com.taptap.taprtc.TapRTCEngine;
+
+public class MyApp extends Application {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        Config config = new Config();
+        config.appId = "AppId";
+        config.appKey = "AppKey";
+        config.serverUrl = "ServerUrl"; // Please remove the http/https prefix and specify a custom domain name or a domain name in the form of "xxx.cloud.tds1.tapapis.cn" or something similar.
+        config.userId = new UserID("UserId");
+        config.deviceId = new DeviceID("DeviceId");
+        // This must be set to LOW if you want to use the Range Audio feature
+        config.profile = AudioPerfProfile.MID;
+        try {
+            TapRTCEngine.get().init(this, config, resultCode -> {
+                if (resultCode == ResultCode.OK) {
+                    // Initialized successfully
+                } else {
+                    // Failed
+                }
+            });
+        } catch (TapRTCException e) {
+            throw new RuntimeException(e);
+        }
+    }
+}
+// In the RTC module of the SDK, interfaces that return ResultCode indicate success with ResultCode.OK.
+```
+
+```objc
+TapRTCConfig *config = [[TapRTCConfig alloc] initWithAppId:@"AppId"
+appKey:@"AppKey" serverUrl:@"ServerUrl"
+userId:@"UserId" deviceId:@"DeviceId"
+profile:AudioPerfProfileMID];
+TapRTCEngine *engine = [TapRTCEngine defaultEngine];
+[engine initializeWithConfig:config resultBlock:^(NSError * _Nullable error) {
+    if (error) {
+        // handle error
+    }
+})];
+```
+
+</MultiLang>
+
+### Trigger Callback Events
+
+For the C# SDK, you must call the `Poll` method in the `Update` method to trigger the event callback. Failure to call this method will cause the SDK to throw exceptions.
+
+```cs
+public void Update()
+{
+    ResultCode code = TapRTC.Poll();
+    if (code == ResultCode.OK) {
+        // Triggered callback successfully
+    } else {
+        // Failed
+    }
+}
+```
+
+For the Java SDK and the Objective-C SDK, you do not need to call the `Poll` method regularly.
+
+### Resume
+
+<MultiLang>
+
+```cs
+ResultCode code = TapRTC.Resume();
+if (code == ResultCode.OK) {
+    // Resumed
+} else {
+    // Failed
+}
+```
+
+```java
+import com.taptap.taprtc.TapRTCEngine;
+
+ResultCode code = TapRTCEngine.get().resume();
+```
+
+```objc
+TapRTCResultCode resultCode = [engine resume];
+if (resultCode == TapRTCResultCode_Success) {
+    // resumed
+} else {
+    // failed to resume
+}
+```
+
+</MultiLang>
+
+### Pause
+
+<MultiLang>
+
+```cs
+ResultCode code = TapRTC.Pause();
+if (code == ResultCode.OK) {
+    // Paused
+} else {
+    // Failed
+}
+```
+
+```java
+import com.taptap.taprtc.TapRTCEngine;
+
+ResultCode code = TapRTCEngine.get().pause();
+```
+
+```objc
+TapRTCResultCode resultCode = [engine pause];
+if (resultCode == TapRTCResultCode_Success) {
+    // paused
+} else {
+    // failed to pause
+}
+```
+
+</MultiLang>
+
+## Room-Related Interfaces
+
+### Create Rooms
+
+After successful initialization, the SDK can make live voice calls only after creating a room.
+The room number (`roomId`) must be specified when creating the room.
+[Whether to enable range audio](#range-audio) must also be set when creating the room. The C# SDK does not enable it by default. For the Java SDK, you must specify whether to enable range audio when creating the room. The Objective-C SDK uses a separate interface to create rooms with range audio.
+
+<MultiLang>
+
+```cs
+bool enableRangeAudio = false;
+var room = await TapRTC.AcquireRoom("roomId", enableRangeAudio);
+```
+
+```java
+import com.taptap.taprtc.TapRTCEngine;
+import com.taptap.taprtc.RoomID;
+
+RoomId roomId = new RoomID("roomId");
+boolean enableRangeAudio = false;
+TapRTCRoom room = TapRTCEngine.get().acquireRoom(roomId, enableRangeAudio);
+```
+
+```objc
+TapRTCRoom *room = [engine acquireRoomWithRoomId:@"roomID"];
+```
+
+</MultiLang>
+
+### Register Room-Related Callback Events
+
+<MultiLang>
+
+```cs
+room.RegisterEventAction(new TapRTCEvent()
+{
+    OnDisconnect = (code, message) => { label.text += "\n" + $"Disconnected code:{code} msg:{e}"; },
+    OnEnterFailure = s => { label.text += "\n" + $"Failed to enter the room:{s}"; },
+    OnEnterSuccess = () => { label.text += "\n" + $"Entered the room"; },
+    OnExit = () => { label.text += "\n" + $"Left the room"; },
+    OnUserEnter = userId => { label.text += "\n" + $"{userId} entered the room"; },
+    OnUserExit = userId => { label.text += "\n" + $"{userId} left the room"; },
+    OnUserSpeaker = (userId, volume) => { label.text += "\n" + $"{userId} is speaking in the room; the volume is {volume}"; },
+    OnUserSpeakEnd = userId => { label.text += "\n" + $"{userId} stopped speaking"; },
+    // Returns the audio quality after the switch; see the section "Switch Audio Quality" below
+    OnRoomTypeChanged = (i) => { label.text += "\n" + $"The audio quality is now {i}"; },
+    OnRoomQualityChanged = (weight, loss, delay) =>
+    {
+       Debug.Log($"Audio quality:{weight} Packet loss:{loss}% Delay:{delay}ms");
+    },
+
+});
+```
+
+```java
+import com.taptap.taprtc.UserID;
+import com.taptap.taprtc.TapRTCRoom;
+
+room.registerCallback(new TapRTCRoom.Callback() {
+    // Entered the room
+    @Override public void onEnterSuccess() {}
+
+    // Failed to enter the room
+    @Override public void onEnterFailure(String msg) {}
+
+    // Lost connection
+    @Override public void onDisconnect() {}
+
+    // Reconnected
+    @Override public void onReConnected() {}
+
+    // Current player left the room
+    @Override public void onExit() {}
+
+    // A player has entered the room
+    @Override public void onUserEnter(UserID userId) {}
+
+    // A player has left the room
+    @Override public void onUserExit(UserID userId) {}
+
+    // A player started talking
+    @Override public void onUserSpeakStart(UserID userId, int volume) {}
+
+    // A player stopped talking
+    @Override public void onUserSpeakEnd(UserID userId) {}
+
+    // Audio quality changed
+    @Override public void onRoomQualityChanged(int weight, double loss, int delay) {}
+});
+```
+
+```objc
+// Need to implement TapRTCRoomDelegate
+
+// Entered the room
+- (void)onEnterSuccess;
+
+// Failed to enter the room
+- (void)onEnterFailure:(NSError *)error;
+
+// A player has entered the room
+- (void)onUsersEnter:(NSString *)userId;
+
+// A player has left the room
+- (void)onUsersExit:(NSString *)userId;
+
+// Current player left the room
+- (void)onExit;
+
+// Lost connection
+- (void)onDisconnect;
+
+// Reconnected
+- (void)onReconnected;
+
+// player started talking
+- (void)onUsersSpeakStart:(NSString *)userId volume:(NSInteger)volume;
+
+// A player stopped talking
+- (void)onUsersSpeakEnd:(NSString *)userId;
+
+// Audio quality changed (returns audio quality, packet loss, and delay)
+- (void)onQualityCallBackWithWeight:(int)weight loss:(float)loss delay:(int)delay;
+```
+
+</MultiLang>
+
+### Join a Room
+
+Enter a room using the [server-side generated authentication information](#server-side-authentication).
+
+After successfully entering a room, a callback is made via `OnEnterSuccess` in `TapRTCEvent`.
+
+<MultiLang>
+
+```cs
+ResultCode code = await room.Join("authBuffer");
+if (code == ResultCode.OK) {
+    // Successfully joined the room
+}
+if (code == ResultCode.ERROR_ALREADY_IN_ROOM) {
+    // The player is already in the room
+}
+```
+
+```java
+import com.taptap.taprtc.Authority;
+
+Authority authBuffer = new Authority("authBuffer");
+ResultCode code = room.join(authBuffer);
+if (code == ResultCode.OK) {
+    // Successfully joined the room
+}
+if (code == ResultCode.ERROR_ALREADY_IN_ROOM) {
+    // The player is already in the room
+}
+```
+
+```objc
+[room joinWithAuth:@"authBuffer"];
+```
+
+</MultiLang>
+
+The `authBuffer' is the authentication information generated on the server side, as described in the [Server-Side Authentication](#server-side-authentication) section below.
+
+### Exit a Room
+
+After leaving a room, a callback is made via `OnExit` in `TapRTCEvent`.
+
+<MultiLang>
+
+```cs
+ResultCode code = room.Exit();
+```
+
+```java
+ResultCode code = room.exit();
+```
+
+```objc
+TapRTCResultCode resultCode = [room exit];
+if (resultCode == TapRTCResultCode_Success) {
+    // exited
+} else {
+    // failed exit
+}
+```
+
+</MultiLang>
+
+### Listen to Someone's Voice (Enabled by Default)
+
+<MultiLang>
+
+```cs
+ResultCode code = room.EnableUserAudio("userId");
+if (code == ResultCode.OK) {
+    // Success
+}
+if (code == ResultCode.ERROR_USER_NOT_EXIST) {
+    // The player does not exist
+}
+```
+
+```java
+import com.taptap.taprtc.UserID;
+
+UserId userId = new UserID("userId");
+ResultCode code = room.enableUserAudio(userId);
+if (code == ResultCode.OK) {
+    // Success
+}
+if (code == ResultCode.ERROR_USER_NOT_EXIST) {
+    // The player does not exist
+}
+```
+
+```objc
+TapRTCResultCode resultCode = [room enableUserAudioWithUserId:@"userId"];
+```
+
+</MultiLang>
+
+### Disable Someone's Voice
+
+<MultiLang>
+
+```cs
+ResultCode code = room.DisableUserAudio("userId");
+if (code == ResultCode.OK) {
+    // Success
+}
+if (code == ResultCode.ERROR_USER_NOT_EXIST) {
+    // The player does not exist
+}
+```
+
+```java
+import com.taptap.taprtc.UserID;
+
+UserId userId = new UserID("userId");
+ResultCode code = room.disableUserAudio(userId);
+if (code == ResultCode.OK) {
+    // Success
+}
+if (code == ResultCode.ERROR_USER_NOT_EXIST) {
+    // The player does not exist
+}
+```
+
+```objc
+TapRTCResultCode resultCode = [room disableUserAudioWithUserId:@"userId"];
+```
+
+</MultiLang>
+
+### Enable/Disable Voice
+
+This interface sets whether or not to receive audio.
+In general, it is recommended that games use the [interface to turn on/off speakers](#enabledisable-speaker).
+
+<MultiLang>
+
+```cs
+// Enable
+ResultCode code = room.EnableAudioReceiver(true);
+
+// Disable
+ResultCode code = room.EnableAudioReceiver(false);
+```
+
+```java
+// Enable
+ResultCode code = room.enableAudioReceiver(true);
+
+// Disable
+ResultCode code = room.enableAudioReceiver(false);
+```
+
+```objc
+TapRTCResultCode resultCode = [room enableAudioReceiver:YES];
+```
+
+</MultiLang>
+
+### Switch Audio Quality
+
+There are three levels of audio quality: LOW, MID, and HIGH.
+
+You can change the audio quality after you enter the room.
+
+<MultiLang>
+
+```cs
+room.ChangeRoomType(AudioPerfProfile.LOW);
+room.ChangeRoomType(AudioPerfProfile.MID);
+room.ChangeRoomType(AudioPerfProfile.HIGH);
+```
+
+```java
+// Not yet supported
+```
+
+```objc
+// Not yet supported
+```
+
+</MultiLang>
+
+Changing the audio quality triggers the `OnRoomTypeChanged` callback.
+
+### Get the Users in the Room
+
+<MultiLang>
+
+```cs
+HashSet<string> userIdList = room.Users;
+```
+
+```java
+List<UserID> userIdList = room.getUsers();
+```
+
+```objc
+[room getUsers:^(NSArray<NSString *>*userIDs, NSError * _Nullable error) {
+    if (error) {
+        // Handle the error
+    } else {
+        // userIDs is the IDs of the users in the room
+    }
+})];
+```
+
+</MultiLang>
+
+## Audio-Related Interfaces
+
+### Enable/Disable Microphone
+
+<MultiLang>
+
+```cs
+// Enable
+ResultCode code = TapRTC.GetAudioDevice().EnableMic(true);
+
+// Disable
+ResultCode code = TapRTC.GetAudioDevice().EnableMic(false);
+```
+
+```java
+// Enable
+boolean ok = TapRTCEngine.get().getAudioDevice().enableMic(true);
+
+// Disable
+boolean ok = TapRTCEngine.get().getAudioDevice().enableMic(false);
+```
+
+```objc
+// Enable
+TapRTCResultCode code = [engine.audioDevice enableMic:YES];
+
+// Disable
+TapRTCResultCode code = [engine.audioDevice enableMic:NO];
+```
+
+</MultiLang>
+
+### Enable/Disable Speaker
+
+<MultiLang>
+
+```cs
+// Enable
+ResultCode code = TapRTC.GetAudioDevice().EnableSpeaker(true);
+
+// Disable
+ResultCode code = TapRTC.GetAudioDevice().EnableSpeaker(false);
+```
+
+```java
+// Enable
+boolean ok = TapRTCEngine.get().getAudioDevice().enableSpeaker(true);
+
+// Disable
+boolean ok = TapRTCEngine.get().getAudioDevice().enableSpeaker(false);
+```
+
+```objc
+// Enable
+TapRTCResultCode code = [engine.audioDevice enableSpeaker:YES];
+
+// Disable
+TapRTCResultCode code = [engine.audioDevice enableSpeaker:NO];
+```
+
+</MultiLang>
+
+### Set/Get Volume
+
+Volume is an integer from 0 to 100.
+
+<MultiLang>
+
+```cs
+int vol = 60;
+
+// Set microphone volume
+ResultCode code = TapRTC.GetAudioDevice().SetMicVolume(vol);
+// Set speaker volume
+ResultCode code = TapRTC.GetAudioDevice().SetSpeakerVolume(vol);
+
+// Get microphone volume
+int micVolume = TapRTC.GetAudioDevice().GetMicVolume();
+// Get speaker volume
+int speakerVolume = TapRTC.GetAudioDevice().GetSpeakerVolume();
+```
+
+```java
+int vol = 60;
+
+// Set microphone volume
+TapRTCEngine.get().getAudioDevice().setMicVolume(vol);
+// Set speaker volume
+boolean ok = TapRTCEngine.get().getAudioDevice().setSpeakerVolume(vol);
+
+// Get microphone volume
+int micVolume = TapRTCEngine.get().getAudioDevice().getMicVolume();
+// Get speaker volume
+int speakerVolume = TapRTCEngine.get().getAudioDevice().getSpeakerVolume();
+```
+
+```objc
+int vol = 60;
+
+// Set microphone volume
+TapRTCResultCode code = [engine.audioDevice setMicVolume:vol];
+// Set speaker volume
+TapRTCResultCode code = [engine.audioDevice setSpeakerVolume:vol];
+
+// Get microphone volume
+int micVolume = [engine.audioDevice getMicVolume];
+// Get speaker volume
+int speakerVolume = [engine.audioDevice getSpeakerVolume];
+```
+
+</MultiLang>
+
+### Enable/Disable Audio Play
+
+<MultiLang>
+
+```cs
+// Enable
+ResultCode code = TapRTC.GetAudioDevice().EnableAudioPlay(true);
+// Disable
+ResultCode code = TapRTC.GetAudioDevice().EnableAudioPlay(false);
+```
+
+```java
+// Enable
+boolean ok = TapRTCEngine.get().getAudioDevice().enableAudioPlay(true);
+// Disable
+boolean ok = TapRTCEngine.get().getAudioDevice().enableAudioPlay(false);
+```
+
+```objc
+// Enable
+TapRTCResultCode code = [engine.audioDevice enableAudioPlay:YES];
+
+// Disable
+TapRTCResultCode code = [engine.audioDevice enableAudioPlay:NO];
+```
+
+</MultiLang>
+
+### Enable/Disable Loopback
+
+<MultiLang>
+
+```cs
+// Enable
+ResultCode code = TapRTC.GetAudioDevice().EnableLoopback(true);
+// Disable
+ResultCode code = TapRTC.GetAudioDevice().EnableLoopback(false);
+```
+
+```java
+// Enable
+boolean ok = TapRTCEngine.get().getAudioDevice().enableLoopback(true);
+// Disable
+boolean ok = TapRTCEngine.get().getAudioDevice().enableLoopback(false);
+```
+
+```objc
+// Enable
+TapRTCResultCode code = [engine.audioDevice enableLoopback:YES];
+
+// Disable
+TapRTCResultCode code = [engine.audioDevice enableLoopback:NO];
+```
+
+</MultiLang>
+
+## Range Audio
+
+The range audio feature can support the following functions:
+
+- Allowing other team members within a certain range of the player to hear the player's voice;
+- Support for a large number of users to turn on the microphone at the same time for voice calls in the same room.
+
+To use range audio, you must first specify that range audio is enabled when you create a room:
+
+<MultiLang>
+
+```cs
+bool enableRangeAudio = true;
+var room = await TapRTC.AcquireRoom("roomId", enableRangeAudio);
+```
+
+```java
+import com.taptap.taprtc.TapRTCEngine;
+import com.taptap.taprtc.RoomID;
+
+RoomId roomId = new RoomID("roomId");
+boolean enableRangeAudio = true;
+TapRTCRoom room = TapRTCEngine.get().acquireRoom(roomId, enableRangeAudio);
+```
+
+```objc
+TapRTCRoom *room = [engine acquireRangeAudioRoomWithRoomId:@"roomID"];
+```
+
+</MultiLang>
+
+Also, before players enter the room, they must **change the audio quality to LOW**:
+
+<MultiLang>
+
+```cs
+room.ChangeRoomType(AudioPerfProfile.LOW);
+```
+
+```java
+// The Java SDK does not provide an interface to switch the audio quality.
+// With the Java SDK, if you want to use the range audio feature, **set the audio quality to LOW when initializing the SDK**.
+```
+
+```objc
+// The Objective-C SDK automatically sets the audio quality to LOW when you enter a room with range audio
+```
+
+</MultiLang>
+
+Next, set the team number and voice mode:
+
+- World Mode: Other team members within [a certain range] (#set-audio-reception-range) of the current player can hear the player's voice;
+- Team Mode: Only team members can talk to each other.
+
+In both modes, team members can talk to each other regardless of distance.
+
+<MultiLang>
+
+```cs
+int teamId = 12345678;
+ResultCode code = room.GetRtcRangeAudioCtrl().SetRangeAudioTeam(teamId);
+if (code == ResultCode.OK) {
+    // Success
+}
+if (code == ResultCode.ERROR_NOT_RANGE_ROOM) {
+    // Range audio is not enabled for this room
+}
+
+// World Mode 
+ResultCode resultCode = room.GetRtcRangeAudioCtrl().SetRangeAudioMode(RangeAudioMode.WORLD);
+if (resultCode == ResultCode.OK) {
+    // Success
+}
+if (resultCode == ResultCode.ERROR_NOT_RANGE_ROOM) {
+    // Range audio is not enabled for this room
+}
+// Team Mode
+ResultCode resultCode = room.GetRtcRangeAudioCtrl().SetRangeAudioMode(RangeAudioMode.TEAM);
+if (resultCode == ResultCode.OK) {
+    // Success
+}
+if (resultCode == ResultCode.ERROR_NOT_RANGE_ROOM) {
+    // Range audio is not enabled for this room
+}
+```
+
+```java
+import com.taptap.taprtc.TapRTCRangeAudioCtrl.RangeAudioMode;
+
+int teamId = 12345678;
+ResultCode code = room.rangeAudioCtrl().setRangeAudioTeam(new TeamID(teamId));
+if (code == ResultCode.OK) {
+    // Success
+}
+if (code == ResultCode.ERROR_NOT_RANGE_ROOM) {
+    // Range audio is not enabled for this room
+}
+
+// World Mode
+ResultCode resultCode = room.rangeAudioCtrl().setRangeAudioMode(RangeAudioMode.WORLD);
+if (resultCode == ResultCode.OK) {
+    // Success
+}
+if (resultCode == ResultCode.ERROR_NOT_RANGE_ROOM) {
+    // Range audio is not enabled for this room
+}
+
+// Team Mode
+ResultCode resultCode = room.rangeAudioCtrl().setRangeAudioMode(RangeAudioMode.TEAM);
+if (resultCode == ResultCode.OK) {
+    // Success
+}
+if (resultCode == ResultCode.ERROR_NOT_RANGE_ROOM) {
+    // Range audio is not enabled for this room
+}
+```
+
+```objc
+int teamId = 12345678;
+TapRTCResultCode resultCode = [room setRangeAudioTeamId:teamId];
+
+// World Mode
+TapRTCResultCode code = [room setRangeAudioMode:TapRTCRangeAudioModeWorld];
+TapRTCResultCode code = [room setRangeAudioMode:TapRTCRangeAudioModeTeam];
+```
+
+</MultiLang>
+
+Then enter the room and [Set Audio Reception Range](#set-audio-reception-range) and [Update Source Orientation](#update-source-orientation) to make the range audio effective.
+
+If you want to change the voice mode after entering the room, you can call `SetRangeAudioMode` again.
+
+### Set Audio Reception Range
+
+The audio reception range controls whether or not other team members can hear your voice in world mode, and is invoked after you enter the room and usually only needs to be set once.
+
+<MultiLang>
+
+```cs
+int range = 300;
+ResultCode code = room.GetRtcRangeAudioCtrl().UpdateAudioReceiverRange(range);
+if (code == ResultCode.OK) {
+    // Success
+}
+if (code == ResultCode.ERROR_NOT_RANGE_ROOM) {
+    // Range audio is not enabled for this room
+}
+```
+
+```java
+int range = 300;
+ResultCode code = room.rangeAudioCtrl().updateAudioReceiverRange(range);
+if (code == ResultCode.OK) {
+    // Success
+}
+if (code == ResultCode.ERROR_NOT_RANGE_ROOM) {
+    // Range audio is not enabled for this room
+}
+```
+
+```objc
+int range = 300;
+TapRTCResultCode code = [room updateAudioReceiverRange:range];
+```
+
+</MultiLang>
+
+Other team members who are out of `range` will not be able to hear the player.
+
+If [3D voice](#3d-Voice) is also enabled, the distance will also affect the volume level:
+
+| Distance | Volume decay |
+| - | - |
+| `N < range/10` | 1.0 (No decay)|
+| `N >= range/10` | `range/10/N` |
+
+### Update Source Orientation
+
+After successfully entering the room, you must call this interface in Unity's Update method to update the orientation and direction of the sound source for the range audio to take effect.
+The orientation is specified by the front, right, and top coordinates of the world coordinate system, and the direction is specified by the unit vector of the front, right, and top axes of its own coordinate system.
+
+<MultiLang>
+
+```cs
+int x = 1;
+int y = 2;
+int z = 3;
+Position position = new Position(x, y, z);
+
+float[] axisForward = new float[3] {1.0, 0.0, 0.0};
+float[] axisRight = new float[3] {0.0, 1.0, 0.0};
+float[] axisUp = new float[3] {0.0, 0.0, 1.0};
+Forward forward = new Forward(axisForward, axisRight, axisUp);
+ResultCode code = room.GetRtcRangeAudioCtrl().UpdateSelfPosition(position, forward);
+if (code == ResultCode.OK) {
+    // Success
+}
+if (code == ResultCode.ERROR_NOT_RANGE_ROOM) {
+    // Range audio is not enabled for this room
+}
+```
+
+```java
+import com.taptap.taprtc.TapRTCRangeAudioCtrl.Position;
+import com.taptap.taprtc.TapRTCRangeAudioCtrl.Forward;
+
+int x = 1;
+int y = 2;
+int z = 3;
+Position position = new Position(x, y, z);
+
+float[] axisForward = {1.0, 0.0, 0.0};
+float[] axisRight = {0.0, 1.0, 0.0};
+float[] axisUp = {0.0, 0.0, 1.0};
+Forward forward = new Forward(axisForward, axisRight, axisUp);
+
+ResultCode code = room.rangeAudioCtrl().updateSelfPosition(position, forward);
+if (code == ResultCode.OK) {
+    // Success
+}
+if (code == ResultCode.ERROR_NOT_RANGE_ROOM) {
+    // Range audio is not enabled for this room
+}
+```
+
+```objc
+TapRTCPosition position;
+position.x = 1.0;
+position.y = 2.0;
+position.z = 3.0;
+
+TapRTCAxis axisForward;
+axisForward.x = 1.0;
+axisForward.y = 0.0;
+axisForward.z = 0.0;
+TapRTCAxis axisRight;
+axisRight.x = 0.0;
+axisRight.y = 1.0;
+axisRight.z = 0.0;
+TapRTCAxis axisUp;
+axisUp.x = 0.0;
+axisUp.y = 0.0;
+axisUp.z = 1.0;
+
+TapRTCForward forward;
+forward.forward = axisForward;
+forward.rightward = axisRight;
+forward.upward = axisUp;
+TapRTCResultCode code = [room updateSelfPosition:position forward:forward];
+```
+
+</MultiLang>
+
+The orientation has no effect on whether the voice is heard or not, so if you do not enable [3D Voice](#3d-voice), the orientation parameter can be set freely when updating the orientation of the sound source.
+However, when 3D Voice is enabled, the orientation must be set correctly to get accurate 3D sound effects.
+
+### 3D Voice
+
+Enabling 3D Voice allows you to convert voices without orientation to voices with source orientation to increase player immersion.
+This interface takes two parameters, the first specifying whether the current player can hear the 3D sound effect, and the second specifying whether the 3D voice works [within the team] (#range-audio).
+
+<MultiLang>
+
+```cs
+bool enable3D = true;
+bool applyToTeam = true;
+ResultCode code = TapRTC.GetAudioDevice().EnableSpatializer(enable3D, applyToTeam);
+```
+
+```java
+boolean enable3D = true;
+boolean applyToTeam = true;
+boolean ok = TapRTCEngine.get().getAudioDevice().enableSpatializer(enable3D, applyToTeam);
+```
+
+```objc
+TapRTCResultCode code = [engine.audioDevice EnableSpatializer:YES applyTeam:YES];
+```
+
+</MultiLang>
+
+
+## Error Codes
+
+Some of the operations in the above document return ResultCode, and the code examples give the error codes corresponding to some common error types.
+The complete list of error codes is shown below:
+
+<MultiLang>
+
+```cs
+namespace TapTap.RTC
+{
+    public enum ResultCode
+    {
+        OK = 0,
+        ERROR_UNKNOWN = 1,
+        ERROR_UNIMPLEMENTED = 2,
+        ERROR_NOT_ON_MAIN_THREAD = 3,
+        ERROR_INVAIDARGS = 4,
+        ERROR_NOT_INIT = 5,
+        ERROR_CONFIG_ERROR = 11,
+        ERROR_NET = 21,
+        ERROR_NET_TIMEOUT = 22,
+        ERROR_USER_NOT_EXIST = 101,
+        ERROR_ROOM_NOT_EXIST = 102,
+        ERROR_DEVICE_NOT_EXIST = 103,
+        ERROR_TEAM_ID_NOT_NULL = 104,
+        ERROR_ALREADY_IN_ROOM = 105,
+        ERROR_NO_PERMISSION = 106,
+        ERROR_AUTH_FAILED = 107,
+        ERROR_LIB_ERROR = 108,
+        ERROR_NOT_RANGE_ROOM = 109,
+    }
+}
+```
+
+```java
+public enum ResultCode {
+    OK(0, "Success"),
+    ERROR_UNKNOWN(1, "Unknown Error"),
+    ERROR_UNIMPLEMENTED(2, "Unimplemented Functionality"),
+    ERROR_NOT_ON_MAIN_THREAD(3, "Not running on the main thread"),
+    ERROR_INVALID_ARGUMENT(4, "Invalid parameter"),
+    ERROR_NOT_INIT(5, "Uninitialized"),
+    ERROR_CONFIG_ERROR(11, "Configuration error"),
+    ERROR_NET(21, "Network error"),
+    ERROR_NET_TIMEOUT(22, "Network request timeout"),
+    ERROR_USER_NOT_EXIST(101, "User does not exist"),
+    ERROR_ROOM_NOT_EXIST(102, "Room does not exist"),
+    ERROR_DEVICE_NOT_EXIST(103, "Device does not exist"),
+    ERROR_TEAM_ID_NOT_NULL(104, "TeamID cannot be Zero"),
+    ERROR_ALREADY_IN_ROOM(105, "It's already in the other room"),
+    ERROR_NO_PERMISSION(106, "TapRTCCode_Error_NoPermission\tNo Permission"),
+    ERROR_AUTH_FAILED(107, "Authorization failure"),
+    ERROR_LIB_ERROR(108, "Service provider library error"),
+    ERROR_NOT_RANGE_ROOM(109, "Not Support Range Room"),
+}
+```
+
+```objc
+FOUNDATION_EXPORT NSString * const TapRTCNetworkErrorDomain;
+FOUNDATION_EXPORT NSString * const TapRTCResultErrorDomain;
+
+typedef NS_ENUM(NSInteger, TapRTCResultCode) {
+    TapRTCCode_OK         = 0,
+    TapRTCCode_Error_Unknown     = 1,
+    TapRTCCode_Error_Unimplemented     = 2,
+    TapRTCCode_Error_NotOnMainThread,
+    TapRTCCode_Error_InvaidArgs,
+    TapRTCCode_Error_NotInit,
+    
+    TapRTCCode_ConfigError_Error  = 11,
+    TapRTCCode_ConfigError_AppID,
+    TapRTCCode_ConfigError_AppKey,
+    TapRTCCode_ConfigError_ServerUrl,
+    TapRTCCode_ConfigError_UserID,
+    TapRTCCode_ConfigError_DeviceID,
+    
+    TapRTCCode_NetError_Error = 21,
+    TapRTCCode_NetError_Timeout,
+    
+    TapRTCCode_Error_UserNotExist = 101,
+    TapRTCCode_Error_RoomNotExist,
+    TapRTCCode_Error_DeviceNotExist,
+    TapRTCCode_Error_TeamIDNotBeZero,
+    TapRTCCode_Error_AlreadyInOtherRoom,
+    TapRTCCode_Error_NoPermission,
+    TapRTCCode_Error_AuthFailed,
+    TapRTCCode_LibError,
+};
+```
+
+</MultiLang>
+
+## Server Side
+
+To secure the chat channel, the RTC service must be used with the game's own authentication server.
+In addition, the game's own server is used to respond to compliance callbacks and to invoke the player removal interface.
+
+### Server-Side Authentication
+
+Before a client joins a room, it must obtain a signature from your own authentication server, after which the RTC cloud verifies the signature, and only requests with valid signatures are executed, and illegal requests are blocked.
+
+<Mermaid diagram={`
+sequenceDiagram
+Client->>Authentication Server: 1. Require signature before entering room
+Authentication Server-->>Client: 2. Generate signature to return to client
+Client->>RTC Cloud: 3. Encode the signature in the request and send it to the real-time voice server
+RTC Cloud-->>Client: 4. Verify the content of the request and the signature and perform the subsequent operations
+`} />
+
+1. The client requests a signature from the game's authentication server before entering the room;
+2. The authentication server generates a signature to return to the client based on the [authentication key algorithm](#authentication-key-algorithm) described below;
+3. The client receives the signature, encrypts it in the request, and sends it to the RTC server;
+4. The RTC server performs a verification of the request content and signature, and performs the subsequent actual operation after passing the verification.
+
+Signatures use a combination of the **HMAC-SHA1** algorithm and Base64.
+For different requests, your app generates different signatures (see format descriptions below). Overall, signing is the process of signing player and room information using a specific key (in this case, we use the application's Master Key).
+
+#### Authentication Key Algorithm
+
+The signature generation process used for authentication involves **plaintext**, **key**, and **encryption algorithm**.
+
+##### Plaintext
+
+The plaintext is a json string consisting of the following fields (in any order)
+
+
+
+| Field       | Type/Length      | Description                                                         |
+| :--------- | :------------- | :----------------------------------------------------------- |
+| `userId`     | `string`         | An identifier of the user entering the room                                   |
+| `appId`      | `string`         | The game's Client ID |
+| `expireAt` | `unsigned int/4` | Expiration time (current time + expiration date (in seconds, recommended value: 300s))          |
+| `roomId`     | `string`         | Room ID                                                       |
+
+##### Key
+
+The `Master Key` (i.e. `Server Secret`) of the game.
+Both the `Client ID` and `Server Secret` can be viewed in **Developer Center > Your game > Game Services > Configuration**.
+
+##### Encryption Algorithm
+
+The encryption algorithm uses a combination of **HMAC-SHA1** algorithm and Base64, similar to the JWT format.
+The generated result contains two parts: payload (plaintext) and sign (encrypted string).
+
+1. Construct the JSON string according to the fields in the table above.
+
+2. Base64-encode the JSON string from the previous step to obtain the payload.
+
+3. Generate the sign using **HMAC-SHA1** on the payload with **key**.
+
+4. Use `.` to join the payload and the token.
+
+Note: The JSON string itself is field-order independent, but the **spliced payload and the payload used to generate the sign must be in the same field order** or they will not pass the checksum in the RTC cloud.
+
+The following sample code in Java and Go is provided for reference:
+
+<details>
+<summary>Java example</summary>
+
+```java
+import com.google.gson.Gson;
+import org.junit.Test;
+import javax.crypto.Mac;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
+import java.nio.charset.StandardCharsets;
+import static org.junit.Assert.*;
+
+import java.time.Instant;
+import java.util.Base64;
+
+public class JUnitTestSuite {
+
+    private static final String MAC_NAME = "HmacSHA1";
+
+    @Test
+    public void testToken() throws Exception {
+        String masterKey = "masterKey";
+        Token t = new Token();
+        t.appId = "appId";
+        t.userId ="user_test";
+        t.roomId ="room_test";;
+
+        int expTime = (int) Instant.now().getEpochSecond() + 5 * 60;
+        t.expireAt = expTime;
+
+        // server authBuff to your SDK Client
+        String authBuff = genToken(t, masterKey);
+        assertNotNull(authBuff);
+    }
+
+    private  String genToken(Token token, String key) throws Exception {
+        Gson gson = new Gson();
+        String t  = gson.toJson(token);
+        String payload = Base64.getEncoder().encodeToString(t.getBytes(StandardCharsets.UTF_8));
+        byte[] pEncryptOutBuf = hmacSHA1Encrypt(payload.getBytes(StandardCharsets.UTF_8), key);
+        String sign = Base64.getEncoder().encodeToString(pEncryptOutBuf);
+        return payload + "." + sign;
+    }
+
+
+    byte[] hmacSHA1Encrypt(byte[] text, String key) throws Exception {
+        byte[] data = key.getBytes(StandardCharsets.UTF_8);
+        SecretKey secretKey = new SecretKeySpec(data, MAC_NAME);
+        Mac mac = Mac.getInstance(MAC_NAME);
+        mac.init(secretKey);
+        return mac.doFinal(text);
+    }
+
+    class Token {
+        String userId;
+        String appId;
+        String roomId;
+        long expireAt;
+    }
+}
+```
+
+</details>
+
+<details>
+<summary>Go example</summary>
+
+```go
+package configs
+
+import (
+   "crypto/hmac"
+   "crypto/sha1"
+   "encoding/base64"
+   "encoding/json"
+   "fmt"
+   "testing"
+   "time"
+
+   "github.com/stretchr/testify/assert"
+)
+
+
+func TestToken(t *testing.T) {
+   assert := assert.New(t)
+   t1 := &Token{
+      UserId:   "appId",
+      AppId:    "user_test",
+      RoomId:   "roomId_test",
+      ExpireAt: time.Now().Unix() + 5*60,
+   }
+   authBuff := GenToken(t1, "masterKey")
+   assert.NotEmpty(authBuff)
+   fmt.Println(authBuff)
+}
+
+
+const (
+   sep = "."
+)
+
+func GenToken(t *Token, masterKey string) string {
+   b, err := json.Marshal(t)
+   if err != nil {
+      return ""
+   }
+   payload := base64.StdEncoding.EncodeToString(b)
+   sign := base64.StdEncoding.EncodeToString(HmacSHA1(masterKey, payload))
+   return payload + sep + sign
+
+}
+
+
+func HmacSHA1(key string, data string) []byte {
+   mac := hmac.New(sha1.New, []byte(key))
+   mac.Write([]byte(data))
+   return mac.Sum(nil)
+}
+
+type Token struct {
+   UserId   string `json:"userId,omitempty"`
+   AppId    string `json:"appId,omitempty"`
+   RoomId   string `json:"roomId,omitempty"`
+   ExpireAt int64  `json:"expireAt,omitempty"`
+}
+```
+
+</details>
+
+#### Deployment Method
+
+Since the encryption key uses `Server Secret`, the logic of the encryption algorithm must be implemented on the server side. **Do not implement the encryption logic on the client side**.
+
+#### Usage
+
+The game's own authentication server generates the encryption string and sends it to the client. The client then passes the appropriate authentication information when calling the [join room interface](#join-a-room).
+
+The C# SDK also provides a `GenToken` method for testing when integrating the SDK on the client side.
+For example, client-side developers can test the functionality of adding rooms on the client side before waiting for server-side developers to implement and deploy the appropriate interfaces.
+Another example is that the client developer can compare the encrypted string generated by the SDK's own `GenToken` with the encrypted string generated by the server to verify that the server has implemented the encryption algorithm correctly.
+
+```cs
+var authBuffer = AuthBufferHelper.GenToken(appId, roomId, userId, masterKey);
+```
+
+Note that since this method requires `Server Secret` to be passed as a parameter, **it is intended for internal testing and development only, and should not be used in published code or installation packages**.
+If you are concerned about `Server Secret` being leaked into external code or installation packages due to human error, or if you want to minimize the number of internal developers having access to `Server Secret` for security reasons, it is recommended that you do not use the `GenToken` method provided by the SDK, and that you generate the encrypted string using the game's own authentication server for internal testing as well.
+
+### Compliance Callback
+
+
+After you set the callback address in the RTC dashboard (**Developer Center > Your game > Game Services > RTC > Settings**), the set callback address will be called if the voice content is illegal.
+
+The callback address should be a URL of the HTTP(S) protocol interface, support the POST method, and use UTF-8 for data encoding.
+
+Example POST body for callback:
+
+```json
+{
+    "HitFlag":true,
+    "Msg":"Illegal message",
+    "ScanFinishTime":1634893736,
+    "ScanStartTime":1634893734,
+    "Scenes":[
+        "default"
+    ],
+    "VoiceFilterPiece":[
+        {
+            "Duration":14000,
+            "HitFlag":true,
+            "Info":"Illegal message",
+            "MainType":"abuse",
+            "Offset":0,
+            "PieceStartTime":1634893734,
+            "RoomId":"1234",
+            "UserId":"123456",
+            "VoiceFilterDetail":[
+                {
+                    "EndTime":0,
+                    "KeyWord":"Illegal keyword",
+                    "Label":"abuse",
+                    "Rate":"0.00",
+                    "StartTime":0
+                }
+            ]
+        }
+    ]
+}
+```
+
+You can get the `sign` field in the callback header to verify that the request is coming from the RTC cloud.
+
+#### Compliance Callback Verification Algorithm
+
+1. Append the `POST` prefix to the POST body of the callback to get the payload:
+
+    ```
+    POST{"HitFlag":true,"Msg":"Illegal message",/* Other logic */}
+    ```
+
+    Note:
+
+    - Please read the JSON content directly from the HTTP request body**. Deserializing to the programming language data structure may change the order of the fields, resulting in a validation failure.
+    - POST and body are directly connected without spaces in between.
+
+2. Perform HMAC-SHA1 encryption on the payload. The key is the game's `Server Secret`.
+
+3. BASE64-encode the result of the previous step to get the sign.
+
+4. Compare it with the value of the sign field in the HTTP header of the callback. If it is the same, then the request is coming from the RTC cloud.
+
+Here is a sample Go code for reference:
+
+<details>
+<summary>Go example</summary>
+
+```go
+package main
+
+import (
+   "crypto/hmac"
+   "crypto/sha1"
+   "encoding/base64"
+   "github.com/labstack/echo/v4"
+   "io/ioutil"
+   "net/http"
+)
+
+
+func testCallback(c echo.Context) error {
+   sign := c.Request().Header.Get("sign")
+   body, _ := ioutil.ReadAll(c.Request().Body)
+   checkGMESign(sign, "yourMasterKey", string(body))
+   return c.NoContent(http.StatusOK)
+}
+
+
+func checkGMESign(signature, secretKey, body string) bool {
+   sign := genSign(secretKey, body)
+   return sign == signature
+}
+
+func genSign(secretKey, body string) string {
+   content := "POST" + body
+   a := hmacSHA1(secretKey, content)
+   return base64.StdEncoding.EncodeToString(a)
+}
+
+func hmacSHA1(key string, data string) []byte {
+   mac := hmac.New(sha1.New, []byte(key))
+   mac.Write([]byte(data))
+   return mac.Sum(nil)
+}
+```
+
+</details>
+
+### Remove Players
+
+In some scenarios, the game may need to kick players out of a room, such as when illegal content is involved.
+You can call the RTC service's REST API from your own server to fulfill this need.
+
+#### Request Format
+
+For POST and PUT requests, the request body must be in JSON format and the Content-Type of the HTTP header must be set to `application/json`.
+
+The request is authenticated by the key/value pairs contained in the HTTP header, with the following parameters:
+
+Key|Value|Meaning|Source
+---|----|---|---
+`X-LC-Id`|`{{appid}}`|The `App Id` (`Client Id`) of the current application|Can be viewed in the console
+`X-LC-Key`|`{{masterkey}},master`|The `Master Key` (`Server Secret`) of the current application|Can be viewed in the console
+
+#### Base URL
+
+The Base URL for REST API requests (the `{{host}}` in the curl examples) is the<Conditional region='cn'> custom</Conditional> API domain of your app. You can <Conditional region='cn'>update or </Conditional>find it on the Developer Center.<Conditional region='cn'> See [Domain](/sdk/storage/guide/setup-dotnet#domain) for more details.</Conditional>
+
+#### REST API
+
+```sh
+curl -X DELETE \
+-H "Content-Type: application/json" \
+-H "X-LC-Id: {{appId}}" \
+-H "X-LC-Key: {{masterKey}},master" \
+-d '{"roomId":"YOUR-ROOM-ID", "userId":"YOUR-USER-ID"}' \
+https://{{host}}/rtc/v1/room/member
+```
+
+The HTTP status code in response to a successful removal is `200`, and the HTTP status code in response to an error is the appropriate error code, e.g. 401 if you do not have permission.
+
+Note that **after a player has been removed, the player can rejoin the room and speak again after joining the room. **
+**The game must also implement the appropriate blocking logic on its own authentication server** so that no signature is issued when the player rejoins the room, preventing players from circumventing the restriction by rejoining the room.

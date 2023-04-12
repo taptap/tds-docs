@@ -21,12 +21,14 @@ rm docs/sdk/taptap-login/guide/upgrade2.x.mdx # TapTap 登录/开发指南/2.x �
 rm docs/sdk/embedded-moments/features.mdx # 内嵌动态/功能介绍
 rm docs/sdk/embedded-moments/bestpractice.mdx # 内嵌动态/最佳实践
 rm -r docs/sdk/tap-friend # TapTap 好友
+rm docs/sdk/achievement/bestpractice.mdx # 成就系统/最佳实践
 rm -r docs/sdk/taplink # TapLink
 rm -r docs/sdk/anti-addiction # 防沉迷
 rm -r docs/sdk/tap-play # TapPlay
 rm -r docs/sdk/tap-canary # TapCanary
 rm docs/sdk/engine/dedicated-IP.mdx # 云引擎/独立 IP
 rm docs/sdk/push/guide/android-mixpush.mdx # 推送通知/开发指南/Android 混合推送
+rm docs/sdk/push/guide/callback-vendor.mdx # 推送通知/开发指南/回调服务厂商配置
 rm -r docs/sdk/multiplayer # 多人在线对战
 
 # 英文版「游戏商店」

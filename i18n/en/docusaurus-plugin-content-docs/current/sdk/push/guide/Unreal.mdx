@@ -1,0 +1,131 @@
+---
+title: Unreal Push Guide
+sidebar_label: Unreal Push
+sidebar_position: 6
+---
+
+import {Conditional} from '/src/docComponents/conditional';
+import CodeBlock from "@theme/CodeBlock";
+import sdkVersions from "/src/docComponents/sdkVersions";
+
+
+This article will show you how to use push notifications in your Unreal project. We recommend that you take a look at [Push Notification Overview](/sdk/push/guide/overview/) if you haven’t already.
+
+Currently we only support iOS and <Conditional region="cn">some Android vendors (Huawei, Xiaomi, vivo, OPPO, Meizu, Honor)</Conditional><Conditional region="global">FCM</Conditional>.
+
+## Getting Started
+
+### Prerequisites
+
+* Install **UE 4.26** or higher on your computer
+* iOS **12** or higher
+* Android MinSDK is **API21** or higher
+
+### iOS
+
+Please first obtain an iOS push notification certificate by following [APNs Configuration Guide](/sdk/push/guide/ios-cert/).
+
+### Android
+
+Please first apply for push notification permissions from <Conditional region="cn">Android vendors</Conditional><Conditional region="global">FCM</Conditional> by following [Android Mixpush Guide](/sdk/push/guide/android-mixpush/).
+
+Note that you only need to follow the guide to apply for push notification permissions from <Conditional region="cn">Android vendors</Conditional><Conditional region="global">FCM</Conditional>. You **don’t** need to follow the guide to set up push notifications for Android.
+
+## Integrate the Push Notification Service
+
+### Install the Plugin
+
+* Download **[TapSDK.zip](https://github.com/taptap/TapSDK-UE4/releases)**, unzip it, and copy `LeanCloudPush` and `LeanCloud` to the `Plugins` directory of the project. If AndroidX configurations are missing from the project, you can also copy `AndroidX` to the project.
+* Restart Unreal Editor.
+* Go to **Edit > Plugins > Project > TapTap** and enable the `LeanCloudPush` module.
+
+### Add Dependencies
+
+Add the following dependencies to **Project.Build.cs**:
+
+```c#
+PublicDependencyModuleNames.AddRange(new string[] { 
+    "Core",
+    "CoreUObject",
+    "Engine",
+    "Slate",
+    "SlateCore",
+    "Http",
+    "Json",
+    "JsonUtilities",
+    "LeanCloud",
+    "LeanCloudPush"
+});
+```
+
+### Project Configurations
+
+#### iOS
+
+Add the following configurations to **DefaultEngine.ini**:
+
+```ini
+[/Script/IOSRuntimeSettings.IOSRuntimeSettings]
+bEnableRemoteNotificationsSupport=True
+```
+
+#### Android
+
+* Create a directory named **app** and copy the file named **agconnect-services.json** downloaded from Huawei Developer Center into this directory
+* Add the following code to the Android UPL file of the project (create the file if it doesn’t exist) and fill in the configurations
+
+```xml
+<resourceCopies>
+    <copyDir src="$S(PluginDir)/YOUR_PATH/app/" dst="$S(BuildDir)/gradle/app/" />
+</resourceCopies>
+
+<androidManifestUpdates>
+    <addElements tag="application">
+        <meta-data
+                android:name="com.vivo.push.api_key"
+                android:value="vivo’s key"/>
+        <meta-data
+                android:name="com.vivo.push.app_id"
+                android:value="vivo’s appid"/>
+        <meta-data
+                android:name="com.hihonor.push.app_id"
+                android:value="Honor’s appid" />
+
+    </addElements>
+</androidManifestUpdates>
+ ```
+
+### Import Header Files
+
+```cpp
+#if PLATFORM_IOS
+#include "iOS/LCIOSPush.h"
+#elif PLATFORM_ANDROID
+#include "Android/LCAndroidPush.h"
+#endif
+```
+
+### Usage
+
+Enter the configurations obtained from developer platforms into the following interface:
+
+```cpp
+#if PLATFORM_IOS
+	FLCIOSPush::Register("iOS Team ID");
+#elif PLATFORM_ANDROID
+	FString DeviceName = FLCAndroidPush::GetDeviceName().ToLower();
+	if (DeviceName.Contains("huawei")) {
+		FLCAndroidPush::RegisterHuaWei();
+	} else if (DeviceName.Contains("oppo")) {
+		FLCAndroidPush::RegisterOPPO("OPPO’s AppKey", "OPPO’s AppSecret");
+	} else if (DeviceName.Contains("vivo")) {
+		FLCAndroidPush::RegisterVIVO();
+	} else if (DeviceName.Contains("meizu")) {
+		FLCAndroidPush::RegisterMeiZu("Meizu’s AppId", "Meizu’s AppKey");
+	} else if (DeviceName.Contains("honor")) {
+		FLCAndroidPush::RegisterHonor();
+	} else {
+		FLCAndroidPush::RegisterXiaoMi("Xiaomi’s AppId", "Xiaomi’s AppKey");
+	}
+#endif
+```

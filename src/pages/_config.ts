@@ -99,7 +99,18 @@ export const getEntries = (brand: string, region: string): Entry[] => {
 
   const ENTRIES_LEANCLOUD: Entry[] = [
     {
+      title: "控制台和账户",
+      description: "LeanCloud 控制台使用指南",
+      links: [
+        {
+          label: "查看更多",
+          to: "/sdk/start/dashboard/",
+        },
+      ],
+    },
+    {
       title: "域名",
+      description: "域名绑定、备案及常见问题",
       links: [
         {
           label: "查看更多",
@@ -109,6 +120,7 @@ export const getEntries = (brand: string, region: string): Entry[] => {
     },
     {
       title: "内建账户",
+      description: "支持用户通过邮件或手机进行注册和登录，并提供密码重置、第三方登录等实用功能",
       links: [
         {
           label: "查看更多",
@@ -118,6 +130,7 @@ export const getEntries = (brand: string, region: string): Entry[] => {
     },
     {
       title: "数据存储",
+      description: "高效存取海量级 JSON 对象、二进制文件、地理位置等数据，提供完整的增删改查操作接口",
       links: [
         {
           label: "查看更多",
@@ -140,6 +153,35 @@ export const getEntries = (brand: string, region: string): Entry[] => {
         {
           label: "查看更多",
           to: "/sdk/push/features",
+        },
+      ],
+    },
+    {
+      title: "即时通讯",
+      links: [
+        {
+          label: "查看更多",
+          to: "/sdk/im/features",
+        },
+      ],
+    },
+    {
+      title: "短信",
+      description: "支持国内短信和国际短信，用途包括验证类、通知类、营销类，方便与 LeanCloud 账户系统集成",
+      links: [
+        {
+          label: "查看更多",
+          to: "/sdk/sms/guide",
+        },
+      ],
+    },
+    {
+      title: "多人在线对战",
+      description: "不需要自己搭建后端系统，轻松实现游戏内玩家匹配、在线对战消息同步等功能",
+      links: [
+        {
+          label: "查看更多",
+          to: "/sdk/multiplayer/features",
         },
       ],
     },

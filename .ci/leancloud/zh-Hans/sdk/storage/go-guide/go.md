@@ -509,7 +509,7 @@ if err := client.Class("Todo").NewQuery().Select("title", "content").Find(&todo)
 ```
 
 `Select`
-支持点号（`author.firstName`），详见[点号使用指南](https://leancloud.cn/docs/dot-notation.html)。
+支持点号（`author.firstName`），详见[点号使用指南](/sdk/storage/guide/dot-notation/)。
 另外，字段名前添加减号前缀表示反向选择，例如 `-author` 表示不返回 `author` 字段。
 反向选择同样适用于内置字段，比如 `-objectId`，也可以和点号组合使用，比如 `-pubUser.createdAt`。
 

@@ -1,127 +1,102 @@
 ---
-title: iOS 推送指南
-sidebar_label: iOS 推送
+title: iOS Push Guide
+sidebar_label: iOS Push
 sidebar_position: 2
 ---
 
 import MultiLang from '/src/docComponents/MultiLang';
+import Mermaid from "/src/docComponents/Mermaid";
 
 
-本文介绍了如何在 iOS 设备中使用推送通知功能。建议先阅读[推送通知总览](/sdk/push/guide/overview/)了解相关概念。
+This article will show you how to use push notifications in your iOS project. We recommend that you take a look at [Push Notification Overview](/sdk/push/guide/overview/) if you haven’t already.
 
-## 配置 APNs 推送证书
+## Configure APNs Certificates
 
-配置 APNs 证书是使用推送服务的前提，详情请参考[iOS 推送设置指南](/sdk/push/guide/ios-cert/)。
+To use push notifications in your iOS project, you must first configure APNs certificates. See [APNs Configuration Guide](/sdk/push/guide/ios-cert/) for more information.
 
-## iOS 流程简介
+## iOS Workflow Overview
 
-首先，注册 APNs 申请 Token，并将其保存到云端：
+The first step is to register with APNs and obtain a token, then store the token in the cloud:
 
-![注册 APNs 申请 Token](/img/apns-registration.svg)
+<Mermaid
+  diagram={`
+sequenceDiagram
+iOS SDK->>APNs: 1. Call the official API and get the deviceToken
+APNs-->>iOS SDK: 2. Provide the deviceToken
+iOS SDK-->>Cloud: 3. The SDK stores the deviceToken in the _Installation table
+`}
+/>
 
-然后，调用推送通知提供的接口发送推送消息：
+Then you can invoke the interface provided by the Push Notification service to send a push notification:
 
-![调用推送通知接口发推送](/img/push-workflow-ios.svg)
+<Mermaid
+  diagram={`
+sequenceDiagram
+Developer->>Cloud: 1. Send an HTTPS request to the Push Notification API
+Cloud-->>APNs: 2. Find the appropriate deviceToken from _Installation and call the APNs API to send the push notification
+APNs->>iOS device: 3. Send the push notification
+`}
+/>
 
 ## Installation
 
-Installation 是 LCObject 的子类，使用 Installation 对象来保存推送所需的 token 以及其它数据。
+Installation is a subclass of LCObject. You can use an Installation object to store the token and other data needed to send a push notification.
 
-SDK 提供默认的 Installation 对象，并**会在默认对象保存成功后持久缓存其数据**。一般情况下，使用默认对象保存 device token。默认对象的获取方式如下：
+The SDK comes with a default Installation object and **will cache the data after you save the default object to the cloud**. In general, the default object is used to store the device token. The code below shows how to get the default object:
 
 <MultiLang kind="ios">
-
-```swift
-let installation = LCApplication.default.currentInstallation
-```
 
 ```objc
 LCInstallation *installation = [LCInstallation defaultInstallation];
 ```
 
+```swift
+let installation = LCApplication.default.currentInstallation
+```
+
 </MultiLang>
 
-除了默认的 Installation 对象，你也可以构造新的 Installation 对象，用来存储其它特殊类型的 token（诸如 VoIP 等），构造方式如下：
+In addition to using the default Installation object, you can also construct new Installation objects and store other tokens of special types (such as VoIP) in them. The following code constructs a new Installation object:
 
 <MultiLang kind="ios">
 
-```swift
-let installation = LCInstallation()
-```
 ```objc
 LCInstallation *installation = [[LCInstallation alloc] init];
 ```
+```swift
+let installation = LCInstallation()
+```
 
 </MultiLang>
 
-**SDK 即时通讯模块会使用默认 Installation 对象的 device token。如需使用即时通讯的离线推送功能，请确保默认 Installation 对象成功保存了 device token。**
+**The Instant Messaging service uses the device token obtained from the default Installation object. To use the push notification feature of the Instant Messaging service, make sure that the default Installation object has successfully saved the device token.**
 
-Installation 对象的默认字段如下所示：
+By default, an Installation object contains the following fields:
 
-字段|类型|说明
+Field|Type|Description
 ---|---|---
-deviceToken|String|推送所需的 Token
-apnsTeamId|String|推送所需的 Team ID
-badge|Number|对应应用通知的标记，主要用于通知标记清零
-channels|Array|订阅频道数组
-deviceProfile|String|自定义证书名称，主要用于多证书推送
-deviceType|String|设备类型，SDK 会自动设置该属性，一般情况下不要随意更改
-apnsTopic|String|应用的 Bundle Identifier，SDK 会自动设置该属性，一般情况下不要随意更改
-timeZone|String|设备所处时区，SDK 会自动设置该属性，一般情况下不要随意更改
+deviceToken|String|The token used to send push notifications
+apnsTeamId|String|The Team ID used to send push notifications
+badge|Number|The number displayed in the app’s badge; primarily used to clear the badge
+channels|Array|An array of subscribed channels
+deviceProfile|String|Custom certificate’s name; primarily used to send push notifications with multiple certificates
+deviceType|String|The device type; the SDK automatically sets the value of this field; please avoid editing it manually
+apnsTopic|String|The app’s Bundle Identifier; the SDK automatically sets the value of this field; please avoid editing it manually
+timeZone|String|The device’s timezone; the SDK automatically sets the value of this field; please avoid editing it manually
 
-### 注册 APNs 获取 Token
+### Register With APNs and Obtain a Token
 
-在保存 installation 前，要先注册 APNs 来获取推送所需的 token，以 User Notification 为例，具体步骤如下：
+Before saving the Installation, you must first register with APNs to obtain the token needed to send push notifications. The code below uses User Notification as an example:
 
 <MultiLang kind="ios">
 
-```swift
-import LeanCloud
-import UserNotifications
-
-func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-
-    // 首先需要初始化应用
-    do {
-        try LCApplication.default.set(
-            id: {{appid}},
-            key: {{appkey}},
-            // 请将 xxx.example.com 替换为你的应用绑定的自定义 API 域名
-            serverURL: "https://xxx.example.com")
-    } catch {
-        print(error)
-        return false
-    }
-    
-    UNUserNotificationCenter.current().getNotificationSettings { (settings) in
-        switch settings.authorizationStatus {
-        case .authorized:
-            DispatchQueue.main.async {
-                UIApplication.shared.registerForRemoteNotifications()
-            }
-        case .notDetermined:
-            UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .alert, .sound]) { (granted, error) in
-                if granted {
-                    DispatchQueue.main.async {
-                        UIApplication.shared.registerForRemoteNotifications()
-                    }
-                }
-            }
-        default:
-            break
-        }
-    }
-    
-    return true
-}
-```
 ```objc
 #import <LeanCloudObjc/Foundation.h>
 #import <UserNotifications/UserNotifications.h>
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     
-    // 首先需要初始化应用
+    // Be sure to initialize the app first
     [LCApplication setApplicationId:{{appid}}
                           clientKey:{{appkey}}
                     serverURLString:"https://please-replace-with-your-customized.domain.com"];
@@ -150,15 +125,69 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
     return YES;
 }
 ```
+```swift
+import LeanCloud
+import UserNotifications
+
+func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+
+    // Be sure to initialize the app first
+    do {
+        try LCApplication.default.set(
+            id: {{appid}},
+            key: {{appkey}},
+            // Please replace xxx.example.com with the custom API domain you have added to your app
+            serverURL: "https://xxx.example.com")
+    } catch {
+        print(error)
+        return false
+    }
+    
+    UNUserNotificationCenter.current().getNotificationSettings { (settings) in
+        switch settings.authorizationStatus {
+        case .authorized:
+            DispatchQueue.main.async {
+                UIApplication.shared.registerForRemoteNotifications()
+            }
+        case .notDetermined:
+            UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .alert, .sound]) { (granted, error) in
+                if granted {
+                    DispatchQueue.main.async {
+                        UIApplication.shared.registerForRemoteNotifications()
+                    }
+                }
+            }
+        default:
+            break
+        }
+    }
+    
+    return true
+}
+```
 
 </MultiLang>
 
-### 保存 Token
+### Save the Token
 
-注册 APNs 成功后，系统会通过 `didRegisterForRemoteNotificationsWithDeviceToken` 函数返回 deviceToken。一般情况，在该函数里保存 deviceToken 和 apnsTeamId 即可。保存方式如下：
+Once you have successfully registered with APNs, the system returns the deviceToken with the `didRegisterForRemoteNotificationsWithDeviceToken` function. In most cases, you can save the deviceToken and apnsTeamId in this function, as shown in the code below:
 
 <MultiLang kind="ios">
 
+```objc
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+
+    [[LCInstallation defaultInstallation] setDeviceTokenFromData:deviceToken
+                                                          teamId:@"YOUR_APNS_TEAM_ID"];
+    [[LCInstallation defaultInstallation] saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+        if (succeeded) {
+            // save succeeded
+        } else if (error) {
+            NSLog(@"%@", error);
+        }
+    }];
+}
+```
 ```swift
 func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
     
@@ -175,54 +204,43 @@ func application(_ application: UIApplication, didRegisterForRemoteNotifications
     }
 }
 ```
-```objc
-- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-
-    [[LCInstallation defaultInstallation] setDeviceTokenFromData:deviceToken
-                                                          teamId:@"YOUR_APNS_TEAM_ID"];
-    [[LCInstallation defaultInstallation] saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-        if (succeeded) {
-            // save succeeded
-        } else if (error) {
-            NSLog(@"%@", error);
-        }
-    }];
-}
-```
 
 </MultiLang>
 
-iOS 系统重装、从备份恢复应用、在新设备上安装应用都会导致 device token 变化，因此 [Apple 推荐][apple-apns]在应用每次启动时都去请求 APNs 的 device token，获取 token 后进行设置并保存 token。
-除此以外，云服务后端会统计 Installation 的更新时间（`updatedAt`），据此清理长期未更新的 Installation 数据。
-所以我们建议开发者遵循 Apple 的推荐方式开发应用，以免有效 Installation 数据被意外清理，以及因为 device token 过期无效而推送失败。
+The device token changes when a user erases their device, restores the app from backup, or installs the app on a new device. To solve this problem, [Apple recommends][apple-apns] that the app requests the device token of the APNs when opening, and then sets and saves the token.
+Also, our system keeps track of the update times (`updatedAt`) of all Installation objects and removes the objects that haven’t been updated in a while.
+Therefore, we recommend that you build your app according to Apple’s recommended way to avoid Installation objects from being removed accidentally and to avoid push notification failure due to expired device tokens.
 
 [apple-apns]: https://developer.apple.com/documentation/usernotifications/registering_your_app_with_apns
 
-## 多证书场景
+## Use Multiple Certificates
 
-对于一些应用，他们在发布和上架时分为不同的版本（司机版、乘客版），但数据和消息是互通的，这种场景下我们允许应用上传多个自定义证书并对不同的设备设置 `deviceProfile`，从而可以用合适的证书给不同版本的应用推送。
+Some developers may publish different apps that share the same data and messages (for example, a carpooling service may provide different apps for drivers and riders). If that’s your case, you can upload multiple custom certificates and configure different `deviceProfile`s for different devices so you can send push notifications to different apps with different certificates.
 
-当你上传自定义证书时会被要求输入「证书类型」，即 deviceProfile 的名字。当 Installation 上保存了 deviceProfile 时，我们将忽略原先的开发和生产证书设置，而直接按照 deviceProfile 推送。
+When you upload a custom certificate, you are prompted for a certificate type, which is also the name of the deviceProfile. If the deviceProfile is set for the Installation, our system will ignore the certificates configured for the development and production environments and use the deviceProfile instead.
 
-## 特殊推送类型
+## Special Push Types
 
-对于诸如 VoIP 这类的特殊推送，由于其使用的 apnsTopic 并不是应用的 Bundle Identifier，所以在保存 token 前，需要修改 apnsTopic 为其指定的值。
+For special push notifications such as VoIP, because they don’t use the app’s Bundle Identifier as apnsTopic, you must change apnsTopic to the specified value before saving the token.
 
-## 发送推送消息
+## Send Push Notifications
 
-可以通过 REST API 或云服务控制台发送 iOS 推送消息。
+You can send iOS push notifications through the REST API or the dashboard.
 
-### 推送环境
+### Environments
 
-iOS 应用的推送环境有**测试**和**生产**两种。
-通过 Xcode 安装的 App 处于测试环境，通过 App Store、Ad-Hoc、TestFlight 发布的正式版 App 处于生产环境。 
+An iOS app comes with a **development** environment and a **production** environment.
+Apps installed using Xcode are in development environments. Apps published through the App Store, Ad-Hoc, and TestFlight are in production environments.
 
-通过 REST API 和控制台推送消息时可以通过 `prod` 参数指定推送到处于哪个环境的 iOS 应用。
-通过 SDK 使用 `Push` 发起推送，默认发往生产环境的 iOS 应用。
-如果要推送到测试环境，需要采用如下方式设置：
+When sending push notifications using the REST API or the dashboard, you can specify which environment to send push notifications to by specifying the `prod` parameter.
+When sending push notifications using `Push` with the SDK, push notifications are sent to the production environment by default.
+To send to the development environment instead, use the following method:
 
 <MultiLang kind="ios">
 
+```objc
+[LCPush setProductionMode:false];
+```
 ```swift
 do {
     let environment: LCApplication.Environment = [.pushDevelopment]
@@ -230,36 +248,38 @@ do {
     try LCApplication.default.set(
         id: {{appid}},
         key: {{appkey}},
-        // 请将 xxx.example.com 替换为你的应用绑定的自定义 API 域名
+        // Please replace xxx.example.com with the custom API domain you have added to your app
         serverURL: "https://xxx.example.com",
         configuration: configuration)
 } catch {
     print(error)
 }
 ```
-```objc
-[LCPush setProductionMode:false];
-```
 
 </MultiLang>
 
-注意，SDK 只能指定推送给哪种环境的 iOS 应用，无法切换 iOS 应用本身所处的推送环境。
-iOS 应用所处的推送环境完全由 App 的分发方式决定。
+Note that if you’re using the SDK, you can only specify which environment to send push notifications to; you can’t change the environment that the app itself belongs to.
+The environment the app belongs to can only be determined by how the app is distributed.
 
-注意，为防止由于大量证书错误所产生的性能问题，我们对使用 **开发证书** 的推送做了设备数量的限制，即一次至多可以向 20,000 个设备进行推送。如果满足推送条件的设备超过了 20,000 个，系统会拒绝此次推送（**开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 推送记录** 页面会显示相应信息）。因此，在使用开发证书推送时，请合理设置推送条件。
+Note that to prevent performance issues caused by massive certificate errors, when using the **development certificate**, you can send push notifications to a maximum of 20,000 devices at a time. If you exceed this limit, the system will reject the push notification request (you will see an error on **Developer Center > Your game > Game Services > Cloud Services > Push Notification > Push records**). Please set the conditions carefully when using the development certificate.
 
-## 使用频道
+## Use Channels
 
-使用频道（channel）可以实现「发布—订阅」的模型。设备订阅某个频道，然后发送消息的时候指定要发送的频道即可。
+Channels allow you to implement a pub-sub model in your app. A device can subscribe to a channel, and when you send push notifications, you can specify which channels to send to.
 
-注意，频道名称只能包含大小写英文字母、数字、下划线（`_`）、连字符（`-`）、等号（`=`）、汉字（中日韩统一表意文字）。
+Note that a channel name can only contain uppercase and lowercase letters, numbers, underscores (`_`), hyphens (`-`), equal signs (`=`), and Chinese characters.
 
-### 订阅和退订
+### Subscribe and Unsubscribe
 
-订阅 `Giants` 频道：
+To subscribe to the `Giants` channel:
 
 <MultiLang kind="ios">
 
+```objc
+LCInstallation *currentInstallation = [LCInstallation defaultInstallation];
+[currentInstallation addUniqueObject:@"Giants" forKey:@"channels"];
+[currentInstallation saveInBackground];
+```
 ```swift
 do {
     try LCApplication.default.currentInstallation.append("channels", element: "Giants", unique: true)
@@ -275,20 +295,20 @@ do {
     print(error)
 }
 ```
-```objc
-LCInstallation *currentInstallation = [LCInstallation defaultInstallation];
-[currentInstallation addUniqueObject:@"Giants" forKey:@"channels"];
-[currentInstallation saveInBackground];
-```
 
 </MultiLang>
 
-订阅后要记得保存。
+Be sure to save after subscribing.
 
-退订：
+To unsubscribe:
 
 <MultiLang kind="ios">
 
+```objc
+LCInstallation *currentInstallation = [LCInstallation defaultInstallation];
+[currentInstallation removeObject:@"Giants" forKey:@"channels"];
+[currentInstallation saveInBackground];
+```
 ```swift
 do {
     try LCApplication.default.currentInstallation.remove("channels", element: "Giants")
@@ -304,36 +324,38 @@ do {
     print(error)
 }
 ```
-```objc
-LCInstallation *currentInstallation = [LCInstallation defaultInstallation];
-[currentInstallation removeObject:@"Giants" forKey:@"channels"];
-[currentInstallation saveInBackground];
-```
 
 </MultiLang>
 
-获取所有订阅的频道：
+Get all subscribed channels:
 
 <MultiLang kind="ios">
 
-```swift
-let subscribedChannels: LCArray? = LCApplication.default.currentInstallation.channels
-```
 ```objc
 NSArray *subscribedChannels = [LCInstallation defaultInstallation].channels;
 ```
+```swift
+let subscribedChannels: LCArray? = LCApplication.default.currentInstallation.channels
+```
 
 </MultiLang>
 
-### 发送消息到频道
+### Send to Channels
 
-发送消息到刚才订阅的「Giants」频道：
+To send to the “Giants” channel:
 
 <MultiLang kind="ios">
 
+```objc
+// Send a notification to all devices subscribed to the "Giants" channel.
+LCPush *push = [[LCPush alloc] init];
+[push setChannel:@"Giants"];
+[push setMessage:@"Giants is cool"];
+[push sendPushInBackground];
+```
 ```swift
 let messageData: [String: Any] = [
-    "alert": "Giants 太牛掰了"
+    "alert": "Giants is cool"
 ]
 
 let channels: [String] = ["Giants"]
@@ -347,20 +369,22 @@ LCPush.send(data: messageData, channels: channels) { (result) in
     }
 }
 ```
-```objc
-// Send a notification to all devices subscribed to the "Giants" channel.
-LCPush *push = [[LCPush alloc] init];
-[push setChannel:@"Giants"];
-[push setMessage:@"Giants 太牛掰了"];
-[push sendPushInBackground];
-```
 
 </MultiLang>
 
-如果你想发送到多个频道，可以指定 channels 数组：
+To send to multiple channels, specify an array for `channels`:
 
 <MultiLang kind="ios">
 
+```objc
+NSArray *channels = [NSArray arrayWithObjects:@"Giants", @"Mets", nil];
+LCPush *push = [[LCPush alloc] init];
+
+// Be sure to use the plural 'setChannels'.
+[push setChannels:channels];
+[push setMessage:@"The Giants won against the Mets 2-3."];
+[push sendPushInBackground];
+```
 ```swift
 let messageData: [String: Any] = [
     "alert": "The Giants won against the Mets 2-3."
@@ -377,30 +401,30 @@ LCPush.send(data: messageData, channels: channels) { (result) in
     }
 }
 ```
-```objc
-NSArray *channels = [NSArray arrayWithObjects:@"Giants", @"Mets", nil];
-LCPush *push = [[LCPush alloc] init];
-
-// Be sure to use the plural 'setChannels'.
-[push setChannels:channels];
-[push setMessage:@"The Giants won against the Mets 2-3."];
-[push sendPushInBackground];
-```
 
 </MultiLang>
 
-## 高级定向发送
+## Send to Specific Devices
 
-频道对于大多数应用来说可能就足够了。但是某些情况下，你可能需要更高精度的定向推送。推送通知允许你通过 LCQuery API 查询 Installation 列表，并向指定条件的 query 推送消息。
+In most cases, using channels to specify targets to receive a push notification is sufficient. However, sometimes you may want to send push notifications to more specific devices. The Push Notification service allows you to query the Installation table using the LCQuery API and send push notifications to devices that match certain query conditions.
 
-因为 Installation 同时是 LCObject 的子类，因此你可以保存任何数据类型到 Installation，并将它和你的其他应用数据对象关联起来，这样一来，你可以非常灵活地向你用户群做定制化、动态的推送。
+Because Installation is a subclass of LCObject, you can store data of any type in an Installation object and associate the Installation with other data in your app. This gives you the ability to send customized and dynamic push notifications to your users.
 
-### 保存 Installation 数据
+### Save Data Into Installation Objects
 
-为 Installation 添加三个新字段：
+To add three new fields to the Installation:
 
 <MultiLang kind="ios">
 
+```objc
+// Store app language and version
+LCInstallation *installation = [LCInstallation defaultInstallation];
+
+[installation setObject:@(YES) forKey:@"scores"];
+[installation setObject:@(YES) forKey:@"gameResults"];
+[installation setObject:@(YES) forKey:@"injuryReports"];
+[installation saveInBackground];
+```
 ```swift
 do {
     let currentInstallation = LCApplication.default.currentInstallation
@@ -421,22 +445,19 @@ do {
     print(error)
 }
 ```
-```objc
-// Store app language and version
-LCInstallation *installation = [LCInstallation defaultInstallation];
-
-[installation setObject:@(YES) forKey:@"scores"];
-[installation setObject:@(YES) forKey:@"gameResults"];
-[installation setObject:@(YES) forKey:@"injuryReports"];
-[installation saveInBackground];
-```
 
 </MultiLang>
 
-你可以给 Installation 添加 owner 属性，比如当前的登录用户：
+You can set an owner for the Installation. This could be the currently logged in user:
 
 <MultiLang kind="ios">
 
+```objc
+// Saving the device's owner
+LCInstallation *installation = [LCInstallation defaultInstallation];
+[installation setObject:[LCUser currentUser] forKey:@"owner"];
+[installation saveInBackground];
+```
 ```swift
 do {
     let currentInstallation = LCApplication.default.currentInstallation
@@ -457,21 +478,26 @@ do {
     print(error)
 }
 ```
-```objc
-// Saving the device's owner
-LCInstallation *installation = [LCInstallation defaultInstallation];
-[installation setObject:[LCUser currentUser] forKey:@"owner"];
-[installation saveInBackground];
-```
 
 </MultiLang>
 
-### 根据查询来推送消息
+### Send Push Notifications Based on Query
 
-一旦 Installation 保存了你的应用数据，你可以使用 Query 来查询出设备的一个子集做推送。
+Once you start storing data with Installation, you can build a query to send push notifications to a subset of all devices registered with your app:
 
 <MultiLang kind="ios">
 
+```objc
+// Create our Installation query
+LCQuery *pushQuery = [LCInstallation query];
+[pushQuery whereKey:@"injuryReports" equalTo:@(YES)];
+
+// Send push notification to query
+LCPush *push = [[LCPush alloc] init];
+[push setQuery:pushQuery]; // Set our Installation query
+[push setMessage:@"Willie Hayes injured by own pop fly."];
+[push sendPushInBackground];
+```
 ```swift
 let query = LCQuery(className: "_Installation")
 query.whereKey("injuryReports", .equalTo(true))
@@ -489,24 +515,25 @@ LCPush.send(data: messageData, query: query) { (result) in
     }
 }
 ```
-```objc
-// Create our Installation query
-LCQuery *pushQuery = [LCInstallation query];
-[pushQuery whereKey:@"injuryReports" equalTo:@(YES)];
-
-// Send push notification to query
-LCPush *push = [[LCPush alloc] init];
-[push setQuery:pushQuery]; // Set our Installation query
-[push setMessage:@"Willie Hayes injured by own pop fly."];
-[push sendPushInBackground];
-```
 
 </MultiLang>
 
-你也可以在查询中添加 channels 的条件：
+You can also perform queries on channels:
 
 <MultiLang kind="ios">
 
+```objc
+// Create our Installation query
+LCQuery *pushQuery = [LCInstallation query];
+[pushQuery whereKey:@"channels" equalTo:@"Giants"]; // Set channel
+[pushQuery whereKey:@"scores" equalTo:@(YES)];
+
+// Send push notification to query
+LCPush *push = [[LCPush alloc] init];
+[push setQuery:pushQuery];
+[push setMessage:@"Giants scored against the A's! It's now 2-2."];
+[push sendPushInBackground];
+```
 ```swift
 let query = LCQuery(className: "_Installation")
 query.whereKey("channels", .equalTo("Giants"))
@@ -525,25 +552,30 @@ LCPush.send(data: messageData, query: query) { (result) in
     }
 }
 ```
-```objc
-// Create our Installation query
-LCQuery *pushQuery = [LCInstallation query];
-[pushQuery whereKey:@"channels" equalTo:@"Giants"]; // Set channel
-[pushQuery whereKey:@"scores" equalTo:@(YES)];
-
-// Send push notification to query
-LCPush *push = [[LCPush alloc] init];
-[push setQuery:pushQuery];
-[push setMessage:@"Giants scored against the A's! It's now 2-2."];
-[push sendPushInBackground];
-```
 
 </MultiLang>
 
-如果你在 Installation 还保存了其他对象的关系，我们同样可以在查询条件中使用这些数据，例如，向靠近北京大学的设备推送消息：
+If you have stored relations with other objects using Installation, we can also use that data. For example, to send push notifications to devices near Peking University:
 
 <MultiLang kind="ios">
 
+```objc
+// Find users near a given location
+LCQuery *userQuery = [LCUser query];
+[userQuery whereKey:@"location"
+        nearGeoPoint:beijingUniversityLocation,
+         withinMiles:[NSNumber numberWithInt:1]]
+
+// Find devices associated with these users
+LCQuery *pushQuery = [LCInstallation query];
+[pushQuery whereKey:@"user" matchesQuery:userQuery];
+
+// Send push notification to query
+LCPush *push = [[LCPush alloc] init];
+[push setQuery:pushQuery]; // Set our Installation query
+[push setMessage:@"Free hotdogs at the Tarara concession stand!"];
+[push sendPushInBackground];
+```
 ```swift
 let beijingUniversityLocation = LCGeoPoint(latitude: 39.9869, longitude: 116.3059)
     
@@ -566,47 +598,41 @@ LCPush.send(data: messageData, query: pushQuery) { (result) in
     }
 }
 ```
-```objc
-// Find users near a given location
-LCQuery *userQuery = [LCUser query];
-[userQuery whereKey:@"location"
-        nearGeoPoint:beijingUniversityLocation,
-         withinMiles:[NSNumber numberWithInt:1]]
-
-// Find devices associated with these users
-LCQuery *pushQuery = [LCInstallation query];
-[pushQuery whereKey:@"user" matchesQuery:userQuery];
-
-// Send push notification to query
-LCPush *push = [[LCPush alloc] init];
-[push setQuery:pushQuery]; // Set our Installation query
-[push setMessage:@"Free hotdogs at the Tarara concession stand!"];
-[push sendPushInBackground];
-```
 
 </MultiLang>
 
-## 发送选项
+## Options
 
-除了发送一个文本信息之外，你还可以播放一个声音，设置 badge 数字或者其他想自定义的数据。你还可以设置一个消息的过期时间，如果对消息的时效性特别敏感的话。
+In addition to sending a text message, you can play a sound, set the number on the badge, or include other custom data in your push notifications. You can also set an expiration time for your push notifications.
 
-### 定制通知
+### Customize Notifications
 
-如果你不仅想发送一条文本消息，你可以构建自定义的推送数据。这里有一些保留字段具有特殊含义：
+If you want to send something in addition to a text message, you can create your own notification data. Note that there are some reserved fields that have special meanings:
 
-保留字段|说明
+Reserved field|Description
 ---|---
-`alert`|推送消息的文本内容
-`badge`|应用图标右上角的数字。可以设置一个值或者递增当前值。
-`sound`|应用 bundle 里的声音文件名称。
-`content-available`|如果使用了 Newsstand，设置为 1 来开始一次后台下载。
+`alert`|The text content of the push notification.
+`badge`|The number on the badge above the app icon. You can set it to a specific value or choose to increase the current value.
+`sound`|The name of the sound file in the app’s bundle.
+`content-available`|If you use the Newsstand, set this to 1 to start a background download.
 
-更多可用的保留字段，请参考[推送 REST API 使用指南](/sdk/push/guide/rest/)的《消息内容参数》一节。
+See [Push Notification REST API Guide](/sdk/push/guide/rest/) for additional reserved fields.
 
-递增 badge 数字并播放声音：
+To increase the number on the badge and play a sound:
 
 <MultiLang kind="ios">
 
+```objc
+NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:
+    @"The Mets scored! The game is now tied 1-1!", @"alert",
+    @"Increment", @"badge",
+    @"cheering.caf", @"sound",
+    nil];
+LCPush *push = [[LCPush alloc] init];
+[push setChannels:[NSArray arrayWithObjects:@"Mets", nil]];
+[push setData:data];
+[push sendPushInBackground];
+```
 ```swift
 let channels: [String] = ["Mets"]
 
@@ -625,24 +651,24 @@ LCPush.send(data: messageData, channels: channels) { (result) in
     }
 }
 ```
-```objc
-NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:
-    @"The Mets scored! The game is now tied 1-1!", @"alert",
-    @"Increment", @"badge",
-    @"cheering.caf", @"sound",
-    nil];
-LCPush *push = [[LCPush alloc] init];
-[push setChannels:[NSArray arrayWithObjects:@"Mets", nil]];
-[push setData:data];
-[push sendPushInBackground];
-```
 
 </MultiLang>
 
-当然，你还可以添加其他自定义的数据。你会在接收推送一节看到，当应用通过推送打开你的应用的时候，你就可以访问这些数据。当你要在用户打开通知的时候显示一个不同的 view controller 的时候，这特别有用。
+You can also add other custom data. In the section about receiving push notifications, you can see that when the user opens your app from a push notification, the app can access this data. This would be helpful if you wanted to display a specific view controller when the user opens your app from a push notification.
 
 <MultiLang kind="ios">
 
+```objc
+NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:
+    @"Ricky Vaughn was injured in last night's game!", @"alert",
+    @"Vaughn", @"name",
+    @"Man bites dog", @"newsItem",
+    nil];
+LCPush *push = [[LCPush alloc] init];
+[push setChannel:@"Indians"];
+[push setData:data];
+[push sendPushInBackground];
+```
 ```swift
 let channels: [String] = ["Indians"]
 
@@ -661,28 +687,32 @@ LCPush.send(data: messageData, channels: channels) { (result) in
     }
 }
 ```
-```objc
-NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:
-    @"Ricky Vaughn was injured in last night's game!", @"alert",
-    @"Vaughn", @"name",
-    @"Man bites dog", @"newsItem",
-    nil];
-LCPush *push = [[LCPush alloc] init];
-[push setChannel:@"Indians"];
-[push setData:data];
-[push sendPushInBackground];
-```
 
 </MultiLang>
 
-### 设置过期日期
+### Set Expiration Date
 
-当设备关闭或者无法连接到网络的时候，推送通知就无法被送达。如果你有一条时间敏感的推送通知，不希望在太长时间后被用户读到，那么可以设置一个过期时间来避免打扰用户。
+A push notification cannot be delivered if the target device is turned off or offline. If you want to send a time-sensitive push notification that you don’t want the user to see after a while, you can set an expiration time for it.
 
-首先是指定过期时间来告诉云服务不要再去发送通知。
+One method is to specify an expiration time. When the time expires, the server will no longer deliver the push notification.
 
 <MultiLang kind="ios">
 
+```objc
+NSDateComponents *comps = [[NSDateComponents alloc] init];
+[comps setYear:2013];
+[comps setMonth:10];
+[comps setDay:12];
+NSCalendar *gregorian =
+  [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+NSDate *date = [gregorian dateFromComponents:comps];
+
+// Send push notification with expiration date
+LCPush *push = [[LCPush alloc] init];
+[push expireAtDate:date];
+[push setMessage:@"Season tickets on sale until October 12th"];
+[push sendPushInBackground];
+```
 ```swift
 let expirationDate = Date(timeIntervalSinceNow: 600)
 
@@ -699,28 +729,21 @@ LCPush.send(data: messageData, expirationDate: expirationDate) { (result) in
     }
 }
 ```
-```objc
-NSDateComponents *comps = [[NSDateComponents alloc] init];
-[comps setYear:2013];
-[comps setMonth:10];
-[comps setDay:12];
-NSCalendar *gregorian =
-  [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-NSDate *date = [gregorian dateFromComponents:comps];
-
-// Send push notification with expiration date
-LCPush *push = [[LCPush alloc] init];
-[push expireAtDate:date];
-[push setMessage:@"Season tickets on sale until October 12th"];
-[push sendPushInBackground];
-```
 
 </MultiLang>
 
-这个方法有个隐患，因为设备的时钟是无法保证精确的，你可能得到错误的结果。因此，我们还提供了指定时间间隔方法，通知将在指定间隔时间后失效：
+There’s a problem with the above method: since the clock on the device might not be accurate, you might get a result that’s not what you expected. There’s another method where you can set an interval and the push notification will expire after the interval:
 
 <MultiLang kind="ios">
 
+```objc
+NSTimeInterval interval = 60*60*24*7; // 1 week
+
+LCPush *push = [[LCPush alloc] init];
+[push expireAfterTimeInterval:interval];
+[push setMessage:@"Season tickets on sale until October 18th"];
+[push sendPushInBackground];
+```
 ```swift
 let expirationInterval: TimeInterval = 60*60*24*7
 
@@ -737,39 +760,17 @@ LCPush.send(data: messageData, expirationInterval: expirationInterval) { (result
     }
 }
 ```
-```objc
-NSTimeInterval interval = 60*60*24*7; // 1 week
-
-LCPush *push = [[LCPush alloc] init];
-[push expireAfterTimeInterval:interval];
-[push setMessage:@"Season tickets on sale until October 18th"];
-[push sendPushInBackground];
-```
 
 </MultiLang>
 
-注意，我们建议给 iOS 设备的推送都设置过期时间，才能保证推送的当时，如果用户设置了飞行模式，在关闭飞行模式之后可以收到推送消息，可以参考 [Stackoverflow - Push notification is not being delivered when iPhone comes back online](http://stackoverflow.com/questions/24026544/push-notification-is-not-being-delivered-when-iphone-comes-back-online)。
+We recommend that you set expiration times for any push notifications you send to iOS devices. This will ensure that if a user has airplane mode enabled when you send a push notification, they will be able to receive the notification when they turn off airplane mode. See [Stackoverflow - Push notification is not being delivered when iPhone comes back online](http://stackoverflow.com/questions/24026544/push-notification-is-not-being-delivered-when-iphone-comes-back-online).
 
-## 定时推送
+## Scheduled Push Notifications
 
-我们提供了设置推送时间的方法，可以在指定的时间进行推送：
+You can set the time at which a push notification is sent;
 
 <MultiLang kind="ios">
 
-```swift
-let pushDate = Date(timeIntervalSinceNow: 6000)
-let messageData: [String: Any] = [
-    "alert": "Push this notification at a later time."
-]
-LCPush.send(data: messageData, pushDate: pushDate) { (result) in
-    switch result {
-    case .success:
-        break
-    case .failure(error: let error):
-        print(error)
-    }
-}
-```
 ```objc
 NSDateComponents *comps = [[NSDateComponents alloc] init];
 [comps setYear:2013];
@@ -784,31 +785,64 @@ LCPush *push = [[LCPush alloc] init];
 [push setMessage:@"Push this notification on 2013-10-12."];
 [push sendPushInBackground];
 ```
+```swift
+let pushDate = Date(timeIntervalSinceNow: 6000)
+let messageData: [String: Any] = [
+    "alert": "Push this notification at a later time."
+]
+LCPush.send(data: messageData, pushDate: pushDate) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
 
 </MultiLang>
 
-定时推送同样可以设置过期时间，例如同时指定时间间隔：
+Scheduled push notifications can also have expiration times. To set an interval:
 
 <MultiLang kind="ios">
 
-```swift
-LCPush.send(data: messageData, pushDate: pushDate, expirationInterval: expirationInterval) { /* 略 */ }
-```
 ```objc
 LCPush *push = [[LCPush alloc] init];
 [push setPushDate:date];
 [push expireAfterTimeInterval:interval];
-// 下略
+// Other logic
+```
+```swift
+LCPush.send(data: messageData, pushDate: pushDate, expirationInterval: expirationInterval) { /* Other logic */ }
 ```
 
 </MultiLang>
 
-### 指定设备平台
+### Specify a Platform
 
-跨平台的应用，可能想指定发送的平台，比如 iOS 或者 Android:
+For cross-platform apps, you can specify a platform to send a push notification to, such as iOS or Android:
 
 <MultiLang kind="ios">
 
+```objc
+LCQuery *query = [LCInstallation query];
+[query whereKey:@"channels" equalTo:@"suitcaseOwners"];
+
+// Notification for Android users
+[query whereKey:@"deviceType" equalTo:@"android"];
+LCPush *androidPush = [[LCPush alloc] init];
+[androidPush setMessage:@"Your suitcase has been filled with tiny robots!"];
+[androidPush setQuery:query];
+[androidPush sendPushInBackground];
+
+// Notification for iOS users
+[query whereKey:@"deviceType" equalTo:@"ios"];
+LCPush *iOSPush = [[LCPush alloc] init];
+[iOSPush setMessage:@"Your suitcase has been filled with tiny apples!"];
+[iOSPush setChannel:@"suitcaseOwners"];
+[iOSPush setQuery:query];
+[iOSPush sendPushInBackground];
+```
 ```swift
 let query = LCQuery(className: "_Installation")
 query.whereKey("channels", .equalTo("suitcaseOwners"))
@@ -841,36 +875,26 @@ LCPush.send(data: messageData, query: query) { (result) in
     }
 }
 ```
-```objc
-LCQuery *query = [LCInstallation query];
-[query whereKey:@"channels" equalTo:@"suitcaseOwners"];
-
-// Notification for Android users
-[query whereKey:@"deviceType" equalTo:@"android"];
-LCPush *androidPush = [[LCPush alloc] init];
-[androidPush setMessage:@"Your suitcase has been filled with tiny robots!"];
-[androidPush setQuery:query];
-[androidPush sendPushInBackground];
-
-// Notification for iOS users
-[query whereKey:@"deviceType" equalTo:@"ios"];
-LCPush *iOSPush = [[LCPush alloc] init];
-[iOSPush setMessage:@"Your suitcase has been filled with tiny apples!"];
-[iOSPush setChannel:@"suitcaseOwners"];
-[iOSPush setQuery:query];
-[iOSPush sendPushInBackground];
-```
 
 </MultiLang>
 
-## 接收推送通知
+## Receive Push Notifications
 
-正如 [定制通知](#定制通知) 一节提到，你可以随通知发送任意的数据。我们使用这些数据修改应用的行为，当应用是通过通知打开的时候。例如，当打开一条通知告诉你有一个新朋友的时候，这时候如果显示一张图片会非常好。
+As mentioned in [Customize Notifications](#customize-notifications), you can include any data with the push notifications you send. This data can be used to change the behavior of your app when your app is opened from a push notification. For example, when a user opens a push notification telling them they have a new friend, it would be great if they could see a picture.
 
-由于 Apple 的对消息大小的限制，请尽量缩小要发送的数据大小，否则会被截断。详情请参看 [APNs 文档](https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/APNsProviderAPI.html#//apple_ref/doc/uid/TP40008194-CH101-SW1)。
+Because Apple limits the size of the message in a push notification, please reduce the size of the data you send in a push notification as much as possible, or the message may be truncated. See [APNs documentation](https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/APNsProviderAPI.html#//apple_ref/doc/uid/TP40008194-CH101-SW1) for more information.
 
 <MultiLang kind="ios">
 
+```objc
+NSDictionary *data = @{
+  @"alert": @"James commented on your photo!",
+  @"p": @"vmRZXZ1Dvo" // Photo's object id
+};
+LCPush *push = [[LCPush alloc] init];
+[push setData:data];
+[push sendPushInBackground];
+```
 ```swift
 let messageData: [String: Any] = [
     "alert": "James commented on your photo!",
@@ -886,34 +910,15 @@ LCPush.send(data: messageData) { (result) in
     }
 }
 ```
-```objc
-NSDictionary *data = @{
-  @"alert": @"James commented on your photo!",
-  @"p": @"vmRZXZ1Dvo" // Photo's object id
-};
-LCPush *push = [[LCPush alloc] init];
-[push setData:data];
-[push sendPushInBackground];
-```
 
 </MultiLang>
 
-## 响应通知数据
+## Respond to Push Notification Data
 
-当应用是被通知打开的时候，你可以通过 `application:didFinishLaunchingWithOptions:`方法的 `launchOptions` 参数所使用的 dictionary 访问到数据：
+When your app is launched from a push notification, you can access the data in the push notification from the dictionary used by the `launchOptions` parameter of the `application:didFinishLaunchingWithOptions:` method:
 
 <MultiLang kind="ios">
 
-```swift
-func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-    
-    if let notification = launchOptions?[.remoteNotification] as? [AnyHashable: Any] {
-        print(notification)
-    }
-    
-    return true
-}
-```
 ```objc
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // ...
@@ -939,18 +944,23 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
     }
 }
 ```
+```swift
+func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    
+    if let notification = launchOptions?[.remoteNotification] as? [AnyHashable: Any] {
+        print(notification)
+    }
+    
+    return true
+}
+```
 
 </MultiLang>
 
-如果当通知到达的时候，你的应用已经在运行，对于 iOS10 以下，你可以通过 `application:didReceiveRemoteNotification:fetchCompletionHandler:` 方法的 `userInfo` 参数所使用 dictionary 访问到数据：
+If your app is already running when a push notification arrives, you can access the data with the dictionary of the `userInfo` parameter of the `application:didReceiveRemoteNotification:fetchCompletionHandler:` method for iOS version less than 10:
 
 <MultiLang kind="ios">
 
-```swift
-func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-    // handle notification
-}
-```
 ```objc
 /*!
  * Required for iOS 7+
@@ -977,13 +987,50 @@ func application(_ application: UIApplication, didReceiveRemoteNotification user
   }];
 }
 ```
+```swift
+func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+    // handle notification
+}
+```
 
 </MultiLang>
 
-iOS10 以上需要使用下面代理方法来获得 `userInfo` ：
+For iOS 10 and above, use the following delegate method to get the `userInfo`:
 
 <MultiLang kind="ios">
 
+```objc
+/**
+ * Required for iOS 10+
+ * The method that is called when the app receives a push notification while running in the foreground
+ */
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center
+       willPresentNotification:(UNNotification *)notification
+         withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
+    NSDictionary *userInfo = notification.request.content.userInfo;
+    if([notification.request.trigger isKindOfClass:[UNPushNotificationTrigger class]]) {
+        // TODO: Handle push notification content
+        NSLog(@"%@", userInfo);
+    }
+    // Run this method and choose whether to notify the user; you can choose Badge, Sound, or Alert
+    completionHandler(UNNotificationPresentationOptionAlert);
+}
+
+/**
+ * Required for iOS 10+
+ * The method that is called when the app is in the background or not running and the user opens a push notification
+ */
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center
+didReceiveNotificationResponse:(UNNotificationResponse *)response
+         withCompletionHandler:(void (^)())completionHandler {
+    NSDictionary * userInfo = response.notification.request.content.userInfo;
+    if([response.notification.request.trigger isKindOfClass:[UNPushNotificationTrigger class]]) {
+        // TODO: Handle push notification content
+        NSLog(@"%@", userInfo);
+    }
+    completionHandler();
+}
+```
 ```swift
 func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
     // handle notification
@@ -993,52 +1040,35 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
     // handle notification
 }
 ```
-```objc
-/**
- * Required for iOS10+
- * 在前台收到推送内容, 执行的方法
- */
-- (void)userNotificationCenter:(UNUserNotificationCenter *)center
-       willPresentNotification:(UNNotification *)notification
-         withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
-    NSDictionary *userInfo = notification.request.content.userInfo;
-    if([notification.request.trigger isKindOfClass:[UNPushNotificationTrigger class]]) {
-        //TODO:处理远程推送内容
-        NSLog(@"%@", userInfo);
-    }
-    // 需要执行这个方法，选择是否提醒用户，有 Badge、Sound、Alert 三种类型可以选择设置
-    completionHandler(UNNotificationPresentationOptionAlert);
-}
-
-/**
- * Required for iOS10+
- * 在后台和启动之前收到推送内容, 点击推送内容后，执行的方法
- */
-- (void)userNotificationCenter:(UNUserNotificationCenter *)center
-didReceiveNotificationResponse:(UNNotificationResponse *)response
-         withCompletionHandler:(void (^)())completionHandler {
-    NSDictionary * userInfo = response.notification.request.content.userInfo;
-    if([response.notification.request.trigger isKindOfClass:[UNPushNotificationTrigger class]]) {
-        //TODO:处理远程推送内容
-        NSLog(@"%@", userInfo);
-    }
-    completionHandler();
-}
-```
 
 </MultiLang>
 
-## 清除 Badge
+## Clear the Badge
 
-一般需要在打开应用或者退出应用时，将 badge 数目清零。
+The badge is often cleared when the user opens or exits the app.
 
 <MultiLang kind="ios">
 
+```objc
+- (void)applicationDidBecomeActive:(UIApplication *)application {
+    // Clear the local badge
+    [application setApplicationIconBadgeNumber:0];
+    // Clear currentInstallation’s badge
+    [LCInstallation defaultInstallation].badge = 0;
+    [[LCInstallation defaultInstallation] saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+        if (succeeded) {
+         // save succeeded
+        } else if (error) {
+         NSLog(@"%@", error);
+        }
+    }];
+}
+```
 ```swift
 override func applicationDidBecomeActive(_ application: UIApplication) {
-    //本地清空角标
+    // Clear the local badge
     application.applicationIconBadgeNumber = 0
-    //currentInstallation 的角标清零
+    // Clear currentInstallation’s badge
     LCApplication.default.currentInstallation.badge = 0
     LCApplication.default.currentInstallation.save { (result) in
         switch result {
@@ -1050,23 +1080,8 @@ override func applicationDidBecomeActive(_ application: UIApplication) {
     }
  }
 ```
-```objc
-- (void)applicationDidBecomeActive:(UIApplication *)application {
-    //本地清空角标
-    [application setApplicationIconBadgeNumber:0];
-    //currentInstallation 的角标清零
-    [LCInstallation defaultInstallation].badge = 0;
-    [[LCInstallation defaultInstallation] saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-        if (succeeded) {
-         // save succeeded
-        } else if (error) {
-         NSLog(@"%@", error);
-        }
-    }];
-}
-```
 
 </MultiLang>
 
 
-你可以阅读 [Apple 本地化和推送的文档](https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/Introduction.html#//apple_ref/doc/uid/TP40008194-CH1-SW1) 来更多地了解推送通知。
+To learn more about push notifications, check out [Apple’s Local and Remote Notifications Overview](https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/Introduction.html#//apple_ref/doc/uid/TP40008194-CH1-SW1).

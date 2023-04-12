@@ -1,0 +1,769 @@
+---
+title: 内建账户 REST API
+sidebar_label: REST API
+sidebar_position: 3
+---
+
+:::tip
+请参考 数据存储 REST API 文档中关于 [Base URL](sdk/storage/guide/rest/#base-url)、[请求格式](/sdk/storage/guide/rest/#请求格式)、[响应格式](/sdk/storage/guide/rest/#响应格式)的说明。
+:::
+
+<table>
+  <thead>
+    <tr>
+      <th>URL</th>
+      <th>HTTP</th>
+      <th>功能</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>/1.1/users</td>
+      <td>POST</td>
+      <td>用户注册<br/>用户连接</td>
+    </tr>
+    <tr>
+      <td>/1.1/usersByMobilePhone</td>
+      <td>POST</td>
+      <td>使用手机号码注册或登录</td>
+    </tr>
+    <tr>
+      <td>/1.1/login</td>
+      <td>POST</td>
+      <td>用户登录</td>
+    </tr>
+    <tr>
+      <td>/1.1/users/&lt;objectId&gt;</td>
+      <td>GET</td>
+      <td>获取用户</td>
+    </tr>
+    <tr>
+      <td>/1.1/users/me</td>
+      <td>GET</td>
+      <td>根据 sessionToken 获取用户信息</td>
+    </tr>
+    <tr>
+      <td>/1.1/users/&lt;objectId&gt;/refreshSessionToken</td>
+      <td>PUT</td>
+      <td>重置用户 sessionToken。</td>
+    </tr>
+    <tr>
+      <td>/1.1/users/&lt;objectId&gt;/updatePassword</td>
+      <td>PUT</td>
+      <td>更新密码，要求输入旧密码。</td>
+    </tr>
+    <tr>
+      <td>/1.1/users/&lt;objectId&gt;</td>
+      <td>PUT</td>
+      <td>更新用户<br/>用户连接<br/>验证Email</td>
+    </tr>
+    <tr>
+      <td>/1.1/users</td>
+      <td>GET</td>
+      <td>查询用户</td>
+    </tr>
+    <tr>
+      <td>/1.1/users/&lt;objectId&gt;</td>
+      <td>DELETE</td>
+      <td>删除用户</td>
+    </tr>
+    <tr>
+      <td>/1.1/requestPasswordReset</td>
+      <td>POST</td>
+      <td>请求密码重设</td>
+    </tr>
+    <tr>
+      <td>/1.1/requestEmailVerify</td>
+      <td>POST</td>
+      <td>请求验证用户邮箱</td>
+    </tr>
+    <tr>
+      <td>/1.1/requestMobilePhoneVerify</td>
+      <td>POST</td>
+      <td>请求发送用户手机号码验证短信</td>
+    </tr>
+    <tr>
+      <td>/1.1/verifyMobilePhone/&lt;code&gt;</td>
+      <td>POST</td>
+      <td>使用"验证码"验证用户手机号码</td>
+    </tr>
+    <tr>
+      <td>/1.1/requestChangePhoneNumber</td>
+      <td>POST</td>
+      <td>请求发送手机短信验证码以绑定或更新手机号。</td>
+    </tr>
+    <tr>
+      <td>/1.1/changePhoneNumber</td>
+      <td>POST</td>
+      <td>验证手机短信验证码并绑定或更新手机号。</td>
+    </tr>
+    <tr>
+      <td>/1.1/requestLoginSmsCode</td>
+      <td>POST</td>
+      <td>请求发送手机号码登录短信。</td>
+    </tr>
+    <tr>
+      <td>/1.1/requestPasswordResetBySmsCode</td>
+      <td>POST</td>
+      <td>请求发送手机短信验证码重置用户密码。</td>
+    </tr>
+    <tr>
+      <td>/1.1/resetPasswordBySmsCode/&lt;code&gt;</td>
+      <td>PUT</td>
+      <td>验证手机短信验证码并重置密码。</td>
+    </tr>
+  </tbody>
+</table>
+
+不仅在移动应用上，还在其他系统中，很多应用都有一个统一的登录流程。通过 REST API 访问用户的账户让你可以简单实现这一功能。
+
+通常来说，**用户**（类名 `_User`）这个类的功能与其他的对象是相同的，比如都没有限制模式（Schema free）。User 对象和其他对象不同的是一个用户必须有用户名（username）和密码（password），密码会被自动地加密和存储。
+**username 和 email 这两个字段必须是没有重复的（大小写敏感）。**
+
+## 注册
+
+注册一个新用户与创建一个新的普通对象之间的不同点在于 username 和 password 字段都是必需的。password 字段会以和其他的字段不一样的方式处理，它在储存时会被加密而且永远不会被返回给任何来自客户端的请求。
+
+你可以让云服务自动验证邮件地址，做法是进入 **云服务控制台 > 内建账户 > 设置**，勾选 **启用邮箱验证功能**。
+
+这项设置启用了的话，所有填写了 email 的用户在注册时都会产生一个 email 验证地址，并发回到用户邮箱，用户打开邮箱点击了验证链接之后，用户表里 `emailVerified` 属性值会被设为 true。你可以在 `emailVerified` 字段上查看用户的 email 是否已经通过验证。
+
+你还可以在 **云服务控制台 > 内建账户 > 设置**，勾选**未验证邮箱的用户，禁止登录**。
+
+为了注册一个新的用户，需要向 user 路径发送一个 POST 请求，你可以加入一个新的字段，例如，创建一个新的用户有一个电话号码:
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '{"username":"tom","password":"f32@ds*@&dsa","phone":"18612340000"}' \
+  https://API_BASE_URL/1.1/users
+```
+
+当创建成功时，HTTP返回为 201 Created，Location 头包含了新用户的 URL：
+
+```sh
+Status: 201 Created
+Location: https://API_BASE_URL/1.1/users/55a47496e4b05001a7732c5f
+```
+
+返回的主体是一个 JSON 对象，包含 objectId、createdAt 时间戳表示创建对象时间，sessionToken 可以被用来认证这名用户随后的请求：
+
+```
+{
+  "sessionToken":"qmdj8pdidnmyzp0c7yqil91oc",
+  "createdAt":"2015-07-14T02:31:50.100Z",
+  "objectId":"55a47496e4b05001a7732c5f"
+}
+```
+
+## 登录
+
+在你允许用户注册之后，在以后你需要让他们用自己的用户名和密码登录。为了做到这一点，发送一个 POST 请求到 `/1.1/login`，加上 username 和 password 作为 body。
+
+```sh
+curl -X POST \
+-H "Content-Type: application/json" \
+-H "X-LC-Id: {{appid}}" \
+-H "X-LC-Key: {{appkey}}" \
+-d '{"username":"tom","password":"f32@ds*@&dsa"}' \
+https://API_BASE_URL/1.1/login
+```
+
+用户也可以通过邮箱地址和密码登录，只需将 body 中的 username 换成 email：
+
+```json
+{"email":"tom@example.com","password":"f32@ds*@&dsa"}
+```
+
+类似地，将 `username` 换成 `mobilePhoneNumber` 可以通过手机号和密码登录：
+
+```json
+{"mobilePhoneNumber":"+86186xxxxxxxx","password":"f32@ds*@&dsa"}
+```
+
+返回的主体是一个 JSON 对象包括所有除了 password 以外的自定义字段。它同样包含了 createdAt、updateAt、objectId 和 sessionToken 字段。
+
+```json
+{
+  "sessionToken":"qmdj8pdidnmyzp0c7yqil91oc",
+  "updatedAt":"2015-07-14T02:31:50.100Z",
+  "phone":"18612340000",
+  "objectId":"55a47496e4b05001a7732c5f",
+  "username":"tom",
+  "createdAt":"2015-07-14T02:31:50.100Z",
+  "emailVerified":false,
+  "mobilePhoneVerified":false
+}
+```
+
+可以将 sessionToken 理解为用户的登录凭证，每个用户的 sessionToken 在同一个应用内都是唯一的， 类似于 Cookie 的概念。
+
+正常情况下，用户的 sessionToken 是固定不变的，但在以下情况下会发生改变：
+
+* 客户端调用了忘记密码功能，重设了密码。
+* 开发者在 **云服务控制台 > 内建账户 > 设置** 中勾选了 **密码修改后，强制客户端重新登录**，那么在修改密码后 sessionToken 也将强制更换。
+* 调用 [`refreshSessionToken`](#重置登录_sessionToken) 主动重置。
+
+在 sessionToken 变化后，已有的登录如果调用到用户相关权限受限的 API，将返回 403 权限错误。
+
+## 重置登录 sessionToken
+
+可以主动重置用户的 sessionToken：
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Session: qmdj8pdidnmyzp0c7yqil91oc" \
+  https://API_BASE_URL/1.1/users/57e3bcca67f35600577c3063/refreshSessionToken
+```
+
+调用这个 API 要求传入登录返回的 `X-LC-Session` 作为认证，或者使用 Master Key。
+
+重置成功将返回新的 sessionToken 及用户信息：
+
+```json
+{
+ "sessionToken":"5frlikqlwzx1nh3wzsdtfr4q7",
+ "updatedAt":"2016-10-20T03:10:57.926Z",
+ "objectId":"57e3bcca67f35600577c3063",
+ "username":"tom",
+ "createdAt":"2016-09-22T11:13:14.842Z",
+ "emailVerified":false,
+ "mobilePhoneVerified":false
+}
+```
+
+### 账户锁定
+
+输入错误的密码或验证码会导致用户登录失败。如果在 15 分钟内，同一个用户登录失败的次数大于 6 次，该用户账户即被云端暂时锁定，此时云端会返回错误码 `{"code":219,"error":"登录失败次数超过限制，请稍候再试，或者通过忘记密码重设密码。"}`，开发者可在客户端进行必要提示。
+
+锁定将在最后一次错误登录的 15 分钟之后由云端自动解除，开发者无法通过 SDK 或 REST API 进行干预。在锁定期间，即使用户输入了正确的验证信息也不允许登录。这个限制在 SDK 和云引擎中都有效。
+
+## 使用手机号码注册或登录
+
+请参考 [短信服务 REST API 详解 &middot; 使用手机号码注册或登录](/sdk/sms/rest/#使用手机号码注册或登录)。
+
+## 验证 Email
+
+设置 email 验证是 app 设置中的一个选项，通过这个标识，应用层可以对提供真实 email 的用户更好的功能或者体验。Email 验证会在 User 对象中加入 `emailVerified` 字段，当一个用户的 email 被新设置或者修改过的话，`emailVerified` 会被重置为 false。云服务会往用户填写的邮箱发送一个验证链接，用户点击这个链接可以让 `emailVerified` 被设置为 true。
+
+emailVerified 字段有 3 种状态可以参考：
+
+1. **true**：用户已经点击了发送到邮箱的验证地址，邮箱被验证为真实有效。云端保证在新创建用户的时候 emailVerified 一定为 false。
+2. **false**：User 对象最后一次被更新的时候，用户并没有确认过他的 email 地址。如果你看到 emailVerified 为 false 的话，你可以考虑刷新 User 对象或者再次请求验证用户邮箱。
+3. **null**：User对象在 email 验证没有打开的时候就已经创建了，或者 User 没有 email。
+
+邮件模板和验证链接可以在**云服务控制台 > 内建账户 > 邮件模板**定制。
+
+## 请求验证 Email
+
+发送给用户的邮箱验证邮件在一周内失效，你可以通过调用 `/1.1/requestEmailVerify` 来强制重新发送：
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"tom@example.com"}' \
+  https://API_BASE_URL/1.1/requestEmailVerify
+```
+
+## 请求密码重设
+
+在用户将 email 与他们的账户关联起来之后，你可以通过邮件来重设密码。操作方法为，发送一个 POST 请求到 `/1.1/requestPasswordReset`，同时在 request 的 body 部分带上 email 字段。
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"tom@example.com"}' \
+  https://API_BASE_URL/1.1/requestPasswordReset
+```
+
+如果成功的话，将返回状态码 `200 OK`。
+
+邮件模板和验证链接可以在**云服务控制台 > 内建账户 > 邮件模板**定制。
+
+## 手机号码验证
+
+请参考 [短信服务 REST API 详解 - 用户账户与手机号码验证](/sdk/sms/rest/#用户账户与手机号码验证)。
+
+## 获取用户
+
+和[获取对象](#获取对象)类似，你可以发送一个 GET 请求到 URL 以获取用户的账户信息。比如，为了获取上面创建的用户:
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  https://API_BASE_URL/1.1/users/55a47496e4b05001a7732c5f
+```
+
+你还可以通过 sessionToken 获取用户信息。
+这种方法最常见的使用场景是用户成功注册或登录后，本地保存服务器返回的 sessionToken，后续使用 sessionToken 获取当前用户信息：
+
+```
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Session: qmdj8pdidnmyzp0c7yqil91oc" \
+  https://API_BASE_URL/1.1/users/me
+```
+
+返回的 JSON 数据与 [`/login`](#登录) 登录请求所返回的相同。
+
+用户不存在时返回 400 Bad Request 错误：
+
+```json
+{
+  "code": 211,
+  "error": "Could not find user."
+}
+```
+
+## 更新用户
+
+在通常的情况下，没有人会允许别人来改动他们自己的数据。为了做好权限认证，确保只有用户自己可以修改个人数据，在更新用户信息的时候，必须在 HTTP 头部加入一个 `X-LC-Session` 项来请求更新，这个 session token 在注册和登录时会返回。
+
+为了改动一个用户已经有的数据，需要对这个用户的 URL 发送一个 PUT 请求。任何你没有指定的 key 都会保持不动，所以你可以只改动用户数据中的一部分。
+
+比如，如果我们想对 「tom」 的手机号码做出一些改动:
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Session: qmdj8pdidnmyzp0c7yqil91oc" \
+  -H "Content-Type: application/json" \
+  -d '{"phone":"18600001234"}' \
+  https://API_BASE_URL/1.1/users/55a47496e4b05001a7732c5f
+```
+
+返回的 body 是一个 JSON 对象，只有一个 `updatedAt` 字段表明更新发生的时间.
+
+```json
+{
+  "updatedAt": "2015-07-14T02:35:50.100Z"
+}
+```
+
+username 也可以改动，但是新的 username 不能和既有数据重复。
+
+很多开发者会希望让用户输入一次旧密码做一次认证，旧密码正确才可以修改为新密码，因此我们提供了一个单独的 API `PUT /1.1/users/:objectId/updatePassword` 来安全地更新密码：
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Session: qmdj8pdidnmyzp0c7yqil91oc" \
+  -H "Content-Type: application/json" \
+  -d '{"old_password":"the_old_password", "new_password":"the_new_password"}' \
+  https://API_BASE_URL/1.1/users/55a47496e4b05001a7732c5f/updatePassword
+```
+
+* **old_password**：用户的老密码
+* **new_password**：用户的新密码
+
+注意：仍然需要传入 X-LC-Session，也就是登录用户才可以修改自己的密码。
+
+## 查询
+
+**请注意，`_User` 表的查询权限默认是关闭的。**
+你可以在云服务控制台的 class 权限设置处打开，但出于安全考虑，一般情况下不建议开启这项权限。
+在 `_User` 表查询权限关闭的情况下，可以在服务端等受信任的环境使用 master key 进行查询。
+
+你可以一次获取多个用户，只要向用户的根 URL 发送一个 GET 请求。没有任何 URL 参数的话，可以简单地列出所有用户：
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  https://API_BASE_URL/1.1/users
+```
+
+返回的值是一个 JSON 对象包括一个 `results` 字段，值是包含了所有对象的一个 JSON 数组。
+
+```json
+{
+  "results":[
+    {
+      "updatedAt":"2015-07-14T02:31:50.100Z",
+      "phone":"18612340000",
+      "objectId":"55a47496e4b05001a7732c5f",
+      "username":"tom",
+      "createdAt":"2015-07-14T02:31:50.100Z",
+      "emailVerified":false,
+      "mobilePhoneVerified":false
+    }
+  ]
+}
+```
+
+所有的对普通对象的查询选项都适用于对用户对象的查询。
+
+## 删除用户
+
+想要删除一个用户，可以向它的 URL 上发送一个 DELETE 请求。同样的，你必须提供一个 X-LC-Session 在 HTTP 头上以便认证。例如：
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Session: qmdj8pdidnmyzp0c7yqil91oc" \
+  https://API_BASE_URL/1.1/users/55a47496e4b05001a7732c5f
+```
+
+## 连接用户账户和第三方平台
+
+你可以连接你的用户到其他服务，比如新浪微博和腾讯微博，这样就允许你的用户直接用他们现有的账号 ID 来注册或登录你的应用。在进行注册和登录时，需要附带上 `authData` 字段来提供你希望连接的服务的授权信息。一旦关联了某个服务，`authData` 将被存储到你的用户信息里。
+
+`authData` 是一个普通的 JSON 对象，它所要求的 key 根据 service 不同而不同，具体要求见下面。每种情况下，你都需要自己负责完成整个授权过程(一般是通过 OAuth 协议，1.0 或者 2.0) 来获取授权信息，提供给连接 API。
+
+[新浪微博](http://weibo.com/) 的 authData 内容：
+
+```json
+{
+  "weibo": {
+    "uid": "123456789",
+    "access_token": "2.00vs3XtCI5FevCff4981adb5jj1lXE",
+    "expiration_in": "36000"
+  }
+}
+```
+
+[腾讯微博](http://t.qq.com/) 的 authData 内容：
+
+```json
+{
+  "qq": {
+    "openid": "0395BA18A5CD6255E5BA185E7BEBA242",
+    "access_token": "12345678-SaMpLeTuo3m2avZxh5cjJmIrAfx4ZYyamdofM7IjU",
+    "expires_in": 1382686496
+  }
+}
+```
+
+[微信](http://open.weixin.qq.com/) 的 authData 内容：
+
+```json
+{
+  "weixin": {
+    "openid": "0395BA18A5CD6255E5BA185E7BEBA242",
+    "access_token": "12345678-SaMpLeTuo3m2avZxh5cjJmIrAfx4ZYyamdofM7IjU",
+    "expires_in": 1382686496
+  }
+}
+```
+
+[Apple](https://developer.apple.com/documentation/sign_in_with_apple/sign_in_with_apple_rest_api) 的 authData 内容：
+
+```json
+{
+  "lc_apple": {
+    "uid": "从 Apple 获取到的 User Identifier",
+    "identity_token": "从苹果获取到的 identity Token",
+    "code": "从苹果获取到的 Authorization Code"
+  }
+}
+```
+
+其他任意第三方平台：
+
+```json
+{
+  "第三方平台名称，例如facebook": {
+    "uid": "在第三方平台上的唯一用户 ID 字符串",
+    "access_token": "在第三方平台的 access token",
+    // ……其他可选属性
+  }
+}
+```
+
+云端会自动为 `authData.第三方平台名称.uid` 创建唯一索引，以确保一个第三方账号只绑定到一个应用内用户上。
+
+注意：
+
+- 其他第三方平台不支持校验 access token。
+- 其他第三方平台不支持后面提到的 UnionID 登录功能，因此也不用设置相应的 `unionid`、`platform`、`main_account` 字段。
+- 其他第三方平台请使用 `uid` 字段储存第三方平台的唯一用户 ID 字符串，不要使用 `openid`。
+
+和第三方登录相似的一个概念是匿名登录。
+匿名用户(Anonymous user)的 authData 内容如下：
+
+```json
+{
+  "anonymous": {
+    "id": "random UUID with lowercase hexadecimal digits"
+  }
+}
+```
+
+### 注册和登录
+
+使用一个连接服务来注册用户并登录，同样使用 POST 请求 users，只是需要提供 `authData` 字段。例如，使用 QQ 账户注册或者登录用户：
+
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '{
+     "authData": {
+       "qq": {
+         "openid": "0395BA18A5CD6255E5BA185E7BEBA242",
+         "access_token": "12345678-SaMpLeTuo3m2avZxh5cjJmIrAfx4ZYyamdofM7IjU",
+         "expires_in": 1382686496
+         }
+    }
+    }' \
+  https://API_BASE_URL/1.1/users
+```
+
+云端会检查是否已经有一个用户连接了这个 `authData` 服务。如果已经有用户存在并连接了同一个 `authData`，那么返回 200 OK 和详细信息（包括用户的 `sessionToken`）：
+
+```sh
+Status: 200 OK
+Location: https://API_BASE_URL/1.1/users/75a4800fe4b05001a7745c41
+```
+
+应答的 body 类似：
+
+```json
+{
+  "username": "Tom",
+  "createdAt": "2015-06-28T23:49:36.353Z",
+  "updatedAt": "2015-06-28T23:49:36.353Z",
+  "objectId": "75a4800fe4b05001a7745c41",
+  "sessionToken": "anythingstringforsessiontoken",
+  "authData": {
+    "qq": {
+      "openid": "0395BA18A5CD6255E5BA185E7BEBA242",
+      "access_token": "12345678-SaMpLeTuo3m2avZxh5cjJmIrAfx4ZYyamdofM7IjU",
+      "expires_in": 1382686496
+    }
+  }
+}
+```
+
+如果用户还没有连接到这个账号，则你会收到 201 Created 的应答状态码，标识新的用户已经被创建：
+
+```sh
+Status: 201 Created
+Location: https://API_BASE_URL/1.1/users/55a4800fe4b05001a7745c41
+```
+
+应答内容包括 objectId、createdAt、sessionToken 以及一个自动生成的随机 username，例如：
+
+```json
+{
+  "username":"ec9m07bo32cko6soqtvn6bko5",
+  "sessionToken":"tfrvbzmdf609nu9204v5f0tuj",
+  "createdAt":"2015-07-14T03:20:47.733Z",
+  "objectId":"55a4800fe4b05001a7745c41"
+}
+```
+
+云端会自动验证部分平台 access token 的有效性。
+详见数据存储开发指南《自动验证第三方平台授权信息》章节的说明。
+
+### UnionID 注册和登录
+
+微信与新浪微博都有 UnionID 登录机制，使用 UnionID 注册登录，可以使得不同微信公众号或小程序之间共享用户。
+
+微信的 authData 内容：
+
+```json
+  "authData": {
+    "access_token" : "access_token",
+    "expires_in" : 7200,
+    "openid" : "openid",
+    "refresh_token" : "refresh_token",
+    "scope" : "snsapi_userinfo",
+    "unionid" : "ox7NLs-e-32ZyHg2URi_F2iPEI2U"
+}
+```
+
+使用 UnionID 注册登录，需要提供带有 `unionid` 参数的 `authData`。另外需要配合传递 `platform` 和 `main_account` 这两个字段。
+
+* `platform`：unionId 对应的注册平台，可由应用自行指定，微信、QQ、微博平台建议设为《数据存储开发指南·该如何指定 unionIdPlatform》中推荐的值。
+* `main_account`： `main_account` 为 true 时把当前平台的鉴权信息作为主账号。
+
+在服务端进行存储的时候会根据 `platform` 来命名新增的平台，如传入 `"platform" = "weixin"` 时，返回数据中会增加 `_weixin_unionid` 字段存储 `{"uid":"xxxxx"}`。
+
+```
+"_weixin_unionid": {
+  "uid": "ox7NLs-e-32ZyHg2URi_F2iPEI2U"
+}
+```
+
+完整的第三方注册登录请求如下，以使用微信 UnionId 为例：
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "authData": {
+      "wxleanoffice": {
+        "openid": "oTY851cqL0gk3DqW3xINqG1Q4PTc",
+        "access_token": "12_b6mz7ujXbTY4vpbqCRaKVa_y0Ij3N9grCeVtM8VJT8KFd4qnQ9lXtBsZVxG6x9c9Nay_oNgvbKK7KYKbn8R2P7uEgA0EhsXMHmxkx-xU-Tk",
+        "expires_in": 7200,
+        "refresh_token": "12_71UYUnqHDuIfekimsJsYjBDfY67ilo30fDqrYkqlwZtxNgcBhMmQgDVhT6mJWkRg0mngvX9kXeCGP8kmBWdvUtc5ngRiN5LDTWAau4du838",
+        "scope": "snsapi_userinfo",
+        "unionid": "ox7NLs-e-32ZyHg2URi_F2iPEI2U",
+        "platform": "weixin",
+        "main_account":"true"
+      },
+      "wxleansupport": {
+        "openid": "ZTY873cOa0gk5aOW5OaaOa3Q6PTc",
+        "access_token": "34_b6mO7OjXbTY6O-bOaRaaVa_O0aj5a9gOaeVOa8VaT8aad6OnQ9lXO-OZVOa6O9c9aaO_ZagObaa7aYabn8R4P7Oagn0ahOXaamOkO-OU-Tk",
+        "expires_in": 7200,
+        "refresh_token": "8-_78UYUnOaaOafekimOaOYj-afY67ilZ40faOOYkOlOZOOagc-hamQgaVhT6maWkRg0mngOX9kXeaaP8km-WdOUOc4ngRia4aaTWnaO4dO848",
+        "scope": "snsapi_userinfo",
+        "unionid": "ox7NLs-e-32ZyHg2URi_F2iPEI2U",
+        "platform": "weixin",
+        "main_account":"false"
+      },
+    }}' \
+   https://API_BASE_URL/1.1/users
+```
+
+我们看到，在上面的例子中，`wxleanoffice` 和 `wxleansupport` 的 `unionid` 是一样的，`platform` 均指定为 `weixin`，`wxleanoffice` 是主账号，`main_account` 为 `true`。
+
+应答内容包括 objectId、createdAt、sessionToken、authData 以及一个自动生成的随机 username，应答的 body 类似：
+
+```json
+{
+    "sessionToken": "v53f0q4oecbrjojn530w89s5f",
+    "updatedAt": "2018-08-16T08:03:44.203Z",
+    "objectId": "5b752fe0a22b9d003137e16d",
+    "username": "vp7szn9ytuaylgtnw14qnjx2u",
+    "createdAt": "2018-08-16T08:03:44.203Z",
+    "emailVerified": false,
+    "authData": {
+        "wxleanoffice": {
+            "openid": "oTY851cqL0gk3DqW3xINqG1Q4PTc",
+            "access_token": "12_b6mz7ujXbTY4vpbqCRaKVa_y0Ij3N9grCeVtM8VJT8KFd4qnQ9lXtBsZVxG6x9c9Nay_oNgvbKK7KYKbn8R2P7uEgA0EhsXMHmxkx-xU-Tk",
+            "expires_in": 7200,
+            "refresh_token": "12_71UYUnqHDuIfekimsJsYjBDfY67ilo30fDqrYkqlwZtxNgcBhMmQgDVhT6mJWkRg0mngvX9kXeCGP8kmBWdvUtc5ngRiN5LDTWAau4du838",
+            "scope": "snsapi_userinfo",
+            "unionid": "ox7NLs-e-32ZyHg2URi_F2iPEI2U",
+            "platform": "weixin",
+            "main_account": "true"
+        },
+        "wxleansupport": {
+            "openid": "ZTY873cOa0gk5aOW5OaaOa3Q6PTc",
+            "access_token": "34_b6mO7OjXbTY6O-bOaRaaVa_O0aj5a9gOaeVOa8VaT8aad6OnQ9lXO-OZVOa6O9c9aaO_ZagObaa7aYabn8R4P7Oagn0ahOXaamOkO-OU-Tk",
+            "expires_in": 7200,
+            "refresh_token": "8-_78UYUnOaaOafekimOaOYj-afY67ilZ40faOOYkOlOZOOagc-hamQgaVhT6maWkRg0mngOX9kXeaaP8km-WdOUOc4ngRia4aaTWnaO4dO848",
+            "scope": "snsapi_userinfo",
+            "unionid": "ox7NLs-e-32ZyHg2URi_F2iPEI2U",
+            "platform": "weixin",
+            "main_account":"false"
+        },
+        "_wxleanoffice_unionid": {
+            "uid": "ox7NLs-e-32ZyHg2URi_F2iPEI2U"
+        }
+    },
+    "mobilePhoneVerified": false
+}
+```
+
+可参见《数据存储开发指南》的《扩展：接入_UnionID_体系，打通不同子产品的账号系统》一节的详细说明。
+
+### 连接
+
+连接一个现有的用户到新浪微博或者微信，可以向 user endpoint 发送一个附带 `authData` 字段的 PUT 请求来实现。例如，连接一个用户到微信账号发起的请求类似这样：
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Session: qmdj8pdidnmyzp0c7yqil91oc" \
+  -H "Content-Type: application/json" \
+  -d '{
+        "authData": {
+          "weixin": {
+            "uid": "123456789",
+            "access_token": "2.00vs3XtCI5FevCff4981adb5jj1lXE",
+            "expiration_in": "36000"
+            ...
+          }
+        }
+      }' \
+  https://API_BASE_URL/1.1/users/55a47496e4b05001a7732c5f
+```
+
+完成连接后，你可以使用匹配的 `authData` 来认证他们。
+
+### 断开连接
+
+断开一个现有用户到某个服务，可以通过删除 `authData` 中对应的平台来做到。
+例如，已经绑定过微信的用户 `authData` 数据格式如下，平台名称为 `weixin`：
+
+```json
+{
+  "username": "3td7p1nucap1i1p53m1zibwgx",
+   "authData": {
+    "weixin": {
+      "openid": "oTY851cqL0gk3DqW3xINqG1Q4PTc",
+      "scope": "snsapi_userinfo",
+      "refresh_token": "refresh_token",
+      "platform": "weixin",
+      "unionid": "unionid,
+      "access_token": "access_token",
+      "expires_in": 7200
+    }
+  },
+}
+```
+
+取消微信关联通过删除 `authData.weixin` 来实现:
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Session: 6fehqhr2t2na5mv1aq2om7jgz" \
+  -H "Content-Type: application/json" \
+  -d '{"authData.weixin":{"__op":"Delete"}}' \
+  https://API_BASE_URL/1.1/users/5b7e53a767f356005fb374f6
+```
+
+其返回值类似于：
+
+```json
+{
+  "updatedAt":"2018-08-23T06:32:47.633Z",
+  "objectId":"5b7e53a767f356005fb374f6"
+}
+```
+
+## 安全
+
+当你用 REST API key 来访问云服务时，访问可能被 ACL 所限制，就像 iOS 和 Android SDK 上所做的一样。你仍然可以通过 REST API 来读和修改，只需要通过 `ACL` 的 key 来访问一个对象。
+
+ACL 按 JSON 对象格式来表示，JSON 对象的 key 是 objectId 或者一个特别的 key（`*`，表示公共访问权限）。ACL 的值是权限对象，这个 JSON 对象的 key 即是权限名，而这些 key 的值总是 true。
+
+举个例子，如果你想让一个 id 为 55a47496e4b05001a7732c5f 的用户有读和写一个对象的权限，而且这个对象应该可以被公共读取，符合的 ACL 应该是:
+
+```json
+{
+  "55a47496e4b05001a7732c5f": {
+    "read": true,
+    "write": true
+  },
+  "*": {
+    "read": true
+  }
+}
+```
+
+这样，只有在 `X-LC-Session` HTTP 头中携带了用户 55a47496e4b05001a7732c5f 的有效 sessionToken 的情况下，对该对象的写请求才不会因为权限不足而报错。
+sessionToken 的值会在用户登录成功时返回。

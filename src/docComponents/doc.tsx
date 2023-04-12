@@ -1,6 +1,24 @@
 import React from "react";
 import Link from "@docusaurus/Link";
 
+export const OfficeDoc = ({ fileUrl }) => {
+  const fileUrlEncoded = encodeURI(fileUrl);
+  const iframeSrc = `https://view.officeapps.live.com/op/embed.aspx?src=${fileUrlEncoded}`;
+  return (
+    <iframe src={iframeSrc} width="100%" height="600px">
+      这是嵌入{" "}
+      <a target="_blank" href="https://office.com">
+        Microsoft Office
+      </a>{" "}
+      演示文稿，由{" "}
+      <a target="_blank" href="https://office.com/webapps">
+        Office
+      </a>{" "}
+      提供支持。
+    </iframe>
+  );
+};
+
 export const [Red, Blue, Black, Gray, Green, BlueBlack] = [
   "#F64C4C",
   "#15C5CE",
@@ -54,6 +72,12 @@ const captionStyle = {
   fontSize: "12px",
   lineHeight: "18px",
   fontWeight: 400,
+  color: COLORS.grey04,
+};
+const captionStrongStyle = {
+  fontSize: "12px",
+  lineHeight: "18px",
+  fontWeight: 700,
   color: COLORS.grey04,
 };
 
@@ -118,6 +142,7 @@ export const Background = ({ children, title, content }) => (
 export const Figure = ({
   subtitle,
   caption,
+  strong = false,
   imgSrc,
   imgAlt,
   isRecommended,
@@ -149,7 +174,13 @@ export const Figure = ({
           gap: "8px",
         }}
       >
-        {caption && <figcaption style={captionStyle}>{caption}</figcaption>}
+        {caption && (
+          <figcaption
+            style={{ ...(strong ? captionStrongStyle : captionStyle) }}
+          >
+            {caption}
+          </figcaption>
+        )}
 
         <img
           src={imgSrc}

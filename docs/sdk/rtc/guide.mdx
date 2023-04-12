@@ -51,7 +51,7 @@ dependencies {
 2. 拖拽 `TapRTC_SDK` 目录到项目目录。
 3. `TapRTC.framework` 和 `GMESDK.framework` 文件拖进项目，选择 `Do Not Embed`。
 4. 将资源文件 TapRTC.bundle 拖进项目。
-5. 添加 SDK 依赖的系统库：libz、libresolv、libiconv、libc++、CoreMedia.framework、CoreAudio.framework、AVFoundation.framework、SystemConfiguration.framework、UIKit.framework、AudioToolbox.framework、OpenAL.framework、Security.framework
+5. 添加 SDK 依赖的系统库：libz、libresolv、libiconv、libc++、CoreMedia.framework、CoreAudio.framework、AVFoundation.framework、SystemConfiguration.framework、UIKit.framework、AudioToolbox.framework、OpenAL.framework、Security.framework。
 
 <CodeBlock className="objectivec">
 TapRTC.framework
@@ -83,7 +83,7 @@ iOS 平台需要申请麦克风权限（`Privacy - Microphone Usage Description`
 
 游戏通常没有后台通话的需求，玩家一般边玩游戏边语音，游戏保持在前台。
 如果游戏类型比较特殊，需要支持后台通话，那么还需申请后台播放权限：
-在 target 中配置 **Capability >  Background Modes > Audio, AirPlay, and Picture in Picture**。
+在 target 中配置 **Capability > Background Modes > Audio, AirPlay, and Picture in Picture**。
 
 ## 核心接口
 
@@ -134,7 +134,7 @@ public class MyApp extends Application {
         Config config = new Config();
         config.appId = "AppId";
         config.appKey = "AppKey";
-        config.serverUrl = "ServerUrl";
+        config.serverUrl = "ServerUrl"; // 请去掉 http/https 前缀，直接传入自定义域名或者形如「xxx.cloud.tds1.tapapis.cn」之类的域名即可。
         config.userId = new UserID("UserId");
         config.deviceId = new DeviceID("DeviceId");
         // 如需使用范围语音功能，此项必须设为 LOW
@@ -798,7 +798,7 @@ room.ChangeRoomType(AudioPerfProfile.LOW);
 ```
 
 ```objc
-// Objective-C SDK 在进入范围语言房间时会自动把音质设为 LOW
+// Objective-C SDK 在进入范围语音房间时会自动把音质设为 LOW
 ```
 
 </MultiLang>
@@ -927,7 +927,7 @@ TapRTCResultCode code = [room updateAudioReceiverRange:range];
 
 | 音源距离 | 音量衰减 |
 | - | - |
-| `N < range/10` | 1.0 （无衰减）|
+| `N < range/10` | 1.0（无衰减）|
 | `N >= range/10` | `range/10/N` |
 
 ### 更新声源方位朝向
@@ -1168,7 +1168,7 @@ sequenceDiagram
 | `userId`     | `string`         | 进入语音聊天房间的用户标识                                   |
 | `appId`      | `string`         | 游戏的 Client ID |
 | `expireAt` | `unsigned int/4` | 过期时间（当前时间+有效期（单位：秒, 建议值：300s））          |
-| `roomId`     | `string`         | 房间ID                                                       |
+| `roomId`     | `string`         | 房间 ID                                                       |
 
 ##### 密钥
 
@@ -1343,7 +1343,7 @@ var authBuffer = AuthBufferHelper.GenToken(appId, roomId, userId, masterKey);
 ### 合规回调
 
 
-开发者在实时语音服务管理后台（**开发者中心 > 你的游戏 > 游戏服务 > 实时语音>设置**）设置回调地址后，语音内容有违规时会调用设置的回调地址。
+开发者在实时语音服务管理后台（**开发者中心 > 你的游戏 > 游戏服务 > 实时语音 > 设置**）设置回调地址后，语音内容有违规时会调用设置的回调地址。
 
 回调地址需要是一个 HTTP(S) 协议接口的 URL，需要支持 POST 方法，传输数据编码采用 UTF-8。
 
@@ -1382,7 +1382,7 @@ var authBuffer = AuthBufferHelper.GenToken(appId, roomId, userId, masterKey);
 }
 ```
 
-开发者可以在回调的Header中拿到 `sign` 字段，以便校验请求是否来自实时语音服务云端。
+开发者可以在回调的 Header 中拿到 `sign` 字段，以便校验请求是否来自实时语音服务云端。
 
 #### 合规回调校验算法
 
@@ -1394,7 +1394,7 @@ var authBuffer = AuthBufferHelper.GenToken(appId, roomId, userId, masterKey);
 
     注意：
 
-    - **请直接从 HTTP 请求体中读取 JSON 内容**，反序列化到程序语言的数据结构可能会改变字段顺序，导致校验失败
+    - **请直接从 HTTP 请求体中读取 JSON 内容**，反序列化到程序语言的数据结构可能会改变字段顺序，导致校验失败。
     - POST 和 body 直接连接，中间无空格。
 
 2. 对 payload 进行 HMAC-SHA1 加密，密钥为游戏应用的 `Server Secret`。
@@ -1467,8 +1467,7 @@ Key|Value|含义|来源
 
 #### Base URL
 
-REST API 请求的 Base URL（下文 curl 示例中用 `{{host}}` 表示）即应用的 API <Conditional region='cn'>自定义</Conditional>域名，可以在控制台<Conditional region='cn'>绑定、</Conditional>查看。
-详见文档关于[域名](/sdk/storage/guide/setup-dotnet#域名)的说明。
+REST API 请求的 Base URL（下文 curl 示例中用 `{{host}}` 表示）即应用的 API <Conditional region='cn'>自定义</Conditional>域名，可以在控制台<Conditional region='cn'>绑定、</Conditional>查看。<Conditional region='cn'>详见文档关于[域名](/sdk/storage/guide/setup-dotnet#域名)的说明。</Conditional>
 
 #### REST API
 

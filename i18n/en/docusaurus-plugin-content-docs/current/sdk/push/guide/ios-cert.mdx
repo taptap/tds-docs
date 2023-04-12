@@ -1,130 +1,130 @@
 ---
-title: APNs（苹果推送通知服务）设置指南
-sidebar_label: APNs 设置
+title: APNs Configuration Guide
+sidebar_label: APNs Configuration
 sidebar_position: 1
 ---
 
-APNs 是 Apple 的推送通知服务，它使第三方应用程序开发人员能够向安装在 Apple 设备上的应用程序发送通知数据。
+APNs is Apple’s push notification service. It allows app developers to send push notifications to apps installed on Apple devices.
 
-此文主要介绍如何让 Apple 设备上的应用程序支持 APNs 以及如何在开发者中心设置相关的配置。
+This article explains how to add APNs support to apps installed on Apple devices and what configurations you need to set up on the Developer Center.
 
-## 启用推送功能
+## Enable Push Notifications
 
-应用要启用推送功能，分为两步：
+Follow these two steps to enable push notifications for your app:
 
-1. 开发项目开启推送的权限。
-2. 在苹果开发者网站为对应的 App ID 启用推送功能。
+1. Enable the push notifications permission for your project.
+2. Enable push notifications for the corresponding App ID on Apple Developer.
 
-### 开启开发项目的推送权限
+### Enable the Push Notifications Permission
 
-要在应用程序中添加所需的权限，请在 Xcode 项目中启用推送通知功能。
+To add the required permission to the app, enable push notifications for the app in Xcode.
 
-打开 Xcode 项目，在 **Project > Target > Capabilities** 页面中点击红框中的加号按钮，然后选择并添加 `Push Notifications`，添加后的结果如图中黄框所示：
+To do this, open the Xcode project, go to **Project > Target > Capabilities**, click the plus sign, select `Push Notifications`, and add it. The result should look like the screenshot below:
 
 ![Project Add Capability](/img/apns_setup/project_add_capability.png)
 
-### 启用苹果 App ID 的推送功能
+### Enable Push Notifications for the App ID
 
-登录苹果开发者网站，进入 **Certificates, Identifiers & Profiles** 页面，点击侧边栏中的 **Identifiers**，然后在列表中找到项目对应的 App ID（即 Xcode 项目中的 Bundle Identifier），点击并进入配置编辑页面，然后选择 `Push Notifications` 旁边的复选框，最后点击右上的 Save（保存）按钮，结果如下图所示：
+To enable push notifications for an App ID, go to Apple Developers, go to **Certificates, Identifiers & Profiles**, click **Identifiers** on the sidebar, and click the corresponding App ID (which is the Bundle Identifier in the Xcode project). Now select the `Push Notifications` checkbox and click “Save” to save the change. The result should look like the screenshot below:
 
 ![App ID Add Capability](/img/apns_setup/app_id_add_capability.png)
 
-## 选择推送方式
+## Select a Push Method
 
-苹果提供了两种方式来发送通知，这两种方式各有优点和缺点，云服务对这两种方式都支持，可以根据需要选择其中一种推送方式。
+Apple offers two ways to send push notifications, each with its own advantages and disadvantages. Both are supported by our Push Notification service, and you can choose one based on your needs.
 
-1. 基于 Token 的推送方式（推荐）。
-   - 理论上它比基于证书的方式更快。
-   - 支持多个云服务应用使用同一个 Key。
-   - 支持用同一个 Key 给苹果开发者账号下的多个应用推送通知。
-   - 支持用同一个 Key 给苹果开发者账号下的测试、正式应用推送通知。
-   - 生成的 Key 不再有过期时间，无需像证书方式那样需要定期重新生成证书。
-2. 基于证书的推送方式。
-   - 证书和苹果的 App ID 绑定，一个证书只能向其绑定的苹果应用推送通知。
-   - APNs 有开发、生产两个环境，可能需要为不同环境下的苹果应用配置对应的证书。
-   - 证书有过期时间，需要定期重新生成并配置。
+1. Token-Based Push Notification (Recommended).
+   - Technically, this is faster than certificate-based push notification.
+   - The same key can be used by multiple applications.
+   - The same key can be used to send push notifications to multiple applications under an Apple Developer account.
+   - The same key can be used to send push notifications to test apps and production apps.
+   - A key never expires, so you don’t have to regenerate it like you do with certificates.
+2. Certificate-Based Push Notification.
+   - A certificate is associated with an Apple Developer App ID and can only be used to send push notifications to the associated app.
+   - APNs comes with a development environment and a production environment. You may need to set up different certificates for apps in different environments.
+   - A certificate has an expiration date, and you will need to regenerate and reconfigure certificates periodically.
 
-总的来说，基于 Token 的推送方式在配置步骤、易用性以及功能性上，都要优于基于证书的推送方式，因此我们推荐使用基于 Token 的推送方式。
+In general, token-based push notification is easier to set up and provides better usability and functionality than certificate-based push notification. We recommend that you use token-based push notification.
 
-> **注意**，这两种方式在云服务平台上是互斥的，且基于 Token 的方式优先级高于基于证书的方式，即如果设置了 Token 方式的配置，则该云服务应用下的所有推送都会使用基于 Token 的方式。
+> **Note that** you cannot use both methods simultaneously, and token-based push notification takes precedence over certificate-based push notification. Once you set up token-based push notifications, all push notifications sent from your app will use this method.
 
-### 基于 Token 的推送方式（推荐）
+### Token-Based Push Notification (Recommended)
 
-要使用基于 Token 的推送方式，首先需从苹果开发者网站上生成并下载密钥（**Auth Key**），之后在开发者中心上传该密钥并设置对应信息，成功后即可使用该方式推送通知。
+To enable token-based push notification, first generate and download an Auth Key from Apple Developer, then upload it to the Developer Center and set up the appropriate configurations. Once complete, you will be able to send push notifications from your app.
 
-#### 生成密钥
+#### Generate a Key
 
-登录苹果开发者网站，进入 **Certificates, Identifiers & Profiles** 页面，点击侧边栏中的 **Keys**，然后点击左上方的添加按钮（+）。在密钥名称下，为密钥输入一个独特的名称，接着选择 **Apple Push Notifications service (APNs)** 旁边的复选框，如下图所示：
+To generate a key, sign in to Apple Developer, navigate to **Certificates, Identifiers & Profiles**, click **Keys** in the sidebar, and then click the plus sign (+). Enter a unique name for the key and select **Apple Push Notifications service (APNs)**:
 
-> **注意**，如果侧边栏中没有 **Keys** 这一项，则可能是**苹果开发者账号无对应的权限**。
+> **Note that** if you don’t see **Keys** in the sidebar, **your account may not have the necessary permissions**.
 
 ![Generate Push Key](/img/apns_setup/generate_push_key.png)
 
-接着点击继续，在下一个页面审查密钥配置，确认无误后点击确认。最后点击下载密钥，成功下载的密钥将被保存为一个文本文件，文件扩展名为 `.p8`。
+Proceed to the next page and review the key details. If everything looks good, generate the key and download it. You will get a text file with the extension `.p8`.
 
-> **注意**，请把这个文件（扩展名为 `.p8`）保存在一个安全的地方，因为密钥不会保存在你的苹果开发者账户中，你将无法再次下载它。如果下载按钮被禁用，说明你之前下载了密钥。
+> **Be sure to** keep this file (with the extension `.p8`) in a safe place. You won’t be able to download it again because the key is not stored in your Apple Developer account. If the download button is disabled, it means you have already downloaded the key.
 
-#### 设置密钥
+#### Configure the Key
 
-下载了密钥（`.p8` 文件）后，需要在开发者中心将其上传，并配置相关信息。具体步骤如下：
+After downloading the key (as a `.p8` file), you will need to upload it to the Developer Center and complete some configurations:
 
-1. 在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置 > iOS 推送 Token Authentication** 点击 **新增 Token Authentication** 按钮。
-2. 在弹出的对话框内填入 `Team ID`、`Key ID`、`Topics`，并将之前下载的密钥文件（`.p8` 文件）上传。
-   - `Team ID` 是苹果开发者账号所属团队的 ID，在苹果开发者账号网站的 **Membership** 中可查看到。
-   - `Key ID` 是之前生成的推送密钥（`.p8` 文件）的 ID，在苹果开发者账号网站的 **Certificates, Identifiers & Profiles > Keys** 中点击对应的密钥，进入详细页面后可查看到。
-   - `Topics` topic 指苹果应用的 ID（即 Xcode 项目中的 Bundle Identifier），此栏支持填入多个 topic，每个 topic 用**英文半角逗号**分隔，且**所有 topic 必须从属于同一个 Team ID**。
-3. 点击**添加**，完成上传以及设置密钥的工作。
+1. Go to **Developer Center > Your game > Game Services > Cloud Services > Push Notification > Settings > iOS Token Authentications** and click on **New Token Authentication**.
+2. Enter `Team ID`, `Key ID`, and `Topics` in the pop-up window and upload the key file (the `.p8` file) here.
+   - `Team ID` is the ID of the team to which the Apple Developer account belongs. You can find it under **Membership** in Apple Developer.
+   - `Key ID` is the ID of the key (the `.p8` file), which can be found by going to **Certificates, Identifiers & Profiles > Keys** in Apple Developer and clicking on the corresponding key.
+   - `Topics` is the IDs of your apps (the Bundle Identifiers in Xcode projects). You can specify multiple topics by separating them with **commas**, as long as **they belong to the same Team ID**.
+3. Click **Add** to finish uploading and setting up the key.
 
-完成以上操作后，可以通过 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 在线发送** 测试推送的发送功能。
+Once you have completed the above steps, you can send a test notification by going to **Developer Center > Your game > Game Services > Cloud Services > Push Notification > Send notifications**.
 
-### 基于证书的推送方式
+### Certificate-Based Push Notification
 
-要使用基于证书的推送方式，需要从苹果开发者网站上为每个苹果应用生成单独的推送证书，每个苹果应用的推送证书又可分为**开发环境推送证书**和**开发&生产环境推送证书**，之后在开发者中心上传对应的推送证书，成功后即可使用该方式推送通知。
+To enable certificate-based push notification, a certificate must be generated for each app on Apple Developer. Each app can have **sandbox certificates** and **sandbox & production certificates**. Once you have obtained the certificates from Apple Developer, upload them to the Developer Center and you will be able to send push notifications using the certificates.
 
-#### 生成证书
+#### Generate Certificates
 
-登录苹果开发者网站，进入 **Certificates, Identifiers & Profiles** 页面，点击侧边栏中的 **Certificates**，然后点击左上方的添加按钮（+），接着按以下步骤操作：
+To generate certificates, sign in to Apple Developer, navigate to **Certificates, Identifiers & Profiles**, click **Certificates** in the sidebar, and then click the plus sign (+). Follow the steps below:
 
-1. 选择对应的证书类型。一般选择 `Apple Push Notification service SSL` 类型的推送证书，这类证书又分为 `Sandbox` 和 `Sandbox & Production` 两种，其中 `Sandbox` 证书只能用于开发环境的苹果应用，而 `Sandbox & Production` 证书既可用于开发环境，也可用于生产环境的苹果应用。具体区别可以看选项下的描述，如下图所示：
+1. Select a certificate type. The most common is `Apple Push Notification service SSL`. For this certificate type, you can choose between `Sandbox` and `Sandbox & Production`. `Sandbox` certificates can only be used in development environments, while `Sandbox & Production` can be used in both development and production environments. You can refer to the descriptions under each option for more information, as shown in the screenshot below:
 
    ![Select Cert Type](/img/apns_setup/select_cert_type.png)
 
-2. 选择完证书后，点击继续，接着选择 App ID（即 Xcode 项目中的 Bundle Identifier），选完后点击继续进入下一页面，会要求上传一个 CSR 文件。
-3. 在你的 Mac 上生成一个 CSR（Certificate Signing Request）文件，生成步骤如下：
+2. After selecting a certificate type, proceed to the next step and select an App ID (the Bundle Identifier in the Xcode project), then proceed to the next step. You will be prompted to upload a CSR file.
+3. Generate a CSR (Certificate Signing Request) file on your Mac by following these steps:
 
-   - 启动位于 `/Applications/Utilities` 的 `Keychain Access`（钥匙串访问）。
-   - 选择 **Keychain Access > Certificate Assistant > Request a Certificate from a Certificate Authority**（钥匙串访问 > 证书助理 > 从证书颁发机构请求证书…）。
-   - 证书助理对话框中，在 `User Email Address`（用户电子邮件地址）栏中输入一个电子邮件地址；在 `Common Name`（通用名称）字段中，输入密钥的名称（例如，Gita Kumar Dev Key）。
-   - 将 CA Email Address（CA 电子邮件地址）字段留空。
-   - 选择 `Saved to disk`（保存到磁盘），然后点击继续。
+   - Open `Keychain Access` in `/Applications/Utilities`.
+   - Select **Keychain Access > Certificate Assistant > Request a Certificate From a Certificate Authority…**.
+   - In the Certificate Assistant window, enter an email address in `User Email Address` and a name for the key in `Common Name` (e.g., Gita Kumar Dev Key).
+   - Leave `CA Email Address` blank.
+   - Select `Saved to disk` and continue.
 
      ![Generate CSR](/img/apns_setup/generate_csr.png)
 
-4. 上传你的 CSR 文件（上一步中保存到本地的 `.certSigningRequest` 文件）并点击继续，最后下载生成的证书。
+4. Upload your CSR file (the `.certSigningRequest` file you saved from the last step) and continue. Download the generated certificate.
 
-#### 设置证书
+#### Set up Certificates
 
-证书生成后，需要将下载的证书和私钥上传到开发者中心。请按以下步骤操作：
+After you generate a certificate, you’ll need to upload the downloaded certificate and your private key to the Developer Center. Follow the instructions below:
 
-1. 在生成 CSR 文件的 Mac 上，双击下载的证书，macOS 会将其导入到 `Keychain` 中并和之前创建的 CSR 的密钥归为一组，如下图所示：
+1. On the Mac you used to generate the CSR, double-click the downloaded certificate. macOS will import the certificate into `Keychain` and group it with the key of the CSR you generated earlier, as shown in the screenshot below:
 
    ![Cert With Key](/img/apns_setup/cert_with_key.png)
 
-2. 在 **Keychain Access > login > My Certificates** 中**右键点击**导入的证书（点击证书，不要点击对应的密钥），选择 **Export（导出）**，将证书以 `.p12` 格式保存到磁盘，这时会有弹窗提示输入密码来保护导出的证书，**请不要设置密码，将两个输入框留空**，点击 OK；之后可能还有一个弹窗，要求输入 macOS 的 login（登录）密码以允许让证书导出，请输入密码并点击 Allow。
-3. 在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置 > iOS 推送证书** 上传对应的证书（上一步导出的 `.p12` 文件）。
-   - 如果证书的类型为 `Sandbox`，则只能上传到开发环境；如果证书的类型为 `Sandbox & Production`，则开发、生产环境都可上传。
+2. Go to **Keychain Access > login > My Certificates** and **right-click** the imported certificate (not the key), select **Export**, and save the certificate to disk as a `.p12` file. A popup will appear asking for a password. **Leave the two fields blank so that you don’t give the file a password**. Now click OK. You may see another popup asking for the macOS login password. Enter the password and click Allow.
+3. Go to **Developer Center > Your game > Game Services > Cloud Services > Push Notification > Settings > iOS push notification certificates** and upload the appropriate certificate (the `.p12` file exported in the last step).
+   - If the certificate type is `Sandbox`, the certificate can only be uploaded to the development environment; if it is `Sandbox & Production`, the certificate can be uploaded to either the development or production environment.
 
-完成以上操作后，可以通过 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 在线发送** 测试推送的发送功能。
+Once you have completed the above steps, you can send a test notification by going to **Developer Center > Your game > Game Services > Cloud Services > Push Notification > Send notifications**.
 
-#### 上传证书失败
+#### Fail to Upload a Certificate
 
-如果上传推送证书失败，通常是因为证书有问题，一般由下列原因导致：
+If you are unable to upload a certificate, it is usually because there is a problem with the certificate. Here are some common reasons:
 
-1. 证书不是推送证书。可以通过证书的 Common Name（常用名称）来判断（在 `Keychain Access` 中双击证书可查看到），推送证书的 Common Name 中会包含 `Push Service` 或者 `Pass Type ID`，如下图所示：
+1. The certificate is not a push notification certificate. You can see this from the Common Name of the certificate, which can be viewed by double-clicking the certificate in `Keychain Access`. The Common Name of a push notification certificate contains either `Push Service` or `Pass Type ID`, as shown in the screenshot below:
 
    ![Cert Common Name](/img/apns_setup/cert_common_name.png)
 
-   上传程序会检查证书的 Common Name（常用名称）是否包含以下前缀：
+   The Developer Center checks to see if the Common Name of the certificate contains any of the following prefixes:
 
    - `Apple Push Services`
    - `Apple Sandbox Push Services`
@@ -132,14 +132,14 @@ APNs 是 Apple 的推送通知服务，它使第三方应用程序开发人员�
    - `Apple Production IOS Push Services`
    - `Pass Type ID`
 
-   > Apple 未来可能会修改推送证书的 Common Name（常用名称）前缀，我们会及时更新前缀列表，同时也欢迎大家来反馈。
+   > Apple may change the Common Name prefix of push notification certificates in the future. When this happens, we will update the list of prefixes we use to verify certificates.
 
-2. 证书导出格式有误。目前开发者中心只接受 `.p12` 格式的证书，因此在导出证书时，必须选择 `.p12` 作为导出格式。
+2. The certificate is being exported in the wrong format. Currently, the Developer Center only accepts certificates in `.p12` format. Please be sure to select this format when exporting the certificate.
 
-#### 证书过期
+#### Certificate Expired
 
-开发者如果使用过期证书进行推送，会遇到 `The iOS certificate file is expired or disabled.` 的错误提示。
+If you try to send a push notification with an expired certificate, you will receive the error `The iOS certificate file is expired or disabled.`.
 
-云服务后端在收到推送请求时都会去检查 `prod` 参数指明的证书是否过期，没有 `prod` 则默认检查生产环境证书，如果发现过期并且 query 条件查出的目标设备可能存在 iOS 设备，就直接拒绝本次推送。
+Each time you submit a request to send push notifications, our server checks whether the certificate of the environment specified by the `prod` parameter has expired (if `prod` is not specified, the certificate of the production environment is checked). If the certificate is expired and the queried target devices may include iOS devices, the push notification request will be rejected.
 
-一种解决方法是替换过期的证书，另一种方法是在 query 条件中通过 `deviceType` 字段明确指定设备类型为非 iOS 设备来推送，方法参见《推送 REST API 使用指南》的《通过查询条件发推送》一节。
+One solution is to replace the expired certificate with a new one. Another solution is to use the `deviceType` field in the query to specify that you want to send push notifications to non-iOS devices. See *Push Notification REST API Guide* for more information.

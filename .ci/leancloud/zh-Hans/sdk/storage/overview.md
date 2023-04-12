@@ -117,7 +117,7 @@ LCObject 中的 **键**，必须是由字母、数字或下划线组成的字符
 
 ### 数据导入和导出
 
-我们并不锁定用户和数据。相反，我们提供 API 和工具，来支持用户随时随地导出存放在我们平台上的数据。同样地，数据导入也是可以批量操作的。除了 REST API 之外，我们还提供通过 [JSON 文件和 CSV 格式文件的导入数据](https://leancloud.cn/docs/dashboard_guide.html#hash722373287) 的功能。
+我们并不锁定用户和数据。相反，我们提供 API 和工具，来支持用户随时随地导出存放在我们平台上的数据。同样地，数据导入也是可以批量操作的。除了 REST API 之外，我们还提供通过 [JSON 文件和 CSV 格式文件的导入数据](/sdk/start/dashboard/#导入数据) 的功能。
 
 ## 数据关联
 
@@ -193,8 +193,7 @@ LeanCloud 平台保证 99.9% 的高可用性，并且数据访问方面保证了
 
 * [PHP](/sdk/storage/guide/php/)
 
-另外还可以参考 [REST API 使用详解](https://leancloud.cn/docs/rest_api.html)。
-
+另外还可以参考 [REST API 使用详解](/sdk/storage/guide/rest/)。
 ## 常见问题
 
 ### 数据安全有保障吗
