@@ -68,20 +68,6 @@ export const getEntries = (brand: string, region: string): Entry[] => {
         },
       ],
     },
-    ...(region === "cn"
-      ? [
-          {
-            title: "平台功能申请",
-            description: "TapTap 平台功能申请",
-            links: [
-              {
-                label: "查看更多",
-                to: "/ad-apply",
-              },
-            ],
-          },
-        ]
-      : []),
     ...(region === "global"
       ? [
           {

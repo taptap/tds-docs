@@ -7,7 +7,6 @@ set -e
 
 # 中文版「文档首页」
 rm -r docs/community # 社区运营指南
-rm -r docs/ad-apply # 平台功能申请
 
 # 中文版「游戏商店」
 rm -r docs/store
