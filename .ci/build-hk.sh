@@ -30,9 +30,6 @@ rm docs/sdk/push/guide/android-mixpush.mdx # 推送通知/开发指南/Android �
 rm docs/sdk/push/guide/callback-vendor.mdx # 推送通知/开发指南/回调服务厂商配置
 rm -r docs/sdk/multiplayer # 多人在线对战
 
-# 英文版「游戏商店」
-rm -r i18n/en/docusaurus-plugin-content-docs/current/store
-
 # 英文版「游戏服务」
 rm i18n/en/docusaurus-plugin-content-docs/current/sdk/embedded-moments/features.mdx # 内嵌动态/功能介绍
 
