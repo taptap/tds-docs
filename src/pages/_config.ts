@@ -134,7 +134,7 @@ export const getEntries = (brand: string, region: string): Entry[] => {
       links: [
         {
           label: "查看更多",
-          to: "/sdk/storage/guide/setup-dotnet",
+          to: "/sdk/storage/overview",
         },
       ],
     },
