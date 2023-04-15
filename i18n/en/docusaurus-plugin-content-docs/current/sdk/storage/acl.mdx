@@ -1,6 +1,6 @@
 ---
-title: ACL 权限管理开发指南
-sidebar_label: ACL 权限管理
+title: ACL Guide
+sidebar_label: ACL
 slug: /sdk/storage/guide/acl/
 sidebar_position: 12
 ---
@@ -10,12 +10,12 @@ import { Conditional } from "/src/docComponents/conditional";
 import Path from "/src/docComponents/path";
 
 :::info
-ACL 是 Access Control List 的缩写，称为访问控制列表，包含了对一个对象或一条记录可进行何种操作的权限定义。
+ACL stands for Access Control List. It defines the access permissions for an object.
 :::
 
-<p><Conditional brand="tds">TDS</Conditional><Conditional brand="leancloud">LeanCloud</Conditional> 云端使用的 ACL 机制是将每个操作授权给特定的 User 用户或者 Role 角色，只允许这些用户或角色对一个对象执行这些操作。</p>
+The ACL mechanism used by <Conditional brand="tds">TDS</Conditional><Conditional brand="leancloud">LeanCloud</Conditional> grants the permission to perform each operation to specific users or roles, allowing only them to perform the operation.
 
-例如如下 ACL 定义：
+For example:
 
 ```json
 {
@@ -34,18 +34,18 @@ ACL 是 Access Control List 的缩写，称为访问控制列表，包含了对�
 }
 ```
 
-- 所有人可读，但不能写（`*` 代表所有人）。
-- 角色为 admin（包含子角色）的用户可读可写。
-- ID 为 `58113fbda0bb9f0061ddc869` 的用户可读可写。
+- Everyone can read, but not everyone can write (`*` means everyone).
+- Users with the admin role (including its sub-roles) can read and write.
+- The user with the ID `58113fbda0bb9f0061ddc869` can read and write.
 
-我们使用内建数据表 `_User` 来维护 [用户/账户系统](/sdk/authentication/guide/)，以及内建数据表 `_Role` 来维护**角色**。
-角色既可以包含用户，也可以包含其他角色，也就是说角色有层次关系，将权限授予一个角色代表该角色所包含的其他角色也会得到相应的权限。
+We use the built-in `_User` table to maintain the [account system](/sdk/authentication/guide/) and the `_Role` table to maintain **roles**.
+Roles can contain users as well as other roles, meaning that roles can have hierarchies. Granting a permission to a role also grants the permission to the roles that belong to this role.
 
-云端对客户端发过来的每一个请求都要进行用户身份鉴别和 ACL 访问授权的严格检查。因此，使用 ACL 可以灵活且最大程度地保护应用数据，提升访问安全。
+For each request sent to the cloud from the client, the cloud authenticates the user and performs checks on ACL. You can have the data in your app protected with the help of ACL.
 
-## 默认 ACL
+## Default ACL
 
-每个 Class 的初始默认 ACL 为所有人可读可写：
+Below is the default ACL value for all classes. It allows everyone to read and write:
 
 ```json
 {
@@ -56,43 +56,43 @@ ACL 是 Access Control List 的缩写，称为访问控制列表，包含了对�
 }
 ```
 
-在创建 Class 对话框可以设置 Class 的默认 ACL：
+When creating a new class on the dashboard, you can configure its default ACL in the dialog box:
 
-![创建 Class 对话框](/img/security/class-acl.png)
+![create class dialog box](/img/security/class-acl.png)
 
-你可以设置 read 和 write 权限开放给哪些用户，其中：
+Here you can specify which users you want to open read and write permissions for:
 
-- 「所有用户」、「指定用户」可以参考数据安全指南的 [Class 层面的访问权限](/sdk/storage/guide/security/#class-权限)一节的说明。
-- 「数据创建者（Owner）」指创建数据的用户。也就是说，新增对象（create）时附带的 `X-LC-Session` HTTP 头对应的用户。
+- See [Data Security](/sdk/storage/guide/security/#class) for more information about "All users" and "Designated users".
+- "Object creator (owner)" refers to the user who creates the data. In other words, it is the user that the `X-LC-Session` HTTP header used when creating the object corresponds to.
 
-除了分别设置 read 和 write 权限开放给哪些用户外，对话框中还提供了一些**常用设定的快捷方式**：
+In addition to specifying which users are allowed to read and write, the dialog also provides some shortcuts for **common settings**:
 
-- **限制写入**：数据创建者可读、可写，其他用户可读、不可写。
-- **限制读取**：数据创建者可读、可写，其他用户不可读、不可写。
-- **限制所有**：数据创建者可读、不可写，其他用户不可读、不可写。
-- **无限制**：所有人可读、可写。
+- **Restrict write**: The creator can read and write; other users can read but not write.
+- **Restrict read**: The creator can read and write; other users cannot read or write.
+- **Restrict all**: The creator can read but not write; other users cannot read or write.
+- **No restrictions**: Everyone can read and write.
 
-对于已经存在的 Class，你可以**更新默认 ACL 和访问权限**。
-进入**<Path to="storage" /> > 结构化数据**，选择一个 Class，再点击**权限**标签页。
-不过，修改默认 ACL 只作用于新增的对象，现存对象的 ACL 值保持不变。
+For an existing class, you can **update the default ACL and access permissions**.
+Go to **<Path to="storage" /> > Data**, select a class, and click the **Permission** tab.
+However, changing the default ACL only affects new objects; the ACL values of existing objects remain unchanged.
 
-除了设置默认 ACL 外，在控制台也可以**设置单个对象的 ACL**。
-不过在控制台手工为每个对象设置 ACL 过于繁琐，并不现实。
-所以通常我们在控制台设置**默认 ACL**，确保所有新创建的对象都有合适的初始 ACL 值。
-为单个对象设置更复杂、更精细的 ACL，则通过代码设置其 `ACL` 字段。
+In addition to setting the default ACL, you can also **set the ACL for individual objects** in the console.
+However, it is not practical to manually set ACLs for each object in the console, as it is too tedious.
+So we typically set the **default ACL** in the console to ensure that all newly created objects have the appropriate initial ACL values.
+To set more complex and granular ACLs for individual objects, set their `ACL` fields by code.
 
-例如，`Post` Class 的默认 ACL 可能是这样的：
+For example, the default ACL for a `Post` class might look like this
 
-- read：所有用户
-- write：数据创建者（Owner）
+- read: all users
+- write: creator (owner)
 
-也就是说，所有用户都可以查看帖子，用户只能修改或者删除自己发的帖子。
+This means that all users can view posts, and users can only edit or delete their own posts.
 
-这里数据创建者指创建对象的请求的 HTTP 头中携带的 session token 对应的用户，在我们的例子中是帖子的作者。
+Here, the data creator is the user corresponding to the session token carried in the HTTP header of the request that created the object, in our case the author of the post.
 
-## 基于用户的权限管理
+## ACL with Users
 
-继续上面的例子，假设某个帖子的发布人允许另一个特定的用户（比如两个人合作编写一篇文章）修改帖子，除此之外的其他人不可修改，那么我们可以这样设置 ACL：
+Let's continue with the example above. Suppose you want to also allow a coauthor to modify a post:
 
 <MultiLang>
 
@@ -100,16 +100,16 @@ ACL 是 Access Control List 的缩写，称为访问控制列表，包含了对�
 try {
   LCQuery<LCUser> userQuery = LCUser.GetQuery();
   LCUser otherUser = await userQuery.Get("55f1572460b2ce30e8b7afde");
-  // 新建一个帖子对象
+  // Create a post object
   LCObject post = LCObject("Post");
-  post["title"] = "这是我的第二条发言，谢谢大家！";
-  post["content"] = "我最近喜欢看足球和篮球了。";
+  post["title"] = "This is my second post.";
+  post["content"] = "I started watching soccer and basketball.";
 
-  //新建一个 ACL 实例
+  //Create a new ACL instance
   LCACL acl = new LCACL();
-  acl.PublicReadAccess = true; // 设置公开的「读」权限，任何人都可阅读
+  acl.PublicReadAccess = true; // Set read access to public so that anyone can read
   LCUser currentUser = await LCUser.GetCurrent();
-  acl.SetUserWriteAccess(currentUser, true); // 为当前用户赋予「写」权限，有且仅有当前用户可以修改这条 Post
+  acl.SetUserWriteAccess(currentUser, true); // Set write access to the current user so that only the current user can update this post
   acl.SetUserWriteAccess(otherUser, true);
   post.ACL = acl;
 
@@ -127,21 +127,21 @@ query.getInBackground("55f1572460b2ce30e8b7afde").subscribe(new Observer<LCUser>
     }
     @Override
     public void onNext(LCUser anotherUser) {
-        // 新建一个帖子对象
+        // Create a post object
         LCObject post= new LCObject("Post");
-        post.put("title","这是我的第二条发言，谢谢大家！");
-        post.put("content","我最近喜欢看足球和篮球了。");
+        post.put("title","This is my second post.");
+        post.put("content","I started watching soccer and basketball.");
 
-        //新建一个 ACL 实例
+        //Create a new ACL instance
         LCACL acl = new LCACL();
-        acl.setPublicReadAccess(true);// 设置公开的「读」权限，任何人都可阅读
-        acl.setWriteAccess(LCUser.getCurrentUser(), true);//为当前用户赋予「写」权限
+        acl.setPublicReadAccess(true);// Set read access to public so that anyone can read
+        acl.setWriteAccess(LCUser.getCurrentUser(), true);//Set write access to the current user
         acl.setWriteAccess(anotherUser, true);
 
-        // 将 ACL 实例赋予 Post对象
+        // Assign the ACL instance to the post object
         post.setACL(acl);
 
-        //保存到云端
+        //Save the object to the cloud
         post.saveInBackground();
     }
     @Override
@@ -158,18 +158,18 @@ query.getInBackground("55f1572460b2ce30e8b7afde").subscribe(new Observer<LCUser>
 LCQuery *query = [LCUser query];
 [query getObjectInBackgroundWithId:@"55f1572460b2ce30e8b7afde" block:^(LCObject * _Nullable object, NSError * _Nullable error) {
     if (error == nil) {
-        // 新建一个帖子对象
+        // Create a post object
         LCObject *post = [LCObject objectWithClassName:@"Post"];
-        [post setObject:@"这是我的第二条发言，谢谢大家！" forKey:@"title"];
-        [post setObject:@"我最近喜欢看足球和篮球了。" forKey:@"content"];
+        [post setObject:@"This is my second post." forKey:@"title"];
+        [post setObject:@"I started watching soccer and basketball." forKey:@"content"];
 
-        //新建一个 ACL 实例
+        //Create a new ACL instance
         LCACL *acl = [LCACL ACL];
-        [acl setPublicReadAccess:YES];// 设置公开的「读」权限，任何人都可阅读
-        [acl setWriteAccess:YES forUser:[LCUser currentUser]];// 为当前用户赋予「写」权限
+        [acl setPublicReadAccess:YES];// Set read access to public so that anyone can read
+        [acl setWriteAccess:YES forUser:[LCUser currentUser]];// Set write access to the current user
         [acl setWriteAccess:YES forUser:otherUser];
         
-        post.ACL = acl;// 将 ACL 实例赋予 Post 对象
+        post.ACL = acl;// Assign the ACL instance to the post object
         
         [post save];
     } else {
@@ -187,8 +187,8 @@ _ = query.get("55f1572460b2ce30e8b7afde") { result in
         do {
             let post = LCObject(className: "Post")
             
-            try post.set("title", value: "这是我的第二条发言，谢谢大家！")
-            try post.set("content", value: "我最近喜欢看足球和篮球了。")
+            try post.set("title", value: "This is my second post.")
+            try post.set("content", value: "I started watching soccer and basketball.")
             
             let acl = LCACL()
             
@@ -216,18 +216,18 @@ _ = query.get("55f1572460b2ce30e8b7afde") { result in
 try {
   LCQuery<LCUser> userQuery = LCUser.getQuery();
   LCUser otherUser = await userQuery.get('55f1572460b2ce30e8b7afde');
-  // 新建一个帖子对象
+  // Create a post object
   LCObject post = LCObject("Post");
-  post['title'] = '这是我的第二条发言，谢谢大家！';
-  post['content'] = '我最近喜欢看足球和篮球了。';
+  post['title'] = 'This is my second post.';
+  post['content'] = 'I started watching soccer and basketball.';
 
-  //新建一个 ACL 实例
+  //Create a new ACL instance
   LCACL acl = LCACL();
-  acl.setPublicReadAccess(true); // 设置公开的「读」权限，任何人都可阅读
+  acl.setPublicReadAccess(true); // Set read access to public so that anyone can read
   LCUser currentUser = await LCUser.getCurrent();
-  acl.setUserWriteAccess(currentUser, true); // 为当前用户赋予「写」权限，有且仅有当前用户可以修改这条 Post
+  acl.setUserWriteAccess(currentUser, true); // Set write access to the current user so that only the current user can update this post
   acl.setUserWriteAccess(otherUser, true);
-  post.acl = acl; //将 ACL 实例赋予 Post对象
+  post.acl = acl; //Assign the ACL instance to the post object
 
   await post.save();
 } on LCException catch (e) {
@@ -236,28 +236,28 @@ try {
 ```
 
 ```js
-  // 创建一个针对 User 的查询
+  // Create a query for User
   var query = new AV.Query(AV.User);
   query.get('55f1572460b2ce30e8b7afde').then(function(otherUser) {
     var post = new AV.Object('Post');
-    post.set('title', '这是我的第二条发言，谢谢大家！');
-    post.set('content','我最近喜欢看足球和篮球了。');
+    post.set('title', 'This is my second post.');
+    post.set('content','I started watching soccer and basketball.');
 
-    // 新建一个 ACL 实例
+    // Create a new ACL instance
     var acl = new AV.ACL();
     acl.setPublicReadAccess(true);
     acl.setWriteAccess(AV.User.current(), true);
     acl.setWriteAccess(otherUser, true);
 
-    // 将 ACL 实例赋予 Post 对象
+    // Assign the ACL instance to the post object
     post.setACL(acl);
 
-    // 保存到云端
+    // Save the object to the cloud
     return post.save();
   }).then(function() {
-    // 保存成功
+    // Saved
   }).catch(function(error) {
-    // 错误信息
+    // Error
     console.log(error);
   });
 ```
@@ -265,41 +265,41 @@ try {
 ```python
 import leancloud
 
-# 登录一个用户
+# Log in a user
 user = leancloud.User()
 user.login('my_user_name', 'my_password')
 
-# 新建一个 Post 对象
+# Create a Post object
 Post = leancloud.Object.extend('Post')
 post = Post()
-post.set('title', '这是我的第二条发言，谢谢大家！')
-post.set('content', '我最近喜欢看足球和篮球了。')
+post.set('title', 'This is my second post.')
+post.set('content', 'I started watching soccer and basketball.')
 
-# 新建一个 leancloud.ACL 实例
+# Create a leancloud.ACL instance
 acl = leancloud.ACL()
 acl.set_public_read_access(True)
-# 设置当前登录用户的的可写权限
+# Set write permission for the currently logged in user
 acl.set_write_access(leancloud.User.get_current().id, True)
-# 设定指定 objectId 用户的可写权限
+# Set write permission for the user with a given objectId
 acl.set_write_access('55f1572460b2ce30e8b7afde', True)
 post.set_acl(acl)
 post.save()
 ```
 
 ```php
-// 登录一个用户
+// Log in a user
 User::logIn("Tom", "cat!@#123");
 
-// 新建一个帖子
+// Create a post
 $post = new LeanObject("Post");
-$post->set("title", "这是我的第二条发言，谢谢大家！");
-$post->set("content", "我最近喜欢看足球和篮球了。");
+$post->set("title", "This is my second post.");
+$post->set("content", "I started watching soccer and basketball.");
 
-// 新建一个 ACL 实例
+// Create a new ACL instance
 $acl = new ACL();
-// 设置公开的「读」权限，任何人都可阅读
+// Set read access to public so that anyone can read
 $acl->setPublicReadAccess(true);
-// 为当前用户赋予「写」权限，有且仅有当前用户可以修改这条 Post
+// Set write access to the current user so that only the current user can update this post
 $acl->setWriteAccess(User::getCurrentUser(), true);
 $otherUser = LeanObject::create("_User", "55f1572460b2ce30e8b7afde");
 $acl->setWriteAccess($otherUser, true);
@@ -309,7 +309,7 @@ $post->save();
 
 </MultiLang>
 
-执行完毕上面的代码，回到控制台，可以看到，该条 Post 记录里面的 ACL 列的内容如下：
+Go back to the dashboard after running the above code and you will see that the ACL of the post will be:
 
 ```json
 {
@@ -325,13 +325,13 @@ $post->save();
 }
 ```
 
-从结果可以看出，该条 Post 已经允许 `objectId` 为 `55b9df0400b0f6d7efaa8801` 以及 `55f1572460b2ce30e8b7afde` 的两个用户（User）修改，他们拥有写权限 `"write": ture`。
+As you can see from the result, the post now allows the two users with `objectId` of `55b9df0400b0f6d7efaa8801` and `55f1572460b2ce30e8b7afde` to update. They have the write permission `"write": ture`.
 
-:::tip 注意
-为了避免示例过于冗长，重点不突出，从下面的示例开始，都不再给出可以直接执行的完整代码，只保留关键部分。
+:::tip Notice
+In order to avoid long and unfocused examples, the following examples do not give the complete code that can be executed directly, but only the key parts.
 :::
 
-假设论坛有一个管理员，可以编辑、删除所有帖子，那么我们可以用类似的方法给每个帖子加上相应的权限：
+Assuming the forum has an administrator who can edit and delete all posts, we can add the appropriate permissions to each post in a similar way:
 
 <MultiLang>
 
@@ -369,18 +369,18 @@ $acl->setReadAccess($anAdministrator, true);
 
 </MultiLang>
 
-但是，未来可能会有新的管理员加入，老的管理员也可能卸任，所以单纯基于用户进行权限管理，任何人员变动都需要批量订正数据（修改 ACL 字段），太不灵活了。
+However, new administrators may join and old ones may leave in the future, so it is too inflexible to manage permissions based on users only, and any personnel changes require bulk data revisions (modification of ACL fields).
 
-因此，我们需要引入角色这一概念。
+Therefore, we need to introduce the concept of roles.
 
-## 基于角色的权限管理
+## ACL with Roles
 
-「角色」相当于用户组，并且可以嵌套。
-换言之，一个角色的成员要么是用户，要么是另一个角色。
+A role is a group of users, and roles can be nested.
+In other words, the member of a role is either a user or another role.
 
-角色的名字由字母、数字、下划线组成，不可变更，在应用内唯一。
+Each role has an immutable and unique name, consisting of alphanumerics and underscores.
 
-继续上面的例子，让我们看看如何赋予管理员角色写权限（假定已经存在一个名为 `admin` 的角色）：
+Continuing the example above, let's see how to grant write permission to the administrator role (assuming there is an existing role named `admin`):
 
 <MultiLang>
 
@@ -422,21 +422,21 @@ $acl->setRoleWriteAccess("admin", true);
 
 </MultiLang>
 
-### 角色的创建
+### Role Creation
 
-下面让我们看看如何创建一个角色。
+Let's see how to create a role.
 
-这里有一个需要特别注意的地方，因为 `Role` 本身也是一个 `Object`，它自身也有 ACL 控制，并且它的权限控制应该更严谨。
-所以通常我们在创建角色的时候会显式地设定该角色的 ACL。
-如果不指定，那么 SDK 会默认设定角色的 ACL 为所有人可读、所有人不可写。
-换言之，在不显式指定 ACL 的情况下，SDK 的默认设定会导致角色一经创建，未来无法在客户端修改，以后添加成员等操作都需要在控制台进行或在服务端使用 masterKey 进行。
-为了便于测试，我们在下面的示例代码中暂且将角色的写权限赋予了创建该角色的用户（当前用户），**实际项目中请根据具体需求设定合适的 ACL**。
+Note that since a `Role` itself is also an `Object`, it has its own ACL control, and it should have tighter permission control.
+So usually when we create a role, we explicitly set the ACL for that role.
+If you don't specify it, then the SDK will set the ACL of the role to be readable by all and unwritable by all by default.
+In other words, without explicitly specifying the ACL, the SDK's default setting makes it impossible to modify the role on the client side once it is created, and future operations such as adding members must be done on the console or on the server side using masterKey.
+For testing purposes, the following sample code temporarily assigns write access to the user who created the role (the current user). **Please set the appropriate ACL according to your specific needs in the actual project**.
 
 <MultiLang>
 
 ```cs
 try {
-  // 角色本身的 ACL
+  // The ACL of the role
   LCACL acl = new LCACL();
   acl.PublicReadAccess = true;
   LCUser currentUser = await LCUser.GetCurrent();
@@ -450,7 +450,7 @@ try {
 ```
 
 ```java
-// 角色本身的 ACL
+// The ACL of the role
 LCACL roleACL = new LCACL();
 roleACL.setPublicReadAccess(true);
 roleACL.setWriteAccess(LCUser.getCurrentUser(),true);
@@ -460,7 +460,7 @@ admin.saveInBackground().blockingSubscribe();
 ```
 
 ```objc
-// 角色本身的 ACL
+// The ACL of the role
 LCACL *roleACL = [LCACL ACL];
 [roleACL setPublicReadAccess:YES];
 [roleACL setWriteAccess:YES forUser:[LCUser currentUser]];
@@ -471,7 +471,7 @@ LCRole *admin = [LCRole roleWithName:@"admin" acl:roleACL];
 
 ```swift
 do {
-  // 角色本身的 ACL 
+  // The ACL of the role 
   let roleACL = LCACL()
   roleACL.setAccess([.read], allowed: true)
   if let currentUserID = LCApplication.default.currentUser?.objectId?.value {
@@ -488,7 +488,7 @@ do {
 
 ```dart
 try {
-  // 角色本身的 ACL 
+  // The ACL of the role 
   LCACL acl = LCACL();
   acl.setPublicReadAccess(true);
   LCUser currentUser = await LCUser.getCurrent();
@@ -502,7 +502,7 @@ try {
 ```
 
 ```js
-// 角色本身的 ACL
+// The ACL of the role
 const roleAcl = new AV.ACL();
 roleAcl.setPublicReadAccess(true);
 roleAcl.setWriteAccess(AV.User.current(), true);
@@ -512,7 +512,7 @@ await admin.save();
 ```
 
 ```python
-# 角色本身的 ACL
+# The ACL of the role
 role_acl = leancloud.ACL()
 role_acl.set_public_read_access(True)
 current_user_id = leancloud.User.get_current().id
@@ -523,7 +523,7 @@ admin.save()
 ```
 
 ```php
-// 角色本身的 ACL 
+// The ACL of the role 
 $roleACL = new ACL();
 $roleACL->setPublicReadAccess(true);
 $roleACL->setWriteAccess(User::getCurrentUser(), true);
@@ -536,7 +536,7 @@ $admin->save();
 
 </MultiLang>
 
-现在这个 `admin` 角色是空的，我们接下来把当前用户**添加**到这个角色：
+Now the `admin` role is empty. Let's **add** the current user to this role:
 
 <MultiLang>
 
@@ -585,7 +585,7 @@ $admin->getUsers().add(User::getCurrentUser());
 
 </MultiLang>
 
-如果我们又想从角色中**移除**用户：
+To **remove** a user from the role:
 
 <MultiLang>
 
@@ -627,8 +627,8 @@ $admin->getUsers().remove(User::getCurrentUser());
 
 </MultiLang>
 
-如前所述，角色的成员可以是另一个角色。
-假定有两个角色，一个「管理员」（`admin`），一个「版主」（`moderator`），我们想让 `admin` 成为 `moderator` 的子角色，因为管理员同时拥有版主的全部权限。
+As mentioned earlier, the member of a role can be another role.
+Suppose there are two roles, an `admin` and a `moderator', and we want `admin` to be a child of `moderator`, since the administrator also has all the privileges of the moderator.
 
 <MultiLang>
 
@@ -673,7 +673,7 @@ $moderator->getRoles().add(admin);
 
 </MultiLang>
 
-偶尔可能想要移除子角色，比如后来我们改变了主意，管理员应该专注于全局性的管理任务，帖子编辑、删除之类的任务全部由版主负责。
+Occasionally you may want to remove subroles. For example, we later changed our minds and decided that admins should focus on global administrative tasks, and that editing, deleting, and the like should be the responsibility of moderators.
 
 <MultiLang>
 
@@ -711,9 +711,9 @@ $moderator->getRoles().remove(admin);
 
 </MultiLang>
 
-### 角色的查询
+### Role Query
 
-查询某个用户有哪些角色：
+Query which roles a user has:
 
 <MultiLang>
 
@@ -733,7 +733,7 @@ LCUser user = LCUser.getCurrentUser();
 user.getRolesInBackground().subscribe(new Observer<List<LCRole>>() {
     @Override public void onSubscribe(Disposable d) {}
     @Override public void onNext(List<LCRole> avRoles) {
-        // avRoles 是查询结果
+        // avRoles is the result
     }
     @Override public void onError(Throwable e) {}
     @Override public void onComplete() {}
@@ -743,7 +743,7 @@ user.getRolesInBackground().subscribe(new Observer<List<LCRole>>() {
 ```objc
 LCUser *user = [LCUser currentUser];
 [user getRolesInBackgroundWithBlock:^(NSArray<LCRole *> * _Nullable avRoles, NSError * _Nullable error) {
-  // avRoles 是查询结果
+  // avRoles is the result
 }];
 ```
 
@@ -787,7 +787,7 @@ $roles = User::getCurrentUser().getRoles();
 
 </MultiLang>
 
-查询某个角色包含的用户（这里只给出构建查询的代码）：
+To query the users included in a role (only the code to build the query is given here):
 
 <MultiLang>
 
@@ -825,9 +825,9 @@ $userQuery = $moderator->getUsers().getQuery();
 
 </MultiLang>
 
-当然，上面的代码没有考虑子角色中包含的用户。
-如果想要查询角色中包含的所有用户（直接包含和间接包含），需要递归地查出角色的所有子角色（包括子角色的子角色，以此类推），接着查询所有这些角色包含的用户。
-限于篇幅，就不在这里列出完整的代码了，只列出如何构建子角色查询的代码：
+Of course, the above code does not take into account the users contained in the subroles.
+If you want to query all of the users contained in a role (both directly and indirectly), you need to recursively look up all of the role's subroles (including subroles of subroles, and so on), and then query all of the users contained in those roles.
+For brevity, we won't include the full code here, just the code to build the subrole query:
 
 <MultiLang>
 
@@ -865,23 +865,24 @@ $subRoleQuery = $moderator->getRoles().getQuery();
 
 </MultiLang>
 
-由于角色继承自结构化存储的对象，你也可以根据角色的其他属性执行各种查询，方式和一般的对象查询是一样的。
+Because roles inherit from structured stored objects, you can also perform various queries based on other properties of the role, just as you can with general object queries.
 
-## 特殊规则
+## Special Rules
 
-因为用户相关信息比较敏感，所以 `_User` 表会忽略 ACL 的设置，任何用户都无法修改其他用户的属性，比如当前登录的用户是 A，而他想通过请求去修改 B 用户的用户名、密码或者其他自定义属性，是不会生效的，即使 B 用户的 ACL 中赋予了 A 写权限也不行。
+Because user-related information is sensitive, the `_User` table ignores ACL settings and no user can change the properties of other users. For example, if the currently logged in user is A, and A wants to change the username, password, or other custom properties of user B via a query, it won't work, even if user B has write access to A in their ACL.
 
-因为 LiveQuery 设计的使用场景是客户端，而客户端不应使用 MasterKey，否则会有极大的安全隐患。
-所以，LiveQuery 订阅事件时会忽略 MasterKey。换言之，LiveQuery 订阅事件时不应使用 MasterKey，即使使用也不会跳过 ACL 等权限检查。
+LiveQuery is designed to be used on the client side, and the client side should not use MasterKey, otherwise there will be big security risks.
+Therefore, the MasterKey is ignored when subscribing to events with LiveQuery. In other words, LiveQuery should not use the MasterKey when subscribing to events, and even if it does, it won't skip permission checks like ACLs.
 
-## 获取对象的 ACL 值
+## Retrieving ACL Value
 
-查询数据时，SDK 默认不会返回对象的 ACL 值。如果想在获取对象的同时返回对象的 ACL 值，需要同时满足下面两个条件：
+When retrieving data, the SDK does not return the ACL value of the object by default. If you want to get the ACL value when fetching an object, the following two conditions must be met:
 
-1. 进入 **<Path to="storage" /> > 服务设置 > 查询设置**，勾选「查询时返回值包括 ACL」。
-2. 客户端查询对象时指定返回 ACL。
+1. Go to **<Path to="storage" /> > Settings > Queries** and select "Include ACL with objects being queried".
+2. The client specifies that the ACL should be returned when the object is retrieved.
 
-代码如下：
+
+The code is as follows:
 
 <MultiLang>
 
@@ -920,18 +921,18 @@ query = leancloud.Object.extend('Todo').query.include_acl(True)
 ```
 
 ```php
-// 暂不支持
+// Not yet supported
 ```
 
 </MultiLang>
 
-## 最佳实践
+## Best Practice
 
-如果应用的权限控制需求比较简单，我们推荐在控制台恰当设置 [Class 权限](/sdk/storage/guide/security/#class-权限)、[字段权限](/sdk/storage/guide/security/#字段权限)、[默认 ACL](#默认-acl)，然后通过客户端代码设置个别需要精细权限控制的 ACL。
+If the application's permission control needs are relatively simple, we recommend setting [class permissions](/sdk/storage/guide/security/#class), [field permissions](/sdk/storage/guide/security/#field), and [default ACL](#default-acl) correctly, and then setting individual ACLs that require fine-grained permission control through client-side code.
 
-对于权限控制需求复杂的应用，我们推荐在控制台设置 Class 权限、字段权限、默认 ACL 后，在云引擎统一处理 ACL 相关的逻辑。
-一方面，这样免去了在 iOS、Android、Web 等各处不断升级和维护逻辑十分类似的客户端代码。
-另一方面，云引擎除了处理 ACL 外，还可以通过 hook 基于更复杂的条件进行权限控制，比如不允许发布超过一定字数的帖子。
-详见 [在云引擎中使用 ACL](/sdk/storage/guide/engine-acl/)。
+For applications with complex permission control requirements, we recommend setting class permissions, field permissions, and default ACLs in the console, and then unifying the ACL-related logic in the Cloud Engine.
+On the one hand, this eliminates the need to constantly update and maintain client-side code with very similar logic across iOS, Android, Web, and so on.
+On the other hand, in addition to handling ACLs, the Cloud Engine can also control permissions through hooks based on more complex conditions, such as not allowing posts that exceed a certain number of words.
+See [在云引擎中使用 ACL](/sdk/storage/guide/engine-acl/) for more details.
 
-对于储存敏感数据、安全性要求非常严苛的 Class，开发者也可以考虑将对应的 [Class 权限](/sdk/storage/guide/security/#class-权限)的写权限乃至读权限完全关闭，客户端所有请求都通过云引擎中转，这样与自己搭建后端具有同样的数据安全性保障。
+For classes that store very sensitive data and have high security requirements, you may also want to consider turning off write and even read permissions in the [class permissions](/sdk/storage/guide/security/#class) and route all client requests through the Cloud Engine, giving you the same security guarantee as building your own backend.
