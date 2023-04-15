@@ -22,7 +22,7 @@ export const getEntries = (brand: string, region: string): Entry[] => {
   const ENTRIES_TDS: Entry[] = [
     {
       title: "游戏商店",
-      description: "游戏商店配置相关服务说明",
+      description: "有关如何上架游戏、开放测试和参与平台活动",
       links: [
         {
           label: "查看更多",
@@ -68,20 +68,6 @@ export const getEntries = (brand: string, region: string): Entry[] => {
         },
       ],
     },
-    ...(region === "cn"
-      ? [
-          {
-            title: "平台功能申请",
-            description: "TapTap 平台功能申请",
-            links: [
-              {
-                label: "查看更多",
-                to: "/ad-apply",
-              },
-            ],
-          },
-        ]
-      : []),
     ...(region === "global"
       ? [
           {

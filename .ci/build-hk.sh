@@ -7,7 +7,6 @@ set -e
 
 # 中文版「文档首页」
 rm -r docs/community # 社区运营指南
-rm -r docs/ad-apply # 平台功能申请
 
 # 中文版「游戏商店」
 rm -r docs/store
@@ -30,9 +29,6 @@ rm docs/sdk/engine/dedicated-IP.mdx # 云引擎/独立 IP
 rm docs/sdk/push/guide/android-mixpush.mdx # 推送通知/开发指南/Android 混合推送
 rm docs/sdk/push/guide/callback-vendor.mdx # 推送通知/开发指南/回调服务厂商配置
 rm -r docs/sdk/multiplayer # 多人在线对战
-
-# 英文版「游戏商店」
-rm -r i18n/en/docusaurus-plugin-content-docs/current/store
 
 # 英文版「游戏服务」
 rm i18n/en/docusaurus-plugin-content-docs/current/sdk/embedded-moments/features.mdx # 内嵌动态/功能介绍
