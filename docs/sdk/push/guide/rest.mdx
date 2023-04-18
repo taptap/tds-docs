@@ -12,7 +12,7 @@ import { Conditional } from "/src/docComponents/conditional";
 
 请求的鉴权是通过 HTTP Header 里面包含的键值对来进行的，详见《存储 REST API》中 [请求格式](/sdk/storage/guide/rest/#请求格式) 一节的说明。
 
-### Installation
+## Installation
 
 你可以通过 REST API 在云端增加安装对象。
 使用 REST API 还可以达成一些客户端 SDK 无法完成的操作，比如查询所有的 installation 来找到一个 channel 的订阅者的集合。
@@ -54,7 +54,7 @@ import { Conditional } from "/src/docComponents/conditional";
   </tbody>
 </table>
 
-#### 增加 Installation
+### 增加 Installation
 
 创建一个安装对象和普通的对象差不多，只是不同平台有不同的字段。
 
@@ -74,7 +74,7 @@ Location: https://{{host}}/1.1/installations/51ff1808e4b074ac5c34d7fd
 }
 ```
 
-##### DeviceToken
+#### DeviceToken
 
 iOS 设备通常使用 DeviceToken 来唯一标识一台设备。
 
@@ -93,7 +93,7 @@ curl -X POST \
   https://{{host}}/1.1/installations
 ```
 
-##### installationId
+#### installationId
 
 对于 Android 设备，SDK 会自动生成 uuid 作为 installationId 保存到云端。
 
@@ -114,7 +114,7 @@ curl -X POST \
 
 `installationId` 必须在应用内唯一。
 
-#### 获取 Installation
+### 获取 Installation
 
 你可以通过 GET 方法请求创建的时候 Location 表示的 URL 来获取 Installation 对象。比如，获取上面创建的对象：
 
@@ -140,7 +140,7 @@ curl -X GET \
 }
 ```
 
-#### 更新 Installation
+### 更新 Installation
 
 安装对象可以向相应的 URL 发送 PUT 请求来更新。例如，通过设置 `channels` 属性来订阅某个推送频道：
 
@@ -191,7 +191,7 @@ curl -X PUT \
   https://{{host}}/1.1/installations/51ff1808e4b074ac5c34d7fd
 ```
 
-#### 查询 Installation
+### 查询 Installation
 
 你可以一次通过 GET 请求到 installations 的根 URL 来获取多个安装对象。这项功能在 SDK 中不可用。
 
@@ -237,7 +237,7 @@ curl -X GET \
 
 出于安全性考虑，云端默认未开放 installation 查找权限，所以通常这个接口需要使用 master key 鉴权。
 
-#### 删除 Installaion
+### 删除 Installaion
 
 为了从 LeanCloud 中删除一个安装对象，可以发送 DELETE 请求到相应的 URL。这个功能在客户端 SDK 也不可用。举例：
 
@@ -250,15 +250,13 @@ curl -X DELETE \
 
 出于安全性考虑，云端默认未开放 installation 删除权限，所以通常这个接口需要使用 master key 鉴权。
 
-#### Installation 自动过期和清理
+### Installation 自动过期和清理
 
 每当用户打开应用，我们都会更新该设备的 `_Installation` 表中的 `updatedAt` 时间戳。如果用户长期没有更新 `_Installation` 表的 `updatedAt` 时间戳，也就意味着该用户长期没有打开过应用。当超过 90 天没有打开过应用时，我们会将这个用户在 `_Installation` 表中的记录删除。不过请不要担心，当用户再次打开应用的时候，仍然会自动创建一个新的 Installation 用于推送。
 
 对于 iOS 设备，除了上述过期机制外还多拥有一套过期机制。当我们根据 Apple 推送服务的反馈获取到某设备的 deviceToken 已过期时，我们也会将这个设备在 `_Installation` 表中的信息删除，并标记这个已过期的 deviceToken 为无效，丢弃后续所有发送到该 deviceToken 的消息。
 
-### 
-
-#### API 接口一览
+### API 接口一览
 
 Path|Method|描述
 ---|---|---
@@ -269,16 +267,16 @@ Path|Method|描述
 /1.1/scheduledPushMessages|GET|查询应用下所有的定时推送
 /1.1/scheduledPushMessages/:id|DELETE|根据 ID 删定时推送
 
-#### master key 校验
+### master key 校验
 
 当在**开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置**中点选了 **禁止从客户端进行消息推送** 后，
 必须通过 **master key** 才能发送推送，从而避免了客户端可以不经限制的给应用内任意目标设备推送消息的可能。
 这一限制默认为启用状态。
 我们建议用户都将此限制启用。
 
-#### 消息内容参数
+### 消息内容参数
 
-##### iOS 设备推送消息内容参数
+#### iOS 设备推送消息内容参数
 
 iOS 设备中 data 和 alert 内属性的具体含义请参考：
 1. [Apple 官方关于 Payload Key 的文档](https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/generating_a_remote_notification)，
@@ -287,7 +285,7 @@ iOS 设备中 data 和 alert 内属性的具体含义请参考：
 
 下面是对各属性的一些具体说明：
 
-##### iOS 设备 data 各属性说明
+#### iOS 设备 data 各属性说明
 
 名称|格式|约束|描述
 ---|---|---|---
@@ -314,7 +312,7 @@ target-content-id|字符串|可选|详情见 APNs 文档关于 target-content-id
 }
 ```
 
-##### iOS 设备 alert 各属性说明
+#### iOS 设备 alert 各属性说明
 
 并且 iOS 设备支持 `alert` 本地化消息推送，只需要将上面 `alert` 参数从 String 替换为一个由本地化消息推送属性组成的 JSON 即可：
 
@@ -345,7 +343,7 @@ summary-arg-count|数字|可选|用于设置 Summary 参数数量
 }
 ```
 
-##### iOS 设备 sound 各属性说明
+#### iOS 设备 sound 各属性说明
 
 iOS 支持通过 sound 参数设置推送声音，可以是字符串类型的声音文件名，指向一个在应用内存在的声音文件，或是 JSON 类型：
 
@@ -375,7 +373,7 @@ volume|数字类型|可选|指定声音大小，必须为 0 到 1 之间的小�
 }
 ```
 
-##### iOS 设备其他说明
+#### iOS 设备其他说明
 
 另外，我们也支持按照上述 Apple 官方文档的方式构造推送参数例如：
 
@@ -423,7 +421,7 @@ volume|数字类型|可选|指定声音大小，必须为 0 到 1 之间的小�
 }
 ```
 
-##### Android 设备通用推送消息内容参数
+#### Android 设备通用推送消息内容参数
 
 如果是 Android 设备，默认的消息栏通知消息内容参数支持下列属性：
 
@@ -453,7 +451,7 @@ action|字符串|可选|注册 Receiver 时提供的 action name，仅当需要�
 
 关于 `silent` 参数请参看 [Android 推送区分透传和通知栏消息](#android-推送区分透传和通知栏消息)，关于自定义 Receiver 请参看《Android 消息推送开发指南》的《自定义 Receiver》一节。
 
-##### 为多种类型设备设置不同推送内容
+#### 为多种类型设备设置不同推送内容
 
 单次推送中，如果查询条件覆盖的目标推送设备包含多种类型，如既包含 iOS 设备，又包含云服务自有渠道的 Android 设备，又有混合推送的小米华为设备等，可以为不同推送设备单独填写推送内容参数，我们会按照设备类型取出对应设备类型的推送内容来发推送，例如：
 
@@ -492,7 +490,7 @@ vivo | vivo 推送 （仅国内版适用）
 oppo | oppo 推送 （仅国内版适用）
 fcm | FCM 推送（仅国际版适用）
 
-#### 通过查询条件发推送
+### 通过查询条件发推送
 
 本接口用于根据提供的查询条件，给在 _Installation 表内所有符合查询条件的有效设备记录发推送消息。例如下面是给所有在 _Installation 表中 `channels` 字段包含 `public` 值的有效设备推送一条内容为 `Hello from LeanCloud` 的消息。
 
@@ -568,7 +566,7 @@ _notificationChannel | 可选 | Android 8.0 以上设备在推送时需要传递
 
 下面会举一些例子，更多例子请参考[数据存储 REST API 使用详解](/sdk/storage/guide/rest/)的《查询》一节。
 
-##### 推送给所有的设备
+#### 推送给所有的设备
 
 ```sh
 curl -X POST \
@@ -583,7 +581,7 @@ curl -X POST \
   https://{{host}}/1.1/push
 ```
 
-##### 推送给 android 设备
+#### 推送给 android 设备
 
 ```sh
 curl -X POST \
@@ -601,7 +599,7 @@ curl -X POST \
 https://{{host}}/1.1/push
 ```
 
-##### 推送给 public 频道的设备
+#### 推送给 public 频道的设备
 
 ```sh
 curl -X POST \
@@ -617,7 +615,7 @@ curl -X POST \
   https://{{host}}/1.1/push
 ```
 
-##### 推送给不活跃的设备
+#### 推送给不活跃的设备
 
 ```sh
 curl -X POST \
@@ -637,7 +635,7 @@ curl -X POST \
 https://{{host}}/1.1/push
 ```
 
-##### 推送给自定义属性符合条件的设备
+#### 推送给自定义属性符合条件的设备
 
 ```sh
 curl -X POST \
@@ -657,7 +655,7 @@ curl -X POST \
 
 用 `where` 查询的都是 `_Installations` 表中的属性。这里假设该表存储了 `preOrder` 的布尔属性。
 
-##### 根据地理信息位置做推送
+#### 根据地理信息位置做推送
 
 ```sh
 curl -X POST \
@@ -688,7 +686,7 @@ curl -X POST \
 
 上面的例子假设 installation 有个 owner 属性指向 `_User` 表的记录，并且用户有个 `location` 属性是 GeoPoint 类型，我们就可以根据地理信息位置做推送。
 
-#### 通过设备 ID 列表发推送
+### 通过设备 ID 列表发推送
 
 本接口用于给一批指定的设备 ID 发推送，推送过程因为不用查询目标设备的 Installation 记录，推送速度相对查询方式来说会更快，延迟相对更低。例如下面是给 device token 为 "device_token1", "device_token2", "device_token3" 的 iOS 设备推送一条内容为 `Hello` 的消息。
 
@@ -738,7 +736,7 @@ device_profile | 可选 | ***仅对开启混合推送的设备有效*** 当目�
 
 [android-channel]: https://developer.android.com/guide/topics/ui/notifiers/notifications.html?hl=zh-cn#ManageChannels
 
-#### Android 混合推送多配置区分
+### Android 混合推送多配置区分
 
 如果使用了混合推送功能，并且在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置 > 混合推送** 增加了多个混合推送配置，那么在向 `_Installation` 表保存设备信息时就需要将当前设备所对应的混合推送配置名存入 `deviceProfile` 字段。系统会按照该字段指定的唯一配置名为每个目标设备进行混合推送。
 
@@ -746,7 +744,7 @@ device_profile | 可选 | ***仅对开启混合推送的设备有效*** 当目�
 
 `deviceProfile` 的值必须以字母开头，由大小写字母、数字和下划线组成的字符串，或为空值。
 
-#### Android 推送区分透传和通知栏消息
+### Android 推送区分透传和通知栏消息
 
 Android 推送（包括 Android 混合推送）支持透传和通知栏两种消息类型。透传消息是指消息到达设备后会先交给 LeanCloud Android SDK，再由 SDK 将消息通过自定义 Receiver 传递给开发者，收到消息后的行为由开发者定义的 Receiver 来决定，SDK 不会自动弹出通知栏提醒。而通知栏消息是指消息到达设备后会立即自动弹出通知栏提醒。
 
@@ -755,7 +753,7 @@ Android 推送（包括 Android 混合推送）支持透传和通知栏两种消
 如果不传递 `silent` 则默认其值为 `false`。
 另外请注意，如果希望接收透传消息请不要忘记自行实现自定义 Receiver，参见[Android 推送指南](/sdk/push/guide/android/)的《自定义 Receiver》一节的说明。
 
-#### 过期时间和定时推送
+### 过期时间和定时推送
 
 如上所述，可以用 `expiration_time` 参数指定消息的过期时间：
 
@@ -790,7 +788,7 @@ curl -X POST \
   https://{{host}}/1.1/push
 ```
 
-##### 定时推送任务查询和取消
+#### 定时推送任务查询和取消
 
 调用 `POST /scheduledPushMessages` 接口可以查询当前正在等待推送的定时推送任务，调用这个接口需要使用 **master key**：
 
@@ -852,11 +850,11 @@ curl -X DELETE \
   https://{{host}}/1.1/scheduledPushMessages/1
 ```
 
-##### 使用云引擎实现周期推送
+#### 使用云引擎实现周期推送
 
 可以配合 `云引擎` 的 `定时任务` 功能实现周期推送，非常方便。请阅读《在云引擎中使用推送服务》。
 
-### 推送记录查询
+## 推送记录查询
 
 `/push` 接口在推送后会返回代表该条推送消息的 `objectId`，你可以使用这个 ID 调用下列 API 查询推送记录：
 
@@ -872,7 +870,7 @@ curl -X GET \
 
 将返回推送记录对象，推送记录各字段含义参考[推送通知总览](/sdk/push/guide/overview/)的《Notification》一节。
 
-### 推送状态查看和取消
+## 推送状态查看和取消
 
 在发推送的过程中，我们会随着推送任务的执行更新推送状态到 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 推送记录** 中，可以在这里查看推送的最新状态。对不同推送状态的说明请参看[推送通知总览](/sdk/push/guide/overview/)的《Notification》一节。
 
