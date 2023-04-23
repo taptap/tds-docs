@@ -71,5 +71,5 @@ yarn build --out-dir build-hk
 
 
 # 重置到初始状态
-git clean -df
-git checkout -f
+# git clean -df
+# git checkout -f
