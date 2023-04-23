@@ -1,8 +1,8 @@
 ---
 title: 深入了解云引擎
-sidebar_label: 深入了解
-sidebar_position: 8
 ---
+
+import Mermaid from "/src/docComponents/Mermaid";
 
 :::note
 这篇文档希望向有经验的开发者介绍云引擎背后的更多细节，如希望快速地开始使用云引擎，请查看 [快速开始部署云引擎应用](/sdk/engine/deploy/getting-started)。
@@ -31,7 +31,17 @@ sidebar_position: 8
 
 云引擎针对多种语言提供了构建支持，我们称之为「运行环境（Runtime）」，云引擎会根据项目代码的结构去判断项目的类型，例如根目录包含 `package.json` 就会被认为是 Node.js 项目。
 
-在开发者使用 Git 或命令行工具将代码上传到云引擎后，云引擎就会开始一个「构建」的过程，云引擎会根据项目的运行环境安装依赖（如 `npm install`）、构建可执行文件（如 `go build`）、执行用户自定义的命令（可在 `leanengine.yaml` 中配置）。
+在开发者使用 Git 或命令行工具将代码上传到云引擎后，云引擎就会开始一个「构建」的过程，云引擎会根据项目的运行环境安装依赖（如 `npm install`）、构建可执行文件（如 `go build`）、执行用户自定义的命令（可在 [leanengine.yaml](/sdk/engine/deep-dive/leanengine-yaml) 中配置）。
+
+<Mermaid
+  diagram={`
+flowchart LR
+    Mainfests["依赖清单\\n(package.json)"] -->|install| +Source["完整代码\\n(package.json + *.ts)"]
+    +Source -->|build| Version["版本\\n(bundled.js)"]
+    Version -->|run| Instances1([实例\\nnode ./bundled.js])
+    Version -->|run| Instances2([实例\\nnode ./bundled.js])
+`}
+/>
 
 构建过程最后会生成一个「版本」用于后续的部署，其中包含了应用的源代码、下载的依赖和构建出的可执行文件（部分运行环境），版本有一个类似 20210913-150821 的编号，在应用内是唯一的。
 
