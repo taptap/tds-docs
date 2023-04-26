@@ -1,0 +1,215 @@
+---
+title: FCM Push Guide
+sidebar_label: FCM Push
+sidebar_position: 4
+---
+import CodeBlock from '@theme/CodeBlock';
+import sdkVersions from '/src/docComponents/sdkVersions';
+
+## FCM Push Overview
+
+Since Android 8.0, system permissions have been tightened and the lifecycle of third-party push channels has become more limited. This is why we have introduced our FCM push solution. It guarantees push delivery rate on mainstream Android systems.
+
+In the FCM push solution, the channel used for message delivery is no longer the long WebSocket connection that we maintain ourselves, but the communication is done through FCM.
+A push message is sent in the following way:
+
+1. The developer calls the push API to request a push to all or specific devices;
+2. The cloud push server forwards the request to the FCM;
+3. The FCM sends the push message through the system channel to the mobile phone, while the system message receiver on the mobile phone displays the push message in the notification bar;
+4. The end user clicks on the message and the target application or page is launched.
+
+The whole process is similar to Apple's APNs push, and the SDK is basically not called on the client side.
+
+The Android FCM push feature is only available for apps with Business Plans. If you would like to use this feature, please go to **Developer Center > Your game > Game Services > Cloud Services > Push Notification > Settings > FCM** and enable FCM Push.
+
+Note that FCM push can be turned on and off at any time. If this option is turned off, the next Android push will automatically be sent to the client through our own channel, just like a normal push, with no effect other than the above mentioned issue of our own channel being limited on some ROMs. If this option is enabled again, the push channels of the vendors will be used again.
+
+When FCM push is enabled, a `registrationId` field is added to each device record in the Installation table to record the vendor-assigned registration ID (similar to the device token in APNs), and a `vendor` field is added (if this field does not exist, there is a client integration problem) with a value of `fcm`.
+
+### Displaying Badges or Push Notifications
+
+A badge appears on the application icon when there are new notifications.
+
+### Notification Bar Messages and Pass-Through Messages
+
+FCM supports pass-through messages to applications when the application is in the foreground.
+
+### Offline Push for Instant Messaging
+
+In the Instant Messaging service, offline pushing is available on iOS when the user goes offline. For Android users, there is no offline pushing when using the private channel because chat and push share the same long WebSocket connection, and if the user goes offline in the Instant Messaging service, pushing is necessarily unreachable. However, if FCM push is enabled, Android users have an offline push notification path because the push message goes through FCM, which is essentially the same as on iOS.
+This means that when FCM push is enabled, the offline push and mute mechanisms in Instant Messaging are also available to Android users who use FCM push.
+
+### Limitations
+
+Push message length limit:
+
+- Messages support a maximum of 128 bytes for the application package name and 4KB for the message content.
+
+Minimum Android version requirement:
+
+- FCM push supports Android 4.1 or higher (minSdkVersion: 16).
+
+Description of factors that affect delivery rates:
+
+- Whether the device is online or not. If the device is offline, the push service will cache messages and push them to the device when it is online.
+- Whether the application that integrates the Push Notification SDK is uninstalled on the mobile device.
+- Whether the network status of the mobile device is stable.
+- The security control policy of the mobile device.
+- The delivery of transmissions is affected by the Android system and whether the application is running in the background.
+
+## Integration
+
+FCM push is essentially dependent on the FCM SDK and server-side capabilities. Our client SDK is a wrapper around the FCM SDK and the actual push requests are passed through LeanCloud to the FCM backend. Our client-side SDK may not be able to keep up with the iteration speed of the FCM, so we recommend that you interface directly with the FCM SDK and store the FCM-assigned "registration id" and FCM identifier (see vendor in previous chapter) in the device information table (`Installation`) so that you can then use our push API to correctly send push messages to all devices. This will allow us to send correct push messages to all devices via our push API.
+
+### Integration on the Client Side
+
+The developer inherits their implementation class from `FirebaseMessagingService` and then calls the code in the `onNewToken` callback function to save it as in the example above (remember to replace `vendor` with `fcm`). See [LCFirebaseMessagingService](https://github.com/leancloud/java-unified-sdk/blob/master/android-sdk/leancloud-fcm/src/main/java/cn/leancloud/LCFirebaseMessagingService.java#L69) for sample code.
+
+### Server-Side API for Sending FCM Pushes
+
+See [Push Notification REST API Guide](/sdk/push/guide/rest/).
+
+If you want to integrate our packaged FCM push SDK, you can read on, but if you want to access the FCM SDK yourself, you can ignore the following.
+
+## FCM Push Library Components
+
+[FCM](https://firebase.google.com/docs/cloud-messaging) (Firebase Cloud Messaging) is a service provided by Google/Firebase to send push notification messages to mobile phones. When integrating, the backend must configure the push key and certificate needed to connect to the FCM server, and the FCM-related token is applied by the LeanCloud SDK.
+
+### Environment Requirements
+
+The FCM client must run on a device running Android 4.1 or higher with the Google Play Store application installed, or in an emulator running Android 4.1 with Google API support. See [Set up a Firebase Cloud Messaging client app on Android](https://firebase.google.com/docs/cloud-messaging/android/client) for specific requirements.
+
+### Integrate the SDK
+
+#### Add Firebase Configuration File
+
+Download the latest configuration file (google-services.json) from the Firebase console and add it to the module (application level) directory of the application.
+
+#### Add Google Service Plugin to Gradle
+
+First, add rules to the root (project level) Gradle file (build.gradle) to include the Google services Gradle plugin:
+
+```groovy
+buildscript {
+
+  repositories {
+    // Check that you have the following line (if not, add it):
+    google()  // Google's Maven repository
+  }
+
+  dependencies {
+    // ...
+
+    // Add the following line:
+    classpath 'com.google.gms:google-services:4.3.5'  // Google Services plugin
+  }
+}
+
+allprojects {
+  // ...
+
+  repositories {
+    // Check that you have the following line (if not, add it):
+    google()  // Google's Maven repository
+    // ...
+  }
+}
+```
+
+Then, in the module (application level) Gradle file (usually app/build.gradle), apply the Google services Gradle plugin:
+
+```groovy
+apply plugin: 'com.android.application'
+// Add the following line:
+apply plugin: 'com.google.gms.google-services'  // Google Services plugin
+
+android {
+  // ...
+}
+```
+
+#### Import SDK FCM Package
+
+In the module (application level) Gradle file (usually app/build.gradle), add the dependencies to the dependencies:
+
+<CodeBlock className="xml">
+{`dependencies {
+    implementation 'cn.leancloud:leancloud-fcm:${sdkVersions.leancloud.java}@aar'
+    // For Instant Messaging and Push Notification
+    implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'\n
+    // Import the BoM for the Firebase platform
+    implementation platform('com.google.firebase:firebase-bom:27.0.0')
+    // Declare the dependencies for the Firebase Cloud Messaging and Analytics libraries
+    // When using the BoM, you don't specify versions in Firebase library dependencies
+    implementation 'com.google.firebase:firebase-messaging'
+    implementation 'com.google.firebase:firebase-analytics'
+}`}
+</CodeBlock>
+
+#### Modify the Application Manifest
+
+Add the following to your application's `AndroidManifest` file:
+
+- PushService service.
+    
+    ```xml
+    <service android:name="cn.leancloud.push.PushService"/>
+    ```
+
+- `LCFirebaseMessagingService` service. This service must be added if you want to do any message processing in the background other than receiving application notifications. To receive notifications, receive data payloads, send uplink messages, etc. in the foreground application, you must inherit this service.
+
+    ```xml
+    <service
+      android:name="cn.leancloud.LCFirebaseMessagingService"
+      android:exported="false">
+    <intent-filter>
+      <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+    </intent-filter>
+    </service>
+    ```
+
+- (Optional) The metadata element in the application component used to set the default notification icon and color. If the incoming message does not explicitly set an icon and color, Android uses these values.
+
+    ```xml
+    <meta-data
+      android:name="com.google.firebase.messaging.default_notification_icon"
+      android:resource="@drawable/ic_launcher_background" />
+    <meta-data
+      android:name="com.google.firebase.messaging.default_notification_color"
+      android:resource="@color/colorAccent" />
+    ```
+
+- (Optional) As of Android 8.0 (API level 26), Android supports and recommends the use of [notification channels](https://developer.android.com/develop/ui/views/notifications#ManageChannels). FCM provides default notification channels with basic settings. If you want to [create](https://developer.android.com/develop/ui/views/notifications/channels) and use your own default channels, please set `default_notification_channel_id` to the ID of your notification channel object (as shown below); if the incoming message does not explicitly set a notification channel, FCM will use this value.
+
+    ```xml
+    <meta-data
+      android:name="com.google.firebase.messaging.default_notification_channel_id"
+      android:value="@string/default_notification_channel_id"/>
+    ```
+
+- If FCM is critical to the functionality of your Android app, be sure to set `minSdkVersion 16` or higher in the app's `build.gradle`. This will ensure that the Android app cannot be installed in an environment that does not allow it to function properly.
+
+### Application Initialization
+
+With FCM push, no special initialization is required for the client application. If the registration is successful, a new record should appear in the `_Installation` table with the field **vendor** as `fcm`.
+
+### Configure the Console (Set FCM's ProjectId and Private Key)
+
+You can get the private key file for the server side to send push requests in [Firebase Console](https://console.firebase.google.com/). Associate this file and the ProjectId with the cloud service application via **Developer Center > Your game > Game Services > Cloud Services > Push Notification > Settings > FCM**.
+
+## Unregister FCM Push
+
+For users who are already registered for FCM push, if they want to unregister for FCM push and use the cloud service's own WebSocket instead, they can call the following function:
+
+```java
+LCMixPushManager.unRegisterMixPush();
+```
+
+This function is asynchronous. If the deregistration is successful, the log will say `Registration canceled successfully`. If the deregistration fails, the log will say `unRegisterMixPush error`.
+
+## Suggestions for Troubleshooting
+
+- If there are conditions that are not met when registering, the SDK will log the reason for the registration failure, for example `register error, mainifest is incomplete` means the manifest is not filled correctly. If the registration is successful, the corresponding record in the `_Installation` table should have the field **vendor** that is not null.
+
+- If the registration continues to fail, please submit a ticket or post to the forum with the relevant logs, device model, and system version number, and we will follow up to assist in troubleshooting.
