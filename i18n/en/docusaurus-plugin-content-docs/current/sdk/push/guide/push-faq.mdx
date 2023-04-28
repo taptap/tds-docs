@@ -1,0 +1,201 @@
+---
+title: Push Notification FAQ
+sidebar_label: FAQ
+sidebar_position: 11
+---
+
+### Why is the number of successful devices less than the target number of devices?
+
+The "target number of devices" refers to the number of valid devices that meet the conditions of this push request, and the "number of successful devices" refers to the number of devices that were successfully reached by this push. There are several situations where devices are not reached:
+
+- The application in the Android device is killed and is offline on the network. In this case, the number of successful devices will gradually increase after waiting a while for the devices to come online.
+- The Android user deleted or reinstalled the application to generate new device data, and the previous invalid data is included in the "target device count".
+- The iOS user deleted or reinstalled the app, and the previous invalid data is included in the target device count, and these numbers are the number of invalidTokens.
+
+### Why can I only send messages to devices that have been active in the last three months? Is it possible to send to all devices?
+
+We only allow developers to send messages to devices that have an **updatedAt** value of **within the last three months** in the `_Installation` table. The reason for this is as follows:
+
+- Devices that have been inactive for three months have a very low probability of users opening the push, and we treat these inactive devices as invalid.
+- Cost reasons. Sending push notifications to all devices will tremendously increase the number of invalid devices, thus consuming a large amount of cloud resources, and one of the impacts that can be perceived by users is the push time.
+
+Due to the above considerations, by default we can only send messages to devices that have been active in the last three months. If you really need to send messages to all devices, you can contact us to upgrade to the Enterprise version of the service and we will create a separate cluster for your application to provide the push service.
+
+### Why is the number of target devices in the push record 0?
+
+In the push record of the dashboard, "number of target devices" refers to the number of valid devices that meet the conditions of this push request. If the value is 0, please check **the conditions of the push query and whether the target devices are valid**.
+
+### Why is the contents of the push record empty?
+
+In the push record of the dashboard, if different message contents are set for different target device types, the "Contents" column will be displayed empty. You need to click the "ID" of the message to open the push details to see the specific contents.
+
+### What is the delivery rate for push notifications?
+
+There is no industry standard for delivery rate. We have tested that the delivery rate of messages from online users is basically 100%. Our SDK has heartbeat and reconnect features to maintain a long connection to the push server as much as possible to improve the speed and reliability of messages reaching users' phones.
+
+### When sending push notifications with iOS Token Authentication certificates, is there a difference between test and production environments?
+
+Yes, the prod parameter is used to distinguish between test and production environments. The same key can send messages to both the test and production environments.
+
+However, the same deviceToken can only be used to successfully push to one environment (either the production environment or the test environment). When sending a push notification to a deviceToken, if it works for the dev, you will get the "invalid Tokens" error for the prod.
+
+### Some iOS devices are not receiving pushes, and when I check the push log in the console, I see that the number of invalidTokens is greater than 0. What is going on?
+
+The number of invalidTokens consists of two parts:
+* The number of invalidTokens increases if the selected device does not match the selected certificate, for example, if you are using a development certificate to push to a device with a production certificate. Please check if the APNS certificate is expired and if the correct certificate type is used.
+* The target device has removed or reinstalled the corresponding application.
+* The invalidTokens error is also reported if the team ID is not uploaded when saving the DeviceToken.
+* When uploading a certificate to the dashboard using Token Authentication, an invalidTokens error will also be reported if the TeamID or Topics is entered incorrectly (Topics is the Bundle ID of the application).
+
+### Can I customize the Receiver for Android notifications so that no notification is shown?
+
+Yes. Please refer to the [Push Notification Guide](/sdk/push/guide/rest/#消息内容参数).
+
+If you want to customize the receiver, you must include a custom action in the message data. When the client receives the message, it will send an intent event with the action value you defined, and your receiver must also include an `intent-filter` to catch the intent event with the action value.
+
+### How long is push history kept?
+
+Push history is kept for 7 days. Push history prior to 7 days cannot be reviewed.
+
+### Will both devices receive push messages if the same account is signed in on both devices?
+
+The push is based on the push query criteria, and the target device is found in the _Installation table. If both devices are included in the query criteria, both devices receive the push.
+
+For the Instant Messaging service, if single sign-on is not enabled, when a user logs in on two devices, if the user is offline, the server will send push notifications to both devices.
+
+### The console push log shows a successful push, but the Android device did not actually receive the push. What is the reason for this?
+
+If the number of successes returned is 1, it means that a response must have been received from the SDK confirming receipt of the message. This means that the push message must have reached the device.
+It is recommended to check if the push uses the custom Receiver (whether there is an action field in the message) where the message arrives and the SDK passes it directly to the custom Receiver that completes the push notification. In this case, you must check the custom Receiver implementation logic to troubleshoot why the notification does not pop up when the message arrives.
+
+### Workaround for older versions of the Objective-C SDK not receiving pushes in the iOS 13 environment.
+
+In iOS 13, older versions of the Objc SDK (<= 11.6.6) are unable to upload a valid device token due to Apple's change in the API of the underlying framework.
+
+The workaround is to upgrade the SDK to v11.6.7 and above and save the device token as described in [Save the Token](/sdk/push/guide/ios/#save-the-token).
+
+The workaround for older versions of the Objective-C SDK (<= 11.6.6) is to upload the device token as follows:
+
+```
+NSUInteger dataLength = deviceToken.length;
+if (dataLength > 0) {
+    const unsigned char *dataBuffer = deviceToken.bytes;
+    NSMutableString *hexString = [NSMutableString stringWithCapacity:(dataLength * 2)];
+    for (int i = 0; i < dataLength; ++i) {
+        [hexString appendFormat:@"%02.2hhx", dataBuffer[i]];
+    }
+    [installation setDeviceToken:[hexString copy]];
+    [installation saveInBackground];
+}
+```
+
+### I get the error "Some pushes are rejected by APNs due to BadDeviceToken" when sending push notifications to iOS devices.
+
+This error occurs because the push environment is incorrect. For example, if the push is sent to a device in the test environment using the prod parameter (i.e. `"prod": "dev"`), the device in the production environment will not receive the push.
+Similarly, if you specify to push to the production environment (i.e., `"prod": "prod"`), devices in the test environment will not receive the push.
+For the push environment for iOS, see [Environments](/sdk/push/guide/ios/#environments).
+
+### How do I select a push certificate for iOS?
+The push interface has a parameter called **prod**.
+**This parameter is only valid for iOS push.**
+
+* When sending iOS pushes using Token Authentication, this parameter is used to set whether to send the push to the development (dev) or production (prod) environment of the APNs.
+* For iOS pushes using certificate authentication, this parameter sets whether to use development (dev) or production (prod) certificates. When using the certificate authentication method, if the device has a deviceProfile set in the Installation table, we give priority to pushing with the certificate specified by the deviceProfile.
+
+### How is the deviceToken stored correctly for iOS push?
+
+The device token changes when a user erases their device, restores the app from backup, or installs the app on a new device. To solve this problem, Apple recommends that the app requests the device token of the APNs when opening, and then sets and saves the token. Also, our system keeps track of the update times (`updatedAt`) of all Installation objects and removes the objects that haven’t been updated in a while.
+Sample code can be found in: [iOS Push Guide](/sdk/push/guide/ios/#save-the-token).
+
+### For iOS, what can I do if the app does not receive a push when it is in the foreground?
+
+The push log will show that the push was successfully delivered, but the push is not received on the mobile side. This is because, by default, the push is not displayed in the notification bar when the iOS app is in the foreground. If the app still needs to display the push, you must use the UNUserNotificationCenterDelegate delegate method `userNotificationCenter:willPresentNotification:withCompletionHandler:` to handle how the notification is displayed.
+
+Available methods for displaying the push notification include:
+* UNNotificationPresentationOptionBadge: Adds the value of badge to the application icon.
+* UNNotificationPresentationOptionBanner: Presents the notification with a banner.
+* UNNotificationPresentationOptionList: Display the notification in the notification center.
+* UNNotificationPresentationOptionSound: Play the sound for the notification.
+
+The sample code to display the notification as a banner is as follows:
+
+```objc
+#import "AppDelegate.h"
+#import <LeanCloudObjc/Foundation.h>
+#import <UserNotifications/UserNotifications.h>
+
+@interface AppDelegate ()<UNUserNotificationCenterDelegate>
+@end
+@implementation AppDelegate
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+
+    //The code to initialize the SDK is omitted
+    UNUserNotificationCenter *center = [UNUserNotificationCenter currentNotificationCenter];
+    //Set the delegate object
+    center.delegate = self;
+    return YES;
+}
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center willPresentNotification:(UNNotification *)notification withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler{
+    completionHandler(UNNotificationPresentationOptionBanner);
+}
+```
+
+### How is _Installation associated with the user id in _User in the offline push notification service?
+
+After a user logs in to the Instant Messaging system, the server stores the user's `clientId` in the `channels` field of the device's `_Installation`, completing the association. If the user is offline and there are offline messages to push, the server will go to the `_Installation` table and find the device with the `channels` field containing the target `clientId` to complete the push.
+
+### If there are two applications on the same device, how do I push to the specified application?
+
+The _Installation table holds the installation information generated on the device. A new field can be added to the _Installation table to distinguish between the different applications. When you push a message, if you choose to push to all users, both applications will receive the push. If you want to push to a specific application, you can refer to the push document [Send to Specific Users](/sdk/push/guide/android/#send-to-specific-users) to push only to the specified device.
+
+### What does the valid field in _Installation refer to and why is it false?
+
+`valid` indicates whether the device record is currently valid. `false` means the record is invalid. A possible reason for this is that push has not been used for a long time, or the device is not registered.
+
+For example, if an Android device does not execute the following code to [Enable the Push Notification Service](/sdk/push/guide/android/#enable-the-push-notification-service), the value of valid will always be false.
+
+```
+// Set the default opened Activity
+PushService.setDefaultPushCallback(this, PushDemo.class);
+```
+If a device does not want to receive push notifications, you can also set the valid field of the corresponding installation object in the _Installation table to false.
+
+## Troubleshooting
+
+Troubleshooting push notifications can be tricky because there are many device- and network-related steps involved in the push process, and the calls are asynchronous. Here are some tips to help you troubleshoot push issues.
+
+### Query Push Results
+
+All messages sent through the `/push` interface can be viewed in the push log in the dashboard's message menu. Each time `/push` is invoked, a new push record is created to represent a push. For the meaning of the properties in this table, see [the Notification table](/sdk/push/guide/overview/#notification).
+
+The `/push` interface returns the `objectId` of the newly created push record, so you can look up the results of the push in the push record based on the ID.
+
+### Suggestions for iOS Troubleshooting
+
+Some suggestions for troubleshooting iOS push issues:
+
+* Make sure you are using the correct **Bundle Identifier** in your project's Info.plist file.
+* Make sure the correct **provisioning profile** is set in **Project** > **Build Settings**.
+* Try cleaning the project and restarting Xcode.
+* Try going to [Apple Developer](https://developer.apple.com/account/overview.action) to regenerate the **provisioning profile**, changing the Apple ID, changing it back, and regenerating the profile. You'll need to reinstall the provisioning profile and reset it in **Project** > **Build Settings**.
+* Open XCode Organizer and remove all expired and unused provisioning profiles from your computer and iOS devices.
+* If the app builds and runs fine, but you still don't receive pushes, make sure your app has permission to receive pushes enabled by checking in **Settings** > **Notifications** > **Your App** on your iOS device.
+* If the permissions are also OK, make sure you are using the correct **provisioning profile**. Package your application. If you uploaded a development certificate and pushed with a development certificate, you must build your application using the **Development Provisioning Profile**. If you are uploading a production certificate and pushing with a production certificate, make sure your application is packaged using the **Distribution Provisioning Profile** signature. Both **Ad Hoc** and **App Store Distribution Provisioning Profile** can be used to receive messages sent with a production certificate.
+* When enabling push to an existing Apple ID, remember to regenerate the **provisioning profile** and update it in XCode Organizer.
+* Production push certificates must be enabled and generated before you submit your app to the App Store, or you will need to resubmit it to the App Store.
+* Please test the production environment push using the Ad Hoc Profile before submitting your app to the App Store. This is the configuration closest to the one used by the App Store.
+* Check the `devices` and `status` in the push log to make sure the push status and number of receiving devices are normal.
+* Check the `invalidTokens` field in the push log. If the number is abnormally high, the certificate may have been misselected and does not match the provisioning profile of the device build.
+* It is recommended that you use a serial queue for the installation to avoid a crash when saving the installation due to multi-threaded writes. You can see the [VoIP project in the Swift demo][swift-voip-demo].
+
+[swift-voip-demo]: https://github.com/leancloud/swift-sdk-demo#voip
+
+### Suggestions for Android Troubleshooting
+
+Some suggestions for troubleshooting Android push issues:
+
+* Make sure the device has called `AVInstallation` correctly to store device information in the _Installation table.
+* You can check if the device is online with `installationId` in the dashboard at **Push Notification** > **Devices**.
+* Make sure that `com.avos.avoscloud.PushService` is added to the AndroidManifest.xml file.
+* If you are using a custom Receiver, make sure you declare your Receiver in the AndroidManifest.xml and make sure the action is consistent in the data.
