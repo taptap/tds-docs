@@ -1,0 +1,145 @@
+---
+title: 'Reference: leanengine.yaml'
+sidebar_label: 'leanengine.yaml'
+---
+
+import { Conditional } from "/src/docComponents/conditional";
+
+`leanengine.yaml` 是一个用来自定义云引擎线上运行环境的配置文件，需要放置在项目的根目录，使用 YAML 语法。
+
+## `runtime` 覆盖运行环境
+
+覆盖自动识别的运行环境，可选的值：
+
+- `cpp`
+- `dotnet`
+- `go`
+- `java`
+- `nodejs`
+- `php`
+- `python`
+- `static`（Web 前端）
+
+## `run` 覆盖运行命令
+
+```yaml
+run: $(npm bin)/serve -c static.json -l ${LEANCLOUD_APP_PORT}
+```
+
+支持 Shell 语法（如引用环境变量等）。
+
+## `install` 覆盖依赖安装命令
+
+覆盖默认的依赖安装命令（如 `npm install`），或在安装依赖前后运行自定义命令，支持用数组来表示多条命令，支持 Shell 语法、引用环境变量。
+
+多数运行环境有默认的依赖安装命令，可以用 `use: default` 来引用默认的命令：
+
+```yaml
+install:
+  - use: default
+  - npm run install-additional
+```
+
+依赖安装步骤默认只会将依赖清单（如 `package.json` 等文件）加入构建目录，如需其他文件可以用 `require` 来引入：
+
+```yaml
+install:
+  - require:
+    - frontend/package.json
+    - frontend/package-lock.json
+  - cd frontend && npm ci
+```
+
+## `build` 覆盖构建命令
+
+```yaml
+build: NODE_ENV=production $(npm bin)/webpack
+```
+
+像 `install` 一样用 `use: default` 来引用默认命令，支持用数组来表示多条命令，支持 Shell 语法、引用环境变量。
+
+在构建阶段全部代码文件都已经被加入了构建目录，可以使用所有的文件。
+
+## `systemDependencies` 系统级依赖
+
+在部署时安装额外的系统级依赖：
+
+```yaml
+systemDependencies:
+  - imagemagick
+```
+
+- `ffmpeg` 一个音视频处理工具库。
+- `imagemagick` 一个图片处理工具库。
+- `fonts-wqy` 文泉驿点阵宋体、文泉驿微米黑字体，通常和 `chrome-headless` 配合来显示中文。
+- `fonts-noto` 思源黑体字体（体积较大），通常和 `chrome-headless` 配合来显示中文。
+- ~~`phantomjs` 一个无 UI 的 WebKit 浏览器~~（该项目已停止维护）。
+- `chrome-headless` 一个无 UI 的 Chrome 浏览器（体积很大，会显著增加部署耗时，运行时也会消耗大量 CPU 和内存；如果使用 `puppeteer` 的话，需要给 `puppeteer.launch` 传递这些参数：`{executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox', '--disable-setuid-sandbox']}`）。
+- `node-canvas` 安装 [node-canvas](https://github.com/Automattic/node-canvas) 所需要的系统级依赖（你仍需要自行安装 `node-canvas`）。
+- `python-talib` [TA-Lib](https://pypi.org/project/TA-Lib/) 所需的系统依赖（你仍需要自行安装 `TA-Lib`）。
+
+:::caution
+注意添加系统依赖将会显著增加部署耗时，因此请不要添加未用到的依赖。
+:::
+
+## `buildRoot` 构建根目录
+
+指定代码包或仓库中的一个子目录进行构建，相当于只上传了这一个子目录的代码。
+
+## `exposeEnvironmentsOnBuild` 在构建阶段使用环境变量
+
+默认情况下，应用在运行阶段才能够读取到内置环境变量和自定义环境变量，设置该选项可以在安装依赖或编译阶段读取到这些环境变量。
+
+```yaml
+exposeEnvironmentsOnBuild: true
+```
+
+云引擎运行环境默认提供的环境变量（以及 Node.js 环境变量 NODE_ENV）无法被自定义环境变量覆盖。
+
+## `startupTimeout` 启动超时
+
+```yaml
+startupTimeout: 60
+```
+
+配置程序启动的超时时间，可设置 15 - 120 的值（秒）
+
+## `functionsMode` 云函数功能开关
+
+控制项目是否使用云函数（Hook）特性。
+
+```yaml
+functionsMode: strict
+```
+
+设置为 `strict` 表示需要使用云函数特性，如获取云函数信息失败则中断部署；设置为 `disabled` 表示不开启云函数相关功能。
+
+<Conditional brand='tds'>
+
+## `extraPorts` 暴露 TCP 或 UDP 端口
+
+```yaml title='leanengine.yaml'
+extraPorts:
+  - name: echo
+    protocol: udp
+    containerPort: 4000
+  - name: game
+    protocol: tcp
+    containerPort: 4000
+```
+
+最多可以配置 5 个端口，是游戏后端功能（[云引擎游戏后端开发指南](/sdk/engine/game/guides)）的一部分。
+
+</Conditional>
+
+## ~~Node.js `installDevDependencies` 安装开发依赖~~
+
+:::caution
+已废弃，请使用 `package-lock.json`。
+:::
+
+```yaml
+installDevDependencies: true
+```
+
+安装 `package.json` 中 `devDependencies` 部分的依赖。

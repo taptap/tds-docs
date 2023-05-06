@@ -1,8 +1,8 @@
 ---
 title: Deep Dive Into Cloud Engine
-sidebar_label: Deep Dive
-sidebar_position: 8
 ---
+
+import Mermaid from "/src/docComponents/Mermaid";
 
 :::note
 This article is intended to introduce the technical specifications of Cloud Engine to experienced developers. For instructions on how to get started with Cloud Engine, see [Getting Started With Cloud Engine](/sdk/engine/deploy/getting-started).
@@ -31,7 +31,17 @@ The design of Cloud Engine is greatly inspired by [The Twelve-Factor App](https:
 
 Cloud Engine can be used to build projects in different languages (runtime environments). When you deploy a project to Cloud Engine, Cloud Engine will be able to tell the type of the project according to the project’s code. For example, if the project contains `package.json`, it will be considered a Node.js project.
 
-Once you upload your project’s code to Cloud Engine with Git or the CLI, Cloud Engine will start a _build process_ during which the dependencies of your project will be installed (`npm install`), executable files will be created (`go build`), and your custom commands will be executed (can be configured in `leanengine.yaml`).
+Once you upload your project’s code to Cloud Engine with Git or the CLI, Cloud Engine will start a _build process_ during which the dependencies of your project will be installed (`npm install`), executable files will be created (`go build`), and your custom commands will be executed (can be configured in [leanengine.yaml](/sdk/engine/deep-dive/leanengine-yaml)).
+
+<Mermaid
+  diagram={`
+flowchart LR
+    Mainfests["Dependency list\\n(package.json)"] -->|install| +Source["Full code\\n(package.json + *.ts)"]
+    +Source -->|build| Version["Version\\n(bundled.js)"]
+    Version -->|run| Instances1([Instance\\nnode ./bundled.js])
+    Version -->|run| Instances2([Instance\\nnode ./bundled.js])
+`}
+/>
 
 A _version_ will be created by the end of the build process. It contains the source code of your project, the dependencies downloaded, and the executable files generated (for certain runtime environments). Each version has an ID like `20210913-150821`, which is unique in the application.
 

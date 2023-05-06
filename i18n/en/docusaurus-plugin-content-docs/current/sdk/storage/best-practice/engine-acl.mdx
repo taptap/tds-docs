@@ -1,0 +1,98 @@
+---
+title: Using ACL in Cloud Engine
+slug: /sdk/storage/guide/engine-acl/
+sidebar_position: 3
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+**[Cloud Engine](https://developer.taptap.cn/docs/sdk/engine/overview/)** offers a way for you to define logic on the cloud to perform certain actions when certain events happen. When you need to print logs, verify permissions, or enforce ACL settings on data operations initiated by clients, this could be very helpful. See **[Cloud Functions and Hooks](/sdk/engine/functions/getting-started/)** for more information.
+
+## Requirements
+
+We have mentioned the requirements above to help you better understand the following requirement description:
+
+Imagine that you are building an application for iOS, Android, and web (JavaScript), and you need to implement a function that adds permission settings to all the objects created. Traditionally, you will need to write the same function in different languages for each platform. But now you can write the same function only once and put it on the cloud, which makes the development process way easier.
+
+## Use Cases
+
+Let's start with a simple example:
+
+We want the administrator to have read and write access to every post made by a user from a client, be it iOS or Android.
+
+To get started, we need to write our Cloud Engine hook function (see [BeforeSave](/sdk/engine/functions/guides/#beforesave) for an introduction to Cloud Engine hook functions):
+
+<Tabs>
+
+<TabItem value="nodejs" label="Node.js" default>
+
+```js
+AV.Cloud.beforeSave('Post', (request) => {
+  const post = request.object;
+  if (post) {
+    var acl = new AV.ACL();
+    acl.setPublicReadAccess(true);
+    // Assuming a role named `admin` exists
+    acl.setRoleWriteAccess('admin', true);
+    post.setACL(acl);
+  } else {
+    throw new AV.Cloud.Error('Invalid Post object.');
+  }
+});
+```
+
+</TabItem>
+
+<TabItem value="python" label="Python">
+
+```python
+@engine.before_save('Post')
+def before_post_save(post):
+    acl = leancloud.ACL()
+    acl.set_public_read_access(True)
+    # Assuming a role named `admin` exists
+    admin = leancloud.Role('admin')
+    acl.set_role_write_access(admin, True)
+    post.set_acl(acl)
+```
+
+</TabItem>
+
+<TabItem value="php" label="PHP">
+
+```php
+Cloud::beforeSave("Post", function($post, $user) {
+  $acl = new ACL();
+  $acl->setPublicReadAccess(true);
+  // Assuming a role named `admin` exists
+  $acl->setRoleWriteAccess("admin", true);
+  $post->setACL($acl);
+});
+```
+
+</TabItem>
+
+<TabItem value="java" label="Java">
+
+```java
+@EngineHook(className = "Post", type = EngineHookType.beforeSave)
+public static AVObject postBeforeSaveHook(AVObject post) throws Exception {
+  AVACL acl = new AVACL();
+  acl.setPublicReadAccess(true);
+  // Assuming a role named `admin` exists
+  acl.setRoleWriteAccess("admin", true);
+  post.setACL(acl);
+  return post;
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+After [deploying the code to the cloud](/sdk/engine/functions/getting-started/#deploy-to-cloud-engine), every post created on the client side from now on will automatically have the following ACL:
+
+```json
+{"*":{"read":true},"role:admin":{"write":true}}
+```

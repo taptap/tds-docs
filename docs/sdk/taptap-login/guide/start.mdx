@@ -150,6 +150,37 @@ SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选�
 </plist>
 ```
 
+#### 配置跳转 TapTap 应用
+
+用户无 TapTap 应用时，默认会通过 WebView 登录。
+
+1. 打开 `info.plist`，添加如下配置（请替换 `clientID` 为你在控制台获取的 Client ID）：
+
+   ![](/img/tap_ios_info.png)
+
+   ```xml
+   <key>CFBundleURLTypes</key>
+   <array>
+       <dict>
+           <key>CFBundleTypeRole</key>
+           <string>Editor</string>
+           <key>CFBundleURLName</key>
+           <string>taptap</string>
+           <key>CFBundleURLSchemes</key>
+           <array>
+               <!-- 这里注意下，中括号需要去掉，最终是 Client ID 前拼接上 `tt` 的形式，例如：ttFwFdCxxxxxxxQDQwQN -->
+               <string>tt[clientID]</string>
+           </array>
+       </dict>
+   </array>
+
+   <key>LSApplicationQueriesSchemes</key>
+   <array>
+     <string>tapiosdk</string>
+     <string>tapsdk</string>
+   </array>
+   ```
+
 </>
 <>
 
@@ -536,7 +567,7 @@ try
     // 在 iOS、Android 系统下会唤起 TapTap 客户端或以 WebView 方式进行登录
     // 在 Windows、macOS 系统下显示二维码（默认）和跳转链接（需配置）
     var tdsUser = await TDSUser.LoginWithTapTap();
-    Debug.Log($"login sucess:{tdsUser}");
+    Debug.Log($"login success:{tdsUser}");
     // 获取 TDSUser 属性
     var objectId = tdsUser.ObjectId;     // 用户唯一标识
     var nickname = tdsUser["nickname"];  // 昵称
