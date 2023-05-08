@@ -25,7 +25,7 @@ yarn start --locale en
     * 参考下文介绍的目录结构，在 docs（中文文档）目录下修改文档内容。
     * 注意要同时在 i18n/en/docusaurus-plugin-content-docs/current（英文文档）目录下同步修改英文文档。
     * 插入配图、图表和 PPT 等，可参考下文详细介绍。
-* 预览文档。运行 `yarn` 命令安装所需要依赖， 运行 `yarn star` 命令可以本地预览。
+* 预览文档。运行 `yarn` 命令安装所需要依赖，运行 `yarn start` 命令可以本地预览。
 * 预览没问题后，提交修改并发起 Pull Request，并指定 Reviewer。
     * Reviewer 同意修改后，才可以合并 Pull Request。如果不知道该设置谁作为 Reviewer，可以指给技术支持同事（fuchenshi、SXiaoXu、WatchMan-Wang、yuwenjian）。
     * Pull Request 合并后，会自动发布上线。文档每隔半小时自动检测是否有更新，如果有更新会自动部署。
