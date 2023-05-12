@@ -14,6 +14,49 @@ import {Conditional} from '/src/docComponents/conditional';
 TapSDK 提供了一套可供游戏开发者收集账号数据的 API。
 系统会收集账号数据并进行分析，最终形成数据报表，帮助游戏开发者分析账号行为并优化游戏。
 
+## 环境要求
+
+<MultiLang kind="ue">
+
+<>
+
+- Unity 2019.4 或更高版本
+- iOS 10 或更高版本
+- Android 5.0（API level 21）或更高版本
+
+</>
+
+<>
+
+Android 5.0（API level 21）或更高版本
+
+</>
+
+<>
+
+iOS 10 或更高版本
+
+</>
+
+<>
+
+- 安装 UE 4.26 及以上版本
+- iOS 12 或更高版本
+- Android 5.0（API level 21）或更高版本
+- macOS 10.14.0 或更高版本
+- Windows 7 或更高版本
+
+**支持平台**：Android / iOS / Windows / macOS
+
+</>
+
+</MultiLang>
+
+## 集成前准备
+
+1. 参考 [准备工作](/sdk/start/get-ready/) 创建应用、开启应用配置开通数据分析服务、绑定 API 域名；
+
+
 ## SDK 集成
 
 请先[下载](/tap-download) TapSDK，并添加相关依赖。
@@ -28,10 +71,7 @@ Unity v3.7.1 及更高版本，还需要导入 `com.leancloud.storage`。
 
 <CodeBlock className="language-json">
 {`"dependencies":{
-    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}",
     "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
-    "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#${sdkVersions.taptap.unity}",
-    "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}",
     "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
     // 数据分析
     "com.taptap.tds.tapdb": "https://github.com/TapTap/TapDB-Unity.git#${sdkVersions.taptap.unity}",
@@ -51,13 +91,9 @@ Unity v3.7.1 及更高版本，还需要导入 `com.leancloud.storage`。
 }
 dependencies {
     // ...
-    implementation (name:'TapBootstrap_${sdkVersions.taptap.android}', ext:'aar')  // 必选： TapSDK 启动器
     implementation (name:'TapCommon_${sdkVersions.taptap.android}', ext:'aar') // 必选：TapSDK 基础库
-    implementation (name:'TapLogin_${sdkVersions.taptap.android}', ext:'aar') // 必选：TapTap 登录
-    implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
-    implementation 'cn.leancloud:storage-android:${sdkVersions.leancloud.java}'
-    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
     implementation (name:'TapDB_${sdkVersions.taptap.android}', ext:'aar') // 数据统计
+    implementation 'cn.leancloud:storage-android:${sdkVersions.leancloud.java}'
 }`}
 </CodeBlock>
 </>
@@ -83,7 +119,8 @@ TapDB.framework`}
 名词 | 含义 | 备注
 --- | --- | ---
 AdSupport.framework | 用来获取设备广告标识，跟踪设备
-AdService.framework | 广告框架 | 设置为 optional
+iAd.framework | 广告框架 | 设置为 optional
+AdServices.framework | 广告框架 | 设置为 optional
 AppTrackingTransparency.framework | iOS 14 新增 app 追踪框架（若无需在 iOS 14 以上追踪 IDFA 可不添加该依赖） | 设置为 optional
 SystemConfiguration.framework |
 CoreMotion.framework |
@@ -98,16 +135,6 @@ libsqlite3.0.tbd |
 </>
 
 <>
-
-#### 环境要求
-
-* 安装 UE 4.26 及以上版本
-* iOS 12 或更高版本
-* Android 5.0（API level 21）或更高版本
-* macOS 10.14.0 或更高版本
-* Windows 7 或更高版本
-
-**支持平台**：iOS / Android / Windows / macOS
 
 #### 安装插件
 
@@ -145,7 +172,7 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core",
 ## 初始化 SDK
 
 
-初始化 SDK 并上报一个设备登录（ `device_login` ）事件，调用这个接口是使用其它接口的先决条件，需要尽早调用。
+初始化 SDK 并上报一个设备登录（ `device_login` ）事件，调用这个接口是使用其它接口的先决条件，需要尽早调用。 
 
 
 :::info
@@ -154,7 +181,7 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core",
 
 ### TapSDK 初始化 {#tapsdk-init}
 
-在 TapSDK 初始化时，同步初始化 TapDB。
+如果项目中同时集成[内建账户系统的 TapTap 登录](/sdk/taptap-login/guide/start/#sdk-初始化)并完成了初始化，需要在此基础上添加 TapDBConfig 配置，即可同步初始化 TapDB。代码如下：
 
 <MultiLang kind="ue">
 
@@ -365,7 +392,7 @@ AdvertiserIDCollectionEnabled | 否 | IDFA 开关，请参考 [收集设备指�
 
 </MultiLang>
 
-### TapDB 单独使用
+### TapDB 单独初始化
 
 在单独使用 TapDB 功能时（即不接登录功能时，不导入 `TapBootstrap` 包时），可以通过以下方式初始化 TapDB。
 

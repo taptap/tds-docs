@@ -12,6 +12,27 @@ yarn start --locale en
 
 注意：`yarn start` 并不会检查坏链。如需检查坏链，需要运行 `yarn build`。坏链检查只会检查文档内部链接指向的页面是否存在，不会检查指向第三方网站的外部链接，也不会检查页内链接（hash link）。
 
+## 贡献
+
+我们欢迎所有 TapTap 用户以及公司同事修改文档或提交 issue 为我们贡献或者修正错误，TapTap 衷心感谢您的贡献。
+
+**贡献方法及注意事项：**
+
+* Fork 这个项目。
+* 切换到本地 master 分支，git fetch 拉取远端最新修改到本地，如果远端 master 分支有修改，则将本地 master 分支 rebase 到最新的 master 分支上。
+* 在 master 上新建分支，在新分支修改文档。
+* 修改文档。
+    * 参考下文介绍的目录结构，在 docs（中文文档）目录下修改文档内容。
+    * 注意要同时在 i18n/en/docusaurus-plugin-content-docs/current（英文文档）目录下同步修改英文文档。
+    * 插入配图、图表和 PPT 等，可参考下文详细介绍。
+* 预览文档。运行 `yarn` 命令安装所需要依赖，运行 `yarn start` 命令可以本地预览。
+* 预览没问题后，提交修改并发起 Pull Request，并指定 Reviewer。
+    * Reviewer 同意修改后，才可以合并 Pull Request。如果不知道该设置谁作为 Reviewer，可以指给技术支持同事（fuchenshi、SXiaoXu、WatchMan-Wang、yuwenjian）。
+    * Pull Request 合并后，会自动发布上线。文档每隔半小时自动检测是否有更新，如果有更新会自动部署。
+    * Pull Request 合并后，可删除当前分支。
+    * 可参考 [Git Commit 日志风格指南](https://open.leancloud.cn/git-commit-message/)
+* 文档规范可参考 [中文文案风格指南](https://blog.taptap.dev/pages/chinese-copywriting-guide)。
+
 ## 目录结构
 
 ```
