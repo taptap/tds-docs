@@ -1,71 +1,71 @@
 ---
-title: 推送 REST API
+title: Push Notification REST API
 sidebar_position: 8
 ---
 
 import { Conditional } from "/src/docComponents/conditional";
 
-当 App 安装到用户设备后，如果要使用推送功能，云服务 SDK 会自动生成一个 Installation 对象。Installation 对象包含了推送所需要的所有信息。你可以使用 REST API，通过 Installation 对象进行推送。
+Once the application is installed on the user's device, the SDK automatically generates an Installation object when you use the push feature. The Installation object contains all the information needed to send push notifications. You can use the REST API to push through the Installation object.
 
-请求的 Base URL 可以在**开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 即时通讯 > 设置**查看。
-对于 POST 和 PUT 请求，请求的主体必须是 JSON 格式，而且 HTTP Header 的 Content-Type 需要设置为 `application/json`。
+The base URL for the request can be found at **Developer Center > Your game > Game Services > Cloud Services > Instant Messaging > Settings**.
+For POST and PUT requests, the request body must be in JSON format and the Content-Type of the HTTP header must be set to `application/json`.
 
-请求的鉴权是通过 HTTP Header 里面包含的键值对来进行的，详见《存储 REST API》中 [请求格式](/sdk/storage/guide/rest/#请求格式) 一节的说明。
+Requests are authenticated by the key-value pairs contained in the HTTP header, as described in the [Request Format](/sdk/storage/guide/rest/#request-format) section of the *Data Storage REST API*.
 
 ## Installation
 
-你可以通过 REST API 在云端增加安装对象。
-使用 REST API 还可以达成一些客户端 SDK 无法完成的操作，比如查询所有的 installation 来找到一个 channel 的订阅者的集合。
+You can add Installation objects to the cloud using the REST API.
+Using the REST API also allows you to do things that the client SDK cannot do, such as querying all Installations to find a collection of subscribers to a channel.
 
 <table>
   <thead>
     <tr>
       <th>URL</th>
       <th>HTTP</th>
-      <th>功能</th>
+      <th>Function</th>
     </tr>
   </thead>
   <tbody>
     <tr>
       <td>/1.1/installations</td>
       <td>POST</td>
-      <td>上传安装数据</td>
+      <td>Upload Installation</td>
     </tr>
     <tr>
       <td>/1.1/installations/&lt;objectId&gt;</td>
       <td>GET</td>
-      <td>获取安装数据</td>
+      <td>Get Installation</td>
     </tr>
     <tr>
       <td>/1.1/installations/&lt;objectId&gt;</td>
       <td>PUT</td>
-      <td>更新安装数据</td>
+      <td>Update Installation</td>
     </tr>
     <tr>
       <td>/1.1/installations</td>
       <td>GET</td>
-      <td>查询安装数据</td>
+      <td>Query Installation</td>
     </tr>
     <tr>
       <td>/1.1/installations/&lt;objectId&gt;</td>
       <td>DELETE</td>
-      <td>删除安装数据</td>
+      <td>Delete Installation</td>
     </tr>
   </tbody>
 </table>
 
-### 增加 Installation
+### Add Installation
 
-创建一个安装对象和普通的对象差不多，只是不同平台有不同的字段。
+Creating an Installation object is similar to creating a normal object, except that different platforms have different fields.
 
-创建成功后，HTTP 的返回值为 **201 Created**，Location header 包括了新的安装的 URL：
+Upon successful creation, the HTTP return value is **201 Created** and the Location header contains the URL of the new Installation:
 
 ```sh
 Status: 201 Created
 Location: https://{{host}}/1.1/installations/51ff1808e4b074ac5c34d7fd
 ```
 
-返回的 body 是一个 JSON 对象，包括了 objectId 和 createdAt 这个创建对象的时间戳。
+The body returned is a JSON object, including the objectId and createdAt, the timestamp of the created object.
 
 ```json
 {
@@ -76,7 +76,7 @@ Location: https://{{host}}/1.1/installations/51ff1808e4b074ac5c34d7fd
 
 #### DeviceToken
 
-iOS 设备通常使用 DeviceToken 来唯一标识一台设备。
+iOS devices typically use DeviceToken to uniquely identify a device.
 
 ```sh
 curl -X POST \
@@ -95,7 +95,7 @@ curl -X POST \
 
 #### installationId
 
-对于 Android 设备，SDK 会自动生成 uuid 作为 installationId 保存到云端。
+For Android devices, the SDK will automatically generate a uuid as the installationId to store in the cloud.
 
 ```sh
 curl -X POST \
@@ -112,11 +112,11 @@ curl -X POST \
   https://{{host}}/1.1/installations
 ```
 
-`installationId` 必须在应用内唯一。
+The `installationId` must be unique within the application.
 
-### 获取 Installation
+### Get Installation
 
-你可以通过 GET 方法请求创建的时候 Location 表示的 URL 来获取 Installation 对象。比如，获取上面创建的对象：
+You can get an Installation object by requesting the URL represented by the Location at the time of creation using the GET method. For example, to get the object created above:
 
 ```sh
 curl -X GET \
@@ -125,7 +125,7 @@ curl -X GET \
   https://{{host}}/1.1/installations/51ff1808e4b074ac5c34d7fd
 ```
 
-返回的 JSON 对象包含所有用户提供的字段，加上 createdAt、updatedAt 和 objectId 字段：
+The returned JSON object contains all of the fields provided by the user, as well as the createdAt, updatedAt, and objectId fields:
 
 ```json
 {
@@ -140,9 +140,9 @@ curl -X GET \
 }
 ```
 
-### 更新 Installation
+### Update Installation
 
-安装对象可以向相应的 URL 发送 PUT 请求来更新。例如，通过设置 `channels` 属性来订阅某个推送频道：
+The Installation object can be updated by sending a PUT request to the appropriate URL. For example, to subscribe to a push channel, set the `channels` property to:
 
 ```sh
 curl -X PUT \
@@ -160,7 +160,7 @@ curl -X PUT \
   https://{{host}}/1.1/installations/51ff1808e4b074ac5c34d7fd
 ```
 
-再比如退订一个频道：
+To unsubscribe from a channel:
 
 ```sh
 curl -X PUT \
@@ -176,9 +176,9 @@ curl -X PUT \
   https://{{host}}/1.1/installations/51ff1808e4b074ac5c34d7fd
 ```
 
-`channels` 本质上是数组属性，因此可以使用标准的数组操作。
+`channels` is essentially an array property, so you can use standard array operations.
 
-又比如添加自定义属性：
+Another example is adding custom attributes:
 
 ```sh
 curl -X PUT \
@@ -186,16 +186,16 @@ curl -X PUT \
   -H "X-LC-Key: {{appkey}}"        \
   -H "Content-Type: application/json" \
   -d '{
-        "userObjectId": "<用户的 objectId>"
+        "userObjectId": "<user's objectId>"
       }' \
   https://{{host}}/1.1/installations/51ff1808e4b074ac5c34d7fd
 ```
 
-### 查询 Installation
+### Query Installation
 
-你可以一次通过 GET 请求到 installations 的根 URL 来获取多个安装对象。这项功能在 SDK 中不可用。
+You can retrieve multiple Installations at once by sending a GET request to the root URL of installations. This feature is not available in the SDK.
 
-没有任何 URL 参数的话，一个 GET 请求会列出所有安装：
+Without any URL parameters, a GET request will list all Installations:
 
 ```sh
 curl -X GET \
@@ -204,7 +204,7 @@ curl -X GET \
   https://{{host}}/1.1/installations
 ```
 
-返回的 JSON 对象的 results 字段包含了所有的结果：
+The result field of the returned JSON object contains all results:
 
 ```json
 {
@@ -233,13 +233,13 @@ curl -X GET \
 }
 ```
 
-所有对普通的对象的查询都对 installation 对象起作用，所以可以查看之前的查询部分以获取详细信息。通过做 channels 的数组查询，你可以查找一个订阅了给定的推送频道的所有设备。
+All queries on normal objects work on Installation objects, so see the previous queries section for details. An array query of channels allows you to find all devices subscribed to a particular push channel.
 
-出于安全性考虑，云端默认未开放 installation 查找权限，所以通常这个接口需要使用 master key 鉴权。
+For security reasons, the Installation lookup permission is not open by default in the cloud, so this interface typically requires master key authentication.
 
-### 删除 Installation
+### Delete Installation
 
-为了从 LeanCloud 中删除一个安装对象，可以发送 DELETE 请求到相应的 URL。这个功能在客户端 SDK 也不可用。举例：
+To remove an Installation from LeanCloud, you can send a DELETE request to the appropriate URL, which is also not available in the client SDK. Example:
 
 ```sh
 curl -X DELETE \
@@ -248,63 +248,63 @@ curl -X DELETE \
   https://{{host}}/1.1/installations/51fcb74ee4b074ac5c34cf85
 ```
 
-出于安全性考虑，云端默认未开放 installation 删除权限，所以通常这个接口需要使用 master key 鉴权。
+For security reasons, the Installation deletion permission is not open by default in the cloud, so this interface typically requires master key authentication.
 
-### Installation 自动过期和清理
+### Automatic Installation Expiration and Cleanup
 
-每当用户打开应用，我们都会更新该设备的 `_Installation` 表中的 `updatedAt` 时间戳。如果用户长期没有更新 `_Installation` 表的 `updatedAt` 时间戳，也就意味着该用户长期没有打开过应用。当超过 90 天没有打开过应用时，我们会将这个用户在 `_Installation` 表中的记录删除。不过请不要担心，当用户再次打开应用的时候，仍然会自动创建一个新的 Installation 用于推送。
+Whenever a user opens an application, we update the `updatedAt` timestamp in the `_Installation` table for that device. If the user has not updated the `updatedAt` timestamp in the `_Installation` table for a long time, it means that the user has not opened the application for a long time. If the user has not opened the application for more than 90 days, we will remove the user's record from the `_Installation` table. But don't worry, if the user opens the application again, a new Installation will be automatically created for pushing.
 
-对于 iOS 设备，除了上述过期机制外还多拥有一套过期机制。当我们根据 Apple 推送服务的反馈获取到某设备的 deviceToken 已过期时，我们也会将这个设备在 `_Installation` 表中的信息删除，并标记这个已过期的 deviceToken 为无效，丢弃后续所有发送到该 deviceToken 的消息。
+For iOS devices, there is another expiration mechanism in addition to the one described above. When we get feedback from Apple's push service that a device's deviceToken has expired, we also remove the device from the `_Installation` table, mark the expired deviceToken as invalid, and discard any subsequent messages sent to the deviceToken.
 
-### API 接口一览
+### API Interfaces at a Glance
 
-Path|Method|描述
+Path|Method|Description
 ---|---|---
-/1.1/push|POST|推送通知
-/1.1/notifications|GET|查询推送记录
-/1.1/notifications/:notification_id|GET|根据 ID 查推送记录
-/1.1/notifications/:notification_id|DELETE|根据 ID 删推送记录
-/1.1/scheduledPushMessages|GET|查询应用下所有的定时推送
-/1.1/scheduledPushMessages/:id|DELETE|根据 ID 删定时推送
+/1.1/push|POST|Send a push notification
+/1.1/notifications|GET|Get push records
+/1.1/notifications/:notification_id|GET|Get a push record by its ID
+/1.1/notifications/:notification_id|DELETE|Delete a push record by its ID
+/1.1/scheduledPushMessages|GET|Get all scheduled push notifications
+/1.1/scheduledPushMessages/:id|DELETE|Delete a scheduled push notification by its ID
 
-### master key 校验
+### master key Verification
 
-当在**开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置**中点选了 **禁止从客户端进行消息推送** 后，
-必须通过 **master key** 才能发送推送，从而避免了客户端可以不经限制的给应用内任意目标设备推送消息的可能。
-这一限制默认为启用状态。
-我们建议用户都将此限制启用。
+If **Prevent clients from sending push notifications** is checked in **Developer Center > Your game > Game Services > Cloud Services > Push Notification > Settings**,
+you will need to pass the **master key** to send pushes, which will prevent the client from being able to push messages to any target device in the app without restriction.
+This restriction is enabled by default.
+We recommend that all users enable this restriction.
 
-### 消息内容参数
+### Message Content Parameters
 
-#### iOS 设备推送消息内容参数
+#### iOS Device Push Message Content Parameters
 
-iOS 设备中 data 和 alert 内属性的具体含义请参考：
-1. [Apple 官方关于 Payload Key 的文档](https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/generating_a_remote_notification)，
-2. [Apple 官方关于 Request Header 的文档](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingwithAPNs.html)，以及
-3. [Apple 官方关于 UserNotifications 的文档](https://developer.apple.com/documentation/usernotifications)。
+For the specific meaning of the attributes within data and alert in iOS devices, please refer to:
+1. [Apple's official documentation on the Payload Key](https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/generating_a_remote_notification),
+2. [Apple's official documentation on the Request Header](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingwithAPNs.html), and
+3. [Apple's official documentation on the UserNotifications](https://developer.apple.com/documentation/usernotifications).
 
-下面是对各属性的一些具体说明：
+Here are some specific descriptions of each property:
 
-#### iOS 设备 data 各属性说明
+#### Properties of data for iOS Devices
 
-名称|格式|约束|描述
+Name|Format|Constraint|Description
 ---|---|---|---
-alert|普通字符串或 JSON 字符串|必填|表示消息内容。如果目标设备中只包含 iOS 设备则还可以是 JSON 类型，下面详述 JSON 类型时支持的属性,
-title|字符串|可选|表示推送内容标题，如果 alert 字段为字符串可以在此补充提供 title，如果 alert 是 JSON 类型则无需再提供本字段,
-category|字符串|可选|通知类型,
-thread-id|字符串|可选|通知分类名称,
-badge|数字|可选|未读消息数目，应用图标边上的小红点数字，可以是数字，也可以是字符串 "Increment"（大小写敏感）,
-sound|普通字符串或 JSON 字符串|可选|指定推送声音信息，下面详述 JSON 类型时支持的属性,
-content-available|数字|可选|如果使用 Newsstand，设置为 1 来开始一次后台下载,
-mutable-content|数字|可选|用于支持 UNNotificationServiceExtension 功能，设置为 1 时启用,
-collapse-id|字符串|可选|对应 APNs request header 的 apns-collapse-id 参数，用于多条推送合并展示，具体请点击下面 Apple 官方关于 Request Header 的文档链接进行查阅,
-apns-priority|数字|可选|只能是 10 或 5，对应 APNs request header 的 apns-priority 参数，用于控制是否以节电模式发推送，具体请点击下面 Apple 官方关于 Request Header 的文档链接进行查阅,
-apns-push-type|字符串|可选|用于设置推送展示类型，在 iOS 13 或 watchOS 6 以上设备支持，只能为 "background" 或 "alert"，默认为 "alert",
-url-args|字符串|可选|列表类型，用于 Safari 推送，详情见 APNs 文档关于 url-args 参数的描述,
-target-content-id|字符串|可选|详情见 APNs 文档关于 target-content-id 参数的描述,
-自定义属性|自定义类型|可选|由用户添加的自定义属性，字段名和字段类型任意。
+alert|Plain string or JSON string|Required|The content of the message. If the target device contains only iOS devices, it can also be of the JSON type; the supported properties for the JSON type are described below.
+title|String|Optional|The title of the push content. If the alert field is a string, you can add the title here, but if the alert is of JSON type, you do not need to provide this field.
+category|String|Optional|Notification type.
+thread-id|String|Optional|Name of the notification category.
+badge|Number|Optional|The number of unread messages displayed on the badge above the application icon, either a number or the string "Increment" (case sensitive).
+sound|Plain string or JSON string|Optional|The sound of the push notification. See the section describing JSON objects below for more details.
+content-available|Number|Optional|Set to 1 to start a background download when using the Newsstand.
+mutable-content|Number|Optional|Used to support UNNotificationServiceExtension. Set to 1 to enable it.
+collapse-id|String|Optional|Corresponds to the apns-collapse-id parameter of the APNs request header, which is used to collapse multiple notifications as described in Apple's official request header documentation linked below.
+apns-priority|Number|Optional|Can only be 10 or 5. Corresponds to the apns-priority parameter of the APNs request header, which is used to control whether notifications are sent in power saving mode. Please click the link below for Apple's official request header documentation for details.
+apns-push-type|String|Optional|Used to set the push display type. Supported on iOS 13 or watchOS 6 or higher. Can only be "background" or "alert". Default is "alert".
+url-args|String|Optional|A list for Safari notifications. See the APNs documentation for details on the url-args parameter.
+target-content-id|String|Optional|See the APNs documentation for details on the target-content-id parameter.
+Custom attribute|Custom type|Optional|Custom attributes added by the user, with arbitrary field names and field types.
 
-示例：
+Example:
 
 ```json
 {
@@ -312,27 +312,27 @@ target-content-id|字符串|可选|详情见 APNs 文档关于 target-content-id
 }
 ```
 
-#### iOS 设备 alert 各属性说明
+#### Properties of alert for iOS Devices
 
-iOS 设备支持 `alert` 本地化消息推送，只需要将上面 `alert` 参数从 String 替换为一个由本地化消息推送属性组成的 JSON 即可：
+iOS devices support localized `alert` message pushing by replacing the above `alert` parameter from a string to JSON consisting of localized message pushing attributes:
 
-名称|格式|约束|描述
+Name|Format|Constraint|Description
 ---|---|---| ---
-title|字符串|可选|表示推送内容标题,
-title-loc-key|字符串列表|可选|详情请参看 Apple 关于推送提醒本地化的说明,
-title-loc-args|字符串列表|可选|详情请参看 Apple 关于推送提醒本地化的说明,
-subtitle|字符串|可选|表示推送内容副标题,
-subtitle-loc-key|字符串|可选|详情请参看 Apple 关于推送提醒本地化的说明,
-subtitle-loc-args|字符串列表|可选|详情请参看 Apple 关于推送提醒本地化的说明,
-body|字符串|可选|表示消息内容,
-action-loc-key|字符串|可选|详情请参看 Apple 关于推送提醒本地化的说明,
-loc-key|字符串|可选|详情请参看 Apple 关于推送提醒本地化的说明,
-loc-args|字符串列表|可选|详情请参看 Apple 关于推送提醒本地化的说明,
-launch-image|字符串|可选|设置点击推送后启动图片文件名,
-summary-arg|字符串|可选|用于设置 Summary,
-summary-arg-count|数字|可选|用于设置 Summary 参数数量
+title|String|Optional|The title of the notification content.
+title-loc-key|String list|Optional|See Apple's push notification localization guide for details.
+title-loc-args|String list|Optional|See Apple's push notification localization guide for details.
+subtitle|String|Optional|The subtitle of the notification content.
+subtitle-loc-key|String|Optional|See Apple's push notification localization guide for details.
+subtitle-loc-args|String list|Optional|See Apple's push notification localization guide for details.
+body|String|Optional|The body of the message.
+action-loc-key|String|Optional|See Apple's push notification localization guide for details.
+loc-key|String|Optional|See Apple's push notification localization guide for details.
+loc-args|String list|Optional|See Apple's push notification localization guide for details.
+launch-image|String|Optional|Sets the name of the image file to launch when the notification is clicked.
+summary-arg|String|Optional|Used to set the summary.
+summary-arg-count|Number|Optional|Used to set the number of summary arguments.
 
-示例：
+Example:
 
 ```json
 {
@@ -343,17 +343,17 @@ summary-arg-count|数字|可选|用于设置 Summary 参数数量
 }
 ```
 
-#### iOS 设备 sound 各属性说明
+#### Properties of sound for iOS Devices
 
-iOS 支持通过 sound 参数设置推送声音，可以是字符串类型的声音文件名，指向一个在应用内存在的声音文件，或是 JSON 类型：
+iOS supports setting the push sound through the sound parameter, either with a string indicating the filename of a sound, pointing to a sound file that exists in the app, or with a JSON object:
 
-名称|格式|约束|描述
+Name|Format|Constraint|Description
 ---|---|---|---
-name|字符串|可选|声音文件名，指向一个在应用内存在的声音文件
-critical|布尔类型|可选|true 表示使用 "Critical" 提示音，默认为 false
-volume|数字类型|可选|指定声音大小，必须为 0 到 1 之间的小数
+name|String|Optional|Sound filename, pointing to a sound file that exists in the application.
+critical|Boolean|Optional|Set to true to use the "Critical" sound. Default is false.
+volume|Number|Optional|The volume of the sound. Must be a decimal number between 0 and 1.
 
-示例：
+Example:
 
 ```json
 {
@@ -365,7 +365,7 @@ volume|数字类型|可选|指定声音大小，必须为 0 到 1 之间的小�
 
 ```json
 {
-  "alert": "消费 13 元",
+  "alert": "You spent $1.99",
   "sound": {
     "name": "ding.aiff",
     "volume": "0.8"
@@ -373,9 +373,9 @@ volume|数字类型|可选|指定声音大小，必须为 0 到 1 之间的小�
 }
 ```
 
-#### iOS 设备其他说明
+#### Additional Notes for iOS Devices
 
-我们也支持按照上述 Apple 官方文档的方式构造推送参数，例如：
+We support the construction of push parameters as described in the official Apple documentation above. For example:
 
 ```json
 {
@@ -387,7 +387,7 @@ volume|数字类型|可选|指定声音大小，必须为 0 到 1 之间的小�
 }
 ```
 
-更详细的描述如下面例子描述：
+For a more detailed description, see the following example:
 
 ```json
 {
