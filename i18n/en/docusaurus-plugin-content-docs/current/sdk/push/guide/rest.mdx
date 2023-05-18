@@ -621,9 +621,9 @@ curl -X POST \
 
 The above example assumes that the installation has an owner attribute pointing to a record in the `_User` table, and the user has a `location` attribute of type GeoPoint, so we can do a push based on geographic location.
 
-### 通过设备 ID 列表发推送
+### Push by Device ID List
 
-本接口用于给一批指定的设备 ID 发推送，推送过程因为不用查询目标设备的 Installation 记录，推送速度相对查询方式来说会更快，延迟相对更低。例如下面是给 device token 为 "device_token1", "device_token2", "device_token3" 的 iOS 设备推送一条内容为 `Hello` 的消息。
+This interface is used to send pushes to a list of specified device IDs. The push process is faster and has lower latency than the query method because it does not query the Installation records of the target devices. For example, the following code is used to push a `Hello` message to the iOS devices with device token "device_token1", "device_token2", and "device_token3".
 
 ```sh
 curl -X POST \
@@ -638,40 +638,40 @@ curl -X POST \
   https://{{host}}/1.1/push/devices
 ```
 
-本接口的参数由推送渠道无关的通用参数和推送渠道相关的渠道参数两部分组成。通用参数因为跟具体推送渠道无关，无论是给 iOS 设备还是 Android 设备发推送都可以带上。
+The parameters of this interface consist of two parts: push-channel-independent generic parameters and push-channel-specific channel parameters. The generic parameters are channel-independent, so you can use them for either iOS or Android devices.
 
-支持的通用参数如下：
+The supported generic parameters are:
 
-名称| 约束 | 描述
+Name| Constraints | Description
 ---|--- | ---
-device_type | **必填** | 目标设备类型，目前只能为 android、ios 两种。一次推送只能给一种类型的设备发推送。
-device_ids | **必填** | 目标设备 ID 列表，最多包含 500 个 ID 。对于 iOS 设备来说，设备 ID 是 _Installation 表中的 deviceToken 字段；对于 Android 设备来说，设备 ID 是 _Installation 表中的 installationId 字段。
-data| **必填**| 同[通过查询条件发推送](#通过查询条件发推送)。
-expiration_interval| 可选 | 同上。
-expiration_time| 可选 | 同上。
-notification_id | 可选 | 同上。
-req_id | 可选 | 同上。
+device_type | **Required** | Target device type. Can only be android or ios. You can only push to one device type at a time.
+device_ids | **Required** | The list of target device IDs. Up to 500 IDs. For iOS devices, the device ID is the deviceToken field in the _Installation table; for Android devices, the device ID is the installationId field in the _Installation table.
+data| **Required**| Same as [pushing by query criteria](#push-by-query-criteria).
+expiration_interval| Optional | Same as above.
+expiration_time| Optional | Same as above.
+notification_id | Optional | Same as above.
+req_id | Optional | Same as above.
 
-如果目标设备为 iOS 设备，则在上述通用参数之外，还可以附带如下参数：
+If the target devices are iOS devices, the following parameters can be included in addition to the generic parameters above:
 
-名称 | 约束 | 描述
+Name| Constraints | Description
 ---- | ---- | ----
-prod| 可选 | 同[通过查询条件发推送](#通过查询条件发推送)。
-topic | 可选 | 同上。
-apns_team_id | 可选 | 同上。
-device_profile | 可选 | 用于指定使用的 iOS 自定义推送证书。如果使用 Token Authentication 鉴权方式，或者使用的推送证书为配置的「生产环境证书」或「开发环境证书」则无需提供本参数。我们会根据你填写的 `prod` 参数值来使用对应的证书。
+prod| Optional | Same as [pushing by query criteria](#push-by-query-criteria).
+topic | Optional | Same as above.
+apns_team_id | Optional | Same as above.
+device_profile | Optional | Specifies the custom iOS push certificate to use. This parameter is not required if you are using token authentication or if the push certificate is a configured "production environment certificate" or "development environment certificate". We will use the appropriate certificate based on the value of the `prod` parameter you provide.
 
-如果目标为 Android 设备，则在前述通用参数之外，还可以附带如下参数：
+If the target devices are Android devices, the following parameters can be included in addition to the general parameters mentioned above:
 
-名称 | 约束 | 描述
+Name| Constraints | Description
 ---- | ---- | ----
-channel| 可选 | 指定[Android 通知渠道][android-channel]。
+channel| Optional | Specifies the [Android Notification Channel][android-channel].
 
-[android-channel]: https://developer.android.com/guide/topics/ui/notifiers/notifications.html?hl=zh-cn#ManageChannels
+[android-channel]: https://developer.android.com/develop/ui/views/notifications#ManageChannels
 
-### 过期时间和定时推送
+### Expiration Time and Scheduled Push
 
-如上所述，可以用 `expiration_time` 参数指定消息的过期时间：
+As mentioned above, you can specify the expiration time of a message using the `expiration_time` parameter:
 
 ```sh
 curl -X POST \
@@ -681,13 +681,13 @@ curl -X POST \
   -d '{
         "expiration_time": "2015-10-07T00:51:13Z",
         "data": {
-          "alert": "你的优惠券将于 10 月 7 日到期。"
+          "alert": "Your coupon expires on October 7th."
         }
       }' \
   https://{{host}}/1.1/push
 ```
 
-`expiration_interval` 也可以用于指定过期时间，一般结合定时推送使用：
+`expiration_interval` can also be used to specify an expiration time, usually used with a scheduled push:
 
 ```sh
 curl -X POST \
@@ -698,15 +698,15 @@ curl -X POST \
         "push_time": "2016-01-28T00:07:29.773Z",
         "expiration_interval": 86400,
         "data": {
-          "alert": "北京时间 1 月 28 日 8:07 发送这条推送，24 小时（86400 秒）后过期"
+          "alert": "This push was sent on January 28th at 8:07 BST and will expire in 24 hours (86400 seconds)"
         }
       }' \
   https://{{host}}/1.1/push
 ```
 
-#### 定时推送任务查询和取消
+#### Retrieving and Canceling Scheduled Pushes
 
-调用 `POST /scheduledPushMessages` 接口可以查询当前正在等待推送的定时推送任务，调用这个接口需要使用 **master key**：
+Call the `POST /scheduledPushMessages` interface to retrieve scheduled push tasks that are currently waiting to be pushed. Calling this interface requires the **master key**:
 
 
 ```sh
@@ -717,7 +717,7 @@ curl -X GET \
   https://{{host}}/1.1/scheduledPushMessages
 ```
 
-查询出来的结果类似：
+The query will return a result similar to
 
 ```json
 {
@@ -751,12 +751,12 @@ curl -X GET \
 }
 ```
 
-其中 `push_msg` 就是该推送消息的详情，`expire_time` 是消息设定推送时间的 unix 时间戳。
+Here `push_msg` is the details of the push message and `expire_time` is the Unix timestamp of the time at which the message is set to be pushed.
 
-根据查询的结果，就可以取消一个定时推送任务。
-注意需要使用返回结果中最外层的 id。
-比如取消第一个定时推送，需要使用 `results[0].id`，而不是 `results[0].push_msg.id`。
-就上面的例子而言，应该使用 `1` 而不是 `XRs9jmWnLd0GH2EH`：
+Based on the result of the query, you can cancel a scheduled push.
+Note that you must use the outermost id in the returned result.
+For example, to cancel the first scheduled push, use `results[0].id` instead of `results[0].push_msg.id`.
+For the above example, `1` should be used instead of `XRs9jmWnLd0GH2EH`:
 
 ```sh
 curl -X DELETE \
@@ -768,11 +768,11 @@ curl -X DELETE \
 
 #### Implement Periodic Push Using Cloud Engine
 
-可以配合 `云引擎` 的 `定时任务` 功能实现周期推送，非常方便。请阅读《在云引擎中使用推送服务》。
+You can use the scheduled task feature provided by Cloud Engine to implement periodic pushes.
 
 ## Query Push Record
 
-`/push` 接口在推送后会返回代表该条推送消息的 `objectId`，你可以使用这个 ID 调用下列 API 查询推送记录：
+The `/push` interface returns an `objectId` representing the push message after the push, and you can use this ID to call the following API to query the push record:
 
 ```sh
 curl -X GET \
@@ -782,80 +782,23 @@ curl -X GET \
   https://{{host}}/1.1/tables/Notifications/:objectId
 ```
 
-其中 URL 里的 `:objectId` 替换成 `/push` 接口返回的 objectId 。
+The `:objectId` in the URL should be replaced with the objectId returned by the `/push` interface.
 
-将返回推送记录对象，推送记录各字段含义参考[推送通知总览](/sdk/push/guide/overview/)的《Notification》一节。
+The push record object will be returned. Refer to the section "Notification" in [Push Notification Overview](/sdk/push/guide/overview/) for the meaning of each field of the push record.
 
-## 推送状态查看和取消
+## Viewing Push Status and Canceling Pushes
 
-在发推送的过程中，我们会随着推送任务的执行更新推送状态到 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 推送记录** 中，可以在这里查看推送的最新状态。对不同推送状态的说明请参看[推送通知总览](/sdk/push/guide/overview/)的《Notification》一节。
+During the process of sending a push, we will update the push status as the push task is executed in **Developer Center > Your game > Game Services > Cloud Services > Push Notification > Push records**, where you can check the latest status of the push. For a description of the different push statuses, please refer to the Notification section of the [Push Notification Overview](/sdk/push/guide/overview/).
 
-在一条推送记录状态到达 **done** 即完成推送之前，其状态信息旁边会显示「取消推送」按钮，点击后就能将本次推送取消。并且取消了的推送会从推送记录中删除。
+Before the status of a push record reaches **done**, that is, before the push is complete, the "Cancel" button will appear next to the status information, and you can cancel the push by clicking it. The canceled push will be deleted from the push record.
 
-请注意取消推送的意思是取消还排在队列中未发出的推送，已经发出或已存入离线缓存的推送是无法取消的。同理，推送状态显示已经完成的推送也无法取消。请尽量在发推送前做好测试，确认好发送内容和目标设备查询条件。
+Note that canceling a push means canceling a push that is still in the queue and has not yet been sent. Similarly, pushes that have already been sent or stored in the offline cache cannot be canceled. Please do your best to test and confirm the content and query conditions of the target devices before sending pushes.
 
-## 限制与费用
+## Restrictions
 
-### 推送消息接口
+* To avoid sending messages to a large number of users who are no longer active, we restrict push messages to devices with an `updatedAt` time in the `_Installation` table within the last three months. We will automatically exclude the devices that do not meet the criteria from the target devices after determining the target devices based on the push query criteria, and the excluded devices will not be counted in the target devices in **Developer Center > Your game > Game Services > Cloud Services > Push Notification > Push records**.
+* To prevent performance issues due to large numbers of certificate errors, we limit the number of devices that can be pushed using **development certificates** to a maximum of 20,000 devices at a time. If more than 20,000 devices meet the push criteria, the system will reject the push and display "Error" in the **Status** column in **Developer Center > Your game > Game Services > Cloud Services > Push Notification > Push records** with the message "dev profile disabled for massive push". Please be sure to set the push conditions appropriately when using the developer certificate.
+* Apple has a limit on the size of push messages, so please try to reduce the size of data to be sent for iOS push, otherwise it will be truncated. Please refer to the [APNs documentation](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/PayloadKeyReference.html) for details.
 
-[推送消息接口](#推送消息)的调用受频率限制，限制如下：
-
-|商用版（每应用）|开发版（每应用）|
-|----------|---------------|
-|最大 9600 次/分钟，默认 600 次/分钟|60 次/分钟|
-
-超过频率限制后 1 分钟内云端会拒绝请求持续返回 429 错误码，一分钟后会重新处理请求。
-
-商用版应用默认上限可以在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置 > 消息推送 API 调用频率上限** 修改。
-按照每日调用频率峰值实行阶梯收费，费用如下：
-
-| 每分钟调用频率 | 费用 |
-| - | - |
-| 0 ～ 600 | 免费 |
-| 601 ~ 1200 | $20 USD / 天 |
-| 1201 ~ 1800 | $30 USD / 天 |
-| 1801 ~ 2400 | $40 USD / 天 |
-| 2401 ~ 3000 | $50 USD / 天 |
-| 3001 ~ 3600 | $60 USD / 天 |
-| 3601 ~ 4200 | $70 USD / 天 |
-| 4201 ~ 4800 | $80 USD / 天 |
-| 4801 ~ 5400 | $90 USD / 天 |
-| 5401 ~ 6000 | $100 USD / 天 |
-| 6001 ~ 6600 | $110 USD / 天 |
-| 6601 ~ 7200 | $120 USD / 天 |
-| 7201 ~ 7800 | $130 USD / 天 |
-| 7801 ~ 8400 | $140 USD / 天 |
-| 8401 ~ 9000 | $150 USD / 天 |
-| 9001 ~ 9600 | $160 USD / 天 |
-
-每日调用频率峰值可在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 统计 > REST API QPM 峰值** 中查看。
-
-### 每日推送人次
-
-限制如下：
-
-|商用版（每应用每天）|开发版（每应用每天）|
-|----------|---------------|
-|最大无上限，默认 100 万人次|1 万人次|
-
-达到限制后，当天将无法再推送消息。
-
-商用版应用默认上限可以在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置 > 每日推送上限** 修改。
-费用如下（其中不足一万人次的部分，按一万人次计算）：
-
-| 每日推送人次 | 费用 |
-| - | - |
-| 小于等于 10 万的部分 | 免费 |
-| 大于 10 万的部分 | $0.02 USD / 万人次 |
-
-每日推送人次可在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 统计 > 推送人次** 中查看。
-
-### 其它
-
-* 为避免给大量早已不再活跃的用户发消息，我们限制只能给 `_Installation` 表内 `updatedAt` 时间在最近三个月以内的设备推送消息。我们会在根据推送查询条件查出目标设备后自动将不符合条件的设备从目标设备中剔除，并且被剔除的设备不会计入 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 推送记录** 内的目标设备数中。商用版用户如有特别需求，可提交工单联系我们付费延长有效期（最长可延长至一年）。
-* 为防止由于大量证书错误所产生的性能问题，我们对使用 **开发证书** 的推送做了设备数量的限制，即一次至多可以向 20,000 个设备进行推送。如果满足推送条件的设备超过了 20,000 个，系统会拒绝此次推送，在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 推送记录** 中的 **状态** 一栏显示「错误」，提示信息为「dev profile disabled for massive push」。因此，在使用开发证书推送时，请合理设置推送条件。
-* Apple 对推送消息大小有限制，对 iOS 推送请尽量缩小要发送的数据大小，否则会被截断。详情请参看 [APNs 文档](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/PayloadKeyReference.html)。
-* 每个开发版应用处在待发队列中的定时推送数量最多 10 条，每个商用版应用处在待发队列中的定时推送数量最多 1000 条。
-
-如果推送失败，在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 推送记录** 的 **状态** 一栏中会看到错误提示。
+If a push fails, you will see an error message in the **Status** section of **Developer Center > Your game > Game Services > Cloud Services > Push Notification > Push records**.
 
