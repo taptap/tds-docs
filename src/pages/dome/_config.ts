@@ -307,7 +307,7 @@ export const getEntries = (brand: string, region: string,buttonType:String): Ent
       links: [
         {
           label: "详细",
-          to: mdPath,
+          href: mdPath,
         },
       ],
     }))
@@ -321,7 +321,7 @@ export const getEntries = (brand: string, region: string,buttonType:String): Ent
       links: [
         {
           label: "详细",
-          to: mdPath,
+          href: mdPath,
         },
       ],
     }))

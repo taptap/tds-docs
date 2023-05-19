@@ -32,11 +32,11 @@ export const getEntries = (brand: string, region: string): Entry[] => {
     "links": [
       {
         "label": "Objective-C SDK",
-        "to": "https://releases.leanapp.cn/#/leancloud/objc-sdk/releases"
+        "href": "https://releases.leanapp.cn/#/leancloud/objc-sdk/releases"
       },
       {
         "label": "Swift SDK ",
-        "to": "https://releases.leanapp.cn/#/leancloud/swift-sdk/releases"
+        "href": "https://releases.leanapp.cn/#/leancloud/swift-sdk/releases"
       }
     ]
   },
@@ -46,11 +46,11 @@ export const getEntries = (brand: string, region: string): Entry[] => {
     "links": [
       {
         "label": "数据存储 SDK",
-        "to": "https://releases.leanapp.cn/#/leancloud/javascript-sdk/releases"
+        "href": "https://releases.leanapp.cn/#/leancloud/javascript-sdk/releases"
       },
       {
         "label": "即时通讯 SDK",
-        "to": "https://releases.leanapp.cn/#/leancloud/js-realtime-sdk/releases"
+        "href": "https://releases.leanapp.cn/#/leancloud/js-realtime-sdk/releases"
       }
     ]
   },
@@ -60,7 +60,7 @@ export const getEntries = (brand: string, region: string): Entry[] => {
     "links": [
       {
         "label": "Java SDK",
-        "to": "https://releases.leanapp.cn/#/leancloud/java-unified-sdk/releases"
+        "href": "https://releases.leanapp.cn/#/leancloud/java-unified-sdk/releases"
       }
     ]
   },
@@ -70,7 +70,7 @@ export const getEntries = (brand: string, region: string): Entry[] => {
     "links": [
       {
         "label": ".NET SDK",
-        "to": "https://github.com/leancloud/csharp-sdk"
+        "href": "https://github.com/leancloud/csharp-sdk"
       }
     ]
   },
@@ -80,11 +80,11 @@ export const getEntries = (brand: string, region: string): Entry[] => {
     "links": [
       {
         "label": "数据存储 SDK",
-        "to": "https://pub.dev/packages/leancloud_storage#-changelog-tab-"
+        "href": "https://pub.dev/packages/leancloud_storage#-changelog-tab-"
       },
       {
         "label": "即时通讯 SDK",
-        "to": "https://pub.dev/packages/leancloud_official_plugin#-changelog-tab-"
+        "href": "https://pub.dev/packages/leancloud_official_plugin#-changelog-tab-"
       }
     ]
   },
@@ -94,19 +94,19 @@ export const getEntries = (brand: string, region: string): Entry[] => {
     "links": [
       {
         "label": "Android SDK（旧版）",
-        "to": "https://github.com/leancloud/android-sdk-all"
+        "href": "https://github.com/leancloud/android-sdk-all"
       },
       {
         "label": "Java SDK（旧版）",
-        "to": "https://github.com/leancloud/java-sdk"
+        "href": "https://github.com/leancloud/java-sdk"
       },
       {
         "label": "Python SDK",
-        "to": "https://github.com/leancloud/python-sdk/"
+        "href": "https://github.com/leancloud/python-sdk/"
       },
       {
         "label": "PHP SDK",
-        "to": "https://github.com/leancloud/php-sdk/"
+        "href": "https://github.com/leancloud/php-sdk/"
       }
     ]
   }
