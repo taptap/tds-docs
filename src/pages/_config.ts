@@ -171,6 +171,16 @@ export const getEntries = (brand: string, region: string): Entry[] => {
         },
       ],
     },
+    {
+      title: "其他",
+      description: "",
+      links: [
+        {
+          label: "查看更多",
+          to: "/sdk/other/error-code",
+        },
+      ],
+    },
   ];
 
   const entries = brand === "leancloud" ? ENTRIES_LEANCLOUD : ENTRIES_TDS;
