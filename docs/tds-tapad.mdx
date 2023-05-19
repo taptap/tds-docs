@@ -63,7 +63,7 @@ dependencies {
 ```
 
 同时，为了将 [Gradle 版本和 Android Gradle Plugin 版本对应](https://developer.android.com/studio/releases/gradle-plugin#expandable-1)，需要更新 Gradle 版本，下载 [6.1.1 版本的 Gradle](https://services.gradle.org/distributions/gradle-6.1.1-bin.zip)，解压后放到自定义的文件夹中，同时**不**勾选 Unity 中的 `Preferences` -> `External Tools`-> `Android` -> `Gradle Installed with Unity(recommend)`，改为选择解压后 Gradle 文件夹的位置，如 <some path\>/gradle-6.1.1。
-**注意**：TapADN SDK 从 3.16.3.10 版本开始更新了 glide 的依赖，glide 版本从 4.0.0 更新到了 4.9.0。
+注意 **TapADN SDK 从 3.16.3.10 版本开始更新了 glide 的依赖，glide 版本从 4.0.0 更新到了 4.9.0。**
 
 </details>
 
@@ -95,6 +95,7 @@ dependencies {
     implementation 'com.android.support:recyclerview-v7:28.0.0'
 // 加入的依赖库-结束
     // highlight-end
+// 下面这行是 Unity 的 mainTemplate.gradle 自带的，帮助定位插入位置
 // **DEPS**
 }
 ```
@@ -110,7 +111,7 @@ dependencies {
 </p>
 
 在游戏目录下 `build.gradle` 文件中添加代码：
-**注意**：TapADN SDK 从 3.16.3.10 版本开始更新了 glide 的依赖，glide 版本从 4.0.0 更新到了 4.9.0。
+注意 **TapADN SDK 从 3.16.3.10 版本开始更新了 glide 的依赖，glide 版本从 4.0.0 更新到了 4.9.0。**
 
 <CodeBlock className="groovy">
 {`repositories{
@@ -132,10 +133,6 @@ dependencies {
     // ...
 }`}
 </CodeBlock>
-
-</>
-
-<>
 
 </>
 
@@ -218,10 +215,6 @@ dependencies {
 
 </>
 
-<>
-
-</>
-
 </MultiLang>
 
 ## 获取广告权限
@@ -244,10 +237,6 @@ TapAdSdk.RequestPermissionIfNecessary();
 ```java
 TapAdManager.get().requestPermissionIfNecessary(activity);
 ```
-
-</>
-
-<>
 
 </>
 
@@ -446,10 +435,6 @@ TapAdSdk.init(this, config);
 
 </>
 
-<>
-
-</>
-
 </MultiLang>
 
 ## 上报用户行为
@@ -532,10 +517,6 @@ TapAdManager.get().uploadUserAction(userActions, new Callback() {
     }
 });
 ```
-
-</>
-
-<>
 
 </>
 
@@ -626,10 +607,6 @@ tapAdNative.loadSplashAd(new AdRequest.Builder().withSpaceId(spaceId).build(), n
 
 </>
 
-<>
-
-</>
-
 </MultiLang>
 
 ### 播放
@@ -693,10 +670,6 @@ splashAd.setSplashInteractionListener(new TapSplashAd.AdInteractionListener() {
 // 展示开屏页
 splashAd.show(this);
 ```
-
-</>
-
-<>
 
 </>
 
@@ -802,10 +775,6 @@ tapAdNative.loadRewardVideoAd(adRequest, new TapAdNative.RewardVideoAdListener()
 
 </>
 
-<>
-
-</>
-
 </MultiLang>
 
 ### 播放
@@ -903,10 +872,6 @@ rewardAd.showRewardVideoAd(activity);
 
 </>
 
-<>
-
-</>
-
 </MultiLang>
 
 ## Banner 广告 {#TapBannerAd}
@@ -914,7 +879,7 @@ rewardAd.showRewardVideoAd(activity);
 模版渲染 Banner：开发者不用自行对广告样式进行编辑和渲染，可直接调用相关接口进行广告展示。
 
 :::tip
-不支持开发者在 view 添加按钮及对广告拦截处理
+不支持开发者在 view 添加按钮及对广告拦截处理。
 :::
 
 ### 获取广告
@@ -983,10 +948,6 @@ tapAdNative.loadBannerAd(new AdRequest.Builder().withSpaceId(spaceId).build(), n
     }
 });
 ```
-
-</>
-
-<>
 
 </>
 
@@ -1064,7 +1025,372 @@ parentLayout.addView(bannerAd.getBannerView());
 
 </>
 
+</MultiLang>
+
+## 自渲染信息流广告 {#TapFeedAd}
+
+为可自定义布局的信息流广告，包含大图和视频两种基本样式类型，应用下载、跳转到落地页和跳转到浏览器三种交互类型。
+
+:::tip
+支持的广告尺寸：
+- 大图(宽高比：1.78 的图片)
+- 视频(宽高比：1.78 的视频)
+:::
+
+### 获取广告
+
+<MultiLang kind="adn">
+
 <>
+
+```cs
+// 暂不支持
+```
+
+</>
+
+<>
+
+```java
+// 注意，一个 Activity/Fragment 中只需要创建一个 TapAdNative 对象
+TapAdNative tapAdNative = TapAdManager.get().createAdNative(activity);
+// 广告后台获取广告位 id
+int spaceId = "your_space_id";
+tapAdNative.loadFeedAd(new AdRequest.Builder().withSpaceId(spaceId).build(), new TapAdNative.FeedAdListener() {
+    @Override
+    public void onError(int code, String message) {
+        // 获取广告失败
+    }
+
+    @Override
+    public void onFeedAdLoad(TapFeedAd feedAd) {
+        
+    }
+});
+
+// TapFeedAd 接口说明
+public interface TapFeedAd {
+
+    /**
+     * 广告标题
+     *
+     * @return
+     */
+    String getTitle();
+
+    /**
+     * 广告描述
+     *
+     * @return
+     */
+    String getDescription();
+
+    /**
+     * 广告图标
+     *
+     * @return
+     */
+    String getIconUrl();
+
+    /**
+     * 得到 Feed 广告图片模式
+     *
+     * @return 1:大图 2:视频
+     */
+    int getImageMode();
+
+    /**
+     * 广告封面图片 Image list
+     *
+     * @return
+     */
+    List<ImageInfo> getImageInfoList();
+    
+    /**
+     * 获取 TapTap 得分
+     *
+     * @return
+     */
+    double getScore();
+
+    /**
+     * 获取广告的 view，如视频广告的 view，当前版本为自动播放且默认打开声音，用户可以手动关闭声音。
+     *
+     * @return
+     */
+    View getAdView();
+
+    /**
+     * 获取合规信息
+     *
+     * @return
+     */
+    ComplianceInfo getComplianceInfo();
+
+    /**
+     * 注册可点击的 view，click/show 会在内部完成
+     *
+     * @param container 渲染广告最外层的 ViewGroup
+     * @param clickViews 可点击的视图
+     * @param creativeViews 可点击的创意视图（广告下载的按钮）
+     * @param privacyViews 可点击的隐私协议视图
+     * @param permissionViews 可点击的权限视图
+     *
+     */
+    void registerViewForInteraction(ViewGroup container, List<View> clickViews, List<View> creativeViews
+     , List<View> privacyViews, List<View> permissionViews, AdInteractionListener listener);
+    
+    /**
+     * 设置下载监听器
+     */
+    void setDownloadListener(TapAppDownloadListener listener);
+
+}
+
+// 应用合规信息
+public interface ComplianceInfo {
+    /**
+     * 获取应用名称
+     *
+     * @return
+     */
+    String getAppName();
+
+    /**
+     * 获取广告
+     *
+     * @return
+     */
+    String getAppVersion();
+
+    /**
+     * 开发者名称 
+     *
+     * @return
+     */
+    String getDeveloperName();
+}
+
+public interface AdInteractionListener {
+    
+    // 广告卡片点击
+    void onAdClicked(View view, TapFeedAd ad);
+
+    // 广告创意交互部分点击
+    void onAdCreativeClick(View view, TapFeedAd ad);
+    
+    // 广告卡片曝光
+    void onAdShow(TapFeedAd ad);
+}
+
+// 广告包下载进度监听
+public interface TapAppDownloadListener {
+    
+    void onDownloadStart();
+
+    void onDownloadComplete();
+
+    void onUpdateDownloadProgress(int percent);
+
+    void onDownloadError();
+
+    void onInstalled();
+}
+
+```
+
+</>
+
+</MultiLang>
+
+### 广告行为监听
+
+:::info
+AdInteractionListener 涉及到广告计费，必须正确调用，convertView 必须使用 ViewGroup。
+:::
+
+在加载到信息流广告后，接入方需要注册在信息流广告中可以点击的 View，即 `TapFeedAd.registerViewForInteraction()` 方法，以实现广告的功能交互及计。包含图文点击区域的注册，附加创意按钮点击区域的注册，隐私协议区域的注册，应用权限的注册。点击附加创意区域会进行应用下载操作。
+
+注意： 如果需要点击图文区域也能进行下载，请将图文区域的 view 传入 creativeViews。示例代码如下：
+
+<MultiLang kind="adn">
+
+<>
+
+```cs
+// 暂不支持
+```
+
+</>
+
+<>
+
+```java
+public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    ...
+
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        ...
+        if (holder instanceof OtherViewHolder) {
+            ...
+        } else if (holder instanceof adViewHolder) {
+            /**
+            * 注册可点击的 View，click/show 会在内部完成
+            * @param container     渲染广告最外层的 ViewGroup
+            * @param clickViews    可点击的 View 的列表
+            * @param creativeViews 用于下载的View
+            */
+            // 可以被点击的 view, 也可以把 convertView 放进来意味整个 item 可被点击，点击会跳转到落地页
+            List<View> clickViewList = new ArrayList<View>();
+            clickViewList.add(convertView);
+            // 创意点击区域的 view 点击根据不同的创意进行下载动作
+            // 如果需要点击图文区域也能进行下载动作，请将图文区域的 view 传入 creativeViewList
+            List<View> creativeViewList = new ArrayList<View>();
+            creativeViewList.add(adViewHolder.mCreativeButton);
+            // 注册普通点击区域，创意点击区域。重要! 这个涉及到广告计费及交互，必须正确调用。convertView 必须使用 ViewGroup。
+            ad.registerViewForInteraction((ViewGroup) convertView, images, clickViewList, creativeViewList,adViewHolder.mDislike,new TTNativeAd.AdInteractionListener() {
+
+                // 点击普通区域的回调
+                @Override
+                public void onAdClicked(View view, TTNativeAd ad) {
+                
+                }
+                
+                // 点击创意区域的回调
+                @Override
+                public void onAdCreativeClick(View view, TTNativeAd ad) {
+                
+                }
+                
+                // 广告曝光展示的回调
+                @Override
+                public void onAdShow(TTNativeAd ad) {
+                
+                }
+            });
+        }
+    }
+}
+
+```
+
+</>
+
+</MultiLang>
+
+### 广告下载事件监听
+
+<MultiLang kind="adn">
+
+<>
+
+```cs
+// 暂不支持
+```
+
+</>
+
+<>
+
+```java
+TapAppDownloadListener downloadListener = new TapAppDownloadListener() {
+
+            // 未开始下载
+            @Override
+            public void onIdle() {
+            }
+
+            // 下载中
+            @Override
+            public void onDownloadStart() {
+            }
+
+            // 下载完成
+            @Override
+            public void onDownloadComplete() {
+            }
+
+            /**
+             * 下载进度更新回调
+             * @param percent 取值范围[0,100] 当前下载进度 
+             */
+            @Override
+            public void onUpdateDownloadProgress(int percent) {;
+            }
+            
+            // 下载出错 （网络/文件存储错）
+            @Override
+            public void onDownloadError() {
+            }
+
+            // 安装成功
+            @Override
+            public void onInstalled() {
+            }
+        };
+
+```
+
+</>
+
+</MultiLang>
+
+### Feed 流广告启动/暂停
+
+:::info
+如果 Feed 流是在 Activity 中使用，需要在 Activity 的 onResume 和 onPause 调用相关方法；
+
+如果 Feed 流是在Fragment中使用，除了要考虑 onResume 和 onPause 的系统回调，还要注意 Fragment 的 setUserVisibleHint 回调。
+:::
+
+<MultiLang kind="adn">
+
+<>
+
+```cs
+// 暂不支持
+```
+
+</>
+
+<>
+
+```java
+// 启动
+tapAdNative.resume();
+
+// 暂停
+tapAdNative.pause();
+```
+
+</>
+
+</MultiLang>
+
+### Feed 流广告销毁
+
+:::info
+如果是在 Activity 中创建，请在 Activity 中调用销毁方法
+
+如果是在 Fragment 中创建，请在 Fragment 中调用销毁方法
+:::
+
+<MultiLang kind="adn">
+
+<>
+
+```cs
+// 暂不支持
+```
+
+</>
+
+<>
+
+```java
+tapAdNative.dispose();
+```
 
 </>
 
