@@ -65,7 +65,6 @@ const config = {
           {
             label: "文档首页",
              to: "/",
-            //to: "https://leancloud.cn/docs/",
             position: "right",
             activeBaseRegex: "^/(?!.+)",
           },
