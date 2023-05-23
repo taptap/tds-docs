@@ -468,7 +468,7 @@ user.getFollowersAndFollowees().then(function(followers, followees) {
 
 #### 向粉丝展示动态
 
-如果希望像微博那样向自己的粉丝发布状态，请继续阅读[社交信息流组件](/sdk/other/openview/status_system/)。
+如果希望像微博那样向自己的粉丝发布状态，请继续阅读[社交信息流组件](https://leancloud.cn/docs/status_system.html)。
 
 ### REST API
 
