@@ -64,15 +64,88 @@ const config = {
         items: [
           {
             label: "文档首页",
-            // to: "/",
-            to: "https://leancloud.cn/docs/",
+             to: "/",
             position: "right",
             activeBaseRegex: "^/(?!.+)",
           },
           {
-            type: "localeDropdown",
-            position: "right",
+            label: 'API文档',
+            position: 'right',
+            items: [
+              {
+                label: 'Android/Java SDK API',
+                href: 'https://leancloud.cn/api-docs/android/index.html',
+                activeBaseRegex: 'none',
+              },
+              {
+                label: 'Objective-C SDK API',
+                to: 'https://leancloud.cn/api-docs/iOS/index.html',
+                activeBaseRegex: 'none',
+              },
+              {
+                label: 'Swfit SDK API',
+                to: 'https://leancloud.cn/api-docs/swift/index.html',
+                activeBaseRegex: 'none',
+              },
+              {
+                label: 'Flutter 数据存储 SDK API',
+                to: 'https://pub.dev/documentation/leancloud_storage/latest/leancloud_storage/leancloud_storage-library.html',
+                activeBaseRegex: 'none',
+              },
+              {
+                label: 'Flutter 即时通讯 SDK API',
+                to: 'https://pub.dev/documentation/leancloud_official_plugin/latest/leancloud_plugin/leancloud_plugin-library.html',
+                activeBaseRegex: 'none',
+              },
+              {
+                label: 'JavaScript 数据存储 SDK API',
+                to: 'https://leancloud.github.io/javascript-sdk/docs/',
+                activeBaseRegex: 'none',
+              },
+              {
+                label: 'JavaScript 多人在线对战 SDK API',
+                to: 'https://leancloud.github.io/Play-SDK-JS/doc/global.html',
+                activeBaseRegex: 'none',
+              },
+              {
+                label: 'Python SDK API',
+                to: 'https://leancloud.github.io/python-sdk/',
+                activeBaseRegex: 'none',
+              },
+              {
+                label: 'PHP SDK API',
+                to: 'https://leancloud.github.io/php-sdk/',
+                activeBaseRegex: 'none',
+              },
+              {
+                label: 'Go SDK API',
+                to: 'https://pkg.go.dev/github.com/leancloud/go-sdk/leancloud',
+                activeBaseRegex: 'none',
+              },
+              {
+                label: '.NET SDK API',
+                to: 'https://leancloud.github.io/csharp-sdk/html/',
+                activeBaseRegex: 'none',
+              }
+            ],
           },
+          {
+            label: '资源下载',
+            position: 'right',
+            items: [
+              {
+                label: 'SDK',
+                href: '/sdk/sdk-page/',
+                activeBaseRegex: 'none',
+              },
+              {
+                label: 'DOME',
+                to: '/dome',
+                activeBaseRegex: 'none',
+              },
+            ],
+          }
+         
         ],
       },
       prism: {

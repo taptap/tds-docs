@@ -1,0 +1,228 @@
+import MultiLang from "/src/docComponents/MultiLang";
+
+# 即时通讯中的在线状态查询
+
+在客户端中展示用户的在线状态是即时通讯类软件的常见功能。它的应用场景十分广泛，例如聊天好友是否在线、公司办公交流时的同事是否在线、以及群成员是否在线等等。
+
+本文会介绍如何使用 [LeanEngine](/sdk/engine/overview/) 来快速实现即时通讯中的在线状态查询。
+
+## 准备工作
+
+在开始之前，你需要了解以下内容：
+
+* [云引擎快速入门](/sdk/engine/deploy/getting-started/)：了解云引擎是什么，是如何运作的。
+* [云函数](/sdk/engine/functions/guides/#云函数)：部署在服务端的代码。我们会使用云函数来实现 LeanCache 的查询以及即时通讯上下线 Hook 的逻辑。
+* [LeanCache](/sdk/engine/database/redis/)：高性能、高可用的 Key-Value 内存存储服务。
+* [即时通讯 Hook 函数](/sdk/im/guide/systemconv/#客户端上下线-hook)：在本篇文档中，我们使用了即时通讯客户端上下线事件的 hook 函数。
+
+## 示例 Demo
+
+我们在 [leanengine-nodejs-demos](https://github.com/leancloud/leanengine-nodejs-demos) 这个项目里提供了[一份代码示例](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/functions/rtm-onoff-status.js)供参考。你可以直接把这里的代码部署到自己的应用中。
+
+
+## 实现步骤
+我们通过 hook 拿到 `clientId` 的在线状态，将这些状态存储到 LeanCache 中。客户端定期查询云函数来获得用户的在线状态。本篇文档在云引擎[初始项目](https://github.com/leancloud/node-js-getting-started)的基础上来实现相关功能。
+
+### 创建 LeanCache 实例
+
+在应用中[创建一个 LeanCache 实例](/sdk/engine/database/redis/#创建实例)，推荐使用 `volatile-lru` 删除策略。
+
+### 安装依赖
+
+请参考[在云引擎中使用 LeanCache](leancache_guide.html#在云引擎中使用（Node.js 环境）)。
+
+### 连接 Redis
+
+首先我们要和 LeanCache 中的 redis 建立连接。在[初始项目](https://github.com/leancloud/node-js-getting-started)的根目录中，我们创建一个新的文件 `redis.js` 用于创建 `Redis` 实例。代码如下：
+
+```js
+const Redis = require('ioredis')
+
+// 创建 redis client，连接 LeanCache 实例
+function createClient() {
+    // 本地环境下此环境变量为 undefined, 会链接到默认的 127.0.0.1:6379，
+    // ⚠️注意，需替换 `<LeanCache-实例名称>` 为实际创建的实例的名称。假如你的实例名是 statusCache，这里需要写 REDIS_URL_statusCache
+    const redisClient = new Redis(process.env['REDIS_URL_<LeanCache-实例名称>'])
+
+    // 监听 redis 的 error 事件，打印错误信息
+    redisClient.on('error', function(err) {
+        console.error('redisClient error', err)
+    })
+
+    return redisClient
+}
+
+module.exports = {
+  redisClient: createClient(),
+  createClient: createClient
+}
+```
+
+### 获取并存储上下线状态
+
+现在我们在项目的 `functions` 文件夹中创建 `rtm-onoff-status.js` 文件撰写上下线时的存储逻辑。
+
+```js
+// 引入依赖
+var AV = require('leanengine')
+const {redisClient} = require('../redis')
+```
+
+在 `onIMClientOffline` 中拿到下线的 `clientId`，将 `clientId` 和下线状态存储到 `LeanCache` 中。代码如下：
+
+```js
+AV.Cloud.onIMClientOffline(async (request) => {
+  // 设置某一客户端 ID 对应的值为 0，表示下线状态，同时设置过期计时
+  // 对于下线后长久未上线的客户端 ID，可以用过期时间来删除数据节省空间
+  redisClient.set(request.params.peerId, 0, 'EX', 604800)
+})
+```
+
+在 `onIMClientOnline` 中拿到上线的 `clientId`，将 `clientId` 和上线状态存储到 `LeanCache` 中。代码如下：
+
+```js
+AV.Cloud.onIMClientOnline(async (request) => {
+  // 设置某一客户端 ID 对应的值为 1，表示上线状态，同时清空过期计时
+  redisClient.set(request.params.peerId, 1)
+})
+```
+
+### 撰写返回用户状态的云函数
+现在我们撰写供客户端调用的云函数，在这个云函数中返回用户的在线状态。在 `rtm-onoff-status.js` 中添加如下代码：
+
+```js
+AV.Cloud.define('getOnOffStatus', async (request) => {
+  // 约定 key: ”peerIds” 对应的值是一组客户端的 ID
+  return redisClient.mget(request.params.peerIds)
+})
+```
+
+到现在我们的逻辑已经写完了，接下来只需要在主文件中加载 `rtm-onoff-status.js` ，客户端就可以调用这里的云函数了。我们在 `app.js` 中添加以下代码：
+
+```js
+// 加载上下线状态中的云函数
+require('./functions/rtm-onoff-status');
+```
+
+### 部署项目
+代码写完后，用命令行工具[将代码部署到服务端](/sdk/engine/cli/#从本地代码部署)。部署成功后，就可以使用 SDK 或者 REST API 调用云函数来查询上下线状态了。
+
+
+### 客户端查询
+
+客户端可以通过 LeanCloud SDK 调用部署成功的云函数，示例代码如下所示。
+<MultiLang kind="im">
+
+```cs
+async Task GetOnOffStatusWithPeerIds(List<string> peerIdList) {
+    if (peerIdList == null || peerIdList.Count == 0) {
+        return;
+    }
+    try {
+        Dictionary<string, object> paramters = new Dictionary<string, object> {
+                    { "peerIds", peerIdList }
+                };
+        List<string> results = await AVCloud.CallFunctionAsync<List<string>>("getOnOffStatus", paramters);
+        foreach (string result in results) {
+            if (result == "1") {
+                // 在线
+            } else {
+                // 离线
+            }
+        }
+    } catch (Exception e) {
+        // TODO 处理错误
+    }
+}
+```
+
+```java
+String name = "getOnOffStatus";
+Map<String, Object> param = new HashMap<String, Object>();
+List<String> userIds = Arrays.asList("your_user_id_1", "your_user_id_2");
+param.put("peerIds", userIds);
+LCCloud.callFunctionInBackground(name, param).subscribe(results -> {
+    System.out.println("结果 = " + results);
+    for (String t: results) {
+        if (null == t) {
+            System.out.println("result: unknown");
+        } else if (1 == Integer.valueOf(t)) {
+            System.out.println("result: online");
+        } else {
+            System.out.println("result: offline");
+        }
+    }
+}, throwable -> {
+    System.out.println("error occurred! " + throwable);
+});
+```
+```objc
++ (void)getOnOffStatusWithPeerIds:(NSArray<NSString *> *)peerIds {
+    if (!peerIds.count) {
+        return;
+    }
+    // 约定 key: ”peerIds” 对应的 value 是一组客户端的 ID
+    NSDictionary *parameters = @{ @"peerIds": peerIds };
+    // 调用云函数 `getOnOffStatus`
+    [LCCloud callFunctionInBackground:@"getOnOffStatus" withParameters:parameters block:^(id  _Nullable object, NSError * _Nullable error) {
+        if (error) {
+            NSLog(@"%@", error);
+        } else if ([object isKindOfClass:[NSArray class]]) {
+            NSArray *results = (NSArray *)object;
+            // 查询结果是数组，各 ID 的结果按顺序与 `peerIds` 对应
+            // 不存在的 ID 对应的查询结果为 `null`，可以将其归为下线状态
+            for (int i = 0; i < results.count; i++) {
+                id item = results[i];
+                if ([item isKindOfClass:[NSNull class]]) {
+                    item = @"0";
+                }
+                if ([item isKindOfClass:[NSString class]]) {
+                    NSString *peerId = peerIds[i];
+                    BOOL isOn = [(NSString *)item isEqualToString:@"1"];
+                    NSLog(@"%@: %@", peerId, @(isOn));
+                    // ...
+                }
+            }
+        }
+    }];
+}
+```
+
+```js
+const params = { peerIds : ['peerId1', 'peerId2', 'peerId3'] };
+AV.Cloud.run('getOnOffStatus', params).then(function (result) {
+  // result: ["0", "1", null]
+}).catch( function (err) {
+  // 处理异常
+});
+```
+
+```swift
+func getOnOffStatus(peerIds: [String]) {
+    guard !peerIds.isEmpty else {
+        return
+    }
+    // 约定 key: ”peerIds” 对应的 value 是一组客户端的 ID
+    let parameters: [String: Any] = ["peerIds": peerIds]
+    // 调用云函数 `getOnOffStatus`
+    LCEngine.run("getOnOffStatus", parameters: parameters) { (result) in
+        switch result {
+        case .success(value: let value):
+            if let results = value as? [Any] {
+                // 查询结果是数组，各 ID 的结果按顺序与 `peerIds` 对应
+                // 不存在的 ID 对应的查询结果为 `null`，可以将其归为下线状态
+                for (index, peerId) in peerIds.enumerated() {
+                    let isOn: Bool = ((results[index] as? String) ?? "0") == "1"
+                    print("\(peerId): \(isOn)")
+                    // ...
+                }
+            }
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+}
+```
+</MultiLang>
+对于一些需要较为实时的更新上下线状态的场景，比如好友列表页面，群成员信息列表页面等等，可以通过轮询的方式来更新状态信息。
+
