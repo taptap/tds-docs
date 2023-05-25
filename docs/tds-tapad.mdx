@@ -242,6 +242,9 @@ TapAdManager.get().requestPermissionIfNecessary(activity);
 </MultiLang>
 
 ## 初始化
+:::info
+Oaid 对于 TapADN SDK 的广告转化效果尤为重要，请务必传递正确的参数
+:::
 
 <MultiLang kind="adn">
 
@@ -256,7 +259,7 @@ TapAdConfig config = new TapAdConfig.Builder()
                 .MediaKey(your_media_key)           // 必选参数。媒体密钥，可以在 TapADN 后台查看（用于传输数据的解密）
                 .MediaVersion("1")                  // 必选参数。默认值 "1"
                 .Channel(your__channel)             // 必选参数，渠道
-                .TapClientId(your_tap_client_id)    // 可选参数。TapTap 开发者中心的游戏 Client ID 
+                .TapClientId(your_tap_client_id)    // 必选参数。TapTap 开发者中心的游戏 Client ID。如果未在TapTap 开发者中心未注册应用，此处填写空字符串。填写正确的Client ID有助于提高广告的转化率。 
                 .EnableDebugLog(false)              // 可选参数，是否打开原生 debug 调试信息输出：true 打开、false 关闭。默认 false 关闭
                 .Build();
 
@@ -439,6 +442,56 @@ TapAdSdk.init(this, config);
 ## 上报用户行为
 
 为了获取更优质的广告内容，需要游戏额外提供一些玩家在游戏中的行为数据作为补充。
+
+上报参数介绍:
+
+| 参数名称 | 描述 | 
+| --- | --- |
+| ActionType | 1～1000: 付费相关
+
+1: 游戏付费（需要填写付费金额amount）
+
+2:打开付费帮助
+
+3:关闭付费帮助
+
+4:进入付费页面
+
+5:退出付费页面
+
+ 
+
+1001～2000：留存相关
+
+1001:激活（用户首次打开APP）
+
+1002:注册（在游戏内注册账户/创建角色）
+
+1003:游戏开始（打开游戏上报）
+
+1004:游戏结束（关闭游戏上报）
+
+1005:开始游戏对局
+
+1006: 结束游戏对局（需要填写胜负is_win）
+
+1007:开始任务
+
+1008:完成任务
+
+1009:领取任务奖励
+
+1010:进入仓库
+
+1011:退出仓库
+
+1012: 拍摄分享
+
+1013: 奖品开箱 |
+| ActionTime | 行为发生时间（单位：秒） |
+| Amount | 付费金额（单位：分） |
+| WinStatus | 游戏对局是否胜利 |
+
 
 <MultiLang kind="adn">
 
@@ -1112,7 +1165,7 @@ public interface TapFeedAd {
     double getScore();
 
     /**
-     * 获取广告的 view，如视频广告的 view，当前版本为自动播放且默认打开声音，用户可以手动关闭声音。
+     * 获取广告的 view，如视频广告的 view，当前版本为自动播放且默认关闭声音，用户可以手动打开声音。
      *
      * @return
      */
