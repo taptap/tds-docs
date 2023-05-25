@@ -111,7 +111,6 @@ export const getEntries = (brand: string, region: string): Entry[] => {
     ]
   }
 ]
-  ;
 
   const entries =  ENTRIES_LEANCLOUD ;
 

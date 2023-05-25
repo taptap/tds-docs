@@ -7,14 +7,17 @@ import Logo from "@theme/Logo";
 import styles from "./styles.module.scss";
 import { getEntries ,typeButton} from "./_config";
 import { BRAND, REGION } from "../../constants/env";
+import { addAbortSignal } from "stream";
 
 const DomePage = () => {
 
   const [buttonType, setButtonType] = useState("所有");
 
   const submitFeedback = (type) => {
-    console.log(type);
     setButtonType(type);
+    // getEntries(BRAND, REGION,buttonType).map((entry) => (
+    //   console.log(entry.title)
+    // ));
   };
 
   return <Layout>
@@ -33,7 +36,7 @@ const DomePage = () => {
         </div>
       </div>
 
-    
+      
       <div className={styles.buttonLine}>
         {typeButton.map((item) => (
           <button className={styles.button} onClick={()=>{
@@ -45,21 +48,15 @@ const DomePage = () => {
 
 
       <div className={styles.entries} >
-        {getEntries(BRAND, REGION,buttonType).map((entry) => (
-
-          <div key={entry.title} className={styles.entry}>
-                
-            
+        {getEntries(BRAND, REGION,buttonType).map((entry,index) => (
+        
+          <div key={index} className={styles.entry}>
+           
             <div className={styles.entryText}>
-             
-             
               <div className={styles.entryTitle}>
                 <div>{entry.title} </div>
                 <div className={styles.type}>{entry.type1} </div>
             </div>
-
-
-
               <div>{entry.description}</div>
             </div>
          
