@@ -9,7 +9,7 @@ import { getEntries ,typeButton} from "./_config";
 import { BRAND, REGION } from "../../constants/env";
 import { addAbortSignal } from "stream";
 
-const DomePage = () => {
+const DemoPage = () => {
 
   const [buttonType, setButtonType] = useState("所有");
 
@@ -31,7 +31,7 @@ const DomePage = () => {
             id="tds-home-开发者文档"
             description="from HomePage Title"
           >
-            Dome 下载
+            Demo 下载
           </Translate>
         </div>
       </div>
@@ -97,4 +97,4 @@ const DomePage = () => {
 </Layout>
 };
 
-export default DomePage;
+export default DemoPage;

@@ -25,7 +25,7 @@ type TypeButton={
   value:String
 }
 
-const domes = {
+const demos = {
   'ios': [{
     name: 'Chat',
     desc: '一个用 Swift 搭建的聊天应用。',
@@ -299,7 +299,7 @@ export const getEntries = (brand: string, region: string,buttonType:String): Ent
 
   var ENTRIES_LEANCLOUD: Entry[]=[];
   if ( buttonType == "所有") {
-   ENTRIES_LEANCLOUD = Object.values(domes).flatMap((arr) =>
+   ENTRIES_LEANCLOUD = Object.values(demos).flatMap((arr) =>
     arr.map(({ name, desc, mdPath ,type}) => ({
       title: name,
       description: desc,
@@ -313,7 +313,7 @@ export const getEntries = (brand: string, region: string,buttonType:String): Ent
     }))
     );
   }else{
-    ENTRIES_LEANCLOUD  = Object.values(domes).flatMap((arr) =>
+    ENTRIES_LEANCLOUD  = Object.values(demos).flatMap((arr) =>
     arr.map(({ name, desc, mdPath ,type}) => ({
       title: name,
       description: desc,
