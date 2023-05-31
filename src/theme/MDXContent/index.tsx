@@ -69,17 +69,21 @@ const getParagraphFromTarget = (target) => {
   return target;
 };
 
-const getTextFromParagraph = (paragraph) => paragraph.textContent;
+const getTextFromParagraph = (paragraph): string => paragraph.textContent;
+
+const getHashCodeFromString = (string: string): string => {
+  let hash = 0;
+  for (let i = 0; i < string.length; i++) {
+    const charCode = string.charCodeAt(i);
+    hash = (hash << 5) - hash + charCode;
+    hash |= 0;
+  }
+  return hash.toString();
+};
 
 const getIdFromParagraph = (paragraph): string => {
   const text = getTextFromParagraph(paragraph);
-  let hash = 0;
-  for (let i = 0; i < text.length; i++) {
-    const charCode = text.charCodeAt(i);
-    hash = (hash << 5) - hash + charCode;
-    hash = hash & hash;
-  }
-  return hash.toString();
+  return getHashCodeFromString(text);
 };
 
 const fetchFeedbackStatistic = async (): Promise<FeedbackStatistic> => {
