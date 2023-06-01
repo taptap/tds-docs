@@ -246,6 +246,7 @@ function ParagraphFeedbackBtn({
   setContext,
 }: ParagraphFeedbackBtnProps) {
   const [paragraph, setParagraph] = useState(null);
+  const [scrollY, setScrollY] = useState(0);
   const timer = useRef(null);
 
   const updateParagraph = (e: MouseEvent) => {
@@ -281,13 +282,19 @@ function ParagraphFeedbackBtn({
     return count;
   };
 
+  const updateScrollY = () => {
+    setScrollY(window.scrollY);
+  };
+
   useEffect(() => {
     document.addEventListener("mouseover", updateParagraph);
+    document.addEventListener("scroll", updateScrollY);
 
     return () => {
       document.removeEventListener("mouseover", updateParagraph);
+      document.removeEventListener("scroll", updateScrollY);
     };
-  }, [paragraph]);
+  }, [paragraph, scrollY]);
 
   return paragraph && context === null ? (
     <button
