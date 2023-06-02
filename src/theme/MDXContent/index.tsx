@@ -50,7 +50,13 @@ const getValueFromCookie = (name: string): string | undefined =>
     .find((row) => row.startsWith(`${name}=`))
     ?.split("=")[1];
 
-const getPageId = (): string => window.location.pathname.substring(5);
+const getPageId = (): string => {
+  let id = window.location.pathname.substring(5);
+  if (!id.endsWith("/")) {
+    id += "/";
+  }
+  return id;
+};
 
 const getRegion = (): string => {
   const INTL_DOMAINS = ["developer.taptap.io", "developer-intl.xdrnd.com"];
