@@ -327,13 +327,7 @@ export const getEntries = (brand: string, region: string,buttonType:String): Ent
     }))
   ) .filter((entry) => entry.type1 === buttonType);
   }
-  console.log(ENTRIES_LEANCLOUD)
-
- 
   const entries =  ENTRIES_LEANCLOUD ;
-  
- 
-
   const back = entries.map((entry) => ({
     title: translate({
       message: entry.title,
@@ -356,7 +350,5 @@ export const getEntries = (brand: string, region: string,buttonType:String): Ent
       }),
     })),
   }));
-  console.log("dsadsa")
-  console.log(back)
   return back;
 };
