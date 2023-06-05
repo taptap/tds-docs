@@ -143,7 +143,16 @@ const config = {
                 to: '/dome',
                 activeBaseRegex: 'none',
               },
+              {
+                label: '云课堂',
+                to: '/classroom',
+                activeBaseRegex: 'none',
+              },
             ],
+          },
+          {
+            type: "localeDropdown",
+            position: "right",
           }
          
         ],
