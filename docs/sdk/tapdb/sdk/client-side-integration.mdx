@@ -1459,7 +1459,8 @@ iOS 平台不适用
 
 若使用 TapSDK 初始化，请在 `TapDBConfig` 中的 `advertiserIDCollectionEnabled` 传入 `true` 开启 IDFA 采集开关。
 
-若单独使用 TapDB SDK 请调用如下接口开启 IDFA 采集开关
+若单独使用 TapDB SDK 请调用如下接口开启 IDFA 采集开关，***为保证数据准确性，该接口应在初始化接口之前调用***
+
 ```cs
 TapDB.AdvertiserIDCollectionEnabled(true);
 ```
@@ -1528,13 +1529,13 @@ SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选�
 "dependencies": {
   "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#3.14.0",
   "com.taptap.tds.tapdb": "https://github.com/TapTap/TapDB-Unity.git#3.14.0",
-  "com.taptap.tds.themis": "https://github.com/TapTap/TapThemis-Unity.git#3.14.0"
+  "com.tds.themis.themis": "https://THEMISUPM:DXY6Kze9wzECU7gbM4H1@git.xindong.com/themis/themis_sdk_upm.git?path=unity/Packages/com.tds.themis.themis"
 }
 ```
 
 如果选择手动导入：
 
-* 在 [下载页](/tap-download) 找到 TapSDK Unity 下载地址，下载 TapSDK-UnityPackage.zip 然后解压，导入其中的 `TapTap_Common`，`TapTap_TapDB` 和 `TapTap_Themis` 模块。
+* 在 [下载页](/tap-download) 找到 TapSDK Unity 下载地址，下载 TapSDK-UnityPackage.zip 然后解压，导入其中的 `TapTap_Common`，`TapTap_TapDB`模块。
 
 </>
 
@@ -1548,7 +1549,7 @@ repositories {
 }
 dependencies {
   ...
-  implementation (name:'THEMIS-release2.6.7', ext:'aar')
+  implementation (name:'THEMIS-release*.*.*', ext:'aar')
 }
 ```
 
@@ -1569,7 +1570,7 @@ dependencies {
 <MultiLang>
 
 ```cs
-using TapTap.TapDB;
+using TapTap.Themis;
 ```
 
 ```cs
@@ -1606,12 +1607,32 @@ TapDB.enableThemis(false);
 
 ### 接口描述
 
+#### 初始化
+
+<MultiLang>
+
+```cs
+TapThemis.InitTHEMIS();
+```
+
+```cs
+// TapDB SDK 自动调用，不需要额外接入
+```
+
+```cs
+// TapDB SDK 自动调用，不需要额外接入
+```
+
+</MultiLang>
+
+***注意：该接口需要在 TapDB 初始化接口之后调用***
+
 #### 设置日志上报等级
 
 <MultiLang>
 
 ```cs
-TapDB.ConfigAutoReportLogLevel(LogSeverity.LogError);
+TapThemis.U3d_ConfigAutoReportLogLevel(LogSeverity.LogError);
 ```
 
 ```cs
@@ -1631,7 +1652,7 @@ TapDB.ConfigAutoReportLogLevel(LogSeverity.LogError);
 <MultiLang>
 
 ```cs
-TapDB.ConfigAutoQuitApplication(true);
+TapThemis.U3d_ConfigAutoQuitApplication(true);
 ```
 
 ```cs
@@ -1651,7 +1672,7 @@ TapDB.ConfigAutoQuitApplication(true);
 <MultiLang>
 
 ```cs
-TapDB.RegisterLogCallback(logcallback);
+TapThemis.U3d_UnregisterLogCallback(logcallback);
 public void logcallback(string condition, string statckTrace, LogType type ){
 
 }
@@ -1674,7 +1695,7 @@ public void logcallback(string condition, string statckTrace, LogType type ){
 <MultiLang>
 
 ```cs
-TapDB.UnRegisterLogCallback(logcallback);
+TapThemis.U3d_UnregisterLogCallback(logcallback);
 ```
 
 ```cs
@@ -1692,7 +1713,7 @@ TapDB.UnRegisterLogCallback(logcallback);
 <MultiLang>
 
 ```cs
-TapDB.ReportException(new Exception("crash test from unity"),"crashMessage desc");
+TapThemis.ReportException(new Exception("Themis crash test from unity"),"crashMessage from untiy");
 ```
 
 ```cs
@@ -1706,3 +1727,39 @@ TapDB.ReportException(new Exception("crash test from unity"),"crashMessage desc"
 </MultiLang>
 
 主动上报异常信息。
+
+## 更新日志
+
+### 3.18.7
+
+#### 内容更新
+1. 修改 Themis 模块依赖
+2. 删除冗余 CAID 开关接口，更新 CAID 获取接口
+
+#### 接口变更
+
+##### 新增接口
+新增 Themis 初始化接口，该接口需在 TapDB 初始化接口之后调用
+
+```c#
+TapTap.Themis.TapThemis.InitTHEMIS();
+```
+#### 修改接口
+替换部分接口使用
+
+```c#
+[Obsolete("已弃用,请调用 TapTap.Themis.TapThemis.U3d_ConfigAutoReportLogLevel(LogSeverity level)")]
+public static void ConfigAutoReportLogLevel(LogSeverity level);
+
+[Obsolete("已弃用,请调用 TapTap.Themis.TapThemis.U3d_ConfigAutoQuitApplication(bool autoQuit)")]
+public static void ConfigAutoQuitApplication(bool enable);
+
+[Obsolete("已弃用,请调用 TapTap.Themis.TapThemis.U3d_RegisterLogCallback(LogCallbackDelegate handler)")]
+public static void RegisterLogCallback(TapDB.LogCallbackDelegate handler);
+
+[Obsolete("已弃用,请调用 TapTap.Themis.TapThemis.U3d_UnregisterLogCallback(LogCallbackDelegate handler)")]
+public static void UnRegisterLogCallback(TapDB.LogCallbackDelegate handler);
+
+[Obsolete("已弃用,请调用 TapTap.Themis.TapThemis.ReportException(System.Exception e, string message)")]
+public static void ReportException(Exception e, string message);
+```

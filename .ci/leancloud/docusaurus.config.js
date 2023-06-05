@@ -139,8 +139,8 @@ const config = {
                 activeBaseRegex: 'none',
               },
               {
-                label: 'DOME',
-                to: '/dome',
+                label: 'Demo',
+                to: '/demo',
                 activeBaseRegex: 'none',
               },
               {

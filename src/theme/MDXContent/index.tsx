@@ -36,6 +36,12 @@ type FeedbackThread = {
 type FeedbackContext = {
   entryType: number;
   text?: string;
+  paragraphId?: string;
+};
+
+type FeedbackStatistic = {
+  count: number;
+  paragraphStatistics: { id: string; count: number }[];
 };
 
 const getValueFromCookie = (name: string): string | undefined =>
@@ -44,7 +50,13 @@ const getValueFromCookie = (name: string): string | undefined =>
     .find((row) => row.startsWith(`${name}=`))
     ?.split("=")[1];
 
-const getPageId = (): string => window.location.pathname.substring(5);
+const getPageId = (): string => {
+  let id = window.location.pathname.substring(5);
+  if (!id.endsWith("/")) {
+    id += "/";
+  }
+  return id;
+};
 
 const getRegion = (): string => {
   const INTL_DOMAINS = ["developer.taptap.io", "developer-intl.xdrnd.com"];
@@ -56,8 +68,32 @@ const getIsLoggedIn = (): boolean => {
   return userId !== undefined;
 };
 
-const fetchFeedbackCount = async (): Promise<number> => {
-  const url = "/api/config/v1/feedback/count";
+const getParagraphFromTarget = (target) => {
+  while (!target.parentNode.classList.contains("theme-doc-markdown")) {
+    target = target.parentNode;
+  }
+  return target;
+};
+
+const getTextFromParagraph = (paragraph): string => paragraph.textContent;
+
+const getHashCodeFromString = (string: string): string => {
+  let hash = 0;
+  for (let i = 0; i < string.length; i++) {
+    const charCode = string.charCodeAt(i);
+    hash = (hash << 5) - hash + charCode;
+    hash |= 0;
+  }
+  return hash.toString();
+};
+
+const getIdFromParagraph = (paragraph): string => {
+  const text = getTextFromParagraph(paragraph);
+  return getHashCodeFromString(text);
+};
+
+const fetchFeedbackStatistic = async (): Promise<FeedbackStatistic> => {
+  const url = "/api/config/v1/feedback/statistic";
   const config = {
     headers: {
       accept: "application/json",
@@ -68,12 +104,19 @@ const fetchFeedbackCount = async (): Promise<number> => {
     },
   };
   const {
-    data: { data },
+    data: {
+      data: {
+        pageStatistic: { count },
+        paragraphStatistics,
+      },
+    },
   } = await axios.get(url, config);
-  return data;
+  return { count, paragraphStatistics };
 };
 
-const fetchFeedbackList = async (): Promise<FeedbackThread[]> => {
+const fetchFeedbackList = async (
+  paragraphId = ""
+): Promise<FeedbackThread[]> => {
   const url = "/api/config/v1/feedback/list";
   const config = {
     headers: {
@@ -82,6 +125,7 @@ const fetchFeedbackList = async (): Promise<FeedbackThread[]> => {
     },
     params: {
       page_id: getPageId(),
+      paragraph_id: paragraphId,
     },
   };
   const {
@@ -124,6 +168,7 @@ function SelectionFeedbackBtn({
   setContext,
 }: SelectionFeedbackBtnProps) {
   const [selection, setSelection] = useState<Selection | null>(null);
+  const [paragraph, setParagraph] = useState(null);
 
   const updateSelection = () => {
     const selection = document.getSelection();
@@ -134,11 +179,15 @@ function SelectionFeedbackBtn({
       selection.getRangeAt(0).getClientRects().length === 0
     ) {
       setSelection(null);
+      setParagraph(null);
     } else {
+      const target = selection.anchorNode;
+      const paragraph = getParagraphFromTarget(target);
       setSelection({
         range: selection.getRangeAt(0),
         text: selection.toString(),
       });
+      setParagraph(paragraph);
     }
   };
 
@@ -176,7 +225,11 @@ function SelectionFeedbackBtn({
       className={styles.selectionFeedbackBtn}
       style={getBtnPositionFromRange(selection.range)}
       onClick={() => {
-        setContext({ entryType: 1, text: selection.text });
+        setContext({
+          entryType: 1,
+          text: selection.text,
+          paragraphId: getIdFromParagraph(paragraph),
+        });
       }}
     >
       <IconEdit className={styles.icon} />
@@ -188,15 +241,18 @@ function SelectionFeedbackBtn({
 }
 
 interface ParagraphFeedbackBtnProps {
+  feedbackStatistic: FeedbackStatistic;
   context: FeedbackContext | null;
   setContext: (context: FeedbackContext) => void;
 }
 
 function ParagraphFeedbackBtn({
+  feedbackStatistic,
   context,
   setContext,
 }: ParagraphFeedbackBtnProps) {
   const [paragraph, setParagraph] = useState(null);
+  const [scrollY, setScrollY] = useState(0);
   const timer = useRef(null);
 
   const updateParagraph = (e: MouseEvent) => {
@@ -206,10 +262,7 @@ function ParagraphFeedbackBtn({
       e.target.closest(".theme-doc-markdown") &&
       !e.target.closest(`.${styles.paragraphFeedbackBtn}`)
     ) {
-      let target = e.target;
-      while (!target.parentNode.classList.contains("theme-doc-markdown")) {
-        target = target.parentNode;
-      }
+      const target = getParagraphFromTarget(e.target);
       setParagraph(target);
     } else {
       timer.current = setTimeout(() => {
@@ -217,8 +270,6 @@ function ParagraphFeedbackBtn({
       }, 3000);
     }
   };
-
-  const getTextFromParagraph = (paragraph) => paragraph.textContent;
 
   const getBtnPositionFromParagraph = (paragraph): Position => {
     const clientRect = paragraph.getBoundingClientRect();
@@ -229,24 +280,47 @@ function ParagraphFeedbackBtn({
     };
   };
 
+  const getFeedbackCount = (paragraph): number => {
+    const { paragraphStatistics } = feedbackStatistic;
+    const paragraphId = getIdFromParagraph(paragraph);
+    const count =
+      paragraphStatistics.find((stat) => stat.id === paragraphId)?.count || 0;
+    return count;
+  };
+
+  const updateScrollY = () => {
+    setScrollY(window.scrollY);
+  };
+
   useEffect(() => {
     document.addEventListener("mouseover", updateParagraph);
+    document.addEventListener("scroll", updateScrollY);
 
     return () => {
       document.removeEventListener("mouseover", updateParagraph);
+      document.removeEventListener("scroll", updateScrollY);
     };
-  }, [paragraph]);
+  }, [paragraph, scrollY]);
 
   return paragraph && context === null ? (
     <button
       className={styles.paragraphFeedbackBtn}
       style={getBtnPositionFromParagraph(paragraph)}
       onClick={() => {
-        setContext({ entryType: 2, text: getTextFromParagraph(paragraph) });
+        setContext({
+          entryType: 2,
+          text: getTextFromParagraph(paragraph),
+          paragraphId: getIdFromParagraph(paragraph),
+        });
       }}
     >
       <IconTip className={styles.tip} />
       <IconEdit className={styles.icon} />
+      {getFeedbackCount(paragraph) > 0 ? (
+        <span>{getFeedbackCount(paragraph)}条反馈</span>
+      ) : (
+        <></>
+      )}
     </button>
   ) : (
     <></>
@@ -297,7 +371,6 @@ interface FeedbackModalProps {
 
 function FeedbackModal({
   isLoggedIn,
-  feedbackList,
   context,
   setContext,
   showToast,
@@ -321,8 +394,16 @@ function FeedbackModal({
   ];
 
   const [type, setType] = useState<number | null>(null);
+  const [feedbackList, setFeedbackList] = useState<FeedbackThread[]>([]);
   const [content, setContent] = useState<string>("");
   const [processing, setProcessing] = useState<boolean>(false);
+
+  const updateFeedbackList = async () => {
+    const feedbackList: FeedbackThread[] = await fetchFeedbackList(
+      context.paragraphId
+    );
+    setFeedbackList(feedbackList);
+  };
 
   const handleTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setType(parseInt(e.target.value));
@@ -336,6 +417,7 @@ function FeedbackModal({
     setProcessing(true);
     const data = {
       pageId: getPageId(),
+      paragraphId: context.paragraphId || "",
       entryType: context.entryType,
       type: type,
       docStart: (context.text || "").slice(0, 10),
@@ -353,6 +435,7 @@ function FeedbackModal({
 
   useEffect(() => {
     document.body.classList.add(styles.noScroll);
+    updateFeedbackList();
 
     return () => {
       document.body.classList.remove(styles.noScroll);
@@ -551,8 +634,9 @@ function Feedback() {
   } = useDocusaurusContext();
 
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
-  const [feedbackCount, setFeedbackCount] = useState<number>(0);
-  const [feedbackList, setFeedbackList] = useState<FeedbackThread[]>([]);
+  const [feedbackStatistic, setFeedbackStatistic] = useState<FeedbackStatistic>(
+    { count: 0, paragraphStatistics: [] }
+  );
   const [context, setContext] = useState<FeedbackContext | null>(null);
   const [isToastOn, setIsToastOn] = useState<boolean>(false);
 
@@ -561,14 +645,9 @@ function Feedback() {
     setIsLoggedIn(isLoggedIn);
   };
 
-  const updateFeedbackCount = async () => {
-    const feedbackCount: number = await fetchFeedbackCount();
-    setFeedbackCount(feedbackCount);
-  };
-
-  const updateFeedbackList = async () => {
-    const feedbackList: FeedbackThread[] = await fetchFeedbackList();
-    setFeedbackList(feedbackList);
+  const updateFeedbackStatistic = async () => {
+    const feedbackStatistic: FeedbackStatistic = await fetchFeedbackStatistic();
+    setFeedbackStatistic(feedbackStatistic);
   };
 
   const showToast = () => {
@@ -581,11 +660,11 @@ function Feedback() {
 
   useEffect(() => {
     updateIsLoggedIn();
-    updateFeedbackCount();
-    updateFeedbackList();
+    updateFeedbackStatistic();
   }, []);
 
   const ENABLED_DOMAINS = [
+    "localhost:3888",
     "developer.taptap.cn",
     "developer.taptap.io",
     "developer.xdrnd.cn",
@@ -607,9 +686,13 @@ function Feedback() {
   return enabled ? (
     <div className={styles.feedback}>
       <SelectionFeedbackBtn context={context} setContext={setContext} />
-      <ParagraphFeedbackBtn context={context} setContext={setContext} />
+      <ParagraphFeedbackBtn
+        feedbackStatistic={feedbackStatistic}
+        context={context}
+        setContext={setContext}
+      />
       <PageFeedbackBtn
-        feedbackCount={feedbackCount}
+        feedbackCount={feedbackStatistic.count}
         context={context}
         setContext={setContext}
       />
@@ -617,7 +700,6 @@ function Feedback() {
       {context ? (
         <FeedbackModal
           isLoggedIn={isLoggedIn}
-          feedbackList={feedbackList}
           context={context}
           setContext={setContext}
           showToast={showToast}
