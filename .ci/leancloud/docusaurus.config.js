@@ -103,6 +103,11 @@ const config = {
                 activeBaseRegex: 'none',
               },
               {
+                label: 'JavaScript 即时通讯 SDK API',
+                to: 'https://leancloud.github.io/js-realtime-sdk/docs/',
+                activeBaseRegex: 'none',
+              },
+              {
                 label: 'JavaScript 多人在线对战 SDK API',
                 to: 'https://leancloud.github.io/Play-SDK-JS/doc/global.html',
                 activeBaseRegex: 'none',
