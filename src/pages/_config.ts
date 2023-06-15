@@ -1,4 +1,6 @@
 import { translate } from "@docusaurus/Translate";
+import { BRAND, REGION } from "../constants/env";
+
 
 /* 内部地址 */
 type ActionCellLinkInternal = {
@@ -19,6 +21,8 @@ type Entry = {
 };
 
 export const getEntries = (brand: string, region: string): Entry[] => {
+
+
   const ENTRIES_TDS: Entry[] = [
     {
       title: "游戏商店",
@@ -182,8 +186,74 @@ export const getEntries = (brand: string, region: string): Entry[] => {
       ],
     },
   ];
+  const ENTRIES_LEANCLOUDEN: Entry[] = [
 
-  const entries = brand === "leancloud" ? ENTRIES_LEANCLOUD : ENTRIES_TDS;
+
+    {
+      title: "内建账户",
+      description: "支持用户通过邮件或手机进行注册和登录，并提供密码重置、第三方登录等实用功能",
+      links: [
+        {
+          label: "查看更多",
+          to: "/sdk/authentication/guide",
+        },
+      ],
+    },
+    {
+      title: "数据存储",
+      description: "高效存取海量级 JSON 对象、二进制文件、地理位置等数据，提供完整的增删改查操作接口",
+      links: [
+        {
+          label: "查看更多",
+          to: "/sdk/storage/overview",
+        },
+      ],
+    },
+    {
+      title: "云引擎",
+      links: [
+        {
+          label: "查看更多",
+          to: "/sdk/engine/overview",
+        },
+      ],
+    },
+    {
+      title: "推送通知",
+      links: [
+        {
+          label: "查看更多",
+          to: "/sdk/push/features",
+        },
+      ],
+    },
+    {
+      title: "即时通讯",
+      links: [
+        {
+          label: "查看更多",
+          to: "/sdk/im/features",
+        },
+      ],
+    },
+    {
+      title: "短信",
+      description: "支持国内短信和国际短信，用途包括验证类、通知类、营销类，方便与 LeanCloud 账户系统集成",
+      links: [
+        {
+          label: "查看更多",
+          to: "/sdk/sms/guide",
+        },
+      ],
+    }
+
+  ];
+
+  var entries = brand === "leancloud" ?
+  window.location.pathname=="/en/"? ENTRIES_LEANCLOUDEN:
+  ENTRIES_LEANCLOUD : ENTRIES_TDS;
+
+
 
   return entries.map((entry) => ({
     title: translate({
