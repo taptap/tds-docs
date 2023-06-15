@@ -191,7 +191,7 @@ export const getEntries = (brand: string, region: string): Entry[] => {
 
     {
       title: "内建账户",
-      description: "支持用户通过邮件或手机进行注册和登录，并提供密码重置、第三方登录等实用功能",
+      description: " Support users to register and log in via email or mobile, and provide practical functions such as password reset and third-party login.",
       links: [
         {
           label: "查看更多",
@@ -201,7 +201,7 @@ export const getEntries = (brand: string, region: string): Entry[] => {
     },
     {
       title: "数据存储",
-      description: "高效存取海量级 JSON 对象、二进制文件、地理位置等数据，提供完整的增删改查操作接口",
+      description: "Efficient access to massive JSON objects, binary files and other data, providing a complete interface for adding, deleting, modifying, and querying operations",
       links: [
         {
           label: "查看更多",
@@ -238,7 +238,7 @@ export const getEntries = (brand: string, region: string): Entry[] => {
     },
     {
       title: "短信",
-      description: "支持国内短信和国际短信，用途包括验证类、通知类、营销类，方便与 LeanCloud 账户系统集成",
+      description: "Support domestic and international SMS, including verification, notification, and marketing purposes, to facilitate integration with the LeanCloud account system",
       links: [
         {
           label: "查看更多",
