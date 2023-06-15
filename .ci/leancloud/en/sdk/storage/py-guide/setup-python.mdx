@@ -1,0 +1,126 @@
+---
+title: How to Install the Python SDK
+sidebar_label: Python SDK Installing
+slug: /sdk/storage/guide/setup-python/
+sidebar_position: 1
+---
+
+import DomainBinding from "../../_partials/setup-domain.mdx";
+import AppConfig from "../_partials/app-config.mdx";
+import { Conditional } from "/src/docComponents/conditional";
+import Path from "/src/docComponents/path";
+
+## Installing SDK
+
+There are several ways for you to install our SDK and the most convenient one is to use a package manager.
+
+### Installing with Package Manager
+
+The easiest way to integrate our SDK into your project is to use `pip`. Run the following command to install it:
+
+```sh
+pip install leancloud
+```
+Depending on the environment you're using, you may need to add `sudo` at the beginning of the command.
+
+
+### Installing Manually
+
+[Python SDK ](https://releases.leanapp.cn/#/leancloud/python-sdk/releases)。
+
+## Initializing Your Project
+
+Then import `leancloud` and call init to initialize it:
+
+<Conditional brand="tds">
+
+```python
+import leancloud
+
+leancloud.init("your-client-id", "your-client-token")
+# 或者使用 Master Key
+# leancloud.init("your-client-id", master_key="your-client-secret")
+```
+
+</Conditional>
+
+<Conditional brand="leancloud">
+
+```python
+import leancloud
+
+leancloud.init("your-app-id", "your-app-key")
+# Or use Master Key
+# leancloud.init("{{appid}}", master_key="{{masterkey}}")
+```
+
+</Conditional>
+
+
+
+## Enabling Debug Logs
+
+You can easily trace the problems in your project by turning debug logs on during the development phase. Once enabled, details of every request made by the SDK along with errors will be output to IDE, browser console, or your app's Dashboard > LeanEngine > App logs.
+
+```python
+# Place the code at the beginning of the start-up script
+# If used in LeanEngine, the start-up script is wsgi.py
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+```
+
+Make sure debug logs are turned off before your app is published. Failure to do so may lead to the exposure of sensitive data.
+
+## Verifying
+
+First of all, make sure you are able to connect to LeanCloud server. You can test it by running the following command:
+
+```sh
+curl "https://{{host}}/1.1/date"
+```
+
+If everything goes well, it will return the current date:
+
+```json
+{ "__type": "Date", "iso": "2020-10-12T06:46:56.000Z" }
+```
+
+Then add the following code into your project:
+
+```js
+TestObject = leancloud.Object.extend('TestObject')
+test_object = TestObject()
+test_object.set('words', "Hello world!")
+test_object.save()
+
+```
+
+
+Save and run your program.
+
+Then go to **<Path to="storage" /> > Data > `TestObject`**. If you see a row with its `words` column being `Hello world!`, it means that you have correctly installed the SDK.
+
+See [Debugging](#Debugging) if you’re not seeing the content.
+
+## Debugging
+
+This guide is written for the latest version of our SDK. If you encounter any error, please first make sure you have the latest version installed.
+
+
+### `401 Unauthorized`
+
+If you get a 401 error or see the following content in network logs:
+
+```json
+{
+  "code": 401,
+  "error": "Unauthorized."
+}
+```
+
+It means that the App ID or App Key might be incorrect or don't match. If you have multiple apps, you might have used the App ID of one app with the App Key of another one, which will lead to such error.
+
+### Client Cannot Access the Internet
+
+Make sure you have granted enough permissions for your mobile app.

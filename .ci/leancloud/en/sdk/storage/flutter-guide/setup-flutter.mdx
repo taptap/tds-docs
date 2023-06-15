@@ -1,0 +1,314 @@
+---
+title: Installing JavaScript SDK  for Data Storage and Instant Messaging
+sidebar_label: Flutter SDK Installing
+slug: /sdk/storage/guide/setup-flutter/
+sidebar_position: 1
+---
+
+import sdkVersions from "/src/docComponents/sdkVersions";
+import CodeBlock from '@theme/CodeBlock';
+import { Conditional } from "/src/docComponents/conditional";
+import DomainBinding from "../../_partials/setup-domain.mdx";
+import AppConfig from "../_partials/app-config.mdx";
+import Path from "/src/docComponents/path";
+
+## Installing SDK
+
+:::tip
+There are various ways to obtain the SDK, but the recommended approach is to download the latest version through a package dependency management tool
+:::
+
+pub.dev:
+
+* [LeanStorage SDK](https://pub.dev/packages/leancloud_storage)
+* [LeanMessage SDK](https://pub.dev/packages/leancloud_official_plugin)
+
+### LeanStorage
+Specify [leancloud_storage](https://pub.dev/packages/leancloud_storage) as dependency in `pubspec.yaml`:
+
+<CodeBlock className="yaml">
+{`dependencies:
+  flutter:
+    sdk: flutter
+  ...
+  leancloud_storage: ^${sdkVersions.leancloud.flutter.storage}`}
+</CodeBlock>
+
+### LeanMessage
+Specify [leancloud_official_plugin](https://pub.dev/packages/leancloud_official_plugin) as dependency in `pubspec.yaml`:
+
+<CodeBlock className="yaml">
+{`dependencies:
+  flutter:
+    sdk: flutter
+  ...
+  leancloud_official_plugin: ^${sdkVersions.leancloud.flutter.realtime}`}
+</CodeBlock>
+
+
+Android:
+
+<CodeBlock className="groovy">
+{`dependencies {
+  implementation 'cn.leancloud:storage-android:${sdkVersions.leancloud.java}'
+  implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
+  implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+}`}
+</CodeBlock>
+
+iOS:
+
+```sh
+cd ios/
+pod update # or $ pod install --repo-update
+```
+
+## Initializing Your Project
+
+
+
+<AppConfig />
+
+### Initializing LeanStorage
+
+Add this import statement in the Dart code:
+
+```dart
+import 'package:leancloud_storage/leancloud.dart';
+```
+
+And initialize SDK as follows:
+
+<Conditional brand="tds">
+
+```dart
+LeanCloud.initialize(
+    'your-client-id', 'your-client-token',
+    server: 'https://your_server_url',
+    queryCache: new LCQueryCache());
+```
+
+</Conditional>
+
+<Conditional brand="leancloud">
+
+```dart
+LeanCloud.initialize(
+    'your-app-id', 'your-app-key',
+    server: 'https://your_server_url',
+    queryCache: new LCQueryCache());
+```
+
+
+</Conditional>
+
+#### Android Permissions
+
+Do not forget to specify required permissions in AndroidManifest.xml:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET"/>
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+```
+
+### Initializing LeanMessage
+
+Import package:leancloud_official_plugin/leancloud_plugin.dart in lib/main.dart of your project:
+
+```dart
+import 'package:leancloud_official_plugin/leancloud_plugin.dart';
+```
+
+**To use the Flutter instant messaging plugin, initialization is required on both the Android and iOS platforms separately.**
+
+#### Android Platform Initialization
+
+First, add the following to the `onCreate` method of the `Application` class:
+
+<Conditional brand="leancloud">
+
+```java
+import cn.leancloud.LeanCloud;
+import cn.leancloud.LCLogger;
+import cn.leancloud.im.LCIMOptions;
+import io.flutter.app.FlutterApplication;
+
+public class MyLeanCloudApp extends FlutterApplication {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        LCIMOptions.getGlobalOptions().setUnreadNotificationEnabled(true);
+        LeanCloud.setLogLevel(LCLogger.Level.DEBUG);
+        LeanCloud.initialize(this, "your-app-id", "your-app-key", "https://your_server_url");
+    }
+}
+```
+
+</Conditional>
+
+<Conditional brand="tds">
+
+```java
+import cn.leancloud.LeanCloud;
+import cn.leancloud.LCLogger;
+import cn.leancloud.im.LCIMOptions;
+import io.flutter.app.FlutterApplication;
+
+public class MyLeanCloudApp extends FlutterApplication {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        LCIMOptions.getGlobalOptions().setUnreadNotificationEnabled(true);
+        LeanCloud.setLogLevel(LCLogger.Level.DEBUG);
+        LeanCloud.initialize(this, "your-client-id", "your-client-token", "https://your_server_url");
+    }
+}
+```
+
+</Conditional>
+
+Then, specify the required permissions for the SDK and declare the MyLeanCloudApp class in the AndroidManifest.xml file:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET"/>
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+<application
+  …
+  android:name=".MyLeanCloudApp" >
+
+  <service android:name="cn.leancloud.push.PushService"/>
+  <receiver android:name="cn.leancloud.push.LCBroadcastReceiver">
+    <intent-filter>
+      <action android:name="android.intent.action.BOOT_COMPLETED"/>
+      <action android:name="android.intent.action.USER_PRESENT"/>
+      <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+    </intent-filter>
+  </receiver>
+</application>
+```
+
+#### iOS 平台初始化
+
+Add the following initialization code to the AppDelegate.swift file:
+
+<Conditional brand="leancloud">
+
+```swift
+import Flutter
+import LeanCloud
+
+@UIApplicationMain
+@objc class AppDelegate: FlutterAppDelegate {
+    override func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    ) -> Bool {
+        do {
+            LCApplication.logLevel = .all
+            try LCApplication.default.set(
+                id: "your-app-id",
+                key: "your-app-key",
+                serverURL: "https://your_server_url")
+            GeneratedPluginRegistrant.register(with: self)
+            return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+        } catch {
+            fatalError("\(error)")
+        }
+    }
+}
+```
+
+</Conditional>
+
+<Conditional brand="tds">
+
+```swift
+import Flutter
+import LeanCloud
+
+@UIApplicationMain
+@objc class AppDelegate: FlutterAppDelegate {
+    override func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
+    ) -> Bool {
+        do {
+            LCApplication.logLevel = .all
+            try LCApplication.default.set(
+                id: "your-client-id",
+                key: "your-client-token",
+                serverURL: "https://your_server_url")
+            GeneratedPluginRegistrant.register(with: self)
+            return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+        } catch {
+            fatalError("\(error)")
+        }
+    }
+}
+```
+
+</Conditional>
+
+
+## Enabling Debug Logs
+
+You can easily trace the problems in your project by turning debug logs on during the development phase. Once enabled, details of every request made by the SDK along with errors will be output to IDE, browser console, or your app's Dashboard > LeanEngine > App logs.
+
+### LeanStorage
+```dart
+LCLogger.setLevel(LCLogger.DebugLevel);
+```
+### LeanMessage
+
+Refer to Swift SDK Setup Guide and Java SDK Setup Guide for information on how to enable debug logs on iOS and Android platforms.
+
+Make sure debug logs are turned off before your app is published. Failure to do so may lead to the exposure of sensitive data.
+
+## Verifying
+
+First of all, make sure you are able to connect to LeanCloud server. You can test it by running the following command:
+
+```sh
+curl "https://{{host}}/1.1/date"
+```
+
+If everything goes well, it will return the current date:
+
+```json
+{ "__type": "Date", "iso": "2020-10-12T06:46:56.000Z" }
+```
+
+Then add the following code into your project:
+
+```js
+LCObject testObject = LCObject('TestObject');
+testObject['words'] = 'Hello world!';
+await testObject.save()
+```
+
+Save the file and run it.
+
+Then go to your app's Dashboard > LeanStorage > Data > TestObject. If you see the following content, it means that you have correctly installed the SDK.
+
+## Debugging
+
+This guide is written for the latest version of our SDK. If you encounter any error, please first make sure you have the latest version installed.
+
+
+### `401 Unauthorized`
+
+If you get a 401 error or see the following content in network logs:
+
+```json
+{
+  "code": 401,
+  "error": "Unauthorized."
+}
+```
+
+It means that the App ID or App Key might be incorrect or don't match. If you have multiple apps, you might have used the App ID of one app with the App Key of another one, which will lead to such error.
+
+### Client Cannot Access the Internet
+
+Make sure you have granted enough permissions for your mobile app.

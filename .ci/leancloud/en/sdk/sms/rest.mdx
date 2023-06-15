@@ -1,0 +1,373 @@
+---
+title: SMS REST API Guide
+sidebar_label: REST API
+sidebar_position: 2
+---
+
+import Mermaid from "/src/docComponents/Mermaid";
+
+[REST API](/sdk/storage/guide/rest/) 可以让任何支持发送 HTTP 请求的设备与 LeanCloud 进行交互。使用我们的短信服务 REST API 可以完成很多事情，比如：
+
+The current API version is `1.1`.
+For request format and response format, please refer to the [Request Format section](/sdk/storage/guide/rest/#请求格式) and [Response Format section](/sdk/storage/guide/rest/#响应格式) of REST API Guide.
+
+Sending SMS verification code involves three parties: client side, cloud side (LeanCloud), and mobile network operator:
+
+
+<Mermaid
+  diagram={`
+  sequenceDiagram
+Client->LeanCloud: 1. provide mobile number
+LeanCloud->Network: 2. provide mobile number and SMS content
+Network->Client: 3. send verification code to the mobile phone via SMS or voice call
+Client->LeanCloud: 4. submit mobile number and verification code received
+`}
+/>
+
+
+
+SMS REST API includes:
+
+**General Verification API**
+
+| URL                         | HTTP Method | Description        |
+| :-------------------------- | :--- | --------- |
+| /1.1/requestSmsCode         | POST | send SMS verification code |
+| /1.1/verifySmsCode/`<code>` | POST | verify SMS code |
+
+**User Verification API**
+
+| URL                                  | HTTP Method | Description                |
+| :----------------------------------- | :--- | ----------------- |
+| /1.1/usersByMobilePhone              | POST | sign up or log in via mobile number       |
+| /1.1/requestMobilePhoneVerify        | POST | send SMS to verify users' mobile number    |
+| /1.1/verifyMobilePhone/`<code>`      | POST | verify users' mobile number via SMS code  |
+| /1.1/requestChangePhoneNumber        | POST | send SMS for binding or updating mobile number |
+| /1.1/changePhoneNumber               | POST | verify SMS code to bind or update mobile number |
+| /1.1/requestLoginSmsCode             | POST | send SMS to log in a user   |
+| /1.1/requestPasswordResetBySmsCode   | POST | send SMS for password reset |
+| /1.1/resetPasswordBySmsCode/`<code>` | PUT  | verify SMS code for password reset |
+
+## Configure SMS Service
+
+To be able to send text messages to users of your application, you need to first [finish some initial configurations](/sdk/sms/guide/#开通短信服务).
+
+## General Verification API
+
+It is becoming quite common that apps rely on SMS to perform verification for sensitive operations.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '{"mobilePhoneNumber": "+1xxxxxxxxxx"}' \
+  https://{{host}}/1.1/requestSmsCode
+```
+
+| Parameter              |  Required  | Description                            |
+| :---------------- | :--: | :----------------------------- |
+| mobilePhoneNumber | Required | mobile phone number                         |
+| smsType           | Optional | `voice` or `sms` (default value: `sms`) |
+| ttl               | Optional | verification code valid time in minutes (default value: `10`) |
+| name              | Optional | application name |
+| op                | Optional | operation name, e.g. payment |
+| template          | Optional | template name, see [Templates section](#templates) below |
+| validate_token    | Optional | see [CAPTCHA section](#CAPTCHA) below | 
+| other_variable    | Optional | [template variable](#templates), `other_variable` is just an example variable name |
+
+It will return status code `200 OK` if succeeded.
+
+Once the user receives the short message, they can fill in the verification code in your application.
+Then you can send a `POST` request to `/verifySmsCode` to check if the code is valid.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '{"mobilePhoneNumber":"+1xxxxxxxxxx"}' \
+  "https://{{host}}/1.1/verifySmsCode/123456"
+```
+
+`123456` is the verification code.
+
+It will return status code `200 OK` if succeeded.
+
+### Sending Verification Code by Calling
+
+You can specify the value of `smsType` parameter as `voice` to send the verification code via phone call.
+The phone call will only tell the verification code to the user.
+You cannot send other information to users in this way.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '{"mobilePhoneNumber": "+1xxxxxxxxxx", "smsType":"voice"}' \
+  https://{{host}}/1.1/requestSmsCode
+```
+
+### Templates
+
+Besides the default verification short message, you can use templates to customize verification message content, or send other non-verification messages, such as notification messages.
+
+Refer to [the Templates section of Short Message Service (SMS) Guide](/sdk/sms/guide/) for information about how to create a template.
+
+To use SMS templates, pass the `template` parameter to `requestSmsCode`:
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '{"mobilePhoneNumber": "+1xxxxxxxxxx", "template":"Order_Notice", "date":"31 Oct. 2014"}' \
+  https://{{host}}/1.1/requestSmsCode
+```
+
+`date` is a [template variable](sms-guide.html#template-variables).
+
+## User Verification API
+
+LeanCloud offers a built-in [user system](l/sdk/sms/guide/#templates) for you to quickly implement account related features.
+LeanCloud also provides dedicated SMS APIs to work with the user system.
+
+### Signing up with Phones
+
+It is common to ask users to sign up a new account directly with their phone numbers.
+After acquiring a verification code via `POST /requestSmsCode` mentioned above,
+your application can sign up a new user with the mobile phone number and the verification code:
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '{"mobilePhoneNumber":"+1xxxxxxxxxx","smsCode":"123456"}' \
+  https://{{host}}/1.1/usersByMobilePhone
+```
+
+If the user (mobile phone) already exists, no new user will be created, and the API call will still be considered as a success.
+
+If succeed, the response body will be something like:
+
+```json
+{
+  "username":     "+1xxxxxxxxxx",
+  "mobilePhone":  "+1xxxxxxxxxx",
+  "createdAt":    "2014-11-07T20:58:34.448Z",
+  "updatedAt":    "2014-11-07T20:58:34.448Z",
+  "objectId":     "51c3ba66e4b0f0e851c1621b",
+  "sessionToken": "pnktnjyb996sj4p156gjtp4im",
+  "mobilePhoneVerified": true,
+  // ... other
+}
+```
+
+If the above call will create a new user account,
+LeanCloud will set `mobilePhoneVerified` to `true`, set `username` to the mobile phone number, and generate a null password.
+A null password indicates the user cannot log in via password.
+
+To specify a username other than the mobile phone number, you can pass an additional `username` parameter.
+Similarly, to allow the user to login via password later, you can pass an additional `password` parameter:
+
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '{"mobilePhoneNumber":"+1xxxxxxxxxx","smsCode":"123456", "password":"your-password"}' \
+  https://{{host}}/1.1/usersByMobilePhone
+```
+
+`username` and `password` parameters only have effects when a new user will be created.
+They will be ignored when logging in an existing user.
+
+### Verifying Mobile Phone
+
+As mentioned above, registering a new user with a mobile phone will set `mobilePhoneVerified` to `true`.
+If the user is registered with another method, you can also ask the user to verify their phone:
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '{"mobilePhoneNumber": "+1xxxxxxxxxx"}' \
+  https://{{host}}/1.1/requestMobilePhoneVerify
+```
+
+It will return status code `200 OK` if succeeded,
+and LeanCloud will send the verification code to the user.
+After the user receives the code, you can ask the user to submit it in your application,
+and check its validness against LeanCloud via `POST /verifyMobilePhone/<code>`:
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '{"mobilePhoneNumber":"+1xxxxxxxxxx"}' \
+  https://{{host}}/1.1/verifyMobilePhone/123456
+```
+
+If the verification succeeded, LeanCloud will set this user's `mobilePhoneNumberVerified` to `true`, and the response body will be something like:
+
+```json
+{
+  "updatedAt":"2017-03-30T08:20:25.452Z",
+  "objectId":"587a0f0661ff4b0065f1dff8"
+}
+```
+
+If you want to make binding/changing mobile phone number an atomic operation, you can use `POST /requestChangePhoneNumber` and `POST /changePhoneNumber` instead:
+
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Session: <sessionToken>" \
+  -H "Content-Type: application/json" \
+  -d '{"mobilePhoneNumber":"+1xxxxxxxxxx","ttl":10}' \
+  https://{{host}}/1.1/requestChangePhoneNumber
+
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '{"mobilePhoneNumber":"+1xxxxxxxxxx","code":"123456"}' \
+  https://{{host}}/1.1/changePhoneNumber
+```
+
+`"ttl": 10` means the verification code will be valid for 10 minutes.
+It is optional (defaults to 6 minutes).
+
+### Logging in with Phones
+
+To log in an existing user with a verified mobile phone number, there is a dedicated endpoint (`POST /requestLoginSmsCode`) to request a verification code:
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '{"mobilePhoneNumber":"+1xxxxxxxxxx"}' \
+  https://{{host}}/1.1/requestLoginSmsCode
+```
+
+It will return status code `200 OK` if succeeded.
+Now this user can use their mobile phone number and verification code to log in:
+
+```sh
+curl -X POST \
+-H "Content-Type: application/json" \
+-H "X-LC-Id: {{appid}}" \
+-H "X-LC-Key: {{appkey}}" \
+-d '{"mobilePhoneNumber":"+1xxxxxxxxxx","smsCode":"123456"}' \
+https://{{host}}/1.1/login
+```
+
+As mentioned above, calling `POST /requestSmsCode` and then `POST /usersByMobilePhone` can also log in an existing user.
+However, calling `POST /requestLoginSmsCode` and then `POST /login` is preferred if you do not want to create a new user when the user does not exist.
+This helps to prevent issues such as a user mistakenly inputs a wrong mobile phone number.
+
+### Password Reset with Phone
+
+A user with a verified mobile phone number can reset their password via their mobile phone:
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '{"mobilePhoneNumber": "+1xxxxxxxxxx"}' \
+  https://{{host}}/1.1/requestPasswordResetBySmsCode
+```
+
+It will return status code `200 OK` if succeeded.
+
+After the user fill in the received verification code, you can call `PUT /1.1/resetPasswordBySmsCode/<code>` to reset their password:
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '{"password": "<new password>", "mobilePhoneNumber": "+1xxxxxxxxxx"}' \
+  https://{{host}}/1.1/resetPasswordBySmsCode/123456
+```
+
+## CAPTCHA
+
+LeanCloud provides [CAPTCHA service](/sdk/sms/guide/##preventing-abuse-with-captcha) to prevent SMS abusing.
+
+|URL|HTTP Method|Description|
+| :----------------------------------- | :--- | ----------------- |
+|/1.1/requestCaptcha|GET|get CAPTCHA image|
+|/1.1/verifyCaptcha|POST|get token after verified|
+
+After enabling CAPTCHA service on dashboard (refer to [SMS Guide](/sdk/sms/guide/) for instructions), you can request a CAPTCHA image as below:
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+   -G \
+  --data-urlencode 'size=4' \
+  https://{{host}}/1.1/requestCaptcha
+```
+
+
+Response:
+
+```json
+{
+   "captcha_token":"R2cxkqSz",
+   "captcha_url":"https:\/\/leancloud.cn\/1.1\/captchaImage?appId=PXnN5AqVpgEI4esrTLhoxUkd-gzGzoHsz&token=R2cxkqSz"
+}
+```
+
+|Properties|Description|
+|:----|:--|
+|captcha_token|to be consumed by `POST /verifyCaptcha`|
+|captcha_url|url to CAPTCHA image file|
+
+Then you can verify it via:
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '{
+        "captcha_code": "0000",
+        "captcha_token": "R2cxkqSz"
+      }' \
+  https://{{host}}/1.1/verifyCaptcha
+
+```
+
+|Properties|Description|
+| :----| :--|
+|captcha_code|entered by the user|
+|captcha_token|returned by `GET /requestCaptcha`|
+
+If succeed, the response body will be:
+
+```json
+{ "validate_token": "the token to send SMS"}
+```
+
+The acquired  `validate_token` should be passed in the `POST /requestSmsCode` request：
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '{"mobilePhoneNumber": "+1xxxxxxxxxx","validate_token":"token"}' \
+  https://{{host}}/1.1/requestSmsCode
+```
