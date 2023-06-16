@@ -73,6 +73,7 @@ cp .ci/leancloud/sidebars.js sidebars.js
 
 #加入lc隐藏文档
 cp -r .ci/leancloud/zh-Hans/sdk/deeplink.mdx docs/
+cp -r .ci/leancloud/zh-Hans/sdk/classroom.mdx docs/
 
 # 构建
 yarn build --out-dir build-leancloud
