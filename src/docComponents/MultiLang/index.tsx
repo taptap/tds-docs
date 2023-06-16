@@ -113,7 +113,6 @@ const CONFIGS: {
   default: {
     leancloud: [
       { label: ".NET", value: "dotnet" },
-      { label: ".NET", value: "dotnet" },
       { label: "Java", value: "java" },
       { label: "Objective-C", value: "objc" },
       { label: "Swift", value: "swift" },
