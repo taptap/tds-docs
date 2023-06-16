@@ -103,11 +103,6 @@ const config = {
                 activeBaseRegex: 'none',
               },
               {
-                label: 'JavaScript 即时通讯 SDK API',
-                to: 'https://leancloud.github.io/js-realtime-sdk/docs/',
-                activeBaseRegex: 'none',
-              },
-              {
                 label: 'JavaScript 多人在线对战 SDK API',
                 to: 'https://leancloud.github.io/Play-SDK-JS/doc/global.html',
                 activeBaseRegex: 'none',
@@ -135,7 +130,7 @@ const config = {
             ],
           },
           {
-            label: '资源下载',
+            label: '资源',
             position: 'right',
             items: [
               {
@@ -147,19 +142,18 @@ const config = {
                 label: 'Demo',
                 to: '/demo',
                 activeBaseRegex: 'none',
-              },
-              {
-                label: '云课堂',
-                to: '/classroom',
-                activeBaseRegex: 'none',
-              },
+              }
             ],
+          },
+          {
+            label: "云课堂",
+             to: "/classroom",
+            position: "right",
           },
           {
             type: "localeDropdown",
             position: "right",
           }
-         
         ],
       },
       prism: {
