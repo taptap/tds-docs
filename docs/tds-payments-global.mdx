@@ -28,9 +28,9 @@ TapPayments-Global 是一项可让您在游戏中销售虚拟商品的服务。
 
 借助 TapTap 开发者中心，可以方便地创建游戏内商品，并且在游戏中便捷地接入 TapPayments-Global 的服务，来进行游戏商品的销售。
 
-## SDK 安装
+## SDK 接入
 
-### 开发环境
+### 环境要求
 
 <MultiLang>
 <>
@@ -50,16 +50,78 @@ TapPayments-Global 是一项可让您在游戏中销售虚拟商品的服务。
 </>
 </MultiLang>
 
-### 集成库
+### 接入前准备
 
-使用 TapTap.TapPay 前提是必须依赖以下库：
+1. 参考 [准备工作](/sdk/start/get-ready/) 创建应用、开启应用配置、绑定 API 域名；
+2. 参考 [快速开始](/sdk/start/quickstart/#配置签名证书) 配置包名与签名证书；
+
+使用 TapTap.TapPayments.Global 前提是必须依赖以下库：
 
 * TapTap.Login
 * TapTap.Common
+* TapTap.Bootstrap
 
-接入方式参考 [入门指南 - 项目配置](/sdk/start/quickstart.mdx)。
+### 获取 SDK
 
-## 初始化
+<MultiLang>
+<>
+
+SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选其一。请根据项目需要选择。
+
+#### 方法一：使用 Unity Package Manager
+
+<CodeBlock className="json">
+  {`"dependencies":{
+    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#${sdkVersions.taptap.unity}",
+    "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}",
+    "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
+}`}
+</CodeBlock>
+
+#### 方法二：手动导入
+
+1. 在 [下载页](/tap-download) 找到 **TapSDK Unity** 和 **LeanCloud C# SDK** 下载地址，分别下载 `TapSDK-UnityPackage.zip` 和 `LeanCloud-SDK-Realtime-Unity.zip`。
+
+2. 在 Unity 项目中依次转到 **Assets > Import Packages > Custom Packages**，从解压后的 `TapSDK-UnityPackage.zip` 中，选择希望在游戏中使用的 TapSDK 包进行导入，其中：
+
+   - `TapTap_Bootstrap.unitypackage` TapSDK 启动器，必选。
+   - `TapTap_Common.unitypackage` TapSDK 基础库，必选。
+   - `TapTap_Login.unitypackage` TapTap 登录，必选。
+   - `TapTap_Payments_Global.unitypackage` TapTap 支付模块，必选。
+
+3. 解压后的 `LeanCloud-SDK-Realtime-Unity.zip` 为 Plugins 文件夹，拖拽至 Unity 即可。
+
+</>
+<>
+
+1. [下载 TapSDK Android](/tap-download)，解压后选择需要用到的 SDK 包导入到项目 `project/app/libs` 目录下。
+
+2. 打开项目的 `project/app/build.gradle` 文件，添加 gradle 配置如下：
+
+<CodeBlock className="java"> {`
+dependencies {
+    ...
+    // 导入 libs 目录下所有 aar 的包：
+    implementation fileTree(dir: 'libs', include: ['*.aar'])
+    // 如果需要单独导入 libs 目录下的指定包，请按照如下方式：
+    implementation files('libs/TapBootstrap_${sdkVersions.taptap.android}.aar') // TapTap 启动器
+    implementation files('libs/TapCommon_${sdkVersions.taptap.android}.aar') // TapTap 基础库
+    implementation files('libs/TapLogin_${sdkVersions.taptap.android}.aar') // TapTap 登录
+    implementation files('libs/TapPaymentsGlobal_${sdkVersions.taptap.android}.aar') // TapTap 登录
+    implementation 'cn.leancloud:storage-android:${sdkVersions.leancloud.java}' // 数据存储
+    implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
+}
+`}</CodeBlock>
+
+</>
+<>
+
+- 暂未支持
+
+</>
+</MultiLang>
 
 ### TapSDK 初始化
 
