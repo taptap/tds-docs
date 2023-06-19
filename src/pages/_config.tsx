@@ -1,5 +1,6 @@
 import { translate } from "@docusaurus/Translate";
-import { BRAND, REGION } from "../constants/env";
+import React from "react";
+import { BRAND, REGION ,HAS_ENGINE_CDN_DOMAIN } from "../constants/env";
 
 
 /* 内部地址 */
@@ -20,7 +21,7 @@ type Entry = {
   links: (ActionCellLinkInternal | ActionCellLinkExternal)[];
 };
 
-export const getEntries = (brand: string, region: string): Entry[] => {
+export const getEntries = (brand: string, region: string, pathname: String ): Entry[] => {
 
 
   const ENTRIES_TDS: Entry[] = [
@@ -250,7 +251,7 @@ export const getEntries = (brand: string, region: string): Entry[] => {
   ];
 
   var entries = brand === "leancloud" ?
-  // window.location.pathname=="/en/"? ENTRIES_LEANCLOUDEN:
+  pathname=="/en/"? ENTRIES_LEANCLOUDEN:
   ENTRIES_LEANCLOUD : ENTRIES_TDS;
 
 
