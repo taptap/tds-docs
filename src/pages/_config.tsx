@@ -1,4 +1,7 @@
 import { translate } from "@docusaurus/Translate";
+import React from "react";
+import { BRAND, REGION ,HAS_ENGINE_CDN_DOMAIN } from "../constants/env";
+
 
 /* 内部地址 */
 type ActionCellLinkInternal = {
@@ -18,7 +21,9 @@ type Entry = {
   links: (ActionCellLinkInternal | ActionCellLinkExternal)[];
 };
 
-export const getEntries = (brand: string, region: string): Entry[] => {
+export const getEntries = (brand: string, region: string, pathname: String ): Entry[] => {
+
+
   const ENTRIES_TDS: Entry[] = [
     {
       title: "游戏商店",
@@ -182,8 +187,74 @@ export const getEntries = (brand: string, region: string): Entry[] => {
       ],
     },
   ];
+  const ENTRIES_LEANCLOUDEN: Entry[] = [
 
-  const entries = brand === "leancloud" ? ENTRIES_LEANCLOUD : ENTRIES_TDS;
+
+    {
+      title: "内建账户",
+      description: " Support users to register and log in via email or mobile, and provide practical functions such as password reset and third-party login.",
+      links: [
+        {
+          label: "查看更多",
+          to: "/sdk/authentication/guide",
+        },
+      ],
+    },
+    {
+      title: "数据存储",
+      description: "Efficient access to massive JSON objects, binary files and other data, providing a complete interface for adding, deleting, modifying, and querying operations",
+      links: [
+        {
+          label: "查看更多",
+          to: "/sdk/storage/overview",
+        },
+      ],
+    },
+    {
+      title: "云引擎",
+      links: [
+        {
+          label: "查看更多",
+          to: "/sdk/engine/overview",
+        },
+      ],
+    },
+    {
+      title: "推送通知",
+      links: [
+        {
+          label: "查看更多",
+          to: "/sdk/push/features",
+        },
+      ],
+    },
+    {
+      title: "即时通讯",
+      links: [
+        {
+          label: "查看更多",
+          to: "/sdk/im/features",
+        },
+      ],
+    },
+    {
+      title: "短信",
+      description: "Support domestic and international SMS, including verification, notification, and marketing purposes, to facilitate integration with the LeanCloud account system",
+      links: [
+        {
+          label: "查看更多",
+          to: "/sdk/sms/guide",
+        },
+      ],
+    }
+
+  ];
+
+  var entries = brand === "leancloud" ?
+  pathname=="/en/"? ENTRIES_LEANCLOUDEN:
+  ENTRIES_LEANCLOUD : ENTRIES_TDS;
+
+
 
   return entries.map((entry) => ({
     title: translate({
