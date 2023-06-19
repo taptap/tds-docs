@@ -206,46 +206,29 @@ public class RedisHelper {
 </TabItem>
 <TabItem value='dotnet'>
 
-Install nuget into your project:
-
-```sh
-dotnet add LeanCloud.Engine.Middleware.AspNetCore
-```
-
 We will use the method mentioned in [StackExchange.Redis](https://stackexchange.github.io/StackExchange.Redis/).
 
 Assuming there’s a LeanCache instance named `dev`, the code below will show how you can have your application connect to this instance, store data, and read data:
 
 ```cs
-// Get the dev instance
-var leancache = new LeanCache("dev");
-// Get dev’s configurations
-var redisConfiguration = leancache.CurrentConfigurations;
-// Construct StackExchange.Redis.ConfigurationOptions
-ConfigurationOptions config = new ConfigurationOptions
-{
-    ServiceName = this.InstanceName,
-    ClientName = this.InstanceName,
-    EndPoints =
-        {
-            {
-                redisConfiguration.Host, redisConfiguration.Port
-            },
-        },
-    KeepAlive = 180,
-    DefaultVersion = new Version(2, 8, 8),
-    Password = redisConfiguration.Password,
-    AbortOnConnectFail = false,
-    ConnectRetry = 3,
+string host = Environment.GetEnvironmentVariable("REDIS_HOST_dev");
+string port = Environment.GetEnvironmentVariable("REDIS_PORT_dev");
+string user = Environment.GetEnvironmentVariable("REDIS_USER_dev");
+string password = Environment.GetEnvironmentVariable("REDIS_PASSWORD_dev");
+ConfigurationOptions config = new ConfigurationOptions {
+    EndPoints = {
+        { host, int.Parse(port) }
+    },
+    User = user,
+    Password = password
 };
-// Connect
-var conn = ConnectionMultiplexer.Connect(config);
+ConnectionMultiplexer conn = ConnectionMultiplexer.Connect(config);
 IDatabase db = conn.GetDatabase();
 db.StringSet("foo", "bar");
 var bar = db.StringGet("foo");
 ```
 
-See [StackExchange.Redis](https://stackexchange.github.io/StackExchange.Redis/) for more information about the usage of `IConnectionMultiplexer`. This is a recommended library for .NET Core.
+See [StackExchange.Redis](https://stackexchange.github.io/StackExchange.Redis/) for more information about the usage of `ConnectionMultiplexer`. This is a recommended library for .NET Core.
 
 </TabItem>
 </EngineRuntimes>
