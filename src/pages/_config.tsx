@@ -250,7 +250,7 @@ export const getEntries = (brand: string, region: string): Entry[] => {
   ];
 
   var entries = brand === "leancloud" ?
-  window.location.pathname=="/en/"? ENTRIES_LEANCLOUDEN:
+  // window.location.pathname=="/en/"? ENTRIES_LEANCLOUDEN:
   ENTRIES_LEANCLOUD : ENTRIES_TDS;
 
 
