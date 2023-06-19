@@ -1,4 +1,4 @@
-import React from "react";
+import React,{ useState }from "react";
 import Translate from "@docusaurus/Translate";
 import useBaseUrl from "@docusaurus/useBaseUrl";
 import { Link } from "react-router-dom";
@@ -10,7 +10,7 @@ import { BRAND, REGION } from "../constants/env";
 import BrowserOnly from '@docusaurus/BrowserOnly';
 
 const HomePage = () =>{
-  const pathname = window.location.pathname;
+  const [pathname, setPathname] = useState("");
   return  <Layout>
   <div className={styles.main}>
     <div className={styles.stage}>
@@ -37,7 +37,9 @@ const HomePage = () =>{
           </Link>
         )}
       </div>
-    
+      <BrowserOnly>
+      {() => <span>{setPathname(window.location.pathname)}</span>}
+      </BrowserOnly>
       <div className={styles.entries}>
 
         {getEntries(BRAND, REGION,pathname).map((entry) => (
