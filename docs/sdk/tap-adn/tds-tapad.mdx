@@ -178,6 +178,8 @@ dependencies {
     <!-- TapAd 必须的权限-结束  -->
     
     <!-- TapAd 可选择权限-开始   -->
+    <!-- 获取网络状态信息   -->
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/> 
     <!-- 获取安装应用列表  Android 11及以上版本才需声明,Android 11以下版本无需申请 -->
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"/>
     <!-- （targetVersion 31 以下）deviceName 和上面的 BLUETOOTH_CONNECT 互斥-->
@@ -1203,13 +1205,13 @@ public interface TapAppDownloadListener {
 </>
 
 <>
-## 插屏广告 {#InterstitialAd}
+## 插屏广告 {#InterstitialAd)}
 
-插屏广告：支持「全屏视频广告」、「全屏图文广告」和「半屏图文广告」等形式，具体广告展示形式在后台配置。
+插屏广告：支持全屏视频广告 和 全屏图文广告,以及半屏图文广告等形式，具体广告展示形式在后台配置。
 
 :::tip
- 插屏广告分横竖屏形式，强烈建议在后台配置后正确使用横屏或竖屏广告，若用错配置的 orientation，可能会出现
-  UI 兼容异常问题。
+ 插屏广告分横竖屏形式,强烈建议在后台配置后正确使用横屏或竖屏广告,若用错配置的orientation,可能会出现
+ UI兼容异常问题。
 :::
 
 ### 获取广告
@@ -1220,32 +1222,29 @@ public interface TapAppDownloadListener {
 
 ```cs
 
-        if (TapAdSdk.IsInited == false)
-        {
-            ShowText("TapAd 没有初始化!将自动初始化");
-            Init();
-            while (TapAdSdk.IsInited == false)
-            {
-                await Task.Yield();
-            }
-            ShowText("TapAd 初始化完毕");
+if (TapAdSdk.IsInited == false){
+        ShowText("TapAd 没有初始化!将自动初始化");
+        Init();
+        while (TapAdSdk.IsInited == false){
+            await Task.Yield();
         }
-        if (_tapInterstitialAd != null)
-        {
-            _tapInterstitialAd.Dispose();
-            _tapInterstitialAd = null;
-        }
+        ShowText("TapAd 初始化完毕");
+}
+if (_tapInterstitialAd != null){
+        _tapInterstitialAd.Dispose();
+        _tapInterstitialAd = null;
+}
 
-        int adId = isHorizontal ? LANDSCAPE_INTERSTITIAL_ID : PORTRAIT_INTERSTITIAL_ID;
-        // create AdRequest
-        var request = new TapAdRequest.Builder()
+int adId = isHorizontal ? LANDSCAPE_INTERSTITIAL_ID : PORTRAIT_INTERSTITIAL_ID;
+// create AdRequest
+var request = new TapAdRequest.Builder()
             .SpaceId(adId)
             .Extra1("{}")
             .UserId("123")
             .Build();
-        _tapInterstitialAd = new TapInterstitialAd(request);
-        _tapInterstitialAd.SetLoadListener(new InterstitialAdLoadListener(this));
-        _tapInterstitialAd.Load();
+_tapInterstitialAd = new TapInterstitialAd(request);
+_tapInterstitialAd.SetLoadListener(new InterstitialAdLoadListener(this));
+_tapInterstitialAd.Load();
 
 ```
 </>
@@ -1253,22 +1252,22 @@ public interface TapAppDownloadListener {
 <>
 ```Java
 
-        AdRequest adRequest = new AdRequest.Builder()
+AdRequest adRequest = new AdRequest.Builder()
                 .withSpaceId(adId)
                 .withExtra1("{}")
                 .withUserId("123")
                 .build();
-        tapAdNative.loadInterstitialAd(adRequest,new TapAdNative.InterstitialAdListener() {
-            @Override
-            public void onInterstitialAdLoad(TapInterstitialAd interstitialAd) {
-                 // 获取广告成功
-            }
+tapAdNative.loadInterstitialAd(adRequest,new TapAdNative.InterstitialAdListener() {
+      @Override
+      public void onInterstitialAdLoad(TapInterstitialAd interstitialAd) {
+           // 获取广告成功
+      }
 
-            @Override
-            public void onError(int code, String message) {
-                // 获取广告失败
-            }
-        });
+      @Override
+      public void onError(int code, String message) {
+           // 获取广告失败
+      }
+  });
 
 ```
 </>
