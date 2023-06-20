@@ -87,7 +87,7 @@ const CONFIGS: {
   },
   sms: {
     leancloud: [
-      { label: ".NET", value: "dotnet" },
+      { label: "C#", value: "charp" },
       { label: "Java", value: "java" },
       { label: "Objective-C", value: "objc" },
       { label: "Swift", value: "swift" },
@@ -95,6 +95,19 @@ const CONFIGS: {
       { label: "JavaScript", value: "js" },
       { label: "Python", value: "python" },
       { label: "PHP", value: "php" },
+    ],
+  },
+  cloud_functions_and_hooks_guide:{
+    leancloud: [
+      { label: "C#", value: "charp" },
+      { label: "Java", value: "java" },
+      { label: "Objective-C", value: "objc" },
+      { label: "Swift", value: "swift" },
+      { label: "Flutter", value: "flutter" },
+      { label: "JavaScript", value: "js" },
+      { label: "Python", value: "python" },
+      { label: "PHP", value: "php" },
+      { label: "Go", value: "go" },
     ],
   },
   default: {

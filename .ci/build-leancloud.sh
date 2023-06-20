@@ -50,6 +50,10 @@ cp -r .ci/leancloud/zh-Hans/sdk/other tmp/zh-Hans #其他的文档
 
 # 英文部分
 cp -r .ci/leancloud/en/sdk/authentication tmp/en # 内建账户
+cp -r .ci/leancloud/en/sdk/im tmp/en # 即时通讯
+cp -r .ci/leancloud/en/sdk/push tmp/en # 推送
+cp -r .ci/leancloud/en/sdk/sms tmp/en # 断行
+cp -r .ci/leancloud/en/sdk/storage tmp/en # 数据存储（LeanCloud 独有的语言）
 
 
 # 移除 TDS 文档
@@ -69,6 +73,7 @@ cp .ci/leancloud/sidebars.js sidebars.js
 
 #加入lc隐藏文档
 cp -r .ci/leancloud/zh-Hans/sdk/deeplink.mdx docs/
+cp -r .ci/leancloud/zh-Hans/sdk/classroom.mdx docs/
 
 # 构建
 yarn build --out-dir build-leancloud

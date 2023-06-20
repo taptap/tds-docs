@@ -12,7 +12,7 @@ const sdkVersions = {
       storage: "4.13.2",
       realtime: "5.0.0-rc.7",
     },
-    java: "8.2.18",
+    java: "8.2.19",
     csharp: "1.0.2",
     flutter: {
       storage: "0.7.10",
