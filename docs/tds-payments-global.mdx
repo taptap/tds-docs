@@ -1,5 +1,5 @@
 ---
-title: 支付系统 TapPayments-Global
+title: 支付系统 TapPayments Global
 ---
 
 <head>
@@ -110,7 +110,7 @@ dependencies {
     implementation files('libs/TapBootstrap_${sdkVersions.taptap.android}.aar') // TapTap 启动器
     implementation files('libs/TapCommon_${sdkVersions.taptap.android}.aar') // TapTap 基础库
     implementation files('libs/TapLogin_${sdkVersions.taptap.android}.aar') // TapTap 登录
-    implementation files('libs/TapPaymentsGlobal_${sdkVersions.taptap.android}.aar') // TapTap 登录
+    implementation files('libs/TapPaymentsGlobal_${sdkVersions.taptap.android}.aar') // TapTap 支付模块
     implementation 'cn.leancloud:storage-android:${sdkVersions.leancloud.java}' // 数据存储
     implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
 }
@@ -132,8 +132,6 @@ dependencies {
 <>
 
 ```cs
-using TapTap.Payment;
-
 var config = new TapConfig.Builder()
     .ClientID(clientId) // 必须，开发者中心对应 Client ID
     .ClientToken(clientToken) // 必须，开发者中心对应 Client Token
@@ -280,11 +278,11 @@ TapPaySDKLoader.getSDK().queryItems(itemIds, new TapPayment.Callback<Item[]>() {
 </MultiLang>
 
 参数说明：
-* `language`:需要的国际化语言代码，例如：zh_CN、en_US、ja_JP 等。如无需自定义语言国家或使用 TapSDK 进行统一设置，则可以使用无语言参数版本的函数，将由 SDK 根据用户的国家或地区自动选择对应的[语言](#国际化相关支持)。
-* `itemIds`:需要查询商品 ID 数组。商品 ID 是游戏在 **开发者中心 > 你的游戏 > 游戏服务 > TapTap Payments > 商品与订单** 中定义的商品的 ID，`items` 是查询到存在的商品信息的回调结果。
-* [`Callback<T>`](#回调对象-callbackt):回调对象
-  - 成功时回调类型:[Item](#商品信息-item)[]
-  - 失败时回调类型:[Error](#支付异常-error)
+* `String language`: 需要的国际化语言代码，例如：zh_CN、en_US、ja_JP 等。如无需自定义语言国家或使用 TapSDK 进行统一设置，则可以使用无语言参数版本的函数，将由 SDK 根据用户的国家或地区自动选择对应的[语言](#国际化相关支持)。
+* `String[] itemIds`: 需要查询商品 ID 数组。商品 ID 是游戏在 **开发者中心 > 你的游戏 > 游戏服务 > TapTap Payments > 商品与订单** 中定义的商品的 ID，<code>[Item](#商品信息-item)&gt;</code> 是查询到存在的商品信息的回调结果。
+* &zwnj;<code>[Callback](#回调对象-callbackt)&lt;[Item](#商品信息-item)[]&gt; callback</code>: 回调对象
+  - 成功时回调类型为商品信息 [Item](#商品信息-item) 的数组: <code>(Array&lt;[Item](#商品信息-item)&gt; items)</code>
+  - 失败时回调类型为异常 [Error](#异常-error): <code>([Error](#异常-error) error)</code>
 
 ### 启动应用内购买
 
@@ -370,18 +368,14 @@ TapPaySDKLoader.getSDK().requestPayFlow(itemId, quantity, extra, new TapPayment.
 </MultiLang>
 
 参数说明：
-* `language`:需要的国际化语言代码，例如：zh_CN、en_US、ja_JP 等。如无需自定义语言国家或使用 TapSDK 进行统一设置，则可以使用无语言参数版本的函数，将由 SDK 根据用户的国家或地区自动选择对应的[语言](#国际化相关支持)。
-* `itemId`:需要购买的商品 ID。商品 ID 是游戏在 **开发者中心 > 你的游戏 > 游戏服务 > TapTap Payments > 商品与订单** 中定义的商品的 ID，`order` 是购买商品的回调结果。
-* `quantity`:需要购买的商品数量。
-* `extra`:额外的扩展信息，将在支付流程结是回调中返回。若订单成功被创建（即使订单未能支付）也会和订单进行绑定。
-* [`PayCallback`](#支付回调对象-paycallback):回调对象
-  - 完成支付流程时回调类型:([Order](#订单信息-order), extra)
-  - 支付流程失败时回调类型:([Error](#支付异常-error), extra)
-  - 用户取消支付流程时回调类型:extra
-  
-  :::info 关于 extra 的回调参数类型
-  额外的扩展信息统一为各语言对应的字符串类型
-  :::
+* `String language`: 需要的国际化语言代码，例如：zh_CN、en_US、ja_JP 等。如无需自定义语言国家或使用 TapSDK 进行统一设置，则可以使用无语言参数版本的函数，将由 SDK 根据用户的国家或地区自动选择对应的[语言](#国际化相关支持)。
+* `String itemId`: 需要购买的商品 ID。商品 ID 是游戏在 **开发者中心 > 你的游戏 > 游戏服务 > TapTap Payments > 商品与订单** 中定义的商品的 ID.
+* `Int quantity`: 需要购买的商品数量。
+* `String extra`: 额外的扩展信息，将在支付流程结是回调中返回。若订单成功被创建（即使订单未能支付）也会和订单进行绑定。
+* [`PayCallback`](#支付回调对象-paycallback): 回调对象。
+  - 完成支付流程时回调类型为订单信息 [Order](#订单-order) 和自定义扩展信息: <code>([Order](#订单-order), String extra)</code>
+  - 支付流程失败时回调类型为异常 [Error](#异常-error) 和自定义扩展信息: <code>([Error](#异常-error), String extra)</code>
+  - 用户取消支付流程时回调类型为自定义扩展信息: `(String extra)`
 
 ### 查询订单
 
@@ -449,16 +443,20 @@ TapPaySDKLoader.getSDK().queryOrder(order, new TapPayment.Callback < Order >() {
 </MultiLang>
 
 参数说明：
-* `orderId` : 需要查询的订单 ID。
-* [`Callback<T>`](#回调对象-callbackt):回调对象
-  - 成功时回调类型:[Order[]](#订单信息-order)
-  - 失败时回调类型:[Error](#支付异常-error)
+* `String orderId`: 需要查询的订单 ID。
+* &zwnj;<code>[Callback](#回调对象-callbackt)&lt;[Order](#订单-order)&gt; callback</code>: 回调对象
+  - 成功时回调类型为订单信息 [Order](#订单-order): <code>([Order](#订单-order) order)</code>
+  - 失败时回调类型为异常 [Error](#异常-error): <code>([Error](#异常-error) error)</code>
 
 参数说明：
-* `order` : 已存在的订单对象。
-* [`Callback<T>`](#回调对象-callbackt):回调对象
-  - 成功时回调类型:[Order[]](#订单信息-order)
-  - 失败时回调类型:[Error](#支付异常-error)
+* &zwnj;<code>[Order](#订单-order) order</code>: 已存在的订单对象。
+* &zwnj;<code>[Callback](#回调对象-callbackt)&lt;[Order](#订单-order)&gt; callback</code>: 回调对象
+  - 成功时回调类型为订单信息 [Order](#订单-order): <code>([Order](#订单-order) order)</code>
+  - 失败时回调类型为异常 [Error](#异常-error): <code>([Error](#异常-error) error)</code>
+
+:::tip 传入参数说明
+订单信息中包含订单 ID，可以直接传入，也可以只传入订单 ID，查询成功时，回调的 <code>([Order](#订单-order) order)</code> 订单信息中的状态 <code>[[State](#订单状态-orderstate) state]</code> 字段可能会更新。
+:::
 
 ### 验证订单
 
@@ -524,17 +522,21 @@ TapPaySDKLoader.getSDK().consumeOrder(order, new TapPayment.Callback < Order >()
 </MultiLang>
 
 参数说明：
-* `orderId` 订单 ID
-* `orderToken` 订单 Token
-* [`Callback<T>`](#回调对象-callbackt):回调对象
-  - 成功时回调类型:[Order](#订单信息-order)
-  - 失败时回调类型:[Error](#支付异常-error)
+* `String orderId`: 需要验证的订单 ID。
+* `String orderToken`: 需要验证的订单 Token。
+* &zwnj;<code>[Callback](#回调对象-callbackt)&lt;[Order](#订单-order)&gt; callback</code>: 回调对象
+  - 成功时回调类型为订单信息 [Order](#订单-order): <code>([Order](#订单-order) order)</code>
+  - 失败时回调类型为异常 [Error](#异常-error): <code>([Error](#异常-error) error)</code>
 
 参数说明：
-* `order` 订单对象
-* [`Callback<T>`](#回调对象-callbackt):回调对象
-  - 成功时回调类型:[Order](#订单信息-order)
-  - 失败时回调类型:[Error](#支付异常-error)
+* &zwnj;<code>[Order](#订单-order) order</code>: 已存在的订单对象。
+* &zwnj;<code>[Callback](#回调对象-callbackt)&lt;[Order](#订单-order)&gt; callback</code>: 回调对象
+  - 成功时回调类型为订单信息 [Order](#订单-order): <code>([Order](#订单-order) order)</code>
+  - 失败时回调类型为异常 [Error](#异常-error): <code>([Error](#异常-error) error)</code>
+
+:::tip 传入参数说明
+订单信息中包含订单 ID 和订单的 Token，可以直接传入，也可以只传入订单 ID 和 订单 Token。验证订单成功时，回调的 <code>([Order](#订单-order) order)</code> 订单信息中的状态 <code>[[State](#订单状态-orderstate) state]</code> 会更新为 `COMPLETED`。
+:::
 
 ### 相关数据结构
 
@@ -571,7 +573,7 @@ TapPaySDKLoader.getSDK().consumeOrder(order, new TapPayment.Callback < Order >()
 </>
 </MultiLang>
 
-#### 订单信息 `Order`
+#### 订单 `Order`
 
 <MultiLang>
 <>
@@ -621,7 +623,7 @@ TapPaySDKLoader.getSDK().consumeOrder(order, new TapPayment.Callback < Order >()
 </>
 </MultiLang>
 
-**State** 订单状态相关说明：
+##### 订单状态 `Order.State`
 
 | 枚举   | 值   |       说明       |
 | :--: | :-: |:--------------:| 
@@ -635,14 +637,14 @@ TapPaySDKLoader.getSDK().consumeOrder(order, new TapPayment.Callback < Order >()
 | REFUND_FAILED| 22|     退款失败。      |
 |REFUND_REJECTED| 23|     退款被驳回。     |
 
-#### 支付异常 `Error`
+#### 异常 `Error`
 
 <MultiLang>
 <>
 
 ```cs
 /// <summary>
-/// 支付错误类
+/// TapPayment 异常类
 /// </summary>
 public class Error : Exception
 {
@@ -674,7 +676,7 @@ public class Error : Exception
 
 ```java
 /**
- * 支付异常类。
+ * TapPayment 异常类。
  */
 public static class Error extends Exception implements Parcelable {
     /**
@@ -945,6 +947,7 @@ public class Callback < T >
 |/open/payment/v1/orders/&lt;order_id&gt;/refund     |POST    | 订单退款                        |
 
 #### 查询订单
+
 通过一个订单 ID 可以查询到订单的详细信息并确定当前的支付状态
 
 ```sh
@@ -953,6 +956,7 @@ curl -X POST \
   -H 'X-LC-Key: {{masterKey}},master \
   https://{{host}}/open/payment/v1/orders/1670731970469806082
 ```
+
 返回值是一个订单的 JSON 对象
 
 ```json
