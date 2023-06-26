@@ -1,0 +1,1123 @@
+---
+title: TapPayments Global Payment System
+---
+
+<head>
+  <meta name="robots" content="noindex" />
+</head>
+
+import MultiLang from "/src/docComponents/MultiLang";
+import CodeBlock from "@theme/CodeBlock";
+import sdkVersions from "/src/docComponents/sdkVersions";
+import { Conditional } from "/src/docComponents/conditional";
+
+
+TapPayments-Global is a service that allows you to sell virtual goods in your game.  
+
+You can sell the following types of goods in TapPayments-Global:
+
+* Consumable goods  
+* Non-consumable goods   
+
+Goods type introduction:
+
+| Type | Description |
+| --- | --- |
+| Consumable goods | **Consumable goods** refer to goods that your game will allocate the associated game content when the user consumes them, and then the user can purchase them again. For example, game currency, game props, etc. |  
+| Non-consumable goods | **Non-consumable goods** refer to goods that can be permanently used after one purchase. For example, paid upgrades and chapter packs. |   
+
+With the TapTap Developer Center, you can easily create in-game goods and seamlessly access TapPayments-Global's services in your game to sell game goods.
+
+## SDK Access
+### Environment Requirements
+
+<MultiLang>
+<>  
+
+- Supports Unity 2019.4 or higher. 
+
+</>
+<>  
+
+- Android 5.0 (Api Level 21) or higher
+
+</>
+<>
+
+- Not currently supported 
+
+</>
+</MultiLang>
+
+### Pre-Access Preparation
+
+1. Refer to [Preparation](/sdk/start/get-ready/) to create an app, enable app configuration, and bind API domain name;
+2. Refer to [Quick Start](/sdk/start/quickstart/#配置签名证书) to configure package name and signature certificate;
+
+To use TapPayments-Global, you must depend on the following libraries:
+
+* TapTap.Login 
+* TapTap.Common 
+* TapTap.Bootstrap 
+
+### Get the SDK 
+
+<MultiLang>
+<>  
+
+The SDK can be **imported through the Unity Package Manager or manually imported**, either of which can be selected as needed for the project. 
+
+#### Method 1: Use the Unity Package Manager
+
+<CodeBlock className="json">
+  {`"dependencies":{
+    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.payments.global":"https://github.com/taptap/TapPayments-Global-Unity.git#${sdkVersions.taptap.unity}",
+    "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}",
+    "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
+}`}
+</CodeBlock>
+
+#### Method 2: Manual Import 
+
+1. On the [Download](/tap-download) page, find the **TapSDK Unity** and **LeanCloud C# SDK** download links and download TapSDK-UnityPackage.zip and LeanCloud-SDK-Realtime-Unity.zip respectively.
+
+2. In the Unity project, go to **Assets > Import Packages > Custom Packages** and select the TapSDK packages you want to use in your game from the unzipped TapSDK-UnityPackage.zip. Where:
+    
+   - TapTap_Bootstrap.unitypackage is the TapSDK starter, required. 
+   - TapTap_Common.unitypackage is the TapSDK basic library, required. 
+   - TapTap_Login.unitypackage is TapTap login, required.  
+   - TapTap_Payments_Global.unitypackage is the TapTap payment module, required.
+
+3. The unzipped LeanCloud-SDK-Realtime-Unity.zip is the Plugins folder. Drag and drop it into Unity.
+
+</> 
+<>  
+
+1. [Download TapSDK Android](/tap-download) and unzip it. Select the SDK packages you need and import them into the project project/app/libs directory. 
+
+2. Open the project's project/app/build.gradle file and add the gradle configuration as follows:
+
+<CodeBlock className="java"> {`
+dependencies {
+    ...
+    // Import all .aar packages in the libs directory: 
+    implementation fileTree(dir: 'libs', include: ['*.aar'])
+    // To import a specific package in the libs directory, use: 
+    implementation files('libs/TapBootstrap_${sdkVersions.taptap.android}.aar') // TapTap starter 
+    implementation files('libs/TapCommon_${sdkVersions.taptap.android}.aar') // TapTap basic library 
+    implementation files('libs/TapLogin_${sdkVersions.taptap.android}.aar') // TapTap Loign
+    implementation files('libs/TapPaymentsGlobal_${sdkVersions.taptap.android}.aar') // TapTap payment module
+    implementation 'cn.leancloud:storage-android:${sdkVersions.leancloud.java}' // data storage
+    implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}' // realtime
+}
+`}</CodeBlock>
+
+</>
+<>
+
+- Not currently supported 
+
+</>
+</MultiLang>
+
+### TapSDK Initialization  
+
+If you have completed the initialization by following the Quick Start, you only need to introduce the payment module here.
+
+<MultiLang> 
+<>
+
+```cs
+var config = new TapConfig.Builder()  
+    .ClientID(clientId) // Required, corresponds to Client ID in Developer Center  
+    .ClientToken(clientToken) // Required, corresponds to Client Token in Developer Center  
+    .ServerURL(serverUrl) // Required, Developer Center > Your Game > Game Service > Basic Information > Domain Name Configuration > API  
+    .RegionType(RegionType.IO) // Required, CN indicates Mainland China, IO indicates other countries or regions  
+    .ConfigBuilder();  
+    
+TapBootstrap.Init(config); 
+```
+
+</>
+<>
+
+```java
+TapConfig config = new TapConfig.Builder()  
+    .withClientId("clientId") // Required, corresponds to Client ID in Developer Center  
+    .withClientToken("clientToken"); // Required, corresponds to Client Token in Developer Center 
+    .withAppContext(applictaionContext) // Android app context  
+    .withServerUrl(serverUrl) // Required, Developer Center > Your Game > Game Service > Basic Information > Domain Name Configuration > API  
+    .withRegionType(TapRegionType.IO) // Required, CN indicates Mainland China, IO indicates other countries or regions  
+    .build();
+    
+TapBootstrap.init(applictaionContext, config);
+```
+
+</> 
+<>
+
+- Not currently supported
+
+</>
+</MultiLang> 
+
+### Payment Module Initialization 
+After the game accesses the TapTap SDK through Unity, you can initialize the payment module through the following methods:
+
+<MultiLang>
+<> 
+
+Set android:name to **com.taptap.payment.api.UnityApplication** under Application tag in Unity's [LauncherManifest.xml](https://docs.unity3d.com/Manual/android-launcher-manifest.html ) for initialization.
+```xml
+<application>  
+    ...  
+    android:name="com.taptap.payment.api.UnityApplication" >  
+    ...  
+</application> 
+```
+If you need to customize the Android Application class, please refer to the Android example. 
+
+</> 
+<>
+
+Use TapPaySDKLoader's loadSDK method to initialize in Application's attachBaseContext:
+```java
+public class YourCustomApplication extends Application {  
+    @Override  
+    protected void attachBaseContext(Context base) {  
+        super.attachBaseContext(base);  
+        TapPaySDKLoader.loadSDK(base);  
+    }  
+}
+```
+
+</>
+</MultiLang> 
+
+## SDK Development Guide
+
+### Query Items 
+
+<MultiLang>  
+<>   
+
+```cs  
+string language = "en_US";  
+
+string[] itemIds = new [] { "product01", "product02", "product03" };  
+
+TapPayment.QueryItems (language, itemIds, new TapPayment.Callback < Item [] > ()  
+{  
+    OnFinish = items =>  
+    {  
+        if ( items == null || items.Length == 0 )  
+        {  
+            Console.WriteLine ( "No relevant items were queried" );  
+        }  
+        else  
+        {  
+            foreach ( var item in items )  
+            {  
+                Console.WriteLine ( item );  
+            }  
+        }  
+    },      
+        
+    OnError = error =>  
+    {  
+        Console.WriteLine ( error );  
+    }   
+} );
+
+// Or use the language-free version of the function, and the SDK will automatically select the appropriate language based on the user's country or region  
+TapPayment.QueryItems (itemIds, new TapPayment.Callback < Item [] > ()  
+{  
+    ...  
+} );
+```
+
+</> 
+<>
+
+```java
+String language = "en_US";  
+
+String[] itemIds = { "product01", "product02", "product03" };  
+
+TapPaySDKLoader.getSDK().queryItems(language, itemIds, new TapPayment.Callback<Item[]>() {  
+
+    @Override
+    public void onError(TapPayment.Error error) {
+        Log.e(TAG, "Query failed\n" + error);
+    }  
+
+    @Override
+    public void onFinish(Item[] result) {
+        for(Item item : result) {
+            Log.i(TAG, item.tostring());
+        }
+    }
+});
+
+// Or use the language-free version of the function, and the SDK will automatically select the appropriate language based on the user's country or region  
+TapPaySDKLoader.getSDK().queryItems(itemIds, new TapPayment.Callback<Item[]>() {
+    ...
+});
+```
+
+</> 
+<>  
+
+- Currently not supported 
+
+</> 
+</MultiLang> 
+
+Parameter description: 
+* `String language`: The required internationalization language code, such as: zh_CN, en_US, ja_JP, etc. If you do not need to customize the language country or use TapSDK for unified settings, you can use the language-free version of the function, and the SDK will automatically select the corresponding [language](#internationalization-support) based on the user's country or region. 
+* `String[] itemIds`: The array of item IDs to be queried. The item ID is the ID of the item defined by the game in **Developer Center > Your Game > Game Services > TapTap Payments > Items and Orders**. <code>[Item](#item-information-item)</code> is the callback result of the queried existing item information.  
+* &zwnj;<code>[Callback](#callback-callbackt)&lt;[Item](#item-information-item)&gt;[] callback</code>: Callback Object
+  - Successful callback type: array of [Item](#item-information-item) item information: <code>(Array&lt;[Item](#item-information-item)&gt; items)</code>
+  - Failure callback type: exception [Error](#exception-error): <code>([Error](#exception-error) error)</code>
+
+### Launch in-app purchase
+
+<MultiLang>
+<>
+
+```cs
+string language = "en_US";
+
+string itemId = "product01";   
+
+int quantity = 1;
+
+string extra = "Custom extension information";  
+
+TapPayment.RequestPayFlow (language, itemId, quantity, extra, new TapPayment.PayCallback ()  
+{  
+    OnCancel = ( extra ) =>  
+    {  
+        Console.WriteLine ( $"Payment canceled\n{extra}" );  
+    },      
+                
+    OnError = ( error, extra ) =>  
+    {  
+        Console.WriteLine ( $"Error code:{error.code}\nError message:{error.Message}\n{extra}");  
+    },     
+                
+
+    OnFinish = ( order, extra ) =>  
+    {  
+        Console.WriteLine ( $"Order information:{order}\n{extra}" );  
+    }  
+} );   
+
+// Or use the language-free version of the function, and the SDK will automatically select the appropriate language based on the user's country or region  
+TapPayment.RequestPayFlow (itemId, quantity, extra, new TapPayment.PayCallback ()  
+{  
+    ...  
+} );
+```
+  
+</>
+<>
+
+```java
+String language = "en_US";  
+
+String itemId = "product01";   
+
+int quantity = 1;
+
+String extra = "Custom extension information";  
+
+TapPaySDKLoader.getSDK().requestPayFlow(language, itemId, quantity, extra, new TapPayment.PayCallback() {  
+    @Override
+    public void onCancel(String extra)  {  
+        Log.i(TAG, "Payment canceled\n" + extra);  
+    }  
+
+    @Override
+    public void onError(TapPayment.Error error, String extra) {  
+        Log.e(TAG, "Payment failed\n" + error + "\n" + extra);  
+    }  
+
+    @Override
+    public void onFinish(Order order, String extra) {  
+        Log.i(TAG, "Payment successful\n" + order + "\n" + extra);  
+    }
+});  
+
+// Or use the language-free version of the function, and the SDK will automatically select the appropriate language based on the user's country or region  
+TapPaySDKLoader.getSDK().requestPayFlow(itemId, quantity, extra, new TapPayment.PayCallback() {  
+    ...  
+});
+```
+
+</>
+<>
+
+- Currently not supported
+
+</>
+</MultiLang>
+
+Parameter description:
+* `String language`: The required internationalization language code, such as: zh_CN, en_US, ja_JP, etc. If you do not need to customize the language country or use TapSDK for unified settings, you can use the language-free version of the function, and the SDK will automatically select the corresponding [language](#internationalization-support) based on the user's country or region. 
+* `String itemId`: The ID of the item to be purchased. The item ID is the ID of the item defined by the game in **Developer Center > Your Game > Game Services > TapTap Payments > Items and Orders**.
+* `Int quantity`: The quantity of items to be purchased. 
+* `String extra`: Additional extension information, which will be returned in the payment process callback. Even if the order fails to be paid, it will be bound to the order. 
+* [`PayCallback`](#payment-callback-paycallback): Callback Object.
+  - When the payment process is completed, the callback type is the order information [Order](#order-order) and custom extension information: <code>([Order](#order-order), String extra)</code>
+  - When the payment process fails, the callback type is the exception [Error](#exception-error) and custom extension information: <code>([Error](#exception-error), String extra)</code> 
+  - When the user cancels the payment process, the callback type is the custom extension information: `(String extra)`
+
+### Query order  
+
+<MultiLang>
+<>
+
+```cs
+String orderId = "Order ID";
+
+TapPayment.QueryOrder ( orderId, new TapPayment.Callback < Order > () 
+{
+    OnFinish = ( order ) =>
+    {
+        Console.WriteLine ( $"Order information: {order}" );
+    },
+                
+    OnError = ( error ) =>
+    {
+        Console.WriteLine ( $"Error code: {error.code}\nError message: {error.Message}" );
+    }
+} );
+
+// Or pass in an existing order object directly
+Order order = new Order();
+order.id = "Order ID";
+TapPayment.QueryOrder ( orderId, new TapPayment.Callback < Order > ()
+{
+    ...
+} );
+```
+
+</>
+<>
+
+```java
+String orderId = "Order ID";  
+
+TapPaySDKLoader.getSDK().queryOrder(orderId, new TapPayment.Callback < Order >() {
+    @Override
+    public void onError(TapPayment.Error error) {
+        Log.e(TAG, "Query failed\n" + error);
+    }  
+
+    @Override
+    public void onFinish(Order order) {
+        Log.i(TAG, "Query succeeded\n" + order.toString());
+    }
+});
+
+// Or pass in an existing order object directly
+Order order = new Order();
+order.id = "Order ID";
+
+TapPaySDKLoader.getSDK().queryOrder(order, new TapPayment.Callback < Order >() {
+    ....
+});
+```
+
+</>
+<>
+
+- Currently not supported
+
+</> 
+</MultiLang>
+
+Parameter description:
+* `String orderId`: The order ID to be queried.
+* &zwnj;<code>[Callback](#callback-callbackt)&lt;[Order](#order-order)&gt; callback</code>: Callback Object
+  - Successful callback type is order information [Order](#order-order): <code>([Order](#order-order) order)</code>
+  - Failure callback type is exception [Error](#exception-error): <code>([Error](#exception-error) error)</code>
+
+Parameter description:
+* &zwnj;<code>[Order](#order-order) order</code>: Existing order object. 
+* &zwnj;<code>[Callback](#callback-callbackt)&lt;[Order](#order-order)&gt; callback</code>:  Callback Object.
+  - Successful callback type is order information [Order](#order-order): <code>([Order](#order-order) order)</code>
+  - Failure callback type is exception [Error](#exception-error): <code>([Error](#exception-error) error)</code>
+
+:::tip Pass arguments description
+The order information contains the order ID. You can pass in the order ID directly, or you can only pass in the order ID. When the query is successful, the status field <code>[[State](#order-state-orderstate) state]</code> of the order information <code>([Order](#order-order) order)</code>passed in <code>[Callback](#callback-callbackt)&lt;[Order](#订单-order)&gt; callback</code> may be updated.
+:::
+
+### Verify order 
+
+<MultiLang>
+<>
+
+```cs 
+String orderId = "Order ID";  
+String orderToken = "Order Token";  
+
+TapPayment.ConsumeOrder ( orderId, orderToken, new TapPayment.Callback < Order > ()
+{
+    OnFinish = ( order ) =>
+    {
+        Console.WriteLine ( $"Order information: {order}" );
+    },
+                
+    OnError = ( error ) =>
+    {
+        Console.WriteLine ( $"Error code: {error.code}\nError message: {error.Message}" );
+    }
+} );  
+
+// Or pass in an existing order object directly
+Order order = Existing order object
+TapPayment.ConsumeOrder ( order, new TapPayment.Callback < Order > ()
+{
+    ...
+} );
+```
+
+</>
+<>
+
+```java
+String orderId = "Order ID";  
+
+TapPaySDKLoader.getSDK().consumeOrder(orderId, new TapPayment.Callback < Order >() {
+    @Override
+    public void onError(TapPayment.Error error) {
+        Log.e(TAG, "Query failed\n" + error);
+    }  
+
+    @Override
+    public void onFinish(Order order) {
+        Log.i(TAG, "Query succeeded\n" + order.toString());
+    }
+});
+
+// Or pass in an existing order object directly
+Order order = Existing order object
+TapPaySDKLoader.getSDK().consumeOrder(order, new TapPayment.Callback < Order >() {
+    ....
+});
+```
+  
+</>
+<>
+
+- Currently not supported
+
+</> 
+</MultiLang>
+
+Parameter description:
+* `String orderId`: The order ID to be verified.
+* `String orderToken`: The order token to be verified. 
+* &zwnj;<code>[Callback](#callback-callbackt)&lt;[Order](#order-order)&gt; callback</code>: Callback Object
+  - Successful callback type is order information [Order](#order-order): <code>([Order](#order-order) order)</code>
+  - Failure callback type is exception [Error](#exception-error): <code>([Error](#exception-error) error)</code>
+
+Parameter description:
+* &zwnj;<code>[Order](#order-order) order</code>: Existing order object.
+* &zwnj;<code>[Callback](#callback-callbackt)&lt;[Order](#order-order)&gt; callback</code>: Callback Object
+  - Successful callback type is order information [Order](#order-order): <code>([Order](#order-order) order)</code>
+  - Failure callback type is exception [Error](#exception-error): <code>([Error](#exception-error) error)</code>
+
+:::tip Pass arguments description
+The order information contains the order ID and the order token. You can pass it in directly, or you can only pass in the order ID and order token. When the order is verified successfully, the state field <code>[[State](#order-state-orderstate) state]</code> of the order information <code>([Order](#order-order) order)</code> returned in the callback will be updated to `COMPLETED`.
+:::
+
+### Related data structures
+
+#### Item information `Item`
+
+<MultiLang>
+<>
+
+| Field     | Type   | Description |
+| :--: |:-------:| :--: |
+| type | int   | Item type |
+| id   | string  | Item ID |
+| name | string  | Item name |
+| description | string  | Item description |
+| price | decimal | Item price |
+| currency | string  | Currency unit |
+| regionId | string  | Item region |
+| languageId| string  | Item language |
+
+</>
+<>
+
+| Field     | Type      | Description |
+| :--: |:-------:| :--: |
+| type | int | Item type |
+| id   | String | Item ID |
+| name | String  | Item name|
+| description | String | Item description |
+| price | BigDecimal | Item price |
+| currency | String | Currency unit |
+| regionId | String | Item region |
+| languageId| String | Item language| （
+
+</>
+</MultiLang>
+
+#### Order `Order`
+
+<MultiLang>
+<>
+
+| Field     | Type      | Description |
+| :--: | :-: | :--:|
+| itemId | string | Item ID| 
+| price | decimal | Item price|
+| tax | decimal | Tax |
+| currency | String | Currency unit| 
+| quantity | int | The quantity of items purchased|
+| extra | String | Custom information defined by the developer|
+| id | String | Order ID|
+| token | String | Order token|
+| state | State | Order status|
+| channel | String | Payment channel|
+| fee | decimal | Channel fee rate | 
+| clientId | String | Client ID| 
+| userId | String | User OpenID|
+| regionId | String | User region ID| 
+
+</>
+<>
+
+| Field     |  Type   | Description |
+| :--: |:-------:| :--:|
+| itemId | String | Item ID|
+| price | BigDecimal | Item price|
+| tax | BigDecimal | Tax |
+| currency | String | Currency unit|
+| quantity | int | The quantity of items purchased|
+| extra | String | Custom information defined by the developer| 
+| id | String | Order ID|
+| token | String | Order token|  
+| state | State | Order status|
+| channel | String | Payment channel|
+| fee | BigDecimal | Channel fee rate | 
+| clientId | String | Client ID|
+| userId | String | User OpenID|
+| regionId | String | User region ID|
+</>
+<>
+
+- Not currently supported
+
+</>
+</MultiLang>
+
+##### Order State `Order.State`
+
+| Enumeration | Value | Description |
+| :--: |:-----:|:--------------:|
+| UNKNOWN |   0   | Unknown status. |
+| PAYMENT_PENDING|   2   | Payment pending. | 
+| PAID|   3   | Paid. |
+| COMPLETED|   4   | The order has been paid and the props have been issued. |
+| PAYMENT_TIMEOUT|   5   | Payment timed out. | 
+| REFUNDING|  20   | Refunding. |  
+| REFUNDED|  21   | Refund successful. |
+| REFUND_FAILED|  22   | Refund failed. |
+|REFUND_REJECTED|  23   | Refund rejected. |
+
+#### Exception `Error`
+
+<MultiLang>
+<>
+
+```cs
+/// <summary> 
+/// Payment Exception class.
+/// </summary>
+public class Error : Exception
+{
+    /// <summary>
+    /// Error code
+    /// </summary>
+    public Code code;
+    /// <summary>
+    /// The constructor of Error 
+    /// Create a payment error object containing the payment error code and information.
+    /// </summary>
+    /// <param name="code">Error code</param> 
+    /// <param name="message">Error message</param>
+    public Error ( Code code, string message ) : base ( message )
+    {
+        this.code = code;
+    }
+    public override string ToString () 
+    { 
+        return "Error(" + "code=" + code + ", message=" + this.Message + ')'; 
+    } 
+}
+```
+
+</>
+<>
+
+```java
+/**
+ * Payment Exception class.
+ */
+public static class Error extends Exception implements Parcelable {
+    /**
+     * Error code
+     */
+    public Code code;
+
+    /**
+     * Create a payment error object containing the payment error code and information.
+     *
+     * @param code Error code {@link Code}
+     * @param message Error message
+     */
+    public Error(Code code, String message) {
+        super(message);
+        this.code = code;
+    }
+}
+```
+
+</>
+<>
+
+- Not currently supported
+
+</>
+</MultiLang>
+
+| Enumeration      | Value | Description     | 
+| :--: |:-----:|:----------:|
+| UNKNOWN |  -1   | Unknown error    | 
+| OK   |   0   | Normal     |
+| ILLEGAL_ARGUMENT |   1   | Illegal argument   |   
+| NETWORK_ERROR |   2   | Network error    | 
+| INTERNAL_SERVER_ERROR|   3   | Internal server error   |
+| NOT_LOGIN|  401  | User not logged in    |
+| TOO_MANY_REQUEST| 1003  | Too many requests   |
+| ITEM_NOT_FOUND| 1001  | Item does not exist    |
+| ITEM_INFO_CHANGE| 1017  | Item information has changed   |
+| REPEAT_PURCHASE_NON_CONSUMABLE_GOODS| 1002  | Repeat purchase of non-consumable goods |
+| ORDER_NOT_FOUND| 1004  | Order does not exist    |
+| ORDER_CREATE_FAILED| 1005  | Failed to create order   | 
+| ORDER_PAID| 1006  | Order paid    |
+| ORDER_TIMEOUT| 1008  | Order timeout    | 
+| ORDER_VERIFY_ERROR| 1018  | Order verification error   |
+| REGION_NOT_EDITABLE| 1007  | Region not editable   | 
+
+#### Payment Callback `PayCallback`
+
+<MultiLang>
+<>
+
+```cs
+/// <summary>  
+/// PayCallback is used as an asynchronous callback notification for payment request functions. Related functions are:  
+/// <ul>  
+///     <li><see cref="RequestPayFlow(string,int,string,TapTap.TapPay.TapPayment.PayCallback)"/></li>  
+///     <li><see cref="RequestPayFlow(string,string,int,string,TapTap.TapPay.TapPayment.PayCallback)"/></li>  
+/// </ul>  
+/// </summary>
+public class PayCallback  
+{  
+    /// <summary>  
+    /// Cancel payment  
+    /// Asynchronous callback when the user cancels the payment operation.  
+    /// </summary>  
+    /// <param name="extra"> Custom information defined by the developer  
+    /// </param>  
+    public delegate void CancelType ( string extra );  
+
+    /// <summary>  
+    /// Payment error  
+    /// Asynchronous callback when an error occurs during payment.  
+    /// </summary>  
+    /// <param name="error"> Error information  
+    /// Error information callback when an error occurs during payment. For details, see <see cref="Error"/>.  
+    /// </param>  
+    /// <param name="extra"> Custom information defined by the developer  
+    ///</param>  
+    public delegate void ErrorType ( Error error, string extra );  
+
+
+    /// <summary>  
+    /// End of payment flow  
+    /// Asynchronous callback when the payment flow is completed.  
+    /// Note: It is recommended to request the server to determine the order status and not rely on this callback. This callback cannot guarantee that the order will definitely be paid successfully when called.  
+    /// </summary>  
+    /// <param name="order">Order information  
+    /// The order object callback at the end of the payment flow. For details, see <see cref="Order"/>.  
+    /// </param>  
+    /// <param name="extra">Custom information defined by the developer</param>  
+    public delegate void FinishType ( Order order, string extra );  
+
+    public CancelType OnCancel { get; set; }  
+    public ErrorType OnError { get; set; }  
+    public FinishType OnFinish { get; set; }  
+}
+```
+
+</>
+<>
+
+```java
+/**  
+ * PayCallback is used for asynchronous callback notification of payment request functions. Related functions are:  
+ * <ul>  
+ *     <li>{@link #requestPayFlow(Activity, String, int, String, PayCallback)} TapPayment#requestPayFlow}</li>  
+ *     <li>{@link #requestPayFlow(Activity, String, String, int, String, PayCallback)} TapPayment#requestPayFlow}</li>  
+ * </ul>  
+ */  
+interface PayCallback {  
+
+    /**  
+     * Cancel payment  
+     * Asynchronous callback when the user cancels the payment operation.  
+     *  
+     * @param extra Custom information defined by the developer  
+     */  
+    void onCancel(String extra);  
+
+    /**  
+     * Payment error  
+     * Asynchronous callback when a payment error occurs.  
+     *  
+     * @param error Error information  
+     *              Error information callback when an error occurs during payment. For details, see {@link Error}.  
+     * @param extra Custom information defined by the developer  
+     */  
+    void onError(Error error, String extra);  
+
+    /**  
+     * End of payment flow  
+     * Asynchronous callback at the end of the payment flow.  
+     * Note: It is recommended to request the server to determine the order status and not rely on this callback. This callback cannot guarantee that the order will definitely be paid successfully when called.  
+     *  
+     * @param order Order information  
+     *              The order object callback at the end of the payment flow. For details, see {@link Order}.  
+     * @param extra Custom information defined by the developer  
+     */  
+    void onFinish(Order order, String extra);  
+}
+```
+
+</>
+<>
+
+- Not currently supported
+
+</>
+</MultiLang>
+
+#### Callback `Callback<T>`
+
+<MultiLang>
+<>
+
+```cs
+/// <summary>  
+/// Callback interface for asynchronous callback results of related functions. Supported functions are:  
+/// <ul>  
+///     <li><see cref="QueryItems(string,string[],Callback{TapTap.TapPay.bean.Item[]})"/></li>    
+///     <li><see cref="QueryItems(string[],Callback{TapTap.TapPay.bean.Item[]})"/></li>  
+///     <li><see cref="QueryOrder"/></li>   
+///    <li><see cref="ConsumeOrder(string,string,Callback{TapTap.TapPay.bean.Order})"/></li>  
+///    <li><see cref="ConsumeOrder(Order,Callback{TapTap.TapPay.bean.Order})"/></li>  
+/// </ul>  
+/// </summary>  
+/// <typeparam name="T">Generic parameter of callback result type</typeparam>
+public class Callback < T > 
+{
+    /// <summary>  
+    /// Request error  
+    /// </summary>  
+    /// <param name="error">Error  
+    /// When an error occurs, error information. For details, see <see cref="Error"/>.  
+    /// </param>  
+    public delegate void ErrorType ( Error error );  
+
+    /// <summary>  
+    /// Request result  
+    /// </summary>  
+    /// <param name="result">Result</param>  
+    public delegate void FinishType ( T result );  
+
+    public ErrorType OnError { get; set; }  
+    public FinishType OnFinish { get; set; }  
+}
+```
+
+</>
+<>
+
+```java
+/**  
+ * The Callback interface is used for asynchronous callback notification of query functions. Supported functions are:  
+ * <ul>  
+ *     <li>{@link TapPayment#queryItems(String, String[], Callback)} TapPayment#queryItems}</li>  
+ *     <li>{@link TapPayment#queryItems(String[], Callback)} TapPayment#queryItems}</li>  
+ *     <li>{@link TapPayment#queryOrder(String, Callback)} TapPayment#queryOrder}</li>   
+ *     <li>{@link TapPayment#consumeOrder(String, String, Callback)} TapPayment#queryOrder}</li>  
+ *     <li>{@link TapPayment#consumeOrder(Order, Callback)} TapPayment#queryOrder}</li>  
+ * </ul>  
+ *  
+ * @param <T> Generic parameter of callback result type  
+ */  
+interface Callback<T> {  
+
+    /**  
+     * Asynchronous callback method for query functions.  
+     * @param error Error information when a request error occurs. For details, see {@link Error}.  
+     */  
+    void onError(Error error);  
+
+    /**  
+     * Asynchronous callback method for query functions.  
+     * @param result Query result.  
+     */  
+    void onFinish(T result);  
+}
+```
+
+</>
+<>
+
+- Not currently supported
+
+</>
+</MultiLang>
+
+### Internationalization support
+
+#### Language code list
+
+Use the two-letter lowercase language codes defined in ISO 639-1 (for example, `en` indicates English, `jp` indicates Japanese), but:
+
+* Due to historical reasons in the Android system, Indonesian uses `in` instead of `id`. 
+* When language codes alone cannot indicate the required language, add the region code defined in ISO 3166-1 (for example, `zh_CN` indicates Simplified Chinese).
+
+Internationalization support has been provided for 8 languages, and the language codes are as follows:
+
+| Code | Language     |
+|----|--------|
+| en | English     |
+| zh_CN | Simplified Chinese   |
+| zh_TW | Traditional Chinese   |
+| in | Indonesian    | 
+| ja | Japanese     |
+| ko | Korean     |
+| pt_BR | Brazilian Portuguese | 
+| th | Thai    |
+
+In addition, when setting item names in the DC backend, multi-language is also supported. The passed language parameters will affect the return of the corresponding internationalized item name.
+
+:::tip Default language 
+If no matching language is found, English will be used as the default language. 
+:::
+
+## Server Development Guide
+### Server REST API
+
+:::tip
+Please refer to the [Base URL](/sdk/storage/guide/rest/#base-url), [Request Format](/sdk/storage/guide/rest/#请求格式) and [Response Format](/sdk/storage/guide/rest/#响应格式) descriptions in the Data Storage REST API documentation. Since this set of interfaces is for calling between servers, only the `master key` authentication method is supported. Do not use or expose the `master key` on the client side. The `master key` is the `serverSecret` of the application in the DC backend.
+:::
+
+|URL                                                 |HTTP    |Function                             | 
+|----------------------------------------------------|--------|--------------------------------|
+|/open/payment/v1/orders/<order_id>            |GET     | Query order information                     | 
+|/open/payment/v1/orders/<order_id>/verify     |POST    | Verify order                        |
+|/open/payment/v1/orders/<order_id>/refund     |POST    | Order refund                        | 
+
+#### Query Order
+
+You can query the detailed information of an order by order ID and determine the current payment status.
+
+```sh
+curl -X POST \
+  -H 'X-LC-Id: {{appid}} \
+  -H 'X-LC-Key: {{masterKey}},master \
+  https://{{host}}/open/payment/v1/orders/1670731970469806082
+```
+
+The return value is a JSON object of an order. 
+
+```json
+{
+   "data" : {
+      "amount" : 299,
+      "client_id" : "UeTShOwxDrAsf232WN",
+      "currency" : "USD",
+      "extra" : "648ff2d31a81c",
+      "goods_open_id" : "game-11190",
+      "minor_unit" : 2,
+      "order_id" : "1670680390026510338",
+      "order_token" : "2cf31318c6f4939d5eaf2e9431bf45f2",
+      "region_id" : "HK",
+      "status" : "refund.succeeded",
+      "user_id" : 3173821787,
+      "verified" : false
+   },
+   "success" : true
+}
+```
+
+#### Verify Order
+After the payment is successful, verifying the order indicates that the payment result has been confirmed and the shipment will be completed for the buyer. The order status will change from `charge.succeeded` to `charge.confirmed`.
+
+```sh
+curl -X POST \
+  -H 'X-LC-Id: {{appid}} \
+  -H 'X-LC-Key: {{masterKey}},master \
+  https://{{host}}/open/payment/v1/orders/1670731970469806082/verify?token=2cf31318c6f4939d5eaf2e9431bf45f2
+```
+
+The return value is a JSON object of an order. 
+
+```json
+{
+   "data" : {
+      "amount" : 299,
+      "client_id" : "UeTShOwxDrAsf232WN",
+      "currency" : "USD",
+      "extra" : "648ff2d31a81c",
+      "goods_open_id" : "game-11190",
+      "minor_unit" : 2,
+      "order_id" : "1670680390026510338",
+      "order_token" : "2cf31318c6f4939d5eaf2e9431bf45f2",
+      "region_id" : "HK",
+      "status" : "refund.succeeded",
+      "user_id" : 3173821787,
+      "verified" : false
+   },
+   "success" : true
+}
+```
+
+#### Order Refund
+Refund an order. 
+
+```sh
+curl -X GET \
+  -H 'X-LC-Id: {{appid}} \
+  -H 'X-LC-Key: {{masterKey}},master \
+  https://{{host}}/open/payment/v1/orders/1670731970469806082/refund
+```
+
+#### Order Object Fields 
+
+|Field                 | Meaning          | 
+|--------------------|---------------|
+|client_id           |               | 
+|user_id             |               | 
+|order_id            |               |
+|order_token         |Token used for verification |
+|goods\_open\_id     |Item ID         |
+|amount              |Order Amount         | 
+|currency            |Currency            | 
+|monior_unit         |Currency Precision         | 
+|region_id           |Buyer Region         |
+|status              |Order Status         | 
+|verified            |Whether verified before |
+|extra               |Business Additional Data      |
+
+#### Order Status
+
+|Status                | Meaning            |
+|-------------------|-----------------| 
+|charge.pending     | Pending Payment           | 
+|charge.succeeded   | Payment Successful         |
+|charge.confirmed   | Verified           | 
+|charge.overdue     | Payment Timeout Closed      | 
+|refund.pending     | Refunding           | 
+|refund.succeeded   | Refund Successful         |
+|refund.failed      | Refund Failed         |
+|refund.rejected    | Refund Rejected       |
+
+### Webhook Callback
+
+#### Webhook Description
+
+Currently, Webhook only monitors the "Refund Successful" event: `refund.succeeded`. For successful payment, it is recommended to take the initiative to `verify the order` and complete the shipment according to the order status.
+
+#### Webhook Verification 
+
+Webhook is an HTTP POST request that passes signature information through the `TapPay-Signature` header. The format is `timestamp, signature` such as: 
+ 
+```
+ TapPay-Signature: 1687224754,4dd293a514223c052513c1db449106f13710c733855d2af6654948675e1624e7
+ ```
+
+According to the above header, `ts = 1687224754` is obtained. You can first confirm whether the difference from the current system time is too large to ensure that it is not an old reused request.
+The request payload is a JSON string defined as `payload`. （
+
+```
+{
+  "event_type": "refund.succeeded"
+  "order": {      
+      "amount" : 299,
+      "client_id" : "UeTShOwxDrAsf232WN",
+      "currency" : "USD",
+      "extra" : "648ff2d31a81c",
+      "goods_open_id" : "game-11190",
+      "minor_unit" : 2,
+      "order_id" : "1670680390026510338",
+      "order_token" : "2cf31318c6f4939d5eaf2e9431bf45f2",
+      "region_id" : "HK",
+      "status" : "refund.succeeded",
+      "user_id" : 3173821787,
+      "verified" : false
+  }
+}
+```
+
+You also need `webhookToken` configured in the DC backend as the secret of the HmacSHA256 algorithm to finally get
+
+```
+sign = HmacSHA256(secret, ts + "." + payload ) 
+```
+
+Compare whether the calculation result sign is the same as the signature part of `TapPay-Signature`
+
+#### Webhook Content
+
+The Webhook content contains `event_type` and order information. The currently supported `event_type` are:
+
+| event_type       | Meaning     |
+|------------------|---------| 
+| refund.succedded | Refund Successful | 
+
+
+```
+{
+  "event_type": "refund.succeeded"
+  "order": {      
+      "amount" : 299,
+      "client_id" : "UeTShOwxDrAsf232WN",
+      "currency" : "USD",
+      "extra" : "648ff2d31a81c",
+      "goods_open_id" : "game-11190",
+      "minor_unit" : 2,
+      "order_id" : "1670680390026510338",
+      "order_token" : "2cf31318c6f4939d5eaf2e9431bf45f2",
+      "region_id" : "HK",
+      "status" : "refund.succeeded",
+      "user_id" : 3173821787,
+      "verified" : false
+  }
+}
+```
