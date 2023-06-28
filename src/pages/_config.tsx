@@ -90,8 +90,8 @@ export const getEntries = (brand: string, region: string, pathname: String ): En
 
   const ENTRIES_LEANCLOUD: Entry[] = [
     {
-      title: "控制台和账户",
-      description: "LeanCloud 控制台使用指南",
+      title: "入门指南",
+      description: "LeanCloud 的入门指南",
       links: [
         {
           label: "查看更多",
