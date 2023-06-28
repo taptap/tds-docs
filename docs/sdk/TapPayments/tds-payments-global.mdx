@@ -1,20 +1,21 @@
 ---
-title: 支付系统 TapPay-Global
+title: 接入指南
+sidebar_position: 3
 ---
 
 <head>
   <meta name="robots" content="noindex" />
 </head>
 
-import MultiLang from "../src/docComponents/MultiLang";
+import MultiLang from "/src/docComponents/MultiLang";
 import CodeBlock from "@theme/CodeBlock";
-import sdkVersions from "../src/docComponents/sdkVersions";
-import { Conditional } from "../src/docComponents/conditional";
+import sdkVersions from "/src/docComponents/sdkVersions";
+import { Conditional } from "/src/docComponents/conditional";
 
 
-TapPay-Global 是一项可让您在游戏中销售虚拟商品的服务。
+TapPayments-Global 是一项可让您在游戏中销售虚拟商品的服务。
 
-您可以在 TapPay-Global 中销售以下类型的商品：
+您可以在 TapPayments-Global 中销售以下类型的商品：
 
 * 消耗型商品
 * 非消耗型商品
@@ -26,11 +27,11 @@ TapPay-Global 是一项可让您在游戏中销售虚拟商品的服务。
 | 消耗型商品 | **消耗型商品**是指当用户消耗该商品时，您的游戏会分配相关联的游戏内容，而用户随后可以再次重复购的商品。例如游戏货币、游戏道具等。|
 | 非消耗型商品 | **非消耗型商品**是指购买一次就能永久使用的商品。例如付费升级和关卡包等。|
 
-借助 TapTap 开发者中心，可以方便地创建游戏内商品，并且在游戏中便捷地接入 TapPay-Global 的服务，来进行游戏商品的销售。
+借助 TapTap 开发者中心，可以方便地创建游戏内商品，并且在游戏中便捷地接入 TapPayments-Global 的服务，来进行游戏商品的销售。
 
-## SDK 安装
+## SDK 接入
 
-### 开发环境
+### 环境要求
 
 <MultiLang>
 <>
@@ -50,16 +51,79 @@ TapPay-Global 是一项可让您在游戏中销售虚拟商品的服务。
 </>
 </MultiLang>
 
-### 集成库
+### 接入前准备
 
-使用 TapTap.TapPay 前提是必须依赖以下库：
+1. 参考 [准备工作](/sdk/start/get-ready/) 创建应用、开启应用配置、绑定 API 域名；
+2. 参考 [快速开始](/sdk/start/quickstart/#配置签名证书) 配置包名与签名证书；
+
+使用 TapPayments-Global 前提是必须依赖以下库：
 
 * TapTap.Login
 * TapTap.Common
+* TapTap.Bootstrap
 
-接入方式参考 [入门指南 - 项目配置](/sdk/start/quickstart.mdx)。
+### 获取 SDK
 
-## 初始化
+<MultiLang>
+<>
+
+SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选其一。请根据项目需要选择。
+
+#### 方法一：使用 Unity Package Manager
+
+<CodeBlock className="json">
+  {`"dependencies":{
+    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.payments.global":"https://github.com/taptap/TapPayments-Global-Unity.git#${sdkVersions.taptap.unity}",
+    "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}",
+    "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
+}`}
+</CodeBlock>
+
+#### 方法二：手动导入
+
+1. 在 [下载页](/tap-download) 找到 **TapSDK Unity** 和 **LeanCloud C# SDK** 下载地址，分别下载 `TapSDK-UnityPackage.zip` 和 `LeanCloud-SDK-Realtime-Unity.zip`。
+
+2. 在 Unity 项目中依次转到 **Assets > Import Packages > Custom Packages**，从解压后的 `TapSDK-UnityPackage.zip` 中，选择希望在游戏中使用的 TapSDK 包进行导入，其中：
+
+   - `TapTap_Bootstrap.unitypackage` TapSDK 启动器，必选。
+   - `TapTap_Common.unitypackage` TapSDK 基础库，必选。
+   - `TapTap_Login.unitypackage` TapTap 登录，必选。
+   - `TapTap_Payments_Global.unitypackage` TapTap 支付模块，必选。
+
+3. 解压后的 `LeanCloud-SDK-Realtime-Unity.zip` 为 Plugins 文件夹，拖拽至 Unity 即可。
+
+</>
+<>
+
+1. [下载 TapSDK Android](/tap-download)，解压后选择需要用到的 SDK 包导入到项目 `project/app/libs` 目录下。
+
+2. 打开项目的 `project/app/build.gradle` 文件，添加 gradle 配置如下：
+
+<CodeBlock className="java"> {`
+dependencies {
+    ...
+    // 导入 libs 目录下所有 aar 的包：
+    implementation fileTree(dir: 'libs', include: ['*.aar'])
+    // 如果需要单独导入 libs 目录下的指定包，请按照如下方式：
+    implementation files('libs/TapBootstrap_${sdkVersions.taptap.android}.aar') // TapTap 启动器
+    implementation files('libs/TapCommon_${sdkVersions.taptap.android}.aar') // TapTap 基础库
+    implementation files('libs/TapLogin_${sdkVersions.taptap.android}.aar') // TapTap 登录
+    implementation files('libs/TapPaymentsGlobal_${sdkVersions.taptap.android}.aar') // TapTap 支付模块
+    implementation 'cn.leancloud:storage-android:${sdkVersions.leancloud.java}' // 数据存储
+    implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
+}
+`}</CodeBlock>
+
+</>
+<>
+
+- 暂未支持
+
+</>
+</MultiLang>
 
 ### TapSDK 初始化
 
@@ -69,8 +133,6 @@ TapPay-Global 是一项可让您在游戏中销售虚拟商品的服务。
 <>
 
 ```cs
-using TapTap.Payment;
-
 var config = new TapConfig.Builder()
     .ClientID(clientId) // 必须，开发者中心对应 Client ID
     .ClientToken(clientToken) // 必须，开发者中心对应 Client Token
@@ -217,11 +279,11 @@ TapPaySDKLoader.getSDK().queryItems(itemIds, new TapPayment.Callback<Item[]>() {
 </MultiLang>
 
 参数说明：
-* `language`:需要的国际化语言代码，例如：zh_CN、en_US、ja_JP 等。如无需自定义语言国家或使用 TapSDK 进行统一设置，则可以使用无语言参数版本的函数，将由 SDK 根据用户的国家或地区自动选择对应的[语言](#国际化相关支持)。
-* `itemIds`:需要查询商品 ID 数组。商品 ID 是游戏在 **开发者中心 > 你的游戏 > 游戏服务 > TapTap Payments > 商品与订单** 中定义的商品的 ID，`items` 是查询到存在的商品信息的回调结果。
-* [`Callback<T>`](#回调对象-callbackt):回调对象
-  - 成功时回调类型:[Item](#商品信息-item)[]
-  - 失败时回调类型:[Error](#支付异常-error)
+* `String language`: 需要的国际化语言代码，例如：zh_CN、en_US、ja_JP 等。如无需自定义语言国家或使用 TapSDK 进行统一设置，则可以使用无语言参数版本的函数，将由 SDK 根据用户的国家或地区自动选择对应的[语言](#国际化相关支持)。
+* `String[] itemIds`: 需要查询商品 ID 数组。商品 ID 是游戏在 **开发者中心 > 你的游戏 > 游戏服务 > TapTap Payments > 商品与订单** 中定义的商品的 ID，<code>[Item](#商品信息-item)&gt;</code> 是查询到存在的商品信息的回调结果。
+* &zwnj;<code>[Callback](#回调对象-callbackt)&lt;[Item](#商品信息-item)[]&gt; callback</code>: 回调对象
+  - 成功时回调类型为商品信息 [Item](#商品信息-item) 的数组: <code>(Array&lt;[Item](#商品信息-item)&gt; items)</code>
+  - 失败时回调类型为异常 [Error](#异常-error): <code>([Error](#异常-error) error)</code>
 
 ### 启动应用内购买
 
@@ -307,18 +369,14 @@ TapPaySDKLoader.getSDK().requestPayFlow(itemId, quantity, extra, new TapPayment.
 </MultiLang>
 
 参数说明：
-* `language`:需要的国际化语言代码，例如：zh_CN、en_US、ja_JP 等。如无需自定义语言国家或使用 TapSDK 进行统一设置，则可以使用无语言参数版本的函数，将由 SDK 根据用户的国家或地区自动选择对应的[语言](#国际化相关支持)。
-* `itemId`:需要购买的商品 ID。商品 ID 是游戏在 **开发者中心 > 你的游戏 > 游戏服务 > TapTap Payments > 商品与订单** 中定义的商品的 ID，`order` 是购买商品的回调结果。
-* `quantity`:需要购买的商品数量。
-* `extra`:额外的扩展信息，将在支付流程结是回调中返回。若订单成功被创建（即使订单未能支付）也会和订单进行绑定。
-* [`PayCallback`](#支付回调对象-paycallback):回调对象
-  - 完成支付流程时回调类型:([Order](#订单信息-order), extra)
-  - 支付流程失败时回调类型:([Error](#支付异常-error), extra)
-  - 用户取消支付流程时回调类型:extra
-  
-  :::info 关于 extra 的回调参数类型
-  额外的扩展信息统一为各语言对应的字符串类型
-  :::
+* `String language`: 需要的国际化语言代码，例如：zh_CN、en_US、ja_JP 等。如无需自定义语言国家或使用 TapSDK 进行统一设置，则可以使用无语言参数版本的函数，将由 SDK 根据用户的国家或地区自动选择对应的[语言](#国际化相关支持)。
+* `String itemId`: 需要购买的商品 ID。商品 ID 是游戏在 **开发者中心 > 你的游戏 > 游戏服务 > TapTap Payments > 商品与订单** 中定义的商品的 ID.
+* `Int quantity`: 需要购买的商品数量。
+* `String extra`: 额外的扩展信息，将在支付流程结是回调中返回。若订单成功被创建（即使订单未能支付）也会和订单进行绑定。
+* [`PayCallback`](#支付回调对象-paycallback): 回调对象。
+  - 完成支付流程时回调类型为订单信息 [Order](#订单-order) 和自定义扩展信息: <code>([Order](#订单-order), String extra)</code>
+  - 支付流程失败时回调类型为异常 [Error](#异常-error) 和自定义扩展信息: <code>([Error](#异常-error), String extra)</code>
+  - 用户取消支付流程时回调类型为自定义扩展信息: `(String extra)`
 
 ### 查询订单
 
@@ -386,16 +444,22 @@ TapPaySDKLoader.getSDK().queryOrder(order, new TapPayment.Callback < Order >() {
 </MultiLang>
 
 参数说明：
-* `orderId` : 需要查询的订单 ID。
-* [`Callback<T>`](#回调对象-callbackt):回调对象
-  - 成功时回调类型:[Order[]](#订单信息-order)
-  - 失败时回调类型:[Error](#支付异常-error)
+* `String orderId`: 需要查询的订单 ID。
+* &zwnj;<code>[Callback](#回调对象-callbackt)&lt;[Order](#订单-order)&gt; callback</code>: 回调对象
+  - 成功时回调类型为订单信息 [Order](#订单-order): <code>([Order](#订单-order) order)</code>
+  - 失败时回调类型为异常 [Error](#异常-error): <code>([Error](#异常-error) error)</code>
 
 参数说明：
-* `order` : 已存在的订单对象。
-* [`Callback<T>`](#回调对象-callbackt):回调对象
-  - 成功时回调类型:[Order[]](#订单信息-order)
-  - 失败时回调类型:[Error](#支付异常-error)
+* &zwnj;<code>[Order](#订单-order) order</code>: 已存在的订单对象。
+* &zwnj;<code>[Callback](#回调对象-callbackt)&lt;[Order](#订单-order)&gt; callback</code>: 回调对象
+  - 成功时回调类型为订单信息 [Order](#订单-order): <code>([Order](#订单-order) order)</code>
+  - 失败时回调类型为异常 [Error](#异常-error): <code>([Error](#异常-error) error)</code>
+
+:::tip 传入参数说明
+订单信息中包含订单 ID，可以直接传入，也可以只传入订单 ID，查询成功时，回调的 <code>([Order](#订单-order) order)</code> 订单信息中的状态 <code>[[State](#订单状态-orderstate) state]</code> 字段可能会更新。
+:::
+
+### 验证订单
 
 <MultiLang>
 <>
@@ -459,17 +523,21 @@ TapPaySDKLoader.getSDK().consumeOrder(order, new TapPayment.Callback < Order >()
 </MultiLang>
 
 参数说明：
-* `orderId` 订单 ID
-* `orderToken` 订单 Token
-* [`Callback<T>`](#回调对象-callbackt):回调对象
-  - 成功时回调类型:[Order](#订单信息-order)
-  - 失败时回调类型:[Error](#支付异常-error)
+* `String orderId`: 需要验证的订单 ID。
+* `String orderToken`: 需要验证的订单 Token。
+* &zwnj;<code>[Callback](#回调对象-callbackt)&lt;[Order](#订单-order)&gt; callback</code>: 回调对象
+  - 成功时回调类型为订单信息 [Order](#订单-order): <code>([Order](#订单-order) order)</code>
+  - 失败时回调类型为异常 [Error](#异常-error): <code>([Error](#异常-error) error)</code>
 
 参数说明：
-* `order` 订单对象
-* [`Callback<T>`](#回调对象-callbackt):回调对象
-  - 成功时回调类型:[Order](#订单信息-order)
-  - 失败时回调类型:[Error](#支付异常-error)
+* &zwnj;<code>[Order](#订单-order) order</code>: 已存在的订单对象。
+* &zwnj;<code>[Callback](#回调对象-callbackt)&lt;[Order](#订单-order)&gt; callback</code>: 回调对象
+  - 成功时回调类型为订单信息 [Order](#订单-order): <code>([Order](#订单-order) order)</code>
+  - 失败时回调类型为异常 [Error](#异常-error): <code>([Error](#异常-error) error)</code>
+
+:::tip 传入参数说明
+订单信息中包含订单 ID 和订单的 Token，可以直接传入，也可以只传入订单 ID 和 订单 Token。验证订单成功时，回调的 <code>([Order](#订单-order) order)</code> 订单信息中的状态 <code>[[State](#订单状态-orderstate) state]</code> 会更新为 `COMPLETED`。
+:::
 
 ### 相关数据结构
 
@@ -506,7 +574,7 @@ TapPaySDKLoader.getSDK().consumeOrder(order, new TapPayment.Callback < Order >()
 </>
 </MultiLang>
 
-#### 订单信息 `Order`
+#### 订单 `Order`
 
 <MultiLang>
 <>
@@ -556,7 +624,7 @@ TapPaySDKLoader.getSDK().consumeOrder(order, new TapPayment.Callback < Order >()
 </>
 </MultiLang>
 
-**State** 订单状态相关说明：
+##### 订单状态 `Order.State`
 
 | 枚举   | 值   |       说明       |
 | :--: | :-: |:--------------:| 
@@ -570,14 +638,14 @@ TapPaySDKLoader.getSDK().consumeOrder(order, new TapPayment.Callback < Order >()
 | REFUND_FAILED| 22|     退款失败。      |
 |REFUND_REJECTED| 23|     退款被驳回。     |
 
-#### 支付异常 `Error`
+#### 异常 `Error`
 
 <MultiLang>
 <>
 
 ```cs
 /// <summary>
-/// 支付错误类
+/// TapPayment 异常类
 /// </summary>
 public class Error : Exception
 {
@@ -609,7 +677,7 @@ public class Error : Exception
 
 ```java
 /**
- * 支付异常类。
+ * TapPayment 异常类。
  */
 public static class Error extends Exception implements Parcelable {
     /**
@@ -839,26 +907,222 @@ public class Callback < T >
 </>
 </MultiLang>
 
-
-####  ``
-
-<MultiLang>
-<>
-
-- 暂未支持
-
-</>
-<>
-
-- 暂未支持
-
-</>
-<>
-
-- 暂未支持
-
-</>
-</MultiLang>
-
 ### 国际化相关支持
-施工ing....
+
+#### 语言代码列表
+
+使用 ISO 639-1 中定义的双小写字母语言代码（例如，`en` 表示英语，`jp` 表示日语），但：
+
+* 由于 Android 系统的历史原因，印尼语使用 `in` 表示，而不是 `id`。
+* 仅使用语言代码无法表示所需语言时，附加 ISO 3166-1 中定义的地区代码（例如，`zh_CN` 表示简体中文）
+
+当前已对 8 种进行国际化支持，语言代码如下：
+
+| 代码 | 语言     |
+|----|--------|
+| en | 英语     |
+| zh_CN | 简体中文   |
+| zh_TW | 繁体中文   |
+| in | 印尼语    |
+| ja | 日文     |
+| ko | 韩文     |
+| pt_BR | 巴西（葡语） |
+| th | 泰语     |
+
+此外 DC 后台设置商品名称时，同样也支持多语言，传递的语言参数会影响返回对应的国际化商品名称。
+:::tip 默认语言
+如果没有匹配到相应语言，会使用英语作为默认语言。
+:::
+
+## 服务端开发指南
+### 服务端 REST API
+
+:::tip
+请参考 数据存储 REST API 文档中关于 [Base URL](/sdk/storage/guide/rest/#base-url)、[请求格式](/sdk/storage/guide/rest/#请求格式)、[响应格式](/sdk/storage/guide/rest/#响应格式)的说明。因为这一组接口为服务器之间的调用，所以仅支持 `master key` 的鉴权方式。不要在客户端使用或暴露 `master key`。 `master key` 是 DC 后台中应用的 `serverSecret`
+:::
+
+|URL                                                 |HTTP    |功能                             |
+|----------------------------------------------------|--------|--------------------------------|
+|/open/payment/v1/orders/&lt;order_id&gt;            |GET     | 查询订单信息                     |
+|/open/payment/v1/orders/&lt;order_id&gt;/verify     |POST    | 核销订单                        |
+|/open/payment/v1/orders/&lt;order_id&gt;/refund     |POST    | 订单退款                        |
+
+#### 查询订单
+
+通过一个订单 ID 可以查询到订单的详细信息并确定当前的支付状态
+
+```sh
+curl -X POST \
+  -H 'X-LC-Id: {{appid}} \
+  -H 'X-LC-Key: {{masterKey}},master \
+  https://{{host}}/open/payment/v1/orders/1670731970469806082
+```
+
+返回值是一个订单的 JSON 对象
+
+```json
+{
+   "data" : {
+      "amount" : 299,
+      "client_id" : "UeTShOwxDrAsf232WN",
+      "currency" : "USD",
+      "extra" : "648ff2d31a81c",
+      "goods_open_id" : "game-11190",
+      "minor_unit" : 2,
+      "order_id" : "1670680390026510338",
+      "order_token" : "2cf31318c6f4939d5eaf2e9431bf45f2",
+      "region_id" : "HK",
+      "status" : "refund.succeeded",
+      "user_id" : 3173821787,
+      "verified" : false
+   },
+   "success" : true
+}
+```
+
+#### 核销订单
+当支付成功后，核销订单表示已经确认支付结果并会对买家完成发货，订单状态也会从 `charge.succeeded` 变为 `charge.confirmed`
+
+```sh
+curl -X POST \
+  -H 'X-LC-Id: {{appid}} \
+  -H 'X-LC-Key: {{masterKey}},master \
+  https://{{host}}/open/payment/v1/orders/1670731970469806082/verify?token=2cf31318c6f4939d5eaf2e9431bf45f2
+```
+返回值是一个订单的 JSON 对象
+
+```json
+{
+   "data" : {
+      "amount" : 299,
+      "client_id" : "UeTShOwxDrAsf232WN",
+      "currency" : "USD",
+      "extra" : "648ff2d31a81c",
+      "goods_open_id" : "game-11190",
+      "minor_unit" : 2,
+      "order_id" : "1670680390026510338",
+      "order_token" : "2cf31318c6f4939d5eaf2e9431bf45f2",
+      "region_id" : "HK",
+      "status" : "refund.succeeded",
+      "user_id" : 3173821787,
+      "verified" : false
+   },
+   "success" : true
+}
+```
+
+#### 订单退款
+对一个订单进行退款
+
+```sh
+curl -X GET \
+  -H 'X-LC-Id: {{appid}} \
+  -H 'X-LC-Key: {{masterKey}},master \
+  https://{{host}}/open/payment/v1/orders/1670731970469806082/refund
+```
+
+#### 订单对象字段
+
+|字段                 | 含义          |
+|--------------------|---------------|
+|client_id           |               |
+|user_id             |               |
+|order_id            |               |
+|order_token         |用于核销的 token |
+|goods\_open\_id     |商品 ID         |
+|amount              |订单金额         |
+|currency            |货币            |
+|monior_unit         |货币精度         |
+|region_id           |买家区域         |
+|status              |订单状态         |
+|verified            |之前是否已经核销过 |
+|extra               |业务附加数据      |
+
+#### 订单状态
+
+|状态                | 含义            |
+|-------------------|-----------------|
+|charge.pending     | 待支付           |
+|charge.succeeded   | 支付成功         |
+|charge.confirmed   | 已核销           |
+|charge.overdue     | 支付超时关闭      |
+|refund.pending     | 退款中           |
+|refund.succeeded   | 退款成功         |
+|refund.failed      | 退款失败         |
+|refund.rejected    | 退款被拒绝       |
+
+### Webhook 回调
+
+#### Webhook 说明
+
+目前 Webhook 仅监听「退款成功」事件: `refund.succeeded`，对于支付成功建议采取主动`核销订单`，根据订单状态完成发货。
+
+#### Webhook 验签
+
+Webhook 是一个 HTTP POST 请求，通过 `TapPay-Signature` header 传递签名信息。格式 `时间戳,签名` 如：
+
+```
+TapPay-Signature: 1687224754,4dd293a514223c052513c1db449106f13710c733855d2af6654948675e1624e7
+```
+
+根据上面的 header ，得到 `ts = 1687224754` ，首先可以确认一下跟当前系统时间是否差异过大，确保不是被重用的旧请求。
+
+请求的 request body ，是一个 JSON 字符串，定义为 `payload`
+
+```
+{
+  "event_type": "refund.succeeded"
+  "order": {      
+      "amount" : 299,
+      "client_id" : "UeTShOwxDrAsf232WN",
+      "currency" : "USD",
+      "extra" : "648ff2d31a81c",
+      "goods_open_id" : "game-11190",
+      "minor_unit" : 2,
+      "order_id" : "1670680390026510338",
+      "order_token" : "2cf31318c6f4939d5eaf2e9431bf45f2",
+      "region_id" : "HK",
+      "status" : "refund.succeeded",
+      "user_id" : 3173821787,
+      "verified" : false
+  }
+}
+```
+
+还需要在 DC 后台配置过的 `webhookToken` ，作为 HmacSHA256 算法的 secret 最终得到 
+
+```
+sign = HmacSHA256(secret, ts + "." + payload )
+```
+
+比对计算结果 sign 和 `TapPay-Signature` 的签名部分是否相同
+
+
+#### Webhook 内容
+
+Webhook 内容包含 `event_type` 和 订单信息，目前支持的 `event_type` 有：
+
+| event_type       | 含义     |
+|------------------|---------|
+| refund.succedded | 退款成功 |
+
+
+```
+{
+  "event_type": "refund.succeeded"
+  "order": {      
+      "amount" : 299,
+      "client_id" : "UeTShOwxDrAsf232WN",
+      "currency" : "USD",
+      "extra" : "648ff2d31a81c",
+      "goods_open_id" : "game-11190",
+      "minor_unit" : 2,
+      "order_id" : "1670680390026510338",
+      "order_token" : "2cf31318c6f4939d5eaf2e9431bf45f2",
+      "region_id" : "HK",
+      "status" : "refund.succeeded",
+      "user_id" : 3173821787,
+      "verified" : false
+  }
+}
+```
