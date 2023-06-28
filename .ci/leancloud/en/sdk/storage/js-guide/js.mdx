@@ -1,0 +1,1356 @@
+---
+title: Data Storage Guide for JavaScript
+sidebar_label: JavaScript Guide
+slug: /sdk/storage/guide/js/
+sidebar_position: 4
+---
+
+import Path from "/src/docComponents/path";
+
+The LeanStorage JavaScript SDK can be used to persist and query data in LeanCloud. The code below shows how you can create an object and store it into the cloud:
+
+```js
+// Create an object
+// Declare a class
+const Todo = AV.Object.extend('Todo');
+
+// Create an object
+const todo = new Todo();
+
+// Set values of fields
+todo.set('title',   'R&D Weekly Meeting');
+todo.set('content', 'All team members, Tue 2pm');
+
+// Save the object to the cloud
+todo.save().then((todo) => {
+  // Execute any logic that should take place after the object is saved
+  console.log(`Object saved. objectId: ${todo.id}`);
+}, (error) => {
+  // Execute any logic that should take place if the save fails
+});
+
+```
+
+The SDK designed for each language interacts with the same REST API via HTTPS, offering fully functional interfaces for you to manipulate the data in the cloud.
+
+## Installing SDK
+
+See [Installing JavaScript SDK](/sdk/storage/guide/setup-js/).
+
+## Objects
+
+### `AV.Object`
+
+The objects on the cloud are built around `AV.Object`. Each `AV.Object` contains key-value pairs of JSON-compatible data. This data is schema-free, which means that you don't need to specify ahead of time what keys exist on each `AV.Object`. Simply set whatever key-value pairs you want, and our backend will store them.
+
+For example, the `AV.Object` storing a simple todo item may contain the following data:
+
+```json
+title:      "Email Linda to Confirm Appointment",
+isComplete: false,
+priority:   2,
+tags:       ["work", "sales"]
+```
+
+### Data Types
+
+`AV.Object` supports a wide range of data types to be used for each field, including common ones like `String`, `Number`, `Boolean`, `Object`, `Array`, and `Date`. You can nest objects in JSON format to store more structured data within a single `Object` or `Array` field.
+
+Special data types supported by `AV.Object` include `Pointer` and `File`, which are used to store a reference to another `AV.Object` and binary data respectively.
+
+`AV.Object` also supports `GeoPoint`, a special data type you can use to store location-based data. See [GeoPoints](#geopoints) for more details.
+
+Some examples:
+
+```js
+// Basic types
+const bool   = true;
+const number = 2018;
+const string = `${number} Top Hit Songs`;
+const date   = new Date();
+const array  = [string, number];
+const object = {
+  number: number,
+  string: string
+};
+
+// Create an object
+const TestObject = AV.Object.extend('TestObject');
+const testObject = new TestObject();
+testObject.set('testNumber',  number);
+testObject.set('testString',  string);
+testObject.set('testDate',    date);
+testObject.set('testArray',   array);
+testObject.set('testObject',  object);
+testObject.save();
+```
+
+We do not recommend storing large pieces of binary data like images or documents with `AV.Object` using `byte[]`. The size of each `AV.Object` should not exceed **128 KB**. We recommend using `AV.File` for storing images, documents, and other types of files. To do so, create `AV.File` objects and assign them to fields of `AV.Object`. See [Files](#files) for details.
+
+Keep in mind that our backend stores dates in UTC format and the SDK will convert them to local times upon retrieval.
+
+The date values displayed on **<Path to="storage" /> > Data** are also converted to match your operating system's time zone. The only exception is that when you retrieve these date values through our REST API, they will remain in UTC format. You can manually convert them using appropriate time zones when necessary.
+
+To learn about how you can protect the data stored on the cloud, see [Data Security](/sdk/storage/guide/security/).
+
+### Creating Objects
+
+The code below creates a new instance of `AV.Object` with class `Todo`:
+
+```js
+// Create a new subclass of AV.Object
+const Todo = AV.Object.extend('Todo');
+
+// Create a new instance of that class
+const todo = new Todo();
+
+// You can also use the AV.Object constructor directly
+const todo = new AV.Object('Todo');
+```
+
+The constructor takes a class name as a parameter so that the cloud knows the class you are using to create the object. A class is comparable to a table in a relational database. A class name starts with a letter and can only contain numbers, letters, and underscores.
+
+If you keep seeing Maximum call stack size exceeded exception in your log, chances are `AV.Object` .extend had been called using the same class name more than once within a loop or a callback. To resolve the issue, either move it out of the loop or the callback to make sure it won't be over-instantiated or switch to JavaScript SDK 1.4 or higher which handles the problem automatically.
+
+If you're using ES6 in your codebase, you can subclass `AV.Object`  with the extends keyword. However, when using extends, the SDK is not automatically aware of your subclasses. You will need to register the subclasses with the SDK:
+
+```js
+class Todo extends AV.Object {
+  // More properties and methods
+}
+
+// Register the subclass
+AV.Object.register(Todo);
+```
+
+After doing this, you will be able to add additional methods and properties to your subclasses of `AV.Object` .
+
+### Saving Objects
+
+The following code saves a new object with class `Todo` to the cloud:
+
+```js
+// Declare a class
+const Todo = AV.Object.extend('Todo');
+
+// Create an object
+const todo = new Todo();
+
+// Set values of fields
+todo.set('title', 'Sign up for Marathon');
+todo.set('priority', 2);
+
+// Save the object to the cloud
+todo.save().then((todo) => {
+  // Execute any logic that should take place after the object is saved
+  console.log(`Object saved. objectId: ${todo.id}`);
+}, (error) => {
+  // Execute any logic that should take place if the save fails
+});
+
+```
+
+To make sure the object is successfully saved, take a look at **<Path to="storage" /> > Data > `Todo`** in your app. You should see a new entry of data with something like this when you click on its `objectId`:
+
+```json
+{
+  "title": "Sign up for Marathon",
+  "priority": 2,
+  "ACL": {
+    "*": {
+      "read": true,
+      "write": true
+    }
+  },
+  "objectId": "582570f38ac247004f39c24b",
+  "createdAt": "2017-11-11T07:19:15.549Z",
+  "updatedAt": "2017-11-11T07:19:15.549Z"
+}
+```
+
+You don't have to create or set up a new class called `Todo` in **<Path to="storage" /> > Data** before running the code above. If the class doesn't exist, it will be automatically created.
+
+Several built-in fields are provided by default which you don't need to specify in your code:
+
+| Built-in Field | Type     | Description                                                                                    |
+| -------------- | -------- | ---------------------------------------------------------------------------------------------- |
+| `objectId`     | `String` | A unique identifier for each saved object.                                                     |
+| `ACL`          | `LCACL`  | Access Control List, a special object defining the read and write permissions of other people. |
+| `createdAt`    | `Date`   | The time the object was created.                                                               |
+| `updatedAt`    | `Date`   | The time the object was last modified.                                                         |
+
+Each of these fields is filled in by the cloud automatically and doesn't exist on the local `AV.Object` until a save operation has been completed.
+
+Field names, or **keys**, can only contain letters, numbers, and underscores. A custom key can neither start with double underscores `__`, nor be identical to any system reserved words or built-in field names (`ACL`, `className`, `createdAt`, `objectId`, and `updatedAt`) regardless of letter cases.
+
+**Values** can be strings, numbers, booleans, or even arrays and dictionaries — anything that can be JSON-encoded. See [Data Types](#data-types) for more information.
+
+We recommend that you adopt CamelCase naming convention to `NameYourClassesLikeThis` and `nameYourKeysLikeThis`, which keeps your code more readable.
+
+### Retrieving Objects
+
+If an `AV.Object` is already in the cloud, you can retrieve it using its `objectId` with the following code:
+
+```js
+const query = new AV.Query('Todo');
+query.get('582570f38ac247004f39c24b').then((todo) => {
+  // todo is the instance of the Todo object with objectId 582570f38ac247004f39c24b
+  const title     = todo.get('title');
+  const priority  = todo.get('priority');
+
+  // Acquire special properties
+  const objectId  = todo.id;
+  const updatedAt = todo.updatedAt;
+  const createdAt = todo.createdAt;
+});
+```
+
+If you try to access a field or property that doesn't exist, the SDK will not raise an error. Instead, it will return `null`.
+
+Sometimes you may want to `get` all the fields back at one time without calling get on each field of the object. This could be helpful when you implement data binding. To do so, call `toJSON` on `AV.Object`:
+
+```js
+const query = new AV.Query('Todo');
+query.get('582570f38ac247004f39c24b').then((todo) => {
+  console.log(todo.toJSON());
+  // {
+  //   createdAt: "2017-03-08T11:25:07.804Z",
+  //   objectId: "582570f38ac247004f39c24b",
+  //   priority: 2,
+  //   title: "R&D Weekly Meeting",
+  //   updatedAt: "2017-03-08T11:25:07.804Z"
+  // }
+});
+```
+
+### Refreshing Objects
+
+If you need to refresh a local object with the latest version of it in the cloud, call the `fetch` method on it:
+
+```js
+const todo = AV.Object.createWithoutData('Todo', '582570f38ac247004f39c24b');
+todo.fetch().then((todo) => {
+  // todo is refreshed
+});
+```
+
+Keep in mind that **any unsaved changes made to the object prior to calling `fetch` will be discarded**. To avoid this, you have the option to provide **a list of keys** when calling the method so that only the fields being specified are retrieved and refreshed (including special built-in fields such as `objectId`, `createdAt`, and `updatedAt`). Changes made to other fields will remain intact.
+
+```js
+const todo = AV.Object.createWithoutData('Todo', '582570f38ac247004f39c24b');
+todo.fetch({
+  keys: 'priority, location'
+}).then((todo) => {
+  // Only priority and location will be retrieved and refreshed
+});
+```
+
+### Updating Objects
+
+To update an existing object, assign the new data to each field and call the `save` method. For example:
+
+```js
+const todo = AV.Object.createWithoutData('Todo', '582570f38ac247004f39c24b');
+todo.set('content', 'Weekly meeting has been rescheduled to Wed 3pm for this week.');
+todo.save();
+```
+
+The cloud automatically figures out which data has changed and only the fields with changes will be sent to the cloud. The fields you didn't update will remain intact.
+
+To view which attributes have unsaved changes, you can invoke the dirtyKeys method:
+
+```js
+todo.dirtyKeys() // ['content']
+```
+
+To revert unsaved changes, you can invoke the revert method. Invoking revert() without passing any parameter will revoke all unsaved changes. To specify attributes to be revoked, pass an array as parameter:
+
+```js
+todo.revert(['content'])
+```
+
+### Updating Data Conditionally
+
+By passing in a `query` option when saving, you can specify conditions on the save operation so that the object can be updated atomically only when those conditions are met. If no object matches the conditions, the cloud will return error `305` to indicate that there was no update taking place.
+
+For example, in the class `Account` there is a field called `balance`, and there are multiple incoming requests that want to modify this field. Since an account cannot have a negative balance, we can only allow a request to update the balance when the amount requested is lower than or equal to the balance:
+
+```js
+const account = AV.Object.createWithoutData('Account', '5745557f71cfe40068c6abe0');
+// Atomically decrease balance by 100
+const amount = -100;
+account.increment('balance', amount);
+account.save(null, {
+  // Add the condition
+  query: new AV.Query('Account').greaterThanOrEqualTo('balance', -amount),
+  // Return the latest data in the cloud upon completion.
+  // All the fields will be returned if the object is new,
+  // otherwise only fields with changes will be returned.
+  fetchWhenSave: true
+}).then((account) => {
+  console.log(`Balance: ${account.get('balance')}`);
+}, (error) => {
+  if (error.code === 305) {
+    console.error('Insufficient balance. Operation failed!');
+  }
+});
+```
+
+**The `query` option only works for existing objects.** In other words, it does not affect objects that haven't been saved to the cloud yet.
+
+The benefit of using the `query` option instead of combining `AV.Query` and `AV.Object` shows up when you have multiple clients trying to update the same field at the same time. The latter way is more cumbersome and may lead to potential inconsistencies.
+
+### Updating Counters
+
+Take Twitter as an example, we need to keep track of how many Likes and Retweets a tweet has gained so far. Since a Like or Retweet action can be triggered simultaneously by multiple clients, saving objects with updated values directly can lead to inaccurate results. To make sure that the total number is stored correctly, you can **atomically** increase (or decrease) the value of a number field:
+
+```js
+post.increment("likes", 1);
+```
+
+You can specify the amount of increment (or decrement) by providing an additional argument. If the argument is not provided, `1` is used by default.
+
+#### Updating Arrays
+
+There are several operations that can be used to atomically update an array associated with a given key:
+
+- `AV.Object.add('arrayKey', value)` appends the given object to the end of an array.
+- `AV.Object.addUnique('arrayKey', value)` adds the given object into an array only if it is not in it. The object will be inserted at a random position.
+- `AV.Object.remove('arrayKey', value)` removes all instances of the given object from an array.
+
+For example, `Todo` has a field named `alarms` for keeping track of the times at which a user wants to be alerted. The following code adds the times to the alarms field:
+
+```js
+const alarm1 = new Date('2018-04-30T07:10:00');
+const alarm2 = new Date('2018-04-30T07:20:00');
+const alarm3 = new Date('2018-04-30T07:30:00');
+
+const alarms = [alarm1, alarm2, alarm3];
+
+const todo = new AV.Object('Todo');
+todo.addUnique('alarms', alarms);
+todo.save();
+```
+
+### Deleting Objects
+
+The following code deletes a `Todo` object from the cloud:
+
+```js
+const todo = AV.Object.createWithoutData('Todo', '582570f38ac247004f39c24b');
+todo.destroy();
+```
+
+Removing data from the cloud should always be dealt with great caution as it may lead to non-recoverable data loss. We strongly advise that you read [ACL Guide](https://docs.leancloud.app/acl-guide.html) to understand the risks thoroughly. You should also consider implementing class-level, object-level, and field-level permissions for your classes in the cloud to guard against unauthorized data operations.
+
+You can delete a given field of an object with the unset method:
+
+```js
+const todo = AV.Object.createWithoutData('Todo', '582570f38ac247004f39c24b');
+
+// The priority field will be removed
+todo.unset('priority');
+
+// Save the object to the cloud
+todo.save();
+```
+
+### Batch Processing
+
+```js
+// Create an array for storing AV.Objects
+const objects = [];
+
+// Batch create and update
+AV.Object.saveAll(objects);
+
+// Batch delete
+AV.Object.destroyAll(objects);
+
+// Batch fetch
+AV.Object.fetchAll(objects);
+```
+
+The following code sets `isComplete` of all `Todo` objects to be `true`:
+
+```js
+const query = new AV.Query('Todo');
+query.find().then((todos) => {
+  // Get a collection of todos to work on
+  todos.forEach((todo) => {
+    // Update value
+    todo.set('isComplete', true);
+  });
+  // Save all at once
+  AV.Object.saveAll(todos);
+});
+```
+
+Although each function call sends multiple operations in one single network request, saving operations and fetching operations are billed as separate API calls for each object in the collection, while deleting operations are billed as a single API call.
+
+
+### Data Models
+
+Objects may have relationships with other objects. For example, in a blogging application, a `Post` object may have relationships with many `Comment` objects. The Data Storage service supports three kinds of relationships, including one-to-one, one-to-many, and many-to-many.
+
+### One-to-One and One-to-Many Relationships
+
+One-to-one and one-to-many relationships are modeled by saving `AV.Object` as a value in the other object. For example, each `Comment` in a blogging app might correspond to one `Post`.
+
+The following code creates a new `Post` with a single `Comment`:
+
+```js
+// Create a post
+const post = new AV.Object('Post');
+post.set('title', 'I am starving!');
+post.set('content', 'Hmmm, where should I go for lunch?');
+
+// Create a comment
+const comment = new AV.Object('Comment');
+comment.set('content', 'KFC is the best!');
+
+// Add the post as a property of the comment
+comment.set('parent', post);
+
+// This will save both post and comment
+comment.save();
+```
+
+Internally, the backend will store the referred-to object with the `Pointer` type in just one place in order to maintain consistency. You can also link objects using their `objectId`s like this:
+
+```js
+const post = AV.Object.createWithoutData('Post', '57328ca079bc44005c2472d0');
+comment.set('post', post);
+```
+
+See [Relational Queries](#relational-queries) for instructions on how to query relational data.
+
+### Many-to-Many Relationships
+
+The easiest way to model many-to-many relationships is to use **arrays**. In most cases, using arrays helps you reduce the number of queries you need to make and leads to better performance. However, if additional properties need to be attached to the relationships between two classes, using **join tables** would be a better choice. Keep in mind that the additional properties are used to describe the relationships between classes rather than any single class.
+
+We recommend you to use join tables if the total number of objects of any class exceeds 100.
+
+
+## Queries
+
+We've already seen how you can retrieve a single object from the cloud with `AV.Object`, but it doesn't seem to be powerful enough when you need to retrieve multiple objects that match certain conditions at once. In such a situation, `AV.Query` would be a more efficient tool you can use.
+
+### Basic Queries
+
+The general steps of performing a basic query include:
+
+1. Creating `AV.Query`.
+2. Putting conditions on it.
+3. Retrieving an array of objects matching the conditions.
+
+The code below retrieves all `Student` objects whose `lastName` is `Smith`:
+
+```js
+const query = new AV.Query('Student');
+query.equalTo('lastName', 'Smith');
+query.find().then((students) => {
+  // students is an array of Student objects satisfying conditions
+});
+```
+
+### Query Constraints
+
+There are several ways to put constraints on the objects found by `AV.Object`.
+
+The code below filters out objects with `Jack` as `firstName`:
+
+```js
+query.notEqualTo('firstName', 'Jack');
+```
+
+For sortable types like numbers and strings, you can use comparisons in queries:
+
+```js
+// Restricts to age < 18
+query.lessThan('age', 18);
+
+// Restricts to age <= 18
+query.lessThanOrEqualTo('age', 18);
+
+// Restricts to age > 18
+query.greaterThan('age', 18);
+
+// Restricts to age >= 18
+query.greaterThanOrEqualTo('age', 18);
+```
+
+You can apply multiple constraints to a single query, and objects will only be in the results if they match all of the constraints. In other words, it's like concatenating constraints with `AND`:
+
+```js
+query.equalTo('firstName', 'Jack');
+query.greaterThan('age', 18);
+```
+
+You can limit the number of results by setting `limit` (defaults to `100`):
+
+```js
+// Get at most 10 results
+query.limit(10);
+```
+
+For performance reasons, the maximum value allowed for `limit` is `1000`, meaning that the cloud would only return 1,000 results even if it is set to be greater than `1000`.
+
+If you need exactly one result, you may use `first` for convenience:
+
+```js
+const query = new AV.Query('Todo');
+query.equalTo('priority', 2);
+query.first().then((todo) => {
+  // todo is the first Todo object satisfying conditions
+});
+```
+
+You can skip a certain number of results by setting `skip`:
+
+```js
+// Skip the first 20 results
+query.skip(20);
+```
+
+You can implement pagination in your app by using `skip` together with `limit`:
+
+```js
+const query = new AV.Query('Todo');
+query.equalTo('priority', 2);
+query.limit(10);
+query.skip(20);
+```
+
+Keep in mind that the higher the `skip` goes, the slower the query will run. You may consider using `createdAt` or `updatedAt` (which are indexed) to set range boundaries for large datasets to make queries more efficient.
+You may also use the last value returned from an auto-increment field along with `limit` for pagination.
+
+For sortable types, you can control the order in which results are returned:
+
+```js
+// Sorts the results in ascending order by the createdAt property
+query.ascending('createdAt');
+
+// Sorts the results in descending order by the createdAt property
+query.descending('createdAt');
+```
+
+You can even attach multiple sorting rules to a single query:
+
+```js
+query.addAscending('priority');
+query.addDescending('createdAt');
+```
+
+To retrieve objects that have or do not have particular fields:
+
+```js
+// Finds objects that have the "images" field
+query.whereExists("images");
+
+// Finds objects that don't have the 'images' field
+query.whereDoesNotExist("images");
+```
+
+You can restrict the fields returned by providing a list of keys with `selectKeys`. The code below retrieves todos with only the `title` and `content` fields (and also special built-in fields including `objectId`, `createdAt`, and `updatedAt`):
+
+```js
+// Finds objects that have the 'images' field
+query.exists('images');
+
+// Finds objects that don't have the 'images' field
+query.doesNotExist('images');
+```
+
+You can use the  `matchesKeyInQuery` method to look for objects with values of fields matching those of objects returned by another query.
+
+For example, if you have a `Country` class matching countries with languages and a `Student` class matching students with their nationalities:
+
+| name  | language |
+| ----- | -------- |
+| US    | English  |
+| UK    | English  |
+| China | Chinese  |
+
+| fullName   | nationality |
+| ---------- | ----------- |
+| John Doe   | US          |
+| Tom Sawyer | UK          |
+| Ming Li    | China       |
+
+The following code looks for all the students who are from English-speaking countries:
+
+```js
+const studentQuery = new AV.Query('Student');
+const countryQuery = new AV.Query('Country');
+// Get all English-speaking countries
+countryQuery.equalTo('language', 'English');
+// Match Student's nationality with Country's name
+studentQuery.matchesKeyInQuery('nationality', 'name', countryQuery);
+studentQuery.find().then((students) => {
+  // students contains John Doe and Tom Sawyer
+});
+```
+You can restrict the fields returned by providing a list of keys with  `select`. The code below retrieves todos with only the `title` and content `fields` (and also special built-in fields such as `objectId`, `createdAt`, and `updatedAt`):
+
+```js
+const query = new AV.Query('Todo');
+query.select(['title', 'content']);
+query.first().then((todo) => {
+  const title = todo.get('title'); // √
+  const content = todo.get('content'); // √
+  const notes = todo.get('notes'); // undefined
+});
+```
+
+
+You can add a minus prefix to the attribute name for inverted selection.
+For example, if you do not care about the post author, use `-author`.
+The inverted selection also applies to preserved attributes and can be used with dot notations, e.g., `-pubUser.createdAt`.
+
+The unselected fields can be fetched later with `fetchInBackground`. See [Refreshing Objects](#refreshing-objects).
+
+
+
+
+### Queries on String Values
+
+Use `startsWith` to restrict to string values that start with a particular string. Similar to a `LIKE` operator in SQL, it is indexed so it is efficient for large datasets:
+
+```js
+const query = new AV.Query('Todo');
+// SQL equivalent: title LIKE 'lunch%'
+query.startsWith('title', 'lunch');
+```
+
+Use `contains` to restrict to string values that contain a particular string:
+
+```js
+const query = new AV.Query('Todo');
+// SQL equivalent: title LIKE '%lunch%'
+query.contains('title', 'lunch');
+```
+
+Unlike `startsWith`, `contains` can't take advantage of indexes, so it is not encouraged to be used for large datasets.
+
+Please note that both `startsWith` and `contains` perform **case-sensitive** matching, so the examples above will not look for string values containing `Lunch`, `LUNCH`, etc.
+
+If you are looking for string values that do not contain a particular string, use `whereMatches` with regular expressions:
+
+```js
+const query = new AV.Query('Todo');
+// 'title' without 'ticket' (case-insensitive)
+const regExp = new RegExp('^((?!ticket).)*$', 'i');
+query.matches('title', regExp);
+```
+
+However, performing queries with regular expressions as constraints can be very expensive, especially for classes with over 100,000 records. The reason behind this is that queries like this can't take advantage of indexes and will lead to exhaustive scanning of the whole dataset to find the matching objects. We recommend that you take a look at our In-App Searching feature, a full-text search solution we provide to improve your app's searching ability and user experience.
+
+If you are facing performance issues with queries, please refer to [Optimizing Performance](#optimizing-performance) for possible workarounds and best practices.
+
+### Queries on Array Values
+
+The code below looks for all the objects with `work` as an element of its array field `tags`:
+
+```js
+query.equalTo('tags', 'work');
+```
+
+To look for objects whose array field `tags` contains three elements:
+
+```js
+query.sizeEqualTo('tags', 3);
+```
+
+You can also look for objects whose array field `tags` contains `work`, `sales`, **and** `appointment`:
+
+```js
+query.containsAll('tags', ['work', 'sales', 'appointment']);
+```
+
+To retrieve objects whose field matches any one of the values in a given list, you can use `whereContainedIn` instead of performing multiple queries. The code below constructs a query that retrieves todo items with `priority` to be `1` **or** `2`:
+
+```js
+// Single query
+const priorityOneOrTwo = new AV.Query('Todo');
+priorityOneOrTwo.containedIn('priority', [1, 2]);
+// Mission completed :)
+
+// ---------------
+//       vs.
+// ---------------
+
+// Multiple queries
+const priorityOne = new AV.Query('Todo');
+priorityOne.equalTo('priority', 1);
+
+const priorityTwo = new AV.Query('Todo');
+priorityTwo.equalTo('priority', 2);
+
+const priorityOneOrTwo = AV.Query.or(priorityOne, priorityTwo);
+// Kind of verbose :(
+```
+
+Conversely, you can use `whereNotContainedIn` if you want to retrieve objects that do not match any of the values in a list.
+
+### Relational Queries
+
+There are several ways to perform queries for relational data. To retrieve objects whose given field matches a particular `AV.Object`, you can use `equalTo` just like how you use it for other data types. For example, if each `Comment` has a `Post` object in its `post` field, you can fetch all the comments for a particular `Post` with the following code:
+
+```js
+const post = AV.Object.createWithoutData('Post', '57328ca079bc44005c2472d0');
+const query = new AV.Query('Comment');
+query.equalTo('post', post);
+query.find().then((comments) => {
+  // comments contains the comments for the post
+});
+```
+
+To retrieve objects whose given field contains an `AV.Object` that matches a different query, you can use `matchesQuery`. The code below constructs a query that looks for all the comments for posts with images:
+
+```js
+const innerQuery = new AV.Query('Post');
+innerQuery.exists('image');
+
+const query = new AV.Query('Comment');
+query.matchesQuery('post', innerQuery);
+```
+
+To retrieve objects whose given field does not contain an `AV.Object` that matches a different query, use `doesNotMatchQuery` instead.
+
+Sometimes you may need to look for related objects from different classes without extra queries. In such situations, you can use `include` on the same query. The following code retrieves the last 10 comments together with the posts related to them:
+
+```js
+const query = new AV.Query('Comment');
+
+// Retrieve the most recent ones
+query.descending('createdAt');
+
+// Only retrieve the last 10
+query.limit(10);
+
+// Include the related post together with each comment
+query.include('post');
+
+query.find().then((comments) => {
+  // comments contains the last 10 comments including the post associated with each
+  comments.forEach((comment) => {
+    // This does not require a network access
+    const post = comment.get('post');
+  });
+});
+```
+You can even indicate multi-level associations using dot notations. If you wanted to include the post for each comment as well as the author of the post, you can do:
+
+```js
+query.include('post.author');
+```
+
+
+
+
+
+#### Caveats about Inner Queries
+
+The Data Storage service is not built on relational databases, which makes it impossible to join tables while querying. For the relational queries mentioned above, what we would do is to perform an inner query first (with `100` as the default `limit` and `1000` as the maximum) and then insert the result from this query into the outer query. If the number of records matching the inner query exceeds the `limit` and the outer query contains other constraints, the amount of the records returned in the end could be zero or less than your expectation since only the records within the `limit` would be inserted into the outer query.
+
+The following actions can be taken to solve the problem:
+
+- Make sure the number of records in the result of the inner query is no more than 100. If it is between 100 and 1,000, set `1000` as the `limit` of the inner query.
+- Create redundancy for the fields being queried by the inner query on the table for the outer query.
+- Repeat the same query with different `skip` values until all the records are gone through (performance issue could occur if the value of `skip` gets too big).
+
+
+
+### Counting Objects
+
+If you just need to count how many objects match a query but do not need to retrieve the actual objects, use `count` instead of `find`. For example, to count how many todos have been completed:
+
+```js
+const query = new AV.Query('Todo');
+query.equalTo('isComplete', true);
+query.count().then((count) => {
+  console.log(`${count} todos completed.`);
+});
+```
+
+### Compound Queries
+
+Compound queries can be used if complex query conditions need to be specified. A compound query is a logical combination (`OR` or `AND`) of subqueries.
+
+Note that we do not support `GeoPoint` or non-filtering constraints (e.g. `near`, `withinGeoBox`, `limit`, `skip`, `ascending`, `descending`, `include`) in the subqueries of a compound query.
+
+#### OR-ed Query Constraints
+
+An object will be returned as long as it fulfills any one of the subqueries. The code below constructs a query that looks for all the todos that either have priorities higher than or equal to `3`, or are already completed:
+
+```js
+const priorityQuery = new AV.Query('Todo');
+priorityQuery.greaterThanOrEqualTo('priority', 3);
+
+const isCompleteQuery = new AV.Query('Todo');
+isCompleteQuery.equalTo('isComplete', true);
+
+const query = AV.Query.or(priorityQuery, isCompleteQuery);
+```
+
+Queries regarding `GeoPoint` cannot be present among OR-ed queries.
+
+#### AND-ed Query Constraints
+
+The effect of using AND-ed query is the same as adding constraints to `AV.Query`. The code below constructs a query that looks for all the todos that are created between `2016-11-13` and `2016-12-02`:
+
+```js
+const startDateQuery = new AV.Query('Todo');
+startDateQuery.greaterThanOrEqualTo('createdAt', new Date('2016-11-13 00:00:00'));
+
+const endDateQuery = new AV.Query('Todo');
+endDateQuery.lessThan('createdAt', new Date('2016-12-03 00:00:00'));
+
+const query = AV.Query.and(startDateQuery, endDateQuery);
+```
+
+While using an AND-ed query by itself doesn't bring anything new compared to a basic query, to combine two or more OR-ed queries, you have to use AND-ed queries:
+
+```js
+const createdAtQuery = new AV.Query('Todo');
+createdAtQuery.greaterThanOrEqualTo('createdAt', new Date('2018-04-30'));
+createdAtQuery.lessThan('createdAt', new Date('2018-05-01'));
+
+const locationQuery = new AV.Query('Todo');
+locationQuery.doesNotExist('location');
+
+var priority2Query = new AV.Query('Todo');
+priority2Query.equalTo('priority', 2);
+
+var priority3Query = new AV.Query('Todo');
+priority3Query.equalTo('priority', 3);
+
+var priorityQuery = AV.Query.or(priority2Query, priority3Query);
+var timeLocationQuery = AV.Query.or(locationQuery, createdAtQuery);
+var query = AV.Query.and(priorityQuery, timeLocationQuery);
+```
+
+### Optimizing Performance
+
+There are several factors that could lead to potential performance issues when you conduct a query, especially when more than 100,000 records are returned at a time. We are listing some common ones here so you can design your apps accordingly to avoid them:
+
+- Querying with "not equal to" or "not include" (index will not work)
+- Querying on strings with a wildcard at the beginning of the pattern (index will not work)
+- Using `count` with conditions (all the entries will be gone through)
+- Using `skip` for a large number of entries (all the entries that need to be skipped will be gone through)
+- Sorting without an index (querying and sorting cannot share a composite index unless the conditions used on them are both covered by the same one)
+- Querying without an index (the conditions used on the query cannot share a composite index unless all of them are covered by the same one; additional time will be consumed if excessive data falls under the uncovered conditions)
+
+## LiveQuery
+
+LiveQuery is, as its name implies, derived from [`AV.Query`](#queries) but has enhanced capability. It allows you to automatically synchronize data changes from one client to other clients without writing complex code, making it suitable for apps that need real-time data.
+
+Suppose you are building an app that allows multiple users to edit the same file at the same time. `AV.Query` would not be an ideal tool since it is based on a pull model and you cannot know when to query from the cloud to get the updates.
+
+To solve this problem, we introduced LiveQuery. This tool allows you to subscribe to the `AV.Query`s you are interested in. Once subscribed, the cloud will notify clients by generating event messages whenever `AV.Object`s that match the `AV.Query` are created or updated, in real-time.
+
+Behind the scenes, we use WebSocket connections to have clients and the cloud communicate with each other and maintain the subscription status of clients. In most cases, it isn't necessary to deal with the WebSocket connections directly, so we developed a simple API to help you focus on your business logic rather than technical implementations.
+
+### Initializing LiveQuery
+
+To use LiveQuery in your app, go to **<Path to="storage" /> > Settings** and check the **Enable LiveQuery** option under the **Security** section. hen include the following npm module in your project:
+
+```js
+// No need to require leancloud-storage if the following line is present
+const AV = require('leancloud-storage/live-query');
+```
+Or load it with the following `<script>` tag:
+
+```xml
+<!-- No need to load av-min.js if the following script is present -->
+<script src="//cdn.jsdelivr.net/npm/leancloud-storage@4.13.1/dist/av-live-query-min.js"></script>
+```
+
+See [Installing SDK](#installing-sdk) for more details.
+
+### Demo
+
+We’ve made a demo app called “LeanTodo” which shows the functionality of LiveQuery. If you’d like to try it:
+
+1. Go to <https://leancloud.github.io/leantodo-vue/>, enter a username and a password, and then hit “Signup”.
+2. Open the same URL on a different device, enter the same credentials, and hit “Login”.
+3. Create, edit, or delete some items on one device and watch what happens on the other one.
+
+### Creating a Subscription
+
+To make a query **live**, create an `AV.Query` object, put conditions on it if there are any, and then subscribe to events:
+
+```js
+const query = new AV.Query('Todo');
+query.subscribe().then((liveQuery) => {
+  // Query becomes live after getting a subscription
+});
+```
+
+You can't use subqueries or restrict fields being returned when using LiveQuery.
+
+Now you will be able to receive updates related to `AV.Object`. If a `Todo` object is created by another client with `Update Portfolio` as `title`, the following code can get the new `Todo` for you:
+
+```js
+const query = new AV.Query('Todo');
+query.subscribe().then((liveQuery) => {
+  liveQuery.on('create', (newTodo) => {
+    console.log(newTodo.get('title')); // Update Portfolio
+  });
+});
+```
+
+If someone updates this `Todo` by changing its `content` to `Add my recent paintings`, the following code can get the updated version for you:
+
+```js
+liveQuery.on('update', (updatedTodo, updatedKeys) => {
+  console.log(updatedTodo.get('content')); // Add my recent paintings
+});
+```
+
+### Event Handling
+
+The following types of data changes can be monitored once a subscription is set up:
+
+- `create`
+- `update`
+- `enter`
+- `leave`
+- `delete`
+
+#### `create` Event
+
+A `create` event will be triggered when a new `AV.Object` is created and fulfills the `AV.Query` you subscribed to. The `object` is the new `AV.Object` being created:
+
+```js
+liveQuery.on('create', (object) => {
+  console.log('Object created.');
+});
+```
+
+#### `update` Event
+
+An `update` event will be triggered when an existing `AV.Object` fulfilling the `AV.Query` you subscribed to is updated. The `object` is the `AV.Object` being updated:
+
+```js
+liveQuery.on('update', (object, updatedKeys) => {
+  console.log('Object updated.');
+});
+```
+
+#### `enter` Event
+
+An `enter` event will be triggered when an existing `AV.Object`'s old value does not fulfill the `AV.Query` you subscribed to but its new value does. The `object` is the `AV.Object` entering the `AV.Query` and its content is the latest value of it:
+
+```js
+liveQuery.on('enter', (object, updatedKeys) => {
+  console.log('Object entered.');
+});
+```
+
+There is a difference between a `create` event and an `enter` event. If an object already exists and later matches the query's conditions, an `enter` event will be triggered. If an object didn't exist already and is later created, a `create` event will be triggered.
+
+#### `leave` Event
+
+A `leave` event will be triggered when an existing `AV.Object`'s old value fulfills the `AV.Query` you subscribed to but its new value does not. The `object` is the `AV.Object` leaving the `AV.Query` and its content is the latest value of it:
+
+```js
+liveQuery.on('leave', (object, updatedKeys) => {
+  console.log('Object left.');
+});
+```
+
+#### `delete` Event
+
+A `delete` event will be triggered when an existing `AV.Object` fulfilling the `AV.Query` you subscribed to is deleted. The `object` is the `objectId` of the `AV.Object` being deleted:
+
+```js
+liveQuery.on('delete', (object) => {
+  console.log('Object deleted.');
+});
+```
+
+### Unsubscribing
+
+You can cancel a subscription to stop receiving events regarding `AV.Query`. After that, you won't get any events from the subscription.
+
+```js
+liveQuery.unsubscribe().then(() => {
+  // Successfully unsubscribed
+});
+```
+
+### Losing Connections
+
+There are different scenarios regarding losing connections:
+
+1. The connection to the Internet is lost unexpectedly.
+2. The user performs certain operations outside of the app, like switching the app to the background, turning off the phone, or turning on the flight mode.
+
+For the scenarios above, you don't need to do any extra work. As long as the user switches back to the app, the SDK will automatically re-establish the connection.
+
+There is another scenario when **the user completely kills the app or closes the web page**. In this case, the SDK cannot automatically re-establish the connection. You will have to create subscriptions again by yourself.
+
+
+
+### Caveats about LiveQuery
+
+Given the real-time feature of LiveQuery, developers may find it tempting to use it for instant messaging. As LiveQuery is neither designed nor optimized for completing such tasks, we discourage such use of this tool, let alone there will be an additional cost for saving message history and rising challenges of code maintenance. We recommend using our Instant Messaging service for this scenario.
+
+
+## Files
+
+`AV.File` allows you to store application files in the cloud that would otherwise be too large or cumbersome to fit into a regular `AV.Object`. The most common use case is storing images, but you can also use it for documents, videos, music, and any other binary data.
+
+### Creating Files
+
+You can create a file from a base64-encoded string:
+
+```js
+// resume.txt is the file name
+const data = { base64: 'TGVhbkNsb3Vk' };
+// resume.txt is the file name
+const file = new AV.File('resume.txt', data);
+```
+
+You can also create a file from an array of byte values:
+
+```js
+const data = { base64: 'TGVhbkNsb3Vk' };
+// resume.txt is the file name
+const file = new AV.File('resume.txt', data);
+```
+What's more, you can also create a file from a Blob (in Browser), and Buffer or Stream (in Node.js).
+
+For React Native applications, you can create a file from a local path:
+
+
+```js
+const data = { blob: { uri: localFileUri } }
+const file = new AV.File('resume.txt', data)
+```
+You can also create a file from a URL:
+
+```js
+const file = AV.File.withURL(
+  'logo.png',
+  'https://leancloud.cn/assets/imgs/press/Logo%20-%20Blue%20Padding.a60eb2fa.png'
+);
+```
+When creating files from URLs, the SDK will not upload the actual files into the cloud but will store the addresses of the files as strings. This will not lead to actual traffic for uploading files, as opposed to creating files in other ways by doing which the files will be actually stored into the cloud.
+
+LeanCloud will auto-detect the type of the file you are uploading based on the file extension, but you can also specify the `Content-Type` (commonly referred to as MIME type):
+
+```js
+const file = new AV.File('resume.txt', data, 'application/json');
+```
+But the most common method for creating files is to upload them from local paths. In a web app, you can first create an input button in the user interface:
+
+```xml
+<input type="file" id="avatar-upload" />
+```
+Then get a reference to that file in a click handler:
+
+```js
+const avatarUpload = document.getElementById('avatar-upload');
+if (avatarUpload.files.length) {
+  const localFile = avatarUpload.files[0];
+  const file = new AV.File('avatar.jpg', localFile);
+}
+```
+You can specify the path of the uploaded file via the key property. For example, use a robots.txt to restrict search engines from crawling uploaded files:
+
+```js
+file.save({ key: 'robots.txt' });
+```
+
+### Saving Files
+
+By saving a file, you store it into the cloud and get a permanent URL pointing to it:
+
+```js
+file.save().then((file) => {
+  console.log(`File uploaded. objectId: ${file.id}`);
+}, (error) => {
+  // The file either could not be read or could not be saved to LeanCloud
+});
+```
+
+A file successfully uploaded can be found in **<Path to="storage" /> > Files** and cannot be modified later. If you need to change the file, you have to upload the modified file again and a new `objectId` and URL will be generated.
+
+You can associate a file with `AV.Object` after it has been saved:
+
+```js
+const data = [0x4c, 0x65, 0x61, 0x6e, 0x43, 0x6c, 0x6f, 0x75, 0x64];
+const file = new AV.File('resume.txt', data);
+file.save({ keepFileName: true }).then((file) => {
+  console.log(file.url); // https://your-file-domain/5112b94e0536e995741c/resume.txt
+}, (error) => {
+  console.error(error);
+});
+```
+
+You can also construct an `AV.Query` to query files:
+
+```js
+const query = new AV.Query('_File');
+```
+
+Note that the `url` field of internal files (files uploaded to the file service) is dynamically generated by the cloud, which will switch custom domain names automatically.
+Therefore, querying files by the `url` field is only applicable to external files (files created by saving the external URL directly to the `_File` table).
+Query internal files by the `key` field (path in URL) instead.
+
+On a related note, if the files are referenced in an array field of `AV.Object` and you want to get them within the same query for `AV.Object`, you need to use the `include` method with `AV.Query`. For example, if you are retrieving all the todos with the same title `Buy Cakes` and you want to retrieve their related attachments at the same time:
+
+```js
+// Get all todos with the same title and contain attachments
+const query = new AV.Query('Todo');
+query.equalTo('title', 'Get Cakes');
+query.exists('attachments');
+
+// Include attachments with each todo
+query.include('attachments');
+
+query.find().then((todos) => {
+  todos.forEach((todo) => {
+    // Get attachments array for each todo
+    const attachments = todo.get('attachments');
+    attachments.forEach((attachment) => {
+      // Each attachment is an AV.File instance
+      console.log(`URL of the attachment: ${attachment.get('url')}`);
+    });
+  });
+});
+```
+
+### Upload Progress
+
+You can monitor the upload progress and display that to the user:
+
+```js
+file.save({
+  onprogress: (progress) => {
+    console.log(progress);
+    // {
+    //   loaded:  1024,
+    //   total:   2048,
+    //   percent: 50
+    // }
+  }
+}).then((file) => {
+  // Things to do after saving
+});
+```
+
+### File Metadata
+
+When uploading a file, you can attach additional properties to it with `metaData`. A file's `metaData` cannot be updated once the file is stored to the cloud.
+
+```js
+// Set metadata
+file.metaData('author', 'LeanCloud');
+file.save().then((file) => {
+  // Get all metadata
+  const metadata = file.metaData();
+  // Get author
+  const author = file.metaData('author');
+  // Get file name
+  const fileName = file.get('name');
+  // Get size (not available for files created from base64-encoded strings or URLs)
+  const size = file.size();
+});
+```
+
+
+
+### Deleting Files
+
+The code below deletes a file from the cloud:
+
+```js
+const file = AV.File.createWithoutData('552e0a27e4b0643b709e891e');
+file.destroy();
+```
+
+By default, a file is not allowed to be deleted.
+We recommend you delete files by accessing our REST API with the Master Key.
+You can also allow certain users and roles to delete files by going to **<Path to="storage" /> > Files > Permission** and select Others > Permission settings > delete..
+
+## Promises
+Each asynchronous method in LeanCloud JavaScript SDK returns a `Promise` which can be used to handle the completion and exception of the method. The example below updates an `AV.Object` after it is being queried:
+```js
+const query = new AV.Query('Todo');
+query.equalTo('priority', 1);
+// find is asynchronous which gives back a Promise that then can be called on
+query.find().then((todos) => {
+  // Returns a list of objects
+  const todo = todos[0];
+  todo.set('notes', 'Needs to be finished today.');
+  // save is also asynchronous which gives back a Promise that you can return here and chain another Promise afterwards
+  return todo.save();
+}).then(() => {
+  // The Promise returned by save method
+  console.log('Successfully updated todo.');
+}).catch((error) => {
+  // Put catch at the very end of Promise chain which catches all the errors
+  console.error(error);
+});
+```
+### The then Method
+Each `Promise` has a method called `then` which takes in two callbacks. The first callback is called when the `Promise` is `resolved` (runs successfully) while the second one is called when it is `rejected` (gets error):
+```js
+todo.save().then((todo) => {
+  console.log('Successfully updated todo.');
+}, (error) => {
+  console.error(error);
+});
+
+```
+The second callback is optional.
+
+You may also implement your logic with `catch`:
+```js
+todo.save().then((todo) => {
+  console.log('Successfully updated todo.');
+}).catch((error) => {
+  console.error(error);
+});
+```
+
+### Chaining Promises Together
+
+Promise allows you to connect asynchronous requests elegantly according to the order they should be called. If the callback of a `Promise` returns another `Promise`, the callback in the second then will not be resolved unless the one in the first `then` is resolved. This is also called `Promise Chain`.
+
+```js
+// Add contents to the page following the order of chapters
+const chapterIds = [
+  '584e1c408e450a006c676162', // Chapter One
+  '584e1c43128fe10058b01cf5', // Chapter Two
+  '581aff915bbb500059ca8d0b'  // Chapter Three
+];
+
+new AV.Query('Chapter').get(chapterIds[0]).then((chapterOne) => {
+  // Add contents to the page
+  addHtmlToPage(chapterOne.get('content'));
+  // Return the new Promise
+  return new AV.Query('Chapter').get(chapterIds[1]);
+}).then((chapterTwo) => {
+  addHtmlToPage(chapterTwo.get('content'));
+  return new AV.Query('Chapter').get(chapterIds[2]);
+}).then((chapterThree) => {
+  addHtmlToPage(chapterThree.get('content'));
+  // Done
+});
+```
+
+### Error Handling with Promises
+If any single `Promise` in the chain throws an error, all the callbacks following it meant for successful operations will be skipped until an error handling callback is encountered.
+
+It is a common practice to attach an error handling function at the end of a `Promise` chain.
+
+The code above can be rewritten with `catch` in the following way:
+
+```js
+new AV.Query('Chapter').get(chapterIds[0]).then((chapterOne) => {
+  addHtmlToPage(chapterOne.get('content'));
+  // Force an error
+  throw new Error('Error');
+  return new AV.Query('Chapter').get(chapterIds[1]);
+}).then((chapterTwo) => {
+  // The code here will be ignored
+  addHtmlToPage(chapterTwo.get('content'));
+  return new AV.Query('Chapter').get(chapterIds[2]);
+}).then((chapterThree) => {
+  // The code here will be ignored
+  addHtmlToPage(chapterThree.get('content'));
+}).catch((error) => {
+  // This error handling function will be called, printing out the error message 'Error'
+  console.error(error.message);
+});
+```
+
+### async and await
+`async` and `await` allows you to use Promise by writing code in a more synchronous manner:
+```js
+async function example() {
+  try {
+    const query = new AV.Query('Todo');
+    query.equalTo('priority', 1);
+    const todos = await query.find();
+    const todo = todos[0];
+    todo.set('notes', 'Needs to be finished today.');
+    return await todo.save();
+  } catch (error) {
+    console.error(error);
+  }
+}
+```
+
+## GeoPoints
+
+You can associate real-world latitude and longitude coordinates with an object by adding an `LCGeoPoint` to the `AV.Object`. By doing so, queries on the proximity of an object to a given point can be performed, allowing you to implement functions like looking for users or places nearby easily.
+
+To associate a point with an object, you need to create the point first. The code below creates an `LCGeoPoint` with `39.9` as `latitude` and `116.4` as `longitude`:
+
+```js
+const point = new AV.GeoPoint(39.9, 116.4);
+
+// Other ways of creating the same AV.GeoPoint
+const point = new AV.GeoPoint([39.9, 116.4]);
+const point = new AV.GeoPoint({ latitude: 39.9, longitude: 116.4 });
+```
+
+Now you can store the point into an object as a regular field:
+
+```js
+todo.set('location', point);
+```
+
+### Geo Queries
+
+With a number of existing objects with spatial coordinates, you can find out which of them are closest to a given point, or are contained within a particular area. This can be done by adding another restriction to `AV.Query` using `whereNear`. The code below returns a list of `Todo` objects with `location` closest to a given point:
+
+```js
+const query = new AV.Query('Todo');
+const point = new AV.GeoPoint(39.9, 116.4);
+query.near('location', point);
+
+// Limit to 10 results
+query.limit(10);
+query.find().then((todos) => {
+  // todos is an array of Todo objects satisfying conditions
+});
+```
+
+Additional sorting conditions like `orderByAscending` and `orderByDescending` will gain higher priorities than the default order by distance.
+
+To have the results limited within a certain distance, check out `whereWithinKilometers`, `whereWithinMiles`, and `whereWithinRadians` in our API docs.
+
+You can also query for the set of objects that are contained within a rectangular bounding box with `whereWithinGeoBox`:
+
+![withinGeoBox](/img/geopoint-withingeobox.svg)
+
+```js
+const query = new AV.Query('Todo');
+const southwest = new AV.GeoPoint(30, 115);
+const northeast = new AV.GeoPoint(40, 118);
+query.withinGeoBox('location', southwest, northeast);
+```
+
+### Caveats about GeoPoints
+
+Points should not exceed the extreme ends of the ranges. Latitude should be between `-90.0` and `90.0`. Longitude should be between `-180.0` and `180.0`. Attempting to set latitude or longitude out of bounds will cause an error.
+Also, each `AV.Object` can only have one field for `LCGeoPoint`.
+
+## Users
+
+See [TDS Authentication Guide](/sdk/authentication/guide/).
+
+## Roles
+
+As your app grows in scope and user base, you may find yourself needing more coarse-grained control over access to pieces of your data than user-linked ACLs can provide. To address this requirement, we support a form of role-based access control. Check the detailed [ACL Guide](https://docs.leancloud.app/acl-guide.html) to learn how to set it up for your objects.
+
+## Full-Text Search
+
+Full-Text Search offers a better way to search through the information contained within your app. It's built with search engine capabilities that you can easily tap into your app. Effective and useful searching functionality in your app is crucial for helping users find what they need. For more details, see [Full-Text Search Guide](/sdk/storage/guide/fulltext-search/).

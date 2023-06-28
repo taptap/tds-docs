@@ -1,0 +1,818 @@
+---
+title: Installing JavaScript SDK  for Data Storage and Instant Messaging
+sidebar_label: JavaScript SDK Installing
+slug: /sdk/storage/guide/setup-js/
+sidebar_position: 1
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import CodeBlock from "@theme/CodeBlock";
+import sdkVersions from "/src/docComponents/sdkVersions";
+import DomainBinding from "../../_partials/setup-domain.mdx";
+import AppConfig from "../_partials/app-config.mdx";
+import { Conditional } from "/src/docComponents/conditional";
+import Path from "/src/docComponents/path";
+import useBaseUrl from "@docusaurus/useBaseUrl";
+import { CardGrid, Card } from "/src/docComponents/doc";
+
+## Installing SDK
+
+Depending on the platform you're using, there are different ways for you to install the SDK.
+
+
+<CardGrid>
+  <Card
+    imgSrc={useBaseUrl("/img/platforms/html5.svg")}
+    imgScale={0.85}
+    label="Web"
+    to="#web"
+  />
+  <Card
+    imgSrc={useBaseUrl("/img/platforms/node-js.svg")}
+    imgScale={0.9}
+    label="Node.js"
+    to="#nodejs"
+  />
+  <Card
+    imgSrc={useBaseUrl("/img/platforms/react-native.svg")}
+    imgScale={0.75}
+    label="React Native"
+    to="#react-native"
+  />
+  <Card
+    imgSrc={useBaseUrl("/img/platforms/electron.svg")}
+    imgScale={0.75}
+    label="Electron"
+    to="#electron"
+  />
+  <Card
+    imgSrc={useBaseUrl("/img/platforms/other.svg")}
+    imgScale={0.8}
+    label="其他"
+    to="#其他平台"
+  />
+</CardGrid>
+
+### Web
+
+The following method can be used if your project runs in browser, WebView, or other in-app HTML platforms.
+
+#### Installing and Referencing SDK
+
+##### npm
+
+The easiest way to integrate our SDK into your project is to use npm:
+
+<Tabs groupId="js-sdk">
+<TabItem value="LeanStorage" label="LeanStorage" default>
+
+```
+$ npm install leancloud-storage --save
+```
+
+</TabItem>
+<TabItem value="LeanStorage（LiveQuery）" label="LeanStorage（LiveQuery）">
+
+```
+$ npm install leancloud-storage --save
+```
+
+</TabItem>
+<TabItem value="LeanMessage" label="LeanMessage">
+
+```
+$ npm install leancloud-realtime --save
+```
+
+</TabItem>
+<TabItem value="LeanMessage(RichMediaMessage)" label="LeanMessage(RichMediaMessage)">
+
+```
+$ npm install leancloud-realtime leancloud-realtime-plugin-typed-messages leancloud-storage --save
+```
+
+</TabItem>
+</Tabs>
+
+Create references to the SDK with require:
+
+<Tabs groupId="js-sdk">
+<TabItem value="LeanStorage" label="LeanStorage" default>
+
+```js
+const AV = require("leancloud-storage");
+const { Query, User } = AV;
+```
+
+</TabItem>
+<TabItem value="LeanStorage（LiveQuery）" label="LeanStorage（LiveQuery）">
+
+```js
+const AV = require("leancloud-storage/live-query");
+const { Query, User } = AV;
+```
+
+</TabItem>
+<TabItem value="LeanMessage" label="LeanMessage">
+
+```js
+const { Realtime, TextMessage } = require("leancloud-realtime");
+```
+
+To avoid compatibility issues, the JavaScript SDK has been distributing ES5 code with all the polyfills (e.g. Promise) bundled. Since v5.0.0-rc.2, the JavaScript LeanMessage SDK also offers a version targeted to the latest version of ECMAScript, which has a smaller size and better runtime optimization for use in scenarios that only need compatibility with latest browsers. If your application uses @babel/preset-env or something similar, you can also use the latest ECMAScript version of LeanCloud SDK, and let Babel or other tools to compile your code to the specific ECMAScript version you need. Since the latest version of ECMAScript changes every year, and the goal of that version is to provide code that is aligned with the latest standards, introducing new features from newer versions of ECMAScript will not be considered as a breaking change. The current version of ECMAScript is 2020.
+
+If you want to try out this version:
+
+```js
+const { Realtime } = require("leancloud-realtime/es-latest");
+```
+
+</TabItem>
+<TabItem value="LeanMessage(RichMediaMessage)" label="LeanMessage(RichMediaMessage)">
+
+```js
+const AV = require("leancloud-storage");
+const IM = require("leancloud-realtime");
+
+const initPlugin = require("leancloud-realtime-plugin-typed-messages");
+
+const { Realtime, TextMessage } = IM;
+const { TypedMessagesPlugin, ImageMessage } = initPlugin(AV, IM);
+```
+
+To avoid compatibility issues, the JavaScript SDK has been distributing ES5 code with all the polyfills (e.g. Promise) bundled. Since v5.0.0-rc.2, the JavaScript LeanMessage SDK also offers a version targeted to the latest version of ECMAScript, which has a smaller size and better runtime optimization for use in scenarios that only need compatibility with latest browsers. If your application uses @babel/preset-env or something similar, you can also use the latest ECMAScript version of LeanCloud SDK, and let Babel or other tools to compile your code to the specific ECMAScript version you need. Since the latest version of ECMAScript changes every year, and the goal of that version is to provide code that is aligned with the latest standards, introducing new features from newer versions of ECMAScript will not be considered as a breaking change. The current version of ECMAScript is 2020.
+
+If you want to try out this version:
+
+
+
+```js
+const { Realtime } = require("leancloud-realtime/es-latest");
+```
+
+</TabItem>
+</Tabs>
+
+##### CDN
+
+
+You can also import the SDK with a script tag:
+
+<Tabs groupId="js-sdk">
+<TabItem value="LeanStorage"label="LeanStorage"  default>
+
+<CodeBlock>
+  {`<script src="//code.bdstatic.com/npm/leancloud-storage@${sdkVersions.leancloud.js.storage}/dist/av-min.js"></script>`}
+</CodeBlock>
+
+</TabItem>
+<TabItem value="LeanStorage(LiveQuery)" label="LeanStorage(LiveQuery)">
+
+<CodeBlock>
+  {`<script src="//code.bdstatic.com/npm/leancloud-storage@${sdkVersions.leancloud.js.storage}/dist/av-live-query-min.js"></script>`}
+</CodeBlock>
+
+</TabItem>
+<TabItem value="LeanMessage" label="LeanMessage">
+
+<CodeBlock>
+  {`<script src="//code.bdstatic.com/npm/leancloud-realtime@${sdkVersions.leancloud.js.realtime}/dist/im-browser.min.js"></script>`}
+</CodeBlock>
+
+</TabItem>
+<TabItem value="LeanMessage(RichMediaMessage)"label="LeanMessage(RichMediaMessage)" >
+
+<CodeBlock>
+  {`<script src="//code.bdstatic.com/npm/leancloud-storage@${sdkVersions.leancloud.js.storage}/dist/av-min.js"></script>
+<script src="//code.bdstatic.com/npm/leancloud-realtime@${sdkVersions.leancloud.js.realtime}/dist/im-browser.min.js"></script>
+<script src="//code.bdstatic.com/npm/leancloud-realtime-plugin-typed-messages@4.0.2/dist/typed-messages.min.js"></script>`}
+</CodeBlock>
+
+</TabItem>
+</Tabs>
+
+When using this method, you can reference the SDK with the global variable AV:
+
+<Tabs groupId="js-sdk">
+<TabItem value="LeanStorage"label="LeanStorage"  default>
+
+```js
+const { Query, User } = AV;
+```
+
+</TabItem>
+<TabItem value="LeanStorage(LiveQuery)" label="LeanStorage(LiveQuery)">
+
+```js
+const { Query, User } = AV;
+```
+
+</TabItem>
+<TabItem value="LeanMessage" label="LeanMessage">
+
+```js
+const { Realtime, TextMessage } = AV;
+```
+
+If you want to try out the latest ECMAScript version of LeanMessage SDK:
+
+<CodeBlock>
+  {`<script src="//code.bdstatic.com/npm/leancloud-realtime@${sdkVersions.leancloud.js.realtime}/dist/es-latest/im.js"></script>`}
+</CodeBlock>
+
+</TabItem>
+<TabItem value="LeanMessage(RichMediaMessage)"label="LeanMessage(RichMediaMessage)" >
+
+```js
+const { Realtime, TextMessage, TypedMessagesPlugin, ImageMessage } = AV;
+```
+
+</TabItem>
+</Tabs>
+
+### Node.js
+
+
+JavaScript SDK also works with Node.js. If you plan to use LeanStorage within LeanEngine, you can import leanengine into your project by following instructions in [LeanEngine Quick Start](/sdk/engine/deploy/nodejs/).
+
+#### Installing and Referencing SDK
+
+You can use [npm](#npm) to install and reference our SDK for Node.js as well. See npm for more details.
+
+
+
+
+### React Native
+
+You can use npm to install and reference our SDK for React Native. 
+React Native support is provided by a separate adapter library （`@leancloud/platform-adapters-react-native`）.
+
+Installing：
+
+<Tabs groupId="js-sdk">
+<TabItem value="LeanStorage"label="LeanStorage"  default>
+
+```
+# Step 1: Install
+$ yarn add leancloud-storage @leancloud/platform-adapters-react-native @react-native-community/async-storage@1
+
+# Step 2: Link
+# For React Native 0.60+
+$ npx pod-install
+# For React Native <= 0.59
+# npx react-native link @react-native-community/async-storage
+# For Expo (SDK >= 38) 无需 link
+```
+
+</TabItem>
+<TabItem value="LeanStorage(LiveQuery)" label="LeanStorage(LiveQuery)">
+
+```
+# Step 1: Install
+$ yarn add leancloud-storage @leancloud/platform-adapters-react-native @react-native-community/async-storage@1
+
+# Step 2: Link
+# For React Native 0.60+
+$ npx pod-install
+# For React Native <= 0.59
+# npx react-native link @react-native-community/async-storage
+# For Expo (SDK >= 38) 无需 link
+```
+
+</TabItem>
+<TabItem value="LeanMessage" label="LeanMessage">
+
+```
+$ yarn add leancloud-realtime @leancloud/platform-adapters-react-native
+```
+
+</TabItem>
+<TabItem value="LeanMessage(RichMediaMessage)"label="LeanMessage(RichMediaMessage)" >
+
+```
+# Step 1: Install
+$ yarn add leancloud-realtime leancloud-realtime-plugin-typed-messages leancloud-storage @leancloud/platform-adapters-react-native @react-native-community/async-storage@1
+
+# Step 2: Link
+# For React Native 0.60+
+$ npx pod-install
+# For React Native <= 0.59
+# npx react-native link @react-native-community/async-storage
+# For Expo (SDK >= 38) No need to link.
+```
+
+</TabItem>
+</Tabs>
+
+Referencing:
+
+<Tabs groupId="js-sdk">
+<TabItem value="LeanStorage"label="LeanStorage"  default>
+
+```js
+import AV from "leancloud-storage/core";
+import * as adapters from "@leancloud/platform-adapters-react-native";
+AV.setAdapters(adapters);
+```
+
+</TabItem>
+<TabItem value="LeanStorage(LiveQuery)" label="LeanStorage(LiveQuery)">
+
+```js
+import AV from "leancloud-storage/live-query-core";
+import * as adapters from "@leancloud/platform-adapters-react-native";
+AV.setAdapters(adapters);
+```
+
+</TabItem>
+<TabItem value="LeanMessage" label="LeanMessage">
+
+```js
+import { Realtime, setAdapters } from "leancloud-realtime/im";
+import * as adapters from "@leancloud/platform-adapters-react-native";
+setAdapters(adapters);
+```
+
+</TabItem>
+<TabItem value="LeanMessage(RichMediaMessage)"label="LeanMessage(RichMediaMessage)" >
+
+```js
+import AV from "leancloud-storage/core";
+import IM from "leancloud-realtime/im";
+import initPlugin from "leancloud-realtime-plugin-typed-messages";
+import * as adapters from "@leancloud/platform-adapters-react-native";
+
+const { Realtime, TextMessage } = IM;
+const { TypedMessagesPlugin, ImageMessage } = initPlugin(AV, IM);
+
+AV.setAdapters(adapters);
+IM.setAdapters(adapters);
+```
+
+</TabItem>
+</Tabs>
+
+### Electron
+
+Electron uses npm for managing dependencies. You can install our SDK with the following command:
+
+<Tabs groupId="js-sdk">
+<TabItem value="LeanStorage"label="LeanStorage"  default>
+
+```
+$ npm install leancloud-storage --save
+```
+
+</TabItem>
+<TabItem value="LeanStorage(LiveQuery)" label="LeanStorage(LiveQuery)">
+
+```
+$ npm install leancloud-storage --save
+```
+
+</TabItem>
+<TabItem value="LeanMessage" label="LeanMessage">
+
+```
+$ npm install leancloud-realtime --save
+```
+
+</TabItem>
+<TabItem value="LeanMessage(RichMediaMessage)"label="LeanMessage(RichMediaMessage)" >
+
+```
+$ npm install leancloud-realtime leancloud-realtime-plugin-typed-messages leancloud-storage --save
+```
+
+</TabItem>
+</Tabs>
+
+#### Importing SDK as Browser Scripts
+
+You can import the SDK by adding a script tag into index.html:
+
+<Tabs groupId="js-sdk">
+<TabItem value="LeanStorage"label="LeanStorage"  default>
+
+```html
+<script src="./node_modules/leancloud-storage/dist/av-min.js"></script>
+```
+
+</TabItem>
+<TabItem value="LeanStorage(LiveQuery)" label="LeanStorage(LiveQuery)">
+
+```html
+<script src="./node_modules/leancloud-storage/dist/av-live-query-min.js"></script>
+```
+
+</TabItem>
+<TabItem value="LeanMessage" label="LeanMessage">
+
+```html
+<script src="./node_modules/leancloud-realtime/dist/im-browser.min.js"></script>
+```
+
+</TabItem>
+<TabItem value="LeanMessage(RichMediaMessage)"label="LeanMessage(RichMediaMessage)" >
+
+```html
+<script src="./node_modules/leancloud-storage/dist/av-min.js"></script>
+<script src="./node_modules/leancloud-realtime/dist/im-browser.min.js"></script>
+<script src="./node_modules/leancloud-realtime-plugin-typed-messages/dist/typed-messages.js"></script>
+```
+
+</TabItem>
+</Tabs>
+
+#### Importing SDK as Node.js Modules
+
+
+The way of using `script` to import the SDK works in most scenarios. However, if you have the following needs, you can also use `require('leancloud-storage')`  to import the SDK as Node.js modules:
+
+- Using the SDK in the main process
+- Constructing AV.File with `Buffer` or `Stream`  provided by `AV.File`
+
+
+
+
+:::note
+require and script import two different sets of SDK. Each of them needs to be initialized separately and cannot be used interchangeably.
+:::
+
+### Other
+
+The JavaScript SDK provides platform-independent versions to support other platforms. All platform-related APIs are abstracted into configurable adapters, which need to be configured for the target platform after introducing the SDK core. Assuming there is an adapter package （`platform-adapters-xyz`） for a platform (xyz) on npm, you can configure the JavaScript SDK as follows:
+
+
+<Tabs groupId="js-sdk">
+<TabItem value="LeanStorage"label="LeanStorage"  default>
+
+```js
+const AV = require("leancloud-storage/core");
+const adapters = require("platform-adapters-xyz");
+AV.setAdapters(adapters);
+```
+
+</TabItem>
+<TabItem value="LeanStorage(LiveQuery)" label="LeanStorage(LiveQuery)">
+
+```js
+const AV = require("leancloud-storage/live-query-core");
+const adapters = require("platform-adapters-xyz");
+AV.setAdapters(adapters);
+```
+
+</TabItem>
+<TabItem value="LeanMessage" label="LeanMessage">
+
+```js
+const { Realtime, setAdapters } = require("leancloud-realtime/im");
+const adapters = require("platform-adapters-xyz");
+setAdapters(adapters);
+```
+
+</TabItem>
+<TabItem value="LeanMessage(RichMediaMessage)"label="LeanMessage(RichMediaMessage)" >
+
+```js
+const AV = require("leancloud-storage/core");
+const IM = require("leancloud-realtime/im");
+const initPlugin = require("leancloud-realtime-plugin-typed-messages");
+const adapters = require("platform-adapters-xyz");
+
+const { Realtime, TextMessage } = IM;
+const { TypedMessagesPlugin, ImageMessage } = initPlugin(AV, IM);
+
+AV.setAdapters(adapters);
+IM.setAdapters(adapters);
+```
+
+</TabItem>
+</Tabs>
+
+Precompiled UMD files are also available, in case you cannot or do not want to use npm:
+
+<Tabs groupId="js-sdk">
+<TabItem value="LeanStorage"label="LeanStorage"  default>
+
+<CodeBlock>
+  {`https://code.bdstatic.com/npm/leancloud-storage@${sdkVersions.leancloud.js.storage}/dist/av-core-min.js`}
+</CodeBlock>
+
+</TabItem>
+<TabItem value="LeanStorage(LiveQuery)" label="LeanStorage(LiveQuery)">
+
+<CodeBlock>
+  {`https://code.bdstatic.com/npm/leancloud-storage@${sdkVersions.leancloud.js.storage}/dist/av-live-query-core-min.js`}
+</CodeBlock>
+
+</TabItem>
+<TabItem value="LeanMessage" label="LeanMessage">
+
+<CodeBlock>
+  {`https://code.bdstatic.com/npm/leancloud-realtime@${sdkVersions.leancloud.js.realtime}/dist/im.min.js`}
+</CodeBlock>
+
+</TabItem>
+<TabItem value="LeanMessage(RichMediaMessage)"label="LeanMessage(RichMediaMessage)" >
+
+```
+// 不支持该方式
+```
+
+</TabItem>
+</Tabs>
+
+
+You can implement your own adapter for a target platform. Interface definitions for adapters can be found in the [`@leancloud/adapter-types`](https://unpkg.com/browse/@leancloud/adapter-types/types.d.ts)  package. You can also search for adapters contributed by other developers with the keyword [`platform-adapters`](https://www.npmjs.com/search?q=keywords:platform-adapters) .
+
+
+## Initializing Your Project
+To begin with, get your App ID and App Key from your app's
+
+
+<Conditional brand="tds">
+
+<Tabs groupId="js-sdk">
+<TabItem value="LeanStorage"label="LeanStorage"  default>
+
+```js
+AV.init({
+  appId: "your-client-id",
+  appKey: "your-client-token",
+  serverURL: "https://your_server_url",
+});
+```
+
+</TabItem>
+<TabItem value="LeanStorage(LiveQuery)" label="LeanStorage(LiveQuery)">
+
+```js
+AV.init({
+  appId: "your-client-id",
+  appKey: "your-client-token",
+  serverURL: "https://your_server_url",
+});
+```
+
+</TabItem>
+<TabItem value="LeanMessage" label="LeanMessage">
+
+```js
+const realtime = new Realtime({
+  appId: "your-client-id",
+  appKey: "your-client-token",
+  server: "https://your_server_url",
+});
+```
+
+</TabItem>
+<TabItem value="LeanMessage(RichMediaMessage)"label="LeanMessage(RichMediaMessage)" >
+
+```js
+const realtime = new Realtime({
+  appId: "your-client-id",
+  appKey: "your-client-token",
+  server: "https://your_server_url",
+  // 初始化即时通讯服务时需要指定富媒体消息插件
+  plugins: [TypedMessagesPlugin],
+});
+// 需要同时初始化存储服务
+AV.init({
+  appId: "your-client-id",
+  appKey: "your-client-token",
+  serverURL: "https://your_server_url",
+});
+```
+
+</TabItem>
+</Tabs>
+
+</Conditional>
+
+<Conditional brand="leancloud">
+
+<Tabs groupId="js-sdk">
+<TabItem value="LeanStorage"label="LeanStorage"  default>
+
+```js
+AV.init({
+  appId: "your-app-id",
+  appKey: "your-app-key",
+  serverURL: "https://your_server_url",
+});
+```
+
+</TabItem>
+<TabItem value="LeanStorage(LiveQuery)" label="LeanStorage(LiveQuery)">
+
+```js
+AV.init({
+  appId: "your-app-id",
+  appKey: "your-app-key",
+  serverURL: "https://your_server_url",
+});
+```
+
+</TabItem>
+<TabItem value="LeanMessage" label="LeanMessage">
+
+```js
+const realtime = new Realtime({
+  appId: "your-app-id",
+  appKey: "your-app-key",
+  server: "https://your_server_url",
+});
+```
+
+</TabItem>
+<TabItem value="LeanMessage(RichMediaMessage)"label="LeanMessage(RichMediaMessage)" >
+
+```js
+const realtime = new Realtime({
+  appId: "your-app-id",
+  appKey: "your-app-key",
+  server: "https://your_server_url",
+  // 初始化即时通讯服务时需要指定富媒体消息插件
+  plugins: [TypedMessagesPlugin],
+});
+// 需要同时初始化存储服务
+AV.init({
+  appId: "your-app-id",
+  appKey: "your-app-key",
+  serverURL: "https://your_server_url",
+});
+```
+
+</TabItem>
+</Tabs>
+
+</Conditional>
+
+
+
+## Enabling Debug Logs
+
+
+For Node.js applications:
+
+<Tabs groupId="js-sdk">
+<TabItem value="LeanStorage"label="LeanStorage"  default>
+
+```
+DEBUG=leancloud* npm start
+```
+
+</TabItem>
+<TabItem value="LeanStorage(LiveQuery)" label="LeanStorage(LiveQuery)">
+
+```
+DEBUG=leancloud*,LC* npm start
+```
+
+</TabItem>
+<TabItem value="LeanMessage" label="LeanMessage">
+
+```
+DEBUG=LC* npm start
+```
+
+</TabItem>
+<TabItem value="LeanMessage(RichMediaMessage)"label="LeanMessage(RichMediaMessage)" >
+
+```
+DEBUG=LC* npm start
+```
+
+</TabItem>
+</Tabs>
+
+For browsers:
+
+<Tabs groupId="js-sdk">
+<TabItem value="LeanStorage"label="LeanStorage"  default>
+
+```
+localStorage.setItem('debug', 'leancloud*');
+```
+
+</TabItem>
+<TabItem value="LeanStorage(LiveQuery)" label="LeanStorage(LiveQuery)">
+
+```
+localStorage.setItem('debug', 'leancloud*,LC*');
+```
+
+</TabItem>
+<TabItem value="LeanMessage" label="LeanMessage">
+
+```
+localStorage.setItem('debug', 'LC*');
+```
+
+</TabItem>
+<TabItem value="LeanMessage(RichMediaMessage)"label="LeanMessage(RichMediaMessage)" >
+
+```
+localStorage.setItem('debug', 'LC*');
+```
+
+</TabItem>
+</Tabs>
+
+You can easily trace the problems in your project by turning debug logs on during the development phase. Once enabled, details of every request made by the SDK along with errors will be output to IDE, browser console, or your app's Dashboard > LeanEngine > App logs.
+
+<Tabs groupId="js-sdk">
+<TabItem value="LeanStorage"label="LeanStorage"  default>
+
+```js
+const AV = require("leancloud-storage");
+AV.debug.enable(); 
+AV.debug.disable(); 
+```
+
+</TabItem>
+<TabItem value="LeanStorage(LiveQuery)" label="LeanStorage(LiveQuery)">
+
+```js
+const AV = require("leancloud-storage");
+AV.debug.enable(); 
+AV.debug.disable(); 
+```
+
+</TabItem>
+<TabItem value="LeanMessage" label="LeanMessage">
+
+```js
+const { debug } = require("leancloud-realtime");
+debug.enable(); 
+debug.disable(); 
+```
+
+</TabItem>
+<TabItem value="LeanMessage(RichMediaMessage)"label="LeanMessage(RichMediaMessage)" >
+
+```js
+const { debug } = require("leancloud-realtime");
+debug.enable(); 
+debug.disable(); 
+```
+
+</TabItem>
+</Tabs>
+
+:::caution
+Make sure debug logs are turned off before your app is published. Failure to do so may lead to the exposure of sensitive data.
+:::
+
+## Verifying
+
+First of all, make sure you are able to connect to LeanCloud server. You can test it by running the following command:
+
+```sh
+curl "https://{{host}}/1.1/date"
+```
+
+If everything goes well, it will return the current date:
+
+```json
+{ "__type": "Date", "iso": "2020-10-12T06:46:56.000Z" }
+```
+
+Then add the following code into your project:
+
+```js
+const TestObject = AV.Object.extend("TestObject");
+const testObject = new TestObject();
+testObject.set("words", "Hello world!");
+testObject.save().then((testObject) => {
+  console.log("保存成功。");
+});
+```
+
+Save the file and run it.
+
+Then go to your app's Dashboard > LeanStorage > Data > TestObject. If you see the following content, it means that you have correctly installed the SDK.
+
+## Debugging
+
+This guide is written for the latest version of our SDK. If you encounter any error, please first make sure you have the latest version installed.
+
+
+### `401 Unauthorized`
+
+If you get a 401 error or see the following content in network logs:
+
+```json
+{
+  "code": 401,
+  "error": "Unauthorized."
+}
+```
+
+It means that the App ID or App Key might be incorrect or don't match. If you have multiple apps, you might have used the App ID of one app with the App Key of another one, which will lead to such error.
+
+### Client Cannot Access the Internet
+
+Make sure you have granted enough permissions for your mobile app.
