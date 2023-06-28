@@ -73,14 +73,11 @@ const Logo = ({ noLabel, noLink, reversed, size = 1 }: LogoProps) => {
       </LinkWrapper>
 
       {BRAND === "tds" && !noLabel && (
-        <>
-          <div className={styles.divider} />
-          <a className={styles.label} href={dcDomainHost}>
-            <Translate id="tds-header-开发者中心" description="from Header">
-              开发者中心
-            </Translate>
-          </a>
-        </>
+        <a className={styles.label} href={dcDomainHost}>
+          <Translate id="tds-header-开发者中心" description="from Header">
+            开发者服务
+          </Translate>
+        </a>
       )}
     </div>
   );
