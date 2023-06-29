@@ -1,6 +1,6 @@
 import React from "react";
 import Layout from "@theme/Layout";
-import Gallery from './components/Gallery'
+import Gallery from './_components/Gallery'
 import { getEntries } from "./_config";
 import { BRAND, REGION } from "../constants/env";
 
