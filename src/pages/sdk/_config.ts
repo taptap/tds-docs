@@ -1,32 +1,5 @@
-import { translate } from "@docusaurus/Translate";
-
-/* 内部地址 */
-type ActionCellLinkInternal = {
-  label: string;
-  to: string;
-};
-
-/* 外跳地址 */
-type ActionCellLinkExternal = {
-  label: string;
-  href: string;
-};
-
-type Entry = {
-  title: string;
-  description?: string;
-  links: (ActionCellLinkInternal | ActionCellLinkExternal)[];
-};
-
-
-
-
-
-
-export const getEntries = (brand: string, region: string): Entry[] => {
- 
-
-  const ENTRIES_LEANCLOUD: Entry[] =[{
+export const ENTRIES = [
+  {
     "title": "iOS",
     "description": "Objective-C SDK 包含数据存储、即时通讯与推送、社交、用户反馈、全文搜索等模块。Swift SDK 包含数据存储、即时通讯与推送等功能。",
     "links": [
@@ -110,29 +83,4 @@ export const getEntries = (brand: string, region: string): Entry[] => {
       }
     ]
   }
-]
-
-  const entries =  ENTRIES_LEANCLOUD ;
-
-  return entries.map((entry) => ({
-    title: translate({
-      message: entry.title,
-      id: `tds-home-${entry.title}`,
-    }),
-    ...(entry.description
-      ? {
-          description: translate({
-            message: entry.description,
-            id: `tds-home-${entry.description}`,
-          }),
-        }
-      : {}),
-    links: entry.links.map((link) => ({
-      ...link,
-      label: translate({
-        message: link.label,
-        id: `tds-home-link-${link.label}`,
-      }),
-    })),
-  }));
-};
+];
