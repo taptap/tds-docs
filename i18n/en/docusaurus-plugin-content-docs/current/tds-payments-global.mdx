@@ -77,6 +77,7 @@ The SDK can be **imported through the Unity Package Manager or manually imported
     "com.taptap.tds.payments.global":"https://github.com/taptap/TapPayments-Global-Unity.git#${sdkVersions.taptap.unity}",
     "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}",
     "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
+    "com.tapsdk.androiddependencyresolver": "https://github.com/luckisnow/android_dependency_resolver.git#1.0.6", // Gradle dependency resolver
 }`}
 </CodeBlock>
 
@@ -90,6 +91,7 @@ The SDK can be **imported through the Unity Package Manager or manually imported
    - `TapTap_Common.unitypackage` is the TapSDK basic library (required). 
    - `TapTap_Login.unitypackage` is TapTap login (required).  
    - `TapTap_Payments_Global.unitypackage` is the TapTap payment module (required).
+   - `TapTap_Android_Dependency_Resolver.unitypackage` TapTap Android Dependency Resolver (required for Android).
 
 3. The unzipped `LeanCloud-SDK-Realtime-Unity.zip` is the Plugins folder. Drag and drop it into Unity.
 
@@ -189,7 +191,7 @@ public class YourCustomApplication extends Application {
     @Override  
     protected void attachBaseContext(Context base) {  
         super.attachBaseContext(base);  
-        TapPaySDKLoader.loadSDK(base);  
+        TapPayment.init(base);
     }  
 }
 ```
@@ -247,7 +249,7 @@ String language = "en_US";
 
 String[] itemIds = { "product01", "product02", "product03" };  
 
-TapPaySDKLoader.getSDK().queryItems(language, itemIds, new TapPayment.Callback<Item[]>() {  
+TapPayment.queryItems(language, itemIds, new TapPayment.Callback<Item[]>() {  
 
     @Override
     public void onError(TapPayment.Error error) {
@@ -263,7 +265,7 @@ TapPaySDKLoader.getSDK().queryItems(language, itemIds, new TapPayment.Callback<I
 });
 
 // Or use the language-free version of the function, and the SDK will automatically select the appropriate language based on the user's country or region  
-TapPaySDKLoader.getSDK().queryItems(itemIds, new TapPayment.Callback<Item[]>() {
+TapPayment.queryItems(itemIds, new TapPayment.Callback<Item[]>() {
     ...
 });
 ```
@@ -335,7 +337,7 @@ int quantity = 1;
 
 String extra = "Custom extension information";  
 
-TapPaySDKLoader.getSDK().requestPayFlow(language, itemId, quantity, extra, new TapPayment.PayCallback() {  
+TapPayment.requestPayFlow(language, itemId, quantity, extra, new TapPayment.PayCallback() {  
     @Override
     public void onCancel(String extra)  {  
         Log.i(TAG, "Payment canceled\n" + extra);  
@@ -353,7 +355,7 @@ TapPaySDKLoader.getSDK().requestPayFlow(language, itemId, quantity, extra, new T
 });  
 
 // Or use the language-free version of the function, and the SDK will automatically select the appropriate language based on the user's country or region  
-TapPaySDKLoader.getSDK().requestPayFlow(itemId, quantity, extra, new TapPayment.PayCallback() {  
+TapPayment.requestPayFlow(itemId, quantity, extra, new TapPayment.PayCallback() {  
     ...  
 });
 ```
@@ -412,7 +414,7 @@ TapPayment.QueryOrder ( orderId, new TapPayment.Callback < Order > ()
 ```java
 String orderId = "Order ID";  
 
-TapPaySDKLoader.getSDK().queryOrder(orderId, new TapPayment.Callback < Order >() {
+TapPayment.queryOrder(orderId, new TapPayment.Callback < Order >() {
     @Override
     public void onError(TapPayment.Error error) {
         Log.e(TAG, "Query failed\n" + error);
@@ -428,7 +430,7 @@ TapPaySDKLoader.getSDK().queryOrder(orderId, new TapPayment.Callback < Order >()
 Order order = new Order();
 order.id = "Order ID";
 
-TapPaySDKLoader.getSDK().queryOrder(order, new TapPayment.Callback < Order >() {
+TapPayment.queryOrder(order, new TapPayment.Callback < Order >() {
     ....
 });
 ```
@@ -493,7 +495,7 @@ TapPayment.ConsumeOrder ( order, new TapPayment.Callback < Order > ()
 ```java
 String orderId = "Order ID";  
 
-TapPaySDKLoader.getSDK().consumeOrder(orderId, new TapPayment.Callback < Order >() {
+TapPayment.consumeOrder(orderId, new TapPayment.Callback < Order >() {
     @Override
     public void onError(TapPayment.Error error) {
         Log.e(TAG, "Query failed\n" + error);
@@ -507,7 +509,7 @@ TapPaySDKLoader.getSDK().consumeOrder(orderId, new TapPayment.Callback < Order >
 
 // Or pass in an existing order object directly
 Order order = Existing order object
-TapPaySDKLoader.getSDK().consumeOrder(order, new TapPayment.Callback < Order >() {
+TapPayment.consumeOrder(order, new TapPayment.Callback < Order >() {
     ....
 });
 ```
