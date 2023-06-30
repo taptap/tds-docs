@@ -55,6 +55,132 @@ Gradle 版本高于 5.6.4，Android AGP 插件版本高于 3.6.0。
 </>
 </MultiLang>
 
+<details>
+<summary>使用内建账户方式进行 SDK 初始化</summary>
+
+### 接入前准备
+
+1. 参考 [准备工作](/sdk/start/get-ready/) 创建应用、开启应用配置；
+2. 参考 [快速开始](/sdk/start/quickstart/#配置签名证书) 配置应用包名与签名证书；
+
+使用 TapPayments-Global 前提是必须依赖以下库：
+
+* TapTap.Login
+* TapTap.Common
+* TapTap.Bootstrap
+
+### 获取 SDK
+
+<MultiLang>
+<>
+
+SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选其一。请根据项目需要选择。
+
+#### 方法一：使用 Unity Package Manager
+
+<CodeBlock className="json">
+  {`"dependencies":{
+    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.payments.global":"https://github.com/taptap/TapPayments-Global-Unity.git#${sdkVersions.taptap.unity}",
+    "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}",
+    "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
+    "com.tapsdk.androiddependencyresolver": "https://github.com/luckisnow/android_dependency_resolver.git#1.1.0", // Gradle dependency resolver
+}`}
+</CodeBlock>
+
+#### 方法二：手动导入
+
+1. 在 [下载页](/tap-download) 找到 **TapSDK Unity** 和 **LeanCloud C# SDK** 下载地址，分别下载 `TapSDK-UnityPackage.zip` 和 `LeanCloud-SDK-Realtime-Unity.zip`。
+
+2. 在 Unity 项目中依次转到 **Assets > Import Packages > Custom Packages**，从解压后的 `TapSDK-UnityPackage.zip` 中，选择希望在游戏中使用的 TapSDK 包进行导入，其中：
+
+   - `TapTap_Bootstrap.unitypackage` TapSDK 启动器，必选。
+   - `TapTap_Common.unitypackage` TapSDK 基础库，必选。
+   - `TapTap_Login.unitypackage` TapTap 登录，必选。
+   - `TapTap_Payments_Global.unitypackage` TapTap 支付模块，必选。
+   - `TapTap_Android_Dependency_Resolver.unitypackage` TapTap Android 依赖导入工具，必选。
+
+3. 解压后的 `LeanCloud-SDK-Realtime-Unity.zip` 为 Plugins 文件夹，拖拽至 Unity 即可。
+
+</>
+<>
+
+1. [下载 TapSDK Android](/tap-download)，解压后选择需要用到的 SDK 包导入到项目 `project/app/libs` 目录下。
+
+2. 打开项目的 `project/app/build.gradle` 文件，添加 gradle 配置如下：
+
+<CodeBlock className="java"> {`
+dependencies {
+    ...
+    // 导入 libs 目录下所有 aar 的包：
+    implementation fileTree(dir: 'libs', include: ['*.aar'])
+    // 如果需要单独导入 libs 目录下的指定包，请按照如下方式：
+    implementation files('libs/TapBootstrap_${sdkVersions.taptap.android}.aar') // TapTap 启动器
+    implementation files('libs/TapCommon_${sdkVersions.taptap.android}.aar') // TapTap 基础库
+    implementation files('libs/TapLogin_${sdkVersions.taptap.android}.aar') // TapTap 登录
+    implementation files('libs/TapPaymentsGlobal_${sdkVersions.taptap.android}.aar') // TapTap 支付模块
+    implementation 'cn.leancloud:storage-android:${sdkVersions.leancloud.java}' // 数据存储
+    implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}' // 实时通信
+    implementation 'com.squareup.okhttp3:okhttp:4.9.2', // 网络请求
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.8.10' // Kotlin
+}
+`}</CodeBlock>
+
+</>
+<>
+
+- 暂未支持
+
+</>
+</MultiLang>
+
+### TapSDK 初始化
+
+如果你已经参考快速开始完成了初始化，这里只需要引入支付模块即可。
+
+<MultiLang>
+<>
+
+```cs
+var config = new TapConfig.Builder()
+    .ClientID(clientId) // 必须，开发者中心对应 Client ID
+    .ClientToken(clientToken) // 必须，开发者中心对应 Client Token
+    .ServerURL(serverUrl) // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
+    .RegionType(RegionType.IO) // 必须，CN 表示中国大陆，IO 表示其他国家或地区
+    .ConfigBuilder();
+TapBootstrap.Init(config);
+``` 
+
+</>
+<>
+
+```java
+TapConfig config = new TapConfig.Builder()
+    .withClientId("clientId") // 必须，开发者中心对应 Client ID
+    .withClientToken("clientToken") // 必须，开发者中心对应 Client Token
+    .withAppContext(applictaionContext) // Android app context
+    .withServerUrl(serverUrl) // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
+    .withRegionType(TapRegionType.IO) // 必须，CN 表示中国大陆，IO 表示其他国家或地区
+    .build();
+
+TapBootstrap.init(applictaionContext, config);
+```
+
+</>
+<>
+
+- 暂未支持
+
+</>
+</MultiLang>
+
+</details>
+
+<details>
+<summary>使用单独 TapTap 授权方式进行 SDK 初始化</summary>
+
 ### 接入前准备
 
 1. 参考 [准备工作](/sdk/start/get-ready/) 创建应用、开启应用配置；
@@ -101,7 +227,7 @@ SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选�
 
 2. 打开项目的 `project/app/build.gradle` 文件，添加 gradle 配置如下：
 
-<CodeBlock className="java"> {`
+```groovy
 dependencies {
     ...
     // 导入 libs 目录下所有 aar 的包：
@@ -113,7 +239,7 @@ dependencies {
     implementation 'com.squareup.okhttp3:okhttp:4.9.2' // 网络请求
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.8.10' // Kotlin
 }
-`}</CodeBlock>
+```
 
 </>
 <>
@@ -157,8 +283,6 @@ loginConfig.regionType = RegionType.IO;
 TapLoginHelper.init(this.getApplicationContext(), config.clientId, loginConfig);
 ```
 
-关于登陆部分的详细文档请参考[登陆模块](/taptap-login/guide/start)。
-
 </>
 <>
 
@@ -167,11 +291,19 @@ TapLoginHelper.init(this.getApplicationContext(), config.clientId, loginConfig);
 </>
 </MultiLang>
 
+</details>
+
+如果你的游戏自己实现了账户系统，也不打算使用好友、成就等 TapSDK 提供的其他功能，仅仅需要接入「单独 TapTap 授权方式进行 SDK 初始化」功能，那么你可以使用第一种「单独 TapTap 授权方式进行 SDK 初始化」方式接入 TapTap 登录。
+:::caution
+使用内建账户和仅接入Tap登录的方式二选一即可，不可同时使用。
+:::
+
 ### 支付模块初始化
-当游戏通过 Unity 接入 TapTap SDK 后，可以通过以下方法初始化支付模块：
 
 <MultiLang>
 <>
+
+当游戏通过 Unity 接入 TapTap SDK 后，可以通过以下方法初始化支付模块：
 
 通过 Unity 的 [LauncherManifest.xml](https://docs.unity3d.com/Manual/android-launcher-manifest.html) 将 Application tag 的 android:name 设置为 **com.taptap.payment.api.UnityApplication** 来进行初始化。
 ```xml
@@ -566,6 +698,14 @@ TapPayment.openUserOrderList ( activity, lang );
 // 或者使用无语言参数版本的函数，将由 SDK 根据用户的国家或地区自动选择对应的语言
 TapPayment.openUserOrderList ( activity );
 ```
+
+</>
+<>
+
+- 暂未支持
+
+</>
+</MultiLang>
 
 
 ### 相关数据结构
