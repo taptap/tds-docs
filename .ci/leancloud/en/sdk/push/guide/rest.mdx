@@ -1,0 +1,645 @@
+---
+title:  REST API
+
+sidebar_position: 8
+---
+
+import { Conditional } from "/src/docComponents/conditional";
+
+### Installation
+
+Once your application has been installed on users' devices, LeanCloud SDKs will automatically generate an installation object for you.
+The installation object contains all the information required for sending push notifications.
+You can use REST API to send push notifications to the installations specified.
+
+#### Creating Installations
+
+Creating an installation is similar to [creating a normal object](/sdk/storage/guide/rest/#creating-objects).
+Its response is also the same as that of creating a normal object, except that an installation contains different attributes on different platforms.
+
+##### DeviceToken
+
+iOS devices use DeviceToken:
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{appkey}}"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "deviceType": "ios",
+        "deviceToken": "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789",
+        "channels": [
+          "public", "protected", "private"
+        ]
+      }' \
+  https://{{host}}/1.1/installations
+```
+
+
+##### installtionId
+
+For Android devices, the LeanCloud SDK will automatically generate a unique ID (`installationId`) and save it in the cloud.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{appkey}}"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "deviceType": "android",
+        "installationId": "12345678-4312-1234-1234-1234567890ab",
+        "channels": [
+          "public", "protected", "private"
+        ]
+      }' \
+  https://{{host}}/1.1/installations
+```
+
+`installationId` should always be unique within a given application.
+
+### Retrieving Installations
+
+You can retrieve an installation in a similar way to [retrieving a normal object](/sdk/storage/guide/rest/#retrieving-objects):
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  https://{{host}}/1.1/installations/51ff1808e4b074ac5c34d7fd
+```
+
+The JSON object returned:
+
+```json
+{
+  "deviceType": "ios",
+  "deviceToken": "abcdefghijklmnopqrstuvwzxyrandomuuidforyourdevice012345678988",
+  "channels": [
+    ""
+  ],
+  "createdAt": "2012-04-28T17:41:09.106Z",
+  "updatedAt": "2012-04-28T17:41:09.106Z",
+  "objectId": "51ff1808e4b074ac5c34d7fd"
+}
+```
+
+### Updating Installations
+
+You can update an installation in a similar way to [updating a normal object](/sdk/storage/guide/rest/#updating-objects).
+
+For example, to subscribe to a channel named "foo":
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '{
+        "deviceType": "ios",
+        "deviceToken": "abcdefghijklmnopqrstuvwzxyrandomuuidforyourdevice012345678988",
+        "channels": [
+          "",
+          "foo"
+        ]
+      }' \
+  https://{{host}}/1.1/installations/51ff1808e4b074ac5c34d7fd
+```
+
+Or to unsubscribe a channel:
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{appkey}}"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "channels": {
+           "__op":"Remove",
+           "objects":["customer"]
+        }
+       }' \
+  https://{{host}}/1.1/installations/51ff1808e4b074ac5c34d7fd
+```
+
+In essence, `channels` is an array.
+Therefore, it conforms to standard [REST API operations](/sdk/storage/guide/rest/#arrays).
+
+You can also add customized attributes to an installation:
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{appkey}}"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "userObjectId": "<user objectId>"
+      }' \
+  https://{{host}}/1.1/installations/51ff1808e4b074ac5c34d7fd 
+```
+
+### Installation Queries
+
+Similar to how you operate normal objects, you can send a GET request to `/installations` to get a list of all installations.
+This only works in the REST API, and there are no equivalent APIs in client-side SDKs.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  https://{{host}}/1.1/installations
+```
+
+A `results` array (wrapped in an object) will be returned:
+
+```json
+{
+  "results": [
+    {
+      "deviceType": "ios",
+      "deviceToken": "abcdefghijklmnopqrstuvwzxyrandomuuidforyourdevice012345678988",
+      "channels": [
+        ""
+      ],
+      "createdAt": "2012-04-28T17:41:09.106Z",
+      "updatedAt": "2012-04-28T17:41:09.106Z",
+      "objectId": "51ff1808e4b074ac5c34d7fd"
+    },
+    {
+      "deviceType": "ios",
+      "deviceToken": "876543210fedcba9876543210fedcba9876543210fedcba9876543210fedcba9",
+      "channels": [
+        ""
+      ],
+      "createdAt": "2012-04-30T01:52:57.975Z",
+      "updatedAt": "2012-04-30T01:52:57.975Z",
+      "objectId": "51fcb74ee4b074ac5c34cf85"
+    }
+  ]
+}
+```
+
+All the queries applicable to normal objects are also applicable to installations.
+By querying the `channels` array, you can retrieve all the devices subscribed to a given channel.
+
+### Deleting Installations
+
+You can delete an installation in a similar way to [deleting a normal object](/sdk/storage/guide/rest/#deleting-objects).
+This is also only available in the REST API.
+There are no equivalent APIs in client-side SDKs.
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  https://{{host}}/1.1/installations/51fcb74ee4b074ac5c34cf85
+```
+
+### Automatic Cleanups
+
+Whenever a user opens the app, LeanCloud will update the `updatedAt` attribute of that installation.
+If the `updatedAt` attribute of an installation has not been updated for a long time, it indicates that the user has not opened the app for a long time.
+When the app has not been opened for more than 90 days, LeanCloud will delete that installation.
+However, once the user opens the app again, a new installation will be created automatically.
+
+For iOS devices, if APNs informs that a deviceToken has expired, LeanCloud will also delete the related installation automatically.
+The expired deviceToken will be added to an internal filter,
+and no further notifications will be pushed to an installation with that expired deviceToken.
+
+### Push Notifications
+
+#### Master Key
+
+By default, you have to use the master key (`X-LC-Key: {{masterkey}},master`) to send push notifications.
+If you want to allow your application users to send push notifications to each other, you can disable the **Prevent clients from sending push notifications** option in Dashboard > Messaging > Push notifications > Settingsd.
+This will make your app less secure, so we recommend that you keep this restriction on unless you have a reason to disable it.
+
+#### Query Then Push
+
+This interface is used to send push notifications to all the devices matching specific conditions.
+For example, to send push notifications to all the devices in the "public" channel:
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "where": {"channels" : ["public"]},
+        "data": {"alert" : "Hello from LeanCloud"}
+     }' \
+  https://{{host}}/1.1/push
+```
+
+Note that the HTTP body (namely the serialized JSON object passed in) must be no larger than 4096 bytes.
+
+The parameters available are as follows:
+
+Name | Optionality | Description 
+--- | --- | ---
+data| **required** | A JSON object of the notification content. See [Message Content section](#message-content) for more details.
+where | optional | The conditions to query the `_installation` table. See also descriptions on how to encode [advanced data types](/sdk/storage/guide/rest/#advanced-data-types).
+channels | optional | Included as a condition in the `where` parameter.
+push_time | optional | An ISO8601 timestamp string with timezone `UTC+0` used for scheduled push. The notification will be pushed immediately if the `push_time` is in less than one minute. You can implement cyclical pushes using LeanEngine.
+expiration_time | optional | The absolute expiration time in ISO8691 format with `UTC+0` timezone, e.g. `2019-04-01T06:19:29.000Z`. If the client-side receives the notifications after the expiration time, it will not display these expired notifications to the user.
+expiration_interval | optional | Expiration time in **second**, relative to `push_time` or the moment the API is invoked if `push_time` is unspecified.
+notification_id | optional | Customizable push notification id. It is a string consisting of up to 16 alphanumeric characters. If not specified, an auto-generated random id will be used. Targets and successes are calculated based on this id, as displayed in Notification History on Dashboard. Specifying a `notification_id` allows for developers to accumulate targets and successes of push notifications for multiple requests.
+req_id | optional | Customizable request id. Similar to `notification_id`, it is a string consisting of up to 16 alphanumeric characters. Requests with an identical `req_id` in five minutes will be treated as duplicated and LeanCloud will only handle one of them. You can specify this parameter when you plan to retry requests on timeout errors. **Retrying too frequently or too much will interfere with normal pushes**. Please be careful.
+prod | optional |**Only applicable to iOS devices.** When using Token Authentication, you can use this parameter to specify whether the notifications will be pushed to the `dev` environment or `prod` environment of APNs. When using certificate authentication, you can use this parameter to specify whether to use a `dev` certificate or a `prod` certificate. When `prod` is unspecified, if there is a `X-LC-Prod` HTTP header whose value is not equal to `1`, this will be equivalent to `{"prod": "dev"}`, otherwise the default value `{"prod": "prod"}` will be used. The `deviceProfile` attribute of the installation takes precedence over this parameter.
+topic | optional | **Only applicable when pushing to iOS devices using Token Authentication.** The APNs Topic is required for Token Authentication. iOS SDKs will automatically use the bundle ID of the iOS application as `apnsTopic`. However, you have to manually specify them under the following circumstances: 1. The iOS SDK version is earlier than v4.2.0; 2. Not using iOS SDK (for example, you are developing a React Native application); 3. Using a `topic` different from the bundle ID.
+apns_team_id | optional | **Only applicable when pushing to iOS devices using Token Authentication.**  The Team ID is required for Token Authentication. Generally, if there are no duplicated APNs Topics for all of your Team IDs, or if you have specified the `apnsTeamId` attribute of the installation beforehand, LeanCloud will automatically send push notifications with the Team ID matched. Otherwise, you will need to manually specify this parameter and ensure all the targeted devices have the specified Team ID.
+flow_control | optional | Targets per second. If specified, LeanCloud will throttle the pushes. The minimum value is 1000. If a value less than 1000 is specified, it will be treated as 1000.
+_notificationChannel | optional | Android channel id. Required for Android 8.0+.
+
+Below are examples of some common use cases.
+Refer to [Queries](/sdk/storage/guide/rest/#queries) section for more information.
+
+##### Push to All Devices
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "data": {
+          "alert": "LeanCloud greetings！"
+        }
+      }' \
+  https://{{host}}/1.1/push
+```
+
+##### Push to Android Devices
+
+```sh
+curl -X POST \
+-H "X-LC-Id: {{appid}}"          \
+-H "X-LC-Key: {{masterkey}},master"        \
+-H "Content-Type: application/json" \
+-d '{
+      "where":{
+        "deviceType": "android"
+      },
+      "data": {
+        "alert": "LeanCloud greetings！"
+      }
+    }' \
+https://{{host}}/1.1/push
+```
+
+##### Push to Devices Subscribed to the `public` Channel
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "channels":["public"],
+        "data": {
+          "alert": "LeanCloud greetings！"
+        }
+      }' \
+  https://{{host}}/1.1/push
+```
+
+##### Push to Inactive Devices
+
+```sh
+curl -X POST \
+-H "X-LC-Id: {{appid}}"          \
+-H "X-LC-Key: {{masterkey}},master"        \
+-H "Content-Type: application/json" \
+-d '{
+      "where":{
+          "updatedAt":{
+              "$lt":{"__type":"Date","iso":"2015-06-29T11:33:53.323Z"}
+            }
+      },
+      "data": {
+          "alert": "LeanCloud greetings！"
+      }
+    }' \
+https://{{host}}/1.1/push
+```
+
+##### Push to Devices with Specific Custom Attributes
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "where": {
+          "preOrder": true
+        },
+        "data": {
+          "alert": "New Arrivals!"
+        }
+      }' \
+  https://{{host}}/1.1/push
+```
+
+##### Push to Devices Nearby
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "where": {
+          "owner": {
+            "$inQuery": {
+              "location": {
+                "$nearSphere": {
+                  "__type": "GeoPoint",
+                  "latitude": 30.0,
+                  "longitude": -20.0
+                },
+                "$maxDistanceInMiles": 10.0
+              }
+            }
+          }
+        },
+        "data": {
+          "alert": "Heat Alert!"
+        }
+      }' \
+  https://{{host}}/1.1/push
+```
+
+#### Push Notifications with Device ID Lists
+
+You can also directly specify a list of devices as push targets.
+This may be faster than the query-then-push approach mentioned above.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "data": {"alert" : "Hello from LeanCloud"},
+        "device_type": "ios",
+        "device_ids": ["device_token1", "device_token2", "device_token3"]
+     }' \
+  https://{{host}}/1.1/push/devices
+```
+
+Platform-independent parameters of this interface are as follows:
+
+Name | Optionality | Description
+--- | --- | ---
+device_type | **required** | `android` or `iOS`.
+device_ids | **required** | The target device ID list, 500 at maximum. For iOS devices, device ID is the `deviceToken` attribute of the installation. For Android devices, device ID is the `registrationId` attribute (with FCM) or the `installationId` attribute (without FCM).
+data| **required** | See the [Query Then Push](#query-then-push) section above.
+expiration_interval | optional | See above.
+expiration_time | optional | See above.
+notification_id | optional | See above.
+req_id | optional | See above.
+
+Parameters for iOS devices are as follows:
+
+Name | Optionality | Description
+---- | ---- | ----
+prod | optional | See the [Query Then Push](#query-then-push) section above. 
+topic | optional | See above.
+anpns_team_id | optional | See above.
+device_profile | optional | Custom push certificate for iOS devices. When using Token Authentication, or when using a configured dev/prod certificate, LeanCloud will automatically choose the certificate based on the `prod` parameter.
+
+Parameters for Android devices are as follows:
+
+Name | Optionality | Description
+---- | ---- | ----
+channel | optional | Android notification channel.
+vendor | optional | `fcm` if using FCM.
+
+#### Message Content
+
+#### iOS Devices
+
+For iOS devices, the notification content (passed in the `data` parameter) should be wrapped in a JSON object with an `aps` key:
+
+```json
+{
+  "aps": {
+     "alert": {
+       "title":               "notification title",
+       // ... and other APNs payload keys
+     }
+     // ... and other APNs payload keys
+   },
+   "collapse-id":          "request header",
+   "apns-priority":        "request header",
+   "apns-push-type":       "One of `background`, `voip`, `complication`, `fileprovider`, `mdm`, and `alert`. Default value: `alert`.",
+   "custom-key":           "arbitrary key specified by developers"
+}
+```
+
+Please refer to the [official](https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/generating_a_remote_notification) [Apple](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingwithAPNs.html) [documentation](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingwithAPNs.html) for details.
+
+#### Android Devices
+
+For Android devices, the default fields are as follows:
+
+```json
+{
+  "alert": "string, notification content",
+  "title": "string, notification title",
+  "silent": "boolean, see below",
+  "custom-key": "arbitrary key specified by developers",
+  "action": "string, if you want to customize the Receiver"
+}
+```
+
+If `silent` is `false`, when the device receives the notification, it will automatically appear in the notification drawer.
+If `silent` is `true`, when the device receives the notification, it will be forward to the LeanCloud Android SDK instead.
+The SDK will then pass the notification to the custom Receiver implemented by the developer.
+LeanCloud SDK will not put the notification into the notification drawer automatically.
+If `silent` is unset, LeanCloud will use the default value `false`.
+
+
+#### Push to Both iOS and Android Devices
+
+You can push to both iOS and Android (with and without FCM) devices in one API call:
+
+```json
+{
+  "ios": {
+    "aps": { /* data for ios */ }
+  },
+  "fcm": {
+    // with FCM
+  },
+  "android": {
+    // without FCM
+  }
+}
+```
+
+#### Expiration Time and Scheduled Push
+
+As mentioned above, the `expiration_time` parameter can be used to specify the expiration time of the message:
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "expiration_time": "2015-10-07T00:51:13Z",
+        "data": {
+          "alert": "Your coupon will expire on October 7."
+        }
+      }' \
+  https://{{host}}/1.1/push
+```
+
+`expiration_interval` can also be used,
+typically with `push_time`:
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "push_time": "2016-01-28T00:07:29.773Z",
+        "expiration_interval": 86400,
+        "data": {
+          "alert": "Send this notification at 8:07 BST on January 28, expired in 24 hours (86400 seconds)"
+        }
+      }' \
+  https://{{host}}/1.1/push
+```
+
+##### Querying and Canceling Scheduled Push
+
+You can query scheduled push notifications via `POST /scheduledPushMessages` with **master key**:
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  https://{{host}}/1.1/scheduledPushMessages
+```
+
+The response body:
+
+```json
+{
+  "results": [
+    {
+      "id": 1,
+      "expire_time": 1373912050838,
+      "push_msg": {
+        "through?": null,
+        "app-id": "OLnulS0MaC7EEyAJ0uA7uKEF-gzGzoHsz",
+        "where": {
+          "sort": {
+            "createdAt": 1
+          },
+          "query": {
+            "installationId": "just-for-test",
+            "valid": true
+          }
+        },
+        "prod": "prod",
+        "api-version": "1.1",
+        "msg": {
+          "message": "test msg"
+        },
+        "id": "XRs9jmWnLd0GH2EH",
+        "notificationId": "mhWjvHvJARB6Q6ni"
+      },
+      "createdAt": "2016-01-21T00:47:46.000Z"
+    }
+  ]
+}
+```
+
+`push_msg` contains details of the push notification,
+and `expire_time` is a unix timestamp for the push time scheduled.
+
+A scheduled push can be canceled based on the query results.
+Note that you need to use the outermost `id` in the query results.
+For example, to cancel the first scheduled push, use `results[0].id` (`1` in the example above) instead of `results[0].push_msg.id` (`XRs9jmWnLd0GH2EH` in the example above).
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  https://{{host}}/1.1/scheduledPushMessages/1
+```
+
+### Querying and Canceling Push Notifications
+
+You can check push history at **Dashboard > Messaging > Push notifications > History**,
+where you can also cancel unpushed notifications.
+
+## Limits and Costs
+
+### Push Notifications
+
+Calls to [push notifications](#push-notifications) have a frequency limit:
+
+|Per Application with a Business Plan | Per Application with a Developer Plan |
+|-|-|
+|Maximum 9600 times/min, default 600 times/min|60 times/min|
+
+Once you exceed the limit, LeanCloud will reject the incoming requests within one minute, returning a 429 error code.
+
+Frequency limit of an application with a Business Plan can be adjusted at **Dashboard > Messaging > Push notifications > Settings > Push notifications settings > Frequency limit for calling API for push notifications**.
+It is billed on the peak daily call frequency:
+
+| Frequency (calls per minute) | Cost (USD / Day) |
+| - | - |
+| 0 - 600 | Free
+| 601 - 1200 | $20  |
+| 1201 - 1800 | $30 |
+| 1801 - 2400 | $40 |
+| 2401 - 3000 | $50 |
+| 3001 - 3600 | $60 |
+| 3601 - 4200 | $70 |
+| 4201 - 4800 | $80 | 
+| 4801 - 5400 | $90 |
+| 5401 - 6000 | $100|
+| 6001 - 6600 | $110|
+| 6601 - 7200 | $120|
+| 7201 - 7800 | $130|
+| 7801 - 8400 | $140|
+| 8401 - 9000 | $150|
+| 9001 - 9600 | $160|
+
+Peak daily call frequency can be viewed at **Dashboard > Messaging > Push notifications > Statistics > Queries per minute**.
+
+### Notifications Pushed Daily
+
+|Per Application with a Business Plan | Per Application with a Developer Plan |
+|-|-|
+|No maximum, default 1m|10k|
+
+Once the limit is reached, no more notifications can be pushed within that day.
+
+This daily limit of an application with a Business Plan can be adjusted at **Dashboard > Messaging > Push notifications > Settings > Push notifications settings > Daily limit**.
+The adjustment may increase your costs.
+
+| Notifications Pushed Daily | Cost (USD, Ceiling) |
+| - | - |
+| Less than or equal to one million | Free |
+| n millions (`n > 1`) | `$0.02 * (n - 1)` |
+
+Notifications pushed daily can be viewed at **Dashboard > Messaging > Push notifications > Statistics > Attempts**.
+
+### Other Limits
+
+* In order to avoid sending messages to a large number of inactive users, LeanCloud restricts sending push notifications to installations whose `updatedAt` attribute is within the last three months. Applications with a Business Plan can contact LeanCloud to extend the active period (no longer than one year).
+* To prevent performance issues caused by a large number of certificate errors, LeanCloud imposes a limit on the number of devices that can be pushed to using **a development certificate**. You can push to at most 20k devices at a time with a development certificate. If there are more than 20k devices that meet the push criteria, LeanCloud will reject the push, and the **status** column in **Dashboard > Messaging > Push notifications > History** will show "error" with the message "dev profile disabled for massive push".
+* Apple has limits on the size of push messages. See [APNs documentation](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/PayloadKeyReference.html) for more information.
+* An application with a Developer Plan can have at most 10 scheduled push tasks and an application with a Business Plan can have at most 1000 scheduled push tasks.
+
+If the push fails, you can check the error message at **Dashboard > Messaging > Push notifications > History**.

@@ -1,0 +1,1593 @@
+---
+title: 三，Security, Permission Management, Chat Rooms, and Temporary Conversations
+sidebar_label: Permission,Chat Rooms
+sidebar_position: 3
+---
+
+import MultiLang from "/src/docComponents/MultiLang";
+import Mermaid from "/src/docComponents/Mermaid";
+import { Conditional } from "/src/docComponents/conditional";
+
+## Introduction
+
+In the previous chapter [Advanced Messaging Features, Push Notifications, Synchronization, and Multi Device Sign-on](/sdk/im/guide/intermediate/), we introduced a number of bonus features that you can implement beyond basic messaging. In this chapter, we will introduce more features from the perspectives of system security and permission management, including:
+
+- How to verify the requests made by clients with third-party signing mechanism
+- How to control the permissions each user has
+- How to build a chat room with unlimited number of people
+- How to filter out certain keywords from the messages being sent out
+- How to implement temporary conversations
+
+## Signing Mechanism
+
+On LeanCloud, LeanMessage is decoupled from the account system offered by LeanStorage. This makes it possible for you to use LeanMessage even though the account system of your app is not built with LeanStorage. To ensure the security of your app, we offer a third-party signing mechanism that helps your app verify all the requests sent from clients.
+
+The mechanism comes with an authentication server (the so-called "third party") deployed between clients and the cloud. Each time a client wants to make a request involving sensitive operations (like logging in, creating conversations, joining conversations, or inviting users), it has to obtain a signature from the authentication server. The signature gets attached to the request and will be verified by the cloud according to a predefined protocol. Only those requests with valid signatures will be accepted by the cloud.
+
+The signing mechanism is turned off by default. You can turn it on by going to your app's Dashboard > Messaging > LeanMessage > Settings > LeanMessage settings:
+
+- **Verify signatures for logging in**: Verify all the activities of logging in
+- **Verify signatures for conversation operations**: Verify all the activities of creating conversations, joining conversations, inviting users, and removing users
+- **Verify signatures for retrieving history messages**: Verify all the activities of retrieving history messages
+- **Verify signatures for blacklist operations**: Verify all the activities of changing blacklisted users of conversations (see the next section for more details regarding blacklists)
+
+You are free to change the settings here based on your app's actual needs, though we highly recommend that you keep **verifying signatures for logging in** on, which guarantees the basic security of your app.
+
+<Mermaid
+  diagram={`
+sequenceDiagram
+Client->Authentication Server: 1. Apply for signature with request
+Authentication Server-->Client: 2. Return timestamp, nonce, and signature to the client
+Client->LeanMessage Cluster: 3. Send the request to the cloud with the signature
+LeanMessage Cluster-->Client: 4. Verify the signature along with the request
+`}
+/>
+
+
+1. When the client performs operations like logging in or creating conversations, the SDK applies for a signature by calling `SignatureFactory` with the operator's information and a request containing the operations to be done.
+2. The authentication server checks if the operations are performed with enough permissions. If that's true, the server will follow the [signing algorithm](#signatures-for-logging-in) that will be mentioned later to generate the timestamp, nonce, and signature, and send them back to the client.
+3. The client attaches the signature to the request and sends them to the cloud.
+4. The cloud verifies the signature along with the request to ensure that the operations in the request are allowed. The request will be accepted if the signature is valid.
+
+The algorithm used for the signing process is **HMAC-SHA1** and the output would be a hex dump. For different requests, different strings with different UTC timestamps and nonces need to be constructed. If you are using `AVUser` in your app, you can get signatures for logging in through our REST API.
+
+
+### Formats of Signatures
+
+Below we will introduce the formats of strings used to obtain signatures for different types of operations.
+
+#### Signatures for Logging in
+
+Below is the format of strings for logging in. Keep in mind that there are *two colons* between `clientid` and `timestamp`:
+
+```
+appid:clientid::timestamp:nonce
+```
+
+Parameter | Description
+--- | ---
+`appid` | Your App ID.
+`clientid` | The `clientId` that will be logged in.
+`timestamp` | The number of **milliseconds** that have elapsed since Unix epoch (UTC).
+`nonce` | A random string.
+
+> Note: The key for signing has to be the **Master Key** of your app. You can find it in your app's Dashboard > Settings > API keys. **Make sure your Master Key is well protected and doesn't get leaked out.**
+
+
+You may implement your own `SignatureFactory` to retrieve signatures from remote servers. If you don't have your own server, you may use the **web hosting** service provided by LeanEngine. Generating signatures within your mobile app is **extremely dangerous** since your **Master Key** can get exposed.
+
+This signature expires in 6 hours,
+but it becomes invalid once the client has been kicked off (via `POST /1.2/rtm/clients/{client_id}/kick`).
+Signature invalidness does not affect currently connected clients.
+
+#### Signatures for Creating Conversations
+
+Below is the format of strings for creating conversations:
+
+```
+appid:clientid:sorted_member_ids:timestamp:nonce
+```
+
+* `appid`, `clientid`, `timestamp`, and `nonce` are [the same as above](#signatures-for-logging-in).
+* `sorted_member_ids` is a list of `clientId`s (users being invited to the conversation) arranged in **ascending order** and divided by colon (`:`).
+
+#### Signatures for Group Operations
+
+Below is the format of strings for **joining conversations**, **inviting users**, and **removing users**:
+
+```
+appid:clientid:convid:sorted_member_ids:timestamp:nonce:action
+```
+
+* `appid`, `clientid`, `sorted_member_ids`, `timestamp`, and `nonce` are the same as above. `sorted_member_ids` could be an empty string if you are creating a new conversation.
+* `convid` is the conversation ID.
+* `action` is the operation being performed: `invite` means joining a conversation or inviting users and `kick` means removing users.
+
+
+#### Signatures for Retrieving Message Histories
+
+```
+appid:client_id:convid:nonce:timestamp
+```
+
+The meanings of these parameters are the same as above.
+
+This signature is only used in REST API.
+It is not applicable to client side SDKs.
+
+
+#### Signatures for Blacklist Operations
+
+There are two formats of strings for two types of blacklist operations:
+1. `client` to `conversation`
+
+  ```
+  appid:clientid:convid::timestamp:nonce:action
+  ```
+
+  - `action` is the operation being performed: `client-block-conversations` means blocking the conversation and `client-unblock-conversations` means unblocking the conversation.
+  
+2. `conversation` to `client`
+
+  ```
+  appid:clientid:convid:sorted_member_ids:timestamp:nonce:action
+  ```
+
+  - `action` is the operation being performed: `conversation-block-clients` means blocking the client and `conversation-unblock-clients` means unblocking the client.
+  - `sorted_member_ids` is the same as above.
+
+### Demo for Generating Signatures on LeanEngine
+
+To help you better understand the signing algorithm, we made a server-side signing program based on Node.js and LeanEngine. It's available [here](https://github.com/leancloud/leanengine-nodejs-demos/blob/master/functions/rtm-signature.js) for you to study and use.
+
+### Supporting Signatures on the Client Side
+
+So far we have been talking about the protocol used by the authentication server to generate signatures. Now let's see what we need to do with the client side to make the entire signing mechanism work.
+
+An interface for `Signature` is available for each `AVIMClient` instance. To enable signing, implement the interface with a class that calls the signing method on the authentication server to get signatures, then bind the class to the `AVIMClient` instance:
+
+
+<MultiLang kind="im">
+
+
+```cs
+// Using ISignatureFactory to create signatures on LeanEngine
+public class LeanEngineSignatureFactory : ISignatureFactory
+{
+    public Task<AVIMSignature> CreateConnectSignature(string clientId)
+    {
+        var data = new Dictionary<string, object>();
+        data.Add("client_id", clientId);
+        return AVCloud.CallFunctionAsync<IDictionary<string,object>>("sign2", data).OnSuccess(_ => 
+        {
+            var jsonData = _.Result;
+            var s = jsonData["signature"].ToString();
+            var n = jsonData["nonce"].ToString();
+            var t = long.Parse(jsonData["timestamp"].ToString());
+            var signature = new AVIMSignature(s,t,n);
+            return signature;
+        });
+    }
+
+    public Task<AVIMSignature> CreateConversationSignature(string conversationId, string clientId, IEnumerable<string> targetIds, ConversationSignatureAction action)
+    {
+        var actionList = new string[] { "invite", "kick" };
+        var data = new Dictionary<string, object>();
+        data.Add("client_id", clientId);
+        data.Add("conv_id", conversationId);
+        data.Add("members", targetIds.ToList());
+        data.Add("action", actionList[(int)action]);
+        return AVCloud.CallFunctionAsync<IDictionary<string, object>>("sign2", data).OnSuccess(_ =>
+        {
+            var jsonData = _.Result;
+            var s = jsonData["signature"].ToString();
+            var n = jsonData["nonce"].ToString();
+            var t = long.Parse(jsonData["timestamp"].ToString());
+            var signature = new AVIMSignature(s, t, n);
+            return signature;
+        });
+    }
+
+    public Task<AVIMSignature> CreateQueryHistorySignature(string clientId, string conversationId)
+    {
+        return Task.FromResult<AVIMSignature>(null);
+    }
+
+    public Task<AVIMSignature> CreateStartConversationSignature(string clientId, IEnumerable<string> targetIds)
+    {
+        var data = new Dictionary<string, object>();
+        data.Add("client_id", clientId);
+        data.Add("members", targetIds.ToList());
+        return AVCloud.CallFunctionAsync<IDictionary<string, object>>("sign2", data).OnSuccess(_ =>
+        {
+            var jsonData = _.Result;
+            var s = jsonData["signature"].ToString();
+            var n = jsonData["nonce"].ToString();
+            var t = long.Parse(jsonData["timestamp"].ToString());
+            var signature = new AVIMSignature(s, t, n);
+            return signature;
+        });
+    }
+}
+
+// Provide the signature factory when initializing LeanMessage
+var config = new AVRealtime.Configuration()
+{
+    ApplicationId = "",
+    ApplicationKey = "",
+    SignatureFactory = new LeanEngineSignatureFactory()
+};
+var realtime = new AVRealtime(config);
+```
+
+```java
+// Create signatures on LeanEngine
+public class KeepAliveSignatureFactory implements SignatureFactory {
+ @Override
+ public Signature createSignature(String peerId, List<String> watchIds) throws SignatureException {
+   Map<String,Object> params = new HashMap<String,Object>();
+   params.put("self_id",peerId);
+   params.put("watch_ids",watchIds);
+
+   try{
+     Object result =  AVCloud.callFunction("sign",params);
+     if(result instanceof Map){
+       Map<String,Object> serverSignature = (Map<String,Object>) result;
+       Signature signature = new Signature();
+       signature.setSignature((String)serverSignature.get("signature"));
+       signature.setTimestamp((Long)serverSignature.get("timestamp"));
+       signature.setNonce((String)serverSignature.get("nonce"));
+       return signature;
+     }
+   }catch(AVException e){
+     throw (SignatureFactory.SignatureException) e;
+   }
+   return null;
+ }
+
+  @Override
+  public Signature createConversationSignature(String convId, String peerId,
+                                               List<String> targetPeerIds,String action) throws SignatureException{
+   Map<String,Object> params = new HashMap<String,Object>();
+   params.put("client_id",peerId);
+   params.put("conv_id",convId);
+   params.put("members",targetPeerIds);
+   params.put("action",action);
+
+   try{
+     Object result = AVCloud.callFunction("sign2",params);
+     if(result instanceof Map){
+        Map<String,Object> serverSignature = (Map<String,Object>) result;
+        Signature signature = new Signature();
+        signature.setSignature((String)serverSignature.get("signature"));
+        signature.setTimestamp((Long)serverSignature.get("timestamp"));
+        signature.setNonce((String)serverSignature.get("nonce"));
+        return signature;
+     }
+   }catch(AVException e){
+     throw (SignatureFactory.SignatureException) e;
+   }
+   return null;
+  }
+
+  @Override
+  public Signature createBlacklistSignature(String clientId, String conversationId, List<String> memberIds,
+                                            String action) throws SignatureException {
+    Map<String,Object> params = new HashMap<String,Object>();
+    params.put("client_id",clientId);
+    params.put("conv_id",conversationId);
+    params.put("members",memberIds);
+    params.put("action",action);
+
+    try{
+      Object result = AVCloud.callFunction("sign3",params);
+      if(result instanceof Map){
+         Map<String,Object> serverSignature = (Map<String,Object>) result;
+         Signature signature = new Signature();
+         signature.setSignature((String)serverSignature.get("signature"));
+         signature.setTimestamp((Long)serverSignature.get("timestamp"));
+         signature.setNonce((String)serverSignature.get("nonce"));
+         return signature;
+      }
+    }catch(AVException e){
+      throw (SignatureFactory.SignatureException) e;
+    }
+    return null;
+  }
+}
+
+// Bind the instance to an AVIMClient
+AVIMClient.setSignatureFactory(new KeepAliveSignatureFactory());
+```
+
+```objc
+// Implement AVIMSignatureDataSource and bind it to an AVIMClient instance
+- (AVIMSignature *)signatureWithClientId:(NSString *)clientId
+                          conversationId:(NSString *)conversationId
+                                  action:(AVIMSignatureAction)action
+                       actionOnClientIds:(NSArray<NSString *> *)clientIds
+{
+  if (action == AVIMSignatureActionOpen) {
+    AVIMSignature *signature;
+    /* Refer to the section "Demo for Generating Signatures on LeanEngine" for details. */
+    return signature;
+  } else {
+    return nil;
+  }
+}
+
+AVIMClient *imClient = [[AVIMClient alloc] initWithClientId:@"Tom"];
+imClient.delegate = self;
+imClient.signatureDataSource = signatureDelegate;
+```
+
+
+
+```js
+// An interface for creating signatures for logging in on LeanEngine
+var signatureFactory = function(clientId) {
+  return AV.Cloud.rpc('sign', { clientId: clientId }); // AV.Cloud.rpc returns a Promise
+};
+// An interface for creating signatures for creating conversations, joining conversations, inviting users, and removing users on LeanEngine
+var conversationSignatureFactory = function(conversationId, clientId, targetIds, action) {
+  return AV.Cloud.rpc('sign-conversation', {
+    conversationId: conversationId,
+    clientId: clientId,
+    targetIds: targetIds,
+    action: action,
+  });
+};
+// An interface for creating signatures for blacklist operations on LeanEngine
+var blacklistSignatureFactory = function(conversationId, clientId, targetIds, action) {
+  return AV.Cloud.rpc('sign-blacklist', {
+    conversationId: conversationId,
+    clientId: clientId,
+    targetIds: targetIds,
+    action: action,
+  });
+};
+
+realtime.createIMClient('Tom', {
+  signatureFactory: signatureFactory,
+  conversationSignatureFactory: conversationSignatureFactory,
+  blacklistSignatureFactory: blacklistSignatureFactory
+}).then(function(tom) {
+  console.log('Tom logged in.');
+}).catch(function(error) {
+  // Errors thrown by signatureFactory or for invalid signatures will be caught here
+});
+```
+
+```swift
+class SignatureDelegator: IMSignatureDelegate {
+  func getClientOpenSignature(completion: (IMSignature) -> Void) {
+    // Refer to the section "Demo for Generating Signatures on LeanEngine" for details.
+  }
+
+  func client(_ client: IMClient, action: IMSignature.Action, signatureHandler: @escaping (IMClient, IMSignature?) -> Void) {
+    switch action {
+      case .open:
+        self.getClientOpenSignature { (signature) in
+          signatureHandler(client, signature)
+        }
+      default:
+        signatureHandler(client, nil)
+    }
+  }
+}
+```
+
+```dart
+<!-- Todo -->
+```
+</MultiLang>
+
+You should never perform signing using your `Master Key` on the client side. If your `Master Key` is leaked out, the data in your app would be accessible by anyone who gets it. Therefore, we highly recommend that you host the signing program on a server that is well-secured (like LeanEngine).
+
+### Signing Mechanism for AVUser
+
+`AVUser` is the built-in account system coming with LeanStorage. If your users have their accounts signed up or logged in with `AVUser`, they can skip the signing process when logging in to LeanMessage. The code below shows how a user can log in to LeanMessage with `AVUser`:
+
+<MultiLang kind="im">
+
+```cs
+// Not supported yet
+```
+
+```java
+// Log in to the account system with the username and password of an AVUser
+AVUser.logInInBackground("username", "password", new LogInCallback<AVUser>() {
+    @Override
+    public void done(AVUser user, AVException e) {
+        if (null != e) {
+          return;
+        }
+        // Create a client with AVUser instance
+        AVIMClient client = AVIMClient.getInstance(user);
+        // Log in to LeanMessage
+        client.open(new AVIMClientCallback() {
+          @Override
+          public void done(final AVIMClient avimClient, AVIMException e) {
+            // Do something as you need
+          }
+       });
+    }
+});
+```
+
+```objc
+// Log in to the account system with the username and password of an AVUser
+[AVUser logInWithUsernameInBackground:username password:password block:^(AVUser * _Nullable user, NSError * _Nullable error) {
+    // Create a client with AVUser instance
+    AVIMClient *client = [[AVIMClient alloc] initWithUser:user];
+    // Log in to LeanMessage
+    [client openWithCallback:^(BOOL succeeded, NSError * _Nullable error) {
+        // Do something you like
+    }];
+}];
+```
+
+
+
+```js
+var AV = require('leancloud-storage');
+// Log in to the account system with the username and password of an AVUser
+AV.User.logIn('username', 'password').then(function(user) {
+  // Log in to LeanMessage with AVUser instance
+  return realtime.createIMClient(user);
+}).catch(console.error.bind(console));
+```
+
+```swift
+// Not supported yet
+```
+
+```dart
+// Not supported yet
+```
+
+</MultiLang>
+
+When creating `IMClient` with an `AVUser` instance that has completed the `logIn` process, the user's signature information can be directly accessed by LeanMessage from the account system of LeanStorage. This allows LeanMessage to automatically verify the client being logged in and the process of applying for signatures from the third-party server can be skipped.
+
+Once `IMClient` is logged in, all the other features work in the same way as discussed earlier.
+
+## Permission Management and Blacklisting
+
+The third-party signing mechanism helps to maintain the general security of your app, but each conversation still needs to keep its own order. For example, a chat room may need managers that can temporarily or permanently mute users that are behaving improperly. In this section, we will talk about how permission management within conversations can be implemented.
+
+### Setting Member Permissions
+
+When permission management is enabled, members in each conversation will be divided into different roles with different permissions. To enable permission management, go to your app's Dashboard > Messaging > LeanMessage > Settings > LeanMessage settings and turn on **Enable permission management for conversations**.
+
+Here is a table showing the permissions each role has:
+
+| Role | Permissions |
+| --- | --- |
+| `Owner` | Mute members, remove members, invite members, blacklist members, and update other members' permissions |
+| `Manager` | Mute members, remove members, invite members, blacklist members, and update other members' permissions |
+| `Member` | Join conversations |
+
+Among all these roles, `Owner` has the highest permissions and `Member` has the lowest. A member with higher permissions can change the role of a member with lower permissions, but not vice versa. In the previous chapters, we have seen that all the members in a conversation can invite or remove people, but once permission management is enabled, only `Owner` and `Manager` can perform these operations. Other members will get an error when attempting to do so.
+
+The `Owner` of a conversation cannot be changed. For other members, their roles can be switched between `Manager` and `Member` with `Conversation#updateMemberRole`:
+
+<MultiLang kind="im">
+
+```cs
+// Not supported yet
+```
+
+```java
+/**
+ * Update the role of a member
+ * @param memberId  The member's clientId
+ * @param role      The role
+ * @param callback  Callback function
+ */
+public void updateMemberRole(final String memberId, final ConversationMemberRole role, final AVIMConversationCallback callback);
+```
+
+```objc
+/**
+ Update the role of a member
+
+ @param memberId The member's clientId
+ @param role The role
+ @param callback Callback function
+ */
+- (void)updateMemberRoleWithMemberId:(NSString *)memberId
+                                role:(AVIMConversationMemberRole)role
+                            callback:(void (^)(BOOL succeeded, NSError * _Nullable error))callback;
+```
+
+
+```js
+/**
+ * Update the role of a member
+ * @since 4.0.0
+ * @param {String} memberId The member's clientId
+ * @param {module:leancloud-realtime.ConversationMemberRole | String} role The role
+ * @return {Promise.<this>} self
+ */
+async updateMemberRole(memberId, role);
+```
+
+```swift
+// Not supported yet
+```
+
+```dart
+/// - role: The role that will be updated.
+/// - memberId: The ID of the member who will be updated.
+Future<void> updateMemberRole({String role, String memberId})
+```
+
+</MultiLang>
+
+
+### Getting Member Permissions
+
+A `Conversation` object offers two ways for getting permission information of members:
+
+- `Conversation#getAllMemberInfo()` can be used to get all members' permission information
+<MultiLang kind="im">
+
+  ```cs
+  // Not supported yet
+  ```
+
+  ```java
+  /**
+  * Get all members' permission information
+  * @param offset    The number of results skipped
+  * @param limit     The maximum number of results
+  * @param callback  Callback function
+  */
+  public void getAllMemberInfo(int offset, int limit, final AVIMConversationMemberQueryCallback callback);
+  ```
+
+   ```objc
+  /**
+  Get all members' permission information; cache is used by default
+
+  @param callback Callback function
+  */
+  - (void)getAllMemberInfoWithCallback:(void (^)(NSArray<AVIMConversationMemberInfo *> * _Nullable memberInfos, NSError * _Nullable error))callback;
+
+  /**
+  Get all members' permission information
+
+  @param ignoringCache Whether to use cache
+  @param callback Callback function
+  */
+  - (void)getAllMemberInfoWithIgnoringCache:(BOOL)ignoringCache
+                                  callback:(void (^)(NSArray<AVIMConversationMemberInfo *> * _Nullable memberInfos, NSError * _Nullable error))callback;
+  ```
+
+  ```js
+  /**
+   * Get all members' permission information
+   * @since 4.0.0
+   * @return {Promise.<ConversationMemberInfo[]>} A list containing all members' permission information
+   */
+  async getAllMemberInfo({ noCache = false } = {})
+  ```
+
+  ```swift
+  // Not supported yet
+  ```
+ 
+ 
+  ```dart
+  // Not supported yet
+  ```
+
+  </MultiLang>
+
+- `Conversation#getMemberInfo(memberId)` can be used to get a specific member's permission information
+
+  <MultiLang kind="im">
+
+  ```cs
+  // Not supported yet
+  ```
+
+  ```java
+  /**
+  * Get a specific member's permission information
+  * @param memberId  The member's clientId
+  * @param callback  Callback function
+  */
+  public void getMemberInfo(final String memberId, final AVIMConversationMemberQueryCallback callback);
+  ```
+
+  ```objc
+  /**
+  Get a specific member's permission information; cache is used by default
+
+  @param memberId The member's clientId
+  @param callback Callback function
+  */
+  - (void)getMemberInfoWithMemberId:(NSString *)memberId
+                          callback:(void (^)(AVIMConversationMemberInfo * _Nullable memberInfo, NSError * _Nullable error))callback;
+  ```
+
+  ```js
+  /**
+   * Get a specific member's permission information
+   * @since 4.0.0
+   * @param {String} memberId The member's clientId
+   * @return {Promise.<ConversationMemberInfo>} The member's permission information
+   */
+  async getMemberInfo(memberId);
+  ```
+  
+  ```dart
+  // Not supported yet
+  ```
+
+  </MultiLang>
+
+Each return value contains permission information of members in a triple or array `<ConversationId, MemberId, ConversationMemberRole>`.
+
+### Muting Members
+
+Members whose roles are `Owner` or `Manager` can mute other members so they can only receive messages from the conversation. They will get an error when they attempt to send messages.
+
+`AVIMConversation` offers the following methods related to muting members:
+
+
+<MultiLang kind="im">
+
+
+```cs
+// Not supported yet
+```
+
+```java
+/**
+ * Mute certain members in the current conversation
+ * @param memberIds  The members' clientIds
+ * @param callback   Callback function
+ */
+public void muteMembers(final List<String> memberIds, final AVIMOperationPartiallySucceededCallback callback);
+/**
+ * Unmute certain members in the current conversation
+ * @param memberIds  The members' clientIds
+ * @param callback   Callback function
+ */
+public void unmuteMembers(final List<String> memberIds, final AVIMOperationPartiallySucceededCallback callback);
+/**
+ * Get a list of members being muted in the current conversation
+ * @param offset    The number of results skipped
+ * @param limit     The maximum number of results
+ * @param callback  Callback function
+ */
+public void queryMutedMembers(int offset, int limit, final AVIMConversationSimpleResultCallback callback);
+```
+
+```objc
+/**
+ Mute certain members in the current conversation
+ 
+ @param memberIds The members' clientIds
+ @param callback Callback function
+ */
+- (void)muteMembers:(NSArray<NSString *> *)memberIds
+           callback:(void (^)(NSArray<NSString *> * _Nullable successfulIds, NSArray<AVIMOperationFailure *> * _Nullable failedIds, NSError * _Nullable error))callback;
+/**
+ Unmute certain members in the current conversation
+ 
+ @param memberIds The members' clientIds
+ @param callback Callback function
+ */
+- (void)unmuteMembers:(NSArray<NSString *> *)memberIds
+             callback:(void (^)(NSArray<NSString *> * _Nullable successfulIds, NSArray<AVIMOperationFailure *> * _Nullable failedIds, NSError * _Nullable error))callback;
+/**
+ Get a list of members being muted in the current conversation
+ 
+ @param limit The maximum number of results
+ @param next The number of results skipped; next becomes nil or empty if there are no more muted members
+ @param callback Callback function
+ */
+- (void)queryMutedMembersWithLimit:(NSInteger)limit
+                              next:(NSString * _Nullable)next
+                          callback:(void (^)(NSArray<NSString *> * _Nullable mutedMemberIds, NSString * _Nullable next, NSError * _Nullable error))callback;
+```
+
+
+```js
+/**
+ * Mute certain members in the current conversation
+ * @param {String|String[]} clientIds The members' clientIds
+ * @return {Promise.<PartiallySuccess>} Result of the operation, including the clientIds that are operated successfully, plus the failures occurred and the clientIds associated with each of them
+ */
+async muteMembers(clientIds);
+
+/**
+ * Unmute certain members in the current conversation
+ * @param {String|String[]} clientIds The members' clientIds
+ * @return {Promise.<PartiallySuccess>} Result of the operation, including the clientIds that are operated successfully, plus the failures occurred and the clientIds associated with each of them
+ */
+async unmuteMembers(clientIds);
+
+/**
+ * Get a list of members being muted in the current conversation
+ * @param {Object} [options]
+ * @param {Number} [options.limit] The maximum number of results; defaults to 10
+ * @param {String} [options.next] The number of results skipped; can be used with limit for pagination
+ * @return {PagedResults.<string>} Results; the existence of cureser indicates that there are more results
+ */
+async queryMutedMembers({ limit, next } = {});
+```
+
+```swift
+// Not supported yet
+```
+
+```dart
+/// - members: The members that will be muted.
+Future<MemberResult> muteMembers({Set<String> members})
+/// - members: The members that will be unmuted.
+Future<MemberResult> unmuteMembers({Set<String> members})
+/// Get the muted members in the conversation.
+///
+/// [limit]'s default is `50`, should not be more than `100`.
+/// [next]'s default is `null`.
+///
+/// Returns a list of members.
+Future<QueryMemberResult> queryMutedMembers({int limit = 50, String next})
+```
+
+</MultiLang>
+
+Note that the result of the operation contains three parts of data:
+
+- `error`/`exception`: Whether the operation is holistically successful. If false, you will get error messages from here and the following two parts can be ignored.
+- `successfulClientIds`: The clientIds that are operated successfully.
+- `failedIds`: The failures occurred and the clientIds associated with each of them; listed in the format of `List<ReasonString, List<ClientId>>`.
+
+#### Events for Muting Members
+
+All the members in the conversation will receive notifications when someone get blocked.
+
+### Blacklisting
+
+There are two types of blacklists available:
+
+- Conversation to user: The list of users that are blocked by a conversation. Blocked users cannot join the conversation.
+- User to conversation: The list of conversations that are blocked by a user. The user cannot be invited to a blocked conversation.
+
+To enable blacklists, go to your app's Dashboard > Messaging > LeanMessage > Settings > LeanMessage settings and turn on **Enable blacklists**.
+
+`AVIMConversation` offers the following methods related to blacklisting:
+
+
+<MultiLang kind="im">
+
+```cs
+// Not supported yet
+```
+
+```java
+/**
+ * Put certain users into the blacklist of the current conversation
+ * @param memberIds  The users' clientIds
+ * @param callback   Callback function
+ */
+public void blockMembers(final List<String> memberIds, final AVIMOperationPartiallySucceededCallback callback);
+/**
+ * Remove certain users from the blacklist of the current
+ * @param memberIds  The users' clientIds
+ * @param callback   Callback function
+ */
+public void unblockMembers(final List<String> memberIds, final AVIMOperationPartiallySucceededCallback callback);
+/**
+ * Get the blacklist of the current conversation
+ * @param offset    The number of results skipped
+ * @param limit     The maximum number of results
+ * @param callback  Callback function
+ */
+public void queryBlockedMembers(int offset, int limit, final AVIMConversationSimpleResultCallback callback);
+```
+
+```objc
+/**
+ Put certain users into the blacklist of the current conversation
+
+ @param memberIds The users' clientIds
+ @param callback Callback function
+ */
+- (void)blockMembers:(NSArray<NSString *> *)memberIds
+            callback:(void (^)(NSArray<NSString *> * _Nullable successfulIds, NSArray<AVIMOperationFailure *> * _Nullable failedIds, NSError * _Nullable error))callback;
+
+/**
+ Remove certain users from the blacklist of the current
+
+ @param memberIds The users' clientIds
+ @param callback Callback function
+ */
+- (void)unblockMembers:(NSArray<NSString *> *)memberIds
+              callback:(void (^)(NSArray<NSString *> * _Nullable successfulIds, NSArray<AVIMOperationFailure *> * _Nullable failedIds, NSError * _Nullable error))callback;
+
+/**
+ Get the blacklist of the current conversation
+
+ @param limit The maximum number of results
+ @param next The number of results skipped; next becomes nil or empty if there are no more muted members
+ @param callback Callback function
+ */
+- (void)queryBlockedMembersWithLimit:(NSInteger)limit
+                                next:(NSString * _Nullable)next
+                            callback:(void (^)(NSArray<NSString *> * _Nullable blockedMemberIds, NSString * _Nullable next, NSError * _Nullable error))callback;
+```
+
+
+```js
+/**
+ * Put certain users into the blacklist of the current conversation
+ * @param {String|String[]} The users' clientIds
+ * @return {Promise.<PartiallySuccess>} Result of the operation, including the clientIds that are operated successfully, plus the failures occurred and the clientIds associated with each of them
+ */
+async blockMembers(clientIds);
+
+/**
+ * Remove certain users from the blacklist of the current conversation
+ * @param {String|String[]} clientIds The users' clientIds
+ * @return {Promise.<PartiallySuccess>} Result of the operation, including the clientIds that are operated successfully, plus the failures occurred and the clientIds associated with each of them
+ */
+async unblockMembers(clientIds);
+
+/**
+ * Get the blacklist of the current conversation
+ * @param {Object} [options]
+ * @param {Number} [options.limit] The maximum number of results; defaults to 10
+ * @param {String} [options.next] The number of results skipped; can be used with limit for pagination
+ * @return {PagedResults.<string>} Results; the existence of cureser indicates that there are more results
+ */
+async queryBlockedMembers({ limit, next } = {});
+```
+
+```swift
+// Not supported yet
+```
+
+
+```dart
+/// - members: The members that will be blocked.
+Future<MemberResult> blockMembers({Set<String> members})
+/// - members: The members that will be un unblocked.
+Future<MemberResult> unblockMembers({Set<String> members})
+/// Get the blocked members in the conversation.
+///
+/// [limit]'s default is `50`, should not be more than `100`.
+/// [next]'s default is `null`.
+///
+/// Returns a list of members.
+Future<QueryMemberResult> queryBlockedMembers({int limit = 50, String next})
+```
+
+</MultiLang>
+
+> The result of the operation is similar to that for muting members. You get the clientIds that are operated successfully, plus the failures occurred and the clientIds associated with each of them.
+
+Once a user is added into the blacklist of a conversation, the user will be removed from the conversation and cannot receive messages from it anymore. Unless the user is removed from the blacklist, other members will not be able to add this user back to the conversation.
+
+#### Events for Blacklisting
+
+All the members in the conversation will receive notifications when someone get blacklisted.
+
+#### Blocking Messages from Specific Users
+
+Another scenario is that a user doesn’t want to receive messages from a specific user. This can be implemented with hooks. See [Hooks for LeanMessage](/sdk/im/guide/systemconv/) for more details.
+
+## Chat Rooms
+
+We have seen different types of scenarios and conversations in our service overview. Now let's learn how to build a chat room.
+
+### Creating Chat Rooms
+
+`AVIMClient` has the `createChatRoom` method for creating chat rooms:
+
+
+<MultiLang kind="im">
+
+```cs
+// Pass in the name of the chat room
+tom.CreateChatRoomAsync("Chat Room");
+```
+
+```java
+tom.createChatRoom(null, "Chat Room", null,
+    new AVIMConversationCreatedCallback() {
+        @Override
+        public void done(AVIMConversation conv, AVIMException e) {
+            if (e == null) {
+                // Chat room created
+            }
+        }
+});
+```
+
+```objc
+[client createChatRoomWithName:@"Chat Room" attributes:nil callback:^(AVIMChatRoom *chatRoom, NSError *error) {
+    if (chatRoom && !error) {        
+        AVIMTextMessage *textMessage = [AVIMTextMessage messageWithText:@"This is a message." attributes:nil];
+        [chatRoom sendMessage:textMessage callback:^(BOOL success, NSError *error) {
+            if (success && !error) {
+
+            }
+        }];
+    }
+}];
+```
+
+
+```js
+tom.createChatRoom({ name:'Chat Room' }).catch(console.error);
+```
+
+```swift
+do {
+    try client.createChatRoom(name: "Chat Room", attributes: nil) { (result) in
+        switch result {
+        case .success(value: let chatRoom):
+            print(chatRoom)
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
+
+
+```dart
+ChatRoom chatRoom = await jerry.createChatRoom(name: 'Chat Room');
+```
+
+</MultiLang>
+
+
+When creating a chat room, you can specify its name and optional attributes. The interface for creating chat rooms has the following differences comparing to that for creating basic conversations:
+
+- A chat room doesn't have a member list, so there is no need to specify `members`.
+- For the same reason, there is no need to specify `unique` (the cloud doesn't need to merge conversations by member lists).
+
+> Although it's possible to create a chat room by passing `{ transient: true }` into `createConversation`, we still recommend that you use `createChatRoom` directly.
+
+### Finding Chat Rooms
+
+In a previous chapter, we have discussed how you can use `ConversationsQuery` to look for conversations with your custom conditions. This works for chat rooms as well, as long as you add `transient = true` as a constraint.
+
+
+<MultiLang kind="im">
+
+```cs
+var query = tom.GetChatRoomQuery();
+```
+
+```java
+AVIMConversationsQuery query = tom.getChatRoomQuery();
+query.findInBackground(new AVIMConversationQueryCallback() {
+    @Override
+    public void done(List<AVIMConversation> conversations, AVIMException e) {
+        if (null != e) {
+            // Success
+        } else {
+            // Error handling
+        }
+    }
+});
+```
+
+```objc
+AVIMConversationQuery *query = [tom conversationQuery];
+[query whereKey:@"tr" equalTo:@(YES)]; 
+```
+
+
+```js
+var query = tom.getQuery().equalTo('tr',true); // Restrict to chat rooms
+query.find().then(function(conversations) {
+  // conversations contains all the results
+}).catch(console.error);
+```
+
+```swift
+do {
+    let query = client.conversationQuery
+    try query.where("tr", .equalTo(true))
+    try query.findConversations { (result) in
+        switch result {
+        case .success(value: let conversations):
+            guard conversations is [IMChatRoom] else {
+                return
+            }
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
+
+
+```dart
+try {
+  ConversationQuery query = tom.conversationQuery();
+  query.whereEqualTo('tr', true);
+  List<Conversation> conversations = await query.find();
+} catch (e) {
+  print(e);
+}
+```
+
+</MultiLang>
+
+
+> Java, Android, and C# SDKs offer their `AVIMClient#getChatRoomQuery` methods that are dedicated for querying chat rooms. By using them, you won't need to deal with the `transient` attribute of conversations.
+
+### Joining and Leaving Chat Rooms
+
+When coming to the interfaces for joining or leaving conversations, group chats are the same as basic conversations. See [Group Chats](/sdk/im/guide/beginner/) in the first chapter for more details.
+
+However, there are several differences on the ways members are managed and notifications are delivered:
+
+- A user cannot be invited to or removed from a chat room. They are only able to join or leave by themselves.
+- If a user logs out, this user will be automatically removed from the chat room they are already in. An exception is that if the user gets offline unexpectedly, they will be added back to the chat room they are previously in as long as they get back within 30 minutes.
+- The cloud will not deliver notifications for users joining or leaving chat rooms.
+- The list of members in a chat room cannot be retrieved. Only the count of members is available.
+
+As a side note, functions like **push notifications, message synchronization, and receipts are also not supported by chat rooms**.
+
+### Getting Member Counts
+
+The `AVIMConversation#memberCount` method lets you get the count of members in a conversation. When used on a chat room, you get the number of people in it at that moment:
+
+<MultiLang kind="im">
+
+
+```cs
+// AVIMConversation.CountMembersAsync returns real-time data
+public async void CountMembers_SampleCode()
+{
+    AVIMClient client = new AVIMClient("Tom");
+    await client.ConnectAsync(); // Tom logs in
+
+    AVIMConversation conversation = (await client.GetQuery().FindAsync()).FirstOrDefault(); // Get the first conversation in the list
+    int membersCount = await conversation.CountMembersAsync();
+}
+```
+
+```java
+private void TomQueryWithLimit() {
+  AVIMClient tom = AVIMClient.getInstance("Tom");
+  tom.open(new AVIMClientCallback() {
+
+    @Override
+    public void done(AVIMClient client, AVIMException e) {
+      if (e == null) {
+        // Successfully logged in
+        AVIMConversationsQuery query = tom.getConversationsQuery();
+        query.setLimit(1);
+        // Get the first conversation
+        query.findInBackground(new AVIMConversationQueryCallback() {
+          @Override
+          public void done(List<AVIMConversation> convs, AVIMException e) {
+            if (e == null) {
+              if (convs != null && !convs.isEmpty()) {
+                AVIMConversation conv = convs.get(0);
+                // Get the count of people in the first conversation
+                conv.getMemberCount(new AVIMConversationMemberCountCallback() {
+
+                  @Override
+                  public void done(Integer count, AVIMException e) {
+                    if (e == null) {
+                      Log.d("Tom & Jerry has " + count + " people online");
+                    }
+                  }
+                });
+              }
+            }
+          }
+        });
+      }
+    }
+  });
+}
+```
+
+```objc
+// Get the count of people
+[conversation countMembersWithCallback:^(NSInteger number, NSError *error) {
+    NSLog(@"%ld",number);
+}];
+```
+
+
+```js
+chatRoom.count().then(function(count) {
+  console.log('Count: ' + count);
+}).catch(console.error.bind(console));
+```
+
+```swift
+do {
+    chatRoom.getOnlineMembersCount { (result) in
+        switch result {
+        case .success(count: let count):
+            print(count)
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
+
+
+```dart
+int count = await chatRoom.countMembers();
+```
+
+</MultiLang>
+
+### Message Priorities
+
+To ensure that important messages get delivered promptly, the server would selectively discard a certain amount of messages with lower priorities when the network connection is bad. Below are the priorities supported:
+
+| Priority | Description |
+| --- | --- |
+| `MessagePriority.HIGH` | High priority. Used for messages that need to be delivered promptly. |
+| `MessagePriority.NORMAL` | Normal priority. Used for ordinary text messages. |
+| `MessagePriority.LOW` | Low priority. Used for messages that are less important. |
+
+The default priority is `NORMAL`.
+
+The priority of a message can be set when sending the message. The code below shows how you can send a message with high priority:
+
+<MultiLang kind="im">
+
+```cs
+// Not supported yet
+```
+
+```java
+AVIMClient tom = AVIMClient.getInstance("Tom");
+    tom.open(new AVIMClientCallback() {
+      @Override
+      public void done(AVIMClient client, AVIMException e) {
+        if (e == null) {
+          // Create a conversation named "Tom & Jerry"
+          client.createConversation(Arrays.asList("Jerry"), "Tom & Jerry", null,
+            new AVIMConversationCreatedCallback() {
+              @Override
+              public void done(AVIMConversation conv, AVIMException e) {
+                if (e == null) {
+                  AVIMTextMessage msg = new AVIMTextMessage();
+                  msg.setText("Get up, Jerry!");
+
+                  AVIMMessageOption messageOption = new AVIMMessageOption();
+                  messageOption.setPriority(AVIMMessageOption.MessagePriority.High);
+                  conv.sendMessage(msg, messageOption, new AVIMConversationCallback() {
+                    @Override
+                    public void done(AVIMException e) {
+                      if (e == null) {
+                        // Sent
+                      }
+                    }
+                  });
+                }
+              }
+            });
+        }
+      }
+    });
+```
+
+```objc
+// Tom creates a client and logs in with his name as clientId
+self.client = [[AVIMClient alloc] initWithClientId:@"Tom"];
+
+// Tom logs in
+[self.client openWithCallback:^(BOOL succeeded, NSError *error) {
+    // Tom creates a conversation with Jerry
+    [self.client createConversationWithName:@"Tom & Jerry" clientIds:@[@"Jerry"]
+      options:AVIMConversationOptionUnique
+      callback:^(AVIMConversation *conversation, NSError *error) {
+        // Tom sends a message to Jerry
+
+        AVIMMessageOption *option = [[AVIMMessageOption alloc] init];
+        option.priority = AVIMMessagePriorityHigh;
+        [conversation sendMessage:[AVIMTextMessage messageWithText:@"Get up, Jerry!" attributes:nil] option:option callback:^(BOOL succeeded, NSError * _Nullable error) {
+            // Handle result and error
+        }];
+
+    }];
+}];
+```
+
+```js
+var { Realtime, TextMessage, MessagePriority } = require('leancloud-realtime');
+var realtime = new Realtime({ appId: 'GDBz24d615WLO5e3OM3QFOaV-gzGzoHsz', appKey: 'dlCDCOvzMnkXdh2czvlbu3Pk' });
+realtime.createIMClient('host').then(function (host) {
+    return host.createConversation({
+        members: ['broadcast'],
+        name: '2094 FIFA World Cup - Vatican City vs China',
+        transient: true
+    });
+}).then(function (conversation) {
+    console.log(conversation.id);
+    return conversation.send(new TextMessage('The score is still 0:0. China definitely needs a substitution for the second half.'), { priority: MessagePriority.HIGH });
+}).then(function (message) {
+    console.log(message);
+}).catch(console.error);
+```
+
+```swift
+do {
+    let message = IMTextMessage(text: "The score is still 0:0. China definitely needs a substitution for the second half.")
+    try chatRoom.send(message: message, priority: .high) { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
+
+
+```dart
+try {
+  TextMessage message = TextMessage();
+  message.text = 'The score is still 0:0. China definitely needs a substitution for the second half.';
+  await chatRoom.send(message: message, priority: MessagePriority.high);
+} catch (e) {
+  print(e);
+}
+```
+
+</MultiLang>
+
+
+> Note:
+>
+> This feature is only available for *chat rooms*. There won't be an effect if you set priorities for messages in basic conversations, since these messages will never get discarded.
+
+### Muting Conversations
+
+If a user doesn't want to get notifications for new messages in a conversation but still wants to stay in the conversation, they can mute the conversation.
+
+For example, Tom is getting busy and wants to mute a conversation:
+
+
+<MultiLang kind="im">
+
+```cs
+// Not supported yet
+```
+
+```java
+AVIMClient tom = AVIMClient.getInstance("Tom");
+tom.open(new AVIMClientCallback(){
+
+    @Override
+    public void done(AVIMClient client,AVIMException e){
+      if(e==null){
+      // Logged in
+      AVIMConversation conv = client.getConversation("551260efe4b01608686c3e0f");
+      conv.mute(new AVIMConversationCallback(){
+
+        @Override
+        public void done(AVIMException e){
+          if(e==null){
+          // Muted
+          }
+        }
+      });
+      }
+    }
+});
+```
+
+```objc
+- (void)tomMuteConversation {
+    // Tom creates a client and logs in with his name as clientId
+    self.client = [[AVIMClient alloc] initWithClientId:@"Tom"];
+
+    // Tom logs in
+    [self.client openWithCallback:^(BOOL succeeded, NSError *error) {
+        // Tom queries the conversation with ID to be 551260efe4b01608686c3e0f
+        AVIMConversationQuery *query = [self.client conversationQuery];
+        [query getConversationById:@"551260efe4b01608686c3e0f" callback:^(AVIMConversation *conversation, NSError *error) {
+            // Tom mutes the conversation
+            [conversation muteWithCallback:^(BOOL succeeded, NSError *error) {
+                if (succeeded) {
+                    NSLog(@"Muted!");
+                }
+            }];
+        }];
+    }];
+}
+```
+
+
+
+```js
+tom.getConversation('CONVERSATION_ID').then(function(conversation) {
+  return conversation.mute();
+}).then(function(conversation) {
+  console.log('Muted!');
+}).catch(console.error.bind(console));
+```
+
+```swift
+conversation.mute { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+
+```dart
+await chatRoom.mute();
+```
+
+</MultiLang>
+
+After a conversation is muted, the current user will not get push notifications from it anymore. To unmute a conversation, use `Conversation#unmute`.
+
+> Tips:
+>
+> - Both chat rooms and basic conversations can be muted.
+> - `mute` and `unmute` operations will change the `mu` field in the `_Conversation` class. **Do not change the `mu` field directly in your app's dashboard**, otherwise push notifications may not work properly.
+
+### Keyword Filtering
+
+You might consider filtering cuss words out from the messages sent into group chats by users. LeanMessage offers built-in keyword filtering.
+It works not only for chat rooms, but also for **basic conversations and system conversations**.
+
+Matched keywords will be replaced with `***`.
+
+Keyword filtering is message modification at the system level, so message sender will receive a `MESSAGE_UPDATE` event.
+Application can listen on this event at client side.
+Please refer to the "Edit a message" section of previous chapter for code samples.
+
+LeanCloud offers a set of keywords by default.
+Apps with Business Plans can customize filtering keywords. To do so, go to your app's Dashboard > Messaging > LeanMessage > Settings and upload your own keywords file to replace the default list.
+The uploaded file must be UTF-8 encoded with one keyword in each line.
+A keyword can have spaces in it. For example, "damn it" will be treated as a single keyword. 
+
+If you have more complicated requirements regarding message filtering, we recommend that you make use of [the `_messageReceived` hook of LeanEngine](/sdk/im/guide/systemconv/). You can defined your own logic for controlling messages.
+
+## Temporary Conversations
+
+Temporary conversations can be used for special scenarios with:
+
+- Short TTL
+- Less members (10 `clientId`s maximum)
+- No message history needed
+
+A highlight of temporary conversations is that they **expire very quickly**. This helps you reduce the space needed for storing conversations and lower the cost for maintaining your app. Temporary conversations are best used for customer service systems.
+
+### Creating Temporary Conversations
+
+`AVIMConversation` has its `createTemporaryConversation` method for creating temporary conversations:
+
+<MultiLang kind="im">
+
+```cs
+var temporaryConversation = await tom.CreateTemporaryConversationAsync();
+```
+
+```java
+tom.createTemporaryConversation(Arrays.asList(members), 3600, new AVIMConversationCreatedCallback(){
+    @Override
+    public void done(AVIMConversation conversation, AVIMException e) {
+        if (null == e) {
+        AVIMTextMessage msg = new AVIMTextMessage();
+        msg.setText("This is a temporary conversation. The conversation will expire in 1 hour.");
+        conversation.sendMessage(msg, new AVIMConversationCallback(){
+            @Override
+            public void done(AVIMException e) {
+            }
+        });
+        }
+    }
+});
+```
+
+```objc
+[tom createTemporaryConversationWithClientIds:@[@"Jerry", @"William"]
+                                                timeToLive:3600
+                                                callback:
+            ^(AVIMTemporaryConversation *tempConv, NSError *error) {
+
+                AVIMTextMessage *textMessage = [AVIMTextMessage messageWithText:@"This is a temporary conversation. The conversation will expire in 1 hour."
+                                                                    attributes:nil];
+                [tempConv sendMessage:textMessage callback:^(BOOL success, NSError *error) {
+
+                    if (success) {
+                        // Sent
+                    }
+                }];
+            }];
+```
+
+
+```js
+realtime.createIMClient('Tom').then(function(tom) {
+  return tom.createTemporaryConversation({
+    members: ['Jerry', 'William'],
+  });
+}).then(function(conversation) {
+  return conversation.send(new AV.TextMessage('This is a temporary conversation.'));
+}).catch(console.error);
+```
+
+```swift
+do {
+    try client.createTemporaryConversation(clientIDs: ["Jerry", "William"], timeToLive: 3600) { (result) in
+        switch result {
+        case .success(value: let tempConversation):
+            print(tempConversation)
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
+
+```dart
+TemporaryConversation temporaryConversation;
+try {
+  temporaryConversation = await jerry.createTemporaryConversation(
+    members: {'Jerry', 'William'},
+  );
+} catch (e) {
+  print(e);
+}
+
+try {
+  TextMessage message = TextMessage();
+  message.text = 'This is a temporary conversation.';
+  await temporaryConversation.send(message: message);
+} catch (e) {
+  print(e);
+}
+```
+
+</MultiLang>
+
+
+Temporary conversations have an **important** attribute that differentiates themselves from others: TTL. It is set to 1 day by default, but you can change it to any time within 30 days. If you want a conversation to survive for more than 30 days, make it a basic conversation instead. The code below creates a temporary conversation with a custom TTL:
+
+
+<MultiLang kind="im">
+
+```cs
+var temporaryConversation = await tom.CreateTemporaryConversationAsync();
+```
+
+```java
+AVIMClient client = AVIMClient.getInstance("Tom");
+client.open(new AVIMClientCallback() {
+    @Override
+    public void done(AVIMClient avimClient, AVIMException e) {
+    if (null == e) {
+        String[] members = {"Jerry", "William"};
+        avimClient.createTemporaryConversation(Arrays.asList(members), 3600, new AVIMConversationCreatedCallback(){
+        @Override
+        public void done(AVIMConversation conversation, AVIMException e) {
+            if (null == e) {
+            AVIMTextMessage msg = new AVIMTextMessage();
+            msg.setText("This is a temporary conversation expiring in 1 hour.");
+            conversation.sendMessage(msg, new AVIMConversationCallback(){
+                @Override
+                public void done(AVIMException e) {
+                }
+            });
+            }
+        }
+        });
+    }
+    }
+});
+```
+
+```objc
+AVIMClient *client = [[AVIMClient alloc] initWithClientId:@"Tom"];
+
+[client openWithCallback:^(BOOL success, NSError *error) {
+    
+    if (success) {
+        
+        [client createTemporaryConversationWithClientIds:@[@"Jerry", @"William"]
+                                                timeToLive:3600
+                                                callback:
+            ^(AVIMTemporaryConversation *tempConv, NSError *error) {
+                
+                AVIMTextMessage *textMessage = [AVIMTextMessage messageWithText:@"This is a temporary conversation expiring in 1 hour."
+                                                                    attributes:nil];
+                
+                [tempConv sendMessage:textMessage callback:^(BOOL success, NSError *error) {
+                    
+                    if (success) {
+                        // Sent
+                    }
+                }];
+            }];
+    }
+}];
+```
+
+
+```js
+realtime.createIMClient('Tom').then(function(tom) {
+  return tom.createTemporaryConversation({
+    members: ['Jerry', 'William'],
+    ttl: 3600,
+  });
+}).then(function(conversation) {
+  return conversation.send(new AV.TextMessage('This is a temporary conversation expiring in 1 hour.'));
+}).catch(console.error);
+```
+
+```swift
+do {
+    try client.createTemporaryConversation(clientIDs: ["Jerry", "William"], timeToLive: 3600) { (result) in
+        switch result {
+        case .success(value: let tempConversation):
+            print(tempConversation)
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
+
+
+```dart
+TemporaryConversation temporaryConversation;
+try {
+  temporaryConversation = await jerry.createTemporaryConversation(
+    members: {'Jerry', 'William'},
+    timeToLive: 3600,
+  );
+} catch (e) {
+  print(e);
+}
+
+try {
+  TextMessage message = TextMessage();
+  message.text = 'This is a temporary conversation expiring in 1 hour.';
+  await temporaryConversation.send(message: message);
+} catch (e) {
+  print(e);
+}
+```
+
+</MultiLang>
+
+Beside this, a temporary conversation shares the same functionality with a basic conversation.
+
+## Continue Reading
+
+[4. Hooks and System Conversations](/sdk/im/guide/systemconv/)

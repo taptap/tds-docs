@@ -48,11 +48,11 @@ const CONFIGS: {
   play: {
     leancloud: [
       { label: "JavaScript", value: "js" },
-      { label: "C#", value: "charp" },
+      { label: "C#", value: "csharp" },
     ],
     tds: [
       { label: "JavaScript", value: "js" },
-      { label: "C#", value: "charp" },
+      { label: "C#", value: "csharp" },
     ],
   },
   ue: {
@@ -77,7 +77,7 @@ const CONFIGS: {
       { label: "JavaScript", value: "js" },
     ],
     leancloud: [
-      { label: "C#", value: "charp" },
+      { label: "C#", value: "csharp" },
       { label: "Java", value: "java" },
       { label: "Objective-C", value: "objc" },
       { label: "JavaScript", value: "js" },
@@ -87,7 +87,7 @@ const CONFIGS: {
   },
   sms: {
     leancloud: [
-      { label: ".NET", value: "dotnet" },
+      { label: "C#", value: "csharp" },
       { label: "Java", value: "java" },
       { label: "Objective-C", value: "objc" },
       { label: "Swift", value: "swift" },

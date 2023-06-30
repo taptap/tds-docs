@@ -64,88 +64,83 @@ const config = {
         items: [
           {
             label: "文档首页",
-             to: "/",
+            to: "/",
             position: "right",
             activeBaseRegex: "^/(?!.+)",
           },
           {
-            label: 'API文档',
+            label: 'API 文档',
             position: 'right',
             items: [
               {
                 label: 'Android/Java SDK API',
                 href: 'https://leancloud.cn/api-docs/android/index.html',
-                activeBaseRegex: 'none',
               },
               {
                 label: 'Objective-C SDK API',
-                to: 'https://leancloud.cn/api-docs/iOS/index.html',
-                activeBaseRegex: 'none',
+                href: 'https://leancloud.cn/api-docs/iOS/index.html',
               },
               {
                 label: 'Swfit SDK API',
-                to: 'https://leancloud.cn/api-docs/swift/index.html',
-                activeBaseRegex: 'none',
+                href: 'https://leancloud.cn/api-docs/swift/index.html',
               },
               {
                 label: 'Flutter 数据存储 SDK API',
-                to: 'https://pub.dev/documentation/leancloud_storage/latest/leancloud_storage/leancloud_storage-library.html',
-                activeBaseRegex: 'none',
+                href: 'https://pub.dev/documentation/leancloud_storage/latest/leancloud_storage/leancloud_storage-library.html',
               },
               {
                 label: 'Flutter 即时通讯 SDK API',
-                to: 'https://pub.dev/documentation/leancloud_official_plugin/latest/leancloud_plugin/leancloud_plugin-library.html',
-                activeBaseRegex: 'none',
+                href: 'https://pub.dev/documentation/leancloud_official_plugin/latest/leancloud_plugin/leancloud_plugin-library.html',
               },
               {
                 label: 'JavaScript 数据存储 SDK API',
-                to: 'https://leancloud.github.io/javascript-sdk/docs/',
-                activeBaseRegex: 'none',
+                href: 'https://leancloud.github.io/javascript-sdk/docs/',
               },
               {
                 label: 'JavaScript 多人在线对战 SDK API',
-                to: 'https://leancloud.github.io/Play-SDK-JS/doc/global.html',
-                activeBaseRegex: 'none',
+                href: 'https://leancloud.github.io/Play-SDK-JS/doc/global.html',
               },
               {
                 label: 'Python SDK API',
-                to: 'https://leancloud.github.io/python-sdk/',
-                activeBaseRegex: 'none',
+                href: 'https://leancloud.github.io/python-sdk/',
               },
               {
                 label: 'PHP SDK API',
-                to: 'https://leancloud.github.io/php-sdk/',
-                activeBaseRegex: 'none',
+                href: 'https://leancloud.github.io/php-sdk/',
               },
               {
                 label: 'Go SDK API',
-                to: 'https://pkg.go.dev/github.com/leancloud/go-sdk/leancloud',
-                activeBaseRegex: 'none',
+                href: 'https://pkg.go.dev/github.com/leancloud/go-sdk/leancloud',
               },
               {
                 label: '.NET SDK API',
-                to: 'https://leancloud.github.io/csharp-sdk/html/',
-                activeBaseRegex: 'none',
+                href: 'https://leancloud.github.io/csharp-sdk/html/',
               }
             ],
           },
           {
-            label: '资源下载',
+            label: '资源',
             position: 'right',
             items: [
               {
                 label: 'SDK',
                 href: '/sdk/sdk-page/',
-                activeBaseRegex: 'none',
               },
               {
                 label: 'Demo',
                 to: '/demo',
-                activeBaseRegex: 'none',
-              },
+              }
             ],
+          },
+          {
+            label: "云课堂",
+            to: "/classroom",
+            position: "right",
+          },
+          {
+            type: "localeDropdown",
+            position: "right",
           }
-         
         ],
       },
       prism: {

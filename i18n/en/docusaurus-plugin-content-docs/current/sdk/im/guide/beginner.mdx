@@ -2734,6 +2734,89 @@ The Objective-C SDK handles new messages with `LCIMClientDelegate` and uses two 
 </>
 <>
 
+When a new message comes in, the JavaScript SDK would always trigger the callback set for the event `Event.MESSAGE` on `IMClient` regardless of the type of the message. You can address different types of messages in different ways within the callback function.
+
+```js
+// Load TypedMessagesPlugin when initializing Realtime
+var { Event, TextMessage } = require("leancloud-realtime");
+var { FileMessage, ImageMessage, AudioMessage, VideoMessage, LocationMessage } =
+  initPlugin(AV, IM);
+// Register handler for the MESSAGE event
+client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
+  // Your logic here
+  var file;
+  switch (message.type) {
+    case TextMessage.TYPE:
+      console.log(
+        "Text message received. Text: " +
+          message.getText() +
+          ", ID: " +
+          message.id
+      );
+      break;
+    case FileMessage.TYPE:
+      file = message.getFile(); // file is an AV.File instance
+      console.log(
+        "File message received. URL: " +
+          file.url() +
+          ", Size: " +
+          file.metaData("size")
+      );
+      break;
+    case ImageMessage.TYPE:
+      file = message.getFile();
+      console.log(
+        "Image message received. URL: " +
+          file.url() +
+          ", Width: " +
+          file.metaData("width")
+      );
+      break;
+    case AudioMessage.TYPE:
+      file = message.getFile();
+      console.log(
+        "Audio message received. URL: " +
+          file.url() +
+          ", Duration: " +
+          file.metaData("duration")
+      );
+      break;
+    case VideoMessage.TYPE:
+      file = message.getFile();
+      console.log(
+        "Video message received. URL: " +
+          file.url() +
+          ", Duration: " +
+          file.metaData("duration")
+      );
+      break;
+    case LocationMessage.TYPE:
+      var location = message.getLocation();
+      console.log(
+        "Location message received. Latitude: " +
+          location.latitude +
+          ", Longitude: " +
+          location.longitude
+      );
+      break;
+    case 1:
+      console.log("OperationMessage is the custom message type");
+    default:
+      // Your application may add new custom message types in the future. The SDK may add new built-in message types as well.
+      // Therefore, do not forget to handle them here. For example, you can notify the user to upgrade to a new version.
+      console.warn("收到未知类型消息");
+  }
+});
+
+// `MESSAGE` event will be triggered on conversation as well
+conversation.on(Event.MESSAGE, function messageEventHandler(message) {
+  // Your logic here
+});
+```
+
+</>
+<>
+
 The Swift SDK handles new messages with `IMClientDelegate`:
 
 ```swift
@@ -2829,89 +2912,6 @@ jerry.onMessage = ({
     }
   }
 };
-```
-
-</>
-<>
-
-When a new message comes in, the JavaScript SDK would always trigger the callback set for the event `Event.MESSAGE` on `IMClient` regardless of the type of the message. You can address different types of messages in different ways within the callback function.
-
-```js
-// Load TypedMessagesPlugin when initializing Realtime
-var { Event, TextMessage } = require("leancloud-realtime");
-var { FileMessage, ImageMessage, AudioMessage, VideoMessage, LocationMessage } =
-  initPlugin(AV, IM);
-// Register handler for the MESSAGE event
-client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
-  // Your logic here
-  var file;
-  switch (message.type) {
-    case TextMessage.TYPE:
-      console.log(
-        "Text message received. Text: " +
-          message.getText() +
-          ", ID: " +
-          message.id
-      );
-      break;
-    case FileMessage.TYPE:
-      file = message.getFile(); // file is an AV.File instance
-      console.log(
-        "File message received. URL: " +
-          file.url() +
-          ", Size: " +
-          file.metaData("size")
-      );
-      break;
-    case ImageMessage.TYPE:
-      file = message.getFile();
-      console.log(
-        "Image message received. URL: " +
-          file.url() +
-          ", Width: " +
-          file.metaData("width")
-      );
-      break;
-    case AudioMessage.TYPE:
-      file = message.getFile();
-      console.log(
-        "Audio message received. URL: " +
-          file.url() +
-          ", Duration: " +
-          file.metaData("duration")
-      );
-      break;
-    case VideoMessage.TYPE:
-      file = message.getFile();
-      console.log(
-        "Video message received. URL: " +
-          file.url() +
-          ", Duration: " +
-          file.metaData("duration")
-      );
-      break;
-    case LocationMessage.TYPE:
-      var location = message.getLocation();
-      console.log(
-        "Location message received. Latitude: " +
-          location.latitude +
-          ", Longitude: " +
-          location.longitude
-      );
-      break;
-    case 1:
-      console.log("OperationMessage is the custom message type");
-    default:
-      // Your application may add new custom message types in the future. The SDK may add new built-in message types as well.
-      // Therefore, do not forget to handle them here. For example, you can notify the user to upgrade to a new version.
-      console.warn("收到未知类型消息");
-  }
-});
-
-// `MESSAGE` event will be triggered on conversation as well
-conversation.on(Event.MESSAGE, function messageEventHandler(message) {
-  // Your logic here
-});
 ```
 
 </>
