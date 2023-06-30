@@ -33,10 +33,14 @@ TapPayments-Global 是一项可让你在游戏中销售虚拟商品的服务。
 
 ### 环境要求
 
+Gradle 版本高于 5.6.4，Android AGP 插件版本高于 3.6.0。
+
 <MultiLang>
 <>
 
-- 支持 Unity 2019.4 或更高版本。
+- 支持 Unity 2019.4 或更高版本
+
+关于 Unity 支持 Android 11 和高版本 Gradle 的相关文档，请参考 [Android 11 支持](https://developers.google.com/ar/develop/unity-arf/android-11-build)。
 
 </>
 <>
@@ -50,6 +54,9 @@ TapPayments-Global 是一项可让你在游戏中销售虚拟商品的服务。
 
 </>
 </MultiLang>
+
+<details>
+<summary>使用内建账户方式进行 SDK 初始化</summary>
 
 ### 接入前准备
 
@@ -79,7 +86,7 @@ SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选�
     "com.taptap.tds.payments.global":"https://github.com/taptap/TapPayments-Global-Unity.git#${sdkVersions.taptap.unity}",
     "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}",
     "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
-    "com.tapsdk.androiddependencyresolver": "https://github.com/luckisnow/android_dependency_resolver.git#1.0.6", // Gradle dependency resolver
+    "com.tapsdk.androiddependencyresolver": "https://github.com/luckisnow/android_dependency_resolver.git#1.1.0", // Gradle dependency resolver
 }`}
 </CodeBlock>
 
@@ -115,7 +122,7 @@ dependencies {
     implementation files('libs/TapLogin_${sdkVersions.taptap.android}.aar') // TapTap 登录
     implementation files('libs/TapPaymentsGlobal_${sdkVersions.taptap.android}.aar') // TapTap 支付模块
     implementation 'cn.leancloud:storage-android:${sdkVersions.leancloud.java}' // 数据存储
-    implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'\n
+    implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}' // 实时通信
     implementation 'com.squareup.okhttp3:okhttp:4.9.2', // 网络请求
     implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.8.10' // Kotlin
 }
@@ -152,7 +159,7 @@ TapBootstrap.Init(config);
 ```java
 TapConfig config = new TapConfig.Builder()
     .withClientId("clientId") // 必须，开发者中心对应 Client ID
-    .withClientToken("clientToken"); // 必须，开发者中心对应 Client Token
+    .withClientToken("clientToken") // 必须，开发者中心对应 Client Token
     .withAppContext(applictaionContext) // Android app context
     .withServerUrl(serverUrl) // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
     .withRegionType(TapRegionType.IO) // 必须，CN 表示中国大陆，IO 表示其他国家或地区
@@ -169,11 +176,134 @@ TapBootstrap.init(applictaionContext, config);
 </>
 </MultiLang>
 
-### 支付模块初始化
-当游戏通过 Unity 接入 TapTap SDK 后，可以通过以下方法初始化支付模块：
+</details>
+
+<details>
+<summary>使用单独 TapTap 授权方式进行 SDK 初始化</summary>
+
+### 接入前准备
+
+1. 参考 [准备工作](/sdk/start/get-ready/) 创建应用、开启应用配置；
+2. 参考 [快速开始](/sdk/start/quickstart/#配置签名证书) 配置应用包名与签名证书；
+
+使用 TapPayments-Global 前提是必须依赖以下库：
+
+* TapTap.Login
+* TapTap.Common
+
+### 获取 SDK
 
 <MultiLang>
 <>
+
+SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选其一。请根据项目需要选择。
+
+#### 方法一：使用 Unity Package Manager
+
+<CodeBlock className="json">
+  {`"dependencies":{
+    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}", 
+    "com.taptap.tds.payments.global":"https://github.com/taptap/TapPayments-Global-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.androiddependencyresolver": "https://github.com/luckisnow/android_dependency_resolver#1.1.0", // Gradle dependency resolver
+}`}
+</CodeBlock>
+
+#### 方法二：手动导入
+
+1. 在 [下载页](/tap-download) 找到 **TapSDK Unity** 和 **LeanCloud C# SDK** 下载地址，分别下载 `TapSDK-UnityPackage.zip` 和 `LeanCloud-SDK-Realtime-Unity.zip`。
+
+2. 在 Unity 项目中依次转到 **Assets > Import Packages > Custom Packages**，从解压后的 `TapSDK-UnityPackage.zip` 中，选择希望在游戏中使用的 TapSDK 包进行导入，其中：
+
+   - `TapTap_Common.unitypackage` TapSDK 基础库，必选。
+   - `TapTap_Login.unitypackage` TapTap 登录，必选。
+   - `TapTap_Payments_Global.unitypackage` TapTap 支付模块，必选。
+   - `TapTap_Android_Dependency_Resolver.unitypackage` TapTap Android 依赖导入工具，必选。
+
+</>
+<>
+
+1. [下载 TapSDK Android](/tap-download)，解压后选择需要用到的 SDK 包导入到项目 `project/app/libs` 目录下。
+
+2. 打开项目的 `project/app/build.gradle` 文件，添加 gradle 配置如下：
+
+```groovy
+dependencies {
+    ...
+    // 导入 libs 目录下所有 aar 的包：
+    implementation fileTree(dir: 'libs', include: ['*.aar'])
+    // 如果需要单独导入 libs 目录下的指定包，请按照如下方式：
+    implementation files('libs/TapCommon_${sdkVersions.taptap.android}.aar') // TapTap 基础库
+    implementation files('libs/TapLogin_${sdkVersions.taptap.android}.aar') // TapTap 登录
+    implementation files('libs/TapPaymentsGlobal_${sdkVersions.taptap.android}.aar') // TapTap 支付模块
+    implementation 'com.squareup.okhttp3:okhttp:4.9.2' // 网络请求
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.8.10' // Kotlin
+}
+```
+
+</>
+<>
+
+- 暂未支持
+
+</>
+</MultiLang>
+
+### TapSDK 初始化
+
+如果你已经参考快速开始完成了初始化，这里只需要引入支付模块即可。
+
+<MultiLang>
+<>
+
+```cs
+var config = new TapConfig.Builder ()
+         .RegionType ( RegionType.IO ) // 必须为 IO, 表示其他国家或地区
+         .ClientID ( "clientId" ) // 必须，开发者中心对应 Client ID
+         .ClientToken("clientToken") // 必须，开发者中心对应 Client Token
+         .ConfigBuilder ();
+TapCommon.Init ( config );
+TapLogin.Init ( "client", false, true ); // 初始化登录模块
+``` 
+
+</>
+<>
+
+```java
+TapConfig config = new TapConfig.Builder()
+    .withClientId("clientId") // 必须，开发者中心对应 Client ID
+    .withClientToken("clientToken") // 必须，开发者中心对应 Client Token
+    .withAppContext(applictaionContext) // Application Context
+    .withRegionType(TapRegionType.IO) // 必须为 IO, 表示其他国家或地区
+    .build();
+
+TapCommon.init(builder.build());
+LoginSdkConfig loginConfig = new LoginSdkConfig();
+loginConfig.regionType = RegionType.IO;
+TapLoginHelper.init(this.getApplicationContext(), config.clientId, loginConfig);
+```
+
+</>
+<>
+
+- 暂未支持
+
+</>
+</MultiLang>
+
+</details>
+
+如果你的游戏自己实现了账户系统，也不打算使用好友、成就等 TapSDK 提供的其他功能，仅仅需要接入「单独 TapTap 授权方式进行 SDK 初始化」功能，那么你可以使用第一种「单独 TapTap 授权方式进行 SDK 初始化」方式接入 TapTap 登录。
+:::caution
+使用内建账户和仅接入Tap登录的方式二选一即可，不可同时使用。
+:::
+
+### 支付模块初始化
+
+<MultiLang>
+<>
+
+当游戏通过 Unity 接入 TapTap SDK 后，可以通过以下方法初始化支付模块：
 
 通过 Unity 的 [LauncherManifest.xml](https://docs.unity3d.com/Manual/android-launcher-manifest.html) 将 Application tag 的 android:name 设置为 **com.taptap.payment.api.UnityApplication** 来进行初始化。
 ```xml
@@ -215,7 +345,7 @@ string language = "zh_CN";
 
 string[] itemIds = new [] { "product01", "product02", "product03" };
 
-TapPayment.QueryItems (language, itemIds, new TapPayment.Callback < Item [] > ()
+TapPayment.QueryItems (language, itemIds, new ITapPayment.Callback < Item [] > ()
 {
     OnFinish = items =>
     {
@@ -239,7 +369,7 @@ TapPayment.QueryItems (language, itemIds, new TapPayment.Callback < Item [] > ()
 } );
 
 // 或者使用无语言参数版本的函数，将由 SDK 根据用户的国家或地区自动选择对应的语言
-TapPayment.QueryItems (itemIds, new TapPayment.Callback < Item [] > ()
+TapPayment.QueryItems (itemIds, new ITapPayment.Callback < Item [] > ()
 {
     ...
 } );
@@ -253,7 +383,7 @@ string language = "zh_CN";
 
 string[] itemIds = { "product01", "product02", "product03" };
 
-TapPayment.queryItems(language, itemIds, new TapPayment.Callback<Item[]>() {
+TapPayment.queryItems(language, itemIds, new ITapPayment.Callback<Item[]>() {
 
     @Override
     public void onError(TapPayment.Error error) {
@@ -269,7 +399,7 @@ TapPayment.queryItems(language, itemIds, new TapPayment.Callback<Item[]>() {
 });
 
 // 或者使用无语言参数版本的函数，将由 SDK 根据用户的国家或地区自动选择对应的语言
-TapPayment.queryItems(itemIds, new TapPayment.Callback<Item[]>() {
+TapPayment.queryItems(itemIds, new ITapPayment.Callback<Item[]>() {
     ...
 });
 ```
@@ -295,13 +425,16 @@ TapPayment.queryItems(itemIds, new TapPayment.Callback<Item[]>() {
 <>
 
 ```cs
+using TapTap.Payments.Global;
+using TapTap.Payments.Global.bean;
+
 string language = "zh_CN";
 
 string itemId = "product01";
 
 int quantity = 1;
 
-string extra = "自定义扩展信息";
+string extraInfo = "自定义扩展信息";
 
 TapPayment.RequestPayFlow ( language, itemId, quantity, extra, new TapPayment.PayCallback ()
 {
@@ -339,9 +472,9 @@ String itemId = "product01";
 
 int quantity = 1;
 
-String extra = "自定义扩展信息";
+String extraInfo = "自定义扩展信息";
 
-TapPayment.requestPayFlow(language, itemId, quantity, extra, new TapPayment.PayCallback() {
+TapPayment.requestPayFlow(activity, language, itemId, quantity, extra, new TapPayment.PayCallback() {
     @Override
     public void onCancel(String extra)  {
         Log.i(TAG, "支付已取消\n" + extra);
@@ -359,7 +492,7 @@ TapPayment.requestPayFlow(language, itemId, quantity, extra, new TapPayment.PayC
 });
 
 // 或者使用无语言参数版本的函数，将由 SDK 根据用户的国家或地区自动选择对应的语言
-TapPayment.requestPayFlow(itemId, quantity, extra, new TapPayment.PayCallback() {
+TapPayment.requestPayFlow(activity, itemId, quantity, extra, new TapPayment.PayCallback() {
     ...
 });
 ```
@@ -390,7 +523,7 @@ TapPayment.requestPayFlow(itemId, quantity, extra, new TapPayment.PayCallback() 
 ```cs
 String orderId = "订单ID";
 
-TapPayment.QueryOrder ( orderId, new TapPayment.Callback < Order > ()
+TapPayment.QueryOrder ( orderId, new ITapPayment.Callback < Order > ()
 {
     OnFinish = ( order ) =>
     {
@@ -406,7 +539,7 @@ TapPayment.QueryOrder ( orderId, new TapPayment.Callback < Order > ()
 // 或者直接传递一个已存在的订单对象
 Order order = new Order();
 order.id = "订单ID";
-TapPayment.QueryOrder ( orderId, new TapPayment.Callback < Order > ()
+TapPayment.QueryOrder ( orderId, new ITapPayment.Callback < Order > ()
 {
     ...
 } );
@@ -418,7 +551,7 @@ TapPayment.QueryOrder ( orderId, new TapPayment.Callback < Order > ()
 ```java
 String orderId = "订单ID";
 
-TapPayment.queryOrder(orderId, new TapPayment.Callback < Order >() {
+TapPayment.queryOrder(orderId, new ITapPayment.Callback < Order >() {
     @Override
     public void onError(TapPayment.Error error) {
         Log.e(TAG, "查询失败\n" + error);
@@ -434,7 +567,7 @@ TapPayment.queryOrder(orderId, new TapPayment.Callback < Order >() {
 Order order = new Order();
 order.id = "订单ID";
 
-TapPayment.queryOrder(order, new TapPayment.Callback < Order >() {
+TapPayment.queryOrder(order, new ITapPayment.Callback < Order >() {
     ....
 });
 ```
@@ -472,7 +605,7 @@ TapPayment.queryOrder(order, new TapPayment.Callback < Order >() {
 String orderId = "订单ID";
 String orderToken = "订单Token";
 
-TapPayment.ConsumeOrder ( orderId, orderToken, new TapPayment.Callback < Order > ()
+TapPayment.ConsumeOrder ( orderId, orderToken, new ITapPayment.Callback < Order > ()
 {
     OnFinish = ( order ) =>
     {
@@ -487,7 +620,7 @@ TapPayment.ConsumeOrder ( orderId, orderToken, new TapPayment.Callback < Order >
 
 // 或者直接传递一个已存在的订单对象
 Order order = 已经存在的订单对象
-TapPayment.ConsumeOrder ( order, new TapPayment.Callback < Order > ()
+TapPayment.ConsumeOrder ( order, new ITapPayment.Callback < Order > ()
 {
     ...
 } );
@@ -499,7 +632,7 @@ TapPayment.ConsumeOrder ( order, new TapPayment.Callback < Order > ()
 ```java
 String orderId = "订单ID";
 
-TapPayment.consumeOrder(orderId, new TapPayment.Callback < Order >() {
+TapPayment.consumeOrder(orderId, new ITapPayment.Callback < Order >() {
     @Override
     public void onError(TapPayment.Error error) {
         Log.e(TAG, "查询失败\n" + error);
@@ -513,7 +646,7 @@ TapPayment.consumeOrder(orderId, new TapPayment.Callback < Order >() {
 
 // 或者直接传递一个已存在的订单对象
 Order order = 已经存在的订单对象
-TapPayment.consumeOrder(order, new TapPayment.Callback < Order >() {
+TapPayment.consumeOrder(order, new ITapPayment.Callback < Order >() {
     ....
 });
 ```
@@ -542,6 +675,38 @@ TapPayment.consumeOrder(order, new TapPayment.Callback < Order >() {
 :::tip 传入参数说明
 订单信息中包含订单 ID 和订单的 Token，可以直接传入，也可以只传入订单 ID 和 订单 Token。验证订单成功时，回调的 <code>([Order](#订单-order) order)</code> 订单信息中的状态 <code>[[State](#订单状态-orderstate) state]</code> 会更新为 `COMPLETED`。
 :::
+
+### 订单列表
+
+用于打开用户在当前游戏中的订单列表。
+
+<MultiLang>
+<>
+
+```cs
+string lang = "zh_CN";
+TapPayment.OpenUserOrderList ( lang );
+```
+
+</>
+<>
+
+```java
+string lang = "zh_CN";
+TapPayment.openUserOrderList ( activity, lang );
+
+// 或者使用无语言参数版本的函数，将由 SDK 根据用户的国家或地区自动选择对应的语言
+TapPayment.openUserOrderList ( activity );
+```
+
+</>
+<>
+
+- 暂未支持
+
+</>
+</MultiLang>
+
 
 ### 相关数据结构
 
