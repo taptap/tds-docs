@@ -42,17 +42,17 @@ cp -r .ci/leancloud/zh-Hans/sdk/authentication tmp/zh-Hans # 内建账户
 cp -r .ci/leancloud/zh-Hans/sdk/storage tmp/zh-Hans # 数据存储（LeanCloud 独有的语言）
 cp -r .ci/leancloud/zh-Hans/sdk/sms tmp/zh-Hans # 短信
 cp -r .ci/leancloud/zh-Hans/sdk/push tmp/zh-Hans # Flutter 推送
-cp -r .ci/leancloud/zh-Hans/sdk/im tmp/zh-Hans # 即时通信
+cp -r .ci/leancloud/zh-Hans/sdk/im tmp/zh-Hans # 即时通讯
 cp -r .ci/leancloud/zh-Hans/sdk/multiplayer tmp/zh-Hans # 对战
 cp -r .ci/leancloud/zh-Hans/sdk/leaderboard tmp/zh-Hans # 排行榜
-cp -r .ci/leancloud/zh-Hans/sdk/other tmp/zh-Hans #其他的文档
+cp -r .ci/leancloud/zh-Hans/sdk/other tmp/zh-Hans # 其他
 
 
 # 英文部分
 cp -r .ci/leancloud/en/sdk/authentication tmp/en # 内建账户
 cp -r .ci/leancloud/en/sdk/im tmp/en # 即时通讯
 cp -r .ci/leancloud/en/sdk/push tmp/en # 推送
-cp -r .ci/leancloud/en/sdk/sms tmp/en # 断行
+cp -r .ci/leancloud/en/sdk/sms tmp/en # 短信
 cp -r .ci/leancloud/en/sdk/storage tmp/en # 数据存储（LeanCloud 独有的语言）
 
 
@@ -71,9 +71,9 @@ cp .ci/leancloud/override.scss src/styles/override.scss
 cp .ci/leancloud/docusaurus.config.js docusaurus.config.js
 cp .ci/leancloud/sidebars.js sidebars.js
 
-#加入lc隐藏文档
-cp -r .ci/leancloud/zh-Hans/sdk/deeplink.mdx docs/
-cp -r .ci/leancloud/zh-Hans/sdk/classroom.mdx docs/
+# 加入 LeanCloud 隐藏文档
+cp .ci/leancloud/zh-Hans/sdk/deeplink.mdx docs
+cp .ci/leancloud/zh-Hans/sdk/classroom.mdx docs
 
 # 构建
 yarn build --out-dir build-leancloud

@@ -1,29 +1,23 @@
-import { translate } from "@docusaurus/Translate";
-import React from "react";
-import { BRAND, REGION ,HAS_ENGINE_CDN_DOMAIN } from "../constants/env";
-
-
-/* 内部地址 */
-type ActionCellLinkInternal = {
+type LinkInternal = {
   label: string;
   to: string;
 };
 
-/* 外跳地址 */
-type ActionCellLinkExternal = {
+type LinkExternal = {
   label: string;
   href: string;
 };
 
+type Link = LinkInternal | LinkExternal;
+
 type Entry = {
   title: string;
   description?: string;
-  links: (ActionCellLinkInternal | ActionCellLinkExternal)[];
+  tag?: string;
+  links: Link[];
 };
 
-export const getEntries = (brand: string, region: string, pathname: String ): Entry[] => {
-
-
+export const getEntries = (brand: string, region: string): Entry[] => {
   const ENTRIES_TDS: Entry[] = [
     {
       title: "游戏商店",
@@ -47,17 +41,17 @@ export const getEntries = (brand: string, region: string, pathname: String ): En
     },
     ...(region === "cn"
       ? [
-          {
-            title: "社区运营指南",
-            description: "TapTap 为开发者提供的社区新手攻略",
-            links: [
-              {
-                label: "查看更多",
-                to: "/community",
-              },
-            ],
-          },
-        ]
+        {
+          title: "社区运营指南",
+          description: "TapTap 为开发者提供的社区新手攻略",
+          links: [
+            {
+              label: "查看更多",
+              to: "/community",
+            },
+          ],
+        },
+      ]
       : []),
     {
       title: "资源下载",
@@ -75,23 +69,23 @@ export const getEntries = (brand: string, region: string, pathname: String ): En
     },
     ...(region === "global"
       ? [
-          {
-            title: "开发者运营手册",
-            links: [
-              {
-                label: "查看更多",
-                to: "/operations/manual",
-              },
-            ],
-          },
-        ]
+        {
+          title: "开发者运营手册",
+          links: [
+            {
+              label: "查看更多",
+              to: "/operations/manual",
+            },
+          ],
+        },
+      ]
       : []),
   ];
 
   const ENTRIES_LEANCLOUD: Entry[] = [
     {
-      title: "入门指南",
-      description: "LeanCloud 的入门指南",
+      title: "控制台和账户",
+      description: "LeanCloud 控制台使用指南",
       links: [
         {
           label: "查看更多",
@@ -178,7 +172,6 @@ export const getEntries = (brand: string, region: string, pathname: String ): En
     },
     {
       title: "其他",
-      description: "",
       links: [
         {
           label: "查看更多",
@@ -187,94 +180,7 @@ export const getEntries = (brand: string, region: string, pathname: String ): En
       ],
     },
   ];
-  const ENTRIES_LEANCLOUDEN: Entry[] = [
 
-
-    {
-      title: "内建账户",
-      description: " Support users to register and log in via email or mobile, and provide practical functions such as password reset and third-party login.",
-      links: [
-        {
-          label: "查看更多",
-          to: "/sdk/authentication/guide",
-        },
-      ],
-    },
-    {
-      title: "数据存储",
-      description: "Efficient access to massive JSON objects, binary files and other data, providing a complete interface for adding, deleting, modifying, and querying operations",
-      links: [
-        {
-          label: "查看更多",
-          to: "/sdk/storage/overview",
-        },
-      ],
-    },
-    {
-      title: "云引擎",
-      links: [
-        {
-          label: "查看更多",
-          to: "/sdk/engine/overview",
-        },
-      ],
-    },
-    {
-      title: "推送通知",
-      links: [
-        {
-          label: "查看更多",
-          to: "/sdk/push/features",
-        },
-      ],
-    },
-    {
-      title: "即时通讯",
-      links: [
-        {
-          label: "查看更多",
-          to: "/sdk/im/features",
-        },
-      ],
-    },
-    {
-      title: "短信",
-      description: "Support domestic and international SMS, including verification, notification, and marketing purposes, to facilitate integration with the LeanCloud account system",
-      links: [
-        {
-          label: "查看更多",
-          to: "/sdk/sms/guide",
-        },
-      ],
-    }
-
-  ];
-
-  var entries = brand === "leancloud" ?
-  pathname=="/en/"? ENTRIES_LEANCLOUDEN:
-  ENTRIES_LEANCLOUD : ENTRIES_TDS;
-
-
-
-  return entries.map((entry) => ({
-    title: translate({
-      message: entry.title,
-      id: `tds-home-${entry.title}`,
-    }),
-    ...(entry.description
-      ? {
-          description: translate({
-            message: entry.description,
-            id: `tds-home-${entry.description}`,
-          }),
-        }
-      : {}),
-    links: entry.links.map((link) => ({
-      ...link,
-      label: translate({
-        message: link.label,
-        id: `tds-home-link-${link.label}`,
-      }),
-    })),
-  }));
+  const entries = brand === "leancloud" ? ENTRIES_LEANCLOUD : ENTRIES_TDS;
+  return entries;
 };
