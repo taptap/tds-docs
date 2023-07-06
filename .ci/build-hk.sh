@@ -45,6 +45,7 @@ cp -r .ci/hk/zh-Hans/store docs/store
 # 中文版「游戏服务」
 cp .ci/hk/zh-Hans/sdk/embedded-moments/features.mdx docs/sdk/embedded-moments/features.mdx # 内嵌动态/功能介绍
 cp .ci/hk/zh-Hans/sdk/push/guide/android-mixpush.mdx docs/sdk/push/guide/android-mixpush.mdx # 推送通知/开发指南/FCM 推送
+cp -r .ci/hk/zh-Hans/sdk/TapPayments docs/sdk # TapTap Payments
 
 # 英文版「文档首页」
 cp -r .ci/hk/en/operations i18n/en/docusaurus-plugin-content-docs/current/operations # 开发者运营手册
@@ -55,6 +56,7 @@ cp -r .ci/hk/en/store i18n/en/docusaurus-plugin-content-docs/current/store
 # 英文版「游戏服务」
 cp .ci/hk/en/sdk/embedded-moments/features.mdx i18n/en/docusaurus-plugin-content-docs/current/sdk/embedded-moments/features.mdx # 内嵌动态/功能介绍
 cp .ci/hk/en/sdk/push/guide/android-mixpush.mdx i18n/en/docusaurus-plugin-content-docs/current/sdk/push/guide/android-mixpush.mdx # 推送通知/开发指南/FCM 推送
+cp -r .ci/hk/en/sdk/TapPayments i18n/en/docusaurus-plugin-content-docs/current/sdk # TapTap Payments
 
 
 # 替换配置文件
