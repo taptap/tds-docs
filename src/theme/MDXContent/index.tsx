@@ -664,7 +664,6 @@ function Feedback() {
   }, []);
 
   const ENABLED_DOMAINS = [
-    "localhost:3888",
     "developer.taptap.cn",
     "developer.taptap.io",
     "developer.xdrnd.cn",
