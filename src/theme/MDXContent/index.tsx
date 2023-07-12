@@ -659,9 +659,11 @@ function Feedback() {
   };
 
   useEffect(() => {
-    updateIsLoggedIn();
-    updateFeedbackStatistic();
-  }, []);
+    if (enabled) {
+      updateIsLoggedIn();
+      updateFeedbackStatistic();
+    }
+  }, [enabled]);
 
   const ENABLED_DOMAINS = [
     "developer.taptap.cn",
