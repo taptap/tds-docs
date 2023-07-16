@@ -658,13 +658,7 @@ function Feedback() {
     }, 5000);
   };
 
-  useEffect(() => {
-    updateIsLoggedIn();
-    updateFeedbackStatistic();
-  }, []);
-
   const ENABLED_DOMAINS = [
-    "localhost:3888",
     "developer.taptap.cn",
     "developer.taptap.io",
     "developer.xdrnd.cn",
@@ -673,6 +667,13 @@ function Feedback() {
   const ENABLED_LOCALES = ["zh-Hans"];
 
   const [enabled, setEnabled] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (enabled) {
+      updateIsLoggedIn();
+      updateFeedbackStatistic();
+    }
+  }, [enabled]);
 
   useEffect(() => {
     if (
