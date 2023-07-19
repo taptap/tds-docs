@@ -26,7 +26,7 @@ TapPayment 是一项可让您在游戏中销售虚拟商品的服务。
 | 消耗型商品 | **消耗型商品**是指当用户消耗该商品时，您的游戏会分配相关联的游戏内容，而用户随后可以再次重复购的商品。例如游戏货币、游戏道具等。|
 | 非消耗型商品 | **非消耗型商品**是指购买一次就能永久使用的商品。例如付费升级和关卡包等。|
 
-借助 TapTap 开发者中心，可以方便地创建游戏内商品，并且在游戏中便捷地接入 TapPayment 的服务，来进行游戏商品的销售。
+借助 TapTap 开发者中心，可以方便地创建游戏内商品，并且在游戏中便捷地接入 TapPayment 的服务，来进行游戏商品的销售。**TapPayment 支付渠道暂时只支持微信支付 & 支付宝支付**
 
 ## SDK 安装
 
@@ -40,7 +40,32 @@ TapPayment 是一项可让您在游戏中销售虚拟商品的服务。
 </>
 <>
 
-- Android 示例代码待补充
+- **最低 Android 版本为 5.0**，SDK 编译环境为 Android Studio。
+
+1. [下载 TapSDK Android](/tap-download)，解压后选择 TapBootstrap、TapCommon、TapPayment 包导入到项目 `project/app/libs` 目录下。
+
+2. 打开项目的 `project/app/build.gradle` 文件，添加 gradle 配置如下：
+
+<CodeBlock className="java"> {`
+dependencies {
+    ...
+    // 导入 libs 目录下所有 aar 的包：
+    implementation fileTree(dir: 'libs', include: ['*.aar'])
+    // 如果需要单独导入 libs 目录下的指定包，请按照如下方式：
+    implementation files('libs/TapBootstrap_${sdkVersions.taptap.android}.aar') // TapTap 启动器
+    implementation files('libs/TapCommon_${sdkVersions.taptap.android}.aar') // TapTap 基础库
+    implementation files('libs/TapPayment_${sdkVersions.taptap.android}.aar') // TapTap 登录
+    // 如果要支持 app 支付，添加下面的微信和支付宝的 SDK
+    implementation 'com.alipay.sdk:alipaysdk-android:15.8.11@aar'
+    implementation 'com.tencent.mm.opensdk:wechat-sdk-android:6.8.0'  
+    ...
+    // 数据存储
+    implementation 'cn.leancloud:storage-android:${sdkVersions.leancloud.java}'
+    // 即时通讯
+    implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
+}
+`}</CodeBlock>
 
 </>
 <>
@@ -92,7 +117,26 @@ TapBootstrap.Init(config);
 </>
 <>
 
-- Android 示例代码待补充
+```java
+TapPaymentConfig tapPaymentConfig = new TapPaymentConfig.Builder()
+    // 地区暂时只支持「中国地区」
+    .withRegionId(Constants.Region.REGION_CN) 
+    // 语言暂时只支持中文
+    .withLanguage(Constants.Language.LANGUAGE_CN) 
+    // 微信商户申请H5时提交的授权域名，详见 https://pay.weixin.qq.com/wiki/doc/api/H5.php?chapter=15_4 里 Referer 设置相关部分 
+    .withWXAuthorizedDomainName("https://${domain}") 
+    .build();
+
+TapConfig tapConfig = new TapConfig.Builder()
+    .withAppContext("${context}") // 初始化的 Activity
+    .withClientId("${ClientId}" ) // DC 后台配置的 Client ID
+    .withClientToken("${ClientToken}") // DC 后台配置的 Client Token
+    .withServerUrl("${ServerUrl}") // DC 后台绑定的域名
+    .withRegionType(TapRegionType.CN) // TapPayment 只支持国内部分
+    .withTapPaymentConfig(tapPaymentConfig)
+    .build();
+TapBootstrap.init(context, tapConfig);
+```
 
 </>
 <>
@@ -179,8 +223,28 @@ TapPayment.QueryProduct(skuId, (skuDetail, error) =>
 </>
 <>
 
-- Android 示例代码待补充
+```java
+/**
+ * 查询单个商品
+ * @param skuId 在DC后台定义的商品id
+ * @param callback 获取商品返回结果
+ */
+TapPayment.queryProduct(String skuId, new Callback<SkuDetails>() {
+    @Override
+    public void onSuccess(SkuDetails result) {
+        if (result == null) {
+            // not found any product with given skuId
+        } else {
+            // do something
+        }
+    }
 
+    @Override
+    public void onError(TapPaymentException tapPaymentException) {
+        // do something
+    }
+});
+```
 </>
 <>
 
@@ -251,7 +315,28 @@ TapPayment.QueryProducts(skuIds, (list, error) =>
 </>
 <>
 
-- Android 示例代码待补充
+```java
+/**
+ * 查询单个商品
+ * @param skuIds 商品id列表 eg "test01,test02"
+ * @param callback 获取商品返回结果
+ */
+TapPayment.queryProducts(Arrays.asList("${id1}", "${id2}"), new ListCallback<SkuDetails>() {
+    @Override
+    public void onSuccess(List<SkuDetails> resultList) {
+        if (resultList.size() == 0) {
+            // not found any product with given skuId
+        } else {
+            // do something
+        }
+    }
+
+    @Override
+    public void onError(TapPaymentException tapPaymentException) {
+        // do something
+    }
+});
+```
 
 </>
 <>
@@ -272,9 +357,9 @@ TapPayment.QueryProducts(skuIds, (list, error) =>
 /**
  * 启动购买流程
  * @param skuDetails 购买的商品信息
- * @param roleId 游戏内角色id
- * @param serverId 游戏的服务器id
- * @param extra 游戏的额外信息 json格式的字符串 eg."{\"test\":\"test\"}"
+ * @param roleId 游戏内角色 id
+ * @param serverId 游戏的服务器 id
+ * @param extra 游戏的额外信息 json 格式的字符串 eg."{\"test\":\"test\"}"
  * @param action
 */
 void LaunchBillingFlow(SkuDetails skuDetails, string roleId, String serverId, String extra, Action<int, TapError> action);
@@ -282,7 +367,18 @@ void LaunchBillingFlow(SkuDetails skuDetails, string roleId, String serverId, St
 </>
 <>
 
-- Android 示例代码待补充
+```java
+/**
+ * 启动购买流程
+ * @param activity 唤起购买流程的 Activity
+ * @param skuDetails 购买的商品信息
+ * @param roleId 游戏内角色 id
+ * @param serverId 游戏的服务器 id
+ * @param extra 游戏的额外信息 json 格式的字符串 eg."{\"test\":\"test\"}"
+ * @param purchaseCallback
+*/
+void launchBillingFlow(final Activity activity, SkuDetails skuDetails, String roleId, String serverId, String extra, PurchaseCallback purchaseCallback)
+```
 
 </>
 <>
@@ -291,6 +387,8 @@ void LaunchBillingFlow(SkuDetails skuDetails, string roleId, String serverId, St
 
 </>
 </MultiLang>
+
+**其中 roleId、serverId、extra 均是透传字段，如果游戏有自己的订单id的话建议通过extra字段来传递，当TapPayment Server收到成功支付消息后会将这些透传字段回传到游戏Server**
 
 示例代码如下：
 <MultiLang>
@@ -323,7 +421,20 @@ TapPayment.LaunchBillingFlow(skuDetailsList[buyPosition], "roleId001", "1e59c66f
 </>
 <>
 
-- Android 示例代码待补充
+```java
+TapPayment.launchBillingFlow(activity
+    , skuDetails
+    , roleId
+    , serverId
+    , extra
+    , new PurchaseCallback() {
+        @Override
+        public void onPurchaseUpdated(int responseCode, String message) {
+            // do some thing            
+        }
+    }
+);
+```
 
 </>
 <>
