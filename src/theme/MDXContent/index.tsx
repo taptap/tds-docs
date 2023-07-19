@@ -64,7 +64,7 @@ const getRegion = (): string => {
 };
 
 const getIsLoggedIn = (): boolean => {
-  const userId: string | undefined = getValueFromCookie("user_id");
+  const userId: string | undefined = getValueFromCookie("user_id") || getValueFromCookie("ACCOUNTS_USER_ID");
   return userId !== undefined;
 };
 
