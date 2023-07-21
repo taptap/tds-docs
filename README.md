@@ -22,15 +22,15 @@ yarn start --locale en
 * 切换到本地 master 分支，git fetch 拉取远端最新修改到本地，如果远端 master 分支有修改，则将本地 master 分支 rebase 到最新的 master 分支上。
 * 在 master 上新建分支，在新分支修改文档。
 * 修改文档。
-    * 参考下文介绍的目录结构，在 docs（中文文档）目录下修改文档内容。
-    * 注意要同时在 i18n/en/docusaurus-plugin-content-docs/current（英文文档）目录下同步修改英文文档。
-    * 插入配图、图表和 PPT 等，可参考下文详细介绍。
+  * 参考下文介绍的目录结构，在 docs（中文文档）目录下修改文档内容。
+  * 注意要同时在 i18n/en/docusaurus-plugin-content-docs/current（英文文档）目录下同步修改英文文档。
+  * 插入配图、图表和 PPT 等，可参考下文详细介绍。
 * 预览文档。运行 `yarn` 命令安装所需要依赖，运行 `yarn start` 命令可以本地预览。
 * 预览没问题后，提交修改并发起 Pull Request，并指定 Reviewer。
-    * Reviewer 同意修改后，才可以合并 Pull Request。如果不知道该设置谁作为 Reviewer，可以指给技术支持同事（fuchenshi、SXiaoXu、WatchMan-Wang、yuwenjian）。
-    * Pull Request 合并后，会自动发布上线。文档每隔半小时自动检测是否有更新，如果有更新会自动部署。
-    * Pull Request 合并后，可删除当前分支。
-    * 可参考 [Git Commit 日志风格指南](https://open.leancloud.cn/git-commit-message/)
+  * Reviewer 同意修改后，才可以合并 Pull Request。如果不知道该设置谁作为 Reviewer，可以指给技术支持同事（fuchenshi、SXiaoXu、WatchMan-Wang、yuwenjian）。
+  * Pull Request 合并后，会自动发布上线。文档每隔半小时自动检测是否有更新，如果有更新会自动部署。
+  * Pull Request 合并后，可删除当前分支。
+  * 可参考 [Git Commit 日志风格指南](https://open.leancloud.cn/git-commit-message/)
 * 文档规范可参考 [中文文案风格指南](https://blog.taptap.dev/pages/chinese-copywriting-guide)。
 
 ## 目录结构
@@ -100,7 +100,7 @@ slug: [URL 路径，一般情况下无需指定，回退到文件路径]
 
 如需添加「一级导航」，请提需求到*技术支持*。如需添加次级导航，则需要调整目录结构，项目将自动以目录结构生成对应侧边栏（二级导航/.../N 级导航）。
 
-如果不想文档出现在侧边栏，则可以放在「一级导航」同级，其它文档可以通过[链接到其它文档](#链接到其它文档)进行跳转，但此时目标页将不会显示侧边栏。这些文档需要在 YAML header 指定 `slug`，以免未来移动位置后 URL 改变；还需要指定 `noindex`，这样文档不会被文档搜索系统收录。
+如果不想文档出现在侧边栏，则可以放在「一级导航」同级，其他文档可以通过[链接到其他文档](#链接到其他文档)进行跳转，但此时目标页将不会显示侧边栏。这些文档需要在 YAML header 指定 `slug`，以免未来移动位置后 URL 改变；还需要指定 `noindex`，这样文档不会被文档搜索系统收录。
 
 例子：
 
@@ -119,7 +119,7 @@ slug: /sdk/tap-support/guide/
 
 可以在 `src/docComponents/doc.tsx` 中编写 React 组件并在 Markdown 文件（下称 md 文件）中引入。目前项目中已预设了部分组件可直接使用。
 
-如需要其它预设，请提需求到*技术支持*。
+如需要其他预设，请提需求到*技术支持*。
 
 ```md
 import { Gray, Blue, Red, Black, FaqLink } from '/src/docComponents/doc';
@@ -158,7 +158,7 @@ public static AccessToken getCurrentToken;
 - 语言的顺序为 C#、Java、Objective-C，不能乱。
 - 有些地方多语言代码示例使用 `Tabs` 组件，它的效果和 `MultiLang` 是等效的（实际上 `MultiLang` 最终会生成 `Tabs` 组件）。因为 `MultiLang` 更简洁，所以新编写的多语言代码示例推荐使用 `MultiLang`。
 
-实际上，`MultiLang` 里不仅可以放入代码片段，还可以放入其它各种组件，只需保证：1) 内容顺序为 C#、Java、Objective-C，2) 不同编程语言内容在组件层级上是同级的。下面是一个例子：
+实际上，`MultiLang` 里不仅可以放入代码片段，还可以放入其他各种组件，只需保证：1) 内容顺序为 C#、Java、Objective-C，2) 不同编程语言内容在组件层级上是同级的。下面是一个例子：
 
 ````md
 <MultiLang>
@@ -311,13 +311,13 @@ import CodeBlock from "@theme/CodeBlock";
 
 #### 链接
 
-##### 链接到其它文档
+##### 链接到其他文档
 
 链接时使用基于对应语言文档根目录的绝对路径，**不要使用相对路径**。
 
-- `docs/sdk/taptap-login/features.mdx` 在其它 md 文件中跳转需写作 `[跳转标题](/sdk/taptap-login/features/)`
-- `docs/design/design-moment.mdx` 在其它 md 文件中跳转需写作 `[跳转标题](/design/design-moment/)`
-- `i18n/en/docusaurus-plugin-content-docs/current/sdk/taptap-login/features.mdx` 在其它 md 文件中跳转需写作 `[跳转标题](/sdk/taptap-login/features/)`
+- `docs/sdk/taptap-login/features.mdx` 在其他 md 文件中跳转需写作 `[跳转标题](/sdk/taptap-login/features/)`
+- `docs/design/design-moment.mdx` 在其他 md 文件中跳转需写作 `[跳转标题](/design/design-moment/)`
+- `i18n/en/docusaurus-plugin-content-docs/current/sdk/taptap-login/features.mdx` 在其他 md 文件中跳转需写作 `[跳转标题](/sdk/taptap-login/features/)`
 - 标题跳转需要去除标点、将空格换成 `-` 并将大写字母改为小写，比如 `[<FaqLink>1. 如何进行游戏认领？</FaqLink>](/store/store-creategame#我的游戏已经被 TapTap 收录，可以进行游戏认领吗？)` 应写作 `[<FaqLink>1. 如何进行游戏认领？</FaqLink>](/store/store-creategame#我的游戏已经被-taptap-收录可以进行游戏认领吗)`
 
 ##### 链接到外部网站
@@ -341,7 +341,7 @@ import CodeBlock from "@theme/CodeBlock";
 4. 将标注组件拖拽到合适的位置并调整大小。
 5. 如果调整好大小之后发现标注组件的边框太细或者里面的文本/箭头太小，可以适当缩小原始截图的大小（注意缩放截图时要按住 <kbd>shift</kbd> 以保持原始长宽比），然后重复第 4 步。
 6. 如果截图需要多个标注，请重复第 2 至 5 步。注意更新标注组件里面用作序号的文本。
-7. 选中所有元素（<kbd>command</kbd> <kbd>A</kbd>），然后按下 <kbd>option</kbd> <kbd>command</kbd> <kbd>G</kbd>（或者右击选中的内容，点击「Frame selection」）。此时包括截图和标注在内的所有元素会被包裹进一个 Frame（可以理解为其它平面设计软件中「画板」和「编组」的结合体）。
+7. 选中所有元素（<kbd>command</kbd> <kbd>A</kbd>），然后按下 <kbd>option</kbd> <kbd>command</kbd> <kbd>G</kbd>（或者右击选中的内容，点击「Frame selection」）。此时包括截图和标注在内的所有元素会被包裹进一个 Frame（可以理解为其他平面设计软件中「画板」和「编组」的结合体）。
 8. 点击右侧面板最下方的「Export」，保持默认设置，点击「Export _Frame 名称_」（如果没有改过 Frame 名称，那么这里默认会显示为「Export Frame 1」）。
 
 ##### Tips
@@ -364,7 +364,7 @@ import CodeBlock from "@theme/CodeBlock";
 
 ### md 文档文件翻译
 
-请放在其它语言（如 `en`）文件夹「相同路径」下。如想翻译 `docs/tap-download.mdx` 文件，则需要把翻译文件放在 `i18n/en/docusaurus-plugin-content-docs/current/tap-download.mdx`。
+请放在其他语言（如 `en`）文件夹「相同路径」下。如想翻译 `docs/tap-download.mdx` 文件，则需要把翻译文件放在 `i18n/en/docusaurus-plugin-content-docs/current/tap-download.mdx`。
 
 ### 文件夹翻译（如有困难可直接联系技术支持）
 
@@ -434,6 +434,6 @@ Docusaurus 自身并没有提供「从一个项目构建出不同版本」的功
 2. 新建一个分支，比如 `vN`，运行 `yarn docusaurus docs:version vN`
 3. 替换 `versioned_docs/version-vN/` 下的内链，替换的正则是 `\]\(/(sdk|store|design)` 替换值为 `](/vN/$1`
 
-## 其它文档
+## 其他文档
 
 [Docusaurus 文档介绍](https://docusaurus.io/zh-CN/docs/docs-introduction)
