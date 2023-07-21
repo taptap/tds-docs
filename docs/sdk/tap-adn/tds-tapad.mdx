@@ -5,10 +5,6 @@ sidebar_position: 3
 ---
 
 
-<head>
-  <meta name="robots" content="noindex" />
-</head>
-
 import MultiLang from '/src/docComponents/MultiLang';
 import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';
@@ -60,13 +56,10 @@ dependencies {
     // 将 3.x.0 版本修改为 4.0.1
     //classpath 'com.android.tools.build:gradle:3.x.0'
     classpath 'com.android.tools.build:gradle:4.0.1'
-    // highlight-end
-    **BUILD_SCRIPT_DEPS**
 }
 ```
 
 同时，为了将 [Gradle 版本和 Android Gradle Plugin 版本对应](https://developer.android.com/studio/releases/gradle-plugin#expandable-1)，需要更新 Gradle 版本，下载 [6.1.1 版本的 Gradle](https://services.gradle.org/distributions/gradle-6.1.1-bin.zip)，解压后放到自定义的文件夹中，同时**不**勾选 Unity 中的 `Preferences` -> `External Tools`-> `Android` -> `Gradle Installed with Unity(recommend)`，改为选择解压后 Gradle 文件夹的位置，如 <some path\>/gradle-6.1.1。
-注意 **TapADN SDK 从 3.16.3.10 版本开始更新了 glide 的依赖，glide 版本从 4.0.0 更新到了 4.9.0。**
 
 </details>
 
@@ -82,7 +75,10 @@ dependencies {
 ```
 
 修改文件内容:
-
+:::tip
+- **TapADN SDK 从 3.16.3.10 版本开始更新了 glide 的依赖，glide 版本从 4.0.0 更新到了 4.9.0。**
+- ** 3.16.3.13 加入 Android Dependencies 文件（位于 TapAD/Editor/TapAdDependencies.xml) 方便接入 EDM4U(https://github.com/googlesamples/unity-jar-resolver) 的项目方解决 Android 依赖。**
+:::
 ```groovy
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -114,8 +110,9 @@ dependencies {
 </p>
 
 在游戏目录下 `build.gradle` 文件中添加代码：
-注意 **TapADN SDK 从 3.16.3.10 版本开始更新了 glide 的依赖，glide 版本从 4.0.0 更新到了 4.9.0。**
-
+:::tip
+**TapADN SDK 从 3.16.3.10 版本开始更新了 glide 的依赖，glide 版本从 4.0.0 更新到了 4.9.0。**
+:::
 <CodeBlock className="groovy">
 {`repositories{
     flatDir{   
@@ -124,7 +121,7 @@ dependencies {
 }
 dependencies {
     // ...
-    implementation(name: "TapAD_${sdkVersions.taptap.ios}", ext: "aar") // 广告 SDK
+    implementation(name: "TapAD_${sdkVersions.tapadn.android}", ext: "aar") // 广告 SDK
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
     implementation 'io.reactivex.rxjava2:rxjava:2.0.1'
     implementation 'com.squareup.okhttp3:okhttp:3.12.1'
@@ -199,13 +196,13 @@ dependencies {
 
 ```xml
 <!-- 广告SDK已添加的权限 -->
-<uses-permission android:name="android.permission.INTERNET"/>>
+<uses-permission android:name="android.permission.INTERNET"/>
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
+<!-- 为了获取更精准的推送数据、建议游戏加上的权限 -->
 <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
 <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-
-<!-- 为了获取更精准的推送数据、建议游戏加上的权限 -->
 <uses-permission android:name="android.permission.BLUETOOTH"/>
 <!-- targetVersion 31 及以上 建议游戏加上这个权限 -->
 <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
@@ -525,7 +522,7 @@ TapAdManager.get().uploadUserAction(userActions, new Callback() {
 
 </MultiLang>
 
-## 开屏广告 {#TapSplashAd}
+## 开屏广告 
 
 开屏广告为用户在进入 App 时展示的全屏广告。开屏广告为一个 `View`，宽高默认为 `match_parent`。
 
@@ -678,7 +675,7 @@ splashAd.show(this);
 
 </MultiLang>
 
-## 激励视频广告 {#TapRewardVideoAd}
+## 激励视频广告 
 
 激励视频是一种全屏播放的视频广告，用户可以在观看完整的视频后获取奖励,视频广告播放结束后会显示结束页面，引导用户进行后续动作。目前激励视频广告的表现形式为：视频播放完展示 Endcard 页面。
 
@@ -877,7 +874,7 @@ rewardAd.showRewardVideoAd(activity);
 
 </MultiLang>
 
-## Banner 广告 {#TapBannerAd}
+## Banner 广告 
 
 模版渲染 Banner：开发者不用自行对广告样式进行编辑和渲染，可直接调用相关接口进行广告展示。
 
@@ -984,6 +981,9 @@ else
 // banner 广告播放回调接口说明
 public interface IBannerAdInteractionListener : ICommonInteractionListener
 {
+    // 当广告曝光
+    void OnAdShow(TapBannerAd ad);
+
     // 当广告关闭
     void OnAdClose(TapBannerAd ad);
 
@@ -1006,6 +1006,12 @@ public interface ICommonInteractionListener
 
 ```java
 bannerAd.setBannerInteractionListener(new TapBannerAd.BannerInteractionListener() {
+
+    @Override
+    public void onAdShow() {
+        // 广告已曝光
+    }
+
     @Override
     public void onAdClose() {
         // 广告已关闭（玩家可以手动点击关闭 banner 广告）
@@ -1030,7 +1036,7 @@ parentLayout.addView(bannerAd.getBannerView());
 
 </MultiLang>
 
-## 自渲染信息流广告 {#TapFeedAd}
+## 自渲染信息流广告 
 
 为可自定义布局的信息流广告，包含大图和视频两种基本样式类型，应用下载、跳转到落地页和跳转到浏览器三种交互类型。
 
@@ -1393,6 +1399,122 @@ tapAdNative.pause();
 
 ```java
 tapAdNative.dispose();
+```
+
+</>
+
+</MultiLang>
+
+## 插屏广告 
+
+插屏广告：支持「全屏视频广告」、「全屏图文广告」和「半屏图文广告」等形式，具体广告展示形式在后台配置。
+
+:::tip
+ 插屏广告分横竖屏形式，强烈建议在后台配置后正确使用横屏或竖屏广告，若用错配置的 orientation，可能会出现 UI 兼容异常问题。
+:::
+
+### 获取广告
+
+<MultiLang kind="adn">
+
+<>
+
+```cs
+if (TapAdSdk.IsInited == false){
+        ShowText("TapAd 没有初始化!将自动初始化");
+        Init();
+        while (TapAdSdk.IsInited == false){
+            await Task.Yield();
+        }
+        ShowText("TapAd 初始化完毕");
+}
+if (_tapInterstitialAd != null){
+        _tapInterstitialAd.Dispose();
+        _tapInterstitialAd = null;
+}
+
+int adId = isHorizontal ? LANDSCAPE_INTERSTITIAL_ID : PORTRAIT_INTERSTITIAL_ID;
+// create AdRequest
+var request = new TapAdRequest.Builder()
+            .SpaceId(adId)
+            .Extra1("{}")
+            .UserId("123")
+            .Build();
+_tapInterstitialAd = new TapInterstitialAd(request);
+_tapInterstitialAd.SetLoadListener(new InterstitialAdLoadListener(this));
+_tapInterstitialAd.Load();
+```
+
+</>
+<>
+
+```java
+AdRequest adRequest = new AdRequest.Builder()
+                .withSpaceId(adId)
+                .withExtra1("{}")
+                .withUserId("123")
+                .build();
+tapAdNative.loadInterstitialAd(adRequest,new TapAdNative.InterstitialAdListener() {
+      @Override
+      public void onInterstitialAdLoad(TapInterstitialAd interstitialAd) {
+           // 获取广告成功
+      }
+
+      @Override
+      public void onError(int code, String message) {
+           // 获取广告失败
+      }
+  });
+```
+</>
+
+</MultiLang>
+
+### 播放
+
+<MultiLang kind="adn">
+
+<>
+
+```cs
+if (TapAdSdk.IsInited == false)
+{
+    ShowText("TapAd 需要先初始化!");
+    return;
+}
+if (_tapInterstitialAd != null)
+{
+    _tapInterstitialAd.SetInteractionListener(new InterstitialAdInteractionListener(this));
+    _tapInterstitialAd.Show();
+}
+else
+{
+    Debug.LogErrorFormat($"[Unity::AD] 未加载好视频,无法播放!");
+}
+```
+</>
+
+<>
+
+```java
+interstitialAd.setInteractionListener(new TapInterstitialAd.InterstitialAdInteractionListener() {
+
+    @Override
+    public void onAdShow() {
+        Log.d(TAG,"onShow");
+    }
+
+    @Override
+    public void onAdClose() {
+        Log.d(TAG,"onAdClose");
+    }
+
+    @Override
+    public void onAdError() {
+        Log.d(TAG,"onAdError");
+    }
+});
+interstitialAd.show(activity);
 ```
 
 </>
