@@ -721,6 +721,7 @@ Key|Value|含义
 `X-TDS-Id`|`{{clientId}}`|游戏的 `Client Id`，可在控制台查看
 `X-TDS-Server-Secret`|`{{serverSecret}}`|游戏的 `Server Secret`，可在控制台查看
 
+
 参见文档关于[应用凭证](/sdk/storage/guide/setup-dotnet#应用凭证)的说明。
 
 除了在 `X-TDS-Id` 这个 HTTP Header 中传入 `Client Id` 外，还需要在 URL 中指定 `Client Id`，两者的值需要一致。
@@ -757,8 +758,8 @@ curl -X GET \
     "list": [
       {
         "achievement_id": "成就 id",
-        "client_id": "游戏 id",
-        "achievement_open_id": "成就外部id（游戏在 DC 新增成就时绑定的 ID）",
+        "client_id": "应用 Client Id",
+        "achievement_open_id": "成就外部 id（开发者中心创建成就时自定义的成就 ID，向 SDK 上报成就的唯一标识）",
         "achievement_type": "成就类型：1-普通成就，99-白金成就",
         "is_hide": "是否隐藏：0-不隐藏，1-隐藏",
         "count_step": "成就步数，不分步时是 1",
@@ -783,7 +784,7 @@ curl -X GET \
 
 ### 玩家成就列表
 
-获取某一玩家取得的成就，调用时需在 URL 中指定该玩家对应的 TDS 内建账户的 ObjectId 和语言。
+获取某一玩家取得的成就，调用时需在 URL 中指定该玩家对应的 TDS 内建账户的 ObjectId 和语言代码。
 
 ```sh
 curl -X GET \
@@ -820,7 +821,7 @@ curl -X GET \
           "level": "稀有度：1-普通，2-稀有，3-珍贵，4-极为珍贵"
         },
         "user_achievement_id": "用户成就 id",
-        "complete_time": "完成时间戳",
+        "complete_time": "完成时间戳（毫秒级）",
         "completed_step": "完成步数",
         "full_completed": "是否完全完成，true-是，fasle-否"
       }
@@ -838,11 +839,11 @@ curl -X POST \
   -H "X-TDS-Id: {{clientId}}" \
   -H "X-TDS-Server-Secret: {{serverSecret}}" \
   -H "Content-Type: application/json" \
-  -d '{"data": [{"userId": <objectId>, "list":
+  -d '{"data": [{"user_id": <objectId>, "list":
         [{
           "achievement_id": "成就 id",
-          "achievement_open_id": "成就外部 id",
-          "complete_time": "完成时间戳",
+          "achievement_open_id": "成就外部 id（开发者中心创建成就时自定义的成就 ID，向 SDK 上报成就的唯一标识）",
+          "complete_time": "完成时间戳（毫秒级）",
           "completed_step": "完成步数"
         }]
       }]
@@ -858,7 +859,7 @@ curl -X POST \
   "data": {
     "list": [
       {
-        "user_id": "TDSId",
+        "user_id": "ObjectId",
         "result_list": [
           {
             "result": "本条数据上报是否成功，true 成功，false 失败",
