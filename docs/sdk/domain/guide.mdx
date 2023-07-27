@@ -42,12 +42,12 @@ import { Conditional } from "/src/docComponents/conditional";
 
 说明：
 
-0. 可以使用同一主域名下不同的子域名，每个子域名只能绑定到一个应用，且同一应用的 API 服务、云引擎网站托管服务、文件服务需绑定不同的子域名。
-1. API 域名需要启用 SSL，绑定时会自动申请 SSL 证书，当然你也可以自行上传证书。
-2. 绑定目标中的「分组」指应用下的云引擎实例分组的生产环境。
-3. 我们推荐为 API 域名和云引擎域名配置独立 IP。**API 服务只对独立（IP）入口提供可用性保证。**未配置独立 IP 的云引擎服务默认会为静态站点优化，有一些对动态内容不那么友好的限制。详见下面的 [API 域名](#api-域名)、[云引擎域名](#云引擎域名)小节。
-4. 文件域名、使用共享 IP 的 API 域名、云引擎域名使用 CNAME 配置域名解析，因此不支持绑定裸域名，以免影响该域名下的其他域名的解析以及与 MX 等记录冲突。如果需要使用裸域名作为 API 域名或云引擎域名可以配置独立 IP 后使用 A 记录绑定。
-5. 一个应用（文件域名、API 域名）或分组（云引擎域名）上可以绑定多个域名，但文件服务返回的内部文件（托管在 <Conditional brand="leancloud">LeanCloud</Conditional><Conditional brand="tds">TDS</Conditional> 文件服务的文件）的 `url` 字段同一时间只能选择使用一个域名（可以在控制台切换）。
+1. 可以使用同一主域名下不同的子域名，每个子域名只能绑定到一个应用，且同一应用的 API 服务、云引擎网站托管服务、文件服务需绑定不同的子域名。
+2. API 域名需要启用 SSL，绑定时会自动申请 SSL 证书，当然你也可以自行上传证书。
+3. 绑定目标中的「分组」指应用下的云引擎实例分组的生产环境。
+4. 我们推荐为 API 域名和云引擎域名配置独立 IP。**API 服务只对独立（IP）入口提供可用性保证。**未配置独立 IP 的云引擎服务默认会为静态站点优化，有一些对动态内容不那么友好的限制。详见下面的 [API 域名](#api-域名)、[云引擎域名](#云引擎域名)小节。
+5. 文件域名、使用共享 IP 的 API 域名、云引擎域名使用 CNAME 配置域名解析，因此不支持绑定裸域名，以免影响该域名下的其他域名的解析以及与 MX 等记录冲突。如果需要使用裸域名作为 API 域名或云引擎域名可以配置独立 IP 后使用 A 记录绑定。
+6. 一个应用（文件域名、API 域名）或分组（云引擎域名）上可以绑定多个域名，但文件服务返回的内部文件（托管在 <Conditional brand="leancloud">LeanCloud</Conditional><Conditional brand="tds">TDS</Conditional> 文件服务的文件）的 `url` 字段同一时间只能选择使用一个域名（可以在控制台切换）。
 
 ## 文件域名
 
@@ -655,7 +655,14 @@ xxx.example.com.	10800	IN	CNAME	yyy.zzz.example.
 
 设置完成后，需要等待一段时间（一般在半小时以内），记录生效后，<Conditional brand="leancloud">LeanCloud</Conditional><Conditional brand="tds">TDS</Conditional> 控制台会显示「已绑定」。
 
-如果长时间卡在「等待配置 DNS」阶段，那么请点击「等待配置 DNS」后的问号图标，依其提示运行相应的 dig 命令检查域名解析记录是否生效。
+:::tip
+可以使用如下命令验证绑定的域名请求是否正常
+```sh
+curl https://{host}/1.1/ping
+```
+:::
+
+如果**长时间卡在「等待配置 DNS」阶段，**那么请点击「等待配置 DNS」后的问号图标，依其提示运行相应的 dig 命令检查域名解析记录是否生效。
 如 dig 命令查不到相应的域名解析记录，请返回域名商控制台检查配置是否正确，如仍有疑问，请联系域名商客服。
 如 dig 命令能查到预期的 CNAME 记录，但控制台仍显示「等待配置 DNS」，请通过工单或论坛联系我们。
 
@@ -666,6 +673,12 @@ xxx.example.com.	10800	IN	CNAME	yyy.zzz.example.
 如果选择手动模式，则需要上传自己的 SSL 证书（通常是 `.crt` 或 `.pem` 文件）和 SSL 私钥（通常是 `.key` 文件），并在证书过期前自行续期及再次上传。
 SSL 证书通常可以在你的域名服务商处购买，你也可以自行申请免费的证书。
 Let's Encrypt 之外，比较知名的免费 SSL 证书提供商有 [ZeroSSL]、[buypass]、[TrustAsia]。
+
+如果设置完成后，显示绑定失败，并且有这个报错提示：
+```
+issueCert for {host}: Authorization not found in HTTP response from {host} ；
+```
+因为工信部规定，网站接入多个云服务商时，需要在各云服务商处接入备案。这个报错是缺少对应的云服务商备案所导致的（如果是华东区的应用，很可能是缺少腾讯云备案）；可以参考[域名备案指南](http://localhost:3888/docs/sdk/domain/icp/#%E6%8E%A5%E5%85%A5%E5%A4%87%E6%A1%88)进行备案操作；
 
 [let's encrypt]: https://letsencrypt.org/
 [zerossl]: https://zerossl.com/
