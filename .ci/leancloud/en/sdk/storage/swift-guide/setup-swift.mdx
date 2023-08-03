@@ -1,0 +1,151 @@
+---
+title: How to Install the Swift SDK
+sidebar_label: Swift SDK Installing
+slug: /sdk/storage/guide/setup-swift/
+sidebar_position: 1
+---
+
+import { Conditional } from "/src/docComponents/conditional";
+import DomainBinding from "../../_partials/setup-domain.mdx";
+import AppConfig from "../_partials/app-config.mdx";
+import Path from "/src/docComponents/path";
+
+## Installing SDK
+
+There are several ways for you to install our SDK and the most convenient one is to use a package manager.
+
+### Installing with Package Manager
+
+You can use [CocoaPods](https://cocoapods.org) or [Swift Package Manager](https://developer.apple.com/documentation/swift_packages) to manage your project's dependencies。
+
+#### CocoaPods
+
+
+Add the following pods into the `target` of `Podfile`:：
+
+```ruby
+pod 'LeanCloud'
+```
+or use the [Subspecs](https://guides.cocoapods.org/syntax/podspec.html#subspec) way:
+
+```ruby
+pod 'LeanCloud/Foundation' # (required) LeanStorage, SMS, LeanEngine etc.
+pod 'LeanCloud/RTM' # (optional) LeanMessage, LiveQuery
+# LeanCloud/RTM depends on LeanCloud/Foundation, so their versions must be consistent.
+```
+
+:::tip 注意
+`LeanCloud/RTM` 依赖了 `LeanCloud/Foundation`，所以不同模块的版本号必需保持一致。
+:::
+
+Then install the SDK with the following command:
+
+```sh
+pod update
+```
+
+Or
+
+```sh
+pod install --repo-update
+```
+See official documentation for the differences between them.
+
+After installing the SDK, you can open your project with **`<PROJECT_NAME>.xcworkspace`** under the root directory of your project.
+
+### Installing Manually
+
+[SDK](https://docs.leancloud.app/sdk_down.html)
+
+## Initializing Your Project
+
+To begin with, get your App ID and App Key from your app's Dashboard > Settings > App Keys.
+
+Add the following line to the top of `AppDelegate.swift`:
+
+```swift
+import LeanCloud
+```
+
+Then add the code below into the function `application(_:didFinishLaunchingWithOptions:):
+
+```swift
+do {
+    try LCApplication.default.set(
+        id: your-app-id,
+        key: your-app-key,
+        serverURL: "https://your_server_url")
+} catch {
+    print(error)
+}
+```
+
+
+## Enabling Debug Logs
+
+You can easily trace the problems in your project by turning debug logs on during the development phase. Once enabled, details of every request made by the SDK along with errors will be output to IDE, browser console, or your app's Dashboard > LeanEngine > App logs.
+
+```python
+// Place the line before LCApplication.default.set; only needs to be called once
+LCApplication.logLevel = .all
+```
+
+Make sure debug logs are turned off before your app is published. Failure to do so may lead to the exposure of sensitive data.
+
+## Verifying
+
+First of all, make sure you are able to connect to LeanCloud server. You can test it by running the following command:
+
+```sh
+curl "https://{{host}}/1.1/date"
+```
+
+If everything goes well, it will return the current date:
+
+```json
+{ "__type": "Date", "iso": "2020-10-12T06:46:56.000Z" }
+```
+
+Then add the following code into your project:
+
+```js
+do {
+    let testObject = LCObject(className: "TestObject")
+    try testObject.set("words", value: "Hello world!")
+    let result = testObject.save()
+    if let error = result.error {
+      print(error)
+    }
+} catch {
+    print(error)
+}
+```
+
+
+Save and run your program.
+
+Then go to **<Path to="storage" /> > Data > `TestObject`**. If you see a row with its `words` column being `Hello world!`, it means that you have correctly installed the SDK.
+
+See [Debugging](#Debugging) if you’re not seeing the content.
+
+## Debugging
+
+This guide is written for the latest version of our SDK. If you encounter any error, please first make sure you have the latest version installed.
+
+
+### `401 Unauthorized`
+
+If you get a 401 error or see the following content in network logs:
+
+```json
+{
+  "code": 401,
+  "error": "Unauthorized."
+}
+```
+
+It means that the App ID or App Key might be incorrect or don't match. If you have multiple apps, you might have used the App ID of one app with the App Key of another one, which will lead to such error.
+
+### Client Cannot Access the Internet
+
+Make sure you have granted enough permissions for your mobile app.

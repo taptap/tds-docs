@@ -1,21 +1,20 @@
-import { translate } from "@docusaurus/Translate";
-
-/* 内部地址 */
-type ActionCellLinkInternal = {
+type LinkInternal = {
   label: string;
   to: string;
 };
 
-/* 外跳地址 */
-type ActionCellLinkExternal = {
+type LinkExternal = {
   label: string;
   href: string;
 };
 
+type Link = LinkInternal | LinkExternal;
+
 type Entry = {
   title: string;
   description?: string;
-  links: (ActionCellLinkInternal | ActionCellLinkExternal)[];
+  tag?: string;
+  links: Link[];
 };
 
 export const getEntries = (brand: string, region: string): Entry[] => {
@@ -42,17 +41,17 @@ export const getEntries = (brand: string, region: string): Entry[] => {
     },
     ...(region === "cn"
       ? [
-          {
-            title: "社区运营指南",
-            description: "TapTap 为开发者提供的社区新手攻略",
-            links: [
-              {
-                label: "查看更多",
-                to: "/community",
-              },
-            ],
-          },
-        ]
+        {
+          title: "社区运营指南",
+          description: "TapTap 为开发者提供的社区新手攻略",
+          links: [
+            {
+              label: "查看更多",
+              to: "/community",
+            },
+          ],
+        },
+      ]
       : []),
     {
       title: "资源下载",
@@ -70,16 +69,16 @@ export const getEntries = (brand: string, region: string): Entry[] => {
     },
     ...(region === "global"
       ? [
-          {
-            title: "开发者运营手册",
-            links: [
-              {
-                label: "查看更多",
-                to: "/operations/manual",
-              },
-            ],
-          },
-        ]
+        {
+          title: "开发者运营手册",
+          links: [
+            {
+              label: "查看更多",
+              to: "/operations/manual",
+            },
+          ],
+        },
+      ]
       : []),
   ];
 
@@ -171,29 +170,17 @@ export const getEntries = (brand: string, region: string): Entry[] => {
         },
       ],
     },
+    {
+      title: "其他",
+      links: [
+        {
+          label: "查看更多",
+          to: "/sdk/other/error-code",
+        },
+      ],
+    },
   ];
 
   const entries = brand === "leancloud" ? ENTRIES_LEANCLOUD : ENTRIES_TDS;
-
-  return entries.map((entry) => ({
-    title: translate({
-      message: entry.title,
-      id: `tds-home-${entry.title}`,
-    }),
-    ...(entry.description
-      ? {
-          description: translate({
-            message: entry.description,
-            id: `tds-home-${entry.description}`,
-          }),
-        }
-      : {}),
-    links: entry.links.map((link) => ({
-      ...link,
-      label: translate({
-        message: link.label,
-        id: `tds-home-link-${link.label}`,
-      }),
-    })),
-  }));
+  return entries;
 };

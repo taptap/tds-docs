@@ -1923,7 +1923,17 @@ mary.onMembersLeft = ({
 </>
 <>
 
-Swift
+| 属性          | 类型     | 描述                                                                                                                                                                                                                                                                                                                                            |
+| ------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `from`        | `String` | 消息发送者的 `clientId`。                                                                                                                                                                                                                                                                                                                       |
+| `cid`         | `String` | 消息所属对话 ID。                                                                                                                                                                                                                                                                                                                               |
+| `id`          | `String` | 消息发送成功之后，由云端给每条消息赋予的唯一 ID。                                                                                                                                                                                                                                                                                               |
+| `timestamp`   | `Date`   | 消息发送的时间。消息发送成功之后，由云端赋予的全局的时间戳。                                                                                                                                                                                                                                                                                    |
+| `deliveredAt` | `Date`   | 消息送达时间。                                                                                                                                                                                                                                                                                                                                  |
+| `status`      | `Symbol` | 消息状态，其值为枚举 [`MessageStatus`](https://leancloud.github.io/js-realtime-sdk/docs/module-leancloud-realtime.html#.MessageStatus) 的成员之一：<br/><br/>`MessageStatus.NONE`（未知）<br/>`MessageStatus.SENDING`（发送中）<br/>`MessageStatus.SENT`（发送成功）<br/>`MessageStatus.DELIVERED`（已送达）<br/>`MessageStatus.FAILED`（失败） |
+
+</>
+<>
 
 | 属性                       | 类型                | 描述                                                                                                                                                                       |
 | -------------------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -1941,20 +1951,6 @@ Swift
 | `isCurrentClientMentioned` | `Bool`              | 当前 `Client` 是否被 @。                                                                                                                                                   |
 | `status`                   | `IMMessage.Status`  | 消息状态，有 6 种取值：<br/><br/>`none`（无状态）<br/>`sending`（发送中）<br/>`sent`（发送成功）<br/>`delivered`（已被接收）<br/>`read`（已被读）<br/>`failed`（发送失败） |
 | `ioType`                   | `IMMessage.IOType`  | 消息传输方向，有两种取值：<br/><br/>`in`（当前用户接收到的）<br/>`out`（由当前用户发出的）                                                                                 |
-
-</>
-<>
-
-JavaScript
-
-| 属性          | 类型     | 描述                                                                                                                                                                                                                                                                                                                                            |
-| ------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `from`        | `String` | 消息发送者的 `clientId`。                                                                                                                                                                                                                                                                                                                       |
-| `cid`         | `String` | 消息所属对话 ID。                                                                                                                                                                                                                                                                                                                               |
-| `id`          | `String` | 消息发送成功之后，由云端给每条消息赋予的唯一 ID。                                                                                                                                                                                                                                                                                               |
-| `timestamp`   | `Date`   | 消息发送的时间。消息发送成功之后，由云端赋予的全局的时间戳。                                                                                                                                                                                                                                                                                    |
-| `deliveredAt` | `Date`   | 消息送达时间。                                                                                                                                                                                                                                                                                                                                  |
-| `status`      | `Symbol` | 消息状态，其值为枚举 [`MessageStatus`](https://leancloud.github.io/js-realtime-sdk/docs/module-leancloud-realtime.html#.MessageStatus) 的成员之一：<br/><br/>`MessageStatus.NONE`（未知）<br/>`MessageStatus.SENDING`（发送中）<br/>`MessageStatus.SENT`（发送成功）<br/>`MessageStatus.DELIVERED`（已送达）<br/>`MessageStatus.FAILED`（失败） |
 
 </>
 </MultiLang>
@@ -2748,6 +2744,80 @@ Objective-C SDK 是通过实现 `LCIMClientDelegate` 代理来响应新消息到
 </>
 <>
 
+不管消息类型如何，JavaScript SDK 都是是通过 `IMClient` 上的 `Event.MESSAGE` 事件回调来通知新消息的，应用层只需要在一个地方，统一对不同类型的消息使用不同方式来处理即可。
+
+```js
+// 在初始化 Realtime 时，需加载 TypedMessagesPlugin
+var { Event, TextMessage } = require("leancloud-realtime");
+var { FileMessage, ImageMessage, AudioMessage, VideoMessage, LocationMessage } =
+  initPlugin(AV, IM);
+// 注册 MESSAGE 事件的 handler
+client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
+  // 请按自己需求改写
+  var file;
+  switch (message.type) {
+    case TextMessage.TYPE:
+      console.log(
+        "收到文本消息，内容：" + message.getText() + "，ID：" + message.id
+      );
+      break;
+    case FileMessage.TYPE:
+      file = message.getFile(); // file 是 AV.File 实例
+      console.log(
+        "收到文件消息，URL：" + file.url() + "，大小：" + file.metaData("size")
+      );
+      break;
+    case ImageMessage.TYPE:
+      file = message.getFile();
+      console.log(
+        "收到图像消息，URL：" + file.url() + "，宽度：" + file.metaData("width")
+      );
+      break;
+    case AudioMessage.TYPE:
+      file = message.getFile();
+      console.log(
+        "收到音频消息，URL：" +
+          file.url() +
+          "，长度：" +
+          file.metaData("duration")
+      );
+      break;
+    case VideoMessage.TYPE:
+      file = message.getFile();
+      console.log(
+        "收到视频消息，URL：" +
+          file.url() +
+          "，长度：" +
+          file.metaData("duration")
+      );
+      break;
+    case LocationMessage.TYPE:
+      var location = message.getLocation();
+      console.log(
+        "收到位置消息，纬度：" +
+          location.latitude +
+          "，经度：" +
+          location.longitude
+      );
+      break;
+    case 1:
+      console.log("OperationMessage 是自定义消息类型");
+    default:
+      // 未来可能添加新的自定义消息类型，新版 SDK 也可能添加新的消息类型。
+      // 因此别忘了在默认分支中处理未知类型，例如提示用户升级客户端至最新版本。
+      console.warn("收到未知类型消息");
+  }
+});
+
+// 同时，对应的 conversation 上也会派发 `MESSAGE` 事件：
+conversation.on(Event.MESSAGE, function messageEventHandler(message) {
+  // 这里补充业务逻辑
+});
+```
+
+</>
+<>
+
 Swift SDK 是通过实现 `IMClientDelegate` 代理来响应新消息到达通知的：
 
 ```swift
@@ -2843,80 +2913,6 @@ jerry.onMessage = ({
     }
   }
 };
-```
-
-</>
-<>
-
-不管消息类型如何，JavaScript SDK 都是是通过 `IMClient` 上的 `Event.MESSAGE` 事件回调来通知新消息的，应用层只需要在一个地方，统一对不同类型的消息使用不同方式来处理即可。
-
-```js
-// 在初始化 Realtime 时，需加载 TypedMessagesPlugin
-var { Event, TextMessage } = require("leancloud-realtime");
-var { FileMessage, ImageMessage, AudioMessage, VideoMessage, LocationMessage } =
-  initPlugin(AV, IM);
-// 注册 MESSAGE 事件的 handler
-client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
-  // 请按自己需求改写
-  var file;
-  switch (message.type) {
-    case TextMessage.TYPE:
-      console.log(
-        "收到文本消息，内容：" + message.getText() + "，ID：" + message.id
-      );
-      break;
-    case FileMessage.TYPE:
-      file = message.getFile(); // file 是 AV.File 实例
-      console.log(
-        "收到文件消息，URL：" + file.url() + "，大小：" + file.metaData("size")
-      );
-      break;
-    case ImageMessage.TYPE:
-      file = message.getFile();
-      console.log(
-        "收到图像消息，URL：" + file.url() + "，宽度：" + file.metaData("width")
-      );
-      break;
-    case AudioMessage.TYPE:
-      file = message.getFile();
-      console.log(
-        "收到音频消息，URL：" +
-          file.url() +
-          "，长度：" +
-          file.metaData("duration")
-      );
-      break;
-    case VideoMessage.TYPE:
-      file = message.getFile();
-      console.log(
-        "收到视频消息，URL：" +
-          file.url() +
-          "，长度：" +
-          file.metaData("duration")
-      );
-      break;
-    case LocationMessage.TYPE:
-      var location = message.getLocation();
-      console.log(
-        "收到位置消息，纬度：" +
-          location.latitude +
-          "，经度：" +
-          location.longitude
-      );
-      break;
-    case 1:
-      console.log("OperationMessage 是自定义消息类型");
-    default:
-      // 未来可能添加新的自定义消息类型，新版 SDK 也可能添加新的消息类型。
-      // 因此别忘了在默认分支中处理未知类型，例如提示用户升级客户端至最新版本。
-      console.warn("收到未知类型消息");
-  }
-});
-
-// 同时，对应的 conversation 上也会派发 `MESSAGE` 事件：
-conversation.on(Event.MESSAGE, function messageEventHandler(message) {
-  // 这里补充业务逻辑
-});
 ```
 
 </>
@@ -4041,16 +4037,16 @@ query.Compact = true;
 query.setCompact(true);
 ```
 
+```objc
+query.option = LCIMConversationQueryOptionCompact;
+```
+
 ```js
 query.compact(true);
 ```
 
 ```swift
 conversationQuery.options = [.notContainMembers]
-```
-
-```objc
-query.option = LCIMConversationQueryOptionCompact;
 ```
 
 ```dart

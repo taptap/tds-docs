@@ -1,0 +1,857 @@
+---
+title: 数据存储开发指南 · Unreal
+sidebar_label: Unreal 开发指南
+slug: /sdk/storage/guide/unreal/
+sidebar_position: 6
+---
+
+import Path from "/src/docComponents/path";
+
+数据存储是云服务提供的核心功能之一，可用于存放和查询应用数据。下面的代码展示了如何创建一个对象并将其存入云端：
+
+```cpp
+// 构建对象
+TSharedPtr<FLCObject> ToDo = MakeShared<FLCObject>("Todo");
+
+// 为属性赋值
+ToDo->Set("title", TEXT("工程师周会"));
+ToDo->Set("content", TEXT("工程师周会"));
+
+// 将对象保存到云端
+ToDo->Save(FLeanCloudBoolResultDelegate::CreateLambda([=](bool bIsSuccess, const FLCError& Error) {
+    if (bIsSuccess) {
+        // 成功保存之后，执行其他逻辑
+        UE_LOG(LogTemp, Error, TEXT("%s"), *ToDo->GetObjectId());
+    } else {
+        // 异常处理
+    }
+}));
+```
+
+我们为各个平台或者语言开发的 SDK 在底层都是通过 HTTPS 协议调用统一的 REST API，提供完整的接口对数据进行各类操作。
+
+## SDK 安装与初始化
+
+请阅读[数据存储、即时通讯 Unreal SDK 配置指南](/sdk/storage/guide/setup-unreal/)。
+
+## 对象
+
+### `FLCObject`
+
+`FLCObject` 是云服务对复杂对象的封装，每个 `FLCObject` 包含若干与 JSON 格式兼容的属性值对（也称键值对，key-value pairs）。这个数据是无模式化的（schema free），意味着你不需要提前标注每个 `FLCObject` 上有哪些 key，你只需要随意设置键值对就可以，云端会保存它。
+
+比如说，一个保存着单个 Todo 的 `FLCObject` 可能包含如下数据：
+
+```json
+title:      "给小林发邮件确认会议时间",
+isComplete: false,
+priority:   2,
+tags:       ["工作", "销售"]
+```
+
+### 数据类型
+
+`FLCObject` 支持的数据类型包括 `FString`、`int`、`Double`、`Boolean`、`Object`、`Array`、`Date` 等等。你可以通过嵌套的方式在 `Object` 或 `Array` 里面存储更加结构化的数据。
+
+`FLCObject` 还支持两种特殊的数据类型 `Pointer` 和 `File`，可以分别用来存储指向其他 `FLCObject` 的指针以及二进制数据。
+
+`FLCObject` 同时支持 `GeoPoint`，可以用来存储地理位置信息。参见 [GeoPoint](#geopoint)。
+
+以下是一些示例：
+
+```cpp
+// 基本类型
+FString String = TEXT("工程师周会");
+int Interger = 10;
+double Double = 20.0;
+bool Boolean = true;
+FDateTime Time = FDateTime::Now();
+TArray<uint8> Data = {8, 16};
+TLCMap Map;
+Map.Add("Key", "Value");
+TLCArray Array = {1, "HAHA", true};
+TSharedPtr<FLCObject> Object = MakeShared<FLCObject>("Todo");
+
+// 构建对象
+TSharedPtr<FLCObject> TestObject = MakeShared<FLCObject>("TestObject");
+TestObject->Set("testString", String);
+TestObject->Set("testInt", Interger);
+TestObject->Set("testDouble", Double);
+TestObject->Set("testBoolean", Boolean);
+TestObject->Set("testTime", Time);
+TestObject->Set("testMap", Map);
+TestObject->Set("testArray", Array);
+TestObject->Set("testObject", Object);
+TestObject->Save();
+```
+
+我们不推荐通过 `NSData` 在 `FLCObject` 里面存储图片、文档等大型二进制数据。每个 `FLCObject` 的大小不应超过 **128 KB**。如需存储大型文件，可创建 `FLCFile`（暂不支持） 实例并将其关联到 `FLCObject` 的某个属性上。参见 [文件](#文件)。
+
+注意：时间类型在云端将会以 UTC 时间格式存储，但是客户端在读取之后会转化成本地时间。
+
+**<Path to="storage" /> > 结构化数据** 中展示的日期数据也会依据操作系统的时区进行转换。一个例外是当你通过 REST API 获得数据时，这些数据将以 UTC 呈现。你可以手动对它们进行转换。
+
+若想了解云服务是如何保护应用数据的，请阅读[数据和安全](/sdk/storage/guide/security/)。
+
+### 构建对象
+
+下面的代码构建了一个 class 为 `Todo` 的 `FLCObject`：
+
+```cpp
+TSharedPtr<FLCObject> Object = MakeShared<FLCObject>("Todo");
+```
+
+在构建对象时，为了使云端知道对象属于哪个 class，需要将 class 的名字作为参数传入。你可以将云服务里面的 class 比作关系型数据库里面的表。一个 class 的名字必须以字母开头，且只能包含数字、字母和下划线。
+
+### 保存对象
+
+下面的代码将一个 class 为 `Todo` 的对象存入云端：
+
+```cpp
+// 构建对象
+TSharedPtr<FLCObject> ToDo = MakeShared<FLCObject>("Todo");
+
+// 为属性赋值
+ToDo->Set("title", TEXT("马拉松报名"));
+ToDo->Set("priority", 2);
+
+// 将对象保存到云端
+ToDo->Save(FLeanCloudBoolResultDelegate::CreateLambda([=](bool bIsSuccess, const FLCError& Error) {
+    if (bIsSuccess) {
+        // 成功保存之后，执行其他逻辑
+        UE_LOG(LogTemp, Error, TEXT("%s"), *ToDo->GetObjectId());
+    } else {
+        // 异常处理
+    }
+}));
+```
+
+为了确认对象已经保存成功，我们可以到 **<Path to="storage" /> > 结构化数据 > `Todo`** 里面看一下，应该会有一行新的数据产生。点一下这个数据的 `objectId`，应该能看到类似这样的内容：
+
+```json
+{
+  "title": "马拉松报名",
+  "priority": 2,
+  "ACL": {
+    "*": {
+      "read": true,
+      "write": true
+    }
+  },
+  "objectId": "582570f38ac247004f39c24b",
+  "createdAt": "2017-11-11T07:19:15.549Z",
+  "updatedAt": "2017-11-11T07:19:15.549Z"
+}
+```
+
+注意，无需在 **<Path to="storage" /> > 结构化数据** 里面创建新的 `Todo` class 即可运行前面的代码。如果 class 不存在，它将自动创建。
+
+以下是一些对象的内置属性，会在对象保存时自动创建，无需手动指定：
+
+| 内置属性    | 类型       | 描述                                                           |
+| ----------- | ---------- | -------------------------------------------------------------- |
+| `objectId`  | `NSString` | 该对象唯一的 ID 标识。                                         |
+| `ACL`       | `LCACL`    | 该对象的权限控制，实际上是一个 JSON 对象，控制台做了展现优化。 |
+| `createdAt` | `NSDate`   | 该对象被创建的时间。                                           |
+| `updatedAt` | `NSDate`   | 该对象最后一次被修改的时间。                                   |
+
+这些属性的值会在对象被存入云端时自动填入，代码中尚未保存的 `FLCObject` 不存在这些属性。
+
+属性名（**keys**）只能包含字母、数字和下划线。自定义属性不得以双下划线（`__`）开头或与任何系统保留字段和内置属性（`ACL`、`className`、`createdAt`、`objectId` 和 `updatedAt`）重名，无论大小写。
+
+属性值（**values**）可以是字符串、数字、布尔值、数组或字典（任何能以 JSON 编码的数据）。参见 [数据类型](#数据类型)。
+
+我们推荐使用驼峰式命名法（CamelCase）为类和属性来取名。类，采用大驼峰法，如 `CustomData`。属性，采用小驼峰法，如 `imageUrl`。
+
+### 获取对象
+
+对于已经保存到云端的 `FLCObject`，可以通过它的 `objectId` 将其取回：
+
+```cpp
+FLCQuery Query = FLCQuery("Todo");
+Query.Get("582570f38ac247004f39c24b", FLeanCloudQueryObjectDelegate::CreateLambda([](TSharedPtr<FLCObject> ObjectPtr, const FLCError& Error) {
+    if (ObjectPtr.IsValid()) {
+        FString Title = ObjectPtr->Get("title").AsString();
+        int Priority = ObjectPtr->Get("priority").AsInteger();
+
+        // 获取内置属性
+        FString ObjectID = ObjectPtr->GetObjectId();
+        FDateTime UpdateAt = ObjectPtr->GetUpdatedAt();
+        FDateTime CreatedAt = ObjectPtr->GetCreatedAt();
+    }
+}));
+```
+
+如果你试图获取一个不存在的属性，SDK 不会报错，而是会返回默认值或者空。
+
+#### 同步对象
+
+当云端数据发生更改时，你可以调用 `FLCObject::Fetch` 方法来刷新对象，使之与云端数据同步：
+
+```cpp
+TSharedPtr<FLCObject> ToDo = MakeShared<FLCObject>("Todo", "5745557f71cfe40068c6abe0");
+ToDo->Fetch(FLeanCloudBoolResultDelegate::CreateLambda([=](bool bIsSuccess, const FLCError& Error) {
+    if (bIsSuccess) {
+        // todo 已刷新
+    }
+}));
+```
+
+刷新操作会强行使用云端的属性值覆盖本地的属性。因此如果本地有属性修改，**`FLCObject::Fetch` 操作会丢弃这些修改**。为避免这种情况，你可以在刷新时指定 **需要刷新的属性**，这样只有指定的属性会被刷新（包括内置属性 `objectId`、`createdAt` 和 `updatedAt`），其他属性不受影响。
+
+```cpp
+TSharedPtr<FLCObject> ToDo = MakeShared<FLCObject>("Todo", "5745557f71cfe40068c6abe0");
+ToDo->Fetch({"priority", "location"}, FLeanCloudBoolResultDelegate::CreateLambda([=](bool bIsSuccess, const FLCError& Error) {
+    if (bIsSuccess) {
+        // 只有 priority 和 location 会被获取和刷新
+    }
+}));
+```
+
+### 更新对象
+
+要更新一个对象，只需指定需要更新的属性名和属性值，然后调用 `FLCObject::Save` 方法。例如：
+
+```cpp
+TSharedPtr<FLCObject> ToDo = MakeShared<FLCObject>("Todo", "5745557f71cfe40068c6abe0");
+ToDo->Set("content", TEXT("这周周会改到周三下午三点。"));
+ToDo->Save();
+```
+
+云服务会自动识别需要更新的属性并将对应的数据发往云端，未更新的属性会保持原样。
+
+#### 有条件更新对象
+
+通过传入 `query` 选项，可以按照指定条件去更新对象——当条件满足时，执行更新；条件不满足时，不执行更新并返回 `305` 错误。
+
+例如，用户的账户表 `Account` 有一个余额字段 `balance`，同时有多个请求要修改该字段值。为避免余额出现负值，只有当金额小于或等于余额的时候才能接受请求：
+
+```cpp
+TSharedPtr<FLCObject> Account = MakeShared<FLCObject>("Account", "5745557f71cfe40068c6abe0");
+// 对 balance 原子减少 100
+int amount = -100;
+Account->Increase(FString("balance"), amount);
+// 设置条件
+FLCQuery Query = FLCQuery();
+Query.WhereGreaterThanOrEqualTo("balance", -amount);
+FLCSaveOption Option;
+Option.SetMatchQuery(Query);
+// 操作结束后，返回最新数据。
+// 如果是新对象，则所有属性都会被返回，
+// 否则只有更新的属性会被返回。
+Option.SetFetchWhenSave(true);
+Account->Save(FLeanCloudBoolResultDelegate::CreateLambda([=](bool bIsSuccess, const FLCError& Error) {
+    if (bIsSuccess) {
+        UE_LOG(LogTemp, Display, TEXT("当前余额为：%s"), *Account->Get("balance").AsString());
+    } else if (Error.Code == 305) {
+        UE_LOG(LogTemp, Error, TEXT("余额不足，操作失败！"));
+    }
+}));
+```
+
+**`query` 选项只对已存在的对象有效**，不适用于尚未存入云端的对象。
+
+`query` 选项在有多个客户端需要更新同一属性的时候非常有用。相比于通过 `FLCQuery` 查询 `FLCObject` 再对其进行更新的方法，这样做更加简洁，并且能够避免出现差错。
+
+#### 更新计数器
+
+设想我们正在开发一个微博，需要统计一条微博有多少个赞和多少次转发。由于赞和转发的操作可能由多个客户端同时进行，直接在本地更新数字并保存到云端的做法极有可能导致差错。为保证计数的准确性，可以通过 **原子操作** 来增加或减少一个属性内保存的数字：
+
+```cpp
+Post->Increase(FString("likes"), 1);
+```
+
+可以指定需要增加或减少的值。若未指定，则默认使用 `1`。
+
+注意，虽然原子增减支持浮点数，但因为底层数据库的浮点数存储格式限制，会有舍入误差。
+因此，需要原子增减的字段建议使用整数以避免误差，例如 `3.14` 可以存储为 `314`，然后在客户端进行相应的转换。
+否则，以比较大小为条件查询对象的时候，需要特殊处理，
+`< a` 需改查 `< a + e`，`> a` 需改查 `> a - e`，`== a` 需改查 `> a - e` 且 `< a + e`，其中 `e` 为误差范围，据所需精度取值，比如 `0.0001`。
+
+#### 更新数组
+
+更新数组也是原子操作。使用以下方法可以方便地维护数组类型的数据：
+
+```cpp
+/**
+    * @brief 将指定对象或数组附加到数组末尾
+    * @param Key 数组所在的Key
+    * @param Value 要添加的对象
+    * @param bIsUnique 确保对象唯一
+    */
+void Add(const FString& Key, const FLCValue& Value, bool bIsUnique = false);
+
+/**
+    * @brief 从数组字段中删除指定对象或数组的所有实例
+    * @param Key 数组所在的Key
+    * @param Value 要删除的对象
+    */
+void Remove(const FString& Key, const FLCValue& Value);
+```
+
+例如，`Todo` 用一个 `alarms` 属性保存所有闹钟的时间。下面的代码将多个时间加入这个属性：
+
+```cpp
+FDateTime alarm1;
+FDateTime alarm2;
+FDateTime alarm3;
+FDateTime::ParseIso8601(TEXT("2023-06-07T12:10:29.907Z"), alarm1);
+FDateTime::ParseIso8601(TEXT("2023-06-07T12:20:29.907Z"), alarm2);
+FDateTime::ParseIso8601(TEXT("2023-06-07T12:30:29.907Z"), alarm3);
+TSharedPtr<FLCObject> ToDo = MakeShared<FLCObject>("Todo");
+ToDo->Add("alarms", {alarm1, alarm2, alarm3});
+ToDo->Save();
+```
+
+### 删除对象
+
+下面的代码从云端删除一个 `Todo` 对象：
+
+```cpp
+TSharedPtr<FLCObject> ToDo = MakeShared<FLCObject>("Todo", "582570f38ac247004f39c24b");
+ToDo->Delete();
+```
+
+注意，删除对象是一个较为敏感的操作，我们建议你阅读[ACL 权限管理开发指南](/sdk/storage/guide/acl/)来了解潜在的风险。熟悉 class 级别、对象级别和字段级别的权限可以帮助你有效阻止未经授权的操作。
+
+### 批量操作
+
+```cpp
+// 批量构建和更新
+static void Save(const TArray<TSharedPtr<FLCObject>>& Objects, FLeanCloudBoolResultDelegate CallBack = nullptr);
+static void Save(const TArray<TSharedPtr<FLCObject>>& Objects, const FLCSaveOption& Option, FLeanCloudBoolResultDelegate CallBack = nullptr);
+
+// 批量删除
+static void Delete(const TArray<TSharedPtr<FLCObject>>& Objects, FLeanCloudBoolResultDelegate CallBack = nullptr);
+
+// 批量同步
+static void Fetch(const TArray<TSharedPtr<FLCObject>>& Objects, FLeanCloudBoolResultDelegate CallBack = nullptr);
+static void Fetch(const TArray<TSharedPtr<FLCObject>>& Objects, const TArray<FString>& Keys, FLeanCloudBoolResultDelegate CallBack = nullptr);
+```
+
+下面的代码将所有 `Todo` 的 `isComplete` 设为 `true`：
+
+```cpp
+FLCQuery Query = FLCQuery("Todo");
+Query.Find(FLeanCloudQueryObjectsDelegate::CreateLambda([=](TArray<TSharedPtr<FLCObject>> ObjectPtrs,
+                                                            const FLCError& _Error) {
+    // 获取需要更新的 todo
+    for (auto FlcObject : ObjectPtrs) {
+        // 更新属性值
+        FlcObject->Set("isComplete", true);
+    }
+    // 批量更新
+    FLCObject::Save(ObjectPtrs);
+}));
+```
+
+虽然上述方法可以在一次请求中包含多个操作，每一个分别的保存或同步操作在计费时依然会被算作一次请求，而所有的删除操作则会被合并为一次请求。
+
+### 后台运行
+
+细心的开发者已经发现，在所有的示例代码中都是用了异步来访问云端，在 Game 线程调用用以实现后台运行的方法，因此开发者在主线程可以放心地调用函数。
+
+
+### 数据模型
+
+对象之间可以产生关联。拿一个博客应用来说，一个 `Post` 对象可以与许多个 `Comment` 对象产生关联。云服务支持三种关系：一对一、一对多、多对多。
+
+#### 一对一、一对多关系
+
+一对一、一对多关系可以通过将 `FLCObject` 保存为另一个对象的属性值的方式产生。比如说，让博客应用中的一个 `Comment` 指向一个 `Post`。
+
+下面的代码会创建一个含有单个 `Comment` 的 `Post`：
+
+```cpp
+// 创建 post
+TSharedPtr<FLCObject> Post = MakeShared<FLCObject>("Post");
+Post->Set("title", TEXT("饿了……"));
+Post->Set("content", TEXT("中午去哪吃呢？"));
+
+// 创建 comment
+TSharedPtr<FLCObject> Comment = MakeShared<FLCObject>("Comment");
+Comment->Set("content", TEXT("当然是肯德基啦！"));
+
+// 将 post 设为 comment 的一个属性值
+Comment->Set("parent", Post);
+
+// 保存 comment 会同时保存 post
+Comment->Save();
+```
+
+云端存储时，会将被指向的对象用 `Pointer` 的形式存起来。你也可以用 `objectId` 来指向一个对象：
+
+```cpp
+TSharedPtr<FLCObject> Post = MakeShared<FLCObject>("Post", "57328ca079bc44005c2472d0");
+Comment->Set("post", Post);
+```
+
+请参阅 [关系查询](#关系查询) 来了解如何获取关联的对象。
+
+#### 多对多关系
+
+想要建立多对多关系，最简单的办法就是使用 **数组**。在大多数情况下，使用数组可以有效减少查询的次数，提升程序的运行效率。但如果有额外的属性需要附着于两个 class 之间的关联，那么使用 **中间表** 可能是更好的方式。注意这里说到的额外的属性是用来描述 class 之间的关系的，而不是任何单一的 class 的。
+
+我们建议你在任何一个 class 的对象数量超出 100 的时候考虑使用中间表。
+
+### 序列化和反序列化
+
+在实际的开发中，把 `FLCObject` 当作参数传递的时候，会涉及到复杂对象的拷贝的问题，因此 `FLCObject` 也提供了序列化和反序列化的方法。
+
+序列化：
+
+```cpp
+TSharedPtr<FLCObject> ToDo = MakeShared<FLCObject>("Todo"); // 构建对象
+ToDo->Set("title", TEXT("马拉松报名")); // 设置名称
+ToDo->Set("priority", 2); // 设置优先级
+ToDo->Set("owner",  StaticCastSharedPtr<FLCObject>(FLCUser::GetCurrentUser())); // 这里就是一个 Pointer 类型，指向当前登录的用户
+
+// 获取序列化
+TArray<uint8> Data;
+FMemoryWriter Writer(Data);
+Writer << *ToDo.Get();
+```
+
+反序列化：
+
+```cpp
+// 由 TArray<uint8> 转化一个 FLCObject
+TArray<uint8> Data;
+TSharedPtr<FLCObject> ToDo = MakeShared<FLCObject>("Todo");
+FMemoryReader Reader(Data);
+Reader << *ToDo.Get();
+```
+
+## 查询
+
+我们已经了解到如何从云端获取单个 `FLCObject`，但你可能还会有一次性获取多个符合特定条件的 `FLCObject` 的需求，这时候就需要用到 `FLCQuery` 了。
+
+### 基础查询
+
+执行一次基础查询通常包括这些步骤：
+
+1. 构建 `FLCQuery`；
+2. 向其添加查询条件；
+3. 执行查询并获取包含满足条件的对象的数组。
+
+下面的代码获取所有 `lastName` 为 `Smith` 的 `Student`：
+
+```cpp
+FLCQuery Query = FLCQuery("Student");
+Query.WhereEqualTo("lastName", "Smith");
+Query.Find(FLeanCloudQueryObjectsDelegate::CreateLambda([](TArray<TSharedPtr<FLCObject>> Students,
+                                                            const FLCError& Error) {
+    // students 是包含满足条件的 Student 对象的数组
+}));
+```
+
+### 查询条件
+
+可以给 `FLCObject` 添加不同的条件来改变获取到的结果。
+
+下面的代码查询所有 `firstName` 不为 `Jack` 的对象：
+
+```cpp
+Query.WhereNotEqualTo("firstName", "Jack");
+```
+
+对于能够排序的属性（比如数字、字符串），可以进行比较查询：
+
+```cpp
+// 限制 age < 18
+Query.WhereLessThan("age", 18);
+
+// 限制 age <= 18
+Query.WhereLessThanOrEqualTo("age", 18);
+
+// 限制 age > 18
+Query.WhereGreaterThan("age", 18);
+
+// 限制 age >= 18
+Query.WhereGreaterThanOrEqualTo("age", 18);
+```
+
+可以在同一个查询中设置多个条件，这样可以获取满足所有条件的结果。可以理解为所有的条件是 `AND` 的关系：
+
+```cpp
+Query.WhereEqualTo("firstName", "Jack");
+Query.WhereGreaterThan("age", 18);
+```
+
+可以通过指定 `limit` 限制返回结果的数量（默认为 `100`）：
+
+```cpp
+// 最多获取 10 条结果
+Query.Limit = 100;
+```
+
+由于性能原因，`limit` 最大只能设为 `1000`。即使将其设为大于 `1000` 的数，云端也只会返回 1,000 条结果。
+
+如果只需要一条结果，可以直接用 `getFirstObject`：
+
+```cpp
+FLCQuery Query = FLCQuery("Todo");
+Query.WhereEqualTo("priority", 2);
+Query.GetFirst(FLeanCloudQueryObjectDelegate::CreateLambda([](TSharedPtr<FLCObject> ObjectPtr, const FLCError& Error) {
+    // todo 是第一个满足条件的 Todo 对象
+}));
+```
+
+可以通过设置 `skip` 来跳过一定数量的结果：
+
+```cpp
+// 跳过前 20 条结果
+Query.Skip = 20;
+```
+
+把 `skip` 和 `limit` 结合起来，就能实现翻页功能：
+
+```cpp
+FLCQuery Query = FLCQuery("Todo");
+Query.WhereEqualTo("priority", 2);
+Query.Limit = 10;
+Query.Skip = 20;
+```
+
+需要注意的是，`skip` 的值越高，查询所需的时间就越长。作为替代方案，可以通过设置 `createdAt` 或 `updatedAt` 的范围来实现更高效的翻页，因为它们都自带索引。
+同理，也可以通过设置自增字段的范围来实现翻页。
+
+对于能够排序的属性，可以指定结果的排序规则：
+
+```cpp
+// 按 createdAt 升序排列
+Query.WhereOrderByAscending("createdAt");
+
+// 按 createdAt 降序排列
+Query.WhereOrderByDescending("createdAt");
+```
+
+还可以为同一个查询添加多个排序规则：
+
+```cpp
+Query.WhereOrderByAscending("priority");
+Query.WhereOrderByDescending("createdAt");
+```
+
+下面的代码可用于查找包含或不包含某一属性的对象：
+
+```cpp
+// 查找包含 "images" 的对象
+Query.WhereKeyExisted("images");
+
+// 查找不包含 "images" 的对象
+Query.WhereKeyNotExisted("images");
+```
+
+可以通过 `selectKeys` 指定需要返回的属性。下面的代码只获取每个对象的 `title` 和 `content`（包括内置属性 `objectId`、`createdAt` 和 `updatedAt`）：
+
+```cpp
+FLCQuery Query = FLCQuery("Todo");
+Query.SetSelectKeys({"title", "content"});
+Query.GetFirst(FLeanCloudQueryObjectDelegate::CreateLambda([](TSharedPtr<FLCObject> ObjectPtr, const FLCError& Error) {
+    if (ObjectPtr.IsValid()) {
+        FString Title = ObjectPtr->Get("title").AsString(); // √
+        FString Content = ObjectPtr->Get("content").AsString(); // √
+        FString Notes = ObjectPtr->Get("notes").AsString(); // 为空
+    }
+}));
+```
+
+`selectKeys` 支持点号（`author.firstName`），详见[《点号使用指南》](/sdk/storage/guide/dot-notation/)。
+另外，字段名前添加减号前缀表示反向选择，例如 `-author` 表示不返回 `author` 字段。
+反向选择同样适用于内置字段，比如 `-objectId`，也可以和点号组合使用，比如 `-pubUser.createdAt`。
+
+对于未获取的属性，可以通过对结果中的对象进行 `FLCObject::Fetch` 操作来获取。参见 [同步对象](#同步对象)。
+
+### 字符串查询
+
+可以用 `WherePrefixedBy` 来查找某一属性值以特定字符串开头的对象。和 SQL 中的 `LIKE` 一样，你可以利用索引带来的优势：
+
+```cpp
+FLCQuery Query = FLCQuery("Todo");
+// 相当于 SQL 中的 title LIKE 'lunch%'
+Query.WherePrefixedBy("title", "lunch");
+```
+
+可以用 `WhereMatchedSubstring` 来查找某一属性值包含特定字符串的对象：
+
+```cpp
+FLCQuery Query = FLCQuery("Todo");
+// 相当于 SQL 中的 title LIKE '%lunch%'
+Query.WhereMatchedSubstring("title", "lunch");
+```
+
+和 `WherePrefixedBy` 不同，`WhereMatchedSubstring` 无法利用索引，因此不建议用于大型数据集。
+
+注意 `WherePrefixedBy` 和 `WhereMatchedSubstring` 都是 **区分大小写** 的，所以上述查询会忽略 `Lunch`、`LUNCH` 等字符串。
+
+如果想查找某一属性值不包含特定字符串的对象，可以使用 `WhereMatchedRegularExpression` 进行基于正则表达式的查询：
+
+```cpp
+FLCQuery Query = FLCQuery("Todo");
+// "title" 不包含 "ticket"（不区分大小写）
+Query.WhereMatchedRegularExpression("title", "^((?!ticket).)*$", "i");
+```
+
+不过我们并不推荐大量使用这类查询，尤其是对于包含超过 100,000 个对象的 class，
+因为这类查询无法利用索引，实际操作中云端会遍历所有对象来获取结果。如果有进行全文搜索的需求，可以使用全文搜索服务。
+
+使用查询时如果遇到性能问题，可参阅 [查询性能优化](#查询性能优化)。
+
+### 数组查询
+
+下面的代码查找所有数组属性 `tags` 包含 `工作` 的对象：
+
+```cpp
+Query.WhereEqualTo("tags", TEXT("工作"));
+```
+
+下面的代码查询数组属性长度为 3（正好包含 3 个标签）的对象：
+
+```cpp
+Query.WhereEqualToSize("tags", 3);
+```
+
+下面的代码查找所有数组属性 `tags` **同时包含** `工作`、`销售` 和 `会议` 的对象：
+
+```cpp
+TLCArray Array = {TEXT("工作"), TEXT("销售"), TEXT("会议")};
+Query.WhereContainedAllIn("tags", Array);
+```
+
+如需获取某一属性值包含一列值中任意一个值的对象，可以直接用 `WhereContainedIn` 而无需执行多次查询。下面的代码构建的查询会查找所有 `priority` 为 `1` **或** `2` 的 todo 对象：
+
+```cpp
+// 单个查询
+FLCQuery PriorityOneOrTwo = FLCQuery("Todo");
+PriorityOneOrTwo.WhereContainedIn("priority", {1, 2});
+// 这样就可以了 :)
+
+// ---------------
+//       vs.
+// ---------------
+
+// 多个查询
+FLCQuery PriorityOne = FLCQuery("Todo");
+PriorityOne.WhereEqualTo("priority", 1);
+
+FLCQuery PriorityTwo = FLCQuery("Todo");
+PriorityOne.WhereEqualTo("priority", 2);
+
+FLCQuery PriorityOneOrTwo = PriorityOne.Or(PriorityTwo);
+// 好像有些繁琐 :(
+```
+
+反过来，还可以用 `WhereNotContainedIn` 来获取某一属性值不包含一列值中任何一个的对象。
+
+### 关系查询
+
+查询关联数据有很多种方式，常见的一种是查询某一属性值为特定 `FLCObject` 的对象，这时可以像其他查询一样直接用 `WhereEqualTo`。比如说，如果每一条博客评论 `Comment` 都有一个 `post` 属性用来存放原文 `Post`，则可以用下面的方法获取所有与某一 `Post` 相关联的评论：
+
+```cpp
+TSharedPtr<FLCObject> Post = MakeShared<FLCObject>("Post", "57328ca079bc44005c2472d0");
+FLCQuery Query = FLCQuery("Comment");
+Query.WhereEqualTo("post", Query);
+Query.Find(FLeanCloudQueryObjectsDelegate::CreateLambda([](TArray<TSharedPtr<FLCObject>> ObjectPtrs,
+                                                            const FLCError& Error) {
+    // comments 包含与 post 相关联的评论
+}));
+```
+
+如需获取某一属性值为另一查询结果中任一 `FLCObject` 的对象，可以用 `matchesQuery`。下面的代码构建的查询可以找到所有包含图片的博客文章的评论：
+
+```cpp
+FLCQuery InnerQuery = FLCQuery("Post");
+InnerQuery.WhereKeyExisted("images");
+
+FLCQuery Query = FLCQuery("Comment");
+Query.WhereMatchesQuery("post", InnerQuery);
+```
+
+如需获取某一属性值不是另一查询结果中任一 `FLCObject` 的对象，则使用 `WhereDoesNotMatchQuery`。
+
+有时候可能需要获取来自另一个 class 的数据而不想进行额外的查询，此时可以在同一个查询上使用 `includeKey`。下面的代码查找最新发布的 10 条评论，并包含各自对应的博客文章：
+
+```cpp
+FLCQuery Query = FLCQuery("Comment");
+
+// 获取最新发布的
+Query.WhereOrderByDescending("createdAt");
+
+// 只获取 10 条
+Query.Limit = 10;
+
+// 同时包含博客文章
+Query.WhereKeyIncluded("post");
+
+Query.Find(FLeanCloudQueryObjectsDelegate::CreateLambda([](TArray<TSharedPtr<FLCObject>> Comments,
+                                                            const FLCError& Error) {
+    // comments 包含最新发布的 10 条评论，包含各自对应的博客文章
+    for (auto Comment : Comments) {
+        // 该操作无需网络连接
+        TSharedPtr<FLCObject> Post = Comment->Get("post").AsObject();
+    }
+}));
+```
+
+可以用 dot 符号（`.`）来获取多级关系，例如 `post.author`，详见[《点号使用指南》](/sdk/storage/guide/dot-notation/)的《在查询对象时使用点号》一节。
+
+可以在同一查询上应用多次 `WhereKeyIncluded` 以包含多个属性。通过这种方法获取到的对象同样接受 `GetFirst` 等 `FLCQuery` 辅助方法。
+
+通过 `WhereKeyIncluded` 进行多级查询的方式不适用于数组属性内部的 `FLCObject`，只能包含到数组本身。
+
+#### 关系查询的注意事项
+
+云端使用的并非关系型数据库，无法做到真正的联表查询，所以实际的处理方式是：先执行内嵌／子查询（和普通查询一样，`limit` 默认为 `100`，最大 `1000`），然后将子查询的结果填入主查询的对应位置，再执行主查询。如果子查询匹配到的记录数量超出 `limit`，且主查询有其他查询条件，那么可能会出现没有结果或结果不全的情况，因为只有 `limit` 数量以内的结果会被填入主查询。
+
+我们建议采用以下方案进行改进：
+
+- 确保子查询的结果在 100 条以下，如果在 100 至 1,000 条之间的话请将子查询的 `limit` 设为 `1000`。
+- 将需要查询的字段冗余到主查询所在的表上。
+- 进行多次查询，每次在子查询上设置不同的 `skip` 值来遍历所有记录（注意 `skip` 的值较大时可能会引发性能问题，因此不是很推荐）。
+
+### 统计总数量
+
+如果只需知道有多少对象匹配查询条件而无需获取对象本身，可使用 `FLCQuery::Count` 来代替 `FLCQuery::Find`。比如说，查询有多少个已完成的 todo：
+
+```cpp
+FLCQuery Query = FLCQuery("Todo");
+Query.WhereEqualTo("isComplete", true);
+Query.Count(FLeanCloudQueryCountDelegate::CreateLambda([](int Count, const FLCError& Error) {
+    UE_LOG(LogTemp, Display, TEXT("%d 个 todo 已完成"), Count);
+}));
+```
+
+### 组合查询
+
+组合查询就是把诸多查询条件用一定逻辑合并到一起（`OR` 或 `AND`）再交给云端去查询。
+
+组合查询不支持在子查询中包含 `GeoPoint` 或其他非过滤性的限制（例如 `near`、`withinGeoBox`、`limit`、`skip`、`ascending`、`descending`、`include`）。
+
+#### OR 查询
+
+OR 操作表示多个查询条件符合其中任意一个即可。 例如，查询优先级大于等于 `3` 或者已经完成了的 todo：
+
+```cpp
+FLCQuery priorityQuery = FLCQuery("Todo");
+priorityQuery.WhereGreaterThanOrEqualTo("priority", 3);
+
+FLCQuery isCompleteQuery = FLCQuery("Todo");
+isCompleteQuery.WhereEqualTo("isComplete", true);
+
+FLCQuery Query = FLCQuery::Or({priorityQuery, isCompleteQuery});
+```
+
+使用 OR 查询时，子查询中不能包含 `GeoPoint` 相关的查询。
+
+#### AND 查询
+
+使用 AND 查询的效果等同于往 `FLCQuery` 添加多个条件。下面的代码构建的查询会查找创建时间在 `2016-11-13` 和 `2016-12-02` 之间的 todo：
+
+```cpp
+FDateTime alarm1;
+FDateTime alarm2;
+FDateTime::ParseIso8601(TEXT("2016-11-13T00:00:00.000Z"), alarm1);
+FDateTime::ParseIso8601(TEXT("2016-12-02T00:00:00.000Z"), alarm2);
+
+FLCQuery StartDateQuery = FLCQuery("Todo");
+StartDateQuery.WhereGreaterThanOrEqualTo("createdAt", alarm1);
+
+FLCQuery EndDateQuery = FLCQuery("Todo");
+EndDateQuery.WhereLessThan("createdAt", alarm2);
+
+FLCQuery Query = FLCQuery::And({StartDateQuery, EndDateQuery});
+```
+
+单独使用 AND 查询跟使用基础查询相比并没有什么不同，不过当查询条件中包含不止一个 OR 查询时，就必须使用 AND 查询：
+
+```cpp
+FDateTime alarm1;
+FDateTime alarm2;
+FDateTime::ParseIso8601(TEXT("2016-11-13T00:00:00.000Z"), alarm1);
+FDateTime::ParseIso8601(TEXT("2016-12-02T00:00:00.000Z"), alarm2);
+FLCQuery CreatedAtQuery = FLCQuery("Todo");
+CreatedAtQuery.WhereGreaterThanOrEqualTo("createdAt", alarm1);
+CreatedAtQuery.WhereLessThan("createdAt", alarm2);
+
+FLCQuery LocationQuery = FLCQuery("Todo");
+LocationQuery.WhereKeyNotExisted("location");
+
+FLCQuery Priority2Query = FLCQuery("Todo");
+Priority2Query.WhereEqualTo("priority", 2);
+
+FLCQuery Priority3Query = FLCQuery("Todo");
+Priority3Query.WhereEqualTo("priority", 3);
+
+FLCQuery PriorityQuery = FLCQuery::Or({Priority2Query, Priority3Query});
+FLCQuery TimeLocationQuery = FLCQuery::Or({LocationQuery, CreatedAtQuery});
+FLCQuery Query = FLCQuery::And({PriorityQuery, TimeLocationQuery});
+```
+
+
+### 查询性能优化
+
+影响查询性能的因素很多。特别是当查询结果的数量超过 10 万，查询性能可能会显著下降或出现瓶颈。以下列举一些容易降低性能的查询方式，开发者可以据此进行有针对性的调整和优化，或尽量避免使用。
+
+- 不等于和不包含查询（无法使用索引）
+- 通配符在前面的字符串查询（无法使用索引）
+- 有条件的 `count`（需要扫描所有数据）
+- `skip` 跳过较多的行数（相当于需要先查出被跳过的那些行）
+- 无索引的排序（另外除非复合索引同时覆盖了查询和排序，否则只有其中一个能使用索引）
+- 无索引的查询（另外除非复合索引同时覆盖了所有条件，否则未覆盖到的条件无法使用索引，如果未覆盖的条件区分度较低将会扫描较多的数据）
+
+## GeoPoint
+
+云服务允许你通过将 `FLCGeoPoint` 关联到 `FLCObject` 的方式存储折射真实世界地理位置的经纬坐标，这样做可以让你查询包含一个点附近的坐标的对象。常见的使用场景有「查找附近的用户」和「查找附近的地点」。
+
+要构建一个包含地理位置的对象，首先要构建一个地理位置。下面的代码构建了一个 `FLCGeoPoint` 并将其纬度（`latitude`）设为 `39.9`，经度（`longitude`）设为 `116.4`：
+
+```cpp
+FLCGeoPoint Point = FLCGeoPoint(39.9, 116.4);
+```
+
+现在可以将这个地理位置存储为一个对象的属性：
+
+```cpp
+ToDo->Set("location", Point);
+```
+
+### 地理位置查询
+
+给定一些含有地理位置的对象，可以从中找出离某一点最近的几个，或者处于某一范围内的几个。要执行这样的查询，可以向普通的 `FLCQuery` 添加 `nearGeoPoint` 条件。下面的代码查找 `location` 属性值离某一点最近的 `Todo` 对象：
+
+```cpp
+FLCQuery Query = FLCQuery("Todo");
+FLCGeoPoint Point = FLCGeoPoint(39.9, 116.4);
+Query.WhereNear("location", Point);
+
+// 限制为 10 条结果
+Query.Limit = 10;
+Query.Find(FLeanCloudQueryObjectsDelegate::CreateLambda([](TArray<TSharedPtr<FLCObject>> ObjectPtrs,
+                                                            const FLCError& Error) {
+    // todos 是包含满足条件的 Todo 对象的数组
+}));
+```
+
+像 `WhereOrderByAscending` 和 `WhereOrderByDescending` 这样额外的排序条件会获得比默认的距离排序更高的优先级。
+
+若要限制结果和给定地点之间的距离，可以参考 API 文档中的 `WhereWithinKilometers`、`WhereWithinMiles` 和 `WhereWithinRadians` 参数。
+
+若要查询在某一矩形范围内的对象，可以用 `WhereWithinGeoBox`：
+
+![withinGeoBox](/img/geopoint-withingeobox.svg)
+
+```cpp
+FLCQuery Query = FLCQuery("Todo");
+FLCGeoPoint Southwest = FLCGeoPoint(30, 115);
+FLCGeoPoint Northeast = FLCGeoPoint(40, 118);
+Query.WhereWithinGeoBox("location", Southwest, Northeast);
+```
+
+### GeoPoint 的注意事项
+
+GeoPoint 的经纬度的类型是数字，且经度需在 -180.0 到 180.0 之间，纬度需在 -90.0 到 90.0 之间。
+另外，每个对象最多只能有一个类型为 GeoPoint 的属性。
+
+iOS 8.0 之后，使用定位服务之前，需要调用 `[locationManager requestWhenInUseAuthorization]` 或 `[locationManager requestAlwaysAuthorization]` 来获取用户的「使用期授权」或「永久授权」，而这两个请求授权需要在 `info.plist` 里面对应添加 `NSLocationWhenInUseUsageDescription` 或 `NSLocationAlwaysUsageDescription` 的键值对，值为开启定位服务原因的描述。SDK 内部默认使用的是「使用期授权」。
+

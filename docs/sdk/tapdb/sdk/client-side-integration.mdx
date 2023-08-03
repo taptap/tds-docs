@@ -21,7 +21,7 @@ TapSDK 提供了一套可供游戏开发者收集账号数据的 API。
 <>
 
 - Unity 2019.4 或更高版本
-- iOS 10 或更高版本
+- iOS 10 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
 - Android 5.0（API level 21）或更高版本
 
 </>
@@ -34,7 +34,7 @@ Android 5.0（API level 21）或更高版本
 
 <>
 
-iOS 10 或更高版本
+iOS 10 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
 
 </>
 
@@ -172,7 +172,7 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core",
 ## 初始化 SDK
 
 
-初始化 SDK 并上报一个设备登录（ `device_login` ）事件，调用这个接口是使用其它接口的先决条件，需要尽早调用。 
+初始化 SDK 并上报一个设备登录（ `device_login` ）事件，调用这个接口是使用其他接口的先决条件，需要尽早调用。 
 
 
 :::info
@@ -1405,7 +1405,6 @@ System.loadLibrary("msaoaidsec");
 
 
 
-
   ### IMEI（Android）
 
 在 `AndroidManifest.xml` 增加如下条目，且用户同意权限的申请后，SDK 将自动采集 Android IMEI。
@@ -1459,7 +1458,8 @@ iOS 平台不适用
 
 若使用 TapSDK 初始化，请在 `TapDBConfig` 中的 `advertiserIDCollectionEnabled` 传入 `true` 开启 IDFA 采集开关。
 
-若单独使用 TapDB SDK 请调用如下接口开启 IDFA 采集开关
+若单独使用 TapDB SDK 请调用如下接口开启 IDFA 采集开关，***为保证数据准确性，该接口应在初始化接口之前调用***
+
 ```cs
 TapDB.AdvertiserIDCollectionEnabled(true);
 ```
@@ -1524,17 +1524,17 @@ SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选�
 
 如果选择 UPM 导入，可以在项目的 `Packages/manifest.json` 文件中添加：
 
-```json
-"dependencies": {
-  "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#3.14.0",
-  "com.taptap.tds.tapdb": "https://github.com/TapTap/TapDB-Unity.git#3.14.0",
-  "com.taptap.tds.themis": "https://github.com/TapTap/TapThemis-Unity.git#3.14.0"
-}
-```
+<CodeBlock className="language-json">
+{`"dependencies":{
+    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.tapdb": "https://github.com/TapTap/TapDB-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.themis": "https://github.com/taptap/TapThemis-Unity.git#3.1.7-6",
+}`}
+</CodeBlock>
 
 如果选择手动导入：
 
-* 在 [下载页](/tap-download) 找到 TapSDK Unity 下载地址，下载 TapSDK-UnityPackage.zip 然后解压，导入其中的 `TapTap_Common`，`TapTap_TapDB` 和 `TapTap_Themis` 模块。
+* 在 [下载页](/tap-download) 找到 TapSDK Unity 下载地址，下载 TapSDK-UnityPackage.zip 然后解压，导入其中的 `TapTap_Common`，`TapTap_TapDB`模块。
 
 </>
 
@@ -1548,7 +1548,7 @@ repositories {
 }
 dependencies {
   ...
-  implementation (name:'THEMIS-release2.6.7', ext:'aar')
+  implementation (name:'THEMIS-release*.*.*', ext:'aar')
 }
 ```
 
@@ -1569,7 +1569,7 @@ dependencies {
 <MultiLang>
 
 ```cs
-using TapTap.TapDB;
+using TapTap.Themis;
 ```
 
 ```cs
@@ -1606,12 +1606,32 @@ TapDB.enableThemis(false);
 
 ### 接口描述
 
+#### 初始化
+
+<MultiLang>
+
+```cs
+TapThemis.InitTHEMIS();
+```
+
+```cs
+// TapDB SDK 自动调用，不需要额外接入
+```
+
+```cs
+// TapDB SDK 自动调用，不需要额外接入
+```
+
+</MultiLang>
+
+***注意：该接口需要在 TapDB 初始化接口之后调用***
+
 #### 设置日志上报等级
 
 <MultiLang>
 
 ```cs
-TapDB.ConfigAutoReportLogLevel(LogSeverity.LogError);
+TapThemis.U3d_ConfigAutoReportLogLevel(TapTap.Themis.LogSeverity.LogError);
 ```
 
 ```cs
@@ -1631,7 +1651,7 @@ TapDB.ConfigAutoReportLogLevel(LogSeverity.LogError);
 <MultiLang>
 
 ```cs
-TapDB.ConfigAutoQuitApplication(true);
+TapThemis.U3d_ConfigAutoQuitApplication(true);
 ```
 
 ```cs
@@ -1651,7 +1671,7 @@ TapDB.ConfigAutoQuitApplication(true);
 <MultiLang>
 
 ```cs
-TapDB.RegisterLogCallback(logcallback);
+TapThemis.U3d_UnregisterLogCallback(logcallback);
 public void logcallback(string condition, string statckTrace, LogType type ){
 
 }
@@ -1674,7 +1694,7 @@ public void logcallback(string condition, string statckTrace, LogType type ){
 <MultiLang>
 
 ```cs
-TapDB.UnRegisterLogCallback(logcallback);
+TapThemis.U3d_UnregisterLogCallback(logcallback);
 ```
 
 ```cs
@@ -1692,7 +1712,7 @@ TapDB.UnRegisterLogCallback(logcallback);
 <MultiLang>
 
 ```cs
-TapDB.ReportException(new Exception("crash test from unity"),"crashMessage desc");
+TapThemis.ReportException(new Exception("Themis crash test from unity"),"crashMessage from untiy");
 ```
 
 ```cs

@@ -1,0 +1,51 @@
+---
+title: 常见问题
+sidebar_label: 常见问题
+sidebar_position: 4
+---
+
+import CodeBlock from "@theme/CodeBlock";
+import sdkVersions from "/src/docComponents/sdkVersions";
+import { Conditional } from "/src/docComponents/conditional";
+
+### TapTap For iOS 登录报 `accessToken: sdk_not_matched` 异常
+检查 TapTap 开发者后台的应用是否配置了应用的 Bundle ID。
+
+### TapTap 登录报 `signature not match` 异常
+接入了 TapTap 登录但没有在开发者中心后台配置签名或者配置错了都会提示该异常。有的开发者可能没有调试出异常信息，可以通过这种方式进行验证：如果将 TapTap 客户端卸载，测试登录功能时会弹出 WebView 授权，而测试设备安装了 TapTap 客户端则无法拉起客户端授权，这种情况基本上就是因为签名配置问题导致的，请参考[文档](/sdk/start/quickstart/#配置签名证书)完成配置。
+
+### TapTap 登录提示 `暂无测试资格或不在测试期间，无法登录游戏` 异常提示。
+**TapTap 开发者中心 > 商店 > 版本发布 > 内部测试** 检查是否开启了内部测试功能，如果开启了检查是否没有将当前 TapTap ID 账号添加进测试用户中。
+
+### TapTap 登录报 `state not equal` 异常
+检查当前设备系统时间是否已经开启联网同步、检查当前设备的 TapTap 客户端版本是否过低。
+
+### TapTap 登录报 `java.lang.NoSuchFieldException: CACHE_ELSE_NETWORK` 异常
+由于 Android 项目开启了混淆操作，TapSDK 已经做了混淆处理，需要跳过对 TapSDK 的混淆操作。具体请参考 [Android 代码混淆](/sdk/start/quickstart/#android-代码混淆)。针对 Android 原生目前暂不支持开启资源混淆操作，如果项目开启了资源混淆操作请关闭掉，`shrinkResources false`。
+
+### TapTap 登录报 `{"code":36869,"error_description":"Unauthorized."}` 异常
+检查 TapSDK 初始化的 Client ID、Client Token 以及 ServerURL 参数赋值是否有误，此外，ServerURL 请**使用 HTTPS 协议**，参考文档关于 **[域名](/sdk/start/get-ready/#域名)** 的说明。
+
+### TapTap 登录报 `Chain validation failed` 异常
+可以按照以下步骤排查：
+1、检查设备是否连接代理并没有正常安装证书。
+2、检查手机系统时间是否有修改。
+
+### 单纯 TapTap 用户认证 For Unity 集成报如下异常：
+```
+Assembly 'Assets/TapTap/Common/Plugins/TapTap.Common.dll' will not be loaded due to errors:
+Unable to resolve reference 'LC.Newtonsoft.Json'. Is the assembly missing or incompatible with the current platform?
+```
+报错原因是因为使用 TapSDK Unity v3.7.1 及更高版本时并没有在项目的 `Packages/manifest.json` 文件中添加 `com.leancloud.storage` 模块导致的，参考[文档](/sdk/taptap-login/guide/tap-login/#sdk-获取)添加即可。
+
+### 登录提示： this app is not allowed for this domain
+
+1. 检查开发者后台应用配置中是否开通了 TapTap 登录服务；
+2. 检查项目初始化代码中 ClientId、ClientToken、ServerUrl （需要以 `https://` 开头）是否和开发者后台保持一致。
+
+
+![](https://dc-file.leanticket.cn/VIFonJ9YOJ4SAXb3WdVhMYWlF84xGKkN/CF18E02C-C819-4940-9C9B-60050062EDD0.png)
+
+### 玩家通过 TapTap 登录后，开发者能否获得玩家的手机号？
+
+手机号属于玩家的隐私信息，目前暂不支持开发者获取登录玩家的手机号。

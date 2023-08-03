@@ -1,5 +1,6 @@
 import React from "react";
 import Link from "@docusaurus/Link";
+import styles from "./doc.module.scss";
 
 export const OfficeDoc = ({ fileUrl }) => {
   const fileUrlEncoded = encodeURI(fileUrl);
@@ -247,4 +248,11 @@ export const Card = ({ imgSrc, imgScale = 1, label, to }) => (
       <span>{label}</span>
     </div>
   </Link>
+);
+
+export const Popup = ({ children, content }) => (
+  <span tabIndex={0} className={styles.popup}>
+    <span>{children}</span>
+    <div className={styles.content}>{content}</div>
+  </span>
 );

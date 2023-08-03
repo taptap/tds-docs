@@ -64,15 +64,83 @@ const config = {
         items: [
           {
             label: "文档首页",
-            // to: "/",
-            to: "https://leancloud.cn/docs/",
+            to: "/",
             position: "right",
             activeBaseRegex: "^/(?!.+)",
           },
           {
-            type: "localeDropdown",
+            label: 'API 文档',
+            position: 'right',
+            items: [
+              {
+                label: 'Android/Java SDK API',
+                href: 'https://leancloud.cn/api-docs/android/index.html',
+              },
+              {
+                label: 'Objective-C SDK API',
+                href: 'https://leancloud.cn/api-docs/iOS/index.html',
+              },
+              {
+                label: 'Swfit SDK API',
+                href: 'https://leancloud.cn/api-docs/swift/index.html',
+              },
+              {
+                label: 'Flutter 数据存储 SDK API',
+                href: 'https://pub.dev/documentation/leancloud_storage/latest/leancloud_storage/leancloud_storage-library.html',
+              },
+              {
+                label: 'Flutter 即时通讯 SDK API',
+                href: 'https://pub.dev/documentation/leancloud_official_plugin/latest/leancloud_plugin/leancloud_plugin-library.html',
+              },
+              {
+                label: 'JavaScript 数据存储 SDK API',
+                href: 'https://leancloud.github.io/javascript-sdk/docs/',
+              },
+              {
+                label: 'JavaScript 多人在线对战 SDK API',
+                href: 'https://leancloud.github.io/Play-SDK-JS/doc/global.html',
+              },
+              {
+                label: 'Python SDK API',
+                href: 'https://leancloud.github.io/python-sdk/',
+              },
+              {
+                label: 'PHP SDK API',
+                href: 'https://leancloud.github.io/php-sdk/',
+              },
+              {
+                label: 'Go SDK API',
+                href: 'https://pkg.go.dev/github.com/leancloud/go-sdk/leancloud',
+              },
+              {
+                label: '.NET SDK API',
+                href: 'https://leancloud.github.io/csharp-sdk/html/',
+              }
+            ],
+          },
+          {
+            label: '资源',
+            position: 'right',
+            items: [
+              {
+                label: 'SDK',
+                href: '/sdk/sdk-page/',
+              },
+              {
+                label: 'Demo',
+                to: '/demo',
+              }
+            ],
+          },
+          {
+            label: "云课堂",
+            to: "/classroom",
             position: "right",
           },
+          {
+            type: "localeDropdown",
+            position: "right",
+          }
         ],
       },
       prism: {

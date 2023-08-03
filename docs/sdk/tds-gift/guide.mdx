@@ -35,8 +35,8 @@ sidebar_position: 2
 
 1. 根据接口文档提交 **兑换码** 与 **配置信息等参数** 给兑换接口。
 2. 兑换接口校验数据合法性。
-3. 兑换系统根据业务场景选择是否调用 **游戏方提供的二次校验接口**。
-4. 校验全部通过后根据不同接口判断是否调用 **游戏方提供的发送道具接口** 完成兑换。
+3. 兑换系统根据业务场景选择是否调用 **游戏方提供的二次校验接口**。（可选，当后台配置二次校验接口时会调用）
+4. 校验全部通过后根据不同接口判断是否调用 **游戏方提供的发送道具接口** 完成兑换。（可选，当后台配置发送道具接口时会调用）
 
 有三种不同的兑换接口可以进行兑换，整体对接流程只要对接其一接口即可完成：
 
@@ -105,11 +105,11 @@ curl --location -g --request POST <后台配置的游戏方二次校验接口地
 | character_id          | 字符串                        | 兑换的用户 ID        |
 | content               | 字符串（嵌套 JSON 字符串）      | 后台配置的自定义条件 |
 | content.condition     | 字符串                        | 自定义条件-key       |
-| content.operate       | 字符串                        | 关系-详情见其它      |
+| content.operate       | 字符串                        | 关系-详情见其他      |
 | content.value         | 字符串                        | 自定义条件-value     |
 | content_obj           | 对象数组（和 content 含义相同） | 后台配置的自定义条件 |
 | content_obj.condition | 字符串                        | 自定义条件-key       |
-| content_obj.operate   | 字符串                        | 关系-详情见其它      |
+| content_obj.operate   | 字符串                        | 关系-详情见其他      |
 | content_obj.value     | 字符串                        | 自定义条件-value     |
 | ext                   | 字符串                        | 请求接口时传递的数值 |
 | gift_code             | 字符串                        | 用户此次兑换的礼包码 |
@@ -300,6 +300,8 @@ Header Content-Type:application/json
 | character_id | 字符串 | 必传     | 游戏用户 ID                         |
 | nonce_str    | 字符串 | 必传     | 随机字符串，建议五位随机字符串      |
 | sign         | 字符串 | 必传     | 签名，该签名用 ClientId 代替 Secret |
+| timestamp         | 整型 | 必传     | 时间戳（秒） |
+
 
 返回参数：
 
@@ -307,7 +309,7 @@ Header Content-Type:application/json
 | ------------------ | ----------------------------- | -------------------------------- |
 | activity_id        | 字符串                        | 礼包活动 ID                      |
 | nonce_str          | 字符串                        | 随机字符串                       |
-| timestamp          | 字符串                        | 时间戳                           |
+| timestamp          | 整型                       | 时间戳                           |
 | content            | 字符串（嵌套 JSON 字符串）      | 后台配置的自定义奖品             |
 | content.name       | 字符串                        | 奖品名称                         |
 | content.number     | 数字                          | 奖品数量                         |
@@ -316,7 +318,7 @@ Header Content-Type:application/json
 | content_obj.number | 整型                        | 奖品数量                         |
 | sign               | 字符串                        | 返回签名，验证返回数据没有被修改 |
 | c_sign             | 字符串                        | 内容签名，验证返回数据没有被修改 |
-| error              | 整形                          | 0 为成功，其它为失败码            |
+| error              | 整形                          | 0 为成功，其他为失败码            |
 | success            | 布尔                          | 是否成功                         |
 | custom             | 对象                          | 维度信息                         |
 | custom.xxx         | 字符数组                      | 自定义维度                       |
@@ -351,6 +353,135 @@ RESULT_REQUEST=`curl --location --request POST 'https://poster-api.xd.cn/api/v1.
 --data-raw "{\"client_id\":\"$client_id\",\"gift_code\":\"$gift_code\",\"character_id\":\"$character_id\",\"nonce_str\":\"$nonce_str\",\"sign\":\"$signed\",\"timestamp\":$(date +%s)}"`
 
 echo $RESULT_REQUEST
+```
+
+</details>
+
+<details>
+<summary>Android 请求示例：</summary>
+
+可以参考[ Android Demo ](https://github.com/taptap/TapSDK-Android-Demo/blob/main/app/src/main/java/com/tds/demo/fragment/GiftFragment.java) 中礼包系统功能
+
+</details>
+
+<details>
+<summary>C# 请求示例：</summary>
+
+```
+using UnityEngine.Networking;
+using System;
+using System.Text;
+using System.Security.Cryptography;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class APIClient : MonoBehaviour
+{
+    private const string apiUrl = "https://poster-api.xd.cn/api/v1.0/cdk/game/submit-simple";
+    private const string contentType = "application/json";
+    private const string clientId = "hskcocvse6x1cgkklm";
+    private const string giftCode = "NZ4mp2cztRMXH";
+    private const string characterId = "879a0cdd9nnb917055ee";
+    private const string nonceStr = "RFG7U";
+
+    public GUISkin demoSkin;
+
+
+    void Start()
+    {
+
+    }
+
+
+     private void OnGUI()
+    {
+
+        GUI.skin = demoSkin;
+        float scale = 1.0f;
+
+        
+        float btnWidth= Screen.width / 5 * 2;
+        float btnWidth2 = btnWidth + 80 * scale;
+
+        float btnHeight = Screen.height / 25;
+        float btnTop = 30 * scale;
+        float btnGap = 20 * scale;
+
+        GUI.skin.button.fontSize = Convert.ToInt32(13 * scale);
+
+        var style = new GUIStyle(GUI.skin.button) { fontSize = 20 };
+        var labelStyle = new GUIStyle(GUI.skin.label) { fontSize = 30 };
+
+        if (GUI.Button(new Rect((Screen.width - btnGap) / 2 - btnWidth, btnTop, btnWidth /2, btnHeight), "返回", style))
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(0);
+
+        }
+
+        btnTop += btnHeight + 20 * scale;
+
+        if (GUI.Button(new Rect((Screen.width - btnGap) / 2 - btnWidth, btnTop, btnWidth, btnHeight), "无服务器兑换", style))
+        {
+             StartCoroutine(StartRequest());
+        }
+
+
+    }
+
+    private IEnumerator StartRequest()
+    {
+        // 获取当前时间戳（秒）
+        int timestamp = (int)(System.DateTime.UtcNow.Subtract(new System.DateTime(1970, 1, 1))).TotalSeconds;
+
+        // 拼接并加密 sign 参数
+        string sign = GetSign(timestamp, nonceStr, clientId);
+
+        // 构建请求参数
+        string requestBody = "{\"client_id\":\"" + clientId + "\",\"gift_code\":\"" + giftCode + "\",\"character_id\":\"" + characterId + "\",\"nonce_str\":\"" + nonceStr + "\",\"timestamp\":" + timestamp + ",\"sign\":\"" + sign + "\"}";
+
+        // 创建 UnityWebRequest 对象
+        UnityWebRequest request = new UnityWebRequest(apiUrl, "POST");
+
+        // 设置请求头
+        request.SetRequestHeader("Content-Type", contentType);
+
+        // 设置请求体
+        byte[] bodyRaw = Encoding.UTF8.GetBytes(requestBody);
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+
+        // 发送请求
+        yield return request.SendWebRequest();
+
+        // 处理响应
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            Debug.Log("API request succeeded");
+            Debug.Log(request.downloadHandler.text);
+        }
+        else
+        {
+
+            Debug.Log("API request failed: " + request.error);
+            Debug.Log(request.downloadHandler.text);
+
+        }
+    }
+
+    private string GetSign(int timestamp, string nonceStr, string clientId)
+    {
+        // 拼接参数并进行 SHA1 加密
+        string signString = timestamp.ToString() + nonceStr + clientId;
+        byte[] signBytes = Encoding.UTF8.GetBytes(signString);
+        byte[] signHash = new SHA1CryptoServiceProvider().ComputeHash(signBytes);
+        string sign = BitConverter.ToString(signHash).Replace("-", "").ToLowerInvariant();
+
+        return sign;
+    }
+}
+
+
 ```
 
 </details>
@@ -480,7 +611,7 @@ Header Content-Type:application/json
 | verify_captcha_key  | 字符串 | 必传     | 验证码 KEY                     |
 | verify_captcha_code | 字符串 | 必传     | 用户提交的验证码答案           |
 
-## 其它
+## 其他
 
 ### 错误码
 
@@ -524,25 +655,3 @@ Header Content-Type:application/json
 | --------------- | ------------- |
 | 国内 taptap.cn | 59.110.228.98 |
 | 海外 taptap.io  | 8.214.95.148  |
-
-### 常见 FAQ
-
-Q: 兑换参数完备，但请求兑换时返回 403。
-
-A: 请检查您的请求中 header 信息，是否有带上特殊的 User Agent。
-
-Q: 二次校验是需要游戏方请求两次兑换接口吗？
-
-A: 二次校验是您按照规范开发校验接口并将地址配置后台中，由兑换系统去请求。
-
-Q: 无服务器返回值的 content 参数无法解析？
-
-A: 返回值的 content 是一段嵌套的 json 字符串，可以先读出字符串再进行进一步 json 解析，除此之外还新增了 content_obj 字段，可以有选择的去使用。
-
-Q: 如何判断兑换是否成功？
-
-A: 可以根据返回值中的 error 字段是否为 0 来判断。
-
-Q: 无服务器兑换的 sign 字段如何使用？
-
-A: 可以参考文档中[签名部分](/sdk/tds-gift/guide/#签名)。
