@@ -172,7 +172,7 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core",
 ## 初始化 SDK
 
 
-初始化 SDK 并上报一个设备登录（ `device_login` ）事件，调用这个接口是使用其它接口的先决条件，需要尽早调用。 
+初始化 SDK 并上报一个设备登录（ `device_login` ）事件，调用这个接口是使用其他接口的先决条件，需要尽早调用。 
 
 
 :::info
@@ -1405,7 +1405,6 @@ System.loadLibrary("msaoaidsec");
 
 
 
-
   ### IMEI（Android）
 
 在 `AndroidManifest.xml` 增加如下条目，且用户同意权限的申请后，SDK 将自动采集 Android IMEI。
@@ -1525,13 +1524,13 @@ SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选�
 
 如果选择 UPM 导入，可以在项目的 `Packages/manifest.json` 文件中添加：
 
-```json
-"dependencies": {
-  "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#3.14.0",
-  "com.taptap.tds.tapdb": "https://github.com/TapTap/TapDB-Unity.git#3.14.0",
-  "com.tds.themis.themis": "https://THEMISUPM:DXY6Kze9wzECU7gbM4H1@git.xindong.com/themis/themis_sdk_upm.git?path=unity/Packages/com.tds.themis.themis"
-}
-```
+<CodeBlock className="language-json">
+{`"dependencies":{
+    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.tapdb": "https://github.com/TapTap/TapDB-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.themis": "https://github.com/taptap/TapThemis-Unity.git#3.1.7-6",
+}`}
+</CodeBlock>
 
 如果选择手动导入：
 
@@ -1632,7 +1631,7 @@ TapThemis.InitTHEMIS();
 <MultiLang>
 
 ```cs
-TapThemis.U3d_ConfigAutoReportLogLevel(LogSeverity.LogError);
+TapThemis.U3d_ConfigAutoReportLogLevel(TapTap.Themis.LogSeverity.LogError);
 ```
 
 ```cs
@@ -1727,39 +1726,3 @@ TapThemis.ReportException(new Exception("Themis crash test from unity"),"crashMe
 </MultiLang>
 
 主动上报异常信息。
-
-## 更新日志
-
-### 3.18.7
-
-#### 内容更新
-1. 修改 Themis 模块依赖
-2. 删除冗余 CAID 开关接口，更新 CAID 获取接口
-
-#### 接口变更
-
-##### 新增接口
-新增 Themis 初始化接口，该接口需在 TapDB 初始化接口之后调用
-
-```c#
-TapTap.Themis.TapThemis.InitTHEMIS();
-```
-#### 修改接口
-替换部分接口使用
-
-```c#
-[Obsolete("已弃用,请调用 TapTap.Themis.TapThemis.U3d_ConfigAutoReportLogLevel(LogSeverity level)")]
-public static void ConfigAutoReportLogLevel(LogSeverity level);
-
-[Obsolete("已弃用,请调用 TapTap.Themis.TapThemis.U3d_ConfigAutoQuitApplication(bool autoQuit)")]
-public static void ConfigAutoQuitApplication(bool enable);
-
-[Obsolete("已弃用,请调用 TapTap.Themis.TapThemis.U3d_RegisterLogCallback(LogCallbackDelegate handler)")]
-public static void RegisterLogCallback(TapDB.LogCallbackDelegate handler);
-
-[Obsolete("已弃用,请调用 TapTap.Themis.TapThemis.U3d_UnregisterLogCallback(LogCallbackDelegate handler)")]
-public static void UnRegisterLogCallback(TapDB.LogCallbackDelegate handler);
-
-[Obsolete("已弃用,请调用 TapTap.Themis.TapThemis.ReportException(System.Exception e, string message)")]
-public static void ReportException(Exception e, string message);
-```

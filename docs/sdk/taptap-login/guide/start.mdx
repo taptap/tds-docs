@@ -411,7 +411,7 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core",
 如果接入 TapDB 模块，那么还需要加上：
 
 ```xml
-<key>NSUserTrackingUsageDescription<key>
+<key>NSUserTrackingUsageDescription</key>
 <string>{数据追踪权限申请文案}</string>
 ```
 
@@ -707,97 +707,6 @@ else
 
 <Profiles />
 
-<Conditional region="cn">
-
-### 测试资格校验
-
-:::tip
-该功能仅用于需要上线「篝火测试服」的游戏，对有登录白名单的用户进行资格校验，防止测试阶段开发包外传被利用。
-
-开发者在测试接口阶段可以提交工单，选择「商店运营服务支持 / 篝火测试咨询」分类，申请篝火测试定向邀请链接。
-
-此外，**游戏在篝火测试完毕后正常开放全量上线时移动端需要去除该接口**。
-:::
-
-请在登录成功的回调里调用相关 API 进行资格校验。
-
-<MultiLang kind="ue">
-
-```cs
-try
-{
-    var test = await TapLogin.GetTestQualification();
-    if(test)
-    {
-        Debug.Log("该玩家具备篝火测试资格");
-    }
-    else
-    {
-        Debug.Log("该玩家不具备篝火测试资格");
-    }
-
-}
-catch(Exception e)
-{
-    Debug.Log($"篝火测试 error：{e.Message}");
-}
-
-```
-
-```java
-TapLoginHelper.getTestQualification(new Api.ApiCallback<Boolean>() {
-    @Override
-    public void onSuccess(Boolean aBoolean) {
-        if(aBoolean){
-            // 该玩家已拥有测试资格
-            Toast.makeText(MainActivity.this, "该玩家已具有篝火测试资格", Toast.LENGTH_SHORT).show();
-        }else {
-            // 该玩家不具备测试资格， 游戏层面进行拦截
-            Toast.makeText(MainActivity.this, "该玩家不具备篝火测试资格", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override
-    public void onError(Throwable throwable) {
-        // 服务端检查出错或者网络异常
-        Toast.makeText(MainActivity.this, "服务端检查出错或者网络异常", Toast.LENGTH_SHORT).show();
-    }
-});
-```
-
-```objectivec
-[TapLoginHelper getTestQualification:^(BOOL isQualified, NSError *_Nullable error) {
-    if (error) {
-        // 网络异常或游戏未开启篝火测试
-    } else {
-        if (isQualified) {
-            // 有篝火测试资格
-        } else {
-            // 没有篝火测试资格
-        }
-    }
-}];
-```
-
-```cpp
-TapUELogin::GetTestQualification([](bool IsQualified, const FTUError& Error)
-{
-	if (IsQualified)
-	{
-		// 有资格
-	}
-	else
-	{
-		// 没有资格
-	}
-});
-```
-
-</MultiLang>
-
-** Error 信息为网络错误，或者该游戏未开通篝火测试服。 **
-
-</Conditional>
 
 ## 登出当前账户
 

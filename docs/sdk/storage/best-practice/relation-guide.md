@@ -7,7 +7,7 @@ sidebar_position: 1
 import { Conditional } from "/src/docComponents/conditional";
 import MultiLang from "/src/docComponents/MultiLang";
 
-多年以来，关系型数据库已经成为了企业数据管理的基础，很多工程师对于关系模型和 6 个范式都比较了解，但是如今来构建和运行一个应用，随着数据来源的越发多样和用户量的不断增长，关系数据库的限制逐渐成为业务的瓶颈，因此越来越多的公司开始向其它 NoSQL 数据库进行迁移。
+多年以来，关系型数据库已经成为了企业数据管理的基础，很多工程师对于关系模型和 6 个范式都比较了解，但是如今来构建和运行一个应用，随着数据来源的越发多样和用户量的不断增长，关系数据库的限制逐渐成为业务的瓶颈，因此越来越多的公司开始向其他 NoSQL 数据库进行迁移。
 
 <p><Conditional brand="tds">TDS</Conditional><Conditional brand="leancloud">LeanCloud</Conditional> 的数据存储后台大量采用了 MongoDB 这种文档数据库来存储结构化数据，正因如此我们才能提供面向对象的、海量的、无需创建数据表结构即存即用的存储能力。从传统的关系型数据库转换到 <Conditional brand="tds">TDS</Conditional><Conditional brand="leancloud">LeanCloud</Conditional> 或者 MongoDB 存储系统，最基础的改变就是「数据建模 Schema 设计」。</p>
 

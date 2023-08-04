@@ -27,6 +27,10 @@ export const getNavLinks = (
     ...(locale === "zh-Hans"
       ? [
           {
+            label: "开发者博客",
+            url: `https://blog.taptap.dev/`,
+          },
+          {
             label: "工作",
             url: "https://www.taptap.cn/hr",
           },
