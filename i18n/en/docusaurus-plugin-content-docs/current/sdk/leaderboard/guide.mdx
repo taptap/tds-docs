@@ -740,6 +740,149 @@ option.includeKeys = @[@"club"];
 Keep in mind that the order of the members with the same score in the returned result is not guaranteed.
 For example, if A, B, and C got 42, 32, and 32, and the leaderboard has a descending order, the result might list the three members in the order of either “A, B, C” or “A, C, B”.
 
+When the score is the same, if you need other factors to set the ranking, you can refer to the following example ** (example is to judge the ranking by the time stamp of the score upload, when the score is the same, the earlier/later the submission, the higher/lower the ranking) ** :
+
+<details>
+<summary>Android request example：</summary>
+
+```
+public class RankingActivity extends AppCompatActivity{
+    
+     // ...
+
+    /**
+     * Upload/update grades
+     * 
+     * */
+    private void submitScore() {
+
+        double score = 324.45;   // Actual score
+        long ts = System.currentTimeMillis() / 1000;   // time stamp
+        double last_score = toEncode( score, ts); // Combine the actual score with the timestamp to generate a new data upload to the server
+
+        Map<String, Double> statistic  = new HashMap<>();
+        statistic.put("word", last_score);
+
+        LCLeaderboard.updateStatistic(LCUser.currentUser(), statistic).subscribe(new Observer<LCStatisticResult>() {
+            @Override
+            public void onSubscribe(@NotNull Disposable disposable) {}
+
+            @Override
+            public void onNext(@NotNull LCStatisticResult jsonObject) {
+                Log.e(TAG, "onNext: "+jsonObject.getResults().get(0).toString());                
+
+            }
+
+            @Override
+            public void onError(@NotNull Throwable throwable) {
+                ToastUtil.showCus(throwable.getMessage(), ToastUtil.Type.ERROR);
+            }
+
+            @Override
+            public void onComplete() {}
+        });
+
+    }
+
+     /**
+     * 查询排行榜列表
+     * */
+    private void searchRankList() {
+        // Obtain an instance of a leaderboard
+        LCLeaderboard leaderboard = LCLeaderboard.createWithoutData("word");
+        
+        leaderboard.getResults(0, 10, null, null).subscribe(new Observer<LCLeaderboardResult>() {
+            @Override
+            public void onSubscribe(@NotNull Disposable disposable) {}
+
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onNext(@NotNull LCLeaderboardResult leaderboardResult) {
+                List<LCRanking> rankings = leaderboardResult.getResults();
+                for(int i=0; i<rankings.size(); i++){
+                    /**
+                     * Decrypt the query method
+                     */
+                    double score = rankings.get(i).getStatisticValue();  // Obtain the scores found in the query
+                    String formatScore = String.format("%.3f", score);   // Serialize fractions of type double into a string that retains 3 decimal places
+                    BigDecimal decimalValue = new BigDecimal(formatScore);
+                    long longPart = decimalValue.longValue();     // Obtain the integer part of the StatisticValue found in the query
+                    float floatPart = decimalValue.subtract(BigDecimal.valueOf(longPart)).floatValue(); // Obtain the decimal part of the StatisticValue found in the query
+
+                    int[] decryptedScoreTs = toDecode(longPart); // Decrypt the integer part
+                    int decryptedScore = decryptedScoreTs[0];  // Obtain the integer part of the actual score
+                    long decryptedTs = decryptedScoreTs[1];    // Obtain the timestamp when submitting grades
+
+                    BigDecimal bigDecimalValue = new BigDecimal(Integer.toString(decryptedScore))
+                            .add(new BigDecimal(Float.toString(floatPart)));  // Splice the integer part of the actual score with the decimal part to obtain the actual score
+                    double doubleValue = bigDecimalValue.doubleValue();   // Convert actual scores to double type
+
+                    Log.e(TAG, "Parsed score: "+doubleValue+" Parsed timestamp:"+ decryptedTs  );
+
+                }
+                
+            }
+
+            @Override
+            public void onError(@NotNull Throwable throwable) {
+            }
+
+            @Override
+            public void onComplete() {}
+        });
+
+    }
+
+    /**
+     * score: Actual score
+     * ts: time stamp
+     * Combine the actual score with the timestamp to generate a new data upload to the server
+     */
+    public static double toEncode(double score, long ts) {
+        int int_score = (int) score;   // The integer part of the actual score
+
+        float float_score = (float) (score - int_score); // Decimal portion of actual score
+
+        /**
+         * When the leaderboard is arranged in descending order and the scores are the same, the closer the time, the higher the ranking. Use this line of code
+         */
+        // long encryptedScoreTs = ((long) int_score << 32) | (ts & 0xFFFFFFFFL); // Encrypt and merge integer fractions with timestamps to form a new score
+
+
+        /**
+         * When the leaderboard is arranged in descending order and the scores are the same, the closer the time and the lower the ranking, use this line of code
+         */
+        long encryptedScoreTs = ((long) int_score << 32) - (ts & 0xFFFFFFFFL); // Encrypt and merge integer fractions with timestamps to form a new score
+
+        double newScore =  (double)encryptedScoreTs + float_score;  // Then concatenate the encrypted generated data with decimal parts of the data and upload it to the server
+        return newScore;
+    }
+    
+    /**
+     * Parse the encrypted data to determine the actual score and the timestamp when submitting the score at that time
+     *
+     */
+    public static int[] toDecode(long encryptedNewScore) {
+        /**
+         * When the leaderboard is arranged in descending order and the scores are the same, the closer the time, the higher the ranking. Use this line of code
+         */
+
+        // int score = (int) (encryptedNewScore >> 32);
+        
+        /**
+         * When the leaderboard is arranged in descending order and the scores are the same, the closer the time and the lower the ranking, use this line of code
+         */
+        int score = (int) (encryptedNewScore >> 32) + 1;
+        long ts = encryptedNewScore & 0xFFFFFFFFL;
+        return new int[]{score, (int) ts};
+    }
+    
+}
+
+```
+</details>
+
+
 ### Getting the Players With Similar Rankings as the Current Player
 
 | Ranking  | Username   | Score↓ |
