@@ -918,19 +918,19 @@ TArray<FLCLeaderboardStatistic> Statistics;
 
 ```cs
 var rankings = await leaderboard.GetResults(limit: 10,
-  selectKeys: new List<string> { "username" });
+  selectKeys: new List<string> { "nickname" });
 ```
 
 ```java
 List<String> selectKeys = new ArrayList<>();
-selectKeys.add("username");
+selectKeys.add("nickname");
 leaderboard.getResults(0, 10, selectKeys, null).subscribe(/* 略 */);
 ```
 
 ```objc
 leaderboard.limit = 10;
 LCLeaderboardQueryOption *option = [[LCLeaderboardQueryOption alloc] init];
-option.selectKeys = @[@"username"];
+option.selectKeys = @[@"nickname"];
 [leaderboard getUserResultsWithOption:option,
   callback:^(NSArray<LCLeaderboardRanking *> * _Nullable rankings, NSInteger count, NSError * _Nullable error) {
   // 略
@@ -939,7 +939,7 @@ option.selectKeys = @[@"username"];
 
 ```cpp
 Leaderboard.Limit = 10;
-Leaderboard.SelectMemberKeys = {"username"};
+Leaderboard.SelectMemberKeys = {"nickname"};
 Leaderboard.GetResults(OnSuccess, OnError);
 ```
 
@@ -1026,6 +1026,146 @@ option.includeKeys = @[@"club"];
 
 注意，排行榜 **不保证成绩并列的成员之间的先后顺序**。
 例如，假设 A、B、C 的成绩为 42、32、32，且排行榜的排序策略为降序，那么查询排行榜的返回结果可能是 A、B、C，也可能是 A、C、B。
+
+当成绩相同时，如果需要其他因素去设置排名可以参考如下示例**（示例是通过成绩上传的时间戳去判断排名，当成绩相同时，越早/晚提交，排名越靠前/后）**：
+<details>
+<summary>Android 请求示例：</summary>
+
+```
+public class RankingActivity extends AppCompatActivity{
+    
+     // ...
+
+    /**
+     * 上传/更新成绩
+     * 
+     * */
+    private void submitScore() {
+
+        double score = 324.45;   // 实际的分数
+        long ts = System.currentTimeMillis() / 1000;   // 时间戳
+        double last_score = toEncode( score, ts); // 将实际分数与时间戳组合生成一个新的数据上传到服务器
+
+        Map<String, Double> statistic  = new HashMap<>();
+        statistic.put("word", last_score);
+
+        LCLeaderboard.updateStatistic(LCUser.currentUser(), statistic).subscribe(new Observer<LCStatisticResult>() {
+            @Override
+            public void onSubscribe(@NotNull Disposable disposable) {}
+
+            @Override
+            public void onNext(@NotNull LCStatisticResult jsonObject) {
+                Log.e(TAG, "onNext: "+jsonObject.getResults().get(0).toString());                
+
+            }
+
+            @Override
+            public void onError(@NotNull Throwable throwable) {
+                ToastUtil.showCus(throwable.getMessage(), ToastUtil.Type.ERROR);
+            }
+
+            @Override
+            public void onComplete() {}
+        });
+
+    }
+
+     /**
+     * 查询排行榜列表
+     * */
+    private void searchRankList() {
+        // 获取排行榜的实例
+        LCLeaderboard leaderboard = LCLeaderboard.createWithoutData("word");
+        
+        leaderboard.getResults(0, 10, null, null).subscribe(new Observer<LCLeaderboardResult>() {
+            @Override
+            public void onSubscribe(@NotNull Disposable disposable) {}
+
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onNext(@NotNull LCLeaderboardResult leaderboardResult) {
+                List<LCRanking> rankings = leaderboardResult.getResults();
+                for(int i=0; i<rankings.size(); i++){
+                    /**
+                     * 将查询的方法进行解密
+                     */
+                    double score = rankings.get(i).getStatisticValue();  // 获取查询到的分数
+                    String formatScore = String.format("%.3f", score);   // 将 double 类型的分数系列化为保留小数点后3位的字符串
+                    BigDecimal decimalValue = new BigDecimal(formatScore);
+                    long longPart = decimalValue.longValue();     // 获取查询到的 StatisticValue 的整数部分
+                    float floatPart = decimalValue.subtract(BigDecimal.valueOf(longPart)).floatValue(); // 获取查询到的 StatisticValue 的小数部分
+
+                    int[] decryptedScoreTs = toDecode(longPart); // 将整数部分进行解密操作
+                    int decryptedScore = decryptedScoreTs[0];  // 获取实际分数的整数部分
+                    long decryptedTs = decryptedScoreTs[1];    // 获取提交成绩时的时间戳
+
+                    BigDecimal bigDecimalValue = new BigDecimal(Integer.toString(decryptedScore))
+                            .add(new BigDecimal(Float.toString(floatPart)));  // 将实际分数的整数部分拼接上小数部分得到实际的分数
+                    double doubleValue = bigDecimalValue.doubleValue();   // 将实际分数转化为 double 类型
+
+                    Log.e(TAG, "解析后的score:"+doubleValue + "解析后的时间戳："+ decryptedTs  );
+
+                }
+                
+            }
+
+            @Override
+            public void onError(@NotNull Throwable throwable) {
+            }
+
+            @Override
+            public void onComplete() {}
+        });
+
+    }
+
+    /**
+     * score 实际的分数
+     * ts 时间戳
+     * 将实际分数与时间戳组合生成一个新的数据上传到服务器
+     */
+    public static double toEncode(double score, long ts) {
+        int int_score = (int) score;   // 实际分数的整数部分
+        float float_score = (float) (score - int_score); // 实际分数的小数部分
+
+        /**
+         * 当排行榜使用降序排列，分数相同时，时间越近，排名靠前，使用这行代码
+         */
+        // long encryptedScoreTs = ((long) int_score << 32) | (ts & 0xFFFFFFFFL); // 将整数部分分数与时间戳进行加密处理合并成一个新的 score
+
+        /**
+         * 当排行榜使用降序排列，分数相同时，时间越近，排名靠后，使用这行代码
+         */
+        long encryptedScoreTs = ((long) int_score << 32) - (ts & 0xFFFFFFFFL); // 将整数部分分数与时间戳进行加密处理合并成一个新的 score
+
+        double newScore =  (double)encryptedScoreTs + float_score;  // 然后将加密生成的数据拼接上小数部分的数据，上传到服务器
+        return newScore;
+    }
+    
+    /**
+     * 将加密的数据进行解析出实际分数和当时提交成绩时的时间戳
+     *
+     */
+    public static int[] toDecode(long encryptedNewScore) {
+        /**
+         * 当排行榜使用降序排列，分数相同时，时间越近，排名靠前，使用这行代码
+         */
+
+        // int score = (int) (encryptedNewScore >> 32);
+        
+        /**
+         * 当排行榜使用降序排列，分数相同时，时间越近，排名靠后，使用这行代码
+         */
+        int score = (int) (encryptedNewScore >> 32) + 1;
+        long ts = encryptedNewScore & 0xFFFFFFFFL;
+        return new int[]{score, (int) ts};
+    }
+    
+
+}
+
+```
+</details>
 
 ### 获取当前用户附近的排名
 
