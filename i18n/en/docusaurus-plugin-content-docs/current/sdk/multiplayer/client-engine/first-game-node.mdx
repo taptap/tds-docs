@@ -1,0 +1,472 @@
+---
+title: Your first Client Engine game · Node.js
+sidebar_label: the first minigame
+sidebar_position: 3
+---
+
+This document helps you get started quickly, implementing a rock-paper-scissors guessing game through the Client Engine. After completing this document tutorial, you will have a preliminary understanding of the basic usage process of Client Engine.
+
+## Prepare the initial project
+
+This small game is divided into two parts, the server and the client. The server is implemented using Client Engine, and the client is a simple Web page. In this tutorial, we focus on teaching you to write the code in Client Engine step by step. Please check the sample project for the client code.
+
+### Client Engine Project
+
+Please read [Client Engine Quick Start: Run and Deploy Project](/sdk/multiplayer/client-engine/quick-start-node/) to get the initial project and learn how to run and deploy the project locally.
+
+The main source files and their uses in `./src` are as follows:
+
+```
+├── configs.ts // configuration file
+├── index.ts // project entry
+├── reception.ts // Reception class implementation file, a subclass of GameManager, responsible for managing Game, in which a custom method for creating Game is written
+└── rps-game.ts // RPSGame class implementation file, a subclass of Game, writes the logic of the specific boxing game in this file
+```
+
+`Game` and `GameManager` in this project use the function of Client Engine SDK. For detailed usage of SDK, please refer to [Client Engine Development Guide](/sdk/multiplayer/client-engine/guide-node/).
+
+You can start with the `index.ts` file to understand the whole project. This file is the entry point of the project. It defines a Web API named `/reservation` through the express framework, which is delivered to the client when the client quickly starts. The new room name.
+
+`reception.ts` and `rps-game.ts` contain all the code for this tutorial. You can choose to back up these two files, clear them and write your own code according to this document, and you can also check the code you have written for comparison.
+
+### Client project
+
+[Click to download the client project](https://github.com/leancloud/client-engine-demo-webapp). **Open `. /src` in `config.ts`, change the appId and appKey to your own information**, follow the README to start the project and observe the interface changes. The game-related logic is located in `. /src/components` file, you can open this file to view the code when needed.
+
+## Core Process
+
+In the multiplayer matchmaking service, rooms are created by MasterClient, so in this mini-game, each room is created by a MasterClient managed by the Client Engine that calls an interface related to the online matchmaking service.There are multiple MasterClients in the Client Engine, and each MasterClient manages its own room. There are multiple MasterClients in the Client Engine, and each MasterClient manages the game logic in its own room.
+
+The core logic of this game is:** MasterClient in Client Engine and Client player Client join in the same room, in the communication process by the MasterClient to control the logic of the game. **The specific disassembly steps are as follows:
+
+1. The Player Client connects to the Multiplayer Online Battle Service (/sdk/multiplayer/features/) and requests the `/reservation` interface provided by the Client Engine to start the game quickly. 2.
+2. Each time Client Engine receives a request, it will check if there is an available room, if there is, it will return the existing roomName to the client; if there is not, it will create a new MasterClient and create a new room, and return the roomName to the client.
+3. The client joins the room with the roomName returned by the Client Engine. 4.
+4. MasterClient and client are in the same room, each time the client throws a punch, it will send a message to MasterClient, MasterClient will forward the message to other clients, and finally judge the game result. 5.
+5. MasterClient decides that the game is over, the client leaves the room, and Client Engine destroys the game.
+
+## Code Development
+
+### Custom Game
+
+Our goal is to let MasterClient and ClientClient enter the same room, the first step is to prepare the room in Client Engine. In the Client Engine SDK, each room corresponds to a `Game` object, and each `Game` object corresponds to its own MasterClient. Next, we create a subclass `RPSGame` that inherits from `Game`, and write the room logic for the guessing game in `RPSGame`.
+
+Initialise the custom `RPSGame` in the `rpg-game.ts` file:
+
+```js
+import { Game } from "@leancloud/client-engine";
+import { Event, Play, Room } from "@leancloud/play";
+export default class RPSGame extends Game {
+  constructor(room: Room, masterClient: Play) {
+    super(room, masterClient);
+  }
+}
+```
+
+### Managing Game
+
+In Client Engine SDK, `GameManger` is responsible for creating and destroying `Game`, please refer to [Client Engine Developer's Guide](/sdk/multiplayer/client-engine/guide-node/) for more details. In this document, we can use `GameMnager`'s management functions by simple configuration.
+
+#### Customising GameManager
+
+First create a subclass `Reception` inheriting from `GameManager` where we can use the methods provided by `GameManager` to help us write our own logic.
+
+Initialise the custom `Reception` in the `reception.ts` file:
+
+```js
+import { Game, GameManager, ICreateGameOptions } from "@leancloud/client-engine" ;
+export default class Reception<T extends Game> extends GameManager<T> {
+
+}
+```
+
+#### Implementation Logic: "Quick Start
+
+The quick start logic we want to implement here is to find a random room with available seats and return it to the client, or create a room and return it to the client if there is no room available in the current Client Engine instance. We write a custom method called `makeReservation()` in the `Reception` class to implement this logic and make it available for [Entry API](#entry-api-quick-start) to call.
+
+```js
+import { Game, GameManager, ICreateGameOptions } from "@leancloud/client-engine";
+export default class Reception<T extends Game> extends GameManager<T> {
+
+  /**
+   * Reserve a game for the given player, if no game is available a new one will be created.
+   * @param playerId The ID of the player who made the reservation.
+   * @return The room name of the successfully booked game.
+   */
+  public async makeReservation(playerId: string) {
+    let game: T;
+    const availableGames = this.getAvailableGames();
+    if (availableGames.length > 0) {
+      game = availableGames[0];
+      this.reserveSeats(game, playerId);
+    } else {
+      game = await this.createGame(playerId);
+    }
+    return game.room.name;
+  }
+
+}
+```
+
+In this code, we call `GameManager`'s `getAvailableGames()` to get the `Games` managed by the current Client Engine instance:
+
+* If there are `Games` with empty seats in the room, use the `reserveSeats()` method of the `GameManager` to take the seats for the player and return the roomName.
+* If all `Game` rooms are full, use `createGame()` method of `GameManager` to create a new room and return roomName.
+
+#### Implementation Logic: `Create New Game
+
+If you want to create a room yourself and then invite your friends to join the room, you can write a create new game method in `reception` for [entry API](#entry-api-creating-a-new-game) to call. Similarly, the `createGame()` method in our custom `createGameAndGetName()` method is provided by the `GameManager` in the SDK.
+
+```js
+export default class Reception<T extends Game> extends GameManager<T> {
+
+  public async makeReservation(playerId: string) {
+    ......
+  }
+
+  /**
+   * Creates a new game.
+   * @param playerId The player ID of the reservation.
+   * @param options Some configuration items that can be specified when creating a new game.
+   * @return The room name of the game being created.
+   */
+  public async createGameAndGetName(playerId: string, options?: ICreateGameOptions) {
+    const game = await this.createGame(playerId, options);
+    return game.room.name;
+  }
+
+}
+```
+
+#### Binding GameManager and Game
+
+When `Reception`, a subclass of `GameManager`, and `RPSGame`, a subclass of `Game`, are ready, we're going to give `RPSGame` to `Reception` in the whole project portal, and `Reception` will manage `RPSGame`.
+
+As you can see in the method that creates the `Reception` object in the `index.ts` file, the first parameter has been passed to `RPSGame`, if your custom `Game` uses a different name, you can replace `RPSGame` with your custom `Game` class.
+
+```js
+import PRSGame from "./rps-game";
+const reception = new Reception(
+  PRSGame,
+  APP_ID,
+  APP_KEY,
+  {
+    concurrency: 2,
+  },
+);
+```
+
+Once configured here, `reception` will create and manage `PRSGame` and the corresponding MasterClient at the appropriate time.
+
+#### Configuring Load Balancing
+
+Since the logic in `GameManager` is directly invoked by external requests, it is necessary to configure load balancing for `GameManager` at the entry point. For more information about load balancing, please refer to [Client Engine Developer's Guide](/sdk/multiplayer/client-engine/guide-node/#load-balancing), here we can simply look at the code in the `index.ts` file to see how to configure it. to get an idea of how to configure it:
+
+```js
+import { ICreateGameOptions,LoadBalancerFactory } from "@leancloud/client-engine";
+
+// Create the object responsible for load balancing, no need to change the code here, just copy and paste it.
+const loadBalancerFactory = new LoadBalancerFactory({
+  poolId: `${APP_ID.slice(0, 5)}-${process.env.LEANCLOUD_APP_ENV || "development"}`,
+  redisUrl: process.env.REDIS_URL__CLIENT_ENGINE,
+});
+
+// Configure load balancing with reception and our custom method makeReservation.
+loadBalancerFactory.bind(reception, ["makeReservation", "createGameAndGetName"]) 
+```
+
+Now that the `reception` for managing the `RPSGame` has been prepared, we'll start writing the specific in-room game logic.
+
+### Setting the number of players in a room
+
+In this little guessing game, we've set it so that only two players are allowed to play, and no new players are allowed to enter the room once two players are reached, by setting the static property `defaultSeatCount` of the `RPSGame` in this way:
+
+```js
+export default class RPSGame extends Game {
+  public static defaultSeatCount = 2;
+}
+```
+
+Once configured here, the Client Engine initial project will limit the number of players in the room based on the value here every time it requests the Multiplayer Matchmaking Service to create a room.
+
+Please refer to [Client Engine Developer Guide](/sdk/multiplayer/client-engine/guide-node/#setting-the-number-of-players-in-a-room) for more details on setting the number of players in a room.
+
+### MasterClient and Clients in the same room
+
+After completing the basic configuration of the Game, MasterClient and Client are ready to join the same room.
+
+#### Entry API: Quick Start
+
+The `index.ts` file has an entry API, `/reservation`, which calls the `Reception` custom `makeReservation()` method when called by the client to help the client start the game quickly.
+
+```js
+app.post("/reservation", async (req, res, next) => {
+  try {
+    const {
+      playerId,
+    } = req.body as {
+      playerId: any
+    };
+    if (typeof playerId !== "string") {
+      throw new Error("Missing playerId");
+    }
+    debug(`Making reservation for player[${playerId}]`);
+// Call the makeReservation() method we prepared in the Reception class.
+    const roomName = await reception.makeReservation(playerId);
+    debug(`Seat reserved, room: ${roomName}`);
+    return res.json({
+      roomName,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+```
+
+The client can call this API to get a quick start, sample code with this interface is as follows **(not Client Engine code)**:
+
+```js
+// Here's a client-side HTTP call to the `/reservation` interface implemented in Client Engine.
+const { roomName } = await (await fetch(
+  `${CLIENT_ENGINE_SERVER}/reservation`,
+  {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      playerId: play.userId,
+    })
+  }
+)).json();
+// Join the room
+return play.joinRoom(roomName);
+```
+
+When the client calls `/reservation` and joins the room successfully, it means the client Client and MasterClient are in the same room, and you can start the game when there are enough people in the room.
+
+The client project has already written the code to call `/reservation` for you, you don't need to write the code by yourself, you can check the related code in `/src/components/Lobby.vue`.
+
+#### Entry API: Creating a New Game
+
+This entry API is written in the same way as the Quickstart, so I won't repeat the instructions, but you can refer to the `/game` method in the index.ts file.
+
+### Announcing the start of a game
+
+In this mini-game, we can start the game when it's full. We can announce the start of the game in the Game's full event:
+
+```js
+import { AutomaticGameEvent, Game, watchRoomFull } from "@leancloud/client-engine";
+import { Play, Room } from "@leancloud/play";
+
+enum Event {
+  Start = 10,
+};
+
+@watchRoomFull()
+export default class RPSGame extends Game {
+  public static defaultSeatCount = 2;
+  constructor(room: Room, masterClient: Play) {
+    super(room, masterClient);
+    // Listen for the ROOM_FULL event and call the `start() method` when it receives it.
+    this.once(AutomaticGameEvent.ROOM_FULL, this.start);
+  }
+
+  protected start = async () => {
+    // Marked rooms are no longer available to join
+    this.masterClient.setRoomOpened(false);
+    // Broadcast the game start event to the client
+    this.broadcast(Event.Start);
+  }
+}
+```
+
+In this code, the `watchRoomFull` decorator causes `Game` to throw the `AutomaticGameEvent.ROOM_FULL` event when it is full, where we choose to call our custom `start` method. In the `start` method we open the room and broadcast the start of the game to all clients.
+
+At this point, you can start the current Client Engine project, launch the client and open two client web pages, click `Quick Start` on the interface, and observe that the first interface that clicks `Quick Start` shows the log: `xxxx joined the room`.
+
+### Guessing Logic
+
+Next we start developing the in-game logic. The steps are as follows:
+
+1. Player A selects a gesture and sends a punch event to the MasterClient. 2.
+2. MasterClient receives the event and forwards it to Player B. 3.
+3. Player B receives the event forwarded by MasterClient, and the interface displays: the opponent has selected. 4.
+4. Player B selects a gesture and sends a punch event to the MasterClient.
+5. MasterClient receives the event and forwards it to Player A. 6.
+6. Player A receives the event forwarded by MasterClient, and the interface displays: the opponent has chosen.
+7. MasterClient finds that both players have thrown punches, judges the result, announces the answer, and declares the end of the game.
+
+The interaction between these three players can be represented by this diagram:
+
+![image](/img/client-engine/rps-game-flow.png)
+
+Next we break down each step and write the code:
+
+
+#### Player A selects a gesture and sends a punch event to MasterClient.
+
+This part of the code is client-side, **you don't need to write it in the Client Engine**, you can find the code in the client-side project `. /src/components/Game.vue`.
+
+```js
+enum Event {
+  Start = 10,
+  Play = 11,
+};
+choices = ["✊", "✌️", "✋"];
+
+// When the user selects it, we send the index of the corresponding option to the server.
+play.sendEvent(Event.Play, {index}, {receiverGroup: ReceiverGroup.MasterClient});
+```
+
+#### MasterClient receives the event and forwards it to Player B.
+
+This part of the code is written in Client Engine, you can write it in your own `RPSGame` based on the sample code below. We register the custom event in the `start` method, and when we receive the `play` event, we erase the content of player A's action and forward it to player B.
+
+
+```js
+protected start = async () => {
+  ......
+  // Receiving custom events
+  this.masterClient.on(PlayEvent.CUSTOM_EVENT, ({ eventId, eventData, senderId }) => {
+    if (eventId === Event.Play) {
+      // Receive events from other players, forward events
+      this.forwardToTheRests({ eventId, eventData, senderId }, (eventData) => {
+        return {}
+      })
+    }
+  });
+}
+```
+
+In this code, the MasterClient object in Game registers a custom event for multiplayer matches, which is triggered when player A sends the `play` event to the MasterClient. We use `Game`'s forward event method `forwardToTheRests()` in this event, the first parameter of this method is the original event, and the second parameter is the eventData data handler of the original event, we change the original eventData data, that is, the `{index}` sent by player A, to empty data We change the original eventData data, that is, the `{index}` sent by player A, to empty data, so that when player B receives the event, he can't know the details of player A's action.
+
+#### Player B receives the event forwarded by MasterClient, and the interface shows that the player has been selected.
+
+This part of the code is client-side, **you don't need to write it in Client Engine**, you can write it in client-side project `. /src/components/Game.vue`.
+
+```js
+play.on(PlayEvent.CUSTOM_EVENT, ({ eventId, eventData, senderId }) => {
+  ......
+  switch (eventId) {
+    ......
+    case Event.Play:
+      this.log(`The opponent has chosen`);
+      break;
+    .....
+  }
+});
+```
+
+#### Player B selects gesture, sends punch event to MasterClient.
+
+This part of the logic is the same as "Player A selects gesture, sends punch event to MasterClient" above, and uses the same part of the code, which can be found in the client project `. /src/components/Game.vue` in the client project.
+
+#### MasterClient receives an event and forwards it to player A.
+
+This part of the logic is the same as the above "MasterClient receives event, forwards event to player B", and uses the same part of the code, so you don't need to write additional code in the Client Engine.
+
+#### Player A receives the event forwarded by MasterClient, the interface will show: the opponent has selected.
+
+This part of logic is the same as the above "Player A receives event forwarded by MasterClient, interface display: opponent has selected", and uses the same part of code, you can write the code in the client project `. /src/components/Game.vue` in the client project.
+
+At this point, you can run the project, open both interfaces for guessing, and observe that both players' actions are synchronised to their respective interfaces, but each player doesn't know what the other player has chosen.
+
+#### MasterClient discovers that both players have thrown a punch, determines the result, announces the answer and declares the game over.
+
+Each time MasterClient receives a player's choice event, we have to save the player's choice and determine if both players have made their choices:
+
+```js
+protected start = async () => {
+  ......
+  // [this.player[0]'s choice, this.player[1]'s choice]. When neither player has a choice, it is assumed that both players have a choice of -1
+  const choices = [-1, -1];
+
+  this.masterClient.on(PlayEvent.CUSTOM_EVENT, ({ eventId, eventData, senderId }) => {
+    if (eventId === Event.Play) {
+      // Receive events from other players, forward events
+      ......
+      // Stores the current player's selection
+      if (this.players[0].actorId === senderId) {
+        // If it's player[0], store it in choices[0].
+        choices[0] = eventData.index;
+      } else {
+        // If it's player[1], store it in choices[1].
+        choices[1] = eventData.index;
+      }
+    }
+  });
+}
+```
+
+In the above code, we construct a choice of type Array to store the player's choice, and store the user's choice when the punch event is received. Next, we determine whether both players have made their choices, and if they have made their choices, we broadcast the result of the game, and broadcast the end of the game:
+
+```js
+enum Event {
+  Start = 10,
+  Play = 11,
+  Over = 20,
+};
+......
+protected start = async () => {
+  ......
+  // [this.player[0]'s choice, this.player[1]'s choice]. When neither player has a choice, it is assumed that both players have a choice of -1
+  const choices = [-1, -1];
+
+  this.masterClient.on(PlayEvent.CUSTOM_EVENT, ({ eventId, eventData, senderId }) => {
+    if (eventId === Event.Play) {
+     // Receive events from other players, forward events
+      ......
+      // Stores the current player's selection
+      ......
+      // Check if both players have made their choices
+      if (choices.every((choice) => choice > 0)) {
+// Both players have made their choices, the game is over, and the result is broadcast to the client.
+        const winner = this.getWinner(choices);
+        this.broadcast(Event.Over, {
+          choices,
+          winnerId: winner ? winner.userId : null,
+        });
+      } 
+    }
+  });
+}
+
+```
+
+In the above code, the `getWinner()` method is used to get the result of the game, this is our custom method to determine the winner, you can copy and paste the code below directly into your own `RPSGame` file:
+
+```js
+// The client's array of punches is: [✊, ✌️, ✋].
+// Out of ✊ (index is 0 ) wins ✌️ (index is 1), so wins[0] = 1, and so on
+const wins = [1, 2, 0];
+
+@watchRoomFull()
+export default class RPSGame extends Game {
+  ......
+
+  /**
+   * Calculate the winner based on the player's choices
+   * @return Returns the winning Player, or null for a tie
+   */
+  private getWinner([player1Choice, player2Choice]: number[]) {
+    if (player1Choice === player2Choice) { return null; }
+    if (wins[player1Choice] === player2Choice) { return this.players[0]; }
+    return this.players[1];
+  }
+}
+```
+
+The client receives the MasterClient broadcast end event and then displays the corresponding result on the interface. Here the basic logic has been developed, you can run the project, open the two pages, and happily start your own battle with yourself.
+
+### Leaving the room
+
+When all the clients leave the room, `GameManager` will help us to destroy the empty room, so we don't need to write this part of code in our game.
+
+### RxJS
+
+When you look at the sample demo, you will see that the code is a bit more compact compared to the code in this document, because the sample demo uses RxJS. If you are interested, you can study the [RxJS](https://rxjs-dev.firebaseapp.com/) and the [API documentation](https://) of the related interfaces by yourself. leancloud.github.io/client-engine-nodejs-sdk/classes/game.html#takefirst).
+
+## Development Guide
+
+After you have developed the guessing game step by step according to the instructions in this document, you must have a preliminary feeling about the Client Engine SDK and the initial project, then you can refer to the [Client Engine Developer's Guide](/sdk/multiplayer/client-engine/guide-node/) for a more in-depth You can refer to the.

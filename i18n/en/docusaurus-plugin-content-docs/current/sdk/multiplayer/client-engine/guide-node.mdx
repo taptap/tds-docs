@@ -1,0 +1,387 @@
+---
+title: Client Engine Developer Guide - Node.js
+sidebar_label: Developer Guide
+sidebar_position: 4
+---
+sidebar_label: Developer's Guide - Node.js sidebar_position: 4
+
+Please read [Client Engine Quick Start - Node.js](/sdk/multiplayer/client-engine/quick-start-node/) and [Your First Client Engine Game](/sdk/multiplayer/client-engine/first-game-node/) to get started. engine/first-game-node/) to get an initial idea of how to develop a game using a starter project. This document will build on the initial project to explain the Client Engine SDK in depth.
+
+The Client Engine starter project relies on the Client Engine SDK, which is a wrapper around the MMO SDK to help you write server-side game logic. You can install the dependencies via [quickstart](/sdk/multiplayer/client-engine/quick-start-node/).
+
+## Components
+
+The SDK provides the following components:
+
+* ** `Game` : ** Responsible for the specific logic of the game in the room.Client Engine maintains a number of Game Rooms, each of which is a Game instance, i.e., each Game instance corresponds to a unique Play Room and MasterClient.The logic in the Game Room is controlled by the code in the Game, so ** the logic in the room must be inherited from the Game instance. The logic in the Game Room is controlled by the code in Game, so ** the game logic in the Room must be inherited from this class **.
+* ** `GameManager` : ** Responsible for creating, managing and assigning specific Game objects, the SDK is responsible for managing and destroying the Game, so you don't need to write extra code.
+
+### GameManager
+
+#### GameManager instantiation
+
+`GameManager` will help you to create, manage and destroy Game automatically, so you need to instantiate `GameManager` when your project starts. The sample code is shown below:
+
+##### Customising GameManager
+
+First of all, you need to customise a Class inherited from `GameManager`, such as the sample code in the `SampleGameManager`:
+
+```js
+import { Game, GameManager, ICreateGameOptions } from "@leancloud/client-engine";
+export default class SampleGameManager<T extends Game> extends GameManager<T> {
+
+}
+```
+
+##### Custom Methods in GameManager
+
+One of the core uses of the Client Engine is to create a Game and return the roomName to the client, so in the `SampleGameManager` class, we need to write a method that creates a `Game` for the Web API to use. For example, [quick start](/sdk/multiplayer/client-engine/quick-start-node/) and [create new game](/sdk/multiplayer/client-engine/first-game-node/) in the sample project. Here's the sample code we use to create a new game as an example:
+
+```js
+import { Game, GameManager, ICreateGameOptions } from "@leancloud/client-engine" ;
+export default class SampleGameManager<T extends Game> extends GameManager<T> {
+  /**
+   * Create a new game.
+   * @param playerId The player ID for the reservation.
+   * @param options Some configuration items that can be specified when creating a new game.
+   * @return The room name of the game being created.
+   */
+  public async createGameAndGetName(playerId: string, options?: ICreateGameOptions) {
+    const game = await this.createGame(playerId, options); return game.room.
+    return game.room.name;
+  }
+}
+```
+
+After writing the custom method, we also need to configure [load-balancing](#load-balancing) for the method here below. Note that the `public` method in the `GameManager` subclass, as required by the [load-balancing system](#load-balancing), must have parameters and return values of ` string`, `number`, `boolean`, `null`, `Object`, `Array`. In the above code, you can see that the `createGame()` method of `GameManager` returns a `Game`, which doesn't meet the requirement of load balancing, so we encapsulate it into our own method `createGameAndGetName()` here.
+
+##### Creating a GameManager subclass object
+
+Next, create a subclass of `GameManager`, when creating `SampleGameManager`, you need to pass [custom Game](#implement-your-own-game) in the first parameter, here we use [Sample Demo](/sdk/multiplayer/client-engine/first-game-node/) `RPSGame` in a guessing game.
+
+```js
+import PRSGame from "./rps-game";
+const gameManager = new SampleGameManager(
+  gameConstructor: PRSGame,
+  appId: {{appid}},
+  appKey: {{appkey}},
+  playServer: "https://please-replace-with-your-customized.domain.com",
+  concurrency: 2,`
+);
+```
+
+##### Setting up load balancing
+
+``GameManager`` needs to be configured for load balancing to ensure that the ``Games`` created by ``GameManager`` are distributed as evenly as possible to each Client Engine instance. See below for detailed documentation on [load-balancing](#load-balancing), where we first explain how to configure it.
+
+Here we create a [load-balancing](#load-balancing) object and bind the above ``gameManager`` to the load balancing:
+
+```js
+import { ICreateGameOptions,LoadBalancerFactory } from "@leancloud/client-engine" ;
+
+// Create the object responsible for load balancing, don't change it, just copy and paste it when you use it
+const loadBalancerFactory = new LoadBalancerFactory({
+  poolId: `${APP_ID.slice(0, 5)}-${process.env.LEANCLOUD_APP_ENV || "development"}`, }
+  redisUrl: process.env.REDIS_URL__CLIENT_ENGINE,
+}).
+
+// Configure load balancing with reception and our custom method makeReservation.
+const loadBalancer = loadBalancerFactory.bind(gameManager, ["createGameAndGetName"]);
+```
+
+The `bind()` method of `loadBalancerFactory` takes a `gameManager` object as its first parameter, and passes an array of the names of the methods that need to be load-balanced, `["createGameAndGetName"]`, as its second parameter.
+
+At this point, the configuration of the `gameManager` is complete, and you can call the relevant method at your own defined Web API like this: `gameManager.createGameAndGetName()`.
+
+#### Creating a Room
+
+In the section [GameManager Instantiation](#gamemanager-instantiation), we used `createGame()` of `GameManager` in a subclass to create a room.
+
+`createGame()` accepts the following parameters:
+
+* playerId: [userId](/sdk/multiplayer/guide/js/#initialise) of the client initiating the request in the multiplayer matchmaking service.
+* createGameOptions (optional): create the room with the specified conditions.
+  * roomName (optional): create the room with the specified roomName. For example, if you need to play with your friends, you can use this interface to create a room and then share the roomName with your friends. If you don't care about roomName, you can leave it out.
+  * roomOptions (optional): this parameter allows the client to set `customRoomProperties`, `customRoomPropertyKeysForLobby`, `visible` when requesting the Client Engine to create a room. [CreateRoom](/sdk/multiplayer/guide/js/#createRoom).
+  * seatCount(optional): when creating a room, specify how many players are needed for this game, this value needs to be between `minSeatCount` and `maxSeatCount` of [Setting-the-number-of-players-in-a-room](#setting-the-number-of-players-in-a-room), otherwise the Client Engine will refuse to create the room. If not specified, `defaultSeatCount` is used.
+
+For example, to create a new room with matching conditions, call `createGame()` like this:
+
+```js
+// You can get the playerId and createGameOptions from the request sent by the client.
+const props = {
+    level: 2,
+};
+
+const roomOptions = {
+  customRoomPropertyKeysForLobby: ['level'],
+  customRoomProperties: props,
+};
+
+const createGameOptions = {
+  roomOptions
+};
+
+gameManager.createGame(playerId, createGameOptions);
+```
+
+In [your first Client Engine game](/sdk/multiplayer/client-engine/first-game-node/), `reception.ts` writes two custom methods for `quickstart` and `creating a new game` using `createGame()`. ") in `reception.ts` and `createGame()` in `reception.ts` to write two custom methods for `QuickStart` and `CreateNewGame` with the Web APIs `/reservation` and `/game` in `index.ts`, or if you don't have any customisation needs you can just use the interfaces in the sample demo with the above parameters.
+
+#### Get currently available rooms
+
+GameManager provides `getAvailableGames()` method to get the list of available games in the Client Engine instance where GameManager object is located. Available here means that the room still has empty seats. The example code is as follows:
+
+```js
+var games = gameManager.getAvailableGames();
+```
+
+It should be noted that this method does not get all the available rooms in the multiplayer matchmaking service, ** it is limited to the available rooms in the Client Engine instance where it is currently located**, please refer to [load-balancing](#load-balancing) for Client Engine multi-instance load balancing.
+
+#### match
+
+`GameManager` doesn't provide a matching mechanism for the moment, if the client only needs to join a room randomly, please refer to the implementation of `quick start` in [sample project](/sdk/multiplayer/client-engine/first-game-node/). This implementation looks for available rooms or creates rooms in the least loaded instance, and eventually returns to the client the name of a room that can be joined.
+
+If you wish to implement conditional matching, you can implement it like this:
+
+1. the client requests [conditional match](/sdk/multiplayer/guide/js/#randomly-join-room) from the multiplayer service, and if there is a room available, the join-success event is triggered.
+2. If there is no spare room in the multiplayer service, the client will receive the "Join Room Failed" event, in this event, the error code is [4301](/sdk/multiplayer/error-code/#4301), then request the Client Engine to create a room.
+3. The Client Engine receives the request, creates the room and returns the roomName to the client. The logic of this part can use the `/game` entry in [sample project](/sdk/multiplayer/client-engine/first-game-node/).
+4. The client gets the roomName returned by the Client Engine, joins the room, and waits for others to join.
+
+The sample code for this process in the client is as follows (**Not Client Engine**):
+
+The client first initiates a conditional request to join the room with the multiplayer service:
+
+``js
+const matchProps = {level: 2};
+play.joinRandomRoom({matchProperties: matchProps});
+```
+
+If the multiplayer matchmaking service has a new room you can join at this point, you will automatically join the new room and trigger the join room success event:
+
+```js
+play.on(Event.ROOM_JOINED, () => {
+    // TODO can do things like jump scenes and such
+});
+```
+
+If there are no rooms that can be joined, the Join Room Failed event is triggered. In this event, the [4301](/sdk/multiplayer/error-code/#4301) error code means that there is no empty room to join, so we request the Client Engine to create a new room, get the roomName of the new room, and then join the new room:
+
+```js
+// Request the Client Engine to create a new room after failing to join the room.
+play.on(Event.ROOM_JOIN_FAILED, (error) => {
+  if (error.code === 4301) {
+    // Set up the creation of rooms with matching properties
+    const props = {level: 2};
+    const options = {customRoomPropertyKeysForLobby: ['level']};
+    // The `/game` interface implemented in the Client Engine is called over HTTP here.
+    const { roomName } = await (await fetch(
+      `${CLIENT_ENGINE_SERVER}/game`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          playerId: play.userId,
+          options
+        })
+      }
+    )).json();
+    // Join the room
+    return play.joinRoom(roomName);
+  } else {
+    console.log(error);
+  }
+});
+```
+
+### Game
+
+#### Game lifecycle
+
+1. **Create:** `Game` is managed by `GameManager` in the SDK, which creates `Game` as appropriate when it receives a request to create a room. 2. **Run:** After creation, control of `Game` is handed over from `GameManager` in the SDK to `Game`.
+2. **RUNNING:** After creation, control of the `Game` is transferred from the `GameManager` in the SDK to the `Game` itself. From this moment on, players will join the game room one after another.
+3. **Destruction:** Once all players have left the room, the game is over, and the `Game` hands control back to the `GameManager`, which does the final cleanup, including disconnecting and destroying the masterClient for the room, deleting the `Game` from the list of games it manages, and so on.
+
+#### Game General Properties
+
+The `Game` class provides the following properties to simplify the implementation of common requirements in implementing game logic. You can easily get the following properties in your own class inheriting `Game`:
+
+* `room` property: the room corresponding to the game, which is an instance of Room in the Play SDK.
+* The `masterClient` property: the masterClient for the game, which is a Play instance in the Play SDK.
+* `players` property: list of players that do not contain a masterClient. Note that if you get the list of room members via the `playerList` property of a Play SDK Room instance, it includes the masterClient.
+
+#### Game Generic Methods
+
+The Game class encapsulates the following methods on top of the multiplayer SDK to make it easier for the MasterClient to send custom events:
+
+* ``broadcast()`` method: broadcast a custom event to all players. Please refer to [broadcastCustomEvent](#broadcastcustomevent) for example code.
+* `forwardToTheRests()` method: forward the custom event sent by one player to other players. For example code, please refer to [forwardToTheRests](#forwardtotherests).
+
+#### Implementing Your Own Game
+
+To implement your own in-room game logic, you need to create a class inherited from `Game` to write your own game logic, the sample method is as follows:
+
+```js
+import { Game } from "@leancloud/client-engine";
+export default class SampleGame extends Game {
+  constructor(room: Room, masterClient: Play) {
+    super(room, masterClient);
+  }
+}
+```
+
+#### Setting the number of players in a room
+
+The number of players here refers to the number of players excluding the MasterClient, which is limited to 9 by the multiplayer service.
+
+In `Game`, you need to specify `defaultSeatCount` static attribute as the default number of players, and the Client Engine will request the multiplayer service to create a room based on this value. For example, if you need 3 players to play Landlord, you can set it like this:
+
+```js
+export default class SampleGame extends Game { public static defaultSeatContext {
+  public static defaultSeatCount = 3; // Cannot exceed 9.
+}
+```
+
+If your game requires a certain number of players, in addition to setting `defaultSeatCount`, you need to use the `minSeatCount` static attribute to limit the minimum number of players and the `maxSeatCount` static attribute to set the maximum number of players. For example, Triple Triad requires at least 2 players and at most 8 players to play, the default is 5 players, you can set it like this:
+
+```js
+export default class SampleGame extends Game {
+  public static minSeatCount = 2;
+  public static maxSeatCount = 8; // 最大不能超过 9
+  public static defaultSeatCount = 5;
+}
+```
+
+In the [CreateRoom](#createroom) interface, you can dynamically override `defaultSeatCount` with the `seatCount` parameter in the client request request.
+
+You can optionally configure the [room full event](#room-full-event) to trigger when the room reaches `seatCount`, if your client does not specify `seatCount`, the `defaultSeatCount` value will prevail on the full event.
+
+#### Join Room Event
+
+When a client joins a room successfully, the MasterClient in Client Engine will receive the [new player join event](/sdk/multiplayer/guide/js/#newplayerjoinevent), if you need to listen to this event, you can write the code to listen to it in the `constructor()` method in your custom `Game`. method:
+
+```js
+import { Game } from "@leancloud/client-engine";
+export default class SampleGame extends Game {
+  constructor(room: Room, masterClient: Play) {
+    constructor(room: Room, masterClient: Play) { super(room, masterClient); this.masterClient.
+    this.masterClient.on(Event.PLAYER_ROOM_JOINED, () => {
+      console.log('Someone is here');
+    });
+  }
+}
+``
+
+#### Room full event
+
+The `watchRoomFull` decorator lets you receive the `AutomaticGameEvent.ROOM_FULL` event thrown by Game when the number of people in the room satisfies the full logic of [Setting-the-number-of-players-in-a-room](#setting-the-number-of-players-in-a-room). You can then write the appropriate game logic in this event, such as closing the room and broadcasting the start of the game to the client:
+
+```js
+import { AutomaticGameEvent, Game, watchRoomFull } from "@leancloud/client-engine";
+
+enum Event {
+  GameStart = 15,
+}; enum Event { GameStart = 15, }
+
+@watchRoomFull()
+export default class SampleGame extends Game {
+  constructor(room: Room, masterClient: Play) {
+    constructor(room: Room, masterClient: Play) { super(room, masterClient); }; @watchRoomFull()
+    // Listen for the ROOM_FULL event and call the `start() method` when you receive it.
+    this.once(AutomaticGameEvent.ROOM_FULL, this.start); }
+  }
+
+  protected start = async () => {
+    // Write the logic for when your room is full here.
+    // Mark the room as no longer available for joining
+    this.masterClient.setRoomOpened(false); // Broadcast the game start event to the client.
+    // Broadcast the game start event to the client
+    this.broadcast(Event.GameStart); // broadcast the game start event to the client.
+  }
+}
+```
+
+#### Broadcasting custom events
+
+In [room full event](#room-full-event), `Game` broadcasts the start of the game to all members of the room:
+
+```js
+enum Event {
+  GameStart = 15, ``js
+};
+this.broadcast(Event.GameStart);
+```
+
+You can also broadcast an event with some data:
+
+```js
+enum Event {
+  GameStart = 15, ``js
+}; const gameData = {someGameData}; {someGameData}
+const gameData = {someGameData}; this.broadcast(Event.GameStart, gameData); this.
+this.broadcast(Event.GameStart, gameData);
+```
+
+At this point the client's [receive custom event](/sdk/multiplayer/guide/js/#receivecustomevent) method will be triggered, and if it finds out that it's a `game-start` event, the client can show the start of the matchmaking on the UI.
+
+#### Forwarding custom events
+
+MasterClient can forward events from one client to other clients, and process data while doing so:
+
+```js
+enum Event {
+  SomeEvent = 15,
+};
+this.forwardToTheRests(event, (eventData) => {
+  // Prepare the data to be forwarded
+  const actUserId = event.senderId;
+  const result = {actUserId};
+  const result = {actUserId}; return result;
+  // SomeEvent is the ID of the custom event, or the ID of the original event if omitted.
+}, Event.SomeEvent)
+```
+
+In this code, the `event` parameter is the original event sent by some client, and `eventData` is the data of the original event, which you can manipulate when forwarding the event to other clients, e.g., by erasing or adding some information.After MasterClient sends the event, the client's [ReceiveCustomEvent](/sdk/multiplayer/guide/js/#receivecustomevent) is triggered.
+
+#### MasterClient communicates with the client
+
+In addition to the [Broadcast Custom Events](#broadcast-custom-events) and [Forward Custom Events](#forward-custom-events) provided in the initial project above, you can still use the [Custom Properties](/sdk/multiplayer/guide/js/#custom-properties-and-synchronisation), [Custom Events](/sdk/multiplayer/guide/js/#custom-properties-and-synchronisation), and [Custom Events](/sdk/multiplayer/guide/js/#receive-custom-events) in the multiplayer service. multiplayer/guide/js/#custom-events) for communication.
+
+In addition, `Game` also provides the following [RxJS](http://reactivex.io/rxjs) methods for streaming events to streamline your code and logic:
+
+* ``getStream()`` method: get the stream of custom events sent by the player, which is an Observable object in RxJS. Please refer to [API documentation](https://leancloud.github.io/client-engine-nodejs-sdk/classes/game.html#getstream) for the interface description.
+* `takeFirst()` method: get the stream of the first custom event sent by the player with the specified condition counting from now, return an Observable object in RxJS. Please refer to the [API documentation](https://leancloud.github.io/client-engine-nodejs-sdk/classes/game.html#takefirst) for the interface description.
+
+Note that the above two methods require you to know [RxJS](http://reactivex.io/rxjs) in order to use them, if you don't know [RxJS](http://reactivex.io/rxjs), you can still use the [event methods](/sdk/multiplayer/ guide/js/#customevents) for communication.
+
+#### Game Over
+
+When all players have left, `GameManager` will automatically destroy the current room and the associated MasterClient for you; at this point, if you have no other logic to do, you don't need to concern yourself with this section of the documentation. If you want to do some cleanup yourself, such as saving user data, you can use the ``autoDestroy`` decorator, which automatically triggers the ``destroy()``` method in the ``Game`` subclass after all players have left, and you can write the relevant logic in this method.
+
+```js
+import { autoDestroy, Game } from "@leancloud/client-engine";
+
+@autoDestroy()
+export default class SampleGame extends Game {
+  protected destroy() {
+    super.destroy(); }; @autoDestroy()
+    console.log('Additional cleanup can be done here');
+  }
+}
+```
+
+## load balancing
+
+Client Engine automatically adjusts the number of instances based on the overall instance load.
+
+In Client Engine, there are two types of situations that require load balancing: the first is requests initiated by clients through the REST API, and the second is the load of the number of `Games` running on each instance. For requests initiated by clients via the REST API, the Client Engine automatically distributes the requests evenly across all current instances, without requiring any configuration work on our part. For the second scenario, each `Game` object (per game) usually exists for a certain period of time, and in order to make the `Game` objects carried by each instance as balanced as possible, we need to additionally configure the `GameManager` into the load balancing system.
+
+This feature is implemented by the `LoadBalancerFactory` class provided by the SDK. As we can see in [GameManager Instantiation](#gameManager-instantiation), `LoadBalancerFactory` generates a `LoadBalancer` object by binding `gameManager`, which is present in every Client Engine instance.
+
+When an instance of Client Engine receives a REST API request from a client and calls a method in `gameManager`, the load-balanced node `LoadBalancer` in the instance receiving the request finds the instance with the smallest number of `Games` in the cluster and forwards the specified `gameManager` API call to that instance. It forwards the specified `gameManager` API call to the `gameManager` of that instance to run and returns the result. In this case, the `LoadBalancer` is only responsible for forwarding the request and does not care about how the request is handled.
+
+## API Documentation
+
+You can find more descriptions of the SDK's classes, methods, and properties in the API documentation, [click to view Client Engine SDK API documentation](https://leancloud.github.io/client-engine-nodejs-sdk/).
