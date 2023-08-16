@@ -5,93 +5,93 @@ sidebar_position: 1
 ---
 
 :::info
-**Before reading this document, please read [Multiplayer Service Features](/sdk/multiplayer/features/) and [MasterClient](/sdk/multiplayer/guide/js/#masterclient) to understand the infrastructure of Multiplayer development. **
+**Before reading this document, please read the [Multiplayer Service Features](/sdk/multiplayer/features/) and [MasterClient](/sdk/multiplayer/guide/js/#masterclient) to understand the infrastructure of Multiplayer development. **
 :::
 
 ## Client Engine What problem is solved
 
-The Multiplayer service (i.e., the Multiplayer service in the figure below) is a good solution to the problem of exchanging messages between players in a "room" abstraction and between rooms. Let's take the game "Rock, Paper, Scissors" as an example, the flow of the game looks like this:
+The multiplayer service (i.e. the multiplayer service in the figure below) is a good solution to the problem of exchanging messages between players in a room abstraction. Let's take the game Rock, Paper, Scissors as an example, the game flow looks like this:
 
 ![image](/img/client-engine/client-engine1.png)
 
-where the Multiplayer service plays a purely message forwarding role, and for the sake of the discussion that follows, we can simplify this diagram a bit (the dotted line represents that the message is passed through the Multiplayer service):
+where the multiplayer service only plays a role of message relay, and for the sake of discussion we can simplify this diagram a bit (the dotted line represents the message being relayed through the multiplayer service):
 
 ![image](/img/client-engine/client-engine2.png)
 
-This process is simple, but there are some problems:
+This process is simple, but there are a few problems:
 
-1. all players have the same God's view, they can see all the states, and the player who throws a punch later (such as B in the picture) can throw a punch according to A's choice to achieve a sure win.
+1. all players have the same god view, they can see all states, and the player who throws a punch later (like B in the picture) can throw a punch according to A's choice to get a sure win.
 2. The final result is reported by the client, and the client can fake the result. 3.
-3. A, as the MasterClient, can manipulate some operations involving randomness, such as shuffling cards, rolling dice, etc. (There is no similar mechanism in "Rock, Paper, Scissors").
+3. A, as the master client, can manipulate some operations involving randomness, such as shuffling cards, rolling dice, etc. (There is no similar mechanism in Rock, Paper, Scissors).
 
-Different game types have different tolerance for these problems. Without changing the flow of the above diagram, each of these problems can be solved in its own way. However, the Client Engine solution tries to solve these problems by taking a radical step away from them: running the MasterClient on the server side. In the Client Engine scenario, the game flows like this:
+Different types of games have different tolerances for these problems. Without changing the flow of the diagram above, each of these problems can be solved in its own way. However, the Client Engine solution attempts to solve these problems by taking a radical step away from them: running the MasterClient on the server side. In the Client Engine scenario, the flow of the game is as follows:
 
 ![image](/img/client-engine/client-engine3.png)
 
-In this flow, the MasterClient running on the server side is the only referee with a God's perspective. All players exchange information with MasterClient only, and MasterClient will only synchronise part of the information to the client (e.g. only tell B "A threw a punch", but what was thrown is unknown). The game logic operations (including randomisation, win/loss decision) and the final result reporting are all done on the server side.
+In this process, the MasterClient running on the server is the only referee with a God's eye view. All players exchange information with the master client, and the master client will only synchronise some information with the client (e.g. it will only tell B that A threw a punch, but what was thrown is unknown). The game logic (including randomness, win/loss decisions) and the final results are reported on the server.
 
-The **Multiplayer service is the foundation. The player client does not communicate directly with the MasterClient; the dotted line in the diagram indicates that messages are still forwarded through the Multiplayer service. **
+**The Multiplayer service is the foundation. The player client does not communicate directly with the master client, the dotted lines in the diagram indicate that messages are still routed through the multiplayer service. The **Multiplayer Service is the foundation.
 
 ## Client Engine Introduction
 
-Client Engine is a Client hosting solution for multiplayer online games. The [Multiplayer Service](/sdk/multiplayer/features/) provides a MasterClient mechanism to control the game logic: MasterClient is a special Client that receives and processes all events and messages within the game, processes them in real-time, and then sends the results to the other game clients to control the downward execution of the game. It receives and processes all events and messages in the game, processes them in real time, and then sends the results to other game clients to control the game downstream. Developers can develop a complete set of MasterClient logic based on an SDK for Multiplayers, and then host such a "client" in the Client Engine, eliminating the burden of program deployment and operation and maintenance. As shown in the diagram:
+Client Engine is a client hosting solution for multiplayer online games. The [Multiplayer Service](/sdk/multiplayer/features/) provides a MasterClient mechanism to control the game logic: MasterClient is a special client that receives and processes all events and messages in the game, processes them in real time, and then sends the results to the other game clients, which control the downward execution of the game. control the downward execution of the game. Developers can develop a complete set of MasterClient logic based on a Multiplayer SDK, and then host such a client in the client engine, saving the burden of deploying and maintaining the programme. As shown here:
 
 ![image](/img/client-engine/structure.png)
 
-In addition to MasterClient hosting, developers can also in the Client Engine
+In addition to master client hosting, developers can also host regular virtual players in the client engine.
 
-* Host ordinary virtual players to increase the fun and activity of the game.
-* Customise the REST API to complete the development of other logic.
+* Host regular virtual players to increase the fun and activity of the game.
+* Customise the REST API to develop additional logic.
 
-Hosting game logic in Client Engine has the following advantages:
+The benefits of hosting game logic in the client engine include:
 
-* Lower network latency. The game running process involves very frequent message interactions between "game players" - "multiplayer battle cloud" - MasterClient, Client Engine and multiplayer battle cloud are in the same physical network, which can significantly reduce the transmission delay of the public network.
-* More mature operation and maintenance support: Client Engine provides perfect log collection, status monitoring, load balancing, and automatic fault-tolerant recovery mechanism, which can provide higher stability guarantee.
-* Client Engine provides a huge resource pool, which can quickly respond to the temporary and sudden expansion demand of individual game products, without the need to manually adjust the instances, and automatically complete the expansion.
+* Reduced network latency. The game running process involves game players - Multiplayer Battle Cloud - MasterClient three-way very frequent message interaction, Client Engine and Multiplayer Battle Cloud in the same physical network, can greatly reduce the public network transmission delay.
+* Client Engine provides perfect log collection, status monitoring, load balancing and automatic fault recovery mechanism, which can provide higher stability guarantee.
+* Client Engine provides a huge resource pool, which can quickly respond to the temporary and sudden expansion demand of a single game product without manually adjusting the instances, and automatically complete the expansion.
 
-## Documentation and Demo
+## Documentation and Demos
 
-Please refer to the documentation for details on how to use Client Engine:
+For more information on using the Client Engine, please refer to the documentation:
 
-* [Client Engine Quick Start - Node.js](/sdk/multiplayer/client-engine/quick-start-node/) Introduces starting from the initial project, how to develop locally for debugging and deploy to the cloud.
-* [Your First Client Engine Trivia Game - Node.js](/sdk/multiplayer/client-engine/first-game-node/) This document helps you to get started quickly by implementing a rock-paper-scissors guessing trivia game with the Client Engine. After completing this tutorial, you will have an initial understanding of the basic flow of using the Client Engine.
-* [Client Engine Development Guide - Node.js](/sdk/multiplayer/client-engine/guide-node/) This tutorial provides an in-depth explanation of the Client Engine SDK based on the initial project.
+* [Client Engine Quick Start - Node.js](/sdk/multiplayer/client-engine/quick-start-node/) describes how to get started with your first project, how to develop and debug locally, and how to deploy to the cloud.
+* [Your First Client Engine Game - Node.js](/sdk/multiplayer/client-engine/first-game-node/) is a tutorial that will help you get started with a rock-paper-scissors guessing game using the Client Engine. After completing this tutorial you will have a basic understanding of the Client Engine process.
+* [Client Engine Development Guide - Node.js](/sdk/multiplayer/client-engine/guide-node/) This tutorial provides an in-depth explanation of the Client Engine SDK based on the first project.
 
-Example Demo:
+Example Demo.
 
-* [Turn-based Demo](/sdk/multiplayer/client-engine/demo/#Turn-based-Battle-Demo).
+* [Turn-based Demo](/sdk/multiplayer/client-engine/demo/#turn-based-demo).
 
 ## Price
 
 ### Developer Edition
 
-Under the development version, we provide a "trial version" for developers to use for free:
+Developer Edition provides a trial edition for developers to use free of charge: 
 
 * Free 100 CCU and 50% CPU.
-* Free 100 CCU and 50% CPU.
-* Auto-scaling and load balancing are not supported.
+* No prepared environment provided.
+* No auto-scaling and load balancing.
 * Forced hibernation.
 
 Hibernation policy:
 
-Standard instances do not hibernate.
+Default instances do not hibernate.
 
-Experience instances enforce a hibernation policy:
+Experience instances enforce the following hibernation policies:
 
-* Hibernate if the application has not had any external requests for a recent period of time (half an hour).
-* Starts immediately after hibernation if there is a new external request for the instance. The visitor experience is that the response time for the first request is 5 ~ 30 seconds (depending on the instance startup time), and the response time for subsequent visits returns to normal.
-* Forced hibernation: If the total number of hours of operation exceeds 18 hours in the last 24 hours, it will be forced to hibernate. At this point, new requests will receive a 503 error response code, which can be viewed at **Cloud Services Console > Play > Client Engine > Statistics**.
+* If the application has had no external requests in the last half hour, it hibernates. 
+* If a new external request is made after the sleep, the instance is started immediately. The response time for the first request is 5 ~ 30 seconds (depending on the instance startup time), and the response time for subsequent requests returns to normal.
+* Forced hibernation: The instance will be forced into hibernation if the total number of hours of operation in the last 24 hours exceeds 18 hours. At this point, new requests will receive a 503 error response code, which can be viewed in **Cloud Services Console > Play > Client Engine > Statistics**.
 
-If you do not want the experience instances in the preparation environment to be out of service due to forced sleep, or if you need multiple instances to fully emulate a production environment, you can purchase standard instances in the preparation environment as needed.
+If you don't want to interrupt the service of the experience instance in the preparation environment by forcing it to sleep, or if you need multiple instances to fully simulate the production environment, you can purchase standard instances in the preparation environment as needed.
 
 ### Business Edition
 
-Under Commercial Edition, you can upgrade from "Experience Edition" to "Standard Edition" through the console. The "Standard Edition" provides a preparation environment, supports automatic capacity expansion and load balancing, and will not sleep.
+The Business Edition allows you to upgrade from the Experience Edition to the Standard Edition via the console. Standard Edition provides a preparation environment, supports automatic scaling and load balancing, and does not sleep.
 
-"The Standard Edition is scaled and billed on a "Compute Unit" basis. A computing unit contains 100 CCUs and 50% CPUs, and we will automatically increase the computing unit when any of the indicators are exhausted. For example, if Client Engine consumes 80 CCU and 90% CPU at a certain moment, the system will allocate 2 computing units for it.
+Standard Edition is scaled and billed by Compute Unit. A Compute Unit contains 100 CCU and 50% CPU and we will automatically add more Compute Units if any of the indicators are exhausted. For example, if the Client Engine is using 80 CCU and 90% CPU at a particular time, the system will allocate 2 units.
 
-The system will bill according to the daily peak consumption of computing units, please refer to [official website](https://leancloud.cn/pricing/) for the price of a single computing unit. For example, if an application on a domestic node uses at most 2 computing units on a certain day, the charge for that day will be 2 * domestic computing unit price.
+The system will charge according to the daily peak consumption of computing units, the price of a single computing unit can be found on the [official website](https://leancloud.cn/pricing/). For example, if an application on a domestic node uses up to 2 computing units on a given day, the charge for that day will be 2 * domestic computing unit price.
 
 :::info
-Note: After upgrading to "Standard Edition", the service will be provided and billed at a minimum of 1 compute unit regardless of whether it is used or not.
+Note: After upgrading to Standard Edition, the service will be provided and billed at a minimum of 1 compute unit, regardless of whether it is used or not.
 :::

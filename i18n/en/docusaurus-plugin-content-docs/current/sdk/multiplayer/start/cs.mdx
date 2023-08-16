@@ -12,15 +12,15 @@ Welcome to online multiplayer matchmaking. This tutorial will explain the core u
 
 ## Installation
 
-The Play client SDK is open source, the source code is available at [csharp-sdk](https://github.com/leancloud/csharp-sdk).
+The Play client SDK is open source, the source code can be found at [csharp-sdk](https://github.com/leancloud/csharp-sdk).
 
 You can also download [Release version](https://github.com/leancloud/csharp-sdk/releases).
 
-### Unity Project
+### Unity Projects
 
-The SDK can be imported via Unity Package Manager or manually, either way:
+The SDK can be imported via Unity Package Manager or manually, either one of them:
 
-* **UPM**: Please add the dependencies in Packages/manifest.json of your project:
+* **UPM**: Please add dependencies in Packages/manifest.json of your project:
 
     <CodeBlock className="json">
     {`"dependencies": {
@@ -35,7 +35,7 @@ The SDK can be imported via Unity Package Manager or manually, either way:
 For debugging purposes, you can register callbacks for logging. In Unity, you can refer to the following settings:
 
 ```cs
-// Setting up the SDK logging delegate
+// Setting the SDK Log Delegation
 LeanCloud.Common.Logger.LogDelegate = (level, log) =>
 {
     if (level == LogLevel.Debug) {
@@ -69,10 +69,10 @@ var client = new Client("your-app-id", "your-app-key", "tarara", playServer: "ht
 
 ```cs
 var client = new Client(
-    "your-client-id", // the game's Client ID
-    "your-client-token", // the game's Client Token
-    "tarara", // set the user id
-    playServer: "https://your_server_url" // the game's API domain name
+    "your-client-id",      // Client ID of the game
+    "your-client-token",   // Client Token for the game
+    "tarara",              // Set the user id
+    playServer: "https://your_server_url" // The game's API domain name
 );
 ```
 
@@ -87,115 +87,115 @@ var client = new Client(
 try {
     await client.Connect();
 } catch (PlayException e) {
-    // Connection failed
-    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail); }
+    // connection failure
+    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
 }
 ```
 
-## Creating or joining a room
+## Creating or Joining a Room
 
-By default Play SDK doesn't need to join a "lobby" to create/join a specific room.
+By default the Play SDK does not require a "lobby" to create/join a room.
 
 ```cs
 try {
     await client.JoinOrCreateRoom(roomName);
 } catch (PlayException e) {
-    // Failed to create or join room
-    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail); }
+    // Failed to create or join a room
+    Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
 }
 ```
 
-`JoinOrCreateRoom` ensures that both client players have access to the same room by having the same roomName. See [Developer Guide](/sdk/multiplayer/guide/cs/#JoinOrCreateRoom/#) for more information on `JoinOrCreateRoom` usage.
+`JoinOrCreateRoom` ensures that two client players can enter the same room by having the same roomName. Please refer to the [Developer Guide](/sdk/multiplayer/guide/cs/#joinorcreateroom) for more information on the usage of `JoinOrCreateRoom`.
 
-## Synchronising player properties via CustomPlayerProperties
+## Synchronising Player Properties via CustomPlayerProperties
 
-When a new player joins a room, the Master assigns a score to each player, which is synchronised to the player via `CustomPlayerProperties`.
+When a new player joins the room, the Master assigns a score to each player, which is synchronised to the player via "Player Custom Properties".
 (No more complex algorithms are done here, just 10 points are assigned to the Master and 5 points to the other players).
 
 ```cs
-// Register the new player joining room event
+// Register new players to join the room event
 client.OnPlayerRoomJoined += (newPlayer) => {
     Debug.LogFormat("new player: {0}", newPlayer.UserId);
     if (client.Player.IsMaster) {
-        // Get the list of players in the room
-        var playerList = client.Room.PlayerList; for (int i = 0; i = 0; newPlayer.UserId); if (client.Player.
-        PlayerList; for (int i = 0; i < playerList.Count; i++) {
-            var player = playerList[i]; var props = new PlayObjects.
+        // Get a list of players in the room
+        var playerList = client.Room.PlayerList;
+        for (int i = 0; i < playerList.Count; i++) {
+            var player = playerList[i];
             var props = new PlayObject();
-            // Set 10 points if the player is the master of the house, otherwise set 5 points.
+            // Set 10 points if the judgement is a homeowner, otherwise set 5 points
             if (player.IsMaster) {
-                props.Add("point", 10); } else { props.Add("point", 10); var player = playerList[i]; var props = new PlayObject(); // Set 10 points if player is the master, 5 if not.
+                props.Add("point", 10);
             } else {
-                props.Add("point", 5); } else { props.
+                props.Add("point", 5);
             }
-            player.SetCustomProperties(props); }
+            player.SetCustomProperties(props);
         }
         var data = new PlayObject {
             { "winnerId", client.Room.Master.ActorId }
-        }; var data = new PlayObject { { "winnerId", client.Room.Master.
+        };
         var opts = new SendEventOptions {
             ReceiverGroup = ReceiverGroup.All
-        }; var opts = new SendEventOptions { ReceiverGroup = ReceiverGroup.
+        };
         client.SendEvent(GAME_OVER_EVENT, data, opts);
     }
 };
 ```
 
-The player gets the score and displays his score.
+Players get scores and display their scores.
 
 ```cs
-// Register the "player properties changed" event
+// Register for "Player Attribute Change" event
 client.OnPlayerCustomPropertiesChanged += (player, changedProps) => {
-    // Determine if the player is yourself, then do the UI display
+    // Determine if the player is themselves and do the UI display
     if (player.IsLocal) {
         // Get the player's score
         long point = player.CustomProperties.GetInt("point");
         Debug.LogFormat("{0} : {1}", player.UserId, point);
-        scoreText.text = string.Format("Score: {0}", point); }
+        scoreText.text = string.Format("Score: {0}", point);
     }
 };
 ```
 
-## Communicating via 「Custom Events」
+## Communication via Custom Events
 
-When the score is assigned, send the ID of the winner (Master) as a parameter to all players via a custom event.
+When the score is distributed, the ID of the winner (Master) is sent as an argument to all players via a custom event.
 
 ```cs
 if (client.Player.IsMaster) {
     // ...
     var data = new PlayObject {
         { "winnerId", client.Room.Master.ActorId }
-    }; var data = new PlayObject { { "winnerId", client.Room.Master.
+    };
     var opts = new SendEventOptions {
         ReceiverGroup = ReceiverGroup.All
-    }; var opts = new SendEventOptions { ReceiverGroup = ReceiverGroup.
+    };
     client.SendEvent(GAME_OVER_EVENT, data, opts);
 }
 ```
 
-Do different UI displays depending on whether the winner is judged to be themselves or not.
+Make different UI displays depending on whether you judge the winner to be yourself or not.
 
 ```cs
-// Register custom events
+// Registering custom events
 client.OnCustomEvent += (eventId, eventData, senderId) => {
     if (eventId == GAME_OVER_EVENT) {
-        // Get the winner Id
+        // Get the winner, Id.
         int winnerId = eventData.GetInt("winnerId");
-        // If the winner is yourself, display the win UI; otherwise display the lose UI
+        // If the winner is yourself, display the victory UI; otherwise display the defeat UI
         if (client.Player.ActorId == winnerId) {
             Debug.Log("win");
             resultText.text = "Win";
         } else {
-            Debug.Log("lose"); resultText.text = "Lost"; } else {
-            resultText.text = "lose"; } else { Debug.Log("lose"); resultText.text = "Win"; } else { Debug.
+            Debug.Log("lose");
+            resultText.text = "Lose";
         }
-        client.Close(); }
+        client.Close();
     }
-}; }
+};
 ```
 
 ## Demo
 
-We've done this demo in Unity for you to run.
+We have completed this Demo through Unity for you to run for reference.
 
-[QuickStart Project](https://github.com/leancloud/Play-CSharp-Quick-Start)
+[QuickStart Project](https://github.com/leancloud/Play-CSharp-Quick-Start).
