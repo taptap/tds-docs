@@ -23,7 +23,7 @@ import sdkVersions from '/src/docComponents/sdkVersions';
 <>
 
 - Unity 2019.4 或更高版本
-- iOS 10 或更高版本
+- iOS 10 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
 - Android 5.0（API level 21）或更高版本
 
 </>
@@ -36,7 +36,7 @@ Android 5.0（API level 21）或更高版本
 
 <>
 
-iOS 10 或更高版本
+iOS 10 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
 
 </>
 
@@ -541,6 +541,8 @@ void UAntiAddictionWidget::OnCallBack(AntiAddictionUE::ResultHandlerCode Code, c
 | 1050 | `DURATION_LIMIT` | 时长限制 |
 | 9002 | `REAL_NAME_STOP` | 实名过程中点击了关闭实名窗 |
 
+***注意：开发者应根据回调类型来判断当前玩家是否可以进入游戏，而不是其他接口***
+
 ## 防沉迷认证
 
 SDK 支持两种防沉迷认证方式：
@@ -742,6 +744,9 @@ EAAUAgeLimit AgeLimit = AntiAddictionUE::GetAgeRange();
 | 8 | 8 到 15 岁 |
 | 16 | 16 到 17 岁 |
 | 18 | 成年玩家 |
+
+***注意：开发者应根据回调类型来判断当前玩家是否可以进入游戏，而不是年龄段数据，当游戏在 TapPlay 中 运行时，该数据可能不准确***
+
 
 ## 获取剩余时长（单位：秒）
 
@@ -1185,132 +1190,6 @@ curl -X POST \
 }
 ```
 
-## 常见问题
-
-### 如何开通实名认证与防沉迷服务
-
-可以在 **开发者中心后台 > 游戏服务 > 开发与构建 > 合规认证** 处自助开通服务。目前提供两种方案，游戏开通时选择其中一种：
-
-* **有版号**。完成控制台提示的前置条件，点击开通，然后配置好[中宣部参数](/sdk/anti-addiction/features/#注册中宣部实名认证系统)：
-    * 将中宣部系统后台的**游戏备案识别码、应用标识、应用密钥**填写到 TapTap 开发者中心后台对应处。
-    * 将 TapTap 开发者中心后台显示的 **IP 白名单地址**复制、填写到中宣部系统后台。
-* **暂无版号**。无版号游戏无法配置中宣部参数，可直接选择开通，等游戏有了版号，可以配置[中宣部参数](/sdk/anti-addiction/features/#注册中宣部实名认证系统)并切换到有版号方案。切换后客户端代码不受影响，不需要修改。
-
-### SDK 自带哪些用户界面（UI）
-
-实名认证和防沉迷 SDK 提供的用户界面主要在防沉迷授权阶段，可参考[功能介绍文档](/sdk/anti-addiction/features/#接入-tds-实名认证和防沉迷服务)中的界面预览。
-
-### 授权失败
-
-在实名认证时使用 TapTap 快速认证服务提示「授权失败」，请至后台[配置签名证书](/sdk/start/quickstart/#配置签名证书)。
-
-### 未查询到实名认证配置 
-
-实名认证时使用手动输入实名信息服务提示「未查询到实名认证配置」，原因是未开启实名认证服务，需要在 开发者中心后台 > 游戏服务 > 开发与构建 > 合规认证 处自助开通服务。
-
-### userIdentifier is empty
-
-调用认证接口时需要传入的玩家唯一标识 userIdentifier 参数值为空，建议开发者对此做非空判断。
-
-### 未弹出实名认证窗口/未收到回调
-
-这种情况一般是仅调用了初始化防沉迷 UI 模块代码，也就是说只完成了 SDK 的初始化，同时注册防沉迷的消息监听。
-
-触发实名认证弹窗**必须调用** [认证接口](/sdk/anti-addiction/guide/#防沉迷认证)，之后才会收到回调。
-
-### 重复认证
-
-我们预期同一个玩家认证过一次之后不再触发弹窗，防沉迷服务直接使用第一次认证的结果，这样用户体验更好。
-
-如果出现重复认证，可以按照以下思路排查：
-
-* 首先确认游戏使用的 [玩家唯一标识 userIdentifier](#玩家唯一标识-useridentifier-参数说明) 符合要求。如果同一个玩家用的 userIdentifier 会发生改变，在防沉迷服务中会被视为不同用户，导致重复认证。这个时候需要游戏传入合适的 userIdentifier，建议接入 [TDS 内建账户系统](/sdk/taptap-login/guide/start/#一键完成-taptap-登录)，用 `objectId` 作为玩家唯一标识；或者使用[单纯 TapTap 用户认证](/sdk/taptap-login/guide/tap-login/#taptap-登录并获取登录结果)，传入 `openid` 或 `unionid` 作为玩家唯一标识。
-* 如果是**有版号游戏**，请确认在 开发者中心后台游戏服务 > 开发与构建 > 合规认证 处填写的参数无误。如果参数有问题，请求中宣部接口会失败，导致重复认证。请检查以下参数配置：
-	* **IP 白名单地址**全部填入中宣部系统后台。
-	* **游戏备案识别码、应用标识**和中宣部后台保持一致。
-	* **应用密钥**在有效期内（有效期为半年，注意在失效前更新）。
-
-## 注意事项
-
-### 玩家唯一标识 userIdentifier 参数说明
-
-第一次认证会触发实名认证弹窗，让玩家授权游戏获取 TapTap 实名信息或输入身份信息，认证通过后，后面每一次以同样的 userIdentifier 调用认证接口都会直接拿到第一次认证的结果，不再触发弹窗。
-
-因此，同一个用户的唯一标识应该要保证唯一性。
-
-### 测试实名认证环境
-
-无论是 Android 还是 iOS 项目，不支持在 Unity Editor 环境里调试，请对应打包到真实设备或者移动端的模拟器中进行测试实名认证防沉迷的相关功能。
-
-## 更新日志
-
-### 3.18.3 
-
-#### 内容变更：
-
-1. 修复 Unity 接入时 iOS 无回调问题
-
-
-### 3.18.2  
-
-#### 内容变更：
-
-1. 修复提示窗口 UI 错位问题
-2. 修复 iOS 部分情况下进入宵禁未弹出提示异常
-
-#### 接口变更
-
-##### 新增接口
-
-防沉迷开始认证接口添加 ** isTapUser ** 参数，当登录方式为 Tap 登录时设置为 `true`, 其他方式设置为 `false`。
-
-<MultiLang kind="ue">
-
-<>
-
-```cs
-// 注意唯一标识参数值长度不能超过 64 字符
-string userIdentifier = "玩家的唯一标识";
-// Deprecated in 3.18.2  Added in 3.15.0
-// AntiAddictionUIKit.Startup(userIdentifier);
-AntiAddictionUIKit.Startup(userIdentifier, true);
-```
-</>
-
-<>
-
-```java
-// 注意唯一标识参数值长度不能超过 64 字符
-String userIdentifier = "玩家的唯一标识";
-// Deprecated in 3.18.2  Added in 3.15.0
-// AntiAddictionUIKit.startup(activity, userIdentifier);
-AntiAddictionUIKit.startup(activity, userIdentifier, true);
-```
-
-</>
-
-<>
-
-```objc
-// 注意唯一标识参数值长度不能超过 64 字符
-NSString *userIdentifier = @"玩家的唯一标识";
-// Deprecated in 3.18.2  Added in 3.15.0
-// [AntiAddiction startupWithUserID:userIdentifier];
-[AntiAddiction startupWithUserID:userIdentifier isTapUser: YES];
-```
-</>
-
-<>
-
-```cpp
-// Deprecated in 3.18.2  
-// AntiAddictionUE::Startup(TEXT("your_userIdentifier"));
-AntiAddictionUE::Startup(TEXT("your_userIdentifier"), true);
-```
-
-</>
-
-</MultiLang>
 
 
 

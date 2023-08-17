@@ -56,13 +56,10 @@ dependencies {
     // 将 3.x.0 版本修改为 4.0.1
     //classpath 'com.android.tools.build:gradle:3.x.0'
     classpath 'com.android.tools.build:gradle:4.0.1'
-    // highlight-end
-    **BUILD_SCRIPT_DEPS**
 }
 ```
 
 同时，为了将 [Gradle 版本和 Android Gradle Plugin 版本对应](https://developer.android.com/studio/releases/gradle-plugin#expandable-1)，需要更新 Gradle 版本，下载 [6.1.1 版本的 Gradle](https://services.gradle.org/distributions/gradle-6.1.1-bin.zip)，解压后放到自定义的文件夹中，同时**不**勾选 Unity 中的 `Preferences` -> `External Tools`-> `Android` -> `Gradle Installed with Unity(recommend)`，改为选择解压后 Gradle 文件夹的位置，如 <some path\>/gradle-6.1.1。
-注意 **TapADN SDK 从 3.16.3.10 版本开始更新了 glide 的依赖，glide 版本从 4.0.0 更新到了 4.9.0。**
 
 </details>
 
@@ -78,7 +75,10 @@ dependencies {
 ```
 
 修改文件内容:
-
+:::tip
+- **TapADN SDK 从 3.16.3.10 版本开始更新了 glide 的依赖，glide 版本从 4.0.0 更新到了 4.9.0。**
+- ** 3.16.3.13 加入 Android Dependencies 文件（位于 TapAD/Editor/TapAdDependencies.xml) 方便接入 EDM4U(https://github.com/googlesamples/unity-jar-resolver) 的项目方解决 Android 依赖。**
+:::
 ```groovy
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -105,13 +105,16 @@ dependencies {
 
 最低支持 Android 5.0（API level 21），编译环境为 Android Studio。
 
+集成参考： [TapADN Demo](https://github.com/taptap/TapADN-Demo)
+
 <p>
 将 <code>TapAD_{sdkVersions.tapadn.android}.aar</code> 拷贝到游戏目录下的 src/main/libs 目录中。
 </p>
 
 在游戏目录下 `build.gradle` 文件中添加代码：
-注意 **TapADN SDK 从 3.16.3.10 版本开始更新了 glide 的依赖，glide 版本从 4.0.0 更新到了 4.9.0。**
-
+:::tip
+**TapADN SDK 从 3.16.3.10 版本开始更新了 glide 的依赖，glide 版本从 4.0.0 更新到了 4.9.0。**
+:::
 <CodeBlock className="groovy">
 {`repositories{
     flatDir{   
@@ -120,7 +123,7 @@ dependencies {
 }
 dependencies {
     // ...
-    implementation(name: "TapAD_${sdkVersions.taptap.ios}", ext: "aar") // 广告 SDK
+    implementation(name: "TapAD_${sdkVersions.tapadn.android}", ext: "aar") // 广告 SDK
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
     implementation 'io.reactivex.rxjava2:rxjava:2.0.1'
     implementation 'com.squareup.okhttp3:okhttp:3.12.1'
@@ -195,13 +198,13 @@ dependencies {
 
 ```xml
 <!-- 广告SDK已添加的权限 -->
-<uses-permission android:name="android.permission.INTERNET"/>>
+<uses-permission android:name="android.permission.INTERNET"/>
 <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+
+<!-- 为了获取更精准的推送数据、建议游戏加上的权限 -->
 <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
 <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" />
 <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
-
-<!-- 为了获取更精准的推送数据、建议游戏加上的权限 -->
 <uses-permission android:name="android.permission.BLUETOOTH"/>
 <!-- targetVersion 31 及以上 建议游戏加上这个权限 -->
 <uses-permission android:name="android.permission.BLUETOOTH_CONNECT"/>
@@ -980,6 +983,9 @@ else
 // banner 广告播放回调接口说明
 public interface IBannerAdInteractionListener : ICommonInteractionListener
 {
+    // 当广告曝光
+    void OnAdShow(TapBannerAd ad);
+
     // 当广告关闭
     void OnAdClose(TapBannerAd ad);
 
@@ -1002,6 +1008,12 @@ public interface ICommonInteractionListener
 
 ```java
 bannerAd.setBannerInteractionListener(new TapBannerAd.BannerInteractionListener() {
+
+    @Override
+    public void onAdShow() {
+        // 广告已曝光
+    }
+
     @Override
     public void onAdClose() {
         // 广告已关闭（玩家可以手动点击关闭 banner 广告）

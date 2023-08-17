@@ -20,7 +20,7 @@ TapSDK 提供的游戏内好友、成就等服务和功能，也都基于这一�
 <>
 
 - Unity 2019.4 或更高版本
-- iOS 10 或更高版本
+- iOS 10 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
 - Android 5.0（API level 21）或更高版本
 
 </>
@@ -33,7 +33,7 @@ Android 5.0（API level 21）或更高版本
 
 <>
 
-iOS 10 或更高版本
+iOS 10 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
 
 </>
 
@@ -320,6 +320,26 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core",
 	"TapBootstrap",
 	"TapLogin"
 });
+if (Target.Platform == UnrealTargetPlatform.IOS || Target.Platform == UnrealTargetPlatform.Android)
+{
+    PublicDependencyModuleNames.AddRange(
+        new string[]
+        {
+            "LeanCloudPush",
+            // 推送接入
+            // "LeanCloudMobile"
+        }
+    );
+}
+else
+{
+    PublicDependencyModuleNames.AddRange(
+        new string[]
+        {
+            "LeanCloud"
+        }
+    );
+}
 ```
 
 #### 导入头文件
@@ -507,13 +527,13 @@ TDSUser.logInAnonymously().subscribe(new Observer<TDSUser>() {
 ```
 
 ```cpp
-FTDSUser::FDelegate OnSuccess = FTDSUser::FDelegate::CreateLambda([](const FTDSUser& User) {
-    FString UserID = User.GetObjectId();
-});
-FTUError::FDelegate OnError = FTUError::FDelegate::CreateLambda([](const FTUError& Error) {
-    // 登录失败 Error.msg;
-});
-FTDSUser::LoginAnonymously(OnSuccess, OnError);
+FTDSUser::LoginAnonymously(FTDSUser::FCallBackDelegate::CreateLambda([](const TSharedPtr<FTDSUser>& UserPtr, const FTUError& Error) {
+    if (UserPtr.IsValid()) {
+        FString UserID = UserPtr->GetObjectId();
+    } else {
+        // 登录失败 Error.msg;
+    }
+}));
 ```
 
 </MultiLang>
@@ -645,13 +665,13 @@ TDSUser.becomeWithSessionTokenInBackground("anmlwi96s381m6ca7o7266pzf").subscrib
 ```
 
 ```cpp
-FTDSUser::FDelegate OnSuccess = FTDSUser::FDelegate::CreateLambda([](const FTDSUser& User) {
-    // 登录成功
-});
-FTUError::FDelegate OnError = FTUError::FDelegate::CreateLambda([](const FTUError& Error) {
-    // session token 无效
-});
-FTDSUser::BecomeWithSessionToken("anmlwi96s381m6ca7o7266pzf", OnSuccess, OnError);
+FTDSUser::BecomeWithSessionToken("anmlwi96s381m6ca7o7266pzf", FTDSUser::FCallBackDelegate::CreateLambda([](const TSharedPtr<FTDSUser>& UserPtr, const FTUError& Error) {
+    if (UserPtr.IsValid()) {
+        FString UserID = UserPtr->GetObjectId();
+    } else {
+        // 登录失败 Error.msg;
+    }
+}));
 ```
 
 </MultiLang>
@@ -758,7 +778,15 @@ currentUser[@"nickname"] = @"Tarara";
 ```
 
 ```cpp
-暂不支持
+TSharedPtr<FTDSUser> User = FTDSUser::GetCurrentUser();
+User->SetNickName(TEXT("Tarara"));
+User->Save(FTDSUser::FCallBackDelegate::CreateLambda([](const TSharedPtr<FTDSUser>& UserPtr, const FTUError& Error) {
+    if (UserPtr.IsValid()) {
+        // 保存成功
+    } else {
+        // 登录失败 Error.msg;
+    }
+}));
 ```
 
 </MultiLang>
@@ -940,7 +968,27 @@ TDSUser.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
 ```
 
 ```cpp
-暂不支持
+FTDSUser::LoginWithTapTap({TUType::PermissionScope::Profile, TUType::PermissionScope::Friend},
+                            FTDSUser::FCallBackDelegate::CreateLambda(
+                                [](const TSharedPtr<FTDSUser>& UserPtr, const FTUError& Error) {
+                                    if (UserPtr.IsValid()) {
+                                        // 试图修改用户名
+                                        UserPtr->SetUsername("Jerry");
+                                        // 保存更改
+                                        UserPtr->Save(FTDSUser::FCallBackDelegate::CreateLambda(
+                                            [](const TSharedPtr<FTDSUser>& UserPtr, const FTUError& Error) {
+                                                if (UserPtr.IsValid()) {
+                                                    // 保存成功 Error.msg;
+                                                }
+                                                else {
+                                                    // 保存失败 Error.msg;
+                                                }
+                                            }));
+                                    }
+                                    else {
+                                        // 登录失败 Error.msg;
+                                    }
+                                }));
 ```
 
 </MultiLang>
@@ -963,7 +1011,7 @@ TDSUser.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
 
 例如以下的代码展示了终端用户使用微信登录的处理流程：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 Dictionary<string, object> thirdPartyData = new Dictionary<string, object> {
@@ -1023,6 +1071,24 @@ option.platform = LeanCloudSocialPlatformWeiXin;
         NSLog(@"登录失败：%@",error.localizedFailureReason);
     }
 }];
+```
+
+```cpp
+TSharedPtr<FJsonObject> ThirdPartyData = MakeShared<FJsonObject>();
+// 必须
+ThirdPartyData->SetNumberField("expires_in", 7200);
+ThirdPartyData->SetStringField("openid", "OPENID");
+ThirdPartyData->SetStringField("access_token", "ACCESS_TOKEN");
+// 可选
+ThirdPartyData->SetStringField("refresh_token", "REFRESH_TOKEN");
+ThirdPartyData->SetStringField("scope", "SCOPE");
+FTDSUser::LoginWithAuthData("weixin", ThirdPartyData, FTDSUser::FCallBackDelegate::CreateLambda([](const TSharedPtr<FTDSUser>& UserPtr, const FTUError& Error) {
+    if (UserPtr.IsValid()) {
+        // 登录成功
+    } else {
+        // 登录失败 Error.msg;
+    }
+}));
 ```
 
 </MultiLang>
@@ -1135,17 +1201,17 @@ TDSUser *user = [TDSUser user];
 ```
 
 ```cpp
-FTDSUser::FDelegate OnSuccess = FTDSUser::FDelegate::CreateLambda([](const FTDSUser& User) {
-    // 登录成功
-});
-FTUError::FDelegate OnError = FTUError::FDelegate::CreateLambda([](const FTUError& Error) {
-    // 登录失败 Error.msg;
-});
 TSharedPtr<FJsonObject> AppleAuthData = MakeShared<FJsonObject>();
 AppleAuthData->SetStringField("uid", "USER IDENTIFIER");
 AppleAuthData->SetStringField("identity_token", "IDENTITY TOKEN");
 AppleAuthData->SetStringField("code", "AUTHORIZATION CODE");
-FTDSUser::LoginWithAuthData("lc_apple", AppleAuthData, OnSuccess, OnError);
+FTDSUser::LoginWithAuthData("lc_apple", AppleAuthData, FTDSUser::FCallBackDelegate::CreateLambda([](const TSharedPtr<FTDSUser>& UserPtr, const FTUError& Error) {
+    if (UserPtr.IsValid()) {
+        // 登录成功
+    } else {
+        // 登录失败 Error.msg;
+    }
+}));
 ```
 
 </MultiLang>
@@ -1277,13 +1343,14 @@ user.associateWithAuthData(weixinData, "weixin").subscribe(new Observer<LCUser>(
 ```
 
 ```cpp
-FTDSUser::FDelegate OnSuccess = FTDSUser::FDelegate::CreateLambda([](const FTDSUser& User) {
-    // 绑定成功
-});
-FTUError::FDelegate OnError = FTUError::FDelegate::CreateLambda([](const FTUError& Error) {
-    // 绑定失败 Error.msg;
-});
-UserPtr->AssociateWithAuthData("weixin", AuthData, OnSuccess, OnError);
+User->AssociateWithAuthData("weixin", AuthData, FTDSUser::FCallBackDelegate::CreateLambda([](const TSharedPtr<FTDSUser>& UserPtr, const FTUError& Error) {
+    if (UserPtr.IsValid()) {
+        // 绑定成功
+    }
+    else {
+        // 绑定失败 Error.msg Error.msg;
+    }
+}));
 ```
 
 </MultiLang>
@@ -1334,13 +1401,15 @@ user.dissociateWithAuthData("weixin").subscribe(new Observer<LCUser>() {
 ```
 
 ```cpp
-FTDSUser::FDelegate OnSuccess = FTDSUser::FDelegate::CreateLambda([](const FTDSUser& User) {
-    // 成功
-});
-FTUError::FDelegate OnError = FTUError::FDelegate::CreateLambda([](const FTUError& Error) {
-    // 失败 Error.msg;
-});
-UserPtr->DisassociateAuthData("weixin", OnSuccess, OnError);
+User->DisassociateAuthData("weixin", FTDSUser::FCallBackDelegate::CreateLambda(
+                                [](const TSharedPtr<FTDSUser>& UserPtr, const FTUError& Error) {
+                                    if (UserPtr.IsValid()) {
+                                        // 成功
+                                    }
+                                    else {
+                                        // 失败 Error.msg;
+                                    }
+                                }));
 ```
 
 </MultiLang>
