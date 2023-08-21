@@ -14,6 +14,7 @@ const config = {
   trailingSlash: true,
   customFields: {
     searchUrl: "https://tds-doc-search-api.cn-e1.leanapp.cn/search",
+    upItemListIndexUrl: "https://tds-doc-search-api.cn-e1.leanapp.cn/upItemListIndexUrl",
     searchProviderName: "LeanDB Elasticsearch",
     searchProviderWebsite:
       "https://developer.taptap.cn/docs/sdk/engine/database/es/",

@@ -16,6 +16,7 @@ import styles from "./index.module.scss";
 import IconSearchBtn from "./icons/search-btn.svg";
 
 import type { HitItem, HitGroupWithTitle } from "./common";
+import { upItemListIndexApi } from "./api";
 
 const useRecentHits = (locale: string) => {
   const localStorageItemKey: string = `tds_doc_search_recent_hits_for_${locale}`;
@@ -82,30 +83,36 @@ const useSearch = (url: string, locale: string) => {
 
   const groupHits = (hits: HitItem[]): HitGroupWithTitle[] => {
     const groupedHits: HitGroupWithTitle[] = [];
-
     hits.forEach((hit) => {
+
+
       for (const group of groupedHits) {
         if (group.title === hit._source.title) {
           group.hits.push(hit);
           return;
         }
       }
-
       groupedHits.push({
         title: hit._source.title,
         hits: [hit],
       });
     });
-
+    //排序
     groupedHits.sort((a: HitGroupWithTitle, b: HitGroupWithTitle): number => {
       const getAvgScore = ({ hits }: HitGroupWithTitle): number =>
         hits.reduce((p: number, c: HitItem) => p + c._score, 0) / hits.length;
       return getAvgScore(b) - getAvgScore(a);
     });
-
+    //增加下标
+    var index = 1
+    groupedHits.forEach((group) => {
+      group.hits.forEach((hit) => {
+        hit._indexItem = index
+        index++
+      })
+    })
     return groupedHits;
   };
-
   const [session] = useState<string>(uuidv4);
   const [query, setQuery] = useState<string>("");
   const [groupedHits, setGroupedHits] = useState<null | HitGroupWithTitle[]>(
@@ -132,12 +139,19 @@ const useSearch = (url: string, locale: string) => {
       const {
         data: { hits },
       }: SearchResponse = await axios.get(url, config);
+      //对返回值进行修改，增加 session 和 sequence
+      hits.forEach((hit) => {
+        hit._X_Tds_Doc_Search_Session = session;
+        hit._X_Tds_Doc_Search_Sequence = sequence;
+        hit._locale = locale
+      });
       return hits;
     };
 
     const search = async () => {
       const hits: HitItem[] = await fetchHits(url, query, locale);
       if (!ignore) {
+
         const groupedHits: HitGroupWithTitle[] = groupHits(hits);
         setGroupedHits(groupedHits);
       }
@@ -177,6 +191,7 @@ const SearchBar = () => {
     i18n: { currentLocale },
   } = useDocusaurusContext();
   const searchUrl = customFields?.searchUrl as string;
+  const upItemListIndexUrl = customFields?.upItemListIndexUrl as string;
 
   const [isSearchOpen, openSearch, closeSearch] = useToggle();
   const [recentHits, setRecentHits] = useRecentHits(currentLocale);
@@ -185,7 +200,6 @@ const SearchBar = () => {
 
   const openHit = (hit: HitItem) => {
     closeSearch();
-
     const updatedRecentHits: HitItem[] = getUpdatedRecentHits(
       recentHits,
       hit,
@@ -195,7 +209,23 @@ const SearchBar = () => {
 
     const url: string = hit._source.url;
     history.push(`${baseUrl}${url}`);
+    upItemListIndex(hit)
   };
+
+
+
+  function upItemListIndex(hit: HitItem) {
+    //TODO 点击条目跳转
+    upItemListIndexApi(upItemListIndexUrl as string,
+      hit._X_Tds_Doc_Search_Session,
+      hit._X_Tds_Doc_Search_Sequence,
+      hit._locale,
+      hit._indexItem,
+      hit._source)
+  }
+
+  
+
 
   const removeRecentHit = (hit: HitItem) => {
     const updatedRecentHits: HitItem[] = getUpdatedRecentHits(
@@ -232,12 +262,13 @@ const SearchBar = () => {
         </span>
       </button>
       {isSearchOpen && (
-        <SearchBox
+        <SearchBox 
           searchUrl={searchUrl}
           locale={currentLocale}
           recentHits={recentHits}
           closeSearch={closeSearch}
           openHit={openHit}
+
           removeRecentHit={removeRecentHit}
         />
       )}
@@ -265,6 +296,7 @@ const SearchBox = ({
   const [query, setQuery, groupedHits] = useSearch(searchUrl, locale);
   const searchFormEl = useRef<HTMLFormElement>(null);
   const searchInputEl = useRef<HTMLInputElement>(null);
+
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -301,9 +333,8 @@ const SearchBox = ({
       <div className={styles.searchBox}>
         <div className={styles.scrim} onClick={closeSearch} />
         <div
-          className={`${styles.panel} ${
-            groupedHits === null && !recentHits.length ? styles.short : ""
-          }`}
+          className={`${styles.panel} ${groupedHits === null && !recentHits.length ? styles.short : ""
+            }`}
         >
           <Input
             query={query}
