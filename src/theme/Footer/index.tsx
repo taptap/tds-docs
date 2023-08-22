@@ -31,7 +31,7 @@ function Footer() {
               <Logo noLabel reversed={BRAND === "leancloud"} />
             </section>
 
-            <section className={styles.discord}>
+            {BRAND === "tds" ? <section className={styles.discord}>
               <a
                 href="https://discord.com/invite/xt3f3XpuQa"
                 target="_blank"
@@ -52,7 +52,7 @@ function Footer() {
                   <Arrow />
                 </div>
               </a>
-            </section>
+            </section> : <></>}
           </section>
 
           <section>
