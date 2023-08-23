@@ -219,7 +219,6 @@ const SearchBar = () => {
     upItemListIndexApi(upItemListIndexUrl as string,
       hit._X_Tds_Doc_Search_Session,
       hit._X_Tds_Doc_Search_Sequence,
-      hit._locale,
       hit._indexItem,
       hit._source)
   }

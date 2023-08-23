@@ -6,18 +6,16 @@ const upItemListIndexApi = async (
   url:string,
   session:string,
   sequence:number,
-  locale:string,
   index:number,
   source:Source,
 ): Promise<Boolean> => {
-  const config=  { index:index,locale:locale ,source:source};
+  const config=  { index:index,source:source};
   const headers =  {
     "X-TDS-Doc-Search-Source": "docs",
     "X-TDS-Doc-Search-Session": session,
     "X-TDS-Doc-Search-Sequence": sequence,
   };
   
-  console.log(url)
 
   var res = await axios.post(url , config,{headers});
   return true;
