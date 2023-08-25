@@ -6,18 +6,18 @@ sidebar_position: 2
 
 import { Conditional } from "/src/docComponents/conditional";
 
-## 前言
+## Introduction
 
-Multiplayer is a C#-based game SDK that provides a complete client-side SDK solution for online games with strong networking requirements, thus eliminating the need for development teams to build their own servers and saving most of the development and O&M costs. The main features provided by Multiplayer are as follows:
+Multiplayer is a C#-based game SDK that provides a complete client-side SDK solution for online games with strong networking requirements, thus eliminating the need for development teams to build their own servers and saving most of the development and maintenance costs. The main features provided by Multiplayer are as follows:
 
-- Get room list
-- Create Room
-- Join Room
-- Randomly join (eligible) rooms
-- Get room players
-- Get, set and synchronise room properties
-- Getting, setting, and synchronising player properties
-- Send and receive Custom Events
+- Getting room list
+- Creating a room
+- Joining a room
+- Randomly joining a (eligible) room
+- Getting players in a room
+- Getting, setting, and synchronizing room properties
+- Getting, setting, and synchronizing player properties
+- Sending and receiving custom events
 - Leaving a room
 
 ## SDK Import
@@ -26,13 +26,13 @@ Please read [Installation Guide](/sdk/multiplayer/start/cs/#installation) to get
 
 ## Initialisation
 
-Import the required namespaces.
+Import the required namespace.
 
 ```cs
 using LeanCloud.Play;
 ```
 
-Next we need to instantiate a client object for the Online Matchmaking SDK.
+Next we need to instantiate a client object for the Multiplayer SDK.
 
 <Conditional brand="leancloud">
 
@@ -50,21 +50,21 @@ var client = new Client(
     "your-client-id",       // Client ID of the game
     "your-client-token",    // Client Token for the game
     "tarara",               // Set the user id
-    playServer: "https://your_server_url", // the game's API domain name
-    gameVersion: "0.0.1"   // set the game version, optional, default 0.0.1, players with different versions will not be matched in the same room
+    playServer: "https://your_server_url", // The game's API domain name
+    gameVersion: "0.0.1"   // Set the game version; optional; default is 0.0.1; players with different versions will not be matched in the same room
 );
 ```
 
 - The `Client ID` and `Client Token` of the game can be viewed at **Developer Centre > Your Games > Game Services > Application Configuration**.
-- The API domain name is viewable at **Application Configuration > Domain Configuration > API**, refer to the documentation for [domain name](/sdk/domain/guide/).
+- The API domain name is viewable at **Application Configuration > Domain Configuration > API**. Refer to the documentation for [domain name](/sdk/domain/guide/) for more information.
 
 </Conditional>
 
-where
+Here
 `userId` serves as a unique identifier for the client connecting to the server.
 Note that this `userId` has the following restrictions:
 
-- Only English, numbers and underscores are allowed.
+- Only letters, numbers, and underscores are allowed
 - Cannot exceed 32 characters in length
 - Globally unique within an application
 
@@ -74,7 +74,7 @@ Note that this `userId` has the following restrictions:
 
 ### Establishing a connection
 
-Connect the current player to the multiplayer matchmaking service with the following code:
+Connect the current player to the Multiplayer service with the following code:
 
 ```cs
 try {
@@ -89,14 +89,14 @@ try {
 ## Lobby
 
 We recommend that you **don't add players to the lobby**, because in the lobby, the server will constantly send out the latest full list of rooms, and players will choose one of the rooms to play by themselves, which is not only unfriendly to the player experience, but also brings a lot of bandwidth pressure.
-We recommend you to use [Room Match](#room-matching) as most of the handheld games nowadays, **Directly through the [Room Match](#room-matching) way, fast match to start the game**.
+We recommend you to **use [Room Matching](#room-matching) like most of the mobile games nowadays to quickly match players and let them start the game**.
 
 If you have a special game scenario where you need to get the room list, you can call the following method:
 
 ```cs
 try {
     await client.JoinLobby();
-    // Join Lobby Successfully
+    // Joined the lobby successfully
 } catch (PlayException e) {
     // Failed to join the lobby
     Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
@@ -177,19 +177,19 @@ The room name must be unique; if it is not set, the server generates a unique ro
 Specified parameters when creating a room, including:
 
 - `Opened`: whether the room is open or not. If set to false, no other players are allowed to join.
-- `Visible`: whether the room is visible. If set to false, it will not appear in the lobby's room list, but other players can join the room by specifying `RoomName`.
+- `Visible`: whether the room is visible. If set to false, it will not appear in the lobby's room list, but other players can join the room by specifying the room name.
 - `EmptyRoomTtl`: how long (in seconds) the room will be kept when there are no players in the room. Default is 0, i.e. the room data will be destroyed immediately when there are no players in the room. Maximum value is 300, i.e. 5 minutes.
 - `PlayerTtl`: the time (in seconds) to keep the player's data in the room when the player drops out. Default is 0, i.e. player data is destroyed immediately after the player drops out. Maximum value is 300, i.e. 5 minutes.
 - `MaxPlayerCount`: the maximum number of players allowed in the room.
 - `CustomRoomProperties`: custom properties for the room.
-- `CustomRoomPropertyKeysForLobby`: the custom properties of the room An array of `keys` in `CustomRoomProperties`, the properties contained in `CustomRoomPropertyKeysForLobby` will appear in the lobby's Room Properties (`client.LobbyRoomList`), and the full set of properties will be viewed in `room.CustomProperties` after the room has been added. These properties will be used when matching rooms.
-- `flag`: create room flag bit, see below for more details [MasterClient drop without transfer](#masterclient-drop-transfer), [Specify other member as MasterClient](#specify-other-members-as-masterclient), [Allow only MasterClient to modify room properties](#allow-only-masterclient-to-modify-room-properties).
+- `CustomRoomPropertyKeysForLobby`: an array of keys in `CustomRoomProperties`. The properties contained in `CustomRoomPropertyKeysForLobby` will appear in the lobby's room Properties (`client.LobbyRoomList`), and the full set of properties can be viewed in `room.CustomProperties` after joining the room. These properties will be used when matching rooms.
+- `Flag`: flag bit for room creation. See [MasterClient drop without transfer](#masterclient-drop-transfer), [Specify other member as MasterClient](#specify-other-members-as-masterclient), and [Allow only MasterClient to modify room properties](#allow-only-masterclient-to-modify-room-properties) below for more details.
 
 #### expectedUserIds
 
-An array of expected player IDs. This parameter is mainly used to "reserve space" for certain players who can join the room.
+An array of specified player IDs. This parameter is mainly used to "reserve space" for certain players who can join the room.
 
-Note: These "specific players" will not actually join the room, but will only reserve space in the room for "specific players" to join. If you want to invite players to join a room, you need to send the room name to your friends through other channels, such as IM, WeChat, etc., and then your friends will join the room through the `JoinRoom(roomName)` interface.
+Note: These "specific players" will not actually join the room. There will only be space in the room reserved for those "specific players" to join. If you want to invite players to join a room, you need to send the room name to your friends through other channels, such as IM, WeChat, etc., and then your friends will join the room through the `JoinRoom(roomName)` interface.
 
 For more information about `CreateRoom`, please refer to [API Documentation](https://leancloud.github.io/Play-SDK-CSharp/html/classLeanCloud_1_1Play_1_1Client.htm#a0478f278b300dd4ae4c4e1fe311d3c7c).
 
@@ -203,7 +203,7 @@ You can join a room by specifying the room name.
 
 ```cs
 try {
-    // Players are joining the 'LiLeiRoom' room.
+    // The player is joining the 'LiLeiRoom' room.
     await client.JoinRoom("LiLeiRoom");
     // Join the room successfully
 } catch (PlayException e) {
@@ -212,12 +212,12 @@ try {
 }
 ```
 
-When joining a room, you can also take up space for other players, if the remaining empty space in the room is less than the number of occupied spaces, you will fail to join the room.
+When joining a room, you can also take up space for other players. If the remaining empty space in the room is less than the number of occupied spaces, you will fail to join the room.
 
 ```cs
 var expectedUserIds = new List<string>() { "LiLei", "Jim" };
 try {
-    // Players are joining the "game" room and taking up space for LiLei and Jim players
+    // Players are joining the "game" room and taking up space for LiLei and Jim
     await client.JoinRoom("game", expectedUserIds);
 } catch (PlayException e) {
     // Failed to join room
@@ -259,7 +259,7 @@ try {
 
 ### Join or create a specific room
 
-Many games don't have scenarios that force a designated room owner, as long as a portion of the players have access to play in the same room, whoever serves as the room owner is fine, and this is where we can use `JoinOrCreateRoom()` to achieve this. This method will join the current player directly to the room if there is a relevant room, or create a new room if it doesn't exist in the room.
+Many games don't have scenarios that force a designated room owner. As long as a number of players can play in the same room, it is fine for anyone to be the owner. We can use `JoinOrCreateRoom()` to achieve this. This method will join the current player directly to the room if there is a relevant room, or create a new room if there isn't such a room.
 
 ```cs
 try {
@@ -278,7 +278,7 @@ For more on `JoinOrCreateRoom`, see the [API documentation](https://leancloud.gi
 For players who are already in the room, when a new player joins the room, the server will send the `OnPlayerRoomJoined` event to notify the client, and the client can use the properties of the new player to do some display logic.
 
 ```cs
-// Register new players to join the event
+// Register the event for new players joining
 client.OnPlayerRoomJoined += newPlayer => {
     // TODO New Player Joining Logic
 };
@@ -298,12 +298,12 @@ var isLocal = player.isLocal;
 
 ### Leaving a room
 
-The following interface can be called when the player wants to 'actively' leave the room.
+The following interface can be called when the player wants to proactively leave the room.
 
 ```cs
 try {
     await client.LeaveRoom();
-    // Leaving the room successfully allows you to execute logic such as jumping scenes
+    // Leaving the room successfully; you can do things like going to another scene
 } catch (PlayException e) {
     // Failed to leave the room
     Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
@@ -315,7 +315,7 @@ Other players in the room will receive the `OnPlayerRoomLeft` event.
 ```cs
 // Register the event of a player leaving the room
 client.OnPlayerRoomLeft += leftPlayer => {
-    // TODO can perform the destruction of the player's departure
+    // TODO can perform the destruction operation for the player's departure
 }
 ```
 
@@ -323,32 +323,32 @@ client.OnPlayerRoomLeft += leftPlayer => {
 
 | Event | Parameter | Description |
 | ------------------ | ---------- | -------------- |
-| OnPlayerRoomJoined | newPlayer | newPlayer joins room |
-| OnPlayerRoomLeft | leftPlayer | player left room |
+| OnPlayerRoomJoined | newPlayer | A new player joined the room |
+| OnPlayerRoomLeft | leftPlayer | A player left the room |
 
 ## MasterClient
 
-The default room creator of the multiplayer service is the MasterClient, who can close the room, set the room to be invisible, kick people, and so on, and his device is also responsible for "logical operations", for example, it can be responsible for the following scenarios in the game:
+The room creator will become the MasterClient by default in the Multiplayer service. They can close the room, set the room to be invisible, kick people, and so on. Their device is also responsible for "logical operations". For example, it can be responsible for the following scenarios in the game:
 
 - Dealing cards for users in card games;
-- Controlling the timing and logic of brushing monsters;
+- Controlling the timing and logic of killing monsters;
 - Judging the winner at the end of the game;
 - ...and so on.
 
-### MasterClient is located on the player's client side
+### MasterClient located on the player's client
 
-You can write the MasterClient logic in the client, and the player terminal as the room creator will take care of the game operations. In this case, multiplayer matches provide the following convenient features for MasterClient:
+You can write the MasterClient logic in the client, and the player terminal ofthe room creator will take care of the game operations. In this case, Multiplayer provide the following convenient features for MasterClient:
 
 #### MasterClient Drop Transfer
 
-When a MasterClient is dropped, the Matchmaking service assigns a new PlayerClient as the MasterClient, even if the original MasterClient does not become the new MasterClient when it comes back online. when the MasterClient is changed, the SDK dispatches ` OnMasterSwitched` event to notify the client when the MasterClient changes.
+When a MasterClient is dropped, the Multiplayer service assigns a new player client as the MasterClient. Even if the original MasterClient comes back online, it does not become the new MasterClient. When the MasterClient is changed, the SDK dispatches the `OnMasterSwitched` event to notify the client when the MasterClient changes.
 
 ```cs
 // Register the host switch event
 client.OnMasterSwitched += newMaster => {
-    // TODO can be a host switching presentation.
+    // TODO can display that the host is changed
 
-    // You can determine whether to perform logical processing based on determining whether the current client is a Master.
+    // You can determine whether to perform logical processing according to whether the current client is the Master.
     if (client.Player.IsMaster) {
 
     }
@@ -359,23 +359,23 @@ client.OnMasterSwitched += newMaster => {
 
 | Event | Parameter | Description |
 | ---------------- | --------- | ----------- |
-| OnMasterSwitched | newMaster | MasterReplacement |
+| OnMasterSwitched | newMaster | Master changed |
 
 #### Specify other members as MasterClient
 
-During the game, if the MasterClient does not want to take the computing function anymore, it can call the following methods to actively transfer its role to other player clients:
+During the game, if the MasterClient does not want to take the computing function anymore, it can call the following method to actively transfer its role to other player clients:
 
 ```cs
 try {
-    // Assign MasterClient by Player Id
+    // Specify MasterClient by Player Id
     await client.SetMaster(newMasterId);
 } catch (PlayException e) {
-    // Setting up Master failed
+    // Failed to set Master
     Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
 }
 ```
 
-After transferring the MasterClient identity, all players in the room receive the `OnMasterSwitched` event.
+After transferring the MasterClient identity, all players in the room will receive the `OnMasterSwitched` event.
 
 ### MasterClient on the server
 
@@ -383,7 +383,7 @@ In order to ensure game security and prevent users from cheating, we recommend t
 
 #### MasterClient will not be transferred when it drops
 
-After placing the MasterClient on the server, the MasterClient should not transfer roles even if it unexpectedly drops out of the game, in which case you need to specify the `FixedMaster` flag when creating a room:
+After placing the MasterClient on the server, the MasterClient role should not be transferred even if it unexpectedly drops out of the game, in which case you need to specify the `FixedMaster` flag when creating a room:
 
 ```cs
 var options = new RoomOptions {
@@ -404,14 +404,14 @@ try {
     await client.SetRoomOpen(false);
     Debug.Log(client.Room.Open);
 } catch (PlayException e) {
-    // Setup Failure
+    // Failed to set
     Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
 }
 ```
 
 #### Setting whether a room is visible or not
 
-MasterClient can set whether a room is visible or not, when the room is not visible, this room will not appear in the player's lobby room list, but **other players can join by specifying roomName**.
+MasterClient can set whether a room is visible or not. When the room is not visible, this room will not appear in the player's lobby room list, but **other players can join by specifying roomName**.
 
 ```cs
 try {
@@ -419,7 +419,7 @@ try {
     await client.SetRoomVisible(false);
     Debug.Log(client.Room.Visible);
 } catch (PlayException e) {
-    // Setup Failure
+    // Failed to set
     Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
 }
 ```
@@ -433,7 +433,7 @@ try {
     // You can pass in the code and msg of the kicker.
     await client.KickPlayer(otherPlayer.ActorId, 1, "You've been kicked out of your room.");
 } catch (PlayException e) {
-    // Kick Failure
+    // Failed to kick
     Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
 }
 ```
@@ -446,7 +446,7 @@ client.OnRoomKicked += (code, msg) => {
 };
 ```
 
-At the same time, players other than the MasterClient that still have a room will receive the `OnPlayerRoomLeft` event:
+At the same time, players other than the MasterClient that are still in the room will receive the `OnPlayerRoomLeft` event:
 
 ```cs
 client.OnPlayerRoomLeft += leftPlayer => {
@@ -456,12 +456,12 @@ client.OnPlayerRoomLeft += leftPlayer => {
 
 ## Custom Attributes and Synchronisation
 
-In order to meet the different gameplay needs of developers, the MMO SDK allows developers to set "custom properties".
+In order to meet the different gameplay needs of developers, the Multiplayer SDK allows developers to set custom properties.
 
-The main purpose of custom property synchronisation includes:
+The main functions of custom property synchronization include:
 
-- Keeping the data of each client consistent.
-- Custom attributes are managed by the server, when a player enters a room, all custom attributes will be available.
+- Keeping the data consistent among multiple clients.
+- Custom attributes are managed by the server. When a player enters a room, all custom attributes will be available.
 
 Custom attributes are divided into "Room Custom Attributes" and "Player Custom Attributes".
 
@@ -479,12 +479,12 @@ try {
     await client.Room.SetCustomProperties(props);
     var newProperties = client.Room.CustomProperties;
 } catch (PlayException e) {
-    // Setting property error
+    // Failed to set the property
     Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
 }
 ```
 
-Note: This interface does not directly set the `Memory values of custom properties in the client`, but sends a message to modify the custom properties, and the server makes the final decision whether to change them or not.
+Note: This interface does not directly set the memory values of custom properties in the client, but sends a message to modify the custom properties, and the server makes the final decision whether to change them or not.
 
 When a room property is changed, the SDK will dispatch the `OnRoomCustomPropertiesChanged` event to notify all player clients (including itself).
 
@@ -496,11 +496,11 @@ client.OnRoomCustomPropertiesChanged += changedProps => {
 };
 ```
 
-Note: The `changedProps` parameter only indicates the currently changed parameters, not the `all properties`. To get all properties, please get them via `client.Room.CustomProperties`.
+Note: The `changedProps` parameter only indicates the currently changed parameters, not all properties. To get all properties, please get them via `client.Room.CustomProperties`.
 
-#### Allow only MasterClient to modify room properties.
+#### Allow only MasterClient to modify room properties
 
-By default all Clients in a room can modify the room's custom properties, if you want to allow only MasterClients to do so, you can specify the `MasterUpdateRoomProperties` flag when creating the room:
+By default, all clients in a room can modify the room's custom properties. If you want to allow only the MasterClient to do so, you can specify the `MasterUpdateRoomProperties` flag when creating the room:
 
 ```cs
 var options = new RoomOptions {
@@ -528,7 +528,7 @@ try {
     // Request to set player attributes
     await client.Player.SetCustomProperties(props);
 } catch (PlayException e) {
-    // Setting property error
+    // Failed to set the property
     Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
 }
 ```
@@ -536,7 +536,7 @@ try {
 Any player in the room (including yourself) who modifies their custom attributes triggers the Player Custom Attribute Change event:
 
 ```cs
-// Register player-defined attribute change events
+// Register player custom attribute change events
 client.OnPlayerCustomPropertiesChanged += (player, changedProps) => {
     // Get all the player's custom attributes
     var props = player.CustomProperties;
@@ -547,16 +547,16 @@ client.OnPlayerCustomPropertiesChanged += (player, changedProps) => {
 
 ### CAS
 
-CAS is called Compare And Swap, which means `Check And Update`, and is used to avoid some `concurrency problems`.
+CAS stands for Compare And Swap, which means check and update, and is used to avoid some concurrency problems.
 
 When `SetCustomProperties` is called, the server receives all the values submitted by the client, which is not enough for some scenarios.
 
 For example, a property holds the holder of an item in this room, i.e. the key of the property is the item and the value is the holder.
-Any client can set this property at any time, and if multiple clients call it at the same time, **the server will take the last call received as the final value**, which is usually illogical, and should generally belong to the first person to get it.
+Any client can set this property at any time, and if multiple clients call it at the same time, **the server will take the last call received as the final value**, which is usually illogical. Usually the item should belong to the first person who got it.
 
-`SetCustomProperties` has an optional parameter `expectedValues` that can be used as a judgement condition. The server will only update properties that currently match `expectedValues`, updates with expired `expectedValues` will be ignored.
+`SetCustomProperties` has an optional parameter `expectedValues` that can be used as a judgement condition. The server will only update properties that currently match `expectedValues`. Updates with expired `expectedValues` will be ignored.
 
-Suppose there are 10 players in a room, but there is only 1 dragon knife, and the dragon knife can only be won by the first person who "grabs it".
+Suppose there are 10 players in a room, but there is only 1 Tulong Knife, and the Tulong Knife can only be won by the first person who "grabs it".
 
 We can set the `tulong` value in `expectedValues`:
 
@@ -566,29 +566,29 @@ var props = new PlayObject {
     { "tulong", X }
 };
 var expectedValues = new PlayObject {
-    // Current owner of the Dragon Slayer
+    // Current owner of the Tulong Knife
     { "tulong", null }
 };
 await client.Room.SetCustomProperties(props, expectedValues);
 ```
 
-This way, after the first player gets the Dragon Slayer, `tulong` corresponds to the value of first player, and subsequent requests `expectedValues = { tulong: null }` will fail.
+This way, after the first player gets the Tulong Knife, `tulong` corresponds to the value of first player, and subsequent requests with `expectedValues = { tulong: null }` will fail.
 
 ### Related events
 
 | Events | Parameters | Description
 | ------------------------------- | ---------------------- | ------------------ |
-| OnRoomCustomPropertiesChanged | changedProps | RoomCustomPropertiesChanged |
-| OnPlayerCustomPropertiesChanged | (player, changedProps) | PlayerCustomPropertiesChanged |
+| OnRoomCustomPropertiesChanged | changedProps | Room custom property is changed |
+| OnPlayerCustomPropertiesChanged | (player, changedProps) | Player custom property is changed |
 
 ## Custom events
 
 In [Custom Properties](#custom-attributes-and-synchronisation), we introduced how to customize the game's data structures and data types based on the game's requirements.
-However, only data is not enough, developers also need to communicate with each other through custom events.
+However, data by itself is not enough. To allow different parties to communicate, custom events are also needed.
 
 ### Sending custom events
 
-We can send various events through Custom Events, such as game start, card capture, release X skill, game end, etc. We can also send custom events to each other through Custom Events.
+We can send various events through custom events, such as game start, card capture, release X skill, game end, etc.
 
 ```cs
 var options = new SendEventOptions {
@@ -607,17 +607,17 @@ try {
     // Send custom events
     await client.SendEvent(SKILL_EVENT_ID, eventData, options);
 } catch (PlayException e) {
-    // Send Event Error
+    // Failed to send the event
     Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
 }
 ```
 
-The `options` are the event sending parameters, including the `ReceiverGroup` and the `ReceiverIdArray`.
+The `options` are the event sending parameters, including the receiving group and the receiver ID array.
 
 - ReceiverGroup is an enumeration of the targets of the received event, including Others (everyone in the room except yourself), All (everyone in the room), and MasterClient (the host).
 - The Receiver ID array is the enumerated value of the target of the received event, i.e., the player's `ActorId` array. The `ActorId` can be obtained via `player.ActorId`.
 
-Note: If both Receive Group and Receiver ID Array are set, Receiver ID Array will override Receive Group.
+Note: If both receiver group and receiver ID array are set, receiver ID array will override receiver group.
 
 ### Receiving custom events
 
@@ -629,7 +629,7 @@ client.OnCustomEvent += (eventId, eventData, senderId) => {
     if (eventId == SKILL_EVENT_ID) {
         // If it is a skill event
         var skillId = eventData.GetString("skillId");
-        // TODO Handling the performance of released skills
+        // TODO Handling the display of released skills
 
     }
 };
@@ -640,8 +640,8 @@ client.OnCustomEvent += (eventId, eventData, senderId) => {
 | parameter | type | description |
 | --------- | ---------- | ------------------------------- |
 | eventId | byte | Event Id for the event |
-| eventData | PlayObject | eventParameter |
-| senderId | int | eventSenderId (player's actorId) |
+| eventData | PlayObject | Event parameter |
+| senderId | int | Event sender ID (player's actorId) |
 
 ## Disconnect
 
@@ -650,7 +650,7 @@ In case of unstable network, you may be disconnected passively. When you are dis
 ```cs
 // Registering for disconnection events
 client.OnDisconnected += () => {
-    // TODO Option to reconnect if required
+    // TODO Reconnect if needed
 };
 ```
 
@@ -658,19 +658,19 @@ client.OnDisconnected += () => {
 
 ### Keep disconnected users in the room.
 
-Unstable network, players put the game in the background, etc. may cause the player to drop out, when the player drops out, the `OnPlayerActivityChanged` event will be triggered for other online players:
+Players may get disconnected when there's unstable network or when they put the game in the background. When the player drops out, the `OnPlayerActivityChanged` event will be triggered for other online players:
 
 ```cs
-// Registered Player Dropping/Uploading Events
+// Register Player Dropping/Connecting Events
 client.OnPlayerActivityChanged += player => {
     // Get the status of whether a user is "active" or not
     Debug.Log(player.IsActive);
-    // TODO can do display and logic processing according to the player's online status.
+    // TODO You can update display and run other logic according to the player's online status.
 };
 ```
 
 If a player doesn't come back to the game for a long time, the server will remove the player from the room and destroy the player's data, and the other players in the room will receive the `OnPlayerRoomLeft` event.
-When creating a room, we can set the `OnPlayerRoomLeft` time via `PlayerTtl`, so that when a player drops out of the room, the server will keep the data of the dropped player in the room during the `PlayerTtl` time and wait for the player to come back online.
+When creating a room, we can set the timeout via `PlayerTtl`, so that when a player drops out of the room, the server will keep the data of the dropped player in the room during the `PlayerTtl` time and wait for the player to come back online.
 
 ```cs
 var options = new RoomOptions {
@@ -693,18 +693,18 @@ client.OnDisconnected += async () => {
 };
 ```
 
-Note: This interface will only reconnect you to the server, not return you directly to the room if you were previously 'playing in the room'.
+Note: This interface will only reconnect you to the server, not return you directly to the room if you were previously playing in the room.
 
 **Recommended** [Reconnect and get room](#rejoin-a-room), then the player can choose whether or not to return to the room.
 
-You can also just say [Reconnect and return to room](#reconnect-and-return-to-room).
+You can also just [Reconnect and return to room](#reconnect-and-return-to-room).
 
-### Reconnect and return to room
+### Reconnect and get room
 
 After reconnecting, the player can use the `FetchMyRoom` interface to fetch the room they were in before leaving:
 
 - If the player is still in the room, the room ID will be returned and the game will inform the player of this state. If the player chooses to return to the room they were in before leaving, they can call the `RejoinRoom` interface.
-- If the player is not in the room, or the room has been destroyed, a [4301](/sdk/multiplayer/error-code/#4301) exception will be returned, and the game will handle it accordingly.
+- If the player is not in the room, or the room has been destroyed, a [4301](/sdk/multiplayer/error-code/#4301) exception will be returned, and the game can handle it accordingly.
 
 ```cs
 string roomName = await client.FetchMyRoom();
@@ -712,7 +712,7 @@ string roomName = await client.FetchMyRoom();
 
 ### Rejoin a room
 
-When a player connects to the server, they can "rejoin" a room via the `Rejoin` interface. If the player calls this interface within the `PlayerTtl` time limit, the player will be able to rejoin the room successfully, if the `PlayerTtl` time limit is exceeded, rejoining the room will fail.
+When a player connects to the server, they can rejoin a room via the `Rejoin` interface. If the player calls this interface within the `PlayerTtl` time limit, the player will be able to rejoin the room successfully; if the `PlayerTtl` time limit is exceeded, rejoining the room will fail.
 
 ```cs
 try {
@@ -736,12 +736,12 @@ try {
 
 ### Reconnect and return to the room
 
-This interface is the equivalent of `Reconnect()` and `RejoinRoom()` combined. With this interface, you can directly reconnect and go back to the "previous room".
+This interface is the equivalent of `Reconnect()` and `RejoinRoom()` combined. With this interface, you can directly reconnect and go back to the previous room.
 
 ```cs
 try {
     await client.ReconnectAndRejoin();
-    // Return to room success, update data and interface
+    // Successfully return to the room; update data and interface
 } catch (PlayException e) {
     // Failure to reconnect or return
     Debug.LogErrorFormat("{0}, {1}", e.Code, e.Detail);
@@ -758,7 +758,7 @@ client.Close();
 
 ## Error handling
 
-Specific exception messages can be caught by try catch when we initiate a request, for example when creating a room:
+Specific exception messages can be caught with try-catch when we initiate a request. For example, when creating a room:
 
 ```cs
 try {
@@ -771,7 +771,7 @@ try {
 
 ## Critical error event
 
-If a major error is currently occurring, this event will not be triggered easily, and if it is triggered, please contact technical support to deal with it.
+If a major error is currently occurring, this event will be triggered. It won't be triggered easily, and if it is triggered, please contact technical support to deal with it.
 
 ```cs
 client.OnError += (code, detail) => {
@@ -799,7 +799,7 @@ public int GetInt(object key);
 public float GetFloat(object key);
 ...
 // Container type
-public PlayObject GetPlayObject(object key); // PlayObject 支持嵌套
+public PlayObject GetPlayObject(object key); // PlayObject supports nesting
 public PlayArray GetPlayArray(object key);
 public T Get<T>(object key);
 ```
@@ -832,7 +832,7 @@ public List<T> ToList<T>();
 
 In addition to supporting the two container types mentioned above, `Play` also supports synchronising data of `Custom Types`.
 
-Suppose we have a Hero type with id, name, hp defined as follows:
+Suppose we have a Hero type with id, name, and hp defined as follows:
 
 ```csharp
 class Hero {
@@ -846,7 +846,7 @@ To synchronise data of type Hero, the following two steps are required:
 
 #### Implement serialisation / deserialisation methods
 
-The implementation of serialisation methods is up to the developer, you can use protobuf, thrift, etc. It is sufficient if the serialisation and deserialisation interfaces supported by `Play` are met. As long as the serialisation and deserialisation interfaces supported by `Play` are satisfied.
+The implementation of serialisation methods is up to the developer. You can use protobuf, thrift, etc. It is sufficient if the serialisation and deserialisation interfaces supported by `Play` are met.
 
 ```csharp
 public delegate byte[] SerializeMethod(object obj);

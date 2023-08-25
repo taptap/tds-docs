@@ -8,17 +8,17 @@ import { Conditional } from "/src/docComponents/conditional";
 import sdkVersions from "/src/docComponents/sdkVersions";
 import CodeBlock from "@theme/CodeBlock";
 
-Welcome to online multiplayer matchmaking. This tutorial will explain the core usage of the SDK by simulating a scenario that compares the size of players' scores.
+Welcome to Multiplayer. This tutorial will explain the core usage of the SDK by simulating a scenario that compares players' scores.
 
 ## Installation
 
-The Play client SDK is open source, the source code can be found at [csharp-sdk](https://github.com/leancloud/csharp-sdk).
+The Play client SDK is open source. The source code can be found at [csharp-sdk](https://github.com/leancloud/csharp-sdk).
 
 You can also download [Release version](https://github.com/leancloud/csharp-sdk/releases).
 
 ### Unity Projects
 
-The SDK can be imported via Unity Package Manager or manually, either one of them:
+The SDK can be imported via Unity Package Manager or manually:
 
 * **UPM**: Please add dependencies in Packages/manifest.json of your project:
 
@@ -28,7 +28,7 @@ The SDK can be imported via Unity Package Manager or manually, either one of the
     }`}
     </CodeBlock>
 
-* **Direct Import**: Unzip the downloaded LeanCloud-SDK-Play-Unity.zip and drag and drop the `Plugins` directory into the Unity project. If there is already a `Plugins` directory in the project, merge it into the `Plugins` directory in the project.
+* **Direct Import**: Unzip the downloaded LeanCloud-SDK-Play-Unity.zip and drag and drop the `Plugins` directory into the Unity project. If there is already a `Plugins` directory in the project, merge the SDK into the `Plugins` directory in the project.
 
 ### Turn on debug logging
 
@@ -77,11 +77,11 @@ var client = new Client(
 ```
 
 - The `Client ID` and `Client Token` of the game can be viewed at **Developer Centre > Your Games > Game Services > Application Configuration**.
-- The API domain name is viewable at **Application Configuration > Domain Configuration > API**, refer to the documentation for [domain name](/sdk/domain/guide/).
+- The API domain name is viewable at **Application Configuration > Domain Configuration > API**. Refer to the documentation for [domain name](/sdk/domain/guide/) for more information.
 
 </Conditional>
 
-## Connecting to a multiplayer matchmaking server
+## Connecting to a Multiplayer server
 
 ```cs
 try {
@@ -109,11 +109,11 @@ try {
 
 ## Synchronising Player Properties via CustomPlayerProperties
 
-When a new player joins the room, the Master assigns a score to each player, which is synchronised to the player via "Player Custom Properties".
+When a new player joins the room, the Master assigns a score to each player, which is synchronised to the players via "Player Custom Properties".
 (No more complex algorithms are done here, just 10 points are assigned to the Master and 5 points to the other players).
 
 ```cs
-// Register new players to join the room event
+// Register the event for new players joining the room
 client.OnPlayerRoomJoined += (newPlayer) => {
     Debug.LogFormat("new player: {0}", newPlayer.UserId);
     if (client.Player.IsMaster) {
@@ -122,7 +122,7 @@ client.OnPlayerRoomJoined += (newPlayer) => {
         for (int i = 0; i < playerList.Count; i++) {
             var player = playerList[i];
             var props = new PlayObject();
-            // Set 10 points if the judgement is a homeowner, otherwise set 5 points
+            // Set 10 points for the master and 5 points for other players
             if (player.IsMaster) {
                 props.Add("point", 10);
             } else {
@@ -141,7 +141,7 @@ client.OnPlayerRoomJoined += (newPlayer) => {
 };
 ```
 
-Players get scores and display their scores.
+Display the score after the player gets their score.
 
 ```cs
 // Register for "Player Attribute Change" event
@@ -179,7 +179,7 @@ Make different UI displays depending on whether you judge the winner to be yours
 // Registering custom events
 client.OnCustomEvent += (eventId, eventData, senderId) => {
     if (eventId == GAME_OVER_EVENT) {
-        // Get the winner, Id.
+        // Get the winner's Id
         int winnerId = eventData.GetInt("winnerId");
         // If the winner is yourself, display the victory UI; otherwise display the defeat UI
         if (client.Player.ActorId == winnerId) {
