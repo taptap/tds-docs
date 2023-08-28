@@ -8,7 +8,7 @@ import { Conditional } from "/src/docComponents/conditional";
 
 ## Preface
 
-Multiplayer is a C#-based game SDK that provides a complete client-side SDK solution for online games with strong networking requirements, thus eliminating the need for development teams to build their own servers and saving most of the development and maintenance costs. The main features provided by Multiplayer are as follows:
+Multiplayer is a JavaScript game SDK that provides a complete client-side SDK solution for online games with strong networking requirements, thus eliminating the need for development teams to build their own servers and saving most of the development and maintenance costs. The main features provided by Multiplayer are as follows:
 
 - Getting room list
 - Creating a room
@@ -22,7 +22,7 @@ Multiplayer is a C#-based game SDK that provides a complete client-side SDK solu
 
 ## SDK Import
 
-Please read [Installation Guide](/sdk/multiplayer/start/cs/#installation) to get the dll library files.
+Please read [Installation Guide](/sdk/multiplayer/start/cs/#installation) to get the JS library files.
 
 ## Initialisation
 
@@ -141,7 +141,7 @@ client.on(Event.LOBBY_ROOM_LIST_UPDATED, () => {
 });
 ```
 
-For more on `LobbyRoom`, see [API documentation](https://leancloud.github.io/Play-SDK-CSharp/html/classLeanCloud_1_1Play_1_1LobbyRoom.htm).
+For more on `LobbyRoom`, see [API documentation](https://leancloud.github.io/Play-SDK-JS/doc/LobbyRoom.html).
 
 ### Related events
 
@@ -234,7 +234,7 @@ An array of specified player IDs. This parameter is mainly used to "reserve spac
 
 Note: These "specific players" will not actually join the room. There will only be space in the room reserved for those "specific players" to join. If you want to invite players to join a room, you need to send the room name to your friends through other channels, such as IM, WeChat, etc., and then your friends will join the room through the `JoinRoom(roomName)` interface.
 
-For more information about `CreateRoom`, please refer to [API Documentation](https://leancloud.github.io/Play-SDK-CSharp/html/classLeanCloud_1_1Play_1_1Client.htm#a0478f278b300dd4ae4c4e1fe311d3c7c).
+For more information about `CreateRoom`, please refer to [API Documentation](https://leancloud.github.io/Play-SDK-JS/doc/Client.html#createRoom).
 
 ### Joining a room
 
@@ -279,7 +279,7 @@ For more on `joinRoom`, see [API documentation](https://leancloud.github.io/Play
 
 #### Randomly joining rooms
 
-Sometimes, instead of joining a specific room, we can randomly join "rooms that meet certain conditions" (or even no conditions), such as quick start, quick match, etc. In this case, we can randomly join rooms by calling the `JoinRandomRoom` method.
+Sometimes, instead of joining a specific room, we can randomly join "rooms that meet certain conditions" (or even no conditions), such as quick start, quick match, etc. In this case, we can randomly join rooms by calling the `joinRandomRoom` method.
 
 ```javascript
 client
@@ -315,7 +315,7 @@ client
 
 ### Join or create a specific room
 
-Many games don't have scenarios that force a designated room owner. As long as a number of players can play in the same room, it is fine for anyone to be the owner. We can use `JoinOrCreateRoom()` to achieve this. This method will join the current player directly to the room if there is a relevant room, or create a new room if there isn't such a room.
+Many games don't have scenarios that force a designated room owner. As long as a number of players can play in the same room, it is fine for anyone to be the owner. We can use `joinOrCreateRoom()` to achieve this. This method will join the current player directly to the room if there is a relevant room, or create a new room if there isn't such a room.
 
 ```javascript
 // For example, if 4 players join a room with the name "room1" at the same time, if it doesn't exist, then create and join the room with the name "room1".
@@ -334,7 +334,7 @@ For more on `joinOrCreateRoom`, see the [API documentation](https://leancloud.gi
 
 ### New player join event
 
-For players who are already in the room, when a new player joins the room, the server will send the `OnPlayerRoomJoined` event to notify the client, and the client can use the properties of the new player to do some display logic.
+For players who are already in the room, when a new player joins the room, the server will send the `PLAYER_ROOM_JOINED` event to notify the client, and the client can use the properties of the new player to do some display logic.
 
 ```javascript
 // Register new players to join the event
@@ -343,7 +343,7 @@ client.on(Event.PLAYER_ROOM_JOINED, ({ newPlayer }) => {
 });
 ```
 
-You can get all the players in the room by `client.Room.PlayerList`.
+You can get all the players in the room by `client.room.playerList`.
 
 ### Determining local players
 
@@ -370,7 +370,7 @@ client
   });
 ```
 
-Other players in the room will receive the `OnPlayerRoomLeft` event.
+Other players in the room will receive the `PLAYER_ROOM_LEFT` event.
 
 ```javascript
 // Registering a player leaving the room event
@@ -401,7 +401,7 @@ You can write the MasterClient logic in the client, and the player terminal ofth
 
 #### MasterClient Drop Transfer
 
-When a MasterClient is dropped, the Multiplayer service assigns a new player client as the MasterClient. Even if the original MasterClient comes back online, it does not become the new MasterClient. When the MasterClient is changed, the SDK dispatches the `OnMasterSwitched` event to notify the client when the MasterClient changes.
+When a MasterClient is dropped, the Multiplayer service assigns a new player client as the MasterClient. Even if the original MasterClient comes back online, it does not become the new MasterClient. When the MasterClient is changed, the SDK dispatches the `MASTER_SWITCHED` event to notify the client when the MasterClient changes.
 
 ```javascript
 // Registering for host switching events
@@ -647,7 +647,7 @@ client.room
   .catch(console.error);
 ```
 
-This way, after the first player gets the Tulong Knife, `tulong` corresponds to the value of first player, and subsequent requests with `expectedValues = { tulong: null }` will fail.
+This way, after the first player gets the Tulong Knife, `tulong` corresponds to the value of first player, and subsequent requests with (`const expectedValues = { tulong: null }`) will fail.
 
 ### Related events
 
@@ -689,7 +689,7 @@ client
 The `options` are the event sending parameters, including the receiving group and the receiver ID array.
 
 - ReceiverGroup is an enumeration of the targets of the received event, including Others (everyone in the room except yourself), All (everyone in the room), and MasterClient (the host).
-- The Receiver ID array is the enumerated value of the target of the received event, i.e., the player's `ActorId` array. The `ActorId` can be obtained via `player.ActorId`.
+- The Receiver ID array is the enumerated value of the target of the received event, i.e., the player's `actorId` array. The `actorId` can be obtained via `player.actorId`.
 
 Note: If both receiver group and receiver ID array are set, receiver ID array will override receiver group.
 
@@ -817,7 +817,7 @@ client.close().then(() => {
 
 ## Error handling
 
-Specific exception messages can be caught with try-catch when we initiate a request. For example, when creating a room:
+Specific exception messages can be caught with Promise catch when we initiate a request. For example, when creating a room:
 
 ```javascript
 client
@@ -906,4 +906,4 @@ where `typeCode` is a numeric code representing the custom type, which is used t
 
 ## API Documentation
 
-For more interfaces and details, please refer to [API Interfaces](https://leancloud.github.io/Play-SDK-CSharp/html/).
+For more interfaces and details, please refer to [API Interfaces](https://leancloud.github.io/Play-SDK-JS/doc/).
