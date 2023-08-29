@@ -370,9 +370,29 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core",
 	"SlateCore",
 	"TapCommon",
 	"TapBootstrap",
-	"TapLogin",
-        "LeanCloud"
+	"TapLogin"
 });
+if (Target.Platform == UnrealTargetPlatform.IOS || Target.Platform == UnrealTargetPlatform.Android)
+{
+    PublicDependencyModuleNames.AddRange(
+        new string[]
+        {
+            // 推送接入
+            // "LeanCloudPush",
+            
+            "LeanCloudMobile"
+        }
+    );
+}
+else
+{
+    PublicDependencyModuleNames.AddRange(
+        new string[]
+        {
+            "LeanCloud"
+        }
+    );
+}
 ```
 
 #### 导入头文件
@@ -617,15 +637,18 @@ TDSUser.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
 ```
 
 ```cpp
-FTDSUser::FDelegate OnSuccess = FTDSUser::FDelegate::CreateLambda([](const FTDSUser& User) {
-    FString UserID = User.GetObjectId();
-    FString UserName = User.GetUsername();
-    FString Avatar = User.GetAvatar();
-});
-FTUError::FDelegate OnError = FTUError::FDelegate::CreateLambda([](const FTUError& Error) {
-    // 登录失败 Error.msg;
-});
-FTDSUser::LoginWithTapTap({TUType::PermissionScope::Profile}, OnSuccess, OnError);
+FTDSUser::LoginWithTapTap({TUType::PermissionScope::Profile},
+                            FTDSUser::FCallBackDelegate::CreateLambda(
+                                [](const TSharedPtr<FTDSUser>& UserPtr, const FTUError& Error) {
+                                    if (UserPtr.IsValid()) {
+                                        FString UserID = UserPtr->GetObjectId();
+		                                FString UserName = UserPtr->GetUsername();
+		                                FString Avatar = UserPtr->GetAvatar();
+                                    }
+                                    else {
+                                        // 登录失败 Error.msg;
+                                    }
+                                }));
 
 // 授权可选项：Profile、Friend、BasicInfo
 ```
