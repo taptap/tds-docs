@@ -10,6 +10,7 @@ function TdsFooter() {
   const { html } = SFooter.render({
     language: currentLocale === 'en' ? Language.en : Language.zh_CN,
     tapUrl: 'https://www.taptap.cn',
+    discordUrl: 'https://discord.gg/ZyuM66bAwx',
   })
   return (<div dangerouslySetInnerHTML={{__html: html}}></div>);
 };
