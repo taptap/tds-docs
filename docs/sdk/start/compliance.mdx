@@ -1,0 +1,473 @@
+---
+title: TapSDK 合规使用说明
+sidebar_position: 9
+---
+
+发布日期：2023 年 8 月 31 日
+
+生效日期：2023 年 8 月 31 日
+
+易玩（上海）网络科技有限公司（以下简称 “TapTap” 或“我们”）将通过本文档向开发者和其用户介绍 TapSDK 的标准使用方式以及相关建议。
+
+## **一、TapSDK 基本业务功能**
+
+业务功能介绍：由于开发者可以根据自身需求接入 TapSDK 的任意功能，因此根据定义，无基本业务功能。
+
+## **二、TapSDK 扩展业务功能**
+
+### 1. TapTap 登录
+
+- 功能介绍
+
+提供 TapTap 登录方式，玩家可以通过 TapTap 授权快速开始游戏。
+
+- 合规调用时机
+
+玩家点击「TapTap 登录」按钮时进行初始化和调用。
+
+- 需要权限
+
+| 权限 | 使用目的 | 权限申请时机 |
+| ---------------------- | ---------------------- | ---------------------- |
+| 网络权限 | 用于检测当前网络连接是否有效 | 用户首次使用该功能时会申请权限 |
+
+- 关闭功能的配置方式
+
+默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码（详见[文档](https://developer.taptap.cn/docs/sdk/taptap-login/guide/tap-login/#%E5%88%9D%E5%A7%8B%E5%8C%96)），示例如下：
+```
+// TapLogin.Init(string clientID);
+
+try
+{
+    // 在 iOS、Android 系统下，会唤起 TapTap 客户端或以 WebView 方式进行登录
+    // 在 Windows、macOS 系统下显示二维码（默认）和跳转链接（需配置）
+//    var accessToken = await TapLogin.Login();
+//    Debug.Log($"TapTap 登录成功 accessToken: {accessToken.ToJson()}");
+}
+```
+或者移除掉统一初始化入口（详见[文档](https://developer.taptap.cn/docs/sdk/start/quickstart/#%E5%88%9D%E5%A7%8B%E5%8C%96)），示例如下：
+```
+// var config =  new TapConfig.Builder()
+//    .ClientID("your_client_id") // 必须，开发者中心对应 Client ID
+//    .ClientToken("your_client_token") // 必须，开发者中心对应 Client Token
+//    .ServerURL("https://your_server_url") // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
+//    .RegionType(RegionType.CN) // 非必须，CN 表示中国大陆，IO 表示其他国家或地区
+//    .ConfigBuilder();
+// TapBootstrap.Init(config);
+```
+
+- 必要个人信息
+
+| 必要个人信息 | 使用目的 | 场景 | 配置方式 | 关闭的配置方式 | 收集频次 | 收集精度 |
+| ------ | ------ | ------ | ------ | ------ | ------ | ------ |
+| 系统版本 | 用于潜在故障分析以改善服务质量 | 遇到服务故障时针对系统版本进行排查和优化 | 在该功能初始化时配置 | 默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码 | 仅在首次使用时收集一次 | - |
+| 设备版本 | 用于潜在故障分析以改善服务质量 | 遇到服务故障时针对系统版本进行排查和优化 | 在该功能初始化时配置 | 默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码 | 仅在首次使用时收集一次 | - |
+
+- 可选个人信息
+
+无
+
+### 2. 数据分析
+
+- 功能介绍
+
+提供了一套专注于解决游戏项目数据需求的分析工具，通过简单的接入就可以获得丰富实用的数据看板和广告追踪能力，让数据分析和广告投放变得轻松易操作，同时也可以用于分析人群画像，帮助开发者更好地理解用户。
+
+- 合规调用时机
+
+玩家触发开发者配置的事件时进行初始化和调用。
+
+- 需要权限
+
+| 权限 | 使用目的 | 权限申请时机 |
+| ---------------------- | ---------------------- | ---------------------- |
+| 网络权限 | 用于检测当前网络连接是否有效 | 用户首次使用该功能时会申请权限 |
+| 读写存储权限（可选） | 用于存储用户标识 | 用户首次使用该功能时会申请权限 |
+| 读取电话状态（可选） | 用于更加精确地描述用户画像 | 用户首次使用该功能时会申请权限 |
+
+- 关闭功能的配置方式
+
+默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码（详见[文档](https://developer.taptap.cn/docs/sdk/tapdb/sdk/client-side-integration/#tapdb-%E5%8D%95%E7%8B%AC%E5%88%9D%E5%A7%8B%E5%8C%96)），示例如下：
+```
+// TapDB.Init("clientId", "taptap", "gameVersion", true);
+```
+或者移除掉统一初始化入口（详见[文档](https://developer.taptap.cn/docs/sdk/start/quickstart/#%E5%88%9D%E5%A7%8B%E5%8C%96)），示例如下：
+```
+// var config =  new TapConfig.Builder()
+//    .ClientID("your_client_id") // 必须，开发者中心对应 Client ID
+//    .ClientToken("your_client_token") // 必须，开发者中心对应 Client Token
+//    .ServerURL("https://your_server_url") // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
+//    .RegionType(RegionType.CN) // 非必须，CN 表示中国大陆，IO 表示其他国家或地区
+//    .ConfigBuilder();
+// TapBootstrap.Init(config);
+```
+
+- 必要个人信息
+
+| 必要个人信息 | 使用目的 | 场景 | 配置方式 | 关闭的配置方式 | 收集频次 | 收集精度 |
+| ------ | ------ | ------ | ------ | ------ | ------ | ------ |
+| WiFi 信息 | 供开发者进行数据分析，是业务需求之一 | 开发者可根据该信息来进行数据分析 | 开发者根据自身业务需要进行配置 | 默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码 | 根据开发者配置的事件和调用时机进行收集（参考：[客户端接入-TapTap 开发者文档](https://developer.taptap.cn/docs/sdk/tapdb/sdk/client-side-integration/)） | - |
+| 系统版本 | 供开发者进行数据分析，是业务需求之一 | 开发者可根据该信息来进行数据分析 | 开发者根据自身业务需要进行配置 | 默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码 | 根据开发者配置的事件和调用时机进行收集（参考：[客户端接入-TapTap 开发者文档](https://developer.taptap.cn/docs/sdk/tapdb/sdk/client-side-integration/)） | - |
+| 设备版本 | 供开发者进行数据分析，是业务需求之一 | 开发者可根据该信息来进行数据分析 | 开发者根据自身业务需要进行配置 | 默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码 | 根据开发者配置的事件和调用时机进行收集（参考：[客户端接入-TapTap 开发者文档](https://developer.taptap.cn/docs/sdk/tapdb/sdk/client-side-integration/)） | - |
+| 手机样式 | 供开发者进行数据分析，是业务需求之一 | 开发者可根据该信息来进行数据分析 | 开发者根据自身业务需要进行配置 | 默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码 | 根据开发者配置的事件和调用时机进行收集（参考：[客户端接入-TapTap 开发者文档](https://developer.taptap.cn/docs/sdk/tapdb/sdk/client-side-integration/)） | - |
+| bssid 设备应用列表 | 供开发者进行数据分析，是业务需求之一 | 开发者可根据该信息来进行数据分析 | 开发者根据自身业务需要进行配置 | 默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码 | 根据开发者配置的事件和调用时机进行收集（参考：[客户端接入-TapTap 开发者文档](https://developer.taptap.cn/docs/sdk/tapdb/sdk/client-side-integration/)） | - |
+| 传感器列表 | 供开发者进行数据分析，是业务需求之一 | 开发者可根据该信息来进行数据分析 | 开发者根据自身业务需要进行配置 | 默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码 | 根据开发者配置的事件和调用时机进行收集（参考：[客户端接入-TapTap 开发者文档](https://developer.taptap.cn/docs/sdk/tapdb/sdk/client-side-integration/)） | - |
+| Android ID | 供开发者进行数据分析，是业务需求之一 | 开发者可根据该信息来进行数据分析 | 开发者根据自身业务需要进行配置 | 默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码 | 根据开发者配置的事件和调用时机进行收集（参考：[客户端接入-TapTap 开发者文档](https://developer.taptap.cn/docs/sdk/tapdb/sdk/client-side-integration/)） | - |
+
+- 可选个人信息
+
+无
+
+### 3. 内嵌动态
+
+- 功能介绍
+
+玩家可以在游戏内访问 TapTap 的社区论坛（官方公告、游戏攻略、问题反馈、热门话题等），同时也可以看到 TapTap 好友的游戏动态，并参与其他玩家、官方和大神之间的互动。
+
+- 合规调用时机
+
+玩家打开内嵌动态或者开始接收动态通知时进行初始化和调用。
+
+- 需要权限
+
+| 权限 | 使用目的 | 权限申请时机 |
+| ---------------------- | ---------------------- | ---------------------- |
+| 网络权限 | 用于检测当前网络连接是否有效 | 用户首次使用该功能时会申请权限 |
+| 读写存储权限 | 用于缓存用户动态内的图文数据，以便于程序快速启动 | 用户首次使用该功能时会申请权限 |
+
+- 关闭功能的配置方式
+
+默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码（详见[文档](https://developer.taptap.cn/docs/sdk/embedded-moments/guide/#sdk-%E8%8E%B7%E5%8F%96)），示例如下：
+```
+"dependencies":{
+  ...
+  // 内嵌动态
+//  "com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#3.20.0",
+}
+```
+或者移除掉统一初始化入口（详见[文档](https://developer.taptap.cn/docs/sdk/start/quickstart/#%E5%88%9D%E5%A7%8B%E5%8C%96)），示例如下：
+```
+// var config =  new TapConfig.Builder()
+//    .ClientID("your_client_id") // 必须，开发者中心对应 Client ID
+//    .ClientToken("your_client_token") // 必须，开发者中心对应 Client Token
+//    .ServerURL("https://your_server_url") // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
+//    .RegionType(RegionType.CN) // 非必须，CN 表示中国大陆，IO 表示其他国家或地区
+//    .ConfigBuilder();
+// TapBootstrap.Init(config);
+```
+
+- 必要个人信息
+
+| 必要个人信息 | 使用目的 | 场景 | 配置方式 | 关闭的配置方式 | 收集频次 | 收集精度 |
+| ------ | ------ | ------ | ------ | ------ | ------ | ------ |
+| WiFi 信息 | 用于潜在故障分析以改善服务质量 | 遇到服务故障时针对网络环境进行排查和优化 | 在该功能初始化时配置 | 默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码 | 仅在首次使用时收集一次 | - |
+| 系统版本 | 用于潜在故障分析以改善服务质量 | 遇到服务故障时针对网络环境进行排查和优化 | 在该功能初始化时配置 | 默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码 | 仅在首次使用时收集一次 | - |
+| 设备版本 | 用于潜在故障分析以改善服务质量 | 遇到服务故障时针对网络环境进行排查和优化 | 在该功能初始化时配置 | 默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码 | 仅在首次使用时收集一次 | - |
+
+
+- 可选个人信息
+
+无
+
+### 4. 公告系统
+
+- 功能介绍
+
+开发者在开发者中心发布编辑公告内容，玩家在打开游戏时可以收到公告通知。
+
+- 合规调用时机
+
+给玩家展示游戏公告时进行初始化和调用。
+
+- 需要权限
+
+| 权限 | 使用目的 | 权限申请时机 |
+| ---------------------- | ---------------------- | ---------------------- |
+| 网络权限 | 用于检测当前网络连接是否有效 | 用户首次使用该功能时会申请权限 |
+
+- 关闭功能的配置方式
+
+默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码（详见[文档](https://developer.taptap.cn/docs/sdk/billboard/guide/#sdk-%E9%85%8D%E7%BD%AE)），示例如下：
+```
+"dependencies":{
+  ...
+  // 公告系统
+//  "com.taptap.tds.billboard": "https://github.com/TapTap/TapBillboard-Unity.git#3.20.0",
+}
+```
+或者移除掉统一初始化入口（详见[文档](https://developer.taptap.cn/docs/sdk/start/quickstart/#%E5%88%9D%E5%A7%8B%E5%8C%96)），示例如下：
+```
+// var config =  new TapConfig.Builder()
+//    .ClientID("your_client_id") // 必须，开发者中心对应 Client ID
+//    .ClientToken("your_client_token") // 必须，开发者中心对应 Client Token
+//    .ServerURL("https://your_server_url") // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
+//    .RegionType(RegionType.CN) // 非必须，CN 表示中国大陆，IO 表示其他国家或地区
+//    .ConfigBuilder();
+// TapBootstrap.Init(config);
+```
+
+- 必要个人信息
+
+| 必要个人信息 | 使用目的 | 场景 | 配置方式 | 关闭的配置方式 | 收集频次 | 收集精度 |
+| ------ | ------ | ------ | ------ | ------ | ------ | ------ |
+| WiFi 信息 | 用于潜在故障分析以改善服务质量 | 遇到服务故障时针对网络环境进行排查和优化 | 在该功能初始化时配置 | 默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码 | 仅在首次使用时收集一次 | - |
+| 系统版本 | 用于潜在故障分析以改善服务质量 | 遇到服务故障时针对网络环境进行排查和优化 | 在该功能初始化时配置 | 默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码 | 仅在首次使用时收集一次 | - |
+
+- 可选个人信息
+
+无
+
+### 5. 游戏好友
+
+- 功能介绍
+
+为游戏开发者提供完整的添加、删除、查找好友的功能接口，帮助游戏快速形成社交网络。
+
+- 合规调用时机
+
+玩家查看游戏好友列表或者开始接收好友状态通知时进行初始化和调用。
+
+- 需要权限
+
+| 权限 | 使用目的 | 权限申请时机 |
+| ---------------------- | ---------------------- | ---------------------- |
+| 网络权限 | 用于检测当前网络连接是否有效 | 用户首次使用该功能时会申请权限 |
+
+- 关闭功能的配置方式
+
+默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码（详见[文档](https://developer.taptap.cn/docs/sdk/friends/guide/#sdk-%E8%8E%B7%E5%8F%96)），示例如下：
+```
+"dependencies":{
+  ...
+//  "com.taptap.tds.friends": "https://github.com/TapTap/TapFriends-Unity.git#3.20.0",
+}
+```
+或者移除掉统一初始化入口（详见[文档](https://developer.taptap.cn/docs/sdk/start/quickstart/#%E5%88%9D%E5%A7%8B%E5%8C%96)），示例如下：
+```
+// var config =  new TapConfig.Builder()
+//    .ClientID("your_client_id") // 必须，开发者中心对应 Client ID
+//    .ClientToken("your_client_token") // 必须，开发者中心对应 Client Token
+//    .ServerURL("https://your_server_url") // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
+//    .RegionType(RegionType.CN) // 非必须，CN 表示中国大陆，IO 表示其他国家或地区
+//    .ConfigBuilder();
+// TapBootstrap.Init(config);
+```
+
+- 必要个人信息
+
+| 必要个人信息 | 使用目的 | 场景 | 配置方式 | 关闭的配置方式 | 收集频次 | 收集精度 |
+| ------ | ------ | ------ | ------ | ------ | ------ | ------ |
+| WiFi 信息 | 用于潜在故障分析以改善服务质量 | 遇到服务故障时针对网络环境进行排查和优化 | 在该功能初始化时配置 | 默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码 | 仅在首次使用时收集一次 | - |
+| 系统版本 | 用于潜在故障分析以改善服务质量 | 遇到服务故障时针对网络环境进行排查和优化 | 在该功能初始化时配置 | 默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码 | 仅在首次使用时收集一次 | - |
+
+- 可选个人信息
+
+无
+
+### 6. 成就系统
+
+- 功能介绍
+
+可以在游戏中设置「普通成就」和「白金成就」，增加玩家在游戏中的参与度，鼓励玩家以不同的玩法来玩游戏。
+
+- 合规调用时机
+
+玩家查看游戏成就时进行初始化和调用。
+
+- 需要权限
+
+| 权限 | 使用目的 | 权限申请时机 |
+| ---------------------- | ---------------------- | ---------------------- |
+| 网络权限 | 用于检测当前网络连接是否有效 | 用户首次使用该功能时会申请权限 |
+
+- 关闭功能的配置方式
+
+默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码（详见[文档](https://developer.taptap.cn/docs/sdk/achievement/guide/#sdk-%E8%8E%B7%E5%8F%96)），示例如下：
+```
+"dependencies":{
+  ...
+//  "com.taptap.tds.achievement": "https://github.com/TapTap/TapAchievement-Unity.git#3.20.0",
+}
+```
+或者移除掉统一初始化入口（详见[文档](https://developer.taptap.cn/docs/sdk/start/quickstart/#%E5%88%9D%E5%A7%8B%E5%8C%96)），示例如下：
+```
+// var config =  new TapConfig.Builder()
+//    .ClientID("your_client_id") // 必须，开发者中心对应 Client ID
+//    .ClientToken("your_client_token") // 必须，开发者中心对应 Client Token
+//    .ServerURL("https://your_server_url") // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
+//    .RegionType(RegionType.CN) // 非必须，CN 表示中国大陆，IO 表示其他国家或地区
+//    .ConfigBuilder();
+// TapBootstrap.Init(config);
+```
+
+- 必要个人信息
+
+| 必要个人信息 | 使用目的 | 场景 | 配置方式 | 关闭的配置方式 | 收集频次 | 收集精度 |
+| ------ | ------ | ------ | ------ | ------ | ------ | ------ |
+| WiFi 信息 | 用于潜在故障分析以改善服务质量 | 遇到服务故障时针对网络环境进行排查和优化 | 在该功能初始化时配置 | 默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码 | 仅在首次使用时收集一次 | - |
+| 系统版本 | 用于潜在故障分析以改善服务质量 | 遇到服务故障时针对网络环境进行排查和优化 | 在该功能初始化时配置 | 默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码 | 仅在首次使用时收集一次 | - |
+
+- 可选个人信息
+
+无
+
+### 7. 实名认证与防沉迷
+
+- 功能介绍
+
+基于 TapTap 账号的快速实名认证功能，对使用 TapTap 账号登录游戏的玩家，在经过玩家同意授权之后，允许玩家使用在 TapTap 里已经通过国家认证的实名信息快速完成游戏中的认证流程。
+
+- 合规调用时机
+
+玩家进行实名认证或者开启防沉迷时进行初始化和调用。
+
+- 需要权限
+
+| 权限 | 使用目的 | 权限申请时机 |
+| ---------------------- | ---------------------- | ---------------------- |
+| 网络权限 | 用于检测当前网络连接是否有效 | 用户首次使用该功能时会申请权限 |
+| 读写存储权限 | 记录玩家实名认证状态 | 用户首次使用该功能时会申请权限 |
+
+- 关闭功能的配置方式
+
+默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码（详见[文档](https://developer.taptap.cn/docs/sdk/anti-addiction/guide/#sdk-%E9%85%8D%E7%BD%AE)），示例如下：
+```
+"dependencies":{
+  ...
+//  "com.tapsdk.antiaddiction":"https://github.com/taptap/TapAntiAddiction-Unity.git#3.20.0",
+}
+
+// AntiAddictionConfig config = new AntiAddictionConfig()
+// {
+//    gameId = "your_client_id",      // TapTap 开发者中心对应 Client ID
+//    showSwitchAccount = false,      // 是否显示切换账号按钮
+// };         
+
+Action<int, string> callback = (code, errorMsg) => {
+    // code == 500;   // 登录成功
+    // code == 1000;  // 用户登出
+    // code == 1001;  // 切换账号
+    // code == 1030;  // 用户当前无法进行游戏
+    // code == 1050;  // 时长限制
+    // code == 9002;  // 实名过程中点击了关闭实名窗
+    UnityEngine.Debug.LogFormat($"code: {code} error Message: {errorMsg}");
+};
+
+// AntiAddictionUIKit.Init(config, callback);
+```
+或者移除掉统一初始化入口（详见[文档](https://developer.taptap.cn/docs/sdk/start/quickstart/#%E5%88%9D%E5%A7%8B%E5%8C%96)），示例如下：
+```
+// var config =  new TapConfig.Builder()
+//    .ClientID("your_client_id") // 必须，开发者中心对应 Client ID
+//    .ClientToken("your_client_token") // 必须，开发者中心对应 Client Token
+//    .ServerURL("https://your_server_url") // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
+//    .RegionType(RegionType.CN) // 非必须，CN 表示中国大陆，IO 表示其他国家或地区
+//    .ConfigBuilder();
+// TapBootstrap.Init(config);
+```
+
+- 必要个人信息
+
+| 必要个人信息 | 使用目的 | 场景 | 配置方式 | 关闭的配置方式 | 收集频次 | 收集精度 |
+| ------ | ------ | ------ | ------ | ------ | ------ | ------ |
+| WiFi 信息 | 用于潜在故障分析以改善服务质量 | 遇到服务故障时针对网络环境进行排查和优化 | 在该功能初始化时配置 | 默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码 | 仅在首次使用时收集一次 | - |
+| 系统版本 | 用于潜在故障分析以改善服务质量 | 遇到服务故障时针对网络环境进行排查和优化 | 在该功能初始化时配置 | 默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码 | 仅在首次使用时收集一次 | - |
+
+- 可选个人信息
+
+无
+
+### 8. 实时语音
+
+- 功能介绍
+
+一站式语音解决方案，提供实时语音、语音合规服务，覆盖 FPS、MOBA、MMORPG、休闲对战、线上桌游等多种游戏玩法类型。
+
+- 合规调用时机
+
+玩家点击语音按钮开始通话时进行初始化和调用。
+
+- 需要权限
+
+| 权限 | 使用目的 | 权限申请时机 |
+| ---------------------- | ---------------------- | ---------------------- |
+| 网络权限 | 用于检测当前网络连接是否有效 | 用户首次使用该功能时会申请权限 |
+| 录音权限 | 音频通话中采集语音数据，以便让用户使用语音能力 | 用户首次使用该功能时会申请权限 |
+| WiFi 信息 | 根据网络类型调整音频编码参数 | 用户首次使用该功能时会申请权限 |
+
+- 关闭功能的配置方式
+
+默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码（详见[文档](https://developer.taptap.cn/docs/sdk/rtc/guide/#%E6%A0%B8%E5%BF%83%E6%8E%A5%E5%8F%A3)），示例如下：
+```
+"dependencies":{
+  ...
+//  "com.taptap.tds.rtc":"https://github.com/TapTap/TapRTC-Unity.git#3.20.0",
+}
+
+// var config = new TapRTCConfig.Builder()
+//            .ClientID("ClientId")
+//            .ClientToken("ClientToken")
+//            .ServerUrl("ServerUrl")
+//            .UserId("UserId")
+//            .DeviceId("DeviceId")
+//            .AudioProfile(AudioPerfProfile.MID)
+//            .ConfigBuilder();
+            
+// ResultCode code = await TapRTC.Init(config);
+```
+或者移除掉统一初始化入口（详见[文档](https://developer.taptap.cn/docs/sdk/start/quickstart/#%E5%88%9D%E5%A7%8B%E5%8C%96)），示例如下：
+```
+// var config =  new TapConfig.Builder()
+//    .ClientID("your_client_id") // 必须，开发者中心对应 Client ID
+//    .ClientToken("your_client_token") // 必须，开发者中心对应 Client Token
+//    .ServerURL("https://your_server_url") // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
+//    .RegionType(RegionType.CN) // 非必须，CN 表示中国大陆，IO 表示其他国家或地区
+//    .ConfigBuilder();
+// TapBootstrap.Init(config);
+```
+
+- 必要个人信息
+
+| 必要个人信息 | 使用目的 | 场景 | 配置方式 | 关闭的配置方式 | 收集频次 | 收集精度 |
+| ------ | ------ | ------ | ------ | ------ | ------ | ------ |
+| WiFi 状态 | 根据网络类型调整音频编码参数 | SDK 初始化和终端用户进入房间时获取 Wi-Fi 状态以调整音频编码参数 | 在该功能初始化时配置 | 默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码 | 仅在首次使用时收集一次 | - |
+| 设备型号 | 根据设备型号调整音频编码参数 | SDK 初始化时获取设备型号以调整音频编码参数 | 在该功能初始化时配置 | 默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码 | 仅在首次使用时收集一次 | - |
+| 操作系统 | 根据操作系统调整音频编码参数 | SDK 初始化时获取操作系统以调整音频编码参数 | 在该功能初始化时配置 | 默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码 | 仅在首次使用时收集一次 | - |
+| IP 地址 | 用于网络数据传输 | SDK 初始化和终端用户进入房间时获取 IP 地址以实现网络数据传输 | 在该功能初始化时配置 | 默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码 | 仅在首次使用时收集一次 | - |
+| 录音 | 用于音频通话 | 音频通话时获取录音以实现音频互通 | 在该功能初始化时配置 | 默认不启动，由开发者按需调用。若要关闭，可在应用中移除该功能相应的初始化代码 | 仅在首次使用时收集一次 | - |
+
+- 可选个人信息
+
+无
+
+### 9. 其他服务
+
+以下功能为云服务，都是基础的技术服务，不收集用户个人信息：
+
+- 内建账户
+- 云存档
+- 排行榜
+- 即时通讯
+- 数据存储
+- 推送通知
+- 云引擎
+
+
+## **三、向最终用户披露 TapSDK 条款**
+
+在接入TapSDK 后，开发者应当向最终用户披露 TapSDK 条款，具体建议如下：
+
+1. 在用户同意游戏的《隐私协议》后再进行 TapSDK 初始化
+2. 在隐私协议中披露接入 TapSDK 的情况，示例：TapTap 在隐私协议中披露使用的第三方 SDK 清单。
+> 名称：TapSDK
+>
+> 公司名称：易玩（上海）网络科技有限公司
+>
+> 收集个人信息类型：Android ID、WiFi 信息、设备版本、系统版本、设备型号、操作系统、IP 地址、录音等
+>
+> 使用目的：第三方登录、数据分析、故障分析、实时语音、推送等
+>
+> 隐私政策链接：[TapSDK 隐私政策 | TapTap 开发者文档](https://developer.taptap.cn/docs/sdk/start/agreement/)
+> ![privacy_overview](/img/tapsdk-compliance/privacy_overview.png)![sdk_info_list](/img/tapsdk-compliance/sdk_info_list.png)
+3. 在申请具体权限前，向用户说明需要权限的具体原因（需提供同意和拒绝按钮 ），当用户同意后，再请求系统权限。示例：
+![request_first](/img/tapsdk-compliance/permission_request_1.png) ![request_second](/img/tapsdk-compliance/permission_request_2.png)
