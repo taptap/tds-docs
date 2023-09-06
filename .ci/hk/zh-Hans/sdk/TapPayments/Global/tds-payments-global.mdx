@@ -1123,7 +1123,6 @@ public class Callback < T >
 :::tip 默认语言
 如果没有匹配到相应语言，会使用英语作为默认语言。
 :::
-
 ## 服务端开发指南
 ### 服务端 REST API
 
@@ -1143,7 +1142,7 @@ public class Callback < T >
 通过一个订单 ID 可以查询到订单的详细信息并确定当前的支付状态
 
 ```sh
-curl -X POST \
+curl -X GET \
   -H 'X-LC-Id: {{client_id}} \
   -H 'X-LC-Key: {{server_secret}},master \
   https://tds-tapsdk0.intl.tapapis.com/open/payment/v1/orders/1670731970469806082
@@ -1178,7 +1177,9 @@ curl -X POST \
 curl -X POST \
   -H 'X-LC-Id: {{client_id}} \
   -H 'X-LC-Key: {{server_secret}},master \
-  https://tds-tapsdk0.intl.tapapis.com/open/payment/v1/orders/1670731970469806082/verify?token=2cf31318c6f4939d5eaf2e9431bf45f2
+  -H 'Content-Type: application/json; charset=utf-8'
+  -d '{"token": "2cf31318c6f4939d5eaf2e9431bf45f2"}'
+  https://tds-tapsdk0.intl.tapapis.com/open/payment/v1/orders/1670731970469806082/verify
 ```
 返回值是一个订单的 JSON 对象
 
@@ -1212,6 +1213,9 @@ curl -X GET \
   https://tds-tapsdk0.intl.tapapis.com/open/payment/v1/orders/1670731970469806082/refund
 ```
 
+#### 查询未核销的订单
+查询当前为核销的订单列表，正常情况下在用户支付成功后，应通过 verify 接口核销订单并同时保证对用户发货成功。如果因异常原因没有完成核销，可以通过这个接口查询并重新 verify 并完成发货。
+
 #### 订单对象字段
 
 |字段                 | 含义          |
@@ -1238,9 +1242,9 @@ curl -X GET \
 |charge.confirmed   | 已核销           |
 |charge.overdue     | 支付超时关闭      |
 |refund.pending     | 退款中           |
-|refund.succeeded   | 退款成功         |
-|refund.failed      | 退款失败         |
-|refund.rejected    | 退款被拒绝       |
+|refund.succeeded   | 退款成功          |
+|refund.failed      | 退款失败          |
+|refund.rejected    | 退款被拒绝        |
 
 ### Webhook 回调
 

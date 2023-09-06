@@ -625,17 +625,48 @@ curl --resolve 'engine.example.com:443:YOUR-ENGINE-IP' https://engine.example.co
 
 </Conditional>
 
-## 域名解析
+## 域名绑定
 
-绑定域名需要设置域名解析，因此这里我们简单解释下如何设置。
+绑定自定义域名前需要准备一个已经**备案的域名**，接下来我们详细介绍自定义域名绑定流程。
 
 绑定域名过程中，控制台会提示相应的 DNS 配置，请按照控制台的提示到域名注册商或域名解析服务提供商处设置（如果自己架设域名解析服务器的话，请根据域名解析服务器文档配置）A 记录或 CNAME 记录。
 
-例如，按控制台提示输入待绑定域名 `api.example.com` 后，控制台会首先检查备案，检查通过后，控制台会显示预期的 DNS 配置。
+以下使用已经备案的主域名 `example.com` 的子域名 `api.example.com` 为例，介绍自定义域名绑定流程：
 
-![控制台域名绑定界面](https://capacity-files.lcfile.com/RonCpipde80meo5BL8fxrjHTee39Wit6/domain-guide.png)
+![控制台域名绑定界面](/img/domain-guide-new.png)
 
-以 A 记录为例，假定控制台显示的 IP 为 `0.0.0.0`，那么对应的 DNS Zone 记录为：
+<Conditional brand="tds">
+
+通过**开发者管理后台 -> 游戏服务 -> 应用配置 -> 域名配置**页面开始，选择你需要绑定自定义域名的服务，然后点击绑定新域名。
+</Conditional>
+
+<Conditional brand="leancloud">
+
+通过 **LeanCloud 管理后台 -> 设置 -> 域名绑定**页面开始，选择你需要绑定自定义域名的服务，然后点击绑定新域名。
+</Conditional>
+
+上图以 <Conditional brand="leancloud">API 访问域名</Conditional><Conditional brand="tds">云服务 API</Conditional> 绑定为例，接下来，我们对绑定过程中的操作步骤进行单独说明：
+
+1. 我们要求使用二级域名（当你已备案的主域名为 `example.com` 时，可以在主域名前加上自定义字段形成新域名，这个域名就是二级域名）进行绑定。输入二级域名后，我们默认启用 SSL、强制使用 HTTPS 和 SSL 证书自动管理，如果自己有证书可以设置为手动，设置 SSL 证书可参考 [SSL 证书](#ssl-证书)。然后点击“绑定”按钮进行下一步。
+
+2. 输入绑定的域名后，后台会先检查该域名是否已经被其他应用绑定过（同一个域名不可重复绑定多个应用或多个服务），然后会检查域名备案信息。
+
+3. 当域名未备案时，会出现绑定失败的提示，这时需要对域名进行备案，可参考[域名备案指南](/sdk/domain/icp/)，或者使用其他已备案的域名重新进行绑定。
+
+4. 检查域名备案信息通过后，会提示配置 DNS，并且会显示推荐 DNS 配置，<Conditional brand="leancloud">以及 CNAME 记录值。</Conditional><Conditional brand="tds">当绑定的服务选择云服务 API，推荐的 DNS 配置为 A 记录。当绑定服务选择的是云引擎、文件、公告，推荐的 DNS 配置为 CNAME 记录，并都会提供推荐的记录值。</Conditional>
+
+
+5. 根据上一步推荐的 DNS 配置到你的域名注册商或域名解析服务提供商处设置域名解析（例如：你的域名是通过腾讯云或者阿里云购买的，这时就需要你通过腾讯云或阿里云管理后台中的域名管理界面进行解析）。上图的第 5 步使用了百度云进行举例，大部分云服务商后台设置域名解析的路径大概均为控制台 -> 域名管理 -> 解析。进入域名解析页面后，按照以下说明添加解析记录即可。
+   1. 主机记录：自定义的字段 + 主域名；例如我设置的自定义域名是 `api.example.com`，所以我只需填 `api` 即可；
+   2. 记录类型：根据上步推荐的 DNS 配置选择对应的记录类型；例如：<Conditional brand="tds">云服务 API 推荐为 A 记录，因此解析时，记录类型也选择 A 记录；</Conditional><Conditional brand="leancloud">推荐 CNAME 为 XXX.XX.cn，因此解析时记录类型选择 CNAME 。</Conditional>
+   3. 记录值：直接复制粘贴推荐的 DNS 配置的记录值。 
+   4. 其他解析线路、TTL 都可使用默认配置。
+
+大多数域名注册商或域名解析服务提供商都提供图形化的设置界面，这样就不用直接写 DNS Zone 记录，按照其说明配置即可。如下，是通过另一个服务商进行域名解析，并设置 CNAME 记录。
+
+![以 DnsPod 添加 CNAME 记录为例](/img/dnspod-add-cname-record.png)
+
+如果需要写 DNS Zone 记录，以 A 记录为例，假定控制台显示的 IP 为 `0.0.0.0`，那么对应的 DNS Zone 记录为：
 
 ```
 api.example.com. 10800 IN A 0.0.0.0
@@ -649,11 +680,7 @@ api.example.com. 10800 IN A 0.0.0.0
 xxx.example.com.	10800	IN	CNAME	yyy.zzz.example.
 ```
 
-大多数域名注册商或域名解析服务提供商都提供图形化的设置界面，这样就不用直接写 DNS Zone 记录，按照其说明配置即可。
-
-![以 DnsPod 添加 CNAME 记录为例](/img/dnspod-add-cname-record.png)
-
-设置完成后，需要等待一段时间（一般在半小时以内），记录生效后，<Conditional brand="leancloud">LeanCloud</Conditional><Conditional brand="tds">TDS</Conditional> 控制台会显示「已绑定」。
+6. 以上 5 个步骤设置完成后，需要等待一段时间（一般在半小时以内），记录生效后，<Conditional brand="leancloud">LeanCloud</Conditional><Conditional brand="tds">TDS</Conditional> 控制台会显示「已绑定」。
 
 :::tip
 可以使用如下命令验证绑定的域名请求是否正常
@@ -675,6 +702,7 @@ SSL 证书通常可以在你的域名服务商处购买，你也可以自行申�
 Let's Encrypt 之外，比较知名的免费 SSL 证书提供商有 [ZeroSSL]、[buypass]、[TrustAsia]。
 
 如果设置完成后，显示绑定失败，并且有这个报错提示：
+
 ```
 issueCert for {host}: Authorization not found in HTTP response from {host} ；
 ```
