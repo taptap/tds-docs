@@ -77,7 +77,7 @@ dependencies {
 修改文件内容:
 :::tip
 - **TapADN SDK 从 3.16.3.10 版本开始更新了 glide 的依赖，glide 版本从 4.0.0 更新到了 4.9.0。**
-- ** 3.16.3.13 加入 Android Dependencies 文件（位于 TapAD/Editor/TapAdDependencies.xml) 方便接入 EDM4U(https://github.com/googlesamples/unity-jar-resolver) 的项目方解决 Android 依赖。**
+- ** 3.16.3.17 加入 Android Dependencies 文件（位于 TapAD/Editor/TapAdDependencies.xml) 方便接入 EDM4U(https://github.com/googlesamples/unity-jar-resolver) 的项目方解决 Android 依赖。**
 :::
 ```groovy
 dependencies {
@@ -589,10 +589,18 @@ public interface ICommonLoadListener
 <>
 
 ```java
+/**
+ * 当前版本发现频繁请求开屏广告时有小概率会出现 Rx 的崩溃
+ * 可以通过在初始化前调用 RxJavaPlugins.setErrorHandler(emptyConsumer()); 来解决
+ * 参考链接: http://reactivex.io/RxJava/2.x/javadoc/ 见 RxJavaPlugins.setErrorHandler
+ */
 TapAdNative tapAdNative = TapAdManager.get().createAdNative(activity);
-// 广告后台获取广告位id
+// 广告后台获取广告位 id
 int spaceId = "your_space_id";
-tapAdNative.loadSplashAd(new AdRequest.Builder().withSpaceId(spaceId).build(), new TapAdNative.SplashAdListener() {
+tapAdNative.loadSplashAd(new AdRequest.Builder()
+    .withSpaceId(spaceId)
+    .withQuery("{query}")  // 搜索词，可选
+    .build(), new TapAdNative.SplashAdListener() {
 
     @Override
     public void onError(int code, String message) {
@@ -634,7 +642,7 @@ if (_tapSplashAd != null)
 }
 else
 {
-    Debug.LogErrorFormat($"[Unity::AD] 未加载好视频,无法播放!");
+    Debug.LogErrorFormat($"[Unity::AD] 未加载好视频，无法播放!");
 }
 // Splash 播放回调接口说明
 public interface ISplashAdInteractionListener : ICommonInteractionListener
@@ -755,6 +763,7 @@ AdRequest adRequest = new AdRequest.Builder()
                             .withRewardAmount("your_reward_amount")   // 奖品数量
                             .withExtra1("your_extra_info")。      // 游戏如果要通过 s2s 验证激励广告有效性的时候需要传入一些辅助信息来验证本次激励活动是否有效
                             .withUserId("game_user_id")           // 游戏如果要通过 s2s 验证激励广告有效性的时候需要传入游戏中的玩家 id，来验证是否可以对当前用户发放奖励
+                            .withQuery("{query}")                 //  搜索词,可选
                             .build();
 
 tapAdNative.loadRewardVideoAd(adRequest, new TapAdNative.RewardVideoAdListener() {
@@ -938,7 +947,11 @@ public interface ICommonLoadListener
 TapAdNative tapAdNative = TapAdManager.get().createAdNative(activity);
 // 广告后台获取广告位 id
 int spaceId = "your_space_id";
-tapAdNative.loadBannerAd(new AdRequest.Builder().withSpaceId(spaceId).build(), new TapAdNative.BannerAdListener() {
+tapAdNative.loadBannerAd(new AdRequest.Builder()
+    .withSpaceId(spaceId)
+    .withQuery("{query}")                 //  搜索词,可选
+    .build(),         new TapAdNative.BannerAdListener() {
+
     @Override
     public void onError(int code, String message) {
         // 获取广告失败
@@ -1067,7 +1080,10 @@ parentLayout.addView(bannerAd.getBannerView());
 TapAdNative tapAdNative = TapAdManager.get().createAdNative(activity);
 // 广告后台获取广告位 id
 int spaceId = "your_space_id";
-tapAdNative.loadFeedAd(new AdRequest.Builder().withSpaceId(spaceId).build(), new TapAdNative.FeedAdListener() {
+tapAdNative.loadFeedAd(new AdRequest.Builder()
+    .withQuery("{query}")                 //  搜索词,可选
+    .withSpaceId(spaceId)
+    .build(),     new TapAdNative.FeedAdListener() {
     @Override
     public void onError(int code, String message) {
         // 获取广告失败
@@ -1125,6 +1141,11 @@ public interface TapFeedAd {
     double getScore();
 
     /**
+     * 如果是直接下载类型，返回 apk 包大小，否则返回 “0B” 或者 “”。
+     */
+    public String getApkSize();
+
+    /**
      * 获取广告的 view，如视频广告的 view，当前版本为自动播放且默认打开声音，用户可以手动关闭声音。
      *
      * @return
@@ -1148,8 +1169,8 @@ public interface TapFeedAd {
      * @param permissionViews 可点击的权限视图
      *
      */
-    void registerViewForInteraction(ViewGroup container, List<View> clickViews, List<View> creativeViews
-     , List<View> privacyViews, List<View> permissionViews, AdInteractionListener listener);
+    void registerViewForInteraction(ViewGroup container, List<View> clickViews, List<View> creativeViews,
+    	List<View> describeViews, List<View> privacyViews, List<View> permissionViews, AdInteractionListener listener);
     
     /**
      * 设置下载监听器
@@ -1180,6 +1201,8 @@ public interface ComplianceInfo {
      * @return
      */
     String getDeveloperName();
+
+
 }
 
 public interface AdInteractionListener {
@@ -1439,8 +1462,6 @@ int adId = isHorizontal ? LANDSCAPE_INTERSTITIAL_ID : PORTRAIT_INTERSTITIAL_ID;
 // create AdRequest
 var request = new TapAdRequest.Builder()
             .SpaceId(adId)
-            .Extra1("{}")
-            .UserId("123")
             .Build();
 _tapInterstitialAd = new TapInterstitialAd(request);
 _tapInterstitialAd.SetLoadListener(new InterstitialAdLoadListener(this));
@@ -1453,8 +1474,7 @@ _tapInterstitialAd.Load();
 ```java
 AdRequest adRequest = new AdRequest.Builder()
                 .withSpaceId(adId)
-                .withExtra1("{}")
-                .withUserId("123")
+                .withQuery("{query}")                 //  搜索词,可选
                 .build();
 tapAdNative.loadInterstitialAd(adRequest,new TapAdNative.InterstitialAdListener() {
     @Override
@@ -1522,6 +1542,40 @@ interstitialAd.show(activity);
 </>
 
 </MultiLang>
+
+## 个性化配置 
+为落实个人信息保护相关的规定，TapADN SDK 为开发者提供退出个性化广告能力的接口，开发者可以调用接口，向用户提供退出个性化广告的能力。退出后，看到的广告数量不变，相关度会降低。开发者需遵守相关法律法规的要求，在开发者应用内为用户提供退出个性化广告的功能，保证在用户点击退出功能后调用穿山甲 SDK 的能力接口。
+
+### 支持版本
+
+Android: 3.16.3.17 及以上
+
+Unity: 3.16.3.17 及以上
+
+<MultiLang kind="adn">
+
+<>
+
+```cs
+using TapTap.TapAd
+
+TapAdConfig config = new TapAdConfig.Builder().Data("[{\"name\":\"personal_ads_type\",\"value\":\"0\"}]").Build();
+TapAdSdk.UpdateAdConfig(config);
+```
+
+</>
+
+<>
+
+```java
+TapAdConfig tapAdConfig = new TapAdConfig.Builder().withData("[{\"name\":\"personal_ads_type\",\"value\":\"0\"}]").build();
+TapAdSdk.updateAdConfig(tapAdConfig);
+```
+
+</>
+
+</MultiLang>
+
 
 ## Android 代码混淆
 
@@ -1638,3 +1692,23 @@ sign = fmt.Sprintf("%x", sha256.Sum256(trans_id:SecurityKey))
 |字段名称 |字段定义 |字段类型|备注|
 |---|-----|-----|-----|
 |isValid |校验结果 | bool|判定结果，是否发放奖励 |
+
+
+
+
+## SDK 常见错误码汇总
+|  错误码  |    错误信息  |     原因    |
+|---|--------|-------------|
+|**3001**| 初始化错误  |  SDK 未初始化,或者初始化异常  |
+|**3002**| 网络异常错误 |  |                 |
+|**3003**| 插屏广告应用横竖方向参数与广告位支持方向不匹配| 插屏广告设置的横竖屏与设置的方向不一致|
+|**9999**| 未获取到广告素材:未知错误      |   |
+|**9000**| 内部错误      |   错误信息和内部错误码一般会上报 |
+|**10003**| Request MediaInfo Miss   |   |
+|**10004**| Request AppInfo Miss     |   |
+|**10005**| Request AdnSdkInfo Miss  |   |
+|**10007**| Request AdSpace Miss     |   |
+|**10008**| Request AdSpace Not Match|   |
+|**10009**| Request Invalid DeviceId |   |
+
+
