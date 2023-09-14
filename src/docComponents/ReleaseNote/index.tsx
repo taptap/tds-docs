@@ -79,9 +79,9 @@ const UnityRelease = ({
           <select id="selectBox" className={styles.selectPosition} onChange={handleSelectChange}>
             <option value="all">全部</option>
 
-            {SDKNameList.map((optionText, index) => (
+            {SDKNameList.map((optionText) => (
 
-              <option key={index} value={optionText}>
+              <option key={optionText} value={optionText}>
                 {optionText}
               </option>
 
