@@ -424,7 +424,17 @@ comment.put("content", "当然是肯德基啦！");
 comment.put("parent", post);
 
 // 保存 comment 会同时保存 post
-comment.save();
+comment.saveInBackground().subscribe(new Observer<LCObject>() {
+        public void onSubscribe(Disposable disposable) {}
+        public void onNext(LCObject todo) {
+            // 成功保存之后，执行其他逻辑
+            Log.e(TAG, "保存成功。objectId：" + todo.getObjectId());
+        }
+        public void onError(Throwable throwable) {
+            // 异常处理
+        }
+        public void onComplete() {}
+    });
 ```
 
 云端存储时，会将被指向的对象用 `Pointer` 的形式存起来。你也可以用 `objectId` 来指向一个对象：
