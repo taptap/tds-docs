@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react"
 import ReactMarkdown from 'react-markdown';
 import styles from "./index.module.scss";
 
+
 import { findReleaseContent, findReleaseSDKNames, findContentForSDKNames } from "./api";
 
 interface UnityReleaseProps {
@@ -72,8 +73,6 @@ const UnityRelease = ({
  }
 
 
-
-
     return (
       <div className={styles.root}>
           <select id="selectBox" className={styles.selectPosition} onChange={handleSelectChange}>
@@ -86,10 +85,9 @@ const UnityRelease = ({
               </option>
 
             ))}
-
           </select>
 
-        <ReactMarkdown children={content}/>
+        <ReactMarkdown children={content} />
       </div>
     );
   };
