@@ -8,6 +8,7 @@ import { BRAND, REGION } from "../../constants/env";
 import { getNavLinks, getLicenceLinks } from "./_config";
 import DiscordLogo from "./discord-mark-white.svg";
 import Arrow from "./arrow.svg";
+import TdsFooter from "./TdsFooter";
 
 function getCopyrightNotice(brand: string): string {
   const year = new Date().getFullYear();
@@ -21,7 +22,7 @@ function Footer() {
     i18n: { currentLocale },
   } = useDocusaurusContext();
 
-  return (
+  return  BRAND === 'tds' && REGION === 'cn' ? <TdsFooter /> :  (
     <footer className={styles.footer}>
       <div className={styles.stage}>
         <div>
@@ -31,7 +32,7 @@ function Footer() {
               <Logo noLabel reversed={BRAND === "leancloud"} />
             </section>
 
-            <section className={styles.discord}>
+            {BRAND === "tds" ? <section className={styles.discord}>
               <a
                 href="https://discord.com/invite/xt3f3XpuQa"
                 target="_blank"
@@ -52,7 +53,7 @@ function Footer() {
                   <Arrow />
                 </div>
               </a>
-            </section>
+            </section> : <></>}
           </section>
 
           <section>

@@ -241,6 +241,7 @@ dependencies {
    CoreTelephony.framework
    SystemConfiguration.framework
    libc++.tbd
+   libsqlite3.tbd
 
    // TapTap 内嵌动态
    AVFoundation.framework
@@ -369,9 +370,29 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core",
 	"SlateCore",
 	"TapCommon",
 	"TapBootstrap",
-	"TapLogin",
-        "LeanCloud"
+	"TapLogin"
 });
+if (Target.Platform == UnrealTargetPlatform.IOS || Target.Platform == UnrealTargetPlatform.Android)
+{
+    PublicDependencyModuleNames.AddRange(
+        new string[]
+        {
+            // 推送接入
+            // "LeanCloudPush",
+            
+            "LeanCloudMobile"
+        }
+    );
+}
+else
+{
+    PublicDependencyModuleNames.AddRange(
+        new string[]
+        {
+            "LeanCloud"
+        }
+    );
+}
 ```
 
 #### 导入头文件
@@ -576,7 +597,7 @@ catch (Exception e)
     if (e is TapException tapError)  // using TapTap.Common
     {
         Debug.Log($"encounter exception:{tapError.code} message:{tapError.message}");
-        if (tapError.code == TapErrorCode.ERROR_CODE_BIND_CANCEL) // 取消登录
+        if (tapError.code == (int)TapErrorCode.ERROR_CODE_BIND_CANCEL) // 取消登录
         {
             Debug.Log("登录取消");
         }
@@ -616,15 +637,18 @@ TDSUser.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
 ```
 
 ```cpp
-FTDSUser::FDelegate OnSuccess = FTDSUser::FDelegate::CreateLambda([](const FTDSUser& User) {
-    FString UserID = User.GetObjectId();
-    FString UserName = User.GetUsername();
-    FString Avatar = User.GetAvatar();
-});
-FTUError::FDelegate OnError = FTUError::FDelegate::CreateLambda([](const FTUError& Error) {
-    // 登录失败 Error.msg;
-});
-FTDSUser::LoginWithTapTap({TUType::PermissionScope::Profile}, OnSuccess, OnError);
+FTDSUser::LoginWithTapTap({TUType::PermissionScope::Profile},
+                            FTDSUser::FCallBackDelegate::CreateLambda(
+                                [](const TSharedPtr<FTDSUser>& UserPtr, const FTUError& Error) {
+                                    if (UserPtr.IsValid()) {
+                                        FString UserID = UserPtr->GetObjectId();
+		                                FString UserName = UserPtr->GetUsername();
+		                                FString Avatar = UserPtr->GetAvatar();
+                                    }
+                                    else {
+                                        // 登录失败 Error.msg;
+                                    }
+                                }));
 
 // 授权可选项：Profile、Friend、BasicInfo
 ```
@@ -807,6 +831,46 @@ Windows Registry Editor Version 5.00
 TapTap 登录支持设置语言：
 
 <Languages kind="ue" />
+
+## 时长统计
+从 TapSDK Android / iOS / Unity 3.20.0 版本 、UE4 3.21.0 版本开始，为了在 Tap 客户端中展示用户的游戏时长，TapSDK 默认会收集当前用户的时长数据，开发者可**在调用初始化接口前**使用如下接口进行设置是否收集。
+
+<MultiLang kind="ue">
+
+<>
+
+```cs
+using TapTap.Common; // 命名空间
+
+TapCommon.SetDurationStatisticsEnabled(true);
+```
+
+</>
+<>
+
+```java
+TapCommon.setDurationStatisticsEnabled(true);
+```
+
+</>
+<>
+
+```objectivec
+[TDSCommonService setDurationStatisticsEnabled:@YES];
+```
+
+</>
+
+<>
+
+```cpp
+TapUECommon::setDurationStatisticsEnabled(true);
+```
+
+</>
+
+</MultiLang>
+
 
 ## 更多功能
 

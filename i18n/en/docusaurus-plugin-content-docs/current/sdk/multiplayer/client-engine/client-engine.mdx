@@ -1,0 +1,111 @@
+---
+title: Client Engine Overview
+sidebar_label: Overview
+sidebar_position: 1
+---
+
+import { Conditional } from "/src/docComponents/conditional";
+
+:::info
+**Before reading this document, please read the [Multiplayer Service Features](/sdk/multiplayer/features/) and [MasterClient](/sdk/multiplayer/guide/js/#masterclient) to understand the architecture you can use for your game when developing features with Multiplayer.**
+:::
+
+## The problem solved by Client Engine
+
+The multiplayer service (i.e. the multiplayer service in the figure below) is a good solution to the problem of abstracting rooms and exchanging messages between players in a room. Let's take the game Rock, Paper, Scissors as an example, the game flow looks like this:
+
+![image](/img/client-engine/client-engine1.png)
+
+where the multiplayer service only plays a role of message relay, and for the sake of discussion we can simplify this diagram a bit (the dotted line represents the message being relayed through the multiplayer service):
+
+![image](/img/client-engine/client-engine2.png)
+
+This process is simple, but there are a few problems:
+
+1. All players have the same god view: they can see all states, and the player who throws a punch later (like B in the picture) can throw a punch according to A's choice to get a sure win.
+2. The final result is reported by the client, and the client can fake the result.
+3. A, as the master client, can manipulate some operations involving randomness, such as shuffling cards, rolling dice, etc. (There is no similar mechanism in Rock, Paper, Scissors).
+
+Different types of games have different tolerances for these problems. Without changing the flow of the diagram above, each of these problems can be solved in its own way. However, the Client Engine solution attempts to solve these problems by taking a radical step away from them: running the MasterClient on the server side. In the Client Engine scenario, the flow of the game is as follows:
+
+![image](/img/client-engine/client-engine3.png)
+
+In this process, the MasterClient running on the server is the only referee with a God's eye view. All players exchange information with the MasterClient, and the MasterClient will only synchronize some information with the client (e.g. it will only tell B that A threw a punch, but what was thrown is unknown). The game logic (including randomness, win/loss decisions) and the reporting of final results are performed on the server.
+
+**The Multiplayer service is the foundation. The player client does not communicate directly with the MasterClient. The dotted lines in the diagram indicate that messages are still routed through the Multiplayer service.**
+
+## Client Engine Introduction
+
+Client Engine is a client-hosting solution for multiplayer online games. The [Multiplayer Service](/sdk/multiplayer/features/) provides a MasterClient mechanism to control the game logic: MasterClient is a special client that receives and processes all events and messages in the game, processes them in real time, and then sends the results to the other game clients, controlling the execution of the game. Developers can develop a complete set of MasterClient logic based on the Multiplayer SDK, and then host such a client in the Client Engine, saving the burden of deploying and maintaining the program. See the picture below:
+
+![image](/img/client-engine/structure.png)
+
+In addition to hosting MasterClient, developers can also do the following things in Client Engine:
+
+* Host regular virtual players to increase the fun and activity of the game.
+* Customise the REST API to develop additional logic.
+
+The benefits of hosting game logic in the Client Engine include:
+
+* Reduced network latency. The game running process involves frequent message interactions among game players, the Multiplayer cloud, and MasterClient. Client Engine and the Multiplayer cloud are in the same physical network, which greatly reduces the transmission delay caused by the public network.
+* Client Engine provides perfect log collection, status monitoring, load balancing and automatic fault recovery mechanism, which can provide higher stability guarantee.
+* Client Engine provides a huge resource pool, which can quickly respond to the temporary and sudden expansion demand of a single game product without having developers manually adjust the instances. Expansions are done automatically.
+
+## Documentation and Demos
+
+For more information on using the Client Engine, please refer to the documentation:
+
+* [Client Engine Quick Start - Node.js](/sdk/multiplayer/client-engine/quick-start-node/) describes how to get started with your first project, how to develop and debug locally, and how to deploy to the cloud.
+* [Your First Client Engine Game - Node.js](/sdk/multiplayer/client-engine/first-game-node/) is a tutorial that will help you get started with a rock-paper-scissors guessing game using the Client Engine. After completing this tutorial you will have a basic understanding of the Client Engine process.
+* [Client Engine Development Guide - Node.js](/sdk/multiplayer/client-engine/guide-node/) provides an in-depth explanation of the Client Engine SDK based on the first project.
+
+Example demo:
+
+* [Turn-based Demo](/sdk/multiplayer/client-engine/demo/#turn-based-demo).
+
+## Price
+
+### Developer Edition
+
+Developer Edition provides a trial edition for developers to use free of charge: 
+
+* Free 100 CCU and 50% CPU.
+* No staging environment provided.
+* No auto-scaling and load balancing.
+* Forced hibernation.
+
+Hibernation policy:
+
+Standard instances do not hibernate.
+
+Trial instances enforce the following hibernation policies:
+
+* If the application has had no external requests in the last half hour, it hibernates. 
+* If a new external request is made after the hibernation, the instance is started immediately. The response time for the first request is 5 to 30 seconds (depending on the instance startup time), and the response time for subsequent requests returns to normal.
+* Forced hibernation: The instance will be forced into hibernation if the total number of hours of operation in the last 24 hours exceeds 18 hours. At this point, new requests will receive a 503 error response code, which can be viewed in **Cloud Services Console > Play > Client Engine > Statistics**.
+
+If you don't want the service to be interrupted due to trial instances in the staging environment being forced to hibernate, or if you need multiple instances to fully simulate the production environment, you can purchase standard instances in the trial environment as needed.
+
+### Business Edition
+
+With Business Edition, you can upgrade from the trial version to the standard version via the console. Standard version provides a staging environment, supports automatic scaling and load balancing, and does not hibernate.
+
+Standard version is scaled and billed by Compute Unit. A Compute Unit contains 100 CCU and 50% CPU and we will automatically add more Compute Units if any of them gets exhausted. For example, if the Client Engine is using 80 CCU and 90% CPU at a particular time, the system will allocate 2 units.
+
+<Conditional region="global">
+
+The system will charge according to the daily peak consumption of computing units. The price of a single computing unit can be found on the [official website](https://developer.taptap.io/product-intro/price). For example, if an application on a China node uses up to 2 computing units on a given day, the charge for that day will be 2 * computing unit price of China.
+
+</Conditional>
+
+<Conditional region="cn">
+
+The system will charge according to the daily peak consumption of computing units. The price of a single computing unit can be found on the [official website](https://developer.taptap.cn/product-intro/price). For example, if an application on a China node uses up to 2 computing units on a given day, the charge for that day will be 2 * computing unit price of China.
+
+</Conditional>
+
+
+
+:::info
+Note: After upgrading to the Standard version, the service will be provided and billed at a minimum of 1 compute unit, regardless of whether it is used or not.
+:::
