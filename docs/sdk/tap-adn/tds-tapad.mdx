@@ -1165,6 +1165,7 @@ public interface TapFeedAd {
      * @param container 渲染广告最外层的 ViewGroup
      * @param clickViews 可点击的视图
      * @param creativeViews 可点击的创意视图（广告下载的按钮）
+     * @param describeViews 可点击的广告详情页 (广告 6 要素新增项)
      * @param privacyViews 可点击的隐私协议视图
      * @param permissionViews 可点击的权限视图
      *
@@ -1294,16 +1295,21 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             * @param container     渲染广告最外层的 ViewGroup
             * @param clickViews    可点击的 View 的列表
             * @param creativeViews 用于下载的 View
+            * @param 
             */
             // 可以被点击的 view, 也可以把 convertView 放进来意味整个 item 可被点击，点击会跳转到落地页
             List<View> clickViewList = new ArrayList<View>();
             clickViewList.add(convertView);
             // 创意点击区域的 view 点击根据不同的创意进行下载动作
             // 如果需要点击图文区域也能进行下载动作，请将图文区域的 view 传入 creativeViewList
-            List<View> creativeViewList = new ArrayList<View>();
-            creativeViewList.add(adViewHolder.mCreativeButton);
+            List<View> clickViewList = Collections.singletonList(adViewHolder.adImageView);
+            List<View> creativeViewList = Collections.singletonList(adViewHolder.creativeTextView);
+            List<View> privacyViewList = Collections.singletonList(adViewHolder.privacyTextView);
+            List<View> describeTextView = Collections.singletonList(adViewHolder.describeTextView);
+            List<View> permissionViewList = Collections.singletonList(adViewHolder.permissionTextView);
+
             // 注册普通点击区域，创意点击区域。重要! 这个涉及到广告计费及交互，必须正确调用。convertView 必须使用 ViewGroup。
-            ad.registerViewForInteraction((ViewGroup) convertView, images, clickViewList, creativeViewList,adViewHolder.mDislike,new TTNativeAd.AdInteractionListener() {
+            ad.registerViewForInteraction((ViewGroup) convertView, images, clickViewList, creativeViewList, describeViewList, privacyViewList, permissionViewList, new TTNativeAd.AdInteractionListener() {
 
                 // 点击普通区域的回调
                 @Override
