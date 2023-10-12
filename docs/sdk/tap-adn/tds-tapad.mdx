@@ -589,17 +589,11 @@ public interface ICommonLoadListener
 <>
 
 ```java
-/**
- * 当前版本发现频繁请求开屏广告时有小概率会出现 Rx 的崩溃
- * 可以通过在初始化前调用 RxJavaPlugins.setErrorHandler(emptyConsumer()); 来解决
- * 参考链接: http://reactivex.io/RxJava/2.x/javadoc/ 见 RxJavaPlugins.setErrorHandler
- */
 TapAdNative tapAdNative = TapAdManager.get().createAdNative(activity);
 // 广告后台获取广告位 id
 int spaceId = "your_space_id";
 tapAdNative.loadSplashAd(new AdRequest.Builder()
     .withSpaceId(spaceId)
-    .withQuery("{query}")  // 搜索词，可选
     .build(), new TapAdNative.SplashAdListener() {
 
     @Override
@@ -763,7 +757,6 @@ AdRequest adRequest = new AdRequest.Builder()
                             .withRewardAmount("your_reward_amount")   // 奖品数量
                             .withExtra1("your_extra_info")         // 游戏如果要通过 s2s 验证激励广告有效性的时候需要传入一些辅助信息来验证本次激励活动是否有效
                             .withUserId("game_user_id")           // 游戏如果要通过 s2s 验证激励广告有效性的时候需要传入游戏中的玩家 id，来验证是否可以对当前用户发放奖励
-                            .withQuery("{query}")                 //  搜索词,可选
                             .build();
 
 tapAdNative.loadRewardVideoAd(adRequest, new TapAdNative.RewardVideoAdListener() {
@@ -949,8 +942,7 @@ TapAdNative tapAdNative = TapAdManager.get().createAdNative(activity);
 int spaceId = "your_space_id";
 tapAdNative.loadBannerAd(new AdRequest.Builder()
     .withSpaceId(spaceId)
-    .withQuery("{query}")                 //  搜索词,可选
-    .build(),         new TapAdNative.BannerAdListener() {
+    .build(), new TapAdNative.BannerAdListener() {
 
     @Override
     public void onError(int code, String message) {
@@ -1165,7 +1157,7 @@ public interface TapFeedAd {
      * @param container 渲染广告最外层的 ViewGroup
      * @param clickViews 可点击的视图
      * @param creativeViews 可点击的创意视图（广告下载的按钮）
-     * @param describeViews 可点击的广告详情页 (广告 6 要素新增项)
+     * @param describeViews 可点击的介绍详情视图
      * @param privacyViews 可点击的隐私协议视图
      * @param permissionViews 可点击的权限视图
      *
@@ -1500,7 +1492,6 @@ _tapInterstitialAd.Load();
 ```java
 AdRequest adRequest = new AdRequest.Builder()
                 .withSpaceId(adId)
-                .withQuery("{query}")                 //  搜索词,可选
                 .build();
 tapAdNative.loadInterstitialAd(adRequest,new TapAdNative.InterstitialAdListener() {
     @Override
@@ -1568,49 +1559,6 @@ interstitialAd.show(activity);
 </>
 
 </MultiLang>
-
-## 个性化配置 
-为落实个人信息保护相关的规定，TapADN SDK 为开发者提供退出个性化广告能力的接口，开发者可以调用接口，向用户提供退出个性化广告的能力。退出后，看到的广告数量不变，相关度会降低。开发者需遵守相关法律法规的要求，在开发者应用内为用户提供退出个性化广告的功能，保证在用户点击退出功能后调用穿山甲 SDK 的能力接口。
-
-### 支持版本
-
-Android: 3.16.3.17 及以上
-
-Unity: 3.16.3.17 及以上
-
-<MultiLang kind="adn">
-
-<>
-
-```cs
-using TapTap.TapAd
-// 关闭个性化推荐
-TapAdConfig config = new TapAdConfig.Builder().Data("[{\"name\":\"personal_ads_type\",\"value\":\"0\"}]").Build();
-TapAdSdk.UpdateAdConfig(config);
-
-// 重新启用个性化推荐
-TapAdConfig config = new TapAdConfig.Builder().Data("[{\"name\":\"personal_ads_type\",\"value\":\"1\"}]").Build();
-TapAdSdk.UpdateAdConfig(config);
-```
-
-</>
-
-<>
-
-```java
-// 关闭个性化推荐
-TapAdConfig tapAdConfig = new TapAdConfig.Builder().withData("[{\"name\":\"personal_ads_type\",\"value\":\"0\"}]").build();
-TapAdSdk.updateAdConfig(tapAdConfig);
-
-// 重新启用个性化推荐
-TapAdConfig tapAdConfig = new TapAdConfig.Builder().withData("[{\"name\":\"personal_ads_type\",\"value\":\"1\"}]").build();
-TapAdSdk.updateAdConfig(tapAdConfig);
-```
-
-</>
-
-</MultiLang>
-
 
 ## Android 代码混淆
 
