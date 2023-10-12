@@ -76,8 +76,11 @@ SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选�
 <CodeBlock className="json">
   {`"dependencies":{
     "com.tapsdk.antiaddiction":"https://github.com/taptap/TapAntiAddiction-Unity.git#${sdkVersions.taptap.unity}",
-    "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
+    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}",
     "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#${sdkVersions.taptap.unity}", // 可选
+    "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}",
+    "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
 }`}
 </CodeBlock>
 
@@ -163,10 +166,12 @@ iOS **防沉迷 SDK** 结构：
 其他依赖：
 
 - `TapCommonSDK.framework` 基础库
+- `TapLogin.framework` 基础库
+- `TapBootstrap.framework` 基础库（可选）
 
 添加防沉迷库文件：
 
-- 添加 `AntiAddictionService.framework`、`AntiAddictionUI.framework` 和 `TapCommonSDK.framework` 静态库。注意添加时选择 Embed 方式为 **Do Not Embed**。
+- 添加 `AntiAddictionService.framework`、`AntiAddictionUI.framework`、`TapLogin.framework`、`TapBootstrap.framework`（可选） 和 `TapCommonSDK.framework` 静态库。注意添加时选择 Embed 方式为 **Do Not Embed**。
 
 - 引用代码：
 
@@ -358,6 +363,8 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core",
 
 ## 初始化
 
+因为防沉迷模块依赖于 `TapLogin` 模块，所以在防沉迷模块初始化前必须把 `TapLogin` 模块[初始化](/sdk/taptap-login/guide/tap-login/#初始化)了。如果使用了 `TapBootstrap` 模块（推荐），那么可以通过 `TapBootstrap` 模块的[初始化](/sdk/taptap-login/guide/start/#sdk-初始化)来初始化 `TapLogin` 模块。
+
 初始化防沉迷 UI 模块，设置启动防沉迷功能的配置，注册防沉迷的消息监听。请注意，**触发回调需要调用[防沉迷认证](#防沉迷认证)接口。**
 
 <MultiLang kind="ue">
@@ -548,7 +555,7 @@ void UAntiAddictionWidget::OnCallBack(AntiAddictionUE::ResultHandlerCode Code, c
 
 SDK 支持两种防沉迷认证方式：
 
-1. 使用 TapTap 快速认证，可令玩家授权游戏使用 TapTap 上的年龄段信息完成实名。
+1. 使用 TapTap 快速认证，可令玩家授权游戏使用 TapTap 上的年龄段信息完成实名。（如果用户使用的是 TapTap 登录，那么将会默认使用 TapTap 快速认证）
 2. 不使用 TapTap 快速认证（即弹出「TapTap 快速认证」授权框后，点击「不使用」按钮），玩家在 SDK 提供的界面中手动输入身份证号等实名信息。
 
 TDS 云端会根据实名信息判断玩家是否可以进行游戏，并将相关信息上报至中宣部防沉迷实名认证系统。
@@ -558,12 +565,11 @@ TDS 云端会根据实名信息判断玩家是否可以进行游戏，并将相�
 ### TapTap 快速认证
 
 :::info
-防沉迷 v3.7.1 开始，使用快速认证不再依赖 TapTap 登录 SDK，但快速认证需要玩家在已登录状态下授权游戏使用其在 TapTap 上的年龄段信息完成实名，**请确保完成了以下工作**：
+快速认证需要玩家在已登录状态下授权游戏使用其在 TapTap 上的年龄段信息完成实名，**请确保完成了以下工作**：
 
 - **在开发者中心手动开通 TapTap 登录功能**。操作位置在 **游戏 > 游戏服务 > 应用配置** 页面，找到 TapTap 登录服务，点击「立即开通」按钮。若此项未完成，快速认证时玩家会遇到「应用未开通 TapTap 登录服务」提醒。
 - **在开发者中心[配置签名证书](/sdk/start/quickstart/#配置签名证书)**。若此项未完成，快速认证拉起 TapTap 客户端会提示「授权失败」。
 
-防沉迷 v3.18.2 开始，快速认证逻辑做了更改，startup 接口中 `isTapUser` 参数更是一种登录方式的选择，而不再表示是否使用快速认证。UI 上最大的变更是不再提供直接手动输入身份信息的弹窗。
 :::
 
 
@@ -630,7 +636,7 @@ AntiAddictionUIKit.startup(activity, userIdentifier, true);
 ```objc
 // 注意唯一标识参数值长度不能超过 64 字符
 NSString *userIdentifier = @"玩家的唯一标识";
-[AntiAddiction startupWithUserID:userIdentifier isTapUser: YES];
+[AntiAddiction startupWithTapTap:userIdentifier];
 ```
 
 使用 **TapTap 快速认证** 需要在 `AppDelegate` 里嵌入回调。
@@ -737,44 +743,6 @@ AntiAddictionUE::SetTestEnvironment(bIsChecked);
 </MultiLang>
 
 使用该接口需要在控制台开启「切换为测试模式」，可以针对某个账号进行一些设置，正式打包上线的应用应该需要去掉这个接口。
-
-
-## 获取玩家年龄段
-
-调用该接口可获取玩家所处年龄段：
-
-<MultiLang kind="ue">
-
-```cs
-int ageRange = AntiAddictionUIKit.AgeRange;
-```
-
-```java
-int ageRange = AntiAddictionUIKit.getAgeRange();
-```
-
-```objc
-NSInteger ageRange = [AntiAddiction getAgeRange];
-```
-
-```cpp
-EAAUAgeLimit AgeLimit = AntiAddictionUE::GetAgeRange();
-```
-
-</MultiLang>
-
-上例中的 `ageRange` 是一个整数，表示玩家所处年龄段的下限（最低年龄）。
-特别地，`-1` 表示「未知」，说明该用户还未实名。
-
-| 类型数值 | 含义 |
-| - | - |
-| -1 | 未知 |
-| 0 | 0 到 7 岁 |
-| 8 | 8 到 15 岁 |
-| 16 | 16 到 17 岁 |
-| 18 | 成年玩家 |
-
-***注意：开发者应根据回调类型来判断当前玩家是否可以进入游戏，而不是年龄段数据，当游戏在 TapPlay 中 运行时，该数据可能不准确***
 
 
 ## 获取剩余时长（单位：秒）
