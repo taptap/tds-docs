@@ -1,7 +1,7 @@
 export const ENTRIES = [
   {
     "title": "通用说明",
-    "description": "SDK 名称：LeanCloud 云服务SDK。           开发者：美味书签（北京）信息技术有限公司。           主要功能：数据存储，即时通讯，混合推送，实时对战等",
+    "description": "SDK 名称：LeanCloud 云服务SDK。           开发者：美味书签（北京）信息技术有限公司。           主要功能：数据存储，即时通讯，混合推送，实时对战等。",
     "links": [
       {
         "label": "个人信息处理与隐私政策",
