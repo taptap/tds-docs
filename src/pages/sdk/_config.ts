@@ -5,11 +5,11 @@ export const ENTRIES = [
     "links": [
       {
         "label": "个人信息处理与隐私政策",
-        "href": "/sdk/start/privacy/"
+        "to": "/sdk/start/privacy/"
       },
       {
         "label": "合规使用说明",
-        "href": "/sdk/start/compliance/"
+        "to": "/sdk/start/compliance/"
       }
     ]
   },
