@@ -10,11 +10,19 @@ import sdkVersions from "/src/docComponents/sdkVersions";
 import { Gray, Blue, Red, Black } from "/src/docComponents/doc";
 import { Conditional } from "/src/docComponents/conditional";
 
+:::tip
+请注意区分 DLC 与[正版验证](/sdk/copyright-verification/guide/)功能。
+
+DLC 提供游戏内购功能，而正版验证则用于付费下载游戏。
+
+如果游戏计划从**付费下载**转为**免费下载 + 内购 DLC** 解锁内容的形式上线，请在新版本中**去除正版验证**相关接口，仅接入以下 DLC 功能。
+:::
+
 ## DLC 查询和购买
 
 可以在 [下载页](/tap-download) 获得 TapSDK，添加以下依赖：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 <>
 
@@ -64,11 +72,27 @@ dependencies {
 
 </>
 
+<>
+
+将插件 ** TapLicense ** 、** TapCommon ** 拷贝到项目的插件目录，并在项目模块的 ** build.cs ** 文件中添加依赖：
+
+```csharp
+PublicDependencyModuleNames.AddRange(new string[] { 
+    "Json",
+    "JsonUtilities",
+    "SlateCore",           
+    "TapCommon",
+    "TapLicense",
+});
+```
+
+</>
+
 </MultiLang>
 
 ### DLC 回调设置
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 public class MyTapDLCCallback:ITapDlcCallback
@@ -105,11 +129,33 @@ TapLicenseHelper.setDLCCallback(new DLCManager.InventoryCallback() {
 // 暂不支持
 ```
 
+```cpp
+FTapLicense::SetDLCCallback(
+    FTapLicense::FDLCQueryDelegate::CreateLambda(
+        [](FTapLicense::EQueryResult Code, const FTapLicense::Map& QueryList) {
+            switch (Code) {
+            case FTapLicense::EQueryResult::OK: 
+                //查询成功
+                break;
+            case FTapLicense::EQueryResult::Error:
+                //查询失败
+                break;
+            case FTapLicense::EQueryResult::NotInstallTapTap:
+                //sdk有相应处理，正常不需要开发者做处理
+                break;
+            }
+        }),
+    FTapLicense::FDLCOrderDelegate::CreateLambda([](const FString& Sku, FTapLicense::EOrderStatus Status) {
+        // ...
+    })
+);
+```
+
 </MultiLang>
 
 ### DLC 查询
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 TapLicense.QueryDLC(string[] skuIds);
@@ -123,11 +169,15 @@ TapLicenseHelper.queryDLC(Activity activity, String[] skuIds);
 // 暂不支持
 ```
 
+```cpp
+FTapLicense::QueryDLC(const TArray<FString>& DLCList);
+```
+
 </MultiLang>
 
 ### DLC 购买
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 TapLicense.PurchaseDLC(string skuId);
@@ -139,6 +189,10 @@ TapLicenseHelper.purchaseDLC(Activity activity, String skuIds);
 
 ```objc
 // 暂不支持
+```
+
+```cpp
+FTapLicense::PurchaseDLC(const FString& DLC);
 ```
 
 </MultiLang>
@@ -168,7 +222,7 @@ TapLicenseHelper.purchaseDLC(Activity activity, String skuIds);
 
 ### 添加测试用户
 
-前往开发者中心 >> 点击<Blue>游戏服务</Blue> >> 点击<Blue>生态服务</Blue> >> 点击<Blue>正版验证</Blue> >> 填写测试用户的 TapTap ID。
+前往开发者中心 >> 点击<Blue>游戏服务</Blue> >> 点击<Blue>开发与构建</Blue> >> 点击<Blue>正版验证</Blue> >> 填写测试用户的 TapTap ID。
 
 ### 开始测试
 
@@ -178,7 +232,7 @@ TapLicenseHelper.purchaseDLC(Activity activity, String skuIds);
 
 ### 完善应用信息
 
-前往开发者中心，按照[物料要求](/store/store-material/)填写应用信息，并审核通过。
+前往开发者中心，填写应用信息，并审核通过。
 
 ### 设置售卖价格
 

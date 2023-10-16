@@ -10,11 +10,11 @@ import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';
 import Profiles from "../../_partials/tap-login-profile.mdx";
 
-如果你仅仅只需要接入 TapTap 这一种登录方式，确认不使用 TDS 其他云服务，可以看这里的文档。请注意，如果刚开始只选择接入「TapTap 登录」，后面又需要使用其他云服务的话，后期可能有一定的升级成本。
+如果你仅仅只需要接入 TapTap 这一种登录方式，确认不使用 TDS 其他云服务，可以看本篇文档。请注意，如果刚开始只选择接入「TapTap 登录」，后面又需要使用其他云服务的话，后期可能有一定的升级成本。
 
 <Conditional region='cn'>
 
-使用原来 TapSDK v1.x 版本的开发者，也可以参考这里的说明来完成 TapSDK 的升级。
+使用原来 TapSDK v1.x 版本的开发者，也可以参考 [1.x 升级 3.x 指南](../upgrade1.x) 完成 TapSDK 的升级。
 
 </Conditional>
 
@@ -25,7 +25,7 @@ import Profiles from "../../_partials/tap-login-profile.mdx";
 <>
 
 - Unity 2019.4 或更高版本
-- iOS 10 或更高版本
+- iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
 - Android 5.0（API level 21）或更高版本
 
 </>
@@ -38,7 +38,7 @@ Android 5.0（API level 21）或更高版本
 
 <>
 
-iOS 10 或更高版本
+iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
 
 </>
 
@@ -56,6 +56,10 @@ iOS 10 或更高版本
 
 </MultiLang>
 
+## 集成前准备
+
+1. 参考 [准备工作](/sdk/start/get-ready/) 创建应用、开启应用配置、绑定 API 域名；
+2. 参考 [快速开始](/sdk/start/quickstart/#配置签名证书) 配置包名与签名证书；
 
 ## SDK 获取
 
@@ -65,24 +69,237 @@ iOS 10 或更高版本
 
 <>
 
-如果使用 TapSDK Unity v3.7.1 及更高版本，还需要在项目的 `Packages/manifest.json` 文件中添加以下依赖：
+SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选其一。请根据项目需要选择。
+
+#### 方法一：使用 Unity Package Manager
+
+在项目的 `Packages/manifest.json` 文件中添加以下依赖：
 
 <CodeBlock className="json">
-{`"dependencies":{ 
-  "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
+  {`"dependencies":{
+    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+    "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
 }`}
 </CodeBlock>
 
-</>
+在 Unity 顶部菜单中选择 **Window > Package Manager** 可查看已经安装在项目中的包。
 
+#### 方法二：手动导入
+
+1. 在 [下载页](/tap-download) 找到 **TapSDK Unity** 和 **LeanCloud C# SDK** 下载地址，分别下载 `TapSDK-UnityPackage.zip` 和 `LeanCloud-SDK-Storage-Unity.zip`。
+
+2. 在 Unity 项目中依次转到 **Assets > Import Packages > Custom Packages**，从解压后的 `TapSDK-UnityPackage.zip` 中，选择希望在游戏中使用的 TapSDK 包导入，其中：
+
+   - `TapTap_Common.unitypackage` TapSDK 基础库，必选。
+   - `TapTap_Login.unitypackage` TapTap 登录，必选。
+
+3. 解压后的 `LeanCloud-SDK-Storage-Unity.zip` 为 Plugins 文件夹，拖拽至 Unity 即可。
+
+:::tip
+
+如果是手动下载 `unitypackage` 进行 SDK 导入，需要将 `Assets/TapTap/Common/Plugins/iOS/TapTap.Common.dll` 设置为只支持 iOS。
+
+:::
+
+#### iOS 配置
+
+在 `Assets/Plugins/iOS/Resource` 目录下创建 `TDS-Info.plist` 文件，复制以下代码并且**替换其中的 `ClientId`**。如果游戏使用了 TapTap [内嵌动态](/sdk/embedded-moments/features/)或[数据分析](/sdk/tapdb/features/)服务，需要配置相关权限并**替换授权文案**：
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>taptap</key>
+    <dict>
+        <key>client_id</key>
+        <string>ClientId</string>
+    </dict>
+
+    <!--使用内嵌动态服务，需要相册、相机、麦克风权限-->
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>说明为何应用需要此项权限</string>
+    <key>NSCameraUsageDescription</key>
+    <string>说明为何应用需要此项权限</string>
+    <key>NSMicrophoneUsageDescription</key>
+    <string>说明为何应用需要此项权限</string>
+    <!--使用数据分析服务需要 IDFA 权限。如应用程序不想弹框，可以设置 TapDB.AdvertiserIDCollectionEnabled(false)-->
+    <key>NSUserTrackingUsageDescription</key>
+    <string>说明为何应用需要此项权限</string>
+</dict>
+</plist>
+```
+
+</>
 <>
-Android SDK 不需要额外增加依赖。
-</>
 
+1. [下载 TapSDK Android](/tap-download)，解压后选择需要用到的 SDK 包导入到项目 `project/app/libs` 目录下。
+
+2. 打开项目的 `project/app/build.gradle` 文件，添加 gradle 配置如下：
+
+<CodeBlock className="java"> {`dependencies {
+    ...
+    // 导入 libs 目录下所有 aar 的包：
+    implementation fileTree(dir: 'libs', include: ['*.aar'])
+    // 如果需要单独导入 libs 目录下的指定包，请按照如下方式：
+    implementation files('libs/TapCommon_${sdkVersions.taptap.android}.aar') // TapTap 基础库
+    implementation files('libs/TapLogin_${sdkVersions.taptap.android}.aar') // TapTap 登录
+}
+`}</CodeBlock>
+
+3. 在 `AndroidManifest.xml` 添加网络权限：
+
+   ```java
+   <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+   ```
+
+4. 旧版 Android 额外配置
+
+   如果 `targetSdkVersion < 29`，还需要添加如下配置：
+
+   - `manifest` 节点添加 `xmlns:tools="http://schemas.android.com/tools"`
+   - `application` 节点添加 `tools:remove="android:requestLegacyExternalStorage"`
+
+</>
 <>
-iOS SDK 不需要额外增加依赖。
-</>
 
+#### 导入 SDK
+
+1. 在 Xcode 选择工程，到 **Build Setting > Other Linker Flags** 添加 `-ObjC`。
+
+2. 下载 [TapSDK iOS](/tap-download)，解压后选择需要导入的资源文件，直接拖拽到项目目录即可。
+
+3. 视需要导入下载的资源文件：
+
+   - 必选：TapTap 启动器、基础库、登录
+
+     ```
+     TapBootstrapSDK.framework
+     TapCommonSDK.framework
+     TapLoginSDK.framework
+     LeanCloudObjc.framework
+     TapCommonResource.bundle
+     TapLoginResource.bundle
+     ```
+
+4. 请仔细核对下面依赖库是否都添加成功：
+
+   ```
+   // 必选
+   WebKit.framework
+   Security.framework
+   SystemConfiguration.framework
+   CoreTelephony.framework
+   SystemConfiguration.framework
+   libc++.tbd
+
+   // TapTap 内嵌动态
+   AVFoundation.framework
+   CoreTelephony.framework
+   MobileCoreServices.framework
+   Photos.framework
+   SystemConfiguration.framework
+   WebKit.framework
+
+   // 数据分析
+   // 如果不需要获取 IDFA 则不要添加 `AppTrackingTransparency` 和 `AdSupport` 两个系统库
+   AppTrackingTransparency.framework
+   AdSupport.framework
+   CoreMotion.framework
+   Security.framework
+   SystemConfiguration.framework
+   libresolv.tbd
+   libsqlite3.0.tbd
+   libz.tbd
+   ```
+
+#### 配置权限
+
+如果游戏使用了 TapTap [内嵌动态](/sdk/embedded-moments/features/)或[数据分析](/sdk/tapdb/features/)服务，那么需要在 `info.plist` 配置相关权限并**替换授权文案**：
+
+```xml
+<!--使用内嵌动态服务，需要相册、相机、麦克风权限-->
+<key>NSPhotoLibraryUsageDescription</key>
+<string>说明为何应用需要此项权限</string>
+<key>NSCameraUsageDescription</key>
+<string>说明为何应用需要此项权限</string>
+<key>NSMicrophoneUsageDescription</key>
+<string>说明为何应用需要此项权限</string>
+<!--使用数据分析服务需要 IDFA 权限。如应用程序不想弹框，可以设置 TapDB.AdvertiserIDCollectionEnabled(false)-->
+<key>NSUserTrackingUsageDescription</key>
+<string>说明为何应用需要此项权限</string>
+```
+
+#### 配置跳转 TapTap 应用
+
+用户无 TapTap 应用时，默认会通过 WebView 登录。
+
+1. 打开 `info.plist`，添加如下配置（请替换 `clientID` 为你在控制台获取的 Client ID）：
+
+   ![](https://capacity-files.lcfile.com/xLmohBqQCMvHMpvxps7pReT9kI8CjSGj/tap_ios_info.png)
+
+   ```xml
+   <key>CFBundleURLTypes</key>
+   <array>
+       <dict>
+           <key>CFBundleTypeRole</key>
+           <string>Editor</string>
+           <key>CFBundleURLName</key>
+           <string>taptap</string>
+           <key>CFBundleURLSchemes</key>
+           <array>
+               <!-- 这里注意下，中括号需要去掉，最终是 Client ID 前拼接上 `tt` 的形式，例如：ttFwFdCxxxxxxxQDQwQN -->
+               <string>tt[clientID]</string>
+           </array>
+       </dict>
+   </array>
+
+   <key>LSApplicationQueriesSchemes</key>
+   <array>
+     <string>tapiosdk</string>
+     <string>tapsdk</string>
+   </array>
+   ```
+
+2. 配置 openUrl：
+
+   a) 如果项目中有 `SceneDelegate.m`，请先删除，然后请添加如下代码到 `AppDelegate.m` 文件：
+
+   ```objectivec
+   - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
+     return [TDSHandleUrl handleOpenURL:url];
+   }
+
+   - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
+     return [TDSHandleUrl handleOpenURL:url];
+   }
+   ```
+
+   b) 删除 `info.plist` 里面的 Application Scene Manifest
+
+   ![](/img/tap_ios_appmanifest.png)
+
+   c) 删除 `AppDelegate.m` 文件中的两个管理 `Scenedelegate` 生命周期代理方法
+
+   ```objectivec
+   #pragma mark - UISceneSession lifecycle
+   - (UISceneConfiguration *)application:(UIApplication *)application configurationForConnectingSceneSession:(UISceneSession *)connectingSceneSession options:(UISceneConnectionOptions *)options {
+
+   return [[UISceneConfiguration alloc] initWithName:@"Default Configuration" sessionRole:connectingSceneSession.role];
+   }
+
+   - (void)application:(UIApplication *)application didDiscardSceneSessions:(NSSet<UISceneSession *> *)sceneSessions {
+   }
+   ```
+
+   d) 在 `AppDelegate.h` 中添加 `UIWindow`
+
+   ```objectivec
+   @property (strong, nonatomic) UIWindow *window;
+   ```
+
+</>
 <>
 
 #### 安装插件
@@ -156,7 +373,7 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core",
 :::info
 游戏 [**适用地区**](/sdk/start/get-ready/#适用地区) 在开启应用配置时选定。
 
-* [TapTap 开发者中心](https://developer.taptap.com/)适用地区为中国大陆。
+* [TapTap 开发者中心](https://developer.taptap.cn/)适用地区为中国大陆。
 
 * 出海游戏请前往 [**TapTap.io 开发者中心**](https://developer.taptap.io/) 开启游戏服务，适用地区为其他国家或地区。
 
@@ -361,7 +578,7 @@ catch (Exception e)
     if (e is TapException tapError)  // using TapTap.Common
     {
         Debug.Log($"encounter exception:{tapError.code} message:{tapError.message}");
-        if (tapError.code == TapErrorCode.ERROR_CODE_BIND_CANCEL) // 取消登录
+        if (tapError.code == (int)TapErrorCode.ERROR_CODE_BIND_CANCEL) // 取消登录
         {
             Debug.Log("登录取消");
         }
@@ -565,10 +782,6 @@ TapUELogin::Logout();
 ```
 
 </MultiLang>
-
-:::tip
-重要提示：在**测试登录功能前**务必完成 [配置签名证书](/sdk/start/quickstart/#配置签名证书) 和 [添加测试用户](/sdk/start/test-accounts/)，否则无法正常使用 TapTap 登录功能。
-:::
 
 ## Unity PC 登录配置
 

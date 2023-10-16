@@ -1,8 +1,8 @@
 const sdkVersions = {
   taptap: {
-    unity: "3.16.1",
-    android: "3.16.1",
-    ios: "3.16.1",
+    unity: "3.22.0",
+    android: "3.22.0",
+    ios: "3.22.0",
     rtc: "1.1.0",
   },
   leancloud: {
@@ -12,9 +12,17 @@ const sdkVersions = {
       storage: "4.13.2",
       realtime: "5.0.0-rc.7",
     },
-    java: "8.2.12",
-    csharp: "0.10.18",
+    java: "8.2.19",
+    csharp: "1.0.2",
+    flutter: {
+      storage: "0.7.10",
+      realtime: "1.0.1",
+    }
   },
+  tapadn: {
+    unity: "3.16.3.20",
+    android: "3.16.3.20",
+  }
 };
 
 export default sdkVersions;

@@ -4,6 +4,8 @@ sidebar_label: C#
 sidebar_position: 2
 ---
 
+import { Conditional } from "/src/docComponents/conditional";
+
 ## 前言
 
 多人在线对战是一款基于 C# 编写的游戏 SDK，它为有强联网需求的网络游戏提供了一整套的客户端 SDK 解决方案，因此开发团队不再需要自建服务端，从而节省大部分开发和运维成本。多人在线对战提供的主要功能如下：
@@ -20,7 +22,7 @@ sidebar_position: 2
 
 ## SDK 导入
 
-请阅读 [安装](/sdk/multiplayer/start/cs/#安装)，获取 dll 库文件。
+请阅读 [安装指南](/sdk/multiplayer/start/cs/#安装)，获取 dll 库文件。
 
 ## 初始化
 
@@ -32,10 +34,31 @@ using LeanCloud.Play;
 
 接着我们需要实例化一个在线对战 SDK 的客户端对象。
 
+<Conditional brand="leancloud">
+
 ```cs
-var client = new Client({{appid}}, {{appkey}}, userId, playServer: "https://xxx.example.com", gameVersion: "0.0.1");
+var client = new Client("your-app-id", "your-app-key", userId, playServer: "https://xxx.example.com", gameVersion: "0.0.1");
 // 请将 xxx.example.com 替换为你的应用绑定的自定义 API 域名
 ```
+
+</Conditional>
+
+<Conditional brand="tds">
+
+```cs
+var client = new Client(
+    "your-client-id",      // 游戏的 Client ID
+    "your-client-token",   // 游戏的 Client Token
+    "tarara",              // 设置用户 id
+    playServer: "https://your_server_url", // 游戏的 API 域名
+    gameVersion: "0.0.1"   // 设置游戏版本号，选填，默认 0.0.1，不同版本的玩家不会匹配到同一个房间
+);
+```
+
+- 在 **开发者中心 > 你的游戏 > 游戏服务 > 应用配置** 可以查看游戏的 `Client ID` 和 `Client Token`。
+- API 域名在 **应用配置 > 域名配置 > API** 处查看，参考文档关于[域名](/sdk/domain/guide/)的说明。
+
+</Conditional>
 
 其中，
 `userId` 作为客户端的唯一标识连接至服务器。
@@ -423,7 +446,7 @@ client.OnRoomKicked += (code, msg) => {
 };
 ```
 
-同时 MasterClient 和其他还存在房间的玩家会收到 `OnPlayerRoomLeft` 事件：
+同时除 MasterClient 之外，其他还存在房间的玩家会收到 `OnPlayerRoomLeft` 事件：
 
 ```cs
 client.OnPlayerRoomLeft += leftPlayer => {
@@ -572,7 +595,7 @@ var options = new SendEventOptions {
     // 设置事件的接收组为 Master
     ReceiverGroup = ReceiverGroup.MasterClient
     // 也可以指定接收者 actorId
-    // targetActorIds = new List<int>() { 1 },
+    // TargetActorIds = new List<int>() { 1 },
 };
 // 设置技能 Id
 var eventData = new PlayObject {
@@ -670,7 +693,22 @@ client.OnDisconnected += async () => {
 };
 ```
 
-注意：这个接口只是重新连接至服务器，如果之前在「房间内游戏」，并不会直接回到房间。如需重连并回到断线前的房间，请参考[重连并回到房间](#重连并回到房间)。
+注意：这个接口只是重新连接至服务器，如果之前在「房间内游戏」，并不会直接回到房间。
+
+**推荐**[重连后获取房间](#重连后获取房间)，再由玩家选择是否回到房间。
+
+也可以直接[重连并回到房间](#重连并回到房间)。
+
+### 重连后获取房间
+
+玩家重连后可以通过 `FetchMyRoom` 接口获取掉线前所在房间：
+
+- 如果玩家仍在房间中会返回房间 id，游戏此时可告知玩家这个状态，玩家若选择回到掉线前所在房间，调用 `RejoinRoom` 接口即可。
+- 如果玩家不在房间，或房间已被销毁，会返回 [4301](/sdk/multiplayer/error-code/#4301) 的异常，游戏再做相应处理。
+
+```cs
+string roomName = await client.FetchMyRoom();
+```
 
 ### 回到房间
 

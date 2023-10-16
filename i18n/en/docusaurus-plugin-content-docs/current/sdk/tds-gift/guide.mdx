@@ -1,0 +1,617 @@
+---
+title: Gift Packages Guide
+sidebar_label: Guide
+sidebar_position: 2
+---
+
+:::tip
+Before integrating Gift Packages into your game, please first complete setting up your game. You can obtain the **Client ID and Server Secret** of your game on **Game Services - Configuration**. This information should be kept private and shall not be shared with anyone else.
+:::
+
+## Getting Started
+
+You can only use Gift Packages with your game if your game is capable of sending requests to our server. At this time, players cannot redeem gift codes without connecting to the internet.
+
+You can use one of the following methods to complete the process of redeeming a gift code.
+
+| Method           | API                           | The game needs to verify that the player meets the conditions of claiming the gifts | The game needs to provide an interface for delivering items to the player |
+| -------------- | -------------------------------- | :----------------------------- | :----------------------- |
+| Verified by game     | /api/v1.0/cdk/game/submit-check  | ✓                              | ✓                        |
+| Requested by game    | /api/v1.0/cdk/game/submit-send   | ✗                              | ✓                        |
+| Redeeming without a server   | /api/v1.0/cdk/game/submit-simple | ✗                              | ✗                        |
+| Verified by game (used on a web page) | /api/v1.0/cdk/page/submit-check  | ✓                              | ✓                        |
+| Requested by game (used on a web page) | /api/v1.0/cdk/page/submit-send   | ✗                              | ✓                        |
+
+### Steps to Integrate Gift Packages Into Your Game
+
+- Finish setting up the game and obtain the **Client ID and Server Secret**.
+- Optional: Go to **Operational Tools - Gifts - Server Configuration** and add a server that will be used to receive notifications and deliver items to players.
+- Create gift events and export gift codes. Once you finish this step, you will be ready to test the gift codes.
+- Players redeem your gift codes and obtain the items.
+
+### Steps to Redeem a Gift Code
+
+Below are the basic steps for redeeming a gift code:
+
+1. Send the **gift code** and **configurations** to the interface for redeeming gift codes.
+2. The interface will check if the information provided is valid.
+3. The system will determine if **the game’s interface for secondary checks** needs to be invoked. (Optional; the interface is used if it is configured)
+4. If all the checks have passed, the system will determine if **the game’s interface for delivering items to players** needs to be invoked. (Optional; the interface is used if it is configured)
+
+There are three different types of interfaces for redeeming a gift code. You can integrate one of them into your game:
+
+| Name         | Description                                                                                                                                                 |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Verified by game   | Choose this flow if you plan to set up a server that connects to our system, are able to have your secrets securely stored, and wish to have your app verify if a request for redeeming a code should be allowed while having an interface provided by your game invoked to deliver the items to the player. |
+| Requested by game   | Choose this flow if you plan to set up a server that connects to our system, are able to have your secrets securely stored, and wish to have an interface provided by your game invoked to deliver the items to the player. |
+| Redeeming without a server | Choose this flow if you don’t want to build and maintain your own interface. Your game will be invoking an interface provided by our system and a value will be returned indicating whether the request succeeded. |
+
+### Three Ways for Redeeming
+
+#### Verified by Game
+
+When your game sends a request to the `submit-check` interface for redeeming a gift code, the system will check the inventory as well as whether the submitted data is valid. If everything looks good, the system will invoke the URL you provided for secondary checks with the conditions you set up on the Developer Center as arguments.
+If your interface approves the request, the system will invoke your interface for delivering items to the player with the items configured on the Developer Center.
+![Verified by game](/img/tds-gift/submit_check.png)
+
+#### Requested by Game
+
+When your game sends a request to the `submit-send` interface for redeeming a gift code, the system will check the inventory as well as whether the submitted data is valid. If everything looks good, the system will invoke your interface for delivering items to the player with the items configured on the Developer Center.
+![Requested by game](/img/tds-gift/submit_send.png)
+
+#### Redeeming Without a Server
+
+When your game sends a request to the `submit-simple` interface for redeeming a gift code, the system will check the inventory as well as whether the submitted data is valid. If everything looks good, the system will return the items configured on the Developer Center to you.
+![Redeeming without a server](/img/tds-gift/submit_simple.png)
+
+## Connecting to the Interface for Redeeming Items
+
+### Implementing Secondary Checks With Your Game
+
+If you have set up custom redeeming rules on the Developer Center and you’re redeeming a gift code with an interface that has the capability of performing secondary checks, the system will send the redeeming rules to your game for a secondary check. The configuration shown in the image below will trigger the following request to the interface you set up on the Developer Center:
+
+![Custom redeeming rules](/img/tds-gift/custom_redemption.png)
+
+```
+curl --location -g --request POST <URL_FOR_SECONDARY_CHECK> \
+--header 'Content-Type: application/json' \
+--data-raw '{"activity_id":<EVENT_ID>,"character_id":<USER_ID>,"content":"[{\"condition\":\"level\",\"operate":\"gt\",\"value\":10}]","ext":<THE_EXT_SUBMITTED>,"gift_code":<GIFT_CODE>,"nonce_str":"abcdc","server_code": <SERVER_CODE>,"sign":"42d2b58a8cd58b5e63d90524aaf63ef97e04f223","timestamp":1658825322}'
+```
+
+After verifying the request, please return a JSON containing the following fields to inform the system of the result.
+
+```json
+{
+  "status": true,
+  "errorCode": "An error code string"
+}
+```
+
+You can use snake_case as well if you wish to maintain consistency.
+
+```json
+{
+  "status": true,
+  "error_code": "An error code string"
+}
+```
+
+If you don’t need our system to know the specific error message, your interface can simply return a **non-200 HTTP code** to indicate that the redemption failed, or an **HTTP code 200** to indicate that the redemption succeeded.
+This allows your interface to respond to requests without following the format specified above.
+
+| Request parameter          | Type           | Description                 |
+| ----------------- | -------------- | -------------------- |
+| activity_id       | String         | Event ID          |
+| character_id      | String         | User ID        |
+| content           | String (JSON) | Custom redeeming rules |
+| content.condition | String         | Custom redeeming rules (condition)       |
+| content.operate   | String         | Custom redeeming rules (comparison operator)      |
+| content.value     | String         | Custom redeeming rules (value)     |
+| ext               | String         | A value provided when sending a request to the interface |
+| gift_code         | String         | The gift code entered by the user |
+| nonce_str         | String         | A random string used for this request |
+| server_code       | String         | Server code          |
+| sign              | String         | Signature                 |
+| timestamp         | Number           | Timestamp with a second precision           |
+
+| Response parameter  | Type           | Description                                            |
+| --------- | -------------- | ----------------------------------------------- |
+| errorCode | String        | Error type; same as `error_code`; if both of them exist, `errorCode` will be used |
+| ext       | String (optional) | A string passed to the interface for delivering items to the player                  |
+| status    | Boolean         | Whether the request passed the verification; `true` means yes and `false` means no         |
+
+### Delivering Items to Players
+
+After validation is completed, our system will send a request to **the game’s interface for delivering items to players** with the items configured on the Developer Center as well as the configured parameters. The configuration shown in the image below will trigger the following request to the interface you set up on the Developer Center:
+![Custom redeeming rules](/img/tds-gift/custom_prizes.png)
+
+```
+curl --location -g --request POST <URL_FOR_ITEM_DELIVERY> \
+--header 'Content-Type: application/json' \
+--data-raw '{"activity_id": <EVENT_ID>,"character_id":"uid","content":"[{\"name\": \"ITEM_NAME\", \"number\": 2}]","ext":<THE_EXT_SUBMITTED>,"gift_code":"gift_code","nonce_str":"abcdc","server_code":<SERVER_CODE>,"sign":"fbe23e6f6f5193355b29e9ea2913b1992af56346","check_ext":<RETURNED_EXT>,"timestamp":1658827492}'
+```
+
+After completing the request, please return a JSON containing the following fields to inform the system of the result. You can use snake_case as well if you wish to maintain consistency.
+
+```json
+{
+  "status": true,
+  "errorCode": "An error code string"
+}
+```
+
+If you don’t need our system to know the specific error message, your interface can simply return a **non-200 HTTP code** to indicate that the redemption failed, or an **HTTP code 200** to indicate that the redemption succeeded.
+This allows your interface to respond to requests without following the format specified above.
+
+| Request parameter       | Type           | Description                         |
+| -------------- | -------------- | ---------------------------- |
+| activity_id    | String         | Event ID                  |
+| character_id   | String         | User ID                |
+| server_code    | String         | Server code                  |
+| content        | String (JSON) | Custom items set up on the Developer Center         |
+| content.name   | String         | Item name                     |
+| content.number | Number           | Item count                     |
+| ext            | String         | A value provided when sending a request to the interface         |
+| gift_code      | String         | The gift code entered by the user         |
+| nonce_str      | String         | A random string used for this request         |
+| sign           | String         | Signature                         |
+| check_ext      | String         | The string provided by the interface that does secondary checks |
+| timestamp      | Number           | Timestamp with a second precision                   |
+
+| Response parameter  | Type   | Description                                            |
+| --------- | ------ | ----------------------------------------------- |
+| errorCode | String | Error type; same as `error_code`; if both of them exist, `errorCode` will be used |
+| status    | Boolean | Whether the request succeeded; `true` means yes and `false` means no         |
+
+### Redeeming Without a Server
+
+With this method, you don’t have to implement an interface for validating requests and delivering items yourself.
+
+If you choose to use this method, make sure to **specify that the event doesn’t need a server when creating the event on the Developer Center**.
+
+Our system will provide the redemption result upon receiving a request. Your game will then determine whether to give the items to the player depending on the result.
+
+### Three Item Delivery Interfaces
+
+#### With Secondary Check
+
+POST /api/v1.0/cdk/game/submit-check
+
+Header Content-Type:application/json
+
+Request parameters:
+
+| Request parameter     | Type   | Required | Description                                              |
+| ------------ | ------ | -------- | ------------------------------------------------- |
+| client_id    | String | Yes     | The Client ID of the game                          |
+| gift_code    | String | Yes     | The gift code entered by the user                                  |
+| server_code  | String | Yes     | Server code                             |
+| character_id | String | Yes     | User ID                                       |
+| nonce_str    | String | Yes     | A random string used for this request; it’s recommended to use 5 digits                    |
+| sign         | String | Yes     | Signature                                              |
+| timestamp    | Number   | Yes     | Timestamp with a second precision; the request will only be accepted if the timestamp is within 1 minute                  |
+| ext          | String | No   | This field will be passed to the game’s interface for secondary checks |
+
+Example request:
+
+```
+curl --location --request POST '<URL>/api/v1.0/cdk/game/submit-check' \
+--header 'Content-Type: application/json' \
+--data-raw '{"client_id":<CLIENT_ID>,"gift_code":<GIFT_CODE>,"server_code":<SERVER_CODE>,"character_id":<USER_ID>,"nonce_str":<NONCE>,"sign":<SIGNATURE>,"timestamp":<TIMESTAMP>,"ext": <THE_EXT_FIELD>}'
+```
+
+#### Without Secondary Check
+
+POST /api/v1.0/cdk/game/submit-send
+
+Header Content-Type:application/json
+
+Request parameters:
+
+| Request parameter     | Type   | Required | Description                             |
+| ------------ | ------ | -------- | -------------------------------- |
+| client_id    | String | Yes     | The Client ID of the game         |
+| gift_code    | String | Yes     | The gift code entered by the user                 |
+| server_code  | String | Yes     | Server code            |
+| character_id | String | Yes    | User ID                      |
+| nonce_str    | String | Yes     | A random string used for this request; it’s recommended to use 5 digits   |
+| sign         | String | Yes     | Signature                             |
+| timestamp    | Number   | Yes     | Timestamp with a second precision; the request will only be accepted if the timestamp is within 1 minute |
+
+Example request:
+
+```
+curl --location --request POST '<URL>/api/v1.0/cdk/game/submit-send' \
+--header 'Content-Type: application/json' \
+--data-raw '{"client_id":<CLIENT_ID>,"gift_code":<GIFT_CODE>,"server_code":<SERVER_CODE>,"character_id":<USER_ID>,"nonce_str":<NONCE>,"sign":<SIGNATURE>,"timestamp":<TIMESTAMP>,"ext": <THE_EXT_FIELD>}'
+```
+
+#### Redeeming Without a Server
+
+POST /api/v1.0/cdk/game/submit-simple
+
+Header Content-Type:application/json
+
+Request parameters:
+
+| Request parameter     | Type   | Required | Description                                |
+| ------------ | ------ | -------- | ----------------------------------- |
+| client_id    | String | Yes     | The Client ID of the game            |
+| gift_code    | String | Yes     | The gift code entered by the user                    |
+| character_id | String | Yes     | User ID                         |
+| nonce_str    | String | Yes     | A random string used for this request; it’s recommended to use 5 digits      |
+| sign         | String | Yes     | Signature; use the Client ID instead of the Secret for generating this signature |
+
+Response parameters:
+
+| Response parameter       | Type           | Description                             |
+| -------------- | -------------- | -------------------------------- |
+| activity_id    | String         | Event ID                     |
+| nonce_str      | String         | A random string                       |
+| timestamp      | String         | Timestamp                           |
+| content        | String (JSON) | Custom items configured on the Developer Center             |
+| content.name   | String         | Item name                         |
+| content.number | Number           | Item count                         |
+| sign           | String         | Returned signature used to check if the returned data has been tampered |
+| success        | Boolean           | Whether the request succeeded                         |
+
+Example request:
+
+```
+curl --location --request POST '<URL>/api/v1.0/cdk/game/submit-simple' \
+--header 'Content-Type: application/json' \
+--data-raw '{"client_id":<CLIENT_ID>,"gift_code":<GIFT_CODE>,"character_id":<USER_ID>,"nonce_str":<NONCE>,"sign":<SIGNATURE>,"timestamp":<TIMESTAMP>}'
+```
+<details>
+<summary>Shell Request example：</summary>
+
+```
+#! /usr/bin/env bash
+
+# TapDC Background application Client ID
+client_id="Replace with console's `Client ID`"
+# The conversion code of this exchange can be found in the "Package Activity panel - Data - Export" and then the exported file in the format of S0LLC8ICB2MP2
+gift_code="Replace with the redemption code in the package panel"
+
+# A random character string. Five random characters are recommended
+nonce_str="A2B3Z"
+# Game user ID
+character_id="6347de128b****3ee825e029"
+# Signature, which replaces Secret with ClientId
+signed=$(echo -n $(date +%s)$nonce_str$client_id |openssl sha1)
+RESULT_REQUEST=`curl --location --request POST 'https://poster-api.xd.cn/api/v1.0/cdk/game/submit-simple' \
+--header 'Content-Type: application/json' \
+--data-raw "{\"client_id\":\"$client_id\",\"gift_code\":\"$gift_code\",\"character_id\":\"$character_id\",\"nonce_str\":\"$nonce_str\",\"sign\":\"$signed\",\"timestamp\":$(date +%s)}"`
+
+echo $RESULT_REQUEST
+```
+
+</details>
+
+<details>
+<summary>Android Request example：</summary>
+
+available for reference[ Android Demo ](https://github.com/taptap/TapSDK-Android-Demo/blob/main/app/src/main/java/com/tds/demo/fragment/GiftFragment.java) Gift package system function
+
+</details>
+
+<details>
+<summary>C# Request example：</summary>
+
+```
+using UnityEngine.Networking;
+using System;
+using System.Text;
+using System.Security.Cryptography;
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class APIClient : MonoBehaviour
+{
+    private const string apiUrl = "https://poster-api.xd.cn/api/v1.0/cdk/game/submit-simple";
+    private const string contentType = "application/json";
+    private const string clientId = "hskcocvse6x1cgkklm";
+    private const string giftCode = "NZ4mp2cztRMXH";
+    private const string characterId = "879a0cdd9nnb917055ee";
+    private const string nonceStr = "RFG7U";
+
+    public GUISkin demoSkin;
+
+
+    void Start()
+    {
+
+    }
+
+
+     private void OnGUI()
+    {
+
+        GUI.skin = demoSkin;
+        float scale = 1.0f;
+
+        
+        float btnWidth= Screen.width / 5 * 2;
+        float btnWidth2 = btnWidth + 80 * scale;
+
+        float btnHeight = Screen.height / 25;
+        float btnTop = 30 * scale;
+        float btnGap = 20 * scale;
+
+        GUI.skin.button.fontSize = Convert.ToInt32(13 * scale);
+
+        var style = new GUIStyle(GUI.skin.button) { fontSize = 20 };
+        var labelStyle = new GUIStyle(GUI.skin.label) { fontSize = 30 };
+
+        if (GUI.Button(new Rect((Screen.width - btnGap) / 2 - btnWidth, btnTop, btnWidth /2, btnHeight), "返回", style))
+        {
+            UnityEngine.SceneManagement.SceneManager.LoadSceneAsync(0);
+
+        }
+
+        btnTop += btnHeight + 20 * scale;
+
+        if (GUI.Button(new Rect((Screen.width - btnGap) / 2 - btnWidth, btnTop, btnWidth, btnHeight), "无服务器兑换", style))
+        {
+             StartCoroutine(StartRequest());
+        }
+
+
+    }
+
+    private IEnumerator StartRequest()
+    {
+        // Get the current timestamp (seconds)
+        int timestamp = (int)(System.DateTime.UtcNow.Subtract(new System.DateTime(1970, 1, 1))).TotalSeconds;
+
+        // Concatenate and encrypt the sign parameter
+        string sign = GetSign(timestamp, nonceStr, clientId);
+
+        // Build request parameter
+        string requestBody = "{\"client_id\":\"" + clientId + "\",\"gift_code\":\"" + giftCode + "\",\"character_id\":\"" + characterId + "\",\"nonce_str\":\"" + nonceStr + "\",\"timestamp\":" + timestamp + ",\"sign\":\"" + sign + "\"}";
+
+        // Create the UnityWebRequest object
+        UnityWebRequest request = new UnityWebRequest(apiUrl, "POST");
+
+        // Set request header
+        request.SetRequestHeader("Content-Type", contentType);
+
+        // Set request body
+        byte[] bodyRaw = Encoding.UTF8.GetBytes(requestBody);
+        request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+        request.downloadHandler = new DownloadHandlerBuffer();
+
+        // send request
+        yield return request.SendWebRequest();
+
+        // Processing response
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            Debug.Log("API request succeeded");
+            Debug.Log(request.downloadHandler.text);
+        }
+        else
+        {
+
+            Debug.Log("API request failed: " + request.error);
+            Debug.Log(request.downloadHandler.text);
+
+        }
+    }
+
+    private string GetSign(int timestamp, string nonceStr, string clientId)
+    {
+        // Concatenate parameters and perform SHA1 encryption
+        string signString = timestamp.ToString() + nonceStr + clientId;
+        byte[] signBytes = Encoding.UTF8.GetBytes(signString);
+        byte[] signHash = new SHA1CryptoServiceProvider().ComputeHash(signBytes);
+        string sign = BitConverter.ToString(signHash).Replace("-", "").ToLowerInvariant();
+
+        return sign;
+    }
+}
+
+
+```
+
+</details>
+
+
+Example response:
+
+```json
+{
+  "activity_id": "TDS20220928151122U9H",
+  "content": "[{\"name\": \"ITEM\", \"number\": 2}]",
+  "nonce_str": "0DD4B",
+  "sign": "5895f87d3dfb5e0918c1b195c015d9284609d122",
+  "timestamp": 1664354023,
+  "success": true
+}
+```
+
+#### Response
+
+If succeeded:
+
+```json
+{
+  "success": true,
+  "messages": "Success"
+}
+```
+
+If failed:
+
+| Response parameter         | Description         |
+| ---------------- | ------------ |
+| error            | Error code       |
+| message          | Summary of the error |
+| info             | Error detail     |
+| info.dev_message | Brief instructions for the developer     |
+| info.hint        | Detailed instructions     |
+
+```json
+{
+  "error": 100001,
+  "message": "Invalid input",
+  "info": {
+    "dev_message": "",
+    "hint": "test error"
+  }
+}
+```
+
+### Request Domain
+
+| TapTap edition     | Domain                      |
+| --------------- | ------------------------- |
+| China (taptap.cn) | https://poster-api.xd.cn  |
+| Other countries and regions (taptap.io)  | https://poster-api.xd.com |
+
+### Signature
+
+For security reasons, when your game communicates with our system, it needs to provide a signature in each request. **The “Secret” mentioned below refers to the Server Secret found on Game Services > Configuration on the Developer Center**.
+
+:::tip
+To ensure the highest security, please never use the Server Secret of your game on the client side.
+:::
+
+Pseudo-code for obtaining a signature:
+
+```
+sign == sha1(timestamp + nonce_str + secret)
+```
+
+You can check if the process of obtaining signatures is implemented correctly with the help of unit testing. The code below is an example in golang:
+
+```go
+func TestMakeSign(t *testing.T) {
+    timestamp := 1655724586
+    nonceStr := "abcde"
+    secret := "abc"
+    sign := MakeSign(int64(timestamp), nonceStr, secret)
+    assert.Equal(t, sign, "3cb8c38833fa742e7873378faddcbe5b56088482")
+    //output: 3cb8c38833fa742e7873378faddcbe5b56088482
+}
+```
+
+To ensure that the Secret never appears on the client side, when redeeming without a server, the signature can be generated **with the Client ID instead of the Secret**.
+
+```
+sign == sha1(timestamp + nonce_str + client_id)
+```
+
+### Using the Redemption Interface on a Web Page
+
+Our system provides a simple interface for redeeming gift codes that supports CAPTCHA. If you have a web page for your event, you can embed this interface into the web page. This interface shares the same flow as those introduced earlier. The only difference is that some of the parameters have been changed.
+
+#### Getting a CAPTCHA
+
+:::tip
+Each CAPTCHA is only valid for 5 minutes. You can request a new CAPTCHA if one expires.
+:::
+
+GET /api/v1.0/cdk/page/captcha-img
+
+Header Content-Type:application/json
+
+| Response parameter | Description                             |
+| -------- | -------------------------------- |
+| img      | The CAPTCHA image in base64            |
+| key      | The key of the CAPTCHA; needs to be submitted together with the user input |
+
+Example response:
+
+```json
+{
+  "img": "data:image/png;base64,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",
+  "key": "XfNTN1gQyvA2AcNOu1UN"
+}
+```
+
+#### Using a Web Page With Secondary Checks
+
+POST /api/v1.0/cdk/page/submit-check
+
+Header Content-Type:application/json
+
+Request parameters:
+
+
+| Request parameter            | Type   | Required | Description                                              |
+| ------------------- | ------ | -------- | ------------------------------------------------- |
+| client_id           | String | Yes     | The Client ID of the game                          |
+| gift_code           | String | Yes     | The gift code entered by the user                                  |
+| server_code         | String | Yes     | Server code                             |
+| character_id        | String | Yes     | User ID                                       |
+| nonce_str           | String | Yes     | A random string used for this request; it’s recommended to use 5 digits                    |
+| verify_captcha_key  | String | Yes     | The key of the CAPTCHA                                       |
+| verify_captcha_code | String | Yes     | The CAPTCHA code entered by the user                              |
+| ext                 | String | No   | This field will be passed to the game’s interface for secondary checks |
+
+#### Using a Web Page Without Secondary Checks
+
+POST /api/v1.0/cdk/page/submit-send
+
+Header Content-Type:application/json
+
+Request parameters:
+
+| Request parameter            | Type   | Required | Description                           |
+| ------------------- | ------ | -------- | ------------------------------ |
+| client_id           | String | Yes     | The Client ID of the game       |
+| gift_code           | String | Yes     | The gift code entered by the user               |
+| server_code         | String | Yes     | Server code          |
+| character_id        | String | Yes     | User ID                    |
+| nonce_str           | String | Yes     | A random string used for this request; it’s recommended to use 5 digits |
+| verify_captcha_key  | String | Yes     | The key of the CAPTCHA                     |
+| verify_captcha_code | String | Yes     | The CAPTCHA code entered by the user           |
+
+## Miscellaneous
+
+### Error Codes
+
+| Error code | Description                                           |
+| ------------ | ---------------------------------------------- |
+| 100001       | Invalid input                                       |
+| 100002       | Invalid account                                   |
+| 100003       | Other error                                       |
+| 100004       | Wrong CAPTCHA                         |
+| 100005       | Parameter error                                       |
+| 100006       | Quota exceeded                                   |
+| 100007       | Batch quota exceeded                               |
+| 100008       | The event hasn’t started yet or has already ended                       |
+| 100009       | Not open yet                                       |
+| 100010       | Out of scope                                 |
+| 100011       | Too many requests                           |
+| 100012       | The user redeemed the same gift too many times                           |
+| 100013       | Invalid CDKEY                              |
+| 100014       | The server is responding slower than usual |
+| 100015       | Failed to deliver the items                                   |
+| 100016       | Invalid gift code                                   |
+| 100017       | Invalid event                               |
+| 100018       | Incorrect interface used for the current event                       |
+| 500001       | Server error                                     |
+| 500002       | Failed to validate with an internal interface                               |
+
+### Comparison Operators
+
+| Comparison operator code | Description     |
+| --------- | -------- |
+| lt        | Less than    |
+| le        | Less than or equal to |
+| eq        | Equal to     |
+| ne        | Not equal to   |
+| ge        | Greater than or equal to |
+| gt        | Greater than     |
+
+### IP Addresses of the System
+
+If your interface can only accept a limited number of IP addresses, please add the IP address listed below.
+
+| TapTap edition     | IP            |
+| --------------- | ------------- |
+| China (taptap.cn) | 59.110.228.98 |
+| Other countries and regions (taptap.io)  | 8.214.95.148  |

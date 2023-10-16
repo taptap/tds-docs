@@ -5,6 +5,7 @@ sidebar_position: 2
 ---
 
 import MultiLang from '/src/docComponents/MultiLang';
+import Mermaid from "/src/docComponents/Mermaid";
 
 
 本文介绍了如何在 iOS 设备中使用推送通知功能。建议先阅读[推送通知总览](/sdk/push/guide/overview/)了解相关概念。
@@ -17,39 +18,53 @@ import MultiLang from '/src/docComponents/MultiLang';
 
 首先，注册 APNs 申请 Token，并将其保存到云端：
 
-![注册 APNs 申请 Token](/img/apns-registration.svg)
+<Mermaid
+  diagram={`
+sequenceDiagram
+iOS SDK->>APNs: 1. 调用官方 API，申请 deviceToken
+APNs-->>iOS SDK: 2. 下发 deviceToken
+iOS SDK-->>云端: 3. SDK 将 deviceToken 存储在云端 _Installation 表中
+`}
+/>
 
 然后，调用推送通知提供的接口发送推送消息：
 
-![调用推送通知接口发推送](/img/push-workflow-ios.svg)
+<Mermaid
+  diagram={`
+sequenceDiagram
+开发者->>云端: 1. HTTPS 请求推送 API
+云端-->>APNs: 2. 找出 _Installation 记录中对应的 deviceToken，调用 APNs API 发送推送
+APNs->>iOS 设备: 3. 发送推送
+`}
+/>
 
 ## Installation
 
-Installation 是 LCObject 的子类，使用 Installation 对象来保存推送所需的 token 以及其它数据。
+Installation 是 LCObject 的子类，使用 Installation 对象来保存推送所需的 token 以及其他数据。
 
 SDK 提供默认的 Installation 对象，并**会在默认对象保存成功后持久缓存其数据**。一般情况下，使用默认对象保存 device token。默认对象的获取方式如下：
 
 <MultiLang kind="ios">
 
-```swift
-let installation = LCApplication.default.currentInstallation
-```
-
 ```objc
 LCInstallation *installation = [LCInstallation defaultInstallation];
 ```
 
+```swift
+let installation = LCApplication.default.currentInstallation
+```
+
 </MultiLang>
 
-除了默认的 Installation 对象，你也可以构造新的 Installation 对象，用来存储其它特殊类型的 token（诸如 VoIP 等），构造方式如下：
+除了默认的 Installation 对象，你也可以构造新的 Installation 对象，用来存储其他特殊类型的 token（诸如 VoIP 等），构造方式如下：
 
 <MultiLang kind="ios">
 
-```swift
-let installation = LCInstallation()
-```
 ```objc
 LCInstallation *installation = [[LCInstallation alloc] init];
+```
+```swift
+let installation = LCInstallation()
 ```
 
 </MultiLang>
@@ -71,10 +86,45 @@ timeZone|String|设备所处时区，SDK 会自动设置该属性，一般情况
 
 ### 注册 APNs 获取 Token
 
-在保存 installation 前，要先注册 APNs 来获取推送所需的 token，以 User Notification 为例，具体步骤如下：
+在保存 Installation 前，要先注册 APNs 来获取推送所需的 token，以 User Notification 为例，具体步骤如下：
 
 <MultiLang kind="ios">
 
+```objc
+#import <LeanCloudObjc/Foundation.h>
+#import <UserNotifications/UserNotifications.h>
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    
+    // 首先需要初始化应用
+    [LCApplication setApplicationId:{{appid}}
+                          clientKey:{{appkey}}
+                    serverURLString:"https://please-replace-with-your-customized.domain.com"];
+
+    [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
+        switch ([settings authorizationStatus]) {
+            case UNAuthorizationStatusAuthorized:
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [[UIApplication sharedApplication] registerForRemoteNotifications];
+                });
+                break;
+            case UNAuthorizationStatusNotDetermined:
+                [[UNUserNotificationCenter currentNotificationCenter] requestAuthorizationWithOptions:(UNAuthorizationOptionBadge | UNAuthorizationOptionSound | UNAuthorizationOptionAlert) completionHandler:^(BOOL granted, NSError * _Nullable error) {
+                    if (granted) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [[UIApplication sharedApplication] registerForRemoteNotifications];
+                        });
+                    }
+                }];
+                break;
+            default:
+                break;
+        }
+    }];
+    
+    return YES;
+}
+```
 ```swift
 import LeanCloud
 import UserNotifications
@@ -115,41 +165,6 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
     return true
 }
 ```
-```objc
-#import <LeanCloudObjc/Foundation.h>
-#import <UserNotifications/UserNotifications.h>
-
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-    
-    // 首先需要初始化应用
-    [LCApplication setApplicationId:{{appid}}
-                          clientKey:{{appkey}}
-                    serverURLString:"https://please-replace-with-your-customized.domain.com"];
-
-    [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
-        switch ([settings authorizationStatus]) {
-            case UNAuthorizationStatusAuthorized:
-                dispatch_async(dispatch_get_main_queue(), ^{
-                    [[UIApplication sharedApplication] registerForRemoteNotifications];
-                });
-                break;
-            case UNAuthorizationStatusNotDetermined:
-                [[UNUserNotificationCenter currentNotificationCenter] requestAuthorizationWithOptions:(UNAuthorizationOptionBadge | UNAuthorizationOptionSound | UNAuthorizationOptionAlert) completionHandler:^(BOOL granted, NSError * _Nullable error) {
-                    if (granted) {
-                        dispatch_async(dispatch_get_main_queue(), ^{
-                            [[UIApplication sharedApplication] registerForRemoteNotifications];
-                        });
-                    }
-                }];
-                break;
-            default:
-                break;
-        }
-    }];
-    
-    return YES;
-}
-```
 
 </MultiLang>
 
@@ -159,6 +174,20 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
 
 <MultiLang kind="ios">
 
+```objc
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+
+    [[LCInstallation defaultInstallation] setDeviceTokenFromData:deviceToken
+                                                          teamId:@"YOUR_APNS_TEAM_ID"];
+    [[LCInstallation defaultInstallation] saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+        if (succeeded) {
+            // save succeeded
+        } else if (error) {
+            NSLog(@"%@", error);
+        }
+    }];
+}
+```
 ```swift
 func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
     
@@ -173,20 +202,6 @@ func application(_ application: UIApplication, didRegisterForRemoteNotifications
             print(error)
         }
     }
-}
-```
-```objc
-- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
-
-    [[LCInstallation defaultInstallation] setDeviceTokenFromData:deviceToken
-                                                          teamId:@"YOUR_APNS_TEAM_ID"];
-    [[LCInstallation defaultInstallation] saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-        if (succeeded) {
-            // save succeeded
-        } else if (error) {
-            NSLog(@"%@", error);
-        }
-    }];
 }
 ```
 
@@ -223,6 +238,9 @@ iOS 应用的推送环境有**测试**和**生产**两种。
 
 <MultiLang kind="ios">
 
+```objc
+[LCPush setProductionMode:false];
+```
 ```swift
 do {
     let environment: LCApplication.Environment = [.pushDevelopment]
@@ -236,9 +254,6 @@ do {
 } catch {
     print(error)
 }
-```
-```objc
-[LCPush setProductionMode:false];
 ```
 
 </MultiLang>
@@ -260,6 +275,11 @@ iOS 应用所处的推送环境完全由 App 的分发方式决定。
 
 <MultiLang kind="ios">
 
+```objc
+LCInstallation *currentInstallation = [LCInstallation defaultInstallation];
+[currentInstallation addUniqueObject:@"Giants" forKey:@"channels"];
+[currentInstallation saveInBackground];
+```
 ```swift
 do {
     try LCApplication.default.currentInstallation.append("channels", element: "Giants", unique: true)
@@ -275,11 +295,6 @@ do {
     print(error)
 }
 ```
-```objc
-LCInstallation *currentInstallation = [LCInstallation defaultInstallation];
-[currentInstallation addUniqueObject:@"Giants" forKey:@"channels"];
-[currentInstallation saveInBackground];
-```
 
 </MultiLang>
 
@@ -289,6 +304,11 @@ LCInstallation *currentInstallation = [LCInstallation defaultInstallation];
 
 <MultiLang kind="ios">
 
+```objc
+LCInstallation *currentInstallation = [LCInstallation defaultInstallation];
+[currentInstallation removeObject:@"Giants" forKey:@"channels"];
+[currentInstallation saveInBackground];
+```
 ```swift
 do {
     try LCApplication.default.currentInstallation.remove("channels", element: "Giants")
@@ -304,11 +324,6 @@ do {
     print(error)
 }
 ```
-```objc
-LCInstallation *currentInstallation = [LCInstallation defaultInstallation];
-[currentInstallation removeObject:@"Giants" forKey:@"channels"];
-[currentInstallation saveInBackground];
-```
 
 </MultiLang>
 
@@ -316,11 +331,11 @@ LCInstallation *currentInstallation = [LCInstallation defaultInstallation];
 
 <MultiLang kind="ios">
 
-```swift
-let subscribedChannels: LCArray? = LCApplication.default.currentInstallation.channels
-```
 ```objc
 NSArray *subscribedChannels = [LCInstallation defaultInstallation].channels;
+```
+```swift
+let subscribedChannels: LCArray? = LCApplication.default.currentInstallation.channels
 ```
 
 </MultiLang>
@@ -331,6 +346,13 @@ NSArray *subscribedChannels = [LCInstallation defaultInstallation].channels;
 
 <MultiLang kind="ios">
 
+```objc
+// Send a notification to all devices subscribed to the "Giants" channel.
+LCPush *push = [[LCPush alloc] init];
+[push setChannel:@"Giants"];
+[push setMessage:@"Giants 太牛掰了"];
+[push sendPushInBackground];
+```
 ```swift
 let messageData: [String: Any] = [
     "alert": "Giants 太牛掰了"
@@ -347,20 +369,22 @@ LCPush.send(data: messageData, channels: channels) { (result) in
     }
 }
 ```
-```objc
-// Send a notification to all devices subscribed to the "Giants" channel.
-LCPush *push = [[LCPush alloc] init];
-[push setChannel:@"Giants"];
-[push setMessage:@"Giants 太牛掰了"];
-[push sendPushInBackground];
-```
 
 </MultiLang>
 
-如果你想发送到多个频道，可以指定 channels 数组：
+如果你想发送到多个频道，可以指定 `channels` 数组：
 
 <MultiLang kind="ios">
 
+```objc
+NSArray *channels = [NSArray arrayWithObjects:@"Giants", @"Mets", nil];
+LCPush *push = [[LCPush alloc] init];
+
+// Be sure to use the plural 'setChannels'.
+[push setChannels:channels];
+[push setMessage:@"The Giants won against the Mets 2-3."];
+[push sendPushInBackground];
+```
 ```swift
 let messageData: [String: Any] = [
     "alert": "The Giants won against the Mets 2-3."
@@ -377,15 +401,6 @@ LCPush.send(data: messageData, channels: channels) { (result) in
     }
 }
 ```
-```objc
-NSArray *channels = [NSArray arrayWithObjects:@"Giants", @"Mets", nil];
-LCPush *push = [[LCPush alloc] init];
-
-// Be sure to use the plural 'setChannels'.
-[push setChannels:channels];
-[push setMessage:@"The Giants won against the Mets 2-3."];
-[push sendPushInBackground];
-```
 
 </MultiLang>
 
@@ -401,6 +416,15 @@ LCPush *push = [[LCPush alloc] init];
 
 <MultiLang kind="ios">
 
+```objc
+// Store app language and version
+LCInstallation *installation = [LCInstallation defaultInstallation];
+
+[installation setObject:@(YES) forKey:@"scores"];
+[installation setObject:@(YES) forKey:@"gameResults"];
+[installation setObject:@(YES) forKey:@"injuryReports"];
+[installation saveInBackground];
+```
 ```swift
 do {
     let currentInstallation = LCApplication.default.currentInstallation
@@ -421,15 +445,6 @@ do {
     print(error)
 }
 ```
-```objc
-// Store app language and version
-LCInstallation *installation = [LCInstallation defaultInstallation];
-
-[installation setObject:@(YES) forKey:@"scores"];
-[installation setObject:@(YES) forKey:@"gameResults"];
-[installation setObject:@(YES) forKey:@"injuryReports"];
-[installation saveInBackground];
-```
 
 </MultiLang>
 
@@ -437,6 +452,12 @@ LCInstallation *installation = [LCInstallation defaultInstallation];
 
 <MultiLang kind="ios">
 
+```objc
+// Saving the device's owner
+LCInstallation *installation = [LCInstallation defaultInstallation];
+[installation setObject:[LCUser currentUser] forKey:@"owner"];
+[installation saveInBackground];
+```
 ```swift
 do {
     let currentInstallation = LCApplication.default.currentInstallation
@@ -457,12 +478,6 @@ do {
     print(error)
 }
 ```
-```objc
-// Saving the device's owner
-LCInstallation *installation = [LCInstallation defaultInstallation];
-[installation setObject:[LCUser currentUser] forKey:@"owner"];
-[installation saveInBackground];
-```
 
 </MultiLang>
 
@@ -472,6 +487,17 @@ LCInstallation *installation = [LCInstallation defaultInstallation];
 
 <MultiLang kind="ios">
 
+```objc
+// Create our Installation query
+LCQuery *pushQuery = [LCInstallation query];
+[pushQuery whereKey:@"injuryReports" equalTo:@(YES)];
+
+// Send push notification to query
+LCPush *push = [[LCPush alloc] init];
+[push setQuery:pushQuery]; // Set our Installation query
+[push setMessage:@"Willie Hayes injured by own pop fly."];
+[push sendPushInBackground];
+```
 ```swift
 let query = LCQuery(className: "_Installation")
 query.whereKey("injuryReports", .equalTo(true))
@@ -489,17 +515,6 @@ LCPush.send(data: messageData, query: query) { (result) in
     }
 }
 ```
-```objc
-// Create our Installation query
-LCQuery *pushQuery = [LCInstallation query];
-[pushQuery whereKey:@"injuryReports" equalTo:@(YES)];
-
-// Send push notification to query
-LCPush *push = [[LCPush alloc] init];
-[push setQuery:pushQuery]; // Set our Installation query
-[push setMessage:@"Willie Hayes injured by own pop fly."];
-[push sendPushInBackground];
-```
 
 </MultiLang>
 
@@ -507,6 +522,18 @@ LCPush *push = [[LCPush alloc] init];
 
 <MultiLang kind="ios">
 
+```objc
+// Create our Installation query
+LCQuery *pushQuery = [LCInstallation query];
+[pushQuery whereKey:@"channels" equalTo:@"Giants"]; // Set channel
+[pushQuery whereKey:@"scores" equalTo:@(YES)];
+
+// Send push notification to query
+LCPush *push = [[LCPush alloc] init];
+[push setQuery:pushQuery];
+[push setMessage:@"Giants scored against the A's! It's now 2-2."];
+[push sendPushInBackground];
+```
 ```swift
 let query = LCQuery(className: "_Installation")
 query.whereKey("channels", .equalTo("Giants"))
@@ -525,18 +552,6 @@ LCPush.send(data: messageData, query: query) { (result) in
     }
 }
 ```
-```objc
-// Create our Installation query
-LCQuery *pushQuery = [LCInstallation query];
-[pushQuery whereKey:@"channels" equalTo:@"Giants"]; // Set channel
-[pushQuery whereKey:@"scores" equalTo:@(YES)];
-
-// Send push notification to query
-LCPush *push = [[LCPush alloc] init];
-[push setQuery:pushQuery];
-[push setMessage:@"Giants scored against the A's! It's now 2-2."];
-[push sendPushInBackground];
-```
 
 </MultiLang>
 
@@ -544,6 +559,23 @@ LCPush *push = [[LCPush alloc] init];
 
 <MultiLang kind="ios">
 
+```objc
+// Find users near a given location
+LCQuery *userQuery = [LCUser query];
+[userQuery whereKey:@"location"
+        nearGeoPoint:beijingUniversityLocation,
+         withinMiles:[NSNumber numberWithInt:1]]
+
+// Find devices associated with these users
+LCQuery *pushQuery = [LCInstallation query];
+[pushQuery whereKey:@"user" matchesQuery:userQuery];
+
+// Send push notification to query
+LCPush *push = [[LCPush alloc] init];
+[push setQuery:pushQuery]; // Set our Installation query
+[push setMessage:@"Free hotdogs at the Tarara concession stand!"];
+[push sendPushInBackground];
+```
 ```swift
 let beijingUniversityLocation = LCGeoPoint(latitude: 39.9869, longitude: 116.3059)
     
@@ -566,23 +598,6 @@ LCPush.send(data: messageData, query: pushQuery) { (result) in
     }
 }
 ```
-```objc
-// Find users near a given location
-LCQuery *userQuery = [LCUser query];
-[userQuery whereKey:@"location"
-        nearGeoPoint:beijingUniversityLocation,
-         withinMiles:[NSNumber numberWithInt:1]]
-
-// Find devices associated with these users
-LCQuery *pushQuery = [LCInstallation query];
-[pushQuery whereKey:@"user" matchesQuery:userQuery];
-
-// Send push notification to query
-LCPush *push = [[LCPush alloc] init];
-[push setQuery:pushQuery]; // Set our Installation query
-[push setMessage:@"Free hotdogs at the Tarara concession stand!"];
-[push sendPushInBackground];
-```
 
 </MultiLang>
 
@@ -596,7 +611,7 @@ LCPush *push = [[LCPush alloc] init];
 
 保留字段|说明
 ---|---
-`alert`|推送消息的文本内容
+`alert`|推送消息的文本内容。
 `badge`|应用图标右上角的数字。可以设置一个值或者递增当前值。
 `sound`|应用 bundle 里的声音文件名称。
 `content-available`|如果使用了 Newsstand，设置为 1 来开始一次后台下载。
@@ -607,6 +622,17 @@ LCPush *push = [[LCPush alloc] init];
 
 <MultiLang kind="ios">
 
+```objc
+NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:
+    @"The Mets scored! The game is now tied 1-1!", @"alert",
+    @"Increment", @"badge",
+    @"cheering.caf", @"sound",
+    nil];
+LCPush *push = [[LCPush alloc] init];
+[push setChannels:[NSArray arrayWithObjects:@"Mets", nil]];
+[push setData:data];
+[push sendPushInBackground];
+```
 ```swift
 let channels: [String] = ["Mets"]
 
@@ -625,17 +651,6 @@ LCPush.send(data: messageData, channels: channels) { (result) in
     }
 }
 ```
-```objc
-NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:
-    @"The Mets scored! The game is now tied 1-1!", @"alert",
-    @"Increment", @"badge",
-    @"cheering.caf", @"sound",
-    nil];
-LCPush *push = [[LCPush alloc] init];
-[push setChannels:[NSArray arrayWithObjects:@"Mets", nil]];
-[push setData:data];
-[push sendPushInBackground];
-```
 
 </MultiLang>
 
@@ -643,6 +658,17 @@ LCPush *push = [[LCPush alloc] init];
 
 <MultiLang kind="ios">
 
+```objc
+NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:
+    @"Ricky Vaughn was injured in last night's game!", @"alert",
+    @"Vaughn", @"name",
+    @"Man bites dog", @"newsItem",
+    nil];
+LCPush *push = [[LCPush alloc] init];
+[push setChannel:@"Indians"];
+[push setData:data];
+[push sendPushInBackground];
+```
 ```swift
 let channels: [String] = ["Indians"]
 
@@ -661,17 +687,6 @@ LCPush.send(data: messageData, channels: channels) { (result) in
     }
 }
 ```
-```objc
-NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:
-    @"Ricky Vaughn was injured in last night's game!", @"alert",
-    @"Vaughn", @"name",
-    @"Man bites dog", @"newsItem",
-    nil];
-LCPush *push = [[LCPush alloc] init];
-[push setChannel:@"Indians"];
-[push setData:data];
-[push sendPushInBackground];
-```
 
 </MultiLang>
 
@@ -683,6 +698,21 @@ LCPush *push = [[LCPush alloc] init];
 
 <MultiLang kind="ios">
 
+```objc
+NSDateComponents *comps = [[NSDateComponents alloc] init];
+[comps setYear:2013];
+[comps setMonth:10];
+[comps setDay:12];
+NSCalendar *gregorian =
+  [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+NSDate *date = [gregorian dateFromComponents:comps];
+
+// Send push notification with expiration date
+LCPush *push = [[LCPush alloc] init];
+[push expireAtDate:date];
+[push setMessage:@"Season tickets on sale until October 12th"];
+[push sendPushInBackground];
+```
 ```swift
 let expirationDate = Date(timeIntervalSinceNow: 600)
 
@@ -699,21 +729,6 @@ LCPush.send(data: messageData, expirationDate: expirationDate) { (result) in
     }
 }
 ```
-```objc
-NSDateComponents *comps = [[NSDateComponents alloc] init];
-[comps setYear:2013];
-[comps setMonth:10];
-[comps setDay:12];
-NSCalendar *gregorian =
-  [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
-NSDate *date = [gregorian dateFromComponents:comps];
-
-// Send push notification with expiration date
-LCPush *push = [[LCPush alloc] init];
-[push expireAtDate:date];
-[push setMessage:@"Season tickets on sale until October 12th"];
-[push sendPushInBackground];
-```
 
 </MultiLang>
 
@@ -721,6 +736,14 @@ LCPush *push = [[LCPush alloc] init];
 
 <MultiLang kind="ios">
 
+```objc
+NSTimeInterval interval = 60*60*24*7; // 1 week
+
+LCPush *push = [[LCPush alloc] init];
+[push expireAfterTimeInterval:interval];
+[push setMessage:@"Season tickets on sale until October 18th"];
+[push sendPushInBackground];
+```
 ```swift
 let expirationInterval: TimeInterval = 60*60*24*7
 
@@ -737,14 +760,6 @@ LCPush.send(data: messageData, expirationInterval: expirationInterval) { (result
     }
 }
 ```
-```objc
-NSTimeInterval interval = 60*60*24*7; // 1 week
-
-LCPush *push = [[LCPush alloc] init];
-[push expireAfterTimeInterval:interval];
-[push setMessage:@"Season tickets on sale until October 18th"];
-[push sendPushInBackground];
-```
 
 </MultiLang>
 
@@ -756,20 +771,6 @@ LCPush *push = [[LCPush alloc] init];
 
 <MultiLang kind="ios">
 
-```swift
-let pushDate = Date(timeIntervalSinceNow: 6000)
-let messageData: [String: Any] = [
-    "alert": "Push this notification at a later time."
-]
-LCPush.send(data: messageData, pushDate: pushDate) { (result) in
-    switch result {
-    case .success:
-        break
-    case .failure(error: let error):
-        print(error)
-    }
-}
-```
 ```objc
 NSDateComponents *comps = [[NSDateComponents alloc] init];
 [comps setYear:2013];
@@ -784,6 +785,20 @@ LCPush *push = [[LCPush alloc] init];
 [push setMessage:@"Push this notification on 2013-10-12."];
 [push sendPushInBackground];
 ```
+```swift
+let pushDate = Date(timeIntervalSinceNow: 6000)
+let messageData: [String: Any] = [
+    "alert": "Push this notification at a later time."
+]
+LCPush.send(data: messageData, pushDate: pushDate) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
 
 </MultiLang>
 
@@ -791,24 +806,43 @@ LCPush *push = [[LCPush alloc] init];
 
 <MultiLang kind="ios">
 
-```swift
-LCPush.send(data: messageData, pushDate: pushDate, expirationInterval: expirationInterval) { /* 略 */ }
-```
 ```objc
 LCPush *push = [[LCPush alloc] init];
 [push setPushDate:date];
 [push expireAfterTimeInterval:interval];
 // 下略
 ```
+```swift
+LCPush.send(data: messageData, pushDate: pushDate, expirationInterval: expirationInterval) { /* 略 */ }
+```
 
 </MultiLang>
 
 ### 指定设备平台
 
-跨平台的应用，可能想指定发送的平台，比如 iOS 或者 Android:
+跨平台的应用，可能想指定发送的平台，比如 iOS 或者 Android：
 
 <MultiLang kind="ios">
 
+```objc
+LCQuery *query = [LCInstallation query];
+[query whereKey:@"channels" equalTo:@"suitcaseOwners"];
+
+// Notification for Android users
+[query whereKey:@"deviceType" equalTo:@"android"];
+LCPush *androidPush = [[LCPush alloc] init];
+[androidPush setMessage:@"Your suitcase has been filled with tiny robots!"];
+[androidPush setQuery:query];
+[androidPush sendPushInBackground];
+
+// Notification for iOS users
+[query whereKey:@"deviceType" equalTo:@"ios"];
+LCPush *iOSPush = [[LCPush alloc] init];
+[iOSPush setMessage:@"Your suitcase has been filled with tiny apples!"];
+[iOSPush setChannel:@"suitcaseOwners"];
+[iOSPush setQuery:query];
+[iOSPush sendPushInBackground];
+```
 ```swift
 let query = LCQuery(className: "_Installation")
 query.whereKey("channels", .equalTo("suitcaseOwners"))
@@ -841,25 +875,6 @@ LCPush.send(data: messageData, query: query) { (result) in
     }
 }
 ```
-```objc
-LCQuery *query = [LCInstallation query];
-[query whereKey:@"channels" equalTo:@"suitcaseOwners"];
-
-// Notification for Android users
-[query whereKey:@"deviceType" equalTo:@"android"];
-LCPush *androidPush = [[LCPush alloc] init];
-[androidPush setMessage:@"Your suitcase has been filled with tiny robots!"];
-[androidPush setQuery:query];
-[androidPush sendPushInBackground];
-
-// Notification for iOS users
-[query whereKey:@"deviceType" equalTo:@"ios"];
-LCPush *iOSPush = [[LCPush alloc] init];
-[iOSPush setMessage:@"Your suitcase has been filled with tiny apples!"];
-[iOSPush setChannel:@"suitcaseOwners"];
-[iOSPush setQuery:query];
-[iOSPush sendPushInBackground];
-```
 
 </MultiLang>
 
@@ -867,10 +882,19 @@ LCPush *iOSPush = [[LCPush alloc] init];
 
 正如 [定制通知](#定制通知) 一节提到，你可以随通知发送任意的数据。我们使用这些数据修改应用的行为，当应用是通过通知打开的时候。例如，当打开一条通知告诉你有一个新朋友的时候，这时候如果显示一张图片会非常好。
 
-由于 Apple 的对消息大小的限制，请尽量缩小要发送的数据大小，否则会被截断。详情请参看 [APNs 文档](https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/APNsProviderAPI.html#//apple_ref/doc/uid/TP40008194-CH101-SW1)。
+由于 Apple 对消息大小的限制，请尽量缩小要发送的数据大小，否则会被截断。详情请参看 [APNs 文档](https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/APNsProviderAPI.html#//apple_ref/doc/uid/TP40008194-CH101-SW1)。
 
 <MultiLang kind="ios">
 
+```objc
+NSDictionary *data = @{
+  @"alert": @"James commented on your photo!",
+  @"p": @"vmRZXZ1Dvo" // Photo's object id
+};
+LCPush *push = [[LCPush alloc] init];
+[push setData:data];
+[push sendPushInBackground];
+```
 ```swift
 let messageData: [String: Any] = [
     "alert": "James commented on your photo!",
@@ -886,34 +910,15 @@ LCPush.send(data: messageData) { (result) in
     }
 }
 ```
-```objc
-NSDictionary *data = @{
-  @"alert": @"James commented on your photo!",
-  @"p": @"vmRZXZ1Dvo" // Photo's object id
-};
-LCPush *push = [[LCPush alloc] init];
-[push setData:data];
-[push sendPushInBackground];
-```
 
 </MultiLang>
 
 ## 响应通知数据
 
-当应用是被通知打开的时候，你可以通过 `application:didFinishLaunchingWithOptions:`方法的 `launchOptions` 参数所使用的 dictionary 访问到数据：
+当应用是被通知打开的时候，你可以通过 `application:didFinishLaunchingWithOptions:` 方法的 `launchOptions` 参数所使用的 dictionary 访问到数据：
 
 <MultiLang kind="ios">
 
-```swift
-func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-    
-    if let notification = launchOptions?[.remoteNotification] as? [AnyHashable: Any] {
-        print(notification)
-    }
-    
-    return true
-}
-```
 ```objc
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // ...
@@ -939,18 +944,23 @@ func application(_ application: UIApplication, didFinishLaunchingWithOptions lau
     }
 }
 ```
+```swift
+func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    
+    if let notification = launchOptions?[.remoteNotification] as? [AnyHashable: Any] {
+        print(notification)
+    }
+    
+    return true
+}
+```
 
 </MultiLang>
 
-如果当通知到达的时候，你的应用已经在运行，对于 iOS10 以下，你可以通过 `application:didReceiveRemoteNotification:fetchCompletionHandler:` 方法的 `userInfo` 参数所使用 dictionary 访问到数据：
+如果当通知到达的时候，你的应用已经在运行，对于 iOS 10 以下，你可以通过 `application:didReceiveRemoteNotification:fetchCompletionHandler:` 方法的 `userInfo` 参数所使用 dictionary 访问到数据：
 
 <MultiLang kind="ios">
 
-```swift
-func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-    // handle notification
-}
-```
 ```objc
 /*!
  * Required for iOS 7+
@@ -977,33 +987,29 @@ func application(_ application: UIApplication, didReceiveRemoteNotification user
   }];
 }
 ```
-
-</MultiLang>
-
-iOS10 以上需要使用下面代理方法来获得 `userInfo` ：
-
-<MultiLang kind="ios">
-
 ```swift
-func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
-    // handle notification
-}
-
-func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
     // handle notification
 }
 ```
+
+</MultiLang>
+
+iOS 10 以上需要使用下面代理方法来获得 `userInfo`：
+
+<MultiLang kind="ios">
+
 ```objc
 /**
- * Required for iOS10+
- * 在前台收到推送内容, 执行的方法
+ * Required for iOS 10+
+ * 在前台收到推送内容，执行的方法
  */
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center
        willPresentNotification:(UNNotification *)notification
          withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
     NSDictionary *userInfo = notification.request.content.userInfo;
     if([notification.request.trigger isKindOfClass:[UNPushNotificationTrigger class]]) {
-        //TODO:处理远程推送内容
+        // TODO: 处理远程推送内容
         NSLog(@"%@", userInfo);
     }
     // 需要执行这个方法，选择是否提醒用户，有 Badge、Sound、Alert 三种类型可以选择设置
@@ -1011,18 +1017,27 @@ func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive respo
 }
 
 /**
- * Required for iOS10+
- * 在后台和启动之前收到推送内容, 点击推送内容后，执行的方法
+ * Required for iOS 10+
+ * 在后台和启动之前收到推送内容，点击推送内容后，执行的方法
  */
 - (void)userNotificationCenter:(UNUserNotificationCenter *)center
 didReceiveNotificationResponse:(UNNotificationResponse *)response
          withCompletionHandler:(void (^)())completionHandler {
     NSDictionary * userInfo = response.notification.request.content.userInfo;
     if([response.notification.request.trigger isKindOfClass:[UNPushNotificationTrigger class]]) {
-        //TODO:处理远程推送内容
+        // TODO: 处理远程推送内容
         NSLog(@"%@", userInfo);
     }
     completionHandler();
+}
+```
+```swift
+func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+    // handle notification
+}
+
+func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+    // handle notification
 }
 ```
 
@@ -1034,11 +1049,26 @@ didReceiveNotificationResponse:(UNNotificationResponse *)response
 
 <MultiLang kind="ios">
 
+```objc
+- (void)applicationDidBecomeActive:(UIApplication *)application {
+    // 本地清空角标
+    [application setApplicationIconBadgeNumber:0];
+    // currentInstallation 的角标清零
+    [LCInstallation defaultInstallation].badge = 0;
+    [[LCInstallation defaultInstallation] saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+        if (succeeded) {
+         // save succeeded
+        } else if (error) {
+         NSLog(@"%@", error);
+        }
+    }];
+}
+```
 ```swift
 override func applicationDidBecomeActive(_ application: UIApplication) {
-    //本地清空角标
+    // 本地清空角标
     application.applicationIconBadgeNumber = 0
-    //currentInstallation 的角标清零
+    // currentInstallation 的角标清零
     LCApplication.default.currentInstallation.badge = 0
     LCApplication.default.currentInstallation.save { (result) in
         switch result {
@@ -1049,21 +1079,6 @@ override func applicationDidBecomeActive(_ application: UIApplication) {
         }
     }
  }
-```
-```objc
-- (void)applicationDidBecomeActive:(UIApplication *)application {
-    //本地清空角标
-    [application setApplicationIconBadgeNumber:0];
-    //currentInstallation 的角标清零
-    [LCInstallation defaultInstallation].badge = 0;
-    [[LCInstallation defaultInstallation] saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
-        if (succeeded) {
-         // save succeeded
-        } else if (error) {
-         NSLog(@"%@", error);
-        }
-    }];
-}
 ```
 
 </MultiLang>

@@ -1,0 +1,260 @@
+---
+title: Cloud Engine Platform Features
+sidebar_label: Platform Features
+sidebar_position: 2
+---
+
+import CloudCustomDomain from "./_partials/cloud-custom-domain.mdx";
+import PlatformIntroduction from "./_partials/platform-introduction.mdx";
+import PlatformRuntimes from "./_partials/platform-runtimes.mdx";
+import { CLI_BINARY } from "/src/constants/env.ts";
+import TabItem from "@theme/TabItem";
+import CodeBlock from "@theme/CodeBlock";
+import { Conditional } from "/src/docComponents/conditional";
+import Path from "/src/docComponents/path";
+
+<PlatformIntroduction />
+
+:::info
+
+This article will guide you through the features provided by the Cloud Engine platform. For details about specific runtime environments, check out the following pages:
+
+<PlatformRuntimes />
+
+:::
+
+## What Can Be Deployed to Cloud Engine
+
+Cloud Engine offers runtime environments on the process level. This means that you no longer need to think about OS environments when developing your application. Instead, you only need to take care of the processes created by your application (like `node` processes or executables compiled from Go projects), leaving you more time to work on the business logic of your application.
+
+Cloud Engine automatically prepares runtime environments for the applications deployed to it as long as these applications follow conventional project structures. For example, if you plan to deploy a Node.js application, the project has to have a `package.json` file. The [Overview](/sdk/engine/overview) page contains links to the dedicated pages for specific runtime environments, from which you can learn more about this.
+
+Cloud Engine barely interferes in the processes of your application. You are free to use your preferred frameworks and libraries in your project and organize files and directories in your way. Cloud Engine’s load balancer forwards all the HTTP requests sent to the domains bound to your application. It’s up to you to design the HTTP API’s paths as well as requests’ and responses’ formats under the web framework used by your application.
+
+Cloud Engine is primarily optimized for hosting stateless HTTP services. Although your application has access to the disk, there’s no guarantee that the disk will keep the files created by your application persistently. For long-term data storage, use the <Conditional brand="tds">[Data Storage](/sdk/storage/features)</Conditional><Conditional brand="leancloud">[Data Storage](https://docs.leancloud.app/storage_overview.html)</Conditional> service or LeanDB’s hosted [Redis](/sdk/engine/database/redis/), [MongoDB](/sdk/engine/database/mongo/), and [Elasticsearch](/sdk/engine/database/es/).
+
+<p>
+  To associate an existing project to a Cloud Engine application, run{" "}
+  <code>{CLI_BINARY} switch</code>:
+</p>
+
+<CodeBlock>
+  {`$ ${CLI_BINARY} switch
+[?] Please select an app:
+ 1) my-engine-app
+ => 1
+Switching to my-engine-app (group: web)`}
+</CodeBlock>
+
+## Viewing Logs
+
+### Logs
+
+You can view deploy logs and program output on **<Path to="engine" /> > Manage deployment > Your group > Logs**. Logs can be filtered by environment (staging/production), type (standard output / standard error), instance, and time.
+
+![Cloud Engine logs](https://capacity-files.lcfile.com/B28L3vYhjdCaavUkLF5TDkHJgFQvxBEo/engine-logs-en.png)
+
+You can export logs to your local computer with the CLI. See [CLI Guide § Viewing Logs](/sdk/engine/cli/#viewing-logs) for more information.
+
+## Viewing Metrics
+
+**<Path to="engine" /> > Manage deployment > Your group > Statistics** shows the usage data of all the instances under the current application. You can tell if the instances’ consumption of resources is approaching or exceeding the limit.
+
+![Cloud Engine statistics](https://capacity-files.lcfile.com/WzAblUPPgp8Upr9P1EPkgSN3pHFAYwWJ/engine-metrics-en.png)
+
+#### Requests per Minute
+
+This graph shows the number of requests handled by Cloud Engine per minute during a given time. You can filter the data by request type (web hosting / Cloud Functions) and HTTP status code using the dropdown menu on the top-left corner of the page.
+
+#### Response Time
+
+If the line in this graph goes up, it indicates that the instances’ consumption of CPU resources is reaching or exceeding the limit. Again, you can filter the data by request type (web hosting / Cloud Functions) and HTTP status code.
+
+#### CPU
+
+This graph shows the actual CPU usage of the application during a given time. If the usage approaches or reaches the limit, the response time of the application might be prolonged.
+
+#### RAM
+
+This graph shows the actual RAM usage of the application during a given time. If the usage reaches the limit, the processes of your application (like Node.js processes or Python processes) will be restarted due to OOM. While restarting, the instance will become unavailable and your application won’t be able to handle requests. If the graph <u>frequently goes up to the limit and then goes down</u>, it means that the processes have been restarted due to OOM.
+
+If **Show details for each instance** is checked, a separate line will be displayed for each instance in the graph for CPU and RAM. Otherwise, the data for all the instances will be combined into a single line.
+
+You can change the time period for the graphs on the top-right corner of the page. Options include Today, Yesterday, and Last 7 days.
+
+## Deploying and Publishing
+
+### Staging Environments vs Production Environments
+
+With the standard mode of Cloud Engine, you get a production environment and a staging environment for each group. The production environment is designed to take in and handle requests from actual users of your application. The staging environment provides almost the same environment as the production environment for you to test your application. They both have access to the same data from the Data Storage service, though a separate domain can be assigned to each environment. When invoking Cloud Functions or updating objects that may trigger hooks with <Conditional brand="tds">TDS</Conditional><Conditional brand="leancloud">LeanCloud</Conditional>’s client-side SDKs, you can specify the environment to which the requests should be sent (`X-LC-Prod`).
+
+While working on your application, you can first deploy your changes to the staging environment, test the changes with the data from the Data Storage service, and publish the changes to the production environment only if everything goes well. If you wish to have a testing environment with a separate data source, consider creating another application.
+
+The trial mode doesn’t come with a staging environment.
+
+### Deploying With CLI
+
+Run the following command under the root directory of your project to deploy your project:
+
+<CodeBlock className="sh">{`${CLI_BINARY} deploy`}</CodeBlock>
+
+The CLI will display an interactive interface that asks you if you want to deploy your project to the production environment or the staging environment. To deploy the project directly to the production environment, add `--prod` to the end of the command. For more information about the usage of the CLI, see [CLI Guide § Deploying a Local Project](/sdk/engine/cli/#deploying-a-local-project).
+
+### Deploying With Git
+
+You can also deploy your project from a Git repository either hosted on platforms like [GitHub](https://github.com/)<Conditional region='cn'> and [Gitee](https://gitee.com/)</Conditional> or self-hosted with services like [GitLab](https://about.gitlab.com/install/). You can configure the address of your project’s Git repository on **<Path to="engine" /> > Manage deployment > Your group > Deploy > Deploy from Git**.
+
+If you have a private repository, you can provide the address with the SSH protocol (like `git@github.com:leancloud/node-js-getting-started.git`). Make sure to set up a deploy key for Cloud Engine with the service hosting the repository. If you have a public repository, we recommend that you provide the address with the HTTPS protocol.
+
+Once you have configured the address of your Git repository, you’ll be able to deploy your project to Cloud Engine by hitting “Deploy”. Cloud Engine will use the code on the `master` branch by default, but you can also specify a version by entering a branch name, tag name, or commit hash.
+
+To trigger automatic deployment each time a commit gets pushed to a specific branch of the Git repository, generate a deploy token on **<Path to="engine" /> > Manage deployment > Your group > Settings > Auto deploy** and use it with the webhook URL shown on the page. Cloud Engine will deploy the code on the specified branch to the specified environment each time the webhook URL receives a POST request. See the guidance on the console for more information on how to set up automatic deployment with GitHub Actions.
+
+### Deployment History
+
+You can view the past deployments of an environment on **<Path to="engine" /> > Manage deployment > Your group > Deploy** by expanding the dropdown menu on an environment and opening “Versions”.
+Each deployment has its description (based on information like Git commit message), version number, and timestamp displayed on the page.
+The deployments are ordered chronologically with the current deployment on the top.
+You can roll back to a previous deployment by hitting “Deploy to”.
+Besides viewing deployments by the environment, you can also view all deployments chronologically under “Timeline” (with the latest on the top).
+
+In addition to the deployment history, the page also shows the deployment status (_hibernating_, _deploying_, or _running_) of each environment.
+You can **restart** an environment (redeploy the current version) or **clear the deployment** (remove the deployment and cancel the Cloud Functions and hooks) with the buttons on the top-right corner of the page.
+For the staging environment, you can hit **Deploy to production** to publish the latest deployment on the staging environment to the production environment.
+If the deployment status of an environment is _deploying_, the page will show the details of the deployment process as well as a **Cancel deployment** button. You can hit this button to cancel the deployment.
+
+### Groups
+
+You can create multiple _groups_ under the same application for hosting different backend programs that have access to the same data from the Data Storage service. Each group can be bound to a different custom domain, making the following scenarios possible:
+
+- Create different projects for the client-side interface and the admin console. Assign different domains to them.
+- Deploy non-essential systems separately from the main system so the main system could keep working if problems occur to any non-essential system.
+- Use different server-side languages for Cloud Functions and the website. For example, you can use Node.js for Cloud Functions and PHP for the website.
+
+Each group comes with a separate staging environment for you to test your code, as well as a separate domain for users to access it. It also has its own environment variables and repository configurations. When deploying your code, you get to choose the group you want to deploy to.
+
+You can deploy Cloud Functions, hooks, and scheduled tasks to any group. One thing to keep in mind is that when you deploy your code to a group, if the code contains a Cloud Function that has the same name as one in a different group, the deployment will be aborted. To force the deployment to continue, enable [`--overwrite-functions`](#deployment-options).
+
+Each application has a default group named `web`. You can create additional groups on **<Path to="engine" /> > Manage deployment**. A new group doesn’t contain any instances and cannot respond to users’ requests until you [adjust the quota and number of instances](#adjusting-quota-and-number-of-instances).
+
+### Deployment Options
+
+You can add the following options when deploying your project:
+
+#### `--no-cache`
+
+If you encounter problems with installing dependencies, you can try adding this option to disable the [caching mechanism](/sdk/engine/deep-dive/#build-process) used to accelerate the build process.
+
+#### `--options 'printBuildLogs=true'`
+
+If you encounter problems with the build process, you can try adding this option to have the build log printed to the console.
+
+#### `--overwrite-functions`
+
+When your project contains Cloud Functions and hooks with duplicate names among different groups, you can add this option to force the Cloud Functions and hooks in your current deployment to take effect. You can use this option to move Cloud Functions and hooks across different groups.
+
+## Managing Resources and Capacities
+
+### Trial Mode
+
+Each application comes with a free trial instance with 0.5 CPU and 256 MB RAM. You can use this instance for learning and trying out Cloud Engine.
+
+**A trial instance hibernates** if it doesn’t receive any requests in a while and restarts once it receives a request. It might take a few seconds for an instance to restart. A trial instance can run for a maximum of 18 hours per day.
+
+<details>
+<summary>More about hibernation</summary>
+
+- A trial instance will hibernate if it receives no requests in 30 minutes.
+- While hibernating, the instance will restart if it receives a request. The first visitor might find that they’ll have to wait for 5 to 30 seconds before they can get a response.
+- If a trial instance has run for more than 18 hours within the past 24 hours, it will be forced to hibernate and won’t restart even if there are requests coming in. The requests will get the 503 error. You can view the errors received by requests on **<Path to="engine" /> > Manage deployment > Your group > Statistics**.
+
+</details>
+
+### Standard Mode
+
+<Conditional brand='leancloud'>
+
+The billing of Cloud Engine doesn’t get affected by the plan (Developer/Business) you are using. Upgrading to or downgrading from the Business Plan won’t affect the charges incurred by your Cloud Engine instances.
+
+</Conditional>
+
+:::tip
+If you’re hosting business projects and already-launched products on Cloud Engine, we recommend that you upgrade to the standard mode and use at least two instances to enhance the availability of your application.
+:::
+
+A standard instance won’t hibernate as a trial instance does. It also comes with a staging environment for you to test your code. If you purchase two or more instances, you can also utilize load balancing and automatic failover to maximize the availability of your application.
+
+The standard mode comes with the following features:
+
+#### Load Balancing (High Availability)
+
+Cloud Engine’s gateway will evenly distribute the requests from users to all the instances in your application. You can enhance your application’s capability of handling requests by simply increasing the number of instances in your application.
+
+When there are two or more instances in the same group’s same environment, automatic failover becomes possible. When one of the instances stops working, Cloud Engine’s gateway will forward requests to other working instances until the corrupted instance is restored.
+
+#### Staging Environment
+
+Each group with the standard mode comes with a free staging environment. It has almost the same runtime environment as the production environment. Before you launch your code, you can deploy it to the staging environment and test it with the environment and data on the server side.
+
+The staging environment shares the same quota with the production environment and hibernates like a trial instance as well.
+
+#### Zero Downtime Deployment
+
+When you’re deploying a new version of your project, or when maintenance operations are going on, the system will have both the older and newer versions of your project run for a while and gradually shut down the older version. This ensures that there will be no downtime in your application.
+
+#### Multiple Groups
+
+With multiple groups, you can deploy different backend programs that have access to the same data from the Data Storage service. Each group can also have its own domain. See [Groups](#groups) for more information.
+
+### Adjusting Quota and Number of Instances
+
+The following quotas are available for standard instances. The difference mainly lies in the size of RAM:
+
+| Quota         | RAM     | CPU    |
+| ------------- | ------- | ------ |
+| standard-512  | 512 MB  | 1 Core |
+| standard-1024 | 1024 MB | 1 Core |
+| standard-2048 | 2048 MB | 1 Core |
+| standard-4096 | 4096 MB | 1 Core |
+
+You can adjust the quota and number of instances on **<Path to="engine" /> > Manage deployment > Your group > Deploy**.
+
+:::tip
+We recommend that you pick a quota according to the maximum RAM needed by your program and later adjust the number of instances to cater to the growth of the number of requests. For business projects and already-launched products, we recommend that you use at least two instances to enhance the availability of your application.
+:::
+
+To ensure your instances’ consumption of resources doesn’t exceed the limit, we recommend that you [check the metrics](#viewing-metrics) regularly:
+
+- If the average **RAM** usage during a day goes beyond **70%** of the available resources (717 MB for a standard-1024 instance), you should consider increasing the quota.
+- If the average **CPU** usage during a day goes beyond **30%** of the available resources (30% CPU for a standard-1024 instance), you should consider increasing the number of instances.
+
+<details>
+<summary>Multiple instances</summary>
+
+Your program will be running on multiple instances concurrently if you have created multiple instances in the same group’s same environment. This also happens when deployment or maintenance operations (like restarting instances) are going on.
+
+Each instance has its own RAM and file system. This means that if a global variable or a file is created in one of the instances, it won’t be accessible from other instances. We recommend that you test your program thoroughly when you first switch from using a single instance to using multiple instances.
+
+To share data among multiple instances with low latency, consider using LeanCache.
+
+</details>
+
+### Billing
+
+The amount charged for your usage will be based on the multiplication of the selected quota and the number of instances. For each given day, the amount for the maximum number of instances that existed on this day will be charged on the next day. You can view the prices of the available quotas on the pricing page<Conditional brand='leancloud'> of the current region</Conditional>. The billing history can be found under <Conditional brand='leancloud'>_Consumption details_ on the dashboard</Conditional><Conditional brand='tds'>_Transactions_ on the Developer Center</Conditional>.
+
+If you want to stop being charged, you can downgrade the quota of all the groups in your application to the _trial mode_. This will remove all the standard instances and only leave a free trial instance in one group. The final bill will be produced on the next day and you won’t be charged after that.
+
+## Adjusting Settings
+
+### Environment Variables
+
+To inject configurations into your application, you can set up custom environment variables on **<Path to="engine" /> > Manage deployment > Your group > Settings > Custom environment variables**. Your updates to the custom environment variables will take effect upon the next deployment.
+
+You can check **Secret** to prevent an environment variable from being displayed on the page. This reduces the chance for sensitive information like keys and passwords to be accidentally leaked.
+
+The default environment variables provided by Cloud Engine runtime environments cannot be overwritten by your custom environment variables.
+
+### Binding Custom Domains
+
+<CloudCustomDomain />

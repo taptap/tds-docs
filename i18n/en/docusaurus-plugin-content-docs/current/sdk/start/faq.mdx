@@ -1,0 +1,115 @@
+---
+title: Frequently Asked Questions
+sidebar_position: 6
+---
+
+import CodeBlock from "@theme/CodeBlock";
+import sdkVersions from "/src/docComponents/sdkVersions";
+import { Conditional } from "/src/docComponents/conditional";
+
+## Miscellaneous
+
+### Does TDS Cloud Services come with DDoS protection?
+
+TDS provides 2 Gbps of protection bandwidth by default, which protects against small attacks at no additional cost to the developer.
+For exclusive games, TDS provides high protection free of charge during the exclusive period. Developers simply need to communicate with TDS in advance about configuration details.
+For other games, TDS can assist in accessing the IaaS provider's DDoS protection service at the developer's expense (IaaS providers charge for DDoS protection bandwidth). Please contact us for further details.
+
+
+### Is there a limit to the number of accounts with real-name authentication for the same ID?
+
+Currently, TapTap requires that a single ID  can only be used for real-name authentication on up to 5 TapTap accounts. There is no limit on real-name authentication for game accounts.
+
+
+### How do I get the MD5 of an Android application?
+
+#### 1. Using an app
+
+If you only have the APK file of your application, you can use the following tool to get the MD5: [**GenSignatureMD5**](https://capacity-files.lcfile.com/vW65JxH2b2KwDS8JcbVUfiwLHSeHTlD5/tds_getsign.apk). To use the tool, sign and package the game application with an official signature certificate, and then install the APK package on the phone. Install the GenSignatureMD5 tool on the same phone, then open the tool and enter the name of the game package to get the signature MD5.
+
+#### 2. Using Android Studio
+
+**For JDK 10 or below**, after signing the application correctly, open a terminal in the jks signature file directory and enter the command:
+
+```sh
+keytool -list -v -keystore xxx.jks
+```
+You will see the signature file information in the command window, including the SHA1 and MD5 values. **Note that this approach does not work for versions below JDK 10**.
+
+For versions above JDK 10, you can't get the MD5 using the above method, but you can use Android Studio's Gradle Tasks to check it, and the debug window will output the MD5 after double-clicking the signingReport in the figure below.
+
+![](https://capacity-files.lcfile.com/y7fcVDW6cUFKfG4ATDXj8KKE9L2jWprB/%E8%8E%B7%E5%8F%96MD5%E7%A4%BA%E4%BE%8B1.jpeg)
+
+:::caution
+
+Note that the MD5 value output from the signingReport debug window is separated by colons, so you will need to manually remove the colons when entering it into the Developer Center.
+Example of a value to enter in the TapTap Developer Center:
+> 
+> Correct: 6EB4347CF9C098BE1C8D965D539C42E2
+>
+> Incorrect: 6E:B4:34:7C:F9:C0:98:BE:1C:8D:96:5D:53:9C:42:E2
+
+:::
+
+If there is no Gradle Tasks tab in the right Gradle panel, uncheck the options shown below in the settings and sync Gradle again to see the Gradle Tasks tab.
+
+![](https://capacity-files.lcfile.com/8dEVF81X34JFtUE50tnqj6OIoxxDdXsU/%E8%8E%B7%E5%8F%96MD5%E7%A4%BA%E4%BE%8B2.jpeg)
+
+
+### What should I do if the versions of okhttp used by TapSDK and Bilibili SDK on Android have conflicts?
+
+TapSDK now automatically includes the LeanCloud core SDK, and the LeanCloud SDK relies on the following base libraries:
+- com.squareup.okhttp3:okhttp:4.7.2
+- com.squareup.retrofit2:retrofit:2.9.0
+- io.reactivex.rxjava2:rxjava:2.2.19
+
+Some developers have given us feedback that the Bilibili game SDK is provided as an aar with okhttp 3.9.0 (at least until version 5.4.0), which conflicts with the TapSDK dependencies and causes the program to start with the following error:
+`Caused by: java.lang.NoSuchMethodError: No static method get(Ljava/lang/String;)Lokhttp3/HttpUrl; in class Lokhttp3/HttpUrl; or its super classes (declaration of 'okhttp3.HttpUrl' appears in /data/app/`
+
+Since the Bilibili game SDK fixes the okhttp version, solving this problem requires downgrading the okhttp, retrofit, and rxjava base libraries in TapSDK.
+You can copy the following configuration to the `dependencies` section of the app's build.gradle:
+
+<details>
+
+<summary>Configuration of build.gradle</summary>
+
+<CodeBlock className="java"> {`
+    // Note that the following code uses the latest version of the LeanCloud core SDK; if you are not using ${sdkVersions.leancloud.java}, please replace the version codes accordingly
+    implementation('cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'){
+        exclude group: 'cn.leancloud', module: 'storage-android'
+        exclude group: 'cn.leancloud', module: 'realtime-core'
+        exclude group: 'cn.leancloud', module: 'storage-core'
+    }
+    implementation('cn.leancloud:storage-android:${sdkVersions.leancloud.java}'){
+        exclude group: 'cn.leancloud', module: 'storage-core'
+    }
+    implementation('cn.leancloud:realtime-core:${sdkVersions.leancloud.java}') {
+        exclude group: 'cn.leancloud', module: 'storage-core'
+    }
+    implementation('cn.leancloud:storage-core:${sdkVersions.leancloud.java}') {
+        exclude group: 'com.squareup.okhttp3', module: 'okhttp'
+        exclude group: 'com.squareup.retrofit2', module: 'retrofit'
+        exclude group: 'com.squareup.retrofit2', module: 'adapter-rxjava2'
+        exclude group: 'com.squareup.retrofit2', module: 'converter-gson'
+        exclude group: 'io.reactivex.rxjava2', module: 'rxjava'
+    }
+    implementation("com.squareup.retrofit2:retrofit:2.3.0")
+    implementation("com.squareup.retrofit2:adapter-rxjava2:2.3.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.3.0")
+    implementation("io.reactivex.rxjava2:rxjava:2.0.0")
+    implementation("com.google.code.gson:gson:2.8.6")
+    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'\n
+    configurations {
+        all*.exclude group: 'com.squareup.okhttp3'
+    }
+`}</CodeBlock>
+
+</details>
+
+### application id is empty 
+
+Please ensure that the code for initializing the TapTap SDK is in the main thread to avoid this issue and subsequent functionality exceptions, such as not being able to access the network when logging in.
+
+### The TapTap Client will not notify in-game users of changes to their information.
+The TapTap client does not support synchronous update, but when the user successfully logs in through the client, it will return `access_token`, `mac_key`, and the game can locally cache the credentials.
+The game can cache the credentials locally, and then each time the user enters the game, it can call the [server-side authentication interface](/sdk/taptap-login/guide/taptap-oauth/) to make a query to synchronise the user's information.

@@ -1,0 +1,804 @@
+---
+title: Push Notification REST API
+sidebar_position: 8
+---
+
+import { Conditional } from "/src/docComponents/conditional";
+
+Once the application is installed on the user's device, the SDK automatically generates an Installation object when you use the push feature. The Installation object contains all the information needed to send push notifications. You can use the REST API to push through the Installation object.
+
+The base URL for the request can be found at **Developer Center > Your game > Game Services > Cloud Services > Instant Messaging > Settings**.
+For POST and PUT requests, the request body must be in JSON format and the Content-Type of the HTTP header must be set to `application/json`.
+
+Requests are authenticated by the key-value pairs contained in the HTTP header, as described in the [Request Format](/sdk/storage/guide/rest/#request-format) section of the *Data Storage REST API*.
+
+## Installation
+
+You can add Installation objects to the cloud using the REST API.
+Using the REST API also allows you to do things that the client SDK cannot do, such as querying all Installations to find a collection of subscribers to a channel.
+
+<table>
+  <thead>
+    <tr>
+      <th>URL</th>
+      <th>HTTP</th>
+      <th>Function</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>/1.1/installations</td>
+      <td>POST</td>
+      <td>Upload Installation</td>
+    </tr>
+    <tr>
+      <td>/1.1/installations/&lt;objectId&gt;</td>
+      <td>GET</td>
+      <td>Get Installation</td>
+    </tr>
+    <tr>
+      <td>/1.1/installations/&lt;objectId&gt;</td>
+      <td>PUT</td>
+      <td>Update Installation</td>
+    </tr>
+    <tr>
+      <td>/1.1/installations</td>
+      <td>GET</td>
+      <td>Query Installation</td>
+    </tr>
+    <tr>
+      <td>/1.1/installations/&lt;objectId&gt;</td>
+      <td>DELETE</td>
+      <td>Delete Installation</td>
+    </tr>
+  </tbody>
+</table>
+
+### Add Installation
+
+Creating an Installation object is similar to creating a normal object, except that different platforms have different fields.
+
+Upon successful creation, the HTTP return value is **201 Created** and the Location header contains the URL of the new Installation:
+
+```sh
+Status: 201 Created
+Location: https://{{host}}/1.1/installations/51ff1808e4b074ac5c34d7fd
+```
+
+The body returned is a JSON object, including the objectId and createdAt, the timestamp of the created object.
+
+```json
+{
+  "createdAt": "2012-04-28T17:41:09.106Z",
+  "objectId": "51ff1808e4b074ac5c34d7fd"
+}
+```
+
+#### DeviceToken
+
+iOS devices typically use DeviceToken to uniquely identify a device.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{appkey}}"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "deviceType": "ios",
+        "deviceToken": "abcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789",
+        "channels": [
+          "public", "protected", "private"
+        ]
+      }' \
+  https://{{host}}/1.1/installations
+```
+
+#### installationId
+
+For Android devices, the SDK will automatically generate a uuid as the installationId to store in the cloud.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{appkey}}"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "deviceType": "android",
+        "installationId": "12345678-4312-1234-1234-1234567890ab",
+        "channels": [
+          "public", "protected", "private"
+        ]
+      }' \
+  https://{{host}}/1.1/installations
+```
+
+The `installationId` must be unique within the application.
+
+### Get Installation
+
+You can get an Installation object by requesting the URL represented by the Location at the time of creation using the GET method. For example, to get the object created above:
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  https://{{host}}/1.1/installations/51ff1808e4b074ac5c34d7fd
+```
+
+The returned JSON object contains all of the fields provided by the user, as well as the createdAt, updatedAt, and objectId fields:
+
+```json
+{
+  "deviceType": "ios",
+  "deviceToken": "abcdefghijklmnopqrstuvwzxyrandomuuidforyourdevice012345678988",
+  "channels": [
+    ""
+  ],
+  "createdAt": "2012-04-28T17:41:09.106Z",
+  "updatedAt": "2012-04-28T17:41:09.106Z",
+  "objectId": "51ff1808e4b074ac5c34d7fd"
+}
+```
+
+### Update Installation
+
+The Installation object can be updated by sending a PUT request to the appropriate URL. For example, to subscribe to a push channel, set the `channels` property to:
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '{
+        "deviceType": "ios",
+        "deviceToken": "abcdefghijklmnopqrstuvwzxyrandomuuidforyourdevice012345678988",
+        "channels": [
+          "",
+          "foo"
+        ]
+      }' \
+  https://{{host}}/1.1/installations/51ff1808e4b074ac5c34d7fd
+```
+
+To unsubscribe from a channel:
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{appkey}}"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "channels": {
+           "__op":"Remove",
+           "objects":["customer"]
+        }
+       }' \
+  https://{{host}}/1.1/installations/51ff1808e4b074ac5c34d7fd
+```
+
+`channels` is essentially an array property, so you can use standard array operations.
+
+Another example is adding custom attributes:
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{appkey}}"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "userObjectId": "<user's objectId>"
+      }' \
+  https://{{host}}/1.1/installations/51ff1808e4b074ac5c34d7fd
+```
+
+### Query Installation
+
+You can retrieve multiple Installations at once by sending a GET request to the root URL of installations. This feature is not available in the SDK.
+
+Without any URL parameters, a GET request will list all Installations:
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  https://{{host}}/1.1/installations
+```
+
+The result field of the returned JSON object contains all results:
+
+```json
+{
+  "results": [
+    {
+      "deviceType": "ios",
+      "deviceToken": "abcdefghijklmnopqrstuvwzxyrandomuuidforyourdevice012345678988",
+      "channels": [
+        ""
+      ],
+      "createdAt": "2012-04-28T17:41:09.106Z",
+      "updatedAt": "2012-04-28T17:41:09.106Z",
+      "objectId": "51ff1808e4b074ac5c34d7fd"
+    },
+    {
+      "deviceType": "ios",
+      "deviceToken": "876543210fedcba9876543210fedcba9876543210fedcba9876543210fedcba9",
+      "channels": [
+        ""
+      ],
+      "createdAt": "2012-04-30T01:52:57.975Z",
+      "updatedAt": "2012-04-30T01:52:57.975Z",
+      "objectId": "51fcb74ee4b074ac5c34cf85"
+    }
+  ]
+}
+```
+
+All queries on normal objects work on Installation objects, so see the previous queries section for details. An array query of channels allows you to find all devices subscribed to a particular push channel.
+
+For security reasons, the Installation lookup permission is not open by default in the cloud, so this interface typically requires master key authentication.
+
+### Delete Installation
+
+To remove an Installation from LeanCloud, you can send a DELETE request to the appropriate URL, which is also not available in the client SDK. Example:
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  https://{{host}}/1.1/installations/51fcb74ee4b074ac5c34cf85
+```
+
+For security reasons, the Installation deletion permission is not open by default in the cloud, so this interface typically requires master key authentication.
+
+### Automatic Installation Expiration and Cleanup
+
+Whenever a user opens an application, we update the `updatedAt` timestamp in the `_Installation` table for that device. If the user has not updated the `updatedAt` timestamp in the `_Installation` table for a long time, it means that the user has not opened the application for a long time. If the user has not opened the application for more than 90 days, we will remove the user's record from the `_Installation` table. But don't worry, if the user opens the application again, a new Installation will be automatically created for pushing.
+
+For iOS devices, there is another expiration mechanism in addition to the one described above. When we get feedback from Apple's push service that a device's deviceToken has expired, we also remove the device from the `_Installation` table, mark the expired deviceToken as invalid, and discard any subsequent messages sent to the deviceToken.
+
+### API Interfaces at a Glance
+
+Path|Method|Description
+---|---|---
+/1.1/push|POST|Send a push notification
+/1.1/notifications|GET|Get push records
+/1.1/notifications/:notification_id|GET|Get a push record by its ID
+/1.1/notifications/:notification_id|DELETE|Delete a push record by its ID
+/1.1/scheduledPushMessages|GET|Get all scheduled push notifications
+/1.1/scheduledPushMessages/:id|DELETE|Delete a scheduled push notification by its ID
+
+### master key Verification
+
+If **Prevent clients from sending push notifications** is checked in **Developer Center > Your game > Game Services > Cloud Services > Push Notification > Settings**,
+you will need to pass the **master key** to send pushes, which will prevent the client from being able to push messages to any target device in the app without restriction.
+This restriction is enabled by default.
+We recommend that all users enable this restriction.
+
+### Message Content Parameters
+
+#### iOS Device Push Message Content Parameters
+
+For the specific meaning of the attributes within data and alert in iOS devices, please refer to:
+1. [Apple's official documentation on the Payload Key](https://developer.apple.com/documentation/usernotifications/setting_up_a_remote_notification_server/generating_a_remote_notification),
+2. [Apple's official documentation on the Request Header](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/CommunicatingwithAPNs.html), and
+3. [Apple's official documentation on the UserNotifications](https://developer.apple.com/documentation/usernotifications).
+
+Here are some specific descriptions of each property:
+
+#### Properties of data for iOS Devices
+
+Name|Format|Constraint|Description
+---|---|---|---
+alert|Plain string or JSON string|Required|The content of the message. If the target device contains only iOS devices, it can also be of the JSON type; the supported properties for the JSON type are described below.
+title|String|Optional|The title of the push content. If the alert field is a string, you can add the title here, but if the alert is of JSON type, you do not need to provide this field.
+category|String|Optional|Notification type.
+thread-id|String|Optional|Name of the notification category.
+badge|Number|Optional|The number of unread messages displayed on the badge above the application icon, either a number or the string "Increment" (case sensitive).
+sound|Plain string or JSON string|Optional|The sound of the push notification. See the section describing JSON objects below for more details.
+content-available|Number|Optional|Set to 1 to start a background download when using the Newsstand.
+mutable-content|Number|Optional|Used to support UNNotificationServiceExtension. Set to 1 to enable it.
+collapse-id|String|Optional|Corresponds to the apns-collapse-id parameter of the APNs request header, which is used to collapse multiple notifications as described in Apple's official request header documentation linked below.
+apns-priority|Number|Optional|Can only be 10 or 5. Corresponds to the apns-priority parameter of the APNs request header, which is used to control whether notifications are sent in power saving mode. Please click the link below for Apple's official request header documentation for details.
+apns-push-type|String|Optional|Used to set the push display type. Supported on iOS 13 or watchOS 6 or higher. Can only be "background" or "alert". Default is "alert".
+url-args|String|Optional|A list for Safari notifications. See the APNs documentation for details on the url-args parameter.
+target-content-id|String|Optional|See the APNs documentation for details on the target-content-id parameter.
+Custom attribute|Custom type|Optional|Custom attributes added by the user, with arbitrary field names and field types.
+
+Example:
+
+```json
+{
+  "alert": "hi"
+}
+```
+
+#### Properties of alert for iOS Devices
+
+iOS devices support localized `alert` message pushing by replacing the above `alert` parameter from a string to JSON consisting of localized message pushing attributes:
+
+Name|Format|Constraint|Description
+---|---|---| ---
+title|String|Optional|The title of the notification content.
+title-loc-key|String list|Optional|See Apple's push notification localization guide for details.
+title-loc-args|String list|Optional|See Apple's push notification localization guide for details.
+subtitle|String|Optional|The subtitle of the notification content.
+subtitle-loc-key|String|Optional|See Apple's push notification localization guide for details.
+subtitle-loc-args|String list|Optional|See Apple's push notification localization guide for details.
+body|String|Optional|The body of the message.
+action-loc-key|String|Optional|See Apple's push notification localization guide for details.
+loc-key|String|Optional|See Apple's push notification localization guide for details.
+loc-args|String list|Optional|See Apple's push notification localization guide for details.
+launch-image|String|Optional|Sets the name of the image file to launch when the notification is clicked.
+summary-arg|String|Optional|Used to set the summary.
+summary-arg-count|Number|Optional|Used to set the number of summary arguments.
+
+Example:
+
+```json
+{
+  "alert": {
+    "title": "A message"
+    "body": "A body"
+  }
+}
+```
+
+#### Properties of sound for iOS Devices
+
+iOS supports setting the push sound through the sound parameter, either with a string indicating the filename of a sound, pointing to a sound file that exists in the app, or with a JSON object:
+
+Name|Format|Constraint|Description
+---|---|---|---
+name|String|Optional|Sound filename, pointing to a sound file that exists in the application.
+critical|Boolean|Optional|Set to true to use the "Critical" sound. Default is false.
+volume|Number|Optional|The volume of the sound. Must be a decimal number between 0 and 1.
+
+Example:
+
+```json
+{
+  "alert": "New weixin message.",
+  "badge": 9,
+  "sound": "biubiubiu.aiff"
+}
+```
+
+```json
+{
+  "alert": "You spent $1.99",
+  "sound": {
+    "name": "ding.aiff",
+    "volume": "0.8"
+  }
+}
+```
+
+#### Additional Notes for iOS Devices
+
+We support the construction of push parameters as described in the official Apple documentation above. For example:
+
+```json
+{
+  "aps": {
+    "alert": "New weixin message.",
+    "badge": 9,
+    "sound": "biubiubiu.aiff"
+  }
+}
+```
+
+For a more detailed description, see the following example:
+
+```json
+{
+  "aps": {
+    "alert": {
+      "title":             "String; the title of the push content",
+      "title-loc-key":     "A list of strings; see Apple's note on localizing push notifications for details",
+      "title-loc-args":    "A list of strings; see Apple's note on localizing push notifications for details",
+      "subtitle":          "String; the subtitle of the push content",
+      "subtitle-loc-key":  "String; see Apple's note on localizing push notifications for details",
+      "subtitle-loc-args": "A list of strings; see Apple's note on localizing push notifications for details",
+      "body":              "String, the body of the message",
+      "action-loc-key":    "String; see Apple's note on localizing push notifications for details",
+      "loc-key":           "String; see Apple's note on localizing push notifications for details",
+      "loc-args":          "A list of strings; see Apple's note on localizing push notifications for details",
+      "launch-image":      "String; the name of the image file to launch when the notification is clicked",
+      "summary-arg":       "String; used to set the summary",
+      "summary-arg-count": "Number; used to set the number of summary arguments"
+    },
+    "category":            "String; notification type",
+    "thread-id":           "String; name of the notification category",
+    "badge":               "Number; the number of unread messages displayed on the badge above the application icon, either a number or the string 'Increment' (case sensitive)",
+    "sound":               "Plain string or JSON string; the sound of the push notification",
+    "content-available":   "Number; set to 1 to start a background download when using the Newsstand",
+    "mutable-content":     "Number; used to support UNNotificationServiceExtension; set to 1 to enable it"
+  },
+  "collapse-id":           "String; corresponds to the apns-collapse-id parameter of the APNs request header, which is used to collapse multiple notifications as described in Apple's official request header documentation linked below",
+  "apns-priority":         "Number; can only be 10 or 5; corresponds to the apns-priority parameter of the APNs request header, which is used to control whether notifications are sent in power saving mode; please click the link below for Apple's official request header documentation for details",
+  "apns-push-type":        "String; used to set the push display type; supported on iOS 13 or watchOS 6 or higher; can only be 'background' or 'alert'; default is 'alert'",
+  "custom-key":            "Custom attributes added by the user, with arbitrary field names and field types"
+}
+```
+
+#### Android Device Push Message Content Parameters
+
+For Android devices, the default notification message content parameter supports the following properties:
+
+Name|Format|Constraint|Description
+---|---|---|---
+alert|String|Required|The content of the message.
+title|String|Optional|The title of the push content.
+silent|Boolean|Optional|Whether to send the push notification as a pass-through message or as a notification bar message. The default is false, i.e. `notification bar message`.
+action|String|Optional|The action name provided when the Receiver was registered. Set this only if the Receiver needs to be customized.
+Custom attribute|Custom type|Optional|Custom attributes added by the user, with arbitrary field names and field types.
+
+Example:
+
+```json
+{
+  "alert": "Hi Ming, you have guests at home. Come home for dinner!",
+  "title": "Ming, you received a WeChat message."
+}
+```
+
+```json
+{
+  "alert": "You received $1.99.",
+  "my-custom-key": "my-custom-value"
+}
+```
+
+### Push by Query Criteria
+
+This interface is used to send a push message to all valid device records in the _Installation table that match the query criteria, based on the query criteria provided. For example, the following code sends a push message containing `Hello from LeanCloud` to all valid devices that contain the value `public` in the `channels` field of the _Installation table.
+
+Note that this interface limits the requested HTTP body size to 4096 bytes, i.e., the result of JSON serialization of any parameters you pass to this interface cannot exceed this limit.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "where": {"channels" : "public"},
+        "data": {"alert" : "Hello from LeanCloud"}
+     }' \
+  https://{{host}}/1.1/push
+```
+
+The parameters supported by this interface are:
+
+Name| Constraint | Description
+---|--- | ---
+data| **Required**| The content of the push. JSON object. See [Message Content Parameters](#message-content-parameters).
+where| Optional | The query condition used to retrieve objects from the `_Installation` table. JSON object. If the query condition contains a special type of data that must be encoded, such as date or binary, the query condition must contain the encoded data. For example, if the `createdAt` field is greater than a certain time, the where condition must be `{"createdAt":{"$gte":{"__type":"Date","iso":"2015-06-21T18:02:52.249Z"}}}`. For more information, see the description in the *Advanced Data Types* section of the [Data Storage REST API](/sdk/storage/guide/rest/).
+channels| Optional | Which channels to push to. Added to the where object as a condition.
+push_time| Optional | Sets the time at which the scheduled push is to be sent, which must be in UTC time and ISO8601 format, e.g. `2019-04-01T06:19:29.000Z`. Note that if the send time is less than 1 minute from the current time, the push will be sent immediately and will not follow the push_time parameter. If you need to implement periodic push, you can refer to [Implement Periodic Push Using Cloud Engine](#implement-periodic-push-using-cloud-engine).
+expiration_time| Optional | The absolute date and time when the message expires, in UTC time and ISO8601 format, for example, "2019-04-01T06:19:29.000Z". If the message is received by the client later than the message expiration time, the message is not displayed to the user.
+expiration_interval| Optional | The relative time in seconds for the message to expire. Counted from `push_time`, or from the time of the API call if `push_time` is not specified. It is recommended that `expiration_time` or `expiration_interval` be set for all pushes to avoid users getting a bunch of expired pushes after a long disconnect and reconnect.
+notification_id | Optional | Custom push id. Up to 16 characters long and can only be letters and numbers. If this parameter is not provided, we randomly assign a unique push id to each push request to distinguish between different pushes. The push id is used to count the number of target devices and messages reached, and is displayed in the push log in the console. Custom push ids can be used to combine multiple different requests under the same push id to get an overall count of the number of target devices and final message arrivals for a batch of push requests.
+req_id | Optional | Custom request id. Can be up to 16 characters long and can only contain letters and numbers. Different push requests with the same req_id within 5 minutes are considered duplicate requests and will be sent only once. The user can resend the request once with a unique req_id in the request to avoid missing failed push requests in case of an exception such as an interface timeout. And since the req_id is the same in both requests, we automatically filter duplicate push requests to ensure that each target end user receives at most one push message. Please note that **too many or too frequent retries can interfere with normal message delivery**.
+prod| Optional | ***Valid for iOS push only***. When sending iOS pushes using token authentication, this parameter is used to set whether to send the push to the development (***dev***) or production (***prod***) environment of the APNs. When sending iOS pushes using certificate authentication, this parameter is used to set whether to use a development certificate (***dev***) or a production certificate (***prod***). If `prod` is not specified and the HTTP header `X-LC-Prod` is passed without a value of 1, then it will be treated as `"prod": "dev"`, otherwise the default is `"prod": "prod"`. When using the certificate authentication method, we give priority to the certificate specified by deviceProfile if the device has deviceProfile set in the Installation record.
+topic | Optional | ***Only valid for iOS push with Token Authentication***. When using token authentication to send iOS push, you need to provide the APNs topic of the device for authentication. Normally, the iOS SDK automatically reads the bundle ID of the iOS application as the topic in the apnsTopic field of the Installation record, so this parameter is not required in the push request. However, it must be specified manually in the following cases: 1. using an iOS SDK lower than v4.2.0; 2. not using the iOS SDK (e.g. using React Native); 3. using a topic different from the iOS bundle ID for the target device.
+apns_team_id | Optional | ***Valid only for iOS push using Token Authentication***. If you are using Token Authentication to send iOS push, you need to provide the corresponding Team ID of the device for authentication. In general, if all APNs Topics are not duplicated under your Team ID, or if you have proactively set the apnsTeamId when saving the Installation, you do not need to provide this parameter; we will match the appropriate Team ID for each device to send the push. Otherwise, this parameter must be provided and you must ensure that the target devices of a single push request belong to the Team ID specified in this parameter through the where-query condition to ensure that the push is performed correctly.
+flow_control | Optional | Whether to enable smoothing. Disabled by default. The value represents the pushing speed, i.e. the number of target end users per second. The minimum value is 1000, and any value below the minimum is treated as the minimum.
+_notificationChannel | Optional | For Android 8.0 or higher, you need to pass the channel id to receive pushes properly. Please refer to the "Adapting for Android 8.0" section in the [Android Push Guide](/sdk/push/guide/android/).
+
+All properties in the `_Installation` table, whether built-in or custom, can be specified as query conditions by where, and all kinds of complex queries are supported.
+
+The objectId of a push is returned on success, and the returned objectId can be used to [query the push record](#query-push-record).
+
+```json
+{"objectId":"i4OcyCnyjckJOtzz","createdAt":"2021-11-23T08:05:54.921Z"}
+```
+
+If it fails, the server will return an error code and the reason for the error:
+
+```json
+{"code":107,"error":"Malformed json object. A json dictionary is expected."}
+```
+
+Some examples are given below. For more examples, see the "Queries" section of the [Data Storage REST API](/sdk/storage/guide/rest/).
+
+#### Push to All Devices
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "data": {
+          "alert": "Greetings!"
+        }
+      }' \
+  https://{{host}}/1.1/push
+```
+
+#### Push to Android Devices
+
+```sh
+curl -X POST \
+-H "X-LC-Id: {{appid}}"          \
+-H "X-LC-Key: {{masterkey}},master"        \
+-H "Content-Type: application/json" \
+-d '{
+      "where":{
+        "deviceType": "android"
+      },
+      "data": {
+        "alert": "Greetings!"
+      }
+    }' \
+https://{{host}}/1.1/push
+```
+
+#### Push to Devices on the public Channel
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "channels":"public",
+        "data": {
+          "alert": "Greetings!"
+        }
+      }' \
+  https://{{host}}/1.1/push
+```
+
+#### Push to Inactive Devices
+
+```sh
+curl -X POST \
+-H "X-LC-Id: {{appid}}"          \
+-H "X-LC-Key: {{masterkey}},master"        \
+-H "Content-Type: application/json" \
+-d '{
+      "where":{
+          "updatedAt":{
+              "$lt":{"__type":"Date","iso":"2015-06-29T11:33:53.323Z"}
+            }
+      },
+      "data": {
+          "alert": "Greetings!"
+      }
+    }' \
+https://{{host}}/1.1/push
+```
+
+#### Push to Devices With Matching Custom Properties
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "where": {
+          "preOrder": true
+        },
+        "data": {
+          "alert": "The sale is on!"
+        }
+      }' \
+  https://{{host}}/1.1/push
+```
+
+The `where` queries are all about the properties in the `_Installation` table. This assumes that the table stores the boolean attribute `preOrder`.
+
+#### Push Based on Geographic Location
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "where": {
+          "owner": {
+            "$inQuery": {
+              "location": {
+                "$nearSphere": {
+                  "__type": "GeoPoint",
+                  "latitude": 30.0,
+                  "longitude": -20.0
+                },
+                "$maxDistanceInMiles": 10.0
+              }
+            }
+          }
+        },
+        "data": {
+          "alert": "The highest temperature in Beijing tomorrow will be 40 degrees Celsius."
+        }
+      }' \
+  https://{{host}}/1.1/push
+```
+
+The above example assumes that the installation has an owner attribute pointing to a record in the `_User` table, and the user has a `location` attribute of type GeoPoint, so we can do a push based on geographic location.
+
+### Push by Device ID List
+
+This interface is used to send pushes to a list of specified device IDs. The push process is faster and has lower latency than the query method because it does not query the Installation records of the target devices. For example, the following code is used to push a `Hello` message to the iOS devices with device token "device_token1", "device_token2", and "device_token3".
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "data": {"alert" : "Hello"},
+        "device_type": "ios",
+        "device_ids": ["device_token1", "device_token2", "device_token3"]
+     }' \
+  https://{{host}}/1.1/push/devices
+```
+
+The parameters of this interface consist of two parts: push-channel-independent generic parameters and push-channel-specific channel parameters. The generic parameters are channel-independent, so you can use them for either iOS or Android devices.
+
+The supported generic parameters are:
+
+Name| Constraints | Description
+---|--- | ---
+device_type | **Required** | Target device type. Can only be android or ios. You can only push to one device type at a time.
+device_ids | **Required** | The list of target device IDs. Up to 500 IDs. For iOS devices, the device ID is the deviceToken field in the _Installation table; for Android devices, the device ID is the installationId field in the _Installation table.
+data| **Required**| Same as [pushing by query criteria](#push-by-query-criteria).
+expiration_interval| Optional | Same as above.
+expiration_time| Optional | Same as above.
+notification_id | Optional | Same as above.
+req_id | Optional | Same as above.
+
+If the target devices are iOS devices, the following parameters can be included in addition to the generic parameters above:
+
+Name| Constraints | Description
+---- | ---- | ----
+prod| Optional | Same as [pushing by query criteria](#push-by-query-criteria).
+topic | Optional | Same as above.
+apns_team_id | Optional | Same as above.
+device_profile | Optional | Specifies the custom iOS push certificate to use. This parameter is not required if you are using token authentication or if the push certificate is a configured "production environment certificate" or "development environment certificate". We will use the appropriate certificate based on the value of the `prod` parameter you provide.
+
+If the target devices are Android devices, the following parameters can be included in addition to the general parameters mentioned above:
+
+Name| Constraints | Description
+---- | ---- | ----
+channel| Optional | Specifies the [Android Notification Channel][android-channel].
+
+[android-channel]: https://developer.android.com/develop/ui/views/notifications#ManageChannels
+
+### Expiration Time and Scheduled Push
+
+As mentioned above, you can specify the expiration time of a message using the `expiration_time` parameter:
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "expiration_time": "2015-10-07T00:51:13Z",
+        "data": {
+          "alert": "Your coupon expires on October 7th."
+        }
+      }' \
+  https://{{host}}/1.1/push
+```
+
+`expiration_interval` can also be used to specify an expiration time, usually used with a scheduled push:
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "push_time": "2016-01-28T00:07:29.773Z",
+        "expiration_interval": 86400,
+        "data": {
+          "alert": "This push was sent on January 28th at 8:07 BST and will expire in 24 hours (86400 seconds)"
+        }
+      }' \
+  https://{{host}}/1.1/push
+```
+
+#### Retrieving and Canceling Scheduled Pushes
+
+Call the `POST /scheduledPushMessages` interface to retrieve scheduled push tasks that are currently waiting to be pushed. Calling this interface requires the **master key**:
+
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  https://{{host}}/1.1/scheduledPushMessages
+```
+
+The query will return a result similar to
+
+```json
+{
+  "results": [
+    {
+      "id": 1,
+      "expire_time": 1373912050838,
+      "push_msg": {
+        "through?": null,
+        "app-id": "OLnulS0MaC7EEyAJ0uA7uKEF-gzGzoHsz",
+        "where": {
+          "sort": {
+            "createdAt": 1
+          },
+          "query": {
+            "installationId": "just-for-test",
+            "valid": true
+          }
+        },
+        "prod": "prod",
+        "api-version": "1.1",
+        "msg": {
+          "message": "test msg"
+        },
+        "id": "XRs9jmWnLd0GH2EH",
+        "notificationId": "mhWjvHvJARB6Q6ni"
+      },
+      "createdAt": "2016-01-21T00:47:46.000Z"
+    }
+  ]
+}
+```
+
+Here `push_msg` is the details of the push message and `expire_time` is the Unix timestamp of the time at which the message is set to be pushed.
+
+Based on the result of the query, you can cancel a scheduled push.
+Note that you must use the outermost id in the returned result.
+For example, to cancel the first scheduled push, use `results[0].id` instead of `results[0].push_msg.id`.
+For the above example, `1` should be used instead of `XRs9jmWnLd0GH2EH`:
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{masterkey}},master"        \
+  -H "Content-Type: application/json" \
+  https://{{host}}/1.1/scheduledPushMessages/1
+```
+
+#### Implement Periodic Push Using Cloud Engine
+
+You can use the scheduled task feature provided by Cloud Engine to implement periodic pushes.
+
+## Query Push Record
+
+The `/push` interface returns an `objectId` representing the push message after the push, and you can use this ID to call the following API to query the push record:
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}"          \
+  -H "X-LC-Key: {{appkey}}"        \
+  -H "Content-Type: application/json" \
+  https://{{host}}/1.1/tables/Notifications/:objectId
+```
+
+The `:objectId` in the URL should be replaced with the objectId returned by the `/push` interface.
+
+The push record object will be returned. Refer to the section "Notification" in [Push Notification Overview](/sdk/push/guide/overview/) for the meaning of each field of the push record.
+
+## Viewing Push Status and Canceling Pushes
+
+During the process of sending a push, we will update the push status as the push task is executed in **Developer Center > Your game > Game Services > Cloud Services > Push Notification > Push records**, where you can check the latest status of the push. For a description of the different push statuses, please refer to the Notification section of the [Push Notification Overview](/sdk/push/guide/overview/).
+
+Before the status of a push record reaches **done**, that is, before the push is complete, the "Cancel" button will appear next to the status information, and you can cancel the push by clicking it. The canceled push will be deleted from the push record.
+
+Note that canceling a push means canceling a push that is still in the queue and has not yet been sent. Similarly, pushes that have already been sent or stored in the offline cache cannot be canceled. Please do your best to test and confirm the content and query conditions of the target devices before sending pushes.
+
+## Restrictions
+
+* To avoid sending messages to a large number of users who are no longer active, we restrict push messages to devices with an `updatedAt` time in the `_Installation` table within the last three months. We will automatically exclude the devices that do not meet the criteria from the target devices after determining the target devices based on the push query criteria, and the excluded devices will not be counted in the target devices in **Developer Center > Your game > Game Services > Cloud Services > Push Notification > Push records**.
+* To prevent performance issues due to large numbers of certificate errors, we limit the number of devices that can be pushed using **development certificates** to a maximum of 20,000 devices at a time. If more than 20,000 devices meet the push criteria, the system will reject the push and display "Error" in the **Status** column in **Developer Center > Your game > Game Services > Cloud Services > Push Notification > Push records** with the message "dev profile disabled for massive push". Please be sure to set the push conditions appropriately when using the developer certificate.
+* Apple has a limit on the size of push messages, so please try to reduce the size of data to be sent for iOS push, otherwise it will be truncated. Please refer to the [APNs documentation](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/PayloadKeyReference.html) for details.
+
+If a push fails, you will see an error message in the **Status** section of **Developer Center > Your game > Game Services > Cloud Services > Push Notification > Push records**.
+

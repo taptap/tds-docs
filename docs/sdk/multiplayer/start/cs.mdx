@@ -4,15 +4,33 @@ sidebar_label: C#
 sidebar_position: 2
 ---
 
+import { Conditional } from "/src/docComponents/conditional";
+import sdkVersions from "/src/docComponents/sdkVersions";
+import CodeBlock from "@theme/CodeBlock";
+
 欢迎使用多人在线对战。本教程将通过模拟一个比较玩家分数大小的场景，来讲解 SDK 的核心使用方法。
 
 ## 安装
 
-Play 客户端 SDK 是开源的，源码地址请访问 [Play-SDK-CSharp](https://github.com/leancloud/Play-SDK-CSharp)。也可以直接下载 [Release 版本](https://github.com/leancloud/Play-SDK-CSharp/releases)。
+Play 客户端 SDK 是开源的，源码地址请访问 [csharp-sdk](https://github.com/leancloud/csharp-sdk)。
 
-### Unity
+也可以直接下载 [Release 版本](https://github.com/leancloud/csharp-sdk/releases)。
 
-解压下载的 SDK.zip，将 `Plugins` 目录拖拽至 Unity 工程。如果项目中已有 `Plugins` 目录，则合并至项目中的 `Plugins` 目录。
+### Unity 项目
+
+SDK 可以通过 Unity Package Manager 导入或手动导入，二者任选其一：
+
+* **UPM**：请在项目的 Packages/manifest.json 中添加依赖项：
+
+    <CodeBlock className="json">
+    {`"dependencies": {
+        "com.leancloud.play": "https://github.com/leancloud/csharp-sdk-upm.git#play-${sdkVersions.leancloud.csharp}",
+    }`}
+    </CodeBlock>
+
+* **直接导入**：解压下载的 LeanCloud-SDK-Play-Unity.zip，将 `Plugins` 目录拖拽至 Unity 工程。如果项目中已有 `Plugins` 目录，则合并至项目中的 `Plugins` 目录。
+
+### 开启调试日志
 
 为方便调试，你可以通过注册回调获取日志。在 Unity 中，可以参考如下设置：
 
@@ -38,10 +56,30 @@ LeanCloud.Common.Logger.LogDelegate = (level, log) =>
 using LeanCloud.Play;
 ```
 
+<Conditional brand="leancloud">
+
 ```cs
-var client = new Client({{appid}}, {{appkey}}, "leancloud", playServer: "https://xxx.example.com");
+var client = new Client("your-app-id", "your-app-key", "tarara", playServer: "https://xxx.example.com");
 // 请将 xxx.example.com 替换为你的应用绑定的自定义 API 域名
 ```
+
+</Conditional>
+
+<Conditional brand="tds">
+
+```cs
+var client = new Client(
+    "your-client-id",      // 游戏的 Client ID
+    "your-client-token",   // 游戏的 Client Token
+    "tarara",              // 设置用户 id
+    playServer: "https://your_server_url" // 游戏的 API 域名
+);
+```
+
+- 在 **开发者中心 > 你的游戏 > 游戏服务 > 应用配置** 可以查看游戏的 `Client ID` 和 `Client Token`。
+- API 域名在 **应用配置 > 域名配置 > API** 处查看，参考文档关于[域名](/sdk/domain/guide/)的说明。
+
+</Conditional>
 
 ## 连接多人对战服务器
 

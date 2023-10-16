@@ -1,0 +1,1156 @@
+---
+title: Real-Name Verification and Anti-addiction Guide
+sidebar_label: Guide
+sidebar_position: 2
+---
+
+import MultiLang from '/src/docComponents/MultiLang';
+import CodeBlock from '@theme/CodeBlock';
+import sdkVersions from '/src/docComponents/sdkVersions';
+
+:::tip
+Before using the TDS’ Real-Name Verification and Anti-addiction service, please first enable the service on **开发者中心后台 > 游戏服务 > 开发与构建 > 合规认证**. When enabling the service, you can select whether your game has gotten an ISBN.
+:::
+
+## Configure the SDK
+
+You can download the TapSDK from the [Downloads page](/tap-download) and import the anti-addiction module into your game.
+
+<MultiLang kind="ue">
+
+<>
+
+If you are building your game with Unity, you can import a `.unitypackage` file to your game, which includes the iOS module and the Android module. If you are building with other engines or for other platforms, you can import the iOS or Android module natively. Please refer to the documentation for iOS or Android for more information.
+
+**Unity requirement**: You will need Unity 2019.4 or higher to use the SDK.
+
+Supported OS versions:
+
+- Android: 5.0 and higher
+- iOS: 10.0 and higher, Xcode 14.1 or later
+
+The SDK can be imported **either using the Unity Package Manager or manually**.
+
+#### Method 1: Use Unity Package Manager
+
+Add the following dependencies into `Packages/manifest.json`:
+
+<CodeBlock className="json">
+  {`"dependencies":{
+    "com.tapsdk.antiaddiction":"https://github.com/taptap/TapAntiAddiction-Unity.git#${sdkVersions.taptap.unity}",
+    "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
+    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+}`}
+</CodeBlock>
+
+In Unity’s menu bar, select **Window > Package Manager** to view the packages already installed in the project.
+
+#### Method 2: Import Manually
+
+Open the download pages of **TapSDK Unity** and **LeanCloud C# SDK** from the [Downloads](/tap-download) page and download `TapSDK-UnityPackage.zip` and `LeanCloud-SDK-Realtime-Unity.zip` from these pages.
+
+<ul>
+    <li>Import the <code>TapTap_Common_{sdkVersions.taptap.unity}.unitypackage</code> and <code>TapTap_AntiAddiction_{sdkVersions.taptap.unity}.unitypackage</code> unzipped from <code>TapSDK-UnityPackage.zip</code>.</li>
+</ul>
+
+- Drag the `Plugins` folder unzipped from [`LeanCloud-SDK-Realtime-Unity.zip`](https://github.com/leancloud/csharp-sdk/releases) into Unity.
+
+Configuring for iOS:
+
+Using Xcode 13.0 beta 5 for compiling the project, please follow the steps below to make sure the Xcode project produced by Unity is correctly configured:
+
+1. Go to `Xcode` - `General` - `Frameworks, Libraries, and Embedded Content` and ensure that `AntiAddictionService.framework` and `AntiAddictionUI.framework` are set to `Do Not Embed`.
+2. If the compilation fails due to missing header files or modules, please make sure the path set in `Xcode` - `Build Settings` - `Framework Search Paths` is correct.
+3. Make sure the `Swift Compile Language` / `Swift Language Version` under `Build Settings` of the Xcode project is `Swift5`.
+4. Add `libz.tbd` and `libc++.tbd` as dependencies.
+5. Write your code to integrate the service.
+6. Copy `AntiAddiction-Unity/Assets/Plugins/iOS/Resource/AntiAdictionResources.bundle` to your game project (if `AntiAddictionResources.bundle` is not correctly imported to the Unity project).
+
+</>
+<>
+
+The SDK supports Android 5.0 (API level 21) and higher. The SDK is compiled with Android Studio.
+
+<ul>
+<li>Copy the <strong>Anti-addiction SDK</strong> <code>AntiAddiction_{sdkVersions.taptap.android}.aar</code> to the <code>src/main/libs</code> directory under your project</li>
+<li>Copy the <strong>Anti-addiction SDK</strong> <code>AntiAddictionUI_{sdkVersions.taptap.android}.aar</code> to the <code>src/main/libs</code> directory under your project</li>
+<li>Copy <code>TapCommon_{sdkVersions.taptap.android}.aar</code> to the <code>src/main/libs</code> directory under your project</li>
+</ul>
+
+Add the following code to `build.gradle` under your project
+
+<CodeBlock className="groovy">
+{`repositories{
+    flatDir{   
+        dirs 'src/main/libs'
+    }
+}
+dependencies {
+    // ...
+    implementation(name: "AntiAddiction_${sdkVersions.taptap.ios}", ext: "aar") // Anti-addiction SDK
+    implementation(name: "AntiAddictionUI_${sdkVersions.taptap.ios}", ext: "aar") // Anti-addiction SDK
+    implementation(name: "TapCommon_${sdkVersions.taptap.ios}", ext: "aar")
+    // ...
+}`}
+</CodeBlock>
+
+</>
+<>
+
+The SDK supports iOS 11 and higher, Xcode 14.1 or later.
+
+Below is the structure of the **Anti-addiction SDK** for iOS:
+
+- `AntiAddictionService`: The base library for the Anti-addiction service written with Swift.
+- `AntiAddictionUI`: The Anti-addiction library with UI, which depends on `AntiAddictionService`. It is written with Objective-C.
+- `AntiAddictionResources.bundle`: Resource files.
+
+Other dependencies:
+
+- `TapCommonSDK.framework`: The base library.
+
+To add the libraries for the Anti-addiction service:
+
+- Add `AntiAddictionService.framework`, `AntiAddictionUI.framework`, and `TapCommonSDK.framework`. Make sure to choose **Do Not Embed** as the embed method when adding these libraries.
+
+- Import the code:
+
+    ``` objc
+    // AntiAddictionUI
+    #import <AntiAddictionUI/AntiAddictionUI.h>
+    ```
+
+Add system dependencies:
+
+Check if the following dependencies have been automatically added to your project:
+
+- `libc++.tdb`
+- `libz.tdb`
+
+If the dependencies cannot be correctly loaded when you try to run your project, you can set the dependencies to be optional and try again.
+
+Configure options for compiling:
+
+- Under *Build Setting*, add `-ObjC` to *Other Link Flag*.
+
+- Under *Build Setting*, set *Always Embed Swift Standard Libraries* to *YES* so that the Swift standard library will always be imported. This prevents exceptions from happening when you run your app due to missing the Swift standard library. If the library cannot be found in your project, you can create an empty Swift file and Xcode will automatically set up the bridging relationship.
+
+- Under *Build Setting*, select *Swift 5* for *Swift Compiler - Language / Swift Language Version*.
+
+</>
+
+<>
+
+#### Environment Requirements
+
+* UE 4.26 or higher
+* iOS 12 or higher, Xcode 14.1 or later
+* Android 5.0 (API level 21) or higher
+* macOS 10.14.0 or higher
+* Windows 7 or higher
+
+**Platforms supported**: iOS / Android / Windows / macOS
+
+#### Install Plugins
+
+* Download [TapSDK UE4](/tap-download), unzip `TapSDK-UE4-xxx.zip`, and copy `AntiAddiction` and `TapCommon` to the `Plugins` directory of your project
+* Restart Unreal Editor
+* Go to Edit > Plugins > Project > TapTap and enable the `AntiAddiction` module
+
+#### Add Dependencies
+
+Add the required dependencies to `Project.Build.cs`:
+
+```cs
+PublicDependencyModuleNames.AddRange(new string[] { "Core",
+	"CoreUObject",
+	"Engine",
+	"Json",
+	"InputCore",
+	"JsonUtilities",
+	"SlateCore",
+	"TapCommon",
+	"AntiAddiction"
+});
+```
+
+#### Import the Header File
+
+```cpp
+#include "TapUEBootstrap.h"
+```
+
+<details>
+
+<summary>Compiling a project with a mixture of Objective-C and Swift code</summary>
+
+You can take either of the following two methods.
+
+Method one: Replace the Anti-addiction library with the dynamic library
+
+Pros can cons:
+
+* Pros: You don’t have to edit the code of the engine
+* Cons:
+    * The size of the package will increase a little bit
+    * Only iOS 13 and higher is supported; the project will crash on iOS 12 and below
+
+Steps:
+
+1. Download the [library file](https://github.com/taptap/TapSDK-iOS/releases) that has the same version as the `TapSDK-iOS` you’re using
+2. Replace the `AntiAddictionService.framework` in `Plugins/AntiAddiction/Source/AntiAddiction/ios/framework/AntiAddictionService.zip` with the `Dylib/AntiAddictionService.framework` you just downloaded (unzip -> replace -> zip)
+3. Replace the following part in `AntiAddiction.Build.cs`
+
+    ```cs
+    new Framework(
+        "AntiAddictionService",
+        "../AntiAddiction/ios/framework/AntiAddictionService.zip"
+    )
+    ```
+
+    with:
+
+    ```cs
+    new Framework(
+        "AntiAddictionService",
+        "../AntiAddiction/ios/framework/AntiAddictionService.zip",
+        null,
+        true
+    )
+    ```
+
+4. Compile the project again
+
+Method two: Edit `UnrealBuildTool`
+
+1. Edit `XcodeProject.cs`
+
+    Path: `Engine/Source/Programs/UnrealBuildTool/ProjectFiles/Xcode/XcodeProject.cs`
+
+    Find the function:
+
+    ```cpp
+    private void AppendProjectBuildConfiguration(StringBuilder Content, string ConfigName, string ConfigGuid)
+    ```
+
+    And add the following code to the function:
+
+    ```cpp
+    // Enable Swift
+    Content.Append("\t\t\t\tCLANG_ENABLE_MODULES = YES;" + ProjectFileGenerator.NewLine);
+    Content.Append("\t\t\t\tSWIFT_VERSION = 5.0;" + ProjectFileGenerator.NewLine);
+    Content.Append("\t\t\t\tLIBRARY_SEARCH_PATHS = \"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\";" + ProjectFileGenerator.NewLine);
+    if (ConfigName == "Debug")
+    {
+        Content.Append("\t\t\t\tSWIFT_OPTIMIZATION_LEVEL = \"-Onone\";" + ProjectFileGenerator.NewLine);
+    }
+    Content.Append("\t\t\t\tALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;" + ProjectFileGenerator.NewLine);
+    Content.Append("\t\t\t\tEMBEDDED_CONTENT_CONTAINS_SWIFT = YES;" + ProjectFileGenerator.NewLine);
+    ```
+
+    Your code should look like this:
+    ![](/img/ue4/16638534428329.jpg)
+
+2. Edit `IOSToolChain.cs`
+
+    Path: `Engine/Source/Programs/UnrealBuildTool/Platform/IOS/IOSToolChain.cs`
+
+    Find the function:
+
+    ```cpp
+    string GetLinkArguments_Global(LinkEnvironment LinkEnvironment)
+    ```
+
+    And add the following code to the function:
+
+    ```cpp
+    // This line shall be placed at the beginning (see the screenshot below)
+    // Added by uwellpeng: enable swift support, make sure '/usr/lib/swift' goes before '@executable_path/Frameworks'
+    Result += " -rpath \"/usr/lib/swift\"";
+
+    // enable swift support
+    Result += " -rpath \"@executable_path/Frameworks\"";
+    // /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/lib/swift/
+    String swiftLibPath = String.Format(" -L {0}Platforms/{1}.platform/Developer/SDKs/{1}{2}.sdk/usr/lib/swift",
+                                Settings.Value.XcodeDeveloperDir, bIsDevice? Settings.Value.DevicePlatformName : Settings.Value.SimulatorPlatformName, Settings.Value.IOSSDKVersion);
+    Result += swiftLibPath;
+    Log.TraceInformation("Add swift lib path : {0}", swiftLibPath);
+    ///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos
+    swiftLibPath = String.Format(" -L {0}Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/{1}",
+                                Settings.Value.XcodeDeveloperDir, bIsDevice? Settings.Value.DevicePlatformName.ToLower() : Settings.Value.SimulatorPlatformName.ToLower());
+    Result += swiftLibPath;
+    Log.TraceInformation("Add swift lib path : {0}", swiftLibPath);
+    ///Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/iphoneos
+    swiftLibPath = String.Format(" -L {0}Toolchains/XcodeDefault.xctoolchain/usr/lib/swift-5.0/{1}",
+                                Settings.Value.XcodeDeveloperDir, bIsDevice? Settings.Value.DevicePlatformName.ToLower() : Settings.Value.SimulatorPlatformName.ToLower());
+    Result += swiftLibPath;
+    // Xcode 12 has an additional `swiftcompatabiliy51` library and the following code needs to be added
+    if (Settings.Value.IOSSDKVersionFloat >= 14.0f)
+    {
+        Result += String.Format(" -lswiftCompatibility51");
+    }
+    ```
+
+    Keep in mind that `Result += " -rpath \"/usr/lib/swift\"";` should be placed above `@executable_path/Frameworks`
+
+    Your code should look like this:
+    
+    ![](/img/ue4/16638540076605.jpg)
+
+3. Recompile UBT
+
+    Recompile `UnrealBuildTool` with `msbuild`. You can run the `Terminal` command `msbuild` under the `Engine/Source/Programs/UnrealBuildTool` directory. If the engine directory is under a directory that you cannot edit, you can prepend the command with `sudo`, like `sudo msbuild`.
+
+    Once you finish the three steps above, you will be able to compile a project with a mixture of Objective-C and Swift code.
+
+</details>
+
+</>
+
+</MultiLang>
+
+The Anti-addiction SDK needs the permissions for connecting to the internet and sending request data. Please make sure to declare those permissions in your project.
+
+## Initialize the SDK
+
+During this step, you will be initializing the Anti-addiction UI module, providing configurations for starting the anti-addiction function, and setting up listeners for events related to anti-addiction. Keep in mind that **the [Identity Verification](#identity-verification) interface needs to be invoked when the callback is triggered**.
+
+<MultiLang kind="ue">
+<>
+
+```cs
+using TapTap.AntiAddiction;
+using TapTap.AntiAddiction.Model;
+
+AntiAddictionConfig config = new AntiAddictionConfig()
+{
+    gameId = "your_client_id",      // The Client ID obtained from the TapTap Developer Center
+    useTapLogin = true,             // Whether to use TapTap Quick Verification
+    showSwitchAccount = false,      // Whether to display the button for switching account
+};         
+
+Action<int, string> callback = (code, errorMsg) => {
+    // code == 500;   // Logged in
+    // code == 1000;  // Logged out
+    // code == 1001;  // The user tapped the button for switching account
+    // code == 1030;  // The user is not allowed to play games at this time
+    // code == 1050;  // The time limit is reached
+    // code == 9002;  // The user closed the window for real-name verification
+    UnityEngine.Debug.LogFormat($"code: {code} error Message: {errorMsg}");
+};
+
+AntiAddictionUIKit.Init(config, callback);
+```
+
+</>
+<>
+
+
+```java
+// The first argument passed into the interfaces of the Android SDK is always the current `Activity`
+
+Config config = new Config.Builder()
+  .withClientId("your_client_id") // The Client ID obtained from the TapTap Developer Center
+  .enableTapLogin(true)           // Whether to use TapTap Quick Verification
+  .showSwitchAccount(false)       // Whether to display the button for switching account
+  .build();
+
+AntiAddictionUIKit.init(activity, config, new AntiAddictionUICallback() {
+    @Override
+    public void onCallback(int code, Map<String, Object> extras) {
+        if (code == Constants.ANTI_ADDICTION_CALLBACK_CODE.LOGIN_SUCCESS){
+            Log.d("TapTap-AntiAddiction", "The player is qualified to play the game");
+        }
+  }
+});
+```
+
+</>
+<>
+
+```objc
+AntiAddictionConfig *config = [[AntiAddictionConfig alloc] init];
+config.clientID = @"your_client_id";  // The Client ID obtained from the TapTap Developer Center
+config.useTapLogin = YES;
+config.showSwitchAccount = YES;
+// `self` needs to implement the `AntiAddictionDelegate` protocol; `self` can be replaced by another object that follows the `AntiAddictionDelegate` protocol
+[AntiAddiction initWithConfig:config delegate:self];
+```
+
+The `delegate` object of `+[AntiAddiction initWithConfig:delegate:]` needs to implement the following protocol to receive callbacks:
+
+```objc
+- (void)antiAddictionCallbackWithCode:(AntiAddictionResultHandlerCode)code extra:(NSString * _Nullable)extra {
+    // Anti-addiction callback
+}
+```
+
+</>
+
+<>
+
+```cpp
+FAAUConfig Config;
+Config.ClientID = TEXT("your_client_id"); // The Client ID obtained from the TapTap Developer Center
+Config.ShowSwitchAccount = false;
+Config.UseTapLogin = true;                // TapTap Quick Verification doesn’t support PC
+AntiAddictionUE::Init(Config);
+```
+
+Once the Anti-addiction service is started, there will be callbacks for different events being triggered, so the `AntiAddictionUE::OnCallBack` callback needs to be listened on. See the values of `AntiAddictionUE::ResultHandlerCode` for a list of possible events.
+
+```cpp
+// Bind the `AntiAddictionUE::OnCallBack` callback
+AntiAddictionUE::OnCallBack.BindUObject(this, &UAntiAddictionWidget::OnCallBack);
+
+void UAntiAddictionWidget::OnCallBack(AntiAddictionUE::ResultHandlerCode Code, const FString& Message) {
+	TUDebuger::DisplayShow(FString::Printf(TEXT("Code: %d, Message: %s"), Code, *Message));
+	switch (Code) {
+	case AntiAddictionUE::LoginSuccess:
+		TUDebuger::DisplayShow(TEXT("Logged in"));
+		break;
+	case AntiAddictionUE::Exited:
+		TUDebuger::DisplayShow(TEXT("Logged out"));
+		break;
+	case AntiAddictionUE::SwitchAccount:
+		TUDebuger::DisplayShow(TEXT("The user tapped the button for switching account"));
+		break;
+	case AntiAddictionUE::DurationLimit:
+		TUDebuger::DisplayShow(TEXT("The time limit is reached"));
+		break;
+	case AntiAddictionUE::PeriodRestrict:
+		TUDebuger::DisplayShow(TEXT("The user is not allowed to play games at this time"));
+		break;
+	case AntiAddictionUE::RealNameStop:
+		TUDebuger::DisplayShow(TEXT("The user closed the window for real-name verification"));
+		break;
+	default:
+		TUDebuger::WarningLog(TEXT("Unknown Code: ") + FString::FromInt(Code));
+		break;
+	}
+}
+```
+
+</>
+
+</MultiLang>
+
+### Parameters
+
+<MultiLang kind="ue">
+
+<>
+
+- `config` is the configuration for the Anti-addiction service. It contains the following parameters:
+  - `gameId`: The `Client ID` of the game, which can be found on the Developer Center (**开发者中心 > 你的游戏 > 游戏服务 > 应用配置**).
+
+  - `useTapLogin`: Whether to use [TapTap Quick Verification](#taptap-quick-verification). We recommend that you enable this feature so that players who have already confirmed their identities on TapTap can quickly complete the verification process for anti-addiction.
+
+  - `showSwitchAccount`: Whether to display the button for switching accounts. If your game doesn’t provide the function for players to switch accounts, you can make this button hidden from the user interface. If you choose to have the button displayed (as shown in the image below), the `1001` callback will be triggered when the player hits the button. Your game can handle the player’s request for switching accounts upon receiving this code.
+  
+- `callback` is the callback interface provided by the SDK to notify users of events. It contains the following parameters:
+  - `code`: The callback type for the event. See [Callback Types](#callback-types) for more information.
+
+  - `errorMsg`: If an error occurs, this will be the error message.
+
+</>
+
+<>
+
+The following parameters need to be provided when you initialize the Anti-addiction service:
+
+- The `Client ID` of the game, which can be found on the Developer Center (**开发者中心 > 你的游戏 > 游戏服务 > 应用配置**).
+- Whether to use [TapTap Quick Verification](#taptap-quick-verification). We recommend that you enable this feature so that players who have already confirmed their identities on TapTap can quickly complete the verification process for anti-addiction.
+- Whether to display the button for switching accounts. If your game doesn’t provide the function for players to switch accounts, you can make this button hidden from the user interface. If you choose to have the button displayed (as shown in the image below), the `1001` callback will be triggered when the player hits the button. Your game can handle the player’s request for switching accounts upon receiving this code.
+
+</>
+
+<>
+
+- `config` is the configuration for the Anti-addiction service. It contains the following parameters:
+  - `clientID`: The `Client ID` of the game, which can be found on the Developer Center (**开发者中心 > 你的游戏 > 游戏服务 > 应用配置**).
+
+  - `useTapLogin`: Whether to use [TapTap Quick Verification](#taptap-quick-verification). We recommend that you enable this feature so that players who have already confirmed their identities on TapTap can quickly complete the verification process for anti-addiction.
+
+  - `showSwitchAccount`: Whether to display the button for switching accounts. If your game doesn’t provide the function for players to switch accounts, you can make this button hidden from the user interface. If you choose to have the button displayed (as shown in the image below), the `1001` callback will be triggered when the player hits the button. Your game can handle the player’s request for switching accounts upon receiving this code.
+  
+- The `delegate` object needs to implement the `-[AntiAddictionDelegate antiAddictionCallbackWithCode:extra:]` protocol to receive callbacks
+  - `code`: The callback type for the event. See [Callback Types](#callback-types) for more information.
+
+  - `extra`: Additional information for the current event.
+
+</>
+
+<>
+
+- `config` is the configuration for the Anti-addiction service. It contains the following parameters:
+  - `ClientID`: The `Client ID` of the game, which can be found on the Developer Center (**开发者中心 > 你的游戏 > 游戏服务 > 应用配置**).
+
+  - `UseTapLogin`: Whether to use [TapTap Quick Verification](#taptap-quick-verification). We recommend that you enable this feature so that players who have already confirmed their identities on TapTap can quickly complete the verification process for anti-addiction.
+
+  - `ShowSwitchAccount`: Whether to display the button for switching accounts. If your game doesn’t provide the function for players to switch accounts, you can make this button hidden from the user interface. If you choose to have the button displayed (as shown in the image below), the `1001` callback will be triggered when the player hits the button. Your game can handle the player’s request for switching accounts upon receiving this code.
+
+
+</>
+
+</MultiLang>
+
+![The user interface for switching account](/img/anti-addiction/switch-account.png)
+
+### Callback Types
+
+| Callback code | Callback type | When does it get triggered |
+|---|---|---|
+| 500 | `LOGIN_SUCCESS` | Logged in |
+| 1000 | `EXITED` | Logged out |
+| 1001 | `SWITCH_ACCOUNT` | The user tapped the button for switching account |
+| 1030 | `PERIOD_RESTRICT` | The user is not allowed to play games at this time |
+| 1050 | `DURATION_LIMIT` | The time limit is reached |
+| 9002 | `REAL_NAME_STOP` | The user closed the window for real-name verification |
+
+## Identity Verification
+
+The SDK provides two methods for you to verify the identities of players:
+
+1. TapTap Quick Verification: This allows players to authorize your game to use their age range information from TapTap to quickly complete the real-name verification process.
+2. Manual entry: This lets players enter their identity information with the user interface provided by the SDK. In this case, the "TapTap Quick Authentication" box pops up and the "Don't use" button is clicked.
+
+TDS’ server will tell if a player can play your game based on their identity information. The player’s information will be automatically sent to Zhongxuanbu’s system.
+
+We recommend that you adopt the first method so that players won’t have to manually enter their identity information and can start playing your game more quickly.
+
+### TapTap Quick Verification
+
+:::info
+Starting from v3.7.1, TapTap Quick Verification doesn’t depend on the TapTap Login SDK anymore, although a player has to be logged in to authorize the game to use their age range information from TapTap. **Please make sure you have completed the following steps**:
+
+- **Enable TapTap Login**. If this step is not completed, the player will see “应用未开通 TapTap 登录服务” when using TapTap Quick Verification.
+- **[Configure the signature certificate](/sdk/start/quickstart/#configure-signature-certificate) on the Developer Center**. If this step is not completed, the player will see “授权失败” when using TapTap Quick Verification.
+:::
+
+To enable TapTap Quick Verification, set the parameter for TapTap Quick Verification to `true` when initializing the SDK.
+
+To start the verification process, you need to provide `userIdentifier`, the unique identifier of the player. The SDK will then open the TapTap app. If the TapTap app is not installed on the device, a WebView will be opened. The player can then authorize the game to use their age range information from TapTap to complete the real-name verification process in the game.
+
+For `userIdentifier`, the **unique identifier of the player**, if your game is using [TDS’ built-in account system](/sdk/taptap-login/guide/start/#quick-log-in-with-taptap), you can use the player’s `objectId` as it; if your game is using the [basic TapTap user verification](/sdk/taptap-login/guide/tap-login/#check-login-status-and-user-info), you can use the player’s `openid` or `unionid`.
+
+<MultiLang kind="ue">
+
+<>
+
+```cs
+// The unique identifier cannot be longer than 64 characters
+string userIdentifier = "THE_UNIQUE_IDENTIFIER_OF_THE_PLAYER";
+AntiAddictionUIKit.Startup(userIdentifier);
+```
+
+**Attention**: If your Unity project hasn’t integrated the TapTap Login module, you’ll need to configure the `URLSchema` when creating a package for iOS from the exported Xcode project.
+
+<details>
+<summary>How to configure the `URLSchema` for an Xcode project</summary>
+
+Open `info.plist` and add the following configurations (replace the `clientID` with the Client ID you obtained from the Developer Center):
+
+![](https://capacity-files.lcfile.com/xLmohBqQCMvHMpvxps7pReT9kI8CjSGj/tap_ios_info.png)
+
+   ```xml
+   <key>CFBundleURLTypes</key>
+   <array>
+       <dict>
+           <key>CFBundleTypeRole</key>
+           <string>Editor</string>
+           <key>CFBundleURLName</key>
+           <string>taptap</string>
+           <key>CFBundleURLSchemes</key>
+           <array>
+               <!-- Note: The final string should be `tt` concatenated with the Client ID (without brackets). For example: ttFwFdCxxxxxxxQDQwQN -->
+               <string>tt[clientID]</string>
+           </array>
+       </dict>
+   </array>
+
+   <key>LSApplicationQueriesSchemes</key>
+   <array>
+     <string>tapiosdk</string>
+     <string>tapsdk</string>
+   </array>
+   ```
+</details>
+</>
+<>
+
+```java
+// The unique identifier cannot be longer than 64 characters
+String userIdentifier = "THE_UNIQUE_IDENTIFIER_OF_THE_PLAYER";
+AntiAddictionUIKit.startup(activity, userIdentifier);
+```
+
+</>
+<>
+
+```objc
+// The unique identifier cannot be longer than 64 characters
+NSString *userIdentifier = @"THE_UNIQUE_IDENTIFIER_OF_THE_PLAYER";
+[AntiAddiction startupWithUserID:userIdentifier];
+```
+
+To use **TapTap Quick Verification**, the callback needs to be embedded into `AppDelegate`.
+
+Attention: If you have already added this for the TapTap Login module, you can skip this step.
+
+```objc
+#import <TapCommonSDK/TapCommonSDK.h>
+
+// The new callback
+- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
+    return [TDSHandleUrl handleOpenURL:url];
+} 
+```
+
+If you haven’t integrated the TapTap Login module, you will need to configure the `URLSchema` as well.
+
+Open `info.plist` and add the following configurations (replace the `clientID` with the Client ID you obtained from the Developer Center):
+
+![](https://capacity-files.lcfile.com/xLmohBqQCMvHMpvxps7pReT9kI8CjSGj/tap_ios_info.png)
+
+   ```xml
+   <key>CFBundleURLTypes</key>
+   <array>
+       <dict>
+           <key>CFBundleTypeRole</key>
+           <string>Editor</string>
+           <key>CFBundleURLName</key>
+           <string>taptap</string>
+           <key>CFBundleURLSchemes</key>
+           <array>
+               <!-- Note: The final string should be `tt` concatenated with the Client ID (without brackets). For example: ttFwFdCxxxxxxxQDQwQN -->
+               <string>tt[clientID]</string>
+           </array>
+       </dict>
+   </array>
+
+   <key>LSApplicationQueriesSchemes</key>
+   <array>
+     <string>tapiosdk</string>
+     <string>tapsdk</string>
+   </array>
+   ```
+  
+</>
+
+<>
+
+```cpp
+AntiAddictionUE::Startup(TEXT("your_userIdentifier"));
+```
+
+</>
+
+</MultiLang>
+
+### Manual Entry
+
+If you prefer not to enable TapTap Quick Verification, set the parameter for TapTap Quick Verification to `false` when initializing the SDK.
+
+The format of the `userIdentifier`, the **unique identifier of the player**, will be defined by your game. It should be no longer than 64 characters.
+
+## Log Out
+
+When a user logs out of your game, you can invoke this method to reset the states of the Anti-addiction service.
+
+<MultiLang kind="ue">
+
+```cs
+AntiAddictionUIKit.Exit();
+```
+
+```java
+AntiAddictionUIKit.exit();
+```
+
+```objc
+[AntiAddiction exit];
+```
+
+```cpp
+AntiAddictionUE::Exit();
+```
+
+</MultiLang>
+
+## Obtain Player’s Age Range
+
+Invoke the following interface to get the player’s age range:
+
+<MultiLang kind="ue">
+
+```cs
+int ageRange = AntiAddictionUIKit.AgeRange;
+```
+
+```java
+int ageRange = AntiAddictionUIKit.getAgeRange();
+```
+
+```objc
+NSInteger ageRange = [AntiAddiction getAgeRange];
+```
+
+```cpp
+EAAUAgeLimit AgeLimit = AntiAddictionUE::GetAgeRange();
+```
+
+</MultiLang>
+
+The `ageRange` in the example above is an integer indicating the minimum age among the age range of the player.
+If its value is `-1`, it means that the age range of the user is unknown. This indicates that the user hasn’t verified their identity yet.
+
+| Value | Meaning |
+| - | - |
+| -1 | Unknown |
+| 0 | 0 to 7 years old |
+| 8 | 8 to 15 years old |
+| 16 | 16 to 17 years old |
+| 18 | Adult |
+
+## Get Remaining Time (In Seconds)
+
+To get the time remaining for the player:
+
+<MultiLang kind="ue">
+
+```cs
+int remainingTimeInSeconds = AntiAddictionUIKit.RemainingTime;
+```
+
+```java
+int remainingTimeInSeconds = AntiAddictionUIKit.getRemainingTime();
+```
+
+```objc
+NSInteger remainingTimeInSeconds = [AntiAddiction getRemainingTime];
+```
+
+```cpp
+int RemainingTime = AntiAddictionUE::GetRemainingTime();
+```
+
+</MultiLang>
+
+## Get Remaining Time (In Minutes)
+
+To get the time remaining for the player:
+
+<MultiLang kind="ue">
+
+```cs
+int remainingTimeInMinutes = AntiAddictionUIKit.RemainingTimeInMinutes;
+```
+
+```java
+int remainingTimeInMinutes = AntiAddictionUIKit.getRemainingTimeInMinutes();
+```
+
+```objc
+NSInteger remainingTimeInMinutes = [AntiAddiction getRemainingTimeInMinutes];
+```
+
+```cpp
+int RemainingTimeInMinutes = AntiAddictionUE::GetRemainingTimeInMinutes();
+```
+
+</MultiLang>
+
+## Check Payment Restrictions
+
+Different payment restrictions are imposed on minors that fall under different age ranges.
+To enable payment restrictions, you will be checking if restrictions exist before a minor attempts to make a payment. When a payment goes through, you will also be reporting the amount paid to our service.
+
+To check if the current player is allowed to make a payment when your game receives a request from the player to make a payment:
+
+<MultiLang kind="ue">
+
+```cs
+long amount = 100;
+AntiAddictionUIKit.CheckPayLimit(amount,
+    (result) => {
+        // If `status` is `1`, the player is allowed to make a payment
+        int status = result.status;
+        if (status == 1) {
+            // The player is allowed to make a payment
+        }
+    },
+    (exception) => {
+        // Handle exception
+    }
+);
+```
+
+```java
+long amount = 100;
+AntiAddictionUIKit.checkPayLimit(activity, amount,
+    new Callback<CheckPayResult>() {
+        @Override
+        public void onSuccess(CheckPayResult result) {
+            // If `status` is `true`, the player is allowed to make a payment; otherwise, the player cannot make a payment
+            if (result.status) {
+            }
+        }
+        
+        @Override
+        public void onError(Throwable throwable) {
+            // Handle exception
+        }
+    }
+);
+```
+
+```objc
+NSInteger amount = 100;
+[AntiAddiction checkPayLimit:amount resultBlock:^(BOOL status) {
+    if (status) {
+        // Not restricted
+    }
+} failureHandler:^(NSString * _Nonnull error) {
+    // Handle exception
+}];
+```
+
+```cpp
+AntiAddictionUE::CheckPayLimit(FCString::Atoi(*AmountTF->Text.ToString()), [](bool Status) {
+    TUDebuger::DisplayShow(FString::Printf(TEXT("Status: %d"), Status));
+}, [](const FString& Msg) {
+    TUDebuger::ErrorShow(Msg);
+});
+```
+
+</MultiLang>
+
+The unit of the amount is *cent*.
+
+To make the function for checking payment restrictions work, your game should be reporting all the payments made by minor players.
+We recommend that you report payments on the server side. Refer to [the description of the relative REST API](#report-payment-amounts) for more information on how you can report payments on the server side.
+You can also report payments using the interface provided by the SDK when a minor player successfully makes a payment. However, this is a less reliable method compared to the former one and is often used by games that don’t require connecting to servers.
+
+<MultiLang kind="ue">
+
+```cs
+long amount = 100;
+AntiAddictionUIKit.SubmitPayResult(amount,
+    () => {
+        // Succeeded
+    }, (exception) => {
+        // Handle exception
+    }
+);
+```
+
+```java
+long amount = 100;
+AntiAddictionUIKit.submitPayResult(amount,
+    new Callback<SubmitPayResult>() {
+        @Override
+        public void onSuccess(SubmitPayResult result) {
+            // Succeeded
+        }
+
+        @Override
+        public void onError(Throwable throwable) {
+            // Handle exception
+        }
+    }
+);
+```
+
+```objc
+NSInteger amount = 100;
+[AntiAddiction submitPayResult:amount callBack:^(BOOL success) {
+    if (success) {
+        // Succeeded
+    }
+} failureHandler:^(NSString * _Nonnull error) {
+    // Handle exception
+}];
+```
+
+```cpp
+AntiAddictionUE::SubmitPayResult(FCString::Atoi(*AmountTF->Text.ToString()), [](bool Success) {
+    TUDebuger::DisplayShow(FString::Printf(TEXT("Success: %d"), Success));
+}, [](const FString& Msg) {
+    TUDebuger::ErrorShow(Msg);
+});
+```
+
+</MultiLang>
+
+When reporting payment amount, the unit of the amount is also *cent*.
+
+## Report Play Time
+
+Invoke the following interface once the player successfully logs in to your game. After that, the SDK will automatically and continuously report the game time of the player.
+
+<MultiLang kind="ue">
+
+```cs
+AntiAddictionUIKit.EnterGame();
+```
+
+```java
+AntiAddictionUIKit.enterGame();
+```
+
+```objc
+[AntiAddiction enterGame];
+```
+
+```cpp
+AntiAddictionUE::EnterGame();
+```
+
+</MultiLang>
+
+Invoke the following interface once the player leaves your game. The SDK will stop reporting the game time of the player.
+
+<MultiLang kind="ue">
+
+```cs
+AntiAddictionUIKit.LeaveGame();
+```
+
+```java
+AntiAddictionUIKit.leaveGame();
+```
+
+```objc
+[AntiAddiction leaveGame];
+```
+
+```cpp
+AntiAddictionUE::LeaveGame();
+```
+
+</MultiLang>
+
+## REST API
+
+### Request Format
+
+The body of any request sent to the REST API must be a JSON object. The `Content-Type` in the HTTP header should be `application/json`.
+
+The `Authorization TOKEN` HTTP header is used by the server to authenticate requests.
+To invoke the Anti-addiction REST API, you will first need to obtain a `TOKEN` on the client using the SDK, then give this `TOKEN` to the server. The server will then be able to invoke the REST API with this `TOKEN`.
+
+The API Base is `https://tds-tapsdk.cn.tapapis.com`.
+
+### Obtain the Authentication Token
+
+<MultiLang kind="ue">
+
+```cs
+string token = AntiAddictionUIKit.CurrentToken;
+```
+
+```java
+String token = AntiAddictionUIKit.currentToken();
+```
+
+```objc
+NSString *token = [AntiAddiction currentToken];
+```
+
+```cpp
+FString Token = AntiAddictionUE::CurrentToken();
+```
+
+</MultiLang>
+
+The token obtained here won’t expire.
+
+### Check if the Player Can Game
+
+```sh
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H 'Authorization: {{token}}' \
+  https://tds-tapsdk.cn.tapapis.com/anti-addiction/v1/clients/{{clientId}}/users/{{userIdentifier}}/playable
+```
+
+Among the request above:
+
+* `{{token}}` needs to be replaced with the [authentication token](#obtain-the-authentication-token) obtained by the client.
+* `{{clientId}}` needs to be replaced with the Client ID obtained from **开发者中心后台游戏服务 > 应用配置**.
+* `{{userIdentifier}}` needs to be replaced with the **unique identifier of the player** used for [identity verification](/sdk/anti-addiction/guide/#identity-verification).
+
+The response’s status code will be `200` for the following situations:
+
+```json
+// Failed to complete real-name verification
+{
+    "success": true,
+    "data": {
+        "status": 2,
+        "anti_addiction_token": "",
+        "age_limit": 18,
+        "has_auth_record": false
+    }
+}
+
+// The player is an adult
+{
+    "success":true,
+    "data":{
+        "code":200,
+        "can_play":true,
+        "message":"游戏时间不受限制",
+        "remain_time":60,
+        "cost_time":0,
+        "restrict_type":0,
+        "title":"健康游戏提示",
+        "description":"当前为成年人账号"
+    }
+}
+
+// The player is a minor and is allowed to game
+{
+    "success":true,
+    "data":{
+        "code":200,
+        "can_play":true,
+        "message":"游戏允许时间",
+        "remain_time": {{remainTime}},
+        "cost_time": {{costtime}},
+        "restrict_type":1,
+        "title":"健康游戏提示","description":"你当前为未成年账号，已被纳入防沉迷系统。根据国家相关规定，周五、周六、周日及法定节假日 20 点 - 21 点之外为健康保护时段。你今日游戏时间还剩余${remainTime}分钟，请注意适当休息。"
+    }
+}
+
+// The player is a minor and is not allowed to game
+{
+    "success":true,
+    "data":{
+        "code":200,
+        "can_play":false,
+        "message":"游戏时间耗尽",
+        "remain_time": 0,
+        "cost_time": 60,
+        "restrict_type":1,
+        "title":"健康游戏提示",
+        "description":"你当前为未成年账号，已被纳入防沉迷系统。根据国家相关规定，周五、周六、周日及法定节假日 20 点 - 21 点之外为健康保护时段。当前时间段无法游玩，请合理安排时间。"
+    }
+}
+```
+
+A `401` error will be returned if the token cannot be parsed:
+
+```json
+{
+    "success":false,
+    "data":{
+        "code":16,
+        "error":"实名认证失败",
+        "error_description":"未实名用户不能进入游戏",
+        "msg":"该账号没有通过实名认证"
+    }
+}
+```
+
+### Check if the Player Can Make Payments
+
+The unit of the payment amount is *cent*. For example, to check if the player can spend 1 Yuan (100 cents):
+
+```sh
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H 'Authorization: {{token}}' \
+  -d '{"amount": 100}' \
+  https://tds-tapsdk.cn.tapapis.com/anti-addiction/v1/clients/{{clientId}}/users/{{userIdentifier}}/payable
+```
+
+The status code of the response will be `200` no matter if the player is allowed to make the payment:
+
+```json
+// Restricted
+{
+    "success":true,
+    "data":{
+        "code":200,
+        "status":false,
+        "message":"限额提示",
+        "title":"健康消费提示",
+        "description":"允许充值根据国家相关规定，未满8周岁：不提供付费服务；8-16周岁以下：单笔付费不超过50元，每月累计不超过200元；16-18周岁以下：单笔付费不超过100元，每月累计不超过400元。"
+    }
+}
+
+// Allowed
+{
+    "success":true,
+    "data":{
+        "code":200,
+        "status":true,
+        "message":"限额提示",
+        "title":"健康消费提示",
+        "description":"允许充值根据国家相关规定，未满8周岁：不提供付费服务；8-16周岁以下：单笔付费不超过50元，每月累计不超过200元；16-18周岁以下：单笔付费不超过100元，每月累计不超过400元。"
+    }
+}
+```
+
+A `400` error will be returned if the amount is malformatted:
+
+```json
+{
+    "success":false,
+    "data":{
+        "code":3,
+        "error":"上传金额不正确",
+        "error_description":"金额大于等于0并小于100_000_000_000","msg":"请输入正确的金额格式"
+    }
+}
+```
+
+A `401` error will be returned if real-name verification fails (including if the token cannot be parsed):
+
+```json
+{
+    "success":false,
+    "data":{
+        "code":16,
+        "error":"实名认证失败",
+        "error_description":"未实名用户不能进入游戏",
+        "msg":"该账号没有通过实名认证"
+    }
+}
+```
+
+### Report Payment Amounts
+
+To report that the player has spent 1 Yuan (100 cents):
+
+```sh
+curl -X POST \
+  -H "Content-Type: application/json" \
+  -H 'Authorization: {{token}}' \
+  -d '{"amount": 100}' \
+  https://tds-tapsdk.cn.tapapis.com/anti-addiction/v1/clients/{{clientId}}/users/{userIdentifier}/payments
+```
+
+The status code of the response will be `200` if the amount is successfully reported:
+
+```json
+{
+    "success":true,
+    "data":{"message":"上传金额成功"}
+}
+```
+
+A `400` error will be returned if the amount is malformatted:
+
+```json
+{
+    "success":false,
+    "data":{
+        "code":3,
+        "error":"上传金额不正确",
+        "error_description":"金额大于等于0并小于100_000_000_000","msg":"请输入正确的金额格式"
+    }
+}
+```

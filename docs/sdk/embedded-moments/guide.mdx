@@ -9,19 +9,57 @@ import CodeBlock from "@theme/CodeBlock";
 import sdkVersions from "/src/docComponents/sdkVersions";
 import Languages from "../_partials/languages.mdx";
 
-本文介绍如何在游戏中加入 [TapTap 内嵌动态](/sdk/embedded-moments/features/)。使用内嵌动态功能需依赖 TapTap 登录，需要导入`TapMoment` 模块。
+本文介绍如何在游戏中加入 [TapTap 内嵌动态](/sdk/embedded-moments/features/)。使用内嵌动态功能需依赖 TapTap 登录。由于 TapTap 登录有两种形式，分别为[基于内建账户系统登录](/sdk/taptap-login/guide/start/)和[单纯登录](/sdk/taptap-login/guide/tap-login/)，所以内嵌动态 SDK 获取以及初始化根据 TapTap 登录集成方式的不同而有区别。
+
+以下先介绍基于内建账户系统登录条件下内嵌动态的集成，**如果使用单纯的 TapTap 登录 并接入内嵌动态，初始化和 SDK 获取请参考：[单纯的内嵌动态初始化](#单纯的内嵌动态初始化)**。
+## 环境要求
+
+<MultiLang kind="ue">
+
+<>
+
+- Unity 2019.4 或更高版本
+- iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
+- Android 5.0（API level 21）或更高版本
+
+</>
+
+<>
+
+Android 5.0（API level 21）或更高版本
+
+</>
+
+<>
+
+iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
+
+</>
+
+<>
+
+- 安装 UE 4.26 及以上版本
+- iOS 12 或更高版本
+- Android 5.0（API level 21）或更高版本
+- macOS 10.14.0 或更高版本
+- Windows 7 或更高版本
+
+**支持平台**：Android / iOS / Windows / macOS
+
+</>
+
+</MultiLang>
+
+## 集成前准备
+
+1. 参考 [准备工作](/sdk/start/get-ready/) 创建应用、开启内嵌动态应用配置、绑定 API 域名；
 
 ## SDK 获取
 
-:::info
 
-- 如果使用 [单纯的 TapTap 登录](/sdk/taptap-login/guide/tap-login/) 并接入内嵌动态，初始化和 SDK 获取请参考：[单纯的内嵌动态初始化](#单纯的内嵌动态初始化)。
+请先参考 [TapTap 登录](/sdk/taptap-login/guide/start/#sdk-获取)完成 SDK 获取，然后在此基础上可以通过 [下载](/tap-download) 获得 TapSDK，添加 `TapMoment` 模块：  
 
-:::
-
-假设你已经在 [快速开始](/sdk/start/quickstart/#初始化) 部分完成了 SDK 初始化，可以通过 [下载](/tap-download) 获得 TapSDK，添加 `TapMoment` 模块：
-
-<MultiLang>
+<MultiLang kind="ue">
 
 <CodeBlock className="json">
   {`"dependencies":{
@@ -50,13 +88,30 @@ TapMomentSDK.framework
 `}
 </CodeBlock>
 
+```cs
+PublicDependencyModuleNames.AddRange(new string[] { 
+  //...
+  "TapMoment"
+});
+```
+
 </MultiLang>
+
+## SDK 初始化
+
+请确认已经完成了 [Tap 登录初始化](/sdk/taptap-login/guide/start/#sdk-初始化)，则内嵌动态无需再次进行初始化；
+
+:::info
+
+- 如果使用 [单纯的 TapTap 登录](/sdk/taptap-login/guide/tap-login/) 并接入内嵌动态，初始化和 SDK 获取请参考：[单纯的内嵌动态初始化](#单纯的内嵌动态初始化)。
+
+:::
 
 ## 设置回调
 
 设置回调以获取动态的状态变化。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 TapMoment.SetCallback((code, msg) => {
@@ -84,6 +139,12 @@ TapMoment.setCallback(new TapMoment.TapMomentCallback() {
 }
 ```
 
+```cpp
+FTapMoment::SetCallback(FTapMoment::FDelegate::CreateLambda([](int Code, const FString& Msg) {
+  
+}));
+```
+
 </MultiLang>
 
 回调方法中 code 表示事件类型，现支持的回调类型如下：
@@ -106,7 +167,7 @@ TapMoment.setCallback(new TapMoment.TapMomentCallback() {
 
 定时调用获取消息通知的接口，有新信息时可以在 TapTap 动态入口显示小红点，提醒玩家查看新动态。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 TapMoment.FetchNotification();
@@ -118,6 +179,10 @@ TapMoment.fetchNotification();
 
 ```objectivec
 [TapMoment fetchNotification];
+```
+
+```cpp
+FTapMoment::FetchNotification();
 ```
 
 </MultiLang>
@@ -134,24 +199,66 @@ TapMoment.fetchNotification();
 
 :::
 
-## 显示动态页面
+## 设置默认屏幕方向
 
-在游戏中显示 TapTap 动态页面，在这个页面，玩家不仅可以查看动态，还能发布新动态。
+在游戏中显示动态页面时，如果游戏屏幕方向始终保持不变，开发者可调用如下接口设置动态默认展示的屏幕方向。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
-TapMoment.Open(Orientation.ORIENTATION_LANDSCAPE);
+TapMoment.SetDefaultOrientation(Orientation.ORIENTATION_LANDSCAPE);
 ```
 
 ```java
-TapMoment.open(TapMoment.ORIENTATION_PORTRAIT);
+TapMoment.setDefaultOrientation(TapMoment.ORIENTATION_PORTRAIT);
 ```
 
 ```objectivec
 TapMomentConfig *mConfig = TapMomentConfig.new;
 mConfig.orientation = TapMomentOrientationDefault;
+[TapMoment setDefaultConfig:mConfig];
+```
+
+
+```cpp
+//暂不支持
+```
+</MultiLang>
+
+设置方向后，后续打开动态页面接口可选择使用该方向。
+
+## 显示动态页面
+
+在游戏中显示 TapTap 动态页面，在这个页面，玩家不仅可以查看动态，还能发布新动态。
+
+<MultiLang kind="ue">
+
+```cs
+//使用指定屏幕方向
+TapMoment.Open(Orientation.ORIENTATION_LANDSCAPE);
+//使用默认方向
+TapMoment.Open();
+```
+
+```java
+//使用指定屏幕方向
+TapMoment.open(TapMoment.ORIENTATION_PORTRAIT);
+//使用默认方向
+TapMoment.open();
+```
+
+```objectivec
+//使用指定屏幕方向
+TapMomentConfig *mConfig = TapMomentConfig.new;
+mConfig.orientation = TapMomentOrientationDefault;
 [TapMoment open:mConfig];
+//使用默认方向
+[TapMoment open];
+```
+
+```cpp
+//使用指定屏幕方向
+FTapMoment::Open(ETapMomentOrientation::PORTRAIT);
 ```
 
 </MultiLang>
@@ -169,26 +276,29 @@ mConfig.orientation = TapMomentOrientationDefault;
 动态页面的背景图可以配置，步骤如下图所示。
 背景图需要人工审核后才能生效，请预留充足的时间。
 
-![](/img/tap_moment_bg.png)
+![](https://capacity-files.lcfile.com/Gboeocmn2zmPlN0779P1RHI4vj0AivGH/tap_moment_bg.png)
 
 ## 场景化入口
 
 开发者可以[结合游戏场景绘制入口](/sdk/embedded-moments/features/#场景化入口)，玩家打开入口跳转到指定的页面。使用前需要在开发者中心后台完成[场景化入口配置](/sdk/embedded-moments/features/#场景化入口配置)。
 
-<MultiLang>
+<MultiLang kind="ue">
 <>
 
 ```cs
-var sceneDic = new Dictionary<string, object>() { { TapMomentConstants.TapMomentPageShortCutKey, sceneId } };
 // sceneId 为开发者中心后台创建场景化入口后生成的「入口 ID」
+var sceneDic = new Dictionary<string, object>() { { TapMomentConstants.TapMomentPageShortCutKey, sceneId } };
+//使用指定屏幕方向
 TapMoment.DirectlyOpen(Orientation.ORIENTATION_DEFAULT, TapMomentConstants.TapMomentPageShortCut, sceneDic);
+// 使用默认屏幕方向
+TapMoment.DirectlyOpen(TapMomentConstants.TapMomentPageShortCut, sceneDic);
 ```
 
 #### 参数说明
 
 | 参数        | 说明                                                                                 |
 | ----------- | ------------------------------------------------------------------------------------ |
-| orientation | 打开方向                                                                             |
+| orientation | 打开方向                                                                              |
 | page        | 固定为 TapMomentConstants.TapMomentPageShortCut                                      |
 | Dictionary  | 其中 TapMomentConstants.TapMomentPageShortCutKey 固定，第三个参数为需要跳转的页面 id |
 
@@ -199,8 +309,12 @@ TapMoment.DirectlyOpen(Orientation.ORIENTATION_DEFAULT, TapMomentConstants.TapMo
 Map<String, String> extras = new HashMap<>();
 // 注意：这里的 key 是固定的，"scene_id"；第二个参数是开发者中心后台创建场景化入口后生成的「入口 ID」
 extras.put("scene_id", "xxxx");
-// 注意：第二个参数固定为 "tap://moment/scene/"
+// 使用指定屏幕方向，注意：第二个参数固定为 "tap://moment/scene/"
 TapMoment.directlyOpen(TapMoment.ORIENTATION_DEFAULT,"tap://moment/scene/", extras);
+
+//使用设置的默认方向
+TapMoment.directlyOpen("tap://moment/scene/", extras);
+
 ```
 
 #### 参数说明
@@ -217,7 +331,10 @@ TapMoment.directlyOpen(TapMoment.ORIENTATION_DEFAULT,"tap://moment/scene/", extr
 ```objectivec
 TapMomentConfig *mConfig = TapMomentConfig.new;
 mConfig.orientation = TapMomentOrientationDefault;
+//使用指定方向
 [TapMoment directlyOpen:mConfig page:TapMomentPageShortcut extras:@{ TapMomentPageShortcutKey: @"sceneid" }];
+//使用设置的默认屏幕方向
+[TapMoment directlyOpen:TapMomentPageShortcut extras:@{ TapMomentPageShortcutKey: @"sceneid" }];
 ```
 
 #### 参数说明
@@ -227,6 +344,25 @@ mConfig.orientation = TapMomentOrientationDefault;
 | orientation | 打开方向                                                   |
 | page        | 固定为 TapMomentPageShortcut                               |
 | Dictionary  | TapMomentPageShortcutKey 为固定写法，表示需要跳转的页面 id |
+
+</>
+
+<>
+
+```cpp
+TSharedPtr<FJsonObject> JsonObject = MakeShared<FJsonObject>();
+// 注意：这里的 key 是固定的，FTapMomentPage::ShortCutKey；第二个参数是开发者中心后台创建场景化入口后生成的「入口 ID」
+JsonObject->SetStringField(FTapMomentPage::ShortCutKey, "xxxx");
+// 注意：第二个参数固定为 FTapMomentPage::ShortCut
+FTapMoment::DirectlyOpen(ETapMomentOrientation::DEFAULT, FTapMomentPage::ShortCut, JsonObject);
+```
+
+
+| 参数        | 说明                                                                                 |
+| ----------- | ------------------------------------------------------------------------------------ |
+| Orientation | 打开方向                                                                             |
+| Page        | 固定为 FTapMomentPage::ShortCut                                      |
+| Extras  | 其中 FTapMomentPage::ShortCutKey 固定，第三个参数为需要跳转的页面 id |
 
 </>
 
@@ -260,7 +396,7 @@ mConfig.orientation = TapMomentOrientationDefault;
 
 比如，玩家排位等待结束，准备进入对局时提示玩家关闭动态页面，玩家确认后关闭。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 TapMoment.Close("提示", "匹配成功，进入游戏");
@@ -274,6 +410,11 @@ TapMoment.closeWithConfirmWindow("提示", "匹配成功，进入游戏");
 [TapMoment closeWithTitle:@"提示" content:@"匹配成功，进入游戏" showConfirm:YES];
 ```
 
+```cpp
+FTapMoment::Close(TEXT("提示"), TEXT("匹配成功，进入游戏"));
+```
+
+
 </MultiLang>
 
 用户的选择会通过回调返回：
@@ -283,7 +424,7 @@ TapMoment.closeWithConfirmWindow("提示", "匹配成功，进入游戏");
 
 如果需要直接关闭动态窗口，不弹出二次确认框：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 TapMoment.Close();
@@ -295,6 +436,10 @@ TapMoment.close();
 
 ```objectivec
 [TapMoment close];
+```
+
+```cpp
+FTapMoment::Close();
 ```
 
 </MultiLang>
@@ -311,19 +456,25 @@ TapMoment.close();
 不过，SDK 也提供了发布图文动态的 API，以支持「一键发动态」等需求。
 图文动态包括单张或多张图片及相应的文字内容。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 string content = "我是描述";
 string[] images = {"imgpath01","imgpath02","imgpath03"};
+//使用指定屏幕方向
 TapMoment.Publish(Orientation.ORIENTATION_LANDSCAPE, images, content);
+//使用默认方向
+TapMoment.Publish(images, content);
 ```
 
 ```java
 int orientation = TapMoment.ORIENTATION_PORTRAIT;
 String content = "描述";
 String[] imagePaths = new String[]{"content://hello.jpg", "/sdcard/world.jpg"};
+//使用指定屏幕方向
 TapMoment.publish(orientation, imagePaths, content);
+//使用默认方向
+TapMoment.publish(imagePaths, content);
 ```
 
 ```objectivec
@@ -333,7 +484,15 @@ tconfig.orientation = TapMomentOrientationDefault;
 TapMomentImageData *postData = TapMomentImageData.new;
 postData.images = @[@"file://..."];
 postData.content = @"我是图片描述";
+//使用指定屏幕方向
 [TapMoment publish:tconfig content:(postData)];
+//使用默认方向
+[TapMoment publish:(postData)];
+```
+
+```cpp
+TArray<FString> ImagePaths = {"imgpath01", "imgpath02", "imgpath03"};
+FTapMoment::Publish(ETapMomentOrientation::PORTRAIT, ImagePaths, TEXT("我是描述"));
 ```
 
 </MultiLang>
@@ -349,7 +508,7 @@ postData.content = @"我是图片描述";
 
 内嵌动态支持设置语言：
 
-<Languages />
+<Languages kind="ue" />
 
 ## 单纯的内嵌动态初始化
 
@@ -359,7 +518,7 @@ postData.content = @"我是图片描述";
 
 TapSDK Unity v3.7.1 及更高版本还需要添加 `com.leancloud.storage` 模块。Android SDK 及 iOS SDK 不需要额外增加依赖。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 <CodeBlock className="json">
   {`"dependencies":{
@@ -388,9 +547,20 @@ dependencies {
   {`// 基础库
 TapCommonSDK.framework
 TapLoginSDK.framework
+TapCommonResource.bundle
+TapLoginResource.bundle
 // 内嵌动态
 TapMomentResource.bundle
 TapMomentSDK.framework
+`}
+</CodeBlock>
+
+<CodeBlock className="cpp">
+  {`// 基础库
+TapCommon
+TapLogin
+// 内嵌动态
+TapMoment
 `}
 </CodeBlock>
 
@@ -400,7 +570,7 @@ TapMomentSDK.framework
 
 3. 完成内嵌动态功能的**初始化**，示例如下：
 
-<MultiLang>
+<MultiLang kind="ue">
 <>
 
 ```cs
@@ -451,6 +621,23 @@ TapMoment.init(Context context, String clientID, boolean isCN);
 | 参数     | 描述                                  |
 | -------- | ------------------------------------- |
 | clientId | TapTap 开发者中心对应应用的 Client ID |
+
+</>
+
+<>
+
+```cpp
+FTapMomentConfig Config;
+Config.RegionType = ERegionType::Global;
+Config.ClientID = "your clientId";
+FTapMoment::Init(Config);
+```
+
+**参数说明**
+
+| 参数     | 描述                                    |
+| -------- | --------------------------------------- |
+| Config | 其中 ClientID 是 TapTap 开发者中心对应游戏的 Client ID。 |
 
 </>
 

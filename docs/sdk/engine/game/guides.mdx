@@ -1,0 +1,176 @@
+---
+title: 云引擎游戏后端开发指南
+sidebar_label: 开发指南
+sidebar_position: 3
+---
+
+import { CLI_BINARY } from "/src/constants/env.ts";
+import CodeBlock from "@theme/CodeBlock";
+import Path from "/src/docComponents/path";
+import { Conditional } from "/src/docComponents/conditional";
+
+<!--
+## 游戏后端实例
+
+:::info
+你需要先将云引擎分组调整到游戏后端实例，才能使用这个页面介绍的功能。
+:::
+
+我们为游戏后端提供了几种不同的实例规格：
+
+| 规格          | 内存    | CPU    |
+| ------------- | ------- | ------ |
+| game-1c4g  | 1024 MB  | 1 Core |
+| game-2c6g | 2048 MB | 2 Core |
+| game-4c8g | 4096 MB | 4 Core |
+
+在 **<Path to="engine" /> > 管理部署 > 你的分组 > 资源** 页面下，可以修改实例的规格和数量。
+-->
+
+## 提供 TCP 或 UDP 服务
+
+在 leanengine.yaml 中可以配置额外的端口：
+
+```yaml title='leanengine.yaml'
+extraPorts:
+  - name: echo
+    protocol: udp
+    containerPort: 4000
+  - name: game
+    protocol: tcp
+    containerPort: 4000
+```
+
+最多可以配置 5 个端口。
+
+### 外网连接
+
+你需要使用 [REST API](#rest-api) 小节中的接口来获取到外网连接的 IP 和端口，然后可以使用客户端连接，这里我们以 `nc` 为例：
+
+```
+$ nc -u 106.75.70.96 11348
+hello
+hello
+```
+
+## 平滑关闭
+
+在版本更新、容量调整、系统自动进行调度，你的应用进程需要被关闭时，云引擎会向你的进程发送 `SIGTERM` 信号，并等待最长 60 分钟的时间。
+
+你的程序应该处理 SIGTERM 信号（否则默认行为是立即退出），根据业务逻辑（如是否还有客户端连接）尽快主动退出。
+
+<EngineRuntimes>
+<TabItem value='go'>
+
+```go
+func main() {
+  go func() {
+    sigTermChan := make(chan os.Signal, 1)
+    signal.Notify(sigTermChan, syscall.SIGTERM, syscall.SIGINT)
+    sig := <-sigTermChan
+
+    log.Println("Received signal", sig)
+
+    // 等待现有业务逻辑（如客户端连接）运行结束
+    time.Sleep(60 * time.Second)
+
+    // 主动退出程序
+    os.Exit(0)
+  }()
+
+  // 其他业务代码
+}
+```
+
+</TabItem>
+</EngineRuntimes>
+
+如果你的程序没有在 60 分钟内主动退出，则云引擎会强制停止你的程序。
+
+如果有 3 倍以上于常规实例数量的实例处于平滑关闭状态（terminating），再进行部署时会失败，你需要额外传入一个 `forceStopOldInstances` 选项来强制关闭最早的几个处于平滑关闭状态的实例：
+
+<CodeBlock>
+  {`$ ${CLI_BINARY} deploy --options 'forceStopOldInstances=true'`}
+</CodeBlock>
+
+## REST API
+
+| 接口                            | 鉴权         | 功能                       |
+| ------------------------------- | ------------ | -------------------------- |
+| `GET /1.1/engine/containers`    | 仅开发者可用 | 获取正在运行的实例列表     |
+| `GET /1.1/engine/gateway/route` | 客户端可用   | 随机返回一个实例的连接信息 |
+
+<Conditional region="cn">
+
+请使用应用绑定的 API 自定义域名来调用这些接口，你可以在控制台查看或绑定 API 自定义域名，详见 [域名绑定指南 § API 域名](/sdk/domain/guide/#api-域名) 中的说明。
+
+</Conditional>
+
+**所有接口** 都需要发送 `X-LC-Id` 头，如 `X-LC-Id: SJjoXHWuhewHKV4Ojw`。
+
+**仅开发者可用** 的接口需要在 `Authorization` 头中发送 Access Token，如 `Authorization: Bearer 14d1c1ff-908b-4a2c-baec-427cbde3bf05`。
+
+### `GET /containers`
+
+这个接口会返回所有运行中的实例列表，开发者可以基于这个接口来实现自定义的路由逻辑，比如将特定的用户分配到同一个实例上。
+
+```
+$ curl -H 'X-LC-Id: SJjoXHWuhewHKV4Ojw' \
+       -H 'Authorization: Bearer 14d1c1ff-908b-4a2c-baec-427cbde3bf05'\
+       'https://shared.cloud.tds1.tapapis.cn/1.1/engine/containers?groupName=udp&prod=1'
+
+[
+  {
+    "name": "web3-219ebd3e",
+    "prod": 1,
+    "status": "running",
+    "extraPorts": [
+      {
+        "name": "game",
+        "protocol": "udp",
+        "publicPort": 19766,
+        "publicIp": "106.75.70.96"
+      }
+    ],
+    "versionTag": "20220606-152341"
+  },
+  {
+    "name": "web3-b102392b",
+    "prod": 1,
+
+    "createdAt": "2022-06-06T07:23:47.000Z",
+    "forceStopAfter": "2022-06-06T07:24:27.000Z",
+
+    "status": "terminating",
+    "extraPorts": [
+      {
+        "name": "game",
+        "protocol": "udp",
+        "publicPort": 18288,
+        "publicIp": "106.75.70.96"
+      }
+    ],
+    "versionTag": "20220606-144209"
+  }
+]
+```
+
+响应中会同时包含正常运行（running）和正在平滑关闭（terminating）的容器，其中 extraPorts 部分就是可供终端设备连接的外部 IP 和端口。
+
+### `GET /gateway/route`
+
+这个接口不需要鉴权，会随机返回一个 running 状态的容器的连接信息，用于开发者不希望自行开发路由接口时直接在客户端使用。
+
+```
+$ curl -H 'X-LC-Id: SJjoXHWuhewHKV4Ojw' \
+       'https://shared.cloud.tds1.tapapis.cn/1.1/engine/gateway/route?groupName=udp&prod=1'
+
+[
+  {
+    "name": "game",
+    "protocol": "udp",
+    "publicPort": 19766,
+    "publicIp": "106.75.70.96"
+  }
+]
+```

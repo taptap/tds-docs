@@ -1,0 +1,271 @@
+---
+title: TapTap 打包规范
+sidebar_position: 5
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+## 支持 64 位架构
+
+自 **2022 年 7 月 27 日**起，您在 TapTap 上发布的应用必须支持 ARM 64 位架构。 64 位 CPU 能够为您的用户提供更快、更丰富的体验。添加 64 位的应用版本不仅可以提升性能、为未来创新创造条件，还能针对仅支持 64 位架构的设备做好准备。
+
+本指南参考 Google Play 的指引，介绍了 32 位应用如何支持 64 位设备，供您随时采用。
+
+## 评估您的应用
+
+如果您的应用仅使用以 Java 编程语言或 Kotlin 编写的代码（包括所有库或 SDK），那么就表示该应用已经能支持 64 位设备。如果您的应用使用了任何原生代码，或者您不确定应用是否使用了这类代码，那么您需要评估应用并采取措施。
+
+### 您的应用是否使用了原生代码？
+
+首先需要检查您的应用是否使用了任何原生代码。 如果您的应用符合以下情况，便是使用了原生代码：
+
+- 使用了任何 C/C++（原生）代码。
+- 与任何第三方原生库关联。
+- 通过使用原生库的第三方应用构建程序构建而成。
+
+### 应用是否包含 64 位库？
+
+若要确定应用是否包含 64 位库，最简单的方法就是检查 APK 文件的结构。在构建时，APK 会与应用所需的所有原生库打包在一起。原生库会根据 [ABI](https://developer.android.com/ndk/guides/abis?hl=zh-cn#sa) 存储在不同的文件夹中。您的应用不一定要支持所有 64 位架构，但对于支持的每种原生 32 位架构，应用都必须包含相应的 64 位架构。
+
+对于 ARM 架构，32 位库位于 **armeabi-v7a** 中。 对应的 64 位库则位于 **arm64-v8a** 中。
+
+对于 x86 架构，32 位库位于 **x86** 中，64 位库则位于 **x86_64** 中。
+
+首先要确保这两个文件夹中都有原生库。总结如下：
+
+| 平台 | 32 位库文件夹     | 64 位库文件夹   |
+| ---- | ----------------- | --------------- |
+| ARM  | `lib/armeabi-v7a` | `lib/arm64-v8a` |
+| x86  | `lib/x86`         | `lib/x86_64`    |
+
+请注意，每个文件夹中的一套库可能完全相同，也可能不完全相同，这取决于应用的具体情况。您应达到的目标是确保您的应用能够在仅支持 64 位架构的环境中正常运行。
+
+通常情况下，同时针对 32 位和 64 位架构构建的 APK 或软件包会具有这两种 ABI 的文件夹，每个文件夹中都有一套相应的原生库。如果您的应用不支持 64 位架构，那么您很可能会看到 32 位 ABI 文件夹，但没有 64 位文件夹。
+
+### 使用 APK 分析器查找原生库
+
+[APK 分析器](https://developer.android.com/studio/debug/apk-analyzer?hl=zh-cn)是一款可用于对所构建的 APK 进行各方面评估的工具。针对我们目前所讨论的情况，我们将使用该工具查找原生库，以确定是否具备 64 位库。
+
+1. 打开 Android Studio，然后**打开任一项目**。
+2. 从菜单中依次选择 **Build > Analyze APK…**
+3. 选择您要评估的 APK。
+4. 查看 **lib** 文件夹，您可以在其中找到“.so”文件。如果在您的应用中找不到任何“.so”文件，则说明该应用已支持 64 位架构，您无需采取进一步措施。如果您看到 **armeabi-v7a** 或 **x86**，则说明您有 32 位库。
+5. 检查是否 **arm64-v8a** 或 **x86_64** 文件夹中有类似的“.so”文件。
+6. 如果您没有任何 **arm64-v8a** 或 **x86_64** 库，则需要更新构建流程以开始构建并打包 APK 中的这些工件。
+
+### 通过解压缩 APK 查找原生库
+
+APK 文件的结构类似于 ZIP 文件，可以像 ZIP 文件一样解压缩。 如果您更喜欢使用命令行或任何其他解压缩工具，也可以采用解压缩 APK 的方法。
+
+只需解压缩 APK 文件（根据您使用的解压缩工具，您可能需要将其重命名为 .zip），然后按照上文中的指南浏览解压缩后的文件，即可确定您的应用是否已经为支持 64 位设备做好准备了。
+
+例如，您可以从命令行中运行如下命令：
+
+```
+:: Command Line > zipinfo -1 YOUR_APK_FILE.apk | grep \.so$ lib/armeabi-v7a/libmain.so lib/armeabi-v7a/libmono.so lib/armeabi-v7a/libunity.so lib/arm64-v8a/libmain.so lib/arm64-v8a/libmono.so lib/arm64-v8a/libunity.so
+```
+
+请注意，此示例中存在 **armeabi-v7a** 库和 **arm64-v8a** 库，这表明该应用支持 64 位架构。
+
+## 使用 64 位库构建应用
+
+下面针对构建 64 位库做出了相关的说明。不过，需要指出的是，以下内容仅介绍了如何构建在源代码的基础上可构建的代码和库。
+
+如果您使用任何外部 SDK 或库，请确保按照[上文所述的步骤](https://developer.android.com/distribute/best-practices/develop/64-bit?hl=zh-cn#assess-your-app)使用 64 位版本。如果没有 64 位版本可用，请与相应 SDK 或库的所有者联系，并在规划支持 64 位设备的方案时将这一点考虑在内。
+
+### 使用 Android Studio 或 Gradle 进行构建
+
+大多数 Android Studio 项目都使用 Gradle 作为底层构建系统，因此本部分适用于使用这两种工具进行构建的情况。针对原生代码进行构建很简单，只需将 **arm64-v8a** 和/或 **x86_64**（视您要支持的架构而定）添加到应用的“build.gradle”文件中的 [ndk.abiFilters](https://google.github.io/android-gradle-dsl/current/com.android.build.gradle.internal.dsl.NdkOptions.html) 设置中即可：
+
+<Tabs>
+<TabItem value='groovy' label='Groovy' default>
+
+```
+// Your app's build.gradle
+plugins {
+  id 'com.android.app'
+}
+
+android {
+   compileSdkVersion 27
+   defaultConfig {
+       appId "com.google.example.64bit"
+       minSdkVersion 15
+       targetSdkVersion 28
+       versionCode 1
+       versionName "1.0"
+       ndk.abiFilters 'armeabi-v7a','arm64-v8a','x86','x86_64'
+// ...
+```
+
+</TabItem>
+<TabItem value='kotlin' label='Kotlin'>
+
+```
+// Your app's build.gradle
+plugins {
+    id("com.android.app")
+}
+
+android {
+    compileSdkVersion(27)
+    defaultConfig {
+        appId = "com.google.example.64bit"
+        minSdkVersion(15)
+        targetSdkVersion(28)
+        versionCode = 1
+        versionName = "1.0"
+        ndk {
+            abiFilters += listOf("armeabi-v7a","arm64-v8a","x86","x86_64")
+        }
+// ...
+```
+
+</TabItem>
+</Tabs>
+
+### 使用 CMake 进行构建
+
+如果您的应用是使用 [CMake](https://developer.android.com/ndk/guides/cmake?hl=zh-cn#options) 构建的，那么您可以通过将 **arm64-v8a** 传递到“-DANDROID_ABI”参数来针对 64 位 ABI 进行构建：
+
+```
+:: Command Line > cmake -DANDROID_ABI=arm64-v8a … or > cmake -DANDROID_ABI=x86_64 …
+```
+
+在使用 `externalNativeBuild` 时，此方法无效。请参阅[使用 Gradle 进行构建](https://developer.android.com/distribute/best-practices/develop/64-bit?hl=zh-cn#building_with_android_studio_or_gradle)部分。
+
+### 使用 ndk-build 进行构建
+
+如果您的应用是使用 [ndk-build](https://developer.android.com/ndk/guides/ndk-build?hl=zh-cn) 构建的，那么您可以使用 `APP_ABI` 变量修改“[Application.mk](https://developer.android.com/ndk/guides/application_mk?hl=zh-cn)”文件，从而针对 64 位 ABI 进行构建：
+
+```
+APP_ABI := armeabi-v7a arm64-v8a x86 x86_64
+```
+
+在使用 `externalNativeBuild` 时，此方法无效。请参阅[使用 Gradle 进行构建](https://developer.android.com/distribute/best-practices/develop/64-bit?hl=zh-cn#building_with_android_studio_or_gradle)部分。
+
+### 将 32 位代码移植到 64 位架构
+
+如果您的代码已经可以在桌面或 iOS 平台上运行，那么您无需针对 Android 做额外的工作。如果这是第一次针对 64 位系统构建您的代码，那么您需要解决的主要问题是指针不再适合 `int` 这样的 32 位整数类型。您将需要更新以 `int`、`unsigned` 或 `uint32_t` 等类型存储指针的代码。在 Unix 系统上，`long` 对应的是指针大小，但在 Windows 上并非如此，因此您应该改用释意类型 `uintptr_t` 或 `intptr_t`。使用 `ptrdiff_t` 类型来存储两个指针之间的差异。
+
+您应该始终选择使用 [`<stdint.h>`](https://en.cppreference.com/w/c/types/integer) 中定义的特定固定宽度整数类型，而不是 `int` 或 `long` 等传统类型，即便对于非指针也应如此。
+
+使用以下编译器标记来捕捉代码在指针和整数之间转换不正确的情况：
+
+```
+-Werror=pointer-to-int-cast -Werror=int-to-pointer-cast -Werror=shorten-64-to-32
+```
+
+具有 `int` 字段（包含指向 C/C++ 对象的指针）的 Java 类也有同样的问题。在 JNI 源代码中搜索 `jint`，并确保切换到 `long`（Java 端）和 `jlong`（C++ 端）。
+
+**注意**：因指针被截断而引起的崩溃将表现为 SIGSEGV，其中错误地址的前 32 位全部为零。
+
+对于 64 位代码而言，隐式函数声明的危险性要高得多。C/C++ 假定隐式声明的函数（即编译器未检测到声明的函数）的返回值类型为 `int`。如果函数的实际返回值类型是指针，那么在 32 位系统上是可行的，因为在 32 位系统中指针的类型为 `int`，但在 64 位系统中，编译器会丢弃指针的前半部分。例如：
+
+```
+// This function returns a pointer:
+// extern char* foo();
+
+// If you don't include a header that declares it,
+// when the compiler sees this:
+char* result = foo();
+
+// Instead of compiling that to:
+result = foo();
+
+// It compiles to something equivalent to:
+result = foo() & 0xffffffff;
+
+// Which will then cause a SIGSEGV if you try to dereference `result`.
+```
+
+以下编译器标记会将隐式函数声明警告变成错误，以便您能够更轻松地查找和解决此问题：
+
+```
+-Werror=implicit-function-declaration
+```
+
+如果您有内联汇编程序，您需要重新编写该程序或使用普通的 C/C++ 实现。
+
+如果您对类型大小进行了硬编码（例如，8 或 16 字节），请使用等效的 `sizeof(T)` 表达式（例如 `sizeof(void*)`）来替换它们。
+
+如果需要有条件地编译不同于 64 位的 32 位代码，则对于一般性的 32/64 差异，您可以使用 `#if defined(__LP64__)`；对于 Android 支持的具体架构，可以使用 `__arm__`、`__aarch64__` (arm64)、`__i386__` (x86) 和 `__x86_64__`。
+
+您需要调整类似 `printf` 或 `scanf` 的函数的格式字符串，因为如果使用传统的格式说明符，您无法以一种对 32 位和 64 位设备都正确的方式来指定 64 位类型。您可利用 [`<inttypes.h>`](https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/inttypes.h.html) 中的 `PRI` 和 `SCN` 宏来解决此问题，`PRIxPTR` 和 `SCNxPTR` 分别用于写入/读取十六进制指针，`PRId64` 和 `SCNd64` 分别用于以可移植的方式写入/读取 64 位值。
+
+在移位时，您可能需要使用 `1ULL` 来获取要移位的 64 位常数，而不能使用仅支持 32 位的 `1`。
+
+### 游戏开发者
+
+我们知道，迁移第三方游戏引擎是一个耗费人力的过程，并且需要很长的准备时间。庆幸的是，三大最常用的引擎目前都支持 64 位架构：
+
+- Unreal（自 2015 年起）
+- Cocos2d（自 2015 年起）
+- Unity（自 2018 年起）
+
+### Unity 开发者
+
+#### 升级到支持的版本
+
+Unity 自版本 [2018.2](https://blogs.unity3d.com/2018/07/10/2018-2-is-now-available/) 和 [2017.4.16](https://unity3d.com/unity/whatsnew/unity-2017.4.16) 开始提供 64 位支持。
+
+如果您发现自己使用的 Unity 版本不支持 64 位架构，请确定要升级到的版本，并按照 Unity 提供的[指南](https://docs.unity3d.com/Manual/UpgradeGuides.html)迁移您的环境，确保将您的应用升级到可构建 64 位库的版本。Unity 建议您[升级到该编辑器的最新 LTS 版本](https://blogs.unity3d.com/2018/04/09/new-plans-for-unity-releases-introducing-the-tech-and-long-term-support-lts-streams/)，以获取最新的功能和更新。
+
+下面的图表概述了 Unity 的各个版本以及您应该采取的措施：
+
+| Unity 版本   | 版本是否支持 64 位？ | 建议采取的措施                                                                                                   |
+| ------------ | -------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| 2022.x       | ✔️                   | 确保您的构建设置能够输出 64 位库。                                                                               |
+| 2021.x       | ✔️                   | 确保您的构建设置能够输出 64 位库。                                                                               |
+| 2020.x       | ✔️                   | 确保您的构建设置能够输出 64 位库。                                                                               |
+| 2019.x       | ✔️                   | 确保您的构建设置能够输出 64 位库。                                                                               |
+| 2018.4 (LTS) | ✔️                   | 确保您的构建设置能够输出 64 位库。                                                                               |
+| 2018.3       | ✔️                   | 确保您的构建设置能够输出 64 位库。                                                                               |
+| 2018.2       | ✔️                   | 确保您的构建设置能够输出 64 位库。                                                                               |
+| 2018.1       | ➖                   | 提供实验性的 64 位支持。                                                                                         |
+| 2017.4 (LTS) | ✔️                   | 自 [2017.4.16](https://unity3d.com/unity/whatsnew/unity-2017.4.16) 开始支持。 确保您的构建设置能够输出 64 位库。 |
+| 2017.3       | ✖️                   | 升级到支持 64 位的版本。                                                                                         |
+| 2017.2       | ✖️                   | 升级到支持 64 位的版本。                                                                                         |
+| 2017.1       | ✖️                   | 升级到支持 64 位的版本。                                                                                         |
+| <=5.6        | ✖️                   | 升级到支持 64 位的版本。                                                                                         |
+
+#### 更改构建设置以输出 64 位库
+
+如果您使用的 Unity 版本支持 64 位的 Android 库，那么您可以通过调整构建设置来生成 64 位版本的应用。您还需要使用 IL2CPP 后端作为 Scripting Backend。要为构建 64 位架构而设置 Unity 项目，请按以下步骤操作：
+
+1. 转到 **Build Settings**，然后确认 Unity 标志是否显示在 **Platform** 下的 **Android** 旁边，以确保您是在针对 Android 进行构建。
+   - 如果 Unity 标志未显示在 Android 平台旁边，请选择 **Android**，然后点击 **Switch Platform**。
+2. 点击 **Player Settings**。
+3. 依次转到 **Player Settings Panel > Settings for Android > Other Settings > Configuration**
+4. 将 **Scripting Backend** 设为 **IL2CPP**。
+5. 依次选择 **Target Architecture > ARM64** 复选框。
+6. 照常构建！
+
+请注意，针对 ARM64 进行构建需要您专门针对该平台构建您的所有资产。请按照 Unity 的[指南](https://docs.unity3d.com/Manual/ReducingFilesize.html)来缩减 APK 大小，同时考虑利用 [Android App Bundle](https://developer.android.com/platform/technology/app-bundle?hl=zh-cn) 功能来减小大小增加量。
+
+## 合并 APK 和 64 位合规性
+
+如果您要使用 Google Play 的[合并 APK 支持](https://developer.android.com/google/play/publishing/multiple-apks?hl=zh-cn)来发布应用，请注意在版本层面评估是否符合 64 位要求。不过，如果 APK 或 app bundle 不会分发给搭载 Android 9 Pie 或更高版本的设备，则不适用 64 位要求。
+
+如果您的某个 APK 被标记为不合规，但该 APK 比较老旧且无法使其合规，一种策略是在该 APK 清单的 [`uses-sdk`](https://developer.android.com/guide/topics/manifest/uses-sdk-element?hl=zh-cn) 元素中添加 `maxSdkVersion="27"` 属性。这样一来，此 APK 将不会被分发给搭载 Android 9 Pie 或更高版本的设备，因而也就不会再妨碍合规。
+
+## RenderScript 和 64 位合规性
+
+如果您的应用使用 RenderScript 并且是通过较低版本的 Android 工具构建的，该应用可能会存在 64 位合规性问题。使用版本低于 21.0.0 的构建工具时，编译器可能会将生成的位码放到外部 `.bc` 文件中。64 位架构不再支持这些旧的 `.bc` 文件，因此，如果您的 APK 中有这类文件，就会造成合规性问题。
+
+要解决此问题，请移除项目中的所有 `.bc` 文件，将环境升级到 `build-tools-21.0.0` 或更高版本，并将 Android Studio 中的 [`renderscriptTargetApi`](https://developer.android.com/guide/topics/renderscript/compute?hl=zh-cn) 设为 21+，以指示编译器不要生成 `.bc` 文件。然后，重新构建您的应用，检查是否有 `.bc` 文件，再将应用上传到 Play 管理中心。
+
+## 在 64 位硬件上测试应用
+
+64 位版本的应用应提供与 32 位版本相同的质量和功能集。请对您的应用进行测试，以确保使用最新的 64 位设备的用户能够在您的应用中获得优质的体验。
+
+要开始测试您的应用，您要有支持 64 位架构的设备。时下有很多支持 64 位架构的热门设备，例如 Google 的 Pixel 以及其他旗舰设备。
+
+最简单的 APK 测试方法就是使用 adb 安装该应用。大多数情况下，您可以提供 `--abi` 作为参数，用以指示要将哪些库安装到设备上。这样在设备上安装该应用时便会仅包含 64 位库。
+
+```
+:: Command Line # A successful install: > adb install --abi armeabi-v7a YOUR_APK_FILE.apk Success # If your APK does not have the 64-bit libraries: > adb install --abi arm64-v8a YOUR_APK_FILE.apk adb: failed to install YOUR_APK_FILE.apk: Failure [INSTALL_FAILED_NO_MATCHING_ABIS: Failed to extract native libraries, res=-113] # If your device does not support 64-bit, an emulator, for example: > adb install --abi arm64-v8a YOUR_APK_FILE.apk ABI arm64-v8a not supported on this device
+```
+
+安装成功后，请照常对应用进行测试，以确保其质量与 32 位版本相同。

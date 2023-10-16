@@ -1,0 +1,69 @@
+---
+title: Game Backend Architecture Reference
+sidebar_label: Architecture Reference
+sidebar_position: 2
+---
+
+import Mermaid from "/src/docComponents/Mermaid";
+import { Conditional } from "/src/docComponents/conditional";
+
+:::info
+
+This document describes the overall architecture of the game backend running on the Cloud Engine. You can learn more about integrating the game backend in the [Game Backend Guide](/sdk/engine/game/guides) or get started quickly by following the [Getting Started With Game Backend](/sdk/engine/game/getting-started).
+
+:::
+
+The Cloud Engine is a process-level runtime environment that allows the developer to focus only on the process itself for the game backend and concentrate on implementing the game, not the OS-level environment.
+
+The Cloud Engine provides the game backend with support for TCP or UDP protocols, smooth shutdown for up to 60 minutes, and allows clients to connect to specific instances, and you can use these features with all languages supported by the Cloud Engine (you can see all supported languages in [Cloud Engine Overview](/sdk/engine/overview)).
+
+Existing game backend projects can often be run on the Cloud Engine with only minor modifications to gain access to the logging, statistics, smooth deployment and rollback, automatic scaling, and other features provided by the Cloud Engine (see these features in [Cloud Engine Platform Features](/sdk/engine/platform)).
+
+<Conditional region="cn">
+
+:::info
+
+The Cloud Engine provides the ability to host the backend of the game. If you want to develop a backendless game project, consider [多人在线对战服务](/sdk/multiplayer/features/) which provides abstractions for entities such as rooms.
+
+:::
+
+</Conditional>
+
+## Servers for Long-Lived Connections
+
+For real-time multiplayer matchmaking games (such as MoBA, FPS, RTS, and other strong matchmaking games), the game state is often updated very frequently (e.g., dozens of times per second), and the industry mostly uses TCP or UDP protocols to maintain the game state in the server's memory.
+
+Running such a program in a container architecture with Cloud Engine requires some additional concerns:
+
+- Because the state in memory varies for each long-lived connection instance, the client needs to know exactly which instance it wants to connect to
+- If an instance needs to be shut down, it must wait until all client connections are closed and the state in memory is no longer meaningful before exiting
+
+The Cloud Engine does not interfere with loads over TCP or UDP, so you can use any protocol (e.g., KCP) or format. However, the source or destination address and port in the header of a TCP or UDP packet will be modified as it passes through the gateway component of the Cloud Engine, and the real IP of the client will not be available in the long-lived connection instance.
+
+## Client Connection
+
+The following diagram shows the network activity from the client's perspective:
+
+<Mermaid
+  diagram={`
+sequenceDiagram
+    autonumber
+    Note over Client,Router: Client asks Router for long-lived connection address
+    Client->>Router: GET /join (HTTP)
+    Note over Client,Router: Router returns long-lived connection address based on matching logic
+    Router->>Client: ip:port (HTTP)
+    Note over Client,Game Server: Client connects to game server
+    Client->>Game Server: connect ip:port (TCP)
+    loop
+        Note over Client,Game Server: Send and receive game data
+        Client->>Game Server: send game action
+        Game Server->>Client: broadcast game events
+    end
+`}
+/>
+
+Where:
+
+- **Client** is the device of the end user of the game.
+- **Router** is an HTTP service implemented by the developer (of course it can also be deployed on the Cloud Engine). The client accesses it through a fixed domain name to get the address of the long-lived connection.
+- **Game Server** is a long-lived connection server deployed by the developer on the Cloud Engine. It has an internal state and the client can connect to different instances through different addresses (combination of IP and port).

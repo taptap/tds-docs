@@ -8,8 +8,8 @@ const CONFIGS: {
 } = {
   ios: {
     leancloud: [
-      { label: "Swift", value: "swift" },
       { label: "Objective-C", value: "objc" },
+      { label: "Swift", value: "swift" },
     ],
     tds: [{ label: "Objective-C", value: "objc" }],
   },
@@ -45,6 +45,16 @@ const CONFIGS: {
       { label: "iOS", value: "ios" },
     ],
   },
+  play: {
+    leancloud: [
+      { label: "JavaScript", value: "js" },
+      { label: "C#", value: "csharp" },
+    ],
+    tds: [
+      { label: "JavaScript", value: "js" },
+      { label: "C#", value: "csharp" },
+    ],
+  },
   ue: {
     tds: [
       { label: "Unity", value: "unity" },
@@ -53,12 +63,38 @@ const CONFIGS: {
       { label: "UE4", value: "ue4" },
     ],
   },
+  adn: {
+    tds: [
+      { label: "Unity", value: "unity" },
+      { label: "Android", value: "android" },
+    ],
+  },
   im: {
     tds: [
       { label: "Unity", value: "unity" },
       { label: "Android", value: "android" },
       { label: "iOS", value: "ios" },
       { label: "JavaScript", value: "js" },
+    ],
+    leancloud: [
+      { label: "C#", value: "csharp" },
+      { label: "Java", value: "java" },
+      { label: "Objective-C", value: "objc" },
+      { label: "JavaScript", value: "js" },
+      { label: "Swift", value: "swift" },
+      { label: "Flutter", value: "flutter" },
+    ]
+  },
+  sms: {
+    leancloud: [
+      { label: "C#", value: "csharp" },
+      { label: "Java", value: "java" },
+      { label: "Objective-C", value: "objc" },
+      { label: "Swift", value: "swift" },
+      { label: "Flutter", value: "flutter" },
+      { label: "JavaScript", value: "js" },
+      { label: "Python", value: "python" },
+      { label: "PHP", value: "php" },
     ],
   },
   default: {

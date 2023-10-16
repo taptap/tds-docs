@@ -6,6 +6,8 @@ sidebar_position: 2
 
 import MultiLang from "/src/docComponents/MultiLang";
 import { Conditional } from "/src/docComponents/conditional";
+import CodeBlock from "@theme/CodeBlock";
+import sdkVersions from "/src/docComponents/sdkVersions";
 
 :::info
 
@@ -16,13 +18,135 @@ import { Conditional } from "/src/docComponents/conditional";
 
 :::
 
-## SDK 安装配置
+## 环境要求
 
-排行榜功能是数据存储 SDK 的一部分，请参考相应平台的数据存储 SDK 的配置指南。
+<MultiLang kind="ue">
 
-- [.NET SDK 配置](/sdk/storage/guide/setup-dotnet)
-- [Java SDK 配置](/sdk/storage/guide/setup-java)
-- [Objective-C SDK 配置](/sdk/storage/guide/setup-objc)
+<>
+
+- Unity 2019.4 或更高版本
+- iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
+- Android 5.0（API level 21）或更高版本
+
+</>
+
+<>
+
+Android 5.0（API level 21）或更高版本
+
+</>
+
+<>
+
+iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
+
+</>
+
+<>
+
+- 安装 UE 4.26 及以上版本
+- iOS 12 或更高版本
+- Android 5.0（API level 21）或更高版本
+
+**支持平台**：Android / iOS
+
+</>
+
+</MultiLang>
+
+## 集成前准备
+
+1. 参考 [准备工作](/sdk/start/get-ready/) 创建应用、开启内建账户、排行榜服务、绑定 API 域名；
+
+## SDK 获取
+
+排行榜功能是数据存储 SDK 的一部分，排行榜 SDK 配置与数据存储 SDK 配置一致；
+
+<MultiLang kind="ue">
+
+<>
+
+SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选其一。请根据项目需要选择。
+
+#### 方法一：使用 Unity Package Manager
+
+在项目的 `Packages/manifest.json` 文件中添加以下依赖：
+
+<CodeBlock className="json">
+  {`"dependencies":{
+    "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}",
+    "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
+}`}
+</CodeBlock>
+
+在 Unity 顶部菜单中选择 **Window > Package Manager** 可查看已经安装在项目中的包。
+
+#### 方法二：手动导入
+
+1. 在 [下载页](/tap-download) 找到 **LeanCloud C# SDK** 下载地址，下载 `LeanCloud-SDK-Realtime-Unity.zip`。
+
+2. 解压后的 `LeanCloud-SDK-Realtime-Unity.zip` 为 Plugins 文件夹，拖拽至 Unity 即可。
+
+
+
+</>
+  
+<>
+
+1. 打开项目的 `project/app/build.gradle` 文件，添加 gradle 配置如下：
+
+<CodeBlock className="java"> {`
+dependencies {
+    ...
+    implementation 'cn.leancloud:storage-android:${sdkVersions.leancloud.java}'
+}
+`}</CodeBlock>
+
+
+</>
+
+<>
+
+参考 [Objective-C SDK 配置](/sdk/storage/guide/setup-objc)。
+
+</>
+
+<>
+
+* 下载 [TapSDK UE4](/tap-download)，TapSDK-UE4-xxx.zip 解压后将 `LeanCloud`  文件夹 Copy 到项目的 `Plugins` 目录中
+* 重启 Unreal Editor
+* 打开 编辑 > 插件 > 项目 > LeanCloud，开启 `LeanCloud` 模块
+
+#### 添加依赖
+
+在 Project.Build.cs 中添加所需模块:
+ 
+```cs
+PublicDependencyModuleNames.AddRange(new string[] { "Core",
+	"CoreUObject",
+	"Engine",
+	"Json",
+	"InputCore",
+	"JsonUtilities",
+	"SlateCore",
+	"LeanCloud"
+});
+```
+
+#### 导入头文件
+
+```cpp
+#include "LCLeaderboard.h"
+```
+
+</>
+
+</MultiLang>
+
+## SDK 初始化
+
+[内建账户 SDK](/sdk/authentication/guide/#sdk-初始化) 初始化完成后会同步初始化排行榜功能，因此无需重复初始化；
+
 
 ## 快速入门
 
@@ -42,7 +166,7 @@ import { Conditional } from "/src/docComponents/conditional";
 
 假设玩家已登录（`currentUser`），通过如下代码即可更新成绩：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 var statistic = new Dictionary<string, double>();
@@ -85,13 +209,25 @@ NSDictionary *statistic = @{
 }];
 ```
 
+```cpp
+TMap<FString, double> Statistic;
+Statistic.Add("world", 20.0);
+FLCLeaderboard::FStatisticsDelegate OnSuccess = FLCLeaderboard::FStatisticsDelegate::CreateLambda([=](TArray<FLCLeaderboardStatistic> Statistics) {
+  // statistics 是更新后你的最好/最新成绩
+});
+FLCError::FDelegate OnError = FLCError::FDelegate::CreateLambda([=](const FLCError& Error) {
+  // 处理错误
+});
+FLCLeaderboard::UpdateCurrentUserStatistics(Statistic, OnSuccess, OnError);
+```
+
 </MultiLang>
 
 ### 获取名次
 
 接下来我们获取排行榜中的前十，由于之前我们只提交了一个玩家（当前玩家）的成绩，所以结果中只包含一个成绩。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 var leaderboard = LCLeaderboard.CreateWithoutData("world");
@@ -121,11 +257,23 @@ leaderboard.getResults(0, 10, null, null).subscribe(new Observer<LCLeaderboardRe
 ```
 
 ```objc
-LCLeaderboard leaderboard = [[LCLeaderboard alloc] initWithStatisticName:@"world"];
+LCLeaderboard *leaderboard = [[LCLeaderboard alloc] initWithStatisticName:@"world"];
 leaderboard.limit = 10;
-[leaderboard getUserResultsWithOption:nil, callback:^(NSArray *rankings, NSInteger count, NSError *error) {
+[leaderboard getUserResultsWithOption:nil callback:^(NSArray *rankings, NSInteger count, NSError *error) {
   // rankings 是排行榜前十的排名信息
 }];
+```
+
+```cpp
+FLCLeaderboard Leaderboard("world", FLCLeaderboard::User);
+Leaderboard.Limit = 10;
+FLCLeaderboard::FRankingsDelegate OnSuccess = FLCLeaderboard::FRankingsDelegate::CreateLambda([=](TArray<FLCLeaderboardRanking> Rankings, int64 Count) {
+  // process rankings
+});
+FLCError::FDelegate OnError = FLCError::FDelegate::CreateLambda([=](const FLCError& Error) {
+  // handle error
+});
+Leaderboard.GetResults(OnSuccess, OnError);
 ```
 
 </MultiLang>
@@ -139,7 +287,7 @@ leaderboard.limit = 10;
 当用户完成了一局游戏后，你可以在客户端使用 SDK 的 `updateStatistic` 方法更新该用户的成绩。
 不过，**从反作弊的角度出发，我们建议在控制台勾选「只允许使用 Master Key 更新分数」，然后在服务端更新成绩。**
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 var statistic = new Dictionary<string, double> {
@@ -177,11 +325,24 @@ NSDictionary *statistic = @{
   @"score" : 3458.0,
   @"kills" : 28.0,
 };
-[LCLeaderboard updateCurrentUserStatistics:statistic, callback:^(NSArray *statistics, NSError *error) {
+[LCLeaderboard updateCurrentUserStatistics:statistic callback:^(NSArray *statistics, NSError *error) {
   if (!error) {
     // saved
   }
 }];
+```
+
+```cpp
+TMap<FString, double> Statistic;
+Statistic.Add("score", 3458.0);
+Statistic.Add("kills", 28.0);
+FLCLeaderboard::FStatisticsDelegate OnSuccess = FLCLeaderboard::FStatisticsDelegate::CreateLambda([=](TArray<FLCLeaderboardStatistic> Statistics) {
+  // saved
+});
+FLCError::FDelegate OnError = FLCError::FDelegate::CreateLambda([=](const FLCError& Error) {
+  // handle error
+});
+FLCLeaderboard::UpdateCurrentUserStatistics(Statistic, OnSuccess, OnError);
 ```
 
 </MultiLang>
@@ -196,7 +357,7 @@ NSDictionary *statistic = @{
 
 玩家也可以删除自己的成绩：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 await LCLeaderboard.DeleteStatistics(currentUser, new List<string> { "world" });
@@ -216,6 +377,10 @@ await LCLeaderboard.DeleteStatistics(currentUser, new List<string> { "world" });
 }];
 ```
 
+```cpp
+// 暂未支持
+```
+
 </MultiLang>
 
 和更新成绩一样，玩家只能删除自己的成绩。
@@ -225,7 +390,7 @@ await LCLeaderboard.DeleteStatistics(currentUser, new List<string> { "world" });
 
 **已登录用户**可以通过 `GetStatistics` 方法查询其他用户在所有排行榜中的成绩：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 var otherUser = LCObject.CreateWithoutData(TDSUser.CLASS_NAME, "5c76107144d90400536fc88b");
@@ -282,12 +447,27 @@ NSString *otherUserObjectId = @"5c76107144d90400536fc88b";
 }];
 ```
 
+```cpp
+FLCLeaderboard::FStatisticsDelegate OnSuccess = FLCLeaderboard::FStatisticsDelegate::CreateLambda([=](TArray<FLCLeaderboardStatistic> Statistics) {
+  for (FLCLeaderboardStatistic Statistic : Statistics) {
+    // 排行榜名称：Statistic.Name;
+    // 成绩：Statistic.Value;
+  }
+});
+FLCError::FDelegate OnError = FLCError::FDelegate::CreateLambda([=](const FLCError& Error) {
+  // 处理错误
+});
+  
+FString OtherUserObjectId = "5c76107144d90400536fc88b";
+FLCLeaderboard::GetStatistics(OtherUserObjectId, OnSuccess, OnError, {}, FLCLeaderboard::User);
+```
+
 </MultiLang>
 
 更多的场景下，只关心用户在某个或某几个排行榜中的成绩。
 查询时指定相应排行榜的名称即可：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 var statistics = await LCLeaderboard.GetStatistics(otherUser, new List<string> { "world" });
@@ -303,11 +483,15 @@ LCLeaderboard.getUserStatistics(otherUser, Arrays.asList("world")).subscribe(/**
 }];
 ```
 
+```cpp
+FLCLeaderboard::GetStatistics(OtherUserObjectId, OnSuccess, OnError, {"world"}, FLCLeaderboard::User);
+```
+
 </MultiLang>
 
 类似地，可以查询 object 和 entity 的成绩。
 
-<MultiLang>
+<MultiLang kind="ue">
 <>
 
 例如，假定武器排行榜是 object 排行榜：
@@ -379,11 +563,29 @@ NSString *excaliburObjectId = @"582570f38ac247004f39c24b";
 ```
 
 </>
+
+<>
+
+例如，假定武器排行榜是 object 排行榜：
+
+```cpp
+FString ExcaliburObjectId = "582570f38ac247004f39c24b";
+FLCLeaderboard::GetStatistics(ExcaliburObjectId, OnSuccess, OnError, {}, FLCLeaderboard::Object);
+```
+
+如果武器排行榜是 entity 排行榜：
+
+```cpp
+FLCLeaderboard::GetStatistics("excalibur", OnSuccess, OnError, {}, FLCLeaderboard::Entity);
+```
+
+</>
+
 </MultiLang>
 
 最后，还可以查询一组成员的成绩：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 var otherUser = LCObject.CreateWithoutData(TDSUser.CLASS_NAME, "5c76107144d90400536fc88b");
@@ -423,6 +625,10 @@ NSString *anotherObjectId = @"672a1279345777005a2b2444";
 }];
 ```
 
+```cpp
+// 暂未支持
+```
+
 </MultiLang>
 
 ## 获取排行榜结果
@@ -432,7 +638,7 @@ NSString *anotherObjectId = @"672a1279345777005a2b2444";
 
 首先，我们构造一个排行榜实例：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 <>
 
@@ -474,6 +680,20 @@ LCLeaderboard leaderboard = [[LCLeaderboard alloc] initWithStatisticName:@"world
 
 </>
 
+<>
+
+```cpp
+FLCLeaderboard Leaderboard("world", FLCLeaderboard::User);
+```
+
+ `FLCLeaderboard` 初始化方法接受两个参数：
+
+
+- `Name` 为排行榜名称，这里需要传入云端已经存在的排行榜名称。上例中是 `world`。
+- `InMemberType` 为排行榜成员类型，传入 `FLCLeaderboard::User` 表示成员类型为用户，传入 `FLCLeaderboard::Entity` 表示成员类型为 entity，传入 `FLCLeaderboard::Object` 表示成员类型为 object
+
+</>
+
 </MultiLang>
 
 构造排行榜实例后，调用该实例上的相应方法即可获取排名。
@@ -482,7 +702,7 @@ LCLeaderboard leaderboard = [[LCLeaderboard alloc] initWithStatisticName:@"world
 
 获取排行榜的 Top 10：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 <>
 
@@ -633,6 +853,56 @@ LCLeaderboardRanking 包含如下属性：
 
 </>
 
+<>
+
+```cpp
+Leaderboard.Limit = 10;
+FLCLeaderboard::FRankingsDelegate OnSuccess = FLCLeaderboard::FRankingsDelegate::CreateLambda([=](TArray<FLCLeaderboardRanking> Rankings, int64 Count) {
+    // 排行榜前十的排名信息
+});
+FLCError::FDelegate OnError = FLCError::FDelegate::CreateLambda([=](const FLCError& Error) {
+    // handle error
+});
+Leaderboard.GetResults(OnSuccess, OnError);
+```
+
+Leaderboard 实例上可以设置如下属性限制查询范围：
+
+```cpp
+/// 指定从某个位置开始获取，与 limit 一起可以实现翻页，默认 0
+int64 Skip = 0;
+/// 限制返回的结果数量，默认 20
+int64 Limit = 20;
+/// 是否返回排行榜的数量
+bool WithCount = false;
+/// 指定排行榜版本号，默认 0
+int64 Version = 0;
+/// 指定返回的 LCLeaderboardRanking 中需要包含的其他成绩
+TArray<FString> IncludeStatistics;
+/// 指定返回的 LCRanking 中排行榜成员需要包含的属性
+TArray<FString> SelectMemberKeys;
+```
+
+
+FLCLeaderboardRanking 提供了以下方法供获取排名信息：
+
+```cpp
+// 排名，从 0 开始
+int64 Rank;
+// 该成绩的用户（user 排行榜）
+TSharedPtr<FLCUser> User;
+// 该成绩的 object（object 排行榜）
+TSharedPtr<FLCObject> Object;
+// 该成绩的 entity（entity 排行榜）
+FString EntityId;
+// 成绩
+double Value;
+// 该成员在其他排行榜的成绩
+TArray<FLCLeaderboardStatistic> Statistics;
+```
+
+</>
+
 </MultiLang>
 
 默认情况下返回的排行榜结果中的 `user` 是一个指向 `LCUser` 的 Pointer。
@@ -644,27 +914,33 @@ LCLeaderboardRanking 包含如下属性：
 |  1   | Lúcio    |  3252  |
 |  2   | D.Va     |  3140  |
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 var rankings = await leaderboard.GetResults(limit: 10,
-  selectKeys: new List<string> { "username" });
+  selectKeys: new List<string> { "nickname" });
 ```
 
 ```java
 List<String> selectKeys = new ArrayList<>();
-selectKeys.add("username");
+selectKeys.add("nickname");
 leaderboard.getResults(0, 10, selectKeys, null).subscribe(/* 略 */);
 ```
 
 ```objc
 leaderboard.limit = 10;
 LCLeaderboardQueryOption *option = [[LCLeaderboardQueryOption alloc] init];
-option.selectKeys = @[@"username"];
+option.selectKeys = @[@"nickname"];
 [leaderboard getUserResultsWithOption:option,
   callback:^(NSArray<LCLeaderboardRanking *> * _Nullable rankings, NSInteger count, NSError * _Nullable error) {
   // 略
 }];
+```
+
+```cpp
+Leaderboard.Limit = 10;
+Leaderboard.SelectMemberKeys = {"nickname"};
+Leaderboard.GetResults(OnSuccess, OnError);
 ```
 
 </MultiLang>
@@ -678,7 +954,7 @@ option.selectKeys = @[@"username"];
 |  1   | Lúcio    |  3252  |   2   |
 |  2   | D.Va     |  3140  |  31   |
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 var rankings = await leaderboard.GetResults(limit: 10, selectKeys: new List<string> { "username" }
@@ -704,13 +980,20 @@ option.selectKeys = @[@"username"];
 }];
 ```
 
+```cpp
+Leaderboard.Limit = 10;
+Leaderboard.SelectMemberKeys = {"username"};
+Leaderboard.IncludeStatistics = {"kills"};
+Leaderboard.GetResults(OnSuccess, OnError);
+```
+
 </MultiLang>
 
 如果想要包含的属性是 Pointer 类型或文件类型，那么 `selectKeys` 只会返回 Pointer 本身。
 想要一并获取 Pointer 指向的另一个 class 的数据的话，需要额外使用 `includeKeys` 指定。
 例如，假设 `club` 是一个指向 `Club` 类的 Pointer：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 var leaderboard = LCLeaderboard.CreateWithoutData("weapons", "Weapon");
@@ -735,10 +1018,154 @@ option.includeKeys = @[@"club"];
 }];
 ```
 
+```cpp
+// 暂未支持
+```
+
 </MultiLang>
 
 注意，排行榜 **不保证成绩并列的成员之间的先后顺序**。
 例如，假设 A、B、C 的成绩为 42、32、32，且排行榜的排序策略为降序，那么查询排行榜的返回结果可能是 A、B、C，也可能是 A、C、B。
+
+当成绩相同时，如果需要其他因素去设置排名可以参考如下示例**（示例是通过成绩上传的时间戳去判断排名，当成绩相同时，越早/晚提交，排名越靠前/后）**：
+<details>
+<summary>Android 请求示例：</summary>
+
+```
+public class RankingActivity extends AppCompatActivity{
+    
+     // ...
+
+    /**
+     * 上传/更新成绩
+     * 
+     * */
+    private void submitScore() {
+
+        double score = 324.45;   // 实际的分数
+        long ts = System.currentTimeMillis() / 1000;   // 时间戳
+        double last_score = toEncode( score, ts); // 将实际分数与时间戳组合生成一个新的数据上传到服务器
+
+        Map<String, Double> statistic  = new HashMap<>();
+        statistic.put("word", last_score);
+
+        LCLeaderboard.updateStatistic(LCUser.currentUser(), statistic).subscribe(new Observer<LCStatisticResult>() {
+            @Override
+            public void onSubscribe(@NotNull Disposable disposable) {}
+
+            @Override
+            public void onNext(@NotNull LCStatisticResult jsonObject) {
+                Log.e(TAG, "onNext: "+jsonObject.getResults().get(0).toString());                
+
+            }
+
+            @Override
+            public void onError(@NotNull Throwable throwable) {
+                ToastUtil.showCus(throwable.getMessage(), ToastUtil.Type.ERROR);
+            }
+
+            @Override
+            public void onComplete() {}
+        });
+
+    }
+
+     /**
+     * 查询排行榜列表
+     * */
+    private void searchRankList() {
+        // 获取排行榜的实例
+        LCLeaderboard leaderboard = LCLeaderboard.createWithoutData("word");
+        
+        leaderboard.getResults(0, 10, null, null).subscribe(new Observer<LCLeaderboardResult>() {
+            @Override
+            public void onSubscribe(@NotNull Disposable disposable) {}
+
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onNext(@NotNull LCLeaderboardResult leaderboardResult) {
+                List<LCRanking> rankings = leaderboardResult.getResults();
+                for(int i=0; i<rankings.size(); i++){
+                    /**
+                     * 将查询的方法进行解密
+                     */
+                    double score = rankings.get(i).getStatisticValue();  // 获取查询到的分数
+                    String formatScore = String.format("%.3f", score);   // 将 double 类型的分数系列化为保留小数点后3位的字符串
+                    BigDecimal decimalValue = new BigDecimal(formatScore);
+                    long longPart = decimalValue.longValue();     // 获取查询到的 StatisticValue 的整数部分
+                    float floatPart = decimalValue.subtract(BigDecimal.valueOf(longPart)).floatValue(); // 获取查询到的 StatisticValue 的小数部分
+
+                    int[] decryptedScoreTs = toDecode(longPart); // 将整数部分进行解密操作
+                    int decryptedScore = decryptedScoreTs[0];  // 获取实际分数的整数部分
+                    long decryptedTs = decryptedScoreTs[1];    // 获取提交成绩时的时间戳
+
+                    BigDecimal bigDecimalValue = new BigDecimal(Integer.toString(decryptedScore))
+                            .add(new BigDecimal(Float.toString(floatPart)));  // 将实际分数的整数部分拼接上小数部分得到实际的分数
+                    double doubleValue = bigDecimalValue.doubleValue();   // 将实际分数转化为 double 类型
+
+                    Log.e(TAG, "解析后的score:"+doubleValue + "解析后的时间戳："+ decryptedTs  );
+
+                }
+                
+            }
+
+            @Override
+            public void onError(@NotNull Throwable throwable) {
+            }
+
+            @Override
+            public void onComplete() {}
+        });
+
+    }
+
+    /**
+     * score 实际的分数
+     * ts 时间戳
+     * 将实际分数与时间戳组合生成一个新的数据上传到服务器
+     */
+    public static double toEncode(double score, long ts) {
+        int int_score = (int) score;   // 实际分数的整数部分
+        float float_score = (float) (score - int_score); // 实际分数的小数部分
+
+        /**
+         * 当排行榜使用降序排列，分数相同时，时间越近，排名靠前，使用这行代码
+         */
+        // long encryptedScoreTs = ((long) int_score << 32) | (ts & 0xFFFFFFFFL); // 将整数部分分数与时间戳进行加密处理合并成一个新的 score
+
+        /**
+         * 当排行榜使用降序排列，分数相同时，时间越近，排名靠后，使用这行代码
+         */
+        long encryptedScoreTs = ((long) int_score << 32) - (ts & 0xFFFFFFFFL); // 将整数部分分数与时间戳进行加密处理合并成一个新的 score
+
+        double newScore =  (double)encryptedScoreTs + float_score;  // 然后将加密生成的数据拼接上小数部分的数据，上传到服务器
+        return newScore;
+    }
+    
+    /**
+     * 将加密的数据进行解析出实际分数和当时提交成绩时的时间戳
+     *
+     */
+    public static int[] toDecode(long encryptedNewScore) {
+        /**
+         * 当排行榜使用降序排列，分数相同时，时间越近，排名靠前，使用这行代码
+         */
+
+        // int score = (int) (encryptedNewScore >> 32);
+        
+        /**
+         * 当排行榜使用降序排列，分数相同时，时间越近，排名靠后，使用这行代码
+         */
+        int score = (int) (encryptedNewScore >> 32) + 1;
+        long ts = encryptedNewScore & 0xFFFFFFFFL;
+        return new int[]{score, (int) ts};
+    }
+    
+
+}
+
+```
+</details>
 
 ### 获取当前用户附近的排名
 
@@ -750,7 +1177,7 @@ option.includeKeys = @[@"club"];
 |    26    | Hanzo      |   23   |
 |    …     |            |        |
 
-<MultiLang>
+<MultiLang kind="ue">
 
 <>
 
@@ -789,6 +1216,19 @@ leaderboard.limit = 3;
 
 </>
 
+<>
+
+如果想达到类似上表的效果，可以调用 `GetAroundResults` 方法：
+
+```cpp
+Leaderboard.Limit = 3;
+Leaderboard.GetAroundResults(CurrentUser->GetObjectId();, OnSuccess, OnError);
+```
+
+`GetAroundResults` 方法的第一个参数为排行榜成员的 ID（user 或 object 为 `objectId`、entity 为字符串），其他参数和 `GetResults` 相同。
+
+</>
+
 </MultiLang>
 
 上面的代码示例中，`limit` 的值为 3，表示获取与当前玩家相邻的前后两个玩家的排名，当前玩家会在结果的中间位置。
@@ -797,7 +1237,7 @@ leaderboard.limit = 3;
 类似地，可以获取某个 object 或 entity 附近的排名。
 例如，获取武器榜上和某件武器排名相近的武器，同时获取这些武器的名称、攻击力、等级：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 var leaderboard = LCLeaderboard.CreateWithoutData("weapons", "Weapon");
@@ -828,12 +1268,20 @@ NSString *excaliburObjectId = @"582570f38ac247004f39c24b";
 }];
 ```
 
+```cpp
+FLCLeaderboard Leaderboard("weapons", FLCLeaderboard::Object);
+Leaderboard.Limit = 3;
+Leaderboard.SelectMemberKeys = {"name", "attack", "level"};
+FString ExcaliburObjectId = "582570f38ac247004f39c24b";
+Leaderboard.GetAroundResults(ExcaliburObjectId, OnSuccess, OnError);
+```
+
 </MultiLang>
 
 上面的例子中假定武器排行榜是通过 object 排行榜实现的，存储武器信息的 Class 为 `Weapon`。
 如果武器排行榜是通过 entity 排行榜实现的，且只需获取武器的名称，那么相应的代码为：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 var leaderboard = LCLeaderboard.CreateWithoutData("weapons", LCLeaderboard.ENTITY_MEMBER_TYPE);
@@ -854,13 +1302,19 @@ leaderboard.limit = 3;
 }];
 ```
 
+```cpp
+FLCLeaderboard Leaderboard("weapons", FLCLeaderboard::Entity);
+Leaderboard.Limit = 3;
+Leaderboard.GetAroundResults("excalibur", OnSuccess, OnError);
+```
+
 </MultiLang>
 
 ## TapTap 好友排行榜列表
 
 获取 TapTap 互关好友在游戏中的排行榜成绩列表（包括自己）。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
  ReadOnlyCollection<TDSLeaderBoardRanking> leaderBoards = await TDSLeaderBoardRanking.QueryTapFriendsLeaderBoard("world",0,10);
@@ -900,6 +1354,22 @@ TDSLeaderBoardRanking.queryTapFriendsLeaderBoard("world", 0, 10, new Callback<Li
   }];
 ```
 
+```cpp
+FTDSLeaderBoardRanking::FRankingsDelegate OnSuccess = FTDSLeaderBoardRanking::FRankingsDelegate::CreateLambda([](const TArray<FTDSLeaderBoardRanking>& Rankings) {
+  for (auto Ranking : Rankings) {
+    TSharedPtr<FJsonObject> JsonObject = MakeShareable(new FJsonObject);
+    JsonObject->SetStringField("StatisticName", Ranking.StatisticName);
+    JsonObject->SetNumberField("StatisticValue", Ranking.StatisticValue);
+    JsonObject->SetNumberField("Rank", Ranking.Rank);
+    JsonObject->SetObjectField("User",  TSharedPtr<FJsonObject>(Ranking.User->GetServerData()));
+  }
+});
+FTUError::FDelegate OnError = FTUError::FDelegate::CreateLambda([](const FTUError& Error) {
+    // handle error
+});
+FTDSLeaderBoardRanking::QueryTapFriendsLeaderBoard("world", 0, 10, OnSuccess, OnError);
+```
+
 </MultiLang>
 
 参数 `name` 为排行榜的名称， `from` 和 `limit` 为分页获取数据时指定的起始位置和数据长度，返回为查询的结果数据，数据结构如下：
@@ -933,7 +1403,7 @@ user | 排行榜数据对应的用户 | TDSUser
 
 :::
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 LCApplication.Initialize({{appid}}, {{appkey}}, "https://xxx.example.com", {{masterkey}});
@@ -948,11 +1418,15 @@ LeanCloud.setMasterKey({{masterkey}});
 // 不支持
 ```
 
+```cpp
+// 不支持
+```
+
 </MultiLang>
 
 ### 创建排行榜
 
-<MultiLang>
+<MultiLang kind="ue">
 
 <>
 
@@ -1027,11 +1501,17 @@ public static Observable<LCLeaderboard> createWithMemberType(String memberType, 
 
 </>
 
+<>
+
+不支持
+
+</>
+
 </MultiLang>
 
 ### 手动重置排行榜
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 var leaderboard = LCLeaderboard.CreateWithoutData("score");
@@ -1066,23 +1546,54 @@ leaderboard.reset().subscribe(new Observer<Boolean>() {
 // 不支持
 ```
 
+```cpp
+// 不支持
+```
+
 </MultiLang>
 
 ### 获取排行榜属性
 
 通过以下接口可以获取当前排行榜的属性，例如：重置周期、版本号、更新策略等。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 var leaderboardData = await LCLeaderboard.GetLeaderboard("world");
 ```
 
 ```java
-LCLeaderboard leaderboard = LCLeaderboard.fetchByName("world").blockingFirst();
+LCLeaderboard.fetchByName("world").subscribe(new Observer<LCLeaderboard>() {
+  @Override
+  public void onSubscribe(Disposable d) {
+
+  }
+
+  @Override
+  public void onNext(LCLeaderboard lcLeaderboard) {
+      int v =lcLeaderboard.getVersion();
+      String statisticName = lcLeaderboard.getStatisticName();
+      Log.d(TAG, String.valueOf(v));
+      Log.d(TAG, statisticName);
+  }
+
+  @Override
+  public void onError(Throwable e) {
+
+  }
+
+  @Override
+  public void onComplete() {
+
+  }
+});
 ```
 
 ```objc
+// 不支持
+```
+
+```cpp
 // 不支持
 ```
 
@@ -1092,7 +1603,7 @@ LCLeaderboard leaderboard = LCLeaderboard.fetchByName("world").blockingFirst();
 
 排行榜创建后，仅可修改自动重置周期和成绩更新策略，其他属性无法修改。
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 var leaderboard = LCLeaderboard.CreateWithoutData("equip");
@@ -1150,11 +1661,15 @@ leaderboard.updateUpdateStrategy(LCLeaderboard.LCLeaderboardUpdateStrategy.Last)
 // 不支持
 ```
 
+```cpp
+// 不支持
+```
+
 </MultiLang>
 
 ### 删除排行榜
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 var leaderboard = lcleaderboard.createwithoutdata("equip");
@@ -1189,6 +1704,10 @@ leaderboard.destroy().subscribe(new Observer<Boolean>() {
 // 不支持
 ```
 
+```cpp
+// 不支持
+```
+
 </MultiLang>
 
 **删除排行榜会删除该排行榜的所有数据，包括当前数据及所有历史版本归档。**
@@ -1197,7 +1716,7 @@ leaderboard.destroy().subscribe(new Observer<Boolean>() {
 
 有些情况下，你会想要绕过排行榜的更新策略强制更新用户的成绩，你可以使用 `overwrite` 参数实现这一需求：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 var statistic = new Dictionary<string, double> {
@@ -1216,11 +1735,15 @@ LCLeaderboard.updateStatistic(currentUser, statistic, true).subscribe(/** 略 **
 // 不支持
 ```
 
+```cpp
+// 不支持
+```
+
 </MultiLang>
 
 object 和 entity 排行榜只支持在服务端使用 Master Key 更新，但仍会遵循排行榜的更新策略：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 var excalibur = LCObject.createWithoutData("Weapon", "582570f38ac247004f39c24b");
@@ -1235,11 +1758,15 @@ await LCLeaderboard.UpdateStatistics(excalibur, statistic);
 不支持
 ```
 
+```cpp
+不支持
+```
+
 </MultiLang>
 
 如果需要强制更新，同样需要指定 `overwrite` 为真：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 await LCLeaderboard.UpdateStatistics("Vimur", statistic, overwrite: true);
@@ -1253,13 +1780,17 @@ await LCLeaderboard.UpdateStatistics("Vimur", statistic, overwrite: true);
 // 不支持
 ```
 
+```cpp
+// 不支持
+```
+
 </MultiLang>
 
 ### 删除排行榜成员成绩
 
 在服务端使用 Master Key 可以删除任意用户、object、entity 的成绩：
 
-<MultiLang>
+<MultiLang kind="ue">
 
 ```cs
 var otherUser = LCObject.CreateWithoutData(TDSUser.CLASS_NAME, "5c76107144d90400536fc88b");
@@ -1276,6 +1807,10 @@ await LCLeaderboard.DeleteStatistics("Vimur", new List<string> { "rivers" });
 ```
 
 ```objc
+// 不支持
+```
+
+```cpp
 // 不支持
 ```
 

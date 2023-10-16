@@ -1,0 +1,1087 @@
+---
+title: iOS Push Guide
+sidebar_label: iOS Push
+sidebar_position: 2
+---
+
+import MultiLang from '/src/docComponents/MultiLang';
+import Mermaid from "/src/docComponents/Mermaid";
+
+
+This article will show you how to use push notifications in your iOS project. We recommend that you take a look at [Push Notification Overview](/sdk/push/guide/overview/) if you haven’t already.
+
+## Configure APNs Certificates
+
+To use push notifications in your iOS project, you must first configure APNs certificates. See [APNs Configuration Guide](/sdk/push/guide/ios-cert/) for more information.
+
+## iOS Workflow Overview
+
+The first step is to register with APNs and obtain a token, then store the token in the cloud:
+
+<Mermaid
+  diagram={`
+sequenceDiagram
+iOS SDK->>APNs: 1. Call the official API and get the deviceToken
+APNs-->>iOS SDK: 2. Provide the deviceToken
+iOS SDK-->>Cloud: 3. The SDK stores the deviceToken in the _Installation table
+`}
+/>
+
+Then you can invoke the interface provided by the Push Notification service to send a push notification:
+
+<Mermaid
+  diagram={`
+sequenceDiagram
+Developer->>Cloud: 1. Send an HTTPS request to the Push Notification API
+Cloud-->>APNs: 2. Find the appropriate deviceToken from _Installation and call the APNs API to send the push notification
+APNs->>iOS device: 3. Send the push notification
+`}
+/>
+
+## Installation
+
+Installation is a subclass of LCObject. You can use an Installation object to store the token and other data needed to send a push notification.
+
+The SDK comes with a default Installation object and **will cache the data after you save the default object to the cloud**. In general, the default object is used to store the device token. The code below shows how to get the default object:
+
+<MultiLang kind="ios">
+
+```objc
+LCInstallation *installation = [LCInstallation defaultInstallation];
+```
+
+```swift
+let installation = LCApplication.default.currentInstallation
+```
+
+</MultiLang>
+
+In addition to using the default Installation object, you can also construct new Installation objects and store other tokens of special types (such as VoIP) in them. The following code constructs a new Installation object:
+
+<MultiLang kind="ios">
+
+```objc
+LCInstallation *installation = [[LCInstallation alloc] init];
+```
+```swift
+let installation = LCInstallation()
+```
+
+</MultiLang>
+
+**The Instant Messaging service uses the device token obtained from the default Installation object. To use the push notification feature of the Instant Messaging service, make sure that the default Installation object has successfully saved the device token.**
+
+By default, an Installation object contains the following fields:
+
+Field|Type|Description
+---|---|---
+deviceToken|String|The token used to send push notifications
+apnsTeamId|String|The Team ID used to send push notifications
+badge|Number|The number displayed in the app’s badge; primarily used to clear the badge
+channels|Array|An array of subscribed channels
+deviceProfile|String|Custom certificate’s name; primarily used to send push notifications with multiple certificates
+deviceType|String|The device type; the SDK automatically sets the value of this field; please avoid editing it manually
+apnsTopic|String|The app’s Bundle Identifier; the SDK automatically sets the value of this field; please avoid editing it manually
+timeZone|String|The device’s timezone; the SDK automatically sets the value of this field; please avoid editing it manually
+
+### Register With APNs and Obtain a Token
+
+Before saving the Installation, you must first register with APNs to obtain the token needed to send push notifications. The code below uses User Notification as an example:
+
+<MultiLang kind="ios">
+
+```objc
+#import <LeanCloudObjc/Foundation.h>
+#import <UserNotifications/UserNotifications.h>
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    
+    // Be sure to initialize the app first
+    [LCApplication setApplicationId:{{appid}}
+                          clientKey:{{appkey}}
+                    serverURLString:"https://please-replace-with-your-customized.domain.com"];
+
+    [[UNUserNotificationCenter currentNotificationCenter] getNotificationSettingsWithCompletionHandler:^(UNNotificationSettings * _Nonnull settings) {
+        switch ([settings authorizationStatus]) {
+            case UNAuthorizationStatusAuthorized:
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    [[UIApplication sharedApplication] registerForRemoteNotifications];
+                });
+                break;
+            case UNAuthorizationStatusNotDetermined:
+                [[UNUserNotificationCenter currentNotificationCenter] requestAuthorizationWithOptions:(UNAuthorizationOptionBadge | UNAuthorizationOptionSound | UNAuthorizationOptionAlert) completionHandler:^(BOOL granted, NSError * _Nullable error) {
+                    if (granted) {
+                        dispatch_async(dispatch_get_main_queue(), ^{
+                            [[UIApplication sharedApplication] registerForRemoteNotifications];
+                        });
+                    }
+                }];
+                break;
+            default:
+                break;
+        }
+    }];
+    
+    return YES;
+}
+```
+```swift
+import LeanCloud
+import UserNotifications
+
+func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+
+    // Be sure to initialize the app first
+    do {
+        try LCApplication.default.set(
+            id: {{appid}},
+            key: {{appkey}},
+            // Please replace xxx.example.com with the custom API domain you have added to your app
+            serverURL: "https://xxx.example.com")
+    } catch {
+        print(error)
+        return false
+    }
+    
+    UNUserNotificationCenter.current().getNotificationSettings { (settings) in
+        switch settings.authorizationStatus {
+        case .authorized:
+            DispatchQueue.main.async {
+                UIApplication.shared.registerForRemoteNotifications()
+            }
+        case .notDetermined:
+            UNUserNotificationCenter.current().requestAuthorization(options: [.badge, .alert, .sound]) { (granted, error) in
+                if granted {
+                    DispatchQueue.main.async {
+                        UIApplication.shared.registerForRemoteNotifications()
+                    }
+                }
+            }
+        default:
+            break
+        }
+    }
+    
+    return true
+}
+```
+
+</MultiLang>
+
+### Save the Token
+
+Once you have successfully registered with APNs, the system returns the deviceToken with the `didRegisterForRemoteNotificationsWithDeviceToken` function. In most cases, you can save the deviceToken and apnsTeamId in this function, as shown in the code below:
+
+<MultiLang kind="ios">
+
+```objc
+- (void)application:(UIApplication *)application didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken {
+
+    [[LCInstallation defaultInstallation] setDeviceTokenFromData:deviceToken
+                                                          teamId:@"YOUR_APNS_TEAM_ID"];
+    [[LCInstallation defaultInstallation] saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+        if (succeeded) {
+            // save succeeded
+        } else if (error) {
+            NSLog(@"%@", error);
+        }
+    }];
+}
+```
+```swift
+func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+    
+    LCApplication.default.currentInstallation.set(
+        deviceToken: deviceToken,
+        apnsTeamId: "YOUR_APNS_TEAM_ID")
+    LCApplication.default.currentInstallation.save { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+}
+```
+
+</MultiLang>
+
+The device token changes when a user erases their device, restores the app from backup, or installs the app on a new device. To solve this problem, [Apple recommends][apple-apns] that the app requests the device token of the APNs when opening, and then sets and saves the token.
+Also, our system keeps track of the update times (`updatedAt`) of all Installation objects and removes the objects that haven’t been updated in a while.
+Therefore, we recommend that you build your app according to Apple’s recommended way to avoid Installation objects from being removed accidentally and to avoid push notification failure due to expired device tokens.
+
+[apple-apns]: https://developer.apple.com/documentation/usernotifications/registering_your_app_with_apns
+
+## Use Multiple Certificates
+
+Some developers may publish different apps that share the same data and messages (for example, a carpooling service may provide different apps for drivers and riders). If that’s your case, you can upload multiple custom certificates and configure different `deviceProfile`s for different devices so you can send push notifications to different apps with different certificates.
+
+When you upload a custom certificate, you are prompted for a certificate type, which is also the name of the deviceProfile. If the deviceProfile is set for the Installation, our system will ignore the certificates configured for the development and production environments and use the deviceProfile instead.
+
+## Special Push Types
+
+For special push notifications such as VoIP, because they don’t use the app’s Bundle Identifier as apnsTopic, you must change apnsTopic to the specified value before saving the token.
+
+## Send Push Notifications
+
+You can send iOS push notifications through the REST API or the dashboard.
+
+### Environments
+
+An iOS app comes with a **development** environment and a **production** environment.
+Apps installed using Xcode are in development environments. Apps published through the App Store, Ad-Hoc, and TestFlight are in production environments.
+
+When sending push notifications using the REST API or the dashboard, you can specify which environment to send push notifications to by specifying the `prod` parameter.
+When sending push notifications using `Push` with the SDK, push notifications are sent to the production environment by default.
+To send to the development environment instead, use the following method:
+
+<MultiLang kind="ios">
+
+```objc
+[LCPush setProductionMode:false];
+```
+```swift
+do {
+    let environment: LCApplication.Environment = [.pushDevelopment]
+    let configuration = LCApplication.Configuration(environment: environment)
+    try LCApplication.default.set(
+        id: {{appid}},
+        key: {{appkey}},
+        // Please replace xxx.example.com with the custom API domain you have added to your app
+        serverURL: "https://xxx.example.com",
+        configuration: configuration)
+} catch {
+    print(error)
+}
+```
+
+</MultiLang>
+
+Note that if you’re using the SDK, you can only specify which environment to send push notifications to; you can’t change the environment that the app itself belongs to.
+The environment the app belongs to can only be determined by how the app is distributed.
+
+Note that to prevent performance issues caused by massive certificate errors, when using the **development certificate**, you can send push notifications to a maximum of 20,000 devices at a time. If you exceed this limit, the system will reject the push notification request (you will see an error on **Developer Center > Your game > Game Services > Cloud Services > Push Notification > Push records**). Please set the conditions carefully when using the development certificate.
+
+## Use Channels
+
+Channels allow you to implement a pub-sub model in your app. A device can subscribe to a channel, and when you send push notifications, you can specify which channels to send to.
+
+Note that a channel name can only contain uppercase and lowercase letters, numbers, underscores (`_`), hyphens (`-`), equal signs (`=`), and Chinese characters.
+
+### Subscribe and Unsubscribe
+
+To subscribe to the `Giants` channel:
+
+<MultiLang kind="ios">
+
+```objc
+LCInstallation *currentInstallation = [LCInstallation defaultInstallation];
+[currentInstallation addUniqueObject:@"Giants" forKey:@"channels"];
+[currentInstallation saveInBackground];
+```
+```swift
+do {
+    try LCApplication.default.currentInstallation.append("channels", element: "Giants", unique: true)
+    _ = LCApplication.default.currentInstallation.save({ (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
+```
+
+</MultiLang>
+
+Be sure to save after subscribing.
+
+To unsubscribe:
+
+<MultiLang kind="ios">
+
+```objc
+LCInstallation *currentInstallation = [LCInstallation defaultInstallation];
+[currentInstallation removeObject:@"Giants" forKey:@"channels"];
+[currentInstallation saveInBackground];
+```
+```swift
+do {
+    try LCApplication.default.currentInstallation.remove("channels", element: "Giants")
+    _ = LCApplication.default.currentInstallation.save({ (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
+```
+
+</MultiLang>
+
+Get all subscribed channels:
+
+<MultiLang kind="ios">
+
+```objc
+NSArray *subscribedChannels = [LCInstallation defaultInstallation].channels;
+```
+```swift
+let subscribedChannels: LCArray? = LCApplication.default.currentInstallation.channels
+```
+
+</MultiLang>
+
+### Send to Channels
+
+To send to the “Giants” channel:
+
+<MultiLang kind="ios">
+
+```objc
+// Send a notification to all devices subscribed to the "Giants" channel.
+LCPush *push = [[LCPush alloc] init];
+[push setChannel:@"Giants"];
+[push setMessage:@"Giants is cool"];
+[push sendPushInBackground];
+```
+```swift
+let messageData: [String: Any] = [
+    "alert": "Giants is cool"
+]
+
+let channels: [String] = ["Giants"]
+
+LCPush.send(data: messageData, channels: channels) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+</MultiLang>
+
+To send to multiple channels, specify an array for `channels`:
+
+<MultiLang kind="ios">
+
+```objc
+NSArray *channels = [NSArray arrayWithObjects:@"Giants", @"Mets", nil];
+LCPush *push = [[LCPush alloc] init];
+
+// Be sure to use the plural 'setChannels'.
+[push setChannels:channels];
+[push setMessage:@"The Giants won against the Mets 2-3."];
+[push sendPushInBackground];
+```
+```swift
+let messageData: [String: Any] = [
+    "alert": "The Giants won against the Mets 2-3."
+]
+
+let channels: [String] = ["Giants", "Mets"]
+
+LCPush.send(data: messageData, channels: channels) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+</MultiLang>
+
+## Send to Specific Devices
+
+In most cases, using channels to specify targets to receive a push notification is sufficient. However, sometimes you may want to send push notifications to more specific devices. The Push Notification service allows you to query the Installation table using the LCQuery API and send push notifications to devices that match certain query conditions.
+
+Because Installation is a subclass of LCObject, you can store data of any type in an Installation object and associate the Installation with other data in your app. This gives you the ability to send customized and dynamic push notifications to your users.
+
+### Save Data Into Installation Objects
+
+To add three new fields to the Installation:
+
+<MultiLang kind="ios">
+
+```objc
+// Store app language and version
+LCInstallation *installation = [LCInstallation defaultInstallation];
+
+[installation setObject:@(YES) forKey:@"scores"];
+[installation setObject:@(YES) forKey:@"gameResults"];
+[installation setObject:@(YES) forKey:@"injuryReports"];
+[installation saveInBackground];
+```
+```swift
+do {
+    let currentInstallation = LCApplication.default.currentInstallation
+    
+    try currentInstallation.set("scores", value: true)
+    try currentInstallation.set("gameResults", value: true)
+    try currentInstallation.set("injuryReports", value: true)
+        
+    _ = currentInstallation.save({ (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
+```
+
+</MultiLang>
+
+You can set an owner for the Installation. This could be the currently logged in user:
+
+<MultiLang kind="ios">
+
+```objc
+// Saving the device's owner
+LCInstallation *installation = [LCInstallation defaultInstallation];
+[installation setObject:[LCUser currentUser] forKey:@"owner"];
+[installation saveInBackground];
+```
+```swift
+do {
+    let currentInstallation = LCApplication.default.currentInstallation
+    
+    if let currentUser = LCApplication.default.currentUser {
+        try currentInstallation.set("owner", value: currentUser)
+    }
+        
+    _ = currentInstallation.save({ (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    })
+} catch {
+    print(error)
+}
+```
+
+</MultiLang>
+
+### Send Push Notifications Based on Query
+
+Once you start storing data with Installation, you can build a query to send push notifications to a subset of all devices registered with your app:
+
+<MultiLang kind="ios">
+
+```objc
+// Create our Installation query
+LCQuery *pushQuery = [LCInstallation query];
+[pushQuery whereKey:@"injuryReports" equalTo:@(YES)];
+
+// Send push notification to query
+LCPush *push = [[LCPush alloc] init];
+[push setQuery:pushQuery]; // Set our Installation query
+[push setMessage:@"Willie Hayes injured by own pop fly."];
+[push sendPushInBackground];
+```
+```swift
+let query = LCQuery(className: "_Installation")
+query.whereKey("injuryReports", .equalTo(true))
+    
+let messageData: [String: Any] = [
+    "alert": "Willie Hayes injured by own pop fly."
+]
+
+LCPush.send(data: messageData, query: query) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+</MultiLang>
+
+You can also perform queries on channels:
+
+<MultiLang kind="ios">
+
+```objc
+// Create our Installation query
+LCQuery *pushQuery = [LCInstallation query];
+[pushQuery whereKey:@"channels" equalTo:@"Giants"]; // Set channel
+[pushQuery whereKey:@"scores" equalTo:@(YES)];
+
+// Send push notification to query
+LCPush *push = [[LCPush alloc] init];
+[push setQuery:pushQuery];
+[push setMessage:@"Giants scored against the A's! It's now 2-2."];
+[push sendPushInBackground];
+```
+```swift
+let query = LCQuery(className: "_Installation")
+query.whereKey("channels", .equalTo("Giants"))
+query.whereKey("scores", .equalTo(true))
+    
+let messageData: [String: Any] = [
+    "alert": "Giants scored against the A's! It's now 2-2."
+]
+
+LCPush.send(data: messageData, query: query) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+</MultiLang>
+
+If you have stored relations with other objects using Installation, we can also use that data. For example, to send push notifications to devices near Peking University:
+
+<MultiLang kind="ios">
+
+```objc
+// Find users near a given location
+LCQuery *userQuery = [LCUser query];
+[userQuery whereKey:@"location"
+        nearGeoPoint:beijingUniversityLocation,
+         withinMiles:[NSNumber numberWithInt:1]]
+
+// Find devices associated with these users
+LCQuery *pushQuery = [LCInstallation query];
+[pushQuery whereKey:@"user" matchesQuery:userQuery];
+
+// Send push notification to query
+LCPush *push = [[LCPush alloc] init];
+[push setQuery:pushQuery]; // Set our Installation query
+[push setMessage:@"Free hotdogs at the Tarara concession stand!"];
+[push sendPushInBackground];
+```
+```swift
+let beijingUniversityLocation = LCGeoPoint(latitude: 39.9869, longitude: 116.3059)
+    
+let userQuery = LCQuery(className: "_User")
+userQuery.whereKey("location", .locatedNear(beijingUniversityLocation, minimal: nil, maximal: nil))
+
+let pushQuery = LCQuery(className: "_Installation")
+pushQuery.whereKey("user", .matchedQuery(userQuery))
+    
+let messageData: [String: Any] = [
+    "alert": "Free hotdogs at the Tarara concession stand!"
+]
+
+LCPush.send(data: messageData, query: pushQuery) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+</MultiLang>
+
+## Options
+
+In addition to sending a text message, you can play a sound, set the number on the badge, or include other custom data in your push notifications. You can also set an expiration time for your push notifications.
+
+### Customize Notifications
+
+If you want to send something in addition to a text message, you can create your own notification data. Note that there are some reserved fields that have special meanings:
+
+Reserved field|Description
+---|---
+`alert`|The text content of the push notification.
+`badge`|The number on the badge above the app icon. You can set it to a specific value or choose to increase the current value.
+`sound`|The name of the sound file in the app’s bundle.
+`content-available`|If you use the Newsstand, set this to 1 to start a background download.
+
+See [Push Notification REST API Guide](/sdk/push/guide/rest/) for additional reserved fields.
+
+To increase the number on the badge and play a sound:
+
+<MultiLang kind="ios">
+
+```objc
+NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:
+    @"The Mets scored! The game is now tied 1-1!", @"alert",
+    @"Increment", @"badge",
+    @"cheering.caf", @"sound",
+    nil];
+LCPush *push = [[LCPush alloc] init];
+[push setChannels:[NSArray arrayWithObjects:@"Mets", nil]];
+[push setData:data];
+[push sendPushInBackground];
+```
+```swift
+let channels: [String] = ["Mets"]
+
+let messageData: [String: Any] = [
+    "alert": "The Mets scored! The game is now tied 1-1!",
+    "badge": "Increment",
+    "sound": "cheering.caf"
+]
+
+LCPush.send(data: messageData, channels: channels) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+</MultiLang>
+
+You can also add other custom data. In the section about receiving push notifications, you can see that when the user opens your app from a push notification, the app can access this data. This would be helpful if you wanted to display a specific view controller when the user opens your app from a push notification.
+
+<MultiLang kind="ios">
+
+```objc
+NSDictionary *data = [NSDictionary dictionaryWithObjectsAndKeys:
+    @"Ricky Vaughn was injured in last night's game!", @"alert",
+    @"Vaughn", @"name",
+    @"Man bites dog", @"newsItem",
+    nil];
+LCPush *push = [[LCPush alloc] init];
+[push setChannel:@"Indians"];
+[push setData:data];
+[push sendPushInBackground];
+```
+```swift
+let channels: [String] = ["Indians"]
+
+let messageData: [String: Any] = [
+    "alert": "Ricky Vaughn was injured in last night's game!",
+    "name": "Vaughn",
+    "newsItem": "Man bites dog"
+]
+
+LCPush.send(data: messageData, channels: channels) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+</MultiLang>
+
+### Set Expiration Date
+
+A push notification cannot be delivered if the target device is turned off or offline. If you want to send a time-sensitive push notification that you don’t want the user to see after a while, you can set an expiration time for it.
+
+One method is to specify an expiration time. When the time expires, the server will no longer deliver the push notification.
+
+<MultiLang kind="ios">
+
+```objc
+NSDateComponents *comps = [[NSDateComponents alloc] init];
+[comps setYear:2013];
+[comps setMonth:10];
+[comps setDay:12];
+NSCalendar *gregorian =
+  [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+NSDate *date = [gregorian dateFromComponents:comps];
+
+// Send push notification with expiration date
+LCPush *push = [[LCPush alloc] init];
+[push expireAtDate:date];
+[push setMessage:@"Season tickets on sale until October 12th"];
+[push sendPushInBackground];
+```
+```swift
+let expirationDate = Date(timeIntervalSinceNow: 600)
+
+let messageData: [String: Any] = [
+    "alert": "Season tickets on sale until October 12th"
+]
+
+LCPush.send(data: messageData, expirationDate: expirationDate) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+</MultiLang>
+
+There’s a problem with the above method: since the clock on the device might not be accurate, you might get a result that’s not what you expected. There’s another method where you can set an interval and the push notification will expire after the interval:
+
+<MultiLang kind="ios">
+
+```objc
+NSTimeInterval interval = 60*60*24*7; // 1 week
+
+LCPush *push = [[LCPush alloc] init];
+[push expireAfterTimeInterval:interval];
+[push setMessage:@"Season tickets on sale until October 18th"];
+[push sendPushInBackground];
+```
+```swift
+let expirationInterval: TimeInterval = 60*60*24*7
+
+let messageData: [String: Any] = [
+    "alert": "Season tickets on sale until October 18th"
+]
+
+LCPush.send(data: messageData, expirationInterval: expirationInterval) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+</MultiLang>
+
+We recommend that you set expiration times for any push notifications you send to iOS devices. This will ensure that if a user has airplane mode enabled when you send a push notification, they will be able to receive the notification when they turn off airplane mode. See [Stackoverflow - Push notification is not being delivered when iPhone comes back online](http://stackoverflow.com/questions/24026544/push-notification-is-not-being-delivered-when-iphone-comes-back-online).
+
+## Scheduled Push Notifications
+
+You can set the time at which a push notification is sent;
+
+<MultiLang kind="ios">
+
+```objc
+NSDateComponents *comps = [[NSDateComponents alloc] init];
+[comps setYear:2013];
+[comps setMonth:10];
+[comps setDay:12];
+NSCalendar *gregorian =
+  [[NSCalendar alloc] initWithCalendarIdentifier:NSGregorianCalendar];
+NSDate *date = [gregorian dateFromComponents:comps];
+
+LCPush *push = [[LCPush alloc] init];
+[push setPushDate:date];
+[push setMessage:@"Push this notification on 2013-10-12."];
+[push sendPushInBackground];
+```
+```swift
+let pushDate = Date(timeIntervalSinceNow: 6000)
+let messageData: [String: Any] = [
+    "alert": "Push this notification at a later time."
+]
+LCPush.send(data: messageData, pushDate: pushDate) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+</MultiLang>
+
+Scheduled push notifications can also have expiration times. To set an interval:
+
+<MultiLang kind="ios">
+
+```objc
+LCPush *push = [[LCPush alloc] init];
+[push setPushDate:date];
+[push expireAfterTimeInterval:interval];
+// Other logic
+```
+```swift
+LCPush.send(data: messageData, pushDate: pushDate, expirationInterval: expirationInterval) { /* Other logic */ }
+```
+
+</MultiLang>
+
+### Specify a Platform
+
+For cross-platform apps, you can specify a platform to send a push notification to, such as iOS or Android:
+
+<MultiLang kind="ios">
+
+```objc
+LCQuery *query = [LCInstallation query];
+[query whereKey:@"channels" equalTo:@"suitcaseOwners"];
+
+// Notification for Android users
+[query whereKey:@"deviceType" equalTo:@"android"];
+LCPush *androidPush = [[LCPush alloc] init];
+[androidPush setMessage:@"Your suitcase has been filled with tiny robots!"];
+[androidPush setQuery:query];
+[androidPush sendPushInBackground];
+
+// Notification for iOS users
+[query whereKey:@"deviceType" equalTo:@"ios"];
+LCPush *iOSPush = [[LCPush alloc] init];
+[iOSPush setMessage:@"Your suitcase has been filled with tiny apples!"];
+[iOSPush setChannel:@"suitcaseOwners"];
+[iOSPush setQuery:query];
+[iOSPush sendPushInBackground];
+```
+```swift
+let query = LCQuery(className: "_Installation")
+query.whereKey("channels", .equalTo("suitcaseOwners"))
+
+// Notification for Android users
+query.whereKey("deviceType", .equalTo("android"))
+let messageData: [String: Any] = [
+    "alert": "Your suitcase has been filled with tiny robots!"
+]
+LCPush.send(data: messageData, query: query) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+
+// Notification for iOS users
+query.whereKey("deviceType", .equalTo("ios"))
+let messageData: [String: Any] = [
+    "alert": "Your suitcase has been filled with tiny apples!"
+]
+LCPush.send(data: messageData, query: query) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+</MultiLang>
+
+## Receive Push Notifications
+
+As mentioned in [Customize Notifications](#customize-notifications), you can include any data with the push notifications you send. This data can be used to change the behavior of your app when your app is opened from a push notification. For example, when a user opens a push notification telling them they have a new friend, it would be great if they could see a picture.
+
+Because Apple limits the size of the message in a push notification, please reduce the size of the data you send in a push notification as much as possible, or the message may be truncated. See [APNs documentation](https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/APNsProviderAPI.html#//apple_ref/doc/uid/TP40008194-CH101-SW1) for more information.
+
+<MultiLang kind="ios">
+
+```objc
+NSDictionary *data = @{
+  @"alert": @"James commented on your photo!",
+  @"p": @"vmRZXZ1Dvo" // Photo's object id
+};
+LCPush *push = [[LCPush alloc] init];
+[push setData:data];
+[push sendPushInBackground];
+```
+```swift
+let messageData: [String: Any] = [
+    "alert": "James commented on your photo!",
+    "p": "vmRZXZ1Dvo" // Photo's object id
+]
+
+LCPush.send(data: messageData) { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+</MultiLang>
+
+## Respond to Push Notification Data
+
+When your app is launched from a push notification, you can access the data in the push notification from the dictionary used by the `launchOptions` parameter of the `application:didFinishLaunchingWithOptions:` method:
+
+<MultiLang kind="ios">
+
+```objc
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    // ...
+    if ([[UIDevice currentDevice].systemVersion floatValue] < 10.0) {
+        NSDictionary *notificationPayload;
+        @try {
+            notificationPayload = launchOptions[UIApplicationLaunchOptionsRemoteNotificationKey];
+        } @catch (NSException *exception) {}
+        
+        // Create a pointer to the Photo object
+        NSString *photoId = [notificationPayload objectForKey:@"p"];
+        LCObject *targetPhoto = [LCObject objectWithoutDataWithClassName:@"Photo"
+                                                                objectId:photoId];
+        
+        // Fetch photo object
+        [targetPhoto fetchIfNeededInBackgroundWithBlock:^(LCObject *object, NSError *error) {
+            // Show photo view controller
+            if (!error && [LCUser currentUser]) {
+                PhotoVC *viewController = [[PhotoVC alloc] initWithPhoto:object];
+                [self.navController pushViewController:viewController animated:YES];
+            }
+        }];
+    }
+}
+```
+```swift
+func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+    
+    if let notification = launchOptions?[.remoteNotification] as? [AnyHashable: Any] {
+        print(notification)
+    }
+    
+    return true
+}
+```
+
+</MultiLang>
+
+If your app is already running when a push notification arrives, you can access the data with the dictionary of the `userInfo` parameter of the `application:didReceiveRemoteNotification:fetchCompletionHandler:` method for iOS version less than 10:
+
+<MultiLang kind="ios">
+
+```objc
+/*!
+ * Required for iOS 7+, Xcode 14.1 or later
+ */
+- (void)application:(UIApplication *)application
+      didReceiveRemoteNotification:(NSDictionary *)userInfo
+            fetchCompletionHandler:(void (^)(UIBackgroundFetchResult))handler {
+  // Create empty photo object
+  NSString *photoId = [userInfo objectForKey:@"p"];
+  LCObject *targetPhoto = [LCObject objectWithoutDataWithClassName:@"Photo"
+                                                          objectId:photoId];
+
+  // Fetch photo object
+  [targetPhoto fetchIfNeededInBackgroundWithBlock:^(LCObject *object, NSError *error) {
+    // Show photo view controller
+    if (error) {
+      handler(UIBackgroundFetchResultFailed);
+    } else if ([LCUser currentUser]) {
+      PhotoVC *viewController = [[PhotoVC alloc] initWithPhoto:object];
+      [self.navController pushViewController:viewController animated:YES];
+    } else {
+      handler(UIBackgroundFetchResultNoData);
+    }
+  }];
+}
+```
+```swift
+func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+    // handle notification
+}
+```
+
+</MultiLang>
+
+For iOS 10 and above, use the following delegate method to get the `userInfo`:
+
+<MultiLang kind="ios">
+
+```objc
+/**
+ * Required for iOS 10+, Xcode 14.1 or later
+ * The method that is called when the app receives a push notification while running in the foreground
+ */
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center
+       willPresentNotification:(UNNotification *)notification
+         withCompletionHandler:(void (^)(UNNotificationPresentationOptions))completionHandler {
+    NSDictionary *userInfo = notification.request.content.userInfo;
+    if([notification.request.trigger isKindOfClass:[UNPushNotificationTrigger class]]) {
+        // TODO: Handle push notification content
+        NSLog(@"%@", userInfo);
+    }
+    // Run this method and choose whether to notify the user; you can choose Badge, Sound, or Alert
+    completionHandler(UNNotificationPresentationOptionAlert);
+}
+
+/**
+ * Required for iOS 10+, Xcode 14.1 or later
+ * The method that is called when the app is in the background or not running and the user opens a push notification
+ */
+- (void)userNotificationCenter:(UNUserNotificationCenter *)center
+didReceiveNotificationResponse:(UNNotificationResponse *)response
+         withCompletionHandler:(void (^)())completionHandler {
+    NSDictionary * userInfo = response.notification.request.content.userInfo;
+    if([response.notification.request.trigger isKindOfClass:[UNPushNotificationTrigger class]]) {
+        // TODO: Handle push notification content
+        NSLog(@"%@", userInfo);
+    }
+    completionHandler();
+}
+```
+```swift
+func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+    // handle notification
+}
+
+func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+    // handle notification
+}
+```
+
+</MultiLang>
+
+## Clear the Badge
+
+The badge is often cleared when the user opens or exits the app.
+
+<MultiLang kind="ios">
+
+```objc
+- (void)applicationDidBecomeActive:(UIApplication *)application {
+    // Clear the local badge
+    [application setApplicationIconBadgeNumber:0];
+    // Clear currentInstallation’s badge
+    [LCInstallation defaultInstallation].badge = 0;
+    [[LCInstallation defaultInstallation] saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+        if (succeeded) {
+         // save succeeded
+        } else if (error) {
+         NSLog(@"%@", error);
+        }
+    }];
+}
+```
+```swift
+override func applicationDidBecomeActive(_ application: UIApplication) {
+    // Clear the local badge
+    application.applicationIconBadgeNumber = 0
+    // Clear currentInstallation’s badge
+    LCApplication.default.currentInstallation.badge = 0
+    LCApplication.default.currentInstallation.save { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+ }
+```
+
+</MultiLang>
+
+
+To learn more about push notifications, check out [Apple’s Local and Remote Notifications Overview](https://developer.apple.com/library/ios/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/Chapters/Introduction.html#//apple_ref/doc/uid/TP40008194-CH1-SW1).

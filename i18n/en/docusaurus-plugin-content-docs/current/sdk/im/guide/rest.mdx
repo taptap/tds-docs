@@ -1,0 +1,2466 @@
+---
+title: Instant Messaging REST API
+sidebar_position: 5
+---
+
+## Overview
+
+The base URL for sending requests can be found on **Developer Center > Your game > Game Services > Cloud Services > Instant Messaging > Settings**.
+For POST and PUT requests, the request body must be a JSON object and the Content-Type in the HTTP Header should be `application/json`.
+Requests are authenticated according to the key-value pairs included in the HTTP Header. See [Data Storage REST API](/sdk/storage/guide/rest/) for more information.
+
+The `_Conversation` table includes some built-in fields that denote a conversation’s attributes and members. One-on-one chats, group chats, chat rooms, and system conversations are all stored in this table. See [Instant Messaging Overview](/sdk/im/guide/overview/) for more information.
+To avoid inconsistencies, we strongly discourage you to manipulate the data in the `_Conversation` table with the Data Storage API.
+
+The current API version is `1.2`:
+
+- APIs related to one-on-one chats and group chats start with `rtm/conversations`.
+- APIs related to chat rooms start with `rtm/chatrooms`. In the `_Conversation` table, chat rooms have their `tr` field being `true`.
+- APIs related to system conversations start with `rtm/service-conversations`. In the `_Conversation` table, system conversations have their `sys` field being `true`.
+
+APIs related to clients start with `rtm/clients`.
+APIs used for global operations start with `rtm/{function}`. For example, `rtm/all-conversations` can be used to look up all conversations regardless of their types.
+
+## One-On-One Chats and Group Chats
+
+### Creating Conversations
+
+With the default ACL settings of the `_Conversation` table, this interface can only be accessed with the master key.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"My First Conversation", "m": ["BillGates", "SteveJobs"], "unique": true}' \
+  https://{{host}}/1.2/rtm/conversations
+```
+
+Above is a minimal example of creating a conversation. The conversation contains two members with their client IDs being BillGates and SteveJobs. The objectId of the conversation will be returned once the conversation is created, after which the client will be able to send messages with the ID. The newly created conversation can be found in the `_Conversation` table.
+See [Instant Messaging Overview](/sdk/im/guide/overview/) for more information about the attributes of a conversation.
+To ensure that the conversation is unique, you can provide the `"unique": true` parameter.
+
+The response looks like
+
+```json
+{
+  "unique": true,
+  "updatedAt": "2020-05-26T06:42:31.492Z",
+  "name": "My First Conversation",
+  "objectId": "5eccba570d3a42c5fd4e25c3",
+  "m": ["BillGates", "SteveJobs"],
+  "createdAt": "2020-05-26T06:42:31.482Z",
+  "uniqueId": "6c7b0e5afcae9aa1139a0afa25833dec"
+}
+```
+
+Keep in mind that the only difference between group chats and one-on-one chats is that they have different numbers of clients. The same API is used for both types of conversations.
+
+### Retrieving Conversations
+
+With the default ACL settings of the `_Conversation` table, this interface can only be accessed with the master key.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -G \
+  --data-urlencode 'where={"name": "first conversation"}' \
+  --data-urlencode 'skip=1' \
+  --data-urlencode 'limit=20' \
+  https://{{host}}/1.2/rtm/conversations
+```
+
+| Parameter  | Constraint | Description                                                                     |
+| ----- | ---- | ------------------------------------------------------------------------ |
+| skip  | Optional |
+| limit | Optional | Can be used for pagination when used together with `skip`                                                 |
+| where | Optional | See [Data Storage REST API](/sdk/storage/guide/rest/) for more information |
+
+The response looks like
+
+```json
+{
+  "results": [
+    {
+      "name": "test conv1",
+      "m": ["tom", "jerry"],
+      "createdAt": "2018-01-17T04:15:33.386Z",
+      "updatedAt": "2018-01-17T04:15:33.386Z",
+      "objectId": "5a5ecde6c3422b738c8779d7"
+    }
+  ]
+}
+```
+
+### Updating Conversations
+
+With the default ACL settings of the `_Conversation` table, this interface can only be accessed with the master key.
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Updated Conversation"}' \
+  https://{{host}}/1.2/rtm/conversations/{conv_id}
+```
+
+All attributes of the `_Conversation` table except `m` can be updated with this interface.
+
+The response looks like
+
+```json
+{
+  "updatedAt": "2018-01-16T03:40:37.683Z",
+  "objectId": "5a5d7433c3422b31ed845e76"
+}
+```
+
+### Deleting Conversations
+
+With the default ACL settings of the `_Conversation` table, this interface can only be accessed with the master key.
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  https://{{host}}/1.2/rtm/conversations/{conv_id}
+```
+
+The response looks like
+
+```json
+{}
+```
+
+### Adding Members
+
+With the default ACL settings of the `_Conversation` table, this interface can only be accessed with the master key.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"client_ids": ["Tom", "Jerry"]}' \
+  https://{{host}}/1.2/rtm/conversations/{conv_id}/members
+```
+
+The response looks like
+
+```json
+{
+  "updatedAt": "2018-01-16T03:40:37.683Z",
+  "objectId": "5a5d7433c3422b31ed845e76"
+}
+```
+
+### Removing Members
+
+With the default ACL settings of the `_Conversation` table, this interface can only be accessed with the master key.
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"client_ids": ["Tom", "Jerry"]}' \
+  https://{{host}}/1.2/rtm/conversations/{conv_id}/members
+```
+
+The response looks like
+
+```json
+{
+  "updatedAt": "2018-01-16T03:40:37.683Z",
+  "objectId": "5a5d7433c3422b31ed845e76"
+}
+```
+
+### Retrieving Members
+
+With the default ACL settings of the `_Conversation` table, this interface can only be accessed with the master key.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  https://{{host}}/1.2/rtm/conversations/{conv_id}/members
+```
+
+The response looks like
+
+```json
+{ "result": ["client1", "client2"] }
+```
+
+### Adding Members That Mute a Conversation
+
+With the default ACL settings of the `_Conversation` table, this interface can only be accessed with the master key.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"client_ids": ["Tom", "Jerry"]}' \
+  https://{{host}}/1.2/rtm/conversations/{conv_id}/mutes
+```
+
+| Parameter       | Description                       |
+| ---------- | -------------------------- |
+| client_ids | An array of `Client ID`s that mute the conversation |
+
+The response looks like
+
+```json
+{
+  "updatedAt": "2018-01-16T03:40:37.683Z",
+  "objectId": "5a5d7433c3422b31ed845e76"
+}
+```
+
+### Removing Members That Mute a Conversation
+
+With the default ACL settings of the `_Conversation` table, this interface can only be accessed with the master key.
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"client_ids": ["Tom", "Jerry"]}' \
+  https://{{host}}/1.2/rtm/conversations/{conv_id}/mutes
+```
+
+The response looks like
+
+```json
+{
+  "updatedAt": "2018-01-16T03:40:37.683Z",
+  "objectId": "5a5d7433c3422b31ed845e76"
+}
+```
+
+### Retrieving Members That Muted a Conversation
+
+With the default ACL settings of the `_Conversation` table, this interface can only be accessed with the master key.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  https://{{host}}/1.2/rtm/conversations/{conv_id}/mutes
+```
+
+The response looks like
+
+```json
+{ "result": ["client1", "client2"] }
+```
+
+### One-On-One Chats and Group Chats: Sending Messages
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"from_client": "", "message": ""}' \
+  https://{{host}}/1.2/rtm/conversations/{conv_id}/messages
+```
+
+**Attention**: Due to the administrative essence of this interface, when you send messages with this interface, our system won’t check if the **from_client** has the permission to send messages to the conversation.
+If you are using rich media messages in your application, please make sure to have the **message** field follow the required format.
+
+| Parameter               | Constraint | Description                                                                                                                                                                                                                           |
+| ------------------ | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| from_client        | Required | The client ID of the sender.                                                                                                                                                                                                         |
+| message            | Required | The content of the message. Although the value of this field is a string, there is no limit on the format of the string. Therefore, you can define messages with different formats using this field, as long as the size of the value of this field doesn’t exceed the limit of 5 KB.                                                                               |
+| transient          | Optional | Whether the message is transient. Defaults to `false`.                                                                                                                                                                                                     |
+| no_sync            | Optional | By default, the message will be synced to the client of the `from_client` that is online. You can disable this feature by setting this property to `true`.                                                                                                                                              |
+| push_data          | Optional | The content used for push notifications. If the receiver uses an iOS device and is not online, the value of this property will be used for sending push notifications. See [2. Advanced Messaging Features, Push Notifications, Synchronization, and Multi-Device Sign-on](/sdk/im/guide/intermediate/) for more information. |
+| priority           | Optional | The priority of the message. Could be `high`, `normal`, or `low`. The value is case-insensitive. Defaults to `normal`. This parameter is only valid if the message is transient or is sent to a chat room. When there is high traffic on the server or users’ devices, messages with high priorities will still be queued.                  |
+| mention_all        | Optional | Boolean. Used to remind all the members in the conversation to pay attention to this message.                                                                                                                                                                                   |
+| mention_client_ids | Optional | Array. Includes the list of `client_id` that will be reminded to pay attention to this message. Can contain at most 20 client IDs.                                                                                                                                      |
+
+Response:
+
+By default, messages are sent asynchronously with the API. You will receive the ID of the message along with the server timestamp, like `{"msg-id":"qNkRkFWOeSqP65S9fDyHJw", "timestamp":1495431811151}`.
+
+Rate limits:
+
+This interface has rate limits enforced. See [Rate Limits](#rate-limits) for more information.
+
+### Retrieving History Messages
+
+This interface can only be accessed with the master key.
+To ensure the security of history messages, you can enable the signing mechanism. See [3. Security, Permission Management, Chat Rooms, and Temporary Conversations](/sdk/im/guide/senior/) for more information.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  https://{{host}}/1.2/rtm/conversations/{conv_id}/messages
+```
+
+| Parameter           | Constraint | Description                                                                                                                           |
+| -------------- | ---- | ------------------------------------------------------------------------------------------------------------------------------ |
+| msgid          | Optional | The ID of the starting message. **When this parameter is provided, the `timestamp` of the corresponding message must be provided as well.**                                               |
+| timestamp      | Optional | The start timestamp (in milliseconds). Defaults to the current time.                                                                                   |
+| till_msgid     | Optional | The ID of the ending message. **When this parameter is provided, the `till_timestamp` of the corresponding message must be provided as well.**                                          |
+| till_timestamp | Optional | The end timestamp (in milliseconds). Defaults to 0.                                                                                         |
+| include_start  | Optional | Whether to include the message determined by `timestamp` and `msgid`. Boolean. Defaults to `false`.                                                             |
+| include_stop   | Optional | Whether to include the message determined by `till_timestamp` and `till_msgid`. Boolean. Defaults to `false`.                                                   |
+| reversed       | Optional | Sort the results in reverse of the default order (time order). With this option enabled, `till_timestamp` defaults to the current time and `timestamp` defaults to 0. Boolean. Defaults to `false`. |
+| limit          | Optional | Used to limit the number of records returned. Defaults to 100. Can be no more than 1000.                                                                                  |
+| client_id      | Optional | Viewer ID (used for signature).                                                                                                          |
+| nonce          | Optional | Nonce for the signature (used for signature).                                                                                                     |
+| signature_ts   | Optional | Timestamp for the signature (used for signature) in milliseconds.                                                                                             |
+| signature      | Optional | The signature (used for signature).                                                                                                               |
+
+This interface contains a lot of parameters related to time. To make things clear, here is an example. Assuming that a conversation has 3 messages with their IDs being `id1`, `id2`, and `id3` and timestamps being `t1`, `t2`, and `t3` (`t1` < `t2` < `t3`). The table below shows the results for queries with different parameters (blank cells indicate that the default values are used):
+
+| timestamp | msgid | till_timestamp | till_msgid | include_start | include_stop | reversed | Result    |
+| --------- | ----- | -------------- | ---------- | ------------- | ------------ | -------- | ------- |
+| t3        | id3   | t1             | id1        |               |              |          | id2     |
+| t3        | id3   | t1             | id1        | true          |              |          | id3 id2 |
+| t3        | id3   | t1             | id1        |               | true         |          | id2 id1 |
+| t1        | id1   | t3             | id3        |               |              | true     | id2     |
+| t1        | id1   | t3             | id3        | true          |              | true     | id1 id2 |
+| t1        | id1   | t3             | id3        |               | true         | true     | id2 id3 |
+
+The response would be a JSON array containing messages sorted from the newest to the oldest. If `reversed` is enabled, the messages will be sorted in reverse order.
+
+Response:
+
+```json
+[
+  {
+    "timestamp": 1408008498571,
+    "conv-id": "219946ef32e40c515d33ae6975a5c593",
+    "data": "Nice weather!",
+    "from": "u111872755_9d0461adf9c267ae263b3742c60fa",
+    "msg-id": "vdkGm4dtRNmhQ5gqUTFBiA",
+    "is-conv": true,
+    "is-room": false,
+    "to": "5541c02ce4b0f83f4d44414e",
+    "bin": false,
+    "from-ip": "202.117.15.217"
+  }
+  // ...
+]
+```
+
+To look up all the messages sent by a user, use `GET /rtm/clients/{client_id}/messages`.
+To look up all the messages sent through your application, use `GET /rtm/messages`.
+
+### One-On-One Chats and Group Chats: Updating Messages
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"from_client": "", "message": "", "timestamp": 123}' \
+  https://{{host}}/1.2/rtm/conversations/{conv_id}/messages/{message_id}
+```
+
+| Parameter        | Constraint | Description                   |
+| ----------- | ---- | ---------------------- |
+| from_client | Required | The client ID of the sender |
+| message     | Required | The message                 |
+| timestamp   | Required | The timestamp of the message           |
+
+If successful, the `200 OK` status code will be returned.
+
+Rate limits:
+
+This interface has rate limits enforced. See [Rate Limits](#rate-limits) for more information.
+
+### One-On-One Chats and Group Chats: Recalling Messages
+
+This interface can only be accessed with the master key. SDK support is needed for requests sent to this interface to take effect. Refer to the interface for updating messages for more information.
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"from_client": "", "timestamp": 123}' \
+  https://{{host}}/1.2/rtm/conversations/{conv_id}/messages/{message_id}/recall
+```
+
+| Parameter        | Constraint | Description                   |
+| ----------- | ---- | ---------------------- |
+| from_client | Required | The client ID of the sender |
+| timestamp   | Required | The timestamp of the message           |
+
+If successful, the `200 OK` status code will be returned.
+
+Rate limits:
+
+This interface has rate limits enforced. See [Rate Limits](#rate-limits) for more information.
+
+### Deleting Messages
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -G \
+  --data-urlencode 'from_client=some-client-id' \
+  --data-urlencode 'timestamp=123' \
+  https://{{host}}/1.2/rtm/conversations/{conv_id}/messages/{message_id}
+```
+
+Keep in mind that this interface will only delete messages on the server and won’t affect clients.
+
+| Parameter        | Constraint | Description                   |
+| ----------- | ---- | ---------------------- |
+| from_client | Required | The client ID of the sender |
+| timestamp   | Required | The timestamp of the message           |
+
+Response:
+
+```json
+{}
+```
+
+### Adding Users That Are Temporarily Blocked
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"client_id": "some-client-id", "ttl": 50}' \
+  https://{{host}}/1.2/rtm/conversations/{conv_id}/temporary-silenceds
+```
+
+| Parameter      | Description                           |
+| --------- | ------------------------------ |
+| client_id | The `Client ID` to be blocked. String.   |
+| ttl       | Time to block the user in seconds. Can be no longer than 24 hours. |
+
+The response looks like
+
+```json
+{}
+```
+
+### Removing Users That Are Temporarily Blocked
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -G \
+  --data-urlencode 'client_id=some-client-id' \
+  https://{{host}}/1.2/rtm/conversations/{conv_id}/temporary-silenceds
+```
+
+The response looks like
+
+```json
+{}
+```
+
+### Conversation Permissions
+
+See [3. Security, Permission Management, Chat Rooms, and Temporary Conversations](/sdk/im/guide/senior/) for an introduction to this feature.
+
+#### Adding Permissions
+
+This interface can only be accessed with the master key.
+Each conversation can have a maximum of 500 users that are blocked permanently.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"clientId": "client", "role": "role"}' \
+  https://{{host}}/1.2/rtm/conversations/{conv_id}/member-infos
+```
+
+| Parameter     | Description                                |
+| -------- | ----------------------------------- |
+| clientId | User ID. String.                     |
+| role     | Role. Can be `Member`, `Manager`, or `Owner`. |
+
+The response looks like
+
+```json
+{
+  "updatedAt": "2018-01-16T03:40:37.683Z",
+  "objectId": "5a5d7433c3422b31ed845e76"
+}
+```
+
+#### Removing Permissions
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  https://{{host}}/1.2/rtm/conversations/{conv_id}/member-infos/{info-id}
+```
+
+| Parameter    | Description                  |
+| ------- | --------------------- |
+| info-id | The `objectId` of the corresponding record. |
+
+The response looks like
+
+```json
+{}
+```
+
+#### Updating Permissions
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"clientId": "client", "role": "role"}' \
+  https://{{host}}/1.2/rtm/conversations/{conv_id}/member-infos/{info-id}
+```
+
+| Parameter     | Description                                      |
+| -------- | ----------------------------------------- |
+| clientId | User ID. String.                           |
+| role     | Role. Can be `Member`, `Manager`, or `Owner`. Optional. |
+| info-id  | The `objectId` of the corresponding record.                     |
+
+The response looks like
+
+```json
+{
+  "updatedAt": "2018-01-16T03:40:37.683Z",
+  "objectId": "5a5d7433c3422b31ed845e76"
+}
+```
+
+#### Retrieving Permissions
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -G \
+  --data-urlencode 'skip=1' \
+  --data-urlencode 'limit=20' \
+  https://{{host}}/1.2/rtm/conversations/{conv_id}/member-infos
+```
+
+| Parameter  | Description                     |
+| ----- | ------------------------ |
+| skip  |
+| limit | Can be used for pagination when used together with `skip` |
+| role  | Used to only include a specific role in the query. |
+
+The response looks like
+
+```json
+{
+  "results": [
+    {
+      "clientId": "client1",
+      "objectId": "5a5d7433c3422b31ed845e76",
+      "role": "Manager"
+    }
+  ]
+}
+```
+
+#### Adding Users That Are Permanently Blocked
+
+This interface can only be accessed with the master key.
+Each conversation can have a maximum of 500 users that are blocked permanently.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"client_ids": ["client1", "client2"]}' \
+  https://{{host}}/1.2/rtm/conversations/{conv_id}/permanent-silenceds
+```
+
+| Parameter       | Description                            |
+| ---------- | ------------------------------- |
+| client_ids | A list of `Client ID`s to be blocked. Array. |
+
+The response looks like
+
+```json
+{}
+```
+
+#### Removing Users That Are Permanently Blocked
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -d '{"client_ids": ["client1", "client2"]}' \
+  https://{{host}}/1.2/rtm/conversations/{conv_id}/permanent-silenceds
+```
+
+The response looks like
+
+```json
+{}
+```
+
+#### Retrieving Users That Are Permanently Blocked
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -G \
+  --data-urlencode 'limit=20' \
+  https://{{host}}/1.2/rtm/conversations/{conv_id}/permanent-silenceds
+```
+
+| Parameter  | Constraint | Description                                                   |
+| ----- | ---- | ------------------------------------------------------ |
+| limit | Optional | Can be used for pagination when used together with `next`. Defaults to 10.                      |
+| next  | Optional | Gets returned after the first query is performed. Use this value for pagination in further queries. |
+
+The response looks like
+
+```json
+{ "client_ids": ["client1", "client2"] }
+```
+
+### Blacklisting
+
+See [3. Security, Permission Management, Chat Rooms, and Temporary Conversations](/sdk/im/guide/senior/) for an introduction to this feature.
+
+#### Adding Clients to a Blacklist
+
+This interface can only be accessed with the master key.
+
+Clients added to the blacklist of a conversation won’t be able to join the conversation anymore. If the client is already in the conversation, adding the client to the blacklist will remove the client from the conversation. Each conversation can have at most 500 clients in its blacklist.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"client_ids": ["client1", "client2"]}' \
+  https://{{host}}/1.2/rtm/conversations/{conv_id}/blacklists
+```
+
+| Parameter       | Description                            |
+| ---------- | ------------------------------- |
+| client_ids | A list of `Client ID`s to be blacklisted. Array. |
+
+The response looks like
+
+```json
+{}
+```
+
+#### Removing Clients From a Blacklist
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -d '{"client_ids": ["client1", "client2"]}' \
+  https://{{host}}/1.2/rtm/conversations/{conv_id}/blacklists
+```
+
+The response looks like
+
+```json
+{}
+```
+
+#### Retrieving Blacklisted Clients
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -d '{"client_ids": ["client1", "client2"]}' \
+  https://{{host}}/1.2/rtm/conversations/{conv_id}/blacklists
+```
+
+| Parameter  | Constraint | Description                                                   |
+| ----- | ---- | ------------------------------------------------------ |
+| limit | Optional | Can be used for pagination when used together with `next`. Defaults to 10.                      |
+| next  | Optional | Gets returned after the first query is performed. Use this value for pagination in further queries. |
+
+The response looks like
+
+```json
+{ "client_ids": ["client1", "client2"] }
+```
+
+## Chat Rooms
+
+### Creating Chat Rooms
+
+With the default ACL settings of the `_Conversation` table, this interface can only be accessed with the master key.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"My First Chatroom"}' \
+  https://{{host}}/1.2/rtm/chatrooms
+```
+
+See [Instant Messaging Overview](/sdk/im/guide/overview/) for more information about the attributes of a conversation.
+
+The response looks like
+
+```json
+{
+  "objectId": "5a5d7432c3422b31ed845e75",
+  "createdAt": "2018-01-16T03:40:32.814Z"
+}
+```
+
+### Retrieving Chat Rooms
+
+With the default ACL settings of the `_Conversation` table, this interface can only be accessed with the master key.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -G \
+  --data-urlencode 'where={"name": "chatroom"}' \
+  --data-urlencode 'skip=1' \
+  --data-urlencode 'limit=20' \
+  https://{{host}}/1.2/rtm/chatrooms
+```
+
+| Parameter  | Constraint | Description                                                                     |
+| ----- | ---- | ------------------------------------------------------------------------ |
+| skip  | Optional |
+| limit | Optional | Can be used for pagination when used together with `skip`                                                 |
+| where | Optional | See [Data Storage REST API](/sdk/storage/guide/rest/) for more information |
+
+The response looks like
+
+```json
+{
+  "results": [
+    {
+      "name": "My First Chatroom",
+      "createdAt": "2018-01-17T04:15:33.386Z",
+      "updatedAt": "2018-01-17T04:15:33.386Z",
+      "objectId": "5a5ecde6c3422b738c8779d7"
+    }
+  ]
+}
+```
+
+### Updating Chat Rooms
+
+With the default ACL settings of the `_Conversation` table, this interface can only be accessed with the master key.
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Updated Chatroom"}' \
+  https://{{host}}/1.2/rtm/chatrooms/{chatroom_id}
+```
+
+The response looks like
+
+```json
+{
+  "updatedAt": "2018-01-16T03:40:37.683Z",
+  "objectId": "5a5d7433c3422b31ed845e76"
+}
+```
+
+### Deleting Chat Rooms
+
+With the default ACL settings of the `_Conversation` table, this interface can only be accessed with the master key.
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  https://{{host}}/1.2/rtm/chatrooms/{chatroom_id}
+```
+
+The response looks like
+
+```json
+{}
+```
+
+### Randomly Retrieving Some Online Members
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  https://{{host}}/1.2/rtm/chatrooms/{chatroom_id}/members
+```
+
+The response looks like
+
+```json
+{ "result": ["clientid1", "clientid2", "clientid3"] }
+```
+
+### Retrieving Numbers of Online Members
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  https://{{host}}/1.2/rtm/chatrooms/{chatroom_id}/members/online-count
+```
+
+The response looks like
+
+```json
+{ "result": 3 }
+```
+
+### Chat Rooms: Sending Messages
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"from_client": "", "message": ""}' \
+  https://{{host}}/1.2/rtm/chatrooms/{chatroom_id}/messages
+```
+
+**Attention**: Due to the administrative essence of this interface, when you send messages with this interface, our system won’t check if the **from_client** has the permission to send messages to the conversation.
+If you are using rich media messages in your application, please make sure to have the **message** field follow the required format.
+Besides, for chat rooms, messages **cannot** be synced to the online **from_client**.
+
+| Parameter               | Constraint | Description                                                                                                                                                                                                          |
+| ------------------ | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| from_client        | Required | The client ID of the sender.                                                                                                                                                                                        |
+| message            | Required | The content of the message. Although the value of this field is a string, there is no limit on the format of the string. Therefore, you can define messages with different formats using this field, as long as the size of the value of this field doesn’t exceed the limit of 5 KB.                                                              |
+| transient          | Optional | Whether the message is transient. Defaults to `false`.                                                                                                                                                                                    |
+| priority           | Optional | The priority of the message. Could be `high`, `normal`, or `low`. The value is case-insensitive. Defaults to `normal`. This parameter is only valid if the message is transient or is sent to a chat room. When there is high traffic on the server or users’ devices, messages with high priorities will still be queued. |
+| mention_all        | Optional | Boolean. Used to remind all the members in the conversation to pay attention to this message.                                                                                                                                                                  |
+| mention_client_ids | Optional | Array. Includes the list of `client_id` that will be reminded to pay attention to this message. Can contain at most 20 client IDs.                                                                                                                     |
+
+Response:
+
+By default, messages are sent asynchronously with the API. You will receive the ID of the message along with the server timestamp, like `{"msg-id":"qNkRkFWOeSqP65S9fDyHJw", "timestamp":1495431811151}`.
+
+Rate limits:
+
+This interface has rate limits enforced. See [Rate Limits](#rate-limits) for more information.
+
+### Retrieving History Messages
+
+This interface can only be accessed with the master key.
+To ensure the security of history messages, you can enable the signing mechanism. See [3. Security, Permission Management, Chat Rooms, and Temporary Conversations](/sdk/im/guide/senior/) for more information.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  https://{{host}}/1.2/rtm/chatrooms/{conv_id}/messages
+```
+
+| Parameter           | Constraint | Description                                                                                                                           |
+| -------------- | ---- | ------------------------------------------------------------------------------------------------------------------------------ |
+| msgid          | Optional | The ID of the starting message. **When this parameter is provided, the `timestamp` of the corresponding message must be provided as well.**                                               |
+| timestamp      | Optional | The start timestamp (in milliseconds). Defaults to the current time.                                                                                   |
+| till_msgid     | Optional | The ID of the ending message. **When this parameter is provided, the `till_timestamp` of the corresponding message must be provided as well.**                                          |
+| till_timestamp | Optional | The end timestamp (in milliseconds). Defaults to 0.                                                                                         |
+| include_start  | Optional | Whether to include the message determined by `timestamp` and `msgid`. Boolean. Defaults to `false`.                                                             |
+| include_stop   | Optional | Whether to include the message determined by `till_timestamp` and `till_msgid`. Boolean. Defaults to `false`.                                                   |
+| reversed       | Optional | Sort the results in reverse of the default order (time order). With this option enabled, `till_timestamp` defaults to the current time and `timestamp` defaults to 0. Boolean. Defaults to `false`. |
+| limit          | Optional | Used to limit the number of records returned. Defaults to 100. Can be no more than 1000.                                                                                  |
+| client_id      | Optional | Viewer ID (used for signature).                                                                                                          |
+| nonce          | Optional | Nonce for the signature (used for signature).                                                                                                     |
+| signature_ts   | Optional | Timestamp for the signature (used for signature) in milliseconds.                                                                                             |
+| signature      | Optional | The signature (used for signature).                                                                                                               |
+
+This interface contains a lot of parameters related to time. To make things clear, here is an example. Assuming that a conversation has 3 messages with their IDs being `id1`, `id2`, and `id3` and timestamps being `t1`, `t2`, and `t3` (`t1` < `t2` < `t3`). The table below shows the results for queries with different parameters (blank cells indicate that the default values are used):
+
+| timestamp | msgid | till_timestamp | till_msgid | include_start | include_stop | reversed | Result    |
+| --------- | ----- | -------------- | ---------- | ------------- | ------------ | -------- | ------- |
+| t3        | id3   | t1             | id1        |               |              |          | id2     |
+| t3        | id3   | t1             | id1        | true          |              |          | id3 id2 |
+| t3        | id3   | t1             | id1        |               | true         |          | id2 id1 |
+| t1        | id1   | t3             | id3        |               |              | true     | id2     |
+| t1        | id1   | t3             | id3        | true          |              | true     | id1 id2 |
+| t1        | id1   | t3             | id3        |               | true         | true     | id2 id3 |
+
+The response would be a JSON array containing messages sorted from the newest to the oldest. If `reversed` is enabled, the messages will be sorted in reverse order.
+
+Response:
+
+```json
+[
+  {
+    "timestamp": 1408008498571,
+    "conv-id": "219946ef32e40c515d33ae6975a5c593",
+    "data": "Nice weather!",
+    "from": "u111872755_9d0461adf9c267ae263b3742c60fa",
+    "msg-id": "vdkGm4dtRNmhQ5gqUTFBiA",
+    "is-conv": true,
+    "is-room": false,
+    "to": "5541c02ce4b0f83f4d44414e",
+    "bin": false,
+    "from-ip": "202.117.15.217"
+  }
+  // ...
+]
+```
+
+To look up all the messages sent by a user, use `GET /rtm/clients/{client_id}/messages`.
+To look up all the messages sent through your application, use `GET /rtm/messages`.
+
+### Chat Rooms: Updating Messages
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"from_client": "", "message": "", "timestamp": 123}' \
+  https://{{host}}/1.2/rtm/chatrooms/{chatroom_id}/messages/{message_id}
+```
+
+| Parameter        | Constraint | Description                   |
+| ----------- | ---- | ---------------------- |
+| from_client | Required | The client ID of the sender |
+| message     | Required | The message                 |
+| timestamp   | Required | The timestamp of the message           |
+
+If successful, the `200 OK` status code will be returned.
+
+Rate limits:
+
+This interface has rate limits enforced. See [Rate Limits](#rate-limits) for more information.
+
+### Chat Rooms: Recalling Messages
+
+This interface can only be accessed with the master key. SDK support is needed for requests sent to this interface to take effect. Refer to the interface for updating messages for more information.
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"from_client": "", "timestamp": 123}' \
+  https://{{host}}/1.2/rtm/chatrooms/{chatroom_id}/messages/{message_id}/recall
+```
+
+| Parameter        | Constraint | Description                   |
+| ----------- | ---- | ---------------------- |
+| from_client | Required | The client ID of the sender |
+| timestamp   | Required | The timestamp of the message           |
+
+If successful, the `200 OK` status code will be returned.
+
+Rate limits:
+
+This interface has rate limits enforced. See [Rate Limits](#rate-limits) for more information.
+
+### Deleting Messages
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -G \
+  --data-urlencode 'from_client=some-client-id' \
+  --data-urlencode 'timestamp=123' \
+  https://{{host}}/1.2/rtm/chatrooms/{chatroom_id}/messages/{message_id}
+```
+
+Keep in mind that this interface will only delete messages on the server and won’t affect clients.
+
+| Parameter        | Constraint | Description                   |
+| ----------- | ---- | ---------------------- |
+| from_client | Required | The client ID of the sender |
+| timestamp   | Required | The timestamp of the message           |
+
+Response:
+
+```json
+{}
+```
+
+### Adding Users That Are Temporarily Blocked
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"client_id": "some-client-id", "ttl": 50}' \
+  https://{{host}}/1.2/rtm/chatrooms/{chatroom_id}/temporary-silenceds
+```
+
+| Parameter      | Description                           |
+| --------- | ------------------------------ |
+| client_id | The `Client ID` to be blocked. String.   |
+| ttl       | Time to block the user in seconds. Can be no longer than 24 hours. |
+
+The response looks like
+
+```json
+{}
+```
+
+### Removing Users That Are Temporarily Blocked
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -G \
+  --data-urlencode 'client_id=some-client-id' \
+  https://{{host}}/1.2/rtm/chatrooms/{chatroom_id}/temporary-silenceds
+```
+
+The response looks like
+
+```json
+{}
+```
+
+### Conversation Permissions
+
+See [3. Security, Permission Management, Chat Rooms, and Temporary Conversations](/sdk/im/guide/senior/) for an introduction to this feature.
+
+#### Adding Permissions
+
+This interface can only be accessed with the master key.
+Each chat room can have a maximum of 10,000 users that are blocked permanently.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"clientId": "client", "role": "role"}' \
+  https://{{host}}/1.2/rtm/chatrooms/{conv_id}/member-infos
+```
+
+| Parameter     | Description                                |
+| -------- | ----------------------------------- |
+| clientId | User ID. String.                     |
+| role     | Role. Can be `Member`, `Manager`, or `Owner`. |
+
+The response looks like
+
+```json
+{
+  "updatedAt": "2018-01-16T03:40:37.683Z",
+  "objectId": "5a5d7433c3422b31ed845e76"
+}
+```
+
+#### Removing Permissions
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  https://{{host}}/1.2/rtm/chatrooms/{conv_id}/member-infos/{info-id}
+```
+
+| Parameter    | Description                  |
+| ------- | --------------------- |
+| info-id | The `objectId` of the corresponding record. |
+
+The response looks like
+
+```json
+{}
+```
+
+#### Updating Permissions
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"clientId": "client", "role": "role"}' \
+  https://{{host}}/1.2/rtm/chatrooms/{conv_id}/member-infos/{info-id}
+```
+
+| Parameter     | Description                                      |
+| -------- | ----------------------------------------- |
+| clientId | User ID. String.                           |
+| role     | Role. Can be `Member`, `Manager`, or `Owner`. Optional. |
+| info-id  | The `objectId` of the corresponding record.                     |
+
+The response looks like
+
+```json
+{
+  "updatedAt": "2018-01-16T03:40:37.683Z",
+  "objectId": "5a5d7433c3422b31ed845e76"
+}
+```
+
+#### Retrieving Permissions
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -G \
+  --data-urlencode 'skip=1' \
+  --data-urlencode 'limit=20' \
+  https://{{host}}/1.2/rtm/chatrooms/{conv_id}/member-infos
+```
+
+| Parameter  | Description                     |
+| ----- | ------------------------ |
+| skip  |
+| limit | Can be used for pagination when used together with `skip` |
+| role  | Used to only include a specific role in the query. |
+
+The response looks like
+
+```json
+{
+  "results": [
+    {
+      "clientId": "client1",
+      "objectId": "5a5d7433c3422b31ed845e76",
+      "role": "Manager"
+    }
+  ]
+}
+```
+
+#### Adding Users That Are Permanently Blocked
+
+This interface can only be accessed with the master key.
+Each chat room can have a maximum of 500 users that are blocked permanently.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"client_ids": ["client1", "client2"]}' \
+  https://{{host}}/1.2/rtm/chatrooms/{conv_id}/permanent-silenceds
+```
+
+| Parameter       | Description                            |
+| ---------- | ------------------------------- |
+| client_ids | A list of `Client ID`s to be blocked. Array. |
+
+The response looks like
+
+```json
+{}
+```
+
+#### Removing Users That Are Permanently Blocked
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -d '{"client_ids": ["client1", "client2"]}' \
+  https://{{host}}/1.2/rtm/chatrooms/{conv_id}/permanent-silenceds
+```
+
+The response looks like
+
+```json
+{}
+```
+
+#### Retrieving Users That Are Permanently Blocked
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -G \
+  --data-urlencode 'limit=20' \
+  https://{{host}}/1.2/rtm/chatrooms/{conv_id}/permanent-silenceds
+```
+
+| Parameter  | Constraint | Description                                                   |
+| ----- | ---- | ------------------------------------------------------ |
+| limit | Optional | Can be used for pagination when used together with `next`. Defaults to 10.                      |
+| next  | Optional | Gets returned after the first query is performed. Use this value for pagination in further queries. |
+
+The response looks like
+
+```json
+{ "client_ids": ["client1", "client2"] }
+```
+
+### Blacklisting
+
+See [3. Security, Permission Management, Chat Rooms, and Temporary Conversations](/sdk/im/guide/senior/) for an introduction to this feature.
+
+#### Adding Clients to a Blacklist
+
+This interface can only be accessed with the master key.
+
+Clients added to the blacklist of a chat room won’t be able to join the chat room anymore. If the client is already in the chat room, adding the client to the blacklist will remove the client from the chat room. Each chat room can have at most 10,000 clients in its blacklist.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"client_ids": ["client1", "client2"]}' \
+  https://{{host}}/1.2/rtm/chatrooms/{chatroom_id}/blacklists
+```
+
+| Parameter       | Description                            |
+| ---------- | ------------------------------- |
+| client_ids | A list of `Client ID`s to be blacklisted. Array. |
+
+The response looks like
+
+```json
+{}
+```
+
+#### Removing Clients From a Blacklist
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -d '{"client_ids": ["client1", "client2"]}' \
+  https://{{host}}/1.2/rtm/chatrooms/{chatroom_id}/blacklists
+```
+
+The response looks like
+
+```json
+{}
+```
+
+#### Retrieving Blacklisted Clients
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -d '{"client_ids": ["client1", "client2"]}' \
+  https://{{host}}/1.2/rtm/chatrooms/{chatroom_id}/blacklists
+```
+
+| Parameter  | Constraint | Description                                                   |
+| ----- | ---- | ------------------------------------------------------ |
+| limit | Optional | Can be used for pagination when used together with `next`. Defaults to 10.                      |
+| next  | Optional | Gets returned after the first query is performed. Use this value for pagination in further queries. |
+
+The response looks like
+
+```json
+{ "client_ids": ["client1", "client2"] }
+```
+
+## System Conversations
+
+### Creating System Conversations
+
+With the default ACL settings of the `_Conversation` table, this interface can only be accessed with the master key.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"My First Service-conversation"}' \
+  https://{{host}}/1.2/rtm/service-conversations
+```
+
+See [Instant Messaging Overview](/sdk/im/guide/overview/) for more information about the attributes of a conversation.
+
+The response looks like
+
+```json
+{
+  "objectId": "5a5d7432c3422b31ed845e75",
+  "createdAt": "2018-01-16T03:40:32.814Z"
+}
+```
+
+### Retrieving System Conversations
+
+With the default ACL settings of the `_Conversation` table, this interface can only be accessed with the master key.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -G \
+  --data-urlencode 'where={"name": "service"}' \
+  --data-urlencode 'skip=1' \
+  --data-urlencode 'limit=20' \
+  https://{{host}}/1.2/rtm/service-conversations
+```
+
+| Parameter  | Constraint | Description                                                                     |
+| ----- | ---- | ------------------------------------------------------------------------ |
+| skip  | Optional |
+| limit | Optional | Can be used for pagination when used together with `skip`                                                 |
+| where | Optional | See [Data Storage REST API](/sdk/storage/guide/rest/) for more information |
+
+The response looks like
+
+```json
+{
+  "results": [
+    {
+      "name": "My First Service-conversation",
+      "createdAt": "2018-01-17T04:15:33.386Z",
+      "updatedAt": "2018-01-17T04:15:33.386Z",
+      "objectId": "5a5ecde6c3422b738c8779d7"
+    }
+  ]
+}
+```
+
+### Updating System Conversations
+
+With the default ACL settings of the `_Conversation` table, this interface can only be accessed with the master key.
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Updated Service-conversation"}' \
+  https://{{host}}/1.2/rtm/service-conversations/{conv_id}
+```
+
+The response looks like
+
+```json
+{
+  "updatedAt": "2018-01-16T03:40:37.683Z",
+  "objectId": "5a5d7433c3422b31ed845e76"
+}
+```
+
+### Deleting System Conversations
+
+With the default ACL settings of the `_Conversation` table, this interface can only be accessed with the master key.
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  https://{{host}}/1.2/rtm/service-conversations/{conv_id}
+```
+
+The response looks like
+
+```json
+{}
+```
+
+### Subscribing System Conversations
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"client_id":"client_id"}' \
+  https://{{host}}/1.2/rtm/service-conversations/{conv_id}/subscribers
+```
+
+The response looks like
+
+```json
+{}
+```
+
+### Unsubscribing System Conversations
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  https://{{host}}/1.2/rtm/service-conversations/{conv_id}/subscribers/{client_id}
+```
+
+The response looks like
+
+```json
+{}
+```
+
+### Retrieving Subscribers
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  https://{{host}}/1.2/rtm/service-conversations/{conv_id}/subscribers
+```
+
+| Parameter      | Constraint | Description                                                                                                         |
+| --------- | ---- | ------------------------------------------------------------------------------------------------------------ |
+| limit     | Optional | Used to limit the number of records returned. Defaults to 50. Can be no more than 50.                                                                     |
+| client_id | Optional | The client ID to start retrieving from. If left blank, the system will start from the first subscriber in the list. The result will not contain the client ID specified here. |
+
+The response looks like
+
+```json
+[
+  {
+    "timestamp": 1491467841116,
+    "subscriber": "client id 1",
+    "conv_id": "55b871"
+  },
+  {
+    "timestamp": 1491467852768,
+    "subscriber": "client id 2",
+    "conv_id": "55b872"
+  }
+  // ...
+]
+```
+
+Here `timestamp` is the time the user subscribed to the system conversation. `subscriber` is the client ID of the subscriber. If the result doesn’t contain all the subscribers and you need to retrieve more records, you can send another request with the last client ID from the result as the `client_id` of the request.
+
+### Retrieving Numbers of Subscribers
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  https://{{host}}/1.2/rtm/service-conversations/{conv_id}/subscribers/count
+```
+
+The response looks like
+
+```json
+{ "count": 100 }
+```
+
+### Messaging All Subscribers
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"from_client": "", "message": ""}' \
+  https://{{host}}/1.2/rtm/service-conversations/{conv_id}/broadcasts
+```
+
+| Parameter        | Constraint | Description                                                                                     |
+| ----------- | ---- | ---------------------------------------------------------------------------------------- |
+| from_client | Required | The client ID of the sender.                                                                   |
+| message     | Required | The message content.                                                                                   |
+| push        | Optional | The content for push notifications. If specified, all iOS and Android users will receive a push notification with this content. String or JSON object. |
+
+Response:
+
+```json
+{ "msg-id": "qNkRkFWOeSqP65S9fDyHJw", "timestamp": 1495431811151 }
+```
+
+Rate limits:
+
+This interface has rate limits enforced. See [Rate Limits](#rate-limits) for more information.
+
+### Updating Messages Sent to All Subscribers
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"from_client": "", "message": "", "timestamp": 123}' \
+  https://{{host}}/1.2/rtm/service-conversations/{conv_id}/messages/{message_id}
+```
+
+| Parameter        | Constraint | Description                   |
+| ----------- | ---- | ---------------------- |
+| from_client | Required | The client ID of the sender. |
+| message     | Required | The message content.                 |
+| timestamp   | Required | The timestamp of the message.           |
+
+If successful, the `200 OK` status code will be returned.
+
+Rate limits:
+
+This interface has rate limits enforced. See [Rate Limits](#rate-limits) for more information.
+
+### Recalling Messages Sent to All Subscribers
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"from_client": "", "timestamp": 123}' \
+  https://{{host}}/1.2/rtm/service-conversations/{conv_id}/messages/{message_id}/recall
+```
+
+| Parameter        | Constraint | Description                   |
+| ----------- | ---- | ---------------------- |
+| from_client | Required | The client ID of the sender. |
+| timestamp   | Required | The timestamp of the message.           |
+
+If successful, the `200 OK` status code will be returned.
+
+Rate limits:
+
+This interface has rate limits enforced. See [Rate Limits](#rate-limits) for more information.
+
+### Messaging Specific Users
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"from_client": "", "message": ""}' \
+  https://{{host}}/1.2/rtm/service-conversations/{conv_id}/messages
+```
+
+**Attention**: Due to the administrative essence of this interface, when you send messages with this interface, our system won’t check if the **from_client** has the permission to send messages to the conversation.
+If you are using rich media messages in your application, please make sure to have the **message** field follow the required format.
+
+| Parameter        | Constraint | Description                                                                                                                                                                                                               |
+| ----------- | ---- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| from_client | Required | The client ID of the sender.                                                                                                                                                                                             |
+| to_clients  | Required | An array of client IDs that will receive the message. Can contain at most 20 client IDs.                                                                                                                                                |
+| message     | Required | The content of the message. Although the value of this field is a string, there is no limit on the format of the string. Therefore, you can define messages with different formats using this field, as long as the size of the value of this field doesn’t exceed the limit of 5 KB.                                                              |
+| transient   | Optional | Whether the message is transient. Defaults to `false`.                                                                                                                                                                                         |
+| no_sync     | Optional | By default, the message will be synced to the client of the `from_client` that is online. You can disable this feature by setting this property to `true`.                                                                                                                                  |
+| push_data   | Optional | The content used for push notifications. If the receiver uses an iOS device and is not online, the value of this property will be used for sending push notifications. See [2. Advanced Messaging Features, Push Notifications, Synchronization, and Multi-Device Sign-on](/sdk/im/guide/intermediate/) for more information. |
+| priority    | Optional | The priority of the message. Could be `high`, `normal`, or `low`. The value is case-insensitive. Defaults to `normal`. This parameter is only valid if the message is transient or is sent to a chat room. When there is high traffic on the server or users’ devices, messages with high priorities will still be queued.      |
+
+Response:
+
+By default, messages are sent asynchronously with the API. You will receive the ID of the message along with the server timestamp, like `{"msg-id":"qNkRkFWOeSqP65S9fDyHJw", "timestamp":1495431811151}`.
+
+Rate limits:
+
+This interface has rate limits enforced. See [Rate Limits](#rate-limits) for more information.
+
+### Updating Messages Sent to Specific Users
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"from_client": "", "message": "", "timestamp": 123, "to_clients":["a","b","c"]}' \
+  https://{{host}}/1.2/rtm/service-conversations/{conv_id}/messages/{message_id}
+```
+
+| Parameter        | Constraint | Description                                                                    |
+| ----------- | ---- | ----------------------------------------------------------------------- |
+| from_client | Required | The client ID of the sender.                                                  |
+| message     | Required | The message content.                                                                  |
+| timestamp   | Required | The timestamp of the message.                                                            |
+| to_clients  | Required | An array of client IDs that will receive the message. Can contain at most 20 client IDs. |
+
+If successful, the `200 OK` status code will be returned.
+
+Rate limits:
+
+This interface has rate limits enforced. See [Rate Limits](#rate-limits) for more information.
+
+### Recalling Messages Sent to Specific Users
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"from_client": "", "timestamp": 123, "to_clients":["a","b","c"]}' \
+  https://{{host}}/1.2/rtm/service-conversations/{conv_id}/messages/{message_id}/recall
+```
+
+| Parameter        | Constraint | Description                                                                    |
+| ----------- | ---- | ----------------------------------------------------------------------- |
+| from_client | Required | The client ID of the sender.                                                  |
+| timestamp   | Required | The timestamp of the message.                                                            |
+| to_clients  | Required | An array of client IDs that will receive the message. Can contain at most 20 client IDs. |
+
+If successful, the `200 OK` status code will be returned.
+
+Rate limits:
+
+This interface has rate limits enforced. See [Rate Limits](#rate-limits) for more information.
+
+### Deleting Messages Sent to Specific Users
+
+Invoking this interface requires the master key. You can only delete messages sent through system conversations or sent to specific users. You cannot delete broadcast messages with this interface.
+To delete broadcast messages, use `DELETE /1.2/rtm/broadcasts/{message_id}` instead.
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -G \
+  --data-urlencode 'from_client=some-client-id' \
+  --data-urlencode 'timestamp=123' \
+  https://{{host}}/1.2/rtm/service-conversations/{conv_id}/subscribers/{client_id}/messages/{message_id}
+```
+
+Keep in mind that this interface will only delete messages on the server and won’t affect clients.
+
+| Parameter        | Constraint | Description                   |
+| ----------- | ---- | ---------------------- |
+| from_client | Required | The client ID of the sender. |
+| timestamp   | Required | The timestamp of the message.           |
+
+Response:
+
+```json
+{}
+```
+
+### Retrieving Messages Sent to Specific Users
+
+This interface can only be accessed with the master key. The result contains messages sent to all users as well as those sent to specific users.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  https://{{host}}/1.2/rtm/service-conversations/{conv_id}/subscribers/{client_id}/messages
+```
+
+The parameters and response formats of this interface are the same as those for retrieving history messages.
+
+### Blacklisting
+
+See [3. Security, Permission Management, Chat Rooms, and Temporary Conversations](/sdk/im/guide/senior/) for an introduction to this feature.
+
+#### Adding Clients to a Blacklist
+
+This interface can only be accessed with the master key.
+
+Clients added to the blacklist of a system conversation won’t be able to join the system conversation anymore. If the client is already in the system conversation, adding the client to the blacklist will remove the client from the system conversation. Each system conversation can have at most 10,000 clients in its blacklist.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"client_ids": ["client1", "client2"]}' \
+  https://{{host}}/1.2/rtm/service-conversations/{conv_id}/blacklists
+```
+
+| Parameter       | Description                            |
+| ---------- | ------------------------------- |
+| client_ids | A list of `Client ID`s to be blacklisted. Array. |
+
+The response looks like
+
+```json
+{}
+```
+
+#### Removing Clients From a Blacklist
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -d '{"client_ids": ["client1", "client2"]}' \
+  https://{{host}}/1.2/rtm/service-conversations/{conv_id}/blacklists
+```
+
+The response looks like
+
+```json
+{}
+```
+
+#### Retrieving Blacklisted Clients
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -d '{"client_ids": ["client1", "client2"]}' \
+  https://{{host}}/1.2/rtm/service-conversations/{conv_id}/blacklists
+```
+
+| Parameter  | Constraint | Description                                                   |
+| ----- | ---- | ------------------------------------------------------ |
+| limit | Optional | Can be used for pagination when used together with `next`. Defaults to 10.                      |
+| next  | Optional | Gets returned after the first query is performed. Use this value for pagination in further queries. |
+
+The response looks like
+
+```json
+{ "client_ids": ["client1", "client2"] }
+```
+
+## Users
+
+### Retrieving Online Members
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"client_ids": ["Tom", "Jerry"]}' \
+  https://{{host}}/1.2/rtm/clients/check-online
+```
+
+| Parameter       | Constraint | Description                                |
+| ---------- | ---- | ----------------------------------- |
+| client_ids | Required | A list of client IDs (no more than 20) to look up. |
+
+The response contains the IDs of the online members
+
+```json
+{ "results": ["client1"] }
+```
+
+Keep in mind that this interface doesn’t check if a user exists. If a user doesn’t exist, the user will be considered offline.
+
+### Retrieving Numbers of Unread Messages
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -G \
+  --data-urlencode 'conv_id=...' \
+  https://{{host}}/1.2/rtm/clients/{client_id}/unread-count
+```
+
+| Parameter    | Constraint | Description                                                        |
+| ------- | ---- | ----------------------------------------------------------- |
+| conv_id | Optional | Conversation ID. If omitted, the numbers of unread messages of all conversations will be returned. |
+
+The response looks like
+
+```json
+{ "count": 1 }
+```
+
+### Forcing Users to Log Out
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"reason": "why"}' \
+  https://{{host}}/1.2/rtm/clients/{client_id}/kick
+```
+
+| Parameter   | Constraint | Description                               |
+| ------ | ---- | ---------------------------------- |
+| reason | Optional | A string indicating the reason. Can contain more than 20 characters. |
+
+The response looks like
+
+```json
+{}
+```
+
+### Retrieving Subscribed System Conversations
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -G \
+  --data-urlencode 'conv_id=...' \
+  --data-urlencode 'timestamp=...' \
+  --data-urlencode 'limit=...' \
+  --data-urlencode 'direction=...' \
+  https://{{host}}/1.2/rtm/clients/{client_id}/service-conversations
+```
+
+| Parameter      | Constraint | Type   | Description                                                                                                                             |
+| --------- | ---- | ------ | -------------------------------------------------------------------------------------------------------------------------------- |
+| conv_id   | Optional | String | The conversation ID to start retrieving from. If left blank, the system will start from the first conversation in the list. The result will not contain the conversation specified here.                                                    |
+| timestamp | Optional | Number   | The subscription time to start from (in milliseconds). Although this parameter is optional, it becomes required when `conv_id` is provided and the value shall be the time that matches the `conv_id` specified.   |
+| limit     | Optional | Number   | Limit the number of records returned. Defaults to 50.                                                                                                       |
+| direction | Optional | String | The order to sort the result. `old` means descending order and `new` means ascending order. Defaults to `new`. If using `old`, the latest subscribed conversation will be returned first; if using `new`, the earliest subscribed conversation will be returned first. |
+
+The response contains the system conversations subscribed by the target user:
+
+```json
+[
+  { "timestamp": 1482994126561, "subscriber": "XXX", "conv_id": "convId1" },
+  { "timestamp": 1491467945277, "subscriber": "XXX", "conv_id": "convId2" }
+  // ...
+]
+```
+
+Here `timestamp` is the time the user subscribed to the system conversation. `subscriber` is the client ID of the subscriber. If the result doesn’t contain all the conversations and you need to retrieve more records, you can send another request with the last conversation ID from the result as the `conv_id` of the request and its timestamp as the `timestamp` of the request.
+
+### Retrieving Messages Sent by Users
+
+This interface can only be accessed with the master key.
+Use this interface to retrieve all the messages sent from a `client_id` to one-on-one chats, group chats, and chat rooms.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  https://{{host}}/1.2/rtm/clients/{client_id}/messages
+```
+
+The parameters and response formats of this interface are the same as those for `GET /1.2/rtm/conversations/{conv_id}/messages`.
+
+### Adding Conversations to the Blacklist
+
+This interface can only be accessed with the master key.
+A client can add group chats, chat rooms, or system conversations to their blacklist, preventing themselves from being added to those conversations.
+At this time, a client cannot add another client into their blacklist.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"conv_id": ""}' \
+  https://{{host}}/1.2/rtm/clients/{client_id}/blacklists
+```
+
+| Parameter    | Constraint | Description                           |
+| ------- | ---- | ------------------------------ |
+| conv_id | Required | The ID of the group chat, chat room, or system conversation to be blacklisted. |
+
+The response looks like
+
+```json
+{}
+```
+
+### Removing Conversations From the Blacklist
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"conv_id": ""}' \
+  https://{{host}}/1.2/rtm/clients/{client_id}/blacklists
+```
+
+The response looks like
+
+```json
+{}
+```
+
+### Retrieving Conversations in the Blacklist
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  https://{{host}}/1.2/rtm/clients/{client_id}/blacklists
+```
+
+| Parameter  | Constraint | Description                                                   |
+| ----- | ---- | ------------------------------------------------------ |
+| limit | Optional | Can be used for pagination when used together with `next`. Defaults to 10.                      |
+| next  | Optional | Gets returned after the first query is performed. Use this value for pagination in further queries. |
+
+The response looks like
+
+```json
+{ "conv_ids": ["conv1"], "next": "1" }
+```
+
+### Obtaining Signatures for Logging In
+
+If your app uses `LCUser`, you can have your app quickly authenticate users with this interface.
+This feature is disabled by default. You can enable it by going to **Developer Center > Your game > Game Services > Cloud Services > Instant Messaging > Settings > Instant Messaging settings** and enabling **Verify signatures for logging in**.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -G \
+  --data-urlencode 'session_token=some-token' \
+  https://{{host}}/1.2/rtm/clients/sign
+```
+
+| Parameter          | Constraint | Description                   |
+| ------------- | ---- | ---------------------- |
+| session_token | Required | The `sessionToken` of the `LCUser` |
+
+The response looks like
+
+```json
+{
+  "signature": "bc884dbb617aab1efc228229210e487330abfc7d",
+  "nonce": "akywke3f28",
+  "client_id": "5fb4ff18d0deed36ea501c8a",
+  "timestamp": 1614237989966
+}
+```
+
+Keep in mind that although this interface takes `GET` requests, requests are not idempotent. Each invocation will get you a different signature.
+
+This interface comes with the `_rtmClientSign` hook, which gets invoked once `sessionToken` is validated. The argument passed into the hook is a JSON object that represents the `LCUser`:
+
+```json
+{
+  "email": "",
+  "sessionToken": "",
+  "updatedAt": "", // Format: 2017-07-11T07:58:10.149Z
+  "phone": "",
+  "objectId": "",
+  "username": "",
+  "createdAt": "", // Format: 2017-07-11T07:58:10.149Z
+  "emailVerified": true, // true/false
+  "mobilePhoneVerified": true // true/false
+}
+```
+
+There are two possible results:
+
+```json
+{"result": true} // Allow to sign
+{"result": false, "error": "error message"}  // Reject to sign
+```
+
+## Global APIs
+
+### Retrieving User Count
+
+This interface will return the number of online users as well as the number of users who logged in today. Invoking this interface requires the master key.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  https://{{host}}/1.2/rtm/stats
+```
+
+The response looks like
+
+```json
+{ "result": { "online_user_count": 10212, "user_count_today": 1002324 } }
+```
+
+Here `online_user_count` is the number of online users and `user_count_today` is the number of users who logged in today.
+
+### Retrieving All Conversations
+
+This interface will return all the conversations, including one-on-one chats, group chats, chat rooms, and system conversations. With the default ACL settings of the `_Conversation` table, this interface can only be accessed with the master key.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  https://{{host}}/1.2/rtm/all-conversations
+```
+
+| Parameter  | Constraint | Description                                                                     |
+| ----- | ---- | ------------------------------------------------------------------------ |
+| skip  | Optional |
+| limit | Optional | Can be used for pagination when used together with `skip`                                                 |
+| where | Optional | See [Data Storage REST API](/sdk/storage/guide/rest/) for more information |
+
+The response looks like
+
+```json
+{
+  "results": [
+    {
+      "name": "conversation",
+      "createdAt": "2018-01-17T04:15:33.386Z",
+      "updatedAt": "2018-01-17T04:15:33.386Z",
+      "objectId": "5a5ecde6c3422b738c8779d7"
+    }
+  ]
+}
+```
+
+### Sending Broadcast Messages
+
+This interface can be used to send broadcast messages to all the clients in your application. You can send at most 30 broadcast messages everyday. Invoking this interface requires the master key.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"from_client": "1a", "message": "{\"_lctype\":-1,\"_lctext\":\"This is a text message\",\"_lcattrs\":{\"a\":\"_lcattrs can be used to store custom key-value pairs\"}}", "conv_id": "..."}' \
+  https://{{host}}/1.2/rtm/broadcasts
+```
+
+| Parameter        | Constraint | Type               | Description                                                                                                                                             |
+| ----------- | ---- | ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| from_client | Required | String             | The client ID of the sender.                                                                                                                                  |
+| conv_id     | Required | String             | The ID of the conversation. For system conversations only.                                                                                                                      |
+| message     | Required | String             | The content of the message. Although the value of this field is a string, there is no limit on the format of the string. Therefore, you can define messages with different formats using this field, as long as the size of the value of this field doesn’t exceed the limit of 5 KB. |
+| valid_till  | Optional | Number               | Expiration time in UTC timestamp (milliseconds). Can be no later than 1 month. Defaults to 1 month.                                                                             |
+| push        | Optional | String or JSON object | The content for push notifications. If specified, **all** iOS and Android users will receive a push notification with this content.                                                                       |
+| transient   | Optional | Boolean             | Whether the message is transient. Defaults to `false`. Transient messages can only be received by online users. Offline users won’t see those messages when they get online.                     |
+
+Push 的格式与《推送 REST API 指南》的《消息内容参数》一节中 `data` 下面的部分一致。如果你需要指定开发证书推送，需要在 push 的 json 中设置 `"_profile": "dev"`，例如：
+
+```json
+{
+  "alert": "消息内容",
+  "category": "通知分类名称",
+  "badge": "Increment",
+  "_profile": "dev"
+}
+```
+
+Rate limits:
+
+This interface has rate limits enforced. See [Rate Limits](#rate-limits) for more information.
+
+### Updating Broadcast Messages
+
+This interface can only be accessed with the master key.
+
+Updating broadcast messages only works for devices that haven’t received the messages yet. Devices that have already received the messages won’t see the updated messages, so please be careful when sending broadcast messages.
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"from_client": "", "message": "", "timestamp": 123}' \
+  https://{{host}}/1.2/rtm/service-conversations/{conv_id}/messages/{message_id}
+```
+
+| Parameter        | Constraint | Description                   |
+| ----------- | ---- | ---------------------- |
+| from_client | Required | The client ID of the sender. |
+| message     | Required | The message content.                 |
+| timestamp   | Required | The timestamp of the message.           |
+
+If successful, the `200 OK` status code will be returned.
+
+Rate limits:
+
+This interface has rate limits enforced. See [Rate Limits](#rate-limits) for more information.
+
+### Deleting Broadcast Messages
+
+This API can be used to delete published broadcast messages. Deleting broadcast messages only works for devices that haven’t received the messages yet. Devices that have already received the messages won’t see the messages deleted. Invoking this interface requires the master key.
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  https://{{host}}/1.2/rtm/broadcasts/{message_id}
+```
+
+| Parameter       | Constraint | Description                    |
+| ---------- | ---- | ----------------------- |
+| message_id | Required | The ID of the message to be deleted. String. |
+
+If successful, the `200 OK` status code will be returned.
+
+### Retrieving Broadcast Messages
+
+This API can be used to retrieve the valid broadcast messages. Invoking this interface requires the master key.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  https://{{host}}/1.2/rtm/broadcasts?conv_id={conv_id}
+```
+
+| Parameter    | Constraint | Description                   |
+| ------- | ---- | ---------------------- |
+| conv_id | Required | The ID of the system conversation.              |
+| limit   | Optional | The number of messages returned.           |
+| skip    | Optional | The number of messages skipped. Used for pagination. |
+
+### Retrieving All History Messages in an Application
+
+This interface can only be accessed with the master key.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  https://{{host}}/1.2/rtm/messages
+```
+
+The parameters and response formats of this interface are the same as those for `GET /1.2/rtm/conversations/{conv_id}/messages`.
+
+## Rich Media Messages
+
+The only difference between the parameter format of [rich media messages](/sdk/im/guide/overview/#default-types-for-rich-media-messages) and that for basic messages is that the value of the `message` parameter for a rich media message is a string containing a JSON.
+See [Instant Messaging Overview · Default Types for Rich Media Messages](/sdk/im/guide/overview/#default-types-for-rich-media-messages) for the meanings of the fields in the JSON.
+Below are some examples of rich media messages derived from predefined types that are serialized to JSON objects.
+
+### Text
+
+```json
+{
+  "_lctype": -1,
+  "_lctext": "This is a text message",
+  "_lcattrs": {
+    "a": "_lcattrs can be used to store custom key-value pairs"
+  }
+}
+```
+
+### Image
+
+```json
+{
+  "_lctype": -2, // Required parameter
+  "_lctext": "Image description",
+  "_lcattrs": {
+    "a": "_lcattrs can be used to store custom key-value pairs",
+    "b": true,
+    "c": 12
+  },
+  "_lcfile": {
+    "url": "http://ac-p2bpmgci.clouddn.com/246b8acc-2e12-4a9d-a255-8d17a3059d25", // Required parameter
+    "objId": "54699d87e4b0a56c64f470a4", // The LCFile.objectId of the file
+    "metaData": {
+      "name": "IMG_20141223.jpeg", // Image name
+      "format": "png", // Image format
+      "height": 768, // Pixels
+      "width": 1024, // Pixels
+      "size": 18 // b
+    }
+  }
+}
+```
+
+Above is a full example. To only send the URL of an image:
+
+```json
+{
+  "_lctype": -2,
+  "_lcfile": {
+    "url": "http://ac-p2bpmgci.clouddn.com/246b8acc-2e12-4a9d-a255-8d17a3059d25"
+  }
+}
+```
+
+### Audio
+
+```json
+{
+  "_lctype": -3,
+  "_lctext": "This is an audio message",
+  "_lcattrs": {
+    "a": "_lcattrs can be used to store custom key-value pairs"
+  },
+  "_lcfile": {
+    "url": "http://ac-p2bpmgci.clouddn.com/246b8acc-2e12-4a9d-a255-8d17a3059d25",
+    "objId": "54699d87e4b0a56c64f470a4", // The LCFile.objectId of the file
+    "metaData": {
+      "name": "Never Gonna Give You Up.wav",
+      "format": "wav",
+      "duration": 26, // Seconds
+      "size": 2738 // b
+    }
+  }
+}
+```
+
+Simplified version:
+
+```json
+{
+  "_lctype": -3,
+  "_lcfile": {
+    "url": "http://www.somemusic.com/x.mp3"
+  }
+}
+```
+
+### Video
+
+```json
+{
+  "_lctype": -4,
+  "_lctext": "This is a video message",
+  "_lcattrs": {
+    "a": "_lcattrs can be used to store custom key-value pairs"
+  },
+  "_lcfile": {
+    "url": "http://ac-p2bpmgci.clouddn.com/99de0f45-171c-4fdd-82b8-1877b29bdd12",
+    "objId": "54699d87e4b0a56c64f470a4", // The LCFile.objectId of the file
+    "metaData": {
+      "name": "video.mov",
+      "format": "avi",
+      "duration": 168, // Seconds
+      "size": 18689 // b
+    }
+  }
+}
+```
+
+Simplified version:
+
+```json
+{
+  "_lctype": -4,
+  "_lcfile": {
+    "url": "http://www.somevideo.com/Y.flv"
+  }
+}
+```
+
+### File
+
+```json
+{
+  "_lctype": -6,
+  "_lctext": "This is a file",
+  "_lcattrs": {
+    "a": "_lcattrs can be used to store custom key-value pairs"
+  },
+  "_lcfile": {
+    "url": "http://www.somefile.com/resume.doc",
+    "name": "resume.doc",
+    "size": 18689 // b
+  }
+}
+```
+
+Simplified version:
+
+```json
+{
+  "_lctype": -6,
+  "_lcfile": {
+    "url": "http://www.somefile.com/resume.doc",
+    "name": "resume.doc"
+  }
+}
+```
+
+### Location
+
+```json
+{
+  "_lctype": -5,
+  "_lctext": "This is a location message",
+  "_lcattrs": {
+    "a": "_lcattrs can be used to store custom key-value pairs"
+  },
+  "_lcloc": {
+    "longitude": 23.2,
+    "latitude": 45.2
+  }
+}
+```
+
+Simplified version:
+
+```json
+{
+  "_lctype": -5,
+  "_lcloc": {
+    "longitude": 23.2,
+    "latitude": 45.2
+  }
+}
+```
+
+## Rate Limits
+
+Rate limits are enforced on all the REST APIs on this page that perform operations on messages (**client SDKs are not affected by these limits**). Those limits are listed below:
+
+### Basic Messages
+
+Version 1.1:
+
+- Sending messages and having system conversations send messages to users (`/1.1/rtm/messages`)
+- Updating and recalling messages (`/1.1/rtm/patch/message`)
+
+Version 1.2:
+
+- [One-On-One Chats and Group Chats: Sending Messages](#one-on-one-chats-and-group-chats-sending-messages)
+- [One-On-One Chats and Group Chats: Updating Messages](#one-on-one-chats-and-group-chats-updating-messages)
+- [One-On-One Chats and Group Chats: Recalling Messages](#one-on-one-chats-and-group-chats-recalling-messages)
+- [Chat Rooms: Sending Messages](#chat-rooms-sending-messages)
+- [Chat Rooms: Updating Messages](#chat-rooms-updating-messages)
+- [Chat Rooms: Recalling Messages](#chat-rooms-recalling-messages)
+- [System Conversations: Messaging Specific Users](#messaging-specific-users)
+- [System Conversations: Updating Messages Sent to Specific Users](#updating-messages-sent-to-specific-users)
+- [System Conversations: Recalling Messages Sent to Specific Users](#recalling-messages-sent-to-specific-users)
+
+#### Limits
+
+| Business Plan (per application)                       | Developer Plan (per application) |
+| -------------------------------------- | ---------------- |
+| No more than 9000 requests per minute; defaults to 1800 requests per minute | 120 requests per minute     |
+
+The limit is shared by all interfaces. If the rate limit is exceeded, the server will reject further requests with the 429 error code until 1 minute later.
+
+If your application has a Business Plan, you can edit its limit by going to **Developer Center > Your game > Game Services > Cloud Services > Instant Messaging > Settings > Thresholds > Frequency limit for calling API for basic messages**.
+You will be billed each day according to the peak request rate that occurred on the day:
+
+| Requests per minute | Price        |
+| -------------- | ----------- |
+| 0 to 1800      | Free        |
+| 1801 to 3600    | ¥20 CNY per day |
+| 3601 to 5400    | ¥30 CNY per day |
+| 5401 to 7200    | ¥40 CNY per day |
+| 7201 to 9000    | ¥50 CNY per day |
+
+International version
+
+| Requests per minute | Price         |
+| -------------- | ------------ |
+| 0 to 1800      | Free         |
+| 1801 to 3600    | $6 USD per day  |
+| 3601 to 5400    | $9 USD per day  |
+| 5401 to 7200    | $12 USD per day |
+| 7201 to 9000    | $15 USD per day |
+
+The peak request rate that occurred on each day can be viewed on **Developer Center > Your game > Game Services > Cloud Services > Instant Messaging > Statistics > REST API Peak QPM**.
+
+### Messages Sent From System Conversations
+
+Version 1.1:
+
+- Sending messages from system conversations (`/1.1/rtm/broadcast/subscriber`)
+
+Version 1.2:
+
+- [Messaging All Subscribers](#messaging-all-subscribers)
+- [Updating Messages Sent to All Subscribers](#updating-messages-sent-to-all-subscribers)
+- [Recalling Messages Sent to All Subscribers](#recalling-messages-sent-to-all-subscribers)
+
+#### Limits
+
+| Limit     | Business Plan             | Developer Plan             |
+| -------- | ------------------ | ------------------ |
+| Rate Limit | 30 requests per minute per application | 10 requests per minute per application |
+| Quota | 1000 requests per day   | 100 requests per day    |
+
+The limit is shared by all interfaces. If the rate limit is exceeded, the server will reject further requests with the 429 error code until 1 minute later. If the quota is exceeded, the server will reject further requests with the 429 error code until the next day.
+
+### Broadcast Messages
+
+Version 1.1:
+
+- Sending broadcast messages (`/1.1/rtm/broadcast`)
+
+Version 1.2:
+
+- [Sending Broadcast Messages](#sending-broadcast-messages)
+- [Updating Broadcast Messages](#updating-broadcast-messages)
+
+#### Limits
+
+| Limit     | Business Plan             | Developer Plan            |
+| -------- | ------------------ | ----------------- |
+| Rate Limit | 10 requests per minute per application | 1 request per minute per application |
+| Quota | 30 requests per day     | 10 requests per day    |
+
+The limit is shared by all interfaces. If the rate limit is exceeded, the server will reject further requests with the 429 error code until 1 minute later. If the quota is exceeded, the server will reject further requests with the 429 error code until the next day.

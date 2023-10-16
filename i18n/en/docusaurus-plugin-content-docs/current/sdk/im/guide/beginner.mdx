@@ -1906,7 +1906,17 @@ All of them are derived from `LCIMMessage`, with the following properties availa
 </>
 <>
 
-Swift
+| Name          | Type     | Description                                                                                                                                                                                                                                                                                                                                                              |
+| ------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `from`        | `String` | The `clientId` of the sender.                                                                                                                                                                                                                                                                                                                                            |
+| `cid`         | `String` | The ID of the conversation.                                                                                                                                                                                                                                                                                                                                              |
+| `id`          | `String` | A unique ID for each message. Assigned by the cloud automatically.                                                                                                                                                                                                                                                                                                       |
+| `timestamp`   | `Date`   | The time the message is sent. Assigned by the cloud automatically.                                                                                                                                                                                                                                                                                                       |
+| `deliveredAt` | `Date`   | The time the message is delivered.                                                                                                                                                                                                                                                                                                                                       |
+| `status`      | `Symbol` | The status of the message. Could be one of the members of [`MessageStatus`](https://leancloud.github.io/js-realtime-sdk/docs/module-leancloud-realtime.html#.MessageStatus):<br/><br/>`MessageStatus.NONE` (unknown)<br/>`MessageStatus.SENDING` (sending)<br/>`MessageStatus.SENT` (sent)<br/>`MessageStatus.DELIVERED` (delivered)<br/>`MessageStatus.FAILED` (failed) |
+
+</>
+<>
 
 | Name                       | Type                | Description                                                                                                                                                                         |
 | -------------------------- | ------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -1924,20 +1934,6 @@ Swift
 | `isCurrentClientMentioned` | `Bool`              | Whether the current `Client` is mentioned.                                                                                                                                          |
 | `status`                   | `IMMessage.Status`  | The status of the message. Could be one of:<br/><br/>`none` (unknown)<br/>`sending` (sending)<br/>`sent` (sent)<br/>`delivered` (delivered)<br/>`read` (read)<br/>`failed` (failed) |
 | `ioType`                   | `IMMessage.IOType`  | The direction of the message. Could be one of:<br/><br/>`in` (sent to the current user)<br/>`out` (sent by the current user)                                                        |
-
-</>
-<>
-
-JavaScript
-
-| Name          | Type     | Description                                                                                                                                                                                                                                                                                                                                                              |
-| ------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `from`        | `String` | The `clientId` of the sender.                                                                                                                                                                                                                                                                                                                                            |
-| `cid`         | `String` | The ID of the conversation.                                                                                                                                                                                                                                                                                                                                              |
-| `id`          | `String` | A unique ID for each message. Assigned by the cloud automatically.                                                                                                                                                                                                                                                                                                       |
-| `timestamp`   | `Date`   | The time the message is sent. Assigned by the cloud automatically.                                                                                                                                                                                                                                                                                                       |
-| `deliveredAt` | `Date`   | The time the message is delivered.                                                                                                                                                                                                                                                                                                                                       |
-| `status`      | `Symbol` | The status of the message. Could be one of the members of [`MessageStatus`](https://leancloud.github.io/js-realtime-sdk/docs/module-leancloud-realtime.html#.MessageStatus):<br/><br/>`MessageStatus.NONE` (unknown)<br/>`MessageStatus.SENDING` (sending)<br/>`MessageStatus.SENT` (sent)<br/>`MessageStatus.DELIVERED` (delivered)<br/>`MessageStatus.FAILED` (failed) |
 
 </>
 </MultiLang>
@@ -2734,6 +2730,89 @@ The Objective-C SDK handles new messages with `LCIMClientDelegate` and uses two 
 </>
 <>
 
+When a new message comes in, the JavaScript SDK would always trigger the callback set for the event `Event.MESSAGE` on `IMClient` regardless of the type of the message. You can address different types of messages in different ways within the callback function.
+
+```js
+// Load TypedMessagesPlugin when initializing Realtime
+var { Event, TextMessage } = require("leancloud-realtime");
+var { FileMessage, ImageMessage, AudioMessage, VideoMessage, LocationMessage } =
+  initPlugin(AV, IM);
+// Register handler for the MESSAGE event
+client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
+  // Your logic here
+  var file;
+  switch (message.type) {
+    case TextMessage.TYPE:
+      console.log(
+        "Text message received. Text: " +
+          message.getText() +
+          ", ID: " +
+          message.id
+      );
+      break;
+    case FileMessage.TYPE:
+      file = message.getFile(); // file is an AV.File instance
+      console.log(
+        "File message received. URL: " +
+          file.url() +
+          ", Size: " +
+          file.metaData("size")
+      );
+      break;
+    case ImageMessage.TYPE:
+      file = message.getFile();
+      console.log(
+        "Image message received. URL: " +
+          file.url() +
+          ", Width: " +
+          file.metaData("width")
+      );
+      break;
+    case AudioMessage.TYPE:
+      file = message.getFile();
+      console.log(
+        "Audio message received. URL: " +
+          file.url() +
+          ", Duration: " +
+          file.metaData("duration")
+      );
+      break;
+    case VideoMessage.TYPE:
+      file = message.getFile();
+      console.log(
+        "Video message received. URL: " +
+          file.url() +
+          ", Duration: " +
+          file.metaData("duration")
+      );
+      break;
+    case LocationMessage.TYPE:
+      var location = message.getLocation();
+      console.log(
+        "Location message received. Latitude: " +
+          location.latitude +
+          ", Longitude: " +
+          location.longitude
+      );
+      break;
+    case 1:
+      console.log("OperationMessage is the custom message type");
+    default:
+      // Your application may add new custom message types in the future. The SDK may add new built-in message types as well.
+      // Therefore, do not forget to handle them here. For example, you can notify the user to upgrade to a new version.
+      console.warn("收到未知类型消息");
+  }
+});
+
+// `MESSAGE` event will be triggered on conversation as well
+conversation.on(Event.MESSAGE, function messageEventHandler(message) {
+  // Your logic here
+});
+```
+
+</>
+<>
+
 The Swift SDK handles new messages with `IMClientDelegate`:
 
 ```swift
@@ -2829,89 +2908,6 @@ jerry.onMessage = ({
     }
   }
 };
-```
-
-</>
-<>
-
-When a new message comes in, the JavaScript SDK would always trigger the callback set for the event `Event.MESSAGE` on `IMClient` regardless of the type of the message. You can address different types of messages in different ways within the callback function.
-
-```js
-// Load TypedMessagesPlugin when initializing Realtime
-var { Event, TextMessage } = require("leancloud-realtime");
-var { FileMessage, ImageMessage, AudioMessage, VideoMessage, LocationMessage } =
-  initPlugin(AV, IM);
-// Register handler for the MESSAGE event
-client.on(Event.MESSAGE, function messageEventHandler(message, conversation) {
-  // Your logic here
-  var file;
-  switch (message.type) {
-    case TextMessage.TYPE:
-      console.log(
-        "Text message received. Text: " +
-          message.getText() +
-          ", ID: " +
-          message.id
-      );
-      break;
-    case FileMessage.TYPE:
-      file = message.getFile(); // file is an AV.File instance
-      console.log(
-        "File message received. URL: " +
-          file.url() +
-          ", Size: " +
-          file.metaData("size")
-      );
-      break;
-    case ImageMessage.TYPE:
-      file = message.getFile();
-      console.log(
-        "Image message received. URL: " +
-          file.url() +
-          ", Width: " +
-          file.metaData("width")
-      );
-      break;
-    case AudioMessage.TYPE:
-      file = message.getFile();
-      console.log(
-        "Audio message received. URL: " +
-          file.url() +
-          ", Duration: " +
-          file.metaData("duration")
-      );
-      break;
-    case VideoMessage.TYPE:
-      file = message.getFile();
-      console.log(
-        "Video message received. URL: " +
-          file.url() +
-          ", Duration: " +
-          file.metaData("duration")
-      );
-      break;
-    case LocationMessage.TYPE:
-      var location = message.getLocation();
-      console.log(
-        "Location message received. Latitude: " +
-          location.latitude +
-          ", Longitude: " +
-          location.longitude
-      );
-      break;
-    case 1:
-      console.log("OperationMessage is the custom message type");
-    default:
-      // Your application may add new custom message types in the future. The SDK may add new built-in message types as well.
-      // Therefore, do not forget to handle them here. For example, you can notify the user to upgrade to a new version.
-      console.warn("收到未知类型消息");
-  }
-});
-
-// `MESSAGE` event will be triggered on conversation as well
-conversation.on(Event.MESSAGE, function messageEventHandler(message) {
-  // Your logic here
-});
 ```
 
 </>
@@ -4034,16 +4030,16 @@ query.Compact = true;
 query.setCompact(true);
 ```
 
+```objc
+query.option = LCIMConversationQueryOptionCompact;
+```
+
 ```js
 query.compact(true);
 ```
 
 ```swift
 conversationQuery.options = [.notContainMembers]
-```
-
-```objc
-query.option = LCIMConversationQueryOptionCompact;
 ```
 
 ```dart

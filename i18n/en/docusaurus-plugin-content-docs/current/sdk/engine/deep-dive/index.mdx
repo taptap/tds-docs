@@ -1,0 +1,83 @@
+---
+title: Deep Dive Into Cloud Engine
+---
+
+import Mermaid from "/src/docComponents/Mermaid";
+
+:::note
+This article is intended to introduce the technical specifications of Cloud Engine to experienced developers. For instructions on how to get started with Cloud Engine, see [Getting Started With Cloud Engine](/sdk/engine/deploy/getting-started).
+:::
+
+## What kinds of applications does Cloud Engine work well with?
+
+Cloud Engine provides container-based process-level runtime environments for your application. When using Cloud Engine, you can focus on your application’s process without caring about the environment provided by the operating system.
+
+With Cloud Engine, your application’s process can focus on the business logic of your project. Your application can interact with Cloud Engine through standardized interfaces:
+
+- You can host your project’s code with Git and have Cloud Engine fetch the code from the corresponding repository
+- You can describe the environment required by your application with a dependency list (like `package.json`) and have Cloud Engine automatically prepare the environment for your application
+- You can manage environment variables with Cloud Engine and have your application load environment variables from Cloud Engine
+- Your application is expected to contain no data or states and is expected to access data through network requests; Cloud Engine provides hosted databases and cache services for your application
+- Your application can be built on Cloud Engine; Cloud Engine provides customizable build mechanisms for your application
+- Your application can run in multiple processes
+- Your application should be complete and runnable without containing a host environment; your application is expected to provide HTTP services through the network
+- Your application can simply print logs to the standard output and Cloud Engine will collect these logs for you to review
+
+:::note
+The design of Cloud Engine is greatly inspired by [The Twelve-Factor App](https://12factor.net/). You can learn more about the methodologies for building modernized, migratable, extensible, and maintainable backend services from its website.
+:::
+
+## Build
+
+Cloud Engine can be used to build projects in different languages (runtime environments). When you deploy a project to Cloud Engine, Cloud Engine will be able to tell the type of the project according to the project’s code. For example, if the project contains `package.json`, it will be considered a Node.js project.
+
+Once you upload your project’s code to Cloud Engine with Git or the CLI, Cloud Engine will start a _build process_ during which the dependencies of your project will be installed (`npm install`), executable files will be created (`go build`), and your custom commands will be executed (can be configured in [leanengine.yaml](/sdk/engine/deep-dive/leanengine-yaml)).
+
+<Mermaid
+  diagram={`
+flowchart LR
+    Mainfests["Dependency list\\n(package.json)"] -->|install| +Source["Full code\\n(package.json + *.ts)"]
+    +Source -->|build| Version["Version\\n(bundled.js)"]
+    Version -->|run| Instances1([Instance\\nnode ./bundled.js])
+    Version -->|run| Instances2([Instance\\nnode ./bundled.js])
+`}
+/>
+
+A _version_ will be created by the end of the build process. It contains the source code of your project, the dependencies downloaded, and the executable files generated (for certain runtime environments). Each version has an ID like `20210913-150821`, which is unique in the application.
+
+Cloud Engine uses layered cache to accelerate the build process. This means that if the operation needed for a step is not changed, the operation will not be executed and the result (cache) from the previous execution will be used. If the operation is changed, all the steps since this step will be executed again. For example, if the dependency list (like `package.json`) is not changed, Cloud Engine will not reinstall dependencies for your project but will use the result from the previous installation, which reduces the time spent on the build process.
+
+:::caution
+The caching mechanism for the build process doesn’t guarantee that the cache will be used if the dependency list of your project doesn’t change.
+:::
+
+:::caution
+If you specify a scope for the versions of the dependencies of your application and you use the same dependency list when you deploy your application for a second time, the dependencies installed for the previous version will be reused even if there are new versions released for the dependencies (and these versions are still within the scope).
+To force Cloud Engine to install the latest versions of the dependencies within the scope, you can disable the cache with the `--no-cache` option.
+:::
+
+## Instances and Deployment
+
+A version can be deployed to _instances_. Each instance corresponds to a container (process) on the server, which provides the computing power for your application and allows your application to provide services to users.
+
+### Zero Downtime Deployment
+
+If you’re using the standard version of Cloud Engine, when you deploy your project, restart your instances, or when we’re migrating instances, new containers will be started first. With new containers running normally, each old container will still keep running for at least 30 seconds to fulfill the ongoing requests. With this mechanism, when you deploy new versions or restart your instances, there probably won’t be requests that would fail, nor will the ability of your application to handle requests get impaired.
+
+Your application can listen to the `SIGTERM` signal to perform cleanups before it exits. By default, your application has 10 seconds to perform cleanups once it receives a `SIGTERM` signal.
+
+### Hibernation
+
+A trial instance (including the free one in the production environment or the staging environment) will hibernate if it receives no requests within a while. While hibernating, the instance will restart if it receives a request. It may take 10 to 20 seconds for an instance to start from hibernation. If a trial instance has run for more than 18 hours within the past 24 hours, it will be forced to hibernate and won’t restart even if there are requests coming in.
+
+### Automatic Instance Migration
+
+Sometimes the system will automatically trigger instance migrations even if you don’t start a deployment or restart your instances. When this happens, the zero-downtime-deployment mechanism will also be used. You may see logs saying that instances have been restarted, but there’s no need to worry about it.
+
+## Cloud Functions
+
+Cloud Functions lets you run backend code on the cloud in response to various types of events. The core functionality of Cloud Functions is provided by the Cloud Engine SDK, which shares the same process and HTTP port as your own project.
+
+Hooks are implemented in a similar manner as Cloud Functions. The difference is that hooks use a special set of names and can only be invoked by the Data Storage service or the Instant Messaging service through our private network. The Cloud Engine SDK will check the IP address of the request sender to ensure that it comes from our private network.
+
+The Cloud Functions and hooks in the different groups of the same application share the same namespace. This means that different Cloud Functions can be provided by different groups and built with different languages. When you deploy your application to Cloud Engine, Cloud Engine will communicate with the SDK to get a list of Cloud Functions and know which Cloud Functions belong to which groups. Our load balancer will then be able to redirect requests to the correct groups.

@@ -1,0 +1,233 @@
+---
+title: Unity Push Guide
+sidebar_label: Unity Push
+sidebar_position: 5
+---
+
+import {Conditional} from '/src/docComponents/conditional';
+import CodeBlock from "@theme/CodeBlock";
+import sdkVersions from "/src/docComponents/sdkVersions";
+
+
+This article will show you how to use push notifications in your Unity project. We recommend that you take a look at [Push Notification Overview](/sdk/push/guide/overview/) if you haven’t already.
+
+Currently we only support iOS and <Conditional region="cn">some Android vendors (Huawei, Xiaomi, VIVO, OPPO, Meizu)</Conditional><Conditional region="global">FCM</Conditional>.
+
+## Getting Started
+
+### iOS
+
+Please first obtain an iOS push notification certificate by following [APNs Configuration Guide](/sdk/push/guide/ios-cert/).
+
+### Android
+
+Please first apply for push notification permissions from <Conditional region="cn">Android vendors</Conditional><Conditional region="global">FCM</Conditional> by following [Android Mixpush Guide](/sdk/push/guide/android-mixpush/).
+
+Note that you only need to follow the guide to apply for push notification permissions from <Conditional region="cn">Android vendors</Conditional><Conditional region="global">FCM</Conditional>. You **don’t** need to follow the guide to set up push notifications for Android.
+
+## Integrate the Push Notification Service
+
+### Install the SDK
+
+You can download the latest `unity-push.unitypackage` or `unity-push-without-gradle.unitypackage` from [SDK Releases](https://github.com/leancloud/csharp-sdk/releases).
+
+If your project has “no” other Android Gradle configurations, you can download `unity-push.unitypackage`. This package includes all iOS and Android configurations. You will only need to configure the parameters for different vendors.
+
+If your project “has” other Android Gradle configurations, you’ll need to download `unity-push-without-gradle.unitypackage`. This package doesn’t contain Android Gradle configurations related to push notifications. You will need to provide those configurations yourself.
+
+The SDK cannot be installed with UPM because it involves Android Gradle configurations.
+
+<Conditional brand="tds">
+
+### Import the `LeanCloud-SDK-Realtime-Unity` Package:
+
+#### Method 1: Use Unity Package Manager
+
+Add the following dependency to the `Packages/manifest.json` file in your project:
+
+<CodeBlock className="json">
+{
+    `"dependencies":{
+        "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}"
+    }`
+}
+</CodeBlock>
+
+You can view all installed packages by going to **Window > Package Manager**.
+
+#### Method 2: Import Manually
+
+1. Locate the **LeanCloud C# SDK** download URL on [Downloads](/tap-download) and download `LeanCloud-SDK-Realtime-Unity.zip`.
+
+2. Unzip `LeanCloud-SDK-Realtime-Unity.zip` and drag the Plugins directory to Unity.
+
+</Conditional>
+
+### Set Up
+
+#### iOS
+
+Provide the iOS developer’s TeamId during initialization. See [Initialization](#initialization).
+
+#### Android
+
+<Conditional region="cn">
+
+##### Huawei
+
+Download the file named `agconnect-services.json` applied from Huawei Push Service and place it in `Assets/LeanCloud/Push/Android/HuaWei/hms/`. When bundling, this file will be copied to the directory specified by Huawei.
+
+##### VIVO
+
+Provide the `app_id` and `api_key` applied from VIVO Push Service as the values of `com.vivo.push.app_id` and `com.vivo.push.api_key` under `meta-data` in `Assets/Plugins/Android/AndroidMenifest.xml`.
+
+##### Other Platforms
+
+For Xiaomi, OPPO, and Meizu, provide the configurations when initializing the SDK.
+
+Note that `${applicationId}` is used for the package name in `AndroidMenifest.xml`. If you need different `applicationId`s for different channels, please edit it manually.
+
+### Initialization
+
+Here you need to initialize the SDK for different vendors according to the platform and device information.
+You can use Xiaomi Push Service as the default option as it is able to establish connections when used under other vendors.
+
+```cs
+using LeanCloud.Storage;
+using LeanCloud;
+using LeanCloud.Push;
+using System.Threading.Tasks;
+using LC.Newtonsoft.Json;
+
+LCApplication.Initialize("{{appid}}", "{{appkey}}", "https://please-replace-with-your-customized.domain.com");
+
+if (Application.platform == RuntimePlatform.IPhonePlayer) {
+    LCIOSPushManager.RegisterIOSPush(IOS_TEAM_ID);
+} else if (Application.platform == RuntimePlatform.Android) {
+    string deviceModel = SystemInfo.deviceModel.ToLower();
+    if (deviceModel.Contains("huawei")) {
+        LCHuaWeiPushManager.RegisterHuaWeiPush();
+    } else if (deviceModel.Contains("oppo")) {
+        LCOPPOPushManager.RegisterOPPOPush(OPPO_APP_KEY, OPPO_APP_SECRET);
+    } else if (deviceModel.Contains("vivo")) {
+        LCVIVOPushManager.RegisterVIVOPush();
+    } else if (deviceModel.Contains("meizu")) {
+        LCMeiZuPushManager.RegisterMeiZuPush(MEIZU_APP_ID, MEIZU_APP_KEY);
+    } else /*if (deviceModel.Contains("xiaomi"))*/ {
+        // Try to register Xiaomi Push Service for other vendors
+        LCXiaoMiPushManager.RegisterXiaoMiPush(XIAOMI_APP_ID, XIAOMI_APP_KEY);
+    }
+}
+```
+
+</Conditional>
+
+<Conditional region="global">
+
+To initialize FCM:
+
+```cs
+LCFCMPushManager.RegisterFCMPush();
+```
+
+</Conditional>
+
+## Installation
+
+The SDK comes with Installation objects that can be used to hold tokens and other data needed for push notifications.
+
+```cs
+LCInstallation lcInstallation = await LCInstallation.GetCurrent();
+```
+
+## Send Push Notifications
+
+By default, **Prevent clients from sending push notifications** is checked in **Developer Center > Your game > Game Services > Cloud Services > Push Notification > Settings** so clients won’t be able to send push notifications to other devices without restriction.
+We recommend leaving this option enabled and sending push notifications through the REST API or the dashboard.
+
+If you need to send push notifications from clients, uncheck this option.
+
+### Send Push Notifications to All Devices
+
+```csharp
+try {
+    LCPush push = new LCPush {
+        Data = new Dictionary<string, object> {
+            { "alert", pushData }
+        }
+    };
+    await push.Send();
+} catch (Exception e) {
+    Debug.LogError(e);
+}
+```
+
+### Send Push Notifications to Specific Users
+
+Below is an example of how to send a push notification from a client to an iOS device in the test environment:
+
+```cs
+try {
+    LCPush push = new LCPush {
+        Data = new Dictionary<string, object> {
+            { "alert", pushData }
+        },
+        IOSEnvironment = LCPush.IOSEnvironmentDev,
+    };
+    LCInstallation installation = await LCInstallation.GetCurrent();
+    push.Query.WhereEqualTo("objectId", installation.ObjectId);
+    await push.Send();
+} catch (Exception e) {
+    Debug.LogError(e);
+}
+```
+
+## Respond to Push Notifications
+
+### Message Format
+
+For more information about the message format, see [Push Notification REST API Guide](/sdk/push/guide/rest#推送消息). For Android devices, the default message content parameter contains the following properties:
+
+```json
+{
+  "alert":      "Message content",
+  "title":      "The title that appears in the notification center",
+  "custom-key": "Custom properties; custom-key is just an example and you can use any other keys"
+}
+```
+
+### Perform an Action When a User Taps a Push Notification
+
+When a user taps a push notification to open your app, the Unity scene might not be initialized. This means that Unity may not know which notification was tapped.
+
+To provide the **notification parameters** to Unity, the SDK will cache the parameters in the native layer when sending push notifications. It provides a C# interface for your program to retrieve the parameters:
+
+```cs
+Dictionary<string, object> launchData = await LCPushBridge.Instance.GetLaunchData();
+```
+
+## Verification
+
+Once you have initialized the SDK in your project and run your project on a real iOS or Android device, an entry with the device information will be created in the `_Installation` table.
+
+You can send a test push notification with custom conditions on **Developer Center > Your game > Game Services > Cloud Services > Push Notification > Send notifications**. This will help you verify that your device can receive push notifications.
+You can send the push notification by providing the objectId of the Installation. For iOS you can also provide the deviceToken and for Android you can use the registrationId.
+
+## FAQ
+### How do I remove the push notification services provided by certain vendors?
+
+<Conditional region="cn">
+
+You might want your app to support only certain vendors, or to release different packages for different channels. In this case, you can remove the vendor SDKs for unused vendors to reduce the size of the packages:
+
+</Conditional>
+
+<Conditional region="global">
+
+The SDK includes vendor SDKs for some Chinese Android vendors. You can remove them to reduce the size of the package.
+
+</Conditional>
+
+- Delete `Assets/LeanCloud/Push/Android/xx`. Here `xx` is the vendor name such as `HuaWei` and `XiaoMi`.
+- Delete `dependencies` from `Assets/Plugins/Android/mainTemplate.gradle`.
+- Delete vendor SDKs from `Assets/Plugins/Android/AndroidManifest.xml` (see to the comments in the file for more information).

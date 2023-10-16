@@ -1,0 +1,145 @@
+---
+title: 'Reference: leanengine.yaml'
+sidebar_label: 'leanengine.yaml'
+---
+
+import { Conditional } from "/src/docComponents/conditional";
+
+`leanengine.yaml` contains configurations for the server-side runtime environment. It uses YAML as syntax and should be placed in the root directory of the project.
+
+## Overriding Runtime Environment With `runtime`
+
+You can override the environment that Cloud Engine automatically detects. You can use the following values:
+
+- `cpp`
+- `dotnet`
+- `go`
+- `java`
+- `nodejs`
+- `php`
+- `python`
+- `static` (Frontend)
+
+## Overriding Command for Execution With `run`
+
+```yaml
+run: $(npm bin)/serve -c static.json -l ${LEANCLOUD_APP_PORT}
+```
+
+You can use shell syntax here for purposes like accessing environment variables.
+
+## Overriding Command for Installing Dependencies With `install`
+
+You can override the default command for installing dependencies (like `npm install`) or run additional commands before or after installing dependencies. You can specify multiple commands with an array, use shell syntax, and access environment variables.
+
+Most runtimes have their default commands for installing dependencies. You can refer to the default command with `use: default`:
+
+```yaml
+install:
+  - use: default
+  - npm run install-additional
+```
+
+When installing dependencies, only the dependency lists (like `package.json`) will be loaded into the build directory. To load additional files, use `require`:
+
+```yaml
+install:
+  - require:
+      - frontend/package.json
+      - frontend/package-lock.json
+  - cd frontend && npm ci
+```
+
+## Overriding Command for Building With `build`
+
+```yaml
+build: NODE_ENV=production $(npm bin)/webpack
+```
+
+As with `install`, you can import the default command with `use: default`. You can specify multiple pieces of commands with an array. You can also use shell syntax and access environment variables.
+
+When building your project, all the files in your project will be loaded into the build directory.
+
+## Specifying System Dependencies With `systemDependencies`
+
+To install additional system dependencies during deployment:
+
+```yaml
+systemDependencies:
+  - imagemagick
+```
+
+- `ffmpeg` A library for processing audio and videos.
+- `imagemagick` A library for processing images.
+- `fonts-wqy` 文泉驿点阵宋体 and 文泉驿微米黑. Often used with `chrome-headless` to display Chinese.
+- `fonts-noto` Source Han Sans (comes with a large size). Often used with `chrome-headless` to display Chinese.
+- ~~`phantomjs` A headless browser based on WebKit~~ (discontinued).
+- `chrome-headless` Headless Chrome. It comes with a large size and will significantly increase the time needed for deployment. It also consumes a lot of CPU and RAM resources. If you need to use `puppeteer`, please provide `{executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox', '--disable-setuid-sandbox']}` to `puppeteer.launch`.
+- `node-canvas` The system dependency required for installing [node-canvas](https://github.com/Automattic/node-canvas) (you still need to install `node-canvas` yourself).
+- `python-talib` The system dependency required for installing [TA-Lib](https://pypi.org/project/TA-Lib/) (you still need to install `TA-Lib` yourself).
+
+:::caution
+Adding system dependencies will significantly increase the time needed for deployment. Please avoid adding dependencies that your project doesn’t need.
+:::
+
+## `buildRoot` 构建根目录
+
+指定代码包或仓库中的一个子目录进行构建，相当于只上传了这一个子目录的代码。
+
+## `exposeEnvironmentsOnBuild` 在构建阶段使用环境变量
+
+默认情况下，应用在运行阶段才能够读取到内置环境变量和自定义环境变量，设置该选项可以在安装依赖或编译阶段读取到这些环境变量。
+
+```yaml
+exposeEnvironmentsOnBuild: true
+```
+
+云引擎运行环境默认提供的环境变量（以及 Node.js 环境变量 NODE_ENV）无法被自定义环境变量覆盖。
+
+## `startupTimeout` 启动超时
+
+```yaml
+startupTimeout: 60
+```
+
+配置程序启动的超时时间，可设置 15 - 120 的值（秒）
+
+## `functionsMode` 云函数功能开关
+
+控制项目是否使用云函数（Hook）特性。
+
+```yaml
+functionsMode: strict
+```
+
+设置为 `strict` 表示需要使用云函数特性，如获取云函数信息失败则中断部署；设置为 `disabled` 表示不开启云函数相关功能。
+
+<Conditional brand='tds'>
+
+## `extraPorts` 暴露 TCP 或 UDP 端口
+
+```yaml title='leanengine.yaml'
+extraPorts:
+  - name: echo
+    protocol: udp
+    containerPort: 4000
+  - name: game
+    protocol: tcp
+    containerPort: 4000
+```
+
+最多可以配置 5 个端口，是游戏后端功能（[云引擎游戏后端开发指南](/sdk/engine/game/guides)）的一部分。
+
+</Conditional>
+
+## ~~Node.js `installDevDependencies` 安装开发依赖~~
+
+:::caution
+已废弃，请使用 `package-lock.json`。
+:::
+
+```yaml
+installDevDependencies: true
+```
+
+安装 `package.json` 中 `devDependencies` 部分的依赖。

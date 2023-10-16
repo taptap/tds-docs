@@ -145,82 +145,6 @@ MAC Token 包含以下字段：
 
 使用 Mac Token 签算一个接口：
 
-<details>
-<summary>脚本请求示例</summary>
-
-可用此脚本验证直接替换参数，用来验证自己服务端签算的 mac token 是否正确。
-
-CLIENT_ID 替换为控制台获取的 `Client ID`，ACCESS_TOKEN 和 MAC_KEY 为客户端登录成功后的 `access_token`、`mac_key`：
-
-<Conditional region='cn'>
-
-```
-#!/usr/bin/env bash
-
-# 客户端 ID
-CLIENT_ID="请替换为控制台的 `Client ID`"
-# SDK 获取的 access_token
-ACCESS_TOKEN="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ"
-# SDK 获取的 mac_key
-MAC_KEY="mSUQNYUGRBPXyRyW"
-
-# 随机数，正式上线请替换
-NONCE="8IBTHwOdqNKAWeKl7plt8g=="
-# 当前时间戳
-TS=$(date +%s)
-
-# 请求方法
-METHOD="GET"
-# 请求地址 (带 query string)
-REQUEST_URI="/account/profile/v1?client_id=${CLIENT_ID}"
-# 请求域名
-REQUEST_HOST="openapi.taptap.com"
-
-MAC=$(printf "%s\n%s\n%s\n%s\n%s\n443\n\n" "${TS}" "${NONCE}" "${METHOD}" "${REQUEST_URI}" "${REQUEST_HOST}" | openssl dgst -binary -sha1 -hmac ${MAC_KEY} | base64)
-
-AUTHORIZATION=$(printf 'MAC id="%s",ts="%s",nonce="%s",mac="%s"' "${ACCESS_TOKEN}" "${TS}" "${NONCE}" "${MAC}")
-
-curl -s -H"Authorization:${AUTHORIZATION}" "https://${REQUEST_HOST}${REQUEST_URI}"
-```
-
-</Conditional>
-
-
-
-<Conditional region='global'>
-
-```
-#!/usr/bin/env bash
-
-# 客户端 ID
-CLIENT_ID="请替换为控制台的 `Client ID`"
-# SDK 获取的 access_token
-ACCESS_TOKEN="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ"
-# SDK 获取的 mac_key
-MAC_KEY="mSUQNYUGRBPXyRyW"
-
-# 随机数，正式上线请替换
-NONCE="8IBTHwOdqNKAWeKl7plt8g=="
-# 当前时间戳
-TS=$(date +%s)
-
-# 请求方法
-METHOD="GET"
-# 请求地址 (带 query string)
-REQUEST_URI="/account/profile/v1?client_id=${CLIENT_ID}"
-# 请求域名
-REQUEST_HOST="openapi.tap.io"
-
-MAC=$(printf "%s\n%s\n%s\n%s\n%s\n443\n\n" "${TS}" "${NONCE}" "${METHOD}" "${REQUEST_URI}" "${REQUEST_HOST}" | openssl dgst -binary -sha1 -hmac ${MAC_KEY} | base64)
-
-AUTHORIZATION=$(printf 'MAC id="%s",ts="%s",nonce="%s",mac="%s"' "${ACCESS_TOKEN}" "${TS}" "${NONCE}" "${MAC}")
-
-curl -s -H"Authorization:${AUTHORIZATION}" "https://${REQUEST_HOST}${REQUEST_URI}"
-```
-
-</Conditional>
-
-</details>
 
 <details>
 <summary>Node.js 请求示例</summary>
@@ -641,11 +565,11 @@ $request_url = "https://openapi.tap.io/account/profile/v1?client_id=".$client_id
 $ts = time();
 $nonce = "== XinDong_Lee-JiEun ==";//随机数，正式上线请替换
 //方式一
-//$params = [$ts,$nonce,"GET","/account/profile/v1?client_id=".$client_id,"openapi.taptap.com", 443,"\n"];
+//$params = [$ts,$nonce,"GET","/account/profile/v1?client_id=".$client_id,"openapi.tap.io", 443,"\n"];
 //$signStr = implode("\n",$params);
 //var_dump($signStr);
 //方式二
-$signStr = sprintf("%s\n%s\n%s\n%s\n%s\n443\n\n",$ts,$nonce,"GET","/account/profile/v1?client_id=".$client_id,"openapi.taptap.com");
+$signStr = sprintf("%s\n%s\n%s\n%s\n%s\n443\n\n",$ts,$nonce,"GET","/account/profile/v1?client_id=".$client_id,"openapi.tap.io");
 //MAC TOKEN 加密
 $mac = base64_encode(hash_hmac('sha1', $signStr, $mac_key,true));
 $auth = sprintf('MAC id="%s",ts="%s",nonce="%s",mac="%s"',$access_token,$ts,$nonce,$mac);
@@ -668,6 +592,314 @@ curl_close($curl);
 
 </details>
 
+<details>
+
+<summary>Python3 请求示例</summary>
+
+<Conditional region='cn'>
+
+```python
+import base64
+import hmac
+import random
+import string
+import time
+from hashlib import sha1
+
+
+def get_mac_token_signature(host, request_url, method, mac_key, kid):
+    mac_token_pattern = 'MAC id="{kid}",ts="{ts}",nonce="{nonce}",mac="{mac}"'
+    timestamp = str(int(time.time()))
+    nonce = ''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase, k=16))
+    sign_array = [timestamp, nonce, method, request_url, host, '443', '']
+    seperator = '\n'
+    sign_input = seperator.join(sign_array) + seperator
+    hmac_code = hmac.new(mac_key.encode('UTF-8'), sign_input.encode('UTF-8'), sha1)
+    mac_str = base64.b64encode(hmac_code.digest()).decode('UTF-8')
+    return mac_token_pattern.format(kid=kid, ts=timestamp, nonce=nonce,
+                                    mac=mac_str)
+
+if __name__ == '__main__':
+    kid = "1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ"
+    mac_key = "mSUQNYUGRBPXyRyW"
+    client_id = "0RiAlMny7jiz086FaU"
+    signature = get_mac_token_signature('openapi.taptap.com', '/account/profile/v1?client_id=' + client_id,
+                                        'GET', mac_key, kid)
+    print(signature)
+```
+</Conditional>
+
+<Conditional region='global'>
+
+```python
+import base64
+import hmac
+import random
+import string
+import time
+from hashlib import sha1
+
+
+def get_mac_token_signature(host, request_url, method, mac_key, kid):
+    mac_token_pattern = 'MAC id="{kid}",ts="{ts}",nonce="{nonce}",mac="{mac}"'
+    timestamp = str(int(time.time()))
+    nonce = ''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase, k=16))
+    sign_array = [timestamp, nonce, method, request_url, host, '443', '']
+    seperator = '\n'
+    sign_input = seperator.join(sign_array) + seperator
+    hmac_code = hmac.new(mac_key.encode('UTF-8'), sign_input.encode('UTF-8'), sha1)
+    mac_str = base64.b64encode(hmac_code.digest()).decode('UTF-8')
+    return mac_token_pattern.format(kid=kid, ts=timestamp, nonce=nonce,
+                                    mac=mac_str)
+
+if __name__ == '__main__':
+    kid = "1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ"
+    mac_key = "mSUQNYUGRBPXyRyW"
+    client_id = "0RiAlMny7jiz086FaU"
+    signature = get_mac_token_signature('openapi.taptap.com', '/account/profile/v1?client_id=' + client_id,
+                                        'GET', mac_key, kid)
+    print(signature)
+```
+</Conditional>
+
+</details>
+
+<details>
+
+<summary>Go 请求示例</summary>
+
+<Conditional region='cn'>
+
+```go
+package main
+
+import (
+	"crypto/hmac"
+	"crypto/sha1"
+	"encoding/base64"
+	"fmt"
+	"io"
+	"net/http"
+	"strconv"
+	"time"
+)
+
+func main() {
+	// 替换 clientId、accessToken、macKey 参数
+	// clientId 参数在 TapDC 后台查看
+	clientId := "请替换为控制台的 `Client ID`"
+	// TapTap 登录成功后 TapSDK 返回的 access_token
+	accessToken := "1/jvsVxFC6-PIUiXvZVVtv1hogX5q9Z1y_rp-AtVjE3iyHikXXfd_2h-i0wLmc9UjLJwhH6fQ8cvGrklONdvy2J5YfoqzV0ewGPMSLkQIkRv_xaLaYPariWbrkP1MtG2b4CzR1KHvuSCJHewCmTFZmsyNGojTJr5t75f5Nc8j-jjCYeDtFO0-XFI_J7kzktswzzsmISt7cx49QVess-VbaQcU31pEDb_OA03I28H5ehIvqQ0CQdf1LieLyONcH97l1IEU39AirioF_KGJccVG64QsgWmzxLPwmfTurw4cwBPo04yuXnas4YI5haE2UxtckNCpagP19drtGW57-HaAdww"
+	// TapTap 登录成功后 TapSDK 返回的 mac_key
+	macKey := "fTCuDUDDmNny7a36EWbhUDLaqpoDMQu2hCi9qAJ5"
+
+	// 随机数，正式上线请替换
+	nonce := "8IBTHwOdqNKAWeKl7plt66=="
+	// 时间戳转换成字符串
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	// 请求 url 相关
+	reqHost := "openapi.taptap.com"
+	reqURI := "/account/profile/v1?client_id=" + clientId
+	reqURL := "https://" + reqHost + reqURI
+
+	macStr := timestamp + "\n" + nonce + "\n" + "GET" + "\n" + reqURI + "\n" + reqHost + "\n" + "443" + "\n\n"
+	mac := hmacSha1(macStr, macKey)
+	authorization := "MAC id=" + "\"" + accessToken + "\"" + "," + "ts=" + "\"" + timestamp + "\"" + "," + "nonce=" + "\"" + nonce + "\"" + "," + "mac=" + "\"" + mac + "\""
+
+	client := http.Client{}
+	req, err := http.NewRequest(http.MethodGet, reqURL, nil)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	// 添加请求头
+	req.Header.Add("Authorization", authorization)
+	// 发送请求
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	fmt.Println(string(respBody))
+}
+
+/*
+HMAC-SHA1 签名
+*/
+func hmacSha1(valStr, keyStr string) string {
+	key := []byte(keyStr)
+	mac := hmac.New(sha1.New, key)
+	mac.Write([]byte(valStr))
+
+	// 进行 Base64 编码
+	return base64.StdEncoding.EncodeToString(mac.Sum(nil))
+}
+```
+</Conditional>
+
+<Conditional region='global'>
+
+```go
+package main
+
+import (
+	"crypto/hmac"
+	"crypto/sha1"
+	"encoding/base64"
+	"fmt"
+	"io"
+	"net/http"
+	"strconv"
+	"time"
+)
+
+func main() {
+	// 替换 clientId、accessToken、macKey 参数
+	// clientId 参数在 TapDC 后台查看
+	clientId := "请替换为控制台的 `Client ID`"
+	// TapTap 登录成功后 TapSDK 返回的 access_token
+	accessToken := "1/jvsVxFC6-PIUiXvZVVtv1hogX5q9Z1y_rp-AtVjE3iyHikXXfd_2h-i0wLmc9UjLJwhH6fQ8cvGrklONdvy2J5YfoqzV0ewGPMSLkQIkRv_xaLaYPariWbrkP1MtG2b4CzR1KHvuSCJHewCmTFZmsyNGojTJr5t75f5Nc8j-jjCYeDtFO0-XFI_J7kzktswzzsmISt7cx49QVess-VbaQcU31pEDb_OA03I28H5ehIvqQ0CQdf1LieLyONcH97l1IEU39AirioF_KGJccVG64QsgWmzxLPwmfTurw4cwBPo04yuXnas4YI5haE2UxtckNCpagP19drtGW57-HaAdww"
+	// TapTap 登录成功后 TapSDK 返回的 mac_key
+	macKey := "fTCuDUDDmNny7a36EWbhUDLaqpoDMQu2hCi9qAJ5"
+
+	// 随机数，正式上线请替换
+	nonce := "8IBTHwOdqNKAWeKl7plt66=="
+	// 时间戳转换成字符串
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	// 请求 url 相关
+	reqHost := "openapi.taptap.com"
+	reqURI := "/account/profile/v1?client_id=" + clientId
+	reqURL := "https://" + reqHost + reqURI
+
+	macStr := timestamp + "\n" + nonce + "\n" + "GET" + "\n" + reqURI + "\n" + reqHost + "\n" + "443" + "\n\n"
+	mac := hmacSha1(macStr, macKey)
+	authorization := "MAC id=" + "\"" + accessToken + "\"" + "," + "ts=" + "\"" + timestamp + "\"" + "," + "nonce=" + "\"" + nonce + "\"" + "," + "mac=" + "\"" + mac + "\""
+
+	client := http.Client{}
+	req, err := http.NewRequest(http.MethodGet, reqURL, nil)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	// 添加请求头
+	req.Header.Add("Authorization", authorization)
+	// 发送请求
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	fmt.Println(string(respBody))
+}
+
+/*
+HMAC-SHA1 签名
+*/
+func hmacSha1(valStr, keyStr string) string {
+	key := []byte(keyStr)
+	mac := hmac.New(sha1.New, key)
+	mac.Write([]byte(valStr))
+
+	// 进行 Base64 编码
+	return base64.StdEncoding.EncodeToString(mac.Sum(nil))
+}
+```
+</Conditional>
+
+</details>
+
+<details>
+<summary>脚本请求示例</summary>
+
+可用此脚本验证直接替换参数，用来验证自己服务端签算的 mac token 是否正确。
+
+CLIENT_ID 替换为控制台获取的 `Client ID`，ACCESS_TOKEN 和 MAC_KEY 为客户端登录成功后的 `access_token`、`mac_key`：
+
+<Conditional region='cn'>
+
+```
+#!/usr/bin/env bash
+
+# 客户端 ID
+CLIENT_ID="请替换为控制台的 `Client ID`"
+# SDK 获取的 access_token
+ACCESS_TOKEN="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ"
+# SDK 获取的 mac_key
+MAC_KEY="mSUQNYUGRBPXyRyW"
+
+# 随机数，正式上线请替换
+NONCE="8IBTHwOdqNKAWeKl7plt8g=="
+# 当前时间戳
+TS=$(date +%s)
+
+# 请求方法
+METHOD="GET"
+# 请求地址 (带 query string)
+REQUEST_URI="/account/profile/v1?client_id=${CLIENT_ID}"
+# 请求域名
+REQUEST_HOST="openapi.taptap.com"
+
+MAC=$(printf "%s\n%s\n%s\n%s\n%s\n443\n\n" "${TS}" "${NONCE}" "${METHOD}" "${REQUEST_URI}" "${REQUEST_HOST}" | openssl dgst -binary -sha1 -hmac ${MAC_KEY} | base64)
+
+AUTHORIZATION=$(printf 'MAC id="%s",ts="%s",nonce="%s",mac="%s"' "${ACCESS_TOKEN}" "${TS}" "${NONCE}" "${MAC}")
+
+curl -s -H"Authorization:${AUTHORIZATION}" "https://${REQUEST_HOST}${REQUEST_URI}"
+```
+
+</Conditional>
+
+
+
+<Conditional region='global'>
+
+```
+#!/usr/bin/env bash
+
+# 客户端 ID
+CLIENT_ID="请替换为控制台的 `Client ID`"
+# SDK 获取的 access_token
+ACCESS_TOKEN="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ"
+# SDK 获取的 mac_key
+MAC_KEY="mSUQNYUGRBPXyRyW"
+
+# 随机数，正式上线请替换
+NONCE="8IBTHwOdqNKAWeKl7plt8g=="
+# 当前时间戳
+TS=$(date +%s)
+
+# 请求方法
+METHOD="GET"
+# 请求地址 (带 query string)
+REQUEST_URI="/account/profile/v1?client_id=${CLIENT_ID}"
+# 请求域名
+REQUEST_HOST="openapi.tap.io"
+
+MAC=$(printf "%s\n%s\n%s\n%s\n%s\n443\n\n" "${TS}" "${NONCE}" "${METHOD}" "${REQUEST_URI}" "${REQUEST_HOST}" | openssl dgst -binary -sha1 -hmac ${MAC_KEY} | base64)
+
+AUTHORIZATION=$(printf 'MAC id="%s",ts="%s",nonce="%s",mac="%s"' "${ACCESS_TOKEN}" "${TS}" "${NONCE}" "${MAC}")
+
+curl -s -H"Authorization:${AUTHORIZATION}" "https://${REQUEST_HOST}${REQUEST_URI}"
+```
+
+</Conditional>
+
+</details>
 
 ### 通用接口错误信息
 
@@ -682,13 +914,13 @@ curl_close($curl);
 
 **错误响应**
 
-| 错误码                    | HTTP 状态码 | 详细描述                                                     |
-| ------------------------- | ----------- | ------------------------------------------------------------ |
-| invalid_request           | 400         | 请求缺少某个必需参数，包含一个不支持的参数或参数值，或者格式不正确 |
-| invalid_time              | 400         | MAC Token 算法中，ts 时间不合法，**应请求服务器时间重新构造** |
-| invalid_client            | 401         | client_id、client_secret 参数无效                             |
-| access_denied             | 401         | 授权服务器拒绝请求 **这个状态出现在拿着 token 请求用户资源时，如出现，客户端应退出本地的用户登录信息，引导用户重新登录** |
-| forbidden       | 403         | 用户没有对当前动作的权限，**引导重新身份验证并不能提供任何帮助，而且这个请求也不应该被重复提交** |
-| not_found       | 404         | 请求失败，请求所希望得到的资源未被在服务器上发现。**在参数相同的情况下，不应该重复请求** |
-| server_error              | 500         | 服务器出现异常情况 **可稍等后重新尝试请求，但需有尝试上限，建议最多 3 次，如一直失败，则中断并告知用户** | 
+| 错误码             | 详细描述                                                     |
+| ------------------| ------------------------------------------------------------ |
+| invalid_request   | 请求缺少某个必需参数，包含一个不支持的参数或参数值，或者格式不正确 |
+| invalid_time      | MAC Token 算法中，ts 时间不合法，**应请求服务器时间重新构造** |
+| invalid_client    | client_id、client_secret 参数无效                             |
+| access_denied     | 授权服务器拒绝请求 **这个状态出现在拿着 token 请求用户资源时，如出现，客户端应退出本地的用户登录信息，引导用户重新登录** |
+| forbidden         | 用户没有对当前动作的权限，**引导重新身份验证并不能提供任何帮助，而且这个请求也不应该被重复提交** |
+| not_found         | 请求失败，请求所希望得到的资源未被在服务器上发现。**在参数相同的情况下，不应该重复请求** |
+| server_error      | 服务器出现异常情况 **可稍等后重新尝试请求，但需有尝试上限，建议最多 3 次，如一直失败，则中断并告知用户** | 
 

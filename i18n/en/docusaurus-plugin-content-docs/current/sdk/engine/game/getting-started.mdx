@@ -1,0 +1,85 @@
+---
+title: Getting Started With Game Backend
+sidebar_label: Getting Started
+sidebar_position: 1
+---
+
+import { CLI_BINARY } from "/src/constants/env.ts";
+import CodeBlock from "@theme/CodeBlock";
+import PlatformRuntimes from "../_partials/platform-runtimes.mdx";
+
+You can download our sample project for C++ and games at:
+
+```sh
+git clone https://github.com/leancloud/cpp-socket-demo.git
+```
+
+This example project contains a simple real-time multiplayer game. Let's start the project locally:
+
+```
+$ make && ./cpp-socket
+[UDP] Socket is listening on 4000
+[TCP] Socket is listening on 4000
+[HTTP] Socket is listening on 3000
+```
+
+Use `nc` to connect to the program on the TCP port:
+
+```
+$ nc 127.0.0.1 4000
+>> 1 players online, last number is 1, you must send the next number but skip numbers which multiples of 3 or includes the digit 3.
+2 (your input)
+>> 2 players online, 127.0.0.1:59385 sent 2.
+>> 127.0.0.1:59897 lost, 2 players online.
+4 (your input)
+>> 1 players online, 127.0.0.1:59385 sent 4.
+```
+
+In this game, you must send the following number to the server, but skip multiples of 3 or numbers containing the number 3. If you enter it incorrectly, you will be disconnected.
+
+## Deploy to Cloud Engine
+
+Select the application and group:
+
+<CodeBlock className="sh">{`${CLI_BINARY} switch`}</CodeBlock>
+
+Deploy to production:
+
+<CodeBlock className="sh">{`${CLI_BINARY} deploy --prod`}</CodeBlock>
+
+For more information on command line tools and local debugging, see the [CLI Guide](/sdk/engine/cli/).
+
+## Connect to the Game in the Cloud
+
+Get the connection address by sending a request. You will need to replace the appId, group name, and environment (production or staging):
+
+```
+$ curl -H 'X-LC-Id: SJjoXHWuhewHKV4Ojw' 'https://shared.cloud.tds1.tapapis.cn/1.1/engine/gateway/route?groupName=udp&prod=1'
+
+[
+  {
+    "name": "game",
+    "protocol": "tcp",
+    "publicPort": 19766,
+    "publicIp": "106.75.70.96"
+  }
+]
+```
+
+Then you can connect with `nc`:
+
+```
+$ nc 106.75.70.96 19766
+```
+
+:::info
+The IP and port may change whenever the Cloud Engine instance is deployed, restarted, or automatically maintained, so please check the server's current IP and port before each connection.
+:::
+
+## Continue Learning
+
+Next, you can read the [Game Backend Architecture Reference](/sdk/engine/game/architecture) for the recommended architecture for running a game backend on the Cloud Engine, or the [Game Backend Guide](/sdk/engine/game/guides) for detailed integration instructions.
+
+You can also see [Cloud Engine Platform Features](/sdk/engine/platform) to learn more about the features provided by the Cloud Engine, or see a dedicated page for details on specific runtime environments at:
+
+<PlatformRuntimes />

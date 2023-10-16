@@ -9,7 +9,17 @@ import sdkVersions from "/src/docComponents/sdkVersions";
 import { Conditional } from "/src/docComponents/conditional";
 import AndroidFaq from "../_partials/android-package-visibility.mdx";
 
-TapTap 开发者服务为游戏和玩家提供唤起 TapTap 客户端进行游戏更新的功能。当游戏发布了新版本，且需要玩家进行更新才能体验新版本时，在游戏内绘制一个界面告知玩家，需要进行新版本更新，并且提供一个更新的按钮。玩家点击后，会跳转到 TapTap 客户端内的游戏详情页面，进行更新。
+TapTap 开发者服务为游戏和玩家提供唤起 TapTap 客户端更新游戏的功能。
+
+当游戏发布了新版本，且需要玩家进行更新才能体验新版本时，在游戏内绘制一个界面告知玩家并提供「更新」按钮。
+
+玩家点击按钮调用 `updateGameAndFailToWebInTapTap` 接口，此时跳转到 TapTap 客户端内的游戏详情页，玩家在 TapTap 内完成更新。
+
+:::info
+唤起更新只提供「唤起 TapTap 客户端，跳转至游戏详情页」这一简单功能。
+
+TapTap 上游戏的**版本号**来自开发者在构建新版本时上传的 APK，唤起更新功能并不提供「检查 TapTap 商店是否有新版本」接口，游戏需自行实现判断版本的功能。
+:::
 
 ## SDK 获取
 
@@ -265,6 +275,10 @@ if(TapGameUtil.updateGameInTapTap(this,"appid")){
 
 </MultiLang>
 
+**常见问题：Android 11 或更高版本无法拉起 TapTap 客户端**
+
+<AndroidFaq />
+
 </details>
 
 </Conditional>
@@ -353,13 +367,9 @@ if(TapGameUtil.openReviewInTapGlobal(this,"appid")){
 </MultiLang>
 
 appid：游戏在 TapTap 商店的唯一身份标识。
-例如：<Conditional region="cn">`https://www.taptap.com/app/187168`</Conditional><Conditional region="global">`https://www.taptap.io/app/187168`</Conditional>，其中 `187168` 是 `appid`。
+例如：<Conditional region="cn">`https://www.taptap.cn/app/187168`</Conditional><Conditional region="global">`https://www.taptap.io/app/187168`</Conditional>，其中 `187168` 是 `appid`。
 
 ## 常见问题
-
-### Android 11 或更高版本无法拉起 TapTap 客户端
-
-<AndroidFaq />
 
 ### 未接入 TapSDK，如何唤起 TapTap 客户端更新游戏
 
@@ -376,7 +386,7 @@ appid：游戏在 TapTap 商店的唯一身份标识。
 
 <Conditional region="cn">
 
-- 适用于中国大陆：`https://l.taptap.com/5d1NGyET?subc1=AppID`
+- 适用于中国大陆：`https://l.taptap.cn/5d1NGyET?subc1=AppID`
 - 适用于其他国家或地区：`https://l.taptap.io/GNYwFaZr?subc1=AppID`
 
 </Conditional>
@@ -390,7 +400,7 @@ appid：游戏在 TapTap 商店的唯一身份标识。
 
 <Conditional region="cn">
 
-- 适用于中国大陆：`taptap://taptap.com/app?app_id=AppID&source=outer|update`
+- 适用于中国大陆：`taptap://taptap.cn/app?app_id=AppID&source=outer|update`
 - 适用于其他国家或地区：`tapglobal://taptap.tw/app?app_id=游戏商店id&source=outer|update`
 
 </Conditional>
@@ -400,7 +410,7 @@ appid：游戏在 TapTap 商店的唯一身份标识。
 
 </Conditional>
 
-注意替换其中的 `AppID`。`AppID` 是游戏在 TapTap 商店的唯一身份标识，例如：<Conditional region="cn">`https://www.taptap.com/app/187168`</Conditional><Conditional region="global">`https://www.taptap.io/app/187168`</Conditional>，其中 `187168` 是 AppID。
+注意替换其中的 `AppID`。`AppID` 是游戏在 TapTap 商店的唯一身份标识，例如：<Conditional region="cn">`https://www.taptap.cn/app/187168`</Conditional><Conditional region="global">`https://www.taptap.io/app/187168`</Conditional>，其中 `187168` 是 AppID。
 
 注意，除了打开 URL 外，还需要检测设备是否已经安装 TapTap 客户端，以及处理唤起失败的逻辑，这些代码都需要自行编写。
 
@@ -431,9 +441,9 @@ public class TapGameUtil {
 
   public static final String PACKAGE_NAME_TAPTAP = "com.taptap";
 
-  public static final String CLIENT_URI_TAPTAP = "taptap://taptap.com";
+  public static final String CLIENT_URI_TAPTAP = "taptap://taptap.cn";
 
-  public static final String DEFAULT_CLIENT_DOWNLOAD_URL_TAPTAP = "https://l.taptap.com/5d1NGyET";
+  public static final String DEFAULT_CLIENT_DOWNLOAD_URL_TAPTAP = "https://l.taptap.cn/5d1NGyET";
 
   // 这里更新的时候不检查 Tap 客户端，一是因为特定 schema 没被应用注册的话大概率是直接返回 error 的，在这里被 try catch 后返回 false 可以近似等于客户端不存在
   // 二是因为 Android 11 开始检查客户端需要游戏做特殊配置，这个配置无法在 SDK 内做好，因为和编译工具版本强绑定，无法做前后版本兼容。

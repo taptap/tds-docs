@@ -1,0 +1,115 @@
+---
+title: TapLink 功能介绍
+sidebar_label: 功能介绍
+sidebar_position: 1
+---
+
+import MultiLang from '/src/docComponents/MultiLang';
+import CodeBlock from '@theme/CodeBlock';
+
+## 能力介绍
+
+- TapLink 是一种基于 deep linking 跳转机制的礼包分发能力。
+- 如果玩家在 TapTap 客户端点击「领取礼包」时已安装了您的游戏，TapLink可立即打开并跳转游戏，并直接进行道具兑换或将用户引导至已有的礼包领取页面。
+- 如果玩家在 TapTap 客户端点击「领取礼包」时未安装您的游戏，TapLink会引导玩家停留在原页面进行礼包码复制。
+
+## 工作流程
+
+![](https://capacity-files.lcfile.com/8HTgi9a15nTfqPvIiFARb4v1rMFSeI9f/0048bea7-49ae-45a4-aecc-9f1a334105ee.png)
+
+## 产品优势
+
+### 礼包领取兑换体验提升，激发玩家兴趣，提高黏性
+
+相较于传统礼包码复制，兑换的领取路径，TapLink 在用户体验上做到了自助跳转，从 **TapTap→游戏**一站式领取礼包，大幅缩短用户体验路径，操作简易，减少用户流失，提升领取率。
+
+### 平台流量导入游戏，助力游戏促活拉新
+
+TapTap 平台礼包入口一键跳转游戏礼包入口，助力游戏日活提升的同时将 TapTap 玩家成功转化为游戏新用户。
+
+### 接入流程简易，降低开发成本
+
+开发者仅需通过 API 解析相关URL，即可开发完成，无需增加额外的开发工作。
+
+### 落地形式灵活，游戏可根据自身需求场景自由设计兑换方式
+
+游戏可根据自身需求将设计落地形式，可直接将 TapLink 所携带的礼包信息解析后，直接下发道具给玩家；也可接入预设好的礼包领取落地页。
+
+## 接入方式
+
+开发者需自行集成 TapLink 链接，方可使用该能力。
+
+![](https://capacity-files.lcfile.com/ky6P3MASLHWh9b40SsEmlpBnElbWiqJN/taplink.png)
+
+TapLink 格式为：`tds{clientID}://gifts?code={code}`（注意这里 `{clientID}` 和 `{code}` 表示变量）。具体的值和示例开发者可以登录控制台查看。一个完整的 URL Scheme 协议格式由 scheme、host、port、path 和 query 组成，其结构为：`<scheme>://<host>:<port>/<path>?<query>`。游戏接入 TapLink 功能只需要在移动端配置 scheme 和 host 即可。需要注意的是 scheme 是大小写敏感的，配置时请务必严格和控制台给出的`链接配置`里的 scheme 保持一致。
+
+<details>
+<summary>Unity-Android scheme 配置示例</summary>
+
+```xml
+假设控制台给出的「链接配置」为：tdsFwFdCIr6u71WQDQwQN://gifts?code={code} 则 scheme 为：tdsFwFdCIr6u71WQDQwQN
+
+  <application>
+    <activity android:name="com.unity3d.player.UnityPlayerActivity" android:theme="@style/UnityThemeSelector" >
+      <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+      </intent-filter>
+      <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <!--  注意：这里的 scheme 必须严格和控制台提示的保持一致  host 固定为 gifts  -->
+        <data android:scheme="tdsFwFdCIr6u71WQDQwQN" android:host="gifts" />
+      </intent-filter>
+    </activity>
+  </application>
+</manifest>
+```
+
+</details>
+
+<details>
+<summary>原生 Android scheme 配置示例</summary>
+
+```xml
+假设控制台给出的「链接配置」为：tdsFwFdCIr6u71WQDQwQN://gifts?code={code} 则 scheme 为：tdsFwFdCIr6u71WQDQwQN
+
+<activity
+    android:name="com.taplink.demo.MainActivity">
+    <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+    </intent-filter>
+    <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <category android:name="android.intent.category.BROWSABLE" />
+        <!--  注意：这里的 scheme 必须严格和控制台提示的保持一致  host 固定为 gifts  -->
+        <data android:scheme="tdsFwFdCIr6u71WQDQwQN"  android:host="gifts" />
+    </intent-filter>
+</activity>
+```
+
+</details>
+
+针对 Android 的包体可以在本地通过 ADB 命令来检测包体中 scheme 的配置是否正确，如果 ADB 命令可以在本地的设备上唤起应用则说明配置没有问题。
+```shell
+# scheme 为控制台展示的 scheme， package 为应用的包名。注意：最终的命令里不包含大括号。
+adb shell am start \
+        -W -a android.intent.action.VIEW \
+        -d "{scheme}://gifts" {packageName}
+```
+
+游戏客户端可按照如下文档解析 TapLink，获得礼包码：
+- [Unity: Deep linking on iOS](https://docs.unity3d.com/Manual/deep-linking-ios.html)
+- [Unity: Deep linking on Android](https://docs.unity3d.com/Manual/deep-linking-android.html)
+- [Android: 创建指向应用内容的深层链接](https://developer.android.com/training/app-links/deep-linking)
+- [Deep linking and URL scheme in iOS](https://benoitpasquier.com/deep-linking-url-scheme-ios/)
+
+由于 deep linking 是一种标准的技术方案，开发者也可以自行搜索获取其解析方法。游戏客户端获取礼包码之后，去自己的服务端进行核销即可，这样就完成了一次礼包码的发放流程。
+
+## 应用场景
+
+当前支持：TapTap 签到活动

@@ -1,0 +1,176 @@
+---
+title: Game Backend Guide
+sidebar_label: Guide
+sidebar_position: 3
+---
+
+import { CLI_BINARY } from "/src/constants/env.ts";
+import CodeBlock from "@theme/CodeBlock";
+import Path from "/src/docComponents/path";
+import { Conditional } from "/src/docComponents/conditional";
+
+<!--
+## 游戏后端实例
+
+:::info
+你需要先将云引擎分组调整到游戏后端实例，才能使用这个页面介绍的功能。
+:::
+
+我们为游戏后端提供了几种不同的实例规格：
+
+| 规格          | 内存    | CPU    |
+| ------------- | ------- | ------ |
+| game-1c4g  | 1024 MB  | 1 Core |
+| game-2c6g | 2048 MB | 2 Core |
+| game-4c8g | 4096 MB | 4 Core |
+
+在 **<Path to="engine" /> > 管理部署 > 你的分组 > 资源** 页面下，可以修改实例的规格和数量。
+-->
+
+## Provide TCP or UDP Services
+
+Additional ports can be configured in leanengine.yaml:
+
+```yaml title='leanengine.yaml'
+extraPorts:
+  - name: echo
+    protocol: udp
+    containerPort: 4000
+  - name: game
+    protocol: tcp
+    containerPort: 4000
+```
+
+Up to 5 ports can be configured.
+
+### Connect From the Internet
+
+You need to use the interface mentioned in the [REST API](#rest-api) section to get the IP and port to connect to from the Internet. You will then be able to connect from the client. We will use `nc` as an example:
+
+```
+$ nc -u 106.75.70.96 11348
+hello
+hello
+```
+
+## Smooth Shutdown
+
+In case of version updates, capacity adjustments or automatic system maintenance, your application process needs to be shut down. The Cloud Engine sends `SIGTERM` signals to your process and waits up to 60 minutes.
+
+Your application should handle the SIGTERM signal (otherwise the default behavior is to exit immediately) and proactively exit as soon as possible based on business logic (e.g., whether there are still client connections).
+
+<EngineRuntimes>
+<TabItem value='go'>
+
+```go
+func main() {
+  go func() {
+    sigTermChan := make(chan os.Signal, 1)
+    signal.Notify(sigTermChan, syscall.SIGTERM, syscall.SIGINT)
+    sig := <-sigTermChan
+
+    log.Println("Received signal", sig)
+
+    // Wait for existing business logic (e.g. client connection) to complete
+    time.Sleep(60 * time.Second)
+
+    // Proactively exit the program
+    os.Exit(0)
+  }()
+
+  // Other code
+}
+```
+
+</TabItem>
+</EngineRuntimes>
+
+If your application does not proactively exit within 60 minutes, the Cloud Engine will force your application to stop.
+
+If more than 3 times the normal number of instances are in a graceful shutdown state (terminating), further deployments will fail and you will need to pass in an additional `forceStopOldInstances' option to force the earliest instances in a graceful shutdown state to shut down:
+
+<CodeBlock>
+  {`$ ${CLI_BINARY} deploy --options 'forceStopOldInstances=true'`}
+</CodeBlock>
+
+## REST API
+
+| Interface                            | Authentication         | Function                       |
+| ------------------------------- | ------------ | -------------------------- |
+| `GET /1.1/engine/containers`    | Available to developers only | Get a list of running instances     |
+| `GET /1.1/engine/gateway/route` | Available to clients   | Return connection information for a random instance |
+
+<Conditional region="cn">
+
+Please use a custom API domain name bound to the application to call these interfaces. You can view or bind custom API domain names in the console as described in the [域名绑定指南 § API 域名](/sdk/domain/guide/#api-域名).
+
+</Conditional>
+
+**All interfaces** require the `X-LC-Id` header, e.g. `X-LC-Id: SJjoXHWuhewHKV4Ojw`.
+
+**Developer-only** interfaces require the access token in the `Authorization` header, e.g. `Authorization: Bearer 14d1c1ff-908b-4a2c-baec-427cbde3bf05`.
+
+### `GET /containers`
+
+This interface returns a list of all running instances, and developers can implement custom routing logic based on this interface, such as assigning specific users to the same instance.
+
+```
+$ curl -H 'X-LC-Id: SJjoXHWuhewHKV4Ojw' \
+       -H 'Authorization: Bearer 14d1c1ff-908b-4a2c-baec-427cbde3bf05'\
+       'https://shared.cloud.tds1.tapapis.cn/1.1/engine/containers?groupName=udp&prod=1'
+
+[
+  {
+    "name": "web3-219ebd3e",
+    "prod": 1,
+    "status": "running",
+    "extraPorts": [
+      {
+        "name": "game",
+        "protocol": "udp",
+        "publicPort": 19766,
+        "publicIp": "106.75.70.96"
+      }
+    ],
+    "versionTag": "20220606-152341"
+  },
+  {
+    "name": "web3-b102392b",
+    "prod": 1,
+
+    "createdAt": "2022-06-06T07:23:47.000Z",
+    "forceStopAfter": "2022-06-06T07:24:27.000Z",
+
+    "status": "terminating",
+    "extraPorts": [
+      {
+        "name": "game",
+        "protocol": "udp",
+        "publicPort": 18288,
+        "publicIp": "106.75.70.96"
+      }
+    ],
+    "versionTag": "20220606-144209"
+  }
+]
+```
+
+The response will contain both running and terminated containers, where the extraPorts section is the external IP and port available for the endpoint to connect to.
+
+### `GET /gateway/route`
+
+This interface does not require authentication and returns connection information for any running container for use directly on the client if the developer does not wish to develop the routing interface themselves.
+
+```
+$ curl -H 'X-LC-Id: SJjoXHWuhewHKV4Ojw' \
+       'https://shared.cloud.tds1.tapapis.cn/1.1/engine/gateway/route?groupName=udp&prod=1'
+
+[
+  {
+    "name": "game",
+    "protocol": "udp",
+    "publicPort": 19766,
+    "publicIp": "106.75.70.96"
+  }
+]
+```

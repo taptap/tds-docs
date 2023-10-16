@@ -14,6 +14,49 @@ import {Conditional} from '/src/docComponents/conditional';
 TapSDK 提供了一套可供游戏开发者收集账号数据的 API。
 系统会收集账号数据并进行分析，最终形成数据报表，帮助游戏开发者分析账号行为并优化游戏。
 
+## 环境要求
+
+<MultiLang kind="ue">
+
+<>
+
+- Unity 2019.4 或更高版本
+- iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
+- Android 5.0（API level 21）或更高版本
+
+</>
+
+<>
+
+Android 5.0（API level 21）或更高版本
+
+</>
+
+<>
+
+iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
+
+</>
+
+<>
+
+- 安装 UE 4.26 及以上版本
+- iOS 12 或更高版本
+- Android 5.0（API level 21）或更高版本
+- macOS 10.14.0 或更高版本
+- Windows 7 或更高版本
+
+**支持平台**：Android / iOS / Windows / macOS
+
+</>
+
+</MultiLang>
+
+## 集成前准备
+
+1. 参考 [准备工作](/sdk/start/get-ready/) 创建应用、开启应用配置开通数据分析服务、绑定 API 域名；
+
+
 ## SDK 集成
 
 请先[下载](/tap-download) TapSDK，并添加相关依赖。
@@ -28,10 +71,7 @@ Unity v3.7.1 及更高版本，还需要导入 `com.leancloud.storage`。
 
 <CodeBlock className="language-json">
 {`"dependencies":{
-    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}",
     "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
-    "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#${sdkVersions.taptap.unity}",
-    "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}",
     "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
     // 数据分析
     "com.taptap.tds.tapdb": "https://github.com/TapTap/TapDB-Unity.git#${sdkVersions.taptap.unity}",
@@ -51,13 +91,9 @@ Unity v3.7.1 及更高版本，还需要导入 `com.leancloud.storage`。
 }
 dependencies {
     // ...
-    implementation (name:'TapBootstrap_${sdkVersions.taptap.android}', ext:'aar')  // 必选： TapSDK 启动器
     implementation (name:'TapCommon_${sdkVersions.taptap.android}', ext:'aar') // 必选：TapSDK 基础库
-    implementation (name:'TapLogin_${sdkVersions.taptap.android}', ext:'aar') // 必选：TapTap 登录
-    implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
-    implementation 'cn.leancloud:storage-android:${sdkVersions.leancloud.java}'
-    implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
     implementation (name:'TapDB_${sdkVersions.taptap.android}', ext:'aar') // 数据统计
+    implementation 'cn.leancloud:storage-android:${sdkVersions.leancloud.java}'
 }`}
 </CodeBlock>
 </>
@@ -72,6 +108,8 @@ TapBootstrapSDK.framework
 TapCommonSDK.framework
 TapLoginSDK.framework
 LeanCloudObjc.framework
+TapCommonResource.bundle
+TapLoginResource.bundle
 //TapDB
 TapDB.framework`}
 </CodeBlock>
@@ -83,7 +121,8 @@ TapDB.framework`}
 名词 | 含义 | 备注
 --- | --- | ---
 AdSupport.framework | 用来获取设备广告标识，跟踪设备
-AdService.framework | 广告框架 | 设置为 optional
+iAd.framework | 广告框架 | 设置为 optional
+AdServices.framework | 广告框架 | 设置为 optional
 AppTrackingTransparency.framework | iOS 14 新增 app 追踪框架（若无需在 iOS 14 以上追踪 IDFA 可不添加该依赖） | 设置为 optional
 SystemConfiguration.framework |
 CoreMotion.framework |
@@ -98,16 +137,6 @@ libsqlite3.0.tbd |
 </>
 
 <>
-
-#### 环境要求
-
-* 安装 UE 4.26 及以上版本
-* iOS 12 或更高版本
-* Android 5.0（API level 21）或更高版本
-* macOS 10.14.0 或更高版本
-* Windows 7 或更高版本
-
-**支持平台**：iOS / Android / Windows / macOS
 
 #### 安装插件
 
@@ -145,7 +174,7 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core",
 ## 初始化 SDK
 
 
-初始化 SDK 并上报一个设备登录（ `device_login` ）事件，调用这个接口是使用其它接口的先决条件，需要尽早调用。
+初始化 SDK 并上报一个设备登录（ `device_login` ）事件，调用这个接口是使用其他接口的先决条件，需要尽早调用。 
 
 
 :::info
@@ -154,7 +183,7 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core",
 
 ### TapSDK 初始化 {#tapsdk-init}
 
-在 TapSDK 初始化时，同步初始化 TapDB。
+如果项目中同时集成[内建账户系统的 TapTap 登录](/sdk/taptap-login/guide/start/#sdk-初始化)并完成了初始化，需要在此基础上添加 TapDBConfig 配置，即可同步初始化 TapDB。代码如下：
 
 <MultiLang kind="ue">
 
@@ -299,7 +328,6 @@ dbConfig.gameVersion=@"1.0.0"; //游戏版本，为空时，自动获取游戏�
 dbConfig.advertiserIDCollectionEnabled=YES; //IDFA 开关，请参考 「收集设备指纹」章节
 config.dbConfig = dbConfig;
 
-config.region = TapSDKRegionTypeCN;
 [TapBootstrap initWithConfig:config];
 ```
 
@@ -366,7 +394,7 @@ AdvertiserIDCollectionEnabled | 否 | IDFA 开关，请参考 [收集设备指�
 
 </MultiLang>
 
-### TapDB 单独使用
+### TapDB 单独初始化
 
 在单独使用 TapDB 功能时（即不接登录功能时，不导入 `TapBootstrap` 包时），可以通过以下方式初始化 TapDB。
 
@@ -1093,7 +1121,7 @@ properties | 否 | 属性字典
 
 #### 设备属性更新
 
-对于常规的用设备属性，可使用改接口进行赋值操作，新的属性值将会直接覆盖旧的属性值
+对于常规的设备属性，可使用该接口进行赋值操作，新的属性值将会直接覆盖旧的属性值。
 
 <MultiLang kind="ue">
 
@@ -1326,15 +1354,15 @@ TapUEDB::UserAdd(Properties);
 
 ### OAID（Android）
 
-> 注意：SDK 版本 3.15.0 及以上支持 OAID 版本为 1.0.5 ~ 1.2.1； 3.14.0 及以下支持 OAID 版本为 1.0.5 ~ 1.0.25
+> 注意：SDK 版本 3.15.0 及以上支持 OAID 版本为 1.0.5 ~ 2.0.0； 3.14.0 及以下支持 OAID 版本为 1.0.5 ~ 1.0.25
 
 
-TapDB SDK 在应用接入 OAID 第三方库时，会在发送相关事件中携带该参数（key 为 `device_id4`)。现支持该第三方库版本为 1.0.5 ~ 1.2.1，因不同版本变更较大，所以针对不同版本接入的说明如下：
+TapDB SDK 在应用接入 OAID 第三方库时，会在发送相关事件中携带该参数（key 为 `device_id4`)。现支持该第三方库版本为 1.0.5 ~ 2.0.0，因不同版本变更较大，所以针对不同版本接入的说明如下：
 
 对于 1.0.5 ~ 1.0.25 不需要额外配置，只需应用添加对应第三方库的依赖即可。
 
 
-对于 1.0.26 ~ 1.2.1 除添加对应第三方库外，需要添加如下处理：
+对于 1.0.26 ~ 2.0.0 除添加对应第三方库外，需要添加如下处理：
 
 #### 1. 设置证书信息及配置文件
 
@@ -1353,7 +1381,7 @@ TapDB SDK 在应用接入 OAID 第三方库时，会在发送相关事件中携�
 
 | 版本号 | 库名称 |
 | ---- | ---- |
-| 1.0.30 ~ 1.2.1 | msaoaidsec |
+| 1.0.30 ~ 2.0.0 | msaoaidsec |
 | 1.0.29 | nllvm1632808251147706677 |
 | 1.0.27 | nllvm1630571663641560568 |
 | 1.0.26 | nllvm1623827671 |
@@ -1372,7 +1400,6 @@ System.loadLibrary("msaoaidsec");
 2. 对于 1.0.26 及以上版本证书所对应的包名是否和当前包名对应
 3. 对于 1.0.26 及以上版本是否加载了其库文件以及库文件名称是否和版本对应
 4. 应用在 Android 12 报错 `java.lang.UnsatisfiedLinkError`且 应用 minSdkVersion 大于等于 23 ，建议在 AndroidManifest.xml 文件 application 标签中添加 `android:extractNativeLibs="true"`
-
 
 
 
@@ -1433,7 +1460,8 @@ iOS 平台不适用
 
 若使用 TapSDK 初始化，请在 `TapDBConfig` 中的 `advertiserIDCollectionEnabled` 传入 `true` 开启 IDFA 采集开关。
 
-若单独使用 TapDB SDK 请调用如下接口开启 IDFA 采集开关
+若单独使用 TapDB SDK 请调用如下接口开启 IDFA 采集开关，***为保证数据准确性，该接口应在初始化接口之前调用***
+
 ```cs
 TapDB.AdvertiserIDCollectionEnabled(true);
 ```
@@ -1498,17 +1526,17 @@ SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选�
 
 如果选择 UPM 导入，可以在项目的 `Packages/manifest.json` 文件中添加：
 
-```json
-"dependencies": {
-  "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#3.14.0",
-  "com.taptap.tds.tapdb": "https://github.com/TapTap/TapDB-Unity.git#3.14.0",
-  "com.taptap.tds.themis": "https://github.com/TapTap/TapThemis-Unity.git#3.14.0"
-}
-```
+<CodeBlock className="language-json">
+{`"dependencies":{
+    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.tapdb": "https://github.com/TapTap/TapDB-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.themis": "https://github.com/taptap/TapThemis-Unity.git#3.1.7-6",
+}`}
+</CodeBlock>
 
 如果选择手动导入：
 
-* 在 [下载页](/tap-download) 找到 TapSDK Unity 下载地址，下载 TapSDK-UnityPackage.zip 然后解压，导入其中的 `TapTap_Common`，`TapTap_TapDB` 和 `TapTap_Themis` 模块。
+* 在 [下载页](/tap-download) 找到 TapSDK Unity 下载地址，下载 TapSDK-UnityPackage.zip 然后解压，导入其中的 `TapTap_Common`，`TapTap_TapDB`模块。
 
 </>
 
@@ -1522,7 +1550,7 @@ repositories {
 }
 dependencies {
   ...
-  implementation (name:'THEMIS-release2.6.7', ext:'aar')
+  implementation (name:'THEMIS-release*.*.*', ext:'aar')
 }
 ```
 
@@ -1543,7 +1571,7 @@ dependencies {
 <MultiLang>
 
 ```cs
-using TapTap.TapDB;
+using TapTap.Themis;
 ```
 
 ```cs
@@ -1556,14 +1584,56 @@ using TapTap.TapDB;
 
 </MultiLang>
 
+### 启用设置
+
+在集成 Themis 对应依赖后，TapDB 模块默认会调用 Themis 相关接口，如果游戏需要禁止该调用，可在初始化 TapDB 接口前调用本接口进行关闭。
+
+<MultiLang>
+
+```cs
+TapDB.EnableThemis(false);
+```
+
+```java
+TapDB.enableThemis(false);
+```
+
+```objective-c
+[TapDB enableThemis: NO];
+```
+
+</MultiLang>
+
+
+
 ### 接口描述
+
+#### 初始化
+
+<MultiLang>
+
+```cs
+TapThemis.InitTHEMIS();
+```
+
+```cs
+// TapDB SDK 自动调用，不需要额外接入
+```
+
+```cs
+// TapDB SDK 自动调用，不需要额外接入
+```
+
+</MultiLang>
+
+***注意：该接口需要在 TapDB 初始化接口之后调用***
 
 #### 设置日志上报等级
 
 <MultiLang>
 
 ```cs
-TapDB.ConfigAutoReportLogLevel(LogSeverity.LogError);
+TapThemis.U3d_ConfigAutoReportLogLevel(TapTap.Themis.LogSeverity.LogError);
 ```
 
 ```cs
@@ -1583,7 +1653,7 @@ TapDB.ConfigAutoReportLogLevel(LogSeverity.LogError);
 <MultiLang>
 
 ```cs
-TapDB.ConfigAutoQuitApplication(true);
+TapThemis.U3d_ConfigAutoQuitApplication(true);
 ```
 
 ```cs
@@ -1603,7 +1673,7 @@ TapDB.ConfigAutoQuitApplication(true);
 <MultiLang>
 
 ```cs
-TapDB.RegisterLogCallback(logcallback);
+TapThemis.U3d_UnregisterLogCallback(logcallback);
 public void logcallback(string condition, string statckTrace, LogType type ){
 
 }
@@ -1626,7 +1696,7 @@ public void logcallback(string condition, string statckTrace, LogType type ){
 <MultiLang>
 
 ```cs
-TapDB.UnRegisterLogCallback(logcallback);
+TapThemis.U3d_UnregisterLogCallback(logcallback);
 ```
 
 ```cs
@@ -1644,7 +1714,7 @@ TapDB.UnRegisterLogCallback(logcallback);
 <MultiLang>
 
 ```cs
-TapDB.ReportException(new Exception("crash test from unity"),"crashMessage desc");
+TapThemis.ReportException(new Exception("Themis crash test from unity"),"crashMessage from untiy");
 ```
 
 ```cs

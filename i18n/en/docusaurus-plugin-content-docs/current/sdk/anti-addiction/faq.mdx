@@ -1,0 +1,81 @@
+---
+title: Frequently Asked Questions
+sidebar_label: Frequently Asked Questions
+sidebar_position: 3
+---
+
+import MultiLang from '/src/docComponents/MultiLang';
+
+### Do individual/group developers need access to anti-addiction tools?
+
+According to the State Press and Publication Administration's [Notice on Further Strict Management to Effectively Prevent Minors from Becoming Addicted to Online Games](https://www.nppa.gov.cn/xxfb/tzgs/202108/t20210830_666285.html), all game publishers and operators are required to implement in-game real name authentication and new anti-addiction strategies.
+For games that do not have a version number, they can access the [Real Name Authentication and Anti-Addiction](/sdk/anti-addiction/features/) launched by TDS.
+
+### What is the relationship between anti-addiction and login?
+
+As of version 3.7.1, Quick Authentication does not rely on the TapTap Login SDK, so anti-addiction and login are not **strongly related**. However, when logged in with TapTap, you can use the [Quick Authentication for anti-addiction](/sdk/anti-addiction/features/#taptap-quick-verification), which allows players to quickly complete the in-game authentication process using their real name information that has been authenticated by the country in TapTap after they have agreed to authorise it.
+In addition, you can also use our [real-name authentication](/sdk/anti-addiction/features/#game-real-name authentication and anti-addiction) feature, which automatically connects to the Ministry of Propaganda's online game anti-addiction real-name authentication system for developers and reports as a developer entity, in line with the Ministry's compliance requirements for game companies to access the system. This is in line with the Ministry's compliance requirements for game companies.
+
+### If you log out of your account and restart the game after passing the real name authentication, the real name authentication process will be skipped.
+
+As of version 3.7.1, Quick Authentication does not rely on the TapTap Login SDK, so there is no **strong correlation** between anti-addiction and login. The first time a player enters the game, a real name authentication popup is triggered, asking the player to authorise the game to obtain TapTap's real name information or to enter their identity information. If the player needs to log in using a different account, they will need to actively log out of their account.
+
+### How do I enable the Real-Name Verification and Anti-addiction service?
+
+You can enable the service on **Developer Centre Backend > Games Services > Development & Build > Compliance Certification**. You can choose one of the following two options for your game:
+
+* **The game has an ISBN**. Once you have completed the prerequisites listed on the page, turn on the service by providing the [parameters obtained from Zhongxuanbu’s system](/sdk/anti-addiction/features/#sign-up-for-zhongxuanbus-real-name-verification-system)：
+    * Fill in the **bizId, APPID, and Secret Key** obtained from Zhongxuanbu’s system.
+    * Then provide the **IP addresses** displayed on the Developer Center to Zhongxuanbu’s system.
+* **The game doesn’t have an ISBN**. You can turn on the service without providing an ISBN. Once your game has obtained an ISBN, you can make a switch by providing the [parameters obtained from Zhongxuanbu’s system](/sdk/anti-addiction/features/#sign-up-for-zhongxuanbus-real-name-verification-system). You won’t need to update the client after you do this.
+
+### What user interfaces does the SDK include?
+
+Most of the interfaces provided by the SDK are used for identity verification. You can take a look at them [here](/sdk/anti-addiction/features/#integrating-tds-real-name-verification-and-anti-addiction-service).
+
+### Authorisation failure
+
+If you see the “Authorisation failure” error when using TapTap Quick Verification, please [configure the signature certificate](/sdk/start/quickstart/#configure-signature-certificate) on the Developer Center.
+
+### No real name authentication configuration was queried
+
+If you see the “No real name authentication configuration was queried” error, it is because the Real-Name Verification service is not enabled. Please enable it on Developer Centre Back Office > Games Services > Development & Build > Compliance.
+
+### userIdentifier is empty
+
+If you see this error, it means that the value you provided for `userIdentifier` is empty. We recommend that your program checks whether this value is empty before submitting it to the server.
+
+### The pop-up for real-name verification is not displayed, and the game is not receiving any callbacks from the SDK.
+
+This often indicates that you have only invoked the code for initializing the UI of the Anti-addiction module and setting up event listeners.
+
+To pull up the pop-up for real-name verification, you’ll **need to invoke** the [interface for identity verification](/sdk/anti-addiction/guide/#identity-verification). After this, you will be able to receive callbacks.
+
+### Verifying Identity Repetitively
+
+We expect that each player only gets verified once and no further pop-ups should show up once the player is already verified. This ensures a better user experience, as the Anti-addiction service can use the result from the previous verification.
+
+If you notice that a player that has already been verified is being verified for a second time, you can try to solve the problem by following the instructions below:
+
+* First of all, make sure that the [`userIdentifier`](#regarding-useridentifier) provided meets the requirements. If the `userIdentifier` of the same player may get changed, the player will be seen as different users and may be asked to verify their identity repetitively. Please make sure that you use the proper value for the `userIdentifier`. We recommend that you use [TDS’ built-in account system](/sdk/taptap-login/guide/start/#quick-log-in-with-taptap) and use each player’s `objectId` as the unique identifier of the player. You can also use the [basic TapTap user verification](/sdk/taptap-login/guide/tap-login/#check-login-status-and-user-info) and use each player’s `openid` or `unionid` as the unique identifier.
+* If your game **already has an ISBN**, please make sure the parameters entered on 开发者中心后台游戏服务 > 开发与构建 > 合规认证 are correct. If the parameters are incorrect, the service will be unable to make requests to Zhongxuanbu’s interface and players may be asked to verify their identity repetitively. Please check the following parameters:
+	* All **IP addresses** should be provided to Zhongxuanbu’s system.
+	* The **bizId and APPID** should be the ones obtained from Zhongxuanbu’s system.
+	* The **Secret Key** should be valid (it is only valid for half a year, so make sure to update it before it expires).
+
+## Caveats
+
+### Regarding `userIdentifier`
+
+When a player opens your game for the first time, the pop-up for identity verification will be displayed, allowing the player to either authorize the game to obtain the identity information from TapTap or manually enter their identity information. Once the verification is done, whenever your game invokes the interface for identity verification with the same `userIdentifier`, the result from the previous verification will be returned and no further pop-ups will be triggered.
+
+Therefore, please make sure that the unique identifier of each user stays unique.
+
+### Environments for Testing Real-Name Verification
+
+No matter if you are building an Android or iOS project, you cannot test the service in Unity Editor’s environment. Please test the service by running packages on real devices or emulators.
+
+
+### In a testing environment for real-name verification, the verification process is still required for test accounts
+
+Please make sure that the **player's unique identifier** `userIdentifier` passed into `startup` is the `unionid` of the TapTap user, which can be obtained by referring to [Quick Log-in With TapTap](/sdk/taptap-login/guide/start/#quick-log-in-with-taptap).

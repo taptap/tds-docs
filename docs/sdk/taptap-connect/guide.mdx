@@ -1,0 +1,201 @@
+---
+title: 悬浮窗开发指南
+sidebar_label: 开发指南
+sidebar_position: 2
+---
+
+import MultiLang from "/src/docComponents/MultiLang";
+import CodeBlock from "@theme/CodeBlock";
+import sdkVersions from "/src/docComponents/sdkVersions";
+import Languages from "../_partials/languages.mdx";
+
+本文介绍如何在游戏中加入 [TapTap 悬浮窗](/sdk/taptap-connect/features/)。使用悬浮窗功能需依赖 TapTap 登录（TapLogin）以及 TapTap 内嵌动态功能（TapMoment）。
+
+## 环境要求
+
+<MultiLang kind="ue">
+
+<>
+
+- TapSDK **3.21.0** 及以上版本
+- Unity 2019.4 或更高版本
+- iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
+- Android 5.0（API level 21）或更高版本
+
+</>
+
+<>
+
+- TapSDK **3.21.0** 及以上版本
+- Android 5.0（API level 21）或更高版本
+
+</>
+
+<>
+
+- TapSDK **3.21.0** 及以上版本
+- iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
+
+</>
+
+<>
+
+- TapSDK **3.22.0** 及以上版本
+- 安装 UE 4.26 及以上版本
+- iOS 12 或更高版本
+- Android 5.0（API level 21）或更高版本
+- macOS 10.14.0 或更高版本
+- Windows 7 或更高版本
+
+**支持平台**：Android / iOS / Windows / macOS
+
+</>
+
+</MultiLang>
+
+## 集成前准备
+
+1. 参考 [准备工作](/sdk/start/get-ready/) 创建应用、开启悬浮窗相应设置；
+
+## SDK 获取
+
+
+请先参考 [TapTap 登录](/sdk/taptap-login/guide/start/#sdk-获取) 和 [内嵌动态](/sdk/embedded-moments/guide/##sdk-获取)完成 SDK 获取，然后在此基础上可以通过 [下载](/tap-download) 获得 TapSDK，添加 `TapConnect` 模块：  
+
+<MultiLang kind="ue">
+
+<CodeBlock className="json">
+  {`"dependencies":{
+  ...
+  // 悬浮窗
+  "com.taptap.tds.connect":"https://github.com/TapTap/TapConnect-Unity.git#${sdkVersions.taptap.unity}",
+  "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}",   // 悬浮窗依赖登录模块-必选
+  "com.taptap.tds.moment":"https://github.com/TapTap/TapMoment-Unity.git#${sdkVersions.taptap.unity}", // 悬浮窗依赖内嵌动态-必选
+  "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",    // 基础模块-必选
+  "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#${sdkVersions.taptap.unity}", // 基础模块-可选
+}`}
+</CodeBlock>
+
+<CodeBlock className="groovy">
+  {`repositories{  
+    flatDir {  
+        dirs 'libs'  
+    }  
+}  
+dependencies {  
+    ... 
+    implementation (name:'TapConnect_${sdkVersions.taptap.android}', ext:'aar') // TapTap 悬浮窗
+    implementation (name:'TapMoment_${sdkVersions.taptap.android}', ext:'aar') // TapTap 悬浮窗依赖内嵌动态-必选
+    implementation (name:'TapLogin_${sdkVersions.taptap.android}', ext:'aar')  // TapTap 悬浮窗依赖登录模块-必选
+    implementation (name:'TapCommon_${sdkVersions.taptap.android}', ext:'aar') // 必选：TapSDK 基础库
+    implementation (name:'TapBootstrap_${sdkVersions.taptap.android}', ext:'aar') // 可选：TapSDK 基础库
+}`}
+</CodeBlock>
+
+<CodeBlock className="objectivec">
+  {`// 悬浮窗
+TapConnectResource.bundle
+TapConnectSDK.framework
+// 悬浮窗依赖内嵌动态和登录模块-必选
+TapMomentResource.bundle
+TapMomentSDK.framework
+TapLoginSDK.framework
+TapLoginResource.bundle
+// 基础模块-必选
+TapCommonResource.bundle
+TapCommonSDK.framework
+// 基础模块-可选
+TapBootstrapSDK.framework
+`}
+</CodeBlock>
+
+```cs
+PublicDependencyModuleNames.AddRange(new string[] { 
+  //...
+  "TapConnect"  //必选
+  "TapLogin"    //必须-悬浮窗依赖登录模块
+  "TapMoment"   //必选-悬浮窗依赖内嵌动态
+  "TapCommon"   //必选-基础模块
+  "TapBootstrap"//可选-基础模块
+});
+```
+
+</MultiLang>
+
+## 初始化
+
+:::info
+以下两种初始化方式任选其一。
+:::
+
+### TapSDK 初始化
+
+如果你已经完成[内建账户系统 Tap 登录](/sdk/taptap-login/guide/start/#sdk-初始化)的初始化，这里只需要引入悬浮窗模块，不需要其他额外处理。
+
+### 悬浮窗单独初始化
+
+如果游戏不通过上面提供的 `TapBootstrap` 方法初始化 TapSDK，悬浮窗可以单独初始化，因为悬浮窗依赖单纯 Tap 认证和内嵌动态，
+
+:::tip
+
+单独初始化悬浮窗需要优先完成`单纯 TapTap 认证` 和 `内嵌动态` 的初始化动作。关于单纯 TapTap 认证初始化[参考](/sdk/taptap-login/guide/tap-login/#初始化)，关于内嵌动态初始化[参考](/sdk/embedded-moments/guide/#单纯的内嵌动态初始化)，
+
+:::
+下面是单独初始化悬浮窗的示例代码：
+
+<MultiLang kind="ue">
+
+```cs
+using TapTap.Connect; // 命名空间
+
+TapConnect.Init("your_client_id", "your_client_token", (bool)isCN);
+```
+
+```java
+//activity 为当前 Activity 实例
+TapConnect.init(activity, "clientId", "clientToken", isCN);
+```
+
+```objc
+[TapConnect initWithClientId:@"clientId" clientToken:@"clientToken" isCN:YES];
+```
+
+```cpp
+FTapConnect::Init("clientId", "clientToken", true);
+```
+
+</MultiLang>
+
+### 参数说明
+
+* `client_id`、`client_token` 信息可在 **开发者中心 > 你的游戏 > 游戏服务 > 应用配置** 查看, isCN 表示是否为中国大陆地区的应用。
+
+## 设置悬浮窗入口显示隐藏
+
+有时开发者希望在某些场景下直接控制悬浮窗入口的显示隐藏，比如仅在部分场景显示悬浮窗入口，这时可以调用下面的接口：
+
+<MultiLang kind="ue">
+
+```cs
+TapConnect.SetEntryVisible(bool visible)
+```
+
+```java
+TapConnect.setEntryVisible(boolean visible);
+```
+
+```objc
+[TapConnect setEntryVisible:YES];
+```
+
+```cpp
+FTapConnect::SetEntryVisible(true);
+```
+
+</MultiLang>
+
+## 国际化
+
+悬浮窗支持设置语言：
+
+<Languages kind="ue" />

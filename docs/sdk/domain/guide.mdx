@@ -6,14 +6,28 @@ sidebar_position: 1
 
 import { Conditional } from "/src/docComponents/conditional";
 
-根据法律法规和有关部门的要求，使用云服务需要绑定自有域名。
-绑定自有域名也有利于从域名层面做好应用隔离，确保业务稳定。
+根据法律法规和有关部门的要求，使用云服务需要绑定一个已经在[工信部](https://beian.miit.gov.cn/?spm=a2c4g.11186623.0.0.58797cc85Mnmlh#/Integrated/index)备案过的域名。绑定自有域名也有利于从域名层面做好应用隔离，确保业务稳定。
 
-这篇指南假定你了解域名解析的基本知识，如果你不太熟悉这方面的内容，可以参考[这篇文章][basic]。
-
-[basic]: https://blog.taptap.dev/posts/domain-introduction
+这篇指南假定你了解域名解析的基本知识，如果你不太熟悉这方面的内容，可以参考[这篇文章](https://blog.taptap.dev/posts/domain-introduction)。
 
 本指南面向国内版应用的开发者。
+
+
+## 以下服务需绑定域名
+
+<Conditional brand="leancloud">
+
+使用 LeanCloud 的数据存储和云引擎服务要求必须绑定自有域名，其他服务可选是否绑定自有域名。
+我们提供了 API 共享域名和文件共享域名，但是请注意，**共享域名没有可用性保证，容易受到 DDoS 攻击影响。我们建议在生产环境中使用绑定的自定义域名。**
+
+</Conditional>
+
+<Conditional brand="tds">
+
+使用 TDS 的数据存储、云引擎和公告服务要求必须绑定自有域名，其他服务可选是否绑定自有域名。
+我们提供了 API 共享域名和文件共享域名，但是请注意，**共享域名没有可用性保证，容易受到 DDoS 攻击影响。我们建议在生产环境中使用绑定的自定义域名。**
+
+</Conditional>
 
 ## 自定义域名的种类
 
@@ -21,33 +35,33 @@ import { Conditional } from "/src/docComponents/conditional";
 
 <Conditional brand="leancloud">
 
-| 域名种类   | 涉及服务                  | 备案 | 在 LeanCloud 备案或接入备案 | SSL | 绑定目标 | 静态资源加速 |
-|--------|-----------------------|----|---------------------|-----|------|--------|
-| 文件域名   | 文件服务                  | 必须 | 可选                  | 可选  | 应用   | 是      |
-| 云引擎域名  | 云引擎 **网站托管**          | 必须 | 必须                  | 可选  | 分组   | 视情况    |
-| API 域名 | 存储、即时通讯、短信、推送、**云函数** | 必须 | 必须                  | 必须  | 应用   | 否      |
+| 域名种类  | 涉及服务 | 在工信部备案 | 在 LeanCloud 备案或接入备案 | SSL | 绑定目标 | 静态资源加速 |
+|---------|--------|------------|--------------------------|-----|---------|------------|
+| 文件域名 | 文件服务 | 必须 | 可选 | 可选  | 应用   | 是 |
+| 云引擎域名 | 云引擎 **网站托管** | 必须 | 必须 | 可选 | 分组 | 视情况  |
+| API 域名 | 存储、即时通讯、短信、推送、**云函数** | 必须 | 必须  | 必须 | 应用 | 否 |
 
 </Conditional>
 
 <Conditional brand="tds">
 
-| 域名种类   | 涉及服务                                       | 备案 | 在 TDS 备案或接入备案 | SSL | 绑定目标 | 静态资源加速 |
-|--------|--------------------------------------------|----|---------------|-----|------|--------|
-| 文件域名   | 文件服务、云存档                                   | 必须 | 可选            | 可选  | 应用   | 是      |
-| 云引擎域名  | 云引擎 **网站托管**                               | 必须 | 必须            | 可选  | 分组   | 视情况    |
-| API 域名 | 存储、排行榜、内建账户、好友、成就、云存档、实时语音、即时通讯、推送、**云函数** | 必须 | 必须            | 必须  | 应用   | 否      |
-| 公告系统域名 | 公告系统                                       | 必须 | 可选            | 必须  | 应用   | 是      |
+| 域名种类 | 涉及服务 | 在工信部备案 | 在 TDS 备案或接入备案 | SSL | 绑定目标 | 静态资源加速 |
+|--------|--------|------------|---------------------|-----|---------|-----------|
+| 文件域名 | 文件服务、云存档 | 必须 | 可选 | 可选 | 应用 | 是 |
+| 云引擎域名 | 云引擎 **网站托管** | 必须 | 必须 | 可选 | 分组 | 视情况 |
+| API 域名 | 存储、排行榜、内建账户、好友、成就、实时语音、即时通讯、推送、**云函数**、云存档 | 必须 | 必须 | 必须 | 应用 | 否 |
+| 公告系统域名 | 公告系统 | 必须 | 可选 | 必须 | 应用 | 是 |
 
 </Conditional>
 
 说明：
 
-0. 可以使用同一主域名下不同的子域名，每个子域名只能绑定到一个应用，且同一应用的 API 服务、云引擎网站托管服务、文件服务需绑定不同的子域名。
-1. API 域名需要启用 SSL，绑定时会自动申请 SSL 证书，当然你也可以自行上传证书。
-2. 绑定目标中的「分组」指应用下的云引擎实例分组的生产环境。
-3. 我们推荐为 API 域名和云引擎域名配置独立 IP。**API 服务只对独立（IP）入口提供可用性保证。**未配置独立 IP 的云引擎服务默认会为静态站点优化，有一些对动态内容不那么友好的限制。详见下面的 [API 域名](#api-域名)、[云引擎域名](#云引擎域名)小节。
-4. 文件域名、使用共享 IP 的 API 域名、云引擎域名使用 CNAME 配置域名解析，因此不支持绑定裸域名，以免影响该域名下的其他域名的解析以及与 MX 等记录冲突。如果需要使用裸域名作为 API 域名或云引擎域名可以配置独立 IP 后使用 A 记录绑定。
-5. 一个应用（文件域名、API 域名）或分组（云引擎域名）上可以绑定多个域名，但文件服务返回的内部文件（托管在 <Conditional brand="leancloud">LeanCloud</Conditional><Conditional brand="tds">TDS</Conditional> 文件服务的文件）的 `url` 字段同一时间只能选择使用一个域名（可以在控制台切换）。
+1. 可以使用同一主域名下不同的子域名，每个子域名只能绑定到一个应用，且同一应用的 API 服务、云引擎网站托管服务、文件服务需绑定不同的子域名。
+2. API 域名需要启用 SSL，绑定时会自动申请 SSL 证书，当然你也可以自行上传证书。
+3. 绑定目标中的「分组」指应用下的云引擎实例分组的生产环境。
+4. 我们推荐为 API 域名和云引擎域名配置独立 IP。**API 服务只对独立（IP）入口提供可用性保证。**未配置独立 IP 的云引擎服务默认会为静态站点优化，有一些对动态内容不那么友好的限制。详见下面的 [API 域名](#api-域名)、[云引擎域名](#云引擎域名)小节。
+5. 文件域名、使用共享 IP 的 API 域名、云引擎域名使用 CNAME 配置域名解析，因此不支持绑定裸域名，以免影响该域名下的其他域名的解析以及与 MX 等记录冲突。如果需要使用裸域名作为 API 域名或云引擎域名可以配置独立 IP 后使用 A 记录绑定。
+6. 一个应用（文件域名、API 域名）或分组（云引擎域名）上可以绑定多个域名，但文件服务返回的内部文件（托管在 <Conditional brand="leancloud">LeanCloud</Conditional><Conditional brand="tds">TDS</Conditional> 文件服务的文件）的 `url` 字段同一时间只能选择使用一个域名（可以在控制台切换）。
 
 ## 文件域名
 
@@ -123,7 +137,7 @@ import { Conditional } from "/src/docComponents/conditional";
 
 - 多人在线对战、排行榜<Conditional brand="tds">、内建账户、好友、成就、云存档、实时语音、推送通知</Conditional>
 
-那么你需要前往 **<Conditional brand="leancloud">应用控制台 > 设置 > 域名绑定 > API 访问域名</Conditional><Conditional brand="tds">开发者中心 > 游戏服务 > 应用配置 > 基本信息 > 域名配置 > API</Conditional>** 绑定 API 域名。
+那么建议你前往 **<Conditional brand="leancloud">应用控制台 > 设置 > 域名绑定 > API 访问域名</Conditional><Conditional brand="tds">开发者中心 > 游戏服务 > 应用配置 > 基本信息 > 域名配置 > API</Conditional>** 绑定 API 域名。其中「结构化数据存储」和「云函数」两个模块是要求绑定自有域名的。
 
 <Conditional brand="leancloud">
 
@@ -187,13 +201,13 @@ import { Conditional } from "/src/docComponents/conditional";
 
 #### REST API
 
-参考 [存储 REST API 使用指南](https://leancloud.cn/docs/rest_api.html#hash-1722650509) 配置。
+参考 [存储 REST API 使用指南](/sdk/storage/guide/rest/#base-url) 配置。
 
 #### JavaScript SDK
 
 ##### 存储 SDK
 
-请参考 [SDK 安装指南](https://leancloud.cn/docs/sdk_setup-js.html#hash-99064366) 配置。
+请参考 [SDK 安装指南](/sdk/storage/guide/setup-js/#安装与引用-sdk) 配置。
 
 旧版本的 SDK 请参考以下方法配置（建议使用最新版本的 SDK）：
 
@@ -268,7 +282,7 @@ AV.init({
 
 ##### 多人在线对战
 
-请参考 [入门指南](https://leancloud.cn/docs/multiplayer-quick-start-js.html#hash20935048) 或 [开发指南](https://leancloud.cn/docs/multiplayer-guide-js.html#hash20935048) 进行配置。
+请参考 [入门指南](/sdk/multiplayer/start/js/#初始化) 或 [开发指南](/sdk/multiplayer/guide/js/) 进行配置。
 
 ##### 微信小程序白名单
 
@@ -280,7 +294,7 @@ AV.init({
 
 #### Objective-C SDK
 
-请参考 [SDK 安装指南](https://leancloud.cn/docs/sdk_setup-objc.html#hash20935048) 配置。
+请参考 [SDK 安装指南](/sdk/storage/guide/setup-objc/#初始化) 配置。
 
 `<12.0.0` 的版本请参考以下方法配置：
 
@@ -307,7 +321,7 @@ AV.init({
 
 #### Swift SDK
 
-`>= 17.0.0` 的版本请参考 [SDK 安装指南](https://leancloud.cn/docs/sdk_setup-swift.html#hash20935048) 配置。
+`>= 17.0.0` 的版本请参考 [SDK 安装指南](/sdk/storage/guide/setup-swift/#初始化) 配置。
 
 `>= 16.1.0, < 17.0.0` 的版本请参考以下方法配置：
 
@@ -339,7 +353,7 @@ do {
 
 #### Java Unified SDK
 
-Java Unified SDK（`>= 6.0.0`）请参考 [SDK 安装指南](https://leancloud.cn/docs/sdk_setup-java.html#hash20935048) 配置。
+Java Unified SDK（`>= 6.0.0`）请参考 [SDK 安装指南](/sdk/storage/guide/setup-java/#初始化) 配置。
 
 旧版本 SDK 请参考以下方法配置：
 
@@ -391,7 +405,7 @@ AVOSCloud.initialize(this, "APPID", "APPKEY");
 
 #### .NET SDK
 
-请参考 [SDK 安装指南](https://leancloud.cn/docs/sdk_setup-dotnet.html#hash20935048) 配置。
+请参考 [SDK 安装指南](/sdk/storage/guide/setup-dotnet/#初始化) 配置。
 
 `< v20190925.1` 的版本请参考以下方法配置：
 
@@ -564,7 +578,7 @@ AVClient.Initialize(new AVClient.Configuration {
 
 ## 公告系统域名
 
-如果你用到了公告系统服务，那么那么你需要前往 **开发者中心 > 游戏服务 > 应用配置 > 基本信息 > 域名配置 > 公告** 绑定公告系统域名。
+如果你用到了公告系统服务，那么你需要前往 **开发者中心 > 游戏服务 > 应用配置 > 基本信息 > 域名配置 > 公告** 绑定公告系统域名。
 
 配置域名后需要更新客户端代码以使用自定义域名，请参考 [公告系统开发指南](/sdk/billboard/guide/)。
 
@@ -625,17 +639,48 @@ curl --resolve 'engine.example.com:443:YOUR-ENGINE-IP' https://engine.example.co
 
 </Conditional>
 
-## 域名解析
+## 域名绑定
 
-绑定域名需要设置域名解析，因此这里我们简单解释下如何设置。
+绑定自定义域名前需要准备一个已经**备案的域名**，接下来我们详细介绍自定义域名绑定流程。
 
 绑定域名过程中，控制台会提示相应的 DNS 配置，请按照控制台的提示到域名注册商或域名解析服务提供商处设置（如果自己架设域名解析服务器的话，请根据域名解析服务器文档配置）A 记录或 CNAME 记录。
 
-例如，按控制台提示输入待绑定域名 `api.example.com` 后，控制台会首先检查备案，检查通过后，控制台会显示预期的 DNS 配置。
+以下使用已经备案的主域名 `example.com` 的子域名 `api.example.com` 为例，介绍自定义域名绑定流程：
 
-![控制台域名绑定界面](/img/domain-guide.png)
+![控制台域名绑定界面](/img/domain-guide-new.png)
 
-以 A 记录为例，假定控制台显示的 IP 为 `0.0.0.0`，那么对应的 DNS Zone 记录为：
+<Conditional brand="tds">
+
+通过**开发者管理后台 -> 游戏服务 -> 应用配置 -> 域名配置**页面开始，选择你需要绑定自定义域名的服务，然后点击绑定新域名。
+</Conditional>
+
+<Conditional brand="leancloud">
+
+通过 **LeanCloud 管理后台 -> 设置 -> 域名绑定**页面开始，选择你需要绑定自定义域名的服务，然后点击绑定新域名。
+</Conditional>
+
+上图以 <Conditional brand="leancloud">API 访问域名</Conditional><Conditional brand="tds">云服务 API</Conditional> 绑定为例，接下来，我们对绑定过程中的操作步骤进行单独说明：
+
+1. 我们要求使用二级域名（当你已备案的主域名为 `example.com` 时，可以在主域名前加上自定义字段形成新域名，这个域名就是二级域名）进行绑定。输入二级域名后，我们默认启用 SSL、强制使用 HTTPS 和 SSL 证书自动管理，如果自己有证书可以设置为手动，设置 SSL 证书可参考 [SSL 证书](#ssl-证书)。然后点击“绑定”按钮进行下一步。
+
+2. 输入绑定的域名后，后台会先检查该域名是否已经被其他应用绑定过（同一个域名不可重复绑定多个应用或多个服务），然后会检查域名备案信息。
+
+3. 当域名未备案时，会出现绑定失败的提示，这时需要对域名进行备案，可参考[域名备案指南](/sdk/domain/icp/)，或者使用其他已备案的域名重新进行绑定。
+
+4. 检查域名备案信息通过后，会提示配置 DNS，并且会显示推荐 DNS 配置，<Conditional brand="leancloud">以及 CNAME 记录值。</Conditional><Conditional brand="tds">当绑定的服务选择云服务 API，推荐的 DNS 配置为 A 记录。当绑定服务选择的是云引擎、文件、公告，推荐的 DNS 配置为 CNAME 记录，并都会提供推荐的记录值。</Conditional>
+
+
+5. 根据上一步推荐的 DNS 配置到你的域名注册商或域名解析服务提供商处设置域名解析（例如：你的域名是通过腾讯云或者阿里云购买的，这时就需要你通过腾讯云或阿里云管理后台中的域名管理界面进行解析）。上图的第 5 步使用了百度云进行举例，大部分云服务商后台设置域名解析的路径大概均为控制台 -> 域名管理 -> 解析。进入域名解析页面后，按照以下说明添加解析记录即可。
+   1. 主机记录：自定义的字段 + 主域名；例如我设置的自定义域名是 `api.example.com`，所以我只需填 `api` 即可；
+   2. 记录类型：根据上步推荐的 DNS 配置选择对应的记录类型；例如：<Conditional brand="tds">云服务 API 推荐为 A 记录，因此解析时，记录类型也选择 A 记录；</Conditional><Conditional brand="leancloud">推荐 CNAME 为 XXX.XX.cn，因此解析时记录类型选择 CNAME 。</Conditional>
+   3. 记录值：直接复制粘贴推荐的 DNS 配置的记录值。 
+   4. 其他解析线路、TTL 都可使用默认配置。
+
+大多数域名注册商或域名解析服务提供商都提供图形化的设置界面，这样就不用直接写 DNS Zone 记录，按照其说明配置即可。如下，是通过另一个服务商进行域名解析，并设置 CNAME 记录。
+
+![以 DnsPod 添加 CNAME 记录为例](/img/dnspod-add-cname-record.png)
+
+如果需要写 DNS Zone 记录，以 A 记录为例，假定控制台显示的 IP 为 `0.0.0.0`，那么对应的 DNS Zone 记录为：
 
 ```
 api.example.com. 10800 IN A 0.0.0.0
@@ -649,13 +694,16 @@ api.example.com. 10800 IN A 0.0.0.0
 xxx.example.com.	10800	IN	CNAME	yyy.zzz.example.
 ```
 
-大多数域名注册商或域名解析服务提供商都提供图形化的设置界面，这样就不用直接写 DNS Zone 记录，按照其说明配置即可。
+6. 以上 5 个步骤设置完成后，需要等待一段时间（一般在半小时以内），记录生效后，<Conditional brand="leancloud">LeanCloud</Conditional><Conditional brand="tds">TDS</Conditional> 控制台会显示「已绑定」。
 
-![以 DnsPod 添加 CNAME 记录为例](/img/dnspod-add-cname-record.png)
+:::tip
+可以使用如下命令验证绑定的域名请求是否正常
+```sh
+curl https://{host}/1.1/ping
+```
+:::
 
-设置完成后，需要等待一段时间（一般在半小时以内），记录生效后，<Conditional brand="leancloud">LeanCloud</Conditional><Conditional brand="tds">TDS</Conditional> 控制台会显示「已绑定」。
-
-如果长时间卡在「等待配置 DNS」阶段，那么请点击「等待配置 DNS」后的问号图标，依其提示运行相应的 dig 命令检查域名解析记录是否生效。
+如果**长时间卡在「等待配置 DNS」阶段，**那么请点击「等待配置 DNS」后的问号图标，依其提示运行相应的 dig 命令检查域名解析记录是否生效。
 如 dig 命令查不到相应的域名解析记录，请返回域名商控制台检查配置是否正确，如仍有疑问，请联系域名商客服。
 如 dig 命令能查到预期的 CNAME 记录，但控制台仍显示「等待配置 DNS」，请通过工单或论坛联系我们。
 
@@ -666,6 +714,13 @@ xxx.example.com.	10800	IN	CNAME	yyy.zzz.example.
 如果选择手动模式，则需要上传自己的 SSL 证书（通常是 `.crt` 或 `.pem` 文件）和 SSL 私钥（通常是 `.key` 文件），并在证书过期前自行续期及再次上传。
 SSL 证书通常可以在你的域名服务商处购买，你也可以自行申请免费的证书。
 Let's Encrypt 之外，比较知名的免费 SSL 证书提供商有 [ZeroSSL]、[buypass]、[TrustAsia]。
+
+如果设置完成后，显示绑定失败，并且有这个报错提示：
+
+```
+issueCert for {host}: Authorization not found in HTTP response from {host} ；
+```
+因为工信部规定，网站接入多个云服务商时，需要在各云服务商处接入备案。这个报错是缺少对应的云服务商备案所导致的（如果是华东区的应用，很可能是缺少腾讯云备案）；可以参考[域名备案指南](http://localhost:3888/docs/sdk/domain/icp/#%E6%8E%A5%E5%85%A5%E5%A4%87%E6%A1%88)进行备案操作；
 
 [let's encrypt]: https://letsencrypt.org/
 [zerossl]: https://zerossl.com/

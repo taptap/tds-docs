@@ -37,12 +37,12 @@ sidebar_position: 10
 
 ## TapPlay 是什么？
 
-​TapPlay 是利用沙盒技术实现的可以让用户直接通过 TapTap 玩游戏的功能服务，旨在帮助开发者实现低成本、高效率的游戏开发，并提高游戏分发的转化率
+TapPlay 是利用沙盒技术实现的可以让用户直接通过 TapTap 玩游戏的功能服务，旨在帮助开发者实现低成本、高效率的游戏开发，并提高游戏分发的转化率
 
 （以下省略）
 ```
 
-如果你了解 markdown 和 github 协作的一般流程，那么现在就可以开始给 TDS 文档贡献内容了。
+如果你了解 markdown 和 GitHub 协作的一般流程，那么现在就可以开始给 TDS 文档贡献内容了。
 期待你的第一个 [PR]！
 
 [PR]: https://docs.github.com/en/get-started/quickstart/github-flow
@@ -114,10 +114,10 @@ sidebar_position: 10
 索引完成后即可搜索整个仓库。
 
 还有一种方式是根据 URL 路径来查找文件。
-比如《学习社区模块》的 URL 是 `https://developer.taptap.com/docs/community/features/`.
-去掉网络协议（`https://`）、域名（`developer.taptap.com`）后，URL 路径为 `/docs/community/features/`，那么对应的文件路径即为 `/docs/community/features.mdx`。
+比如《学习社区模块》的 URL 是 `https://developer.taptap.cn/docs/community/features/`.
+去掉网络协议（`https://`）、域名（`developer.taptap.cn`）后，URL 路径为 `/docs/community/features/`，那么对应的文件路径即为 `/docs/community/features.mdx`。
 
-再比如，《开发者应对 DDoS 攻击问题的指引文档》的 URL 为 `https://developer.taptap.com/docs/ddos/`，所以对应的文件路径为 `/docs/ddos.mdx`。
+再比如，《开发者应对 DDoS 攻击问题的指引文档》的 URL 为 `https://developer.taptap.cn/docs/ddos/`，所以对应的文件路径为 `/docs/ddos.mdx`。
 
 注意，有部分不在侧边栏显示的、隐藏入口的页面的 URL 和文件路径并不对应，这种情况请通过搜索查找。
 还有一些文件的命名没有遵循和 URL 路径保持一致的原则，这些属于历史遗留问题，会逐渐切换到标准的命名方式。
@@ -192,7 +192,7 @@ sidebar_position: 10
 
 没问题的话，点绿色的 Create pull request 按钮进入 PR 表单。
 PR 标题 GitHub 会自动填写，如果不满意，可以修改一下。
-右方 Reviewer 选择 weakish 或 fuchenshi 或 kylinbin 或其他相关的同事，然后再点绿色的 Create pull request 按钮提交。
+右方 Reviewer 选择 fuchenshi 或 kylinbin 或其他相关的同事，然后再点绿色的 Create pull request 按钮提交。
 
 ![open a pull request](.contributing/img/open-a-pr.png)
 
@@ -232,7 +232,7 @@ PR 标题 GitHub 会自动填写，如果不满意，可以修改一下。
 点击「文件」图标，在左栏点击 `docs` 旁的箭头可展开文件夹，之后在鼠标悬浮到 EXPLORER 右侧的 `...` 的下方，会出现四个图标，点击最左侧的「New File」文件即可新增文件。
 
 默认配置下，文件名会成为 URL 的一部分，因此请使用小写英文字母、数字、连字符（`-`）。
-例如，在 `/docs/community/` 目录下新建 `features.mdx` 文件，那么发布后的 URL 会是 `https://developer.taptap.com/docs/community/features`。
+例如，在 `/docs/community/` 目录下新建 `features.mdx` 文件，那么发布后的 URL 会是 `https://developer.taptap.cn/docs/community/features`。
 
 MDX 文件开头的 [YAML] front matter 指定元信息，注意 YAML 区域上下分别用三个短横 `---` 隔开，其中用到的短横、冒号、引号都是英文半角标点。
 
@@ -277,7 +277,7 @@ sidebar_position: 10
 添加附件的过程和添加图片类似，把文件拖放到 `/static/files` 目录下，然后在 Markdown 文件中通过 `pathname:///files/FILENAME.EXT` 链接到文件，例如：
 
 ```markdown
-点击下载 [icon.zip](pathname:///files/taptap-login-button.zip)
+推荐位的 icon 设计：尺寸为**200*200**，设计上建议简洁明了，可以用游戏内的 UI/ 角色头像，如没有合适素材，可[点击这里](pathname:///files/recommends-icons.zip)获取 TapTap 默认素材包。
 ```
 
 注意：
