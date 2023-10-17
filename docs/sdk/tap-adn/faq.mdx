@@ -1,0 +1,98 @@
+---
+title: 常见问题
+sidebar_label: 常见问题
+sidebar_position: 4
+---
+
+import CodeBlock from "@theme/CodeBlock";
+import sdkVersions from "/src/docComponents/sdkVersions";
+import { Conditional } from "/src/docComponents/conditional";
+
+### 1、有展现量没有预估收益 /eCPM 波动大？
+
+独占接入 TapADN 广告，计费点如下：
+
+* 开屏广告：点击跳转 h5，在 h5 内下载；
+
+* 激励视频、banner、信息流：下载 apk；
+
+下载即计费，无下载的游戏无收益。
+
+一般展现量 5k 以上数据较为可靠，收益较低的游戏可尝试聚合接入。
+
+### 2、新建正式媒体找不到预约游戏
+
+可在上线前，建测试媒体和测试推广位，提前接好 SDK；
+
+上线后将媒体和广告位转为正式直接开启计费；
+
+### 3、聚合模式由于没有回传 oaid 无数据
+
+聚合接入（bidding 和瀑布流）必须回传 oaid，没有 oaid 的广告不参竞，建议回传 oaid，回传方式见[获取 oaid 并回传](#3获取-oaid-并回传强烈建议)。
+
+### 4、未上架 Tap 的媒体如何接入 TapADN？
+
+联系对接人，提供以下信息进行资质审核，平台方手动开户。
+
+（1）提交资质文件：营业执照、软著、ICP 证，若上述证件主体不一致，需提供授权书。
+
+（2）与财务确认是否可以开具广告费。
+
+（3）提供公司名称、统一社会信用代码、TapTap 用户 id 作为超管用户。
+
+### 5、如何获取 SHA1
+
+不同签名文件的 SHA1 值不同，可以参考下面三种获取 SHA1 值的方式：
+
+**一、无法获取 keystore 的情况，获取 SHA1 的方法（优先推荐）**
+
+**获取 SHA1 方法源码请：[点击跳转](https://lf6-ttcdn-tos.pstatp.com/obj/ad-tetris-site/AppSigning.java)**
+
+![源码](https://capacity-files.lcfile.com/bEe1uaMYUu54KM15Nx3GGbKnKKPFiNNG/157634260ac5d68ba1cd6a705bef285d.png)
+
+**二、通过 Eclipse 编译器获取**
+
+使用 adt 22 以上版本，可以在 Eclipse 中直接查看。
+
+Windows：依次在 Eclipse 中打开 Window -> Preferences -> Android -> Build
+
+Mac：依次在 Eclipse 中打开 Eclipse/ADT -> Preferences -> Android -> Build
+
+在弹出的 Build 对话框中 「SHA1 fingerprint」 中的值即为 Android 签名证书的 SHA1 值，如图所示：
+
+![Eclipse 页面](https://capacity-files.lcfile.com/KhIkBPGze6Y8yjnfAlcEdEBaUlckuUjB/22.png)
+
+**三、通过 keytool 即 jdk 自带工具获取**
+
+按照如下步骤进行操作：
+
+1、运行，进入控制台
+
+![cmd](https://capacity-files.lcfile.com/WwtnCLs9omH3Rhv9kV1wPIcc3YECO1FE/cmd.png)
+
+2、 在控制台窗口中输入 `cd .android` ，然后定位到 `.android` 文件夹
+
+![cmd_exe](https://capacity-files.lcfile.com/jXjKy7NlKGKwA5uEklQzjjf74urX6Oz6/cmd_exe.png)
+
+3、继续在控制台输入命令。
+
+debug.keystore：命令为：
+```
+keytool -list -v -keystore debug.keystore
+```
+自定义的 keystore：命令为：
+```
+keytool -list -v -keystore apk 的 keystore
+```
+如图所示：
+
+![keytool](https://capacity-files.lcfile.com/XzDOuLRMMBB84XBI5uAfwvccpwO39oAg/keytool.png)
+
+提示输入密钥库密码，编译器提供的 debug keystore 默认密码是 Android，请自行填写自定义签名文件的密码。
+
+输入密钥后回车（如果没设置密码，可直接回车），此时可在控制台显示的信息中获取 SHA1 值，keystore 文件为 Android 签名证书文件。
+
+如下图所示：
+
+![SHA1 值](https://capacity-files.lcfile.com/YwQKTQjoj7ooJ2eADXfmfWRJyH6J43XV/333.png)
+
