@@ -39,6 +39,32 @@ import AndroidFaq from "../_partials/android-package-visibility.mdx";
 
 </MultiLang>
 
+<details>
+
+<summary>点击展开 Unity 2022.3 之前的版本升级 Gradle 版本</summary>
+
+为了将 [Gradle 版本和 Android Gradle Plugin 版本对应](https://developer.android.com/studio/releases/gradle-plugin#expandable-1)，需要更新 Gradle 版本，下载 [6.7.1 版本的 Gradle](https://services.gradle.org/distributions/gradle-6.7.1-bin.zip)，解压后放到自定义的文件夹中，同时**不**勾选 Unity 中的 `Preferences` -> `External Tools`-> `Android` -> `Gradle Installed with Unity(recommend)`，改为选择解压后 Gradle 文件夹的位置，如 <some path\>/gradle-6.7.1。
+
+另外， Unity 更新唤醒模块会**自动**更新项目中使用的 Android Gradle Plugin 版本，如果您需要手动更改或者查看，可以在 `Project Settings` -> `Player` -> `Android Tab` -> `Publish Settings` -> `Build`，然后勾选**Custom Base Gradle Template**
+
+将以下更改应用于生成的这个文件:
+**Assets/Plugins/Android/baseProjectTemplate.gradle**
+
+修改文件内容:
+
+```groovy
+dependencies {
+    // If you are changing the Android Gradle Plugin version, make sure it is compatible with the Gradle version preinstalled with Unity
+    // See which Gradle version is preinstalled with Unity here https://docs.unity3d.com/Manual/android-gradle-overview.html
+    // See official Gradle and Android Gradle Plugin compatibility table here https://developer.android.com/studio/releases/gradle-plugin#updating-gradle
+    // To specify a custom Gradle version in Unity, go do "Preferences > External Tools", uncheck "Gradle Installed with Unity (recommended)" and specify a path to a custom Gradle version
+    // highlight-start
+    // 将版本修改至少为 4.2.0
+    classpath 'com.android.tools.build:gradle:4.2.0'
+}
+```
+
+</details>
 
 ## SDK 获取
 
@@ -55,6 +81,7 @@ SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选�
     "com.taptap.tds.update":"https://github.com/TapTap/Tapupdate-Unity.git#${sdkVersions.taptap.unity}",
     "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
     "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
+    "com.tapsdk.androiddependencyresolver": "https://github.com/TapTap/Android_Dependency_Resolver#${sdkVersions.taptap.adr}",
 }`}
 </CodeBlock>
 
@@ -103,7 +130,7 @@ dependencies {
 ```cs
 using TapTap.Update
 
-TapTap.Update.TapUpdate.UpdateGame((result) => {
+TapTap.Update.TapUpdate.UpdateGame(() => {
   // 取消更新的事件
 });
 ```
@@ -519,3 +546,9 @@ public class TapGameUtil {
 ```
 
 </details>
+
+### Unity 唤醒更新会增加哪些 Android 依赖库
+首先 Unity 唤醒更新只会在 **Android** 平台生效，其次唤醒更新新加的依赖库会在打包过程中自动添加到 [Unity Gradle Template](https://docs.unity3d.com/Manual/gradle-templates.html) 中，您可以到 `唤醒更新模块/Mobile/Editor/TapTapUpdateDependencies.xml` 中查看到，具体来说会增加 3 个依赖库：
+1. com.squareup.okhttp3:okhttp:3.12.1
+2. androidx.core:core:1.6.0
+3. com.google.android.flexbox:flexbox:3.0.0
