@@ -45,6 +45,8 @@ flowchart LR
 
 A _version_ will be created by the end of the build process. It contains the source code of your project, the dependencies downloaded, and the executable files generated (for certain runtime environments). Each version has an ID like `20210913-150821`, which is unique in the application.
 
+### Build Cache
+
 Cloud Engine uses layered cache to accelerate the build process. This means that if the operation needed for a step is not changed, the operation will not be executed and the result (cache) from the previous execution will be used. If the operation is changed, all the steps since this step will be executed again. For example, if the dependency list (like `package.json`) is not changed, Cloud Engine will not reinstall dependencies for your project but will use the result from the previous installation, which reduces the time spent on the build process.
 
 :::caution
@@ -55,6 +57,14 @@ The caching mechanism for the build process doesn’t guarantee that the cache w
 If you specify a scope for the versions of the dependencies of your application and you use the same dependency list when you deploy your application for a second time, the dependencies installed for the previous version will be reused even if there are new versions released for the dependencies (and these versions are still within the scope).
 To force Cloud Engine to install the latest versions of the dependencies within the scope, you can disable the cache with the `--no-cache` option.
 :::
+
+### Resource Limits
+
+The **build process** is provided with following resources:
+
+- **2 CPU cores** CPU utilization is up to 200%
+- **30 minutes of CPU time** the build command will be terminated when used too much CPU time.
+- **4 GB memory** if memory consumption reaches the limit, you may see errors like "Out of memory" or "memory allocation error". In this case, try to change your build command to use less memory, like limiting compiler processes running concurrently.
 
 ## Instances and Deployment
 
