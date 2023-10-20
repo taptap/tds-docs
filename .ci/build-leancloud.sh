@@ -23,6 +23,7 @@ cp -r docs/sdk/leaderboard tmp/zh-Hans # 排行榜
 rm tmp/zh-Hans/storage/features.mdx # 数据存储/功能介绍
 rm -r tmp/zh-Hans/engine/game # 云引擎/游戏后端
 rm tmp/zh-Hans/leaderboard/guide.mdx # 排行榜-开发指南
+rm tmp/zh-Hans/leaderboard/faq.mdx # 排行榜-常见问题
 
 # 英文部分
 cp -r i18n/en/docusaurus-plugin-content-docs/current/sdk/_partials tmp/en
@@ -43,7 +44,6 @@ cp -r .ci/leancloud/zh-Hans/sdk/storage tmp/zh-Hans # 数据存储（LeanCloud �
 cp -r .ci/leancloud/zh-Hans/sdk/sms tmp/zh-Hans # 短信
 cp -r .ci/leancloud/zh-Hans/sdk/push tmp/zh-Hans # Flutter 推送
 cp -r .ci/leancloud/zh-Hans/sdk/im tmp/zh-Hans # 即时通讯
-cp -r .ci/leancloud/zh-Hans/sdk/multiplayer tmp/zh-Hans # 对战
 cp -r .ci/leancloud/zh-Hans/sdk/leaderboard tmp/zh-Hans # 排行榜
 cp -r .ci/leancloud/zh-Hans/sdk/other tmp/zh-Hans # 其他
 

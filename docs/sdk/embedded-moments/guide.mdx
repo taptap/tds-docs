@@ -19,7 +19,7 @@ import Languages from "../_partials/languages.mdx";
 <>
 
 - Unity 2019.4 或更高版本
-- iOS 10 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
+- iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
 - Android 5.0（API level 21）或更高版本
 
 </>
@@ -32,7 +32,7 @@ Android 5.0（API level 21）或更高版本
 
 <>
 
-iOS 10 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
+iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
 
 </>
 
@@ -199,6 +199,34 @@ FTapMoment::FetchNotification();
 
 :::
 
+## 设置默认屏幕方向
+
+在游戏中显示动态页面时，如果游戏屏幕方向始终保持不变，开发者可调用如下接口设置动态默认展示的屏幕方向。
+
+<MultiLang kind="ue">
+
+```cs
+TapMoment.SetDefaultOrientation(Orientation.ORIENTATION_LANDSCAPE);
+```
+
+```java
+TapMoment.setDefaultOrientation(TapMoment.ORIENTATION_PORTRAIT);
+```
+
+```objectivec
+TapMomentConfig *mConfig = TapMomentConfig.new;
+mConfig.orientation = TapMomentOrientationDefault;
+[TapMoment setDefaultConfig:mConfig];
+```
+
+
+```cpp
+//暂不支持
+```
+</MultiLang>
+
+设置方向后，后续打开动态页面接口可选择使用该方向。
+
 ## 显示动态页面
 
 在游戏中显示 TapTap 动态页面，在这个页面，玩家不仅可以查看动态，还能发布新动态。
@@ -206,20 +234,30 @@ FTapMoment::FetchNotification();
 <MultiLang kind="ue">
 
 ```cs
+//使用指定屏幕方向
 TapMoment.Open(Orientation.ORIENTATION_LANDSCAPE);
+//使用默认方向
+TapMoment.Open();
 ```
 
 ```java
+//使用指定屏幕方向
 TapMoment.open(TapMoment.ORIENTATION_PORTRAIT);
+//使用默认方向
+TapMoment.open();
 ```
 
 ```objectivec
+//使用指定屏幕方向
 TapMomentConfig *mConfig = TapMomentConfig.new;
 mConfig.orientation = TapMomentOrientationDefault;
 [TapMoment open:mConfig];
+//使用默认方向
+[TapMoment open];
 ```
 
 ```cpp
+//使用指定屏幕方向
 FTapMoment::Open(ETapMomentOrientation::PORTRAIT);
 ```
 
@@ -248,16 +286,19 @@ FTapMoment::Open(ETapMomentOrientation::PORTRAIT);
 <>
 
 ```cs
-var sceneDic = new Dictionary<string, object>() { { TapMomentConstants.TapMomentPageShortCutKey, sceneId } };
 // sceneId 为开发者中心后台创建场景化入口后生成的「入口 ID」
+var sceneDic = new Dictionary<string, object>() { { TapMomentConstants.TapMomentPageShortCutKey, sceneId } };
+//使用指定屏幕方向
 TapMoment.DirectlyOpen(Orientation.ORIENTATION_DEFAULT, TapMomentConstants.TapMomentPageShortCut, sceneDic);
+// 使用默认屏幕方向
+TapMoment.DirectlyOpen(TapMomentConstants.TapMomentPageShortCut, sceneDic);
 ```
 
 #### 参数说明
 
 | 参数        | 说明                                                                                 |
 | ----------- | ------------------------------------------------------------------------------------ |
-| orientation | 打开方向                                                                             |
+| orientation | 打开方向                                                                              |
 | page        | 固定为 TapMomentConstants.TapMomentPageShortCut                                      |
 | Dictionary  | 其中 TapMomentConstants.TapMomentPageShortCutKey 固定，第三个参数为需要跳转的页面 id |
 
@@ -268,8 +309,12 @@ TapMoment.DirectlyOpen(Orientation.ORIENTATION_DEFAULT, TapMomentConstants.TapMo
 Map<String, String> extras = new HashMap<>();
 // 注意：这里的 key 是固定的，"scene_id"；第二个参数是开发者中心后台创建场景化入口后生成的「入口 ID」
 extras.put("scene_id", "xxxx");
-// 注意：第二个参数固定为 "tap://moment/scene/"
+// 使用指定屏幕方向，注意：第二个参数固定为 "tap://moment/scene/"
 TapMoment.directlyOpen(TapMoment.ORIENTATION_DEFAULT,"tap://moment/scene/", extras);
+
+//使用设置的默认方向
+TapMoment.directlyOpen("tap://moment/scene/", extras);
+
 ```
 
 #### 参数说明
@@ -286,7 +331,10 @@ TapMoment.directlyOpen(TapMoment.ORIENTATION_DEFAULT,"tap://moment/scene/", extr
 ```objectivec
 TapMomentConfig *mConfig = TapMomentConfig.new;
 mConfig.orientation = TapMomentOrientationDefault;
+//使用指定方向
 [TapMoment directlyOpen:mConfig page:TapMomentPageShortcut extras:@{ TapMomentPageShortcutKey: @"sceneid" }];
+//使用设置的默认屏幕方向
+[TapMoment directlyOpen:TapMomentPageShortcut extras:@{ TapMomentPageShortcutKey: @"sceneid" }];
 ```
 
 #### 参数说明
@@ -413,14 +461,20 @@ FTapMoment::Close();
 ```cs
 string content = "我是描述";
 string[] images = {"imgpath01","imgpath02","imgpath03"};
+//使用指定屏幕方向
 TapMoment.Publish(Orientation.ORIENTATION_LANDSCAPE, images, content);
+//使用默认方向
+TapMoment.Publish(images, content);
 ```
 
 ```java
 int orientation = TapMoment.ORIENTATION_PORTRAIT;
 String content = "描述";
 String[] imagePaths = new String[]{"content://hello.jpg", "/sdcard/world.jpg"};
+//使用指定屏幕方向
 TapMoment.publish(orientation, imagePaths, content);
+//使用默认方向
+TapMoment.publish(imagePaths, content);
 ```
 
 ```objectivec
@@ -430,7 +484,10 @@ tconfig.orientation = TapMomentOrientationDefault;
 TapMomentImageData *postData = TapMomentImageData.new;
 postData.images = @[@"file://..."];
 postData.content = @"我是图片描述";
+//使用指定屏幕方向
 [TapMoment publish:tconfig content:(postData)];
+//使用默认方向
+[TapMoment publish:(postData)];
 ```
 
 ```cpp
@@ -490,6 +547,8 @@ dependencies {
   {`// 基础库
 TapCommonSDK.framework
 TapLoginSDK.framework
+TapCommonResource.bundle
+TapLoginResource.bundle
 // 内嵌动态
 TapMomentResource.bundle
 TapMomentSDK.framework

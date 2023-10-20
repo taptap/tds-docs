@@ -1,0 +1,909 @@
+---
+title: Multiplayer Development Guide - JavaScript
+sidebar_label: JavaScript
+sidebar_position: 1
+---
+
+import { Conditional } from "/src/docComponents/conditional";
+
+## Preface
+
+Multiplayer is a JavaScript game SDK that provides a complete client-side SDK solution for online games with strong networking requirements, thus eliminating the need for development teams to build their own servers and saving most of the development and maintenance costs. The main features provided by Multiplayer are as follows:
+
+- Getting room list
+- Creating a room
+- Joining a room
+- Randomly joining a (eligible) room
+- Getting players in a room
+- Getting, setting, and synchronizing room properties
+- Getting, setting, and synchronizing player properties
+- Sending and receiving custom events
+- Leaving a room
+
+## SDK Import
+
+Please read [Installation Guide](/sdk/multiplayer/start/js/#installation) to get the JS library files.
+
+## Initialisation
+
+First of all, you need to introduce common types and constants in the SDK.
+
+```javascript
+const {
+  // SDK
+  Client,
+  // Play SDK Event Constants
+  Event,
+  // event receiver group
+  ReceiverGroup,
+  // Creating Room Signs
+  CreateRoomFlag,
+} = Play;
+```
+
+Note: Cocos Creator can't load `Play` into global variables properly when building `WeChatGame` project, so you need to import `Play` module first.
+
+```javascript
+const Play = require("./play");
+```
+
+Next we need to instantiate a client object for the Multiplayer SDK.
+
+<Conditional brand="leancloud">
+
+```javascript
+const client = new Client({
+  // Setting the APP ID
+  appId: "your-app-id",
+  // Setting the APP Key
+  appKey: "your-app-key",
+  // Setting up the Server (replace xxx.example.com with the custom API domain name your app is bound to)
+  playServer: 'https://xxx.example.com',
+  // Setting the user id
+  userId: 'tarara',
+  // Set game version number (optional, default 0.0.1)
+  gameVersion: '0.0.1'
+});
+```
+
+</Conditional>
+
+<Conditional brand="tds">
+
+```js
+const client = new Client({
+  appId: 'your-client-id',                // the game's Client ID
+  appKey: 'your-client-token',            // the game's Client Token
+  playServer: 'https://your_server_url',  // the game's API domain name
+  userId: 'tarara',                       // set user id
+  gameVersion: '0.0.1'  // Set the game version, optional, default 0.0.1, players with different versions will not be matched in the same room.
+});
+```
+
+- The `Client ID` and `Client Token` of the game can be viewed at **Developer Centre > Your Games > Game Services > Application Configuration**.
+- The API domain name is viewable at **Application Configuration > Domain Configuration > API**. Refer to the documentation for [domain name](/sdk/domain/guide/) for more information.
+
+</Conditional>
+
+Here
+`userId` serves as a unique identifier for the client connecting to the server.
+Note that this `userId` has the following restrictions:
+
+- Only letters, numbers, and underscores are allowed
+- Cannot exceed 32 characters in length
+- Globally unique within an application
+
+`gameVersion` indicates the version number of the client, which can be used to route to different game servers if multiple versions of the game are allowed to co-exist.
+
+## Connection
+
+### Establishing a connection
+
+Connect the current player to the Multiplayer service with the following code:
+
+```javascript
+client
+  .connect()
+  .then(() => {
+    // Connection successful
+  })
+  .catch((error) => {
+    // connection failure
+    console.error(error.code, error.detail);
+  });
+```
+
+## Lobby
+
+We recommend that you **don't add players to the lobby**, because in the lobby, the server will constantly send out the latest full list of rooms, and players will choose one of the rooms to play by themselves, which is not only unfriendly to the player experience, but also brings a lot of bandwidth pressure.
+We recommend you to **use [Room Matching](#room-matching) like most of the mobile games nowadays to quickly match players and let them start the game**.
+
+If you have a special game scenario where you need to get the room list, you can call the following method:
+
+```javascript
+client
+  .joinLobby()
+  .then(() => {
+    // Join Lobby Successfully
+  })
+  .catch((error) => {
+    // Failed to join the lobby
+    console.error(error.code, error.detail);
+  });
+```
+
+When a player joins the lobby, the server sends the list of rooms in the current lobby to the client, and the developer can view the list of rooms or join a room to join the game as needed.
+
+```javascript
+client.on(Event.LOBBY_ROOM_LIST_UPDATED, () => {
+  const roomList = client.lobbyRoomList;
+   // TODO can do the logic for displaying the list of rooms.
+});
+```
+
+For more on `LobbyRoom`, see [API documentation](https://leancloud.github.io/Play-SDK-JS/doc/LobbyRoom.html).
+
+### Related events
+
+| Event | Parameter | Description |
+| ----------------------- | ---- | ---------------- |
+| LOBBY_ROOM_LIST_UPDATED | None | Lobby Room List Update |
+
+## Room Matching
+
+A room is a unit that generates "combat interactions" between players. For example, the card table of Landlord, the copy of MMO, the battle of WeChat game, etc., all belong to the category of room in a broad sense.
+The combat interactions between players are all done in the room. Therefore, how players enter a room is the key to room matching. Below we will analyse the commonly used "Room Matching" function from the aspects of "Create Room" and "Join Room".
+
+### Creating a Room
+
+We can create a room simply like this. The player who creates the room is the room owner ([MasterClient](#masterclient)), and when the owner creates a room successfully, he/she also joins the room.
+
+```javascript
+client
+  .createRoom()
+  .then(() => {
+    // Successful room creation also means that you have successfully joined the room.
+  })
+  .catch((error) => {
+    // Failed to create room
+    console.error(error.code, error.detail);
+  });
+```
+
+We can also create a room that sets the relevant information.
+
+```javascript
+// Room customisation properties
+const props = {
+  title: "room title",
+  level: 2,
+};
+const options = {
+  // The room is not visible
+  visible: false,
+  // Retention time after room emptying, in seconds
+  emptyRoomTtl: 300,
+  // Maximum number of players allowed
+  maxPlayerCount: 2,
+  // The amount of time, in seconds, that the player's data is retained after the player goes offline.
+  playerTtl: 300,
+  customRoomProperties: props,
+  // Custom attribute key for room matching, i.e. room matching condition is level = 2
+  customRoomPropertyKeysForLobby: ["level"],
+  // Setting permissions on the MasterClient
+  flag:
+    CreateRoomFlag.MasterSetMaster | CreateRoomFlag.MasterUpdateRoomProperties,
+};
+const expectedUserIds = ["world"];
+client
+  .createRoom({
+    roomName,
+    roomOptions: options,
+    expectedUserIds: expectedUserIds,
+  })
+  .then(() => {
+   // Successful room creation also means that you have successfully joined the room.
+  })
+  .catch((error) => {
+    console.error(error.code, error.detail);
+  });
+```
+
+The parameters `roomName`, `roomOptions` and `expectedUserIds` are optional.
+
+#### roomName
+
+The room name must be unique; if it is not set, the server generates a unique room id and returns it.
+
+#### roomOptions
+
+Specified parameters when creating a room, including:
+
+- `Opened`: whether the room is open or not. If set to false, no other players are allowed to join.
+- `Visible`: whether the room is visible. If set to false, it will not appear in the lobby's room list, but other players can join the room by specifying the room name.
+- `EmptyRoomTtl`: how long (in seconds) the room will be kept when there are no players in the room. Default is 0, i.e. the room data will be destroyed immediately when there are no players in the room. Maximum value is 300, i.e. 5 minutes.
+- `PlayerTtl`: the time (in seconds) to keep the player's data in the room when the player drops out. Default is 0, i.e. player data is destroyed immediately after the player drops out. Maximum value is 300, i.e. 5 minutes.
+- `MaxPlayerCount`: the maximum number of players allowed in the room.
+- `CustomRoomProperties`: custom properties for the room.
+- `CustomRoomPropertyKeysForLobby`: an array of keys in `CustomRoomProperties`. The properties contained in `CustomRoomPropertyKeysForLobby` will appear in the lobby's room Properties (`client.LobbyRoomList`), and the full set of properties can be viewed in `room.CustomProperties` after joining the room. These properties will be used when matching rooms.
+- `Flag`: flag bit for room creation. See [MasterClient drop without transfer](#masterclient-drop-transfer), [Specify other member as MasterClient](#specify-other-members-as-masterclient), and [Allow only MasterClient to modify room properties](#allow-only-masterclient-to-modify-room-properties) below for more details.
+
+#### expectedUserIds
+
+An array of specified player IDs. This parameter is mainly used to "reserve space" for certain players who can join the room.
+
+Note: These "specific players" will not actually join the room. There will only be space in the room reserved for those "specific players" to join. If you want to invite players to join a room, you need to send the room name to your friends through other channels, such as IM, WeChat, etc., and then your friends will join the room through the `JoinRoom(roomName)` interface.
+
+For more information about `CreateRoom`, please refer to [API Documentation](https://leancloud.github.io/Play-SDK-JS/doc/Client.html#createRoom).
+
+### Joining a room
+
+When a room is created, other players can participate in the game by "joining the room".
+
+#### Join the designated room
+
+You can join a room by specifying the room name.
+
+```javascript
+// Players are joining the 'LiLeiRoom' room.
+client
+  .joinRoom("LiLeiRoom")
+  .then(() => {
+    // Join the room successfully
+  })
+  .catch((error) => {
+    // Failed to join room
+    console.error(error.code, error.detail);
+  });
+```
+
+When joining a room, you can also take up space for other players. If the remaining empty space in the room is less than the number of occupied spaces, you will fail to join the room.
+
+```javascript
+const expectedUserIds = ["LiLei", "Jim"];
+// Players are joining the 'game' room and taking up space for the hello and world players.
+client
+  .joinRoom("game", {
+    expectedUserIds,
+  })
+  .then(() => {
+    // Join the room successfully
+  })
+  .catch((error) => {
+    // Failed to join room
+    console.error(error.code, error.detail);
+  });
+```
+
+For more on `joinRoom`, see [API documentation](https://leancloud.github.io/Play-SDK-JS/doc/Client.html#joinRoom).
+
+#### Randomly joining rooms
+
+Sometimes, instead of joining a specific room, we can randomly join "rooms that meet certain conditions" (or even no conditions), such as quick start, quick match, etc. In this case, we can randomly join rooms by calling the `joinRandomRoom` method.
+
+```javascript
+client
+  .joinRandomRoom()
+  .then(() => {
+    // Join the room successfully
+  })
+  .catch((error) => {
+    // Failed to join room
+    console.error(error.code, error.detail);
+  });
+```
+
+It is also possible to set "conditions" for random joining, such as randomly joining a room with level = 2.
+
+```javascript
+// Set the match attribute
+const matchProps = {
+  level: 2,
+};
+client
+  .joinRandomRoom({
+    matchProperties: matchProps,
+  })
+  .then(() => {
+    // Join the room successfully
+  })
+  .catch((error) => {
+   // Failed to join room
+    console.error(error.code, error.detail);
+  });
+```
+
+### Join or create a specific room
+
+Many games don't have scenarios that force a designated room owner. As long as a number of players can play in the same room, it is fine for anyone to be the owner. We can use `joinOrCreateRoom()` to achieve this. This method will join the current player directly to the room if there is a relevant room, or create a new room if there isn't such a room.
+
+```javascript
+// For example, if 4 players join a room with the name "room1" at the same time, if it doesn't exist, then create and join the room with the name "room1".
+client
+  .joinOrCreateRoom("room1")
+  .then(() => {
+    // Join or create a room successfully
+  })
+  .catch((error) => {
+    // Failed to join a room and did not successfully create a room
+    console.error(error.code, error.detail);
+  });
+```
+
+For more on `joinOrCreateRoom`, see the [API documentation](https://leancloud.github.io/Play-SDK-JS/doc/Client.html#joinOrCreateRoom).
+
+### New player join event
+
+For players who are already in the room, when a new player joins the room, the server will send the `PLAYER_ROOM_JOINED` event to notify the client, and the client can use the properties of the new player to do some display logic.
+
+```javascript
+// Register new players to join the event
+client.on(Event.PLAYER_ROOM_JOINED, ({ newPlayer }) => {
+  // TODO New Player Joining Logic
+});
+```
+
+You can get all the players in the room by `client.room.playerList`.
+
+### Determining local players
+
+Once you have all the players in the room, you can determine if a `Player` is the current local player.
+
+```javascript
+const players = client.room.playerList;
+const player = players[0];
+const isLocal = player.isLocal;
+```
+
+### Leaving a room
+
+The following interface can be called when the player wants to proactively leave the room.
+
+```javascript
+client
+  .leaveRoom()
+  .then(() => {
+    // Leaving the room successfully allows you to execute logic such as jumping scenes
+  })
+  .catch((error) => {
+    console.error(error.code, error.detail);
+  });
+```
+
+Other players in the room will receive the `PLAYER_ROOM_LEFT` event.
+
+```javascript
+// Registering a player leaving the room event
+client.on(Event.PLAYER_ROOM_LEFT, ({ leftPlayer }) => {
+  // TODO Can perform the destruction of the player's departure
+});
+```
+
+### Related events
+
+| Event | Parameter | Description |
+| ------------------ | -------------- | -------------- |
+| PLAYER_ROOM_JOINED | { newPlayer } | A new player joined the room |
+| PLAYER_ROOM_LEFT | { leftPlayer } | A player left the room |
+
+## MasterClient
+
+The room creator will become the MasterClient by default in the Multiplayer service. They can close the room, set the room to be invisible, kick people, and so on. Their device is also responsible for "logical operations". For example, it can be responsible for the following scenarios in the game:
+
+- Dealing cards for users in card games;
+- Controlling the timing and logic of killing monsters;
+- Judging the winner at the end of the game;
+- ...and so on.
+
+### MasterClient located on the player's client
+
+You can write the MasterClient logic in the client, and the player terminal ofthe room creator will take care of the game operations. In this case, Multiplayer provide the following convenient features for MasterClient:
+
+#### MasterClient Drop Transfer
+
+When a MasterClient is dropped, the Multiplayer service assigns a new player client as the MasterClient. Even if the original MasterClient comes back online, it does not become the new MasterClient. When the MasterClient is changed, the SDK dispatches the `MASTER_SWITCHED` event to notify the client when the MasterClient changes.
+
+```javascript
+// Registering for host switching events
+client.on(Event.MASTER_SWITCHED, ({ newMaster }) => {
+  // TODO can do host switching display
+
+  // You can determine whether to perform logical processing based on determining whether the current client is a Master.
+  if (client.player.isMaster) {
+  }
+});
+```
+
+#### Related Events
+
+| Event | Parameter | Description |
+| --------------- | ------------- | ----------- |
+| MASTER_SWITCHED | { newMaster } | Master changed |
+
+#### Specify other members as MasterClient
+
+During the game, if the MasterClient does not want to take the computing function anymore, it can call the following method to actively transfer its role to other player clients:
+
+```javascript
+// Assign MasterClient by Player Id
+client
+  .setMaster(otherActorId)
+  .then(() => {
+    // The value here is false
+    console.log(client.player.isMaster);
+  })
+  .catch(console.error);
+```
+
+After transferring the MasterClient identity, all players in the room receive the `MASTER_SWITCHED` event.
+
+### MasterClient on the server
+
+In order to ensure game security and prevent users from cheating, we recommend that you host your MasterClient in the Client Engine provided by TDS and configure the following permissions:
+
+#### MasterClient will not be transferred when it drops
+
+After placing the MasterClient on the server, the MasterClient role should not be transferred even if it unexpectedly drops out of the game, in which case you need to specify the `FixedMaster` flag when creating a room:
+
+```js
+client.createRoom({
+  roomOptions: {
+    flag: CreateRoomFlag.FixedMaster,
+  },
+});
+```
+
+### MasterClient operation
+
+#### Set whether a room is open or not
+
+MasterClient can set whether a room is open or not, so that other players are not allowed to join when the room is closed.
+
+```javascript
+// Setting the room to close
+client
+  .setRoomOpen(false)
+  .then(() => {
+    console.log(client.room.open);
+  })
+  .catch((error) => {
+    console.error(error.code, error.detail);
+  });
+```
+
+#### Setting whether a room is visible or not
+
+MasterClient can set whether a room is visible or not. When the room is not visible, this room will not appear in the player's lobby room list, but **other players can join by specifying roomName**.
+
+```javascript
+// Setting the room invisible
+client
+  .setRoomVisible(false)
+  .then(() => {
+    console.log(client.room.visible);
+  })
+  .catch((error) => {
+    console.error(error.code, error.detail);
+  });
+```
+
+#### Kicking people
+
+MasterClient can kick other players in a room out of the room:
+
+```javascript
+// You can pass in an Object object, which only supports the code and msg keys.
+var info = { code: 1, msg: "You've been kicked out of your room." };
+client.kickPlayer(otherPlayer.actorId, info).then(() => {
+  console.log("Successfully kicked out of the room");
+});
+```
+
+After being kicked out of a room, the kicked player receives the `ROOM_KICKED` event.
+
+```javascript
+client.on(Event.ROOM_KICKED, ({ code, msg }) => {
+  // code and msg are what the MasterClient passes when it kicks someone.
+});
+```
+
+At the same time, players other than the MasterClient who still have a room will receive the `PLAYER_ROOM_LEFT` event:
+
+```javascript
+client.on(Event.PLAYER_ROOM_LEFT, ({ leftPlayer }) => {});
+```
+
+## Custom Attributes and Synchronisation
+
+In order to meet the different game requirements of developers, the Online Battle SDK allows developers to set "custom properties". The custom property interface parameters are defined as JavaScript `Object` types, and the supported data types include:
+
+- Boolean
+- Number
+- String
+- Object
+- Array
+
+The main functions of custom property synchronization include:
+
+- Keeping the data consistent among multiple clients.
+- Custom attributes are managed by the server. When a player enters a room, all custom attributes will be available.
+
+Custom attributes are divided into "Room Custom Attributes" and "Player Custom Attributes".
+
+### Room Custom Attributes
+
+You can set a `Object` type custom attribute for a room, such as the number of rounds in a battle, all the pieces in a room, and so on.
+
+```javascript
+// Set the custom properties you want to modify
+const props = {
+  gold: 1000,
+};
+// Set the gold property to 1000
+client.room
+  .setCustomProperties(props)
+  .then(() => {
+    var newProperties = client.room.customProperties;
+  })
+  .catch(console.error);
+```
+
+Note: This interface does not directly set the `Memory values of custom properties in the client`, but rather sends a message to modify the custom properties, with the server making the final determination of whether to do so or not.
+
+When a room property is changed, the SDK will dispatch the `ROOM_CUSTOM_PROPERTIES_CHANGED` event to notify all player clients (including itself).
+
+```javascript
+// Registering room property change events
+client.on(Event.ROOM_CUSTOM_PROPERTIES_CHANGED, ({ changedProps }) => {
+  // The full properties of the room can be obtained from this method
+  const properties = client.room.customProperties;
+  const gold = properties.gold;
+  // TODO can do the interface display of attribute changes.
+});
+```
+
+Note: The `changedProps` parameter only indicates incrementally changed parameters, not `all properties`. To get all properties, please get them via `client.room.customProperties`.
+
+#### Allow only MasterClient to modify room properties
+
+By default, all clients in a room can modify the room's custom properties. If you want to allow only the MasterClient to do so, you can specify the `MasterUpdateRoomProperties` flag when creating the room:
+
+```js
+client
+  .createRoom({
+    roomOptions: {
+      flag: CreateRoomFlag.MasterUpdateRoomProperties,
+    },
+  })
+  .then(() => {
+    // Room Creation Successful
+  })
+  .catch(console.error);
+```
+
+### Player custom attributes
+
+Player custom attributes are essentially the same as [room custom attributes](#room-custom-attributes).
+
+```javascript
+// Poker Objects
+const poker = {
+  // design and colour
+  flower: 1,
+  // numerical value
+  num: 13,
+};
+const props = {
+  nickname: "Li Lei",
+  gold: 1000,
+  poker: poker,
+};
+// Request to set player attributes
+client.player
+  .setCustomProperties(props)
+  .then(() => {
+    // Setting properties succeeded
+  })
+  .catch(console.error);
+```
+
+Any player in the room (including yourself) who modifies their custom attributes triggers the Player Custom Attribute Change event:
+
+```javascript
+// Registering for player-defined attribute change events
+client.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, ({ player }) => {
+  // Get all custom attributes of the player
+  const props = player.customProperties;
+  const { title, gold } = props;
+  // TODO You can do an interface display of property changes
+});
+```
+
+### CAS
+
+CAS stands for Compare And Swap, which means check and update, and is used to avoid some concurrency problems.
+
+When `SetCustomProperties` is called, the server receives all the values submitted by the client, which is not enough for some scenarios.
+
+For example, a property holds the holder of an item in this room, i.e. the key of the property is the item and the value is the holder.
+Any client can set this property at any time, and if multiple clients call it at the same time, **the server will take the last call received as the final value**, which is usually illogical. Usually the item should belong to the first person who got it.
+
+`SetCustomProperties` has an optional parameter `expectedValues` that can be used as a judgement condition. The server will only update properties that currently match `expectedValues`. Updates with expired `expectedValues` will be ignored.
+
+Suppose there are 10 players in a room, but there is only 1 Tulong Knife, and the Tulong Knife can only be won by the first person who "grabs it".
+
+We can set the `tulong` value in `expectedValues`:
+
+```javascript
+const props = {
+  tulong: X, // X denotes the current client, respectively
+};
+const expectedValues = {
+  tulong: null, // Current owner of the Dragon Slayer
+};
+client.room
+  .setCustomProperties(props, { expectedValues })
+  .then(() => {})
+  .catch(console.error);
+```
+
+This way, after the first player gets the Tulong Knife, `tulong` corresponds to the value of first player, and subsequent requests with (`const expectedValues = { tulong: null }`) will fail.
+
+### Related events
+
+| Events | Parameters | Description |
+| -------------------------------- | ------------------------ | ------------------ |
+| ROOM_CUSTOM_PROPERTIES_CHANGED | { changedProps } | Room custom property is changed |
+| PLAYER_CUSTOM_PROPERTIES_CHANGED | { player, changedProps } | Player custom property is changed  |
+
+## Custom events
+
+In [Custom Properties](#custom-attributes-and-synchronisation), we introduced how to customize the game's data structures and data types based on the game's requirements.
+However, data by itself is not enough. To allow different parties to communicate, custom events are also needed.
+
+### Sending custom events
+
+We can send various events through custom events, such as game start, card capture, release X skill, game end, etc.
+
+```javascript
+const options = {
+  // Set the receiving group of the event to MasterClient
+  receiverGroup: ReceiverGroup.MasterClient,
+  // You can also specify the recipient actorId
+  // options.targetActorIds: [1],
+};
+// Setting Skill Id
+const eventData = {
+  skillId: 123,
+};
+
+// Set Event Id
+const SKILL_EVENT_ID = 1;
+// Send custom events
+client
+  .sendEvent(SKILL_EVENT_ID, eventData, options)
+  .then(() => {})
+  .catch(console.error);
+```
+
+The `options` are the event sending parameters, including the receiving group and the receiver ID array.
+
+- ReceiverGroup is an enumeration of the targets of the received event, including Others (everyone in the room except yourself), All (everyone in the room), and MasterClient (the host).
+- The Receiver ID array is the enumerated value of the target of the received event, i.e., the player's `actorId` array. The `actorId` can be obtained via `player.actorId`.
+
+Note: If both receiver group and receiver ID array are set, receiver ID array will override receiver group.
+
+### Receiving custom events
+
+When the event is sent successfully, the custom event `CUSTOM_EVENT` in the event receiver will be triggered, and different events can be handled according to `eventId` (event ID).
+
+```javascript
+// Registering custom events
+client.on(Event.CUSTOM_EVENT, ({ eventId, eventData }) => {
+  if (eventId === SKILL_EVENT_ID) {
+    // Deconstruct event data if it is a skill event
+    const { skillId, targetId } = eventData;
+    // TODO Handling the performance of released skills
+  }
+});
+```
+
+### `event` Parameters
+
+| parameter | type | description |
+| --------- | ------ | ------------------------------- |
+| eventId | Number |  Event Id for the event  |
+| eventData | Object | Event parameter |
+| senderId | Number | Event sender ID (player's actorId)|
+
+## Disconnect
+
+In case of unstable network, you may be disconnected passively. When you are disconnected passively, the SDK will send `DISCONNECTED` event to the client, where the developer can alert the player on the UI:
+
+```javascript
+// Registering for disconnection events
+client.on(Event.DISCONNECTED, () => {
+  // TODO Option to detect the network and reconnect if required
+});
+```
+
+## Disconnect and reconnect
+
+### Keep disconnected users in the room.
+
+Players may get disconnected when there's unstable network or when they put the game in the background. When the player drops out, the `PLAYER_ACTIVITY_CHANGED` event will be triggered for other online players:
+
+```javascript
+// Registered Player Dropping/Uploading Events
+client.on(Event.PLAYER_ACTIVITY_CHANGED, ({ player }) => {
+  // Get the status of whether a user is "active" or not
+  cc.log(player.isActive());
+  // TODO can do display and logic processing according to the player's online status.
+});
+```
+
+If a player doesn't come back to the game for a long time, the server will remove the player from the room and destroy the player's data, and the other players in the room will receive the `PLAYER_ROOM_LEFT` event.
+When creating a room, we can set the timeout via `PlayerTtl`, so that when a player drops out of the room, the server will keep the data of the dropped player in the room during the `PlayerTtl` time and wait for the player to come back online.
+
+```javascript
+const options = {
+  // Set playerTtl to 300 seconds
+  playerTtl: 300,
+};
+client
+  .createRoom({
+    roomOptions: options,
+  })
+  .then(() => {})
+  .catch(console.error);
+```
+
+When a dropped player returns to the room within the `PlayerTtl` time, the other player's `PLAYER_ACTIVITY_CHANGED` event will be triggered again, and the developer can determine the player's current state in this event.
+
+### Reconnect
+
+Users can reconnect to the server after being disconnected through the following interface.
+
+```javascript
+client
+  .reconnect()
+  .then(() => {
+    // Reconnect successfully, you can choose whether to return to the room or not at this time
+  })
+  .catch(console.error);
+```
+
+Note: This interface will only reconnect you to the server, not return you directly to the room if you were previously playing in the room.**Recommended** [Reconnect and get room](#rejoin-a-room), then the player can choose whether or not to return to the room.You can also just [Reconnect and return to room](#reconnect-and-return-to-room).
+
+### Returning to a room
+
+Once a player is connected to the server, they can "rejoin" a room via the `rejoin` interface. If this interface is called within `playerTtl` time, the player will be able to return to the room successfully, if the `playerTtl` time is exceeded, then rejoining the room will fail.
+
+```javascript
+client
+  .reconnect()
+  .then(() => {
+    // The reconnection was successful. We're back in the same room as before.
+    return client.rejoinRoom(roomName); // The roomName of the room needs to be cached in the client itself.
+  })
+  .then(() => {
+    // If you return to the room successfully, the other players in the room will receive the `PLAYER_ACTIVITY_CHANGED` event.
+  })
+  .catch(console.error);
+```
+
+### Reconnect and return to room
+
+This interface is the equivalent of `reconnect()` and `rejoinRoom()` combined. This interface allows you to directly reconnect and go back to the previous room.
+
+```javascript
+client
+  .reconnectAndRejoin()
+  .then(() => {
+    // Return to room success, update data and interface
+  })
+  .catch(console.error);
+```
+
+## Close
+
+Developers can also proactively close the SDK via the following interface, after which the Client needs to be re-instantiated if it needs to be used again.
+
+```javascript
+client.close().then(() => {
+  // Disconnect successful.
+});
+```
+
+## Error handling
+
+Specific exception messages can be caught with Promise catch when we initiate a request. For example, when creating a room:
+
+```javascript
+client
+  .createRoom()
+  .then(() => {
+    // Room Creation Successful
+  })
+  .catch((error) => {
+    console.error(error.code, error.detail);
+  });
+```
+
+## Critical error event
+
+If a major error is currently occurring, this event will be triggered. It won't be triggered easily, and if it is triggered, please contact technical support to deal with it.
+
+```javascript
+client.on(Event.Error, ({ code, detail }) => {
+  // Contact Technical Support
+});
+```
+
+## Serialisation
+
+JavaScript is a weakly typed language, so data can be synchronised as long as it is of type `Object/Array`.
+
+### Custom types
+
+Suppose we have a Hero type with id, name, hp defined as follows:
+
+```javascript
+class Hero {
+  constructor(id, name, hp) {
+    this._id = id;
+    this._name = name;
+    this._hp = hp;
+  }
+}
+```
+
+To synchronise data of type Hero, the following two steps are required:
+
+#### Implement serialisation / deserialisation methods
+
+The implementation of serialisation methods is up to the developer, you can use protobuf, thrift, etc. It is sufficient if the serialisation and deserialisation interfaces supported by `Play` are met. As long as the serialisation and deserialisation interfaces supported by `Play` are satisfied.
+
+The following is an example of how to serialise an `Object` with the serialisation methods provided by `Play`:
+
+```javascript
+const {
+  serializeObject,
+  deserializeObject,
+} = Play;
+
+// serialisation
+static serialize(hero) {
+  // You can filter the fields to be serialised
+  const obj = {
+    id: hero._id,
+    name: hero._name,
+    hp: hero._hp,
+  };
+  return serializeObject(obj);
+}
+
+// deserialisation
+static deserialize(bytes) {
+  const obj = deserializeObject(bytes);
+  const { id, name, hp } = obj;
+  const hero = new Hero(id, name, hp);
+  return hero;
+}
+```
+
+#### Registering Custom Types
+
+When implementing a serialisation method, remember to register the custom type before using it.
+
+```javascript
+const { registerType } = Play;
+
+registerType(Hero, typeCode, Hero.serialize, Hero.deserialize);
+```
+
+where `typeCode` is a numeric code representing the custom type, which is used to determine the custom type during deserialisation.
+
+## API Documentation
+
+For more interfaces and details, please refer to [API Interfaces](https://leancloud.github.io/Play-SDK-JS/doc/).
