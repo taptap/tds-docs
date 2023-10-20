@@ -83,7 +83,7 @@ const config = {
             position: "right",
           },
           {
-            label: "API",
+            label: "SDK API",
             to: "/sdk-api",
             position: "right",
           },
