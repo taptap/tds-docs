@@ -1,6 +1,6 @@
 const sdkVersions = {
   taptap: {
-    unity: "3.23.0",
+    unity: "3.25.0",
     android: "3.23.0",
     ios: "3.22.0",
     rtc: "1.1.0",
@@ -14,7 +14,7 @@ const sdkVersions = {
       realtime: "5.0.0-rc.7",
     },
     java: "8.2.19",
-    csharp: "1.0.2",
+    csharp: "2.3.0",
     flutter: {
       storage: "0.7.10",
       realtime: "1.0.1",
