@@ -32,7 +32,7 @@ The system provides managers with detailed data to evaluate the quantity and qua
 
 ### User Experience Designed for Players
 
-As a customer service focused on the gaming community, Tap Game Customer Service provides an in-game customer service experience. Players don't have to switch apps to use the customer service feature, and they can receive in-game prompts immediately after customer service replies.
+As a customer service tool focused on gaming scenarios, Tap Game Customer Service provides an in-game customer service experience. Players don't have to switch apps to use the customer service feature, and they can receive in-game prompts immediately after customer service replies.
 
 In addition, the SDK optimizes visuals and interactions for landscape scenarios and provides developers with a control API to reduce the impact of the SDK on the performance of the game's core processes.
 
