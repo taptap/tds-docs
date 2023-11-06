@@ -38,7 +38,7 @@ In addition, the SDK optimizes visuals and interactions for landscape scenarios 
 
 ### Out-of-the-box development experience
 
-The Tap Game Customer Service client SDK covers popular game development platforms and provides features such as user interface, login, data reporting, and red dot maintenance. The highly integrated features provide an out-of-the-box development experience.
+The Tap Game Customer Service client SDK covers popular game development platforms and provides features such as user interface, login, data reporting, and badge maintenance. The highly integrated features provide an out-of-the-box development experience.
 
 Customer Service supports multiple login methods, including the TDS built-in account feature if the game already uses it, or the game's own account system.
 
