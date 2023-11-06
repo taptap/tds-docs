@@ -44,5 +44,6 @@ Customer Service supports multiple login methods, including the TDS built-in acc
 
   
 
->Still under development
->Tap Customer Service is currently in public beta, and some features that are still in development may not be available to all users.
+:::info Still under development
+Tap Customer Service is currently in public beta, and some features that are still in development may not be available to all users.
+:::
