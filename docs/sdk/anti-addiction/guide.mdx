@@ -1172,6 +1172,186 @@ curl -X POST \
 }
 ```
 
+## Webhook
+
+### Webhook 内容
+
+回调游戏 webhook 是 POST 方法，返回的内容解密后的 `data` 结构体和描述如下所示：
+
+```json
+{
+    "baseInfo": {
+        "userId": "用户实名认证时的唯一标识",
+        "clientId": "同上",
+        "userIP": "用户实名认证时的 IP",
+        "authType": "MANUAL"
+    },
+    "realNameInfo": {
+        "name": "用户的姓名",
+        "idCard": "用户的身份证号码",
+        "birthDate": "用户的生日"
+    }
+}
+```
+
+### Webhook 验签
+
+Webhook 使用 HmacSHA256 算法验签，Webhook 的签名验证过程如下：
+
+- 将 `data` 转换成为 json 字符串
+
+```java
+String dataJson = JSON.toJSONString(data); 
+```
+
+- 使用 AES 加密方式，以应用在 Tap 开发者服务中心的 Server Secret 为 key 对 dataJson 进行加密生成 encryptData
+
+```java
+String encryptData = SecureUtil.aes(serverSecret.getBytes(StandardCharsets.UTF_8)).encryptHex(payload.getBytes(StandardCharsets.UTF_8));
+```
+
+- 获取时间戳，并将时间戳 timestamp 和 encryptData 以逗号连接生成字符串 signedEncrypt 
+
+```java
+Long timestamp = LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8"));
+String signedEncrypt = String.format("%d,%s", timestamp, encryptData);
+```
+
+- 使用 HMAC256 签算方式以应用在 Tap 开发者服务中心的 Server Secret 为 key 对 signedEncrypt 进行签算生成最终的签算结果：sign
+
+```java
+String sign = SecureUtil.hmac(HmacSHA256, serverSecret.getBytes(StandardCharsets.UTF_8)).digestHex(signedEncrypt.getBytes(StandardCharsets.UTF_8));
+```
+
+- 设置 TDS-Sign，将时间戳和最终的签算 sign 以逗号连接并设置进 header 中。
+
+```java
+ headers.add("TDS-Sign", String.format("%d,%s", timestamp, sign));
+```
+
+- 设置 HTTP 的 body，将 encryptData 字段放入 Map 中和上一步生成的 header 一起传入 body 中。
+
+```java
+HashMap<String, Object> map = new HashMap<>();
+map.put("data", encryptData);
+HttpEntity httpEntity = new HttpEntity<>(map, headers);
+```
+
+### 游戏侧处理数据流程
+
+- 在 TapTap 开发者服务 > 你的游戏 > 合规认证 > Webhooks 设置 配置 URL。
+- 获取 HTTP 请求中的 `TDS-Sign` 字段值，该字段值为使用游戏在 TapTap 开发者服务中心的 Server Secret 按照上述签名规则生成的字符串。
+- 验证签名，游戏服务端根据上述签名规则得到的签名和  `TDS-Sign` 字段值进行比较，签名结果相同则进行下一步操作即解密和保存数据。
+- 解密和保存数据，由于 TDS 返回的数据是加密的数据，所以需要游戏侧进行解密。
+
+<details>
+
+<summary>Python Webhook 脚本示例</summary>
+此脚本用于演示如何获取用户解密后的数据，总体流程为：
+
+1、在 TapTap 开发者服务 > 你的游戏 > 合规认证 > Webhooks 设置 配置 URL
+
+2、获取 http 请求中的 sign 以及加密的用户数据 data
+
+3、游戏服务端根据签名规则进行签名，得到的签名和 http 请求的获取的 sign 做比较，二者签名一致说明数据正确安全返回可进行下一步操作
+
+4、解密用户数据后进行保存
+
+```python
+import hashlib
+import time
+import hmac
+import base64
+import json
+from flask import Flask, request
+from datetime import datetime, timedelta
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
 
 
+app = Flask(__name__)
 
+@app.route("/")
+def hello_world():
+	return "<p>Hello World!<p>"
+
+@app.route("/webhook/event",methods=['POST'])
+def event():
+    # 获取 TDS-Sign 用于和游戏服务端自己签算做比较
+	sign = request.headers.get('TDS-Sign')
+    # TDS 返回的加密的用户数据
+	json_data = json.loads(request.data)
+	result = json.dumps(json_data)
+	data = json_data['data']
+	with open('result.json', 'w') as f:
+		f.write(result)
+	with open('data.txt', 'w') as df:
+		df.write(data)
+
+	server_secret = "替换成游戏在 Tap 开发者服务中心的 Server Secret"
+
+	decrypted_data = verify_signature(sign, server_secret, data)
+
+    # 验证签名，签名正确则可以保存用户解密后的数据。
+	if decrypted_data:
+		print("Decrypted Data Success: ", decrypted_data)
+	else:
+		print("Verification failed.")
+	
+	return "Success LeeJiEun"
+
+# 验签
+def verify_signature(sign, server_secret, data):
+	split = sign.split(",")
+
+	if len(split) != 2:
+		print("sign is invalid, sign:", sign)
+		return False
+
+	timestamp = split[0]
+	now = datetime.now()
+	sign_time = datetime.fromtimestamp(int(timestamp)) + timedelta(hours=8)
+
+	if now - timedelta(minutes=10) > sign_time:
+		print("timestamp is invalid, sign:", sign)
+		return False
+
+	sign_data = split[1]
+	str1 = f"{timestamp},{data}"
+	print("str1:", str1)
+
+
+	# 使用HMAC-SHA256算法创建HMAC对象
+	hmac_sha256 = hmac.new(server_secret.encode('utf-8'), str1.encode('utf-8'), hashlib.sha256)
+
+	# 获取签名结果的二进制数据
+	sign_check = hmac_sha256.hexdigest()
+
+
+	if sign_check != sign_data:
+		print("sign is invalid, signData:", sign_data, "signCheck:", sign_check)
+		return False
+    
+	# 解密数据
+	decrypt_payload = decrypt_data(server_secret, data)
+	return decrypt_payload
+
+# 解密数据
+def decrypt_data(server_secret, data):
+	try:
+		bytes_data = bytes.fromhex(data)
+		cipher = AES.new(server_secret.encode('utf-8'), AES.MODE_ECB)
+		decrypted_data = cipher.decrypt(bytes_data)
+		decrypt_data = decrypted_data.decode('utf-8')
+		with open('final.json', 'w') as ff:
+			ff.write(decrypt_data) 
+		return True
+	except Exception as e:
+		print("AES decryption failed:", str(e))
+		return None
+
+if __name__ == '__main__':
+	app.run(host="0.0.0.0", port=8080)
+```
+
+</details>
