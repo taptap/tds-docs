@@ -17,7 +17,7 @@ Tap Game Customer Service consists of two core systems: Ticket and Knowledge Bas
 
 ### Multi-dimensional analytics to support operations
 
-Tap Game Customer Service is designed to help solve player problems, but it is also designed to help operations identify issues, refine and accelerate valuable content, and improve the game itself.
+Tap Game Customer Service is designed to help solve player problems, but it is also designed to help the operation team identify issues, refine and accelerate valuable content, and improve the game itself.
 
 - Tickets have flexible search and filtering capabilities and support aggregation and analysis by classification, field, and status. It also supports data export for further analysis with third-party tools.
     
