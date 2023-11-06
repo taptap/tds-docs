@@ -28,7 +28,7 @@ Tap Game Customer Service is designed to help solve player problems, but it is a
 
 Tap Game Customer Service provides an intuitive role-based permission control system that supports custom roles in addition to pre-built roles for more flexible needs.
 
-The system provides managers with detailed data to evaluate the quantity and quality of customer service work, including but not limited to the number of Tickets handled, the timeliness of responses to players, and player satisfaction.
+The system provides managers with detailed data to evaluate the quantity and quality of customer service work, including but not limited to the number of tickets handled, the timeliness of responses to players, and player satisfaction.
 
 ### User Experience Designed for Players
 
