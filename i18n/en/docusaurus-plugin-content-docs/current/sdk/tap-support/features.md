@@ -8,7 +8,7 @@ Tap Game Customer Service assists the game operations team in solving the proble
 
 Tap Game Customer Service consists of two core systems: Ticket and Knowledge Base, providing a set of freely combinable functional modules, including announcements, FAQs, forms, etc., to solve players' problems and requests.
 
-- Ticket built-in classification-based customer service automatic assignment function, you can also customize triggers to achieve a more complex assignment mechanism, the first time the Ticket will be assigned to the most appropriate customer service hands.
+- The ticket module comes with the category-based auto-assignment function. You can also customize triggers to achieve a more complex assignment mechanism that can quickly assign tickets to the most appropriate staff members.
     
 - Tickets support custom fields that can be filled in by the player via a form or actively reported by the developer, providing detailed context for customer service.
     
