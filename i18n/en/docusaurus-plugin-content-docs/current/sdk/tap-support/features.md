@@ -1,6 +1,6 @@
 # Tap Customer Service Introduction
 
-Tap Game Customer Service assists the game operations team in solving player problems faster and better.
+Tap Game Customer Service assists the game operations team in solving the problems encountered by players faster and better.
 
 ## Key Benefits
 
