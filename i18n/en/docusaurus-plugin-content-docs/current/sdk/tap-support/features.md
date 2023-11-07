@@ -1,12 +1,12 @@
-# Tap Customer Service Introduction
+# TapSupport Introduction
 
-Tap Game Customer Service assists the game operations team in solving the problems encountered by players faster and better.
+TapSupport assists the game operations team in solving the problems encountered by players faster and better.
 
 ## Key Benefits
 
-### Rich tools to improve customer service efficiency
+### Rich Tools to Improve Customer Support Efficiency
 
-Tap Game Customer Service consists of two core systems: Ticket and Knowledge Base, providing a set of freely combinable functional modules, including announcements, FAQs, forms, etc., to solve players' problems and requests.
+TapSupport consists of two core systems: Ticket and Knowledge Base, providing a set of freely combinable functional modules, including announcements, FAQs, forms, etc., to solve players' problems and requests.
 
 - The ticket module comes with the category-based auto-assignment function. You can also customize triggers to achieve a more complex assignment mechanism that can quickly assign tickets to the most appropriate staff members.
     
@@ -15,9 +15,9 @@ Tap Game Customer Service consists of two core systems: Ticket and Knowledge Bas
 - Multiple notification methods are supported to ensure you don't miss any player responses.
     
 
-### Multi-dimensional analytics to support operations
+### Multi-dimensional Analytics to Support Operations
 
-Tap Game Customer Service is designed to help solve player problems, but it is also designed to help the operation team identify issues, refine and accelerate valuable content, and improve the game itself.
+TapSupport is designed to help solve player problems, but it is also designed to help the operation team identify issues, refine and accelerate valuable content, and improve the game itself.
 
 - Tickets have flexible search and filtering capabilities and support aggregation and analysis by classification, field, and status. It also supports data export for further analysis with third-party tools.
     
@@ -26,24 +26,24 @@ Tap Game Customer Service is designed to help solve player problems, but it is a
 
 ### Simple and Powerful Management Features
 
-Tap Game Customer Service provides an intuitive role-based permission control system that supports custom roles in addition to pre-built roles for more flexible needs.
+TapSupport provides an intuitive role-based permission control system that supports custom roles in addition to pre-built roles for more flexible needs.
 
-The system provides managers with detailed data to evaluate the quantity and quality of customer service work, including but not limited to the number of tickets handled, the timeliness of responses to players, and player satisfaction.
+The system provides managers with detailed data to evaluate the quantity and quality of customer support work, including but not limited to the number of tickets handled, the timeliness of responses to players, and player satisfaction.
 
 ### User Experience Designed for Players
 
-As a customer service tool focused on gaming scenarios, Tap Game Customer Service provides an in-game customer service experience. Players don't have to switch apps to use the customer service feature, and they can receive in-game prompts immediately after customer service replies.
+As a customer support tool focused on gaming scenarios, TapSupport provides an in-game customer support experience. Players don't have to switch apps to use the TapSupport feature, and they can receive in-game prompts immediately after customer support replies.
 
 In addition, the SDK optimizes visuals and interactions for landscape scenarios and provides developers with a control API to reduce the impact of the SDK on the performance of the game's core processes.
 
-### Out-of-the-box development experience
+### Out-of-the-box Development Experience
 
-The Tap Game Customer Service client SDK covers popular game development platforms and provides features such as user interface, login, data reporting, and badge maintenance. The highly integrated features provide an out-of-the-box development experience.
+The TapSupport client SDK covers popular game development platforms and provides features such as user interface, login, data reporting, and badge maintenance. The highly integrated features provide an out-of-the-box development experience.
 
-Customer Service supports multiple login methods, including the TDS built-in account feature if the game already uses it, or the game's own account system.
+TapSupport multiple login methods, including the TDS built-in account feature if the game already uses it, or the game's own account system.
 
   
 
 :::info Still under development
-Tap Customer Service is currently in public beta, and some features that are still in development may not be available to all users.
+TapSupport is currently in public beta, and some features that are still in development may not be available to all users.
 :::
