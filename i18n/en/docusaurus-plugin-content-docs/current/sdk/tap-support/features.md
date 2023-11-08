@@ -17,11 +17,11 @@ TapSupport consists of two core systems: Ticket and Knowledge Base, providing a 
 
 ### Multi-dimensional Analytics to Support Operations
 
-TapSupport is designed to help solve player problems, but it is also designed to help the operation team identify issues, refine and accelerate valuable content, and improve the game itself.
+TapSupport is designed to help solve player problems, but it is also designed to help the operation team identify issues, refine valuable content, and improve the game itself.
 
-- Tickets have flexible search and filtering capabilities and support aggregation and analysis by classification, field, and status. It also supports data export for further analysis with third-party tools.
+- The ticket module has flexible search and filtering capabilities and support aggregation and analysis by category, field, and status. It also supports data export for further analysis with third-party tools.
     
-- Knowledge base articles provide user feedback to see behind the scenes what content is effective and what is not solving the player's problem.
+- Users can leave feedback on knowledge base articles so that you can see behind the scenes what content is effective and what is not solving the player's problem.
     
 
 ### Simple and Powerful Management Features
