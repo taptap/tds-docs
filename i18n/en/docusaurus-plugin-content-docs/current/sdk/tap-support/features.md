@@ -40,7 +40,7 @@ In addition, the SDK optimizes visuals and interactions for landscape scenarios 
 
 The TapSupport client SDK covers popular game development platforms and provides features such as user interface, login, data reporting, and badge maintenance. The highly integrated features provide an out-of-the-box development experience.
 
-TapSupport multiple login methods, including the TDS built-in account feature if the game already uses it, or the game's own account system.
+TapSupport supports multiple login methods, including the TDS built-in account feature if the game already uses it, or the game's own account system.
 
   
 
