@@ -243,6 +243,14 @@ REST API 文档使用 curl 作为示范，其中 `--data-urlencode` 表示要对
 
 需要检查代码，通过打印 log 和断点的方式来定位究竟是由哪一行 `save` 所引发的。
 
+### 使用 Android SDK 的数据存储功能，APP 上架时被厂商检测存在自启动问题。
+
+解决办法：将 Android SDK 升级到 v8.2.19 及以上版本。
+
+自启动问题是因为 LiveQuery 需要在后台有一个长链接，这样才能及时收到云端的事件通知，而这个长链接是放在一个后台 Service 里面的，并且由自动重连的能力——这会监听网络状态变化，在网络有效的时候启动这个 service，这个逻辑可能会被一些平台判定为「自启动」。
+
+老版本 SDK 因为没有适配 Android 新版本，所以有时候会抛出异常，8.2.19 版本 SDK 对 Android 新系统进行了适配，但是也并没有完全禁止这个自动重连的逻辑，所以可能还是会被误判。如果已经使用新版 SDK 仍出现这个问题，也可以向厂商申诉。
+
 ### JavaScript SDK 有没有同步 API
 
 JavaScript SDK 由于平台的特殊性（运行在单线程运行的浏览器或者 Node.js 环境中），不提供同步 API，所有需要网络交互的 API 都需要以 callback 的形式调用。我们提供了 [Promise 模式](/sdk/storage/guide/js/#promise) 来减少 callback 嵌套过多的问题。
