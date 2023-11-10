@@ -179,6 +179,16 @@ You will be billed for the price of standard-1024 multiplied by 4 instances.
 You can use the interface for uploading files provided by the SDK,
 though we generally recommend that you upload files with client SDKs without having the files go through Cloud Engine. This helps you reduce the unnecessary traffic generated.
 
+## I get the error "failed to upload file to qiniu bcz current file has not data stream" when uploading files in Cloud Engine.
+
+LCFile internally uses a local cache (which requires a local directory) to hold the binary data before uploading it to the file storage service. Inside the Cloud Engine it is not possible to create such a cache directory or file due to insufficient permissions, resulting in errors like `failed to upload file to qiniu bcz current file has not data stream`.
+We do not recommend using file services in the Cloud Engine for several reasons:
+
+1. The permission issue mentioned above will occur. This makes it impossible to create cache directories and temporary files in the Cloud Engine.
+2. All file data goes to the server first, and then the API is called to push it to the file storage provider, which leads to low efficiency and high network cost for the user (you will need to pay for the excessive traffic usage with Cloud Engine).
+
+It is recommended to use the SDK to upload the file, and then give the result (e.g. the object id or url of the file) to the server (the code for Cloud Engine). Uploading on the client side will use the file storage provider's CDN (servers close to the user), which makes the user experience faster and saves the traffic costs of Cloud Engine.
+
 ### Should scheduled tasks be executed in the staging environment or the production environment?
 
 The free trial instances provided by the staging environment may hibernate automatically, which could impact the execution of the scheduled tasks. Therefore, we recommend that you test scheduled tasks in the staging environment and run them in the production environment.
