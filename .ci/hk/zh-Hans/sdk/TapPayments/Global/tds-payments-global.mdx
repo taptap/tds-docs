@@ -559,7 +559,7 @@ TapPayment.QueryOrder ( orderId, new ITapPayment.Callback < Order > ()
 
 // 或者直接传递一个已存在的订单对象
 Order order = new Order();
-order.id = "订单ID";
+order.id = "订单 ID";
 TapPayment.QueryOrder ( orderId, new ITapPayment.Callback < Order > ()
 {
     ...
@@ -586,7 +586,7 @@ TapPayment.queryOrder(orderId, new ITapPayment.Callback < Order >() {
 
 // 或者直接传递一个已存在的订单对象
 Order order = new Order();
-order.id = "订单ID";
+order.id = "订单 ID";
 
 TapPayment.queryOrder(order, new ITapPayment.Callback < Order >() {
     ....
@@ -1143,8 +1143,8 @@ public class Callback < T >
 
 ```sh
 curl -X GET \
-  -H 'X-LC-Id: {{client_id}} \
-  -H 'X-LC-Key: {{server_secret}},master \
+  -H 'X-LC-Id: {{client_id}}' \
+  -H 'X-LC-Key: {{server_secret}},master' \
   https://tds-tapsdk0.intl.tapapis.com/open/payment/v1/orders/1670731970469806082
 ```
 
@@ -1175,8 +1175,8 @@ curl -X GET \
 
 ```sh
 curl -X POST \
-  -H 'X-LC-Id: {{client_id}} \
-  -H 'X-LC-Key: {{server_secret}},master \
+  -H 'X-LC-Id: {{client_id}}' \
+  -H 'X-LC-Key: {{server_secret}},master' \
   -H 'Content-Type: application/json; charset=utf-8'
   -d '{"token": "2cf31318c6f4939d5eaf2e9431bf45f2"}'
   https://tds-tapsdk0.intl.tapapis.com/open/payment/v1/orders/1670731970469806082/verify
@@ -1203,13 +1203,30 @@ curl -X POST \
 }
 ```
 
+游戏服务端使用 REST API 应该只有「查询订单」以及「核销订单」的场景。异常响应示例如下所示：
+
+```json 
+// 1004 - 订单不存在    1018 - 验证订单错误
+{
+   "data" : {
+      "code" : 1004,
+      "error" : "order_not_found",
+      "error_description" : "订单不存在",
+      "msg" : "订单不存在"
+   },
+   "success" : false
+}
+```
+
+
+
 #### 订单退款
 对一个订单进行退款
 
 ```sh
 curl -X GET \
-  -H 'X-LC-Id: {{client_id}} \
-  -H 'X-LC-Key: {{server_secret}},master \
+  -H 'X-LC-Id: {{client_id}}' \
+  -H 'X-LC-Key: {{server_secret}},master' \
   https://tds-tapsdk0.intl.tapapis.com/open/payment/v1/orders/1670731970469806082/refund
 ```
 
@@ -1220,9 +1237,9 @@ curl -X GET \
 
 |字段                 | 含义          |
 |--------------------|---------------|
-|client_id           |               |
-|user_id             |               |
-|order_id            |               |
+|client_id           | 应用 Client ID |
+|user_id             | 用户 OpenID    |
+|order_id            | 订单 ID        |
 |order_token         |用于核销的 token |
 |goods\_open\_id     |商品 ID         |
 |amount              |订单金额         |
@@ -1284,7 +1301,7 @@ TapPay-Signature: 1687224754,4dd293a514223c052513c1db449106f13710c733855d2af6654
 }
 ```
 
-还需要在 DC 后台配置过的 `webhookToken` ，作为 HmacSHA256 算法的 secret 最终得到 
+此外，还需要将在 TapTap 开发者中心后台配置的 `API 密钥` 作为 HmacSHA256 算法的 secret 最终得到 
 
 ```
 sign = HmacSHA256(secret, ts + "." + payload )

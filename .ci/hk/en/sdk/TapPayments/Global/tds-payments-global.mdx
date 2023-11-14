@@ -967,8 +967,8 @@ You can query the detailed information of an order by order ID and determine the
 
 ```sh
 curl -X POST \
-  -H 'X-LC-Id: {{appid}} \
-  -H 'X-LC-Key: {{masterKey}},master \
+  -H 'X-LC-Id: {{appid}}' \
+  -H 'X-LC-Key: {{masterKey}},master' \
   https://{{host}}/open/payment/v1/orders/1670731970469806082
 ```
 
@@ -999,8 +999,8 @@ After the payment is successful, verifying the order indicates that the payment 
 
 ```sh
 curl -X POST \
-  -H 'X-LC-Id: {{appid}} \
-  -H 'X-LC-Key: {{masterKey}},master \
+  -H 'X-LC-Id: {{appid}}' \
+  -H 'X-LC-Key: {{masterKey}},master' \
   https://{{host}}/open/payment/v1/orders/1670731970469806082/verify?token=2cf31318c6f4939d5eaf2e9431bf45f2
 ```
 
@@ -1026,13 +1026,28 @@ The return value is a JSON object of an order.
 }
 ```
 
+The only scenarios where the game server should use the REST API are when querying and validating orders. An example of an exception response is shown below:
+
+```json 
+// 1004 - Order does not exist    1018 - Order verification error
+{
+   "data" : {
+      "code" : 1004,
+      "error" : "order_not_found",
+      "error_description" : "Order does not exist",
+      "msg" : "Order does not exist"
+   },
+   "success" : false
+}
+```
+
 #### Order Refund
 Refund an order. 
 
 ```sh
 curl -X GET \
-  -H 'X-LC-Id: {{appid}} \
-  -H 'X-LC-Key: {{masterKey}},master \
+  -H 'X-LC-Id: {{appid}}' \
+  -H 'X-LC-Key: {{masterKey}},master' \
   https://{{host}}/open/payment/v1/orders/1670731970469806082/refund
 ```
 
@@ -1040,9 +1055,9 @@ curl -X GET \
 
 |Field                 | Meaning          | 
 |--------------------|---------------|
-|client_id           |               | 
-|user_id             |               | 
-|order_id            |               |
+|client_id           |Client ID      | 
+|user_id             |User OpenID    | 
+|order_id            |Order ID       |
 |order_token         |Token used for verification |
 |goods\_open\_id     |Item ID         |
 |amount              |Order Amount         | 
@@ -1104,7 +1119,7 @@ The request body is a JSON string defined as `payload`.
 }
 ```
 
-You also need the `webhookToken` configured in the DC backend as the secret of the HmacSHA256 algorithm to finally get
+You also need the `API key` configured in the DC backend as the secret of the HmacSHA256 algorithm to finally get
 
 ```
 sign = HmacSHA256(secret, ts + "." + payload ) 

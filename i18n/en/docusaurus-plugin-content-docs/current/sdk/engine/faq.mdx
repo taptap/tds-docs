@@ -33,7 +33,7 @@ Yes. When you deploy a new version of your project, Cloud Engine will first star
 
 Cloud Engine is a platform for hosting backend services. It can be used to host all kinds of backend programs and it won’t interfere with the internal logic of the programs.
 
-On top of this, you can choose to integrate the Cloud Engine SDK into your program, which gives your program access to functions like Cloud Functions and hooks. Cloud Functions is designed to work perfectly with our <Conditional brand="tds">[Data Storage](/sdk/storage/features)</Conditional><Conditional brand="leancloud">[Data Storage](https://docs.leancloud.app/storage_overview.html)</Conditional> service. If you’re already using the Data Storage service, you’ll find it easy to get started with Cloud Functions.
+On top of this, you can choose to integrate the Cloud Engine SDK into your program, which gives your program access to functions like Cloud Functions and hooks. Cloud Functions is designed to work perfectly with our <Conditional brand="tds">[Data Storage](/sdk/storage/features)</Conditional><Conditional brand="leancloud">[Data Storage](/sdk/storage/overview/)</Conditional> service. If you’re already using the Data Storage service, you’ll find it easy to get started with Cloud Functions.
 
 You can still use the other features besides Cloud Functions without integrating the Cloud Engine SDK into your program. In addition to the features mentioned above, Cloud Engine also provides hosted [Redis](/sdk/engine/database/redis/), [MongoDB](/sdk/engine/database/mongo/), and [Elasticsearch](/sdk/engine/database/es/) for you to store the data of your application.
 
@@ -178,6 +178,16 @@ You will be billed for the price of standard-1024 multiplied by 4 instances.
 
 You can use the interface for uploading files provided by the SDK,
 though we generally recommend that you upload files with client SDKs without having the files go through Cloud Engine. This helps you reduce the unnecessary traffic generated.
+
+## I get the error "failed to upload file to qiniu bcz current file has not data stream" when uploading files in Cloud Engine.
+
+LCFile internally uses a local cache (which requires a local directory) to hold the binary data before uploading it to the file storage service. Inside the Cloud Engine it is not possible to create such a cache directory or file due to insufficient permissions, resulting in errors like `failed to upload file to qiniu bcz current file has not data stream`.
+We do not recommend using file services in the Cloud Engine for several reasons:
+
+1. The permission issue mentioned above will occur. This makes it impossible to create cache directories and temporary files in the Cloud Engine.
+2. All file data goes to the server first, and then the API is called to push it to the file storage provider, which leads to low efficiency and high network cost for the user (you will need to pay for the excessive traffic usage with Cloud Engine).
+
+It is recommended to use the SDK to upload the file, and then give the result (e.g. the object id or url of the file) to the server (the code for Cloud Engine). Uploading on the client side will use the file storage provider's CDN (servers close to the user), which makes the user experience faster and saves the traffic costs of Cloud Engine.
 
 ### Should scheduled tasks be executed in the staging environment or the production environment?
 
