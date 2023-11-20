@@ -8,7 +8,6 @@ sidebar_position: 4
 </head>
 
 ## 服务端开发指南
-### 服务端 REST API
 
 :::tip
 请参考 数据存储 REST API 文档中关于 [Base URL](/sdk/storage/guide/rest/#base-url)、[请求格式](/sdk/storage/guide/rest/#请求格式)、[响应格式](/sdk/storage/guide/rest/#响应格式)的说明。因为这一组接口为服务器之间的调用，所以仅支持 `master key` 的鉴权方式。不要在客户端使用或暴露 `master key`。 `master key` 是 DC 后台中应用的 `serverSecret`
@@ -21,7 +20,7 @@ sidebar_position: 4
 |/open/payment/v1/orders/&lt;order_id&gt;/refund     |POST    | 订单退款                         |
 |/open/payment/v1/orders/unconfirmed|GET     | 查询未核销的订单列表               |
 
-#### 查询订单
+### 查询订单
 
 通过一个订单 ID 可以查询到订单的详细信息并确定当前的支付状态
 
@@ -54,7 +53,7 @@ curl -X GET \
 }
 ```
 
-#### 核销订单
+### 核销订单
 当支付成功后，核销订单表示已经确认支付结果并会对买家完成发货，订单状态也会从 `charge.succeeded` 变为 `charge.confirmed`
 
 ```sh
@@ -104,7 +103,7 @@ curl -X POST \
 
 
 
-#### 订单退款
+### 订单退款
 对一个订单进行退款
 
 ```sh
@@ -149,26 +148,41 @@ curl -X GET \
 
 
 
-#### 角色信息
 
-（必配）
+
+
+
+
+
+
+
+### 角色信息
+
+游戏需要依次进入 **TapTap 开发者中心 > 你的游戏 > 游戏服务 > TapPayment > 商品与订单 > 网站售卖设置 > 游戏信息 API**，配置有效的 API 地址。（**必配**）
+
 >路由地址
+
 ```
 游戏可自定义
 ```
+
 > 请求方式
-```
+
+```json
 POST-application/json
 ```
 > 入参
-|参数|类型|含义|是否必须
-|:----- |:----- |:----- |:----- |
-|open_id|string|用户唯一ID|Y
-|language|string|展示label的语言|Y
+
+|参数|类型|含义|是否必须|
+|-----|-----|----- |-----|
+| open_id | string | 用户唯一 ID | Y |
+| language | string | 展示 label 的语言 | Y |
 
 > 出参如下
 
-示例一：适合通过"角色"确定一个充值对象
+
+<details>
+<summary>示例一：适合通过"角色"确定一个充值对象</summary>
 
 ```json
 {
@@ -181,11 +195,11 @@ POST-application/json
         ],
         "player": [
             {
-                "label": "冒险者A",
+                "label": "冒险者 A",
                 "value": "a"
             },
             {
-                "label": "冒险者B",
+                "label": "冒险者 B",
                 "value": "b"
             }
         ]
@@ -194,7 +208,10 @@ POST-application/json
 }
 ```
 
-示例二：适合通过"服务器"，"角色"确定一个充值对象
+</details>
+
+<details>
+<summary>示例二：适合通过"服务器"，"角色"确定一个充值对象</summary>
 
 ```json
 {
@@ -211,25 +228,25 @@ POST-application/json
         ],
         "player": [
             {
-                "label": "服务器S1",
+                "label": "服务器 S1",
                 "value": "S1",
                 "children": [
                     {
-                        "label": "冒险者A",
+                        "label": "冒险者 A",
                         "value": "a"
                     },
                     {
-                        "label": "冒险者B",
+                        "label": "冒险者 B",
                         "value": "b"
                     }
                 ]
             },
             {
-                "label": "服务器S2",
+                "label": "服务器S 2",
                 "value": "S2",
                 "children": [
                     {
-                        "label": "冒险者C",
+                        "label": "冒险者 C",
                         "value": "c"
                     }
                 ]
@@ -238,10 +255,12 @@ POST-application/json
     },
     "success": true
 }
-`
+```
 
+</details>
 
-示例三：适合通过"地区"，"服务器"，"角色"确定一个充值对象
+<details>
+<summary>示例三：适合通过"地区"，"服务器"，"角色"确定一个充值对象</summary>
 
 ```json
 {
@@ -266,21 +285,21 @@ POST-application/json
                 "value": "ae",
                 "children": [
                     {
-                        "label": "服务器S1",
+                        "label": "服务器 S1",
                         "value": "S1",
                         "children": [
                             {
-                                "label": "冒险者A",
+                                "label": "冒险者 A",
                                 "value": "a"                            
                             }
                         ]
                     },
                     {
-                        "label": "服务器S2",
+                        "label": "服务器 S2",
                         "value": "S2",
                         "children": [
                             {
-                                "label": "冒险者C",
+                                "label": "冒险者 C",
                                 "value": "c"
                             }
                         ]
@@ -293,15 +312,20 @@ POST-application/json
 }
 ```
 
-#### 购买配置 API
+</details>
 
-（选配）
+### 购买配置 API
+
+游戏需要依次进入 **TapTap 开发者中心 > 你的游戏 > 游戏服务 > TapPayment > 商品与订单 > 网站售卖设置 > 购买限制 API**，配置有效的 API 地址。（**选配**）
 
 >路由地址
+
 ```
 游戏可自定义
 ```
+
 > 请求方式
+
 ```
 POST-application/json
 ```
@@ -311,31 +335,31 @@ POST-application/json
 
 |参数|类型|含义|是否必须
 |:----- |:----- |:----- |:----- |
-|role|string|角色ID|Y
+|role|string|角色 ID|Y
 
 示例二
 
 |参数|类型|含义|是否必须
 |:----- |:----- |:----- |:----- |
-|server|string|服务器ID|Y
-|role|string|角色ID|Y
+|server|string|服务器 ID|Y
+|role|string|角色 ID|Y
 
 示例三
 
 |参数|类型|含义|是否必须
 |:----- |:----- |:----- |:----- |
-|region|string|地区ID|Y
-|server|string|服务器ID|Y
-|role|string|角色ID|Y
+|region|string|地区 ID|Y
+|server|string|服务器 ID|Y
+|role|string|角色 ID|Y
 
 > 出参
 
 |参数|类型|含义|是否必须
 |:----- |:----- |:----- |:----- |
-|type|string|规则类型：blacklist-商品黑名单，whitelist-商品白名单|Y
-|list|string|商品唯一ID|Y
+|type|string|规则类型：blacklist - 商品黑名单，whitelist - 商品白名单|Y
+|list|string|商品唯一 ID|Y
 
-```
+```json
 {
     "data": {
         "type": "blacklist",
@@ -348,32 +372,100 @@ POST-application/json
 }
 ```
 
-#### 到账通知
 
-（必配）
->路由地址
-```
-游戏可自定义
-```
-> 请求方式
+#### TapPay-Signature header 规则
+
+角色查询、购买配置 API 接口的签算规则请参考 [Webhook 验签](#Webhook-验签)，二者规则一样。
+
+### Webhook 回调
+
+#### Webhook 说明
+
+目前 Webhook 支持监听「充值成功」「退款成功」「退款失败」事件，对于支付成功建议采取主动`核销订单`，根据订单状态完成发货。
+
+游戏需要依次进入 **TapTap 开发者中心 > 你的游戏 > 游戏服务 > TapPayment > 商品与订单 > Webhooks 设置 > 添加**，添加有效的**充值成功** URL。（**必配**）
+
+
+#### Webhook 验签
+
+Webhook 是一个 HTTP POST 请求，通过 `TapPay-Signature` header 传递签名信息。格式 `时间戳,签名` 如：
 
 ```java
-POST-application/json
+TapPay-Signature: 1687224754,4dd293a514223c052513c1db449106f13710c733855d2af6654948675e1624e7
 ```
-> 入参
 
+根据上面的 header ，得到 `ts = 1687224754` ，首先可以确认一下跟当前系统时间是否差异过大，确保不是被重用的旧请求。
+
+请求的 request body ，是一个 JSON 字符串，定义为 `payload`
+
+```json
+{
+    "order":{
+        "id":1721791738662895617,
+        "client_id":"3l5b2phi8k2snze3hs",
+        "user_id":3173820362,
+        "open_id":"I1LEuujBQMqM4d9CWpVQug==",
+        "user_region":"CL",
+        "merchant_order_id":"f84f6778-9357-413c-b503-066900667ff5",
+        "payment_provider":"STRIPE",
+        "payment_channel":"CARD",
+        "goods_id":"com.gooplin.il.goods1030",
+        "goods_name":"test20230920-name",
+        "status":"charge.confirmed",
+        "amount":"990",
+        "tax":"0",
+        "fee":"0",
+        "currency":"CLP",
+        "create_time":1699342114,
+        "pay_time":1699342118,
+        "extra":"{\"server\":\"S1\",\"role\":\"b\"}",
+        "order_refund":{
+            "id":1721791738662833333,//退款号
+            "reason":"道具未到账",//退款原因
+            "status":"done", //状态：pending-待处理，refunding-退款中，done-已完成，overrule-已驳回，failed-退款失败
+            "comments":"",//退款申请，游戏开发者的审核意见
+            "comments_picture":"",//审核意见附件
+            "errs":"",// 退款异常信息
+            "created_at":1700449577
+            "updatedAt":1700449577
+        }
+    },
+    "event_type":"refund.succeeded"
+}
+```
+
+此外，还需要将在 TapTap 开发者中心后台配置的 `API 密钥` 作为 HmacSHA256 算法的 secret 最终得到 
+
+```java
+sign = HmacSHA256(secret, ts + "." + payload )
+```
+
+比对计算结果 sign 和 `TapPay-Signature` 的签名部分是否相同
+
+
+#### Webhook 内容
+
+Webhook 内容包含 `event_type` 和 订单信息，目前支持的 `event_type` 有：
+
+| event_type       | 含义     |
+|------------------|---------|
+| refund.succedded | 退款成功 |
+| refund.failed | 退款失败 |
+| charge.succeeded | 充值成功 |
+
+目前 Webhook 支持监听「充值成功」「退款成功」「退款失败」事件的入参数格式及出参格式保持一致。
 
 |参数|类型|含义|是否必须
 |:----- |:----- |:----- |:----- |
-|id|long|订单唯一ID|Y
-|client_id|string|DC应用ID|Y
-|user_id|long|用户的TapTapId|Y
-|open_id|long|用户的开放平台ID|Y
+|id|long|订单唯一 ID|Y
+|client_id|string|应用的 Client ID|Y
+|user_id|long|用户的 TapID|Y
+|open_id|long|用户的开放平台 ID|Y
 |user_region|string|用户地区|Y
-|merchant_order_id|string|商户订单唯一ID|Y
+|merchant_order_id|string|商户订单唯一 ID|Y
 |payment_provider|string|支付方式|Y
 |payment_channel|string|支付渠道|Y
-|goods_id|string|商品唯一ID|Y
+|goods_id|string|商品唯一 ID|Y
 |goods_name|string|商品名称|Y
 |status|string|订单状态|Y
 |amount|string|金额|Y
@@ -384,6 +476,9 @@ POST-application/json
 |pay_time|long|支付时间|Y
 |extra|string|自定义信息，如服务器、角色信息|Y
 |order_refund|object|退款信息，默认空|Y
+
+<details>
+<summary>充值成功事件入参示例</summary>
 
 ```json
 {
@@ -411,96 +506,63 @@ POST-application/json
     "event_type":"charge.succeeded"
 }
 ```
+</details>
+
+<details>
+<summary>退款成功事件入参示例</summary>
+
+```json
+{
+    "order":{
+        "id":1721791738662895617,
+        "client_id":"3l5b2phi8k2snze3hs",
+        "user_id":3173820362,
+        "open_id":"I1LEuujBQMqM4d9CWpVQug==",
+        "user_region":"CL",
+        "merchant_order_id":"f84f6778-9357-413c-b503-066900667ff5",
+        "payment_provider":"STRIPE",
+        "payment_channel":"CARD",
+        "goods_id":"com.gooplin.il.goods1030",
+        "goods_name":"test20230920-name",
+        "status":"charge.confirmed",
+        "amount":"990",
+        "tax":"0",
+        "fee":"0",
+        "currency":"CLP",
+        "create_time":1699342114,
+        "pay_time":1699342118,
+        "extra":"{\"server\":\"S1\",\"role\":\"b\"}",
+        "order_refund":{
+            "id":1721791738662833333,//退款号
+            "reason":"道具未到账",//退款原因
+            "status":"done", //状态：pending-待处理，refunding-退款中，done-已完成，overrule-已驳回，failed-退款失败
+            "comments":"",//退款申请，游戏开发者的审核意见
+            "comments_picture":"",//审核意见附件
+            "errs":"",// 退款异常信息
+            "created_at":1700449577
+            "updatedAt":1700449577
+        }
+    },
+    "event_type":"refund.succeeded"
+}
+```
+
+</details>
 
 > 出参如下
-成功则输出字符串：success
-失败输出其他任意字符串
-
-
-## TapPay-Signature header规则
-通过 TapPay-Signature header 传递签名信息。格式 时间戳,签名 如：
-TapPay-Signature: 1687224754,4dd293a514223c052513c1db449106f13710c733855d2af6654948675e1624e7
-根据上面的 header ，得到 ts = 1687224754 ，首先可以确认一下跟当前系统时间是否差异过大，确保不是被重用的旧请求。
-请求的 request body ，是一个 JSON 字符串，定义为 payload
 
 ```
-{"open_id":"4tPbsDs1EHHt33c9HMFOjg=="}
-sign = HmacSHA256(secret, ts + "." + payload )
+成功则输出字符串：success，失败输出其他任意字符串。
 ```
 
+>路由地址
 
-### Webhook 回调
+```
+游戏可自定义
+```
 
-#### Webhook 说明
-
-目前 Webhook 仅监听「退款成功」事件: `refund.succeeded`，对于支付成功建议采取主动`核销订单`，根据订单状态完成发货。
-
-#### Webhook 验签
-
-Webhook 是一个 HTTP POST 请求，通过 `TapPay-Signature` header 传递签名信息。格式 `时间戳,签名` 如：
+> 请求方式
 
 ```java
-TapPay-Signature: 1687224754,4dd293a514223c052513c1db449106f13710c733855d2af6654948675e1624e7
-```
-
-根据上面的 header ，得到 `ts = 1687224754` ，首先可以确认一下跟当前系统时间是否差异过大，确保不是被重用的旧请求。
-
-请求的 request body ，是一个 JSON 字符串，定义为 `payload`
-
-```json
-{
-  "event_type": "refund.succeeded"
-  "order": {      
-      "amount" : 299,
-      "client_id" : "UeTShOwxDrAsf232WN",
-      "currency" : "USD",
-      "extra" : "648ff2d31a81c",
-      "goods_open_id" : "game-11190",
-      "minor_unit" : 2,
-      "order_id" : "1670680390026510338",
-      "order_token" : "2cf31318c6f4939d5eaf2e9431bf45f2",
-      "region_id" : "HK",
-      "status" : "refund.succeeded",
-      "user_id" : 3173821787,
-      "verified" : false
-  }
-}
-```
-
-此外，还需要将在 TapTap 开发者中心后台配置的 `API 密钥` 作为 HmacSHA256 算法的 secret 最终得到 
-
-```java
-sign = HmacSHA256(secret, ts + "." + payload )
-```
-
-比对计算结果 sign 和 `TapPay-Signature` 的签名部分是否相同
-
-
-#### Webhook 内容
-
-Webhook 内容包含 `event_type` 和 订单信息，目前支持的 `event_type` 有：
-
-| event_type       | 含义     |
-|------------------|---------|
-| refund.succedded | 退款成功 |
-
-
-```json
-{
-  "event_type": "refund.succeeded"
-  "order": {      
-      "amount" : 299,
-      "client_id" : "UeTShOwxDrAsf232WN",
-      "currency" : "USD",
-      "extra" : "648ff2d31a81c",
-      "goods_open_id" : "game-11190",
-      "minor_unit" : 2,
-      "order_id" : "1670680390026510338",
-      "order_token" : "2cf31318c6f4939d5eaf2e9431bf45f2",
-      "region_id" : "HK",
-      "status" : "refund.succeeded",
-      "user_id" : 3173821787,
-      "verified" : false
-  }
-}
+POST-application/json
 ```
