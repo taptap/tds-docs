@@ -1,0 +1,216 @@
+---
+title: Server REST API
+sidebar_position: 4
+---
+
+<head>
+  <meta name="robots" content="noindex" />
+</head>
+
+## Server Development Guide
+### Server REST API
+
+:::tip
+Please refer to the [Base URL](/sdk/storage/guide/rest/#base-url), [Request Format](/sdk/storage/guide/rest/#request-format) and [Response Format](/sdk/storage/guide/rest/#response-format) descriptions in the Data Storage REST API documentation. Since this set of interfaces is for calling between servers, only the `master key` authentication method is supported. Do not use or expose the `master key` on the client side. The `master key` is the `serverSecret` of the application in the DC backend.
+:::
+
+|URL                                                 |HTTP    |Function                             | 
+|----------------------------------------------------|--------|--------------------------------|
+|/open/payment/v1/orders/<order_id>            |GET     | Query order information                     | 
+|/open/payment/v1/orders/<order_id>/verify     |POST    | Verify order                        |
+|/open/payment/v1/orders/<order_id>/refund     |POST    | Order refund                        | 
+
+#### Query Order
+
+You can query the detailed information of an order by order ID and determine the current payment status.
+
+```sh
+curl -X POST \
+  -H 'X-LC-Id: {{appid}}' \
+  -H 'X-LC-Key: {{masterKey}},master' \
+  https://{{host}}/open/payment/v1/orders/1670731970469806082
+```
+
+The return value is a JSON object of an order. 
+
+```json
+{
+   "data" : {
+      "amount" : 299,
+      "client_id" : "UeTShOwxDrAsf232WN",
+      "currency" : "USD",
+      "extra" : "648ff2d31a81c",
+      "goods_open_id" : "game-11190",
+      "minor_unit" : 2,
+      "order_id" : "1670680390026510338",
+      "order_token" : "2cf31318c6f4939d5eaf2e9431bf45f2",
+      "region_id" : "HK",
+      "status" : "refund.succeeded",
+      "user_id" : 3173821787,
+      "verified" : false
+   },
+   "success" : true
+}
+```
+
+#### Verify Order
+After the payment is successful, verifying the order indicates that the payment result has been confirmed and the delivery will be completed for the buyer. The order status will change from `charge.succeeded` to `charge.confirmed`.
+
+```sh
+curl -X POST \
+  -H 'X-LC-Id: {{appid}}' \
+  -H 'X-LC-Key: {{masterKey}},master' \
+  https://{{host}}/open/payment/v1/orders/1670731970469806082/verify?token=2cf31318c6f4939d5eaf2e9431bf45f2
+```
+
+The return value is a JSON object of an order. 
+
+```json
+{
+   "data" : {
+      "amount" : 299,
+      "client_id" : "UeTShOwxDrAsf232WN",
+      "currency" : "USD",
+      "extra" : "648ff2d31a81c",
+      "goods_open_id" : "game-11190",
+      "minor_unit" : 2,
+      "order_id" : "1670680390026510338",
+      "order_token" : "2cf31318c6f4939d5eaf2e9431bf45f2",
+      "region_id" : "HK",
+      "status" : "refund.succeeded",
+      "user_id" : 3173821787,
+      "verified" : false
+   },
+   "success" : true
+}
+```
+
+The only scenarios where the game server should use the REST API are when querying and validating orders. An example of an exception response is shown below:
+
+```json 
+// 1004 - Order does not exist    1018 - Order verification error
+{
+   "data" : {
+      "code" : 1004,
+      "error" : "order_not_found",
+      "error_description" : "Order does not exist",
+      "msg" : "Order does not exist"
+   },
+   "success" : false
+}
+```
+
+#### Order Refund
+Refund an order. 
+
+```sh
+curl -X GET \
+  -H 'X-LC-Id: {{appid}}' \
+  -H 'X-LC-Key: {{masterKey}},master' \
+  https://{{host}}/open/payment/v1/orders/1670731970469806082/refund
+```
+
+#### Order Object Fields 
+
+|Field                 | Meaning          | 
+|--------------------|---------------|
+|client_id           |Client ID      | 
+|user_id             |User OpenID    | 
+|order_id            |Order ID       |
+|order_token         |Token used for verification |
+|goods\_open\_id     |Item ID         |
+|amount              |Order Amount         | 
+|currency            |Currency            | 
+|monior_unit         |Currency Precision         | 
+|region_id           |Buyer Region         |
+|status              |Order Status         | 
+|verified            |Whether verified before |
+|extra               |Business Additional Data      |
+
+#### Order Status
+
+|Status                | Meaning            |
+|-------------------|-----------------| 
+|charge.pending     | Pending Payment           | 
+|charge.succeeded   | Payment Successful         |
+|charge.confirmed   | Verified           | 
+|charge.overdue     | Payment Closed Due to Timeout       | 
+|refund.pending     | Refunding           | 
+|refund.succeeded   | Refund Successful         |
+|refund.failed      | Refund Failed         |
+|refund.rejected    | Refund Rejected       |
+
+### Webhook Callback
+
+#### Webhook Description
+
+Currently, Webhook only monitors the "Refund Successful" event: `refund.succeeded`. For successful payment, it is recommended to take the initiative to `verify the order` and complete the delivery according to the order status.
+
+#### Webhook Verification 
+
+Webhook is an HTTP POST request that passes signature information through the `TapPay-Signature` header. The format is `timestamp, signature` such as: 
+ 
+```
+ TapPay-Signature: 1687224754,4dd293a514223c052513c1db449106f13710c733855d2af6654948675e1624e7
+ ```
+
+According to the above header, `ts = 1687224754` is obtained. You can first confirm whether its difference from the current system time is too large to ensure that it is not a reused request.
+
+The request body is a JSON string defined as `payload`.
+
+```
+{
+  "event_type": "refund.succeeded"
+  "order": {      
+      "amount" : 299,
+      "client_id" : "UeTShOwxDrAsf232WN",
+      "currency" : "USD",
+      "extra" : "648ff2d31a81c",
+      "goods_open_id" : "game-11190",
+      "minor_unit" : 2,
+      "order_id" : "1670680390026510338",
+      "order_token" : "2cf31318c6f4939d5eaf2e9431bf45f2",
+      "region_id" : "HK",
+      "status" : "refund.succeeded",
+      "user_id" : 3173821787,
+      "verified" : false
+  }
+}
+```
+
+You also need the `API key` configured in the DC backend as the secret of the HmacSHA256 algorithm to finally get
+
+```
+sign = HmacSHA256(secret, ts + "." + payload ) 
+```
+
+Compare whether the calculated sign is the same as the signature part of `TapPay-Signature`
+
+#### Webhook Content
+
+The Webhook content contains `event_type` and order information. The currently supported `event_type` are:
+
+| event_type       | Meaning     |
+|------------------|---------| 
+| refund.succedded | Refund Successful | 
+
+
+```
+{
+  "event_type": "refund.succeeded"
+  "order": {      
+      "amount" : 299,
+      "client_id" : "UeTShOwxDrAsf232WN",
+      "currency" : "USD",
+      "extra" : "648ff2d31a81c",
+      "goods_open_id" : "game-11190",
+      "minor_unit" : 2,
+      "order_id" : "1670680390026510338",
+      "order_token" : "2cf31318c6f4939d5eaf2e9431bf45f2",
+      "region_id" : "HK",
+      "status" : "refund.succeeded",
+      "user_id" : 3173821787,
+      "verified" : false
+  }
+}
+```
