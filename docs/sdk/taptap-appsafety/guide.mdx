@@ -1,0 +1,230 @@
+---
+title: 应用安全接入指南
+sidebar_label: 开发指南
+sidebar_position: 2
+---
+
+本文介绍如何在游戏中加入 TapTap 推出的应用安全功能。
+
+## APK 加固功能说明
+
+### 功能特点
+
+| 功能名称 | 描述 | 
+| --- | --- |
+| SO 加密保护 | 对 SO 文件进行代码、函数、导出表加密混淆，防止 HOOK 攻击，有效提高脱壳难度。 |
+| global-metadata 加密 | 针对 IL2CPP 游戏，对 global-metadata 实现加固，提高破解门槛。 |
+| AAB 加固 | Android App Bundle 加固方案支持。 |
+| 加固方案自保护 | 对加固方案源码进行了混淆，极大的提高了外挂作者对加固方案的逆向分析门槛，进一步提高了游戏的破解难度。 |
+| ROOT 环境检测 | 减少风险环境作弊的可能性。 |
+| 反调试 | 检测 IDA、FRIDA 等调试工具，有效提高动态分析门槛。 |
+| 模拟器识别 | 基于样本库，精确识别模拟器用户，为游戏隔离匹配提供准确依据。 |
+| 云手机识别 | 基于真机数据与外网多种云手机样本，多维度断定云手机环境。 |
+| 防二次打包 | 保持加固前后签名一致的情况下，可以开启签名校验，防止二次打包。 |
+| 恶意软件对抗 | 防框架插件、内存修改器、多开等软件。 |
+
+### 操作说明
+
+#### 功能入口
+
+- 未加入薪火，且在 TapTap 独家发型的游戏，直接通过「应用安全」功能入口进入即可，如没有该入口，可联系对应的商务或者运营申请。
+
+- 薪火计划的游戏，则直接在薪火页面，选择 APK 加固权益，点击立即使用即可（如下图）。
+
+![](https://capacity-files.lcfile.com/wKzxfJfVfKOxDKRlEgiQvAnQ69OdKiak/app-safety-jiagu.png)
+
+#### 使用规则
+
+- 每个游戏单个自然月加固成功次数不允许超过5次，开发者请勿滥用；
+- 有多渠道需求的使用方，若须先加固再进行二次打包，请确保项目处于正常运行状态；
+- 加固文件大小不超过 2G；
+- 加固不支持自动签名，加固后需要重新签名；
+- 每次加固，最多加固 2 个文件。
+
+## 反作弊检测功能说明
+
+反作弊检测功能主要是游戏通过加固后，平台将监测并捕获 App 运行时非法操作及环境的数据进行展示。通过展示作弊设备及相关详情，让开发者深入了解安全现状、精准把握安全态势。
+
+![](https://capacity-files.lcfile.com/XJgCXueaiMHdcKDHjom7yBel6fqL8zD7/app-safety-resist.png)
+
+### 页面字段说明
+
+- UUID：运行设备标记
+- 用户ID：游戏侧上报
+- 特征编号：显示值为十六进制
+
+
+<table>
+ 	<tr>
+		<th> 特征编码 </th>
+		<th> ID </th>
+		<th> 检测类型 </th>
+		<th> 详细信息 </th>
+	</tr>
+	<tr>
+		<td rowspan="2"> 1000000000000000+id </td>
+		<td> 0 </td>
+		<td> root 类 </td>
+		<td> root 系统，测试签名模式 </td>
+	</tr>
+	<tr>
+		<td> 1 </td>
+		<td> root </td>
+		<td> root、magisk、TESTSIGNING </td>
+	</tr>
+  <tr>
+		<td rowspan="3"> 2000000000000000+id </td>
+		<td> 0 </td>
+		<td> 调试类 </td>
+		<td> 调试器 </td>
+	</tr>
+	<tr>
+		<td> 1 </td>
+		<td> android debug </td>
+		<td> ida、frida、java 信息 </td>
+	</tr>
+  <tr>
+		<td> 3 </td>
+		<td> android ADB </td>
+		<td> adb enabled </td>
+	</tr>
+  <tr>
+		<td rowspan="5"> 3000000000000000+id </td>
+		<td> 0 </td>
+		<td> hook 类 </td>
+		<td> 被 hook </td>
+	</tr>
+	<tr>
+		<td> 1 </td>
+		<td> android hooked, iOS inline hook </td>
+		<td> api flag </td>
+	</tr>
+  <tr>
+		<td> 2 </td>
+		<td> android hook 框架，iOS fh hook </td>
+		<td> hook frame </td>
+	</tr>
+  <tr>
+		<td> 3 </td>
+		<td> android java hooked </td>
+		<td> java hook flag </td>
+	</tr>
+  <tr>
+		<td> 5 </td>
+		<td> android hook 框架（多开器） </td>
+		<td>  </td>
+	</tr>
+  <tr>
+		<td rowspan="2"> 4000000000000000+id </td>
+		<td> 0 </td>
+		<td> 内存类 </td>
+		<td> 运行时内存被外部修改 </td>
+	</tr>
+	<tr>
+		<td> 1 </td>
+		<td> 判断内存设备被打开 </td>
+		<td>  </td>
+	</tr>
+  <tr>
+		<td rowspan="2"> 5000000000000000+id </td>
+		<td> 0 </td>
+		<td> 资源修改类 </td>
+		<td> 资源、签名被修改 </td>
+	</tr>
+	<tr>
+		<td> 1 </td>
+		<td> android 签名，iOS 异常签名团队 </td>
+		<td> apk or so 签名信息 </td>
+	</tr>
+  <tr>
+		<td rowspan="2"> 6000000000000000+id </td>
+		<td> 0 </td>
+		<td> 模拟器类 </td>
+		<td> 使用模拟器运行 </td>
+	</tr>
+	<tr>
+		<td> any </td>
+		<td> 模拟器 </td>
+		<td> 类型 </td>
+	</tr>
+
+  <tr>
+		<td rowspan="2"> 7000000000000000+id </td>
+		<td> 0 </td>
+		<td> 云手机类 </td>
+		<td> 使用云手机运行 </td>
+	</tr>
+	<tr>
+		<td> any </td>
+		<td> 云手机 </td>
+		<td> 类型 </td>
+	</tr>
+  <tr>
+		<td rowspan="2"> 8000000000000000+id </td>
+		<td> 0 </td>
+		<td> 通用外挂、外设类 </td>
+		<td>  </td>
+	</tr>
+	<tr>
+		<td> any </td>
+		<td> 通用外挂、外设类型值 </td>
+		<td> 外设 </td>
+	</tr>
+
+  <tr>
+		<td rowspan="2"> B000000000000000+id </td>
+		<td> 0 </td>
+		<td> 沙盒类 </td>
+		<td>  </td>
+	</tr>
+	<tr>
+		<td> any </td>
+		<td> 沙盒检测类型 </td>
+		<td> 类型 </td>
+	</tr>
+</table>
+
+- 检测类型
+
+| index | 类型 | 描述 | 
+| --- | --- | --- |
+| 1 | root 类 | android and ios：运行环境是 root 环境，windows：测试签名环境 |
+| 2 | 调试类 | 运行进程被调试 |
+| 3 | hook 类 | 被 hook |
+| 4 | 内存修改类 | 运行内容被修改 |
+| 5 | 资源修改类 | 资源签名被修改 |
+| 6 | 模拟器类 | 模拟器运行 |
+| 7 | 云真机类 | 云真机运行 |
+| 8 | 通用外挂类 | 已知各类作弊软件检测 |
+| 9 | 特殊外挂类 | 外设输入捕获计算结果 |
+| 10 | 注入类 | 	
+作弊框架或其他注入 |
+| 11 | 沙盒类 | 沙盒环境运行 |
+
+- 检测结果
+
+1、对应检测类型实行处理策略。
+
+2、检测到退出或者不做额外操作
+
+- 详细信息
+
+1、检测类型详细信息
+
+ 
+
+### 功能使用规则
+
+#### 图表操作
+
+- 提供基于上报 ID、用户 ID、检测类型、检测结果以及时间的筛选功能。
+- 提供报表下载功能，支持对检测的数据下载到本地。
+
+![](https://capacity-files.lcfile.com/skGGCntpLlMUqjeQOMESC2mHQs7dOG9q/app-safety-diagrams.png)
+
+### 反作弊策略配置
+
+- 提供反作弊策略配置，开发者自主配置作弊打击策略。
+- 配置默认开启，支持配置，开发者可按需关闭，关闭后，则相应配置策略不生效。
+
+![](https://capacity-files.lcfile.com/ItAilmNzJsHD2usODnWMLHIqahLDt9Ow/app-safety-cheat.png)
