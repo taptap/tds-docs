@@ -677,6 +677,72 @@ splashAd.show(this);
 
 </MultiLang>
 
+### 关闭开屏广告
+:::tip
+注意 **3.16.3.23 版本开始 开屏广告移除了自动关闭逻辑，需要媒体手动关闭**。
+:::
+
+<MultiLang kind="adn">
+
+<>
+
+```cs
+using TapTap.TapAd
+// 场景 1 媒体直接关闭开屏广告
+if (_tapSplashAd != null)
+{
+    _tapSplashAd.Dispose();
+}
+
+// 场景 2 在收到开屏广告交互事件后选择关闭
+public void OnAdSkip(TapSplashAd ad) {
+    if (ad != null) ad.Dispose();
+}
+
+public void OnAdTimeOver(TapSplashAd ad) {
+    if (ad != null) ad.Dispose();
+}
+...
+
+```
+
+</>
+
+<>
+
+```java
+// 场景 1 媒体展示开屏中直接关闭广告
+if (splashAd != null)
+{
+    splashAd.dispose();
+    splashAd.destroyView();
+}
+
+// 场景 2 在收到开屏广告交互事件后选择关闭
+@Override
+public void onAdSkip() {
+    if (splashAd != null)
+    {
+        splashAd.dispose();
+        splashAd.destroyView();
+    }
+}
+
+@Override
+public void onAdTimeOver() {
+    if (splashAd != null)
+    {
+        splashAd.dispose();
+        splashAd.destroyView();
+    }
+}
+```
+
+</>
+
+</MultiLang>
+
+
 ## 激励视频广告 
 
 激励视频是一种全屏播放的视频广告，用户可以在观看完整的视频后获取奖励,视频广告播放结束后会显示结束页面，引导用户进行后续动作。目前激励视频广告的表现形式为：视频播放完展示 Endcard 页面。
@@ -1160,8 +1226,24 @@ public interface TapFeedAd {
      * @param permissionViews 可点击的权限视图
      *
      */
+    @Deprecated
     void registerViewForInteraction(ViewGroup container, List<View> clickViews, List<View> creativeViews,
     	List<View> describeViews, List<View> privacyViews, List<View> permissionViews, AdInteractionListener listener);
+
+    /**
+    * 注册可点击的 view，click/show 会在内部完成
+    *
+    * @param activity 渲染广告所在的 activity
+    * @param container 渲染广告最外层的 ViewGroup
+    * @param clickViews 可点击的视图
+    * @param creativeViews 可点击的创意视图（广告下载的按钮）
+    * @param describeViews 可点击的介绍详情视图
+    * @param privacyViews 可点击的隐私协议视图
+    * @param permissionViews 可点击的权限视图
+    *
+    */
+    void registerViewForInteraction(Activity activity, ViewGroup container, List<View> clickViews, List<View> creativeViews,
+        List<View> describeViews, List<View> privacyViews, List<View> permissionViews, AdInteractionListener listener);
     
     /**
      * 设置下载监听器
