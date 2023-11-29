@@ -11,14 +11,16 @@ import IconRecent from "../../icons/recent.svg";
 import type { HitItem, HitGroup } from "../../common";
 
 interface HistoryProps {
+  query:string,
   recentHits: HitItem[];
   searchFormEl: React.RefObject<HTMLFormElement>;
   searchInputEl: React.RefObject<HTMLInputElement>;
-  openHit: (hit: HitItem) => void;
+  openHit: (hit: HitItem,query: string) => void;
   removeRecentHit: (hit: HitItem) => void;
 }
 
 const History = ({
+  query,
   recentHits,
   searchFormEl,
   searchInputEl,
@@ -28,9 +30,10 @@ const History = ({
   const groupedHits: HitGroup[] = [{ hits: recentHits }];
   const [selection, setSelection, selectionEl] = useSelection(
     groupedHits,
+    query,
     searchFormEl,
     searchInputEl,
-    openHit
+    openHit,
   );
 
   return (
@@ -48,7 +51,8 @@ const History = ({
             }}
             selectionEl={selectionEl}
             openHit={openHit}
-            key={hit._id}
+            query={query}
+            key={hit._id} 
           >
             <div className={styles.wrapper}>
               <div className={styles.content}>
