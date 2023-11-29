@@ -22,11 +22,15 @@ const Gallery = ({ brand, entries, title, cardSize = 'narrow', showFilter = fals
       <div className={styles.hero}>
         <div className={styles.title}>
           {/* @ts-ignore */}
-          <Logo noLabel noLink size={brand === "leancloud" ? 1.3 : 1.6} />
+          {
+            ({brand}.toString() === "leancloud")? <Logo noLabel noLink size={brand === "leancloud" ? 1.3 : 1.6} />:  <img src={useBaseUrl("/img/Local.png")} width="334" ></img>
+          }
+         
+
           <Translate
             id={`tds-home-${title}`}
           >
-            {title}
+            {brand === "leancloud" ?title:""}
           </Translate>
         </div>
 

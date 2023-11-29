@@ -3,6 +3,7 @@ import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import Translate from "@docusaurus/Translate";
 import { BRAND } from "../../constants/env";
 import styles from "./styles.module.scss";
+import useBaseUrl from "@docusaurus/useBaseUrl";
 
 const LOGOS = {
   tds: (
@@ -55,23 +56,31 @@ const Logo = ({ noLabel, noLink, reversed, size = 1 }: LogoProps) => {
   return (
     <div className={styles.logo}>
       <LinkWrapper>
-        <div
-          title={BRAND === "leancloud" ? "LeanCloud" : "TapTap"}
-          className={`${styles.logoImage} ${reversed ? styles.reversed : ""}`}
-          style={{
-            height: getHeight(BRAND === "leancloud" ? 20 : 24),
-            transform: BRAND === "leancloud" ? "none" : "translateY(1px)",
-          }}
-        >
-          {BRAND === "leancloud" ? LOGOS.leancloud : LOGOS.tds}
-        </div>
+      {
+        BRAND === "leancloud" ?  <div
+        title={BRAND === "leancloud" ? "LeanCloud" : "TapTap"}
+        className={`${styles.logoImage} ${reversed ? styles.reversed : ""}`}
+        style={{
+          height: getHeight(BRAND === "leancloud" ? 20 : 24),
+          transform: BRAND === "leancloud" ? "none" : "translateY(1px)",
+        }}
+      >
+        {BRAND === "leancloud" ? LOGOS.leancloud : LOGOS.tds}
+      </div> :   <div
+      >
+        <img src={useBaseUrl("/img/Local.png")} width="218" height="30"></img>
+      </div>
+      }
+
+
+      
       </LinkWrapper>
 
       {BRAND === "tds" && !noLabel && (
         <a className={styles.label} href={dcDomainHost}>
-          <Translate id="tds-header-开发者中心" description="from Header">
+          {/* <Translate id="tds-header-开发者中心" description="from Header">
             开发者服务
-          </Translate>
+          </Translate> */}
         </a>
       )}
     </div>
