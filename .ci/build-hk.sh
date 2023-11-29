@@ -13,6 +13,7 @@ rm -r docs/store
 
 # 中文版「游戏服务」
 rm docs/sdk/start/agreement.mdx # 入门指南/TapSDK 隐私政策
+rm docs/sdk/start/compliance.mdx # 入门指南/TapSDK 合规使用说明
 rm -r docs/sdk/domain # 域名
 rm -r docs/sdk/fire-test # 薪火计划
 rm docs/sdk/taptap-login/guide/upgrade1.x.mdx # TapTap 登录/开发指南/1.x 升级 3.x

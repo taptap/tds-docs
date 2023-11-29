@@ -86,7 +86,7 @@ SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选�
     "com.taptap.tds.payments.global":"https://github.com/taptap/TapPayments-Global-Unity.git#${sdkVersions.taptap.unity}",
     "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}",
     "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
-    "com.taptap.tds.androiddependencyresolver": "https://github.com/TapTap/Android_Dependency_Resolver#1.1.1"
+    "com.taptap.tds.androiddependencyresolver": "https://github.com/TapTap/Android_Dependency_Resolver#${sdkVersions.taptap.adr}"
 }`}
 </CodeBlock>
 
@@ -211,7 +211,7 @@ SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选�
     "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}",
     "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}", 
     "com.taptap.tds.payments.global":"https://github.com/taptap/TapPayments-Global-Unity.git#${sdkVersions.taptap.unity}",
-    "com.taptap.tds.androiddependencyresolver": "https://github.com/TapTap/Android_Dependency_Resolver#1.1.1"
+    "com.taptap.tds.androiddependencyresolver": "https://github.com/TapTap/Android_Dependency_Resolver#${sdkVersions.taptap.adr}"
 }`}
 </CodeBlock>
 
@@ -457,7 +457,7 @@ int quantity = 1;
 
 string extraInfo = "自定义扩展信息";
 
-TapPayment.RequestPayFlow ( language, itemId, quantity, extra, new TapPayment.PayCallback ()
+TapPayment.RequestPayFlow ( language, itemId, quantity, extraInfo, new TapPayment.PayCallback ()
 {
     OnCancel = ( extra ) =>
     {
@@ -495,7 +495,7 @@ int quantity = 1;
 
 String extraInfo = "自定义扩展信息";
 
-TapPayment.requestPayFlow(activity, language, itemId, quantity, extra, new TapPayment.PayCallback() {
+TapPayment.requestPayFlow(activity, language, itemId, quantity, extraInfo, new TapPayment.PayCallback() {
     @Override
     public void onCancel(String extra)  {
         Log.i(TAG, "支付已取消\n" + extra);
@@ -559,7 +559,7 @@ TapPayment.QueryOrder ( orderId, new ITapPayment.Callback < Order > ()
 
 // 或者直接传递一个已存在的订单对象
 Order order = new Order();
-order.id = "订单ID";
+order.id = "订单 ID";
 TapPayment.QueryOrder ( orderId, new ITapPayment.Callback < Order > ()
 {
     ...
@@ -586,7 +586,7 @@ TapPayment.queryOrder(orderId, new ITapPayment.Callback < Order >() {
 
 // 或者直接传递一个已存在的订单对象
 Order order = new Order();
-order.id = "订单ID";
+order.id = "订单 ID";
 
 TapPayment.queryOrder(order, new ITapPayment.Callback < Order >() {
     ....
@@ -1123,197 +1123,3 @@ public class Callback < T >
 :::tip 默认语言
 如果没有匹配到相应语言，会使用英语作为默认语言。
 :::
-
-## 服务端开发指南
-### 服务端 REST API
-
-:::tip
-请参考 数据存储 REST API 文档中关于 [Base URL](/sdk/storage/guide/rest/#base-url)、[请求格式](/sdk/storage/guide/rest/#请求格式)、[响应格式](/sdk/storage/guide/rest/#响应格式)的说明。因为这一组接口为服务器之间的调用，所以仅支持 `master key` 的鉴权方式。不要在客户端使用或暴露 `master key`。 `master key` 是 DC 后台中应用的 `serverSecret`
-:::
-
-|URL                                                 |HTTP    |功能                             |
-|----------------------------------------------------|--------|--------------------------------|
-|/open/payment/v1/orders/&lt;order_id&gt;            |GET     | 查询订单信息                     |
-|/open/payment/v1/orders/&lt;order_id&gt;/verify     |POST    | 核销订单                         |
-|/open/payment/v1/orders/&lt;order_id&gt;/refund     |POST    | 订单退款                         |
-|/open/payment/v1/orders/&lt;order_id&gt;/unconfirmed|GET     | 查询未核销的订单列表               |
-
-#### 查询订单
-
-通过一个订单 ID 可以查询到订单的详细信息并确定当前的支付状态
-
-```sh
-curl -X POST \
-  -H 'X-LC-Id: {{client_id}} \
-  -H 'X-LC-Key: {{server_secret}},master \
-  https://tds-tapsdk0.intl.tapapis.com/open/payment/v1/orders/1670731970469806082
-```
-
-返回值是一个订单的 JSON 对象
-
-```json
-{
-   "data" : {
-      "amount" : 299,
-      "client_id" : "UeTShOwxDrAsf232WN",
-      "currency" : "USD",
-      "extra" : "648ff2d31a81c",
-      "goods_open_id" : "game-11190",
-      "minor_unit" : 2,
-      "order_id" : "1670680390026510338",
-      "order_token" : "2cf31318c6f4939d5eaf2e9431bf45f2",
-      "region_id" : "HK",
-      "status" : "refund.succeeded",
-      "user_id" : 3173821787,
-      "verified" : false
-   },
-   "success" : true
-}
-```
-
-#### 核销订单
-当支付成功后，核销订单表示已经确认支付结果并会对买家完成发货，订单状态也会从 `charge.succeeded` 变为 `charge.confirmed`
-
-```sh
-curl -X POST \
-  -H 'X-LC-Id: {{client_id}} \
-  -H 'X-LC-Key: {{server_secret}},master \
-  https://tds-tapsdk0.intl.tapapis.com/open/payment/v1/orders/1670731970469806082/verify?token=2cf31318c6f4939d5eaf2e9431bf45f2
-```
-返回值是一个订单的 JSON 对象
-
-```json
-{
-   "data" : {
-      "amount" : 299,
-      "client_id" : "UeTShOwxDrAsf232WN",
-      "currency" : "USD",
-      "extra" : "648ff2d31a81c",
-      "goods_open_id" : "game-11190",
-      "minor_unit" : 2,
-      "order_id" : "1670680390026510338",
-      "order_token" : "2cf31318c6f4939d5eaf2e9431bf45f2",
-      "region_id" : "HK",
-      "status" : "refund.succeeded",
-      "user_id" : 3173821787,
-      "verified" : false
-   },
-   "success" : true
-}
-```
-
-#### 订单退款
-对一个订单进行退款
-
-```sh
-curl -X GET \
-  -H 'X-LC-Id: {{client_id}} \
-  -H 'X-LC-Key: {{server_secret}},master \
-  https://tds-tapsdk0.intl.tapapis.com/open/payment/v1/orders/1670731970469806082/refund
-```
-
-#### 订单对象字段
-
-|字段                 | 含义          |
-|--------------------|---------------|
-|client_id           |               |
-|user_id             |               |
-|order_id            |               |
-|order_token         |用于核销的 token |
-|goods\_open\_id     |商品 ID         |
-|amount              |订单金额         |
-|currency            |货币            |
-|monior_unit         |货币精度         |
-|region_id           |买家区域         |
-|status              |订单状态         |
-|verified            |之前是否已经核销过 |
-|extra               |业务附加数据      |
-
-#### 订单状态
-
-|状态                | 含义            |
-|-------------------|-----------------|
-|charge.pending     | 待支付           |
-|charge.succeeded   | 支付成功         |
-|charge.confirmed   | 已核销           |
-|charge.overdue     | 支付超时关闭      |
-|refund.pending     | 退款中           |
-|refund.succeeded   | 退款成功         |
-|refund.failed      | 退款失败         |
-|refund.rejected    | 退款被拒绝       |
-
-### Webhook 回调
-
-#### Webhook 说明
-
-目前 Webhook 仅监听「退款成功」事件: `refund.succeeded`，对于支付成功建议采取主动`核销订单`，根据订单状态完成发货。
-
-#### Webhook 验签
-
-Webhook 是一个 HTTP POST 请求，通过 `TapPay-Signature` header 传递签名信息。格式 `时间戳,签名` 如：
-
-```
-TapPay-Signature: 1687224754,4dd293a514223c052513c1db449106f13710c733855d2af6654948675e1624e7
-```
-
-根据上面的 header ，得到 `ts = 1687224754` ，首先可以确认一下跟当前系统时间是否差异过大，确保不是被重用的旧请求。
-
-请求的 request body ，是一个 JSON 字符串，定义为 `payload`
-
-```
-{
-  "event_type": "refund.succeeded"
-  "order": {      
-      "amount" : 299,
-      "client_id" : "UeTShOwxDrAsf232WN",
-      "currency" : "USD",
-      "extra" : "648ff2d31a81c",
-      "goods_open_id" : "game-11190",
-      "minor_unit" : 2,
-      "order_id" : "1670680390026510338",
-      "order_token" : "2cf31318c6f4939d5eaf2e9431bf45f2",
-      "region_id" : "HK",
-      "status" : "refund.succeeded",
-      "user_id" : 3173821787,
-      "verified" : false
-  }
-}
-```
-
-还需要在 DC 后台配置过的 `webhookToken` ，作为 HmacSHA256 算法的 secret 最终得到 
-
-```
-sign = HmacSHA256(secret, ts + "." + payload )
-```
-
-比对计算结果 sign 和 `TapPay-Signature` 的签名部分是否相同
-
-
-#### Webhook 内容
-
-Webhook 内容包含 `event_type` 和 订单信息，目前支持的 `event_type` 有：
-
-| event_type       | 含义     |
-|------------------|---------|
-| refund.succedded | 退款成功 |
-
-
-```
-{
-  "event_type": "refund.succeeded"
-  "order": {      
-      "amount" : 299,
-      "client_id" : "UeTShOwxDrAsf232WN",
-      "currency" : "USD",
-      "extra" : "648ff2d31a81c",
-      "goods_open_id" : "game-11190",
-      "minor_unit" : 2,
-      "order_id" : "1670680390026510338",
-      "order_token" : "2cf31318c6f4939d5eaf2e9431bf45f2",
-      "region_id" : "HK",
-      "status" : "refund.succeeded",
-      "user_id" : 3173821787,
-      "verified" : false
-  }
-}
-```

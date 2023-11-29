@@ -1,5 +1,19 @@
 export const ENTRIES = [
   {
+    "title": "通用说明",
+    "description": "SDK 名称：LeanCloud 云服务SDK。           开发者：美味书签（北京）信息技术有限公司。           主要功能：数据存储，即时通讯，混合推送，实时对战等。",
+    "links": [
+      {
+        "label": "个人信息处理与隐私政策",
+        "to": "/sdk/start/privacy/"
+      },
+      {
+        "label": "合规使用说明",
+        "to": "/sdk/start/compliance/"
+      }
+    ]
+  },
+  {
     "title": "iOS",
     "description": "Objective-C SDK 包含数据存储、即时通讯与推送、社交、用户反馈、全文搜索等模块。Swift SDK 包含数据存储、即时通讯与推送等功能。",
     "links": [

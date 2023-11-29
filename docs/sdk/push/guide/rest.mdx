@@ -7,8 +7,20 @@ import { Conditional } from "/src/docComponents/conditional";
 
 当 App 安装到用户设备后，如果要使用推送功能，云服务 SDK 会自动生成一个 Installation 对象。Installation 对象包含了推送所需要的所有信息。你可以使用 REST API，通过 Installation 对象进行推送。
 
+<Conditional brand="leancloud">
+
+请求的 Base URL 可以在**应用 > 设置 > 应用凭证 > 服务器地址**查看。
+对于 POST 和 PUT 请求，请求的主体必须是 JSON 格式，而且 HTTP Header 的 Content-Type 需要设置为 `application/json`。
+
+</Conditional>
+
+<Conditional brand="tds">
+
 请求的 Base URL 可以在**开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 即时通讯 > 设置**查看。
 对于 POST 和 PUT 请求，请求的主体必须是 JSON 格式，而且 HTTP Header 的 Content-Type 需要设置为 `application/json`。
+
+</Conditional>
+
 
 请求的鉴权是通过 HTTP Header 里面包含的键值对来进行的，详见《存储 REST API》中 [请求格式](/sdk/storage/guide/rest/#请求格式) 一节的说明。
 
@@ -860,9 +872,21 @@ curl -X GET \
 
 [推送消息接口](#推送消息)的调用受频率限制，限制如下：
 
+<Conditional brand="leancloud">
+
 |商用版（每应用）|开发版（每应用）|
 |----------|---------------|
 |最大 9600 次/分钟，默认 600 次/分钟|60 次/分钟|
+
+</Conditional>
+
+<Conditional brand="tds">
+
+| 每个应用 |
+|----------|
+|最大 9600 次/分钟，默认 600 次/分钟|
+
+</Conditional>
 
 超过频率限制后 1 分钟内云端会拒绝请求持续返回 429 错误码，一分钟后会重新处理请求。
 
@@ -915,9 +939,21 @@ curl -X GET \
 
 限制如下：
 
+<Conditional brand="leancloud">
+
 |商用版（每应用每天）|开发版（每应用每天）|
 |----------|---------------|
 |最大无上限，默认 100 万人次|1 万人次|
+
+</Conditional>
+
+<Conditional brand="tds">
+
+| 每个应用 |
+|----------|
+|最大无上限，默认 100 万人次|
+
+</Conditional>
 
 达到限制后，当天将无法再推送消息。
 
@@ -944,7 +980,7 @@ curl -X GET \
 * 为防止由于大量证书错误所产生的性能问题，我们对使用 **开发证书** 的推送做了设备数量的限制，即一次至多可以向 20,000 个设备进行推送。如果满足推送条件的设备超过了 20,000 个，系统会拒绝此次推送，在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 推送记录** 中的 **状态** 一栏显示「错误」，提示信息为「dev profile disabled for massive push」。因此，在使用开发证书推送时，请合理设置推送条件。
 * Apple 对推送消息大小有限制，对 iOS 推送请尽量缩小要发送的数据大小，否则会被截断。详情请参看 [APNs 文档](https://developer.apple.com/library/content/documentation/NetworkingInternet/Conceptual/RemoteNotificationsPG/PayloadKeyReference.html)。
 * 如果使用了 Android 的混合推送，请注意华为推送对消息大小有限制。为保证推送消息能被正常发送，我们要求 data + channels 参数须小于 4096 字节，超过限制会导致推送无法正常发送，请尽量减小发送数据大小。
-* 每个开发版应用处在待发队列中的定时推送数量最多 10 条，每个商用版应用处在待发队列中的定时推送数量最多 1000 条。
+* <Conditional brand="leancloud">每个开发版应用处在待发队列中的定时推送数量最多 10 条，每个商用版应用处在待发队列中的定时推送数量最多 1000 条。</Conditional><Conditional brand="tds">每个应用处在待发队列中的定时推送数量最多 1000 条。</Conditional>
 
 如果推送失败，在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 推送记录** 的 **状态** 一栏中会看到错误提示。
 

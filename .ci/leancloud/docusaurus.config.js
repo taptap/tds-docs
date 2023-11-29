@@ -97,6 +97,10 @@ const config = {
                 href: 'https://leancloud.github.io/javascript-sdk/docs/',
               },
               {
+                label: 'JavaScript 即时通讯 SDK API',
+                href: 'https://leancloud.github.io/js-realtime-sdk/docs/',
+              },
+              {
                 label: 'JavaScript 多人在线对战 SDK API',
                 href: 'https://leancloud.github.io/Play-SDK-JS/doc/global.html',
               },
