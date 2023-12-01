@@ -41,7 +41,6 @@ const sdkVersions = {
       this.taptap.android = androidVersion.data;
       this.taptap.ios = iosVersion.data;
       this.taptap.unreal = ueVersion.data;
-      console.log(unityVersion.data)
     } catch (error) {
       console.error(error);
     }
