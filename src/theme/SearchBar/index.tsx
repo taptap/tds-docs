@@ -16,6 +16,12 @@ import styles from "./index.module.scss";
 import IconSearchBtn from "./icons/search-btn.svg";
 
 import type { HitItem, HitGroupWithTitle } from "./common";
+import { upItemListIndexApi } from "./api";
+import { Segment, useDefault } from 'segmentit';
+import { BRAND } from "../../constants/env";
+import { time } from "console";
+const segmentit = useDefault(new Segment());
+var myTimer ;
 
 const useRecentHits = (locale: string) => {
   const localStorageItemKey: string = `tds_doc_search_recent_hits_for_${locale}`;
@@ -61,7 +67,7 @@ const getUpdatedRecentHits = (
   return updatedRecentHits;
 };
 
-const useSearch = (url: string, locale: string) => {
+const useSearch = (url: string,aiUrl:string, locale: string) => {
   interface SearchRequestConfig {
     headers: {
       "X-TDS-Doc-Search-Source": string;
@@ -80,38 +86,46 @@ const useSearch = (url: string, locale: string) => {
     };
   }
 
+ 
+
   const groupHits = (hits: HitItem[]): HitGroupWithTitle[] => {
     const groupedHits: HitGroupWithTitle[] = [];
-
     hits.forEach((hit) => {
+
+
       for (const group of groupedHits) {
         if (group.title === hit._source.title) {
           group.hits.push(hit);
           return;
         }
       }
-
       groupedHits.push({
         title: hit._source.title,
         hits: [hit],
       });
     });
-
+    //排序
     groupedHits.sort((a: HitGroupWithTitle, b: HitGroupWithTitle): number => {
       const getAvgScore = ({ hits }: HitGroupWithTitle): number =>
         hits.reduce((p: number, c: HitItem) => p + c._score, 0) / hits.length;
       return getAvgScore(b) - getAvgScore(a);
     });
-
+    //增加下标
+    var index = 1
+    groupedHits.forEach((group) => {
+      group.hits.forEach((hit) => {
+        hit._indexItem = index
+        index++
+      })
+    })
     return groupedHits;
   };
-
   const [session] = useState<string>(uuidv4);
   const [query, setQuery] = useState<string>("");
   const [groupedHits, setGroupedHits] = useState<null | HitGroupWithTitle[]>(
     null
   );
-
+  
   useEffect(() => {
     let ignore: boolean = false;
 
@@ -132,14 +146,40 @@ const useSearch = (url: string, locale: string) => {
       const {
         data: { hits },
       }: SearchResponse = await axios.get(url, config);
+      //对返回值进行修改，增加 session 和 sequence
+      hits.forEach((hit) => {
+        hit._X_Tds_Doc_Search_Session = session;
+        hit._X_Tds_Doc_Search_Sequence = sequence;
+        hit._locale = locale
+      });
       return hits;
     };
+    
+   
+   
 
     const search = async () => {
-      const hits: HitItem[] = await fetchHits(url, query, locale);
-      if (!ignore) {
-        const groupedHits: HitGroupWithTitle[] = groupHits(hits);
-        setGroupedHits(groupedHits);
+      if (myTimer){
+        console.log("清除Ai 定时器");
+        clearTimeout(myTimer)
+      }
+      // 当问题只有纯数字也不调用或分词数小于 2 的时候也不调用AI
+      if(/^\d+$/.test(query)||segmentit.doSegment(query).length<=2){
+        
+        const hits: HitItem[] = await fetchHits(url, query, locale);
+        if (!ignore) {
+          const groupedHits: HitGroupWithTitle[] = groupHits(hits);
+          setGroupedHits(groupedHits);
+        }
+      }else{
+        //TODO 计算发送间隔，如果输入后0.5内无输入就发送请求
+        myTimer = setTimeout(async function() {
+          const hits: HitItem[] = await fetchHits(aiUrl, query, locale);
+          if (!ignore) {
+            const groupedHits: HitGroupWithTitle[] = groupHits(hits);
+            setGroupedHits(groupedHits);
+          }
+        }, 500)
       }
     };
 
@@ -176,16 +216,18 @@ const SearchBar = () => {
     siteConfig: { customFields, baseUrl },
     i18n: { currentLocale },
   } = useDocusaurusContext();
+  
   const searchUrl = customFields?.searchUrl as string;
+  const upItemListIndexUrl = customFields?.upItemListIndexUrl as string;
+  const aiSearchUrl =  currentLocale=="en"? customFields?.aiSearchEnUrl  as string: customFields?.aiSearchUrl  as string;
 
   const [isSearchOpen, openSearch, closeSearch] = useToggle();
   const [recentHits, setRecentHits] = useRecentHits(currentLocale);
 
   const history = useHistory();
 
-  const openHit = (hit: HitItem) => {
+  const openHit = (hit: HitItem,query:string) => {
     closeSearch();
-
     const updatedRecentHits: HitItem[] = getUpdatedRecentHits(
       recentHits,
       hit,
@@ -195,7 +237,28 @@ const SearchBar = () => {
 
     const url: string = hit._source.url;
     history.push(`${baseUrl}${url}`);
+    if (query!=""){
+      upItemListIndex(hit,query);
+    }
+   
   };
+
+
+
+  function upItemListIndex(hit: HitItem,query:string) {
+    var source  =  hit._source
+    // TODO 点击条目跳转
+    upItemListIndexApi(
+      upItemListIndexUrl as string,
+      query,
+      hit._X_Tds_Doc_Search_Session,
+      hit._X_Tds_Doc_Search_Sequence,
+      hit._indexItem,
+      source,hit._locale)
+  }
+
+  
+
 
   const removeRecentHit = (hit: HitItem) => {
     const updatedRecentHits: HitItem[] = getUpdatedRecentHits(
@@ -232,12 +295,14 @@ const SearchBar = () => {
         </span>
       </button>
       {isSearchOpen && (
-        <SearchBox
+        <SearchBox 
           searchUrl={searchUrl}
+          aiSearchUrl={aiSearchUrl}
           locale={currentLocale}
           recentHits={recentHits}
           closeSearch={closeSearch}
           openHit={openHit}
+
           removeRecentHit={removeRecentHit}
         />
       )}
@@ -247,24 +312,27 @@ const SearchBar = () => {
 
 interface SearchBoxProps {
   searchUrl: string;
+  aiSearchUrl:string;
   locale: string;
   recentHits: HitItem[];
   closeSearch: () => void;
-  openHit: (hit: HitItem) => void;
+  openHit: (hit: HitItem,query:string) => void;
   removeRecentHit: (hit: HitItem) => void;
 }
 
 const SearchBox = ({
   searchUrl,
+  aiSearchUrl,
   locale,
   recentHits,
   closeSearch,
   openHit,
   removeRecentHit,
 }: SearchBoxProps) => {
-  const [query, setQuery, groupedHits] = useSearch(searchUrl, locale);
+  const [query, setQuery, groupedHits] = useSearch(searchUrl, aiSearchUrl,locale);
   const searchFormEl = useRef<HTMLFormElement>(null);
   const searchInputEl = useRef<HTMLInputElement>(null);
+
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -291,6 +359,7 @@ const SearchBox = ({
 
   return (
     <>
+      {/* 这是头部 */}
       <Head>
         <meta
           name="viewport"
@@ -301,10 +370,10 @@ const SearchBox = ({
       <div className={styles.searchBox}>
         <div className={styles.scrim} onClick={closeSearch} />
         <div
-          className={`${styles.panel} ${
-            groupedHits === null && !recentHits.length ? styles.short : ""
-          }`}
+          className={`${styles.panel} ${groupedHits === null && !recentHits.length ? styles.short : ""
+            }`}
         >
+          {/* 输入框 */}
           <Input
             query={query}
             setQuery={setQuery}
@@ -312,6 +381,7 @@ const SearchBox = ({
             searchInputEl={searchInputEl}
             closeSearch={closeSearch}
           />
+          {/* 返回的显示 */}
           <Content
             query={query}
             recentHits={recentHits}
