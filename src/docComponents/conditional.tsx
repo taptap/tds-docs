@@ -8,9 +8,6 @@ interface ConditionalProps {
 }
 
 export function Conditional(props: ConditionalProps) {
-  
-  
-
   const { children, brand, region } = props;
   if (
     (!brand || brand === BRAND) &&

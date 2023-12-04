@@ -16,8 +16,7 @@ import IconStar from "./icons/star.svg";
 import IconInfo from "./icons/info.svg";
 import IconSuccess from "./icons/success.svg";
 import tap from "./icons/tap.png";
-import sdkVersions from "../../docComponents/sdkVersions";
- 
+
 type Position = { top: number; left: number };
 
 type Selection = { range: Range; text: string };
@@ -438,7 +437,6 @@ function FeedbackModal({
     document.body.classList.add(styles.noScroll);
     updateFeedbackList();
 
-
     return () => {
       document.body.classList.remove(styles.noScroll);
     };
@@ -730,20 +728,10 @@ function Feedback() {
 type Props = WrapperProps<typeof MDXContentType>;
 
 export default function MDXContentWrapper(props: Props): JSX.Element {
-
-  sdkVersions.initialize();
-  const unityVersion = sdkVersions.taptap.unity;
   return (
-    
-      <>
-        {
-        unityVersion ?
-          <>
-          <MDXContent {...props} />
-          <Feedback />
-        </>
-        : ""
-        }
-      </>
+    <>
+      <MDXContent {...props} />
+      <Feedback />
+    </>
   );
 }
