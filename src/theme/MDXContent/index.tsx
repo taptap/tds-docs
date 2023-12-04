@@ -735,15 +735,11 @@ export default function MDXContentWrapper(props: Props): JSX.Element {
   const unityVersion = sdkVersions.taptap.unity;
   return (
     
-      <>
-        {
-        unityVersion ?
+     
           <>
           <MDXContent {...props} />
           <Feedback />
         </>
-        : ""
-        }
-      </>
+       
   );
 }
