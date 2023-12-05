@@ -118,19 +118,16 @@ const CONFIGS: {
 };
 
 const MultiLang = ({ children, kind = "default" }) => {
-  
 
   const values = CONFIGS[kind][BRAND];
   return (
-
-      <Tabs groupId="tap-platform">
-      {values.map(({ label, value }, index) => (
-        <TabItem value={value} label={label} default={index === 0} key={value}>
-          {children[index]}
-        </TabItem>
-      ))}
-    </Tabs>
-    
+        <Tabs groupId="tap-platform">
+        {values.map(({ label, value }, index) => (
+          <TabItem value={value} label={label} default={index === 0} key={value}>
+            {children[index]}
+          </TabItem>
+        ))}
+      </Tabs>
   );
 };
 

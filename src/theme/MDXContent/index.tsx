@@ -736,7 +736,6 @@ export default function MDXContentWrapper(props: Props): JSX.Element {
 
   const [sdkVersion, setSdkVersion] = useState("");
 
-
   useEffect(() => {
 
     const initialize = async () => {
@@ -749,20 +748,19 @@ export default function MDXContentWrapper(props: Props): JSX.Element {
     };
 
     initialize();
-  }, []); 
+  }); 
 
   return (
     <>
-    {
-      sdkVersion != "" ?
-      <>
-        <MDXContent {...props} />
-        <Feedback />
-      </>
-      : <p>{sdkVersion}</p>
-    }
+      {
+        sdkVersion != "" ?
+        <>
+          <MDXContent {...props} />
+          <Feedback />
+        </>
+      : ""
+      }
     </>
-   
        
   );
 }
