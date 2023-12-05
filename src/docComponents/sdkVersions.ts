@@ -2,10 +2,10 @@ import { findSDKVersion } from "./ReleaseNote/api/index";
 
 const sdkVersions = {
   taptap: {
-    unity: "3.26.3",
-    android: "3.24.0",
-    ios: "3.23.0",
-    unreal: "3.25.0",
+    unity: "",
+    android: "",
+    ios: "",
+    unreal: "",
     rtc: "1.1.0",
     adr: "1.1.5"
   },
@@ -29,26 +29,23 @@ const sdkVersions = {
   },
 
   async initialize() {
-    // try {
-    //   // 调用 findSDKVersion 方法获取版本信息
-    //   const unityVersion = await findSDKVersion("unity");
-    //   const androidVersion = await findSDKVersion("android");
-    //   const iosVersion = await findSDKVersion("ios");
-    //   const ueVersion = await findSDKVersion("ue4");
+    try {
+      // 调用 findSDKVersion 方法获取版本信息
+      const unityVersion = await findSDKVersion("unity");
+      const androidVersion = await findSDKVersion("android");
+      const iosVersion = await findSDKVersion("ios");
+      const ueVersion = await findSDKVersion("ue4");
 
-    //   // 将获取的版本信息赋值给 taptap.unity
-    //   this.taptap.unity = unityVersion.data;
-    //   this.taptap.android = androidVersion.data;
-    //   this.taptap.ios = iosVersion.data;
-    //   this.taptap.unreal = ueVersion.data;
-    // } catch (error) {
-    //   console.error(error);
-    // }
+      // 将获取的版本信息赋值给 taptap.unity
+      this.taptap.unity = unityVersion.data;
+      this.taptap.android = androidVersion.data;
+      this.taptap.ios = iosVersion.data;
+      this.taptap.unreal = ueVersion.data;
+    } catch (error) {
+      console.error(error);
+    }
   },
 };
-
-// 在其他地方调用 sdkVersions.initialize() 来初始化异步值
-sdkVersions.initialize();
 
 export default sdkVersions;
 
