@@ -17,7 +17,8 @@ import IconInfo from "./icons/info.svg";
 import IconSuccess from "./icons/success.svg";
 import tap from "./icons/tap.png";
 import sdkVersions from "../../docComponents/sdkVersions";
- 
+import { findSDKVersion } from "../../docComponents/ReleaseNote/api/index";
+
 type Position = { top: number; left: number };
 
 type Selection = { range: Range; text: string };
@@ -729,17 +730,38 @@ function Feedback() {
 
 type Props = WrapperProps<typeof MDXContentType>;
 
+
 export default function MDXContentWrapper(props: Props): JSX.Element {
 
-  sdkVersions.initialize();
-  const unityVersion = sdkVersions.taptap.unity;
+  const [sdkVersion, setSdkVersion] = useState("");
+
+  useEffect(() => {
+
+    const initialize = async() => {
+      try {
+       if(sdkVersions.taptap.unity === ""){
+        await sdkVersions.initialize()
+       }
+       setSdkVersion(sdkVersions.taptap.unity)
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    initialize();
+  }); 
+
   return (
-    
-     
-          <>
+    <>
+      {
+        sdkVersion ?
+        <>
           <MDXContent {...props} />
           <Feedback />
         </>
+      : ""
+      }
+    </>
        
   );
 }

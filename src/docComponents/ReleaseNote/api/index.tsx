@@ -15,6 +15,6 @@ export const findContentForSDKNames = (sdkPlugName: string, sdkName: string) => 
 };
 
 
-export const findSDKVersion = (sdkPlugName: string) => {
-  return ajax('https://taptap.leanapp.cn/releases/find/version', { sdkPlugName }, 'GET');
+export const findSDKVersion = () => {
+  return ajax('https://taptap.leanapp.cn/releases/find/version', {}, 'GET');
 };
