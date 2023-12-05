@@ -731,16 +731,15 @@ function Feedback() {
 type Props = WrapperProps<typeof MDXContentType>;
 
 
-
 export default function MDXContentWrapper(props: Props): JSX.Element {
 
   const [sdkVersion, setSdkVersion] = useState("");
 
   useEffect(() => {
 
-    const initialize = async () => {
+    const initialize = () => {
       try {
-       await sdkVersions.initialize()
+       sdkVersions.initialize()
        setSdkVersion(sdkVersions.taptap.unity)
       } catch (error) {
         console.error(error);
