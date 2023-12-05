@@ -739,7 +739,9 @@ export default function MDXContentWrapper(props: Props): JSX.Element {
 
     const initialize = async() => {
       try {
-       await sdkVersions.initialize()
+       if(sdkVersions.taptap.unity === ""){
+        await sdkVersions.initialize()
+       }
        setSdkVersion(sdkVersions.taptap.unity)
       } catch (error) {
         console.error(error);
@@ -752,7 +754,7 @@ export default function MDXContentWrapper(props: Props): JSX.Element {
   return (
     <>
       {
-        sdkVersion != "" ?
+        sdkVersion ?
         <>
           <MDXContent {...props} />
           <Feedback />
