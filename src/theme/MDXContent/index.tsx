@@ -737,9 +737,9 @@ export default function MDXContentWrapper(props: Props): JSX.Element {
 
   useEffect(() => {
 
-    const initialize = () => {
+    const initialize = async() => {
       try {
-       sdkVersions.initialize()
+       await sdkVersions.initialize()
        setSdkVersion(sdkVersions.taptap.unity)
       } catch (error) {
         console.error(error);
