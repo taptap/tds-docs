@@ -77,15 +77,15 @@ const config = {
             items: [
               {
                 label: 'Android/Java SDK API',
-                href: 'https://leancloud.cn/api-docs/android/index.html',
+                href: 'https://leancloud.github.io/java-unified-sdk/',
               },
               {
                 label: 'Objective-C SDK API',
-                href: 'https://leancloud.cn/api-docs/iOS/index.html',
+                href: 'https://leancloud.github.io/objc-sdk/',
               },
               {
                 label: 'Swfit SDK API',
-                href: 'https://leancloud.cn/api-docs/swift/index.html',
+                href: 'https://leancloud.github.io/swift-sdk/',
               },
               {
                 label: 'Flutter 数据存储 SDK API',
