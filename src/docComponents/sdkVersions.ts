@@ -2,10 +2,10 @@ import { findSDKVersion } from "./ReleaseNote/api/index";
 
 const sdkVersions = {
   taptap: {
-    unity: "",
-    android: "",
-    ios: "",
-    unreal: "",
+    unity: "3.26.5",
+    android: "3.24.1",
+    ios: "3.23.1",
+    unreal: "3.25.1",
     rtc: "1.1.0",
     adr: "1.1.5"
   },
@@ -26,28 +26,7 @@ const sdkVersions = {
   tapadn: {
     unity: "3.16.3.23",
     android: "3.16.3.23",
-  },
-
-  async initialize() {
-    try {
-      const versions = await findSDKVersion();
-      if(versions.data.length > 0 ){
-        for (const item of versions.data) {
-          if(item.sdkPlugName == "unity"){
-            this.taptap.unity = item.version;
-          }else if(item.sdkPlugName == "ios"){
-            this.taptap.ios = item.version;
-          }else if(item.sdkPlugName == "android"){
-            this.taptap.android = item.version;
-          }else if(item.sdkPlugName == "ue4"){
-            this.taptap.unreal = item.version;
-          }
-        }
-      }   
-    } catch (error) {
-      console.error(error);
-    }
-  },
+  }
 };
 
 export default sdkVersions;
