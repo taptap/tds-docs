@@ -37,19 +37,38 @@ implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'\n
 
 然后新建一个 Java Class ，名字叫做 **MyLeanCloudApp**，让它继承自 **Application** 类，实例代码如下:
 
+<Conditional brand="leancloud">
+
 ```java
 public class MyLeanCloudApp extends Application {
 
     @Override
     public void onCreate() {
         super.onCreate();
-
-        // 初始化参数依次为 this, AppId, AppKey
-        LeanCloud.initialize(this, "{{appid}}", "{{appkey}}", "https://please-replace-with-your-customized.domain.com");
+         // 初始化参数依次为 this, AppID, appkey
+        LeanCloud.initialize(this, "{{AppID}}", "{{appkey}}", "https://please-replace-with-your-customized.domain.com");
+      
     }
 }
 ```
 
+</Conditional>
+
+<Conditional brand="tds">
+
+```java
+public class MyLeanCloudApp extends Application {
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+         // 初始化参数依次为 this, ClientID, clientToken
+        LeanCloud.initialize(this, "{{clientID}}", "{{clientToken}}", "https://please-replace-with-your-customized.domain.com");
+    }
+}
+```
+
+</Conditional>
 ### 配置 AndroidManifest
 
 请确保你的 `AndroidManifest.xml` 的 `<application>` 中包含如下内容：
@@ -203,6 +222,9 @@ public static void createNotificationChannel(Context context, String channelId, 
 
 例如如下的请求会在客户端通知 id 为「1」的通道进行显示：
 
+
+<Conditional brand="leancloud">
+
 ```sh
 curl -X POST \
   -H "X-LC-Id: {{appid}}"          \
@@ -218,6 +240,29 @@ curl -X POST \
      }' \
   https://{{host}}/1.1/push
 ```
+
+</Conditional>
+
+<Conditional brand="tds">
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{ClientID}}"          \
+  -H "X-LC-Key: {{ClientToken}}"        \
+  -H "Content-Type: application/json" \
+  -d '{
+        "where": {"key" : "value"}
+        "data": {
+          "alert": "消息内容",
+          "title": "显示在通知栏的标题",
+          "_notificationChannel": "1"
+        }
+     }' \
+  https://{{host}}/1.1/push
+```
+
+</Conditional>
+
 
 ## 推送消息
 
