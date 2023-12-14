@@ -2,12 +2,51 @@
 on:
   push:
     branches: [master]
+  schedule:
+    - cron: '*/20 * * * *'
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Deploy to LeanEngine
-        uses: enflo/curl-action@v1.2
-        with:
-          curl: -X POST https://cn-e1-console-api.leancloud.cn/1.1/engine/groups/web/production/version?gitTag=${{ github.sha }}&token=${{ secrets.DEPLOY_TOKEN }}
+
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.DEPLOY_TOKEN }}    
+
+    - name: update SDK Version
+      if: github.event_name == 'schedule'
+      run: |
+        SDK_DATA=$(curl -s https://taptap.leanapp.cn/releases/find/version)
+
+        TAPTAP_UNITY=$(echo "$SDK_DATA" | jq -r '.data[] | select(.sdkPlugName == "unity") | .version')
+        TAPTAP_IOS=$(echo "$SDK_DATA" | jq -r '.data[] | select(.sdkPlugName == "ios") | .version')
+        TAPTAP_UE4=$(echo "$SDK_DATA" | jq -r '.data[] | select(.sdkPlugName == "ue4") | .version')
+        TAPTAP_ANDROID=$(echo "$SDK_DATA" | jq -r '.data[] | select(.sdkPlugName == "android") | .version')
+
+        if [ "$TAPTAP_UNITY" != "$(grep -oP 'const taptapUnity = "\K[^"]*' src/docComponents/sdkVersions.ts)" ] || \
+          [ "$TAPTAP_IOS" != "$(grep -oP 'const taptapIos = "\K[^"]*' src/docComponents/sdkVersions.ts)" ] || \
+          [ "$TAPTAP_UE4" != "$(grep -oP 'const taptapUnreal = "\K[^"]*' src/docComponents/sdkVersions.ts)" ] || \
+          [ "$TAPTAP_ANDROID" != "$(grep -oP 'const taptapAndroid = "\K[^"]*' src/docComponents/sdkVersions.ts)" ]; then
+          
+          sed -i "s/const taptapUnity = \".*\"/const taptapUnity = \"$TAPTAP_UNITY\"/" src/docComponents/sdkVersions.ts
+          sed -i "s/const taptapIos = \".*\"/const taptapIos = \"$TAPTAP_IOS\"/" src/docComponents/sdkVersions.ts
+          sed -i "s/const taptapUnreal = \".*\"/const taptapUnreal = \"$TAPTAP_UE4\"/" src/docComponents/sdkVersions.ts
+          sed -i "s/const taptapAndroid = \".*\"/const taptapAndroid = \"$TAPTAP_ANDROID\"/" src/docComponents/sdkVersions.ts
+          
+          echo "SDK 版本有更新"
+
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add -A
+          git commit -m "Update SDK Versions [skip ci]"
+          git push
+        else
+          echo "SDK 版本未更新"
+        fi
+
+    - name: Deploy to LeanEngine
+      uses: enflo/curl-action@v1.2
+      with:
+        curl: -X POST https://cn-e1-console-api.leancloud.cn/1.1/engine/groups/web/production/version?gitTag=${{ github.sha }}&token=${{ secrets.DEPLOY_TOKEN }}
