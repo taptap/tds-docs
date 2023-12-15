@@ -4,8 +4,7 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 import { Link } from "react-router-dom";
 import Logo from "@theme/Logo";
 import styles from "./styles.module.scss";
-
-const Gallery = ({ brand, entries, title, cardSize = 'narrow', showFilter = false }) => {
+const Gallery = ({ brand, entries, title, cardSize = 'narrow', showFilter = false ,REGION="cn"}) => {
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
 
   const getTags = (entries) => {
@@ -23,7 +22,9 @@ const Gallery = ({ brand, entries, title, cardSize = 'narrow', showFilter = fals
         <div className={styles.title}>
           {/* @ts-ignore */}
           {
-            ({brand}.toString() === "leancloud")? <Logo noLabel noLink size={brand === "leancloud" ? 1.3 : 1.6} />:  <img src={useBaseUrl("/img/Local.png")} width="334" ></img>
+            ({brand}.toString() === "leancloud")? <Logo noLabel noLink size={brand === "leancloud" ? 1.3 : 1.6} />:  
+            ({REGION}.toString() === "cn")?<img src={useBaseUrl("/img/Local.png")} width="334" ></img>:
+            <img src={useBaseUrl("/img/logo_en.png")} width="450" ></img>
           }
          
 
