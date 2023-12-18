@@ -22,7 +22,7 @@ const Gallery = ({ brand, entries, title, cardSize = 'narrow', showFilter = fals
   }
 
   return <div className={styles.main}>
-    {brand}
+    {`tds-home-${title}`}
     <div className={styles.stage}>
       <div className={styles.hero}>
         <div className={styles.title}>
@@ -38,13 +38,13 @@ const Gallery = ({ brand, entries, title, cardSize = 'narrow', showFilter = fals
            <img src={useBaseUrl("/img/Local.png")} width="334" ></img>
          
           }
-          
-
-          <Translate
+          {brand === "leancloud" ?  <Translate
             id={`tds-home-${title}`}
           >
             {brand === "leancloud" ?title:""}
-          </Translate>
+          </Translate>:<div></div>}
+
+        
         </div>
 
         {brand === "tds" && (
