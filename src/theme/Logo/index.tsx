@@ -53,6 +53,10 @@ const Logo = ({ noLabel, noLink, reversed, size = 1 }: LogoProps) => {
   const LinkWrapper = ({ children }) =>
     noLink ? children : <a href={mainDomainHost}>{children}</a>;
 
+
+    const {
+      i18n: { currentLocale },
+    } = useDocusaurusContext();
   return (
     <div className={styles.logo}>
       <LinkWrapper>
@@ -66,9 +70,12 @@ const Logo = ({ noLabel, noLink, reversed, size = 1 }: LogoProps) => {
         }}
       >
         {BRAND === "leancloud" ? LOGOS.leancloud : LOGOS.tds}
-      </div> :   <div
-      >
-        <img src={useBaseUrl("/img/Local.png")} width="218" height="30"></img>
+      </div> :  
+       (currentLocale === "zh-Hans")?  <div>
+       <img src={useBaseUrl("/img/Local.png")} width="218" height="30"></img>
+      </div>:
+        <div>
+        <img src={useBaseUrl("/img/logo_en.png")} width="380" height="30"></img>
       </div>
       }
 

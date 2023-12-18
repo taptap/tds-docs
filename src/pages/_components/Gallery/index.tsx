@@ -4,8 +4,13 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 import { Link } from "react-router-dom";
 import Logo from "@theme/Logo";
 import styles from "./styles.module.scss";
-const Gallery = ({ brand, entries, title, cardSize = 'narrow', showFilter = false ,REGION="cn"}) => {
+import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
+const Gallery = ({ brand, entries, title, cardSize = 'narrow', showFilter = false }) => {
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+
+  const {
+    i18n: { currentLocale },
+  } = useDocusaurusContext();
 
   const getTags = (entries) => {
     const tagSet = new Set<string>(entries.map(entry => entry.tag))
@@ -23,7 +28,7 @@ const Gallery = ({ brand, entries, title, cardSize = 'narrow', showFilter = fals
           {/* @ts-ignore */}
           {
             ({brand}.toString() === "leancloud")? <Logo noLabel noLink size={brand === "leancloud" ? 1.3 : 1.6} />:  
-            ({REGION}.toString() === "cn")?<img src={useBaseUrl("/img/Local.png")} width="334" ></img>:
+            (currentLocale === "zh-Hans")?<img src={useBaseUrl("/img/Local.png")} width="334" ></img>:
             <img src={useBaseUrl("/img/logo_en.png")} width="450" ></img>
           }
          
