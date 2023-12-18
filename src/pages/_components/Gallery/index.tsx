@@ -22,14 +22,18 @@ const Gallery = ({ brand, entries, title, cardSize = 'narrow', showFilter = fals
   }
 
   return <div className={styles.main}>
+    
     <div className={styles.stage}>
       <div className={styles.hero}>
         <div className={styles.title}>
           {/* @ts-ignore */}
           {
             ({brand}.toString() === "leancloud")? <Logo noLabel noLink size={brand === "leancloud" ? 1.3 : 1.6} />:  
-            (currentLocale === "zh-Hans")?<img src={useBaseUrl("/img/Local.png")} width="334" ></img>:
+            (currentLocale === "en" )?
             <img src={useBaseUrl("/img/logo_en.png")} width="450" ></img>
+           :
+           <img src={useBaseUrl("/img/Local.png")} width="334" ></img>
+         
           }
          
 

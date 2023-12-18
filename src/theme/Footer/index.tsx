@@ -9,6 +9,7 @@ import { getNavLinks, getLicenceLinks } from "./_config";
 import DiscordLogo from "./discord-mark-white.svg";
 import Arrow from "./arrow.svg";
 import TdsFooter from "./TdsFooter";
+import useBaseUrl from "@docusaurus/useBaseUrl";
 
 function getCopyrightNotice(brand: string): string {
   const year = new Date().getFullYear();
@@ -27,10 +28,20 @@ function Footer() {
       <div className={styles.stage}>
         <div>
           <section>
-            <section className={styles.logo}>
+            { REGION === 'global' ?<section className={styles.logo}>
+              {/* @ts-ignore */}
+              {
+                (currentLocale === "en" )?
+                <img src={useBaseUrl("/img/logo_en_footer.png")} width="200" height="30"></img>
+               :
+               <img src={useBaseUrl("/img/logo_zh_footer.png")} width="180" height="30"></img>
+              }
+             
+            </section>:<section className={styles.logo}>
               {/* @ts-ignore */}
               <Logo noLabel reversed={BRAND === "leancloud"} />
-            </section>
+            </section>}
+            
 
             {BRAND === "tds" ? <section className={styles.discord}>
               <a
