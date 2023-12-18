@@ -22,7 +22,6 @@ const Gallery = ({ brand, entries, title, cardSize = 'narrow', showFilter = fals
   }
 
   return <div className={styles.main}>
-    {`tds-home-${title}`}
     <div className={styles.stage}>
       <div className={styles.hero}>
         <div className={styles.title}>
