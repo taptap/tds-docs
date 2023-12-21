@@ -437,6 +437,7 @@ function FeedbackModal({
     document.body.classList.add(styles.noScroll);
     updateFeedbackList();
 
+
     return () => {
       document.body.classList.remove(styles.noScroll);
     };
@@ -727,11 +728,14 @@ function Feedback() {
 
 type Props = WrapperProps<typeof MDXContentType>;
 
+
 export default function MDXContentWrapper(props: Props): JSX.Element {
+
+
   return (
-    <>
-      <MDXContent {...props} />
-      <Feedback />
-    </>
+      <>
+        <MDXContent {...props} />
+        <Feedback />
+      </>
   );
 }

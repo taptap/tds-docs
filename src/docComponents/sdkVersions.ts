@@ -1,9 +1,11 @@
+import { findSDKVersion } from "./ReleaseNote/api/index";
+
 const sdkVersions = {
   taptap: {
-    unity: "3.26.0",
-    android: "3.24.0",
-    ios: "3.23.0",
-    unreal: "3.25.0",
+    unity: "3.26.5",
+    android: "3.24.1",
+    ios: "3.23.1",
+    unreal: "3.25.1",
     rtc: "1.1.0",
     adr: "1.1.5"
   },
@@ -22,9 +24,10 @@ const sdkVersions = {
     }
   },
   tapadn: {
-    unity: "3.16.3.22",
-    android: "3.16.3.22",
+    unity: "3.16.3.23",
+    android: "3.16.3.23",
   }
 };
 
 export default sdkVersions;
+

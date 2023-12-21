@@ -13,6 +13,9 @@ const config = {
   trailingSlash: true,
   customFields: {
     searchUrl: "https://lc-doc-search-api.cn-e1.leanapp.cn/search",
+    upItemListIndexUrl: "https://lc-doc-search-check-log.cn-e1.leanapp.cn/api/check-log-up",
+    aiSearchUrl :"https://tds-doc-search-ai-api.ap-sg.tdsapps.com/api/ai-search?type=LC",
+    aiSearchEnUrl :"https://tds-doc-search-ai-api.ap-sg.tdsapps.com/api/ai-search?type=LCen",
     searchProviderName: "LeanDB Elasticsearch",
     searchProviderWebsite: "https://docs.leancloud.cn/sdk/engine/database/es/",
     mainDomainHost: "https://www.leancloud.cn",
@@ -74,15 +77,15 @@ const config = {
             items: [
               {
                 label: 'Android/Java SDK API',
-                href: 'https://leancloud.cn/api-docs/android/index.html',
+                href: 'https://leancloud.github.io/java-unified-sdk/',
               },
               {
                 label: 'Objective-C SDK API',
-                href: 'https://leancloud.cn/api-docs/iOS/index.html',
+                href: 'https://leancloud.github.io/objc-sdk/',
               },
               {
                 label: 'Swfit SDK API',
-                href: 'https://leancloud.cn/api-docs/swift/index.html',
+                href: 'https://leancloud.github.io/swift-sdk/',
               },
               {
                 label: 'Flutter 数据存储 SDK API',

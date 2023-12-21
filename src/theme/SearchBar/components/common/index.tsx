@@ -7,9 +7,10 @@ import type { HitItem, HitGroup } from "../../common";
 
 const useSelection = (
   groupedHits: HitGroup[],
+  query:string,
   searchFormEl: React.RefObject<HTMLFormElement>,
   searchInputEl: React.RefObject<HTMLInputElement>,
-  openHit: (hit: HitItem) => void
+  openHit: (hit: HitItem,query: string) => void
 ) => {
   type Selection = [number, number];
 
@@ -54,7 +55,7 @@ const useSelection = (
   useEffect(() => {
     const handleSubmit = () => {
       const hit: HitItem = getHit(groupedHits, selection);
-      openHit(hit);
+      openHit(hit,query);
     };
 
     searchFormEl.current?.addEventListener("submit", handleSubmit);
@@ -123,15 +124,17 @@ const Group = ({ title, zIndex, children }: GroupProps) => (
 
 interface CardProps {
   hit: HitItem;
+  query:string;
   selected: boolean;
   onSelect: () => void;
   selectionEl: React.RefObject<HTMLLIElement>;
-  openHit: (hit: HitItem) => void;
+  openHit: (hit: HitItem,query:string) => void;
   children: React.ReactNode;
 }
 
 const Card = ({
   hit,
+  query,
   selected,
   onSelect,
   selectionEl,
@@ -147,7 +150,7 @@ const Card = ({
     <Link
       to={`/${hit._source.url}`}
       onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {
-        openHit(hit);
+        openHit(hit,query);
         e.preventDefault();
       }}
     >
