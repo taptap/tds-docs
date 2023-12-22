@@ -9,7 +9,7 @@ const config = {
   baseUrl: PREVIEW === "true" ? "/" : "/docs/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
-  favicon: "img/favicon.ico",
+  favicon: "img/logoh.png",
   trailingSlash: true,
   customFields: {
     searchUrl: "https://tds-doc-search-api.avosapps.us/search",
