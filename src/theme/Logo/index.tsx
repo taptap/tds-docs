@@ -71,7 +71,7 @@ const Logo = ({ noLabel, noLink, reversed, size = 1 }: LogoProps) => {
       >
         {BRAND === "leancloud" ? LOGOS.leancloud : LOGOS.tds}
       </div> :  
-       (currentLocale === "en")?  <div style={styles.logo} >
+       (currentLocale === "en")?  <div style={styles.logodev} >
        <img src={useBaseUrl("/img/logo_top_en.png")} width="203" height="28" ></img>
       </div>:
         <div className={styles.logodev}>
