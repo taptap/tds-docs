@@ -360,11 +360,161 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core",
 
 ## 初始化
 
-因为防沉迷模块依赖于 `TapLogin` 模块，所以在防沉迷模块初始化前必须把 `TapLogin` 模块[初始化](/sdk/taptap-login/guide/tap-login/#初始化)了。如果使用了 `TapBootstrap` 模块（推荐），那么可以通过 `TapBootstrap` 模块的[初始化](/sdk/taptap-login/guide/start/#sdk-初始化)来初始化 `TapLogin` 模块。
+从 `3.27.0` 版本开始，防沉迷初始化有两种方式，使用 `TapBootstrap` 模块（推荐）初始化和单独调用防沉迷初始化接口，游戏根据需要选择一种即可， `3.27.0` 之前的版本只支持单独调用防沉迷初始化接口。
 
-初始化防沉迷 UI 模块，设置启动防沉迷功能的配置，注册防沉迷的消息监听。请注意，**触发回调需要调用[防沉迷认证](#防沉迷认证)接口。**
+### TapBootstrap 初始化
 
-如果游戏有接入 TapTap 登录功能，则需要在 TapTap 登录之前进行防沉迷初始化，然后再进行 TapTap 登录。
+使用 `TapBootstrap` 初始化时，需要在 `TapConfig` 中设置 `TapAntiAddicitionConfig` 配置, 但不需要再额外调用登录初始化接口。示例如下：
+
+<MultiLang kind="ue">
+<>
+
+```cs
+var configBuilder = new TapConfig.Builder()
+        .ClientID(clientId)
+        .ClientToken(clientToken)
+        .ServerURL(serverUrl)
+        .RegionType(regionType)
+        // showAntiAddictionSwitchAccount 参数为 bool 类型，表示是否显示切换账号   
+        .AntiAddictionConfig(showAntiAddictionSwitchAccount);     
+TapBootstrap.Init(config);
+```
+
+</>
+<>
+
+
+```java
+
+// TapAntiAddicitonConfig 构造方法中参数为是否显示切换账号
+TapAntiAddictionConfig tapAntiAddictionConfig = new TapAntiAddictionConfig(true);
+
+TapConfig tapConfig = new TapConfig.Builder()
+        .withAppContext(activity)
+        .withClientId(clientId)
+        .withClientToken(clientToken)
+        .withServerUrl(serverUrl)
+        .withRegionType(regionType)
+        .withAntiAddictionConfig(tapAntiAddictionConfig)
+        .build();
+TapBootstrap.init(activity, tapConfig);
+```
+
+</>
+<>
+
+```objc
+ TapConfig *config = [TapConfig new];
+ config.clientId = @"your_client_id"; // 必须，开发者中心对应 Client ID
+ config.clientToken = @"your_client_token"; // 必须，开发者中心对应 Client Token
+ config.serverURL = @"https://your_server_url";
+ config.tapAntiAddictionConfig = [[TapAntiAddictionConfig alloc] init];
+ config.tapAntiAddictionConfig.showSwitchAccount = true;
+ [TapBootstrap initWithConfig:config];
+
+```
+
+</>
+
+<>
+
+```cpp
+FTUConfig Config;
+Config.ClientID = ETB_Init_ClientID->GetText().ToString();
+Config.ClientToken = ETB_Init_ClientToken->GetText().ToString();
+Config.ServerURL = ETB_Init_ServerURL->GetText().ToString();
+Config.TapAntiAddictionConfig = MakeShared<FTapAntiAddictionConfig>();
+Config.TapAntiAddictionConfig->bShowSwitchAccount = true;
+FTapBootstrap::Init(Config);
+
+```
+
+</>
+
+</MultiLang>
+
+初始化完成后，需要注册监听防沉迷消息的回调，示例如下：
+
+<MultiLang kind="ue">
+<>
+
+```cs
+Action<int, string> callback = (code, errorMsg) => {
+    // code == 500;   // 登录成功
+    // code == 1000;  // 用户登出
+    // code == 1001;  // 切换账号
+    // code == 1030;  // 用户当前无法进行游戏
+    // code == 1050;  // 时长限制
+    // code == 9002;  // 实名过程中点击了关闭实名窗
+    UnityEngine.Debug.LogFormat($"code: {code} error Message: {errorMsg}");
+};
+```
+
+</>
+<>
+
+
+```java
+
+AntiAddictionUIKit.setAntiAddictionCallback(new AntiAddictionUICallback() {
+      @Override
+      public void onCallback(int code, Map<String, Object> extras) {
+		    // code == 500;   // 登录成功
+		    // code == 1000;  // 用户登出
+		    // code == 1001;  // 切换账号
+		    // code == 1030;  // 用户当前无法进行游戏
+		    // code == 1050;  // 时长限制
+		    // code == 9002;  // 实名过程中点击了关闭实名窗
+        
+     }
+});
+```
+
+</>
+<>
+
+```objc
+[AntiAddiction setDelegate:delegate];
+//`delegate` 对象需要实现以下协议方法来接收回调
+- (void)antiAddictionCallbackWithCode:(AntiAddictionResultHandlerCode)code extra:(NSString * _Nullable)extra {
+    // 防沉迷回调
+}
+```
+
+
+</>
+
+<>
+
+```cpp
+AntiAddictionUE::OnCallBack.BindLambda([Printer](AntiAddictionUE::ResultHandlerCode Code, const FString& Message)
+	{
+		TMap<AntiAddictionUE::ResultHandlerCode, FString> DesMap = {
+			{AntiAddictionUE::LoginSuccess, TEXT("登录成功")},
+			{AntiAddictionUE::Exited, TEXT("用户登出")},
+			{AntiAddictionUE::SwitchAccount, TEXT("切换账号")},
+			{AntiAddictionUE::DurationLimit, TEXT("时长耗尽，用户当前无法进行游戏")},
+			{AntiAddictionUE::PeriodRestrict, TEXT("宵禁时间，用户当前无法进行游戏")},
+			{AntiAddictionUE::RealNameStop, TEXT("取消实名")}
+		};
+		FTapApiNode OnCallbackNode = Printer.NewCallback(TEXT("OnCallBack"));
+		OnCallbackNode[TEXT("Code")] = Code;
+		OnCallbackNode[TEXT("CodeDescription")] = DesMap[Code];
+		OnCallbackNode[TEXT("Message")] = Message;
+		Printer.Print();
+	});
+
+```
+
+</>
+
+</MultiLang>
+
+### 防沉迷接口初始化
+
+因防沉迷模块依赖于 `TapLogin` 模块，所以在防沉迷模块初始化前必须完成 `TapLogin` 模块[初始化](/sdk/taptap-login/guide/tap-login/#初始化)初始化。
+初始化防沉迷 UI 模块，包括设置启动防沉迷功能的配置、注册防沉迷的消息监听。
+请注意，**触发回调需要调用[防沉迷认证](#防沉迷认证)接口。**
 
 <MultiLang kind="ue">
 <>
