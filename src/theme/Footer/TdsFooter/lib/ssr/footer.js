@@ -1703,7 +1703,7 @@ const gt = (n) => new st(n).i18n, at = {
   qrcode: {
     follow: "关注{{content}}",
     tencent_wx: "微信公众号",
-    tencent_video: "腾讯视频号",
+    tencent_video: "微信视频号",
     bili: "B站官方号",
     join: "加入 {{content}}",
     qq: "QQ 交流群"
