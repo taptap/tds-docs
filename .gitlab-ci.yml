@@ -6,30 +6,9 @@ include:
       - /shared/deploy-kubefiles.yml
 
 stages:
-  - build
   - image
   - deploy-staging
   - deploy-production
-
-build:
-  stage: build
-  image: node:18.8.0
-  before_script:
-    - yarn --version
-    - yarn install
-  script:
-    - "yarn build --out-dir build-cn"
-    - "sh .ci/build-hk.sh"
-  cache:
-    key: ${CI_COMMIT_REF_SLUG}
-    paths:
-      - node_modules
-  artifacts:
-    paths:
-      - build-cn
-      - build-hk
-  only:
-    - master
 
 build-and-push-image:
   stage: image
@@ -38,8 +17,6 @@ build-and-push-image:
   variables:
     DOCKER_REGISTRY_NAMESPACE: tds
     DOCKER_REGISTRY_REPO: tapsdkdoc
-  dependencies:
-    - build
   only:
     - master
 
