@@ -1,0 +1,57 @@
+Cloud Engine now supports these package managers:
+
+- [npm](https://docs.npmjs.com/cli/v10/commands/npm)
+- [pnpm](https://pnpm.io)
+- [Yarn 1](https://classic.yarnpkg.com)
+- [Yarn 2+](https://yarnpkg.com)
+
+Cloud Engine will automatically detect the package manager based on these conditions:
+
+| Package Manager | Condition                                                                       | Version                      |
+| --------------- | ------------------------------------------------------------------------------- | ---------------------------- |
+| pnpm            | A valid `pnpm-lock.yaml` exists                                                 |                              |
+|                 | `lockfileVersion: '6.0'` or higher                                              | 8                            |
+|                 | `lockfileVersion: 5.3` or higher                                                | 7                            |
+|                 | Otherwise                                                                       | 6                            |
+| Yarn 1          | `yarn.lock` exists                                                              | 1                            |
+| Yarn 2+         | Not supported by default, enable via [Corepack](#experimental-corepack-support) | 2+                           |
+| npm             | Otherwise                                                                       | npm with the Node.js is used |
+
+### Experimental Corepack support
+
+**Due to Corepack is still experimental, Cloud Engine can't make sure the support for Corepack is stable, use at your own risk**
+
+To enable Corepack, setting the `ENABLE_EXPERIMENTAL_COREPACK` environment variable of the group to any non-empty string.
+
+Cloud Engine will automatically detect package manager based on `packageManager` field in `package.json`, then use Corepack to install and enable the package manager. This is the only way to use Yarn 2+ for now.
+
+Assume we have a `package.json` shown below：
+
+```json title="package.json"
+{
+  "name": "example",
+  "packageManager": "yarn@4.0.2"
+}
+```
+
+Now Cloud Engine will call `corepack prepare --activate` and detect the package manager is Yarn 2+.
+
+Reference：[Corepack](https://nodejs.org/api/corepack.html)
+
+### Default commands
+
+The default commands may vary depending on the package manager, e.g. if pnpm is used, `npm ci` will be `pnpm install --frozen-lockfile`.
+
+Cloud Engine will skip installing the devDependencies only when `installDevDependencies` is not `true` and the build script is empty (which either not specified in `leanengine.yaml` or `scripts.build` in `package.json` not exists).
+
+| Pharse  | Package Mamager | Condition                                                                                 | Command                                                                     |
+| ------- | --------------- | ----------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| install | npm             | Node.js version is higher then 10 and `package-lock.json` or `npm-shrinkwrap.json` exists | `npm ci`                                                                    |
+|         |                 |                                                                                           | `npm install` or `npm install --omit=dev`                                   |
+|         | pnpm            |                                                                                           | `pnpm install --frozen-lockfile` or `pnpm install --frozen-lockfile --prod` |
+|         | Yarn 1          |                                                                                           | `yarn install` or `yarn install --production`                               |
+|         | Yarn 2+         |                                                                                           | `yarn install`                                                              |
+
+:::note
+Be adviced, Yarn 1 will use the resolved URL in `yarn.lock` without respecting your registry configuration, use proper registry before deploy to Cloud Engine, or build time might increase.
+:::

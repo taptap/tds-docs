@@ -12,8 +12,6 @@ import { Conditional } from "/src/docComponents/conditional";
 
 ## SDK 配置
 
-<!--可以在 [下载页](/tap-download) 获得 TapSDK，引入广告模块。-->
-
 <MultiLang kind="adn">
 
 <>
@@ -589,17 +587,11 @@ public interface ICommonLoadListener
 <>
 
 ```java
-/**
- * 当前版本发现频繁请求开屏广告时有小概率会出现 Rx 的崩溃
- * 可以通过在初始化前调用 RxJavaPlugins.setErrorHandler(emptyConsumer()); 来解决
- * 参考链接: http://reactivex.io/RxJava/2.x/javadoc/ 见 RxJavaPlugins.setErrorHandler
- */
 TapAdNative tapAdNative = TapAdManager.get().createAdNative(activity);
 // 广告后台获取广告位 id
 int spaceId = "your_space_id";
 tapAdNative.loadSplashAd(new AdRequest.Builder()
     .withSpaceId(spaceId)
-    .withQuery("{query}")  // 搜索词，可选
     .build(), new TapAdNative.SplashAdListener() {
 
     @Override
@@ -685,6 +677,72 @@ splashAd.show(this);
 
 </MultiLang>
 
+### 关闭开屏广告
+:::tip
+注意 **3.16.3.23 版本开始 开屏广告移除了自动关闭逻辑，需要媒体手动关闭**。
+:::
+
+<MultiLang kind="adn">
+
+<>
+
+```cs
+using TapTap.TapAd
+// 场景 1 媒体直接关闭开屏广告
+if (_tapSplashAd != null)
+{
+    _tapSplashAd.Dispose();
+}
+
+// 场景 2 在收到开屏广告交互事件后选择关闭
+public void OnAdSkip(TapSplashAd ad) {
+    if (ad != null) ad.Dispose();
+}
+
+public void OnAdTimeOver(TapSplashAd ad) {
+    if (ad != null) ad.Dispose();
+}
+...
+
+```
+
+</>
+
+<>
+
+```java
+// 场景 1 媒体展示开屏中直接关闭广告
+if (splashAd != null)
+{
+    splashAd.dispose();
+    splashAd.destroyView();
+}
+
+// 场景 2 在收到开屏广告交互事件后选择关闭
+@Override
+public void onAdSkip() {
+    if (splashAd != null)
+    {
+        splashAd.dispose();
+        splashAd.destroyView();
+    }
+}
+
+@Override
+public void onAdTimeOver() {
+    if (splashAd != null)
+    {
+        splashAd.dispose();
+        splashAd.destroyView();
+    }
+}
+```
+
+</>
+
+</MultiLang>
+
+
 ## 激励视频广告 
 
 激励视频是一种全屏播放的视频广告，用户可以在观看完整的视频后获取奖励,视频广告播放结束后会显示结束页面，引导用户进行后续动作。目前激励视频广告的表现形式为：视频播放完展示 Endcard 页面。
@@ -763,7 +821,6 @@ AdRequest adRequest = new AdRequest.Builder()
                             .withRewardAmount("your_reward_amount")   // 奖品数量
                             .withExtra1("your_extra_info")         // 游戏如果要通过 s2s 验证激励广告有效性的时候需要传入一些辅助信息来验证本次激励活动是否有效
                             .withUserId("game_user_id")           // 游戏如果要通过 s2s 验证激励广告有效性的时候需要传入游戏中的玩家 id，来验证是否可以对当前用户发放奖励
-                            .withQuery("{query}")                 //  搜索词,可选
                             .build();
 
 tapAdNative.loadRewardVideoAd(adRequest, new TapAdNative.RewardVideoAdListener() {
@@ -833,6 +890,9 @@ public interface IRewardVideoInteractionListener : ICommonInteractionListener
 
     // 当跳过视频
     void OnSkippedVideo(TapRewardVideoAd ad);
+
+    // 点击事件
+    void OnAdClick(TapRewardVideoAd ad);
 }
 // 通用广告播放回调接口说明
 public interface ICommonInteractionListener
@@ -876,6 +936,11 @@ rewardAd.setRewardAdInteractionListener(new TapRewardVideoAd.RewardAdInteraction
     @Override
     public void onSkippedVideo() {
         // 激励广告中玩家点击了跳过视频的按钮
+    }
+
+    @Override
+    public void onAdClick() {
+        // 激励广告点击事件
     }
 });
 rewardAd.showRewardVideoAd(activity);
@@ -949,8 +1014,7 @@ TapAdNative tapAdNative = TapAdManager.get().createAdNative(activity);
 int spaceId = "your_space_id";
 tapAdNative.loadBannerAd(new AdRequest.Builder()
     .withSpaceId(spaceId)
-    .withQuery("{query}")                 //  搜索词,可选
-    .build(),         new TapAdNative.BannerAdListener() {
+    .build(), new TapAdNative.BannerAdListener() {
 
     @Override
     public void onError(int code, String message) {
@@ -1165,13 +1229,29 @@ public interface TapFeedAd {
      * @param container 渲染广告最外层的 ViewGroup
      * @param clickViews 可点击的视图
      * @param creativeViews 可点击的创意视图（广告下载的按钮）
-     * @param describeViews 可点击的广告详情页 (广告 6 要素新增项)
+     * @param describeViews 可点击的介绍详情视图
      * @param privacyViews 可点击的隐私协议视图
      * @param permissionViews 可点击的权限视图
      *
      */
+    @Deprecated
     void registerViewForInteraction(ViewGroup container, List<View> clickViews, List<View> creativeViews,
     	List<View> describeViews, List<View> privacyViews, List<View> permissionViews, AdInteractionListener listener);
+
+    /**
+    * 注册可点击的 view，click/show 会在内部完成
+    *
+    * @param activity 渲染广告所在的 activity
+    * @param container 渲染广告最外层的 ViewGroup
+    * @param clickViews 可点击的视图
+    * @param creativeViews 可点击的创意视图（广告下载的按钮）
+    * @param describeViews 可点击的介绍详情视图
+    * @param privacyViews 可点击的隐私协议视图
+    * @param permissionViews 可点击的权限视图
+    *
+    */
+    void registerViewForInteraction(Activity activity, ViewGroup container, List<View> clickViews, List<View> creativeViews,
+        List<View> describeViews, List<View> privacyViews, List<View> permissionViews, AdInteractionListener listener);
     
     /**
      * 设置下载监听器
@@ -1500,7 +1580,6 @@ _tapInterstitialAd.Load();
 ```java
 AdRequest adRequest = new AdRequest.Builder()
                 .withSpaceId(adId)
-                .withQuery("{query}")                 //  搜索词,可选
                 .build();
 tapAdNative.loadInterstitialAd(adRequest,new TapAdNative.InterstitialAdListener() {
     @Override
@@ -1569,53 +1648,13 @@ interstitialAd.show(activity);
 
 </MultiLang>
 
-## 个性化配置 
-为落实个人信息保护相关的规定，TapADN SDK 为开发者提供退出个性化广告能力的接口，开发者可以调用接口，向用户提供退出个性化广告的能力。退出后，看到的广告数量不变，相关度会降低。开发者需遵守相关法律法规的要求，在开发者应用内为用户提供退出个性化广告的功能，保证在用户点击退出功能后调用穿山甲 SDK 的能力接口。
-
-### 支持版本
-
-Android: 3.16.3.17 及以上
-
-Unity: 3.16.3.17 及以上
-
-<MultiLang kind="adn">
-
-<>
-
-```cs
-using TapTap.TapAd
-// 关闭个性化推荐
-TapAdConfig config = new TapAdConfig.Builder().Data("[{\"name\":\"personal_ads_type\",\"value\":\"0\"}]").Build();
-TapAdSdk.UpdateAdConfig(config);
-
-// 重新启用个性化推荐
-TapAdConfig config = new TapAdConfig.Builder().Data("[{\"name\":\"personal_ads_type\",\"value\":\"1\"}]").Build();
-TapAdSdk.UpdateAdConfig(config);
-```
-
-</>
-
-<>
-
-```java
-// 关闭个性化推荐
-TapAdConfig tapAdConfig = new TapAdConfig.Builder().withData("[{\"name\":\"personal_ads_type\",\"value\":\"0\"}]").build();
-TapAdSdk.updateAdConfig(tapAdConfig);
-
-// 重新启用个性化推荐
-TapAdConfig tapAdConfig = new TapAdConfig.Builder().withData("[{\"name\":\"personal_ads_type\",\"value\":\"1\"}]").build();
-TapAdSdk.updateAdConfig(tapAdConfig);
-```
-
-</>
-
-</MultiLang>
-
-
 ## Android 代码混淆
 
-为了保证 SDK 在代码混淆后能正常运作，需要加入防混淆配置，可以参考下列配置：
+为了保证 SDK 在代码混淆后能正常运作，需要将如下防混淆代码添加到混淆文件中：
 
+:::tip
+Android 原生项目混淆文件位于 `app/proguard-rules.pro`，Unity 项目需要先通过 `Project Settings -> Player -> Publishing Settings -> 勾选 Custom Proguard File`, 然后混淆文件位于项目该路径下 `Assets/Plugins/Android/proguard-user.txt`
+:::
 ```
 -dontwarn com.tapadn.**
 -keep class com.tapadn.** { *;}
@@ -1732,6 +1771,7 @@ sign = fmt.Sprintf("%x", sha256.Sum256(trans_id:SecurityKey))
 
 
 ## SDK 常见错误码汇总
+
 |  错误码  |    错误信息  |     原因    |
 |---|--------|-------------|
 |**3001**| 初始化错误  |  SDK 未初始化,或者初始化异常  |

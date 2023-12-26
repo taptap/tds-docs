@@ -15,7 +15,7 @@ interface ContentProps {
   groupedHits: HitGroupWithTitle[] | null;
   searchFormEl: React.RefObject<HTMLFormElement>;
   searchInputEl: React.RefObject<HTMLInputElement>;
-  openHit: (hit: HitItem) => void;
+  openHit: (hit: HitItem,query: string) => void;
   removeRecentHit: (hit: HitItem) => void;
 }
 
@@ -23,17 +23,20 @@ const Content = ({
   query,
   recentHits,
   groupedHits,
+  openHit,
   ...props
 }: ContentProps) => (
   <div className={styles.content}>
     {groupedHits === null ? (
       recentHits.length ? (
-        <History recentHits={recentHits} {...props} key={recentHits.length} />
+          
+        // 历史信息
+        <History query={query} recentHits={recentHits} {...props} key={recentHits.length} openHit={openHit}/>
       ) : (
         <NoHistory />
       )
     ) : groupedHits.length ? (
-      <Results groupedHits={groupedHits} {...props} key={query} />
+      <Results groupedHits={groupedHits} {...props} key={query} query={query} openHit={openHit}/>
     ) : (
       <NoResults />
     )}

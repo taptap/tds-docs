@@ -172,6 +172,7 @@ export const getLicenceLinks = (
     return LICENCE_LINKS_LEANCLOUD_CN;
   } else {
     if (region === "cn") {
+      
       if (locale === "zh-Hans") {
         return LICENCE_LINKS_TDS_CN.map((link, index) => ({
           ...link,

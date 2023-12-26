@@ -7,6 +7,7 @@ sidebar_position: 2
 import MultiLang from '/src/docComponents/MultiLang';
 import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';
+import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
 
 :::tip
 使用 TDS 实名认证和防沉迷服务之前，需要在 **开发者中心后台 > 游戏服务 > 开发与构建 > 合规认证** 处开通服务，可选择「已有版号」或「暂无版号」方案。
@@ -23,7 +24,7 @@ import sdkVersions from '/src/docComponents/sdkVersions';
 <>
 
 - Unity 2019.4 或更高版本
-- iOS 10 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
+- iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
 - Android 5.0（API level 21）或更高版本
 
 </>
@@ -36,7 +37,7 @@ Android 5.0（API level 21）或更高版本
 
 <>
 
-iOS 10 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
+iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
 
 </>
 
@@ -67,31 +68,20 @@ iOS 10 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.a
 
 <>
 
-SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选其一。请根据项目需要选择。
-
-#### 方法一：使用 Unity Package Manager
-
-在项目的 `Packages/manifest.json` 文件中添加以下依赖：
-
-<CodeBlock className="json">
-  {`"dependencies":{
-    "com.tapsdk.antiaddiction":"https://github.com/taptap/TapAntiAddiction-Unity.git#${sdkVersions.taptap.unity}",
-    "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
-    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
-}`}
-</CodeBlock>
-
-在 Unity 顶部菜单中选择 **Window > Package Manager** 可查看已经安装在项目中的包。
-
-#### 方法二：手动导入
-
-在 [下载页](/tap-download) 找到 TapSDK Unity 和 LeanCloud C# SDK 下载地址，分别下载 TapSDK-UnityPackage.zip 和 LeanCloud-SDK-Storage-Unity.zip。
-
-<ul>
-    <li>TapSDK-UnityPackage.zip 解压后，导入其中的 <code>TapTap_Common_{sdkVersions.taptap.unity}.unitypackage</code> 和 <code>TapTap_AntiAddiction_{sdkVersions.taptap.unity}.unitypackage</code>。</li>
-</ul>
-
-- [LeanCloud-SDK-Storage-Unity.zip](https://github.com/leancloud/csharp-sdk/releases)，解压后为 Plugins 文件夹，拖拽至 Unity 即可。  
+<UnitySDKInstallation 
+npmDeps={[
+    "com.tapsdk.antiaddiction",
+]} 
+githubDeps={[
+    {package: "com.taptap.tds.common", url: `https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}`},
+    {package: "com.tapsdk.antiaddiction", url: `https://github.com/TapTap/TapAntiAddiction-Unity.git#${sdkVersions.taptap.unity}`},
+    {package: "com.leancloud.storage", url: `https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}`},
+    {package: "com.taptap.tds.login", url: `https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}`},
+]}
+unitypackageModules={[
+    {name: "TapTap_Common.unitypackage", desc: "TapSDK 基础库，必选"},
+    {name: "TapTap_AntiAddiction.unitypackage", desc: "TapTap 防沉迷库，必选"},
+]}/>
 
 iOS 平台配置：
 
@@ -132,6 +122,10 @@ iOS 平台配置：
 <li>将 <strong>防沉迷 SDK</strong> <code>AntiAddiction_{sdkVersions.taptap.android}.aar</code> 拷贝到游戏目录下的 <code>src/main/libs</code> 目录中</li>
 <li>将 <strong>防沉迷 SDK</strong> <code>AntiAddictionUI_{sdkVersions.taptap.android}.aar</code> 拷贝到游戏目录下的 <code>src/main/libs</code> 目录中</li>
 <li>将 <code>TapCommon_{sdkVersions.taptap.android}.aar</code> 拷贝到游戏目录下的 <code>src/main/libs</code> 目录中</li>
+<li>将 <code>TapLogin_{sdkVersions.taptap.android}.aar</code> 拷贝到游戏目录下的
+<code>src/main/libs</code> 目录中</li>
+<li>将 <code>TapBootstrap_{sdkVersions.taptap.android}.aar</code> 拷贝到游戏目录下的
+<code>src/main/libs</code> 目录中 (可选）</li>
 </ul>
 
 在游戏目录下 `build.gradle` 文件中添加代码
@@ -144,9 +138,11 @@ iOS 平台配置：
 }
 dependencies {
     // ...
-    implementation(name: "AntiAddiction_${sdkVersions.taptap.ios}", ext: "aar") // 防沉迷 SDK
-    implementation(name: "AntiAddictionUI_${sdkVersions.taptap.ios}", ext: "aar") // 防沉迷 SDK
-    implementation(name: "TapCommon_${sdkVersions.taptap.ios}", ext: "aar")
+    implementation(name: "AntiAddiction_${sdkVersions.taptap.android}", ext: "aar") // 防沉迷 SDK
+    implementation(name: "AntiAddictionUI_${sdkVersions.taptap.android}", ext: "aar") // 防沉迷 SDK
+    implementation(name: "TapCommon_${sdkVersions.taptap.android}", ext: "aar")
+    implementation(name: "TapLogin_${sdkVersions.taptap.android}", ext: "aar")
+    implementation(name: "TapBootstrap_${sdkVersions.taptap.android}", ext: "aar") // 可选
     // ...
 }`}
 </CodeBlock>
@@ -163,10 +159,14 @@ iOS **防沉迷 SDK** 结构：
 其他依赖：
 
 - `TapCommonSDK.framework` 基础库
+- `TapLoginSDK.framework` 基础库
+- `TapCommonResource.bundle` 资源文件
+- `TapLoginResource.bundle` 资源文件
+- `TapBootstrap.framework` 基础库（可选）
 
 添加防沉迷库文件：
 
-- 添加 `AntiAddictionService.framework`、`AntiAddictionUI.framework` 和 `TapCommonSDK.framework` 静态库。注意添加时选择 Embed 方式为 **Do Not Embed**。
+- 添加 `AntiAddictionService.framework`、`AntiAddictionUI.framework`、`TapLoginSDK.framework`、`TapBootstrap.framework`（可选） 和 `TapCommonSDK.framework` 静态库。注意添加时选择 Embed 方式为 **Do Not Embed**。
 
 - 引用代码：
 
@@ -186,7 +186,7 @@ iOS **防沉迷 SDK** 结构：
 
 配置编译选项：
 
-- 在 Build Setting 中的 Other Link Flag 中添加 `-ObjC`。
+- 在 Build Setting 中的 Other Link Flag 中添加 `-ObjC` 和 `-Wl -ld_classic`。
 
 - 在 Build Setting 中的 Always Embed Swift Standard Libraries 设置为 YES，即始终引入 Swift 标准库，避免 App 启动时报错「无法找到 Swift 标准库之类」。如果项目中找不到，可以建立一个空 Swift 文件，Xcode 会自动建立桥接关系。
 
@@ -198,7 +198,7 @@ iOS **防沉迷 SDK** 结构：
 
 #### 安装插件
 
-* 下载 [TapSDK UE4](/tap-download)，TapSDK-UE4-xxx.zip 解压后将 `AntiAddiction`、`TapCommon` 文件夹 Copy 到项目的 `Plugins` 目录中
+* 下载 [TapSDK UE4](/tap-download)，TapSDK-UE4-xxx.zip 解压后将 `AntiAddiction`、`TapCommon`、`TapLogin`、`TapBootstrap(可选)` 文件夹 Copy 到项目的 `Plugins` 目录中
 * 重启 Unreal Editor
 * 打开 编辑 > 插件 > 项目 > TapTap，开启 `AntiAddiction` 模块
 
@@ -215,6 +215,8 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core",
 	"JsonUtilities",
 	"SlateCore",
 	"TapCommon",
+    "TapLogin",
+    "TapBootstrap",  // 可选
 	"AntiAddiction"
 });
 ```
@@ -358,7 +360,161 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core",
 
 ## 初始化
 
-初始化防沉迷 UI 模块，设置启动防沉迷功能的配置，注册防沉迷的消息监听。请注意，**触发回调需要调用[防沉迷认证](#防沉迷认证)接口。**
+从 `3.27.0` 版本开始，防沉迷初始化有两种方式，使用 `TapBootstrap` 模块（推荐）初始化和单独调用防沉迷初始化接口，游戏根据需要选择一种即可， `3.27.0` 之前的版本只支持单独调用防沉迷初始化接口。
+
+### TapBootstrap 初始化
+
+使用 `TapBootstrap` 初始化时，需要在 `TapConfig` 中设置 `TapAntiAddicitionConfig` 配置, 但不需要再额外调用登录初始化接口。示例如下：
+
+<MultiLang kind="ue">
+<>
+
+```cs
+var config = new TapConfig.Builder()
+        .ClientID(clientId)
+        .ClientToken(clientToken)
+        .ServerURL(serverUrl)
+        .RegionType(regionType)
+        // showAntiAddictionSwitchAccount 参数为 bool 类型，表示是否显示切换账号   
+        .AntiAddictionConfig(showAntiAddictionSwitchAccount);     
+TapBootstrap.Init(config);
+```
+
+</>
+<>
+
+
+```java
+
+// TapAntiAddicitonConfig 构造方法中参数为是否显示切换账号
+TapAntiAddictionConfig tapAntiAddictionConfig = new TapAntiAddictionConfig(true);
+
+TapConfig tapConfig = new TapConfig.Builder()
+        .withAppContext(activity)
+        .withClientId(clientId)
+        .withClientToken(clientToken)
+        .withServerUrl(serverUrl)
+        .withRegionType(regionType)
+        .withAntiAddictionConfig(tapAntiAddictionConfig)
+        .build();
+TapBootstrap.init(activity, tapConfig);
+```
+
+</>
+<>
+
+```objc
+ TapConfig *config = [TapConfig new];
+ config.clientId = @"your_client_id"; // 必须，开发者中心对应 Client ID
+ config.clientToken = @"your_client_token"; // 必须，开发者中心对应 Client Token
+ config.serverURL = @"https://your_server_url";
+ config.tapAntiAddictionConfig = [[TapAntiAddictionConfig alloc] init];
+ config.tapAntiAddictionConfig.showSwitchAccount = true;
+ [TapBootstrap initWithConfig:config];
+
+```
+
+</>
+
+<>
+
+```cpp
+FTUConfig Config;
+Config.ClientID = ETB_Init_ClientID->GetText().ToString();
+Config.ClientToken = ETB_Init_ClientToken->GetText().ToString();
+Config.ServerURL = ETB_Init_ServerURL->GetText().ToString();
+Config.TapAntiAddictionConfig = MakeShared<FTapAntiAddictionConfig>();
+Config.TapAntiAddictionConfig->bShowSwitchAccount = true;
+FTapBootstrap::Init(Config);
+
+```
+
+</>
+
+</MultiLang>
+
+初始化完成后，需要注册监听防沉迷消息的回调，示例如下：
+
+<MultiLang kind="ue">
+<>
+
+```cs
+Action<int, string> callback = (code, errorMsg) => {
+    // code == 500;   // 登录成功
+    // code == 1000;  // 用户登出
+    // code == 1001;  // 切换账号
+    // code == 1030;  // 用户当前无法进行游戏
+    // code == 1050;  // 时长限制
+    // code == 9002;  // 实名过程中点击了关闭实名窗
+    UnityEngine.Debug.LogFormat($"code: {code} error Message: {errorMsg}");
+};
+```
+
+</>
+<>
+
+
+```java
+
+AntiAddictionUIKit.setAntiAddictionCallback(new AntiAddictionUICallback() {
+      @Override
+      public void onCallback(int code, Map<String, Object> extras) {
+		    // code == 500;   // 登录成功
+		    // code == 1000;  // 用户登出
+		    // code == 1001;  // 切换账号
+		    // code == 1030;  // 用户当前无法进行游戏
+		    // code == 1050;  // 时长限制
+		    // code == 9002;  // 实名过程中点击了关闭实名窗
+        
+     }
+});
+```
+
+</>
+<>
+
+```objc
+[AntiAddiction setDelegate:delegate];
+//`delegate` 对象需要实现以下协议方法来接收回调
+- (void)antiAddictionCallbackWithCode:(AntiAddictionResultHandlerCode)code extra:(NSString * _Nullable)extra {
+    // 防沉迷回调
+}
+```
+
+
+</>
+
+<>
+
+```cpp
+AntiAddictionUE::OnCallBack.BindLambda([Printer](AntiAddictionUE::ResultHandlerCode Code, const FString& Message)
+	{
+		TMap<AntiAddictionUE::ResultHandlerCode, FString> DesMap = {
+			{AntiAddictionUE::LoginSuccess, TEXT("登录成功")},
+			{AntiAddictionUE::Exited, TEXT("用户登出")},
+			{AntiAddictionUE::SwitchAccount, TEXT("切换账号")},
+			{AntiAddictionUE::DurationLimit, TEXT("时长耗尽，用户当前无法进行游戏")},
+			{AntiAddictionUE::PeriodRestrict, TEXT("宵禁时间，用户当前无法进行游戏")},
+			{AntiAddictionUE::RealNameStop, TEXT("取消实名")}
+		};
+		FTapApiNode OnCallbackNode = Printer.NewCallback(TEXT("OnCallBack"));
+		OnCallbackNode[TEXT("Code")] = Code;
+		OnCallbackNode[TEXT("CodeDescription")] = DesMap[Code];
+		OnCallbackNode[TEXT("Message")] = Message;
+		Printer.Print();
+	});
+
+```
+
+</>
+
+</MultiLang>
+
+### 防沉迷接口初始化
+
+因防沉迷模块依赖于 `TapLogin` 模块，所以在防沉迷模块初始化前必须完成 `TapLogin` 模块[初始化](/sdk/taptap-login/guide/tap-login/#初始化)初始化。
+初始化防沉迷 UI 模块，包括设置启动防沉迷功能的配置、注册防沉迷的消息监听。
+请注意，**触发回调需要调用[防沉迷认证](#防沉迷认证)接口。**
 
 <MultiLang kind="ue">
 <>
@@ -546,32 +702,36 @@ void UAntiAddictionWidget::OnCallBack(AntiAddictionUE::ResultHandlerCode Code, c
 
 ## 防沉迷认证
 
-SDK 支持两种防沉迷认证方式：
+SDK 内含有两种防沉迷认证方式：
 
-1. 使用 TapTap 快速认证，可令玩家授权游戏使用 TapTap 上的年龄段信息完成实名。
-2. 不使用 TapTap 快速认证（即弹出「TapTap 快速认证」授权框后，点击「不使用」按钮），玩家在 SDK 提供的界面中手动输入身份证号等实名信息。
+1. 使用 TapTap 快速认证，可令玩家授权游戏使用 TapTap 上的年龄段信息完成实名。（如果用户使用的是 TapTap 登录，那么将会默认使用 TapTap 快速认证）
+2. 手动认证（即弹出「TapTap 快速认证」授权框后，点击「不使用」按钮），玩家在 SDK 提供的界面中手动输入身份证号等实名信息。
 
 TDS 云端会根据实名信息判断玩家是否可以进行游戏，并将相关信息上报至中宣部防沉迷实名认证系统。
 
-我们推荐使用第一种方式，对于玩家而言，不需要手动输入信息，可以快速完成认证、进入游戏，体验更佳。
+### SDK 防沉迷认证流程
+
+SDK 防沉迷认证开始的时候，将会检测 Tap 用户是否已经登录而分为两种流程：
+
+* 对于已经登录的 Tap 用户，防沉迷认证将直接使用 TapTap 快速认证，对于玩家而言，不需要手动输入信息，可以快速完成认证、进入游戏，体验更佳。
+* 对于非 Tap 用户，防沉迷认证将会弹出「TapTap 快速认证」授权框，授权框中将包含「使用」按钮和「不使用」按钮，点击「使用」按钮将会进入 TapTap 快速认证实名流程，点击「不使用」按钮将会进入手动认证流程。
+
+因为这两种流程都包含了 TapTap 快速认证的流程，所以**必须要开通 TapTap 登录服务**。
 
 ### TapTap 快速认证
 
 :::info
-防沉迷 v3.7.1 开始，使用快速认证不再依赖 TapTap 登录 SDK，但快速认证需要玩家在已登录状态下授权游戏使用其在 TapTap 上的年龄段信息完成实名，**请确保完成了以下工作**：
+快速认证需要玩家在已登录状态下授权游戏使用其在 TapTap 上的年龄段信息完成实名，**请确保完成了以下工作**：
 
 - **在开发者中心手动开通 TapTap 登录功能**。操作位置在 **游戏 > 游戏服务 > 应用配置** 页面，找到 TapTap 登录服务，点击「立即开通」按钮。若此项未完成，快速认证时玩家会遇到「应用未开通 TapTap 登录服务」提醒。
 - **在开发者中心[配置签名证书](/sdk/start/quickstart/#配置签名证书)**。若此项未完成，快速认证拉起 TapTap 客户端会提示「授权失败」。
 
-防沉迷 v3.18.2 开始，快速认证逻辑做了更改，startup 接口中 `isTapUser` 参数更是一种登录方式的选择，而不再表示是否使用快速认证。UI 上最大的变更是不再提供直接手动输入身份信息的弹窗。
 :::
 
 
-传入玩家唯一标识 `userIdentifier` 及 是否是 Tap 用户参数时，即可开始 TapTap 快速认证。SDK 会拉起 TapTap 开始快速认证，如果 SDK 检测到玩家设备中未安装 TapTap 客户端，则会打开 WebView，玩家可授权游戏使用其在 TapTap 上的年龄段信息来完成游戏内的实名流程。
+传入玩家唯一标识 `userIdentifier`，即可开始 TapTap 快速认证。SDK 会拉起 TapTap 开始快速认证，如果 SDK 检测到玩家设备中未安装 TapTap 客户端，则会打开 WebView，玩家可授权游戏使用其在 TapTap 上的年龄段信息来完成游戏内的实名流程。
 
 其中的**玩家唯一标识** `userIdentifier`，如果接入 [TDS 内建账户系统](/sdk/taptap-login/guide/start/#一键完成-taptap-登录)，可以用玩家的 `objectId`；如果使用[单纯 TapTap 用户认证](/sdk/taptap-login/guide/tap-login/#taptap-登录并获取登录结果)则可以用 `openid` 或 `unionid`。
-
-对于**是否是 Tap 用户**，游戏可根据当前玩家选择的登录方式进行设置，即选择 Tap 登录方式的设置为 `true`, 其他类型设置为 `false`。
 
 <MultiLang kind="ue">
 
@@ -580,7 +740,7 @@ TDS 云端会根据实名信息判断玩家是否可以进行游戏，并将相�
 ```cs
 // 注意唯一标识参数值长度不能超过 64 字符
 string userIdentifier = "玩家的唯一标识";
-AntiAddictionUIKit.Startup(userIdentifier, true);
+AntiAddictionUIKit.StartupWithTapTap(userIdentifier);
 ```
 
 **注意**：Unity 项目如果没有接入登录模块，则项目导出的 Xcode 工程打包 iOS 时需要配置 `URLSchema`。
@@ -612,6 +772,7 @@ AntiAddictionUIKit.Startup(userIdentifier, true);
    <array>
      <string>tapiosdk</string>
      <string>tapsdk</string>
+     <string>taptap</string>
    </array>
    ```
 </details>
@@ -621,7 +782,7 @@ AntiAddictionUIKit.Startup(userIdentifier, true);
 ```java
 // 注意唯一标识参数值长度不能超过 64 字符
 String userIdentifier = "玩家的唯一标识";
-AntiAddictionUIKit.startup(activity, userIdentifier, true);
+AntiAddictionUIKit.startupWithTapTap(activity, userIdentifier);
 ```
 
 </>
@@ -630,7 +791,7 @@ AntiAddictionUIKit.startup(activity, userIdentifier, true);
 ```objc
 // 注意唯一标识参数值长度不能超过 64 字符
 NSString *userIdentifier = @"玩家的唯一标识";
-[AntiAddiction startupWithUserID:userIdentifier isTapUser: YES];
+[AntiAddiction startupWithTapTap:userIdentifier];
 ```
 
 使用 **TapTap 快速认证** 需要在 `AppDelegate` 里嵌入回调。
@@ -672,6 +833,7 @@ NSString *userIdentifier = @"玩家的唯一标识";
    <array>
      <string>tapiosdk</string>
      <string>tapsdk</string>
+     <string>taptap</string>
    </array>
    ```
   
@@ -680,7 +842,7 @@ NSString *userIdentifier = @"玩家的唯一标识";
 <>
 
 ```cpp
-AntiAddictionUE::Startup(TEXT("your_userIdentifier"), true);
+AntiAddictionUE::StartupWithTapTap(TEXT("your_userIdentifier"), true);
 ```
 
 </>
@@ -713,7 +875,9 @@ AntiAddictionUE::Exit();
 
 ## 测试模式设置
 
-开启测试模式的接口需要在 `init` 初始化之后，`startup` 启动之前调用。而且无论前面接入的是 [TDS 内建账户系统](/sdk/taptap-login/guide/start/#一键完成-taptap-登录)，还是使用[单纯 TapTap 用户认证](/sdk/taptap-login/guide/tap-login/#taptap-登录并获取登录结果)，在 `startup` 传入的 **玩家唯一标识** `userIdentifier` 必须为 TapTap 用户的 unionid，获取方式可以参考[获取用户信息](../../taptap-login/guide/start/#获取用户信息)的内容。
+测试账号的使用强依赖于 [TapTap 登录](/sdk/taptap-login/guide/start/)功能，需要游戏先实现 TapTap 登录功能。使用提供的测试账号以邮箱方式登录 TapTap，游戏启动后触发 TapTap 登录，登录成功后会在成功的回调中得到当前测试账号对应的 `unionid`， `unionid` 获取方式可以参考[获取用户信息](/sdk/taptap-login/guide/start/#获取用户信息)的内容。
+
+开启测试模式的接口需要在 SDK 的 `init` 初始化接口之后，`startupwithtaptap` 接口之前调用。在 `startupwithtaptap` 传入的 **玩家唯一标识** `userIdentifier` 必须为测试账号对应的 TapTap 登录后返回的 `unionid`。
 
 
 <MultiLang kind="ue">
@@ -737,7 +901,6 @@ AntiAddictionUE::SetTestEnvironment(bIsChecked);
 </MultiLang>
 
 使用该接口需要在控制台开启「切换为测试模式」，可以针对某个账号进行一些设置，正式打包上线的应用应该需要去掉这个接口。
-
 
 ## 获取玩家年龄段
 
@@ -777,53 +940,39 @@ EAAUAgeLimit AgeLimit = AntiAddictionUE::GetAgeRange();
 ***注意：开发者应根据回调类型来判断当前玩家是否可以进入游戏，而不是年龄段数据，当游戏在 TapPlay 中 运行时，该数据可能不准确***
 
 
-## 获取剩余时长（单位：秒）
+
+## 获取剩余时长
 
 获取玩家当前剩余时长：
 
 <MultiLang kind="ue">
 
 ```cs
-int remainingTimeInSeconds = AntiAddictionUIKit.RemainingTime;
+int remainingTimeInSeconds = AntiAddictionUIKit.RemainingTime;    // 单位：秒
+
+int remainingTimeInMinutes = AntiAddictionUIKit.RemainingTimeInMinutes;    // 单位：分
 ```
 
 ```java
-int remainingTimeInSeconds = AntiAddictionUIKit.getRemainingTime();
+int remainingTimeInSeconds = AntiAddictionUIKit.getRemainingTime();    // 单位：秒
+
+int remainingTimeInMinutes = AntiAddictionUIKit.getRemainingTimeInMinutes();    // 单位：分
 ```
 
 ```objc
-NSInteger remainingTimeInSeconds = [AntiAddiction getRemainingTime];
+NSInteger remainingTimeInSeconds = [AntiAddiction getRemainingTime];    // 单位：秒
+
+NSInteger remainingTimeInMinutes = [AntiAddiction getRemainingTimeInMinutes];    // 单位：分
 ```
 
 ```cpp
-int RemainingTime = AntiAddictionUE::GetRemainingTime();
+int RemainingTime = AntiAddictionUE::GetRemainingTime();    // 单位：秒
+
+int RemainingTimeInMinutes = AntiAddictionUE::GetRemainingTimeInMinutes();    // 单位：分
 ```
 
 </MultiLang>
 
-## 获取剩余时长（单位：分钟）
-
-获取玩家当前剩余时长：
-
-<MultiLang kind="ue">
-
-```cs
-int remainingTimeInMinutes = AntiAddictionUIKit.RemainingTimeInMinutes;
-```
-
-```java
-int remainingTimeInMinutes = AntiAddictionUIKit.getRemainingTimeInMinutes();
-```
-
-```objc
-NSInteger remainingTimeInMinutes = [AntiAddiction getRemainingTimeInMinutes];
-```
-
-```cpp
-int RemainingTimeInMinutes = AntiAddictionUE::GetRemainingTimeInMinutes();
-```
-
-</MultiLang>
 
 ## 检查消费上限
 
@@ -1219,6 +1368,186 @@ curl -X POST \
 }
 ```
 
+## Webhook
+
+### Webhook 内容
+
+回调游戏 webhook 是 POST 方法，返回的内容解密后的 `data` 结构体和描述如下所示：
+
+```json
+{
+    "baseInfo": {
+        "userId": "用户实名认证时的唯一标识",
+        "clientId": "同上",
+        "userIP": "用户实名认证时的 IP",
+        "authType": "MANUAL"
+    },
+    "realNameInfo": {
+        "name": "用户的姓名",
+        "idCard": "用户的身份证号码",
+        "birthDate": "用户的生日"
+    }
+}
+```
+
+### Webhook 验签
+
+Webhook 使用 HmacSHA256 算法验签，Webhook 的签名验证过程如下：
+
+- 将 `data` 转换成为 json 字符串
+
+```java
+String dataJson = JSON.toJSONString(data); 
+```
+
+- 使用 AES 加密方式，以应用在 Tap 开发者服务中心的 Server Secret 为 key 对 dataJson 进行加密生成 encryptData
+
+```java
+String encryptData = SecureUtil.aes(serverSecret.getBytes(StandardCharsets.UTF_8)).encryptHex(payload.getBytes(StandardCharsets.UTF_8));
+```
+
+- 获取时间戳，并将时间戳 timestamp 和 encryptData 以逗号连接生成字符串 signedEncrypt 
+
+```java
+Long timestamp = LocalDateTime.now().toEpochSecond(ZoneOffset.of("+8"));
+String signedEncrypt = String.format("%d,%s", timestamp, encryptData);
+```
+
+- 使用 HMAC256 签算方式以应用在 Tap 开发者服务中心的 Server Secret 为 key 对 signedEncrypt 进行签算生成最终的签算结果：sign
+
+```java
+String sign = SecureUtil.hmac(HmacSHA256, serverSecret.getBytes(StandardCharsets.UTF_8)).digestHex(signedEncrypt.getBytes(StandardCharsets.UTF_8));
+```
+
+- 设置 TDS-Sign，将时间戳和最终的签算 sign 以逗号连接并设置进 header 中。
+
+```java
+ headers.add("TDS-Sign", String.format("%d,%s", timestamp, sign));
+```
+
+- 设置 HTTP 的 body，将 encryptData 字段放入 Map 中和上一步生成的 header 一起传入 body 中。
+
+```java
+HashMap<String, Object> map = new HashMap<>();
+map.put("data", encryptData);
+HttpEntity httpEntity = new HttpEntity<>(map, headers);
+```
+
+### 游戏侧处理数据流程
+
+- 在 TapTap 开发者服务 > 你的游戏 > 合规认证 > Webhooks 设置 配置 URL。
+- 获取 HTTP 请求中的 `TDS-Sign` 字段值，该字段值为使用游戏在 TapTap 开发者服务中心的 Server Secret 按照上述签名规则生成的字符串。
+- 验证签名，游戏服务端根据上述签名规则得到的签名和  `TDS-Sign` 字段值进行比较，签名结果相同则进行下一步操作即解密和保存数据。
+- 解密和保存数据，由于 TDS 返回的数据是加密的数据，所以需要游戏侧进行解密。
+
+<details>
+
+<summary>Python Webhook 脚本示例</summary>
+此脚本用于演示如何获取用户解密后的数据，总体流程为：
+
+1、在 TapTap 开发者服务 > 你的游戏 > 合规认证 > Webhooks 设置 配置 URL
+
+2、获取 http 请求中的 sign 以及加密的用户数据 data
+
+3、游戏服务端根据签名规则进行签名，得到的签名和 http 请求的获取的 sign 做比较，二者签名一致说明数据正确安全返回可进行下一步操作
+
+4、解密用户数据后进行保存
+
+```python
+import hashlib
+import time
+import hmac
+import base64
+import json
+from flask import Flask, request
+from datetime import datetime, timedelta
+from Crypto.Cipher import AES
+from Crypto.Util.Padding import unpad
 
 
+app = Flask(__name__)
 
+@app.route("/")
+def hello_world():
+	return "<p>Hello World!<p>"
+
+@app.route("/webhook/event",methods=['POST'])
+def event():
+    # 获取 TDS-Sign 用于和游戏服务端自己签算做比较
+	sign = request.headers.get('TDS-Sign')
+    # TDS 返回的加密的用户数据
+	json_data = json.loads(request.data)
+	result = json.dumps(json_data)
+	data = json_data['data']
+	with open('result.json', 'w') as f:
+		f.write(result)
+	with open('data.txt', 'w') as df:
+		df.write(data)
+
+	server_secret = "替换成游戏在 Tap 开发者服务中心的 Server Secret"
+
+	decrypted_data = verify_signature(sign, server_secret, data)
+
+    # 验证签名，签名正确则可以保存用户解密后的数据。
+	if decrypted_data:
+		print("Decrypted Data Success: ", decrypted_data)
+	else:
+		print("Verification failed.")
+	
+	return "Success LeeJiEun"
+
+# 验签
+def verify_signature(sign, server_secret, data):
+	split = sign.split(",")
+
+	if len(split) != 2:
+		print("sign is invalid, sign:", sign)
+		return False
+
+	timestamp = split[0]
+	now = datetime.now()
+	sign_time = datetime.fromtimestamp(int(timestamp)) + timedelta(hours=8)
+
+	if now - timedelta(minutes=10) > sign_time:
+		print("timestamp is invalid, sign:", sign)
+		return False
+
+	sign_data = split[1]
+	str1 = f"{timestamp},{data}"
+	print("str1:", str1)
+
+
+	# 使用HMAC-SHA256算法创建HMAC对象
+	hmac_sha256 = hmac.new(server_secret.encode('utf-8'), str1.encode('utf-8'), hashlib.sha256)
+
+	# 获取签名结果的二进制数据
+	sign_check = hmac_sha256.hexdigest()
+
+
+	if sign_check != sign_data:
+		print("sign is invalid, signData:", sign_data, "signCheck:", sign_check)
+		return False
+    
+	# 解密数据
+	decrypt_payload = decrypt_data(server_secret, data)
+	return decrypt_payload
+
+# 解密数据
+def decrypt_data(server_secret, data):
+	try:
+		bytes_data = bytes.fromhex(data)
+		cipher = AES.new(server_secret.encode('utf-8'), AES.MODE_ECB)
+		decrypted_data = cipher.decrypt(bytes_data)
+		decrypt_data = decrypted_data.decode('utf-8')
+		with open('final.json', 'w') as ff:
+			ff.write(decrypt_data) 
+		return True
+	except Exception as e:
+		print("AES decryption failed:", str(e))
+		return None
+
+if __name__ == '__main__':
+	app.run(host="0.0.0.0", port=8080)
+```
+
+</details>

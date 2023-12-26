@@ -1,6 +1,7 @@
 ---
-title: 唤起更新开发指南
+title: 更新唤起开发指南
 sidebar_label: 开发指南
+sidebar_position: 2
 ---
 
 import MultiLang from "/src/docComponents/MultiLang";
@@ -8,47 +9,158 @@ import CodeBlock from "@theme/CodeBlock";
 import sdkVersions from "/src/docComponents/sdkVersions";
 import { Conditional } from "/src/docComponents/conditional";
 import AndroidFaq from "../_partials/android-package-visibility.mdx";
-
-TapTap 开发者服务为游戏和玩家提供唤起 TapTap 客户端更新游戏的功能。
-
-当游戏发布了新版本，且需要玩家进行更新才能体验新版本时，在游戏内绘制一个界面告知玩家并提供「更新」按钮。
-
-玩家点击按钮调用 `updateGameAndFailToWebInTapTap` 接口，此时跳转到 TapTap 客户端内的游戏详情页，玩家在 TapTap 内完成更新。
+import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
 
 :::info
-唤起更新只提供「唤起 TapTap 客户端，跳转至游戏详情页」这一简单功能。
-
-TapTap 上游戏的**版本号**来自开发者在构建新版本时上传的 APK，唤起更新功能并不提供「检查 TapTap 商店是否有新版本」接口，游戏需自行实现判断版本的功能。
+本文档只适用于国内版本，海外版本请参考 [文档](/tap-update-old-guide/)
 :::
+## 环境要求
 
-## SDK 获取
-
-<MultiLang>
+<MultiLang kind="ue">
 
 <>
 
-SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选其一。
+- TapSDK **3.23.0** 及以上版本
+- Unity 2019.4 或更高版本
+- Android 5.0（API level 21）或更高版本
 
-如果选择 UPM 导入，可以在项目的 `Packages/manifest.json` 文件中添加：
+<details>
 
-<CodeBlock className="json">
-  {`"dependencies":{
-    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
-    "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
-}`}
-</CodeBlock>
+<summary>点击展开 Unity 2022.3 之前的版本升级 Gradle 版本</summary>
 
-如果选择手动导入：
+为了将 [Gradle 版本和 Android Gradle Plugin 版本对应](https://developer.android.com/studio/releases/gradle-plugin#expandable-1)，需要更新 Gradle 版本，下载 [6.7.1 版本的 Gradle](https://services.gradle.org/distributions/gradle-6.7.1-bin.zip)，解压后放到自定义的文件夹中，同时**不**勾选 Unity 中的 `Preferences` -> `External Tools`-> `Android` -> `Gradle Installed with Unity(recommend)`，改为选择解压后 Gradle 文件夹的位置，如 <some path\>/gradle-6.7.1。
 
-* 在 [下载页](/tap-download) 找到 TapSDK Unity 下载地址，下载 TapSDK-UnityPackage.zip 然后解压，导入其中的 `TapTap_Common` 模块。
-* 下载 [LeanCloud-SDK-Storage-Unity.zip](https://github.com/leancloud/csharp-sdk/releases)，解压后为 Plugins 文件夹，拖拽至 Unity 即可。  
+另外， Unity 更新唤醒模块会**自动**更新项目中使用的 Android Gradle Plugin 版本，如果您需要手动更改或者查看，可以在 `Project Settings` -> `Player` -> `Android Tab` -> `Publish Settings` -> `Build`，然后勾选**Custom Base Gradle Template**
 
+将以下更改应用于生成的这个文件:
+**Assets/Plugins/Android/baseProjectTemplate.gradle**
+
+修改文件内容:
+
+```groovy
+dependencies {
+    // 将版本修改至少为 4.2.0
+    classpath 'com.android.tools.build:gradle:4.2.0'
+}
+```
+
+</details>
 
 </>
 
 <>
 
-在 [下载页](/tap-download) 获得 TapSDK，添加 `TapCommon` 模块。
+- TapSDK **3.23.0** 及以上版本
+- Android 5.0（API level 21）或更高版本
+
+</>
+
+<>
+
+- 受限于苹果政策，iOS 平台的 TapTap 客户端不提供游戏更新功能
+
+</>
+
+<>
+
+- 安装 UE 4.26 及以上版本
+- iOS 12 或更高版本
+- Android 5.0（API level 21）或更高版本
+- macOS 10.14.0 或更高版本
+- Windows 7 或更高版本
+
+**支持平台**：Android / iOS / Windows / macOS
+
+</>
+
+</MultiLang>
+
+
+## 集成前准备
+
+使用更新唤起功能前提需要通过 **TapTap 开发者中心 > 商店 > 游戏资料 > 商店资料** 中已经上传 APK， 发布设置为 **立即上线** 并通过 **审核**（开发者包如果暂时不想对外，发布状态选 **敬请期待** 或者 **预约**）。
+
+
+
+## SDK 获取
+
+<MultiLang kind="ue">
+
+<>
+
+SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选其一。请根据项目需要选择。
+
+#### 方法一：使用 Unity Package Manager
+
+##### NPMJS 安装
+
+从 3.25.0 版本开始，TapSDK 支持了 NPMJS 安装，优势是只需要配置版本号，并且支持嵌套依赖。
+
+在项目的 `Packages/manifest.json` 文件中添加以下依赖：
+
+<CodeBlock className="json">
+  {`"dependencies":{
+    "com.taptap.tds.update":"${sdkVersions.taptap.unity}",
+}`}
+</CodeBlock>
+
+但需要注意的是，要在 `Packages/manifest.json` 中 `dependencies` 同级下声明 `scopedRegistries`：
+
+<CodeBlock className="json">
+{`"scopedRegistries": [
+    {
+      "name": "NPMJS",
+      "url": "https://registry.npmjs.org/",
+      "scopes": ["com.tapsdk", "com.taptap", "com.leancloud"]
+    }
+  ]`}
+</CodeBlock>
+
+##### GitHub 安装
+
+在项目的 `Packages/manifest.json` 文件中添加以下依赖：
+
+<CodeBlock className="json">
+  {`"dependencies":{
+    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.update":"https://github.com/TapTap/TapUpdate-Unity.git#${sdkVersions.taptap.unity}",
+    "com.leancloud.storage":"https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
+    "com.tapsdk.androiddependencyresolver":"${sdkVersions.taptap.adr}",
+}
+"scopedRegistries": [
+  {
+    "name": "TapSDK",
+    "url": "https://nexus.tapsvc.com/repository/npm-registry/",
+    "scopes": [
+      "com.tapsdk",
+      "com.taptap",
+      "com.leancloud"
+      ]
+   }
+]`}
+</CodeBlock>
+
+在 Unity 顶部菜单中选择 **Window > Package Manager** 可查看已经安装在项目中的包。
+
+#### 方法二：手动导入
+
+1. 在 [下载页](/tap-download) 找到 **TapSDK Unity** 和 **LeanCloud C# SDK** 下载地址，分别下载 `TapSDK-UnityPackage.zip` 和 `LeanCloud-SDK-Realtime-Unity.zip`。
+
+    然后请[**点击下载**](https://github.com/taptap/android_dependency_resolver/releases) `TapTap_AndroidDependencyResolver.unitypackage` 。
+
+2. 在 Unity 项目中依次转到 **Assets > Import Packages > Custom Packages**，从解压后的 `TapSDK-UnityPackage.zip` 中，选择希望在游戏中使用的 TapSDK 包导入，其中：
+
+    - TapTap_Common.unitypackage TapSDK 基础库，必选。
+    - TapTap_Update.unitypackage TapTap 唤起更新库，必选。
+    - TapTap_AndroidDependencyResolver.unitypackage 必选。
+
+3. 解压后的 `LeanCloud-SDK-Realtime-Unity.zip` 为 Plugins 文件夹，拖拽至 Unity 即可。
+
+</>
+
+<>
+
+在 [下载页](/tap-download) 获得 TapSDK，添加 `TapUpdate` 和 `TapCommon` 模块。
 
 <CodeBlock className="groovy">
   {`repositories{  
@@ -58,230 +170,97 @@ SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选�
 }  
 dependencies {  
     ... 
+    implementation (name:'TapUpdate_${sdkVersions.taptap.android}', ext:'aar')
     implementation (name:'TapCommon_${sdkVersions.taptap.android}', ext:'aar')
+    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
+    implementation 'androidx.core:core:1.6.0'
+    implementation 'com.google.android.flexbox:flexbox:3.0.0'
 }`}
+
 </CodeBlock>
 
 </>
 <>
 
-在 [下载页](/tap-download) 获得 TapSDK，添加 `TapCommon` 模块。
+受限于苹果政策，iOS 平台的 TapTap 客户端不提供游戏更新功能
 
-<CodeBlock className="objectivec">{`TapCommonSDK.framework`}</CodeBlock>
+</>
+
+<>
+
+#### 安装插件
+
+* 下载 [TapSDK UE4](/tap-download)，TapSDK-UE4-xxx.zip 解压后将 `TapUpdate`、`TapCommon` 文件夹 Copy 到项目的 `Plugins` 目录中
+* 重启 Unreal Editor
+* 打开 编辑 > 插件 > 项目 > TapTap，开启 `TapUpdate` 模块
+
+#### 添加依赖
+
+在 Project.Build.cs 中添加所需模块:
+
+```cs
+PublicDependencyModuleNames.AddRange(new string[] { "Core",
+	"CoreUObject",
+	"Engine",
+	"Json",
+	"InputCore",
+	"JsonUtilities",
+	"SlateCore",
+	"TapCommon",
+    "TapUpdate",
+});
+```
+
+#### 导入头文件
+
+```cpp
+#include "TapUpdate.h"
+```
 
 </>
 
 </MultiLang>
 
-## 唤起 TapTap 检查更新
+## 开始更新
 
 :::tip
-自 TapSDK 3.3.0 版本开始，针对更新功能做了逻辑优化，唤起 TapTap 客户端更新游戏失败时可以跳转到自定义网页。TapSDK 3.3.0 版本对之前的版本向下兼容。
-该版本一般情况下不需要在使用以下 API 前特别检查是否安装 TapTap 客户端，自 TapSDK 3.3.0 版本开始推荐使用新接口。
+TapSDK 如果检查当前设备未安装 TapTap 客户端，首先会弹窗询问用户「是否需要使用 TapTap 更新」，当点击「取消」按钮时取消更新的回调方法才会执行。
 :::
 
-<MultiLang>
-<>
-
-在 TapTap 客户端更新游戏，失败时通过浏览器打开 TapTap 网站对应的游戏页面：
-
-<Conditional region="cn">
+<MultiLang kind="ue">
 
 ```cs
-// 适用于中国大陆
-bool isSuccess = await TapCommon.UpdateGameAndFailToWebInTapTap(string appId);
+using TapTap.Update
 
-// 适用于其他国家或地区
-bool isSuccess = await TapCommon.UpdateGameAndFailToWebInTapGlobal(string appId);
-```
-
-</Conditional>
-
-<Conditional region="global">
-
-```cs
-bool isSuccess = await TapCommon.UpdateGameAndFailToWebInTapGlobal(string appId);
-```
-
-</Conditional>
-
-唤起 TapTap 客户端更新游戏失败，跳转到自定义网页：
-
-<Conditional region="cn">
-
-```cs
-// 适用于中国大陆
-bool isSuccess = await TapCommon.UpdateGameAndFailToWebInTapTap(string appId, string webUrl);
-
-// 适用于其他国家或地区
-bool isSuccess = await TapCommon.UpdateGameAndFailToWebInTapGlobal(string appId, string webUrl);
-```
-
-</Conditional>
-
-<Conditional region="global">
-
-```cs
-bool isSuccess = await TapCommon.UpdateGameAndFailToWebInTapGlobal(string appId, string webUrl);
-```
-
-</Conditional>
-
-</>
-<>
-
-在 TapTap 客户端更新游戏，失败时通过浏览器打开 TapTap 网站对应的游戏页面：
-
-<Conditional region="cn">
-
-```java
-// 适用于中国大陆
-TapGameUtil.updateGameAndFailToWebInTapTap(context, "your app id");
-
-// 适用于其他国家或地区
-TapGameUtil.updateGameAndFailToWebInTapGlobal(context, "your app id");
-```
-
-</Conditional>
-
-<Conditional region="global">
-
-```java
-TapGameUtil.updateGameAndFailToWebInTapGlobal(context, "your app id");
-```
-
-</Conditional>
-
-唤起 TapTap 客户端更新游戏失败，跳转到自定义网页：
-
-<Conditional region="cn">
-
-```java
-// 适用于中国大陆
-TapGameUtil.updateGameAndFailToWebInTapTap(context, "your app id", "your website url");
-
-// 适用于其他国家或地区
-TapGameUtil.updateGameAndFailToWebInTapGlobal(context, "your app id", "your website url");
-```
-
-</Conditional>
-
-<Conditional region="global">
-
-```java
-TapGameUtil.updateGameAndFailToWebInTapGlobal(context, "your app id", "your website url");
-```
-
-</Conditional>
-
-</>
-<>
-
-```objc
-// 受限于苹果政策，iOS 平台的 TapTap 客户端不提供游戏更新功能
-```
-
-</>
-</MultiLang>
-
-<Conditional region="cn">
-
-<details>
-<summary>点击展开 TapSDK 3.3.0 之前的相关接口</summary>
-
-**TapSDK 3.3.0 及之后版本不必参考这一节**，推荐使用上面「唤起 TapTap 检查更新」的 API。
-
-**检查 TapTap 客户端是否安装**：
-
-<MultiLang>
-
-<>
-
-```cs
-// 适用于中国大陆
-TapCommon.IsTapTapInstalled(installed =>
-{
-    if (installed) {
-        Debug.Log("TapTap 已经安装");
-    }
-});
-
-// 适用于其他国家或地区
-TapCommon.IsTapTapGlobalInstalled(installed =>
-{
-    if (installed) {
-        Debug.Log("TapTap 已经安装");
-    }
-});
-```
-
-</>
-<>
-
-需要导入 `TapCommon.aar` 包，接口在 `TapGameUtil` 中。
-
-```java
-import com.tds.common.utils.TapGameUtil;
-
-// 适用于中国大陆
-if(TapGameUtil.isTapTapInstalled(this)){
-    Log.d(TAG, "已经安装 TapTap 客户端");
-}
-// 适用于其他国家或地区
-if(TapGameUtil.isTapGlobalInstalled(this)){
-    Log.d(TAG, "已经安装 TapTap 客户端");
-}
-```
-
-</>
-<>
-
-需要导入 `TapCommon.framework` 库文件，在 `info.plist` 里配置 `LSApplicationQueriesSchemes` 增加 `tapsdk` 和 `tapiosdk`。
-
-```objc
-#import <TapCommonSDK/TapCommonSDK.h>
-// 适用于中国大陆
-BOOL isInstalled = [TapGameUtil isTapTapInstalled];
-// 适用于其他国家或地区
-BOOL isInstalled = [TapGameUtil isTapGlobalInstalled];
-```
-
-</>
-
-</MultiLang>
-
-**唤起 TapTap 更新游戏**：
-
-<MultiLang>
-
-```cs
-TapCommon.UpdateGameInTapTap("appid", callSuccess =>
-{
-    if (callSuccess) {
-        Debug.Log("TapTap 唤起成功");
-    }
+TapTap.Update.TapUpdate.UpdateGame(() => {
+  // 取消更新的事件
 });
 ```
 
 ```java
-if(TapGameUtil.updateGameInTapTap(this,"appid")){
-    Log.d(TAG, "唤起 TapTap 客户端成功");
-}
+import com.taptap.services.update.TapUpdate;
+import com.taptap.services.update.TapUpdateCallback;
+
+
+TapUpdate.updateGame(DemoUpdateActivity.this, new TapUpdateCallback() {
+    @Override
+    public void onCancel() {
+        // 取消更新的事件
+    }
+});
 ```
 
-```objc
-// 受限于苹果政策，iOS 平台的 TapTap 客户端不提供游戏更新功能
+
+受限于苹果政策，iOS 平台的 TapTap 客户端不提供游戏更新功能
+
+```cpp
+FTapUpdate::UpdateGame(FSimpleDelegate::CreateLambda([]() {
+  // Update cancel
+}));
 ```
 
 </MultiLang>
 
-**常见问题：Android 11 或更高版本无法拉起 TapTap 客户端**
-
-<AndroidFaq />
-
-</details>
-
-</Conditional>
 
 ## 打开游戏评论区
 
@@ -369,307 +348,23 @@ if(TapGameUtil.openReviewInTapGlobal(this,"appid")){
 appid：游戏在 TapTap 商店的唯一身份标识。
 例如：<Conditional region="cn">`https://www.taptap.cn/app/187168`</Conditional><Conditional region="global">`https://www.taptap.io/app/187168`</Conditional>，其中 `187168` 是 `appid`。
 
-## 常见问题
 
-### 未接入 TapSDK，如何唤起 TapTap 客户端更新游戏
 
-受限于苹果政策，iOS 平台的 TapTap 客户端不提供游戏更新功能，以下方案仅限于 Android 平台使用。
+## 测试
+为了保证上线后，游戏对于用户是否正常使用更新唤起功能，请务必按照以下说明完成自测。
 
-未接入 TapSDK、使用旧版 TapSDK 难以升级的游戏，可以通过以下方案进行手动唤起 TapTap 客户端更新游戏：
+### 上传 APK
 
-根据玩家设备是否安装 TapTap 客户端来对应打开 URL:
+新应用需要上传测试的 APK 至开发者中心，并通过审核。已上架的游戏，需确保更新资料版本中的 APK 包名和已上架的 APK 包名保持一致。
 
-- 如果玩家设备安装 TapTap 客户端则直接唤起 TapTap 客户端到游戏详情页进行更新；
-- 如果玩家设备没有安装 TapTap 客户端，则以 Web 形式打开游戏详情页，根据页面底部提示引导玩家下载 TapTap 客户端，安装成功后打开 TapTap 客户端，玩家根据提示选择在 TapTap 客户端里打开游戏详情页进行更新。
+### 应用上线
 
-未安装 TapTap 客户端对应的 URL：
+应用的发布状态需要设置成上线状态，此时如果并不想让玩家通过 TapTap 下载游戏包体，可以将游戏状态设置成为 `预约` 或者 `敬请期待`。
 
-<Conditional region="cn">
+### 开始测试
 
-- 适用于中国大陆：`https://l.taptap.cn/5d1NGyET?subc1=AppID`
-- 适用于其他国家或地区：`https://l.taptap.io/GNYwFaZr?subc1=AppID`
+触发更新唤起功能后正常状态是可以唤起应用在 TapTap 商店的详情页面。
 
-</Conditional>
-<Conditional region="global">
 
-- `https://l.taptap.io/GNYwFaZr?subc1=AppID`
 
-</Conditional>
 
-已安装 TapTap 客户端对应的 URL：
-
-<Conditional region="cn">
-
-- 适用于中国大陆：`taptap://taptap.cn/app?app_id=AppID&source=outer|update`
-- 适用于其他国家或地区：`tapglobal://taptap.tw/app?app_id=游戏商店id&source=outer|update`
-
-</Conditional>
-<Conditional region="global">
-
-- `tapglobal://taptap.tw/app?app_id=游戏商店id&source=outer|update`
-
-</Conditional>
-
-注意替换其中的 `AppID`。`AppID` 是游戏在 TapTap 商店的唯一身份标识，例如：<Conditional region="cn">`https://www.taptap.cn/app/187168`</Conditional><Conditional region="global">`https://www.taptap.io/app/187168`</Conditional>，其中 `187168` 是 AppID。
-
-注意，除了打开 URL 外，还需要检测设备是否已经安装 TapTap 客户端，以及处理唤起失败的逻辑，这些代码都需要自行编写。
-
-下面提供 TapSDK 唤起更新的代码供参考。
-
-<details>
-<summary>参考代码</summary>
-
-<Conditional region="cn">
-
-适用于中国大陆：
-
-```java
-package com.tds.common.utils;
-
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.net.Uri;
-import android.text.TextUtils;
-import android.util.Log;
-import java.util.Locale;
-
-public class TapGameUtil {
-
-  private static final String TAG = TapGameUtil.class.getName();
-
-  public static final String PACKAGE_NAME_TAPTAP = "com.taptap";
-
-  public static final String CLIENT_URI_TAPTAP = "taptap://taptap.cn";
-
-  public static final String DEFAULT_CLIENT_DOWNLOAD_URL_TAPTAP = "https://l.taptap.cn/5d1NGyET";
-
-  // 这里更新的时候不检查 Tap 客户端，一是因为特定 schema 没被应用注册的话大概率是直接返回 error 的，在这里被 try catch 后返回 false 可以近似等于客户端不存在
-  // 二是因为 Android 11 开始检查客户端需要游戏做特殊配置，这个配置无法在 SDK 内做好，因为和编译工具版本强绑定，无法做前后版本兼容。
-  public static boolean updateGameAndFailToWebInTapTap(Activity activity, String appId) {
-    return updateGameInTapTap(activity, appId) || openWebDownloadUrlOfTapTap(activity, appId);
-  }
-
-  public static boolean updateGameAndFailToWebInTapTap(Activity activity, String appId, String webUrl) {
-    if (TextUtils.isEmpty(webUrl)) {
-      return updateGameAndFailToWebInTapTap(activity, appId);
-    }
-    return updateGameInTapTap(activity, appId) || openWebDownloadUrl(activity, webUrl);
-  }
-
-  public static boolean isTapTapInstalled(Context context) {
-    return isTapClientInstalled(context, PACKAGE_NAME_TAPTAP);
-  }
-
-  public static boolean isTapClientInstalled(Context context, String clientPackageName) {
-    if (context != null && !TextUtils.isEmpty(clientPackageName)) {
-      boolean TapTapInstalled = false;
-      try {
-        PackageInfo packageInfo = context.getPackageManager().getPackageInfo(clientPackageName, 0);
-        if (null != packageInfo) {
-          TapTapInstalled = true;
-        }
-      } catch (Exception e) {
-        Log.e(TAG, clientPackageName + " isInstalled=false");
-      }
-      return TapTapInstalled;
-    }
-    return false;
-  }
-
-  public static boolean updateGameInTapTap(Activity activity, String appId) {
-    return updateGameInTapClient(activity, appId, CLIENT_URI_TAPTAP);
-  }
-
-  public static boolean updateGameInTapClient(Activity activity, String appId, String clientUri) {
-    if (activity != null && !TextUtils.isEmpty(appId) && !TextUtils.isEmpty(clientUri)) {
-      try {
-        Uri uri = Uri.parse(String.format(Locale.US,
-            "%s/app?app_id=%s&source=outer|update", clientUri, appId));
-        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        activity.startActivity(intent);
-      } catch (Exception e) {
-        Log.e(TAG, clientUri + "updateGameInTapTap failed");
-        return false;
-      }
-      return true;
-    }
-    Log.e(TAG, clientUri + "updateGameInTapTap failed");
-    return false;
-  }
-
-  public static boolean openReviewInTapTap(Activity activity, String appId) {
-    return openReviewInTapClient(activity, appId, CLIENT_URI_TAPTAP);
-  }
-
-  public static boolean openReviewInTapClient(Activity activity, String appId, String clientUri) {
-    if (activity != null && !TextUtils.isEmpty(appId) && !TextUtils.isEmpty(clientUri)) {
-      try {
-        Uri uri = Uri.parse(String.format(Locale.US,
-            "%s/app?tab_name=review&app_id=%s", clientUri, appId));
-        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        activity.startActivity(intent);
-      } catch (Exception e) {
-        Log.e(TAG, clientUri + "openTapTapReview failed");
-        return false;
-      }
-      return true;
-    }
-    Log.e(TAG, clientUri + "openTapTapReview failed");
-    return false;
-  }
-
-  public static boolean openWebDownloadUrlOfTapTap(Activity activity, String appId) {
-    return openWebDownloadUrl(activity, String.format(Locale.US, DEFAULT_CLIENT_DOWNLOAD_URL_TAPTAP + "?subc1=%s", appId));
-  }
-
-  public static boolean openWebDownloadUrl(Activity activity, String url) {
-    if (activity != null && !TextUtils.isEmpty(url)) {
-      try {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setData(Uri.parse(url));
-        activity.startActivity(intent);
-      } catch (Exception e) {
-        Log.e(TAG, "openWebUrl fail");
-        return false;
-      }
-      return true;
-    }
-    return false;
-  }
-
-}
-```
-
-适用于其他国家或地区：
-
-</Conditional>
-
-```java
-package com.tds.common.utils;
-
-import android.app.Activity;
-import android.content.Context;
-import android.content.Intent;
-import android.content.pm.PackageInfo;
-import android.net.Uri;
-import android.text.TextUtils;
-import android.util.Log;
-import java.util.Locale;
-
-public class TapGameUtil {
-
-  private static final String TAG = TapGameUtil.class.getName();
-
-  public static final String PACKAGE_NAME_TAPTAP_GLOBAL = "com.taptap.global";
-
-  public static final String CLIENT_URI_TAPTAP_GLOBAL = "tapglobal://taptap.tw";
-
-  public static final String DEFAULT_CLIENT_DOWNLOAD_URL_TAPTAP_GLOBAL = "https://l.taptap.io/GNYwFaZr";
-
-  // 这里更新的时候不检查 Tap 客户端，一是因为特定 schema 没被应用注册的话大概率是直接返回 error 的，在这里被 try catch 后返回 false 可以近似等于客户端不存在
-  // 二是因为 Android 11 开始检查客户端需要游戏做特殊配置，这个配置无法在 SDK 内做好，因为和编译工具版本强绑定，无法做前后版本兼容。
-
-  public static boolean updateGameAndFailToWebInTapGlobal(Activity activity, String appId) {
-    return updateGameInTapGlobal(activity, appId) || openWebDownloadUrlOfTapGlobal(activity, appId);
-  }
-
-  public static boolean updateGameAndFailToWebInTapGlobal(Activity activity, String appId, String webUrl) {
-    if (TextUtils.isEmpty(webUrl)) {
-      return updateGameAndFailToWebInTapGlobal(activity, appId);
-    }
-    return updateGameInTapGlobal(activity, appId) || openWebDownloadUrl(activity, webUrl);
-  }
-
-  public static boolean isTapGlobalInstalled(Context context) {
-    return isTapClientInstalled(context, PACKAGE_NAME_TAPTAP_GLOBAL);
-  }
-
-  public static boolean isTapClientInstalled(Context context, String clientPackageName) {
-    if (context != null && !TextUtils.isEmpty(clientPackageName)) {
-      boolean TapTapInstalled = false;
-      try {
-        PackageInfo packageInfo = context.getPackageManager().getPackageInfo(clientPackageName, 0);
-        if (null != packageInfo) {
-          TapTapInstalled = true;
-        }
-      } catch (Exception e) {
-        Log.e(TAG, clientPackageName + " isInstalled=false");
-      }
-      return TapTapInstalled;
-    }
-    return false;
-  }
-
-  public static boolean updateGameInTapGlobal(Activity activity, String appId) {
-    return updateGameInTapClient(activity, appId, CLIENT_URI_TAPTAP_GLOBAL);
-  }
-
-  public static boolean updateGameInTapClient(Activity activity, String appId, String clientUri) {
-    if (activity != null && !TextUtils.isEmpty(appId) && !TextUtils.isEmpty(clientUri)) {
-      try {
-        Uri uri = Uri.parse(String.format(Locale.US,
-            "%s/app?app_id=%s&source=outer|update", clientUri, appId));
-        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        activity.startActivity(intent);
-      } catch (Exception e) {
-        Log.e(TAG, clientUri + "updateGameInTapTap failed");
-        return false;
-      }
-      return true;
-    }
-    Log.e(TAG, clientUri + "updateGameInTapTap failed");
-    return false;
-  }
-
-  public static boolean openReviewInTapGlobal(Activity activity, String appId) {
-    return openReviewInTapClient(activity, appId, CLIENT_URI_TAPTAP_GLOBAL);
-  }
-
-  public static boolean openReviewInTapClient(Activity activity, String appId, String clientUri) {
-    if (activity != null && !TextUtils.isEmpty(appId) && !TextUtils.isEmpty(clientUri)) {
-      try {
-        Uri uri = Uri.parse(String.format(Locale.US,
-            "%s/app?tab_name=review&app_id=%s", clientUri, appId));
-        Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        activity.startActivity(intent);
-      } catch (Exception e) {
-        Log.e(TAG, clientUri + "openTapTapReview failed");
-        return false;
-      }
-      return true;
-    }
-    Log.e(TAG, clientUri + "openTapTapReview failed");
-    return false;
-  }
-
-  public static boolean openWebDownloadUrlOfTapGlobal(Activity activity, String appId) {
-    return openWebDownloadUrl(activity, String.format(Locale.US, DEFAULT_CLIENT_DOWNLOAD_URL_TAPTAP_GLOBAL + "?subc1=%s", appId));
-  }
-
-  public static boolean openWebDownloadUrl(Activity activity, String url) {
-    if (activity != null && !TextUtils.isEmpty(url)) {
-      try {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        intent.setData(Uri.parse(url));
-        activity.startActivity(intent);
-      } catch (Exception e) {
-        Log.e(TAG, "openWebUrl fail");
-        return false;
-      }
-      return true;
-    }
-    return false;
-  }
-
-}
-```
-
-</details>

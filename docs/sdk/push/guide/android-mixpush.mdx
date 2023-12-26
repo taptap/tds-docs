@@ -5,6 +5,7 @@ sidebar_position: 4
 ---
 import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';
+import {Conditional} from '/src/docComponents/conditional';
 
 ## 混合推送概述
 
@@ -20,7 +21,17 @@ import sdkVersions from '/src/docComponents/sdkVersions';
 
 整个流程与苹果的 APNs 推送类似，SDK 在客户端基本不会得到调用（具体依赖于厂商的实现方案），消息的下发和展示都依赖厂商客户端的行为。所以**如果部分厂商在某些推送中夹带了其他非开发者提交的消息，或者在服务启用的时候，有额外营销性质的弹窗，这都是厂商自己的行为，与我们完全无关**，还请大家了解。另外，如果开发者碰到厂商 SDK 的问题，我们也无法深入调查，还请大家自行到厂商的论坛或技术支持渠道咨询解决。
 
+<Conditional brand="leancloud">
+
+Android 混合推送功能仅对商用版应用开放，如果希望使用该功能，请进入 **应用 > 推送 > 设置 > 混合推送**，打开混合推送的开关。
+
+</Conditional>
+
+<Conditional brand="tds">
+
 Android 混合推送功能仅对商用版应用开放，如果希望使用该功能，请进入 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 推送通知 > 设置 > 混合推送**，打开混合推送的开关。
+
+</Conditional>
 
 注意，混合推送可以随时按需开关。当该选项关闭后，下一次 Android 推送会与普通推送一样自动选择自有通道送达客户端，除了会再次遇到上面提到的自有通道在部分 ROM 上会受到限制的问题之外，不会有别的影响。而当该选项再次开启后，Android 推送又会去选择厂商推送渠道。
 
@@ -80,8 +91,8 @@ vivo | 否（老版本有透传接口，新版本已不建议使用）
 
 最低 Android 版本要求：
 
-- 华为推送需要用户手机上安装 HMS Core（APK）4.0.0.300 及以上版本，最低 Android 版本为 4.4（minSdkVersion 19）。
-- 小米推送服务 SDK 支持的最低安卓版本为 2.3（minSdkVersion：9）。
+- 华为推送需要用户手机上安装 HMS Core（APK）6.11.0.300 及以上版本，最低 Android 版本为 4.4（minSdkVersion 19）。
+- 小米推送服务 SDK 支持的最低安卓版本为 4.4（minSdkVersion：19）。
 - vivo 推送服务支持的最低 Android 版本为 6.0（minSdkVersion：23）。
 - OPPO 推送只支持 Android 4.4 或以上版本的手机系统（minSdkVersion：19）。
 - 魅族（flyme）推送只支持 Android 4.2 或以上版本的手机系统（minSdkVersion：17）。
@@ -228,7 +239,7 @@ maven {url 'https://developer.hihonor.com/repo/'}
     ```groovy
     dependencies {
         classpath 'com.android.tools.build:gradle:4.1.1'
-        classpath 'com.huawei.agconnect:agcp:1.2.1.301'
+        classpath 'com.huawei.agconnect:agcp:1.6.0.300'
     }
     ```
 
@@ -249,7 +260,7 @@ maven {url 'https://developer.hihonor.com/repo/'}
         ```groovy
         dependencies {
           //其他已存在的依赖不要删除
-          implementation 'com.huawei.hms:push:5.3.0.304'
+          implementation 'com.huawei.hms:push:6.11.0.300'
         }
         ```
 
@@ -294,7 +305,7 @@ maven {url 'https://developer.hihonor.com/repo/'}
   //即时通信与推送需要的包
   implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'\n
-  implementation 'com.huawei.hms:push:5.3.0.304'
+  implementation 'com.huawei.hms:push:6.11.0.300'
 }`}
 </CodeBlock>
 
@@ -575,12 +586,12 @@ context.getContentResolver().call(Uri.parse("content://com.huawei.android.launch
 
 ### 接入 SDK
 
-我们混合推送基于小米 4.8.2 版本 SDK 进行开发。开发者需要首先导入 `mixpush-android` 包：修改 `build.gradle` 文件，在 **dependencies** 中添加依赖：
+我们混合推送基于小米 5.9.9 版本 SDK 进行开发。开发者需要首先导入 `mixpush-android` 包：修改 `build.gradle` 文件，在 **dependencies** 中添加依赖：
 
 <CodeBlock className="groovy">
 {`dependencies {
   //混合推送需要的包
-  implementation fileTree(dir: 'libs', include: ['*.jar']) // 需将 MiPush_SDK_Client_4_8_2.jar 放入应用的 libs 目录下
+  implementation fileTree(dir: 'libs', include: ['*.aar']) // 需将 MiPush_SDK_Client_5_9_9-C_3rd.aar 放入应用的 libs 目录下
   implementation 'cn.leancloud:mixpush-android:${sdkVersions.leancloud.java}'
   //即时通信与推送需要的包
   implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
@@ -589,7 +600,7 @@ context.getContentResolver().call(Uri.parse("content://com.huawei.android.launch
 </CodeBlock>
 
 如果只希望接入小米推送，可以将 `mixpush-android` 替换为 `mixpush-xiaomi`。
-如果是通过 jar 包导入，则需要手动下载 jar 包 [小米 Push SDK](http://dev.xiaomi.com/mipush/downpage/)。
+如果是通过 aar 包导入，则需要手动下载 aar 包 [小米 Push SDK](http://dev.xiaomi.com/mipush/downpage/)。
 
 然后配置相关 AndroidManifest。添加 Permission：
 
@@ -720,7 +731,7 @@ LCMixPushManager.registerXiaomiPush(context, miAppId, miAppKey, profile, true);
 <CodeBlock className="groovy">
 {`dependencies {
   //魅族推送需要的包
-  implementation 'com.meizu.flyme.internet:push-internal:3.6.+@aar'
+  implementation 'com.meizu.flyme.internet:push-internal:4.3.0'
   //混合推送需要的包
   implementation 'cn.leancloud:mixpush-android:${sdkVersions.leancloud.java}'
   //即时通信与推送需要的包
@@ -796,14 +807,14 @@ vivo 混合推送 demo：可参照 [这里](https://github.com/leancloud/mixpush
 
 ### 接入 SDK
 
-当前版本的 SDK 是基于 vivo 官方文档 [push SDK 接入文档](https://dev.vivo.com.cn/documentCenter/doc/365) 封装而来，使用的 vivo push SDK 基线版本是 `3.0.0.3`。我们会结合 demo（[源码](https://github.com/leancloud/mixpush-demos/tree/master/vivo/)）来解释整个接入流程。
+当前版本的 SDK 是基于 vivo 官方文档 [push SDK 接入文档](https://dev.vivo.com.cn/documentCenter/doc/365) 封装而来，使用的 vivo push SDK 基线版本是 `3.0.0.7`。我们会结合 demo（[源码](https://github.com/leancloud/mixpush-demos/tree/master/vivo/)）来解释整个接入流程。
 
 首先将 demo 工程 `app/libs` 目录下的所有 jar 包（如有）拷贝到目标工程的 libs 目录下，然后修改 `build.gradle` 文件，在 `dependencies` 中添加依赖：
 
 <CodeBlock className="groovy">
 {`dependencies {
   //混合推送需要的包
-  implementation files("libs/vivo_pushsdk-v3.0.0.3_483.aar") // 将 vivo_pushsdk-v3.0.0.3_483.aar 置于应用 libs 目录下
+  implementation files("libs/vivo_pushsdk-v3.0.0.7_488.aar") // 将 vivo_pushsdk-v3.0.0.7_488.aar 置于应用 libs 目录下
   implementation 'cn.leancloud:mixpush-vivo:${sdkVersions.leancloud.java}'
   //即时通信与推送需要的包
   implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
@@ -850,7 +861,7 @@ vivo 混合推送 demo：可参照 [这里](https://github.com/leancloud/mixpush
 <!--vivo Push SDK的版本信息-->
 <meta-data
     android:name="sdk_version_vivo"
-    android:value="483"/>
+    android:value="488"/>
 ```
 
 接下来我们看看代码上要怎么做。
@@ -882,7 +893,9 @@ public class MyApp extends Application {
     // vivo 推送初始化
     // 使用 mixpush-android 的场合，引用 cn.leancloud.LCMixPushManager
     // 使用 mixpush-vivo 的场合，引用 cn.leancloud.vivo.LCMixPushManager
-    LCMixPushManager.registerVIVOPush(this);
+    // 注意这里第二个参数，表示用户是否同意了应用的隐私声明。true：用户同意了隐私声明,默认同意；false:未同意隐私声明。
+    LCMixPushManager.registerVIVOPush(this, true);
+
     LCMixPushManager.turnOnVIVOPush(new LCCallback<Boolean>() {
       @Override
       protected void internalDone0(Boolean aBoolean, LCException e) {
@@ -1003,7 +1016,7 @@ vivo 桌面图标角标默认是关闭的，开发者接入完成后还需要终
 
 ## OPPO 推送
 
-混合推送 OPPO 模块基于 oppo Push SDK v3.0.0 版本，支持 Android 4.4 或以上版本的手机系统，服务支持信息如下：
+混合推送 OPPO 模块基于 oppo Push SDK v3.4.0 版本，支持 Android 4.4 或以上版本的手机系统，服务支持信息如下：
 
 - 支持平台：ColorOS 3.1 及以上的系统的 OPPO 机型，一加 5/5t 及以上机型，realme 所有机型。
 - 通知消息类型：只支持通知栏消息的推送。消息下发到 OS 系统模块并由系统通知模块展示，在用户点击通知前，不启动应用。具体限制可参考 [OPPO 官方文档](https://open.oppomobile.com/wiki/doc#id=10743)。
@@ -1015,7 +1028,7 @@ vivo 桌面图标角标默认是关闭的，开发者接入完成后还需要终
 在开始接入之前，有两项准备工作：
 
 - 在 [OPPO 开放平台](https://open.oppomobile.com/)注册一个账号，并创建好应用。
-- 从 OPPO 官网下载 aar 资源。OPPO 官方 aar 下载地址为：<https://openfs.oppomobile.com/open/oop/202109/18/a6165ca79f20025a21a8158a30dd6964.zip>。
+- 从 OPPO 官网下载 aar 资源。OPPO 官方 aar 下载地址为：<https://openfs.oppomobile.com/open/oop/202310/19/47f9d3623bdb72e37847556f44a9af31.zip>。
 
 这里假设大家已经完成上述操作，创建好了应用，并获取了 `appKey`、`appSecret`、`masterSecret`，请保存好这三个值，下一步接入的时候会用到：
 
@@ -1026,7 +1039,7 @@ vivo 桌面图标角标默认是关闭的，开发者接入完成后还需要终
 
 #### 下载 SDk
 
-- 将之前下载的 SDK（`oppo-push-3.0.0.aar`）复制到工程 libs/ 目录下，然后修改 `build.gradle` 文件，在 `dependencies` 中添加依赖：
+- 将之前下载的 SDK（`com.heytap.msp_3.4.0.aar`）复制到工程 libs/ 目录下，然后修改 `build.gradle` 文件，在 `dependencies` 中添加依赖：
 
 <CodeBlock className="groovy">
 {`dependencies {
@@ -1042,7 +1055,7 @@ vivo 桌面图标角标默认是关闭的，开发者接入完成后还需要终
 
 #### 配置 AndroidManifest.xml
 
-注意：OPPO 推送服务SDK 3.0.0 版本支持的最低安卓版本为 Android 4.4 系统（`minSdkVersion="19"`）。
+注意：OPPO 推送服务SDK 3.4.0 版本支持的最低安卓版本为 Android 4.4 系统（`minSdkVersion="19"`）。
 
 - 增加权限列表（如果应用无透传权限，则不用配置）
 
@@ -1065,7 +1078,7 @@ vivo 桌面图标角标默认是关闭的，开发者接入完成后还需要终
         <intent-filter>
         <action android:name="com.coloros.mcs.action.RECEIVE_MCS_MESSAGE"/>
         </intent-filter>
-    </service> <!-- 兼容Q以下版本 -->
+    </service> <!-- 兼容 Q 以下版本 -->
     <service
       android:name="com.heytap.msp.push.service.DataMessageCallbackService"     
     android:permission="com.heytap.mcs.permission.SEND_PUSH_MESSAGE">
@@ -1073,7 +1086,7 @@ vivo 桌面图标角标默认是关闭的，开发者接入完成后还需要终
         <action android:name="com.heytap.mcs.action.RECEIVE_MCS_MESSAGE"/>
     <action android:name="com.heytap.msp.push.RECEIVE_MCS_MESSAGE"/>
         </intent-filter>
-    </service>
+    </service>. <!-- 兼容 Q 版本 -->
     ```
 
 
@@ -1167,7 +1180,7 @@ public class MyApp extends Application {
 
 	```groovy
 	dependencies {
-  	implementation 'com.hihonor.mcs:push:7.0.41.300'
+  	implementation 'com.hihonor.mcs:push:7.0.41.301'
 	}
 	```
 
@@ -1209,7 +1222,7 @@ public class MyApp extends Application {
   //即时通信与推送需要的包
   implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'
   implementation 'io.reactivex.rxjava2:rxandroid:2.1.0'\n
-  implementation 'com.hihonor.mcs:push:7.0.41.300'
+  implementation 'com.hihonor.mcs:push:7.0.41.301'
 }`}
 </CodeBlock>
 

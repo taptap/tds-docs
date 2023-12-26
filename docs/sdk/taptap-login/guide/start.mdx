@@ -10,6 +10,8 @@ import Languages from "../../_partials/languages.mdx";
 import Profiles from "../../_partials/tap-login-profile.mdx";
 import CodeBlock from "@theme/CodeBlock";
 import sdkVersions from "/src/docComponents/sdkVersions";
+import UnitySDKInstallation from "../../_partials/unity-sdk-installation.mdx";
+
 
 :::tip
 推荐阅读博客文章[登录最佳实践](https://blog.taptap.dev/posts/tapsdk-taplogin-bestpractice)，了解 TapSDK 登录的整个流程。
@@ -39,7 +41,7 @@ import sdkVersions from "/src/docComponents/sdkVersions";
 <>
 
 - Unity 2019.4 或更高版本
-- iOS 10 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
+- iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
 - Android 5.0（API level 21）或更高版本
 
 </>
@@ -52,7 +54,7 @@ Android 5.0（API level 21）或更高版本
 
 <>
 
-iOS 10 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
+iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
 
 </>
 
@@ -81,41 +83,22 @@ iOS 10 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.a
 <MultiLang kind="ue">
 <>
 
-SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选其一。请根据项目需要选择。
-
-#### 方法一：使用 Unity Package Manager
-
-在项目的 `Packages/manifest.json` 文件中添加以下依赖：
-
-<CodeBlock className="json">
-  {`"dependencies":{
-    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}",
-    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
-    "com.taptap.tds.bootstrap":"https://github.com/TapTap/TapBootstrap-Unity.git#${sdkVersions.taptap.unity}",
-    "com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}",
-    "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
-}`}
-</CodeBlock>
-
-在 Unity 顶部菜单中选择 **Window > Package Manager** 可查看已经安装在项目中的包。
-
-#### 方法二：手动导入
-
-1. 在 [下载页](/tap-download) 找到 **TapSDK Unity** 和 **LeanCloud C# SDK** 下载地址，分别下载 `TapSDK-UnityPackage.zip` 和 `LeanCloud-SDK-Realtime-Unity.zip`。
-
-2. 在 Unity 项目中依次转到 **Assets > Import Packages > Custom Packages**，从解压后的 `TapSDK-UnityPackage.zip` 中，选择希望在游戏中使用的 TapSDK 包导入，其中：
-
-   - `TapTap_Bootstrap.unitypackage` TapSDK 启动器，必选。
-   - `TapTap_Common.unitypackage` TapSDK 基础库，必选。
-   - `TapTap_Login.unitypackage` TapTap 登录，必选。
-
-3. 解压后的 `LeanCloud-SDK-Realtime-Unity.zip` 为 Plugins 文件夹，拖拽至 Unity 即可。
-
-:::tip
-
-如果是手动下载 `unitypackage` 进行 SDK 导入，需要将 `Assets/TapTap/Common/Plugins/iOS/TapTap.Common.dll` 设置为只支持 iOS。
-
-:::
+<UnitySDKInstallation 
+npmDeps={[
+    "com.taptap.tds.bootstrap",
+]} 
+githubDeps={[
+    {package: "com.taptap.tds.login", url: `https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}`},
+    {package: "com.taptap.tds.common", url: `https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}`},
+    {package: "com.taptap.tds.bootstrap", url: `https://github.com/TapTap/TapBootstrap-Unity.git#${sdkVersions.taptap.unity}`},
+    {package: "com.leancloud.realtime", url: `https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}`},
+    {package: "com.leancloud.storage", url: `https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}`},
+]}
+unitypackageModules={[
+    {name: "TapTap_Bootstrap.unitypackage", desc: "TapSDK 启动器，必选"},
+    {name: "TapTap_Common.unitypackage", desc: "TapSDK 基础库，必选"},
+    {name: "TapTap_Login.unitypackage", desc: "TapTap 登录库，必选"},
+]}/>
 
 #### iOS 配置
 
@@ -174,6 +157,7 @@ SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选�
    <array>
      <string>tapiosdk</string>
      <string>tapsdk</string>
+     <string>taptap</string>
    </array>
    ```
 
@@ -216,7 +200,7 @@ dependencies {
 
 #### 导入 SDK
 
-1. 在 Xcode 选择工程，到 **Build Setting > Other Linker Flags** 添加 `-ObjC`。
+1. 在 Xcode 选择工程，到 **Build Setting > Other Linker Flags** 添加 `-ObjC` 和 `-Wl -ld_classic`。
 
 2. 下载 [TapSDK iOS](/tap-download)，解压后选择需要导入的资源文件，直接拖拽到项目目录即可。
 
@@ -229,6 +213,8 @@ dependencies {
      TapCommonSDK.framework
      TapLoginSDK.framework
      LeanCloudObjc.framework
+     TapCommonResource.bundle
+     TapLoginResource.bundle
      ```
 
 4. 请仔细核对下面依赖库是否都添加成功：
@@ -308,6 +294,7 @@ dependencies {
    <array>
      <string>tapiosdk</string>
      <string>tapsdk</string>
+     <string>taptap</string>
    </array>
    ```
 
@@ -426,6 +413,7 @@ else
 <array>
     <string>tapiosdk</string>
     <string>tapsdk</string>
+    <string>taptap</string>
 </array>
 ```
 
@@ -678,7 +666,7 @@ TapTap 授权登录接口支持选择不同的授权范围且支持任意组合�
 | `basic_info` | 获得 openid 和 unionid | v3.13.0 |
 
 :::tip
-当游戏运行在 TapTap v2.34.0-Beta.2 及以上版本的 [TapPlay](/sdk/tap-play/features/) 中时，若游戏发起 TapTap 授权登录时只请求 `basic_info` 的权限，则用户可享受无感登录的特性，即用户不需要手动确认授权即可自动授权完成登录。
+若游戏发起 TapTap 授权登录时只请求 `basic_info` 的权限，则用户可享受无感登录的特性，即用户不需要手动确认授权即可自动授权完成登录。
 :::
 
 </Conditional>
@@ -875,3 +863,9 @@ TapUECommon::setDurationStatisticsEnabled(true);
 ## 更多功能
 
 请阅读[内建账户指南](/sdk/authentication/guide/)了解内建账户系统的更多功能。
+
+## 视频教程
+
+可以参考视频教程：[如何在游戏中集成 TapTap 登录功能](https://www.bilibili.com/video/BV1YX4y1b7TB/)，了解如何在 Untiy 项目中接入登录功能。
+
+更多视频教程见[开发者学堂](https://developer.taptap.cn/tds-tutorials/list)。因为 SDK 功能在不断完善，视频教程可能出现与新版 SDK 功能不一致的地方，以当前文档为准。
