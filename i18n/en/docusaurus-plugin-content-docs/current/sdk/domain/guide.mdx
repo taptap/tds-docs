@@ -1,0 +1,744 @@
+---
+title: Domain Binding Guide
+sidebar_label: Binding Guide
+sidebar_position: 1
+---
+
+import { Conditional } from "/src/docComponents/conditional";
+
+According to laws and regulations and the requirements of relevant departments, the use of cloud services needs to bind a domain name that has been filed with the [Ministry of Industry and Information Technology](https://beian.miit.gov.cn/?spm=a2c4g.11186623.0.0.58797cc85Mnmlh#/Integrated/index). Binding your own domain name is also conducive to good application isolation from the domain name level to ensure business stability.
+
+This guide assumes that you understand the basics of domain name resolution, if you are not familiar with this aspect, you can refer to [this article](https://blog.taptap.dev/posts/domain-introduction).
+
+This guide is intended for developers of the domestic version of the application.
+
+
+## The following services require a bound domain name
+
+<Conditional brand="leancloud">
+
+Using LeanCloud's data storage and cloud engine services requires that you must bind your own domain name, other services are optional with or without binding your own domain name.
+We offer API shared domains and file shared domains, but please note that **shared domains do not have availability guarantees and are vulnerable to DDoS attacks. We recommend using bound custom domain names in production environments. **
+
+</Conditional>
+
+<Conditional brand="tds">
+
+Data storage, cloud engine and announcement services that use TDS require that you must bind your own domain name, other services are optional with or without binding your own domain name.
+We offer API Shared Domains and File Shared Domains, but please note that **Shared Domains have no availability guarantee and are vulnerable to DDoS attacks. We recommend using bound custom domain names in production environments. **
+
+</Conditional>
+
+## Types of Customized Domain Names
+
+The Domestic Node Service involves the following types of custom domain names:
+
+<Conditional brand="leancloud">
+
+| Domain Types | Services Involved | Recorded with MIIT | Recorded with LeanCloud or Access Recorded | SSL | Binding Target | Static Resource Acceleration |
+| ---------|--------|------------|--------------------------|-----|---------|------------|
+| File Domain Name | File Service | Required | Optional | Optional | Application | Yes |
+| Cloud Engine Domains | Cloud Engine **Website Hosting** | Required | Must | Optional | Grouping | As appropriate |
+| API Domain Name | Storage, Instant Messaging, SMS, Push, **Cloud Functions** | Must | Must | Must | Application | No |
+
+</Conditional>
+
+<Conditional brand="tds">
+
+| Domain Name Type | Services Involved | Recorded at MIIT | Recorded at TDS or Access Recorded | SSL | Bind Target | Static Resource Acceleration |
+|--------|--------|------------|---------------------|-----|---------|-----------|
+| File Domain | File Service, Cloud Archive | Required | Optional | Optional | Application | Yes |
+| Cloud Engine Domains | Cloud Engine **Website Hosting** | Required | Mandatory | Optional | Grouping | As appropriate |
+| API Domains | Storage, Leaderboards, Built-in Accounts, Friends, Achievements, Real-time Voice, Instant Messaging, Push, **Cloud Functions**, Cloud Archive | Must | Required | Required | Required | Apply | No |
+| Announcement System Domain | Announcement System | Must | Optional | Required | Must | Apply | Yes |
+
+</Conditional>
+
+Description:
+
+1. You can use different sub-domains under the same main domain name, each sub-domain can only be bound to one application, and the API service, cloud engine web hosting service and file service of the same application need to be bound to different sub-domains.
+2. The API domain name needs to be enabled with SSL, and it will apply for SSL certificate automatically when binding, of course, you can also upload the certificate by yourself.
+3. "Grouping" in the binding target refers to the production environment where Cloud Engine instances are grouped under the application.
+4. It is recommended to configure separate IPs for API domains and Cloud Engine domains.** The API service only provides availability guarantees for separate (IP) entries. **Cloud Engine services that are not configured with a separate IP are optimized for static sites by default, with some limitations that are less friendly to dynamic content. See the [API Domain Name](#api-domain), [Cloud Engine Domain Name](#cloud-engine-domains) subsections below for details.
+5. File domain name, API domain name with shared IP, cloud engine domain name use CNAME to configure domain name resolution, so it does not support binding bare domain name, so as not to affect the resolution of other domain names under the domain name and conflict with MX and other records. If you need to use a bare domain name as an API domain name or cloud engine domain name, you can configure an independent IP and bind it with an A record.
+6. Multiple domains can be bound to an application (file domain, API domain) or group (cloud engine domain), but the `url` field for internal files returned by the file service (files hosted on <Conditional brand="leancloud">LeanCloud</Conditional><Conditional brand="tds" >TDS</Conditional> file service) the `url` field can only optionally use one domain name at a time (which can be toggled in the console).
+
+## Document domain name
+
+If your app uses file services, go to **<Conditional brand="leancloud">Application Console > Settings > Domain Binding > File Access Domain Name</Conditional><Conditional brand="tds">Developer Center > Game Services > Application Configuration > Basic Information > Domain Name Configuration > File</Conditional>** Bind the file domain name.
+
+Note that even if you are not using a data storage service, but are using multimedia messaging (images, audio, video, etc.) for instant messaging, then it is possible that a file service is being used.
+An easy way to tell is to go to the **<Conditional brand="tds">Developer Center > Game Services > Cloud Services</Conditional><Conditional brand="leancloud">Console</Conditional> > Data Storage > Files > File Management** page. If there is data in it, it indicates that your app is using the file service.
+
+When binding the file domain name, you can choose whether to enable HTTPS or not:
+
+- Without HTTPS, the client can only access via HTTP.
+
+- When HTTPS is enabled, the client can access the file via HTTPS and HTTP at the same time. However, it is limited by the file service provider, regardless of whether the client uses HTTP URL or HTTPS URL access:
+
+  - Traffic to custom file domains with HTTPS-enabled domain names is billed as HTTPS traffic.
+  - Similarly, file traffic statistics in the application console are always categorized as HTTPS traffic.
+
+By **<Conditional brand="tds">Developer Center > Game Services > Cloud Services</Conditional><Conditional brand="leancloud">Console</Conditional> > Data Storage > Files > Settings > File Access Addresses** After changing the file domain name, the files previously hosted in the file service will be accessed at the same URL. When you change the file domain name, the URL of the file previously hosted on the file service is automatically updated.
+URLs in instant messaging history messages (including rich media messages) are not automatically updated.
+Similarly, if a developer stores the file URLs separately somewhere else, you will need to implement the appropriate replacement logic on the client side when you change the file domain name.
+Therefore, we recommend that developers bind a custom file domain name when they start using the file service and instant messaging service, so as not to make migration more difficult in the future.
+
+Older applications that previously used <Conditional brand="leancloud"> LeanCloud East China Node</Conditional> public file domain names can still be accessed by existing URLs that use the shared domain name after binding the file domain name.
+If more than one file domain name is bound, the files hosted on the file service (internal files) can be accessed through all of these domain names, but the URLs of the internal files returned by the file service will always use the domain name that is set in the File Access Addresses section above.
+
+<Conditional brand="leancloud">
+If you bind a <code>_File</code>{" "}
+  Class, then you need to bind the custom file domain name in the source application, and the target application does not need to bind the custom file domain name.
+</Conditional>
+
+Due to the limitation of the underlying file service provider, if you have an account with the underlying file service provider (Seven Cows) and bind a generic domain name (e.g. `*.example.com`) in your Seven Cows account, then all the subdomains under the domain name (`example.com`) can't be bound to <Conditional brand="leancloud" >LeanCloud</Conditional><Conditional brand="tds">TDS</Conditional> file service.
+If you cancel pan-domain binding in Seven Bulls, you can bind sub-domains under this domain to <Conditional brand="leancloud">LeanCloud</Conditional><Conditional brand="tds">TDS</Conditional> file service after the next billing period.
+
+## Cloud Engine Domains
+
+Applications that use cloud engine web hosting services need to go to **<Conditional brand="leancloud">Application Console > Settings > Domain Name Binding > Cloud Engine, ClientEngine Domain Name</Conditional><Conditional brand="tds">Developer Center > Games Services > Application Configuration > Basic Information > Domain Configuration > Cloud Engine</Conditional>** Bind the cloud engine domain name.
+
+As mentioned earlier, applications that only use cloud functions (including hook functions) do not need to bind a cloud engine domain name, but they do need to bind an API domain name.
+
+When the console binds the domain name, it can automatically apply for an SSL certificate. Accordingly, the `/.well-known/acme-challenge/` path is used for authentication and is not available to developers.
+
+Custom domain names starting with `stg-` (e.g. `stg-web.example.com`) are automatically bound to the preparation environment.
+
+As mentioned earlier, we recommend configuring a separate IP for the Cloud Engine. Cloud Engine services that are not configured with a separate IP are optimized for static sites by default, using edge nodes to accelerate access for static resources. However, due to the limitations of edge nodes, they are not very friendly to some dynamic content requests. The table below briefly compares the two:
+
+|           |                            stand-alone entrance                             |                           acceleration node                            |
+| --------- | :--------------------------------------------------------------: | :-------------------------------------------------------------: |
+| Domain name pointing to | Separate IP of cloud engine cluster | Edge node |
+| Access Acceleration  |                                -                                 |            ✔️<br /><small>(for cacheable resources)</small>            |
+| dynamic request  |                               amicably                               |                             restrictive                              |
+| DDoS protection | 2 Gbps protection bandwidth<br /><small>(IP replacement or access to cleaning services available)</small> |                         Basic DDoS Protection                        |
+| traffic cost  |    0.8 dollars/GB<br /><small>(1GB free per instance per day)</small>     | 0.36 dollars/GB<br /><small>(Back-to-source traffic is still charged at regular domain name rates)</small> |
+| DNS resolution  |                              A records                              |                           CNAME records                            |
+
+
+If you are deploying purely static sites on the cloud engine, such as statically generated websites, front-end portions of front-end and back-end separated applications, and static resources such as images, files, etc., then the use of acceleration nodes can improve end-user access speeds, and reduce traffic costs in the case of higher traffic.
+
+If you deploy websites or services that provide dynamic content on the cloud engine, such as API services or server-side rendered pages, it is recommended to use a separate portal. On the one hand, accelerating dynamic content is likely to slightly affect user access speeds and incur both acceleration traffic costs and back-to-source traffic costs. On the other hand, due to the limitations of edge nodes, cloud engine services using edge nodes may encounter problems when using WebSocket connections, HTTP PATCH methods, and obtaining client IPs, and the request timeout limit may be as low as 10 seconds. Cloud Engine sites that use A records pointing to separate IPs use separate entry points and do not pass through edge nodes, without the above limitations.
+
+For mixed-content deployments, such as common single-page applications with separate front and back ends, which provide both static front-end pages and dynamic API services in a group, you can bind two domain names, one pointing to an independent IP through an A record and the other to an acceleration node through a CNAME record, accessing dynamic API services through the first domain name and static resources through the second.
+
+You can choose the entry point of the domain name at any time by configuring DNS on demand.
+In other words, to switch between standalone entry and acceleration node, you only need to modify the DNS resolution at the domain name service provider and replace the CNAME record with A record or vice versa.
+
+## API Domain
+
+If you use the following services:
+
+- Structured data storage
+
+- Cloud functions (including hook functions)
+
+- Instant Messaging
+
+- Multiplayer online battles, leaderboards<Conditional brand="tds">, built-in accounts, friends, achievements, cloud archives, real-time voice, push notifications</Conditional>.
+
+Then it is recommended that you go to **<Conditional brand="leancloud">Application Console > Settings > Domain Binding > API to access the domain name</Conditional><Conditional brand="tds">Developer Center > Game Services > Application Configuration > Basic Information > Domain Configuration > API</Conditional>** Bind the API domain name. Among them, "Structured Data Storage" and "Cloud Functions" modules are required to bind their own domain names.
+
+<Conditional brand="leancloud">
+
+Only use push and SMS functions, and push and SMS are sent through the server, not involving UGC.
+Apps that only use push and SMS functions and send push and SMS through the server side, and do not involve UGC content, are not mandatory to bind a domain name, but we still recommend users to bind their own API
+However, we still recommend that users bind their own API domain names to avoid being affected by the availability of shared domain names.
+
+</Conditional>
+
+<p>
+  <Conditional brand="leancloud">We recommend having a separate IP for the API domain name.</Conditional>
+  <Conditional brand="tds">
+    We give away a separate IP for each app that is bound to an API customized domain name.
+  </Conditional>
+  <strong>
+    API
+    Service portals are categorized into independent (IP) portals and shared portals, and we only provide availability guarantees for independent (IP) portals.
+  </strong>
+</p>
+
+**Shared portals are used by many applications and are risky, so we do not guarantee their availability. **Accessing the API service in the following ways will use a shared portal that is not guaranteed to be available:
+
+- Using your own domain name that is bound, but does not point to a separate IP
+
+  You can `dig` your own domain name at the command line to check if the resolution results point to a standalone IP.
+  If it does not point to a standalone IP, go to the domain name service provider of your own domain name to modify the domain name resolution by replacing the CNAME record with an A record that points to a standalone IP.
+
+- Use the test domain name assigned by the system
+
+  We provide a test domain name for apps in the development and testing phase. This domain name is for testing purposes only and may be reclaimed. For the official launch of the application, please bind your own domain name. The test domain name can be viewed in **<Conditional brand="leancloud">Console > Settings > Application Credentials > Server Address</Conditional><Conditional brand="tds">Developer Center > Game Services > Application Configuration > Basic Information > Domain Configuration > API > Shared Domains</Conditional><Conditional brand="tds">Developer Center > Game Services > Application Configuration > Basic Information > Domain Configuration > API > Shared Domains</Conditional>. Conditional>** View.
+
+<Conditional brand="leancloud">
+
+- Using an older SDK without a specified domain name
+
+  For applications that are bound to their own domain name, for compatibility reasons, the old version of the client can continue to access the shared domain name originally provided by LeanCloud (the old SDK will automatically obtain the shared domain name). We will reclaim shared domains in the future as appropriate. We strongly recommend that developers push users to upgrade to a new version of the client application that uses a customized domain name to avoid unnecessary disruption to their business.
+
+- Use of Other Discontinued Domains
+
+  Some of the older, discontinued SDKs use domains that we announced a long time ago that we were discontinuing support for. We will stop serving APIs on these domains in the future.
+
+</Conditional>
+
+At this time, shared domains will still be used for Instant Messaging, LiveQuery, and multiplayer WebSocket connections after the API domain is bound.
+These shared domains use a shared portal, but we do our best to keep them available.
+We will support the use of private domain names for such WebSocket connections in the future.
+
+<Conditional brand="leancloud">
+  In addition, the user feedback component API
+  has been deprecated, but since the user feedback data is not included in the exported application data, for the convenience of developers to migrate the data, the user feedback related
+  REST API interfaces can still be called, and these interfaces still use shared domain names.
+</Conditional>
+
+### Update Code
+
+After binding your own API domain name, you need to update the client code to use the custom domain name. Please refer to the development guide of each service for configuration.
+
+<Conditional brand="leancloud">
+
+The following section assumes that the bound custom domain is `xxx.example.com` and HTTPS is enabled.
+
+#### REST API
+
+Refer to [Storage REST API Usage Guide](/sdk/storage/guide/rest/#base-url) Configuration.
+
+#### JavaScript SDK
+
+##### Storage SDK
+
+Please refer to [SDK Installation Guide](/sdk/storage/guide/setup-js/#Installing and referencing-sdk) for configuration.
+
+For older versions of the SDK, please refer to the following method for configuration (the latest version of the SDK is recommended):
+
+<details>
+
+Versions of `>=3.5.5, <3.11.1` may run into a bug that still uses the cache's default configuration, which may cause the first request after an update to fail.
+
+```js
+AV.init({
+  // appId, appKey,
+  serverURLs: "https://xxx.example.com",
+});
+```
+
+`>= 3.0.0, <3.5.5`
+
+```js
+AV.init({
+  // appId, appKey,
+  serverURLs: {
+    push: "https://xxx.example.com",
+    stats: "https://xxx.example.com",
+    engine: "https://xxx.example.com",
+    api: "https://xxx.example.com",
+  },
+});
+```
+
+The `<3.0.0` datastore SDK does not support custom domain names.
+
+</details>
+
+##### Instant Messaging SDK
+
+See [Instant Messaging Developer Guide](/sdk/im/guide/overview/) to configure it.
+
+For older versions of the SDK, please refer to the following method for configuration (the latest version of the SDK is recommended):
+
+<details>
+
+The server parameter of the Instant Messaging SDK for `>=4.0.0, <=4.3.1` can only be filled with a domain name (without protocol), and does not support custom domain names without HTTPS enabled:
+
+```js
+new Realtime({
+  // appId, appKey,
+  server: "xxx.example.com",
+});
+```
+
+The `<4.0.0` instant messaging SDK does not support custom domains.
+
+If LiveQuery functionality is used, it is recommended to use the Storage SDK for `>=3.14.0`.
+Older versions (`>=3.5.0, <=3.13.2`) of the SDK also require additional configuration of the domain name of the LiveQuery module during initialization:
+
+```js
+AV.init({
+  // appId, appKey,
+  // serverURLs,
+  realtime: new AV._sharedConfig.liveQueryRealtime({
+    appId,
+    appKey,
+    server: "xxx.example.com",
+  }),
+});
+```
+
+SDKs for `>=3.5.0, <3.13.2` do not support custom domains without HTTPS enabled.
+
+LiveQuery for the `<3.5.0` storage SDK does not support custom domains.
+
+</details>
+
+##### Multiplayer online battles
+
+Please refer to [Getting Started Guide](/sdk/multiplayer/start/js/#initialization) or [Developer's Guide](/sdk/multiplayer/guide/js/) for configuration.
+
+##### WeChat Small Program Whitelist
+
+Go to **LeanCloud Console > Settings > Application Credentials > Domain Whitelist** to get the domain whitelist (different applications correspond to different domains).
+
+Log in to [WeChat Public Platform], go to **Settings > Development Settings > Server Configuration > "Modify "** link, and **add** the domain names in the above domain whitelist.
+
+[WeChat Public Platform]: https://mp.weixin.qq.com
+
+#### Objective-C SDK
+
+Please refer to [SDK Installation Guide](/sdk/storage/guide/setup-objc/#initialization) to configure.
+
+For `<12.0.0` version, please refer to the following method to configure:
+
+<details>
+<pre><code>
+// Configuring SDK Storage
+[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleAPI];
+// Configuring SDK Push
+[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModulePush];
+// Configuring the SDK Cloud Engine (for accessing cloud functions, use the API custom domain name, not the cloud engine custom domain name)
+[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleEngine];
+// Configuring the SDK for Instant Messaging
+[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleRTM];
+// Configuring SDK Statistics
+[AVOSCloud setServerURLString:@"https://xxx.example.com" forServiceModule:AVServiceModuleStatistics];
+// Initialize the application
+[AVOSCloud setApplicationId:@"APPID" clientKey:@"APPKEY"];
+</code></pre>
+
+<strong>Some older versions of the SDK (&lt; 8.2.3) have SSL Pinning, which may cause the configured custom server address to be unusable, if there is an error related to "Illegal certificate", please upgrade the SDK to at least 8.2.3, and it is recommended to upgrade to the latest version.</strong>
+</details>
+
+Custom domains are not supported in versions `<4.6.0`.
+
+#### Swift SDK
+
+For `>= 17.0.0` version, please refer to [SDK Installation Guide](/sdk/storage/guide/setup-swift/#initialization) to configure.
+
+For versions `>= 16.1.0, < 17.0.0`, please refer to the following method:
+
+<details>
+
+```swift
+let configuration = LCApplication.Configuration(
+    customizedServers: [
+        .api("https://xxx.example.com"),
+        .engine("https://xxx.example.com"),
+        .push("https://xxx.example.com"),
+        .rtm("https://xxx.example.com")
+    ]
+)
+do {
+    try LCApplication.default.set(
+        id: "APPID",
+        key: "APPKEY",
+        configuration: configuration
+    )
+} catch {
+    fatalError("\(error)")
+}
+```
+
+</details>
+
+Custom domains are not supported in versions `<16.1.0`.
+
+#### Java Unified SDK
+
+For Java Unified SDK (`>= 6.0.0`), please refer to [SDK Installation Guide](/sdk/storage/guide/setup-java/#initialization) for configuration.
+
+For older versions of SDK, please refer to the following method to configure:
+
+<details>
+
+Android projects using the Java Unified SDK (`< 6.0.0`) need to add the `onCreate` method to the `Application` class:
+
+```java
+import cn.leancloud.AVOSCloud;
+
+public class MyLeanCloudApp extends Application {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        // Configuring SDK Storage
+        AVOSCloud.setServer(AVOSService.API, "https://xxx.example.com");
+        // Configuring the SDK Cloud Engine (for accessing cloud functions, use the API custom domain name, not the cloud engine custom domain name)
+        AVOSCloud.setServer(AVOSService.ENGINE, "https://xxx.example.com");
+        // Configuring SDK Push
+        AVOSCloud.setServer(AVOSService.PUSH, "https://xxx.example.com");
+        // Configuring the SDK for Instant Messaging
+        AVOSCloud.setServer(AVOSService.RTM, "https://xxx.example.com");
+
+        // Provide this, App ID and App Key as parameters.
+        // Be careful not to call the initialize method of cn.leancloud.core.AVOSCloud here, or you'll get errors such as NetworkOnMainThread.
+        AVOSCloud.initialize(this, "APPID", "APPKEY");
+    }
+}
+```
+
+For older Android SDKs, please refer to the following method for configuration:
+
+```java
+// Configuring SDK Storage
+AVOSCloud.setServer(AVOSCloud.SERVER_TYPE.API, "https://xxx.example.com");
+// Configuring the SDK Cloud Engine
+AVOSCloud.setServer(AVOSCloud.SERVER_TYPE.ENGINE, "https://xxx.example.com");
+// Configuring SDK Push
+AVOSCloud.setServer(AVOSCloud.SERVER_TYPE.PUSH, "https://xxx.example.com");
+// Configuring the SDK for Instant Messaging
+AVOSCloud.setServer(AVOSCloud.SERVER_TYPE.RTM, "https://xxx.example.com");
+// Initialize the application
+AVOSCloud.initialize(this, "APPID", "APPKEY");
+```
+
+The Android SDK for `<4.4.4` does not support custom domain names.
+
+</details>
+
+#### .NET SDK
+
+Refer to [SDK Installation Guide](/sdk/storage/guide/setup-dotnet/#initialization) to configure.
+
+For versions of `< v20190925.1` please refer to the following method for configuration:
+
+<details>
+
+```cs
+AVClient.Initialize(new AVClient.Configuration {
+                ApplicationId = "APPID",
+                ApplicationKey = "APPKEY",
+                ApiServer = new Uri("https://xxx.example.com"),
+                EngineServer = new Uri("https://xxx.example.com"),
+                PushServer = new Uri("https://xxx.example.com")
+});
+```
+
+</details>
+
+#### PHP & Python SDK
+
+Note that the access to APIs within CloudEngine is through the intranet, so you do not need and should not configure an API custom domain name.
+The sample code in the template project and the CloudEngine web hosting development guide are not configured with an API custom domain name, please do not set up a custom domain name, so as not to turn it into a public network access, which will affect the performance.
+
+If you are using PHP or Python SDK on a server other than CloudEngine, you can not configure an API custom domain name.
+
+#### How to initialize SDK for international version apps with App ID suffix other than `-MdYXbMMI`.
+
+There are very few international apps that have an App ID with a suffix other than `-MdYXbMMI` (including some older apps and apps that have been migrated to the international version with a special configuration).
+For these apps, initializing the SDK without configuring a custom domain name may result in errors
+(This is because newer versions of the SDK add a check on the custom domain configuration parameter, which determines if an app is international based on the App ID suffix.)
+These apps need to initialize the SDK this way:
+
+<details>
+
+Note, please replace `aaaaaaaaa` in the url address below with the first 8 digits of your app's App ID.
+
+**JavaScript Storage**
+
+```js
+AV.init({
+  // appId, appKey,
+  serverURLs: {
+    push: "https://aaaaaaaa.push.lncldglobal.com",
+    stats: "https://aaaaaaaa.stats.lncldglobal.com",
+    engine: "https://aaaaaaaa.engine.lncldglobal.com",
+    api: "https://aaaaaaaa.api.lncldglobal.com",
+  },
+});
+```
+
+**JavaScript instant messaging (IM)**
+
+<p>
+  please refer to{" "}
+  <a href="https://developer.taptap.cn/docs/sdk/im/guide/overview/">
+    Instant Messaging Developer's Guide
+  </a>{" "}
+  configure. included among these <code>server</code> The value of the parameter is{" "}
+  <code>aaaaaaaa.rtm.lncldglobal.com</code>。
+</p>
+
+<p>
+  <strong>JavaScript Multiplayer online battles</strong>
+</p>
+
+<p>
+  please refer to{" "}
+  <a href="https://developer.taptap.cn/docs/sdk/multiplayer/start/js/">
+    Getting Started
+  </a>{" "}
+  or{" "}
+  <a href="https://developer.taptap.cn/docs/sdk/multiplayer/guide/js/">
+    Development Guide
+  </a>{" "}
+  executable configuration。 included among these <code>playServer</code> The value of the parameter is{" "}
+  <code>aaaaaaaa.play.lncldglobal.com</code>。
+</p>
+
+<p>
+  <strong>Objective-C</strong>
+</p>
+
+<pre>
+  <code>
+    // Configuring SDK Storage [AVOSCloud
+    setServerURLString:@"https://aaaaaaaa.api.lncldglobal.com"
+    forServiceModule:AVServiceModuleAPI]; // Configuring SDK Push [AVOSCloud
+    setServerURLString:@"https://aaaaaaaa.push.lncldglobal.com"
+    forServiceModule:AVServiceModulePush]; // Configuring the SDK
+    Cloud Engine (for accessing cloud functions, use API to customize domain name, not cloud engine custom domain name)
+    [AVOSCloud setServerURLString:@"https://aaaaaaaa.engine.lncldglobal.com"
+    forServiceModule:AVServiceModuleEngine]; // Configuring the SDK for Instant Messaging [AVOSCloud
+    setServerURLString:@"https://aaaaaaaa.rtm.lncldglobal.com"
+    forServiceModule:AVServiceModuleRTM]; // Configuring SDK Statistics [AVOSCloud
+    setServerURLString:@"https://aaaaaaaa.stats.lncldglobal.com"
+    forServiceModule:AVServiceModuleStatistics]; // Initialize the application [AVOSCloud
+    setApplicationId:@"APPID" clientKey:@"APPKEY"];
+  </code>
+</pre>
+
+<p>
+  <strong>Swift</strong>
+</p>
+
+```swift
+let configuration = LCApplication.Configuration(
+    customizedServers: [
+        .api("https://aaaaaaaa.api.lncldglobal.com"),
+        .engine("https://aaaaaaaa.engine.lncldglobal.com"),
+        .push("https://aaaaaaaa.push.lncldglobal.com"),
+        .rtm("https://aaaaaaaa.rtm.lncldglobal.com")
+    ]
+)
+do {
+    try LCApplication.default.set(
+        id: "APPID",
+        key: "APPKEY",
+        configuration: configuration
+    )
+} catch {
+    fatalError("\(error)")
+}
+```
+
+<p>
+  <strong>Java</strong>
+</p>
+
+```java
+import cn.leancloud.AVOSCloud;
+
+public class MyLeanCloudApp extends Application {
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        // Configuring SDK Storage
+        AVOSCloud.setServer(AVOSService.API, "https://aaaaaaaa.api.lncldglobal.com");
+        // Configuring the SDK Cloud Engine (for accessing cloud functions, use the API custom domain name, not the cloud engine custom domain name)
+        AVOSCloud.setServer(AVOSService.ENGINE, "https://aaaaaaaa.engine.lncldglobal.com");
+        // Configuring SDK Push
+        AVOSCloud.setServer(AVOSService.PUSH, "https://aaaaaaaa.push.lncldglobal.com");
+        // Configuring the SDK for Instant Messaging
+        AVOSCloud.setServer(AVOSService.RTM, "https://aaaaaaaa.rtm.lncldglobal.com");
+
+        // Provide this, App ID and App Key as parameters.
+        // Be careful not to call the initialize method of cn.leancloud.core.AVOSCloud here, or you'll get errors such as NetworkOnMainThread.
+        AVOSCloud.initialize(this, "APPID", "APPKEY");
+    }
+}
+```
+
+<p>
+  <strong>.NET</strong>
+</p>
+
+```cs
+AVClient.Initialize(new AVClient.Configuration {
+                ApplicationId = "APPID",
+                ApplicationKey = "APPKEY",
+                ApiServer = new Uri("https://aaaaaaaa.api.lncldglobal.com"),
+                EngineServer = new Uri("https://aaaaaaaa.engine.lncldglobal.com"),
+                PushServer = new Uri("https://aaaaaaaa.push.lncldglobal.com")
+});
+```
+
+</details>
+
+</Conditional>
+
+<Conditional brand="tds">
+
+## Announcement system domain name
+
+If you use the announcement system service, then you need to go to **Developer Center > Game Services > Application Configuration > Basic Information > Domain Configuration > Announcement** to bind the announcement system domain name.
+
+After configuring the domain name, you need to update the client code to use the customized domain name, please refer to [Announcement System Development Guide](/sdk/billboard/guide/).
+
+In domestic nodes, the announcement system must be accessed with a custom domain name, and the custom domain name will enable CDN acceleration by default.
+
+</Conditional>
+
+## Independent IP
+
+<Conditional brand="leancloud">
+
+In the North China Node console ("Upper right avatar drop-down menu > Account Settings > Standalone IP"), you can view the API Standalone IP and Cloud Engine Standalone IP used by your current account, and you can also apply for and unbind IPs on the same page.
+
+After applying for a standalone IP, when you add a new domain binding in the LeanCloud console, follow the console prompts to add an A-record at the domain service provider of your own domain name, pointing to the standalone IP.
+For a customized domain name that has already been bound to LeanCloud, you only need to modify the resolution record at the domain name service provider and replace the CNAME record with an A record to switch.
+
+Before unbinding the IP, please make sure that all the custom domain names pointing to the IP have modified the resolution records and replaced the corresponding A records with CNAME records.
+Since it takes a long time for DNS to take effect across the Internet, please wait at least 48 hours after modifying the resolution records before unbundling the IP** to avoid service disruption.
+
+The independent IP is shared by all applications under the account, but the API service and cloud engine service cannot share the IP.
+If you want to further segregate the entrances of each application, you can also purchase more independent IPs in the console.
+All available IPs under the account are listed on the app's domain binding page, so you need to plan which IPs to use for which apps.
+
+Each IP provides 2 Gbps of bandwidth by default, which is sufficient to protect against small-scale attacks at no extra cost to you.
+If an attack exceeds the default protection capacity, the IP will be disabled and you can purchase a new IP to replace it.
+Or you can use the new IP as the source IP to access the third-party cleaning service, please contact us through the work order, we will provide the necessary support.
+
+The cost of a standalone IP is CNY 50 per month. One month's fee (CNY 50) will be deducted from the purchase of each IP, and the fee will be deducted at the rate of CNY 50 per IP on the first day of each month starting from the next natural month.
+We give an API independent IP to all users who have commercial applications under the name of North China Node, and they can use it for free.
+
+The independent IP is bound to the account and will not change with the transfer of the application. In order to avoid affecting the service, if the transferred application does not change the resolution configuration of the customized domain name, then it can continue to use the original independent IP.
+
+East China Node does not support self-service binding of independent IPs in the console, if you need to do so, please contact us by submitting a work order.
+
+If you have more than one IP, you may want to verify that you can access the service through the new IP before switching to a separate IP by modifying the domain name resolution.
+In this case, you can use the `--resolve` parameter of curl to specify the domain name to be resolved to a specific IP (similar to modifying the `/etc/hosts` file).
+For example, to verify an API-independent IP:
+
+```sh
+curl --resolve 'api.example.com:443:YOUR-API-IP' https://api.example.com/1.1/date
+```
+
+Normally, JSON format data with the current time is returned.
+The same applies to verifying the Cloud Engine standalone IP:
+
+```sh
+curl --resolve 'engine.example.com:443:YOUR-ENGINE-IP' https://engine.example.com/
+```
+
+</Conditional>
+
+<Conditional brand="tds">
+We give a standalone IP to every application that binds an API custom domain name.
+
+You can use the dedicated IP by binding the API custom domain name and specifying the API custom domain name when initializing the client SDK.
+
+The [Cloud Engine Dedicated IP](/sdk/engine/dedicated-IP/) can be purchased on demand.
+
+</Conditional>
+
+## Domain name binding
+
+## Domain Binding
+
+Before binding a custom domain name, you need to prepare a domain name that has been **recorded**, then we introduce the custom domain name binding process in detail.
+
+During the process of binding a domain name, the console will prompt you to configure the appropriate DNS configuration, please follow the prompts of the console to the domain name registrar or domain name resolution service provider to set up (if you set up your own domain name resolution servers, please configure according to the documentation of the domain name resolution servers) the A record or CNAME record.
+
+The following is an example of customized domain name binding process, using `api.example.com`, a sub-domain of `example.com`, which has already been filed in the main domain name:
+
+![Console domain binding interface](/img/domain-guide-new.png)
+
+<Conditional brand="tds">
+
+Starting from the **Developer Management Backend -> Game Services -> Application Configuration -> Domain Configuration** page, select the service you need to bind a custom domain name to, and then click Bind New Domain.
+</Conditional>
+
+<Conditional brand="leancloud">
+
+Start by going to the **LeanCloud Admin Backend -> Settings -> Domain Binding** page, select the service you need to bind a custom domain name to, and then click Bind New Domain.
+</Conditional>
+
+The above figure takes the <Conditional brand="leancloud">API access domain name</Conditional><Conditional brand="tds">Cloud Service API</Conditional> binding as an example, and then, we explain the steps in the binding process separately:
+
+1. We require the use of a second-level domain name (when you have filed a primary domain name for `example.com`, you can add a custom field before the primary domain name to form a new domain name, this domain name is the second-level domain name) for binding. After entering the second-level domain name, we enable SSL, force to use HTTPS and SSL certificate automatic management by default, if you have your own certificate, you can set it to manual, set SSL certificate, please refer to [SSL Certificate](#ssl-certificate). Then click the "Bind" button for the next step. 2.
+
+2. After you enter the bound domain name, the background will check whether the domain name has been bound by other applications (the same domain name can not be repeatedly bound to multiple applications or multiple services), and then check the domain name filing information.
+
+3. When the domain name has not been filed, there will be a prompt of binding failure, then you need to file the domain name, you can refer to [Domain Name Filing Guidelines](/sdk/domain/icp/), or use other filed domain name to re-bind.
+
+4. After checking the domain name filing information, you will be prompted to configure DNS, and the recommended DNS configuration, <Conditional brand="leancloud">and CNAME record value will be displayed. </Conditional><Conditional brand="tds">When the bound service selects Cloud Service API, the recommended DNS configuration is A record. When the bound service is Cloud Engine, File, or Announcement, the recommended DNS configuration is a CNAME record and the recommended record value is provided. </Conditional>
+
+5. According to the recommended DNS configuration in the previous step to your domain name registrar or domain name resolution service provider to set up domain name resolution (for example: your domain name is purchased through the Tencent Cloud or Aliyun, this time you need to be through the Tencent Cloud or Aliyun management background in the domain name management interface for resolution). Step 5 in the above figure uses Baidu Cloud as an example, and the path to set up domain name resolution in the background of most cloud service providers is probably Control Panel -> Domain Management -> Resolution. After entering the domain name resolution page, follow the instructions below to add resolution records.
+   1. Host record: customized field + primary domain name; for example, the customized domain name I set is `api.example.com`, so I only need to fill in `api`;
+   2. Record type: Select the corresponding record type according to the DNS configuration recommended in the previous step; for example: <Conditional brand="tds">Cloud service API recommends A record, so when resolving, select A record for record type;</Conditional><Conditional brand="leancloud"> Recommended CNAME is XXX.XX.cn, so when parsing, choose CNAME for record type. </Conditional>
+   3. Record Value: Copy and paste the record value of the recommended DNS configuration directly.
+   4. The default configuration can be used for all other resolution lines and TTLs.
+
+Most domain name registrars or domain name resolution service providers provide a graphical setup interface so that you don't have to write DNS Zone records directly, just follow their instructions to configure them. Below is the example of domain name resolution through another service provider and setting up CNAME records.
+
+![Take the example of adding a CNAME record to a DnsPod](/img/dnspod-add-cname-record.png)
+
+If you need to write a DNS Zone record, take the A record for example, assuming the IP shown on the console is `0.0.0.0`, then the corresponding DNS Zone record would be:
+
+```
+api.example.com. 10800 IN A 0.0.0.0
+```
+
+Where 10800 is the TTL, you can set it according to your needs.
+
+Let's take another example of CNAME, suppose we bind `xxx.example.com`, the CNAME target value shown on the console is `yyyy.zzzz.example`, then the corresponding DNS Zone record is:
+
+```
+xxx.example.com.	10800	IN	CNAME	yyy.zzz.example.
+```
+
+6. After the above 5 steps are completed, you need to wait for some time (usually less than half an hour), after the record takes effect, the <Conditional brand="leancloud">LeanCloud</Conditional><Conditional brand="tds">TDS</Conditional> console will show "Bound". Conditional> console will show "Bound".
+
+:::tip
+The following command can be used to verify that the request for the bound domain name is working properly
+```sh
+curl https://{host}/1.1/ping
+```
+:::
+
+If** you are stuck in the "Waiting for DNS Configuration" stage for a long time,** then please click the question mark icon after the "Waiting for DNS Configuration", and follow the prompts to run the corresponding dig commands to check if the domain name resolution records are effective.
+If the dig command fails to find the corresponding domain name resolution record, please return to the domain name reseller console to check whether the configuration is correct, or contact the domain name reseller's customer service if you still have any questions.
+If the dig command can find the expected CNAME record, but the console still shows "Waiting for DNS configuration", please contact us through work order or forum.
+
+## SSL Certificate
+
+When binding a customized domain name in the <Conditional brand="leancloud">LeanCloud</Conditional><Conditional brand="tds">TDS</Conditional> console, you can choose to manage the SSL certificate automatically or manage the SSL certificate manually. When the console binds a custom domain name, you can choose to manage the SSL certificate automatically or manually.
+If you choose automatic mode, <Conditional brand="leancloud">LeanCloud</Conditional><Conditional brand="tds">TDS</Conditional> will automatically apply for and renew [Let's Encrypt] certificate.
+If you choose manual mode, you need to upload your own SSL certificate (usually `.crt` or `.pem` file) and SSL private key (usually `.key` file), and renew and upload again before the certificate expires.
+SSL certificates can usually be purchased from your domain name provider, or you can apply for a free certificate on your own.
+Besides Let's Encrypt, the more famous free SSL certificate providers are [ZeroSSL], [buypass], [TrustAsia].
+
+If the setup is complete, it shows that the binding failed and has this error message:
+
+```
+issueCert for {host}: Authorization not found in HTTP response from {host} ；
+```
+Because the Ministry of Industry and Information Technology regulations, the website access to multiple cloud service providers, you need to access the record at each cloud service provider. This error is caused by the lack of corresponding cloud service providers for the record (if the application is in East China, it is likely to be the lack of Tencent cloud for the record); you can refer to the [domain name filing guide](/sdk/domain/icp) for the record operation;
+
+[let's encrypt]: https://letsencrypt.org/
+[zerossl]: https://zerossl.com/
+[buypass]: https://www.buypass.com/ssl/products/acme
+[trustasia]: https://freessl.cn/
+
+## Recommended Reading
+
+For more on the basics of domain names, check out the following two articles:
+
+1. [What's Behind Domain Names](https://blog.taptap.dev/posts/domain-introduction)
+2. [The Death of Domain Names](https://blog.taptap.dev/posts/domain-problems)
+
+
+## Video Tutorial
+
+You can refer to the video tutorial: [How to bind a domain name and how to submit a record](https://www.bilibili.com/video/BV1cu4y1V7mG/).
+
+More video tutorials can be found in [Developer Academy](https://developer.taptap.cn/tds-tutorials/list). Because the SDK features are constantly improving, the video tutorials may appear inconsistent with the new version of the SDK features, the current documentation shall prevail.
