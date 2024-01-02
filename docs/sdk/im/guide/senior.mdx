@@ -171,23 +171,6 @@ public class LocalSignatureFactory : ILCIMSignatureFactory {
         });
     }
 
-    public Task<LCIMSignature> CreateBlacklistSignature(string conversationId, string clientId, IEnumerable<string> memberIds, string action) {
-        string sortedMemberIds = string.Empty;
-        if (memberIds != null) {
-            List<string> sortedMemberList = memberIds.ToList();
-            sortedMemberList.Sort();
-            sortedMemberIds = string.Join(":", sortedMemberList);
-        }
-        long timestamp = DateTimeOffset.Now.ToUnixTimeSeconds();
-        string nonce = NewNonce();
-        string signature = GenerateSignature(LCApplication.AppId, clientId, conversationId, sortedMemberIds, timestamp.ToString(), nonce, action);
-        return Task.FromResult(new LCIMSignature {
-            Signature = signature,
-            Timestamp = timestamp,
-            Nonce = nonce
-        });
-    }
-
     private static string SignSHA1(string key, string text) {
         HMACSHA1 hmac = new HMACSHA1(Encoding.UTF8.GetBytes(key));
         byte[] bytes = hmac.ComputeHash(Encoding.UTF8.GetBytes(text));
@@ -263,31 +246,6 @@ public class KeepAliveSignatureFactory implements SignatureFactory {
    }
    return null;
   }
-
-  @Override
-  public Signature createBlacklistSignature(String clientId, String conversationId, List<String> memberIds,
-                                            String action) throws SignatureException {
-    Map<String,Object> params = new HashMap<String,Object>();
-    params.put("client_id",clientId);
-    params.put("conv_id",conversationId);
-    params.put("members",memberIds);
-    params.put("action",action);
-
-    try{
-      Object result = LCCloud.callFunction("sign3",params);
-      if(result instanceof Map){
-         Map<String,Object> serverSignature = (Map<String,Object>) result;
-         Signature signature = new Signature();
-         signature.setSignature((String)serverSignature.get("signature"));
-         signature.setTimestamp((Long)serverSignature.get("timestamp"));
-         signature.setNonce((String)serverSignature.get("nonce"));
-         return signature;
-      }
-    }catch(LCException e){
-      throw (SignatureFactory.SignatureException) e;
-    }
-    return null;
-  }
 }
 
 // 将签名工厂类的实例绑定到 LCIMClient 上
@@ -349,7 +307,6 @@ realtime
   .createIMClient("Tom", {
     signatureFactory: signatureFactory,
     conversationSignatureFactory: conversationSignatureFactory,
-    blacklistSignatureFactory: blacklistSignatureFactory,
   })
   .then(function (tom) {
     console.log("Tom 登录");
