@@ -76,7 +76,7 @@ const Logo = ({ noLabel, noLink, reversed, size = 1 }: LogoProps) => {
       </div>:
         <div className={styles.logodev}>
             <img src={useBaseUrl("/img/logo_top_cn.png")} width="203" height="28" ></img>
-
+           
       </div>
       }
 
@@ -91,7 +91,16 @@ const Logo = ({ noLabel, noLink, reversed, size = 1 }: LogoProps) => {
           </Translate> */}
         </a>
       )}
+      {
+         BRAND === "tds"?   <div className={styles.cat}></div>:<></>
+      }
+     {/* <div className={styles.cat}></div> */}
+     {
+        BRAND === "tds"?   (currentLocale === "en")? <div className={styles.title}> Help Document </div>: <div className={styles.title}> 帮助文档</div>:<></>
+     }
+     {/* <div className={styles.title}> 帮助文档</div> */}
     </div>
+  
   );
 };
 

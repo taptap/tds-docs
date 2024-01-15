@@ -20,7 +20,7 @@ const config = {
     searchProviderName: "LeanDB Elasticsearch",
     searchProviderWebsite:
       "https://developer.taptap.cn/docs/sdk/engine/database/es/",
-    mainDomainHost: "https://www.taptap.cn",
+    mainDomainHost: "https://developer.taptap.cn/",
     dcDomainHost: "https://developer.taptap.cn?from=tds-docs",
   },
 
