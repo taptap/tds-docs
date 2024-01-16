@@ -22,7 +22,7 @@ export const OfficeDoc = ({ fileUrl }) => {
 
 export const [Red, Blue, Black, Gray, Green, BlueBlack] = [
   "#F64C4C",
-  "#ffa3f2",
+  "#06c4b0",
   "#1F1F1F",
   "#8E8E8E",
   "#47B881",
@@ -47,7 +47,7 @@ const COLORS = {
   grey05: "#666666",
   grey04: "#888888",
   grey01: "#F6F6F6",
-  sdkBlue: "#33D9C5",
+  sdkBlue: "#06c4b0",
   sdkRed: "#F64C4C",
   sdkBlueExt: "rgba(21, 197, 206, 0.3)",
   sdkRedExt: "rgba(246, 76, 76, 0.3)",
