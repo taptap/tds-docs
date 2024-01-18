@@ -10,7 +10,7 @@ const config = {
   baseUrl: PREVIEW === "true" ? "/" : "/docs/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
-  favicon: "img/favicon.ico",
+  favicon: "img/logoh.png",
   trailingSlash: true,
   customFields: {
     searchUrl: "https://tds-doc-search-api.cn-e1.leanapp.cn/search",
@@ -20,7 +20,7 @@ const config = {
     searchProviderName: "LeanDB Elasticsearch",
     searchProviderWebsite:
       "https://developer.taptap.cn/docs/sdk/engine/database/es/",
-    mainDomainHost: "https://www.taptap.cn",
+    mainDomainHost: "https://developer.taptap.cn/",
     dcDomainHost: "https://developer.taptap.cn?from=tds-docs",
   },
 
