@@ -14,14 +14,14 @@ cp -r docs/sdk/_partials tmp/zh-Hans
 cp -r docs/sdk/domain tmp/zh-Hans # 域名
 cp -r docs/sdk/storage tmp/zh-Hans # 数据存储
 cp -r docs/sdk/engine tmp/zh-Hans # 云引擎
-cp -r docs/sdk/push tmp/zh-Hans # 推送通知
+cp -r docs/shadow/push tmp/zh-Hans # 推送通知
 cp -r docs/sdk/im tmp/zh-Hans # 即时通讯
 cp -r docs/sdk/multiplayer tmp/zh-Hans # 对战
 cp -r docs/sdk/leaderboard tmp/zh-Hans # 排行榜
 
 # 减去
 rm tmp/zh-Hans/storage/features.mdx # 数据存储/功能介绍
-rm -r tmp/zh-Hans/engine/game # 云引擎/游戏后端
+# rm -r tmp/zh-Hans/engine/game # 云引擎/游戏后端
 rm tmp/zh-Hans/leaderboard/guide.mdx # 排行榜-开发指南
 rm tmp/zh-Hans/leaderboard/faq.mdx # 排行榜-常见问题
 
