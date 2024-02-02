@@ -12,8 +12,8 @@ const config = {
   favicon: "img/lc-favicon.ico",
   trailingSlash: true,
   customFields: {
-    searchUrl: "https://lc-doc-search-api.cn-e1.leanapp.cn/search",
-    upItemListIndexUrl: "https://lc-doc-search-check-log.cn-e1.leanapp.cn/api/check-log-up",
+    searchUrl: "https://lc-doc-search-api.leanapp.cn/search",
+    upItemListIndexUrl: "https://lc-doc-search-check-log.leanapp.cn/api/check-log-up",
     aiSearchUrl :"https://tds-doc-search-ai-api.ap-sg.tdsapps.com/api/ai-search?type=LC",
     aiSearchEnUrl :"https://tds-doc-search-ai-api.ap-sg.tdsapps.com/api/ai-search?type=LCen",
     searchProviderName: "LeanDB Elasticsearch",
