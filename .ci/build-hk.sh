@@ -28,7 +28,7 @@ rm -r docs/sdk/anti-addiction # 防沉迷
 rm -r docs/sdk/tap-play # TapPlay
 rm -r docs/sdk/tap-canary # TapCanary
 rm docs/sdk/engine/dedicated-IP.mdx # 云引擎/独立 IP
-rm docs/shadow/push/guide/android-mixpush.mdx # 推送通知/开发指南/Android 混合推送
+rm docs/sdk/push/guide/android-mixpush.mdx # 推送通知/开发指南/Android 混合推送
 rm -r docs/sdk/multiplayer # 多人在线对战
 
 # 英文版「游戏服务」
@@ -45,7 +45,7 @@ cp -r .ci/hk/zh-Hans/store docs/store
 
 # 中文版「游戏服务」
 cp .ci/hk/zh-Hans/sdk/embedded-moments/features.mdx docs/sdk/embedded-moments/features.mdx # 内嵌动态/功能介绍
-cp .ci/hk/zh-Hans/sdk/push/guide/android-mixpush.mdx docs/shadow/push/guide/android-mixpush.mdx # 推送通知/开发指南/FCM 推送
+cp .ci/hk/zh-Hans/sdk/push/guide/android-mixpush.mdx docs/sdk/push/guide/android-mixpush.mdx # 推送通知/开发指南/FCM 推送
 cp -r .ci/hk/zh-Hans/sdk/TapPayments docs/sdk # TapTap Payments
 
 # 英文版「文档首页」
@@ -56,7 +56,7 @@ cp -r .ci/hk/en/store i18n/en/docusaurus-plugin-content-docs/current/store
 
 # 英文版「游戏服务」
 cp .ci/hk/en/sdk/embedded-moments/features.mdx i18n/en/docusaurus-plugin-content-docs/current/sdk/embedded-moments/features.mdx # 内嵌动态/功能介绍
-cp .ci/hk/en/sdk/push/guide/android-mixpush.mdx i18n/en/docusaurus-plugin-content-docs/current/shadow/push/guide/android-mixpush.mdx # 推送通知/开发指南/FCM 推送
+cp .ci/hk/en/sdk/push/guide/android-mixpush.mdx i18n/en/docusaurus-plugin-content-docs/current/sdk/push/guide/android-mixpush.mdx # 推送通知/开发指南/FCM 推送
 cp -r .ci/hk/en/sdk/TapPayments i18n/en/docusaurus-plugin-content-docs/current/sdk # TapTap Payments
 
 

@@ -4,21 +4,11 @@ sidebar_label: 常见问题
 sidebar_position: 11
 ---
 
-import {Conditional} from '/src/docComponents/conditional';
-
-
 ### 为什么成功设备数小于目标设备数？
 
 「目标设备数」是指符合本次推送查询条件的有效设备数量，「成功设备数」是指这次推送成功到达的设备数量。没有到达设备一般有以下几种情况：
 
-<Conditional brand="tds">
-- Android 设备中的应用被杀掉，在网络中处于离线状态。对于这种情况，稍等一段时间待设备上线后，成功设备数就会逐渐增加。同时推荐集成 [混合推送](/shadow/push/guide/android-mixpush/) 来提升推送到达率。
-</Conditional>
-
-<Conditional brand="leancloud">
 - Android 设备中的应用被杀掉，在网络中处于离线状态。对于这种情况，稍等一段时间待设备上线后，成功设备数就会逐渐增加。同时推荐集成 [混合推送](/sdk/push/guide/android-mixpush/) 来提升推送到达率。
-</Conditional>
-
 - Android 用户删掉或重装应用生成了新的设备数据，之前的无效数据被包含到了「目标设备数」中。
 - iOS 用户删掉或重装了应用，之前的无效数据被包含到了「目标设备数」中，这些数量就是 invalidTokens 数量。
 
@@ -59,25 +49,13 @@ invalidTokens 的数量由以下两部分组成：
 
 ### Android 消息接收能不能自定义 Receiver 不弹出通知。
 
-<Conditional brand="tds">
-可以。请参考 [消息推送开发指南](/shadow/push/guide/rest/#消息内容参数)。
-</Conditional>
-
-<Conditional brand="leancloud">
 可以。请参考 [消息推送开发指南](/sdk/push/guide/rest/#消息内容参数)。
-</Conditional>
 
 如果要自定义 receiver，必须在消息的 data 里带上自定义的 action。客户端在接收到消息后，将广播 action 为您定义的值的 intent 事件，您的 receiver 里也必须带上 `intent-filter` 来捕获该 action 值的 intent 事件。
 
 ### Android 应用进程被杀掉后无法收到推送消息
 
-<Conditional brand="tds">
-iOS 能做到这点，是因为当应用进程关闭后，Apple 和设备的系统之间还会存在连接，这条连接跟应用无关，所以无论应用是否被杀掉，消息都能发送到 APNs 再通过这条连接发送到设备。但对 Android 来说，如果是国内用户，因为众所周知的原因，Google 和设备之间的这条连接是无法使用的，所以应用只能自己去保持连接并在后台持续运行，一旦后台进程被杀掉，就无法收到推送消息了。虽然 Android SDK 已经采取了各种办法保持应用在后台运行，但随着 Android 系统版本的升级，权限控制越来越严，第三方推送通道的生命周期受到较大限制。因此 Android SDK 推出了混合推送的方案，对接国内主流厂商，保障了主流 Android 系统上的推送到达率。详见 [Android 混合推送开发指南](/shadow/push/guide/android-mixpush/)。
-</Conditional>
-
-<Conditional brand="leancloud">
 iOS 能做到这点，是因为当应用进程关闭后，Apple 和设备的系统之间还会存在连接，这条连接跟应用无关，所以无论应用是否被杀掉，消息都能发送到 APNs 再通过这条连接发送到设备。但对 Android 来说，如果是国内用户，因为众所周知的原因，Google 和设备之间的这条连接是无法使用的，所以应用只能自己去保持连接并在后台持续运行，一旦后台进程被杀掉，就无法收到推送消息了。虽然 Android SDK 已经采取了各种办法保持应用在后台运行，但随着 Android 系统版本的升级，权限控制越来越严，第三方推送通道的生命周期受到较大限制。因此 Android SDK 推出了混合推送的方案，对接国内主流厂商，保障了主流 Android 系统上的推送到达率。详见 [Android 混合推送开发指南](/sdk/push/guide/android-mixpush/)。
-</Conditional>
 
 ### 推送记录会保留多久？
 
@@ -98,13 +76,7 @@ iOS 能做到这点，是因为当应用进程关闭后，Apple 和设备的系�
 
 在 iOS 13 环境下，由于苹果更改了基础框架的 API，导致旧版本的 Objc SDK（<= 11.6.6）无法上传有效的 device token。
 
-<Conditional brand="tds">
-解决办法是升级 SDK 版本到 v11.6.7 及以上，保存 deviceToken 的方法参见  [保存 Token](/shadow/push/guide/ios/#保存-token)。
-</Conditional>
-
-<Conditional brand="leancloud">
 解决办法是升级 SDK 版本到 v11.6.7 及以上，保存 deviceToken 的方法参见  [保存 Token](/sdk/push/guide/ios/#保存-token)。
-</Conditional>
 
 旧版本的 Objective-C SDK（<= 11.6.6）的解决办法是按如下方式上传 device token：
 
@@ -123,17 +95,9 @@ if (dataLength > 0) {
 
 ### iOS 推送报错 「部分推送被 APNs 拒绝，拒绝原因是: BadDeviceToken」
 
-<Conditional brand="tds">
-这个报错是因为推送环境不正确，例如推送时通过 prod 参数设置推送给测试环境的设备（即 `"prod": "dev"`），则生产环境的设备无法收到推送。
-同理，如果指定推送给生产环境的设备（即 `"prod": "prod"`），则测试环境的设备无法收到推送。
-关于 iOS 的推送环境参考：[推送环境](/shadow/push/guide/ios/#推送环境)。
-</Conditional>
-
-<Conditional brand="leancloud">
 这个报错是因为推送环境不正确，例如推送时通过 prod 参数设置推送给测试环境的设备（即 `"prod": "dev"`），则生产环境的设备无法收到推送。
 同理，如果指定推送给生产环境的设备（即 `"prod": "prod"`），则测试环境的设备无法收到推送。
 关于 iOS 的推送环境参考：[推送环境](/sdk/push/guide/ios/#推送环境)。
-</Conditional>
 
 ### iOS 推送如何选择推送证书？
 推送消息接口有一个参数：**prod**。
@@ -144,15 +108,8 @@ if (dataLength > 0) {
 
 ### iOS 推送如何正确保存 deviceToken？
 
-<Conditional brand="tds">
-iOS 系统重装、从备份恢复应用、在新设备上安装应用都会导致 device token 变化，因此 Apple 推荐 在应用每次启动时都去请求 APNs 的 device token，获取 token 后进行设置并保存 token。 除此以外，后端会统计 installation 的更新时间（updatedAt），据此清理长期未更新的 installation 数据。 所以我们建议开发者遵循 Apple 的推荐方式开发应用，以免有效 installation 数据被意外清理，以及因为 device token 过期无效而推送失败。
-示例代码可以参考：[iOS 消息推送开发指南](/shadow/push/guide/ios/#保存-token)。
-</Conditional>
-
-<Conditional brand="leancloud">
 iOS 系统重装、从备份恢复应用、在新设备上安装应用都会导致 device token 变化，因此 Apple 推荐 在应用每次启动时都去请求 APNs 的 device token，获取 token 后进行设置并保存 token。 除此以外，后端会统计 installation 的更新时间（updatedAt），据此清理长期未更新的 installation 数据。 所以我们建议开发者遵循 Apple 的推荐方式开发应用，以免有效 installation 数据被意外清理，以及因为 device token 过期无效而推送失败。
 示例代码可以参考：[iOS 消息推送开发指南](/sdk/push/guide/ios/#保存-token)。
-</Conditional>
 
 ### iOS 推送，APP 在前台时收不到推送如何处理？
 
@@ -194,25 +151,13 @@ iOS 系统重装、从备份恢复应用、在新设备上安装应用都会导�
 
 ### 如果同一个设备上有两个应用，如何推送到指定的应用？
 
-<Conditional brand="tds">
-_Installation 表记录了设备上生成的安装信息。可以在 _Installation 表新增一个字段来区分不同的应用。在推送消息的时候，如果选择推送全部用户，则两个应用都会收到推送。如果想要针对某一个应用推送，可以参考 [发送给特定的用户](/shadow/push/guide/android/#发送给特定的用户) 这个推送文档，只发送给指定的设备。
-</Conditional>
-
-<Conditional brand="leancloud">
 _Installation 表记录了设备上生成的安装信息。可以在 _Installation 表新增一个字段来区分不同的应用。在推送消息的时候，如果选择推送全部用户，则两个应用都会收到推送。如果想要针对某一个应用推送，可以参考 [发送给特定的用户](/sdk/push/guide/android/#发送给特定的用户) 这个推送文档，只发送给指定的设备。
-</Conditional>
 
 ### _Installation 中的 valid 字段指的是什么，valid 为什么是 false？
 
 valid 表示当前这条设备记录是否有效，是 false 表示这条记录失效了，比如长时间未使用推送或者推送设备并未登录。
 
-<Conditional brand="tds">
-比如 Android 设备未执行以下代码打开[启动推送服务](/shadow/push/guide/android/#启动推送服务)，valid 的值就会一直是 false。
-</Conditional>
-
-<Conditional brand="leancloud">
 比如 Android 设备未执行以下代码打开[启动推送服务](/sdk/push/guide/android/#启动推送服务)，valid 的值就会一直是 false。
-</Conditional>
 
 ```
 // 设置默认打开的 Activity
@@ -226,13 +171,7 @@ PushService.setDefaultPushCallback(this, PushDemo.class);
 
 ### 推送结果查询
 
-<Conditional brand="tds">
-所有经过 `/push` 接口发出的消息的都可以在控制台的消息菜单里的推送记录看到。每次调用 `/push` 都将产生一条新的 推送记录表示一次推送。该表的各属性含义请参考 [Notification 表详解](/shadow/push/guide/overview/#notification) 。
-</Conditional>
-
-<Conditional brand="leancloud">
 所有经过 `/push` 接口发出的消息的都可以在控制台的消息菜单里的推送记录看到。每次调用 `/push` 都将产生一条新的 推送记录表示一次推送。该表的各属性含义请参考 [Notification 表详解](/sdk/push/guide/overview/#notification) 。
-</Conditional>
 
 `/push` 接口会返回新建的推送记录的 `objectId`，你就可以在推送记录里根据 ID 查询消息推送的结果。
 
