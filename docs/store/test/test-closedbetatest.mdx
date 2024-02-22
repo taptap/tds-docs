@@ -144,7 +144,86 @@ sidebar_position: 5
 
 ![](https://img.tapimg.com/market/images/bac5852159a089c21c412047996ea0a0.png)
 
-此功能需要游戏内做一定的开发改动，如需使用此功能，请联系 TapTap 工作人员咨询并对接。
+此功能需要游戏内做一定的开发改动，如需使用此功能，请按照下方使用说明接入。
+
+### 接入流程概述
+
+![](https://img.tapimg.com/market/images/eb7c56716bba2f1fcaef5d90ae47c5a6.png)
+
+### 接入前准备
+
+请提前创建封闭式测试计划，并创建玩家分享资格的发放方式。
+
+:::tip
+
+创建玩家分享的发放方式请注意：
+- 一个测试计划只能够创建 1 个玩家分享资格的发放计划。
+- 如果您创建了 1 个玩家分享资格的发放计划用于 Debug ，也请直接将此发放方式用户正式上线使用。
+
+:::
+
+### 接口使用说明
+
+该接口用于生成邀请链接，通过该链接可以邀请新用户加入。
+
+接口需要 client id 对应的游戏存在开启的测试计划，且测试计划中存在玩家分享资格类型的发放计划，需要注意一个测试计划中仅能有一个玩家分享资格类型的发放计划生效。
+
+生成链接的数量是没有限制的，但单个链接的邀请上限和所有链接的邀请上线受到对应发放计划的限制，当超过限制时，访问生成的链接会提示名额已满。
+
+请务必在服务端进行接口调用，避免 Server Secret 泄漏。
+
+### 接口信息
+
+接口地址: `https://partner.taptapdada.com/test/v1/invite-link`
+
+请求方式: `POST`，使用 query params 传递参数
+
+#### 请求参数:
+| 参数名   | 类型     | 必选 | 说明                                     |
+|--------|--------|----|----------------------------------------|
+| client_id | String  | 是  | 游戏对应的 client_id                         |
+| uid    | String  | 是  | 用户唯一标识，由调用方决定，最多100位              |
+| time   | Integer | 是  | 时间戳                                    |
+| nonce  | String  | 是  | 随机字符串，建议5位                           |
+| sign   | String  | 是  | 签名                                      |
+
+#### 请求示例:
+```
+curl --location --request POST 'https://partner.taptapdada.com/test/v1/invite-link?client_id=abcdefg&uid=12345&time=1690000000&nonce=abcde&sign=sign'
+```
+
+#### 签名算法:
+
+1. 把除 `sign` 外所有参数按 `key` 的字母顺序排序
+
+2. 用 `&` 符号把 `key=value` 参数对链接
+
+   * `key` 和 `value` 不用 `urlencode`
+
+3. 在字符串最后拼接上应用密钥 `secret`，请使用 游戏服务 - 应用配置 - 基本信息 下的 Server Secret
+
+4. 步骤 3 中得到的字符串做 md5 hash
+
+#### 返回参数:
+
+| 参数名   | 类型     | 说明             |
+|--------|--------|----------------|
+| invited | Integer | 已使用的邀请次数 |
+| limit  | Integer | 邀请次数上限     |
+| link   | String  | 邀请链接         |
+
+返回示例:
+```
+{
+  "data": {
+    "invited": 0,
+    "limit": 10,
+    "link": "https://example.com/invite?code=1234"
+  },
+  "now": 1692101733,
+  "success": true
+}
+```
 
 ## 如何接入 TapTap 登录增强测试保密性
 
