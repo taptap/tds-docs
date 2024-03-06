@@ -225,6 +225,47 @@ curl --location --request POST 'https://partner.taptapdada.com/test/v1/invite-li
 }
 ```
 
+<details>
+<summary>Python3 请求示例</summary>
+
+```python
+
+import requests
+import random
+import string
+import hashlib
+import urllib
+from datetime import datetime
+
+
+if __name__ == '__main__':
+    # request the secret from your partner
+    secret = "your Server Secret"
+    params = {
+        'client_id': "your client ID",
+        "uid": "uid",
+    }
+    # sign param
+    randomStr = ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
+    params['nonce'] = randomStr
+    params['time'] = int(datetime.now().timestamp())
+    payload = ""
+    for i in sorted(params):
+        payload += '%s=%s&' % (i, params[i])
+    payload = payload.strip("&") + secret
+    sign = hashlib.md5(payload.encode('utf-8')).hexdigest()
+    params['sign'] = sign
+    url = "https://partner.taptapdada.com/test/v1/invite-link?" + urllib.parse.urlencode(params)
+    print(url)
+    response = requests.post(url)
+    print(response.text)
+
+```
+
+</details>
+
+
+
 ## 如何接入 TapTap 登录增强测试保密性
 
 如果您担心下载的 APK 被转发或 TestFlight 公开链接被复制，最终导致游戏包体泄露、测试内容不保密，那么推荐您使用 TapTap 登录 SDK 验证测试资格。接入后，仅已获得测试资格的用户在测试开始期间可登录游戏，不在测试时间或未获得测试资格的用户无法登录游戏。
