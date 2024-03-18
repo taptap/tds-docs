@@ -580,6 +580,28 @@ context.getContentResolver().call(Uri.parse("content://com.huawei.android.launch
 
 我们提供了一个 [最新的华为推送 demo](https://github.com/leancloud/mixpush-demos/tree/master/huawei)，可供你在接入过程中参考。
 
+### 华为推送测试
+
+华为推送在每日单设备推送数量上有一些限制，详细信息可以见[华为官方文档](https://developer.huawei.com/consumer/cn/doc/HMSCore-Guides/message-restriction-description-0000001361648361#section104849311415)；一般来说，资讯营销类消息的每日单设备的推送数量为 2 条。
+
+所以在单设备测试华为推送时，需要添加一个参数用来标识此次推送是测试推送，测试推送不受每日单设备推送数量上限要求，详细信息可见[华为官方文档的 target_user_type 参数](https://developer.huawei.com/consumer/cn/doc/HMSCore-References/https-send-api-0000001050986197)；当设置 `target_user_type` 参数为 1 时，即表明此次推送为测试推送。
+
+华为测试推送也存在一些限制，如下：
+* 每个应用每日可发送该测试消息 500 条
+* 单次推送不能超过 10 台设备
+
+可以在推送的 data 中加入 `target_user_type` 参数，样例如下：
+```json
+{
+  "alert" : "Hello",
+  "hms" : {
+    "target_user_type" : 1
+  }
+}
+```
+
+**注意：请不要在正式推送中使用 `target_user_type` 参数。**
+
 ## 小米推送
 
 ### 环境配置
@@ -722,6 +744,10 @@ LCMixPushManager.registerXiaomiPush(context, miAppId, miAppKey, profile, true);
 
 -->
 
+### 其它
+
+如果遇到报错「应用在黑名单中，禁止发送消息」，则原因可能是没在小米应用商店上架 APP。详细信息可以参见小米推送服务在 2022 年更新的[小米推送技术服务协议](https://dev.mi.com/console/doc/detail?pId=860)。
+
 ## 魅族推送
 
 ### 环境配置
@@ -802,6 +828,10 @@ LCMixPushManager.registerXiaomiPush(context, miAppId, miAppKey, profile, true);
 #### 魅族推送通知栏消息的点击事件
 
 当魅族通知栏消息被点击后，如果已经设置了自定义 Receiver，则 SDK 会发送一个 action 为 `com.avos.avoscloud.flyme_notification_action` 的 broadcast。如有需要，开发者可以通过订阅此消息获取点击事件，否则 SDK 会默认打开启动推送服务时对应设置的 Activity。
+
+### 魅族推送测试
+
+测试魅族推送时，需提前将设备加入到魅族推送后台的「常用设备」列表中。登录魅族开发者账号，进入推送服务后台管理，然后进入「配置管理」页面，最后进入「常用设备」页面，添加常用设备。
 
 ## vivo 推送
 
@@ -1337,6 +1367,28 @@ public class MyApp extends Application {
     </intent-filter>
 </activity>
 ```
+
+### 荣耀推送测试
+
+荣耀推送在每日单设备推送数量上有一些限制（和华为推送类似）。
+
+所以在单设备测试荣耀推送时，需要添加一个参数用来标识此次推送是测试推送，测试推送不受每日单设备推送数量上限要求，详细信息可见[荣耀官方文档的 targetUserType 参数](https://developer.hihonor.com/cn/kitdoc?category=%E5%9F%BA%E7%A1%80%E6%9C%8D%E5%8A%A1&kitId=11002&navigation=ref&docId=downlink-message.md&token=)；当设置 `targetUserType` 参数为 1 时，即表明此次推送为测试推送。
+
+荣耀测试推送也存在一些限制，如下：
+* 每个应用每日可发送该测试消息 1000 条
+* 单次推送不能超过 10 台设备
+
+可以在推送的 data 中加入 `targetUserType` 参数，样例如下：
+```json
+{
+  "alert" : "Hello",
+  "honor" : {
+    "targetUserType" : 1
+  }
+}
+```
+
+**注意：请不要在正式推送中使用 `targetUserType` 参数。**
 
 ## 取消混合推送注册
 
