@@ -27,8 +27,8 @@ const sdkVersions = {
     }
   },
   tapadn: {
-    unity: "3.16.3.25",
-    android: "3.16.3.25",
+    unity: "3.16.3.27",
+    android: "3.16.3.27",
   }
 };
 
