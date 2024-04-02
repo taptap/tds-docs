@@ -29,14 +29,14 @@ curl -X GET \
   https://{{domain}}/payment/order/v1/info?client_id=xxxxx&order_id=xxxxx
 ```
 
-data 对象结构见 [订单信息](/sdk/TapPayments/develop/server/#订单信息)
+`data.order` 对象结构见 [订单信息](/sdk/TapPayments/develop/server/#订单信息)
 
 ```
 {
-   "data" : {
-
-   },
-   "success" : true
+  "data": {
+    "order": {}
+  },
+  "success": true
 }
 ```
 
@@ -56,20 +56,18 @@ data.list 数组内对象结构见 [订单信息](/sdk/TapPayments/develop/serve
 
 ```
 {
-    "data": {
-        "list": [
-            {
-
-            }
-        ]
-    },
-    "success": true
+  "data": {
+    "list": [
+      {}
+    ]
+  },
+  "success": true
 }
 ```
 
 ### 核销订单
 
-当支付成功后，核销订单表示已经确认支付结果并会对买家完成发货，订单状态也会从 charge.succeeded 变为 charge.confirmed
+当支付成功后，核销订单表示已经确认支付结果并会对买家完成发货，订单状态也会从 `charge.succeeded` 变为 `charge.confirmed`
 
 ```
 curl -X POST \
@@ -81,14 +79,14 @@ curl -X POST \
   https://{{domain}}/payment/order/v1/verify?client_id=xxxxx
 ```
 
-data 对象结构见 [订单信息](/sdk/TapPayments/develop/server/#订单信息)
+`data.order` 对象结构见 [订单信息](/sdk/TapPayments/develop/server/#订单信息)
 
 ```
 {
-   "data" : {
-
-   },
-   "success" : true
+  "data": {
+    "order": {}
+  },
+  "success": true
 }
 ```
 
@@ -97,7 +95,7 @@ data 对象结构见 [订单信息](/sdk/TapPayments/develop/server/#订单信�
 :::tip
 同样的通知可能会多次发送，商户系统必须正确处理重复通知。
 
-推荐做法是：当商户系统收到通知时，先进行签名验证 [请求签算](/sdk/TapPayments/develop/server/#请求签算)，然后检查对应业务数据的状态，如未处理，则进行处理；如已处理，则直接返回成功。
+推荐做法是：当商户系统收到通知时，首先进行签名验证，然后检查对应业务数据的状态，如未处理，则进行处理；如已处理，则直接返回成功。
 
 在处理业务数据时建议采用数据锁进行并发控制，以避免可能出现的数据异常。
 :::
@@ -137,8 +135,8 @@ order 对象结构见 [订单信息](/sdk/TapPayments/develop/server/#订单信�
 
 ```
 {
-    "code": "",
-    "msg": "order not found"
+    "code": "SUCCESS",
+    "msg": ""
 }
 ```
 
@@ -146,8 +144,8 @@ order 对象结构见 [订单信息](/sdk/TapPayments/develop/server/#订单信�
 
 | **字段** | **类型** | **是否必须** | **描述**                                 |
 | -------- | -------- | ------------ | ---------------------------------------- |
-| code     | string   | Y            | 状态码，SUCCESS 为接收成功，其他均为失败 |
-| msg      | string   | N            | 返回信息，如错误原因                     |
+| code     | string   | Y            | 状态码，`SUCCESS` 为接收成功，`FAIL` 或其他均为失败 |
+| msg      | string   | N            | 当接收失败时需返回失败原因                     |
 
 ## 请求规则和签算
 
@@ -169,7 +167,11 @@ order 对象结构见 [订单信息](/sdk/TapPayments/develop/server/#订单信�
 | --------- | --------------- |
 | client_id | 开发平台应用 ID |
 
-#### 当 POST 请求方式
+```
+https://{{domain}}/payment/order/v1/info?client_id=xxxxx&order_id=xxxxx
+```
+
+#### 当请求方法是 POST
 
 HTTP body 需使用 JSON 编码格式传输参数，即请求 headers 中应该携带 Content-Type: application/json
 
@@ -189,11 +191,9 @@ curl -X POST \
 
 ```
 {
-    "data": {
-
-    },
-    "now": 1640966400,
-    "success": true
+  "data": {},
+  "now": 1640966400,
+  "success": true
 }
 ```
 
@@ -217,7 +217,7 @@ curl -X POST \
 | -------- | -------- | ------------ | --------------------------- |
 | data     | object   | Y            | 业务数据，或异常信息描述    |
 | now      | int      | Y            | 服务端时间 (unix timestamp) |
-| success  | bool     | Y            | 响应状态，true 为成功       |
+| success  | bool     | Y            | 响应状态，`true` 为成功       |
 
 异常响应 data 字段描述
 
@@ -253,23 +253,24 @@ sign = HMAC.New(Sha256, "{{server secret}}").Hash(message)
 
 **body:** 请求体，如果请求体为空，则最后一行仅为一个 \n
 
-#### 签算伪代码示例
+#### 签算验证示例
 
 ```
 func TestSign(t *testing.T) {
 	secret := "6n8cdaz6Qq5pYjNaQ88BzWkVvNATeOhY"
 	body := []byte(`{"name":"test"}`)
 	url := "https://example.com/my-service/v1/my-method?client_id=XXX&some_param=123&another=456"
-	method := "GET"
+	method := "POST"
 	header := http.Header{
 		"Content-Type":  {"application/json"},
 		"Authorization": {"Bearer ourSenEFQhvkC4Mww6uk8fs0d28eFrvzaH59ORp1"},
-		"X-Tap-Ts":      {"1640966400"},
+		"X-Tap-Ts":      {"1711296000"},
 		"X-Tap-Nonce":   {"XphYC2P1cl"},
 		// 测试 headers 排序
 		"X-Tap-0":   {"1"},
 		"X-Tap-00":  {"2"},
 		"X-Tap-A00": {"3"},
+
 		// 测试非 X-Tap- 开头的 headers
 		"X-None-Sign-Part":    {"XXX"},
 		"Tap-None-Sign-Part":  {"XXX"},
@@ -287,12 +288,10 @@ func TestSign(t *testing.T) {
 }
 ```
 
-
-
 参与签算部分
 
 ```
-GET\n
+POST\n
 /my-service/v1/my-method?client_id=XXX&some_param=123&another=456\n
 x-tap-0:1\n
 x-tap-00:2\n
@@ -302,12 +301,10 @@ x-tap-ts:1711296000\n
 {"name":"test"}\n
 ```
 
-
-
 签算结果（X-Tap-Sign 的值）
 
 ```
-EnI56yWFllbbG1YS6UoQ4qjuRUqfK9+pEsIEQ0B48Cc=
+Z9i6Az32ZpDzAvPhHX22+KCNoBW0CishEAXDiVxfA18=
 ```
 
 ## 通用对象结构描述
@@ -328,7 +325,7 @@ EnI56yWFllbbG1YS6UoQ4qjuRUqfK9+pEsIEQ0B48Cc=
 | currency       | string   | Y            | [币种](/sdk/TapPayments/appendix/regions-currencies) |
 | create_time    | string   | Y            | 创建时间                                                     |
 | pay_time       | string   | Y            | 支付时间                                                     |
-| extra          | string   | Y            | 自定义信息，如服务器、角色信息                               |
+| extra          | string   | Y            | 商户自定义数据，如角色信息等，长度不超过 255 UTF-8 字符            |
 
 #### 订单状态
 
