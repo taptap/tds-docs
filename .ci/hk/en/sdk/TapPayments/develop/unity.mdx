@@ -1,0 +1,193 @@
+---
+title: Unity 集成指南
+sidebar_position: 1
+---
+
+# Unity 集成指南
+
+## 环境要求
+
+- 支持 Unity 2019.4 及以上版本
+
+## 准备
+
+- 参照 [准备工作](/sdk/start/get-ready/) 所述创建 app，配置 app 参数并且绑定 API 域名
+- 参照 [TapSDK 快速开始](/sdk/start/quickstart/) 配置包名和签名
+
+## 获取 SDK
+
+### External Dependency Manager for Unity(EDM4U)
+
+TapPayment SDK 依赖 EDM4U 来处理 Android 相关的依赖。
+
+#### 通过 OpenUPM 安装
+
+EDM4U 可以通过 OpenUPM 进行下载，开发者可以通过 **Edit > Project Settings > Package Manager** 来注册使用 OpenUPM。
+
+![](https://capacity-files.lcfile.com/gpS8BcTVJIdSpMxyDipIWORX4Gb2filA/NdoQbmRRvovet4x3LGUcsTXWnjb.png)
+
+#### 本地安装 UPM 包
+
+开发者可以通过 [Google APIs for Unity](https://developers.google.com/unity/archive#external_dependency_manager_for_unity) 下载 UPM 安装包. 并且通过[从本地磁盘安装](https://docs.unity3d.com/Manual/upm-ui-local.html)的方式进行安装。
+
+### TapPayment SDK
+
+TapPayment SDK 可以通过 NPMJS 进行安装, 开发者可以通过 **Edit > Project Settings > Package Manager** 来注册使用 NPMJS。
+
+![](https://capacity-files.lcfile.com/08NEse4Je2VrKBQItQRqFxeVBp9bKK7G/ZLXNblCW8oDEJ9xIyrLcNB2onLd.png)
+
+配置完成以后就可以在 **Window > Package Manager > My Registries** 中安装 **TapTap Payments Global V2 （1.0.3)**
+
+
+如果安装目录中没有 `TapTap Payments Global V2`, 请尝试在 **Edit > Project Settings > Package Manager** 中重新注册NPMJS
+
+### 处理安卓依赖
+
+EDM4U 会自动监控 TapPayment SDK 引入的 Android 依赖，但是在某些特殊情况下自动依赖解析可能失败，开发者可以通过 **Assets > External Dependency Manager > Android Resolver > Force Resolve** 来强制依赖解析。在测试之前请确认对于 `com.taptap.android.payment:unity` 的依赖被加到了 mainTemplate.gradle 文件中，如果 EDM4U 没有自动添加这个依赖，开发者也可以通过手动添加的方式处理依赖。
+
+## SDK 指南
+
+我们在 [Unity IAP](https://unity.com/products/iap) 的框架下实现了一个新的商店实现，通过这种方式降低已经有 Google Play 或者 App Store 内购的 app 的接入成本。如果开发者是第一次接触到内购的流程，我们会在接下来简要说明 Unity 的内购流程，开发者也可以在 Unity 的[官方文档](https://docs.unity3d.com/Packages/com.unity.purchasing@4.8/manual/Overview.html) 中了解有关内购的详细内容。
+
+### 初始化 Unity Gaming Services
+
+调用 `UnityServices.InitializeAsync()` 来一次性初始化 Unity Gaming Services。 这个方法会返回一个 `Task` 对象，开发者可以通过这个对象来获取初始化的状态信息。
+
+```
+using System;
+using Unity.Services.Core;
+using Unity.Services.Core.Environments;
+using UnityEngine;
+
+public class InitializeUnityServices : MonoBehaviour
+{
+    public string environment = "production";
+
+    async void Start()
+    {
+        try
+        {
+            var options = new InitializationOptions()
+                .SetEnvironmentName(environment);
+
+            await UnityServices.InitializeAsync(options);
+        }
+        catch (Exception exception)
+        {
+            // An error occurred during services initialization.
+        }
+    }
+}
+```
+
+### 初始化 IAP
+
+确保你在初始化 IAP 的时候添加 `TapPurchasingModule`，并且设置正确的 `clientId` 和 `clientToken`。
+
+```
+using UnityEngine;
+using UnityEngine.Purchasing;
+using TapTap.Payments.Global.V2;
+
+public class MyIAPManager : IStoreListener {
+
+    private IStoreController controller;
+    private IExtensionProvider extensions;
+
+    public MyIAPManager () {
+        var builder = ConfigurationBuilder.Instance(TapPurchasingModule.Instance);
+        builder.Configure<ITapConfiguration>().SetClientId("Your Client ID Here");
+        builder.Configure<ITapConfiguration>().SetClientToken("Your Client Token Here");
+        builder.AddProduct("100_gold_coins", ProductType.Consumable, new IDs
+        {
+            {"100_gold_coins_google", GooglePlay.Name},
+            {"100_gold_coins_mac", MacAppStore.Name}
+        });
+
+        UnityPurchasing.Initialize (this, builder);
+    }
+
+    /// <summary>
+    /// Called when Unity IAP is ready to make purchases.
+    /// </summary>
+    public void OnInitialized (IStoreController controller, IExtensionProvider extensions)
+    {
+        this.controller = controller;
+        this.extensions = extensions;
+    }
+
+    /// <summary>
+    /// Called when Unity IAP encounters an unrecoverable initialization error.
+    ///
+    /// Note that this will not be called if Internet is unavailable; Unity IAP
+    /// will attempt initialization until it becomes available.
+    /// </summary>
+    public void OnInitializeFailed (InitializationFailureReason error)
+    {
+    }
+
+    /// <summary>
+    /// Called when a purchase completes.
+    ///
+    /// May be called at any time after OnInitialized().
+    /// </summary>
+    public PurchaseProcessingResult ProcessPurchase (PurchaseEventArgs e)
+    {
+        return PurchaseProcessingResult.Complete;
+    }
+
+    /// <summary>
+    /// Called when a purchase fails.
+    /// </summary>
+    public void OnPurchaseFailed (Product i, PurchaseFailureReason p)
+    {
+    }
+}
+```
+
+### 发起内购流程
+
+在 IAP 被成功初始化以后，你可以通过调用 `IStoreController.InitiatePurchase` 来发起内购流程。
+
+```
+// Example method called when the user taps a 'buy' button
+// to start the purchase process.
+public void OnPurchaseClicked(string productId) {
+    controller.InitiatePurchase(productId);
+}
+```
+
+### 处理购买结果
+
+购买完成时会调用商店监听器的 ProcessPurchase 函数。无论用户购买任何物品，您的应用程序都应该履单；例如，解锁本地内容或将购买收据发送给服务器以更新服务器端游戏模型。
+
+此过程会返回结果以指出应用程序是否已完成对购买的处理：
+
+| 结果                              | 描述                                                                                                                                         |
+| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| PurchaseProcessingResult.Complete | 应用程序已完成对购买的处理，不应再次向应用程序通知此事。                                                                                     |
+| PurchaseProcessingResult.Pending  | 应用程序仍在处理购买，除非调用 `IStoreController` 的 `ConfirmPendingPurchase` 函数，否则将在下一次应用程序启动时再次调用 `ProcessPurchase`。 |
+
+请注意，在初始化成功后，随时可能调用 `ProcessPurchase`。如果应用程序在 `ProcessPurchase` 处理程序执行过程中崩溃，那么在 Unity IAP 下次初始化时会再次调用它，因此您可能希望实现自己的额外重复数据删除功能。
+
+#### 可靠性
+
+Unity IAP 要求明确确认购买以确保在网络中断或应用程序崩溃的情况下可靠地完成购买。在应用程序离线时完成的任何购买都将在下次初始化时发送给应用程序。
+
+#### 立即完成购买
+
+返回 `PurchaseProcessingResult.Complete` 时，Unity IAP 立即完成交易（如下图所示）。
+
+如果您正在销售可消耗商品并从服务器履行订单（例如，在网络游戏中提供游戏币），那么您不得返回 `PurchaseProcessingResult.Complete`。
+
+否则，如果在保存到云端之前卸载应用程序，则购买的消耗品将面临丢失的风险。
+
+![](https://capacity-files.lcfile.com/PYPIumvCKtaAwhJOPAf1qaApNMOdQ9nF/VrHVbfdKUoCHgXxmOYkccZLMn8e.png)
+
+#### 将购买保存到云端
+
+如果要将消耗品购买交易保存到云端，您必须返回 `PurchaseProcessingResult.Pending`，并且仅在成功保存购买时才调用 `ConfirmPendingPurchase`。
+
+返回 `Pending` 时，Unity IAP 会在底层商店中保持交易为未结 (open) 状态，直至确认为已处理为止，因此确保了即使在消耗品处于此待处理状态时用户重新安装您的应用程序，消耗品购买交易也不会丢失。
+
+![](https://capacity-files.lcfile.com/zDX7oMjWBju6ME0K9i4zym9OOuIgCvrx/TFgMbu4JhohID1xHBnhcet7nnth.png)

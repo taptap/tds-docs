@@ -1,7 +1,7 @@
-const taptapUnity = "3.28.0"
-const taptapIos = "3.27.1"
-const taptapAndroid = "3.28.0"
-const taptapUnreal = "3.28.0"
+const taptapUnity = "3.28.3"
+const taptapIos = "3.28.3"
+const taptapAndroid = "3.28.3"
+const taptapUnreal = "3.28.3"
 
 const sdkVersions = {
   taptap: {
@@ -10,7 +10,7 @@ const sdkVersions = {
     ios: taptapIos,
     unreal: taptapUnreal,
     rtc: "1.1.0",
-    adr: "1.1.5"
+    adr: "1.2.2"
   },
   leancloud: {
     objc: "13.9.0",
@@ -19,7 +19,7 @@ const sdkVersions = {
       storage: "4.13.2",
       realtime: "5.0.0-rc.7",
     },
-    java: "8.2.19",
+    java: "8.2.24",
     csharp: "2.3.0",
     flutter: {
       storage: "0.7.10",
@@ -27,8 +27,8 @@ const sdkVersions = {
     }
   },
   tapadn: {
-    unity: "3.16.3.25",
-    android: "3.16.3.25",
+    unity: "3.16.3.29",
+    android: "3.16.3.29",
   }
 };
 

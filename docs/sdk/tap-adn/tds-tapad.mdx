@@ -103,8 +103,6 @@ dependencies {
 
 最低支持 Android 5.0（API level 21），编译环境为 Android Studio。
 
-集成参考： [TapADN Demo](https://github.com/taptap/TapADN-Demo)
-
 <p>
 将 <code>TapAD_{sdkVersions.tapadn.android}.aar</code> 拷贝到游戏目录下的 `src/main/libs` 目录中。
 </p>
@@ -259,6 +257,7 @@ TapAdConfig config = new TapAdConfig.Builder()
                 .Channel(your__channel)             // 必选参数，渠道
                 .TapClientId(your_tap_client_id)    // 可选参数，TapTap 开发者中心的游戏 Client ID 
                 .EnableDebugLog(false)              // 可选参数，是否打开原生 debug 调试信息输出：true 打开、false 关闭。默认 false 关闭
+                .ShakeEnabled(false)                // 可选参数，是否开启摇一摇: true 打开、false 关闭
                 .Build();
 
 // CustomControllerWrapper 为实现了 TapTap.TapAd.ICustomController 的类
@@ -355,6 +354,7 @@ TapAdConfig config = new TapAdConfig.Builder()
                 .withTapClientId(your_tap_client_id)     // 可选参数。TapTap 开发者中心的游戏 Client ID           
                 .enableDebug(true)                       // 可选参数，是否打开 debug 调试信息输出：true 打开、false 关闭。默认 false 关闭
                 .withGameChannel(your_app_channel)       // 必选参数，渠道
+                .shakeEnabled(false)                     // 可选参数，是否开启摇一摇: true 打开、false 关闭
                 .withCustomController(new TapAdCustomController() {
 
                     // 是否允许 SDK 主动使用地理位置信息
@@ -1115,7 +1115,11 @@ parentLayout.addView(bannerAd.getBannerView());
 
 </MultiLang>
 
-## 自渲染信息流广告 
+## 自渲染信息流广告
+
+:::tip
+- **TapADN SDK 从 3.16.3.28 版本开始自渲染信息流视频广告对外暴露视频控制接口。**
+:::
 
 为可自定义布局的信息流广告，包含大图和视频两种基本样式类型，应用下载、跳转到落地页和跳转到浏览器三种交互类型。
 
@@ -1258,6 +1262,40 @@ public interface TapFeedAd {
      */
     void setDownloadListener(TapAppDownloadListener listener);
 
+    /**
+     * 设置可以控制自渲染信息流视频，比如播放，暂停，音量键显隐等，v3.16.3.28可用
+     */
+    void setVideoPlaySelfController(boolean isSelfController);
+
+    /**
+     * 设置自渲染信息流广告视频回调接口，v3.16.3.28可用
+     */
+    void setVideoAdListener(VideoAdListener videoAdListener);
+
+    /**
+     * 暂停自渲染信息流广告视频播放，v3.16.3.28可用
+     */
+    void stopVideoPlay();
+
+    /**
+     * 恢复自渲染信息流广告视频自动播放，v3.16.3.28可用
+     */
+    void startVideoPlay();
+
+    /**
+     * 设置自渲染信息流广告音量键显隐，v3.16.3.28可用
+     */
+    void setVolumeVisible(boolean isVisible);
+
+    /**
+     * 打开自渲染信息流广告视频音量（全局），v3.16.3.28可用
+     */
+    void openVideoVolume();
+
+    /**
+     * 关闭自渲染信息流广告视频音量（全局），v3.16.3.28可用
+     */
+    void closeVideoVolume();
 }
 
 // 应用合规信息
@@ -1316,6 +1354,18 @@ public interface AdInteractionListener {
     
     // 广告卡片曝光
     void onAdShow(TapFeedAd ad);
+
+    // 广告卡片单次（第一次）曝光
+    void onDistinctAdShow(TapFeedAd ad);
+}
+
+// 自渲染信息流广告视频回调接口 3.16.3.28 版本开始
+interface VideoAdListener {
+    void onVideoPrepared(TapFeedAd ad);
+    void onVideoStart(TapFeedAd ad);
+    void onVideoPause(TapFeedAd ad);
+    void onVideoVolumeOpen(TapFeedAd ad);
+    void onVideoVolumeClose(TapFeedAd ad);
 }
 
 // 广告包下载进度监听

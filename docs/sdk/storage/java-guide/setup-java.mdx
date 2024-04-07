@@ -1,5 +1,5 @@
 ---
-title: 数据存储、即时通讯 Java SDK 配置指南
+title: 数据存储 Java SDK 配置指南
 sidebar_label: Java SDK 配置
 slug: /sdk/storage/guide/setup-java/
 sidebar_position: 3
@@ -14,55 +14,19 @@ import AppConfig from "../_partials/app-config.mdx";
 import { Conditional } from "/src/docComponents/conditional";
 import Path from "/src/docComponents/path";
 
-## 平台与 SDK 对应关系
-
-Java SDK 主要包含以下几个 library，其层次结构以及平台对应关系如下：
-
-### 基础包（可以在纯 Java 环境下调用）
-
-- `storage-core`：包含所有数据存储的功能，如
-  - 结构化数据（LCObject）
-  - 内建账户系统（LCUser）
-  - 查询（LCQuery）
-  - 文件存储（LCFile）
-  - 社交关系（LCFriendship，当前版本暂不提供）
-  - 朋友圈（LCStatus，当前版本暂不提供）
-  - 短信（LCSMS）
-  - 等等
-- `realtime-core`：部分依赖 storage-core library，实现了 LiveQuery 以及即时通讯功能，如：
-  - LiveQuery
-  - LCIMClient
-  - LCIMConversation 以及多种场景对话
-  - LCIMMessage 以及多种子类化的多媒体消息
-  - 等等
-
-### Android 特有的包
-
-- `storage-android`：是 storage-core 在 Android 平台的定制化实现，接口与 storage-core 完全相同。
-- `realtime-android`：是 realtime-core 在 Android 平台的定制化实现，并且增加 Android 推送相关接口。
-- `mixpush-android`：是混合推送的 library，支持华为、小米、魅族、vivo 以及 OPPO 的官方推送。
-- `leancloud-fcm`：是 Firebase Cloud Messaging 的封装 library，供美国节点的 app 使用推送服务。
-
-### 模块依赖关系
-
-Java SDK 一共包含如下几个模块：
-
-| 目录                           | 模块名                                                      | 适用平台 | 依赖关系                       |
-| ------------------------------ | ----------------------------------------------------------- | -------- | ------------------------------ |
-| ./core                         | storage-core，存储核心 library                              | Java     | 无，它是最核心的 library       |
-| ./realtime                     | realtime-core，LiveQuery 与实时通讯核心 library             | Java     | storage-core                   |
-| ./android-sdk/storage-android  | storage-android，Android 存储 library                       | Android  | storage-core                   |
-| ./android-sdk/realtime-android | realtime-android，Android 推送、LiveQuery、即时通讯 library | Android  | storage-android, realtime-core |
-| ./android-sdk/mixpush-android  | Android 混合推送 library                                    | Android  | realtime-android               |
-| ./android-sdk/leancloud-fcm    | Firebase Cloud Messaging library                            | Android  | realtime-android               |
-
 ## 获取 SDK
 
 获取 SDK 有多种方式，较为推荐的方式是通过包依赖管理工具下载最新版本。
 
+### 使用包管理工具下载
+
 我们已经将所有的 library 发布到了 maven 中心仓库，开发者可以用以下任意包管理工具来安装 SDK。
 
-### 数据存储服务
+<Conditional brand="leancloud">
+
+对于数据存储服务：
+
+</Conditional>
 
 <Tabs groupId="java-sdk-installation">
 <TabItem value="android" label="Android" default>
@@ -70,7 +34,7 @@ Java SDK 一共包含如下几个模块：
 如果是 Android 项目，使用这些包：
 
 <CodeBlock className="groovy">
-{`implementation 'cn.leancloud:storage-android:${sdkVersions.leancloud.java}'
+{`implementation 'com.taptap:lc-storage-android:${sdkVersions.leancloud.java}'
 implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'`}
 </CodeBlock>
 </TabItem>
@@ -79,8 +43,8 @@ implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'`}
 
 <CodeBlock className="xml">
   {`<dependency>
-    <groupId>cn.leancloud</groupId>
-    <artifactId>storage-core</artifactId>
+    <groupId>com.taptap</groupId>
+    <artifactId>lc-storage-core</artifactId>
     <version>${sdkVersions.leancloud.java}</version>
 </dependency>`}
 </CodeBlock>
@@ -90,7 +54,7 @@ implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'`}
 <TabItem value="ivy" label="Ivy">
 
 <CodeBlock className="xml">
-  {`<dependency org="cn.leancloud" name="storage-core" rev="${sdkVersions.leancloud.java}" />`}
+  {`<dependency org="com.taptap" name="lc-storage-core" rev="${sdkVersions.leancloud.java}" />`}
 </CodeBlock>
 
 </TabItem>
@@ -98,7 +62,7 @@ implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'`}
 <TabItem value="sbt" label="SBT">
 
 <CodeBlock className="scala">
-  {`libraryDependencies += "cn.leancloud" %% "storage-core" % "${sdkVersions.leancloud.java}"`}
+  {`libraryDependencies += "com.taptap" %% "lc-storage-core" % "${sdkVersions.leancloud.java}"`}
 </CodeBlock>
 
 </TabItem>
@@ -106,14 +70,16 @@ implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'`}
 <TabItem value="gradle" label="Gradle">
 
 <CodeBlock className="groovy">
-  {`implementation 'cn.leancloud:storage-core:${sdkVersions.leancloud.java}'`}
+  {`implementation 'com.taptap:lc-storage-core:${sdkVersions.leancloud.java}'`}
 </CodeBlock>
 
 </TabItem>
 
 </Tabs>
 
-### 即时通讯与推送服务
+<Conditional brand="leancloud">
+
+对于即时通讯与推送服务：
 
 <Tabs groupId="java-sdk-installation">
 <TabItem value="android" label="Android" default>
@@ -172,6 +138,8 @@ implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'`}
 
 </Tabs>
 
+</Conditional>
+
 <details>
 <summary>点击查看对 maven 源的特别说明</summary>
 
@@ -222,15 +190,15 @@ allprojects {
 可以执行以下命令获取 Java SDK 并安装：
 
 ```sh
-$ git clone https://github.com/leancloud/java-unified-sdk.git
-$ cd java-unified-sdk/
+$ git clone https://github.com/taptap/TapSDK-LC-Java.git
+$ cd TapSDK-LC-Java/
 $ mvn clean install
 ```
 
 获取和安装 Android SDK：
 
 ```sh
-$ cd java-unified-sdk/
+$ cd TapSDK-LC-Java/
 $ cd android-sdk/
 $ gradle clean assemble
 ```
@@ -258,14 +226,14 @@ $ gradle clean assemble
 <Conditional brand="tds">
 
 ```java
-import cn.leancloud.LeanCloud;
+import com.tapsdk.lc.LeanCloud;
 
 public class MyLeanCloudApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
 
-        // 注意这里千万不要调用 cn.leancloud.core.LeanCloud 的 initialize 方法，否则会出现 NetworkOnMainThread 等错误。
+        // 注意这里千万不要调用 com.tapsdk.lc.core.LeanCloud 的 initialize 方法，否则会出现 NetworkOnMainThread 等错误。
         LeanCloud.initialize(this, "your-client-id", "your-client-token", "https://your_server_url");
     }
 }
@@ -292,6 +260,25 @@ public class MyLeanCloudApp extends Application {
 </Conditional>
 
 然后指定 SDK 需要的权限并在 `AndroidManifest.xml` 里面声明 `MyLeanCloudApp` 类：
+
+<Conditional brand="tds">
+
+```xml
+<!-- 基本模块（必须）START -->
+<uses-permission android:name="android.permission.INTERNET"/>
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+<!-- 基本模块 END -->
+
+<application
+  …
+  android:name=".MyLeanCloudApp" >
+
+</application>
+```
+
+</Conditional>
+
+<Conditional brand="leancloud">
 
 ```xml
 <!-- 基本模块（必须）START -->
@@ -324,6 +311,8 @@ public class MyLeanCloudApp extends Application {
 LCIMOptions.getGlobalOptions().setDisableAutoLogin4Push(true);
 ```
 
+</Conditional>
+
 <Conditional brand="leancloud">
 
 #### 更安全的客户端初始化方法
@@ -355,7 +344,7 @@ public class MyLeanCloudApp extends Application {
 <Conditional brand="tds">
 
 ```java
-import cn.leancloud.core.LeanCloud;
+import com.tapsdk.lc.core.LeanCloud;
 
 LeanCloud.initialize("your-client-id", "your-client-token", "https://your_server_url");
 ```
@@ -376,6 +365,8 @@ LeanCloud.initialize("your-app-id", "your-app-key", "https://your_server_url");
 模板项目和示例代码均未配置 API 自定义域名，
 请勿调用 `setServer`，否则会变成公网访问，影响性能。
 
+<Conditional brand="leancloud">
+
 realtime-core library 也支持在纯 Java Application 中使用，但是与 Android 的调用方式有细微差异，Java Application 中需要开发者显式建立与云端的长链接（Android 平台是通过 PushService 自动建立的）。建立长链接的方法如下：
 
 ```java
@@ -392,6 +383,8 @@ LCConnectionManager.getInstance().startConnection(new LCCallback() {
 ```
 
 只有长链接成功建立之后，后续的聊天请求才能开始。
+
+</Conditional>
 
 ## 域名
 
@@ -484,8 +477,8 @@ SDK 安装指南基于当前最新版本的 SDK 编写，所以排查问题前�
 -keep class sun.security.** { *; }
 -dontwarn com.google.**
 -keep class com.google.** { *;}
--dontwarn cn.leancloud.**
--keep class cn.leancloud.** { *;}
+-dontwarn com.tapsdk.lc.**
+-keep class com.tapsdk.lc.** { *;}
 -keep public class android.net.http.SslError
 -keep public class android.webkit.WebViewClient
 -dontwarn android.webkit.WebView
