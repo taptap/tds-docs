@@ -5,21 +5,15 @@ on:
     types: [closed]
 
 env:
-  REGION: cn-e1
-  APP_ID: j1sU6A4GIEiCzwDu5l9Klk03-9Nh9j0Va
+  REGION: cn-n1 # set this to your LeanCloud region, e.g. cn-n1
+  APP_ID: j1sU6A4GIEiCzwDu5l9Klk03-9Nh9j0Va # set this to your App ID on LeanCloud
+  GROUP: web   # set this to your group, e.g. web
 
 jobs:
   delete-preview-environment:
     runs-on: ubuntu-latest
-
-    strategy:
-      max-parallel: 1
-      matrix:
-        group: [web, tds, intl]
-
     permissions:
       deployments: write
-
     steps:
       - name: Install lean-cli
         run: |
@@ -29,11 +23,11 @@ jobs:
       - name: Delete
         run: |
           lean login --region ${{ env.REGION }} --token ${{ secrets.ACCESS_TOKEN }}
-          lean switch --region ${{ env.REGION }} --group ${{ matrix.group }} ${{ env.APP_ID }}
+          lean switch --region ${{ env.REGION }} --group ${{ env.GROUP }} ${{ env.APP_ID }}
           lean preview delete
 
       - uses: strumwolf/delete-deployment-environment@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          environment: preview-${{ matrix.group }}/${{ github.head_ref }}
+          environment: preview/${{ github.head_ref }}
           onlyDeactivateDeployments: true

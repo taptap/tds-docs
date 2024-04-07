@@ -10,14 +10,17 @@ const config = {
   baseUrl: PREVIEW === "true" ? "/" : "/docs/",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "warn",
-  favicon: "img/favicon.ico",
+  favicon: "img/logoh.png",
   trailingSlash: true,
   customFields: {
-    searchUrl: "https://tds-doc-search-api.cn-e1.leanapp.cn/search",
+    searchUrl: "https://tds-doc-search-api.leanapp.cn/search",
+    upItemListIndexUrl: "https://tds-doc-search-check-log.leanapp.cn/api/check-log-up",
+    aiSearchUrl :"https://tds-doc-search-ai-api.ap-sg.tdsapps.com/api/ai-search?type=TDS",
+    aiSearchEnUrl :"https://tds-doc-search-ai-api.ap-sg.tdsapps.com/api/ai-search?type=TDSen",
     searchProviderName: "LeanDB Elasticsearch",
     searchProviderWebsite:
       "https://developer.taptap.cn/docs/sdk/engine/database/es/",
-    mainDomainHost: "https://www.taptap.cn",
+    mainDomainHost: "https://developer.taptap.cn/",
     dcDomainHost: "https://developer.taptap.cn?from=tds-docs",
   },
 

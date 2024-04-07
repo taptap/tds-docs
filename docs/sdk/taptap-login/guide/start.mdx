@@ -12,6 +12,7 @@ import CodeBlock from "@theme/CodeBlock";
 import sdkVersions from "/src/docComponents/sdkVersions";
 import UnitySDKInstallation from "../../_partials/unity-sdk-installation.mdx";
 
+
 :::tip
 推荐阅读博客文章[登录最佳实践](https://blog.taptap.dev/posts/tapsdk-taplogin-bestpractice)，了解 TapSDK 登录的整个流程。
 :::
@@ -71,6 +72,33 @@ iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.a
 
 </MultiLang>
 
+## 权限说明
+
+<MultiLang kind="ue">
+
+<>
+
+</>
+
+<>
+开发者需在应用 `AndroidManifest.xml` 中添加如下权限：
+
+```
+<uses-permission android:name="android.permission.INTERNET"/>
+```
+
+</>
+
+<>
+
+</>
+
+<>
+
+</>
+</MultiLang>
+
+
 ## 集成前准备
 
 1. 参考 [准备工作](/sdk/start/get-ready/) 创建应用、开启应用配置、绑定 API 域名；
@@ -85,6 +113,8 @@ iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.a
 <UnitySDKInstallation 
 npmDeps={[
     "com.taptap.tds.bootstrap",
+    "com.taptap.tds.common",
+    "com.taptap.tds.login",
 ]} 
 githubDeps={[
     {package: "com.taptap.tds.login", url: `https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}`},
@@ -103,6 +133,12 @@ unitypackageModules={[
 
 在 `Assets/Plugins/iOS/Resource` 目录下创建 `TDS-Info.plist` 文件，复制以下代码并且**替换其中的 `ClientId`**。如果游戏使用了 TapTap [内嵌动态](/sdk/embedded-moments/features/)或[数据分析](/sdk/tapdb/features/)服务，需要配置相关权限并**替换授权文案**：
 
+:::tip
+
+复制使用以下内容时，**请删除空行以及注释**，以免出现 XML 解析时报错，`ApplicationException: expected a key node`。
+
+:::
+
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -113,7 +149,6 @@ unitypackageModules={[
         <key>client_id</key>
         <string>ClientId</string>
     </dict>
-
     <!--使用内嵌动态服务，需要相册、相机、麦克风权限-->
     <key>NSPhotoLibraryUsageDescription</key>
     <string>说明为何应用需要此项权限</string>
@@ -176,8 +211,8 @@ dependencies {
     implementation files('libs/TapBootstrap_${sdkVersions.taptap.android}.aar') // TapTap 启动器
     implementation files('libs/TapCommon_${sdkVersions.taptap.android}.aar') // TapTap 基础库
     implementation files('libs/TapLogin_${sdkVersions.taptap.android}.aar') // TapTap 登录
-    implementation 'cn.leancloud:storage-android:${sdkVersions.leancloud.java}' // 数据存储
-    implementation 'cn.leancloud:realtime-android:${sdkVersions.leancloud.java}'  // 即时通讯
+    implementation 'com.taptap:lc-storage-android:${sdkVersions.leancloud.java}' // 数据存储
+    implementation 'com.taptap:lc-realtime-android:${sdkVersions.leancloud.java}'  // 即时通讯
 }
 `}</CodeBlock>
 
@@ -199,7 +234,7 @@ dependencies {
 
 #### 导入 SDK
 
-1. 在 Xcode 选择工程，到 **Build Setting > Other Linker Flags** 添加 `-ObjC`。
+1. 在 Xcode 选择工程，到 **Build Setting > Other Linker Flags** 添加 `-ObjC` 和 `-Wl -ld_classic`。
 
 2. 下载 [TapSDK iOS](/tap-download)，解压后选择需要导入的资源文件，直接拖拽到项目目录即可。
 
@@ -862,3 +897,9 @@ TapUECommon::setDurationStatisticsEnabled(true);
 ## 更多功能
 
 请阅读[内建账户指南](/sdk/authentication/guide/)了解内建账户系统的更多功能。
+
+## 视频教程
+
+可以参考视频教程：[如何在游戏中集成 TapTap 登录功能](https://www.bilibili.com/video/BV1YX4y1b7TB/)，了解如何在 Untiy 项目中接入登录功能。
+
+更多视频教程见[开发者学堂](https://developer.taptap.cn/tds-tutorials/list)。因为 SDK 功能在不断完善，视频教程可能出现与新版 SDK 功能不一致的地方，以当前文档为准。

@@ -1,0 +1,57 @@
+云引擎目前支持以下包管理器：
+
+- [npm](https://docs.npmjs.com/cli/v10/commands/npm)
+- [pnpm](https://pnpm.io)
+- [Yarn 1](https://classic.yarnpkg.com)
+- [Yarn 2+](https://yarnpkg.com)
+
+云引擎会按照以下条件使用包管理器：
+
+| 包管理器 | 条件                                                      | 版本                        |
+| -------- | --------------------------------------------------------- | --------------------------- |
+| pnpm     | 存在合法能被解析的 `pnpm-lock.yaml`                       |                             |
+|          | `lockfileVersion: '6.0'` 或更高                           | 8                           |
+|          | `lockfileVersion: 5.3` 或更高                             | 7                           |
+|          | 其他                                                      | 6                           |
+| Yarn 1   | 存在 `yarn.lock`                                          | 1                           |
+| Yarn 2+  | 不默认支持，需通过 [Corepack](#实验性-corepack-支持) 启用 | 2+                          |
+| npm      | 其他情况                                                  | 使用 Node.js 默认提供的 npm |
+
+### 实验性 Corepack 支持
+
+**由于 Corepack 还是实验性特性，云引擎不能保证对 Corepack 的支持是稳定的**
+
+通过给分组设置 `ENABLE_EXPERIMENTAL_COREPACK` 环境变量为任意非空字符串来启用实验性 Corepack 支持。
+
+云引擎会通过调用 Corepack 读取 `package.json` 里的 `packageManager` 字段来自动识别、使用用户指定的包管理器，这也是目前唯一一种使用 Yarn 2+ 的方式。
+
+假设有以下 `package.json`：
+
+```json title="package.json"
+{
+  "name": "example",
+  "packageManager": "yarn@4.0.2"
+}
+```
+
+此时云引擎会自动调用 `corepack prepare --activate` 并识别包管理器为 Yarn 2+。
+
+参考：[Corepack](https://nodejs.org/api/corepack.html)
+
+### 默认命令
+
+云引擎默认运行的脚本会随着包管理器的变化而变化，如使用了 pnpm， `npm ci` 会变成 `pnpm install --frozen-lockfile`。
+
+云引擎只有在没有指定 `installDevDependencies` 为 `true` 且构建脚本为空（没有手动指定，`package.json` 里的 `scripts.build` 不存在）时才会省略 devDependencies 的安装。
+
+| 阶段    | 包管理器 | 条件                                                               | 命令                                                                        |
+| ------- | -------- | ------------------------------------------------------------------ | --------------------------------------------------------------------------- |
+| install | npm      | Node.js 10 以上且存在 `package-lock.json` 或 `npm-shrinkwrap.json` | `npm ci`                                                                    |
+|         |          |                                                                    | `npm install` 或 `npm install --omit=dev`                                   |
+|         | pnpm     |                                                                    | `pnpm install --frozen-lockfile` 或 `pnpm install --frozen-lockfile --prod` |
+|         | Yarn 1   |                                                                    | `yarn install` 或 `yarn install --production`                               |
+|         | Yarn 2+  |                                                                    | `yarn install`                                                              |
+
+:::note
+请注意 Yarn 1 只会使用 `yarn.lock` 内解析的 URL 下载依赖且不会遵循用户设置的源，请选择合适的源，否则可能会增加构建时间。
+:::

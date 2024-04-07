@@ -8,6 +8,10 @@ yarn start
 
 # 预览英文文档
 yarn start --locale en
+
+### 国际版预览中文文档：
+yarn start --locale zh-hans 
+
 ```
 
 注意：`yarn start` 并不会检查坏链。如需检查坏链，需要运行 `yarn build`。坏链检查只会检查文档内部链接指向的页面是否存在，不会检查指向第三方网站的外部链接，也不会检查页内链接（hash link）。

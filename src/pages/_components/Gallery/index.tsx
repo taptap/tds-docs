@@ -4,9 +4,13 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 import { Link } from "react-router-dom";
 import Logo from "@theme/Logo";
 import styles from "./styles.module.scss";
-
+import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 const Gallery = ({ brand, entries, title, cardSize = 'narrow', showFilter = false }) => {
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
+
+  const {
+    i18n: { currentLocale },
+  } = useDocusaurusContext();
 
   const getTags = (entries) => {
     const tagSet = new Set<string>(entries.map(entry => entry.tag))
@@ -22,12 +26,24 @@ const Gallery = ({ brand, entries, title, cardSize = 'narrow', showFilter = fals
       <div className={styles.hero}>
         <div className={styles.title}>
           {/* @ts-ignore */}
-          <Logo noLabel noLink size={brand === "leancloud" ? 1.3 : 1.6} />
-          <Translate
+          {
+            (brand === "leancloud")?<div>
+                 <Logo noLabel noLink size={brand === "leancloud" ? 1.3 : 1.6} />
+                   
+            </div>:  
+            (currentLocale === "en" )?
+            <img src={useBaseUrl("/img/logo_en.png")} width="450" ></img>
+           :
+           <img src={useBaseUrl("/img/Local.png")} width="334" ></img>
+         
+          }
+          {brand === "leancloud" ?  <Translate
             id={`tds-home-${title}`}
           >
-            {title}
-          </Translate>
+            {brand === "leancloud" ?title:""}
+          </Translate>:<div></div>}
+
+        
         </div>
 
         {brand === "tds" && (

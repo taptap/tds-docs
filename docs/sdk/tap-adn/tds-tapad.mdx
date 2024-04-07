@@ -103,8 +103,6 @@ dependencies {
 
 最低支持 Android 5.0（API level 21），编译环境为 Android Studio。
 
-集成参考： [TapADN Demo](https://github.com/taptap/TapADN-Demo)
-
 <p>
 将 <code>TapAD_{sdkVersions.tapadn.android}.aar</code> 拷贝到游戏目录下的 `src/main/libs` 目录中。
 </p>
@@ -259,6 +257,7 @@ TapAdConfig config = new TapAdConfig.Builder()
                 .Channel(your__channel)             // 必选参数，渠道
                 .TapClientId(your_tap_client_id)    // 可选参数，TapTap 开发者中心的游戏 Client ID 
                 .EnableDebugLog(false)              // 可选参数，是否打开原生 debug 调试信息输出：true 打开、false 关闭。默认 false 关闭
+                .ShakeEnabled(false)                // 可选参数，是否开启摇一摇: true 打开、false 关闭
                 .Build();
 
 // CustomControllerWrapper 为实现了 TapTap.TapAd.ICustomController 的类
@@ -355,6 +354,7 @@ TapAdConfig config = new TapAdConfig.Builder()
                 .withTapClientId(your_tap_client_id)     // 可选参数。TapTap 开发者中心的游戏 Client ID           
                 .enableDebug(true)                       // 可选参数，是否打开 debug 调试信息输出：true 打开、false 关闭。默认 false 关闭
                 .withGameChannel(your_app_channel)       // 必选参数，渠道
+                .shakeEnabled(false)                     // 可选参数，是否开启摇一摇: true 打开、false 关闭
                 .withCustomController(new TapAdCustomController() {
 
                     // 是否允许 SDK 主动使用地理位置信息
@@ -677,6 +677,72 @@ splashAd.show(this);
 
 </MultiLang>
 
+### 关闭开屏广告
+:::tip
+注意 **3.16.3.23 版本开始 开屏广告移除了自动关闭逻辑，需要媒体手动关闭**。
+:::
+
+<MultiLang kind="adn">
+
+<>
+
+```cs
+using TapTap.TapAd
+// 场景 1 媒体直接关闭开屏广告
+if (_tapSplashAd != null)
+{
+    _tapSplashAd.Dispose();
+}
+
+// 场景 2 在收到开屏广告交互事件后选择关闭
+public void OnAdSkip(TapSplashAd ad) {
+    if (ad != null) ad.Dispose();
+}
+
+public void OnAdTimeOver(TapSplashAd ad) {
+    if (ad != null) ad.Dispose();
+}
+...
+
+```
+
+</>
+
+<>
+
+```java
+// 场景 1 媒体展示开屏中直接关闭广告
+if (splashAd != null)
+{
+    splashAd.dispose();
+    splashAd.destroyView();
+}
+
+// 场景 2 在收到开屏广告交互事件后选择关闭
+@Override
+public void onAdSkip() {
+    if (splashAd != null)
+    {
+        splashAd.dispose();
+        splashAd.destroyView();
+    }
+}
+
+@Override
+public void onAdTimeOver() {
+    if (splashAd != null)
+    {
+        splashAd.dispose();
+        splashAd.destroyView();
+    }
+}
+```
+
+</>
+
+</MultiLang>
+
+
 ## 激励视频广告 
 
 激励视频是一种全屏播放的视频广告，用户可以在观看完整的视频后获取奖励,视频广告播放结束后会显示结束页面，引导用户进行后续动作。目前激励视频广告的表现形式为：视频播放完展示 Endcard 页面。
@@ -824,6 +890,9 @@ public interface IRewardVideoInteractionListener : ICommonInteractionListener
 
     // 当跳过视频
     void OnSkippedVideo(TapRewardVideoAd ad);
+
+    // 点击事件
+    void OnAdClick(TapRewardVideoAd ad);
 }
 // 通用广告播放回调接口说明
 public interface ICommonInteractionListener
@@ -867,6 +936,11 @@ rewardAd.setRewardAdInteractionListener(new TapRewardVideoAd.RewardAdInteraction
     @Override
     public void onSkippedVideo() {
         // 激励广告中玩家点击了跳过视频的按钮
+    }
+
+    @Override
+    public void onAdClick() {
+        // 激励广告点击事件
     }
 });
 rewardAd.showRewardVideoAd(activity);
@@ -1041,7 +1115,11 @@ parentLayout.addView(bannerAd.getBannerView());
 
 </MultiLang>
 
-## 自渲染信息流广告 
+## 自渲染信息流广告
+
+:::tip
+- **TapADN SDK 从 3.16.3.28 版本开始自渲染信息流视频广告对外暴露视频控制接口。**
+:::
 
 为可自定义布局的信息流广告，包含大图和视频两种基本样式类型，应用下载、跳转到落地页和跳转到浏览器三种交互类型。
 
@@ -1160,14 +1238,64 @@ public interface TapFeedAd {
      * @param permissionViews 可点击的权限视图
      *
      */
+    @Deprecated
     void registerViewForInteraction(ViewGroup container, List<View> clickViews, List<View> creativeViews,
     	List<View> describeViews, List<View> privacyViews, List<View> permissionViews, AdInteractionListener listener);
+
+    /**
+    * 注册可点击的 view，click/show 会在内部完成
+    *
+    * @param activity 渲染广告所在的 activity
+    * @param container 渲染广告最外层的 ViewGroup
+    * @param clickViews 可点击的视图
+    * @param creativeViews 可点击的创意视图（广告下载的按钮）
+    * @param describeViews 可点击的介绍详情视图
+    * @param privacyViews 可点击的隐私协议视图
+    * @param permissionViews 可点击的权限视图
+    *
+    */
+    void registerViewForInteraction(Activity activity, ViewGroup container, List<View> clickViews, List<View> creativeViews,
+        List<View> describeViews, List<View> privacyViews, List<View> permissionViews, AdInteractionListener listener);
     
     /**
      * 设置下载监听器
      */
     void setDownloadListener(TapAppDownloadListener listener);
 
+    /**
+     * 设置可以控制自渲染信息流视频，比如播放，暂停，音量键显隐等，v3.16.3.28可用
+     */
+    void setVideoPlaySelfController(boolean isSelfController);
+
+    /**
+     * 设置自渲染信息流广告视频回调接口，v3.16.3.28可用
+     */
+    void setVideoAdListener(VideoAdListener videoAdListener);
+
+    /**
+     * 暂停自渲染信息流广告视频播放，v3.16.3.28可用
+     */
+    void stopVideoPlay();
+
+    /**
+     * 恢复自渲染信息流广告视频自动播放，v3.16.3.28可用
+     */
+    void startVideoPlay();
+
+    /**
+     * 设置自渲染信息流广告音量键显隐，v3.16.3.28可用
+     */
+    void setVolumeVisible(boolean isVisible);
+
+    /**
+     * 打开自渲染信息流广告视频音量（全局），v3.16.3.28可用
+     */
+    void openVideoVolume();
+
+    /**
+     * 关闭自渲染信息流广告视频音量（全局），v3.16.3.28可用
+     */
+    void closeVideoVolume();
 }
 
 // 应用合规信息
@@ -1226,6 +1354,18 @@ public interface AdInteractionListener {
     
     // 广告卡片曝光
     void onAdShow(TapFeedAd ad);
+
+    // 广告卡片单次（第一次）曝光
+    void onDistinctAdShow(TapFeedAd ad);
+}
+
+// 自渲染信息流广告视频回调接口 3.16.3.28 版本开始
+interface VideoAdListener {
+    void onVideoPrepared(TapFeedAd ad);
+    void onVideoStart(TapFeedAd ad);
+    void onVideoPause(TapFeedAd ad);
+    void onVideoVolumeOpen(TapFeedAd ad);
+    void onVideoVolumeClose(TapFeedAd ad);
 }
 
 // 广告包下载进度监听
@@ -1681,6 +1821,7 @@ sign = fmt.Sprintf("%x", sha256.Sum256(trans_id:SecurityKey))
 
 
 ## SDK 常见错误码汇总
+
 |  错误码  |    错误信息  |     原因    |
 |---|--------|-------------|
 |**3001**| 初始化错误  |  SDK 未初始化,或者初始化异常  |

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Tabs from "@theme/Tabs";
 import TabItem from "@theme/TabItem";
 import { BRAND } from "../../constants/env";
@@ -118,8 +118,10 @@ const CONFIGS: {
 };
 
 const MultiLang = ({ children, kind = "default" }) => {
+  
   const values = CONFIGS[kind][BRAND];
   return (
+   
     <Tabs groupId="tap-platform">
       {values.map(({ label, value }, index) => (
         <TabItem value={value} label={label} default={index === 0} key={value}>
