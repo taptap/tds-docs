@@ -255,10 +255,26 @@ sign = HMAC.New(Sha256, "{{server secret}}").Hash(message)
 
 **body:** 请求体，如果请求体为空，则最后一行仅为一个 \n
 
-#### 签算验证示例
+#### 签算示例代码 (Golang 版)
 
-```
-func TestSign(t *testing.T) {
+```go
+package main
+
+import (
+	"bytes"
+	"context"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/base64"
+	"fmt"
+	"io"
+	"net/http"
+	"sort"
+	"strings"
+)
+
+func main() {
+	//nolint:gosec
 	secret := "6n8cdaz6Qq5pYjNaQ88BzWkVvNATeOhY"
 	body := []byte(`{"name":"test"}`)
 	url := "https://example.com/my-service/v1/my-method?client_id=XXX&some_param=123&another=456"
@@ -272,21 +288,62 @@ func TestSign(t *testing.T) {
 		"X-Tap-0":   {"1"},
 		"X-Tap-00":  {"2"},
 		"X-Tap-A00": {"3"},
-
 		// 测试非 X-Tap- 开头的 headers
 		"X-None-Sign-Part":    {"XXX"},
 		"Tap-None-Sign-Part":  {"XXX"},
 		"X-TapNone-Sign-Part": {"XXX"},
 	}
-	req, _ := http.NewRequest(method, url, bytes.NewBuffer(body))
+	ctx := context.Background()
+	req, _ := http.NewRequestWithContext(ctx, method, url, bytes.NewBuffer(body))
 	req.Header = header
 	sign, err := Sign(req, secret)
 	if err != nil {
-		t.Error(err)
-		return
+		panic(err)
 	}
 	req.Header.Set("X-Tap-Sign", sign)
-	t.Log(sign)
+	fmt.Println(sign)
+}
+
+// Sign signs the request.
+func Sign(req *http.Request, secret string) (string, error) {
+	methodPart := req.Method
+	urlPathAndQueryPart := req.URL.RequestURI()
+	headersPart, err := getHeadersPart(req.Header)
+	if err != nil {
+		return "", err
+	}
+	bodyPart, err := io.ReadAll(req.Body)
+	if err != nil {
+		return "", err
+	}
+	signParts := methodPart + "\n" + urlPathAndQueryPart + "\n" + headersPart + "\n" + string(bodyPart) + "\n"
+	fmt.Println(signParts)
+	h := hmac.New(sha256.New, []byte(secret))
+	h.Write([]byte(signParts))
+	rawSign := h.Sum(nil)
+	sign := base64.StdEncoding.EncodeToString(rawSign)
+	return sign, nil
+}
+
+// getHeadersPart returns the headers part of the request.
+func getHeadersPart(header http.Header) (string, error) {
+	var headerKeys []string
+	for k, v := range header {
+		k = strings.ToLower(k)
+		if !strings.HasPrefix(k, "x-tap-") {
+			continue
+		}
+		if len(v) > 1 {
+			return "", fmt.Errorf("invalid header, %q has multiple values", k)
+		}
+		headerKeys = append(headerKeys, k)
+	}
+	sort.Strings(headerKeys)
+	headers := make([]string, 0, len(headerKeys))
+	for _, k := range headerKeys {
+		headers = append(headers, fmt.Sprintf("%s:%s", k, header.Get(k)))
+	}
+	return strings.Join(headers, "\n"), nil
 }
 ```
 
