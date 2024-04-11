@@ -3,6 +3,9 @@ title: Unity 集成指南
 sidebar_position: 1
 ---
 
+
+import MultiLang from "/src/docComponents/MultiLang";
+
 # Unity 集成指南
 
 ## 环境要求
@@ -16,44 +19,48 @@ sidebar_position: 1
 
 ## 获取 SDK
 
-可以通过两种方式添加相关依赖: 1.Package Manager 可视化界面操作, 2.修改 Packages/manifest.json 引入依赖。
-两种方式均可以，任选其中一种进行操作
+以下介绍了**通过 Unity Package Manager 导入**或者**修改 Packages/manifest.json 配置文件引入**两种方式，根据项目需要，任选其一即可:
 
-### 1. Package Manager 可视化界面操作
-#### External Dependency Manager for Unity(EDM4U)
+### 1、通过 Package Manager 可视化界面引入
 
-TapPayment SDK 依赖 EDM4U 来处理 Android 相关的依赖。
+因为 TapPayment SDK 依赖 **EDM4U（External Dependency Manager for Unity）** 来处理 Android 相关的依赖，因此引入依赖的步骤是**先安装 EDM4U 库，然后安装 TapPayment SDK**。
 
-#### 通过 OpenUPM 安装
+#### 安装 EDM4U
+
+下面介绍了两种方式安装 EDM4U，分别是通过 **OpenUPM 安装**以及**手动下载安装**；
+
+- **方法一：通过 OpenUPM 安装 EDM4U**
 
 EDM4U 可以通过 OpenUPM 进行下载，开发者可以通过 **Edit > Project Settings > Package Manager** 来注册使用 OpenUPM。
 
 ![](https://capacity-files.lcfile.com/gpS8BcTVJIdSpMxyDipIWORX4Gb2filA/NdoQbmRRvovet4x3LGUcsTXWnjb.png)
 
-#### 本地安装 UPM 包
+- **方法二：手动下载安装**
 
 开发者可以通过 [Google APIs for Unity](https://developers.google.com/unity/archive#external_dependency_manager_for_unity) 下载 UPM 安装包. 并且通过[从本地磁盘安装](https://docs.unity3d.com/Manual/upm-ui-local.html)的方式进行安装。
 
-#### TapPayment SDK
+#### 安装 TapPayment SDK
 
 TapPayment SDK 可以通过 NPMJS 进行安装, 开发者可以通过 **Edit > Project Settings > Package Manager** 来注册使用 NPMJS。
 
-![](https://capacity-files.lcfile.com/08NEse4Je2VrKBQItQRqFxeVBp9bKK7G/ZLXNblCW8oDEJ9xIyrLcNB2onLd.png)
+![](https://capacity-files.lcfile.com/sJDhXK4vAwAYX7BpQFh1SrQzeUmXk165/taptap.png)
 
 
-配置完成以后就可以在 **Window > Package Manager > My Registries** 中安装 **TapTap Payments Global V2 （1.0.3)**
-如果安装目录中没有 `TapTap Payments Global V2`, 请尝试在 **Edit > Project Settings > Package Manager** 中重新注册NPMJS
-![](https://capacity-files.lcfile.com/k8MtkgoHCnAyfz72nbukYuOaIModYMNV/npmjs.png)
+配置完成以后就可以在 **Window > Package Manager > My Registries** 中安装 **TapTap Payments Global V2 （1.0.4)**
+如果安装目录中没有 `TapTap Payments Global V2`, 请尝试在 **Edit > Project Settings > Package Manager** 中重新注册 NPMJS
 
+![](https://capacity-files.lcfile.com/nD2NS414ej55xxCus8YpbsGRchkmgaUX/tappayment.png)
 
+### 2、修改 Packages/manifest.json 文件
 
-### 2. 修改 Packages/manifest.json 文件
-```
+```cs
 {
   "dependencies": {
-    "com.taptap.tds.payments.global.v2": "1.0.3", //添加 TapPayment 
+    "com.taptap.tds.payments.global.v2": "1.0.4", //添加 TapPayment 
     "com.unity.purchasing": "3.1.0", //TapPayment 所须依赖
     "com.google.external-dependency-manager": "1.2.179", //TapPayment 所须依赖
+    "com.taptap.tds.common":"3.28.3",
+    "com.taptap.tds.login":"3.28.3",
     ...
     ...
   },
@@ -63,9 +70,7 @@ TapPayment SDK 可以通过 NPMJS 进行安装, 开发者可以通过 **Edit > P
     {
       "name": "taptap",
       "url": "https://registry.npmjs.org",
-      "scopes": [
-        "com.taptap"
-      ]
+      "scopes": ["com.tapsdk", "com.taptap", "com.leancloud"]
     },
     {
       "name": "openupm",
@@ -78,9 +83,12 @@ TapPayment SDK 可以通过 NPMJS 进行安装, 开发者可以通过 **Edit > P
 }
 ```
 
-### 3. 处理安卓依赖
+:::tip
+
+**处理安卓依赖失败**
 
 EDM4U 会自动监控 TapPayment SDK 引入的 Android 依赖，但是在某些特殊情况下自动依赖解析可能失败，开发者可以通过 **Assets > External Dependency Manager > Android Resolver > Force Resolve** 来强制依赖解析。在测试之前请确认对于 `com.taptap.android.payment:unity` 的依赖被加到了 mainTemplate.gradle 文件中，如果 EDM4U 没有自动添加这个依赖，开发者也可以通过手动添加的方式处理依赖。
+:::
 
 ## SDK 指南
 
@@ -90,7 +98,7 @@ EDM4U 会自动监控 TapPayment SDK 引入的 Android 依赖，但是在某些�
 
 调用 `UnityServices.InitializeAsync()` 来一次性初始化 Unity Gaming Services。 这个方法会返回一个 `Task` 对象，开发者可以通过这个对象来获取初始化的状态信息。
 
-```
+```cs
 using System;
 using Unity.Services.Core;
 using Unity.Services.Core.Environments;
@@ -121,7 +129,7 @@ public class InitializeUnityServices : MonoBehaviour
 
 确保你在初始化 IAP 的时候添加 `TapPurchasingModule`，并且设置正确的 `clientId` 和 `clientToken`。
 
-```
+```cs
 using UnityEngine;
 using UnityEngine.Purchasing;
 using TapTap.Payments.Global.V2;
@@ -163,6 +171,11 @@ public class MyIAPManager : IStoreListener {
     {
     }
 
+    public void OnInitializeFailed(InitializationFailureReason error, string str)
+    {
+    }
+
+
     /// <summary>
     /// Called when a purchase completes.
     ///
@@ -186,7 +199,7 @@ public class MyIAPManager : IStoreListener {
 
 在 IAP 被成功初始化以后，你可以通过调用 `IStoreController.InitiatePurchase` 来发起内购流程。
 
-```
+```cs
 // Example method called when the user taps a 'buy' button
 // to start the purchase process.
 public void OnPurchaseClicked(string productId) {
