@@ -3,6 +3,9 @@ title: Android 集成指南
 sidebar_position: 2
 ---
 
+import MultiLang from "/src/docComponents/MultiLang";
+import { Conditional } from "/src/docComponents/conditional";
+
 # Android 集成指南
 
 ## **环境要求**
@@ -20,11 +23,11 @@ sidebar_position: 2
 
 打开项目的 project/app/build.gradle 文件，添加 gradle 配置如下：
 
-```
+```java
 // TapPayment dependency
 implementation 'com.taptap.android.payment:sdk:1.0.3'
 ```
-如果项目中有依赖TapSDK的库, 请保持版本大于 3.28.3
+如果项目中有依赖 TapSDK 的库, 请保持 TapSDK 版本为 3.28.3 及以上；
 
 
 ### **SDK 初始化**
@@ -33,11 +36,11 @@ implementation 'com.taptap.android.payment:sdk:1.0.3'
 
 创建 `TapPayment`，请使用 `newBuilder()`。您可以将任何上下文传递给 `newBuilder()`，以供 `TapPayment` 用于获取应用上下文。意味着您不必担心内存泄漏。这里需要设置对应在开发者后台申请的 `ClientID` 和 `ClientToken`，用于校验是否有权限使用 `TapPayment`。
 
-```
+```java
 TapPayment tapPayment = TapPayment.newBuilder(context) // 将会用来获取 ApplicationContext.
-            .setClientId("xxxx") // 必填，开发者中心对应 Client ID
-            .setClientToken("xxxxx") // 必填，开发者中心对应 Client Token
-            .build();
+    .setClientId("xxxx") // 必填，开发者中心对应 Client ID
+    .setClientToken("xxxxx") // 必填，开发者中心对应 Client Token
+    .build();
 ```
 
 ### **展示可供购买的商品**
@@ -46,7 +49,7 @@ TapPayment tapPayment = TapPayment.newBuilder(context) // 将会用来获取 App
 
 查询应用内商品详情，请调用 `queryProductDetailsAsync()`。为了处理该异步操作的结果，您还必须指定实现 ` ProductDetailsResponseListener` 接口的监听器。然后，您可以替换 `onProductDetailsResponse()`，该方法会在查询完成时通知监听器，如以下示例所示：
 
-```
+```java
 List<Product> queryProductList = new ArrayList<>();
 // 支持批量查询 Product, 设置好对应的 ProductID、ProductType
 // ProductType 目前仅支持 ProductType.INAPP
@@ -77,14 +80,14 @@ tapPayment.queryProductDetailsAsync(params, new ProductDetailsResponseListener()
 
 如需从应用发起购买请求，请从应用的主线程调用 `launchBillingFlow()` 方法。此方法接受对 `BillingFlowParams` 对象的引用，该对象包含通过调用 `queryProductDetailsAsync()` 获取的相关 `ProductDetails` 对象。如需创建 `BillingFlowParams` 对象，请使用 `BillingFlowParams.Builder` 类。
 
-```
+```java
 // An activity reference from which the billing flow will be launched.
 Activity activity = ...;
 ProductDetailsParams productDetailsParams =
-        ProductDetailsParams.newBuilder()
-             // retrieve a value for "productDetails" by calling queryProductDetailsAsync()
-            .setProductDetails(productDetails)
-            .build();
+    ProductDetailsParams.newBuilder()
+        // retrieve a value for "productDetails" by calling queryProductDetailsAsync()
+        .setProductDetails(productDetails)
+        .build();
 
 BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
     .setProductDetailsParams(productDetailsParams)
@@ -92,14 +95,13 @@ BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
     .build();
 // Launch the billing flow
 TapPaymentResult result = tapPayment.launchBillingFlow(activity,
-          billingFlowParams,
-
-          new PurchaseUpdatedListener() {
-              @Override
-              public void onPurchaseUpdated(TapPaymentResult result, Purchase purchases) {
-                  // To be implemented in a later section.
-              }
-          }
+    billingFlowParams,
+    new PurchaseUpdatedListener() {
+        @Override
+        public void onPurchaseUpdated(TapPaymentResult result, Purchase purchases) {
+            // To be implemented in a later section.
+        }
+    }
 );
 ```
 
@@ -109,7 +111,7 @@ TapPaymentResult result = tapPayment.launchBillingFlow(activity,
 
 在购买流程中, `TapPayment` 会调用 `onPurchasesUpdated()`，以将购买的订单状态变更实时传给实现 PurchasesUpdatedListener 接口的监听器。您可以在初始化时使用 `setListener()` 方法指定监听器。您必须实现 `onPurchasesUpdated()` 来处理可能的响应代码。以下提供了一个 `onPurchasesUpdated()` 示例 :
 
-```
+```java
 @Override
 public void onPurchaseUpdated(TapPaymentResult result, Purchase purchase) {
     if (result.getResponseCode() == TapPaymentResponseCode.OK
@@ -127,13 +129,13 @@ public void onPurchaseUpdated(TapPaymentResult result, Purchase purchase) {
 
 在用户进行完了任意商品的购买, 请确认为该用户发放对应的商品或者解锁对应的关卡。在确定商品发放之后需要调用 `finishPurchaseAsync` 告知 `TapPayment` 已完成商品的发放。以下是个代码实例：
 
-```
+```java
 Purchase purchase = ...;
 FinishPurchaseParams params = FinishPurchaseParams.newBuilder()
-                  .setId(purchase.getOrderId()) // Required
-                  .setOrderToken(purchase.getOrderToken()) // Required
-                  .setPurchaseToken(purchase.getPurchaseToken()) // Required
-                  .build();
+    .setId(purchase.getOrderId()) // Required
+    .setOrderToken(purchase.getOrderToken()) // Required
+    .setPurchaseToken(purchase.getPurchaseToken()) // Required
+    .build();
 tapPayment.finishPurchaseAsync(params, new FinishPurchaseResponseListener() {
     @Override
     public void onFinishPurchaseResponse(TapPaymentResult result, Purchase purchase) {
@@ -153,7 +155,7 @@ tapPayment.finishPurchaseAsync(params, new FinishPurchaseResponseListener() {
 
 以下示例展示了如何提取用户的未完成订单列表：
 
-```
+```java
 tapPayment.queryUnfinishedPurchaseAsync(new PurchasesResponseListener() {
     @Override
     public void onQueryPurchasesResponse(TapPaymentResult result, List<Purchase> purchases) {
