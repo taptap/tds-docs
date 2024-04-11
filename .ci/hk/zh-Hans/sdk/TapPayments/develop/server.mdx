@@ -11,7 +11,7 @@ sidebar_position: 3
 
 ## 主查服务
 
-Domain: `https://cloud.tapapis.com`
+请求域名: `https://cloud.tapapis.com`
 
 | **Path**                      | **Method** | **描述**             |
 | ----------------------------- | ---------- | -------------------- |
@@ -44,7 +44,7 @@ curl -X GET \
 
 ### 查询未核销的订单列表
 
-查询当前为核销的订单列表，正常情况下在用户支付成功后，应通过 verify 接口核销订单并同时保证对用户发货成功。如果因异常原因没有完成核销，可以通过这个接口查询重新 verify 并完成发货。
+查询当前未核销的订单列表，正常情况下在用户支付成功后，应通过 verify 接口核销订单并同时保证对用户发货成功。如果因异常原因没有完成核销，可以通过此接口查询，重新 verify 并完成发货。
 
 ```
 curl -X GET \
@@ -69,7 +69,7 @@ curl -X GET \
 
 ### 核销订单
 
-当支付成功后，核销订单表示已经确认支付结果并会对买家完成发货，订单状态也会从 `charge.succeeded` 变为 `charge.confirmed`
+当支付成功后，核销订单表示已经确认支付结果并已对买家完成发货，订单状态也会从 `charge.succeeded` 变为 `charge.confirmed`
 
 ```
 curl -X POST \
@@ -106,11 +106,11 @@ curl -X POST \
 
 目前 Webhook 支持监听「充值成功」「退款成功」「退款失败」事件。对于「充值成功」建议采取主动核销订单，根据订单状态完成发货。
 
-游戏需要依次进入 **TapTap 开发者中心 > 你的游戏 > 游戏服务 > TapPayment > 商品与订单 > Webhooks 设置 > 添加**，添加有效的 **充值成功** URL。
+需要依次进入 **TapTap 开发者中心 > 你的游戏 > 游戏服务 > TapPayment > 商品与订单 > Webhooks 设置 > 添加**，添加有效的 **充值成功** URL。
 
 ### Webhook 请求
 
-请求体包含 `event_type` 和 `order` 两个字段域
+请求体包含 `order` 和 `event_type` 两个字段域
 
 ```
 curl -X POST \
@@ -123,6 +123,8 @@ curl -X POST \
 
 ```
 
+`order` 对象结构见 [订单信息](/sdk/TapPayments/develop/server/#订单信息)
+
 `event_type` 事件枚举
 
 | event_type       | 描述     |
@@ -130,8 +132,6 @@ curl -X POST \
 | `charge.succeeded` | 充值成功 |
 | `refund.succeeded` | 退款成功 |
 | `refund.failed`    | 退款失败 |
-
-`order` 对象结构见 [订单信息](/sdk/TapPayments/develop/server/#订单信息)
 
 ### Webhook 响应
 
@@ -146,7 +146,7 @@ curl -X POST \
 
 | **字段** | **类型** | **是否必须** | **描述**                                 |
 | -------- | -------- | ------------ | ---------------------------------------- |
-| code     | string   | Y            | 状态码，`SUCCESS` 为接收成功，`FAIL` 或其他均为失败 |
+| code     | string   | Y            | 状态码，`SUCCESS` 为接收成功，`FAIL` 或其他均认为失败 |
 | msg      | string   | N            | 当接收失败时需返回失败原因                     |
 
 ## 请求规则和签算
@@ -157,13 +157,13 @@ curl -X POST \
 | ----------- | ------------ | ------------------------------------------------------------ |
 | `X-Tap-Sign`  | Y            | 接口签算，详见 [请求签算](/sdk/TapPayments/develop/server/#请求签算) |
 | `X-Tap-Ts`    | Y            | 请求方当前时间 unix timestamp                                |
-| `X-Tap-Nonce` | Y            | 随机数，每次请求此参数不相同需要大于等于 6 字节，小于等于 60 字节 |
+| `X-Tap-Nonce` | Y            | 随机数，需要大于等于 6 字节，小于等于 60 字节，每次请求需重新生成 |
 
 ### 请求 Request
 
 #### 保留参数
 
-所有 HTTP method 必传，需要作为查询参数的一部分
+所有 HTTP METHOD 必传，需要作为查询参数的一部分
 
 | **Key**   | **描述**        |
 | --------- | --------------- |
@@ -221,7 +221,7 @@ curl -X POST \
 | now      | int      | Y            | 服务端时间 (unix timestamp) |
 | success  | bool     | Y            | 响应状态，`true` 为成功       |
 
-异常响应 data 字段描述
+异常响应 `data` 字段描述
 
 | **字段**          | **类型** | **是否必须** | **描述**                                                     |
 | ----------------- | -------- | ------------ |------------------------------------------------------------|
@@ -255,10 +255,26 @@ sign = HMAC.New(Sha256, "{{server secret}}").Hash(message)
 
 **body:** 请求体，如果请求体为空，则最后一行仅为一个 \n
 
-#### 签算验证示例
+#### 签算示例代码 (Golang 版)
 
-```
-func TestSign(t *testing.T) {
+```go
+package main
+
+import (
+	"bytes"
+	"context"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/base64"
+	"fmt"
+	"io"
+	"net/http"
+	"sort"
+	"strings"
+)
+
+func main() {
+	//nolint:gosec
 	secret := "6n8cdaz6Qq5pYjNaQ88BzWkVvNATeOhY"
 	body := []byte(`{"name":"test"}`)
 	url := "https://example.com/my-service/v1/my-method?client_id=XXX&some_param=123&another=456"
@@ -272,21 +288,62 @@ func TestSign(t *testing.T) {
 		"X-Tap-0":   {"1"},
 		"X-Tap-00":  {"2"},
 		"X-Tap-A00": {"3"},
-
 		// 测试非 X-Tap- 开头的 headers
 		"X-None-Sign-Part":    {"XXX"},
 		"Tap-None-Sign-Part":  {"XXX"},
 		"X-TapNone-Sign-Part": {"XXX"},
 	}
-	req, _ := http.NewRequest(method, url, bytes.NewBuffer(body))
+	ctx := context.Background()
+	req, _ := http.NewRequestWithContext(ctx, method, url, bytes.NewBuffer(body))
 	req.Header = header
 	sign, err := Sign(req, secret)
 	if err != nil {
-		t.Error(err)
-		return
+		panic(err)
 	}
 	req.Header.Set("X-Tap-Sign", sign)
-	t.Log(sign)
+	fmt.Println(sign)
+}
+
+// Sign signs the request.
+func Sign(req *http.Request, secret string) (string, error) {
+	methodPart := req.Method
+	urlPathAndQueryPart := req.URL.RequestURI()
+	headersPart, err := getHeadersPart(req.Header)
+	if err != nil {
+		return "", err
+	}
+	bodyPart, err := io.ReadAll(req.Body)
+	if err != nil {
+		return "", err
+	}
+	signParts := methodPart + "\n" + urlPathAndQueryPart + "\n" + headersPart + "\n" + string(bodyPart) + "\n"
+	fmt.Println(signParts)
+	h := hmac.New(sha256.New, []byte(secret))
+	h.Write([]byte(signParts))
+	rawSign := h.Sum(nil)
+	sign := base64.StdEncoding.EncodeToString(rawSign)
+	return sign, nil
+}
+
+// getHeadersPart returns the headers part of the request.
+func getHeadersPart(header http.Header) (string, error) {
+	var headerKeys []string
+	for k, v := range header {
+		k = strings.ToLower(k)
+		if !strings.HasPrefix(k, "x-tap-") {
+			continue
+		}
+		if len(v) > 1 {
+			return "", fmt.Errorf("invalid header, %q has multiple values", k)
+		}
+		headerKeys = append(headerKeys, k)
+	}
+	sort.Strings(headerKeys)
+	headers := make([]string, 0, len(headerKeys))
+	for _, k := range headerKeys {
+		headers = append(headers, fmt.Sprintf("%s:%s", k, header.Get(k)))
+	}
+	return strings.Join(headers, "\n"), nil
 }
 ```
 
@@ -322,7 +379,7 @@ Z9i6Az32ZpDzAvPhHX22+KCNoBW0CishEAXDiVxfA18=
 | user_region    | string   | Y            | [用户地区](/sdk/TapPayments/appendix/regions-currencies) |
 | goods_open_id  | string   | Y            | 商品唯一 ID                                                  |
 | goods_name     | string   | Y            | 商品名称                                                     |
-| status         | string   | Y            | 订单状态                                                     |
+| status         | string   | Y            | [订单状态](/sdk/TapPayments/develop/server/#订单状态)          |
 | amount         | string   | Y            | 金额（本币金额 x 1,000,000）                                 |
 | currency       | string   | Y            | [币种](/sdk/TapPayments/appendix/regions-currencies) |
 | create_time    | string   | Y            | 创建时间                                                     |
