@@ -152,46 +152,81 @@ MAC Token 包含以下字段：
 <Conditional region='cn'>
 
 ```javascript
+const http = require('http');
+const https = require('https');
 const crypto = require('crypto');
-const urllib = require('urllib');
-var format = require('string-format');
-const utils = require('./utils');
-/**
-TapSDK 登录后信息获取
-**/
-var kid = "1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ";
-var mac_key = "mSUQNYUGRBPXyRyW";
-var nonce = crypto.randomBytes(16).toString('base64');
-var client_id = "0RiAlMny7jiz086FaU";
+
+function getAuthorization(requestUrl, method, keyId, macKey) {
+    const url = new URL(requestUrl);
+    const time = Math.floor(Date.now() / 1000).toString().padStart(10, '0');
+    const randomStr = getRandomString(16);
+    const host = url.hostname;
+    const uri = url.pathname + url.search;
+    const port = url.port || (url.protocol === 'https:' ? '443' : '80');
+    const other = '';
+    const sign = signData(mergeData(time, randomStr, method, uri, host, port, other), macKey);
+
+    return `MAC id="${keyId}", ts="${time}", nonce="${randomStr}", mac="${sign}"`;
+}
+
+function getRandomString(length) {
+    return crypto.randomBytes(length).toString('base64');
+}
+
+function mergeData(time, randomCode, httpType, uri, domain, port, other) {
+    let prefix =
+        `${time}\n${randomCode}\n${httpType}\n${uri}\n${domain}\n${port}\n`;
+
+    if (!other) {
+        prefix += '\n';
+    } else {
+        prefix += `${other}\n`;
+    }
+
+    return prefix;
+}
+
+function signData(signatureBaseString, key) {
+    const hmac = crypto.createHmac('sha1', key);
+    hmac.update(signatureBaseString);
+    return hmac.digest('base64');
+}
+
+const client_id = "hskcocvse6x1cgkklm";
+const keyId = "1/VLDoiGUhNCIpUq827Lu4zg0Cuqz8mRzAJ-i8hT_w9vuPtPgdaPkWDv6K4eVe_yZnKzDA8eDIA83FEYep-T4ki5w3kyYACVnM61JJqDEKfpNnHoTZUPVY95U8j_8lyYxMPWiUArkgPsWEwOpZGxva7FnqbTwmpLT0a28UtiR5gyr4XXutbnE5tb4A-iSqRpqqtgABXBZd34U5Th3iJ1C666iYQFvuQL9uC-Zv7-xKCNjyPonBqU4ZWZnKLFf2mzprU5vJCA8q5by1SZxY63kZBQieHYxFjyOCQdJ-25gDlxiqDbNq08kmSdY6TB1qtQ68V37L6a8nIzyVHooX9uc2Yw";
+const macKey = 'VPDalRmxtBqwKiW9NTrrblK3z81dtH937GNKIvj3';
+const requestUrl = 'https://open.tapapis.cn/account/profile/v1?client_id='+ client_id ;
+const method = 'GET';
 
 
-var ts = Math.ceil(Date.now() / 1000);
-var ext = "";
-var signArray = [ts, nonce, 'GET', '/account/profile/v1?client_id=' + client_id, 'open.tapapis.cn', 443, ext];
+const authorization = getAuthorization(requestUrl, method, keyId, macKey);
+console.log(authorization);
 
-var mac = utils.hmacSha1(signArray.join("\n")+"\n", mac_key);
-var auth = format('MAC id={id},ts={ts},nonce={nonce},mac={mac}', {
-  id: '\"'+kid+'\"',
-  ts: '\"'+ts+'\"',
-  nonce: '\"'+nonce+'\"',
-  mac: '\"'+mac+'\"'
+const options = new URL(requestUrl);
+const client = options.protocol === 'https:' ? https : http;
+
+const req = client.request({
+    hostname: options.hostname,
+    port: options.port,
+    path: options.pathname + options.search,
+    method: 'GET',
+    headers: {
+        'Authorization': authorization
+    }
+}, (res) => {
+    let data = '';
+
+    res.on('data', (chunk) => {
+        data += chunk;
+    });
+
+    res.on('end', () => {
+        console.log(data);
+    });
 });
 
-var headers = {
-  Authorization: auth
-}
+req.end();
 
-var reqData = {
-  method: "GET",
-  headers: headers
-}
-
-urllib.request("https://open.tapapis.cn/account/profile/v1?client_id=" + client_id, reqData,
-  (err, data, response) => {
-    if(!err){
-      console.log("返回数据：" + data.toString());
-    }
-  });
 
 ```
 
@@ -245,6 +280,7 @@ urllib.request("https://openapi.tap.io/account/profile/v1?client_id=" + client_i
 
 </Conditional>
 
+<Conditional region='global'>
 
 ```javascript
 //utils
@@ -265,6 +301,9 @@ exports.hmacSha1 = function (encodedFlags, secretKey) {
     return hmac.digest('base64');
 };
 ```
+
+</Conditional>
+
 
 </details>
 
