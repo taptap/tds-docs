@@ -133,7 +133,6 @@ curl -X POST \
 | `refund.succeeded` | 退款成功 |
 | `refund.failed`    | 退款失败 |
 
-
 ### Webhook 响应
 
 ```
@@ -159,6 +158,7 @@ curl -X POST \
 | `X-Tap-Sign`  | Y            | 接口签算，详见 [请求签算](/sdk/TapPayments/develop/server/#请求签算) |
 | `X-Tap-Ts`    | Y            | 请求方当前时间 unix timestamp                                |
 | `X-Tap-Nonce` | Y            | 随机数，需要大于等于 6 字节，小于等于 60 字节，每次请求需重新生成 |
+| `X-Tap-*` | N           | 后续扩展以 `X-Tap-` 为前缀的请求头信息|
 
 ### 请求 Request
 
@@ -252,7 +252,7 @@ sign = HMAC.New(Sha256, "{{server secret}}").Hash(message)
 
 **url_path_and_query:** 完整请求路径及参数，如 /service/v1/method?client_id=XXX&some_param=123
 
-**headers:** 为 X-Tap- 前缀 headers 组合，将 keys 按 ASCII-code order 排序后以换行符 \n 为分隔符拼接。如 {key1}:{value1}\n{key2}:{value2}\n{key3}:{value3}。**为避免不同网络框架导致 keys 的排序结果不一致，签算时需要执行 key 转小写操作 key = tolower(key)**
+**headers:** 所有 `X-Tap-` 前缀的 headers 组合，将 keys 按 ASCII-code order 排序后以换行符 \n 为分隔符拼接。如 {key1}:{value1}\n{key2}:{value2}\n{key3}:{value3}。**为避免不同网络框架导致 keys 的排序结果不一致，签算时需要执行 key 转小写操作 key = tolower(key)**
 
 **body:** 请求体，如果请求体为空，则最后一行仅为一个 \n
 
@@ -285,6 +285,7 @@ func main() {
 		"Authorization": {"Bearer ourSenEFQhvkC4Mww6uk8fs0d28eFrvzaH59ORp1"},
 		"X-Tap-Ts":      {"1711296000"},
 		"X-Tap-Nonce":   {"XphYC2P1cl"},
+		"X-Tap-Sign":    {"Z9i6Az32ZpDzAvPhHX22+KCNoBW0CishEAXDiVxfA18="},
 		// 测试 headers 排序
 		"X-Tap-0":   {"1"},
 		"X-Tap-00":  {"2"},
@@ -334,6 +335,9 @@ func getHeadersPart(header http.Header) (string, error) {
 		if !strings.HasPrefix(k, "x-tap-") {
 			continue
 		}
+		if k == "x-tap-sign" {
+			continue
+		}
 		if len(v) > 1 {
 			return "", fmt.Errorf("invalid header, %q has multiple values", k)
 		}
@@ -346,12 +350,12 @@ func getHeadersPart(header http.Header) (string, error) {
 	}
 	return strings.Join(headers, "\n"), nil
 }
-
 ```
 
-参与签算部分
+上述示例签算结果
 
 ```
+# 参与签算部分
 POST\n
 /my-service/v1/my-method?client_id=XXX&some_param=123&another=456\n
 x-tap-0:1\n
@@ -360,11 +364,8 @@ x-tap-a00:3\n
 x-tap-nonce:XphYC2P1cl\n
 x-tap-ts:1711296000\n
 {"name":"test"}\n
-```
 
-签算结果（`X-Tap-Sign` 的值）
-
-```
+# 签算结果 (X-Tap-Sign)
 Z9i6Az32ZpDzAvPhHX22+KCNoBW0CishEAXDiVxfA18=
 ```
 
