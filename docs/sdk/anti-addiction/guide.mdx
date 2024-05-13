@@ -460,11 +460,12 @@ void UAntiAddictionWidget::OnCallBack(AntiAddictionUE::ResultHandlerCode Code, c
 | 回调 code | 回调类型 | 触发逻辑 |
 |---|---|---|
 | 500 | `LOGIN_SUCCESS` | 玩家未受到限制，游戏正常进入 |
-| 1000 | `EXITED` | 退出防沉迷认证及检查，当开发者调用 Exit 接口时触发 |
+| 1000 | `EXITED` | 退出防沉迷认证及检查，当开发者调用 Exit 接口时或用户认证信息无效时触发，游戏应返回到登录页 |
 | 1001 | `SWITCH_ACCOUNT` | 用户点击切换账号，游戏应返回到登录页 |
 | 1030 | `PERIOD_RESTRICT` | 用户当前时间无法进行游戏，此时用户只能退出游戏或切换账号 |
 | 1050 | `DURATION_LIMIT` | 用户无可玩时长，此时用户只能退出游戏或切换账号 |
-| 1100 | `AGE_LIMIT` | 当前用户因年龄限制无法进入游戏，当 SDK 执行实名状态拦截器内方法返回 false 时触发
+| 1100 | `AGE_LIMIT` | 当前用户因触发应用设置的年龄限制无法进入游戏 |
+| 1200 | `INVALID_CLIENT_OR_NETWORK_ERROR` | 数据请求失败，游戏需检查当前设置的应用信息是否正确及判断当前网络连接是否正常
 | 9002 | `REAL_NAME_STOP` | 实名过程中点击了关闭实名窗，游戏可重新开始防沉迷认证 |
 
 ### 初始化
@@ -483,7 +484,7 @@ void UAntiAddictionWidget::OnCallBack(AntiAddictionUE::ResultHandlerCode Code, c
 TapAntiAddictionConfig config = new TapAntiAddictionConfig()
 {
     showSwitchAccount = false,      // 是否显示切换账号按钮
-    needAgeRange = true
+    useAgeRange = true
 };      
 var config = new TapConfig.Builder()
         .ClientID(clientId)
@@ -502,9 +503,8 @@ AntiAddictionUIKit.SetAntiAddictionCallback(callback);
 
 ```java
 
-// TapAntiAddicitonConfig 构造方法中参数为是否显示切换账号
-TapAntiAddictionConfig tapAntiAddictionConfig = new TapAntiAddictionConfig(true);
-tapAntiAddictionConfig.setNeedAgeRange(true);
+// TapAntiAddicitonConfig 构造方法中参数为是否显示切换账号,是否使用年龄段
+TapAntiAddictionConfig tapAntiAddictionConfig = new TapAntiAddictionConfig(true,true);
 
 TapConfig tapConfig = new TapConfig.Builder()
         .withAppContext(activity)
@@ -529,7 +529,7 @@ AntiAddictionUIKit.setAntiAddictionCallback(callback);
  config.serverURL = @"https://your_server_url";
  config.tapAntiAddictionConfig = [[TapAntiAddictionConfig alloc] init];
  config.tapAntiAddictionConfig.showSwitchAccount = true;
- config.tapAntiAddictionConfig.needAgeRange = true;
+ config.tapAntiAddictionConfig.useAgeRange = true;
  [TapBootstrap initWithConfig:config];
  //设置回调， callback 为开发者实现的自定义防沉迷回调对象
  [AntiAddiction setDelegate:delegate];
@@ -546,7 +546,7 @@ Config.ClientToken = ETB_Init_ClientToken->GetText().ToString();
 Config.ServerURL = ETB_Init_ServerURL->GetText().ToString();
 Config.TapAntiAddictionConfig = MakeShared<FTapAntiAddictionConfig>();
 Config.TapAntiAddictionConfig->bShowSwitchAccount = true;
-Config.TapAntiAddictionConfig->bNeedAgeRange = true;
+Config.TapAntiAddictionConfig->bUseAgeRange = true;
 FTapBootstrap::Init(Config);
 // 绑定开发者实现的自定义防沉迷回调对象 AntiAddictionUE::OnCallBack 
 AntiAddictionUE::OnCallBack.BindUObject(this, &UAntiAddictionWidget::OnCallBack);
@@ -567,7 +567,7 @@ TapAntiAddictionConfig 为防沉迷模块使用的配置，其参数如下：
 
  - `showSwitchAccount` 是否显示切换账号按钮。如果游戏不支持切换账号功能，应设置为 false；如果游戏支持则设置为 true，当玩家点击切换账按钮后，SDK 会触发 `1001` 回调，游戏可根据这个回调 code 做相应处理。
 
- - `needAgeRange` 游戏是否需要获取真实年龄段信息，当设置为 true 时，使用 Tap 实名时会需要用户主动授权，当设置为 false 时，使用 Tap 实名时会进行无 UI 交互的静默授权，未设置时默认为 true
+ - `useAgeRange` 游戏是否需要获取真实年龄段信息，当设置为 true 时，使用 Tap 实名时会需要用户主动授权，当设置为 false 时，使用 Tap 实名时会进行无 UI 交互的静默授权，未设置时默认为 true
   
 
 
@@ -617,6 +617,7 @@ AntiAddictionConfig config = new AntiAddictionConfig()
 {
     gameId = "your_client_id",      // TapTap 开发者中心对应 Client ID
     showSwitchAccount = false,      // 是否显示切换账号按钮
+    useAgeRange = true 		//是否使用年龄段信息
 };         
 //设置配置及回调，callback 为开发者实现的自定义防沉迷回调对象
 AntiAddictionUIKit.Init(config, callback);
@@ -633,6 +634,7 @@ TapTap.AntiAddiction.TapTapAntiAddictionManager.AntiAddictionConfig.gameId = "yo
 Config config = new Config.Builder()
   .withClientId("your_client_id") // TapTap 开发者中心对应 Client ID
   .showSwitchAccount(false)       // 是否显示切换账号按钮
+  .useAgeRange(true)  //是否使用年龄段信息
   .build();
 //设置配置及回调， callback 为开发者实现的自定义防沉迷回调对象
 AntiAddictionUIKit.init(activity, config, callback);
@@ -645,6 +647,7 @@ AntiAddictionUIKit.init(activity, config, callback);
 AntiAddictionConfig *config = [[AntiAddictionConfig alloc] init];
 config.clientID = @"your_client_id";  // TapTap 开发者中心对应 Client ID
 config.showSwitchAccount = YES;
+config.useAgeRange = YES; //是否使用年龄段信息
 //设置配置与回调， delegate 为开发者实现的自定义防沉迷回调对象
 [AntiAddiction initWithConfig:config delegate:delegate];
 ```
@@ -656,6 +659,7 @@ config.showSwitchAccount = YES;
 FAAUConfig Config;
 Config.ClientID = TEXT("your_client_id"); // TapTap 开发者中心对应 Client ID
 Config.ShowSwitchAccount = false;
+Config.UseAgeRange = true; //是否使用年龄段信息
 AntiAddictionUE::Init(Config);
 // 绑定 开发者实现的自定义防沉迷回调对象 AntiAddictionUE::OnCallBack 
 AntiAddictionUE::OnCallBack.BindUObject(this, &UAntiAddictionWidget::OnCallBack);
@@ -675,8 +679,7 @@ AntiAddictionUE::OnCallBack.BindUObject(this, &UAntiAddictionWidget::OnCallBack)
 - `config` 是防沉迷功能的配置，包括如下参数：
   - `gameId` 游戏的 `Client ID`，可以在控制台查看（**开发者中心 > 你的游戏 > 游戏服务 > 应用配置**）。
   - `showSwitchAccount` 是否显示切换账号按钮。如果游戏不支持切换账号功能，应设置为 false；如果支持则设置为 true，当玩家点击切换账按钮(如下图所示）后，SDK 会触发 `1001` 回调，游戏可根据这个回调 code 做相应处理。
-  - `needAgeRange` 游戏是否需要获取真实年龄段信息，当设置为 true 时，使用 Tap 实名时会需要用户主动授权，当设置为 false 时，使用 Tap 实名时会进行无 UI 交互的静默授权，未设置时默认为 true
-  
+  - `useAgeRange` 游戏是否需要获取真实年龄段信息，当设置为 true 时，使用 Tap 实名时会需要用户主动授权，当设置为 false 时，在移动端使用 Tap 实名时会进行无 UI 交互的静默授权，未设置时默认为 true  
 - `callback` 开发者实现的自定义防沉迷回调对象
 
 
@@ -689,7 +692,7 @@ AntiAddictionUE::OnCallBack.BindUObject(this, &UAntiAddictionWidget::OnCallBack)
 - `config` 是防沉迷功能的配置，包括如下参数：
   - `clientID` 游戏的 `Client ID`，可以在控制台查看（**开发者中心 > 你的游戏 > 游戏服务 > 应用配置**）。
   - `showSwitchAccount` 是否显示切换账号按钮。如果游戏不支持切换账号功能，应设置为 false；如果支持则设置为 true，当玩家点击切换账按钮(如下图所示）后，SDK 会触发 `1001` 回调，游戏可根据这个回调 code 做相应处理。
-  -  `needAgeRange` 游戏是否需要获取真实年龄段信息，当设置为 true 时，使用 Tap 实名时会需要用户主动授权，当设置为 false 时，使用 Tap 实名时会进行无 UI 交互的静默授权，未设置时默认为 true
+  -  `useAgeRange` 游戏是否需要获取真实年龄段信息，当设置为 true 时，使用 Tap 实名时会需要用户主动授权，当设置为 false 时，使用 Tap 实名时会进行无 UI 交互的静默授权，未设置时默认为 true
   
 - `callback` 开发者实现的自定义防沉迷回调对象
 
@@ -701,7 +704,7 @@ AntiAddictionUE::OnCallBack.BindUObject(this, &UAntiAddictionWidget::OnCallBack)
 - `config` 是防沉迷功能的配置，包括如下参数：
   - `clientID` 游戏的 `Client ID`，可以在控制台查看（**开发者中心 > 你的游戏 > 游戏服务 > 应用配置**）。
   - `showSwitchAccount` 是否显示切换账号按钮。如果游戏不支持切换账号功能，应设置为 false；如果支持则设置为 true，当玩家点击切换账按钮(如下图所示）后，SDK 会触发 `1001` 回调，游戏可根据这个回调 code 做相应处理。
-  -  `needAgeRange` 游戏是否需要获取真实年龄段信息，当设置为 true 时，使用 Tap 实名时会需要用户主动授权，当设置为 false 时，使用 Tap 实名时会进行无 UI 交互的静默授权，未设置时默认为 true
+  -  `useAgeRange` 游戏是否需要获取真实年龄段信息，当设置为 true 时，使用 Tap 实名时会需要用户主动授权，当设置为 false 时，使用 Tap 实名时会进行无 UI 交互的静默授权，未设置时默认为 true
   
 - `delegate` 开发者实现的自定义防沉迷回调对象
 
@@ -713,7 +716,7 @@ AntiAddictionUE::OnCallBack.BindUObject(this, &UAntiAddictionWidget::OnCallBack)
   - `ClientID` 游戏的 `Client ID`，可以在控制台查看（**开发者中心 > 你的游戏 > 游戏服务 > 应用配置**）。
 
   - `ShowSwitchAccount` 是否显示切换账号按钮。如果游戏不支持切换账号功能，应设置为 false；如果支持则设置为 true，当玩家点击切换账按钮(如下图所示）后，SDK 会触发 `1001` 回调，游戏可根据这个回调 code 做相应处理。
-  -  `needAgeRange` 游戏是否需要获取真实年龄段信息，当设置为 true 时，使用 Tap 实名时会需要用户主动授权，当设置为 false 时，使用 Tap 实名时会进行无 UI 交互的静默授权，未设置时默认为 true
+  -  `UseAgeRange` 游戏是否需要获取真实年龄段信息，当设置为 true 时，使用 Tap 实名时会需要用户主动授权，当设置为 false 时，在移动端使用 Tap 实名时会进行无 UI 交互的静默授权，未设置时默认为 true
 
 
 </>
@@ -993,7 +996,7 @@ int RemainingTimeInMinutes = AntiAddictionUE::GetRemainingTimeInMinutes();    //
 
 ### 设置适龄限制
 
-当除了需要满足防沉迷政策外，应用需要对用户年龄有额外限制，例如只允许 16 周岁以上使用时，开发者可在 DC 页面配置对应的年龄限制Hi，SDK 将在用户完成实名后 且 根据时长限制规则显示 UI 前 检查用户是否符合游戏要求，满足要求时，SDK 会继续进行后续时长业务及回调处理，否则会直接返回 code 为 `1100` 的年龄限制回调通知开发者。
+当除了需要满足防沉迷政策外，应用需要对用户年龄有额外限制时，例如只允许 16 周岁以上使用，开发者可在 开发者中心页面配置对应的年龄限制，SDK 将在用户完成实名后 且 根据时长限制规则显示 UI 前检查用户是否符合游戏要求，满足要求时，SDK 会继续进行后续时长业务及回调处理，否则会直接返回 code 为 `1100` 的年龄限制回调通知开发者。
 
 
 ### 测试模式设置
