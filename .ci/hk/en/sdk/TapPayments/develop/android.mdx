@@ -9,7 +9,7 @@ import { Conditional } from "/src/docComponents/conditional";
 
 ## **环境要求**
 
-- Gradle 版本高于 5.6.4，Android AGP 插件版本高于 3.6.0
+- Gradle 版本不低于 6.1.1，Android AGP 插件版本不低于 4.0.1;
 
 ## **准备**
 
@@ -24,7 +24,7 @@ import { Conditional } from "/src/docComponents/conditional";
 
 ```java
 // TapPayment dependency
-implementation 'com.taptap.android.payment:sdk:1.0.9'
+implementation 'com.taptap.android.payment:sdk:4.0.1'
 ```
 
 :::tip
@@ -34,8 +34,8 @@ implementation 'com.taptap.android.payment:sdk:1.0.9'
 当项目中有引入 `TapCommon_X.XX.X.aar` 和 `TapLogin_X.XX.X.aar` 的离线包时，请删除本地引入的这两个包，然后**改成 Gradle 方式依赖**，打开项目的 `project/app/build.gradle` 文件，添加 gradle 配置如下：
 
 ```java
-implementation("com.taptap.android:login:3.29.0@aar")
-implementation("com.taptap.android:common:3.29.0@aar")
+implementation("com.taptap.android:login:3.28.3@aar")
+implementation("com.taptap.android:common:3.28.3@aar")
 ```
 :::
 
@@ -47,10 +47,20 @@ implementation("com.taptap.android:common:3.29.0@aar")
 创建 `TapPayment`，请使用 `newBuilder()`。您可以将任何上下文传递给 `newBuilder()`，以供 `TapPayment` 用于获取应用上下文。意味着您不必担心内存泄漏。这里需要设置对应在开发者后台申请的 `ClientID` 和 `ClientToken`，用于校验是否有权限使用 `TapPayment`。
 
 ```java
-TapPayment tapPayment = TapPayment.newBuilder(context) // 将会用来获取 ApplicationContext.
-    .setClientId("xxxx") // 必填，开发者中心对应 Client ID
-    .setClientToken("xxxxx") // 必填，开发者中心对应 Client Token
-    .build();
+TapTapSdkOptions sdkOptions = new TapTapSdkOptions(
+    "应用的 ClientID",
+    "应用的 ClientToken",
+    TapTapRegion.GLOBAL,
+    "",
+    "",
+    false,
+    false,
+    null,
+    null,
+    false
+);
+
+TapTapSdk.init(this, sdkOptions);
 ```
 
 ### **展示可供购买的商品**
