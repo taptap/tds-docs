@@ -44,11 +44,13 @@ implementation("com.taptap.android:common:3.28.3@aar")
 
 添加 TapPayment 的依赖项后，您需要初始化 `TapPayment` 实例。`TapPayment` 是 SDK 与应用的其余部分之间进行通信。`TapPayment` 为许多常见的操作提供了方法。
 
-创建 `TapPayment`，请使用 `newBuilder()`。您可以将任何上下文传递给 `newBuilder()`，以供 `TapPayment` 用于获取应用上下文。意味着您不必担心内存泄漏。这里需要设置对应在开发者后台申请的 `ClientID` 和 `ClientToken`，用于校验是否有权限使用 `TapPayment`。
+首先 在应用启动时需要进行 SDK 初始化, 通过设置 `TapTapSdkOptions`, 完成 SDK 初始化, `TapTapSdk.init` 。
+
+这里需要设置对应在开发者后台申请的 `ClientID` 和 `ClientToken`，用于校验是否有权限使用 `TapPayment`。
 
 ```java
 TapTapSdkOptions sdkOptions = new TapTapSdkOptions(
-    "应用的 ClientID",   // clientId 开发者平台申请
+    "应用的 ClientID",         // clientId 开发者平台申请
     "应用的 ClientToken",       // clientToken 开发者平台申请
     TapTapRegion.GLOBAL,       // 地区
     "",                         // 分包渠道名称
@@ -60,8 +62,17 @@ TapTapSdkOptions sdkOptions = new TapTapSdkOptions(
     false                       // 是否开启 log，建议 Debug 开启，Release 关闭
 );
 
-TapTapSdk.init(this, sdkOptions);
+TapTapSdk.init(context, sdkOptions);
 ```
+
+创建 `TapPayment`，请使用 `newBuilder()`。您可以将任何上下文传递给 `newBuilder()`，以供 `TapPayment` 用于获取应用上下文。意味着您不必担心内存泄漏。这里需要设置对应在开发者后台申请的 `ClientID` 和 `ClientToken`，用于校验是否有权限使用 `TapPayment`。
+
+```java
+ TapPayment tapPayment = TapPayment.newBuilder(context) // 将会用来获取 ApplicationContext.
+     .setClientId("xxxx") // 必填，开发者中心对应 Client ID
+     .setClientToken("xxxxx") // 必填，开发者中心对应 Client Token
+     .build();
+ ```
 
 ### **展示可供购买的商品**
 
