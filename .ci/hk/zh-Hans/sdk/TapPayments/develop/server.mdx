@@ -3,6 +3,8 @@ title: 服务端开发指南
 sidebar_position: 3
 ---
 
+import MultiLang from "/src/docComponents/MultiLang";
+
 # 服务端开发指南
 
 :::tip
@@ -106,7 +108,8 @@ curl -X POST \
 
 目前 Webhook 支持监听「充值成功」「退款成功」「退款失败」事件。对于「充值成功」建议采取主动核销订单，根据订单状态完成发货。
 
-需要依次进入 **TapTap 开发者中心 > 你的游戏 > 游戏服务 > TapPayment > 商品与订单 > Webhooks 设置 > 添加**，添加有效的 **充值成功** URL。
+1. 需要依次进入 **TapTap 开发者中心 > 你的游戏 > 游戏服务 > TapPayment > 商品与订单 > API 密钥**，检查是否有已生效的秘钥，没有则需要 **添加新的秘钥**
+2. 需要依次进入 **TapTap 开发者中心 > 你的游戏 > 游戏服务 > TapPayment > 商品与订单 > Webhooks 设置 > 添加**，添加有效的 **充值成功** URL。
 
 ### Webhook 请求
 
@@ -233,11 +236,11 @@ curl -X POST \
 
 ### 请求签算
 
-签算采用 HMAC-SHA256 算法，将 server secret 作为密钥，密钥可在 **开发者中心 > 你的游戏 > 游戏服务 > 应用配置** 查看。
+签算采用 HMAC-SHA256 算法，将 **Server Secret** 作为密钥，密钥可在 **开发者中心 > 你的游戏 > 游戏服务 > 应用配置** 查看。
 
 #### 签算说明
 
-sign = HMAC.New(Sha256, "{{server secret}}").Hash(message)
+sign = HMAC.New(Sha256, "{{Server Secret}}").Hash(message)
 
 以下为 `message` 组成
 
@@ -256,101 +259,337 @@ sign = HMAC.New(Sha256, "{{server secret}}").Hash(message)
 
 **body:** 请求体，如果请求体为空，则最后一行仅为一个 \n
 
-#### 签算示例代码 (Golang 版)
+
+<MultiLang kind="payment">
+
+<>
+
+```java
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpClient;
+import java.net.http.HttpResponse;
+import java.util.*;
+import java.util.stream.Collectors;
+public class SignatureExample {
+
+    public static String signRequest(String method, URI uri, String body, Map<String, List<String>> headers, String secret) throws Exception {
+        String urlPathAndQueryPart = uri.getRawPath() + (uri.getRawQuery() != null ? "?" + uri.getRawQuery() : "");
+        String headersPart = getHeadersPart(headers);
+
+        // 包含请求体的签名字符串部分
+        String signParts = method.toUpperCase() + "\n" + urlPathAndQueryPart + "\n" + headersPart + "\n" + body + "\n";
+
+        System.out.println("Sign Parts:\n" + signParts);
+
+        Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
+        SecretKeySpec secretKey = new SecretKeySpec(secret.getBytes(), "HmacSHA256");
+        sha256_HMAC.init(secretKey);
+
+        byte[] hash = sha256_HMAC.doFinal(signParts.getBytes());
+        return Base64.getEncoder().encodeToString(hash);
+    }
+
+    private static String getHeadersPart(Map<String, List<String>> headers) throws Exception {
+        TreeMap<String, String> sortedHeaders = new TreeMap<>();
+        headers.forEach((key, value) -> {
+            String lowerKey = key.toLowerCase();
+            if (lowerKey.equals("x-tap-sign")) {
+                return;
+            }
+            if (lowerKey.startsWith("x-tap-")) {
+                if (value.size() > 1) {
+                    throw new RuntimeException("Invalid header, " + lowerKey + " has multiple values");
+                }
+                sortedHeaders.put(lowerKey, value.get(0));
+            }
+        });
+
+        return sortedHeaders.entrySet().stream()
+            .map(entry -> entry.getKey() + ":" + entry.getValue())
+            .collect(Collectors.joining("\n"));
+    }
+
+    public static void main(String[] args) {
+        try {
+            String secret = "6n8cdaz6Qq5pYjNaQ88BzWkVvNATeOhY";
+            String body = "{\"name\":\"test\"}";
+            URI uri = new URI("https://example.com/my-service/v1/my-method?client_id=XXX&some_param=123&another=456");
+
+            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+                .uri(uri)
+                .header("Content-Type", "application/json")
+                .header("Authorization", "Bearer ourSenEFQhvkC4Mww6uk8fs0d28eFrvzaH59ORp1")
+                .header("X-Tap-Ts", "1711296000")
+                .header("X-Tap-Nonce", "XphYC2P1cl")
+                .header("X-Tap-Sign", "Z9i6Az32ZpDzAvPhHX22+KCNoBW0CishEAXDiVxfA18=")
+                .header("X-Tap-0", "1")
+                .header("X-Tap-00", "2")
+                .header("X-Tap-A00", "3");
+
+            // Considering body to be added for a POST request
+            HttpRequest request = requestBuilder
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build();
+
+            String method = "POST";  // Since we are using the POST method in this example
+            String signature = signRequest(method, uri, body, request.headers().map(), secret);
+            System.out.println("Signature: " + signature);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+</>
+<>
 
 ```go
 package main
 
 import (
-	"bytes"
-	"context"
-	"crypto/hmac"
-	"crypto/sha256"
-	"encoding/base64"
-	"fmt"
-	"io"
-	"net/http"
-	"sort"
-	"strings"
+    "bytes"
+    "context"
+    "crypto/hmac"
+    "crypto/sha256"
+    "encoding/base64"
+    "fmt"
+    "io"
+    "net/http"
+    "sort"
+    "strings"
 )
 
 func main() {
-	//nolint:gosec
-	secret := "6n8cdaz6Qq5pYjNaQ88BzWkVvNATeOhY"
-	body := []byte(`{"name":"test"}`)
-	url := "https://example.com/my-service/v1/my-method?client_id=XXX&some_param=123&another=456"
-	method := "POST"
-	header := http.Header{
-		"Content-Type":  {"application/json"},
-		"Authorization": {"Bearer ourSenEFQhvkC4Mww6uk8fs0d28eFrvzaH59ORp1"},
-		"X-Tap-Ts":      {"1711296000"},
-		"X-Tap-Nonce":   {"XphYC2P1cl"},
-		"X-Tap-Sign":    {"Z9i6Az32ZpDzAvPhHX22+KCNoBW0CishEAXDiVxfA18="},
-		// 测试 headers 排序
-		"X-Tap-0":   {"1"},
-		"X-Tap-00":  {"2"},
-		"X-Tap-A00": {"3"},
-		// 测试非 X-Tap- 开头的 headers
-		"X-None-Sign-Part":    {"XXX"},
-		"Tap-None-Sign-Part":  {"XXX"},
-		"X-TapNone-Sign-Part": {"XXX"},
-	}
-	ctx := context.Background()
-	req, _ := http.NewRequestWithContext(ctx, method, url, bytes.NewBuffer(body))
-	req.Header = header
-	sign, err := Sign(req, secret)
-	if err != nil {
-		panic(err)
-	}
-	req.Header.Set("X-Tap-Sign", sign)
-	fmt.Println(sign)
+    //nolint:gosec
+    secret := "6n8cdaz6Qq5pYjNaQ88BzWkVvNATeOhY"
+    body := []byte(`{"name":"test"}`)
+    url := "https://example.com/my-service/v1/my-method?client_id=XXX&some_param=123&another=456"
+    method := "POST"
+    header := http.Header{
+        "Content-Type":  {"application/json"},
+        "Authorization": {"Bearer ourSenEFQhvkC4Mww6uk8fs0d28eFrvzaH59ORp1"},
+        "X-Tap-Ts":      {"1711296000"},
+        "X-Tap-Nonce":   {"XphYC2P1cl"},
+        "X-Tap-Sign":    {"Z9i6Az32ZpDzAvPhHX22+KCNoBW0CishEAXDiVxfA18="},
+        // 测试 headers 排序
+        "X-Tap-0":   {"1"},
+        "X-Tap-00":  {"2"},
+        "X-Tap-A00": {"3"},
+        // 测试非 X-Tap- 开头的 headers
+        "X-None-Sign-Part":    {"XXX"},
+        "Tap-None-Sign-Part":  {"XXX"},
+        "X-TapNone-Sign-Part": {"XXX"},
+    }
+    ctx := context.Background()
+    req, _ := http.NewRequestWithContext(ctx, method, url, bytes.NewBuffer(body))
+    req.Header = header
+    sign, err := Sign(req, secret)
+    if err != nil {
+        panic(err)
+    }
+    req.Header.Set("X-Tap-Sign", sign)
+    fmt.Println(sign)
 }
 
 // Sign signs the request.
 func Sign(req *http.Request, secret string) (string, error) {
-	methodPart := req.Method
-	urlPathAndQueryPart := req.URL.RequestURI()
-	headersPart, err := getHeadersPart(req.Header)
-	if err != nil {
-		return "", err
-	}
-	bodyPart, err := io.ReadAll(req.Body)
-	if err != nil {
-		return "", err
-	}
-	signParts := methodPart + "\n" + urlPathAndQueryPart + "\n" + headersPart + "\n" + string(bodyPart) + "\n"
-	fmt.Println(signParts)
-	h := hmac.New(sha256.New, []byte(secret))
-	h.Write([]byte(signParts))
-	rawSign := h.Sum(nil)
-	sign := base64.StdEncoding.EncodeToString(rawSign)
-	return sign, nil
+    methodPart := req.Method
+    urlPathAndQueryPart := req.URL.RequestURI()
+    headersPart, err := getHeadersPart(req.Header)
+    if err != nil {
+        return "", err
+    }
+    bodyPart, err := io.ReadAll(req.Body)
+    if err != nil {
+        return "", err
+    }
+    signParts := methodPart + "\n" + urlPathAndQueryPart + "\n" + headersPart + "\n" + string(bodyPart) + "\n"
+    fmt.Println(signParts)
+    h := hmac.New(sha256.New, []byte(secret))
+    h.Write([]byte(signParts))
+    rawSign := h.Sum(nil)
+    sign := base64.StdEncoding.EncodeToString(rawSign)
+    return sign, nil
 }
 
 // getHeadersPart returns the headers part of the request.
 func getHeadersPart(header http.Header) (string, error) {
-	var headerKeys []string
-	for k, v := range header {
-		k = strings.ToLower(k)
-		if !strings.HasPrefix(k, "x-tap-") {
-			continue
-		}
-		if k == "x-tap-sign" {
-			continue
-		}
-		if len(v) > 1 {
-			return "", fmt.Errorf("invalid header, %q has multiple values", k)
-		}
-		headerKeys = append(headerKeys, k)
-	}
-	sort.Strings(headerKeys)
-	headers := make([]string, 0, len(headerKeys))
-	for _, k := range headerKeys {
-		headers = append(headers, fmt.Sprintf("%s:%s", k, header.Get(k)))
-	}
-	return strings.Join(headers, "\n"), nil
+    var headerKeys []string
+    for k, v := range header {
+        k = strings.ToLower(k)
+        if !strings.HasPrefix(k, "x-tap-") {
+            continue
+        }
+        if k == "x-tap-sign" {
+            continue
+        }
+        if len(v) > 1 {
+            return "", fmt.Errorf("invalid header, %q has multiple values", k)
+        }
+        headerKeys = append(headerKeys, k)
+    }
+    sort.Strings(headerKeys)
+    headers := make([]string, 0, len(headerKeys))
+    for _, k := range headerKeys {
+        headers = append(headers, fmt.Sprintf("%s:%s", k, header.Get(k)))
+    }
+    return strings.Join(headers, "\n"), nil
 }
 ```
+
+</>
+
+<>
+
+```python
+import base64
+import hashlib
+import hmac
+from typing import Dict, List
+from urllib.parse import urlparse
+
+def sign_request(method: str, url: str, body: str, headers: Dict[str, List[str]], secret: str) -> str:
+    # 提取URL路径和查询字符串部分
+    parsed_url = urlparse(url)
+    url_path_and_query = parsed_url.path + ('?' + parsed_url.query if parsed_url.query else '')
+
+    # 获取符合条件的头部信息并排序
+    headers_part = get_headers_part(headers)
+
+    # 拼接签名字符串
+    sign_parts = f"{method}\n{url_path_and_query}\n{headers_part}\n{body}\n"
+
+    print("Sign Parts:\n", sign_parts)
+
+    # 使用HMAC SHA256算法生成签名
+    raw_sign = hmac.new(secret.encode(), sign_parts.encode(), hashlib.sha256).digest()
+
+    # 对签名进行Base64编码
+    sign = base64.b64encode(raw_sign).decode()
+
+    return sign
+
+def get_headers_part(headers: Dict[str, List[str]]) -> str:
+    # 筛选和排序头部
+    headers = {k.lower(): v for k, v in headers.items() if k.lower().startswith('x-tap-') and k.lower() != "x-tap-sign"}
+    header_keys = sorted(headers.keys())
+
+    # 组装头部字符串
+    headers_str = '\n'.join(f"{k}:{headers[k][0]}" for k in header_keys if len(headers[k]) == 1)
+
+    if any(len(headers[k]) > 1 for k in header_keys):
+        raise ValueError("Invalid header: has multiple values")
+
+    return headers_str
+
+# 示例使用
+secret = "6n8cdaz6Qq5pYjNaQ88BzWkVvNATeOhY"
+url = "https://example.com/my-service/v1/my-method?client_id=XXX&some_param=123&another=456"
+method = "POST"
+body = '{"name":"test"}'
+headers = {
+    "Content-Type": ["application/json"],
+    "Authorization": ["Bearer ourSenEFQhvkC4Mww6uk8fs0d28eFrvzaH59ORp1"],
+    "X-Tap-Ts": ["1711296000"],
+    "X-Tap-Nonce": ["XphYC2P1cl"],
+    "X-Tap-Sign": ["Z9i6Az32ZpDzAvPhHX22+KCNoBW0CishEAXDiVxfA18="],
+    "X-Tap-0": ["1"],
+    "X-Tap-00": ["2"],
+    "X-Tap-A00": ["3"],
+    # 测试非 X-Tap- 开头的 headers
+    "X-None-Sign-Part": ["XXX"],
+    "Tap-None-Sign-Part": ["XXX"],
+    "X-TapNone-Sign-Part": ["XXX"]
+}
+
+try:
+    sign = sign_request(method, url, body, headers, secret)
+    print("Signature: ", sign)
+except Exception as e:
+    print("Error: ", str(e))
+
+```
+
+</>
+
+<>
+
+```php
+<?php
+function signRequest($method, $url, $body, $headers, $secret) {
+    // 提取URL路径和查询字符串部分
+    $urlParts = parse_url($url);
+    $urlPathAndQuery = $urlParts['path'] . (isset($urlParts['query']) ? '?' . $urlParts['query'] : '');
+    // 获取符合条件的头部信息并排序
+    $headersPart = getHeadersPart($headers);
+    // 拼接签名字符串
+    $signParts = $method . "\n" . $urlPathAndQuery . "\n" . $headersPart . "\n" . $body . "\n";
+    echo "Sign Parts:\n" . $signParts . "\n";
+    // 使用HMAC SHA256算法生成签名
+    $rawSign = hash_hmac('sha256', $signParts, $secret, true);
+    // 返回 Base64 编码
+    return base64_encode($rawSign);
+}
+
+function getHeadersPart($headers) {
+    // Headers processing
+    $signHeaders = [];
+    foreach ($headers as $key => $value) {
+        if (count($value) > 1) {
+            throw new Exception("Multiple values for header: " . $key);
+        }
+        if (strpos($key, 'X-Tap-') === 0) {
+            $signHeaders[strtolower($key)] = $value; // Assuming each header has a single value
+        }
+    }
+    $headerKeys = [];
+    foreach ($signHeaders as $key => $value) {
+        if (!(strpos($key, 'x-tap-') === 0)) {
+            continue;
+        }
+        $headerKeys[] = $key;
+    }
+    sort($headerKeys);
+    $headerParts = [];
+    foreach ($headerKeys as $key) {
+        $headerParts[] = $key . ':' . $signHeaders[$key][0];
+    }
+    return implode("\n", $headerParts);
+}
+
+// 示例使用
+$secret = "6n8cdaz6Qq5pYjNaQ88BzWkVvNATeOhY";
+$url = "https://example.com/my-service/v1/my-method?client_id=XXX&some_param=123&another=456";
+$method = "POST";
+$body = '{"name":"test"}';
+$headers = [
+    "Content-Type" => ["application/json"],
+    "Authorization" => ["Bearer ourSenEFQhvkC4Mww6uk8fs0d28eFrvzaH59ORp1"],
+    "X-Tap-Ts" => ["1711296000"],
+    "X-Tap-Nonce" => ["XphYC2P1cl"],
+    "X-Tap-0" => ["1"],
+    "X-Tap-00" => ["2"],
+    "X-Tap-A00" => ["3"],
+    "X-None-Sign-Part" => ["XXX"],
+    "Tap-None-Sign-Part" => ["XXX"],
+    "X-TapNone-Sign-Part" => ["XXX"]
+];
+try {
+    $sign = signRequest($method, $url, $body, $headers, $secret);
+    echo "Signature: " . $sign . "\n";
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage() . "\n";
+}
+
+```
+
+</>
+
+</MultiLang>
 
 上述示例签算结果
 
