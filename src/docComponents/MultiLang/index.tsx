@@ -97,6 +97,14 @@ const CONFIGS: {
       { label: "PHP", value: "php" },
     ],
   },
+  payment: {
+    tds: [
+      { label: "Java", value: "java" },
+      { label: "Go", value: "go" },
+      { label: "Python", value: "python" },
+      { label: "PHP", value: "php" },
+    ],
+  },
   default: {
     leancloud: [
       { label: ".NET", value: "dotnet" },
@@ -118,10 +126,10 @@ const CONFIGS: {
 };
 
 const MultiLang = ({ children, kind = "default" }) => {
-  
+
   const values = CONFIGS[kind][BRAND];
   return (
-   
+
     <Tabs groupId="tap-platform">
       {values.map(({ label, value }, index) => (
         <TabItem value={value} label={label} default={index === 0} key={value}>
