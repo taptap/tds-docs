@@ -644,6 +644,9 @@ public interface ISplashAdInteractionListener : ICommonInteractionListener
 
     // 广告时间到
     void OnAdTimeOver(TapSplashAd ad);
+
+    // 点击广告回调 3.16.3.30 新增
+    void OnAdClick();
 }
 // 通用播放回调接口说明
 public interface ICommonInteractionListener
@@ -667,6 +670,11 @@ splashAd.setSplashInteractionListener(new TapSplashAd.AdInteractionListener() {
     @Override
     public void onAdTimeOver() {
         // 开屏时间到（开屏页已关闭），可以进入游戏
+    }
+
+    @Override
+    public void onAdClick() {
+        // 开屏广告点击了转化按钮，会跳转到落地页 3.16.3.30 新增
     }
 });
 // 展示开屏页
@@ -1221,6 +1229,12 @@ public interface TapFeedAd {
     View getAdView();
 
     /**
+     * @return 0: onKnown 1: 下载类广告 2:直接跳转外部App 3: 通过浏览器打开落地页
+     *         4: 小程序跳转类广告 3.16.3.30 新增
+     */
+    int getInteractionType();
+
+    /**
      * 获取合规信息
      *
      * @return
@@ -1439,23 +1453,23 @@ public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
             List<View> permissionViewList = Collections.singletonList(adViewHolder.permissionTextView);
 
             // 注册普通点击区域，创意点击区域。重要! 这个涉及到广告计费及交互，必须正确调用。convertView 必须使用 ViewGroup。
-            ad.registerViewForInteraction((ViewGroup) convertView, images, clickViewList, creativeViewList, describeViewList, privacyViewList, permissionViewList, new TTNativeAd.AdInteractionListener() {
+            ad.registerViewForInteraction((ViewGroup) convertView, images, clickViewList, creativeViewList, describeViewList, privacyViewList, permissionViewList, new TapFeedAd.AdInteractionListener() {
 
                 // 点击普通区域的回调
                 @Override
-                public void onAdClicked(View view, TTNativeAd ad) {
+                public void onAdClicked(View view, TapFeedAd ad) {
                 
                 }
                 
                 // 点击创意区域的回调
                 @Override
-                public void onAdCreativeClick(View view, TTNativeAd ad) {
+                public void onAdCreativeClick(View view, TapFeedAd ad) {
                 
                 }
                 
                 // 广告曝光展示的回调
                 @Override
-                public void onAdShow(TTNativeAd ad) {
+                public void onAdShow(TapFeedAd ad) {
                 
                 }
             });
@@ -1502,9 +1516,9 @@ TapAppDownloadListener downloadListener = new TapAppDownloadListener() {
     }
 
     /**
-        * 下载进度更新回调
-        * @param percent 取值范围[0,100] 当前下载进度 
-        */
+      * 下载进度更新回调
+      * @param percent 取值范围[0,100] 当前下载进度 
+      */
     @Override
     public void onUpdateDownloadProgress(int percent) {;
     }
@@ -1585,6 +1599,156 @@ tapAdNative.dispose();
 </>
 
 </MultiLang>
+
+## 模板染信息流广告
+
+支持图文和视频样式，开发者不用自行对广告样式进行编辑和渲染，可直接调用相关接口获取广告view去进行展示, 开发者可以随时对 TapADN 平台上勾选的模板进行样式上的调整。降低了接入成本的前提下，不会影响cpm的水平，仍然可以保持高的竞争力。
+
+:::info
+支持的广告样式：开发者在 TapADN 平台上可以进行多模板的勾选。模板渲染信息流广告支持开发者调整、编辑。**注意**：不允许开发者在view添加按钮及对广告拦截处理。
+:::
+
+### 获取广告
+
+<MultiLang kind="adn">
+
+<>
+
+```cs
+// 暂不支持
+```
+
+</>
+
+<>
+
+```java
+TapAdNative tapAdNative = TapAdManager.get().createAdNative(activity);
+// 广告后台获取广告位 id
+int spaceId = "your_space_id";
+tapAdNative.loadFeedAd(new AdRequest.Builder()
+    .withQuery("{query}")                 //  搜索词,可选
+    .withSpaceId(spaceId)
+    .build(), new TapAdNative.FeedAdListener() {
+        @Override
+        public void onError(int code, String message) {
+            // 获取广告失败
+        }
+
+        @Override
+        public void onFeedAdLoad(TapFeedAd feedAd) {
+            
+        }
+});
+
+// 模板渲染信息流 接口说明
+/**
+ * 注册模板信息流广告的交互监听 
+ * 
+ */
+ void setExpressRenderListener(ExpressRenderListener listener);
+
+/**
+ * 开始绘制广告 View。**注意** 请确保已经调用了`TapFeedAd.setExpressRenderListener`接口，否则无法收到广告渲染的结果。
+ * @param activity 需要展现广告的 activity
+ * @param feedOption 模版卡片的参数。包括卡片的宽、高，以及视频配置
+ */
+void render(Activity activity, FeedOption feedOption);
+
+
+// 模板渲染信息流广告视频回调接口
+interface VideoAdListener {
+    void onVideoPrepared(TapFeedAd ad);
+    void onVideoStart(TapFeedAd ad);
+    void onVideoPause(TapFeedAd ad);
+    void onVideoVolumeOpen(TapFeedAd ad);
+    void onVideoVolumeClose(TapFeedAd ad);
+}
+
+// 模板渲染广告交互接口
+interface ExpressRenderListener {
+    void onRenderSuccess(TapFeedAdView adView);
+    void onRenderFail(TapFeedAdView adView, TapFeedAd feedAd, int errorCode, String msg);
+    void onAdShow(TapFeedAdView adView);
+    void onAdClicked(TapFeedAdView view);
+    void onAdClosed(TapFeedAdView view);
+}
+```
+
+</>
+
+</MultiLang>
+
+### 广告行为监听
+在加载到模板渲染信息流广告后，接入方需要调用 `TapFeedAd.render()` 接口进行模版广告的绘制 同时注册广告交互接口 `TapFeedAd.setExpressRenderListener()` 方法，以实现广告渲染以及其它广告行为的监听。
+
+<MultiLang kind="adn">
+
+<>
+
+```cs
+// 暂不支持
+```
+
+</>
+
+<>
+
+```java
+public class FeedAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+    ...
+
+    @Override
+    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+        ...
+        if (holder instanceof OtherViewHolder) {
+            ...
+        } else if (holder instanceof adViewHolder) {
+            tapFeedAd.setExpressRenderListener(new TapFeedAd.ExpressRenderListener() {
+                    @Override
+                    public void onRenderSuccess(TapFeedAdView adView) {
+                        adViewHolder.itemView.removeAllViews();
+                        adViewHolder.itemView.addView(adView);
+                    }
+
+                    @Override
+                    public void onRenderFail(TapFeedAdView adView, TapFeedAd feedAd, int errorCode, String msg) {
+
+                    }
+
+                    @Override
+                    public void onAdShow(TapFeedAdView adView) {
+
+                    }
+
+                    @Override
+                    public void onAdClicked(TapFeedAdView view) {
+
+                    }
+
+                    @Override
+                    public void onAdClosed(TapFeedAdView view) {
+
+                    }
+                });
+            
+            // 模板广告请求方法需要开发者设置 expressWidth、expressHeight。 参数单位是 px， 高度设置`ViewGroup.LayoutParams.WRAP_CONTENT`, 宽度根据开发者实际需求传入（宽度过小会影响广告体验）
+            // videoOption.AutoPlayPolicy 分为 VideoOption.AutoPlayPolicy.ALWAYS(视频永远自动播放) / VideoOption.AutoPlayPolicy.WIFI（视频仅在 WIFI 情况下自动播放）
+            FeedOption feedOption = new FeedOption.Builder()
+                .expressWidth(ViewGroup.LayoutParams.MATCH_PARENT)
+                .expressHeight(ViewGroup.LayoutParams.WRAP_CONTENT)
+                .videoOption(new VideoOption.Builder().autoPlayPolicy(VideoOption.AutoPlayPolicy.ALWAYS).build())
+                .build();
+            tapFeedAd.render(ExpressFeedViewActivity.this, feedOption);
+        }
+    }
+}
+```
+
+</>
+
+</MultiLang>
+
 
 ## 插屏广告 
 
