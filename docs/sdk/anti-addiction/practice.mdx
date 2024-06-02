@@ -27,18 +27,23 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 逻辑上是先进行 SDK 初始化，然后调用以下的实名认证接口完成 TDS 的实名认证功能。建议将 SDK 的初始化靠前，初始化完成后再调用认证接口：`AntiAddictionUIKit.StartupWithTapTap(isUserIdentifier);` 建议初始化和认证接口保留毫秒级的时间间隔，以确保 SDK 的初始化完成。
 
 ```csharp
+// 引入命名空间
+using TapTap.Login;
+using TapTap.Common;
+using TapTap.AntiAddiction;    
+using TapTap.AntiAddiction.Model;    
+
+string clientid = "游戏的 Client ID";    // TapTap 开发者中心对应 Client ID
+
 // 先初始化 TapTap 登录模块（单纯 TapTap 用户认证方式）
-TapLogin.Init(string clientID); 
+TapLogin.Init(clientid); 
 
 // 再初始化合规认证模块，这部分代码只是初始化合规认证模块并注册监听回调，实名认证的结果根据回调方法给出。需要说明的是：调用 startupwithtaptap  认证接口才会触发回调。
-using TapTap.AntiAddiction;    
-using TapTap.AntiAddiction.Model;    // 引入命名空间
-
 AntiAddictionConfig config = new AntiAddictionConfig()
 {
-    gameId = "游戏的 Client ID",      // TapTap 开发者中心对应 Client ID
+    gameId = clientid,      // TapTap 开发者中心对应 Client ID
     showSwitchAccount = false,      // 是否显示切换账号按钮，根据游戏自身需求设置是否显示「切换账号」按钮
-    useAgeRange = true      // 是否使用年龄段信息
+    useAgeRange = false      // 是否使用年龄段信息，false 表示静默授权，用户体验更好，无法获取玩家具体年龄段信息；true 表示
 };         
 
 Action<int, string> callback = (code, errorMsg) => {
@@ -121,14 +126,10 @@ catch (Exception e)
 // 获取 TapTap Profile  可以获得当前用户的一些基本信息，例如名称、头像。
 var profile = await TapLogin.FetchProfile();
 Debug.Log($"TapTap 登录成功 profile: {profile.ToJson()}");
-```
 
-- 实名认证，TapTap 登录成功后，游戏需要调用 `StartupWithTapTap` 接口进行实名认证
-
-```csharp
-string userIdentifier = "玩家的唯一标识";
-// 玩家唯一标识 userIdentifier 为 TapTap 登录成功后返回的用户唯一标识 openid 或 unionid
-AntiAddictionUIKit.StartupWithTapTap(userIdentifier);
+// 实名认证，TapTap 登录成功后，游戏需要调用 `StartupWithTapTap` 接口进行实名认证
+string userIdentifier = profile.unionid;
+AntiAddictionUIKit.StartupWithTapTap(userIdentifier);  // 调用 StartupWithTapTap 接口才会触发实名认证回调，玩家的最终实名认证结果通过回调给出
 ```
 
 ### TapTap 登录 & 实名认证授权页面说明
@@ -207,30 +208,3 @@ AntiAddictionUIKit.SubmitPayResult(amount,
     }
 );
 ```
-
-
-
-## Checklist
-
-游戏侧接入 TapSDK 合规认证，开发者需要测试合规认证流程是否正常，检查并知晓以下事项：
-
-- TapTap 登录模块正确接入。
-
-- 合规认证 SDK 的正确初始化，gameId 参数为 Tap Client ID，游戏侧根据需求决定是否显示「切换账号」按钮，若显示「切换账号」按钮请务必处理好这块的逻辑。
-
-- 充分了解实名认证防沉迷的各个回调方法所对应的含义，游戏侧对此做出相应的逻辑处理。
-
-- 充分了解实名认证 AntiAddictionUIKit.StartupWithTapTap(userIdentifier) 接口的 userIdentifier 参数含义。
-
-- SDK 的初始化 AntiAddictionUIKit.Init 和实名认证接口 AntiAddictionUIKit.StartupWithTapTap 保留毫秒级的间隔，以确保 SDK 完成初始化。
-
-- 游戏存在适龄要求，充分了解合规认证的适龄功能。
-
-- 充分了解测试账号的使用。
-
-- 游戏在收到未成年玩家付费请求时请 **务必** 先检查当前这笔消费是否已达上限，达到上限则拦截当前这笔消费。消费结束后请 **务必** 上报消费金额。
-
-
-## 服务支持
-
-对此有任何问题，非常欢迎通过开发者中心后台提工单咨询。
