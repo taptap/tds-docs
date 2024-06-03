@@ -134,6 +134,14 @@ try
     // 在 Windows、macOS 系统下显示二维码（默认）和跳转链接（需配置）
     var accessToken = await TapLogin.Login();
     Debug.Log($"TapTap 登录成功 accessToken: {accessToken.ToJson()}");
+
+    // TapTap 登录成功后可以通过 Profile  获得当前用户的一些基本信息，例如名称、头像。
+    var profile = await TapLogin.FetchProfile();
+    Debug.Log($"TapTap 登录成功 profile: {profile.ToJson()}");
+
+    // 实名认证，TapTap 登录成功后，游戏需要调用 `StartupWithTapTap` 接口进行实名认证
+    string userIdentifier = profile.unionid;
+    AntiAddictionUIKit.StartupWithTapTap(userIdentifier);  // 调用 StartupWithTapTap 接口才会触发实名认证回调，玩家的最终实名认证结果通过回调给出
 }
 catch (Exception e)
 {
@@ -146,14 +154,6 @@ catch (Exception e)
         }
     }
 }
-
-// 获取 TapTap Profile  可以获得当前用户的一些基本信息，例如名称、头像。
-var profile = await TapLogin.FetchProfile();
-Debug.Log($"TapTap 登录成功 profile: {profile.ToJson()}");
-
-// 实名认证，TapTap 登录成功后，游戏需要调用 `StartupWithTapTap` 接口进行实名认证
-string userIdentifier = profile.unionid;
-AntiAddictionUIKit.StartupWithTapTap(userIdentifier);  // 调用 StartupWithTapTap 接口才会触发实名认证回调，玩家的最终实名认证结果通过回调给出
 ```
 
 ### TapTap 登录 & 实名认证授权页面说明
