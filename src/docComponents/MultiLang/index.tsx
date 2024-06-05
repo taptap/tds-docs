@@ -105,6 +105,11 @@ const CONFIGS: {
       { label: "PHP", value: "php" },
     ],
   },
+  unity_alone: {
+    tds: [
+      { label: "Unity", value: "unity" },
+    ]
+  },
   default: {
     leancloud: [
       { label: ".NET", value: "dotnet" },
@@ -122,13 +127,7 @@ const CONFIGS: {
       { label: "Android", value: "android" },
       { label: "iOS", value: "ios" },
     ],
-  },
-
-  unity_alone: {
-    tds: [
-      { label: "Unity", value: "unity" },
-    ],
-  },
+  }
 };
 
 const MultiLang = ({ children, kind = "default" }) => {
