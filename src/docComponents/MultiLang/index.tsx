@@ -123,6 +123,12 @@ const CONFIGS: {
       { label: "iOS", value: "ios" },
     ],
   },
+
+  unity_alone: {
+    tds: [
+      { label: "Unity", value: "unity" },
+    ],
+  },
 };
 
 const MultiLang = ({ children, kind = "default" }) => {

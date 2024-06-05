@@ -4,26 +4,32 @@ sidebar_label: 最佳实践
 sidebar_position: 3
 ---
 
-import useBaseUrl from "@docusaurus/useBaseUrl";
 import CodeBlock from '@theme/CodeBlock';
+import useBaseUrl from "@docusaurus/useBaseUrl";
+import MultiLang from '/src/docComponents/MultiLang';
 import sdkVersions from '/src/docComponents/sdkVersions';
 
-## 准备工作
+## 准备
 
 在使用 TapSDK 合规认证服务之前，游戏厂商需要完成一些前期准备工作。
-- 1、创建应用，在 [TapTap 开发者中心](https://developer.taptap.cn) 创建游戏应用，获取应用 Client ID、Client Token 等参数，用于初始化 SDK；
+
+### 1. 创建应用获取应用参数
+在 [TapTap 开发者中心](https://developer.taptap.cn) 创建游戏应用，获取应用 Client ID、Client Token 等参数，用于初始化 SDK；
 
 ![](https://capacity-files.lcfile.com/nnQKxgJJzgErOlIOcxnbIHt8Vc1RmGYe/tap_get_ready.png)
 
-- 2、开通 TapTap 登录服务，合规认证服务依赖于 TapTap 登录服务，因此，厂商需要在 **开发者中心 > 游戏服务 > 应用配置** 开启「TapTap 登录」；
+### 2. 开通 TapTap 登录服务
+合规认证服务依赖于 TapTap 登录服务，因此，厂商需要在 **开发者中心 > 游戏服务 > 应用配置** 开启「TapTap 登录」；
 
 ![](https://img.tapimg.com/market/images/168f902edd3de84cf0d5eb5fa640e78d.png)
 
-- 3、配置应用包名和签名信息，Android 签名处填写 MD5 值，详情可参考：[如何获取 MD5 值](/sdk/start/faq/#如何获取-android-应用的-md5-值)；
+### 3. 配置应用包名和签名信息
+Android 签名处填写 MD5 值，详情可参考：[如何获取 MD5 值](/sdk/start/faq/#如何获取-android-应用的-md5-值)；
 
 ![](https://img.tapimg.com/market/images/3c725fc6859363f630d90471d0c8929b.png)
 
-- 4、开通合规认证服务，找到 **开发者中心 > 游戏服务 > 合规认证** 根据游戏的情况而定，可选「已有版号」或「暂无版号」方案，然后点击立即开通即可；
+### 4. 开通合规认证服务
+找到 **开发者中心 > 游戏服务 > 合规认证** 根据游戏的情况而定，可选「已有版号」或「暂无版号」方案，然后点击立即开通即可；
 
 ![](https://img.tapimg.com/market/images/90e6d759ba528aa7e9ef29077387edbb.png)
 
@@ -31,9 +37,11 @@ import sdkVersions from '/src/docComponents/sdkVersions';
 
 接下来将介绍该如何接入 TapSDK 合规认证服务：
 
-## 游戏实名认证
+## 实名
 
 ### 导入 SDK 包体
+
+<MultiLang kind="unity_alone">
 
 在项目的 `Packages/manifest.json` 文件中添加以下依赖：
 
@@ -48,11 +56,18 @@ import sdkVersions from '/src/docComponents/sdkVersions';
 
 在 Unity 顶部菜单中选择 **Window > Package Manager** 可查看已经安装在项目中的包。
 
+</MultiLang>
+
+
+
 ### 初始化 SDK
 
 逻辑上是先进行 SDK 初始化，然后调用以下的实名认证接口完成 TDS 的实名认证功能。建议将 SDK 的初始化靠前，比如 Unity 生命周期中的 `Start()` 方法或者 `Awake()` 方法中执行 SDK 的初始化。
 
-```csharp
+
+<MultiLang kind="unity_alone">
+
+```cs
 // 引入命名空间
 using TapTap.Login;
 using TapTap.Common;
@@ -123,11 +138,19 @@ AntiAddictionUIKit.Init(config);
 AntiAddictionUIKit.SetAntiAddictionCallback(callback);
 ```
 
+</MultiLang>
+
+
+
 ### TapTap 登录 & 实名认证
 
 游戏完成 SDK 的初始化后，接下来需要完成 TapTap 登录，TapTap 登录成功后，再进行实名认证。TapTap 登录按钮素材需要使用官方提供的[登录按钮素材](https://assets.tapimg.com/img/TapTap_Login_Source.zip)；
 
-```csharp
+
+
+<MultiLang kind="unity_alone">
+
+```cs
 try
 {
     // 在 iOS、Android 系统下，会唤起 TapTap 客户端或以 WebView 方式进行登录
@@ -156,21 +179,18 @@ catch (Exception e)
 }
 ```
 
+</MultiLang>
 
-## 测试账号使用
-在 **开发者中心 > 游戏服务 > 合规认证** 可以申请测试账号，测试账号的使用流程：
-- 使用测试账号以邮箱方式登录 TapTap 客户端
-- 完成 TapTap 登录，获取测试账号对应 TapTap 登录后返回的 `unionid` 值
-- 触发实名认证 `startupwithtaptap` 接口， 接口中玩家唯一标识 `userIdentifier` 参数必须赋值为测试账号对应的 TapTap 登录后返回的 unionid，否则测试账号使用无效
 
-## 适龄设置
+
+## 适龄
 该功能需在 **TapTap 开发者中心 > 你的游戏 > 游戏服务 > 合规认证 > 可玩年龄限制** 中开启后才可进行游戏适龄设置，例如游戏适龄 12+，开发者可在开发者中心配置年龄限制为 12，SDK 将在用户完成实名后 且 根据时长限制规则显示 UI 前检查玩家年龄是否 12+。
 - 如果当前玩家年龄不满足 12+ 则对应 code 为 1100 的回调将会被触发，开发者以此知晓当前玩家的年龄不满足 12+，对此可进行拦截，不要进入游戏；
 - 如果当前玩家年龄满足 12+ 则对应 code 为 1100 的回调不会被触发。
 
 ![](https://img.tapimg.com/market/images/e7fab2ce4099b792bd32390c04e28986.png)
 
-## 消费额度限制
+## 消费
 
 根据年龄段的不同，未成年玩家的消费金额有不同的上限。 
 
@@ -181,7 +201,7 @@ catch (Exception e)
 :::
 
 
-```csharp
+```cs
 long amount = 100;    // 100 表示 100 分，即 1 元
 AntiAddictionUIKit.CheckPayLimit(amount,
     (result) => {
@@ -205,7 +225,7 @@ AntiAddictionUIKit.CheckPayLimit(amount,
 
 :::
 
-```csharp
+```cs
 long amount = 100;
 AntiAddictionUIKit.SubmitPayResult(amount,
     () => {
@@ -215,3 +235,10 @@ AntiAddictionUIKit.SubmitPayResult(amount,
     }
 );
 ```
+
+
+## 测试
+在 **开发者中心 > 游戏服务 > 合规认证** 可以申请测试账号，测试账号的使用流程：
+- 使用测试账号以邮箱方式登录 TapTap 客户端
+- 完成 TapTap 登录，获取测试账号对应 TapTap 登录后返回的 `unionid` 值
+- 触发实名认证 `startupwithtaptap` 接口， 接口中玩家唯一标识 `userIdentifier` 参数必须赋值为测试账号对应的 TapTap 登录后返回的 unionid，否则测试账号使用无效
