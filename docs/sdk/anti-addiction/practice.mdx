@@ -7,38 +7,41 @@ sidebar_position: 3
 import MultiLang from '/src/docComponents/MultiLang';
 import CodeBlock from '@theme/CodeBlock';
 import sdkVersions from '/src/docComponents/sdkVersions';
-import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
 
+## 准备工作
 
-## 准备
-
-在使用 TapSDK 合规认证服务之前，游戏厂商需要完成一些前期准备工作。
-
-### 1. 创建应用获取应用参数
+### 创建应用获取应用参数
 在 [TapTap 开发者中心](https://developer.taptap.cn) 创建游戏应用，获取应用 Client ID、Client Token 等参数，用于初始化 SDK；
 
 ![](https://capacity-files.lcfile.com/nnQKxgJJzgErOlIOcxnbIHt8Vc1RmGYe/tap_get_ready.png)
 
-### 2. 开通 TapTap 登录服务
-合规认证服务依赖于 TapTap 登录服务，因此，厂商需要在 **开发者中心 > 游戏服务 > 应用配置** 开启「TapTap 登录」；
+### 开通 TapTap 登录服务
+合规认证服务依赖于 TapTap 登录服务，因此，厂商需要在 **TapTap 开发者中心 > 你的游戏 > 游戏服务 > 应用配置** 开启「TapTap 登录」；
 
 ![](https://img.tapimg.com/market/images/168f902edd3de84cf0d5eb5fa640e78d.png)
 
-### 3. 配置应用包名和签名信息
+### 配置应用包名和签名信息
 Android 签名处填写 MD5 值，详情可参考：[如何获取 MD5 值](/sdk/start/faq/#如何获取-android-应用的-md5-值)；
 
 ![](https://img.tapimg.com/market/images/3c725fc6859363f630d90471d0c8929b.png)
 
-### 4. 开通合规认证服务
-找到 **开发者中心 > 游戏服务 > 合规认证** 根据游戏的情况而定，可选「已有版号」或「暂无版号」方案，然后点击立即开通即可；
+### 开通合规认证服务
+找到 **TapTap 开发者中心 > 你的游戏 > 游戏服务 > 开发与构建 > 合规认证**，根据游戏实际情况，选择「已有版号」或「暂无版号」方案，然后点击**立即开通**
 
 ![](https://img.tapimg.com/market/images/90e6d759ba528aa7e9ef29077387edbb.png)
 
-若游戏选择的是「已有版号」方案则还需要完成中宣部实名认证系统的注册，具体的操作请参考 [注册中宣部实名认证系统](/sdk/anti-addiction/features/#已有版号)
+:::tip
+若游戏选择的是「已有版号」方案则还需要完成中宣部实名认证系统的注册以及相应配置，具体的操作请参考 [注册中宣部实名认证系统](/sdk/anti-addiction/features/#已有版号)
+:::
 
-接下来将介绍该如何接入 TapSDK 合规认证服务：
+### 可玩年龄限制
+应用需要对用户年龄有额外限制时，可在 **TapTap 开发者中心 > 你的游戏 > 游戏服务 > 合规认证 > 可玩年龄限制** 中开启此功能，并配置所需的**最低年龄要求**
 
-## 实名
+在后续的代码集成中，也需要处理相关的 `1100` 回调
+
+![](https://img.tapimg.com/market/images/e7fab2ce4099b792bd32390c04e28986.png)
+
+## 代码接入
 
 ### 导入 SDK 包体
 
@@ -86,44 +89,46 @@ Android 签名处填写 MD5 值，详情可参考：[如何获取 MD5 值](/sdk/
 </MultiLang>
 
 
-### 初始化 SDK
-
-逻辑上是先进行 SDK 初始化，然后调用以下的实名认证接口完成 TDS 的实名认证功能。建议将 SDK 的初始化靠前，比如 Unity 生命周期中的 `Start()` 方法或者 `Awake()` 方法中执行 SDK 的初始化。
+### 初始化与设置回调
 
 <MultiLang kind="alone_unity">
 
 <>
 
-逻辑上是先进行 SDK 初始化，然后调用以下的实名认证接口完成 TDS 的实名认证功能。建议将 SDK 的初始化靠前，比如 Unity 生命周期中的 `Start()` 方法或者 `Awake()` 方法中执行 SDK 的初始化。
+先进行 SDK 初始化，然后调用以下的实名认证接口完成 TDS 的实名认证功能。**请在 Unity 生命周期中的 `Start()` 方法或者 `Awake()` 方法中执行 SDK 的初始化。**
 
 ```cs
 // 引入命名空间
 using TapTap.Login;
 using TapTap.Common;
-using TapTap.AntiAddiction;    
-using TapTap.AntiAddiction.Model;    
+using TapTap.AntiAddiction;
+using TapTap.AntiAddiction.Model;
 
-string clientid = "游戏的 Client ID";    // TapTap 开发者中心对应 Client ID
+// 将以下代码复制到 Start() 或 Awake() 方法中
 
-// 先初始化 TapTap 登录（单纯 TapTap 用户认证方式）
-TapLogin.Init(clientid); 
+// 应用参数配置
+string clientId = "游戏的 Client ID"; // TapTap 开发者中心对应 Client ID
 
-// 再初始化合规认证，这部分代码只是初始化合规认证模块并注册监听回调，实名认证的结果根据回调方法给出。需要说明的是：调用 startupwithtaptap  认证接口才会触发回调。
+// 初始化 TapTap 登录（单纯 TapTap 用户认证方式）
+TapLogin.Init(clientId);
+
+// 定义防沉迷模块 config
 AntiAddictionConfig config = new AntiAddictionConfig()
 {
-    gameId = clientid,      // TapTap 开发者中心对应 Client ID
-    showSwitchAccount = false,      // 是否显示切换账号按钮，根据游戏自身需求设置是否显示「切换账号」按钮
-    useAgeRange = false      // 是否使用年龄段信息，false 表示静默授权，用户体验更好，无法获取玩家年龄段信息；true 表示获取玩家实名认证后的年龄段信息
-};         
+    gameId = clientId,          // TapTap 开发者中心对应 Client ID
+    showSwitchAccount = false,  // 是否显示切换账号按钮，根据游戏自身需求设置是否显示「切换账号」按钮
+    useAgeRange = false         // 是否使用年龄段信息，false 静默授权，用户体验更好；true 获取玩家实名认证后的年龄段信息
+};
 
+// 定义回调，此处需要游戏自行实现
 Action<int, string> callback = (code, errorMsg) => {
-    
+
     UnityEngine.Debug.LogFormat($"code: {code} error Message: {errorMsg}");
 
     // 根据 code 不同提示玩家不同信息，详见下面的说明
     if (code == 500)
     {
-        // 玩家未受到限制，正常进入游戏，进行游戏主界面的跳转
+        // 玩家未受到限制，正常进入游戏
     }
     if (code == 1000)
     {
@@ -132,24 +137,12 @@ Action<int, string> callback = (code, errorMsg) => {
     }
     if (code == 1001)
     {
-        // 说明玩家在实名认证过程中，点击了「切换账号」按钮，点击切换账号按钮会触发该回调，同时实名认证的弹窗会被销毁，
-        // 逻辑上需要游戏重新触发实名认证，正确引导玩家完成实名认证
-    }
-    if (code == 1030)
-    {
-        // 该状态不需要游戏做任何处理
-        // 说明玩家是未成年，且该未成年玩家此时是不被允许进行游戏的，逻辑上不要进行游戏主界面的跳转，
-        // 此状态，SDK 内部封装的弹窗会被触发，玩家只能选择「切换账号」（前提是显示切换账号按钮 bool showSwitchAccount = true）或者「退出游戏」
-    }
-    if (code == 1050)
-    {
-        // 说明当前未成年玩家持续游戏时间达到当天上限，SDK 内部会做处理，给出弹窗，玩家只能选择退出游戏，这种状态开发者不需要关注，也不要做什么逻辑上的处理。
+        // 说明玩家在实名认证过程中，点击了「切换账号」按钮会触发该回调，同时实名认证的弹窗会被销毁
+        // 需要游戏重新触发实名认证，正确引导玩家完成实名认证
     }
     if (code == 1100)
     {
-        // 当前未成年玩家因触发应用设置的适龄限制无法进入游戏，适龄设置是 TapSDK 3.29.0 版本开始提供的功能
-        // 例如游戏适龄 12+，开发者可在 开发者中心配置年龄限制为 12，SDK 将在用户完成实名后 且 根据时长限制规则显示 UI 前检查玩家年龄是否 12+，如果当前玩家年龄满足 12+ 该回调不会被触发，否则会直接返回 code 为 1100 的年龄限制回调通知开发者。
-        // code 为 1100 被触发了，那么 code 为 500 对应的回调不会被触发。
+        // 当前未成年玩家因触发应用设置的适龄限制无法进入游戏
     }
     if (code == 1200)
     {
@@ -157,12 +150,12 @@ Action<int, string> callback = (code, errorMsg) => {
     }
     if (code == 9002)
     {
-        // 实名认证过程中玩家点击了关闭实名窗，说明玩家并没有完成实名认证，是不可以进入游戏的。
-        // 逻辑上需要重新触发实名认证，正确引导玩家完成实名认证
+        // 实名认证过程中玩家点击了关闭实名窗，说明玩家并没有完成实名认证，是不可以进入游戏的
+        // 需要重新触发实名认证，正确引导玩家完成实名认证
     }
-    
 };
 
+// 再初始化合规认证
 AntiAddictionUIKit.Init(config);
 AntiAddictionUIKit.SetAntiAddictionCallback(callback);
 ```
@@ -193,10 +186,13 @@ AntiAddictionUIKit.SetAntiAddictionCallback(callback);
 </MultiLang>
 
 
-### TapTap 登录 & 实名认证
+### TapTap 登录 & 开始实名认证
 
-游戏完成 SDK 的初始化后，接下来需要完成 TapTap 登录，TapTap 登录成功后，再进行实名认证。TapTap 登录按钮素材需要使用官方提供的[登录按钮素材](https://assets.tapimg.com/img/TapTap_Login_Source.zip)；
+游戏完成 SDK 的初始化后，接下来需要完成 TapTap 登录，TapTap 登录成功后，再进行实名认证。
 
+:::tip
+TapTap 登录按钮素材需要使用官方提供的[登录按钮素材](https://assets.tapimg.com/img/TapTap_Login_Source.zip)；
+:::
 
 <MultiLang kind="alone_unity">
 
@@ -205,8 +201,6 @@ AntiAddictionUIKit.SetAntiAddictionCallback(callback);
 ```cs
 try
 {
-    // 在 iOS、Android 系统下，会唤起 TapTap 客户端或以 WebView 方式进行登录
-    // 在 Windows、macOS 系统下显示二维码（默认）和跳转链接（需配置）
     var accessToken = await TapLogin.Login();
     Debug.Log($"TapTap 登录成功 accessToken: {accessToken.ToJson()}");
 
@@ -256,29 +250,13 @@ catch (Exception e)
 
 </MultiLang>
 
+## 限制未成年人消费额度
 
-## 适龄
-该功能需在 **TapTap 开发者中心 > 你的游戏 > 游戏服务 > 合规认证 > 可玩年龄限制** 中开启后才可进行游戏适龄设置，例如游戏适龄 12+，开发者可在开发者中心配置年龄限制为 12，SDK 将在用户完成实名后 且 根据时长限制规则显示 UI 前检查玩家年龄是否 12+。
-- 如果当前玩家年龄不满足 12+ 则对应 code 为 1100 的回调将会被触发，开发者以此知晓当前玩家的年龄不满足 12+，对此可进行拦截，不要进入游戏；
-- 如果当前玩家年龄满足 12+ 则对应 code 为 1100 的回调不会被触发。
-
-![](https://img.tapimg.com/market/images/e7fab2ce4099b792bd32390c04e28986.png)
-
-## 消费
-
-根据年龄段的不同，未成年玩家的消费金额有不同的上限。 
+根据年龄段的不同，未成年玩家的消费金额有不同的上限
 
 :::tip
-
-未成年玩家每次充值之前，游戏侧请 **务必** 调用 `CheckPayLimit` 接口进行判断，检验当前玩家的付费行为是否被限制。消费金额的单位为分。
-
+每次充值之前，游戏侧请 **务必** 调用 `CheckPayLimit` 接口进行判断，检验当前玩家的付费行为是否被限制。消费金额的单位为分。
 :::
-
-
-
-
-
-
 
 <MultiLang kind="alone_unity">
 
@@ -328,14 +306,8 @@ AntiAddictionUIKit.CheckPayLimit(amount,
 </MultiLang>
 
 
-
-
-
-
 :::tip
-
-当未成年玩家消费成功后，游戏侧请 **务必** 调用 `SubmitPayResult` 接口上报玩家消费金额。上报消费金额时，传入的消费金额的单位同样为分。
-
+消费成功后，游戏侧请 **务必** 调用 `SubmitPayResult` 接口上报玩家消费金额。上报消费金额时，传入的消费金额的单位同样为分。
 :::
 
 <MultiLang kind="alone_unity">
@@ -377,66 +349,3 @@ AntiAddictionUIKit.SubmitPayResult(amount,
 </>
 
 </MultiLang>
-
-
-## 测试
-在 **开发者中心 > 游戏服务 > 合规认证** 可以申请测试账号。
-### 1. 准备
-- 使用测试账号以邮箱方式登录 TapTap 客户端
-- 游戏内完成 TapTap 登录，获取测试账号对应 TapTap 登录后返回的 `unionid` 值
-- 触发实名认证 `startupwithtaptap` 接口， 接口中玩家唯一标识 `userIdentifier` 参数 **必须** 为测试账号对应的 TapTap 登录后返回的 `unionid`，否则测试账号使用无效。上述 [TapTap 登录 & 实名认证](/sdk/anti-addiction/practice/#taptap-登录--实名认证) 示例代码中 `startupwithtaptap` 接口传递的为 `unionid`。
-
-### 2. 测试
-
-依据测试账号的使用场景将测试账号的使用模式分为两种：**常规模式** 和 **测试模式**。
-
-#### 常规模式
-常规模式模拟的是真实环境，常规模式下测试账号的状态和属性是无法变更的，这种模式适用于游戏提交版署审核、申请版号的场景。常规模式下完成上述的准备工作后即可以正常测试了。
-
-#### 测试模式
-为方便开发者针对未成年玩家的实名认证防沉迷功能进行测试，因此推出测试模式，该模式下测试账号的状态和属性是可以更改的。比如，针对提供的未成年测试账号可以更改当前时间是否可玩、已充值金额，这样开发者不需要等待到未成年合规游戏时间段时进行防沉迷功能测试。
-测试模式的使用需要注意以下两点：
-- 项目工程中需要显示调用 `SetTestEnvironment` 接口开启测试模式， 该接口需要在 SDK 的 `init` 初始化接口之后并且在 `startupwithtaptap` 接口之前调用。
-
-<MultiLang kind="alone_unity">
-
-<>
-
-```cs
-AntiAddictionUIKit.SetTestEnvironment(true);
-```
-
-</>
-<>
-
-```java
-
-```
-
-</>
-<>
-
-```objc
-
-```  
-</>
-
-<>
-
-```cpp
-
-```
-
-</>
-
-</MultiLang>
-
-
-- 测试模式还需要在控制台开启「切换为测试模式」，可以针对某个账号进行一些设置。
-
-
-:::tip
-
-正式打包上线的应用以及提交版署审核的应用都需要去掉 `SetTestEnvironment` 接口。
-
-:::
