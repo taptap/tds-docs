@@ -252,3 +252,41 @@ A：请检查上报数据的频率是否低于 5 分钟一次。为了保证图�
 *TapDB 并不会对上报的充值数据进行去重，当接口返回 200 时则代表 TapDB 已经接受到该条日志数据，请到埋点概览中查看该条数据后续的落盘情况。反复上报相同订单记录将会导致数据被重复统计*
 
 
+### 退款记录
+
+对于需要进行退款分析的游戏，这里提供服务端退款数据推送接口。该接口的属性与付费事件的属性基本一致，但额外增加了一个 origin_order_id 字段，用于追踪原始订单的 ID。
+
+<Conditional region='cn'>
+
+    `POST` `https://e.tapdb.net/v2/event`
+
+</Conditional>
+
+<Conditional region='global'>
+
+    `POST` `https://e.tapdb.ap-sg.tapapis.com/v2/event`
+
+</Conditional>
+
+`Content-Type: application/json`
+
+```json
+{
+  "name": "refund", // 事件名，固定为 refund
+  "client_id": "ClientID", // 必需。注意 ClientID 需要被替换成游戏的 ClientID
+  "user_id": "userId", // 必需。用户ID。必须和SDK的setUser接口传递的userId一样，并且该用户已经通过SDK接口进行过推送
+  "type": "track", // 必需。数据类型，请确保传入的值为 track
+  "properties": {
+    "ip": "8.8.8.8", // 可选。充值用户的IP
+    "order_id": "100000", // 可选。长度大于0并小于等于256。订单ID。
+    "origin_order_id": "200000", // 可选。长度大于0并小于256。原始充值订单ID。
+    "amount": 100, // 必需。大于0并小于等于100000000000。充值金额。单位分，即无论什么币种，都需要乘以100
+    "virtual_currency_amount": 100, //获赠虚拟币数量，必传，可为0
+    "currency_type": "CNY", // 可选。货币类型。国际通行三字母表示法，为空时默认CNY。参考：人民币 CNY，美元 USD；欧元 EUR
+    "product": "item1", // 可选。长度大于0并小于等于256。商品名称
+    "payment": "alipay" // 可选。长度大于0并小于等于256。充值渠道
+  }
+}
+```
+
+
