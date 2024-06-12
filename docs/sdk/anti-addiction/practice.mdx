@@ -97,69 +97,78 @@ Android 签名处填写 MD5 值，详情可参考：[如何获取 MD5 值](/sdk/
 
 <>
 
-先进行 SDK 初始化，然后调用以下的实名认证接口完成 TDS 的实名认证功能。**请在 Unity 生命周期中的 `Start()` 方法或者 `Awake()` 方法中执行 SDK 的初始化。**
+**在游戏主场景生命周期中的 `Start()` 或 `Awake()` 方法中执行 SDK 的初始化，** 并调用开始认证接口进入合规认证处理流程，示例如下：
 
 ```cs
-// 引入命名空间
 using TapTap.Login;
 using TapTap.Common;
 using TapTap.AntiAddiction;
 using TapTap.AntiAddiction.Model;
+using UnityEngine;
+using System;
 
-// 将以下代码复制到 Start() 或 Awake() 方法中
 
-// 应用参数配置
-string clientId = "游戏的 Client ID"; // TapTap 开发者中心对应 Client ID
+public class GameMainScene: MonoBehaviour {
 
-// 初始化 TapTap 登录（单纯 TapTap 用户认证方式）
-TapLogin.Init(clientId);
+	 // 游戏在 TapTap 开发者中心对应的 Client ID
+	private readonly string clientId = "游戏的 Client ID";
+	
+	// 合规认证回调声明
+	private Action<int, string> AntiAddictionCallback => (code, extra)=> {
+      // 根据回调返回的参数 code 添加不同情况的处理
+      switch (code){
+        //玩家未受限制，可正常进入
+        case 500: 
+                  //TODO: 进入游戏
+                  break;
+        // 退出账号，当调用 AntiAddictionUIKit.Exit() 接口时触发          
+        case 1000: 
+        // 玩家在实名认证过程中，点击了「切换账号」按钮       
+        case 1001:
+                  //TODO: 切换到登录页面
+                  break;
+        // 当前玩家触发游戏设置的适龄限制         
+        case 1100:
+                  //TODO: 弹出游戏绘制的适龄限制提示，并引导玩家退出游戏或切换账号
+                  break;   
+        // 数据请求失败，游戏需检查当前设置的应用信息是否正确或引导玩家查看当前网络连接是否正常               
+        case 1200:
+                  //TODO: 引导玩家查看当前网络连接是否正常，并重新调用开始认证接口进入合规认证处理流程 
+                  break;
+        // 实名认证过程中玩家点击了关闭实名窗口        
+        case 9002:
+                  //TODO: 重新调用开始认证接口进入合规认证处理流程 或 切换到登录页面
+                  break;
+        default:
+                  break;                                        
+      }
 
-// 定义防沉迷模块 config
-AntiAddictionConfig config = new AntiAddictionConfig()
-{
-    gameId = clientId,          // TapTap 开发者中心对应 Client ID
-    showSwitchAccount = false,  // 是否显示切换账号按钮，根据游戏自身需求设置是否显示「切换账号」按钮
-    useAgeRange = false         // 是否使用年龄段信息，false 静默授权，用户体验更好；true 获取玩家实名认证后的年龄段信息
-};
-
-// 定义回调，此处需要游戏自行实现
-Action<int, string> callback = (code, errorMsg) => {
-
-    UnityEngine.Debug.LogFormat($"code: {code} error Message: {errorMsg}");
-
-    // 根据 code 不同提示玩家不同信息，详见下面的说明
-    if (code == 500)
+    };
+    
+    /// <summary>
+    /// 游戏场景的 Start 回调方法
+    /// </summary>
+  public void Start() {
+  
+    // 初始化 TapTap 登录（单纯 TapTap 用户认证方式）
+	  TapLogin.Init(clientId);
+	
+    // 定义合规认证模块 config
+    AntiAddictionConfig config = new AntiAddictionConfig()
     {
-        // 玩家未受到限制，正常进入游戏
-    }
-    if (code == 1000)
-    {
-        // 退出账号，当调用 AntiAddictionUIKit.Exit() 接口时触发
-        // 玩家在游戏内退出账号时调用该接口，重置防沉迷状态。
-    }
-    if (code == 1001)
-    {
-        // 说明玩家在实名认证过程中，点击了「切换账号」按钮会触发该回调，同时实名认证的弹窗会被销毁
-        // 需要游戏重新触发实名认证，正确引导玩家完成实名认证
-    }
-    if (code == 1100)
-    {
-        // 当前未成年玩家因触发应用设置的适龄限制无法进入游戏
-    }
-    if (code == 1200)
-    {
-        // 数据请求失败，游戏需检查当前设置的应用信息是否正确及判断当前网络连接是否正常
-    }
-    if (code == 9002)
-    {
-        // 实名认证过程中玩家点击了关闭实名窗，说明玩家并没有完成实名认证，是不可以进入游戏的
-        // 需要重新触发实名认证，正确引导玩家完成实名认证
-    }
-};
+        gameId = clientId,          // TapTap 开发者中心对应 Client ID
+        showSwitchAccount = false,  // 是否显示切换账号按钮
+        useAgeRange = false         // 是否使用年龄段信息
+     };
 
-// 再初始化合规认证
-AntiAddictionUIKit.Init(config);
-AntiAddictionUIKit.SetAntiAddictionCallback(callback);
+    // 初始化合规认证及设置回调
+    AntiAddictionUIKit.Init(config);
+    AntiAddictionUIKit.SetAntiAddictionCallback(AntiAddictionCallback);
+  }
+}
+
+
+
 ```
 
 </>
@@ -201,30 +210,23 @@ TapTap 登录按钮素材需要使用官方提供的[登录按钮素材](https:/
 <>
 
 ```cs
-try
-{
-    var accessToken = await TapLogin.Login();
-    Debug.Log($"TapTap 登录成功 accessToken: {accessToken.ToJson()}");
-
-    // TapTap 登录成功后可以通过 Profile  获得当前用户的一些基本信息，例如名称、头像。
-    var profile = await TapLogin.FetchProfile();
-    Debug.Log($"TapTap 登录成功 profile: {profile.ToJson()}");
-
-    // 实名认证，TapTap 登录成功后，游戏需要调用 `StartupWithTapTap` 接口进行实名认证
-    string userIdentifier = profile.unionid;
-    AntiAddictionUIKit.StartupWithTapTap(userIdentifier);  // 调用 StartupWithTapTap 接口才会触发实名认证回调，玩家的最终实名认证结果通过回调给出
-}
-catch (Exception e)
-{
-    if (e is TapException tapError)  // using TapTap.Common
-    {
-        Debug.Log($"encounter exception:{tapError.code} message:{tapError.message}");
-        if (tapError.code == (int)TapErrorCode.ERROR_CODE_BIND_CANCEL) // 取消登录
-        {
-            Debug.Log("登录取消");
-        }
-    }
-}
+try {
+		 // 检查之前是否已登录
+        AccessToken accessToken = await TapLogin.GetAccessToken();
+        if (accessToken == null) {
+        	  //未登录时，发起登录
+            accessToken = await TapLogin.Login();
+        } 
+        // 登录成功后可以通过 Profile  获得当前用户的一些基本信息
+        var profile = await TapLogin.FetchProfile();
+        string userIdentifier = profile.unionid;
+        // 使用当前 Tap 用户的 unionid 作为用户标识进行合规认证检查
+        AntiAddictionUIKit.StartupWithTapTap(userIdentifier);         
+    } 
+   	 catch (Exception e) {
+	 	 // 登录取消或失败
+	 	 //TODO: 提示用户重新登录
+	 }
 ```
 
 </>
@@ -271,7 +273,8 @@ AntiAddictionUIKit.CheckPayLimit(amount,
         if (status == 1) {
             // 可以进行支付
         } else {
-          // 说明玩家当前这笔消费不可以再继续了，如果继续就超过了限制，游戏侧需要拦截这笔消费
+          // 本次消费触发合规限制，游戏侧需停止后续付费流程
+          //TODO: 游戏提示玩家无法充值
         }
     },
     (exception) => {
