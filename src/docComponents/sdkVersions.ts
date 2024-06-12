@@ -10,7 +10,7 @@ const sdkVersions = {
     ios: taptapIos,
     unreal: taptapUnreal,
     rtc: "1.1.0",
-    adr: "1.2.2"
+    adr: "1.2.1"
   },
   leancloud: {
     objc: "13.9.0",
