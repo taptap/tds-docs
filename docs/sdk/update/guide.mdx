@@ -130,6 +130,13 @@ SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选�
 
 #### 方法一：使用 Unity Package Manager
 
+从 3.29.1 版本开始， SDK 修改 JSON 解析库为 `Newtonsoft-json`，如果当前工程已接入该依赖库，则不需额外处理，否则需在 `Packages/manifest.json` 添加如下依赖：
+
+```
+"com.unity.nuget.newtonsoft-json":"3.2.1"
+```
+
+
 ##### NPMJS 安装
 
 从 3.25.0 版本开始，TapSDK 支持了 NPMJS 安装，优势是只需要配置版本号，并且支持嵌套依赖。
@@ -163,7 +170,6 @@ SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选�
   {`"dependencies":{
     "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
     "com.taptap.tds.update":"https://github.com/TapTap/TapUpdate-Unity.git#${sdkVersions.taptap.unity}",
-    "com.leancloud.storage":"https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
     "com.tapsdk.androiddependencyresolver":"${sdkVersions.taptap.adr}",
 }
 "scopedRegistries": [
@@ -183,7 +189,7 @@ SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选�
 
 #### 方法二：手动导入
 
-1. 在 [下载页](/tap-download) 找到 **TapSDK Unity** 和 **LeanCloud C# SDK** 下载地址，分别下载 `TapSDK-UnityPackage.zip` 和 `LeanCloud-SDK-Realtime-Unity.zip`。
+1. 在 [下载页](/tap-download) 找到 **TapSDK Unity** 下载地址，分别下载 `TapSDK-UnityPackage.zip` 。
 
     然后请[**点击下载**](https://github.com/taptap/android_dependency_resolver/releases) `TapTap_AndroidDependencyResolver.unitypackage` 。
 
@@ -193,7 +199,16 @@ SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选�
     - TapTap_Update.unitypackage TapTap 唤起更新库，必选。
     - TapTap_AndroidDependencyResolver.unitypackage 必选。
 
-3. 解压后的 `LeanCloud-SDK-Realtime-Unity.zip` 为 Plugins 文件夹，拖拽至 Unity 即可。
+3. 如果当前项目已集成 Newtonsoft.Json 依赖，则忽略该步骤，否则在 NuGet.org [ Newtonsoft.Json ](https://www.nuget.org/packages/Newtonsoft.Json) 页面中通过点击右侧 Download package 下载库文件，并将下载的文件后缀从`.nupkg` 修改为 `.zip`，同时解压该文件并复制内部的 `Newtonsoft.Json.dll` 文件拷贝到工程 `Assets` 的 `Plugins` 目录下，另外为了避免导出 IL2CPP 平台时删除必要数据，需在 `Assets` 目录下创建 link.xml 文件（如果已有该文件，则添加如下内容），其内容如下：
+
+```
+<linker>
+  <assembly fullname="System.Core">
+    <type fullname="System.Linq.Expressions.Interpreter.LightLambda" preserve="all" />
+  </assembly>
+</linker>
+
+```
 
 </>
 
