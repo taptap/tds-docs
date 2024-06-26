@@ -55,6 +55,11 @@ const CONFIGS: {
       { label: "C#", value: "csharp" },
     ],
   },
+  alone_unity: {
+    tds: [
+      { label: "Unity", value: "unity" },
+    ],
+  },
   ue: {
     tds: [
       { label: "Unity", value: "unity" },
