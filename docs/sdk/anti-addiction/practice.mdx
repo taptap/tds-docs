@@ -311,7 +311,18 @@ public class LoginScene : MonoBehaviour
     /// </summary>
     public async void StartAntiAddiction()
     {
-        var profile = await TapLogin.GetProfile();
+        Profile profile = null;
+        try
+        {
+            profile = await TapLogin.GetProfile();
+        }
+        catch (Exception e)
+        {
+            // 获取 Tap profile 发生异常时，登出并显示登录按钮
+            TapLogin.Logout();
+            // TODO: 显示登录按钮
+            return;
+        }
 
         // 使用当前 Tap 用户的 unionid 作为用户标识进行合规认证检查
         string userIdentifier = profile.unionid;
