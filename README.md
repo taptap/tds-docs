@@ -22,6 +22,7 @@ yarn start --locale zh-hans
 
 **贡献方法及注意事项：**
 
+* 搭建本地开发环境，需要 [Node.js](https://nodejs.org/en/download/package-manager) 18.0 或更高版本 （可以通过运行 `node -v` 命令来查看本地 Node.js 版本）。你可以使用 [nvm](https://github.com/nvm-sh/nvm) 管理同一台计算机上安装的多个 Node 版本。
 * Fork 这个项目。
 * 切换到本地 master 分支，git fetch 拉取远端最新修改到本地，如果远端 master 分支有修改，则将本地 master 分支 rebase 到最新的 master 分支上。
 * 在 master 上新建分支，在新分支修改文档。
@@ -31,7 +32,7 @@ yarn start --locale zh-hans
   * 插入配图、图表和 PPT 等，可参考下文详细介绍。
 * 预览文档。运行 `yarn` 命令安装所需要依赖，运行 `yarn start` 命令可以本地预览。
 * 预览没问题后，提交修改并发起 Pull Request，并指定 Reviewer。
-  * Reviewer 同意修改后，才可以合并 Pull Request。如果不知道该设置谁作为 Reviewer，可以指给技术支持同事（fuchenshi、SXiaoXu、WatchMan-Wang、yuwenjian）。
+  * Reviewer 同意修改后，才可以合并 Pull Request。如果不知道该设置谁作为 Reviewer，可以指给技术支持同事（SXiaoXu、WatchMan-Wang、yuwenjian）。
   * Pull Request 合并后，会自动发布上线。文档每隔半小时自动检测是否有更新，如果有更新会自动部署。
   * Pull Request 合并后，可删除当前分支。
   * 可参考 [Git Commit 日志风格指南](https://open.leancloud.cn/git-commit-message/)
