@@ -22,7 +22,7 @@ yarn start --locale zh-hans
 
 **贡献方法及注意事项：**
 
-* 搭建本地开发环境，需要 Node.js 18.0 或更高版本 （可以通过运行 `node -v` 命令来查看本地 Node.js 版本）。
+* 搭建本地开发环境，需要 [Node.js](https://nodejs.org/en/download/package-manager) 18.0 或更高版本 （可以通过运行 `node -v` 命令来查看本地 Node.js 版本）。你可以使用 [nvm](https://github.com/nvm-sh/nvm) 管理同一台计算机上安装的多个 Node 版本。
 * Fork 这个项目。
 * 切换到本地 master 分支，git fetch 拉取远端最新修改到本地，如果远端 master 分支有修改，则将本地 master 分支 rebase 到最新的 master 分支上。
 * 在 master 上新建分支，在新分支修改文档。
