@@ -32,7 +32,7 @@ yarn start --locale zh-hans
   * 插入配图、图表和 PPT 等，可参考下文详细介绍。
 * 预览文档。运行 `yarn` 命令安装所需要依赖，运行 `yarn start` 命令可以本地预览。
 * 预览没问题后，提交修改并发起 Pull Request，并指定 Reviewer。
-  * Reviewer 同意修改后，才可以合并 Pull Request。如果不知道该设置谁作为 Reviewer，可以指给技术支持同事（fuchenshi、SXiaoXu、WatchMan-Wang、yuwenjian）。
+  * Reviewer 同意修改后，才可以合并 Pull Request。如果不知道该设置谁作为 Reviewer，可以指给技术支持同事（SXiaoXu、WatchMan-Wang、yuwenjian）。
   * Pull Request 合并后，会自动发布上线。文档每隔半小时自动检测是否有更新，如果有更新会自动部署。
   * Pull Request 合并后，可删除当前分支。
   * 可参考 [Git Commit 日志风格指南](https://open.leancloud.cn/git-commit-message/)
