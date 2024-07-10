@@ -38,8 +38,8 @@ Add the following dependencies into `Packages/manifest.json`:
 <CodeBlock className="json">
   {`"dependencies":{
     "com.tapsdk.antiaddiction":"https://github.com/taptap/TapAntiAddiction-Unity.git#${sdkVersions.taptap.unity}",
-    "com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
     "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}",
 }`}
 </CodeBlock>
 
@@ -50,10 +50,18 @@ In Unity’s menu bar, select **Window > Package Manager** to view the packages 
 Open the download pages of **TapSDK Unity** and **LeanCloud C# SDK** from the [Downloads](/tap-download) page and download `TapSDK-UnityPackage.zip` and `LeanCloud-SDK-Realtime-Unity.zip` from these pages.
 
 <ul>
-    <li>Import the <code>TapTap_Common_{sdkVersions.taptap.unity}.unitypackage</code> and <code>TapTap_AntiAddiction_{sdkVersions.taptap.unity}.unitypackage</code> unzipped from <code>TapSDK-UnityPackage.zip</code>.</li>
+    <li>Import the <code>TapTap_Common_{sdkVersions.taptap.unity}.unitypackage</code> and <code>TapTap_AntiAddiction_{sdkVersions.taptap.unity}.unitypackage</code> and <code>TapTap_Login_{sdkVersions.taptap.unity}.unitypackage</code>unzipped from <code>TapSDK-UnityPackage.zip</code>.</li>
 </ul>
 
-- Drag the `Plugins` folder unzipped from [`LeanCloud-SDK-Realtime-Unity.zip`](https://github.com/leancloud/csharp-sdk/releases) into Unity.
+- If the current project has integrated the Newtonsoft.Json dependency, ignore this step, otherwise download the library file by clicking `Download package` on the right side of the NuGet.org [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json) page and change the downloaded file extension from `.nupkg` to `.zip`, extract the file and copy the internal `Newtonsoft.Json.dll` file into the Plugins directory of the project `Assets - Plugins`. In addition, to avoid deleting the necessary data when exporting the `IL2CPP` platform, create a `link.xml` file in the `Assets` directory (if you already have this file, add the following content) with the following content
+
+```xml
+<linker>
+  <assembly fullname="System.Core">
+    <type fullname="System.Linq.Expressions.Interpreter.LightLambda" preserve="all" />
+  </assembly>
+</linker>
+```
 
 Configuring for iOS:
 
@@ -75,6 +83,7 @@ The SDK supports Android 5.0 (API level 21) and higher. The SDK is compiled with
 <li>Copy the <strong>Anti-addiction SDK</strong> <code>AntiAddiction_{sdkVersions.taptap.android}.aar</code> to the <code>src/main/libs</code> directory under your project</li>
 <li>Copy the <strong>Anti-addiction SDK</strong> <code>AntiAddictionUI_{sdkVersions.taptap.android}.aar</code> to the <code>src/main/libs</code> directory under your project</li>
 <li>Copy <code>TapCommon_{sdkVersions.taptap.android}.aar</code> to the <code>src/main/libs</code> directory under your project</li>
+<li>Copy <code>TapLogin_{sdkVersions.taptap.android}.aar</code> to the <code>src/main/libs</code> directory under your project</li>
 </ul>
 
 Add the following code to `build.gradle` under your project
@@ -90,6 +99,7 @@ dependencies {
     implementation(name: "AntiAddiction_${sdkVersions.taptap.ios}", ext: "aar") // Anti-addiction SDK
     implementation(name: "AntiAddictionUI_${sdkVersions.taptap.ios}", ext: "aar") // Anti-addiction SDK
     implementation(name: "TapCommon_${sdkVersions.taptap.ios}", ext: "aar")
+    implementation(name: "TapLogin_${sdkVersions.taptap.ios}", ext: "aar")
     // ...
 }`}
 </CodeBlock>
@@ -108,10 +118,13 @@ Below is the structure of the **Anti-addiction SDK** for iOS:
 Other dependencies:
 
 - `TapCommonSDK.framework`: The base library.
+- `TapLoginSDK.framework`: The base library.
+- `TapCommonResource.bundle`: The Resource files.
+- `TapLoginResource.bundle`: The Resource files.
 
 To add the libraries for the Anti-addiction service:
 
-- Add `AntiAddictionService.framework`, `AntiAddictionUI.framework`, and `TapCommonSDK.framework`. Make sure to choose **Do Not Embed** as the embed method when adding these libraries.
+- Add `AntiAddictionService.framework`, `AntiAddictionUI.framework`,  `TapLoginSDK.framework` , and `TapCommonSDK.framework`. Make sure to choose **Do Not Embed** as the embed method when adding these libraries.
 
 - Import the code:
 
@@ -153,7 +166,7 @@ Configure options for compiling:
 
 #### Install Plugins
 
-* Download [TapSDK UE4](/tap-download), unzip `TapSDK-UE4-xxx.zip`, and copy `AntiAddiction` and `TapCommon` to the `Plugins` directory of your project
+* Download [TapSDK UE4](/tap-download), unzip `TapSDK-UE4-xxx.zip`, and copy `AntiAddiction`, TapLogin and `TapCommon` to the `Plugins` directory of your project
 * Restart Unreal Editor
 * Go to Edit > Plugins > Project > TapTap and enable the `AntiAddiction` module
 
@@ -170,6 +183,7 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core",
 	"JsonUtilities",
 	"SlateCore",
 	"TapCommon",
+    "TapLogin",
 	"AntiAddiction"
 });
 ```
@@ -325,7 +339,7 @@ using TapTap.AntiAddiction.Model;
 AntiAddictionConfig config = new AntiAddictionConfig()
 {
     gameId = "your_client_id",      // The Client ID obtained from the TapTap Developer Center
-    useTapLogin = true,             // Whether to use TapTap Quick Verification
+    useAgeRange = false ,             // Whether to use age group information
     showSwitchAccount = false,      // Whether to display the button for switching account
 };         
 
@@ -335,11 +349,14 @@ Action<int, string> callback = (code, errorMsg) => {
     // code == 1001;  // The user tapped the button for switching account
     // code == 1030;  // The user is not allowed to play games at this time
     // code == 1050;  // The time limit is reached
+    // code == 1100;  // The user is unable to access the game due to triggering the age limit set by the app
+    // code == 1200;  // If the data request fails, the game needs to check whether the currently set application information is correct and judge whether the current network connection is normal.
     // code == 9002;  // The user closed the window for real-name verification
     UnityEngine.Debug.LogFormat($"code: {code} error Message: {errorMsg}");
 };
 
-AntiAddictionUIKit.Init(config, callback);
+AntiAddictionUIKit.Init(config);
+AntiAddictionUIKit.SetAntiAddictionCallback(callback);
 ```
 
 </>
@@ -351,7 +368,7 @@ AntiAddictionUIKit.Init(config, callback);
 
 Config config = new Config.Builder()
   .withClientId("your_client_id") // The Client ID obtained from the TapTap Developer Center
-  .enableTapLogin(true)           // Whether to use TapTap Quick Verification
+  .useAgeRange(false)           // Whether to use age group information
   .showSwitchAccount(false)       // Whether to display the button for switching account
   .build();
 
@@ -371,10 +388,11 @@ AntiAddictionUIKit.init(activity, config, new AntiAddictionUICallback() {
 ```objc
 AntiAddictionConfig *config = [[AntiAddictionConfig alloc] init];
 config.clientID = @"your_client_id";  // The Client ID obtained from the TapTap Developer Center
-config.useTapLogin = YES;
-config.showSwitchAccount = YES;
+config.useAgeRange = NO;   // Whether to use age group information
+config.showSwitchAccount = NO;  // Whether to display the button for switching account
 // `self` needs to implement the `AntiAddictionDelegate` protocol; `self` can be replaced by another object that follows the `AntiAddictionDelegate` protocol
-[AntiAddiction initWithConfig:config delegate:self];
+[AntiAddiction initWithConfig:config];
+[AntiAddiction setDelegate:delegate];
 ```
 
 The `delegate` object of `+[AntiAddiction initWithConfig:delegate:]` needs to implement the following protocol to receive callbacks:
@@ -391,9 +409,9 @@ The `delegate` object of `+[AntiAddiction initWithConfig:delegate:]` needs to im
 
 ```cpp
 FAAUConfig Config;
-Config.ClientID = TEXT("your_client_id"); // The Client ID obtained from the TapTap Developer Center
-Config.ShowSwitchAccount = false;
-Config.UseTapLogin = true;                // TapTap Quick Verification doesn’t support PC
+Config.ClientID = TEXT("your_client_id");  // The Client ID obtained from the TapTap Developer Center
+Config.ShowSwitchAccount = false;          // Whether to display the button for switching account
+Config.UseAgeRange = false;                // Whether to use age group information
 AntiAddictionUE::Init(Config);
 ```
 
@@ -506,6 +524,8 @@ The following parameters need to be provided when you initialize the Anti-addict
 | 1001 | `SWITCH_ACCOUNT` | The user tapped the button for switching account |
 | 1030 | `PERIOD_RESTRICT` | The user is not allowed to play games at this time |
 | 1050 | `DURATION_LIMIT` | The time limit is reached |
+| 1100 | `AGE_LIMIT` | The user is unable to access the game due to triggering the age limit set by the app |
+| 1200 | `INVALID_CLIENT_OR_NETWORK_ERROR` | If the data request fails, the game needs to check whether the currently set application information is correct and judge whether the current network connection is normal. |
 | 9002 | `REAL_NAME_STOP` | The user closed the window for real-name verification |
 
 ## Identity Verification
@@ -522,7 +542,7 @@ We recommend that you adopt the first method so that players won’t have to man
 ### TapTap Quick Verification
 
 :::info
-Starting from v3.7.1, TapTap Quick Verification doesn’t depend on the TapTap Login SDK anymore, although a player has to be logged in to authorize the game to use their age range information from TapTap. **Please make sure you have completed the following steps**:
+**Please make sure you have completed the following steps**:
 
 - **Enable TapTap Login**. If this step is not completed, the player will see “应用未开通 TapTap 登录服务” when using TapTap Quick Verification.
 - **[Configure the signature certificate](/sdk/start/quickstart/#configure-signature-certificate) on the Developer Center**. If this step is not completed, the player will see “授权失败” when using TapTap Quick Verification.
@@ -541,7 +561,7 @@ For `userIdentifier`, the **unique identifier of the player**, if your game is u
 ```cs
 // The unique identifier cannot be longer than 64 characters
 string userIdentifier = "THE_UNIQUE_IDENTIFIER_OF_THE_PLAYER";
-AntiAddictionUIKit.Startup(userIdentifier);
+AntiAddictionUIKit.StartupWithTapTap(userIdentifier);
 ```
 
 **Attention**: If your Unity project hasn’t integrated the TapTap Login module, you’ll need to configure the `URLSchema` when creating a package for iOS from the exported Xcode project.
@@ -583,7 +603,7 @@ Open `info.plist` and add the following configurations (replace the `clientID` w
 ```java
 // The unique identifier cannot be longer than 64 characters
 String userIdentifier = "THE_UNIQUE_IDENTIFIER_OF_THE_PLAYER";
-AntiAddictionUIKit.startup(activity, userIdentifier);
+AntiAddictionUIKit.startupWithTapTap(activity, userIdentifier);
 ```
 
 </>
@@ -592,7 +612,7 @@ AntiAddictionUIKit.startup(activity, userIdentifier);
 ```objc
 // The unique identifier cannot be longer than 64 characters
 NSString *userIdentifier = @"THE_UNIQUE_IDENTIFIER_OF_THE_PLAYER";
-[AntiAddiction startupWithUserID:userIdentifier];
+[AntiAddiction startupWithTapTap:userIdentifier];
 ```
 
 To use **TapTap Quick Verification**, the callback needs to be embedded into `AppDelegate`.
@@ -643,7 +663,7 @@ Open `info.plist` and add the following configurations (replace the `clientID` w
 <>
 
 ```cpp
-AntiAddictionUE::Startup(TEXT("your_userIdentifier"));
+AntiAddictionUE::StartupWithTapTap(TEXT("your_userIdentifier"));
 ```
 
 </>
@@ -886,273 +906,3 @@ AntiAddictionUE::SubmitPayResult(FCString::Atoi(*AmountTF->Text.ToString()), [](
 </MultiLang>
 
 When reporting payment amount, the unit of the amount is also *cent*.
-
-## Report Play Time
-
-Invoke the following interface once the player successfully logs in to your game. After that, the SDK will automatically and continuously report the game time of the player.
-
-<MultiLang kind="ue">
-
-```cs
-AntiAddictionUIKit.EnterGame();
-```
-
-```java
-AntiAddictionUIKit.enterGame();
-```
-
-```objc
-[AntiAddiction enterGame];
-```
-
-```cpp
-AntiAddictionUE::EnterGame();
-```
-
-</MultiLang>
-
-Invoke the following interface once the player leaves your game. The SDK will stop reporting the game time of the player.
-
-<MultiLang kind="ue">
-
-```cs
-AntiAddictionUIKit.LeaveGame();
-```
-
-```java
-AntiAddictionUIKit.leaveGame();
-```
-
-```objc
-[AntiAddiction leaveGame];
-```
-
-```cpp
-AntiAddictionUE::LeaveGame();
-```
-
-</MultiLang>
-
-## REST API
-
-### Request Format
-
-The body of any request sent to the REST API must be a JSON object. The `Content-Type` in the HTTP header should be `application/json`.
-
-The `Authorization TOKEN` HTTP header is used by the server to authenticate requests.
-To invoke the Anti-addiction REST API, you will first need to obtain a `TOKEN` on the client using the SDK, then give this `TOKEN` to the server. The server will then be able to invoke the REST API with this `TOKEN`.
-
-The API Base is `https://tds-tapsdk.cn.tapapis.com`.
-
-### Obtain the Authentication Token
-
-<MultiLang kind="ue">
-
-```cs
-string token = AntiAddictionUIKit.CurrentToken;
-```
-
-```java
-String token = AntiAddictionUIKit.currentToken();
-```
-
-```objc
-NSString *token = [AntiAddiction currentToken];
-```
-
-```cpp
-FString Token = AntiAddictionUE::CurrentToken();
-```
-
-</MultiLang>
-
-The token obtained here won’t expire.
-
-### Check if the Player Can Game
-
-```sh
-curl -X POST \
-  -H "Content-Type: application/json" \
-  -H 'Authorization: {{token}}' \
-  https://tds-tapsdk.cn.tapapis.com/anti-addiction/v1/clients/{{clientId}}/users/{{userIdentifier}}/playable
-```
-
-Among the request above:
-
-* `{{token}}` needs to be replaced with the [authentication token](#obtain-the-authentication-token) obtained by the client.
-* `{{clientId}}` needs to be replaced with the Client ID obtained from **开发者中心后台游戏服务 > 应用配置**.
-* `{{userIdentifier}}` needs to be replaced with the **unique identifier of the player** used for [identity verification](/sdk/anti-addiction/guide/#identity-verification).
-
-The response’s status code will be `200` for the following situations:
-
-```json
-// Failed to complete real-name verification
-{
-    "success": true,
-    "data": {
-        "status": 2,
-        "anti_addiction_token": "",
-        "age_limit": 18,
-        "has_auth_record": false
-    }
-}
-
-// The player is an adult
-{
-    "success":true,
-    "data":{
-        "code":200,
-        "can_play":true,
-        "message":"游戏时间不受限制",
-        "remain_time":60,
-        "cost_time":0,
-        "restrict_type":0,
-        "title":"健康游戏提示",
-        "description":"当前为成年人账号"
-    }
-}
-
-// The player is a minor and is allowed to game
-{
-    "success":true,
-    "data":{
-        "code":200,
-        "can_play":true,
-        "message":"游戏允许时间",
-        "remain_time": {{remainTime}},
-        "cost_time": {{costtime}},
-        "restrict_type":1,
-        "title":"健康游戏提示","description":"你当前为未成年账号，已被纳入防沉迷系统。根据国家相关规定，周五、周六、周日及法定节假日 20 点 - 21 点之外为健康保护时段。你今日游戏时间还剩余${remainTime}分钟，请注意适当休息。"
-    }
-}
-
-// The player is a minor and is not allowed to game
-{
-    "success":true,
-    "data":{
-        "code":200,
-        "can_play":false,
-        "message":"游戏时间耗尽",
-        "remain_time": 0,
-        "cost_time": 60,
-        "restrict_type":1,
-        "title":"健康游戏提示",
-        "description":"你当前为未成年账号，已被纳入防沉迷系统。根据国家相关规定，周五、周六、周日及法定节假日 20 点 - 21 点之外为健康保护时段。当前时间段无法游玩，请合理安排时间。"
-    }
-}
-```
-
-A `401` error will be returned if the token cannot be parsed:
-
-```json
-{
-    "success":false,
-    "data":{
-        "code":16,
-        "error":"实名认证失败",
-        "error_description":"未实名用户不能进入游戏",
-        "msg":"该账号没有通过实名认证"
-    }
-}
-```
-
-### Check if the Player Can Make Payments
-
-The unit of the payment amount is *cent*. For example, to check if the player can spend 1 Yuan (100 cents):
-
-```sh
-curl -X POST \
-  -H "Content-Type: application/json" \
-  -H 'Authorization: {{token}}' \
-  -d '{"amount": 100}' \
-  https://tds-tapsdk.cn.tapapis.com/anti-addiction/v1/clients/{{clientId}}/users/{{userIdentifier}}/payable
-```
-
-The status code of the response will be `200` no matter if the player is allowed to make the payment:
-
-```json
-// Restricted
-{
-    "success":true,
-    "data":{
-        "code":200,
-        "status":false,
-        "message":"限额提示",
-        "title":"健康消费提示",
-        "description":"允许充值根据国家相关规定，未满8周岁：不提供付费服务；8-16周岁以下：单笔付费不超过50元，每月累计不超过200元；16-18周岁以下：单笔付费不超过100元，每月累计不超过400元。"
-    }
-}
-
-// Allowed
-{
-    "success":true,
-    "data":{
-        "code":200,
-        "status":true,
-        "message":"限额提示",
-        "title":"健康消费提示",
-        "description":"允许充值根据国家相关规定，未满8周岁：不提供付费服务；8-16周岁以下：单笔付费不超过50元，每月累计不超过200元；16-18周岁以下：单笔付费不超过100元，每月累计不超过400元。"
-    }
-}
-```
-
-A `400` error will be returned if the amount is malformatted:
-
-```json
-{
-    "success":false,
-    "data":{
-        "code":3,
-        "error":"上传金额不正确",
-        "error_description":"金额大于等于0并小于100_000_000_000","msg":"请输入正确的金额格式"
-    }
-}
-```
-
-A `401` error will be returned if real-name verification fails (including if the token cannot be parsed):
-
-```json
-{
-    "success":false,
-    "data":{
-        "code":16,
-        "error":"实名认证失败",
-        "error_description":"未实名用户不能进入游戏",
-        "msg":"该账号没有通过实名认证"
-    }
-}
-```
-
-### Report Payment Amounts
-
-To report that the player has spent 1 Yuan (100 cents):
-
-```sh
-curl -X POST \
-  -H "Content-Type: application/json" \
-  -H 'Authorization: {{token}}' \
-  -d '{"amount": 100}' \
-  https://tds-tapsdk.cn.tapapis.com/anti-addiction/v1/clients/{{clientId}}/users/{userIdentifier}/payments
-```
-
-The status code of the response will be `200` if the amount is successfully reported:
-
-```json
-{
-    "success":true,
-    "data":{"message":"上传金额成功"}
-}
-```
-
-A `400` error will be returned if the amount is malformatted:
-
-```json
-{
-    "success":false,
-    "data":{
-        "code":3,
-        "error":"上传金额不正确",
-        "error_description":"金额大于等于0并小于100_000_000_000","msg":"请输入正确的金额格式"
-    }
-}
-```
