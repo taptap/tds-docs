@@ -27,34 +27,26 @@ import CodeBlock from '@theme/CodeBlock';
 <CodeBlock className="java">
  {`dependencies {
     ...
-    // TapPayment dependency
-    implementation 'com.taptap.android.payment:sdk:${sdkVersions.tapGlobalPayments.android}'
+    // TapTapIAP dependency
+    implementation 'com.taptap.android.payment:iap:${sdkVersions.tapGlobalPayments.android}'
+    implementation 'com.taptap.android.payment:base:${sdkVersions.tapGlobalPayments.android}'
+    implementation 'com.taptap.android.payment:stripe:${sdkVersions.tapGlobalPayments.android}'
+    implementation 'com.taptap.android.payment:braintree:${sdkVersions.tapGlobalPayments.android}'
+    implementation 'com.taptap.android.payment:iap:${sdkVersions.tapGlobalPayments.android}'
 }
 `}
 </CodeBlock>
 
 
 
-:::tip
-
-如果项目中有依赖 TapSDK 的库, 请使用 TapSDK 版本为 3.28.3 。
-
-当项目中有引入 `TapCommon_X.XX.X.aar` 和 `TapLogin_X.XX.X.aar` 的离线包时，请删除本地引入的这两个包，然后**改成 Gradle 方式依赖**，打开项目的 `project/app/build.gradle` 文件，添加 gradle 配置如下：
-
-```java
-implementation("com.taptap.android:login:3.28.3@aar")
-implementation("com.taptap.android:common:3.28.3@aar")
-```
-:::
-
 
 ### **SDK 初始化**
 
-添加 TapPayment 的依赖项后，您需要初始化 `TapPayment` 实例。`TapPayment` 是 SDK 与应用的其余部分之间进行通信。`TapPayment` 为许多常见的操作提供了方法。
+添加 TapTapIAP 的依赖项后，您需要初始化 `TapTapIAP` 实例。`TapTapIAP` 是 SDK 与应用的其余部分之间进行通信。`TapTapIAP` 为许多常见的操作提供了方法。
 
 首先 在应用启动时需要进行 SDK 初始化, 通过设置 `TapTapSdkOptions`, 完成 SDK 初始化, `TapTapSdk.init` 。
 
-这里需要设置对应在开发者后台申请的 `ClientID` 和 `ClientToken`，用于校验是否有权限使用 `TapPayment`。
+这里需要设置对应在开发者后台申请的 `ClientID` 和 `ClientToken`，用于校验是否有权限使用 `TapTapIAP`。
 
 ```java
 TapTapSdkOptions sdkOptions = new TapTapSdkOptions(
@@ -73,18 +65,16 @@ TapTapSdkOptions sdkOptions = new TapTapSdkOptions(
 TapTapSdk.init(context, sdkOptions);
 ```
 
-创建 `TapPayment`，请使用 `newBuilder()`。您可以将任何上下文传递给 `newBuilder()`，以供 `TapPayment` 用于获取应用上下文。意味着您不必担心内存泄漏。这里需要设置对应在开发者后台申请的 `ClientID` 和 `ClientToken`，用于校验是否有权限使用 `TapPayment`。
+创建 `TapTapIAP`，请使用 `newBuilder()`这里会根据SDK.init所设置的 `ClientID` 和 `ClientToken`校验是否有权限使用 `TapTapIAP`。
 
 ```java
- TapPayment tapPayment = TapPayment.newBuilder(context) // 将会用来获取 ApplicationContext.
-     .setClientId("xxxx") // 必填，开发者中心对应 Client ID
-     .setClientToken("xxxxx") // 必填，开发者中心对应 Client Token
-     .build();
+// 创建 TapTapIAP 实例
+ TapTapIAP tapTapIAP = TapTapIAP.newBuilder().build();
  ```
 
 ### **展示可供购买的商品**
 
-初始化完成 `TapPayment` 后，您就可以查询可售的商品并将其展示给用户了。
+初始化完成 `TapTapIAP` 后，您就可以查询可售的商品并将其展示给用户了。
 
 查询应用内商品详情，请调用 `queryProductDetailsAsync()`。为了处理该异步操作的结果，您还必须指定实现 ` ProductDetailsResponseListener` 接口的监听器。然后，您可以替换 `onProductDetailsResponse()`，该方法会在查询完成时通知监听器，如以下示例所示：
 
@@ -103,7 +93,7 @@ for (int i = 0; i < products.length; i++) {
 }
 QueryProductDetailsParams params = QueryProductDetailsParams.newBuilder()
     .setProductList(queryProductList).build();
-tapPayment.queryProductDetailsAsync(params, new ProductDetailsResponseListener() {
+tapTapIAP.queryProductDetailsAsync(params, new ProductDetailsResponseListener() {
     @Override
     public void onProductDetailsResponse(TapPaymentResult result,
         List<ProductDetails> productDetails, List<String> unavailableProductIds) {
@@ -133,7 +123,7 @@ BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
     .setObfuscatedAccountId("xxx") //Specifies an optional obfuscated string that is uniquely associated with the user's account in your app.
     .build();
 // Launch the billing flow
-TapPaymentResult result = tapPayment.launchBillingFlow(activity,
+TapPaymentResult result = tapTapIAP.launchBillingFlow(activity,
     billingFlowParams,
     new PurchaseUpdatedListener() {
         @Override
@@ -148,7 +138,7 @@ TapPaymentResult result = tapPayment.launchBillingFlow(activity,
 
 ### **购买流程中订单状态监听**
 
-在购买流程中, `TapPayment` 会调用 `onPurchasesUpdated()`，以将购买的订单状态变更实时传给实现 PurchasesUpdatedListener 接口的监听器。您可以在初始化时使用 `setListener()` 方法指定监听器。您必须实现 `onPurchasesUpdated()` 来处理可能的响应代码。以下提供了一个 `onPurchasesUpdated()` 示例 :
+在购买流程中, `TapTapIAP` 会调用 `onPurchasesUpdated()`，以将购买的订单状态变更实时传给实现 PurchasesUpdatedListener 接口的监听器。您可以在初始化时使用 `setListener()` 方法指定监听器。您必须实现 `onPurchasesUpdated()` 来处理可能的响应代码。以下提供了一个 `onPurchasesUpdated()` 示例 :
 
 ```java
 @Override
@@ -166,7 +156,7 @@ public void onPurchaseUpdated(TapPaymentResult result, Purchase purchase) {
 
 ### **进行商品的发放，且完成订单**
 
-在用户进行完了任意商品的购买, 请确认为该用户发放对应的商品或者解锁对应的关卡。在确定商品发放之后需要调用 `finishPurchaseAsync` 告知 `TapPayment` 已完成商品的发放。以下是个代码实例：
+在用户进行完了任意商品的购买, 请确认为该用户发放对应的商品或者解锁对应的关卡。在确定商品发放之后需要调用 `finishPurchaseAsync` 告知 `TapTapIAP` 已完成商品的发放。以下是个代码实例：
 
 ```java
 Purchase purchase = ...;
@@ -175,7 +165,7 @@ FinishPurchaseParams params = FinishPurchaseParams.newBuilder()
     .setOrderToken(purchase.getOrderToken()) // Required
     .setPurchaseToken(purchase.getPurchaseToken()) // Required
     .build();
-tapPayment.finishPurchaseAsync(params, new FinishPurchaseResponseListener() {
+tapTapIAP.finishPurchaseAsync(params, new FinishPurchaseResponseListener() {
     @Override
     public void onFinishPurchaseResponse(TapPaymentResult result, Purchase purchase) {
     }
@@ -190,12 +180,12 @@ tapPayment.finishPurchaseAsync(params, new FinishPurchaseResponseListener() {
 - **多部设备**：用户在一部设备上购买了一件商品，然后在切换设备时期望看到该商品。
 - **异常崩溃**：用户在外部购买成功时，应用出现了崩溃的情况。
 
-为了处理这些情况，请确保您的应用在 `onResume()` 方法中调用 `tapPayment.queryUnfinishedPurchaseAsync()`，以确保所有购买交易都得到正确处理。
+为了处理这些情况，请确保您的应用在 `onResume()` 方法中调用 `tapTapIAP.queryUnfinishedPurchaseAsync()`，以确保所有购买交易都得到正确处理。
 
 以下示例展示了如何提取用户的未完成订单列表：
 
 ```java
-tapPayment.queryUnfinishedPurchaseAsync(new PurchasesResponseListener() {
+tapTapIAP.queryUnfinishedPurchaseAsync(new PurchasesResponseListener() {
     @Override
     public void onQueryPurchasesResponse(TapPaymentResult result, List<Purchase> purchases) {
         if (purchases != null) {
@@ -209,7 +199,7 @@ tapPayment.queryUnfinishedPurchaseAsync(new PurchasesResponseListener() {
 
 ### **处理 TapPaymentResult 响应代码**
 
-当使用 `TapPayment Play` 结算库调用触发操作时，该库会返回 `TapPaymentResult` 响应，并将结果告知开发者。例如，如果您使用 `queryProductDetailsAsync` 且返回 `OK` ，并提供正确的 `ProductDetails` 对象；或者返回了其他类型，代表了无法提供 `ProductDetails` 对象的原因。
+当使用 `TapTapIAP` 结算库调用触发操作时，该库会返回 `TapPaymentResult` 响应，并将结果告知开发者。例如，如果您使用 `queryProductDetailsAsync` 且返回 `OK` ，并提供正确的 `ProductDetails` 对象；或者返回了其他类型，代表了无法提供 `ProductDetails` 对象的原因。
 
 并非所有类型都是错误。下面列举了一些 `TapPaymentResponseCode` 不是错误的：
 
@@ -220,7 +210,7 @@ tapPayment.queryUnfinishedPurchaseAsync(new PurchasesResponseListener() {
 
 | **可重试的 CODE**  | **问题**                                                                                            | **可以尝试的解决方案**                                                                 |
 | ------------------ | --------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| NETWORK_ERROR      | 此错误代表设备和 TapPayment 系统之间的网络连接出现问题                                              | 可以使用简单的重试策略或指数退避算法                                                   |
+| NETWORK_ERROR      | 此错误代表设备和 TapTapIAP 系统之间的网络连接出现问题                                              | 可以使用简单的重试策略或指数退避算法                                                   |
 | ITEM_ALREADY_OWNED | 这个类型表明用户已经购买过 非消耗品 商品, 再次购买时会返回该错误                                    | 为了避免出现这个问题, 在展示商品界面就提示用户已经购买该商品, 且无法点进进行购买流程.  |
 | USER_CANCELED      | 用户已退出结算流程                                                                                  |                                                                                        |
 | ITEM_UNAVAILABLE   | 商品无效, 有可能是商品已经过期或者商品已经被下架                                                    | 确保您通过 `queryProductDetailsAsync` 刷新商品详情。如果商品无效则不在界面上展示给用户 |

@@ -32,7 +32,7 @@ const sdkVersions = {
   },
   tapGlobalPayments: {
     unity: "4.0.14",
-    android: "4.0.14",
+    android: "4.2.5",
   }
 };
 
