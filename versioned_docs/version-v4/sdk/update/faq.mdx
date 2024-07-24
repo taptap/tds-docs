@@ -1,0 +1,71 @@
+---
+title: 常见问题
+sidebar_label: 常见问题
+sidebar_position: 3
+---
+
+### 弹窗提示『请求失败，请重试』
+
+可以参考[集成前准备](/sdk/update/guide/#集成前准备)检查是否已经提交 APK 并通过审核，以及发布设置是否为立即上线状态。
+
+
+### 从 v3.23.0 以前的版本更新到新版本的升级流程
+将原先 `updateGame` 相关的接口代码删除，并重新按 [sdk-获取](/sdk/update/guide/#sdk-获取)的流程接入
+
+### Unity 唤醒更新会增加哪些 Android 依赖库
+首先 Unity 唤醒更新只会在 **Android** 平台生效，其次唤醒更新新加的依赖库会在打包过程中自动添加到 [Unity Gradle Template](https://docs.unity3d.com/Manual/gradle-templates.html) 中，您可以到 `唤醒更新模块/Mobile/Editor/TapTapUpdateDependencies.xml` 中查看到，具体来说会增加 3 个依赖库：
+1. com.squareup.okhttp3:okhttp:3.12.1
+2. androidx.core:core:1.6.0
+3. com.google.android.flexbox:flexbox:3.0.0
+
+## 单机游戏没有服务器，如何接入该功能？
+
+单机游戏暂不需要接入更新唤起功能。
+
+## 更新唤起功能支持 iOS 版本吗？
+
+受限于苹果政策，iOS 平台的 TapTap 客户端无法提供游戏更新功能，更新唤起能力仅支持 Android 平台使用。
+
+## 更新唤起功能是否只适用于强制更新的游戏版本？
+
+游戏在强更场景必须使用「更新唤起」服务，**当游戏需要包体强更时，请求 SDK 更新接口，唤起 TapTap 更新即可**，同时平台也不会干涉游戏自身的热更操作，如果游戏在非强更场景，也希望用户更新的话，可以尝试在公告等场景对用户进行提醒。
+
+## 接入更新唤起功能后，如何进行测试？
+
+建议在测试环境中验收接入效果，具体测试流程如下：
+
+1. 需模拟游戏实际更新场景，测试的包体版本号（Version Code）需低于游戏在服务器上设置的最新版本；
+2. 当打开版本号较低的测试包体时，游戏需自行获取服务器上的版本号并能与当前测试包体的版本号进行判断对比；
+3. 判断当前测试包体版本号较低的情况下，能成功调起更新唤起功能接口；
+4. 功能验证完成。
+
+## 接入更新唤起游戏打包报 `Android resource linking failed，AAPT:error:resource android:attr/xx/xx not found.` 异常
+
+检查项目打包时 compileSdkVersion 版本号，该异常时 Gradle 版本和 compileSdkVersion 匹配问题导致，建议将 compileSdkVersion 升级到 28 或更高版本。
+
+## 接入更新唤起游戏打包报 `getUpdateInfo error: org.json.JSONExcetion: {"date": "{xxxx}"}` 异常
+
+检查项目是否开启了混淆操作，TapSDK 已经做了混淆处理，再次混淆会导致不可预期的错误，请在项目的混淆脚本中添加如下配置，跳过对 TapSDK 的混淆操作：
+```java
+-keep class com.tds.** { *;}
+-keep class com.taptap.** { *;}
+-keep class com.tapsdk.** { *;}
+-keep class tds.androidx.** { *;}
+```
+
+### 引入 TapUpdate 模块后闪退报错：Unable to get provider com.taptap.services.update.TapUpdateFileProvider，具体表现是弹出「更新游戏，需安装 TapTap 客户端」页面，点击「安装 TapTap」没有相应。
+
+检查游戏是否存在二次打包的情况，检查二次打包后 APK 中的 AndroidManifest.xml 文件中如下的 `provider` 标签里面的 `android:authorities` 字段值是否为 `项目包名.com.taptap.services.update.fileProvider`，如果不是的话，请手动更正。
+
+```xml
+<provider
+    android:name="com.taptap.services.update.TapUpdateFileProvider"
+    android:exported="false"
+    android:authorities="项目包名.com.taptap.services.update.fileProvider"
+    android:grantUriPermissions="true">
+
+    <meta-data
+        android:name="android.support.FILE_PROVIDER_PATHS"
+        android:resource="@ref/0x7f100002" />
+</provider>
+```
