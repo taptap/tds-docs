@@ -49,7 +49,7 @@ const config = {
           versions: {
             'v4': {
               label: 'v4',
-              path: 'version-v4',
+              path: 'v4',
               banner: "unreleased",
             },
             current: {
@@ -57,7 +57,7 @@ const config = {
             },
             'v2': {
               label: 'v2',
-              path: 'version-v2',
+              path: 'v2',
               banner: 'unmaintained',
             },
           },
