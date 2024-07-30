@@ -33,7 +33,7 @@ TODO ChenKe
 
 <>
 
-TODO LiChao
+iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
 
 </>
 
@@ -55,7 +55,6 @@ TODO ChenKe
 
 <>
 
-TODO LiChao
 
 </>
 
@@ -98,7 +97,27 @@ TODO ChenKe
 </>
 
 <>
-TODO LiChao
+iOS 提供通过添加 cocosPod 远程依赖和使用本地文件导入两种集成方式，推荐使用远程依赖方式。
+
+#### 远程依赖
+
+1. 在工程 Podfile 文件中对应模块下添加依赖：` pod 'TapTapAchievementSDK', '~> 4.3.0'
+   `
+2. 执行 `Pod install` 下载对应依赖文件
+3. 将工程 Pods 目录下 `TapTapAchievementSDK/Frameworks/TapTapAchievementResource.bundle` 和 `TapTapLoginSDK/Frameworks/TapTapLoginResource.bundle`
+   等资源文件导入工程中
+
+#### 本地文件依赖
+
+成就模块依赖于 TapCore 和 Tap 登录模块，使用本地文件方式添加依赖时，需先参考 TapCore 和 Tap 登录模块添加对应依赖。
+
+1. 在下载页下载如下文件：
+
+- `TapTapAchievementSDK ` 合规认证依赖库
+- `TapTapAchievementResource.bundle` 合规认证资源文件
+
+2. 在工程中添加 `framework` 静态库，注意添加时选择 Embed 方式为 **Do Not Embed**。
+
 </>
 
 </MultiLang>
@@ -136,7 +155,22 @@ TODO ChenKe
 </>
 
 <>
-TODO LiChao
+
+```
+import TapTapAchievementSDK
+import TapTapCoreSDK
+
+// 核心配置
+let coreOptions = TapTapSDKCoreOptions()
+// TODO: coreOptions 配置
+// 成就配置
+let achievementOptions = TapTapAchievementOptions()
+achievementOptions.enableToast = true
+// 其他模块配置项
+let otherOptions = [achievementOptions]
+// TapSDK 初始化
+TapTapSDK.initWith(coreOptions, otherOptions: otherOptions)
+```
 </>
 
 </MultiLang>
@@ -161,7 +195,8 @@ TODO ChenKe
 </>
 
 <>
-TODO LiChao
+```
+```
 </>
 
 </MultiLang>
@@ -200,7 +235,7 @@ class AchievementCallback : ITapAchievementCallback
         // achievementId 触发失败的成就 ID， 如果调用的是 [ShowAchievements] 接口，则为 "" 空字符串。
         // errorCode 错误码 详见 [错误码详情]
         // errorMsg 错误描述
-    }
+	}
 
 }
 ```
@@ -245,10 +280,60 @@ TODO ChenKe
 </>
 <>
 
-```objectivec
-TODO LiChao
-```
+```swift
+import TapTapAchievementSDK
 
+class GameMainSence: NSObject, TapTapAcheievementCallback {
+
+		override init() {}
+		
+		// 成就状态更新成功
+		func onAchievementSuccess(code: Int, result: TapTapAchievementResult) {
+	        // code 70001 解锁成就成功
+	        // code 70002 增加步长成功
+	        // result 成就数据详情 详见 [成功数据详情]
+        }
+		
+		// 成就状态更新失败或其他错误    
+		func onAchievementFailure(achievementId: String, errorCode: Int, errorMsg: String) {
+			 // achievementId 触发失败的成就 ID， 如果调用的是 [ShowAchievements] 接口，则为 "" 空字符串。
+        	 // errorCode 错误码 详见 [错误码详情]
+        	 // errorMsg 错误描述
+		 }
+}
+```
+成就常量定义：
+
+```swift
+public class TapAchievementCallbackCode: NSObject {
+    // 解锁成就成功，包括步长达到阈值解锁和直接解锁
+    public static let UNLOCK_SUCCESS = 70001
+    
+    // 增加步长成功
+    public static let INCREMENT_SUCCESS = 70002
+    
+    // 上报失败，未初始化
+    public static let NOT_INITIALIZED = 80000
+    
+    // 区域不支持
+    public static let REGION_NOT_SUPPORTED = 80001
+    
+    // 上报失败，未登录
+    public static let NOT_LOGGED = 80002
+    
+    // 认证信息无效
+    public static let ACCESS_DENIED = 80010
+    
+    // 无效请求
+    public static let INVALID_REQUEST = 80020
+    
+    // 网络异常
+    public static let NETWORK_ERROR = 80030
+    
+    // 未知异常
+    public static let UNKNOWN_ERROR = 80100
+}
+```
 </>
 
 </MultiLang>
@@ -294,8 +379,11 @@ TapTapAchievement.Unlock(achievementId : achievementId);
 TODO ChenKe
 ```
 
-```objectivec
-TODO LiChao
+```swift
+import TapTapAchievementSDK
+
+// achievementId 是在开发者中心中添加成就时自行设定的成就 Id
+TapTapAchievement.unlock(achievementId: achievementId)
 ```
 
 </MultiLang>
@@ -322,8 +410,15 @@ TapTapAchievement.Increment(achievementId : achievementId, step : step);
 TODO ChenKe
 ```
 
-```objectivec
-TODO LiChao
+```swift
+import TapTapAchievementSDK
+
+// achievementId 为在开发者中心中添加成就时自行设定的成就 Id
+let achievementId = "achievementId"
+// steps 为增长的步数
+let steps = 1
+// 更新成就步长数据
+TapTapAchievement.increment(achievementId: achievementId, steps: steps)
 ```
 
 </MultiLang>
@@ -345,8 +440,10 @@ TapTapAchievement.SetToastEnable(false);
 TODO ChenKe
 ```
 
-```objectivec
-TODO LiChao
+```swift
+import TapTapAchievementSDK
+
+TapTapAchievement.setToastEnable(enable: false)
 ```
 
 </MultiLang>
@@ -379,8 +476,10 @@ TODO ChenKe
 
 <>
 
-```objectivec
-TODO LiChao
+```swift
+import TapTapAchievementSDK
+
+TapTapAchievement.showAchievements()
 ```
 
 </>

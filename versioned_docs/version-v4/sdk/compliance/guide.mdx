@@ -114,18 +114,20 @@ iOS 提供通过添加 cocosPod 远程依赖和使用本地文件导入两种集
 
 #### 远程依赖
 
-1. 在工程 Podfile 文件中对应模块下添加依赖：` pod 'TapTapSDKCompliance', '~> 4.3.0'
+1. 在工程 Podfile 文件中对应模块下添加依赖：` pod 'TapTapComplianceSDK', '~> 4.3.0'
    `
 2. 执行 `Pod install` 下载对应依赖文件
-3. 将工程 Pods 目录下 `TapTapSDKCompilance/Frameworks/TapComplianceResource.bundle` 和 `TapTapLoginSDK/Frameworks/TapTapLoginResource.bundle`
+3. 将工程 Pods 目录下 `TapTapCompilanceSDK/Frameworks/TapTapComplianceResource.bundle` 和 `TapTapLoginSDK/Frameworks/TapTapLoginResource.bundle`
    等资源文件导入工程中
 
 #### 本地文件依赖
 
+合规认证模块依赖于 TapCore 和 Tap 登录模块，使用本地文件方式添加依赖时，需先参考 TapCore 和 Tap 登录模块添加对应依赖。
+
 1. 在下载页下载如下文件：
 
-- `TapTapSDKCompliance.xcframework` 合规认证依赖库
-- `TapComplianceResource.bundle` 合规认证资源文件
+- `TapTapComplianceSDK.xcframework` 合规认证依赖库
+- `TapTapComplianceResource.bundle` 合规认证资源文件
 
 2. 在工程中添加 `framework` 静态库，注意添加时选择 Embed 方式为 **Do Not Embed**。
 
@@ -176,17 +178,20 @@ TapTapSDK.Init(coreOptions, otherOptions);
 <>
 
 ```swift
-	// 核心配置
-	let coreOptions = TapTapSDKCoreOptions()
-    // TODO: coreOptions 配置
-    // 合规认证配置
-	let complianceOptions = TapTapComplianceOptions()
-	complianceOptions.useAgeRange = false
-	complianceOptions.showSwitchAccount = true
-	// 其他模块配置项
-	let otherOptions = [complianceOptions]
-	// TapSDK 初始化
-	TapTapSDK.initWith(coreOptions, otherOptions: otherOptions)
+import TapTapComplianceSDK
+import TapTapCoreSDK
+
+// 核心配置
+let coreOptions = TapTapSDKCoreOptions()
+// TODO: coreOptions 配置
+// 合规认证配置
+let complianceOptions = TapTapComplianceOptions()
+complianceOptions.useAgeRange = false
+complianceOptions.showSwitchAccount = true
+// 其他模块配置项
+let otherOptions = [complianceOptions]
+// TapSDK 初始化
+TapTapSDK.initWith(coreOptions, otherOptions: otherOptions)
 ```
 
 </>
@@ -231,6 +236,8 @@ TapTapCompliance.RegisterComplianceCallback(callback);
 <>
 
 ```swift
+import TapTapComplianceSDK
+
 // 实现 TapTapComplianceDelegate 协议
 extension GameMainController: TapTapComplianceDelegate {
     func complianceCallback(with code: TapComplianceResultHandlerCode, extra: String?) {
@@ -288,6 +295,9 @@ if (account != null) {
 <>
 
 ```swift
+import TapTapComplianceSDK
+import TapTapLoginSDK
+
 let userIdentifier = TapTapLogin.currentAccount?.userInfo?.unionId
 TapTapCompliance.startup(userIdentifier)
 ```  
@@ -326,6 +336,8 @@ TapTapCompliance.CheckPayLimit(
 ```
 
 ```swift
+import TapTapComplianceSDK
+
 // 消费金额，单位为分
 let amount = 100 
 TapTapCompliance.checkPaymentLimit(amount) { status, title, desc in
@@ -369,6 +381,8 @@ TapTapCompliance.SubmitPayResult(
 ```
 
 ```swift
+import TapTapComplianceSDK
+
 // 消费金额，单位为分
 let amount = 100 
 TapTapCompliance.submitPayment(amount) { success in
@@ -399,6 +413,8 @@ TapTapCompliance.Exit();
 ```
 
 ```swift
+import TapTapComplianceSDK
+
 TapTapCompliance.exit()
 ```
 
@@ -422,6 +438,8 @@ int ageRange = await TapTapCompliance.GetAgeRange();
 ```
 
 ```swift
+import TapTapComplianceSDK
+
 let ageRange = TapTapCompliance.getAgeRange().rawValue
 ```
 
@@ -460,9 +478,9 @@ int time = await TapTapCompliance.GetRemainingTime(); // 单位:秒
 ```
 
 ```swift
-let remainingTimeInSeconds = TapTapCompliance.getRemainingTime()    // 单位：秒
+import TapTapComplianceSDK
 
-let remainingTimeInMinutes = TapTapCompliance.getRemainingTimeInMinutes()    // 单位：分
+let remainingTimeInSeconds = TapTapCompliance.getRemainingTime()    // 单位：秒
 ```
 
 </MultiLang>
@@ -495,6 +513,8 @@ TapTapCompliance.SetTestEnvironment(true);
 ```
 
 ```swift
+import TapTapComplianceSDK
+
 TapTapCompliance.setTestEnvironment(true)
 ```
 
