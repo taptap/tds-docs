@@ -51,9 +51,9 @@ iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.a
 
 该模块需要如下权限：
 
-| 权限 | 使用目的 | 权限申请时机 |
-| ---------------------- | ---------------------- | ---------------------- |
-| 网络权限 | 用于正常网络请求 | 用户首次使用该功能时会申请权限 |
+| 权限       | 使用目的           | 权限申请时机          |
+|----------|----------------|-----------------|
+| 网络权限     | 用于正常网络请求       | 用户首次使用该功能时会申请权限 |
 | 获取网络状态权限 | 用于检测当前网络连接是否有效 | 用户首次使用该功能时会申请权限 |
 
 该模块将在应用中添加如下权限：
@@ -71,8 +71,6 @@ iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.a
 
 </MultiLang>
 
-
-
 ## 集成前准备
 
 1. 参考 [准备工作](/sdk/start/get-ready/) 创建应用、开启应用配置。
@@ -87,22 +85,67 @@ iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.a
 
 <>
 
+由于TapSDK V4 依赖于TapTapCore核心库，所以需要在TapTapCore的基础上，另外添加 `TapTapCompliance` 、 `TapTapLogin` 模块：
+
+从 3.29.1 版本开始， SDK 修改 JSON 解析库为 `Newtonsoft-json`，如果当前工程已接入该依赖库，则不需额外处理，否则需在 `Packages/manifest.json` 添加如下依赖：
+
+```
+{
+   "dependencies": {
+      "com.unity.nuget.newtonsoft-json":"3.2.1"
+   }
+}
+```
+
+从 4.0.0 版本开始， SDK 使用 `com.google.external-dependency-manager`
+管理Android、iOS依赖，如果当前工程已接入该依赖库，则不需额外处理，否则需在 `Packages/manifest.json` 添加如下依赖：
+
+```
+{
+   "dependencies": {
+      "com.google.external-dependency-manager": "1.2.179"
+   },
+   "scopedRegistries": [
+      {
+         "name": "package.openupm.com",
+         "url": "https://package.openupm.com",
+         "scopes": [
+            "com.google.external-dependency-manager"
+         ]
+      }
+  ]
+}
+```
+
+SDK 目前使用手动导入。
+
+1. [点击下载 TapSDK-UnityPackage.zip](https://git.gametaptap.com/tapsdk/unity/unitypackage/-/blob/master/TapSDK_4.3.0.zip)，然后将该 SDK 解压到方便的位置。
+
+2. 在 Unity 项目中依次转到 **Assets > Import Packages > Custom Packages**。
+
+3. 从解压缩中的 TapSDK 中，选择希望在应用中使用的 TapTapSDK 包导入。
+
+    - `TapTapSDK_Core.unitypackage` 必选，TapTapSDK 启动器
+    - `TapTapSDK_Compliance.unitypackage` 必选，TapTapSDK 合规认证模块
+    - `TapTapSDK_Login.unitypackage` 必选，TapTapSDK 登录模块
+
+导入 SDK 后还需进行 Android、iOS 平台的相关配置。
+
 </>
 <>
-
 
 </>
 <>
 
 iOS 提供通过添加 cocosPod 远程依赖和使用本地文件导入两种集成方式，推荐使用远程依赖方式。
 
-
 #### 远程依赖
 
 1. 在工程 Podfile 文件中对应模块下添加依赖：` pod 'TapTapSDKCompliance', '~> 4.3.0'
-`
+   `
 2. 执行 `Pod install` 下载对应依赖文件
-3. 将工程 Pods 目录下 `TapTapSDKCompilance/Frameworks/TapComplianceResource.bundle` 和 `TapTapLoginSDK/Frameworks/TapTapLoginResource.bundle` 等资源文件导入工程中
+3. 将工程 Pods 目录下 `TapTapSDKCompilance/Frameworks/TapComplianceResource.bundle` 和 `TapTapLoginSDK/Frameworks/TapTapLoginResource.bundle`
+   等资源文件导入工程中
 
 #### 本地文件依赖
 
@@ -128,13 +171,29 @@ iOS 提供通过添加 cocosPod 远程依赖和使用本地文件导入两种集
 <MultiLang>
 <>
 
-```cs    
-
+```cs   
+using TapSDK.Core;
+using TapSDK.Compliance;
+ 
+// 核心配置 详细参数见 [TapTapSDK]
+TapTapSDKCoreOptions coreOptions = new TapTapSDKCoreOptions();
+// 合规认证配置
+TapTapComplianceOption complianceOption = new TapTapComplianceOption
+{
+    showSwitchAccount = showComplianceSwitchAccount,
+    useAgeRange = useComplianceAgeRange
+};
+// 其他模块配置项
+TapTapSDKBaseOption[] otherOptions = new TapTapSDKBaseOption[]
+{
+    complianceOption
+};
+// TapSDK 初始化
+TapTapSDK.Init(coreOptions, otherOptions);
 ```
 
 </>
 <>
-
 
 ```java
 
@@ -163,12 +222,12 @@ iOS 提供通过添加 cocosPod 远程依赖和使用本地文件导入两种集
 
 ##### 参数说明
 
- - `showSwitchAccount` 是否显示切换账号按钮，默认为 false 。如果游戏支持切换账号功能则可以设置为 true，当玩家点击切换账号按钮后，SDK 会触发 `1001` 回调，游戏可根据该回调 code 做相应处理
- - `useAgeRange` 游戏是否需要获取真实年龄段信息，默认为 true 。当为 true 时，使用 Tap 实名时会需要用户主动授权，当设置为 false 时，使用 Tap 实名时会进行无 UI 交互的静默授权
-  
+- `showSwitchAccount` 是否显示切换账号按钮，默认为 false 。如果游戏支持切换账号功能则可以设置为 true，当玩家点击切换账号按钮后，SDK 会触发 `1001`
+  回调，游戏可根据该回调 code 做相应处理
+- `useAgeRange` 游戏是否需要获取真实年龄段信息，默认为 true 。当为 true 时，使用 Tap 实名时会需要用户主动授权，当设置为 false 时，使用 Tap 实名时会进行无
+  UI 交互的静默授权
 
 ![切换账号界面](/img/anti-addiction/switch-account.png)
-
 
 ### 回调设置
 
@@ -178,11 +237,17 @@ iOS 提供通过添加 cocosPod 远程依赖和使用本地文件导入两种集
 <>
 
 ```cs
+using TapSDK.Compliance;
+
+private Action<int, string> callback => (code, s) => {
+    // do something
+};
+
+TapTapCompliance.RegisterComplianceCallback(callback);
 ```
 
 </>
 <>
-
 
 ```java
 
@@ -203,37 +268,42 @@ extension GameMainController: TapTapComplianceDelegate {
 TapTapCompliance.register(self)
 ```
 
-
 </>
 
 </MultiLang>
 
 回调参数中 code 用于标识回调类型， extra 为对应提示信息
 
-| 回调 code | 回调类型 | 触发逻辑 |
-|---|---|---|
-| 500 | `LOGIN_SUCCESS` | 玩家未受到限制，正常进入游戏 |
-| 1000 | `EXITED` | 退出防沉迷认证及检查，当开发者调用 Exit 接口时或用户认证信息无效时触发，游戏应返回到登录页 |
-| 1001 | `SWITCH_ACCOUNT` | 用户点击切换账号，游戏应返回到登录页 |
-| 1030 | `PERIOD_RESTRICT` | 用户当前时间无法进行游戏，此时用户只能退出游戏或切换账号 |
-| 1050 | `DURATION_LIMIT` | 用户无可玩时长，此时用户只能退出游戏或切换账号 |
-| 1100 | `AGE_LIMIT` | 当前用户因触发应用设置的年龄限制无法进入游戏 |
-| 1200 | `INVALID_CLIENT_OR_NETWORK_ERROR` | 数据请求失败，游戏需检查当前设置的应用信息是否正确及判断当前网络连接是否正常
-| 9002 | `REAL_NAME_STOP` | 实名过程中点击了关闭实名窗，游戏可重新开始防沉迷认证 |
-
-
+| 回调 code | 回调类型                              | 触发逻辑                                             |
+|---------|-----------------------------------|--------------------------------------------------|
+| 500     | `LOGIN_SUCCESS`                   | 玩家未受到限制，正常进入游戏                                   |
+| 1000    | `EXITED`                          | 退出防沉迷认证及检查，当开发者调用 Exit 接口时或用户认证信息无效时触发，游戏应返回到登录页 |
+| 1001    | `SWITCH_ACCOUNT`                  | 用户点击切换账号，游戏应返回到登录页                               |
+| 1030    | `PERIOD_RESTRICT`                 | 用户当前时间无法进行游戏，此时用户只能退出游戏或切换账号                     |
+| 1050    | `DURATION_LIMIT`                  | 用户无可玩时长，此时用户只能退出游戏或切换账号                          |
+| 1100    | `AGE_LIMIT`                       | 当前用户因触发应用设置的年龄限制无法进入游戏                           |
+| 1200    | `INVALID_CLIENT_OR_NETWORK_ERROR` | 数据请求失败，游戏需检查当前设置的应用信息是否正确及判断当前网络连接是否正常           
+| 9002    | `REAL_NAME_STOP`                  | 实名过程中点击了关闭实名窗，游戏可重新开始防沉迷认证                       |
 
 ## 开始认证
 
-防沉迷开始认证时需传入玩家唯一标识 `userIdentifier`，建议使用[TapTap 用户认证](/sdk/taptap-login/guide/tap-login/#taptap-登录并获取登录结果)中的 `openid` 或 `unionid`。
+防沉迷开始认证时需传入玩家唯一标识 `userIdentifier`，建议使用[TapTap 用户认证](/sdk/taptap-login/guide/tap-login/#taptap-登录并获取登录结果)
+中的 `openid` 或 `unionid`。
 
 <MultiLang>
 
 <>
 
 ```cs
+using TapSDK.Compliance;
 
+TapTapAccount account = await TapTapLogin.Instance.GetCurrentAccount();
+if (account != null) {
+    string userIdentifier = account.uniontId;
+    TapTapCompliance.startup(userIdentifier)
+}
 ```
+
 </>
 <>
 
@@ -248,11 +318,10 @@ TapTapCompliance.register(self)
 let userIdentifier = TapTapLogin.currentAccount?.userInfo?.unionId
 TapTapCompliance.startup(userIdentifier)
 ```  
+
 </>
 
 </MultiLang>
-
-
 
 ## 检查消费限制
 
@@ -263,6 +332,21 @@ TapTapCompliance.startup(userIdentifier)
 <MultiLang>
 
 ```cs
+using TapSDK.Compliance;
+
+var amount = 1000;
+TapTapCompliance.CheckPayLimit(
+   amount: amount,
+   handleCheckPayLimit: checkResult =>
+    {
+        // 充值 status 结果: {checkResult.status}
+        // status 为 1 时可以支付
+    },
+    handleCheckPayLimitException: errorMsg =>
+    {
+        // 检查充值异常, 处理异常
+    });
+
 ```
 
 ```java
@@ -291,6 +375,21 @@ TapTapCompliance.checkPaymentLimit(amount) { status, title, desc in
 <MultiLang>
 
 ```cs
+using TapSDK.Compliance;
+
+long amount = 100;
+TapTapCompliance.SubmitPayResult(
+    amount: amount,
+    handleSubmitPayResult: () =>
+    {
+        // 成功
+    },
+    handleSubmitPayResultException: (exception) =>
+    {
+        // 处理异常
+    }
+);
+
 ```
 
 ```java
@@ -317,6 +416,9 @@ TapTapCompliance.submitPayment(amount) { success in
 <MultiLang>
 
 ```cs
+using TapSDK.Compliance;
+
+TapTapCompliance.Exit();
 ```
 
 ```java
@@ -330,6 +432,7 @@ TapTapCompliance.exit()
 </MultiLang>
 
 ## 其他
+
 ### 获取玩家年龄段
 
 开发者可调用如下接口获取玩家所处年龄段：
@@ -337,6 +440,9 @@ TapTapCompliance.exit()
 <MultiLang>
 
 ```cs
+using TapSDK.Compliance;
+
+int ageRange = await TapTapCompliance.GetAgeRange();
 ```
 
 ```java
@@ -350,21 +456,19 @@ let ageRange = TapTapCompliance.getAgeRange().rawValue
 
 上例中的 `ageRange` 是一个整数，表示玩家所处年龄段的下限（最低年龄）。
 
-| 类型数值 | 含义 |
-| - | - |
-| -1 | 未知 |
-| 0 | 0 到 7 岁 |
-| 8 | 8 到 15 岁 |
-| 16 | 16 到 17 岁 |
-| 18 | 成年玩家 |
+| 类型数值 | 含义        |
+|------|-----------|
+| -1   | 未知        |
+| 0    | 0 到 7 岁   |
+| 8    | 8 到 15 岁  |
+| 16   | 16 到 17 岁 |
+| 18   | 成年玩家      |
 
 `-1` 表示「未知」，说明该用户还未实名或未授予年龄段权限，通常有以下几个原因：
 
 1. 开发者在用户未完成实名时调用该接口，应该在收到用户是否可进入游戏的回调时（回调 code 为 500 / 1030 / 1050）时，再进行调用
 2. 在防沉迷初始化时配置的参数 useAgeRange 设置为 false 导致，需设置为 true
 3. 该游戏无版号且在 TapPlay 中运行
-
-
 
 ### 获取剩余时长
 
@@ -373,7 +477,9 @@ let ageRange = TapTapCompliance.getAgeRange().rawValue
 <MultiLang>
 
 ```cs
+using TapSDK.Compliance;
 
+int time = await TapTapCompliance.GetRemainingTime(); // 单位:秒
 ```
 
 ```java
@@ -390,21 +496,26 @@ let remainingTimeInMinutes = TapTapCompliance.getRemainingTimeInMinutes()    // 
 
 ### 设置适龄限制
 
-当除了需要满足防沉迷政策外，应用需要对用户年龄有额外限制时，例如只允许 16 周岁以上使用，开发者可在 开发者中心页面配置对应的年龄限制，SDK 将在用户完成实名后 且 根据时长限制规则显示 UI 前检查用户是否符合游戏要求，满足要求时，SDK 会继续进行后续时长业务及回调处理，否则会直接返回 code 为 `1100` 的年龄限制回调通知开发者。
-
+当除了需要满足防沉迷政策外，应用需要对用户年龄有额外限制时，例如只允许 16 周岁以上使用，开发者可在 开发者中心页面配置对应的年龄限制，SDK 将在用户完成实名后
+且 根据时长限制规则显示 UI 前检查用户是否符合游戏要求，满足要求时，SDK 会继续进行后续时长业务及回调处理，否则会直接返回 code 为 `1100` 的年龄限制回调通知开发者。
 
 ### 测试模式设置
 
-使用提供的测试账号以邮箱方式登录 TapTap，游戏启动后触发 TapTap 登录，登录成功后会在成功的回调中得到当前测试账号对应的 `unionid`， `unionid` 获取方式可以参考[获取用户信息](/sdk/taptap-login/guide/start/#获取用户信息)的内容。
+使用提供的测试账号以邮箱方式登录 TapTap，游戏启动后触发 TapTap 登录，登录成功后会在成功的回调中得到当前测试账号对应的 `unionid`， `unionid`
+获取方式可以参考[获取用户信息](/sdk/taptap-login/guide/start/#获取用户信息)的内容。
 
 开启测试模式的接口需要在 SDK 的 `init` 初始化接口之后，`startup` 接口之前调用。
 
-测试账号的使用场景分为两种：**常规模式** 和 **测试模式**。无论是常规模式还是测试模式，在 `startup` 传入的 **玩家唯一标识** `userIdentifier` 皆必须为测试账号对应的 TapTap 登录后返回的 `unionid`。
+测试账号的使用场景分为两种：**常规模式** 和 **测试模式**。无论是常规模式还是测试模式，在 `startup` 传入的 **玩家唯一标识** `userIdentifier` 皆必须为测试账号对应的
+TapTap 登录后返回的 `unionid`。
 
 
 <MultiLang>
 
 ```cs
+using TapSDK.Compliance;
+
+TapTapCompliance.SetTestEnvironment(true);
 ```
 
 ```java
