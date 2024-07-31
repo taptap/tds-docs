@@ -314,9 +314,6 @@ req.end();
 
 </Conditional>
 
-
-
-
 </details>
 
 
@@ -870,6 +867,202 @@ func hmacSha1(valStr, keyStr string) string {
 	// 进行 Base64 编码
 	return base64.StdEncoding.EncodeToString(mac.Sum(nil))
 }
+```
+</Conditional>
+
+</details>
+
+<details>
+<summary>C# 请求示例</summary>
+
+<Conditional region='cn'>
+
+```cs
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Text;
+
+public class TapLoginOAuth : MonoBehaviour
+{
+
+    private string host = "open.tapapis.cn";
+    private string clientId = "应用的 Client id";
+    private string macKey = "客户端登录返回的 macKey 值";
+    private string kid = "客户端登录返回的 kid/access_token 值";
+
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        // 发起网络请求
+        StartCoroutine(SendRequest());
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+    
+    IEnumerator SendRequest()
+    {
+        // 构建请求 URL
+        string requestUrl = $"/account/profile/v1?client_id={clientId}";
+
+        // 生成签名
+        string signature = GetMacTokenSignature(host, requestUrl, "GET", macKey, kid);
+        Debug.Log("Generated Signature: " + signature);
+
+        // 发送 GET 请求到服务器
+        using (var httpClient = new HttpClient())
+        {
+            var uri = new Uri($"https://{host}{requestUrl}");
+            var request = new HttpRequestMessage(HttpMethod.Get, uri);
+            request.Headers.Add("Authorization", signature);
+
+            // 发送请求并等待响应
+            var response = httpClient.SendAsync(request).Result;
+            var responseBody = response.Content.ReadAsStringAsync().Result;
+
+            // 输出服务器响应
+            Debug.Log("Server Response: " + responseBody);
+        }
+
+        yield return null;
+    }
+    string GetMacTokenSignature(string host, string requestUrl, string method, string macKey, string kid)
+    {
+        string macTokenPattern = "MAC id=\"{0}\",ts=\"{1}\",nonce=\"{2}\",mac=\"{3}\"";
+        string timestamp = ((int)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds).ToString();
+        string nonce = GenerateNonce(16);
+        string[] signArray = { timestamp, nonce, method, requestUrl, host, "443", "" };
+        string separator = "\n";
+        string signInput = string.Join(separator, signArray) + separator;
+
+        using (var hmac = new System.Security.Cryptography.HMACSHA1(Encoding.UTF8.GetBytes(macKey)))
+        {
+            byte[] hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(signInput));
+            string macStr = Convert.ToBase64String(hash);
+            return string.Format(macTokenPattern, kid, timestamp, nonce, macStr);
+        }
+    }
+
+    string GenerateNonce(int length)
+    {
+        const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        var random = new System.Random();
+        var nonce = new char[length];
+
+        for (int i = 0; i < length; i++)
+        {
+            nonce[i] = chars[random.Next(chars.Length)];
+        }
+
+        return new string(nonce);
+    }
+}
+ 
+```
+</Conditional>
+
+
+<Conditional region='global'>
+
+```cs
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Text;
+
+public class TapLoginOAuth : MonoBehaviour
+{
+    private string host = "openapi.tap.io";
+    private string clientId = "应用的 Client id";
+    private string macKey = "客户端登录返回的 macKey 值";
+    private string kid = "客户端登录返回的 kid/access_token 值";
+
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        // 发起网络请求
+        StartCoroutine(SendRequest());
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
+    
+    IEnumerator SendRequest()
+    {
+        // 构建请求 URL
+        string requestUrl = $"/account/profile/v1?client_id={clientId}";
+
+        // 生成签名
+        string signature = GetMacTokenSignature(host, requestUrl, "GET", macKey, kid);
+        Debug.Log("Generated Signature: " + signature);
+
+        // 发送 GET 请求到服务器
+        using (var httpClient = new HttpClient())
+        {
+            var uri = new Uri($"https://{host}{requestUrl}");
+            var request = new HttpRequestMessage(HttpMethod.Get, uri);
+            request.Headers.Add("Authorization", signature);
+
+            // 发送请求并等待响应
+            var response = httpClient.SendAsync(request).Result;
+            var responseBody = response.Content.ReadAsStringAsync().Result;
+
+            // 输出服务器响应
+            Debug.Log("Server Response: " + responseBody);
+        }
+
+        yield return null;
+    }
+    string GetMacTokenSignature(string host, string requestUrl, string method, string macKey, string kid)
+    {
+        string macTokenPattern = "MAC id=\"{0}\",ts=\"{1}\",nonce=\"{2}\",mac=\"{3}\"";
+        string timestamp = ((int)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds).ToString();
+        string nonce = GenerateNonce(16);
+        string[] signArray = { timestamp, nonce, method, requestUrl, host, "443", "" };
+        string separator = "\n";
+        string signInput = string.Join(separator, signArray) + separator;
+
+        using (var hmac = new System.Security.Cryptography.HMACSHA1(Encoding.UTF8.GetBytes(macKey)))
+        {
+            byte[] hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(signInput));
+            string macStr = Convert.ToBase64String(hash);
+            return string.Format(macTokenPattern, kid, timestamp, nonce, macStr);
+        }
+    }
+
+    string GenerateNonce(int length)
+    {
+        const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        var random = new System.Random();
+        var nonce = new char[length];
+
+        for (int i = 0; i < length; i++)
+        {
+            nonce[i] = chars[random.Next(chars.Length)];
+        }
+
+        return new string(nonce);
+    }
+}
+
 ```
 </Conditional>
 
