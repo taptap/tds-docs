@@ -16,7 +16,7 @@ import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
 :::
 ## 环境要求
 
-<MultiLang kind="ue">
+<MultiLang>
 
 <>
 
@@ -61,26 +61,15 @@ dependencies {
 
 </>
 
-<>
-
-- 安装 UE 4.26 及以上版本
-- iOS 12 或更高版本
-- Android 5.0（API level 21）或更高版本
-- macOS 10.14.0 或更高版本
-- Windows 7 或更高版本
-
-**支持平台**：Android / iOS / Windows / macOS
-
-</>
 
 </MultiLang>
 
 ## 权限说明
 
-<MultiLang kind="ue">
+<MultiLang>
 
 <>
-
+Unity 
 </>
 
 <>
@@ -108,10 +97,6 @@ dependencies {
 <>
 
 </>
-
-<>
-
-</>
 </MultiLang>
 
 ## 集成前准备
@@ -122,7 +107,7 @@ dependencies {
 
 ## SDK 获取
 
-<MultiLang kind="ue">
+<MultiLang>
 
 <>
 
@@ -147,27 +132,27 @@ unitypackageModules={[
 </>
 
 <>
+1. 项目根目录的 build.gradle 添加仓库地址：
 
-在 [下载页](/tap-download) 获得 TapSDK，添加 `TapUpdate` 和 `TapCommon` 模块。
+```groovy
+allprojects { 
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+```
 
-<CodeBlock className="groovy">
-  {`repositories{  
-    flatDir {  
-        dirs 'libs'  
-    }  
-}  
-dependencies {  
-    ... 
-    implementation (name:'TapUpdate_${sdkVersions.taptap.android}', ext:'aar')
-    implementation (name:'TapCommon_${sdkVersions.taptap.android}', ext:'aar')
-    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
-    implementation 'androidx.core:core:1.6.0'
-    implementation 'com.google.android.flexbox:flexbox:3.0.0'
-}`}
+2. app module 的 build.gradle 添加对应依赖：
 
-</CodeBlock>
-
+```groovy
+dependencies {
+    implmentation 'com.taptap.sdk:tap-core:latest'
+    implmentation 'com.taptap.sdk:taptap-update:latest'
+}
+```
 </>
+
 <>
 
 受限于苹果政策，iOS 平台的 TapTap 客户端不提供游戏更新功能
@@ -217,24 +202,27 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core",
 
 ### TapSDK 初始化
 
-如果你已经完成[内建账户系统 Tap 登录](/sdk/taptap-login/guide/start/#sdk-初始化)的初始化，这里只需要引入更新唤起模块，不需要其他额外处理。
+<MultiLang>
 
-### 更新唤起单独初始化
-根据在开发者中心的应用配置，开发者调用如下接口：
+<>
+unity
+</>
 
-<MultiLang kind="ue">
+<>
 
-```cs
-using TapTap.Update
-
-TapUpdate.Init("clientId", "clientToken");
+```kotlin
+TapTapSdk.init(
+    context = context,
+    sdkOptions = TapTapSdkOptions(
+        clientId = binding.edClientId.text.toString(),
+        clientToken = binding.edClientToken.text.toString(),
+        region = TapTapRegion.CN,
+        preferredLanguage = TapTapLanguage.ZH_HANS,
+        enableLog = false
+    ),
+)
 ```
-
-```java
-import com.taptap.services.update.TapUpdate;
-
-TapUpdate.init(activity, "clientId", "clientToken");
-```
+</>
 
 
 受限于苹果政策，iOS 平台的 TapTap 客户端不提供游戏更新功能
@@ -258,7 +246,7 @@ clientToken | TapTap 开发者中心对应应用的 Client Token
 TapSDK 如果检查当前设备未安装 TapTap 客户端，首先会弹窗询问用户「是否需要使用 TapTap 更新」，当点击「取消」按钮时取消更新的回调方法才会执行。
 :::
 
-<MultiLang kind="ue">
+<MultiLang>
 
 <>
 
@@ -275,16 +263,18 @@ TapTap.Update.TapUpdate.UpdateGame(() => {
 
 由于更新唤起 UI 依赖于开发者设置的 Activity 实例，所以为了避免因 Activity 发生重建导致更新唤起功能不可用，开发者应确保在屏幕旋转、配置修改时当前 Activity 不会发生重建，具体设置方式参考 [限制 activity 重新创建](https://developer.android.com/guide/topics/resources/runtime-changes?hl=zh-cn#restrict-activity)
 
-```java
-import com.taptap.services.update.TapUpdate;
-import com.taptap.services.update.TapUpdateCallback;
-
-TapUpdate.updateGame(DemoUpdateActivity.this, new TapUpdateCallback() {
-    @Override
-    public void onCancel() {
-        // 取消更新的事件
+```kotlin
+TapTapUpdate.updateGame(
+    activity = this,
+    callback = object : TapTapUpdateCallback {
+        
+        override fun onCancel() {
+            
+            Toast.makeText(this@DemoUpdateActivity, "取消更新", Toast.LENGTH_SHORT)
+                .show()
+        }
     }
-});
+)
 ```
 </>
 
@@ -292,15 +282,6 @@ TapUpdate.updateGame(DemoUpdateActivity.this, new TapUpdateCallback() {
 
 受限于苹果政策，iOS 平台的 TapTap 客户端不提供游戏更新功能
 
-</>
-
-<>
-
-```cpp
-FTapUpdate::UpdateGame(FSimpleDelegate::CreateLambda([]() {
-  // Update cancel
-}));
-```
 </>
 
 </MultiLang>
