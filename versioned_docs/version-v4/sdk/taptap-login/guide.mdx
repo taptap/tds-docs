@@ -7,6 +7,8 @@ sidebar_position: 1
 import MultiLang from '/src/docComponents/MultiLang';
 import { Conditional } from '/src/docComponents/conditional';
 import Profiles from "../../../../docs/sdk/_partials/tap-login-profile.mdx";
+import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
+import sdkVersions from '../../sdkVersions';
 
 适用于以下场景：
 
@@ -80,7 +82,25 @@ iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.a
 <MultiLang>
 
 <>
-Unity
+
+<UnitySDKInstallation
+npmDeps={[
+"com.taptap.tds.bootstrap",
+"com.taptap.tds.common",
+"com.taptap.tds.login",
+]}
+githubDeps={[
+{package: "com.taptap.tds.login", url: `https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}`},
+{package: "com.taptap.tds.common", url: `https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}`},
+{package: "com.taptap.tds.bootstrap", url: `https://github.com/TapTap/TapBootstrap-Unity.git#${sdkVersions.taptap.unity}`},
+{package: "com.leancloud.realtime", url: `https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}`},
+{package: "com.leancloud.storage", url: `https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}`},
+]}
+unitypackageModules={[
+{name: "TapTapSDK_Core.unitypackage", desc: "TapTapSDK 核心模块，必选"},
+{name: "TapTapSDK_Login.unitypackage", desc: "TapTapSDK 登录模块，必选"},
+]}/>
+
 </>
 
 <>
@@ -233,7 +253,17 @@ func application(_ application: UIApplication, didDiscardSceneSessions sceneSess
 <MultiLang>
 
 <>
-Unity
+
+```
+using TapSDK.Core;
+using TapSDK.Achievement;
+ 
+// 核心配置 详细参数见 [TapTapSDK]
+TapTapSDKCoreOptions coreOptions = new TapTapSDKCoreOptions();
+// TapSDK 初始化
+TapTapSDK.Init(coreOptions);
+```
+
 </>
 
 <>
@@ -279,7 +309,31 @@ iOS
 <MultiLang>
 
 <>
-Unity
+
+```cs
+using TapSDK.Login;
+
+List<string> permissions = new List<string>();
+permissions.Add(TapTapLogin.TAP_LOGIN_SCOPE_BASIC_INFO);
+permissions.Add(TapTapLogin.TAP_LOGIN_SCOPE_PUBLIC_PROFILE);
+permissions.Add(TapTapLogin.TAP_LOGIN_SCOPE_USER_FRIENDS);
+permissions.Add(TapTapLogin.TAP_LOGIN_SCOPE_EMAIL);
+Task<TapTapAccount> task = TapTapLogin.Instance.Login(permissions.ToArray());
+var result = await task;
+if (task.IsCompleted)
+{
+// 成功
+} 
+else if (task.IsCanceled)
+{
+ // 取消
+}
+else
+{
+// 失败
+}
+```
+
 </>
 
 <>
@@ -377,7 +431,18 @@ TapTap 用户登录成功之后，开发者可以通过如下方式获取到 Tap
 <MultiLang>
 
 <>
-Unity
+
+```cs
+using TapSDK.Login;
+
+TapTapAccount account = await TapTapLogin.Instance.GetCurrentAccount();
+if (account == null) {
+// 未登录
+} else {
+// 已登录
+}
+```
+
 </>
 
 <>
@@ -422,7 +487,13 @@ if let account = TapTapLogin.currentAccount {
 <MultiLang>
 
 <>
-Unity
+
+```cs
+using TapSDK.Login;
+
+TapTapLogin.Instance.Logout();
+```
+
 </>
 
 <>
