@@ -114,7 +114,28 @@ dependencies {
 </>
 
 <>
-iOS
+iOS 提供通过添加 cocosPod 远程依赖和使用本地文件导入两种集成方式，推荐使用远程依赖方式。
+
+#### 远程依赖
+
+1. 在工程 Podfile 文件中对应模块下添加依赖：` pod 'TapTapLoginSDK', '~> 4.3.0'
+   `
+2. 执行 `Pod install` 下载对应依赖文件
+3. 将工程 Pods 目录下 `TapTapLoginSDK/Frameworks/TapTapLoginResource.bundle`
+   等资源文件导入工程中
+
+#### 本地文件依赖
+
+合规认证模块依赖于 TapCore 模块，使用本地文件方式添加依赖时，需先参考 TapCore 添加对应依赖。
+
+1. 在下载页下载如下文件：
+
+- `TapTapLoginSDK.xcframework` 合规认证依赖库
+- `TapTapLoginResource.bundle` 合规认证资源文件
+
+2. 在工程中添加 `framework` 静态库，注意添加时选择 Embed 方式为 **Do Not Embed**
+
+
 </>
 
 </MultiLang>
@@ -212,7 +233,30 @@ TapTapLogin.loginWithScope(
 </>
 
 <>
-ios
+
+```swift
+import TapTapLoginSDK
+
+// 定义授权范围
+var scopes: [Scope] = [Scope.publicProfile]
+// 发起 Tap 登录
+TapTapLogin.login(with: scopes) {[weak self] account, error, isCancel in
+    guard let self else { return }
+    if isCancel {
+        // 登录取消
+    } else if let error = error {
+    	 // 登录失败
+        NSLog("Tap登录失败：\(error.localizedDescription)")
+    } else if let account = account {
+    	 // 登录成功
+    	 // 登录 token
+    	 let token = account.accessToken
+    	 // 用户信息
+    	 let userInfo = account.userInfo
+    }
+}
+```
+
 </>
 
 </MultiLang>
@@ -277,11 +321,24 @@ when (TapTapLogin.getCurrentTapAccount() == null) {
     }
 }
 
-````
+```
 </>
 
 <>
-iOS
+
+```swift
+if let account = TapTapLogin.currentAccount {
+    let token = account.accessToken
+    let profile = account.userInfo
+    if let token, let profile {
+			// 用户已登录
+       } else {
+         NSLog("Tap账户未登录")
+    }
+} else {
+    NSLog("Tap账户未登录")
+}
+```
 </>
 
 </MultiLang>
@@ -298,11 +355,14 @@ Unity
 
 ```kotlin
 TapTapLogin.logout()
-````
+```
 </>
 
 <>
-iOS
+
+```swift
+ TapTapLogin.logout()
+```
 </>
 
 </MultiLang>
