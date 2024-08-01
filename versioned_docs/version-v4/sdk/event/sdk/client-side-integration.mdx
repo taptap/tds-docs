@@ -95,6 +95,29 @@ unitypackageModules={[
 </>
 
 <>
+iOS 提供通过添加 cocosPod 远程依赖和使用本地文件导入两种集成方式，推荐使用远程依赖方式。
+
+#### 远程依赖
+
+1. 在工程 Podfile 文件中对应模块下添加依赖：` pod 'TapTapCoreSDK', '~> 4.3.0'
+   `
+2. 执行 `Pod install` 下载对应依赖文件
+
+#### 本地文件依赖
+
+因 SDK 依赖于 [`Protobuf` 依赖库](https://cocoapods.org/pods/Protobuf)，开发者应提前通过远程或文件方式添加对应依赖。
+
+1. 在下载页下载如下文件：
+
+- `tapsdkcorecpp.xcframework` 基础库
+- `TapTapBasicToolsSDK.xcframework` 基础库
+- `TapTapCoreSDK.xcframework` 核心库
+- `TapTapGidSDK.xcframework` 基础库
+- `TapTapNetworkSDK.xcframework` 基础库
+- `THEMISLite.xcframework` 基础库
+
+
+2. 在工程中添加 `framework` 静态库，注意添加时选择 Embed 方式为 **Do Not Embed**
 
 </>
 
@@ -191,15 +214,16 @@ setUser("userId",properties);
 
 <>
 
-```objectivec
-+ (void)setUser:(NSString *)userId;
+```swift
+import TapTapCoreSDK
 
-+ (void)setUser:(NSString *)userId properties:(nullable NSDictionary *)properties;
+// 设置用户 ID
+TapTapEvent.setUserID(userId)
 
-[TapDB setUser:@"userId"];
-
-// 同时传递事件属性
-[TapDB setUser:@"userId" properties:@{@"#currentPoints":@10}];
+// 设置用户 ID 及账号登录事件属性
+var properties = [String: Any]()
+properties["currentPoints"] = 10
+TapTapEvent.setUserID(name, properties: properties)
 ```
 
 | 字段         | 可为空 | 说明                                                                                   |
@@ -246,10 +270,8 @@ TapDB.
 clearUser();
 ```
 
-```objectivec
-+ (void)clearUser;
-
-[TapDB clearUser];
+```swift
+TapTapEvent.clearUser()
 ```
 
 ```cpp
@@ -289,12 +311,13 @@ TapDB.
 onCharge("0xueiEns","轩辕剑","100","CNY","wechat",info);
 ```
 
-```objectivec
-+ (void)onChargeSuccess:(nullable NSString *)orderId product:(nullable NSString *)product amount:(NSInteger)amount currencyType:(nullable NSString *)currencyType payment:(nullable NSString *)payment;
-
-+ (void)onChargeSuccess:(nullable NSString *)orderId product:(nullable NSString *)product amount:(NSInteger)amount currencyType:(nullable NSString *)currencyType payment:(nullable NSString *)payment properties:(nullable NSDictionary *)properties;
-
-[TapDB onChargeSuccess:@"0xueiEns" product:@"轩辕剑" amount:100 currencyType:@"CNY" payment:@"wechat", properties:@{@"on_sell":YES}];
+```swift
+let orderId = "订单 ID"
+// 定义充值事件属性
+var properties = [String: Any]()
+properties["on_sell"] = true
+// 上报充值事件
+TapTapEvent.logPurchasedEvent(orderId, productName:"商品名", amount: 100, currencyType: "CNY", paymentMethod:"支付宝", properties: properties)
 ```
 
 ```cpp
@@ -346,11 +369,13 @@ TapDB.
 trackEvent("#battle",properties);
 ```
 
-```objectivec
-+ (void)trackEvent:(NSString *)eventName properties:(NSDictionary *)properties;
-
-NSDictionary* dic = @{@"aaa":@"xxx",@"bbb":@"yyy"};
-[TapDB trackEvent:@"testEvent2" properties:dic];
+```swift
+// 定义事件属性
+var properties = [String: Any]()
+properties["#weapon"] = "axe"
+properties["#level"] = 10
+// 发送自定义事件
+TapTapEvent.logEvent(eventName, properties: properties)
 ```
 
 ```cpp
@@ -401,11 +426,13 @@ TapDB.
 registerStaticProperties(commonProperties);
 ```
 
-```objectivec
-+ (void)registerStaticProperties:(NSDictionary *)staticProperties;
-
-//当设置了静态通用事件属性 #current_channel，值固定为 TapDB 后使用事件上报时，等效于在事件属性中添加了 #current_channel
-[TapDB registerStaticProperties:@{@"#current_channel":@"TapDB"}];
+```swift
+// 定义通用事件属性
+var staticProperties = [String: Any]()
+// 当设置属性 "#current_channel" 为 "TapDB" 时, 后续事件上报都会在事件属性中添加了 "#current_channel"字段
+staticProperties["#current_channel"] = "TapDB"
+// 设置通用事件属性
+TapTapEvent.addCommon(staticProperties)
 ```
 
 ```cpp
@@ -418,7 +445,7 @@ TapUEDB::RegisterStaticProperties(Properties);
 ------------------|-----|------------
  staticProperties | 否   | 静态通用事件属性字典 
 
-#### 删除单个静态通用事件属性
+#### 删除部分静态通用事件属性
 
 <MultiLang kind="ue">
 
@@ -436,10 +463,11 @@ TapDB.
 unregisterStaticProperty("#current_channel");
 ```
 
-```objectivec
-+ (void)unregisterStaticProperty:(NSString *)propertyName;
-
-[TapDB unregisterStaticProperty:@"#current_channel"];
+```swift
+// 定义需要删除的通用事件属性名称
+let propertyNames = [propertyName1, propertyName2]
+// 从通用事件属性中移除
+TapTapEvent.clearCommonProperties(propertyNames)
 ```
 
 ```cpp
@@ -450,7 +478,7 @@ TapUEDB::UnregisterStaticProperty(Key);
 
  参数           | 可为空 | 说明      
 --------------|-----|---------
- propertyName | 否   | 静态通用属性名 
+ propertyNames | 否   | 静态通用属性名称数组
 
 #### 清空全部静态通用属性
 
@@ -471,9 +499,7 @@ clearStaticProperties();
 ```
 
 ```objectivec
-+ (void)clearStaticProperties;
-
-[TapDB clearStaticProperties];
+TapTapEvent.clearAllCommonProperties()
 ```
 
 ```cpp
@@ -524,15 +550,11 @@ put("#currentLevel",level);
             );
 ```
 
-```objectivec
-+ (void)registerDynamicProperties:(NSDictionary* (^)(void))dynamicPropertiesCaculator;
-
+```swift
 // 后续上报的事件都将携带 #currentLevel 属性，值为变量 level 在事件上报时刻的值
-[TapDB registerDynamicProperties:^NSDictionary *_Nonnull {
-      return @{
-          @"#currentLevel": level
-      };
-  }];
+TapTapEvent.registerDynamicProperties {
+    return ["#currentLevel": level]
+}
 ```
 
 ```cpp
@@ -597,14 +619,13 @@ deviceInitialize(properties);
 // 此时设备表的 "#firstActiveServer" 字段值还是为 "server1"
 ```
 
-```objectivec
-+ (void)deviceInitialize:(NSDictionary *)properties;
-
-[TapDB deviceInitialize:@{@"firstActiveServer":@"server1"}];
-// 此时设备表的 "#firstActiveServer" 字段值还是为 "server1"
-
-[TapDB deviceInitialize:@{@"firstActiveServer":@"server2"}];
-// 此时设备表的 "#firstActiveServer" 字段值还是为 "server1"
+```swift
+var properties = [String: Any]()
+properties["firstActiveServer"] = "server1"
+// 该方法执行后设备表的 "#firstActiveServer" 字段值为 "server1"
+TapTapEvent.deviceInitialize(properties)
+// 多次设置同一属性时，后续执行不会生效，例如如下调用不会更新 "firstActiveServer" 的值
+// TapTapEvent.deviceInitialize(["firstActiveServer":"server2"])
 ```
 
 ```cpp
@@ -656,14 +677,16 @@ deviceUpdate(properties);
 // 此时设备表的 "currentPoints" 字段值为 42
 ```
 
-```objectivec
-+ (void)deviceUpdate:(NSDictionary *)properties;
+```swift
+// 定义要更新的属性
+var properties = [String: Any]()
+properties["currentPoints"] = 10
+// 该方法执行后，此时设备表的 "currentPoints" 字段值为 10
+TapTapEvent.deviceUpdate(properties)
 
-[TapDB deviceUpdate:@{@"currentPoints":@10}];
-// 此时设备表的 "currentPoints" 字段值为 10
+// 多次执行时会更新属性，例如执行以下方法时，此时设备表的 "currentPoints" 字段值为 42
+// TapTapEvent.deviceUpdate(["currentPoints":42])
 
-[TapDB deviceUpdate:@{@"currentPoints":@42}];
-// 此时设备表的 "currentPoints" 字段值为 42
 ```
 
 ```cpp
@@ -733,18 +756,21 @@ deviceAdd(properties);
 <>
 
 ```objectivec
-+ (void)deviceAdd:(NSDictionary *)properties;
+// 定义要累加的属性
+var properties = [String: Any]()
+properties["totalPoints"] = 10
 
-[TapDB deviceAdd:@{@"totalPoints":@10}];
-// 此时设备表的 "totalPoints" 字段值为 10
+// 执行该方法后，此时设备表的 "totalPoints" 字段值为 10
+TapTapEvent.deviceAdd(properties)
 
-[TapDB deviceAdd:@{@"totalPoints":@(-2)}];
-// 此时设备表的 "totalPoints" 字段值为 8
+// 执行该方法后，此时设备表的 "totalPoints" 字段值为 8
+TapTapEvent.deviceAdd（["totalPoints":-2])
+
 ```
 
  参数         | 可为空 | 说明                         
 ------------|-----|----------------------------
- properties | 否   | 属性字典，value 仅支持 NSNumber 类型 
+ properties | 否   | 属性字典，value 仅支持数字类型 
 
 </>
 
@@ -783,10 +809,10 @@ TapDB.
 userInitialize(properties);
 ```
 
-```objectivec
-+ (void)userInitialize:(NSDictionary *)properties;
-
-[TapDB userInitialize:@{@"firstActiveServer":@"server1"}];
+```swift
+var properties = [String: Any]()
+properties["firstActiveServer"] = "server1"
+TapTapEvent.userInitialize(properties)
 ```
 
 ```cpp
@@ -815,10 +841,8 @@ TapDB.
 userUpdate(properties);
 ```
 
-```objectivec
-+ (void)userUpdate:(NSDictionary *)properties;
-
-[TapDB userUpdate:@{@"currentPoints":@10}];
+```swift
+TapTapEvent.userUpdate(["firstActiveServer":"server2"])
 ```
 
 ```cpp
@@ -847,10 +871,8 @@ TapDB.
 userAdd(properties);
 ```
 
-```objectivec
-+ (void)userAdd:(NSDictionary *)properties;
-
-[TapDB userAdd:@{@"totalPoints":@10}];
+```swift
+TapTapEvent.userAdd(["totalPoints": 10])
 ```
 
 ```cpp
@@ -971,13 +993,8 @@ iOS 平台不适用
 <string>此标识符将用于向您推荐个性化广告（或其他描述）</string>
 ```
 
-若使用 TapSDK 初始化，请在 `TapDBConfig` 中的 `advertiserIDCollectionEnabled` 传入 `true` 开启 IDFA 采集开关。
+在初始化时设置 `TapTapSDKCoreOptions` 中的 `enableAdvertiserIDCollection` 为 `true` 开启 IDFA 采集开关。
 
-若单独使用 TapDB SDK 请调用如下接口开启 IDFA 采集开关，***为保证数据准确性，该接口应在初始化接口之前调用***
-
-```cs
-TapDB.AdvertiserIDCollectionEnabled(true);
-```
 
 </>
 
@@ -999,12 +1016,6 @@ TapDB.AdvertiserIDCollectionEnabled(true);
 ```
 
 若使用 TapSDK 初始化，请在 `TapDBConfig` 中的 `advertiserIDCollectionEnabled` 传入 `YES` 开启 IDFA 采集开关。
-
-若单独使用 TapDB SDK 请调用如下接口开启 IDFA 采集开关
-
-```objective-c
-[TapDB setAdvertiserIDCollectionEnabled:YES];
-```
 
 </>
 
