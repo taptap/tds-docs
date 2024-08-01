@@ -48,14 +48,81 @@ iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.a
 
 <>
 
+```cs
+using TapSDK.Core;
+ 
+// 核心配置 
+TapTapSDKCoreOptions coreOptions = new TapTapSDKCoreOptions
+{
+   // 客户端 ID，开发者后台获取
+   clientId = clientId,
+   // 客户端令牌，开发者后台获取
+   clientToken = clientToken,
+   // 地区，CN 为国内，Overseas 为海外
+   region = TapTapRegionType.CN
+   // 渠道，如 AppStore、GooglePlay
+   channel = "AppStore",
+   // 语言，默认为 Auto，默认情况下，国内为 zh_Hans，海外为 en
+   preferredLanguage = TapTapLanguageType.zh_Hans,
+   // 游戏版本号，如果不传则默认读取应用的版本号
+   gameVersion = "1.1.0",
+   // 初始化时传入的自定义参数，会在初始化时上报到 device_login 事件
+   propertiesJson = "{\"device_login_custom_key\": \"这是初始化的时候传入的数据，会上报到 device_login 事件\"}",
+   // CAID，仅国内 iOS
+   caid = "000-000-0000-00000",
+   // 是否能够覆盖内置参数，默认为 false
+   overrideBuiltInParameters = false,
+   // 是否开启广告商 ID 收集，默认为 false
+   enableAdvertiserIDCollection = true,
+   // 是否开启自动上报 IAP 事件
+   enableAutoIAPEvent = true,
+   // OAID证书, 仅 Android，用于上报 OAID 仅 [TapTapRegion.CN] 生效
+   oaidCert = null,
+   // 是否开启日志，Release 版本请设置为 false
+   enableLog = true
+};
+// TapSDK 初始化
+TapTapSDK.Init(coreOptions);
+
+
+// 如果有其他TapTap模块配置可以一起初始化配置, 请使用如下API
+// 其他模块配置项
+TapTapSDKBaseOption[] otherOptions = new TapTapSDKBaseOption[]
+{
+    achievementOptions,
+    // ...
+};
+TapTapSDK.Init(coreOptions, otherOptions);
+
+```
+
+| 字段                           | 可为空 | 说明                                                 |
+|------------------------------|-----|----------------------------------------------------|
+| clientId                     | 否   | 客户端 ID，开发者后台获取                                     |
+| clientToken                  | 否   | 客户端令牌，开发者后台获取                                      |
+| region                       | 否   | 地区，CN 为国内，Overseas 为海外                             |
+| preferredLanguage            | 是   | 默认为 TapTapLanguageType.Auto, 语言                    |
+| enableLog                    | 是   | 默认为 false, 是否开启日志，Release 版本请设置为 false             |
+| channel                      | 是   | 渠道，如 AppStore、GooglePlay                           |
+| gameVersion                  | 是   | 游戏版本号，如果不传则默认读取应用的版本号                              |
+| propertiesJson               | 是   | 初始化时传入的自定义参数，会在初始化时上报到 device_login 事件             |
+| caid                         | 是   | CAID，仅国内 iOS                                       |
+| overrideBuiltInParameters    | 是   | 是否能够覆盖内置参数，默认为 false                               |
+| enableAdvertiserIDCollection | 是   | 是否开启广告商 ID 收集，默认为 false                            |
+| enableAutoIAPEvent           | 是   | 是否开启自动上报 IAP 事件                                    |
+| oaidCert                     | 是   | OAID证书, 仅 Android，用于上报 OAID 仅 [TapTapRegion.CN] 生效 |
+
 </>
 
 <>
 
-[//]: # (<span style="color:#ff0000;">TODO android</span>)
+TODO ChenKe
+
 </>
 
 <>
+
+TODO LiChao
 
 </>
 
@@ -88,13 +155,17 @@ githubDeps={[
 unitypackageModules={[
 {name: "TapTapSDK_Core.unitypackage", desc: "TapSDK 基础库，必选"},
 ]}/>
-</>
-
-<>
 
 </>
 
 <>
+
+TODO ChenKe
+
+</>
+
+<>
+
 iOS 提供通过添加 cocosPod 远程依赖和使用本地文件导入两种集成方式，推荐使用远程依赖方式。
 
 #### 远程依赖
@@ -131,29 +202,24 @@ iOS 提供通过添加 cocosPod 远程依赖和使用本地文件导入两种集
 
 ## 初始化 SDK
 
-初始化 SDK 并上报一个设备登录（ `device_login` ）事件，调用这个接口是使用其他接口的先决条件，需要尽早调用。
+详见 TapTapSDK初始化文档。
 
-:::info
-以下两种初始化方式结合使用场景任选其一即可。
-:::
-
-### TapSDK 初始化 {#tapsdk-init}
-
-如果项目中同时集成[内建账户系统的 TapTap 登录](/sdk/taptap-login/guide/start/#sdk-初始化)并完成了初始化，需要在此基础上添加 TapDBConfig 配置，即可同步初始化
-TapDB。代码如下：
+示例代码如下：
 
 <MultiLang>
-
 <>
+
 
 </>
 
 <>
 
+TODO ChenKe
+
 </>
 
 <>
-
+TODO LiChao
 </>
 
 </MultiLang>
@@ -168,48 +234,29 @@ TapDB。代码如下：
 
 在重启应用或调用清除账号 ID（ `clearUser` ）前，上报的事件都会带有该账号 ID。
 
-<MultiLang kind="ue">
+<MultiLang>
 
 <>
 
 ```cs
-public static void SetUser(string userId)
+using TapSDK.Core
 
-TapDB.SetUser("userId");
-```
-
-| 字段     | 可为空 | 说明                                                                                    |
-|--------|-----|---------------------------------------------------------------------------------------|
-| userId | 否   | 账号的唯一字符串，字符串长度不大于 256，只能包含数字、大小写字母、下划线（`_`）、短横（`-`）<br /> 开发者需要保证不同账号的 `userId` 均不相同。 |
-
-</>
-
-<>
-
-```java
-public static void setUser(final String userId)
-
-public static void setUser(final String userId, final JSONObject properties)
-
-TapDB.
-
-setUser("userId");
-
-// 同时传递事件属性
-JSONObject properties = new JSONObject();
-properties.
-
-put("currentPoints",10);
-TapDB.
-
-setUser("userId",properties);
+var dict = new Dictionary<string, string>();
+dict.Add(key, value);
+dict.Add(key2, value2);
+string properties = dict.toJson();
+TapTapEvent.SetUserID(userId, properties);
 ```
 
 | 字段         | 可为空 | 说明                                                                                    |
 |------------|-----|---------------------------------------------------------------------------------------|
 | userId     | 否   | 账号的唯一字符串，字符串长度不大于 256，只能包含数字、大小写字母、下划线（`_`）、短横（`-`）<br /> 开发者需要保证不同账号的 `userId` 均不相同。 |
-| properties | 是   | 账号登录（ `user_login` ）的事件属性                                                             
+| properties | 是   | 账号登录（ `user_login` ）的事件属性                                                             |
 
+</>
+
+<>
+TODO ChenKe
 </>
 
 <>
@@ -233,50 +280,37 @@ TapTapEvent.setUserID(name, properties: properties)
 
 </>
 
-<>
-
-```cpp
-FString UserId = TEXT("userId");
-FString LoginType = TUDBType::LoginType::TapTap;
-TapUEDB::SetUserWithLoginType(UserId, LoginType);
-```
-
-| 字段        | 可为空 | 说明                                                                                   |
-|-----------|-----|--------------------------------------------------------------------------------------|
-| userId    | 否   | 账号的唯一字符串，字符串长度不大于 256，只能包含数字、大小写字母、下划线（`_`）、短横（`-`）<br /> 开发者需要保证不同账号的 `userId` 均不相同 |
-| LoginType | 是   | 账号登录方式，参考 `TUDBType::LoginType`                                                      
-
-</>
-
 </MultiLang>
 
 ### 清除账号 ID
 
 当用户进行登出时，可调用 `clearUser` 清除当前 SDK 中保存的账号 ID，后续上报的事件将不会带有账号 ID，调用该接口不会上报任何事件。
 
-<MultiLang kind="ue">
+<MultiLang>
+
+<>
 
 ```cs
-public static void ClearUser()
+using TapSDK.Core
 
-TapDB.ClearUser();
+TapTapEvent.ClearUser();
 ```
 
-```java
-public static void clearUser()
+</>
 
-TapDB.
+<>
 
-clearUser();
-```
+TODO ChenKe
+
+</>
+
+<>
 
 ```swift
 TapTapEvent.clearUser()
 ```
 
-```cpp
-TapUEDB::ClearUser();
-```
+</>
 
 </MultiLang>
 
@@ -284,32 +318,41 @@ TapUEDB::ClearUser();
 
 在用户进行充值后，可调用该接口上报充值信息，调用后将上报 `charge` 事件，并将传入的参数作为事件的属性。
 
-<MultiLang kind="ue">
+<MultiLang>
+
+<>
 
 ```cs
-public static void OnCharge(string orderId, string product, long amount, string currencyType, string payment)
+using TapSDK.Core
 
-public static void OnCharge(string orderId, string product, long amount, string currencyType, string payment,
-            string properties)
-
-TapDB.OnCharge("0xueiEns", "轩辕剑", "100", "CNY", "wechat", "{\"on_sell\":true}");
+TapTapEvent.LogChargeEvent(
+   orderID: orderID,
+   productName: productName,
+   amount: amount,
+   currencyType: currencyType,
+   paymentMethod: paymentMethod,
+   properties: properties
+);
 ```
 
-```java
-public static void onCharge(final String orderId, final String product, final long amount,
-                            final String currencyType, final String payment)
+| 字段            | 可为空 | 说明                                           |
+|---------------|-----|----------------------------------------------|
+| orderID       | 否   | 订单 ID                                        |
+| productName   | 否   | 产品名称                                         |
+| amount        | 否   | 充值金额（单位分，即无论什么币种，都需要乘以 100）                  |
+| currencyType  | 否   | 货币类型，遵循 ISO 4217 标准。参考：人民币 CNY，美元 USD；欧元 EUR |
+| paymentMethod | 否   | 支付方式，如：支付宝                                   |
+| properties    | 否   | 充值（ charge ）的事件属性                            |
 
-public static void onCharge(final String orderId, final String product, final long amount,
-                            final String currencyType, final String payment, final JSONObject properties)
+</>
 
-JSONObject info = new JSONObject();
-info.
+<>
 
-put("on_sell":true);
-TapDB.
+TODO ChenKe
 
-onCharge("0xueiEns","轩辕剑","100","CNY","wechat",info);
-```
+</>
+
+<>
 
 ```swift
 let orderId = "订单 ID"
@@ -320,12 +363,6 @@ properties["on_sell"] = true
 TapTapEvent.logPurchasedEvent(orderId, productName:"商品名", amount: 100, currencyType: "CNY", paymentMethod:"支付宝", properties: properties)
 ```
 
-```cpp
-TapUEDB::OnCharge(OrderId, Product, Amount, CurrencyType, Payment, Properties);
-```
-
-</MultiLang>
-
  参数           | 可为空 | 说明                                           
 --------------|-----|----------------------------------------------
  orderId      | 否   | 订单 ID                                        
@@ -335,6 +372,11 @@ TapUEDB::OnCharge(OrderId, Product, Amount, CurrencyType, Payment, Properties);
  payment      | 是   | 支付方式，如：支付宝                                   
  properties   | 是   | 充值（ `charge` ）的事件属性                          
 
+</>
+
+</MultiLang>
+
+
 **注意:在条件允许的情况下推荐使用服务端充值统计接口，请参考 [服务端接入文档](/sdk/tapdb/sdk/server-side-integration#2.2.上报充值记录)**
 
 ## 自定义事件
@@ -343,31 +385,36 @@ TapUEDB::OnCharge(OrderId, Product, Amount, CurrencyType, Payment, Properties);
 
 在 SDK 初始化完成后可使用该接口上报事件
 
-<MultiLang kind="ue">
+<MultiLang>
+
+<>
 
 ```cs
-public static void TrackEvent(string eventName, string properties)
+using TapSDK.Core
 
-TapDB.TrackEvent("eventName", "{\"weapon\":\"axe\"}");
+var dict = new Dictionary<string, string>
+{
+  { key, value },
+  { key2, value2 }
+};
+string properties = dict.toJson();
+TapTapEvent.LogEvent(name, properties);
 ```
 
-```java
-public static void trackEvent(final String eventName, final JSONObject properties)
+| 字段         | 可为空 | 说明               |
+|------------|-----|------------------|
+| name       | 否   | 事件的名称            |
+| properties | 否   | 事件的属性 JSONString |
 
-JSONObject properties = new JSONObject();
-properties.
+</>
 
-put("#weapon","axe");
-properties.
+<>
 
-put("#level",10);
-properties.
+TODO ChenKe
 
-put("#map","atrium");
-TapDB.
+</>
 
-trackEvent("#battle",properties);
-```
+<>
 
 ```swift
 // 定义事件属性
@@ -378,16 +425,14 @@ properties["#level"] = 10
 TapTapEvent.logEvent(eventName, properties: properties)
 ```
 
-```cpp
-TapUEDB::TrackEvent(EventName, Properties);
-```
-
-</MultiLang>
-
  参数         | 可为空 | 说明    
 ------------|-----|-------
  eventName  | 否   | 事件的名称 
  properties | 是   | 事件的属性 
+
+</>
+
+</MultiLang>
 
 **注意:**
 
@@ -395,7 +440,7 @@ TapUEDB::TrackEvent(EventName, Properties);
 * 事件属性的 key 值为属性的名称，支持 NSString 类型
 * 事件属性的 value 值为属性的名称，支持 NSString（最大长度 `256` ）、NSNumber（取值区间为 `[-9E15, 9E15]` ）类型
 * 事件属性支持上报预置属性和自定属性，其中自定义属性应以 `#` 开头
-* 事件属性传入预置属性时，SDK 默认采集的预置属性将被覆盖
+* 事件属性传入预置属性时，SDK 默认采集的预置属性将不被覆盖， 这个可以再初始化时候修改配置 `overrideBuiltInParameters` 控制。
 
 ### 设置通用事件属性
 
@@ -403,28 +448,45 @@ TapUEDB::TrackEvent(EventName, Properties);
 
 #### 添加静态通用事件属性
 
-<MultiLang kind="ue">
+<MultiLang>
+
+<>
 
 ```cs
-public static void RegisterStaticProperties(string staticProperties)
+using TapSDK.Core
 
-//当设置了静态通用事件属性 #current_channel，值固定为 TapDB 后使用事件上报时，等效于在事件属性中添加了 #current_channel
-string properties = "{\"#current_channel\":\"TapDB\"}";
-TapDB.RegisterStaticProperties(properties);
+// 添加单个属性
+var key = kv["key"];
+var value = kv["value"];
+TapTapEvent.AddCommonProperty(key, value);
+
+// 添加多个属性
+var key = kv["key"];
+var value = kv["value"];
+var key2 = kv["key2"];
+var value2 = kv["value2"];
+var dict = new Dictionary<string, string>
+{
+  { key, value },
+  { key2, value2 }
+};
+string properties = dict.toJson();
+TapTapEvent.AddCommon(properties);
 ```
 
-```java
-public static void registerStaticProperties(final JSONObject staticProperties)
+| 字段         | 可为空 | 说明               |
+|------------|-----|------------------|
+| properties | 否   | 事件的属性 JSONString |
 
-//当设置了静态通用事件属性 #current_channel，值固定为 TapDB 后使用事件上报时，等效于在事件属性中添加了 #current_channel
-JSONObject commonProperties = new JSONObject();
-commonProperties.
+</>
 
-put("#current_channel","TapDB");
-TapDB.
+<>
 
-registerStaticProperties(commonProperties);
-```
+TODO ChenKe
+
+</>
+
+<>
 
 ```swift
 // 定义通用事件属性
@@ -435,33 +497,50 @@ staticProperties["#current_channel"] = "TapDB"
 TapTapEvent.addCommon(staticProperties)
 ```
 
+</>
+
+<>
+
 ```cpp
 TapUEDB::RegisterStaticProperties(Properties);
 ```
-
-</MultiLang>
 
  字段               | 可为空 | 说明         
 ------------------|-----|------------
  staticProperties | 否   | 静态通用事件属性字典 
 
+</>
+
+</MultiLang>
+
 #### 删除部分静态通用事件属性
 
-<MultiLang kind="ue">
+<MultiLang>
+
+<>
 
 ```cs
-public static void UnregisterStaticProperty(string propertyName)
+using TapSDK.Core
 
-TapDB.UnregisterStaticProperty("#current_channel");
+// 删除单个属性
+TapTapEvent.ClearCommonProperty(key);
+
+// 删除多个属性
+var key1 = kv["key"];
+var key2 = kv["value"];
+var keysToClear = new string[] { key1, key2 };
+TapTapEvent.ClearCommonProperties(keysToClear);
 ```
 
-```java
-public static void unregisterStaticProperty(string propertyName)
+</>
 
-TapDB.
+<>
 
-unregisterStaticProperty("#current_channel");
-```
+TODO ChenKe
+
+</>
+
+<>
 
 ```swift
 // 定义需要删除的通用事件属性名称
@@ -470,41 +549,42 @@ let propertyNames = [propertyName1, propertyName2]
 TapTapEvent.clearCommonProperties(propertyNames)
 ```
 
-```cpp
-TapUEDB::UnregisterStaticProperty(Key);
-```
+ 参数            | 可为空 | 说明         
+---------------|-----|------------
+ propertyNames | 否   | 静态通用属性名称数组 
+
+</>
 
 </MultiLang>
 
- 参数           | 可为空 | 说明      
---------------|-----|---------
- propertyNames | 否   | 静态通用属性名称数组
-
 #### 清空全部静态通用属性
 
-<MultiLang kind="ue">
+<MultiLang>
+
+<>
 
 ```cs
-public static void ClearStaticProperties()
+using TapSDK.Core
 
-TapDB.ClearStaticProperties();
+TapTapEvent.ClearAllCommonProperties();
 ```
 
-```java
-public static void clearStaticProperties()
+</>
 
-TapDB.
+<>
 
-clearStaticProperties();
-```
+TODO ChenKe
+
+</>
+
+<>
 
 ```objectivec
 TapTapEvent.clearAllCommonProperties()
 ```
 
-```cpp
-TapUEDB::ClearStaticProperties();
-```
+</>
+
 
 </MultiLang>
 
@@ -512,43 +592,31 @@ TapUEDB::ClearStaticProperties();
 
 对于可能随时发生变化的通用事件属性，可以注册动态通用事件属性回调，该回调会在每次调用时被触发，将计算好的属性添加到本次上报事件属性中。
 
-<MultiLang kind="ue">
+<MultiLang>
+
+<>
 
 ```cs
-public static void RegisterDynamicProperties(IDynamicProperties properties)
+using TapSDK.Core;
 
-// 后续上报的事件都将携带 #currentLevel 属性，值为变量 level 在事件上报时刻的值
-public class TapDBDynamicPropertiesImpl : IDynamicProperties
+// 后续上报的事件都将携带 #currentTime 属性，值为变量 currentTime 在事件上报时刻的值
+TapTapEvent.RegisterDynamicProperties(() =>
 {
-        public Dictionary<string, object> GetDynamicProperties()
-        {
-                Dictionary<string, object> dic = new Dictionary<string, object>();
-                dic["#currentLevel"] = level;
-                return dic;
-        }
-}
-TapDB.RegisterDynamicProperties(new TapDBDynamicPropertiesImpl());
+    string currentTime = DateTime.Now.ToString("o");
+    Debug.Log("RegisterDynamicProperties currentTime" + currentTime);
+    return $"{{ \"currentTime\": \"{currentTime}\" }}";
+});
 ```
 
-```java
-public static void registerDynamicProperties(
-        final TapDBDataDynamicProperties dynamicProperties)
+</>
 
-// 后续上报的事件都将携带 #currentLevel 属性，值为变量 level 在事件上报时刻的值
-TapDB.
+<>
 
-registerDynamicProperties(
-    () ->{
-JSONObject properties = new JSONObject();
-// getCurrentLevel 在这里仅作为案例，表示用户任何的自有逻辑实现
-long level = getCurrentLevel();
-        properties.
+TODO ChenKe
 
-put("#currentLevel",level);
-        return properties;
-    }
-            );
-```
+</>
+
+<>
 
 ```swift
 // 后续上报的事件都将携带 #currentLevel 属性，值为变量 level 在事件上报时刻的值
@@ -557,19 +625,21 @@ TapTapEvent.registerDynamicProperties {
 }
 ```
 
+</>
+
 ```cpp
 TapUEDB::RegisterDynamicProperties(PropertiesBlock);
 ```
-
-</MultiLang>
 
  参数                | 可为空 | 说明           
 -------------------|-----|--------------
  dynamicProperties | 否   | 动态通用事件属性计算回调 
 
-**注意:**
+</MultiLang>
 
-*
+
+
+**注意:**
 
 在上报事件或通用属性中使用相同属性名会出现属性覆盖的现象，属性覆盖的优先级从高到低依次为：事件属性、动态通用事件属性、静态通用事件属性、预置属性（例如 `trackEvent`
 中设置的事件属性将覆盖动态通用事件属性、静态通用事件属性、预置属性中的同名属性）
@@ -584,40 +654,33 @@ TapDB 支持两种用户主体：设备和账号，你可以通过如下接口�
 
 对于需要保证只有首次设置时有效的属性，可以使用该接口进行赋值操作，仅当前值为空时赋值操作才会生效，如当前值不为空，则赋值操作会被忽略。
 
-<MultiLang kind="ue">
+<MultiLang>
+
+<>
 
 ```cs
+using TapSDK.Core;
+
 public static void DeviceInitialize(string properties)
 
 string properties = "{\"firstActiveServer\":\"server1\"}";
-TapDB.DeviceInitialize(properties);
+TapTapEvent.DeviceInitialize(properties);
 // 此时设备表的 "#firstActiveServer" 字段值为 "server1"
 
 string properties = "{\"firstActiveServer\":\"server2\"}";
-TapDB.DeviceInitialize(properties);
+TapDB.TapTapEvent(properties);
 // 此时设备表的 "#firstActiveServer" 字段值还是为 "server1"
 ```
 
-```java
-public static void deviceInitialize(final JSONObject properties)
+</>
 
-JSONObject properties = new JSONObject();
-properties.
+<>
 
-put("firstActiveServer","server1");
-TapDB.
+TODO ChenKe
 
-deviceInitialize(properties);
-// 此时设备表的 "#firstActiveServer" 字段值为 "server1"
+</>
 
-properties.
-
-put("firstActiveServer","server2");
-TapDB.
-
-deviceInitialize(properties);
-// 此时设备表的 "#firstActiveServer" 字段值还是为 "server1"
-```
+<>
 
 ```swift
 var properties = [String: Any]()
@@ -628,54 +691,44 @@ TapTapEvent.deviceInitialize(properties)
 // TapTapEvent.deviceInitialize(["firstActiveServer":"server2"])
 ```
 
-```cpp
-TapUEDB::DeviceInitialize(Properties);
-```
-
-</MultiLang>
-
  参数         | 可为空 | 说明   
 ------------|-----|------
  properties | 否   | 属性字典 
+
+</>
+
+</MultiLang>
 
 #### 设备属性更新
 
 对于常规的设备属性，可使用该接口进行赋值操作，新的属性值将会直接覆盖旧的属性值。
 
-<MultiLang kind="ue">
+<MultiLang >
+
+<>
 
 ```cs
+
+using TapSDK.Core;
+
 public static void DeviceUpdate(string properties)
 
 string properties = "{\"currentPoints\":10}";
-TapDB.DeviceUpdate(properties);
+TapTapEvent.DeviceUpdate(properties);
 // 此时设备表的 "currentPoints" 字段值为 10
 
 properties = "{\"currentPoints\":42}";
-TapDB.DeviceUpdate(properties);
+TapTapEvent.DeviceUpdate(properties);
 // 此时设备表的 "currentPoints" 字段值为 42
 ```
 
-```java
-public static void deviceUpdate(final JSONObject properties)
+</>
+<>
 
-JSONObject properties = new JSONObject();
-properties.
+TODO ChenKe
 
-put("currentPoints",10);
-TapDB.
-
-deviceUpdate(properties);
-// 此时设备表的 "currentPoints" 字段值为 10
-
-properties.
-
-put("currentPoints",42);
-TapDB.
-
-deviceUpdate(properties);
-// 此时设备表的 "currentPoints" 字段值为 42
-```
+</>
+<>
 
 ```swift
 // 定义要更新的属性
@@ -689,67 +742,41 @@ TapTapEvent.deviceUpdate(properties)
 
 ```
 
-```cpp
-TapUEDB::DeviceUpdate(Properties);
-```
-
-</MultiLang>
-
  参数         | 可为空 | 说明   
 ------------|-----|------
  properties | 否   | 属性字典 
 
+</>
+
+</MultiLang>
+
 #### 设备属性累加
 
 对于数值类型的属性，可以使用该接口进行累加操作，调用后 TapDB 将对原属性值进行累加后保存结果值
-<MultiLang kind="ue">
+
+<MultiLang >
 
 <>
 
 ```cs
+using TapSDK.Core;
+
 public static void DeviceAdd(string properties)
 
 string properties = "{\"totalPoints\":10}";
-TapDB.DeviceAdd(properties);
+TapTapEvent.DeviceAdd(properties);
 // 此时设备表的 "totalPoints" 字段值为 10
 
 properties = "{\"totalPoints\":-2}";
-TapDB.DeviceAdd(properties);
+TapTapEvent.DeviceAdd(properties);
 // 此时设备表的 "totalPoints" 字段值为 8
 ```
-
- 账号         | 可为空 | 说明                 
-------------|-----|--------------------
- properties | 否   | 属性字典，value 仅支持数值类型 
 
 </>
 
 <>
 
-```java
-public static void deviceAdd(final JSONObject properties)
-
-JSONObject properties = new JSONObject();
-properties.
-
-put("totalPoints",10);
-TapDB.
-
-deviceAdd(properties);
-// 此时设备表的 "totalPoints" 字段值为 10
-
-properties.
-
-put("totalPoints",-2);
-TapDB.
-
-deviceAdd(properties);
-// 此时设备表的 "totalPoints" 字段值为 8
-```
-
- 字段         | 可为空 | 说明                 
-------------|-----|--------------------
- properties | 否   | 属性字典，value 仅支持数值类型 
+TODO ChenKe
 
 </>
 
@@ -757,7 +784,7 @@ deviceAdd(properties);
 
 ```objectivec
 // 定义要累加的属性
-var properties = [String: Any]()
+var properties =[String: Any]()
 properties["totalPoints"] = 10
 
 // 执行该方法后，此时设备表的 "totalPoints" 字段值为 10
@@ -768,17 +795,9 @@ TapTapEvent.deviceAdd（["totalPoints":-2])
 
 ```
 
- 参数         | 可为空 | 说明                         
-------------|-----|----------------------------
+ 参数         | 可为空 | 说明                 
+------------|-----|--------------------
  properties | 否   | 属性字典，value 仅支持数字类型 
-
-</>
-
-<>
-
-```cpp
-TapUEDB::DeviceAdd(Properties);
-```
 
 </>
 
@@ -793,21 +812,28 @@ TapUEDB::DeviceAdd(Properties);
 
 使用方法同设备属性初始化操作
 
-<MultiLang kind="ue">
+<MultiLang >
+
+<>
 
 ```cs
+using TapSDK.Core;
+
 public static void UserInitialize(string properties)
 
-TapDB.UserInitialize(properties);
+string properties = "{\"firstActive\":\"active\"}";
+TapTapEvent.UserInitialize(properties);
 ```
 
-```java
-public static void userInitialize(final JSONObject properties)
+</>
 
-TapDB.
+<>
 
-userInitialize(properties);
-```
+TODO ChenKe
+
+</>
+
+<>
 
 ```swift
 var properties = [String: Any]()
@@ -815,9 +841,7 @@ properties["firstActiveServer"] = "server1"
 TapTapEvent.userInitialize(properties)
 ```
 
-```cpp
-TapUEDB::UserInitialize(Properties);
-```
+</>
 
 </MultiLang>
 
@@ -825,29 +849,34 @@ TapUEDB::UserInitialize(Properties);
 
 使用方法同设备属性更新操作
 
-<MultiLang kind="ue">
+<MultiLang>
+
+<>
 
 ```cs
+using TapSDK.Core;
+
 public static void UserUpdate(string properties)
 
-TapDB.UserUpdate(properties);
+string properties = "{\"firstActive\":\"activeNew\"}";
+TapTapEvent.UserUpdate(properties);
 ```
 
-```java
-public static void userUpdate(final JSONObject properties)
+</>
 
-TapDB.
+<>
 
-userUpdate(properties);
-```
+TODO ChenKe
+
+</>
+
+<>
 
 ```swift
 TapTapEvent.userUpdate(["firstActiveServer":"server2"])
 ```
 
-```cpp
-TapUEDB::UserUpdate(Properties);
-```
+</>
 
 </MultiLang>
 
@@ -855,29 +884,34 @@ TapUEDB::UserUpdate(Properties);
 
 使用方法同设备属性累加操作
 
-<MultiLang kind="ue">
+<MultiLang>
+
+<>
 
 ```cs
+using TapSDK.Core;
+
 public static void UserAdd(string properties)
 
-TapDB.UserAdd(properties);
+string properties = "{\"conut\":1}";
+TapTapEvent.UserAdd(properties);
 ```
 
-```java
-public static void userAdd(final JSONObject properties)
+</>
 
-TapDB.
+<>
 
-userAdd(properties);
-```
+TODO ChenKe
+
+</>
+
+<>
 
 ```swift
 TapTapEvent.userAdd(["totalPoints": 10])
 ```
 
-```cpp
-TapUEDB::UserAdd(Properties);
-```
+</>
 
 </MultiLang>
 
@@ -944,7 +978,7 @@ System.loadLibrary("msaoaidsec");
 
 在 `AndroidManifest.xml` 增加如下条目，且用户同意权限的申请后，SDK 将自动采集 Android IMEI。
 
-<MultiLang kind="ue">
+<MultiLang >
 
 <>
 
@@ -982,7 +1016,7 @@ iOS 平台不适用
 
 由于 `iOS14.5` 以上系统，获取 IDFA 需要弹出窗口有用户确认，故 SDK 默认不获取 IDFA，可以调用接口开启 IDFA 获取。
 
-<MultiLang kind="ue">
+<MultiLang >
 
 <>
 
@@ -994,7 +1028,6 @@ iOS 平台不适用
 ```
 
 在初始化时设置 `TapTapSDKCoreOptions` 中的 `enableAdvertiserIDCollection` 为 `true` 开启 IDFA 采集开关。
-
 
 </>
 
