@@ -7,6 +7,8 @@ sidebar_position: 1
 import MultiLang from '/src/docComponents/MultiLang';
 import { Conditional } from '/src/docComponents/conditional';
 import Profiles from "../../../../docs/sdk/_partials/tap-login-profile.mdx";
+import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
+import sdkVersions from '../../sdkVersions';
 
 适用于以下场景：
 
@@ -80,7 +82,25 @@ iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.a
 <MultiLang>
 
 <>
-Unity
+
+<UnitySDKInstallation
+npmDeps={[
+"com.taptap.tds.bootstrap",
+"com.taptap.tds.common",
+"com.taptap.tds.login",
+]}
+githubDeps={[
+{package: "com.taptap.tds.login", url: `https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}`},
+{package: "com.taptap.tds.common", url: `https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}`},
+{package: "com.taptap.tds.bootstrap", url: `https://github.com/TapTap/TapBootstrap-Unity.git#${sdkVersions.taptap.unity}`},
+{package: "com.leancloud.realtime", url: `https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}`},
+{package: "com.leancloud.storage", url: `https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}`},
+]}
+unitypackageModules={[
+{name: "TapTapSDK_Core.unitypackage", desc: "TapTapSDK 核心模块，必选"},
+{name: "TapTapSDK_Login.unitypackage", desc: "TapTapSDK 登录模块，必选"},
+]}/>
+
 </>
 
 <>
@@ -114,7 +134,102 @@ dependencies {
 </>
 
 <>
-iOS
+
+### 添加依赖
+
+iOS 提供通过添加 cocosPod 远程依赖和使用本地文件导入两种集成方式，推荐使用远程依赖方式。
+
+#### 远程依赖
+
+1. 在工程 Podfile 文件中对应模块下添加依赖：` pod 'TapTapLoginSDK', '~> 4.3.0'
+   `
+2. 执行 `Pod install` 下载对应依赖文件
+3. 将工程 Pods 目录下 `TapTapLoginSDK/Frameworks/TapTapLoginResource.bundle`
+   等资源文件导入工程中
+
+#### 本地文件依赖
+
+合规认证模块依赖于 TapCore 模块，使用本地文件方式添加依赖时，需先参考 TapCore 添加对应依赖。
+
+1. 在下载页下载如下文件：
+
+- `TapTapLoginSDK.xcframework` 合规认证依赖库
+- `TapTapLoginResource.bundle` 合规认证资源文件
+
+2. 在工程中添加 `framework` 静态库，注意添加时选择 Embed 方式为 **Do Not Embed**
+
+### 工程配置
+
+TapTap 客户端应用跳转配置
+
+1. 打开 `info.plist`，添加如下配置（请替换 `clientID` 为你在控制台获取的 Client ID）：
+
+   ![](https://capacity-files.lcfile.com/xLmohBqQCMvHMpvxps7pReT9kI8CjSGj/tap_ios_info.png)
+
+   ```xml
+   <key>CFBundleURLTypes</key>
+   <array>
+       <dict>
+           <key>CFBundleTypeRole</key>
+           <string>Editor</string>
+           <key>CFBundleURLName</key>
+           <string>taptap</string>
+           <key>CFBundleURLSchemes</key>
+           <array>
+               <!-- 这里注意下，中括号需要去掉，最终是 Client ID 前拼接上 `tt` 的形式，例如：ttFwFdCxxxxxxxQDQwQN -->
+               <string>tt[clientID]</string>
+           </array>
+       </dict>
+   </array>
+
+   <key>LSApplicationQueriesSchemes</key>
+   <array>
+     <string>tapiosdk</string>
+     <string>tapsdk</string>
+     <string>taptap</string>
+   </array>
+   ```
+
+2. 配置 openUrl
+
+   a) 如果项目中有 `SceneDelegate.swift`，请先删除，然后请添加如下代码到 `AppDelegate.swift` 文件：
+
+```swift
+func application(_ app: UIApplication, open url: URL) -> Bool {
+    return TapTapLogin.open(url: url)
+}
+    
+func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+    return TapTapLogin.open(url: url)
+}
+    
+func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
+    return TapTapLogin.open(url: url)
+}
+```
+
+   b) 删除 `info.plist` 里面的 Application Scene Manifest
+
+   ![](/img/tap_ios_appmanifest.png)
+
+   c) 删除 `AppDelegate.swift` 文件中的两个管理 `Scenedelegate` 生命周期代理方法
+
+```swift
+func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+    
+}
+    
+func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
+    
+}
+```
+
+   d) 在 `AppDelegate.swift` 中添加 `UIWindow`
+
+   ```swift
+   var window: UIWindow?
+   ```
+
 </>
 
 </MultiLang>
@@ -138,7 +253,17 @@ iOS
 <MultiLang>
 
 <>
-Unity
+
+```
+using TapSDK.Core;
+using TapSDK.Achievement;
+ 
+// 核心配置 详细参数见 [TapTapSDK]
+TapTapSDKCoreOptions coreOptions = new TapTapSDKCoreOptions();
+// TapSDK 初始化
+TapTapSDK.Init(coreOptions);
+```
+
 </>
 
 <>
@@ -184,7 +309,31 @@ iOS
 <MultiLang>
 
 <>
-Unity
+
+```cs
+using TapSDK.Login;
+
+List<string> permissions = new List<string>();
+permissions.Add(TapTapLogin.TAP_LOGIN_SCOPE_BASIC_INFO);
+permissions.Add(TapTapLogin.TAP_LOGIN_SCOPE_PUBLIC_PROFILE);
+permissions.Add(TapTapLogin.TAP_LOGIN_SCOPE_USER_FRIENDS);
+permissions.Add(TapTapLogin.TAP_LOGIN_SCOPE_EMAIL);
+Task<TapTapAccount> task = TapTapLogin.Instance.Login(permissions.ToArray());
+var result = await task;
+if (task.IsCompleted)
+{
+// 成功
+} 
+else if (task.IsCanceled)
+{
+ // 取消
+}
+else
+{
+// 失败
+}
+```
+
 </>
 
 <>
@@ -212,7 +361,30 @@ TapTapLogin.loginWithScope(
 </>
 
 <>
-ios
+
+```swift
+import TapTapLoginSDK
+
+// 定义授权范围
+var scopes: [Scope] = [Scope.publicProfile]
+// 发起 Tap 登录
+TapTapLogin.login(with: scopes) {[weak self] account, error, isCancel in
+    guard let self else { return }
+    if isCancel {
+        // 登录取消
+    } else if let error = error {
+    	 // 登录失败
+        NSLog("Tap登录失败：\(error.localizedDescription)")
+    } else if let account = account {
+    	 // 登录成功
+    	 // 登录 token
+    	 let token = account.accessToken
+    	 // 用户信息
+    	 let userInfo = account.userInfo
+    }
+}
+```
+
 </>
 
 </MultiLang>
@@ -259,7 +431,18 @@ TapTap 用户登录成功之后，开发者可以通过如下方式获取到 Tap
 <MultiLang>
 
 <>
-Unity
+
+```cs
+using TapSDK.Login;
+
+TapTapAccount account = await TapTapLogin.Instance.GetCurrentAccount();
+if (account == null) {
+// 未登录
+} else {
+// 已登录
+}
+```
+
 </>
 
 <>
@@ -277,11 +460,24 @@ when (TapTapLogin.getCurrentTapAccount() == null) {
     }
 }
 
-````
+```
 </>
 
 <>
-iOS
+
+```swift
+if let account = TapTapLogin.currentAccount {
+    let token = account.accessToken
+    let profile = account.userInfo
+    if let token, let profile {
+			// 用户已登录
+       } else {
+         NSLog("Tap账户未登录")
+    }
+} else {
+    NSLog("Tap账户未登录")
+}
+```
 </>
 
 </MultiLang>
@@ -291,18 +487,27 @@ iOS
 <MultiLang>
 
 <>
-Unity
+
+```cs
+using TapSDK.Login;
+
+TapTapLogin.Instance.Logout();
+```
+
 </>
 
 <>
 
 ```kotlin
 TapTapLogin.logout()
-````
+```
 </>
 
 <>
-iOS
+
+```swift
+ TapTapLogin.logout()
+```
 </>
 
 </MultiLang>
