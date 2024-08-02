@@ -164,136 +164,28 @@ dependencies {
 
 #### 导入 SDK
 
-1. 在 Xcode 选择工程，到 **Build Setting > Other Linker Flags** 添加 `-ObjC` 和 `-Wl -ld_classic`。
+iOS 提供通过添加 cocosPod 远程依赖和使用本地文件导入两种集成方式，推荐使用远程依赖方式。
 
-2. 下载 [TapSDK iOS](/tap-download)，解压后选择需要导入的资源文件，直接拖拽到项目目录即可。
+##### 远程依赖
 
-3. 视需要导入下载的资源文件：
+1. 在工程 Podfile 文件中对应模块下添加依赖：` pod 'TapTapCoreSDK', '~> 4.3.0'
+   `
+2. 执行 `Pod install` 下载对应依赖文件
 
-    - 必选：TapTap 启动器、基础库、登录
+##### 本地文件依赖
 
-      ```
-      TapBootstrapSDK.framework
-      TapCommonSDK.framework
-      TapLoginSDK.framework
-      TapCommonResource.bundle
-      TapLoginResource.bundle
-      LeanCloudObjc.framework
-      ```
+1. 在下载页下载如下文件：
 
-4. 请仔细核对下面依赖库是否都添加成功：
+- `tapsdkcorecpp.xcframework` 基础库
+- `TapTapBasicToolsSDK.xcframework` 基础库
+- `TapTapCoreSDK.xcframework` 核心库
+- `TapTapGidSDK.xcframework` 基础库
+- `TapTapNetworkSDK.xcframework` 基础库
+- `THEMISLite.xcframework` 基础库
 
-   ```
-   // 必选
-   WebKit.framework
-   Security.framework
-   SystemConfiguration.framework
-   CoreTelephony.framework
-   SystemConfiguration.framework
-   libc++.tbd
 
-   // TapTap 内嵌动态
-   AVFoundation.framework
-   CoreTelephony.framework
-   MobileCoreServices.framework
-   Photos.framework
-   SystemConfiguration.framework
-   WebKit.framework
-
-   // 数据分析
-   // 如果不需要获取 IDFA 则不要添加 `AppTrackingTransparency` 和 `AdSupport` 两个系统库
-   AppTrackingTransparency.framework
-   AdSupport.framework
-   CoreMotion.framework
-   Security.framework
-   SystemConfiguration.framework
-   libresolv.tbd
-   libsqlite3.0.tbd
-   libz.tbd
-   ```
-
-#### 配置权限
-
-如果游戏使用了 TapTap [内嵌动态](/sdk/embedded-moments/features/)或[数据分析](/sdk/tapdb/features/)服务，那么需要在 `info.plist` 配置相关权限并**替换授权文案
-**：
-
-```xml
-<!--使用内嵌动态服务，需要相册、相机、麦克风权限-->
-<key>NSPhotoLibraryUsageDescription</key><string>说明为何应用需要此项权限</string><key>NSCameraUsageDescription</key><string>
-说明为何应用需要此项权限
-</string><key>NSMicrophoneUsageDescription</key><string>说明为何应用需要此项权限
-</string><!--使用数据分析服务需要 IDFA 权限。如应用程序不想弹框，可以设置 TapDB.AdvertiserIDCollectionEnabled(false)-->
-<key>NSUserTrackingUsageDescription</key><string>说明为何应用需要此项权限</string>
-```
-
-#### 配置跳转 TapTap 应用
-
-用户无 TapTap 应用时，默认会通过 WebView 登录。
-
-1. 打开 `info.plist`，添加如下配置（请替换 `clientID` 为你在控制台获取的 Client ID）：
-
-   ![](https://capacity-files.lcfile.com/xLmohBqQCMvHMpvxps7pReT9kI8CjSGj/tap_ios_info.png)
-
-   ```xml
-   <key>CFBundleURLTypes</key>
-   <array>
-       <dict>
-           <key>CFBundleTypeRole</key>
-           <string>Editor</string>
-           <key>CFBundleURLName</key>
-           <string>taptap</string>
-           <key>CFBundleURLSchemes</key>
-           <array>
-               <!-- 这里注意下，中括号需要去掉，最终是 Client ID 前拼接上 `tt` 的形式，例如：ttFwFdCxxxxxxxQDQwQN -->
-               <string>tt[clientID]</string>
-           </array>
-       </dict>
-   </array>
-
-   <key>LSApplicationQueriesSchemes</key>
-   <array>
-     <string>tapiosdk</string>
-     <string>tapsdk</string>
-     <string>taptap</string>
-   </array>
-   ```
-
-2. 配置 openUrl：
-
-   a) 如果项目中有 `SceneDelegate.m`，请先删除，然后请添加如下代码到 `AppDelegate.m` 文件：
-
-   ```objectivec
-   - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
-     return [TDSHandleUrl handleOpenURL:url];
-   }
-
-   - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
-     return [TDSHandleUrl handleOpenURL:url];
-   }
-   ```
-
-   b) 删除 `info.plist` 里面的 Application Scene Manifest
-
-   ![](/img/tap_ios_appmanifest.png)
-
-   c) 删除 `AppDelegate.m` 文件中的两个管理 `Scenedelegate` 生命周期代理方法
-
-   ```objectivec
-   #pragma mark - UISceneSession lifecycle
-   - (UISceneConfiguration *)application:(UIApplication *)application configurationForConnectingSceneSession:(UISceneSession *)connectingSceneSession options:(UISceneConnectionOptions *)options {
-
-   return [[UISceneConfiguration alloc] initWithName:@"Default Configuration" sessionRole:connectingSceneSession.role];
-   }
-
-   - (void)application:(UIApplication *)application didDiscardSceneSessions:(NSSet<UISceneSession *> *)sceneSessions {
-   }
-   ```
-
-   d) 在 `AppDelegate.h` 中添加 `UIWindow`
-
-   ```objectivec
-   @property (strong, nonatomic) UIWindow *window;
-   ```
+2. 在工程中添加 `framework` 静态库，注意添加时选择 Embed 方式为 **Do Not Embed**
+3. SDK 内部使用了 [`Protobuf` 依赖库](https://cocoapods.org/pods/Protobuf)，开发者应提前通过远程或文件导入方式添加对应依赖。
 
 </>
 
@@ -468,14 +360,23 @@ init(MainActivity .this, tdsConfig);
 </>
 <>
 
-```objectivec
-// 开发者必须至少依赖 `TapBootstrap`、`TapLogin`、`TapCommon` 以及 `LeanCloudObjc` 模块，并按照如下方式完成初始化：
-TapConfig *config =[TapConfig new];
-config.clientId = @"your_client_id"; // 必须，开发者中心对应 Client ID
-config.clientToken = @"your_client_token"; // 必须，开发者中心对应 Client Token
-config.serverURL = @"https://your_server_url"; // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
-config.region = TapSDKRegionTypeCN; // TapSDKRegionTypeCN：中国大陆，TapSDKRegionTypeIO：其他国家或地区
-[TapBootstrap initWithConfig:config];
+```swift
+import TapTapCoreSDK
+
+let options = TapTapSDKCoreOptions()
+options.clientId = "your_client_id" // 必须，开发者中心对应 Client ID
+options.clientToken = "your_client_token" // 必须，开发者中心对应 Client Token
+options.region = .CN // .CN：中国大陆，.overseas:其他国家或地区
+options.enableLog = enableLog.selectedSegmentIndex == 0 // 是否开启 log，建议 Debug 开启，Release 关闭，默认关闭 log
+
+// 初始化 SDK
+TapTapSDK.initWith(options)
+
+// 当需要添加其他模块的初始化配置项，例如合规认证、成就等，可调用下面配置
+// let moduleOptions = [ moduleOption] // moduleOption 为其他模块内部配置项
+// 初始化 SDK
+// TapTapSDK.initWith(options, otherOptions: moduleOptions)
+
 ```
 
 </>

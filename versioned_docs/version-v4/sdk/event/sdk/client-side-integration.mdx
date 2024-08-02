@@ -183,30 +183,6 @@ dependencies {
 
 <>
 
-iOS 提供通过添加 cocosPod 远程依赖和使用本地文件导入两种集成方式，推荐使用远程依赖方式。
-
-#### 远程依赖
-
-1. 在工程 Podfile 文件中对应模块下添加依赖：` pod 'TapTapCoreSDK', '~> 4.3.0'
-   `
-2. 执行 `Pod install` 下载对应依赖文件
-
-#### 本地文件依赖
-
-因 SDK 依赖于 [`Protobuf` 依赖库](https://cocoapods.org/pods/Protobuf)，开发者应提前通过远程或文件方式添加对应依赖。
-
-1. 在下载页下载如下文件：
-
-- `tapsdkcorecpp.xcframework` 基础库
-- `TapTapBasicToolsSDK.xcframework` 基础库
-- `TapTapCoreSDK.xcframework` 核心库
-- `TapTapGidSDK.xcframework` 基础库
-- `TapTapNetworkSDK.xcframework` 基础库
-- `THEMISLite.xcframework` 基础库
-
-
-2. 在工程中添加 `framework` 静态库，注意添加时选择 Embed 方式为 **Do Not Embed**
-
 </>
 
 
@@ -247,7 +223,29 @@ TapTapSdk.init(
 </>
 
 <>
-TODO LiChao
+
+在 [TapSDK 初始化](/v4/sdk/start/quickstart#初始化) 时可以配置上报事件所携带的游戏包属性及当前设备的信息，具体使用方式如下：
+
+```
+import TapTapCoreSDK
+
+let options = TapTapSDKCoreOptions()
+
+... // 应用信息配置
+
+// 数据分析相关属性配置
+options.channel = "channel name" // 分包渠道名称
+options.gameVersion = "gameVersion" // 游戏版本（默认会读取主包 info.plist 中的版本号）
+options.caid = caidTextField.text ?? "" //
+options.overrideBuiltInParameters = true //  自定义字段是否能覆盖内置字段,默认 false
+options.enableAdvertiserIDCollection = false // 是否可以获取 IDFA，默认值为 false
+options.enableAutoIAPEvent = false // 是否自动上报苹果内购支付成功事件
+options.properties = properties // 自定义属性，启动首个预置事件（device_login）会携带该属性
+
+// 初始化 SDK
+TapTapSDK.initWith(options)
+
+```
 </>
 
 </MultiLang>
