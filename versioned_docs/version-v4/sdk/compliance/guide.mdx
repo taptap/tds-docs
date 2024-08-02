@@ -105,9 +105,29 @@ unitypackageModules={[
 ]}/>
 
 </>
-<>
 
+<>
+1. 项目根目录的 build.gradle 添加仓库地址：
+
+```groovy
+allprojects { 
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+```
+
+2. app module 的 build.gradle 添加对应依赖：
+
+```groovy
+dependencies {
+    implmentation 'com.taptap.sdk:tap-core:latest'
+    implmentation 'com.taptap.sdk:taptap-compliance:latest'
+}
+```
 </>
+
 <>
 
 iOS 提供通过添加 cocosPod 远程依赖和使用本地文件导入两种集成方式，推荐使用远程依赖方式。
@@ -170,8 +190,31 @@ TapTapSDK.Init(coreOptions, otherOptions);
 </>
 <>
 
-```java
+```kotlin
+import com.taptap.sdk.core.TapTapSdk
+import com.taptap.sdk.core.TapTapSdkOptions
+import com.taptap.sdk.compliance.options.TapTapComplianceOptions
+import com.taptap.sdk.core.TapTapLanguage
+import com.taptap.sdk.core.TapTapRegion
 
+TapTapSdk.init(
+    context = context,
+    sdkOptions = TapTapSdkOptions(
+        clientId = binding.edClientId.text.toString(),
+        clientToken = binding.edClientToken.text.toString(),
+        region = TapTapRegion.CN,
+        preferredLanguage = TapTapLanguage.ZH_HANS,
+        enableLog = false
+    ),
+    options = arrayOf(
+        TapTapComplianceOptions(
+            //
+            showSwitchAccount = true,
+            //
+            useAgeRange = true,
+        )
+    )
+)
 ```
 
 </>
@@ -227,9 +270,28 @@ TapTapCompliance.RegisterComplianceCallback(callback);
 </>
 <>
 
-```java
+```kotlin
 
-};
+TapTapCompliance.registerComplianceCallback(
+    callback = object : TapTapComplianceCallback {
+
+        override fun onComplianceResult(code: Int, extra: Map<String, Any>?) {
+            when (code) {
+                LOGIN_SUCCESS -> {
+                    // 登录成功
+                }
+
+                EXITED -> {
+                    // 退出登录
+                }
+
+                SWITCH_ACCOUNT -> {
+                    // 切换账号
+                }
+            }
+        }
+    }
+)
 ```
 
 </>
@@ -287,8 +349,12 @@ if (account != null) {
 </>
 <>
 
-```java
+```kotlin
 
+TapTapCompliance.startup(
+    activity = this, 
+    userId = "userId"
+)
 ```
 
 </>
@@ -332,7 +398,23 @@ TapTapCompliance.CheckPayLimit(
 
 ```
 
-```java
+```kotlin
+TapTapCompliance.checkPaymentLimit(
+    activity = this,
+    amount = amount,
+    callback = object : TapTapCallback<CheckPaymentResult> {
+
+        override fun onSuccess(result: CheckPaymentResult) {
+            if (result.status) {
+                // 付费没有限制
+            }
+        }
+
+        override fun onFail(exception: TapTapException) {
+            // 查询失败，开发者可以继续重试，但建议最多重试 3次
+        }
+    }
+)
 ```
 
 ```swift
@@ -377,7 +459,20 @@ TapTapCompliance.SubmitPayResult(
 
 ```
 
-```java
+```kotlin
+
+TapTapCompliance.submitPayment(
+    amount = amount,
+    callback = object : TapTapCallback<JsonElement> {
+        override fun onSuccess(result: JsonElement) {
+            // 上报付费成功
+        }
+
+        override fun onFail(exception: TapTapException) {
+            // 上报付费失败
+        }
+    }
+)
 ```
 
 ```swift
@@ -408,8 +503,9 @@ using TapSDK.Compliance;
 TapTapCompliance.Exit();
 ```
 
-```java
+```kotlin
 
+TapTapCompliance.exit()
 ```
 
 ```swift
@@ -434,7 +530,9 @@ using TapSDK.Compliance;
 int ageRange = await TapTapCompliance.GetAgeRange();
 ```
 
-```java
+```kotlin
+
+TapTapCompliance.getAgeRange()
 ```
 
 ```swift
@@ -473,8 +571,9 @@ using TapSDK.Compliance;
 int time = await TapTapCompliance.GetRemainingTime(); // 单位:秒
 ```
 
-```java
+```kotlin
 
+TapTapCompliance.getUserRemainTime()
 ```
 
 ```swift
@@ -509,7 +608,12 @@ using TapSDK.Compliance;
 TapTapCompliance.SetTestEnvironment(true);
 ```
 
-```java
+```kotlin
+
+TapTapCompliance.setTestEnvironment(
+    activity = this,
+    isTestEnv = isChecked
+)
 ```
 
 ```swift
