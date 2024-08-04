@@ -18,7 +18,7 @@ import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
 - 如已购买，则可正常进入游戏。
 - 如查询到未购买，将出现「游戏未激活，请前往 TapTap 购买此游戏」弹窗，玩家必须选择「打开 TapTap」购买之后才能游玩。
 
-## 付费下载
+## 正版验证
 
 ### 权限说明
 
@@ -83,18 +83,30 @@ NoNeedLC={true}/>
 
 <>
 
-将 SDK 包导入到项目 `project/app/libs` 目录下。打开项目的 `project/app/build.gradle` 文件，添加：
+1. 项目根目录的 build.gradle 添加仓库地址：
 
 <CodeBlock className="groovy">
-  {`repositories{
-    flatDir {  
-        dirs 'libs'  
-    }  
-}  
-dependencies {
-    implementation name:'TapCommon_${sdkVersions.taptap.android}', ext:'aar'
-    implementation name:'TapLicense_${sdkVersions.taptap.android}', ext:'aar'
-}`}
+    {
+        `allprojects {
+            repositories {
+                google()
+                mavenCentral()
+            }
+        }`
+    }
+
+</CodeBlock>
+
+2. app module 的 build.gradle 添加对应依赖：
+
+<CodeBlock className="groovy">
+    {
+        `dependencies {
+             implmentation 'com.taptap.sdk:tap-core:latest'
+             implmentation 'com.taptap.sdk:taptap-license:latest'
+         }`
+    }
+
 </CodeBlock>
 
 </>
@@ -146,9 +158,9 @@ using TapTap.License;
 TapLicense.SetTestEnvironment(bool isTest);
 ```
 
-```java
+```kotlin
 // 设置是否开启测试环境
-TapLicenseHelper.setTestEnvironment(boolean isTest, Activity activity);
+TapTapLicense.setTestEnvironment(activity: Activity, true: Boolean)
 ```
 
 ```objc
@@ -165,6 +177,7 @@ FTapLicense::SetTestEnvironment(bool bIsTest);
 </MultiLang>
 
 ### 设置授权回调
+可注册多个回调，
 
 <MultiLang kind="ue">
 
@@ -184,12 +197,15 @@ public interface ITapLicenseCallback
 
 ```java
 // 默认情况下 SDK 会弹出不可由玩家手动取消的弹窗来避免未授权玩家进入游戏，如果需要回调来触发流程，请添加如下代码
-TapLicenseHelper.setLicenseCallback(new TapLicenseCallback() {
-    @Override
-    public void onLicenseSuccess() {
-        // 授权成功回调
-    }
-});
+TapTapLicense.registerLicenseCallback(object : TapTapLicenseCallback {
+            override fun onLicenseSuccess() {
+                // your code
+            }
+
+        })
+
+// 取消回调监听
+
 ```
 
 ```objc
@@ -219,9 +235,9 @@ TapLicense.Check();
 TapLicense.Check(true);
 ```
 
-```java
-TapLicenseHelper.check(Activity activity);
-TapLicenseHelper.check(Activity activity, boolean forceCheck);
+```kotlin
+// forceCheck参数可不传，默认为false
+TapTapLicense.checkLicense(activity: Activity, forceCheck: Boolean)
 ```
 
 ```objc
@@ -293,9 +309,9 @@ using TapTap.License;
 TapLicense.SetTestEnvironment(bool isTest);
 ```
 
-```java
+```kotlin
 // 设置是否开启测试环境
-TapLicenseHelper.setTestEnvironment(boolean isTest, Activity activity);
+TapTapLicense.setTestEnvironment(activity: Activity, true: Boolean)
 ```
 
 ```objc
@@ -339,18 +355,16 @@ unitypackageModules={[
 
 <>
 
-将 SDK 包导入到项目 `project/app/libs` 目录下。打开项目的 `project/app/build.gradle` 文件，添加：
+app module 的 build.gradle 添加对应依赖：
 
 <CodeBlock className="groovy">
-  {`repositories{
-    flatDir {  
-        dirs 'libs'  
-    }  
-}  
-dependencies {
-    implementation name:'TapCommon_${sdkVersions.taptap.android}', ext:'aar'
-    implementation name:'TapLicense_${sdkVersions.taptap.android}', ext:'aar'
-}`}
+    {
+        `dependencies {
+             implmentation 'com.taptap.sdk:tap-core:latest'
+             implmentation 'com.taptap.sdk:taptap-license:latest'
+         }`
+    }
+
 </CodeBlock>
 
 </>
@@ -404,19 +418,17 @@ public class MyTapDLCCallback:ITapDlcCallback
 TapLicense.SetDLCCallback(new MyTapDLCCallback());
 ```
 
-```java
-TapLicenseHelper.setDLCCallback(new DLCManager.InventoryCallback() {
-    @Override
-    public boolean onQueryCallBack(int i, HashMap<String, Integer> queryList) {
-        // 查询回调
-        return false;
-    }
+```kotlin
+TapTapLicense.registerDLCCallback(object : TapTapDLCCallback {
+        override fun onQueryResult(resultCode: Int, resultList: HashMap<String, Int>?) {
+            // 查询回调
+        }
 
-    @Override
-    public void onOrderCallBack(String s, int i) {
-        // 购买回调
-    }
-});
+        override fun onPurchaseResult(skuId: String, status: Int) {
+            // 购买回调
+        }
+
+    })
 ```
 
 ```objc
@@ -450,7 +462,7 @@ FTapLicense::SetDLCCallback(
 
 #### DLC 查询
 
-对应的查询回调会返回具体的查询结果，查询成功时会返回当前 Tap 玩家是否已经购买过对应商品，在查询回调中返回的键值对类型参数 `queryList` 中可以获取，该参数 `key` 为查询的商品 `skuid`，`value` 表示该商品当前查询用户的购买状态：0 表示未购买，1 表示已购买。
+对应的查询回调会返回具体的查询结果，查询成功时会返回当前 Tap 玩家是否已经购买过对应商品，在查询回调中返回的键值对类型参数 `skuIds` 中可以获取，该参数 `key` 为查询的商品 `skuid`，`value` 表示该商品当前查询用户的购买状态：0 表示未购买，1 表示已购买。
 
 <MultiLang kind="ue">
 
@@ -458,8 +470,8 @@ FTapLicense::SetDLCCallback(
 TapLicense.QueryDLC(string[] skuIds);
 ```
 
-```java
-TapLicenseHelper.queryDLC(Activity activity, String[] skuIds);
+```kotlin
+TapTapLicense.queryDLC(activity: Activity, skuIds: List<String>)
 ```
 
 ```objc
@@ -480,8 +492,8 @@ FTapLicense::QueryDLC(const TArray<FString>& DLCList);
 TapLicense.PurchaseDLC(string skuId);
 ```
 
-```java
-TapLicenseHelper.purchaseDLC(Activity activity, String skuIds);
+```kotlin
+TapTapLicense.purchaseDLC(activity: Activity, skuId: String)
 ```
 
 ```objc
@@ -523,7 +535,7 @@ FTapLicense::PurchaseDLC(const FString& DLC);
 
 ### SDK 开启测试模式
 
-在 License 模块初始化后，调用 TapLicenseHelper.setTestEnvironment(boolean testEnvironment, Activity activity) 开启/关闭测试模式。
+在 License 模块初始化后，调用 TapTapLicense.setTestEnvironment(activity:Activity, true:Boolean) 开启/关闭测试模式。
 
 ### 填写测试包名、测试用户
 
