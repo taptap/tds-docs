@@ -286,6 +286,8 @@ else
 
 初始化 TapSDK 时需传入 `Client ID`、区域等应用配置信息。
 
+新版TapSDK提供统一初始化，业务模块（如：成就 登录等）无需单独初始化。
+
 <MultiLang kind="ue">
 
 <>
@@ -344,17 +346,20 @@ TapTapSDK.Init(coreOptions, otherOptions);
 
 **请确保 TapSDK 的初始化在主线程（UI 线程）中执行。**
 
-```java
-TapConfig tdsConfig = new TapConfig.Builder()
-        .withAppContext(MainActivity.this) // Context 上下文
-        .withClientId("your_client_id") // 必须，开发者中心对应 Client ID
-        .withClientToken("your_client_token") // 必须，开发者中心对应 Client Token
-        .withServerUrl("https://your_server_url") // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
-        .withRegionType(TapRegionType.CN) // TapRegionType.CN：中国大陆，TapRegionType.IO：其他国家或地区
-        .build();
-TapBootstrap.
-
-init(MainActivity .this, tdsConfig);
+```kotlin
+TapTapSdk.init(
+            this,
+            TapTapSdkOptions(
+                clientId, // 游戏client id
+                clientToken, // 游戏client token
+                region, // 游戏可玩区域: [TapTapRegion.CN]=国内 [TapTapRegion.GLOBAL]=海外
+                gameVersion, // 游戏版本号
+                enableLog, // 是否开启 log，建议 Debug 开启，Release 关闭，默认关闭 log
+                preferredLanguage, // 多语言设置，默认为中文
+            ),
+            TapTapAchievementOptions(enableToast = true), // 成就初始化配置
+            TapTapComplianceOptions(showSwitchAccount = true, useAgeRange = true) // 合规认证初始化配置
+        )
 ```
 
 </>
@@ -401,11 +406,9 @@ FTapBootstrap::Init(Config);
 
 </MultiLang>
 
-初始化的时候，**必须填入** `client_id`、`client_token` 和 `server_url`，其中：
+初始化的时候，**必须填入** `client_id`以及`client_token`
 
 - `client_id`、`client_token` 信息可在 **开发者中心 > 你的游戏 > 游戏服务 > 应用配置** 查看。
-
-- `server_url` 请**使用 HTTPS 协议**，参考文档关于 **[域名](/sdk/start/get-ready/#域名)** 的说明。
 
 ## 接入功能
 
