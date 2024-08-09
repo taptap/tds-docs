@@ -32,7 +32,7 @@ import CodeBlock from '@theme/CodeBlock';
     implementation 'com.taptap.android.payment:base:${sdkVersions.tapGlobalPayments.android}'
     implementation 'com.taptap.android.payment:stripe:${sdkVersions.tapGlobalPayments.android}'
     implementation 'com.taptap.android.payment:braintree:${sdkVersions.tapGlobalPayments.android}'
-    implementation 'com.taptap.android.payment:iap:${sdkVersions.tapGlobalPayments.android}'
+    implementation 'com.taptap.android.payment:alipay:${sdkVersions.tapGlobalPayments.android}'
 }
 `}
 </CodeBlock>
@@ -120,7 +120,7 @@ ProductDetailsParams productDetailsParams =
 
 BillingFlowParams billingFlowParams = BillingFlowParams.newBuilder()
     .setProductDetailsParams(productDetailsParams)
-    .setObfuscatedAccountId("xxx") //Specifies an optional obfuscated string that is uniquely associated with the user's account in your app.
+    .setObfuscatedAccountId("xxx") //Specifies an optional obfuscated string that is uniquely associated with the order(or another information) in your app.
     .build();
 // Launch the billing flow
 TapPaymentResult result = tapTapIAP.launchBillingFlow(activity,
@@ -153,7 +153,6 @@ public void onPurchaseUpdated(TapPaymentResult result, Purchase purchase) {
     }
 }
 ```
-
 ### **进行商品的发放，且完成订单**
 
 在用户进行完了任意商品的购买, 请确认为该用户发放对应的商品或者解锁对应的关卡。在确定商品发放之后需要调用 `finishPurchaseAsync` 告知 `TapTapIAP` 已完成商品的发放。以下是个代码实例：
@@ -171,6 +170,9 @@ tapTapIAP.finishPurchaseAsync(params, new FinishPurchaseResponseListener() {
     }
 });
 ```
+:::tip
+确认发放商品非常重要, 如果您没有调用 `finishPurchaseAsync` 来完成订单, 用户将无法再次购买该商品，且该订单将会在 3天后自动退款。
+:::
 
 ### **获取未完成的订单列表**
 
