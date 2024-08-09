@@ -35,7 +35,7 @@ export const getEntries = (brand: string, region: string): Entry[] => {
       links: [
         {
           label: "查看更多",
-          to: "/v4/sdk",
+          to: "/sdk",
         },
       ],
     },
