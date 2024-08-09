@@ -47,8 +47,18 @@ const config = {
           routeBasePath: "/",
           lastVersion: "current",
           versions: {
+            'v4': {
+              label: 'v4',
+              path: 'v4',
+              banner: "unreleased",
+            },
             current: {
               label: "v3",
+            },
+            'v2': {
+              label: 'v2',
+              path: 'v2',
+              banner: 'unmaintained',
             },
           },
         },

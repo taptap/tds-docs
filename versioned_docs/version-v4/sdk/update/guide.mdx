@@ -1,0 +1,272 @@
+---
+title: 更新唤起开发指南
+sidebar_label: 开发指南
+sidebar_position: 2
+---
+
+import MultiLang from "/src/docComponents/MultiLang";
+import CodeBlock from "@theme/CodeBlock";
+import sdkVersions from "/src/docComponents/sdkVersions";
+import { Conditional } from "/src/docComponents/conditional";
+import AndroidFaq from "../../../../docs/sdk/_partials/android-package-visibility.mdx";
+import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
+
+:::info
+本文档只适用于国内版本，海外版本请参考 [文档](/tap-update-old-guide/)
+:::
+
+## 权限说明
+
+<MultiLang>
+
+<>
+该模块依赖权限如下：
+
+| 权限 | 使用目的 | 权限申请时机 |
+| ---------------------- | ---------------------- | ---------------------- |
+| 网络权限 | 用于正常网络访问 | 用户首次使用该功能时会申请权限 |
+| 安装 APK 权限 | 用于安装 Tap 客户端 | 用户首次使用该功能时会申请权限 |
+</>
+
+<>
+
+该模块依赖权限如下：
+
+| 权限 | 使用目的 | 权限申请时机 |
+| ---------------------- | ---------------------- | ---------------------- |
+| 网络权限 | 用于正常网络访问 | 用户首次使用该功能时会申请权限 |
+| 安装 APK 权限 | 用于安装 Tap 客户端 | 用户首次使用该功能时会申请权限 |
+
+同时该模块也会访问设备已安装的 Tap 客户端信息，所以接入 SDK 后将在应用 `AndroidManifest.xml` 中添加如下配置：
+
+```xml
+<uses-permission android:name="android.permission.INTERNET"/>
+<uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+<queries>
+        <package android:name="com.taptap" />
+        <package android:name="com.taptap.global" />
+</queries>
+```
+
+</>
+
+<>
+
+</>
+</MultiLang>
+
+## 集成前准备
+
+使用更新唤起功能前提需要通过 **TapTap 开发者中心 > 商店 > 游戏资料 > 商店资料** 中已经上传 APK， 发布设置为 **立即上线** 并通过 **审核**（开发者包如果暂时不想对外，发布状态选 **敬请期待** 或者 **预约**）。
+
+
+## SDK 获取
+
+<MultiLang>
+
+<>
+
+<UnitySDKInstallation
+npmDeps={[
+"com.taptap.sdk.core",
+"com.taptap.sdk.login",
+"com.taptap.sdk.update",
+]}
+githubDeps={[
+{package: "com.taptap.tds.login", url: `https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}`},
+{package: "com.taptap.tds.common", url: `https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}`},
+{package: "com.taptap.tds.bootstrap", url: `https://github.com/TapTap/TapBootstrap-Unity.git#${sdkVersions.taptap.unity}`},
+{package: "com.leancloud.realtime", url: `https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}`},
+{package: "com.leancloud.storage", url: `https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}`},
+]}
+unitypackageModules={[
+{name: "TapTapSDK_Core.unitypackage", desc: "TapTapSDK 核心模块，必选"},
+{name: "TapTapSDK_Update.unitypackage", desc: "TapTapSDK 更新唤起模块，必选"},
+]}/>
+
+</>
+
+<>
+1. 项目根目录的 build.gradle 添加仓库地址：
+
+```groovy
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+```
+
+2. app module 的 build.gradle 添加对应依赖：
+
+```groovy
+dependencies {
+    implmentation 'com.taptap.sdk:tap-core:latest'
+    implmentation 'com.taptap.sdk:tap-update:latest'
+}
+```
+</>
+
+<>
+
+受限于苹果政策，iOS 平台的 TapTap 客户端不提供游戏更新功能
+
+</>
+
+<>
+
+#### 安装插件
+
+* 下载 [TapSDK UE4](/tap-download)，TapSDK-UE4-xxx.zip 解压后将 `TapUpdate`、`TapCommon` 文件夹 Copy 到项目的 `Plugins` 目录中
+* 重启 Unreal Editor
+* 打开 编辑 > 插件 > 项目 > TapTap，开启 `TapUpdate` 模块
+
+#### 添加依赖
+
+在 Project.Build.cs 中添加所需模块:
+
+```cs
+PublicDependencyModuleNames.AddRange(new string[] { "Core",
+	"CoreUObject",
+	"Engine",
+	"Json",
+	"InputCore",
+	"JsonUtilities",
+	"SlateCore",
+	"TapCommon",
+    "TapUpdate",
+});
+```
+
+#### 导入头文件
+
+```cpp
+#include "TapUpdate.h"
+```
+
+</>
+
+</MultiLang>
+
+## 初始化
+
+### TapSDK 初始化
+
+<MultiLang>
+
+<>
+
+`TapTapSDKCoreOptions` 详细参数见 [入门指南#快速开始](/v4/sdk/access/quickstart/#初始化)
+
+```cs
+using TapSDK.Core;
+using TapSDK.Compliance;
+
+// 核心配置 详细参数见 [入门指南#快速开始]
+TapTapSDKCoreOptions coreOptions = new TapTapSDKCoreOptions();
+// TapSDK 初始化
+TapTapSDK.Init(coreOptions);
+```
+
+</>
+
+<>
+
+```kotlin
+TapTapSdk.init(
+    context = context,
+    sdkOptions = TapTapSdkOptions(
+        clientId = binding.edClientId.text.toString(),
+        clientToken = binding.edClientToken.text.toString(),
+        region = TapTapRegion.CN,
+        preferredLanguage = TapTapLanguage.ZH_HANS,
+        enableLog = false
+    ),
+)
+```
+</>
+
+
+受限于苹果政策，iOS 平台的 TapTap 客户端不提供游戏更新功能
+
+```cpp
+FTapUpdate::Init(TEXT("clientId"), TEXT("clientToken"));
+```
+
+</MultiLang>
+
+**参数说明**
+
+参数  | 描述
+| ------ | ------ |
+clientId | TapTap 开发者中心对应应用的 Client ID
+clientToken | TapTap 开发者中心对应应用的 Client Token
+
+## 开始更新
+
+:::tip
+TapSDK 如果检查当前设备未安装 TapTap 客户端，首先会弹窗询问用户「是否需要使用 TapTap 更新」，当点击「取消」按钮时取消更新的回调方法才会执行。
+:::
+
+<MultiLang>
+
+<>
+
+```cs
+using TapSDK.Update
+
+TapTapUpdate.UpdateGame(() => {
+    // 唤醒更新收到[取消]回调
+});
+```
+</>
+
+<>
+
+由于更新唤起 UI 依赖于开发者设置的 Activity 实例，所以为了避免因 Activity 发生重建导致更新唤起功能不可用，开发者应确保在屏幕旋转、配置修改时当前 Activity 不会发生重建，具体设置方式参考 [限制 activity 重新创建](https://developer.android.com/guide/topics/resources/runtime-changes?hl=zh-cn#restrict-activity)
+
+```kotlin
+TapTapUpdate.updateGame(
+    activity = this,
+    callback = object : TapTapUpdateCallback {
+
+        override fun onCancel() {
+
+            Toast.makeText(this@DemoUpdateActivity, "取消更新", Toast.LENGTH_SHORT)
+                .show()
+        }
+    }
+)
+```
+</>
+
+<>
+
+受限于苹果政策，iOS 平台的 TapTap 客户端不提供游戏更新功能
+
+</>
+
+</MultiLang>
+
+
+## 测试
+为了保证上线后，游戏对于用户是否正常使用更新唤起功能，请务必按照以下说明完成自测。
+
+### 上传 APK
+
+新应用需要上传测试的 APK 至开发者中心，并通过审核。已上架的游戏，需确保更新资料版本中的 APK 包名和已上架的 APK 包名保持一致。
+
+### 应用上线
+
+针对已上架的游戏，开发者需确保**更新资料版本中的包名和已上架的游戏包名保持一致**，否则会导致玩家因包名不一致而更新失败。
+
+针对新游戏，开发者需要在 TapTap 上线一个包含 APK 包并且通过审核**（用于平台获取游戏包名，包名需与后续更新的包名保持一致）**的商店资料版本，如果 APK 包当前无法对外，可将发布状态设置为「敬请期待」或「预约」。
+
+### 开始测试
+
+触发更新唤起功能后正常状态是可以唤起应用在 TapTap 商店的详情页面。
+
+
+
+
