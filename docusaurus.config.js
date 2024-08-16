@@ -5,150 +5,149 @@ const PREVIEW = process.env.PREVIEW ?? "false";
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: "TapTap 开发者文档",
-  url: "https://developer.taptap.cn",
-  baseUrl: PREVIEW === "true" ? "/" : "/docs/",
-  onBrokenLinks: "throw",
-  onBrokenMarkdownLinks: "warn",
-  favicon: "img/logoh.png",
-  trailingSlash: true,
-  customFields: {
-    searchUrl: "https://tds-doc-search-api.leanapp.cn/search",
-    upItemListIndexUrl: "https://tds-doc-search-check-log.leanapp.cn/api/check-log-up",
-    aiSearchUrl :"https://tds-doc-search-ai-api.ap-sg.tdsapps.com/api/ai-search?type=TDS",
-    aiSearchEnUrl :"https://tds-doc-search-ai-api.ap-sg.tdsapps.com/api/ai-search?type=TDSen",
-    searchProviderName: "LeanDB Elasticsearch",
-    searchProviderWebsite:
-      "https://developer.taptap.cn/docs/sdk/engine/database/es/",
-    mainDomainHost: "https://developer.taptap.cn/",
-    dcDomainHost: "https://developer.taptap.cn?from=tds-docs",
-  },
-
-  i18n: {
-    localeConfigs: {
-      en: {
-        label: "English",
-      },
-      "zh-Hans": {
-        label: "简体中文",
-      },
+    title: "TapTap 开发者文档",
+    url: "https://developer.taptap.cn",
+    baseUrl: PREVIEW === "true" ? "/" : "/docs/",
+    onBrokenLinks: "throw",
+    onBrokenMarkdownLinks: "warn",
+    favicon: "img/logoh.png",
+    trailingSlash: true,
+    customFields: {
+        searchUrl: "https://tds-doc-search-api.leanapp.cn/search",
+        upItemListIndexUrl: "https://tds-doc-search-check-log.leanapp.cn/api/check-log-up",
+        aiSearchUrl: "https://tds-doc-search-ai-api.ap-sg.tdsapps.com/api/ai-search?type=TDS",
+        aiSearchEnUrl: "https://tds-doc-search-ai-api.ap-sg.tdsapps.com/api/ai-search?type=TDSen",
+        searchProviderName: "LeanDB Elasticsearch",
+        searchProviderWebsite:
+            "https://developer.taptap.cn/docs/sdk/engine/database/es/",
+        mainDomainHost: "https://developer.taptap.cn/",
+        dcDomainHost: "https://developer.taptap.cn?from=tds-docs",
     },
-    defaultLocale: "zh-Hans",
-    locales: ["zh-Hans", "en"],
-  },
 
-  presets: [
-    [
-      "classic",
-      /** @type {import('@docusaurus/preset-classic').Options} */
-      ({
-        docs: {
-          sidebarPath: require.resolve("./sidebars.js"),
-          routeBasePath: "/",
-          lastVersion: "current",
-          versions: {
-            'v4': {
-              label: 'v4',
-              path: 'v4',
-              banner: "unreleased",
+    i18n: {
+        localeConfigs: {
+            en: {
+                label: "English",
             },
-            current: {
-              label: "v3",
+            "zh-Hans": {
+                label: "简体中文",
             },
-            'v2': {
-              label: 'v2',
-              path: 'v2',
-              banner: 'unmaintained',
-            },
-          },
         },
-        theme: {
-          customCss: require.resolve("./src/styles/index.scss"),
-        },
-        googleAnalytics: {
-          trackingID: "UA-73963350-1",
-        },
-      }),
-    ],
-  ],
+        defaultLocale: "zh-Hans",
+        locales: ["zh-Hans", "en"],
+    },
 
-  themeConfig:
-    /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
-    ({
-      navbar: {
-        items: [
-          {
-            label: "文档首页",
-            to: "/",
-            position: "right",
-            activeBaseRegex: `^${
-              PREVIEW === "true" ? "/" : "/docs/"
-            }(en/)?(?!.+)`,
-          },
-          {
-            label: "游戏商店",
-            to: "store",
-            position: "right",
-          },
-          {
-            label: "游戏服务",
-            to: "sdk",
-            position: "right",
-          },
-          {
-            label: "SDK API",
-            to: "/sdk-api",
-            position: "right",
-          },
-          {
-            label: "下载",
-            position: "right",
-            items: [
-              {
-                label: "设计资源",
-                to: "/design",
-              },
-              {
-                label: "SDK 工具包",
-                to: "/tap-download",
-              },
-              {
-                label: "Demos",
-                to: "/demos",
-              },
-            ],
-          },
-          {
-            type: "docsVersionDropdown",
-            position: "right",
-          },
-          {
-            type: "localeDropdown",
-            position: "right",
-          },
+    presets: [
+        [
+            "classic",
+            /** @type {import('@docusaurus/preset-classic').Options} */
+            ({
+                docs: {
+                    sidebarPath: require.resolve("./sidebars.js"),
+                    routeBasePath: "/",
+                    lastVersion: "current",
+                    versions: {
+                        'v4': {
+                            label: 'v4',
+                            path: 'v4',
+                            banner: "unreleased",
+                        },
+                        current: {
+                            label: "v3",
+                        },
+                        'v2': {
+                            label: 'v2',
+                            path: 'v2',
+                            banner: 'unmaintained',
+                        },
+                    },
+                },
+                theme: {
+                    customCss: require.resolve("./src/styles/index.scss"),
+                },
+                googleAnalytics: {
+                    trackingID: "UA-73963350-1",
+                },
+            }),
         ],
-      },
-      prism: {
-        theme: require("./src/theme/prism-taptap"),
-        additionalLanguages: ["csharp", "java", "php", "groovy", "swift", "dart"],
-      },
-      image: "/img/logo.svg",
-      metadata: [
-        {
-          name: "keywords",
-          content: "taptap tds 开发者 文档",
-        },
-      ],
-      colorMode: {
-        defaultMode: "light",
-        disableSwitch: true,
-      },
-    }),
+    ],
 
-  plugins: [
-    "docusaurus-plugin-sass",
-    path.resolve(__dirname, "./plugins/npsmeter"),
-  ],
+    themeConfig:
+        /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
+        ({
+            navbar: {
+                items: [
+                    {
+                        label: "文档首页",
+                        to: "/",
+                        position: "right",
+                        activeBaseRegex: `^${PREVIEW === "true" ? "/" : "/docs/"
+                            }(en/)?(?!.+)`,
+                    },
+                    {
+                        label: "游戏商店",
+                        to: "store",
+                        position: "right",
+                    },
+                    {
+                        label: "游戏服务",
+                        to: "sdk",
+                        position: "right",
+                    },
+                    {
+                        label: "SDK API",
+                        to: "/sdk-api",
+                        position: "right",
+                    },
+                    {
+                        label: "下载",
+                        position: "right",
+                        items: [
+                            {
+                                label: "设计资源",
+                                to: "/design",
+                            },
+                            {
+                                label: "SDK 工具包",
+                                to: "/tap-download",
+                            },
+                            {
+                                label: "Demos",
+                                to: "/demos",
+                            },
+                        ],
+                    },
+                    {
+                        type: "docsVersionDropdown",
+                        position: "right",
+                    },
+                    {
+                        type: "localeDropdown",
+                        position: "right",
+                    },
+                ],
+            },
+            prism: {
+                theme: require("./src/theme/prism-taptap"),
+                additionalLanguages: ["csharp", "java", "php", "groovy", "swift", "dart", "kotlin", "json"],
+            },
+            image: "/img/logo.svg",
+            metadata: [
+                {
+                    name: "keywords",
+                    content: "taptap tds 开发者 文档",
+                },
+            ],
+            colorMode: {
+                defaultMode: "light",
+                disableSwitch: true,
+            },
+        }),
+
+    plugins: [
+        "docusaurus-plugin-sass",
+        path.resolve(__dirname, "./plugins/npsmeter"),
+    ],
 };
 
 module.exports = config;

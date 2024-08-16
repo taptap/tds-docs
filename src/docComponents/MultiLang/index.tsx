@@ -128,6 +128,12 @@ const CONFIGS: {
       { label: "iOS", value: "ios" },
     ],
   },
+  android_unity: {
+    tds: [
+      { label: "Unity", value: "unity" },
+      { label: "Android", value: "android" },
+    ]
+  },
 };
 
 const MultiLang = ({ children, kind = "default" }) => {
