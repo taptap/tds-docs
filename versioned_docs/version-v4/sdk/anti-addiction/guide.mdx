@@ -348,11 +348,13 @@ TapTapCompliance.startup(userIdentifier)
 
 </MultiLang>
 
-## 检查消费限制
+## 充值额度限制
 
-不同年龄段的玩家，消费金额有不同的上限，开发者需在玩家消费前检查是否受限，并在成功消费后上报消费金额，具体流程如下：
+不同年龄段的玩家，充值金额有不同的上限，开发者需在玩家充值前检查是否受限，并在玩家成功充值后上报充值金额，具体流程如下：
 
-1. 游戏在收到玩家的付费请求后，调用以下接口获取本次付费行为是否受限：
+### 检查充值限制
+
+游戏在收到玩家的充值请求后，调用以下接口检查本次充值行为是否受限：
 
 <MultiLang>
 
@@ -360,7 +362,7 @@ TapTapCompliance.startup(userIdentifier)
 using TapSDK.Compliance;
 
 var amount = 1000;
-TapTapCompliance.CheckPayLimit(
+TapTapCompliance.CheckPaymentLimit(
    amount: amount,
    handleCheckPayLimit: checkResult =>
     {
@@ -382,7 +384,7 @@ TapTapCompliance.checkPaymentLimit(
 
         override fun onSuccess(result: CheckPaymentResult) {
             if (result.status) {
-                // 付费没有限制
+                // 充值没有限制
             }
         }
 
@@ -396,14 +398,14 @@ TapTapCompliance.checkPaymentLimit(
 ```swift
 import TapTapComplianceSDK
 
-// 消费金额，单位为分
+// 充值金额，单位为分
 let amount = 100 
 TapTapCompliance.checkPaymentLimit(amount) { status, title, desc in
-    // 付费没有限制
+    // 充值没有限制
     if status {
-        // TODO: 完成后续付费流程
+        // TODO: 完成后续充值流程
     }
-    // 在付费被限制时，SDK 会弹出对应提示窗口，开发者不需要额外处理
+    // 在充值被限制时，SDK 会弹出对应提示窗口，开发者不需要额外处理
 } failureHandler: { msg in
     // 查询失败，开发者可以继续重试，但建议最多重试三次
 }
@@ -411,9 +413,11 @@ TapTapCompliance.checkPaymentLimit(amount) { status, title, desc in
 
 </MultiLang>
 
-消费金额的单位为分。
+充值金额的单位为分。
 
-2. 当未成年玩家消费成功后，调用如下接口上报玩家消费金额：
+### 上报充值金额
+
+当玩家充值成功后，开发者需调用如下接口上报玩家充值金额：
 
 <MultiLang>
 
@@ -421,7 +425,7 @@ TapTapCompliance.checkPaymentLimit(amount) { status, title, desc in
 using TapSDK.Compliance;
 
 long amount = 100;
-TapTapCompliance.SubmitPayResult(
+TapTapCompliance.SubmitPayment(
     amount: amount,
     handleSubmitPayResult: () =>
     {
@@ -441,11 +445,11 @@ TapTapCompliance.submitPayment(
     amount = amount,
     callback = object : TapTapCallback<JsonElement> {
         override fun onSuccess(result: JsonElement) {
-            // 上报付费成功
+            // 上报充值成功
         }
 
         override fun onFail(exception: TapTapException) {
-            // 上报付费失败
+            // 上报充值失败
         }
     }
 )
@@ -454,7 +458,7 @@ TapTapCompliance.submitPayment(
 ```swift
 import TapTapComplianceSDK
 
-// 消费金额，单位为分
+// 充值金额，单位为分
 let amount = 100 
 TapTapCompliance.submitPayment(amount) { success in
    // 上报成功
@@ -465,7 +469,7 @@ TapTapCompliance.submitPayment(amount) { success in
 
 </MultiLang>
 
-上报消费金额时，传入的消费金额的单位同样为分。
+上报充值金额时，传入的充值金额的单位同样为分。
 
 ## 退出认证
 
