@@ -116,7 +116,7 @@ iOS 提供通过添加 cocosPod 远程依赖和使用本地文件导入两种集
 
 #### 本地文件依赖
 
-TapTap 登录依赖于初始化模块，使用本地文件方式添加依赖时，需先参考 [入门指南](/v4/sdk/access/quickstart) 添加对应本地文件依赖项。
+TapTap 登录依赖于初始化模块，使用本地文件方式添加依赖时，需先参考 [TapSDK 集成](/v4/sdk/access/quickstart/#本地文件依赖) 添加对应本地文件依赖项。
 
 1. 在下载页下载如下文件：
 
@@ -163,6 +163,8 @@ TapTap 客户端应用跳转配置
    a) 如果项目中有 `SceneDelegate.swift`，请先删除，然后请添加如下代码到 `AppDelegate.swift` 文件：
 
 ```swift
+import TapTapLoginSDK
+
 func application(_ app: UIApplication, open url: URL) -> Bool {
     return TapTapLogin.open(url: url)
 }
@@ -217,15 +219,14 @@ func application(_ application: UIApplication, didDiscardSceneSessions sceneSess
 
 </Conditional>
 
+TapTap 登录模块依赖于 TapTapSDK 初始化，具体参考 [TapSDK 集成](/v4/sdk/access/quickstart/#初始化)
+
 <MultiLang>
 
 <>
 
-`TapTapSDKCoreOptions` 详细参数见 [入门指南#快速开始](/v4/sdk/access/quickstart/#初始化)
-
 ```cs
 using TapSDK.Core;
-using TapSDK.Achievement;
  
 // 核心配置 详细参数见 [TapTapSDK]
 TapTapSDKCoreOptions coreOptions = new TapTapSDKCoreOptions();
@@ -265,11 +266,11 @@ enableLog | 是否开启日志
 
 <>
 
-登录模块依赖于 TapTapSDK 初始化，具体参考[入门指南#快速开始](/v4/sdk/access/quickstart/#初始化)
 
 ```swift
 import TapTapCoreSDK
 
+// 核心配置项
 let options = TapTapSDKCoreOptions()
 options.clientId = "your_client_id" // 必须，开发者中心对应 Client ID
 options.clientToken = "your_client_token" // 必须，开发者中心对应 Client Token
@@ -298,25 +299,29 @@ TapTapSDK.initWith(options)
 
 ```cs
 using TapSDK.Login;
+using System.Threading.Tasks;
 
+// 定义授权范围
 List<string> permissions = new List<string>();
-permissions.Add(TapTapLogin.TAP_LOGIN_SCOPE_BASIC_INFO);
 permissions.Add(TapTapLogin.TAP_LOGIN_SCOPE_PUBLIC_PROFILE);
-permissions.Add(TapTapLogin.TAP_LOGIN_SCOPE_USER_FRIENDS);
-permissions.Add(TapTapLogin.TAP_LOGIN_SCOPE_EMAIL);
-Task<TapTapAccount> task = TapTapLogin.Instance.Login(permissions.ToArray());
+
+// 初始化登录请求 Task
+Task<TapTapAccount> task = TapTapLogin.Instance.LoginWithScopes(permissions.ToArray());
 var result = await task;
+
+// 判断登录结果
 if (task.IsCompleted)
 {
-// 成功
+	// 登录成功
 } 
 else if (task.IsCanceled)
 {
- // 取消
+ 	// 登录取消
 }
 else
 {
-// 失败
+	// 登录失败
+	Debug.Log($"登录失败: {task.Exception.Message}");
 }
 ```
 
@@ -353,6 +358,7 @@ import TapTapLoginSDK
 
 // 定义授权范围
 var scopes: [Scope] = [Scope.publicProfile]
+
 // 发起 Tap 登录
 TapTapLogin.login(with: scopes) {[weak self] account, error, isCancel in
     guard let self else { return }
@@ -363,6 +369,7 @@ TapTapLogin.login(with: scopes) {[weak self] account, error, isCancel in
         NSLog("Tap登录失败：\(error.localizedDescription)")
     } else if let account = account {
     	 // 登录成功
+
     	 // 登录 token
     	 let token = account.accessToken
     	 // 用户信息
@@ -421,12 +428,17 @@ TapTap 用户登录成功之后，开发者可以通过如下方式获取到 Tap
 ```cs
 using TapSDK.Login;
 
-TapTapAccount account = await TapTapLogin.Instance.GetCurrentAccount();
-if (account == null) {
-// 未登录
-} else {
-// 已登录
+try {
+    TapTapAccount account = await TapTapLogin.Instance.GetCurrentAccount();
+    if (account == null) {
+        // 用户未登录
+    } else {
+        // 用户已登录
+    }
+} catch (Exception e) {
+    Debug.Log($"获取用户信息失败 {e.Message}");
 }
+
 ```
 
 </>
@@ -452,6 +464,8 @@ when (TapTapLogin.getCurrentTapAccount() == null) {
 <>
 
 ```swift
+import TapTapLoginSDK
+
 if let account = TapTapLogin.getCurrentTapAccount() {
     let token = account.accessToken
     let profile = account.userInfo
@@ -492,7 +506,9 @@ TapTapLogin.logout()
 <>
 
 ```swift
- TapTapLogin.logout()
+import TapTapLoginSDK
+
+TapTapLogin.logout()
 ```
 </>
 
