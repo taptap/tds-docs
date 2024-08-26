@@ -18,38 +18,7 @@ import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
 - 如已购买，则可正常进入游戏。
 - 如查询到未购买，将出现「游戏未激活，请前往 TapTap 购买此游戏」弹窗，玩家必须选择「打开 TapTap」购买之后才能游玩。
 
-## 正版验证
-
-### 权限说明
-
-<MultiLang kind="android_unity">
-
-<>
-
-</>
-
-<>
-
-该模块需要访问设备中已安装的 Tap 客户端信息，在 Android 11 且工程 targetVersion > 29 时需要
-开发者在应用 `AndroidManifest.xml` 中添加如下配置：
-
-```xml
- <queries>
-    <package android:name="com.taptap" />
-    <package android:name="com.taptap.pad" />
-    <package android:name="com.taptap.global" />
-</queries>   
-```
-该模块将在应用中添加如下权限：
-
-```xml
-<uses-permission android:name="android.permission.REORDER_TASKS" />
-```
-</>
-
-</MultiLang>
-
-### SDK 获取
+## SDK 获取
 
 可以在 [下载页](/tap-download) 获得 TapSDK，添加以下依赖：
 
@@ -105,6 +74,82 @@ NoNeedLC={true}/>
 
 </MultiLang>
 
+## SDK 初始化
+
+<MultiLang kind="android_unity">
+
+<>
+
+`TapTapSDKCoreOptions` 详细参数见 [入门指南#快速开始](/v4/sdk/access/quickstart/#初始化)
+
+```cs
+using TapSDK.Core;
+ 
+// 核心配置 详细参数见 [TapTapSDK]
+TapTapSDKCoreOptions coreOptions = new TapTapSDKCoreOptions();
+// TapSDK 初始化
+TapTapSDK.Init(coreOptions);
+```
+
+</>
+
+<>
+
+`TapTapSdkOptions` 详细参数见 [入门指南#快速开始](/v4/sdk/access/quickstart/#初始化)
+
+```kotlin
+import com.taptap.sdk.core.TapTapSdk
+import com.taptap.sdk.core.TapTapSdkOptions
+import com.taptap.sdk.core.TapTapRegion
+import com.taptap.sdk.core.TapTapLanguage
+
+TapTapSdk.init(
+  context = context,
+  sdkOptions = TapTapSdkOptions(
+      clientId = clientId,
+      clientToken = clientToken,
+      region = TapTapRegion.CN,
+      preferredLanguage = TapTapLanguage.ZH_HANS,
+      enableLog = false
+  )
+)
+```
+
+</>
+
+</MultiLang>
+
+## 正版验证
+
+### 权限说明
+
+<MultiLang kind="android_unity">
+
+<>
+
+</>
+
+<>
+
+该模块需要访问设备中已安装的 Tap 客户端信息，在 Android 11 且工程 targetVersion > 29 时需要
+开发者在应用 `AndroidManifest.xml` 中添加如下配置：
+
+```xml
+ <queries>
+    <package android:name="com.taptap" />
+    <package android:name="com.taptap.pad" />
+    <package android:name="com.taptap.global" />
+</queries>   
+```
+该模块将在应用中添加如下权限：
+
+```xml
+<uses-permission android:name="android.permission.REORDER_TASKS" />
+```
+</>
+
+</MultiLang>
+
 ### 测试模式设置
 
 测试模式开启后，可以模拟线上正版验证流程，方便进行调试。
@@ -126,6 +171,8 @@ TapLicense.SetTestEnvironment(bool isTest);
 ```
 
 ```kotlin
+import com.taptap.sdk.license.TapTapLicense
+
 // 设置是否开启测试环境
 TapTapLicense.setTestEnvironment(activity: Activity, true: Boolean)
 ```
@@ -152,6 +199,9 @@ public interface ITapLicenseCallback
 ```
 
 ```kotlin
+import com.taptap.sdk.license.TapTapLicense
+import com.taptap.sdk.license.TapTapLicenseCallback
+
 // 默认情况下 SDK 会弹出不可由玩家手动取消的弹窗来避免未授权玩家进入游戏，如果需要回调来触发流程，请添加如下代码
 TapTapLicense.registerLicenseCallback(object : TapTapLicenseCallback {
     override fun onLicenseSuccess() {
@@ -174,6 +224,8 @@ TapLicense.checkLicense(true);
 ```
 
 ```kotlin
+import com.taptap.sdk.license.TapTapLicense
+
 // forceCheck参数可不传，默认为false
 TapTapLicense.checkLicense(activity: Activity, forceCheck: Boolean)
 ```
@@ -305,6 +357,9 @@ TapLicense.RegisterDLCCallback(new MyTapDLCCallback());
 ```
 
 ```kotlin
+import com.taptap.sdk.license.TapTapLicense
+import com.taptap.sdk.license.TapTapDLCCallback
+
 TapTapLicense.registerDLCCallback(object : TapTapDLCCallback {
     override fun onQueryResult(resultCode: Int, resultList: HashMap<String, Int>?) {
         // 查询回调
@@ -330,6 +385,8 @@ TapLicense.QueryDLC(string[] skuIds);
 ```
 
 ```kotlin
+import com.taptap.sdk.license.TapTapLicense
+
 TapTapLicense.queryDLC(activity: Activity, skuIds: List<String>)
 ```
 
@@ -344,6 +401,8 @@ TapLicense.PurchaseDLC(string skuId);
 ```
 
 ```kotlin
+import com.taptap.sdk.license.TapTapLicense
+
 TapTapLicense.purchaseDLC(activity: Activity, skuId: String)
 ```
 
