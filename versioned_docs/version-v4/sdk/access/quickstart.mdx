@@ -66,40 +66,6 @@ unitypackageModules={[
 {name: "TapTapSDK_Core.unitypackage", desc: "TapTapSDK 核心模块，必选"},
 ]}/>
 
-#### iOS 配置
-
-在 `Assets/Plugins/iOS/Resource` 目录下创建 `TDS-Info.plist` 文件，复制以下代码并且**替换其中的 `ClientId`**。如果游戏使用了
-TapTap [内嵌动态](/v4/sdk/embedded-moments/features/)或[数据分析](/v4/sdk/tapdb/features/)服务，需要配置相关权限并**替换授权文案**：
-
-:::tip
-
-复制使用以下内容时，**请删除空行以及注释**，以免出现 XML 解析时报错，`ApplicationException: expected a key node`。
-
-:::
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-    <dict>
-        <key>taptap</key>
-        <dict>
-            <key>client_id</key>
-            <string>ClientId</string>
-        </dict>
-        <!--使用内嵌动态服务，需要相册、相机、麦克风权限-->
-        <key>NSPhotoLibraryUsageDescription</key>
-        <string>说明为何应用需要此项权限</string>
-        <key>NSCameraUsageDescription</key>
-        <string>说明为何应用需要此项权限</string>
-        <key>NSMicrophoneUsageDescription</key>
-        <string>说明为何应用需要此项权限</string>
-        <!--使用数据分析服务需要 IDFA 权限。如应用程序不想弹框，可以设置 TapDB.AdvertiserIDCollectionEnabled(false)-->
-        <key>NSUserTrackingUsageDescription</key>
-        <string>说明为何应用需要此项权限</string>
-    </dict>
-</plist>
-```
-
 </>
 <>
 
@@ -112,9 +78,7 @@ TapTap [内嵌动态](/v4/sdk/embedded-moments/features/)或[数据分析](/v4/s
         google()
         mavenCentral()
     }
-}`
-}
-
+}`}
 </CodeBlock>
 
 2. app module 的 build.gradle 添加对应模块依赖（如：登录以及内嵌动态）：
@@ -122,15 +86,16 @@ TapTap [内嵌动态](/v4/sdk/embedded-moments/features/)或[数据分析](/v4/s
 <CodeBlock language="groovy">
 {
 `dependencies {
-    implementation 'com.taptap.sdk:tap-core:latest.release'
-    implementation 'com.taptap.sdk:tap-login:latest.release' // 登录
-    implementation 'com.taptap.sdk:tap-moment:latest.release' // 内嵌动态
+    implementation 'com.taptap.sdk:tap-core:${sdkVersions.taptap.android}'
+    implementation 'com.taptap.sdk:tap-login:${sdkVersions.taptap.android}' // 登录
+    implementation 'com.taptap.sdk:tap-moment:${sdkVersions.taptap.android}' // 内嵌动态
 }`
 }
-
+	
 </CodeBlock>
 
 3. 在 `AndroidManifest.xml` 添加网络权限：
+
 <CodeBlock language="xml">
 {
 `<uses-permission android:name="android.permission.INTERNET"></uses-permission>`
@@ -153,8 +118,10 @@ iOS 提供通过添加 cocosPod 远程依赖和使用本地文件导入两种集
 
 ##### 远程依赖
 
-1. 在工程 Podfile 文件中对应模块下添加依赖：` pod 'TapTapCoreSDK', '~> 4.3.0'
-   `
+1. 在工程 Podfile 文件中对应模块下添加依赖：
+
+<CodeBlock>{` pod 'TapTapCoreSDK', '~> ${sdkVersions.taptap.ios }'`}</CodeBlock>
+
 2. 执行 `Pod install` 下载对应依赖文件
 
 ##### 本地文件依赖
@@ -172,6 +139,14 @@ iOS 提供通过添加 cocosPod 远程依赖和使用本地文件导入两种集
 2. 在工程中添加 `framework` 静态库，注意添加时选择 Embed 方式为 **Do Not Embed**
 3. SDK 内部使用了 [`Protobuf` 依赖库](https://cocoapods.org/pods/Protobuf)，开发者应提前通过远程或文件导入方式添加对应依赖。
 
+#### 配置编译选项
+
+- 在 Build Setting 中的 Other Link Flag 中添加 `-ObjC` 和 `-Wl -ld_classic`。
+
+- 在 Build Setting 中的 Always Embed Swift Standard Libraries 设置为 YES，即始终引入 Swift 标准库，避免 App 启动时报错「无法找到 Swift 标准库之类」。如果项目中找不到，可以建立一个空 Swift 文件，Xcode 会自动建立桥接关系。
+
+- 在 Build Setting 中的 Swift Compiler - Language/Swift Language Version 选择 Swift 5。
+
 </>
 
 </MultiLang>
@@ -180,7 +155,7 @@ iOS 提供通过添加 cocosPod 远程依赖和使用本地文件导入两种集
 
 初始化 TapSDK 时需传入 `Client ID`、区域等应用配置信息。
 
-新版TapSDK提供统一初始化，业务模块（如：成就 登录等）无需单独初始化。
+新版 TapSDK 提供统一初始化，业务模块（如：成就 登录等）无需单独初始化。
 
 <MultiLang>
 
@@ -197,7 +172,7 @@ TapTapSDKCoreOptions coreOptions = new TapTapSDKCoreOptions
    // 客户端令牌，开发者后台获取
    clientToken = clientToken,
    // 地区，CN 为国内，Overseas 为海外
-   region = TapTapRegionType.CN
+   region = TapTapRegionType.CN,
    // 语言，默认为 Auto，默认情况下，国内为 zh_Hans，海外为 en
    preferredLanguage = TapTapLanguageType.zh_Hans,
    // 是否开启日志，Release 版本请设置为 false
@@ -207,33 +182,14 @@ TapTapSDKCoreOptions coreOptions = new TapTapSDKCoreOptions
 TapTapSDK.Init(coreOptions);
 
 
-// 如果有其他TapTap模块配置可以一起初始化配置, 请使用如下API
-// 其他模块配置项
+// 当需要添加其他模块的初始化配置项，例如合规认证、成就等， 请使用如下 API
 TapTapSDKBaseOption[] otherOptions = new TapTapSDKBaseOption[]
 {
-    achievementOptions,
-    // ...
+    // 其他模块配置项
 };
 TapTapSDK.Init(coreOptions, otherOptions);
 
 ```
-
-| 字段                           | 可为空 | 说明                                                 |
-|------------------------------|-----|----------------------------------------------------|
-| clientId                     | 否   | 客户端 ID，开发者后台获取                                     |
-| clientToken                  | 否   | 客户端令牌，开发者后台获取                                      |
-| region                       | 否   | 地区，CN 为国内，Overseas 为海外                             |
-| preferredLanguage            | 是   | 默认为 TapTapLanguageType.Auto, 语言                    |
-| enableLog                    | 是   | 默认为 false, 是否开启日志，Release 版本请设置为 false             |
-| 以下参数为数据分析配置，详见数据分析           |
-| channel                      | 是   | 渠道，如 AppStore、GooglePlay                           |
-| gameVersion                  | 是   | 游戏版本号，如果不传则默认读取应用的版本号                              |
-| propertiesJson               | 是   | 初始化时传入的自定义参数，会在初始化时上报到 device_login 事件             |
-| caid                         | 是   | CAID，仅国内 iOS                                       |
-| overrideBuiltInParameters    | 是   | 是否能够覆盖内置参数，默认为 false                               |
-| enableAdvertiserIDCollection | 是   | 是否开启广告商 ID 收集，默认为 false                            |
-| enableAutoIAPEvent           | 是   | 是否开启自动上报 IAP 事件                                    |
-| oaidCert                     | 是   | OAID证书, 仅 Android，用于上报 OAID 仅 [TapTapRegion.CN] 生效 |
 
 </>
 <>
@@ -266,23 +222,28 @@ let options = TapTapSDKCoreOptions()
 options.clientId = "your_client_id" // 必须，开发者中心对应 Client ID
 options.clientToken = "your_client_token" // 必须，开发者中心对应 Client Token
 options.region = .CN // .CN：中国大陆，.overseas:其他国家或地区
-options.enableLog = enableLog.selectedSegmentIndex == 0 // 是否开启 log，建议 Debug 开启，Release 关闭，默认关闭 log
+options.enableLog = true // 是否开启 log，建议 Debug 开启，Release 关闭，默认关闭 log
 options.preferredLanguage = TapLanguageType.auto // 语言设置，默认跟随系统，当系统语言不支持时，国内为中文，海外为英文
 
 // 初始化 SDK
 TapTapSDK.initWith(options)
 
-// 当需要添加其他模块的初始化配置项，例如合规认证、成就等，可调用下面配置
-// let moduleOptions = [ moduleOption] // moduleOption 为其他模块内部配置项
+
+// 当需要添加其他模块的初始化配置项，例如合规认证、成就等，可调用如下 API
+var otherOptions:[TapTapSDKBaseOptions] = []
+
+// 添加其他模块初始化配置项
+// otherOptions.append(moduleOptions) moduleOptions 为其他模块初始化配置项
+
 // 初始化 SDK
-// TapTapSDK.initWith(options, otherOptions: moduleOptions)
+TapTapSDK.initWith(options, otherOptions: otherOptions)
 
 ```
 
 </>
 </MultiLang>
 
-初始化的时候，**必须填入** `client_id`以及`client_token`
+初始化的时候，**必须填入** `client_id` 以及 `client_token`
 
 - `client_id`、`client_token` 信息可在 **开发者中心 > 你的游戏 > 游戏服务 > 应用配置** 查看。
 

@@ -6,7 +6,7 @@ sidebar_position: 2
 
 import MultiLang from '/src/docComponents/MultiLang';
 import CodeBlock from '@theme/CodeBlock';
-import sdkVersions from '/src/docComponents/sdkVersions';
+import sdkVersions from '../../sdkVersions';
 import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
 
 :::tip
@@ -94,12 +94,12 @@ allprojects {
 
 2. app module 的 build.gradle 添加对应依赖：
 
-```groovy
-dependencies {
-    implementation 'com.taptap.sdk:tap-core:latest.release'
-    implementation 'com.taptap.sdk:tap-compliance:latest.release'
-}
-```
+<CodeBlock language="groovy">{
+`dependencies {
+    implementation 'com.taptap.sdk:tap-core:${sdkVersions.taptap.android}'
+    implementation 'com.taptap.sdk:tap-compliance:${sdkVersions.taptap.android}'
+}`
+}</CodeBlock>
 </>
 
 <>
@@ -108,15 +108,17 @@ iOS 提供通过添加 cocosPod 远程依赖和使用本地文件导入两种集
 
 #### 远程依赖
 
-1. 在工程 Podfile 文件中对应模块下添加依赖：` pod 'TapTapComplianceSDK', '~> 4.3.0'
-   `
+1. 在工程 Podfile 文件中对应模块下添加依赖：
+
+<CodeBlock>{` pod 'TapTapComplianceSDK', '~> ${sdkVersions.taptap.ios }'`}</CodeBlock>
+
 2. 执行 `Pod install` 下载对应依赖文件
 3. 将工程 Pods 目录下 `TapTapCompilanceSDK/Frameworks/TapTapComplianceResource.bundle` 和 `TapTapLoginSDK/Frameworks/TapTapLoginResource.bundle`
    等资源文件导入工程中
 
 #### 本地文件依赖
 
-合规认证依赖于初始化和 TapTap 登录模块，使用本地文件方式添加依赖时，需先参考 [入门指南](/v4/sdk/access/quickstart/)  和 [TapTap 登录](/v4/sdk/taptap-login/guide/) 添加对应本地文件依赖项。
+合规认证依赖于初始化和 TapTap 登录模块，使用本地文件方式添加依赖时，需先参考 [TapSDK 集成](/v4/sdk/access/quickstart/#本地文件依赖)  和 [TapTap 登录](/v4/sdk/taptap-login/guide/#本地文件依赖) 添加对应本地文件依赖项。
 
 1. 在下载页下载如下文件：
 
@@ -142,13 +144,15 @@ iOS 提供通过添加 cocosPod 远程依赖和使用本地文件导入两种集
 using TapSDK.Core;
 using TapSDK.Compliance;
  
-// 核心配置 详细参数见 [TapTapSDK]
+// 核心配置
 TapTapSDKCoreOptions coreOptions = new TapTapSDKCoreOptions();
+// TODO: coreOptions 应用参数配置
+
 // 合规认证配置
 TapTapComplianceOption complianceOption = new TapTapComplianceOption
 {
-    showSwitchAccount = showComplianceSwitchAccount,
-    useAgeRange = useComplianceAgeRange
+    showSwitchAccount = true,
+    useAgeRange = false
 };
 // 其他模块配置项
 TapTapSDKBaseOption[] otherOptions = new TapTapSDKBaseOption[]
@@ -183,7 +187,7 @@ TapTapSdk.init(
             //
             showSwitchAccount = true,
             //
-            useAgeRange = true,
+            useAgeRange = false,
         )
     )
 )
@@ -198,7 +202,7 @@ import TapTapCoreSDK
 
 // 核心配置
 let coreOptions = TapTapSDKCoreOptions()
-// TODO: coreOptions 配置
+// TODO: coreOptions 应用参数配置
 
 // 合规认证配置
 let complianceOptions = TapTapComplianceOptions()
@@ -219,8 +223,7 @@ TapTapSDK.initWith(coreOptions, otherOptions: otherOptions)
 
 - `showSwitchAccount` 是否显示切换账号按钮，默认为 false 。如果游戏支持切换账号功能则可以设置为 true，当玩家点击切换账号按钮后，SDK 会触发 `1001`
   回调，游戏可根据该回调 code 做相应处理
-- `useAgeRange` 游戏是否需要获取真实年龄段信息，默认为 true 。当为 true 时，使用 Tap 实名时会需要用户主动授权，当设置为 false 时，使用 Tap 实名时会进行无
-  UI 交互的静默授权
+- `useAgeRange` 游戏是否需要获取真实年龄段信息，默认为 true 。当为 true 时，使用 Tap 实名时会需要用户主动授权，当设置为 false 时，使用 Tap 实名时会进行无 UI 交互的静默授权
 
 ![切换账号界面](/img/anti-addiction/switch-account.png)
 
@@ -359,13 +362,15 @@ TapTapCompliance.startup(userIdentifier)
 ```cs
 using TapSDK.Compliance;
 
+// 充值金额，单位为分
 var amount = 1000;
+
 TapTapCompliance.CheckPaymentLimit(
    amount: amount,
    handleCheckPayLimit: checkResult =>
     {
         // 充值 status 结果: {checkResult.status}
-        // status 为 1 时可以支付
+        // status 为 1 时可以继续支付流程，为 0 时 SDK 会弹出对应提示窗口，开发者不需要额外处理
     },
     handleCheckPayLimitException: errorMsg =>
     {
@@ -387,6 +392,7 @@ TapTapCompliance.checkPaymentLimit(
             if (result.status) {
                 // 充值没有限制
             }
+            // 在充值被限制时，SDK 会弹出对应提示窗口，开发者不需要额外处理
         }
 
         override fun onFail(exception: TapTapException) {
@@ -425,6 +431,7 @@ TapTapCompliance.checkPaymentLimit(amount) { status, title, desc in
 ```cs
 using TapSDK.Compliance;
 
+// 充值金额，单位为分
 long amount = 100;
 TapTapCompliance.SubmitPayment(
     amount: amount,
