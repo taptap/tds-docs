@@ -144,7 +144,7 @@ TapTapSDKCoreOptions coreOptions = new TapTapSDKCoreOptions();
 // 成就配置
 TapTapAchievementOptions achievementOptions = new TapTapAchievementOptions
 {
-    enableToast = enableAchievementToast
+    enableToast = true
 };
 // 其他模块配置项
 TapTapSDKBaseOption[] otherOptions = new TapTapSDKBaseOption[]
@@ -217,7 +217,7 @@ TapTapSDK.initWith(coreOptions, otherOptions: otherOptions)
 TapTapAchievementOptions achievementOptions = new TapTapAchievementOptions
 {
     // 成就达成时SDK是否会自行展示一个冒泡浮窗提示
-    enableToast = enableAchievementToast
+    enableToast = true
 };
 ```
 
@@ -280,14 +280,14 @@ class AchievementCallback : ITapAchievementCallback
         // 成就状态更新成功
         // code 70001 解锁成就成功
         // code 70002 增加步长成功
-        // result 成就数据详情 详见 [成功数据详情]
+        // result 成就数据详情 
     }
   
     public void OnAchievementFailure(string achievementId, int errorCode, string errorMsg)
     {
         // 成就状态更新失败或其他错误
         // achievementId 触发失败的成就 ID， 如果调用的是 [ShowAchievements] 接口，则为 "" 空字符串。
-        // errorCode 错误码 详见 [错误码详情]
+        // errorCode 错误码 
         // errorMsg 错误描述
 	}
 
@@ -350,7 +350,7 @@ TapTapAchievement.unregisterCallback(callback)
 ```swift
 import TapTapAchievementSDK
 
-class GameMainSence: NSObject, TapTapAcheievementCallback {
+class CallbackImpl: NSObject, TapTapAcheievementCallback {
 
 		override init() {}
 		
@@ -358,16 +358,21 @@ class GameMainSence: NSObject, TapTapAcheievementCallback {
 		func onAchievementSuccess(code: Int, result: TapTapAchievementResult) {
 	        // code 70001 解锁成就成功
 	        // code 70002 增加步长成功
-	        // result 成就数据详情 详见 [成功数据详情]
+	        // result 成就数据详情 
         }
 		
 		// 成就状态更新失败或其他错误    
 		func onAchievementFailure(achievementId: String, errorCode: Int, errorMsg: String) {
 			 // achievementId 触发失败的成就 ID， 如果调用的是 [ShowAchievements] 接口，则为 "" 空字符串。
-        	 // errorCode 错误码 详见 [错误码详情]
+        	 // errorCode 错误码 
         	 // errorMsg 错误描述
 		 }
 }
+let callback = CallbackImpl()
+TapTapAchievement.registerCallback(callback: callback)
+
+// 不需要接收回调时调用接口移除之前设置的回调对象
+TapTapAchievement.unregisterCallback(callback: callback)
 ```
 成就常量定义：
 
@@ -414,11 +419,11 @@ public class TapAchievementCallbackCode: NSObject {
 | `achievementId`   | 成就id                                                                         |
 | `achievementName` | 成就名称                                                                         |
 | `achievementType` | 成就类型，分为普通成就（`TapAchievementType.NORMAL`）、白金成就（`TapAchievementType.PLATINUM`） |
-| `currentSteps`    | 当前成就进度，如果不是分步式成就改值为0                                                         |
+| `currentSteps`    | 当前成就进度，如果不是分步式成就该值为 0                                                         |
 
 ### 错误码详情
 
-| **errorCode** | **错误类型**               | **错误原因*                                  |
+| **errorCode** | **错误类型**               | **错误原因**                                  |
 |---------------|------------------------|------------------------------------------|
 | 80000         | `NOT_INITIALIZED`      | 未初始化，在调用API之前请先初始化                       |
 | 80001         | `REGION_NOT_SUPPORTED` | 区域不支持，成就目前只支持区域 `CN` , 请确认初始化参数 `region` |

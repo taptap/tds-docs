@@ -144,15 +144,11 @@ dependencies {
 
 ## 初始化 SDK
 
-详见 TapTapSDK初始化文档。
-
-示例代码如下：
+在 [TapSDK 初始化](/v4/sdk/access/quickstart#初始化) 时可以配置上报事件所携带的游戏包属性及当前设备的信息，具体使用方式如下：
 
 <MultiLang>
 
 <>
-
-`TapTapSDKCoreOptions` 详细参数见 [入门指南#快速开始](/v4/sdk/access/quickstart/#初始化)
 
 ```cs
 using TapSDK.Core;
@@ -165,7 +161,7 @@ clientId = clientId,
 // 客户端令牌，开发者后台获取
 clientToken = clientToken,
 // 地区，CN 为国内，Overseas 为海外
-region = TapTapRegionType.CN
+region = TapTapRegionType.CN,
 // 渠道，如 AppStore、GooglePlay
 channel = "AppStore",
 // 语言，默认为 Auto，默认情况下，国内为 zh_Hans，海外为 en
@@ -214,7 +210,7 @@ TapTapSDK.Init(coreOptions, otherOptions);
 | propertiesJson               | 是   | 初始化时传入的自定义参数，会在初始化时上报到 device_login 事件             |
 | caid                         | 是   | CAID，仅国内 iOS                                       |
 | overrideBuiltInParameters    | 是   | 是否能够覆盖内置参数，默认为 false                               |
-| enableAdvertiserIDCollection | 是   | 是否开启广告商 ID 收集，默认为 false                            |
+| enableAdvertiserIDCollection | 是   | 是否开启广告商 ID 收集，仅 iOS ，默认为 false，开启时需添加[工程配置](#idfaios)                            |
 | enableAutoIAPEvent           | 是   | 是否开启自动上报 IAP 事件                                    |
 | oaidCert                     | 是   | OAID证书, 仅 Android，用于上报 OAID 仅 [TapTapRegion.CN] 生效 |
 
@@ -240,14 +236,14 @@ TapTapSdk.init(
 
 <>
 
-在 [TapSDK 初始化](/v4/sdk/access/quickstart#初始化) 时可以配置上报事件所携带的游戏包属性及当前设备的信息，具体使用方式如下：
+
 
 ```swift
 import TapTapCoreSDK
 
 let options = TapTapSDKCoreOptions()
 
-... // 应用信息配置
+// TODO: 应用信息配置
 
 // 数据分析相关属性配置
 options.channel = "channel name" // 分包渠道名称
@@ -256,12 +252,16 @@ options.caid = "caid" // 国内 iOS CAID
 options.overrideBuiltInParameters = true //  自定义字段是否能覆盖内置字段,默认 false
 options.enableAdvertiserIDCollection = false // 是否可以获取 IDFA，默认值为 false
 options.enableAutoIAPEvent = false // 是否自动上报苹果内购支付成功事件
+// 自定义属性配置
+let properties = ["custom_key": "value"]
 options.properties = properties // 自定义属性，启动首个预置事件（device_login）会携带该属性
 
 // 初始化 SDK
 TapTapSDK.initWith(options)
 
 ```
+**注意**：启用 IDFA 时需添加[工程配置](#idfaios)
+
 </>
 
 </MultiLang>
@@ -283,10 +283,13 @@ TapTapSDK.initWith(options)
 ```cs
 using TapSDK.Core
 
+// 自定义属性
 var dict = new Dictionary<string, string>();
 dict.Add(key, value);
 dict.Add(key2, value2);
 string properties = dict.toJson();
+
+// 设置用户 ID 及账号登录事件属性
 TapTapEvent.SetUserID(userId, properties);
 ```
 
@@ -298,6 +301,7 @@ TapTapEvent.SetUserID(userId, properties);
 </>
 
 <>
+
 ```kotlin
    TapTapEvent.setUserId(
       userId = "userId",
@@ -317,7 +321,7 @@ TapTapEvent.setUserID(userId)
 // 设置用户 ID 及账号登录事件属性
 var properties = [String: Any]()
 properties["currentPoints"] = 10
-TapTapEvent.setUserID(name, properties: properties)
+TapTapEvent.setUserID(userId, properties: properties)
 ```
 
 | 字段         | 可为空 | 说明                                                                                   |
@@ -749,14 +753,12 @@ TapDB 支持两种用户主体：设备和账号，你可以通过如下接口�
 ```cs
 using TapSDK.Core;
 
-public static void DeviceInitialize(string properties)
-
 string properties = "{\"firstActiveServer\":\"server1\"}";
 TapTapEvent.DeviceInitialize(properties);
 // 此时设备表的 "#firstActiveServer" 字段值为 "server1"
 
-string properties = "{\"firstActiveServer\":\"server2\"}";
-TapDB.TapTapEvent(properties);
+string properties2 = "{\"firstActiveServer\":\"server2\"}";
+TapTapEvent.DeviceInitialize(properties2);
 // 此时设备表的 "#firstActiveServer" 字段值还是为 "server1"
 ```
 
@@ -802,8 +804,6 @@ TapTapEvent.deviceInitialize(properties)
 ```cs
 
 using TapSDK.Core;
-
-public static void DeviceUpdate(string properties)
 
 string properties = "{\"currentPoints\":10}";
 TapTapEvent.DeviceUpdate(properties);
@@ -857,8 +857,6 @@ TapTapEvent.deviceUpdate(properties)
 ```cs
 using TapSDK.Core;
 
-public static void DeviceAdd(string properties)
-
 string properties = "{\"totalPoints\":10}";
 TapTapEvent.DeviceAdd(properties);
 // 此时设备表的 "totalPoints" 字段值为 10
@@ -882,7 +880,7 @@ TapTapEvent.deviceAdd(
 
 <>
 
-```objectivec
+```swift
 // 定义要累加的属性
 var properties =[String: Any]()
 properties["totalPoints"] = 10
@@ -891,7 +889,7 @@ properties["totalPoints"] = 10
 TapTapEvent.deviceAdd(properties)
 
 // 执行该方法后，此时设备表的 "totalPoints" 字段值为 8
-TapTapEvent.deviceAdd（["totalPoints":-2])
+TapTapEvent.deviceAdd(["totalPoints":-2])
 
 ```
 
@@ -918,8 +916,6 @@ TapTapEvent.deviceAdd（["totalPoints":-2])
 
 ```cs
 using TapSDK.Core;
-
-public static void UserInitialize(string properties)
 
 string properties = "{\"firstActive\":\"active\"}";
 TapTapEvent.UserInitialize(properties);
@@ -960,8 +956,6 @@ TapTapEvent.userInitialize(properties)
 ```cs
 using TapSDK.Core;
 
-public static void UserUpdate(string properties)
-
 string properties = "{\"firstActive\":\"activeNew\"}";
 TapTapEvent.UserUpdate(properties);
 ```
@@ -998,8 +992,6 @@ TapTapEvent.userUpdate(["firstActiveServer":"server2"])
 
 ```cs
 using TapSDK.Core;
-
-public static void UserAdd(string properties)
 
 string properties = "{\"conut\":1}";
 TapTapEvent.UserAdd(properties);
