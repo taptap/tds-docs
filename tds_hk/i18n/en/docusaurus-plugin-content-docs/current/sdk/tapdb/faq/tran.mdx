@@ -1,0 +1,103 @@
+---
+title: SDK Integration Questions
+sidebar_position: 1
+---
+
+### Q: SDK initialization was successful, why no new data?
+
+A: Before you fix the problem, you should have a rough understanding of the data reporting process: 
+ 
+1. The game App calls the relevant interfaces of the SDK to report data. 
+2. DB platform receives the reported data and displays it in the "Reporting Details".
+ 
+The troubleshooting method is also based on this process step by step. Open Configuration - Report Details and check: 
+
+1. Check if initialization is the earliest call? If not, adjust and try again;
+2. Observe whether the reported data is displayed in the "Reporting details" function; If the data is displayed, the data is reported normally. If no data is displayed, enter 3; 
+3. Open the mobile bag capture tool to test whether the equipment reports data normally.
+
+### Q: The SDK initialization was successful, why is the added data incorrect?
+
+A: You can use the "Report Details" function to verify the accuracy of buried point reporting.
+
+### Q: How can I check the reported data?
+
+A: You can check the reported data through "Report Details" and "Buried Site Management.
+
+"Reporting Details": you can use "Reporting Details" to view the real-time reporting of buried data during the debugging stage of SDK access and buried testing.
+
+"Buried point management" : you can view the data reception of the project in the last 7 days, quickly understand the overall situation of buried point reporting, as well as the details of error reporting and sampling examples.
+
+### Q: Why did the SDK initialization fail?
+
+You can try to debug the gameversion field, if there is no value, you need to fill in the value.
+
+### Q: How to store userId of single player game?
+
+A: The userId of the standalone game needs to pay attention to the following points.
+
+(1) iOS has to generate an ID by itself and store it in the certificate space. iOS has a storage space, one for application and one for certificate (enterprise).
+
+(2) Android try to save to SD card, use a user operation or call `setUser` after 1 minute.
+
+(3) Randomly generate a unique user ID and save it locally.
+
+### Q: Why no new data is added after SDK integration?
+
+A: Please check whether the initialization of the SDK is called successfully, in addition the initialization should be called at the earliest. If the initialization fails, then do the processing according to the failure log.
+
+### Q: Do both the server and client need to pass the recharge data?
+
+A: You can choose one way to pass the recharge data in the server side and the client side. If you pass both, the recharge data will be doubled.
+
+### Q: Why the TapDB page does not show the revenue or the revenue is more than the actual revenue when the server side delivers the recharge data?
+
+A: First of all, only one of the server-side and client-side interfaces can be used (if both are used, it will show double the recharge amount and make sure the recharge is successful before sending the recharge data), and secondly, the user_id in "identify": "user_id" on the server side and the "userId" in setUser in the document "Record a Player" need to be consistent.
+
+### Q: Why does TapDB show no data after sending real-time online data?
+
+A: There may be several reasons for not displaying data.
+
+(1) Check the file format, parameter type (returning 400 error means the format is not correct).
+
+(2) Pay attention to the timestamp unit (seconds), and only send the last 7 days of data, too early data will not be saved.
+
+(3) Note: **whether there is a required header information: `Content-Type: application/json`.**
+
+### Q: Can I not fill in the parameters that can be empty?
+
+A: No, the parameters that can be empty are filled with `null`.
+
+### Q: Why can't I find the subcontracted channel in TapDB after filling in the channel?
+
+A: There must be an added data for TapDB to receive the channel and display the subcontracted channel in this page.
+
+### Q: When TapDB reports events, are the letters of the events case-sensitive?
+
+A: All keys are case-insensitive, and all values are case-sensitive. The event name is value, the property name is key, and the property value is value.
+
+### Q: When reporting a custom event, must the property type be exactly the same as the registered one? Is there any compatibility policy?
+
+A: It must be identical, there is no compatibility policy. The wrong type will be discarded by the agent as dirty data.
+
+### Q: Is it possible to deploy privately?
+
+A: Private deployment is not supported for now. But we will ensure the security of your data.
+
+### Q: How to set the permission?
+
+A: You can modify account permissions in "Enterprise Settings" - "Permission Management" - "Edit Members".
+
+### Q：After reporting the Custom Event, no data can be found in the backend.
+
+A: Please first check if the [user_id](/sdk/tapdb/sdk/client-side-integration/#设置账号-id) is set in the code. If you're unsure, you can go to the backend and use SQL queries to see the user_id that has been reported previously.
+
+
+![ SQL Link](/img/数据分析-Sql查询.png)
+
+```SQL
+SELECT * FROM hive_saas1.tapdb."users"
+WHERE user_id LIKE'%dTJTp6sA+OWsZ7Jf0JmGg==%'
+LIMIT 100
+```
+Check if the user_id that needs to be reported is present in the reported user_id.

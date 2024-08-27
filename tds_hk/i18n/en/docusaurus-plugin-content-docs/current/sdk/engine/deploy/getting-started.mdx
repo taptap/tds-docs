@@ -1,0 +1,134 @@
+---
+title: Getting Started With Cloud Engine
+sidebar_label: Getting Started
+sidebar_position: 1
+---
+
+import QuickStartNew from "../_partials/quick-start-new.mdx";
+import QuickStartDeploy from "../_partials/quick-start-deploy.mdx";
+import PlatformIntroduction from "../_partials/platform-introduction.mdx";
+import CloudCustomDomain from "../_partials/cloud-custom-domain.mdx";
+import PlatformRuntimes from "../_partials/platform-runtimes.mdx";
+import { CLI_BINARY } from "/src/constants/env.ts";
+import EngineRuntimes from "/src/docComponents/MultiLang/engine";
+import TabItem from "@theme/TabItem";
+import CodeBlock from "@theme/CodeBlock";
+
+:::info
+If you are planning to use Cloud Functions and Hooks rather than deploy a general-purpose backend program, see [Getting Started With Cloud Functions and Hooks](/sdk/engine/functions/getting-started).
+
+To deploy a frontend app, see [Frontend Runtime Environment § Getting Started](/sdk/engine/deploy/webapp/#getting-started).
+:::
+
+<PlatformIntroduction />
+
+## Create a Project
+
+The easiest way to start a new project is to use our boilerplate.
+
+<QuickStartNew />
+
+
+## Binding a Project 
+
+<p>
+  To associate an existing project to a Cloud Engine application, you can use the <code>{CLI_BINARY} switch</code>：
+</p>
+
+<CodeBlock>
+  {`$ ${CLI_BINARY} switch
+[?] Please select an app:
+ 1) my-engine-app
+ => 1
+Switching to my-engine-app (group: web)`}
+</CodeBlock>
+
+
+## Run and Debug Locally
+
+You can define routes with the web framework for the language of your choice so the program can handle requests sent to the paths specified. Feel free to look into the examples within the boilerplate:
+
+<EngineRuntimes>
+<TabItem value='nodejs'>
+
+```javascript title='app.js'
+app.get("/", function (req, res) {
+  res.render("index", { currentTime: new Date() });
+});
+```
+
+</TabItem>
+<TabItem value='python'>
+
+```python title='app.py'
+@app.route('/')
+def index():
+    return render_template('index.html')
+```
+
+</TabItem>
+<TabItem value='php'>
+
+```php title='src/app.php'
+$app->get('/', function (Request $request, Response $response) {
+    return $this->view->render($response, "index.phtml", array(
+        "currentTime" => new \DateTime(),
+    ));
+});
+```
+
+</TabItem>
+<TabItem value='java'>
+
+```java title='src/main/webapp/WEB-INF/web.xml'
+<welcome-file-list>
+  <welcome-file>index.html</welcome-file>
+</welcome-file-list>
+```
+
+</TabItem>
+<TabItem value='dotnet'>
+
+```cs title='web/Startup.cs'
+app.UseEndpoints(endpoints => {
+    endpoints.MapControllerRoute(
+        name: "default",
+        pattern: "{controller=Home}/{action=Index}/{id?}");
+})
+```
+
+</TabItem>
+<TabItem value='go'>
+
+```go title='main.go'
+e.GET("/", routes.Index)
+```
+
+```go title='routes/index.go'
+func Index(c echo.Context) error {
+  return c.Render(http.StatusOK, "index", time.Now().String())
+}
+```
+
+</TabItem>
+</EngineRuntimes>
+
+With all the dependencies correctly installed, run the project locally by running the CLI under the project’s root directory:
+
+<CodeBlock className="sh">{`$ ${CLI_BINARY} up`}</CodeBlock>
+
+See [Cloud Engine CLI Guide](/sdk/engine/cli/) for more information on the CLI as well as debugging your project locally.
+
+## Deploy to Cloud Engine
+
+<QuickStartDeploy />
+
+<CloudCustomDomain noStaging={true} />
+
+For example, if you have bound the domain `web.example.com`, you will be able to access your app on `https://web.example.com` (production environment).
+
+## More
+
+Continue reading [Cloud Engine Platform Features](/sdk/engine/platform) to learn about the additional features provided by Cloud Engine. You may also skip to the dedicated pages for specific runtime environments:
+
+<PlatformRuntimes />

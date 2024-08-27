@@ -1,0 +1,120 @@
+---
+title: LeanDB Elasticsearch Guide
+sidebar_label: LeanDB Elasticsearch
+sidebar_position: 4
+---
+
+import EngineRuntimes from "/src/docComponents/MultiLang/engine";
+import LeandbCliAccess from "../_partials/leandb-cli-access.mdx";
+import LeandbCreateInstance from "../_partials/leandb-create-instance.mdx";
+import TabItem from "@theme/TabItem";
+import Path from "/src/docComponents/path";
+
+LeanDB Elasticsearch is the hosted database provided by Cloud Engine. You can have your project connect to the database using Elasticsearch libraries or HTTP APIs and have access to all the functions provided by Elasticsearch. See [Cloud Engine Overview](/sdk/engine/overview) to learn about the other hosted database services provided by Cloud Engine.
+
+Elasticsearch has the following features:
+
+- **High availability**: With clusters containing multiple nodes, errors on a single node won’t affect the availability of the service.
+- **Resizing online**: Adjust the size of your instance at any time.
+- **Multiple instances**: Get larger storage and better performance as you need.
+
+## Creating and Managing Instances
+
+You can create and manage LeanDB Elasticsearch instances on **<Path to="engine" /> > Database > Elasticsearch**.
+
+### Creating Instances
+
+<LeandbCreateInstance>
+
+- **Specification** You can choose from `512M`, `1GB`, `2GB`, `4GB`, and `8GB`.
+
+Each specification has its limit on the space. Upgrade to a higher specification to allow for more space.
+
+</LeandbCreateInstance>
+
+### Elasticsearch Version
+
+LeanDB only provides Elasticsearch 7.9 at this time.
+
+### Resizing Online
+
+At this time, you can’t resize LeanDB Elasticsearch instances on your own. Please reach out to us if you need to have your instances resized.
+
+### Sharing Instances
+
+You can use the “Manage sharing” function to share your LeanDB instances with other applications. When you share an instance with another application, the instance will appear in this application. The relevant environment variables will also be available in this application’s Cloud Engine instances.
+
+## Accessing From Cloud Engine
+
+When you deploy a project to the Cloud Engine instances under an application, some environment variables containing information for connecting to Elasticsearch will be injected, including:
+
+- `ELASTICSEARCH_URL_<NAME>`
+
+Here `<NAME>` is the name you provided when creating your LeanDB instance. If the name of your LeanDB instance is `MYES`, there will be an environment variable named `ELASTICSEARCH_URL_MYES`.
+
+The environment variable has a format like `http://username:password@host:port`, containing everything you need to connect to the instance, including credentials.
+
+<EngineRuntimes>
+<TabItem value='nodejs'>
+
+To connect to Elasticsearch from Node.js:
+
+```javascript
+const { Client } = require("@elastic/elasticsearch");
+const client = new Client({
+  node: process.env.ELASTICSEARCH_URL_MYES,
+});
+
+// promise API
+const result = await client.search({
+  index: "my-index",
+  body: {
+    query: {
+      match: { hello: "world" },
+    },
+  },
+});
+
+// callback API
+client.search(
+  {
+    index: "my-index",
+    body: {
+      query: {
+        match: { hello: "world" },
+      },
+    },
+  },
+  (err, result) => {
+    if (err) console.log(err);
+  }
+);
+```
+
+- Make sure to install the dependencies used in the code above with `npm install @elastic/elasticsearch`
+- See [Elasticsearch Node.js client’s docs](https://www.elastic.co/guide/en/elasticsearch/client/javascript-api/current/index.html) for more information
+
+</TabItem>
+</EngineRuntimes>
+
+### Custom Dictionary
+
+You can upload a custom dictionary on the dashboard.
+The dictionary should be encoded with UTF-8 with every line containing a word. The file should be no larger than 10 MB. For example:
+
+```
+Object-oriented programming
+Functional programming
+Higher-order function
+Responsive web design
+```
+
+Save the content into a text file with its name being something like `dict.txt`. Once you upload the file, it should be effective in 2 minutes. You can test if the dictionary is working with the [analyze API](https://www.elastic.co/guide/en/elasticsearch/reference/7.x/test-analyzer.html). Keep in mind that when using the analyze API, an index has to be specified, so the request looks like `curl -X POST "localhost:9200/my-index/_analyze?pretty"`.
+
+## Managing Data
+
+Besides accessing LeanDB with your code from Cloud Engine, you can also use the following ways to manage, debug, or perform operations on your instances.
+
+### Connecting With the CLI
+
+<LeandbCliAccess />

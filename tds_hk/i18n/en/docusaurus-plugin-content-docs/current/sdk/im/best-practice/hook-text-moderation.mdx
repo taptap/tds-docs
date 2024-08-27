@@ -1,0 +1,94 @@
+---
+title: Text Moderation With Instant Messaging
+sidebar_label: Text Moderation
+---
+
+This article introduces how you can integrate third-party text moderation services into your application using a hook offered by the Instant Messaging service.
+
+## Before You Start
+
+This article assumes that you already know about the hooks offered by the Instant Messaging service as well as Cloud Engine’s web interface for editing Cloud Functions. If you haven’t learned about them yet, please first take a look at the following pages:
+
+1. [Hooks and System Conversations](/sdk/im/guide/systemconv/)
+2. [Cloud Functions and Hooks Guide § Writing Cloud Functions Online](/sdk/engine/functions/guides#writing-cloud-functions-online)
+
+## Enabling the Feature
+
+1. With the Cloud Engine service enabled, go to **Cloud Engine > web > Deploy > Create function** and select `Hook` in the pop-up window. Select `_messageReceived` as the name of the hook and provide your code below. Once you finish creating the hook, click on **Deploy** and wait for the deployment to complete.
+
+![](https://capacity-files.lcfile.com/dmLYApCx0fTIx0FCsrJbs4PnXwPGkiA2/Frame%202%20%281%29.png)
+
+2. Now when a message is sent through the Instant Messaging service, you will see that the message gets changed according to the mechanism you set up.
+
+## Code Example
+
+Below is a code example for the hook written in Node.js. You can use it as a boilerplate for your code:
+
+```javascript
+const https = require("https");
+
+// Assuming that the third-party text moderation service requires authentication using the HTTP Header
+const authToken = "THE_TOKEN_FOR_THE_THIRD_PARTY_TEXT_MODERATION_SERVICE";
+
+const params = request.params;
+
+// Submit the message and the user ID to the third-party text moderation service
+// Different services may require different parameters
+const postData = JSON.stringify({
+  data: {
+    text: params.content,
+    user_id: params.fromPeer,
+  },
+});
+
+const options = {
+  hostname: "third-party-text-moderation.example.com",
+  port: 443,
+  path: "/path/to/text/moderation/interface",
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "X-Third-Party-Auth": authToken,
+  },
+};
+
+return new Promise((resolve, reject) => {
+  const req = https.request(options, (res) => {
+    if (res.statusCode != 200) {
+      // or resolve(null)
+      reject(new Error(`BAD STATUS: ${res.statusCode}`));
+      return;
+    }
+    let body = "";
+    res.setEncoding("utf8");
+    res.on("data", (chunk) => {
+      body += chunk;
+    });
+    res.on("end", () => {
+      json = JSON.parse(body);
+
+      if (json.result == 0) {
+        resolve(null);
+      } else {
+        // Assuming that the third-party text moderation service will return the filtered text as the value of the `filtered_text` field
+        if (json.filtered_text) {
+          resolve({ content: json.filtered_text });
+        } else {
+          resolve({ drop: true });
+        }
+      }
+    });
+  });
+
+  req.on("error", (e) => {
+    // or resolve(null)
+    reject(e);
+  });
+
+  req.write(postData);
+  req.end();
+});
+```
+
+The code above shows how you can use a third-party text moderation service with the Instant Messaging service. You can customize the request and response according to your own requirements.
+To learn more about the parameters of the hook and the request and response parameters of the text moderation service, please refer to [the \_messageReceived hook of the Instant Messaging service](/sdk/im/guide/systemconv/#_messagereceived) and the API documentation of the text moderation service you are using.

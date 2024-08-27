@@ -1,0 +1,734 @@
+---
+title: Cloud Engine SDK Guide
+sidebar_label: Cloud Engine SDK
+sidebar_position: 3
+---
+
+import EngineRuntimes from "/src/docComponents/MultiLang/engine";
+import TabItem from "@theme/TabItem";
+import { Conditional } from "/src/docComponents/conditional";
+
+:::info
+This article serves as a thorough introduction to the Cloud Engine SDK. To learn about the usage of Cloud Functions and hooks, see [Cloud Functions and Hooks Guide](/sdk/engine/functions/guides).
+:::
+
+The Cloud Engine SDKs for most of the runtime environments are based on the <Conditional brand="tds">[Data Storage](/sdk/storage/features)</Conditional><Conditional brand="leancloud">[Data Storage](/sdk/storage/overview/)</Conditional> SDK, offering additional features that support Cloud Functions and hooks. With the Cloud Engine SDK, you can easily build backend apps that can be deployed to Cloud Engine.
+
+## Integrating the Cloud Engine SDK
+
+If you’ve created your project based on one of our demo projects, you already have the Cloud Engine SDK integrated. To integrate the Cloud Engine SDK into other projects, follow these steps:
+
+<EngineRuntimes>
+<TabItem value='nodejs'>
+
+```sh
+npm install leanengine leancloud-storage
+```
+
+Then mount the Cloud Engine middleware to Express:
+
+```js title='app.js'
+var express = require("express");
+var AV = require("leanengine");
+
+AV.init({
+  appId: process.env.LEANCLOUD_APP_ID,
+  appKey: process.env.LEANCLOUD_APP_KEY,
+  masterKey: process.env.LEANCLOUD_APP_MASTER_KEY,
+});
+
+var app = express();
+app.use(AV.express());
+app.listen(process.env.LEANCLOUD_APP_PORT);
+```
+
+`AV.express` accepts an optional parameter, `options`, that contains the following optional properties:
+
+- `onError`: A global error handling function, which will be called when a Cloud Function (including hook) throws an error. You can have your program send error reports using this function.
+- `ignoreInvalidSessionToken`: If set to `true`, the invalid `sessionToken`s (from the `X-LC-session` header) sent from clients will be ignored. If set to `false`, a `401` error, `{"code": 211, "error": "Verify sessionToken failed, maybe login expired: ..."}`, will be thrown in this case.
+
+<details>
+<summary>If you’re using Koa</summary>
+
+```js title='app.js'
+var koa = require("koa");
+var AV = require("leanengine");
+
+AV.init({
+  appId: process.env.LEANCLOUD_APP_ID,
+  appKey: process.env.LEANCLOUD_APP_KEY,
+  masterKey: process.env.LEANCLOUD_APP_MASTER_KEY,
+});
+
+var app = koa();
+app.use(AV.koa());
+app.listen(process.env.LEANCLOUD_APP_PORT);
+```
+
+</details>
+
+<details>
+<summary>Differences among the different versions of the Node.js SDK</summary>
+
+The Node.js SDK has the following versions:
+
+- `0.x`: This is the initial version of the Node.js SDK. It’s not very compatible with Node.js 4.x and above.
+- `1.x`: The global `currentUser` has been deprecated in this version. The JavaScript SDK has also been upgraded to 1.x. This version provides support for Koa and Node.js 4.x and above.
+- `2.x`: This version starts supporting Cloud Functions and hooks written with Promise. Some deprecated features (like `AV.Cloud.httpRequest`) have been removed. Callbacks with the Backbone style are not supported anymore.
+- `3.x`: This is the **recommended** version. The JavaScript SDK has become a peer dependency in this version and you can customize the version of the JavaScript SDK. The JavaScript SDK has been upgraded to 3.x.
+
+</details>
+
+You can find the source code of the Node.js SDK on [GitHub](https://github.com/leancloud/leanengine-node-sdk).
+
+</TabItem>
+<TabItem value='python'>
+
+Add `leancloud` to `requirements.txt`:
+
+```
+leancloud>=2.9.4,<3.0.0
+```
+
+When running and debugging your project locally, you can run the following command under your project’s directory to install the dependencies.
+
+```sh
+pip install -r requirements.txt
+```
+
+Now you can import the SDK into your code. Since `wsgi.py` is the first file being executed, we recommend that you initialize the Python SDK in this file:
+
+```python
+import os
+import leancloud
+
+APP_ID = os.environ['LEANCLOUD_APP_ID']
+APP_KEY = os.environ['LEANCLOUD_APP_KEY']
+MASTER_KEY = os.environ['LEANCLOUD_APP_MASTER_KEY']
+
+leancloud.init(APP_ID, app_key=APP_KEY, master_key=MASTER_KEY)
+
+leancloud.use_master_key(True)
+```
+
+By default, the permission for the SDK to use the `masterKey` is enabled, which means that permission restrictions like ACL will be skipped. See [Using MasterKey](#using-masterkey) for more information.
+
+<details>
+<summary>Differences between <code>leancloud-sdk</code> and <code>leancloud</code> on PyPI</summary>
+
+`leancloud-sdk` is the older version of the Python SDK, which is not maintained anymore. Please use `leancloud`.
+
+</details>
+
+You can find the source code of the Python SDK on [GitHub](https://github.com/leancloud/python-sdk).
+
+</TabItem>
+<TabItem value='java'>
+
+Add the following configurations to `pom.xml` to add the Java SDK:
+
+```xml
+<dependencies>
+  <dependency>
+    <groupId>cn.leancloud</groupId>
+    <artifactId>engine-core</artifactId>
+    <version>8.2.1</version>
+  </dependency>
+</dependencies>
+```
+
+Initialize the SDK in your code:
+
+```java
+import cn.leancloud.LCCloud;
+import cn.leancloud.LCObject;
+import cn.leancloud.core.GeneralRequestSignature;
+import cn.leancloud.LeanEngine;
+
+String appId = System.getenv("LEANCLOUD_APP_ID");
+String appKey = System.getenv("LEANCLOUD_APP_KEY");
+String appMasterKey = System.getenv("LEANCLOUD_APP_MASTER_KEY");
+String hookKey = System.getenv("LEANCLOUD_APP_HOOK_KEY");
+
+LeanEngine.initialize(appId, appKey, appMasterKey);
+
+GeneralRequestSignature.setMasterKey(appMasterKey);
+```
+
+The permission for the SDK to use the `masterKey` is enabled by the code above, which means that permission restrictions like ACL will be skipped. See [Using MasterKey](#using-masterkey) for more information.
+
+You can find the source code of the Java SDK on [GitHub](https://github.com/leancloud/java-unified-sdk).
+
+</TabItem>
+<TabItem value='php'>
+
+Install the dependency::
+
+```sh
+composer require leancloud/leancloud-sdk
+```
+
+Initialize the SDK:
+
+```php
+use \LeanCloud\Client;
+
+Client::initialize(
+    getenv("LEANCLOUD_APP_ID"),
+    getenv("LEANCLOUD_APP_KEY"),
+    getenv("LEANCLOUD_APP_MASTER_KEY")
+);
+
+Client::useMasterKey(true);
+```
+
+The permission for the SDK to use the `masterKey` is enabled by the code above, which means that permission restrictions like ACL will be skipped. See [Using MasterKey](#using-masterkey) for more information.
+
+You can find the source code of the PHP SDK on [GitHub](https://github.com/leancloud/php-sdk).
+
+</TabItem>
+<TabItem value='dotnet'>
+
+Add the dependency::
+
+```sh
+dotnet add package LeanCloud.Storage
+```
+
+Initialize the SDK:
+
+```cs
+LCEngine.Initialize(services);
+```
+
+You can find the source code of the .NET SDK on [GitHub](https://github.com/leancloud/csharp-sdk).
+
+</TabItem>
+<TabItem value='go'>
+
+Add the dependency:
+
+```go
+import "github.com/leancloud/go-sdk/leancloud"
+```
+
+Initialize the SDK:
+
+```go
+client := leancloud.NewEnvClient()
+leancloud.Engine.Init(client)
+```
+
+The Go SDK offers an interface in the form of the HTTP function in the standard library for any framework to access it. Take **echo** as an example:
+
+```go
+// ./adapters/echo.go
+//...
+func Echo(e *echo.Echo) {
+	e.Any("/1/*", echo.WrapHandler(leancloud.Engine.Handler()), setResponseContentType)
+	e.Any("/1.1/*", echo.WrapHandler(leancloud.Engine.Handler()), setResponseContentType)
+	e.Any("/__engine/*", echo.WrapHandler(leancloud.Engine.Handler()), setResponseContentType)
+}
+
+func setResponseContentType(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		c.Response().Header().Set("Content-Type", "application/json; charset=UTF-8")
+		return next(c)
+	}
+}
+```
+
+The **Echo** function accepts an instance of echo and binds the interfaces from the Go SDK that provide features relevant to Cloud Engine to routes starting with `/1/`, `/1.1/`, and `/__engine/`. This allows Cloud Engine’s basic features to work as expected.
+
+Most Go-based web frameworks provide functions for you to convert the HTTP handler from the standard library to specialized handlers. As long as you can integrate the two components mentioned above into the framework you’re using, you will be able to integrate the Cloud Engine SDK into your project.
+
+You can find the source code of the Go SDK on [GitHub](https://github.com/leancloud/go-sdk).
+
+</TabItem>
+</EngineRuntimes>
+
+## Using the Data Storage Service
+
+Once you have integrated the SDK, you will be able to access the <Conditional brand="tds">[Data Storage](/sdk/storage/features)</Conditional><Conditional brand="leancloud">[Data Storage](/sdk/storage/overview/)</Conditional> service from Cloud Engine to store data. See the articles for Data Storage SDKs for more information.
+
+Functions related to the Data Storage service can be accessed from Cloud Functions and hooks as well as other places in your project (like the web framework you’re using).
+
+## Using MasterKey
+
+Since Cloud Engine runs in a trusted environment on the server side, when your program accesses the data from the Data Storage service, it can skip permission checks enforced by ACL and class permissions with the Master Key of your application. Some interfaces that are available to administrators, which require the Master Key, can also be accessed from Cloud Engine.
+
+This means that you can enable the use of Master Key globally in your program to have the permission checks enforced by ACL and class permissions skipped. Certain APIs requiring the `Master Key` can also be accessed from Cloud Engine.
+
+<EngineRuntimes>
+<TabItem value='nodejs'>
+
+To enable Master Key globally:
+
+```js title='sever.js'
+AV.Cloud.useMasterKey();
+```
+
+If this line of code is not added to your program, the Master Key won’t be used by default. This means that data protected by ACL can’t be accessed by your program. You’ll have to specify a `sessionToken` for each operation to have the operation executed with a user’s permission:
+
+```js
+const post = new Post();
+post.save(
+  { author: user }
+  // Or use `request.sessionToken` (enable `Cloud.CookieSession` for web hosting)
+  // {
+  //  sessionToken: user.getSessionToken()
+  // }
+);
+```
+
+You can also enable `Master Key` for a single operation to skip permission checks for it:
+
+```js
+post.destroy({ useMasterKey: true });
+```
+
+With Master Key enabled globally, you can use `useMasterKey: false` to disable Master Key for a single operation.
+
+</TabItem>
+<TabItem value='python'>
+
+```python
+# Often in wsgi.py
+leancloud.use_master_key(True)
+```
+
+</TabItem>
+<TabItem value='java'>
+
+```java
+// Often in src/…/AppInitListener.java
+RequestSignImplementation.setMasterKey(appMasterKey);
+```
+
+</TabItem>
+<TabItem value='php'>
+
+```php
+// Often in src/app.php
+Client::useMasterKey(true);
+```
+
+</TabItem>
+<TabItem value='dotnet'>
+
+```cs
+LCApplication.UseMasterKey = true;
+```
+
+</TabItem>
+<TabItem value='go'>
+
+To enable `Master Key` for an operation like `Create`, `Set`, or `Update`, append `UseMasterKey()` as an optional parameter of the operation.
+
+</TabItem>
+</EngineRuntimes>
+
+If you’re unsure whether you should enable Master Key globally, see the tips below:
+
+- If your project contains a lot of operations that need special permissions or work with global data that doesn’t belong to users, we would recommend that you enable `Master Key` globally. Your program needs to check permissions for the requests sent from users carefully.
+- If your project contains a lot of operations that are relevant to users’ data and need to follow ACL, we would recommend that you disable `Master Key`. Your program can pass the user’s `sessionToken` into each operation when needed.
+
+## Managing User Statuses
+
+:::caution
+Since Cloud Engine’s runtime environments run on multiple hosts and processes, storing sessions in memory (e.g., with [express-session](https://github.com/expressjs/session)’s default storage, `MemoryStore`, or PHP’s built-in `$_SESSION`) could lead to unexpected behavior of your program.
+:::
+
+### Using HTTP Header
+
+If the pages of your application are mostly rendered by the browser, we recommend that you log users in on the frontend with the SDK and obtain the session token with the SDK’s interface, then send the session token to the backend using HTTP header.
+
+<EngineRuntimes>
+<TabItem value='nodejs'>
+
+The example below logs a user in, gets the session token with `user.getSessionToken(), and sends it to the backend:
+
+```js
+AV.User.login(user, pass).then((user) => {
+  return fetch("/profile", {
+    headers: {
+      "X-LC-Session": user.getSessionToken(),
+    },
+  });
+});
+```
+
+Here is the Node.js code on the backend:
+
+```js
+app.get("/profile", function (req, res) {
+  AV.User.become(req.headers["x-lc-session"])
+    .then((user) => {
+      res.send(user);
+    })
+    .catch((err) => {
+      res.send({ error: err.message });
+    });
+});
+
+app.post("/todos", function (req, res) {
+  var todo = new Todo();
+  todo
+    .save(req.body, { sessionToken: req.headers["x-lc-session"] })
+    .then(() => {
+      res.send(todo);
+    })
+    .catch((err) => {
+      res.send({ error: err.message });
+    });
+});
+```
+
+</TabItem>
+</EngineRuntimes>
+
+### CookieSession
+
+If the pages in your application are mostly rendered on the server side, you can use the cookie session component provided by some of our SDKs, which will store the session token from the Data Storage service as a cookie. This makes it easier for the server side to manage user statuses.
+
+:::danger
+If you decide to use this method, make sure you have taken measures to [prevent CSRF attacks](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html).
+
+CSRF tokens are often used to prevent CSRF attacks. The way it works is that the server will send a random string (CSRF token) to the client (can be passed through cookies) and the client has to include this token in the header or the body of each request that may have side effects. The server will need to check if the CSRF token is correct.
+:::
+
+<EngineRuntimes>
+<TabItem value='nodejs'>
+
+If the pages in your application are mostly rendered on the server side (like with EJS or Pug) and the frontend part doesn’t need to perform data operations with the JavaScript SDK, you can use the `AV.Cloud.CookieSession` middleware to maintain user statuses with cookies:
+
+```js
+// Express
+app.use(
+  AV.Cloud.CookieSession({
+    secret: "my secret",
+    maxAge: 3600000,
+    fetchUser: true,
+  })
+);
+// Koa
+app.use(
+  AV.Cloud.CookieSession({
+    framework: "koa",
+    secret: "my secret",
+    maxAge: 3600000,
+    fetchUser: true,
+  })
+);
+```
+
+You need to pass in a `secret` to sign the cookie (required). The middleware will keep the user status of `AV.User` with the cookie. The next time the user opens your app, the SDK will automatically check if the user is logged in. If the user is logged in, you can obtain the current user with `req.currentUser`.
+
+`AV.Cloud.CookieSession` accepts the following options:
+
+- **fetchUser**: Whether to automatically `fetch` the `AV.User` object of the current user. Defaults to `false`. When set to `true`, each HTTP request will invoke an API call to `fetch` the user. When set to `false`, only the `id` if the `req.currentUser` object (i.e., the `objectId` in the `_User` table) can be accessed by default. You’ll have to manually `fetch` the user when needed.
+- **name**: The name of the cookie. Defaults to `avos.sess`.
+- **maxAge**: The max age of the cookie in milliseconds.
+
+You won’t be able to get a user’s data using `AV.User.current()` in the Node.js SDK. You will have to:
+
+- Get the user data with `request.currentUser`
+- Pass the user object explicitly to other functions
+
+<details>
+<summary>An example of a site that allows users to log in</summary>
+
+```js
+app.post("/login", function (req, res) {
+  AV.User.logIn(req.body.username, req.body.password).then(
+    function (user) {
+      res.saveCurrentUser(user); // save cookie
+      res.redirect("/profile");
+    },
+    function (error) {
+      res.redirect("/login");
+    }
+  );
+});
+
+app.get("/profile", function (req, res) {
+  if (req.currentUser) {
+    res.send(req.currentUser);
+  } else {
+    res.redirect("/login");
+  }
+});
+
+app.get("/logout", function (req, res) {
+  req.currentUser.logOut();
+  res.clearCurrentUser(); // clear cookie
+  res.redirect("/profile");
+});
+```
+
+</details>
+
+<details>
+<summary>Browsers’ restrictions on accessing cookies under different origins (<code>SameSite</code>)</summary>
+
+Starting from Chrome 80, the default value of `SameSite` has been set to `Lax`. If the frontend part of your application is not deployed to Cloud Engine and your app needs to send POST requests with cookies, you’ll need to set `SameSite` to `none`.
+
+`AV.Cloud.CookieSession` will pass all the parameters to the browser’s `cookies.set()`, so you can pass in `sameSite`:
+
+```js
+AV.Cloud.CookieSession({ sameSite: "none" });
+```
+
+Keep in mind that:
+
+- `SameSite` has to be sent together with the `Secure` attribute. Please make sure the client of your app accesses Cloud Engine through HTTPS.
+- Please only set `SameSite` to `none` when necessary, or the risk for your application to suffer from CSRF attacks may increase.
+
+</details>
+
+</TabItem>
+<TabItem value='python'>
+
+The Python SDK offers a WSGI middleware called `leancloud.engine.CookieSessionMiddleware`, which maintains the user status of `leancloud.User` with cookie. To use this middleware, find the following line in `wsgi.py`:
+
+```python
+application = engine
+```
+
+Then replace it with the following line:
+
+```python
+application = leancloud.engine.CookieSessionMiddleware(engine, secret=YOUR_APP_SECRET)
+```
+
+You need to pass in a `secret` to sign the cookie (required). The middleware will keep the user status of `AV.User` with the cookie. The next time the user opens your app, the SDK will automatically check if the user is logged in. If the user is logged in, you can obtain the current user with `leancloud.User.get_current()`.
+
+When being initialized, `leancloud.engine.CookieSessionMiddleware` accepts the following optional options:
+
+- **name**: The key of the cookie storing the session token. Defaults to `leancloud:session`.
+- **excluded_paths**: Specifies the URL paths that should not take care of the session token (like those for static files). Accepts a `list` as its value.
+- **fetch_user**: Whether to fetch the user from the Data Storage service. If set to `False`, the user data obtained from `leancloud.User.get_current()` will contain nothing except `session_token`. You’ll have to manually fetch the user data with `fetch()`. If set to `True`, `fetch()` will be automatically called on the user object. Defaults to `False`.
+- **expires**: The expirtaion data of the cookie (see [Werkzeug Document](https://werkzeug.palletsprojects.com/en/2.1.x/http/#werkzeug.http.dump_cookie)).
+- **max_age**: The max age of the cookie in seconds (see [Werkzeug Document](https://werkzeug.palletsprojects.com/en/2.1.x/http/#werkzeug.http.dump_cookie)).
+
+</TabItem>
+<TabItem value='php'>
+
+Cloud Engine offers a module called `LeanCloud\Storage\CookieStorage`, which is used to maintain the user status of `User` objects with cookies. To use it, add the following code to `app.php`:
+
+```php
+use \LeanCloud\Storage\CookieStorage;
+Client::setStorage(new CookieStorage(60 * 60 * 24, "/"));
+```
+
+`CookieStorage` accepts a max age in seconds and a path as the scope of the cookie. The default max age is 7 days.
+
+You can get the current user with `User::getCurrentUser()`. The code below shows how you can implement a website that allows users to log in:
+
+```php
+$app->get('/login', function($req, $res) {
+  // login page
+});
+
+$app->post('/login', function($req, $res) {
+    $params = $req->getQueryParams();
+    try {
+        User::logIn($params["username"], $params["password"]);
+        return $res->withRedirect('/profile');
+    } catch (Exception $ex) {
+        return $res->withRedirect('/login');
+    }
+});
+
+$app->get('/profile', function($req, $res) {
+    $user = User::getCurrentUser();
+    if ($user) {
+        return $res->getBody()->write($user->getUsername());
+    } else {
+        return $res->withRedirect('/login');
+    }
+});
+
+$app->get('/logout', function($req, $res) {
+    User::logOut();
+    return $res->redirect("/");
+});
+```
+
+A simple log-in page could look like this:
+
+```html
+<html>
+  <head></head>
+  <body>
+    <form method="post" action="/login">
+      <label>Username</label>
+      <input name="username" />
+      <label>Password</label>
+      <input name="password" type="password" />
+      <input class="button" type="submit" value="login" />
+    </form>
+  </body>
+</html>
+```
+
+`CookieStorage` can be used to store other properties as well:
+
+```php
+$cookieStorage = Client::getStorage();
+$cookieStorage->set("key", "val");
+```
+
+</TabItem>
+</EngineRuntimes>
+
+## FAQ
+
+### How to redirect to HTTPS using the SDK?
+
+We recommend that you enable _Force HTTPS_ when binding custom domains instead of using the middleware from the SDK for redirecting.
+
+<Conditional region='cn'>
+
+:::info
+However, _Force HTTPS_ only works with dedicated IP addresses at this time.
+If you’re using CDN, you’ll have to implement the redirect within the code of your project.
+:::
+
+</Conditional>
+
+<details>
+<summary>View how to redirect to HTTPS using the SDK (not recommended)</summary>
+
+Some SDKs provide a middleware for redirecting to HTTPS. With this middleware enabled, visitors to your site will be redirected to HTTPS.
+
+<EngineRuntimes>
+<TabItem value='nodejs'>
+
+Node.js (Express):
+
+```js
+app.enable("trust proxy");
+app.use(AV.Cloud.HttpsRedirect());
+```
+
+Node.js (Koa):
+
+```js
+app.proxy = true;
+app.use(AV.Cloud.HttpsRedirect({ framework: "koa" }));
+```
+
+</TabItem>
+<TabItem value='python'>
+
+```python
+import leancloud
+
+application = get_your_wsgi_func()
+
+application = leancloud.HttpsRedirectMiddleware(application)
+```
+
+</TabItem>
+<TabItem value='php'>
+
+```php
+SlimEngine::enableHttpsRedirect();
+$app->add(new SlimEngine());
+```
+
+</TabItem>
+<TabItem value='java'>
+
+```java
+LeanEngine.setHttpsRedirectEnabled(true);
+```
+
+</TabItem>
+<TabItem value='dotnet'>
+
+```cs
+app.UseHttpsRedirection();
+```
+
+</TabItem>
+</EngineRuntimes>
+</details>
+
+### How to print the HTTP requests made by the SDK?
+
+<EngineRuntimes>
+<TabItem value='nodejs'>
+
+You can set the environment variable `DEBUG=leancloud:request` to have the HTTP requests made by the SDK printed. When debugging locally, you can start your project like this:
+
+```sh
+env DEBUG=leancloud:request lean up
+```
+
+When the SDK sends a request to the server, you will see a log like this:
+
+```sh
+leancloud:request request(0) +0ms GET https://{{host}}/1.1/classes/Todo?&where=%7B%7D&order=-createdAt { where: '{}', order: '-createdAt' }
+leancloud:request response(0) +220ms 200 {"results":[{"content":"1","createdAt":"2016-08-09T06:18:13.028Z","updatedAt":"2016-08-09T06:18:13.028Z","objectId":"57a975a55bbb5000643fb690"}]}
+```
+
+We don’t recommend that you enable these logs on the server side, or you will see excessive logs on the dashboard. You can use `DEBUG=leancloud:request:error` to only have errors printed.
+
+</TabItem>
+</EngineRuntimes>
+
+### Why is the data in a Pointer field only partially sent to the client?
+
+<EngineRuntimes>
+<TabItem value='nodejs'>
+
+> You can upgrade the JavaScript SDK and the Node.js SDK to 3.0 and above to solve the problem.
+
+When a Cloud Function sends a response to the client, it will call the `AV.Object#toJSON` method to serialize the result to a JSON object. In the early versions of the SDK, `AV.Object#toJSON` will only return the metadata of the Pointer for Pointer fields and won’t include the other fields. We have redesigned the serialization-related logic in [JavaScript SDK 3.0](https://github.com/leancloud/javascript-sdk/releases/tag/v3.0.0). **You can upgrade the JavaScript SDK and the Node.js SDK to 3.0 and above to solve the problem**.
+
+If you can’t upgrade the SDK used by your project to the newer version, you can bypass the problem in the following way:
+
+```javascript
+AV.Cloud.define("querySomething", function (req, res) {
+  var query = new AV.Query("Something");
+  // `user` is a `Pointer` field in the `Something` table
+  query.include("user");
+  query
+    .find()
+    .then(function (results) {
+      // Serialize manually
+      results.forEach(function (result) {
+        result.set(
+          "user",
+          result.get("user") ? result.get("user").toJSON() : null
+        );
+      });
+      // Return the result to the client
+      res.success(results);
+    })
+    .catch(res.error);
+});
+```
+
+</TabItem>
+<TabItem value='python'>
+
+The Python SDK will only return the metadata of Pointer. You will have to manually perform a query and serialize the result (see the code for Node.js).
+
+</TabItem>
+</EngineRuntimes>
+
+### When invoking a Cloud Function with RPC, why do I unexpectedly get an empty object as the result?
+
+<EngineRuntimes>
+<TabItem value='nodejs'>
+
+For a Cloud Function defined with the Node.js SDK, if the function returns a value other than an `AVObject` (like a string or number), the RPC invocation will get an empty object (`{}`).
+Similarly, if an array containing members other than `AVObject`s gets returned, those members will be serialized to `{}`.
+This problem will be fixed in the next major version of the Node.js SDK (4.0).
+To bypass the problem, you can return an object (`{}`) containing the response.
+
+</TabItem>
+</EngineRuntimes>

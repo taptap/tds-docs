@@ -1,0 +1,137 @@
+---
+title: Getting Started With Cloud Functions and Hooks
+sidebar_label: Getting Started
+sidebar_position: 1
+---
+
+import QuickStartNew from "../_partials/quick-start-new.mdx";
+import QuickStartDeploy from "../_partials/quick-start-deploy.mdx";
+import FunctionsIntroduction from "../_partials/functions-introduction.mdx";
+import PlatformRuntimes from "../_partials/platform-runtimes.mdx";
+import { CLI_BINARY } from "/src/constants/env.ts";
+import EngineRuntimes from "/src/docComponents/MultiLang/engine";
+import TabItem from "@theme/TabItem";
+import CodeBlock from "@theme/CodeBlock";
+
+<FunctionsIntroduction />
+
+:::info
+If you only need to write simple Cloud Functions and Hooks with Node.js, see [Cloud Functions and Hooks Guide § Writing Cloud Functions Online](/sdk/engine/functions/guides/#writing-cloud-functions-online).
+:::
+
+## Create a Project
+
+<QuickStartNew appName="my-functions" />
+
+## Write a Cloud Function
+
+You can find the following Cloud Function example in the demo project of the respective runtime environment:
+
+<EngineRuntimes>
+<TabItem value='nodejs'>
+
+```js title='cloud.js'
+AV.Cloud.define("hello", function (request) {
+  return "Hello world!";
+});
+```
+
+</TabItem>
+<TabItem value='python'>
+
+```python title='cloud.py'
+@engine.define
+def hello(**params):
+    if 'name' in params:
+        return 'Hello, {}!'.format(params['name'])
+    else:
+        return 'Hello, LeanCloud!'
+```
+
+</TabItem>
+<TabItem value='php'>
+
+```php title='src/cloud.php'
+Cloud::define("sayHello", function($params, $user) {
+    return "hello {$params['name']}";
+});
+```
+
+</TabItem>
+<TabItem value='java'>
+
+```java title='src/main/java/cn/leancloud/demo/todo/Cloud.java'
+@EngineFunction("hello")
+public static String hello(@EngineFunctionParam("name") String name) {
+  if (name == null) {
+    return "What is your name?";
+  }
+
+  return String.format("Hello %s!", name);
+}
+```
+
+</TabItem>
+<TabItem value='dotnet'>
+
+```cs title='web/HelloSample.cs'
+[EngineFunction("Hello")]
+public static string Hello([EngineFunctionParameter("text")]string text)
+{
+    return $"Hello, {text}";
+}
+```
+
+</TabItem>
+<TabItem value='go'>
+
+```go title='functions/hello.go'
+func init() {
+	leancloud.Engine.Define("hello", hello)
+}
+
+func hello(req *leancloud.FunctionRequest) (interface{}, error) {
+	return map[string]string{
+		"hello": "world",
+	}, nil
+}
+```
+
+</TabItem>
+</EngineRuntimes>
+
+The way you write a Hook is similar to that for a Cloud Function. We will cover more about the usage of Cloud Functions and Hooks later.
+
+## Run and Debug Locally
+
+<p>
+  You can run and debug your project locally by running{" "}
+  <code>{CLI_BINARY} up</code>. The CLI will automatically inject your app’s
+  environment variables into the project so that the Cloud Functions in your
+  project can have access to the data stored within the Data Storage service.
+</p>
+
+<CodeBlock className="sh">
+  {`$ ${CLI_BINARY} up
+[INFO] The project is running at: http://localhost:3000
+[INFO] Cloud function debug console (if available) is accessible at: http://localhost:3001`}
+</CodeBlock>
+
+<p>
+  <code>{CLI_BINARY} up</code> will also start a console for debugging Cloud
+  Functions on port 3001 (
+  <a href="http://localhost:3001">http://localhost:3001</a>). The console allows
+  you to debug Cloud Functions and Hooks by providing dummy data.
+</p>
+
+![Cloud Function Debug Console](/img/cloud-engine/engine-cli-debug-console.png)
+
+## Deploy to Cloud Engine
+
+<QuickStartDeploy />
+
+## Next Steps
+
+Read [Cloud Functions and Hooks Guide](/sdk/engine/functions/guides) to learn how you can get the most out of Cloud Functions. If you’re interested in more advanced ways of using the Cloud Engine SDK, you can jump to [Cloud Engine SDK Guide](/sdk/engine/functions/sdk). If you haven’t read it yet, make sure to check out [Cloud Engine Platform Features](/sdk/engine/platform) where you can explore the diverse features provided by Cloud Engine. To learn more about the specific runtime environments provided by Cloud Engine, see the pages below:
+
+<PlatformRuntimes />

@@ -1,0 +1,815 @@
+---
+title: Multiplayer Introduction
+sidebar_label: Introduction
+sidebar_position: 1
+---
+
+import MultiLang from "/src/docComponents/MultiLang";
+import { Conditional } from "/src/docComponents/conditional";
+
+Multiplayer is a backend service specifically designed for multiplayer online games by <Conditional brand="tds">TDS</Conditional><Conditional brand="leancloud">LeanCloud</Conditional>. Developers don't need to build their own backend systems; they can easily implement features such as player matching and real-time battle message synchronization using cloud services.
+
+## Core Features
+
+- **Player Matching**: Match players together to play games either randomly or based on specified criteria. In online battles, the matching functionality brings players about to play together into the same room (Room). For example, in games like "Identity V," "Honor of Kings," and "PUBG," players can quickly match with others by clicking "Quick Match," and they all enter the same room to prepare for the game. Players can also create rooms and invite friends to play together.
+- **Fast Battle Message Synchronization**: Real-time bidirectional communication between the client and server is achieved through WebSocket channels, ensuring that all in-game messages are quickly synchronized.
+- **Game Logic Processing**: Multiplayer provides [MasterClient](/sdk/multiplayer/guide/js/#masterclient) as the client host for controlling game logic. All in-game logic is managed by the MasterClient, and in case the MasterClient unexpectedly disconnects, the client with the best network status will be automatically switched to MasterClient to ensure smooth gameplay. Developers can also choose to implement game logic on the server side (server-side game logic support is under development).
+- **Multi-Platform Support**: Perfectly compatible with Unity and Cocos Creator, supporting multiple platforms.
+
+## Features
+
+- Supports dynamic scalability to handle massive concurrency with ease.
+- Built on a proven underlying architecture, it has undergone deep optimization and improvements, ensuring stability for handling message delivery rates of up to billions per second.
+
+## Core Concepts
+
+### Client and UserId
+
+In the Multiplayer service, each terminal is referred to as a "Client." Each Client has a unique identifier called `UserId` throughout the entire Multiplayer service. This `UserId` can only consist of English letters, numbers, and underscores, with a length of up to 32 characters and shall be unique within the application. Each game player is definitely a Client, but not all Clients are actual players. For instance, the MasterClient that manages rooms in the Client Engine or self-made AI players are also Clients.
+
+The Multiplayer service only allows one Client to establish a connection with one server at a time. If a Client with an already logged-in `UserId` attempts to log in again, the second login will kick out the previous one.
+
+### Rooms and ActorId
+
+Once players are successfully matched, they will enter the same room to play the game, and battle messages will be swiftly synchronized within this room. Each player in this room has a unique ActorId, which is used for all communication within the room. When a player leaves the room, the ActorId becomes invalid. Upon entering a new room, the player will be assigned a new ActorId specific to that room.
+
+**A room can support a maximum of 10 players online simultaneously.**
+
+## Game Core Process
+
+Here's a simple example code to help you quickly understand the overall process. For detailed development guidance, please refer to:
+
+- [Multiplayer Development Guide · JavaScript](/sdk/multiplayer/guide/js/)
+- [Multiplayer Development Guide · C#](/sdk/multiplayer/guide/cs/)
+
+### Connecting to the Server
+
+<MultiLang kind="play">
+<>
+
+<Conditional brand="leancloud">
+
+```js
+const client = new Client({
+    // Set your APP ID
+    appId: {{appid}},
+    // Set your APP Key
+    appKey: {{appkey}},
+    // Set the Server (replace xxx.example.com with your custom API domain bound to your app)
+    playServer: 'https://xxx.example.com',
+    // Set the user id
+    userId: 'tarara',
+    // Set the game version; optional; default is 0.0.1; players with different versions won't match in the same room
+    gameVersion: '0.0.1'
+});
+
+client.connect().then(()=> {
+  // Connection successful
+}).catch(console.error);
+```
+
+</Conditional>
+
+<Conditional brand="tds">
+
+```js
+const client = new Client({
+  appId: 'your-client-id',                // Your game's Client ID
+  appKey: 'your-client-token',            // Your game's Client Token
+  playServer: 'https://your_server_url',  // Your game's API domain
+  userId: 'tarara',                       // Set user id
+  gameVersion: '0.0.1' // Set game version; optional; default is 0.0.1; players with different versions won't match in the same room
+});
+
+client.connect().then(()=> {
+  // Connection successful
+}).catch(console.error);
+```
+
+- You can find your game's `Client ID` and `Client Token` in **Developer Center > Your Game > Game Services > App Configuration**.
+- The API domain can be found in **App Configuration > Domain Configuration > API**. Refer to the documentation on [Domains](/sdk/domain/guide/) for more information.
+
+</Conditional>
+
+</>
+<>
+
+```cs
+Play.UserID = "tarara";
+// You can declare the game version when connecting to the server; players with different versions won't match in the same room
+Play.Connect("0.0.1");
+```
+
+</>
+</MultiLang>
+
+### Player Matching
+
+#### Random Matching
+
+The most common scenario for single players is to quickly match with other players. The implementation steps are as follows:
+
+1、Call `JoinRandomRoom` to start matching.
+
+<MultiLang kind="play">
+<>
+
+```js
+client
+  .joinRandomRoom()
+  .then(() => {
+    // Successfully joined the room
+  })
+  .catch(console.error);
+```
+
+</>
+<>
+
+```cs
+Play.JoinRandomRoom();
+```
+
+</>
+</MultiLang>
+
+2、In ideal cases, players will enter a room with available slots and start the game.
+
+<MultiLang kind="play">
+<>
+
+```js
+// Use the Promise returned by joinRandomRoom to determine if joining the room was successful in the JavaScript SDK
+```
+
+</>
+<>
+
+```cs
+play.On(Event.ROOM_JOINED, (evtData) => {
+  // Successfully joined the room
+
+});
+```
+
+</>
+</MultiLang>
+
+3、If there is no empty room, it will fail to join. At this point we can create a room in the callback triggered by the failure and wait for others to join. When creating the room:
+
+- You don't need to worry about the name of the room.
+- The default maximum number of people in a room is 10. You can set MaxPlayerCount to limit the maximum number of people.
+- Set [Retention time after player dropped](/sdk/multiplayer/guide/cs/#retain-disconnected-user-in-room). If the player is added back to the room within the valid time, the room will still retain the player's custom attributes.
+
+<MultiLang kind="play">
+<>
+
+```js
+client
+  .joinRandomRoom()
+  .then()
+  .catch((error) => {
+    if (error.code === 4301) {
+      const options = {
+        // Set the maximum number of people so that when the room is full, the server will not match new players in.
+        maxPlayerCount: 4,
+        // Set the hold time after a player is dropped to 120 seconds
+        playerTtl: 120,
+      };
+      // Creating a Room
+      client
+        .createRoom({
+          roomOptions: options,
+        })
+        .then(() => {
+          // Room created successfully
+        });
+    }
+  });
+```
+
+</>
+<>
+
+```cs
+// This callback is triggered when joining fails
+play.On(Event.ROOM_JOIN_FAILED, (evtData) =>
+{
+  var options = new RoomOptions()
+  {
+ // Set the maximum number of players so that when the room is full, the server won't match new players in.
+     MaxPlayerCount = 4,
+    // Set the hold time after a player is dropped to 120 seconds.
+    PlayerTtl = 120,
+  };
+  play.CreateRoom(roomOptions: options);
+});
+```
+
+</>
+</MultiLang>
+
+#### Customised room matching rules
+
+There are times when we want to match players with similar levels. For example, if the current player is level 5, he can only be matched with players of level 0-10, and players above level 10 cannot be matched. This scenario can be realised by setting attributes for the room. The logic is as follows:
+
+1. Determine the matching attributes, e.g. level 0-10 is level-1, and levels above 10 is level-2.
+
+<MultiLang kind="play">
+<>
+
+```js
+var matchLevel = 0;
+if (level < 10) {
+  matchLevel = 1;
+} else {
+  matchLevel = 2;
+}
+```
+
+</>
+<>
+
+```cs
+int matchLevel = 0;
+if (level < 10) {
+  matchLevel = 1;
+} else {
+  matchLevel = 2;
+}
+```
+
+</>
+</MultiLang>
+
+2、Join the room according to the matching attributes
+
+<MultiLang kind="play">
+<>
+
+```js
+const matchProps = {
+  level: matchLevel,
+};
+
+client
+  .joinRandomRoom({ matchProperties: matchProps })
+  .then(() => {
+    // Successfully joined the room
+  })
+  .catch(console.error);
+```
+
+</>
+<>
+
+```cs
+Hashtable matchProp = new Hashtable();
+matchProp.Add("matchLevel", matchLevel);
+Play.JoinRandomRoom(matchProp);
+```
+
+</>
+</MultiLang>
+
+3. If randomly joining a room fails, a room with matching attributes is created to wait for other people of the same level to join.
+
+<MultiLang kind="play">
+<>
+
+```js
+const matchProps = {
+  level: matchLevel,
+};
+
+client
+  .joinRandomRoom({ matchProperties: matchProps })
+  .then()
+  .catch((error) => {
+    if (error.code === 4301) {
+      const options = {
+      // Set the maximum number of people so that when the room is full, the server won't match new players in.
+        maxPlayerCount: 4,
+        // Set the hold time after a player is dropped to 120 seconds
+        playerTtl: 120,
+        // Custom properties of the room
+        customRoomProperties: matchProps,
+        // Select the key for matching from the room's custom properties
+        customRoomPropertyKeysForLobby: ["level"],
+      };
+
+      client
+        .createRoom({
+          roomOptions: options,
+        })
+        .then()
+        .catch(console.error);
+    }
+  });
+```
+
+</>
+<>
+
+```cs
+play.On(Event.ROOM_JOIN_FAILED, (error) => {
+  if (error["code"] == 4301)
+  {
+    var props = new Dictionary<string, object>();
+    props.Add("level", 2);
+    var options = new RoomOptions()
+    {
+      // Set the maximum number of people so that when the room is full, the server won't match new players in.
+      MaxPlayerCount = 3,
+      // Set the hold time after a player is dropped to 120 seconds
+      PlayerTtl = 120,
+      // Custom properties of the room
+      CustomRoomProperties = props,
+      // Select the key for matching from the room's custom properties
+      CustoRoomPropertyKeysForLobby = new List<string>() { "level" },
+    };
+    play.CreateRoom(roomOptions: options);
+  }
+});
+```
+
+</>
+</MultiLang>
+
+#### Playing with friends
+
+Suppose PlayerA wants to play the game with his best friend PlayerB, then there are two scenarios:
+
+- Just two people playing together, no strangers allowed.
+- Friends and strangers playing together
+
+##### No strangers allowed
+
+1. PlayerA creates a room and makes it invisible, so that other people don't randomly join the room that PlayerA has created.
+
+<MultiLang kind="play">
+<>
+
+```js
+const options = {
+// Room invisible
+  visible: false,
+};
+client
+  .createRoom({
+    roomOptions: options,
+  })
+  .then()
+  .catch(console.error);
+```
+
+</>
+<>
+
+```cs
+var options = new RoomOptions()
+{
+  Visible = false,
+};
+play.CreateRoom(roomOptions: options);
+```
+
+</>
+</MultiLang>
+
+2. PlayerA tells PlayerB the name of the room through some kind of communication (e.g. [instant messaging](/sdk/im/features/)).
+
+3. PlayerB joins the room based on the room name.
+
+<MultiLang kind="play">
+
+<>
+
+```js
+client.joinRoom("LiLeiRoom").then().catch(console.error);
+```
+
+</>
+<>
+
+```cs
+Play.JoinRoom(roomName);
+```
+
+</>
+</MultiLang>
+
+##### Friends and strangers playing together
+
+PlayerA invites PlayerB via some communication method (e.g. [Instant Messaging](/sdk/im/features/)), and PlayerB accepts the invitation.
+
+1、PlayerA sets up a match with PlayerB to enter a room.
+
+<MultiLang kind="play">
+<>
+
+```js
+client
+  .joinRandomRoom({ expectedUserIds: ["playerB"] })
+  .then(() => {
+    // Join Success
+  })
+  .catch(console.error);
+```
+
+</>
+<>
+
+```cs
+Play.JoinRandomRoom(expectedUserIds: new string[] {"playerB"});
+```
+
+</>
+</MultiLang>
+
+2、If there is enough space in the room, PlayerA joins successfully.
+
+<MultiLang kind="play">
+<>
+
+```js
+// JavaScript SDK determines whether a room has been successfully joined by using the joinRandomRoom Promise.
+```
+
+</>
+<>
+
+```cs
+play.On(Event.ROOM_JOINED, (evtData) => {
+  // TODO can do things like jumping to other scenes
+
+});
+```
+
+</>
+</MultiLang>
+
+PlayerA tells PlayerB the roomName of the room it has joined via some form of communication (e.g. [instant messaging](/sdk/im/features/)), and PlayerB joins the room based on the roomName.
+
+<MultiLang kind="play">
+<>
+
+```js
+client.joinRoom("LiLeiRoom").then().catch(console.error);
+```
+
+</>
+<>
+
+```cs
+Play.JoinRoom(roomName);
+```
+
+</>
+</MultiLang>
+
+3. If there is no suitable room then create and join the room:
+
+<MultiLang kind="play">
+<>
+
+```js
+const expectedUserIds = ["playerB"];
+client
+  .joinRandomRoom({ expectedUserIds })
+  .then()
+  .catch((error) => {
+    // No room available or insufficient room space
+    if (error.code === 4301 || error.code === 4302) {
+      client
+        .createRoom({
+          expectedUserIds: expectedUserIds,
+        })
+        .then()
+        .catch(console.error);
+    }
+  });
+```
+
+</>
+<>
+
+```cs
+play.On(Event.ROOM_JOIN_FAILED, (error) => {
+  var expectedUserIds = new List<string>() { "cr3_2" };
+  Play.CreateRoom(expectedUserIds: expectedUserIds);
+});
+```
+
+</>
+</MultiLang>
+
+After PlayerA creates a room, it tells PlayerB the roomName of the room it has joined via some form of communication (e.g., [instant messaging](/sdk/im/features/)), and PlayerB joins the room based on the roomName.
+
+<MultiLang kind="play">
+<>
+
+```js
+client.joinRoom("LiLeiRoom").then().catch(console.error);
+```
+
+</>
+<>
+
+```cs
+Play.JoinRoom(roomName);
+```
+
+</>
+</MultiLang>
+
+For other matching interfaces, see the room matching documentation: [JavaScript](/sdk/multiplayer/guide/js/#room-matching), [C#](/sdk/multiplayer/guide/cs/#room-matching).
+
+### In game
+
+#### Relevant concepts
+
+- **MasterClient**: Multiplayer uses the [MasterClient](/sdk/multiplayer/guide/js/#masterclient) to act as a computational host on the client side, where the MasterClient controls the game logic, such as deciding whether to start or end the game, who should play the next round, how many coins should be deducted from the player, etc.
+- **Custom Attributes**: Custom attributes are divided into [Room Custom Attributes](/sdk/multiplayer/guide/js/#room-custom-attributes) and [Player Custom Attributes](/sdk/multiplayer/guide/js/#player-custom-attributes). We recommend adding game data to the custom attributes, such as the current room map, total coin bet, everyone's cards, etc. This way, when the MasterClient is transferred, the new MasterClient can get the latest data from the current game and continue to calculate.
+
+#### Starting the game
+
+Before the game starts, it is recommended that each player has a ready status. When all players are ready, the MasterClient will start the game. The room must be made invisible before the game starts to prevent other players from being matched during the game.
+
+Player A sets the ready state by setting a custom property:
+
+<MultiLang kind="play">
+<>
+
+```js
+// Player setup readiness
+const props = {
+  ready: true,
+};
+// Request to set player attributes
+play.player
+  .setCustomProperties(props)
+  .then(() => {
+    // Setting properties succeeded
+  })
+  .catch(console.error);
+```
+
+</>
+<>
+
+```cs
+// Player setup readiness
+Hashtable prop = new Hashtable();
+prop.Add("ready", true);
+play.Player.SetCustomProperties(props);
+```
+
+</>
+</MultiLang>
+
+All players (including PlayerA) are notified of the event callback:
+
+<MultiLang kind="play">
+<>
+
+```js
+play.on(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, (data) => {
+  // Only the MasterClient performs this operation.
+  if (play.player.isMaster) {
+    // Check the number of players who are ready in a method you defined; you can get the list of players via play.room.playerList.
+    const readyPlayerCount = getReadyPlayerCount();
+    // Start the game if players are all set
+    if (
+      readyPlayersCount > 1 &&
+      readyPlayersCount == play.room.playerList.length()
+    ) {
+      // Set the room to be invisible to avoid other players being matched in
+      play.setRoomVisible(false);
+      // Start the game
+      start();
+    }
+  }
+});
+```
+
+</>
+<>
+
+```cs
+
+play.On(Event.PLAYER_CUSTOM_PROPERTIES_CHANGED, (evtData) => {
+  // Only the MasterClient performs this operation.
+  if (play.Player.IsMaster)
+  {
+    // Check the number of players who are ready in your own method; you can get the player list via play.Room.playerList.
+    var readyPlayerCount = getReadyPlayerCount();
+    // Start the game if players are all set
+    if (readyPlayersCount > 1 && readyPlayersCount == Play.Players.Count())
+    {
+      // Set the room to be invisible to avoid other players being matched in
+      play.SetRoomVisible(false);
+      // Start the game
+      start();
+    }
+  }
+});
+```
+
+</>
+</MultiLang>
+
+#### Sending messages in game
+
+Most messages in the game are sent to the [MasterClient](/sdk/multiplayer/guide/js/#masterclient), where the MasterClient crunches the numbers and decides what to do next. Suppose we have this scenario: Player A tells the MasterClient that he is done following cards, then the MasterClient receives the message and informs everyone that the next player to act is Player B.
+
+The process of sending the message is as follows:
+
+1、Player A sends a custom event `follow` to notify MasterClient that his follow is complete.
+
+<MultiLang kind="play">
+<>
+
+```js
+// Set the receiving group of the event to Master
+const options = {
+  receiverGroup: ReceiverGroup.MasterClient,
+};
+
+// Set the message to be sent
+const eventData = {
+  actorId: play.player.actorId,
+};
+
+// Set the Event Id
+const FOLLOW_EVENT_ID = 1;
+
+// Send event
+play.sendEvent(FOLLOW_EVENT_ID, eventData, options);
+```
+
+</>
+<>
+
+```cs
+// Set the receiving group of the event to Master
+var options = new SendEventOptions() {
+    ReceiverGroup = ReceiverGroup.MasterClient
+};
+// Set the message to be sent
+var eventData = new Dictionary<string, object>();
+eventData.Add("actorId", play.player.actorId);
+
+// Set the Event Id
+byte followEventId = 1;
+
+// Send event
+play.SendEvent(followEventId, eventData, options);
+```
+
+</>
+</MultiLang>
+
+2、The relevant method in the MasterClient is triggered. The MasterClient calculates that the next player to act is PlayerB, and then calls the `next` method to notify all players that PlayerB currently needs to act.
+
+<MultiLang kind="play">
+<>
+
+```js
+// Event.CUSTOM_EVENT method will be triggered
+play.on(Event.CUSTOM_EVENT, event => {
+  const { eventId } = event;
+
+  if (eventId === FOLLOW_EVENT_ID) {
+    // follow custom events
+    // Determine that PlayerB will act next
+    int PlayerBId = getNextPlayerId();
+
+    // Notify all players that PlayerB will act next
+    const options = {
+      receiverGroup: ReceiverGroup.All,
+    };
+    const eventData = {
+	    actorId: PlayerBId,
+    };
+    const NEXT_EVENT_ID = 2;
+    play.sendEvent(NEXT_EVENT_ID, eventData, options);
+  }
+});
+
+```
+
+</>
+<>
+
+```cs
+// Event.CUSTOM_EVENT method will be triggered
+play.On(Event.CUSTOM_EVENT, (evtData) => {
+  // Getting event parameters
+  var eventId = evtData["eventId"];
+  if (eventId == followEventId) {
+    byte nextEventId = 2;
+
+    // Content of the event
+    var eventData = new Dictionary<string, object>();
+    eventData.Add("actorId", PlayerBId);
+
+    // Send to all
+    var options = new SendEventOptions()
+    {
+      ReceiverGroup = ReceiverGroup.All
+    };
+
+    play.SendEvent(nextEventId, eventData, options);
+  }
+});
+```
+
+</>
+</MultiLang>
+
+3、Relevant methods are triggered for all players.
+
+<MultiLang kind="play">
+<>
+
+```js
+// Event.CUSTOM_EVENT method will be triggered
+play.on(Event.CUSTOM_EVENT, event => {
+  const { eventId, eventData } = event;
+  if (eventId === FOLLOW_EVENT_ID) {
+    ......
+  };
+  if (eventId === NEXT_EVENT_ID) {
+    // next event logic
+    console.log('Next Player:'  + eventData.actorId);
+  }
+});
+
+```
+
+</>
+<>
+
+```cs
+play.On(Event.CUSTOM_EVENT, (evtData) => {
+  if (eventId == followEventId)
+  {
+    ......
+  }
+
+  if (eventId == nextEventId)
+  {
+    // next event logic
+    var actorId = evtData["actorId"];
+  }
+});
+```
+
+</>
+</MultiLang>
+
+For more detailed usage and introduction, please refer to :
+
+- [JavaScript - Custom Events](/sdk/multiplayer/guide/js/#customevents)
+- [C# - Custom Events](/sdk/multiplayer/guide/cs/#customevents)
+
+#### Disconnect and reconnect in game
+
+If the MasterClient is located on the client side, when the MasterClient is disconnected, the Multiplayer service will pick another member to be the new MasterClient, and the original MasterClient will become a normal member after returning to the room. Please refer to [Disconnect Reconnect](/sdk/multiplayer/guide/js/#disconnect-reconnect) for details.
+
+#### Exiting the room
+
+<MultiLang kind="play">
+<>
+
+```js
+play
+  .leaveRoom()
+  .then(() => {
+    // Successfully exited the room
+  })
+  .catch(console.error);
+```
+
+</>
+<>
+
+```cs
+Play.LeaveRoom();
+```
+
+</>
+</MultiLang>
+
+## Documentation
+
+### JavaScript
+
+- [Quickstart](/sdk/multiplayer/start/js/): Getting up to speed with Multiplayer and running a small demo.
+- Multiplayer Development Guide - JavaScript](/sdk/multiplayer/guide/js/): A detailed introduction to all the features and interfaces of Multiplayer.
+
+### C#
+
+- [Quickstart](/sdk/multiplayer/start/cs/): Getting started and running a small demo.
+- [Multiplayer Development Guide - C#](/sdk/multiplayer/guide/cs/): A detailed introduction to all the features and interfaces of Multiplayer.

@@ -1,0 +1,27 @@
+import Path from "/src/docComponents/path";
+
+Cloud Engine is primarily optimized for web applications. Your app is expected to provide HTTP services through the port specified by the environment variable named `LEANCLOUD_APP_PORT`. Keep in mind that the app should listen on `0.0.0.0` (all interfaces) instead of `127.0.0.1` which is the default host of many frameworks.
+
+While your app is being deployed, Cloud Engine will check your app every second to see if it has been successfully started. If your app has not been started within the time limit (30 seconds by default), the deployment will be canceled. After your app has been deployed, Cloud Engine will run health checks for your app regularly and automatically restart it if the check fails.
+
+The way the health check works is that Cloud Engine will send an HTTP request to the homepage (`/`) of your app. If it gets an HTTP 2xx response, your app will pass the health check.
+
+<details>
+<summary>Health check and the Cloud Engine SDK</summary>
+
+Cloud Engine will also check `/__engine/1/ping` which is handled by the SDK. If the SDK is integrated correctly, Cloud Engine will not check the homepage (`/`) anymore.
+
+If **<Path to="engine" /> > Manage deployment > Your group > Settings > Cloud functions mode** is set to _Enable_, or if `functionsMode` in `leanengine.yaml` is set to `strict`, Cloud Engine will check if the SDK is integrated correctly. If not, it will consider your app to have failed to start.
+
+</details>
+
+<details>
+<summary>Customizing startup timeout (<code>startupTimeout</code>)</summary>
+
+The default timeout for your app to start is 30 seconds. You can change it to any value between 15 and 120 seconds with `leanengine.yaml`:
+
+```yaml title='leanengine.yaml'
+startupTimeout: 60
+```
+
+</details>

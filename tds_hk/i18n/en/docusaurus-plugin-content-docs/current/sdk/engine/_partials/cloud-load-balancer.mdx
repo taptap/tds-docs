@@ -1,0 +1,154 @@
+import { Conditional } from "/src/docComponents/conditional";
+import { HAS_ENGINE_CDN_DOMAIN } from "/src/constants/env.ts";
+import EngineRuntimes from "/src/docComponents/MultiLang/engine";
+import TabItem from "@theme/TabItem";
+
+All HTTP and HTTPS requests sent to Cloud Engine will go through a load balancer that deals with chores including HTTPS encryption, HTTPS redirection, and response compression. You won’t have to implement features for handling these tasks yourself for the programs hosted on Cloud Engine. Meanwhile, the load balancer brings the following restrictions that your program cannot bypass:
+
+- Paths starting with `/.well-known/acme-challenge/` are used by Cloud Engine to automatically renew certificates. Requests sent to these paths won’t be forwarded to your program.
+- The size of a request header (URL and headers) should be within 64K and each line of the request header should be within 8K.
+- The size of a request (for uploading files) should be within 100M.
+- The timeout for connecting or waiting for a response is 60 seconds.
+
+<Conditional if={!props.noClientInfo}>
+
+#### Getting the Client IP Address
+
+Cloud Engine’s load balancer includes the following information depicting the original request in the HTTP header:
+
+- `X-Real-IP`: The original IP address.
+- `X-Forwarded-Proto`: The original protocol (`http` or `https`).
+- `Forwarded`: Information about the proxy, defined by RFC 7239. It contains the IP address and the protocol.
+
+<Conditional if={HAS_ENGINE_CDN_DOMAIN}>
+
+:::caution
+If CDN is enabled, the information included in the HTTP headers above will be those of the CDN rather than the original request.
+:::
+
+With CDN enabled, the following HTTP headers will also be present:
+
+- `X-Forwarded-For`: IP addresses separated by a comma. The first one would be the IP address of the original request.
+
+:::caution
+It’s possible that the information included in the HTTP headers above gets counterfeited. Cloud Engine won’t be able to guarantee its authenticity.
+:::
+
+</Conditional>
+
+<EngineRuntimes only={props.only}>
+<TabItem value='nodejs'>
+
+In Express:
+
+```js
+app.get("/", function (req, res) {
+  console.log(req.headers["x-real-ip"]);
+  res.send(req.headers["x-real-ip"]);
+});
+```
+
+</TabItem>
+<TabItem value='python'>
+
+Python (Flask):
+
+```python
+from flask import Flask
+from flask import request
+
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    print(request.headers['x-real-ip'])
+    return 'ok'
+```
+
+Python (Django):
+
+```python
+def index(request):
+    print(request.META['HTTP_X_REAL_IP'])
+    return render(request, 'index.html', {})
+```
+
+</TabItem>
+<TabItem value='php'>
+
+```php
+$app->get('/', function($req, $res) {
+  error_log($_SERVER['HTTP_X_REAL_IP']);
+  return $res;
+});
+```
+
+</TabItem>
+<TabItem value='java'>
+
+```java
+EngineRequestContext.getRemoteAddress();
+```
+
+</TabItem>
+<TabItem value='go'>
+
+Go (Echo):
+
+```go
+func fetchRealIP(c echo.Context) error {
+  realIP = c.RealIP()
+  //...
+}
+```
+
+</TabItem>
+</EngineRuntimes>
+
+<Conditional region='cn'>
+
+:::info
+For Cloud Engine applications deployed within Mainland China, CDN will be enabled by default. To ensure that your application always gets the accurate IP addresses of original requests, consider enabling dedicated IP. You can learn more about the differences between CDN and dedicated IP on [Binding Your Domains § Cloud Engine Domains](/sdk/domain/guide/#cloud-engine-domains).
+:::
+
+</Conditional>
+</Conditional>
+
+#### HTTPS Redirect
+
+When you bind a custom Cloud Engine domain, you can enable _Force HTTPS_ to have the load balancer redirect HTTP requests to HTTPS while keeping the paths.
+
+<Conditional if={HAS_ENGINE_CDN_DOMAIN}>
+
+:::caution
+_Force HTTPS_ won’t work properly if CDN is enabled. You’ll still need to [implement redirect in your project’s code](/sdk/engine/functions/sdk/#how-to-redirect-http-requests-to-https-with-the-sdk).
+:::
+
+</Conditional>
+
+<Conditional if={HAS_ENGINE_CDN_DOMAIN}>
+
+#### CDN Caching
+
+If you resolve your custom domain to the CDN (including the shared domain provided by Cloud Engine), the CDN will cache the responses for the requests it has received. There are some default rules for caching followed by the CDN.
+
+The CDN will cache the response if:
+
+- The response header contains `Last-Modified` (this indicates that the resource requested is static; for HTML files, they will be cached for at most 60 seconds).
+
+The CDN will not cache the response if:
+
+- There is an error with the response (not 2xx).
+- The request is not idempotent (like a `POST` request).
+- The response header doesn’t contain `Last-Modified` (this often indicates that the resource requested is dynamic).
+
+The age of the cache for a given file will depend on the file type and the value of the `Last-Modified` header. The less frequently the file gets modified, the longer the file gets cached. You can override the default behavior by configuring `Cache-Control` and the CDN will try its best to follow your configurations. For example:
+
+- You can use `Cache-Control: no-cache` to prevent the response from being cached.
+- You can use `Cache-Control: max-age=3600` to specify the age of the cache (here we set it to be 1 hour).
+
+:::info
+To prevent your application from being affected by the caching mechanism, consider enabling dedicated IP. You can learn more about the differences between CDN and dedicated IP on [Binding Your Domains § Cloud Engine Domains](/sdk/domain/guide/#cloud-engine-domains).
+:::
+
+</Conditional>

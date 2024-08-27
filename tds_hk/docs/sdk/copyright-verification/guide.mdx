@@ -1,0 +1,546 @@
+---
+title: 正版验证开发指南
+sidebar_label: 开发指南
+sidebar_position: 2
+---
+
+import { Conditional } from "/src/docComponents/conditional";
+import MultiLang from "/src/docComponents/MultiLang";
+import CodeBlock from "@theme/CodeBlock";
+import sdkVersions from "/src/docComponents/sdkVersions";
+import AndroidFaq from "../_partials/android-package-visibility.mdx";
+import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
+
+正版验证适用于在 TapTap 上架的**付费下载**游戏。
+
+游戏集成 TapSDK 的正版验证之后，当玩家第一次启动游戏时（包含卸载后再次安装），SDK 会前往 TapTap 查询玩家是否已购买游戏：
+
+- 如已购买，则可正常进入游戏。
+- 如查询到未购买，将出现「游戏未激活，请前往 TapTap 购买此游戏」弹窗，玩家必须选择「打开 TapTap」购买之后才能游玩。
+
+## 付费下载
+
+### 权限说明
+
+<MultiLang kind="ue">
+
+<>
+
+</>
+
+<>
+
+该模块需要访问设备中已安装的 Tap 客户端信息，在 Android 11 且工程 targetVersion > 29 时需要
+开发者在应用 `AndroidManifest.xml` 中添加如下配置：
+
+```
+ <queries>
+    <package android:name="com.taptap" />
+    <package android:name="com.taptap.pad" />
+    <package android:name="com.taptap.global" />
+</queries>   
+```
+该模块将在应用中添加如下权限：
+
+```
+<uses-permission android:name="android.permission.REORDER_TASKS" />
+```
+</>
+
+<>
+
+</>
+
+<>
+
+</>
+</MultiLang>
+
+### SDK 获取
+
+可以在 [下载页](/tap-download) 获得 TapSDK，添加以下依赖：
+
+<MultiLang kind="ue">
+
+<>
+
+<UnitySDKInstallation 
+npmDeps={[
+    "com.taptap.tds.dlc",
+    "com.taptap.tds.common",
+]} 
+githubDeps={[
+    {package: "com.taptap.tds.common", url: `https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}`},
+    {package: "com.taptap.tds.dlc", url: `https://github.com/TapTap/TapLicense-Unity.git#${sdkVersions.taptap.unity}`},
+]}
+unitypackageModules={[
+    {name: "TapTap_Common.unitypackage", desc: "TapSDK 基础库，必选"},
+    {name: "TapTap_License.unitypackage", desc: "TapTap 正版验证库，必选"},
+]}
+NoNeedLC={true}/>
+
+</>
+
+<>
+
+将 SDK 包导入到项目 `project/app/libs` 目录下。打开项目的 `project/app/build.gradle` 文件，添加：
+
+<CodeBlock className="groovy">
+  {`repositories{
+    flatDir {  
+        dirs 'libs'  
+    }  
+}  
+dependencies {
+    implementation name:'TapCommon_${sdkVersions.taptap.android}', ext:'aar'
+    implementation name:'TapLicense_${sdkVersions.taptap.android}', ext:'aar'
+}`}
+</CodeBlock>
+
+</>
+
+<>
+
+```objc
+// 暂不支持
+```
+
+</>
+
+
+<>
+
+将插件 ** TapLicense ** 、** TapCommon ** 拷贝到项目的插件目录，并在项目模块的 ** build.cs ** 文件中添加依赖：
+
+```csharp
+PublicDependencyModuleNames.AddRange(new string[] { 
+    "Json",
+    "JsonUtilities",
+    "SlateCore",           
+    "TapCommon",
+    "TapLicense",
+});
+```
+
+</>
+
+</MultiLang>
+
+### 测试模式设置
+
+测试模式开启后，可以模拟线上正版验证流程，方便进行调试。
+
+测试模式需要在 License 其他功能调用之前开启。
+
+:::info
+切记在上线前关闭测试模式
+:::
+
+<MultiLang kind="ue">
+
+```cs
+// 需要引入 `License` 库
+using TapTap.License;
+
+// 设置是否开启测试环境
+TapLicense.SetTestEnvironment(bool isTest);
+```
+
+```java
+// 设置是否开启测试环境
+TapLicenseHelper.setTestEnvironment(boolean isTest, Activity activity);
+```
+
+```objc
+// 暂不支持
+```
+
+```cpp
+// 需要引入 `License` 库
+#include "TapLicense.h"
+
+// 设置是否开启测试环境
+FTapLicense::SetTestEnvironment(bool bIsTest);
+```
+</MultiLang>
+
+### 设置授权回调
+
+<MultiLang kind="ue">
+
+```cs
+// 需要引入 `License` 库
+using TapTap.License;
+
+// 默认情况下 SDK 会弹出不可由玩家手动取消的弹窗来避免未授权玩家进入游戏，如果需要回调来触发流程，请添加如下代码
+TapLicense.SetLicencesCallback(ITapLicenseCallback callback);
+
+public interface ITapLicenseCallback
+{
+    // 授权成功回调
+    void OnLicenseSuccess();
+}
+```
+
+```java
+// 默认情况下 SDK 会弹出不可由玩家手动取消的弹窗来避免未授权玩家进入游戏，如果需要回调来触发流程，请添加如下代码
+TapLicenseHelper.setLicenseCallback(new TapLicenseCallback() {
+    @Override
+    public void onLicenseSuccess() {
+        // 授权成功回调
+    }
+});
+```
+
+```objc
+// 暂不支持
+```
+
+```cpp
+// 需要引入 `License` 库
+#include "TapLicense.h"
+
+// 默认情况下 SDK 会弹出不可由玩家手动取消的弹窗来避免未授权玩家进入游戏，如果需要回调来触发流程，请添加如下代码
+FTapLicense::SetLicenseCallback(FSimpleDelegate::CreateLambda([]() {
+    // 本体授权成功
+}));
+```
+
+</MultiLang>
+
+### 检查是否购买游戏
+
+Check 方法中参数默认值为 false，表示为 SDK 首次触发以及在距离首次触发的第 5 天之后再一次会通过 TapTap 客户端来确认当前登录用户是否购买游戏，如果使用 true 的话，则每次接口调用都会通过 TapTap 客户端来确认当前登录用户是否购买过游戏。
+
+<MultiLang kind="ue">
+
+```cs
+TapLicense.Check();
+TapLicense.Check(true);
+```
+
+```java
+TapLicenseHelper.check(Activity activity);
+TapLicenseHelper.check(Activity activity, boolean forceCheck);
+```
+
+```objc
+// 暂不支持
+```
+
+```cpp
+FTapLicense::Check();
+FTapLicense::Check(true);
+```
+
+</MultiLang>
+
+### Android 11 及更高版本的适配
+
+<AndroidFaq />
+
+## DLC
+
+### 权限说明
+
+<MultiLang kind="ue">
+
+<>
+
+</>
+
+<>
+
+该模块需要访问设备中已安装的 Tap 客户端信息，在工程 targetVersion > 29 时需要
+开发者在应用 AndroidManifest.xml 中添加如下配置：
+
+```
+ <queries>
+    <package android:name="com.taptap" />
+    <package android:name="com.taptap.pad" />
+    <package android:name="com.taptap.global" />
+</queries>
+```
+
+</>
+
+<>
+
+</>
+
+<>
+
+</>
+</MultiLang>
+
+### 测试模式设置
+
+测试模式开启后，可以模拟线上 DLC 的查询与购买，方便进行调试。
+
+测试模式需要在 License 其他功能调用之前开启。
+
+:::info
+切记在上线前关闭测试模式
+:::
+
+<MultiLang kind="ue">
+
+```cs
+// 需要引入 `License` 库
+using TapTap.License;
+
+// 设置是否开启测试环境
+TapLicense.SetTestEnvironment(bool isTest);
+```
+
+```java
+// 设置是否开启测试环境
+TapLicenseHelper.setTestEnvironment(boolean isTest, Activity activity);
+```
+
+```objc
+// 暂不支持
+```
+
+```cpp
+// 需要引入 `License` 库
+#include "TapLicense.h"
+
+// 设置是否开启测试环境
+FTapLicense::SetTestEnvironment(bool bIsTest);
+```
+</MultiLang>
+
+
+### DLC 查询和购买
+
+可以在 [下载页](/tap-download) 获得 TapSDK，添加以下依赖：
+
+<MultiLang kind="ue">
+
+<>
+
+<UnitySDKInstallation 
+npmDeps={[
+    "com.taptap.tds.dlc",
+    "com.taptap.tds.common",
+]} 
+githubDeps={[
+    {package: "com.taptap.tds.common", url: `https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}`},
+    {package: "com.taptap.tds.dlc", url: `https://github.com/TapTap/TapLicense-Unity.git#${sdkVersions.taptap.unity}`},
+    {package: "com.leancloud.storage", url: `https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}`},
+]}
+unitypackageModules={[
+    {name: "TapTap_Common.unitypackage", desc: "TapSDK 基础库，必选"},
+    {name: "TapTap_License.unitypackage", desc: "TapTap 正版验证库，必选"},
+]}/>
+
+</>
+
+<>
+
+将 SDK 包导入到项目 `project/app/libs` 目录下。打开项目的 `project/app/build.gradle` 文件，添加：
+
+<CodeBlock className="groovy">
+  {`repositories{
+    flatDir {  
+        dirs 'libs'  
+    }  
+}  
+dependencies {
+    implementation name:'TapCommon_${sdkVersions.taptap.android}', ext:'aar'
+    implementation name:'TapLicense_${sdkVersions.taptap.android}', ext:'aar'
+}`}
+</CodeBlock>
+
+</>
+
+<>
+
+```objc
+// 暂不支持
+```
+
+</>
+
+<>
+
+将插件 ** TapLicense ** 、** TapCommon ** 拷贝到项目的插件目录，并在项目模块的 ** build.cs ** 文件中添加依赖：
+
+```csharp
+PublicDependencyModuleNames.AddRange(new string[] { 
+    "Json",
+    "JsonUtilities",
+    "SlateCore",           
+    "TapCommon",
+    "TapLicense",
+});
+```
+
+</>
+
+</MultiLang>
+
+#### DLC 回调设置
+
+DLC 回调包含查询回调和购买回调。
+
+<MultiLang kind="ue">
+
+```cs
+public class MyTapDLCCallback:ITapDlcCallback
+{
+    public void OnQueryCallBack(TapLicenseQueryCode code, Dictionary<string, object> queryList)
+    {
+        // 查询回调
+    }
+
+    public void OnOrderCallBack(string sku, TapLicensePurchasedCode status)
+    {
+        // 购买回调
+    }
+}
+
+TapLicense.SetDLCCallback(new MyTapDLCCallback());
+```
+
+```java
+TapLicenseHelper.setDLCCallback(new DLCManager.InventoryCallback() {
+    @Override
+    public boolean onQueryCallBack(int i, HashMap<String, Integer> queryList) {
+        // 查询回调
+        return false;
+    }
+
+    @Override
+    public void onOrderCallBack(String s, int i) {
+        // 购买回调
+    }
+});
+```
+
+```objc
+// 暂不支持
+```
+
+```cpp
+FTapLicense::SetDLCCallback(
+    FTapLicense::FDLCQueryDelegate::CreateLambda(
+        [](FTapLicense::EQueryResult Code, const FTapLicense::Map& QueryList) {
+            // 查询回调
+            switch (Code) {
+            case FTapLicense::EQueryResult::OK: 
+                //查询成功
+                break;
+            case FTapLicense::EQueryResult::Error:
+                //查询失败
+                break;
+            case FTapLicense::EQueryResult::NotInstallTapTap:
+                //sdk有相应处理，正常不需要开发者做处理
+                break;
+            }
+        }),
+    FTapLicense::FDLCOrderDelegate::CreateLambda([](const FString& Sku, FTapLicense::EOrderStatus Status) {
+        // 购买回调
+    })
+);
+```
+
+</MultiLang>
+
+#### DLC 查询
+
+对应的查询回调会返回具体的查询结果，查询成功时会返回当前 Tap 玩家是否已经购买过对应商品，在查询回调中返回的键值对类型参数 `queryList` 中可以获取，该参数 `key` 为查询的商品 `skuid`，`value` 表示该商品当前查询用户的购买状态：0 表示未购买，1 表示已购买。
+
+<MultiLang kind="ue">
+
+```cs
+TapLicense.QueryDLC(string[] skuIds);
+```
+
+```java
+TapLicenseHelper.queryDLC(Activity activity, String[] skuIds);
+```
+
+```objc
+// 暂不支持
+```
+
+```cpp
+FTapLicense::QueryDLC(const TArray<FString>& DLCList);
+```
+
+</MultiLang>
+
+#### DLC 购买
+
+<MultiLang kind="ue">
+
+```cs
+TapLicense.PurchaseDLC(string skuId);
+```
+
+```java
+TapLicenseHelper.purchaseDLC(Activity activity, String skuIds);
+```
+
+```objc
+// 暂不支持
+```
+
+```cpp
+FTapLicense::PurchaseDLC(const FString& DLC);
+```
+
+</MultiLang>
+
+#### 参数说明
+
+##### TapLicenseQueryCode
+
+| 回调                            | 回调值 | 说明                           |
+| ------------------------------- | ------ | ------------------------------ |
+| QUERY_RESULT_OK                 | 0      | 查询成功                       |
+| QUERY_RESULT_NOT_INSTALL_TAPTAP | 1      | 检查测试机未安装 TapTap 客户端 |
+| QUERY_RESULT_ERR                | 2      | 查询失败                       |
+| ERROR_CODE_UNDEFINED            | 80000  | 未知错误                       |
+
+##### skuId
+
+<Conditional region="cn">
+
+请前往 [DLC 商品](/store/buyout/dlc-products) 查看如何创建 DLC 商品并获得 skuid。
+
+</Conditional>
+
+<Conditional region="global">
+请前往 DLC 商品查看如何创建 DLC 商品并获得 skuid。
+
+</Conditional>
+
+
+## 如何测试
+
+### SDK 开启测试模式
+
+在 License 模块初始化后，调用 TapLicenseHelper.setTestEnvironment(boolean testEnvironment, Activity activity) 开启/关闭测试模式。
+
+### 填写测试包名、测试用户
+
+在开发者中心 > 游戏服务 > 正版验证添加测试包名，同时将测试用户的 TapTap ID 加入测试白名单。
+
+![](https://img.tapimg.com/market/images/02d44a76f74acfde8d7a38f41c84f073.png)
+
+### 完成支付
+加入测试白名单的用户将正常拉起 TapTap 的支付功能，请正常操作完成购买。
+
+:::tip
+
+- 测试用户所使用的 TapTap 请确保是最新正式版本。
+- 测试环境的购买仅为了模拟正式环境的购买流程，并不会产生真正的付款订单。
+- 单个测试用户在测试环境下仅可完成 1 次订单支付。如需重复测试，请从白名单中移除此测试账号后再加入。
+- 在正式上线前，请关闭测试环境。
+
+:::
+
+![](https://img.tapimg.com/market/images/c22970392e74be4a59bd3d12138d205e.png)
