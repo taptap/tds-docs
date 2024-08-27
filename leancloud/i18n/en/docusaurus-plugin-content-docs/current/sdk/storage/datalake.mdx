@@ -1,0 +1,222 @@
+---
+title: Data Lake Guide
+sidebar_label: Data Lake
+sidebar_position: 14
+---
+
+import { Conditional } from "/src/docComponents/conditional";
+
+Based on ClickHouse, a modern database, we have built a new generation of data lake. Tightly integrated with cloud services, it supports automatic entry of stored data and log table data, providing powerful data support for statistical analysis of business operations.
+
+The new data lake offers the following unique features:
+
+1. Column-based storage that supports high compression rates, which can significantly reduce storage costs;
+1. Column-based traversal and vector operations that support efficient queries, which can reduce complex queries that would otherwise take minutes to seconds;
+1. Intuitive data views that support the storage of intermediate results, which, together with join queries, can support highly efficient and complex second-order queries;
+1. Richer functionality to support more complex SQL queries. See the [Common Use Cases](#common-use-cases) section below;
+1. Seamless connection to log tables that can support real-time input and query from a variety of data sources, allowing for more flexible integration of external data sources and more complete data analysis capabilities for the business.
+
+## Data Entry
+
+Before querying the data, we need to store the data first. At present, we mainly support data input from classes in the Data Storage service. Classes are divided into two categories: log tables and basic classes.
+
+### Log Tables
+
+Log tables are a special class of data storage designed to meet the business needs of storing events, logs, and other "immutable" data that cannot be changed after it is written. Once collected, this data can be used for business auditing and operational analysis, and for developers to track events. Because this type of data is appended and not modified, we are able to provide greater concurrent write throughput.
+
+#### Enabling and Accessing Log Tables
+
+On the "Data Storage" page of the dashboard, click "Create class" and check the "log table" option to create a log table. For example, we can create a log table named `EventLog`.
+
+At the SDK level, creating a log table object is the same as creating a normal object:
+
+```java
+// for Android
+AVObject event = new AVObject("EventLog");
+event.put("eventType", "buttonClick");
+event.put("eventName", "orderSubmit");
+event.put("eventDate", new Date());
+event.saveInBackground();
+```
+
+Logs are submitted and stored directly in the data lake and are available in real time.
+
+### Syncing With Basic Classes
+
+The process of synchronizing basic class objects to the data lake is a bit more complicated because of the support for updates.
+
+On the dashboard, go to "Data Storage" - "Data lake", click "Create Class Sync", and select the fields that need to be queried and analyzed in the data lake, then you can start synchronizing the class with the data lake. The synchronization starts immediately. Depending on the size of the data, the synchronization may take a long time, so please be patient.
+
+For classes with synchronization enabled, we will synchronize the previous day's updated data in the early morning of the next day. Therefore, the updated objects will not be visible until the next day. We will continue to tweak this process to achieve more real-time synchronization.
+
+### Data Type Conversion
+ 
+The field types in the data lake are significantly different from those in the Data Dtorage service, and we perform data conversions during the data entry process. Among the things that need special attention are that
+
+1. The data lake does not support the `null` type, and missing fields are stored as zero values. The zero value of a string type is an empty string, and the zero value of a numeric field is the number 0.
+1. The `Boolean` type is converted to `UInt8`. 0 means false and 1 means true. With the above zero-value feature, the default value for a missing field is 0, which means false.
+1. Nested objects are not supported. They are stored as JSON strings and must be extracted using the JSON function.
+1. For array types, the elements must be of the same type. They are converted to `Array(String)` during data entry, and you must use the type conversion function to convert them back to their original type. 
+
+See the following table for specific type conversion behavior:
+
+<table>
+  <thead>
+    <tr>
+      <td>Data Storage Type</td>
+      <td>Data Lake Type</td>
+      <td>Description</td>
+      <td>Example</td>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Array</td>
+      <td>Array(String)</td>
+      <td>The element type is stored as a string, and you need to use the type to convert the elements to the original type after extracting the elements</td>
+      <td><code>toInt64(xs[1])</code></td>
+    </tr>
+    <tr>
+      <td>Boolean</td>
+      <td>UInt8</td>
+      <td>0 means false, 1 means true</td>
+      <td><code>emailVerified = 1</code></td>
+    </tr>
+    <tr>
+      <td>Bytes</td>
+      <td>N/A</td>
+      <td>Not supported</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Date</td>
+      <td>DateTime</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>File</td>
+      <td>
+            <code>*.className String</code><br/>
+            <code>*.objectId  String</code>
+      </td>
+      <td>Is expanded to two fields: className and objectId</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>GeoPoint</td>
+      <td>Point</td>
+      <td>Experimental support</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Number</td>
+      <td>Float64</td>
+      <td></td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Object</td>
+      <td>String</td>
+      <td>Stored as JSON string; you must extract the fields using the appropriate functions</td>
+      <td><code>visitParamExtractInt64(object, 'id')</code></td>
+    </tr>
+    <tr>
+      <td>Pointer</td>
+      <td>
+            <code>*.className String</code> <br/>
+            <code>*.objectId  String</code>
+      </td>
+      <td>Is expanded to two fields: className and objectId</td>
+      <td></td>
+    </tr>
+  </tbody>
+</table>
+
+See [ClickHouse Data Types](https://clickhouse.com/docs/en/sql-reference/data-types/) for all the types supported by the data lake, and [Type Conversion Functions](https://clickhouse.com/docs/en/sql-reference/functions/type-conversion-functions/) for how to convert data between different types.
+
+## Query Syntax
+
+The data lake only supports `select` queries. The syntax looks like this
+
+```sql
+SELECT column1, column2, expr ...
+FROM table | (subquery)
+[INNER|LEFT|RIGHT|FULL|CROSS] JOIN (subquery)|table (ON <expr_list>)
+[WHERE expr]
+[GROUP BY expr_list]
+[HAVING expr]
+[ORDER BY expr_list]
+[LIMIT [skip, ]n]
+[UNION  ...]
+```
+
+Note that strings, dates, and certain other values must be enclosed in **single quotes**. For special characters in the field or table name, you can use backquotes to enclose them in quotation marks. For example
+
+```sql
+WHERE order_status = 'delivered' 
+  AND `from` = 'example.com'
+```
+
+For more query syntax, please refer to the [ClickHouse documentation](https://clickhouse.com/docs/en/sql-reference/statements/select/).
+
+## Common Use Cases
+
+#### Extracting JSON Fields Using visitParamExtract*
+
+During data synchronization, multiple layers of nested objects are imported as JSON strings. To extract the fields from a JSON string, it is recommended to use `visitParamExtract*`. For example
+
+```sql
+SELECT visitParamExtractString('{"abc":"\\u263a"}', 'abc') = '☺';
+```
+
+If the nesting is complex and there are overlapping fields, you can use `JSONExtract*`. For example
+
+```sql
+SELECT JSONExtractFloat('{"a": "hello", "b": [-100, 200.0, 300]}', 'b', 2) = 200.0
+```
+
+More JSON extraction functions can be found in the [official documentation](https://clickhouse.com/docs/en/sql-reference/functions/json-functions/#visitparamextractuintparams-name).
+
+#### Time Zone Conversion With toTimeZone
+
+By default, dates are displayed in the server-side timezone. If this is not expected, you can use `toTimeZone` to convert the date to a specific timezone.
+
+```sql
+toTimeZone(createdAt, 'Asia/Shanghai')
+```
+
+#### Using toYYYYMMDD for Statistics by Date
+
+When analyzing statistics by date, you can use `toYYYYMMDD` to stringify the date and use "group by". You also need to be aware of time zone handling, for example
+
+```sql
+GROUP BY toYYYYMMDD(toTimeZone(createdAt, 'Asia/Shanghai'))
+```
+
+#### Use argMax to Extract the Most Recent Version
+
+When you encounter duplicate data, you can use argMax to extract the last piece of data as the "latest version" of the data. For example, we can extract the latest status of a particular order
+
+```sql
+SELECT
+  orderId,
+  argMax(status, updatedAt) AS status
+FROM my_class
+GROUP BY orderId
+```
+
+
+## Other Restrictions
+
+* For security reasons, the `sessionToken`, `password`, `salt`, and `authData` fields of the `_User` table and the `ACL` fields of all tables do not support synchronization.
+* For performance reasons, large array fields such as `m` and `mu` of the `_Conversation` table do not support synchronization at this time.
+* To better isolate the impact between applications, we impose quota limits on slow queries from the same application. For example, we only allow a maximum of 3 slow queries to run simultaneously. If a query takes more than 5 seconds, it is a slow query.
+
+## REST API
+
+Coming soon.
+
+## Pricing
+
+The data lake feature <Conditional brand="leancloud">is only available to applications with the Business Plan</Conditional><Conditional brand="tds">is available to all games</Conditional> and is currently in beta preview, so there is no charge for now. When we officially release the feature, we will charge for both "storage" and "compute resources".

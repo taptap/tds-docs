@@ -1,0 +1,214 @@
+---
+title: 数据存储 .NET SDK 配置指南
+sidebar_label: .NET SDK 配置
+slug: /sdk/storage/guide/setup-dotnet/
+sidebar_position: 1
+---
+
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import CodeBlock from "@theme/CodeBlock";
+import sdkVersions from "/src/docComponents/sdkVersions";
+import DomainBinding from "../../_partials/setup-domain.mdx";
+import AppConfig from "../_partials/app-config.mdx";
+import { Conditional } from "/src/docComponents/conditional";
+import Path from "/src/docComponents/path";
+
+:::info
+.NET SDK 基于 .NET Standard 2.0 接口标准实现，支持框架如下：
+
+- Unity 2018.1+
+- .NET Core 2.0+
+- .NET Framework 4.6.1+
+- Mono 5.4+
+
+更多支持框架可参考 [.NET Standard](https://docs.microsoft.com/en-us/dotnet/standard/net-standard) 文档。
+
+:::
+
+## 获取 SDK
+
+通过 GitHub 仓库 [Releases](https://github.com/leancloud/csharp-sdk/releases) 下载最新版本 SDK。
+
+各模块及依赖关系如下：
+
+| 名称                     | 模块描述                                         |
+| ------------------------ | ------------------------------------------------ |
+| `LeanCloud-SDK-Storage`  | 存储服务。                                       |
+| `LeanCloud-SDK-Realtime` | 即时通信、LiveQuery 服务，依赖于存储服务。       |
+| `LeanCloud-SDK-Engine`   | 云引擎服务，依赖于存储，适用于云引擎服务端环境。 |
+
+如只需使用某种服务，可下载最小依赖包，减小程序体积。
+
+### Unity 项目安装
+
+- 直接导入：请下载 LeanCloud-SDK-XXX-Unity.zip，解压后为 Plugins 文件夹，拖拽至 Unity 即可。
+
+- UPM：请在项目的 Packages/manifest.json 中添加依赖项
+  <CodeBlock className="json">
+    {`"dependencies": {
+"com.leancloud.storage": "https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}",
+"com.leancloud.realtime": "https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}"
+}`}
+  </CodeBlock>
+
+注意：仅支持 Unity 2018+，即 Unity Api Compatibility Level 支持 .NET Standard 2.0 的版本。
+
+### 非 Unity 项目安装
+
+.NET Core 或其他支持 .NET Standard 2.0 的项目请下载 LeanCloud-SDK-XXX-Standard.zip，解压后设置依赖即可（XXX 指云服务，包括存储 Storage，云引擎 Engine）。
+
+## 初始化
+
+<Conditional brand="tds">
+
+:::info
+[TapSDK 初始化](/sdk/start/quickstart/#初始化)时，会自动执行这一节的初始化方法。
+
+如果已经参考 **快速开始** 文档完成了 TapSDK 初始化，则**不需要**参考这里的初始化。
+:::
+
+</Conditional>
+
+导入模块：
+
+```cs
+// 导入基础模块
+using LeanCloud;
+// 导入存储模块
+using LeanCloud.Storage;
+using LeanCloud.Realtime;
+```
+
+在使用服务前，先调用如下代码初始化 SDK：
+
+<Conditional brand="tds">
+
+```cs
+LCApplication.Initialize("your-client-id", "your-client-token", "https://your_server_url");
+```
+
+</Conditional>
+
+<Conditional brand="leancloud">
+
+```cs
+LCApplication.Initialize("your-app-id", "your-app-key", "https://your_server_url");
+```
+
+</Conditional>
+
+### 应用凭证
+
+<AppConfig />
+
+## 域名
+
+<DomainBinding />
+
+## 开启调试日志
+
+在应用开发阶段，你可以选择开启 SDK 的调试日志（debug log）来方便追踪问题。调试日志开启后，SDK 会把网络请求、错误消息等信息输出到 IDE 的日志窗口，或是浏览器 Console 或是云引擎日志（如果在云引擎下运行 SDK）。
+
+<Tabs>
+<TabItem value="debug-unity" label="Unity" default>
+
+```cs
+LCLogger.LogDelegate = (LCLogLevel level, string info) => {
+    switch (level) {
+        case LCLogLevel.Debug:
+            Debug.Log($"[DEBUG] {DateTime.Now} {info}\n");
+            break;
+        case LCLogLevel.Warn:
+            Debug.Log($"[WARNING] {DateTime.Now} {info}\n");
+            break;
+        case LCLogLevel.Error:
+            Debug.Log($"[ERROR] {DateTime.Now} {info}\n");
+            break;
+        default:
+            Debug.Log(info);
+            break;
+    }
+}
+```
+
+</TabItem>
+
+<TabItem value="debug-dotnet" label=".NET">
+
+```cs
+LCLogger.LogDelegate = (LCLogLevel level, string info) => {
+    switch (level) {
+        case LCLogLevel.Debug:
+            TestContext.Out.WriteLine($"[DEBUG] {DateTime.Now} {info}\n");
+            break;
+        case LCLogLevel.Warn:
+            TestContext.Out.WriteLine($"[WARNING] {DateTime.Now} {info}\n");
+            break;
+        case LCLogLevel.Error:
+            TestContext.Out.WriteLine($"[ERROR] {DateTime.Now} {info}\n");
+            break;
+        default:
+            TestContext.Out.WriteLine(info);
+            break;
+    }
+}
+```
+
+</TabItem>
+</Tabs>
+
+:::caution
+在应用发布之前，请关闭调试日志，以免暴露敏感数据。
+:::
+
+## 验证
+
+首先，确认本地网络环境是可以访问云端服务器的，可以执行以下命令：
+
+```sh
+curl "https://{{host}}/1.1/date"
+```
+
+`{{host}}` 为绑定的 API 自定义域名。
+
+如果当前网络正常会返回当前时间：
+
+```json
+{ "__type": "Date", "iso": "2020-10-12T06:46:56.000Z" }
+```
+
+然后在项目中编写如下测试代码：
+
+```cs
+LCObject testObject = new LCObject("TestObject");
+testObject["words"] = "Hello world!";
+await testObject.Save();
+```
+
+保存后运行程序。
+
+然后打开 **<Path to="storage" /> > 结构化数据 > `TestObject`**，如果看到数据表中出现一行「words」列的值为「Hello world!」的数据，说明 SDK 已经正确地执行了上述代码，配置完毕。
+
+如果控制台没有发现对应的数据，请参考 [问题排查](#问题排查)。
+
+## 问题排查
+
+SDK 安装指南基于当前最新版本的 SDK 编写，所以排查问题前，请先检查下安装的 SDK 是不是最新版本。
+
+### `401 Unauthorized`
+
+如果 SDK 抛出 `401` 异常或者查看本地网络访问日志存在：
+
+```json
+{
+  "code": 401,
+  "error": "Unauthorized."
+}
+```
+
+则可认定为 App ID 或者 `App Key` 输入有误，或者是不匹配，很多开发者同时注册了多个应用，导致拷贝粘贴的时候，用 A 应用的 App ID 匹配 B 应用的 `App Key`，这样就会出现服务端鉴权失败的错误。
+
+### 客户端无法访问网络
+
+客户端尤其是手机端，应用在访问网络的时候需要申请一定的权限。

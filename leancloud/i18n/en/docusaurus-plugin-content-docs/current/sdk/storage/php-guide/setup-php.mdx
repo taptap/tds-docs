@@ -1,0 +1,136 @@
+---
+title: PHP SDK 配置指南
+sidebar_label: PHP SDK 配置
+slug: /sdk/storage/guide/setup-php/
+sidebar_position: 1
+---
+
+import { Conditional } from "/src/docComponents/conditional";
+import DomainBinding from "../../_partials/setup-domain.mdx";
+import AppConfig from "../_partials/app-config.mdx";
+import Path from "/src/docComponents/path";
+
+:::info
+PHP SDK 为服务端 SDK，主要用于在云引擎等受信任的服务器环境中调用管理接口、云函数等。
+如果你需要在自己的服务器上使用 PHP SDK，请参考此篇文档完成配置。
+:::
+
+## 获取 SDK
+
+获取 SDK 有多种方式，较为推荐的方式是通过**包依赖管理工具**下载最新版本。
+
+### 包依赖管理工具安装
+
+composer 是推荐的 PHP 包管理工具。安装 SDK 只需执行以下命令：
+
+```sh
+composer require leancloud/leancloud-sdk
+```
+
+注意：
+
+- `leancloud-sdk` 依赖 PHP 的 curl 扩展（常见 Linux 系统下一般需要安装 `php-curl` 这个包）。
+- 如果 composer 访问 packagist 仓库有问题，需要 [设置镜像](https://mirrors.aliyun.com/composer/) 或者通过代理（设置 `http_proxy` 环境变量）访问。
+
+### 手动安装
+
+前往 [PHP SDK 下载页](https://releases.leanapp.cn/#/leancloud/php-sdk/releases)获取 SDK 并安装。
+
+## 初始化
+
+### 应用凭证
+
+<AppConfig />
+
+导入 `Client`，并调用 `initialize` 方法进行初始化：
+
+<Conditional brand="leancloud">
+
+```php
+use \LeanCloud\Client;
+// 参数依次为 App ID、App Key、Master Key
+Client::initialize("your-app-id", "your-app-key", "your-master-key");
+```
+
+</Conditional>
+
+<Conditional brand="tds">
+
+```php
+use \LeanCloud\Client;
+// 参数依次为 Client ID、Client Token、Server Secret
+Client::initialize("your-Client-id", "your-client-token", "your-server-secret");
+```
+
+</Conditional>
+
+## 域名
+
+<DomainBinding />
+
+## 开启调试日志
+
+在应用开发阶段，你可以选择开启 SDK 的调试日志（debug log）来方便追踪问题。调试日志开启后，SDK 会把网络请求、错误消息等信息输出到 IDE 的日志窗口，或是浏览器 Console 或是云引擎日志（如果在云引擎下运行 SDK）。
+
+```php
+// 放在 SDK 初始化语句 Client::initialize() 后面，只需要调用一次即可
+Client::setDebug(true);
+```
+
+注意，在应用发布之前，请关闭调试日志，以免暴露敏感数据。
+
+## 验证
+
+首先，确认本地网络环境是可以访问云端服务器的，可以执行以下命令：
+
+```sh
+curl "https://{{host}}/1.1/date"
+```
+
+`{{host}}` 为绑定的 API 自定义域名。
+
+如果当前网络正常会返回当前时间：
+
+```json
+{"__type":"Date","iso":"2020-10-12T06:46:56.000Z"}
+```
+
+然后在项目中编写如下测试代码：
+
+```php
+$testObject = new LeanObject("TestObject");
+$testObject->set("words", "Hello world!");
+try {
+    $testObject->save();
+    echo "保存成功。";
+} catch (Exception $ex) {
+    echo "保存失败。";
+}
+```
+
+保存后运行程序。
+
+然后打开 **<Path to="storage" /> > 结构化数据 > `TestObject`**，如果看到数据表中出现一行「words」列的值为「Hello world!」的数据，说明 SDK 已经正确地执行了上述代码，配置完毕。
+
+如果控制台没有发现对应的数据，请参考 [问题排查](#问题排查)。
+
+## 问题排查
+
+SDK 安装指南基于当前最新版本的 SDK 编写，所以排查问题前，请先检查下安装的 SDK 是不是最新版本。
+
+### `401 Unauthorized`
+
+如果 SDK 抛出 `401` 异常或者查看本地网络访问日志存在：
+
+```json
+{
+  "code": 401,
+  "error": "Unauthorized."
+}
+```
+
+则可认定为 App ID 或者 App Key 输入有误，或者是不匹配，很多开发者同时注册了多个应用，导致拷贝粘贴的时候，用 A 应用的 App ID 匹配 B 应用的 App Key，这样就会出现服务端鉴权失败的错误。
+
+### 客户端无法访问网络
+
+客户端尤其是手机端，应用在访问网络的时候需要申请一定的权限。

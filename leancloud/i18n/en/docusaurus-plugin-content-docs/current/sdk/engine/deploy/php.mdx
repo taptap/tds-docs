@@ -1,0 +1,124 @@
+---
+title: PHP Runtime Environment
+sidebar_label: PHP
+sidebar_position: 7
+---
+
+import CloudEnvironments from "../_partials/cloud-environments.mdx";
+import CloudTimezone from "../_partials/cloud-timezone.mdx";
+import CloudLogs from "../_partials/cloud-logs.mdx";
+import CloudInternetAddress from "../_partials/cloud-internet-address.mdx";
+import CloudLoadBalancer from "../_partials/cloud-load-balancer.mdx";
+import CloudFilesystem from "../_partials/cloud-filesystem.mdx";
+import BuildingAdvanced from "../_partials/building-advanced.mdx";
+import BuildingBuildLogs from "../_partials/building-build-logs.mdx";
+import CloudCustomDomain from "../_partials/cloud-custom-domain.mdx";
+import CloudHealthCheck from "../_partials/cloud-health-check.mdx";
+import { Conditional } from "/src/docComponents/conditional";
+
+:::info
+This article serves as a thorough introduction to Cloud Engine’s PHP runtime environment. To quickly get started with Cloud Engine, see [Getting Started With Cloud Engine](/sdk/engine/deploy/getting-started).
+:::
+
+A PHP project has to have a `composer.json` and `public/index.php` under its root directory for Cloud Engine to correctly identify it as a PHP project.
+
+If you are looking to start a new project, we recommend that you use our [PHP sample project](https://github.com/leancloud/slim-getting-started) as a boilerplate.
+
+## How It Works
+
+Cloud Engine runs your application with Nginx and PHP-FPM. The `public` directory will be mapped as the document root of your website. The `.php` files in this directory will be handled by PHP-FPM while other static files will be handled by Nginx. If a user requests a path that does not exist, the request will be handled by `public/index.php`, which can serve as the entry point for most frameworks.
+
+Cloud Engine assigns a PHP-FPM worker for every 64 MB of memory. To customize the number of workers, you can add a _custom environment variable_ on Cloud Engine’s _Settings_ page with `PHP_WORKERS` as its name and the number of workers you want as its value. Keep in mind that if you set the number too low, there might not be enough workers for handling new requests; if you set the number too high, there might not be enough memory for handling requests.
+
+## Configure PHP Version
+
+You can specify the PHP version you want to use in `composer.json`:
+
+```json
+"require": {
+  "php": "8.0"
+}
+```
+
+At this time, Cloud Engine supports PHP `5.6`, `7.0`, `7.1`, `7.2`, `7.3`, `7.4`, and `8.0`.
+
+:::note
+
+<Conditional brand="leancloud">For newly created apps, if</Conditional>
+<Conditional brand="tds">If</Conditional> you don’t specify a PHP version, the
+latest stable version will be used.
+<Conditional brand="leancloud">
+  {" "}
+  For apps created before 9/2/2021, PHP `5.6` will be used by default to ensure compatibility.
+</Conditional>
+
+:::
+
+## Install Dependencies (`composer.json`)
+
+Cloud Engine will automatically install the dependencies listed in `composer.json`. At this time, the version of Composer used by Cloud Engine is 1.x.
+
+## PHP Extensions
+
+Regardless of what PHP version you are using, the following extensions will be enabled by default: `fpm`, `curl`, `mysql`, `zip`, `xml`, `mbstring`, `gd`, `soap`, and `sqlite3`.
+
+For PHP 7.0 and above, `mongodb` will be enabled by default.
+
+Starting from PHP 7.2, the `mcrypt` extension is not provided by default anymore. To use this extension in your project, you can add `ext-mcrypt: *` into `require` in `composer.json`. Adding `mcrypt` will increase the time needed for deployment. If your project doesn’t need this extension, you don’t have to add it.
+
+## Customize Build Process
+
+<BuildingAdvanced />
+
+### Build Logs
+
+<BuildingBuildLogs />
+
+## Health Check
+
+<CloudHealthCheck />
+
+## Cloud Environment
+
+### Custom Domains
+
+<CloudCustomDomain />
+
+### Load Balancer and CDN
+
+<CloudLoadBalancer only="php" />
+
+### Environment Variables
+
+<CloudEnvironments />
+
+### Logs
+
+<CloudLogs only="php" />
+
+### Timezone
+
+<CloudTimezone />
+
+### File System
+
+<CloudFilesystem />
+
+### IP Addresses
+
+<CloudInternetAddress />
+
+## Troubleshooting
+
+### Can I specify local Composer repositories with the `path` type?
+
+Because Cloud Engine will copy `composer.json` and `composer.lock` to dedicated directories for installing dependencies, local Composer repositories with the `path` type are not supported.
+If your project uses local Composer repositories with the `path` type, we recommend that you change them to the `vcs` type.
+
+### When I deploy my project, it fails to fetch files from files.phpcomposer.com.
+
+phpcomposer.com has already stopped its service, so if the `composer.lock` in your PHP project contains URLs under this domain, you won’t be able to install dependencies for your project.
+There are two solutions:
+
+1. Remove `composer.lock` before you deploy your project so that Cloud Engine will install dependencies according to `composer.json`.
+2. After you have correctly configured the repository address on your local computer, run `composer update --lock` to update the download links in `composer.lock`. This won’t affect the versions specified for the dependencies.

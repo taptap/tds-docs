@@ -1,0 +1,484 @@
+---
+title: CLI Guide
+sidebar_label: CLI
+sidebar_position: 8
+---
+
+import CodeBlock from "@theme/CodeBlock";
+import LeandbCliAccess from "./_partials/leandb-cli-access.mdx";
+import QuickStartNew from "./_partials/quick-start-new.mdx";
+import { Conditional } from "/src/docComponents/conditional";
+import { Command } from "/src/docComponents/engine";
+import { CLI_BINARY, BRAND } from "/src/constants/env.ts";
+import Path from "/src/docComponents/path";
+
+The Cloud Engine CLI (<Command />) is a tool for you to deploy your Cloud Engine projects and manage your applications.
+
+## Install the CLI
+
+### macOS
+
+You can install the CLI with [Homebrew](https://brew.sh/):
+
+```sh
+brew update && brew install lean-cli
+```
+
+<details>
+<summary>Having trouble using Homebrew?</summary>
+
+If you’re having a poor connection to Homebrew’s service, you can [set up environment variables like `http_proxy` to make your connection faster](https://docs.brew.sh/Manpage#using-homebrew-behind-a-proxy). You can also use a mirror for Homebrew (like [TUNA](https://mirror.tuna.tsinghua.edu.cn/help/homebrew/)).
+
+If you prefer not to use Homebrew, you can download the binary file named <Command suffix="-macos-arm64" /> (for Apple Silicon) or <Command suffix="-macos-x64" /> (for Intel) from [GitHub releases], rename the file to <Command />, and move the file to a directory listed within `$PATH`. Make sure to make the file executable by running <Command prefix="chmod a+x /path/to/" />.
+
+</details>
+
+### Windows
+
+You can download the 32-bit or 64-bit **msi** file from [GitHub releases] and run the file to install the CLI. After you install the CLI, you’ll be able to use it by running <Command /> in Command Prompt or PowerShell.
+
+You can also download the **exe** file, rename it to <Command suffix=".exe" />, and add its path to the **PATH** environment variable ([instructions](https://www.java.com/en/download/help/path.html)). You will then be able to run <Command /> under any directory using Command Prompt or PowerShell. Besides adding the file’s path to PATH, you can also choose to move the file to a directory already listed within PATH, like `C:\Windows\System32`.
+
+### Linux
+
+For Debian-based distributions, you can download the deb file from [GitHub releases].
+
+For other distributions, you can download the pre-compiled binary file (like <Command suffix="-linux-x64" />) from [GitHub releases], rename the file to <Command />, and move the file to a directory listed within `$PATH`. Make sure to make the file executable by running <Command prefix="chmod a+x /path/to/" />.
+
+[github releases]: https://releases.leanapp.cn/#/leancloud/lean-cli/releases
+
+### Upgrade to the Latest Version
+
+If you have already installed the CLI, you can upgrade it to the latest version by reinstalling the CLI with the latest file.
+
+## Usage
+
+After installing the CLI, you can run <Command suffix=" help" /> on the terminal to view the help information:
+
+<details>
+<summary>View the output of <Command suffix=" help" /></summary>
+
+<Conditional brand='leancloud'>
+
+```
+NAME:
+   lean - Command line tool to manage and deploy LeanEngine apps
+
+USAGE:
+   lean [global options] command [command options] [arguments...]
+
+VERSION:
+   1.0.0
+
+COMMANDS:
+     login    Log in to LeanCloud
+     switch   Change the associated LeanEngine app
+     info     Show information about the associated user and app
+     up       Start a development instance locally with debug console
+     new      Create a new LeanEngine project from official examples
+     deploy   Deploy the project to LeanEngine
+     publish  Publish the version of staging to production
+     db       Access to to LeanDB instances
+     file     Manage files ('_File' class in Data Storage)
+     logs     Show LeanEngine logs
+     debug    Start the debug console without running the project
+     env      Print custom environment variables on LeanEngine (secret variables not included)
+     cql      Enter CQL interactive shell (warn: CQL is deprecated)
+     help     Show usages of all subcommands
+
+GLOBAL OPTIONS:
+   --version, -v  print the version
+```
+
+</Conditional>
+<Conditional brand='tds'>
+
+```
+NAME:
+   tds - Command line tool to manage and deploy Cloud Engine apps
+
+USAGE:
+   tds [global options] command [command options] [arguments...]
+
+VERSION:
+   1.0.0
+
+COMMANDS:
+     login    Log in to TapTap Developer Services
+     switch   Change the associated Cloud Engine app
+     info     Show information about the associated user and app
+     up       Start a development instance locally with debug console
+     new      Create a new Cloud Engine project from official examples
+     deploy   Deploy the project to Cloud Engine
+     publish  Publish the version of staging to production
+     db       Access to to Database instances
+     file     Manage files ('_File' class in Data Storage)
+     logs     Show Cloud Engine logs
+     debug    Start the debug console without running the project
+     env      Print custom environment variables on Cloud Engine (secret variables not included)
+     cql      Enter CQL interactive shell (warn: CQL is deprecated)
+     help     Show usages of all subcommands
+
+GLOBAL OPTIONS:
+   --version, -v  print the version
+```
+
+</Conditional>
+
+</details>
+
+To view the version of the CLI, use the `--version` option:
+
+<CodeBlock>
+  {`$ ${CLI_BINARY} --version
+${CLI_BINARY} version 1.0.0`}
+</CodeBlock>
+
+The following subcommands are available in the CLI:
+
+| Command   | Purpose                                                                                                     |
+| --------- | ----------------------------------------------------------------------------------------------------------- |
+| `login`   | Log in to an account                                                                                        |
+| `switch`  | Change the application and group linked to the project                                                      |
+| `info`    | View the application and group linked to the project                                                        |
+| `up`      | Run and debug the project locally                                                                           |
+| `new`     | Create a new project from a template                                                                        |
+| `deploy`  | Deploy the project to Cloud Engine                                                                          |
+| `publish` | Publish the version in the staging environment to the production environment                                |
+| `db`      | Connect to LeanCache or LeanDB                                                                              |
+| `file`    | Upload files to the Data Storage service (uploaded files can be found on **<Path to="storage" /> > Files**) |
+| `logs`    | View Cloud Engine logs                                                                                      |
+| `debug`   | Open the Cloud Function Debug Console without running the project                                           |
+| `env`     | View or edit the environment variables of the current project                                               |
+
+You can learn more about each subcommand by running <Command suffix=" <command> --help" />. For example:
+
+<details>
+<summary>View the output of <Command suffix=" deploy --help" /></summary>
+
+<CodeBlock>
+  {`NAME:
+   ${CLI_BINARY} deploy - Deploy the project to ${
+    BRAND === "leancloud" ? "LeanEngine" : "Cloud Engine"
+  }\n
+USAGE:
+   tds deploy [command options] (--prod | --staging) [--no-cache --build-logs --overwrite-functions]\n
+OPTIONS:
+   --prod                              Deploy to production environment
+   --staging                           Deploy to staging environment
+   --build-logs                        Print build logs
+   -g                                  Deploy from git repo
+   --war                               Deploy .war file for Java project. The first .war file in target/ is used by default
+   --no-cache                          Disable buliding cache
+   --overwrite-functions               Overwrite cloud functions with the same name in other groups
+   --leanignore value                  Rule file for ignored files in deployment (default: ".leanignore")
+   --message value, -m value           Comment for this version, only applicable when deploying from local files
+   --keep-deploy-file
+   --revision value, -r value          Git revision or branch. Only applicable when deploying from Git (default: "master")
+   --options --options build-root=app  Send additional deploy options to server, in urlencode format(like --options build-root=app)
+   --direct                            Upload project's tarball to remote directly`}
+</CodeBlock>
+
+</details>
+
+## Log In
+
+The first thing you may want to do after installing the CLI is to log in to your account.
+
+<Conditional brand='tds'>
+
+Please go to the Developer Center, click “Create Game”, and then follow the instructions to enter your game’s information. After this, go to your game’s **Game Services > Cloud Services > Cloud Engine > Turn on now > Deploy projects > Deploy using CLI** and follow the instructions to log in to your account.
+
+</Conditional>
+
+To switch to a different account, run <Command suffix=" login" /> again.
+
+## Initialize a Project
+
+After logging in, you can initialize a project with <Command suffix=" new" />. This will also link the project to an existing application.
+
+<QuickStartNew noCliSetup={true} />
+
+## Link to an Application and Group
+
+Most of the functions provided by the CLI require the project to be linked to an application. You can use <Command suffix=" switch" /> to link a project to an application:
+
+<CodeBlock className="sh">{`${CLI_BINARY} switch`}</CodeBlock>
+
+If your application contains multiple groups, you’ll need to pick a group as well.
+
+To link the project to a different application, run <Command suffix=" switch" /> again.
+
+You can also run <Command suffix=" switch <another app’s ID>" /> to quickly switch to a different application.
+
+You can view the application linked to the current project with <Command suffix=" info" />.
+
+## Run and Debug Locally
+
+Run the following command under the root directory of your project to run and debug the project locally:
+
+<CodeBlock className="sh">{`${CLI_BINARY} up`}</CodeBlock>
+
+Besides starting your project, the CLI will also start a Cloud Function Debug Console.
+
+- Visit <http://localhost:3000> for the homepage of a web application.
+- Visit <http://localhost:3001> for the Cloud Function Debug Console (you can debug hooks as well).
+
+To change the port for starting the project, run <Command suffix=" up --port <new port>" />.
+
+The CLI won’t take care of auto-restart or hot-reload for your project, though some of our demo projects (like the Node.js demo project) come with the auto-restart feature.
+
+Besides starting your project with the CLI, you can also start them **natively** using commands like `node server.js` or `python wsgi.py`. This helps if you want to integrate the development process of your Cloud Engine project into your own development process or the IDE you’re using. If you created your project with the CLI, the project would depend on certain environment variables. You will need to configure these environment variables on your own.
+
+You can run <Command suffix=" env" /> to get the environment variables mentioned above. Once you’ve configured them on the terminal, you won’t have to start your project with the CLI anymore. If your shell is compatible with `sh`, you can also run <Command prefix="eval $(" suffix=" env)" /> to have all the environment variables configured automatically.
+
+When starting your project, you can add custom options to the startup command by adding `--` after <Command suffix=" up" />. All the options added after `--` will be passed to the actual startup command. For example, if you want to enable the inspector by adding `--inspect` when starting a Node.js project, you can run <Command suffix=" up -- --inspect" />.
+
+You can also start your project with any startup command by using the `--cmd` flag, like <Command suffix=" up --cmd=my-custom-command" />.
+
+If you ever need to start your project with an IDE or debug the Cloud Functions of a project located on a virtual machine or a remote computer, you can run the Cloud Function Debug Console without running the project itself:
+
+<CodeBlock className="sh">
+  {`$ ${CLI_BINARY} debug --remote=http://remote-url-or-ip-address:remote-port --app-id=xxxxxx`}
+</CodeBlock>
+
+For more information about Cloud Engine, see [Cloud Engine Overview](/sdk/engine/overview/).
+
+## Deploy
+
+Starting from v1.0, <Command suffix=' deploy' /> requires that you provide an argument specifying the environment you would like to deploy your project to. If you don’t provide the argument, the CLI will ask for the environment interactively:
+
+| Command                                | Behavior under trial mode            | Behavior under standard mode                                                 |
+| -------------------------------------- | ------------------------------------ | ---------------------------------------------------------------------------- |
+| <Command suffix=' deploy --prod' />    | Deploy to the production environment | Deploy to the production environment                                         |
+| <Command suffix=' deploy --staging' /> | Not supported                        | Deploy to the staging environment                                            |
+| <Command suffix=' publish' />          | Not supported                        | Publish the version in the staging environment to the production environment |
+
+### Deploy From Local Project
+
+Once you’ve finished developing and testing your project, you can deploy it to Cloud Engine:
+
+<CodeBlock className="sh">{`${CLI_BINARY} deploy --prod`}</CodeBlock>
+
+This command will deploy the project to the production environment and override the previous version deployed from a local project, Git, or the online editor.
+
+You will see the progress during the deployment:
+
+<CodeBlock>
+  {`$ ${CLI_BINARY} deploy --prod
+[INFO] lean (v1.0.0) running on darwin/arm64
+[INFO] Current app: my-engine-app (xxxxxxxxxxxxxxxxxxxxxxxx), group: web, region: cn-n1
+[INFO] Deploying new verison to production
+[INFO] Node.js runtime detected
+[INFO] Uploading file 6.40 KiB / 6.40 KiB [=========================] 100.00% 0s
+[REMOTE] 开始构建 20220328-114036
+[REMOTE] 正在下载应用代码 ...
+[REMOTE] 正在解压缩应用代码 ...
+[REMOTE] 运行环境: nodejs
+[REMOTE] 正在下载和安装依赖项 ...
+[REMOTE] 存储镜像到仓库（0B）...
+[REMOTE] 镜像构建完成：20220328-114036
+[REMOTE] 开始部署 20181207-115634 到 web1
+[REMOTE] 正在创建新实例 ...
+[REMOTE] 正在启动新实例 ...
+[REMOTE] [Python] 使用 Python 3.7.1, Python SDK 2.1.8
+[REMOTE] 实例启动成功：{"version": "2.1.8", "runtime": "cpython-3.7.1"}
+[REMOTE] 云函数和 Hook 信息已更新
+[REMOTE] 部署完成：1 个实例部署成功`}
+</CodeBlock>
+
+The default message for the deployment is “Built from lean-cli”, which will be displayed on **<Path to="engine" /> > Manage deployment > Your group > Logs**. You can customize the message with `-m`:
+
+<CodeBlock className="sh">
+  {`${CLI_BINARY} deploy --prod -m 'fix #42'`}
+</CodeBlock>
+
+After deploying, you’ll need to bind a Cloud Engine domain for your application, then you’ll be able to test your project with curl or visit your site via a browser.
+
+<details>
+<summary>Ignore files with <code>.leanignore</code></summary>
+
+If your project contains certain files that need to be skipped when your deploy your project (like temporary files or those used by source code management tools), you can add them to `.leanignore`.
+
+`.leanignore` shares a similar format with `.gitignore` (the syntax for `.leanignore` is actually a subset of that for `.gitignore`), with every single line as a file or directory to be ignored. If your project does not contain a `.leanignore`, the CLI will automatically create one [according to the language used for the project][defaultignorepatterns]. Make sure to check if the content in the file meets the requirements of your project.
+
+[defaultignorepatterns]: https://github.com/leancloud/lean-cli/blob/master/runtimes/ignorefiles.go#L13
+
+</details>
+
+### Staging Environment
+
+If you’ve upgraded your application to the standard mode, a staging environment will be included in your application. The staging environment shares almost the same environment with the production environment and they both have access to the same data from the Data Storage services. You can bind a separate domain to the staging environment for testing purposes. While developing your project, you can deploy the changes to the staging environment first, and only publish the changes to the production environment if everything goes well in the staging environment.
+
+To deploy to the staging environment:
+
+<CodeBlock className="sh">{`${CLI_BINARY} deploy --staging`}</CodeBlock>
+
+To publish the version in the staging environment to the production environment:
+
+<CodeBlock>
+  {`$ ${CLI_BINARY} publish
+[INFO] Current CLI tool version:  0.21.0
+[INFO] Retrieving app info ...
+[INFO] Deploying AwesomeApp(xxxxxx) to region: cn group: web production
+[REMOTE] 开始部署 20181207-115634 到 web1
+[REMOTE] 正在创建新实例 ...
+[REMOTE] 正在启动新实例 ...
+[REMOTE] 实例启动成功：{"version": "2.1.8", "runtime": "cpython-3.7.1"}
+[REMOTE] 正在更新云函数信息 ...
+[REMOTE] 部署完成：1 个实例部署成功`}
+</CodeBlock>
+
+<Command suffix=" publish" /> guarantees that the exact same version in the staging
+environment (including dependencies and the build output) will be deployed to the
+production environment.
+
+### Deploy From Git Repository
+
+If your project is hosted on a Git platform (like [GitHub](https://github.com/)) and you have already configured the Git repository and deploy key on the dashboard, you can run the following command to have your project deployed with the source code in the repository:
+
+<CodeBlock className="sh">{`${CLI_BINARY} deploy --prod -g`}</CodeBlock>
+
+- `-g` means to deploy from the Git repository. Make sure it is already set up on the dashboard.
+- The command will use the latest commit on the **master** branch by default. You can specify the commit or branch by adding `-r <revision>`.
+- See [Cloud Engine Platform Features § Deploying With Git](/sdk/engine/platform/#deploying-with-git) for instructions on how to set up Git repository and deploy key.
+
+## View Logs
+
+You can view the latest logs of your application with `logs`:
+
+<CodeBlock>
+  {`$ ${CLI_BINARY} logs
+      2019-11-20 17:17:12  Deploying 20191120-171431 to web1
+      2019-11-20 17:17:12  Creating new instance ...
+      2019-11-20 17:17:22  Starting new instance ...
+web1  2019-11-20 17:17:22
+web1  2019-11-20 17:17:22  > node-js-getting-started@1.0.0 start /home/leanengine/app
+web1  2019-11-20 17:17:22  > node server.js
+web1  2019-11-20 17:17:22
+web1  2019-11-20 17:17:23  Node app is running on port: 3000
+      2019-11-20 17:17:23  Instance started: {"runtime":"nodejs-v12.13.1","version":"3.4.0"}
+      2019-11-20 17:17:23  Cloud functions and hooks metadata updated
+      2019-11-20 17:17:23  Deploy finished: 1 instances deployed`}
+</CodeBlock>
+
+The command will return 30 entries by default, with the latest ones on the bottom.
+
+You can use the `-f` option to have logs fetched continuously (similar to using `tail -f`):
+
+<CodeBlock className="sh">{`${CLI_BINARY} logs -f`}</CodeBlock>
+
+Newer logs will be automatically printed to the bottom of the screen.
+
+<details>
+<summary>Advanced usage of <Command suffix=" logs" /></summary>
+
+You can specify the number of entries returned by the CLI using the `-l` option. For example, to return the latest 100 entries:
+
+<CodeBlock className="sh">{`${CLI_BINARY} logs -l 100`}</CodeBlock>
+
+If you want to fetch the logs generated within a certain period of time, you can provide a `--from` and `--to` parameter:
+
+<CodeBlock className="sh">
+  {`${CLI_BINARY} logs --from=2017-07-01 --to=2017-07-07`}
+</CodeBlock>
+
+Use `--from` without `--to` if you want to fetch the logs from a certain day to the current time:
+
+<CodeBlock className="sh">{`${CLI_BINARY} logs --from=2017-07-01`}</CodeBlock>
+
+If you prefer viewing logs with a different tool on your computer, you can export the logs into a file in the format of JSON:
+
+<CodeBlock className="sh">
+  {`${CLI_BINARY} logs --from=2017-07-01 --to=2017-07-07 --format=json > leanengine.logs`}
+</CodeBlock>
+
+Both `--from` and `--to` use the local time zone (the time zone of the machine in which you run <Command />).
+
+</details>
+
+## Connect to LeanDB
+
+<LeandbCliAccess />
+
+## Troubleshooting
+
+### What should I do if the deployment failed?
+
+There could be different reasons that could cause a deployment to fail. Please read the error message to find the specific reason.
+If you’re not using the latest version of the CLI, you can try to upgrade the CLI to the latest version and try again.
+
+### I’m seeing `Error: listen EADDRINUSE :::3000` when starting my project locally.
+
+`listen EADDRINUSE :::3000` means the default port used by your program, 3000, is already occupied by a different program. You can find and kill the program using the port 3000 by following the instructions below:
+
+- [For macOS, you can use `lsof` and `kill`](https://stackoverflow.com/questions/3855127/find-and-kill-process-locking-port-3000-on-mac)
+- [For Linux, you can use `fuser`](https://stackoverflow.com/questions/11583562/how-to-kill-a-process-running-on-particular-port-in-linux)
+- [For Windows, you can use `netstat` and `taskkill`](https://stackoverflow.com/questions/6204003/kill-a-process-by-looking-up-the-port-being-used-by-it-from-a-bat)
+
+You can also change the default port used by the CLI:
+
+<CodeBlock className="sh">{`${CLI_BINARY} -p 3002`}</CodeBlock>
+
+### How to upload files with the CLI?
+
+<CodeBlock className="sh">
+  {`$ ${CLI_BINARY} file upload public/index.html
+Uploads /Users/dennis/programming/avos/new_app/public/index.html successfully at: http://ac-7104en0u.qiniudn.com/f9e13e69-10a2-1742-5e5a-8e71de75b9fc.html`}
+</CodeBlock>
+
+You will get a URL for each file successfully uploaded. That’s the message shown after `successfully at:` in the example above.
+
+To upload all the files under `images`:
+
+<CodeBlock className="sh">{`${CLI_BINARY} file upload images/`}</CodeBlock>
+
+### How to deploy the same project to multiple applications?
+
+You can switch to a different application with <Command suffix=" switch" /> and deploy the project with <Command suffix=" deploy --prod" />. <Command suffix=" switch" /> can be used non-interactively with arguments provided:
+
+<CodeBlock className="sh">
+  {`${CLI_BINARY} switch --region <REGION> --group <GROUP_NAME> <APP_ID>
+${CLI_BINARY} deploy --prod`}
+</CodeBlock>
+
+In the command above, `<REGION>` is the region of the application<Conditional brand="leancloud">, which can be set to `cn-n1` (China North), `cn-e1` (China East), or `us-w1` (International)</Conditional>.
+`--prod` means to deploy to the production environment. To deploy to the staging environment, use <Command suffix=" deploy --staging" />.
+With the two commands mentioned above, you can write CI scripts to quickly deploy your project to multiple applications.
+
+### Can I extend the features provided by the CLI?
+
+If you have certain operations that need to be performed frequently (like checking the total number of records in `_User`), you can define your own commands.
+
+Simply create an executable file with its name starting with `lean-` (like `lean-usercount`) and put it into a directory included in `PATH` or `.leancloud/bin` under the project directory. After this, you will be able to run the file with <Command suffix=" usercount" />. Compared to running `lean-usercount`, this method gives the program in the file the ability to access the environment variables related to each application.
+
+For example, you can put the file below into a directory included in `PATH` (like `/usr/local/bin`):
+
+```python
+#! /bin/env python
+
+import sys
+
+import leancloud
+
+app_id = os.environ['LEANCLOUD_APP_ID']
+master_key = os.environ['LEANCLOUD_APP_MASTER_KEY']
+
+leancloud.init(app_id, master_key=master_key)
+print(leancloud.User.query.count())
+```
+
+Grant the file the permission to be executed by running `$ chmod +x /usr/local/bin/lean-usercount`, and then run <Command suffix=" usercount" /> under the project directory. Now you will see the total number of records in `_User`.
+
+### What has been changed in the 1.0 version of the CLI?
+
+In March 2022, we launched the 1.0 version of the CLI. Below are the breaking changes:
+
+- When using <Command suffix=" deploy" />, you have to specify the environment you want to deploy your project to (`--prod` or `--staging`). The older version of the CLI will deploy your project to the production environment if you’re using the trial mode and to the staging environment if you’re using the standard mode.
+- <Command suffix=" up" /> won’t fetch the server-side environment variables by default.
+  You can add the `--fetch-env` option to have those environment variables fetched.
+- Deleted <Command suffix=" cache" />. We recommend that you use the most advanced <Command suffix=" db" /> for accessing LeanCache and LeanDB.
+
+### I’ve installed the older version of the CLI with `npm`. How do I upgrade to the latest version?
+
+If you’ve installed the older version of the CLI with `npm`, please uninstall the CLI with `npm uninstall -g avoscloud-code leancloud-cli` to avoid any conflicts. You can also follow Homebrew’s instructions to run `brew link --overwrite lean-cli` to override the previous `lean` command.
