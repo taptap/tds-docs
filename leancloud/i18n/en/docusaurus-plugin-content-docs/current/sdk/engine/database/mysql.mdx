@@ -1,0 +1,229 @@
+---
+title: LeanDB MySQL Guide
+sidebar_label: LeanDB MySQL
+sidebar_position: 2
+---
+
+import EngineRuntimes from "/src/docComponents/MultiLang/engine";
+import LeandbCliAccess from "../_partials/leandb-cli-access.mdx";
+import LeandbCreateInstance from "../_partials/leandb-create-instance.mdx";
+import TabItem from "@theme/TabItem";
+import Path from "/src/docComponents/path";
+
+LeanDB MySQL is the hosted database provided by Cloud Engine. You can have your project connect to the database using MySQL libraries and have access to all the functions provided by MySQL. See [Cloud Engine Overview](/sdk/engine/overview) to learn about the other hosted database services provided by Cloud Engine.
+
+## Creating and Managing Instances
+
+You can create and manage LeanDB MySQL instances on **<Path to="engine" /> > Database > MySQL**.
+
+### Creating Instances
+
+<LeandbCreateInstance>
+
+- **Name** Used to access this instance from Cloud Engine. Should be unique in the application.
+- **Memory** You can choose from `0.5GB`, `1GB`, `2GB`, and `4GB`.
+- **Storage** You can choose from `20G`, `100G`, and `500G`.
+
+</LeandbCreateInstance>
+
+### MySQL Version
+
+LeanDB only provides MySQL 5.6 at this time.
+
+### Resizing Online
+
+At this time, you can’t resize LeanDB MySQL instances on your own. Please reach out to us if you need to have your instances resized.
+
+### Sharing Instances
+
+You can use the “Manage sharing” function to share your LeanDB instances with other applications. When you share an instance with another application, the instance will appear in this application. The relevant environment variables will also be available in this application’s Cloud Engine instances.
+
+## Accessing From Cloud Engine
+
+When you deploy a project to the Cloud Engine instances under an application, some environment variables containing information for connecting to MySQL will be injected, including:
+
+- `MYSQL_HOST_<NAME>`
+- `MYSQL_PORT_<NAME>`
+- `MYSQL_ADMIN_USER_<NAME>`
+- `MYSQL_ADMIN_PASSWORD_<NAME>`
+
+Here `<NAME>` is the name you provided when creating your LeanDB instance. If the name of your LeanDB instance is `MYRDB`, there will be an environment variable named `MYSQL_HOST_MYRDB` (together with the other three).
+
+<EngineRuntimes>
+<TabItem value='nodejs'>
+
+To connect to MySQL from Node.js:
+
+```javascript
+const mysql = require("mysql");
+const Promise = require("bluebird");
+
+const mysqlPool = Promise.promisifyAll(
+  mysql.createPool({
+    host: process.env["MYSQL_HOST_MYRDB"],
+    port: process.env["MYSQL_PORT_MYRDB"],
+    user: process.env["MYSQL_ADMIN_USER_MYRDB"],
+    password: process.env["MYSQL_ADMIN_PASSWORD_MYRDB"],
+    database: "test",
+    connectionLimit: 10,
+  })
+);
+
+mysqlPool
+  .queryAsync("SELECT 1 + 1 AS solution")
+  .then((rows) => {
+    console.log("The solution is", rows[0].solution);
+  })
+  .catch((err) => {
+    console.error(err);
+  });
+```
+
+- Make sure to install the dependencies needed by running `npm install --save mysql bluebird`
+- See [mysqljs/mysql](https://github.com/mysqljs/mysql) for more information
+
+</TabItem>
+<TabItem value='python'>
+
+To connect to MySQL from Python:
+
+```python
+import os
+import mysql.connector
+
+result = ''
+
+host = os.environ['MYSQL_HOST_MYRDB']
+port = os.environ['MYSQL_PORT_MYRDB']
+user = os.environ['MYSQL_ADMIN_USER_MYRDB']
+password = os.environ['MYSQL_ADMIN_PASSWORD_MYRDB']
+try:
+  cnx = mysql.connector.connect(
+    user=user, password=password, database='test', host=host, port=port)
+except mysql.connector.Error as err:
+  if err.errno == errorcode.ER_ACCESS_DENIED_ERROR:
+    print("username or password error")
+  elif err.errno == errorcode.ER_BAD_DB_ERROR:
+    print("Database does not exist")
+  else:
+    print(err)
+  else:
+    cursor = cnx.cursor()
+    cursor.execute('SELECT 1 + 1 AS solution')
+    for row in cursor:
+      result = "The solution is {}".format(row[0])
+
+    cursor.close()
+    cnx.close()
+```
+
+- We’re using MySQL’s official Python driver; make sure to list the dependency in `requirements.txt` like this: `mysql-connector-python>=8.0.16,<9.0.0`
+- See [MySQL Connector/Python](https://dev.mysql.com/doc/connector-python/en/) for more information.
+
+</TabItem>
+<TabItem value='php'>
+
+To connect to MySQL from PHP:
+
+```php
+try {
+  $mysqlHost = getenv('MYSQL_HOST_MYRDB');
+  $mysqlPort = getenv('MYSQL_PORT_MYRDB');
+  $pdo = new PDO("mysql:host=$mysqlHost:$mysqlPort;dbname=test", getenv('MYSQL_ADMIN_USER_MYRDB'), getenv('MYSQL_ADMIN_PASSWORD_MYRDB'));
+
+  foreach($pdo->query('SELECT 1 + 1 AS solution') as $row) {
+    print "The solution is {$row['solution']}";
+  }
+} catch (PDOException $e) {
+  print $e->getMessage();
+}
+```
+
+- See [PDO’s docs](https://www.php.net/manual/zh/class.pdo.php) for more information
+
+</TabItem>
+<TabItem value='java'>
+
+To connect to MySQL from Java:
+
+```java
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+
+String host = System.getenv("MYSQL_HOST_MYRDB");
+String port = System.getenv("MYSQL_PORT_MYRDB");
+String user = System.getenv("MYSQL_ADMIN_USER_MYRDB");
+String password = System.getenv("MYSQL_ADMIN_PASSWORD_MYRDB");
+try {
+  Class.forName("com.mysql.jdbc.Driver").newInstance();
+} catch (Exception ex) {
+  // Handle error
+}
+try {
+  Connection connection = DriverManager.getConnection("jdbc:mysql://" + host + ":" + port + "/test?" +
+  "user=" + user + "&password=" + password);
+  Statement statement = connection.createStatement();
+  ResultSet resultSet = statement.executeQuery("SELECT 1 + 1 AS solution");
+  resultSet.first();
+  System.out.format("The solution is %d", resultSet.getInt("solution"));
+} catch (SQLException ex) {
+  // Handle error
+}
+```
+
+- Make sure to add the dependency for MySQL connector to `pom.xml`:
+
+```xml
+<dependency>
+  <groupId>mysql</groupId>
+  <artifactId>mysql-connector-java</artifactId>
+  <version>8.0.16</version>
+</dependency>
+```
+
+- See [MySQL Connector/J](https://dev.mysql.com/doc/connector-j/8.0/en/connector-j-usagenotes-connect-drivermanager.html) for more information
+
+</TabItem>
+<TabItem value='dotnet'>
+
+To connect to MySQL from .NET:
+
+```cs
+string host = Environment.GetEnvironmentVariable("MYSQL_HOST_mysql");
+string port = Environment.GetEnvironmentVariable("MYSQL_PORT_mysql");
+string uid = Environment.GetEnvironmentVariable("MYSQL_ADMIN_USER_mysql");
+string password = Environment.GetEnvironmentVariable("MYSQL_ADMIN_PASSWORD_mysql");
+string connectionString = $"server={host};port={port};uid={uid};pwd={password};database=leancloud";
+MySqlConnection conn = new MySqlConnection(connectionString);
+conn.Open();
+string sql = "SELECT * FROM hello";
+MySqlCommand command = new MySqlCommand(sql, conn);
+MySqlDataReader reader = command.ExecuteReader();
+StringBuilder sb = new StringBuilder();
+while (reader.Read()) {
+    sb.AppendLine($"{reader[0]} -- {reader[1]}");
+}
+Console.WriteLine(sb.ToString());
+```
+
+- See [MySQL Connector .NET](https://dev.mysql.com/doc/connector-net/en/) for more information
+
+</TabItem>
+</EngineRuntimes>
+
+## Managing Data
+
+Besides accessing LeanDB with your code from Cloud Engine, you can also use the following ways to manage, debug, or perform operations on your instances.
+
+### Admin Panel
+
+To make it easy for you to develop and debug, we provide a web interface for you to manage your MySQL instance. You can access the web interface by clicking “Admin panel” on the dashboard.
+
+You can run SQL to query and update your data, create and manage databases, and create and manage indices.
+
+### Connecting With the CLI
+
+<LeandbCliAccess />
