@@ -1,0 +1,125 @@
+---
+title: Cloud Engine REST API
+sidebar_label: REST API
+sidebar_position: 5
+---
+
+import { Conditional } from "/src/docComponents/conditional";
+
+:::info
+This article serves as a thorough introduction to Cloud Engine’s REST API. To learn about Cloud Functions and hooks, see [Cloud Functions and Hooks Guide](/sdk/engine/functions/guides).
+:::
+
+Cloud Engine offers a REST API for users to access Cloud Functions. When you invoke Cloud Functions using our SDKs, the SDKs use the same API for accessing our service.
+
+We recommend that you use [Postman](https://www.postman.com/) for testing the REST API.
+
+## Base URL
+
+The base URL of the REST API is the API domain of your application (represented with `{{host}}`). You can bind and view API domains on the dashboard. See <Conditional brand="tds">[Domain](/sdk/storage/guide/setup-dotnet/#domain)</Conditional><Conditional brand="leancloud">[Binding Your Domains](/sdk/domain/guide/)</Conditional> for more information.
+
+See <Conditional brand="tds">[this article](/sdk/storage/guide/rest/#request-format)</Conditional><Conditional brand="leancloud">[this article](https://docs.leancloud.app/en/sdk/storage/guide/rest/#request-format)</Conditional> for more information about the format of the request.
+
+## Overview
+
+| URL                                 | HTTP | Function                                                               |
+| ----------------------------------- | ---- | ---------------------------------------------------------------------- |
+| /1.1/functions/&lt;functionName&gt; | POST | Invoke a Cloud Function                                                |
+| /1.1/call/&lt;functionName&gt;      | POST | Invoke a Cloud Function with `LCObject`s as the argument or the result |
+
+## Staging Environment vs. Production Environment
+
+When invoking Cloud Functions from the client with the REST API, you can set the HTTP header `X-LC-Prod` to specify the environment.
+
+- `X-LC-Prod: 0` means to use the staging environment
+- `X-LC-Prod: 1` means to use the production environment
+
+When invoking Cloud Functions with the SDK, the SDK will set the HTTP header `X-LC-Prod` according to the current environment. See [Cloud Functions and Hooks Guide § Production Environment vs. Staging Environment](/sdk/engine/functions/guides/#production-environment-vs-staging-environment) for more information.
+
+## Cloud Functions
+
+You can invoke a Cloud Function by accessing `POST /functions/:name`. Both the argument and the result are in JSON.
+For example, to get the score of a movie with the movie’s name:
+
+```sh
+curl -X POST -H "Content-Type: application/json; charset=utf-8" \
+       -H "X-LC-Id: {{appid}}" \
+       -H "X-LC-Key: {{appkey}}" \
+       -d '{"movie":"A Quiet Place"}' \
+https://{{host}}/1.1/functions/averageStars
+```
+
+Response:
+
+```json
+{
+  "result": {
+    "movie": "A Quiet Place",
+    "stars": "2.5"
+  }
+}
+```
+
+If a user needs to be used to invoke the Cloud Function, provide the `sessionToken` of the user through `X-LC-Session`:
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Session: qmdj8pdidnmyzp0c7yqil91oc" \
+  -H "Content-Type: application/json" \
+  -d '{}' \
+  https://{{host}}/1.1/functions/hello
+```
+
+If you need to use `LCObject`s as the argument or the result of a Cloud Function, you can invoke the function with RPC by accessing `POST /1.1/call/:name`:
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '{"__type": "Object", "className": "Post", "pubUser": "LeanCloud Staff"}' \
+  https://{{host}}/1.1/call/addPost
+```
+
+Response:
+
+```json
+{
+  "result": {
+    "__type": "Object",
+    "className": "Post",
+    "pubUser": "Staff"
+  }
+}
+```
+
+When invoking a Cloud Function with RPC, you can provide or receive an object containing multiple `LCObject`s.
+For example, if a Cloud Function returns an array containing a number and a `Todo` object, the result of the RPC invocation would be:
+
+```json
+{
+  "result": [
+    1,
+    {
+      "title": "R&D Weekly Meeting",
+      "createdAt": {
+        "__type": "Date",
+        "iso": "2019-04-28T08:34:12.932Z"
+      },
+      "updatedAt": {
+        "__type": "Date",
+        "iso": "2019-04-28T08:34:12.932Z"
+      },
+      "objectId": "5cc5658443e78cb53fe7b731",
+      "__type": "Object",
+      "className": "Todo"
+    }
+  ]
+}
+```
+
+When invoking a Cloud Function with RPC using the SDK, the SDK will automatically deserialize everything.
+
+If a timeout occurs, the client will get a response with its HTTP status code being 503, 524, or 141.

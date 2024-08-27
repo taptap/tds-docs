@@ -1,0 +1,262 @@
+---
+title: Cloud Engine FAQ
+sidebar_label: FAQ
+sidebar_position: 10
+---
+
+import { Conditional } from "/src/docComponents/conditional";
+import Path from "/src/docComponents/path";
+
+## Cloud Engine Features
+
+### What are the languages supported by Cloud Engine?
+
+The runtime environments supported by Cloud Engine include Node.js, Python, Java, PHP, .NET, and Go. Frontend projects based on Node.js can also be hosted on Cloud Engine. See [Cloud Engine Overview](/sdk/engine/overview/) for more information.
+
+You can let us know if you wish other runtime environments to be supported.
+
+### Can I host static websites on Cloud Engine?
+
+Yes. See [Frontend Runtime Environment](/sdk/engine/deploy/webapp/) for more information.
+
+### Does Cloud Engine support HTTPS?
+
+Yes. When binding a custom domain, you can choose to either upload your own SSL certificate or have Cloud Engine automatically manage certificates for your project.
+
+You can also enable _Force HTTPS_ to have HTTP requests automatically redirected to HTTPS.
+
+### Would my application still be able to provide services while I’m deploying a new version of my project?
+
+Yes. When you deploy a new version of your project, Cloud Engine will first start new instances running the new version. After the new version passes the health check, Cloud Engine will update the router to redirect incoming requests to the new instances and then shut down the old ones. With this mechanism, your application can keep providing services while you deploy a new version.
+
+### What’s the relationship between Cloud Engine and Cloud Functions?
+
+Cloud Engine is a platform for hosting backend services. It can be used to host all kinds of backend programs and it won’t interfere with the internal logic of the programs.
+
+On top of this, you can choose to integrate the Cloud Engine SDK into your program, which gives your program access to functions like Cloud Functions and hooks. Cloud Functions is designed to work perfectly with our <Conditional brand="tds">[Data Storage](/sdk/storage/features)</Conditional><Conditional brand="leancloud">[Data Storage](/sdk/storage/overview/)</Conditional> service. If you’re already using the Data Storage service, you’ll find it easy to get started with Cloud Functions.
+
+You can still use the other features besides Cloud Functions without integrating the Cloud Engine SDK into your program. In addition to the features mentioned above, Cloud Engine also provides hosted [Redis](/sdk/engine/database/redis/), [MongoDB](/sdk/engine/database/mongo/), and [Elasticsearch](/sdk/engine/database/es/) for you to store the data of your application.
+
+## Cloud Functions
+
+### What are some restrictions with Cloud Functions?
+
+Cloud Functions is a **relatively constrained** function that allows you to define server-side logics for your application. It is **highly integrated** into our SDK. Cloud Functions is designed as an **RPC**-like mechanism. When invoking a Cloud Function, you can only pass in arguments and receive a result from the function. You can’t customize timeouts, HTTP methods, or URLs for it, nor can you read and set the header.
+
+To use the semantic functions of HTTP freely or to use the standard RESTful API provided by third-party frameworks, you can choose to have your application handle HTTP requests without using Cloud Functions.
+
+### Can I use Cloud Functions with multiple groups?
+
+Cloud Engine will automatically redirect requests for invoking Cloud Functions to the correct groups. This means that you can use Cloud Functions with multiple groups.
+
+### I’ve finished deploying my project, but Cloud Functions and hooks still don’t work.
+
+In order to support Cloud Functions and hooks, Cloud Engine’s management program will interact with the Cloud Engine SDK through `/1.1/functions/_ops/metadatas`. Please make sure to have the SDK take care of this URL.
+By default, Cloud Engine will try to get the metadata of Cloud Functions and hooks by accessing `/1.1/functions/_ops/metadatas`. If Cloud Engine fails to access this URL, your project’s Cloud Functions and hooks will not work, but the deployment won’t be interrupted.
+To interrupt the deployment if Cloud Engine fails to access the metadata, set `functionsMode` to `strict` in `leanengine.yaml`.
+If your project doesn’t need Cloud Functions or hooks, you can choose:
+
+- Not to specify `functionsMode` in `leanengine.yaml`. At the same time, let `/1.1/functions/_ops/metadatas` **return an HTTP status code of `404`**, which indicates that Cloud Functions and hooks are not used by the project.
+- Or, to set `functionsMode` to `disabled` in `leanengine.yaml`. Keep in mind that if you do this, hooks will not take effect even though you define them in your program. Invocations to Cloud Functions (including the remote ones triggered by the SDK and those triggered through the REST API) may fail for being redirected to the wrong groups.
+
+### The deployment is interrupted, saying that there’s a Cloud Function with the same name.
+
+You can use Cloud Functions with multiple groups.
+However, if the code you’re deploying contains a Cloud Function that shares the same name as one that already exists in a different group, the deployment will be interrupted by default, and you’ll see an error message. This helps you avoid accidentally redefining a Cloud Functions.
+We recommend that you remove the Cloud Functions you don’t need from your project since it would be hard for you to comprehend and maintain duplicate Cloud Functions.
+Though you can choose to specify the `--overwrite-functions` option to have the Cloud Functions in the code you’re deploying override those in the other groups.
+
+### What could be the possible reason for hooks not being triggered as expected?
+
+Please first make sure that you’ve understood when each hook gets triggered:
+
+- `beforeSave`: Before an object gets saved
+- `afterSave`: After an object has been saved
+- `beforeUpdate`: Before an object gets updated
+- `afterUpdate`: After an object has been updated
+- `beforeDelete`: Before an object gets deleted
+- `afterDelete`: After an object has been deleted
+- `onVerified`: After a user has verified their email or phone number
+- `onLogin`: When a user logs in (this doesn’t include `become(sessionToken)`)
+
+If you’re debugging locally, the hooks in the staging environment will be triggered. If your application doesn’t have a staging environment, no hooks will be triggered.
+
+You can check if a hook has been triggered using the following method:
+
+Print a log at the beginning of the function defined for a hook, then trigger the hook. Now you can check the logs on the dashboard to see if the log shows up. If it doesn’t show up, possible reasons include:
+
+- Your code is not deployed to the correct application
+- Your code is not (successfully) deployed to the production environment
+- You entered an incorrect class name for the hook
+
+If the log shows up, you can check if there are error messages on the dashboard. For `before` hooks, please ensure that they return within 15 seconds, or a timeout will be caused.
+
+For `after` hooks, the timeout is 3 seconds. If your trial instance has already hibernated, it might not be able to receive `after` hooks due to its long startup time. We recommend that you upgrade to a standard instance to prevent hibernation.
+
+### Can I have my program in a Cloud Function retrieve data from the \_User table without logging in?
+
+Yes. By skipping permission checks with the `masterKey`, you can have your program in a Cloud Function retrieve data from the \_User table without logging in.
+
+Since Cloud Engine runs within the trusted server-side environment, you can enable `Master Key` globally to skip permission checks enforced by ACL and class permission settings. See [Cloud Engine SDK Guide § Using MasterKey](/sdk/engine/functions/sdk/#using-masterkey) for more information.
+
+## Deployment
+
+### When I deploy my project for a second time, there’s a huge discrepancy between the mirror size of this deployment and that of the previous deployment. Why?
+
+Cloud Engine uses a caching mechanism to accelerate the build process of deployments. The mirror size displayed for a deployment shows the size of the data generated for this deployment. You can deduce if a deployment has made use of the cache according to this size. This size doesn’t necessarily indicate the size of the entire project.
+
+### What should I do if a deployment is stuck in the stage of downloading and installing dependencies?
+
+During this stage, Cloud Engine would be using the package manager of the language of your choice (`npm`, `pip`, `composer`, or `maven`) to install dependencies for your project. We have a caching mechanism that helps accelerate this process, but the cache might not work due to various reasons (like if the dependency list is modified). When this happens, it might take us longer to finish installing the dependencies, so please wait patiently. If you have specified system dependencies with `leanengine.yaml`, these dependencies will also be installed during this stage, so please don’t add unused dependencies to this file.
+
+For Node.js projects, please check if you have specified a slow mirror in `package-lock.json` or `yarn.lock`.
+
+### I’m deploying my project to multiple instances. Do I need to redeploy my project if the deployment fails on some of the instances?
+
+When you have multiple instances under any of the environments (staging environment or production environment), Cloud Engine will deploy your project to all of the instances under this environment. If the deployment fails on some of the instances, Cloud Engine will try to redeploy your project automatically in a few minutes. You don’t have to manually redeploy your project.
+
+### I’m seeing “Deploying” on the dashboard even after the deployment has finished. Why?
+
+When the dashboard says “Deploying”, it could mean that maintenance is going on. This may be triggered by starting hibernated instances or server errors and doesn’t necessarily mean that you’ve triggered a deployment.
+
+### What is a health check?
+
+Cloud Engine checks the statuses of all the instances every few minutes (through HTTP requests; see the _Health Check_ section in the respective runtime environment’s docs for more information).
+If any of the instances cannot provide a valid response, Cloud Engine will trigger a redeployment and print the following log on the console:
+
+> 健康检查失败：web1 检测到 Error connect ECONNREFUSED 10.19.30.220:51797
+
+This could happen once or twice a week and that would be totally fine. If it happens frequently, chances are that your program is not having enough resources for it to respond correctly. There could be other reasons causing this problem as well.
+
+## Restrictions and Pricing
+
+### What are the restrictions imposed by Cloud Engine?
+
+A request cannot be larger than 100 MB (including uploading files to Cloud Engine).
+
+A request has to get a response within 60 seconds.
+
+A WebSocket connection will be stopped if no data is transmitted within the past 60 seconds.
+
+### What’s the maximum number of instances an application can have?
+
+Each application can have at most 12 instances. Please reach out to us if you need more instances for your application.
+
+### How will I be billed?
+
+If your application makes requests to the Data Storage API, those requests will be billed according to the Data Storage service’s pricing.
+
+Standard instances, LeanDB instances, back-to-origin traffic, and CDN traffic will all lead to charges. See the pricing page for more information.
+
+### How will the traffic be billed?
+
+Each instance has a free quota of 1 GB every day. For the price of the exceeding part, see the pricing page<Conditional brand='leancloud'> of the current region</Conditional>.
+
+The traffic of all the instances under an application will be summed up. If the total number of standard instances under all the groups of an application is `n`, the free quota every day will be `max(n, 1)` GB.
+
+**Cloud Engine is not designed to distribute large files**. Please use the file service if you have this type of requirement.
+
+You can see the traffic of your instances on **<Path to="engine" /> > Manage deployment > Your group > Statistics > Traffic**.
+
+### If I’ve changed the quota or number of instances on a day, how will I be billed for this day?
+
+You will be billed for **the maximum number of instances you have had for the day** on the next day. For example, if you have done the following activities during a day:
+
+- Your application has 4 standard-512 instances;
+- You changed the quota to standard-1024;
+- You changed the number of instances to 2.
+
+You will be billed for the price of standard-1024 multiplied by 4 instances.
+
+### Will hooks lead to API calls? Will `afterUpdate` lead to an API call?
+
+`afterUpdate` is executed within Cloud Engine, so `afterUpdate` won’t lead to API calls. If `afterUpdate` leads to API requests, the API requests will be billed.
+
+## Best Practices
+
+### How do I upload files to Cloud Engine?
+
+You can use the interface for uploading files provided by the SDK,
+though we generally recommend that you upload files with client SDKs without having the files go through Cloud Engine. This helps you reduce the unnecessary traffic generated.
+
+## I get the error "failed to upload file to qiniu bcz current file has not data stream" when uploading files in Cloud Engine.
+
+LCFile internally uses a local cache (which requires a local directory) to hold the binary data before uploading it to the file storage service. Inside the Cloud Engine it is not possible to create such a cache directory or file due to insufficient permissions, resulting in errors like `failed to upload file to qiniu bcz current file has not data stream`.
+We do not recommend using file services in the Cloud Engine for several reasons:
+
+1. The permission issue mentioned above will occur. This makes it impossible to create cache directories and temporary files in the Cloud Engine.
+2. All file data goes to the server first, and then the API is called to push it to the file storage provider, which leads to low efficiency and high network cost for the user (you will need to pay for the excessive traffic usage with Cloud Engine).
+
+It is recommended to use the SDK to upload the file, and then give the result (e.g. the object id or url of the file) to the server (the code for Cloud Engine). Uploading on the client side will use the file storage provider's CDN (servers close to the user), which makes the user experience faster and saves the traffic costs of Cloud Engine.
+
+### Should scheduled tasks be executed in the staging environment or the production environment?
+
+The free trial instances provided by the staging environment may hibernate automatically, which could impact the execution of the scheduled tasks. Therefore, we recommend that you test scheduled tasks in the staging environment and run them in the production environment.
+If your scheduled tasks take up a lot of CPU and memory and you don’t want them to interfere with the production environment, consider buying standard instances in the staging environment and running your scheduled tasks in the staging environment.
+
+### How do I tell if I’m using the staging environment or the production environment?
+
+By default, there’s only a production environment provided by Cloud Engine. The domain of it would be web.example.com. There will only be a trial instance in the production environment for you to run your program.
+
+When you upgrade the trial instance in the production environment to a standard instance, you will get a staging environment with its domain being stg-web.example.com. Both two environments have access to the same data in the Data Storage service. You can test your code with the staging environment by deploying your updated code to this environment and only publish your code to the production environment after testing your code. If you want an environment that has access to a different set of data in the Data Storage service, we recommend that you create a separate application.
+
+Keep in mind that the stg-web.example.com domain needs to be bound on the dashboard on your own.
+
+### How can I access the website hosted in the staging environment?
+
+Please bind a domain starting with `stg-` on the dashboard. Domains starting with `stg-` (like stg-web.example.com) will be automatically bound to the staging environment.
+
+### Can I bind a bare domain to Cloud Engine?
+
+<Conditional region='cn'>
+
+Yes. You can add an A record pointing to the dedicated IP address.
+
+</Conditional>
+
+<Conditional region='global'>
+
+To bind bare domains, we recommend that you choose a domain registry that supports ANAME or CNAME flattening.
+
+</Conditional>
+
+## Other Problems
+
+### I’m seeing the _Application not found_ error.
+
+There could be different reasons that lead to this error:
+
+- You’re accessing the incorrect environment. There might not be a staging environment in your application, but you’re trying to access this environment.
+- You’re entering the wrong domain for Cloud Engine.
+- You’re using the trial version and your instances have gone hibernated. You can upgrade to the standard version to prevent your instances from hibernating.
+
+### What can I do if the response time of my instances increases?
+
+There could be different reasons that cause the response time of your instances to increase.
+We recommend that you scrutinize your code and the usage of CPU and memory to spot the bottleneck, then consider if you need to increase the quota or the number of instances.
+It might be helpful to download the access logs so you can see which APIs or Cloud Functions are responding slowly.
+
+### What if I can’t access the files hosted on my project?
+
+Please first check if the capitalizations of the letters in the file names are correct. The file system used by Cloud Engine is case-sensitive, while Windows and macOS are often configured to be case-insensitive.
+
+### Will Cloud Engine retry any requests?
+
+For idempotent requests (GET and PUT), Cloud Engine will retry them when there’s an error or timeout with HTTP. To avoid retries from happening, use the correct verb (like POST) for your requests.
+
+
+
+
+<Conditional brand="tds">
+
+### Where is the `AccessToken` for the cloud engine
+
+Deployed using ** CLI > Generate ** new access token
+Like:
+
+![](https://capacity-files.lcfile.com/x87lNfXuP7FFArbDu6HzCRLHrLgeKHRd/Frame%205.png)
+![](https://capacity-files.lcfile.com/2b28rUUa3OdUvMp2O6QetnmCEbGYWe4X/Frame%203%20%281%29.png)
+
+</Conditional>
+
+

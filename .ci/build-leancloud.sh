@@ -11,9 +11,9 @@ mv leancloud/i18n .
 
 # 替换配置文件
 mv leancloud/conf/env.ts src/constants/env.ts
-cp leancloud/conf/override.scss src/styles/override.scss
-cp leancloud/conf/docusaurus.config.js docusaurus.config.js
-cp leancloud/conf/sidebars.js sidebars.js
+mv leancloud/conf/override.scss src/styles/override.scss
+mv leancloud/conf/docusaurus.config.js docusaurus.config.js
+mv leancloud/conf/sidebars.js sidebars.js
 
 # 构建
 yarn build --out-dir build-leancloud

@@ -1,0 +1,168 @@
+---
+title: Node.js Runtime Environment
+sidebar_label: Node.js
+sidebar_position: 4
+---
+
+import CloudEnvironments from "../_partials/cloud-environments.mdx";
+import CloudTimezone from "../_partials/cloud-timezone.mdx";
+import CloudLogs from "../_partials/cloud-logs.mdx";
+import CloudInternetAddress from "../_partials/cloud-internet-address.mdx";
+import CloudLoadBalancer from "../_partials/cloud-load-balancer.mdx";
+import CloudFilesystem from "../_partials/cloud-filesystem.mdx";
+import BuildingAdvanced from "../_partials/building-advanced.mdx";
+import BuildingBuildLogs from "../_partials/building-build-logs.mdx";
+import NodejsSetupRuntime from "../_partials/nodejs-setup-runtime.mdx";
+import NodejsSetupPackageManager from "../_partials/nodejs-setup-package-manager.mdx";
+import NodejsSetupDependencies from "../_partials/nodejs-setup-dependencies.mdx";
+import CloudCustomDomain from "../_partials/cloud-custom-domain.mdx";
+import CloudHealthCheck from "../_partials/cloud-health-check.mdx";
+
+:::info
+This article serves as a thorough introduction to Cloud Engine’s Node.js runtime environment. To quickly get started with Cloud Engine, see [Getting Started With Cloud Engine](/sdk/engine/deploy/getting-started).
+:::
+
+A Node.js project has to have a [package.json](https://docs.npmjs.com/cli/v8/configuring-npm/package-json) under its root directory for Cloud Engine to correctly identify it as a Node.js project. This file also helps Cloud Engine understand the project’s requirements for the environment:
+
+```json title='package.json'
+{
+  "name": "node-js-getting-started",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js -- "
+  },
+  "dependencies": {
+    "leancloud-storage": "^3.11.0",
+    "leanengine": "^3.3.2"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.7"
+  },
+  "engines": {
+    "node": "16.x"
+  }
+}
+```
+
+If you are looking to start a new project, we recommend that you use our [Node.js sample project](https://github.com/leancloud/node-js-getting-started) as a boilerplate.
+
+## Startup Command
+
+By default, Cloud Engine starts your project with `npm start`. You can change the entry point of your program or add additional options to `node` by editing `scripts.start` in `package.json`.
+
+```json title='package.json'
+{
+  "scripts": {
+    "start": "node server.js"
+  }
+}
+```
+
+:::note
+When debugging locally by running `lean up` with the [CLI](/sdk/engine/cli), the CLI will start your project with `npm run dev`.
+:::
+
+## Configure Node.js Version
+
+<NodejsSetupRuntime />
+
+## Configure Package Manager
+
+<NodejsSetupPackageManager />
+
+## Install Dependencies (`package.json`)
+
+<NodejsSetupDependencies />
+
+## Customize Build Process
+
+<BuildingAdvanced>
+
+#### Install Dependencies for Sub-Projects
+
+```yaml title='leanengine.yaml'
+install:
+  - use: default
+  - require:
+    - ./frontend/package.json
+    - ./frontend/package-lock.json
+  - cd frontend && npm ci
+build:
+  - npm run build
+  - cd frontend && run build
+```
+
+Here we keep the default behavior and install dependencies and run build commands for the `frontend` directory.
+
+</BuildingAdvanced>
+
+### Build Logs
+
+<BuildingBuildLogs />
+
+## Health Check
+
+<CloudHealthCheck />
+
+## Cloud Environment
+
+### Custom Domains
+
+<CloudCustomDomain />
+
+### Load Balancer and CDN
+
+<CloudLoadBalancer only="nodejs" />
+
+### Environment Variables
+
+<CloudEnvironments />
+
+### Logs
+
+<CloudLogs only="nodejs" />
+
+### Timezone
+
+<CloudTimezone />
+
+### File System
+
+<CloudFilesystem />
+
+### IP Addresses
+
+<CloudInternetAddress />
+
+## Troubleshooting
+
+### Why are the dependencies listed under `devDependencies` not installed?
+
+When you deploy your project, Cloud Engine will install dependencies (including those listed under `devDependencies`) for your project with `npm ci`.
+However, if the Node.js version you specified is below 10 or lockfile not exists, Cloud Engine will use `npm install --production` instead. This means that the dependencies listed under `devDependencies` will **not** be installed, see [Default Commands](/sdk/engine/deploy/nodejs#Default+Commands).
+To have these dependencies installed as well, you can specify `installDevDependencies: true` in `leanengine.yaml`.
+
+### What should I do if I see `npm ERR! peer dep missing`?
+
+If you see an error like this when deploying your project:
+
+```
+npm ERR! peer dep missing: graphql@^0.10.0 || ^0.11.0, required by express-graphql@0.6.11
+```
+
+This means that some of the peer dependencies are not successfully installed. The reason is that if the version of Node.js you specified is below 10, Cloud Engine will only install the dependencies listed under `dependencies`. Please make sure the required dependencies of the dependencies listed under `dependencies` are also listed under `dependencies`, not `devDependencies`.
+
+You can reproduce the problem on your local computer by deleting `node_modules` and installing dependencies with `npm install --production`.
+
+You may also consider upgrading Node.js to 10 or higher to solve the problem.
+
+#### Timeout Settings
+
+If a request triggers a function that doesn’t give a response due to an error, the server’s RAM will still be occupied for this request. To prevent the RAM from being occupied in this case and to have the client receive an error without delay, there needs to be a timeout set up on the server so that when a request doesn’t receive a response in a while, the server will return an HTTP error code to the client.
+
+The default timeout for the custom routes defined with Express is 15 seconds. You can edit this value in `app.js`:
+
+```js
+// Set the default timeout
+app.use(timeout("15s"));
+```
