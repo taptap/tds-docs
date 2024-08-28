@@ -404,7 +404,6 @@ import CodeBlock from "@theme/CodeBlock";
 
 - [TapTap 国内版](https://developer.taptap.cn/docs/)
 - [TapTap 海外版](https://developer.taptap.io/docs/)
-- [LeanCloud](https://docs.leancloud.cn/)
 
 这三个服务的文档内容各不相同，每个服务的文档都有一些它独有的页面。不同文档的配置也存在差异，比如 TapTap 国内版文档的默认语言是简体中文，而 TapTap 海外版文档的默认语言则是英文。同一篇文档中不同内容的显示与否也会由配置来决定。此外，LeanCloud 文档需要使用和 TapTap 文档不一样的配色风格。
 
