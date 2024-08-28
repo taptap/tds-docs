@@ -95,11 +95,6 @@ const config = {
                         position: "right",
                     },
                     {
-                        label: "SDK API",
-                        to: "/sdk-api",
-                        position: "right",
-                    },
-                    {
                         label: "下载",
                         position: "right",
                         items: [
