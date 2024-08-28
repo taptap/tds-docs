@@ -6,572 +6,1246 @@ sidebar_position: 2
 
 import MultiLang from "/src/docComponents/MultiLang";
 import { Conditional } from "/src/docComponents/conditional";
-import sdkVersions from "/src/docComponents/sdkVersions";
-import CodeBlock from "@theme/CodeBlock";
-import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
 
-从 TapSDK 3.0 开始，我们提供了一个内建账户系统供游戏使用：开发者可以直接用 TapTap OAuth 授权的结果生成一个游戏内的账号（`TDSUser`），同时我们也支持将更多第三方认证登录的结果绑定到该账号上来。
-TapSDK 提供的游戏内好友、成就等服务和功能，也都基于这一账户系统。
+用户系统几乎是每款应用都要加入的功能，我们为此专门提供了一个 `LCUser` 类来方便应用使用各项用户管理的功能。
 
-## 环境要求
+`LCUser` 是 `LCObject` 的子类，这意味着任何 `LCObject` 提供的方法也适用于 `LCUser`，唯一的区别就是 `LCUser` 提供一些额外的用户管理相关的功能。
 
-<MultiLang kind="ue">
+## 用户的属性
 
-<>
+`LCUser` 相比一个普通的 `LCObject` 多出了以下属性：
 
-- Unity 2019.4 或更高版本
-- iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
-- Android 5.0（API level 21）或更高版本
+- `username`：用户的用户名。
+- `password`：用户的密码。
+- `email`：用户的电子邮箱。
+- `emailVerified`：用户的电子邮箱是否已验证。
+- `mobilePhoneNumber`：用户的手机号。
+- `mobilePhoneVerified`：用户的手机号是否已验证。
 
-</>
+在接下来对用户功能的介绍中我们会逐一了解到这些属性。
 
-<>
+## 注册
 
-Android 5.0（API level 21）或更高版本
+用户第一次打开应用的时候，可以让用户注册一个账户。下面的代码展示了一个典型的使用用户名和密码注册的流程：
 
-</>
-
-<>
-
-iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
-
-</>
-
-<>
-
-- 安装 UE 4.26 及以上版本
-- iOS 12 或更高版本
-- Android 5.0（API level 21）或更高版本
-- macOS 10.14.0 或更高版本
-- Windows 7 或更高版本
-
-**支持平台**：Android / iOS / Windows / macOS
-
-</>
-
-</MultiLang>
-
-## 权限说明
-
-<MultiLang kind="ue">
-
-<>
-
-</>
-
-<>
-
-该模块需要如下权限：
-
-| 权限 | 使用目的 | 权限申请时机 |
-| ---------------------- | ---------------------- | ---------------------- |
-| 网络权限 | 用于访问网络数据 | 用户首次使用该功能时会申请权限 |
-
-该模块将在应用中添加如下权限：
-
-```
-<uses-permission android:name="android.permission.INTERNET"/>
-```
-
-</>
-
-<>
-
-</>
-
-<>
-
-</>
-</MultiLang>
-
-## 集成前准备
-
-1. 参考 [准备工作](/sdk/start/get-ready/) 创建应用、开启内建账户应用服务、绑定 API 域名；
-
-
-## SDK 获取
-
-<MultiLang kind="ue">
-<>
-
-<UnitySDKInstallation 
-npmDeps={[
-    "com.taptap.tds.bootstrap",
-    "com.taptap.tds.login",
-    "com.taptap.tds.common",
-]} 
-githubDeps={[
-    {package: "com.taptap.tds.login", url: `https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}`},
-    {package: "com.taptap.tds.common", url: `https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}`},
-    {package: "com.taptap.tds.bootstrap", url: `https://github.com/TapTap/TapBootstrap-Unity.git#${sdkVersions.taptap.unity}`},
-    {package: "com.leancloud.realtime", url: `https://github.com/leancloud/csharp-sdk-upm.git#realtime-${sdkVersions.leancloud.csharp}`},
-    {package: "com.leancloud.storage", url: `https://github.com/leancloud/csharp-sdk-upm.git#storage-${sdkVersions.leancloud.csharp}`},
-]}
-unitypackageModules={[
-    {name: "TapTap_Bootstrap.unitypackage", desc: "TapSDK 启动器，必选"},
-    {name: "TapTap_Common.unitypackage", desc: "TapSDK 基础库，必选"},
-    {name: "TapTap_Login.unitypackage", desc: "TapTap 登录库，必选"},
-]}/>
-
-#### iOS 配置
-
-在 `Assets/Plugins/iOS/Resource` 目录下创建 `TDS-Info.plist` 文件，复制以下代码并且**替换其中的 `ClientId`**。如果游戏使用了 TapTap [内嵌动态](/sdk/embedded-moments/features/)或[数据分析](/sdk/tapdb/features/)服务，需要配置相关权限并**替换授权文案**：
-
-:::tip
-
-复制使用以下内容时，**请删除空行以及注释**，以免出现 XML 解析时报错，`ApplicationException: expected a key node`。
-
-:::
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>taptap</key>
-    <dict>
-        <key>client_id</key>
-        <string>ClientId</string>
-    </dict>
-    <!--使用内嵌动态服务，需要相册、相机、麦克风权限-->
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>说明为何应用需要此项权限</string>
-    <key>NSCameraUsageDescription</key>
-    <string>说明为何应用需要此项权限</string>
-    <key>NSMicrophoneUsageDescription</key>
-    <string>说明为何应用需要此项权限</string>
-    <!--使用数据分析服务需要 IDFA 权限。如应用程序不想弹框，可以设置 TapDB.AdvertiserIDCollectionEnabled(false)-->
-    <key>NSUserTrackingUsageDescription</key>
-    <string>说明为何应用需要此项权限</string>
-</dict>
-</plist>
-```
-
-</>
-<>
-
-1. [下载 TapSDK Android](/tap-download)，解压后选择需要用到的 SDK 包导入到项目 `project/app/libs` 目录下。
-
-2. 打开项目的 `project/app/build.gradle` 文件，添加 gradle 配置如下：
-
-<CodeBlock className="java"> {`
-dependencies {
-    ...
-    // 导入 libs 目录下所有 aar 的包：
-    implementation fileTree(dir: 'libs', include: ['*.aar'])
-    // 如果需要单独导入 libs 目录下的指定包，请按照如下方式：
-    implementation files('libs/TapBootstrap_${sdkVersions.taptap.android}.aar') // TapTap 启动器
-    implementation files('libs/TapCommon_${sdkVersions.taptap.android}.aar') // TapTap 基础库
-    implementation files('libs/TapLogin_${sdkVersions.taptap.android}.aar') // TapTap 登录
-    implementation 'com.taptap:lc-storage-android:${sdkVersions.leancloud.java}' // 数据存储
-    implementation 'com.taptap:lc-realtime-android:${sdkVersions.leancloud.java}'
-}
-`}</CodeBlock>
-
-3. 旧版 Android 额外配置
-
-   如果 `targetSdkVersion < 29`，还需要添加如下配置：
-
-   - `manifest` 节点添加 `xmlns:tools="http://schemas.android.com/tools"`
-   - `application` 节点添加 `tools:remove="android:requestLegacyExternalStorage"`
-
-</>
-<>
-
-#### 导入 SDK
-
-1. 在 Xcode 选择工程，到 **Build Setting > Other Linker Flags** 添加 `-ObjC` 和 `-Wl -ld_classic`。
-
-2. 下载 [TapSDK iOS](/tap-download)，解压后选择需要导入的资源文件，直接拖拽到项目目录即可。
-
-3. 视需要导入下载的资源文件：
-
-   - 必选：TapTap 启动器、基础库、登录
-
-     ```
-     TapBootstrapSDK.framework
-     TapCommonSDK.framework
-     TapLoginSDK.framework
-     LeanCloudObjc.framework
-     TapCommonResource.bundle
-     TapLoginResource.bundle
-     ```
-
-4. 请仔细核对下面依赖库是否都添加成功：
-
-   ```
-   // 必选
-   WebKit.framework
-   Security.framework
-   SystemConfiguration.framework
-   CoreTelephony.framework
-   SystemConfiguration.framework
-   libc++.tbd
-
-   // TapTap 内嵌动态
-   AVFoundation.framework
-   CoreTelephony.framework
-   MobileCoreServices.framework
-   Photos.framework
-   SystemConfiguration.framework
-   WebKit.framework
-
-   // 数据分析
-   // 如果不需要获取 IDFA 则不要添加 `AppTrackingTransparency` 和 `AdSupport` 两个系统库
-   AppTrackingTransparency.framework
-   AdSupport.framework
-   CoreMotion.framework
-   Security.framework
-   SystemConfiguration.framework
-   libresolv.tbd
-   libsqlite3.0.tbd
-   libz.tbd
-   ```
-
-#### 配置权限
-
-如果游戏使用了 TapTap [内嵌动态](/sdk/embedded-moments/features/)或[数据分析](/sdk/tapdb/features/)服务，那么需要在 `info.plist` 配置相关权限并**替换授权文案**：
-
-```xml
-<!--使用内嵌动态服务，需要相册、相机、麦克风权限-->
-<key>NSPhotoLibraryUsageDescription</key>
-<string>说明为何应用需要此项权限</string>
-<key>NSCameraUsageDescription</key>
-<string>说明为何应用需要此项权限</string>
-<key>NSMicrophoneUsageDescription</key>
-<string>说明为何应用需要此项权限</string>
-<!--使用数据分析服务需要 IDFA 权限。如应用程序不想弹框，可以设置 TapDB.AdvertiserIDCollectionEnabled(false)-->
-<key>NSUserTrackingUsageDescription</key>
-<string>说明为何应用需要此项权限</string>
-```
-
-#### 配置跳转 TapTap 应用
-
-用户无 TapTap 应用时，默认会通过 WebView 登录。
-
-1. 打开 `info.plist`，添加如下配置（请替换 `clientID` 为你在控制台获取的 Client ID）：
-
-   ![](https://capacity-files.lcfile.com/xLmohBqQCMvHMpvxps7pReT9kI8CjSGj/tap_ios_info.png)
-
-   ```xml
-   <key>CFBundleURLTypes</key>
-   <array>
-       <dict>
-           <key>CFBundleTypeRole</key>
-           <string>Editor</string>
-           <key>CFBundleURLName</key>
-           <string>taptap</string>
-           <key>CFBundleURLSchemes</key>
-           <array>
-               <!-- 这里注意下，中括号需要去掉，最终是 Client ID 前拼接上 `tt` 的形式，例如：ttFwFdCxxxxxxxQDQwQN -->
-               <string>tt[clientID]</string>
-           </array>
-       </dict>
-   </array>
-
-   <key>LSApplicationQueriesSchemes</key>
-   <array>
-     <string>tapiosdk</string>
-     <string>tapsdk</string>
-     <string>taptap</string>
-   </array>
-   ```
-
-2. 配置 openUrl：
-
-   a) 如果项目中有 `SceneDelegate.m`，请先删除，然后请添加如下代码到 `AppDelegate.m` 文件：
-
-   ```objectivec
-   - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
-     return [TDSHandleUrl handleOpenURL:url];
-   }
-
-   - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
-     return [TDSHandleUrl handleOpenURL:url];
-   }
-   ```
-
-   b) 删除 `info.plist` 里面的 Application Scene Manifest
-
-   ![](/img/tap_ios_appmanifest.png)
-
-   c) 删除 `AppDelegate.m` 文件中的两个管理 `Scenedelegate` 生命周期代理方法
-
-   ```objectivec
-   #pragma mark - UISceneSession lifecycle
-   - (UISceneConfiguration *)application:(UIApplication *)application configurationForConnectingSceneSession:(UISceneSession *)connectingSceneSession options:(UISceneConnectionOptions *)options {
-
-   return [[UISceneConfiguration alloc] initWithName:@"Default Configuration" sessionRole:connectingSceneSession.role];
-   }
-
-   - (void)application:(UIApplication *)application didDiscardSceneSessions:(NSSet<UISceneSession *> *)sceneSessions {
-   }
-   ```
-
-   d) 在 `AppDelegate.h` 中添加 `UIWindow`
-
-   ```objectivec
-   @property (strong, nonatomic) UIWindow *window;
-   ```
-
-</>
-
-<>
-
-* 下载 [TapSDK UE4](/tap-download)，TapSDK-UE4-xxx.zip 解压后将 `TapBootstrap`、`TapCommon`、`TapLogin` 文件夹 Copy 到项目的 `Plugins` 目录中
-* 重启 Unreal Editor
-* 打开 编辑 > 插件 > 项目 > TapTap，开启 `TapBootstrap` 和 `TapLogin` 模块
-
-#### 添加依赖
-
-在 Project.Build.cs 中添加所需模块:
-
-```cs
-PublicDependencyModuleNames.AddRange(new string[] { "Core",
-	"CoreUObject",
-	"Engine",
-	"Json",
-	"InputCore",
-	"JsonUtilities",
-	"SlateCore",
-	"TapCommon",
-	"TapBootstrap",
-	"TapLogin"
-});
-if (Target.Platform == UnrealTargetPlatform.IOS || Target.Platform == UnrealTargetPlatform.Android)
-{
-    PublicDependencyModuleNames.AddRange(
-        new string[]
-        {
-            // 推送接入
-            // "LeanCloudPush",
-            
-            "LeanCloudMobile"
-        }
-    );
-}
-else
-{
-    PublicDependencyModuleNames.AddRange(
-        new string[]
-        {
-            "LeanCloud"
-        }
-    );
-}
-```
-
-#### 导入头文件
-
-```cpp
-#include "TapBootstrap.h"
-```
-
-<details>
-
-<summary>点击展开 iOS 配置</summary>
-
-在 项目设置 > Platform > iOS > Additional Plist data 中可以填入一个字符串，复制以下代码并且替换其中的 `ClientID` 以及授权文案。
-
-```xml
-<key>CFBundleURLTypes</key>
-    <array>
-        <dict>
-            <key>CFBundleTypeRole</key>
-            <string>Editor</string>
-            <key>CFBundleURLName</key>
-            <string>taptap</string>
-            <key>CFBundleURLSchemes</key>
-            <array>
-                <!-- 这里注意下，花括号需要去掉，最终是 ClientID 前拼接上 `tt` 的形式，例如：ttFwFdCxxxxxxxQDQwQN -->
-                <string>tt{ClientID}</string>
-            </array>
-        </dict>
-    </array>
-<key>LSApplicationQueriesSchemes</key>
-<array>
-    <string>tapiosdk</string>
-    <string>tapsdk</string>
-    <string>taptap</string>
-</array>
-```
-
-如果接入 TapDB 模块，那么还需要加上：
-
-```xml
-<key>NSUserTrackingUsageDescription<key>
-<string>{数据追踪权限申请文案}</string>
-```
-
-</details>
-
-</>
-
-</MultiLang>
-
-## SDK 初始化
-
-初始化 TapSDK 时需传入 `Client ID`、区域等应用配置信息。
-
-<MultiLang kind="ue">
+<MultiLang>
 
 <>
 
 ```cs
-using TapTap.Bootstrap; // 命名空间
-using TapTap.Common; // 命名空间
+// 创建实例
+LCUser user = new LCUser();
 
-var config =  new TapConfig.Builder()
-    .ClientID("your_client_id") // 必须，开发者中心对应 Client ID
-    .ClientToken("your_client_token") // 必须，开发者中心对应 Client Token
-    .ServerURL("https://your_server_url") // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
-    .RegionType(RegionType.CN) // 非必须，CN 表示中国大陆，IO 表示其他国家或地区
-    .ConfigBuilder();
-TapBootstrap.Init(config);
+// 等同于 user["username"] = "Tom";
+user.Username = "Tom";
+user.Password = "cat!@#123";
+
+// 可选
+user.Email = "tom@xd.com";
+user.Mobile = "+8619201680101";
+
+// 设置其他属性的方法跟 LCObject 一样
+user["gender"] = "secret";
+await user.SignUp();
 ```
 
-</>
-<>
+新建 `LCUser` 的操作应使用 `SignUp` 而不是 `Save`，但以后的更新操作就可以用 `Save` 了。
 
-**请确保 TapSDK 的初始化在主线程（UI 线程）中执行。**
+</>
+
+<>
 
 ```java
-TapConfig tdsConfig = new TapConfig.Builder()
-        .withAppContext(MainActivity.this) // Context 上下文
-        .withClientId("your_client_id") // 必须，开发者中心对应 Client ID
-        .withClientToken("your_client_token") // 必须，开发者中心对应 Client Token
-        .withServerUrl("https://your_server_url") // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
-        .withRegionType(TapRegionType.CN) // TapRegionType.CN：中国大陆，TapRegionType.IO：其他国家或地区
-        .build();
-TapBootstrap.init(MainActivity.this, tdsConfig);
-```
+// 创建实例
+LCUser user = new LCUser();
 
-</>
-<>
+// 等同于 user.put("username", "Tom")
+user.setUsername("Tom");
+user.setPassword("cat!@#123");
 
-```objectivec
-// 开发者必须至少依赖 `TapBootstrap`、`TapLogin`、`TapCommon` 以及 `LeanCloudObjc` 模块，并按照如下方式完成初始化：
-TapConfig *config = [TapConfig new];
-config.clientId = @"your_client_id"; // 必须，开发者中心对应 Client ID
-config.clientToken = @"your_client_token"; // 必须，开发者中心对应 Client Token
-config.serverURL = @"https://your_server_url"; // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
-config.region = TapSDKRegionTypeCN; // TapSDKRegionTypeCN：中国大陆，TapSDKRegionTypeIO：其他国家或地区
-[TapBootstrap initWithConfig:config];
-```
+// 可选
+user.setEmail("tom@xd.com");
+user.setMobilePhoneNumber("+8619201680101");
 
-</>
+// 设置其他属性的方法跟 LCObject 一样
+user.put("gender", "secret");
 
-<>
-
-`TapBootstrap` 初始化方法会把直接初始化 TapLogin 模块，如果插件中包含 TapDB 并且 `DBConfig.Enable = true`，那么也会完成 [`TapDB` 初始化](/sdk/tapdb/sdk/client-side-integration/#tapsdk-init)。
-
-这两个模块无需再次初始化。
-
-```cpp
-FTUConfig Config;
-Config.ClientID = "your_client_id"; // 必须，开发者中心对应 Client ID
-Config.ClientToken = "your_client_token"; // 必须，开发者中心对应 Client Token
-Config.ServerURL = "https://your_server_url"; // 必须，开发者中心 > 你的游戏 > 游戏服务 > 基本信息 > 域名配置 > API
-Config.RegionType = ERegionType::CN; // ERegionType::CN：中国大陆，ERegionType::Global：其他国家或地区
-FTapBootstrap::Init(Config);
-```
-
-</>
-
-</MultiLang>
-
-初始化的时候，**必须填入** `client_id`、`client_token` 和 `server_url`，其中：
-
-- `client_id`、`client_token` 信息可在 **开发者中心 > 你的游戏 > 游戏服务 > 应用配置** 查看。
-
-- `server_url` 请**使用 HTTPS 协议**，参考文档关于 **[域名](/sdk/start/get-ready/#域名)** 的说明。
-
-
-## `TDSUser` 和 `LCUser`
-
-`TDSUser` 类继承自 `LCUser` 类。
-`LCUser` 是 LeanCloud 提供的账户系统，`TDSUser` 基本沿用了其功能和接口，并针对 TDS 的需求进行了细微调整，所以我们推荐大家使用 `TDSUser` 类来构建玩家账户系统。
-
-## TapTap 登录
-
-直接调用一键登录方法即可，详见[接入 TapTap 登录](/sdk/taptap-login/guide/start/#一键完成-taptap-登录)。
-
-## 游客登录
-
-内建账户系统支持玩家在游戏中创建一个游客账号，其调用示例如下：
-
-<MultiLang kind="ue">
-
-```cs
-try{
-    // 通过 tdsUSer 给出用户唯一标识，如果有的话
-    var tdsUser = await TDSUser.LoginAnonymously();
-}catch(Exception e){
-    // 登录失败
-    Debug.Log($"{e.code} : {e.message}");
-}
-```
-
-```java
-TDSUser.logInAnonymously().subscribe(new Observer<TDSUser>() {
-  @Override
-  public void onSubscribe(Disposable disposable) {
-
-  }
-
-  @Override
-  public void onNext(TDSUser resultUser) {
-    // 登录成功，得到一个账户实例
-    String userId = resultUser.getObjectId();
-  }
-
-  @Override
-  public void onError(Throwable throwable) {
-
-  }
-
-  @Override
-  public void onComplete() {
-  }
+user.signUpInBackground().subscribe(new Observer<LCUser>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCUser user) {
+        // 注册成功
+        System.out.println("注册成功。objectId：" + user.getObjectId());
+    }
+    public void onError(Throwable throwable) {
+        // 注册失败（通常是因为用户名已被使用）
+    }
+    public void onComplete() {}
 });
 ```
 
-```objectivec
-[TDSUser loginAnonymously:^(TDSUser * _Nullable user, NSError * _Nullable error) {
-    if (user) {
-        NSString *userId = user.objectId;
+新建 `LCUser` 的操作应使用 `signUpInBackground` 而不是 `saveInBackground`，但以后的更新操作就可以用 `saveInBackground` 了。
+
+</>
+
+<>
+
+```objc
+// 创建实例
+LCUser *user = [LCUser user];
+
+// 等同于 [user setObject:@"Tom" forKey:@"username"]
+user.username = @"Tom";
+user.password = @"cat!@#123";
+
+// 可选
+user.email = @"tom@xd.com";
+user.mobilePhoneNumber = @"+8619201680101";
+
+// 设置其他属性的方法跟 LCObject 一样
+[user setObject:@"secret" forKey:@"gender"];
+
+[user signUpInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        // 注册成功
+        NSLog(@"注册成功。objectId：%@", user.objectId);
     } else {
-        NSLog(@"%@", error);
+        // 注册失败（通常是因为用户名已被使用）
     }
 }];
 ```
 
-```cpp
-FTDSUser::LoginAnonymously(FTDSUser::FCallBackDelegate::CreateLambda([](const TSharedPtr<FTDSUser>& UserPtr, const FTUError& Error) {
-    if (UserPtr.IsValid()) {
-        FString UserID = UserPtr->GetObjectId();
-    } else {
-        // 登录失败 Error.msg;
+新建 `LCUser` 的操作应使用 `signUpInBackground` 而不是 `saveInBackground`，但以后的更新操作就可以用 `saveInBackground` 了。
+
+</>
+
+<>
+
+```swift
+do {
+    // 创建实例
+    let user = LCUser()
+
+    // 等同于 user.set("username", value: "Tom")
+    user.username = LCString("Tom")
+    user.password = LCString("cat!@#123")
+
+    // 可选
+    user.email = LCString("tom@xd.com")
+    user.mobilePhoneNumber = LCString("+8619201680101")
+
+    // 设置其他属性的方法跟 LCObject 一样
+    try user.set("gender", value: "secret")
+
+    _ = user.signUp { (result) in
+        switch result {
+        case .success:
+            break
+        case .failure(error: let error):
+            print(error)
+        }
     }
-}));
+} catch {
+    print(error)
+}
+```
+
+新建 `LCUser` 的操作应使用 `signUp` 而不是 `save`，但以后的更新操作就可以用 `save` 了。
+
+</>
+
+<>
+
+```dart
+// 创建实例
+LCUser user = LCUser();
+
+// 等同于 user['username'] = 'Tom';
+user.username = 'Tom';
+user.password = 'cat!@#123';
+
+// 可选
+user.email = 'tom@xd.com';
+user.mobile = '+8619201680101';
+
+// 设置其他属性的方法跟 LCObject 一样
+user['gender'] = 'secret';
+await user.signUp();
+```
+
+新建 `LCUser` 的操作应使用 `signUp` 而不是 `save`，但以后的更新操作就可以用 `save` 了。
+
+</>
+
+<>
+
+```js
+// 创建实例
+const user = new AV.User();
+
+// 等同于 user.set('username', 'Tom')
+user.setUsername("Tom");
+user.setPassword("cat!@#123");
+
+// 可选
+user.setEmail("tom@xd.com");
+user.setMobilePhoneNumber("+8619201680101");
+
+// 设置其他属性的方法跟 AV.Object 一样
+user.set("gender", "secret");
+
+user.signUp().then(
+  (user) => {
+    // 注册成功
+    console.log(`注册成功。objectId：${user.id}`);
+  },
+  (error) => {
+    // 注册失败（通常是因为用户名已被使用）
+  }
+);
+```
+
+新建 `AV.User` 的操作应使用 `signUp` 而不是 `save`，但以后的更新操作就可以用 `save` 了。
+
+</>
+
+<>
+
+```python
+# 创建实例
+user = leancloud.User()
+
+# 等同于 user.set('username', 'Tom')
+user.set_username('Tom')
+user.set_password('cat!@#123')
+
+# 可选
+user.set_email('tom@xd.com')
+user.set_mobile_phone_number('+8619201680101')
+
+# 设置其他属性的方法跟 leancloud.Object 一样
+user.set('gender', 'secret')
+
+user.sign_up()
+```
+
+新建 `leancloud.User` 的操作应使用 `sign_up` 而不是 `save`，但以后的更新操作就可以用 `save` 了。
+
+</>
+
+<>
+
+```php
+// 创建实例
+$user = new User();
+
+// 等同于 $user->set("username", "Tom")
+$user->setUsername("Tom");
+$user->setPassword("cat!@#123");
+
+// 可选
+$user->setEmail("tom@xd.com");
+$user->setMobilePhoneNumber("+8619201680101");
+
+// 设置其他属性的方法跟 LeanObject 一样
+$user->set("gender", "secret");
+
+$user->signUp();
+```
+
+新建 `User` 的操作应使用 `signUp` 而不是 `save`，但以后的更新操作就可以用 `save` 了。
+
+</>
+
+```go
+// 注册用户
+user, err := client.Users.SignUp("Tom", "cat!@#123")
+if err != nil {
+  panic(err)
+}
+
+// 设置其他属性
+if err := client.Users.ID(user.ID).Set("email", "tom@xd.com", leancloud.UseUser(user)); err != nil {
+  panic(err)
+}
 ```
 
 </MultiLang>
 
-:::info
+如果收到 `202` 错误码，意味着已经存在使用同一 `username` 的账号，此时应提示用户换一个用户名。除此之外，每个用户的 `email` 和 `mobilePhoneNumber` 也需要保持唯一性，否则会收到 `203` 或 `214` 错误。可以考虑在注册时把用户的 `username` 设为与 `email` 相同，这样用户可以直接 [用邮箱重置密码](#重置密码)。
 
-这里的「游客账户」可以保证玩家在同一个设备上多次登录都得到同一个账户，但是如果玩家卸载游戏重装之后再以「游客」身份登录则无法保证账户的唯一性。
+采用「用户名 + 密码」注册时需要注意：密码是以明文方式通过 HTTPS 加密传输给云端，云端会以密文存储密码（云端对密码的长度、复杂度不作限制），并且我们的加密算法是无法通过所谓「彩虹表撞库」获取的，这一点请开发者放心。换言之，用户的密码只可能用户本人知道，开发者不论是通过控制台还是 API 都是无法获取。另外我们需要强调 **在客户端，应用切勿再次对密码加密，这会导致 [重置密码](#重置密码) 等功能失效**。
 
-:::
+### 手机号注册
+
+对于移动应用来说，允许用户以手机号注册是个很常见的需求。实现该功能大致分两步，第一步是让用户提供手机号，点击「获取验证码」按钮后，该号码会收到一个六位数的验证码：
+
+<MultiLang>
+
+```cs
+await LCSMSClient.RequestSMSCode("+8619201680101");
+```
+
+```java
+LCSMSOption option = new LCSMSOption();
+option.setSignatureName("sign_name"); // 设置短信签名名称
+LCSMS.requestSMSCodeInBackground("+8619201680101", option).subscribe(new Observer<LCNull>() {
+    @Override
+    public void onSubscribe(Disposable disposable) {
+    }
+    @Override
+    public void onNext(LCNull avNull) {
+        Log.d("TAG","Result: succeed to request SMSCode.");
+    }
+    @Override
+    public void onError(Throwable throwable) {
+        Log.d("TAG","Result: failed to request SMSCode. cause:" + throwable.getMessage()）;
+    }
+    @Override
+    public void onComplete() {
+    }
+});
+```
+
+```objc
+LCShortMessageRequestOptions *options = [[LCShortMessageRequestOptions alloc] init];
+options.templateName = @"template_name"; // 控制台配置好的模板名称
+options.signatureName = @"sign_name"; // 控制台配置好的短信签名名称
+[LCSMS requestShortMessageForPhoneNumber:@"+8619201680101" options:options callback:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+        /* 请求成功 */
+    } else {
+        /* 请求失败 */
+    }
+}];
+```
+
+```swift
+// templateName 是短信模版名称，signatureName 是短信签名名称。可以在控制台 > 短信 > 设置中查看。
+_ = LCSMSClient.requestShortMessage(mobilePhoneNumber: "+8619201680101", templateName: "template_name", signatureName: "sign_name") { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+```dart
+await LCSMSClient.requestSMSCode('+8619201680101');
+```
+
+```js
+AV.Cloud.requestSmsCode("+8619201680101");
+```
+
+```python
+leancloud.cloud.request_sms_code('+8619201680101')
+```
+
+```php
+SMS::requestSmsCode("+8619201680101");
+```
+
+```go
+// 暂不支持
+```
+
+</MultiLang>
+
+用户填入验证码后，用下面的方法完成注册：
+
+<MultiLang>
+
+```cs
+await LCUser.SignUpOrLoginByMobilePhone("+8619201680101", "123456");
+```
+
+```java
+LCUser.signUpOrLoginByMobilePhoneInBackground("+8619201680101", "123456").subscribe(new Observer<LCUser>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCUser user) {
+        // 注册成功
+        System.out.println("注册成功。objectId：" + user.getObjectId());
+    }
+    public void onError(Throwable throwable) {
+        // 验证码不正确
+    }
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser signUpOrLoginWithMobilePhoneNumberInBackground:@"+8619201680101" smsCode:@"123456" block:^(LCUser *user, NSError *error) {
+    if (user != nil) {
+        // 注册成功
+        NSLog(@"注册成功。objectId：%@", user.objectId);
+    } else {
+        // 验证码不正确
+    }
+}];
+```
+
+```swift
+_ = LCUser.signUpOrLogIn(mobilePhoneNumber: "+8619201680101", verificationCode: "123456", completion: { (result) in
+    switch result {
+    case .success(object: let user):
+        print(user)
+    case .failure(error: let error):
+        print(error)
+    }
+})
+```
+
+```dart
+ await LCUser.signUpOrLoginByMobilePhone('+8619201680101', '123456');
+```
+
+```js
+AV.User.signUpOrlogInWithMobilePhone("+8619201680101", "123456").then(
+  (user) => {
+    // 注册成功
+    console.log(`注册成功。objectId：${user.id}`);
+  },
+  (error) => {
+    // 验证码不正确
+  }
+);
+```
+
+```python
+user = leancloud.User.signup_or_login_with_mobile_phone('+8619201680101', '123456')
+```
+
+```php
+User::signUpOrLoginByMobilePhone("+8619201680101", "123456");
+```
+
+```go
+user, err := client.Users.SignUpByMobilePhone("+8619201680101", "123456")
+if err != nil {
+  panic(err)
+}
+```
+
+</MultiLang>
+
+`username` 将与 `mobilePhoneNumber` 相同，`password` 会由云端随机生成。如果希望让用户指定密码，可以在客户端让用户填写手机号和密码，然后按照上一小节使用用户名和密码注册的流程，将用户填写的手机号作为 `username` 和 `mobilePhoneNumber` 的值同时提交。同时根据业务需求，在**云服务控制台 > 内建账户 > 设置**勾选**未验证手机号码的用户，禁止登录**、**已验证手机号码的用户，允许以短信验证码登录**。
+
+### 手机号格式
+
+云端接受的手机号以 `+` 和国家代码开头，后面紧跟着剩余的部分。手机号中不应含有任何划线、空格等非数字字符。例如，`+15559463664` 是一个合法的美国或加拿大手机号（`1` 是国家代码），`+8619201680101` 是一个合法的中国手机号（`86` 是国家代码）。
+
+请参阅官网的[价格](https://www.leancloud.cn/pricing/)页面以了解支持的国家和地区。
+
+## 登录
+
+下面的代码用用户名和密码登录一个账户：
+
+<MultiLang>
+
+```cs
+try {
+  // 登录成功
+  LCUser user = await LCUser.Login("Tom", "cat!@#123");
+} catch (LCException e) {
+  // 登录失败（可能是密码错误）
+  print($"{e.code} : {e.message}");
+}
+```
+
+```java
+LCUser.logIn("Tom", "cat!@#123").subscribe(new Observer<LCUser>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCUser user) {
+        // 登录成功
+    }
+    public void onError(Throwable throwable) {
+        // 登录失败（可能是密码错误）
+    }
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser logInWithUsernameInBackground:@"Tom" password:@"cat!@#123" block:^(LCUser *user, NSError *error) {
+    if (user != nil) {
+        // 登录成功
+    } else {
+        // 登录失败（可能是密码错误）
+    }
+}];
+```
+
+```swift
+_ = LCUser.logIn(username: "Tom", password: "cat!@#123") { result in
+    switch result {
+    case .success(object: let user):
+        print(user)
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+```dart
+try {
+  // 登录成功
+  LCUser user = await LCUser.login('Tom', 'cat!@#123');
+} on LCException catch (e) {
+  // 登录失败（可能是密码错误）
+  print('${e.code} : ${e.message}');
+}
+```
+
+```js
+AV.User.logIn("Tom", "cat!@#123").then(
+  (user) => {
+    // 登录成功
+  },
+  (error) => {
+    // 登录失败（可能是密码错误）
+  }
+);
+```
+
+```python
+user = leancloud.User()
+user.login(username='Tom', password='cat!@#123')
+```
+
+```php
+User::logIn("Tom", "cat!@#123");
+```
+
+```go
+user, err := client.Users.LogIn("Tom", "cat!@#123")
+if err != nil {
+  panic(err)
+}
+```
+
+</MultiLang>
+
+### 邮箱登录
+
+下面的代码用邮箱和密码登录一个账户：
+
+<MultiLang>
+
+```cs
+try {
+  // 登录成功
+  LCUser user = await LCUser.LoginByEmail("tom@xd.com", "cat!@#123");
+} catch (LCException e) {
+  // 登录失败（可能是密码错误）
+  print($"{e.code} : {e.message}");
+}
+```
+
+```java
+LCUser.loginByEmail("tom@xd.com", "cat!@#123").subscribe(new Observer<LCUser>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCUser user) {
+        // 登录成功
+    }
+    public void onError(Throwable throwable) {
+        // 登录失败（可能是密码错误）
+    }
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser loginWithEmail:@"tom@xd.com" password:@"cat!@#123" block:^(LCUser *user, NSError *error) {
+    if (user != nil) {
+        // 登录成功
+    } else {
+        // 登录失败（可能是密码错误）
+    }
+}];
+```
+
+```swift
+_ = LCUser.logIn(email: "tom@xd.com", password: "cat!@#123") { result in
+    switch result {
+    case .success(object: let user):
+        print(user)
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+```dart
+try {
+  // 登录成功
+  LCUser user = await LCUser.loginByEmail('tom@xd.com', 'cat!@#123');
+} on LCException catch (e) {
+  // 登录失败（可能是密码错误）
+  print('${e.code} : ${e.message}');
+}
+```
+
+```js
+AV.User.loginWithEmail("tom@xd.com", "cat!@#123").then(
+  (user) => {
+    // 登录成功
+  },
+  (error) => {
+    // 登录失败（可能是密码错误）
+  }
+);
+```
+
+```python
+user = leancloud.User()
+user.login(email='tom@xd.com', password='cat!@#123')
+```
+
+```php
+User::logInWithEmail("tom@xd.com", "cat!@#123");
+```
+
+```go
+user, err := client.LoginByEmail("tom@xd.com", "cat!@#123")
+if err != nil {
+  panic(err)
+}
+
+fmt.Println(user)
+```
+
+</MultiLang>
+
+### 手机号登录
+
+如果应用允许用户以手机号注册，那么也可以让用户以手机号配合密码或短信验证码登录。下面的代码用手机号和密码登录一个账户：
+
+<MultiLang>
+
+```cs
+try {
+  // 登录成功
+  LCUser user = await LCUser.LoginByMobilePhoneNumber("+8619201680101", "cat!@#123");
+} catch (LCException e) {
+  // 登录失败（可能是密码错误）
+  print($"{e.code} : {e.message}");
+}
+```
+
+```java
+LCUser.loginByMobilePhoneNumber("+8619201680101", "cat!@#123").subscribe(new Observer<LCUser>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCUser user) {
+        // 登录成功
+    }
+    public void onError(Throwable throwable) {
+        // 登录失败（可能是密码错误）
+    }
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser logInWithMobilePhoneNumberInBackground:@"+8619201680101" password:@"cat!@#123" block:^(LCUser *user, NSError *error) {
+    if (user != nil) {
+        // 登录成功
+    } else {
+        // 登录失败（可能是密码错误）
+    }
+}];
+```
+
+```swift
+_ = LCUser.logIn(mobilePhoneNumber: "+8619201680101", password: "cat!@#123") { result in
+    switch result {
+    case .success(object: let user):
+        print(user)
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+```dart
+try {
+  // 登录成功
+  LCUser user = await LCUser.loginByMobilePhoneNumber('+8619201680101', 'cat!@#123');
+} on LCException catch (e) {
+  // 登录失败（可能是密码错误）
+  print('${e.code} : ${e.message}');
+}
+```
+
+```js
+AV.User.logInWithMobilePhone("+8619201680101", "cat!@#123").then(
+  (user) => {
+    // 登录成功
+  },
+  (error) => {
+    // 登录失败（可能是密码错误）
+  }
+);
+```
+
+```python
+user = leancloud.User.login_with_mobile_phone('+8619201680101', 'cat!@#123')
+```
+
+```php
+User::logInWithMobilePhoneNumber("+8619201680101", "cat!@#123");
+```
+
+```go
+user, err := client.LogInByMobilePhoneNumber("+8619201680101", "cat!@#123")
+if err != nil {
+  panic(err)
+}
+
+fmt.Println(user)
+```
+
+</MultiLang>
+
+默认情况下，云服务允许所有关联了手机号的用户直接以手机号登录，无论手机号是否 [通过验证](#验证手机号)。为了让应用更加安全，你可以选择只允许验证过手机号的用户通过手机号登录。可以在 **控制台 > 内建账户 > 设置** 里面开启该功能。
+
+除此之外，还可以让用户通过短信验证码登录，适用于用户忘记密码且不愿重置密码的情况。和 [通过手机号注册](#手机号注册) 的步骤类似，首先让用户填写与账户关联的手机号码，然后在用户点击「获取验证码」后调用下面的方法：
+
+<MultiLang>
+
+```cs
+await LCUser.RequestLoginSMSCode("+8619201680101");
+```
+
+```java
+LCUser.requestLoginSmsCodeInBackground("+8619201680101").subscribe(new Observer<LCNull>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCNull null) {
+        // 成功调用
+    }
+    public void onError(Throwable throwable) {
+        // 调用出错
+    }
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser requestLoginSmsCode:@"+8619201680101"];
+```
+
+```swift
+_ = LCUser.requestLoginVerificationCode(mobilePhoneNumber: "+8619201680101") { result in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+```dart
+await LCUser.requestLoginSMSCode('+8619201680101');
+```
+
+```js
+AV.User.requestLoginSmsCode("+8619201680101");
+```
+
+```python
+leancloud.User.request_login_sms_code('+8619201680101')
+```
+
+```php
+SMS::requestSmsCode("+8619201680101");
+```
+
+```go
+if err := client.Users.RequestLoginSMSCode("+8619201680101"); err != nil {
+    panic(err)
+}
+```
+
+</MultiLang>
+
+用户填写收到的验证码后，用下面的方法完成登录：
+
+<MultiLang>
+
+```cs
+try {
+  // 登录成功
+  await LCUser.SignUpOrLoginByMobilePhone("+8619201680101", "123456");
+} catch (LCException e) {
+  // 验证码不正确
+  print($"{e.code} : {e.message}");
+}
+```
+
+```java
+LCUser.signUpOrLoginByMobilePhoneInBackground("+8619201680101", "123456").subscribe(new Observer<LCUser>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCUser user) {
+        // 登录成功
+    }
+    public void onError(Throwable throwable) {
+        // 验证码不正确
+    }
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser logInWithMobilePhoneNumberInBackground:@"+8619201680101" smsCode:@"123456" block:^(LCUser *user, NSError *error) {
+    if (user != nil) {
+        // 登录成功
+    } else {
+        // 验证码不正确
+    }
+}];
+```
+
+```swift
+_ = LCUser.logIn(mobilePhoneNumber: "+8619201680101", verificationCode: "123456") { result in
+    switch result {
+    case .success(object: let user):
+        print(user)
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+```dart
+try {
+  // 登录成功
+  await LCUser.signUpOrLoginByMobilePhone('+8619201680101', '123456');
+} on LCException catch (e) {
+  // 验证码不正确
+  print('${e.code} : ${e.message}');
+}
+```
+
+```js
+AV.User.logInWithMobilePhoneSmsCode("+8619201680101", "123456").then(
+  (user) => {
+    // 登录成功
+  },
+  (error) => {
+    // 验证码不正确
+  }
+);
+```
+
+```python
+user = leancloud.User.signup_or_login_with_mobile_phone('+8619201680101', '123456')
+```
+
+```php
+User::signUpOrLoginByMobilePhone("+8619201680101", "123456");
+```
+
+```go
+user, err := client.Users.LogInByMobilePhoneNumber("+8619201680101", "123456")
+if err != nil {
+    panic(err)
+}
+```
+
+</MultiLang>
+
+### 测试手机号和固定验证码
+
+在开发过程中，可能会因测试目的而需要频繁地用手机号注册登录，然而运营商的发送频率限制往往会导致测试过程耗费较多的时间。
+
+为了解决这个问题，可以在 **控制台 > 短信 > 设置** 里面设置一个测试手机号，而云端会为该号码生成一个固定验证码。以后进行登录操作时，只要使用的是这个号码，云端就会直接放行，无需经过运营商网络。
+
+测试手机号还可用于将 iOS 应用提交到 App Store 进行审核的场景，因为审核人员可能因没有有效的手机号码而无法登录应用来进行评估审核。如果不提供一个测试手机号，应用有可能被拒绝。
+
+可参阅 [短信 SMS 服务使用指南](/sdk/sms/guide/) 来了解更多有关短信发送和接收的限制。
+
+### 单设备登录
+
+某些场景下需要确保用户的账户在同一时间只在一台设备上登录，也就是说当用户在一台设备上登录后，其他设备上的会话全部失效。可以按照以下方案来实现：
+
+1. 新建一个专门用于记录用户登录信息和当前设备信息的 class。
+2. 每当用户在新设备上登录时，将该 class 中该用户对应的设备更新为该设备。
+3. 在另一台设备上打开客户端时，检查该设备是否与云端保存的一致。若不一致，则将用户 [登出](#当前用户)。
+
+### 账户锁定
+
+输入错误的密码或验证码会导致用户登录失败。如果在 15 分钟内，同一个用户登录失败的次数大于 6 次，该用户账户即被云端暂时锁定，此时云端会返回错误码 `{ "code": 1, "error": "You have exceeded the maximum number of login attempts, please try again later, or consider resetting your password." }`，开发者可在客户端进行必要提示。
+
+锁定将在最后一次错误登录的 15 分钟之后由云端自动解除，开发者无法通过 SDK 或 REST API 进行干预。在锁定期间，即使用户输入了正确的验证信息也不允许登录。这个限制在 SDK 和云引擎中都有效。
+
+## 验证邮箱
+
+可以通过要求用户在登录或使用特定功能之前验证邮箱的方式防止恶意注册。默认情况下，当用户注册或变更邮箱后，`emailVerified` 会被设为 `false`。在应用的 **云服务控制台 > 内建账户 > 设置** 中，可以开启 **启用邮箱验证功能** 选项，这样当用户注册或变更邮箱时，会收到一封含有验证链接的邮件。在同一设置页面还可找到阻止未验证邮箱的用户登录的选项。
+
+如果用户忘记点击链接并且在未来某一时刻需要进行验证，可以用下面的代码发送一封新的邮件：
+
+<MultiLang>
+
+```cs
+await LCUser.RequestEmailVerify("tom@xd.com");
+```
+
+```java
+LCUser.requestEmailVerifyInBackground("tom@xd.com").subscribe(new Observer<LCNull>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCNull null) {
+        // 成功调用
+    }
+    public void onError(Throwable throwable) {
+        // 调用出错
+    }
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser requestEmailVerify:@"tom@xd.com"];
+```
+
+```swift
+_ = LCUser.requestVerificationMail(email: "tom@xd.com") { result in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+```dart
+await LCUser.requestEmailVerify('tom@xd.com');
+```
+
+```js
+AV.User.requestEmailVerify("tom@xd.com");
+```
+
+```python
+leancloud.User.request_email_verify('tom@xd.com')
+```
+
+```php
+User::requestEmailVerify("tom@xd.com");
+```
+
+```go
+if err := client.Users.RequestEmailVerify("tom@xd.com"); err != nil {
+    panic(err)
+}
+```
+
+</MultiLang>
+
+用户点击邮件内的链接后，`emailVerified` 会变为 `true`。如果用户的 `email` 属性为空，则该属性永远不会为 `true`。
+
+## 验证手机号
+
+和 [验证邮箱](#验证邮箱) 类似，应用还可以要求用户在登录或使用特定功能之前验证手机号。默认情况下，当用户注册或变更手机号后，`mobilePhoneVerified` 会被设为 `false`。在应用的 **控制台 > 内建账户 > 设置** 中，可以开启阻止未验证手机号的用户登录的选项。
+
+可以用下面的代码发送一条新的验证码（如果相应用户的 `mobilePhoneVerified` 已经为 `true`，那么验证短信不会发送）：
+
+<MultiLang>
+
+```cs
+await LCUser.RequestMobilePhoneVerify("+8619201680101");
+```
+
+```java
+LCUser.requestMobilePhoneVerifyInBackground("+8619201680101").subscribe(new Observer<LCNull>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCNull null) {
+        // 成功调用
+    }
+    public void onError(Throwable throwable) {
+        // 调用出错
+    }
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser requestMobilePhoneVerify:@"+8619201680101" withBlock:^(BOOL succeeded, NSError * _Nullable error) {
+    if(succeeded){
+        // 请求成功
+    }else{
+        // 请求失败
+    }
+}];
+```
+
+```swift
+_ = LCUser.requestVerificationCode(mobilePhoneNumber: "+8619201680101") { result in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+```dart
+await LCUser.requestMobilePhoneVerify('+8619201680101');
+```
+
+```js
+AV.User.requestMobilePhoneVerify("+8619201680101");
+```
+
+```python
+leancloud.User.request_mobile_phone_verify('+8619201680101')
+```
+
+```php
+User::requestMobilePhoneVerify("+8619201680101");
+```
+
+```go
+if err := client.Users.RequestMobilePhoneVerify("+8619201680101"); err != nil {
+    panic(err)
+}
+```
+
+</MultiLang>
+
+用户填写验证码后，调用下面的方法来完成验证。`mobilePhoneVerified` 将变为 `true`：
+
+<MultiLang>
+
+```cs
+await LCUser.VerifyMobilePhone("+8619201680101", "123456");
+```
+
+```java
+LCUser.verifyMobilePhoneInBackground("123456").subscribe(new Observer<LCNull>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCNull null) {
+        // mobilePhoneVerified 将变为 true
+    }
+    public void onError(Throwable throwable) {
+        // 验证码不正确
+    }
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser verifyMobilePhone:@"123456" withBlock:^(BOOL succeeded, NSError * _Nullable error) {
+    if(succeeded){
+        // mobilePhoneVerified 将变为 true
+    }else{
+        // 验证码不正确
+    }
+}];
+```
+
+```swift
+_ = LCUser.verifyMobilePhoneNumber(mobilePhoneNumber: "+8619201680101", verificationCode: "123456") { result in
+    switch result {
+    case .success:
+        // mobilePhoneVerified 将变为 true
+        break
+    case .failure(error: let error):
+        // 验证码不正确
+        print(error)
+    }
+}
+```
+
+```dart
+await LCUser.verifyMobilePhone('+8619201680101','123456');
+```
+
+```js
+AV.User.verifyMobilePhone("123456").then(
+  () => {
+    // mobilePhoneVerified 将变为 true
+  },
+  (error) => {
+    // 验证码不正确
+  }
+);
+```
+
+```python
+leancloud.User.verify_mobile_phone_number('123456')
+```
+
+```php
+User::verifyMobilePhone("123456");
+```
+
+```go
+// 暂不支持
+```
+
+</MultiLang>
+
+### 绑定、修改手机号之前先验证
+
+除了在用户绑定、修改手机号**之后**进行验证，云服务也支持在用户绑定或修改手机号**之前**先通过短信验证。也就是说，绑定手机号或修改手机号时先请求发送验证码（用户需处于登录状态），再凭短信验证码完成绑定或修改操作。
+
+<MultiLang>
+
+```cs
+await LCUser.RequestSMSCodeForUpdatingPhoneNumber("+8619201680101");
+
+await LCUser.VerifyCodeForUpdatingPhoneNumber("+8619201680101", "123456");
+// 更新本地数据
+LCUser currentUser = await LCUser.GetCurrent();
+user.Mobile = "+8619201680101";
+```
+
+```java
+LCUser.requestSMSCodeForUpdatingPhoneNumberInBackground("+8619201680101",null).subscribe(new Observer<LCNull>() {
+    @Override
+    public void onSubscribe(@NonNull Disposable d) {
+    }
+    @Override
+    public void onNext(@NonNull LCNull lcNull) {
+        // 成功调用
+    }
+    @Override
+    public void onError(@NonNull Throwable e) {
+        // 调用出错
+    }
+    @Override
+    public void onComplete() {
+    }
+});
+
+LCUser.verifySMSCodeForUpdatingPhoneNumberInBackground("123456", "+8619201680101").subscribe(new Observer<LCNull>() {
+    @Override
+    public void onSubscribe(@NonNull Disposable d) {
+    }
+    @Override
+    public void onNext(@NonNull LCNull lcNull) {
+        // 更新本地数据
+        LCUser currentUser = LCUser.getCurrentUser();
+        currentUser.setMobilePhoneNumber("+8619201680101");
+    }
+    @Override
+    public void onError(@NonNull Throwable e) {
+        // 验证码不正确
+    }
+    @Override
+    public void onComplete() {
+    }
+});
+```
+
+```objc
+[LCUser requestVerificationCodeForUpdatingPhoneNumber:@"+8619201680101" withBlock:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+        // 请求成功
+    } else {
+        // 请求失败
+    }
+}];
+
+[LCUser verifyCodeToUpdatePhoneNumber:@"+8619201680101" code:@"123456" withBlock:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+        // mobilePhoneNumber 变为 +8619201680101
+        // mobilePhoneVerified 变为 true
+    } else {
+        // 验证码不正确
+    }
+}];
+```
+
+```swift
+_ = LCUser.requestVerificationCode(forUpdatingMobilePhoneNumber: "+8619201680101") { result in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+
+_ = LCUser.verifyVerificationCode("123456", toUpdateMobilePhoneNumber:"+8619201680101") { result in
+    switch result {
+    case .success:
+        // mobilePhoneNumber 变为 +8619201680101
+        // mobilePhoneVerified 变为 true
+        break
+    case .failure(error: let error):
+        // 验证码不正确
+        print(error)
+    }
+}
+```
+
+```dart
+await LCUser.requestSMSCodeForUpdatingPhoneNumber('+8619201680101');
+
+await LCUser.verifyCodeForUpdatingPhoneNumber('+8619201680101', '123456');
+// 更新本地数据
+LCUser currentUser = await LCUser.getCurrent();
+user.mobile = '+8619201680101';
+```
+
+```js
+AV.User.requestChangePhoneNumber("+8619201680101");
+
+AV.User.changePhoneNumber("+8619201680101", "123456").then(
+  () => {
+    // 更新本地数据
+    const currentUser = AV.User.current();
+    currentUser.setMobilePhoneNumber("+8619201680101");
+  },
+  (error) => {
+    // 验证码不正确
+  }
+);
+```
+
+```python
+User.request_change_phone_number("+8619201680101")
+
+User.change_phone_number("123456", "+8619201680101")
+# 更新本地数据
+current_user = leancloud.User.get_current()
+current_user.set_mobile_phone_number("+8619201680101")
+```
+
+```php
+User::requestChangePhoneNumber("+8619201680101");
+
+User::changePhoneNumber("123456", "+8619201680101");
+// 更新本地数据
+$currentUser = User::getCurrentUser();
+$user->setMobilePhoneNumber("+8619201680101");
+```
+
+```go
+if err := client.Users.requestChangePhoneNumber("+8619201680101"); err != nil {
+  panic(err)
+}
+
+if err := client.Users.ChangePhoneNumber("123456", "+8619201680101"); err != nil {
+  panic(err)
+}
+```
+
+</MultiLang>
 
 ## 当前用户
 
 用户登录后，SDK 会自动将会话信息存储到客户端，这样用户在下次打开客户端时无需再次登录。下面的代码检查是否有已经登录的用户：
 
-<MultiLang kind="ue">
+<MultiLang>
 
 ```cs
-TDSUser currentUser = await TDSUser.GetCurrent();
+LCUser currentUser = await LCUser.GetCurrent();
 if (currentUser != null) {
   // 跳到首页
 } else {
@@ -580,7 +1254,7 @@ if (currentUser != null) {
 ```
 
 ```java
-TDSUser currentUser = TDSUser.getCurrentUser();
+LCUser currentUser = LCUser.getCurrentUser();
 if (currentUser != null) {
     // 跳到首页
 } else {
@@ -589,7 +1263,7 @@ if (currentUser != null) {
 ```
 
 ```objc
-TDSUser *currentUser = [TDSUser currentUser];
+LCUser *currentUser = [LCUser currentUser];
 if (currentUser != nil) {
     // 跳到首页
 } else {
@@ -597,75 +1271,146 @@ if (currentUser != nil) {
 }
 ```
 
-```cpp
-TSharedPtr<FTDSUser> CurrentUser = FTDSUser::GetCurrentUser();
-if (CurrentUser.IsValid()) {
+```swift
+if let user = LCApplication.default.currentUser {
     // 跳到首页
 } else {
     // 显示注册或登录页面
 }
 ```
 
+```dart
+LCUser currentUser = await LCUser.getCurrent();
+if (currentUser != null) {
+  // 跳到首页
+} else {
+  // 显示注册或登录页面
+}
+```
+
+```js
+const currentUser = AV.User.current();
+if (currentUser) {
+  // 跳到首页
+} else {
+  // 显示注册或登录页面
+}
+```
+
+```python
+current_user = leancloud.User.get_current()
+if current_user is not None:
+    # 跳到首页
+    pass
+else:
+    # 显示注册或登录页面
+    pass
+```
+
+```php
+$currentUser = User::getCurrentUser();
+if ($currentUser != null) {
+    // 跳到首页
+} else {
+    // 显示注册或登录页面
+}
+```
+
+```go
+// 暂不支持
+```
+
 </MultiLang>
 
 会话信息会长期有效，直到用户主动登出：
 
-<MultiLang kind="ue">
+<MultiLang>
 
 ```cs
-await TDSUser.Logout();
+await LCUser.Logout();
 
 // currentUser 变为 null
-TDSUser currentUser = await TDSUser.GetCurrent();
+LCUser currentUser = await LCUser.GetCurrent();
 ```
 
 ```java
-TDSUser.logOut();
+LCUser.logOut();
 
 // currentUser 变为 null
-TDSUser currentUser = TDSUser.getCurrentUser();
+LCUser currentUser = LCUser.getCurrentUser();
 ```
 
 ```objc
-[TDSUser logOut];
+[LCUser logOut];
 
 // currentUser 变为 nil
-TDSUser *currentUser = [TDSUser currentUser];
+LCUser *currentUser = [LCUser currentUser];
 ```
 
-```cpp
-FTDSUser::Logout();
+```swift
+LCUser.logOut()
 
-// CurrentUser 变为 nullptr
-TSharedPtr<FTDSUser> CurrentUser = FTDSUser::GetCurrentUser();
+// currentUser 变为 nil
+let currentUser = LCApplication.default.currentUser
+```
+
+```dart
+await LCUser.logout();
+
+// currentUser 变为 null
+LCUser currentUser = await LCUser.getCurrent();
+```
+
+```js
+AV.User.logOut();
+
+// currentUser 变为 null
+const currentUser = AV.User.current();
+```
+
+```python
+user.logout()
+
+current_user = leancloud.User.get_current()  # None
+```
+
+```php
+User::logOut();
+
+// currentUser 变为 null
+$currentUser = User::getCurrentUser();
+```
+
+```go
+// 暂不支持
 ```
 
 </MultiLang>
 
 ## 设置当前用户
 
-用户登录后，云端会返回一个 **session token** 给客户端，它会由 SDK 缓存起来并用于日后同一 `TDSUser` 的鉴权请求。session token 会被包含在每个客户端发起的 HTTP 请求的 header 里面，这样云端就知道是哪个 `TDSUser` 发起的请求了。
+用户登录后，云端会返回一个 **session token** 给客户端，它会由 SDK 缓存起来并用于日后同一用户的鉴权请求。session token 会被包含在每个客户端发起的 HTTP 请求的 header 里面，这样云端就知道是哪个用户发起的请求了。
 
 以下是一些应用可能需要用到 session token 的场景：
 
-- 应用根据以前缓存的 session token 登录（可以通过 `sessionToken` 属性获取到当前用户的 session token；在服务端等受信任的环境下，可以通过 Master Key（即 Server Secret）读取任意用户的 `sessionToken` 字段以获取 session token）。
+- 应用根据以前缓存的 session token 登录。
 - 应用内的某个 WebView 需要知道当前登录的用户。
 - 在服务端登录后，返回 session token 给客户端，客户端根据返回的 session token 登录。
 
 下面的代码使用 session token 登录一个用户（云端会验证 session token 是否有效）：
 
-<MultiLang kind="ue">
+<MultiLang>
 
 ```cs
-await TDSUser.BecomeWithSessionToken("anmlwi96s381m6ca7o7266pzf");
+await LCUser.BecomeWithSessionToken("anmlwi96s381m6ca7o7266pzf");
 ```
 
 ```java
-TDSUser.becomeWithSessionTokenInBackground("anmlwi96s381m6ca7o7266pzf").subscribe(new Observer<TDSUser>() {
+LCUser.becomeWithSessionTokenInBackground("anmlwi96s381m6ca7o7266pzf").subscribe(new Observer<LCUser>() {
     public void onSubscribe(Disposable disposable) {}
-    public void onNext(TDSUser user) {
+    public void onNext(LCUser user) {
         // 修改 currentUser
-        TDSUser.changeCurrentUser(user, true);
+        LCUser.changeCurrentUser(user, true);
     }
     public void onError(Throwable throwable) {
         // session token 无效
@@ -675,7 +1420,7 @@ TDSUser.becomeWithSessionTokenInBackground("anmlwi96s381m6ca7o7266pzf").subscrib
 ```
 
 ```objc
-[TDSUser becomeWithSessionTokenInBackground:@"anmlwi96s381m6ca7o7266pzf" block:^(TDSUser * _Nullable user, NSError * _Nullable error) {
+[LCUser becomeWithSessionTokenInBackground:@"anmlwi96s381m6ca7o7266pzf" block:^(LCUser * _Nullable user, NSError * _Nullable error) {
     if (user != nil) {
         // 登录成功
     } else {
@@ -684,28 +1429,61 @@ TDSUser.becomeWithSessionTokenInBackground("anmlwi96s381m6ca7o7266pzf").subscrib
 }];
 ```
 
-```cpp
-FTDSUser::BecomeWithSessionToken("anmlwi96s381m6ca7o7266pzf", FTDSUser::FCallBackDelegate::CreateLambda([](const TSharedPtr<FTDSUser>& UserPtr, const FTUError& Error) {
-    if (UserPtr.IsValid()) {
-        FString UserID = UserPtr->GetObjectId();
-    } else {
-        // 登录失败 Error.msg;
+```swift
+_ = LCUser.logIn(sessionToken: "anmlwi96s381m6ca7o7266pzf") { (result) in
+    switch result {
+    case .success(object: let user):
+        // 登录成功
+        print(user)
+    case .failure(error: let error):
+        // session token 无效
+        print(error)
     }
-}));
+}
+```
+
+```dart
+await LCUser.becomeWithSessionToken('anmlwi96s381m6ca7o7266pzf');
+```
+
+```js
+AV.User.become("anmlwi96s381m6ca7o7266pzf").then(
+  (user) => {
+    // 登录成功
+  },
+  (error) => {
+    // session token 无效
+  }
+);
+```
+
+```python
+user = leancloud.User.become('anmlwi96s381m6ca7o7266pzf')
+```
+
+```php
+User::become("anmlwi96s381m6ca7o7266pzf");
+```
+
+```go
+user, err := client.Users.Become("anmlwi96s381m6ca7o7266pzf")
+if err != nil {
+    panic(err)
+}
 ```
 
 </MultiLang>
 
 请避免在外部浏览器使用 URL 来传递 session token，以防范信息泄露风险。
 
-如果在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 内建账户 > 设置** 中勾选了 **密码修改后，强制客户端重新登录**，那么当一个用户修改密码后，该用户的 session token 会被重置。此时需要让用户重新登录，否则会遇到 `403 (Forbidden)` 错误。
+如果在 **控制台 > 内建账户 > 设置** 中勾选了 **密码修改后，强制客户端重新登录**，那么当一个用户修改密码后，该用户的 session token 会被重置。此时需要让用户重新登录，否则会遇到 `403 (Forbidden)` 错误。
 
 下面的代码检查 session token 是否有效：
 
-<MultiLang kind="ue">
+<MultiLang>
 
 ```cs
-TDSUser currentUser = await TDSUser.GetCurrent();
+LCUser currentUser = await LCUser.GetCurrent();
 bool isAuthenticated = await currentUser.IsAuthenticated();
 if (isAuthenticated) {
   // session token 有效
@@ -715,7 +1493,7 @@ if (isAuthenticated) {
 ```
 
 ```java
-boolean authenticated = TDSUser.getCurrentUser().isAuthenticated();
+boolean authenticated = LCUser.getCurrentUser().isAuthenticated();
 if (authenticated) {
     // session token 有效
 } else {
@@ -724,7 +1502,7 @@ if (authenticated) {
 ```
 
 ```objc
-TDSUser *currentUser = [TDSUser currentUser];
+LCUser *currentUser = [LCUser currentUser];
 NSString *token = currentUser.sessionToken;
 [currentUser isAuthenticatedWithSessionToken:token callback:^(BOOL succeeded, NSError * _Nullable error) {
     if (succeeded) {
@@ -735,109 +1513,341 @@ NSString *token = currentUser.sessionToken;
 }];
 ```
 
-```cpp
-TSharedPtr<FTDSUser> User = FTDSUser::GetCurrentUser();
-if (User.IsValid() && User->IsAuthenticated()) {
+```swift
+if let sessionToken = LCApplication.default.currentUser?.sessionToken?.value {
+    _ = LCUser.logIn(sessionToken: sessionToken) { (result) in
+        if result.isSuccess {
+            // session token 有效
+        } else {
+            // session token 无效
+        }
+    }
+}
+```
+
+```dart
+LCUser currentUser = await LCUser.getCurrent();
+bool isAuthenticated = await currentUser.isAuthenticated();
+if (isAuthenticated) {
+  // session token 有效
+} else {
+  // session token 无效
+}
+```
+
+```js
+const currentUser = AV.User.current();
+currentUser.isAuthenticated().then((authenticated) => {
+  if (authenticated) {
+    // session token 有效
+  } else {
+    // session token 无效
+  }
+});
+```
+
+```python
+authenticated = leancloud.User.get_current().is_authenticated()
+if authenticated:
+    # session token 有效
+    pass
+else:
+    # session token 无效
+    pass
+```
+
+```php
+$authenticated = User::isAuthenticated();
+if ($authenticated) {
     // session token 有效
 } else {
     // session token 无效
 }
 ```
 
+```go
+// 暂不支持
+```
+
 </MultiLang>
 
-## 设置其他用户属性
+## 重置密码
 
-开发者可以使用内建账户系统设置 `nickname` 和 `avatar`，比如通过设置 `nickname` 字段来添加昵称：
+我们都知道，应用一旦加入账户密码系统，那么肯定会有用户忘记密码的情况发生。对于这种情况，我们为用户提供了多种重置密码的方法。
 
-<MultiLang kind="ue">
+邮箱重置密码的流程如下：
+
+1. 用户输入注册的电子邮箱，请求重置密码；
+2. 云端向该邮箱发送一封包含重置密码的特殊链接的电子邮件；
+3. 用户点击重置密码链接后，一个特殊的页面会打开，让他们输入新密码；
+4. 用户的密码已被重置为新输入的密码。
+
+首先让用户填写注册账户时使用的邮箱，然后调用下面的方法：
+
+<MultiLang>
 
 ```cs
-var currentUser = await TDSUser.GetCurrent();  // 获取当前登录的账户实例
-currentUser["nickname"] = "Tarara";
-await currentUser.Save();
+await LCUser.RequestPasswordReset("tom@xd.com");
 ```
 
 ```java
-TDSUser currentUser = TDSUser.currentUser();  // 获取当前登录的账户实例
-currentUser.put("nickname", "Tarara");
-currentUser.saveInBackground().subscribe(new Observer<LCObject>() {
-    @Override
-    public void onSubscribe(@NotNull Disposable d) {
-
+LCUser.requestPasswordResetInBackground("tom@xd.com").subscribe(new Observer<LCNull>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCNull null) {
+        // 成功调用
     }
-
-    @Override
-    public void onNext(@NotNull LCObject lcObject) {
-        // 保存成功，currentUser 的属性得到更新
-        TDSUser tdsUser = (TDSUser) lcObject;
+    public void onError(Throwable throwable) {
+        // 调用出错
     }
-
-    @Override
-    public void onError(@NotNull Throwable e) {
-
-    }
-
-    @Override
-    public void onComplete() {
-
-    }
+    public void onComplete() {}
 });
 ```
 
-```objectivec
-TDSUser *currentUser = [TDSUser currentUser];
-currentUser[@"nickname"] = @"Tarara";
-[currentUser saveInBackgroundWithBlock:^(BOOL succeeded, NSError * _Nullable error) {
+```objc
+[LCUser requestPasswordResetForEmailInBackground:@"tom@xd.com"];
+```
+
+```swift
+_ = LCUser.requestPasswordReset(email: "tom@xd.com") { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+```dart
+await LCUser.requestPasswordReset('tom@xd.com');
+```
+
+```js
+AV.User.requestPasswordReset("tom@xd.com");
+```
+
+```python
+leancloud.User.request_password_reset('tom@xd.com')
+```
+
+```php
+User::requestPasswordReset("tom@xd.com");
+```
+
+```go
+if err := client.Users.RequestPasswordReset("tom@xd.com"); err != nil {
+    panic(err)
+}
+```
+
+</MultiLang>
+
+上面的代码会查询是否有用户的 `email` 属性与前面提供的邮箱匹配。如果有的话，则向该邮箱发送一封密码重置邮件。之前提到过，应用可以让 `username` 与 `email` 保持一致，也可以单独收集用户的邮箱并将其存为 `email`。
+
+密码重置邮件的内容可在应用的 **云服务控制台 > 内建账户 > 邮件模版** 中自定义。更多关于自定义邮件模板和验证链接的内容，请参考《自定义邮件验证和重设密码页面》。
+
+除此之外，还可以用手机号重置密码：
+
+1. 用户输入注册的手机号，请求重置密码；
+2. 云端向该号码发送一条包含验证码的短信；
+3. 用户输入验证码和新密码。
+
+下面的代码向用户发送含有验证码的短信：
+
+<MultiLang>
+
+```cs
+await LCUser.RequestPasswordRestBySmsCode("+8619201680101");
+```
+
+```java
+LCUser.requestPasswordResetBySmsCodeInBackground("+8619201680101").subscribe(new Observer<LCNull>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCNull null) {
+        // 成功调用
+    }
+    public void onError(Throwable throwable) {
+        // 调用出错
+    }
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser requestPasswordResetWithPhoneNumber:@"+8619201680101"];
+```
+
+```swift
+_ = LCUser.requestPasswordReset(mobilePhoneNumber: "+8619201680101") { (result) in
+    switch result {
+    case .success:
+        break
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+```dart
+await LCUser.requestPasswordRestBySmsCode('+8619201680101');
+```
+
+```js
+AV.User.requestPasswordResetBySmsCode("+8619201680101");
+```
+
+```python
+leancloud.User.request_password_reset_by_sms_code('+8619201680101')
+```
+
+```php
+User::requestPasswordResetBySmsCode("+8619201680101");
+```
+
+```go
+if err := client.Users.RequestPasswordResetBySmsCode("+8619201680101"); err != nil {
+    panic(err)
+}
+```
+
+</MultiLang>
+
+上面的代码会查询是否有用户的 `mobilePhoneNumber` 属性与前面提供的手机号匹配。如果有的话，则向该号码发送验证码短信。
+
+可以在 **云服务控制台 > 内建账户 > 设置** 中设置只有在 `mobilePhoneVerified` 为 `true` 的情况下才能用手机号重置密码。
+
+用户输入验证码和新密码后，用下面的代码完成密码重置：
+
+<MultiLang>
+
+```cs
+await LCUser.ResetPasswordBySmsCode("+8619201680101", "123456", "cat!@#123");
+```
+
+```java
+LCUser.resetPasswordBySmsCodeInBackground("123456", "cat!@#123").subscribe(new Observer<LCNull>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCNull null) {
+        // 密码重置成功
+    }
+    public void onError(Throwable throwable) {
+        // 验证码不正确
+    }
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser resetPasswordWithSmsCode:@"123456" newPassword:@"cat!@#123" block:^(BOOL succeeded, NSError *error) {
     if (succeeded) {
-        // 保存成功
+        // 密码重置成功
     } else {
-        NSLog(@"%@", error);
+        // 验证码不正确
     }
 }];
 ```
 
-```cpp
-TSharedPtr<FTDSUser> User = FTDSUser::GetCurrentUser();
-User->SetNickName(TEXT("Tarara"));
-User->Save(FTDSUser::FCallBackDelegate::CreateLambda([](const TSharedPtr<FTDSUser>& UserPtr, const FTUError& Error) {
-    if (UserPtr.IsValid()) {
-        // 保存成功
-    } else {
-        // 登录失败 Error.msg;
+```swift
+_ = LCUser.resetPassword(mobilePhoneNumber: "+8619201680101", verificationCode: "123456", newPassword: "cat!@#123") { result in
+    switch result {
+    case .success:
+        // 密码重置成功
+        break
+    case .failure(error: let error):
+        // 验证码不正确
+        print(error)
     }
-}));
+}
+```
+
+```dart
+await LCUser.resetPasswordBySmsCode('+8619201680101', '123456', 'cat!@#123');
+```
+
+```js
+AV.User.resetPasswordBySmsCode("123456", "cat!@#123").then(
+  () => {
+    // 密码重置成功
+  },
+  (error) => {
+    // 验证码不正确
+  }
+);
+```
+
+```python
+leancloud.User.reset_password_by_sms_code('123456', 'cat!@#123')
+```
+
+```php
+User::resetPasswordBySmsCode("123456", "cat!@#123");
+```
+
+```go
+if err := client.Users.ResetPasswordBySmsCode("+8619201680101", "123456", "cat!@#123"); err != nil {
+    panic(err)
+}
 ```
 
 </MultiLang>
 
-内建账户系统只支持内置字段和两个自定义字段： `nickname`（昵称） 以及 `avatar`（头像），添加其他新的字段会报错。
-
-内建账户系统保存了用户的**鉴权信息**，也可能保存了邮箱、手机等**敏感信息**，因此会设置非常严格的权限，以防用户信息泄露。另外，在内建账户系统中保存过多数据，也容易导致慢查询等性能问题。所以，我们限制了自定义字段的使用，如需保存其他的用户信息，建议另外创建专门的 Class（比如 `UserProfile`）。
-
-:::tip
-建议开发者使用 `nickname` 字段存储昵称信息，[TDS 游戏好友模块](/sdk/friends/guide/) **根据昵称查找好友、好友邀请链接功能都使用了 `nickname` 字段**。
-
-[通过 TapTap OAuth 授权结果直接登录](/sdk/taptap-login/guide/start/#一键完成-taptap-登录)这一方式创建的玩家，SDK 会自动将 `nickname` 字段设置为 TapTap 账户的用户名。
-:::
-
 ## 用户的查询
 
-`TDSUser` 是 `LCObject` 的子类，所以 `LCObject` 支持的数据增删改查方式，`TDSUser` 也都可用。感兴趣的读者可以参考[数据存储的开发文档](/sdk/storage/features/)了解更多信息。
+使用下面的代码来查询用户：
 
-不过，为了安全起见，**内建账户系统（`_User` 表）默认关闭了 `find` 权限**，这样每位用户登录后只能查询到自己在 `_User` 表中的数据，无法查询其他用户的数据。如果需要让其查询其他用户的数据，建议单独创建一张表来保存这类数据，并开放这张表的 `find` 查询权限。除此之外，还可以在云引擎里封装用户查询相关的方法。
+<MultiLang>
 
-可以参见 [用户对象的安全](#用户对象的安全) 来了解 `_User` 表的一些限制，还可以阅读[数据和安全](/sdk/storage/guide/security/)来了解更多 class 级权限设置的方法。
+```cs
+LCQuery<LCUser> userQuery = LCUser.GetQuery();
+```
+
+```java
+LCQuery<LCUser> userQuery = LCUser.getQuery();
+```
+
+```objc
+LCQuery *userQuery = [LCUser query];
+```
+
+```swift
+let userQuery = LCQuery(className: "_User")
+```
+
+```dart
+LCQuery<LCUser> userQuery = LCUser.getQuery();
+```
+
+```js
+const userQuery = new AV.Query("_User");
+```
+
+```python
+user_query = leancloud.Query('_leancloud.User')
+```
+
+```php
+$userQuery = new Query("_User");
+```
+
+```go
+userQuery := client.Users.NewUserQuery()
+```
+
+</MultiLang>
+
+为了安全起见，**新创建的应用的 `_User` 表默认关闭了 `find` 权限**，这样每位用户登录后只能查询到自己在 `_User` 表中的数据，无法查询其他用户的数据。如果需要让其查询其他用户的数据，建议单独创建一张表来保存这类数据，并开放这张表的 `find` 查询权限。除此之外，还可以在 [云引擎](/sdk/engine/overview) 里封装用户查询相关的方法。
+
+可以参见 [用户对象的安全](#用户对象的安全) 来了解 `_User` 表的一些限制，还可以阅读[《数据和安全》](/sdk/storage/guide/security)来了解更多 class 级权限设置的方法。
 
 ## 关联用户对象
 
-关联 `TDSUser` 的方法和 `LCObject` 是一样的。下面的代码为一名作者保存了一本书，然后获取所有该作者写的书：
+关联用户的方法和对象是一样的。下面的代码为一名作者保存了一本书，然后获取所有该作者写的书：
 
-<MultiLang kind="ue">
+<MultiLang>
 
 ```cs
 LCObject book = new LCObject("Book");
-TDSUser author = await LCUser.GetCurrent();
+LCUser author = await LCUser.GetCurrent();
 book["title"] = "我的第五本书";
 book["author"] = author;
 await book.Save();
@@ -850,7 +1860,7 @@ ReadOnlyCollection<LCObject> books = await query.Find();
 
 ```java
 LCObject book = new LCObject("Book");
-TDSUser author = TDSUser.getCurrentUser();
+LCUser author = LCUser.getCurrentUser();
 book.put("title", "我的第五本书");
 book.put("author", author);
 book.saveInBackground().subscribe(new Observer<LCObject>() {
@@ -875,7 +1885,7 @@ book.saveInBackground().subscribe(new Observer<LCObject>() {
 
 ```objc
 LCObject *book = [LCObject objectWithClassName:@"Book"];
-TDSUser *author = [TDSUser currentUser];
+LCUser *author = [LCUser currentUser];
 [book setObject:@"我的第五本书" forKey:@"title"];
 [book setObject:author forKey:@"author"];
 [book saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
@@ -888,33 +1898,123 @@ TDSUser *author = [TDSUser currentUser];
 }];
 ```
 
-```cpp
-暂不支持
+```swift
+do {
+    guard let author = LCApplication.default.currentUser else {
+        return
+    }
+    let book = LCObject(className: "Book")
+    try book.set("title", value: "我的第五本书")
+    try book.set("author", value: author)
+    _ = book.save { result in
+        switch result {
+        case .success:
+            // 获取所有该作者写的书
+            let query = LCQuery(className: "Book")
+            query.whereKey("author", .equalTo(author))
+            _ = query.find { result in
+                switch result {
+                case .success(objects: let books):
+                    // books 是包含同一作者所有 Book 对象的数组
+                    break
+                case .failure(error: let error):
+                    print(error)
+                }
+            }
+        case .failure(error: let error):
+            print(error)
+        }
+    }
+} catch {
+    print(error)
+}
+```
+
+```dart
+LCObject book = LCObject('Book');
+LCUser author = await LCUser.getCurrent();
+book['title'] = '我的第五本书';
+book['author'] = author;
+await book.save();
+
+LCQuery<LCObject> query = LCQuery('Book');
+query.whereEqualTo('author', author);
+// books 是包含同一作者所有 Book 对象的数组
+List<LCObject> books = await query.find();
+```
+
+```js
+const Book = AV.Object.extend("Book");
+const book = new Book();
+const author = AV.User.current();
+book.set("title", "我的第五本书");
+book.set("author", author);
+book.save().then((book) => {
+  // 获取所有该作者写的书
+  const query = new AV.Query("Book");
+  query.equalTo("author", author);
+  query.find().then((books) => {
+    // books 是包含同一作者所有 Book 对象的数组
+  });
+});
+```
+
+```python
+Book = leancloud.Object.extend('Book')
+book = Book()
+author = leancloud.User.get_current()
+book.set('title', '我的第五本书')
+book.set('author', author)
+book.save()
+
+# 获取所有该作者写的书
+query = Book.query
+query.equal_to('author', author)
+book_list = query.find()
+```
+
+```php
+$book = new LeanObject("Book");
+$author = User::getCurrentUser();
+$book->set("title", "我的第五本书");
+$book->set("author", $author);
+$book->save();
+
+// 获取所有该作者写的书
+$query = new Query("Book");
+$query->equalTo("author", $author);
+$books = $query->find();
+```
+
+```go
+// 暂不支持
 ```
 
 </MultiLang>
 
 ## 用户对象的安全
 
-`TDSUser` 类自带安全保障，只有通过登录等经过鉴权的方法获取到的 `TDSUser` 才能进行保存或删除相关的操作，保证每个用户只能修改自己的数据。
+用户对象自带安全保障，只有通过经过鉴权的方法获取到的用户对象才能进行更新或删除操作，保证每个用户只能修改自己的数据。
 
-这样设计是因为 `TDSUser` 中存储的大多数数据都比较敏感，包括手机号、社交网络账号等等。为了用户的隐私安全，即使是应用的开发者也应避免直接接触这些数据。
+这样设计是因为用户对象中存储的大多数数据都比较敏感，包括手机号、社交网络账号等等。为了用户的隐私安全，即使是应用的开发者也应避免直接接触这些数据。
 
 下面的代码展现了这种安全措施：
 
-<MultiLang kind="ue">
+<MultiLang>
 
 ```cs
 try {
-  TDSUser tdsUser = await TDSUser.LoginWithTapTap();
+  LCUser user = await LCUser.Login("Tom", "cat!@#123");
   // 试图修改用户名
   user["username"] = "Jerry";
+  // 密码已被加密，这样做会获取到空字符串
+  string password = user["password"];
   // 可以执行，因为用户已鉴权
   await user.Save();
 
   // 绕过鉴权直接获取用户
-  LCQuery<TDSUser> userQuery = TDSUser.GetQuery();
-  TDSUser unauthenticatedUser = await userQuery.Get(user.ObjectId);
+  LCQuery<LCUser> userQuery = LCUser.GetQuery();
+  LCUser unauthenticatedUser = await userQuery.Get(user.ObjectId);
   unauthenticatedUser["username"] = "Toodle";
 
   // 会出错，因为用户未鉴权
@@ -925,20 +2025,21 @@ try {
 ```
 
 ```java
-TDSUser.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
-    @Override
-    public void onSuccess(TDSUser resultUser) {
-        Toast.makeText(MainActivity.this, "Logged in with TapTap.", Toast.LENGTH_SHORT).show();
-        // 可以修改，因为已经鉴权
-        resultUser.put("username", "Toodle");
-        // 仅为示意，实际项目中需使用异步方法以免阻塞
-        resultUser.save();
+LCUser.logIn("Tom", "cat!@#123").subscribe(new Observer<LCUser>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCUser user) {
+        // 试图修改用户名
+        user.put("username", "Jerry");
+        // 密码已被加密，这样做会获取到空字符串
+        String password = user.getString("password");
+        // 可以执行，因为用户已鉴权
+        user.save();
 
         // 绕过鉴权直接获取用户
-        LCQuery<TDSUser> query = new LCQuery<>("_User");
-        query.getInBackground(user.getObjectId()).subscribe(new Observer<TDSUser>() {
+        LCQuery<LCUser> query = new LCQuery<>("_User");
+        query.getInBackground(user.getObjectId()).subscribe(new Observer<LCUser>() {
             public void onSubscribe(Disposable disposable) {}
-            public void onNext(TDSUser unauthenticatedUser) {
+            public void onNext(LCUser unauthenticatedUser) {
                 unauthenticatedUser.put("username", "Toodle");
                 // 会出错，因为用户未鉴权
                 unauthenticatedUser.save();
@@ -947,26 +2048,25 @@ TDSUser.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
             public void onComplete() {}
         });
     }
-
-    @Override
-    public void onFail(TapError error) {
-        Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
-    }
-}, "public_profile");
+    public void onError(Throwable throwable) {}
+    public void onComplete() {}
+});
 ```
 
 ```objc
-[TDSUser loginByTapTapWithPermissions:@[@"public_profile"] callback:^(TDSUser * _Nullable user, NSError * _Nullable error) {
-    if (user) {
+[LCUser logInWithUsernameInBackground:@"Tom" password:@"cat!@#123" block:^(LCUser *user, NSError *error) {
+    if (user != nil) {
         // 试图修改用户名
         [user setObject:@"Jerry" forKey:@"username")];
+        // 密码已被加密，这样做会获取到空字符串
+        NSString *password = user[@"password"];
         // 保存更改
         [user saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
             if (succeeded) {
                 // 可以执行，因为用户已鉴权
 
                 // 绕过鉴权直接获取用户
-                LCQuery *query = [TDSUser query];
+                LCQuery *query = [LCQuery queryWithClassName:@"_User"];
                 [query getObjectInBackgroundWithId:user.objectId block:^(LCObject *unauthenticatedUser, NSError *error) {
                     [unauthenticatedUser setObject:@"Toodle" forKey:@"username"];
                     [unauthenticatedUser saveInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
@@ -987,35 +2087,204 @@ TDSUser.loginWithTapTap(MainActivity.this, new Callback<TDSUser>() {
 }];
 ```
 
-```cpp
-FTDSUser::LoginWithTapTap({TUType::PermissionScope::Profile, TUType::PermissionScope::Friend},
-                            FTDSUser::FCallBackDelegate::CreateLambda(
-                                [](const TSharedPtr<FTDSUser>& UserPtr, const FTUError& Error) {
-                                    if (UserPtr.IsValid()) {
-                                        // 试图修改用户名
-                                        UserPtr->SetUsername("Jerry");
-                                        // 保存更改
-                                        UserPtr->Save(FTDSUser::FCallBackDelegate::CreateLambda(
-                                            [](const TSharedPtr<FTDSUser>& UserPtr, const FTUError& Error) {
-                                                if (UserPtr.IsValid()) {
-                                                    // 保存成功 Error.msg;
-                                                }
-                                                else {
-                                                    // 保存失败 Error.msg;
-                                                }
-                                            }));
-                                    }
-                                    else {
-                                        // 登录失败 Error.msg;
-                                    }
-                                }));
+```swift
+_ = LCUser.logIn(username: "Tom", password: "cat!@#123") { result in
+    switch result {
+    case .success(object: let user):
+        // 试图修改用户名
+        try! user.set("username", "Jerry")
+        // 密码已被加密，这样做会获取到空字符串
+        let password = user.get("password")
+        // 可以执行，因为用户已鉴权
+        user.save()
+
+        // 绕过鉴权直接获取用户
+        let query = LCQuery(className: "_User")
+        _ = query.get(user.objectId) { result in
+            switch result {
+                case .success(object: let unauthenticatedUser):
+                    try! unauthenticatedUser.set("username", "Toodle")
+                    _ = unauthenticatedUser.save { result in
+                        switch result {
+                            .success:
+                                // 无法执行，因为用户未鉴权
+                            .failure:
+                                // 操作失败
+                        }
+                    }
+                case .failure(error: let error):
+                    print(error)
+            }
+        }
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+```dart
+try {
+  LCUser user = await LCUser.login('Tom', 'cat!@#123');
+  // 试图修改用户名
+  user['username'] = 'Jerry';
+  // 密码已被加密，这样做会获取到空字符串
+  String password = user['password'];
+  // 可以执行，因为用户已鉴权
+  await user.save();
+
+  // 绕过鉴权直接获取用户
+  LCQuery<LCUser> userQuery = LCQuery('_User');
+  LCUser unauthenticatedUser = await userQuery.get(user.objectId);
+  unauthenticatedUser['username'] = 'Toodle';
+
+  // 会出错，因为用户未鉴权
+  unauthenticatedUser.save();
+} on LCException catch (e) {
+  print('${e.code} : ${e.message}');
+}
+```
+
+```js
+const user = AV.User.logIn("Tom", "cat!@#123").then((user) => {
+  // 试图修改用户名
+  user.set("username", "Jerry");
+  // 密码已被加密，这样做会获取到空字符串
+  const password = user.get("password");
+  // 保存更改
+  user.save().then((user) => {
+    // 可以执行，因为用户已鉴权
+
+    // 绕过鉴权直接获取用户
+    const query = new AV.Query("_User");
+    query.get(user.objectId).then((unauthenticatedUser) => {
+      unauthenticatedUser.set("username", "Toodle");
+      unauthenticatedUser.save().then(
+        (unauthenticatedUser) => {},
+        (error) => {
+          // 会出错，因为用户未鉴权
+        }
+      );
+    });
+  });
+});
+```
+
+```python
+leancloud.User.login('Tom', 'cat!@#123')
+current_user = leancloud.User.get_current()
+
+# 试图修改用户名
+current_user.set('username', 'Jerry')
+# 密码已被加密，这样做会获取到空字符串
+password = current_user.get('password')
+# 可以执行，因为用户已鉴权
+current_user.save()
+
+# 绕过鉴权直接获取用户
+query = leancloud.Query('_User')
+unauthenticated_user = query.get(current_user.id)
+unauthenticated_user.set('username', 'Toodle')
+# 会出错，因为用户未鉴权
+unauthenticated_user.save()
+```
+
+```php
+User::logIn("Tom", "cat!@#123");
+$currentUser = User::getCurrentUser();
+
+// 试图修改用户名
+$currentUser->set("username", "Jerry");
+// 密码已被加密，这样做会获取到空字符串
+$password = $currentUser->get("password");
+// 可以执行，因为用户已鉴权
+$currentUser->save();
+
+// 绕过鉴权直接获取用户
+$query = new Query("_User");
+$unauthenticatedUser = $query->get($currentUser->getObjectId())
+$unauthenticatedUser->set("username", "Toodle");
+// 会出错，因为用户未鉴权
+$unauthenticatedUser->save()
+```
+
+```go
+user, err := client.Users.LogIn("Tom", "cat!@#123")
+if err != nil {
+    panic(err)
+}
+
+// 试图修改用户名，未鉴权将失败
+if err := client.User(user).Set("username", "Jerry"); err != nil {
+    panic(err)
+}
+
+// 密码已被加密，这样做会获取到空字符串
+password := user.String("password")
+
+// 可以执行，因为用户已鉴权
+if err := client.User(user).Set("username", "Jerry", leancloud.UseUser(user)); err != nil {
+    panic(err)
+}
+
+// 绕过鉴权直接获取用户
+unauthenticatedUser := User{}
+if err := client.Users.NewUserQuery().EqualTo("objectId", user.ID).First(&unauthenticatedUser); err != nil {
+    panic(err)
+}
+
+// 会出错，因为用户未鉴权
+if err := client.User(unauthenticatedUser).Set("username", "Toodle"); err != nil {
+    panic(err)
+}
 ```
 
 </MultiLang>
 
-通过 `TDSUser.GetCurrent()` 获取的 `LCUser` 总是经过鉴权的。
+通过调用 [当前用户](#当前用户) 相关方法获取的用户总是经过鉴权的。
 
-要查看一个 `TDSUser` 是否经过鉴权，可以调用 `isAuthenticated` 方法。通过经过鉴权的方法获取到的 `TDSUser` 无需进行该检查。
+要查看一个用户对象是否经过鉴权，可以调用如下方法。通过经过鉴权的方法获取到的用户对象无需进行该检查。
+
+<MultiLang>
+
+```cs
+IsAuthenticated
+```
+
+```java
+isAuthenticated
+```
+
+```objc
+isAuthenticatedWithSessionToken
+```
+
+```swift
+// 暂不支持
+```
+
+```dart
+isAuthenticated
+```
+
+```js
+isAuthenticated;
+```
+
+```python
+is_authenticated
+```
+
+```php
+isAuthenticated
+```
+
+```go
+// 暂不支持
+```
+
+</MultiLang>
+
+注意，用户的密码只能在注册的时候进行设置，日后如需修改，只能通过 [重置密码](#重置密码) 的方式进行。密码不会被缓存在本地。如果尝试直接获取已登录用户的密码，会得到 `null`。
 
 ## 其他对象的安全
 
@@ -1023,40 +2292,39 @@ FTDSUser::LoginWithTapTap({TUType::PermissionScope::Profile, TUType::PermissionS
 
 ## 第三方账户登录
 
-我们在登录功能的开发指南中已经介绍了如何[一键完成 TapTap 登录](/sdk/taptap-login/guide/start#一键完成-taptap-登录)。
-
-其实除了 TapTap 外，我们也支持直接使用第三方社交平台（例如 Apple、<Conditional region="cn">微信、QQ</Conditional><Conditional region="global">Facebook</Conditional> 等）的账户信息来创建自己的账户体系并完成登录，也允许将既有账户与第三方账户绑定起来，这样终端用户后续可以直接用第三方账户信息来便捷登录。
-
-事实上，TapSDK 采用了开放的接口设计，平台标识和唯一授权信息都由开发者指定，所以是可以兼容所有的第三方账户登录需求的。例如，海外开发者拿到 Facebook 授权信息之后，一样可以调用 `TDSUser.loginWithAuthData` 接口完成玩家账户的登录（平台名字可指定为 `facebook`）。
+云服务支持应用层直接使用第三方社交平台（例如微信、微博、QQ 等）的账户信息来创建自己的账户体系并完成登录，也允许将既有账户与第三方账户绑定起来，这样终端用户后续可以直接用第三方账户信息来便捷登录。
 
 例如以下的代码展示了终端用户使用微信登录的处理流程：
 
-<MultiLang kind="ue">
+<MultiLang>
 
 ```cs
 Dictionary<string, object> thirdPartyData = new Dictionary<string, object> {
-  // 可选参数
+  // 必须
   { "openid", "OPENID" },
   { "access_token", "ACCESS_TOKEN" },
   { "expires_in", 7200 },
+
+  // 可选
   { "refresh_token", "REFRESH_TOKEN" },
   { "scope", "SCOPE" }
 };
-TDSUser currentUser = await TDSUser.LoginWithAuthData(thirdPartyData, "weixin");
+LCUser currentUser = await LCUser.LoginWithAuthData(thirdPartyData, "weixin");
 ```
 
 ```java
 Map<String, Object> thirdPartyData = new HashMap<String, Object>();
-// 可选参数
+// 必须
 thirdPartyData.put("expires_in", 7200);
 thirdPartyData.put("openid", "OPENID");
 thirdPartyData.put("access_token", "ACCESS_TOKEN");
+// 可选
 thirdPartyData.put("refresh_token", "REFRESH_TOKEN");
 thirdPartyData.put("scope", "SCOPE");
-TDSUser.loginWithAuthData(TDSUser.class, thirdPartyData, "weixin").subscribe(new Observer<TDSUser>() {
+LCUser.loginWithAuthData(thirdPartyData, "weixin").subscribe(new Observer<LCUser>() {
     public void onSubscribe(Disposable disposable) {
     }
-    public void onNext(TDSUser user) {
+    public void onNext(LCUser user) {
        System.out.println("成功登录");
     }
     public void onError(Throwable throwable) {
@@ -1069,40 +2337,94 @@ TDSUser.loginWithAuthData(TDSUser.class, thirdPartyData, "weixin").subscribe(new
 
 ```objc
 NSDictionary *thirdPartyData = @{
-                            // 可选参数
+                            // 必须
                             @"openid":@"OPENID",
                             @"access_token":@"ACCESS_TOKEN",
                             @"expires_in":@7200,
+
+                            // 可选
                             @"refresh_token":@"REFRESH_TOKEN",
                             @"scope":@"SCOPE",
                             };
-TDSUser *user = [TDSUser user];
+LCUser *user = [LCUser user];
 LCUserAuthDataLoginOption *option = [LCUserAuthDataLoginOption new];
 option.platform = LeanCloudSocialPlatformWeiXin;
 [user loginWithAuthData:thirdPartyData platformId:LeanCloudSocialPlatformWeiXin options:option callback:^(BOOL succeeded, NSError * _Nullable error) {
     if (succeeded) {
         NSLog(@"登录成功");
-    } else {
+    }else{
         NSLog(@"登录失败：%@",error.localizedFailureReason);
     }
 }];
 ```
 
-```cpp
-TSharedPtr<FJsonObject> ThirdPartyData = MakeShared<FJsonObject>();
-// 可选参数
-ThirdPartyData->SetNumberField("expires_in", 7200);
-ThirdPartyData->SetStringField("openid", "OPENID");
-ThirdPartyData->SetStringField("access_token", "ACCESS_TOKEN");
-ThirdPartyData->SetStringField("refresh_token", "REFRESH_TOKEN");
-ThirdPartyData->SetStringField("scope", "SCOPE");
-FTDSUser::LoginWithAuthData("weixin", ThirdPartyData, FTDSUser::FCallBackDelegate::CreateLambda([](const TSharedPtr<FTDSUser>& UserPtr, const FTUError& Error) {
-    if (UserPtr.IsValid()) {
-        // 登录成功
-    } else {
-        // 登录失败 Error.msg;
+```swift
+let thirdPartyData: [String: Any] = [
+    // 必须
+    "openid":        "OPENID",
+    "access_token":  "ACCESS_TOKEN",
+    "expires_in":    7200,
+
+    // 可选
+    "refresh_token": "REFRESH_TOKEN",
+    "scope":         "SCOPE"
+]
+let user = LCUser()
+user.logIn(authData: thirdPartyData, platform: .weixin) { (result) in
+    switch result {
+    case .success:
+        assert(user.objectId != nil)
+    case .failure(error: let error):
+        print(error)
     }
-}));
+}
+```
+
+```dart
+var thirdPartyData = {
+  // 必须
+  'openid':        'OPENID',
+  'access_token':  'ACCESS_TOKEN',
+  'expires_in':    7200,
+
+  // 可选
+  'refresh_token': 'REFRESH_TOKEN',
+  'scope':         'SCOPE'
+};
+LCUser currentUser = await LCUser.loginWithAuthData(thirdPartyData, 'weixin');
+```
+
+```js
+const thirdPartyData = {
+  // 必须
+  openid: "OPENID",
+  access_token: "ACCESS_TOKEN",
+  expires_in: 7200,
+
+  // 可选
+  refresh_token: "REFRESH_TOKEN",
+  scope: "SCOPE",
+};
+AV.User.loginWithAuthData(thirdPartyData, "weixin").then(
+  (user) => {
+    // 登录成功
+  },
+  (error) => {
+    // 登录失败
+  }
+);
+```
+
+```python
+# 暂不支持
+```
+
+```php
+// 暂不支持
+```
+
+```go
+// 暂不支持
 ```
 
 </MultiLang>
@@ -1157,8 +2479,8 @@ FTDSUser::LoginWithAuthData("weixin", ThirdPartyData, FTDSUser::FCallBackDelegat
 
 - **`lc_apple`**：只有 platform 为 `lc_apple` 时，云服务才会执行 `identity_token` 和 `code` 的逻辑。
 - **`uid`**：必填。云服务通过 `uid` 判断是否存在用户。
-- **`identity_token`**：可选。`authData` 中有 `identity_token` 时云端会自动校验 `identity_token` 的有效性。开发者需要在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 内建账户 > 设置 > 第三方集成** 中填写 Apple 的相关信息。
-- **`code`**：可选。`authData` 中有 `code` 时云端会自动用该 `code` 向 Apple 换取 `access_token` 和 `refresh_token`。开发者需要在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 内建账户 > 设置 > 第三方集成** 中填写 Apple 的相关信息。
+- **`identity_token`**：可选。`authData` 中有 `identity_token` 时云端会自动校验 `identity_token` 的有效性。开发者需要在 **云服务控制台 > 内建账户 > 设置 > 第三方集成** 中填写 Apple 的相关信息。
+- **`code`**：可选。`authData` 中有 `code` 时云端会自动用该 `code` 向 Apple 换取 `access_token` 和 `refresh_token`。开发者需要在 **云服务控制台 > 内建账户 > 设置 > 第三方集成** 中填写 Apple 的相关信息。
 
 #### 获取 Client ID
 
@@ -1166,7 +2488,7 @@ Client ID 用于校验 `identity_token` 及获取 `access_token`，指的是 App
 
 #### 获取 Private Key 及 Private Key ID
 
-Private Key 用于获取 `access_token`。登录 Apple 开发者平台，在左侧的「Certificates, Identifiers & Profiles」中选择「Keys」，添加一个用于 Apple Sign In 的 Private Key，下载 `.p8` 文件，同时在下载 Key 的页面获得 Private Key ID。详情请参考 [Apple 的文档](https://developer.apple.com/cn/help/account/)。
+Private Key 用于获取 `access_token`。登录 Apple 开发者平台，在左侧的「Certificates, Identifiers & Profiles」中选择「Keys」，添加一个用于 Apple Sign In 的 Private Key，下载 `.p8` 文件，同时在下载 Key 的页面获得 Private Key ID。详情请参考 [Apple 的文档](https://help.apple.com/developer-account/#/dev77c875b7e)。
 
 将 Key ID 填写到控制台，将下载下来的 Private Key 文件上传到控制台。控制台只能上传 Private Key 文件，无法查看及下载其内容。
 
@@ -1178,16 +2500,18 @@ Team ID 用于获取 `access_token`。登录 Apple 开发者平台，在右上�
 
 在控制台填写完成所有信息后，使用以下代码登录。
 
-<MultiLang kind="ue">
+<MultiLang>
 
 ```cs
-// 使用 Apple 登录时，uid、identity_token、code 都必传；
 Dictionary<string, object> appleAuthData = new Dictionary<string, object> {
+  // 必须
   { "uid", "USER IDENTIFIER" },
+
+  // 可选
   { "identity_token", "IDENTITY TOKEN" },
   { "code", "AUTHORIZATION CODE" }
 };
-TDSUser currentUser = await TDSUser.LoginWithAuthData(appleAuthData, "lc_apple");
+LCUser currentUser = await LCUser.LoginWithAuthData(appleAuthData, "lc_apple");
 ```
 
 ```java
@@ -1195,13 +2519,14 @@ TDSUser currentUser = await TDSUser.LoginWithAuthData(appleAuthData, "lc_apple")
 ```
 
 ```objc
-// 使用 Apple 登录时，uid、identity_token、code 都必传；
 NSDictionary *appleAuthData = @{
+                            // 必须
                             @"uid":@"USER IDENTIFIER",
+                            // 可选
                             @"identity_token":@"IDENTITY TOKEN",
                             @"code":@"AUTHORIZATION CODE",
                             };
-TDSUser *user = [TDSUser user];
+LCUser *user = [LCUser user];
 [user loginWithAuthData:appleAuthData platformId:"lc_apple" options:nil callback:^(BOOL succeeded, NSError * _Nullable error) {
     if (succeeded) {
         NSLog(@"登录成功");
@@ -1211,18 +2536,51 @@ TDSUser *user = [TDSUser user];
 }];
 ```
 
-```cpp
-TSharedPtr<FJsonObject> AppleAuthData = MakeShared<FJsonObject>();
-AppleAuthData->SetStringField("uid", "USER IDENTIFIER");
-AppleAuthData->SetStringField("identity_token", "IDENTITY TOKEN");
-AppleAuthData->SetStringField("code", "AUTHORIZATION CODE");
-FTDSUser::LoginWithAuthData("lc_apple", AppleAuthData, FTDSUser::FCallBackDelegate::CreateLambda([](const TSharedPtr<FTDSUser>& UserPtr, const FTUError& Error) {
-    if (UserPtr.IsValid()) {
-        // 登录成功
-    } else {
-        // 登录失败 Error.msg;
+```swift
+let appleData: [String: Any] = [
+    // 必须
+    "uid":             "USER IDENTIFIER",
+    // 可选
+    "identity_token":  "IDENTITY TOKEN",
+    "code":            "AUTHORIZATION CODE"
+]
+let user = LCUser()
+user.logIn(authData: appleData, platform: .apple) { (result) in
+    switch result {
+    case .success:
+        assert(user.objectId != nil)
+    case .failure(error: let error):
+        print(error)
     }
-}));
+}
+
+```
+
+```dart
+var appleData = {
+    // 必须
+    "uid":             "USER IDENTIFIER",
+    // 可选
+    "identity_token":  "IDENTITY TOKEN",
+    "code":            "AUTHORIZATION CODE"
+};
+LCUser currentUser = await LCUser.loginWithAuthData(appleData, 'lc_apple');
+```
+
+```js
+// 不支持
+```
+
+```python
+# 不支持
+```
+
+```php
+// 不支持
+```
+
+```go
+// 不支持
 ```
 
 </MultiLang>
@@ -1230,8 +2588,6 @@ FTDSUser::LoginWithAuthData("lc_apple", AppleAuthData, FTDSUser::FCallBackDelega
 ### 鉴权数据的保存
 
 每个用户的 `authData` 是一个以平台名为键名，鉴权信息为键值的 JSON 对象。
-
-<Conditional region="cn">
 
 一个关联了微信账户的用户应该会有下列对象作为 `authData`：
 
@@ -1280,8 +2636,6 @@ FTDSUser::LoginWithAuthData("lc_apple", AppleAuthData, FTDSUser::FCallBackDelega
 }
 ```
 
-</Conditional>
-
 理解 `authData` 的数据结构至关重要。一个终端用户通过如下的鉴权信息来登录的时候，
 
 ```json
@@ -1297,28 +2651,28 @@ FTDSUser::LoginWithAuthData("lc_apple", AppleAuthData, FTDSUser::FCallBackDelega
 云端首先会查找账户系统，看看是否存在 `authData.platform.openid` 等于 `OPENID` 的账户，如果存在，则返回现有账户，如果不存在那么就创建一个新账户，同时将上面的鉴权信息写入新账户的 `authData` 属性中，并将新账户的数据当成结果返回。
 
 云端会自动为每个用户的 `authData.<PLATFORM>.<uid>` 创建唯一索引，从而避免重复数据。
-`<uid>` 在<Conditional region="cn">微信等</Conditional>部分云服务内建支持的第三方平台上为 `openid` 字段，在其他第三方平台（包括部分云服务专门支持的第三方平台和所有云服务没有专门支持的第三方平台）上为 `uid` 字段。
+`<uid>` 在微信等部分云服务内建支持的第三方平台上为 `openid` 字段，在其他第三方平台（包括部分云服务专门支持的第三方平台和所有云服务没有专门支持的第三方平台）上为 `uid` 字段。
 
 ### 自动验证第三方平台授权信息
 
 为了确保账户数据的有效性，云端还支持对部分平台的 Access Token 的有效性进行自动验证，以防止伪造账户数据。如果有效性验证不通过，云端会返回 `invalid authData` 错误，关联不会被建立。对于云端无法识别的服务，开发者需要自己去验证 Access Token 的有效性。
 比如，注册、登录时分别通过云引擎的 `beforeSave` hook、`beforeUpdate` hook 来验证 Access Token 有效性。
 
-如果希望使用这一功能，则在开始使用前，需要在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 内建账户 > 设置** 配置相应平台的 **应用 ID** 和 **应用 Secret Key**。
+如果希望使用这一功能，则在开始使用前，需要在 **云服务控制台 > 内建账户 > 设置** 配置相应平台的 **应用 ID** 和 **应用 Secret Key**。
 
-如果不希望云端自动验证 Access Token，可以在 **开发者中心 > 你的游戏 > 游戏服务 > 云服务 > 内建账户 > 设置** 里面取消勾选 **第三方登录时，验证用户 AccessToken 合法性**。
+如果不希望云端自动验证 Access Token，可以在 **云服务控制台 > 内建账户 > 设置** 里面取消勾选 **第三方登录时，验证用户 AccessToken 合法性**。
 
-配置平台账号的目的在于创建 `TDSUser` 时，云端会使用相关信息去校验请求参数 `thirdPartyData` 的合法性，确保 `TDSUser` 实际对应着一个合法真实的用户，确保平台安全性。
+配置平台账号的目的在于创建用户对象时，云端会使用相关信息去校验请求参数 `thirdPartyData` 的合法性，确保用户对象实际对应着一个合法真实的用户，确保平台安全性。
 
 ### 绑定第三方账户
 
-如果用户已经登录，也可以在当前账户上绑定或解绑更多第三方平台信息。例如，先用游客身份登录，再绑定 TapTap 或其他第三方账号，那么以后通过 TapTap 或其他第三方授权登录，都可以得到完全相同的账号。
+如果用户已经登录，也可以在当前账户上绑定或解绑更多第三方平台信息。
 
-绑定成功后，新的第三方账户信息会被添加到 `TDSUser` 的 `authData` 字段里。
+绑定成功后，新的第三方账户信息会被添加到用户对象的 `authData` 字段里。
 
 例如，下面的代码可以关联微信账户：
 
-<MultiLang kind="ue">
+<MultiLang>
 
 ```cs
 await currentUser.AssociateAuthData(weixinData, "weixin");
@@ -1353,15 +2707,42 @@ user.associateWithAuthData(weixinData, "weixin").subscribe(new Observer<LCUser>(
 }];
 ```
 
-```cpp
-User->AssociateWithAuthData("weixin", AuthData, FTDSUser::FCallBackDelegate::CreateLambda([](const TSharedPtr<FTDSUser>& UserPtr, const FTUError& Error) {
-    if (UserPtr.IsValid()) {
-        // 绑定成功
+```swift
+currentUser.associate(authData: weixinData, platform: .weixin) { (result) in
+    switch result {
+    case .success:
+        // 关联成功
+    case .failure(error: let error):
+        // 关联失败
     }
-    else {
-        // 绑定失败 Error.msg Error.msg;
-    }
-}));
+}
+```
+
+```dart
+await currentUser.associateAuthData(weixinData, 'weixin');
+```
+
+```js
+user
+  .associateWithAuthData(weixinData, "weixin")
+  .then(function (user) {
+    // 成功绑定
+  })
+  .catch(function (error) {
+    console.error("error: ", error);
+  });
+```
+
+```python
+user.link_with("weixin", weixin_data)
+```
+
+```php
+$user->linkWith("weixin", $weixinData);
+```
+
+```go
+// 暂不支持
 ```
 
 </MultiLang>
@@ -1374,15 +2755,15 @@ User->AssociateWithAuthData("weixin", AuthData, FTDSUser::FCallBackDelegate::Cre
 
 例如，下面的代码可以解除用户和微信账户的关联：
 
-<MultiLang kind="ue">
+<MultiLang>
 
 ```cs
-TDSUser currentUser = await TDSUser.GetCurrent();
+LCUser currentUser = await LCUser.GetCurrent();
 await currentUser.DisassociateWithAuthData("weixin");
 ```
 
 ```java
-TDSUser user = TDSUser.currentUser();
+LCUser user = LCUser.currentUser();
 user.dissociateWithAuthData("weixin").subscribe(new Observer<LCUser>() {
     @Override
     public void onSubscribe(Disposable d) {
@@ -1411,21 +2792,310 @@ user.dissociateWithAuthData("weixin").subscribe(new Observer<LCUser>() {
 }];
 ```
 
-```cpp
-User->DisassociateAuthData("weixin", FTDSUser::FCallBackDelegate::CreateLambda(
-                                [](const TSharedPtr<FTDSUser>& UserPtr, const FTUError& Error) {
-                                    if (UserPtr.IsValid()) {
-                                        // 成功
-                                    }
-                                    else {
-                                        // 失败 Error.msg;
-                                    }
-                                }));
+```swift
+currentUser.disassociate(authData: .weixin) { (result) in
+    switch result {
+    case .success:
+        // 解除关联成功
+    case .failure(error: let error):
+        // 解除关联失败
+    }
+}
+```
+
+```dart
+LCUser currentUser = await LCUser.getCurrent();
+await currentUser.disassociateWithAuthData('weixin');
+```
+
+```js
+user.dissociateAuthData("weixin").then(
+  (s) => {
+    // 解除关联成功
+  },
+  (error) => {
+    // 解除关联失败
+  }
+);
+```
+
+```python
+user.unlink_from("weixin")
+```
+
+```php
+$user->unlinkWith("weixin");
+```
+
+```go
+// 暂不支持
 ```
 
 </MultiLang>
 
-<Conditional region="cn">
+<details>
+
+<summary>扩展：第三方登录时补充完整的用户信息</summary>
+
+有些产品，新用户在使用第三方账号授权拿到相关信息后，仍然需要补充设置用户名、手机号、密码等重要信息后，才被允许登录成功。
+
+这时要使用 `loginWithauthData` 登录接口的 `failOnNotExist` 参数并将其设置为 `true`。服务端会判断是否已存在能匹配上的 `authData`，如果不存在则会返回 `211` 错误码和 `Could not find user` 报错信息。开发者根据这个 `211` 错误码，跳转到要求输入用户名、密码、手机号等信息的页面，实例化一个用户对象，保存上述补充数据，再次调用 `loginWithauthData` 接口进行登录，并 **不再传入 `failOnNotExist` 参数**。示例代码如下：
+
+<MultiLang>
+
+```cs
+try {
+  Dictionary<string, object> thirdPartyData = new Dictionary<string, object> {
+    // 必须
+    { "openid", "OPENID" },
+    { "access_token", "ACCESS_TOKEN" },
+    { "expires_in", 7200 },
+
+    // 可选
+    { "refresh_token", "REFRESH_TOKEN" },
+    { "scope", "SCOPE" }
+  };
+  LCUserAuthDataLoginOption option = new LCUserAuthDataLoginOption();
+  option.FailOnNotExist = true;
+  LCUser currentUser = await LCUser.LoginWithAuthData(thirdPartyData, "weixin", option: option);
+} catch (LCException e) {
+  if (e.code == 211) {
+    // 不存在 authData 的 LCUser 的实例，跳转到输入用户名、密码、手机号等业务页面
+  }
+}
+
+// 跳转到输入用户名、密码、手机号等业务页面之后
+Dictionary<string, object> thirdPartyData = new Dictionary<string, object> {
+  { "expires_in", 7200 },
+  { "openid", "OPENID" },
+  { "access_token", "ACCESS_TOKEN" }
+};
+try {
+  LCUserAuthDataLoginOption option = new LCUserAuthDataLoginOption();
+  option.FailOnNotExist = true;
+  LCUser user = await LCUser.LoginWithAuthData(thirdPartyData, "weixin", option: option);
+  user.Username = "Tom";
+  user.Mobile = "+8618200008888";
+  await user.Save();
+} catch (LCException e) {
+    //其他报错信息
+}
+```
+
+```java
+Map<String, Object> thirdPartyData = new HashMap<String, Object>();
+thirdPartyData.put("expires_in", 7200);
+thirdPartyData.put("openid", "OPENID");
+thirdPartyData.put("access_token", "ACCESS_TOKEN");
+thirdPartyData.put("refresh_token", "REFRESH_TOKEN");
+thirdPartyData.put("scope", "SCOPE");
+Boolean failOnNotExist = true;
+LCUser user = new LCUser();
+user.loginWithAuthData(thirdPartyData, "weixin", failOnNotExist).subscribe(new Observer<LCUser>() {
+    @Override
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(LCUser user) {
+        System.out.println("存在匹配的用户，登录成功");
+    }
+    @Override
+    public void onError(Throwable e) {
+        LCException avException = new LCException(e);
+        int code = avException.getCode();
+        if (code == 211){
+            // 跳转到输入用户名、密码、手机号等业务页面
+        } else {
+            System.out.println("发生错误:" + e.getMessage());
+        }
+    }
+    @Override
+    public void onComplete() {
+    }
+});
+
+// 跳转到输入用户名、密码、手机号等业务页面之后
+LCUser user = new LCUser();
+user.setUsername("Tom");
+user.setMobilePhoneNumber("+8618200008888");
+Boolean failOnNotExist = false;
+user.loginWithAuthData(thirdPartyData, "weixin", failOnNotExist).subscribe(new Observer<LCUser>() {
+    @Override
+    public void onSubscribe(Disposable d) {
+    }
+    @Override
+    public void onNext(LCUser user) {
+        System.out.println("登录成功");
+    }
+    @Override
+    public void onError(Throwable e) {
+        System.out.println("登录失败：" + e.getMessage());
+    }
+    @Override
+    public void onComplete() {
+    }
+});
+```
+
+```objc
+NSDictionary *thirdPartyData = @{
+                            @"access_token":@"ACCESS_TOKEN",
+                            @"expires_in":@7200,
+                            @"refresh_token":@"REFRESH_TOKEN",
+                            @"openid":@"OPENID",
+                            @"scope":@"SCOPE",
+                            };
+LCUser *user = [LCUser user];
+LCUserAuthDataLoginOption *option = [LCUserAuthDataLoginOption new];
+option.platform = LeanCloudSocialPlatformWeiXin;
+option.failOnNotExist = true;
+[user loginWithAuthData:thirdPartyData platformId:LeanCloudSocialPlatformWeiXin options:option callback:^(BOOL succeeded, NSError * _Nullable error) {
+    if (succeeded) {
+        // 你的逻辑
+    } else if ([error.domain isEqualToString:kLeanCloudErrorDomain] && error.code == 211) {
+        // 不存在 thirdPartyData 的 LCUser 的实例，跳转到输入用户名、密码、手机号等业务页面
+    }
+}];
+
+// 跳转到输入用户名、密码、手机号等业务页面之后
+LCUser *user = [LCUser user];
+user.username = @"Tom";
+user.mobilePhoneNumber = @"+8618200008888";
+LCUserAuthDataLoginOption *option = [LCUserAuthDataLoginOption new];
+option.platform = LeanCloudSocialPlatformWeiXin;
+[user loginWithAuthData:thirdPartyData platformId:LeanCloudSocialPlatformWeiXin options:option callback:^(BOOL succeeded, NSError * _Nullable error) {
+        if (succeeded) {
+            NSLog(@"登录成功");
+    }else{
+            NSLog(@"登录失败：%@",error.localizedFailureReason);
+    }
+}];
+```
+
+```swift
+let thirdPartyData: [String: Any] = [
+    "access_token": "ACCESS_TOKEN",
+    "expires_in": 7200,
+    "refresh_token": "REFRESH_TOKEN",
+    "openid": "OPENID",
+    "scope": "SCOPE"
+]
+let user = LCUser()
+user.logIn(authData: thirdPartyData, platform: .weixin, options: [.failOnNotExist]) { (result) in
+    switch result {
+    case .success:
+        assert(user.objectId != nil)
+    case .failure(error: let error):
+        if error.code == 211 {
+            // 不存在绑定了当前 authData 的 User 的实例
+            // 跳转到输入用户名、密码、手机号等业务页面
+            let user = LCUser()
+            user.username = "Tom"
+            user.password = "cat!@#123"
+            user.mobilePhoneNumber = "+8618200008888"
+            user.logIn(authData: thirdPartyData, platform: .weixin, completion: { (result) in
+                switch result {
+                case .success:
+                    assert(user.objectId != nil)
+                case .failure(error: let error):
+                    print(error)
+                }
+            })
+        }
+    }
+}
+```
+
+```dart
+try {
+  Map<String, dynamic> thirdPartyData = {
+    // 必须
+    'openid': 'OPENID',
+    'access_token': 'ACCESS_TOKEN',
+    'expires_in': 7200,
+
+    // 可选
+    'refresh_token': 'REFRESH_TOKEN',
+    'scope': 'SCOPE'
+  };
+  LCUserAuthDataLoginOption option = new LCUserAuthDataLoginOption();
+  option.failOnNotExist = true;
+  LCUser currentUser = await LCUser.loginWithAuthData(thirdPartyData, 'weixin', option: option);
+} on LCException catch (e) {
+  if (e.code == 211) {
+    // 不存在 authData 的 LCUser 的实例，跳转到输入用户名、密码、手机号等业务页面
+  }
+}
+
+// 跳转到输入用户名、密码、手机号等业务页面之后
+Map<String, dynamic> thirdPartyData = {
+  'expires_in': 7200,
+  'openid': 'OPENID',
+  'access_token': 'ACCESS_TOKEN'
+};
+try {
+  LCUserAuthDataLoginOption option = new LCUserAuthDataLoginOption();
+  option.failOnNotExist = true;
+  LCUser user = await LCUser.loginWithAuthData(thirdPartyData, 'weixin', option: option);
+  user.username = 'Tome';
+  user.mobile = '+8618200008888';
+  await user.save();
+} on LCException catch (e) {
+    //其他报错信息
+}
+```
+
+```js
+const thirdPartyData = {
+  access_token: "ACCESS_TOKEN",
+  expires_in: 7200,
+  refresh_token: "REFRESH_TOKEN",
+  openid: "OPENID",
+  scope: "SCOPE",
+};
+AV.User.loginWithAuthData(thirdPartyData, "weixin", {
+  failOnNotExist: true,
+}).then(
+  (s) => {
+    // 登录成功
+  },
+  (error) => {
+    // 登录失败
+    // 检查 error.code == 211，跳转到用户名、手机号等资料的输入页面
+  }
+);
+
+const user = new AV.User();
+// 设置用户名
+user.setUsername("Tom");
+// 设置密码
+user.setMobilePhoneNumber("+8618200008888");
+user.setPassword("cat!@#123");
+// 设置邮箱
+user.setEmail("tom@leancloud.rocks");
+user.loginWithAuthData(thirdPartyData, "weixin").then(
+  (loggedInUser) => {
+    console.log(loggedInUser);
+  },
+  (error) => {}
+);
+```
+
+```python
+# 暂不支持
+```
+
+```php
+// 暂不支持
+```
+
+```go
+// 暂不支持
+```
+
+</MultiLang>
+
+</details>
 
 <details>
 
@@ -1485,7 +3155,7 @@ Dictionary<string, object> thirdPartyData = new Dictionary<string, object> {
 LCUserAuthDataLoginOption option = new LCUserAuthDataLoginOption();
 option.AsMainAccount = true;
 option.UnionIdPlatform = "weixin";
-TDSUser currentUser = await TDSUser.LoginWithAuthDataAndUnionId(
+LCUser currentUser = await LCUser.LoginWithAuthDataAndUnionId(
     thirdPartyData, "wxleanoffice", "unionid4a",
     option: option);
 ```
@@ -1496,15 +3166,15 @@ thirdPartyData.put("expires_in", 1384686496);
 thirdPartyData.put("uid", "officeopenid");
 thirdPartyData.put("access_token", "officetoken");
 thirdPartyData.put("scope", "SCOPE");
-TDSUser.loginWithAuthData(TDSUser.class, thirdPartyData, "wxleanoffice",
+LCUser.loginWithAuthData(LCUser.class, thirdPartyData, "wxleanoffice",
    "unionid4a", "weixin", true)   // 新增参数，分别表示 uniondId，unionIdPlatform，asMainAccount
                                   // 对于 unionIdPlatform，这里使用「weixin」来指代微信平台。
-   .subscribe(new Observer<TDSUser>() {
+   .subscribe(new Observer<LCUser>() {
     @Override
     public void onSubscribe(Disposable d) {
     }
     @Override
-    public void onNext(TDSUser user) {
+    public void onNext(LCUser user) {
         System.out.println("登录成功");
     }
     @Override
@@ -1525,7 +3195,7 @@ NSDictionary *thirdPartyData = @{
                             @"scope":@"SCOPE",
                             @"unionid":@"unionid4a" // 新增属性
                             };
-TDSUser *currentuser = [TDSUser user];
+LCUser *currentuser = [LCUser user];
 LCUserAuthDataLoginOption *option = [LCUserAuthDataLoginOption new];
 option.platform = @"weixin";   // 这里指定 UnionIdPlatform，使用「weixin」来指代微信平台。
 option.unionId = thirdPartyData[@"unionid"];
@@ -1539,9 +3209,92 @@ option.isMainAccount = true;
 }];
 ```
 
+```swift
+let thirdPartyData: [String: Any] = [
+    "access_token": "officetoken",
+    "expires_in": 1384686496,
+    "uid": "officeopenid",
+    "scope": "SCOPE",
+    "unionid": "unionid4a" // 新增属性
+]
+let user = LCUser()
+user.logIn(
+    authData: thirdPartyData,
+    platform: .custom("wxleanoffice"),
+    unionID: thirdPartyData["unionid"] as? String,
+    unionIDPlatform: .weixin,   // 这里指定 UnionIdPlatform，使用「weixin」来指代微信平台。
+    options: [.mainAccount])
+{ (result) in
+    switch result {
+    case .success:
+        assert(user.objectId != nil)
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+```dart
+Map<String, dynamic> thirdPartyData = {
+  // 必须
+  'uid': 'officeopenid',
+  'access_token': 'officetoken',
+  'expires_in': 1384686496,
+  'unionId': 'unionid4a',   // 新增属性
+
+  // 可选
+  'refresh_token': '...',
+  'scope': 'SCOPE'
+};
+LCUserAuthDataLoginOption option = LCUserAuthDataLoginOption();
+option.asMainAccount = true;
+option.unionIdPlatform = 'weixin';
+LCUser currentUser = await LCUser.loginWithAuthDataAndUnionId(
+    thirdPartyData, 'wxleanoffice', 'unionid4a',
+    option: option);
+```
+
+```js
+const thirdPartyData = {
+  access_token: "officetoken",
+  expires_in: 1384686496,
+  uid: "officeopenid",
+  scope: "SCOPE",
+};
+
+AV.User.loginWithAuthDataAndUnionId(
+  thirdPartyData,
+  "wxleanoffice",
+  "unionid4a", // 新增参数
+  {
+    unionIdPlatform: "weixin", // 这里指定 UnionIdPlatform，使用「weixin」来指代微信平台。
+    asMainAccount: true,
+  }
+).then(
+  (user) => {
+    // 绑定成功
+  },
+  (error) => {
+    // 绑定失败
+  }
+);
+```
+
+```python
+# 暂不支持
+```
+
+```php
+// 暂不支持
+```
+
+```go
+// 暂不支持
+```
+
 </MultiLang>
 
-注意代码中将微信传回来的 openid 属性改为了 uid，这是因为云端要求对于自定义的 platform，只能使用 uid 这样的属性名，才能保证自动建立 `authData.<PLATFORM>.uid` 的唯一索引，具体可以参考[数据存储 REST API 使用详解](/sdk/storage/guide/rest/)的《连接用户账户和第三方平台》一节。
+注意代码中将微信传回来的 openid 属性改为了 uid，这是因为云端要求对于自定义的 platform，只能使用 uid 这样的属性名，才能保证自动建立 `authData.<PLATFORM>.uid` 的唯一索引，具体可以参考《数据存储 REST API 使用详解》的[《连接用户账户和第三方平台》](/sdk/authentication/rest/#连接用户账户和第三方平台)一节。
 
 如果用户 A 是第一次在「云服务通讯」中通过微信登录，那么 `_User` 表中会增加一个新用户（假设其 `objectId` 为 `ThisIsUserA`），其 `authData` 的结果如下：
 
@@ -1587,7 +3340,7 @@ Dictionary<string, object> thirdPartyData = new Dictionary<string, object> {
 LCUserAuthDataLoginOption option = new LCUserAuthDataLoginOption();
 option.AsMainAccount = false;
 option.UnionIdPlatform = "weixin";     // 这里指定 unionIdPlatform，使用「weixin」来指代微信平台。
-TDSUser currentUser = await TDSUser.LoginWithAuthDataAndUnionId(
+LCUser currentUser = await LCUser.LoginWithAuthDataAndUnionId(
     thirdPartyData, "wxleansupport", "unionid4a",
     option: option);
 ```
@@ -1598,14 +3351,14 @@ thirdPartyData.put("expires_in", 1384686496);
 thirdPartyData.put("uid", "supportopenid");
 thirdPartyData.put("access_token", "supporttoken");
 thirdPartyData.put("scope", "SCOPE");
-TDSUser.loginWithAuthData(TDSUser.class, thirdPartyData, "wxleansupport", "unionid4a",
+LCUser.loginWithAuthData(LCUser.class, thirdPartyData, "wxleansupport", "unionid4a",
   "weixin",     // 这里指定 unionIdPlatform，使用「weixin」来指代微信平台。
-  false).subscribe(new Observer<TDSUser>() {
+  false).subscribe(new Observer<LCUser>() {
     @Override
     public void onSubscribe(Disposable d) {
     }
     @Override
-    public void onNext(TDSUser user) {
+    public void onNext(LCUser user) {
         System.out.println("登录成功");
     }
     @Override
@@ -1626,7 +3379,7 @@ NSDictionary *thirdPartyData = @{
                             @"scope":@"SCOPE",
                             @"unionid":@"unionid4a"
                             };
-TDSUser *currentuser = [TDSUser user];
+LCUser *currentuser = [LCUser user];
 LCUserAuthDataLoginOption *option = [LCUserAuthDataLoginOption new];
 option.platform = @"weixin";   // 这里指定 unionIdPlatform，使用「weixin」来指代微信平台。
 option.unionId = thirdPartyData[@"unionid"];
@@ -1638,6 +3391,89 @@ option.isMainAccount = false;
             NSLog(@"登录失败：%@",error.localizedFailureReason);
         }
 }];
+```
+
+```swift
+let thirdPartyData: [String: Any] = [
+    "access_token": "supporttoken",
+    "expires_in": 1384686496,
+    "uid": "supportopenid",
+    "scope": "SCOPE",
+    "unionid": "unionid4a"
+]
+let user = LCUser()
+user.logIn(
+    authData: thirdPartyData,
+    platform: .custom("wxleansupport"),
+    unionID: thirdPartyData["unionid"] as? String,
+    unionIDPlatform: .weixin,  // 这里指定 unionIdPlatform，使用「weixin」来指代微信平台。
+    options: [.mainAccount])
+{ (result) in
+    switch result {
+    case .success:
+        assert(user.objectId != nil)
+    case .failure(error: let error):
+        print(error)
+    }
+}
+```
+
+```dart
+Map<String, dynamic> thirdPartyData = {
+  // 必须
+  'uid': 'supportopenid',
+  'access_token': 'supporttoken',
+  'expires_in': 1384686496,
+  'unionId': 'unionid4a',
+
+  // 可选
+  'refresh_token': '...',
+  'scope': 'SCOPE'
+};
+LCUserAuthDataLoginOption option = LCUserAuthDataLoginOption();
+option.asMainAccount = false;
+option.unionIdPlatform = 'weixin';     // 这里指定 unionIdPlatform，使用「weixin」来指代微信平台。
+LCUser currentUser = await LCUser.loginWithAuthDataAndUnionId(
+    thirdPartyData, 'wxleansupport', 'unionid4a',
+    option: option);
+```
+
+```js
+const thirdPartyData = {
+  access_token: "supporttoken",
+  expires_in: 1384686496,
+  uid: "supportopenid",
+  scope: "SCOPE",
+};
+
+AV.User.loginWithAuthDataAndUnionId(
+  thirdPartyData,
+  "wxleansupport",
+  "unionid4a",
+  {
+    unionIdPlatform: "weixin", // 这里指定 unionIdPlatform，使用「weixin」来指代微信平台。
+    asMainAccount: false,
+  }
+).then(
+  (user) => {
+    // 绑定成功
+  },
+  (error) => {
+    // 绑定失败
+  }
+);
+```
+
+```python
+# 暂不支持
+```
+
+```php
+// 暂不支持
+```
+
+```go
+// 暂不支持
 ```
 
 </MultiLang>
@@ -1668,11 +3504,11 @@ option.isMainAccount = false;
 }
 ```
 
-在新的登录方式中，当一个用户以「平台名为 `wxleanoffice`、uid 为 `officeopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息登录得到新的 `TDSUser` 后，接下来这个用户以「平台名为 `wxleansupport`、uid 为 `supportopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息登录时，云端判定是同样的 UnionID，就直接把来自 `wxleansupport` 的新用户数据加入到已有账户的 `authData` 里了，不会再创建新的账户。
+在新的登录方式中，当一个用户以「平台名为 `wxleanoffice`、uid 为 `officeopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息登录得到新的用户对象后，接下来这个用户以「平台名为 `wxleansupport`、uid 为 `supportopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息登录时，云端判定是同样的 UnionID，就直接把来自 `wxleansupport` 的新用户数据加入到已有账户的 `authData` 里了，不会再创建新的账户。
 
-这样一来，云端通过识别平台性的用户唯一标识 UnionID，让来自同一个 UnionID 体系内的应用程序、小程序等不同平台的用户都绑定到了一个 `TDSUser` 上，实现互通。
+这样一来，云端通过识别平台性的用户唯一标识 UnionID，让来自同一个 UnionID 体系内的应用程序、小程序等不同平台的用户都绑定到了一个用户对象上，实现互通。
 
-#### 为 UnionID 建立索引
+### 为 UnionID 建立索引
 
 云端会为 UnionID 自动建立索引，不过因为自动创建基于请求的抽样统计，可能会滞后。
 因此，我们推荐自行创建相关索引，特别是用户量（`_User`　表记录数）很大的应用，更需要预先创建索引，否则用户使用 UnionID 账号登录时可能超时失败。
@@ -1682,7 +3518,7 @@ option.isMainAccount = false;
 - `authData.wxleansupport.uid`
 - `authData._weixin_unionid.uid`
 
-#### 该如何指定 unionIdPlatform
+### 该如何指定 unionIdPlatform
 
 从上面的例子可以看出，使用 UnionID 登录的时候，需要指定 `unionIdPlatform` 的主要目的，就是为了便于查找已经存在的唯一主账号。云端会在主账号对应账户的 `authData` 属性中增加一个 `_{unionIdPlatform}_unionid` 键值对来标记唯一性，终端用户在其他应用中登录的时候，云端会根据参数中提供的 `uniondId` + `unionIdPlatform` 的组合，在 `_User` 表中进行查找，这样来确定唯一的既存主账号。
 
@@ -1698,11 +3534,11 @@ option.isMainAccount = false;
 - 微博平台的多个应用，统一使用 `weibo` 作为 `unionIdPlatform`；
 - 除此之外的其他平台，开发者可以自行定义 `unionIdPlatform` 的名字，只要自己保证多个应用间统一即可。
 
-#### 主副应用不同登录顺序出现的不同结果
+### 主副应用不同登录顺序出现的不同结果
 
 上面的流程是用户先登录了「云服务通讯」这个主应用，然后再登录「云服务技术支持」这个副应用，所以账号都被通过 UnionID 有效关联起来了。可能有人会想到另外一个问题，如果用户 B 先登录副应用，后登录主应用，这时候会发生什么事情呢？
 
-用户 B 首先登录副应用的时候，提供了「平台名为 `wxleansupport`、uid 为 `supportopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息，并且指定「UnionIDPlatform 为 `weixin`、`asMainAccount` 为 `false`」（与上面的调用完全一致），此时云端由于找不到存在的 UnionID，会新建一个 `TDSUser` 对象，该账户 `authData` 结果为：
+用户 B 首先登录副应用的时候，提供了「平台名为 `wxleansupport`、uid 为 `supportopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息，并且指定「UnionIDPlatform 为 `weixin`、`asMainAccount` 为 `false`」（与上面的调用完全一致），此时云端由于找不到存在的 UnionID，会新建一个用户对象，该账户 `authData` 结果为：
 
 ```json
 {
@@ -1717,7 +3553,7 @@ option.isMainAccount = false;
 }
 ```
 
-用户 B 接着又使用了主应用，ta 再次通过微信登录，此时以「平台名为 `wxleanoffice`、uid 为 `officeopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息，以及「UnionIDPlatform 为 `weixin`、`asMainAccount` 为 `true`」的参数进行登录，此时云端由于找不到存在的 UnionID，会再次新建一个 `TDSUser` 对象，该账户 `authData` 结果为：
+用户 B 接着又使用了主应用，ta 再次通过微信登录，此时以「平台名为 `wxleanoffice`、uid 为 `officeopenid`、UnionID 为 `unionid4a`」的第三方鉴权信息，以及「UnionIDPlatform 为 `weixin`、`asMainAccount` 为 `true`」的参数进行登录，此时云端由于找不到存在的 UnionID，会再次新建一个用户对象，该账户 `authData` 结果为：
 
 ```json
 {
@@ -1737,7 +3573,7 @@ option.isMainAccount = false;
 
 还有更复杂的情况。如果某公司的产品之前就接入了微信登录，产生了很多存量用户，并且分散在不同的子产品中，这时候怎么办？我们接下来专门讨论此时的解决方案。
 
-#### 存量账户如何通过 UnionID 实现关联
+### 存量账户如何通过 UnionID 实现关联
 
 还是以我们的两个子产品「云服务通讯」（后续以「产品 1」指代）和「云服务技术支持为例」（后续以「产品 2」指代）为例，在接入 UnionID 之前，我们就接入了之前版本的微信平台登录，这时候账户系统内可能存在多种账户：
 
@@ -1796,4 +3632,221 @@ option.isMainAccount = false;
 
 </details>
 
-</Conditional>
+## 匿名用户
+
+将数据与用户关联需要首先创建一个用户，但有时你不希望强制用户在一开始就进行注册。使用匿名用户，可以让应用不提供注册步骤也能创建用户。下面的代码创建一个新的匿名用户：
+
+<MultiLang>
+
+```cs
+await LCUser.LoginAnonymously();
+```
+
+```java
+LCUser.logInAnonymously().subscribe(new Observer<LCUser>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCUser user) {
+        // user 是新的匿名用户
+    }
+    public void onError(Throwable throwable) {}
+    public void onComplete() {}
+});
+```
+
+```objc
+[LCUser loginAnonymouslyWithCallback:^(LCUser *user, NSError *error) {
+    // user 是新的匿名用户
+}];
+```
+
+```swift
+// 暂不支持
+```
+
+```dart
+await LCUser.loginAnonymously();
+```
+
+```js
+AV.User.loginAnonymously().then((user) => {
+  // user 是新的匿名用户
+});
+```
+
+```python
+# 暂不支持
+```
+
+```php
+// 暂不支持
+```
+
+```go
+// 暂不支持
+```
+
+</MultiLang>
+
+可以像给普通用户设置属性那样给匿名用户设置 `username`、`password`、`email` 等属性，还可以通过走正常的注册流程来将匿名用户转化为普通用户。匿名用户能够：
+
+- [使用用户名和密码注册](#注册)
+- [关联第三方平台](#第三方账户登录)，比如微信
+
+下面的代码为一名匿名用户设置用户名和密码：
+
+<MultiLang>
+
+```cs
+LCUser currentUser = await LCUser.LoginAnonymously();
+currentUser.Username = "Tom";
+currentUser.Password = "cat!@#123";
+
+await currentUser.SignUp();
+```
+
+```java
+// currentUser 是个匿名用户
+LCUser currentUser = LCUser.getCurrentUser();
+
+currentUser.setUsername("Tom");
+currentUser.setPassword("cat!@#123");
+
+currentUser.signUpInBackground().subscribe(new Observer<LCUser>() {
+    public void onSubscribe(Disposable disposable) {}
+    public void onNext(LCUser user) {
+        // currentUser 已经转化为普通用户
+    }
+    public void onError(Throwable throwable) {
+        // 注册失败（通常是因为用户名已被使用）
+    }
+    public void onComplete() {}
+});
+```
+
+```objc
+// currentUser 是个匿名用户
+LCUser *currentUser = [LCUser currentUser];
+
+user.username = @"Tom";
+user.password = @"cat!@#123";
+
+[user signUpInBackgroundWithBlock:^(BOOL succeeded, NSError *error) {
+    if (succeeded) {
+        // currentUser 已经转化为普通用户
+    } else {
+        // 注册失败（通常是因为用户名已被使用）
+    }
+}];
+```
+
+```swift
+// 暂不支持
+```
+
+```dart
+LCUser currentUser = await LCUser.loginAnonymously();
+currentUser.username = 'Tom';
+currentUser.password = 'cat!@#123';
+
+await currentUser.signUp();
+```
+
+```js
+// currentUser 是个匿名用户
+const currentUser = AV.User.current();
+
+user.setUsername("Tom");
+user.setPassword("cat!@#123");
+
+user.signUp().then(
+  (user) => {
+    // currentUser 已经转化为普通用户
+  },
+  (error) => {
+    // 注册失败（通常是因为用户名已被使用）
+  }
+);
+```
+
+```python
+# 暂不支持
+```
+
+```php
+// 暂不支持
+```
+
+```go
+// 暂不支持
+```
+
+</MultiLang>
+
+下面的代码检查当前用户是否为匿名用户：
+
+<MultiLang>
+
+```cs
+LCUser currentUser = await LCUser.GetCurrent();
+if (currentUser.IsAnonymous) {
+  // currentUser 是匿名用户
+} else {
+  // currentUser 不是匿名用户
+}
+```
+
+```java
+LCUser currentUser = LCUser.getCurrentUser();
+if (currentUser.isAnonymous()) {
+  // currentUser 是匿名用户
+} else {
+  // currentUser 不是匿名用户
+}
+```
+
+```objc
+LCUser *currentUser = [LCUser currentUser];
+if (currentUser.isAnonymous) {
+    // currentUser 是匿名用户
+} else {
+    // currentUser 不是匿名用户
+}
+```
+
+```swift
+// 暂不支持
+```
+
+```dart
+LCUser currentUser = await LCUser.getCurrent();
+if (currentUser.isAnonymous) {
+  // currentUser 是匿名用户
+} else {
+  // currentUser 不是匿名用户
+}
+```
+
+```js
+const currentUser = AV.User.current();
+if (currentUser.isAnonymous()) {
+  // currentUser 是匿名用户
+} else {
+  // currentUser 不是匿名用户
+}
+```
+
+```python
+# 暂不支持
+```
+
+```php
+// 暂不支持
+```
+
+```go
+// 暂不支持
+```
+
+</MultiLang>
+
+如果匿名用户未能在登出前转化为普通用户，那么该用户将无法再次登录同一账户，且之前产生的数据也无法被取回。

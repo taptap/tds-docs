@@ -1,4 +1,4 @@
-export const BRAND: string = "tds";
+export const BRAND: string = "leancloud";
 export const REGION: string = "cn";
 
 // Cloud Engine
