@@ -6,7 +6,7 @@ sidebar_position: 2
 
 import MultiLang from "/src/docComponents/MultiLang";
 import CodeBlock from "@theme/CodeBlock";
-import v3SDKVersions from "/src/docComponents/v3SDKVersions";
+import v4SDKVersions from '/src/docComponents/v4SDKVersions';
 import { Conditional } from "/src/docComponents/conditional";
 import AndroidFaq from "../_partials/android-package-visibility.mdx";
 import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
@@ -14,73 +14,18 @@ import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
 :::info
 本文档只适用于国内版本，海外版本请参考 [文档](/tap-update-old-guide/)
 :::
-## 环境要求
-
-<MultiLang kind="ue">
-
-<>
-
-- TapSDK **3.23.0** 及以上版本
-- Unity 2019.4 或更高版本
-- Android 5.0（API level 21）或更高版本
-
-<details>
-
-<summary>点击展开 Unity 2022.3 之前的版本升级 Gradle 版本</summary>
-
-为了将 [Gradle 版本和 Android Gradle Plugin 版本对应](https://developer.android.com/studio/releases/gradle-plugin#expandable-1)，需要更新 Gradle 版本，下载 [6.7.1 版本的 Gradle](https://services.gradle.org/distributions/gradle-6.7.1-bin.zip)，解压后放到自定义的文件夹中，同时**不**勾选 Unity 中的 `Preferences` -> `External Tools`-> `Android` -> `Gradle Installed with Unity(recommend)`，改为选择解压后 Gradle 文件夹的位置，如 <some path\>/gradle-6.7.1。
-
-另外， Unity 更新唤醒模块会**自动**更新项目中使用的 Android Gradle Plugin 版本，如果您需要手动更改或者查看，可以在 `Project Settings` -> `Player` -> `Android Tab` -> `Publish Settings` -> `Build`，然后勾选**Custom Base Gradle Template**
-
-将以下更改应用于生成的这个文件:
-**Assets/Plugins/Android/baseProjectTemplate.gradle**
-
-修改文件内容:
-
-```groovy
-dependencies {
-    // 将版本修改至少为 4.2.0
-    classpath 'com.android.tools.build:gradle:4.2.0'
-}
-```
-
-</details>
-
-</>
-
-<>
-
-- TapSDK **3.23.0** 及以上版本
-- Android 5.0（API level 21）或更高版本
-
-</>
-
-<>
-
-- 受限于苹果政策，iOS 平台的 TapTap 客户端不提供游戏更新功能
-
-</>
-
-<>
-
-- 安装 UE 4.26 及以上版本
-- iOS 12 或更高版本
-- Android 5.0（API level 21）或更高版本
-- macOS 10.14.0 或更高版本
-- Windows 7 或更高版本
-
-**支持平台**：Android / iOS / Windows / macOS
-
-</>
-
-</MultiLang>
 
 ## 权限说明
 
-<MultiLang kind="ue">
+<MultiLang kind="android_unity">
 
 <>
+该模块依赖权限如下：
 
+| 权限 | 使用目的 | 权限申请时机 |
+| ---------------------- | ---------------------- | ---------------------- |
+| 网络权限 | 用于正常网络访问 | 用户首次使用该功能时会申请权限 |
+| 安装 APK 权限 | 用于安装 Tap 客户端 | 用户首次使用该功能时会申请权限 |
 </>
 
 <>
@@ -105,13 +50,6 @@ dependencies {
 
 </>
 
-<>
-
-</>
-
-<>
-
-</>
 </MultiLang>
 
 ## 集成前准备
@@ -119,156 +57,59 @@ dependencies {
 使用更新唤起功能前提需要通过 **TapTap 开发者中心 > 商店 > 游戏资料 > 商店资料** 中已经上传 APK， 发布设置为 **立即上线** 并通过 **审核**（开发者包如果暂时不想对外，发布状态选 **敬请期待** 或者 **预约**）。
 
 
-
 ## SDK 获取
 
-<MultiLang kind="ue">
+<MultiLang kind="android_unity">
 
 <>
 
-SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选其一。请根据项目需要选择。
+<UnitySDKInstallation
+npmDeps={[
+"com.taptap.sdk.core",
+"com.taptap.sdk.login",
+"com.taptap.sdk.update",
+]}
+githubDeps={[
+{package: "com.taptap.tds.login", url: `https://github.com/TapTap/TapLogin-Unity.git#${v4SDKVersions.taptap.unity}`},
+{package: "com.taptap.tds.common", url: `https://github.com/TapTap/TapCommon-Unity.git#${v4SDKVersions.taptap.unity}`},
+{package: "com.taptap.tds.bootstrap", url: `https://github.com/TapTap/TapBootstrap-Unity.git#${v4SDKVersions.taptap.unity}`},
+{package: "com.leancloud.realtime", url: `https://github.com/leancloud/csharp-sdk-upm.git#realtime-${v4SDKVersions.leancloud.csharp}`},
+{package: "com.leancloud.storage", url: `https://github.com/leancloud/csharp-sdk-upm.git#storage-${v4SDKVersions.leancloud.csharp}`},
+]}
+unitypackageModules={[
+{name: "TapTapSDK_Core.unitypackage", desc: "TapTapSDK 核心模块，必选"},
+{name: "TapTapSDK_Update.unitypackage", desc: "TapTapSDK 更新唤起模块，必选"},
+]}/>
 
-#### 方法一：使用 Unity Package Manager
+</>
 
-从 3.29.1 版本开始， SDK 修改 JSON 解析库为 `Newtonsoft-json`，如果当前工程已接入该依赖库，则不需额外处理，否则需在 `Packages/manifest.json` 添加如下依赖：
+<>
 
-```
-"com.unity.nuget.newtonsoft-json":"3.2.1"
-```
+1. 项目根目录的 build.gradle 添加仓库地址:
 
-
-##### NPMJS 安装
-
-从 3.25.0 版本开始，TapSDK 支持了 NPMJS 安装，优势是只需要配置版本号，并且支持嵌套依赖。
-
-在项目的 `Packages/manifest.json` 文件中添加以下依赖：
-
-<CodeBlock className="json">
-  {`"dependencies":{
-    "com.taptap.tds.update":"${v3SDKVersions.taptap.unity}",
-    "com.taptap.tds.common":"${v3SDKVersions.taptap.unity}",
-}`}
-</CodeBlock>
-
-但需要注意的是，要在 `Packages/manifest.json` 中 `dependencies` 同级下声明 `scopedRegistries`：
-
-<CodeBlock className="json">
-{`"scopedRegistries": [
-    {
-      "name": "NPMJS",
-      "url": "https://registry.npmjs.org/",
-      "scopes": ["com.tapsdk", "com.taptap"]
-    }
-  ]`}
-</CodeBlock>
-
-##### GitHub 安装
-
-在项目的 `Packages/manifest.json` 文件中添加以下依赖：
-
-<CodeBlock className="json">
-  {`"dependencies":{
-    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${v3SDKVersions.taptap.unity}",
-    "com.taptap.tds.update":"https://github.com/TapTap/TapUpdate-Unity.git#${v3SDKVersions.taptap.unity}",
-    "com.tapsdk.androiddependencyresolver":"${v3SDKVersions.taptap.adr}",
-}
-"scopedRegistries": [
-  {
-    "name": "TapSDK",
-    "url": "https://nexus.tapsvc.com/repository/npm-registry/",
-    "scopes": [
-      "com.tapsdk",
-      "com.taptap"
-    ]
+<CodeBlock language="groovy">{
+	`allprojects {
+    repositories {
+        google()
+        mavenCentral()
    }
-]`}
-</CodeBlock>
+}`
+}</CodeBlock>
 
-在 Unity 顶部菜单中选择 **Window > Package Manager** 可查看已经安装在项目中的包。
+2. app module 的 build.gradle 添加对应依赖：
 
-#### 方法二：手动导入
-
-1. 在 [**下载页**](/tap-download) 找到 **TapSDK Unity** 下载地址，分别下载 `TapSDK-UnityPackage.zip` 。
-
-    然后请[**点击下载**](https://github.com/taptap/android_dependency_resolver/releases) `TapTap_AndroidDependencyResolver.unitypackage` 。
-
-2. 在 Unity 项目中依次转到 **Assets > Import Packages > Custom Packages**，从解压后的 `TapSDK-UnityPackage.zip` 中，选择希望在游戏中使用的 TapSDK 包导入，其中：
-
-    - `TapTap_Common.unitypackage` TapSDK 基础库，必选。
-    - `TapTap_Update.unitypackage` TapTap 唤起更新库，必选。
-    - `TapTap_AndroidDependencyResolver.unitypackage` 必选。
-
-3. 如果当前项目已集成 `Newtonsoft.Json` 依赖，则忽略该步骤，否则在 `NuGet.org` [ Newtonsoft.Json ](https://www.nuget.org/packages/Newtonsoft.Json) 页面中通过点击右侧 「Download package」 下载库文件，并将下载的文件后缀从`.nupkg` 修改为 `.zip`，同时解压该文件并复制内部的 `Newtonsoft.Json.dll` 文件拷贝到工程 `Assets` 的 `Plugins` 目录下，另外为了避免导出 IL2CPP 平台时删除必要数据，需在 `Assets` 目录下创建 `link.xml` 文件（如果已有该文件，则添加如下内容），其内容如下：
-
-```
-<linker>
-  <assembly fullname="System.Core">
-    <type fullname="System.Linq.Expressions.Interpreter.LightLambda" preserve="all" />
-  </assembly>
-</linker>
-
-```
+<CodeBlock language="groovy">{
+`dependencies {
+    implementation 'com.taptap.sdk:tap-core:${v4SDKVersions.taptap.android}'
+    implementation 'com.taptap.sdk:tap-update:${v4SDKVersions.taptap.android}'
+}`
+}</CodeBlock>
 
 </>
 
-<>
-
-在 [下载页](/tap-download) 获得 TapSDK，添加 `TapUpdate` 和 `TapCommon` 模块。
-
-<CodeBlock className="groovy">
-  {`repositories{  
-    flatDir {  
-        dirs 'libs'  
-    }  
-}  
-dependencies {  
-    ... 
-    implementation (name:'TapUpdate_${v3SDKVersions.taptap.android}', ext:'aar')
-    implementation (name:'TapCommon_${v3SDKVersions.taptap.android}', ext:'aar')
-    implementation 'com.squareup.okhttp3:okhttp:3.12.1'
-    implementation 'androidx.core:core:1.6.0'
-    implementation 'com.google.android.flexbox:flexbox:3.0.0'
-}`}
-
-</CodeBlock>
-
-</>
 <>
 
 受限于苹果政策，iOS 平台的 TapTap 客户端不提供游戏更新功能
-
-</>
-
-<>
-
-#### 安装插件
-
-* 下载 [TapSDK UE4](/tap-download)，TapSDK-UE4-xxx.zip 解压后将 `TapUpdate`、`TapCommon` 文件夹 Copy 到项目的 `Plugins` 目录中
-* 重启 Unreal Editor
-* 打开 编辑 > 插件 > 项目 > TapTap，开启 `TapUpdate` 模块
-
-#### 添加依赖
-
-在 Project.Build.cs 中添加所需模块:
-
-```cs
-PublicDependencyModuleNames.AddRange(new string[] { "Core",
-	"CoreUObject",
-	"Engine",
-	"Json",
-	"InputCore",
-	"JsonUtilities",
-	"SlateCore",
-	"TapCommon",
-    "TapUpdate",
-});
-```
-
-#### 导入头文件
-
-```cpp
-#include "TapUpdate.h"
-```
 
 </>
 
@@ -276,30 +117,48 @@ PublicDependencyModuleNames.AddRange(new string[] { "Core",
 
 ## 初始化
 
-:::info
-以下两种初始化方式任选其一。
-:::
-
 ### TapSDK 初始化
 
-如果你已经完成[内建账户系统 Tap 登录](/sdk/taptap-login/guide/start/#sdk-初始化)的初始化，这里只需要引入更新唤起模块，不需要其他额外处理。
+<MultiLang kind="android_unity">
 
-### 更新唤起单独初始化
-根据在开发者中心的应用配置，开发者调用如下接口：
+<>
 
-<MultiLang kind="ue">
+`TapTapSdkOptions` 详细参数见 [入门指南#快速开始](/v4/sdk/access/quickstart/#初始化)
 
 ```cs
-using TapTap.Update
+using TapSDK.Core;
+using TapSDK.Compliance;
 
-TapUpdate.Init("clientId", "clientToken");
+// 核心配置 详细参数见 [入门指南#快速开始]
+TapTapSdkOptions coreOptions = new TapTapSdkOptions();
+// TapSDK 初始化
+TapTapSDK.Init(coreOptions);
 ```
 
-```java
-import com.taptap.services.update.TapUpdate;
+</>
 
-TapUpdate.init(activity, "clientId", "clientToken");
+<>
+
+`TapTapSdkOptions` 详细参数见 [入门指南#快速开始](/v4/sdk/access/quickstart/#初始化)
+
+```kotlin
+import com.taptap.sdk.core.TapTapSdk
+import com.taptap.sdk.core.TapTapSdkOptions
+import com.taptap.sdk.core.TapTapRegion
+import com.taptap.sdk.core.TapTapLanguage
+
+TapTapSdk.init(
+    context = context,
+    sdkOptions = TapTapSdkOptions(
+        clientId = clientId,
+        clientToken = clientToken,
+        region = TapTapRegion.CN,
+        preferredLanguage = TapTapLanguage.ZH_HANS,
+        enableLog = false
+    ),
+)
 ```
+</>
 
 
 受限于苹果政策，iOS 平台的 TapTap 客户端不提供游戏更新功能
@@ -310,28 +169,21 @@ FTapUpdate::Init(TEXT("clientId"), TEXT("clientToken"));
 
 </MultiLang>
 
-**参数说明**
-
-参数  | 描述
-| ------ | ------ |
-clientId | TapTap 开发者中心对应应用的 Client ID
-clientToken | TapTap 开发者中心对应应用的 Client Token
-
 ## 开始更新
 
 :::tip
 TapSDK 如果检查当前设备未安装 TapTap 客户端，首先会弹窗询问用户「是否需要使用 TapTap 更新」，当点击「取消」按钮时取消更新的回调方法才会执行。
 :::
 
-<MultiLang kind="ue">
+<MultiLang kind="android_unity">
 
 <>
 
 ```cs
-using TapTap.Update
+using TapSDK.Update
 
-TapTap.Update.TapUpdate.UpdateGame(() => {
-  // 取消更新的事件
+TapTapUpdate.UpdateGame(() => {
+    // 唤醒更新收到[取消]回调
 });
 ```
 </>
@@ -340,16 +192,21 @@ TapTap.Update.TapUpdate.UpdateGame(() => {
 
 由于更新唤起 UI 依赖于开发者设置的 Activity 实例，所以为了避免因 Activity 发生重建导致更新唤起功能不可用，开发者应确保在屏幕旋转、配置修改时当前 Activity 不会发生重建，具体设置方式参考 [限制 activity 重新创建](https://developer.android.com/guide/topics/resources/runtime-changes?hl=zh-cn#restrict-activity)
 
-```java
-import com.taptap.services.update.TapUpdate;
-import com.taptap.services.update.TapUpdateCallback;
+```kotlin
+import com.taptap.sdk.update.TapTapUpdate
+import com.taptap.sdk.update.TapTapUpdateCallback
 
-TapUpdate.updateGame(DemoUpdateActivity.this, new TapUpdateCallback() {
-    @Override
-    public void onCancel() {
-        // 取消更新的事件
+TapTapUpdate.updateGame(
+    activity = this,
+    callback = object : TapTapUpdateCallback {
+
+        override fun onCancel() {
+
+            Toast.makeText(this@DemoUpdateActivity, "取消更新", Toast.LENGTH_SHORT)
+                .show()
+        }
     }
-});
+)
 ```
 </>
 
@@ -359,118 +216,7 @@ TapUpdate.updateGame(DemoUpdateActivity.this, new TapUpdateCallback() {
 
 </>
 
-<>
-
-```cpp
-FTapUpdate::UpdateGame(FSimpleDelegate::CreateLambda([]() {
-  // Update cancel
-}));
-```
-</>
-
 </MultiLang>
-
-
-## 打开游戏评论区
-
-如果玩家设备已经安装 TapTap 客户端，会打开游戏所在 TapTap 客户端对应的评论区页面，如果玩家设备没有安装 TapTap 客户端，则打开游戏评论区失败，需要游戏侧自行处理相关逻辑。
-
-<MultiLang>
-
-<>
-
-<Conditional region="cn">
-
-```cs
-// 适用于中国大陆
-TapCommon.OpenReviewInTapTap(appId, openSuccess =>
-{
-    if (openSuccess) {
-        Debug.Log("打开游戏评论区成功");
-    } else {
-        Debug.Log("打开游戏评论区失败");
-    }
-});
-
-// 适用于其他国家或地区
-TapCommon.OpenReviewInTapGlobal(appId, openSuccess =>
-{
-    if (openSuccess) {
-        Debug.Log("打开游戏评论区成功");
-    } else {
-        Debug.Log("打开游戏评论区失败");
-    }
-});
-```
-
-</Conditional>
-
-<Conditional region="global">
-
-```cs
-TapCommon.OpenReviewInTapGlobal(appId, openSuccess =>
-{
-    if (openSuccess) {
-        Debug.Log("打开游戏评论区成功");
-    } else {
-        Debug.Log("打开游戏评论区失败");
-    }
-});
-```
-
-</Conditional>
-
-</>
-
-<>
-
-<Conditional region="cn">
-
-```java
-// 适用于中国大陆
-if(TapGameUtil.openReviewInTapTap(this,"appid")){
-    Log.d(TAG, "打开评论区成功");
-} else {
-    Log.d(TAG, "打开评论区失败");
-}
-
-// 适用于其他国家或地区
-if(TapGameUtil.openReviewInTapGlobal(this,"appid")){
-    Log.d(TAG, "打开评论区成功");
-} else {
-    Log.d(TAG, "打开评论区失败");
-}
-```
-
-</Conditional>
-
-<Conditional region="global">
-
-```java
-if(TapGameUtil.openReviewInTapGlobal(this,"appid")){
-    Log.d(TAG, "打开评论区成功");
-} else {
-    Log.d(TAG, "打开评论区失败");
-}
-```
-
-</Conditional>
-
-</>
-
-<>
-
-```objc
-// 未支持
-```
-
-</>
-
-</MultiLang>
-
-appid：游戏在 TapTap 商店的唯一身份标识。
-例如：<Conditional region="cn">`https://www.taptap.cn/app/187168`</Conditional><Conditional region="global">`https://www.taptap.io/app/187168`</Conditional>，其中 `187168` 是 `appid`。
-
 
 
 ## 测试
