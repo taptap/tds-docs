@@ -4,28 +4,12 @@ on:
   pull_request:
     types: [closed]
 
-env:
-  REGION: cn-n1 # set this to your LeanCloud region, e.g. cn-n1
-  APP_ID: j1sU6A4GIEiCzwDu5l9Klk03-9Nh9j0Va # set this to your App ID on LeanCloud
-  GROUP: web   # set this to your group, e.g. web
-
 jobs:
   delete-preview-environment:
     runs-on: ubuntu-latest
     permissions:
       deployments: write
     steps:
-      - name: Install lean-cli
-        run: |
-          sudo curl -L -o /bin/lean https://github.com/leancloud/lean-cli/releases/download/v1.2.3/lean-linux-x64
-          sudo chmod +x /bin/lean
-
-      - name: Delete
-        run: |
-          lean login --region ${{ env.REGION }} --token ${{ secrets.ACCESS_TOKEN }}
-          lean switch --region ${{ env.REGION }} --group ${{ env.GROUP }} ${{ env.APP_ID }}
-          lean preview delete
-
       - uses: strumwolf/delete-deployment-environment@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
