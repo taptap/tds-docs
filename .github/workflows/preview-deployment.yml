@@ -1,5 +1,3 @@
-# .github/workflows/preview-env-deploy.yml
-
 name: Deploy Preview Environment
 
 on:
@@ -19,15 +17,13 @@ jobs:
       url: ${{ env.PREVIEW_URL }}
     steps:
       - uses: actions/checkout@v3
-
       - name: Install lean-cli
         run: |
           sudo curl -L -o /bin/lean https://github.com/leancloud/lean-cli/releases/download/v1.2.3/lean-linux-x64
           sudo chmod +x /bin/lean
-
       - name: Deploy
         run: |
-          lean login --region ${{ env.REGION }} --token ${{ secrets.ACCESS_TOKEN }}
+          lean login --region ${{ env.REGION }} --token ${{ secrets.LC_ACCESS_TOKEN }}
           lean switch --region ${{ env.REGION }} --group ${{ env.GROUP }} ${{ env.APP_ID }}
           PREVIEW_URL=$(lean preview deploy)
           echo "PREVIEW_URL=$PREVIEW_URL" >> $GITHUB_ENV
