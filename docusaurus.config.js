@@ -26,15 +26,12 @@ const config = {
 
     i18n: {
         localeConfigs: {
-            en: {
-                label: "English",
-            },
             "zh-Hans": {
                 label: "简体中文",
             },
         },
         defaultLocale: "zh-Hans",
-        locales: ["zh-Hans", "en"],
+        locales: ["zh-Hans"],
     },
 
     presets: [
@@ -110,10 +107,6 @@ const config = {
                     },
                     {
                         type: "docsVersionDropdown",
-                        position: "right",
-                    },
-                    {
-                        type: "localeDropdown",
                         position: "right",
                     },
                 ],
