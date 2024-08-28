@@ -3,7 +3,7 @@ const taptapIos = "4.3.8"
 const taptapAndroid = "4.3.8"
 const taptapUnreal = "3.29.2"
 
-const sdkVersions = {
+const v4SDKVersions = {
     taptap: {
         unity: taptapUnity,
         android: taptapAndroid,
@@ -36,5 +36,5 @@ const sdkVersions = {
     }
 };
 
-export default sdkVersions;
+export default v4SDKVersions;
 
