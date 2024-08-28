@@ -106,10 +106,6 @@ const config = {
                                 label: "SDK 工具包",
                                 to: "/tap-download",
                             },
-                            {
-                                label: "Demos",
-                                to: "/demos",
-                            },
                         ],
                     },
                     {
