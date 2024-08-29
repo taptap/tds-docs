@@ -1679,13 +1679,14 @@ const gt = (n) => new st(n).i18n, at = {
   store: "游戏商店",
   publish_game: "发布游戏",
   game_service: "游戏服务",
-  develop_and_build: "开发与构建",
+  develop_and_build: "基础服务",
   operate_tool: "运营工具",
-  revenue_tools: "营收与变现",
+  revenue_tools: "发行服务",
   commercialization: "商业化",
   ad: "推广平台",
   rep: "资源置换平台",
   cmp: "内容营销平台",
+  ssp: "广告联盟平台",
   community: "社区",
   tds_tutorials: "开发者学堂",
   developer_forum: "开发者论坛",
@@ -1735,6 +1736,7 @@ const gt = (n) => new st(n).i18n, at = {
   ad: "Advertising",
   rep: "Resource Exchange",
   cmp: "Content Marketing",
+  ssp: "Affiliate platforms",
   community: "Community",
   tds_tutorials: "Tutorials",
   developer_forum: "Group",
@@ -1911,6 +1913,12 @@ const Ot = ne((n, e, t, o) => {
           track: j.FooterCommercializationCmp,
           href: "https://tapu.taptap.cn/",
           blank: !0
+        },
+        {
+          name: s.t("ssp"),
+          track: j.FooterCommercializationSmp,
+          href: "https://ssp.taptap.cn/",
+          blank: !0
         }
       ]
     },
@@ -1932,29 +1940,12 @@ const Ot = ne((n, e, t, o) => {
           name: s.t("tds_document"),
           href: "/docs",
           track: j.FooterCommunityDocument
-        },
-        {
-          name: s.t("developer_blog"),
-          href: "https://blog.taptap.dev/",
-          track: j.FooterCommunityBlog,
-          blank: !0
-        },
-        {
-          name: s.t("project_torch"),
-          href: "/project-torch",
-          track: j.FooterCommunityProjectTorch
         }
       ]
     },
     {
       title: s.t("other"),
       items: [
-        {
-          name: s.t("tds_status"),
-          href: "https://tdsstatus.cn/",
-          track: j.FooterOtherStatus,
-          blank: !0
-        },
         {
           name: s.t("service_terms"),
           href: "https://www.taptap.cn/doc/terms/",
