@@ -6,9 +6,8 @@ sidebar_position: 3
 
 import MultiLang from '/src/docComponents/MultiLang';
 import CodeBlock from '@theme/CodeBlock';
-import sdkVersions from '/src/docComponents/sdkVersions';
+import v4SDKVersions from '/src/docComponents/v4SDKVersions';
 
-平台推荐集成 3.29.2 及以上版本的 SDK，配套使用 TapTap 登录 + 合规认证服务，以达到最佳用户体验。
 
 ## 准备工作
 
@@ -23,7 +22,7 @@ import sdkVersions from '/src/docComponents/sdkVersions';
 ![](https://img.tapimg.com/market/images/168f902edd3de84cf0d5eb5fa640e78d.png)
 
 ### 配置应用包名和签名信息
-Android 签名处填写 MD5 值，详情可参考：[如何获取 MD5 值](/sdk/start/faq/#如何获取-android-应用的-md5-值)；
+Android 签名处填写 MD5 值，详情可参考：[如何获取 MD5 值](/sdk/access/android-md5)；
 
 ![](https://img.tapimg.com/market/images/3c725fc6859363f630d90471d0c8929b.png)
 
@@ -61,11 +60,13 @@ Android 签名处填写 MD5 值，详情可参考：[如何获取 MD5 值](/sdk/
 
 在游戏项目的 `Packages/manifest.json` 文件中添加以下依赖：
 
-<CodeBlock className="json">
+<CodeBlock language="json">
   {`"dependencies":{
-    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${sdkVersions.taptap.unity}",
-    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${sdkVersions.taptap.unity}",
-    "com.tapsdk.antiaddiction":"https://github.com/TapTap/TapAntiAddiction-Unity.git#${sdkVersions.taptap.unity}",
+    "com.taptap.sdk.core":"https://github.com/taptap/TapSDKCore-Unity.git#${v4SDKVersions.taptap.unity}",
+    "com.taptap.sdk.login":"https://github.com/taptap/TapSDKLogin-Unity.git#${v4SDKVersions.taptap.unity}",
+    "com.taptap.sdk.compliance":"https://github.com/taptap/TapSDKCompliance-Unity.git#${v4SDKVersions.taptap.unity}",
+    "com.google.external-dependency-manager": "1.2.179",
+    "com.github-glitchenzo.nugetforunity": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity"
 }`}
 </CodeBlock>
 
@@ -108,9 +109,10 @@ Android 签名处填写 MD5 值，详情可参考：[如何获取 MD5 值](/sdk/
 
 ```cs
 using System;
-using TapTap.Login;
-using TapTap.AntiAddiction;
-using TapTap.AntiAddiction.Model;
+using TapSDK.Login;
+using TapSDK.Compliance;
+using TapSDK.Core;
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -120,12 +122,14 @@ public sealed class GameSDKManager
 {
     // 游戏在 TapTap 开发者中心对应的 Client ID
     private readonly string clientId = "游戏的 Client ID";
+    // 游戏在 TapTap 开发者中心对应的 Client Token
+    private readonly string clientToken = "游戏的 Client Token";
 
     // 是否已初始化
     private readonly bool hasInit = false;
     
     // 是否已通过合规认证检查
-    public bool hasCheckedAntiAddiction { get; private set; }
+    public bool hasCheckedCompliance { get; private set; }
 
     private static readonly Lazy<GameSDKManager> lazy
         = new Lazy<GameSDKManager>(() => new GameSDKManager());
@@ -135,21 +139,21 @@ public sealed class GameSDKManager
     private GameSDKManager() { }
 
     // 声明合规认证回调
-    private readonly Action<int, string> AntiAddictionCallback = (code, errorMsg) =>
+    private readonly Action<int, string> ComplianceCallback = (code, errorMsg) =>
     {
         // 根据回调返回的参数 code 添加不同情况的处理
         switch (code)
         {
 
             case 500: // 玩家未受限制，可正常进入
-                Instance.hasCheckedAntiAddiction = true;
+                Instance.hasCheckedCompliance = true;
                 // TODO: 显示开始游戏按钮      
                 break;
 
             case 1000: // 防沉迷认证凭证无效时触发
             case 1001: // 当玩家触发时长限制时，点击了拦截窗口中「切换账号」按钮
             case 9002: // 实名认证过程中玩家关闭了实名窗口
-                TapLogin.Logout(); // 如果游戏有其他账户系统，此时也应执行退出
+                TapTapLogin.Instance.Logout(); // 如果游戏有其他账户系统，此时也应执行退出
                 // TODO: 切换到登录页面 例如：SceneManager.LoadScene("Login");
                 break;
 
@@ -169,26 +173,29 @@ public sealed class GameSDKManager
     };
 
     /// <summary>
-    /// 初始化登录与合规认证 SDK 
+    /// 初始化 TapSDK 并注册合规认证回调
     /// </summary>
     public void InitSDK()
     {
         if (!hasInit)
         {
-            // 初始化 TapTap 登录
-            TapLogin.Init(clientId);
-
-            // 定义合规认证模块 config
-            AntiAddictionConfig config = new AntiAddictionConfig()
+            TapTapSdkOptions coreOptions = new TapTapSdkOptions
             {
-                gameId = clientId,           // TapTap 开发者中心对应 Client ID
-                showSwitchAccount = true,    // 是否显示切换账号按钮
-                useAgeRange = false          // 是否使用年龄段信息
+                clientId = clientId,
+                clientToken = clientToken
             };
-
-            // 初始化合规认证及设置回调
-            AntiAddictionUIKit.Init(config);
-            AntiAddictionUIKit.SetAntiAddictionCallback(AntiAddictionCallback);
+            TapTapComplianceOption complianceOption = new TapTapComplianceOption
+            {
+                showSwitchAccount = false, // 是否显示切换账号按钮
+                useAgeRange = true // 是否使用年龄段信息
+            };
+            // 创建其他选项数组
+            TapTapSdkBaseOptions[] otherOptions = new TapTapSdkBaseOptions[]
+            {
+                complianceOption
+            };
+            TapTapSDK.Init(coreOptions, otherOptions);
+            TapTapCompliance.RegisterComplianceCallback(ComplianceCallback);
         }
     }
     
@@ -196,10 +203,10 @@ public sealed class GameSDKManager
     /// 开始合规认证检查
     /// </summary>
     /// <param name="userIdentifier">用户唯一标识</param>
-    public void StartAntiAddiction(string userIdentifier)
+    public void StartCheckCompliance(string userIdentifier)
     {
-        hasCheckedAntiAddiction = false;
-        AntiAddictionUIKit.StartupWithTapTap(userIdentifier);
+        hasCheckedCompliance = false;
+        TapTapCompliance.Startup(userIdentifier);
     }
 }
 ```
@@ -244,8 +251,10 @@ TapTap 登录按钮素材需要使用官方提供的[登录按钮素材](https:/
 ```cs
 using UnityEngine;
 using System;
-using TapTap.AntiAddiction;
-using TapTap.Login;
+using TapSDK.Login;
+using TapSDK.Compliance;
+using System.Collections.Generic;
+
 
 /// <summary>
 /// 登录场景
@@ -260,28 +269,28 @@ public class LoginScene : MonoBehaviour
         // 初始化 SDK
         GameSDKManager.Instance.InitSDK();
 
-        AccessToken currentToken = null;
+        TapTapAccount account = null;
         try
         {
-            // 检查本地是否已存在 TapToken
-            currentToken = await TapLogin.GetAccessToken();
+            // 检查本地是否已存在 account 信息
+           account = await TapTapLogin.Instance.GetCurrentTapAccount();
         }
         catch (Exception e)
         {
-            Debug.Log("本地无有效 token");
+            Debug.Log("本地无有效用户信息");
         }
 
-        if (currentToken == null)
+        if (account == null)
         {
             // TODO: 显示登录按钮
         }
         else
         {
             // 如果当前还未通过合规认证检查，开始认证
-            if (!GameSDKManager.Instance.hasCheckedAntiAddiction)
+            if (!GameSDKManager.Instance.hasCheckedCompliance)
             {
                 // 开始合规认证检查
-                StartAntiAddiction();
+                StartCheckCompliance();
             }
         }
     }
@@ -293,11 +302,15 @@ public class LoginScene : MonoBehaviour
     {
         try
         {
+            List<string> scopes = new List<string>
+            {
+                TapTapLogin.TAP_LOGIN_SCOPE_PUBLIC_PROFILE
+            };
             // 发起 Tap 登录并获取用户信息
-            var accessToken = await TapLogin.Login();
+            var account = await TapTapLogin.Instance.LoginWithScopes(scopes.ToArray());
 
             // 开始合规认证检查
-            StartAntiAddiction();
+            StartCheckCompliance();
         }
         catch (Exception e)
         {
@@ -309,29 +322,29 @@ public class LoginScene : MonoBehaviour
     /// <summary>
     /// 开启合规认证检查
     /// </summary>
-    public async void StartAntiAddiction()
+    public async void StartCheckCompliance()
     {
-        // 获取当前已登录用户的 Profile 信息
-        Profile profile = null;
+        // 获取当前已登录用户的 account 信息
+        TapTapAccount account = null;
         try
         {
-            profile = await TapLogin.GetProfile();
+            account = await TapTapLogin.Instance.GetCurrentTapAccount();
         }
         catch (Exception exception)
         {
-            Debug.Log($"获取 Profile 信息出现异常：{exception}");
+            Debug.Log($"获取用户信息出现异常：{exception}");
         }
-        if (profile == null)
+        if (account == null)
         {
-            // 无法获取 Profile 时，登出并显示登录按钮
-            TapLogin.Logout();
+            // 无法获取用户信息时，登出并显示登录按钮
+            TapTapLogin.Instance.Logout();
             // TODO: 显示登录按钮
             return;
         }
 
         // 使用当前 Tap 用户的 unionid 作为用户标识进行合规认证检查
-        string userIdentifier = profile.unionid;
-        GameSDKManager.Instance.StartAntiAddiction(userIdentifier);
+        string userIdentifier = account.uniontId;
+        GameSDKManager.Instance.StartCheckCompliance(userIdentifier);
     }
 
 }
@@ -365,7 +378,7 @@ public class LoginScene : MonoBehaviour
 ### 限制未成年人消费额度
 
 :::tip
-每次充值之前，游戏侧请 **务必** 调用 `CheckPayLimit` 接口进行判断，检验当前玩家的充值行为是否被限制。充值金额的单位为分。
+每次充值之前，游戏侧请 **务必** 调用 `CheckPaymentLimit` 接口进行判断，检验当前玩家的充值行为是否被限制。充值金额的单位为分。
 :::
 
 <MultiLang kind="alone_unity">
@@ -373,9 +386,11 @@ public class LoginScene : MonoBehaviour
 <>
 
 ```cs
+using TapSDK.Compliance;
+
 // 100 表示 100 分，即 1 元
 long amount = 100;
-AntiAddictionUIKit.CheckPayLimit(amount, (result) =>
+TapTapCompliance.CheckPaymentLimit(amount, (result) =>
     {
         // 获取检查状态
         int status = result.status;
@@ -424,7 +439,7 @@ AntiAddictionUIKit.CheckPayLimit(amount, (result) =>
 
 
 :::tip
-充值成功后，游戏侧请 **务必** 调用 `SubmitPayResult` 接口上报玩家充值金额。上报充值金额时，传入的充值金额的单位同样为分。
+充值成功后，游戏侧请 **务必** 调用 `SubmitPayment` 接口上报玩家充值金额。上报充值金额时，传入的充值金额的单位同样为分。
 :::
 
 <MultiLang kind="alone_unity">
@@ -432,9 +447,11 @@ AntiAddictionUIKit.CheckPayLimit(amount, (result) =>
 <>
 
 ```cs
+using TapSDK.Compliance;
+
 // 100 表示 100 分，即 1 元
 long amount = 100;
-AntiAddictionUIKit.SubmitPayResult(amount, () =>
+TapTapCompliance.SubmitPayment(amount, () =>
     {
         // 提交成功
     }, (exception) =>

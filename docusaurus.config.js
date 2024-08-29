@@ -26,15 +26,12 @@ const config = {
 
     i18n: {
         localeConfigs: {
-            en: {
-                label: "English",
-            },
             "zh-Hans": {
                 label: "简体中文",
             },
         },
         defaultLocale: "zh-Hans",
-        locales: ["zh-Hans", "en"],
+        locales: ["zh-Hans"],
     },
 
     presets: [
@@ -47,13 +44,13 @@ const config = {
                     routeBasePath: "/",
                     lastVersion: "current",
                     versions: {
-                        'v4': {
-                            label: 'v4',
-                            path: 'v4',
-                            banner: "unreleased",
-                        },
                         current: {
-                            label: "v3",
+                            label: "v4",
+                        },
+                        'v3': {
+                            label: 'v3',
+                            path: 'v3',
+                            banner: "unmaintained",
                         },
                         'v2': {
                             label: 'v2',
@@ -95,11 +92,6 @@ const config = {
                         position: "right",
                     },
                     {
-                        label: "SDK API",
-                        to: "/sdk-api",
-                        position: "right",
-                    },
-                    {
                         label: "下载",
                         position: "right",
                         items: [
@@ -111,18 +103,10 @@ const config = {
                                 label: "SDK 工具包",
                                 to: "/tap-download",
                             },
-                            {
-                                label: "Demos",
-                                to: "/demos",
-                            },
                         ],
                     },
                     {
                         type: "docsVersionDropdown",
-                        position: "right",
-                    },
-                    {
-                        type: "localeDropdown",
                         position: "right",
                     },
                 ],

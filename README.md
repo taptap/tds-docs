@@ -264,7 +264,7 @@ SDK 版本号统一维护在 `/src/docComponents/sdkVersions.ts`。当 SDK 版�
 如果一篇文档需要引用 SDK 版本号，需要先在开头引入前面提到的这个文件：
 
 ```js
-import sdkVersions from "/src/docComponents/sdkVersions";
+import v3SDKVersions from "/src/docComponents/v3SDKVersions";
 ```
 
 如果版本号会出现在代码块中，还需要额外引入 `CodeBlock`：

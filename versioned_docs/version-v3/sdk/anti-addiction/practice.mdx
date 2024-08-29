@@ -1,0 +1,470 @@
+---
+title: 最佳实践
+sidebar_label: 最佳实践
+sidebar_position: 3
+---
+
+import MultiLang from '/src/docComponents/MultiLang';
+import CodeBlock from '@theme/CodeBlock';
+import v3SDKVersions from '/src/docComponents/v3SDKVersions';
+
+平台推荐集成 3.29.2 及以上版本的 SDK，配套使用 TapTap 登录 + 合规认证服务，以达到最佳用户体验。
+
+## 准备工作
+
+### 创建应用获取应用参数
+在 [TapTap 开发者中心](https://developer.taptap.cn) 创建游戏应用，获取应用 Client ID、Client Token 等参数，用于初始化 SDK；
+
+![](https://capacity-files.lcfile.com/nnQKxgJJzgErOlIOcxnbIHt8Vc1RmGYe/tap_get_ready.png)
+
+### 开通 TapTap 登录服务
+合规认证服务依赖于 TapTap 登录服务，因此，厂商需要在 **TapTap 开发者中心 > 你的游戏 > 游戏服务 > 应用配置** 开启「TapTap 登录」；
+
+![](https://img.tapimg.com/market/images/168f902edd3de84cf0d5eb5fa640e78d.png)
+
+### 配置应用包名和签名信息
+Android 签名处填写 MD5 值，详情可参考：[如何获取 MD5 值](/v3/sdk/start/faq/#如何获取-android-应用的-md5-值)；
+
+![](https://img.tapimg.com/market/images/3c725fc6859363f630d90471d0c8929b.png)
+
+### 开通合规认证服务
+找到 **TapTap 开发者中心 > 你的游戏 > 游戏服务 > 开发与构建 > 合规认证**，根据游戏实际情况，选择「已有版号」或「暂无版号」方案，然后点击**立即开通**
+
+![](https://img.tapimg.com/market/images/90e6d759ba528aa7e9ef29077387edbb.png)
+
+:::tip
+若游戏选择的是「已有版号」方案则还需要完成中宣部实名认证系统的注册以及相应配置，具体的操作请参考 [注册中宣部实名认证系统](/v3/sdk/anti-addiction/features/#已有版号)
+:::
+
+### 可玩年龄限制
+应用需要对用户年龄有额外限制时，可在 **TapTap 开发者中心 > 你的游戏 > 游戏服务 > 合规认证 > 可玩年龄限制** 中开启此功能，并配置所需的**最低年龄要求**
+
+在后续的代码集成中，也需要处理相关的 `1100` 回调
+
+![](https://img.tapimg.com/market/images/e7fab2ce4099b792bd32390c04e28986.png)
+
+## 代码接入
+
+下面模拟一个小游戏来进行接入示例，该游戏主要包括两个场景：
+- 登录场景 LoginScene: 用于初始化 SDK 、用户登录、切换账号、显示合规认证异常提示 UI 等
+- 游戏商店及设置场景 GameStoreAndSettignsScene: 用于展示充值页面、设置菜单等
+
+另外，因合规认证模块在游戏整个生命周期中运行，所以通过全局的单例管理工具类 GameSDKManager 来处理 SDK 的初始化及回调。
+
+完整示例代码可参考 [TDS-Unity-Demo](https://github.com/taptap/TDS-Unity-Demo)
+
+### 导入 SDK 包体
+
+<MultiLang kind="alone_unity">
+
+<>
+
+在游戏项目的 `Packages/manifest.json` 文件中添加以下依赖：
+
+<CodeBlock className="json">
+  {`"dependencies":{
+    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${v3SDKVersions.taptap.unity}",
+    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${v3SDKVersions.taptap.unity}",
+    "com.tapsdk.antiaddiction":"https://github.com/TapTap/TapAntiAddiction-Unity.git#${v3SDKVersions.taptap.unity}",
+}`}
+</CodeBlock>
+
+
+在 Unity 顶部菜单中选择 **Window > Package Manager** 可查看已经安装在项目中的包。
+
+</>
+<>
+
+```java
+
+```
+
+</>
+<>
+
+```objc
+
+```  
+</>
+
+<>
+
+```cpp
+
+```
+
+</>
+
+</MultiLang>
+
+
+### 初始化与设置回调
+
+在 GameSDKManager 工具类中完成 SDK 的初始化及全局回调的设置，示例如下：
+
+<MultiLang kind="alone_unity">
+
+<>
+
+```cs
+using System;
+using TapTap.Login;
+using TapTap.AntiAddiction;
+using TapTap.AntiAddiction.Model;
+using UnityEngine;
+
+/// <summary>
+/// SDK 初始化及合规认证回调处理管理类
+/// </summary>
+public sealed class GameSDKManager
+{
+    // 游戏在 TapTap 开发者中心对应的 Client ID
+    private readonly string clientId = "游戏的 Client ID";
+
+    // 是否已初始化
+    private readonly bool hasInit = false;
+    
+    // 是否已通过合规认证检查
+    public bool hasCheckedAntiAddiction { get; private set; }
+
+    private static readonly Lazy<GameSDKManager> lazy
+        = new Lazy<GameSDKManager>(() => new GameSDKManager());
+
+    public static GameSDKManager Instance { get { return lazy.Value; } }
+
+    private GameSDKManager() { }
+
+    // 声明合规认证回调
+    private readonly Action<int, string> AntiAddictionCallback = (code, errorMsg) =>
+    {
+        // 根据回调返回的参数 code 添加不同情况的处理
+        switch (code)
+        {
+
+            case 500: // 玩家未受限制，可正常进入
+                Instance.hasCheckedAntiAddiction = true;
+                // TODO: 显示开始游戏按钮      
+                break;
+
+            case 1000: // 防沉迷认证凭证无效时触发
+            case 1001: // 当玩家触发时长限制时，点击了拦截窗口中「切换账号」按钮
+            case 9002: // 实名认证过程中玩家关闭了实名窗口
+                TapLogin.Logout(); // 如果游戏有其他账户系统，此时也应执行退出
+                // TODO: 切换到登录页面 例如：SceneManager.LoadScene("Login");
+                break;
+
+            case 1100: // 当前用户因触发应用设置的年龄限制无法进入游戏
+                // TODO: 游戏应自行绘制适龄限制提示，并引导玩家退出游戏
+                break;
+
+            case 1200: // 数据请求失败，应用信息错误或网络连接异常  
+                // TODO: 引导玩家确认网络连接是否正常，并重新调用开始认证接口
+                break;
+
+            default:
+                Debug.Log("其他可选回调");
+                break;
+        }
+
+    };
+
+    /// <summary>
+    /// 初始化登录与合规认证 SDK 
+    /// </summary>
+    public void InitSDK()
+    {
+        if (!hasInit)
+        {
+            // 初始化 TapTap 登录
+            TapLogin.Init(clientId);
+
+            // 定义合规认证模块 config
+            AntiAddictionConfig config = new AntiAddictionConfig()
+            {
+                gameId = clientId,           // TapTap 开发者中心对应 Client ID
+                showSwitchAccount = true,    // 是否显示切换账号按钮
+                useAgeRange = false          // 是否使用年龄段信息
+            };
+
+            // 初始化合规认证及设置回调
+            AntiAddictionUIKit.Init(config);
+            AntiAddictionUIKit.SetAntiAddictionCallback(AntiAddictionCallback);
+        }
+    }
+    
+    /// <summary>
+    /// 开始合规认证检查
+    /// </summary>
+    /// <param name="userIdentifier">用户唯一标识</param>
+    public void StartAntiAddiction(string userIdentifier)
+    {
+        hasCheckedAntiAddiction = false;
+        AntiAddictionUIKit.StartupWithTapTap(userIdentifier);
+    }
+}
+```
+
+</>
+<>
+
+```java
+
+```
+
+</>
+<>
+
+```objc
+
+```  
+</>
+
+<>
+
+```cpp
+
+```
+
+</>
+
+</MultiLang>
+
+### TapTap 登录 & 开始实名认证
+
+登录场景为游戏的第一个场景，在该脚本中需调用 `GameSDKManager` 中初始化接口，并实现 Tap 登录、开始合规认证，示例如下：
+
+:::tip
+TapTap 登录按钮素材需要使用官方提供的[登录按钮素材](https://assets.tapimg.com/img/TapTap_Login_Source.zip)；
+:::
+
+<MultiLang kind="alone_unity">
+
+<>
+
+```cs
+using UnityEngine;
+using System;
+using TapTap.AntiAddiction;
+using TapTap.Login;
+
+/// <summary>
+/// 登录场景
+/// </summary>
+public class LoginScene : MonoBehaviour
+{
+    /// <summary>
+    /// 初始化 SDK 并判断本地是否已登录，已登录时开始合规认证检查，否则显示登录按钮
+    /// </summary>
+    async void Start()
+    {
+        // 初始化 SDK
+        GameSDKManager.Instance.InitSDK();
+
+        AccessToken currentToken = null;
+        try
+        {
+            // 检查本地是否已存在 TapToken
+            currentToken = await TapLogin.GetAccessToken();
+        }
+        catch (Exception e)
+        {
+            Debug.Log("本地无有效 token");
+        }
+
+        if (currentToken == null)
+        {
+            // TODO: 显示登录按钮
+        }
+        else
+        {
+            // 如果当前还未通过合规认证检查，开始认证
+            if (!GameSDKManager.Instance.hasCheckedAntiAddiction)
+            {
+                // 开始合规认证检查
+                StartAntiAddiction();
+            }
+        }
+    }
+
+    /// <summary>
+    /// 登录按钮点击后执行 Tap 登录
+    /// </summary>
+    public async void OnTapLoginButtonClick()
+    {
+        try
+        {
+            // 发起 Tap 登录并获取用户信息
+            var accessToken = await TapLogin.Login();
+
+            // 开始合规认证检查
+            StartAntiAddiction();
+        }
+        catch (Exception e)
+        {
+            // 登录取消或错误，提示用户重新登录
+            Debug.Log("用户登录取消或错误");
+        }
+    }
+
+    /// <summary>
+    /// 开启合规认证检查
+    /// </summary>
+    public async void StartAntiAddiction()
+    {
+        // 获取当前已登录用户的 Profile 信息
+        Profile profile = null;
+        try
+        {
+            profile = await TapLogin.GetProfile();
+        }
+        catch (Exception exception)
+        {
+            Debug.Log($"获取 Profile 信息出现异常：{exception}");
+        }
+        if (profile == null)
+        {
+            // 无法获取 Profile 时，登出并显示登录按钮
+            TapLogin.Logout();
+            // TODO: 显示登录按钮
+            return;
+        }
+
+        // 使用当前 Tap 用户的 unionid 作为用户标识进行合规认证检查
+        string userIdentifier = profile.unionid;
+        GameSDKManager.Instance.StartAntiAddiction(userIdentifier);
+    }
+
+}
+```
+
+</>
+<>
+
+```java
+
+```
+
+</>
+<>
+
+```objc
+
+```  
+</>
+
+<>
+
+```cpp
+
+```
+
+</>
+
+</MultiLang>
+
+### 限制未成年人消费额度
+
+:::tip
+每次充值之前，游戏侧请 **务必** 调用 `CheckPayLimit` 接口进行判断，检验当前玩家的充值行为是否被限制。充值金额的单位为分。
+:::
+
+<MultiLang kind="alone_unity">
+
+<>
+
+```cs
+// 100 表示 100 分，即 1 元
+long amount = 100;
+AntiAddictionUIKit.CheckPayLimit(amount, (result) =>
+    {
+        // 获取检查状态
+        int status = result.status;
+        
+        // 当前充值不受限
+        if (status == 1)
+        {
+            // TODO: 进行后续充值流程，充值完成后调用上报充值金额接口
+        }
+        else
+        {
+            // 本次充值触发合规限制，游戏侧需停止后续充值流程
+        }
+    },
+    (exception) =>
+    {
+        // TODO: 处理参数或网络异常后重试
+    }
+);
+```
+
+</>
+<>
+
+```java
+
+```
+
+</>
+<>
+
+```objc
+
+```  
+</>
+
+<>
+
+```cpp
+
+```
+
+</>
+
+</MultiLang>
+
+
+:::tip
+充值成功后，游戏侧请 **务必** 调用 `SubmitPayResult` 接口上报玩家充值金额。上报充值金额时，传入的充值金额的单位同样为分。
+:::
+
+<MultiLang kind="alone_unity">
+
+<>
+
+```cs
+// 100 表示 100 分，即 1 元
+long amount = 100;
+AntiAddictionUIKit.SubmitPayResult(amount, () =>
+    {
+        // 提交成功
+    }, (exception) =>
+    {
+        // TODO: 处理参数或网络异常后重试
+    }
+);
+```
+
+</>
+<>
+
+```java
+
+```
+
+</>
+<>
+
+```objc
+
+```  
+</>
+
+<>
+
+```cpp
+
+```
+
+</>
+
+</MultiLang>
