@@ -1,17 +1,17 @@
 import CodeBlock from "@theme/CodeBlock";
 import v4SDKVersions from '/src/docComponents/v4SDKVersions';
 
-SDK 需**通过 Unity Package Manager 导入**，具体设置如下：
+### 接入外部依赖
 
-#### 1. 添加外部依赖
+SDK 内部使用了部分第三方库，开发者接入时需先确保 SDK 外部依赖库已正常接入，具体设置如下：
 
-SDK 使用的 JSON 解析库为 `Newtonsoft-json`，如果当前工程已接入该依赖库，则不需额外处理，否则需在 `Packages/manifest.json` 添加如下依赖：
+1. SDK 使用的 JSON 解析库为 `Newtonsoft-json`，如果当前工程已接入该依赖库，则不需额外处理，否则需在 `Packages/manifest.json` 添加如下依赖：
 
 ```json
 "com.unity.nuget.newtonsoft-json":"3.2.1"
 ```
 
-SDK 使用 `com.google.external-dependency-manager`
+2. SDK 使用 `com.google.external-dependency-manager`
 管理 Android、iOS 依赖，如果当前工程已接入该依赖库，则不需额外处理，否则需在 `Packages/manifest.json` 添加如下依赖：
 
 ```json
@@ -31,9 +31,15 @@ SDK 使用 `com.google.external-dependency-manager`
 }
 ```
 
-#### 2. 添加 SDK 依赖
+### 添加 SDK 依赖
 
-TapSDK 使用 NPMJS 安装，优势是只需要配置版本号，并且支持嵌套依赖。
+SDK 支持** Unity Package Manager ** 及本地文件导入两种集成方式，开发者根据需求选择其中一种即可，推荐使用远程依赖。
+
+#### 远程依赖
+
+SDK 支持通过 NPMJS 及 GitHub 两种方式，开发者选择其中一种即可。
+
+##### 1. NPMJS 接入
 
 
 在项目的 `Packages/manifest.json` 文件中添加以下依赖：
@@ -60,43 +66,27 @@ TapSDK 使用 NPMJS 安装，优势是只需要配置版本号，并且支持嵌
 ```
 
 
-[//]: # (##### GitHub 安装)
+##### 2. GitHub 接入
 
-[//]: # ()
-[//]: # ()
-[//]: # (在项目的 `Packages/manifest.json` 文件中添加以下依赖：)
+在项目的 `Packages/manifest.json` 文件中添加以下依赖：
 
-[//]: # ()
-[//]: # ()
-[//]: # (<CodeBlock className="json">)
+<CodeBlock className="json">
+ {`"dependencies":{
+   ${props.githubDeps.map(dep => `"${dep.package}":"${dep.url}",`).join('\n   ')} 
+ }`}
+</CodeBlock>
 
-[//]: # ()
-[//]: # (  {`"dependencies":{)
+在 Unity 顶部菜单中选择 **Window > Package Manager** 可查看已经安装在项目中的包。
 
-[//]: # ()
-[//]: # (    ${props.githubDeps.map&#40;dep => `"${dep.package}":"${dep.url}",`&#41;.join&#40;'\n    '&#41;} )
+#### 本地文件导入
 
-[//]: # ()
-[//]: # (    }`})
-
-[//]: # ()
-[//]: # (</CodeBlock>)
-
-[//]: # ()
-[//]: # ()
-[//]: # (在 Unity 顶部菜单中选择 **Window > Package Manager** 可查看已经安装在项目中的包。)
-
-<!--#### 方法二：手动导入
-
-1. 在 [下载页](/tap-download) 找到 **TapSDK Unity** 下载地址，下载 `TapSDK-UnityPackage.zip` 。
-
-2. 在 Unity 项目中依次转到 **Assets > Import Packages > Custom Packages**，从解压后的 `TapSDK-UnityPackage.zip` 中，选择希望在游戏中使用的 TapSDK 包导入，其中：
+1. 在 [下载页](/tap-download) 下载下列模块对应 `unitypackage` 文件，并在 Unity 项目中依次通过 **Assets > Import Packages > Custom Packages** 进行导入，包括：
 
   <ul>
     {props.unitypackageModules.map(module => <li><code>{module.name}</code> {module.desc}。</li>)}
   </ul>
 
-3. 如果当前项目已集成 `Newtonsoft.Json` 依赖，则忽略该步骤，否则在 `NuGet.org` [ Newtonsoft.Json ](https://www.nuget.org/packages/Newtonsoft.Json) 页面中通过点击右侧 「Download package」 下载库文件，并将下载的文件后缀从`.nupkg` 修改为 `.zip`，同时解压该文件并复制内部的 `Newtonsoft.Json.dll` 文件拷贝到工程 `Assets` 的 `Plugins` 目录下，另外为了避免导出 IL2CPP 平台时删除必要数据，需在 `Assets` 目录下创建 `link.xml` 文件（如果已有该文件，则添加如下内容），其内容如下：
+2. 如果当前项目已集成 `Newtonsoft.Json` 依赖，则忽略该步骤，否则在 `NuGet.org` [ Newtonsoft.Json ](https://www.nuget.org/packages/Newtonsoft.Json) 页面中通过点击右侧 「Download package」 下载库文件，并将下载的文件后缀从`.nupkg` 修改为 `.zip`，同时解压该文件并复制内部的 `Newtonsoft.Json.dll` 文件拷贝到工程 `Assets` 的 `Plugins` 目录下，另外为了避免导出 IL2CPP 平台时删除必要数据，需在 `Assets` 目录下创建 `link.xml` 文件（如果已有该文件，则添加如下内容），其内容如下：
 
 ```xml
 <linker>
@@ -105,5 +95,5 @@ TapSDK 使用 NPMJS 安装，优势是只需要配置版本号，并且支持嵌
   </assembly>
 </linker>
 
-```-->
+```
 
