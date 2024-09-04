@@ -3,19 +3,15 @@
 ## 环境搭建
 
 ```sh
-brew install node@18 yarn
+brew install node@18 yarn # 安装软件
+yarn          # 安装依赖
 ```
 
 ## 本地预览
 
 ```sh
-yarn          # 安装依赖
-
 yarn start-cn # 预览 CN 文档
 yarn start-hk # 预览 HK 文档
-
-# CN 预览英文文档
-yarn start-cn --locale en
 
 ### HK 预览中文文档：
 yarn start-hk --locale zh-hans 
