@@ -4,25 +4,18 @@
 
 ```sh
 yarn
-yarn start
+yarn start-cn # 启动 CN 文档项目
+yarn start-hk # 启动 HK 文档项目
 
 # 预览英文文档
-yarn start --locale en
+yarn start-cn --locale en
 
 ### 国际版预览中文文档：
-yarn start --locale zh-hans 
+yarn start-cn --locale zh-hans 
 
 ```
 
-注意：`yarn start` 并不会检查坏链。如需检查坏链，需要运行 `yarn build`。坏链检查只会检查文档内部链接指向的页面是否存在，不会检查指向第三方网站的外部链接，也不会检查页内链接（hash link）。
-
-### 切换 HK 本地开发环境
-
-执行`yarn setup-hk`，会把本地变成 HK 文档开发环境，在 docs 目录下修改内容，可以直接在本地预览。
-
-### 还原 CN 本地开发环境
-
-HK 文档修改完毕后，提交前，执行`yarn restore-cn`，会把修改移动到 tds_hk 目录，然后把本地还原成 CN 文档开发环境。
+注意：`yarn start-[cn|hk]` 并不会检查坏链。如需检查坏链，需要运行 `yarn build-[cn|hk]`。坏链检查只会检查文档内部链接指向的页面是否存在，不会检查指向第三方网站的外部链接，也不会检查页内链接（hash link）。
 
 ## 贡献
 
@@ -436,7 +429,7 @@ Docusaurus 自身并没有提供「从一个项目构建出不同版本」的功
 
 ## 优化图片
 
-运行 `yarn optimg` 任务可以优化 `img` 下的 JPEG（有损压缩）和 PNG 图片（无损压缩）。这一任务运行时间较长，所以未加入构建环节，需要手动运行。建议过一段时间（比如一两个月）跑一下。
+运行 `yarn optimg-[cn|hk]` 任务可以优化 `[cn|hk]/static/img` 下的 JPEG（有损压缩）和 PNG 图片（无损压缩）。这一任务运行时间较长，所以未加入构建环节，需要手动运行。建议过一段时间（比如一两个月）跑一下。
 
 ## 多版本
 
