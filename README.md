@@ -4,7 +4,7 @@
 
 ```sh
 brew install node@18 yarn # 安装软件
-yarn          # 安装依赖
+yarn                      # 安装依赖
 ```
 
 ## 本地预览
@@ -62,10 +62,20 @@ yarn build-hk # 编译 HK 文档项目
 
 ```
 .
-├── .ci                                      CI/CD 相关配置
-├── .github                                  GitHub Actions 配置
-├── cn                                       CN 文档
+├── .ci             CI/CD 相关配置
+├── .github         GitHub Actions 配置
+├── cn              CN 文档
+├── hk              HK 文档
+├── package.json    依赖配置
+└── yarn.lock       依赖版本锁定
+```
 
+### 文档目录结构
+
+cn 和 hk 是存放国内和海外文档的目录，两者目录结构相同，以下以 cn 为例：
+
+```
+.
 ├── docs                                     中文文档
 │   ├── ddos.mdx                             隐藏文档
 │   └── sdk                                  顶栏菜单项
@@ -79,15 +89,18 @@ yarn build-hk # 编译 HK 文档项目
 │       │   └── current.json                 侧栏菜单项翻译
 │       └── docusaurus-theme-classic
 │           └── navbar.json                  顶栏菜单项翻译
-├── img                                      文档配图
-├── sidebars.js                              菜单配置
+├── plugins                                  插件
 ├── src
 │   ├── docComponents                        自定义组件（用于文档内容，如多编程语言）
 │   ├── pages                                文档以外的页面（目前只包含首页）
 │   ├── styles                               一些共享样式
 │   └── theme                                自定义组件（用于文档内容以外的地方，如文档搜索）
+├── static                                   静态资源
+│   ├── files                                一些提供用户下载的资源文件（如 aar）
+│   └── img                                  文档配图                                      
 ├── versioned_docs                           旧版文档内容
 ├── versioned_sidebars                       旧版文档菜单配置
+├── sidebars.js                              菜单配置
 └── versions.json                            历史版本配置
 ```
 
