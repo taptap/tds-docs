@@ -1,21 +1,44 @@
 # TapTap 开发者中心文档
 
+## 环境搭建
+
+```sh
+brew install node@18 yarn
+```
+
 ## 本地预览
 
 ```sh
-yarn
-yarn start-cn # 启动 CN 文档项目
-yarn start-hk # 启动 HK 文档项目
+yarn          # 安装依赖
 
-# 预览英文文档
+yarn start-cn # 预览 CN 文档项目
+yarn start-hk # 预览 HK 文档项目
+
+# CN 预览英文文档
 yarn start-cn --locale en
 
-### 国际版预览中文文档：
-yarn start-cn --locale zh-hans 
-
+### HK 预览中文文档：
+yarn start-hk --locale zh-hans 
 ```
 
-注意：`yarn start-[cn|hk]` 并不会检查坏链。如需检查坏链，需要运行 `yarn build-[cn|hk]`。坏链检查只会检查文档内部链接指向的页面是否存在，不会检查指向第三方网站的外部链接，也不会检查页内链接（hash link）。
+## 本地编译
+
+一般的小修改，使用本地预览就足够了。但如果对文档的结构进行了修改，或者删除了文件，就需要本地编译一下，以确保没有死链。
+
+```sh
+yarn build-cn # 编译 CN 文档项目
+yarn build-hk # 编译 HK 文档项目
+```
+
+最后输出以下信息，表示编译成功，可以放心提交。
+
+```sh
+[SUCCESS] Generated static files in "hk/build/zh-Hans".
+[INFO] Use `npm run serve` command to test your build locally.
+✨  Done in 163.88s.
+```
+
+注意：`yarn build-[cn|hk]`只会检查文档内部链接指向的页面是否存在，不会检查指向第三方网站的外部链接，也不会检查页内链接（hash link）。
 
 ## 贡献
 
