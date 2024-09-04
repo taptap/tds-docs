@@ -18,11 +18,11 @@ yarn start --locale zh-hans
 
 ### 切换 HK 本地开发环境
 
-执行 .ci/setup-hk.sh 脚本，会把本地变成 HK 文档开发环境，在 docs 目录下修改内容，可以直接在本地预览。
+执行`yarn setup-hk`，会把本地变成 HK 文档开发环境，在 docs 目录下修改内容，可以直接在本地预览。
 
 ### 还原 CN 本地开发环境
 
-HK 文档修改完毕后，执行 .ci/restore_cn_dev.sh 脚本，会把修改移动到 tds_hk 目录，然后把本地还原成 CN 文档开发环境。
+HK 文档修改完毕后，提交前，执行`yarn restore-cn`，会把修改移动到 tds_hk 目录，然后把本地还原成 CN 文档开发环境。
 
 ## 贡献
 
