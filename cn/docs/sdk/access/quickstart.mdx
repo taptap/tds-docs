@@ -14,7 +14,7 @@ import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
 
 ## 环境要求
 
-<MultiLang>
+<MultiLang kind="android_jk">
 <>
 
 - Unity 2019.4 或更高版本
@@ -22,6 +22,13 @@ import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
 - Android 5.0（API level 21）或更高版本
 
 </>
+
+<>
+
+- Android 5.0（API level 21）或更高版本
+
+</>
+
 <>
 
 - Android 5.0（API level 21）或更高版本
@@ -48,7 +55,7 @@ import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
 
 ## 项目配置
 
-<MultiLang>
+<MultiLang kind="android_jk">
 <>
 
 <UnitySDKInstallation
@@ -63,6 +70,51 @@ unitypackageModules={[
 ]}/>
 
 </>
+
+<>
+
+1. 项目根目录的 build.gradle 添加仓库地址：
+
+<CodeBlock language="groovy">
+{
+`allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}`}
+</CodeBlock>
+
+2. app module 的 build.gradle 添加对应模块依赖（如：登录以及内嵌动态）：
+
+<CodeBlock language="groovy">
+{
+`dependencies {
+    implementation 'com.taptap.sdk:tap-core:${v4SDKVersions.taptap.android}'
+    implementation 'com.taptap.sdk:tap-login:${v4SDKVersions.taptap.android}' // 登录
+    implementation 'com.taptap.sdk:tap-moment:${v4SDKVersions.taptap.android}' // 内嵌动态
+}`
+}
+
+</CodeBlock>
+
+3. 在 `AndroidManifest.xml` 添加网络权限：
+
+<CodeBlock language="xml">
+{
+`<uses-permission android:name="android.permission.INTERNET"></uses-permission>`
+}
+</CodeBlock>
+
+4. 旧版 Android 额外配置
+
+   如果 `targetSdkVersion < 29`，还需要添加如下配置：
+
+   - `manifest` 节点添加 `xmlns:tools="http://schemas.android.com/tools"`
+   - `application` 节点添加 `tools:remove="android:requestLegacyExternalStorage"`
+
+</>
+
 <>
 
 1. 项目根目录的 build.gradle 添加仓库地址：
@@ -106,6 +158,8 @@ unitypackageModules={[
     - `application` 节点添加 `tools:remove="android:requestLegacyExternalStorage"`
 
 </>
+
+
 <>
 
 #### 导入 SDK
@@ -153,7 +207,7 @@ iOS 提供通过添加 cocosPod 远程依赖和使用本地文件导入两种集
 
 新版 TapSDK 提供统一初始化，业务模块（如：成就 登录等）无需单独初始化。
 
-<MultiLang>
+<MultiLang kind="android_jk">
 
 <>
 
@@ -188,6 +242,49 @@ TapTapSDK.Init(coreOptions, otherOptions);
 ```
 
 </>
+
+<>
+
+**请确保 TapSDK 的初始化在主线程（UI 线程）中执行。**
+
+```java
+import com.taptap.sdk.achievement.options.TapTapAchievementOptions;
+import com.taptap.sdk.compilance.option.TapTapComplianceOptions;
+import com.taptap.sdk.core.TapTapLanguage;
+import com.taptap.sdk.core.TapTapRegion;
+import com.taptap.sdk.core.TapTapSdk;
+import com.taptap.sdk.core.TapTapSdkOptions;
+
+// 必选配置
+TapTapSdkOptions tapSdkOptions = new TapTapSdkOptions(
+       "client_id", // 游戏 Client ID
+       "client_token", // 游戏 Client Token
+       TapTapRegion.CN, // 游戏可玩区域: [TapTapRegion.CN]=国内 [TapTapRegion.GLOBAL]=海外
+       "channel", // 分包渠道名称 , 可为空
+       "gameVersion", // 游戏版本号
+       false, // 是否自动上报 GooglePlay 内购支付成功事件 仅 [TapTapRegion.GLOBAL] 生效
+       false, // 自定义字段是否能覆盖内置字段
+       null, // 自定义属性，启动首个预置事件（device_login）会带上这些属性
+       "oaidCert", // OAID 证书内容, 用于上报 OAID 仅 [TapTapRegion.CN] 生效
+       true, // 是否开启 log，建议 Debug 开启，Release 关闭，默认关闭 log
+       TapTapLanguage.AUTO // TapSDK 首选语言 默认为 TapTapLanguage.AUTO
+);
+// 可选配置 成就模块
+TapTapAchievementOptions tapAchievementOptions = new TapTapAchievementOptions(
+       true // 解锁成就弹出 Toast 提示，默认 true
+);
+// 可选配置 合规模块
+TapTapComplianceOptions tapComplianceOptions = new TapTapComplianceOptions(
+       true, // 是否显示切换账号按钮，默认为 false
+       true // 游戏是否需要获取真实年龄段信息，默认为 true
+);
+// 初始化 TapSDK
+TapTapSdk.init(context, tapSdkOptions, tapAchievementOptions, tapComplianceOptions);
+
+```
+
+</>
+
 <>
 
 **请确保 TapSDK 的初始化在主线程（UI 线程）中执行。**
@@ -196,17 +293,17 @@ TapTapSDK.Init(coreOptions, otherOptions);
 TapTapSdk.init(
     this,
     TapTapSdkOptions(
-        clientId, // 游戏client id
-        clientToken, // 游戏client token
+        clientId, // 游戏 Client ID
+        clientToken, // 游戏 Client Token
         region, // 游戏可玩区域: [TapTapRegion.CN]=国内 [TapTapRegion.GLOBAL]=海外
         channel, // 分包渠道名称
         gameVersion, // 游戏版本号
-        autoIAPEventEnabled, // 是否自动上报GooglePlay内购支付成功事件 仅 [TapTapRegion.GLOBAL] 生效
+        autoIAPEventEnabled, // 是否自动上报 GooglePlay 内购支付成功事件 仅 [TapTapRegion.GLOBAL] 生效
         overrideBuiltInParameters, // 自定义字段是否能覆盖内置字段
         properties, // 自定义属性，启动首个预置事件（device_login）会带上这些属性
-        oaidCert, // OAID证书, 用于上报 OAID 仅 [TapTapRegion.CN] 生效
+        oaidCert, // OAID 证书, 用于上报 OAID 仅 [TapTapRegion.CN] 生效
         enableLog, // 是否开启 log，建议 Debug 开启，Release 关闭，默认关闭 log
-        preferredLanguage, // TapSdk首选语言 默认为 TapTapLanguage.AUTO
+        preferredLanguage, // TapSDK 首选语言 默认为 TapTapLanguage.AUTO
     ),
     TapTapAchievementOptions(enableToast = true), // 成就初始化配置
     TapTapComplianceOptions(showSwitchAccount = true, useAgeRange = true) // 合规认证初始化配置
@@ -222,7 +319,7 @@ import TapTapCoreSDK
 let options = TapTapSdkOptions()
 options.clientId = "your_client_id" // 必须，开发者中心对应 Client ID
 options.clientToken = "your_client_token" // 必须，开发者中心对应 Client Token
-options.region = .CN // .CN：中国大陆，.overseas:其他国家或地区
+options.region = .CN // .CN：中国大陆，.overseas：其他国家或地区
 options.enableLog = true // 是否开启 log，建议 Debug 开启，Release 关闭，默认关闭 log
 options.preferredLanguage = TapLanguageType.auto // 语言设置，默认跟随系统，当系统语言不支持时，国内为中文，海外为英文
 
