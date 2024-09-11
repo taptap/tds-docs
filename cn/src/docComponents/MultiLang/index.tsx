@@ -137,8 +137,8 @@ const CONFIGS: {
   android_jk: {
       tds: [
       { label: "Unity", value: "unity" },
-      { label: "Android(Java)", value: "android_java" },
-      { label: "Android(Kotlin)", value: "android_kotlin" },
+      { label: "Android Java", value: "android_java" },
+      { label: "Android Kotlin", value: "android_kotlin" },
       { label: "iOS", value: "ios" },
       ]
     },
