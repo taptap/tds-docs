@@ -17,7 +17,7 @@ import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
 
 ## 权限说明
 
-<MultiLang kind="android_unity">
+<MultiLang kind="unity_android_v4">
 
 <>
 该模块依赖权限如下：
@@ -26,6 +26,28 @@ import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
 | ---------------------- | ---------------------- | ---------------------- |
 | 网络权限 | 用于正常网络访问 | 用户首次使用该功能时会申请权限 |
 | 安装 APK 权限 | 用于安装 Tap 客户端 | 用户首次使用该功能时会申请权限 |
+</>
+
+<>
+
+该模块依赖权限如下：
+
+| 权限 | 使用目的 | 权限申请时机 |
+| ---------------------- | ---------------------- | ---------------------- |
+| 网络权限 | 用于正常网络访问 | 用户首次使用该功能时会申请权限 |
+| 安装 APK 权限 | 用于安装 Tap 客户端 | 用户首次使用该功能时会申请权限 |
+
+同时该模块也会访问设备已安装的 Tap 客户端信息，所以接入 SDK 后将在应用 `AndroidManifest.xml` 中添加如下配置：
+
+```xml
+<uses-permission android:name="android.permission.INTERNET"/>
+<uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+<queries>
+        <package android:name="com.taptap" />
+        <package android:name="com.taptap.global" />
+</queries>
+```
+
 </>
 
 <>
@@ -59,7 +81,7 @@ import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
 
 ## SDK 获取
 
-<MultiLang kind="android_unity">
+<MultiLang kind="unity_android_v4">
 
 <>
 
@@ -105,6 +127,30 @@ unitypackageModules={[
 
 <>
 
+1. 项目根目录的 build.gradle 添加仓库地址:
+
+<CodeBlock language="groovy">{
+`allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}`
+}</CodeBlock>
+
+2. app module 的 build.gradle 添加对应依赖：
+
+<CodeBlock language="groovy">{
+`dependencies {
+    implementation 'com.taptap.sdk:tap-core:${v4SDKVersions.taptap.android}'
+    implementation 'com.taptap.sdk:tap-update:${v4SDKVersions.taptap.android}'
+}`
+}</CodeBlock>
+
+</>
+
+<>
+
 受限于苹果政策，iOS 平台的 TapTap 客户端不提供游戏更新功能
 
 </>
@@ -115,7 +161,7 @@ unitypackageModules={[
 
 ### TapSDK 初始化
 
-<MultiLang kind="android_unity">
+<MultiLang kind="unity_android_v4">
 
 <>
 
@@ -129,6 +175,36 @@ using TapSDK.Compliance;
 TapTapSdkOptions coreOptions = new TapTapSdkOptions();
 // TapSDK 初始化
 TapTapSDK.Init(coreOptions);
+```
+
+</>
+
+<>
+
+`TapTapSdkOptions` 详细参数见 [入门指南#快速开始](/sdk/access/quickstart/#初始化)
+
+```java
+import com.taptap.sdk.core.TapTapLanguage;
+import com.taptap.sdk.core.TapTapRegion;
+import com.taptap.sdk.core.TapTapSdk;
+import com.taptap.sdk.core.TapTapSdkOptions;
+
+// 必选配置
+TapTapSdkOptions tapSdkOptions = new TapTapSdkOptions(
+       "client_id", // 游戏 Client ID
+       "client_token", // 游戏 Client Token
+       TapTapRegion.CN, // 游戏可玩区域: [TapTapRegion.CN]=国内 [TapTapRegion.GLOBAL]=海外
+       "channel", // 分包渠道名称 , 可为空
+       "gameVersion", // 游戏版本号
+       false, // 是否自动上报 GooglePlay 内购支付成功事件 仅 [TapTapRegion.GLOBAL] 生效
+       false, // 自定义字段是否能覆盖内置字段
+       null, // 自定义属性，启动首个预置事件（device_login）会带上这些属性
+       "oaidCert", // OAID 证书内容, 用于上报 OAID 仅 [TapTapRegion.CN] 生效
+       true, // 是否开启 log，建议 Debug 开启，Release 关闭，默认关闭 log
+       TapTapLanguage.AUTO // TapSDK 首选语言 默认为 TapTapLanguage.AUTO
+);
+
+TapTapSdk.init(context, tapSdkOptions);
 ```
 
 </>
@@ -171,7 +247,7 @@ FTapUpdate::Init(TEXT("clientId"), TEXT("clientToken"));
 TapSDK 如果检查当前设备未安装 TapTap 客户端，首先会弹窗询问用户「是否需要使用 TapTap 更新」，当点击「取消」按钮时取消更新的回调方法才会执行。
 :::
 
-<MultiLang kind="android_unity">
+<MultiLang kind="unity_android_v4">
 
 <>
 
@@ -181,6 +257,24 @@ using TapSDK.Update
 TapTapUpdate.UpdateGame(() => {
     // 唤醒更新收到[取消]回调
 });
+```
+</>
+
+<>
+
+由于更新唤起 UI 依赖于开发者设置的 Activity 实例，所以为了避免因 Activity 发生重建导致更新唤起功能不可用，开发者应确保在屏幕旋转、配置修改时当前 Activity 不会发生重建，具体设置方式参考 [限制 activity 重新创建](https://developer.android.com/guide/topics/resources/runtime-changes?hl=zh-cn#restrict-activity)
+
+```java
+import com.taptap.sdk.update.TapTapUpdate;
+import com.taptap.sdk.update.TapTapUpdateCallback;
+
+TapTapUpdate.updateGame(activity, new TapTapUpdateCallback() {
+    @Override
+    public void onCancel() {
+        // 更新取消
+    }
+});
+
 ```
 </>
 
