@@ -15,9 +15,27 @@ import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
 
 ## 权限说明
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 <>
+
+</>
+
+<>
+
+该模块需要如下权限：
+
+| 权限       | 使用目的           | 权限申请时机          |
+|----------|----------------|-----------------|
+| 网络权限     | 用于正常网络请求       | 用户首次使用该功能时会申请权限 |
+| 获取网络状态权限 | 用于检测当前网络连接是否有效 | 用户首次使用该功能时会申请权限 |
+
+该模块将在应用中添加如下权限：
+
+```xml
+<uses-permission android:name="android.permission.INTERNET"/>
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+```
 
 </>
 
@@ -55,7 +73,7 @@ import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
 
 可以在 [下载页](/tap-download) 获得 TapSDK，引入防沉迷模块。
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
@@ -76,6 +94,28 @@ unitypackageModules={[
 {name: "TapTapSDK_Compliance.unitypackage", desc: "TapTapSDK 合规认证模块，必选"},
 ]}/>
 
+</>
+
+<>
+1. 项目根目录的 build.gradle 添加仓库地址：
+
+```groovy
+allprojects { 
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+```
+
+2. app module 的 build.gradle 添加对应依赖：
+
+<CodeBlock language="groovy">{
+`dependencies {
+    implementation 'com.taptap.sdk:tap-core:${v4SDKVersions.taptap.android}'
+    implementation 'com.taptap.sdk:tap-compliance:${v4SDKVersions.taptap.android}'
+}`
+}</CodeBlock>
 </>
 
 <>
@@ -135,7 +175,7 @@ iOS 提供通过添加 cocosPod 远程依赖和使用本地文件导入两种集
 
 合规认证模块支持设置**是否显示切换账号**和**使用年龄段信息**，开发者可在 [TapSDK 初始化](/sdk/access/quickstart#初始化) 时添加对应的配置，具体如下：
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 <>
 
 ```cs   
@@ -162,6 +202,43 @@ TapTapSDK.Init(coreOptions, otherOptions);
 ```
 
 </>
+
+<>
+
+```java
+import com.taptap.sdk.compilance.option.TapTapComplianceOptions;
+import com.taptap.sdk.core.TapTapLanguage;
+import com.taptap.sdk.core.TapTapRegion;
+import com.taptap.sdk.core.TapTapSdk;
+import com.taptap.sdk.core.TapTapSdkOptions;
+
+// 必选配置
+TapTapSdkOptions tapSdkOptions = new TapTapSdkOptions(
+        "client_id", // 游戏 Client ID
+        "client_token", // 游戏 Client Token
+        TapTapRegion.CN, // 游戏可玩区域: [TapTapRegion.CN]=国内 [TapTapRegion.GLOBAL]=海外
+        "channel", // 分包渠道名称 , 可为空
+        "gameVersion", // 游戏版本号
+        false, // 是否自动上报 GooglePlay 内购支付成功事件 仅 [TapTapRegion.GLOBAL] 生效
+        false, // 自定义字段是否能覆盖内置字段
+        null, // 自定义属性，启动首个预置事件（device_login）会带上这些属性
+        "oaidCert", // OAID 证书内容, 用于上报 OAID 仅 [TapTapRegion.CN] 生效
+        true, // 是否开启 log，建议 Debug 开启，Release 关闭，默认关闭 log
+        TapTapLanguage.AUTO // TapSDK 首选语言 默认为 TapTapLanguage.AUTO
+);
+
+// 可选配置 合规模块
+TapTapComplianceOptions tapComplianceOptions = new TapTapComplianceOptions(
+        true, // 是否显示切换账号按钮，默认为 false
+        true // 游戏是否需要获取真实年龄段信息，默认为 true
+);
+// 初始化 TapSDK
+TapTapSdk.init(context, tapSdkOptions, tapComplianceOptions);
+
+```
+
+</>
+
 <>
 
 ```kotlin
@@ -229,7 +306,7 @@ TapTapSDK.initWith(coreOptions, otherOptions: otherOptions)
 
 为了处理用户在进行合规认证时触发的不同事件，游戏需通过设置回调进行监听。示例如下：
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 <>
 
 ```cs
@@ -243,6 +320,49 @@ TapTapCompliance.RegisterComplianceCallback(callback);
 ```
 
 </>
+
+
+<>
+
+```java
+import com.taptap.sdk.compilance.TapTapCompliance;
+import com.taptap.sdk.compilance.TapTapComplianceCallback;
+import com.taptap.sdk.compilance.constants.ComplianceMessage;
+
+TapTapCompliance.registerComplianceCallback(new TapTapComplianceCallback() {
+    @Override
+    public void onComplianceResult(int code, @Nullable Map<String, ?> extra) {
+        // 合规结果
+        switch (code) {
+            case ComplianceMessage.LOGIN_SUCCESS:
+                // do something
+                break;
+            case ComplianceMessage.EXITED:
+                // do something
+                break;
+            case ComplianceMessage.SWITCH_ACCOUNT:
+                // do something
+                break;
+            case ComplianceMessage.PERIOD_RESTRICT:
+                // do something
+                break;
+            case ComplianceMessage.DURATION_LIMIT:
+                // do something
+                break;
+            case ComplianceMessage.INVALID_CLIENT_OR_NETWORK_ERROR:
+                // do something
+                break;
+            default:
+                break;
+        }
+    }
+});
+
+```
+
+</>
+
+
 <>
 
 ```kotlin
@@ -309,7 +429,7 @@ TapTapCompliance.register(self)
 防沉迷开始认证时需传入玩家唯一标识 `userIdentifier`，建议使用[TapTap 用户认证](/sdk/taptap-login/guide/#获取用户信息)
 中的 `openid` 或 `unionid`。
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
@@ -324,12 +444,29 @@ if (account != null) {
 ```
 
 </>
+
+<>
+
+```java
+import com.taptap.sdk.compilance.TapTapCompliance;
+import com.taptap.sdk.login.TapTapAccount;
+import com.taptap.sdk.login.TapTapLogin;
+
+TapTapAccount currentTapAccount = TapTapLogin.getCurrentTapAccount();
+if(currentTapAccount != null) {
+    String unionId = currentTapAccount.getUnionId();
+    TapTapCompliance.startup(activity, unionId);
+}
+```
+
+</>
+
 <>
 
 ```kotlin
 import com.taptap.sdk.compilance.TapTapCompliance
 
-TapTapCompliance.startup(activity = this, userId = "userId")
+TapTapCompliance.startup(activity = this, userId = "userIdentifier")
 ```
 
 </>
@@ -355,7 +492,7 @@ TapTapCompliance.startup(userIdentifier)
 
 游戏在收到玩家的充值请求后，调用以下接口检查本次充值行为是否受限：
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 ```cs
 using TapSDK.Compliance;
@@ -375,6 +512,37 @@ TapTapCompliance.CheckPaymentLimit(
         // 检查充值异常, 处理异常
     }
 );
+```
+
+```java
+import com.taptap.sdk.compilance.TapTapCompliance;
+import com.taptap.sdk.compilance.bean.CheckPaymentResult;
+import com.taptap.sdk.kit.internal.callback.TapTapCallback;
+import com.taptap.sdk.kit.internal.exception.TapTapException;
+
+// 充值金额，单位为分
+int amount = 100;
+
+TapTapCompliance.checkPaymentLimit(activity, amount, new TapTapCallback<CheckPaymentResult>() {
+
+    @Override
+    public void onSuccess(CheckPaymentResult checkPaymentResult) {
+        if(checkPaymentResult.getStatus()) {
+            // 充值没有限制
+        } else {
+            // 在充值被限制时，SDK 会弹出对应提示窗口，开发者不需要额外处理
+        }
+    }
+
+    @Override
+    public void onFail(@NonNull TapTapException exception) {
+        // 查询失败，开发者可以继续重试，但建议最多重试三次
+    }
+
+    @Override
+    public void onCancel() {
+    }
+});
 ```
 
 ```kotlin
@@ -424,7 +592,7 @@ TapTapCompliance.checkPaymentLimit(amount) { status, title, desc in
 
 当玩家充值成功后，开发者需调用如下接口上报玩家充值金额：
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 ```cs
 using TapSDK.Compliance;
@@ -442,6 +610,29 @@ TapTapCompliance.SubmitPayment(
         // 处理异常
     }
 );
+```
+
+```java
+import com.taptap.sdk.compilance.TapTapCompliance;
+import com.taptap.sdk.kit.internal.callback.TapTapCallback;
+import com.taptap.sdk.kit.internal.exception.TapTapException;
+
+int amount = 100;
+TapTapCompliance.submitPayment(amount, new TapTapCallback<JsonElement>() {
+    @Override
+    public void onSuccess(JsonElement jsonElement) {
+        // 上报充值成功
+    }
+
+    @Override
+    public void onFail(@NonNull TapTapException exception) {
+        // 上报充值失败
+    }
+
+    @Override
+    public void onCancel() {
+    }
+});
 ```
 
 ```kotlin
@@ -482,12 +673,18 @@ TapTapCompliance.submitPayment(amount) { success in
 
 玩家在游戏内退出账号时调用，重置防沉迷状态。
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 ```cs
 using TapSDK.Compliance;
 
 TapTapCompliance.Exit();
+```
+
+```java
+import com.taptap.sdk.compilance.TapTapCompliance;
+
+TapTapCompliance.exit();
 ```
 
 ```kotlin
@@ -510,12 +707,18 @@ TapTapCompliance.exit()
 
 开发者可调用如下接口获取玩家所处年龄段：
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 ```cs
 using TapSDK.Compliance;
 
 int ageRange = await TapTapCompliance.GetAgeRange();
+```
+
+```java
+import com.taptap.sdk.compilance.TapTapCompliance;
+
+int ageRange = TapTapCompliance.getAgeRange();
 ```
 
 ```kotlin
@@ -552,12 +755,18 @@ let ageRange = TapTapCompliance.getAgeRange().rawValue
 
 获取玩家当前剩余时长：
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 ```cs
 using TapSDK.Compliance;
 
 int time = await TapTapCompliance.GetRemainingTime(); // 单位:秒
+```
+
+```java
+import com.taptap.sdk.compilance.TapTapCompliance;
+
+int remainingTime = TapTapCompliance.getRemainingTime(); // 单位:秒
 ```
 
 ```kotlin
