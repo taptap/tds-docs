@@ -15,9 +15,27 @@ import Languages from "../_partials/languages.mdx";
 
 ## 权限说明
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 <>
+
+</>
+
+<>
+
+该模块需要如下权限：
+
+| 权限 | 使用目的 | 权限申请时机 |
+| ---------------------- | ---------------------- | ---------------------- |
+| 网络权限 | 用于访问网络数据 | 用户首次使用该功能时会申请权限 |
+| 网络状态权限 | 用于检查网络连接状态（如 Wi-Fi 或移动数据是否可用） | 用户首次使用该功能时会申请权限 |
+
+该模块将在应用中添加如下权限：
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+```
 
 </>
 
@@ -54,7 +72,7 @@ import Languages from "../_partials/languages.mdx";
 
 由于TapSDK V4 依赖于TapTapCore核心库，所以需要在TapTapCore的基础上，另外添加 `TapTapAchievement` 、 `TapTapLogin` 模块：
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 <>
 
 <UnitySDKInstallation
@@ -73,6 +91,29 @@ unitypackageModules={[
 {name: "TapTapSDK_Login.unitypackage", desc: "TapTapSDK 登录模块，必选"},
 {name: "TapTapSDK_Achievement.unitypackage", desc: "TapTapSDK 成就模块，必选"},
 ]}/>
+
+</>
+
+<>
+1. 项目根目录的 build.gradle 添加仓库地址：
+
+```groovy
+allprojects { 
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+```
+
+2. app module 的 build.gradle 添加对应依赖：
+
+<CodeBlock language="groovy">{
+`dependencies {
+    implementation 'com.taptap.sdk:tap-core:${v4SDKVersions.taptap.android}'
+    implementation 'com.taptap.sdk:tap-achievement:${v4SDKVersions.taptap.android}'
+}`
+}</CodeBlock>
 
 </>
 
@@ -131,7 +172,7 @@ iOS 提供通过添加 cocosPod 远程依赖和使用本地文件导入两种集
 
 详见 [TapTapSDK 初始化文档](/sdk/access/quickstart#初始化)。
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 <>
 
 `TapTapSdkOptions` 详细参数见 [入门指南#快速开始](/sdk/access/quickstart/#初始化)
@@ -155,6 +196,40 @@ TapTapSdkBaseOptions[] otherOptions = new TapTapSdkBaseOptions[]
 };
 // TapSDK 初始化
 TapTapSDK.Init(coreOptions, otherOptions);
+```
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.achievement.options.TapTapAchievementOptions;
+import com.taptap.sdk.core.TapTapLanguage;
+import com.taptap.sdk.core.TapTapRegion;
+import com.taptap.sdk.core.TapTapSdk;
+import com.taptap.sdk.core.TapTapSdkOptions;
+
+// 必选配置
+TapTapSdkOptions tapSdkOptions = new TapTapSdkOptions(
+       "client_id", // 游戏 Client ID
+       "client_token", // 游戏 Client Token
+       TapTapRegion.CN, // 游戏可玩区域: [TapTapRegion.CN]=国内 [TapTapRegion.GLOBAL]=海外
+       "channel", // 分包渠道名称 , 可为空
+       "gameVersion", // 游戏版本号
+       false, // 是否自动上报 GooglePlay 内购支付成功事件 仅 [TapTapRegion.GLOBAL] 生效
+       false, // 自定义字段是否能覆盖内置字段
+       null, // 自定义属性，启动首个预置事件（device_login）会带上这些属性
+       "oaidCert", // OAID 证书内容, 用于上报 OAID 仅 [TapTapRegion.CN] 生效
+       true, // 是否开启 log，建议 Debug 开启，Release 关闭，默认关闭 log
+       TapTapLanguage.AUTO // TapSDK 首选语言 默认为 TapTapLanguage.AUTO
+);
+// 可选配置 成就模块
+TapTapAchievementOptions tapAchievementOptions = new TapTapAchievementOptions(
+       true // 解锁成就弹出 Toast 提示，默认 true
+);
+// 初始化 TapSDK
+TapTapSdk.init(context, tapSdkOptions, tapAchievementOptions);
+
 ```
 
 </>
@@ -216,7 +291,7 @@ TapTapSDK.initWith(coreOptions, otherOptions: otherOptions)
 
 成就 SDK 中包含多个监听回调，分别会在初始化数据成功、初始化数据失败以及成就进度更新时被调用。
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
@@ -282,6 +357,34 @@ namespace TapSDK.Achievement
 ```
 
 </>
+
+<>
+
+```java
+import com.taptap.sdk.achievement.TapAchievementCallback;
+import com.taptap.sdk.achievement.TapTapAchievement;
+import com.taptap.sdk.achievement.TapTapAchievementResult;
+
+TapAchievementCallback callback = new TapAchievementCallback(){
+
+    @Override
+    public void onAchievementSuccess(int code, @Nullable TapTapAchievementResult result) {
+        // 成就状态更新成功
+    }
+    
+    @Override
+    public void onAchievementFailure(@NonNull String achievementId, int errorCode, @NonNull String errorMessage) {
+        // 成就状态更新失败
+    }
+
+};
+TapTapAchievement.registerCallback(callback);
+TapTapAchievement.unregisterCallback(callback);
+
+```
+
+</>
+
 <>
 
 ```kotlin
@@ -397,13 +500,19 @@ public class TapAchievementCallbackCode: NSObject {
 当玩家达成某一成就时，可以使用以下方式解锁成就，解锁成功后会触发 callback 的 `OnAchievementSuccess` 回调。
 解锁失败会触发 callback 的 `OnAchievementFailure` 回调。具体错误码请参考 [错误码详情](#错误码详情)
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 ```cs
 using TapSDK.Achievement;
 
 // achievementId 是在开发者中心中添加成就时自行设定的 成就 Id
 TapTapAchievement.Unlock(achievementId : achievementId);
+```
+
+```java
+import com.taptap.sdk.achievement.TapTapAchievement;
+// achievementId 是在开发者中心中添加成就时自行设定的 成就 Id
+TapTapAchievement.unlock("achievementId");
 ```
 
 ```kotlin
@@ -428,7 +537,7 @@ TapTapAchievement.unlock(achievementId: achievementId)
 解锁成功后会触发 callback 的 `OnAchievementSuccess` 回调。
 解锁失败会触发 callback 的 `OnAchievementFailure` 回调。具体错误码请参考 [错误码详情](#错误码详情)
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 ```cs
 using TapSDK.Achievement;
@@ -438,6 +547,14 @@ string achievementId = "achievementId";
 // step 是增长的步数
 int step = 1;
 TapTapAchievement.Increment(achievementId : achievementId, step : step);
+```
+
+```java
+import com.taptap.sdk.achievement.TapTapAchievement;
+// achievementId 为在开发者中心中添加成就时自行设定的成就 Id
+// steps 为增长的步数
+int steps = 1;
+TapTapAchievement.increment("achievementId", steps);
 ```
 
 ```kotlin
@@ -464,12 +581,18 @@ TapTapAchievement.increment(achievementId: achievementId, steps: steps)
 默认情况下，成就达成时 SDK 会自行展示一个冒泡浮窗提示玩家已达成相应成就。需要关闭请调用如下接口或者在初始化的时候设置
 TapTapAchievementOptions.enableToast 为 false。 详见 [成就初始化配置](#成就初始化配置)
 
-<MultiLang >
+<MultiLang kind="unity_android_ios_v4">
 
 ```cs
 using TapSDK.Achievement;
 
 TapTapAchievement.SetToastEnable(false);
+```
+
+```java
+import com.taptap.sdk.achievement.TapTapAchievement;
+
+TapTapAchievement.setToastEnable(false);
 ```
 
 ```kotlin
