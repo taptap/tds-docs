@@ -22,7 +22,7 @@ import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
 
 可以在 [下载页](/tap-download) 获得 TapSDK，添加以下依赖：
 
-<MultiLang kind="android_unity">
+<MultiLang kind="unity_android_v4">
 
 <>
 
@@ -72,11 +72,40 @@ NoNeedLC={true}/>
 </CodeBlock>
 </>
 
+<>
+
+1. 项目根目录的 build.gradle 添加仓库地址：
+
+<CodeBlock language="groovy">
+{
+`allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}`
+}
+
+</CodeBlock>
+
+2. app module 的 build.gradle 添加对应依赖：
+
+<CodeBlock language="groovy">
+{
+`dependencies {
+    implementation 'com.taptap.sdk:tap-core:${v4SDKVersions.taptap.android}'
+    implementation 'com.taptap.sdk:taptap-license:${v4SDKVersions.taptap.android}'
+}`
+}
+
+</CodeBlock>
+</>
+
 </MultiLang>
 
 ## SDK 初始化
 
-<MultiLang kind="android_unity">
+<MultiLang kind="unity_android_v4">
 
 <>
 
@@ -89,6 +118,36 @@ using TapSDK.Core;
 TapTapSdkOptions coreOptions = new TapTapSdkOptions();
 // TapSDK 初始化
 TapTapSDK.Init(coreOptions);
+```
+
+</>
+
+<>
+
+`TapTapSdkOptions` 详细参数见 [入门指南#快速开始](/sdk/access/quickstart/#初始化)
+
+```java
+import com.taptap.sdk.core.TapTapLanguage;
+import com.taptap.sdk.core.TapTapRegion;
+import com.taptap.sdk.core.TapTapSdk;
+import com.taptap.sdk.core.TapTapSdkOptions;
+
+// 必选配置
+TapTapSdkOptions tapSdkOptions = new TapTapSdkOptions(
+       "client_id", // 游戏 Client ID
+       "client_token", // 游戏 Client Token
+       TapTapRegion.CN, // 游戏可玩区域: [TapTapRegion.CN]=国内 [TapTapRegion.GLOBAL]=海外
+       "channel", // 分包渠道名称 , 可为空
+       "gameVersion", // 游戏版本号
+       false, // 是否自动上报 GooglePlay 内购支付成功事件 仅 [TapTapRegion.GLOBAL] 生效
+       false, // 自定义字段是否能覆盖内置字段
+       null, // 自定义属性，启动首个预置事件（device_login）会带上这些属性
+       "oaidCert", // OAID 证书内容, 用于上报 OAID 仅 [TapTapRegion.CN] 生效
+       true, // 是否开启 log，建议 Debug 开启，Release 关闭，默认关闭 log
+       TapTapLanguage.AUTO // TapSDK 首选语言 默认为 TapTapLanguage.AUTO
+);
+
+TapTapSdk.init(context, tapSdkOptions);
 ```
 
 </>
@@ -123,10 +182,29 @@ TapTapSdk.init(
 
 ### 权限说明
 
-<MultiLang kind="android_unity">
+<MultiLang kind="unity_android_v4">
 
 <>
 
+</>
+
+<>
+
+该模块需要访问设备中已安装的 Tap 客户端信息，在 Android 11 且工程 targetVersion > 29 时需要
+开发者在应用 `AndroidManifest.xml` 中添加如下配置：
+
+```xml
+ <queries>
+    <package android:name="com.taptap" />
+    <package android:name="com.taptap.pad" />
+    <package android:name="com.taptap.global" />
+</queries>
+```
+该模块将在应用中添加如下权限：
+
+```xml
+<uses-permission android:name="android.permission.REORDER_TASKS" />
+```
 </>
 
 <>
@@ -160,7 +238,7 @@ TapTapSdk.init(
 切记在上线前关闭测试模式
 :::
 
-<MultiLang kind="android_unity">
+<MultiLang kind="unity_android_v4">
 
 ```cs
 // 需要引入 `License` 库
@@ -168,6 +246,12 @@ using TapSDK.License;
 
 // 设置是否开启测试环境
 TapTapLicense.SetTestEnvironment(bool isTest);
+```
+```java
+import com.taptap.sdk.license.TapTapLicense;
+
+// 设置是否开启测试环境
+TapTapLicense.setTestEnvironment(activity, true);
 ```
 
 ```kotlin
@@ -182,7 +266,7 @@ TapTapLicense.setTestEnvironment(activity: Activity, true: Boolean)
 ### 设置授权回调
 可注册多个回调，
 
-<MultiLang kind="android_unity">
+<MultiLang kind="unity_android_v4">
 
 ```cs
 // 需要引入 `License` 库
@@ -197,6 +281,19 @@ public interface ITapLicenseCallback
     // 授权成功回调
     void OnLicenseSuccess();
 }
+```
+
+```java
+import com.taptap.sdk.license.TapTapLicense;
+import com.taptap.sdk.license.TapTapLicenseCallback;
+
+// 默认情况下 SDK 会弹出不可由玩家手动取消的弹窗来避免未授权玩家进入游戏，如果需要回调来触发流程，请添加如下代码
+TapTapLicense.registerLicenseCallback(new TapTapLicenseCallback() {
+    @Override
+    public void onLicenseSuccess() {
+        // 授权成功
+    }
+});
 ```
 
 ```kotlin
@@ -217,7 +314,7 @@ TapTapLicense.registerLicenseCallback(object : TapTapLicenseCallback {
 
 Check 方法中参数默认值为 false，表示为 SDK 首次触发以及在距离首次触发的第 5 天之后再一次会通过 TapTap 客户端来确认当前登录用户是否购买游戏，如果使用 true 的话，则每次接口调用都会通过 TapTap 客户端来确认当前登录用户是否购买过游戏。
 
-<MultiLang kind="android_unity">
+<MultiLang kind="unity_android_v4">
 
 ```cs
 using TapSDK.License;
@@ -229,6 +326,16 @@ TapTapLicense.CheckLicense();
 TapTapLicense.CheckLicense(true);
 
 ```
+
+```java
+import com.taptap.sdk.license.TapTapLicense;
+
+// 普通检查
+TapTapLicense.checkLicense(activity);
+// 强制检查
+TapTapLicense.checkLicense(activity, true);
+```
+
 
 ```kotlin
 import com.taptap.sdk.license.TapTapLicense
@@ -247,9 +354,24 @@ TapTapLicense.checkLicense(activity: Activity, forceCheck: Boolean)
 
 ### 权限说明
 
-<MultiLang kind="android_unity">
+<MultiLang kind="unity_android_v4">
 
 <>
+
+</>
+
+<>
+
+该模块需要访问设备中已安装的 Tap 客户端信息，在工程 targetVersion > 29 时需要
+开发者在应用 AndroidManifest.xml 中添加如下配置：
+
+```xml
+ <queries>
+    <package android:name="com.taptap" />
+    <package android:name="com.taptap.pad" />
+    <package android:name="com.taptap.global" />
+</queries>
+```
 
 </>
 
@@ -280,7 +402,7 @@ TapTapLicense.checkLicense(activity: Activity, forceCheck: Boolean)
 切记在上线前关闭测试模式
 :::
 
-<MultiLang kind="android_unity">
+<MultiLang kind="unity_android_v4">
 
 ```cs
 // 需要引入 `License` 库
@@ -288,6 +410,12 @@ using TapSDK.License;
 
 // 设置是否开启测试环境
 TapTapLicense.SetTestEnvironment(isTest);
+```
+
+```java
+import com.taptap.sdk.license.TapTapLicense;
+// 设置是否开启测试环境
+TapTapLicense.setTestEnvironment(activity, true);
 ```
 
 ```kotlin
@@ -301,7 +429,7 @@ TapTapLicense.setTestEnvironment(activity: Activity, true: Boolean)
 
 可以在 [下载页](/tap-download) 获得 TapSDK，添加以下依赖：
 
-<MultiLang kind="android_unity">
+<MultiLang kind="unity_android_v4">
 
 <>
 
@@ -338,13 +466,29 @@ app module 的 build.gradle 添加对应依赖：
 
 </>
 
+<>
+
+app module 的 build.gradle 添加对应依赖：
+
+<CodeBlock language="groovy">
+{
+`dependencies {
+    implementation 'com.taptap.sdk:tap-core:latest.release
+    implementation 'com.taptap.sdk:taptap-license:latest.release
+}`
+}
+
+</CodeBlock>
+
+</>
+
 </MultiLang>
 
 #### DLC 回调设置
 
 DLC 回调包含查询回调和购买回调。
 
-<MultiLang kind="android_unity">
+<MultiLang kind="unity_android_v4">
 
 ```cs
 using TapSDK.License;
@@ -363,6 +507,23 @@ public class MyTapDLCCallback:ITapDlcCallback
 }
 
 TapTapLicense.RegisterDLCCallback(new MyTapDLCCallback());
+```
+
+```java
+import com.taptap.sdk.license.TapTapDLCCallback;
+import com.taptap.sdk.license.TapTapLicense;
+
+TapTapLicense.registerDLCCallback(new TapTapDLCCallback() {
+    @Override
+    public void onQueryResult(int resultCode, @Nullable HashMap<String, Integer> resultList) {
+        // 查询回调
+    }
+
+    @Override
+    public void onPurchaseResult(@NonNull String skuId, int status) {
+        // 购买回调
+    }
+});
 ```
 
 ```kotlin
@@ -387,10 +548,19 @@ TapTapLicense.registerDLCCallback(object : TapTapDLCCallback {
 
 对应的查询回调会返回具体的查询结果，查询成功时会返回当前 Tap 玩家是否已经购买过对应商品，在查询回调中返回的键值对类型参数 `skuIds` 中可以获取，该参数 `key` 为查询的商品 `skuid`，`value` 表示该商品当前查询用户的购买状态：0 表示未购买，1 表示已购买。
 
-<MultiLang kind="android_unity">
+<MultiLang kind="unity_android_v4">
 
 ```cs
 TapTapLicense.QueryDLC(string[] skuIds);
+```
+
+```java
+import com.taptap.sdk.license.TapTapLicense;
+
+List<String> skuList = new ArrayList<>();
+skuList.add("skuId1");
+skuList.add("skuId2");
+TapTapLicense.queryDLC(activity, skuList);
 ```
 
 ```kotlin
@@ -403,10 +573,16 @@ TapTapLicense.queryDLC(activity: Activity, skuIds: List<String>)
 
 #### DLC 购买
 
-<MultiLang kind="android_unity">
+<MultiLang kind="unity_android_v4">
 
 ```cs
 TapTapLicense.PurchaseDLC(string skuId);
+```
+
+```java
+import com.taptap.sdk.license.TapTapLicense;
+
+TapTapLicense.purchaseDLC(activity, "skuId");
 ```
 
 ```kotlin
