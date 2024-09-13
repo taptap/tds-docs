@@ -14,9 +14,32 @@ import v4SDKVersions from '/src/docComponents/v4SDKVersions';
 
 ## 权限说明
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 <>
+
+</>
+
+<>
+
+该模块需要如下权限：
+
+| 权限 | 使用目的 | 权限申请时机 |
+| ---------------------- | ---------------------- | ---------------------- |
+| 网络权限 | 用于访问网络数据 | 用户首次使用该功能时会申请权限 |
+| 获取网络状态 | 用于检测当前网络连接是否有效 | 用户首次使用该功能时会申请权限 |
+| 读写存储权限 | 用于发布或下载动态页面内图片、视频 | 下载或使用本地图片发布动态时申请 |
+
+该模块将在应用中添加如下权限：
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+  tools:ignore="ScopedStorage" />
+<uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+<uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
+<uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+```
 
 </>
 
@@ -72,7 +95,7 @@ import v4SDKVersions from '/src/docComponents/v4SDKVersions';
 
 完成 SDK 获取，然后在此基础上可以通过 [下载](/tap-download) 获得 TapSDK，添加 `TapMoment` 模块：  
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 <UnitySDKInstallation
@@ -152,6 +175,38 @@ unitypackageModules={[
 </>
 
 <>
+1. 项目根目录的 build.gradle 添加仓库地址：
+
+<CodeBlock language="groovy">
+{
+`allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}`
+}
+
+</CodeBlock>
+
+2. app module 的 build.gradle 添加对应依赖：
+
+内嵌动态模块依赖于 `TapLogin`， 需额外添加 `TapLogin` 模块依赖。
+
+<CodeBlock language="groovy">
+{
+`dependencies {
+    implementation 'com.taptap.sdk:tap-core:${v4SDKVersions.taptap.android}'
+    implementation 'com.taptap.sdk:tap-login:${v4SDKVersions.taptap.android}'
+    implementation 'com.taptap.sdk:tap-moment:${v4SDKVersions.taptap.android}'
+}`
+}
+
+</CodeBlock>
+
+</>
+
+<>
 
 iOS 提供通过添加 cocosPod 远程依赖和使用本地文件导入两种集成方式，推荐使用远程依赖方式。
 
@@ -182,7 +237,7 @@ iOS 提供通过添加 cocosPod 远程依赖和使用本地文件导入两种集
 
 ## SDK 初始化
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
@@ -195,6 +250,36 @@ using TapSDK.Core;
 TapTapSdkOptions coreOptions = new TapTapSdkOptions();
 // TapSDK 初始化
 TapTapSDK.Init(coreOptions);
+```
+
+</>
+
+<>
+
+`TapTapSdkOptions` 详细参数见 [入门指南#快速开始](/sdk/access/quickstart/#初始化)
+
+```java
+import com.taptap.sdk.core.TapTapLanguage;
+import com.taptap.sdk.core.TapTapRegion;
+import com.taptap.sdk.core.TapTapSdk;
+import com.taptap.sdk.core.TapTapSdkOptions;
+
+// 必选配置
+TapTapSdkOptions tapSdkOptions = new TapTapSdkOptions(
+        "client_id", // 游戏 Client ID
+        "client_token", // 游戏 Client Token
+        TapTapRegion.CN, // 游戏可玩区域: [TapTapRegion.CN]=国内 [TapTapRegion.GLOBAL]=海外
+        "channel", // 分包渠道名称 , 可为空
+        "gameVersion", // 游戏版本号
+        false, // 是否自动上报 GooglePlay 内购支付成功事件 仅 [TapTapRegion.GLOBAL] 生效
+        false, // 自定义字段是否能覆盖内置字段
+        null, // 自定义属性，启动首个预置事件（device_login）会带上这些属性
+        "oaidCert", // OAID 证书内容, 用于上报 OAID 仅 [TapTapRegion.CN] 生效
+        true, // 是否开启 log，建议 Debug 开启，Release 关闭，默认关闭 log
+        TapTapLanguage.AUTO // TapSDK 首选语言 默认为 TapTapLanguage.AUTO
+);
+
+TapTapSdk.init(context, tapSdkOptions);
 ```
 
 </>
@@ -248,7 +333,7 @@ TapTapSDK.initWith(options)
 
 设置回调以获取动态的状态变化。
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 ```cs
 using TapSDK.Moment;
@@ -260,6 +345,19 @@ TapTapMoment.SetCallback((code, msg) =>
 
 // 移除 callback
 TapTapMoment.SetCallback(null);
+```
+
+```java
+import com.taptap.sdk.moment.TapTapMoment;
+
+TapTapMoment.setCallback(new TapTapMoment.TapTapMomentCallback() {
+   @Override
+   public void onCallback(int code, @Nullable String msg) {
+      // 根据 code 处理事件
+   }
+});
+
+TapTapMoment.setCallback(null);
 ```
 
 ```kotlin
@@ -314,12 +412,18 @@ TapTapMoment.setDelegate(self)
 
 定时调用获取消息通知的接口，有新信息时可以在 TapTap 动态入口显示小红点，提醒玩家查看新动态。
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 ```cs
 using TapSDK.Moment;
 
 TapTapMoment.FetchNotification();
+```
+
+```java
+import com.taptap.sdk.moment.TapTapMoment;
+
+TapTapMoment.fetchNotification();
 ```
 
 ```kotlin
@@ -352,7 +456,7 @@ TapTapMoment.fetchNotification()
 
 在游戏中显示 TapTap 动态页面，玩家可以查看及发布动态。
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 ```cs
 using TapSDK.Moment;
@@ -360,6 +464,11 @@ using TapSDK.Moment;
 TapTapMoment.open();
 ```
 
+```java
+import com.taptap.sdk.moment.TapTapMoment;
+
+TapTapMoment.open();
+```
 
 ```kotlin
 import com.taptap.sdk.moment.TapTapMoment
@@ -394,7 +503,7 @@ TapTapMoment.open()
 
 开发者可以[结合游戏场景绘制入口](/sdk/embedded-moments/features/#场景化入口)，玩家打开入口跳转到指定的页面。使用前需要在开发者中心后台完成[场景化入口配置](/sdk/embedded-moments/features/#场景化入口配置)。
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 <>
 
 ```cs
@@ -402,6 +511,17 @@ using TapSDK.Moment;
 
 // sceneId 为在开发者中心后台创建场景化入口后生成的「入口 ID」
 TapTapMoment.OpenScene(sceneId);
+```
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.moment.TapTapMoment;
+
+// sceneId 为在开发者中心后台创建场景化入口后生成的「入口 ID」
+TapTapMoment.openScene(sceneId);
 ```
 
 </>
@@ -456,12 +576,18 @@ TapTapMoment.openScene(sceneId)
 
 比如，玩家排位等待结束，准备进入对局时提示玩家关闭动态页面，玩家确认后关闭，此时调用如下接口：
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 ```cs
 using TapSDK.Moment;
 
 TapTapMoment.CloseWithTitle("提示", "匹配成功，进入游戏");
+```
+
+```java
+import com.taptap.sdk.moment.TapTapMoment;
+
+TapTapMoment.closeWithTitle("提示", "匹配成功，进入游戏");
 ```
 
 ```kotlin
@@ -487,12 +613,18 @@ TapTapMoment.close(withTitle: "标题", content: "匹配成功，是否离开动
 
 如果需要直接关闭动态窗口，不弹出二次确认框，调用如下接口：
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 ```cs
 using TapSDK.Moment;
 
 TapTapMoment.Close();
+```
+
+```java
+import com.taptap.sdk.moment.TapTapMoment;
+
+TapTapMoment.close();
 ```
 
 ```kotlin
@@ -521,13 +653,30 @@ TapTapMoment.close()
 不过，SDK 也提供了发布图文动态的 API，以支持「一键发动态」等需求。
 图文动态包括单张或多张图片及相应的文字内容。
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 ```cs
 using TapSDK.Moment;
 
 PublishMetaData publishMetaData = new PublishMetaData(content: "动态文字内容", imagePaths: new List<string> { "file://..." });
 TapTapMoment.Publish(publishMetaData)
+```
+
+```java
+import com.taptap.sdk.moment.TapTapMoment;
+import com.taptap.sdk.moment.model.PublishMetaData;
+
+List<String> imagePaths = new ArrayList<>();
+imagePaths.add("图片路径1");
+imagePaths.add("图片路径2");
+PublishMetaData publishMetaData = new PublishMetaData(
+       "动态文字内容",
+       new ArrayList<String>(),
+       imagePaths
+);
+
+TapTapMoment.publish(publishMetaData);
+
 ```
 
 ```kotlin
@@ -573,4 +722,4 @@ TapTapMoment.publish(postData)
 
 内嵌动态支持设置语言：
 
-<Languages/>
+<Languages kind="unity_android_ios_v4"/>
