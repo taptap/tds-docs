@@ -301,3 +301,32 @@ tools:remove="android:requestLegacyExternalStorage"
 需要配置 icon 和 `BundleID`：
 
 ![](https://capacity-files.lcfile.com/Nke4QO6zdEz5mRd2Kwd8R9ydyP8QYaJy/tap_ios_build.png)
+
+## 重打包
+
+### META-INF/services 合并错误导致的初始化失败问题
+
+:::tip
+TapSDK 初始化框架的实现依赖了 [auto-service](https://github.com/google/auto/blob/main/service/README.md) ，
+通过 auto-service 生成 META-INF/services/xxx 文件（服务实现类），然后靠 Java 的 [service loader](https://docs.oracle.com/javase/8/docs/api/java/util/ServiceLoader.html) 去加载
+:::
+
+问题表象往往是**初始化失败**，但**本质原因**是游戏开发者**重打包**的时候，没有正确合并 `META-INF` 文件夹下的文件。
+
+#### 类型一：重打包的时候 exclude 了 META-INF/services/com.taptap.sdk.internal.service.ITapAutoService 文件
+
+这类问题居多，即开发者往往直接不处理 `META-INF/services` 下的所有文件（exclude），导致 SDK 初始化失败。
+
+#### 类型二：合并 META-INF/services/com.taptap.sdk.internal.service.ITapAutoService 错误
+
+即开发者意识到了需要处理 `META-INF/services` 下的文件，但是合并的时候出现了错误，导致`SDK`初始化失败。
+这类问题往往是因为开发者重打包的时候采取的是 `override`（覆盖）而非 `merge`（合并）策略，
+即遇到多个 aar 里包含同名文件 `META-INF/services/com.taptap.sdk.internal.service.ITapAutoService` 时，只保留了一个，导致 SDK 初始化失败。
+
+错误的合并，如图：
+![](/img/错误的合并.png)
+
+正确的合并，如图：
+![](/img/正确的合并.png)
+
+
