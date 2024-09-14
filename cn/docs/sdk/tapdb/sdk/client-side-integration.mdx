@@ -18,13 +18,19 @@ TapSDK 提供了一套可供游戏开发者收集账号数据的 API。
 
 ## 环境要求
 
-<MultiLang >
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
 - Unity 2019.4 或更高版本
 - iOS 11 或更高版本，Xcode 版本 15.3 或更高版本
 - Android 5.0（API level 21）或更高版本
+
+</>
+
+<>
+
+Android 5.0（API level 21）或更高版本
 
 </>
 
@@ -44,10 +50,30 @@ iOS 11 或更高版本，Xcode 版本 15.3 或更高版本
 
 ## 权限说明
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
+
+</>
+
+<>
+
+该模块需要如下权限：
+
+| 权限 | 使用目的 | 权限申请时机 |
+| ---------------------- | ---------------------- | ---------------------- |
+| 获取网络状态 | 用于检测当前网络连接是否有效 | 用户首次使用该功能时会申请权限 |
+| 网络状态权限 | 用于检查网络连接状态（如 Wi-Fi 或移动数据是否可用） | 用户首次使用该功能时会申请权限 |
+
+对于可选权限，SDK 不会主动发起申请，只在用户已授权的情况下获取对应数据，需要由开发者决定是否申请。
+
+该模块将在应用中添加如下权限：
+
+```xml
+ <uses-permission android:name="android.permission.INTERNET" />
+ <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+ ```
 
 </>
 
@@ -86,7 +112,7 @@ iOS 11 或更高版本，Xcode 版本 15.3 或更高版本
 
 请先[下载](/tap-download) TapSDK，并添加相关依赖。
 
-<MultiLang >
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
@@ -102,6 +128,29 @@ githubDeps={[
 unitypackageModules={[
 {name: "TapTapSDK_Core.unitypackage", desc: "TapSDK 基础库，必选"},
 ]}/>
+
+</>
+
+<>
+
+1. 项目根目录的 build.gradle 添加仓库地址：
+
+```groovy
+allprojects { 
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+```
+
+2. app module 的 build.gradle 添加对应依赖：
+
+<CodeBlock language="groovy">{
+`dependencies {
+    implementation 'com.taptap.sdk:tap-core:${v4SDKVersions.taptap.android}'
+}`
+}</CodeBlock>
 
 </>
 
@@ -177,7 +226,7 @@ iOS 提供通过添加 cocosPod 远程依赖和使用本地文件导入两种集
 
 在 [TapSDK 初始化](/sdk/access/quickstart#初始化) 时可以配置上报事件所携带的游戏包属性及当前设备的信息，具体使用方式如下：
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
@@ -252,6 +301,36 @@ TapTapSDK.Init(coreOptions, otherOptions);
 
 `TapTapSdkOptions` 详细参数见 [入门指南#快速开始](/sdk/access/quickstart/#初始化)
 
+```java
+import com.taptap.sdk.core.TapTapLanguage;
+import com.taptap.sdk.core.TapTapRegion;
+import com.taptap.sdk.core.TapTapSdk;
+import com.taptap.sdk.core.TapTapSdkOptions;
+
+// 必选配置
+TapTapSdkOptions tapSdkOptions = new TapTapSdkOptions(
+       "client_id", // 游戏 Client ID
+       "client_token", // 游戏 Client Token
+       TapTapRegion.CN, // 游戏可玩区域: [TapTapRegion.CN]=国内 [TapTapRegion.GLOBAL]=海外
+       "channel", // 分包渠道名称 , 可为空
+       "gameVersion", // 游戏版本号
+       false, // 是否自动上报 GooglePlay 内购支付成功事件 仅 [TapTapRegion.GLOBAL] 生效
+       false, // 自定义字段是否能覆盖内置字段
+       null, // 自定义属性，启动首个预置事件（device_login）会带上这些属性
+       "oaidCert", // OAID 证书内容, 用于上报 OAID 仅 [TapTapRegion.CN] 生效
+       true, // 是否开启 log，建议 Debug 开启，Release 关闭，默认关闭 log
+       TapTapLanguage.AUTO // TapSDK 首选语言 默认为 TapTapLanguage.AUTO
+);
+
+TapTapSdk.init(context, tapSdkOptions);
+```
+
+</>
+
+<>
+
+`TapTapSdkOptions` 详细参数见 [入门指南#快速开始](/sdk/access/quickstart/#初始化)
+
 ```kotlin
 import com.taptap.sdk.core.TapTapSdk
 import com.taptap.sdk.core.TapTapSdkOptions
@@ -314,7 +393,7 @@ TapTapSDK.initWith(options)
 
 在重启应用或调用清除账号 ID（ `clearUser` ）前，上报的事件都会带有该账号 ID。
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
@@ -336,6 +415,25 @@ TapTapEvent.SetUserID(userId, properties);
 | userId     | 否   | 账号的唯一字符串，字符串长度不大于 256，只能包含数字、大小写字母、下划线（`_`）、短横（`-`）<br /> 开发者需要保证不同账号的 `userId` 均不相同。 |
 | properties | 是   | 账号登录（ `user_login` ）的事件属性                                                             |
 
+</>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+import org.json.JSONObject;
+
+JSONObject properties = new JSONObject();
+try {
+    // 自定义属性
+    properties.put("key1", "value1");
+    properties.put("key2", "value2");
+} catch (Exception e) {
+    e.printStackTrace();
+}
+// 设置用户 ID 及账号登录事件属性
+TapTapEvent.setUserId("userId", properties);
+```
 </>
 
 <>
@@ -374,7 +472,7 @@ TapTapEvent.setUserID(userId, properties: properties)
 
 当用户进行登出时，可调用 `clearUser` 清除当前 SDK 中保存的账号 ID，后续上报的事件将不会带有账号 ID，调用该接口不会上报任何事件。
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
@@ -382,6 +480,16 @@ TapTapEvent.setUserID(userId, properties: properties)
 using TapSDK.Core
 
 TapTapEvent.ClearUser();
+```
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+
+TapTapEvent.clearUser();
 ```
 
 </>
@@ -412,7 +520,7 @@ TapTapEvent.clearUser()
 
 在用户进行充值后，可调用该接口上报充值信息，调用后将上报 `charge` 事件，并将传入的参数作为事件的属性。
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
@@ -437,6 +545,36 @@ TapTapEvent.LogChargeEvent(
 | currencyType  | 否   | 货币类型，遵循 ISO 4217 标准。参考：人民币 CNY，美元 USD；欧元 EUR |
 | paymentMethod | 否   | 支付方式，如：支付宝                                   |
 | properties    | 否   | 充值（ charge ）的事件属性                            |
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+import com.taptap.sdk.core.TapTapPurchasedEvent;
+import org.json.JSONObject;
+
+JSONObject properties = new JSONObject();
+try {
+    // 自定义属性
+    properties.put("key1", "value1");
+    properties.put("key2", "value2");
+} catch (Exception e) {
+    e.printStackTrace();
+}
+
+TapTapPurchasedEvent purchasedEvent = new TapTapPurchasedEvent(
+        "orderId", // 订单 ID
+        "productName", // 产品名称
+        10000.0, // 充值金额（单位分，即无论什么币种，都需要乘以 100）
+        "CNY", // 货币类型，遵循 ISO 4217 标准。参考：人民币 CNY，美元 USD；欧元 EUR
+        "支付宝", // 支付方式，如：支付宝
+        properties// 充值（ charge ）的事件属性
+);
+
+TapTapEvent.logPurchasedEvent(purchasedEvent);
+```
 
 </>
 
@@ -495,7 +633,7 @@ TapTapEvent.logPurchasedEvent(orderId, productName:"商品名", amount: 100, cur
 
 在 SDK 初始化完成后可使用该接口上报事件
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
@@ -515,6 +653,26 @@ TapTapEvent.LogEvent(name, properties);
 |------------|-----|------------------|
 | name       | 否   | 事件的名称            |
 | properties | 否   | 事件的属性 JSONString |
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+import org.json.JSONObject;
+
+JSONObject properties = new JSONObject();
+try {
+    // 定义事件属性
+    properties.put("key1", "value1");
+    properties.put("key2", "value2");
+} catch (Exception e) {
+    e.printStackTrace();
+}
+
+TapTapEvent.logEvent("eventName", properties);
+```
 
 </>
 
@@ -564,7 +722,7 @@ TapTapEvent.logEvent(eventName, properties: properties)
 
 #### 添加静态通用事件属性
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
@@ -593,6 +751,26 @@ TapTapEvent.AddCommon(properties);
 | 字段         | 可为空 | 说明               |
 |------------|-----|------------------|
 | properties | 否   | 事件的属性 JSONString |
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+import org.json.JSONObject;
+
+JSONObject properties = new JSONObject();
+try {
+    // 通用事件属性
+    properties.put("key1", "value1");
+    properties.put("key2", "value2");
+} catch (Exception e) {
+    e.printStackTrace();
+}
+
+TapTapEvent.addCommon(properties);
+```
 
 </>
 
@@ -637,7 +815,7 @@ TapUEDB::RegisterStaticProperties(Properties);
 
 #### 删除部分静态通用事件属性
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
@@ -652,6 +830,17 @@ var key1 = kv["key"];
 var key2 = kv["value"];
 var keysToClear = new string[] { key1, key2 };
 TapTapEvent.ClearCommonProperties(keysToClear);
+```
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+
+String[] keys = new String[]{"key1", "key1"};
+TapTapEvent.clearCommonProperties(keys);
 ```
 
 </>
@@ -693,7 +882,7 @@ TapTapEvent.clearCommonProperties(propertyNames)
 
 #### 清空全部静态通用属性
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
@@ -701,6 +890,16 @@ TapTapEvent.clearCommonProperties(propertyNames)
 using TapSDK.Core
 
 TapTapEvent.ClearAllCommonProperties();
+```
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+
+TapTapEvent.clearAllCommonProperties();
 ```
 
 </>
@@ -732,7 +931,7 @@ TapTapEvent.clearAllCommonProperties()
 
 对于可能随时发生变化的通用事件属性，可以注册动态通用事件属性回调，该回调会在每次调用时被触发，将计算好的属性添加到本次上报事件属性中。
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
@@ -746,6 +945,33 @@ TapTapEvent.RegisterDynamicProperties(() =>
     Debug.Log("RegisterDynamicProperties currentTime" + currentTime);
     return $"{{ \"currentTime\": \"{currentTime}\" }}";
 });
+```
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+import org.json.JSONObject;
+
+TapTapEvent.TapEventDynamicProperties dynamicProperties = new TapTapEvent.TapEventDynamicProperties() {
+    @Override
+    public JSONObject getDynamicProperties() {
+        JSONObject properties = new JSONObject();
+        try {
+            // 动态通用事件属性
+            properties.put("key1", "value1");
+            properties.put("key2", "value2");
+            properties.put("currentTimeMillis", System.currentTimeMillis());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return properties;
+    }
+};
+        
+TapTapEvent.registerDynamicProperties(dynamicProperties);
 ```
 
 </>
@@ -806,7 +1032,7 @@ TapDB 支持两种用户主体：设备和账号，你可以通过如下接口�
 
 对于需要保证只有首次设置时有效的属性，可以使用该接口进行赋值操作，仅当前值为空时赋值操作才会生效，如当前值不为空，则赋值操作会被忽略。
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
@@ -820,6 +1046,25 @@ TapTapEvent.DeviceInitialize(properties);
 string properties2 = "{\"firstActiveServer\":\"server2\"}";
 TapTapEvent.DeviceInitialize(properties2);
 // 此时设备表的 "#firstActiveServer" 字段值还是为 "server1"
+```
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+import org.json.JSONObject;
+
+JSONObject properties = new JSONObject();
+try {
+    // 设备属性初始化属性
+    properties.put("key1", "value1");
+    properties.put("key2", "value2");
+} catch (Exception e) {
+    e.printStackTrace();
+}
+TapTapEvent.deviceInitialize(properties);
 ```
 
 </>
@@ -859,7 +1104,7 @@ TapTapEvent.deviceInitialize(properties)
 
 对于常规的设备属性，可使用该接口进行赋值操作，新的属性值将会直接覆盖旧的属性值。
 
-<MultiLang >
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
@@ -877,6 +1122,26 @@ TapTapEvent.DeviceUpdate(properties);
 ```
 
 </>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+import org.json.JSONObject;
+
+JSONObject properties = new JSONObject();
+try {
+    // 设备属性更新属性
+    properties.put("key1", "value1");
+    properties.put("key2", "value2");
+} catch (Exception e) {
+    e.printStackTrace();
+}
+TapTapEvent.deviceUpdate(properties);
+```
+
+</>
+
 <>
 
 ```kotlin
@@ -914,7 +1179,7 @@ TapTapEvent.deviceUpdate(properties)
 
 对于数值类型的属性，可以使用该接口进行累加操作，调用后 TapDB 将对原属性值进行累加后保存结果值
 
-<MultiLang >
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
@@ -928,6 +1193,24 @@ TapTapEvent.DeviceAdd(properties);
 properties = "{\"totalPoints\":-2}";
 TapTapEvent.DeviceAdd(properties);
 // 此时设备表的 "totalPoints" 字段值为 8
+```
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+import org.json.JSONObject;
+
+JSONObject properties = new JSONObject();
+try {
+    // 设备属性累加属性
+    properties.put("key2", 100);
+} catch (Exception e) {
+    e.printStackTrace();
+}
+TapTapEvent.deviceAdd(properties);
 ```
 
 </>
@@ -976,7 +1259,7 @@ TapTapEvent.deviceAdd(["totalPoints":-2])
 
 使用方法同设备属性初始化操作
 
-<MultiLang >
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
@@ -985,6 +1268,25 @@ using TapSDK.Core;
 
 string properties = "{\"firstActive\":\"active\"}";
 TapTapEvent.UserInitialize(properties);
+```
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+import org.json.JSONObject;
+
+JSONObject properties = new JSONObject();
+try {
+    // 账号初始化属性
+    properties.put("key1", "value1");
+    properties.put("key2", 100);
+} catch (Exception e) {
+    e.printStackTrace();
+}
+TapTapEvent.userInitialize(properties);
 ```
 
 </>
@@ -1017,7 +1319,7 @@ TapTapEvent.userInitialize(properties)
 
 使用方法同设备属性更新操作
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
@@ -1026,6 +1328,25 @@ using TapSDK.Core;
 
 string properties = "{\"firstActive\":\"activeNew\"}";
 TapTapEvent.UserUpdate(properties);
+```
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+import org.json.JSONObject;
+
+JSONObject properties = new JSONObject();
+try {
+    // 账号更新属性
+    properties.put("key1", "value1");
+    properties.put("key2", 100);
+} catch (Exception e) {
+    e.printStackTrace();
+}
+TapTapEvent.userUpdate(properties);
 ```
 
 </>
@@ -1056,7 +1377,7 @@ TapTapEvent.userUpdate(["firstActiveServer":"server2"])
 
 使用方法同设备属性累加操作
 
-<MultiLang>
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
@@ -1065,6 +1386,24 @@ using TapSDK.Core;
 
 string properties = "{\"conut\":1}";
 TapTapEvent.UserAdd(properties);
+```
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+import org.json.JSONObject;
+
+JSONObject properties = new JSONObject();
+try {
+    // 账号累加属性
+    properties.put("key2", 100);
+} catch (Exception e) {
+    e.printStackTrace();
+}
+TapTapEvent.userAdd(properties);
 ```
 
 </>
@@ -1154,7 +1493,16 @@ System.loadLibrary("msaoaidsec");
 
 在 `AndroidManifest.xml` 增加如下条目，且用户同意权限的申请后，SDK 将自动采集 Android IMEI。
 
-<MultiLang >
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+```xml
+
+<uses-permission android:name="android.permission.READ_PHONE_STATE" />
+```
+
+</>
 
 <>
 
@@ -1188,7 +1536,7 @@ iOS 平台不适用
 
 由于 `iOS14.5` 以上系统，获取 IDFA 需要弹出窗口有用户确认，故 SDK 默认不获取 IDFA，可以调用接口开启 IDFA 获取。
 
-<MultiLang >
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
@@ -1200,6 +1548,14 @@ iOS 平台不适用
 ```
 
 在初始化时设置 `TapTapSdkOptions` 中的 `enableAdvertiserIDCollection` 为 `true` 开启 IDFA 采集开关。
+
+</>
+
+<>wd
+
+```java
+// Android 平台不适用
+```
 
 </>
 
