@@ -1,0 +1,106 @@
+---
+title: 更新唤起
+sidebar_label: 功能介绍
+sidebar_position: 1
+---
+
+## 功能介绍
+
+  
+- 更新唤起服务主要应用于在 TapTap 国内商店分发的游戏包体更新场景，目前仅支持安卓。
+- 使用更新唤起功能，需接入 TapSDK，开发者在判断游戏需要强更后调用 TapSDK 更新接口，就会唤起 TapTap 客户端，引导用户前往 TapTap 完成更新。
+
+## 接入优势
+- **节省开发及流量成本**：游戏接入更新唤起功能后，无需自行开发 APK 包更新流程，同时也可以节省下载新版本所需要付出的流量成本。
+
+- **帮助玩家规范游戏更新流程，提升游戏热度**：TapSDK 为玩家提供了标准化的更新流程，与苹果应用商店等更新流程体验保持一致。同时游戏的更新下载热度是影响 TapTap 热门榜单的因素之一，用户前往 TapTap 更新后，在包体强更的节点时将有机会在热门榜中露出，获得更多流量曝光，帮助游戏吸引新老用户的新增与回流。
+
+
+## 接入要求
+  
+- 游戏需保持全网更新方式的统一性，平台不会干涉游戏自身的热更操作，**游戏只需要在包体强更时，请求 SDK 更新接口，唤起 TapTap 更新即可**。
+
+- 开发者需确保**在 TapTap 商店的游戏包体是最新版本**，否则会导致用户打开 TapTap 后发现商店版本较低，影响用户体验。
+
+- 针对已上架的游戏，开发者需确保**更新资料版本中的包名和已上架的游戏包名保持一致**，否则会导致玩家因包名不一致而更新失败。
+
+- 针对新游戏，开发者需要在 TapTap 上线一个包含 APK 包**（用于平台获取游戏包名，包名需与后续更新的包名保持一致）**的商店资料版本，如果 APK 包当前无法对外，可将发布状态设置为「敬请期待」或「预约」。
+
+
+## 游戏接入建议 
+**图示 UI 仅供参考，非 TapSDK 提供**
+
+1、**包体强更场景**：玩家必须更新到最新包体才可以玩游戏。
+- 游戏判断当前包体需强更时，在 APP 启动或者用户登陆成功之后，打开强更弹窗（如下图），告知玩家当前版本过低，当用户点击「更新」按钮时，则直接调用 TapSDK 更新接口。点击「取消」时，则关闭游戏或者提示玩家“不更新至最新版本，游戏无法玩”。
+![](https://capacity-files.lcfile.com/ESiXBqnxhUDN8r7IteGSnPGcuFk14pyq/01.png)
+
+2、**普通更新场景**：游戏内支持热更，或者玩家无需更新到最新包体也可以玩游戏。
+- 平台不要求开发者在普通更新场景去请求 TapSDK 更新接口，对玩家进行强制更新引导，开发者如果需要玩家更新，可在公告等其他场景进行弱引导提醒即可。
+
+
+
+## 更新唤起流程说明
+ 
+游戏调用 TapSDK 更新接口后，TapSDK 会检查当前设备是否已安装 TapTap 客户端来进入不同的更新流程。
+
+### 玩家已安装 TapTap 客户端
+
+- TapSDK 会直接唤起 TapTap 客户端，并跳转至游戏更新页面，引导用户完成更新。在唤起 TapTap 客户端的时候，设备可能会有打开第三方 APP 的提示（不同设备提示样式会有差异，下图仅为参考），用户需同意后，才可打开 TapTap，然后根据页面引导完成游戏更新即可。
+
+![](https://capacity-files.lcfile.com/7TN6cV9vEljCHNOpIa01oBbPk4m3za1D/02.png)
+
+### 玩家未安装 TapTap 客户端
+
+- TapSDK 如果检查当前设备未安装 TapTap 客户端，首先会询问用户“是否需要使用 TapTap 更新”（见下图，该弹窗由 TapSDK 提供）。
+
+![](https://capacity-files.lcfile.com/Tc9HkqxzgmWUVq5tcqbsece4R0QBMUd4/03.png)
+
+- 用户确认更新后，则会开始直接下载 TapTap 客户端，下载完成后会自动向设备请求安装，用户根据设备引导完成安装即可（见下图）。
+
+![](https://capacity-files.lcfile.com/05g1cDq1tLjDnHmmODMmbKUFHy0NzyS0/update-03.png)
+
+- TapTap 客户端下载并安装成功后，将会继续跳转 TapTap 更新游戏页面，有部分安卓设备会引导用户返回游戏，SDK 内也会提示用户“打开 TapTap 去更新“（见下图，该弹窗由 TapSDK 提供）。用户打开 TapTap 后，根据页面引导完成游戏更新即可。
+
+![](https://capacity-files.lcfile.com/wuprYiOr9iBSe79U5pyG3NOuEakVTxc3/update-04.png)
+
+- 针对以上流程，用户如果选择关闭弹窗或取消等中断更新游戏的行为，TapSDK 会提供相关的回调接口，方便开发者接管用户后续行为。比如当用户取消「使用 TapTap 更新」TapSDK 会告知游戏更新失败。
+
+## 最佳实践
+
+### 月圆之夜 
+游戏启动后，告知玩家需要更新到新版本，点击更新，唤起 TapTap 的流程。
+<div align="center">
+  <video
+    src="https://capacity-files.lcfile.com/pYgJPgdBcPGWNmNV5i4mTWmQU1dxlvWq/video_1280.mp4"
+    controls
+    muted
+    preload="auto"
+    width="30%"
+    height="10%"
+  >
+    Video not supported.
+  </video>
+</div>
+
+### 香肠派对 
+
+通过公告形式提醒玩家强制更新，但是更新后会给玩家相应奖励，鼓励玩家去更新。
+![](https://capacity-files.lcfile.com/9OslzFsggaPsGkp5BEObRyqbhxgmATkf/04.png)
+
+### 史莱姆连接
+
+检测到玩家未安装 TapTap 客户端时，玩家选择更新，下载并安装 TapTap 客户端完成更新的流程。
+
+<div align="center">
+  <video
+    src="https://capacity-files.lcfile.com/UnjEDwiE0MlMpm46ss0z0GoqnrPQ2BKq/video_1280%20%281%29.mp4"
+    controls
+    muted
+    preload="auto"
+    width="30%"
+    height="10%"
+  >
+    Video not supported.
+  </video>
+</div>
+
