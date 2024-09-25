@@ -5,7 +5,7 @@ sidebar_position: 1
 
 
 import MultiLang from "/src/docComponents/MultiLang";
-import v3SDKVersions from '/src/docComponents/v3SDKVersions';
+import v4SDKVersions from '/src/docComponents/v4SDKVersions';
 import CodeBlock from '@theme/CodeBlock';
 
 
@@ -51,22 +51,21 @@ TapPayment SDK 可以通过 NPMJS 进行安装, 开发者可以通过 **Edit > P
 ![](https://capacity-files.lcfile.com/sJDhXK4vAwAYX7BpQFh1SrQzeUmXk165/taptap.png)
 
 <>
-  配置完成以后就可以在 <strong>Window &gt; Package Manager &gt; My Registries</strong> 中安装 <strong>TapTap Payments Global V2 （{v3SDKVersions.tapGlobalPayments.unity}）</strong>。
+  配置完成以后就可以在 <strong>Window &gt; Package Manager &gt; My Registries</strong> 中安装 <strong>TapTapSDK IAP {v4SDKVersions.tapGlobalPayments.unity}</strong>。
   如果安装目录中没有 <code>TapTap Payments Global V2</code>, 请尝试在 <strong>Edit &gt; Project Settings &gt; Package Manager</strong> 中重新注册 NPMJS。
 </>
 
-![](https://img.tapimg.com/market/images/4900806ff9290049ee68aa67ee05b71b.png)
+![](https://img.tapimg.com/market/images/cda0911e47723fba9bee9a29ef62260f.png)
 
 
 ### 2、修改 Packages/manifest.json 文件
 
 <CodeBlock className="json">
   {` "dependencies": {
-    "com.taptap.tds.payments.global.v2": "${v3SDKVersions.tapGlobalPayments.unity}", //添加 TapPayment
+    "com.taptap.sdk.iap": "${v4SDKVersions.tapGlobalPayments.unity}", //添加 TapPayment
     "com.unity.purchasing": "3.1.0", //TapPayment 所须依赖
     "com.google.external-dependency-manager": "1.2.179", //TapPayment 所须依赖
-    "com.taptap.tds.common":"3.28.3",
-    "com.taptap.tds.login":"3.28.3",
+    "com.taptap.sdk.core": "${v4SDKVersions.tapGlobalPayments.unity}",
     ...
     ...
   },
@@ -138,7 +137,8 @@ public class InitializeUnityServices : MonoBehaviour
 ```cs
 using UnityEngine;
 using UnityEngine.Purchasing;
-using TapTap.Payments.Global.V2;
+using UnityEngine.Purchasing.Extension;
+using TapSDK.IAP;
 
 public class MyIAPManager : IStoreListener {
 
@@ -147,8 +147,9 @@ public class MyIAPManager : IStoreListener {
 
     public MyIAPManager () {
         var builder = ConfigurationBuilder.Instance(TapPurchasingModule.Instance);
-        builder.Configure<ITapConfiguration>().SetClientId("Your Client ID Here");
-        builder.Configure<ITapConfiguration>().SetClientToken("Your Client Token Here");
+        builder.Configure<ITapTapStoreConfiguration>().SetClientId("Your Client ID Here");
+        builder.Configure<ITapTapStoreConfiguration>().SetClientToken("Your Client Token Here");
+        builder.Configure<ITapTapStoreConfiguration>().SetRegionCode(1); // 0: CN, 1: GLOBAL
         builder.AddProduct("100_gold_coins", ProductType.Consumable, new IDs
         {
             {"100_gold_coins_google", GooglePlay.Name},
@@ -209,7 +210,7 @@ public class MyIAPManager : IStoreListener {
 // Example method called when the user taps a 'buy' button
 // to start the purchase process.
 public void OnPurchaseClicked(string productId) {
-    controller.InitiatePurchase(productId);
+    controller.InitiatePurchase(productId, "developerPayload, e.g. user_id or order_id");
 }
 ```
 
