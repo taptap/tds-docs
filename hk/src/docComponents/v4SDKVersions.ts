@@ -27,8 +27,8 @@ const v4SDKVersions = {
         }
     },
     tapadn: {
-        unity: "3.16.3.34_h1",
-        android: "3.16.3.34_h1",
+        unity: "3.16.3.35",
+        android: "3.16.3.35",
     },
     tapGlobalPayments: {
         unity: "4.3.12",
