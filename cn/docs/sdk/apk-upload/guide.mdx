@@ -1,0 +1,240 @@
+---
+title: TapTap API 上传 APK 开发指南
+sidebar_label: 开发指南
+sidebar_position: 1
+---
+
+import useBaseUrl from '@docusaurus/useBaseUrl';
+import { Red, Blue, Black, Gray } from "/src/docComponents/doc";
+
+## 业务流程
+
+通过 API 上传 APK 的流程图如下：
+
+<img src={useBaseUrl('https://capacity-files.lcfile.com/IfLh6E9YbU4WfHwwQCPBGc8fVNF0iAIB/r.png')} alt="" width="800" />
+
+开发者需要实现其中的两个步骤：
+
+1. 调用 TapTap 提供的接口，获取上传请求参数
+2. 根据 1 中的返回数据，拼装 curl 命令，将本地文件直传到云存储
+
+上传完成后，你可以在 <Blue>商店 >> 游戏资料 >> 商店资料</Blue> 找到刚刚上传成功的 APK，进行提交审核等操作
+
+:::tip
+
+- TapTap 支持查看和提审近七天内上传成功的 APK 列表
+
+:::
+
+## 准备工作
+
+在调用接口前，你需要先 [开启应用配置](/sdk/access/get-ready/) ，以获取到用于请求签算的 `Client ID` 和 `Server Secret`
+
+## 获取上传请求参数
+
+`GET` `https://cloud.tapapis.cn/apk/v1/upload-params`
+
+### 请求参数
+
+| 字段名       | 描述                                                  | 类型     | 示例                 |
+|-----------|-----------------------------------------------------|--------|--------------------|
+| client_id | TapTap 开放平台 ID                                      | string | s7ui6smunrk7tmt4m6 |
+| app_id    | TapTap 上架游戏的数字 ID                                   | uint64 | 58881              |
+| file_name | 要上传的 APK 文件名，必须以 .apk 为扩展名，且只允许包含以下字符：字母、数字、下划线、中横线 | string | example.apk        |
+
+### 请求签算
+
+请求接口时，必须携带以下请求头
+
+| 字段名         | 描述         | 类型     | 示例                                           |
+|-------------|------------|--------|----------------------------------------------|
+| X-Tap-Ts    | 请求时间，秒级时间戳 | uint64 | 1692347090                                   |
+| X-Tap-Nonce | 8 位随机字符串   | string | q1w2e3r4                                     |
+| X-Tap-Sign  | 签算结果       | string | TZ76PQthw6mjaEPMbdyFjHyXvH7yAr2+IahMgX9ue8M= |
+
+其中 `X-Tap-Sign` 是对整个请求进行签算所得，具体的签算步骤如下
+
+#### 一、构造待签名的请求内容 `SignParts`
+
+格式
+
+```
+{method}\n
+{url_path_and_query}\n
+{headers}\n
+{body}\n
+```
+
+参数说明如下
+
+| 字段名                | 描述                                                                                                            | 示例                                                                                |
+|--------------------|---------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------|
+| method             | HTTP 方法，如 `GET` / `POST` (须为全部大写)                                                                             | GET                                                                               |
+| url_path_and_query | 完整请求路径及 QueryString                                                                                           | /apk/v1/upload-params?app_id=58881&file_name=xxx.apk&client_id=rfciqabirt4vqav7io |
+| headers            | 所有以 `X-Tap-` 为前缀的请求头（`X-Tap-Sign` 除外），将其 keys 全部转小写并按字典排序后，key 和 value 以 `:` 分隔，各个 header 以换行符 `\n` 分隔，拼接成字符串 | x-tap-nonce:q1w2e3r4\nx-tap-ts:1692347090                                         |
+| body               | 请求体                                                                                                           | {"key":"value"}                                                                   |
+
+#### 二、计算签名
+
+```
+Signature = Base64Encode(HMAC-SHA256(Server Secret, SignParts))
+```
+
+其中
+- `HMAC-SHA256` 方法的第一个参数是 key，第二个参数是待签名字符串
+- `Server Secret` 为开放平台的服务端密钥
+- `SignParts` 为第一步计算所得字符串
+
+#### 签名计算示例
+
+<details>
+  <summary>Go 请求示例</summary>
+
+  ```go
+  package tapsign
+
+  import (
+      "crypto/hmac"
+      "crypto/sha256"
+      "encoding/base64"
+      "errors"
+      "fmt"
+      "io"
+      "net/http"
+      "sort"
+      "strings"
+  )
+
+  func Sign(req *http.Request, secret string) (string, error) {
+      methodPart := req.Method
+      urlPathAndQueryPart := req.URL.RequestURI()
+      headersPart, err := getHeadersPart(req.Header)
+      if err != nil {
+          return "", err
+      }
+
+      bodyPart, err := io.ReadAll(req.Body)
+      if err != nil {
+          return "", err
+      }
+
+      signParts := methodPart + "\n" + urlPathAndQueryPart + "\n" + headersPart + "\n" + string(bodyPart) + "\n"
+
+      fmt.Println(signParts)
+
+      h := hmac.New(sha256.New, []byte(secret))
+      h.Write([]byte(signParts))
+      rawSign := h.Sum(nil)
+
+      sign := base64.StdEncoding.EncodeToString(rawSign)
+
+      return sign, nil
+  }
+
+  func getHeadersPart(header http.Header) (string, error) {
+      var headerKeys []string
+
+      for k, v := range header {
+          k = strings.ToLower(k)
+          if !strings.HasPrefix(k, "x-tap-") {
+              continue
+          }
+          if len(v) > 1 {
+              return "", errors.New(fmt.Sprintf("invalid header, %q has multiple values", k))
+          }
+
+          headerKeys = append(headerKeys, k)
+      }
+
+      sort.Strings(headerKeys)
+
+      headers := make([]string, 0, len(headerKeys))
+      for _, k := range headerKeys {
+          headers = append(headers, fmt.Sprintf("%s:%s", k, header.Get(k)))
+      }
+
+      return strings.Join(headers, "\n"), nil
+  }
+  ```
+
+</details>
+
+### 响应数据
+
+| 字段名                   | 描述                | 类型                |
+|-----------------------|-------------------|-------------------|
+| success               | 请求是否成功            | bool              |
+| now                   | 当前服务器时间           | uint64            |
+| data                  | 上传请求参数结构体         | ApkUploadParams   |
+| ApkUploadParams 的结构如下 |
+| url                   | 上传请求的 URL         | string            |
+| method                | 上传请求的 HTTP Method | string            |
+| headers               | 上传请求的请求头列表        | map[string]string |
+
+以下是一个完整的响应示例
+
+```json
+{
+  "data": {
+    "url": "https://rnd-taptap.oss-cn-shanghai.aliyuncs.com/upload/20240923/58881-iOWGlETz.apk",
+    "method": "PUT",
+    "headers": {
+      "authorization": "OSS4-HMAC-SHA256 Credential=xqKABkhrbAOqd20s/20240923/cn-shanghai/oss/aliyun_v4_request,AdditionalHeaders=host,Signature=1d26b0964e93eb9e47d22fda47a9cbd73a2f2bea13bbba569cdc4c6e1c1a4990",
+      "content-type": "application/vnd.android.package-archive",
+      "host": "rnd-taptap.oss-cn-shanghai.aliyuncs.com",
+      "x-oss-callback": "eyJjYWxsYmFja1VybCI6Imh0dHBzOi8vcGFydG5lci5hcGkueGRybmQuY24vY2FsbGJhY2svdjIvYXBrL3VwbG9hZGVkLWZyb20tYXBpIiwiY2FsbGJhY2tIb3N0IjoicGFydG5lci5hcGkueGRybmQuY24iLCJjYWxsYmFja1NOSSI6dHJ1ZSwiY2FsbGJhY2tCb2R5Ijoie1wiZmlsZW5hbWVcIjoke29iamVjdH0sXCJzaXplXCI6JHtzaXplfSxcIm1pbWVUeXBlXCI6JHttaW1lVHlwZX0sXCJldGFnXCI6JHtldGFnfSxcImNvZGVcIjoke3g6Y29kZX19IiwiY2FsbGJhY2tCb2R5VHlwZSI6ImFwcGxpY2F0aW9uL2pzb24ifQ==",
+      "x-oss-callback-var": "eyJ4OmNvZGUiOiJRN3pnSmpHNCJ9",
+      "x-oss-content-sha256": "UNSIGNED-PAYLOAD",
+      "x-oss-date": "20240923T113220Z"
+    }
+  },
+  "now": 1727091140,
+  "success": true
+}
+```
+
+## 上传文件
+
+调用接口获取到上传请求参数后，开发者即可自行将参数拼装为 curl 命令，发起文件上传，拼接方式如下
+
+```
+curl -X ${method} \
+  -T ${local_file_path} \
+FOREACH ${headers} AS ${key} => ${value}
+  -H "${key}:${value} \
+ENDFOREACH
+  ${url}
+```
+
+其中
+- `method` 是接口返回的 HTTP Method
+- `local_file_path` 是本地待上传的文件路径
+- `headers` 是接口返回的请求头列表
+- `url` 是接口返回的 URL
+
+以下是一个完整的 curl 示例
+
+```
+curl -X PUT \
+  -T app-release-rel.apk \
+  -H "host:tap-apk.oss-cn-beijing.aliyuncs.com" \
+  -H "x-oss-content-sha256:UNSIGNED-PAYLOAD" \
+  -H "x-oss-date:20240914T074000Z" \
+  -H "Authorization:OSS4-HMAC-SHA256 Credential=BJqv1THhNPjsGGum/20240914/cn-beijing/oss/aliyun_v4_request,AdditionalHeaders=host,Signature=6a5329b20c47f83b4870e61cc6b5de8d5d0716cb4265e643b716f10ecdc1d734" \
+  https://tap-apk.oss-cn-beijing.aliyuncs.com/upload/20240914/cuQaR3bC-app-release-rel.apk
+```
+
+## 提交审核
+
+上传成功后，等待约 3-5min（具体时间跟上传包的大小有关），你就可以在 <Blue>商店 >> 游戏资料 >> 商店资料</Blue> 里面找到刚刚上传的 APK 包，并将其作为版本资料的一部分进行提交审核操作
+
+<video
+  src="https://capacity-files.lcfile.com/bhXUeo0WS77u1flBeTQVcefzS17bJiHl/%E5%B1%8F%E5%B9%95%E5%BD%95%E5%88%B62024-09-26%2023.41.37.mp4"
+  controls
+  muted
+  preload="auto"
+  width="100%"
+  height="100%"
+>
+  Video not supported.
+</video>
