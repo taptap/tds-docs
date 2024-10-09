@@ -144,6 +144,14 @@ const CONFIGS: {
       ]
   },
 
+  android_ios_v4: {
+    tds: [
+      { label: "Android Java", value: "android_java" },
+      { label: "Android Kotlin", value: "android_kotlin" },
+      { label: "iOS", value: "ios" },
+    ]
+  },
+
   unity_android_v4: {
         tds: [
         { label: "Unity", value: "unity" },
