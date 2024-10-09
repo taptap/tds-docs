@@ -1,5 +1,5 @@
 ---
-title: 更新唤起开发指南
+title: TapTap 分享开发指南
 sidebar_label: 开发指南
 sidebar_position: 2
 ---
@@ -11,22 +11,9 @@ import { Conditional } from "/src/docComponents/conditional";
 import AndroidFaq from "../_partials/android-package-visibility.mdx";
 import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
 
-:::info
-本文档只适用于国内版本，海外版本请参考 [文档](/tap-update-old-guide/)
-:::
-
 ## 权限说明
 
-<MultiLang kind="unity_android_v4">
-
-<>
-该模块依赖权限如下：
-
-| 权限 | 使用目的 | 权限申请时机 |
-| ---------------------- | ---------------------- | ---------------------- |
-| 网络权限 | 用于正常网络访问 | 用户首次使用该功能时会申请权限 |
-| 安装 APK 权限 | 用于安装 Tap 客户端 | 用户首次使用该功能时会申请权限 |
-</>
+<MultiLang kind="android_v4">
 
 <>
 
@@ -34,17 +21,14 @@ import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
 
 | 权限 | 使用目的 | 权限申请时机 |
 | ---------------------- | ---------------------- | ---------------------- |
-| 网络权限 | 用于正常网络访问 | 用户首次使用该功能时会申请权限 |
 | 安装 APK 权限 | 用于安装 Tap 客户端 | 用户首次使用该功能时会申请权限 |
 
 同时该模块也会访问设备已安装的 Tap 客户端信息，所以接入 SDK 后将在应用 `AndroidManifest.xml` 中添加如下配置：
 
 ```xml
-<uses-permission android:name="android.permission.INTERNET"/>
 <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 <queries>
         <package android:name="com.taptap" />
-        <package android:name="com.taptap.global" />
 </queries>
 ```
 
@@ -56,17 +40,14 @@ import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
 
 | 权限 | 使用目的 | 权限申请时机 |
 | ---------------------- | ---------------------- | ---------------------- |
-| 网络权限 | 用于正常网络访问 | 用户首次使用该功能时会申请权限 |
 | 安装 APK 权限 | 用于安装 Tap 客户端 | 用户首次使用该功能时会申请权限 |
 
 同时该模块也会访问设备已安装的 Tap 客户端信息，所以接入 SDK 后将在应用 `AndroidManifest.xml` 中添加如下配置：
 
 ```xml
-<uses-permission android:name="android.permission.INTERNET"/>
 <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
 <queries>
         <package android:name="com.taptap" />
-        <package android:name="com.taptap.global" />
 </queries>
 ```
 
@@ -76,12 +57,12 @@ import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
 
 ## 集成前准备
 
-使用更新唤起功能前提需要通过 **TapTap 开发者中心 > 商店 > 游戏资料 > 商店资料** 中已经上传 APK， 发布设置为 **立即上线** 并通过 **审核**（开发者包如果暂时不想对外，发布状态选 **敬请期待** 或者 **预约**）。
+使用Tap分享功能前提需要通过 **TapTap 开发者中心 > 商店 > 游戏资料 > 商店资料** 中已经上传 APK， 发布设置为 **立即上线** 并通过 **审核**（开发者包如果暂时不想对外，发布状态选 **敬请期待** 或者 **预约**）。
 
 
 ## SDK 获取
 
-<MultiLang kind="unity_android_v4">
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
@@ -119,7 +100,7 @@ unitypackageModules={[
 <CodeBlock language="groovy">{
 `dependencies {
     implementation 'com.taptap.sdk:tap-core:${v4SDKVersions.taptap.android}'
-    implementation 'com.taptap.sdk:tap-update:${v4SDKVersions.taptap.android}'
+    implementation 'com.taptap.sdk:tap-share:${v4SDKVersions.taptap.android}'
 }`
 }</CodeBlock>
 
@@ -143,7 +124,7 @@ unitypackageModules={[
 <CodeBlock language="groovy">{
 `dependencies {
     implementation 'com.taptap.sdk:tap-core:${v4SDKVersions.taptap.android}'
-    implementation 'com.taptap.sdk:tap-update:${v4SDKVersions.taptap.android}'
+    implementation 'com.taptap.sdk:tap-share:${v4SDKVersions.taptap.android}'
 }`
 }</CodeBlock>
 
@@ -151,7 +132,28 @@ unitypackageModules={[
 
 <>
 
-受限于苹果政策，iOS 平台的 TapTap 客户端不提供游戏更新功能
+### 添加依赖
+
+iOS 提供通过添加 cocoaPods 远程依赖和使用本地文件导入两种集成方式，推荐使用远程依赖方式。
+
+#### 远程依赖
+
+1. 在工程 Podfile 文件中对应模块下添加依赖：
+
+<CodeBlock>{` pod 'TapTapShareSDK', '~> ${v4SDKVersions.taptap.ios }'`}</CodeBlock>
+
+2. 执行 `pod install` 下载对应依赖文件
+
+
+#### 本地文件依赖
+
+TapTap 分享依赖于初始化模块，使用本地文件方式添加依赖时，需先参考 [TapSDK 集成](/sdk/access/quickstart/#本地文件依赖) 添加对应本地文件依赖项。
+
+1. 在 [下载页](/tap-download) 下载如下文件：
+
+- `TapTapShareSDK.xcframework` 分享依赖库
+
+2. 在工程中添加 `framework` 静态库，注意添加时选择 Embed 方式为 **Do Not Embed**
 
 </>
 
@@ -161,7 +163,7 @@ unitypackageModules={[
 
 ### TapSDK 初始化
 
-<MultiLang kind="unity_android_v4">
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
@@ -231,77 +233,113 @@ TapTapSdk.init(
 ```
 </>
 
+<>
 
-受限于苹果政策，iOS 平台的 TapTap 客户端不提供游戏更新功能
+`TapTapSdkOptions` 详细参数见 [入门指南#快速开始](/sdk/access/quickstart/#初始化)
 
-```cpp
-FTapUpdate::Init(TEXT("clientId"), TEXT("clientToken"));
+```swift
+import TapTapCoreSDK
+
+// 核心配置项
+let options = TapTapSdkOptions()
+options.clientId = "your_client_id" // 必须，开发者中心对应 Client ID
+options.clientToken = "your_client_token" // 必须，开发者中心对应 Client Token
+options.region = .CN // .CN：中国大陆，.overseas：其他国家或地区
+options.enableLog = enableLog.selectedSegmentIndex == 0 // 是否开启 log，建议 Debug 开启，Release 关闭，默认关闭 log
+options.preferredLanguage = TapLanguageType.auto // 语言设置，默认跟随系统，当系统语言不支持时，国内为中文，海外为英文
+
+// 初始化 SDK
+TapTapSDK.initWith(options)
+
 ```
+</>
 
 </MultiLang>
 
-## 开始更新
+## 调起分享
 
-:::tip
-TapSDK 如果检查当前设备未安装 TapTap 客户端，首先会弹窗询问用户「是否需要使用 TapTap 更新」，当点击「取消」按钮时取消更新的回调方法才会执行。
-:::
-
-<MultiLang kind="unity_android_v4">
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
 ```cs
-using TapSDK.Update
-
-TapTapUpdate.UpdateGame(() => {
-    // 唤醒更新收到[取消]回调
-});
+// TODO unity
 ```
 </>
 
 <>
-
-由于更新唤起 UI 依赖于开发者设置的 Activity 实例，所以为了避免因 Activity 发生重建导致更新唤起功能不可用，开发者应确保在屏幕旋转、配置修改时当前 Activity 不会发生重建，具体设置方式参考 [限制 activity 重新创建](https://developer.android.com/guide/topics/resources/runtime-changes?hl=zh-cn#restrict-activity)
 
 ```java
-import com.taptap.sdk.update.TapTapUpdate;
-import com.taptap.sdk.update.TapTapUpdateCallback;
+import com.taptap.sdk.share.TapTapShareBuilder;
+import com.taptap.sdk.share.TapTapShareCode;
 
-TapTapUpdate.updateGame(activity, new TapTapUpdateCallback() {
-    @Override
-    public void onCancel() {
-        // 更新取消
-    }
-});
+int resultCode = new TapTapShareBuilder()
+    .addTitle("title") // 分享标题
+    .addContents("content") // 分享内容
+    .addHashtagIds("hashtag ids") // HashTag 和活动 Id
+    .addGroupLabelId("group ids") // 论坛标签 Id
+    .addFooterImageUrls(new ArrayList<Uri>(uri1, uri2)) // 分享的图片
+    .build()
+    .share(activity);
+
+switch (resultCode){
+    case TapTapShareCode.Success_Code: // 分享成功
+    case TapTapShareCode.Error_NotInstall: // 分享失败：未安装 TapTap 应用
+    default: // 分享失败：TapTap 应用不支持
+}
 
 ```
 </>
 
 <>
-
-由于更新唤起 UI 依赖于开发者设置的 Activity 实例，所以为了避免因 Activity 发生重建导致更新唤起功能不可用，开发者应确保在屏幕旋转、配置修改时当前 Activity 不会发生重建，具体设置方式参考 [限制 activity 重新创建](https://developer.android.com/guide/topics/resources/runtime-changes?hl=zh-cn#restrict-activity)
 
 ```kotlin
-import com.taptap.sdk.update.TapTapUpdate
-import com.taptap.sdk.update.TapTapUpdateCallback
+import com.taptap.sdk.share.TapTapShareBuilder
+import com.taptap.sdk.share.TapTapShareCode
 
-TapTapUpdate.updateGame(
-    activity = this,
-    callback = object : TapTapUpdateCallback {
+val resultCode: Int = TapTapShareBuilder()
+    .addTitle(title) // 分享标题
+    .addContents(content) // 分享内容
+    .addHashtagIds(hashtag) // HashTag 和活动 Id
+    .addGroupLabelId(group) // 论坛标签 Id
+    .addFailUrl("fail url") // 未安装 TapTap 应用时跳转链接
+    .addFooterImageUrls(picList) // 分享的图片
+    .build()
+    .share(this)
 
-        override fun onCancel() {
-
-            Toast.makeText(this@DemoUpdateActivity, "取消更新", Toast.LENGTH_SHORT)
-                .show()
-        }
-    }
-)
+when (resultCode) {
+    TapTapShareCode.Success_Code -> // 分享成功
+    TapTapShareCode.Error_NotInstall -> // 分享失败: 未安装 TapTap 应用
+    else -> // 分享失败: TapTap 应用不支持
+}
 ```
 </>
 
 <>
 
-受限于苹果政策，iOS 平台的 TapTap 客户端不提供游戏更新功能
+```swift
+import TapTapShareSDK
+
+var images: [Data] = [] // 需要分享的图片数据
+
+let image = UIImage(named: "avatar") // 获取图片数据
+let imageData = image.pngData()
+images.append(imageData)
+
+let obj = TapTapShareObj(
+    title: "title", // 分享标题
+    contents: "content", // 分享内容
+    groupLabelId: "groupid", // 论坛标签 ID
+    hashtagIds: "ids", // HashTag 和 活动ID
+    footerImages: images, // 可选，最多支持9个，总大小未见苹果说明限制，但应尽量保持小
+    failUrl: "https://***", // 未安装 TapTap 应用时跳转链接
+    backUrl: "gameUrl" // 返回游戏时的 URLScheme
+)
+ TapTapShare.share(obj) { result in
+            print("result: \(result)")
+            // result 对应值 0 ：分享成功,  -1 ：未安装 Tap 客户端,  其他: Tap 应用不支持
+        }        
+```
 
 </>
 
@@ -309,7 +347,7 @@ TapTapUpdate.updateGame(
 
 
 ## 测试
-为了保证上线后，游戏对于用户是否正常使用更新唤起功能，请务必按照以下说明完成自测。
+为了保证上线后，游戏对于用户是否正常使用 Tap 分享功能，请务必按照以下说明完成自测。
 
 ### 上传 APK
 
@@ -323,7 +361,7 @@ TapTapUpdate.updateGame(
 
 ### 开始测试
 
-触发更新唤起功能后正常状态是可以唤起应用在 TapTap 商店的详情页面。
+触发分享功能后正常状态是可以唤起 TapTap 应用的分享页面。
 
 
 
