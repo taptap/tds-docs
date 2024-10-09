@@ -70,7 +70,7 @@ import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
 
 ## SDK 获取
 
-<MultiLang kind="unity_android_v4">
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
@@ -140,6 +140,29 @@ unitypackageModules={[
 
 <>
 
+### 添加依赖
+
+iOS 提供通过添加 cocoaPods 远程依赖和使用本地文件导入两种集成方式，推荐使用远程依赖方式。
+
+#### 远程依赖
+
+1. 在工程 Podfile 文件中对应模块下添加依赖：
+
+<CodeBlock>{` pod 'TapTapShareSDK', '~> ${v4SDKVersions.taptap.ios }'`}</CodeBlock>
+
+2. 执行 `pod install` 下载对应依赖文件
+
+
+#### 本地文件依赖
+
+TapTap 分享依赖于初始化模块，使用本地文件方式添加依赖时，需先参考 [TapSDK 集成](/sdk/access/quickstart/#本地文件依赖) 添加对应本地文件依赖项。
+
+1. 在 [下载页](/tap-download) 下载如下文件：
+
+- `TapTapShareSDK.xcframework` 分享依赖库
+
+2. 在工程中添加 `framework` 静态库，注意添加时选择 Embed 方式为 **Do Not Embed**
+
 </>
 
 </MultiLang>
@@ -148,7 +171,7 @@ unitypackageModules={[
 
 ### TapSDK 初始化
 
-<MultiLang kind="unity_android_v4">
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
@@ -226,17 +249,32 @@ TapTapSdk.init(
 ```
 </>
 
-// TODO iOS 初始化
+<>
 
-```cpp
-FTapUpdate::Init(TEXT("clientId"), TEXT("clientToken"));
+`TapTapSdkOptions` 详细参数见 [入门指南#快速开始](/sdk/access/quickstart/#初始化)
+
+```swift
+import TapTapCoreSDK
+
+// 核心配置项
+let options = TapTapSdkOptions()
+options.clientId = "your_client_id" // 必须，开发者中心对应 Client ID
+options.clientToken = "your_client_token" // 必须，开发者中心对应 Client Token
+options.region = .CN // .CN：中国大陆，.overseas：其他国家或地区
+options.enableLog = enableLog.selectedSegmentIndex == 0 // 是否开启 log，建议 Debug 开启，Release 关闭，默认关闭 log
+options.preferredLanguage = TapLanguageType.auto // 语言设置，默认跟随系统，当系统语言不支持时，国内为中文，海外为英文
+
+// 初始化 SDK
+TapTapSDK.initWith(options)
+
 ```
+</>
 
 </MultiLang>
 
 ## 调起分享
 
-<MultiLang kind="unity_android_v4">
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
@@ -295,7 +333,29 @@ when (resultCode) {
 
 <>
 
-// TODO iOS 文档
+```swift
+import TapTapShareSDK
+
+var images: [Data] = [] // 需要分享的图片数据
+
+let image = UIImage(named: "avatar") // 获取图片数据
+let imageData = image.pngData()
+images.append(imageData)
+
+let obj = TapTapShareObj(
+    title: "title", // 分享标题
+    contents: "content", // 分享内容
+    groupLabelId: "groupid", // 论坛标签 ID
+    hashtagIds: "ids", // HashTag 和 活动ID
+    footerImages: images, // 可选，最多支持9个，总大小未见苹果说明限制，但应尽量保持小
+    failUrl: "https://***", // 未安装 TapTap 应用时跳转链接
+    backUrl: "gameUrl" // 返回游戏时的 URLScheme
+)
+ TapTapShare.share(obj) { result in
+            print("result: \(result)")
+            // result 对应值 0 ：分享成功,  -1 ：未安装 Tap 客户端,  其他: Tap 应用不支持
+        }        
+```
 
 </>
 
