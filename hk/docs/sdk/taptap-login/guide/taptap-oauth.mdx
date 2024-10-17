@@ -10,7 +10,7 @@ import {Conditional} from '/src/docComponents/conditional';
 
 TapTap OpenAPI 采用统一的 Mac Token 头部签算来传递用户授权信息。
 
-开发者接入 SDK [单纯 TapTap 用户认证方式](/sdk/taptap-login/guide/tap-login/)，在用户授权你的应用程序后，将会生成访问令牌（Access Token）。这个访问令牌在加密后会生成 Mac Token 字符串。Access Token 长期有效，只有在用户更新其账户安全信息或解除对当前应用的授权时才会失效。开发人员应妥善管理 Access Token 在其服务器上，用作与 TapTap 服务器进行后续通讯的标识。
+开发者接入 SDK [登录模块](/sdk/taptap-login/guide/tap-login/)，在用户授权你的应用程序后，将会生成访问令牌（Access Token）。这个访问令牌在加密后会生成 Mac Token 字符串。Access Token 长期有效，只有在用户更新其账户安全信息或解除对当前应用的授权时才会失效。开发人员应妥善管理 Access Token 在其服务器上，用作与 TapTap 服务器进行后续通讯的标识。
 
 Mac Token 生成算法见文档中的 [MAC Token 算法](#mac-token-算法) 部分。
 
@@ -22,11 +22,10 @@ Mac Token 生成算法见文档中的 [MAC Token 算法](#mac-token-算法) 部�
 
 ## 流程
 
-1. 移动端用 SDK 的 TapTap 登录，可以 [获取 AccessToken](/sdk/taptap-login/guide/tap-login/#检查登录状态和用户信息)，里面包含：
+1. 移动端用 SDK 的 TapTap 登录，可以 [获取 AccessToken](/sdk/taptap-login/guide/tap-login/)，里面包含：
 
     ```java
     public String kid;
-    public String access_token;
     public String token_type;
     public String mac_key;
     public String mac_algorithm;
@@ -35,8 +34,6 @@ Mac Token 生成算法见文档中的 [MAC Token 算法](#mac-token-算法) 部�
 
 2. 再把移动端获取的参数发到游戏服务器，服务端签算 mac token。
 3. 请求 <Conditional region='cn'>`https://open.tapapis.cn/account/profile/v1`</Conditional><Conditional region='global'>`https://openapi.tap.io/account/profile/v1`</Conditional> ， header 携带 `mac token`。
-
-注意：当前实际返回的 `kid` 和 `access_token` 值相等，建议使用 `kid`。
 
 ## API
 当 SDK 只请求 basic_info 的权限时，请使用基础信息接口，请求 public_profile 时，请使用详细信息接口。
@@ -138,7 +135,6 @@ MAC Token 包含以下字段：
 | 字段          | 类型   | 说明                            |
 | ------------- | ------ | ------------------------------- |
 | kid           | string | mac_key id, The key identifier. |
-| access_token  | string | 该字段暂无作用                    |
 | token_type    | string | Token 类型，如 mac               |
 | mac_key       | string | mac 密钥                         |
 | mac_algorithm | string | mac 计算的算法名称 hmac-sha-1      |
@@ -313,6 +309,9 @@ req.end();
 ```
 
 </Conditional>
+
+
+
 
 </details>
 
@@ -563,8 +562,8 @@ public class Authorization {
 
 # 客户端 ID
 $client_id = "请替换为控制台的 Client ID";
-# 替换成移动端 SDK 获取的 access_token
-$access_token="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ";
+# 替换成移动端 SDK 获取的 kid
+$kid="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ";
 # 替换成移动端 SDK 获取的 mac_key
 $mac_key = "mSUQNYUGRBPXyRyW";
 # 接口请求地址
@@ -579,7 +578,7 @@ $nonce = "== XinDong_Lee-JiEun ==";//随机数，正式上线请替换
 $signStr = sprintf("%s\n%s\n%s\n%s\n%s\n443\n\n",$ts,$nonce,"GET","/account/profile/v1?client_id=".$client_id,"open.tapapis.cn");
 //MAC TOKEN 加密
 $mac = base64_encode(hash_hmac('sha1', $signStr, $mac_key,true));
-$auth = sprintf('MAC id="%s",ts="%s",nonce="%s",mac="%s"',$access_token,$ts,$nonce,$mac);
+$auth = sprintf('MAC id="%s",ts="%s",nonce="%s",mac="%s"',$kid,$ts,$nonce,$mac);
 $headers = array(
     "Authorization:".$auth
 );
@@ -604,8 +603,8 @@ curl_close($curl);
 
 # 客户端 ID
 $client_id = "请替换为控制台的 Client ID";
-# 替换成移动端 SDK 获取的 access_token
-$access_token="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ";
+# 替换成移动端 SDK 获取的 kid
+$kid="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ";
 # 替换成移动端 SDK 获取的 mac_key
 $mac_key = "mSUQNYUGRBPXyRyW";
 # 接口请求地址
@@ -620,7 +619,7 @@ $nonce = "== XinDong_Lee-JiEun ==";//随机数，正式上线请替换
 $signStr = sprintf("%s\n%s\n%s\n%s\n%s\n443\n\n",$ts,$nonce,"GET","/account/profile/v1?client_id=".$client_id,"openapi.tap.io");
 //MAC TOKEN 加密
 $mac = base64_encode(hash_hmac('sha1', $signStr, $mac_key,true));
-$auth = sprintf('MAC id="%s",ts="%s",nonce="%s",mac="%s"',$access_token,$ts,$nonce,$mac);
+$auth = sprintf('MAC id="%s",ts="%s",nonce="%s",mac="%s"',$kid,$ts,$nonce,$mac);
 $headers = array(
     "Authorization:".$auth
 );
@@ -736,8 +735,8 @@ func main() {
 	// 替换 clientId、accessToken、macKey 参数
 	// clientId 参数在 TapDC 后台查看
 	clientId := "请替换为控制台的 `Client ID`"
-	// TapTap 登录成功后 TapSDK 返回的 access_token
-	accessToken := "1/jvsVxFC6-PIUiXvZVVtv1hogX5q9Z1y_rp-AtVjE3iyHikXXfd_2h-i0wLmc9UjLJwhH6fQ8cvGrklONdvy2J5YfoqzV0ewGPMSLkQIkRv_xaLaYPariWbrkP1MtG2b4CzR1KHvuSCJHewCmTFZmsyNGojTJr5t75f5Nc8j-jjCYeDtFO0-XFI_J7kzktswzzsmISt7cx49QVess-VbaQcU31pEDb_OA03I28H5ehIvqQ0CQdf1LieLyONcH97l1IEU39AirioF_KGJccVG64QsgWmzxLPwmfTurw4cwBPo04yuXnas4YI5haE2UxtckNCpagP19drtGW57-HaAdww"
+	// TapTap 登录成功后 TapSDK 返回的 kid
+	kid := "1/jvsVxFC6-PIUiXvZVVtv1hogX5q9Z1y_rp-AtVjE3iyHikXXfd_2h-i0wLmc9UjLJwhH6fQ8cvGrklONdvy2J5YfoqzV0ewGPMSLkQIkRv_xaLaYPariWbrkP1MtG2b4CzR1KHvuSCJHewCmTFZmsyNGojTJr5t75f5Nc8j-jjCYeDtFO0-XFI_J7kzktswzzsmISt7cx49QVess-VbaQcU31pEDb_OA03I28H5ehIvqQ0CQdf1LieLyONcH97l1IEU39AirioF_KGJccVG64QsgWmzxLPwmfTurw4cwBPo04yuXnas4YI5haE2UxtckNCpagP19drtGW57-HaAdww"
 	// TapTap 登录成功后 TapSDK 返回的 mac_key
 	macKey := "fTCuDUDDmNny7a36EWbhUDLaqpoDMQu2hCi9qAJ5"
 
@@ -752,7 +751,7 @@ func main() {
 
 	macStr := timestamp + "\n" + nonce + "\n" + "GET" + "\n" + reqURI + "\n" + reqHost + "\n" + "443" + "\n\n"
 	mac := hmacSha1(macStr, macKey)
-	authorization := "MAC id=" + "\"" + accessToken + "\"" + "," + "ts=" + "\"" + timestamp + "\"" + "," + "nonce=" + "\"" + nonce + "\"" + "," + "mac=" + "\"" + mac + "\""
+	authorization := "MAC id=" + "\"" + kid + "\"" + "," + "ts=" + "\"" + timestamp + "\"" + "," + "nonce=" + "\"" + nonce + "\"" + "," + "mac=" + "\"" + mac + "\""
 
 	client := http.Client{}
 	req, err := http.NewRequest(http.MethodGet, reqURL, nil)
@@ -813,8 +812,8 @@ func main() {
 	// 替换 clientId、accessToken、macKey 参数
 	// clientId 参数在 TapDC 后台查看
 	clientId := "请替换为控制台的 `Client ID`"
-	// TapTap 登录成功后 TapSDK 返回的 access_token
-	accessToken := "1/jvsVxFC6-PIUiXvZVVtv1hogX5q9Z1y_rp-AtVjE3iyHikXXfd_2h-i0wLmc9UjLJwhH6fQ8cvGrklONdvy2J5YfoqzV0ewGPMSLkQIkRv_xaLaYPariWbrkP1MtG2b4CzR1KHvuSCJHewCmTFZmsyNGojTJr5t75f5Nc8j-jjCYeDtFO0-XFI_J7kzktswzzsmISt7cx49QVess-VbaQcU31pEDb_OA03I28H5ehIvqQ0CQdf1LieLyONcH97l1IEU39AirioF_KGJccVG64QsgWmzxLPwmfTurw4cwBPo04yuXnas4YI5haE2UxtckNCpagP19drtGW57-HaAdww"
+	// TapTap 登录成功后 TapSDK 返回的 kid
+	kid := "1/jvsVxFC6-PIUiXvZVVtv1hogX5q9Z1y_rp-AtVjE3iyHikXXfd_2h-i0wLmc9UjLJwhH6fQ8cvGrklONdvy2J5YfoqzV0ewGPMSLkQIkRv_xaLaYPariWbrkP1MtG2b4CzR1KHvuSCJHewCmTFZmsyNGojTJr5t75f5Nc8j-jjCYeDtFO0-XFI_J7kzktswzzsmISt7cx49QVess-VbaQcU31pEDb_OA03I28H5ehIvqQ0CQdf1LieLyONcH97l1IEU39AirioF_KGJccVG64QsgWmzxLPwmfTurw4cwBPo04yuXnas4YI5haE2UxtckNCpagP19drtGW57-HaAdww"
 	// TapTap 登录成功后 TapSDK 返回的 mac_key
 	macKey := "fTCuDUDDmNny7a36EWbhUDLaqpoDMQu2hCi9qAJ5"
 
@@ -893,7 +892,7 @@ public class TapLoginOAuth : MonoBehaviour
     private string host = "open.tapapis.cn";
     private string clientId = "应用的 Client id";
     private string macKey = "客户端登录返回的 macKey 值";
-    private string kid = "客户端登录返回的 kid/access_token 值";
+    private string kid = "客户端登录返回的 kid 值";
 
 
     // Start is called before the first frame update
@@ -989,7 +988,7 @@ public class TapLoginOAuth : MonoBehaviour
     private string host = "openapi.tap.io";
     private string clientId = "应用的 Client id";
     private string macKey = "客户端登录返回的 macKey 值";
-    private string kid = "客户端登录返回的 kid/access_token 值";
+    private string kid = "客户端登录返回的 kid 值";
 
 
     // Start is called before the first frame update
@@ -1073,7 +1072,7 @@ public class TapLoginOAuth : MonoBehaviour
 
 可用此脚本验证直接替换参数，用来验证自己服务端签算的 mac token 是否正确。
 
-CLIENT_ID 替换为控制台获取的 `Client ID`，ACCESS_TOKEN 和 MAC_KEY 为客户端登录成功后的 `access_token`、`mac_key`：
+CLIENT_ID 替换为控制台获取的 `Client ID`，KID 和 MAC_KEY 为客户端登录成功后的 `kid`、`mac_key`：
 
 <Conditional region='cn'>
 
@@ -1082,8 +1081,8 @@ CLIENT_ID 替换为控制台获取的 `Client ID`，ACCESS_TOKEN 和 MAC_KEY 为
 
 # 客户端 ID
 CLIENT_ID="请替换为控制台的 `Client ID`"
-# SDK 获取的 access_token
-ACCESS_TOKEN="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ"
+# SDK 获取的 kid
+KID="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ"
 # SDK 获取的 mac_key
 MAC_KEY="mSUQNYUGRBPXyRyW"
 
@@ -1101,7 +1100,7 @@ REQUEST_HOST="open.tapapis.cn"
 
 MAC=$(printf "%s\n%s\n%s\n%s\n%s\n443\n\n" "${TS}" "${NONCE}" "${METHOD}" "${REQUEST_URI}" "${REQUEST_HOST}" | openssl dgst -binary -sha1 -hmac ${MAC_KEY} | base64)
 
-AUTHORIZATION=$(printf 'MAC id="%s",ts="%s",nonce="%s",mac="%s"' "${ACCESS_TOKEN}" "${TS}" "${NONCE}" "${MAC}")
+AUTHORIZATION=$(printf 'MAC id="%s",ts="%s",nonce="%s",mac="%s"' "${KID}" "${TS}" "${NONCE}" "${MAC}")
 
 curl -s -H"Authorization:${AUTHORIZATION}" "https://${REQUEST_HOST}${REQUEST_URI}"
 ```
@@ -1117,8 +1116,8 @@ curl -s -H"Authorization:${AUTHORIZATION}" "https://${REQUEST_HOST}${REQUEST_URI
 
 # 客户端 ID
 CLIENT_ID="请替换为控制台的 `Client ID`"
-# SDK 获取的 access_token
-ACCESS_TOKEN="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ"
+# SDK 获取的 kid
+KID="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ"
 # SDK 获取的 mac_key
 MAC_KEY="mSUQNYUGRBPXyRyW"
 
@@ -1136,7 +1135,7 @@ REQUEST_HOST="openapi.tap.io"
 
 MAC=$(printf "%s\n%s\n%s\n%s\n%s\n443\n\n" "${TS}" "${NONCE}" "${METHOD}" "${REQUEST_URI}" "${REQUEST_HOST}" | openssl dgst -binary -sha1 -hmac ${MAC_KEY} | base64)
 
-AUTHORIZATION=$(printf 'MAC id="%s",ts="%s",nonce="%s",mac="%s"' "${ACCESS_TOKEN}" "${TS}" "${NONCE}" "${MAC}")
+AUTHORIZATION=$(printf 'MAC id="%s",ts="%s",nonce="%s",mac="%s"' "${KID}" "${TS}" "${NONCE}" "${MAC}")
 
 curl -s -H"Authorization:${AUTHORIZATION}" "https://${REQUEST_HOST}${REQUEST_URI}"
 ```

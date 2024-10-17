@@ -1,64 +1,18 @@
 ---
-title: 单纯 TapTap 用户认证
-sidebar_label: 单纯认证
+title: 开发指南
+sidebar_label: 开发指南
 sidebar_position: 1
 ---
 
 import MultiLang from '/src/docComponents/MultiLang';
-import {Conditional} from '/src/docComponents/conditional';
-import CodeBlock from '@theme/CodeBlock';
-import v3SDKVersions from '/src/docComponents/v3SDKVersions';
-import Profiles from "../../_partials/tap-login-profile.mdx";
-
-如果你仅仅只需要接入 TapTap 这一种登录方式，确认不使用 TDS 其他云服务，可以看本篇文档。请注意，如果刚开始只选择接入「TapTap 登录」，后面又需要使用其他云服务的话，后期可能有一定的升级成本。
-
-<Conditional region='cn'>
-
-使用原来 TapSDK v1.x 版本的开发者，也可以参考 [1.x 升级 3.x 指南](../upgrade1.x) 完成 TapSDK 的升级。
-
-</Conditional>
-
-## 环境要求
-
-<MultiLang kind="ue">
-
-<>
-
-- Unity 2019.4 或更高版本
-- iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
-- Android 5.0（API level 21）或更高版本
-
-</>
-
-<>
-
-Android 5.0（API level 21）或更高版本
-
-</>
-
-<>
-
-iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
-
-</>
-
-<>
-
-- 安装 UE 4.26 及以上版本
-- iOS 12 或更高版本
-- Android 5.0（API level 21）或更高版本
-- macOS 10.14.0 或更高版本
-- Windows 7 或更高版本
-
-**支持平台**：Android / iOS / Windows / macOS
-
-</>
-
-</MultiLang>
+import { Conditional } from '/src/docComponents/conditional';
+import UnitySDKInstallation from "../../_partials/unity-sdk-installation.mdx";
+import v4SDKVersions from '/src/docComponents/v4SDKVersions';
+import CodeBlock from "@theme/CodeBlock";
 
 ## 权限说明
 
-<MultiLang kind="ue">
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
@@ -74,7 +28,7 @@ iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.a
 
 该模块将在应用中添加如下配置：
 
-```
+```xml
 <uses-permission android:name="android.permission.INTERNET"/>
 ```
 
@@ -82,77 +36,54 @@ iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.a
 
 <>
 
+该模块依赖如下权限：
+
+| 权限 | 使用目的 | 权限申请时机 |
+| ---------------------- | ---------------------- | ---------------------- |
+| 网络权限 | 用于访问网络数据 | 用户首次使用该功能时会申请权限 |
+
+该模块将在应用中添加如下配置：
+
+```xml
+<uses-permission android:name="android.permission.INTERNET"/>
+```
+
 </>
 
 <>
 
+
 </>
 </MultiLang>
 
-## 集成前准备
+## 准备集成 SDK
 
 1. 参考 [准备工作](/sdk/start/get-ready/) 创建应用、开启应用配置、绑定 API 域名；
 2. 参考 [快速开始](/sdk/start/quickstart/#配置签名证书) 配置包名与签名证书；
 
 ## SDK 获取
 
-单纯接入「TapTap 登录」，需要依赖 `TapLogin` 和 `TapCommon` 模块。请先 [下载](/tap-download) TapSDK，并添加相关依赖。
-
-<MultiLang kind="ue">
+<MultiLang kind="unity_android_ios_v4">
 
 <>
 
-SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选其一。请根据项目需要选择。
-
-#### 方法一：使用 Unity Package Manager
-
-从 3.29.1 版本开始， SDK 修改 JSON 解析库为 `Newtonsoft-json`，如果当前工程已接入该依赖库，则不需额外处理，否则需在 `Packages/manifest.json` 添加如下依赖：
-
-```
-"com.unity.nuget.newtonsoft-json":"3.2.1"
-```
-
-
-在项目的 `Packages/manifest.json` 文件中添加以下依赖：
-
-<CodeBlock className="json">
-  {`"dependencies":{
-    "com.taptap.tds.login":"https://github.com/TapTap/TapLogin-Unity.git#${v3SDKVersions.taptap.unity}",
-    "com.taptap.tds.common":"https://github.com/TapTap/TapCommon-Unity.git#${v3SDKVersions.taptap.unity}",
-}`}
-</CodeBlock>
-
-在 Unity 顶部菜单中选择 **Window > Package Manager** 可查看已经安装在项目中的包。
-
-#### 方法二：手动导入
-
-1. 在 [下载页](/tap-download) 找到 **TapSDK Unity** 下载地址，下载 `TapSDK-UnityPackage.zip`。
-
-2. 在 Unity 项目中依次转到 **Assets > Import Packages > Custom Packages**，从解压后的 `TapSDK-UnityPackage.zip` 中，选择希望在游戏中使用的 TapSDK 包导入，其中：
-
-   - `TapTap_Common.unitypackage` TapSDK 基础库，必选。
-   - `TapTap_Login.unitypackage` TapTap 登录，必选。
-
-3. 如果当前项目已集成 Newtonsoft.Json 依赖，则忽略该步骤，否则在 NuGet.org [ Newtonsoft.Json ](https://www.nuget.org/packages/Newtonsoft.Json) 页面中通过点击右侧 Download package 下载库文件，并将下载的文件后缀从`.nupkg` 修改为 `.zip`，同时解压该文件并复制内部的 `Newtonsoft.Json.dll` 文件拷贝到工程 `Assets` 的 `Plugins` 目录下，另外为了避免导出 IL2CPP 平台时删除必要数据，需在 `Assets` 目录下创建 link.xml 文件（如果已有该文件，则添加如下内容），其内容如下：
-
-```
-<linker>
-  <assembly fullname="System.Core">
-    <type fullname="System.Linq.Expressions.Interpreter.LightLambda" preserve="all" />
-  </assembly>
-</linker>
-
-```
-
-:::tip
-
-如果是手动下载 `unitypackage` 进行 SDK 导入，需要将 `Assets/TapTap/Common/Plugins/iOS/TapTap.Common.dll` 设置为只支持 iOS。
-
-:::
+<UnitySDKInstallation
+npmDeps={[
+"com.taptap.sdk.core",
+"com.taptap.sdk.login",
+]}
+githubDeps={[
+{package: "com.taptap.sdk.core", url: `https://github.com/taptap/TapSDKCore-Unity.git#${v4SDKVersions.taptap.unity}`},
+{package: "com.taptap.sdk.login", url: `https://github.com/taptap/TapSDKLogin-Unity.git#${v4SDKVersions.taptap.unity}`}
+]}
+unitypackageModules={[
+{name: "TapTapSDK_Core.unitypackage", desc: "TapTapSDK 核心模块，必选"},
+{name: "TapTapSDK_Login.unitypackage", desc: "TapTapSDK 登录模块，必选"},
+]}/>
 
 #### iOS 配置
 
-在 `Assets/Plugins/iOS/Resource` 目录下创建 `TDS-Info.plist` 文件，复制以下代码并且**替换其中的 `ClientId`**。如果游戏使用了 TapTap [内嵌动态](/sdk/embedded-moments/features/)或[数据分析](/sdk/tapdb/features/)服务，需要配置相关权限并**替换授权文案**：
+在 `Assets/Plugins/iOS/Resource` 目录下创建 `TDS-Info.plist` 文件，复制以下代码并且**替换其中的 `ClientId`**。
 
 :::tip
 
@@ -170,117 +101,108 @@ SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选�
         <key>client_id</key>
         <string>ClientId</string>
     </dict>
-    <!--使用内嵌动态服务，需要相册、相机、麦克风权限-->
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>说明为何应用需要此项权限</string>
-    <key>NSCameraUsageDescription</key>
-    <string>说明为何应用需要此项权限</string>
-    <key>NSMicrophoneUsageDescription</key>
-    <string>说明为何应用需要此项权限</string>
-    <!--使用数据分析服务需要 IDFA 权限。如应用程序不想弹框，可以设置 TapDB.AdvertiserIDCollectionEnabled(false)-->
-    <key>NSUserTrackingUsageDescription</key>
-    <string>说明为何应用需要此项权限</string>
 </dict>
 </plist>
 ```
 
 </>
+
+
+
 <>
 
-1. [下载 TapSDK Android](/tap-download)，解压后选择需要用到的 SDK 包导入到项目 `project/app/libs` 目录下。
+1. 项目根目录的 build.gradle 添加仓库地址：
 
-2. 打开项目的 `project/app/build.gradle` 文件，添加 gradle 配置如下：
-
-<CodeBlock className="java"> {`dependencies {
-    ...
-    // 导入 libs 目录下所有 aar 的包：
-    implementation fileTree(dir: 'libs', include: ['*.aar'])
-    // 如果需要单独导入 libs 目录下的指定包，请按照如下方式：
-    implementation files('libs/TapCommon_${v3SDKVersions.taptap.android}.aar') // TapTap 基础库
-    implementation files('libs/TapLogin_${v3SDKVersions.taptap.android}.aar') // TapTap 登录
+```groovy
+repositories {
+  google()
+  mavenCentral()
 }
-`}</CodeBlock>
-
-3. 旧版 Android 额外配置
-
-   如果 `targetSdkVersion < 29`，还需要添加如下配置：
-
-   - `manifest` 节点添加 `xmlns:tools="http://schemas.android.com/tools"`
-   - `application` 节点添加 `tools:remove="android:requestLegacyExternalStorage"`
-
-</>
-<>
-
-#### 导入 SDK
-
-1. 在 Xcode 选择工程，到 **Build Setting > Other Linker Flags** 添加 `-ObjC` 和 `-Wl -ld_classic`。
-
-2. 下载 [TapSDK iOS](/tap-download)，解压后选择需要导入的资源文件，直接拖拽到项目目录即可。
-
-3. 视需要导入下载的资源文件：
-
-   - 必选：TapTap 启动器、基础库、登录
-
-     ```
-     TapBootstrapSDK.framework
-     TapCommonSDK.framework
-     TapLoginSDK.framework
-     LeanCloudObjc.framework
-     TapCommonResource.bundle
-     TapLoginResource.bundle
-     ```
-
-4. 请仔细核对下面依赖库是否都添加成功：
-
-   ```
-   // 必选
-   WebKit.framework
-   Security.framework
-   SystemConfiguration.framework
-   CoreTelephony.framework
-   SystemConfiguration.framework
-   libc++.tbd
-
-   // TapTap 内嵌动态
-   AVFoundation.framework
-   CoreTelephony.framework
-   MobileCoreServices.framework
-   Photos.framework
-   SystemConfiguration.framework
-   WebKit.framework
-
-   // 数据分析
-   // 如果不需要获取 IDFA 则不要添加 `AppTrackingTransparency` 和 `AdSupport` 两个系统库
-   AppTrackingTransparency.framework
-   AdSupport.framework
-   CoreMotion.framework
-   Security.framework
-   SystemConfiguration.framework
-   libresolv.tbd
-   libsqlite3.0.tbd
-   libz.tbd
-   ```
-
-#### 配置权限
-
-如果游戏使用了 TapTap [内嵌动态](/sdk/embedded-moments/features/)或[数据分析](/sdk/tapdb/features/)服务，那么需要在 `info.plist` 配置相关权限并**替换授权文案**：
-
-```xml
-<!--使用内嵌动态服务，需要相册、相机、麦克风权限-->
-<key>NSPhotoLibraryUsageDescription</key>
-<string>说明为何应用需要此项权限</string>
-<key>NSCameraUsageDescription</key>
-<string>说明为何应用需要此项权限</string>
-<key>NSMicrophoneUsageDescription</key>
-<string>说明为何应用需要此项权限</string>
-<!--使用数据分析服务需要 IDFA 权限。如应用程序不想弹框，可以设置 TapDB.AdvertiserIDCollectionEnabled(false)-->
-<key>NSUserTrackingUsageDescription</key>
-<string>说明为何应用需要此项权限</string>
 ```
 
-#### 配置跳转 TapTap 应用
+2. app module 的 build.gradle 添加对应依赖：
 
-用户无 TapTap 应用时，默认会通过 WebView 登录。
+<CodeBlock language="groovy">{
+`dependencies {
+    implementation 'com.taptap.sdk:tap-core:${v4SDKVersions.taptap.android}'
+    implementation 'com.taptap.sdk:tap-kit:${v4SDKVersions.taptap.android}'
+    implementation 'com.taptap.sdk:tap-login:${v4SDKVersions.taptap.android}'
+}`
+}</CodeBlock>
+
+:::tip
+如果 `targetSdkVersion < 29`，还需要添加如下配置：
+
+- `manifest` 节点添加 `xmlns:tools="http://schemas.android.com/tools"`
+- `application` 节点添加 `tools:remove="android:requestLegacyExternalStorage"`
+:::
+
+</>
+
+<>
+
+1. 项目根目录的 build.gradle 添加仓库地址：
+
+```groovy
+repositories {
+  google()
+  mavenCentral()
+}
+```
+
+2. app module 的 build.gradle 添加对应依赖：
+
+<CodeBlock language="groovy">{
+`dependencies {
+    implementation 'com.taptap.sdk:tap-core:${v4SDKVersions.taptap.android}'
+    implementation 'com.taptap.sdk:tap-kit:${v4SDKVersions.taptap.android}'
+    implementation 'com.taptap.sdk:tap-login:${v4SDKVersions.taptap.android}'
+}`
+}</CodeBlock>
+
+:::tip
+
+如果 `targetSdkVersion < 29`，还需要添加如下配置：
+
+- `manifest` 节点添加 `xmlns:tools="http://schemas.android.com/tools"`
+- `application` 节点添加 `tools:remove="android:requestLegacyExternalStorage"`
+:::
+
+</>
+
+
+<>
+
+### 添加依赖
+
+iOS 提供通过添加 cocoaPods 远程依赖和使用本地文件导入两种集成方式，推荐使用远程依赖方式。
+
+#### 远程依赖
+
+1. 在工程 Podfile 文件中对应模块下添加依赖：
+
+<CodeBlock>{` pod 'TapTapLoginSDK', '~> ${v4SDKVersions.taptap.ios }'`}</CodeBlock>
+
+2. 执行 `pod install` 下载对应依赖文件
+
+3. 将工程 Pods 目录下 `TapTapLoginSDK/Frameworks/TapTapLoginResource.bundle`
+   等资源文件导入工程中
+
+#### 本地文件依赖
+
+TapTap 登录依赖于初始化模块，使用本地文件方式添加依赖时，需先参考 [TapSDK 集成](/sdk/access/quickstart/#本地文件依赖) 添加对应本地文件依赖项。
+
+1. 在 [下载页](/tap-download) 下载如下文件：
+
+- `TapTapLoginSDK.xcframework` 登录依赖库
+- `TapTapLoginResource.bundle` 登录资源文件
+
+2. 在工程中添加 `framework` 静态库，注意添加时选择 Embed 方式为 **Do Not Embed**，导入 `bundle` 资源文件
+3. SDK 内部使用了 [`Kingfisher` 依赖库](https://cocoapods.org/pods/Kingfisher)，开发者应提前通过远程或文件导入方式添加对应依赖。
+
+### 工程配置
+
+TapTap 客户端应用跳转配置
 
 1. 打开 `info.plist`，添加如下配置（请替换 `clientID` 为你在控制台获取的 Client ID）：
 
@@ -310,542 +232,552 @@ SDK 可以**通过 Unity Package Manager 导入或手动导入**，二者任选�
    </array>
    ```
 
-2. 配置 openUrl：
+2. 配置 openUrl
 
-   a) 如果项目中有 `SceneDelegate.m`，请先删除，然后请添加如下代码到 `AppDelegate.m` 文件：
+   a) 如果项目中有 `SceneDelegate.swift`，请先删除，然后请添加如下代码到 `AppDelegate.swift` 文件：
 
-   ```objectivec
-   - (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
-     return [TDSHandleUrl handleOpenURL:url];
-   }
+```swift
+import TapTapLoginSDK
 
-   - (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
-     return [TDSHandleUrl handleOpenURL:url];
-   }
-   ```
+func application(_ app: UIApplication, open url: URL) -> Bool {
+    return TapTapLogin.open(url: url)
+}
+    
+func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+    return TapTapLogin.open(url: url)
+}
+    
+func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
+    return TapTapLogin.open(url: url)
+}
+```
 
    b) 删除 `info.plist` 里面的 Application Scene Manifest
 
    ![](/img/tap_ios_appmanifest.png)
 
-   c) 删除 `AppDelegate.m` 文件中的两个管理 `Scenedelegate` 生命周期代理方法
+   c) 删除 `AppDelegate.swift` 文件中的两个管理 `Scenedelegate` 生命周期代理方法
 
-   ```objectivec
-   #pragma mark - UISceneSession lifecycle
-   - (UISceneConfiguration *)application:(UIApplication *)application configurationForConnectingSceneSession:(UISceneSession *)connectingSceneSession options:(UISceneConnectionOptions *)options {
+```swift
+func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+    
+}
+    
+func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
+    
+}
+```
 
-   return [[UISceneConfiguration alloc] initWithName:@"Default Configuration" sessionRole:connectingSceneSession.role];
-   }
+   d) 在 `AppDelegate.swift` 中添加 `UIWindow`
 
-   - (void)application:(UIApplication *)application didDiscardSceneSessions:(NSSet<UISceneSession *> *)sceneSessions {
-   }
+   ```swift
+   var window: UIWindow?
    ```
-
-   d) 在 `AppDelegate.h` 中添加 `UIWindow`
-
-   ```objectivec
-   @property (strong, nonatomic) UIWindow *window;
-   ```
-
-</>
-<>
-
-#### 安装插件
-
-* 下载 [TapSDK UE4](/tap-download)，TapSDK-UE4-xxx.zip 解压后将 `TapLogin`、`TapCommon` 文件夹 Copy 到项目的 `Plugins` 目录中
-* 重启 Unreal Editor
-* 打开 编辑 > 插件 > 项目 > TapTap，开启 `TapLogin` 模块
-
-#### 添加依赖
-
-在 Project.Build.cs 中添加所需模块:
-
-```cs
-PublicDependencyModuleNames.AddRange(new string[] { "Core",
-	"CoreUObject",
-	"Engine",
-	"Json",
-	"InputCore",
-	"JsonUtilities",
-	"SlateCore",
-	"TapCommon",
-	"TapLogin"
-});
-```
-
-#### 导入头文件
-
-```cpp
-#include "TapUELogin.h"
-#include "TapUECommon.h"
-```
-
-<details>
-
-<summary>点击展开 iOS 配置</summary>
-
-在 项目设置 > Platform > iOS > Additional Plist data 中可以填入一个字符串，复制以下代码并且替换其中的 `ClientID` 以及授权文案。
-
-```xml
-<key>CFBundleURLTypes</key>
-    <array>
-        <dict>
-            <key>CFBundleTypeRole</key>
-            <string>Editor</string>
-            <key>CFBundleURLName</key>
-            <string>taptap</string>
-            <key>CFBundleURLSchemes</key>
-            <array>
-                <!-- 这里注意下，花括号需要去掉，最终是 ClientID 前拼接上 `tt` 的形式，例如：ttFwFdCxxxxxxxQDQwQN -->
-                <string>tt{ClientID}</string>
-            </array>
-        </dict>
-    </array>
-<key>LSApplicationQueriesSchemes</key>
-<array>
-    <string>tapiosdk</string>
-    <string>tapsdk</string>
-    <string>taptap</string>
-</array>
-```
-
-</details>
 
 </>
 
 </MultiLang>
 
-## 初始化
+## SDK 初始化
 
 <Conditional region='cn'>
 
 :::info
-游戏 [**适用地区**](/sdk/start/get-ready/#适用地区) 在开启应用配置时选定。
+游戏 [**适用地区**](/sdk/access/get-ready/#适用地区) 在开启应用配置时选定。
 
 * [TapTap 开发者中心](https://developer.taptap.cn/)适用地区为中国大陆。
 
 * 出海游戏请前往 [**TapTap.io 开发者中心**](https://developer.taptap.io/) 开启游戏服务，适用地区为其他国家或地区。
 
-**单纯 TapTap 登录初始化时需要区分**适用于中国大陆还是其他国家或地区。
 :::
 
 </Conditional>
 
-<MultiLang kind="ue">
-<>
+TapTap 登录模块依赖于 TapTapSDK 初始化，具体参考 [TapSDK 集成](/sdk/access/quickstart/#初始化)
 
-<Conditional region='cn'>
+<MultiLang kind="unity_android_ios_v4">
+
+<>
 
 ```cs
-// 适用于中国大陆
-TapLogin.Init(string clientID);
-
-// 适用于其他国家或地区
-TapLogin.Init(string clientID, bool isCn, bool roundCorner);
+using TapSDK.Core;
+ 
+// 核心配置 详细参数见 [TapTapSDK]
+TapTapSdkOptions coreOptions = new TapTapSdkOptions();
+// TapSDK 初始化
+TapTapSDK.Init(coreOptions);
 ```
-
-</Conditional>
-
-<Conditional region='global'>
-
-```cs
-TapLogin.Init(string clientID, bool isCn, bool roundCorner);
-```
-
-</Conditional>
-
-**参数说明**
-
-参数  | 描述
-| ------ | ------ |
-clientID | TapTap 开发者中心对应应用的 Client ID
-isCn | 中国大陆为 true，其他国家或地区为 false
-roundCorner | 网页登录时边框是否使用圆角，使用圆⻆边框为 true，使用直⻆边框为 false
 
 </>
+
 <>
 
-<Conditional region='cn'>
+`TapTapSdkOptions` 详细参数见 [入门指南#快速开始](/sdk/access/quickstart/#初始化)
 
 ```java
-// 适用于中国大陆
-TapLoginHelper.init(Context context, String clientID);
+import com.taptap.sdk.core.TapTapRegion;
+import com.taptap.sdk.core.TapTapSdk;
+import com.taptap.sdk.core.TapTapSdkOptions;
 
-// 适用于其他国家或地区
-LoginSdkConfig config = new LoginSdkConfig();
-config.regionType = RegionType.IO;
-TapLoginHelper.init(Context context, String clientID, config);
-```
+/* 必选配置 */
+// 开发者中心对应 Client ID
+String clientId = "";
+// 开发者中心对应 Client Token
+String clientToken = "";
+// 是否开启 log，建议 Debug 开启，Release 关闭，默认关闭 log
+boolean enableLog = BuildConfig.DEBUG;
 
-</Conditional>
-
-<Conditional region='global'>
-
-```java
-LoginSdkConfig config = new LoginSdkConfig();
-config.regionType = RegionType.IO;
-TapLoginHelper.init(Context context, String clientID, config);
-```
-
-</Conditional>
-
-**参数说明**
-
-参数  | 描述
-| ------ | ------ |
-context | 上下文，一般是当前 Application
-clientID | TapTap 开发者中心对应应用的 Client ID
-
-</>
-<>
-
-<Conditional region='cn'>
-
-```objectivec
-// 适用于中国大陆
-[TapLoginHelper initWithClientID:clientID];
-
-// 适用于其他国家或地区
-TTSDKConfig *config = [[TTSDKConfig alloc] init];
-config.regionType = RegionTypeIO;
-config.roundCorner = YES;
-[TapLoginHelper initWithClientID:clientID config:config];
-```
-
-</Conditional>
-
-<Conditional region='global'>
-
-```objectivec
-TTSDKConfig *config = [[TTSDKConfig alloc] init];
-config.regionType = RegionTypeIO;
-config.roundCorner = YES;
-[TapLoginHelper initWithClientID:clientID config:config];
-```
-
-</Conditional>
-
-**参数说明**
-
-参数  | 描述
-| ------ | ------ |
-clientID | TapTap 开发者中心对应应用的 Client ID
-regionType | 适用地区。适用于中国大陆为 `RegionTypeCN`，适用于其他国家或地区为 `RegionTypeIO` 
-roundCorner | 是否为圆角
-
-**配置跳转 TapTap 应用**
-
-
-用户无 TapTap 应用时，默认会打开 WebView 登录
-
-打开 info.plist，添加如下配置，然后请替换 clientID 为你在控制台获取的 clientID
-
-```xml
-<key>CFBundleURLTypes</key>
-<array>
-    <dict>
-        <key>CFBundleTypeRole</key>
-        <string>Editor</string>
-        <key>CFBundleURLName</key>
-        <string>taptap</string>
-        <key>CFBundleURLSchemes</key>
-        <array>
-            <string>tt[clientID]</string>
-        </array>
-    </dict>
-</array>
-
-<key>LSApplicationQueriesSchemes</key>
-<array>
-   <string>tapiosdk</string>
-   <string>tapsdk</string>
-   <string>taptap</string>
-</array>
-```
-
-
-如果项目中有 SceneDelegate.m，请先删除，然后添加如下代码到 AppDelegate.m 文件中。
-
-```objectivec
-#import <TapCommonSDK/TapCommonSDK.h> 
-- (BOOL)application:(UIApplication *)application openURL:(NSURL *)url sourceApplication:(NSString *)sourceApplication annotation:(id)annotation {
-   return [TDSHandleUrl handleOpenURL:url];
-}
-
-- (BOOL)application:(UIApplication *)app openURL:(NSURL *)url options:(NSDictionary<UIApplicationOpenURLOptionsKey,id> *)options {
-   return [TDSHandleUrl handleOpenURL:url];
-}
-```
-
-并在 AppDelegate.h 中添加 UIWindow，然后删除 info.plist 里面的 Application Scene Manifest
-
-```objectivec
-@property (strong, nonatomic) UIWindow *window;
+TapTapSdkOptions tapSdkOptions = new TapTapSdkOptions(
+        clientId, // 游戏 Client ID
+        clientToken, // 游戏 Client Token
+        TapTapRegion.CN // 游戏可玩区域: [TapTapRegion.CN]=国内 [TapTapRegion.GLOBAL]=海外
+);
+tapSdkOptions.setEnableLog(enableLog);
+// 初始化 TapSDK
+TapTapSdk.init(context, tapSdkOptions);
 ```
 
 </>
 
 <>
 
-```cpp
-FTULoginConfig Config;
-Config.ClientID = ClientID;
-Config.RegionType = RegionType;
-TapUELogin::Init(Config);
+`TapTapSdkOptions` 详细参数见 [入门指南#快速开始](/sdk/access/quickstart/#初始化)
+
+```kotlin
+import com.taptap.sdk.core.TapTapSdk
+import com.taptap.sdk.core.TapTapSdkOptions
+import com.taptap.sdk.core.TapTapRegion
+import com.taptap.sdk.core.TapTapLanguage
+
+TapTapSdk.init(
+  context = context,
+  sdkOptions = TapTapSdkOptions(
+      clientId = clientId,
+      clientToken = clientToken,
+      region = TapTapRegion.CN,
+      preferredLanguage = TapTapLanguage.ZH_HANS,
+      enableLog = false
+  )
+)
 ```
-
-**参数说明**
-
-参数  | 描述
-| ------ | ------ |
-clientID | TapTap 开发者中心对应应用的 Client ID
-RegionType | 适用地区。适用于中国大陆为 `ERegionType::CN`，适用于其他国家或地区为 `ERegionType::Global` 
 
 </>
 
+<>
+
+
+```swift
+import TapTapCoreSDK
+
+// 核心配置项
+let options = TapTapSdkOptions()
+options.clientId = "your_client_id" // 必须，开发者中心对应 Client ID
+options.clientToken = "your_client_token" // 必须，开发者中心对应 Client Token
+options.region = .CN // .CN：中国大陆，.overseas：其他国家或地区
+options.enableLog = enableLog.selectedSegmentIndex == 0 // 是否开启 log，建议 Debug 开启，Release 关闭，默认关闭 log
+options.preferredLanguage = TapLanguageType.auto // 语言设置，默认跟随系统，当系统语言不支持时，国内为中文，海外为英文
+
+// 初始化 SDK
+TapTapSDK.initWith(options)
+
+```
+
+</>
 
 </MultiLang>
 
-## TapTap 登录并获取登录结果
+## 登录
 
 :::tip
 当用户启动游戏时，可以先检查[用户登录状态](#检查登录状态和用户信息)，如果玩家已经登录，则不显示登录按钮，让玩家直接进入游戏。
 :::
 
-<MultiLang kind="ue">
+<MultiLang kind="unity_android_ios_v4">
 
+<>
 
 ```cs
-try
-{
-    // 在 iOS、Android 系统下，会唤起 TapTap 客户端或以 WebView 方式进行登录
-    // 在 Windows、macOS 系统下显示二维码（默认）和跳转链接（需配置）
-    var accessToken = await TapLogin.Login();
-    Debug.Log($"TapTap 登录成功 accessToken: {accessToken.ToJson()}");
-}
-catch (Exception e)
-{
-    if (e is TapException tapError)  // using TapTap.Common
-    {
-        Debug.Log($"encounter exception:{tapError.code} message:{tapError.message}");
-        if (tapError.code == (int)TapErrorCode.ERROR_CODE_BIND_CANCEL) // 取消登录
-        {
-            Debug.Log("登录取消");
-        }
-    }
-}
+using TapSDK.Login;
+using System.Threading.Tasks;
 
-// 获取 TapTap Profile  可以获得当前用户的一些基本信息，例如名称、头像。
-var profile = await TapLogin.FetchProfile();
-Debug.Log($"TapTap 登录成功 profile: {profile.ToJson()}");
+// 定义授权范围
+List<string> scopes = new List<string>();
+scopes.Add(TapTapLogin.TAP_LOGIN_SCOPE_PUBLIC_PROFILE);
+
+// 初始化登录请求 Task
+Task<TapTapAccount> task = TapTapLogin.Instance.LoginWithScopes(scopes.ToArray());
+var result = await task;
+
+// 判断登录结果
+if (task.IsCompleted)
+{
+	// 登录成功
+} 
+else if (task.IsCanceled)
+{
+ 	// 登录取消
+}
+else
+{
+	// 登录失败
+	Debug.Log($"登录失败: {task.Exception.Message}");
+}
 ```
+
+</>
+
+<>
 
 ```java
-// 实例化监听
-TapLoginHelper.TapLoginResultCallback loginCallback = new TapLoginHelper.TapLoginResultCallback() {
+import com.taptap.sdk.kit.internal.callback.TapTapCallback;
+import com.taptap.sdk.kit.internal.exception.TapTapException;
+import com.taptap.sdk.login.Scopes;
+import com.taptap.sdk.login.TapTapAccount;
+import com.taptap.sdk.login.TapTapLogin;
+import androidx.annotation.NonNull;
+
+// 定义授权范围
+String[] scopes = new String[]{Scopes.SCOPE_PROFILE, Scopes.SCOPE_BASIC_INFO};
+
+TapTapLogin.loginWithScopes(activity, scopes, new TapTapCallback<TapTapAccount>() {
     @Override
-    public void onLoginSuccess(AccessToken token) {
-        Log.d(TAG, "TapTap authorization succeed");
-        // 开发者调用 TapLoginHelper.getCurrentProfile() 可以获得当前用户的一些基本信息，例如名称、头像。
-        Profile profile = TapLoginHelper.getCurrentProfile();
-    }
-
-    @Override
-    public void onLoginCancel() {
-        Log.d(TAG, "TapTap authorization cancelled");
-    }
-
-    @Override
-    public void onLoginError(AccountGlobalError globalError) {
-        Log.d(TAG, "TapTap authorization failed. cause: " + globalError.getMessage());
-    }
-};
-// 注册监听
-TapLoginHelper.registerLoginCallback(loginCallback);
-// 登录
-TapLoginHelper.startTapLogin(MainActivity.this, TapLoginHelper.SCOPE_PUBLIC_PROFILE);
-```
-
-```objectivec
-[TapLoginHelper registerLoginResultDelegate:delegator];
-if ([TapLoginHelper currentProfile]) {
-    // 当前已经登录
-} else {
-    [TapLoginHelper startTapLogin:@[@"public_profile"]];
-}
-
-// delegator
-- (void)onLoginCancel {
-    // 登录取消
-}
-
-- (void)onLoginError:(nonnull NSError *)error {
-    // 登录失败
-}
-
-- (void)onLoginSuccess:(nonnull TTSDKAccessToken *)token {
-    // 登录成功
-}
-```
-
-```cpp
-// 权限参考 TUType::PermissionScope
-TapUELogin::Login({TUType::PermissionScope::Profile}, [](const TUAuthResult& Result) {
-    if (Result.GetType() == TUAuthResult::Success) {
+    public void onSuccess(TapTapAccount tapTapAccount) {
         // 登录成功
-        TSharedPtr<FTULoginProfileModel> Profile = TapUELogin::GetProfile();
     }
-    else if (Result.GetType() == TUAuthResult::Cancel) {
-        // 登录取消
-    }
-    else {
+
+    @Override
+    public void onFail(@NonNull TapTapException exception) {
         // 登录失败
     }
+
+    @Override
+    public void onCancel() {
+        // 登录取消
+    }
 });
+
 ```
+</>
+
+<>
+
+```kotlin
+import com.taptap.sdk.login.TapTapLogin
+import com.taptap.sdk.kit.internal.callback.TapTapCallback
+import com.taptap.sdk.login.TapTapAccount
+import com.taptap.sdk.login.Scopes
+
+val scopes = mutableSetOf<String>()
+scopes.add(Scopes.SCOPE_PROFILE)
+
+TapTapLogin.loginWithScopes(
+    activity,
+    scopes.toTypedArray(),
+    object : TapTapCallback<TapTapAccount> {
+
+        override fun onSuccess(result: TapTapAccount) {
+            // 成功
+        }
+
+        override fun onCancel() {
+            // 取消
+        }
+
+        override fun onFail(exception: TapTapException) {
+           // 失败
+        }
+    }
+)
+```
+</>
+
+<>
+
+```swift
+import TapTapLoginSDK
+
+// 定义授权范围
+var scopes: [Scope] = [Scope.publicProfile]
+
+// 发起 Tap 登录
+TapTapLogin.loginWithScopes(with: scopes) {[weak self] account, error, isCancel in
+    guard let self else { return }
+    if isCancel {
+        // 登录取消
+    } else if let error = error {
+    	 // 登录失败
+        NSLog("Tap登录失败：\(error.localizedDescription)")
+    } else if let account = account {
+    	 // 登录成功
+
+    	 // 登录 token
+    	 let token = account.accessToken
+    	 // 用户信息
+    	 let userInfo = account.userInfo
+    }
+}
+```
+
+</>
 
 </MultiLang>
 
-<Profiles />
+### 不同的授权范围
 
-开发者可以合理使用这些信息。
+TapTap 授权登录接口支持选择不同的授权范围且支持任意组合，但必须包含 `public_profile` 和 `basic_info` 中的一个，不然无法获得 openid 和 unionid。TapTap 授权登录接口可以传递 String 类型的数组作为参数，开发者可以根据自己业务需求添加不同的权限为数组的元素。
 
-参见[TapTap OAuth 接口文档](/sdk/taptap-login/guide/taptap-oauth/)。
+<Conditional region='cn'>
+
+| 权限 | 说明
+|---|---|
+| `public_profile` | 获得 openid、unionid、用户昵称、用户头像
+| `user_friends` | 获得访问 TapTap 好友相关数据的权限
+| `basic_info` | 获得 openid 和 unionid
+
+:::tip
+若游戏发起 TapTap 授权登录时只请求 `basic_info` 的权限，则用户可享受无感登录的特性，即用户不需要手动确认授权即可自动授权完成登录。
+:::
+
+</Conditional>
+
+<Conditional region='global'>
+
+| 权限 | 说明
+|---|---|---|
+| `public_profile` | 获得 openid、unionid、用户昵称、用户头像
+| `user_friends` | 获得访问 TapTap 好友相关数据的权限
+| `basic_info` | 获得 openid 和 unionid
+| `email` | 获得 email 和 emailVerified 数据
+
+</Conditional>
+
+### 获取用户信息
+
+TapTap 用户登录成功之后，开发者可以通过如下方式获取到 TapTap 授权结果的详细信息：
+
+这里获取的 `Profile` 类根据游戏申请的授权范围有所差异。
+
+其中可能会包含如下信息：
+
+<Conditional region="global">
+
+  | 参数      | 说明                                                                                                                         |
+  | --------- | ---------------------------------------------------------------------------------------------------------------------------- |
+  | `name`    | 玩家在 TapTap 平台的昵称                                                                                                     |
+  | `avatar`  | 玩家在 TapTap 平台的头像 url                                                                                                 |
+  | `openid`  | 通过用户信息和游戏信息生成的**用户唯一标识**，每个玩家在每个游戏中的 `openid` 都是不一样的                                   |
+  | `unionid` | 通过用户信息加上厂商信息生成的用户唯一标识，一个玩家在同一个厂商的所有游戏中 `unionid` 都是一样的，不同厂商下 `unionid` 不同 |
+  | `email`   | 用户在 TapTap 平台注册使用的邮箱 |
+  | `emailVerified`   | 用户在 TapTap 平台注册使用的邮箱是否经过验证 |
+
+</Conditional>
+
+<Conditional region="cn">
+
+  | 参数      | 说明                                                                                                                         |
+  | --------- | ---------------------------------------------------------------------------------------------------------------------------- |
+  | `name`    | 玩家在 TapTap 平台的昵称                                                                                                     |
+  | `avatar`  | 玩家在 TapTap 平台的头像 url                                                                                                 |
+  | `openid`  | 通过用户信息和游戏信息生成的**用户唯一标识**，每个玩家在每个游戏中的 `openid` 都是不一样的                                   |
+  | `unionid` | 通过用户信息加上厂商信息生成的用户唯一标识，一个玩家在同一个厂商的所有游戏中 `unionid` 都是一样的，不同厂商下 `unionid` 不同 |
+
+</Conditional>
+
+`openid` 和 `unionid` 使用[标准的 Base64](https://datatracker.ietf.org/doc/html/rfc4648#section-4)（带 Padding）编码，包含的字符有 `A-Za-z0-9+/=`。`openid` 和 `unionid` 长度最大值为 50 个字符。
+
+:::info
+由于 `unionid` 与游戏所属厂商有强关联性，因此 `unionid` 适用于如下场景：厂商使用测试服进行付费删档等测试，正式服需要对于之前参与测试的老玩家进行返利等操作。因为同一个玩家在同一个厂商下的所有游戏中的  `unionid` 不变。
+一个游戏在厂商转移后同一个用户的 `unionid` 会发生改变，如果游戏使用了 `unionid`，TDS 技术支持会在转移前通过工单和游戏开发者确认相关数据的处理方案，保证迁移前后用户数据不错乱。
+:::
 
 ## 检查登录状态和用户信息
 
 登录状态和用户信息存在本地缓存中，重新登录将会重置，登出将会清除。
 
-<MultiLang kind="ue">
+<MultiLang kind="unity_android_ios_v4">
+
+<>
 
 ```cs
-// 获取登录状态
-try 
-{
-    var accesstoken = await TapLogin.GetAccessToken();
-    Debug.Log("已登录");
-    // 直接进入游戏
-} 
-catch (Exception e)
-{
-    Debug.Log("当前未登录");
-    // 开始登录
+using TapSDK.Login;
+
+try {
+    TapTapAccount account = await TapTapLogin.Instance.GetCurrentTapAccount();
+    if (account == null) {
+        // 用户未登录
+    } else {
+        // 用户已登录
+    }
+} catch (Exception e) {
+    Debug.Log($"获取用户信息失败 {e.Message}");
 }
 
-// 获取用户信息
-await TapLogin.GetProfile();
-
-// 获取实时更新的用户信息
-await TapLogin.FetchProfile();
 ```
+
+</>
+
+<>
 
 ```java
-// 获取登录状态
-TapLoginHelper.getCurrentAccessToken();
+import com.taptap.sdk.login.AccessToken;
+import com.taptap.sdk.login.TapTapAccount;
+import com.taptap.sdk.login.TapTapLogin;
+
+TapTapAccount currentTapAccount = TapTapLogin.getCurrentTapAccount();
+
+if (currentTapAccount != null) {
+    // 已登录
+    AccessToken accessToken = currentTapAccount.getAccessToken();
+} else {
+    // 未登录
+}
+```
+</>
+
+<>
+
+```kotlin
+import com.taptap.sdk.login.TapTapLogin
+import com.taptap.sdk.login.TapTapAccount
 
 // 获取用户信息
-TapLoginHelper.getCurrentProfile();
+when (TapTapLogin.getCurrentTapAccount() == null) {
+    true -> {
+        // 未登录
+    }
 
-// 获取实时更新的用户信息
-TapLoginHelper.fetchProfileForCurrentAccessToken(new ApiCallback<Profile>() {
-  @Override
-  public void onSuccess(Profile data) {
-
-  }
-
-  @Override
-  public void onError(Throwable error) {
-    
-  }
-});
+    else -> {
+        // 已登录
+    }
+}
 ```
+</>
 
-```objectivec
-// 获取登录状态
-[TapLoginHelper currentAccessToken];
+<>
 
-// 获取用户信息
-[TapLoginHelper currentProfile];
+```swift
+import TapTapLoginSDK
 
-// 获取实时更新的用户信息
-[TapLoginHelper fetchProfileForCurrentAccessToken:^(TTSDKProfile *_Nonnull profile, NSError *_Nonnull error) {}];
+if let account = TapTapLogin.getCurrentTapAccount() {
+    let token = account.accessToken
+    let profile = account.userInfo
+    if let token, let profile {
+			// 用户已登录
+       } else {
+         NSLog("Tap账户未登录")
+    }
+} else {
+    NSLog("Tap账户未登录")
+}
 ```
-
-```cpp
-// 获取登录状态
-TSharedPtr<FTUAccessToken> AccessToken = TapUELogin::GetAccessToken();
-if (AccessToken.IsValid())
-{
-	// 已登录，直接进入游戏
-}
-else
-{
-	// 未登录
-}
-
-// 获取用户信息
-// 注意：如果登录的权限没有 TUType::Profile，那么获取不到用户信息
-TSharedPtr<FTULoginProfileModel> Profile = TapUELogin::GetProfile();
-if (Profile.IsValid())
-{
-	// 获取成功
-}
-else
-{
-	// 获取失败
-}
-
-// 获取实时更新的用户信息
-// 注意：如果登录的权限没有 TUType::Profile，那么获取不到用户信息
-TapUELogin::FetchProfile([](TSharedPtr<FTULoginProfileModel> ModelPtr, const FTUError& Error) {
-if (ModelPtr.IsValid())
-{
-	// 请求成功
-}
-else
-{
-	// 请求失败
-}
-});
-```
+</>
 
 </MultiLang>
 
 ## 登出
 
-<MultiLang kind="ue">
+<MultiLang kind="unity_android_ios_v4">
+
+<>
 
 ```cs
-TapLogin.Logout();
+using TapSDK.Login;
+
+TapTapLogin.Instance.Logout();
 ```
+
+</>
+
+<>
 
 ```java
-TapLoginHelper.logout();
+import com.taptap.sdk.login.TapTapLogin;
+
+TapTapLogin.logout();
 ```
 
-```objectivec
-[TapLoginHelper logout];
-```
+</>
 
-```cpp
-TapUELogin::Logout();
+<>
+
+```kotlin
+import com.taptap.sdk.login.TapTapLogin
+
+TapTapLogin.logout()
 ```
+</>
+
+<>
+
+```swift
+import TapTapLoginSDK
+
+TapTapLogin.logout()
+```
+</>
 
 </MultiLang>
 
 ## Unity PC 登录配置
 
-Unity SDK 自 3.5.2 起支持在 Windows、macOS 下让玩家扫码或跳转网页浏览器完成 TapTap 登录。
+:::tip
+SDK **默认支持扫码登录**，跳转浏览器登录需要额外配置，具体参考以下两节。
+:::
 
-SDK **默认支持扫码登录**，跳转浏览器登录需要[额外配置](/sdk/taptap-login/guide/start/#unity-pc-登录配置)。
+<Conditional region='cn'>
 
-## 升级到内建账户系统
+![PC 登录](https://capacity-files.lcfile.com/BGyFDAQUNUrw9EuMcx8SyP7pek4BKz5u/taptap-login-pc.png)
 
-前面说过，如果前期开发时只把「TapTap 登录」作为一个第三方渠道进行了接入，后期要使用内建账户系统，或者老的 v1.x 版本的游戏要升级到 3.x 版本并使用其他服务，这时候会有「一定的开发成本」。这里我们就来具体说说这种情况下该如何处理。
+</Conditional>
 
-1. 首先按照前述[初始化](#初始化)和[一键完成 TapTap 登录](#一键完成-taptap-登录)的提示，完成内建账户系统的 TapTap 用户登录，这时候开发者可以得到一个 TDSUser 实例。
+<Conditional region='global'>
 
-2. 登录成功后获得当前授权用户的 `Profile` 信息。请注意，这里的 `Profile` 信息和游戏之前得到的 `Profile` 信息应该是完全一样的，游戏开发者应该可以据此找到游戏服务器上持久化保存的玩家信息，也可以将当前的 TDSUser 与原来的游戏玩家信息绑定在一起。对于游戏来说，最后是否需要将 TDSUser 与游戏内玩家账户进行绑定，是完全由开发者自己决定的：
+![PC 登录](https://capacity-files.lcfile.com/GI0d6OOdTq4Xaphumdiayqi16JBgbmMg/taptap-login-pc.png)
 
-    - 不绑定是可行的，因为 TapSDK 内部会缓存当前用户的登录状态，需要的时候总能得到之前[登录的 TDS 账户](/sdk/taptap-login/guide/start/#检查登录状态)；
-    - 绑定带来的好处则是使用上更加简单，同时也可以将 TDS 账户信息扩展到更多的第三方平台。
+</Conditional>
+
+### Windows 平台
+
+如果想要在 Windows 使用跳转网页浏览器登录功能，需要在注册表添加相应配置：
+
+```
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\open-taptap-{client_id}]
+@="{游戏名称}"
+"URL Protocol"="{程序.exe 安装路径}}"
+
+[HKEY_CLASSES_ROOT\open-taptap-{client_id}]
+@="{游戏名称}"
+
+[HKEY_CLASSES_ROOT\open-taptap-{client_id}]
+
+[HKEY_CLASSES_ROOT\open-taptap-{client_id}\Shell\Open]
+
+[HKEY_CLASSES_ROOT\open-taptap-{client_id}\Shell\Open\Command]
+@="\"{程序.exe 安装路径}\" \"%1\""
+```
+
+### macOS 平台
+
+在 macOS 平台下，SDK 会自动配置 `CFBundleURLTypes`。
+
+请通过以下步骤确认配置无误：
+
+- 在 Unity 下打开 `BuildSetting` 选择 `PC、Mac & Linux Standalone` Platform，`Target Platform` 选择 `macOS`。
+- 勾选 `Create XCode Project`，选择输出 `XCode` 工程进行编译。
+- 打开输出的 `XCode Project`，选择 `Target`，点击 `Info`，展开 `URL Types`，检查是否自动添加以下 `URL Scheme`：`TapWeb : open-taptap-{clientId}`，如未添加，则手动添加：
+
+```xml
+<key>CFBundleURLTypes</key>
+<array>
+    <dict>
+        <key>CFBundleURLName</key>
+        <string>TapWeb</string>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>open-taptap-{client_id}</string>
+        </array>
+    </dict>
+</array>
+```
