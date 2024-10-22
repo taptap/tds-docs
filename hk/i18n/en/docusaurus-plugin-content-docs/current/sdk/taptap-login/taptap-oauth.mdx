@@ -1,0 +1,1158 @@
+---
+
+title: TapTap OAuth Interface
+sidebar_position: 4
+---
+
+import {Red, Blue, Black, Gray} from '/src/docComponents/doc';
+import {Conditional} from '/src/docComponents/conditional';
+
+## Overview
+
+TapTap OpenAPI uses a unified Mac Token header signature to transmit user authorization information.
+
+When developers integrate the SDK [login module](/sdk/taptap-login/guide), an access token (Access Token) is generated after the user authorizes your application. This access token is encrypted to generate a Mac Token string. The Access Token is valid for a long time and only becomes invalid when the user updates their account security information or revokes authorization for the current application. Developers should properly manage the Access Token on their server to serve as an identifier for subsequent communications with the TapTap server.
+
+The Mac Token generation algorithm can be found in the [MAC Token Algorithm](#mac-token-算法) section of the document.
+
+<Conditional region='cn'>
+
+The following interfaces are domestic examples. When the mobile terminal is initialized overseas, the login is overseas, and the server-side documentation process remains unchanged. Simply replace the request domain `open.tapapis.cn` in the examples with the overseas domain `open.tapapis.com`.
+
+</Conditional>
+
+## Process
+
+1. Use SDK's TapTap login on the mobile terminal to [obtain AccessToken](/sdk/taptap-login/guide/#检查登录状态和用户信息), which includes:
+
+    ```java
+    public String kid;
+    public String token_type;
+    public String mac_key;
+    public String mac_algorithm;
+    public Set<String> scopeSet;
+    ```
+
+2. Send the parameters obtained from the mobile terminal to the game server, and the server-side calculates the mac token.
+3. Request <Conditional region='cn'>`https://open.tapapis.cn/account/profile/v1`</Conditional><Conditional region='global'>`https://openapi.tap.io/account/profile/v1`</Conditional>, with the header carrying `mac token`.
+
+## API
+When the SDK only requests the basic_info permission, use the basic information interface. When requesting public_profile, use the detailed information interface.
+
+### Get Current Account Basic Information
+
+>  <Red> GET </Red> <Conditional region='cn'>https://open.tapapis.cn/account/basic-info/v1?client_id=xxx</Conditional><Conditional region='global'>https://openapi.tap.io/account/basic-info/v1?client_id=xxx</Conditional> <br/><Blue> Authorization </Blue> mac token
+
+#### Request Parameters
+
+| Field     | Type   | Description   |
+| --------- | ------ | ------------- |
+| client_id | string | The application's `Client ID`, should match the agreement |
+
+#### Response Parameters
+
+Field             | Type           | Description
+--------------- | ------------- | ------------
+openid          | string        | Unique identifier for authorized user, each player has a different openid in each game, the same game always retrieves the same openid for the same player
+unionid         | string        | Unique identifier for authorized user, the same unionid for a player across all games of a vendor, different unionid for different vendors
+
+#### Request Example
+
+Replace `MAC id` and `Client ID` with your calculated mac token and the `Client ID` from the console.
+
+<Conditional region='cn'>
+
+```
+curl -s -H 'Authorization:MAC id="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJa
+gCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTs
+KQ",ts="1618221750",nonce="adssd",mac="XWTPmq6A6LzgK8BbNDwj+kE4gzs="' "https://open.tapapis.cn/account/basic-info/v1?client_id=<Client ID>"
+```
+
+</Conditional>
+
+<Conditional region='global'>
+
+```
+curl -s -H 'Authorization:MAC id="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJa
+gCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTs
+KQ",ts="1618221750",nonce="adssd",mac="XWTPmq6A6LzgK8BbNDwj+kE4gzs="' "https://openapi.tap.io/account/basic-info/v1?client_id=<Client ID>"
+```
+
+</Conditional>
+
+### Get Current Account Detailed Information
+
+>  <Red> GET </Red> <Conditional region='cn'>https://open.tapapis.cn/account/profile/v1?client_id=xxx</Conditional><Conditional region='global'>https://openapi.tap.io/account/profile/v1?client_id=xxx</Conditional> <br/><Blue> Authorization </Blue> mac token
+
+#### Request Parameters
+
+| Field     | Type   | Description   |
+| --------- | ------ | ------------- |
+| client_id | string | The application's `Client ID`, should match the agreement |
+
+#### Response Parameters
+
+Field             | Type           | Description
+--------------- | ------------- | ------------
+name            | string        | Username
+avatar          | string        | User avatar image address
+openid          | string        | Unique identifier for authorized user, each player has a different openid in each game, the same game always retrieves the same openid for the same player
+unionid         | string        | Unique identifier for authorized user, the same unionid for a player across all games of a vendor, different unionid for different vendors
+
+#### Request Example
+
+Replace `MAC id` and `Client ID` with your calculated mac token and the `Client ID` from the console.
+
+<Conditional region='cn'>
+
+```
+curl -s -H 'Authorization:MAC id="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJa
+gCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTs
+KQ",ts="1618221750",nonce="adssd",mac="XWTPmq6A6LzgK8BbNDwj+kE4gzs="' "https://open.tapapis.cn/account/profile/v1?client_id=<Client ID>"
+```
+
+</Conditional>
+
+<Conditional region='global'>
+
+```
+curl -s -H 'Authorization:MAC id="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJa
+gCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTs
+KQ",ts="1618221750",nonce="adssd",mac="XWTPmq6A6LzgK8BbNDwj+kE4gzs="' "https://openapi.tap.io/account/profile/v1?client_id=<Client ID>"
+```
+
+</Conditional>
+
+## Others
+
+### MAC Token Algorithm
+
+MAC Token contains the following fields:
+
+| Field          | Type   | Description                            |
+| ------------- | ------ | ------------------------------- |
+| kid           | string | mac_key id, The key identifier. |
+| token_type    | string | Token type, e.g., mac               |
+| mac_key       | string | mac key                         |
+| mac_algorithm | string | mac calculation algorithm name hmac-sha-1      |
+
+Use Mac Token to sign an interface:
+
+<details>
+<summary>Node.js Request Example</summary>
+
+<Conditional region='cn'>
+
+```javascript
+const http = require('http');
+const https = require('https');
+const crypto = require('crypto');
+
+function getAuthorization(requestUrl, method, keyId, macKey) {
+    const url = new URL(requestUrl);
+    const time = Math.floor(Date.now() / 1000).toString().padStart(10, '0');
+    const randomStr = getRandomString(16);
+    const host = url.hostname;
+    const uri = url.pathname + url.search;
+    const port = url.port || (url.protocol === 'https:' ? '443' : '80');
+    const other = '';
+    const sign = signData(mergeData(time, randomStr, method, uri, host, port, other), macKey);
+
+    return `MAC id="${keyId}", ts="${time}", nonce="${randomStr}", mac="${sign}"`;
+}
+
+function getRandomString(length) {
+    return crypto.randomBytes(length).toString('base64');
+}
+
+function mergeData(time, randomCode, httpType, uri, domain, port, other) {
+    let prefix =
+        `${time}\n${randomCode}\n${httpType}\n${uri}\n${domain}\n${port}\n`;
+
+    if (!other) {
+        prefix += '\n';
+    } else {
+        prefix += `${other}\n`;
+    }
+
+    return prefix;
+}
+
+function signData(signatureBaseString, key) {
+    const hmac = crypto.createHmac('sha1', key);
+    hmac.update(signatureBaseString);
+    return hmac.digest('base64');
+}
+
+const client_id = "hskc**********kklm";
+const keyId = "1/VLDoiGUhNCIpUq827L**************zAJ-i8hT_w9vuPtPgdaPkWDv6K4eVe_yZnKz************EYep-T4ki5w3kyYACVnM61JJqDEKfpNnHoTZU********************iUArkgPsWEwOpZGxva7FnqbTwmpLT0a28UtiR5gyr4XXutbnE5tb4A-iSqRpqqtgABXBZd34U5Th3iJ1C666iYQFvuQL9uC-Zv7-xKCNjyPonBqU4ZWZnKLFf2mzprU5vJCA8q5by1SZxY63kZBQieHYxFjyOCQdJ-25gDlxiqDbNq08kmSdY6TB1qtQ68V37L6a8nIzyVHooX9uc2Yw";
+const macKey = 'VPDalRmxtBqi******************tH937GNKIvj3';
+const requestUrl = 'https://open.tapapis.cn/account/profile/v1?client_id='+ client_id ;
+const method = 'GET';
+
+
+const authorization = getAuthorization(requestUrl, method, keyId, macKey);
+console.log(authorization);
+
+const options = new URL(requestUrl);
+const client = options.protocol === 'https:' ? https : http;
+
+const req = client.request({
+    hostname: options.hostname,
+    port: options.port,
+    path: options.pathname + options.search,
+    method: 'GET',
+    headers: {
+        'Authorization': authorization
+    }
+}, (res) => {
+    let data = '';
+
+    res.on('data', (chunk) => {
+        data += chunk;
+    });
+
+    res.on('end', () => {
+        console.log(data);
+    });
+});
+
+req.end();
+
+
+```
+
+</Conditional>
+
+<Conditional region='global'>
+
+```javascript
+const http = require('http');
+const https = require('https');
+const crypto = require('crypto');
+
+function getAuthorization(requestUrl, method, keyId, macKey) {
+    const url = new URL(requestUrl);
+    const time = Math.floor(Date.now() / 1000).toString().padStart(10, '0');
+    const randomStr = getRandomString(16);
+    const host = url.hostname;
+    const uri = url.pathname + url.search;
+    const port = url.port || (url.protocol === 'https:' ? '443' : '80');
+    const other = '';
+    const sign = signData(mergeData(time, randomStr, method, uri, host, port, other), macKey);
+
+    return `MAC id="${keyId}", ts="${time}", nonce="${randomStr}", mac="${sign}"`;
+}
+
+function getRandomString(length) {
+    return crypto.randomBytes(length).toString('base64');
+}
+
+function mergeData(time, randomCode, httpType, uri, domain, port, other) {
+    let prefix =
+        `${time}\n${randomCode}\n${httpType}\n${uri}\n${domain}\n${port}\n`;
+
+    if (!other) {
+        prefix += '\n';
+    } else {
+        prefix += `${other}\n`;
+    }
+
+    return prefix;
+}
+
+function signData(signatureBaseString, key) {
+    const hmac = crypto.createHmac('sha1', key);
+    hmac.update(signatureBaseString);
+    return hmac.digest('base64');
+}
+
+const client_id = "5enu******wfy";
+const keyId = "1/JFZi8****IiumsGZI31iJH1q*****UKZ-eKA";
+const macKey = 'LMbNcKox*******kfmk7oWXbuRz';
+const requestUrl = 'https://openapi.tap.io/account/profile/v1?client_id='+ client_id ;
+const method = 'GET';
+
+const authorization = getAuthorization(requestUrl, method, keyId, macKey);
+console.log(authorization);
+
+const options = new URL(requestUrl);
+const client = options.protocol === 'https:' ? https : http;
+
+const req = client.request({
+    hostname: options.hostname,
+    port: options.port,
+    path: options.pathname + options.search,
+    method: 'GET',
+    headers: {
+        'Authorization': authorization
+    }
+}, (res) => {
+    let data = '';
+
+    res.on('data', (chunk) => {
+        data += chunk;
+    });
+
+    res.on('end', () => {
+        console.log(data);
+    });
+});
+
+req.end();
+
+
+```
+
+</Conditional>
+
+</details>
+
+<details>
+<summary>Java Request Example</summary>
+
+<Conditional region='cn'>
+
+```java
+package com.taptap;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.*;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+public class Authorization {
+    public static void main(String[] args) throws IOException {
+        String client_id = "0RiAlMny7jiz086FaU";
+        String kid = "1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ"; // kid
+        String mac_key = "mSUQNYUGRBPXyRyW"; // mac_key
+        String method = "GET";
+        String request_url = "https://open.tapapis.cn/account/profile/v1?client_id=" + client_id; //
+        String authorization = getAuthorization(request_url, method, kid, mac_key);
+        System.out.println(authorization);
+        URL url = new URL(request_url);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        // Http
+        conn.setRequestProperty("Authorization", authorization);
+        conn.setRequestMethod("GET");
+        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        String line;
+        StringBuilder result = new StringBuilder();
+        while ((line = rd.readLine()) != null) {
+            result.append(line);
+        }
+        rd.close();
+        System.out.println(result.toString());
+    }
+    /**
+     * @param request_url
+     * @param method "GET" or "POST"
+     * @param key_id key id by OAuth 2.0
+     * @param mac_key mac key by OAuth 2.0
+     * @return authorization string
+     */
+    public static String getAuthorization(String request_url, String method, String key_id, String
+            mac_key) {
+        try {
+            URL url = new URL(request_url);
+            String time = String.format(Locale.US, "%010d", System.currentTimeMillis() / 1000);
+            String randomStr = getRandomString(16);
+            String host = url.getHost();
+            String uri = request_url.substring(request_url.lastIndexOf(host) + host.length());
+            String port = "80";
+            if (request_url.startsWith("https")) {
+                port = "443";
+            }
+            String other = "";
+            String sign = sign(mergeSign(time, randomStr, method, uri, host, port, other), mac_key);
+            return "MAC " + getAuthorizationParam("id", key_id) + "," + getAuthorizationParam("ts", time)
+                    + "," + getAuthorizationParam("nonce", randomStr) + "," + getAuthorizationParam("mac",
+                    sign);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    private static String getRandomString(int length) {
+        byte[] bytes = new byte[length];
+        new SecureRandom().nextBytes(bytes);
+        String base64String = Base64.getEncoder().encodeToString(bytes);
+        return base64String;
+    }
+    private static String mergeSign(String time, String randomCode, String httpType, String uri,
+                                    String domain, String port, String other) {
+        if (time.isEmpty() || randomCode.isEmpty() || httpType.isEmpty() || domain.isEmpty() || port.isEmpty())
+        {
+            return null;
+        }
+        String prefix =
+                time + "\n" + randomCode + "\n" + httpType + "\n" + uri + "\n" + domain + "\n" + port
+                        + "\n";
+        if (other.isEmpty()) {
+            prefix += "\n";
+        } else {
+            prefix += (other + "\n");
+        }
+        return prefix;
+    }
+    private static String sign(String signatureBaseString, String key) {
+        try {
+            SecretKeySpec signingKey = new SecretKeySpec(key.getBytes(), "HmacSHA1");
+            Mac mac = Mac.getInstance("HmacSHA1");
+            mac.init(signingKey);
+            byte[] text = signatureBaseString.getBytes(StandardCharsets.UTF_8);
+            byte[] signatureBytes = mac.doFinal(text);
+            signatureBytes = Base64.getEncoder().encode(signatureBytes);
+            return new String(signatureBytes, StandardCharsets.UTF_8);
+        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+    private static String getAuthorizationParam(String key, String value) {
+        if (key.isEmpty() || value.isEmpty()) {
+            return null;
+        }
+        return key + "=" + "\"" + value + "\"";
+    }
+}
+```
+
+</Conditional>
+
+<Conditional region='global'>
+
+```java
+package com.taptap;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.util.*;
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+public class Authorization {
+    public static void main(String[] args) throws IOException {
+        String client_id = "0RiAlMny7jiz086FaU";
+        String kid = "1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ"; // kid
+        String mac_key = "mSUQNYUGRBPXyRyW"; // mac_key
+        String method = "GET";
+        String request_url = "https://openapi.tap.io/account/profile/v1?client_id=" + client_id; //
+        String authorization = getAuthorization(request_url, method, kid, mac_key);
+        System.out.println(authorization);
+        URL url = new URL(request_url);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        // Http
+        conn.setRequestProperty("Authorization", authorization);
+        conn.setRequestMethod("GET");
+        BufferedReader rd = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+        String line;
+        StringBuilder result = new StringBuilder();
+        while ((line = rd.readLine()) != null) {
+            result.append(line);
+        }
+        rd.close();
+        System.out.println(result.toString());
+    }
+    /**
+     * @param request_url
+     * @param method "GET" or "POST"
+     * @param key_id key id by OAuth 2.0
+     * @param mac_key mac key by OAuth 2.0
+     * @return authorization string
+     */
+    public static String getAuthorization(String request_url, String method, String key_id, String
+            mac_key) {
+        try {
+            URL url = new URL(request_url);
+            String time = String.format(Locale.US, "%010d", System.currentTimeMillis() / 1000);
+            String randomStr = getRandomString(16);
+            String host = url.getHost();
+            String uri = request_url.substring(request_url.lastIndexOf(host) + host.length());
+            String port = "80";
+            if (request_url.startsWith("https")) {
+                port = "443";
+            }
+            String other = "";
+            String sign = sign(mergeSign(time, randomStr, method, uri, host, port, other), mac_key);
+            return "MAC " + getAuthorizationParam("id", key_id) + "," + getAuthorizationParam("ts", time)
+                    + "," + getAuthorizationParam("nonce", randomStr) + "," + getAuthorizationParam("mac",
+                    sign);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+    private static String getRandomString(int length) {
+        byte[] bytes = new byte[length];
+        new SecureRandom().nextBytes(bytes);
+        String base64String = Base64.getEncoder().encodeToString(bytes);
+        return base64String;
+    }
+    private static String mergeSign(String time, String randomCode, String httpType, String uri,
+                                    String domain, String port, String other) {
+        if (time.isEmpty() || randomCode.isEmpty() || httpType.isEmpty() || domain.isEmpty() || port.isEmpty())
+        {
+            return null;
+        }
+        String prefix =
+                time + "\n" + randomCode + "\n" + httpType + "\n" + uri + "\n" + domain + "\n" + port
+                        + "\n";
+        if (other.isEmpty()) {
+            prefix += "\n";
+        } else {
+            prefix += (other + "\n");
+        }
+        return prefix;
+    }
+    private static String sign(String signatureBaseString, String key) {
+        try {
+            SecretKeySpec signingKey = new SecretKeySpec(key.getBytes(), "HmacSHA1");
+            Mac mac = Mac.getInstance("HmacSHA1");
+            mac.init(signingKey);
+            byte[] text = signatureBaseString.getBytes(StandardCharsets.UTF_8);
+            byte[] signatureBytes = mac.doFinal(text);
+            signatureBytes = Base64.getEncoder().encode(signatureBytes);
+            return new String(signatureBytes, StandardCharsets.UTF_8);
+        } catch (NoSuchAlgorithmException | InvalidKeyException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+    private static String getAuthorizationParam(String key, String value) {
+        if (key.isEmpty() || value.isEmpty()) {
+            return null;
+        }
+        return key + "=" + "\"" + value + "\"";
+    }
+}
+```
+
+</Conditional>
+
+</details>
+
+<details>
+
+<summary>PHP Request Example</summary>
+
+<Conditional region='cn'>
+
+```php
+<?php
+
+# Client ID
+$client_id = "Replace with the Client ID from the console";
+# Replace with the kid obtained from the mobile SDK
+$kid="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ";
+# Replace with the mac_key obtained from the mobile SDK
+$mac_key = "mSUQNYUGRBPXyRyW";
+# API request URL
+$request_url = "https://open.tapapis.cn/account/profile/v1?client_id=".$client_id;
+$ts = time();
+$nonce = "== XinDong_Lee-JiEun ==";//Random string, replace when going live
+//Method one
+//$params = [$ts,$nonce,"GET","/account/profile/v1?client_id=".$client_id,"open.tapapis.cn", 443,"\n"];
+//$signStr = implode("\n",$params);
+//var_dump($signStr);
+//Method two
+$signStr = sprintf("%s\n%s\n%s\n%s\n%s\n443\n\n",$ts,$nonce,"GET","/account/profile/v1?client_id=".$client_id,"open.tapapis.cn");
+//MAC TOKEN encryption
+$mac = base64_encode(hash_hmac('sha1', $signStr, $mac_key,true));
+$auth = sprintf('MAC id="%s",ts="%s",nonce="%s",mac="%s"',$kid,$ts,$nonce,$mac);
+$headers = array(
+    "Authorization:".$auth
+);
+echo "Authorization:".$auth.PHP_EOL.PHP_EOL;
+
+$curl = curl_init($request_url);
+// Set request method
+curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
+// Set header information
+curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+$result = curl_exec($curl);
+curl_close($curl);
+
+?>
+```
+</Conditional>
+
+<Conditional region='global'>
+
+```php
+<?php
+
+# Client ID
+$client_id = "Replace with the Client ID from the console";
+# Replace with the kid obtained from the mobile SDK
+$kid="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ";
+# Replace with the mac_key obtained from the mobile SDK
+$mac_key = "mSUQNYUGRBPXyRyW";
+# API request URL
+$request_url = "https://openapi.tap.io/account/profile/v1?client_id=".$client_id;
+$ts = time();
+$nonce = "== XinDong_Lee-JiEun ==";//Random string, replace when going live
+//Method one
+//$params = [$ts,$nonce,"GET","/account/profile/v1?client_id=".$client_id,"openapi.tap.io", 443,"\n"];
+//$signStr = implode("\n",$params);
+//var_dump($signStr);
+//Method two
+$signStr = sprintf("%s\n%s\n%s\n%s\n%s\n443\n\n",$ts,$nonce,"GET","/account/profile/v1?client_id=".$client_id,"openapi.tap.io");
+//MAC TOKEN encryption
+$mac = base64_encode(hash_hmac('sha1', $signStr, $mac_key,true));
+$auth = sprintf('MAC id="%s",ts="%s",nonce="%s",mac="%s"',$kid,$ts,$nonce,$mac);
+$headers = array(
+    "Authorization:".$auth
+);
+echo "Authorization:".$auth.PHP_EOL.PHP_EOL;
+
+$curl = curl_init($request_url);
+// Set request method
+curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
+// Set header information
+curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+$result = curl_exec($curl);
+curl_close($curl);
+
+?>
+```
+</Conditional>
+
+</details>
+
+<details>
+
+<summary>Python3 Request Example</summary>
+
+<Conditional region='cn'>
+
+```python
+import base64
+import hmac
+import random
+import string
+import time
+from hashlib import sha1
+
+
+def get_mac_token_signature(host, request_url, method, mac_key, kid):
+    mac_token_pattern = 'MAC id="{kid}",ts="{ts}",nonce="{nonce}",mac="{mac}"'
+    timestamp = str(int(time.time()))
+    nonce = ''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase, k=16))
+    sign_array = [timestamp, nonce, method, request_url, host, '443', '']
+    seperator = '\n'
+    sign_input = seperator.join(sign_array) + seperator
+    hmac_code = hmac.new(mac_key.encode('UTF-8'), sign_input.encode('UTF-8'), sha1)
+    mac_str = base64.b64encode(hmac_code.digest()).decode('UTF-8')
+    return mac_token_pattern.format(kid=kid, ts=timestamp, nonce=nonce,
+                                    mac=mac_str)
+
+if __name__ == '__main__':
+    kid = "1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ"
+    mac_key = "mSUQNYUGRBPXyRyW"
+    client_id = "0RiAlMny7jiz086FaU"
+    signature = get_mac_token_signature('open.tapapis.cn', '/account/profile/v1?client_id=' + client_id,
+                                        'GET', mac_key, kid)
+    print(signature)
+```
+</Conditional>
+
+<Conditional region='global'>
+
+```python
+import base64
+import hmac
+import random
+import string
+import time
+from hashlib import sha1
+
+
+def get_mac_token_signature(host, request_url, method, mac_key, kid):
+    mac_token_pattern = 'MAC id="{kid}",ts="{ts}",nonce="{nonce}",mac="{mac}"'
+    timestamp = str(int(time.time()))
+    nonce = ''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase, k=16))
+    sign_array = [timestamp, nonce, method, request_url, host, '443', '']
+    seperator = '\n'
+    sign_input = seperator.join(sign_array) + seperator
+    hmac_code = hmac.new(mac_key.encode('UTF-8'), sign_input.encode('UTF-8'), sha1)
+    mac_str = base64.b64encode(hmac_code.digest()).decode('UTF-8')
+    return mac_token_pattern.format(kid=kid, ts=timestamp, nonce=nonce,
+                                    mac=mac_str)
+
+if __name__ == '__main__':
+    kid = "1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ"
+    mac_key = "mSUQNYUGRBPXyRyW"
+    client_id = "0RiAlMny7jiz086FaU"
+    signature = get_mac_token_signature('openapi.tap.io', '/account/profile/v1?client_id=' + client_id,
+                                        'GET', mac_key, kid)
+    print(signature)
+```
+</Conditional>
+
+</details>
+
+<details>
+
+<summary>Go Request Example</summary>
+
+<Conditional region='cn'>
+
+```go
+package main
+
+import (
+	"crypto/hmac"
+	"crypto/sha1"
+	"encoding/base64"
+	"fmt"
+	"io"
+	"net/http"
+	"strconv"
+	"time"
+)
+
+func main() {
+	// Replace clientId, accessToken, macKey parameters
+	// clientId parameter can be viewed in TapDC backend
+	clientId := "Replace with the `Client ID` from the console"
+	// kid returned by TapSDK after successful TapTap login
+	kid := "1/jvsVxFC6-PIUiXvZVVtv1hogX5q9Z1y_rp-AtVjE3iyHikXXfd_2h-i0wLmc9UjLJwhH6fQ8cvGrklONdvy2J5YfoqzV0ewGPMSLkQIkRv_xaLaYPariWbrkP1MtG2b4CzR1KHvuSCJHewCmTFZmsyNGojTJr5t75f5Nc8j-jjCYeDtFO0-XFI_J7kzktswzzsmISt7cx49QVess-VbaQcU31pEDb_OA03I28H5ehIvqQ0CQdf1LieLyONcH97l1IEU39AirioF_KGJccVG64QsgWmzxLPwmfTurw4cwBPo04yuXnas4YI5haE2UxtckNCpagP19drtGW57-HaAdww"
+	// mac_key returned by TapSDK after successful TapTap login
+	macKey := "fTCuDUDDmNny7a36EWbhUDLaqpoDMQu2hCi9qAJ5"
+
+	// Random number, replace when going live
+	nonce := "8IBTHwOdqNKAWeKl7plt66=="
+	// Convert timestamp to string
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	// Request URL related
+	reqHost := "open.tapapis.cn"
+	reqURI := "/account/profile/v1?client_id=" + clientId
+	reqURL := "https://" + reqHost + reqURI
+
+	macStr := timestamp + "\n" + nonce + "\n" + "GET" + "\n" + reqURI + "\n" + reqHost + "\n" + "443" + "\n\n"
+	mac := hmacSha1(macStr, macKey)
+	authorization := "MAC id=" + "\"" + kid + "\"" + "," + "ts=" + "\"" + timestamp + "\"" + "," + "nonce=" + "\"" + nonce + "\"" + "," + "mac=" + "\"" + mac + "\""
+
+	client := http.Client{}
+	req, err := http.NewRequest(http.MethodGet, reqURL, nil)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	// Add request header
+	req.Header.Add("Authorization", authorization)
+	// Send request
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	fmt.Println(string(respBody))
+}
+
+/*
+HMAC-SHA1 Signature
+*/
+func hmacSha1(valStr, keyStr string) string {
+	key := []byte(keyStr)
+	mac := hmac.New(sha1.New, key)
+	mac.Write([]byte(valStr))
+
+	// Perform Base64 encoding
+	return base64.StdEncoding.EncodeToString(mac.Sum(nil))
+}
+```
+</Conditional>
+
+<Conditional region='global'>
+
+```go
+package main
+
+import (
+	"crypto/hmac"
+	"crypto/sha1"
+	"encoding/base64"
+	"fmt"
+	"io"
+	"net/http"
+	"strconv"
+	"time"
+)
+
+func main() {
+	// Replace clientId, accessToken, macKey parameters
+	// clientId parameter can be viewed in TapDC backend
+	clientId := "Replace with the `Client ID` from the console"
+	// kid returned by TapSDK after successful TapTap login
+	kid := "1/jvsVxFC6-PIUiXvZVVtv1hogX5q9Z1y_rp-AtVjE3iyHikXXfd_2h-i0wLmc9UjLJwhH6fQ8cvGrklONdvy2J5YfoqzV0ewGPMSLkQIkRv_xaLaYPariWbrkP1MtG2b4CzR1KHvuSCJHewCmTFZmsyNGojTJr5t75f5Nc8j-jjCYeDtFO0-XFI_J7kzktswzzsmISt7cx49QVess-VbaQcU31pEDb_OA03I28H5ehIvqQ0CQdf1LieLyONcH97l1IEU39AirioF_KGJccVG64QsgWmzxLPwmfTurw4cwBPo04yuXnas4YI5haE2UxtckNCpagP19drtGW57-HaAdww"
+	// mac_key returned by TapSDK after successful TapTap login
+	macKey := "fTCuDUDDmNny7a36EWbhUDLaqpoDMQu2hCi9qAJ5"
+
+	// Random number, replace when going live
+	nonce := "8IBTHwOdqNKAWeKl7plt66=="
+	// Convert timestamp to string
+	timestamp := strconv.FormatInt(time.Now().Unix(), 10)
+	// Request URL related
+	reqHost := "openapi.tap.io"
+	reqURI := "/account/profile/v1?client_id=" + clientId
+	reqURL := "https://" + reqHost + reqURI
+
+	macStr := timestamp + "\n" + nonce + "\n" + "GET" + "\n" + reqURI + "\n" + reqHost + "\n" + "443" + "\n\n"
+	mac := hmacSha1(macStr, macKey)
+	authorization := "MAC id=" + "\"" + accessToken + "\"" + "," + "ts=" + "\"" + timestamp + "\"" + "," + "nonce=" + "\"" + nonce + "\"" + "," + "mac=" + "\"" + mac + "\""
+
+	client := http.Client{}
+	req, err := http.NewRequest(http.MethodGet, reqURL, nil)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+
+	// Add request header
+	req.Header.Add("Authorization", authorization)
+	// Send request
+	resp, err := client.Do(req)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	fmt.Println(string(respBody))
+}
+
+/*
+HMAC-SHA1 Signature
+*/
+func hmacSha1(valStr, keyStr string) string {
+	key := []byte(keyStr)
+	mac := hmac.New(sha1.New, key)
+	mac.Write([]byte(valStr))
+
+	// Perform Base64 encoding
+	return base64.StdEncoding.EncodeToString(mac.Sum(nil))
+}
+```
+</Conditional>
+
+</details>
+
+<details>
+<summary>C# Request Example</summary>
+
+<Conditional region='cn'>
+
+```cs
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Text;
+
+public class TapLoginOAuth : MonoBehaviour
+{
+
+    private string host = "open.tapapis.cn";
+    private string clientId = "Application's Client id";
+    private string macKey = "macKey value returned after client login";
+    private string kid = "kid value returned after client login";
+
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        // Send network request
+        StartCoroutine(SendRequest());
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
+    }
+
+    IEnumerator SendRequest()
+    {
+        // Construct request URL
+        string requestUrl = $"/account/profile/v1?client_id={clientId}";
+
+        // Generate signature
+        string signature = GetMacTokenSignature(host, requestUrl, "GET", macKey, kid);
+        Debug.Log("Generated Signature: " + signature);
+
+        // Send GET request to server
+        using (var httpClient = new HttpClient())
+        {
+            var uri = new Uri($"https://{host}{requestUrl}");
+            var request = new HttpRequestMessage(HttpMethod.Get, uri);
+            request.Headers.Add("Authorization", signature);
+
+            // Send request and wait for response
+            var response = httpClient.SendAsync(request).Result;
+            var responseBody = response.Content.ReadAsStringAsync().Result;
+
+            // Output server response
+            Debug.Log("Server Response: " + responseBody);
+        }
+
+        yield return null;
+    }
+    string GetMacTokenSignature(string host, string requestUrl, string method, string macKey, string kid)
+    {
+        string macTokenPattern = "MAC id=\"{0}\",ts=\"{1}\",nonce=\"{2}\",mac=\"{3}\"";
+        string timestamp = ((int)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds).ToString();
+        string nonce = GenerateNonce(16);
+        string[] signArray = { timestamp, nonce, method, requestUrl, host, "443", "" };
+        string separator = "\n";
+        string signInput = string.Join(separator, signArray) + separator;
+
+        using (var hmac = new System.Security.Cryptography.HMACSHA1(Encoding.UTF8.GetBytes(macKey)))
+        {
+            byte[] hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(signInput));
+            string macStr = Convert.ToBase64String(hash);
+            return string.Format(macTokenPattern, kid, timestamp, nonce, macStr);
+        }
+    }
+
+    string GenerateNonce(int length)
+    {
+        const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        var random = new System.Random();
+        var nonce = new char[length];
+
+        for (int i = 0; i < length; i++)
+        {
+            nonce[i] = chars[random.Next(chars.Length)];
+        }
+
+        return new string(nonce);
+    }
+}
+
+```
+</Conditional>
+
+<Conditional region='global'>
+
+```cs
+
+using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Text;
+
+public class TapLoginOAuth : MonoBehaviour
+{
+    private string host = "openapi.tap.io";
+    private string clientId = "Application's Client id";
+    private string macKey = "macKey value returned after client login";
+    private string kid = "kid value returned after client login";
+
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        // Send network request
+        StartCoroutine(SendRequest());
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+
+    }
+
+    IEnumerator SendRequest()
+    {
+        // Construct request URL
+        string requestUrl = $"/account/profile/v1?client_id={clientId}";
+
+        // Generate signature
+        string signature = GetMacTokenSignature(host, requestUrl, "GET", macKey, kid);
+        Debug.Log("Generated Signature: " + signature);
+
+        // Send GET request to server
+        using (var httpClient = new HttpClient())
+        {
+            var uri = new Uri($"https://{host}{requestUrl}");
+            var request = new HttpRequestMessage(HttpMethod.Get, uri);
+            request.Headers.Add("Authorization", signature);
+
+            // Send request and wait for response
+            var response = httpClient.SendAsync(request).Result;
+            var responseBody = response.Content.ReadAsStringAsync().Result;
+
+            // Output server response
+            Debug.Log("Server Response: " + responseBody);
+        }
+
+        yield return null;
+    }
+    string GetMacTokenSignature(string host, string requestUrl, string method, string macKey, string kid)
+    {
+        string macTokenPattern = "MAC id=\"{0}\",ts=\"{1}\",nonce=\"{2}\",mac=\"{3}\"";
+        string timestamp = ((int)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalSeconds).ToString();
+        string nonce = GenerateNonce(16);
+        string[] signArray = { timestamp, nonce, method, requestUrl, host, "443", "" };
+        string separator = "\n";
+        string signInput = string.Join(separator, signArray) + separator;
+
+        using (var hmac = new System.Security.Cryptography.HMACSHA1(Encoding.UTF8.GetBytes(macKey)))
+        {
+            byte[] hash = hmac.ComputeHash(Encoding.UTF8.GetBytes(signInput));
+            string macStr = Convert.ToBase64String(hash);
+            return string.Format(macTokenPattern, kid, timestamp, nonce, macStr);
+        }
+    }
+
+    string GenerateNonce(int length)
+    {
+        const string chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        var random = new System.Random();
+        var nonce = new char[length];
+
+        for (int i = 0; i < length; i++)
+        {
+            nonce[i] = chars[random.Next(chars.Length)];
+        }
+
+        return new string(nonce);
+    }
+}
+
+```
+</Conditional>
+
+</details>
+
+<details>
+<summary>Shell Script Request Example</summary>
+
+You can use this script to verify by directly replacing parameters to check if the mac token calculated by your server is correct.
+
+Replace CLIENT_ID with the `Client ID` obtained from the console, and KID and MAC_KEY with the `kid` and `mac_key` obtained after successful client login:
+
+<Conditional region='cn'>
+
+```
+#!/usr/bin/env bash
+
+# Client ID
+CLIENT_ID="Replace with the `Client ID` from the console"
+# kid obtained from SDK
+KID="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJa
+gCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ"
+# mac_key obtained from SDK
+MAC_KEY="mSUQNYUGRBPXyRyW"
+
+# Random string, replace when going live
+NONCE="8IBTHwOdqNKAWeKl7plt8g=="
+# Current timestamp
+TS=$(date +%s)
+
+# Request method
+METHOD="GET"
+# Request URL (with query string)
+REQUEST_URI="/account/profile/v1?client_id=${CLIENT_ID}"
+# Request domain
+REQUEST_HOST="open.tapapis.cn"
+
+MAC=$(printf "%s\n%s\n%s\n%s\n%s\n443\n\n" "${TS}" "${NONCE}" "${METHOD}" "${REQUEST_URI}" "${REQUEST_HOST}" | openssl dgst -binary -sha1 -hmac ${MAC_KEY} | base64)
+
+AUTHORIZATION=$(printf 'MAC id="%s",ts="%s",nonce="%s",mac="%s"' "${KID}" "${TS}" "${NONCE}" "${MAC}")
+
+curl -s -H"Authorization:${AUTHORIZATION}" "https://${REQUEST_HOST}${REQUEST_URI}"
+```
+
+</Conditional>
+
+<Conditional region='global'>
+
+```
+#!/usr/bin/env bash
+
+# Client ID
+CLIENT_ID="Replace with the `Client ID` from the console"
+# kid obtained from SDK
+KID="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJa
+gCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ"
+# mac_key obtained from SDK
+MAC_KEY="mSUQNYUGRBPXyRyW"
+
+# Random string, replace when going live
+NONCE="8IBTHwOdqNKAWeKl7plt8g=="
+# Current timestamp
+TS=$(date +%s)
+
+# Request method
+METHOD="GET"
+# Request URL (with query string)
+REQUEST_URI="/account/profile/v1?client_id=${CLIENT_ID}"
+# Request domain
+REQUEST_HOST="openapi.tap.io"
+
+MAC=$(printf "%s\n%s\n%s\n%s\n%s\n443\n\n" "${TS}" "${NONCE}" "${METHOD}" "${REQUEST_URI}" "${REQUEST_HOST}" | openssl dgst -binary -sha1 -hmac ${MAC_KEY} | base64)
+
+AUTHORIZATION=$(printf 'MAC id="%s",ts="%s",nonce="%s",mac="%s"' "${KID}" "${TS}" "${NONCE}" "${MAC}")
+
+curl -s -H"Authorization:${AUTHORIZATION}" "https://${REQUEST_HOST}${REQUEST_URI}"
+```
+
+</Conditional>
+
+</details>
+
+### Common Interface Error Information
+
+**Unified Format**
+
+| Field              | Type   | Description                                                 |
+| ----------------- | ------ | ------------------------------------------------------------ |
+| code              | int    | Reserved field for future issue tracking                     |
+| error             | string | Error code, used for logic judgment in the code              |
+| error_description | string | Error description, used to help understand and resolve the error during development |
+
+**Error Response**
+
+| Error Code          | Detailed Description                                               |
+| ------------------| ------------------------------------------------------------------- |
+| invalid_request   | The request is missing a required parameter, includes an unsupported parameter or parameter value, or is formatted incorrectly |
+| invalid_time      | The ts time in MAC Token algorithm is invalid, **request server time to reconstruct** |
+| invalid_client    | The client_id parameter is invalid                                  |
+| access_denied     | The authorization server denies the request **This status occurs when requesting user resources with a token, if it appears, the client should exit the local user login information and guide the user to log in again** |
+| forbidden         | The user does not have permission for the current action, **guiding re-authentication will not help, and this request should not be resubmitted** |
+| not_found         | The request failed, the requested resource was not found on the server. **Under the same parameters, the request should not be repeated** |
+| server_error      | An exception occurred on the server **Retry the request after a while, but there should be a retry limit, recommended maximum of 3 times, if it keeps failing, interrupt and inform the user** | 

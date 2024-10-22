@@ -134,6 +134,38 @@ const CONFIGS: {
       { label: "Android", value: "android" },
     ]
   },
+
+  unity_android_ios_v4: {
+      tds: [
+      { label: "Unity", value: "unity" },
+      { label: "Android Java", value: "android_java" },
+      { label: "Android Kotlin", value: "android_kotlin" },
+      { label: "iOS", value: "ios" },
+      ]
+  },
+
+  android_ios_v4: {
+    tds: [
+      { label: "Android Java", value: "android_java" },
+      { label: "Android Kotlin", value: "android_kotlin" },
+      { label: "iOS", value: "ios" },
+    ]
+  },
+
+  unity_android_v4: {
+        tds: [
+        { label: "Unity", value: "unity" },
+        { label: "Android Java", value: "android_java" },
+        { label: "Android Kotlin", value: "android_kotlin" },
+        ]
+  },
+
+  android_v4: {
+        tds: [
+        { label: "Android Java", value: "android_java" },
+        { label: "Android Kotlin", value: "android_kotlin" },
+        ]
+  },
 };
 
 const MultiLang = ({ children, kind = "default" }) => {

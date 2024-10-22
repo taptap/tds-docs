@@ -1,7 +1,7 @@
-const taptapUnity = "3.29.3"
-const taptapIos = "3.29.2"
-const taptapAndroid = "3.29.3"
-const taptapUnreal = "3.29.3"
+const taptapUnity = "3.29.4"
+const taptapIos = "3.29.4"
+const taptapAndroid = "3.29.4"
+const taptapUnreal = "3.29.4"
 
 const v3SDKVersions = {
   taptap: {
@@ -27,8 +27,8 @@ const v3SDKVersions = {
     }
   },
   tapadn: {
-    unity: "3.16.3.31",
-    android: "3.16.3.31",
+    unity: "3.16.3.35",
+    android: "3.16.3.35",
   },
   tapGlobalPayments: {
     unity: "4.0.14",

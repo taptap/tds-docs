@@ -1,0 +1,779 @@
+---
+title: Development Guide
+sidebar_label: Development Guide
+sidebar_position: 1
+---
+
+import MultiLang from '/src/docComponents/MultiLang';
+import { Conditional } from '/src/docComponents/conditional';
+import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
+import v4SDKVersions from '/src/docComponents/v4SDKVersions';
+import CodeBlock from "@theme/CodeBlock";
+
+## Permissions Description
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+</>
+
+<>
+
+This module depends on the following permissions:
+
+| Permission | Purpose | Timing of Permission Request |
+| ---------------------- | ---------------------- | ---------------------- |
+| Network Permission | Used for accessing network data | Permission is requested the first time the user uses this feature |
+
+The module will add the following configuration to the application:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET"/>
+```
+
+</>
+
+<>
+
+This module depends on the following permissions:
+
+| Permission | Purpose | Timing of Permission Request |
+| ---------------------- | ---------------------- | ---------------------- |
+| Network Permission | Used for accessing network data | Permission is requested the first time the user uses this feature |
+
+The module will add the following configuration to the application:
+
+```xml
+<uses-permission android:name="android.permission.INTERNET"/>
+```
+
+</>
+
+<>
+
+
+</>
+</MultiLang>
+
+## Preparing to Integrate the SDK
+
+1. Refer to [Preparation Work](/sdk/access/get-ready/) to create an application, enable application configuration, and bind the API domain name;
+2. Refer to [Quick Start](/sdk/access/get-ready/#configure-signature-certificate) to configure the package name and signature certificate;
+
+## Obtaining the SDK
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+<UnitySDKInstallation
+npmDeps={[
+"com.taptap.sdk.core",
+"com.taptap.sdk.login",
+]}
+githubDeps={[
+{package: "com.taptap.sdk.core", url: `https://github.com/taptap/TapSDKCore-Unity.git#${v4SDKVersions.taptap.unity}`},
+{package: "com.taptap.sdk.login", url: `https://github.com/taptap/TapSDKLogin-Unity.git#${v4SDKVersions.taptap.unity}`}
+]}
+unitypackageModules={[
+{name: "TapTapSDK_Core.unitypackage", desc: "TapTapSDK Core Module, Mandatory"},
+{name: "TapTapSDK_Login.unitypackage", desc: "TapTapSDK Login Module, Mandatory"},
+]}/>
+
+#### iOS Configuration
+
+Create a `TDS-Info.plist` file in the `Assets/Plugins/iOS/Resource` directory, copy the following code, and **replace `ClientId` within it**.
+
+:::tip
+
+When copying the content below, **please remove empty lines and comments** to avoid XML parsing errors, such as `ApplicationException: expected a key node`.
+
+:::
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>taptap</key>
+    <dict>
+        <key>client_id</key>
+        <string>ClientId</string>
+    </dict>
+</dict>
+</plist>
+```
+
+</>
+
+<>
+
+1. Add the repository address to the build.gradle in the root directory of the project:
+
+```groovy
+repositories {
+  google()
+  mavenCentral()
+}
+```
+
+2. Add corresponding dependencies to the app module's build.gradle:
+
+<CodeBlock language="groovy">{
+`dependencies {
+    implementation 'com.taptap.sdk:tap-core:${v4SDKVersions.taptap.android}'
+    implementation 'com.taptap.sdk:tap-kit:${v4SDKVersions.taptap.android}'
+    implementation 'com.taptap.sdk:tap-login:${v4SDKVersions.taptap.android}'
+}`
+}</CodeBlock>
+
+:::tip
+If `targetSdkVersion < 29`, the following configuration is also needed:
+
+- Add `xmlns:tools="http://schemas.android.com/tools"` to the `manifest` node
+- Add `tools:remove="android:requestLegacyExternalStorage"` to the `application` node
+:::
+
+</>
+
+<>
+
+1. Add the repository address to the build.gradle in the root directory of the project:
+
+```groovy
+repositories {
+  google()
+  mavenCentral()
+}
+```
+
+2. Add corresponding dependencies to the app module's build.gradle:
+
+<CodeBlock language="groovy">{
+`dependencies {
+    implementation 'com.taptap.sdk:tap-core:${v4SDKVersions.taptap.android}'
+    implementation 'com.taptap.sdk:tap-kit:${v4SDKVersions.taptap.android}'
+    implementation 'com.taptap.sdk:tap-login:${v4SDKVersions.taptap.android}'
+}`
+}</CodeBlock>
+
+:::tip
+
+If `targetSdkVersion < 29`, the following configuration is also needed:
+
+- Add `xmlns:tools="http://schemas.android.com/tools"` to the `manifest` node
+- Add `tools:remove="android:requestLegacyExternalStorage"` to the `application` node
+:::
+
+</>
+
+<>
+
+### Adding Dependencies
+
+iOS provides two integration methods: adding CocoaPods remote dependencies and using local file imports. It is recommended to use the remote dependency method.
+
+#### Remote Dependencies
+
+1. Add dependencies under the corresponding module in the project's Podfile file:
+
+<CodeBlock>{` pod 'TapTapLoginSDK', '~> ${v4SDKVersions.taptap.ios }'`}</CodeBlock>
+
+2. Execute `pod install` to download the corresponding dependency files
+
+3. Import resource files such as `TapTapLoginSDK/Frameworks/TapTapLoginResource.bundle` from the Pods directory of the project into the project
+
+#### Local File Dependencies
+
+TapTap login depends on the initialization module. When adding dependencies using local files, refer to [TapSDK Integration](/sdk/access/quickstart/#local-file-dependencies) to add the corresponding local file dependencies.
+
+1. Download the following files from the [Download Page](/tap-download):
+
+- `TapTapLoginSDK.xcframework` login dependency library
+- `TapTapLoginResource.bundle` login resource file
+
+2. Add the `framework` static library to the project, ensure the Embed method is set to **Do Not Embed** when adding, and import the `bundle` resource file
+3. The SDK internally uses the [`Kingfisher` dependency library](https://cocoapods.org/pods/Kingfisher). Developers should add the corresponding dependency in advance through remote or file import methods.
+
+### Project Configuration
+
+TapTap client application jump configuration
+
+1. Open `info.plist` and add the following configuration (please replace `clientID` with the Client ID you obtained from the console):
+
+   ![](https://capacity-files.lcfile.com/xLmohBqQCMvHMpvxps7pReT9kI8CjSGj/tap_ios_info.png)
+
+   ```xml
+   <key>CFBundleURLTypes</key>
+   <array>
+       <dict>
+           <key>CFBundleTypeRole</key>
+           <string>Editor</string>
+           <key>CFBundleURLName</key>
+           <string>taptap</string>
+           <key>CFBundleURLSchemes</key>
+           <array>
+               <!-- Note here, the brackets need to be removed, the final form is `tt` prefixed to the Client ID, for example: ttFwFdCxxxxxxxQDQwQN -->
+               <string>tt[clientID]</string>
+           </array>
+       </dict>
+   </array>
+
+   <key>LSApplicationQueriesSchemes</key>
+   <array>
+     <string>tapiosdk</string>
+     <string>tapsdk</string>
+     <string>taptap</string>
+   </array>
+   ```
+
+2. Configure openUrl
+
+   a) If there is a `SceneDelegate.swift` in the project, please delete it first, then add the following code to the `AppDelegate.swift` file:
+
+```swift
+import TapTapLoginSDK
+
+func application(_ app: UIApplication, open url: URL) -> Bool {
+    return TapTapLogin.open(url: url)
+}
+    
+func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+    return TapTapLogin.open(url: url)
+}
+    
+func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
+    return TapTapLogin.open(url: url)
+}
+```
+
+   b) Delete the Application Scene Manifest inside `info.plist`
+
+   ![](/img/tap_ios_appmanifest.png)
+
+   c) Delete the two lifecycle delegate methods managing `Scenedelegate` in the `AppDelegate.swift` file
+
+```swift
+func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
+    
+}
+    
+func application(_ application: UIApplication, didDiscardSceneSessions sceneSessions: Set<UISceneSession>) {
+    
+}
+```
+
+   d) Add `UIWindow` in `AppDelegate.swift`
+
+   ```swift
+   var window: UIWindow?
+   ```
+
+</>
+
+</MultiLang>
+
+## SDK Initialization
+
+<Conditional region='cn'>
+
+:::info
+The game [**Applicable Regions**](/sdk/access/get-ready/#适用地区) is selected when enabling application configuration.
+
+* The applicable region for the [TapTap Developer Center](https://developer.taptap.cn/) is Mainland China.
+
+* For overseas games, please go to the [**TapTap.io Developer Center**](https://developer.taptap.io/) to enable game services, applicable to other countries or regions.
+
+:::
+
+</Conditional>
+
+TapTap login module depends on TapTapSDK initialization, please refer to [TapSDK Integration](/sdk/access/quickstart/#initialization) for details.
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+```cs
+using TapSDK.Core;
+ 
+// Core configuration, detailed parameters see [TapTapSDK]
+TapTapSdkOptions coreOptions = new TapTapSdkOptions();
+// TapSDK Initialization
+TapTapSDK.Init(coreOptions);
+```
+
+</>
+
+<>
+
+Detailed parameters of `TapTapSdkOptions` can be found in [Getting Started Guide#Quick Start](/sdk/access/quickstart/#initialization)
+
+```java
+import com.taptap.sdk.core.TapTapRegion;
+import com.taptap.sdk.core.TapTapSdk;
+import com.taptap.sdk.core.TapTapSdkOptions;
+
+/* Required Configuration */
+// Client ID corresponding to the Developer Center
+String clientId = "";
+// Client Token corresponding to the Developer Center
+String clientToken = "";
+// Whether to enable log, it is recommended to enable it during Debug and disable it during Release, default is to disable log
+boolean enableLog = BuildConfig.DEBUG;
+
+TapTapSdkOptions tapSdkOptions = new TapTapSdkOptions(
+        clientId, // Game Client ID
+        clientToken, // Game Client Token
+        TapTapRegion.CN // Playable region of the game: [TapTapRegion.CN]=Domestic [TapTapRegion.GLOBAL]=Overseas
+);
+tapSdkOptions.setEnableLog(enableLog);
+// Initialize TapSDK
+TapTapSdk.init(context, tapSdkOptions);
+```
+
+</>
+
+<>
+
+Detailed parameters of `TapTapSdkOptions` can be found in [Getting Started Guide#Quick Start](/sdk/access/quickstart/#initialization)
+
+```kotlin
+import com.taptap.sdk.core.TapTapSdk
+import com.taptap.sdk.core.TapTapSdkOptions
+import com.taptap.sdk.core.TapTapRegion
+import com.taptap.sdk.core.TapTapLanguage
+
+TapTapSdk.init(
+  context = context,
+  sdkOptions = TapTapSdkOptions(
+      clientId = clientId,
+      clientToken = clientToken,
+      region = TapTapRegion.CN,
+      preferredLanguage = TapTapLanguage.ZH_HANS,
+      enableLog = false
+  )
+)
+```
+
+</>
+
+<>
+
+
+```swift
+import TapTapCoreSDK
+
+// Core configuration items
+let options = TapTapSdkOptions()
+options.clientId = "your_client_id" // Required, Client ID corresponding to the Developer Center
+options.clientToken = "your_client_token" // Required, Client Token corresponding to the Developer Center
+options.region = .CN // .CN: Mainland China, .overseas: Other countries or regions
+options.enableLog = enableLog.selectedSegmentIndex == 0 // Whether to enable log, it is recommended to enable it during Debug and disable it during Release, default is to disable log
+options.preferredLanguage = TapLanguageType.auto // Language setting, default is to follow the system, when the system language is not supported, it defaults to Chinese domestically and English overseas
+
+// Initialize SDK
+TapTapSDK.initWith(options)
+
+```
+
+</>
+
+</MultiLang>
+
+## Login
+
+:::tip
+When the user starts the game, you can first check the [user's login status](#check-login-status-and-user-information). If the player is already logged in, do not display the login button and allow the player to enter the game directly.
+:::
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+```cs
+using TapSDK.Login;
+using System.Threading.Tasks;
+
+// Define authorization scopes
+List<string> scopes = new List<string>();
+scopes.Add(TapTapLogin.TAP_LOGIN_SCOPE_PUBLIC_PROFILE);
+
+// Initialize login request Task
+Task<TapTapAccount> task = TapTapLogin.Instance.LoginWithScopes(scopes.ToArray());
+var result = await task;
+
+// Check login result
+if (task.IsCompleted)
+{
+	// Login successful
+} 
+else if (task.IsCanceled)
+{
+ 	// Login canceled
+}
+else
+{
+	// Login failed
+	Debug.Log($"Login failed: {task.Exception.Message}");
+}
+```
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.kit.internal.callback.TapTapCallback;
+import com.taptap.sdk.kit.internal.exception.TapTapException;
+import com.taptap.sdk.login.Scopes;
+import com.taptap.sdk.login.TapTapAccount;
+import com.taptap.sdk.login.TapTapLogin;
+import androidx.annotation.NonNull;
+
+// Define authorization scopes
+String[] scopes = new String[]{Scopes.SCOPE_PROFILE, Scopes.SCOPE_BASIC_INFO};
+
+TapTapLogin.loginWithScopes(activity, scopes, new TapTapCallback<TapTapAccount>() {
+    @Override
+    public void onSuccess(TapTapAccount tapTapAccount) {
+        // Login successful
+    }
+
+    @Override
+    public void onFail(@NonNull TapTapException exception) {
+        // Login failed
+    }
+
+    @Override
+    public void onCancel() {
+        // Login canceled
+    }
+});
+
+```
+</>
+
+<>
+
+```kotlin
+import com.taptap.sdk.login.TapTapLogin
+import com.taptap.sdk.kit.internal.callback.TapTapCallback
+import com.taptap.sdk.login.TapTapAccount
+import com.taptap.sdk.login.Scopes
+
+val scopes = mutableSetOf<String>()
+scopes.add(Scopes.SCOPE_PROFILE)
+
+TapTapLogin.loginWithScopes(
+    activity,
+    scopes.toTypedArray(),
+    object : TapTapCallback<TapTapAccount> {
+
+        override fun onSuccess(result: TapTapAccount) {
+            // Success
+        }
+
+        override fun onCancel() {
+            // Canceled
+        }
+
+        override fun onFail(exception: TapTapException) {
+           // Failed
+        }
+    }
+)
+```
+</>
+
+<>
+
+```swift
+import TapTapLoginSDK
+
+// Define authorization scopes
+var scopes: [Scope] = [Scope.publicProfile]
+
+// Initiate Tap login
+TapTapLogin.loginWithScopes(with: scopes) {[weak self] account, error, isCancel in
+    guard let self else { return }
+    if isCancel {
+        // Login canceled
+    } else if let error = error {
+    	 // Login failed
+        NSLog("Tap login failed: \(error.localizedDescription)")
+    } else if let account = account {
+    	 // Login successful
+
+    	 // Login token
+    	 let token = account.accessToken
+    	 // User information
+    	 let userInfo = account.userInfo
+    }
+}
+```
+
+</>
+
+</MultiLang>
+
+### Different Authorization Scopes
+
+The TapTap authorization login interface supports selecting different authorization scopes and supports any combination, but must include either `public_profile` or `basic_info`, otherwise `openid` and `unionid` cannot be obtained. The TapTap authorization login interface can pass an array of String types as parameters, and developers can add different permissions as elements of the array according to their business needs.
+
+<Conditional region='cn'>
+
+| Permission | Description
+|---|---|
+| `public_profile` | Obtain openid, unionid, user nickname, user avatar
+| `user_friends` | Obtain permission to access TapTap friend-related data
+| `basic_info` | Obtain openid and unionid
+
+:::tip
+If the game initiates a TapTap authorization login requesting only the `basic_info` permission, users can enjoy the feature of seamless login, i.e., users do not need to manually confirm authorization to automatically complete the login.
+:::
+
+</Conditional>
+
+<Conditional region='global'>
+
+| Permission | Description
+|---|---|---|
+| `public_profile` | Obtain openid, unionid, user nickname, user avatar
+| `user_friends` | Obtain permission to access TapTap friend-related data
+| `basic_info` | Obtain openid and unionid
+| `email` | Obtain email and emailVerified data
+
+</Conditional>
+
+### Obtaining User Information
+
+After TapTap user login is successful, developers can obtain detailed information about the TapTap authorization result as follows:
+
+The `Profile` class obtained here varies according to the authorization scopes requested by the game.
+
+It may contain the following information:
+
+<Conditional region="global">
+
+  | Parameter      | Description                                                                                                                         |
+  | --------- | ---------------------------------------------------------------------------------------------------------------------------- |
+  | `name`    | The player's nickname on the TapTap platform                                                                                                     |
+  | `avatar`  | The player's avatar URL on the TapTap platform                                                                                                 |
+  | `openid`  | A **unique user identifier** generated through user information and game information, each player's `openid` in each game is different                                   |
+  | `unionid` | A unique user identifier generated through user information and vendor information, `unionid` is the same for a player in all games under the same vendor, different under different vendors |
+  | `email`   | The email used by the user to register on the TapTap platform |
+  | `emailVerified`   | Whether the email used by the user to register on the TapTap platform has been verified |
+
+</Conditional>
+
+<Conditional region="cn">
+
+  | Parameter      | Description                                                                                                                         |
+  | --------- | ---------------------------------------------------------------------------------------------------------------------------- |
+  | `name`    | The player's nickname on the TapTap platform                                                                                                     |
+  | `avatar`  | The player's avatar URL on the TapTap platform                                                                                                 |
+  | `openid`  | A **unique user identifier** generated through user information and game information, each player's `openid` in each game is different                                   |
+  | `unionid` | A unique user identifier generated through user information and vendor information, `unionid` is the same for a player in all games under the same vendor, different under different vendors |
+
+</Conditional>
+
+`openid` and `unionid` are encoded using [standard Base64](https://datatracker.ietf.org/doc/html/rfc4648#section-4) (with Padding) and contain characters `A-Za-z0-9+/=`. The maximum length of `openid` and `unionid` is 50 characters.
+
+:::info
+Since `unionid` is strongly related to the vendor of the game, `unionid` is suitable for scenarios such as: the vendor uses a test server for paid deletion tests, and the official server needs to provide benefits to old players who participated in the tests before. This is because the same player has an unchanged `unionid` in all games under the same vendor.
+A user's `unionid` will change after a game is transferred to another vendor. If a game uses `unionid`, TDS technical support will confirm the relevant data processing plan with the game developer through a ticket before the transfer to ensure that user data is not confused before and after the transfer.
+:::
+
+## Check Login Status and User Information
+
+The login status and user information are stored in local cache, re-logging will reset it, and logging out will clear it.
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+```cs
+using TapSDK.Login;
+
+try {
+    TapTapAccount account = await TapTapLogin.Instance.GetCurrentTapAccount();
+    if (account == null) {
+        // User not logged in
+    } else {
+        // User logged in
+    }
+} catch (Exception e) {
+    Debug.Log($"Failed to obtain user information {e.Message}");
+}
+
+```
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.login.AccessToken;
+import com.taptap.sdk.login.TapTapAccount;
+import com.taptap.sdk.login.TapTapLogin;
+
+TapTapAccount currentTapAccount = TapTapLogin.getCurrentTapAccount();
+
+if (currentTapAccount != null) {
+    // Logged in
+    AccessToken accessToken = currentTapAccount.getAccessToken();
+} else {
+    // Not logged in
+}
+```
+</>
+
+<>
+
+```kotlin
+import com.taptap.sdk.login.TapTapLogin
+import com.taptap.sdk.login.TapTapAccount
+
+// Get user information
+when (TapTapLogin.getCurrentTapAccount() == null) {
+    true -> {
+        // Not logged in
+    }
+
+    else -> {
+        // Logged in
+    }
+}
+```
+</>
+
+<>
+
+```swift
+import TapTapLoginSDK
+
+if let account = TapTapLogin.getCurrentTapAccount() {
+    let token = account.accessToken
+    let profile = account.userInfo
+    if let token, let profile {
+			// User logged in
+       } else {
+         NSLog("Tap account not logged in")
+    }
+} else {
+    NSLog("Tap account not logged in")
+}
+```
+</>
+
+</MultiLang>
+
+## Logout
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+```cs
+using TapSDK.Login;
+
+TapTapLogin.Instance.Logout();
+```
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.login.TapTapLogin;
+
+TapTapLogin.logout();
+```
+
+</>
+
+<>
+
+```kotlin
+import com.taptap.sdk.login.TapTapLogin
+
+TapTapLogin.logout()
+```
+</>
+
+<>
+
+```swift
+import TapTapLoginSDK
+
+TapTapLogin.logout()
+```
+</>
+
+</MultiLang>
+
+## Unity PC Login Configuration
+
+:::tip
+The SDK **supports QR code login by default**, extra configuration is needed for redirecting to browser login, refer to the following sections for details.
+:::
+
+<Conditional region='cn'>
+
+![PC Login](https://capacity-files.lcfile.com/BGyFDAQUNUrw9EuMcx8SyP7pek4BKz5u/taptap-login-pc.png)
+
+</Conditional>
+
+<Conditional region='global'>
+
+![PC Login](https://capacity-files.lcfile.com/GI0d6OOdTq4Xaphumdiayqi16JBgbmMg/taptap-login-pc.png)
+
+</Conditional>
+
+### Windows Platform
+
+To use the browser login feature on Windows, the registry needs to be configured accordingly:
+
+```
+Windows Registry Editor Version 5.00
+
+[HKEY_CLASSES_ROOT\open-taptap-{client_id}]
+@="{Game Name}"
+"URL Protocol"="{Program.exe installation path}}"
+
+[HKEY_CLASSES_ROOT\open-taptap-{client_id}]
+@="{Game Name}"
+
+[HKEY_CLASSES_ROOT\open-taptap-{client_id}]
+
+[HKEY_CLASSES_ROOT\open-taptap-{client_id}\Shell\Open]
+
+[HKEY_CLASSES_ROOT\open-taptap-{client_id}\Shell\Open\Command]
+@="\"{Program.exe installation path}\" \"%1\""
+```
+
+### macOS Platform
+
+On macOS, the SDK will automatically configure `CFBundleURLTypes`.
+
+Please confirm the configuration is correct by following these steps:
+
+- In Unity, open `BuildSetting`, select `PC, Mac & Linux Standalone` Platform, and set `Target Platform` to `macOS`.
+- Check `Create XCode Project` and choose to output the `XCode` project for compilation.
+- Open the output `XCode Project`, select `Target`, click `Info`, expand `URL Types`, and check if the following `URL Scheme` is automatically added: `TapWeb : open-taptap-{clientId}`. If not, add it manually:
+
+```xml
+<key>CFBundleURLTypes</key>
+<array>
+    <dict>
+        <key>CFBundleURLName</key>
+        <string>TapWeb</string>
+        <key>CFBundleURLSchemes</key>
+        <array>
+          <string>open-taptap-{client_id}</string>
+        </array>
+    </dict>
+</array>
+```

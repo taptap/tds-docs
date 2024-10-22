@@ -1,0 +1,988 @@
+---
+title: 成就系统开发指南
+sidebar_label: 开发指南
+sidebar_position: 2
+---
+
+import MultiLang from '/src/docComponents/MultiLang';
+import CodeBlock from '@theme/CodeBlock';
+import v3SDKVersions from '/src/docComponents/v3SDKVersions';
+import Languages from '../_partials/languages.mdx';
+import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
+
+本文介绍如何在游戏中加入成就系统。TDS 推出的成就系统模块，是基于内建账户系统（TDSUser）的，具体请阅读 **[内建账户 > 开发指南](/v3/sdk/authentication/guide/)**。
+
+## 环境要求
+
+<MultiLang kind="ue">
+
+<>
+
+- Unity 2019.4 或更高版本
+- iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
+- Android 5.0（API level 21）或更高版本
+
+</>
+
+<>
+
+Android 5.0（API level 21）或更高版本
+
+</>
+
+<>
+
+iOS 11 或更高版本，Xcode 版本 [14.1 或更高版本](https://developer.apple.com/news/?id=jd9wcyov)
+
+</>
+
+<>
+
+- 安装 UE 4.26 及以上版本
+- iOS 12 或更高版本
+- Android 5.0（API level 21）或更高版本
+- macOS 10.14.0 或更高版本
+- Windows 7 或更高版本
+
+**支持平台**：Android / iOS / Windows / macOS
+
+</>
+
+</MultiLang>
+
+## 权限说明
+
+<MultiLang kind="ue">
+
+<>
+
+</>
+
+<>
+
+该模块需要如下权限：
+
+| 权限 | 使用目的 | 权限申请时机 |
+| ---------------------- | ---------------------- | ---------------------- |
+| 网络权限 | 用于访问网络数据 | 用户首次使用该功能时会申请权限 |
+
+该模块将在应用中添加如下权限：
+
+```
+ <uses-permission android:name="android.permission.INTERNET" />
+```
+
+</>
+
+<>
+
+</>
+
+<>
+
+</>
+</MultiLang>
+
+
+## 集成前准备
+
+1. 参考 [准备工作](/v3/sdk/start/get-ready/) 创建应用、开启成就服务、绑定 API 域名；
+
+## SDK 获取
+
+由于成就服务依赖内建账户，所以集成游戏成就服务所需 SDK 依赖库需要在[内建账户依赖库](/v3/sdk/authentication/guide/#sdk-获取)的基础上，在 [下载页](/tap-download) 获得 TapSDK，另外添加 `TapAchievement` 模块：
+
+<MultiLang kind="ue">
+
+<UnitySDKInstallation 
+npmDeps={[
+    "com.taptap.tds.achievement",
+    "com.taptap.tds.login",
+    "com.taptap.tds.common",
+    "com.taptap.tds.bootstrap",
+]} 
+githubDeps={[
+    {package: "com.taptap.tds.login", url: `https://github.com/TapTap/TapLogin-Unity.git#${v3SDKVersions.taptap.unity}`},
+    {package: "com.taptap.tds.common", url: `https://github.com/TapTap/TapCommon-Unity.git#${v3SDKVersions.taptap.unity}`},
+    {package: "com.taptap.tds.bootstrap", url: `https://github.com/TapTap/TapBootstrap-Unity.git#${v3SDKVersions.taptap.unity}`},
+    {package: "com.taptap.tds.achievement", url: `https://github.com/TapTap/TapAchievement-Unity.git#${v3SDKVersions.taptap.unity}`},
+    {package: "com.leancloud.realtime", url: `https://github.com/leancloud/csharp-sdk-upm.git#realtime-${v3SDKVersions.leancloud.csharp}`},
+    {package: "com.leancloud.storage", url: `https://github.com/leancloud/csharp-sdk-upm.git#storage-${v3SDKVersions.leancloud.csharp}`},
+]}
+unitypackageModules={[
+    {name: "TapTap_Bootstrap.unitypackage", desc: "TapSDK 启动器，必选"},
+    {name: "TapTap_Common.unitypackage", desc: "TapSDK 基础库，必选"},
+    {name: "TapTap_Login.unitypackage", desc: "TapTap 登录库，必选"},
+    {name: "TapTap_Achievement.unitypackage", desc: "TapTap 成就库，必选"},
+]}/>
+
+<CodeBlock className="groovy">
+{`repositories{  
+    flatDir {  
+        dirs 'libs'  
+    }  
+}  
+dependencies {  
+    ... 
+    implementation (name:'TapAchievement_${v3SDKVersions.taptap.android}', ext:'aar') // TapTap 成就系统
+}`}
+</CodeBlock>
+
+<CodeBlock className="objectivec">
+{`// 成就系统
+TapAchievementResource.bundle
+TapAchievementSDK.framework`}
+</CodeBlock>
+
+<>
+<CodeBlock className="cpp">
+{`PublicDependencyModuleNames.AddRange(new string[] {
+  // 添加 TapTap 成就系统
+  "TapAchievement",
+});
+`}
+</CodeBlock>
+</>
+
+</MultiLang>
+
+## SDK 初始化
+
+参考[内建账户](/v3/sdk/authentication/guide/#sdk-初始化)的初始化方法，初始化内建账户服务会同步初始化游戏成就服务；
+
+
+
+## 模块基础设置
+<MultiLang kind="ue">
+
+<>
+
+PC 平台的成就详情界面会显示游戏名称和游戏 Icon。（下图中：左上角图片为应用图标，「人类跌落梦境」为应用名称）
+![img](https://img.tapimg.com/market/images/0bee8d2437aaf06d5f145ff1f37897c5.png)
+
+默认情况下，SDK 会以应用的名字和图标来显示，如果需要*自定义*名字和图标，可以通过以下接口：
+
+```cs
+TapAchievement.SetApplicationName(string applicationName)
+
+TapAchievement.SetApplicationIcon(Texture2D applicationIcon)
+```
+</>
+
+<>
+Android 不需要设置
+</>
+
+<>
+iOS 不需要设置
+</>
+
+<>
+
+UE4 的 SDK 需要设置应用的名称和图标，用于在成就详情页面显示。
+（下图中：左上角图片为应用图标，「人类跌落梦境」为应用名称）
+![成就移动端横屏详情页面](https://img.tapimg.com/market/images/0bee8d2437aaf06d5f145ff1f37897c5.png)
+```cpp
+FTapAchievementsPtr AchievementInterface = FTapAchievementModule::GetAchievementInterface();
+
+FText ProjectName = /** 你的应用名称 */
+UTexture2D* ProjectTexture = /** 你的应用图标 */
+
+AchievementInterface->SetApplicationName(ProjectName);
+AchievementInterface->SetApplicationIcon(ProjectTexture);
+```
+</>
+
+</MultiLang>
+
+## 注册监听回调
+成就 SDK 中包含多个监听回调，分别会在初始化数据成功、初始化数据失败以及成就进度更新时被调用，请特别注意初始化数据成功的回调，这是成就 SDK 正常使用的前提，初始化数据失败时请提示用户或者在合适的时候重新初始化数据。
+
+<MultiLang kind="ue">
+
+<>
+
+**使用前提**
+
+使用 TapTap.Achievement 前提是必须依赖 `TapTap.Bootstrap` 库。
+
+**命名空间**
+
+```cs
+using TapTap.Achievement;
+```
+
+注册监听回调：
+
+```cs
+TapAchievement.RegisterCallback(IAchievementCallback callback);
+
+private class AchievementCallback:IAchievementCallback
+{
+    public void OnAchievementSDKInitSuccess()
+    {
+        // 成就 SDK 初始化成功
+    }
+
+    public void OnAchievementSDKInitFail(TapError errorCode)
+    {
+        if (errorCode != null)
+        {
+            // 初始化失败
+        }
+    }
+
+    public void OnAchievementStatusUpdate(TapAchievementBean bean, TapError errorCode)
+    {
+        if (errorCode != null)
+        {
+            // 成就状态更新失败
+            return;
+        }
+
+        if (bean != null)
+        {
+            // 成就状态更新成功
+        }
+    }
+}
+```
+
+</>
+<>
+
+```java
+TapAchievement.registerCallback(new AchievementCallback() {
+  @Override
+  public void onAchievementSDKInitSuccess() {
+    // 数据加载成功
+  }
+
+  @Override
+  public void onAchievementSDKInitFail(AchievementException exception) {
+    // 数据加载失败，请重试
+  }
+
+  @Override
+  public void onAchievementStatusUpdate(TapAchievementBean item, AchievementException exception) {
+    if (exception != null) {
+      // 成就更新失败
+      return;
+    }
+    if (item != null) {
+      // item 更新成功
+    }
+  }
+});
+```
+
+</>
+<>
+
+
+```objectivec
+[TapAchievement registerCallBack:self];
+
+- (void)onAchievementSDKInitSuccess {
+  // 数据加载成功
+}
+
+// 初始化失败
+- (void)onAchievementSDKInitFail:(nullable NSError *)error {
+    // 数据加载失败，请重试
+}
+
+// 成就状态改变
+- (void)onAchievementStatusUpdate:(nullable TapAchievementModel *)achievement failure:(nullable NSError *)error {
+    if (error) {
+       // 成就更新失败
+    } else {
+      // achievement 更新成功
+    }
+}
+```
+
+</>
+
+<>
+
+
+```cpp
+FTapAchievementsPtr AchievementInterface = FTapAchievementModule::GetAchievementInterface();
+
+AchievementInterface->OnAchievementStatusUpdate.AddLambda([](const FAchievementDescTap* Desc, const FAchievementTap* Achievement, const TSharedPtr<FTUError>& Error)
+	{
+		if (Desc && Achievement)
+		{
+			//成就更新成功
+		}
+		else if(Error)  
+		{
+			//成就更新失败
+		}
+	});
+```
+
+</>
+
+</MultiLang>
+
+## 初始化数据
+由于成就系统会在本地记录用户的成就数据，所以请**在用户登录后初始化数据**。如果用户切换账号时，务必重新调用该接口，不然数据可能会存在账号存储混乱的问题。
+
+这个步骤是异步操作，需要确认收到成功回调时才能进行更多操作。
+
+<MultiLang kind="ue">
+
+```cs
+TapAchievement.InitData();
+```
+
+```java
+TapAchievement.initData();
+```
+
+```objectivec
+[TapAchievement initData];
+```
+
+```cpp
+AchievementInterface->InitData(
+	FSimpleDelegate::CreateWeakLambda(this,[this]()
+	{
+		//初始化数据成功
+		int32 TotalIconNumber = AchievementInterface->AsyncDownloadAllAchievementIcon(FDownloadIconStatus::CreateWeakLambda(this, [this](const FString& DisplayId, int32 LiftNumber)
+		{
+			if (LiftNumber == 0)
+			{
+				//异步加载图标完成
+			}
+		}));
+	}),
+	FTUError::FDelegate::CreateLambda([](const FTUError& Error)
+	{
+		//初始化数据失败
+	}));
+```
+
+</MultiLang>
+
+## 获取全部成就数据
+全部成就数据分为本地数据和服务端数据两种：本地数据是记录在玩家本机的数据，本地数据会在调用初始化数据接口成功后被服务端数据刷新。主动调用服务端数据接口时也会更新本地数据。
+
+如果在游玩过程中有更新服务端数据且需要实时更新的需求时，可以调用获取服务端数据接口来实现，正常情况下直接获取本地数据即可。
+
+<MultiLang kind="ue">
+
+```cs
+// 获取本地数据
+TapAchievement.GetLocalAllAchievementList((list, code) =>
+{
+     if (code != null)
+     {
+        // 获取成就数据失败
+     }
+     else
+     {
+        // 获取成就数据成功
+     });
+}
+// 获取服务器数据
+TapAchievement.FetchAllAchievementList((list, code) =>
+{
+     if (code != null)
+     {
+        // 获取成就数据失败
+     }
+     else
+     {
+        // 获取成就数据成功
+     });
+}
+```
+
+```java
+// 本地数据
+List<TapAchievementBean> allList = TapAchievement.getLocalAllAchievementList();
+
+// 服务端数据
+TapAchievement.fetchAllAchievementList(new GetAchievementListCallBack() {
+  @Override
+  public void onGetAchievementList(List<TapAchievementBean> achievementList, AchievementException exception) {
+    if (exception != null) {
+      switch (exception.errorCode) {
+        case AchievementException.SDK_NOT_INIT:
+          // SDK 还未初始化数据
+          break;
+        default:
+          // 数据获取失败
+      }
+    } else {
+      // 成功获取数据
+    }
+  }
+});
+```
+
+```objectivec
+// 本地数据
+ NSArray<TapAchievementModel *> *allList = [TapAchievement getLocalAllAchievementList];
+
+ // 服务端数据
+ [TapAchievement fetchAllAchievementList:^(NSArray<TapAchievementModel *> *_Nullable result, NSError *_Nullable error) {
+        if (error) {
+            switch (error.code) {
+                case 9001:
+                    // SDK 还未成功初始化
+                    break;
+                default:
+                    // 数据获取失败
+                    break;
+            }
+        } else {
+            // 成功获取数据
+        }
+    }];
+```
+
+```cpp
+// 本地数据
+const TArray<FAchievementDescTap>& Descriptions = AchievementInterface->GetLocalAllAchievementList();
+
+// 服务端数据
+AchievementInterface->FetchAllAchievementList(
+	FTapAchievementDescriptionResult::CreateWeakLambda(this, [this](const TArray<FAchievementDescTap>& Descriptions)
+	{
+		//获取服务端数据成功
+		AchievementInterface->AsyncDownloadAllAchievementIcon(FDownloadIconStatus::CreateWeakLambda(this, [this](const FString& DisplayId, int32 LiftNumber)
+		{
+			if (LiftNumber == 0)
+			{
+				//异步加载图标完成
+			}
+		}));
+	}),
+	FTUError::FDelegate::CreateWeakLambda(this, [this](const FTUError& Error)
+	{
+		//获取服务端数据失败
+	}));
+```
+
+</MultiLang>
+
+## 获取当前用户成就数据
+用户成就数据分为本地数据和服务端数据两种：本地数据是记录在玩家本机的数据，本地数据会在调用初始化数据接口成功后和服务端数据合并（对单个成就来说会以步长更高的数据为准）。主动调用服务端数据接口也会和本地数据进行合并。
+
+对于用户数据，一般以本地数据为准。服务端数据可能存在上报失败等可能导致数据并非实时。
+<MultiLang kind="ue">
+
+```cs
+// 获取本地数据
+TapAchievement.GetLocalUserAchievementList((list, code) =>
+{
+     if (code != null)
+     {
+        // 获取成就数据失败
+     }
+     else
+     {
+        // 获取成就数据成功
+     });
+}
+// 获取服务器数据
+TapAchievement.FetchUserAchievementList((list, code) =>
+{
+     if (code != null)
+     {
+        // 获取成就数据失败
+     }
+     else
+     {
+        // 获取成就数据成功
+     });
+}
+```
+
+```java
+// 本地数据
+List<TapAchievementBean> userList = TapAchievement.getLocalUserAchievementList();
+
+// 服务端数据
+TapAchievement.fetchUserAchievementList(new GetAchievementListCallBack() {
+  @Override
+  public void onGetAchievementList(List<TapAchievementBean> achievementList, AchievementException exception) {
+    if (exception != null) {
+      switch (exception.errorCode) {
+        case AchievementException.SDK_NOT_INIT:
+          // SDK 还未初始化数据
+          break;
+        default:
+          // 数据获取失败
+      }
+    } else {
+      // 成功获取数据
+    }
+  }
+});
+```
+
+```objectivec
+// 本地数据
+ NSArray<TapAchievementModel *> *userList = [TapAchievement getLocalUserAchievementList];
+
+// 服务端数据
+[TapAchievement fetchUserAchievementList:^(NSArray<TapAchievementModel *> *_Nullable result, NSError *_Nullable error) {
+        if (error) {
+            switch (error.code) {
+                case 9001:
+                    // SDK 还未成功初始化
+                    break;
+                default:
+                    // 数据获取失败
+                    break;
+            }
+        } else {
+            // 成功获取数据
+        }
+    }];
+```
+
+```cpp
+// 本地数据
+const TArray<FAchievementTap>& Achievements = AchievementInterface->GetLocalUserAchievementList();
+
+// 服务端数据
+AchievementInterface->FetchUserAchievementList(
+	FTapAchievementProgressResult::CreateWeakLambda(this, [this](const TArray<FAchievementTap>& Achievements)
+	{
+		//获取服务端数据成功
+	}),
+	FTUError::FDelegate::CreateWeakLambda(this, [this](const FTUError& Error)
+	{
+		//获取服务端数据失败
+	}));
+```
+
+</MultiLang>
+
+## 达成某个成就（直接获得）
+
+<MultiLang kind="ue">
+
+```cs
+// displayID 是在开发者中心中添加成就时自行设定的 成就 ID
+TapAchievement.Reach("displayID");
+```
+
+```java
+// displayID 是在开发者中心中添加成就时自行设定的 成就 ID
+TapAchievement.reach("displayID");
+```
+
+```objectivec
+// displayID 是在开发者中心中添加成就时自行设定的 成就 ID
+[TapAchievement reach:@"displayId"];
+```
+
+```cpp
+// DisplayId 是在开发者中心中添加成就时自行设定的 成就 ID
+if (const FTapAchievementsPtr AchievementInterface = FTapAchievementModule::GetAchievementInterface())
+{
+	AchievementInterface->Reach(DisplayId);
+}
+```
+
+</MultiLang>
+
+## 分步成就增长步数
+成就增长步数提供两种方式调用，`growSteps` 中传递当前增量达成的步数（例如：多走了 5 步，则传递 5 即可），`makeSteps` 中传递当前成就已达成的步数（例如：当前已经走了 100 步，则传递 100），调用 `growSteps` 时 SDK 内部会计算当前全量步数。
+
+<MultiLang kind="ue">
+
+```cs
+// displayID 是在开发者中心中添加成就时自行设定的 成就 ID
+TapAchievement.GrowSteps("displayID", step);
+TapAchievement.MakeSteps("displayID", step);
+```
+
+```java
+// displayID 是在开发者中心中添加成就时自行设定的 成就 ID
+TapAchievement.growSteps("displayID", 5);
+TapAchievement.makeSteps("displayID", 100);
+```
+
+```objectivec
+// displayID 是在开发者中心中添加成就时自行设定的 成就 ID
+[TapAchievement growSteps:@"displayID" numSteps:5];
+[TapAchievement makeSteps:@"displayID" numSteps:100];
+```
+
+```cpp
+// DisplayId 是在开发者中心中添加成就时自行设定的 成就 ID
+if (const FTapAchievementsPtr AchievementInterface = FTapAchievementModule::GetAchievementInterface())
+{
+  AchievementInterface->GrowSteps(DisplayId, 5);
+  AchievementInterface->MakeSteps(DisplayId, 100);
+}
+```
+
+</MultiLang>
+
+## 设置冒泡开关
+默认情况下，成就达成时 SDK 会自行展示一个冒泡浮窗提示玩家已达成相应成就。需要关闭请调用如下接口：
+
+<MultiLang kind="ue">
+
+```cs
+TapAchievement.SetShowToast(bool isShow);
+```
+
+```java
+TapAchievement.setShowToast(false);
+```
+
+```objectivec
+[TapAchievement setShowToast:NO];
+```
+
+```cpp
+AchievementInterface->SetShowToast(false);
+```
+
+</MultiLang>
+
+## 打开成就展示页
+SDK 自带一个展示所有成就和已达成成就情况的页面：
+
+<MultiLang kind="ue">
+
+```cs
+TapAchievement.ShowAchievementPage();
+```
+
+```java
+TapAchievement.showAchievementPage();
+```
+
+```objectivec
+[TapAchievement showAchievementPage];
+```
+
+```cpp
+AchievementInterface->ShowAchievementsUI();
+```
+
+</MultiLang>
+
+## 成就相关数据解读
+
+<MultiLang kind="ue">
+
+```cs
+public string displayId;              // 成就 ID 
+public int visible = VisibleFalse;    // 是否是隐藏成就
+public string title;                  // 标题
+public string subTitle;               // 副标题
+public string achieveIcon;            // 图标
+public int step;                      // 设定步数
+public bool fullReached;              // 是否达成
+public int reachedStep;               // 达成步数
+public long reachedTime;              // 达成时间
+public AchievementStats stats;        // 当前成就稀有度指标
+```
+
+```java
+  /*base*/
+  private String displayId;             // 成就 ID
+  private int visible = VISIBLE_TRUE;   // 是否是隐藏成就
+  private String title;                 // 标题
+  private String subTitle;              // 副标题
+  private String achieveIcon;           // 图标
+  private int step;                     // 设定步数
+  private AchievementStats stats;       // 当前成就稀有度指标
+  private int type;                     // 类型，1 为普通成就，99 为白金成就
+  /*user*/
+  private boolean fullReached;          // 是否已达成
+  private int reachedStep;              // 当前达成步数
+  private long reachedTime;             // 当前达成时间
+```
+
+```objectivec
+@property (nonatomic, copy, readonly) NSString *displayId;      // 成就 ID
+@property (nonatomic, copy, readonly) NSString *achieveIcon;    // 成就图片
+@property (nonatomic, copy) NSString *title;                    // 成就名称
+@property (nonatomic, copy, readonly) NSString *subTitle;       // 成就描述
+@property (nonatomic, assign, readonly) NSNumber *step;         // 完成成就总的步数
+@property (nonatomic, strong) TDSAchievementStatus *stats;      // 当前成就稀有度指标
+@property (nonatomic, assign) NSInteger type;                   // 类型，1 为普通成就，99 为白金成就
+
+// 用户数据
+@property (nonatomic, assign) BOOL fullReached;                 // 是否到达成就 
+@property (nonatomic, assign) long reachedTime;                 // 成就达到时间
+@property (nonatomic, assign) NSInteger reachedStep;            // 当前完成步数
+```
+
+```cpp
+FString DisplayId;                            // 成就 ID
+bool bIsHide = false;                         // 是否是隐藏成就
+int32 CountStep = 0;                          // 完成成就总的步数
+FString AchievementTitle;                     // 标题
+FString AchievementSubtitle;                  // 副标题
+FString AchievementIconUrl;                   // 成就图标网络地址
+float Rarity = 0.f;                           // 当前成就稀有度指标
+double RarityD = 0.0;                         // 当前成就稀有度指标 double
+int32 Level = 1;                              // 当前成就稀有度级别(1~4)
+int32 Type = 1;                               // 类型，1 为普通成就，99 为白金成就
+mutable UTexture2D* IconTexture = nullptr;    // 成就图标贴图资源(受引擎内存管理，设置 "IconTexture = nullptr" 引擎定时回收内存，可由 AsyncDownloadAllAchievementIcon 统一异步加载并转化贴图)
+
+// 用户数据
+FString DisplayId;                            // 成就 ID
+FDateTime CompleteTime;                       // 成就达成时间
+int32 CompleteStep = 0;                       // 当前达成步数
+bool bFullCompleted = false;                  // 是否达成成就
+```
+
+</MultiLang>
+
+## 国际化
+
+成就支持设置语言：
+
+:::tip
+初始化数据时只会从服务端更新当前的语言对应的成就数据，如果在初始化后切换语言的话，需要重新调用 `fetchAllAchievementList` 和 `fetchUserAchievementList` 接口来更新成就数据的多语言内容。
+:::
+
+<Languages kind="ue" />
+
+## REST API
+
+下面我们介绍成就相关的 REST API 接口。
+开发者可以自行编写程序或脚本调用这些接口在服务端进行管理性质的操作。
+
+### 请求格式
+
+POST 请求的主体必须是 JSON 格式，而且 HTTP Header 的 Content-Type 需要设置为 `application/json`。
+
+请求的鉴权是通过 HTTP Header 里面包含的键值对来进行的，参数如下表：
+
+Key|Value|含义
+---|----|---
+`X-TDS-Id`|`{{clientId}}`|游戏的 `Client Id`，可在控制台查看
+`X-TDS-Server-Secret`|`{{serverSecret}}`|游戏的 `Server Secret`，可在控制台查看
+
+
+参见文档关于[应用凭证](/v3/sdk/storage/guide/setup-dotnet#应用凭证)的说明。
+
+除了在 `X-TDS-Id` 这个 HTTP Header 中传入 `Client Id` 外，还需要在 URL 中指定 `Client Id`，两者的值需要一致。
+
+获取成就的接口需要在 URL 中指定语言，详见[语言代码列表](#语言代码列表)。
+
+
+异常时返回 500（HTTP 状态码）错误，例如：
+
+```json
+{
+    "code": "500",
+    "msg": "成就服务忙，稍后请求",
+}
+```
+
+### 全部成就列表
+
+获取游戏的全部成就，调用时需在 URL 中指定相应的语言。
+
+```sh
+curl -X GET \
+  -H "X-TDS-Id: {{clientId}}" \
+  -H "X-TDS-Server-Secret: {{serverSecret}}" \
+  https://tds-tapsdk.cn.tapapis.com/achievement/open/v1/clients/{{clientId}}/achievements/languages/<lang>
+```
+
+返回数据结构体：
+
+```json
+{
+  "success": true,
+  "data": {
+    "list": [
+      {
+        "achievement_id": "成就 id",
+        "client_id": "应用 Client Id",
+        "achievement_open_id": "成就外部 id（开发者中心创建成就时自定义的成就 ID，向 SDK 上报成就的唯一标识）",
+        "achievement_type": "成就类型：1-普通成就，99-白金成就",
+        "is_hide": "是否隐藏：0-不隐藏，1-隐藏",
+        "count_step": "成就步数，不分步时是 1",
+        "show_order": "成就顺序，白金成就是 0",
+        "achievement_config_out_dto": {
+          "achievement_config_id": "成就配置 id",
+          "achievement_id": "成就 id",
+          "language_id": "语言 id",
+          "achievement_icon": "成就 icon 链接",
+          "achievement_title": "成就标题",
+          "achievement_sub_title": "成就副标题"
+        },
+        "achievement_rarity": {
+          "rarity": "稀有度比率",
+          "level": "稀有度：1-普通，2-稀有，3-珍贵，4-极为珍贵"
+        }
+      }
+    ]
+  }
+}
+```
+
+### 玩家成就列表
+
+获取某一玩家取得的成就，调用时需在 URL 中指定该玩家对应的 TDS 内建账户的 ObjectId 和语言代码。
+
+```sh
+curl -X GET \
+  -H "X-TDS-Id: {{clientId}}" \
+  -H "X-TDS-Server-Secret: {{serverSecret}}" \
+  https://tds-tapsdk.cn.tapapis.com/achievement/open/v1/clients/{{clientId}}/users/<objectId>/achievements/languages/<lang>
+```
+
+返回数据结构体：
+
+```json
+{
+  "success": true,
+  "data": {
+    "list": [
+      {
+        "achievement_id": "成就 id",
+        "client_id": "游戏 id",
+        "achievement_open_id": "成就外部 id（游戏在 DC 新增成就时绑定的 ID）",
+        "achievement_type": "成就类型：1-普通成就，99-白金成就",
+        "is_hide": "是否隐藏：0-不隐藏，1-隐藏",
+        "count_step": "成就步数，不分步时是 1",
+        "show_order": "成就顺序，白金成就是 0",
+        "achievement_config_out_dto": {
+          "achievement_config_id": "成就配置 id",
+          "achievement_id": "成就 id",
+          "language_id": "语言 id",
+          "achievement_icon": "成就 icon 链接",
+          "achievement_title": "成就标题",
+          "achievement_sub_title": "成就副标题"
+        },
+        "achievement_rarity": {
+          "rarity": "稀有度比率",
+          "level": "稀有度：1-普通，2-稀有，3-珍贵，4-极为珍贵"
+        },
+        "user_achievement_id": "用户成就 id",
+        "complete_time": "完成时间戳（毫秒级）",
+        "completed_step": "完成步数",
+        "full_completed": "是否完全完成，true-是，fasle-否"
+      }
+    ]
+  }
+}
+```
+
+### 提交成就
+
+可以调用这一接口提交单个或多个玩家取得的成就，提交的成就会**追加**到玩家已达成的成就列表。
+
+```sh
+curl -X POST \
+  -H "X-TDS-Id: {{clientId}}" \
+  -H "X-TDS-Server-Secret: {{serverSecret}}" \
+  -H "Content-Type: application/json" \
+  -d '{"data": [{"user_id": <objectId>, "list":
+        [{
+          "achievement_id": "成就 id",
+          "achievement_open_id": "成就外部 id（开发者中心创建成就时自定义的成就 ID，向 SDK 上报成就的唯一标识）",
+          "complete_time": "完成时间戳（毫秒级）",
+          "completed_step": "完成步数"
+        }]
+      }]
+    }' \
+  https://tds-tapsdk.cn.tapapis.com/achievement/open/v1/clients/{{clientId}}/achievements
+```
+
+返回数据结构体：
+
+```json
+{
+  "success": true,
+  "data": {
+    "list": [
+      {
+        "user_id": "ObjectId",
+        "result_list": [
+          {
+            "result": "本条数据上报是否成功，true 成功，false 失败",
+            "code": "成功时，返回 0，失败时，返回对应错误码",
+            "msg": "成功时，无返回，失败时，返回对应错误信息"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### 语言代码列表
+
+使用 ISO 639-1 中定义的双小写字母语言代码（例如，`en` 表示英语，`jp` 表示日语），但：
+
+1. ISO 639-1 中未包括的语言，使用 ISO 632-2 中定义的三小写字母语言代码（例如，`fil` 表示菲律宾语）
+2. 仅使用语言代码无法表示所需语言时，附加 ISO 3166-1 中定义的地区代码（例如，`zh_CN` 表示简体中文）
+
+当前 REST API 支持的语言代码如下：
+
+| 代码 | 语言         |
+| ------- | ----------- |
+| zh_CN    | 简体中文     |
+| zh_TW    | 繁体中文     |
+| en_US    | 英语（美国） |
+| ja_JP    | 日文         |
+| ko_KR    | 韩文         |
+| pt_PT    | 葡萄牙语     |
+| vi_VN    | 越南语       |
+| hi_IN    | 印度语       |
+| id_ID    | 印尼语       |
+| ms_MY    | 马来语       |
+| th_TH    | 泰语         |
+| es_ES    | 西班牙语     |
+| af       | 南非荷兰语   |
+| am       | 阿姆哈拉语   |
+| bg       | 保加利亚语   |
+| ca       | 加泰罗尼亚语 |
+| hr       | 克罗地亚语   |
+| cs       | 捷克语       |
+| da       | 丹麦语       |
+| nl       | 荷兰语       |
+| et       | 爱沙尼亚语   |
+| fil      | 菲律宾语     |
+| fi       | 芬兰语       |
+| fr       | 法语         |
+| de       | 德语         |
+| el       | 希腊语       |
+| he       | 希伯来语     |
+| hu       | 匈牙利语     |
+| is       | 冰岛语       |
+| it       | 意大利语     |
+| lv       | 拉脱维亚语   |
+| lt       | 立陶宛语     |
+| no       | 挪威语       |
+| pl       | 波兰语       |
+| ro       | 罗马尼亚语   |
+| ru       | 俄语         |
+| sr       | 塞尔维亚语   |
+| sk       | 斯洛伐克语   |
+| sl       | 斯洛文尼亚语 |
+| sw       | 斯瓦希里语   |
+| sv       | 瑞典语       |
+| tr       | 土耳其语     |
+| uk       | 乌克兰语     |
+| zu       | 祖鲁语       |
+
+注意，上表中的部分语言虽然 REST API 支持，但[客户端 SDK 并没有支持](#国际化)。
+
+
+## 视频教程
+
+可以参考视频教程：[TapTap 成就功能讲解及接入](https://www.bilibili.com/video/BV1yH4y1z7F7/)，了解如何在 Untiy 项目中接入成就功能。
+
+更多视频教程见[开发者学堂](https://developer.taptap.cn/tds-tutorials/list)。因为 SDK 功能在不断完善，视频教程可能出现与新版 SDK 功能不一致的地方，以当前文档为准。

@@ -47,8 +47,13 @@ const config = {
           lastVersion: "current",
           versions: {
             current: {
-              label: "v3",
+              label: "v4",
             },
+            "v3": {
+              label: "v3",
+              path: 'v3',
+              banner: 'unmaintained',
+            }
           },
         },
         theme: {
@@ -102,6 +107,10 @@ const config = {
             type: "localeDropdown",
             position: "right",
           },
+          {
+            type: "docsVersionDropdown",
+            position: "right",
+        },
         ],
       },
       prism: {
