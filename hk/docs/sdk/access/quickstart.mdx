@@ -1,0 +1,413 @@
+---
+title: TapSDK集成
+sidebar_label: TapSDK 集成
+sidebar_position: 1
+---
+
+import MultiLang from "/src/docComponents/MultiLang";
+import CodeBlock from "@theme/CodeBlock";
+import { Conditional } from "/src/docComponents/conditional";
+import v4SDKVersions from '/src/docComponents/v4SDKVersions';
+import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
+
+本文介绍如何快速接入 TapSDK 。
+
+## 环境要求
+
+<MultiLang kind="unity_android_ios_v4">
+<>
+
+- Unity 2019.4 或更高版本
+- iOS 11 或更高版本，Xcode 版本 15.3 或更高版本
+- Android 5.0（API level 21）或更高版本
+
+</>
+
+<>
+
+- Android 5.0（API level 21）或更高版本
+
+</>
+
+<>
+
+- Android 5.0（API level 21）或更高版本
+
+</>
+<>
+
+- iOS 11 或更高版本，Xcode 版本 15.3 或更高版本
+
+</>
+
+<>
+
+* 安装 UE 4.26 及以上版本
+* iOS 12 或更高版本
+* Android 5.0（API level 21）或更高版本
+
+**支持平台**：Android / iOS
+
+</>
+
+</MultiLang>
+
+
+## 项目配置
+
+<MultiLang kind="unity_android_ios_v4">
+<>
+
+<UnitySDKInstallation
+npmDeps={[
+"com.taptap.sdk.core"
+]}
+githubDeps={[
+{package: "com.taptap.sdk.core", url: `https://github.com/taptap/TapSDKCore-Unity.git#${v4SDKVersions.taptap.unity}`}
+]}
+unitypackageModules={[
+{name: "TapTapSDK_Core.unitypackage", desc: "TapTapSDK 核心模块，必选"},
+]}/>
+
+</>
+
+<>
+
+1. 项目根目录的 build.gradle 添加仓库地址：
+
+<CodeBlock language="groovy">
+{
+`allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}`}
+</CodeBlock>
+
+2. app module 的 build.gradle 添加对应模块依赖（如：登录以及内嵌动态）：
+
+<CodeBlock language="groovy">
+{
+`dependencies {
+    implementation 'com.taptap.sdk:tap-core:${v4SDKVersions.taptap.android}'
+}`
+}
+
+</CodeBlock>
+
+3. 在 `AndroidManifest.xml` 添加网络权限：
+
+<CodeBlock language="xml">
+{
+`<uses-permission android:name="android.permission.INTERNET"></uses-permission>`
+}
+</CodeBlock>
+
+4. 旧版 Android 额外配置
+
+   如果 `targetSdkVersion < 29`，还需要添加如下配置：
+
+   - `manifest` 节点添加 `xmlns:tools="http://schemas.android.com/tools"`
+   - `application` 节点添加 `tools:remove="android:requestLegacyExternalStorage"`
+
+</>
+
+<>
+
+1. 项目根目录的 build.gradle 添加仓库地址：
+
+<CodeBlock language="groovy">
+{
+`allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}`}
+</CodeBlock>
+
+2. app module 的 build.gradle 添加对应模块依赖（如：登录以及内嵌动态）：
+
+<CodeBlock language="groovy">
+{
+`dependencies {
+    implementation 'com.taptap.sdk:tap-core:${v4SDKVersions.taptap.android}'
+}`
+}
+	
+</CodeBlock>
+
+3. 在 `AndroidManifest.xml` 添加网络权限：
+
+<CodeBlock language="xml">
+{
+`<uses-permission android:name="android.permission.INTERNET"></uses-permission>`
+}
+</CodeBlock>
+
+4. 旧版 Android 额外配置
+
+   如果 `targetSdkVersion < 29`，还需要添加如下配置：
+
+    - `manifest` 节点添加 `xmlns:tools="http://schemas.android.com/tools"`
+    - `application` 节点添加 `tools:remove="android:requestLegacyExternalStorage"`
+
+</>
+
+
+<>
+
+#### 导入 SDK
+
+iOS 提供通过添加 cocoaPods 远程依赖和使用本地文件导入两种集成方式，推荐使用远程依赖方式。
+
+##### 远程依赖
+
+1. 在工程 Podfile 文件中对应模块下添加依赖：
+
+<CodeBlock>{` pod 'TapTapCoreSDK', '~> ${v4SDKVersions.taptap.ios }'`}</CodeBlock>
+
+2. 执行 `Pod install` 下载对应依赖文件
+
+##### 本地文件依赖
+
+1. 在[下载页](/tap-download)下载如下文件：
+
+- `tapsdkcorecpp.xcframework` 基础库
+- `TapTapBasicToolsSDK.xcframework` 基础库
+- `TapTapCoreSDK.xcframework` 核心库
+- `TapTapGidSDK.xcframework` 基础库
+- `TapTapNetworkSDK.xcframework` 基础库
+- `THEMISLite.xcframework` 基础库
+
+
+2. 在工程中添加 `framework` 静态库，注意添加时选择 Embed 方式为 **Do Not Embed**
+3. SDK 内部使用了 [`Protobuf` 依赖库](https://cocoapods.org/pods/Protobuf)，开发者应提前通过远程或文件导入方式添加对应依赖。
+
+#### 配置编译选项
+
+- 在 Build Setting 中的 Other Link Flag 中添加 `-ObjC` 和 `-Wl -ld_classic`。
+
+- 在 Build Setting 中的 Always Embed Swift Standard Libraries 设置为 YES，即始终引入 Swift 标准库，避免 App 启动时报错「无法找到 Swift 标准库之类」。如果项目中找不到，可以建立一个空 Swift 文件，Xcode 会自动建立桥接关系。
+
+- 在 Build Setting 中的 Swift Compiler - Language/Swift Language Version 选择 Swift 5。
+
+</>
+
+</MultiLang>
+
+## 初始化
+
+初始化 TapSDK 时需传入 `Client ID`、区域等应用配置信息。
+
+新版 TapSDK 提供统一初始化，业务模块（如：成就 登录等）无需单独初始化。
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+```cs
+using TapSDK.Core;
+
+// 核心配置
+TapTapSdkOptions coreOptions = new TapTapSdkOptions
+{
+   // 客户端 ID，开发者后台获取
+   clientId = clientId,
+   // 客户端令牌，开发者后台获取
+   clientToken = clientToken,
+   // 地区，CN 为国内，Overseas 为海外
+   region = TapTapRegionType.CN,
+   // 语言，默认为 Auto，默认情况下，国内为 zh_Hans，海外为 en
+   preferredLanguage = TapTapLanguageType.zh_Hans,
+   // 是否开启日志，Release 版本请设置为 false
+   enableLog = true
+};
+// TapSDK 初始化
+TapTapSDK.Init(coreOptions);
+
+
+// 当需要添加其他模块的初始化配置项，例如合规认证、成就等， 请使用如下 API
+TapTapSdkBaseOptions[] otherOptions = new TapTapSdkBaseOptions[]
+{
+    // 其他模块配置项
+};
+TapTapSDK.Init(coreOptions, otherOptions);
+
+```
+
+</>
+
+<>
+
+**请确保 TapSDK 的初始化在主线程（UI 线程）中执行。**
+
+```java
+import com.taptap.sdk.core.TapTapRegion;
+import com.taptap.sdk.core.TapTapSdk;
+import com.taptap.sdk.core.TapTapSdkOptions;
+
+/* 必选配置 */
+// 开发者中心对应 Client ID
+String clientId = "";
+// 开发者中心对应 Client Token
+String clientToken = "";
+// 是否开启 log，建议 Debug 开启，Release 关闭，默认关闭 log
+boolean enableLog = BuildConfig.DEBUG;
+
+TapTapSdkOptions tapSdkOptions = new TapTapSdkOptions(
+       clientId, // 游戏 Client ID
+       clientToken, // 游戏 Client Token
+       TapTapRegion.CN // 游戏可玩区域: [TapTapRegion.CN]=国内 [TapTapRegion.GLOBAL]=海外
+);
+tapSdkOptions.setEnableLog(enableLog);
+// 初始化 TapSDK
+TapTapSdk.init(context, tapSdkOptions);
+
+```
+
+</>
+
+<>
+
+**请确保 TapSDK 的初始化在主线程（UI 线程）中执行。**
+
+```kotlin
+TapTapSdk.init(
+    this,
+    TapTapSdkOptions(
+        clientId, // 游戏 Client ID
+        clientToken, // 游戏 Client Token
+        region, // 游戏可玩区域: [TapTapRegion.CN]=国内 [TapTapRegion.GLOBAL]=海外
+        channel, // 分包渠道名称
+        gameVersion, // 游戏版本号
+        autoIAPEventEnabled, // 是否自动上报 GooglePlay 内购支付成功事件 仅 [TapTapRegion.GLOBAL] 生效
+        overrideBuiltInParameters, // 自定义字段是否能覆盖内置字段
+        properties, // 自定义属性，启动首个预置事件（device_login）会带上这些属性
+        oaidCert, // OAID 证书, 用于上报 OAID 仅 [TapTapRegion.CN] 生效
+        enableLog, // 是否开启 log，建议 Debug 开启，Release 关闭，默认关闭 log
+        preferredLanguage, // TapSDK 首选语言 默认为 TapTapLanguage.AUTO
+    ),
+    TapTapAchievementOptions(enableToast = true), // 成就初始化配置
+    TapTapComplianceOptions(showSwitchAccount = true, useAgeRange = true) // 合规认证初始化配置
+)
+```
+
+</>
+<>
+
+```swift
+import TapTapCoreSDK
+
+let options = TapTapSdkOptions()
+options.clientId = "your_client_id" // 必须，开发者中心对应 Client ID
+options.clientToken = "your_client_token" // 必须，开发者中心对应 Client Token
+options.region = .CN // .CN：中国大陆，.overseas：其他国家或地区
+options.enableLog = true // 是否开启 log，建议 Debug 开启，Release 关闭，默认关闭 log
+options.preferredLanguage = TapLanguageType.auto // 语言设置，默认跟随系统，当系统语言不支持时，国内为中文，海外为英文
+
+// 初始化 SDK
+TapTapSDK.initWith(options)
+
+
+// 当需要添加其他模块的初始化配置项，例如合规认证、成就等，可调用如下 API
+var otherOptions:[TapTapSdkBaseOptions] = []
+
+// 添加其他模块初始化配置项
+// otherOptions.append(moduleOptions) moduleOptions 为其他模块初始化配置项
+
+// 初始化 SDK
+TapTapSDK.initWith(options, otherOptions: otherOptions)
+
+```
+
+</>
+</MultiLang>
+
+初始化的时候，**必须填入** `client_id` 以及 `client_token`
+
+- `client_id`、`client_token` 信息可在 **开发者中心 > 你的游戏 > 游戏服务 > 应用配置** 查看。
+
+## 接入功能
+
+TapSDK 提供了众多功能。请在初始化 SDK 后，根据项目需要，参考相应功能的文档，接入相应功能。
+绝大多数游戏都会接入 TapTap 登录，所以我们推荐从这一功能开始。
+
+
+### 配置签名证书
+
+Android 和 iOS 应用需要在 TapTap 开发者中心进入你的游戏，依次选择 **游戏服务 > 应用配置 > 签名证书配置** 配置应用的相关信息（如下图所示），否则 Android
+应用测试登录功能时会返回 `signature not match` 报错信息，iOS 会返回 `sdk_not_matched` 报错信息，无法正常使用 TapTap 登录功能。
+
+Android 签名处填写 MD5 值，详情可参考：[如何获取 MD5 值](/sdk/access/android-md5)。
+
+
+![](https://img.tapimg.com/market/images/1cac0c5e7ef75ef1df4614c947a2db69.png)
+
+
+接下来，就可以打包应用，测试 TapTap 登录功能了。
+
+### Android 代码混淆
+
+TapSDK 已经做了混淆处理，再次混淆会导致不可预期的错误，请在项目的混淆脚本中添加如下配置，跳过对 TapSDK 的混淆操作：
+
+```java
+-keep class com.taptap.**{*;}
+
+-keep class com.tapsdk.**{*;}
+```
+
+## 打包
+
+Android 或 iOS 请按通常的 Android APK 或者 iOS 应用打包流程操作即可。这里介绍一下 Unity 打包流程：
+
+### 打包 APK
+
+第一步，配置 package name 和签名文件：
+
+![](https://capacity-files.lcfile.com/qooIRbr5qtLrnhsP0hWjOSnBYW12eNg6/tap_unity_android_build.png)
+
+第二步，检查 **File > Build Settings > Player Settings > Other Settings > Target API Level** 版本，当 API Level 小于 29 时，需要配置
+manifest，在 `application` 节点添加：
+
+```json
+tools:remove="android:requestLegacyExternalStorage"
+```
+
+这是因为 SDK 内部默认配置了 `android:requestLegacyExternalStorage = true`，当 `targetSdkVersion < 29` 时会报错 `Android resource linking failed`。
+
+### 导出 Xcode 工程
+
+需要配置 icon 和 `BundleID`：
+
+![](https://capacity-files.lcfile.com/Nke4QO6zdEz5mRd2Kwd8R9ydyP8QYaJy/tap_ios_build.png)
+
+## 重打包
+
+### META-INF/services 合并错误导致的初始化失败问题
+
+:::tip
+TapSDK 初始化框架的实现依赖了 [auto-service](https://github.com/google/auto/blob/main/service/README.md) ，
+通过 auto-service 生成 META-INF/services/xxx 文件（服务实现类），然后靠 Java 的 [service loader](https://docs.oracle.com/javase/8/docs/api/java/util/ServiceLoader.html) 去加载
+:::
+
+问题表象往往是**初始化失败**，但**本质原因**是游戏开发者**重打包**的时候，没有正确合并 `META-INF` 文件夹下的文件。
+
+#### 类型一：重打包的时候 exclude 了 META-INF/services/com.taptap.sdk.internal.service.ITapAutoService 文件
+
+这类问题居多，即开发者往往直接不处理 `META-INF/services` 下的所有文件（exclude），导致 SDK 初始化失败。
+
+#### 类型二：合并 META-INF/services/com.taptap.sdk.internal.service.ITapAutoService 错误
+
+即开发者意识到需要处理 `META-INF/services` 下的文件，但在合并的时候出现了错误，导致 `SDK` 初始化失败。
+这类问题往往是因为开发者重打包的时候采取的是 `override`（覆盖）而非 `merge`（合并）策略，
+即遇到多个 aar 里包含同名文件 `META-INF/services/com.taptap.sdk.internal.service.ITapAutoService` 时，只保留了一个，导致 SDK 初始化失败。
+
+错误的合并，如图：
+![](/img/错误的合并.png)
+
+正确的合并，如图：
+![](/img/正确的合并.png)
+
+

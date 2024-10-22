@@ -1,0 +1,2128 @@
+---
+title: Leaderboard Guide
+sidebar_label: Guide
+sidebar_position: 2
+---
+
+import MultiLang from "/src/docComponents/MultiLang";
+import { Conditional } from "/src/docComponents/conditional";
+
+:::info
+
+Before continuing, make sure you have read:
+
+- [Leaderboard Introduction](/v3/sdk/leaderboard/features/). It introduces the core concepts and functions of Leaderboard.
+- [TDS Authentication Guide](/v3/sdk/authentication/guide/). There are three types of members: user, object, and entity. Here “user” refers to the users in the built-in account system. Besides, the `currentUser` mentioned later in this page refers to the currently logged-in user.
+
+:::
+
+## Installing and Setting up SDK
+
+Leaderboard comes as a part of the Data Storage SDK. Check the following pages if you haven’t set up the Data Storage SDK.
+
+- [Installing .NET SDK](/v3/sdk/storage/guide/setup-dotnet)
+- [Installing Java SDK](/v3/sdk/storage/guide/setup-java)
+- [Installing Objective-C SDK](/v3/sdk/storage/guide/setup-objc)
+
+## Quick Start
+
+### Creating Leaderboards
+
+There are 3 ways to create a leaderboard:
+
+- Go to the Developer Center’s [dashboard](#dashboard).
+- [Access the REST API](#creating-leaderboards-2) under **trusted environments like the server side**.
+- [Access the management interface of the SDK](#creating-leaderboards-1) under **trusted environments like the server side**.
+
+For example, you can create a leaderboard named `world` with “built-in account system” as the type of members, `descending` as the order, `better` as the update strategy, and “every month” as the reset interval.
+
+![create leaderboard](https://capacity-files.lcfile.com/0UqoMYAOerNgQLfyHiBFxhrULm8kjCPO/io-create_leaderboard.png)
+
+### Submitting Scores
+
+If the player is logged in (accessible with `currentUser`), you can update their score with the following code:
+
+<MultiLang>
+
+```cs
+var statistic = new Dictionary<string, double>();
+statistic["world"] = 20.0;
+await LCLeaderboard.UpdateStatistics(currentUser, statistic);
+```
+
+```java
+Map<String, Double> statistic  = new HashMap<>();
+statistic.put("world", 20.0);
+LCLeaderboard.updateStatistic(currentUser, statistic).subscribe(new Observer<LCStatisticResult>() {
+  @Override
+  public void onSubscribe(@NotNull Disposable disposable) {}
+
+  @Override
+  public void onNext(@NotNull LCStatisticResult jsonObject) {
+      // scores saved
+  }
+
+  @Override
+  public void onError(@NotNull Throwable throwable) {
+      // handle error
+  }
+
+  @Override
+  public void onComplete() {}
+});
+```
+
+```objc
+NSDictionary *statistic = @{
+  @"world" : 20.0,
+};
+[LCLeaderboard updateCurrentUserStatistics:statistic, callback:^(NSArray *statistics, NSError *error) {
+  if (statistics) {
+    // statistics is the best or latest score after the update
+  } else if (error) {
+    // Handle error
+  }
+}];
+```
+
+</MultiLang>
+
+### Getting Results
+
+The code below retrieves the top 10 players from the leaderboard. Since we’ve only submitted one player’s score so far, the leaderboard will only have this one score.
+
+<MultiLang>
+
+```cs
+var leaderboard = LCLeaderboard.CreateWithoutData("world");
+var rankings = await leaderboard.GetResults(limit: 10);
+```
+
+```java
+LCLeaderboard leaderboard = LCLeaderboard.createWithoutData("world");
+leaderboard.getResults(0, 10, null, null).subscribe(new Observer<LCLeaderboardResult>() {
+    @Override
+    public void onSubscribe(@NotNull Disposable disposable) {}
+
+    @Override
+    public void onNext(@NotNull LCLeaderboardResult leaderboardResult) {
+      List<LCRanking> rankings = leaderboardResult.getResults();
+      // process rankings
+    }
+
+    @Override
+    public void onError(@NotNull Throwable throwable) {
+      // handle error
+    }
+
+    @Override
+    public void onComplete() {}
+});
+```
+
+```objc
+LCLeaderboard leaderboard = [[LCLeaderboard alloc] initWithStatisticName:@"world"];
+leaderboard.limit = 10;
+[leaderboard getUserResultsWithOption:nil, callback:^(NSArray *rankings, NSInteger count, NSError *error) {
+  // rankings contains the top 10 players’ data
+}];
+```
+
+</MultiLang>
+
+We’ve just introduced the most basic usage of Leaderboard. Now let’s look at all the interfaces provided by Leaderboard.
+
+## Managing Scores
+
+### Updating the Current Player’s Scores
+
+Once a player finishes a game, you can use the `updateStatistic` method provided by the client SDK to update this player’s score.
+However, **to effectively prevent cheating from happening, we suggest that you enable “Only Master Key is allowed to update the score” on the dashboard and update scores on the server side only.**
+
+<MultiLang>
+
+```cs
+var statistic = new Dictionary<string, double> {
+    { "score", 3458.0 },
+    { "kills", 28.0 }
+};
+await LCLeaderboard.UpdateStatistics(currentUser, statistic);
+```
+
+```java
+Map<String, Double> statistic  = new HashMap<>();
+statistic.put("score", 3458.0);
+statistic.put("kills", 28.0);
+LCLeaderboard.updateStatistic(currentUser, statistic).subscribe(new Observer<LCStatisticResult>() {
+  @Override
+  public void onSubscribe(@NotNull Disposable disposable) {}
+
+  @Override
+  public void onNext(@NotNull LCStatisticResult jsonObject) {
+      // saved
+  }
+
+  @Override
+  public void onError(@NotNull Throwable throwable) {
+      // handle error
+  }
+
+  @Override
+  public void onComplete() {}
+});
+```
+
+```objc
+NSDictionary *statistic = @{
+  @"score" : 3458.0,
+  @"kills" : 28.0,
+};
+[LCLeaderboard updateCurrentUserStatistics:statistic, callback:^(NSArray *statistics, NSError *error) {
+  if (!error) {
+    // saved
+  }
+}];
+```
+
+</MultiLang>
+
+Updating a player’s score requires this player to be logged in. A player can only update their own scores.
+You can update multiple leaderboards at once. The example above updates the scores in both `score` and `kills`.
+
+You cannot update an object or entity’s scores with the client SDK.
+To update other players’, an object’s, or an entity’s scores, you have to use the [REST API](#updating-scores) or the [management interface provided by the SDK](#updating-leaderboard-members-scores).
+
+### Deleting the Current Player’s Scores
+
+A player can delete their own scores:
+
+<MultiLang>
+
+```cs
+await LCLeaderboard.DeleteStatistics(currentUser, new List<string> { "world" });
+```
+
+```java
+// Not supported yet
+```
+
+```objc
+[LCLeaderboard deleteCurrentUserStatistics:@[@"world"], callback:^(BOOL succeeded, NSError * _Nullable error) {
+  if (succeeded) {
+    // Score deleted
+  } else if (error) {
+    // Handle error
+  }
+}];
+```
+
+</MultiLang>
+
+Same as updating scores, a player can only delete their own scores.
+To delete other players’, an object’s, or an entity’s scores, you have to use the [REST API](#deleting-scores) or the [management interface provided by the SDK](#deleting-leaderboard-members-scores).
+
+### Getting Leaderboard Members’ Scores
+
+A **logged-in player** can retrieve the scores of other players in all leaderboards with `GetStatistics`:
+
+<MultiLang>
+
+```cs
+var otherUser = LCObject.CreateWithoutData(TDSUser.CLASS_NAME, "5c76107144d90400536fc88b");
+var statistics = await LCLeaderboard.GetStatistics(otherUser);
+foreach(var statistic in statistics) {
+  Debug.Log(statistic.Name);
+  Debug.Log(statistic.Value);
+}
+```
+
+```java
+// Retrieve leaderboard members’ scores
+LCUser otherUser = null;
+try {
+    otherUser = LCUser.createWithoutData(LCUser.class, "5c76107144d90400536fc88b");
+} catch (LCException e) {
+    e.printStackTrace();
+}
+LCLeaderboard.getUserStatistics(otherUser).subscribe(new Observer<LCStatisticResult>() {
+    @Override
+    public void onSubscribe(@NotNull Disposable disposable) {}
+
+    @Override
+    public void onNext(@NotNull LCStatisticResult lcStatisticResult) {
+        List<LCStatistic> statistics = lcStatisticResult.getResults();
+        for (LCStatistic statistic : statistics) {
+            Log.d(TAG, statistic.getName());
+            Log.d(TAG, String.valueOf(statistic.getValue()));
+        }
+    }
+
+    @Override
+    public void onError(@NotNull Throwable throwable) {
+        // handle error
+        Toast.makeText(MainActivity.this, "Failed: " + throwable.getMessage(), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onComplete() {}
+});
+```
+
+```objc
+NSString *otherUserObjectId = @"5c76107144d90400536fc88b";
+[LCLeaderboard getStatisticsWithUserId:otherUserObjectId, statisticNames:nil, callback:^(NSArray<LCLeaderboardStatistic *> * _Nullable *statistics, NSError _Nullable *error) {
+  if (statistics) {
+    for (LCLeaderboardStatistic *statistic in statistics) {
+      NSLog(@"Leaderboard name: %@", statistic.name);
+      NSLog(@"Scores: %f", statistic.value);
+    }
+  } else if (error) {
+        // Handle error
+  }
+}];
+```
+
+</MultiLang>
+
+In most cases, you may only need to retrieve the scores of a user from specific leaderboards.
+To do so, provide the names of the leaderboards when querying:
+
+<MultiLang>
+
+```cs
+var statistics = await LCLeaderboard.GetStatistics(otherUser, new List<string> { "world" });
+```
+
+```java
+LCLeaderboard.getUserStatistics(otherUser, Arrays.asList("world")).subscribe(/** Other logic **/);
+```
+
+```objc
+[LCLeaderboard getStatisticsWithUserId:otherUserObjectId, statisticNames:@[@"world"], callback:^(NSArray<LCLeaderboardStatistic *> * _Nullable statistics, NSError * _Nullable error) {
+  // Other logic
+}];
+```
+
+</MultiLang>
+
+Similarly, you can retrieve scores from leaderboards with member types being object or entity.
+
+<MultiLang>
+<>
+
+For example, if the weapon leaderboard has its member type to be object:
+
+```cs
+var excalibur = LCObject.createWithoutData("Weapon", "582570f38ac247004f39c24b");
+var statistics = await LCLeaderboard.GetStatistics(excalibur, new List<string> { "weapons" });
+```
+
+If the weapon leaderboard has its member type to be entity:
+
+```cs
+var statistics = await LCLeaderboard.GetStatistics("excalibur", new List<string> { "weapons" });
+```
+
+</>
+<>
+
+For example, if the weapon leaderboard has its member type to be object:
+
+```java
+String excaliburObjectId = "582570f38ac247004f39c24b";
+LCLeaderboard.getMemberStatistics("Weapon", excaliburObjectId,
+  Arrays.asList("weapons")).subscribe(/** Other logic **/);
+```
+
+If the weapon leaderboard has its member type to be entity:
+
+```java
+LCLeaderboard.getMemberStatistics(LCLeaderboard.MEMBER_TYPE_ENTITY, "excalibur",
+  Arrays.asList("weapons")).subscribe(/** Other logic **/);
+```
+
+The `getUserStatistics` method mentioned earlier:
+
+```java
+LCLeaderboard.getUserStatistics(otherUser, Arrays.asList("weapons")).subscribe(/** Other logic **/);
+```
+
+Is equivalent to:
+
+```java
+LCLeaderboard.getMemberStatistics(LCLeaderboard.LCLeaderboard.MEMBER_TYPE_USER,
+  otherUser.getObjectId(),
+  Arrays.asList("weapons")).subscribe(/** Other logic **/);
+```
+
+</>
+<>
+
+For example, if the weapon leaderboard has its member type to be object:
+
+```objc
+NSString *excaliburObjectId = @"582570f38ac247004f39c24b";
+[LCLeaderboard getStatisticsWithObjectId:excaliburObjectId, statisticNames:@[@"weapons"],
+  option:nil
+  callback:^(NSArray *statistics, NSError *error) {
+  // Other logic
+}];
+```
+
+If the weapon leaderboard has its member type to be entity:
+
+```objc
+[LCLeaderboard getStatisticsWithEntity:@"excalibur", statisticNames:@[@"weapons"],
+  callback:^(NSArray<LCLeaderboardStatistic *> * _Nullable *statistics, NSError * _Nullable error) {
+  // Other logic
+}];
+```
+
+</>
+</MultiLang>
+
+You can also retrieve the scores of a group of members:
+
+<MultiLang>
+
+```cs
+var otherUser = LCObject.CreateWithoutData(TDSUser.CLASS_NAME, "5c76107144d90400536fc88b");
+var anotherUser = LCObject.CreateWithoutData(TDSUser.CLASS_NAME, "672a127144a90d00536f3456");
+var statistics = await LCLeaderboard.GetStatistics({otherUser, anotherUser}, new List<string> { "world" });
+
+var oneObject = LCObject.CreateWithoutData<LCObject>("abccb27133a90ddd536ffffa");
+var anotherUser = LCObject.CreateWithoutData<LCObject>("672a1279345777005a2b2444");
+var statistics = await LCLeaderboard.GetStatistics({oneObject, anotherObject}, new List<string> { "weapons" });
+
+var statistics = await LCLeaderboard.GetStatistics({"Sylgr", "Leiptr"}, new List<string> { "rivers" });
+```
+
+```java
+// Not supported yet
+```
+
+```objc
+NSString *otherUserObjectId = @"5c76107144d90400536fc88b";
+NSString *anotherUserObjectId = @"672a127144a90d00536f3456";
+[leaderboard getStatisticsWithUserIds:@[otherUserObjectId, anotherUserObjectId]
+  callback:^(NSArray<LCLeaderboardStatistic *> * _Nullable statistics, NSError * _Nullable error) {
+// Other logic
+}];
+
+NSString *oneObjectId = @"abccb27133a90ddd536ffffa";
+NSString *anotherObjectId = @"672a1279345777005a2b2444";
+[leaderboard getStatisticsWithObjectIds:@[oneObjectId, anotherObjectId]
+  option:nil
+  callback:^(NSArray<LCLeaderboardStatistic *> * _Nullable statistics, NSError * _Nullable error) {
+// Other logic
+}];
+
+[leaderboard getStatisticsWithEntities:@[@"Sylgr", "Leiptr"]
+  callback:^(NSArray<LCLeaderboardStatistic *> * _Nullable statistics, NSError * _Nullable error) {
+// Other logic
+}];
+```
+
+</MultiLang>
+
+## Getting Leaderboard Results
+
+You can get the result of a leaderboard with the `Leaderboard#getResults` method.
+The most common use case of it is to get the scores of the top players or to get the players with similar rankings as the current player.
+
+Let’s first construct a leaderboard instance:
+
+<MultiLang>
+
+<>
+
+```cs
+var leaderboard = LCLeaderboard.CreateWithoutData("world");
+```
+
+`LCLeaderboard.CreateWithoutData` accepts two arguments:
+
+```cs
+public static LCLeaderboard CreateWithoutData(string statisticName, string memberType = LCLeaderboard.USER_MEMBER_TYPE)
+```
+
+- `statisticName` is the name of an existing leaderboard. It’s set to be `world` in the example above.
+- `memberType` is the type of members: `LCLeaderboard.USER_MEMBER_TYPE` for user and `LCLeaderboard.ENTITY_MEMBER_TYPE` for entity. For object, provide the corresponding class name. The example above omitted this argument, which means to default to user.
+
+</>
+<>
+
+```java
+LCLeaderboard leaderboard = LCLeaderboard.createWithoutData("world");
+```
+
+`LCLeaderboard.createWithoutData` accepts two arguments:
+
+```java
+public static LCLeaderboard createWithoutData(String name, String memberType)
+```
+
+- `name` is the name of an existing leaderboard. It’s set to be `world` in the example above.
+- `memberType` is the type of members: `LCLeaderboard.MEMBER_TYPE_USER` for user and `LCLeaderboard.MEMBER_TYPE_ENTITY` for entity. For object, provide the corresponding class name. Since user is the most common type, `createWithoutData` provides an overload method with a single argument. The example above only passes the name of the leaderboard to the function, which indicates that the type is user.
+
+</>
+<>
+
+```objc
+LCLeaderboard leaderboard = [[LCLeaderboard alloc] initWithStatisticName:@"world"];
+```
+
+</>
+
+</MultiLang>
+
+After the leaderboard instance is constructed, you can call the corresponding methods on the instance to get the rankings.
+
+### Getting Rankings Within a Scope
+
+To get the top 10 on the leaderboard:
+
+<MultiLang>
+
+<>
+
+```cs
+var rankings = await leaderboard.GetResults(limit: 10);
+```
+
+`GetResults` accepts the following arguments for specifying constraints:
+
+|        Name         |    Type    | Description                                                                                                                                     |
+| :-----------------: | :--------: | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+|    `aroundUser`     |  `LCUser`  | Get the players with similar rankings as a given player. See the next section for more information.                                             |
+|   `aroundObject`    | `LCObject` | Get the objects with similar rankings as a given object. See the next section for more information.                                             |
+|   `aroundEntity`    |  `string`  | Get the entities with similar rankings as a given entity. See the next section for more information.                                            |
+|       `limit`       |  `number`  | Limit the number of results. Defaults to 10.                                                                                                    |
+|       `skip`        |  `number`  | Set the offset. Can be used with `limit` to implement pagination. Defaults to 10.                                                               |
+|    `selectKeys`     | `string[]` | Specify the properties that need to be included with the `user`s from the returned `Ranking`s. Continue reading for more information.           |
+|    `includeKeys`    | `string[]` | Specify the `Pointer` properties that need to be included with the `user`s from the returned `Ranking`s. Continue reading for more information. |
+| `includeStatistics` | `string[]` | Specify the scores in other leaderboards that need to be included in the `Ranking`s. Continue reading for more information.                     |
+|      `version`      |  `number`  | Specify the version of the leaderboard.                                                                                                         |
+
+The returned result is an array (`Ranking[]`) with each `Ranking` holding the following properties:
+
+|         Name         |       Type        | Description                                             |
+| :------------------: | :---------------: | ------------------------------------------------------- |
+|        `Rank`        |       `int`       | The ranking. Starts with 0.                             |
+|        `User`        |     `LCUser`      | The user who got the score (for user leaderboards).     |
+|       `Object`       |    `LCObject`     | The object who got the score (for object leaderboards). |
+|       `Entity`       |     `string`      | The entity who got the score (for entity leaderboards). |
+|       `Value`        |     `double`      | The score.                                              |
+| `IncludedStatistics` | `List<Statistic>` | The member’s scores in other leaderboards.              |
+
+</>
+<>
+
+```java
+leaderboard.getResults(0, 10, null, null).subscribe(new Observer<LCLeaderboardResult>() {
+    @Override
+    public void onSubscribe(@NotNull Disposable disposable) {}
+
+    @Override
+    public void onNext(@NotNull LCLeaderboardResult leaderboardResult) {
+      List<LCRanking> rankings = leaderboardResult.getResults();
+    }
+
+    @Override
+    public void onError(@NotNull Throwable throwable) {
+      // handle error
+    }
+
+    @Override
+    public void onComplete() {}
+});
+```
+
+`Leaderboard#getResults` accepts the following arguments for specifying constraints:
+
+```java
+Observable<LCLeaderboardResult> getResults(
+  int skip, int limit,
+  List<String> selectMemberKeys, List<String> includeStatistics)
+```
+
+- `skip` Set the offset. Can be used with `limit` to implement pagination. Defaults to 10.
+- `limit` Limit the number of results. Defaults to 20.
+- `selectMemberKeys` Specify the properties that need to be included with the `user`s from the returned `LCRanking`s. Continue reading for more information.
+- `includeStatistics` Specify the scores in other leaderboards that need to be included in the `LCRanking`s. Continue reading for more information.
+
+By providing a version number, you can retrieve data from a previous version of the leaderboard:
+
+```java
+int previousVersion = currentVersion - 1;
+leaderboard.setVersion(previousVersion);
+```
+
+`LCRanking` provides the following methods for getting members’ information:
+
+```java
+// The ranking; starts with 0
+int getRank()
+// The user who got the score (for user leaderboards)
+LCUser getUser()
+// The object who got the score (for object leaderboards)
+LCObject getObject()
+// The entity who got the score (for entity leaderboards)
+String getEntityId()
+// The score
+double getStatisticValue()
+// The member’s scores in other leaderboards
+List<LCStatistic> getIncludedStatistics()
+```
+
+</>
+<>
+
+```objc
+leaderboard.limit = 10;
+[leaderboard getUserResultsWithOption:nil,
+  callback:^(NSArray <LCLeaderboardRanking *> * _Nullable *rankings, NSInteger count, NSError * _Nullable error) {
+  // rankings contains the data of the top 10 members in the leaderboard
+}];
+```
+
+Leaderboard accepts the following properties for specifying constraints:
+
+```objc
+/// Set the offset; can be used with `limit` to implement pagination; defaults to 10.
+@property (nonatomic) NSInteger skip;
+/// Limit the number of results; defaults to 20.
+@property (nonatomic) NSInteger limit;
+/// Specify the scores in other leaderboards that need to be included in the `LCLeaderboardRanking`s
+@property (nonatomic, nullable) NSArray<NSString *> *includeStatistics;
+/// Specify the version of the leaderboard; defaults to 0
+@property (nonatomic) NSInteger version;
+```
+
+The first option of `getUserResultsWithOption` is `LCLeaderboardQueryOption`, in which you can specify the properties you want the members of the returned `LCLeaderboardRanking` to include. Continue reading for more information.
+
+The `rankings` in the callback is an `LCLeaderboardRanking` array.
+`LCLeaderboardRanking` contains the following properties:
+
+```objc
+// The name of the leaderboard
+@property (nonatomic, readonly, nullable) NSString *statisticName;
+/// The ranking; starts with 0
+@property (nonatomic, readonly) NSInteger rank;
+/// The score
+@property (nonatomic, readonly) double value;
+/// The member’s scores in other leaderboards
+@property (nonatomic, readonly, nullable) NSArray<LCLeaderboardStatistic *> *includedStatistics;
+/// The user who got the score (for user leaderboards)
+@property (nonatomic, readonly, nullable) LCUser *user;
+/// The object who got the score (for object leaderboards)
+@property (nonatomic, readonly, nullable) LCObject *object;
+/// The entity who got the score (for entity leaderboards)
+@property (nonatomic, readonly, nullable) NSString *entity;
+```
+
+Since the `getUserResultsWithOption` method is called in the previous example, the `user` property is not empty and the `object` and `entity` properties are empty.
+
+For an object or entity leaderboard, the `getObjectResultsWithOption` and `getEntityResultsWithCallback` methods need to be called correspondingly.
+The option for `getObjectResultsWithOption` is the same as that for `getUserResultsWithOption`.
+Since the members of entity leaderboards are strings, `getEntityResultsWithCallback` doesn’t support `LCLeaderboardQueryOption` and its first option is the callback. The callback has the same options as `getUserResultsWithOption` and `getObjectResultsWithOption`:
+
+```objc
+- (void)getEntityResultsWithCallback:(void (^)(NSArray<LCLeaderboardRanking *> * _Nullable rankings, NSInteger count, NSError * _Nullable error))callback;
+```
+
+</>
+
+</MultiLang>
+
+By default, the `user`s in the results are `LCUser` `Pointer`s.
+To include the usernames or other properties (in the `_User` class) of the users so that they can be displayed like the table below, specify them with `selectKeys`.
+
+| Ranking | Username | Score↓ |
+| :-----: | -------- | :----: |
+|    0    | Genji    |  3458  |
+|    1    | Lúcio    |  3252  |
+|    2    | D.Va     |  3140  |
+
+<MultiLang>
+
+```cs
+var rankings = await leaderboard.GetResults(limit: 10,
+  selectKeys: new List<string> { "username" });
+```
+
+```java
+List<String> selectKeys = new ArrayList<>();
+selectKeys.add("username");
+leaderboard.getResults(0, 10, selectKeys, null).subscribe(/* Other logic */);
+```
+
+```objc
+leaderboard.limit = 10;
+LCLeaderboardQueryOption *option = [[LCLeaderboardQueryOption alloc] init];
+option.selectKeys = @[@"username"];
+[leaderboard getUserResultsWithOption:option,
+  callback:^(NSArray<LCLeaderboardRanking *> * _Nullable rankings, NSInteger count, NSError * _Nullable error) {
+  // Other logic
+}];
+```
+
+</MultiLang>
+
+To include the players’ scores in other leaderboards, use `includeStatistics`.
+For example, to include the kills when retrieving the leaderboard for scores:
+
+| Ranking | Username | Score↓ | Kills |
+| :-----: | -------- | :----: | :---: |
+|    0    | Genji    |  3458  |  28   |
+|    1    | Lúcio    |  3252  |   2   |
+|    2    | D.Va     |  3140  |  31   |
+
+<MultiLang>
+
+```cs
+var rankings = await leaderboard.GetResults(limit: 10, selectKeys: new List<string> { "username" }
+  includeStatistics: new List<string> { "kills" });
+```
+
+```java
+List<String> selectKeys = new ArrayList<>();
+selectKeys.add("username");
+List<String> includeStatistics = new ArrayList<>();
+includeStatistics.add("kills");
+leaderboard.getResults(0, 10, selectKeys, includeStatistics).subscribe(/* Other logic */);
+```
+
+```objc
+leaderboard.limit = 10;
+leaderboard.includeStatistics = @[@"kills"];
+LCLeaderboardQueryOption *option = [[LCLeaderboardQueryOption alloc] init];
+option.selectKeys = @[@"username"];
+[leaderboard getUserResultsWithOption:option,
+  callback:^(NSArray<LCLeaderboardRanking *> * _Nullable rankings, NSInteger count, NSError * _Nullable error) {
+  // Other logic
+}];
+```
+
+</MultiLang>
+
+If a `Pointer` or file property is included using `selectKeys`, you will only get the `Pointer`s themselves.
+To include the objects referenced by the `Pointer`s, you need to use `includeKeys` as well.
+For example, assuming `club` is a `Club` `Pointer`:
+
+<MultiLang>
+
+```cs
+var leaderboard = LCLeaderboard.CreateWithoutData("weapons", "Weapon");
+var rankings = await leaderboard.GetResults(limit: 10,
+  selectKeys: new List<string> { "name", "club" },
+  includeKeys: new List<string> { "club" });
+```
+
+```java
+// Not supported yet; you can invoke an additional query within the onNext method instead
+```
+
+```objc
+LCLeaderboard leaderboard = [[LCLeaderboard alloc] initWithStatisticName:@"weapons"];
+leaderboard.limit = 10;
+LCLeaderboardQueryOption *option = [[LCLeaderboardQueryOption alloc] init];
+option.selectKeys = @[@"name", @"club"];
+option.includeKeys = @[@"club"];
+[leaderboard getUserResultsWithOption:option,
+  callback:^(NSArray<LCLeaderboardRanking *> * _Nullable rankings, NSInteger count, NSError * _Nullable error) {
+  // Other logic
+}];
+```
+
+</MultiLang>
+
+Keep in mind that the order of the members with the same score in the returned result is not guaranteed.
+For example, if A, B, and C got 42, 32, and 32, and the leaderboard has a descending order, the result might list the three members in the order of either “A, B, C” or “A, C, B”.
+
+When the score is the same, if you need other factors to set the ranking, you can refer to the following example ** (example is to judge the ranking by the time stamp of the score upload, when the score is the same, the earlier/later the submission, the higher/lower the ranking) ** :
+
+<details>
+<summary>Android request example：</summary>
+
+```
+public class RankingActivity extends AppCompatActivity{
+    
+     // ...
+
+    /**
+     * Upload/update grades
+     * 
+     * */
+    private void submitScore() {
+
+        double score = 324.45;   // Actual score
+        long ts = System.currentTimeMillis() / 1000;   // time stamp
+        double last_score = toEncode( score, ts); // Combine the actual score with the timestamp to generate a new data upload to the server
+
+        Map<String, Double> statistic  = new HashMap<>();
+        statistic.put("word", last_score);
+
+        LCLeaderboard.updateStatistic(LCUser.currentUser(), statistic).subscribe(new Observer<LCStatisticResult>() {
+            @Override
+            public void onSubscribe(@NotNull Disposable disposable) {}
+
+            @Override
+            public void onNext(@NotNull LCStatisticResult jsonObject) {
+                Log.e(TAG, "onNext: "+jsonObject.getResults().get(0).toString());                
+
+            }
+
+            @Override
+            public void onError(@NotNull Throwable throwable) {
+                ToastUtil.showCus(throwable.getMessage(), ToastUtil.Type.ERROR);
+            }
+
+            @Override
+            public void onComplete() {}
+        });
+
+    }
+
+     /**
+     * 查询排行榜列表
+     * */
+    private void searchRankList() {
+        // Obtain an instance of a leaderboard
+        LCLeaderboard leaderboard = LCLeaderboard.createWithoutData("word");
+        
+        leaderboard.getResults(0, 10, null, null).subscribe(new Observer<LCLeaderboardResult>() {
+            @Override
+            public void onSubscribe(@NotNull Disposable disposable) {}
+
+            @RequiresApi(api = Build.VERSION_CODES.N)
+            @Override
+            public void onNext(@NotNull LCLeaderboardResult leaderboardResult) {
+                List<LCRanking> rankings = leaderboardResult.getResults();
+                for(int i=0; i<rankings.size(); i++){
+                    /**
+                     * Decrypt the query method
+                     */
+                    double score = rankings.get(i).getStatisticValue();  // Obtain the scores found in the query
+                    String formatScore = String.format("%.3f", score);   // Serialize fractions of type double into a string that retains 3 decimal places
+                    BigDecimal decimalValue = new BigDecimal(formatScore);
+                    long longPart = decimalValue.longValue();     // Obtain the integer part of the StatisticValue found in the query
+                    float floatPart = decimalValue.subtract(BigDecimal.valueOf(longPart)).floatValue(); // Obtain the decimal part of the StatisticValue found in the query
+
+                    int[] decryptedScoreTs = toDecode(longPart); // Decrypt the integer part
+                    int decryptedScore = decryptedScoreTs[0];  // Obtain the integer part of the actual score
+                    long decryptedTs = decryptedScoreTs[1];    // Obtain the timestamp when submitting grades
+
+                    BigDecimal bigDecimalValue = new BigDecimal(Integer.toString(decryptedScore))
+                            .add(new BigDecimal(Float.toString(floatPart)));  // Splice the integer part of the actual score with the decimal part to obtain the actual score
+                    double doubleValue = bigDecimalValue.doubleValue();   // Convert actual scores to double type
+
+                    Log.e(TAG, "Parsed score: "+doubleValue+" Parsed timestamp:"+ decryptedTs  );
+
+                }
+                
+            }
+
+            @Override
+            public void onError(@NotNull Throwable throwable) {
+            }
+
+            @Override
+            public void onComplete() {}
+        });
+
+    }
+
+    /**
+     * score: Actual score
+     * ts: time stamp
+     * Combine the actual score with the timestamp to generate a new data upload to the server
+     */
+    public static double toEncode(double score, long ts) {
+        int int_score = (int) score;   // The integer part of the actual score
+
+        float float_score = (float) (score - int_score); // Decimal portion of actual score
+
+        /**
+         * When the leaderboard is arranged in descending order and the scores are the same, the closer the time, the higher the ranking. Use this line of code
+         */
+        // long encryptedScoreTs = ((long) int_score << 32) | (ts & 0xFFFFFFFFL); // Encrypt and merge integer fractions with timestamps to form a new score
+
+
+        /**
+         * When the leaderboard is arranged in descending order and the scores are the same, the closer the time and the lower the ranking, use this line of code
+         */
+        long encryptedScoreTs = ((long) int_score << 32) - (ts & 0xFFFFFFFFL); // Encrypt and merge integer fractions with timestamps to form a new score
+
+        double newScore =  (double)encryptedScoreTs + float_score;  // Then concatenate the encrypted generated data with decimal parts of the data and upload it to the server
+        return newScore;
+    }
+    
+    /**
+     * Parse the encrypted data to determine the actual score and the timestamp when submitting the score at that time
+     *
+     */
+    public static int[] toDecode(long encryptedNewScore) {
+        /**
+         * When the leaderboard is arranged in descending order and the scores are the same, the closer the time, the higher the ranking. Use this line of code
+         */
+
+        // int score = (int) (encryptedNewScore >> 32);
+        
+        /**
+         * When the leaderboard is arranged in descending order and the scores are the same, the closer the time and the lower the ranking, use this line of code
+         */
+        int score = (int) (encryptedNewScore >> 32) + 1;
+        long ts = encryptedNewScore & 0xFFFFFFFFL;
+        return new int[]{score, (int) ts};
+    }
+    
+}
+
+```
+</details>
+
+
+### Getting the Players With Similar Rankings as the Current Player
+
+| Ranking  | Username   | Score↓ |
+| :------: | ---------- | :----: |
+|    …     |            |        |
+|    24    | Bastion    |  716   |
+| 25 (You) | Widowmaker |  698   |
+|    26    | Hanzo      |   23   |
+|    …     |            |        |
+
+<MultiLang>
+
+<>
+
+To implement something like the table above in your game, provide the current user when calling `GetResults`:
+
+```cs
+var rankings = await leaderboard.GetResults(aroundUser: currentUser, limit: 3, selectKeys: new List<string> { "username" });
+```
+
+</>
+<>
+
+To implement something like the table above in your game, call the `getAroundResults` method:
+
+```java
+List<String> selectKeys = new ArrayList<>();
+selectKeys.add("username");
+leaderboard.getAroundResults(currentUser.getObjectId(), 0, 3, selectKeys, null).subscribe(/* Other logic */);
+```
+
+The first argument of `getAroundResults` is the ID of the member (`objectId` for user and object; string for entity). Other arguments are the same as those for `getResults`.
+
+</>
+<>
+
+To implement something like the table above in your game, call the `getUserResultsAroundUser` method:
+
+```objc
+leaderboard.limit = 3;
+[leaderboard getUserResultsAroundUser:currentUser.objectId,
+  option:nil,
+  callback:^(NSArray<LCLeaderboardRanking *> * _Nullable rankings, NSInteger count, NSError * _Nullable error) {
+  // Other logic
+}];
+```
+
+</>
+
+</MultiLang>
+
+In the example above, the `limit` is set to 3, which means to get two players with similar rankings as the current player together with the current player placed between them. You can set `limit` to 1 to get the current player’s ranking only.
+
+Similarly, you can retrieve objects or entities with similar rankings as a given object or entity.
+For example, to get the weapons with similar rankings as a given weapon from the weapon leaderboard, including their names, attacks, and levels:
+
+<MultiLang>
+
+```cs
+var leaderboard = LCLeaderboard.CreateWithoutData("weapons", "Weapon");
+var excalibur = LCObject.createWithoutData("Weapon", "582570f38ac247004f39c24b");
+var rankings = await leaderboard.GetResults(aroundObject: excalibur, limit: 3, selectKeys: new List<string> { "name", "attack", "level" });
+```
+
+```java
+LCLeaderboard leaderboard = LCLeaderboard.createWithoutData("world", "Weapon");
+String excaliburObjectId = "582570f38ac247004f39c24b";
+List<String> selectKeys = new ArrayList<>();
+selectKeys.add("name");
+selectKeys.add("attack");
+selectKeys.add("level");
+leaderboard.getAroundResults(excaliburObjectId, 0, 3, selectKeys, null).subscribe(/* Other logic */);
+```
+
+```objc
+LCLeaderboard leaderboard = [[LCLeaderboard alloc] initWithStatisticName:@"weapons"];
+leaderboard.limit = 3;
+LCLeaderboardQueryOption *option = [[LCLeaderboardQueryOption alloc] init];
+option.selectKeys = @[@"name", @"attack", @"level"];
+NSString *excaliburObjectId = @"582570f38ac247004f39c24b";
+[leaderboard getObjectResultsAroundObject:excaliburObjectId,
+  option:option,
+  callback:^(NSArray<LCLeaderboardRanking *> * _Nullable rankings, NSInteger count, NSError * _Nullable error) {
+  // Other logic
+}];
+```
+
+</MultiLang>
+
+The example above assumes that the weapon leaderboard is an object leaderboard and the class for storing weapons is named `Weapon`.
+If the weapon leaderboard has entity as its type, and you only need to retrieve the names of the weapons, the following code would apply:
+
+<MultiLang>
+
+```cs
+var leaderboard = LCLeaderboard.CreateWithoutData("weapons", LCLeaderboard.ENTITY_MEMBER_TYPE);
+var rankings = await leaderboard.GetResults(aroundEntity: "excalibur", limit: 3);
+```
+
+```java
+LCLeaderboard leaderboard = LCLeaderboard.createWithoutData("world", LCLeaderboard.ENTITY_MEMBER_TYPE);
+leaderboard.getAroundResults("excalibur", 0, 3, null, null).subscribe(/* Other logic */);
+```
+
+```objc
+LCLeaderboard leaderboard = [[LCLeaderboard alloc] initWithStatisticName:@"weapons"];
+leaderboard.limit = 3;
+[leaderboard getEntityResultsAroundEntity:@"excalibur",
+  callback:^(NSArray^(NSArray<LCLeaderboardRanking *> * _Nullable rankings, NSInteger count, NSError * _Nullable error) {
+  // Other logic
+}];
+```
+
+</MultiLang>
+
+## Dashboard
+
+On **Game Services > Cloud Services > Leaderboard**, you can:
+
+- Create, reset, edit, and delete leaderboards.
+- View the current versions of the leaderboards, delete scores, and download the archives of the earlier versions of the leaderboards.
+- Configure whether the client can retrieve the previous version of each leaderboard, and whether scores can be updated with the Master Key only.
+
+## SDK Management Interface
+
+Besides using the dashboard, you can also manage leaderboards with the management interfaces provided by the C# SDK and the Java SDK. Those interfaces can be used **in trusted environments including the server side**.
+Another way to access the management interface is to use the REST API.
+
+Let’s first take a look at the management interfaces provided by the SDKs.
+
+:::caution
+
+To use the management interface, the SDK needs to be initialized with the `masterKey`. Therefore, **you should only use the management interface in trusted environments like the server side, and not the client side.**
+
+:::
+
+<MultiLang>
+
+```cs
+LCApplication.Initialize({{appid}}, {{appkey}}, "https://xxx.example.com", {{masterkey}});
+LCApplication.UseMasterKey = true;
+```
+
+```java
+LeanCloud.setMasterKey({{masterkey}});
+```
+
+```objc
+// Not supported yet
+```
+
+</MultiLang>
+
+### Creating Leaderboards
+
+<MultiLang>
+
+<>
+
+```cs
+var leaderboard = await LCLeaderboard.CreateLeaderboard("time", order: LCLeaderboardOrder.ASCENDING);
+```
+
+Below are the available options and their default values:
+
+```cs
+public static async Task<LCLeaderboard> CreateLeaderboard(string statisticName,
+    LCLeaderboardOrder order = LCLeaderboardOrder.Descending,
+    LCLeaderboardUpdateStrategy updateStrategy = LCLeaderboardUpdateStrategy.Better,
+    LCLeaderboardVersionChangeInterval versionChangeInterval = LCLeaderboardVersionChangeInterval.Week,
+    string memberType = LCLeaderboard.USER_MEMBER_TYPE)
+```
+
+- `statisticName` The name of the leaderboard.
+- `order` The order. Can be `LCLeaderboardOrder.Descending` or `LCLeaderboardOrder.Ascending`.
+- `updateStrategy` The strategy for updating scores. Can be `LCLeaderboardUpdateStrategy.Better`, `LCLeaderboardUpdateStrategy.Last`, or `LCLeaderboardUpdateStrategy.Sum`.
+- `versionChangeInterval` The interval for resetting the leaderboard. Can be `LCLeaderboardVersionChangeInterval.Never`, `LCLeaderboardVersionChangeInterval.Day`, `LCLeaderboardVersionChangeInterval.Week`, or `LCLeaderboardVersionChangeInterval.Month`.
+- `memberType` The type of the members. Use `LCLeaderboard.USER_MEMBER_TYPE` for user and `LCLeaderboard.ENTITY_MEMBER_TYPE` for entity. For object, use the name of the class.
+
+</>
+<>
+
+```java
+LCLeaderboard.createWithMemberType(LCLeaderboard.MEMBER_TYPE_USER, "time",
+  LCLeaderboard.LCLeaderboardOrder.Ascending,
+  LCLeaderboard.LCLeaderboardUpdateStrategy.Last,
+  LCLeaderboard.LCLeaderboardVersionChangeInterval.Day).subscribe(new Observer<LCLeaderboard>() {
+    @Override
+    public void onSubscribe(@NotNull Disposable disposable) {}
+
+    @Override
+    public void onNext(@NotNull final LCLeaderboard lcLeaderboard) {
+      System.out.println("leaderboard created");
+    }
+
+    @Override
+    public void onError(@NotNull Throwable throwable) {
+      System.out.println("failed to create leaderboard. Cause " + throwable);
+    }
+
+    @Override
+    public void onComplete() {}
+});
+```
+
+Below are the available options:
+
+```java
+public static Observable<LCLeaderboard> createWithMemberType(String memberType, String name,
+  LCLeaderboardOrder order,
+  LCLeaderboardUpdateStrategy updateStrategy,
+  LCLeaderboardVersionChangeInterval versionChangeInterval)
+```
+
+- `memberType` The type of the members. Use `LCLeaderboard.MEMBER_TYPE_USER` for user and `LCLeaderboard.MEMBER_TYPE_ENTITY` for entity. For object, use the name of the class.
+- `name` The name of the leaderboard.
+- `order` The order. Can be `LCLeaderboard.LCLeaderboardOrder.Descending` (default) or `LCLeaderboard.LCLeaderboardOrder.Ascending`.
+- `updateStrategy` The strategy for updating scores. Can be `LCLeaderboard.LCLeaderboardUpdateStrategy.Better` (default), `LCLeaderboard.LCLeaderboardUpdateStrategy.Last`, or `LCLeaderboard.LCLeaderboardUpdateStrategy.Sum`.
+- `versionChangeInterval` The interval for resetting the leaderboard. Can be `LCLeaderboard.LCLeaderboardVersionChangeInterval.Never`, `LCLeaderboard.LCLeaderboardVersionChangeInterval.Day`, `LCLeaderboard.LCLeaderboardVersionChangeInterval.Week` (default), or `LCLeaderboard.LCLeaderboardVersionChangeInterval.Month`.
+
+“Default” indicates the value used when `null` is provided.
+
+</>
+
+<>
+
+Not supported yet.
+
+</>
+
+</MultiLang>
+
+### Manually Resetting the Leaderboard
+
+<MultiLang>
+
+```cs
+var leaderboard = LCLeaderboard.CreateWithoutData("score");
+await leaderboard.Reset();
+```
+
+```java
+LCLeaderboard leaderboard = LCLeaderboard.createWithoutData("score");
+leaderboard.reset().subscribe(new Observer<Boolean>() {
+    @Override
+    public void onSubscribe(@NotNull Disposable disposable) {
+    }
+
+    @Override
+    public void onNext(@NotNull Boolean aBoolean) {
+      if (aBoolean) { // aBoolean should always be true
+        System.out.println("leaderboard reset");
+      }
+    }
+
+    @override
+    public void onerror(@notnull throwable throwable) {
+        system.out.println("Failed to reset leaderboard. Cause " + throwable);
+    }
+
+    @override
+    public void oncomplete() {}
+});
+```
+
+```objc
+// Not supported yet
+```
+
+</MultiLang>
+
+### Retrieving Leaderboard Properties
+
+Use the following interface to get the properties of a leaderboard, including its reset interval, version, and update strategy.
+
+<MultiLang>
+
+```cs
+var leaderboardData = await LCLeaderboard.GetLeaderboard("world");
+```
+
+```java
+LCLeaderboard leaderboard = LCLeaderboard.fetchByName("world").blockingFirst();
+```
+
+```objc
+// Not supported yet
+```
+
+</MultiLang>
+
+### Updating Leaderboard Properties
+
+Once a leaderboard is created, only its reset interval and update strategy can be updated. Other properties cannot be modified.
+
+<MultiLang>
+
+```cs
+var leaderboard = LCLeaderboard.CreateWithoutData("equip");
+await leaderboard.UpdateVersionChangeInterval(LCLeaderboardVersionChangeInterval.Week);
+await leaderboard.UpdateUpdateStrategy(LCLeaderboardUpdateStrategy.Last);
+```
+
+```java
+LCLeaderboard leaderboard = LCLeaderboard.createWithoutData("equip");
+leaderboard.updateVersionChangeInterval(LCLeaderboard.LCLeaderboardVersionChangeInterval.Week)
+  .subscribe(new Observer<Boolean>() {
+    @Override
+    public void onSubscribe(@NotNull Disposable disposable) {
+    }
+
+    @Override
+    public void onNext(@NotNull Boolean aBoolean) {
+      if (aBoolean) { // aBoolean should always be true
+        System.out.println("version update interval updated");
+      }
+    }
+
+    @override
+    public void onerror(@notnull throwable throwable) {
+        system.out.println("Failed to change version update interval. Cause: " + throwable);
+    }
+
+    @override
+    public void oncomplete() {}
+});
+leaderboard.updateUpdateStrategy(LCLeaderboard.LCLeaderboardUpdateStrategy.Last)
+  .subscribe(new Observer<Boolean>() {
+    @Override
+    public void onSubscribe(@NotNull Disposable disposable) {
+    }
+
+    @Override
+    public void onNext(@NotNull Boolean aBoolean) {
+      if (aBoolean) { // aBoolean should always be true
+        System.out.println("update strategy updated");
+      }
+    }
+
+    @override
+    public void onerror(@notnull throwable throwable) {
+        system.out.println("Failed to change update strategy. Cause: " + throwable);
+    }
+
+    @override
+    public void oncomplete() {}
+});
+```
+
+```objc
+// Not supported yet
+```
+
+</MultiLang>
+
+### Deleting Leaderboards
+
+<MultiLang>
+
+```cs
+var leaderboard = lcleaderboard.createwithoutdata("equip");
+await leaderboard.destroy();
+```
+
+```java
+LCLeaderboard leaderboard = LCLeaderboard.createWithoutData("equip");
+leaderboard.destroy().subscribe(new Observer<Boolean>() {
+    @Override
+    public void onSubscribe(@NotNull Disposable disposable) {
+    }
+
+    @Override
+    public void onNext(@NotNull Boolean aBoolean) {
+      if (aBoolean) { // aBoolean should always be true
+        System.out.println("leaderboard deleted");
+      }
+    }
+
+    @override
+    public void onerror(@notnull throwable throwable) {
+        system.out.println("Failed to delete leaderboard. Cause " + throwable);
+    }
+
+    @override
+    public void oncomplete() {}
+});
+```
+
+```objc
+// Not supported yet
+```
+
+</MultiLang>
+
+**Deleting a leaderboard will delete all the data within it, including the current version and the archives of the past versions.**
+
+### Updating Leaderboard Members’ Scores
+
+You can use the `overwrite` option to bypass the update strategy and force update a member’s score:
+
+<MultiLang>
+
+```cs
+var statistic = new Dictionary<string, double> {
+    { "score", 0.0 }
+};
+await LCLeaderboard.UpdateStatistics(user, statistic, overwrite: true);
+```
+
+```java
+Map<String, Double> statistic  = new HashMap<>();
+statistic.put("world", 0.0);
+LCLeaderboard.updateStatistic(currentUser, statistic, true).subscribe(/** Other logic **/);
+```
+
+```objc
+// Not supported yet
+```
+
+</MultiLang>
+
+Object and entity leaderboards can only be updated on the server side with the Master Key. The update strategy of the leaderboard will still be followed, though:
+
+<MultiLang>
+
+```cs
+var excalibur = LCObject.createWithoutData("Weapon", "582570f38ac247004f39c24b");
+await LCLeaderboard.UpdateStatistics(excalibur, statistic);
+```
+
+```java
+// Not supported yet; consider using the REST API
+```
+
+```objc
+Not supported yet.
+```
+
+</MultiLang>
+
+To force update the data, set `overwrite` to `true`:
+
+<MultiLang>
+
+```cs
+await LCLeaderboard.UpdateStatistics("Vimur", statistic, overwrite: true);
+```
+
+```java
+// Not supported yet; consider using the REST API
+```
+
+```objc
+// Not supported yet
+```
+
+</MultiLang>
+
+### Deleting Leaderboard Members’ Scores
+
+Use the Master Key on the server side to delete the score of any user, object, or entity:
+
+<MultiLang>
+
+```cs
+var otherUser = LCObject.CreateWithoutData(TDSUser.CLASS_NAME, "5c76107144d90400536fc88b");
+await LCLeaderboard.DeleteStatistics(otherUser, new List<string> { "world" });
+
+var excalibur = LCObject.createWithoutData("Weapon", "582570f38ac247004f39c24b");
+await LCLeaderboard.DeleteStatistics(excalibur, new List<string> { "weapons" });
+
+await LCLeaderboard.DeleteStatistics("Vimur", new List<string> { "rivers" });
+```
+
+```java
+// Not supported yet; consider using the REST API
+```
+
+```objc
+// Not supported yet
+```
+
+</MultiLang>
+
+## REST API
+
+Now we will introduce the Leaderboard-related REST API interfaces.
+You can write your own programs or scripts to access these interfaces to perform administrative operations on the server side.
+
+### Request Format
+
+For POST and PUT requests, the body of the request must be in JSON, and the `Content-Type` of the HTTP Header should be `application/json`.
+
+Requests are authenticated by the following key-value pairs in the HTTP Header:
+
+| Key        | Value        | Meaning                                           | Source                               |
+| ---------- | ------------ | ------------------------------------------------- | ------------------------------------ |
+| `X-LC-Id`  | `{{appid}}`  | The `App Id` (`Client Id`) of the current app     | Can be found on the Developer Center |
+| `X-LC-Key` | `{{appkey}}` | The `App Key` (`Client Token`) of the current app | Can be found on the Developer Center |
+
+To access the management interface, the `Master Key` is required: `X-LC-Key: {{masterkey}},master`.
+`Master Key` is also named `Server Secret`, which can be found on the Developer Center as well.
+
+See [Credentials](/v3/sdk/storage/guide/setup-dotnet#credentials) for more information.
+
+### Base URL
+
+The Base URL for the REST API (`{{host}}` in curl examples) is the app’s <Conditional region='cn'>custom</Conditional> API domain, which can be <Conditional region='cn'>added and</Conditional> viewed on the Developer Center. See [Domain](/v3/sdk/storage/guide/setup-dotnet#domain) for more information.
+
+### Managing Leaderboards
+
+#### Creating Leaderboards
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"statisticName": "world", "memberType": "_User", "order": "descending", "updateStrategy": "better", "versionChangeInterval": "month"}' \
+  https://{{host}}/1.1/leaderboard/leaderboards
+```
+
+| Parameter               | Required | Description                                                                                                                                |
+| ----------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `statisticName`         | Required | The name of the leaderboard. Cannot be edited once the leaderboard is created.                                                             |
+| `memberType`            | Required | The type of the members. Cannot be edited once the leaderboard is created. Can be `_Entity`, `_User`, or the name of an existing class.    |
+| `order`                 | Optional | The strategy for ordering. Cannot be edited once the leaderboard is created. Can be `ascending` or `descending`. Defaults to `descending`. |
+| `updateStrategy`        | Optional | Can be `better`, `last`, or `sum`. Defaults to `better`.                                                                                   |
+| `versionChangeInterval` | Optional | Can be `day`, `week`, `month`, or `never`. Defaults to `week`.                                                                             |
+
+The response body will be a JSON object containing all the parameters provided when creating the leaderboard, as well as the following fields:
+
+- `version` The version of the leaderboard.
+- `expiredAt` The time the leaderboard will be reset for the next time.
+- `activatedAt` The time the current version started.
+
+```json
+{
+  "objectId": "5b62c15a9f54540062427acc",
+  "statisticName": "world",
+  "memberType": "_User",
+  "versionChangeInterval": "month",
+  "order": "descending",
+  "updateStrategy": "better",
+  "version": 0,
+  "createdAt": "2018-08-02T08:31:22.294Z",
+  "updatedAt": "2018-08-02T08:31:22.294Z",
+  "expiredAt": {
+    "__type": "Date",
+    "iso": "2018-08-31T16:00:00.000Z"
+  },
+  "activatedAt": {
+    "__type": "Date",
+    "iso": "2018-08-02T08:31:22.290Z"
+  }
+}
+```
+
+#### Retrieving Leaderboard Properties
+
+The following interface allows you to retrieve the properties of a leaderboard, including its update strategy and version number.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  https://{{host}}/1.1/leaderboard/leaderboards/<statisticName>
+```
+
+The returned JSON object contains all the information related to the leaderboard:
+
+```json
+{
+  "objectId": "5b0b97cf06f4fd0abc0abe35",
+  "statisticName": "world",
+  "memberType": "_User",
+  "order": "descending",
+  "updateStrategy": "better",
+  "version": 5,
+  "versionChangeInterval": "day",
+  "expiredAt": { "__type": "Date", "iso": "2018-05-02T16:00:00.000Z" },
+  "activatedAt": { "__type": "Date", "iso": "2018-05-01T16:00:00.000Z" },
+  "createdAt": "2018-04-28T05:46:58.579Z",
+  "updatedAt": "2018-05-01T01:00:00.000Z"
+}
+```
+
+#### Updating Leaderboard Properties
+
+The following interface allows you to update the `updateStrategy` and `versionChangeInterval` of a leaderboard. Properties other than these cannot be updated. You can update only one of the two properties. For example, to update `versionChangeInterval` only:
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '{"versionChangeInterval": "day"}' \
+  https://{{host}}/1.1/leaderboard/leaderboards/<statisticName>
+```
+
+The returned JSON object contains all the updated fields as well as an `updatedAt` field.
+
+```json
+{
+  "objectId": "5b0b97cf06f4fd0abc0abe35",
+  "versionChangeInterval": "day",
+  "updatedAt": "2018-05-01T08:01:00.000Z"
+}
+```
+
+#### Resetting Leaderboards
+
+The following interface allows you to reset a leaderboard regardless of its reset strategy. Once you reset a leaderboard, the current version of it will be cleared and the cleared data will be archived as a CSV file for you to download. The `version` of the leaderboard will automatically increment by 1.
+
+```sh
+curl -X PUT \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  https://{{host}}/1.1/leaderboard/leaderboards/<statisticName>/incrementVersion
+```
+
+The returned JSON object will contain the new version number, the time the leaderboard will be reset for the next time (`expiredAt`), and the time the current version started (`activatedAt`):
+
+```json
+{
+  "objectId": "5b0b97cf06f4fd0abc0abe35",
+  "version": 7,
+  "expiredAt": { "__type": "Date", "iso": "2018-06-03T16:00:00.000Z" },
+  "activatedAt": { "__type": "Date", "iso": "2018-05-28T06:02:56.169Z" },
+  "updatedAt": "2018-05-28T06:02:56.185Z"
+}
+```
+
+#### Retrieving Archives
+
+Since each leaderboard can hold at most 60 archive files, we recommend that you retrieve the archived files regularly and back them up in your own places with the following interface.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -G \
+  --data-urlencode 'limit=10' \
+  https://{{host}}/1.1/leaderboard/leaderboards/<statisticName>/archives
+```
+
+The returned objects will be in decreasing order by `createdAt`. For each object, it has the file name (`file_key`), the URL for downloading (`url`), and a `status` property being one of the following statuses:
+
+- `scheduled`: The archiving process is queued. This usually won’t last very long.
+- `inProgress`: Archiving in progress.
+- `failed`: Failed to archive. Please reach out to our technical support.
+- `completed`: Successfully archived.
+
+```json
+{
+  "results": [
+    {
+      "objectId": "5b0b9da506f4fd0abc0abe6e",
+      "statisticName": "wins",
+      "version": 9,
+      "status": "completed",
+      "url": "https://lc-paas-files.cn-n1.lcfile.com/yK5s6YJztAwEYiWs.csv",
+      "file_key": "yK5s6YJztAwEYiWs.csv",
+      "activatedAt": { "__type": "Date", "iso": "2018-05-28T06:11:49.572Z" },
+      "deactivatedAt": { "__type": "Date", "iso": "2018-05-30T06:11:49.951Z" },
+      "createdAt": "2018-05-01T16:00.00.000Z",
+      "updatedAt": "2018-05-28T06:11:50.129Z"
+    }
+  ]
+}
+```
+
+#### Deleting Leaderboards
+
+**This will delete everything within the leaderboard**, including the current version and all the archives. You won’t be able to undo this operation.
+
+Provide the `statisticName` of the leaderboard to delete it.
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  https://{{host}}/1.1/leaderboard/leaderboards/<statisticName>
+```
+
+Once done, an empty JSON object will be returned:
+
+```json
+{}
+```
+
+### Managing Scores
+
+#### Updating Scores
+
+Use the Master Key to update any score while still following the `updateStrategy`.
+
+Provide the corresponding user’s `objectId` when you update their score:
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '[{"statisticName": "wins", "statisticValue": 5}, {"statisticName": "world", "statisticValue": 91}]' \
+  https://{{host}}/1.1/leaderboard/users/<objectId>/statistics
+```
+
+The returned data will be the current score:
+
+```sh
+{
+  "results": [
+    {
+      "statisticName": "wins",
+      "version": 0,
+      "statisticValue": 5
+    },
+    {
+      "statisticName": "world",
+      "version": 2,
+      "statisticValue": 91
+    }
+  ]
+}
+```
+
+Similarly, you can provide the `objectId` of an object when updating its score:
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '[{"statisticName": "wins", "statisticValue": 5}, {"statisticName": "weapons","statisticValue": 91}]' \
+  https://{{host}}/1.1/leaderboard/objects/<objectId>/statistics
+```
+
+For entity, provide the string for it:
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '[{"statisticName": "wins", "statisticValue": 5}, {"statisticName": "cities","statisticValue": 91}]' \
+  https://{{host}}/1.1/leaderboard/entities/<entityString>/statistics
+```
+
+The current user can update their own score, though this won’t require the `Master Key` for the management interface. However, the `sessionToken` of the current user needs to be provided (the SDK has already encapsulated this interface):
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Session: <sessionToken>" \
+  -H "Content-Type: application/json" \
+  -d '[{"statisticName": "wins", "statisticValue": 5}, {"statisticName": "world", "statisticValue": 91}]' \
+  https://{{host}}/1.1/leaderboard/users/self/statistics
+```
+
+#### Force Updating Scores
+
+Add `overwrite=1` to ignore the `better` and `sum` update strategies and use `last` instead.
+For example, if cheating is detected on a user, you can force update the user’s score with this interface.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  -d '[{"statisticName": "wins", "statisticValue": 10}]' \
+  https://{{host}}/1.1/leaderboard/users/<uid>/statistics?overwrite=1
+```
+
+The returned data is the current score:
+
+```json
+{ "results": [{ "statisticName": "wins", "version": 0, "statisticValue": 10 }] }
+```
+
+`overwrite=1` can be used for object scores and entity scores as well.
+
+#### Deleting Scores
+
+Use this interface to remove the score and ranking of a user from the leaderboard. Note that only the score on the current version of the leaderboard can be removed.
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  -H "Content-Type: application/json" \
+  https://{{host}}/1.1/leaderboard/users/<uid>/statistics?statistics=wins,world
+```
+
+Once done, an empty object will be returned:
+
+```
+{}
+```
+
+Similarly, you can delete the score of an object:
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  --data-urlencode 'statistics=weapons,equipments' \
+  https://{{host}}/1.1/leaderboard/objects/<objectId>/statistics
+```
+
+And the score of an entity:
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{masterkey}},master" \
+  --data-urlencode 'statistics=cities' \
+  https://{{host}}/1.1/leaderboard/entities/<entityString>/statistics
+```
+
+The current user can delete their own score, though this won’t require the `Master Key` for the management interface. However, the `sessionToken` of the current user needs to be provided (the SDK has already encapsulated this interface):
+
+```sh
+curl -X DELETE \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "X-LC-Session: <sessionToken>" \
+  -H "Content-Type: application/json" \
+  https://{{host}}/1.1/leaderboard/users/self/statistics?statistics=wins,world
+```
+
+### Retrieving Scores
+
+The REST API interfaces for retrieving scores are not management interfaces and the `Master Key` is not required:
+
+#### Retrieving a Single Score
+
+Retrieve a score by providing the `objectId` of a user.
+You can specify multiple leaderboards within the `statistics` property (separated by `,`) to get the scores of the user in all the given leaderboards. If this option is not provided, the user’s scores in all leaderboards will be returned.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  --data-urlencode 'statistics=wins,world' \
+  https://{{host}}/1.1/leaderboard/users/<objectId>/statistics
+```
+
+Response:
+
+```json
+{
+  "results": [
+    {
+      "statisticName": "wins",
+      "statisticValue": 5,
+      "version": 0,
+      "user": {
+        "__type": "Pointer",
+        "className": "_User",
+        "objectId": "60d950629be318a249000001"
+      }
+    },
+    {
+      "statisticName": "world",
+      "statisticValue": 91,
+      "version": 0,
+      "user": {...}
+    }
+  ]
+}
+```
+
+Similarly, you can get an object’s scores by providing its `objectId`:
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  --data-urlencode 'statistics=wins,world' \
+  https://{{host}}/1.1/leaderboard/objects/<objectId>/statistics
+```
+
+Response:
+
+```json
+{
+  "results": [
+    {
+      "statisticName": "wins",
+      "statisticValue": 5,
+      "version": 0,
+      "object": {
+        "__type": "Pointer",
+        "className": "Weapon",
+        "objectId": "60d1af149be3180684000002"
+      }
+    },
+    {
+      "statisticName": "world",
+      "statisticValue": 91,
+      "version": 0,
+      "object": {
+        "__type": "Pointer",
+        "className": "Weapon",
+        "objectId": "60d1af149be3180684000002"
+      }
+    }
+  ]
+}
+```
+
+To get an entity’s scores, provide the string for the entity:
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  --data-urlencode 'statistics=wins,world' \
+  https://{{host}}/1.1/leaderboard/entities/<entityString>/statistics
+```
+
+Response:
+
+```json
+{
+  "results": [
+    {
+      "statisticName": "wins",
+      "statisticValue": 5,
+      "version": 0,
+      "entity": "1a2b3c4d"
+    },
+    {
+      "statisticName": "world",
+      "statisticValue": 91,
+      "version": 0,
+      "entity": "1a2b3c4d"
+    }
+  ]
+}
+```
+
+#### Retrieving a Group of Scores
+
+With this interface, you can get the scores of no more than 200 users at once. To use this interface, provide an array of `objectId`s of the users in the body.
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '["60d950629be318a249000001", "60d950629be318a249000000"]'
+  https://{{host}}/1.1/leaderboard/users/statistics/<statisticName>
+```
+
+The response is similar to that of [retrieving a single score](#retrieving-a-single-score):
+
+```json
+{
+  "results": [
+    {
+      "statisticName": "wins",
+      "statisticValue": 1,
+      "version": 0,
+      "user": {
+        "__type": "Pointer",
+        "className": "_User",
+        "objectId": "60d950629be318a249000001"
+      }
+    },
+    {
+      "statisticName": "wins",
+      "statisticValue": 2,
+      "version": 0,
+      "user": {
+        "__type": "Pointer",
+        "className": "_User",
+        "objectId": "60d950629be318a249000000"
+      }
+    }
+  ]
+}
+```
+
+Similarly, provide a list of `objectId`s of objects (no more than 200) to get these objects’ scores:
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '["60d950629be318a249000001", "60d950629be318a249000000"]'
+  https://{{host}}/1.1/leaderboard/objects/statistics/<statisticName>
+```
+
+Provide a list of strings of entities (no more than 200) to get these entities’ scores:
+
+```sh
+curl -X POST \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -H "Content-Type: application/json" \
+  -d '["Vimur", "Fimbulthul"]'
+  https://{{host}}/1.1/leaderboard/entities/statistics/<statisticName>
+```
+
+### Queries on Leaderboards
+
+#### Retrieving Scores Within a Scope
+
+Use this interface to retrieve the top players.
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -G \
+  --data-urlencode 'startPosition=0' \
+  --data-urlencode 'maxResultsCount=20' \
+  --data-urlencode 'selectKeys=username,club' \
+  --data-urlencode 'includeKeys=club' \
+  --data-urlencode 'includeStatistics=wins' \
+  https://{{host}}/1.1/leaderboard/leaderboards/user/<statisticName>/ranks
+```
+
+| Parameter         | Required | Description                                                                                                                                                                                                                                                       |
+| ----------------- | -------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| startPosition     | Optional | The offset of the query. Defaults to 0.                                                                                                                                                                                                                           |
+| maxResultsCount   | Optional | The maximum number of results. Defaults to 20.                                                                                                                                                                                                                    |
+| selectKeys        | Optional | Return the other fields of the user in the `_User` class. You can provide multiple fields separated by `,`. For security reasons, the `email` and `mobilePhoneNumber` fields will not be returned if you are not using the `masterKey`.                           |
+| includeKeys       | Optional | Return the referenced objects of the other fields of the user in the `_User` class. You can provide multiple fields separated by `,`. For security reasons, the `email` and `mobilePhoneNumber` fields will not be returned if you are not using the `masterKey`. |
+| includeStatistics | Optional | Return the user’s scores in other leaderboards. If a non-existant leaderboard is provided, an error will be returned.                                                                                                                                             |
+| version           | Optional | Return the results from a specific version. By default, the results from the current version will be returned.                                                                                                                                                    |
+| count             | Optional | If set to 1, the number of members in the leaderboard will be returned. Defaults to 0.                                                                                                                                                                            |
+
+The response will be a JSON object:
+
+```json
+{
+  "results": [
+    {
+      "statisticName": "world",
+      "statisticValue": 91,
+      "rank": 0,
+      "user": {
+        "__type": "Pointer",
+        "className": "_User",
+        "updatedAt": "2021-07-21T03:08:10.487Z",
+        "username": "zw1stza3fy701rvgxqwiikex7",
+        "createdAt": "2020-09-04T04:23:04.795Z",
+        "club": {
+          "objectId": "60f78f98d9f1465d3b1da12d",
+          "name": "board games",
+          "updatedAt": "2021-07-21T03:08:08.692Z",
+          "createdAt": "2021-07-21T03:08:08.692Z",
+        },
+        "objectId": "5f51c1287628f2468aa696e6"
+      }
+    },
+    {...}
+  ],
+  "count": 500
+}
+```
+
+Querying on object leaderboards shares a similar interface. The only difference is that `user` will be replaced by `object`:
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -G \
+  --data-urlencode 'startPosition=0' \
+  --data-urlencode 'maxResultsCount=2' \
+  --data-urlencode 'selectKeys=name,image' \
+  --data-urlencode 'includeKeys=image' \
+  --data-urlencode 'count=1' \
+  https://{{host}}/1.1/leaderboard/leaderboards/object/<statisticName>/ranks
+```
+
+Response:
+
+```json
+{
+  "results": [
+    {
+      "statisticName": "wins",
+      "statisticValue": 4,
+      "rank": 0,
+      "object": {
+        "__type": "Pointer",
+        "className": "Weapon",
+        "name": "sword",
+        "image": {
+          "bucket": "test_files",
+          "provider": "leancloud",
+          "name": "sword.jpg",
+          "url": "https://example.com/sword.jpg",
+          "objectId": "60d2f3a39be3183377000002",
+          "__type": "File"
+        },
+        "objectId": "60d2f22f9be318328b000007"
+      }
+    },
+    {
+      "statisticName": "wins",
+      "statisticValue": 3,
+      "rank": 1,
+      "object": {...}
+    }
+  ],
+  "count": 500
+}
+```
+
+Change `user` to `entity` to query on entity leaderboards:
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -G \
+  --data-urlencode 'startPosition=0' \
+  --data-urlencode 'maxResultsCount=2' \
+  --data-urlencode 'count=1' \
+  https://{{host}}/1.1/leaderboard/leaderboards/entity/<statisticName>/ranks
+```
+
+Response:
+
+```json
+{
+  "results": [
+    {
+      "statisticName": "wins",
+      "statisticValue": 4,
+      "rank": 0,
+      "entity": "1234567890"
+    },
+    {
+      "statisticName": "wins",
+      "statisticValue": 3,
+      "rank": 1,
+      "entity": "2345678901"
+    }
+  ],
+  "count": 500
+}
+```
+
+#### Retrieving Members With Similar Rankings as the Given Member
+
+Add the corresponding `objectId` to the end of the URL to retrieve the users and objects with similar rankings as the given one.
+
+To get the users with similar rankings as the given user:
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -G \
+  --data-urlencode 'startPosition=0' \
+  --data-urlencode 'maxResultsCount=20' \
+  --data-urlencode 'selectKeys=username,club' \
+  --data-urlencode 'includeKeys=club' \
+  https://{{host}}/1.1/leaderboard/leaderboards/user/<statisticName>/ranks/<objectId>
+```
+
+See [Retrieving Scores Within a Scope](#retrieving-scores-within-a-scope) for the meanings of the parameters.
+The response is similar to that for [retrieving-scores-within-a-scope](#retrieving-scores-within-a-scope).
+
+```json
+{
+  "results": [
+    {
+      "statisticName": "wins",
+      "statisticValue": 3,
+      "rank": 2,
+      "user": {...}
+    },
+    {
+      "statisticName": "wins",
+      "statisticValue": 2.5,
+      "rank": 3,
+      "user": {
+        "__type": "Pointer",
+        "className": "_User",
+        "username": "kate",
+        "club": {
+          "objectId": "60f78f98d9f1465d3b1da12d",
+          "name": "board games",
+          "updatedAt": "2021-07-21T03:08:08.692Z",
+          "createdAt": "2021-07-21T03:08:08.692Z",
+        },
+        "objectId": "60d2faa99be3183623000001"
+      }
+    },
+    {
+      "statisticName": "wins",
+      "statisticValue": 2,
+      "rank": 4,
+      "user": {...}
+    }
+  ],
+  "count": 500
+}
+```
+
+To get the objects with similar rankings as the given object:
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -G \
+  --data-urlencode 'startPosition=0' \
+  --data-urlencode 'maxResultsCount=2' \
+  --data-urlencode 'selectKeys=name,image' \
+  --data-urlencode 'includeKeys=image' \
+  --data-urlencode 'count=1' \
+  https://{{host}}/1.1/leaderboard/leaderboards/object/<statisticName>/ranks/<objectId>
+```
+
+To get the entities with similar rankings as the given entity:
+
+```sh
+curl -X GET \
+  -H "X-LC-Id: {{appid}}" \
+  -H "X-LC-Key: {{appkey}}" \
+  -G \
+  --data-urlencode 'startPosition=0' \
+  --data-urlencode 'maxResultsCount=2' \
+  --data-urlencode 'count=1' \
+  https://{{host}}/1.1/leaderboard/leaderboards/entity/<statisticName>/ranks/<id>
+```
+
+## Video Tutorials
+
+You can refer to the video tutorial:[How to Integrate Leaderboard in Games](https://www.bilibili.com/video/BV1ZN411s7Jj/) to learn how to access leaderboard in Untiy projects.
+
+For more video tutorials, see [Developer Academy](https://developer.taptap.cn/tds-tutorials/list). As the SDK features are constantly being improved, there may be inconsistencies between the video tutorials and the new SDK features, so the current documentation should prevail.

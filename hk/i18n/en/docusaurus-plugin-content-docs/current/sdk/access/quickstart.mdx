@@ -1,0 +1,399 @@
+---
+
+title: TapSDK Integration
+sidebar_label: TapSDK Integration
+sidebar_position: 1
+---
+
+import MultiLang from "/src/docComponents/MultiLang";
+import CodeBlock from "@theme/CodeBlock";
+import { Conditional } from "/src/docComponents/conditional";
+import v4SDKVersions from '/src/docComponents/v4SDKVersions';
+import UnitySDKInstallation from "../_partials/unity-sdk-installation.mdx";
+
+This document introduces how to quickly integrate TapSDK.
+
+## Environment Requirements
+
+<MultiLang kind="unity_android_ios_v4">
+<>
+
+- Unity 2019.4 or higher
+- iOS 11 or higher, Xcode version 15.3 or higher
+- Android 5.0 (API level 21) or higher
+
+</>
+
+<>
+
+- Android 5.0 (API level 21) or higher
+
+</>
+
+<>
+
+- Android 5.0 (API level 21) or higher
+
+</>
+<>
+
+- iOS 11 or higher, Xcode version 15.3 or higher
+
+</>
+
+<>
+
+* Install UE 4.26 and above
+* iOS 12 or higher
+* Android 5.0 (API level 21) or higher
+
+**Supported Platforms**: Android / iOS
+
+</>
+
+</MultiLang>
+
+## Project Configuration
+
+<MultiLang kind="unity_android_ios_v4">
+<>
+
+<UnitySDKInstallation
+npmDeps={[
+"com.taptap.sdk.core"
+]}
+githubDeps={[
+{package: "com.taptap.sdk.core", url: `https://github.com/taptap/TapSDKCore-Unity.git#${v4SDKVersions.taptap.unity}`}
+]}
+unitypackageModules={[
+{name: "TapTapSDK_Core.unitypackage", desc: "TapTapSDK Core Module, Mandatory"},
+]}/>
+
+</>
+
+<>
+
+1. Add the repository address to the build.gradle in the root directory of the project:
+
+<CodeBlock language="groovy">
+{
+`allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}`}
+</CodeBlock>
+
+2. Add corresponding module dependencies to the app module's build.gradle (e.g., login and embedded dynamics):
+
+<CodeBlock language="groovy">
+{
+`dependencies {
+    implementation 'com.taptap.sdk:tap-core:${v4SDKVersions.taptap.android}'
+}`
+}
+
+</CodeBlock>
+
+3. Add network permissions in `AndroidManifest.xml`:
+
+<CodeBlock language="xml">
+{
+`<uses-permission android:name="android.permission.INTERNET"></uses-permission>`
+}
+</CodeBlock>
+
+4. Additional configuration for older Android versions
+
+   If `targetSdkVersion < 29`, you also need to add the following configuration:
+
+   - Add `xmlns:tools="http://schemas.android.com/tools"` to the `manifest` node
+   - Add `tools:remove="android:requestLegacyExternalStorage"` to the `application` node
+
+</>
+
+<>
+
+1. Add the repository address to the build.gradle in the root directory of the project:
+
+<CodeBlock language="groovy">
+{
+`allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}`}
+</CodeBlock>
+
+2. Add corresponding module dependencies to the app module's build.gradle (e.g., login and embedded dynamics):
+
+<CodeBlock language="groovy">
+{
+`dependencies {
+    implementation 'com.taptap.sdk:tap-core:${v4SDKVersions.taptap.android}'
+}`
+}
+
+</CodeBlock>
+
+3. Add network permissions in `AndroidManifest.xml`:
+
+<CodeBlock language="xml">
+{
+`<uses-permission android:name="android.permission.INTERNET"></uses-permission>`
+}
+</CodeBlock>
+
+4. Additional configuration for older Android versions
+
+   If `targetSdkVersion < 29`, you also need to add the following configuration:
+
+    - Add `xmlns:tools="http://schemas.android.com/tools"` to the `manifest` node
+    - Add `tools:remove="android:requestLegacyExternalStorage"` to the `application` node
+
+</>
+
+<>
+
+#### Import SDK
+
+iOS provides two integration methods: adding CocoaPods remote dependencies and using local file imports. It is recommended to use the remote dependency method.
+
+##### Remote Dependencies
+
+1. Add dependencies under the corresponding module in the project's Podfile file:
+
+<CodeBlock>{` pod 'TapTapCoreSDK', '~> ${v4SDKVersions.taptap.ios }'`}</CodeBlock>
+
+2. Execute `Pod install` to download the corresponding dependency files
+
+##### Local File Dependencies
+
+1. Download the following files from the [Download Page](/tap-download):
+
+- `tapsdkcorecpp.xcframework` Base Library
+- `TapTapBasicToolsSDK.xcframework` Base Library
+- `TapTapCoreSDK.xcframework` Core Library
+- `TapTapGidSDK.xcframework` Base Library
+- `TapTapNetworkSDK.xcframework` Base Library
+- `THEMISLite.xcframework` Base Library
+
+2. Add the `framework` static library to the project, ensure the Embed method is set to **Do Not Embed**
+3. The SDK internally uses the [`Protobuf` dependency library](https://cocoapods.org/pods/Protobuf). Developers should add the corresponding dependency in advance through remote or file import methods.
+
+#### Configure Compilation Options
+
+- Add `-ObjC` and `-Wl -ld_classic` to Other Link Flag in Build Setting.
+
+- Set Always Embed Swift Standard Libraries to YES in Build Setting to always include the Swift standard library to avoid app startup errors like "Swift standard library not found". If not found in the project, create an empty Swift file, and Xcode will automatically establish a bridging relationship.
+
+- Choose Swift 5 in Swift Compiler - Language/Swift Language Version in Build Setting.
+
+</>
+
+</MultiLang>
+
+## Initialization
+
+When initializing TapSDK, you need to pass in application configuration information such as `Client ID` and region.
+
+The new version of TapSDK provides unified initialization, and business modules (e.g., achievements, login, etc.) do not need separate initialization.
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+```cs
+using TapSDK.Core;
+
+// Core configuration
+TapTapSdkOptions coreOptions = new TapTapSdkOptions
+{
+   // Client ID, obtained from the developer backend
+   clientId = clientId,
+   // Client Token, obtained from the developer backend
+   clientToken = clientToken,
+   // Region, CN for domestic, Overseas for abroad
+   region = TapTapRegionType.CN,
+   // Language, default is Auto, by default, zh_Hans for domestic, en for abroad
+   preferredLanguage = TapTapLanguageType.zh_Hans,
+   // Whether to enable logging, set to false for Release version
+   enableLog = true
+};
+// TapSDK Initialization
+TapTapSDK.Init(coreOptions);
+
+// When you need to add initialization configuration items for other modules, such as compliance certification, achievements, etc., please use the following API
+TapTapSdkBaseOptions[] otherOptions = new TapTapSdkBaseOptions[]
+{
+    // Other module configuration items
+};
+TapTapSDK.Init(coreOptions, otherOptions);
+
+```
+
+</>
+
+<>
+
+**Please ensure that the initialization of TapSDK is executed on the main thread (UI thread).**
+
+```java
+import com.taptap.sdk.core.TapTapRegion;
+import com.taptap.sdk.core.TapTapSdk;
+import com.taptap.sdk.core.TapTapSdkOptions;
+
+/* Required Configuration */
+// Client ID corresponding to the Developer Center
+String clientId = "";
+// Client Token corresponding to the Developer Center
+String clientToken = "";
+// Whether to enable log, it is recommended to enable it during Debug and disable it during Release, default is to disable log
+boolean enableLog = BuildConfig.DEBUG;
+
+TapTapSdkOptions tapSdkOptions = new TapTapSdkOptions(
+       clientId, // Game Client ID
+       clientToken, // Game Client Token
+       TapTapRegion.CN // Playable region of the game: [TapTapRegion.CN]=Domestic [TapTapRegion.GLOBAL]=Overseas
+);
+tapSdkOptions.setEnableLog(enableLog);
+// Initialize TapSDK
+TapTapSdk.init(context, tapSdkOptions);
+
+```
+
+</>
+
+<>
+
+**Please ensure that the initialization of TapSDK is executed on the main thread (UI thread).**
+
+```kotlin
+TapTapSdk.init(
+    this,
+    TapTapSdkOptions(
+        clientId, // Game Client ID
+        clientToken, // Game Client Token
+        region, // Playable region of the game: [TapTapRegion.CN]=Domestic [TapTapRegion.GLOBAL]=Overseas
+        channel, // Subpackage channel name
+        gameVersion, // Game version number
+        autoIAPEventEnabled, // Whether to automatically report GooglePlay in-app purchase success events, only effective for [TapTapRegion.GLOBAL]
+        overrideBuiltInParameters, // Whether custom fields can override built-in fields
+        properties, // Custom properties, these properties will be included when launching the first preset event (device_login)
+        oaidCert, // OAID certificate, used for reporting OAID, only effective for [TapTapRegion.CN]
+        enableLog, // Whether to enable log, it is recommended to enable it during Debug and disable it during Release, default is to disable log
+        preferredLanguage, // TapSDK preferred language, default is TapTapLanguage.AUTO
+    ),
+    TapTapAchievementOptions(enableToast = true), // Achievement initialization configuration
+    TapTapComplianceOptions(showSwitchAccount = true, useAgeRange = true) // Compliance certification initialization configuration
+)
+```
+
+</>
+<>
+
+```swift
+import TapTapCoreSDK
+
+let options = TapTapSdkOptions()
+options.clientId = "your_client_id" // Required, Client ID corresponding to the Developer Center
+options.clientToken = "your_client_token" // Required, Client Token corresponding to the Developer Center
+options.region = .CN // .CN: Mainland China, .overseas: Other countries or regions
+options.enableLog = true // Whether to enable log, it is recommended to enable it during Debug and disable it during Release, default is to disable log
+options.preferredLanguage = TapLanguageType.auto // Language setting, default is to follow the system, when the system language is not supported, it defaults to Chinese domestically and English overseas
+
+// Initialize SDK
+TapTapSDK.initWith(options)
+
+// When you need to add initialization configuration items for other modules, such as compliance certification, achievements, etc., you can call the following API
+var otherOptions:[TapTapSdkBaseOptions] = []
+
+// Add initialization configuration items for other modules
+// otherOptions.append(moduleOptions) moduleOptions is the initialization configuration item for other modules
+
+// Initialize SDK
+TapTapSDK.initWith(options, otherOptions: otherOptions)
+
+```
+
+</>
+</MultiLang>
+
+During initialization, **you must fill in** `client_id` and `client_token`
+
+- `client_id` and `client_token` information can be found in **Developer Center > Your Game > Game Services > Application Configuration**.
+
+## Integration Features
+
+TapSDK provides numerous features. After initializing the SDK, refer to the documentation of the corresponding features and integrate them as needed for your project. Most games will integrate TapTap login, so we recommend starting with this feature.
+
+### Configure Signature Certificate
+
+Android and iOS applications need to go to the TapTap Developer Center, enter your game, and select **Game Services > Application Configuration > Signature Certificate Configuration** to configure the relevant information of the application (as shown below). Otherwise, when testing the login function for Android applications, a `signature not match` error message will be returned, and for iOS, a `sdk_not_matched` error message will be returned, making it impossible to use the TapTap login function normally.
+
+Fill in the MD5 value at the Android signature. For details, please refer to: [How to Obtain MD5 Value](/sdk/access/android-md5).
+
+![](https://img.tapimg.com/market/images/1cac0c5e7ef75ef1df4614c947a2db69.png)
+
+Next, you can package the application and test the TapTap login function.
+
+### Android Code Obfuscation
+
+TapSDK has already been obfuscated, and further obfuscation will lead to unexpected errors. Please add the following configuration to your project's obfuscation script to skip the obfuscation operation on TapSDK:
+
+```java
+-keep class com.taptap.**{*;}
+
+-keep class com.tapsdk.**{*;}
+```
+
+## Packaging
+
+For Android or iOS, just follow the usual Android APK or iOS application packaging process. Here is an introduction to the Unity packaging process:
+
+### Packaging APK
+
+Step 1, configure package name and signature file:
+
+![](https://capacity-files.lcfile.com/qooIRbr5qtLrnhsP0hWjOSnBYW12eNg6/tap_unity_android_build.png)
+
+Step 2, check **File > Build Settings > Player Settings > Other Settings > Target API Level** version. When the API Level is less than 29, you need to configure the manifest and add in the `application` node:
+
+```json
+tools:remove="android:requestLegacyExternalStorage"
+```
+
+This is because the SDK internally defaults to `android:requestLegacyExternalStorage = true`, which will cause an error `Android resource linking failed` when `targetSdkVersion < 29`.
+
+### Export Xcode Project
+
+You need to configure the icon and `BundleID`:
+
+![](https://capacity-files.lcfile.com/Nke4QO6zdEz5mRd2Kwd8R9ydyP8QYaJy/tap_ios_build.png)
+
+## Repackaging
+
+### Initialization Failure Due to META-INF/services Merge Error
+
+:::tip
+The implementation of TapSDK's initialization framework relies on [auto-service](https://github.com/google/auto/blob/main/service/README.md),
+generating META-INF/services/xxx files (service implementation classes) through auto-service, and then using Java's [service loader](https://docs.oracle.com/javase/8/docs/api/java/util/ServiceLoader.html) to load them.
+:::
+
+The problem often appears as **initialization failure**, but the **essential reason** is that during **repackaging**, the game developer did not correctly merge the files in the `META-INF` folder.
+
+#### Type 1: Excluded META-INF/services/com.taptap.sdk.internal.service.ITapAutoService File During Repackaging
+
+This type of problem is common, where developers often do not process all files under `META-INF/services` (exclude), leading to SDK initialization failure.
+
+#### Type 2: Error in Merging META-INF/services/com.taptap.sdk.internal.service.ITapAutoService
+
+This means that the developer realized the need to process the files under `META-INF/services`, but an error occurred during the merge, leading to SDK initialization failure. This type of problem often arises because the developer adopted the `override` strategy rather than `merge` during repackaging, which means that when encountering the same file name `META-INF/services/com.taptap.sdk.internal.service.ITapAutoService` in multiple AARs, only one was retained, leading to SDK initialization failure.
+
+Incorrect merge, as shown:
+![](/img/错误的合并.png)
+
+Correct merge, as shown:
+![](/img/正确的合并.png)

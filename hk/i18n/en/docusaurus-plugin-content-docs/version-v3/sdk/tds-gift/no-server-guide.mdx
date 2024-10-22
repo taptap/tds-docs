@@ -1,0 +1,62 @@
+---
+title: Serverless Exchange Development Guide
+sidebar_label: Serverless Exchange
+sidebar_position: 3
+---
+
+:::tip
+This article is to explain the access process of serverless redemption method. If you need complete development content, please refer to [**Guide**](/v3/sdk/tds-gift/guide/).
+:::
+
+## Present
+
+Docking gift redemption code requires the game party to maintain one or two web interfaces, which is relatively cumbersome. Therefore, we have simplified the redemption process as follows:
+
+** The game party requests the redemption interface for redemption, and judges whether the redemption is successful based on the information returned by the interface. **
+
+In this way, the game party only needs to call one interface to complete the redemption process.
+
+:::tip
+The exchange results received directly by the client can be intercepted, so the security of this method is not as high as other methods.
+:::
+
+## Matchmaking
+
+### Redemption interface
+
+The domain name is divided into two addresses according to the developer centre, and the gift pack data of the two addresses are not interoperable:
+
+| TapTap Version     | Domain Name                      |
+| --------------- | ------------------------- |
+| China taptap.cn | https://poster-api.xd.cn  |
+| Overseas taptap.io  | https://poster-api.xd.com |
+
+The redemption interface parameters are described in detail in the [**Developer's Guide - Serverless Redemption**](/v3/sdk/tds-gift/guide/#redeeming-without-a-server-1).
+
+A signature needs to be generated when initiating a redemption. The signature of the service-less redemption interface is calculated from the Client Id and other information, see [**Documentation**](/v3/sdk/tds-gift/guide/#signature) for the signature calculation process.
+
+### Return value
+
+#### Result
+
+Judge whether the exchange behaviour is successful or not by whether the error field in the return value is 0. If the error field is judged not to be 0, you can see the specific reason according to [**error-codes**](/v3/sdk/tds-gift/guide/#error-codes).
+
+#### Verification
+
+To prevent the return information from being tampered with, it is recommended that you take the following measures:
+1. To prevent replay attacks, you need to verify whether the return timestamp is too different from the client's time;
+2. Calculate a signature based on the return value and verify that it matches the signature in the return value. The signature calculation process is described in [**Documentation**](/v3/sdk/tds-gift/guide/#signature);
+2. It is recommended that the name of the gift content can be an encrypted name.
+
+#### Prize content
+
+The prize content corresponding to the redemption code can be obtained based on the content or content_obj field in the return value. The difference is that content is a nested json string and parsing it directly as an object may result in an error. 
+
+The prize content setting is not limited to English and Chinese. In order to facilitate development and judgment, it is recommended to maintain a prop list.
+
+## Other
+### Development Environment
+
+Using the serverless redemption interface to distinguish the formal testing environment requires creating different applications in the Developer Center.
+
+If it is not possible to deal with environmental issues by application, it is recommended to use the [without secondary check redemption interface](/v3/sdk/tds-gift/guide/#without-secondary-check) to complete the redemption by configuring server information and configuring the server code to be forwarded to different environments .
