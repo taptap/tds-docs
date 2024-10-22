@@ -1,6 +1,6 @@
-const taptapUnity = "4.4.1"
+const taptapUnity = "4.4.2"
 const taptapIos = "4.4.0"
-const taptapAndroid = "4.4.1"
+const taptapAndroid = "4.4.2"
 const taptapUnreal = "3.29.2"
 
 const v4SDKVersions = {
