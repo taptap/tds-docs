@@ -1,54 +1,115 @@
 import CodeBlock from "@theme/CodeBlock";
-import v3SDKVersions from "/src/docComponents/v3SDKVersions";
+import v4SDKVersions from '/src/docComponents/v4SDKVersions';
 
-The SDK can be imported either **through Unity Package Manager** or manually**. Please choose according to your project needs.
+### External Dependency Integration
 
-#### Method 1: Use Unity Package Manager
+The SDK internally uses some third-party libraries. Developers need to ensure that the external dependencies are properly integrated before using the SDK. The specific settings are as follows:
 
-##### NPMJS Installation
+1. The SDK uses the `Newtonsoft-json` library for JSON parsing. If this dependency is already integrated in the current project, no additional handling is needed. Otherwise, add the following dependency to `Packages/manifest.json`:
 
-As of version 3.25.0, TapSDK supports NPMJS installation, with the advantage that only the version number needs to be configured and nested dependencies are supported.
+```json
+"com.unity.nuget.newtonsoft-json":"3.2.1"
+```
 
-Add the following dependencies to your project's `Packages/manifest.json` file:
+2. The SDK uses `com.google.external-dependency-manager` to manage Android and iOS dependencies. If this dependency is already integrated in the current project, no additional handling is needed. Otherwise, add the following dependency to `Packages/manifest.json`:
 
-<CodeBlock className="json">
+```json
+{
+   "dependencies": {
+      "com.google.external-dependency-manager": "1.2.179"
+   },
+   "scopedRegistries": [
+      {
+         "name": "package.openupm.com",
+         "url": "https://package.openupm.com",
+         "scopes": [
+            "com.google.external-dependency-manager"
+         ]
+      }
+  ]
+}
+```
+
+:::tip
+
+If you need to integrate TapSDK for the Unity PC platform, you need to use the NuGet integration tool to integrate the `K4os.Compression.LZ4` and `protobuf-net` libraries. The specific settings are as follows:
+
+- Add the following dependency in `Packages/manifest.json`:
+```json
+"com.github-glitchenzo.nugetforunity": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity"
+```
+- After adding, if the **NuGet** option does not appear in the top menu of Unity, restart the Unity editor, including the Unity Hub client.
+- In the top menu of Unity, select **NuGet > Manage NuGet Packages**, search for `K4os.Compression.LZ4` and `protobuf-net` in the pop-up window, and install them.
+
+  The final `packages.config` file in the Assets folder will automatically generate the following dependencies:
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<packages>
+  <package id="K4os.Compression.LZ4" version="1.3.8" manuallyInstalled="true" />
+  <package id="System.Collections.Immutable" version="7.0.0" />
+  <package id="System.Runtime.CompilerServices.Unsafe" version="6.0.0" />
+  <package id="protobuf-net" version="3.2.30" manuallyInstalled="true" />
+  <package id="protobuf-net.Core" version="3.2.30" />
+</packages>
+```
+:::
+
+### Adding SDK Dependencies
+
+The SDK supports integration through **Unity Package Manager** and local file imports. Developers can choose one of these methods based on their needs, with remote dependencies being recommended.
+
+#### Remote Dependency
+
+The SDK can be integrated via NPMJS or GitHub. Developers can choose one of these methods.
+
+##### 1. NPMJS Integration
+
+Add the following dependencies in the project's `Packages/manifest.json` file:
+
+<CodeBlock language="json">
   {`"dependencies":{
-    ${props.npmDeps.map(dep => `"${dep}":"${v3SDKVersions.taptap.unity}",`).join('\n    ')}
+    ${props.npmDeps.map(dep => `"${dep}":"${v4SDKVersions.taptap.unity}",`).join('\n    ')}
 }`}
 </CodeBlock>
 
-However, it should be noted that `scopedRegistries` must be declared under the same level of dependencies in `Packages/manifest.json`:
+Note that you need to declare `scopedRegistries` at the same level as `dependencies` in `Packages/manifest.json`:
 
-<CodeBlock className="json">
-{`"scopedRegistries": [
-    {
-      "name": "NPMJS",
-      "url": "https://registry.npmjs.org/",
-      "scopes": ["com.tapsdk", "com.taptap", "com.leancloud"]
-    }
-  ]`}
+```json
+"scopedRegistries":[
+  {
+    "name": "NPMJS",
+    "url": "https://registry.npmjs.org/",
+    "scopes": ["com.taptap"]
+  }
+]
+```
+
+##### 2. GitHub Integration
+
+Add the following dependencies in the project's `Packages/manifest.json` file:
+
+<CodeBlock language="json">
+ {`"dependencies":{
+   ${props.githubDeps.map(dep => `"${dep.package}":"${dep.url}",`).join('\n   ')}
+ }`}
 </CodeBlock>
 
-##### GitHub Installation
+In Unity's top menu, select **Window > Package Manager** to view packages installed in the project.
 
-Add the following dependencies to your project's `Packages/manifest.json` file:
+#### Local File Import
 
-<CodeBlock className="json">
-  {`"dependencies":{
-    ${props.githubDeps.map(dep => `"${dep.package}":"${dep.url}",`).join('\n    ')}
-}`}
-</CodeBlock>
-
-Select **Window > Package Manager** in the top menu of Unity to see the packages already installed in your project.
-
-#### Method 2: Import Manually
-
-1. Find the download addresses of **TapSDK Unity** and **LeanCloud C# SDK** on the [download page](/tap-download) , and download `TapSDK-UnityPackage.zip` and `LeanCloud-SDK-Realtime-Unity.zip` respectively.
-
-2. In the Unity project, go to **Assets > Import Packages > Custom Packages**, and from the unzipped `TapSDK-UnityPackage.zip`, select the TapSDK packages that you want to use in the game, and import them:
+1. Download the corresponding `unitypackage` files for the modules from the [Download Page](/tap-download) and import them into the Unity project through **Assets > Import Packages > Custom Packages**, including:
 
   <ul>
     {props.unitypackageModules.map(module => <li><code>{module.name}</code> {module.desc}。</li>)}
   </ul>
 
-3. The decompresses `LeanCloud-SDK-Realtime-Unity.zip` is in the Plugins folder, drag and drop it to Unity.
+2. If the current project has already integrated the `Newtonsoft.Json` dependency, skip this step. Otherwise, download the library file from `NuGet.org` [Newtonsoft.Json](https://www.nuget.org/packages/Newtonsoft.Json) by clicking "Download package" on the right, change the file extension from `.nupkg` to `.zip`, extract the file, and copy the `Newtonsoft.Json.dll` file to the `Plugins` directory under `Assets`. Additionally, to avoid deleting necessary data when exporting to the IL2CPP platform, create a `link.xml` file in the `Assets` directory (if it already exists, add the following content):
+
+```xml
+<linker>
+  <assembly fullname="System.Core">
+    <type fullname="System.Linq.Expressions.Interpreter.LightLambda" preserve="all" />
+  </assembly>
+</linker>
+```
