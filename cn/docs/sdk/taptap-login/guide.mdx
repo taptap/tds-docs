@@ -400,27 +400,23 @@ TapTapSDK.initWith(options)
 using TapSDK.Login;
 using System.Threading.Tasks;
 
-// 定义授权范围
-List<string> scopes = new List<string>();
-scopes.Add(TapTapLogin.TAP_LOGIN_SCOPE_PUBLIC_PROFILE);
-
-// 初始化登录请求 Task
-Task<TapTapAccount> task = TapTapLogin.Instance.LoginWithScopes(scopes.ToArray());
-var result = await task;
-
-// 判断登录结果
-if (task.IsCompleted)
+try
 {
-	// 登录成功
-} 
-else if (task.IsCanceled)
-{
- 	// 登录取消
+    // 定义授权范围
+    List<string> scopes = new List<string>
+    {
+        TapTapLogin.TAP_LOGIN_SCOPE_PUBLIC_PROFILE
+    };
+    // 发起 Tap 登录
+    var account = await TapTapLogin.Instance.LoginWithScopes(scopes.ToArray());
 }
-else
+catch (TaskCanceledException)
 {
-	// 登录失败
-	Debug.Log($"登录失败: {task.Exception.Message}");
+    Debug.Log("用户取消");
+}
+catch (Exception exception)
+{
+    Debug.Log($"获取 account 信息出现异常：{exception}");
 }
 ```
 
