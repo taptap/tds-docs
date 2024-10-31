@@ -555,88 +555,165 @@ public class Authorization {
 
 <summary>PHP 请求示例</summary>
 
-<Conditional region='cn'>
-
 ```php
 <?php
-
-# 客户端 ID
+/**
+ * 以下是配置项：请按实际情况替换参数后进行授权请求。
+ */
 $client_id = "请替换为控制台的 Client ID";
-# 替换成移动端 SDK 获取的 kid
-$kid="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ";
-# 替换成移动端 SDK 获取的 mac_key
-$mac_key = "mSUQNYUGRBPXyRyW";
-# 接口请求地址
-$request_url = "https://open.tapapis.cn/account/profile/v1?client_id=".$client_id;
-$ts = time();
-$nonce = "== XinDong_Lee-JiEun ==";//随机数，正式上线请替换
-//方式一
-//$params = [$ts,$nonce,"GET","/account/profile/v1?client_id=".$client_id,"open.tapapis.cn", 443,"\n"];
-//$signStr = implode("\n",$params);
-//var_dump($signStr);
-//方式二
-$signStr = sprintf("%s\n%s\n%s\n%s\n%s\n443\n\n",$ts,$nonce,"GET","/account/profile/v1?client_id=".$client_id,"open.tapapis.cn");
-//MAC TOKEN 加密
-$mac = base64_encode(hash_hmac('sha1', $signStr, $mac_key,true));
-$auth = sprintf('MAC id="%s",ts="%s",nonce="%s",mac="%s"',$kid,$ts,$nonce,$mac);
-$headers = array(
-    "Authorization:".$auth
-);
-echo "Authorization:".$auth.PHP_EOL.PHP_EOL;
+$kid = "请替换为客户端 SDK 授权成功后，MAC Token 中 kid 的值";
+$mac_key = "请替换为客户端 SDK 授权成功后，MAC Token 中 mac_key 的值";
 
-$curl = curl_init($request_url);
-// 设置请求方式
-curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
-// Header 头信息设置
-curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-$result = curl_exec($curl);
-curl_close($curl);
+/**
+ * 获取当前账户详细信息的接口。
+ * 如果需要获取账户基础信息，请替换为以下 URL:
+ * https://openapi.tap.io/account/basic-info/v1
+ */
+$url = "https://openapi.tap.io/account/profile/v1";
 
-?>
+/**
+ * 主程序逻辑
+ */
+// 步骤 1：设置 $method、$request_url
+$method = "GET";
+$request_url = $url . "?client_id=" . urlencode($client_id);
+
+// 步骤 2：生成时间戳和随机数
+$ts = time(); // 秒级当前时间戳
+$nonce = randomString(5); // 随机数，至少5位
+
+// 步骤 3：创建待签名字符串并生成签名
+$signing_string = createSigningString($request_url, $ts, $nonce, $method);
+$mac = sign($signing_string, $mac_key);
+
+// 步骤 4：生成 Authorization 头部信息
+$auth = sprintf('MAC id="%s",ts="%s",nonce="%s",mac="%s"', $kid, $ts, $nonce, $mac);
+echo "Authorization: " . $auth . PHP_EOL . PHP_EOL;
+
+// 步骤 5：执行 HTTP 请求并输出结果
+$headers = array("Authorization: " . $auth);
+$response = executeCurlRequest($request_url, $headers, $method);
+
+echo "HTTP Status Code: " . $response['http_code'] . PHP_EOL . PHP_EOL;
+if (isset($response['error'])) {
+    echo "Error: " . $response['error'] . PHP_EOL . PHP_EOL;
+}
+if (isset($response['body'])) {
+    echo "Response Body: " . PHP_EOL . json_encode($response['body'], JSON_PRETTY_PRINT) . PHP_EOL;
+}
+
+/**
+ * 创建待签名字符串
+ *
+ * @param string $request_url 请求的 URL
+ * @param int $ts 时间戳
+ * @param string $nonce 随机数
+ * @param string $method HTTP 方法
+ * @return string 待签名字符串
+ */
+function createSigningString($request_url, $ts, $nonce, $method)
+{
+    $parsed_url = parse_url($request_url);
+    $uri = $parsed_url['path'] . '?' . $parsed_url['query'];
+    $domain = $parsed_url['host'];
+    $port = 443; // 使用 HTTPS 固定端口
+
+    return implode("\n", [
+            $ts,
+            $nonce,
+            $method,
+            $uri,
+            $domain,
+            $port,
+            ""
+        ]) . "\n";
+}
+
+/**
+ * 生成签名值
+ *
+ * @param string $signing_string 待签名字符串
+ * @param string $mac_key MAC 密钥
+ * @return string 生成的签名值
+ * @example sign('abc', 'def') -> dYTuFEkwcs2NmuhQ4P8JBTgjD4w=
+ */
+function sign($signing_string, $mac_key)
+{
+    return base64_encode(hash_hmac('sha1', $signing_string, $mac_key, true));
+}
+
+/**
+ * 执行 cURL 请求并返回结果
+ *
+ * @param string $url 请求的 URL
+ * @param array $headers 请求头
+ * @param string $method HTTP 方法
+ * @return array 包含状态码和响应内容或错误信息
+ */
+function executeCurlRequest($url, $headers, $method)
+{
+    $curl = curl_init($url);
+    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
+    curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+
+    // 执行请求并捕获响应
+    $response = curl_exec($curl);
+    $httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+    // 检查是否发生 cURL 错误
+    if (curl_errno($curl)) {
+        $error_message = curl_error($curl);
+        curl_close($curl);
+
+        return array(
+            'http_code' => 0,
+            'error' => "cURL 错误: " . $error_message,
+            'body' => json_decode($response, true)
+        );
+    }
+
+    // 关闭 cURL 句柄
+    curl_close($curl);
+
+    // 解析响应
+    $parsed_body = json_decode($response, true);
+
+    // 根据 HTTP 状态码返回结果
+    if ($httpCode >= 200 && $httpCode < 300) {
+        return array(
+            'http_code' => $httpCode,
+            'body' => $parsed_body
+        );
+    } else {
+        return array(
+            'http_code' => $httpCode,
+            'error' => "HTTP 请求失败，状态码: $httpCode",
+            'body' => $parsed_body
+        );
+    }
+}
+
+/**
+ * 生成随机字符串
+ *
+ * @param int $length 随机字符串的长度
+ * @return string 随机生成的字符串
+ */
+function randomString($length = 5)
+{
+    $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    $charactersLength = strlen($characters);
+    $randomString = '';
+
+    for ($i = 0; $i < $length; $i++) {
+        $randomIndex = mt_rand(0, $charactersLength - 1);
+        $randomString .= $characters[$randomIndex];
+    }
+
+    return $randomString;
+}
 ```
-</Conditional>
-
-<Conditional region='global'>
-
-```php
-<?php
-
-# 客户端 ID
-$client_id = "请替换为控制台的 Client ID";
-# 替换成移动端 SDK 获取的 kid
-$kid="1/hC0vtMo7ke0Hkd-iI8-zcAwy7vKds9si93l7qBmNFxJkylWEOYEzGqa7k_9iw_bb3vizf-3CHc6U8hs-5a74bMFzkkz7qC2HdifBEHsW9wxOBn4OsF9vz4Cc6CWijkomnOHdwt8Km6TywOX5cxyQv0fnQQ9fEHbptkIJagCd33eBXg76grKmKsIR-YUZd1oVHu0aZ6BR7tpYYsCLl-LM6ilf8LZpahxQ28n2c-y33d-20YRY5NW1SnR7BorFbd00ZP97N9kwDncoM1GvSZ7n90_0ZWj4a12x1rfAWLuKEimw1oMGl574L0wE5mGoshPa-CYASaQmBDo3Q69XbjTsKQ";
-# 替换成移动端 SDK 获取的 mac_key
-$mac_key = "mSUQNYUGRBPXyRyW";
-# 接口请求地址
-$request_url = "https://openapi.tap.io/account/profile/v1?client_id=".$client_id;
-$ts = time();
-$nonce = "== XinDong_Lee-JiEun ==";//随机数，正式上线请替换
-//方式一
-//$params = [$ts,$nonce,"GET","/account/profile/v1?client_id=".$client_id,"openapi.tap.io", 443,"\n"];
-//$signStr = implode("\n",$params);
-//var_dump($signStr);
-//方式二
-$signStr = sprintf("%s\n%s\n%s\n%s\n%s\n443\n\n",$ts,$nonce,"GET","/account/profile/v1?client_id=".$client_id,"openapi.tap.io");
-//MAC TOKEN 加密
-$mac = base64_encode(hash_hmac('sha1', $signStr, $mac_key,true));
-$auth = sprintf('MAC id="%s",ts="%s",nonce="%s",mac="%s"',$kid,$ts,$nonce,$mac);
-$headers = array(
-    "Authorization:".$auth
-);
-echo "Authorization:".$auth.PHP_EOL.PHP_EOL;
-
-$curl = curl_init($request_url);
-// 设置请求方式
-curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "GET");
-// Header 头信息设置
-curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
-$result = curl_exec($curl);
-curl_close($curl);
-
-?>
-```
-</Conditional>
-
 </details>
 
 <details>
