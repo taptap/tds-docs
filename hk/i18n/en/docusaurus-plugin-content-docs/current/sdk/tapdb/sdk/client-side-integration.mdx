@@ -1,0 +1,1579 @@
+---
+title: Client Integration
+sidebar_label: Client Integration
+sidebar_position: 3
+---
+
+import MultiLang from '/src/docComponents/MultiLang';
+import CodeBlock from '@theme/CodeBlock';
+import v4SDKVersions from '/src/docComponents/v4SDKVersions';
+import {Conditional} from '/src/docComponents/conditional';
+
+import UnitySDKInstallation from "../../_partials/unity-sdk-installation.mdx";
+
+## Introduction
+
+TapSDK provides an API for game developers to collect account data. The system collects and analyzes account data to generate data reports, helping game developers analyze account behavior and optimize games.
+
+## Environment Requirements
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+- Unity 2019.4 or later
+- iOS 11 or later, Xcode version 15.3 or later
+- Android 5.0 (API level 21) or later
+
+</>
+
+<>
+
+Android 5.0 (API level 21) or later
+
+</>
+
+<>
+
+Android 5.0 (API level 21) or later
+
+</>
+
+<>
+
+iOS 11 or later, Xcode version 15.3 or later
+
+</>
+
+</MultiLang>
+
+## Permission Description
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+
+</>
+
+<>
+
+The module requires the following permissions:
+
+| Permission                | Purpose                                | Timing of Permission Request                |
+| ------------------------- | -------------------------------------- | ------------------------------------------- |
+| Get Network Status        | To check if the current network connection is valid | Permission is requested when the user first uses the feature |
+| Network State Permission  | To check the network connection status (such as whether Wi-Fi or mobile data is available) | Permission is requested when the user first uses the feature |
+
+For optional permissions, the SDK will not proactively request them and will only access the corresponding data if the user has granted the permission. Developers need to decide whether to request these permissions.
+
+The module will add the following permissions to the application:
+
+```xml
+ <uses-permission android:name="android.permission.INTERNET" />
+ <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+ ```
+
+</>
+
+<>
+
+The module requires the following permissions:
+
+| Permission                | Purpose                                | Timing of Permission Request                |
+| ------------------------- | -------------------------------------- | ------------------------------------------- |
+| Get Network Status        | To check if the current network connection is valid | Permission is requested when the user first uses the feature |
+| Network State Permission  | To check the network connection status (such as whether Wi-Fi or mobile data is available) | Permission is requested when the user first uses the feature |
+
+For optional permissions, the SDK will not proactively request them and will only access the corresponding data if the user has granted the permission. Developers need to decide whether to request these permissions.
+
+The module will add the following permissions to the application:
+
+```xml
+ <uses-permission android:name="android.permission.INTERNET" />
+ <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+ ```
+
+</>
+
+<>
+
+
+</>
+
+</MultiLang>
+
+## Preparation Before Integration
+
+1. Refer to [Getting Ready](/sdk/access/get-ready/) to create an application and enable data analysis services;
+
+## SDK Integration
+
+Please [download](/tap-download) TapSDK and add the relevant dependencies.
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+If you only need to use TapEvent separately, you can import the dependency `com.taptap.sdk.core`.
+
+<UnitySDKInstallation
+npmDeps={[
+"com.taptap.sdk.core"
+]}
+githubDeps={[
+{package: "com.taptap.sdk.core", url: `https://github.com/taptap/TapSDKCore-Unity.git#${v4SDKVersions.taptap.unity}`}
+]}
+unitypackageModules={[
+{name: "TapTapSDK_Core.unitypackage", desc: "TapSDK Core Library, Mandatory"},
+]}/>
+
+</>
+
+<>
+
+1. Add the repository address to the build.gradle in the project root directory:
+
+```groovy
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+```
+
+2. Add the corresponding dependency to the app module's build.gradle:
+
+<CodeBlock language="groovy">{
+`dependencies {
+    implementation 'com.taptap.sdk:tap-core:${v4SDKVersions.taptap.android}'
+}`
+}</CodeBlock>
+
+</>
+
+<>
+
+1. Add the repository address to the build.gradle in the project root directory:
+
+```groovy
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+```
+
+2. Add the corresponding dependency to the app module's build.gradle:
+
+<CodeBlock language="groovy">{
+`dependencies {
+    implementation 'com.taptap.sdk:tap-core:${v4SDKVersions.taptap.android}'
+}`
+}</CodeBlock>
+
+</>
+
+<>
+
+iOS provides two integration methods through adding CocoaPods remote dependencies and using local file imports. Remote dependencies are recommended.
+
+##### Remote Dependency
+
+1. Add the dependency under the corresponding module in the Podfile:
+
+<CodeBlock>{` pod 'TapTapCoreSDK', '~> ${v4SDKVersions.taptap.ios }'`}</CodeBlock>
+
+2. Execute `Pod install` to download the corresponding dependency files
+
+##### Local File Dependency
+
+1. Download the following files from the [download page](/tap-download):
+
+- `tapsdkcorecpp.xcframework` Core Library
+- `TapTapBasicToolsSDK.xcframework` Core Library
+- `TapTapCoreSDK.xcframework` Core Library
+- `TapTapGidSDK.xcframework` Core Library
+- `TapTapNetworkSDK.xcframework` Core Library
+- `THEMISLite.xcframework` Core Library
+
+2. Add the `framework` static library in the project, and set the Embed option to **Do Not Embed**
+3. The SDK internally uses the [`Protobuf` dependency library](https://cocoapods.org/pods/Protobuf). Developers should add the corresponding dependency in advance through remote or file import methods.
+
+#### Configure Compilation Options
+
+- Add `-ObjC` and `-Wl -ld_classic` in Other Link Flag in Build Setting.
+
+- Set Always Embed Swift Standard Libraries to YES in Build Setting to always include the Swift standard library, avoiding startup errors like "Swift standard library not found". If it is not found in the project, you can create an empty Swift file, and Xcode will automatically establish a bridge.
+
+- Select Swift 5 in Swift Compiler - Language/Swift Language Version in Build Setting.
+
+</>
+
+
+</MultiLang>
+
+:::info
+If you have used TapSDK's data analysis feature with version `<3.6.3`, and the region was set to International (`IO`) during initialization, you need to migrate the data before upgrading the SDK to version `>=3.6.3`. Please submit a ticket to contact us for data migration before upgrading.
+:::
+
+## SDK Initialization
+
+During [TapSDK initialization](/sdk/access/quickstart#initialization), you can configure game package properties and the current device information for event reporting. The specific usage is as follows:
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+```cs
+using TapSDK.Core;
+
+// Core configuration
+TapTapSdkOptions coreOptions = new TapTapSdkOptions
+{
+// Client ID, obtained from the developer backend
+clientId = clientId,
+// Client Token, obtained from the developer backend
+clientToken = clientToken,
+// Region, CN for domestic, Overseas for abroad
+region = TapTapRegionType.CN,
+// Channel, such as AppStore, GooglePlay
+channel = "AppStore",
+// Language, default is Auto, the default is zh_Hans for domestic and en for abroad
+preferredLanguage = TapTapLanguageType.zh_Hans,
+// Game version number, if not provided, the app's version number will be read by default
+gameVersion = "1.1.0",
+// Custom parameters passed during initialization, will be reported in the device_login event
+propertiesJson = "{\"device_login_custom_key\": \"Data passed during initialization, will be reported in the device_login event\"}",
+// CAID, only for domestic iOS
+caid = "000-000-0000-00000",
+// Whether to override built-in parameters, default is false
+overrideBuiltInParameters = false,
+// Whether to enable advertiser ID collection, default is false
+enableAdvertiserIDCollection = true,
+// Whether to enable automatic reporting of IAP events
+enableAutoIAPEvent = true,
+// OAID certificate, only for Android, used to report OAID, only effective for [TapTapRegion.CN]
+oaidCert = null,
+// Whether to enable logging, set to false for the Release version
+enableLog = true
+};
+// TapSDK initialization
+TapTapSDK.Init(coreOptions);
+
+
+// If there are other TapTap module configurations, you can initialize them together using the following API
+// Other module configuration items
+TapTapSdkBaseOptions[] otherOptions = new TapTapSdkBaseOptions[]
+{
+achievementOptions,
+// ...
+};
+TapTapSDK.Init(coreOptions, otherOptions);
+
+```
+
+| Field                        | Nullable | Description                                             |
+|------------------------------|----------|---------------------------------------------------------|
+| clientId                     | No       | Client ID, obtained from the developer backend          |
+| clientToken                  | No       | Client Token, obtained from the developer backend       |
+| region                       | No       | Region, CN for domestic, Overseas for abroad            |
+| preferredLanguage            | Yes      | Default is TapTapLanguageType.Auto, language            |
+| enableLog                    | Yes      | Default is false, whether to enable logging, set to false for the Release version |
+| channel                      | Yes      | Channel, such as AppStore, GooglePlay                   |
+| gameVersion                  | Yes      | Game version number, if not provided, the app's version number will be read by default |
+| propertiesJson               | Yes      | Custom parameters passed during initialization, will be reported in the device_login event |
+| caid                         | Yes      | CAID, only for domestic iOS                             |
+| overrideBuiltInParameters    | Yes      | Whether to override built-in parameters, default is false |
+| enableAdvertiserIDCollection | Yes      | Whether to enable advertiser ID collection, only for iOS, default is false, enable requires adding [project configuration](#idfaios) |
+| enableAutoIAPEvent           | Yes      | Whether to enable automatic reporting of IAP events     |
+| oaidCert                     | Yes      | OAID certificate, only for Android, used to report OAID, only effective for [TapTapRegion.CN] |
+
+</>
+
+<>
+
+For detailed parameters of `TapTapSdkOptions`, see [Getting Started Guide#Quick Start](/sdk/access/quickstart/#initialization)
+
+```java
+import com.taptap.sdk.core.TapTapRegion;
+import com.taptap.sdk.core.TapTapSdk;
+import com.taptap.sdk.core.TapTapSdkOptions;
+
+/* Required configuration */
+// Client ID corresponding to the developer center
+String clientId = "";
+// Client Token corresponding to the developer center
+String clientToken = "";
+// Whether to enable log, it is recommended to enable in Debug and disable in Release, default is log disabled
+boolean enableLog = BuildConfig.DEBUG;
+
+TapTapSdkOptions tapSdkOptions = new TapTapSdkOptions(
+        clientId, // Game Client ID
+        clientToken, // Game Client Token
+        TapTapRegion.CN // Game playable region: [TapTapRegion.CN]=Domestic [TapTapRegion.GLOBAL]=Abroad
+);
+tapSdkOptions.setEnableLog(enableLog);
+// Initialize TapSDK
+TapTapSdk.init(context, tapSdkOptions);
+```
+
+</>
+
+<>
+
+For detailed parameters of `TapTapSdkOptions`, see [Getting Started Guide#Quick Start](/sdk/access/quickstart/#initialization)
+
+```kotlin
+import com.taptap.sdk.core.TapTapSdk
+import com.taptap.sdk.core.TapTapSdkOptions
+import com.taptap.sdk.core.TapTapRegion
+import com.taptap.sdk.core.TapTapLanguage
+
+TapTapSdk.init(
+   context = context,
+   sdkOptions = TapTapSdkOptions(
+         clientId = clientId,
+         clientToken = clientToken,
+         region = TapTapRegion.CN,
+         preferredLanguage = TapTapLanguage.ZH_HANS,
+         enableLog = false
+   )
+)
+```
+
+</>
+
+<>
+
+
+
+```swift
+import TapTapCoreSDK
+
+let options = TapTapSdkOptions()
+
+// TODO: Application information configuration
+
+// Data analysis-related property configuration
+options.channel = "channel name" // Sub-package channel name
+options.gameVersion = "gameVersion" // Game version (the version number in the main package info.plist will be read by default)
+options.caid = "caid" // Domestic iOS CAID
+options.overrideBuiltInParameters = true // Whether custom fields can override built-in fields, default is false
+options.enableAdvertiserIDCollection = false // Whether IDFA can be obtained, default value is false
+options.enableAutoIAPEvent = false // Whether to automatically report Apple in-app purchase success events
+// Custom property configuration
+let properties = ["custom_key": "value"]
+options.properties = properties // Custom properties, the first preset event (device_login) will carry this property
+
+// Initialize SDK
+TapTapSDK.initWith(options)
+
+```
+**Note**: When enabling IDFA, add [project configuration](#idfaios)
+
+</>
+
+</MultiLang>
+
+## Set Account
+
+### Set Account ID
+
+Call this API to record an account when the account logs in.
+
+After calling, an account login (`user_login`) event will be reported, and the `has_user` attribute of this device will be set to `true`.
+
+Before restarting the application or calling clear account ID (`clearUser`), events reported will carry this account ID.
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+```cs
+using TapSDK.Core
+
+// Custom properties
+var dict = new Dictionary<string, string>();
+dict.Add(key, value);
+dict.Add(key2, value2);
+string properties = dict.toJson();
+
+// Set User ID and account login event properties
+TapTapEvent.SetUserID(userId, properties);
+```
+
+| Field      | Nullable | Description                                                                                 |
+|------------|----------|---------------------------------------------------------------------------------------------|
+| userId     | No       | A unique string for the account, with a length of no more than 160, can only contain numbers, uppercase and lowercase letters, underscores (`_`), hyphens (`-`), plus signs (`+`), forward slashes (`/`), equal signs (`=`), periods (`.`), commas (`,`), colons (`:`). Developers need to ensure that `userId` is different for different accounts. |
+| properties | Yes      | Event properties for account login (`user_login`)                                           |
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+import org.json.JSONObject;
+
+JSONObject properties = new JSONObject();
+try {
+    // Custom properties
+    properties.put("key1", "value1");
+    properties.put("key2", "value2");
+} catch (Exception e) {
+    e.printStackTrace();
+}
+// Set User ID and account login event properties
+TapTapEvent.setUserId("userId", properties);
+```
+</>
+
+<>
+
+```kotlin
+import com.taptap.sdk.core.TapTapEvent
+
+TapTapEvent.setUserId(userId = "userId", properties = properties)
+```
+</>
+
+<>
+
+```swift
+import TapTapCoreSDK
+
+// Set User ID
+TapTapEvent.setUserID(userId)
+
+// Set User ID and account login event properties
+var properties = [String: Any]()
+properties["currentPoints"] = 10
+TapTapEvent.setUserID(userId, properties: properties)
+```
+
+| Field      | Nullable | Description                                                                                  |
+|------------|----------|----------------------------------------------------------------------------------------------|
+| userId     | No       | A unique string for the account, with a length of no more than 256, can only contain numbers, uppercase and lowercase letters, underscores (`_`), hyphens (`-`). Developers need to ensure that `userId` is different for different accounts. |
+| properties | Yes      | Event properties for account login (`user_login`)                                            |
+
+</>
+
+</MultiLang>
+
+### Clear Account ID
+
+When the user logs out, you can call `clearUser` to clear the account ID saved in the current SDK. Subsequent reported events will not carry the account ID, and calling this interface will not report any events.
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+```cs
+using TapSDK.Core
+
+TapTapEvent.ClearUser();
+```
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+
+TapTapEvent.clearUser();
+```
+
+</>
+
+<>
+
+```kotlin
+import com.taptap.sdk.core.TapTapEvent
+
+TapTapEvent.clearUser()
+```
+
+</>
+
+<>
+
+```swift
+import TapTapCoreSDK
+
+TapTapEvent.clearUser()
+```
+
+</>
+
+</MultiLang>
+
+## Report Recharge Records
+
+After a user recharges, you can call this interface to report recharge information. After calling, a `charge` event will be reported, and the parameters passed will be used as the event's properties.
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+```cs
+using TapSDK.Core
+
+TapTapEvent.LogChargeEvent(
+   orderID: orderID,
+   productName: productName,
+   amount: amount,
+   currencyType: currencyType,
+   paymentMethod: paymentMethod,
+   properties: properties
+);
+```
+
+| Field          | Nullable | Description                                                            |
+|---------------|----------|------------------------------------------------------------------------|
+| orderID       | No       | Order ID                                                               |
+| productName   | No       | Product Name                                                           |
+| amount        | No       | Recharge amount (in cents, regardless of currency, multiply by 100)    |
+| currencyType  | No       | Currency type, following ISO 4217 standard. Reference: CNY for RMB, USD for US dollars, EUR for Euros |
+| paymentMethod | No       | Payment method, such as Alipay                                        |
+| properties    | No       | Event properties for recharge (`charge`)                               |
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+import com.taptap.sdk.core.TapTapPurchasedEvent;
+import org.json.JSONObject;
+
+JSONObject properties = new JSONObject();
+try {
+    // Custom properties
+    properties.put("key1", "value1");
+    properties.put("key2", "value2");
+} catch (Exception e) {
+    e.printStackTrace();
+}
+
+TapTapPurchasedEvent purchasedEvent = new TapTapPurchasedEvent(
+        "orderId", // Order ID
+        "productName", // Product Name
+        10000.0, // Recharge amount (in cents, regardless of currency, multiply by 100)
+        "CNY", // Currency type, following ISO 4217 standard. Reference: CNY for RMB, USD for US dollars, EUR for Euros
+        "Alipay", // Payment method, such as Alipay
+        properties// Event properties for recharge (`charge`)
+);
+
+TapTapEvent.logPurchasedEvent(purchasedEvent);
+```
+
+</>
+
+<>
+
+```kotlin
+import com.taptap.sdk.core.TapTapEvent
+import com.taptap.sdk.core.TapTapPurchasedEvent
+
+TapTapEvent.logPurchasedEvent(
+   purchasedEvent = TapTapPurchasedEvent(
+         orderId = orderId,
+         productName = productName,
+         amount = amount,
+         currencyType = currencyType,
+         paymentMethod = paymentMethod,
+         properties = properties
+   )
+)
+```
+
+</>
+
+<>
+
+```swift
+import TapTapCoreSDK
+
+let orderId = "Order ID"
+// Define recharge event properties
+var properties = [String: Any]()
+properties["on_sell"] = true
+// Report recharge event
+TapTapEvent.logPurchasedEvent(orderId, productName:"Product Name", amount: 100, currencyType: "CNY", paymentMethod:"Alipay", properties: properties)
+```
+
+| Field         | Nullable | Description                                                            |
+|---------------|----------|------------------------------------------------------------------------|
+| orderId       | No       | Order ID                                                               |
+| product       | Yes      | Product Name                                                           |
+| amount        | No       | Recharge amount (in cents, regardless of currency, multiply by 100)    |
+| currencyType  | Yes      | Currency type, following ISO 4217 standard. Reference: CNY for RMB, USD for US dollars, EUR for Euros |
+| payment       | Yes      | Payment method, such as Alipay                                        |
+| properties    | Yes      | Event properties for recharge (`charge`)                               |
+
+</>
+
+</MultiLang>
+
+**Note: It is recommended to use the server-side recharge statistics interface when possible. Please refer to [Server-side Integration Document](/sdk/tapdb/sdk/server-side-integration#2.2.Report Recharge Records)**
+
+## Custom Events
+
+### Report Event
+
+After SDK initialization is complete, you can use this interface to report events.
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+```cs
+using TapSDK.Core
+
+var dict = new Dictionary<string, string>
+{
+  { key, value },
+  { key2, value2 }
+};
+string properties = dict.toJson();
+TapTapEvent.LogEvent(name, properties);
+```
+
+| Field      | Nullable | Description          |
+|------------|----------|----------------------|
+| name       | No       | Event Name           |
+| properties | No       | Event properties JSONString |
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+import org.json.JSONObject;
+
+JSONObject properties = new JSONObject();
+try {
+    // Define event properties
+    properties.put("key1", "value1");
+    properties.put("key2", "value2");
+} catch (Exception e) {
+    e.printStackTrace();
+}
+
+TapTapEvent.logEvent("eventName", properties);
+```
+
+</>
+
+<>
+
+```kotlin
+import com.taptap.sdk.core.TapTapEvent
+
+TapTapEvent.logEvent(name = title, properties = properties)
+```
+
+</>
+
+<>
+
+```swift
+import TapTapCoreSDK
+
+// Define event properties
+var properties = [String: Any]()
+properties["#weapon"] = "axe"
+properties["#level"] = 10
+// Send custom event
+TapTapEvent.logEvent(eventName, properties: properties)
+```
+
+| Field      | Nullable | Description     |
+|------------|----------|-----------------|
+| eventName  | No       | Event Name      |
+| properties | Yes      | Event properties|
+
+</>
+
+</MultiLang>
+
+**Note:**
+
+* Event names support reporting preset events and custom events, where custom events should start with `#`
+* The key value of the event properties is the name of the property, supporting NSString type
+* The value of the event properties is the name of the property, supporting NSString (maximum length `256`), NSNumber (value range is `[-9E15, 9E15]`) types
+* Event properties support reporting preset attributes and custom attributes, where custom attributes should start with `#`
+* When passing preset attributes to event properties, the default collected preset attributes of the SDK will not be overridden. This can be controlled by modifying the configuration `overrideBuiltInParameters` during initialization.
+
+### Set Universal Event Properties
+
+For properties that all events need to carry, it is recommended to use universal event properties.
+
+#### Add Static Universal Event Properties
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+```cs
+using TapSDK.Core
+
+// Add a single property
+var key = kv["key"];
+var value = kv["value"];
+TapTapEvent.AddCommonProperty(key, value);
+
+// Add multiple properties
+var key = kv["key"];
+var value = kv["value"];
+var key2 = kv["key2"];
+var value2 = kv["value2"];
+var dict = new Dictionary<string, string>
+{
+  { key, value },
+  { key2, value2 }
+};
+string properties = dict.toJson();
+TapTapEvent.AddCommon(properties);
+```
+
+| Field      | Nullable | Description          |
+|------------|----------|----------------------|
+| properties | No       | Event properties JSONString |
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+import org.json.JSONObject;
+
+JSONObject properties = new JSONObject();
+try {
+    // Universal event properties
+    properties.put("key1", "value1");
+    properties.put("key2", "value2");
+} catch (Exception e) {
+    e.printStackTrace();
+}
+
+TapTapEvent.addCommon(properties);
+```
+
+</>
+
+<>
+
+```kotlin
+import com.taptap.sdk.core.TapTapEvent
+
+TapTapEvent.addCommon(properties = properties)
+```
+
+</>
+
+<>
+
+```swift
+import TapTapCoreSDK
+
+// Define universal event properties
+var staticProperties = [String: Any]()
+// When setting the property "#current_channel" to "TapDB", subsequent event reports will add the "#current_channel" field to the event properties
+staticProperties["#current_channel"] = "TapDB"
+// Set universal event properties
+TapTapEvent.addCommon(staticProperties)
+```
+
+</>
+
+<>
+
+```cpp
+TapUEDB::RegisterStaticProperties(Properties);
+```
+
+| Field             | Nullable | Description         |
+|------------------|----------|---------------------|
+| staticProperties | No       | Static universal event property dictionary |
+
+</>
+
+</MultiLang>
+
+#### Delete Part of Static Universal Event Properties
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+```cs
+using TapSDK.Core
+
+// Delete a single property
+TapTapEvent.ClearCommonProperty(key);
+
+// Delete multiple properties
+var key1 = kv["key"];
+var key2 = kv["value"];
+var keysToClear = new string[] { key1, key2 };
+TapTapEvent.ClearCommonProperties(keysToClear);
+```
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+
+String[] keys = new String[]{"key1", "key1"};
+TapTapEvent.clearCommonProperties(keys);
+```
+
+</>
+
+<>
+
+```kotlin
+import com.taptap.sdk.core.TapTapEvent
+
+TapTapEvent.clearCommonProperties(
+   keys = arrayOf(
+         "key1",
+         "key2",
+         "key3"
+   )
+)
+```
+
+</>
+
+<>
+
+```swift
+import TapTapCoreSDK
+
+// Define the names of the universal event properties to be deleted
+let propertyNames = [propertyName1, propertyName2]
+// Remove from universal event properties
+TapTapEvent.clearCommonProperties(propertyNames)
+```
+
+| Field          | Nullable | Description          |
+|----------------|----------|----------------------|
+| propertyNames  | No       | Array of static universal property names |
+
+</>
+
+</MultiLang>
+
+#### Clear All Static Universal Properties
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+```cs
+using TapSDK.Core
+
+TapTapEvent.ClearAllCommonProperties();
+```
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+
+TapTapEvent.clearAllCommonProperties();
+```
+
+</>
+
+<>
+
+```kotlin
+import com.taptap.sdk.core.TapTapEvent
+
+TapTapEvent.clearAllCommonProperties()
+```
+
+</>
+
+<>
+
+```swift
+import TapTapCoreSDK
+
+TapTapEvent.clearAllCommonProperties()
+```
+
+</>
+
+
+</MultiLang>
+
+#### Register Dynamic Universal Event Properties
+
+For universal event properties that may change at any time, you can register dynamic universal event property callbacks. This callback will be triggered every time it is called, and the calculated properties will be added to the event properties reported this time.
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+```cs
+using TapSDK.Core;
+
+// Subsequent reported events will carry the #currentTime property, whose value is the value of the variable currentTime at the time of event reporting
+TapTapEvent.RegisterDynamicProperties(() =>
+{
+    string currentTime = DateTime.Now.ToString("o");
+    Debug.Log("RegisterDynamicProperties currentTime" + currentTime);
+    return $"{{ \"currentTime\": \"{currentTime}\" }}";
+});
+```
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+import org.json.JSONObject;
+
+TapTapEvent.TapEventDynamicProperties dynamicProperties = new TapTapEvent.TapEventDynamicProperties() {
+    @Override
+    public JSONObject getDynamicProperties() {
+        JSONObject properties = new JSONObject();
+        try {
+            // Dynamic universal event properties
+            properties.put("key1", "value1");
+            properties.put("key2", "value2");
+            properties.put("currentTimeMillis", System.currentTimeMillis());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return properties;
+    }
+};
+
+TapTapEvent.registerDynamicProperties(dynamicProperties);
+```
+
+</>
+
+<>
+
+```kotlin
+import com.taptap.sdk.core.TapTapEvent
+
+TapTapEvent.registerDynamicProperties(
+   dynamic = object : TapTapEvent.TapEventDynamicProperties {
+         override fun getDynamicProperties(): JSONObject {
+            // return JSONObject
+         }
+   }
+)
+```
+
+</>
+
+<>
+
+```swift
+import TapTapCoreSDK
+
+// Subsequent reported events will carry the #currentLevel property, whose value is the value of the variable level at the time of event reporting
+TapTapEvent.registerDynamicProperties {
+    return ["#currentLevel": level]
+}
+```
+
+</>
+
+```cpp
+TapUEDB::RegisterDynamicProperties(PropertiesBlock);
+```
+
+| Field                | Nullable | Description                      |
+|----------------------|----------|----------------------------------|
+| dynamicProperties    | No       | Dynamic universal event property calculation callback |
+
+</MultiLang>
+
+**Note:**
+
+When using the same property name in reported events or universal properties, there will be a phenomenon of property overwriting. The priority of property overwriting from high to low is: event properties, dynamic universal event properties, static universal event properties, preset properties (for example, the event properties set in `trackEvent` will overwrite the same-name properties in dynamic universal event properties, static universal event properties, and preset properties).
+
+## Modify User Properties
+
+TapDB supports two types of user entities: devices and accounts. You can use the following interfaces to operate on the properties of these two types of users.
+
+### Modify Device Properties
+
+#### Device Property Initialization
+
+For properties that need to be effective only when set for the first time, you can use this interface to perform assignment operations. The assignment operation will only be effective if the current value is empty. If the current value is not empty, the assignment operation will be ignored.
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+```cs
+using TapSDK.Core;
+
+string properties = "{\"firstActiveServer\":\"server1\"}";
+TapTapEvent.DeviceInitialize(properties);
+// At this time, the value of the "#firstActiveServer" field in the device table is "server1"
+
+string properties2 = "{\"firstActiveServer\":\"server2\"}";
+TapTapEvent.DeviceInitialize(properties2);
+// At this time, the value of the "#firstActiveServer" field in the device table is still "server1"
+```
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+import org.json.JSONObject;
+
+JSONObject properties = new JSONObject();
+try {
+    // Device property initialization properties
+    properties.put("key1", "value1");
+    properties.put("key2", "value2");
+} catch (Exception e) {
+    e.printStackTrace();
+}
+TapTapEvent.deviceInitialize(properties);
+```
+
+</>
+
+<>
+
+```kotlin
+import com.taptap.sdk.core.TapTapEvent
+
+TapTapEvent.deviceInitialize(properties = properties)
+```
+
+</>
+
+<>
+
+```swift
+import TapTapCoreSDK
+
+var properties = [String: Any]()
+properties["firstActiveServer"] = "server1"
+// After executing this method, the value of the "#firstActiveServer" field in the device table is "server1"
+TapTapEvent.deviceInitialize(properties)
+// When setting the same property multiple times, subsequent executions will not take effect, for example, the following call will not update the value of "firstActiveServer"
+// TapTapEvent.deviceInitialize(["firstActiveServer":"server2"])
+```
+
+| Field      | Nullable | Description  |
+|------------|----------|--------------|
+| properties | No       | Property dictionary |
+
+</>
+
+</MultiLang>
+
+#### Device Property Update
+
+For regular device properties, you can use this interface to perform assignment operations. The new property value will directly overwrite the old property value.
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+```cs
+
+using TapSDK.Core;
+
+string properties = "{\"currentPoints\":10}";
+TapTapEvent.DeviceUpdate(properties);
+// At this time, the value of the "currentPoints" field in the device table is 10
+
+properties = "{\"currentPoints\":42}";
+TapTapEvent.DeviceUpdate(properties);
+// At this time, the value of the "currentPoints" field in the device table is 42
+```
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+import org.json.JSONObject;
+
+JSONObject properties = new JSONObject();
+try {
+    // Device property update properties
+    properties.put("key1", "value1");
+    properties.put("key2", "value2");
+} catch (Exception e) {
+    e.printStackTrace();
+}
+TapTapEvent.deviceUpdate(properties);
+```
+
+</>
+
+<>
+
+```kotlin
+import com.taptap.sdk.core.TapTapEvent
+
+TapTapEvent.deviceUpdate(properties = properties)
+```
+
+</>
+<>
+
+```swift
+import TapTapCoreSDK
+
+// Define properties to be updated
+var properties = [String: Any]()
+properties["currentPoints"] = 10
+// After executing this method, the value of the "currentPoints" field in the device table is 10
+TapTapEvent.deviceUpdate(properties)
+
+// When executed multiple times, the property will be updated, for example, when executing the following method, the value of the "currentPoints" field in the device table is 42
+// TapTapEvent.deviceUpdate(["currentPoints":42])
+
+```
+
+| Field      | Nullable | Description  |
+|------------|----------|--------------|
+| properties | No       | Property dictionary |
+
+</>
+
+</MultiLang>
+
+#### Device Property Accumulation
+
+For numerical properties, you can use this interface to perform accumulation operations. After calling, TapDB will save the result value after accumulating the original property value.
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+```cs
+using TapSDK.Core;
+
+string properties = "{\"totalPoints\":10}";
+TapTapEvent.DeviceAdd(properties);
+// At this time, the value of the "totalPoints" field in the device table is 10
+
+properties = "{\"totalPoints\":-2}";
+TapTapEvent.DeviceAdd(properties);
+// At this time, the value of the "totalPoints" field in the device table is 8
+```
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+import org.json.JSONObject;
+
+JSONObject properties = new JSONObject();
+try {
+    // Device property accumulation properties
+    properties.put("key2", 100);
+} catch (Exception e) {
+    e.printStackTrace();
+}
+TapTapEvent.deviceAdd(properties);
+```
+
+</>
+
+<>
+
+```kotlin
+import com.taptap.sdk.core.TapTapEvent
+
+TapTapEvent.deviceAdd(properties = properties)
+```
+
+</>
+
+<>
+
+```swift
+import TapTapCoreSDK
+
+// Define properties to be accumulated
+var properties =[String: Any]()
+properties["totalPoints"] = 10
+
+// After executing this method, the value of the "totalPoints" field in the device table is 10
+TapTapEvent.deviceAdd(properties)
+
+// After executing this method, the value of the "totalPoints" field in the device table is 8
+TapTapEvent.deviceAdd(["totalPoints":-2])
+
+```
+
+| Field      | Nullable | Description                              |
+|------------|----------|------------------------------------------|
+| properties | No       | Property dictionary, value only supports numeric types |
+
+</>
+
+</MultiLang>
+
+In the above code examples, the property value is an integer. Accumulation operations also support floating-point numbers, but floating-point addition has precision issues, and developers should be aware of this.
+
+### Modify Account Properties
+
+#### Account Property Initialization
+
+The usage is the same as the device property initialization operation.
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+```cs
+using TapSDK.Core;
+
+string properties = "{\"firstActive\":\"active\"}";
+TapTapEvent.UserInitialize(properties);
+```
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+import org.json.JSONObject;
+
+JSONObject properties = new JSONObject();
+try {
+    // Account initialization properties
+    properties.put("key1", "value1");
+    properties.put("key2", 100);
+} catch (Exception e) {
+    e.printStackTrace();
+}
+TapTapEvent.userInitialize(properties);
+```
+
+</>
+
+<>
+
+```kotlin
+import com.taptap.sdk.core.TapTapEvent
+
+TapTapEvent.userInitialize(properties = properties)
+```
+
+</>
+
+<>
+
+```swift
+import TapTapCoreSDK
+
+var properties = [String: Any]()
+properties["firstActiveServer"] = "server1"
+TapTapEvent.userInitialize(properties)
+```
+
+</>
+
+</MultiLang>
+
+#### Account Property Update
+
+The usage is the same as the device property update operation.
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+```cs
+using TapSDK.Core;
+
+string properties = "{\"firstActive\":\"activeNew\"}";
+TapTapEvent.UserUpdate(properties);
+```
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+import org.json.JSONObject;
+
+JSONObject properties = new JSONObject();
+try {
+    // Account update properties
+    properties.put("key1", "value1");
+    properties.put("key2", 100);
+} catch (Exception e) {
+    e.printStackTrace();
+}
+TapTapEvent.userUpdate(properties);
+```
+
+</>
+
+<>
+
+```kotlin
+import com.taptap.sdk.core.TapTapEvent
+
+TapTapEvent.userUpdate(properties = properties)
+```
+
+</>
+
+<>
+
+```swift
+import TapTapCoreSDK
+
+TapTapEvent.userUpdate(["firstActiveServer":"server2"])
+```
+
+</>
+
+</MultiLang>
+
+#### Account Property Accumulation
+
+The usage is the same as the device property accumulation operation.
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+```cs
+using TapSDK.Core;
+
+string properties = "{\"conut\":1}";
+TapTapEvent.UserAdd(properties);
+```
+
+</>
+
+<>
+
+```java
+import com.taptap.sdk.core.TapTapEvent;
+import org.json.JSONObject;
+
+JSONObject properties = new JSONObject();
+try {
+    // Account accumulation properties
+    properties.put("key2", 100);
+} catch (Exception e) {
+    e.printStackTrace();
+}
+TapTapEvent.userAdd(properties);
+```
+
+</>
+
+<>
+
+```kotlin
+import com.taptap.sdk.core.TapTapEvent
+
+TapTapEvent.userAdd(properties = properties)
+```
+
+</>
+
+<>
+
+```swift
+import TapTapCoreSDK
+
+TapTapEvent.userAdd(["totalPoints": 10])
+```
+
+</>
+
+</MultiLang>
+
+## Collect Device Fingerprint
+
+Allow the SDK to collect device fingerprints for auxiliary data analysis and advertising attribution, which will make the statistical results more accurate.
+
+:::info
+Please initialize the SDK after permission requests, setting IDFA switches, and other operations to ensure that device fingerprints can be reported normally.
+:::
+
+### OAID (Android)
+
+> Note: SDK version 3.28.2 and above supports OAID version 1.0.5 ~ 2.4.0; 3.15.0 ~ 3.28.0 supports OAID version 1.0.5 ~ 2.1.0; 3.14.0 and below supports OAID version 1.0.5 ~ 1.0.25
+
+When the TapDB SDK integrates the OAID third-party library, it will carry this parameter (key is `device_id4`) when sending related events. The currently supported version of the third-party library is 1.0.5 ~ 2.4.0. Due to significant changes in different versions, the instructions for integration for different versions are as follows:
+
+For version 1.0.5 ~ 1.0.25, no additional configuration is required, just add the dependency of the corresponding third-party library to the application.
+
+For version 1.0.26 ~ 2.4.0, in addition to adding the corresponding third-party library, the following processing is required:
+
+#### 1. Set Certificate Information and Configuration File
+
+The certificate information is the content of the `.cert.pem` file applied by the application through the Mobile Security Alliance email <msa@caict.ac.cn>, and this file corresponds to the package name. Currently, two settings are supported:
+
+1. Copy the `cert.pem` file to the application's `assets` directory, and note that the file name should be set to `packageName.cert.pem`, where `packageName` is the current application package name.
+2. Set the content of the certificate file through the SDK's interface `setOAIDCert`.
+
+Choose one of the above two methods. When both are used at the same time, the certificate information set through the interface takes precedence.
+
+The configuration file is `supplierconfig.json`. The application needs to modify the content corresponding to the internal appid to the application ID of the application in the corresponding app store, and other parts do not need to be modified. Copy the modified file to the `assets` directory.
+
+#### 2. Load the Corresponding Library File in the Application Project
+
+The library file names corresponding to different versions of the OAID third-party library are as follows:
+
+| Version          | Library Name                |
+|------------------|-----------------------------|
+| 1.0.30 ~ 2.4.0   | msaoaidsec                  |
+| 1.0.29           | nllvm1632808251147706677    |
+| 1.0.27           | nllvm1630571663641560568    |
+| 1.0.26           | nllvm1623827671             |
+
+Add the code to load the third-party library in the `onCreate` method of the custom `Application` class in the Android project. For example, when the application integrates OAID version 1.2.1, it is as follows:
+
+```java
+System.loadLibrary("msaoaidsec");
+```
+
+#### Common Problem Handling
+
+When the OAID library is introduced in the project, but the device OAID information is still not found during reporting, check the following items:
+
+1. Is the device time normal?
+2. For version 1.0.26 and above, is the package name corresponding to the certificate consistent with the current package name?
+3. For version 1.0.26 and above, is the library file loaded, and is the library file name consistent with the version?
+4. If the application reports an error `java.lang.UnsatisfiedLinkError` on Android 12 and the application's minSdkVersion is greater than or equal to 23, it is recommended to add `android:extractNativeLibs="true"` to the application tag in the AndroidManifest.xml file.
+
+### IMEI (Android)
+
+Add the following entry to `AndroidManifest.xml`, and after the user agrees to the permission request, the SDK will automatically collect the Android IMEI.
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+```xml
+
+<uses-permission android:name="android.permission.READ_PHONE_STATE" />
+```
+
+</>
+
+<>
+
+```xml
+
+<uses-permission android:name="android.permission.READ_PHONE_STATE" />
+```
+
+</>
+
+<>
+
+```xml
+
+<uses-permission android:name="android.permission.READ_PHONE_STATE" />
+```
+
+</>
+
+<>
+
+```xml
+Not applicable for iOS platform
+```
+
+</>
+
+</MultiLang>
+
+### IDFA (iOS)
+
+Since obtaining IDFA requires a pop-up window for user confirmation on systems above `iOS14.5`, the SDK does not obtain IDFA by default. You can enable IDFA acquisition by calling the interface.
+
+<MultiLang kind="unity_android_ios_v4">
+
+<>
+
+Ensure that the permission request description text is added to `info.plist`, and the SDK will automatically pop up the permission request window during initialization.
+
+```xml
+<key>NSUserTrackingUsageDescription</key>
+<string>This identifier will be used to recommend personalized ads to you (or other descriptions)</string>
+```
+
+Set `enableAdvertiserIDCollection` in `TapTapSdkOptions` to `true` during initialization to enable the IDFA acquisition switch.
+
+</>
+
+<>wd
+
+```java
+// Not applicable for Android platform
+```
+
+</>
+
+<>
+
+```java
+// Not applicable for Android platform
+```
+
+</>
+
+<>
+
+Ensure that the permission request description text is added to `info.plist`, and the SDK will automatically pop up the permission request window during initialization.
+
+```xml
+<key>NSUserTrackingUsageDescription</key>
+<string>This identifier will be used to recommend personalized ads to you (or other descriptions)</string>
+```
+
+Set `enableAdvertiserIDCollection` in `TapTapSdkOptions` to `true` during initialization to enable the IDFA acquisition switch.
+
+</>
+
+<>
+
+iOS exclusive method
+
+```cpp
+TapUEDB::AdvertiserIDCollectionEnabled(true);
+```
+
+</>
+
+</MultiLang>
