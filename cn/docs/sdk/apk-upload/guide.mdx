@@ -159,6 +159,70 @@ Signature = Base64Encode(HMAC-SHA256(Server Secret, SignParts))
 
 </details>
 
+<details>
+  <summary>Shell 请求示例</summary>
+
+```bash
+#!/usr/bin/env bash
+
+# TapTap API 上传 APK 「获取上传请求参数」接口请求示例 Shell 脚本
+# 测试该脚本时需要开发者根据自己的应用参数替换如下四个参数：app_id、client_id、server_secret、file_name
+
+# app_id：游戏在 TapTap 商店的唯一身份标识。 例如：https://www.taptap.cn/app/187168，其中 187168 是 app_id。
+app_id="填写应用的 App ID"
+
+# TapTap 开放平台提供的 Client ID，应用的客户端标识
+client_id="填写应用的 Client ID"
+
+# TapTap 开放平台的 Server Secret，服务端对服务端的调用凭证，用来生成签名的密钥（请勿泄露）
+server_secret="填写应用的 Server Secret"
+
+# 要上传的 APK 文件名，必须以 .apk 为扩展名，且只允许包含字母、数字、下划线和中横线
+file_name="要上传的 APK 文件名，必须以 .apk 为扩展名"
+
+# 生成 8 位随机字符串作为请求中的 nonce，用于防止请求重放
+nonce=$(openssl rand -hex 4)
+
+# 当前时间的秒级 Unix 时间戳，用于生成签名
+ts=$(date +%s)
+
+# 构造待签名的请求内容
+# 请求方法
+method="GET"
+
+# 完整请求路径及其 QueryString 参数，用于访问 API 上传参数
+url_path_and_query="/apk/v1/upload-params?app_id=${app_id}&file_name=${file_name}&client_id=${client_id}"
+
+# 请求头信息，包含随机数 nonce 和时间戳 ts
+headers=$(printf "%s\n%s" "x-tap-nonce:${nonce}" "x-tap-ts:${ts}")
+
+# GET 请求不携带 Body，因此 Body 内容为空
+body=""
+
+# 输出待签名的请求内容（请求方法、路径、头信息、Body）用于调试
+printf "%s\n%s\n%s\n%s\n" "${method}" "${url_path_and_query}" "${headers}" "${body}"
+
+# 使用 HMAC-SHA256 算法对请求进行签名，并使用 Base64 编码
+# 签名生成的步骤：使用请求方法、请求路径、请求头信息和 Body，通过密钥加密生成签名
+sign=$(printf "%s\n%s\n%s\n%s\n" "${method}" "${url_path_and_query}" "${headers}" "${body}" | openssl dgst -binary -sha256 -hmac "${server_secret}" | base64)
+
+# 输出生成的签名值用于调试
+echo "生成的签名: $sign"
+
+# 构造完整的请求 URL，包括路径和查询参数
+Request_Url="https://cloud.tapapis.cn${url_path_and_query}"
+
+# 使用 curl 发起 GET 请求，传递时间戳 ts、nonce 和签名 sign 作为请求头
+curl -X GET \
+    -H "X-Tap-Ts: ${ts}" \
+    -H "X-Tap-Nonce: ${nonce}" \
+    -H "X-Tap-Sign: ${sign}" \
+    "${Request_Url}"
+```
+
+</details>
+
+
 ### 响应数据
 
 | 字段名                   | 描述                | 类型                |
