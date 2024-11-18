@@ -1,0 +1,686 @@
+---
+title: 服务端开发指南
+sidebar_position: 3
+---
+
+import MultiLang from "/src/docComponents/MultiLang";
+
+:::tip
+服务通用规则请参考 [请求规则和签算](/sdk/tap-iap/develop/server/#请求规则和签算)
+:::
+
+## 主查服务
+
+#### 请求域名:
+- `https://cloud-payment.tapapis.com`
+
+
+| ** 接口地址 **                      | **Method** | **描述**             |
+| ----------------------------- | ---------- | -------------------- |
+| `/order/v1/info?client_id={{client_id}}&order_id={{order_id}}`        | `GET`        | 查询订单信息         |
+| `/order/v1/unconfirmed?client_id={{client_id}}` | `GET`        | 查询未核销的订单列表 |
+| `/order/v1/verify?client_id={{client_id}}`      | `POST`       | 核销订单             |
+
+### 查询订单信息
+
+#### 服务 URL
+- https://{{domain}}/order/v1/info?client_id={{client_id}}&order_id={{order_id}}
+
+#### 请求方式
+- GET
+
+#### 请求签算
+- 详见 [请求规则和签算](/sdk/tap-iap/develop/server/#请求规则和签算)
+
+通过订单 ID 查询订单详细信息和支付状态
+
+```
+curl -X GET \
+  -H 'X-Tap-Sign: {{signature}}' \
+  -H 'X-Tap-Ts: {{unix timestamp}}' \
+  -H 'X-Tap-Nonce: {{random nonce}}' \
+  https://{{domain}}/order/v1/info?client_id={{client_id}}&order_id={{order_id}}
+```
+
+`data.order` 对象结构见 [订单信息](/sdk/tap-iap/develop/server/#订单信息)
+
+```
+{
+  "data": {
+    "order": {}
+  },
+  "success": true
+}
+```
+
+### 查询未核销的订单列表
+
+#### 服务 URL
+- https://{{domain}}/order/v1/unconfirmed?client_id={{client_id}}
+
+#### 请求方式
+- GET
+
+#### 请求签算
+- 详见 [请求规则和签算](/sdk/tap-iap/develop/server/#请求规则和签算)
+
+查询当前未核销的订单列表，正常情况下在用户支付成功后，应通过 verify 接口核销订单并同时保证对用户发货成功。如果因异常原因没有完成核销，可以通过此接口查询，重新 verify 并完成发货。
+
+```
+curl -X GET \
+  -H 'X-Tap-Sign: {{signature}}' \
+  -H 'X-Tap-Ts: {{unix timestamp}}' \
+  -H 'X-Tap-Nonce: {{random nonce}}' \
+  https://{{domain}}/order/v1/unconfirmed?client_id={{client_id}}
+```
+
+`data.list` 数组内对象结构见 [订单信息](/sdk/tap-iap/develop/server/#订单信息)
+
+```
+{
+  "data": {
+    "list": [
+      {}
+    ]
+  },
+  "success": true
+}
+```
+
+### 核销订单
+
+#### 服务 URL
+- https://{{domain}}/order/v1/verify?client_id={{client_id}}
+
+#### 请求方式
+- POST[application/json; charset=utf-8]
+
+#### 请求正文信息
+
+| ** 参数名称 ** | ** 必填 ** | ** 格式 ** |  ** 描述 ** |
+| --------------| --------------| --------------| --------------|
+| `order_id`    |    Y      |   string |  订单唯一 ID |
+| `purchase_token` |    Y      |   string |  用于订单核销的 token |
+
+#### 请求签算
+- 详见 [请求规则和签算](/sdk/tap-iap/develop/server/#请求规则和签算)
+
+当支付成功后，核销订单表示已经确认支付结果并已对买家完成发货，订单状态也会从 `charge.succeeded` 变为 `charge.confirmed`
+
+```
+curl -X POST \
+  -H 'X-Tap-Sign: {{signature}}' \
+  -H 'X-Tap-Ts: {{unix timestamp}}' \
+  -H 'X-Tap-Nonce: {{random nonce}}' \
+  -H 'Content-Type: application/json; charset=utf-8'
+  -d '{"order_id":"{{order_id}}","purchase_token":"{{purchase_token}}"}'
+  https://{{domain}}/order/v1/verify?client_id={{client_id}}
+```
+
+`data.order` 对象结构见 [订单信息](/sdk/tap-iap/develop/server/#订单信息)
+
+```
+{
+  "data": {
+    "order": {}
+  },
+  "success": true
+}
+```
+
+## Webhook 回调
+
+:::tip
+同样的通知可能会多次发送，商户系统必须正确处理重复通知。
+
+推荐做法是：当商户系统收到通知时，首先进行签名验证，然后检查对应业务数据的状态，如未处理，则进行处理；如已处理，则直接返回成功。
+
+在处理业务数据时建议采用数据锁进行并发控制，以避免可能出现的数据异常。
+:::
+
+### Webhook 说明
+
+目前 Webhook 支持监听「充值成功」「退款成功」「退款失败」事件。对于「充值成功」建议采取主动核销订单，根据订单状态完成发货。
+
+1. 需要依次进入 **TapTap 开发者中心 > 你的游戏 > 游戏服务 > TapPayment > 商品与订单 > API 密钥**，检查是否有已生效的密钥，没有则需要 **添加新的密钥**
+2. 需要依次进入 **TapTap 开发者中心 > 你的游戏 > 游戏服务 > TapPayment > 商品与订单 > Webhooks 设置 > 添加**，添加有效的 **充值成功** URL。
+
+### Webhook 请求
+
+#### 服务 URL
+- 由开发者提供，在 Webhooks 设置中添加
+
+#### 请求方式
+- POST[application/json; charset=utf-8]
+
+#### 请求正文信息
+
+| ** 参数名称 ** | ** 必填 ** | ** 格式 ** |  ** 描述 ** |
+| --------------| --------------| --------------| --------------|
+| `order`    |    Y      |   object |  对象结构见 [订单信息](/sdk/tap-iap/develop/server/#订单信息) |
+| `event_type` |    Y      |   string |  事件枚举见 [Webhook的事件枚举](/sdk/tap-iap/develop/server/#webhook的事件枚举) |
+
+#### 请求签算
+- 详见 [请求规则和签算](/sdk/tap-iap/develop/server/#请求规则和签算)
+
+```
+curl -X POST \
+  -H 'X-Tap-Sign: {{signature}}' \
+  -H 'X-Tap-Ts: {{unix timestamp}}' \
+  -H 'X-Tap-Nonce: {{random nonce}}' \
+  -H 'Content-Type: application/json; charset=utf-8'
+  -d '{"order":{},"event_type":"charge.succeeded"}'
+  {{your webhook url}}
+
+```
+
+### Webhook 响应
+
+```
+{
+    "code": "SUCCESS",
+    "msg": ""
+}
+```
+
+#### 字段描述
+
+| **字段** | **类型** | **是否必须** | **描述**                                 |
+| -------- | -------- | ------------ | ---------------------------------------- |
+| code     | string   | Y            | 状态码，`SUCCESS` 为接收成功，`FAIL` 或其他均认为失败 |
+| msg      | string   | N            | 当接收失败时需返回失败原因                     |
+
+## 请求规则和签算
+
+### 请求 Headers
+
+| **Header**  | **是否必须** | **描述**                                                     |
+| ----------- | ------------ | ------------------------------------------------------------ |
+| `X-Tap-Sign`  | Y            | 接口签算，详见 [签算](/sdk/tap-iap/develop/server/#签算) |
+| `X-Tap-Ts`    | Y            | 请求方当前时间 unix timestamp                                |
+| `X-Tap-Nonce` | Y            | 随机数，需要大于等于 6 字节，小于等于 60 字节，每次请求需重新生成 |
+
+### 请求 Request
+
+#### 保留参数
+
+所有 HTTP METHOD 必传，需要作为查询参数的一部分
+
+| **Key**   | **描述**        |
+| --------- | --------------- |
+| client_id | 开发平台应用 ID |
+
+```
+https://{{domain}}/order/v1/info?client_id={{client_id}}&order_id={{order_id}}
+```
+
+#### 当请求方法是 POST
+
+HTTP body 需使用 JSON 编码格式传输参数，即请求 headers 中应该携带 `Content-Type: application/json; charset=utf-8`
+
+```
+curl -X POST \
+  -H 'X-Tap-Sign: {{signature}}' \
+  -H 'X-Tap-Ts: {{unix timestamp}}' \
+  -H 'X-Tap-Nonce: {{random nonce}}' \
+  -H 'Content-Type: application/json; charset=utf-8'
+  -d '{"order_id":{{order_id}},"purchase_token":"{{purchase_token}}"}'
+  https://{{domain}}/order/v1/verify?client_id={{client_id}}
+```
+
+### 请求 Response
+
+#### 请求成功响应
+
+```
+{
+  "data": {},
+  "now": 1640966400,
+  "success": true
+}
+```
+
+#### 请求异常响应
+
+```
+{
+  "data": {
+    "code": 100004,
+    "msg": "NotFound: Unknown Error",
+    "error_description": "order not found"
+  },
+  "now": 1640966400,
+  "success": false
+}
+```
+
+#### 字段描述
+
+| **字段** | **类型** | **是否必须** | **描述**                    |
+| -------- | -------- | ------------ | --------------------------- |
+| data     | object   | Y            | 业务数据，或异常信息描述    |
+| now      | int      | Y            | 服务端时间 (unix timestamp) |
+| success  | bool     | Y            | 响应状态，`true` 为成功       |
+
+异常响应 `data` 字段描述
+
+| **字段**          | **类型** | **是否必须** | **描述**                                                     |
+| ----------------- | -------- | ------------ |------------------------------------------------------------|
+| code              | int      | Y            | [错误码](/sdk/tap-iap/develop/server/#错误码)           |
+| msg               | string   | Y            | 通用错误描述                                                     |
+| error_description | string   | Y            | 详细错误描述，辅助理解和解决发生的错误                                        |
+
+
+### 签算
+
+签算采用 HMAC-SHA256 算法
+
+#### 密钥获取
+- 可在 **TapTap 开发者中心 > 你的游戏 > 游戏服务 > TapPayment > 商品与订单 > API 密钥** 查看。
+
+#### 签算说明
+
+sign = HMAC.New(Sha256, "{{Server Secret}}").Hash(message)
+
+以下为 `message` 组成
+
+```
+{method}\n
+{url_path_and_query}\n
+{headers}\n
+{body}\n
+```
+
+**method:** 请求 HTTP 方法，如 GET、POST。
+
+**url_path_and_query:** 完整请求路径及参数，如 /service/v1/method?client_id={{client_id}}&foo={{foo}}&bar={{bar}}&foo_bar={{foo_bar}}
+
+**headers:** 所有 `X-Tap-` 前缀的 headers 组合，将 keys 按 ASCII-code order 排序后以换行符 \n 为分隔符拼接。如 {key1}:{value1}\n{key2}:{value2}\n{key3}:{value3}。**为避免不同网络框架导致 keys 的排序结果不一致，签算时需要执行 key 转小写操作 key = tolower(key)**
+
+**body:** 请求体，如果请求体为空，则最后一行仅为一个 \n
+
+以下为请求体为空时的 `message` 组成
+
+```
+{method}\n
+{url_path_and_query}\n
+{headers}\n
+\n
+```
+
+:::tip
+请求体 body，无需处理请求参数的顺序。建议用 String 接收 Webhook 请求的 RequestBody，验证请求签算后，再完成数据的反序列化
+:::
+
+
+<MultiLang kind="payment">
+
+<>
+
+```java
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpClient;
+import java.net.http.HttpResponse;
+import java.util.*;
+import java.util.stream.Collectors;
+public class SignatureExample {
+
+    public static String signRequest(String method, URI uri, String body, Map<String, List<String>> headers, String secret) throws Exception {
+        String urlPathAndQueryPart = uri.getRawPath() + (uri.getRawQuery() != null ? "?" + uri.getRawQuery() : "");
+        String headersPart = getHeadersPart(headers);
+
+        // 包含请求体的签名字符串部分
+        String signParts = method.toUpperCase() + "\n" + urlPathAndQueryPart + "\n" + headersPart + "\n" + body + "\n";
+
+        System.out.println("Sign Parts:\n" + signParts);
+
+        Mac sha256_HMAC = Mac.getInstance("HmacSHA256");
+        SecretKeySpec secretKey = new SecretKeySpec(secret.getBytes(), "HmacSHA256");
+        sha256_HMAC.init(secretKey);
+
+        byte[] hash = sha256_HMAC.doFinal(signParts.getBytes());
+        return Base64.getEncoder().encodeToString(hash);
+    }
+
+    private static String getHeadersPart(Map<String, List<String>> headers) throws Exception {
+        TreeMap<String, String> sortedHeaders = new TreeMap<>();
+        headers.forEach((key, value) -> {
+            String lowerKey = key.toLowerCase();
+            if (lowerKey.equals("x-tap-sign")) {
+                return;
+            }
+            if (lowerKey.startsWith("x-tap-")) {
+                if (value.size() > 1) {
+                    throw new RuntimeException("Invalid header, " + lowerKey + " has multiple values");
+                }
+                sortedHeaders.put(lowerKey, value.get(0));
+            }
+        });
+
+        return sortedHeaders.entrySet().stream()
+            .map(entry -> entry.getKey() + ":" + entry.getValue())
+            .collect(Collectors.joining("\n"));
+    }
+
+    public static void main(String[] args) {
+        try {
+            String secret = "VRy8aS2xbwImQUwtxc6vs4v51DaJWdlO";
+            String body = "{\"event_type\":\"charge.succeeded\",\"order\":{\"order_id\":\"1790288650833465345\",\"purchase_token\":\"rT2Et9p0cfzq4fwjrTsGSacq0jQExFDqf5gTy1alp+Y=\",\"client_id\":\"o6nD4iNavjQj75zPQk\",\"open_id\":\"4+Axcl2RFgXbt6MZwdh++w==\",\"user_region\":\"US\",\"goods_open_id\":\"com.goods.open_id\",\"goods_name\":\"TestGoodsName\",\"status\":\"charge.succeeded\",\"amount\":\"19000000000\",\"currency\":\"USD\",\"create_time\":\"1716168000\",\"pay_time\":\"1716168000\",\"extra\":\"1111111111111111111\"}}";
+            URI uri = new URI("https://example.com/my-service/v1/my-method");
+
+            HttpRequest.Builder requestBuilder = HttpRequest.newBuilder()
+                .uri(uri)
+                .header("Content-Type", "Content-Type: application/json; charset=utf-8")
+                .header("X-Tap-Ts", "1716168000")
+                .header("X-Tap-Nonce", "V7v7zJ");
+
+            // Considering body to be added for a POST request
+            HttpRequest request = requestBuilder
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build();
+
+            String method = "POST";  // Since we are using the POST method in this example
+            String signature = signRequest(method, uri, body, request.headers().map(), secret);
+            System.out.println("Signature: " + signature);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+</>
+<>
+
+```go
+package main
+
+import (
+    "bytes"
+    "context"
+    "crypto/hmac"
+    "crypto/sha256"
+    "encoding/base64"
+    "fmt"
+    "io"
+    "net/http"
+    "sort"
+    "strings"
+)
+
+func main() {
+    //nolint:gosec
+    secret := "VRy8aS2xbwImQUwtxc6vs4v51DaJWdlO"
+    body := []byte(`{"event_type":"charge.succeeded","order":{"order_id":"1790288650833465345","purchase_token":"rT2Et9p0cfzq4fwjrTsGSacq0jQExFDqf5gTy1alp+Y=","client_id":"o6nD4iNavjQj75zPQk","open_id":"4+Axcl2RFgXbt6MZwdh++w==","user_region":"US","goods_open_id":"com.goods.open_id","goods_name":"TestGoodsName","status":"charge.succeeded","amount":"19000000000","currency":"USD","create_time":"1716168000","pay_time":"1716168000","extra":"1111111111111111111"}}`)
+    url := "https://example.com/my-service/v1/my-method"
+    method := "POST"
+    header := http.Header{
+        "Content-Type":  {"Content-Type: application/json; charset=utf-8"},
+        "X-Tap-Ts":      {"1716168000"},
+        "X-Tap-Nonce":   {"V7v7zJ"},
+    }
+    ctx := context.Background()
+    req, _ := http.NewRequestWithContext(ctx, method, url, bytes.NewBuffer(body))
+    req.Header = header
+    sign, err := Sign(req, secret)
+    if err != nil {
+        panic(err)
+    }
+    req.Header.Set("X-Tap-Sign", sign)
+    fmt.Println(sign)
+}
+
+// Sign signs the request.
+func Sign(req *http.Request, secret string) (string, error) {
+    methodPart := req.Method
+    urlPathAndQueryPart := req.URL.RequestURI()
+    headersPart, err := getHeadersPart(req.Header)
+    if err != nil {
+        return "", err
+    }
+    bodyPart, err := io.ReadAll(req.Body)
+    if err != nil {
+        return "", err
+    }
+    signParts := methodPart + "\n" + urlPathAndQueryPart + "\n" + headersPart + "\n" + string(bodyPart) + "\n"
+    fmt.Println(signParts)
+    h := hmac.New(sha256.New, []byte(secret))
+    h.Write([]byte(signParts))
+    rawSign := h.Sum(nil)
+    sign := base64.StdEncoding.EncodeToString(rawSign)
+    return sign, nil
+}
+
+// getHeadersPart returns the headers part of the request.
+func getHeadersPart(header http.Header) (string, error) {
+    var headerKeys []string
+    for k, v := range header {
+        k = strings.ToLower(k)
+        if !strings.HasPrefix(k, "x-tap-") {
+            continue
+        }
+        if k == "x-tap-sign" {
+            continue
+        }
+        if len(v) > 1 {
+            return "", fmt.Errorf("invalid header, %q has multiple values", k)
+        }
+        headerKeys = append(headerKeys, k)
+    }
+    sort.Strings(headerKeys)
+    headers := make([]string, 0, len(headerKeys))
+    for _, k := range headerKeys {
+        headers = append(headers, fmt.Sprintf("%s:%s", k, header.Get(k)))
+    }
+    return strings.Join(headers, "\n"), nil
+}
+```
+
+</>
+
+<>
+
+```python
+import base64
+import hashlib
+import hmac
+from typing import Dict, List
+from urllib.parse import urlparse
+
+def sign_request(method: str, url: str, body: str, headers: Dict[str, List[str]], secret: str) -> str:
+    # 提取URL路径和查询字符串部分
+    parsed_url = urlparse(url)
+    url_path_and_query = parsed_url.path + ('?' + parsed_url.query if parsed_url.query else '')
+
+    # 获取符合条件的头部信息并排序
+    headers_part = get_headers_part(headers)
+
+    # 拼接签名字符串
+    sign_parts = f"{method}\n{url_path_and_query}\n{headers_part}\n{body}\n"
+
+    print("Sign Parts:\n", sign_parts)
+
+    # 使用HMAC SHA256算法生成签名
+    raw_sign = hmac.new(secret.encode(), sign_parts.encode(), hashlib.sha256).digest()
+
+    # 对签名进行Base64编码
+    sign = base64.b64encode(raw_sign).decode()
+
+    return sign
+
+def get_headers_part(headers: Dict[str, List[str]]) -> str:
+    # 筛选和排序头部
+    headers = {k.lower(): v for k, v in headers.items() if k.lower().startswith('x-tap-') and k.lower() != "x-tap-sign"}
+    header_keys = sorted(headers.keys())
+
+    # 组装头部字符串
+    headers_str = '\n'.join(f"{k}:{headers[k][0]}" for k in header_keys if len(headers[k]) == 1)
+
+    if any(len(headers[k]) > 1 for k in header_keys):
+        raise ValueError("Invalid header: has multiple values")
+
+    return headers_str
+
+# 示例使用
+secret = "VRy8aS2xbwImQUwtxc6vs4v51DaJWdlO"
+url = "https://example.com/my-service/v1/my-method"
+method = "POST"
+body = '{"event_type":"charge.succeeded","order":{"order_id":"1790288650833465345",' \
+       '"purchase_token":"rT2Et9p0cfzq4fwjrTsGSacq0jQExFDqf5gTy1alp+Y=","client_id":"o6nD4iNavjQj75zPQk",' \
+       '"open_id":"4+Axcl2RFgXbt6MZwdh++w==","user_region":"US","goods_open_id":"com.goods.open_id",' \
+       '"goods_name":"TestGoodsName","status":"charge.succeeded","amount":"19000000000","currency":"USD",' \
+       '"create_time":"1716168000","pay_time":"1716168000","extra":"1111111111111111111"}}'
+headers = {
+    "Content-Type": ["Content-Type: application/json; charset=utf-8"],
+    "X-Tap-Ts": ["1716168000"],
+    "X-Tap-Nonce": ["V7v7zJ"],
+}
+
+try:
+    sign = sign_request(method, url, body, headers, secret)
+    print("Signature: ", sign)
+except Exception as e:
+    print("Error: ", str(e))
+
+```
+
+</>
+
+<>
+
+```php
+<?php
+function signRequest($method, $url, $body, $headers, $secret) {
+    // 提取URL路径和查询字符串部分
+    $urlParts = parse_url($url);
+    $urlPathAndQuery = $urlParts['path'] . (isset($urlParts['query']) ? '?' . $urlParts['query'] : '');
+    // 获取符合条件的头部信息并排序
+    $headersPart = getHeadersPart($headers);
+    // 拼接签名字符串
+    $signParts = $method . "\n" . $urlPathAndQuery . "\n" . $headersPart . "\n" . $body . "\n";
+    echo "Sign Parts:\n" . $signParts . "\n";
+    // 使用HMAC SHA256算法生成签名
+    $rawSign = hash_hmac('sha256', $signParts, $secret, true);
+    // 返回 Base64 编码
+    return base64_encode($rawSign);
+}
+
+function getHeadersPart($headers) {
+    // Headers processing
+    $signHeaders = [];
+    foreach ($headers as $key => $value) {
+        $key = strtolower($key);
+        if (count($value) > 1) {
+            throw new Exception("Multiple values for header: " . $key);
+        }
+        if ($key === "x-tap-sign") {
+            continue;
+        }
+        if (strpos($key, 'x-tap-') === 0) {
+            $signHeaders[$key] = $value; // Assuming each header has a single value
+        }
+    }
+    $headerKeys = [];
+    foreach ($signHeaders as $key => $value) {
+        if (!(strpos($key, 'x-tap-') === 0)) {
+            continue;
+        }
+        $headerKeys[] = $key;
+    }
+    sort($headerKeys);
+    $headerParts = [];
+    foreach ($headerKeys as $key) {
+        $headerParts[] = $key . ':' . $signHeaders[$key][0];
+    }
+    return implode("\n", $headerParts);
+}
+
+// 示例使用
+$secret = "VRy8aS2xbwImQUwtxc6vs4v51DaJWdlO";
+$url = "https://example.com/my-service/v1/my-method";
+$method = "POST";
+$body = '{"event_type":"charge.succeeded","order":{"order_id":"1790288650833465345","purchase_token":"rT2Et9p0cfzq4fwjrTsGSacq0jQExFDqf5gTy1alp+Y=","client_id":"o6nD4iNavjQj75zPQk","open_id":"4+Axcl2RFgXbt6MZwdh++w==","user_region":"US","goods_open_id":"com.goods.open_id","goods_name":"TestGoodsName","status":"charge.succeeded","amount":"19000000000","currency":"USD","create_time":"1716168000","pay_time":"1716168000","extra":"1111111111111111111"}}';
+$headers = [
+    "Content-Type" => ["Content-Type: application/json; charset=utf-8"],
+    "X-Tap-Ts" => ["1716168000"],
+    "X-Tap-Nonce" => ["V7v7zJ"]
+];
+try {
+    $sign = signRequest($method, $url, $body, $headers, $secret);
+    echo "Signature: " . $sign . "\n";
+} catch (Exception $e) {
+    echo "Error: " . $e->getMessage() . "\n";
+}
+
+```
+
+</>
+
+</MultiLang>
+
+上述示例签算结果
+
+```
+# 参与签算部分
+POST\n
+/my-service/v1/my-method\n
+x-tap-nonce:V7v7zJ\n
+x-tap-ts:1716168000\n
+{"event_type":"charge.succeeded","order":{"order_id":"1790288650833465345","purchase_token":"rT2Et9p0cfzq4fwjrTsGSacq0jQExFDqf5gTy1alp+Y=","client_id":"o6nD4iNavjQj75zPQk","open_id":"4+Axcl2RFgXbt6MZwdh++w==","user_region":"US","goods_open_id":"com.goods.open_id","goods_name":"TestGoodsName","status":"charge.succeeded","amount":"19000000000","currency":"USD","create_time":"1716168000","pay_time":"1716168000","extra":"1111111111111111111"}}\n
+
+# 签算结果 (X-Tap-Sign)
+PyKQzlI65e0I9noVxcQc7FPU3nEyEFHKfRde65F6vhI=
+```
+
+## 通用对象结构描述
+
+### 订单信息
+
+| **参数**       | **类型** | **是否必须** | **描述**                                                     |
+| -------------- | -------- | ------------ | ------------------------------------------------------------ |
+| order_id       | string   | Y            | 订单唯一 ID                                                  |
+| purchase_token | string   | Y            | 用于订单核销的 token                                         |
+| client_id      | string   | Y            | 应用的 Client ID                                             |
+| open_id        | string   | Y            | 用户的开放平台 ID                                            |
+| user_region    | string   | Y            | [用户地区]                                                    |
+| goods_open_id  | string   | Y            | 商品唯一 ID                                                  |
+| goods_name     | string   | Y            | 商品名称                                                     |
+| status         | string   | Y            | [订单状态](/sdk/tap-iap/develop/server/#订单状态)          |
+| amount         | string   | Y            | 金额（本币金额 x 1,000,000）                                 |
+| currency       | string   | Y            | [币种]                                                       |
+| create_time    | string   | Y            | 创建时间                                                     |
+| pay_time       | string   | Y            | 支付时间                                                     |
+| extra          | string   | Y            | 商户自定义数据，如角色信息等，长度不超过 255 UTF-8 字符            |
+
+#### 订单状态
+
+| **订单状态**     | **描述**     |
+| ---------------- | ------------ |
+| `charge.pending`   | 待支付       |
+| `charge.succeeded` | 支付成功     |
+| `charge.confirmed` | 已核销       |
+| `charge.overdue`   | 支付超时关闭 |
+| `refund.pending`   | 退款中       |
+| `refund.succeeded` | 退款成功     |
+| `refund.failed`    | 退款失败     |
+| `refund.rejected`  | 退款被拒绝   |
+
+### Webhook的事件枚举
+
+| **event_type**   | **描述** |
+| ---------------- | -------- |
+| `charge.succeeded` | 充值成功 |
+| `refund.succeeded` | 退款成功 |
+| `refund.failed`    | 退款失败 |
+
+## 错误码
+
+| **code** | **描述**     |
+| -------- | ------------ |
+| `-1`       | 非法请求     |
+| `100000`   | 支付服务异常 |
+| `100004`   | 订单不存在   |
+| `100018`   | 订单验证错误 |
