@@ -38,27 +38,29 @@ Open the `project/app/build.gradle` file of your project and add the following g
 
 ### **SDK Initialization**
 
-After adding the TapTapIAP dependency, you need to initialize the `TapTapIAP` instance. `TapTapIAP` communicates between the SDK and the rest of your application, providing methods for many common operations.
-
-First, initialize the SDK during app launch by setting `TapTapSdkOptions` and completing SDK initialization with `TapTapSdk.init`.
-
-You need to set the `ClientID` and `ClientToken` obtained from the developer backend for permission validation to use `TapTapIAP`.
+The TapTapIAP module relies on the initialization of the TapTapSDK. For details, refer to [TapSDK Integration](/sdk/access/quickstart/#Initialization).
 
 ```java
-TapTapSdkOptions sdkOptions = new TapTapSdkOptions(
-    "Your App's ClientID",     // clientId obtained from the developer platform
-    "Your App's ClientToken",  // clientToken obtained from the developer platform
-    TapTapRegion.GLOBAL,       // Region
-    "",                        // Sub-package channel name
-    "",                        // Game version, null will take AppVersion
-    false,                     // Automatically report GooglePlay purchase success event, effective only for [TapTapRegion.GLOBAL]
-    false,                     // Custom fields can overwrite built-in fields
-    null,                      // Custom attributes, included with the first preset event (device_login)
-    null,                      // OAID certificate, used for reporting OAID, effective only for [TapTapRegion.CN]
-    false                      // Enable log, recommended to enable in Debug and disable in Release
-);
+import com.taptap.sdk.core.TapTapRegion;
+import com.taptap.sdk.core.TapTapSdk;
+import com.taptap.sdk.core.TapTapSdkOptions;
 
-TapTapSdk.init(context, sdkOptions);
+String clientId = "";
+
+String clientToken = "";
+// Enable the log. It's recommended to turn it on for Debug and off for Release, with it being off by default.
+boolean enableLog = BuildConfig.DEBUG;
+
+TapTapSdkOptions tapSdkOptions = new TapTapSdkOptions(
+        clientId, // clientId obtained from the developer platform
+        clientToken, // clientToken obtained from the developer platform
+        TapTapRegion.GLOBAL // Region: TapTapRegion.CN, TapTapRegion.GLOBAL
+);
+tapSdkOptions.setEnableLog(enableLog);
+
+TapTapSdk.init(context, tapSdkOptions);
+
+
 ```
 
 To create `TapTapIAP`, use `newBuilder()`, which will validate the permissions to use `TapTapIAP` based on the `ClientID` and `ClientToken` set in SDK.init.
@@ -158,7 +160,6 @@ After a user completes the purchase of any product, confirm that the correspondi
 Purchase purchase = ...;
 FinishPurchaseParams params = FinishPurchaseParams.newBuilder()
     .setId(purchase.getOrderId()) // Required
-    .setOrderToken(purchase.getOrderToken()) // Required
     .setPurchaseToken(purchase.getPurchaseToken()) // Required
     .build();
 tapTapIAP.finishPurchaseAsync(params, new FinishPurchaseResponseListener() {
